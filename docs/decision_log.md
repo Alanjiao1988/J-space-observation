@@ -243,3 +243,27 @@ Next recommended step:
 - Run the GHCR build workflow manually in GitHub Actions to produce `ghcr.io/alanjiao1988/j-space-observation:<git-sha>`.
 - Separately, confirm Azure Container Apps T4 GPU quota for `southeastasia`.
 - Do not create Azure resources until both the image and quota are ready.
+
+## 2026-07-08 — GHCR primary path; ACR now Registered again
+
+Status:
+
+- Microsoft.ContainerRegistry provider: `Registered` (state flipped from `Registering` to `Registered` on read-only re-check).
+- Microsoft.App provider: `Registered`.
+- GHCR workflow template (`infra/ci/build-ghcr.yml`) validated: workflow_dispatch, builds Dockerfile, pushes to GHCR, tags git SHA + optional latest, no model download/cache, only `contents: read` + `packages: write`.
+- GHCR Azure job script (`infra/azure/scripts/05_run_job_ghcr.sh`) validated: parameterized, no hardcoded token, `GHCR_PAT` via env/Azure secret, GHCR image path, `JOB_COMMAND` override supported.
+- Local checks: `41 passed, 2 warnings`; Phase 1 dry-run 54 cells.
+- Azure resources created: none.
+
+Decision:
+
+- Keep GHCR as the primary container registry path per Alan's instruction, even though ACR is now `Registered`. ACR scripts remain available as a secondary option.
+- Manual installation of `.github/workflows/build-ghcr.yml` via the GitHub web UI remains required (CLI credential lacks `workflow` scope).
+- The next Azure gate is Container Apps T4 GPU quota confirmation in `southeastasia`; documented portal + support-request steps in the runbook.
+- Do not create Azure resources and do not fall back to local inference.
+
+Next recommended step:
+
+- Alan installs the workflow via GitHub web UI and runs it to build the GHCR image.
+- Confirm T4 GPU quota for `southeastasia` (portal or support request).
+- Only then deploy the Container Apps Job via `05_run_job_ghcr.sh`.

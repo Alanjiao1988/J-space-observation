@@ -6,19 +6,25 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 
 ## Current Phase
 
-**Phase: Azure-first execution; ACR blocked, adopting GHCR fallback (local PC orchestration-only)**
+**Phase: Azure-first execution; GHCR primary registry path; T4 quota is the next gate (local PC orchestration-only)**
 
-## GHCR Fallback Decision (2026-07-08 21:09 +08:00)
+## GHCR + T4 Quota Path Status (2026-07-08 21:28 +08:00)
 
-- `Microsoft.ContainerRegistry` stayed `Registering` for several hours, including after an explicit `az provider register --namespace Microsoft.ContainerRegistry --wait` (exit code 0 but state unchanged).
-- ACR path is treated as blocked. Adopting GHCR (GitHub Container Registry) as the fallback image registry.
-- Prepared GHCR fallback assets (no Azure resources created):
-  - `infra/ci/build-ghcr.yml`: GitHub Actions build/push definition for `ghcr.io/alanjiao1988/j-space-observation:<git-sha>` (install into `.github/workflows/` via web UI or a `workflow`-scoped token; the CLI credential lacks `workflow` scope).
-  - `infra/azure/scripts/05_run_job_ghcr.sh`: parameterized Azure Container Apps Job using a GHCR image; GHCR PAT via env/Azure secret only.
-  - `docs/azure_runbook.md`: "GHCR fallback when Microsoft.ContainerRegistry is blocked" section.
-  - `.dockerignore`: prevents secrets, results, and model caches from entering the image.
-- Still required before any GPU job: `Microsoft.App` registered (satisfied), and Azure Container Apps T4 GPU quota confirmed for `southeastasia`.
-- Do not fall back to local model inference if T4 quota is unavailable.
+- Read-only provider re-check: `Microsoft.ContainerRegistry` = `Registered` (finally flipped from `Registering`), `Microsoft.App` = `Registered`.
+- ACR is technically unblocked again, but the primary container path remains **GHCR** per current direction; ACR scripts remain available as a secondary option.
+- GHCR workflow template `infra/ci/build-ghcr.yml`: **valid** (workflow_dispatch, builds Dockerfile, pushes to GHCR, tags git SHA + optional latest, no model download/cache, `contents: read` + `packages: write`).
+- GHCR Azure job script `infra/azure/scripts/05_run_job_ghcr.sh`: **valid** (parameterized, no hardcoded token, `GHCR_PAT` via env/Azure secret, GHCR image path, `JOB_COMMAND` override for Phase 0.5 / Phase 1 dry-run / small pilot).
+- Manual workflow install: **still required** — the CLI credential lacks the GitHub `workflow` OAuth scope, so `.github/workflows/build-ghcr.yml` must be created via the GitHub web UI.
+- Local checks: `41 passed, 2 warnings`; Phase 1 dry-run `54` cells.
+- Azure resources created: **none**.
+
+### Next step for Alan (GitHub UI)
+
+1. GitHub web UI -> **Add file -> Create new file** -> path `.github/workflows/build-ghcr.yml`.
+2. Paste the contents of `infra/ci/build-ghcr.yml`; commit directly to `main`.
+3. **Actions** tab -> **Build and push image to GHCR** -> **Run workflow**.
+4. Expected image: `ghcr.io/alanjiao1988/j-space-observation:<git-sha>`.
+5. Separately, confirm Azure Container Apps **T4 GPU quota for southeastasia** before any GPU job (portal, or support request per `docs/azure_runbook.md`).
 
 ## Azure-first Policy (2026-07-08)
 

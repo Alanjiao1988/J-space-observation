@@ -285,19 +285,44 @@ Azure:
 
 - Azure resources created: none.
 
-## 2026-07-08 — Local validation sequence
+## 2026-07-08 — GHCR + T4 quota path focus; ACR now Registered
 
-Commands executed:
+Commands executed (read-only + local):
 
-- `git status -sb`
-- `git --no-pager log -3 --oneline`
+- `az provider show -n Microsoft.ContainerRegistry --query registrationState -o tsv`
+- `az provider show -n Microsoft.App --query registrationState -o tsv`
 - `python -m pytest tests/ -v`
-- `python experiments\phase0_5_jlens_spike.py --skip-fit`
 - `python experiments\phase1_depth_gradient.py --dry-run`
 
 Results:
 
-- Git state: `main` synced with `origin/main` before validation.
+- Microsoft.ContainerRegistry registration: `Registered` (state has now flipped from `Registering` to `Registered`).
+- Microsoft.App registration: `Registered`.
+- GHCR workflow template `infra/ci/build-ghcr.yml` reviewed and valid:
+  - uses `workflow_dispatch`;
+  - builds the repo `Dockerfile`;
+  - pushes to GHCR;
+  - tags image with git SHA and optionally `latest`;
+  - does not download models or bake HF cache;
+  - requires only `contents: read` + `packages: write` with `GITHUB_TOKEN`.
+- GHCR Azure job script `infra/azure/scripts/05_run_job_ghcr.sh` reviewed and valid:
+  - parameterized; no hardcoded token;
+  - reads `GHCR_PAT` from environment and passes it as a Container Apps secret;
+  - uses a GHCR image path;
+  - supports command override via `JOB_COMMAND` (Phase 0.5 skip-fit, Phase 1 dry-run, small Phase 1 pilot);
+  - creates resources only when explicitly invoked.
+- Test result: `41 passed, 2 warnings`.
+- Phase 1 dry-run: completed, total cells `54`.
+- T4 GPU quota status: not yet confirmed; documented portal + support-request steps in `docs/azure_runbook.md`.
+- Azure resources created: none.
+
+Decision:
+
+- ACR is now `Registered`, so the ACR path is technically unblocked again. Per Alan's instruction, the primary container path remains GHCR for now; ACR scripts remain available as an alternative.
+- Manual installation of `.github/workflows/build-ghcr.yml` via the GitHub web UI is still required because the CLI credential lacks `workflow` scope.
+- Next Azure gate: confirm Container Apps T4 GPU quota in `southeastasia`.
+
+## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`
   - `30f770c Record scaffold sync verification`

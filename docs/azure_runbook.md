@@ -171,6 +171,28 @@ Once installed, trigger the build workflow manually:
 3. The image does not include secrets, Hugging Face model cache, or experiment outputs.
 4. Confirm the pushed image at: `https://github.com/alanjiao1988/j-space-observation/pkgs/container/j-space-observation`.
 
+### Manual workflow installation (step-by-step for Alan)
+
+The CLI Git credential lacks the GitHub `workflow` OAuth scope, so `.github/workflows/*` cannot be pushed from this machine. Install the workflow through the GitHub web UI:
+
+1. Open the GitHub web UI for `Alanjiao1988/J-space-observation`.
+2. Click **Add file -> Create new file**.
+3. Set the file path to exactly:
+   ```text
+   .github/workflows/build-ghcr.yml
+   ```
+4. Open `infra/ci/build-ghcr.yml` in the repo, copy its full contents, and paste them into the new file.
+5. Choose **Commit directly to the `main` branch** and commit.
+6. Go to the **Actions** tab.
+7. Select the **Build and push image to GHCR** workflow.
+8. Click **Run workflow** (leave `push_latest` = `true`).
+9. After it succeeds, the expected image reference is:
+   ```text
+   ghcr.io/alanjiao1988/j-space-observation:<git-sha>
+   ```
+10. Confirm the package at:
+    `https://github.com/alanjiao1988/j-space-observation/pkgs/container/j-space-observation`.
+
 ### GHCR deploy notes for Azure Container Apps Job
 
 Use `infra/azure/scripts/05_run_job_ghcr.sh`. It is parameterized and must not hardcode secrets.
@@ -189,6 +211,49 @@ JOB_COMMAND=<container command to run>
 ```
 
 Do not run the GHCR deployment script until `Microsoft.App` is registered and T4 GPU quota is confirmed.
+
+The container command is overridable via `JOB_COMMAND`. Supported examples:
+
+```text
+# Phase 0.5 availability/model-loading check
+JOB_COMMAND="python experiments/phase0_5_jlens_spike.py --skip-fit"
+
+# Phase 1 dry run
+JOB_COMMAND="python experiments/phase1_depth_gradient.py --dry-run"
+
+# Small Phase 1 pilot: single model, arithmetic only, depths 1/2/3, all three conditions
+JOB_COMMAND="python experiments/phase1_depth_gradient.py --models Qwen/Qwen2.5-Math-1.5B --task-families arithmetic --depths 1,2,3 --conditions strict_answer_only,visible_cot,r1_style_thinking --items-per-cell 1 --max-new-tokens 64"
+```
+
+## Confirm Azure Container Apps T4 quota in southeastasia
+
+This is the next Azure gate before any GPU job. Do not create GPU jobs until quota is confirmed.
+
+Portal check:
+
+1. Azure Portal -> Subscriptions -> select `MCAPS-Hybrid-REQ-125620-2025-alanjiao`.
+2. Open **Usage + quotas**.
+3. Filter by region `southeastasia` and provider `Microsoft.App` (Container Apps).
+4. Look for the managed environment Consumption T4 GPU quota.
+5. Confirm the available limit is at least 1 GPU for the workload profile `Consumption-GPU-NC8as-T4`.
+
+CLI discovery helper (read-only):
+
+```powershell
+az containerapp env workload-profile list-supported -l southeastasia -o table
+```
+
+If T4 quota is unavailable or zero, open an Azure support request:
+
+- Issue type: **Service and subscription limits (quotas)**
+- Quota type: **Container Apps**
+- Quota detail: **Managed Environment Consumption T4 GPUs**
+- Region: **southeastasia**
+
+Rules:
+
+- Do not create GPU jobs until T4 quota is confirmed.
+- Do not fall back to local inference if quota is missing.
 
 ## Required run logging
 
