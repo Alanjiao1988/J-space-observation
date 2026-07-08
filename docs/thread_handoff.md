@@ -2,7 +2,7 @@
 
 Date: 2026-07-08
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified commit before this handoff: `0ca7985854406c82bcb6684b4f4a347bebda3211`
+Latest verified commit before this handoff: `15a972c23e65932a8508ee36ad534e82591303e0`
 Latest status message for that commit: `Configure GHCR auth for Azure Container Apps jobs`
 
 > Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
@@ -10,6 +10,8 @@ Latest status message for that commit: `Configure GHCR auth for Azure Container 
 > Update (2026-07-08 22:34 +08:00): Retried GHCR smoke job using `gh auth token` as the Azure registry secret because `GHCR_PAT` was not set. Token value was not printed/logged. Job creation still failed with `InvalidParameterValueInContainerTemplate` and `DENIED: requested access to the resource is denied`. This confirms the available `gh auth token` is insufficient for Azure to pull the private GHCR package. `infra/azure/scripts/05_run_job_ghcr.sh` was updated to use ARM REST job creation, place `workloadProfileName` at `properties.workloadProfileName`, use actual `*-sea` resource names, avoid failed T4 min/max and `--enable-dedicated-gpu` args, and fallback to `gh auth token` only if `GHCR_PAT` is absent. No jobs were created successfully; Phase 0.5 / Phase 1 dry-run / small pilot were not attempted.
 >
 > Update (2026-07-08 22:43 +08:00): `GHCR_PAT` remains unset. Current `gh auth token` was tested against the GHCR package versions API and returned `403` / `read:packages` required, so no Azure job retry was attempted with the known-insufficient token. `infra/azure/scripts/05_run_job_ghcr.sh` now also supports the env aliases `JOB_NAME`, `CONTAINERAPPS_ENVIRONMENT`, and `WORKLOAD_PROFILE_NAME`, and avoids passing token values as helper Python command-line arguments. Next step is still to make the GHCR package public or provide a classic PAT with `read:packages` via secure env/Azure secret path. Do not paste tokens into chat.
+>
+> Update (2026-07-08 22:51 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but Copilot's fresh tool processes could not see them in Process/User/Machine environment scopes. No package-read preflight or Azure job retry was attempted. To continue, set the variables in Windows User environment (or another secure path readable by the agent), e.g. `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`. Do not paste tokens into chat.
 
 This document is intended to let a new ChatGPT / Copilot thread continue the project without reading the full previous conversation.
 
@@ -238,6 +240,16 @@ job execution quota: not yet validated because GHCR pull authentication blocked 
 ```
 
 Current main gate: GHCR pull authentication. Do not run Phase 0.5, Phase 1 dry-run, or pilot until the smoke job can pull/start the image.
+
+If Alan says the PAT is set but Copilot cannot see it, check all scopes:
+
+```powershell
+[Environment]::GetEnvironmentVariable("GHCR_PAT", "Process")
+[Environment]::GetEnvironmentVariable("GHCR_PAT", "User")
+[Environment]::GetEnvironmentVariable("GHCR_PAT", "Machine")
+```
+
+Do not print the token value; only report whether each scope is set.
 
 ---
 

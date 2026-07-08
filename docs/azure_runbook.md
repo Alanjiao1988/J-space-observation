@@ -377,6 +377,18 @@ Preflight update:
 - Do not retry job creation with the current `gh auth token`.
 - `infra/azure/scripts/05_run_job_ghcr.sh` now supports `GHCR_PAT` first, then `gh auth token` fallback, but a proper package-read token is still required for a private GHCR package.
 
+Environment variable visibility note:
+
+- Setting `$env:GHCR_PAT` in a user shell may not be visible to Copilot tool processes because each command runs in a fresh process.
+- If Copilot reports `GHCR_PAT` is not visible, set it in Windows User environment or another secure path readable by the agent:
+
+  ```powershell
+  [Environment]::SetEnvironmentVariable("GHCR_USERNAME", "Alanjiao1988", "User")
+  [Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")
+  ```
+
+- Do not paste token values into chat and do not commit them.
+
 ## Required run logging
 
 Every Azure resource creation or job start must append to `docs/run_log.md`:

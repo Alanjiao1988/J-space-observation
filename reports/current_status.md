@@ -99,6 +99,24 @@ Current actionable options:
 - Decision: do not retry Azure job creation with the known-insufficient token.
 - No new Azure resources were created in this step.
 
+### GHCR_PAT Visibility Update
+
+- Alan set `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but the Copilot tool process could not see them.
+- Checked Process/User/Machine environment scopes:
+  - `GHCR_USERNAME`: not visible
+  - `GHCR_PAT`: not visible
+- No package-read preflight or Azure job retry was attempted in this step.
+- Existing Azure resources remain unchanged.
+
+To retry, set the variables in Windows User environment (not only shell-local), then start a new request:
+
+```powershell
+[Environment]::SetEnvironmentVariable("GHCR_USERNAME", "Alanjiao1988", "User")
+[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")
+```
+
+Do not paste the token into chat.
+
 ### Script Update
 
 `infra/azure/scripts/05_run_job_ghcr.sh` has been updated to match the actual Azure resource names and the live CLI findings:

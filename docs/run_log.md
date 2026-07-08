@@ -692,6 +692,44 @@ Azure:
 - Smoke job rerun: not attempted due missing usable package-read token.
 - Phase 0.5 / Phase 1 dry-run / pilot: not attempted.
 
+## 2026-07-08 — GHCR_PAT not visible to agent environment
+
+Scope:
+
+- Alan indicated `GHCR_USERNAME` and `GHCR_PAT` were set in a local PowerShell shell.
+- The Copilot tool process runs commands in fresh child processes and did not inherit those shell-local variables.
+
+Checks executed (token values not printed):
+
+- `git fetch origin`
+- `git checkout main`
+- `git pull --ff-only origin main`
+- Checked `GHCR_USERNAME` and `GHCR_PAT` presence in:
+  - Process environment
+  - User environment
+  - Machine environment
+
+Results:
+
+- Repo synced at `033a52d80d91647809bf37f09851a47be0eee55f`.
+- `GHCR_USERNAME`: not visible in Process/User/Machine environment.
+- `GHCR_PAT`: not visible in Process/User/Machine environment.
+- GHCR package-read preflight: not run because no token was visible.
+- Azure job retry: not attempted.
+- Azure resources created in this step: none.
+- Existing Azure resources unchanged:
+  - `rg-jspace-observation-sea`
+  - `law-jspace-observation-sea`
+  - `cae-jspace-observation-sea`
+  - `gpu-t4`
+
+Next required action:
+
+- Make the PAT visible to the agent without pasting it into chat. Recommended local command for Alan to run in a separate PowerShell, replacing `<token>` locally:
+  - `[Environment]::SetEnvironmentVariable("GHCR_USERNAME", "Alanjiao1988", "User")`
+  - `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`
+- After that, ask Copilot to retry. Copilot will verify presence via `User` scope without printing the token.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`

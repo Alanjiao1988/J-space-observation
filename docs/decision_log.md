@@ -404,3 +404,23 @@ Decision:
   - make GHCR package public, or
   - provide a classic PAT with `read:packages` through environment/Azure secret path only.
 - `infra/azure/scripts/05_run_job_ghcr.sh` was hardened to support env aliases and avoid passing token values as command-line arguments to helper Python.
+
+## 2026-07-08 — GHCR_PAT set in shell but not visible to agent
+
+Status:
+
+- Alan reported setting `GHCR_USERNAME` and `GHCR_PAT` in PowerShell.
+- Copilot checked Process/User/Machine environment scopes.
+- `GHCR_USERNAME`: not visible.
+- `GHCR_PAT`: not visible.
+- No token value was printed or committed.
+- No Azure job retry was attempted.
+- Azure resources created in this step: none.
+
+Decision:
+
+- Stop until the PAT is exposed through a scope readable by the agent, preferably Windows User environment.
+- Recommended user-scope setup:
+  - `[Environment]::SetEnvironmentVariable("GHCR_USERNAME", "Alanjiao1988", "User")`
+  - `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`
+- Do not paste token values into chat.
