@@ -19,3 +19,61 @@ Key constraints:
 Next action:
 
 - 由 GitHub Copilot / Copilot Agent 根据 `docs/copilot_prompt.md` 实现脚手架、Phase 0.5 和 Phase 1。
+
+## 2026-07-08 — Executable scaffold implementation complete
+
+Status: ✓ Implemented
+
+What was built:
+
+1. **Core modules** (src/jspace_observation/):
+   - config.py: Model and experiment configuration
+   - model_loader.py: HuggingFace model loading with device/dtype management
+   - no_cot.py: Strict no-CoT utilities (empty-think prefill for R1-Distill, answer-only for Qwen)
+   - prompt_sets.py: Pilot prompt generation with small datasets
+   - eval_parsing.py: Numeric, entity, yes/no answer parsing
+   - stats.py: Wilson CI and bootstrap confidence intervals
+   - run_logging.py: Run directory creation and metadata tracking
+   - jlens_utils.py: J-lens availability checking and reporting
+
+2. **Experiment scripts**:
+   - phase0_5_jlens_spike.py: J-lens feasibility check
+   - phase1_depth_gradient.py: Behavioral depth gradient experiments
+
+3. **Tests** (tests/):
+   - test_no_cot.py: No-CoT validation tests
+   - test_eval_parsing.py: Answer parsing tests
+   - test_stats.py: Statistics utility tests
+   - All tests pass without requiring model downloads
+
+4. **Infrastructure** (infra/azure/):
+   - Bash scripts for Azure job submission
+   - Variables template for configuration
+   - README with usage instructions
+
+5. **Build automation**:
+   - Makefile for common operations (install, test, run experiments)
+
+Key decisions:
+
+- No-CoT validation checks for think tags and visible reasoning patterns
+- Pilot prompts kept small for rapid iteration
+- Phase 0.5 prioritizes checking pre-fitted lens availability before attempting fitting
+- Phase 1 focuses on behavioral metrics and does not yet attempt mechanistic interpretation
+- All runs logged to docs/run_log.md and docs/decision_log.md
+
+What remains:
+
+- Actual Phase 0.5 execution (requires jacobian-lens package)
+- Actual Phase 1 execution (generates behavioral metrics)
+- Phase 1.5 layer taxonomy characterization
+- Phase 2 J-lens workspace readout (if J-lens feasible)
+- Phase 3 distill vs base comparison
+- Phase 4 activation patching
+
+How to proceed:
+
+1. Test: `make test`
+2. Local spike: `make phase0-5` or `make phase1-dry`
+3. Full Phase 1: `make phase1`
+4. Azure submission: `make azure-setup && make azure-phase0-5`
