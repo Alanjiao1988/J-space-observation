@@ -482,6 +482,118 @@ T4 quota conclusion:
 - Next action: use Azure Portal Usage + quotas or Azure support to confirm/request Container Apps Managed Environment Consumption T4 GPUs in `southeastasia`.
 - Do not create Azure GPU jobs and do not fall back to local inference.
 
+## 2026-07-08 — Azure GHCR smoke path: resource creation and first pull failure
+
+Scope:
+
+- Alan explicitly approved entering the Azure resource creation and GHCR smoke-test phase.
+- Still prohibited: local model inference/downloads, local Phase 1 generation, local J-lens fitting, secrets in repo/logs.
+
+Image/build decision:
+
+- Repo HEAD at start: `ed1872c5347cb525af262e77348e167818dc7b10`.
+- Validated GHCR image: `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66`.
+- Diff from image commit to HEAD was documentation-only:
+  - `docs/azure_runbook.md`
+  - `docs/decision_log.md`
+  - `docs/run_log.md`
+  - `docs/thread_handoff.md`
+  - `reports/current_status.md`
+- Image rebuild: not required.
+
+Scripts reviewed:
+
+- `docs/azure_runbook.md`
+- `docs/thread_handoff.md`
+- `reports/current_status.md`
+- `infra/azure/scripts/`
+- `infra/azure/scripts/05_run_job_ghcr.sh`
+
+Azure sanity checks:
+
+- Subscription: `MCAPS-Hybrid-REQ-125620-2025-alanjiao`
+- Microsoft.App: `Registered`
+- Microsoft.ContainerRegistry: `Registered`
+- Microsoft.Quota: `Registered`
+- Existing project resource groups before creation: none.
+
+Resources created:
+
+- Resource group:
+  - name: `rg-jspace-observation-sea`
+  - location: `southeastasia`
+  - tags: `project=jspace-observation owner=alan purpose=research-pilot registry=ghcr environment=dev`
+  - provisioning: `Succeeded`
+- Log Analytics workspace:
+  - name: `law-jspace-observation-sea`
+  - resource group: `rg-jspace-observation-sea`
+  - location: `southeastasia`
+  - provisioning: `Succeeded`
+  - customerId: `8daddd67-1cfd-47c5-857e-af3c4a4e3787`
+  - key acquired: yes (value not logged)
+- Container Apps environment:
+  - name: `cae-jspace-observation-sea`
+  - resource group: `rg-jspace-observation-sea`
+  - location: `Southeast Asia`
+  - provisioning: `Succeeded`
+  - default domain: `ambitiouspebble-6a6974cf.southeastasia.azurecontainerapps.io`
+- Workload profiles:
+  - `Consumption`
+  - `gpu-t4` (`Consumption-GPU-NC8as-T4`)
+
+Container Apps environment command notes:
+
+- Failed command:
+  - `az containerapp env create ... --enable-workload-profiles true --enable-dedicated-gpu true ...`
+  - error code: `WorkloadProfileInvalidType`
+  - exact message: `Workload profile type 'NC24_A100' is invalid.`
+  - classification: CLI/preview parameter issue; `--enable-dedicated-gpu true` defaults toward an invalid A100 profile for this region/path.
+  - fix: create the workload-profile environment without `--enable-dedicated-gpu true`.
+- Failed command:
+  - `az containerapp env workload-profile add ... --workload-profile-type Consumption-GPU-NC8as-T4 --min-nodes 0 --max-nodes 1`
+  - error code: `WorkloadProfilePropertyNotSupported`
+  - exact message: `Workload Profile property 'MinimumCount' is not supported for CONSUMPTION_GPU_NC8AS_T4`
+  - classification: CLI/service syntax for consumption GPU profile.
+  - fix: omit `--min-nodes/--max-nodes`.
+- Successful command:
+  - `az containerapp env workload-profile add ... --workload-profile-name gpu-t4 --workload-profile-type Consumption-GPU-NC8as-T4`
+  - result: `gpu-t4` profile added.
+
+Effective T4 quota validation:
+
+- `Consumption-GPU-NC8as-T4` workload profile was successfully added to the environment.
+- No quota error occurred during resource group, Log Analytics, environment, or GPU workload profile creation.
+- GPU job execution has not yet succeeded; GHCR pull/auth blocked the smoke job before execution.
+
+GHCR authentication check:
+
+- Local environment variables:
+  - `GHCR_PAT`: not set
+  - `GHCR_USERNAME`: not set
+- First smoke-test job attempted unauthenticated GHCR pull.
+- Job name attempted: `job-jspace-ghcr-smoke`
+- Image: `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66`
+- Intended smoke command: `python -m pytest tests/ -q` (not executed due pull/auth failure)
+- Job was not created.
+- Error code: `InvalidParameterValueInContainerTemplate`
+- Exact error message:
+  - `Field 'template.containers.job-jspace-ghcr-smoke.image' is invalid with details: 'Invalid value: "ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66": GET https:?scope=repository%3Aalanjiao1988%2Fj-space-observation%3Apull&service=ghcr.io: UNAUTHORIZED: authentication required';.`
+- Classification: GHCR private package / registry authentication required.
+
+Current stop reason:
+
+- Need GHCR pull credentials or make package public before Azure Container Apps can create/run the GHCR job.
+- Do not send token in chat. Provide `GHCR_PAT` through environment variable or Azure secret path only.
+- No model inference, Phase 0.5, Phase 1 dry-run, or Phase 1 pilot was run in Azure yet.
+
+Script maintenance:
+
+- Updated `infra/azure/scripts/05_run_job_ghcr.sh` after the live Azure attempt:
+  - defaults now match actual resource names: `rg-jspace-observation-sea`, `cae-jspace-observation-sea`, `job-jspace-ghcr-smoke`;
+  - resource group / environment / job creation includes project tags;
+  - removed `--enable-dedicated-gpu true` from environment creation because it caused `WorkloadProfileInvalidType: NC24_A100 invalid`;
+  - removed `--min-nodes/--max-nodes` from `Consumption-GPU-NC8as-T4` workload profile creation because it caused `WorkloadProfilePropertyNotSupported`.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`

@@ -2,10 +2,10 @@
 
 Date: 2026-07-08
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified commit before this handoff: `95541404ff86fdf436706cd635c62dea29b9ff86`
-Latest status message for that commit: `Confirm T4 quota gate status`
+Latest verified commit before this handoff: `be9f71caf1c8e346c5dc8ac8d910f4733356b5e8`
+Latest status message for that commit: `Run Azure GHCR smoke path`
 
-> Update (2026-07-08 22:00 +08:00): The GHCR workflow is installed at `.github/workflows/build-ghcr.yml` (commit `c07db5c9625a9f9ad96c55f77385c078e11d4a66`) and run `28947916765` completed successfully, pushing `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66` plus `latest`. Diff from image commit to repo commit `c10afdd...` is documentation-only, so no image rebuild is required. `Microsoft.Quota` is now registered and CLI quota queries work, but they do not expose a T4 / NC8as-T4 quota item for Microsoft.App in `southeastasia`; the subscription's actual T4 quota remains unknown and must be confirmed through Azure Portal Usage + quotas or support. Azure resources remain none (verified). See `reports/current_status.md` for the latest details.
+> Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
 
 This document is intended to let a new ChatGPT / Copilot thread continue the project without reading the full previous conversation.
 
@@ -218,17 +218,22 @@ It returned exit code 0 but initially remained `Registering`. Later read-only ch
 Azure resources created so far:
 
 ```text
-none
+resource group: rg-jspace-observation-sea
+log analytics workspace: law-jspace-observation-sea
+container apps environment: cae-jspace-observation-sea
+workload profile: gpu-t4 (Consumption-GPU-NC8as-T4)
+jobs: none created successfully
 ```
 
 T4 quota status:
 
 ```text
 region availability: CONFIRMED (Consumption-GPU-NC8as-T4 is offered in southeastasia)
-subscription quota: STILL UNKNOWN (Microsoft.Quota is Registered, but az quota list/usage for Microsoft.App in southeastasia does not expose a T4/NC8as-T4 quota item)
+workload profile creation: SUCCEEDED (gpu-t4 added to cae-jspace-observation-sea)
+job execution quota: not yet validated because GHCR pull authentication blocked job creation
 ```
 
-This is now the main gate. Do not create GPU jobs until Azure Container Apps T4 quota for `southeastasia` is confirmed.
+Current main gate: GHCR pull authentication. Do not run Phase 0.5, Phase 1 dry-run, or pilot until the smoke job can pull/start the image.
 
 ---
 
@@ -315,6 +320,13 @@ Known properties:
 - reads `GHCR_PAT` from environment / Azure secret only
 - uses GHCR image path
 - supports `JOB_COMMAND` override
+- defaults match the actual created Azure resources:
+  - `rg-jspace-observation-sea`
+  - `cae-jspace-observation-sea`
+  - `job-jspace-ghcr-smoke`
+- has been updated to avoid the live CLI failures:
+  - no `--enable-dedicated-gpu true`
+  - no `--min-nodes/--max-nodes` on `Consumption-GPU-NC8as-T4`
 - can run commands equivalent to:
 
 ```bash
@@ -328,7 +340,7 @@ python experiments/phase1_depth_gradient.py \
   --max-new-tokens 64
 ```
 
-Do not run deployment scripts until T4 quota is confirmed.
+Do not run Phase 0.5, Phase 1 dry-run, or pilot until the GHCR smoke job can pull/start the image.
 
 ---
 
@@ -336,41 +348,47 @@ Do not run deployment scripts until T4 quota is confirmed.
 
 The new thread should continue from here:
 
-### Step 1: Confirm T4 quota
+### Step 1: Resolve GHCR pull authentication
 
-Confirm Azure Container Apps T4 GPU quota for:
+The Azure environment and `gpu-t4` workload profile already exist. The smoke job failed at image validation:
 
 ```text
-region: southeastasia
-quota: Managed Environment Consumption T4 GPUs / Container Apps GPU T4
+InvalidParameterValueInContainerTemplate
+UNAUTHORIZED: authentication required
 ```
 
-If quota is unavailable:
+Resolve one of:
 
-- stop
-- open Azure support quota request
-- do not fall back to local inference
+1. Make the GHCR package public; or
+2. Provide `GHCR_USERNAME` and `GHCR_PAT` through a secure environment/Azure secret path only.
 
-### Step 2: Only after GHCR image + T4 quota are ready
+Do not send token values in chat, commit them, or log them.
 
-Prepare Azure resources and smoke jobs:
+### Step 2: Rerun GHCR smoke job
 
-1. Resource group / environment setup.
-2. Container Apps Job pulling GHCR image.
-3. Azure smoke test.
-4. Azure Phase 0.5 availability check:
+Once GHCR auth is resolved, rerun the smoke job:
+
+```text
+job: job-jspace-ghcr-smoke
+image: ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66
+command: python -m pytest tests/ -q
+```
+
+### Step 3: Only after smoke succeeds
+
+Run Azure Phase 0.5 availability check:
 
 ```bash
 python experiments/phase0_5_jlens_spike.py --skip-fit
 ```
 
-5. Azure Phase 1 dry run:
+Then Azure Phase 1 dry run:
 
 ```bash
 python experiments/phase1_depth_gradient.py --dry-run
 ```
 
-6. Azure small real Phase 1 pilot:
+Then Azure small real Phase 1 pilot:
 
 ```bash
 python experiments/phase1_depth_gradient.py \

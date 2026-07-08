@@ -41,10 +41,14 @@ Do not silently fall back to local model inference if Azure is blocked.
 
 ## Target Azure defaults
 
-- Resource group: `rg-jspace-observation`
+- Resource group: `rg-jspace-observation-sea`
 - Region: `southeastasia`
-- Container Apps environment: `acaenv-jspace-observation`
-- Container Apps job prefix: `job-jspace-observation`
+- Log Analytics workspace: `law-jspace-observation-sea`
+- Container Apps environment: `cae-jspace-observation-sea`
+- Smoke test job: `job-jspace-ghcr-smoke`
+- Phase 0.5 job: `job-jspace-phase05`
+- Phase 1 dry-run job: `job-jspace-phase1-dryrun`
+- Small pilot job: `job-jspace-phase1-pilot`
 - GPU workload profile type: `Consumption-GPU-NC8as-T4`
 - GPU workload profile name: `gpu-t4`
 - Model cache in container: `/mnt/models/huggingface`
@@ -207,10 +211,10 @@ Use `infra/azure/scripts/05_run_job_ghcr.sh`. It is parameterized and must not h
 Required environment variables (do not commit real values):
 
 ```text
-RESOURCE_GROUP=rg-jspace-observation
+RESOURCE_GROUP=rg-jspace-observation-sea
 LOCATION=southeastasia
-CONTAINER_APP_ENV=acaenv-jspace-observation
-CONTAINER_APP_JOB=job-jspace-observation-ghcr
+CONTAINER_APP_ENV=cae-jspace-observation-sea
+CONTAINER_APP_JOB=job-jspace-ghcr-smoke
 IMAGE=ghcr.io/alanjiao1988/j-space-observation:<git-sha>
 GHCR_USERNAME=<github-username>
 GHCR_PAT=<provided via env var or Azure secret only>
@@ -275,27 +279,37 @@ Do not run any of these until: (a) the GHCR image exists, and (b) T4 quota is co
 
 1. **Confirm T4 quota** (read-only; portal or support request as above). Gate: quota >= 1 T4 in `southeastasia`.
 
-2. **Create resource group** (only after quota confirmed):
+2. **Create resource group**:
    ```bash
-   az group create --name rg-jspace-observation --location southeastasia -o table
+   az group create --name rg-jspace-observation-sea --location southeastasia \
+     --tags project=jspace-observation owner=alan purpose=research-pilot registry=ghcr environment=dev -o table
    ```
 
 3. **Create Container Apps environment with GPU workload profile:**
    ```bash
-   az containerapp env create \
-     --resource-group rg-jspace-observation \
-     --name acaenv-jspace-observation \
+   az monitor log-analytics workspace create \
+     --resource-group rg-jspace-observation-sea \
+     --workspace-name law-jspace-observation-sea \
      --location southeastasia \
-     --enable-workload-profiles true \
-     --enable-dedicated-gpu true -o table
+     --tags project=jspace-observation owner=alan purpose=research-pilot registry=ghcr environment=dev -o table
+
+   az containerapp env create \
+     --resource-group rg-jspace-observation-sea \
+     --name cae-jspace-observation-sea \
+     --location southeastasia \
+     --enable-workload-profiles true -o table
 
    az containerapp env workload-profile add \
-     --resource-group rg-jspace-observation \
-     --name acaenv-jspace-observation \
+     --resource-group rg-jspace-observation-sea \
+     --name cae-jspace-observation-sea \
      --workload-profile-name gpu-t4 \
-     --workload-profile-type Consumption-GPU-NC8as-T4 \
-     --min-nodes 0 --max-nodes 1 -o table
+     --workload-profile-type Consumption-GPU-NC8as-T4 -o table
    ```
+
+   Notes from first real attempt:
+   - `--enable-dedicated-gpu true` caused `WorkloadProfileInvalidType: NC24_A100 invalid`; do not use it for the T4 path.
+   - `--min-nodes/--max-nodes` on `Consumption-GPU-NC8as-T4` caused `WorkloadProfilePropertyNotSupported: MinimumCount is not supported`; omit min/max for this consumption GPU profile.
+   - Creating `gpu-t4` with only `--workload-profile-type Consumption-GPU-NC8as-T4` succeeded.
 
 4. **GHCR image smoke test** (cheap CPU-style command to verify image pull + startup). Provide GHCR creds via env only:
    ```bash
@@ -330,6 +344,23 @@ az containerapp job execution list -g rg-jspace-observation -n job-jspace-observ
 ```
 
 Secondary fallback: if GHCR pull fails, switch to ACR via `infra/azure/scripts/01_build_and_push_image.sh` then the `02_/03_/04_` ACR job scripts.
+
+### GHCR pull/auth findings from first smoke attempt
+
+The first unauthenticated GHCR smoke-job creation failed before execution because the package requires authentication:
+
+```text
+Error code: InvalidParameterValueInContainerTemplate
+Message: Field 'template.containers.job-jspace-ghcr-smoke.image' is invalid:
+GET ... ghcr.io ... UNAUTHORIZED: authentication required
+```
+
+Next GHCR smoke attempt needs one of:
+
+1. Make the GHCR package public; or
+2. Provide `GHCR_USERNAME` and `GHCR_PAT` via environment variables / Azure secret only.
+
+Do not commit or log `GHCR_PAT`. The token should have minimal package read permission (`read:packages`) if the package remains private.
 
 ## Required run logging
 

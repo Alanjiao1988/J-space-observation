@@ -14,10 +14,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../" && pwd)"
 
 # ---- Required configuration (override via environment) ----
-RESOURCE_GROUP="${RESOURCE_GROUP:-rg-jspace-observation}"
+RESOURCE_GROUP="${RESOURCE_GROUP:-rg-jspace-observation-sea}"
 LOCATION="${LOCATION:-southeastasia}"
-CONTAINER_APP_ENV="${CONTAINER_APP_ENV:-acaenv-jspace-observation}"
-CONTAINER_APP_JOB="${CONTAINER_APP_JOB:-job-jspace-observation-ghcr}"
+CONTAINER_APP_ENV="${CONTAINER_APP_ENV:-cae-jspace-observation-sea}"
+CONTAINER_APP_JOB="${CONTAINER_APP_JOB:-job-jspace-ghcr-smoke}"
 GPU_WORKLOAD_PROFILE="${GPU_WORKLOAD_PROFILE:-Consumption-GPU-NC8as-T4}"
 GPU_WORKLOAD_PROFILE_NAME="${GPU_WORKLOAD_PROFILE_NAME:-gpu-t4}"
 
@@ -71,7 +71,11 @@ fi
 
 if ! az group show --name "$RESOURCE_GROUP" >/dev/null 2>&1; then
     echo "[CREATE] Resource group ${RESOURCE_GROUP}"
-    az group create --name "$RESOURCE_GROUP" --location "$LOCATION" -o table
+    az group create \
+        --name "$RESOURCE_GROUP" \
+        --location "$LOCATION" \
+        --tags project=jspace-observation owner=alan purpose=research-pilot registry=ghcr environment=dev \
+        -o table
 fi
 
 if ! az containerapp env show --resource-group "$RESOURCE_GROUP" --name "$CONTAINER_APP_ENV" >/dev/null 2>&1; then
@@ -81,7 +85,7 @@ if ! az containerapp env show --resource-group "$RESOURCE_GROUP" --name "$CONTAI
         --name "$CONTAINER_APP_ENV" \
         --location "$LOCATION" \
         --enable-workload-profiles true \
-        --enable-dedicated-gpu true \
+        --tags project=jspace-observation owner=alan purpose=research-pilot registry=ghcr environment=dev \
         -o table
 fi
 
@@ -97,8 +101,6 @@ if [[ "$PROFILE_COUNT" == "0" ]]; then
         --name "$CONTAINER_APP_ENV" \
         --workload-profile-name "$GPU_WORKLOAD_PROFILE_NAME" \
         --workload-profile-type "$GPU_WORKLOAD_PROFILE" \
-        --min-nodes 0 \
-        --max-nodes 1 \
         -o table
 fi
 
@@ -125,6 +127,7 @@ if ! az containerapp job show --resource-group "$RESOURCE_GROUP" --name "$CONTAI
         --env-vars "HF_HOME=${HF_HOME}" "TRANSFORMERS_CACHE=${TRANSFORMERS_CACHE}" "RESULTS_DIR=${RESULTS_DIR}" \
         --command "/bin/bash" \
         --args "-lc" "$JOB_COMMAND" \
+        --tags project=jspace-observation owner=alan purpose=research-pilot registry=ghcr environment=dev \
         -o table
 else
     echo "[UPDATE] Container Apps job ${CONTAINER_APP_JOB}"

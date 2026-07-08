@@ -32,6 +32,57 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 
 1. Confirm Container Apps **T4 GPU quota in southeastasia** via Azure Portal (Usage + quotas) or Azure support. CLI quota query did not expose the required T4 quota item.
 
+## Azure GHCR Smoke Path Attempt (2026-07-08)
+
+Alan explicitly approved minimal Azure resource creation to validate the deployment path instead of continuing to block on invisible quota.
+
+### Resources Created
+
+- Resource group: `rg-jspace-observation-sea` (`southeastasia`)
+- Log Analytics workspace: `law-jspace-observation-sea`
+- Container Apps environment: `cae-jspace-observation-sea`
+- Workload profile: `gpu-t4` (`Consumption-GPU-NC8as-T4`)
+- Jobs: none created successfully
+
+### T4 / Quota Validation
+
+- `Consumption-GPU-NC8as-T4` workload profile creation succeeded.
+- No quota error occurred during environment/profile creation.
+- GPU job execution has not yet succeeded, because GHCR image pull was blocked before job creation.
+
+### Errors Encountered
+
+1. Container Apps environment with `--enable-dedicated-gpu true` failed:
+   - Error code: `WorkloadProfileInvalidType`
+   - Message: `Workload profile type 'NC24_A100' is invalid.`
+   - Fix: create environment without `--enable-dedicated-gpu true`.
+2. Adding T4 profile with `--min-nodes/--max-nodes` failed:
+   - Error code: `WorkloadProfilePropertyNotSupported`
+   - Message: `Workload Profile property 'MinimumCount' is not supported for CONSUMPTION_GPU_NC8AS_T4`
+   - Fix: omit min/max for the consumption GPU profile.
+3. GHCR smoke job creation failed before execution:
+   - Error code: `InvalidParameterValueInContainerTemplate`
+   - Message includes: `UNAUTHORIZED: authentication required`
+   - Classification: GHCR private package / registry authentication required
+
+### Current Blocker
+
+Azure Container Apps cannot pull the GHCR image anonymously. Next step is one of:
+
+1. Make the GHCR package public; or
+2. Provide GHCR credentials through a secure path (`GHCR_USERNAME` + `GHCR_PAT` with minimal `read:packages`), then create the registry secret / rerun `job-jspace-ghcr-smoke`.
+
+Do not send token values in chat and do not commit them.
+
+### Script Update
+
+`infra/azure/scripts/05_run_job_ghcr.sh` has been updated to match the actual Azure resource names and the live CLI findings:
+
+- defaults now use `rg-jspace-observation-sea`, `cae-jspace-observation-sea`, and `job-jspace-ghcr-smoke`;
+- removed `--enable-dedicated-gpu true` from environment creation;
+- removed `--min-nodes/--max-nodes` from the T4 workload profile add command;
+- added project tags to resources created by the script.
+
 ## GHCR + T4 Quota Path Status (2026-07-08 21:34 +08:00)
 
 - Read-only provider re-check: `Microsoft.ContainerRegistry` = `Registered`, `Microsoft.App` = `Registered`.

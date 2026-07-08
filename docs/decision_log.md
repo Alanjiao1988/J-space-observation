@@ -334,3 +334,29 @@ Decision:
 
 - Do not create Azure GPU resources yet.
 - Next gate remains T4 quota confirmation via Azure Portal Usage + quotas or Azure support request for Container Apps Managed Environment Consumption T4 GPUs in `southeastasia`.
+
+## 2026-07-08 — Azure GHCR smoke path created resources, stopped on GHCR auth
+
+Status:
+
+- Alan approved creating minimal Azure resources to validate the GHCR/Container Apps path instead of continuing to block on invisible quota.
+- Resource group created: `rg-jspace-observation-sea`.
+- Log Analytics workspace created: `law-jspace-observation-sea`.
+- Container Apps environment created: `cae-jspace-observation-sea`.
+- T4 workload profile created: `gpu-t4` (`Consumption-GPU-NC8as-T4`).
+- No Container Apps job was successfully created.
+- Azure resources created: yes, limited to resource group, Log Analytics workspace, Container Apps environment, and workload profile.
+
+Findings:
+
+- T4 workload profile creation succeeded, so the previous quota ambiguity no longer blocks environment/profile creation.
+- The first smoke job was blocked by GHCR registry authentication, not quota.
+- Error code: `InvalidParameterValueInContainerTemplate`.
+- Error message includes: `UNAUTHORIZED: authentication required`.
+
+Decision:
+
+- Stop before Phase 0.5, Phase 1 dry-run, or small pilot.
+- Next gate is GHCR pull authentication: make the GHCR package public or provide `GHCR_USERNAME` + `GHCR_PAT` through environment/Azure secret only.
+- Do not commit or print GHCR token values.
+- `infra/azure/scripts/05_run_job_ghcr.sh` was updated to use the actual `*-sea` resource names and to avoid the `--enable-dedicated-gpu` / T4 min-max parameters that failed during live Azure CLI execution.
