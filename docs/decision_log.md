@@ -382,3 +382,25 @@ Decision:
 - Stop before any Phase 0.5, Phase 1 dry-run, or small pilot.
 - Next step must be either making the GHCR package public or providing a proper classic PAT with `read:packages` via secure environment/Azure secret path.
 - Do not send token values in chat; do not commit/log them.
+
+## 2026-07-08 — Stop GHCR smoke retry before Azure job due missing package-read token
+
+Status:
+
+- Existing Azure resources remain available:
+  - `rg-jspace-observation-sea`
+  - `law-jspace-observation-sea`
+  - `cae-jspace-observation-sea`
+  - `gpu-t4`
+- `GHCR_PAT`: not set.
+- `gh auth token`: available, but package read preflight returns `403` / `read:packages` required.
+- No smoke job was recreated in this step.
+- No new Azure resources were created in this step.
+
+Decision:
+
+- Do not retry Azure Container Apps Job creation with the current token.
+- Required next step remains secure GHCR package-read authentication:
+  - make GHCR package public, or
+  - provide a classic PAT with `read:packages` through environment/Azure secret path only.
+- `infra/azure/scripts/05_run_job_ghcr.sh` was hardened to support env aliases and avoid passing token values as command-line arguments to helper Python.

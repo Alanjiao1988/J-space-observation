@@ -370,6 +370,13 @@ Follow-up retry:
 - Conclusion: the current `gh auth token` is not sufficient for Azure to pull this private GHCR image.
 - Next retry needs either a public GHCR package or a classic PAT with `read:packages`.
 
+Preflight update:
+
+- `GHCR_PAT` was not set in the local environment.
+- The current `gh auth token` was tested against the GHCR package versions API and returned `403` / `read:packages` required.
+- Do not retry job creation with the current `gh auth token`.
+- `infra/azure/scripts/05_run_job_ghcr.sh` now supports `GHCR_PAT` first, then `gh auth token` fallback, but a proper package-read token is still required for a private GHCR package.
+
 ## Required run logging
 
 Every Azure resource creation or job start must append to `docs/run_log.md`:

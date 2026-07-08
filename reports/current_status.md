@@ -91,6 +91,14 @@ Current actionable options:
 1. Make the GHCR package public; or
 2. Provide a classic PAT with `read:packages` through a secure local environment variable (`GHCR_PAT`) or an approved Azure secret path. Do not send the token in chat.
 
+### GHCR Auth Preflight Update
+
+- `GHCR_PAT` is still not set.
+- Current `gh auth token` was tested against the GHCR package versions API.
+- Result: `403` with message `You need at least read:packages scope to get a package's versions.`
+- Decision: do not retry Azure job creation with the known-insufficient token.
+- No new Azure resources were created in this step.
+
 ### Script Update
 
 `infra/azure/scripts/05_run_job_ghcr.sh` has been updated to match the actual Azure resource names and the live CLI findings:
@@ -101,6 +109,8 @@ Current actionable options:
 - uses ARM REST job creation/update to avoid Azure CLI `--args -lc ...` parsing issues;
 - places `workloadProfileName` at `properties.workloadProfileName`, which is the schema position validated by live Azure errors;
 - falls back to `gh auth token` only when `GHCR_PAT` is absent;
+- supports Alan's requested env var aliases: `JOB_NAME`, `CONTAINERAPPS_ENVIRONMENT`, and `WORKLOAD_PROFILE_NAME`;
+- no longer passes the GHCR token as a Python command-line argument while generating the ARM body;
 - added project tags to resources created by the script.
 
 ## GHCR + T4 Quota Path Status (2026-07-08 21:34 +08:00)

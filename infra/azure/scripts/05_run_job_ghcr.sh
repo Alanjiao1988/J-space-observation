@@ -16,10 +16,10 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../" && pwd)"
 # ---- Required configuration (override via environment) ----
 RESOURCE_GROUP="${RESOURCE_GROUP:-rg-jspace-observation-sea}"
 LOCATION="${LOCATION:-southeastasia}"
-CONTAINER_APP_ENV="${CONTAINER_APP_ENV:-cae-jspace-observation-sea}"
-CONTAINER_APP_JOB="${CONTAINER_APP_JOB:-job-jspace-ghcr-smoke}"
+CONTAINER_APP_ENV="${CONTAINER_APP_ENV:-${CONTAINERAPPS_ENVIRONMENT:-cae-jspace-observation-sea}}"
+CONTAINER_APP_JOB="${CONTAINER_APP_JOB:-${JOB_NAME:-job-jspace-ghcr-smoke}}"
 GPU_WORKLOAD_PROFILE="${GPU_WORKLOAD_PROFILE:-Consumption-GPU-NC8as-T4}"
-GPU_WORKLOAD_PROFILE_NAME="${GPU_WORKLOAD_PROFILE_NAME:-gpu-t4}"
+GPU_WORKLOAD_PROFILE_NAME="${GPU_WORKLOAD_PROFILE_NAME:-${WORKLOAD_PROFILE_NAME:-gpu-t4}}"
 
 # GHCR image, for example: ghcr.io/alanjiao1988/j-space-observation:<git-sha>
 IMAGE="${IMAGE:-}"
@@ -122,8 +122,10 @@ cleanup() {
 }
 trap cleanup EXIT
 
-python - "$BODY_FILE" "$LOCATION" "$ENVIRONMENT_ID" "$IMAGE" "$GHCR_USERNAME" "$TOKEN_TO_USE" "$JOB_COMMAND" "$HF_HOME" "$TRANSFORMERS_CACHE" "$RESULTS_DIR" "$GPU_WORKLOAD_PROFILE_NAME" <<'PY'
+export TOKEN_TO_USE
+python - "$BODY_FILE" "$LOCATION" "$ENVIRONMENT_ID" "$IMAGE" "$GHCR_USERNAME" "$JOB_COMMAND" "$HF_HOME" "$TRANSFORMERS_CACHE" "$RESULTS_DIR" "$GPU_WORKLOAD_PROFILE_NAME" <<'PY'
 import json
+import os
 import sys
 
 (
@@ -132,13 +134,13 @@ import sys
     environment_id,
     image,
     ghcr_username,
-    token,
     job_command,
     hf_home,
     transformers_cache,
     results_dir,
     workload_profile,
 ) = sys.argv[1:]
+token = os.environ["TOKEN_TO_USE"]
 
 body = {
     "location": location,

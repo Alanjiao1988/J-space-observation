@@ -646,6 +646,52 @@ Current stop reason:
 - Do not paste the token in chat. Do not commit it. Do not print it.
 - Phase 0.5 / Phase 1 dry-run / small pilot were not attempted.
 
+## 2026-07-08 — GHCR auth preflight: no usable package-read token
+
+Scope:
+
+- Alan requested resolving GHCR private image pull authentication and rerunning the smoke job.
+- Existing Azure resources were verified; no new resource creation was attempted in this step because credentials were not usable.
+
+Existing Azure resources:
+
+- Resource group: `rg-jspace-observation-sea` (`Succeeded`)
+- Log Analytics workspace: `law-jspace-observation-sea` (`Succeeded`)
+- Container Apps environment: `cae-jspace-observation-sea` (`Succeeded`)
+- Workload profile: `gpu-t4` / `Consumption-GPU-NC8as-T4`
+- Jobs: none
+
+GHCR token preflight:
+
+- `GHCR_USERNAME`: defaulted to `Alanjiao1988`
+- `GHCR_PAT`: not set
+- `gh auth token`: available
+- Package read test using current `gh auth token`:
+  - endpoint: `gh api users/Alanjiao1988/packages/container/j-space-observation/versions`
+  - result: `403`
+  - message: `You need at least read:packages scope to get a package's versions.`
+- Token value was not printed or committed.
+
+Decision:
+
+- Do not retry Azure job creation with the known-insufficient `gh auth token`.
+- Current blocker remains GHCR private image pull authentication.
+- Required next step: either make the GHCR package public or set a secure `GHCR_PAT` classic PAT with `read:packages` in the local environment / approved Azure secret path.
+
+Script maintenance:
+
+- Updated `infra/azure/scripts/05_run_job_ghcr.sh` to:
+  - support aliases requested by Alan: `JOB_NAME`, `CONTAINERAPPS_ENVIRONMENT`, `WORKLOAD_PROFILE_NAME`;
+  - keep `CONTAINER_APP_JOB`, `CONTAINER_APP_ENV`, and `GPU_WORKLOAD_PROFILE_NAME` compatibility;
+  - avoid passing the GHCR token as a Python command-line argument when generating the ARM request body;
+  - continue using `GHCR_PAT` first and `gh auth token` fallback only when `GHCR_PAT` is absent.
+
+Azure:
+
+- Azure resources created in this step: none.
+- Smoke job rerun: not attempted due missing usable package-read token.
+- Phase 0.5 / Phase 1 dry-run / pilot: not attempted.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`
