@@ -227,6 +227,25 @@ Decision:
 
 - Stop. Re-check provider registration later before any quota check or readiness script.
 
+## 2026-07-08 — Azure provider gate re-check
+
+Commands executed:
+
+- `az provider show -n Microsoft.ContainerRegistry --query registrationState -o tsv`
+- `az provider show -n Microsoft.App --query registrationState -o tsv`
+
+Results:
+
+- Microsoft.ContainerRegistry registration: `Registering`
+- Microsoft.App registration: `Registered`
+- T4 GPU quota status: not checked because `Microsoft.ContainerRegistry` remains `Registering`.
+- Readiness script result: not run.
+- Azure resources created: none.
+
+Decision:
+
+- Stop. Re-check provider registration later before any quota check or readiness script.
+
 ## 2026-07-08 — Local validation sequence
 
 Commands executed:

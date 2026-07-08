@@ -61,6 +61,15 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 - Azure resources created: none.
 - Next step: re-check provider registration later.
 
+## Latest Azure Provider Gate Re-check (2026-07-08 18:41 +08:00)
+
+- Microsoft.ContainerRegistry: `Registering`.
+- Microsoft.App: `Registered`.
+- T4 GPU quota status: not checked because the provider gate remains blocked.
+- Readiness script: not run.
+- Azure resources created: none.
+- Next step: re-check provider registration later.
+
 ## Next Command
 
 After `Microsoft.ContainerRegistry` is registered and GPU quota is confirmed:
