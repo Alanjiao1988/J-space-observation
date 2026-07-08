@@ -196,3 +196,20 @@ Next recommended step:
 - Run the Azure readiness script after provider/quota checks:
   - `.\infra\azure\scripts\00_check_prereqs.ps1`
   - or `bash infra/azure/scripts/00_check_prereqs.sh`
+
+## 2026-07-08 — Azure readiness gate stopped on provider registration
+
+Status:
+
+- Microsoft.App provider: `Registered`.
+- Microsoft.ContainerRegistry provider: `Registering`.
+- Subscription: `MCAPS-Hybrid-REQ-125620-2025-alanjiao`.
+- Azure Container Apps T4 GPU quota status: not checked because the Container Registry provider gate failed first.
+- Readiness script: not run.
+- Azure resources created: none.
+
+Decision:
+
+- Stop until `Microsoft.ContainerRegistry` becomes `Registered`.
+- After provider registration is complete, confirm Azure Container Apps T4 GPU quota for `southeastasia` before running `00_check_prereqs.ps1`.
+- Do not create Azure resources and do not fall back to local model inference.

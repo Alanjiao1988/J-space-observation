@@ -43,6 +43,15 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 - Verify Azure Container Apps GPU T4 quota for `southeastasia` and workload profile `Consumption-GPU-NC8as-T4`.
 - Do not run real inference or model loading locally as a fallback.
 
+## Latest Azure Readiness Gate Re-check (2026-07-08)
+
+- Microsoft.ContainerRegistry: `Registering`.
+- Microsoft.App: `Registered`.
+- T4 GPU quota status: not checked because `Microsoft.ContainerRegistry` is still not `Registered`.
+- Readiness script: not run.
+- Azure resources created: none.
+- Current blocker: provider registration must complete before quota confirmation or readiness script execution.
+
 ## Next Command
 
 After `Microsoft.ContainerRegistry` is registered and GPU quota is confirmed:

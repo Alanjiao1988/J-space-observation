@@ -185,6 +185,29 @@ Local validation after Azure-first updates:
 - No local model inference, model download, or J-lens fitting was run.
 - Azure resources created: none.
 
+## 2026-07-08 — Azure readiness gate re-check
+
+Commands executed:
+
+- `az provider show -n Microsoft.ContainerRegistry --query registrationState -o tsv`
+- `az provider show -n Microsoft.App --query registrationState -o tsv`
+- `az account show --query "{name:name,id:id,state:state,isDefault:isDefault}" -o json`
+
+Results:
+
+- Subscription: `MCAPS-Hybrid-REQ-125620-2025-alanjiao`
+- Subscription state: `Enabled`
+- Microsoft.ContainerRegistry registration: `Registering`
+- Microsoft.App registration: `Registered`
+- Azure Container Apps T4 GPU quota status: not checked because provider gate failed first.
+- Readiness script result: not run because `Microsoft.ContainerRegistry` is not yet `Registered`.
+- Azure resources created: none.
+
+Decision:
+
+- Stop before any Azure resource creation.
+- Re-run provider gate later; only proceed to GPU quota confirmation after `Microsoft.ContainerRegistry` becomes `Registered`.
+
 ## 2026-07-08 — Local validation sequence
 
 Commands executed:
