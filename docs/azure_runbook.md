@@ -21,6 +21,16 @@ Heavy execution must happen in Azure GPU containers:
 
 Do not silently fall back to local model inference if Azure is blocked.
 
+## Container registry strategy: GHCR primary, ACR secondary
+
+- **Primary: GHCR (GitHub Container Registry).** Images are built by a GitHub Actions workflow and pushed to `ghcr.io/alanjiao1988/j-space-observation:<git-sha>`.
+- **Secondary fallback: ACR (Azure Container Registry).** As of 2026-07-08, `Microsoft.ContainerRegistry` is now `Registered`, so the ACR scripts (`01_build_and_push_image.sh`, `02_run_phase0_5.sh`, `03_run_phase1.sh`, `04_run_phase1_pilot.sh`) are usable again. Use ACR only if GHCR is unavailable.
+- **Reason GHCR stays primary:**
+  - GHCR aligns with git-SHA image provenance (each image tagged with the exact commit SHA).
+  - Builds run in GitHub Actions, so the local PC does not build or push large images.
+  - Avoids re-coupling the pipeline to ACR provider registration timing, which was blocked for hours.
+- Both paths still require `Microsoft.App` registered and confirmed Container Apps T4 GPU quota in `southeastasia`.
+
 ## Resource principles
 
 - Prefer Azure Container Apps Jobs with GPU T4 workload profiles for batch work.
@@ -254,6 +264,68 @@ Rules:
 
 - Do not create GPU jobs until T4 quota is confirmed.
 - Do not fall back to local inference if quota is missing.
+
+## Planned Azure command sequence (GHCR primary; do not run until gates pass)
+
+Do not run any of these until: (a) the GHCR image exists, and (b) T4 quota is confirmed. Each numbered step is a gate; stop and record a blocker if a step fails.
+
+1. **Confirm T4 quota** (read-only; portal or support request as above). Gate: quota >= 1 T4 in `southeastasia`.
+
+2. **Create resource group** (only after quota confirmed):
+   ```bash
+   az group create --name rg-jspace-observation --location southeastasia -o table
+   ```
+
+3. **Create Container Apps environment with GPU workload profile:**
+   ```bash
+   az containerapp env create \
+     --resource-group rg-jspace-observation \
+     --name acaenv-jspace-observation \
+     --location southeastasia \
+     --enable-workload-profiles true \
+     --enable-dedicated-gpu true -o table
+
+   az containerapp env workload-profile add \
+     --resource-group rg-jspace-observation \
+     --name acaenv-jspace-observation \
+     --workload-profile-name gpu-t4 \
+     --workload-profile-type Consumption-GPU-NC8as-T4 \
+     --min-nodes 0 --max-nodes 1 -o table
+   ```
+
+4. **GHCR image smoke test** (cheap CPU-style command to verify image pull + startup). Provide GHCR creds via env only:
+   ```bash
+   export IMAGE=ghcr.io/alanjiao1988/j-space-observation:<git-sha>
+   export GHCR_USERNAME=<github-username>
+   export GHCR_PAT=<read:packages PAT, env only>
+   export JOB_COMMAND="python -c 'import torch,transformers; print(\"image ok\")'"
+   bash infra/azure/scripts/05_run_job_ghcr.sh
+   ```
+
+5. **Phase 0.5 `--skip-fit` on Azure:**
+   ```bash
+   export JOB_COMMAND="python experiments/phase0_5_jlens_spike.py --skip-fit"
+   bash infra/azure/scripts/05_run_job_ghcr.sh
+   ```
+
+6. **Phase 1 `--dry-run` on Azure:**
+   ```bash
+   export JOB_COMMAND="python experiments/phase1_depth_gradient.py --dry-run"
+   bash infra/azure/scripts/05_run_job_ghcr.sh
+   ```
+
+7. **Small Phase 1 pilot on Azure:**
+   ```bash
+   export JOB_COMMAND="python experiments/phase1_depth_gradient.py --models Qwen/Qwen2.5-Math-1.5B --task-families arithmetic --depths 1,2,3 --conditions strict_answer_only,visible_cot,r1_style_thinking --items-per-cell 1 --max-new-tokens 64"
+   bash infra/azure/scripts/05_run_job_ghcr.sh
+   ```
+
+Check each job execution:
+```bash
+az containerapp job execution list -g rg-jspace-observation -n job-jspace-observation-ghcr -o table
+```
+
+Secondary fallback: if GHCR pull fails, switch to ACR via `infra/azure/scripts/01_build_and_push_image.sh` then the `02_/03_/04_` ACR job scripts.
 
 ## Required run logging
 

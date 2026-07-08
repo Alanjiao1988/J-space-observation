@@ -267,3 +267,21 @@ Next recommended step:
 - Alan installs the workflow via GitHub web UI and runs it to build the GHCR image.
 - Confirm T4 GPU quota for `southeastasia` (portal or support request).
 - Only then deploy the Container Apps Job via `05_run_job_ghcr.sh`.
+
+## 2026-07-08 — Confirm GHCR primary / ACR secondary (final)
+
+Status:
+
+- Microsoft.ContainerRegistry: `Registered`. Microsoft.App: `Registered`.
+- Azure resources created: none.
+
+Decision (locked):
+
+- GHCR is the **primary** container registry path.
+- ACR is a **secondary fallback** only, used if GHCR pull/build fails.
+- Rationale: git-SHA image provenance, GitHub-hosted builds (local PC does not build large images), and decoupling from ACR provider registration timing.
+- Added to `docs/azure_runbook.md`: registry strategy section and a gated "Planned Azure command sequence" (quota -> resource group -> Container Apps env + GPU profile -> GHCR image smoke test -> Phase 0.5 --skip-fit -> Phase 1 --dry-run -> small Phase 1 pilot).
+
+Next required gate:
+
+- Confirm Container Apps T4 GPU quota in `southeastasia`. No Azure resources created until quota is confirmed and the GHCR image exists.

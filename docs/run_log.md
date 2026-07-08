@@ -322,6 +322,31 @@ Decision:
 - Manual installation of `.github/workflows/build-ghcr.yml` via the GitHub web UI is still required because the CLI credential lacks `workflow` scope.
 - Next Azure gate: confirm Container Apps T4 GPU quota in `southeastasia`.
 
+## 2026-07-08 — Keep GHCR primary after ACR provider recovery
+
+Commands executed (read-only + local):
+
+- `az provider show -n Microsoft.ContainerRegistry --query registrationState -o tsv`
+- `az provider show -n Microsoft.App --query registrationState -o tsv`
+- `python -m pytest tests/ -v`
+- `python experiments\phase1_depth_gradient.py --dry-run`
+
+Results:
+
+- Microsoft.ContainerRegistry registration: `Registered` (confirmed again).
+- Microsoft.App registration: `Registered`.
+- Test result: `41 passed, 2 warnings`.
+- Phase 1 dry-run: completed, total cells `54`.
+- T4 GPU quota status: not yet confirmed (next Azure gate).
+- Azure resources created: none.
+
+Decision:
+
+- ACR provider is now `Registered`, but GHCR remains the **primary** container registry path; ACR is the **secondary fallback** only.
+- Reason: GHCR aligns better with git-SHA image provenance and GitHub workflow-based builds, and avoids re-coupling the pipeline to ACR provider timing.
+- Documented registry strategy, planned Azure command sequence, and T4 quota confirmation steps in `docs/azure_runbook.md`.
+- Manual installation of `.github/workflows/build-ghcr.yml` remains required (CLI credential lacks `workflow` scope).
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`

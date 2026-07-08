@@ -8,13 +8,15 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 
 **Phase: Azure-first execution; GHCR primary registry path; T4 quota is the next gate (local PC orchestration-only)**
 
-## GHCR + T4 Quota Path Status (2026-07-08 21:28 +08:00)
+## GHCR + T4 Quota Path Status (2026-07-08 21:34 +08:00)
 
-- Read-only provider re-check: `Microsoft.ContainerRegistry` = `Registered` (finally flipped from `Registering`), `Microsoft.App` = `Registered`.
-- ACR is technically unblocked again, but the primary container path remains **GHCR** per current direction; ACR scripts remain available as a secondary option.
-- GHCR workflow template `infra/ci/build-ghcr.yml`: **valid** (workflow_dispatch, builds Dockerfile, pushes to GHCR, tags git SHA + optional latest, no model download/cache, `contents: read` + `packages: write`).
-- GHCR Azure job script `infra/azure/scripts/05_run_job_ghcr.sh`: **valid** (parameterized, no hardcoded token, `GHCR_PAT` via env/Azure secret, GHCR image path, `JOB_COMMAND` override for Phase 0.5 / Phase 1 dry-run / small pilot).
-- Manual workflow install: **still required** — the CLI credential lacks the GitHub `workflow` OAuth scope, so `.github/workflows/build-ghcr.yml` must be created via the GitHub web UI.
+- Read-only provider re-check: `Microsoft.ContainerRegistry` = `Registered`, `Microsoft.App` = `Registered`.
+- **Decision locked:** GHCR is the **primary** registry path; ACR is a **secondary fallback** only (used if GHCR fails). Rationale: git-SHA image provenance, GitHub-hosted builds, and decoupling from ACR provider timing.
+- GHCR workflow template `infra/ci/build-ghcr.yml`: **valid**.
+- GHCR Azure job script `infra/azure/scripts/05_run_job_ghcr.sh`: **valid** (parameterized; `JOB_COMMAND` override).
+- Runbook now includes a gated **Planned Azure command sequence**: T4 quota -> resource group -> Container Apps env + GPU profile -> GHCR image smoke test -> Phase 0.5 `--skip-fit` -> Phase 1 `--dry-run` -> small Phase 1 pilot.
+- Manual workflow install: **still required** (CLI credential lacks GitHub `workflow` scope).
+- Next Azure gate: **confirm T4 GPU quota in southeastasia**.
 - Local checks: `41 passed, 2 warnings`; Phase 1 dry-run `54` cells.
 - Azure resources created: **none**.
 
