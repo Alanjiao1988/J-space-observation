@@ -2,10 +2,10 @@
 
 Date: 2026-07-08
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified commit before this handoff: `66b86efe61244f29d46edb67bb73e8a40fb2bdc0`
-Latest status message for that commit: `Run GHCR workflow and update handoff status`
+Latest verified commit before this handoff: `686765fbe63e264740e1514e4f8fc52787a73760`
+Latest status message for that commit: `Confirm T4 quota gate status`
 
-> Update (2026-07-08 21:54 +08:00): The GHCR workflow is now installed at `.github/workflows/build-ghcr.yml` (commit `c07db5c9625a9f9ad96c55f77385c078e11d4a66`) and was successfully triggered through `gh workflow run`. Run `28947916765` completed successfully and pushed `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66` plus `latest`. T4 GPU workload profile type is offered in `southeastasia`, but the subscription's actual T4 quota is still unconfirmed (`az quota` blocked by unregistered `Microsoft.Quota`). Azure resources remain none (verified). See `reports/current_status.md` for the latest details.
+> Update (2026-07-08 22:00 +08:00): The GHCR workflow is installed at `.github/workflows/build-ghcr.yml` (commit `c07db5c9625a9f9ad96c55f77385c078e11d4a66`) and run `28947916765` completed successfully, pushing `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66` plus `latest`. Diff from image commit to repo commit `c10afdd...` is documentation-only, so no image rebuild is required. `Microsoft.Quota` is now registered and CLI quota queries work, but they do not expose a T4 / NC8as-T4 quota item for Microsoft.App in `southeastasia`; the subscription's actual T4 quota remains unknown and must be confirmed through Azure Portal Usage + quotas or support. Azure resources remain none (verified). See `reports/current_status.md` for the latest details.
 
 This document is intended to let a new ChatGPT / Copilot thread continue the project without reading the full previous conversation.
 
@@ -225,7 +225,7 @@ T4 quota status:
 
 ```text
 region availability: CONFIRMED (Consumption-GPU-NC8as-T4 is offered in southeastasia)
-subscription quota: NOT yet confirmed (az quota blocked by unregistered Microsoft.Quota; use portal or support request)
+subscription quota: STILL UNKNOWN (Microsoft.Quota is Registered, but az quota list/usage for Microsoft.App in southeastasia does not expose a T4/NC8as-T4 quota item)
 ```
 
 This is now the main gate. Do not create GPU jobs until Azure Container Apps T4 quota for `southeastasia` is confirmed.
@@ -406,9 +406,9 @@ Current known state:
 - Latest verified commit before handoff: c07db5c9625a9f9ad96c55f77385c078e11d4a66 plus follow-up documentation commits.
 - Azure-first execution policy: local PC is orchestration-only.
 - GHCR is primary registry path; ACR is secondary fallback.
-- Microsoft.App and Microsoft.ContainerRegistry are Registered.
+- Microsoft.App, Microsoft.ContainerRegistry, and Microsoft.Quota are Registered.
 - No Azure resources have been created yet.
-- T4 quota for Azure Container Apps in southeastasia is not yet confirmed.
+- T4 quota for Azure Container Apps in southeastasia is still unknown: CLI quota APIs do not expose the T4 quota item, so portal/support confirmation is needed.
 - GHCR workflow is installed at .github/workflows/build-ghcr.yml and has successfully pushed:
   ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66
 - latest tag was also pushed.

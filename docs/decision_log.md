@@ -310,3 +310,27 @@ Decision:
 - GHCR image exists, satisfying the image prerequisite for future Azure Container Apps Jobs.
 - Do not create any Azure GPU job until the subscription's Container Apps T4 quota in `southeastasia` is confirmed.
 - Do not register `Microsoft.Quota` without Alan approval.
+
+## 2026-07-08 — Microsoft.Quota registered; T4 quota still unknown via CLI
+
+Status:
+
+- Latest repo commit before this update: `c10afdd1d0817b0cf3c773b54a91d81d65f2ed05`.
+- GHCR image commit: `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.
+- Diff from image commit to latest commit: documentation-only; no GHCR rebuild required.
+- Microsoft.App: `Registered`.
+- Microsoft.ContainerRegistry: `Registered`.
+- Microsoft.Quota: `Registered`.
+- Azure resources created: none.
+
+Quota query result:
+
+- `az quota list` and `az quota usage list` for `Microsoft.App` in `southeastasia` succeeded.
+- Returned entries include `ManagedEnvironmentCount` (limit 50, usage 0) and `SessionPools` (limit 50, usage 0).
+- Returned entries do not include `Consumption-GPU-NC8as-T4`, T4, NC8as, or Managed Environment Consumption T4 quota.
+- `Consumption-GPU-NC8as-T4` remains regionally offered in `southeastasia`, but the subscription's actual T4 GPU quota remains unknown via CLI.
+
+Decision:
+
+- Do not create Azure GPU resources yet.
+- Next gate remains T4 quota confirmation via Azure Portal Usage + quotas or Azure support request for Container Apps Managed Environment Consumption T4 GPUs in `southeastasia`.

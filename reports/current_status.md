@@ -8,7 +8,7 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 
 **Phase: Azure-first execution; GHCR primary registry path; T4 quota is the next gate (local PC orchestration-only)**
 
-## GHCR Workflow Run + T4 Quota Findings (2026-07-08 21:54 +08:00)
+## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 
 - Baseline: read `docs/thread_handoff.md`; repo was synced to `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.
 - Workflow file installed: `.github/workflows/build-ghcr.yml` exists and matches `infra/ci/build-ghcr.yml`.
@@ -20,15 +20,17 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
   - `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66`
   - `ghcr.io/alanjiao1988/j-space-observation:latest`
 - Package API note: current `gh` token lacks `read:packages`, so package version API checks return 403; the workflow logs confirm both image tags were pushed.
-- Providers: `Microsoft.App` = `Registered`, `Microsoft.ContainerRegistry` = `Registered`, `Microsoft.Quota` = `NotRegistered`.
+- Diff from image commit `c07db5c...` to latest repo commit `c10afdd...`: documentation-only (`docs/*.md`, `reports/current_status.md`); image rebuild not required.
+- Providers: `Microsoft.App` = `Registered`, `Microsoft.ContainerRegistry` = `Registered`, `Microsoft.Quota` = `Registered`.
 - Azure resource check: no `jspace` / `j-space` resource groups found.
 - T4 GPU workload profile type availability: `Consumption-GPU-NC8as-T4` is offered in `southeastasia`.
-- **T4 GPU quota (subscription): still NOT confirmed** — `az quota` is blocked because `Microsoft.Quota` provider is not registered. Do not register it without Alan approval. Use portal Usage+quotas or an approved support request.
+- `az quota list` and `az quota usage list` for `Microsoft.App` / `southeastasia` returned `ManagedEnvironmentCount`, `SessionPools`, `SubscriptionDedicatedNCA100Gpus`, and `ExpressEnvironmentCount`, but did **not** expose a T4 / NC8as-T4 / Managed Environment Consumption T4 quota item.
+- **T4 GPU quota (subscription): still unknown via CLI.** Use Azure Portal Usage + quotas or Azure support to confirm/request Container Apps Managed Environment Consumption T4 GPUs in `southeastasia`.
 - Azure resources created: none.
 
 ### Remaining blocker
 
-1. Confirm Container Apps **T4 GPU quota in southeastasia** via Azure Portal (Usage + quotas), support request, or Alan-approved `Microsoft.Quota` provider registration and read-only quota query.
+1. Confirm Container Apps **T4 GPU quota in southeastasia** via Azure Portal (Usage + quotas) or Azure support. CLI quota query did not expose the required T4 quota item.
 
 ## GHCR + T4 Quota Path Status (2026-07-08 21:34 +08:00)
 

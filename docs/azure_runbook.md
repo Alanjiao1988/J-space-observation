@@ -250,6 +250,13 @@ CLI discovery helper (read-only):
 az containerapp env workload-profile list-supported -l southeastasia -o table
 ```
 
+Current CLI findings:
+
+- `Consumption-GPU-NC8as-T4` is offered in `southeastasia`.
+- `Microsoft.Quota` can be registered for read-only quota queries.
+- `az quota list --scope /subscriptions/<sub>/providers/Microsoft.App/locations/southeastasia` and `az quota usage list ...` currently return environment/session pool quotas but do **not** expose a T4 / NC8as-T4 / Managed Environment Consumption T4 quota item for this subscription/region.
+- Therefore, if the portal does not show the quota clearly, use Azure support.
+
 If T4 quota is unavailable or zero, open an Azure support request:
 
 - Issue type: **Service and subscription limits (quotas)**

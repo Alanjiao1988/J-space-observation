@@ -423,6 +423,65 @@ T4 quota:
 - Subscription quota remains **not confirmed** because `Microsoft.Quota` is `NotRegistered`; do not register it without Alan approval.
 - Next gate: confirm Azure Container Apps T4 quota in `southeastasia` before any Azure GPU job.
 
+## 2026-07-08 — GHCR image/current commit check and quota CLI attempt
+
+Repository/image diff:
+
+- Repo latest commit at start: `c10afdd1d0817b0cf3c773b54a91d81d65f2ed05`.
+- GHCR image commit: `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.
+- Changed files between image commit and latest commit:
+  - `docs/azure_runbook.md`
+  - `docs/decision_log.md`
+  - `docs/run_log.md`
+  - `docs/thread_handoff.md`
+  - `reports/current_status.md`
+- Classification: documentation-only. Rebuild not required.
+- Rebuild performed: no.
+
+GHCR image status:
+
+- Existing image retained: `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66`
+- `latest` tag: yes, workflow logs confirm it was pushed.
+- Package API:
+  - repo-scoped endpoint: `404`
+  - user-scoped endpoint: `403` because current token lacks `read:packages`
+  - workflow logs confirm pushed manifests for both SHA tag and `latest`.
+
+Azure read-only checks:
+
+- `az account show --query "{name:name, id:id, state:state}" -o table`: subscription `MCAPS-Hybrid-REQ-125620-2025-alanjiao`, `Enabled`.
+- Microsoft.App: `Registered`
+- Microsoft.ContainerRegistry: `Registered`
+- Microsoft.Quota before registration: `NotRegistered`
+- Project resource groups: none (`az group list` query returned no `jspace` / `j-space` groups).
+
+Microsoft.Quota registration:
+
+- Alan's current instruction allowed registering `Microsoft.Quota` only for quota read access.
+- Command run: `az provider register --namespace Microsoft.Quota` (no `--wait`).
+- Initial short polling: `Registering`.
+- Final follow-up provider status: `Registered`.
+- Azure resources created: none.
+
+Quota read attempts:
+
+- `az quota list --scope /subscriptions/<sub>/providers/Microsoft.App/locations/southeastasia -o json`
+- `az quota usage list --scope /subscriptions/<sub>/providers/Microsoft.App/locations/southeastasia -o json`
+- Returned quota/usage entries:
+  - `ManagedEnvironmentCount`: limit 50, usage 0
+  - `SessionPools`: limit 50, usage 0
+  - `SubscriptionDedicatedNCA100Gpus`: limit 0, usage -1, `isQuotaApplicable=false`
+  - `ExpressEnvironmentCount`: limit 500, usage 0, `isQuotaApplicable=false`
+- No `Consumption-GPU-NC8as-T4`, T4, NC8as, or managed environment Consumption T4 quota item was returned.
+
+T4 quota conclusion:
+
+- Region/workload profile availability: yes (`Consumption-GPU-NC8as-T4` is offered in `southeastasia`).
+- Subscription T4 quota: still unknown via CLI.
+- Exact blocker: Microsoft.App quota API does not expose a T4/NC8as-T4 quota item for this subscription/region.
+- Next action: use Azure Portal Usage + quotas or Azure support to confirm/request Container Apps Managed Environment Consumption T4 GPUs in `southeastasia`.
+- Do not create Azure GPU jobs and do not fall back to local inference.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`
