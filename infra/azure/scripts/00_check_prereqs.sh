@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Script: 00_check_prereqs.sh
-# Purpose: Verify all prerequisites for Azure infrastructure
+# Purpose: Azure-first readiness check. This script does not create resources.
 
 set -euo pipefail
 
@@ -8,84 +8,87 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../" && pwd)"
 
 echo "================================"
-echo "Checking Prerequisites"
+echo "Azure readiness check"
 echo "================================"
 echo
 
-# Source variables
-if [ ! -f "$SCRIPT_DIR/../variables.env" ]; then
-    echo "✗ variables.env not found"
-    echo "  Run: cp variables.example.env variables.env"
+if ! command -v az >/dev/null 2>&1; then
+    echo "[FAIL] Azure CLI is not installed or not on PATH."
+    echo "Install Azure CLI, then run: az login"
     exit 1
 fi
-source "$SCRIPT_DIR/../variables.env"
 
-echo "Environment loaded from variables.env"
+echo "[OK] Azure CLI found"
+az version --query '"azure-cli"' -o tsv
 echo
 
-# Check required commands
-echo "Checking commands..."
-for cmd in az docker python3; do
-    if command -v "$cmd" &> /dev/null; then
-        echo "✓ $cmd installed"
-    else
-        echo "✗ $cmd not found"
-        exit 1
-    fi
-done
-echo
-
-# Check Python packages
-echo "Checking Python packages..."
-python3 -c "import torch" && echo "✓ torch installed" || echo "✗ torch not installed"
-python3 -c "import transformers" && echo "✓ transformers installed" || echo "✗ transformers not installed"
-python3 -c "import jspace_observation" && echo "✓ jspace_observation available" || echo "✗ jspace_observation not available (install with: pip install -e src)"
-echo
-
-# Check Azure login
 echo "Checking Azure login..."
-if az account show &> /dev/null; then
-    CURRENT_SUB=$(az account show --query id -o tsv)
-    echo "✓ Logged into Azure"
-    echo "  Subscription: $CURRENT_SUB"
-else
-    echo "✗ Not logged into Azure"
-    echo "  Run: az login"
+if ! az account show >/dev/null 2>&1; then
+    echo "[FAIL] Azure CLI is not logged in."
+    echo "Run: az login"
+    exit 1
+fi
+
+SUBSCRIPTION_NAME="$(az account show --query name -o tsv)"
+SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
+SUBSCRIPTION_STATE="$(az account show --query state -o tsv)"
+echo "[OK] Logged in"
+echo "Subscription name: ${SUBSCRIPTION_NAME}"
+echo "Subscription id: ${SUBSCRIPTION_ID}"
+echo "Subscription state: ${SUBSCRIPTION_STATE}"
+echo
+
+echo "Checking provider registrations..."
+APP_STATE="$(az provider show -n Microsoft.App --query registrationState -o tsv)"
+ACR_STATE="$(az provider show -n Microsoft.ContainerRegistry --query registrationState -o tsv)"
+echo "Microsoft.App: ${APP_STATE}"
+echo "Microsoft.ContainerRegistry: ${ACR_STATE}"
+if [[ "$APP_STATE" != "Registered" ]]; then
+    echo "[FAIL] Microsoft.App is not Registered. Do not create Container Apps resources yet."
+    exit 1
+fi
+if [[ "$ACR_STATE" != "Registered" ]]; then
+    echo "[FAIL] Microsoft.ContainerRegistry is not Registered. Do not create ACR resources yet."
     exit 1
 fi
 echo
 
-# Check resource group
-echo "Checking resource group..."
-if az group exists --name "$AZURE_RESOURCE_GROUP" &> /dev/null; then
-    echo "✓ Resource group exists: $AZURE_RESOURCE_GROUP"
+echo "Checking Container Apps extension..."
+if az extension show --name containerapp >/dev/null 2>&1; then
+    CONTAINERAPP_VERSION="$(az extension show --name containerapp --query version -o tsv)"
+    echo "[OK] containerapp extension installed: ${CONTAINERAPP_VERSION}"
 else
-    echo "⊘ Resource group not found: $AZURE_RESOURCE_GROUP"
-    echo "  Creating resource group..."
-    az group create --name "$AZURE_RESOURCE_GROUP" --location "$AZURE_LOCATION"
-    echo "✓ Resource group created"
+    echo "[FAIL] containerapp extension is not installed."
+    echo "Run: az extension add --name containerapp --upgrade"
+    exit 1
 fi
 echo
 
-# Check ACR
-echo "Checking Azure Container Registry..."
-if az acr show --resource-group "$AZURE_RESOURCE_GROUP" --name "$ACR_NAME" &> /dev/null; then
-    echo "✓ ACR exists: $ACR_NAME"
-else
-    echo "⊘ ACR not found: $ACR_NAME"
-    echo "  (Will attempt to create during build)"
-fi
+echo "GPU quota check instructions:"
+echo "1. Confirm region and workload profile from infra/azure/variables.env."
+echo "2. In Azure Portal: Subscription -> Usage + quotas -> filter by provider Microsoft.App and region."
+echo "3. Verify quota for Container Apps GPU T4 workload profile, e.g. Consumption-GPU-NC8as-T4."
+echo "4. If quota is missing or zero, stop and request quota before running jobs."
+echo "5. Do not fall back to local model inference."
 echo
 
-# Log to run log
+echo "No Azure resources were created by this readiness check."
+
 LOG_FILE="$PROJECT_ROOT/docs/run_log.md"
-mkdir -p "$(dirname "$LOG_FILE")"
-echo "" >> "$LOG_FILE"
-echo "## Prerequisites Check - $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$LOG_FILE"
-echo "Status: ✓ All prerequisites verified" >> "$LOG_FILE"
-echo "Subscription: $CURRENT_SUB" >> "$LOG_FILE"
-echo "Resource group: $AZURE_RESOURCE_GROUP" >> "$LOG_FILE"
+if [[ -f "$LOG_FILE" ]]; then
+    {
+        echo ""
+        echo "## Azure readiness script check - $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+        echo ""
+        echo "- Command: \`bash infra/azure/scripts/00_check_prereqs.sh\`"
+        echo "- Subscription: ${SUBSCRIPTION_NAME} (${SUBSCRIPTION_ID})"
+        echo "- Microsoft.App registration: ${APP_STATE}"
+        echo "- Microsoft.ContainerRegistry registration: ${ACR_STATE}"
+        echo "- containerapp extension: installed (${CONTAINERAPP_VERSION})"
+        echo "- Azure resources created: none"
+    } >> "$LOG_FILE"
+fi
 
 echo "================================"
-echo "✓ All prerequisites verified"
+echo "[OK] Azure readiness check completed"
 echo "================================"

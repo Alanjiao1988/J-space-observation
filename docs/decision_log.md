@@ -163,6 +163,36 @@ Decision:
 - The local dependency blocker is resolved for Phase 0.5 availability/model-loading checks and Phase 1 dry runs.
 - Plan A is still not proven because no actual tiny J-lens fitting has been run and no pre-fitted lens was found locally.
 
+Superseded next step:
+
+- The small real Phase 1 pilot should be run via Azure after readiness/quota gates, not locally.
+
+## 2026-07-08 — Adopt Azure-first execution workflow
+
+Decision:
+
+- Use Azure cloud GPU containers as the default execution environment for heavy work.
+- The local PC is orchestration-only from now on: tests, dry-runs, documentation, Git, and Azure CLI commands.
+- Do not run real model inference, model downloads, real Phase 1 generation, J-lens fitting, patching, or ablation locally.
+- Do not make a Plan A feasibility decision from local availability checks.
+
+Azure readiness status:
+
+- Azure CLI login: available.
+- Active subscription: `MCAPS-Hybrid-REQ-125620-2025-alanjiao`.
+- Microsoft.App provider: `Registered`.
+- Microsoft.ContainerRegistry provider: `Registering`.
+- containerapp extension: installed (`1.3.0b4`).
+- Azure resources created: none.
+
+Blockers before Azure execution:
+
+- Wait for `Microsoft.ContainerRegistry` to become `Registered`.
+- Verify Azure Container Apps GPU T4 quota for the target region/workload profile.
+- Do not fall back to local inference if quota is unavailable.
+
 Next recommended step:
 
-- Run a small real Phase 1 pilot first: single model, arithmetic only, depths `1,2,3`, all three conditions.
+- Run the Azure readiness script after provider/quota checks:
+  - `.\infra\azure\scripts\00_check_prereqs.ps1`
+  - or `bash infra/azure/scripts/00_check_prereqs.sh`

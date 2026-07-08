@@ -6,7 +6,56 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 
 ## Current Phase
 
-**Phase: Local environment validated; ready for small real Phase 1 pilot**
+**Phase: Azure-first execution preparation; local PC is orchestration-only**
+
+## Azure-first Policy (2026-07-08)
+
+- Local validation is complete.
+- Local PC is now limited to orchestration, tests, dry-runs, documentation, Git, and Azure CLI commands.
+- Heavy execution must run on Azure GPU containers:
+  - model download
+  - model loading
+  - Phase 0.5 fitting / model loading
+  - Phase 1 real generation
+  - later J-lens, patching, and ablation experiments
+- Do not run real Phase 1, model downloads, or J-lens fitting locally.
+- Do not silently fall back to local inference if Azure is blocked.
+
+## Azure Readiness Status (2026-07-08)
+
+- Azure CLI: available (`2.83.0`).
+- Active subscription: `MCAPS-Hybrid-REQ-125620-2025-alanjiao`.
+- Subscription state: `Enabled`.
+- Microsoft.App provider: `Registered`.
+- Microsoft.ContainerRegistry provider: `Registering`.
+- containerapp extension: installed (`1.3.0b4`).
+- Azure resources created: none.
+- Azure scripts are prepared for:
+  - no-resource readiness checks;
+  - ACR build/push;
+  - Phase 0.5 Azure availability/model-loading job;
+  - Phase 1 Azure dry-run job;
+  - small real Phase 1 pilot job.
+
+## Azure Blockers Before Execution
+
+- Wait for `Microsoft.ContainerRegistry` to become `Registered`.
+- Verify Azure Container Apps GPU T4 quota for `southeastasia` and workload profile `Consumption-GPU-NC8as-T4`.
+- Do not run real inference or model loading locally as a fallback.
+
+## Next Command
+
+After `Microsoft.ContainerRegistry` is registered and GPU quota is confirmed:
+
+```powershell
+.\infra\azure\scripts\00_check_prereqs.ps1
+```
+
+or:
+
+```bash
+bash infra/azure/scripts/00_check_prereqs.sh
+```
 
 ## Latest Local Validation (2026-07-08)
 
@@ -64,12 +113,12 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 - No pre-fitted lenses were found locally/configured.
 - Models load on CPU locally; real generation may be slow without GPU.
 
-### Next Command
+### Previous Local Pilot Command (superseded by Azure-first policy)
 
-Run a small real Phase 1 pilot with a single model and arithmetic only:
+The equivalent small real Phase 1 pilot must be run via Azure, not locally:
 
-```powershell
-python experiments\phase1_depth_gradient.py --models Qwen/Qwen2.5-Math-1.5B --task-families arithmetic --depths 1,2,3 --conditions strict_answer_only,visible_cot,r1_style_thinking --items-per-cell 1 --max-new-tokens 64
+```bash
+bash infra/azure/scripts/04_run_phase1_pilot.sh
 ```
 
 ## What Has Been Implemented

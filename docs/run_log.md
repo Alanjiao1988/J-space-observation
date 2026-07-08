@@ -131,6 +131,60 @@ Azure:
 
 - Azure resources created: none.
 
+## 2026-07-08 — Azure-first workflow preparation
+
+Policy update:
+
+- Local validation is complete.
+- From this point, the local PC is orchestration-only.
+- Heavy execution must happen on Azure GPU containers:
+  - model download
+  - model loading
+  - Phase 0.5 fitting / model loading
+  - Phase 1 real generation
+  - later J-lens, patching, and ablation experiments
+- Do not silently fall back to local inference if Azure is blocked.
+
+Lightweight Azure CLI checks executed:
+
+- `az version`
+- `az account show --query "{name:name,id:id,state:state,isDefault:isDefault,tenantId:tenantId}" -o json`
+- `az extension list -o table`
+- `az provider show -n Microsoft.App --query registrationState -o tsv`
+- `az provider show -n Microsoft.ContainerRegistry --query registrationState -o tsv`
+- `az extension show --name containerapp --query "{name:name,version:version,preview:preview}" -o json`
+
+Azure CLI results:
+
+- Azure CLI: `2.83.0`
+- Active subscription: `MCAPS-Hybrid-REQ-125620-2025-alanjiao`
+- Subscription state: `Enabled`
+- Microsoft.App registration: `Registered`
+- Microsoft.ContainerRegistry registration: `Registering`
+- containerapp extension: installed, version `1.3.0b4`
+- `az extension add --name containerapp --upgrade` was not run because the extension is already installed.
+
+Repository updates:
+
+- Updated `docs/azure_runbook.md` with Azure-first policy, readiness checks, GPU quota gate, and stop rules.
+- Updated `infra/azure/variables.example.env` with Azure Container Apps GPU placeholders.
+- Updated `infra/azure/scripts/00_check_prereqs.sh` to be a no-resource readiness check.
+- Added `infra/azure/scripts/00_check_prereqs.ps1`.
+- Updated Azure scripts for ACR build, Phase 0.5 Azure job, Phase 1 Azure dry-run job, and small Phase 1 pilot job.
+
+Azure:
+
+- Azure resources created: none.
+- Blocker before resource creation: wait for `Microsoft.ContainerRegistry` to become `Registered` and verify Container Apps GPU T4 quota.
+
+Local validation after Azure-first updates:
+
+- `python -m pytest tests/ -v` -> `41 passed, 2 warnings`
+- `python experiments\phase1_depth_gradient.py --dry-run` -> completed, total cells `54`
+- Phase 1 dry-run conditions: `strict_answer_only`, `visible_cot`, `r1_style_thinking`
+- No local model inference, model download, or J-lens fitting was run.
+- Azure resources created: none.
+
 ## 2026-07-08 — Local validation sequence
 
 Commands executed:
