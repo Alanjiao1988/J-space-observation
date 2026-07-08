@@ -6,7 +6,42 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 
 ## Current Phase
 
-**Phase: Scaffold Implementation (Complete)**
+**Phase: Local validation complete; ready for dependency fix before small Phase 1 pilot**
+
+## Latest Local Validation (2026-07-08)
+
+### Validation Results
+
+- Repository state: `main` synced with `origin/main` before validation.
+- Tests: `python -m pytest tests/ -v` -> `41 passed, 2 warnings`.
+- Phase 0.5 availability/model-loading check: completed.
+  - Output directory: `results/runs/20260708_181325`
+  - Summary: `results/runs/20260708_181325/phase0_5_summary.md`
+  - Pre-fitted lenses found locally/configured: no.
+  - jacobian-lens installed/importable: no / no.
+  - Model loading attempted: yes.
+  - Model loading succeeded: no. Both configured models failed because `accelerate` is required for `device_map`.
+  - Actual tiny J-lens fitting attempted: no.
+  - Actual tiny J-lens fitting success: not attempted.
+- Phase 1 dry run: completed.
+  - Conditions included `strict_answer_only`, `visible_cot`, and `r1_style_thinking`.
+  - Total cells: 54.
+  - No model download or generation was performed by the dry run.
+- Azure resources created: none.
+
+### Blockers
+
+- Local environment is missing `accelerate`, so Phase 0.5 model loading did not succeed.
+- `jacobian-lens` is not installed/importable locally, so real tiny J-lens fitting remains unavailable.
+- No pre-fitted lenses were found locally/configured.
+
+### Next Command
+
+After resolving the missing `accelerate` dependency, run a small real Phase 1 pilot with a single model and arithmetic only:
+
+```powershell
+python experiments\phase1_depth_gradient.py --models Qwen/Qwen2.5-Math-1.5B --task-families arithmetic --depths 1,2,3 --conditions strict_answer_only,visible_cot,r1_style_thinking --items-per-cell 1 --max-new-tokens 64
+```
 
 ## What Has Been Implemented
 

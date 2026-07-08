@@ -105,3 +105,32 @@ Decision:
 Next decision:
 
 - Run Phase 0.5 availability check and Phase 1 dry run locally before any Azure execution or Plan A feasibility decision.
+
+## Phase 0.5 Run - 2026-07-08T18:13:38.361771
+- Jacobian-lens installed: False
+- Pre-fitted lens found: False
+- Model loading check success for all models: False
+- Actual tiny fitting attempted: no
+- Actual tiny fitting success: not attempted
+- Results: C:\Users\alanjiao\J-space-observation\results\runs\20260708_181325
+
+## 2026-07-08 — Local validation completed
+
+Status:
+
+- Tests passed: yes (`41 passed, 2 warnings`)
+- Phase 0.5 availability/model-loading check completed: yes
+- Phase 1 dry run completed: yes
+- Azure resources created: none
+
+Phase 0.5 interpretation:
+
+- Pre-fitted lenses were not found locally/configured.
+- jacobian-lens is not installed/importable in the local environment.
+- Model loading was attempted but failed for both configured models because `accelerate` is required for `device_map`.
+- Actual tiny J-lens fitting was not attempted.
+- This validation does not prove Plan A feasibility.
+
+Next recommended step:
+
+- Resolve the local `accelerate` dependency, then run a small real Phase 1 pilot with a single model and arithmetic only before any Azure execution or Plan A decision.

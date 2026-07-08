@@ -155,16 +155,16 @@ def main():
     )
     
     if jlens_status['loadable'] and requested_fit:
-        print("✓ jacobian-lens is importable")
-        print("⊘ Actual tiny fitting attempted: no")
+        print("[OK] jacobian-lens is importable")
+        print("[SKIP] Actual tiny fitting attempted: no")
         print(f"  {tiny_fit_message}")
     else:
         if args.skip_fit:
-            print("⊘ Fitting skipped (--skip-fit flag)")
+            print("[SKIP] Fitting skipped (--skip-fit flag)")
         elif args.search_prefitted_only:
-            print("⊘ Only searching for pre-fitted lenses (--search-prefitted-only flag)")
+            print("[SKIP] Only searching for pre-fitted lenses (--search-prefitted-only flag)")
         elif not jlens_status['loadable']:
-            print("✗ jacobian-lens not loadable. Install with:")
+            print("[FAIL] jacobian-lens not loadable. Install with:")
             print(f"  {jso.get_jlens_install_command()}")
         print()
     
@@ -202,7 +202,7 @@ def main():
                 "success": True,
                 "error": None,
             }
-            print(f"✓ {model_name}")
+            print(f"[OK] {model_name}")
             log_model_info(info, verbose=True)
             print()
             # Clean up
@@ -212,7 +212,7 @@ def main():
                 "success": False,
                 "error": str(e),
             }
-            print(f"✗ {model_name}: {str(e)}")
+            print(f"[FAIL] {model_name}: {str(e)}")
             print()
     
     # Generate summary
@@ -230,13 +230,13 @@ def main():
     )
     
     prefitted_summary = "\n".join([
-        f"- {m}: {'✓ Found' if found else '✗ Not found'}"
+        f"- {m}: {'Found' if found else 'Not found'}"
         for m, (found, _) in prefitted_results.items()
     ])
     summary_builder.add_section("Pre-fitted Lens Status", prefitted_summary)
     
     model_loading_summary = "\n".join([
-        f"- {m}: {'✓ loaded' if r['success'] else '✗ failed'}"
+        f"- {m}: {'loaded' if r['success'] else 'failed'}"
         + (f" ({r['error']})" if not r["success"] else "")
         for m, r in model_loading_results.items()
     ])
@@ -257,12 +257,12 @@ def main():
     # Decision summary
     decision_lines = []
     if any(found for _, (found, _) in prefitted_results.items()):
-        decision_lines.append("- ✓ Pre-fitted lens found - Plan A partially unblocked")
+        decision_lines.append("- Pre-fitted lens found - Plan A partially unblocked")
     else:
         decision_lines.append("- Pre-fitted lens not found")
     
     if jlens_status['loadable']:
-        decision_lines.append("- ✓ jacobian-lens installed/loadable")
+        decision_lines.append("- jacobian-lens installed/loadable")
     else:
         decision_lines.append(f"- jacobian-lens not available")
         decision_lines.append(f"  Install: `{jso.get_jlens_install_command()}`")

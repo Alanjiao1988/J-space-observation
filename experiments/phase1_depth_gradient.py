@@ -209,16 +209,16 @@ def main():
         try:
             config_obj = ModelConfig(model_name=model_name, dtype=args.dtype)
             model, tokenizer, device, info = load_model_and_tokenizer(config_obj)
-            print("✓ Model loaded")
+            print("[OK] Model loaded")
             log_model_info(info, verbose=True)
         except Exception as e:
-            print(f"✗ Failed to load: {str(e)}")
+            print(f"[FAIL] Failed to load: {str(e)}")
             traceback.print_exc()
             continue
         
         for task_family in task_families:
             if task_family not in prompt_sets:
-                print(f"⊘ Task family not found: {task_family}")
+                print(f"[SKIP] Task family not found: {task_family}")
                 continue
             
             items_by_depth = {}
@@ -229,7 +229,7 @@ def main():
             
             for depth in depths:
                 if depth not in items_by_depth:
-                    print(f"⊘ No items for {task_family} depth {depth}")
+                    print(f"[SKIP] No items for {task_family} depth {depth}")
                     continue
                 
                 items = items_by_depth[depth]
@@ -271,7 +271,7 @@ def main():
                             )
                             latencies.append(gen_time)
                         except Exception as e:
-                            print(f"  ✗ Generation failed: {str(e)}")
+                            print(f"  [FAIL] Generation failed: {str(e)}")
                             output = ""
                             gen_time = 0
                         

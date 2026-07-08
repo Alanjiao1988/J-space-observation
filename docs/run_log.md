@@ -71,6 +71,47 @@ Azure:
 
 - No Azure resources were created in this step.
 
+## 2026-07-08 — Local validation sequence
+
+Commands executed:
+
+- `git status -sb`
+- `git --no-pager log -3 --oneline`
+- `python -m pytest tests/ -v`
+- `python experiments\phase0_5_jlens_spike.py --skip-fit`
+- `python experiments\phase1_depth_gradient.py --dry-run`
+
+Results:
+
+- Git state: `main` synced with `origin/main` before validation.
+- Latest commits:
+  - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`
+  - `30f770c Record scaffold sync verification`
+  - `ff6a351 Implement Phase 0.5 and Phase 1 executable scaffold`
+- Test result: `41 passed, 2 warnings`.
+- Phase 0.5 availability/model-loading check completed after replacing non-ASCII runtime status symbols with ASCII-safe labels.
+- Phase 0.5 output directory: `results/runs/20260708_181325`
+- Phase 0.5 summary path: `results/runs/20260708_181325/phase0_5_summary.md`
+- Phase 0.5 findings:
+  - Pre-fitted lenses found locally/configured: `false`
+  - jacobian-lens installed/importable: `false` / `false`
+  - Model loading attempted: `true`
+  - Model loading success for all models: `false`
+  - Model loading failure reason: `accelerate` is required for `device_map`
+  - Actual tiny fitting attempted: `no`
+  - Actual tiny fitting success: `not attempted`
+- Phase 1 dry-run result:
+  - Models: `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`, `Qwen/Qwen2.5-Math-1.5B`
+  - Task families: `arithmetic`, `synthetic_relation`, `factual_counterfactual`
+  - Depths: `1`, `2`, `3`
+  - Conditions: `strict_answer_only`, `visible_cot`, `r1_style_thinking`
+  - Total cells: `54`
+  - No model download/generation was performed by dry run.
+
+Azure:
+
+- Azure resources created: none.
+
 ## 2026-07-08 — Strict no-CoT and Phase 0.5 clarification fixes
 
 Action:
