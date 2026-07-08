@@ -8,6 +8,24 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 
 **Phase: Azure-first execution; GHCR primary registry path; T4 quota is the next gate (local PC orchestration-only)**
 
+## GHCR Workflow Install + T4 Quota Findings (2026-07-08 21:39 +08:00)
+
+- Baseline: read `docs/thread_handoff.md`; `origin/main` HEAD = `dd1b243...` (confirmed).
+- **Programmatic workflow install is NOT possible** with available credentials:
+  - Owner account `Alanjiao1988` lacks the GitHub `workflow` OAuth scope.
+  - Account `alanjiao_microsoft` has `workflow` scope but no access (404) to this repo.
+  - Contents API `PUT .github/workflows/build-ghcr.yml` -> 404 (masked workflow-scope restriction).
+  - => Manual GitHub web UI install by Alan is required (unchanged).
+- **T4 GPU region availability: confirmed** — `Consumption-GPU-NC8as-T4` is offered in `southeastasia`.
+- **T4 GPU quota (subscription): still NOT confirmed** — `az quota` is blocked because `Microsoft.Quota` provider is not registered. Did not register it (avoiding another multi-hour provider registration without approval). Use portal Usage+quotas or a support request.
+- **Azure resources: none** (verified via `az group list` — no project resource groups).
+- Providers: `Microsoft.App` = Registered, `Microsoft.ContainerRegistry` = Registered.
+
+### Two remaining blockers (both need Alan)
+
+1. Install `.github/workflows/build-ghcr.yml` via GitHub web UI (paste from `infra/ci/build-ghcr.yml`), then run the workflow.
+2. Confirm Container Apps **T4 GPU quota in southeastasia** via the Azure Portal (Usage + quotas) or a support request. Optionally, approve registering `Microsoft.Quota` so `az quota` can check programmatically.
+
 ## GHCR + T4 Quota Path Status (2026-07-08 21:34 +08:00)
 
 - Read-only provider re-check: `Microsoft.ContainerRegistry` = `Registered`, `Microsoft.App` = `Registered`.

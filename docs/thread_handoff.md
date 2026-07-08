@@ -2,8 +2,10 @@
 
 Date: 2026-07-08
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified commit before this handoff: `6ea9f461fdf9d0814d06f04a2d1b75ab1dbb0689`
-Latest status message for that commit: `Focus Azure execution on GHCR and T4 quota path`
+Latest verified commit before this handoff: `dd1b24301407955b1d0de90e9e96a4035d87b183`
+Latest status message for that commit: `Keep GHCR primary after ACR provider recovery`
+
+> Update (2026-07-08 21:39 +08:00): Programmatic install of the GHCR workflow was attempted and is confirmed NOT possible with available credentials (owner account lacks `workflow` scope; the workflow-scoped `alanjiao_microsoft` account has no access to this repo; Contents API returns 404). Manual GitHub web UI install remains required. T4 GPU workload profile type is confirmed offered in `southeastasia`, but the subscription's actual T4 quota is still unconfirmed (`az quota` blocked by unregistered `Microsoft.Quota`). Azure resources remain none (verified). See `reports/current_status.md` for the latest details.
 
 This document is intended to let a new ChatGPT / Copilot thread continue the project without reading the full previous conversation.
 
@@ -222,7 +224,8 @@ none
 T4 quota status:
 
 ```text
-not yet confirmed
+region availability: CONFIRMED (Consumption-GPU-NC8as-T4 is offered in southeastasia)
+subscription quota: NOT yet confirmed (az quota blocked by unregistered Microsoft.Quota; use portal or support request)
 ```
 
 This is now the main gate. Do not create GPU jobs until Azure Container Apps T4 quota for `southeastasia` is confirmed.
@@ -258,6 +261,8 @@ infra/ci/build-ghcr.yml
 ```
 
 It is not yet installed under `.github/workflows/` because the local CLI credential lacks the GitHub `workflow` OAuth scope.
+
+> Confirmed (2026-07-08): Programmatic install is not possible. The repo-owner `gh` account (`Alanjiao1988`) lacks `workflow` scope; the workflow-scoped account (`alanjiao_microsoft`) has no access to this repo (404); and a Contents API `PUT` to `.github/workflows/build-ghcr.yml` returns 404 (GitHub's masked workflow-scope restriction). To install programmatically instead of via the UI, either add the `workflow` scope to the `Alanjiao1988` token (`gh auth refresh -h github.com -s workflow`, requires interactive browser auth) or grant the `alanjiao_microsoft` account push access to the repo.
 
 Manual installation is required:
 

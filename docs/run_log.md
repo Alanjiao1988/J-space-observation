@@ -347,6 +347,38 @@ Decision:
 - Documented registry strategy, planned Azure command sequence, and T4 quota confirmation steps in `docs/azure_runbook.md`.
 - Manual installation of `.github/workflows/build-ghcr.yml` remains required (CLI credential lacks `workflow` scope).
 
+## 2026-07-08 — Workflow install attempt + read-only Azure gate checks
+
+Baseline: read `docs/thread_handoff.md`; confirmed `origin/main` HEAD = `dd1b24301407955b1d0de90e9e96a4035d87b183` (matches expected).
+
+Workflow installation attempts (both failed as expected):
+
+- `gh auth status`: two accounts on github.com:
+  - `Alanjiao1988` (active, repo owner): scopes `gist, read:org, repo` — **no `workflow` scope**.
+  - `alanjiao_microsoft`: scopes include `workflow`, but **404 (no access)** to `Alanjiao1988/J-space-observation`.
+- Tried Contents API install with the owner account:
+  - `gh api -X PUT repos/Alanjiao1988/J-space-observation/contents/.github/workflows/build-ghcr.yml` -> `404 Not Found` (GitHub masks the `workflow`-scope restriction as 404).
+- Conclusion: `.github/workflows/build-ghcr.yml` **cannot** be installed programmatically with available credentials. Manual GitHub web UI install by Alan remains required. Switched active `gh` account back to `Alanjiao1988`.
+
+Read-only Azure checks (no resources created):
+
+- `az group list` filtered for `jspace`: `[]` (no project resource groups exist).
+- `az containerapp env workload-profile list-supported -l southeastasia`: the profile `Consumption-GPU-NC8as-T4` **is offered in southeastasia** (regional availability confirmed).
+- `az quota list --scope /subscriptions/<sub>/providers/Microsoft.App/locations/southeastasia`: failed with `MissingRegistrationForResourceProvider: Microsoft.Quota`. Did not register `Microsoft.Quota` (avoiding another multi-hour provider registration without approval).
+
+Status after checks:
+
+- Microsoft.App: `Registered`. Microsoft.ContainerRegistry: `Registered`.
+- T4 GPU workload profile TYPE available in `southeastasia`: **yes**.
+- Actual T4 GPU QUOTA for the subscription: **still not confirmed** (needs portal Usage+quotas or a support request; `az quota` blocked by unregistered `Microsoft.Quota`).
+- Azure resources created: **none** (verified).
+
+Decision:
+
+- Workflow install stays a manual UI action for Alan.
+- Do not create Azure resources; T4 quota confirmation remains the gate.
+- Did not register `Microsoft.Quota` — will ask Alan before triggering any further provider registration.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`
