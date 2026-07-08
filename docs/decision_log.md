@@ -134,3 +134,35 @@ Phase 0.5 interpretation:
 Next recommended step:
 
 - Resolve the local `accelerate` dependency, then run a small real Phase 1 pilot with a single model and arithmetic only before any Azure execution or Plan A decision.
+
+## Phase 0.5 Run - 2026-07-08T18:25:22.961267
+- Jacobian-lens installed: True
+- Pre-fitted lens found: False
+- Model loading check success for all models: True
+- Actual tiny fitting attempted: no
+- Actual tiny fitting success: not attempted
+- Results: C:\Users\alanjiao\J-space-observation\results\runs\20260708_182022
+
+## 2026-07-08 — Local environment validation for Phase 0.5
+
+Status:
+
+- Environment fixed: yes.
+- Core dependencies installed/importable: yes (`torch`, `transformers`, `accelerate`, `safetensors`, `sentencepiece`).
+- External jacobian-lens installed: yes, from `C:\Users\alanjiao\external\jacobian-lens`.
+- jacobian-lens importable: yes, via `import jlens`.
+- Phase 0.5 availability/model-loading check completed: yes.
+- Model loading now succeeds for both configured models on CPU.
+- Pre-fitted lenses found locally/configured: no.
+- Actual tiny J-lens fitting attempted: no.
+- Phase 1 dry run completed: yes, 54 cells.
+- Azure resources created: none.
+
+Decision:
+
+- The local dependency blocker is resolved for Phase 0.5 availability/model-loading checks and Phase 1 dry runs.
+- Plan A is still not proven because no actual tiny J-lens fitting has been run and no pre-fitted lens was found locally.
+
+Next recommended step:
+
+- Run a small real Phase 1 pilot first: single model, arithmetic only, depths `1,2,3`, all three conditions.

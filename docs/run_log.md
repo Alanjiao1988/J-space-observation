@@ -71,6 +71,66 @@ Azure:
 
 - No Azure resources were created in this step.
 
+## 2026-07-08 — Local environment validation for Phase 0.5
+
+Active Python environment:
+
+- Python version: `Python 3.13.14`
+- Python executable: `C:\Users\alanjiao\AppData\Local\Programs\Python\Python313\python.exe`
+- pip: `pip 26.1.2`
+
+Commands executed:
+
+- `python --version`
+- `python -c "import sys; print(sys.executable)"`
+- `python -m pip --version`
+- `python -m pip list | findstr /I "torch transformers accelerate safetensors sentencepiece"`
+- `python -m pip install --upgrade pip`
+- `python -m pip install -r requirements.txt`
+- `python -c "import torch, transformers, accelerate, safetensors, sentencepiece; print('core deps ok')"`
+- `cd C:\Users\alanjiao`
+- `if not exist external mkdir external`
+- `cd external`
+- `if not exist jacobian-lens git clone https://github.com/anthropics/jacobian-lens.git`
+- `cd jacobian-lens`
+- `python -m pip install -e .`
+- `python -c "import jlens; print('jlens import ok')"`
+- `python -m pytest tests/ -v`
+- `python experiments\phase0_5_jlens_spike.py --skip-fit`
+- `python experiments\phase1_depth_gradient.py --dry-run`
+
+Dependency install results:
+
+- `requirements.txt` installed successfully in the active Python environment.
+- Core dependency import check passed: `core deps ok`.
+- `accelerate` is now installed/importable.
+- External jacobian-lens clone/install path: `C:\Users\alanjiao\external\jacobian-lens`
+- jacobian-lens import result: `import jlens` succeeded.
+- The project helper was updated to recognize the package's installed import name, `jlens`.
+
+Validation results:
+
+- Test result: `41 passed, 2 warnings`.
+- Phase 0.5 output directory: `results/runs/20260708_182022`
+- Phase 0.5 summary path: `results/runs/20260708_182022/phase0_5_summary.md`
+- Phase 0.5 findings:
+  - Pre-fitted lenses found locally/configured: `false`
+  - jacobian-lens installed/importable: `true` / `true`
+  - Model loading attempted: `true`
+  - Model loading success for all models: `true`
+  - DeepSeek-R1-Distill-Qwen-1.5B loaded on CPU; 28 layers, hidden size 1536, 1.78B parameters.
+  - Qwen2.5-Math-1.5B loaded on CPU; 28 layers, hidden size 1536, 1.54B parameters.
+  - Actual tiny fitting attempted: `no`
+  - Actual tiny fitting success: `not attempted`
+- Phase 1 dry-run result:
+  - Conditions: `strict_answer_only`, `visible_cot`, `r1_style_thinking`
+  - Total cells: `54`
+  - No model generation was performed by dry run.
+
+Azure:
+
+- Azure resources created: none.
+
 ## 2026-07-08 — Local validation sequence
 
 Commands executed:

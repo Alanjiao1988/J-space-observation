@@ -7,10 +7,14 @@ import sys
 def check_jacobian_lens_installed() -> bool:
     """Check if jacobian-lens package is installed."""
     try:
-        import jacobian_lens  # noqa: F401
+        import jlens  # noqa: F401
         return True
     except ImportError:
-        return False
+        try:
+            import jacobian_lens  # noqa: F401
+            return True
+        except ImportError:
+            return False
 
 
 def get_jlens_install_command() -> str:
@@ -88,10 +92,15 @@ def try_import_jacobian_lens():
         (success, module_or_error_msg)
     """
     try:
-        import jacobian_lens
-        return True, jacobian_lens
+        import jlens
+        return True, jlens
     except ImportError as e:
-        return False, str(e)
+        jlens_error = str(e)
+        try:
+            import jacobian_lens
+            return True, jacobian_lens
+        except ImportError as fallback_error:
+            return False, f"jlens: {jlens_error}; jacobian_lens: {fallback_error}"
     except Exception as e:
         return False, f"Unexpected error loading jacobian-lens: {str(e)}"
 
