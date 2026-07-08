@@ -730,6 +730,43 @@ Next required action:
   - `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`
 - After that, ask Copilot to retry. Copilot will verify presence via `User` scope without printing the token.
 
+## 2026-07-08 — GHCR_PAT retry after reported environment reset still not visible
+
+Scope:
+
+- Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` as Windows User environment variables and restarting VS Code / Copilot agent / terminal.
+- Copilot re-synced the repo and re-checked all environment scopes.
+
+Checks executed:
+
+- `git fetch origin`
+- `git checkout main`
+- `git pull --ff-only origin main`
+- `git status -sb`
+- `git log --oneline -5`
+- Checked `GHCR_USERNAME` / `GHCR_PAT` presence in Process, User, and Machine environment scopes.
+- Confirmed existing Azure resources:
+  - `rg-jspace-observation-sea`: `Succeeded`
+  - `law-jspace-observation-sea`: `Succeeded`
+  - `cae-jspace-observation-sea`: `Succeeded`
+  - workload profile `gpu-t4` / `Consumption-GPU-NC8as-T4`: present
+
+Results:
+
+- `GHCR_USERNAME`: not visible in Process/User/Machine environment.
+- `GHCR_PAT`: not visible in Process/User/Machine environment.
+- GHCR package-read preflight: not run because no PAT was visible.
+- Azure smoke job retry: not attempted.
+- Token printed: no.
+- Secret committed: no.
+- Azure resources created in this step: none.
+
+Decision:
+
+- Stop. The current agent process still cannot read the GHCR PAT.
+- Do not retry Azure job creation with `gh auth token`, because previous preflight showed it lacks `read:packages`.
+- Required next action: expose a classic PAT with `read:packages` through a mechanism visible to this agent process, or make the GHCR package public.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`

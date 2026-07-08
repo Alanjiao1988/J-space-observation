@@ -424,3 +424,21 @@ Decision:
   - `[Environment]::SetEnvironmentVariable("GHCR_USERNAME", "Alanjiao1988", "User")`
   - `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`
 - Do not paste token values into chat.
+
+## 2026-07-08 — GHCR_PAT still not visible after reported restart
+
+Status:
+
+- Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in Windows User environment and restarting the local tools.
+- Copilot checked Process/User/Machine environment scopes again.
+- `GHCR_USERNAME`: not visible.
+- `GHCR_PAT`: not visible.
+- No package-read preflight was run.
+- No Azure job retry was attempted.
+- Existing Azure resources unchanged.
+
+Decision:
+
+- Stop until the agent can read a valid package-read token.
+- Do not fall back to the current `gh auth token` because it previously failed with `read:packages` required.
+- Next option: make GHCR package public, or provide a secure token path that is visible to the agent process.

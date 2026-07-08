@@ -117,6 +117,18 @@ To retry, set the variables in Windows User environment (not only shell-local), 
 
 Do not paste the token into chat.
 
+### GHCR_PAT Visibility Retry
+
+- Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` as Windows User environment variables and restarting VS Code / Copilot agent / terminal.
+- Copilot re-checked Process/User/Machine environment scopes.
+- `GHCR_USERNAME`: still not visible.
+- `GHCR_PAT`: still not visible.
+- GHCR package-read preflight was not run because no PAT was visible.
+- Azure smoke job was not retried.
+- Existing Azure resources remain unchanged.
+
+Current blocker remains: the agent process cannot read a valid `GHCR_PAT`. Next action is to provide a secure token path visible to the agent or make the GHCR package public.
+
 ### Script Update
 
 `infra/azure/scripts/05_run_job_ghcr.sh` has been updated to match the actual Azure resource names and the live CLI findings:
