@@ -2,7 +2,7 @@
 
 Date: 2026-07-08
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified commit before this handoff: `686765fbe63e264740e1514e4f8fc52787a73760`
+Latest verified commit before this handoff: `95541404ff86fdf436706cd635c62dea29b9ff86`
 Latest status message for that commit: `Confirm T4 quota gate status`
 
 > Update (2026-07-08 22:00 +08:00): The GHCR workflow is installed at `.github/workflows/build-ghcr.yml` (commit `c07db5c9625a9f9ad96c55f77385c078e11d4a66`) and run `28947916765` completed successfully, pushing `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66` plus `latest`. Diff from image commit to repo commit `c10afdd...` is documentation-only, so no image rebuild is required. `Microsoft.Quota` is now registered and CLI quota queries work, but they do not expose a T4 / NC8as-T4 quota item for Microsoft.App in `southeastasia`; the subscription's actual T4 quota remains unknown and must be confirmed through Azure Portal Usage + quotas or support. Azure resources remain none (verified). See `reports/current_status.md` for the latest details.
