@@ -594,6 +594,58 @@ Script maintenance:
   - removed `--enable-dedicated-gpu true` from environment creation because it caused `WorkloadProfileInvalidType: NC24_A100 invalid`;
   - removed `--min-nodes/--max-nodes` from `Consumption-GPU-NC8as-T4` workload profile creation because it caused `WorkloadProfilePropertyNotSupported`.
 
+## 2026-07-08 — GHCR auth retry with gh token, still blocked
+
+GHCR token handling:
+
+- Local env check:
+  - `GHCR_PAT`: not set
+  - `GHCR_USERNAME`: not set; defaulted to `Alanjiao1988`
+  - `gh auth token`: available
+- Token values were not printed or committed.
+- Used `gh auth token` as the Azure registry secret value for a retry because no `GHCR_PAT` was available.
+
+Job creation method:
+
+- Switched to `az rest` / ARM body to avoid `az containerapp job create --args -lc ...` CLI parsing problems.
+- Discovered correct ARM schema placement for job workload profile:
+  - invalid: `properties.template.workloadProfileName`
+  - invalid: `properties.configuration.workloadProfileName`
+  - valid: `properties.workloadProfileName`
+- Updated `infra/azure/scripts/05_run_job_ghcr.sh` accordingly.
+
+Failed schema attempts:
+
+- Error: `Unknown properties workloadProfileName in ContainerAppsJobTemplate are not supported`
+- Error: `Unknown properties workloadProfileName in ContainerAppsJobConfiguration are not supported`
+- Classification: ARM schema placement issue; fixed by moving `workloadProfileName` to `properties.workloadProfileName`.
+
+GHCR auth retry result:
+
+- Job attempted: `job-jspace-ghcr-smoke`
+- Image: `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66`
+- Intended smoke command: `python -m pytest tests/ -q`
+- Error code: `InvalidParameterValueInContainerTemplate`
+- Exact error message:
+  - `Field 'template.containers.main.image' is invalid with details: 'Invalid value: "ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66": GET https:: DENIED: requested access to the resource is denied';.`
+- Classification: GHCR private package / token insufficient for package pull. The available `gh auth token` is not sufficient for Azure to pull this private GHCR image.
+
+Resource state after retry:
+
+- Jobs: none.
+- Resource group remains: `rg-jspace-observation-sea`.
+- Log Analytics workspace remains: `law-jspace-observation-sea`.
+- Container Apps environment remains: `cae-jspace-observation-sea`.
+- Workload profile remains: `gpu-t4` (`Consumption-GPU-NC8as-T4`).
+
+Current stop reason:
+
+- Need either:
+  1. Make GHCR package public; or
+  2. Provide `GHCR_USERNAME` + classic PAT with `read:packages` via secure environment variable / Azure secret path.
+- Do not paste the token in chat. Do not commit it. Do not print it.
+- Phase 0.5 / Phase 1 dry-run / small pilot were not attempted.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`

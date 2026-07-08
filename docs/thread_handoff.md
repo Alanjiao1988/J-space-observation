@@ -2,10 +2,12 @@
 
 Date: 2026-07-08
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified commit before this handoff: `be9f71caf1c8e346c5dc8ac8d910f4733356b5e8`
-Latest status message for that commit: `Run Azure GHCR smoke path`
+Latest verified commit before this handoff: `0024253c17f7d341df77a36184f827e9a06d737c`
+Latest status message for that commit: `Configure GHCR auth for Azure Container Apps jobs`
 
 > Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
+>
+> Update (2026-07-08 22:34 +08:00): Retried GHCR smoke job using `gh auth token` as the Azure registry secret because `GHCR_PAT` was not set. Token value was not printed/logged. Job creation still failed with `InvalidParameterValueInContainerTemplate` and `DENIED: requested access to the resource is denied`. This confirms the available `gh auth token` is insufficient for Azure to pull the private GHCR package. `infra/azure/scripts/05_run_job_ghcr.sh` was updated to use ARM REST job creation, place `workloadProfileName` at `properties.workloadProfileName`, use actual `*-sea` resource names, avoid failed T4 min/max and `--enable-dedicated-gpu` args, and fallback to `gh auth token` only if `GHCR_PAT` is absent. No jobs were created successfully; Phase 0.5 / Phase 1 dry-run / small pilot were not attempted.
 
 This document is intended to let a new ChatGPT / Copilot thread continue the project without reading the full previous conversation.
 
@@ -327,6 +329,9 @@ Known properties:
 - has been updated to avoid the live CLI failures:
   - no `--enable-dedicated-gpu true`
   - no `--min-nodes/--max-nodes` on `Consumption-GPU-NC8as-T4`
+- uses ARM REST job create/update to avoid Azure CLI `--args -lc ...` parsing failures
+- uses `properties.workloadProfileName` for `gpu-t4`
+- falls back to `gh auth token` only if `GHCR_PAT` is absent, but the available `gh auth token` has already proven insufficient for private GHCR pull
 - can run commands equivalent to:
 
 ```bash
@@ -360,7 +365,7 @@ UNAUTHORIZED: authentication required
 Resolve one of:
 
 1. Make the GHCR package public; or
-2. Provide `GHCR_USERNAME` and `GHCR_PAT` through a secure environment/Azure secret path only.
+2. Provide `GHCR_USERNAME` and a classic `GHCR_PAT` with `read:packages` through a secure environment/Azure secret path only.
 
 Do not send token values in chat, commit them, or log them.
 

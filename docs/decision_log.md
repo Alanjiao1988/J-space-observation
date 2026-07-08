@@ -360,3 +360,25 @@ Decision:
 - Next gate is GHCR pull authentication: make the GHCR package public or provide `GHCR_USERNAME` + `GHCR_PAT` through environment/Azure secret only.
 - Do not commit or print GHCR token values.
 - `infra/azure/scripts/05_run_job_ghcr.sh` was updated to use the actual `*-sea` resource names and to avoid the `--enable-dedicated-gpu` / T4 min-max parameters that failed during live Azure CLI execution.
+
+## 2026-07-08 — GHCR auth retry confirms gh token is insufficient
+
+Status:
+
+- `GHCR_PAT`: not set.
+- `gh auth token`: available and used as an Azure registry secret retry; token value was not printed or committed.
+- ARM schema for Container Apps Job was corrected:
+  - `workloadProfileName` belongs at `properties.workloadProfileName`.
+- Smoke job still failed before creation/execution.
+
+Error:
+
+- Error code: `InvalidParameterValueInContainerTemplate`.
+- Exact message includes: `DENIED: requested access to the resource is denied`.
+- Classification: GHCR package pull authentication. The current `gh auth token` is insufficient for Azure to pull the private GHCR image.
+
+Decision:
+
+- Stop before any Phase 0.5, Phase 1 dry-run, or small pilot.
+- Next step must be either making the GHCR package public or providing a proper classic PAT with `read:packages` via secure environment/Azure secret path.
+- Do not send token values in chat; do not commit/log them.

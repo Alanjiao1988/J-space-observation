@@ -362,6 +362,14 @@ Next GHCR smoke attempt needs one of:
 
 Do not commit or log `GHCR_PAT`. The token should have minimal package read permission (`read:packages`) if the package remains private.
 
+Follow-up retry:
+
+- Retrying with the available `gh auth token` as the Azure registry secret also failed.
+- Error code: `InvalidParameterValueInContainerTemplate`.
+- Message includes: `DENIED: requested access to the resource is denied`.
+- Conclusion: the current `gh auth token` is not sufficient for Azure to pull this private GHCR image.
+- Next retry needs either a public GHCR package or a classic PAT with `read:packages`.
+
 ## Required run logging
 
 Every Azure resource creation or job start must append to `docs/run_log.md`:

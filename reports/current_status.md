@@ -74,6 +74,23 @@ Azure Container Apps cannot pull the GHCR image anonymously. Next step is one of
 
 Do not send token values in chat and do not commit them.
 
+### GHCR Auth Retry Result
+
+- `GHCR_PAT`: not set.
+- `GHCR_USERNAME`: defaulted to `Alanjiao1988`.
+- `gh auth token`: available and used as an Azure registry secret for a retry (token value not printed/logged).
+- Job creation still failed:
+  - Error code: `InvalidParameterValueInContainerTemplate`
+  - Message includes: `DENIED: requested access to the resource is denied`
+  - Classification: available `gh auth token` is insufficient for Azure to pull the private GHCR image.
+- Jobs created successfully: none.
+- Phase 0.5 / Phase 1 dry-run / small pilot: not attempted.
+
+Current actionable options:
+
+1. Make the GHCR package public; or
+2. Provide a classic PAT with `read:packages` through a secure local environment variable (`GHCR_PAT`) or an approved Azure secret path. Do not send the token in chat.
+
 ### Script Update
 
 `infra/azure/scripts/05_run_job_ghcr.sh` has been updated to match the actual Azure resource names and the live CLI findings:
@@ -81,6 +98,9 @@ Do not send token values in chat and do not commit them.
 - defaults now use `rg-jspace-observation-sea`, `cae-jspace-observation-sea`, and `job-jspace-ghcr-smoke`;
 - removed `--enable-dedicated-gpu true` from environment creation;
 - removed `--min-nodes/--max-nodes` from the T4 workload profile add command;
+- uses ARM REST job creation/update to avoid Azure CLI `--args -lc ...` parsing issues;
+- places `workloadProfileName` at `properties.workloadProfileName`, which is the schema position validated by live Azure errors;
+- falls back to `gh auth token` only when `GHCR_PAT` is absent;
 - added project tags to resources created by the script.
 
 ## GHCR + T4 Quota Path Status (2026-07-08 21:34 +08:00)
