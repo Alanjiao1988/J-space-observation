@@ -47,3 +47,26 @@ Next action:
 - Run `make phase0-5` for local Phase 0.5 spike
 - Run `make phase1-dry` for Phase 1 dry-run
 - Setup Azure and submit jobs if needed
+
+## 2026-07-08 — Scaffold sync verification before GitHub push
+
+Action:
+
+- Verified local branch state before pushing: `main` was ahead of `origin/main` by one implementation commit.
+- Verified required implementation files exist locally, including all core modules, Phase 0.5/Phase 1 scripts, tests, Makefile, and Azure scripts.
+- Implementation summary:
+  - Phase 0.5 J-lens feasibility scaffold is implemented in `experiments/phase0_5_jlens_spike.py`.
+  - Phase 1 behavioral depth-gradient scaffold is implemented in `experiments/phase1_depth_gradient.py`.
+  - Strict no-CoT utilities, prompt sets, parsing, stats, run logging, model loading, and J-lens availability helpers are implemented under `src/jspace_observation/`.
+  - Lightweight tests are implemented under `tests/`.
+
+Test command:
+
+- Requested command: `make test`
+- Result: not executable in this Windows environment because `make` is not installed.
+- Equivalent Makefile target command run: `python -m pytest tests/ -v`
+- Test result: `41 passed, 2 warnings`
+
+Azure:
+
+- No Azure resources were created in this step.

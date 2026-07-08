@@ -77,3 +77,19 @@ How to proceed:
 2. Local spike: `make phase0-5` or `make phase1-dry`
 3. Full Phase 1: `make phase1`
 4. Azure submission: `make azure-setup && make azure-phase0-5`
+
+## 2026-07-08 — GitHub sync decision for executable scaffold
+
+Status: Ready to push
+
+Decision:
+
+- Phase 0.5 and Phase 1 executable scaffold is implemented locally.
+- Required implementation files are present under `src/jspace_observation/`, `experiments/`, `tests/`, and `infra/azure/scripts/`.
+- Tests passed with the Makefile target's underlying command: `python -m pytest tests/ -v` -> `41 passed, 2 warnings`.
+- `make test` was attempted, but `make` is not installed in the current Windows environment.
+
+Next decision:
+
+- Run Phase 0.5 feasibility spike and Phase 1 dry run locally before Azure execution.
+- Do not create Azure resources until local dry runs are inspected.
