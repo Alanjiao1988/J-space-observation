@@ -1,0 +1,74 @@
+name: Build and push image to GHCR
+
+# Manual trigger only. This workflow builds the experiment image and pushes it
+# to GitHub Container Registry (GHCR) as a fallback when Azure Container
+# Registry (Microsoft.ContainerRegistry) is unavailable.
+#
+# This workflow does NOT:
+# - download models
+# - bake Hugging Face model cache into the image
+# - run experiments
+# - embed secrets into the image
+
+on:
+  workflow_dispatch:
+    inputs:
+      push_latest:
+        description: "Also tag and push :latest"
+        required: false
+        default: "true"
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set lowercase image name
+        id: img
+        run: |
+          echo "image=$(echo '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute tags
+        id: tags
+        run: |
+          SHA_TAG="${{ steps.img.outputs.image }}:${{ github.sha }}"
+          TAGS="$SHA_TAG"
+          if [ "${{ github.event.inputs.push_latest }}" = "true" ]; then
+            TAGS="$TAGS,${{ steps.img.outputs.image }}:latest"
+          fi
+          echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
+          echo "sha_tag=$SHA_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          provenance: false
+
+      - name: Print pushed image reference
+        run: |
+          echo "Pushed image: ${{ steps.tags.outputs.sha_tag }}"
+          echo "Use this reference in infra/azure/scripts/05_run_job_ghcr.sh via the IMAGE variable."

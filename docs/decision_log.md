@@ -213,3 +213,33 @@ Decision:
 - Stop until `Microsoft.ContainerRegistry` becomes `Registered`.
 - After provider registration is complete, confirm Azure Container Apps T4 GPU quota for `southeastasia` before running `00_check_prereqs.ps1`.
 - Do not create Azure resources and do not fall back to local model inference.
+
+## 2026-07-08 — Adopt GHCR fallback due to blocked Container Registry provider
+
+Status:
+
+- `az provider register --namespace Microsoft.ContainerRegistry --wait` returned exit code `0`, but the state remained `Registering` afterward and on re-check.
+- Microsoft.ContainerRegistry provider: `Registering` (still blocked after several hours and an explicit retry).
+- Microsoft.App provider: `Registered`.
+- Subscription: `MCAPS-Hybrid-REQ-125620-2025-alanjiao`.
+- Azure resources created: none.
+
+Decision:
+
+- Treat the ACR path as blocked. Do not wait indefinitely on `Microsoft.ContainerRegistry`.
+- Adopt GHCR (GitHub Container Registry) as the fallback image registry for Azure Container Apps.
+- Build/push images via a GitHub Actions workflow (stored at `infra/ci/build-ghcr.yml`) so the local PC does not build large images.
+- Deploy Azure Container Apps Jobs from the GHCR image using `infra/azure/scripts/05_run_job_ghcr.sh`, with the GHCR PAT provided only via environment variable / Azure secret.
+- Constraint: the CLI Git credential lacks the `workflow` OAuth scope, so `.github/workflows/` files cannot be pushed. The workflow file is stored at `infra/ci/build-ghcr.yml` and must be copied into `.github/workflows/build-ghcr.yml` via the GitHub web UI or a `workflow`-scoped token before it runs.
+
+Still required before any GPU job:
+
+- `Microsoft.App` must remain `Registered` (currently satisfied).
+- Azure Container Apps T4 GPU quota for `southeastasia` must be confirmed.
+- If T4 quota is unavailable, stop and do not fall back to local model inference.
+
+Next recommended step:
+
+- Run the GHCR build workflow manually in GitHub Actions to produce `ghcr.io/alanjiao1988/j-space-observation:<git-sha>`.
+- Separately, confirm Azure Container Apps T4 GPU quota for `southeastasia`.
+- Do not create Azure resources until both the image and quota are ready.

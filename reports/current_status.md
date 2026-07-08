@@ -6,7 +6,19 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 
 ## Current Phase
 
-**Phase: Azure-first execution preparation; local PC is orchestration-only**
+**Phase: Azure-first execution; ACR blocked, adopting GHCR fallback (local PC orchestration-only)**
+
+## GHCR Fallback Decision (2026-07-08 21:09 +08:00)
+
+- `Microsoft.ContainerRegistry` stayed `Registering` for several hours, including after an explicit `az provider register --namespace Microsoft.ContainerRegistry --wait` (exit code 0 but state unchanged).
+- ACR path is treated as blocked. Adopting GHCR (GitHub Container Registry) as the fallback image registry.
+- Prepared GHCR fallback assets (no Azure resources created):
+  - `infra/ci/build-ghcr.yml`: GitHub Actions build/push definition for `ghcr.io/alanjiao1988/j-space-observation:<git-sha>` (install into `.github/workflows/` via web UI or a `workflow`-scoped token; the CLI credential lacks `workflow` scope).
+  - `infra/azure/scripts/05_run_job_ghcr.sh`: parameterized Azure Container Apps Job using a GHCR image; GHCR PAT via env/Azure secret only.
+  - `docs/azure_runbook.md`: "GHCR fallback when Microsoft.ContainerRegistry is blocked" section.
+  - `.dockerignore`: prevents secrets, results, and model caches from entering the image.
+- Still required before any GPU job: `Microsoft.App` registered (satisfied), and Azure Container Apps T4 GPU quota confirmed for `southeastasia`.
+- Do not fall back to local model inference if T4 quota is unavailable.
 
 ## Azure-first Policy (2026-07-08)
 

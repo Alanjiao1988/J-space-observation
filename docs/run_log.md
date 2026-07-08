@@ -227,7 +227,7 @@ Decision:
 
 - Stop. Re-check provider registration later before any quota check or readiness script.
 
-## 2026-07-08 — Azure provider gate re-check
+## 2026-07-08 — Azure provider gate re-check (first recheck)
 
 Commands executed:
 
@@ -245,6 +245,45 @@ Results:
 Decision:
 
 - Stop. Re-check provider registration later before any quota check or readiness script.
+
+## 2026-07-08 — Container Registry provider retry + GHCR fallback
+
+Commands executed:
+
+- `az provider register --namespace Microsoft.ContainerRegistry --wait`
+- `az provider show -n Microsoft.ContainerRegistry --query registrationState -o tsv`
+- `az provider show -n Microsoft.App --query registrationState -o tsv`
+
+Results:
+
+- `az provider register --namespace Microsoft.ContainerRegistry --wait` returned exit code `0`, but registration state remained `Registering` after the command completed and after a follow-up re-check.
+- Microsoft.ContainerRegistry registration: `Registering` (still blocked after retry)
+- Microsoft.App registration: `Registered`
+- T4 GPU quota status: not checked; blocked by registry provider gate.
+- Readiness script result: not run.
+- Azure resources created: none.
+
+Decision:
+
+- ACR path is treated as blocked because `Microsoft.ContainerRegistry` did not reach `Registered` even after an explicit `--wait` retry that took several hours in total.
+- Adopt GHCR (GitHub Container Registry) as the fallback image registry for Azure Container Apps.
+- Prepared GHCR fallback assets (no Azure resources created):
+  - `infra/ci/build-ghcr.yml`: GitHub Actions workflow definition to build/push image to GHCR (see note below on installation).
+  - `infra/azure/scripts/05_run_job_ghcr.sh`: parameterized Azure Container Apps Job script using a GHCR image; secrets provided only via environment/Azure secret, never committed.
+  - `docs/azure_runbook.md`: new "GHCR fallback when Microsoft.ContainerRegistry is blocked" section.
+  - `.dockerignore`: prevents secrets, results, and Hugging Face caches from entering the image.
+- Note: The Git credential used by the CLI lacks the `workflow` OAuth scope, so pushing files under `.github/workflows/` was rejected by GitHub (`refusing to allow an OAuth App to create or update workflow ... without workflow scope`). The workflow file is therefore stored at `infra/ci/build-ghcr.yml` and must be installed into `.github/workflows/build-ghcr.yml` via the GitHub web UI or a `workflow`-scoped token.
+- Microsoft.App provider and Azure Container Apps T4 GPU quota (southeastasia) are still required before any GPU job.
+- Do not fall back to local model inference if T4 quota is unavailable.
+
+Local validation:
+
+- `python -m pytest tests/ -v` -> `41 passed, 2 warnings`
+- `python experiments\phase1_depth_gradient.py --dry-run` -> completed, total cells `54`
+
+Azure:
+
+- Azure resources created: none.
 
 ## 2026-07-08 — Local validation sequence
 

@@ -130,6 +130,66 @@ bash infra/azure/scripts/04_run_phase1_pilot.sh
 
 The small pilot is intentionally scoped to one model, arithmetic only, depths `1,2,3`, all three prompt conditions, one item per cell, and `max_new_tokens=64`.
 
+## GHCR fallback when Microsoft.ContainerRegistry is blocked
+
+If `Microsoft.ContainerRegistry` cannot reach `Registered` (for example, it stays in `Registering` for hours even after `az provider register --namespace Microsoft.ContainerRegistry --wait`), do not block the whole pipeline on ACR. Use GitHub Container Registry (GHCR) as the image source instead.
+
+Key points:
+
+- Azure Container Apps can pull images from public or private container registries, including GHCR.
+- GHCR image path format:
+
+  ```text
+  ghcr.io/alanjiao1988/j-space-observation:<git-sha>
+  ```
+
+- Prefer building/pushing the image with GitHub Actions (`.github/workflows/build-ghcr.yml`) so the local PC does not build or push large images.
+- For private GHCR packages, use a GitHub Personal Access Token (PAT) with the minimal `read:packages` permission.
+- Provide the GHCR token to Azure only as a Container Apps secret at deployment time.
+- Never commit the GHCR token to the repository.
+- Never print or log token values.
+
+Still required even with the GHCR fallback:
+
+- `Microsoft.App` provider must be `Registered`.
+- Azure Container Apps T4 GPU quota must be confirmed for the target region.
+- T4 quota for `southeastasia` must be confirmed before creating GPU jobs.
+- If T4 quota is unavailable, stop and do not fall back to local model inference.
+
+### GHCR build workflow
+
+The workflow definition is stored at `infra/ci/build-ghcr.yml`.
+
+> Note: The current Git credential lacks the `workflow` OAuth scope, so the CLI cannot push files under `.github/workflows/`. To activate the workflow, install it into `.github/workflows/build-ghcr.yml` using one of:
+> - GitHub web UI: create `.github/workflows/build-ghcr.yml` and paste the contents of `infra/ci/build-ghcr.yml`; or
+> - a local Git credential/token that has the `workflow` scope, then copy the file to `.github/workflows/build-ghcr.yml` and push.
+
+Once installed, trigger the build workflow manually:
+
+1. GitHub repo -> Actions -> "Build and push image to GHCR" -> Run workflow.
+2. The workflow builds the `Dockerfile` and pushes to GHCR tagged with the commit SHA (and `latest`).
+3. The image does not include secrets, Hugging Face model cache, or experiment outputs.
+4. Confirm the pushed image at: `https://github.com/alanjiao1988/j-space-observation/pkgs/container/j-space-observation`.
+
+### GHCR deploy notes for Azure Container Apps Job
+
+Use `infra/azure/scripts/05_run_job_ghcr.sh`. It is parameterized and must not hardcode secrets.
+
+Required environment variables (do not commit real values):
+
+```text
+RESOURCE_GROUP=rg-jspace-observation
+LOCATION=southeastasia
+CONTAINER_APP_ENV=acaenv-jspace-observation
+CONTAINER_APP_JOB=job-jspace-observation-ghcr
+IMAGE=ghcr.io/alanjiao1988/j-space-observation:<git-sha>
+GHCR_USERNAME=<github-username>
+GHCR_PAT=<provided via env var or Azure secret only>
+JOB_COMMAND=<container command to run>
+```
+
+Do not run the GHCR deployment script until `Microsoft.App` is registered and T4 GPU quota is confirmed.
+
 ## Required run logging
 
 Every Azure resource creation or job start must append to `docs/run_log.md`:
@@ -152,14 +212,16 @@ Stop and update `docs/decision_log.md` if any of these occur:
 
 - Azure CLI is not logged in or subscription is wrong.
 - `Microsoft.App` is not registered.
-- `Microsoft.ContainerRegistry` is not registered.
+- `Microsoft.ContainerRegistry` is not registered AND the GHCR fallback is not available.
 - Container Apps GPU T4 quota is unavailable.
-- ACR build fails.
+- ACR build fails (and GHCR fallback also fails).
 - Container Apps job cannot pull the image.
 - Model download fails in Azure.
 - Model loading fails in Azure.
 - J-lens package import fails in Azure.
 - J-lens fitting fails due to memory/runtime.
 - Phase 1 pilot produces invalid no-CoT behavior at high rates.
+
+Note: If only `Microsoft.ContainerRegistry` is blocked, prefer the GHCR fallback (see above) instead of stopping the whole pipeline.
 
 Do not compensate by running full model inference, J-lens fitting, or heavy experiments locally.

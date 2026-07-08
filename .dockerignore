@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+
+# Secrets and local env
+.env
+.env.*
+infra/azure/variables.env
+secrets/
+*.pem
+*.key
+
+# Results and model artifacts (must not be baked into image)
+results/runs/*
+!results/runs/.gitkeep
+models/
+checkpoints/
+*.safetensors
+*.pt
+*.pth
+*.bin
+*.gguf
+
+# Hugging Face cache
+.cache/
+huggingface/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Docs and CI (not needed at runtime)
+.github/
