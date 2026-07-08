@@ -285,3 +285,28 @@ Decision (locked):
 Next required gate:
 
 - Confirm Container Apps T4 GPU quota in `southeastasia`. No Azure resources created until quota is confirmed and the GHCR image exists.
+
+## 2026-07-08 — GHCR image published; quota remains next gate
+
+Status:
+
+- Workflow file installed: `.github/workflows/build-ghcr.yml`.
+- Workflow install commit: `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.
+- Workflow run id: `28947916765`.
+- Workflow conclusion: `success`.
+- GHCR image published:
+  - `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66`
+  - `ghcr.io/alanjiao1988/j-space-observation:latest`
+- Providers:
+  - Microsoft.App: `Registered`
+  - Microsoft.ContainerRegistry: `Registered`
+  - Microsoft.Quota: `NotRegistered`
+- Azure resources created: none.
+- T4 workload profile type offered in `southeastasia`: yes (`Consumption-GPU-NC8as-T4`).
+- Subscription T4 quota: not confirmed.
+
+Decision:
+
+- GHCR image exists, satisfying the image prerequisite for future Azure Container Apps Jobs.
+- Do not create any Azure GPU job until the subscription's Container Apps T4 quota in `southeastasia` is confirmed.
+- Do not register `Microsoft.Quota` without Alan approval.

@@ -379,6 +379,50 @@ Decision:
 - Do not create Azure resources; T4 quota confirmation remains the gate.
 - Did not register `Microsoft.Quota` — will ask Alan before triggering any further provider registration.
 
+## 2026-07-08 — GHCR workflow triggered and image published
+
+Repository sync:
+
+- Pulled remote `main`; workflow install commit present: `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.
+- `.github/workflows/build-ghcr.yml` exists.
+- `infra/ci/build-ghcr.yml` and `.github/workflows/build-ghcr.yml` have no diff.
+
+GitHub workflow checks:
+
+- `gh auth status -h github.com`: active account `Alanjiao1988`, repo access `ADMIN`.
+- `gh workflow list -R Alanjiao1988/J-space-observation`: `Build and push image to GHCR` is active.
+- Trigger command: `gh workflow run build-ghcr.yml -R Alanjiao1988/J-space-observation --ref main -f push_latest=true`.
+- Trigger method: `gh workflow run` by file name.
+
+Workflow run:
+
+- Run id: `28947916765`
+- Status: `completed`
+- Conclusion: `success`
+- URL: `https://github.com/Alanjiao1988/J-space-observation/actions/runs/28947916765`
+- Head SHA: `c07db5c9625a9f9ad96c55f77385c078e11d4a66`
+
+GHCR image:
+
+- `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66`
+- `ghcr.io/alanjiao1988/j-space-observation:latest`
+- Workflow logs confirm both manifests were pushed.
+- Package API note: current `gh` token lacks `read:packages`, so user package version API returns `403`; repo package endpoint returns `404`. This does not invalidate the push because the workflow completed successfully and logs include pushed manifests.
+
+Azure read-only status:
+
+- Microsoft.App: `Registered`
+- Microsoft.ContainerRegistry: `Registered`
+- Microsoft.Quota: `NotRegistered`
+- `az group list --query "[?contains(name, 'jspace') || contains(name, 'j-space')].{name:name, location:location}" -o table`: no matching resource groups.
+- Azure resources created: none.
+
+T4 quota:
+
+- T4 workload profile type `Consumption-GPU-NC8as-T4` is offered in `southeastasia`.
+- Subscription quota remains **not confirmed** because `Microsoft.Quota` is `NotRegistered`; do not register it without Alan approval.
+- Next gate: confirm Azure Container Apps T4 quota in `southeastasia` before any Azure GPU job.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`

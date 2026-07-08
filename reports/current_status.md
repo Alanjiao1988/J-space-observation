@@ -8,23 +8,27 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 
 **Phase: Azure-first execution; GHCR primary registry path; T4 quota is the next gate (local PC orchestration-only)**
 
-## GHCR Workflow Install + T4 Quota Findings (2026-07-08 21:39 +08:00)
+## GHCR Workflow Run + T4 Quota Findings (2026-07-08 21:54 +08:00)
 
-- Baseline: read `docs/thread_handoff.md`; `origin/main` HEAD = `dd1b243...` (confirmed).
-- **Programmatic workflow install is NOT possible** with available credentials:
-  - Owner account `Alanjiao1988` lacks the GitHub `workflow` OAuth scope.
-  - Account `alanjiao_microsoft` has `workflow` scope but no access (404) to this repo.
-  - Contents API `PUT .github/workflows/build-ghcr.yml` -> 404 (masked workflow-scope restriction).
-  - => Manual GitHub web UI install by Alan is required (unchanged).
-- **T4 GPU region availability: confirmed** — `Consumption-GPU-NC8as-T4` is offered in `southeastasia`.
-- **T4 GPU quota (subscription): still NOT confirmed** — `az quota` is blocked because `Microsoft.Quota` provider is not registered. Did not register it (avoiding another multi-hour provider registration without approval). Use portal Usage+quotas or a support request.
-- **Azure resources: none** (verified via `az group list` — no project resource groups).
-- Providers: `Microsoft.App` = Registered, `Microsoft.ContainerRegistry` = Registered.
+- Baseline: read `docs/thread_handoff.md`; repo was synced to `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.
+- Workflow file installed: `.github/workflows/build-ghcr.yml` exists and matches `infra/ci/build-ghcr.yml`.
+- Installation note: the local `gh` token still lacks GitHub `workflow` OAuth scope, but the workflow was successfully installed through the GitHub connector / GitHub App path in commit `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.
+- Workflow trigger: `gh workflow run build-ghcr.yml -R Alanjiao1988/J-space-observation --ref main -f push_latest=true`.
+- Workflow run: `28947916765`, completed successfully.
+- Workflow URL: `https://github.com/Alanjiao1988/J-space-observation/actions/runs/28947916765`
+- GHCR image pushed:
+  - `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66`
+  - `ghcr.io/alanjiao1988/j-space-observation:latest`
+- Package API note: current `gh` token lacks `read:packages`, so package version API checks return 403; the workflow logs confirm both image tags were pushed.
+- Providers: `Microsoft.App` = `Registered`, `Microsoft.ContainerRegistry` = `Registered`, `Microsoft.Quota` = `NotRegistered`.
+- Azure resource check: no `jspace` / `j-space` resource groups found.
+- T4 GPU workload profile type availability: `Consumption-GPU-NC8as-T4` is offered in `southeastasia`.
+- **T4 GPU quota (subscription): still NOT confirmed** — `az quota` is blocked because `Microsoft.Quota` provider is not registered. Do not register it without Alan approval. Use portal Usage+quotas or an approved support request.
+- Azure resources created: none.
 
-### Two remaining blockers (both need Alan)
+### Remaining blocker
 
-1. Install `.github/workflows/build-ghcr.yml` via GitHub web UI (paste from `infra/ci/build-ghcr.yml`), then run the workflow.
-2. Confirm Container Apps **T4 GPU quota in southeastasia** via the Azure Portal (Usage + quotas) or a support request. Optionally, approve registering `Microsoft.Quota` so `az quota` can check programmatically.
+1. Confirm Container Apps **T4 GPU quota in southeastasia** via Azure Portal (Usage + quotas), support request, or Alan-approved `Microsoft.Quota` provider registration and read-only quota query.
 
 ## GHCR + T4 Quota Path Status (2026-07-08 21:34 +08:00)
 
@@ -33,18 +37,14 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 - GHCR workflow template `infra/ci/build-ghcr.yml`: **valid**.
 - GHCR Azure job script `infra/azure/scripts/05_run_job_ghcr.sh`: **valid** (parameterized; `JOB_COMMAND` override).
 - Runbook now includes a gated **Planned Azure command sequence**: T4 quota -> resource group -> Container Apps env + GPU profile -> GHCR image smoke test -> Phase 0.5 `--skip-fit` -> Phase 1 `--dry-run` -> small Phase 1 pilot.
-- Manual workflow install: **still required** (CLI credential lacks GitHub `workflow` scope).
+- GHCR workflow installed and run successfully.
 - Next Azure gate: **confirm T4 GPU quota in southeastasia**.
 - Local checks: `41 passed, 2 warnings`; Phase 1 dry-run `54` cells.
 - Azure resources created: **none**.
 
-### Next step for Alan (GitHub UI)
+### Next step
 
-1. GitHub web UI -> **Add file -> Create new file** -> path `.github/workflows/build-ghcr.yml`.
-2. Paste the contents of `infra/ci/build-ghcr.yml`; commit directly to `main`.
-3. **Actions** tab -> **Build and push image to GHCR** -> **Run workflow**.
-4. Expected image: `ghcr.io/alanjiao1988/j-space-observation:<git-sha>`.
-5. Separately, confirm Azure Container Apps **T4 GPU quota for southeastasia** before any GPU job (portal, or support request per `docs/azure_runbook.md`).
+Confirm Azure Container Apps **T4 GPU quota for southeastasia** before any GPU job (portal, support request, or approved `Microsoft.Quota` registration and read-only quota query).
 
 ## Azure-first Policy (2026-07-08)
 
@@ -65,7 +65,7 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 - Active subscription: `MCAPS-Hybrid-REQ-125620-2025-alanjiao`.
 - Subscription state: `Enabled`.
 - Microsoft.App provider: `Registered`.
-- Microsoft.ContainerRegistry provider: `Registering`.
+- Microsoft.ContainerRegistry provider: `Registered`.
 - containerapp extension: installed (`1.3.0b4`).
 - Azure resources created: none.
 - Azure scripts are prepared for:
@@ -77,36 +77,35 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 
 ## Azure Blockers Before Execution
 
-- Wait for `Microsoft.ContainerRegistry` to become `Registered`.
 - Verify Azure Container Apps GPU T4 quota for `southeastasia` and workload profile `Consumption-GPU-NC8as-T4`.
 - Do not run real inference or model loading locally as a fallback.
 
-## Latest Azure Readiness Gate Re-check (2026-07-08)
+## Historical Azure Readiness Gate Re-check (2026-07-08; superseded)
 
 - Microsoft.ContainerRegistry: `Registering`.
 - Microsoft.App: `Registered`.
 - T4 GPU quota status: not checked because `Microsoft.ContainerRegistry` is still not `Registered`.
 - Readiness script: not run.
 - Azure resources created: none.
-- Current blocker: provider registration must complete before quota confirmation or readiness script execution.
+- Current status has superseded this: `Microsoft.ContainerRegistry` is now `Registered`.
 
-## Latest Azure Provider Gate Re-check (2026-07-08 18:39 +08:00)
-
-- Microsoft.ContainerRegistry: `Registering`.
-- Microsoft.App: `Registered`.
-- T4 GPU quota status: not checked because the provider gate remains blocked.
-- Readiness script: not run.
-- Azure resources created: none.
-- Next step: re-check provider registration later.
-
-## Latest Azure Provider Gate Re-check (2026-07-08 18:41 +08:00)
+## Historical Azure Provider Gate Re-check (2026-07-08 18:39 +08:00; superseded)
 
 - Microsoft.ContainerRegistry: `Registering`.
 - Microsoft.App: `Registered`.
 - T4 GPU quota status: not checked because the provider gate remains blocked.
 - Readiness script: not run.
 - Azure resources created: none.
-- Next step: re-check provider registration later.
+- Current status has superseded this: `Microsoft.ContainerRegistry` is now `Registered`.
+
+## Historical Azure Provider Gate Re-check (2026-07-08 18:41 +08:00; superseded)
+
+- Microsoft.ContainerRegistry: `Registering`.
+- Microsoft.App: `Registered`.
+- T4 GPU quota status: not checked because the provider gate remains blocked.
+- Readiness script: not run.
+- Azure resources created: none.
+- Current status has superseded this: `Microsoft.ContainerRegistry` is now `Registered`.
 
 ## Next Command
 

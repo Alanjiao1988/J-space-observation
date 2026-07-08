@@ -168,40 +168,37 @@ Still required even with the GHCR fallback:
 
 ### GHCR build workflow
 
-The workflow definition is stored at `infra/ci/build-ghcr.yml`.
+The workflow is installed at `.github/workflows/build-ghcr.yml`.
 
-> Note: The current Git credential lacks the `workflow` OAuth scope, so the CLI cannot push files under `.github/workflows/`. To activate the workflow, install it into `.github/workflows/build-ghcr.yml` using one of:
-> - GitHub web UI: create `.github/workflows/build-ghcr.yml` and paste the contents of `infra/ci/build-ghcr.yml`; or
-> - a local Git credential/token that has the `workflow` scope, then copy the file to `.github/workflows/build-ghcr.yml` and push.
+Source template:
 
-Once installed, trigger the build workflow manually:
+```text
+infra/ci/build-ghcr.yml
+```
 
-1. GitHub repo -> Actions -> "Build and push image to GHCR" -> Run workflow.
-2. The workflow builds the `Dockerfile` and pushes to GHCR tagged with the commit SHA (and `latest`).
-3. The image does not include secrets, Hugging Face model cache, or experiment outputs.
-4. Confirm the pushed image at: `https://github.com/alanjiao1988/j-space-observation/pkgs/container/j-space-observation`.
+Workflow installation status:
 
-### Manual workflow installation (step-by-step for Alan)
+- The local `gh` token could not install the workflow because it lacked GitHub `workflow` OAuth scope.
+- The workflow was successfully installed through the GitHub connector / GitHub App path in commit `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.
+- Do not re-add manual-install instructions unless the workflow file is removed.
 
-The CLI Git credential lacks the GitHub `workflow` OAuth scope, so `.github/workflows/*` cannot be pushed from this machine. Install the workflow through the GitHub web UI:
+Workflow trigger command:
 
-1. Open the GitHub web UI for `Alanjiao1988/J-space-observation`.
-2. Click **Add file -> Create new file**.
-3. Set the file path to exactly:
-   ```text
-   .github/workflows/build-ghcr.yml
-   ```
-4. Open `infra/ci/build-ghcr.yml` in the repo, copy its full contents, and paste them into the new file.
-5. Choose **Commit directly to the `main` branch** and commit.
-6. Go to the **Actions** tab.
-7. Select the **Build and push image to GHCR** workflow.
-8. Click **Run workflow** (leave `push_latest` = `true`).
-9. After it succeeds, the expected image reference is:
-   ```text
-   ghcr.io/alanjiao1988/j-space-observation:<git-sha>
-   ```
-10. Confirm the package at:
-    `https://github.com/alanjiao1988/j-space-observation/pkgs/container/j-space-observation`.
+```powershell
+gh workflow run build-ghcr.yml -R Alanjiao1988/J-space-observation --ref main -f push_latest=true
+```
+
+Latest successful run:
+
+```text
+run id: 28947916765
+url: https://github.com/Alanjiao1988/J-space-observation/actions/runs/28947916765
+head sha: c07db5c9625a9f9ad96c55f77385c078e11d4a66
+image: ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66
+latest: pushed
+```
+
+The workflow builds the `Dockerfile`, pushes to GHCR with the commit SHA and `latest`, and does not download Hugging Face models, bake model cache, run experiments, or include secrets.
 
 ### GHCR deploy notes for Azure Container Apps Job
 

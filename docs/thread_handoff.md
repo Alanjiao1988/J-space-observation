@@ -2,10 +2,10 @@
 
 Date: 2026-07-08
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified commit before this handoff: `dd1b24301407955b1d0de90e9e96a4035d87b183`
-Latest status message for that commit: `Keep GHCR primary after ACR provider recovery`
+Latest verified commit before this handoff: `66b86efe61244f29d46edb67bb73e8a40fb2bdc0`
+Latest status message for that commit: `Run GHCR workflow and update handoff status`
 
-> Update (2026-07-08 21:39 +08:00): Programmatic install of the GHCR workflow was attempted and is confirmed NOT possible with available credentials (owner account lacks `workflow` scope; the workflow-scoped `alanjiao_microsoft` account has no access to this repo; Contents API returns 404). Manual GitHub web UI install remains required. T4 GPU workload profile type is confirmed offered in `southeastasia`, but the subscription's actual T4 quota is still unconfirmed (`az quota` blocked by unregistered `Microsoft.Quota`). Azure resources remain none (verified). See `reports/current_status.md` for the latest details.
+> Update (2026-07-08 21:54 +08:00): The GHCR workflow is now installed at `.github/workflows/build-ghcr.yml` (commit `c07db5c9625a9f9ad96c55f77385c078e11d4a66`) and was successfully triggered through `gh workflow run`. Run `28947916765` completed successfully and pushed `ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66` plus `latest`. T4 GPU workload profile type is offered in `southeastasia`, but the subscription's actual T4 quota is still unconfirmed (`az quota` blocked by unregistered `Microsoft.Quota`). Azure resources remain none (verified). See `reports/current_status.md` for the latest details.
 
 This document is intended to let a new ChatGPT / Copilot thread continue the project without reading the full previous conversation.
 
@@ -254,54 +254,49 @@ ACR remains available as a secondary fallback but should not be the primary path
 
 ## 8. GHCR workflow status
 
-A valid GHCR workflow template exists at:
+The GHCR workflow template exists at:
 
 ```text
 infra/ci/build-ghcr.yml
 ```
 
-It is not yet installed under `.github/workflows/` because the local CLI credential lacks the GitHub `workflow` OAuth scope.
-
-> Confirmed (2026-07-08): Programmatic install is not possible. The repo-owner `gh` account (`Alanjiao1988`) lacks `workflow` scope; the workflow-scoped account (`alanjiao_microsoft`) has no access to this repo (404); and a Contents API `PUT` to `.github/workflows/build-ghcr.yml` returns 404 (GitHub's masked workflow-scope restriction). To install programmatically instead of via the UI, either add the `workflow` scope to the `Alanjiao1988` token (`gh auth refresh -h github.com -s workflow`, requires interactive browser auth) or grant the `alanjiao_microsoft` account push access to the repo.
-
-Manual installation is required:
-
-1. Open GitHub web UI.
-2. Add file -> Create new file.
-3. Use exact path:
+The workflow is installed at:
 
 ```text
 .github/workflows/build-ghcr.yml
 ```
 
-4. Paste full contents of:
+Installation commit:
 
 ```text
-infra/ci/build-ghcr.yml
+c07db5c9625a9f9ad96c55f77385c078e11d4a66
 ```
 
-5. Commit directly to `main`.
-6. Go to Actions.
-7. Run workflow:
+The local `gh` token could not install the workflow because it lacked `workflow` scope, but the workflow was successfully installed through the GitHub connector / GitHub App path.
+
+Workflow run:
 
 ```text
-Build and push image to GHCR
+run id: 28947916765
+status: completed
+conclusion: success
+url: https://github.com/Alanjiao1988/J-space-observation/actions/runs/28947916765
 ```
 
-8. Leave `push_latest = true`.
-9. Expected image:
+Images pushed:
 
 ```text
-ghcr.io/alanjiao1988/j-space-observation:<git-sha>
+ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66
+ghcr.io/alanjiao1988/j-space-observation:latest
 ```
 
-Package page expected:
+Package page:
 
 ```text
 https://github.com/alanjiao1988/j-space-observation/pkgs/container/j-space-observation
 ```
 
-If the GHCR package is private, Azure Container Apps must use GHCR credentials through Azure secrets. Never commit GHCR tokens to the repo.
+The current `gh` token lacks `read:packages`, so the package versions API returns 403. Workflow logs confirm both tags were pushed. If the GHCR package is private, Azure Container Apps must use GHCR credentials through Azure secrets. Never commit GHCR tokens to the repo.
 
 ---
 
@@ -341,25 +336,7 @@ Do not run deployment scripts until T4 quota is confirmed.
 
 The new thread should continue from here:
 
-### Step 1: Confirm GitHub workflow installation
-
-Ask Alan whether `.github/workflows/build-ghcr.yml` has been manually created in GitHub UI from `infra/ci/build-ghcr.yml`.
-
-If not, instruct Alan to do it.
-
-### Step 2: Run GHCR workflow
-
-After workflow is installed:
-
-- Go to GitHub Actions.
-- Run `Build and push image to GHCR`.
-- Confirm image exists:
-
-```text
-ghcr.io/alanjiao1988/j-space-observation:<git-sha>
-```
-
-### Step 3: Confirm T4 quota
+### Step 1: Confirm T4 quota
 
 Confirm Azure Container Apps T4 GPU quota for:
 
@@ -374,7 +351,7 @@ If quota is unavailable:
 - open Azure support quota request
 - do not fall back to local inference
 
-### Step 4: Only after GHCR image + T4 quota are ready
+### Step 2: Only after GHCR image + T4 quota are ready
 
 Prepare Azure resources and smoke jobs:
 
@@ -426,20 +403,22 @@ Please read docs/thread_handoff.md first, then use the repo documents as source 
 - reports/current_status.md
 
 Current known state:
-- Latest verified commit before handoff: 6ea9f461fdf9d0814d06f04a2d1b75ab1dbb0689
+- Latest verified commit before handoff: c07db5c9625a9f9ad96c55f77385c078e11d4a66 plus follow-up documentation commits.
 - Azure-first execution policy: local PC is orchestration-only.
 - GHCR is primary registry path; ACR is secondary fallback.
 - Microsoft.App and Microsoft.ContainerRegistry are Registered.
 - No Azure resources have been created yet.
 - T4 quota for Azure Container Apps in southeastasia is not yet confirmed.
-- GHCR workflow template exists at infra/ci/build-ghcr.yml, but must be manually installed to .github/workflows/build-ghcr.yml through GitHub UI because the CLI credential lacks workflow scope.
+- GHCR workflow is installed at .github/workflows/build-ghcr.yml and has successfully pushed:
+  ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66
+- latest tag was also pushed.
 
 Your first tasks:
-1. Confirm whether .github/workflows/build-ghcr.yml has been manually created from infra/ci/build-ghcr.yml.
-2. If installed, guide me to run the GitHub Actions workflow and verify the GHCR image.
-3. Then help confirm Azure Container Apps T4 quota for southeastasia.
-4. Do not run local model inference.
-5. Do not create Azure resources until GHCR image and T4 quota are ready.
+1. Help confirm Azure Container Apps T4 quota for southeastasia.
+2. If quota is confirmed, prepare the GHCR-based Azure Container Apps smoke job using:
+   ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66
+3. Do not run local model inference.
+4. Do not create Azure resources until T4 quota is confirmed.
 ```
 
 ---
