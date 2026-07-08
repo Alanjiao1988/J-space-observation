@@ -26,3 +26,6 @@ checkpoints/
 *.pem
 *.key
 secrets/
+
+# Local Azure execution context (resource IDs, generated values; not source)
+.azure_*.tmp

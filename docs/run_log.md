@@ -767,6 +767,125 @@ Decision:
 - Do not retry Azure job creation with `gh auth token`, because previous preflight showed it lacks `read:packages`.
 - Required next action: expose a classic PAT with `read:packages` through a mechanism visible to this agent process, or make the GHCR package public.
 
+## 2026-07-08 — Switch to ACR managed identity and complete Azure pilot chain
+
+Decision:
+
+- Stop pursuing GHCR private package authentication.
+- Activate ACR as the registry path using Azure AAD / user-assigned managed identity, no ACR admin password.
+
+Repository:
+
+- Starting commit: `d69187c7a14782121d8d90c983ce7033b29967dd`.
+- Diff from GHCR image commit `c07db5c...` to HEAD included docs plus `infra/azure/scripts/05_run_job_ghcr.sh`, so ACR image was rebuilt from current HEAD.
+
+ACR:
+
+- Name: `acrjspaceobssea0708231738`
+- Login server: `acrjspaceobssea0708231738.azurecr.io`
+- SKU: `Basic`
+- Admin user enabled: `False`
+- ARM audience token auth: `enabled`
+- Image repository: `j-space-observation`
+- Image tags:
+  - `d69187c7a147`
+  - `latest`
+- Full image used by jobs: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147`
+- Build command: `az acr build --registry acrjspaceobssea0708231738 --image j-space-observation:d69187c7a147 --image j-space-observation:latest --file Dockerfile .`
+- Build result: success; digest `sha256:c41aa98e7316b9f153eb107647bcf5bb683a43097d224d70d8237d44d4d17c94`
+
+Managed identity:
+
+- Name: `id-jspace-aca-acrpull-sea`
+- Identity ID: `/subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea`
+- Principal ID: `78d4348b-57eb-4fb9-aaa7-99148b303292`
+- AcrPull assignment: yes, scoped to ACR `acrjspaceobssea0708231738`
+
+Azure resources now present:
+
+- Resource group: `rg-jspace-observation-sea`
+- Log Analytics workspace: `law-jspace-observation-sea`
+- Container Apps environment: `cae-jspace-observation-sea`
+- Workload profile: `gpu-t4` / `Consumption-GPU-NC8as-T4`
+- ACR: `acrjspaceobssea0708231738`
+- User-assigned managed identity: `id-jspace-aca-acrpull-sea`
+- Jobs:
+  - `job-jspace-acr-smoke`
+  - `job-jspace-phase05-acr`
+  - `job-jspace-phase1-dryrun-acr`
+  - `job-jspace-phase1-pilot-acr`
+
+Smoke job:
+
+- Job: `job-jspace-acr-smoke`
+- Image pull/auth: success via user-assigned managed identity and AcrPull.
+- Execution: `job-jspace-acr-smoke-9b9wb4z`
+- Status: `Succeeded`
+- Command: `python -m pytest tests/ -q`
+- Logs summary: `41 passed, 2 warnings in 4.93s`
+- No model download/inference occurred.
+
+Phase 0.5:
+
+- Job: `job-jspace-phase05-acr`
+- First execution: `job-jspace-phase05-acr-i5qd9yo`
+  - Status: `Succeeded` at job level, but internal model loading failed due `/mnt/models` permission error.
+  - Fix: reran with writable cache env: `HF_HOME=/tmp/models/huggingface`, `TRANSFORMERS_CACHE=/tmp/models/huggingface`, `RESULTS_DIR=/tmp/results`; increased resources to `cpu=4`, `memory=16Gi`.
+- Successful execution: `job-jspace-phase05-acr-i110lnu`
+- Status: `Succeeded`
+- Logs summary:
+  - `jacobian-lens package installed: False`
+  - pre-fitted lenses: not found locally
+  - model loading check attempted: true
+  - both models loaded successfully on `cuda:0`, GPU `Tesla T4`, GPU memory `16.70 GB`
+  - actual tiny fitting attempted: no
+  - actual tiny fitting success: not attempted
+- Output path inside container: `/workspace/results/runs/20260708_153600`
+
+Phase 1 dry-run:
+
+- Job: `job-jspace-phase1-dryrun-acr`
+- Execution: `job-jspace-phase1-dryrun-acr-v0j1bkd`
+- Status: `Succeeded`
+- Command: `python experiments/phase1_depth_gradient.py --dry-run`
+- Logs summary:
+  - models: DeepSeek-R1-Distill-Qwen-1.5B and Qwen2.5-Math-1.5B
+  - task families: arithmetic, synthetic_relation, factual_counterfactual
+  - depths: 1,2,3
+  - conditions: strict_answer_only, visible_cot, r1_style_thinking
+  - total cells: 54
+  - no real generation
+- Output path inside container: `/workspace/results/runs/20260708_154052`
+
+Small Phase 1 pilot:
+
+- Job: `job-jspace-phase1-pilot-acr`
+- Execution: `job-jspace-phase1-pilot-acr-lhuvwbf`
+- Status: `Succeeded`
+- Command:
+  - `python experiments/phase1_depth_gradient.py --models deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --task-families arithmetic --depths 1,2,3 --conditions strict_answer_only,visible_cot,r1_style_thinking --max-new-tokens 64 --items-per-cell 1`
+- Logs summary:
+  - model loaded on `cuda:0`, GPU `Tesla T4`
+  - task family: arithmetic only
+  - depths: 1,2,3
+  - conditions: strict_answer_only, visible_cot, r1_style_thinking
+  - pilot completed, results written
+  - example cell metrics observed in logs:
+    - depth 1 strict_answer_only accuracy 1.000, no-CoT valid 1.000
+    - depth 2 visible_cot accuracy 1.000, no-CoT valid 0.000
+    - depth 3 r1_style_thinking accuracy 1.000, no-CoT valid 0.000
+- Output path inside container: `/workspace/results/runs/20260708_154330`
+
+Important scientific note:
+
+- The small Phase 1 pilot is behavioral only.
+- It is not J-space evidence and does not prove Plan A.
+
+Scripts:
+
+- Added `infra/azure/scripts/06_run_job_acr_mi.sh` for ACR image jobs with user-assigned managed identity and AcrPull.
+- Added `.azure_*.tmp` to `.gitignore` so local Azure context files are not committed.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`

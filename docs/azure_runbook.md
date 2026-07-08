@@ -23,13 +23,29 @@ Do not silently fall back to local model inference if Azure is blocked.
 
 ## Container registry strategy: GHCR primary, ACR secondary
 
-- **Primary: GHCR (GitHub Container Registry).** Images are built by a GitHub Actions workflow and pushed to `ghcr.io/alanjiao1988/j-space-observation:<git-sha>`.
-- **Secondary fallback: ACR (Azure Container Registry).** As of 2026-07-08, `Microsoft.ContainerRegistry` is now `Registered`, so the ACR scripts (`01_build_and_push_image.sh`, `02_run_phase0_5.sh`, `03_run_phase1.sh`, `04_run_phase1_pilot.sh`) are usable again. Use ACR only if GHCR is unavailable.
-- **Reason GHCR stays primary:**
-  - GHCR aligns with git-SHA image provenance (each image tagged with the exact commit SHA).
-  - Builds run in GitHub Actions, so the local PC does not build or push large images.
-  - Avoids re-coupling the pipeline to ACR provider registration timing, which was blocked for hours.
-- Both paths still require `Microsoft.App` registered and confirmed Container Apps T4 GPU quota in `southeastasia`.
+Historical decision: GHCR was preferred for git-SHA provenance and GitHub Actions builds. Current active route changed after private GHCR pull authentication blocked Azure job creation.
+
+Current active route:
+
+- **Active: ACR (Azure Container Registry) + user-assigned managed identity.**
+- **GHCR: historical/secondary only** unless Alan explicitly reopens it.
+- ACR admin credentials are disabled and must not be used.
+- Container Apps Jobs pull from ACR using user-assigned managed identity with `AcrPull`.
+
+Current ACR resources:
+
+- ACR: `acrjspaceobssea0708231738`
+- Login server: `acrjspaceobssea0708231738.azurecr.io`
+- Image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147`
+- Managed identity: `id-jspace-aca-acrpull-sea`
+- AcrPull: assigned
+
+Reason for switching:
+
+- GHCR package is private.
+- `GHCR_PAT` was not visible to the agent process.
+- Current `gh auth token` lacks `read:packages`.
+- ACR + managed identity avoids registry passwords and token handling.
 
 ## Resource principles
 
@@ -344,6 +360,66 @@ az containerapp job execution list -g rg-jspace-observation -n job-jspace-observ
 ```
 
 Secondary fallback: if GHCR pull fails, switch to ACR via `infra/azure/scripts/01_build_and_push_image.sh` then the `02_/03_/04_` ACR job scripts.
+
+## Active ACR managed-identity command sequence
+
+The ACR path has been executed successfully through smoke, Phase 0.5, Phase 1 dry-run, and a small Phase 1 pilot.
+
+Current image:
+
+```text
+acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147
+```
+
+Run ACR-managed-identity jobs with:
+
+```bash
+export RESOURCE_GROUP="rg-jspace-observation-sea"
+export CONTAINERAPPS_ENVIRONMENT="cae-jspace-observation-sea"
+export WORKLOAD_PROFILE_NAME="gpu-t4"
+export ACR_NAME="acrjspaceobssea0708231738"
+export ACR_LOGIN_SERVER="acrjspaceobssea0708231738.azurecr.io"
+export ACR_IMAGE="acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147"
+export IDENTITY_NAME="id-jspace-aca-acrpull-sea"
+```
+
+Smoke:
+
+```bash
+export JOB_NAME="job-jspace-acr-smoke"
+export JOB_COMMAND="python -m pytest tests/ -q"
+bash infra/azure/scripts/06_run_job_acr_mi.sh
+```
+
+Phase 0.5:
+
+```bash
+export JOB_NAME="job-jspace-phase05-acr"
+export JOB_COMMAND="python experiments/phase0_5_jlens_spike.py --skip-fit"
+export CPU_CORES=4
+export MEMORY=16Gi
+bash infra/azure/scripts/06_run_job_acr_mi.sh
+```
+
+Phase 1 dry-run:
+
+```bash
+export JOB_NAME="job-jspace-phase1-dryrun-acr"
+export JOB_COMMAND="python experiments/phase1_depth_gradient.py --dry-run"
+bash infra/azure/scripts/06_run_job_acr_mi.sh
+```
+
+Small Phase 1 pilot:
+
+```bash
+export JOB_NAME="job-jspace-phase1-pilot-acr"
+export JOB_COMMAND="python experiments/phase1_depth_gradient.py --models deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --task-families arithmetic --depths 1,2,3 --conditions strict_answer_only,visible_cot,r1_style_thinking --max-new-tokens 64 --items-per-cell 1"
+export CPU_CORES=4
+export MEMORY=16Gi
+bash infra/azure/scripts/06_run_job_acr_mi.sh
+```
+
+Do not run a broader Phase 1 sweep until pilot outputs are reviewed and persistent result export is decided.
 
 ### GHCR pull/auth findings from first smoke attempt
 

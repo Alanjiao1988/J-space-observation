@@ -2,8 +2,8 @@
 
 Date: 2026-07-08
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified commit before this handoff: `712c09d82c02287550e3b2f8461cd1c4807e0788`
-Latest status message for that commit: `Configure GHCR auth for Azure Container Apps jobs`
+Latest verified commit before this handoff: `a245b116d2da54db1c46b9330531a105a2bdee7a`
+Latest status message for that commit: `Switch Azure jobs to ACR managed identity`
 
 > Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
 >
@@ -12,6 +12,8 @@ Latest status message for that commit: `Configure GHCR auth for Azure Container 
 > Update (2026-07-08 22:43 +08:00): `GHCR_PAT` remains unset. Current `gh auth token` was tested against the GHCR package versions API and returned `403` / `read:packages` required, so no Azure job retry was attempted with the known-insufficient token. `infra/azure/scripts/05_run_job_ghcr.sh` now also supports the env aliases `JOB_NAME`, `CONTAINERAPPS_ENVIRONMENT`, and `WORKLOAD_PROFILE_NAME`, and avoids passing token values as helper Python command-line arguments. Next step is still to make the GHCR package public or provide a classic PAT with `read:packages` via secure env/Azure secret path. Do not paste tokens into chat.
 >
 > Update (2026-07-08 22:56 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` as Windows User environment variables and restarting tools, but Copilot's fresh command processes still cannot see them in Process/User/Machine scopes. No package-read preflight or Azure job retry was attempted. Current blocker remains: the agent needs a secure token path it can actually read, or the GHCR package must be made public.
+>
+> Update (2026-07-08 23:16 +08:00): Alan instructed to abandon GHCR auth and switch to ACR + Azure managed identity. Created ACR `acrjspaceobssea0708231738`, built image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147` via `az acr build`, created user-assigned identity `id-jspace-aca-acrpull-sea`, assigned `AcrPull`, and successfully ran ACR jobs: smoke (`job-jspace-acr-smoke-9b9wb4z`), Phase 0.5 (`job-jspace-phase05-acr-i110lnu`), Phase 1 dry-run (`job-jspace-phase1-dryrun-acr-v0j1bkd`), and small Phase 1 pilot (`job-jspace-phase1-pilot-acr-lhuvwbf`). No local model execution occurred. The pilot is behavioral only and not J-space evidence. Next blocker: results are currently ephemeral in job containers; decide persistent result export/storage before broader runs.
 >
 > Update (2026-07-08 22:51 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but Copilot's fresh tool processes could not see them in Process/User/Machine environment scopes. No package-read preflight or Azure job retry was attempted. To continue, set the variables in Windows User environment (or another secure path readable by the agent), e.g. `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`. Do not paste tokens into chat.
 
@@ -230,7 +232,13 @@ resource group: rg-jspace-observation-sea
 log analytics workspace: law-jspace-observation-sea
 container apps environment: cae-jspace-observation-sea
 workload profile: gpu-t4 (Consumption-GPU-NC8as-T4)
-jobs: none created successfully
+ACR: acrjspaceobssea0708231738
+managed identity: id-jspace-aca-acrpull-sea
+jobs:
+  job-jspace-acr-smoke
+  job-jspace-phase05-acr
+  job-jspace-phase1-dryrun-acr
+  job-jspace-phase1-pilot-acr
 ```
 
 T4 quota status:
@@ -238,10 +246,10 @@ T4 quota status:
 ```text
 region availability: CONFIRMED (Consumption-GPU-NC8as-T4 is offered in southeastasia)
 workload profile creation: SUCCEEDED (gpu-t4 added to cae-jspace-observation-sea)
-job execution quota: not yet validated because GHCR pull authentication blocked job creation
+job execution: VALIDATED (ACR managed identity smoke, Phase 0.5, Phase 1 dry-run, and small pilot succeeded)
 ```
 
-Current main gate: GHCR pull authentication. Do not run Phase 0.5, Phase 1 dry-run, or pilot until the smoke job can pull/start the image.
+Current main gate: decide persistent result export/storage and review the small pilot logs before any broader run.
 
 If Alan says the PAT is set but Copilot cannot see it, check all scopes:
 
@@ -257,21 +265,24 @@ Do not print the token value; only report whether each scope is set.
 
 ## 7. Registry decision
 
-Even though ACR is now technically unblocked, the current decision is:
+Current active decision:
 
 ```text
-Primary registry path: GHCR
-Secondary fallback: ACR
+Active registry path: ACR + user-assigned managed identity
+GHCR: historical/secondary only
 ```
 
-Reasons:
+Current ACR state:
 
-- GHCR is better aligned with the GitHub repo workflow.
-- Git SHA image provenance is cleaner.
-- GitHub Actions can build and push the image without using the local PC.
-- Azure Container Apps can pull images from public or private registries, including GHCR, using registry credentials/secrets.
+```text
+ACR: acrjspaceobssea0708231738
+login server: acrjspaceobssea0708231738.azurecr.io
+image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147
+identity: id-jspace-aca-acrpull-sea
+AcrPull: assigned
+```
 
-ACR remains available as a secondary fallback but should not be the primary path unless GHCR fails.
+Reason for switching away from GHCR: private GHCR pull auth was blocked (`GHCR_PAT` not visible to agent; `gh auth token` lacked `read:packages`). ACR avoids registry password handling through managed identity.
 
 ---
 
@@ -366,7 +377,7 @@ python experiments/phase1_depth_gradient.py \
   --max-new-tokens 64
 ```
 
-Do not run Phase 0.5, Phase 1 dry-run, or pilot until the GHCR smoke job can pull/start the image.
+GHCR private pull remains historical; do not return to GHCR unless Alan explicitly asks. Active path is ACR managed identity.
 
 ---
 
@@ -374,58 +385,24 @@ Do not run Phase 0.5, Phase 1 dry-run, or pilot until the GHCR smoke job can pul
 
 The new thread should continue from here:
 
-### Step 1: Resolve GHCR pull authentication
+### Step 1: Review small pilot and decide persistence
 
-The Azure environment and `gpu-t4` workload profile already exist. The smoke job failed at image validation:
-
-```text
-InvalidParameterValueInContainerTemplate
-UNAUTHORIZED: authentication required
-```
-
-Resolve one of:
-
-1. Make the GHCR package public; or
-2. Provide `GHCR_USERNAME` and a classic `GHCR_PAT` with `read:packages` through a secure environment/Azure secret path only.
-
-Do not send token values in chat, commit them, or log them.
-
-### Step 2: Rerun GHCR smoke job
-
-Once GHCR auth is resolved, rerun the smoke job:
+The Azure ACR managed-identity chain has already succeeded:
 
 ```text
-job: job-jspace-ghcr-smoke
-image: ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66
-command: python -m pytest tests/ -q
+smoke execution: job-jspace-acr-smoke-9b9wb4z
+phase 0.5 execution: job-jspace-phase05-acr-i110lnu
+phase 1 dry-run execution: job-jspace-phase1-dryrun-acr-v0j1bkd
+small phase 1 pilot execution: job-jspace-phase1-pilot-acr-lhuvwbf
 ```
 
-### Step 3: Only after smoke succeeds
+Before any broader run:
 
-Run Azure Phase 0.5 availability check:
-
-```bash
-python experiments/phase0_5_jlens_spike.py --skip-fit
-```
-
-Then Azure Phase 1 dry run:
-
-```bash
-python experiments/phase1_depth_gradient.py --dry-run
-```
-
-Then Azure small real Phase 1 pilot:
-
-```bash
-python experiments/phase1_depth_gradient.py \
-  --models deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B \
-  --task-families arithmetic \
-  --depths 1,2,3 \
-  --conditions strict_answer_only,visible_cot,r1_style_thinking \
-  --max-new-tokens 64
-```
-
-Do not run the full two-model/all-task Phase 1 until the small pilot outputs are reviewed.
+1. Decide how to persist/export result files (current result paths are inside ephemeral job containers).
+2. Review small pilot logs/metrics.
+3. Decide whether to install `jacobian-lens` into the image before any real Phase 0.5 fitting.
+4. Do not claim Phase 1 behavioral pilot as J-space evidence.
+5. Do not run the full two-model/all-task Phase 1 until pilot outputs are reviewed.
 
 ---
 
@@ -447,22 +424,20 @@ Please read docs/thread_handoff.md first, then use the repo documents as source 
 - reports/current_status.md
 
 Current known state:
-- Latest verified commit before handoff: c07db5c9625a9f9ad96c55f77385c078e11d4a66 plus follow-up documentation commits.
+- Latest verified commit before handoff: latest docs should be checked from git log; active ACR image tag is `d69187c7a147`.
 - Azure-first execution policy: local PC is orchestration-only.
-- GHCR is primary registry path; ACR is secondary fallback.
-- Microsoft.App, Microsoft.ContainerRegistry, and Microsoft.Quota are Registered.
-- No Azure resources have been created yet.
-- T4 quota for Azure Container Apps in southeastasia is still unknown: CLI quota APIs do not expose the T4 quota item, so portal/support confirmation is needed.
-- GHCR workflow is installed at .github/workflows/build-ghcr.yml and has successfully pushed:
-  ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66
-- latest tag was also pushed.
+- ACR + managed identity is the active registry path.
+- Azure resources exist: `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, `gpu-t4`, `acrjspaceobssea0708231738`, `id-jspace-aca-acrpull-sea`, and four jobs.
+- Smoke, Phase 0.5, Phase 1 dry-run, and small Phase 1 pilot all succeeded on Azure.
+- Small pilot results are behavioral only, not J-space evidence.
+- Results are currently ephemeral inside job containers/logs; persistent export is not configured.
 
 Your first tasks:
-1. Help confirm Azure Container Apps T4 quota for southeastasia.
-2. If quota is confirmed, prepare the GHCR-based Azure Container Apps smoke job using:
-   ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66
-3. Do not run local model inference.
-4. Do not create Azure resources until T4 quota is confirmed.
+1. Read `docs/run_log.md` and `reports/current_status.md` for the latest execution IDs.
+2. Decide how to persist/export results before any broader run.
+3. Review the small pilot logs/metrics before expanding Phase 1.
+4. Do not run local model inference.
+5. Do not claim J-space evidence from Phase 1 behavior.
 ```
 
 ---

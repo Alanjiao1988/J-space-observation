@@ -6,7 +6,62 @@ J-space observation project scaffold has been successfully implemented. Phase 0.
 
 ## Current Phase
 
-**Phase: Azure-first execution; GHCR primary registry path; T4 quota is the next gate (local PC orchestration-only)**
+**Phase: Azure ACR managed-identity smoke path completed; small Phase 1 pilot succeeded**
+
+## ACR Managed Identity Azure Execution (2026-07-08)
+
+GHCR route was abandoned for execution because private package pull authentication remained blocked. The project switched to ACR with Azure AAD / user-assigned managed identity.
+
+### ACR and Identity
+
+- ACR: `acrjspaceobssea0708231738`
+- Login server: `acrjspaceobssea0708231738.azurecr.io`
+- Admin user enabled: `False`
+- ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147`
+- ACR build: succeeded via `az acr build`
+- Managed identity: `id-jspace-aca-acrpull-sea`
+- Principal ID: `78d4348b-57eb-4fb9-aaa7-99148b303292`
+- AcrPull assigned: yes
+
+### Azure Resources
+
+- Resource group: `rg-jspace-observation-sea`
+- Log Analytics workspace: `law-jspace-observation-sea`
+- Container Apps environment: `cae-jspace-observation-sea`
+- Workload profile: `gpu-t4` / `Consumption-GPU-NC8as-T4`
+- Jobs:
+  - `job-jspace-acr-smoke`
+  - `job-jspace-phase05-acr`
+  - `job-jspace-phase1-dryrun-acr`
+  - `job-jspace-phase1-pilot-acr`
+
+### Execution Results
+
+- Smoke job: `Succeeded`
+  - Execution: `job-jspace-acr-smoke-9b9wb4z`
+  - Logs: `41 passed, 2 warnings`
+- Phase 0.5 `--skip-fit`: `Succeeded`
+  - Successful execution: `job-jspace-phase05-acr-i110lnu`
+  - Both configured 1.5B models loaded successfully on Azure `Tesla T4`.
+  - `jacobian-lens` not installed in the image.
+  - Actual tiny fitting: not attempted.
+  - Output path: `/workspace/results/runs/20260708_153600`
+- Phase 1 dry-run: `Succeeded`
+  - Execution: `job-jspace-phase1-dryrun-acr-v0j1bkd`
+  - Total cells: 54
+  - No real generation.
+  - Output path: `/workspace/results/runs/20260708_154052`
+- Small Phase 1 pilot: `Succeeded`
+  - Execution: `job-jspace-phase1-pilot-acr-lhuvwbf`
+  - Scope: DeepSeek-R1-Distill-Qwen-1.5B, arithmetic only, depths 1/2/3, three conditions, `--items-per-cell 1`, `--max-new-tokens 64`
+  - Output path: `/workspace/results/runs/20260708_154330`
+
+### Current blockers / caveats
+
+- Results are inside ephemeral job containers; no persistent result volume/export has been configured yet.
+- Phase 0.5 does not include real J-lens fitting; `jacobian-lens` is not installed in the ACR image.
+- The small Phase 1 pilot is behavioral only and is not J-space evidence.
+- Review exported logs/metrics before broadening the run.
 
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 

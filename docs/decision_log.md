@@ -357,7 +357,7 @@ Findings:
 Decision:
 
 - Stop before Phase 0.5, Phase 1 dry-run, or small pilot.
-- Next gate is GHCR pull authentication: make the GHCR package public or provide `GHCR_USERNAME` + `GHCR_PAT` through environment/Azure secret only.
+- Historical next gate at that point was GHCR pull authentication; this has since been superseded by the ACR managed-identity route.
 - Do not commit or print GHCR token values.
 - `infra/azure/scripts/05_run_job_ghcr.sh` was updated to use the actual `*-sea` resource names and to avoid the `--enable-dedicated-gpu` / T4 min-max parameters that failed during live Azure CLI execution.
 
@@ -442,3 +442,39 @@ Decision:
 - Stop until the agent can read a valid package-read token.
 - Do not fall back to the current `gh auth token` because it previously failed with `read:packages` required.
 - Next option: make GHCR package public, or provide a secure token path that is visible to the agent process.
+
+## 2026-07-08 — Switch to ACR managed identity and complete Azure pilot chain
+
+Decision:
+
+- Stop pursuing GHCR authentication as the active path.
+- Use ACR with Azure AAD / user-assigned managed identity as the active registry route.
+- ACR admin user/password remains disabled and unused.
+
+Status:
+
+- ACR created: `acrjspaceobssea0708231738`
+- ACR image built: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147`
+- Managed identity created: `id-jspace-aca-acrpull-sea`
+- AcrPull assigned: yes
+- Container Apps jobs created:
+  - `job-jspace-acr-smoke`
+  - `job-jspace-phase05-acr`
+  - `job-jspace-phase1-dryrun-acr`
+  - `job-jspace-phase1-pilot-acr`
+
+Execution results:
+
+- Smoke test succeeded (`job-jspace-acr-smoke-9b9wb4z`), `41 passed, 2 warnings`.
+- Phase 0.5 `--skip-fit` succeeded (`job-jspace-phase05-acr-i110lnu`); both models loaded on Azure T4; no actual fitting.
+- Phase 1 dry-run succeeded (`job-jspace-phase1-dryrun-acr-v0j1bkd`); 54 cells; no real generation.
+- Small Phase 1 pilot succeeded (`job-jspace-phase1-pilot-acr-lhuvwbf`) with single distill model / arithmetic / depths 1,2,3 / three conditions / one item per cell.
+
+Scientific interpretation:
+
+- The small pilot is behavioral-only and does not count as J-space evidence.
+- Plan A remains unproven until real J-lens fitting/loading and validation are implemented and pass.
+
+Next decision:
+
+- Configure persistent results export/storage before broader Phase 1 runs, or explicitly accept log-only summaries for the next small run.
