@@ -120,7 +120,7 @@ def main():
     )
     parser.add_argument(
         "--conditions",
-        default="strict_answer_only,visible_cot",
+        default="strict_answer_only,visible_cot,r1_style_thinking",
         help="Comma-separated conditions to test",
     )
     parser.add_argument(

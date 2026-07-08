@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """
-Phase 0.5: J-lens feasibility and saturation spike.
+Phase 0.5: J-lens availability/model-loading check.
 
-Objective: Determine if Plan A (real J-lens) is feasible.
+Objective: collect the prerequisites needed before a Plan A decision.
 - Search for pre-fitted lenses
-- Attempt tiny fitting if jacobian-lens is available
-- Measure cost/saturation across layer/prompt count sweeps
-- Report feasibility for Phase 2
+- Check whether jacobian-lens is importable
+- Check target model loading
+- Write a planned cost/saturation sweep
+
+This script does not currently perform real tiny J-lens fitting. Its summary
+must not be treated as proof that Plan A is feasible.
 """
 
 import argparse
@@ -36,7 +39,7 @@ from jspace_observation import (
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Phase 0.5: J-lens feasibility and saturation spike"
+        description="Phase 0.5: J-lens availability/model-loading check"
     )
     parser.add_argument(
         "--model",
@@ -77,12 +80,12 @@ def main():
     parser.add_argument(
         "--skip-fit",
         action="store_true",
-        help="Skip actual J-lens fitting, only check availability",
+        help="Skip actual J-lens fitting. Current scaffold never runs fitting.",
     )
     parser.add_argument(
         "--search-prefitted-only",
         action="store_true",
-        help="Only search for pre-fitted lenses, don't attempt fitting",
+        help="Only search for pre-fitted lenses. Current scaffold never runs fitting.",
     )
     
     args = parser.parse_args()
@@ -103,7 +106,7 @@ def main():
         run_dir = logger.create_run_directory("phase0_5")
     run_dir.mkdir(parents=True, exist_ok=True)
     
-    print(f"Phase 0.5: J-lens Feasibility Spike")
+    print(f"Phase 0.5: J-lens Availability/Model-Loading Check")
     print(f"=" * 60)
     print(f"Run directory: {run_dir}")
     print()
@@ -136,18 +139,25 @@ def main():
     print()
     print(search_summary)
     
-    # Phase 0.5b: Check tiny fitting feasibility
-    print("\nPhase 0.5b: Checking tiny fitting feasibility...")
+    # Phase 0.5b: Check package availability; no fitting is executed here.
+    print("\nPhase 0.5b: Checking J-lens package availability (no tiny fitting attempted)...")
     print("-" * 60)
     
     valid_reqs, req_msg = jlens.validate_requirements()
     print(f"Requirements check: {req_msg}")
     
-    can_fit = jlens_status['loadable'] and not args.skip_fit and not args.search_prefitted_only
+    requested_fit = not args.skip_fit and not args.search_prefitted_only
+    tiny_fit_attempted = "no"
+    tiny_fit_success = "not attempted"
+    tiny_fit_message = (
+        "Actual tiny fitting is not implemented in this scaffold. "
+        "This run is an availability/model-loading check only."
+    )
     
-    if can_fit:
-        print("✓ J-lens fitting is theoretically possible")
-        print("  (Not actually executing fitting in dry-run/scope mode)")
+    if jlens_status['loadable'] and requested_fit:
+        print("✓ jacobian-lens is importable")
+        print("⊘ Actual tiny fitting attempted: no")
+        print(f"  {tiny_fit_message}")
     else:
         if args.skip_fit:
             print("⊘ Fitting skipped (--skip-fit flag)")
@@ -182,26 +192,36 @@ def main():
     print("-" * 60)
     
     model_infos = {}
+    model_loading_results = {}
     for model_name in models:
         try:
             config_obj = ModelConfig(model_name=model_name, dtype="float16")
             model, tokenizer, device, info = load_model_and_tokenizer(config_obj)
             model_infos[model_name] = info
+            model_loading_results[model_name] = {
+                "success": True,
+                "error": None,
+            }
             print(f"✓ {model_name}")
             log_model_info(info, verbose=True)
             print()
             # Clean up
             del model, tokenizer
         except Exception as e:
+            model_loading_results[model_name] = {
+                "success": False,
+                "error": str(e),
+            }
             print(f"✗ {model_name}: {str(e)}")
             print()
     
     # Generate summary
-    summary_builder = SummaryBuilder("Phase 0.5: J-lens Feasibility Spike")
+    summary_builder = SummaryBuilder("Phase 0.5: J-lens Availability/Model-Loading Check")
     
     summary_builder.add_section(
         "Objective",
-        "Determine if Plan A (real J-lens) is feasible for mechanistic interpretation."
+        "Check prerequisites for Plan A. This script does not prove Plan A "
+        "feasibility because it does not currently run actual tiny J-lens fitting."
     )
     
     summary_builder.add_section(
@@ -215,8 +235,24 @@ def main():
     ])
     summary_builder.add_section("Pre-fitted Lens Status", prefitted_summary)
     
-    fitting_status = jlens.create_tiny_fitting_report(can_fit)
-    summary_builder.add_section("Tiny Fitting Status", fitting_status)
+    model_loading_summary = "\n".join([
+        f"- {m}: {'✓ loaded' if r['success'] else '✗ failed'}"
+        + (f" ({r['error']})" if not r["success"] else "")
+        for m, r in model_loading_results.items()
+    ])
+    summary_builder.add_section("Model Loading Check", model_loading_summary)
+
+    status_lines = [
+        f"- Pre-fitted lens found locally/configured: {any(found for _, (found, _) in prefitted_results.items())}",
+        f"- jacobian-lens package installed: {jlens_status['installed']}",
+        f"- jacobian-lens package loadable: {jlens_status['loadable']}",
+        f"- Model loading check attempted: {bool(model_loading_results)}",
+        f"- Model loading check success for all models: {all(r['success'] for r in model_loading_results.values()) if model_loading_results else False}",
+        f"- Actual tiny fitting attempted: {tiny_fit_attempted}",
+        f"- Actual tiny fitting success: {tiny_fit_success}",
+        f"- Tiny fitting note: {tiny_fit_message}",
+    ]
+    summary_builder.add_section("Status Matrix", "\n".join(status_lines))
     
     # Decision summary
     decision_lines = []
@@ -226,15 +262,20 @@ def main():
         decision_lines.append("- Pre-fitted lens not found")
     
     if jlens_status['loadable']:
-        decision_lines.append("- ✓ jacobian-lens installed - can attempt fitting")
+        decision_lines.append("- ✓ jacobian-lens installed/loadable")
     else:
         decision_lines.append(f"- jacobian-lens not available")
         decision_lines.append(f"  Install: `{jso.get_jlens_install_command()}`")
     
     decision_lines.append("")
+    decision_lines.append("**Interpretation:**")
+    decision_lines.append("- This run is an availability/model-loading check only.")
+    decision_lines.append("- Do not treat this summary as proof that Plan A is feasible.")
+    decision_lines.append("- A real tiny-fit run is still required before a Plan A decision.")
+    decision_lines.append("")
     decision_lines.append("**Next Steps:**")
     decision_lines.append("1. If pre-fitted lens found: Load and validate (Phase 2)")
-    decision_lines.append("2. If jacobian-lens available: Run tiny fitting in Phase 0.5 proper")
+    decision_lines.append("2. If jacobian-lens available: Implement/run actual tiny fitting in Phase 0.5 proper")
     decision_lines.append("3. Otherwise: Prepare Plan B (logit lens + probing)")
     
     summary_builder.add_section("Decision", "\n".join(decision_lines))
@@ -272,8 +313,14 @@ def main():
             "layer_mode": args.layer_mode,
             "skip_fit": args.skip_fit,
             "search_prefitted_only": args.search_prefitted_only,
+            "prefitted_lens_found": any(found for _, (found, _) in prefitted_results.items()),
+            "jacobian_lens_installed": jlens_status["installed"],
+            "jacobian_lens_loadable": jlens_status["loadable"],
+            "model_loading_results": model_loading_results,
+            "actual_tiny_fitting_attempted": tiny_fit_attempted,
+            "actual_tiny_fitting_success": tiny_fit_success,
         },
-        notes="J-lens feasibility spike and pre-fitted lens search"
+        notes="J-lens availability/model-loading check; actual tiny fitting not attempted"
     )
     
     metadata_path = Path(run_dir) / "metadata.json"
@@ -296,6 +343,9 @@ def main():
         f.write(f"\n## Phase 0.5 Run - {datetime.now().isoformat()}\n")
         f.write(f"- Jacobian-lens installed: {jlens_status['installed']}\n")
         f.write(f"- Pre-fitted lens found: {any(found for _, (found, _) in prefitted_results.items())}\n")
+        f.write(f"- Model loading check success for all models: {all(r['success'] for r in model_loading_results.values()) if model_loading_results else False}\n")
+        f.write(f"- Actual tiny fitting attempted: {tiny_fit_attempted}\n")
+        f.write(f"- Actual tiny fitting success: {tiny_fit_success}\n")
         f.write(f"- Results: {run_dir}\n")
 
 

@@ -189,12 +189,14 @@ make azure-phase1
 
 - **For R1-Distill**: Uses empty-think prefill
   ```
+  [question]
+
   <think>
   </think>
-  
-  [question]
+
+  Answer:
   ```
-  This keeps the model in distribution while preventing visible thinking.
+  This keeps the model in distribution while closing the thinking block before final answer generation.
 
 - **For Qwen2.5-Math**: Uses standard answer-only prompts
   No empty-think tag needed since this model doesn't have <think> training.
@@ -215,15 +217,16 @@ make azure-phase1
   - Synthetic relations (1-3 hops, facts in prompt)
   - Factual/counterfactual (1-2 hops)
 
-### J-lens Feasibility
+### J-lens Availability Check
 
 Phase 0.5 prioritizes:
 1. Checking if pre-fitted lenses exist
 2. Reporting jacobian-lens installation instructions
 3. Not failing if jacobian-lens is unavailable
-4. Planning cost sweeps for actual fitting
+4. Checking target model loading
+5. Planning cost sweeps for a future actual fitting run
 
-This allows the project to proceed to Phase 1 (behavioral metrics) while J-lens availability is being resolved.
+The current Phase 0.5 script does not perform actual tiny fitting and must not be treated as proof that Plan A is feasible.
 
 ## What Remains
 

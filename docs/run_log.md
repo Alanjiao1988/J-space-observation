@@ -70,3 +70,24 @@ Test command:
 Azure:
 
 - No Azure resources were created in this step.
+
+## 2026-07-08 — Strict no-CoT and Phase 0.5 clarification fixes
+
+Action:
+
+- Moved R1-Distill strict no-CoT empty-think prefill after the base prompt and before an `Answer:` cue:
+  - `{base_prompt}`
+  - `<think>\n</think>`
+  - `Answer:`
+- Added `r1_style_thinking` to the default Phase 1 conditions.
+- Clarified Phase 0.5 script status as an availability/model-loading check only.
+- Clarified Phase 0.5 summary fields for pre-fitted lens search, jacobian-lens availability, model loading, and actual tiny fitting attempted/success.
+
+Test command:
+
+- `python -m pytest tests/ -v`
+- Test result: `41 passed, 2 warnings`
+
+Azure:
+
+- No Azure resources were created in this step.

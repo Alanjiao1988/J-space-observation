@@ -93,3 +93,15 @@ Next decision:
 
 - Run Phase 0.5 feasibility spike and Phase 1 dry run locally before Azure execution.
 - Do not create Azure resources until local dry runs are inspected.
+
+## 2026-07-08 — Correct strict no-CoT prefill ordering and Phase 1 defaults
+
+Decision:
+
+- R1-Distill strict no-CoT prompts must place the base question first, then the already-closed empty think block, then `Answer:`.
+- Phase 1 default conditions must include `strict_answer_only`, `visible_cot`, and `r1_style_thinking`.
+- The current Phase 0.5 script is explicitly classified as an availability/model-loading check only; it does not attempt actual tiny J-lens fitting.
+
+Next decision:
+
+- Run Phase 0.5 availability check and Phase 1 dry run locally before any Azure execution or Plan A feasibility decision.

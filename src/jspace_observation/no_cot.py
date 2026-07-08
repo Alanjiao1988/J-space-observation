@@ -19,13 +19,19 @@ class NoCoTValidationResult:
 
 def construct_empty_think_prefill_prompt(base_prompt: str) -> str:
     """
-    Construct prompt with empty think prefill for R1-Distill.
+    Construct strict no-CoT prompt with empty-think prefill for R1-Distill.
     
     Format:
+    {base_prompt}
+
     <think>
     </think>
-    
-    {base_prompt}
+
+    Answer:
+
+    The question appears first. The already-closed empty think block then keeps
+    R1-style models in-distribution while forcing zero visible thinking budget
+    before final answer generation.
     
     Args:
         base_prompt: The actual question/prompt
@@ -33,7 +39,7 @@ def construct_empty_think_prefill_prompt(base_prompt: str) -> str:
     Returns:
         Full prompt with empty think prefill
     """
-    return f"<think>\n</think>\n\n{base_prompt}"
+    return f"{base_prompt}\n\n<think>\n</think>\n\nAnswer:"
 
 
 def construct_answer_only_prompt(base_prompt: str) -> str:
@@ -107,8 +113,8 @@ def validate_no_cot_output(
         think_content = think_matches[0]
         result.think_tag_content = think_content
         
-        # For empty-think prefill, any think tag content is invalid
-        # (since we start with empty <think></think>)
+        # For empty-think prefill, any generated think tag content is invalid
+        # because the prompt has already closed the empty <think></think> block.
         if method == "empty_think_prefill":
             # Allow only minimal think tags (whitespace only)
             if think_content.strip():

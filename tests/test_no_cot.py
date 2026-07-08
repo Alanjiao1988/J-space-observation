@@ -24,6 +24,10 @@ def test_empty_think_prefill_prompt():
     assert "<think>" in result
     assert "</think>" in result
     assert base in result
+    assert result.startswith(base)
+    assert result.endswith("Answer:")
+    assert result.index(base) < result.index("<think>")
+    assert result.index("</think>") < result.index("Answer:")
 
 
 def test_answer_only_prompt():
