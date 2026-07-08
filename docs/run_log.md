@@ -1,15 +1,16 @@
 # Run Log
 
-Record every Azure command and every material local experiment command here.
+本文件记录所有实验命令、Azure 资源、运行结果和错误。
 
-## Policy
+## 2026-07-08 — Repository reset
 
-- Every Azure command must be recorded before or immediately after execution.
-- Include timestamp, operator, working directory, command, purpose, and result.
-- Do not paste secrets, tokens, keys, or full credential values.
+Action:
 
-## Entries
+- Replaced existing repository contents with the final experiment plan and Copilot execution prompt.
 
-| Timestamp | Operator | Environment | Command | Purpose | Result |
-| --- | --- | --- | --- | --- | --- |
-| 2026-07-08T11:55:47+08:00 | Copilot | Local scaffold | N/A | Initialize repository scaffold | No Azure commands executed |
+No Azure resources were created in this step.
+
+Next expected runs:
+
+1. Phase 0.5 J-lens feasibility and saturation spike.
+2. Phase 1 behavioral reasoning-depth gradient.

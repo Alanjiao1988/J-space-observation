@@ -1,19 +1,21 @@
 # Decision Log
 
-Record every phase decision here.
+## 2026-07-08 — Reset repository to final experiment plan
 
-## Policy
+Decision:
 
-- Every phase decision must be recorded.
-- Include date, decision, rationale, and consequences.
-- Do not retroactively edit meaning; append superseding decisions instead.
+- 删除既有仓库内容，用当前最终实验方案重建文档。
+- Plan A 仍为主路径：使用真实 Jacobian Lens 做 J-space observation。
+- Plan B 只作为保险路径：如果 J-lens 不可行，则降级为 hidden representation probe，不能声称直接 J-space observation。
+- 立即执行优先级为：Phase 0.5 J-lens feasibility spike 和 Phase 1 behavioral reasoning-depth gradient。
 
-## Decisions
+Key constraints:
 
-### D-0001: Define Phase 1 as a J-space-inspired hidden reasoning probe
+- R1-Distill strict no-CoT 主方法为 empty-think prefill。
+- RQ3 主证据使用 lens-independent patching/probe。
+- Phase 5 ablation 必须使用 DoD，并受 Phase 1 headroom gate 控制。
+- Probe 必须跨模板泛化。
 
-- Date: 2026-07-08
-- Phase: 1
-- Decision: Phase 1 will study hidden representations of `DeepSeek-R1-Distill-Qwen-1.5B` under no-CoT / answer-only prompts.
-- Rationale: The project's differentiating question is whether reasoning-like structure appears in hidden states when visible reasoning tokens are suppressed.
-- Consequences: The project must not claim full Anthropic J-space replication, and generated chain-of-thought text is out of scope for Phase 1 analysis.
+Next action:
+
+- 由 GitHub Copilot / Copilot Agent 根据 `docs/copilot_prompt.md` 实现脚手架、Phase 0.5 和 Phase 1。

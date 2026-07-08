@@ -1,15 +1,12 @@
-FROM python:3.11-slim
+FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+WORKDIR /workspace
 
-WORKDIR /app
+RUN apt-get update && apt-get install -y git curl vim && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt pyproject.toml ./
-COPY src ./src
+COPY requirements.txt /workspace/requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir -e .
+COPY . /workspace
 
-CMD ["python", "-c", "import jspace_observation; print(jspace_observation.__version__)"]
+CMD ["bash", "-lc", "python --version && python -c 'import torch; print(torch.cuda.is_available())'"]

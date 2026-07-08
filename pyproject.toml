@@ -1,33 +1,8 @@
-[build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "jspace-observation"
 version = "0.1.0"
-description = "J-space-inspired hidden reasoning probes under answer-only prompting."
-readme = "README.md"
+description = "J-lens based hidden workspace observation for R1 distilled small models"
 requires-python = ">=3.11"
-authors = [
-  { name = "Alan Jiao" }
-]
-classifiers = [
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.11",
-  "Private :: Do Not Upload"
-]
-dependencies = [
-  "accelerate>=0.33",
-  "datasets>=2.20",
-  "matplotlib>=3.9",
-  "numpy>=1.26",
-  "pandas>=2.2",
-  "pyyaml>=6.0",
-  "scikit-learn>=1.5",
-  "torch>=2.3",
-  "tqdm>=4.66",
-  "transformers>=4.43"
-]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.pytest.ini_options]
+testpaths = ["tests"]

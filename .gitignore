@@ -1,49 +1,28 @@
 # Python
 __pycache__/
 *.py[cod]
-*.egg-info/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
-
-# Virtual environments
 .venv/
 venv/
-env/
-
-# Environment and credentials
 .env
 .env.*
-!.env.example
-*.pem
-*.key
-*.pfx
-*.p12
-azureProfile.json
-clouds.config
-msal_token_cache.json
 
-# Model weights and large model artifacts
-*.bin
-*.ckpt
-*.gguf
-*.h5
-*.onnx
+# Results and model artifacts
+results/runs/*
+!results/runs/.gitkeep
+models/
+checkpoints/
+*.safetensors
 *.pt
 *.pth
-*.safetensors
-models/
-model_weights/
-checkpoints/
+*.bin
+*.gguf
 
-# Generated experiment artifacts
-results/*
-!results/README.md
-
-# OS and editor files
+# OS / editor
 .DS_Store
-Thumbs.db
 .vscode/
 .idea/
+
+# Secrets
+*.pem
+*.key
+secrets/
