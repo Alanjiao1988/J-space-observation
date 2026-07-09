@@ -25,6 +25,16 @@ class NoCoTValidationResult:
     parse_failed: bool = False
 
 
+@dataclass(frozen=True)
+class ConditionGenerationConfig:
+    """Generation settings tied to a prompt condition."""
+    max_new_tokens: int
+    temperature: float
+    top_p: float
+    do_sample: bool
+    decoding_profile: str
+
+
 def construct_empty_think_prefill_prompt(base_prompt: str) -> str:
     """
     Construct strict no-CoT prompt with empty-think prefill for R1-Distill.
@@ -47,7 +57,22 @@ def construct_empty_think_prefill_prompt(base_prompt: str) -> str:
     Returns:
         Full prompt with empty think prefill
     """
-    return f"{base_prompt}\n\n<think>\n</think>\n\nAnswer:"
+    instruction = (
+        "You must output only the final answer. Do not explain. Do not show "
+        "steps. Do not include reasoning. Do not include a step-by-step "
+        "explanation."
+    )
+    return f"{base_prompt}\n\n{instruction}\n\n<think>\n</think>\n\nAnswer:"
+
+
+def construct_prefill_answer_prompt(base_prompt: str) -> str:
+    """Construct direct answer-prefill prompt without think tags."""
+    instruction = (
+        "You must output only the final answer. Do not explain. Do not show "
+        "steps. Do not include reasoning. Do not include a step-by-step "
+        "explanation. Do not include <think> tags."
+    )
+    return f"{base_prompt}\n\n{instruction}\n\nAnswer:"
 
 
 def construct_answer_only_prompt(base_prompt: str) -> str:
@@ -62,6 +87,36 @@ def construct_answer_only_prompt(base_prompt: str) -> str:
     """
     instruction = "Answer the question directly with only the final answer. Do not show any reasoning steps.\n\n"
     return instruction + base_prompt
+
+
+def get_generation_config_for_condition(
+    condition: str,
+    default_max_new_tokens: int,
+) -> ConditionGenerationConfig:
+    """Return condition-specific decoding settings."""
+    if condition == "strict_answer_only":
+        return ConditionGenerationConfig(
+            max_new_tokens=min(default_max_new_tokens, 12),
+            temperature=0.0,
+            top_p=1.0,
+            do_sample=False,
+            decoding_profile="strict_empty_think_answer_only_max12",
+        )
+    if condition == "strict_answer_only_prefill_answer":
+        return ConditionGenerationConfig(
+            max_new_tokens=min(default_max_new_tokens, 8),
+            temperature=0.0,
+            top_p=1.0,
+            do_sample=False,
+            decoding_profile="strict_prefill_answer_only_max8",
+        )
+    return ConditionGenerationConfig(
+        max_new_tokens=default_max_new_tokens,
+        temperature=1.0,
+        top_p=1.0,
+        do_sample=False,
+        decoding_profile="default_greedy",
+    )
 
 
 def construct_visible_cot_prompt(base_prompt: str) -> str:
@@ -131,7 +186,7 @@ def validate_no_cot_output(
     # Any generated think tag marker is a strict no-CoT violation. This catches
     # unmatched tags like a stray "</think>" as well as matched tags with empty
     # content.
-    if method in {"empty_think_prefill", "answer_only_prompt"} and re.search(
+    if method in {"empty_think_prefill", "answer_only_prompt", "answer_prefill"} and re.search(
         r"</?think>", output, flags=re.IGNORECASE
     ):
         result.has_think_tag = True
@@ -265,7 +320,7 @@ def create_generation_record(
     """
     validation = validate_no_cot_output(output, method=no_cot_method)
     answer = extract_answer_from_output(output)
-    no_cot_applicable = no_cot_method in {"empty_think_prefill", "answer_only_prompt"}
+    no_cot_applicable = no_cot_method in {"empty_think_prefill", "answer_only_prompt", "answer_prefill"}
     
     record = {
         "prompt": prompt,

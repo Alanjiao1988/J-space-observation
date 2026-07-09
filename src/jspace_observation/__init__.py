@@ -13,8 +13,10 @@ from .model_loader import (
 from .no_cot import (
     construct_empty_think_prefill_prompt,
     construct_answer_only_prompt,
+    construct_prefill_answer_prompt,
     construct_visible_cot_prompt,
     construct_r1_style_thinking_prompt,
+    get_generation_config_for_condition,
     validate_no_cot_output,
     extract_answer_from_output,
     create_generation_record,
@@ -76,8 +78,10 @@ __all__ = [
     # No-CoT
     "construct_empty_think_prefill_prompt",
     "construct_answer_only_prompt",
+    "construct_prefill_answer_prompt",
     "construct_visible_cot_prompt",
     "construct_r1_style_thinking_prompt",
+    "get_generation_config_for_condition",
     "validate_no_cot_output",
     "extract_answer_from_output",
     "create_generation_record",

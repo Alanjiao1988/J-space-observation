@@ -44,8 +44,10 @@ from jspace_observation import (
     generate_all_pilot_prompt_sets,
     construct_empty_think_prefill_prompt,
     construct_answer_only_prompt,
+    construct_prefill_answer_prompt,
     construct_visible_cot_prompt,
     construct_r1_style_thinking_prompt,
+    get_generation_config_for_condition,
     parse_answer,
     evaluate_answer,
     create_generation_record,
@@ -63,6 +65,9 @@ def run_generation(
     prompt: str,
     model_name: str,
     max_new_tokens: int = 128,
+    temperature: float = 1.0,
+    top_p: float = 1.0,
+    do_sample: bool = False,
     device = None
 ) -> Tuple[str, float]:
     """
@@ -82,9 +87,9 @@ def run_generation(
         outputs = model.generate(
             **inputs,
             max_new_tokens=max_new_tokens,
-            temperature=1.0,
-            top_p=1.0,
-            do_sample=False,
+            temperature=temperature,
+            top_p=top_p,
+            do_sample=do_sample,
             pad_token_id=tokenizer.pad_token_id,
         )
     
@@ -274,18 +279,29 @@ def main():
                             else:
                                 full_prompt = construct_answer_only_prompt(item.prompt_base)
                                 no_cot_method = "answer_only_prompt"
+                        elif condition == "strict_answer_only_prefill_answer":
+                            full_prompt = construct_prefill_answer_prompt(item.prompt_base)
+                            no_cot_method = "answer_prefill"
                         elif condition == "visible_cot":
                             full_prompt = construct_visible_cot_prompt(item.prompt_base)
                             no_cot_method = "visible_cot"
                         else:  # r1_style_thinking
                             full_prompt = construct_r1_style_thinking_prompt(item.prompt_base)
                             no_cot_method = "r1_style_thinking"
+
+                        generation_config = get_generation_config_for_condition(
+                            condition,
+                            args.max_new_tokens,
+                        )
                         
                         # Generate
                         try:
                             output, gen_time = run_generation(
                                 model, tokenizer, full_prompt, model_name,
-                                max_new_tokens=args.max_new_tokens,
+                                max_new_tokens=generation_config.max_new_tokens,
+                                temperature=generation_config.temperature,
+                                top_p=generation_config.top_p,
+                                do_sample=generation_config.do_sample,
                                 device=device
                             )
                             latencies.append(gen_time)
@@ -306,6 +322,11 @@ def main():
                             depth=depth,
                             condition=condition,
                             generation_time_s=gen_time,
+                            condition_max_new_tokens=generation_config.max_new_tokens,
+                            condition_temperature=generation_config.temperature,
+                            condition_do_sample=generation_config.do_sample,
+                            condition_top_p=generation_config.top_p,
+                            decoding_profile=generation_config.decoding_profile,
                         )
                         # Parse and evaluate
                         eval_record = create_eval_record(

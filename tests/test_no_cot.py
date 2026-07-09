@@ -9,10 +9,13 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from jspace_observation import (
     construct_empty_think_prefill_prompt,
     construct_answer_only_prompt,
+    construct_prefill_answer_prompt,
     construct_visible_cot_prompt,
     construct_r1_style_thinking_prompt,
+    get_generation_config_for_condition,
     validate_no_cot_output,
     extract_answer_from_output,
+    create_generation_record,
     NoCoTValidationResult,
 )
 
@@ -38,6 +41,17 @@ def test_answer_only_prompt():
     assert "Answer" in result or "answer" in result
 
 
+def test_prefill_answer_prompt_is_strict_and_ends_with_answer():
+    base = "What is 2+2?"
+    result = construct_prefill_answer_prompt(base)
+    assert result.startswith(base)
+    assert "Do not explain" in result
+    assert "Do not show steps" in result
+    assert "Do not include <think> tags" in result
+    assert "show your reasoning" not in result.lower()
+    assert result.endswith("Answer:")
+
+
 def test_visible_cot_prompt():
     """Test visible CoT prompt construction."""
     base = "What is 2+2?"
@@ -51,6 +65,36 @@ def test_r1_style_thinking_prompt():
     base = "What is 2+2?"
     result = construct_r1_style_thinking_prompt(base)
     assert base in result
+
+
+def test_strict_generation_config_uses_small_budget():
+    cfg = get_generation_config_for_condition("strict_answer_only", 64)
+    assert cfg.max_new_tokens == 12
+    assert cfg.temperature == 0.0
+    assert not cfg.do_sample
+    assert "strict" in cfg.decoding_profile
+
+
+def test_prefill_generation_config_uses_tiny_budget():
+    cfg = get_generation_config_for_condition("strict_answer_only_prefill_answer", 64)
+    assert cfg.max_new_tokens == 8
+    assert cfg.temperature == 0.0
+    assert not cfg.do_sample
+    assert "prefill" in cfg.decoding_profile
+
+
+def test_visible_generation_config_is_not_tightened():
+    cfg = get_generation_config_for_condition("visible_cot", 64)
+    assert cfg.max_new_tokens == 64
+    assert cfg.temperature == 1.0
+    assert not cfg.do_sample
+    assert cfg.decoding_profile == "default_greedy"
+
+
+def test_r1_generation_config_is_not_tightened():
+    cfg = get_generation_config_for_condition("r1_style_thinking", 64)
+    assert cfg.max_new_tokens == 64
+    assert cfg.decoding_profile == "default_greedy"
 
 
 def test_validate_no_cot_empty_think_valid():
@@ -128,6 +172,22 @@ def test_validate_no_cot_rejects_multiline_explanation():
     result = validate_no_cot_output(output, method="empty_think_prefill")
     assert not result.is_valid
     assert "reasoning_heading_generated" in result.violation_reasons
+
+
+def test_generation_record_preserves_decoding_metadata():
+    record = create_generation_record(
+        prompt="What is 2+2?\n\nAnswer:",
+        output="4",
+        no_cot_method="answer_prefill",
+        model_name="test-model",
+        condition_max_new_tokens=8,
+        condition_temperature=0.0,
+        condition_do_sample=False,
+        decoding_profile="strict_prefill_answer_only_max8",
+    )
+    assert record["no_cot_validity"] is True
+    assert record["decoding_profile"] == "strict_prefill_answer_only_max8"
+    assert record["condition_max_new_tokens"] == 8
 
 
 def test_validate_no_cot_token_budget():
