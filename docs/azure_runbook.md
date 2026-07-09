@@ -500,6 +500,33 @@ Interpretation:
 - Do not broaden Phase 1 until strict-answer-only prompting/decoding and parse policy are reviewed.
 - This is still behavioral/infrastructure validation only, not J-space evidence.
 
+## Strict answer-only prefill variant status
+
+The strict answer-only generation strategy was tightened and rerun with one additional condition.
+
+Current strictfix image:
+
+```text
+acrjspaceobssea0708231738.azurecr.io/j-space-observation:9b5895db173f
+```
+
+Strictfix run:
+
+```text
+job: job-jspace-p1-strictfix2
+execution: job-jspace-p1-strictfix2-1sjj2n5
+blob prefix: phase1-pilot-strictfix2/20260709T025356Z
+```
+
+Result:
+
+```text
+strict_answer_only: still no-CoT invalid for all depths
+strict_answer_only_prefill_answer: no visible reasoning on depth 1, but incomplete/wrong; still invalid on depths 2/3
+```
+
+Do not broaden the run yet. Any future attempt should test stop-sequence or explicitly labeled post-processing while preserving raw output and reporting raw vs postprocessed validity separately.
+
 ## Persistent results storage status
 
 Azure Files was attempted as the first persistence path and is currently blocked by organization/subscription policy.

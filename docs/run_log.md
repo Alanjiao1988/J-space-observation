@@ -1023,6 +1023,90 @@ Next action:
 - Fix no-CoT visible-reasoning validation before any broader Phase 1 run.
 - Use `JSPACE_RESULTS_ROOT=/workspace/results` for future runs to avoid doubled path `/workspace/results/runs/runs/...`.
 
+## 2026-07-09 — Tighten strict answer-only prompting and rerun minimal pilot
+
+Goal:
+
+- Keep validator strict.
+- Add a direct answer-prefill strict variant and condition-specific decoding.
+- Rerun the same minimal persistent pilot only.
+
+Code changes:
+
+- Added `strict_answer_only_prefill_answer` condition.
+- Added `construct_prefill_answer_prompt()`.
+- Tightened existing `strict_answer_only` prompt with explicit no-explanation/no-steps/no-reasoning instruction.
+- Added condition-specific decoding metadata:
+  - `strict_answer_only`: `max_new_tokens=12`, `temperature=0`, greedy, profile `strict_empty_think_answer_only_max12`
+  - `strict_answer_only_prefill_answer`: `max_new_tokens=8`, `temperature=0`, greedy, profile `strict_prefill_answer_only_max8`
+  - `visible_cot` and `r1_style_thinking`: unchanged default budget/profile
+- Added reasoning markers for `alright`, `hmm`, and `wait` after first strictfix run exposed those as leakage markers.
+
+Tests:
+
+- Command: `python -m pytest tests/ -q`
+- Result before extra marker pass: `60 passed, 2 warnings`
+- Result after extra marker pass: `62 passed, 2 warnings`
+
+ACR builds:
+
+- Build run `cm5`: image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:b91bc335caf1`
+- Digest `cm5`: `sha256:97c43f11d0bdc409bd09e9c8f904ceeafb7150d0fcbd14e348dfb13a376c7aa6`
+- Build run `cm6`: image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9b5895db173f`
+- Digest `cm6`: `sha256:267e422baaad24b577ac103af9c9ca2af56295780eaa0804161aa4ff6d4fe189`
+
+First strictfix rerun:
+
+- Job: `job-jspace-p1-strictfix`
+- Execution: `job-jspace-p1-strictfix-sq17fi0`
+- Status: `Succeeded`
+- Blob prefix: `phase1-pilot-strictfix/20260709T024358Z`
+- Result:
+  - `strict_answer_only` remained no-CoT invalid for all depths.
+  - `strict_answer_only_prefill_answer` improved visible reasoning on depth 1 but exposed new marker leaks (`Alright`, `Wait`) on deeper items.
+
+Final strictfix2 rerun:
+
+- Job: `job-jspace-p1-strictfix2`
+- Execution: `job-jspace-p1-strictfix2-1sjj2n5`
+- Status: `Succeeded`
+- Blob prefix: `phase1-pilot-strictfix2/20260709T025356Z`
+- Files uploaded:
+  - `phase1_eval_records.jsonl`
+  - `phase1_generations.jsonl`
+  - `phase1_metrics.csv`
+  - `phase1_summary.md`
+
+Final strictfix2 review:
+
+- Cells completed: 12 (depths 1/2/3 x strict_answer_only, strict_answer_only_prefill_answer, visible_cot, r1_style_thinking).
+- `strict_answer_only`:
+  - no-CoT valid rate: `0.0000` for depths 1/2/3
+  - visible reasoning marker rate: `1.0000` for depths 1/2/3
+  - accuracy: `0.0000` for depths 1/2/3
+- `strict_answer_only_prefill_answer`:
+  - depth 1: no-CoT valid `1.0000`, visible reasoning marker `0.0000`, parse ambiguous `0.0000`, accuracy `0.0000`
+  - depth 2: no-CoT valid `0.0000`, visible reasoning marker `1.0000`, parse valid `0.0000`, accuracy `0.0000`
+  - depth 3: no-CoT valid `0.0000`, visible reasoning marker `1.0000`, parse ambiguous `0.0000`, accuracy `0.0000`
+- parse_ambiguous_rate:
+  - all original strict_answer_only rows: `1.0000`
+  - all visible_cot / r1_style rows: `1.0000`
+  - strict_answer_only_prefill_answer rows: `0.0000`
+- representative strict outputs:
+  - `strict_answer_only`: still emits `Step-by-step explanation`
+  - `strict_answer_only_prefill_answer` depth 1: `7 + 5 = \boxed` (no visible reasoning, but incomplete/wrong)
+  - `strict_answer_only_prefill_answer` depth 2: `__________\n\nAlright, so I have` (flagged invalid)
+  - `strict_answer_only_prefill_answer` depth 3: `\boxed{12}\n\nWait,` (flagged invalid)
+
+Decision:
+
+- Direct `Answer:` prefill reduces visible reasoning for the easiest item but does not establish a useful strict answer-only condition.
+- Tiny token budget causes incomplete/wrong answers.
+- The model still leaks visible reasoning on harder arithmetic even with direct answer prefill.
+- Do not broaden Phase 1 yet.
+- Next step should try a different strict decoding/prompting strategy, e.g. stop criteria around newline/explanation markers or a post-processing experiment clearly labeled as post-processed.
+- This remains behavioral/infrastructure sanity only. No J-space claim.
+
 ## 2026-07-09 — Harden no-CoT validation and parse warnings
 
 Goal:

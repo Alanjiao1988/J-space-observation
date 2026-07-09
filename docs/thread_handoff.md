@@ -2,8 +2,8 @@
 
 Date: 2026-07-08
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified commit before this handoff: `c228cb1f413d0de6b83b4db0d9ad585fad6da736`
-Latest status message for that commit: `Record validator pilot rerun results`
+Latest verified commit before this handoff: `9969471d136b509323ce8a719d9fe0e237721b10`
+Latest status message for that commit: `Record strict answer-only rerun results`
 
 > Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
 >
@@ -20,6 +20,8 @@ Latest status message for that commit: `Record validator pilot rerun results`
 > Update (2026-07-09 09:08 +08:00): Switched to Azure Blob upload with managed identity. Added Blob export utility and smoke script, rebuilt ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:afd647a6b53e`, assigned `Storage Blob Data Contributor` to `id-jspace-aca-acrpull-sea`, and verified Blob upload. Blob smoke succeeded (`job-jspace-blob-smoke-acr-o7kl7s2`) and uploaded `smoke/20260709T013310Z/smoke.txt`. Persistent Phase 1 pilot succeeded (`job-jspace-phase1-pilot-blob-acr-9voxpdm`) and uploaded 4 files under `phase1-pilot/20260709T014336Z`. Pilot review found a blocker before scaling: strict answer-only outputs can contain visible reasoning that current no-CoT validation fails to flag. Next action: fix no-CoT visible-reasoning validation before any broader Phase 1 run.
 >
 > Update (2026-07-09 10:02 +08:00): Hardened no-CoT validation and parser ambiguity reporting. Local tests now `54 passed, 2 warnings`. Rebuilt ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:937288cfb8ef` (build `cm4`). Reran minimal persistent validator pilot (`job-jspace-p1-validator-xkqro3f`) and uploaded outputs under `phase1-pilot-validator/20260709T022001Z`. Result: strict_answer_only no-CoT valid rate is now `0.0000` for depths 1/2/3, visible reasoning marker rate is `1.0000`, parse ambiguity is `1.0000` for all cells. This fixes the false-negative validator bug and shows the current strict-answer-only prompt/decoding still leaks visible reasoning. Do not broaden Phase 1 until strict answer-only prompting/decoding and parser policy are reviewed.
+>
+> Update (2026-07-09 10:32 +08:00): Added `strict_answer_only_prefill_answer` and condition-specific strict decoding. Final ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9b5895db173f` (build `cm6`). Reran minimal persistent pilot as `job-jspace-p1-strictfix2-1sjj2n5`, Blob prefix `phase1-pilot-strictfix2/20260709T025356Z`. Existing `strict_answer_only` remains no-CoT invalid for all depths. New direct `Answer:` prefill suppresses visible reasoning only on depth 1 but gives incomplete/wrong answer; depths 2/3 still leak meta-reasoning (`Alright`, `Wait`) and are invalid. Do not broaden Phase 1. Next likely experiment: stop-sequence or explicitly labeled post-processing while preserving raw output.
 >
 > Update (2026-07-08 22:51 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but Copilot's fresh tool processes could not see them in Process/User/Machine environment scopes. No package-read preflight or Azure job retry was attempted. To continue, set the variables in Windows User environment (or another secure path readable by the agent), e.g. `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`. Do not paste tokens into chat.
 
@@ -255,7 +257,7 @@ workload profile creation: SUCCEEDED (gpu-t4 added to cae-jspace-observation-sea
 job execution: VALIDATED (ACR managed identity smoke, Phase 0.5, Phase 1 dry-run, and small pilot succeeded)
 ```
 
-Current main gate: tighten strict-answer-only prompting/decoding and review parser policy before any broader Phase 1 run. Blob persistence works and the validation false negative is fixed.
+Current main gate: establish a usable strict answer-only condition. Prompt-only/direct-prefill variants have not succeeded enough to broaden Phase 1.
 
 If Alan says the PAT is set but Copilot cannot see it, check all scopes:
 
@@ -404,9 +406,9 @@ small phase 1 pilot execution: job-jspace-phase1-pilot-acr-lhuvwbf
 
 Before any broader run:
 
-1. Review validator pilot artifacts in Blob prefix `phase1-pilot-validator/20260709T022001Z`.
-2. Tighten strict-answer-only prompting/decoding because current strict outputs are no-CoT invalid.
-3. Review parser policy; all pilot cells are parse-ambiguous under the current numeric parser.
+1. Review strictfix artifacts in Blob prefix `phase1-pilot-strictfix2/20260709T025356Z`.
+2. Decide whether to test stop-sequence / raw-vs-postprocessed output handling next.
+3. Review parser policy; many pilot cells remain parse-ambiguous.
 4. Decide whether to install `jacobian-lens` into the image before any real Phase 0.5 fitting.
 5. Do not claim Phase 1 behavioral pilot as J-space evidence.
 6. Do not run the full two-model/all-task Phase 1 until strict no-CoT behavior is improved and accepted.

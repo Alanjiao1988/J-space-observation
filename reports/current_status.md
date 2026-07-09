@@ -202,6 +202,50 @@ The no-CoT validator and parser warning layer were hardened and rerun on the sam
 - Do not expand to broader Phase 1 until strict-answer-only prompting/decoding and parser policy are reviewed.
 - Scientific conclusion remains infrastructure + behavioral sanity only; no J-space claim.
 
+## Strict Answer-only Prompt/Decoding Rerun (2026-07-09)
+
+### Changes
+
+- Added `strict_answer_only_prefill_answer`.
+- Tightened `strict_answer_only` prompt with explicit no-explanation/no-steps/no-reasoning instruction.
+- Added strict condition decoding profiles:
+  - `strict_answer_only`: `max_new_tokens=12`
+  - `strict_answer_only_prefill_answer`: `max_new_tokens=8`
+- Kept `visible_cot` and `r1_style_thinking` unchanged.
+- Added `alright`, `hmm`, and `wait` as visible/meta-reasoning markers after the first strictfix rerun exposed them.
+
+### Tests and image
+
+- Tests: `62 passed, 2 warnings`
+- Final ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9b5895db173f`
+- Build run: `cm6`
+- Digest: `sha256:267e422baaad24b577ac103af9c9ca2af56295780eaa0804161aa4ff6d4fe189`
+
+### Azure rerun
+
+- First strictfix job: `job-jspace-p1-strictfix`, execution `job-jspace-p1-strictfix-sq17fi0`
+- Final strictfix2 job: `job-jspace-p1-strictfix2`
+- Final execution: `job-jspace-p1-strictfix2-1sjj2n5`
+- Status: `Succeeded`
+- Blob prefix: `phase1-pilot-strictfix2/20260709T025356Z`
+
+### Review
+
+- Cells completed: 12.
+- `strict_answer_only`: no-CoT valid rate `0.0000` for depths 1/2/3; visible reasoning marker rate `1.0000`.
+- `strict_answer_only_prefill_answer`:
+  - depth 1: no-CoT valid `1.0000`, visible reasoning marker `0.0000`, parse ambiguity `0.0000`, accuracy `0.0000`.
+  - depths 2/3: still no-CoT invalid due meta-reasoning markers (`Alright`, `Wait`).
+- `visible_cot` and `r1_style_thinking`: no-CoT validity reported as `NA`, not judged as strict no-CoT.
+
+### Current decision
+
+- Direct `Answer:` prefill improves visible-reasoning suppression on the easiest item but produces incomplete/wrong answers and still leaks meta-reasoning on harder items.
+- Prompt-only strict no-CoT is still not established for this model/task setup.
+- Do not expand Phase 1 yet.
+- Next step should test a carefully labeled stop-sequence / post-processing experiment while preserving raw-output validation.
+- Scientific conclusion remains infrastructure + behavioral sanity only; no J-space claim.
+
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 
 - Baseline: read `docs/thread_handoff.md`; repo was synced to `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.

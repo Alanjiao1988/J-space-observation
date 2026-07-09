@@ -557,3 +557,31 @@ Decision:
 - Do not broaden Phase 1 yet.
 - Next step should tighten strict-answer-only generation/prompting and parser policy, then rerun the same small persistent pilot.
 - No J-space or hidden reasoning conclusion may be drawn from this behavioral sanity run.
+
+## 2026-07-09 — strict answer-only prefill variant tested
+
+Status:
+
+- Added `strict_answer_only_prefill_answer`.
+- Rebuilt ACR images:
+  - `b91bc335caf1` in build `cm5`
+  - `9b5895db173f` in build `cm6`
+- Reran minimal persistent pilot with four conditions:
+  - `strict_answer_only`
+  - `strict_answer_only_prefill_answer`
+  - `visible_cot`
+  - `r1_style_thinking`
+- Final execution: `job-jspace-p1-strictfix2-1sjj2n5`.
+- Blob prefix: `phase1-pilot-strictfix2/20260709T025356Z`.
+
+Findings:
+
+- Existing `strict_answer_only` remains no-CoT invalid for all depths.
+- New `strict_answer_only_prefill_answer` suppresses visible reasoning on depth 1 but returns incomplete/wrong answer text.
+- New `strict_answer_only_prefill_answer` still leaks meta-reasoning on depths 2/3 (`Alright`, `Wait`) and is no-CoT invalid there.
+
+Decision:
+
+- The direct `Answer:` prefill variant is not sufficient to establish a reliable strict answer-only condition.
+- Do not expand Phase 1.
+- Next step should test stop-sequence / post-processing approaches that preserve raw output and separately report raw vs postprocessed no-CoT validity.
