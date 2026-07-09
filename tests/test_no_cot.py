@@ -142,6 +142,8 @@ def test_validate_no_cot_with_visible_reasoning():
         "Follow these steps: first add 7 and 5. The answer is 12.",
         "First, compute 7 + 5. Then, write 12.",
         "To solve this, add the numbers.\n1) 7 + 5 = 12\nAnswer: 12",
+        "Alright, so I have this problem.",
+        "Wait, that answer needs checking.",
     ],
 )
 def test_validate_no_cot_rejects_reasoning_markers(output):

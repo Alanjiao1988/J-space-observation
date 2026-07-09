@@ -224,6 +224,9 @@ def validate_no_cot_output(
             r"\bfollow these steps\b",
             r"\bbecause\b",
             r"\bso we\b",
+            r"\balright\b",
+            r"\bhmm\b",
+            r"\bwait[,:\s]",
         ]
 
         if any(re.search(pattern, text_lower) for pattern in reasoning_heading_patterns):
