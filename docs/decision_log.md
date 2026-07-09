@@ -478,3 +478,27 @@ Scientific interpretation:
 Next decision:
 
 - Configure persistent results export/storage before broader Phase 1 runs, or explicitly accept log-only summaries for the next small run.
+
+## 2026-07-09 — Azure Files persistence blocked by shared-key policy
+
+Status:
+
+- Storage account `stjspaceobssea07090835` created; `allowSharedKeyAccess=False`.
+- Storage account `stjspacefiles0709085305` created with explicit `--allow-shared-key-access true`, but `allowSharedKeyAccess` still remained `False`.
+- Azure Files data-plane operations using account key failed with `KeyBasedAuthenticationNotPermitted`.
+- Environment storage `jspace-results-storage` was registered but proved unusable; storage smoke job hung.
+- Stuck storage smoke execution `job-jspace-storage-smoke-acr-1s1g5d8` was stopped.
+- `job-jspace-storage-smoke-acr` was deleted.
+- `jspace-results-storage` was removed from the Container Apps environment.
+
+Decision:
+
+- Azure Files key-based mount is blocked by organization/subscription policy.
+- Do not rerun storage-mount jobs until a working persistence backend is selected.
+- Do not broaden Phase 1 until result persistence is solved.
+
+Next options:
+
+- Request admin exception for Azure Files shared-key access; or
+- Switch to Azure Blob upload with managed identity; or
+- Investigate identity-based Container Apps storage support for this tenant.

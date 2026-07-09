@@ -63,6 +63,48 @@ GHCR route was abandoned for execution because private package pull authenticati
 - The small Phase 1 pilot is behavioral only and is not J-space evidence.
 - Review exported logs/metrics before broadening the run.
 
+## Persistent Storage Attempt (2026-07-09)
+
+Goal: configure Azure Files persistence before broader Phase 1 runs.
+
+### Result
+
+- Azure Files persistence path is currently blocked.
+- Both storage accounts created in this attempt have `allowSharedKeyAccess=False`, even when `--allow-shared-key-access true` was specified during creation.
+- Azure Files data-plane operations with account key fail with:
+  - `KeyBasedAuthenticationNotPermitted`
+  - `Key based authentication is not permitted on this storage account.`
+
+### Storage resources
+
+- `stjspaceobssea07090835`: created, key-based auth disabled by policy
+- `stjspacefiles0709085305`: created with explicit shared-key flag, but key-based auth still disabled by policy
+- File share `jspace-results` was created through ARM management plane on the first storage account, but key-based Azure Files access remains unusable for Container Apps mount.
+
+### Container Apps mount attempt
+
+- Environment storage `jspace-results-storage` was registered, but the smoke job using `/mnt/results` hung.
+- Stuck execution: `job-jspace-storage-smoke-acr-1s1g5d8`
+- Cleanup completed:
+  - stopped the stuck execution
+  - deleted `job-jspace-storage-smoke-acr`
+  - removed `jspace-results-storage` from the Container Apps environment
+- No environment storage is currently registered.
+
+### Script status
+
+- `infra/azure/scripts/06_run_job_acr_mi.sh` now supports Azure Files volume mounting (`ENABLE_RESULTS_MOUNT`, `STORAGE_MOUNT_NAME`, `RESULTS_MOUNT_PATH`), but this should not be used until a working storage backend is available.
+
+### Next blocker
+
+Choose a persistence alternative:
+
+1. Ask the Azure/admin team to allow Azure Files shared-key access for this project; or
+2. Switch to Azure Blob upload using managed identity from inside the container; or
+3. Use identity-based Container Apps storage if supported in this tenant.
+
+Do not run broader experiments until persistent output is solved.
+
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 
 - Baseline: read `docs/thread_handoff.md`; repo was synced to `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.

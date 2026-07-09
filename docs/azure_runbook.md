@@ -421,6 +421,34 @@ bash infra/azure/scripts/06_run_job_acr_mi.sh
 
 Do not run a broader Phase 1 sweep until pilot outputs are reviewed and persistent result export is decided.
 
+## Persistent results storage status
+
+Azure Files was attempted as the first persistence path and is currently blocked by organization/subscription policy.
+
+Observed behavior:
+
+- Storage account creation succeeds.
+- `allowSharedKeyAccess` remains `False` even when `--allow-shared-key-access true` is specified.
+- Azure Files data-plane operations using account keys fail:
+
+```text
+KeyBasedAuthenticationNotPermitted
+Key based authentication is not permitted on this storage account.
+```
+
+- Container Apps environment storage registration can be created, but the mounted job hung and was stopped.
+- The invalid environment storage registration has been removed.
+
+Do not use `ENABLE_RESULTS_MOUNT=true` until a working storage backend is available.
+
+Persistence options:
+
+1. Request an admin exception to allow Azure Files shared-key access for the project storage account.
+2. Switch to Azure Blob result upload using managed identity from inside the container.
+3. Investigate whether identity-based Container Apps storage is supported in this tenant/API version.
+
+Do not run broader experiments until result persistence is solved, unless Alan explicitly accepts log-only output for another small run.
+
 ### GHCR pull/auth findings from first smoke attempt
 
 The first unauthenticated GHCR smoke-job creation failed before execution because the package requires authentication:

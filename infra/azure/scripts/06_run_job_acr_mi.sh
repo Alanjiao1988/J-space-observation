@@ -25,6 +25,13 @@ MEMORY="${MEMORY:-4Gi}"
 HF_HOME="${HF_HOME:-/tmp/models/huggingface}"
 TRANSFORMERS_CACHE="${TRANSFORMERS_CACHE:-/tmp/models/huggingface}"
 RESULTS_DIR="${RESULTS_DIR:-/tmp/results}"
+ENABLE_RESULTS_MOUNT="${ENABLE_RESULTS_MOUNT:-false}"
+STORAGE_MOUNT_NAME="${STORAGE_MOUNT_NAME:-jspace-results-storage}"
+RESULTS_MOUNT_PATH="${RESULTS_MOUNT_PATH:-/mnt/results}"
+
+if [[ "$ENABLE_RESULTS_MOUNT" == "true" && "${RESULTS_DIR:-/tmp/results}" == "/tmp/results" ]]; then
+    RESULTS_DIR="$RESULTS_MOUNT_PATH"
+fi
 
 if [[ -z "$ACR_LOGIN_SERVER" && -n "$ACR_NAME" ]]; then
     ACR_LOGIN_SERVER="$(az acr show --name "$ACR_NAME" --resource-group "$RESOURCE_GROUP" --query loginServer -o tsv)"
@@ -52,6 +59,11 @@ echo "Identity: ${IDENTITY_NAME}"
 echo "Command: ${JOB_COMMAND}"
 echo "CPU: ${CPU_CORES}"
 echo "Memory: ${MEMORY}"
+echo "Results mount enabled: ${ENABLE_RESULTS_MOUNT}"
+if [[ "$ENABLE_RESULTS_MOUNT" == "true" ]]; then
+    echo "Storage mount name: ${STORAGE_MOUNT_NAME}"
+    echo "Results mount path: ${RESULTS_MOUNT_PATH}"
+fi
 echo
 
 SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
@@ -67,7 +79,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-python - "$BODY_FILE" "$LOCATION" "$ENVIRONMENT_ID" "$ACR_IMAGE" "$ACR_LOGIN_SERVER" "$IDENTITY_ID" "$JOB_COMMAND" "$WORKLOAD_PROFILE_NAME" "$REPLICA_TIMEOUT" "$CPU_CORES" "$MEMORY" "$HF_HOME" "$TRANSFORMERS_CACHE" "$RESULTS_DIR" <<'PY'
+python - "$BODY_FILE" "$LOCATION" "$ENVIRONMENT_ID" "$ACR_IMAGE" "$ACR_LOGIN_SERVER" "$IDENTITY_ID" "$JOB_COMMAND" "$WORKLOAD_PROFILE_NAME" "$REPLICA_TIMEOUT" "$CPU_CORES" "$MEMORY" "$HF_HOME" "$TRANSFORMERS_CACHE" "$RESULTS_DIR" "$ENABLE_RESULTS_MOUNT" "$STORAGE_MOUNT_NAME" "$RESULTS_MOUNT_PATH" <<'PY'
 import json
 import sys
 
@@ -86,7 +98,42 @@ import sys
     hf_home,
     transformers_cache,
     results_dir,
+    enable_results_mount,
+    storage_mount_name,
+    results_mount_path,
 ) = sys.argv[1:]
+
+use_results_mount = enable_results_mount.lower() == "true"
+container = {
+    "name": "main",
+    "image": image,
+    "command": ["/bin/sh"],
+    "args": ["-lc", job_command],
+    "env": [
+        {"name": "HF_HOME", "value": hf_home},
+        {"name": "TRANSFORMERS_CACHE", "value": transformers_cache},
+        {"name": "RESULTS_DIR", "value": results_dir},
+    ],
+    "resources": {
+        "cpu": float(cpu_cores),
+        "memory": memory,
+    },
+}
+volumes = []
+if use_results_mount:
+    container["volumeMounts"] = [
+        {
+            "volumeName": "results",
+            "mountPath": results_mount_path,
+        }
+    ]
+    volumes.append(
+        {
+            "name": "results",
+            "storageType": "AzureFile",
+            "storageName": storage_mount_name,
+        }
+    )
 
 body = {
     "location": location,
@@ -122,26 +169,12 @@ body = {
             ],
         },
         "template": {
-            "containers": [
-                {
-                    "name": "main",
-                    "image": image,
-                    "command": ["/bin/sh"],
-                    "args": ["-lc", job_command],
-                    "env": [
-                        {"name": "HF_HOME", "value": hf_home},
-                        {"name": "TRANSFORMERS_CACHE", "value": transformers_cache},
-                        {"name": "RESULTS_DIR", "value": results_dir},
-                    ],
-                    "resources": {
-                        "cpu": float(cpu_cores),
-                        "memory": memory,
-                    },
-                }
-            ],
+            "containers": [container],
         },
     },
 }
+if volumes:
+    body["properties"]["template"]["volumes"] = volumes
 
 with open(body_file, "w", encoding="utf-8") as f:
     json.dump(body, f)

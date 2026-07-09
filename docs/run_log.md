@@ -886,6 +886,70 @@ Scripts:
 - Added `infra/azure/scripts/06_run_job_acr_mi.sh` for ACR image jobs with user-assigned managed identity and AcrPull.
 - Added `.azure_*.tmp` to `.gitignore` so local Azure context files are not committed.
 
+## 2026-07-09 — Azure Files persistence attempt blocked by shared-key policy
+
+Goal:
+
+- Configure persistent result export/storage before broader Phase 1 runs.
+- Use Azure Files as the first persistence path for Container Apps Jobs.
+
+Storage resources attempted:
+
+- Storage account 1: `stjspaceobssea07090835`
+  - resource group: `rg-jspace-observation-sea`
+  - location: `southeastasia`
+  - provisioning: `Succeeded`
+  - `allowSharedKeyAccess`: `False`
+  - Created file share through ARM management plane: `jspace-results`
+  - Data-plane key operations failed.
+- Storage account 2: `stjspacefiles0709085305`
+  - created with explicit `--allow-shared-key-access true`
+  - provisioning: `Succeeded`
+  - `allowSharedKeyAccess`: still `False`
+  - Data-plane key operations failed.
+
+Exact storage errors:
+
+- `KeyBasedAuthenticationNotPermitted`
+- Message: `Key based authentication is not permitted on this storage account.`
+
+Container Apps environment storage:
+
+- Registered `jspace-results-storage` initially, but storage was not usable because Azure Files key-based auth was blocked.
+- Storage smoke execution:
+  - job: `job-jspace-storage-smoke-acr`
+  - execution: `job-jspace-storage-smoke-acr-1s1g5d8`
+  - status: stuck/running, then stopped
+  - likely cause: Azure Files mount blocked/hanging due unusable storage key path
+- Cleanup:
+  - deleted `job-jspace-storage-smoke-acr`
+  - removed `jspace-results-storage` from Container Apps environment
+  - storage accounts retained for audit; no environment storage is currently registered
+
+Script update:
+
+- Patched `infra/azure/scripts/06_run_job_acr_mi.sh` to support:
+  - `ENABLE_RESULTS_MOUNT`
+  - `STORAGE_MOUNT_NAME`
+  - `RESULTS_MOUNT_PATH`
+  - `RESULTS_DIR=/mnt/results` when mount is enabled
+  - volume + volumeMount ARM payload when storage is available
+
+Current persistence status:
+
+- Azure Files share/mount persistence: failed due organization/subscription policy disabling shared-key access.
+- Persistent pilot rerun: not attempted.
+- Optional persistent Phase 0.5 rerun: not attempted.
+- No local model execution occurred.
+
+Next action:
+
+- Choose an alternative persistence strategy:
+  1. Ask admin to allow Azure Files shared-key access for this storage account / project scope; or
+  2. Switch to Azure Blob output upload using managed identity / Azure CLI SDK inside the container; or
+  3. Use Container Apps supported identity-based storage if available in this tenant/CLI version.
+- Do not run broader experiments until results can be persisted.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`
