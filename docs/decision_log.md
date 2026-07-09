@@ -533,3 +533,27 @@ Decision:
 - Do not expand Phase 1 yet.
 - Fix no-CoT validation before broader runs.
 - This pilot remains infrastructure + behavioral sanity only, not J-space evidence.
+
+## 2026-07-09 — no-CoT validator hardened; strict answer-only leakage exposed
+
+Status:
+
+- Local tests passed: `54 passed, 2 warnings`.
+- New ACR image built: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:937288cfb8ef`.
+- Validator rerun job succeeded: `job-jspace-p1-validator-xkqro3f`.
+- Blob output prefix: `phase1-pilot-validator/20260709T022001Z`.
+
+Findings:
+
+- strict_answer_only no-CoT validity is now `0.0000` for depths 1/2/3 in the tiny arithmetic pilot.
+- visible reasoning marker rate is `1.0000` for strict_answer_only depths 1/2/3.
+- parse ambiguity is now explicit (`parse_ambiguous_rate = 1.0000` for all cells).
+- Correctness is reported separately from no-CoT compliance.
+
+Decision:
+
+- The validation false negative is fixed.
+- The tiny pilot shows current strict-answer-only prompt/decoding still leaks visible reasoning.
+- Do not broaden Phase 1 yet.
+- Next step should tighten strict-answer-only generation/prompting and parser policy, then rerun the same small persistent pilot.
+- No J-space or hidden reasoning conclusion may be drawn from this behavioral sanity run.

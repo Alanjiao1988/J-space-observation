@@ -158,6 +158,50 @@ Azure Blob upload with managed identity is now the working persistence route.
 
 Fix no-CoT visible-reasoning validation before any broader Phase 1 run.
 
+## Validator Hardening Success (2026-07-09)
+
+The no-CoT validator and parser warning layer were hardened and rerun on the same minimal persistent Phase 1 pilot scope.
+
+### Code changes
+
+- `src/jspace_observation/no_cot.py`: stricter visible-reasoning detection and explicit no-CoT violation reasons.
+- `src/jspace_observation/eval_parsing.py`: parser ambiguity and answer-format warning fields.
+- `experiments/phase1_depth_gradient.py`: richer generation/eval records and metrics.
+- Tests expanded for known false negatives and ambiguous parsing.
+
+### Test result
+
+- `python -m pytest tests/ -q` -> `54 passed, 2 warnings`
+
+### New image and rerun
+
+- ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:937288cfb8ef`
+- ACR build run: `cm4`
+- Digest: `sha256:c3dcbdd7360ff1f1462263446ee8865132dd854df3a29f4f57b8e7d6ae348094`
+- Azure job: `job-jspace-p1-validator`
+- Execution: `job-jspace-p1-validator-xkqro3f`
+- Blob prefix: `phase1-pilot-validator/20260709T022001Z`
+- Files: generation JSONL, eval JSONL, metrics CSV, summary MD
+
+### Rerun pilot review
+
+- Cells completed: 9.
+- strict_answer_only no-CoT valid rate: `0.0000` for depths 1, 2, and 3.
+- strict_answer_only visible reasoning marker rate: `1.0000` for depths 1, 2, and 3.
+- parse_ambiguous_rate: `1.0000` for all 9 cells.
+- answer_format_warning_rate: `1.0000` for all 9 cells.
+- Summary warnings now explicitly report:
+  - strict_answer_only no-CoT invalid count: `3/3`
+  - strict_answer_only visible reasoning marker count: `3/3`
+  - parse ambiguous count: `9/9`
+
+### Current decision
+
+- The known validator false negative is fixed.
+- The pilot reveals that current strict-answer-only prompting/decoding still produces visible reasoning, so strict no-CoT-valid samples are absent in this tiny arithmetic pilot.
+- Do not expand to broader Phase 1 until strict-answer-only prompting/decoding and parser policy are reviewed.
+- Scientific conclusion remains infrastructure + behavioral sanity only; no J-space claim.
+
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 
 - Baseline: read `docs/thread_handoff.md`; repo was synced to `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.

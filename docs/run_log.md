@@ -1023,6 +1023,77 @@ Next action:
 - Fix no-CoT visible-reasoning validation before any broader Phase 1 run.
 - Use `JSPACE_RESULTS_ROOT=/workspace/results` for future runs to avoid doubled path `/workspace/results/runs/runs/...`.
 
+## 2026-07-09 — Harden no-CoT validation and parse warnings
+
+Goal:
+
+- Fix strict-answer-only validation before any broader Phase 1 run.
+- Keep the rerun scope minimal: one model, arithmetic only, depths 1/2/3, three conditions, one item per cell.
+
+Code changes:
+
+- `src/jspace_observation/no_cot.py`
+  - Added explicit violation reasons.
+  - Added detection for reasoning headings, stepwise markers, explanation markers, multi-line reasoning, and excessive answer-only length.
+  - `no_cot_validity` now applies only to strict answer-only methods; visible_cot and r1_style_thinking get `no_cot_validity = null`.
+- `src/jspace_observation/eval_parsing.py`
+  - Added `parse_ambiguous`, `parse_strategy`, `candidate_answers`, and `answer_format_warning`.
+  - Numeric parser records when last-number extraction is used.
+- `experiments/phase1_depth_gradient.py`
+  - Generation/eval records now include no-CoT violation reasons and parser ambiguity fields.
+  - Metrics now include parse ambiguity rate, visible reasoning marker rate, answer format warning rate, and condition-appropriate no-CoT validity.
+  - Summary now includes validation warnings.
+- Tests added/updated for known false negatives and ambiguous parsing.
+
+Local tests:
+
+- Command: `python -m pytest tests/ -q`
+- Result: `54 passed, 2 warnings`
+
+ACR image:
+
+- Build run: `cm4`
+- Image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:937288cfb8ef`
+- Digest: `sha256:c3dcbdd7360ff1f1462263446ee8865132dd854df3a29f4f57b8e7d6ae348094`
+
+Azure rerun:
+
+- Job: `job-jspace-p1-validator`
+- Execution: `job-jspace-p1-validator-xkqro3f`
+- Status: `Succeeded`
+- Blob prefix: `phase1-pilot-validator/20260709T022001Z`
+- Files uploaded:
+  - `phase1_eval_records.jsonl`
+  - `phase1_generations.jsonl`
+  - `phase1_metrics.csv`
+  - `phase1_summary.md`
+
+Rerun validation review:
+
+- Cells completed: 9.
+- strict_answer_only no-CoT valid rate:
+  - depth 1: `0.0000`
+  - depth 2: `0.0000`
+  - depth 3: `0.0000`
+- strict_answer_only visible reasoning marker rate:
+  - depth 1: `1.0000`
+  - depth 2: `1.0000`
+  - depth 3: `1.0000`
+- parse_ambiguous_rate: `1.0000` for all 9 cells.
+- answer_format_warning_rate: `1.0000` for all 9 cells.
+- Summary warning counts:
+  - strict_answer_only no-CoT invalid count: `3/3`
+  - strict_answer_only visible reasoning marker count: `3/3`
+  - parse ambiguous count: `9/9`
+
+Decision:
+
+- Validator now correctly flags the known strict-answer-only visible reasoning false negatives.
+- Accuracy and no-CoT compliance are separated.
+- Parser ambiguity is explicit rather than hidden.
+- Do not expand the run yet; review whether prompts/decoding should be tightened to reduce strict-answer-only reasoning leakage.
+- Scientific conclusion remains infrastructure + behavioral sanity only. No J-space or hidden reasoning claim.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`

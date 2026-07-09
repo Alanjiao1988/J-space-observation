@@ -467,6 +467,39 @@ bash infra/azure/scripts/06_run_job_acr_mi.sh
 
 Do not run broader Phase 1 until the no-CoT validation bug observed in the pilot is fixed.
 
+## Validator-hardened pilot status
+
+The no-CoT validation false negative has been fixed and rerun on the minimal persistent pilot.
+
+Current validator image:
+
+```text
+acrjspaceobssea0708231738.azurecr.io/j-space-observation:937288cfb8ef
+```
+
+Current validator pilot:
+
+```text
+job: job-jspace-p1-validator
+execution: job-jspace-p1-validator-xkqro3f
+blob prefix: phase1-pilot-validator/20260709T022001Z
+```
+
+Key result:
+
+```text
+strict_answer_only no_cot_valid_rate: 0.0000 for depths 1, 2, 3
+strict_answer_only visible_reasoning_marker_rate: 1.0000 for depths 1, 2, 3
+parse_ambiguous_rate: 1.0000 for all cells
+```
+
+Interpretation:
+
+- The previous validator false negative is fixed.
+- The current strict-answer-only prompt/decoding still produces visible reasoning, so no strict no-CoT-valid behavioral subset exists in this tiny pilot.
+- Do not broaden Phase 1 until strict-answer-only prompting/decoding and parse policy are reviewed.
+- This is still behavioral/infrastructure validation only, not J-space evidence.
+
 ## Persistent results storage status
 
 Azure Files was attempted as the first persistence path and is currently blocked by organization/subscription policy.
