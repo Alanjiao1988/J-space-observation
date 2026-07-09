@@ -63,6 +63,7 @@ from .jlens_utils import (
     JacobianLensWrapper,
 )
 from .blob_export import upload_directory_to_blob
+from .postprocess import postprocess_answer_only, PostprocessResult
 
 __version__ = "0.1.0"
 
@@ -123,4 +124,7 @@ __all__ = [
     "JacobianLensWrapper",
     # Blob export
     "upload_directory_to_blob",
+    # Postprocess
+    "postprocess_answer_only",
+    "PostprocessResult",
 ]
