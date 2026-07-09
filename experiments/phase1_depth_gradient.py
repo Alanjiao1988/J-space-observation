@@ -23,6 +23,7 @@ import csv
 import sys
 import time
 import traceback
+import os
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
@@ -52,6 +53,7 @@ from jspace_observation import (
     wilson_ci,
     cot_gain_by_depth,
     compute_slope,
+    upload_directory_to_blob,
 )
 
 
@@ -156,6 +158,11 @@ def main():
         action="store_true",
         help="Print plan without executing",
     )
+    parser.add_argument(
+        "--require-blob-export",
+        action="store_true",
+        help="Fail if configured Blob export does not complete",
+    )
     
     args = parser.parse_args()
     
@@ -167,8 +174,12 @@ def main():
     
     # Setup
     config = ExperimentConfig()
+    results_root = os.getenv("JSPACE_RESULTS_ROOT")
     if args.output_dir:
         run_dir = Path(args.output_dir)
+    elif results_root:
+        logger = RunLogger(Path(results_root))
+        run_dir = logger.create_run_directory("phase1")
     else:
         logger = RunLogger(config.results_dir)
         run_dir = logger.create_run_directory("phase1")
@@ -396,6 +407,8 @@ def main():
     summary_path = run_dir / "phase1_summary.md"
     with open(summary_path, "w") as f:
         f.write(summary)
+
+    upload_directory_to_blob(run_dir, require=args.require_blob_export)
     
     print("\n" + "=" * 60)
     print("Phase 1 Complete")

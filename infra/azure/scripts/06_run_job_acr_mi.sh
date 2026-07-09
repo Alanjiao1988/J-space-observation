@@ -25,6 +25,11 @@ MEMORY="${MEMORY:-4Gi}"
 HF_HOME="${HF_HOME:-/tmp/models/huggingface}"
 TRANSFORMERS_CACHE="${TRANSFORMERS_CACHE:-/tmp/models/huggingface}"
 RESULTS_DIR="${RESULTS_DIR:-/tmp/results}"
+AZURE_CLIENT_ID="${AZURE_CLIENT_ID:-}"
+JSPACE_BLOB_ACCOUNT="${JSPACE_BLOB_ACCOUNT:-}"
+JSPACE_BLOB_CONTAINER="${JSPACE_BLOB_CONTAINER:-}"
+JSPACE_BLOB_PREFIX="${JSPACE_BLOB_PREFIX:-}"
+JSPACE_RESULTS_ROOT="${JSPACE_RESULTS_ROOT:-}"
 ENABLE_RESULTS_MOUNT="${ENABLE_RESULTS_MOUNT:-false}"
 STORAGE_MOUNT_NAME="${STORAGE_MOUNT_NAME:-jspace-results-storage}"
 RESULTS_MOUNT_PATH="${RESULTS_MOUNT_PATH:-/mnt/results}"
@@ -60,6 +65,7 @@ echo "Command: ${JOB_COMMAND}"
 echo "CPU: ${CPU_CORES}"
 echo "Memory: ${MEMORY}"
 echo "Results mount enabled: ${ENABLE_RESULTS_MOUNT}"
+echo "Blob export configured: $([[ -n "$JSPACE_BLOB_ACCOUNT" && -n "$JSPACE_BLOB_CONTAINER" ]] && echo yes || echo no)"
 if [[ "$ENABLE_RESULTS_MOUNT" == "true" ]]; then
     echo "Storage mount name: ${STORAGE_MOUNT_NAME}"
     echo "Results mount path: ${RESULTS_MOUNT_PATH}"
@@ -79,7 +85,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-python - "$BODY_FILE" "$LOCATION" "$ENVIRONMENT_ID" "$ACR_IMAGE" "$ACR_LOGIN_SERVER" "$IDENTITY_ID" "$JOB_COMMAND" "$WORKLOAD_PROFILE_NAME" "$REPLICA_TIMEOUT" "$CPU_CORES" "$MEMORY" "$HF_HOME" "$TRANSFORMERS_CACHE" "$RESULTS_DIR" "$ENABLE_RESULTS_MOUNT" "$STORAGE_MOUNT_NAME" "$RESULTS_MOUNT_PATH" <<'PY'
+python - "$BODY_FILE" "$LOCATION" "$ENVIRONMENT_ID" "$ACR_IMAGE" "$ACR_LOGIN_SERVER" "$IDENTITY_ID" "$JOB_COMMAND" "$WORKLOAD_PROFILE_NAME" "$REPLICA_TIMEOUT" "$CPU_CORES" "$MEMORY" "$HF_HOME" "$TRANSFORMERS_CACHE" "$RESULTS_DIR" "$AZURE_CLIENT_ID" "$JSPACE_BLOB_ACCOUNT" "$JSPACE_BLOB_CONTAINER" "$JSPACE_BLOB_PREFIX" "$JSPACE_RESULTS_ROOT" "$ENABLE_RESULTS_MOUNT" "$STORAGE_MOUNT_NAME" "$RESULTS_MOUNT_PATH" <<'PY'
 import json
 import sys
 
@@ -98,6 +104,11 @@ import sys
     hf_home,
     transformers_cache,
     results_dir,
+    azure_client_id,
+    blob_account,
+    blob_container,
+    blob_prefix,
+    results_root,
     enable_results_mount,
     storage_mount_name,
     results_mount_path,
@@ -119,6 +130,16 @@ container = {
         "memory": memory,
     },
 }
+optional_env = {
+    "AZURE_CLIENT_ID": azure_client_id,
+    "JSPACE_BLOB_ACCOUNT": blob_account,
+    "JSPACE_BLOB_CONTAINER": blob_container,
+    "JSPACE_BLOB_PREFIX": blob_prefix,
+    "JSPACE_RESULTS_ROOT": results_root,
+}
+for key, value in optional_env.items():
+    if value:
+        container["env"].append({"name": key, "value": value})
 volumes = []
 if use_results_mount:
     container["volumeMounts"] = [

@@ -60,6 +60,7 @@ from .jlens_utils import (
     try_import_jacobian_lens,
     JacobianLensWrapper,
 )
+from .blob_export import upload_directory_to_blob
 
 __version__ = "0.1.0"
 
@@ -116,4 +117,6 @@ __all__ = [
     "summarize_jlens_search_results",
     "try_import_jacobian_lens",
     "JacobianLensWrapper",
+    # Blob export
+    "upload_directory_to_blob",
 ]

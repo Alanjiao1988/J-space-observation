@@ -13,3 +13,5 @@ rich
 typer
 pydantic
 pytest
+azure-identity
+azure-storage-blob

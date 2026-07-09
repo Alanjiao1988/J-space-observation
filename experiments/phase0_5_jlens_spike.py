@@ -34,6 +34,7 @@ from jspace_observation import (
     JacobianLensWrapper,
     load_model_and_tokenizer,
     log_model_info,
+    upload_directory_to_blob,
 )
 
 
@@ -87,6 +88,11 @@ def main():
         action="store_true",
         help="Only search for pre-fitted lenses. Current scaffold never runs fitting.",
     )
+    parser.add_argument(
+        "--require-blob-export",
+        action="store_true",
+        help="Fail if configured Blob export does not complete",
+    )
     
     args = parser.parse_args()
     
@@ -99,8 +105,12 @@ def main():
     
     # Setup output directory
     config = ExperimentConfig()
+    results_root = os.getenv("JSPACE_RESULTS_ROOT")
     if args.output_dir:
         run_dir = Path(args.output_dir)
+    elif results_root:
+        logger = RunLogger(Path(results_root))
+        run_dir = logger.create_run_directory("phase0_5")
     else:
         logger = RunLogger(config.results_dir)
         run_dir = logger.create_run_directory("phase0_5")
@@ -336,6 +346,8 @@ def main():
     
     print(f"Metadata saved to: {metadata_path}")
     print(f"Sweep configs saved to: {sweep_path}")
+
+    upload_directory_to_blob(run_dir, require=args.require_blob_export)
     
     # Update decision log
     decision_log_path = config.docs_dir / "decision_log.md"
