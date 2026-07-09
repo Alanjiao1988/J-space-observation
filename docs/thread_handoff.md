@@ -1,9 +1,9 @@
 # Thread handoff — J-space observation project
 
-Date: 2026-07-08
+Date: 2026-07-09
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified commit before this handoff: `9969471d136b509323ce8a719d9fe0e237721b10`
-Latest status message for that commit: `Record strict answer-only rerun results`
+Latest verified code/image commit before this handoff: `9342ef130d46`
+Latest status message for that commit: `Export postprocess helper`
 
 > Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
 >
@@ -22,6 +22,8 @@ Latest status message for that commit: `Record strict answer-only rerun results`
 > Update (2026-07-09 10:02 +08:00): Hardened no-CoT validation and parser ambiguity reporting. Local tests now `54 passed, 2 warnings`. Rebuilt ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:937288cfb8ef` (build `cm4`). Reran minimal persistent validator pilot (`job-jspace-p1-validator-xkqro3f`) and uploaded outputs under `phase1-pilot-validator/20260709T022001Z`. Result: strict_answer_only no-CoT valid rate is now `0.0000` for depths 1/2/3, visible reasoning marker rate is `1.0000`, parse ambiguity is `1.0000` for all cells. This fixes the false-negative validator bug and shows the current strict-answer-only prompt/decoding still leaks visible reasoning. Do not broaden Phase 1 until strict answer-only prompting/decoding and parser policy are reviewed.
 >
 > Update (2026-07-09 10:32 +08:00): Added `strict_answer_only_prefill_answer` and condition-specific strict decoding. Final ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9b5895db173f` (build `cm6`). Reran minimal persistent pilot as `job-jspace-p1-strictfix2-1sjj2n5`, Blob prefix `phase1-pilot-strictfix2/20260709T025356Z`. Existing `strict_answer_only` remains no-CoT invalid for all depths. New direct `Answer:` prefill suppresses visible reasoning only on depth 1 but gives incomplete/wrong answer; depths 2/3 still leak meta-reasoning (`Alright`, `Wait`) and are invalid. Do not broaden Phase 1. Next likely experiment: stop-sequence or explicitly labeled post-processing while preserving raw output.
+>
+> Update (2026-07-09 12:45 +08:00): Added explicitly labeled raw-vs-postprocessed answer-only evaluation via `strict_answer_only_postprocessed`. Final ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9342ef130d46` (build `cm8`, digest `sha256:3fc9e9d58b0ce6d5ea8a260cb7c172aa7cebfbe31427f94ee8cdae8d3b2a9ed1`). Reran small persistent pilot as `job-jspace-p1-postprocess-gor0o1r`, Blob prefix `phase1-pilot-postprocess/20260709T044224Z`. Raw no-CoT validity for the postprocessed condition remained `0.0000` for depths 1/2/3; postprocessed no-CoT validity was `1.0000`; postprocessed accuracy was `1.0000/0.0000/0.0000` for depths 1/2/3. This is answer-recovery evaluation only, not no-CoT proof and not J-space evidence.
 >
 > Update (2026-07-08 22:51 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but Copilot's fresh tool processes could not see them in Process/User/Machine environment scopes. No package-read preflight or Azure job retry was attempted. To continue, set the variables in Windows User environment (or another secure path readable by the agent), e.g. `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`. Do not paste tokens into chat.
 
@@ -99,6 +101,8 @@ Implemented modules include:
 - `src/jspace_observation/stats.py`
 - `src/jspace_observation/run_logging.py`
 - `src/jspace_observation/jlens_utils.py`
+- `src/jspace_observation/blob_export.py`
+- `src/jspace_observation/postprocess.py`
 
 Experiment scripts:
 
@@ -118,11 +122,13 @@ Tests:
 - `tests/test_no_cot.py`
 - `tests/test_eval_parsing.py`
 - `tests/test_stats.py`
+- `tests/test_blob_export.py`
+- `tests/test_postprocess.py`
 
 Latest known test status:
 
 ```text
-python -m pytest tests/ -v -> 41 passed, 2 warnings
+python -m pytest tests/ -q -> 68 passed, 2 warnings
 ```
 
 Phase 1 dry run status:

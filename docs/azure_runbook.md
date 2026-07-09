@@ -527,6 +527,44 @@ strict_answer_only_prefill_answer: no visible reasoning on depth 1, but incomple
 
 Do not broaden the run yet. Any future attempt should test stop-sequence or explicitly labeled post-processing while preserving raw output and reporting raw vs postprocessed validity separately.
 
+## Raw-vs-postprocessed condition status
+
+Condition:
+
+```text
+strict_answer_only_postprocessed
+```
+
+Current image:
+
+```text
+acrjspaceobssea0708231738.azurecr.io/j-space-observation:9342ef130d46
+```
+
+Run:
+
+```text
+job: job-jspace-p1-postprocess
+execution: job-jspace-p1-postprocess-gor0o1r
+blob prefix: phase1-pilot-postprocess/20260709T044224Z
+```
+
+Key result:
+
+```text
+raw_no_cot_valid_rate: 0.0000 for depths 1,2,3
+postprocessed_no_cot_valid_rate: 1.0000 for depths 1,2,3
+postprocessing_success_rate: depth1=1.0000, depth2=0.0000, depth3=1.0000
+accuracy_postprocessed: depth1=1.0000, depth2=0.0000, depth3=0.0000
+```
+
+Interpretation:
+
+- Raw output still leaks visible reasoning.
+- Postprocessing can recover a clean correct answer in the easiest cell only.
+- Postprocessed output must not be treated as genuine no-CoT generation.
+- This remains behavioral/infrastructure validation, not J-space evidence.
+
 ## Persistent results storage status
 
 Azure Files was attempted as the first persistence path and is currently blocked by organization/subscription policy.

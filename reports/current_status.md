@@ -246,6 +246,54 @@ The no-CoT validator and parser warning layer were hardened and rerun on the sam
 - Next step should test a carefully labeled stop-sequence / post-processing experiment while preserving raw-output validation.
 - Scientific conclusion remains infrastructure + behavioral sanity only; no J-space claim.
 
+## Raw-vs-Postprocessed Answer-only Evaluation (2026-07-09)
+
+### Main fix
+
+- Added `strict_answer_only_postprocessed`.
+- Raw output is preserved.
+- Postprocessed output is stored separately.
+- Raw no-CoT validity and postprocessed answer validity are reported separately.
+- Postprocessing does not count as genuine raw no-CoT compliance.
+
+### Code and tests
+
+- Added `src/jspace_observation/postprocess.py`.
+- Extended Phase 1 records and metrics with postprocessing fields.
+- Tests: `68 passed, 2 warnings`.
+
+### ACR image and job
+
+- Final ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9342ef130d46`
+- Build run: `cm8`
+- Digest: `sha256:3fc9e9d58b0ce6d5ea8a260cb7c172aa7cebfbe31427f94ee8cdae8d3b2a9ed1`
+- Job: `job-jspace-p1-postprocess`
+- Successful execution: `job-jspace-p1-postprocess-gor0o1r`
+- Blob prefix: `phase1-pilot-postprocess/20260709T044224Z`
+- Files: generation JSONL, eval JSONL, metrics CSV, summary MD
+
+### Rerun review
+
+- Cells completed: 12.
+- `strict_answer_only_postprocessed` raw no-CoT valid rate: `0.0000` for all depths.
+- `strict_answer_only_postprocessed` postprocessed no-CoT valid rate: `1.0000` for all depths.
+- Postprocessing applied rate: `1.0000` for all depths.
+- Postprocessing success rate:
+  - depth 1: `1.0000`
+  - depth 2: `0.0000`
+  - depth 3: `1.0000`
+- Accuracy postprocessed:
+  - depth 1: `1.0000`
+  - depth 2: `0.0000`
+  - depth 3: `0.0000`
+
+### Current decision
+
+- Postprocessing can recover a clean correct answer in the easiest cell, but raw output still violates no-CoT.
+- Postprocessing is useful as an answer-recovery analysis, not as evidence of no-CoT generation.
+- Do not claim hidden reasoning or J-space evidence.
+- Next step: decide whether to test stop-sequence generation controls or keep postprocessing as a separate answer-recovery analysis only.
+
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 
 - Baseline: read `docs/thread_handoff.md`; repo was synced to `c07db5c9625a9f9ad96c55f77385c078e11d4a66`.

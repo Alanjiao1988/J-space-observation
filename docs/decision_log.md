@@ -585,3 +585,28 @@ Decision:
 - The direct `Answer:` prefill variant is not sufficient to establish a reliable strict answer-only condition.
 - Do not expand Phase 1.
 - Next step should test stop-sequence / post-processing approaches that preserve raw output and separately report raw vs postprocessed no-CoT validity.
+
+## 2026-07-09 — raw-vs-postprocessed answer-only condition tested
+
+Status:
+
+- Added `strict_answer_only_postprocessed`.
+- ACR image built: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9342ef130d46`.
+- Build run: `cm8`.
+- Azure job succeeded: `job-jspace-p1-postprocess-gor0o1r`.
+- Blob prefix: `phase1-pilot-postprocess/20260709T044224Z`.
+
+Findings:
+
+- Raw no-CoT validity for `strict_answer_only_postprocessed`: `0.0000` for depths 1/2/3.
+- Postprocessed no-CoT validity: `1.0000` for depths 1/2/3.
+- Postprocessing recovered a correct answer only for depth 1.
+- Depth 2 had no answer-like span after truncation.
+- Depth 3 produced a clean but wrong postprocessed answer.
+
+Decision:
+
+- Postprocessing is an answer-recovery analysis only.
+- Postprocessed validity must not be interpreted as raw no-CoT compliance.
+- Do not expand Phase 1 yet.
+- Next decision should choose between stop-sequence generation controls or treating postprocessing as a separate analysis track.

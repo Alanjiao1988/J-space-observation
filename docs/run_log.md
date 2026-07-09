@@ -1107,6 +1107,105 @@ Decision:
 - Next step should try a different strict decoding/prompting strategy, e.g. stop criteria around newline/explanation markers or a post-processing experiment clearly labeled as post-processed.
 - This remains behavioral/infrastructure sanity only. No J-space claim.
 
+## 2026-07-09 — Raw-vs-postprocessed answer-only pilot
+
+Goal:
+
+- Stop trying prompt-only variants in this round.
+- Add an explicitly labeled raw-vs-postprocessed condition.
+- Preserve raw output and report raw no-CoT validity separately from postprocessed answer validity.
+
+Code changes:
+
+- Added `src/jspace_observation/postprocess.py`.
+- Added `strict_answer_only_postprocessed` condition.
+- Added postprocessing fields:
+  - `raw_output_before_postprocess`
+  - `postprocessed_output`
+  - `postprocessing_applied`
+  - `postprocessing_strategy`
+  - `postprocessing_reason`
+  - `postprocessing_warning`
+  - `raw_no_cot_valid`
+  - `postprocessed_no_cot_valid`
+  - `postprocessed_answer_like`
+  - `eval_output_used`
+- Added metrics:
+  - `raw_no_cot_valid_rate`
+  - `postprocessed_no_cot_valid_rate`
+  - `postprocessing_applied_rate`
+  - `postprocessing_success_rate`
+  - `postprocessing_warning_rate`
+  - `accuracy_raw`
+  - `accuracy_postprocessed`
+- Added unit tests for explicit answer extraction, boxed extraction, incomplete boxed warning, reasoning-marker truncation, and entity final-answer extraction.
+
+Tests:
+
+- Command: `python -m pytest tests/ -q`
+- Result after postprocessing implementation: `68 passed, 2 warnings`
+- Result after bug fix / final run: local tests remained passing before build; final code is covered by the added tests.
+
+ACR image:
+
+- Build run `cm7`: image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:a15575e7dbad`
+- Build run `cm8`: final image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9342ef130d46`
+- Digest `cm8`: `sha256:3fc9e9d58b0ce6d5ea8a260cb7c172aa7cebfbe31427f94ee8cdae8d3b2a9ed1`
+
+First postprocess pilot attempt:
+
+- Job: `job-jspace-p1-postprocess`
+- Execution: `job-jspace-p1-postprocess-uooxev9`
+- Status: `Failed`
+- Error: `TypeError: create_eval_record() got multiple values for keyword argument 'eval_output_used'`
+- Fix: removed duplicate `eval_output_used` from the postprocessing record expansion.
+
+Final postprocess pilot:
+
+- Job: `job-jspace-p1-postprocess`
+- Execution: `job-jspace-p1-postprocess-gor0o1r`
+- Status: `Succeeded`
+- Blob prefix: `phase1-pilot-postprocess/20260709T044224Z`
+- Files uploaded:
+  - `phase1_eval_records.jsonl`
+  - `phase1_generations.jsonl`
+  - `phase1_metrics.csv`
+  - `phase1_summary.md`
+
+Review:
+
+- Cells completed: 12.
+- `strict_answer_only_prefill_answer`
+  - raw/no-postprocess condition
+  - no-CoT valid rates: depth 1 `1.0000`, depth 2 `0.0000`, depth 3 `0.0000`
+  - accuracy: `0.0000` all depths
+- `strict_answer_only_postprocessed`
+  - raw no-CoT valid rate: `0.0000` all depths
+  - postprocessed no-CoT valid rate: `1.0000` all depths
+  - postprocessing applied rate: `1.0000` all depths
+  - postprocessing success rate: depth 1 `1.0000`, depth 2 `0.0000`, depth 3 `1.0000`
+  - postprocessing warning rate: depth 1 `0.0000`, depth 2 `1.0000`, depth 3 `0.0000`
+  - accuracy_raw: depth 1 `1.0000`, depth 2 `0.0000`, depth 3 `0.0000`
+  - accuracy_postprocessed: depth 1 `1.0000`, depth 2 `0.0000`, depth 3 `0.0000`
+- Representative raw/postprocessed outputs:
+  - depth 1 raw: `7 + 5 = \boxed{12}\n\nWait...`; postprocessed: `\boxed{12}`; correct after postprocess
+  - depth 2 raw: `__________\n\nAlright...`; postprocessed: `__________`; no answer-like span
+  - depth 3 raw: `\boxed{12}\n\nWait...`; postprocessed: `\boxed{12}`; wrong answer
+- `visible_cot` and `r1_style_thinking` remain raw-output evaluation conditions.
+
+Scientific boundary:
+
+- Postprocessed answer validity does not imply raw no-CoT compliance.
+- Raw output still leaks visible reasoning under the postprocessed condition.
+- This is an evaluation/postprocessing sanity check only, not evidence of hidden reasoning or J-space.
+
+Decision:
+
+- Postprocessing can recover a clean/correct answer for the easiest arithmetic item.
+- It does not establish strict no-CoT generation.
+- Do not use postprocessed output as proof of no-CoT.
+- Next step: decide whether to develop raw stop-sequence generation controls or keep postprocessing as a separate answer-recovery analysis only.
+
 ## 2026-07-09 — Harden no-CoT validation and parse warnings
 
 Goal:
