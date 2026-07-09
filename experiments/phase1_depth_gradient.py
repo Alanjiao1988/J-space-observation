@@ -367,7 +367,6 @@ def main():
                             "raw_no_cot_valid": gen_record["no_cot_validity"],
                             "postprocessed_no_cot_valid": None,
                             "postprocessed_answer_like": None,
-                            "eval_output_used": eval_output_used,
                         }
 
                         if condition == "strict_answer_only_postprocessed":
@@ -384,7 +383,6 @@ def main():
                                 "raw_no_cot_valid": pp.raw_no_cot_valid,
                                 "postprocessed_no_cot_valid": pp.postprocessed_no_cot_valid,
                                 "postprocessed_answer_like": pp.postprocessed_answer_like,
-                                "eval_output_used": eval_output_used,
                             }
 
                         eval_record = create_eval_record(
@@ -415,6 +413,7 @@ def main():
                             "answer_format_warning": eval_record["answer_format_warning"],
                             "raw_correct": raw_eval_record["correctness"],
                             "raw_parsed_answer": raw_eval_record["parsed_answer"],
+                            "eval_output_used": eval_output_used,
                             **postprocess_record,
                         })
                         generation_records.append(gen_record)
