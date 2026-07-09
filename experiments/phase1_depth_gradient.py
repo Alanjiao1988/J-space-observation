@@ -211,8 +211,12 @@ def main():
     # Generate records
     generation_records = []
     eval_records = []
-    metrics_rows = [["model", "task_family", "depth", "condition", 
-                      "accuracy", "parse_valid", "no_cot_valid", "avg_latency_s"]]
+    metrics_rows = [[
+        "model", "task_family", "depth", "condition", "n",
+        "accuracy", "parse_valid_rate", "parse_ambiguous_rate",
+        "no_cot_valid_rate", "visible_reasoning_marker_rate",
+        "answer_format_warning_rate", "avg_latency_s",
+    ]]
     
     # Process each cell
     for model_name in models:
@@ -255,6 +259,10 @@ def main():
                     correct_count = 0
                     parse_valid_count = 0
                     no_cot_valid_count = 0
+                    no_cot_applicable_count = 0
+                    parse_ambiguous_count = 0
+                    answer_format_warning_count = 0
+                    visible_reasoning_marker_count = 0
                     latencies = []
                     
                     for item in items:
@@ -299,9 +307,6 @@ def main():
                             condition=condition,
                             generation_time_s=gen_time,
                         )
-                        generation_records.append(gen_record)
-                        cell_records.append(gen_record)
-                        
                         # Parse and evaluate
                         eval_record = create_eval_record(
                             output=output,
@@ -314,25 +319,57 @@ def main():
                             condition=condition,
                         )
                         eval_records.append(eval_record)
+
+                        gen_record.update({
+                            "raw_output": output,
+                            "parsed_answer": eval_record["parsed_answer"],
+                            "correct": eval_record["correctness"],
+                            "parse_valid": eval_record["parse_valid"],
+                            "parse_ambiguous": eval_record["parse_ambiguous"],
+                            "parse_strategy": eval_record["parse_strategy"],
+                            "answer_format_warning": eval_record["answer_format_warning"],
+                        })
+                        generation_records.append(gen_record)
+                        cell_records.append(gen_record)
                         
                         # Count metrics
                         if eval_record["parse_valid"]:
                             parse_valid_count += 1
                         if eval_record["correctness"]:
                             correct_count += 1
-                        if gen_record["no_cot_validity"]:
+                        if eval_record["parse_ambiguous"]:
+                            parse_ambiguous_count += 1
+                        if eval_record["answer_format_warning"]:
+                            answer_format_warning_count += 1
+                        if gen_record["has_visible_reasoning_marker"]:
+                            visible_reasoning_marker_count += 1
+                        if gen_record["no_cot_applicable"]:
+                            no_cot_applicable_count += 1
+                        if gen_record["no_cot_validity"] is True:
                             no_cot_valid_count += 1
                     
                     # Compute metrics
                     n_items = len(items)
                     accuracy = correct_count / n_items if n_items > 0 else 0
                     parse_valid_rate = parse_valid_count / n_items if n_items > 0 else 0
-                    no_cot_valid_rate = no_cot_valid_count / n_items if n_items > 0 else 0
+                    parse_ambiguous_rate = parse_ambiguous_count / n_items if n_items > 0 else 0
+                    no_cot_valid_rate = (
+                        no_cot_valid_count / no_cot_applicable_count
+                        if no_cot_applicable_count > 0
+                        else None
+                    )
+                    visible_reasoning_marker_rate = visible_reasoning_marker_count / n_items if n_items > 0 else 0
+                    answer_format_warning_rate = answer_format_warning_count / n_items if n_items > 0 else 0
                     avg_latency = sum(latencies) / len(latencies) if latencies else 0
                     
                     print(f"  Accuracy: {accuracy:.3f}")
                     print(f"  Parse valid: {parse_valid_rate:.3f}")
-                    print(f"  No-CoT valid: {no_cot_valid_rate:.3f}")
+                    print(f"  Parse ambiguous: {parse_ambiguous_rate:.3f}")
+                    if no_cot_valid_rate is None:
+                        print("  No-CoT valid: N/A")
+                    else:
+                        print(f"  No-CoT valid: {no_cot_valid_rate:.3f}")
+                    print(f"  Visible reasoning markers: {visible_reasoning_marker_rate:.3f}")
                     print(f"  Avg latency: {avg_latency:.2f}s")
                     
                     # Add to metrics
@@ -341,9 +378,13 @@ def main():
                         task_family,
                         depth,
                         condition,
+                        n_items,
                         f"{accuracy:.4f}",
                         f"{parse_valid_rate:.4f}",
-                        f"{no_cot_valid_rate:.4f}",
+                        f"{parse_ambiguous_rate:.4f}",
+                        "NA" if no_cot_valid_rate is None else f"{no_cot_valid_rate:.4f}",
+                        f"{visible_reasoning_marker_rate:.4f}",
+                        f"{answer_format_warning_rate:.4f}",
                         f"{avg_latency:.4f}",
                     ])
         
@@ -394,6 +435,25 @@ def main():
         f"- Evaluations: {eval_path}\n"
         f"- Metrics: {metrics_path}"
     )
+
+    warning_lines = [
+        "- Accuracy and strict no-CoT compliance are reported separately.",
+        "- Correct answers from no-CoT-invalid outputs must not be interpreted as hidden reasoning evidence.",
+        "- Ambiguous numeric parsing is flagged via parse_ambiguous and answer_format_warning.",
+    ]
+    strict_records = [
+        r for r in generation_records
+        if r.get("condition") == "strict_answer_only"
+    ]
+    if strict_records:
+        invalid = sum(1 for r in strict_records if r.get("no_cot_validity") is False)
+        visible = sum(1 for r in strict_records if r.get("has_visible_reasoning_marker"))
+        warning_lines.append(f"- strict_answer_only no-CoT invalid count: {invalid}/{len(strict_records)}")
+        warning_lines.append(f"- strict_answer_only visible reasoning marker count: {visible}/{len(strict_records)}")
+    ambiguous = sum(1 for r in eval_records if r.get("parse_ambiguous"))
+    if eval_records:
+        warning_lines.append(f"- parse ambiguous count: {ambiguous}/{len(eval_records)}")
+    summary_builder.add_section("Validation Warnings", "\n".join(warning_lines))
     
     summary_builder.add_section(
         "Next Steps",

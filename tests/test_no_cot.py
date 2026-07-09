@@ -87,7 +87,47 @@ def test_validate_no_cot_with_visible_reasoning():
         allow_visible_reasoning=False
     )
     assert not result.is_valid
-    assert result.reason_for_invalidity == "visible_reasoning_generated"
+    assert result.reason_for_invalidity == "intermediate_steps_generated"
+    assert "intermediate_steps_generated" in result.violation_reasons
+
+
+@pytest.mark.parametrize(
+    "output",
+    [
+        "Step-by-step explanation: 7 + 5 = 12, so the answer is 12.",
+        "Follow these steps: first add 7 and 5. The answer is 12.",
+        "First, compute 7 + 5. Then, write 12.",
+        "To solve this, add the numbers.\n1) 7 + 5 = 12\nAnswer: 12",
+    ],
+)
+def test_validate_no_cot_rejects_reasoning_markers(output):
+    result = validate_no_cot_output(output, method="empty_think_prefill")
+    assert not result.is_valid
+    assert result.has_visible_reasoning_marker
+    assert result.violation_reasons
+
+
+def test_validate_no_cot_allows_short_numeric_answer():
+    result = validate_no_cot_output("42", method="empty_think_prefill")
+    assert result.is_valid
+    assert result.violation_reasons == []
+
+
+def test_validate_no_cot_allows_short_answer_cue():
+    result = validate_no_cot_output("Answer: 42", method="empty_think_prefill")
+    assert result.is_valid
+
+
+def test_validate_no_cot_allows_short_entity_answer():
+    result = validate_no_cot_output("Paris", method="answer_only_prompt")
+    assert result.is_valid
+
+
+def test_validate_no_cot_rejects_multiline_explanation():
+    output = "Answer: 12\nExplanation:\nFirst add 7.\nThen add 5."
+    result = validate_no_cot_output(output, method="empty_think_prefill")
+    assert not result.is_valid
+    assert "reasoning_heading_generated" in result.violation_reasons
 
 
 def test_validate_no_cot_token_budget():

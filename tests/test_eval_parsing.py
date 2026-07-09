@@ -12,6 +12,7 @@ from jspace_observation import (
     parse_yes_no_answer,
     parse_answer,
     evaluate_answer,
+    create_eval_record,
 )
 
 
@@ -21,6 +22,7 @@ def test_parse_numeric_simple():
     result = parse_numeric_answer(output)
     assert result.parse_valid
     assert result.parsed_answer == "12"
+    assert not result.parse_ambiguous
 
 
 def test_parse_numeric_negative():
@@ -54,6 +56,39 @@ def test_parse_numeric_multiple_numbers():
     assert result.parse_valid
     # Should return the last number
     assert result.parsed_answer == "12"
+    assert result.parse_strategy == "last_number"
+    assert result.candidate_answers == ["5", "7", "12"]
+
+
+def test_parse_numeric_answer_prefix_clean():
+    """Test explicit answer prefix is preferred."""
+    result = parse_numeric_answer("Answer: 42")
+    assert result.parse_valid
+    assert result.parsed_answer == "42"
+    assert result.parse_strategy == "explicit_answer"
+    assert not result.parse_ambiguous
+
+
+def test_parse_numeric_reasoning_multiple_numbers_ambiguous():
+    """Reasoning with multiple numbers is marked ambiguous."""
+    output = "First, add 5 and 7. Then the answer is 12."
+    result = parse_numeric_answer(output)
+    assert result.parse_valid
+    assert result.parse_ambiguous
+    assert result.answer_format_warning
+    assert len(result.candidate_answers) == 3
+
+
+def test_create_eval_record_reports_parse_ambiguity():
+    record = create_eval_record(
+        output="Step-by-step explanation: 5 + 7 = 12.",
+        parse_type="numeric",
+        expected_answer="12",
+    )
+    assert record["parse_valid"]
+    assert record["parse_ambiguous"]
+    assert record["parse_strategy"] in {"last_number", "explicit_answer"}
+    assert record["answer_format_warning"]
 
 
 def test_parse_entity_simple():

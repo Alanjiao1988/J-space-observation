@@ -11,6 +11,10 @@ class ParseResult:
     parsed_answer: Optional[str] = None
     parse_valid: bool = False
     parse_error_type: Optional[str] = None
+    parse_ambiguous: bool = False
+    parse_strategy: Optional[str] = None
+    candidate_answers: Optional[list[str]] = None
+    answer_format_warning: Optional[str] = None
 
 
 def parse_numeric_answer(output: str) -> ParseResult:
@@ -26,19 +30,59 @@ def parse_numeric_answer(output: str) -> ParseResult:
     Returns:
         ParseResult with parsed numeric answer
     """
+    text = re.sub(r'<think>.*?</think>', '', output, flags=re.DOTALL | re.IGNORECASE)
+
+    # Prefer explicit final-answer forms when available.
+    final_patterns = [
+        r"(?:final\s+answer|answer|the\s+answer\s+is)\s*[:：]?\s*(-?\d+(?:\.\d+)?)",
+    ]
+    explicit_matches = []
+    for pattern in final_patterns:
+        explicit_matches.extend(re.findall(pattern, text, flags=re.IGNORECASE))
+
     # Find all numeric patterns
     numeric_pattern = r'-?\d+(?:\.\d+)?'
-    matches = re.findall(numeric_pattern, output)
+    matches = re.findall(numeric_pattern, text)
     
     if not matches:
-        return ParseResult(parse_valid=False, parse_error_type="no_numeric_found")
-    
-    # Return the last numeric match (likely the final answer)
-    parsed_answer = matches[-1]
+        return ParseResult(
+            parse_valid=False,
+            parse_error_type="no_numeric_found",
+            candidate_answers=[],
+            parse_strategy="no_numeric_found",
+        )
+
+    reasoning_like = bool(
+        re.search(
+            r"step[-\s]*by[-\s]*step|explanation|follow these steps|to solve|first,|then,|therefore|because|\bstep\s*\d+\b",
+            text,
+            flags=re.IGNORECASE,
+        )
+    )
+
+    if explicit_matches:
+        parsed_answer = explicit_matches[-1]
+        strategy = "explicit_answer"
+    else:
+        # Return the last numeric match (likely the final answer), but make the
+        # strategy explicit so downstream analysis can audit ambiguity.
+        parsed_answer = matches[-1]
+        strategy = "single_number" if len(matches) == 1 else "last_number"
+
+    parse_ambiguous = len(matches) > 1 and (reasoning_like or len(text) > 80)
+    warning = None
+    if parse_ambiguous:
+        warning = f"multiple_numeric_candidates:{len(matches)}"
+    elif len(matches) > 1:
+        warning = f"multiple_numbers_short_output:{len(matches)}"
     
     return ParseResult(
         parsed_answer=parsed_answer,
-        parse_valid=True
+        parse_valid=True,
+        parse_ambiguous=parse_ambiguous,
+        parse_strategy=strategy,
+        candidate_answers=matches,
+        answer_format_warning=warning,
     )
 
 
@@ -60,13 +104,13 @@ def parse_entity_answer(output: str, max_length: int = 50) -> ParseResult:
     text = text.strip()
     
     if not text:
-        return ParseResult(parse_valid=False, parse_error_type="empty_output")
+        return ParseResult(parse_valid=False, parse_error_type="empty_output", parse_strategy="entity_last_line")
     
     # Split into lines and find meaningful lines
     lines = [line.strip() for line in text.split('\n') if line.strip()]
     
     if not lines:
-        return ParseResult(parse_valid=False, parse_error_type="no_lines")
+        return ParseResult(parse_valid=False, parse_error_type="no_lines", parse_strategy="entity_last_line")
     
     # Take the last line, it's likely the answer
     candidate = lines[-1]
@@ -80,14 +124,24 @@ def parse_entity_answer(output: str, max_length: int = 50) -> ParseResult:
     candidate = candidate.strip()
     
     if len(candidate) > max_length:
-        return ParseResult(parse_valid=False, parse_error_type="answer_too_long")
+        return ParseResult(
+            parse_valid=False,
+            parse_error_type="answer_too_long",
+            parse_ambiguous=True,
+            parse_strategy="entity_last_line",
+            answer_format_warning="entity_answer_too_long",
+        )
     
     if not candidate:
-        return ParseResult(parse_valid=False, parse_error_type="empty_after_cleaning")
+        return ParseResult(parse_valid=False, parse_error_type="empty_after_cleaning", parse_strategy="entity_last_line")
     
     return ParseResult(
         parsed_answer=candidate,
-        parse_valid=True
+        parse_valid=True,
+        parse_ambiguous=len(lines) > 1,
+        parse_strategy="entity_last_line",
+        candidate_answers=[candidate],
+        answer_format_warning="multi_line_entity_output" if len(lines) > 1 else None,
     )
 
 
@@ -108,20 +162,20 @@ def parse_yes_no_answer(output: str) -> ParseResult:
     
     # Look for yes pattern
     if re.search(r'\byes\b', text):
-        return ParseResult(parsed_answer="yes", parse_valid=True)
+        return ParseResult(parsed_answer="yes", parse_valid=True, parse_strategy="yes_no_keyword", candidate_answers=["yes"])
     
     # Look for no pattern
     if re.search(r'\bno\b', text):
-        return ParseResult(parsed_answer="no", parse_valid=True)
+        return ParseResult(parsed_answer="no", parse_valid=True, parse_strategy="yes_no_keyword", candidate_answers=["no"])
     
     # Look for true/false as fallback
     if re.search(r'\btrue\b', text):
-        return ParseResult(parsed_answer="yes", parse_valid=True)
+        return ParseResult(parsed_answer="yes", parse_valid=True, parse_strategy="true_false_keyword", candidate_answers=["true"])
     
     if re.search(r'\bfalse\b', text):
-        return ParseResult(parsed_answer="no", parse_valid=True)
+        return ParseResult(parsed_answer="no", parse_valid=True, parse_strategy="true_false_keyword", candidate_answers=["false"])
     
-    return ParseResult(parse_valid=False, parse_error_type="no_yes_no_found")
+    return ParseResult(parse_valid=False, parse_error_type="no_yes_no_found", parse_strategy="yes_no_keyword")
 
 
 def parse_answer(
@@ -235,6 +289,10 @@ def create_eval_record(
         "parsed_answer": parse_result.parsed_answer,
         "parse_valid": parse_result.parse_valid,
         "parse_error_type": parse_result.parse_error_type,
+        "parse_ambiguous": parse_result.parse_ambiguous,
+        "parse_strategy": parse_result.parse_strategy,
+        "candidate_answers": parse_result.candidate_answers,
+        "answer_format_warning": parse_result.answer_format_warning,
         "correctness": is_correct,
         "error_type": error_type,
     }
