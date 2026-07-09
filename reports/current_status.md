@@ -56,9 +56,9 @@ GHCR route was abandoned for execution because private package pull authenticati
   - Scope: DeepSeek-R1-Distill-Qwen-1.5B, arithmetic only, depths 1/2/3, three conditions, `--items-per-cell 1`, `--max-new-tokens 64`
   - Output path: `/workspace/results/runs/20260708_154330`
 
-### Current blockers / caveats
+### Current caveats
 
-- Results are inside ephemeral job containers; no persistent result volume/export has been configured yet.
+- Blob persistence is now configured and has persisted the small Phase 1 pilot outputs.
 - Phase 0.5 does not include real J-lens fitting; `jacobian-lens` is not installed in the ACR image.
 - The small Phase 1 pilot is behavioral only and is not J-space evidence.
 - Review exported logs/metrics before broadening the run.
@@ -95,7 +95,7 @@ Goal: configure Azure Files persistence before broader Phase 1 runs.
 
 - `infra/azure/scripts/06_run_job_acr_mi.sh` now supports Azure Files volume mounting (`ENABLE_RESULTS_MOUNT`, `STORAGE_MOUNT_NAME`, `RESULTS_MOUNT_PATH`), but this should not be used until a working storage backend is available.
 
-### Next blocker
+### Historical next blocker (resolved)
 
 Choose a persistence alternative:
 
@@ -103,7 +103,60 @@ Choose a persistence alternative:
 2. Switch to Azure Blob upload using managed identity from inside the container; or
 3. Use identity-based Container Apps storage if supported in this tenant.
 
-Do not run broader experiments until persistent output is solved.
+Resolved by switching to Azure Blob upload with managed identity; see the Blob persistence success section below.
+
+## Blob Persistence Success (2026-07-09)
+
+Azure Blob upload with managed identity is now the working persistence route.
+
+### Storage and identity
+
+- Storage account: `stjspacefiles0709085305`
+- Blob container: `jspace-results`
+- Shared key used: no
+- `allowSharedKeyAccess`: `False`
+- Managed identity: `id-jspace-aca-acrpull-sea`
+- Managed identity role: `Storage Blob Data Contributor`
+
+### Code/image
+
+- Added `src/jspace_observation/blob_export.py`
+- Added `scripts/blob_export_smoke.py`
+- Added `azure-identity` and `azure-storage-blob`
+- Added Blob export hooks to Phase 0.5 and Phase 1
+- ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:afd647a6b53e`
+
+### Blob smoke
+
+- Job: `job-jspace-blob-smoke-acr`
+- Successful execution: `job-jspace-blob-smoke-acr-o7kl7s2`
+- Blob prefix: `smoke/20260709T013310Z`
+- Verified file: `smoke/20260709T013310Z/smoke.txt`
+
+### Persistent Phase 1 pilot
+
+- Job: `job-jspace-phase1-pilot-blob-acr`
+- Execution: `job-jspace-phase1-pilot-blob-acr-9voxpdm`
+- Status: `Succeeded`
+- Blob prefix: `phase1-pilot/20260709T014336Z`
+- Files uploaded:
+  - `phase1_eval_records.jsonl`
+  - `phase1_generations.jsonl`
+  - `phase1_metrics.csv`
+  - `phase1_summary.md`
+
+### Pilot review
+
+- Expected files present: yes
+- Cells completed: 9
+- Strict answer-only no-CoT validity is overestimated by current validator.
+- Obvious bug: strict answer-only outputs can contain visible reasoning such as `Step-by-step explanation` and `follow these steps`, but the validator did not flag them.
+- Numeric parser can be misled by truncated reasoning and last-number selection.
+- Scientific conclusion: infrastructure + behavioral sanity only; no J-space claim.
+
+### Next action
+
+Fix no-CoT visible-reasoning validation before any broader Phase 1 run.
 
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 

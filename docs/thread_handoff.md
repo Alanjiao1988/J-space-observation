@@ -2,8 +2,8 @@
 
 Date: 2026-07-08
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified commit before this handoff: `5e1695e81229211b6b7a67fef97b077c5d7de427`
-Latest status message for that commit: `Add persistent Azure results storage`
+Latest verified commit before this handoff: `66a933b2b3d2c441304086dc23a28503e2bc045a`
+Latest status message for that commit: `Persist Azure results to Blob with managed identity`
 
 > Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
 >
@@ -16,6 +16,8 @@ Latest status message for that commit: `Add persistent Azure results storage`
 > Update (2026-07-08 23:16 +08:00): Alan instructed to abandon GHCR auth and switch to ACR + Azure managed identity. Created ACR `acrjspaceobssea0708231738`, built image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147` via `az acr build`, created user-assigned identity `id-jspace-aca-acrpull-sea`, assigned `AcrPull`, and successfully ran ACR jobs: smoke (`job-jspace-acr-smoke-9b9wb4z`), Phase 0.5 (`job-jspace-phase05-acr-i110lnu`), Phase 1 dry-run (`job-jspace-phase1-dryrun-acr-v0j1bkd`), and small Phase 1 pilot (`job-jspace-phase1-pilot-acr-lhuvwbf`). No local model execution occurred. The pilot is behavioral only and not J-space evidence. Next blocker: results are currently ephemeral in job containers; decide persistent result export/storage before broader runs.
 >
 > Update (2026-07-09 08:33 +08:00): Attempted Azure Files persistence. Created storage accounts `stjspaceobssea07090835` and `stjspacefiles0709085305`, but both have `allowSharedKeyAccess=False` due policy, and Azure Files key-based operations fail with `KeyBasedAuthenticationNotPermitted`. Registered env storage `jspace-results-storage`, but the storage smoke job hung; stopped execution `job-jspace-storage-smoke-acr-1s1g5d8`, deleted job `job-jspace-storage-smoke-acr`, and removed the env storage registration. `infra/azure/scripts/06_run_job_acr_mi.sh` now supports Azure Files volume mounting, but `ENABLE_RESULTS_MOUNT=true` should not be used until storage is fixed. Next blocker: choose persistence alternative (admin exception for Azure Files shared-key, Azure Blob upload with managed identity, or identity-based Container Apps storage).
+>
+> Update (2026-07-09 09:08 +08:00): Switched to Azure Blob upload with managed identity. Added Blob export utility and smoke script, rebuilt ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:afd647a6b53e`, assigned `Storage Blob Data Contributor` to `id-jspace-aca-acrpull-sea`, and verified Blob upload. Blob smoke succeeded (`job-jspace-blob-smoke-acr-o7kl7s2`) and uploaded `smoke/20260709T013310Z/smoke.txt`. Persistent Phase 1 pilot succeeded (`job-jspace-phase1-pilot-blob-acr-9voxpdm`) and uploaded 4 files under `phase1-pilot/20260709T014336Z`. Pilot review found a blocker before scaling: strict answer-only outputs can contain visible reasoning that current no-CoT validation fails to flag. Next action: fix no-CoT visible-reasoning validation before any broader Phase 1 run.
 >
 > Update (2026-07-08 22:51 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but Copilot's fresh tool processes could not see them in Process/User/Machine environment scopes. No package-read preflight or Azure job retry was attempted. To continue, set the variables in Windows User environment (or another secure path readable by the agent), e.g. `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`. Do not paste tokens into chat.
 
@@ -251,7 +253,7 @@ workload profile creation: SUCCEEDED (gpu-t4 added to cae-jspace-observation-sea
 job execution: VALIDATED (ACR managed identity smoke, Phase 0.5, Phase 1 dry-run, and small pilot succeeded)
 ```
 
-Current main gate: choose a persistence strategy. Azure Files key-based mount is blocked by policy; do not run broader experiments until persistence is solved or Alan explicitly accepts log-only output for another small run.
+Current main gate: fix no-CoT visible-reasoning validation before any broader Phase 1 run. Blob persistence now works.
 
 If Alan says the PAT is set but Copilot cannot see it, check all scopes:
 
@@ -400,14 +402,11 @@ small phase 1 pilot execution: job-jspace-phase1-pilot-acr-lhuvwbf
 
 Before any broader run:
 
-1. Choose persistence strategy:
-   - request Azure Files shared-key exception;
-   - switch to Azure Blob upload with managed identity;
-   - or investigate identity-based Container Apps storage.
-2. Review small pilot logs/metrics already captured in `docs/run_log.md`.
+1. Fix no-CoT visible-reasoning validation; current strict answer-only validity is overestimated.
+2. Review small pilot artifacts in Blob prefix `phase1-pilot/20260709T014336Z`.
 3. Decide whether to install `jacobian-lens` into the image before any real Phase 0.5 fitting.
 4. Do not claim Phase 1 behavioral pilot as J-space evidence.
-5. Do not run the full two-model/all-task Phase 1 until persistence and pilot review are done.
+5. Do not run the full two-model/all-task Phase 1 until validation is fixed and pilot review is accepted.
 
 ---
 

@@ -502,3 +502,34 @@ Next options:
 - Request admin exception for Azure Files shared-key access; or
 - Switch to Azure Blob upload with managed identity; or
 - Investigate identity-based Container Apps storage support for this tenant.
+
+## 2026-07-09 — Azure Blob persistence works; validation bug is next blocker
+
+Status:
+
+- Azure Blob upload with managed identity succeeded.
+- Blob storage account: `stjspacefiles0709085305`.
+- Blob container: `jspace-results`.
+- Managed identity `id-jspace-aca-acrpull-sea` has `Storage Blob Data Contributor`.
+- Blob smoke succeeded:
+  - job: `job-jspace-blob-smoke-acr`
+  - execution: `job-jspace-blob-smoke-acr-o7kl7s2`
+  - verified blob: `smoke/20260709T013310Z/smoke.txt`
+- Persistent Phase 1 pilot succeeded:
+  - job: `job-jspace-phase1-pilot-blob-acr`
+  - execution: `job-jspace-phase1-pilot-blob-acr-9voxpdm`
+  - blob prefix: `phase1-pilot/20260709T014336Z`
+  - files: eval JSONL, generation JSONL, metrics CSV, summary MD
+
+Pilot review:
+
+- 9 cells completed.
+- Output artifacts are persisted to Blob.
+- Current no-CoT validator overestimates strict answer-only validity: visible reasoning in strict answer-only outputs was not flagged.
+- Numeric parser can be misled by truncated reasoning and last-number selection.
+
+Decision:
+
+- Do not expand Phase 1 yet.
+- Fix no-CoT validation before broader runs.
+- This pilot remains infrastructure + behavioral sanity only, not J-space evidence.

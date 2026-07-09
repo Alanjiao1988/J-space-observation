@@ -950,6 +950,79 @@ Next action:
   3. Use Container Apps supported identity-based storage if available in this tenant/CLI version.
 - Do not run broader experiments until results can be persisted.
 
+## 2026-07-09 — Blob persistence via managed identity succeeded
+
+Code and image:
+
+- Added Blob export support:
+  - `src/jspace_observation/blob_export.py`
+  - `scripts/blob_export_smoke.py`
+  - `azure-identity`, `azure-storage-blob` dependencies
+  - Phase 0.5 / Phase 1 `--require-blob-export` hooks
+  - ACR job env support for Blob variables
+- Local tests: `43 passed, 2 warnings`
+- ACR build run: `cm3`
+- New ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:afd647a6b53e`
+- Digest: `sha256:ecb9a70dc9e11eb59e3ba0f9777d19bfbf7a5e2b6567e7993f586be6d44e84f3`
+
+Blob storage:
+
+- Storage account used: `stjspacefiles0709085305`
+- Blob container: `jspace-results`
+- Shared key used: no
+- `allowSharedKeyAccess`: `False`
+- Managed identity: `id-jspace-aca-acrpull-sea`
+- Managed identity role: `Storage Blob Data Contributor`
+- Current signed-in user role for verification: `Storage Blob Data Reader`
+
+Blob smoke:
+
+- Job: `job-jspace-blob-smoke-acr`
+- First execution: `job-jspace-blob-smoke-acr-qalz3t9`
+  - Status: `Failed`
+  - Error: `ModuleNotFoundError: No module named 'jspace_observation'`
+  - Fix: add `src` to `sys.path` in `scripts/blob_export_smoke.py` and pass `PYTHONPATH=/workspace/src`
+- Successful execution: `job-jspace-blob-smoke-acr-o7kl7s2`
+- Status: `Succeeded`
+- Blob prefix: `smoke/20260709T013310Z`
+- Verified blob: `smoke/20260709T013310Z/smoke.txt`
+
+Persistent Phase 1 pilot:
+
+- Job: `job-jspace-phase1-pilot-blob-acr`
+- Execution: `job-jspace-phase1-pilot-blob-acr-9voxpdm`
+- Status: `Succeeded`
+- Blob prefix: `phase1-pilot/20260709T014336Z`
+- Files uploaded:
+  - `phase1_eval_records.jsonl`
+  - `phase1_generations.jsonl`
+  - `phase1_metrics.csv`
+  - `phase1_summary.md`
+- Download/review location (not committed): `C:\Users\alanjiao\.copilot\session-state\41000e7a-c709-4082-9452-b0c72ff481d8\files\azure_blob_pilot_review`
+
+Pilot review:
+
+- Expected files present: yes, 4 files.
+- Cells completed: 9 (depths 1/2/3 x strict_answer_only, visible_cot, r1_style_thinking).
+- Parse/eval records present: yes.
+- Metrics sanity:
+  - strict_answer_only no-CoT validity was reported as 1.0 for depths 1/2/3.
+  - visible_cot / r1_style_thinking no-CoT validity was often 0.0 for depth 2/3 as expected.
+- Obvious bug before scaling:
+  - strict_answer_only outputs contain visible reasoning phrases such as `Step-by-step explanation` and `follow these steps`, but current no-CoT validator did not flag them.
+  - The pilot therefore reveals a validation bug; strict no-CoT validity is overestimated.
+  - Numeric parsing can be misled by truncated reasoning outputs and last-number selection.
+- Scientific conclusion: infrastructure + behavioral sanity only. No J-space claim.
+
+Optional persistent Phase 0.5:
+
+- Not attempted. Existing non-persistent Phase 0.5 already succeeded; next priority is no-CoT validation correctness before scaling.
+
+Next action:
+
+- Fix no-CoT visible-reasoning validation before any broader Phase 1 run.
+- Use `JSPACE_RESULTS_ROOT=/workspace/results` for future runs to avoid doubled path `/workspace/results/runs/runs/...`.
+
 ## 2026-07-08 — Local validation sequence
 - Latest commits:
   - `00349b7 Fix strict no-CoT prefill and Phase 1 defaults`

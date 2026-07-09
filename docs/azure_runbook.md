@@ -421,6 +421,52 @@ bash infra/azure/scripts/06_run_job_acr_mi.sh
 
 Do not run a broader Phase 1 sweep until pilot outputs are reviewed and persistent result export is decided.
 
+## Active persistence route: Azure Blob with managed identity
+
+Azure Blob upload with managed identity is now the working persistence path.
+
+Current storage:
+
+```text
+storage account: stjspacefiles0709085305
+container: jspace-results
+shared key used: no
+identity: id-jspace-aca-acrpull-sea
+role: Storage Blob Data Contributor
+```
+
+Blob export environment variables:
+
+```bash
+export AZURE_CLIENT_ID="479d9229-632e-4490-ad92-854a34dfddf8"
+export JSPACE_BLOB_ACCOUNT="stjspacefiles0709085305"
+export JSPACE_BLOB_CONTAINER="jspace-results"
+export JSPACE_BLOB_PREFIX="<run-specific-prefix>"
+export JSPACE_RESULTS_ROOT="/workspace/results"
+```
+
+Smoke:
+
+```bash
+export JOB_NAME="job-jspace-blob-smoke-acr"
+export JOB_COMMAND="python scripts/blob_export_smoke.py"
+export ACR_IMAGE="acrjspaceobssea0708231738.azurecr.io/j-space-observation:afd647a6b53e"
+bash infra/azure/scripts/06_run_job_acr_mi.sh
+```
+
+Persistent small Phase 1 pilot:
+
+```bash
+export JOB_NAME="job-jspace-phase1-pilot-blob-acr"
+export JOB_COMMAND="python experiments/phase1_depth_gradient.py --models deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --task-families arithmetic --depths 1,2,3 --conditions strict_answer_only,visible_cot,r1_style_thinking --max-new-tokens 64 --items-per-cell 1 --require-blob-export"
+export ACR_IMAGE="acrjspaceobssea0708231738.azurecr.io/j-space-observation:afd647a6b53e"
+export CPU_CORES=4
+export MEMORY=16Gi
+bash infra/azure/scripts/06_run_job_acr_mi.sh
+```
+
+Do not run broader Phase 1 until the no-CoT validation bug observed in the pilot is fixed.
+
 ## Persistent results storage status
 
 Azure Files was attempted as the first persistence path and is currently blocked by organization/subscription policy.
