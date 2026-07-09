@@ -56,6 +56,7 @@ from jspace_observation import (
     cot_gain_by_depth,
     compute_slope,
     upload_directory_to_blob,
+    postprocess_answer_only,
 )
 
 
@@ -220,7 +221,11 @@ def main():
         "model", "task_family", "depth", "condition", "n",
         "accuracy", "parse_valid_rate", "parse_ambiguous_rate",
         "no_cot_valid_rate", "visible_reasoning_marker_rate",
-        "answer_format_warning_rate", "avg_latency_s",
+        "answer_format_warning_rate", "raw_no_cot_valid_rate",
+        "postprocessed_no_cot_valid_rate", "postprocessing_applied_rate",
+        "postprocessing_success_rate", "postprocessing_warning_rate",
+        "accuracy_raw", "accuracy_postprocessed", "eval_output_used",
+        "avg_latency_s",
     ]]
     
     # Process each cell
@@ -268,6 +273,15 @@ def main():
                     parse_ambiguous_count = 0
                     answer_format_warning_count = 0
                     visible_reasoning_marker_count = 0
+                    raw_no_cot_valid_count = 0
+                    raw_no_cot_applicable_count = 0
+                    postprocessed_no_cot_valid_count = 0
+                    postprocessed_applicable_count = 0
+                    postprocessing_applied_count = 0
+                    postprocessing_success_count = 0
+                    postprocessing_warning_count = 0
+                    raw_correct_count = 0
+                    postprocessed_correct_count = 0
                     latencies = []
                     
                     for item in items:
@@ -280,6 +294,9 @@ def main():
                                 full_prompt = construct_answer_only_prompt(item.prompt_base)
                                 no_cot_method = "answer_only_prompt"
                         elif condition == "strict_answer_only_prefill_answer":
+                            full_prompt = construct_prefill_answer_prompt(item.prompt_base)
+                            no_cot_method = "answer_prefill"
+                        elif condition == "strict_answer_only_postprocessed":
                             full_prompt = construct_prefill_answer_prompt(item.prompt_base)
                             no_cot_method = "answer_prefill"
                         elif condition == "visible_cot":
@@ -310,7 +327,7 @@ def main():
                             output = ""
                             gen_time = 0
                         
-                        # Create generation record
+                        # Create generation record for raw output.
                         gen_record = create_generation_record(
                             prompt=full_prompt,
                             output=output,
@@ -328,8 +345,7 @@ def main():
                             condition_top_p=generation_config.top_p,
                             decoding_profile=generation_config.decoding_profile,
                         )
-                        # Parse and evaluate
-                        eval_record = create_eval_record(
+                        raw_eval_record = create_eval_record(
                             output=output,
                             parse_type=item.parse_type,
                             expected_answer=item.expected_answer,
@@ -339,16 +355,67 @@ def main():
                             depth=depth,
                             condition=condition,
                         )
+                        eval_output = output
+                        eval_output_used = "raw"
+                        postprocess_record = {
+                            "raw_output_before_postprocess": output,
+                            "postprocessed_output": None,
+                            "postprocessing_applied": False,
+                            "postprocessing_strategy": None,
+                            "postprocessing_reason": None,
+                            "postprocessing_warning": None,
+                            "raw_no_cot_valid": gen_record["no_cot_validity"],
+                            "postprocessed_no_cot_valid": None,
+                            "postprocessed_answer_like": None,
+                            "eval_output_used": eval_output_used,
+                        }
+
+                        if condition == "strict_answer_only_postprocessed":
+                            pp = postprocess_answer_only(output, task_type=item.parse_type)
+                            eval_output = pp.postprocessed_output
+                            eval_output_used = "postprocessed"
+                            postprocess_record = {
+                                "raw_output_before_postprocess": pp.raw_output,
+                                "postprocessed_output": pp.postprocessed_output,
+                                "postprocessing_applied": pp.postprocessing_applied,
+                                "postprocessing_strategy": pp.postprocessing_strategy,
+                                "postprocessing_reason": pp.postprocessing_reason,
+                                "postprocessing_warning": pp.postprocessing_warning,
+                                "raw_no_cot_valid": pp.raw_no_cot_valid,
+                                "postprocessed_no_cot_valid": pp.postprocessed_no_cot_valid,
+                                "postprocessed_answer_like": pp.postprocessed_answer_like,
+                                "eval_output_used": eval_output_used,
+                            }
+
+                        eval_record = create_eval_record(
+                            output=eval_output,
+                            parse_type=item.parse_type,
+                            expected_answer=item.expected_answer,
+                            task_id=item.id,
+                            model_name=model_name,
+                            task_family=task_family,
+                            depth=depth,
+                            condition=condition,
+                            raw_correctness=raw_eval_record["correctness"],
+                            raw_parsed_answer=raw_eval_record["parsed_answer"],
+                            raw_parse_valid=raw_eval_record["parse_valid"],
+                            eval_output_used=eval_output_used,
+                            **postprocess_record,
+                        )
                         eval_records.append(eval_record)
 
                         gen_record.update({
                             "raw_output": output,
+                            "eval_output": eval_output,
                             "parsed_answer": eval_record["parsed_answer"],
                             "correct": eval_record["correctness"],
                             "parse_valid": eval_record["parse_valid"],
                             "parse_ambiguous": eval_record["parse_ambiguous"],
                             "parse_strategy": eval_record["parse_strategy"],
                             "answer_format_warning": eval_record["answer_format_warning"],
+                            "raw_correct": raw_eval_record["correctness"],
+                            "raw_parsed_answer": raw_eval_record["parsed_answer"],
+                            **postprocess_record,
                         })
                         generation_records.append(gen_record)
                         cell_records.append(gen_record)
@@ -358,6 +425,10 @@ def main():
                             parse_valid_count += 1
                         if eval_record["correctness"]:
                             correct_count += 1
+                        if raw_eval_record["correctness"]:
+                            raw_correct_count += 1
+                        if eval_output_used == "postprocessed" and eval_record["correctness"]:
+                            postprocessed_correct_count += 1
                         if eval_record["parse_ambiguous"]:
                             parse_ambiguous_count += 1
                         if eval_record["answer_format_warning"]:
@@ -368,6 +439,20 @@ def main():
                             no_cot_applicable_count += 1
                         if gen_record["no_cot_validity"] is True:
                             no_cot_valid_count += 1
+                        if gen_record["no_cot_applicable"]:
+                            raw_no_cot_applicable_count += 1
+                        if postprocess_record["raw_no_cot_valid"] is True:
+                            raw_no_cot_valid_count += 1
+                        if eval_output_used == "postprocessed":
+                            postprocessed_applicable_count += 1
+                            if postprocess_record["postprocessed_no_cot_valid"] is True:
+                                postprocessed_no_cot_valid_count += 1
+                            if postprocess_record["postprocessing_applied"]:
+                                postprocessing_applied_count += 1
+                            if postprocess_record["postprocessed_answer_like"]:
+                                postprocessing_success_count += 1
+                            if postprocess_record["postprocessing_warning"]:
+                                postprocessing_warning_count += 1
                     
                     # Compute metrics
                     n_items = len(items)
@@ -381,6 +466,37 @@ def main():
                     )
                     visible_reasoning_marker_rate = visible_reasoning_marker_count / n_items if n_items > 0 else 0
                     answer_format_warning_rate = answer_format_warning_count / n_items if n_items > 0 else 0
+                    raw_no_cot_valid_rate = (
+                        raw_no_cot_valid_count / raw_no_cot_applicable_count
+                        if raw_no_cot_applicable_count > 0
+                        else None
+                    )
+                    postprocessed_no_cot_valid_rate = (
+                        postprocessed_no_cot_valid_count / postprocessed_applicable_count
+                        if postprocessed_applicable_count > 0
+                        else None
+                    )
+                    postprocessing_applied_rate = (
+                        postprocessing_applied_count / postprocessed_applicable_count
+                        if postprocessed_applicable_count > 0
+                        else None
+                    )
+                    postprocessing_success_rate = (
+                        postprocessing_success_count / postprocessed_applicable_count
+                        if postprocessed_applicable_count > 0
+                        else None
+                    )
+                    postprocessing_warning_rate = (
+                        postprocessing_warning_count / postprocessed_applicable_count
+                        if postprocessed_applicable_count > 0
+                        else None
+                    )
+                    accuracy_raw = raw_correct_count / n_items if n_items > 0 else 0
+                    accuracy_postprocessed = (
+                        postprocessed_correct_count / postprocessed_applicable_count
+                        if postprocessed_applicable_count > 0
+                        else None
+                    )
                     avg_latency = sum(latencies) / len(latencies) if latencies else 0
                     
                     print(f"  Accuracy: {accuracy:.3f}")
@@ -406,6 +522,14 @@ def main():
                         "NA" if no_cot_valid_rate is None else f"{no_cot_valid_rate:.4f}",
                         f"{visible_reasoning_marker_rate:.4f}",
                         f"{answer_format_warning_rate:.4f}",
+                        "NA" if raw_no_cot_valid_rate is None else f"{raw_no_cot_valid_rate:.4f}",
+                        "NA" if postprocessed_no_cot_valid_rate is None else f"{postprocessed_no_cot_valid_rate:.4f}",
+                        "NA" if postprocessing_applied_rate is None else f"{postprocessing_applied_rate:.4f}",
+                        "NA" if postprocessing_success_rate is None else f"{postprocessing_success_rate:.4f}",
+                        "NA" if postprocessing_warning_rate is None else f"{postprocessing_warning_rate:.4f}",
+                        f"{accuracy_raw:.4f}",
+                        "NA" if accuracy_postprocessed is None else f"{accuracy_postprocessed:.4f}",
+                        "postprocessed" if postprocessed_applicable_count > 0 else "raw",
                         f"{avg_latency:.4f}",
                     ])
         
@@ -461,6 +585,7 @@ def main():
         "- Accuracy and strict no-CoT compliance are reported separately.",
         "- Correct answers from no-CoT-invalid outputs must not be interpreted as hidden reasoning evidence.",
         "- Ambiguous numeric parsing is flagged via parse_ambiguous and answer_format_warning.",
+        "- Postprocessed answer-only validity does not imply raw no-CoT compliance.",
     ]
     strict_records = [
         r for r in generation_records

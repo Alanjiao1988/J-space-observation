@@ -110,6 +110,14 @@ def get_generation_config_for_condition(
             do_sample=False,
             decoding_profile="strict_prefill_answer_only_max8",
         )
+    if condition == "strict_answer_only_postprocessed":
+        return ConditionGenerationConfig(
+            max_new_tokens=min(default_max_new_tokens, 32),
+            temperature=0.0,
+            top_p=1.0,
+            do_sample=False,
+            decoding_profile="strict_postprocessed_answer_only_max32",
+        )
     return ConditionGenerationConfig(
         max_new_tokens=default_max_new_tokens,
         temperature=1.0,
