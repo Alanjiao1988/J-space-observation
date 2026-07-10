@@ -646,3 +646,26 @@ Scientific decision:
 - Keep raw strict, stopped, and postprocessed conditions separate.
 - Do not broaden Phase 1 yet because stopped answer quality fails at depths 2/3.
 - No hidden-reasoning or J-space claim is supported.
+
+## 2026-07-10 — separate Phase 1 answer-control conditions into three branches
+
+Decision:
+
+- Define `raw_strict` as raw strict no-CoT feasibility.
+- Define `stopped_intervention` as stop-controlled generation intervention.
+- Define `postprocessed_utility` as postprocessed answer-recovery utility.
+- Treat the three branches as non-interchangeable in records, metrics, summaries, and interpretation.
+
+Reason:
+
+- Prompt-only strict no-CoT was unreliable.
+- Stop controls can suppress visible reasoning but are generation-time interventions.
+- Postprocessing can recover answer spans but does not establish raw no-CoT compliance.
+
+Consequence:
+
+- Future Phase 1 reports must preserve raw, stopped, and postprocessed outputs, validity, and correctness separately.
+- Non-applicable branch metrics must be `NA`.
+- Stopped validity is not spontaneous no-CoT, and postprocessed validity is not raw no-CoT.
+- No branch by itself supports hidden-reasoning or J-space claims.
+- Scaling remains paused until branch-specific success criteria are reviewed and approved.

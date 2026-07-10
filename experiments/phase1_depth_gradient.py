@@ -60,6 +60,9 @@ from jspace_observation import (
     compute_slope,
     upload_directory_to_blob,
     postprocess_answer_only,
+    PHASE1_INTERPRETATION_BOUNDARIES,
+    get_phase1_branch_metadata,
+    render_branch_metrics_table,
 )
 
 
@@ -244,8 +247,8 @@ def main():
     generation_records = []
     eval_records = []
     metrics_rows = [[
-        "model", "task_family", "depth", "condition", "n",
-        "accuracy", "parse_valid_rate", "parse_ambiguous_rate",
+        "model", "task_family", "depth", "condition", "branch", "branch_label", "n",
+        "accuracy", "eval_accuracy", "parse_valid_rate", "parse_ambiguous_rate",
         "no_cot_valid_rate", "visible_reasoning_marker_rate",
         "answer_format_warning_rate", "raw_no_cot_valid_rate",
         "stopped_no_cot_valid_rate", "postprocessed_no_cot_valid_rate",
@@ -290,7 +293,13 @@ def main():
                     items = items[:args.items_per_cell]
                 
                 for condition in conditions:
-                    print(f"\n{model_name} | {task_family} | depth={depth} | {condition}")
+                    branch_metadata = get_phase1_branch_metadata(condition)
+                    phase1_branch = branch_metadata["phase1_branch"]
+                    phase1_branch_label = branch_metadata["phase1_branch_label"]
+                    print(
+                        f"\n{model_name} | {task_family} | depth={depth} | "
+                        f"{condition} | branch={phase1_branch}"
+                    )
                     print("-" * 50)
                     
                     cell_records = []
@@ -387,6 +396,7 @@ def main():
                             stop_control_enabled=generation_config.stop_control_enabled,
                             stop_strings=list(generation_config.stop_strings),
                             stop_mode=generation_config.stop_mode,
+                            **branch_metadata,
                         )
                         raw_eval_record = create_eval_record(
                             output=output,
@@ -397,6 +407,7 @@ def main():
                             task_family=task_family,
                             depth=depth,
                             condition=condition,
+                            **branch_metadata,
                         )
                         eval_output = output
                         eval_output_used = "raw"
@@ -480,9 +491,19 @@ def main():
                             raw_parsed_answer=raw_eval_record["parsed_answer"],
                             raw_parse_valid=raw_eval_record["parse_valid"],
                             eval_output_used=eval_output_used,
+                            **branch_metadata,
                             **stop_record,
                             **postprocess_record,
                         )
+                        eval_record.update({
+                            "eval_correctness": eval_record["correctness"],
+                            "stopped_correctness": (
+                                eval_record["correctness"] if eval_output_used == "stopped" else None
+                            ),
+                            "postprocessed_correctness": (
+                                eval_record["correctness"] if eval_output_used == "postprocessed" else None
+                            ),
+                        })
                         eval_records.append(eval_record)
 
                         gen_record.update({
@@ -495,8 +516,23 @@ def main():
                             "parse_strategy": eval_record["parse_strategy"],
                             "answer_format_warning": eval_record["answer_format_warning"],
                             "raw_correct": raw_eval_record["correctness"],
+                            "raw_correctness": raw_eval_record["correctness"],
                             "raw_parsed_answer": raw_eval_record["parsed_answer"],
                             "eval_output_used": eval_output_used,
+                            "eval_correct": eval_record["correctness"],
+                            "eval_correctness": eval_record["correctness"],
+                            "stopped_correct": (
+                                eval_record["correctness"] if eval_output_used == "stopped" else None
+                            ),
+                            "stopped_correctness": (
+                                eval_record["correctness"] if eval_output_used == "stopped" else None
+                            ),
+                            "postprocessed_correct": (
+                                eval_record["correctness"] if eval_output_used == "postprocessed" else None
+                            ),
+                            "postprocessed_correctness": (
+                                eval_record["correctness"] if eval_output_used == "postprocessed" else None
+                            ),
                             **stop_record,
                             **postprocess_record,
                         })
@@ -635,7 +671,10 @@ def main():
                         task_family,
                         depth,
                         condition,
+                        phase1_branch,
+                        phase1_branch_label,
                         n_items,
+                        f"{accuracy:.4f}",
                         f"{accuracy:.4f}",
                         f"{parse_valid_rate:.4f}",
                         f"{parse_ambiguous_rate:.4f}",
@@ -706,8 +745,22 @@ def main():
         f"- Metrics: {metrics_path}"
     )
 
+    metric_records = [
+        dict(zip(metrics_rows[0], row))
+        for row in metrics_rows[1:]
+    ]
+    summary_builder.add_section(
+        "Branch-level Metrics",
+        render_branch_metrics_table(metric_records),
+    )
+    summary_builder.add_section(
+        "Interpretation Boundaries",
+        PHASE1_INTERPRETATION_BOUNDARIES,
+    )
+
     warning_lines = [
         "- Accuracy and strict no-CoT compliance are reported separately.",
+        "- The legacy accuracy field follows eval_output_used; use branch-specific accuracy fields for comparisons.",
         "- Correct answers from no-CoT-invalid outputs must not be interpreted as hidden reasoning evidence.",
         "- Ambiguous numeric parsing is flagged via parse_ambiguous and answer_format_warning.",
         "- Postprocessed answer-only validity does not imply raw no-CoT compliance.",
@@ -729,10 +782,10 @@ def main():
     
     summary_builder.add_section(
         "Next Steps",
-        "1. Analyze depth gradients and CoT gain slopes\n"
-        "2. Identify ability floors for each task/model cell\n"
-        "3. Mark cells with sufficient headroom for Phase 5 ablations\n"
-        "4. Prepare Phase 1.5 layer taxonomy if J-lens feasible"
+        "1. Review raw strict, stopped intervention, and postprocessed utility branches separately\n"
+        "2. Identify ability floors and answer-quality failures within each branch\n"
+        "3. Do not scale Phase 1 until the branch selection and reporting policy is approved\n"
+        "4. Treat all current Phase 1 results as behavioral and methodological evidence only"
     )
     
     summary = summary_builder.build()

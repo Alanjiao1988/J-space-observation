@@ -2,8 +2,8 @@
 
 Date: 2026-07-10
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified code/image commit before this handoff: `c29852ab97b5`
-Latest status message for that commit: `Add stop-controlled answer-only generation`
+Latest verified repository baseline before branch formalization: `0aa536b3b239eb163740e1188e0a2adaaebc011b`
+Current image commit: `c29852ab97b5`
 
 > Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
 >
@@ -26,6 +26,8 @@ Latest status message for that commit: `Add stop-controlled answer-only generati
 > Update (2026-07-09 12:45 +08:00): Added explicitly labeled raw-vs-postprocessed answer-only evaluation via `strict_answer_only_postprocessed`. Final ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9342ef130d46` (build `cm8`, digest `sha256:3fc9e9d58b0ce6d5ea8a260cb7c172aa7cebfbe31427f94ee8cdae8d3b2a9ed1`). Reran small persistent pilot as `job-jspace-p1-postprocess-gor0o1r`, Blob prefix `phase1-pilot-postprocess/20260709T044224Z`. Raw no-CoT validity for the postprocessed condition remained `0.0000` for depths 1/2/3; postprocessed no-CoT validity was `1.0000`; postprocessed accuracy was `1.0000/0.0000/0.0000` for depths 1/2/3. This is answer-recovery evaluation only, not no-CoT proof and not J-space evidence.
 >
 > Update (2026-07-10 15:30 +08:00): Added `strict_answer_only_stopped` and rebuilt ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5` (build `cm9`, digest `sha256:2919bfa04dbcef0998cd9d770ffc91992958840d52ad512ab8b20b41dd434098`). Storage public access is disabled, so a private path was created: VNet `vnet-jspace-observation-sea`, Blob private endpoint `pe-stjspacefiles-blob-sea`, private DNS zone `privatelink.blob.core.windows.net`, and active VNet-integrated environment `cae-jspace-observation-sea-vnet2`. The first environment `cae-jspace-observation-sea-vnet` was created before `Microsoft.Network/AllowBringYourOwnPublicIpAddress` was registered and cannot start containers; it was retained, not deleted. Blob smoke `job-jspace-blob-net-smoke-v2-l02nljz` succeeded. The 15-cell pilot `job-jspace-p1-stopcontrol-vnet-b55p4c6` succeeded and uploaded four files under `phase1-pilot-stopcontrol-vnet/20260710T072107Z`. For `strict_answer_only_stopped`, raw/stopped no-CoT validity and stop-trigger rate were `1.0000` at all depths; stopped accuracy was `1.0000/0.0000/0.0000`. All stops were triggered by `\n\n`; depth 2 was truncated to a non-answer placeholder and depth 3 to a wrong boxed answer. Stop control is an intervention, not proof of spontaneous no-CoT and not J-space evidence.
+>
+> Update (2026-07-10 — branch formalization): Phase 1 now has three non-interchangeable answer-control branches: `raw_strict`, `stopped_intervention`, and `postprocessed_utility`. Records and summaries preserve branch labels plus raw/stopped/postprocessed outputs, validity, and correctness separately. Summary tables use `NA` when a metric does not apply. Local tests pass (`80 passed, 2 warnings`). No model inference, Azure job, ACR build, experiment scaling, J-lens fitting, or activation patching occurred in this update. Current blocker is none; scaling remains paused pending branch-specific success criteria.
 >
 > Update (2026-07-08 22:51 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but Copilot's fresh tool processes could not see them in Process/User/Machine environment scopes. No package-read preflight or Azure job retry was attempted. To continue, set the variables in Windows User environment (or another secure path readable by the agent), e.g. `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`. Do not paste tokens into chat.
 
@@ -105,6 +107,7 @@ Implemented modules include:
 - `src/jspace_observation/jlens_utils.py`
 - `src/jspace_observation/blob_export.py`
 - `src/jspace_observation/postprocess.py`
+- `src/jspace_observation/phase1_branches.py`
 
 Experiment scripts:
 
@@ -126,11 +129,12 @@ Tests:
 - `tests/test_stats.py`
 - `tests/test_blob_export.py`
 - `tests/test_postprocess.py`
+- `tests/test_phase1_branches.py`
 
 Latest known test status:
 
 ```text
-python -m pytest tests/ -q -> 68 passed, 2 warnings
+python -m pytest tests/ -q -> 80 passed, 2 warnings
 ```
 
 Phase 1 dry run status:
@@ -257,6 +261,21 @@ jobs:
   job-jspace-phase1-pilot-acr
 ```
 
+Active private execution path:
+
+```text
+VNet: vnet-jspace-observation-sea
+active ACA subnet: snet-aca-jspace-sea-v2
+private endpoint subnet: snet-pe-jspace-sea
+Blob private endpoint: pe-stjspacefiles-blob-sea
+Blob private IP: 10.80.2.4
+private DNS zone: privatelink.blob.core.windows.net
+active ACA environment: cae-jspace-observation-sea-vnet2
+inactive retained environment: cae-jspace-observation-sea-vnet
+latest successful stop pilot: job-jspace-p1-stopcontrol-vnet-b55p4c6
+latest stop-pilot Blob prefix: phase1-pilot-stopcontrol-vnet/20260710T072107Z
+```
+
 T4 quota status:
 
 ```text
@@ -265,7 +284,7 @@ workload profile creation: SUCCEEDED (gpu-t4 added to cae-jspace-observation-sea
 job execution: VALIDATED (ACR managed identity smoke, Phase 0.5, Phase 1 dry-run, and small pilot succeeded)
 ```
 
-Current main gate: establish a usable strict answer-only condition. Prompt-only/direct-prefill variants have not succeeded enough to broaden Phase 1.
+Current blocker: none. The next decision gate is approval of branch-specific success criteria; no Phase 1 scaling is approved.
 
 If Alan says the PAT is set but Copilot cannot see it, check all scopes:
 
@@ -293,7 +312,7 @@ Current ACR state:
 ```text
 ACR: acrjspaceobssea0708231738
 login server: acrjspaceobssea0708231738.azurecr.io
-image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147
+image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5
 identity: id-jspace-aca-acrpull-sea
 AcrPull: assigned
 ```
@@ -401,7 +420,7 @@ GHCR private pull remains historical; do not return to GHCR unless Alan explicit
 
 The new thread should continue from here:
 
-### Step 1: Review small pilot and decide persistence
+### Step 1: Review branch-specific success criteria
 
 The Azure ACR managed-identity chain has already succeeded:
 
@@ -412,14 +431,13 @@ phase 1 dry-run execution: job-jspace-phase1-dryrun-acr-v0j1bkd
 small phase 1 pilot execution: job-jspace-phase1-pilot-acr-lhuvwbf
 ```
 
-Before any broader run:
+Before any new run:
 
-1. Review strictfix artifacts in Blob prefix `phase1-pilot-strictfix2/20260709T025356Z`.
-2. Decide whether to test stop-sequence / raw-vs-postprocessed output handling next.
-3. Review parser policy; many pilot cells remain parse-ambiguous.
-4. Decide whether to install `jacobian-lens` into the image before any real Phase 0.5 fitting.
-5. Do not claim Phase 1 behavioral pilot as J-space evidence.
-6. Do not run the full two-model/all-task Phase 1 until strict no-CoT behavior is improved and accepted.
+1. Use `docs/phase1_experiment_branches.md` as the reporting contract.
+2. Review raw strict, stopped intervention, and postprocessed utility independently.
+3. Define branch-specific success criteria for no-CoT validity, parse quality, and accuracy.
+4. Keep scaling paused until those criteria are approved.
+5. Do not claim hidden reasoning or J-space evidence from Phase 1 behavior.
 
 ---
 
@@ -441,20 +459,17 @@ Please read docs/thread_handoff.md first, then use the repo documents as source 
 - reports/current_status.md
 
 Current known state:
-- Latest verified commit before handoff: latest docs should be checked from git log; active ACR image tag is `d69187c7a147`.
-- Azure-first execution policy: local PC is orchestration-only.
-- ACR + managed identity is the active registry path.
-- Azure resources exist: `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, `gpu-t4`, `acrjspaceobssea0708231738`, `id-jspace-aca-acrpull-sea`, and four jobs.
-- Smoke, Phase 0.5, Phase 1 dry-run, and small Phase 1 pilot all succeeded on Azure.
-- Small pilot results are behavioral only, not J-space evidence.
-- Results are currently ephemeral inside job containers/logs; persistent export is not configured.
+- Active ACR image is `acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5`.
+- Azure-first execution policy remains in force; the local PC is orchestration-only.
+- Private Blob persistence is working through `cae-jspace-observation-sea-vnet2`.
+- The stop-control pilot succeeded as `job-jspace-p1-stopcontrol-vnet-b55p4c6`.
+- Phase 1 has three non-interchangeable branches: raw strict, stopped intervention, and postprocessed utility.
+- Stop controls suppress visible reasoning in the tiny pilot but answer quality fails at depths 2/3.
+- Current blocker is none, but scaling is paused.
+- No Phase 1 result is hidden-reasoning or J-space evidence.
 
-Your first tasks:
-1. Read `docs/run_log.md` and `reports/current_status.md` for the latest execution IDs.
-2. Decide how to persist/export results before any broader run.
-3. Review the small pilot logs/metrics before expanding Phase 1.
-4. Do not run local model inference.
-5. Do not claim J-space evidence from Phase 1 behavior.
+Your first task:
+Review and approve branch-specific success criteria before authorizing any new model or Azure run.
 ```
 
 ---
@@ -471,3 +486,6 @@ Your first tasks:
 - Do not create Azure GPU jobs before T4 quota confirmation.
 - Do not claim J-space evidence from Phase 1 behavioral results alone.
 - Do not claim Plan A feasibility until actual J-lens fitting / validation succeeds.
+- Do not merge raw strict, stopped intervention, and postprocessed utility metrics.
+- Do not describe stopped validity as spontaneous no-CoT.
+- Do not describe postprocessed validity as raw no-CoT.

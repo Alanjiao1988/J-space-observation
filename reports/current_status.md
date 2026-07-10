@@ -2,11 +2,11 @@
 
 ## Summary
 
-The executable scaffold, Azure ACR managed-identity path, private Blob persistence path, and small stop-controlled Phase 1 pilot are complete.
+The executable scaffold, Azure ACR managed-identity path, private Blob persistence path, small stop-controlled Phase 1 pilot, and branch-aware Phase 1 reporting are complete.
 
 ## Current Phase
 
-**Phase: private Blob path and stop-controlled 15-cell pilot completed; no scale expansion approved**
+**Phase: raw strict, stopped intervention, and postprocessed utility reporting formalized; no scale expansion approved**
 
 ## ACR Managed Identity Azure Execution (2026-07-08)
 
@@ -17,7 +17,7 @@ GHCR route was abandoned for execution because private package pull authenticati
 - ACR: `acrjspaceobssea0708231738`
 - Login server: `acrjspaceobssea0708231738.azurecr.io`
 - Admin user enabled: `False`
-- ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147`
+- ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5`
 - ACR build: succeeded via `az acr build`
 - Managed identity: `id-jspace-aca-acrpull-sea`
 - Principal ID: `78d4348b-57eb-4fb9-aaa7-99148b303292`
@@ -370,6 +370,50 @@ All three stops were triggered by `\n\n`. In this run, the generation-time crite
 - Treat raw strict, stopped, and postprocessed conditions as distinct branches.
 - Stop control preserves answer quality only in the easiest cell and destroys or fails to recover useful answers at depths 2/3.
 - No hidden-reasoning or J-space claim is supported.
+
+## Phase 1 Branch Taxonomy and Reporting Semantics (2026-07-10)
+
+Phase 1 answer-control conditions are now divided into three non-interchangeable branches:
+
+| Branch | Canonical key | Conditions |
+|---|---|---|
+| Raw strict no-CoT feasibility | `raw_strict` | `strict_answer_only`, `strict_answer_only_prefill_answer` |
+| Stop-controlled generation intervention | `stopped_intervention` | `strict_answer_only_stopped` |
+| Postprocessed answer-recovery utility | `postprocessed_utility` | `strict_answer_only_postprocessed` |
+
+Report/schema updates:
+
+- Records include stable branch metadata.
+- Raw, stopped, and postprocessed outputs, no-CoT validity, and correctness remain separate.
+- Metrics CSV includes branch labels and branch-specific accuracy columns.
+- Summaries include a branch-level table and use `NA` for non-applicable metrics.
+- The legacy `accuracy` field follows `eval_output_used` and must not be used for cross-branch comparisons.
+
+Interpretation boundaries:
+
+- Stopped validity is generation-time intervention output, not spontaneous no-CoT.
+- Postprocessed validity is extracted-surface validity, not raw no-CoT.
+- No Phase 1 branch by itself is hidden-reasoning or J-space evidence.
+
+Local validation:
+
+```text
+python -m pytest tests\ -q
+80 passed, 2 warnings
+```
+
+Azure state:
+
+- Rerun performed for this update: no.
+- Active environment: `cae-jspace-observation-sea-vnet2`.
+- Inactive retained environment: `cae-jspace-observation-sea-vnet`.
+- Latest stop-control execution: `job-jspace-p1-stopcontrol-vnet-b55p4c6`.
+- Active persisted result prefix: `phase1-pilot-stopcontrol-vnet/20260710T072107Z`.
+- Private Blob network path: fixed and operational.
+
+Current blocker: none.
+
+Next action: review and approve branch-specific success criteria before authorizing any new run or scale increase.
 
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 
@@ -978,39 +1022,17 @@ J-space-observation/
 
 ## Next Immediate Actions
 
-1. **Verify tests pass**:
-   ```bash
-   make test
-   ```
-
-2. **Run Phase 0.5 locally**:
-   ```bash
-   make phase0-5
-   ```
-   This checks J-lens availability and plans the feasibility study.
-
-3. **Analyze Phase 0.5 output**:
-   - If pre-fitted lens found → can proceed to Phase 2
-   - If jacobian-lens available → can run tiny fitting
-   - Otherwise → prepare Plan B fallback
-
-4. **Run Phase 1** (if confident models load):
-   ```bash
-   make phase1-dry  # Test with small item count
-   make phase1      # Full behavioral gradient
-   ```
-
-5. **Submit to Azure** (if large-scale needed):
-   ```bash
-   make azure-setup
-   make azure-phase0-5
-   make azure-phase1
-   ```
+1. Review `docs/phase1_experiment_branches.md`.
+2. Approve branch-specific success criteria for no-CoT validity, parse quality, and answer accuracy.
+3. Keep model inference and Azure scaling paused until that review is complete.
+4. On the next approved pilot, use the branch-aware records and summary without merging raw, stopped, or postprocessed metrics.
 
 ## Success Criteria
 
 ✓ **Implemented**: Executable scaffold for Phase 0.5 and Phase 1
 ✓ **Tests passing**: All unit tests pass without model downloads
-✓ **Documented**: All code, configurations, and infrastructure documented
-✓ **Reproducible**: Can run locally or on Azure with single commands
-⏳ **Pending**: Actual phase execution and data collection
+✓ **Infrastructure**: ACR managed identity and private Blob persistence are operational
+✓ **Pilot**: Small stop-controlled Phase 1 run persisted successfully
+✓ **Reporting**: Raw strict, stopped intervention, and postprocessed utility are separate
+⏳ **Pending**: Approval of branch-specific success criteria before further runs
+⏳ **Pending**: Actual J-lens fitting and validation

@@ -635,6 +635,27 @@ Interpretation:
 - Keep raw, stopped, and postprocessed branches separate.
 - Do not broaden Phase 1 yet.
 
+## Phase 1 branch reporting policy
+
+Every future Phase 1 run must use the taxonomy in `docs/phase1_experiment_branches.md`:
+
+| Branch | Key | Conditions | Meaning |
+|---|---|---|---|
+| Raw strict no-CoT feasibility | `raw_strict` | `strict_answer_only`, `strict_answer_only_prefill_answer` | Evaluate unmodified raw output without stop intervention or extraction. |
+| Stop-controlled generation intervention | `stopped_intervention` | `strict_answer_only_stopped` | Test generation-time suppression of visible reasoning. |
+| Postprocessed answer-recovery utility | `postprocessed_utility` | `strict_answer_only_postprocessed` | Test deterministic answer-span recovery, not no-CoT generation. |
+
+Operational reporting rules:
+
+1. Preserve raw, stopped, and postprocessed outputs and validity fields separately.
+2. Report `accuracy_raw`, `accuracy_stopped`, and `accuracy_postprocessed` separately.
+3. Use `NA` for metrics that do not apply to a branch.
+4. If stop triggering occurs, describe the output as intervention-controlled.
+5. Postprocessed validity never replaces raw validity.
+6. Do not use any Phase 1 branch as hidden-reasoning or J-space evidence.
+
+No Azure rerun or ACR build was performed for this reporting-only update. The active environment remains `cae-jspace-observation-sea-vnet2`, the current blocker is none, and scaling remains paused pending approval of branch-specific success criteria.
+
 ## Persistent results storage status
 
 Azure Files was attempted as the first persistence path and is currently blocked by organization/subscription policy.

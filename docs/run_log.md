@@ -177,6 +177,50 @@ Scientific boundary:
 - No J-space claim is made.
 - Do not expand Phase 1 yet.
 
+## 2026-07-10 — Phase 1 branch taxonomy and report semantics
+
+Scope:
+
+- Documentation, metrics schema, summary generation, and local unit tests only.
+- Baseline repository commit verified: `0aa536b3b239eb163740e1188e0a2adaaebc011b`.
+- No model inference, Azure job, ACR build, J-lens fitting, activation patching, or experiment scaling was performed.
+
+Implementation:
+
+- Added `src/jspace_observation/phase1_branches.py`.
+- Added `docs/phase1_experiment_branches.md`.
+- Mapped raw strict, stopped intervention, and postprocessed utility conditions to stable branch labels.
+- Added branch metadata and explicit raw/stopped/postprocessed correctness aliases to Phase 1 records.
+- Added branch columns to the metrics CSV.
+- Added a branch-level metrics table with `NA` for non-applicable metrics.
+- Added mandatory summary warnings that stopped validity is not spontaneous no-CoT, postprocessed validity is not raw no-CoT, and Phase 1 is not J-space evidence.
+
+Local commands:
+
+```text
+python -m py_compile src\jspace_observation\phase1_branches.py src\jspace_observation\__init__.py experiments\phase1_depth_gradient.py
+python -m pytest tests\ -q
+```
+
+Result:
+
+```text
+80 passed, 2 warnings
+```
+
+Azure:
+
+- Rerun performed: no.
+- Active environment remains `cae-jspace-observation-sea-vnet2`.
+- Latest successful stop-control execution remains `job-jspace-p1-stopcontrol-vnet-b55p4c6`.
+- Latest stop-control Blob prefix remains `phase1-pilot-stopcontrol-vnet/20260710T072107Z`.
+
+Decision:
+
+- Current blocker: none.
+- Keep scaling paused.
+- Review and approve branch-specific success criteria before any new model run.
+
 ## 2026-07-08 — Local environment validation for Phase 0.5
 
 Active Python environment:
