@@ -230,16 +230,56 @@ def main():
     print(f"Depths: {depths}")
     print(f"Conditions: {conditions}")
     print()
-    
+
+    prompt_sets = generate_all_pilot_prompt_sets()
+
     if args.dry_run:
-        total_cells = len(models) * len(task_families) * len(depths) * len(conditions)
-        print(f"[DRY RUN] Total cells: {total_cells}")
+        configuration_cells = 0
+        total_observations = 0
+        shortfalls = []
+        for task_family in task_families:
+            family_items = prompt_sets.get(task_family, [])
+            for depth in depths:
+                available = sum(1 for item in family_items if item.depth == depth)
+                selected = (
+                    min(available, args.items_per_cell)
+                    if args.items_per_cell is not None
+                    else available
+                )
+                if available > 0:
+                    configuration_cells += len(models) * len(conditions)
+                    total_observations += (
+                        len(models) * len(conditions) * selected
+                    )
+                if (
+                    args.items_per_cell is not None
+                    and available < args.items_per_cell
+                ):
+                    shortfalls.append(
+                        f"{task_family}/depth={depth}: "
+                        f"requested={args.items_per_cell}, available={available}"
+                    )
+
+        print(f"[DRY RUN] Models: {len(models)}")
+        print(f"[DRY RUN] Task families: {len(task_families)}")
+        print(f"[DRY RUN] Depths: {len(depths)}")
+        print(f"[DRY RUN] Conditions: {len(conditions)}")
+        print(f"[DRY RUN] Configuration cells: {configuration_cells}")
+        print(
+            "[DRY RUN] Items per cell: "
+            f"{args.items_per_cell if args.items_per_cell is not None else 'all'}"
+        )
+        print(f"[DRY RUN] Total observations: {total_observations}")
+        if shortfalls:
+            print("[DRY RUN] Insufficient prompt capacity:")
+            for shortfall in shortfalls:
+                print(f"  - {shortfall}")
+            raise SystemExit(2)
         print("[DRY RUN] Not running actual experiments")
         return
     
     # Load prompt sets
     print("Loading prompt sets...")
-    prompt_sets = generate_all_pilot_prompt_sets()
     print(f"Loaded {len(prompt_sets)} task families")
     for family, items in prompt_sets.items():
         print(f"  {family}: {len(items)} items")

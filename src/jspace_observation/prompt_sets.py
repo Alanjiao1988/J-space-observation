@@ -116,6 +116,16 @@ class ArithmeticPromptSet:
                 parse_type="numeric",
                 floor_accuracy=0.70,
             ),
+            PromptItem(
+                id="arith_3op_003",
+                task_family="arithmetic",
+                depth=3,
+                prompt_base="What is ((9 - 3) * 4) + 2?",
+                expected_answer="26",
+                expected_intermediates=["6", "24", "26"],
+                parse_type="numeric",
+                floor_accuracy=0.70,
+            ),
         ])
         
         return items
