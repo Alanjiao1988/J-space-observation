@@ -13,6 +13,8 @@ from jspace_observation import (
     construct_visible_cot_prompt,
     construct_r1_style_thinking_prompt,
     get_generation_config_for_condition,
+    STRICT_ANSWER_ONLY_STOP_STRINGS,
+    apply_stop_control_cleanup,
     validate_no_cot_output,
     extract_answer_from_output,
     create_generation_record,
@@ -89,12 +91,60 @@ def test_visible_generation_config_is_not_tightened():
     assert cfg.temperature == 1.0
     assert not cfg.do_sample
     assert cfg.decoding_profile == "default_greedy"
+    assert not cfg.stop_control_enabled
 
 
 def test_r1_generation_config_is_not_tightened():
     cfg = get_generation_config_for_condition("r1_style_thinking", 64)
     assert cfg.max_new_tokens == 64
     assert cfg.decoding_profile == "default_greedy"
+    assert not cfg.stop_control_enabled
+
+
+def test_stopped_generation_config_enables_stop_controls():
+    cfg = get_generation_config_for_condition("strict_answer_only_stopped", 64)
+    assert cfg.max_new_tokens == 32
+    assert cfg.temperature == 0.0
+    assert not cfg.do_sample
+    assert cfg.stop_control_enabled
+    assert cfg.stop_mode == "truncate_at_stop_string"
+    assert "stopped" in cfg.decoding_profile
+
+
+def test_strict_stop_strings_cover_known_reasoning_markers():
+    assert "Wait," in STRICT_ANSWER_ONLY_STOP_STRINGS
+    assert "Step-by-step" in STRICT_ANSWER_ONLY_STOP_STRINGS
+    assert "Explanation" in STRICT_ANSWER_ONLY_STOP_STRINGS
+    assert "\n\n" in STRICT_ANSWER_ONLY_STOP_STRINGS
+
+
+def test_stop_cleanup_preserves_raw_output_and_truncates_stopped_output():
+    raw = "\\boxed{12}\n\nWait, I should check"
+    result = apply_stop_control_cleanup(raw)
+    assert result.raw_output_before_stop_cleanup == raw
+    assert result.raw_output == raw
+    assert result.stopped_output == "\\boxed{12}"
+    assert result.stop_triggered
+    assert result.stop_string == "\n\n"
+    assert result.stop_reason == "stop_string_matched"
+
+
+def test_stop_cleanup_no_trigger_keeps_stopped_output_equal_to_raw_strip():
+    raw = "42"
+    result = apply_stop_control_cleanup(raw)
+    assert result.raw_output_before_stop_cleanup == raw
+    assert result.raw_output == raw
+    assert result.stopped_output == raw
+    assert not result.stop_triggered
+
+
+def test_raw_and_stopped_validity_are_separate():
+    raw = "12\n\nWait, I should check"
+    stopped = apply_stop_control_cleanup(raw).stopped_output
+    raw_validation = validate_no_cot_output(raw, method="answer_prefill")
+    stopped_validation = validate_no_cot_output(stopped, method="answer_prefill")
+    assert not raw_validation.is_valid
+    assert stopped_validation.is_valid
 
 
 def test_validate_no_cot_empty_think_valid():

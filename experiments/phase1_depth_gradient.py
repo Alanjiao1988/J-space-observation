@@ -48,6 +48,9 @@ from jspace_observation import (
     construct_visible_cot_prompt,
     construct_r1_style_thinking_prompt,
     get_generation_config_for_condition,
+    StopStringCriteria,
+    apply_stop_control_cleanup,
+    validate_no_cot_output,
     parse_answer,
     evaluate_answer,
     create_generation_record,
@@ -69,8 +72,10 @@ def run_generation(
     temperature: float = 1.0,
     top_p: float = 1.0,
     do_sample: bool = False,
-    device = None
-) -> Tuple[str, float]:
+    device = None,
+    stop_control_enabled: bool = False,
+    stop_strings: Tuple[str, ...] = (),
+) -> Tuple[str, float, Dict[str, Any]]:
     """
     Generate response and measure latency.
     
@@ -78,20 +83,37 @@ def run_generation(
         Tuple of (output_text, generation_time_seconds)
     """
     import torch
+    from transformers import StoppingCriteriaList
     
     # Tokenize
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
     
     start_time = time.time()
     
+    stopping_criteria = None
+    stop_criterion = None
+    if stop_control_enabled and stop_strings:
+        stop_criterion = StopStringCriteria(
+            tokenizer=tokenizer,
+            prompt_length=inputs["input_ids"].shape[-1],
+            stop_strings=stop_strings,
+        )
+        stopping_criteria = StoppingCriteriaList([stop_criterion])
+
+    generate_kwargs = {
+        "max_new_tokens": max_new_tokens,
+        "temperature": temperature,
+        "top_p": top_p,
+        "do_sample": do_sample,
+        "pad_token_id": tokenizer.pad_token_id,
+    }
+    if stopping_criteria is not None:
+        generate_kwargs["stopping_criteria"] = stopping_criteria
+
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
-            max_new_tokens=max_new_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            do_sample=do_sample,
-            pad_token_id=tokenizer.pad_token_id,
+            **generate_kwargs,
         )
     
     gen_time = time.time() - start_time
@@ -104,7 +126,11 @@ def run_generation(
     if output_text.startswith(input_text):
         output_text = output_text[len(input_text):]
     
-    return output_text.strip(), gen_time
+    stop_metadata = {
+        "stop_triggered_by_criteria": bool(stop_criterion.triggered) if stop_criterion else False,
+        "stop_string_by_criteria": stop_criterion.triggered_stop_string if stop_criterion else None,
+    }
+    return output_text, gen_time, stop_metadata
 
 
 def main():
@@ -222,9 +248,11 @@ def main():
         "accuracy", "parse_valid_rate", "parse_ambiguous_rate",
         "no_cot_valid_rate", "visible_reasoning_marker_rate",
         "answer_format_warning_rate", "raw_no_cot_valid_rate",
-        "postprocessed_no_cot_valid_rate", "postprocessing_applied_rate",
-        "postprocessing_success_rate", "postprocessing_warning_rate",
-        "accuracy_raw", "accuracy_postprocessed", "eval_output_used",
+        "stopped_no_cot_valid_rate", "postprocessed_no_cot_valid_rate",
+        "stop_triggered_rate", "stop_success_rate", "stop_warning_rate",
+        "postprocessing_applied_rate", "postprocessing_success_rate",
+        "postprocessing_warning_rate", "accuracy_raw", "accuracy_stopped",
+        "accuracy_postprocessed", "eval_output_used",
         "avg_latency_s",
     ]]
     
@@ -277,10 +305,16 @@ def main():
                     raw_no_cot_applicable_count = 0
                     postprocessed_no_cot_valid_count = 0
                     postprocessed_applicable_count = 0
+                    stopped_no_cot_valid_count = 0
+                    stopped_applicable_count = 0
+                    stop_triggered_count = 0
+                    stop_success_count = 0
+                    stop_warning_count = 0
                     postprocessing_applied_count = 0
                     postprocessing_success_count = 0
                     postprocessing_warning_count = 0
                     raw_correct_count = 0
+                    stopped_correct_count = 0
                     postprocessed_correct_count = 0
                     latencies = []
                     
@@ -296,7 +330,7 @@ def main():
                         elif condition == "strict_answer_only_prefill_answer":
                             full_prompt = construct_prefill_answer_prompt(item.prompt_base)
                             no_cot_method = "answer_prefill"
-                        elif condition == "strict_answer_only_postprocessed":
+                        elif condition in {"strict_answer_only_postprocessed", "strict_answer_only_stopped"}:
                             full_prompt = construct_prefill_answer_prompt(item.prompt_base)
                             no_cot_method = "answer_prefill"
                         elif condition == "visible_cot":
@@ -313,19 +347,25 @@ def main():
                         
                         # Generate
                         try:
-                            output, gen_time = run_generation(
+                            output, gen_time, stop_metadata = run_generation(
                                 model, tokenizer, full_prompt, model_name,
                                 max_new_tokens=generation_config.max_new_tokens,
                                 temperature=generation_config.temperature,
                                 top_p=generation_config.top_p,
                                 do_sample=generation_config.do_sample,
-                                device=device
+                                device=device,
+                                stop_control_enabled=generation_config.stop_control_enabled,
+                                stop_strings=generation_config.stop_strings,
                             )
                             latencies.append(gen_time)
                         except Exception as e:
                             print(f"  [FAIL] Generation failed: {str(e)}")
                             output = ""
                             gen_time = 0
+                            stop_metadata = {
+                               "stop_triggered_by_criteria": False,
+                               "stop_string_by_criteria": None,
+                            }
                         
                         # Create generation record for raw output.
                         gen_record = create_generation_record(
@@ -344,6 +384,9 @@ def main():
                             condition_do_sample=generation_config.do_sample,
                             condition_top_p=generation_config.top_p,
                             decoding_profile=generation_config.decoding_profile,
+                            stop_control_enabled=generation_config.stop_control_enabled,
+                            stop_strings=list(generation_config.stop_strings),
+                            stop_mode=generation_config.stop_mode,
                         )
                         raw_eval_record = create_eval_record(
                             output=output,
@@ -357,6 +400,18 @@ def main():
                         )
                         eval_output = output
                         eval_output_used = "raw"
+                        stop_record = {
+                            "stop_control_enabled": generation_config.stop_control_enabled,
+                            "stop_triggered": False,
+                            "stop_reason": None,
+                            "stop_string": None,
+                            "stop_mode": generation_config.stop_mode,
+                            "stop_warning": None,
+                            "raw_output_before_stop_cleanup": output,
+                            "raw_output": output,
+                            "stopped_output": None,
+                            "stopped_no_cot_valid": None,
+                        }
                         postprocess_record = {
                             "raw_output_before_postprocess": output,
                             "postprocessed_output": None,
@@ -368,6 +423,33 @@ def main():
                             "postprocessed_no_cot_valid": None,
                             "postprocessed_answer_like": None,
                         }
+
+                        if condition == "strict_answer_only_stopped":
+                            stop_result = apply_stop_control_cleanup(
+                                raw_output=output,
+                                stop_strings=generation_config.stop_strings,
+                                stop_control_enabled=True,
+                                stop_mode=generation_config.stop_mode,
+                                triggered_stop_string=stop_metadata["stop_string_by_criteria"],
+                            )
+                            stopped_validation = validate_no_cot_output(
+                                stop_result.stopped_output,
+                                method=no_cot_method,
+                            )
+                            eval_output = stop_result.stopped_output
+                            eval_output_used = "stopped"
+                            stop_record = {
+                                "stop_control_enabled": stop_result.stop_control_enabled,
+                                "stop_triggered": stop_result.stop_triggered,
+                                "stop_reason": stop_result.stop_reason,
+                                "stop_string": stop_result.stop_string,
+                                "stop_mode": stop_result.stop_mode,
+                                "stop_warning": stop_result.stop_warning,
+                                "raw_output_before_stop_cleanup": stop_result.raw_output_before_stop_cleanup,
+                                "raw_output": stop_result.raw_output,
+                                "stopped_output": stop_result.stopped_output,
+                                "stopped_no_cot_valid": stopped_validation.is_valid,
+                            }
 
                         if condition == "strict_answer_only_postprocessed":
                             pp = postprocess_answer_only(output, task_type=item.parse_type)
@@ -398,6 +480,7 @@ def main():
                             raw_parsed_answer=raw_eval_record["parsed_answer"],
                             raw_parse_valid=raw_eval_record["parse_valid"],
                             eval_output_used=eval_output_used,
+                            **stop_record,
                             **postprocess_record,
                         )
                         eval_records.append(eval_record)
@@ -414,6 +497,7 @@ def main():
                             "raw_correct": raw_eval_record["correctness"],
                             "raw_parsed_answer": raw_eval_record["parsed_answer"],
                             "eval_output_used": eval_output_used,
+                            **stop_record,
                             **postprocess_record,
                         })
                         generation_records.append(gen_record)
@@ -426,6 +510,8 @@ def main():
                             correct_count += 1
                         if raw_eval_record["correctness"]:
                             raw_correct_count += 1
+                        if eval_output_used == "stopped" and eval_record["correctness"]:
+                            stopped_correct_count += 1
                         if eval_output_used == "postprocessed" and eval_record["correctness"]:
                             postprocessed_correct_count += 1
                         if eval_record["parse_ambiguous"]:
@@ -442,6 +528,16 @@ def main():
                             raw_no_cot_applicable_count += 1
                         if postprocess_record["raw_no_cot_valid"] is True:
                             raw_no_cot_valid_count += 1
+                        if eval_output_used == "stopped":
+                            stopped_applicable_count += 1
+                            if stop_record["stopped_no_cot_valid"] is True:
+                                stopped_no_cot_valid_count += 1
+                            if stop_record["stop_triggered"]:
+                                stop_triggered_count += 1
+                            if stop_record["stopped_no_cot_valid"] is True and eval_record["parse_valid"]:
+                                stop_success_count += 1
+                            if stop_record["stop_warning"]:
+                                stop_warning_count += 1
                         if eval_output_used == "postprocessed":
                             postprocessed_applicable_count += 1
                             if postprocess_record["postprocessed_no_cot_valid"] is True:
@@ -475,6 +571,26 @@ def main():
                         if postprocessed_applicable_count > 0
                         else None
                     )
+                    stopped_no_cot_valid_rate = (
+                        stopped_no_cot_valid_count / stopped_applicable_count
+                        if stopped_applicable_count > 0
+                        else None
+                    )
+                    stop_triggered_rate = (
+                        stop_triggered_count / stopped_applicable_count
+                        if stopped_applicable_count > 0
+                        else None
+                    )
+                    stop_success_rate = (
+                        stop_success_count / stopped_applicable_count
+                        if stopped_applicable_count > 0
+                        else None
+                    )
+                    stop_warning_rate = (
+                        stop_warning_count / stopped_applicable_count
+                        if stopped_applicable_count > 0
+                        else None
+                    )
                     postprocessing_applied_rate = (
                         postprocessing_applied_count / postprocessed_applicable_count
                         if postprocessed_applicable_count > 0
@@ -491,6 +607,11 @@ def main():
                         else None
                     )
                     accuracy_raw = raw_correct_count / n_items if n_items > 0 else 0
+                    accuracy_stopped = (
+                        stopped_correct_count / stopped_applicable_count
+                        if stopped_applicable_count > 0
+                        else None
+                    )
                     accuracy_postprocessed = (
                         postprocessed_correct_count / postprocessed_applicable_count
                         if postprocessed_applicable_count > 0
@@ -522,13 +643,18 @@ def main():
                         f"{visible_reasoning_marker_rate:.4f}",
                         f"{answer_format_warning_rate:.4f}",
                         "NA" if raw_no_cot_valid_rate is None else f"{raw_no_cot_valid_rate:.4f}",
+                        "NA" if stopped_no_cot_valid_rate is None else f"{stopped_no_cot_valid_rate:.4f}",
                         "NA" if postprocessed_no_cot_valid_rate is None else f"{postprocessed_no_cot_valid_rate:.4f}",
+                        "NA" if stop_triggered_rate is None else f"{stop_triggered_rate:.4f}",
+                        "NA" if stop_success_rate is None else f"{stop_success_rate:.4f}",
+                        "NA" if stop_warning_rate is None else f"{stop_warning_rate:.4f}",
                         "NA" if postprocessing_applied_rate is None else f"{postprocessing_applied_rate:.4f}",
                         "NA" if postprocessing_success_rate is None else f"{postprocessing_success_rate:.4f}",
                         "NA" if postprocessing_warning_rate is None else f"{postprocessing_warning_rate:.4f}",
                         f"{accuracy_raw:.4f}",
+                        "NA" if accuracy_stopped is None else f"{accuracy_stopped:.4f}",
                         "NA" if accuracy_postprocessed is None else f"{accuracy_postprocessed:.4f}",
-                        "postprocessed" if postprocessed_applicable_count > 0 else "raw",
+                        "postprocessed" if postprocessed_applicable_count > 0 else ("stopped" if stopped_applicable_count > 0 else "raw"),
                         f"{avg_latency:.4f}",
                     ])
         
@@ -585,6 +711,7 @@ def main():
         "- Correct answers from no-CoT-invalid outputs must not be interpreted as hidden reasoning evidence.",
         "- Ambiguous numeric parsing is flagged via parse_ambiguous and answer_format_warning.",
         "- Postprocessed answer-only validity does not imply raw no-CoT compliance.",
+        "- Stop-controlled answer-only validity does not imply spontaneous raw no-CoT compliance.",
     ]
     strict_records = [
         r for r in generation_records

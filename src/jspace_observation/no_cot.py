@@ -1,7 +1,7 @@
 """No-CoT prompt construction and validation utilities."""
 
 import re
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any, Optional, Tuple, Sequence
 from dataclasses import dataclass
 
 
@@ -33,6 +33,127 @@ class ConditionGenerationConfig:
     top_p: float
     do_sample: bool
     decoding_profile: str
+    stop_control_enabled: bool = False
+    stop_strings: Tuple[str, ...] = ()
+    stop_mode: str = "none"
+
+
+@dataclass
+class StopControlResult:
+    """Result of preserving raw output and optionally truncating at a stop string."""
+
+    raw_output_before_stop_cleanup: str
+    raw_output: str
+    stopped_output: str
+    stop_control_enabled: bool
+    stop_triggered: bool
+    stop_reason: Optional[str]
+    stop_string: Optional[str]
+    stop_mode: str
+    stop_warning: Optional[str] = None
+
+
+STRICT_ANSWER_ONLY_STOP_STRINGS: Tuple[str, ...] = (
+    "\n\n",
+    "\nStep",
+    "\nstep",
+    "Step-by-step",
+    "step-by-step",
+    "Explanation",
+    "explanation",
+    "First,",
+    "first,",
+    "Then,",
+    "then,",
+    "Wait,",
+    "wait,",
+    "Alright,",
+    "alright,",
+    "Let's",
+    "let's",
+    "I need",
+    "We need",
+    "<think>",
+    "</think>",
+)
+
+
+class StopStringCriteria:
+    """Transformers-compatible stopping criterion for generated-text stop strings."""
+
+    def __init__(self, tokenizer, prompt_length: int, stop_strings: Sequence[str]):
+        self.tokenizer = tokenizer
+        self.prompt_length = prompt_length
+        self.stop_strings = tuple(s for s in stop_strings if s)
+        self.triggered = False
+        self.triggered_stop_string: Optional[str] = None
+
+    def __call__(self, input_ids, scores, **kwargs) -> bool:
+        generated_ids = input_ids[0][self.prompt_length:]
+        if generated_ids.numel() == 0:
+            return False
+        generated_text = self.tokenizer.decode(generated_ids, skip_special_tokens=False)
+        for stop_string in self.stop_strings:
+            if stop_string in generated_text:
+                self.triggered = True
+                self.triggered_stop_string = stop_string
+                return True
+        return False
+
+
+def apply_stop_control_cleanup(
+    raw_output: str,
+    stop_strings: Sequence[str] = STRICT_ANSWER_ONLY_STOP_STRINGS,
+    stop_control_enabled: bool = True,
+    stop_mode: str = "truncate_at_stop_string",
+    triggered_stop_string: Optional[str] = None,
+) -> StopControlResult:
+    """Preserve raw output and derive stopped output by truncating at stop boundary."""
+    if not stop_control_enabled:
+        return StopControlResult(
+            raw_output_before_stop_cleanup=raw_output,
+            raw_output=raw_output,
+            stopped_output=raw_output,
+            stop_control_enabled=False,
+            stop_triggered=False,
+            stop_reason=None,
+            stop_string=None,
+            stop_mode="none",
+        )
+
+    earliest_index = None
+    earliest_stop = None
+    for stop_string in stop_strings:
+        if not stop_string:
+            continue
+        index = raw_output.find(stop_string)
+        if index != -1 and (earliest_index is None or index < earliest_index):
+            earliest_index = index
+            earliest_stop = stop_string
+
+    stop_string = triggered_stop_string or earliest_stop
+    stop_triggered = earliest_index is not None or triggered_stop_string is not None
+    stopped_output = raw_output
+    if earliest_index is not None:
+        stopped_output = raw_output[:earliest_index].strip()
+    else:
+        stopped_output = raw_output.strip()
+
+    warning = None
+    if stop_triggered and not stopped_output:
+        warning = "empty_after_stop_cleanup"
+
+    return StopControlResult(
+        raw_output_before_stop_cleanup=raw_output,
+        raw_output=raw_output,
+        stopped_output=stopped_output,
+        stop_control_enabled=True,
+        stop_triggered=stop_triggered,
+        stop_reason="stop_string_matched" if stop_triggered else None,
+        stop_string=stop_string,
+        stop_mode=stop_mode,
+        stop_warning=warning,
+    )
 
 
 def construct_empty_think_prefill_prompt(base_prompt: str) -> str:
@@ -117,6 +238,17 @@ def get_generation_config_for_condition(
             top_p=1.0,
             do_sample=False,
             decoding_profile="strict_postprocessed_answer_only_max32",
+        )
+    if condition == "strict_answer_only_stopped":
+        return ConditionGenerationConfig(
+            max_new_tokens=min(default_max_new_tokens, 32),
+            temperature=0.0,
+            top_p=1.0,
+            do_sample=False,
+            decoding_profile="strict_stopped_answer_only_max32",
+            stop_control_enabled=True,
+            stop_strings=STRICT_ANSWER_ONLY_STOP_STRINGS,
+            stop_mode="truncate_at_stop_string",
         )
     return ConditionGenerationConfig(
         max_new_tokens=default_max_new_tokens,
