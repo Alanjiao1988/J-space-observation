@@ -2,8 +2,8 @@
 
 Date: 2026-07-10
 Repository: `Alanjiao1988/J-space-observation`
-Latest pushed baseline before gate hardening: `20f17dd2df16171b4b5fda081b8d8c93014468fd`
-Current image commit: `f94e889ef608`
+Latest experiment source commit: `359643b7b5eb8f95c13cca2e60fa753df8701282`
+Current image commit: `359643b7b5eb`
 
 > Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
 >
@@ -34,6 +34,8 @@ Current image commit: `f94e889ef608`
 > Update (2026-07-10 — criteria validation): Alan approved exactly one fixed 15-cell validation run. ACR build `cma` produced image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608`, digest `sha256:f27cc0e4cea0ae9569dbb384598fb391f3b923022ce9257f8301684c9dc23806`. The valid shortened job name is `job-jspace-p1-criteria-val`; its only execution, `job-jspace-p1-criteria-val-6s8p15p`, succeeded in `cae-jspace-observation-sea-vnet2` and uploaded four files under `phase1-pilot-criteria-validation/20260710T135655Z`. The summary contained 15 records, all three branch classifications, passed/failed criteria, stop-string distribution, and mandatory interpretation warnings. Depth-wise raw classifications were `surface_answer_only_but_task_failed / raw_strict_not_established / raw_strict_not_established`; stopped classifications were `usable / not_useful / surface_compliant_but_task_failed`; postprocessed classifications were `usable / surface_clean_but_warning_high / usable`. The depth 3 postprocessed usable label reflects `0 >= 0` non-degradation and must not be read as task success. No local inference, scale expansion, hidden-reasoning claim, or J-space claim occurred.
 >
 > Update (2026-07-10 — gate hardening): Phase 1 formal success now requires `n >= 3`, an absolute branch accuracy floor of `0.50`, and valid visible-CoT baseline guards before raw/stopped relative gates apply. Postprocessed utility requires both non-degradation and `accuracy_postprocessed >= 0.50`; the depth-3 `0 >= 0` regression now produces `postprocessed_surface_clean_but_task_failed`. A matching visible-CoT baseline is valid only at `n >= 3`, parse-valid rate `>= 0.80`, and accuracy `> 0`; otherwise the relative gate is `NA`. Otherwise-passing single-sample rows use branch-specific `pilot_only` labels, while clear failures retain failure labels. Local tests pass (`109 passed, 2 warnings`). No Azure job, model inference, model download, ACR rebuild, or scale increase occurred. The prior Blob summary remains unchanged as a historical artifact.
+>
+> Update (2026-07-10 — bounded n=3 validation): Parallel pre-run audits found arithmetic prompt capacity `3/3/2`; Alan explicitly approved one unique third depth-3 item. Commit `359643b7b5eb` added it plus capacity-aware dry-run validation. Local tests pass (`111 passed, 2 warnings`), and dry-run confirmed 15 configurations x 3 items = 45 observations. ACR build `cmb` produced digest `sha256:004ec8bff66fbc8a23b122660aeb58914b2ee3cedfc5246429046eef252c9069`. The sole execution `job-jspace-p1-n3-gates-02ilmgm` succeeded in `cae-jspace-observation-sea-vnet2` and uploaded four artifacts under `phase1-limited-n3-gates/20260710T152820Z`. Raw strict was not established at any depth; stopped intervention was usable only at depth 1; postprocessed answer recovery was usable only at depth 1. Depth-3 visible-CoT accuracy was zero, so relative gates were `NA`; depth-3 postprocessing remained task-failed despite `0 >= 0`. Post-run classification audit found zero mismatches. Counts passed, but record-level duplicate/item-membership checks remain inconclusive because local access to private Blob is blocked. Results are behavioral/operational only; `n=3` is not stability evidence.
 >
 > Update (2026-07-08 22:51 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but Copilot's fresh tool processes could not see them in Process/User/Machine environment scopes. No package-read preflight or Azure job retry was attempted. To continue, set the variables in Windows User environment (or another secure path readable by the agent), e.g. `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`. Do not paste tokens into chat.
 
@@ -426,7 +428,7 @@ GHCR private pull remains historical; do not return to GHCR unless Alan explicit
 
 The new thread should continue from here:
 
-### Step 1: Obtain separate approval for a minimum-evidence validation
+### Step 1: Complete a record-level artifact audit
 
 The Azure ACR managed-identity chain has already succeeded:
 
@@ -437,12 +439,12 @@ phase 1 dry-run execution: job-jspace-phase1-dryrun-acr-v0j1bkd
 small phase 1 pilot execution: job-jspace-phase1-pilot-acr-lhuvwbf
 ```
 
-Before any new run:
+Before any new model run:
 
-1. Preserve the completed Blob summary as a historical artifact under the earlier criteria.
-2. Use the hardened criteria in `docs/phase1_experiment_branches.md`.
-3. Obtain explicit approval for any run with at least three observations per branch/depth; no such run is currently authorized.
-4. Rebuild ACR from the then-current approved commit only after run approval.
+1. Audit all 45 generation/eval records from within the existing private data path or another explicitly approved read-only method.
+2. Check duplicate task/condition/depth combinations, exact item membership, and raw/stopped/postprocessed field consistency.
+3. Review the 18 ambiguous parses without changing validators or thresholds post hoc.
+4. Do not run a higher-n replication without separate approval.
 5. Keep all branches separate and make no hidden-reasoning or J-space claim.
 
 ---
@@ -465,22 +467,23 @@ Please read docs/thread_handoff.md first, then use the repo documents as source 
 - reports/current_status.md
 
 Current known state:
-- Active ACR image is `acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608`.
+- Active ACR image is `acrjspaceobssea0708231738.azurecr.io/j-space-observation:359643b7b5eb`.
 - Azure-first execution policy remains in force; the local PC is orchestration-only.
 - Private Blob persistence is working through `cae-jspace-observation-sea-vnet2`.
-- Criteria validation succeeded as `job-jspace-p1-criteria-val-6s8p15p`.
-- Results are under `phase1-pilot-criteria-validation/20260710T135655Z`.
+- Bounded n=3 validation succeeded as `job-jspace-p1-n3-gates-02ilmgm`.
+- Results are under `phase1-limited-n3-gates/20260710T152820Z`.
 - Phase 1 has three non-interchangeable branches: raw strict, stopped intervention, and postprocessed utility.
 - Branch success criteria now include absolute accuracy, visible-CoT baseline validity, and `n >= 3` guards.
-- Local tests pass: `109 passed, 2 warnings`.
-- The real summary generated classifications, passed/failed criteria, and interpretation warnings correctly.
-- The historical depth-3 `0 >= 0` label is fixed prospectively; the persisted Blob summary is not rewritten.
-- The current ACR image predates gate hardening and was not rebuilt.
-- There is no infrastructure blocker, but further runs are paused pending explicit approval.
+- Local tests pass: `111 passed, 2 warnings`.
+- The run produced 45 generation and 45 eval records plus 15 metric rows with `n=3`.
+- Raw strict failed at all depths; stopped and postprocessed utility passed only at depth 1.
+- Depth-3 visible-CoT baseline is invalid (`visible_cot_accuracy_zero`), so relative gates are `NA`.
+- Record-level duplicate/item-membership audit remains incomplete because private Blob is not reachable from the local machine.
+- No further model run is authorized.
 - No Phase 1 result is hidden-reasoning or J-space evidence.
 
 Your first task:
-Request explicit approval for a limited minimum-evidence validation only after confirming the proposed scope remains bounded.
+Complete a read-only record-level audit of the existing 45 generation/eval pairs without rerunning the model or opening Storage public access.
 ```
 
 ---

@@ -36,7 +36,7 @@ Current ACR resources:
 
 - ACR: `acrjspaceobssea0708231738`
 - Login server: `acrjspaceobssea0708231738.azurecr.io`
-- Current image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608`
+- Current image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:359643b7b5eb`
 - Managed identity: `id-jspace-aca-acrpull-sea`
 - AcrPull: assigned
 
@@ -64,7 +64,7 @@ Reason for switching:
 - Blob network smoke job: `job-jspace-blob-net-smoke-v2`
 - Phase 0.5 job: `job-jspace-phase05`
 - Phase 1 dry-run job: `job-jspace-phase1-dryrun`
-- Current small pilot job: `job-jspace-p1-criteria-val`
+- Current small pilot job: `job-jspace-p1-n3-gates`
 - GPU workload profile type: `Consumption-GPU-NC8as-T4`
 - GPU workload profile name: `gpu-t4`
 - Model cache in container: `/tmp/models/huggingface`
@@ -725,7 +725,43 @@ active image remains: acrjspaceobssea0708231738.azurecr.io/j-space-observation:f
 latest successful execution remains: job-jspace-p1-criteria-val-6s8p15p
 ```
 
-The current ACR image predates these rules. Rebuild only after a separately approved limited run.
+## Bounded n=3 validation status
+
+```text
+starting commit: d1750a9d51e102c644933d8c41b7d65432f8bdfa
+source commit: 359643b7b5eb8f95c13cca2e60fa753df8701282
+ACR build: cmb
+image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:359643b7b5eb
+digest: sha256:004ec8bff66fbc8a23b122660aeb58914b2ee3cedfc5246429046eef252c9069
+environment: cae-jspace-observation-sea-vnet2
+workload profile: gpu-t4 / Consumption-GPU-NC8as-T4
+job: job-jspace-p1-n3-gates
+execution: job-jspace-p1-n3-gates-02ilmgm
+status: Succeeded
+retry count: 0
+Blob prefix: phase1-limited-n3-gates/20260710T152820Z
+configuration cells: 15
+items per cell: 3
+total observations: 45
+```
+
+The pre-run audits found only two depth-3 arithmetic items. Alan explicitly approved adding one unique third item. Commit `359643b7b5eb` also makes dry-run count real prompt capacity and fail on shortfall.
+
+The helper `06_run_job_acr_mi.sh` automatically starts the job. It produced the sole execution above; do not issue a second `az containerapp job start`.
+
+Runtime evidence:
+
+- 45 generation records and 45 eval records.
+- 15 metric rows, every row `n=3`.
+- Four Blob artifacts uploaded through managed identity and the private endpoint.
+- Nine answer-control classification rows.
+- Raw strict failed at every depth.
+- Stopped intervention was usable only at depth 1.
+- Postprocessed answer recovery was usable only at depth 1.
+- Depth-3 visible-CoT accuracy was zero, so relative gates were `NA`.
+- Depth-3 `0 >= 0` postprocessed non-degradation did not pass the absolute accuracy floor.
+
+Local Entra Blob listing remains blocked by network rules, as expected. Do not enable public access or use keys/SAS. Record-level duplicate and item-membership checks therefore remain pending; no model rerun is authorized.
 
 ## Persistent results storage status
 

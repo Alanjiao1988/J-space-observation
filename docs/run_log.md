@@ -1663,3 +1663,147 @@ Execution boundary:
 - Active environment remains `cae-jspace-observation-sea-vnet2`.
 - Latest successful execution remains `job-jspace-p1-criteria-val-6s8p15p`.
 - No hidden-reasoning or J-space claim is made.
+
+## Azure ACR managed-identity job - 2026-07-10T15:28:44Z
+
+- Command: `bash infra/azure/scripts/06_run_job_acr_mi.sh`
+- Job: job-jspace-p1-n3-gates
+- Image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:359643b7b5eb
+- Registry: acrjspaceobssea0708231738.azurecr.io via user-assigned managed identity
+- Container command: `python experiments/phase1_depth_gradient.py --models deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --task-families arithmetic --depths 1,2,3 --conditions strict_answer_only_prefill_answer,strict_answer_only_stopped,strict_answer_only_postprocessed,visible_cot,r1_style_thinking --max-new-tokens 64 --items-per-cell 3 --require-blob-export && echo "=== PHASE1 SUMMARY ===" && find /workspace/results/runs -name phase1_summary.md -print -exec cat {} \; && echo "=== PHASE1 METRICS CSV ===" && find /workspace/results/runs -name phase1_metrics.csv -print -exec cat {} \;`
+
+## 2026-07-10 — bounded Phase 1 n=3 validation
+
+Authorization and scope:
+
+- Run type: bounded minimum-evidence validation.
+- Starting commit: `d1750a9d51e102c644933d8c41b7d65432f8bdfa`.
+- Model: `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`.
+- Task family: `arithmetic`.
+- Depths: `1,2,3`.
+- Conditions: `strict_answer_only_prefill_answer`, `strict_answer_only_stopped`, `strict_answer_only_postprocessed`, `visible_cot`, `r1_style_thinking`.
+- Configuration cells: `15`.
+- Items per cell: `3`.
+- Total observations: `45`.
+- No second model, task family, depth, condition, or item above the approved count was added.
+
+Parallel pre-run audits:
+
+- Requested model: `gpt-5.6 soil`; actual model: `gpt-5.6-sol`; reasoning: `max`.
+- Agents: `n3-method-audit`, `n3-code-audit`, `n3-azure-audit`.
+- All three initially returned `NO-RUN` because arithmetic prompt capacity was `3/3/2`.
+- Azure infrastructure itself passed; the helper was confirmed to create/update and automatically start the job.
+- Alan explicitly approved one unique third depth-3 arithmetic prompt. No threshold or branch semantics changed.
+
+Pre-run fix and local validation:
+
+- Added `arith_3op_003`: `((9 - 3) * 4) + 2 = 26`.
+- Made dry-run compute observations from real prompt capacity and fail on shortfall.
+- Source commit: `359643b7b5eb8f95c13cca2e60fa753df8701282`.
+
+```text
+python -m pytest tests\ -q
+111 passed, 2 warnings
+
+configuration_cells = 15
+items_per_cell = 3
+total_observations = 45
+```
+
+ACR provenance:
+
+- Build run: `cmb`.
+- Status: `Succeeded`.
+- Image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:359643b7b5eb`.
+- Digest: `sha256:004ec8bff66fbc8a23b122660aeb58914b2ee3cedfc5246429046eef252c9069`.
+- `latest` points to the same digest.
+
+Private infrastructure verification:
+
+- Environment: `cae-jspace-observation-sea-vnet2`; state `Succeeded`.
+- Workload profile: `gpu-t4 / Consumption-GPU-NC8as-T4`.
+- Managed identity: `id-jspace-aca-acrpull-sea`.
+- Roles: `AcrPull`, `Storage Blob Data Contributor`.
+- Storage public network access: `Disabled`.
+- Shared-key access: `False`.
+- Blob private endpoint: `pe-stjspacefiles-blob-sea`; state `Succeeded`, connection `Approved`.
+- Git Bash used `MSYS_NO_PATHCONV=1` and `MSYS2_ARG_CONV_EXCL=*`.
+
+Execution:
+
+- Job: `job-jspace-p1-n3-gates`.
+- All execution IDs: `job-jspace-p1-n3-gates-02ilmgm`.
+- Start: `2026-07-10T15:28:47Z`.
+- End: `2026-07-10T15:32:31Z`.
+- Status: `Succeeded`.
+- Full execution attempts: `1`.
+- Retry count: `0`.
+- Failed execution IDs: none.
+- Blob prefix: `phase1-limited-n3-gates/20260710T152820Z`.
+
+Persistence and counts:
+
+- `phase1_generations.jsonl`: `45` records.
+- `phase1_eval_records.jsonl`: `45` records; `18` parse-ambiguous.
+- `phase1_metrics.csv`: `15` data rows; every row has `n=3`; aggregate `sum(n)=45`.
+- `phase1_summary.md`: branch table and mandatory warnings present.
+- Blob upload: `4` files, complete.
+- Answer-control classification rows: `9`.
+- Stop-string distribution: `"\n\n"=3` at every stopped depth.
+
+Visible-CoT baseline:
+
+| Depth | n | Accuracy | Parse valid | Format warning | Baseline valid | Failure reason |
+|---|---:|---:|---:|---:|---|---|
+| 1 | 3 | 0.3333 | 1.0000 | 1.0000 | true | `NA` |
+| 2 | 3 | 0.6667 | 1.0000 | 1.0000 | true | `NA` |
+| 3 | 3 | 0.0000 | 1.0000 | 1.0000 | false | `visible_cot_accuracy_zero` |
+
+Raw strict:
+
+| Depth | Classification | Accuracy | Absolute | Relative | Criteria passed | Criteria failed | Criteria NA |
+|---|---|---:|---|---|---|---|---|
+| 1 | `raw_strict_not_established` | 0.6667 | pass | pass | n; parse valid; ambiguity; absolute; relative | raw validity; reasoning marker; format warning | none |
+| 2 | `raw_strict_not_established` | 0.3333 | fail | fail | n; ambiguity; format warning | raw validity; reasoning marker; parse valid; absolute; relative | none |
+| 3 | `raw_strict_not_established` | 0.0000 | fail | `NA` | n; ambiguity; format warning | raw validity; reasoning marker; parse valid; absolute | relative gate |
+
+Stopped intervention:
+
+| Depth | Classification | Validity | Stop success | Triggered | Accuracy | Absolute | Relative | Criteria passed | Criteria failed | Criteria NA |
+|---|---|---:|---:|---:|---:|---|---|---|---|---|
+| 1 | `stopped_intervention_usable` | 1.0000 | 1.0000 | 1.0000 | 1.0000 | pass | pass | all | none | none |
+| 2 | `stopped_intervention_not_useful` | 1.0000 | 0.3333 | 1.0000 | 0.3333 | fail | fail | n; validity | stop success; parse valid; absolute; relative | none |
+| 3 | `stopped_intervention_not_useful` | 1.0000 | 0.3333 | 1.0000 | 0.0000 | fail | `NA` | n; validity | stop success; parse valid; absolute | relative gate |
+
+Postprocessed utility:
+
+| Depth | Classification | Validity | Success | Warning | Raw accuracy | Postprocessed accuracy | Non-degradation | Absolute | Criteria passed | Criteria failed | Criteria NA |
+|---|---|---:|---:|---:|---:|---:|---|---|---|---|---|
+| 1 | `postprocessed_answer_recovery_usable` | 1.0000 | 1.0000 | 0.0000 | 0.3333 | 1.0000 | pass | pass | all | none | none |
+| 2 | `postprocessed_surface_clean_but_task_failed` | 1.0000 | 0.3333 | 0.6667 | 0.0000 | 0.3333 | pass | fail | n; validity; non-degradation | success; warning; absolute | none |
+| 3 | `postprocessed_surface_clean_but_task_failed` | 1.0000 | 0.3333 | 0.6667 | 0.0000 | 0.0000 | pass (`0 >= 0`) | fail | n; validity; non-degradation | success; warning; absolute | relative gate |
+
+Parallel post-run audits:
+
+- Requested model: `gpt-5.6 soil`; actual model: `gpt-5.6-sol`; reasoning: `max`.
+- Agents: `n3-artifact-audit`, `n3-classification-audit`, `n3-science-audit`.
+- Classification audit: `PASS`; all nine rows independently recomputed with zero mismatches.
+- Artifact count audit: generation/eval/metrics/Blob counts `PASS`.
+- Record-level duplicate IDs, exact item membership, and raw/stopped/postprocessed field equality: `INCONCLUSIVE` because local Entra Blob access was blocked by private network rules. Metric-cell keys had zero duplicates and all nine source task IDs are unique.
+- Scientific audit found no mechanistic overclaim. `sample_size_sufficient=true` means registered-gate sufficiency only, not statistical stability.
+
+Operational errors and handling:
+
+1. Pre-run audit found `3/3/2` prompt capacity. No Azure job existed. Fixed with the explicitly approved unique depth-3 item and revalidated `45` observations.
+2. The first log command omitted the CLI-required container name. Queried replica `job-jspace-p1-n3-gates-02ilmgm-dxdmc` and container `main`, then retrieved logs without rerunning.
+3. Local Entra Blob listing was blocked by Storage network rules. No key, SAS, or network-policy change was attempted.
+4. Three stopped classification log lines are invalid outer JSON because of escaped `"\n\n"` values; raw log text retained all lines and the audit recovered them.
+
+Scientific boundary:
+
+- `n=3` is the registered minimum only; it does not demonstrate stability, robustness, or generalizability.
+- Branch classifications are behavioral and operational.
+- Raw strict success would not prove hidden reasoning; raw strict was not established here.
+- Stopped depth-1 usability is intervention utility, not spontaneous no-CoT.
+- Postprocessed depth-1 usability is answer-recovery utility, not raw no-CoT.
+- No hidden-reasoning, internal-workspace, genuine invisible-reasoning, or J-space claim is made.

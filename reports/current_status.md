@@ -2,11 +2,11 @@
 
 ## Summary
 
-The executable scaffold, private Azure path, real criteria-validation run, and prospective Phase 1 branch-gate hardening are complete.
+The executable scaffold, private Azure path, hardened branch gates, and bounded n=3 Phase 1 validation are complete.
 
 ## Current Phase
 
-**Phase: branch success gates hardened; no follow-up run authorized**
+**Phase: bounded n=3 validation complete; record-level artifact audit pending**
 
 ## ACR Managed Identity Azure Execution (2026-07-08)
 
@@ -17,7 +17,7 @@ GHCR route was abandoned for execution because private package pull authenticati
 - ACR: `acrjspaceobssea0708231738`
 - Login server: `acrjspaceobssea0708231738.azurecr.io`
 - Admin user enabled: `False`
-- ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608`
+- ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:359643b7b5eb`
 - ACR build: succeeded via `az acr build`
 - Managed identity: `id-jspace-aca-acrpull-sea`
 - Principal ID: `78d4348b-57eb-4fb9-aaa7-99148b303292`
@@ -524,7 +524,50 @@ Historical regression interpretation:
 
 No Azure job, model inference, model download, ACR rebuild, or scale increase occurred during hardening. Results remain behavioral and operational only. Stopped output remains intervention-controlled, postprocessed output remains distinct from raw no-CoT, and no hidden-reasoning or J-space claim is supported.
 
-Next action: obtain explicit approval for a bounded validation with at least three observations per branch/depth before rebuilding ACR or running Azure.
+## Bounded Phase 1 n=3 Validation (2026-07-10)
+
+Scope and provenance:
+
+- Starting commit: `d1750a9d51e102c644933d8c41b7d65432f8bdfa`.
+- Source commit: `359643b7b5eb8f95c13cca2e60fa753df8701282`.
+- Tests: `111 passed, 2 warnings`.
+- Dry-run: `configuration_cells=15`, `items_per_cell=3`, `total_observations=45`.
+- ACR build: `cmb`.
+- Image digest: `sha256:004ec8bff66fbc8a23b122660aeb58914b2ee3cedfc5246429046eef252c9069`.
+- Job: `job-jspace-p1-n3-gates`.
+- Sole execution: `job-jspace-p1-n3-gates-02ilmgm`; status `Succeeded`; retries `0`.
+- Blob prefix: `phase1-limited-n3-gates/20260710T152820Z`.
+- Artifacts: four files; 45 generation records, 45 eval records, 15 metric rows, every row `n=3`.
+
+Visible-CoT baseline:
+
+| Depth | n | Accuracy | Parse valid | Baseline valid | Failure reason |
+|---|---:|---:|---:|---|---|
+| 1 | 3 | 0.3333 | 1.0000 | true | `NA` |
+| 2 | 3 | 0.6667 | 1.0000 | true | `NA` |
+| 3 | 3 | 0.0000 | 1.0000 | false | `visible_cot_accuracy_zero` |
+
+Branch classifications:
+
+| Depth | Raw strict | Stopped intervention | Postprocessed utility |
+|---|---|---|---|
+| 1 | `raw_strict_not_established` | `stopped_intervention_usable` | `postprocessed_answer_recovery_usable` |
+| 2 | `raw_strict_not_established` | `stopped_intervention_not_useful` | `postprocessed_surface_clean_but_task_failed` |
+| 3 | `raw_strict_not_established` | `stopped_intervention_not_useful` | `postprocessed_surface_clean_but_task_failed` |
+
+Key interpretation:
+
+- All nine rows meet the registered sample-count gate; this means registered-gate sufficiency only, not statistical stability.
+- Raw strict was not established at any depth.
+- Stopped depth-1 usability is intervention utility; it is not spontaneous no-CoT.
+- Postprocessed depth-1 usability is answer-recovery utility; it is not raw no-CoT.
+- Depth-3 postprocessed non-degradation is `0 >= 0`, but absolute accuracy fails, so it is not usable.
+- Depth-3 relative gates are `NA`, not passed or failed.
+- Classification audit independently recomputed all nine rows with zero mismatches.
+- Count/aggregate audits passed. Record-level duplicates, item membership, and field equality remain inconclusive because local Entra Blob access is blocked by private network rules.
+- No hidden-reasoning, internal-workspace, genuine invisible-reasoning, or J-space claim is supported.
+
+Next action: complete a read-only record-level audit of the existing 45 generation/eval pairs, including the 18 ambiguous parses, before requesting any higher-n replication.
 
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 

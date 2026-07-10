@@ -746,3 +746,39 @@ Consequence:
 - The depth-3 `0 >= 0` case now classifies as `postprocessed_surface_clean_but_task_failed`.
 - No Azure job, model inference, model download, ACR rebuild, or experiment-scale change was performed.
 - These classifications remain behavioral and operational only; they do not establish hidden reasoning, internal workspace behavior, or J-space evidence.
+
+## 2026-07-10 — run bounded Phase 1 n=3 validation
+
+Decision:
+
+- Run one bounded validation using the hardened branch gates.
+- Keep one model, arithmetic only, depths 1/2/3, the five registered conditions, and exactly three items per condition/depth.
+- After the parallel pre-run audits found arithmetic prompt capacity `3/3/2`, approve one unique third depth-3 arithmetic item so the registered `n=3` scope is executable.
+- Do not change any threshold, model, task family, depth, or condition after observing results.
+
+Reason:
+
+- The previous `n=1` run validated the reporting pipeline but could not emit formal branch-success labels.
+- The new run was needed to exercise the registered minimum-sample guard, absolute accuracy floor, and visible-CoT baseline guard on real outputs.
+- Duplicating a prompt or silently accepting 40 observations would not satisfy the approved 45-observation design.
+
+Evidence:
+
+- Source fix commit: `359643b7b5eb8f95c13cca2e60fa753df8701282`.
+- Tests: `111 passed, 2 warnings`.
+- Dry-run: `15` configuration cells, `3` items per cell, `45` planned observations.
+- ACR build: `cmb`; image `359643b7b5eb`; digest `sha256:004ec8bff66fbc8a23b122660aeb58914b2ee3cedfc5246429046eef252c9069`.
+- Execution: `job-jspace-p1-n3-gates-02ilmgm`; first attempt `Succeeded`.
+- Blob prefix: `phase1-limited-n3-gates/20260710T152820Z`; four artifacts uploaded.
+- Runtime evidence: `45` generation records, `45` eval records, and `15` metric rows with `n=3`.
+
+Consequence:
+
+- Raw strict is not established at any depth.
+- Stopped intervention is usable at depth 1 only; it remains intervention-controlled.
+- Postprocessed answer recovery is usable at depth 1 only; it is not raw no-CoT.
+- The depth-3 visible-CoT baseline is invalid because accuracy is zero; relative gates are `NA`.
+- The depth-3 postprocessed `0 >= 0` non-degradation result correctly fails the absolute floor and is not usable.
+- `n=3` meets only the registered minimum and does not establish statistical stability.
+- Counts and aggregate rows passed audit. Record-level duplicate IDs, exact item membership, and field equality remain inconclusive because private Blob data cannot be read from the local machine without changing network policy; no key, SAS, or public-network workaround was used.
+- No result establishes hidden reasoning, internal workspace behavior, or J-space evidence.
