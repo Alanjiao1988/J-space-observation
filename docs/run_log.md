@@ -71,6 +71,112 @@ Azure:
 
 - No Azure resources were created in this step.
 
+## 2026-07-10 — Private Blob network path and stop-controlled pilot
+
+Starting state:
+
+- Code/image commit: `c29852ab97b5`.
+- Tests: `python -m pytest tests/ -q` -> `73 passed, 2 warnings`.
+- ACR build: `cm9`.
+- Image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5`.
+- Digest: `sha256:2919bfa04dbcef0998cd9d770ffc91992958840d52ad512ab8b20b41dd434098`.
+- Previous execution `job-jspace-p1-stopcontrol-0w0svmg` completed model inference and local result writing but failed Blob upload:
+  - code: `AuthorizationFailure`
+  - message: `This request is not authorized to perform this operation.`
+  - root cause: storage `publicNetworkAccess=Disabled` with no VNet/private endpoint path.
+- `Storage Blob Data Contributor` was confirmed for principal `78d4348b-57eb-4fb9-aaa7-99148b303292`.
+
+Private network resources:
+
+- VNet: `vnet-jspace-observation-sea` (`10.80.0.0/16`).
+- First ACA subnet: `snet-aca-jspace-sea` (`10.80.0.0/23`), delegated to `Microsoft.App/environments`.
+- Active ACA subnet: `snet-aca-jspace-sea-v2` (`10.80.4.0/23`), delegated to `Microsoft.App/environments`.
+- Private endpoint subnet: `snet-pe-jspace-sea` (`10.80.2.0/27`).
+- Blob private endpoint: `pe-stjspacefiles-blob-sea`.
+- Private endpoint connection: `pec-stjspacefiles-blob-sea`.
+- Private endpoint state: `Succeeded`; connection state: `Approved`.
+- Blob private IP: `10.80.2.4`.
+- Private DNS zone: `privatelink.blob.core.windows.net`.
+- VNet link: `link-vnet-jspace-observation-sea-blob`.
+- DNS A record: `stjspacefiles0709085305 -> 10.80.2.4`.
+- Storage public network remained disabled; no storage key or SAS was used.
+
+Environment provisioning:
+
+- Initial environment: `cae-jspace-observation-sea-vnet`.
+- Initial environment write reported:
+  - code: `SubscriptionNotRegisteredForFeature`
+  - required feature: `Microsoft.Network/AllowBringYourOwnPublicIpAddress`
+- The feature was registered and `Microsoft.Network` was re-registered.
+- The first environment continued to fail before container creation for both ACR and public MCR images. It was retained and not deleted.
+- A fresh delegated subnet and environment were therefore created after feature registration:
+  - active environment: `cae-jspace-observation-sea-vnet2`
+  - state: `Succeeded`
+  - profiles: `Consumption`, `gpu-t4 / Consumption-GPU-NC8as-T4`
+- Runtime smoke:
+  - job: `job-jspace-vnet2-runtime-smoke`
+  - execution: `job-jspace-vnet2-runtime-smoke-1rrcsmi`
+  - status: `Succeeded`
+  - log: `runtime-smoke-ok`
+
+Blob network smoke:
+
+- Job: `job-jspace-blob-net-smoke-v2`.
+- Execution: `job-jspace-blob-net-smoke-v2-l02nljz`.
+- Status: `Succeeded`.
+- Prefix: `network-smoke-v2/20260710T071144Z`.
+- Log:
+  - `Uploaded blob: network-smoke-v2/20260710T071144Z/smoke.txt`
+  - `Blob export complete: 1 files`
+
+Stop-control pilot:
+
+- First VNet pilot execution: `job-jspace-p1-stopcontrol-vnet-kegu1ln`.
+- Status: `Failed` before model execution.
+- Error: `/bin/sh: 1: Syntax error: "&&" unexpected`.
+- Cause: invalid `find -exec` terminator in the appended log-printing command.
+- Corrected execution: `job-jspace-p1-stopcontrol-vnet-b55p4c6`.
+- Status: `Succeeded`.
+- Environment: `cae-jspace-observation-sea-vnet2`.
+- Workload profile: `gpu-t4`.
+- Blob prefix: `phase1-pilot-stopcontrol-vnet/20260710T072107Z`.
+- Cells: 15.
+- Uploaded files:
+  - `phase1_eval_records.jsonl`
+  - `phase1_generations.jsonl`
+  - `phase1_metrics.csv`
+  - `phase1_summary.md`
+- Upload log: `Blob export complete: 4 files`.
+
+`strict_answer_only_stopped` metrics:
+
+| Depth | Raw no-CoT valid | Stopped no-CoT valid | Stop triggered | Stop success | Accuracy stopped | Parse valid | Parse ambiguous |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.0000 |
+| 2 | 1.0000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.0000 | 1.0000 | 0.0000 |
+
+VNet result review:
+
+- Job: `job-jspace-stop-review-vnet`.
+- Execution: `job-jspace-stop-review-vnet-m7grppm`.
+- Status: `Succeeded`.
+- Blob count: 4.
+- Representative stopped records:
+  - depth 1 raw: `7 + 5 = \boxed{12}\n\n`; stopped: `7 + 5 = \boxed{12}`; correct.
+  - depth 2 raw: `__________\n\n`; stopped: `__________`; parse failed.
+  - depth 3 raw: `\boxed{12}\n\n`; stopped: `\boxed{12}`; parsed but wrong.
+- All three stop triggers were `\n\n`.
+- Summary warning: stop-controlled answer-only validity does not imply spontaneous raw no-CoT compliance.
+
+Scientific boundary:
+
+- Stop control is a generation intervention.
+- Raw, stopped, and postprocessed validity remain separate.
+- The result does not prove spontaneous no-CoT reasoning.
+- No J-space claim is made.
+- Do not expand Phase 1 yet.
+
 ## 2026-07-08 — Local environment validation for Phase 0.5
 
 Active Python environment:

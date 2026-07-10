@@ -2,11 +2,11 @@
 
 ## Summary
 
-J-space observation project scaffold has been successfully implemented. Phase 0.5 (J-lens feasibility spike) and Phase 1 (behavioral reasoning-depth gradient) are now executable.
+The executable scaffold, Azure ACR managed-identity path, private Blob persistence path, and small stop-controlled Phase 1 pilot are complete.
 
 ## Current Phase
 
-**Phase: Azure ACR managed-identity smoke path completed; small Phase 1 pilot succeeded**
+**Phase: private Blob path and stop-controlled 15-cell pilot completed; no scale expansion approved**
 
 ## ACR Managed Identity Azure Execution (2026-07-08)
 
@@ -293,6 +293,83 @@ The no-CoT validator and parser warning layer were hardened and rerun on the sam
 - Postprocessing is useful as an answer-recovery analysis, not as evidence of no-CoT generation.
 - Do not claim hidden reasoning or J-space evidence.
 - Next step: decide whether to test stop-sequence generation controls or keep postprocessing as a separate answer-recovery analysis only.
+
+## Private Blob Path + Stop-controlled Pilot (2026-07-10)
+
+### Stop-control implementation
+
+- Condition: `strict_answer_only_stopped`
+- Code/image commit: `c29852ab97b5`
+- Tests: `73 passed, 2 warnings`
+- ACR build: `cm9`
+- Image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5`
+- Digest: `sha256:2919bfa04dbcef0998cd9d770ffc91992958840d52ad512ab8b20b41dd434098`
+
+The condition preserves:
+
+- `raw_output_before_stop_cleanup`
+- `raw_output`
+- `stopped_output`
+- raw, stopped, and postprocessed no-CoT validity separately
+- stop trigger, string, reason, mode, and warning
+
+### Private network
+
+- VNet: `vnet-jspace-observation-sea`
+- Active ACA subnet: `snet-aca-jspace-sea-v2` (`10.80.4.0/23`)
+- Private endpoint subnet: `snet-pe-jspace-sea` (`10.80.2.0/27`)
+- Blob private endpoint: `pe-stjspacefiles-blob-sea`
+- Private endpoint state: `Succeeded` / `Approved`
+- Private IP: `10.80.2.4`
+- Private DNS zone: `privatelink.blob.core.windows.net`
+- DNS link: `link-vnet-jspace-observation-sea-blob`
+- Active environment: `cae-jspace-observation-sea-vnet2`
+- Active environment state: `Succeeded`
+- Workload profile: `gpu-t4` / `Consumption-GPU-NC8as-T4`
+
+The first environment, `cae-jspace-observation-sea-vnet`, was created before the subscription feature `Microsoft.Network/AllowBringYourOwnPublicIpAddress` was registered. It reports `Succeeded` at the resource layer but cannot start containers. It was retained and is not the active environment.
+
+### Blob network smoke
+
+- Job: `job-jspace-blob-net-smoke-v2`
+- Execution: `job-jspace-blob-net-smoke-v2-l02nljz`
+- Status: `Succeeded`
+- Prefix: `network-smoke-v2/20260710T071144Z`
+- Uploaded: `smoke.txt`
+- Authentication: user-assigned managed identity only
+- Storage key/SAS/public network: not used
+
+### Stop-control rerun
+
+- Job: `job-jspace-p1-stopcontrol-vnet`
+- Execution: `job-jspace-p1-stopcontrol-vnet-b55p4c6`
+- Status: `Succeeded`
+- Blob prefix: `phase1-pilot-stopcontrol-vnet/20260710T072107Z`
+- Files uploaded: 4
+- Cells: 15
+
+`strict_answer_only_stopped` results:
+
+| Depth | Raw no-CoT valid | Stopped no-CoT valid | Stop triggered | Stop success | Accuracy stopped | Parse ambiguous |
+|---|---:|---:|---:|---:|---:|---:|
+| 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.0000 |
+| 2 | 1.0000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 | 0.0000 |
+| 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+
+Representative outputs:
+
+- Depth 1 raw: `7 + 5 = \boxed{12}\n\n`; stopped: `7 + 5 = \boxed{12}`; correct.
+- Depth 2 raw: `__________\n\n`; stopped: `__________`; parse failed.
+- Depth 3 raw: `\boxed{12}\n\n`; stopped: `\boxed{12}`; parsed but wrong.
+
+All three stops were triggered by `\n\n`. In this run, the generation-time criterion prevented any subsequent reasoning marker from being emitted, so raw and stopped no-CoT validity were both `1.0000`. This is still an intervention: stop-controlled validity does not establish spontaneous raw no-CoT reasoning.
+
+### Current decision
+
+- Do not expand the experiment yet.
+- Treat raw strict, stopped, and postprocessed conditions as distinct branches.
+- Stop control preserves answer quality only in the easiest cell and destroys or fails to recover useful answers at depths 2/3.
+- No hidden-reasoning or J-space claim is supported.
 
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 

@@ -21,7 +21,7 @@ Heavy execution must happen in Azure GPU containers:
 
 Do not silently fall back to local model inference if Azure is blocked.
 
-## Container registry strategy: GHCR primary, ACR secondary
+## Container registry strategy: ACR active, GHCR historical
 
 Historical decision: GHCR was preferred for git-SHA provenance and GitHub Actions builds. Current active route changed after private GHCR pull authentication blocked Azure job creation.
 
@@ -36,7 +36,7 @@ Current ACR resources:
 
 - ACR: `acrjspaceobssea0708231738`
 - Login server: `acrjspaceobssea0708231738.azurecr.io`
-- Image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147`
+- Current image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5`
 - Managed identity: `id-jspace-aca-acrpull-sea`
 - AcrPull: assigned
 
@@ -60,15 +60,15 @@ Reason for switching:
 - Resource group: `rg-jspace-observation-sea`
 - Region: `southeastasia`
 - Log Analytics workspace: `law-jspace-observation-sea`
-- Container Apps environment: `cae-jspace-observation-sea`
-- Smoke test job: `job-jspace-ghcr-smoke`
+- Active Container Apps environment: `cae-jspace-observation-sea-vnet2`
+- Blob network smoke job: `job-jspace-blob-net-smoke-v2`
 - Phase 0.5 job: `job-jspace-phase05`
 - Phase 1 dry-run job: `job-jspace-phase1-dryrun`
-- Small pilot job: `job-jspace-phase1-pilot`
+- Current small pilot job: `job-jspace-p1-stopcontrol-vnet`
 - GPU workload profile type: `Consumption-GPU-NC8as-T4`
 - GPU workload profile name: `gpu-t4`
-- Model cache in container: `/mnt/models/huggingface`
-- Results directory in container: `/mnt/results`
+- Model cache in container: `/tmp/models/huggingface`
+- Results root in container: `/workspace/results/runs`
 
 Copy `infra/azure/variables.example.env` to `infra/azure/variables.env` locally and fill placeholders. Do not commit `variables.env`.
 
@@ -421,9 +421,9 @@ bash infra/azure/scripts/06_run_job_acr_mi.sh
 
 Do not run a broader Phase 1 sweep until pilot outputs are reviewed and persistent result export is decided.
 
-## Active persistence route: Azure Blob with managed identity
+## Active persistence route: private Azure Blob with managed identity
 
-Azure Blob upload with managed identity is now the working persistence path.
+Azure Blob upload with managed identity over a private endpoint is the working persistence path. Storage public network access remains disabled.
 
 Current storage:
 
@@ -433,6 +433,10 @@ container: jspace-results
 shared key used: no
 identity: id-jspace-aca-acrpull-sea
 role: Storage Blob Data Contributor
+active ACA environment: cae-jspace-observation-sea-vnet2
+VNet: vnet-jspace-observation-sea
+Blob private endpoint: pe-stjspacefiles-blob-sea
+private DNS zone: privatelink.blob.core.windows.net
 ```
 
 Blob export environment variables:
@@ -465,7 +469,7 @@ export MEMORY=16Gi
 bash infra/azure/scripts/06_run_job_acr_mi.sh
 ```
 
-Do not run broader Phase 1 until the no-CoT validation bug observed in the pilot is fixed.
+Do not run jobs requiring Blob export in the old non-VNet environment. Use `cae-jspace-observation-sea-vnet2`.
 
 ## Validator-hardened pilot status
 
@@ -565,6 +569,72 @@ Interpretation:
 - Postprocessed output must not be treated as genuine no-CoT generation.
 - This remains behavioral/infrastructure validation, not J-space evidence.
 
+## Private network and stop-control status
+
+Active private resources:
+
+```text
+VNet: vnet-jspace-observation-sea
+ACA subnet: snet-aca-jspace-sea-v2 (10.80.4.0/23)
+private endpoint subnet: snet-pe-jspace-sea (10.80.2.0/27)
+Blob private endpoint: pe-stjspacefiles-blob-sea
+Blob private IP: 10.80.2.4
+private DNS zone: privatelink.blob.core.windows.net
+DNS link: link-vnet-jspace-observation-sea-blob
+active ACA environment: cae-jspace-observation-sea-vnet2
+GPU profile: gpu-t4 / Consumption-GPU-NC8as-T4
+```
+
+Subscription prerequisite:
+
+```text
+Microsoft.Network/AllowBringYourOwnPublicIpAddress = Registered
+```
+
+The first environment, `cae-jspace-observation-sea-vnet`, was created before this feature was registered and cannot start containers. Do not use it. It remains present because no deletion was authorized.
+
+Blob network smoke:
+
+```text
+job: job-jspace-blob-net-smoke-v2
+execution: job-jspace-blob-net-smoke-v2-l02nljz
+status: Succeeded
+prefix: network-smoke-v2/20260710T071144Z
+uploaded: smoke.txt
+```
+
+Stop-control pilot:
+
+```text
+condition: strict_answer_only_stopped
+image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5
+job: job-jspace-p1-stopcontrol-vnet
+execution: job-jspace-p1-stopcontrol-vnet-b55p4c6
+status: Succeeded
+prefix: phase1-pilot-stopcontrol-vnet/20260710T072107Z
+files: 4
+cells: 15
+```
+
+Stopped-condition result:
+
+```text
+raw_no_cot_valid_rate: 1.0000 for depths 1,2,3
+stopped_no_cot_valid_rate: 1.0000 for depths 1,2,3
+stop_triggered_rate: 1.0000 for depths 1,2,3
+stop string: \n\n for all depths
+accuracy_stopped: depth1=1.0000, depth2=0.0000, depth3=0.0000
+```
+
+Interpretation:
+
+- The stop criterion prevented subsequent reasoning markers from being emitted in this pilot.
+- Depth 2 stopped at a non-answer placeholder.
+- Depth 3 stopped at a clean but wrong boxed answer.
+- Stop-controlled validity is an intervention result, not spontaneous raw no-CoT evidence.
+- Keep raw, stopped, and postprocessed branches separate.
+- Do not broaden Phase 1 yet.
+
 ## Persistent results storage status
 
 Azure Files was attempted as the first persistence path and is currently blocked by organization/subscription policy.
@@ -585,13 +655,13 @@ Key based authentication is not permitted on this storage account.
 
 Do not use `ENABLE_RESULTS_MOUNT=true` until a working storage backend is available.
 
-Persistence options:
+Current decision:
 
-1. Request an admin exception to allow Azure Files shared-key access for the project storage account.
-2. Switch to Azure Blob result upload using managed identity from inside the container.
-3. Investigate whether identity-based Container Apps storage is supported in this tenant/API version.
-
-Do not run broader experiments until result persistence is solved, unless Alan explicitly accepts log-only output for another small run.
+1. Do not use Azure Files.
+2. Do not enable storage public network access.
+3. Do not use storage keys or SAS.
+4. Use Blob managed-identity upload from `cae-jspace-observation-sea-vnet2`.
+5. Verify private outputs through job logs or a review job inside the same VNet.
 
 ### GHCR pull/auth findings from first smoke attempt
 

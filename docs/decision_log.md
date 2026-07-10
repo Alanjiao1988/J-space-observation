@@ -610,3 +610,39 @@ Decision:
 - Postprocessed validity must not be interpreted as raw no-CoT compliance.
 - Do not expand Phase 1 yet.
 - Next decision should choose between stop-sequence generation controls or treating postprocessing as a separate analysis track.
+
+## 2026-07-10 — private Blob path and stop-controlled condition verified
+
+Infrastructure decision:
+
+- Keep Storage public network access disabled.
+- Do not use storage keys, SAS, or Azure Files.
+- Use VNet-integrated Container Apps, Blob private endpoint, private DNS, and managed identity.
+- Active environment: `cae-jspace-observation-sea-vnet2`.
+- The first environment, `cae-jspace-observation-sea-vnet`, was created before `Microsoft.Network/AllowBringYourOwnPublicIpAddress` was registered and cannot start containers. It remains present but inactive.
+- Blob network smoke succeeded as `job-jspace-blob-net-smoke-v2-l02nljz`.
+
+Experiment status:
+
+- Condition: `strict_answer_only_stopped`.
+- Image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5`.
+- Pilot execution: `job-jspace-p1-stopcontrol-vnet-b55p4c6`.
+- Blob prefix: `phase1-pilot-stopcontrol-vnet/20260710T072107Z`.
+- Fifteen cells completed and four files were uploaded.
+
+Findings:
+
+- Raw no-CoT valid rate: `1.0000` for depths 1/2/3.
+- Stopped no-CoT valid rate: `1.0000` for depths 1/2/3.
+- Stop-triggered rate: `1.0000` for depths 1/2/3.
+- Stop string: `\n\n` for all three stopped records.
+- Stopped accuracy: depth 1 `1.0000`, depth 2 `0.0000`, depth 3 `0.0000`.
+- Depth 2 stopped at a non-answer placeholder.
+- Depth 3 stopped at a parseable but wrong boxed answer.
+
+Scientific decision:
+
+- Stop control is a generation intervention, not evidence of spontaneous no-CoT reasoning.
+- Keep raw strict, stopped, and postprocessed conditions separate.
+- Do not broaden Phase 1 yet because stopped answer quality fails at depths 2/3.
+- No hidden-reasoning or J-space claim is supported.
