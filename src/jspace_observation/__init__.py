@@ -75,11 +75,15 @@ from .phase1_branches import (
     VISIBLE_REASONING_BASELINE_BRANCH,
     UNCLASSIFIED_BRANCH,
     PHASE1_INTERPRETATION_BOUNDARIES,
+    PHASE1_BRANCH_CLASSIFICATION_WARNING,
     Phase1BranchDefinition,
+    classify_branch_result,
     get_phase1_branch,
     get_phase1_branch_definition,
     get_phase1_branch_metadata,
     render_branch_metrics_table,
+    render_branch_success_classification_table,
+    render_branch_success_classification_section,
 )
 
 __version__ = "0.1.0"
@@ -155,9 +159,13 @@ __all__ = [
     "VISIBLE_REASONING_BASELINE_BRANCH",
     "UNCLASSIFIED_BRANCH",
     "PHASE1_INTERPRETATION_BOUNDARIES",
+    "PHASE1_BRANCH_CLASSIFICATION_WARNING",
     "Phase1BranchDefinition",
+    "classify_branch_result",
     "get_phase1_branch",
     "get_phase1_branch_definition",
     "get_phase1_branch_metadata",
     "render_branch_metrics_table",
+    "render_branch_success_classification_table",
+    "render_branch_success_classification_section",
 ]

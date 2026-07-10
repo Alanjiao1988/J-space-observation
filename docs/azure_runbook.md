@@ -654,7 +654,17 @@ Operational reporting rules:
 5. Postprocessed validity never replaces raw validity.
 6. Do not use any Phase 1 branch as hidden-reasoning or J-space evidence.
 
-No Azure rerun or ACR build was performed for this reporting-only update. The active environment remains `cae-jspace-observation-sea-vnet2`, the current blocker is none, and scaling remains paused pending approval of branch-specific success criteria.
+Preregistered limited-scale gates:
+
+| Branch | Required thresholds |
+|---|---|
+| `raw_strict` | `raw_no_cot_valid_rate >= 0.90`; reasoning markers `<= 0.10`; parse validity `>= 0.80`; ambiguity/warnings `<= 0.20`; raw accuracy `>= 0.50` or `>= 0.70 * visible_cot_accuracy`. |
+| `stopped_intervention` | stopped validity `>= 0.90`; stop success `>= 0.80`; parse validity `>= 0.80`; stopped accuracy `>= 0.50`. |
+| `postprocessed_utility` | postprocessed validity `>= 0.90`; recovery success `>= 0.80`; warnings `<= 0.20`; postprocessed accuracy `>=` raw accuracy. |
+
+The detailed and controlling definition is `docs/phase1_experiment_branches.md`. Do not change these thresholds after observing a new run without a new logged decision.
+
+No Azure rerun or ACR build was performed for this criteria update. The active environment remains `cae-jspace-observation-sea-vnet2`, the current blocker is none, and no run is authorized yet. Any next run requires explicit approval and must remain limited scale.
 
 ## Persistent results storage status
 

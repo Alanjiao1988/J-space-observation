@@ -221,6 +221,51 @@ Decision:
 - Keep scaling paused.
 - Review and approve branch-specific success criteria before any new model run.
 
+## 2026-07-10 — preregister Phase 1 branch success criteria
+
+Scope:
+
+- Methodology, classification helper, report template, tests, and documentation only.
+- Repository baseline: `a9c8e29ebab6dd4fbf1ec3803de3bcc300c80d3a`.
+- No model inference, Azure job, ACR build, scale increase, model addition, task-family addition, J-lens fitting, or activation patching was performed.
+
+Implementation:
+
+- Added deterministic `classify_branch_result()` logic for all three answer-control branches.
+- Added raw strict absolute and matching visible-CoT relative accuracy gates.
+- Added stopped-intervention surface, stop-success, parsing, and accuracy gates.
+- Added postprocessed validity, recovery-success, warning, and relative accuracy gates.
+- Added a `Branch success classification` report section with per-branch labels, failed/passed criteria, stop-string distribution, and mandatory scientific warnings.
+- Preserved `NA` for non-applicable metrics and did not change validator behavior.
+
+Local commands:
+
+```text
+python -m py_compile src\jspace_observation\phase1_branches.py src\jspace_observation\__init__.py experiments\phase1_depth_gradient.py
+python -m pytest tests\test_phase1_branches.py -q
+python -m pytest tests\ -q
+```
+
+Result:
+
+```text
+targeted: 19 passed, 2 warnings
+full suite: 92 passed, 2 warnings
+```
+
+Azure:
+
+- Rerun performed: no.
+- Active environment remains `cae-jspace-observation-sea-vnet2`.
+- Active Blob prefix remains `phase1-pilot-stopcontrol-vnet/20260710T072107Z`.
+- Latest successful stop-control execution remains `job-jspace-p1-stopcontrol-vnet-b55p4c6`.
+
+Decision:
+
+- Criteria are preregistered before any new data collection.
+- Current blocker: none.
+- The next run requires explicit approval and must remain limited scale.
+
 ## 2026-07-08 — Local environment validation for Phase 0.5
 
 Active Python environment:

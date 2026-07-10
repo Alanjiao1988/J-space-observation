@@ -2,7 +2,7 @@
 
 Date: 2026-07-10
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified repository baseline before branch formalization: `0aa536b3b239eb163740e1188e0a2adaaebc011b`
+Latest verified repository baseline before success-criteria work: `a9c8e29ebab6dd4fbf1ec3803de3bcc300c80d3a`
 Current image commit: `c29852ab97b5`
 
 > Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
@@ -28,6 +28,8 @@ Current image commit: `c29852ab97b5`
 > Update (2026-07-10 15:30 +08:00): Added `strict_answer_only_stopped` and rebuilt ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5` (build `cm9`, digest `sha256:2919bfa04dbcef0998cd9d770ffc91992958840d52ad512ab8b20b41dd434098`). Storage public access is disabled, so a private path was created: VNet `vnet-jspace-observation-sea`, Blob private endpoint `pe-stjspacefiles-blob-sea`, private DNS zone `privatelink.blob.core.windows.net`, and active VNet-integrated environment `cae-jspace-observation-sea-vnet2`. The first environment `cae-jspace-observation-sea-vnet` was created before `Microsoft.Network/AllowBringYourOwnPublicIpAddress` was registered and cannot start containers; it was retained, not deleted. Blob smoke `job-jspace-blob-net-smoke-v2-l02nljz` succeeded. The 15-cell pilot `job-jspace-p1-stopcontrol-vnet-b55p4c6` succeeded and uploaded four files under `phase1-pilot-stopcontrol-vnet/20260710T072107Z`. For `strict_answer_only_stopped`, raw/stopped no-CoT validity and stop-trigger rate were `1.0000` at all depths; stopped accuracy was `1.0000/0.0000/0.0000`. All stops were triggered by `\n\n`; depth 2 was truncated to a non-answer placeholder and depth 3 to a wrong boxed answer. Stop control is an intervention, not proof of spontaneous no-CoT and not J-space evidence.
 >
 > Update (2026-07-10 — branch formalization): Phase 1 now has three non-interchangeable answer-control branches: `raw_strict`, `stopped_intervention`, and `postprocessed_utility`. Records and summaries preserve branch labels plus raw/stopped/postprocessed outputs, validity, and correctness separately. Summary tables use `NA` when a metric does not apply. Local tests pass (`80 passed, 2 warnings`). No model inference, Azure job, ACR build, experiment scaling, J-lens fitting, or activation patching occurred in this update. Current blocker is none; scaling remains paused pending branch-specific success criteria.
+>
+> Update (2026-07-10 — criteria preregistration): Branch-specific thresholds are now fixed in `docs/phase1_experiment_branches.md` before any new data collection. `classify_branch_result()` independently labels raw strict feasibility, stop-intervention utility, and postprocessed answer recovery. Phase 1 summaries now include a `Branch success classification` table, matching visible-CoT relative accuracy where available, stop-string distribution, `NA` for non-applicable metrics, and mandatory no-hidden-reasoning/no-J-space warnings. Local tests pass (`92 passed, 2 warnings`). No model inference, Azure job, ACR build, or scale increase occurred. The next run requires explicit approval and must remain limited scale.
 >
 > Update (2026-07-08 22:51 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but Copilot's fresh tool processes could not see them in Process/User/Machine environment scopes. No package-read preflight or Azure job retry was attempted. To continue, set the variables in Windows User environment (or another secure path readable by the agent), e.g. `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`. Do not paste tokens into chat.
 
@@ -134,7 +136,7 @@ Tests:
 Latest known test status:
 
 ```text
-python -m pytest tests/ -q -> 80 passed, 2 warnings
+python -m pytest tests/ -q -> 92 passed, 2 warnings
 ```
 
 Phase 1 dry run status:
@@ -420,7 +422,7 @@ GHCR private pull remains historical; do not return to GHCR unless Alan explicit
 
 The new thread should continue from here:
 
-### Step 1: Review branch-specific success criteria
+### Step 1: Approve the next limited-scale gate
 
 The Azure ACR managed-identity chain has already succeeded:
 
@@ -433,11 +435,11 @@ small phase 1 pilot execution: job-jspace-phase1-pilot-acr-lhuvwbf
 
 Before any new run:
 
-1. Use `docs/phase1_experiment_branches.md` as the reporting contract.
-2. Review raw strict, stopped intervention, and postprocessed utility independently.
-3. Define branch-specific success criteria for no-CoT validity, parse quality, and accuracy.
-4. Keep scaling paused until those criteria are approved.
-5. Do not claim hidden reasoning or J-space evidence from Phase 1 behavior.
+1. Use the preregistered thresholds in `docs/phase1_experiment_branches.md` without post-hoc changes.
+2. Obtain explicit approval for a limited-scale scope.
+3. Keep the existing models, task families, and items per cell unchanged unless separately approved.
+4. Classify raw strict, stopped intervention, and postprocessed utility independently.
+5. Do not claim hidden reasoning or J-space evidence from any classification.
 
 ---
 
@@ -464,12 +466,14 @@ Current known state:
 - Private Blob persistence is working through `cae-jspace-observation-sea-vnet2`.
 - The stop-control pilot succeeded as `job-jspace-p1-stopcontrol-vnet-b55p4c6`.
 - Phase 1 has three non-interchangeable branches: raw strict, stopped intervention, and postprocessed utility.
+- Branch-specific success criteria are preregistered in `docs/phase1_experiment_branches.md`.
+- Local tests pass: `92 passed, 2 warnings`.
 - Stop controls suppress visible reasoning in the tiny pilot but answer quality fails at depths 2/3.
 - Current blocker is none, but scaling is paused.
 - No Phase 1 result is hidden-reasoning or J-space evidence.
 
 Your first task:
-Review and approve branch-specific success criteria before authorizing any new model or Azure run.
+Obtain explicit approval for one limited-scale run scope without changing models, task families, or items per cell.
 ```
 
 ---

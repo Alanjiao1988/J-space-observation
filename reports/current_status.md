@@ -2,11 +2,11 @@
 
 ## Summary
 
-The executable scaffold, Azure ACR managed-identity path, private Blob persistence path, small stop-controlled Phase 1 pilot, and branch-aware Phase 1 reporting are complete.
+The executable scaffold, private Azure execution path, branch-aware reporting, and preregistered Phase 1 branch success criteria are complete.
 
 ## Current Phase
 
-**Phase: raw strict, stopped intervention, and postprocessed utility reporting formalized; no scale expansion approved**
+**Phase: branch-specific success criteria preregistered; awaiting explicit approval for any limited-scale run**
 
 ## ACR Managed Identity Azure Execution (2026-07-08)
 
@@ -413,7 +413,40 @@ Azure state:
 
 Current blocker: none.
 
-Next action: review and approve branch-specific success criteria before authorizing any new run or scale increase.
+## Phase 1 Branch-specific Success Criteria (2026-07-10)
+
+The criteria in `docs/phase1_experiment_branches.md` are fixed before any new data collection:
+
+| Branch | Passing classification | Core gate |
+|---|---|---|
+| `raw_strict` | `raw_strict_preliminarily_established` | Raw validity/marker/parsing/format thresholds plus absolute or matching visible-CoT-relative accuracy. |
+| `stopped_intervention` | `stopped_intervention_usable` | Stopped validity, stop success, parse validity, and stopped accuracy. |
+| `postprocessed_utility` | `postprocessed_answer_recovery_usable` | Postprocessed validity, recovery success, warning rate, and no accuracy degradation. |
+
+Report changes:
+
+- Every model x task family x depth x condition row is classified independently.
+- Missing required metrics fail their criterion; non-applicable metrics remain `NA`.
+- Reports include criteria passed/failed, matching visible-CoT accuracy, stop-trigger rate, stop-string distribution, and postprocessing warning/application rates.
+- The mandatory warning states that classifications are behavioral and operational, not hidden-reasoning, internal-workspace, or J-space evidence.
+
+Local validation:
+
+```text
+python -m pytest tests\ -q
+92 passed, 2 warnings
+```
+
+Execution state:
+
+- Azure rerun performed: no.
+- Model inference performed: no.
+- ACR rebuild performed: no.
+- Active environment: `cae-jspace-observation-sea-vnet2`.
+- Active Blob prefix: `phase1-pilot-stopcontrol-vnet/20260710T072107Z`.
+- Current blocker: none.
+
+Next action: obtain explicit approval for one limited-scale run scope without adding models, task families, or items per cell.
 
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 
@@ -1022,10 +1055,10 @@ J-space-observation/
 
 ## Next Immediate Actions
 
-1. Review `docs/phase1_experiment_branches.md`.
-2. Approve branch-specific success criteria for no-CoT validity, parse quality, and answer accuracy.
-3. Keep model inference and Azure scaling paused until that review is complete.
-4. On the next approved pilot, use the branch-aware records and summary without merging raw, stopped, or postprocessed metrics.
+1. Obtain explicit approval for one limited-scale Phase 1 run scope.
+2. Keep the existing models, task families, and items per cell unchanged.
+3. Apply the preregistered criteria without post-hoc threshold changes.
+4. Keep raw, stopped, and postprocessed classifications separate.
 
 ## Success Criteria
 
@@ -1034,5 +1067,6 @@ J-space-observation/
 ✓ **Infrastructure**: ACR managed identity and private Blob persistence are operational
 ✓ **Pilot**: Small stop-controlled Phase 1 run persisted successfully
 ✓ **Reporting**: Raw strict, stopped intervention, and postprocessed utility are separate
-⏳ **Pending**: Approval of branch-specific success criteria before further runs
+✓ **Criteria**: Branch-specific thresholds preregistered before further runs
+⏳ **Pending**: Explicit approval for one limited-scale run scope
 ⏳ **Pending**: Actual J-lens fitting and validation

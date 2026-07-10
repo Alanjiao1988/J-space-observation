@@ -669,3 +669,24 @@ Consequence:
 - Stopped validity is not spontaneous no-CoT, and postprocessed validity is not raw no-CoT.
 - No branch by itself supports hidden-reasoning or J-space claims.
 - Scaling remains paused until branch-specific success criteria are reviewed and approved.
+
+## 2026-07-10 — preregister branch-specific Phase 1 success criteria
+
+Decision:
+
+- Preregister separate success criteria for `raw_strict`, `stopped_intervention`, and `postprocessed_utility` before scaling Phase 1.
+- Classify every model x task family x depth x condition row independently.
+- Treat missing required metrics as failed criteria and preserve `NA` for non-applicable metrics.
+
+Reason:
+
+- Prior pilots showed that raw strict generation, stop intervention, and postprocessed answer recovery behave differently.
+- A single answer-only or accuracy metric would make these branches scientifically non-interpretable.
+- Thresholds must be fixed before any new limited-scale run rather than selected after observing results.
+
+Consequence:
+
+- Future Phase 1 summaries must include independent branch classifications and interpretation warnings.
+- A passing classification is behavioral and operational only.
+- It does not establish hidden reasoning, internal workspace behavior, or J-space evidence.
+- No new run is authorized by this decision; the next run requires explicit approval and must remain limited scale.

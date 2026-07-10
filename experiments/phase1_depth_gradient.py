@@ -18,6 +18,7 @@ Output:
 """
 
 import argparse
+from collections import Counter, defaultdict
 import json
 import csv
 import sys
@@ -63,6 +64,7 @@ from jspace_observation import (
     PHASE1_INTERPRETATION_BOUNDARIES,
     get_phase1_branch_metadata,
     render_branch_metrics_table,
+    render_branch_success_classification_section,
 )
 
 
@@ -749,9 +751,58 @@ def main():
         dict(zip(metrics_rows[0], row))
         for row in metrics_rows[1:]
     ]
+    visible_cot_accuracy_by_cell = {
+        (
+            str(row["model"]),
+            str(row["task_family"]),
+            str(row["depth"]),
+        ): row["accuracy_raw"]
+        for row in metric_records
+        if row["condition"] == "visible_cot"
+    }
+    stop_string_counts: dict[tuple[str, str, str, str], Counter[str]] = defaultdict(Counter)
+    for record in generation_records:
+        if record.get("phase1_branch") != "stopped_intervention":
+            continue
+        cell_key = (
+            str(record.get("model_name")),
+            str(record.get("task_family")),
+            str(record.get("depth")),
+            str(record.get("condition")),
+        )
+        stop_string = record.get("stop_string")
+        stop_label = json.dumps(stop_string) if stop_string is not None else "none"
+        stop_string_counts[cell_key][stop_label] += 1
+
+    for row in metric_records:
+        cell_key = (
+            str(row["model"]),
+            str(row["task_family"]),
+            str(row["depth"]),
+        )
+        row["visible_cot_accuracy"] = (
+            visible_cot_accuracy_by_cell.get(cell_key, "NA")
+            if row["branch"] == "raw_strict"
+            else "NA"
+        )
+        stop_key = (*cell_key, str(row["condition"]))
+        distribution = stop_string_counts.get(stop_key)
+        row["stop_string_distribution"] = (
+            ", ".join(
+                f"{stop_string}={count}"
+                for stop_string, count in sorted(distribution.items())
+            )
+            if distribution
+            else "NA"
+        )
+
     summary_builder.add_section(
         "Branch-level Metrics",
         render_branch_metrics_table(metric_records),
+    )
+    summary_builder.add_section(
+        "Branch success classification",
+        render_branch_success_classification_section(metric_records),
     )
     summary_builder.add_section(
         "Interpretation Boundaries",
@@ -782,10 +833,10 @@ def main():
     
     summary_builder.add_section(
         "Next Steps",
-        "1. Review raw strict, stopped intervention, and postprocessed utility branches separately\n"
-        "2. Identify ability floors and answer-quality failures within each branch\n"
-        "3. Do not scale Phase 1 until the branch selection and reporting policy is approved\n"
-        "4. Treat all current Phase 1 results as behavioral and methodological evidence only"
+        "1. Review each branch against its preregistered success criteria\n"
+        "2. Require explicit approval before any new limited-scale model or Azure run\n"
+        "3. Do not expand models, task families, or items per cell without a new decision\n"
+        "4. Treat all classifications as behavioral and operational evidence only"
     )
     
     summary = summary_builder.build()
