@@ -690,3 +690,35 @@ Consequence:
 - A passing classification is behavioral and operational only.
 - It does not establish hidden reasoning, internal workspace behavior, or J-space evidence.
 - No new run is authorized by this decision; the next run requires explicit approval and must remain limited scale.
+
+## 2026-07-10 — run fixed-scope Phase 1 criteria validation
+
+Decision:
+
+- Accept one Azure validation run using the exact approved 15-cell scope.
+- Preserve the preregistered criteria and report the resulting classifications without post-hoc threshold changes.
+- Do not authorize a rerun, broader sweep, new model, new task family, new depth, or higher items-per-cell count.
+
+Evidence:
+
+- Source commit/image tag: `f94e889ef6089aab8f651a2d14c42341440625a3` / `f94e889ef608`.
+- ACR build: `cma`; digest `sha256:f27cc0e4cea0ae9569dbb384598fb391f3b923022ce9257f8301684c9dc23806`.
+- Active environment: `cae-jspace-observation-sea-vnet2`.
+- Job: `job-jspace-p1-criteria-val`.
+- Execution: `job-jspace-p1-criteria-val-6s8p15p`; status `Succeeded`.
+- Blob prefix: `phase1-pilot-criteria-validation/20260710T135655Z`.
+- Generation records: `15`; exported files: `4`.
+
+Observed classifications by depth 1/2/3:
+
+- `raw_strict`: `surface_answer_only_but_task_failed` / `raw_strict_not_established` / `raw_strict_not_established`.
+- `stopped_intervention`: `stopped_intervention_usable` / `stopped_intervention_not_useful` / `stopped_surface_compliant_but_task_failed`.
+- `postprocessed_utility`: `postprocessed_answer_recovery_usable` / `postprocessed_surface_clean_but_warning_high` / `postprocessed_answer_recovery_usable`.
+
+Consequence:
+
+- The reporting code generated the expected classification table, passed/failed criteria, stop-string distribution, and interpretation warnings.
+- Depth 3 postprocessing is classified usable by the preregistered non-degradation rule even though raw and postprocessed accuracy are both zero.
+- Depth 3 raw accuracy satisfies the relative rule because matching visible-CoT accuracy is zero, but raw strict still fails its surface criteria.
+- These are prospective criteria-design questions, not grounds to rewrite this run after seeing results.
+- No result supports hidden reasoning, internal workspace, or J-space claims.

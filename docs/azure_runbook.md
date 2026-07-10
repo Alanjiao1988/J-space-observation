@@ -36,7 +36,7 @@ Current ACR resources:
 
 - ACR: `acrjspaceobssea0708231738`
 - Login server: `acrjspaceobssea0708231738.azurecr.io`
-- Current image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5`
+- Current image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608`
 - Managed identity: `id-jspace-aca-acrpull-sea`
 - AcrPull: assigned
 
@@ -64,7 +64,7 @@ Reason for switching:
 - Blob network smoke job: `job-jspace-blob-net-smoke-v2`
 - Phase 0.5 job: `job-jspace-phase05`
 - Phase 1 dry-run job: `job-jspace-phase1-dryrun`
-- Current small pilot job: `job-jspace-p1-stopcontrol-vnet`
+- Current small pilot job: `job-jspace-p1-criteria-val`
 - GPU workload profile type: `Consumption-GPU-NC8as-T4`
 - GPU workload profile name: `gpu-t4`
 - Model cache in container: `/tmp/models/huggingface`
@@ -664,7 +664,45 @@ Preregistered limited-scale gates:
 
 The detailed and controlling definition is `docs/phase1_experiment_branches.md`. Do not change these thresholds after observing a new run without a new logged decision.
 
-No Azure rerun or ACR build was performed for this criteria update. The active environment remains `cae-jspace-observation-sea-vnet2`, the current blocker is none, and no run is authorized yet. Any next run requires explicit approval and must remain limited scale.
+The criteria-validation run below used these preregistered thresholds without modification.
+
+## Criteria-validation pilot status
+
+```text
+source commit: f94e889ef6089aab8f651a2d14c42341440625a3
+ACR build: cma
+image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608
+digest: sha256:f27cc0e4cea0ae9569dbb384598fb391f3b923022ce9257f8301684c9dc23806
+environment: cae-jspace-observation-sea-vnet2
+workload profile: gpu-t4 / Consumption-GPU-NC8as-T4
+job: job-jspace-p1-criteria-val
+execution: job-jspace-p1-criteria-val-6s8p15p
+status: Succeeded
+Blob prefix: phase1-pilot-criteria-validation/20260710T135655Z
+files: 4
+cells: 15
+```
+
+The requested job name `job-jspace-p1-criteria-validation` is 33 characters and exceeds the Container Apps Jobs 32-character limit. Use `job-jspace-p1-criteria-val`.
+
+When invoking the Bash helper from Windows:
+
+1. Use `C:\Program Files\Git\bin\bash.exe`, not the WindowsApps WSL launcher.
+2. Set `MSYS_NO_PATHCONV=1`.
+3. Set `MSYS2_ARG_CONV_EXCL=*`.
+4. Do not issue a separate `az containerapp job start`; `06_run_job_acr_mi.sh` already starts the job.
+
+Observed classifications by depth 1/2/3:
+
+- Raw strict: `surface_answer_only_but_task_failed` / `raw_strict_not_established` / `raw_strict_not_established`.
+- Stopped intervention: `stopped_intervention_usable` / `stopped_intervention_not_useful` / `stopped_surface_compliant_but_task_failed`.
+- Postprocessed utility: `postprocessed_answer_recovery_usable` / `postprocessed_surface_clean_but_warning_high` / `postprocessed_answer_recovery_usable`.
+
+The summary printed all passed/failed criteria and the mandatory interpretation warnings. Blob upload completed through managed identity and the private endpoint. Storage public access and shared-key access remained disabled.
+
+Do not treat the depth 3 postprocessed usable label as task success: both raw and postprocessed accuracy were zero, satisfying only the preregistered non-degradation rule. Review an absolute floor prospectively before any later run. Do not change this completed run after the fact.
+
+No further run is authorized. No hidden-reasoning, internal-workspace, or J-space claim is supported.
 
 ## Persistent results storage status
 

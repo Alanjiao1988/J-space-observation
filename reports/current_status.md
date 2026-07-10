@@ -2,11 +2,11 @@
 
 ## Summary
 
-The executable scaffold, private Azure execution path, branch-aware reporting, and preregistered Phase 1 branch success criteria are complete.
+The executable scaffold, private Azure path, preregistered criteria, and one fixed-scope real criteria-validation run are complete.
 
 ## Current Phase
 
-**Phase: branch-specific success criteria preregistered; awaiting explicit approval for any limited-scale run**
+**Phase: 15-cell criteria validation succeeded; further runs paused for prospective criteria review**
 
 ## ACR Managed Identity Azure Execution (2026-07-08)
 
@@ -17,7 +17,7 @@ GHCR route was abandoned for execution because private package pull authenticati
 - ACR: `acrjspaceobssea0708231738`
 - Login server: `acrjspaceobssea0708231738.azurecr.io`
 - Admin user enabled: `False`
-- ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5`
+- ACR image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608`
 - ACR build: succeeded via `az acr build`
 - Managed identity: `id-jspace-aca-acrpull-sea`
 - Principal ID: `78d4348b-57eb-4fb9-aaa7-99148b303292`
@@ -439,14 +439,70 @@ python -m pytest tests\ -q
 
 Execution state:
 
-- Azure rerun performed: no.
-- Model inference performed: no.
-- ACR rebuild performed: no.
+- One fixed-scope Azure validation run performed: yes.
+- Local model inference performed: no.
+- ACR rebuild performed: yes, from `f94e889ef6089aab8f651a2d14c42341440625a3`.
 - Active environment: `cae-jspace-observation-sea-vnet2`.
-- Active Blob prefix: `phase1-pilot-stopcontrol-vnet/20260710T072107Z`.
-- Current blocker: none.
+- Active Blob prefix: `phase1-pilot-criteria-validation/20260710T135655Z`.
+- Current infrastructure blocker: none.
 
-Next action: obtain explicit approval for one limited-scale run scope without adding models, task families, or items per cell.
+## Phase 1 Criteria-validation Pilot (2026-07-10)
+
+Provenance:
+
+- ACR build: `cma`.
+- Image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608`.
+- Digest: `sha256:f27cc0e4cea0ae9569dbb384598fb391f3b923022ce9257f8301684c9dc23806`.
+- Job: `job-jspace-p1-criteria-val`.
+- Execution: `job-jspace-p1-criteria-val-6s8p15p`.
+- Status: `Succeeded`.
+- Cells: `15`.
+- Blob files: `4`.
+
+Approved scope:
+
+- One model: `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`.
+- One task family: `arithmetic`.
+- Depths: `1,2,3`.
+- Five conditions.
+- Items per cell: `1`.
+- No model, task, depth, or item-count expansion.
+
+Classification result:
+
+| Depth | Raw strict | Stopped intervention | Postprocessed utility |
+|---|---|---|---|
+| 1 | `surface_answer_only_but_task_failed` | `stopped_intervention_usable` | `postprocessed_answer_recovery_usable` |
+| 2 | `raw_strict_not_established` | `stopped_intervention_not_useful` | `postprocessed_surface_clean_but_warning_high` |
+| 3 | `raw_strict_not_established` | `stopped_surface_compliant_but_task_failed` | `postprocessed_answer_recovery_usable` |
+
+Key depth 1/2/3 metrics:
+
+- Raw-strict `raw_no_cot_valid_rate`: `1.0000 / 0.0000 / 0.0000`.
+- Raw-strict `accuracy_raw`: `0.0000 / 0.0000 / 0.0000`.
+- Stopped `raw_no_cot_valid_rate`: `1.0000 / 1.0000 / 1.0000`.
+- `stopped_no_cot_valid_rate`: `1.0000 / 1.0000 / 1.0000`.
+- `stop_triggered_rate`: `1.0000 / 1.0000 / 1.0000`.
+- `accuracy_stopped`: `1.0000 / 0.0000 / 0.0000`.
+- Postprocessed `raw_no_cot_valid_rate`: `0.0000 / 0.0000 / 0.0000`.
+- `postprocessed_no_cot_valid_rate`: `1.0000 / 1.0000 / 1.0000`.
+- `postprocessing_success_rate`: `1.0000 / 0.0000 / 1.0000`.
+- `postprocessing_warning_rate`: `0.0000 / 1.0000 / 0.0000`.
+- `accuracy_postprocessed`: `1.0000 / 0.0000 / 0.0000`.
+
+Validation outcome:
+
+- The real summary includes branch classifications, criteria passed/failed, interpretation warnings, and stop-string distribution.
+- The stop string distribution is `"\n\n"=1` at each stopped depth.
+- Depth 3 postprocessed utility is mechanically usable because `accuracy_postprocessed >= accuracy_raw` is `0 >= 0`; this is not task success.
+- The depth 3 raw relative-accuracy criterion also passes against a zero visible-CoT baseline, while raw surface criteria correctly fail.
+- These limitations require a prospective criteria decision before another run; this run is not reclassified.
+- Results are behavioral and operational only.
+- Stop-controlled validity is not spontaneous no-CoT.
+- Postprocessed validity is not raw no-CoT.
+- No hidden-reasoning, internal-workspace, or J-space claim is supported.
+
+Next action: review absolute-floor and zero-baseline guards prospectively before approving any further run.
 
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 

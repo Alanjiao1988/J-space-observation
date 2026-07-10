@@ -1521,3 +1521,102 @@ Test command:
 Azure:
 
 - No Azure resources were created in this step.
+
+## Azure ACR managed-identity job - 2026-07-10T13:57:22Z
+
+- Command: `bash infra/azure/scripts/06_run_job_acr_mi.sh`
+- Job: job-jspace-p1-criteria-val
+- Image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608
+- Registry: acrjspaceobssea0708231738.azurecr.io via user-assigned managed identity
+- Container command: `python experiments/phase1_depth_gradient.py --models deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --task-families arithmetic --depths 1,2,3 --conditions strict_answer_only_prefill_answer,strict_answer_only_stopped,strict_answer_only_postprocessed,visible_cot,r1_style_thinking --max-new-tokens 64 --items-per-cell 1 --require-blob-export && echo "=== PHASE1 SUMMARY ===" && find /workspace/results/runs -name phase1_summary.md -print -exec cat {} \; && echo "=== PHASE1 METRICS CSV ===" && find /workspace/results/runs -name phase1_metrics.csv -print -exec cat {} \;`
+
+## 2026-07-10 — limited Phase 1 criteria-validation run
+
+Approval and scope:
+
+- One limited validation run was explicitly approved.
+- Model: `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`.
+- Task family: `arithmetic`.
+- Depths: `1,2,3`.
+- Conditions: `strict_answer_only_prefill_answer`, `strict_answer_only_stopped`, `strict_answer_only_postprocessed`, `visible_cot`, `r1_style_thinking`.
+- Items per cell: `1`.
+- Total cells: `15`.
+- No local model inference, model download, J-lens fitting, activation patching, or scope expansion occurred.
+
+Local gate:
+
+```text
+python -m pytest tests\ -q
+92 passed, 2 warnings
+```
+
+ACR provenance:
+
+- Source commit: `f94e889ef6089aab8f651a2d14c42341440625a3`.
+- Image: `acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608`.
+- Build run: `cma`.
+- Build status: `Succeeded`.
+- Digest: `sha256:f27cc0e4cea0ae9569dbb384598fb391f3b923022ce9257f8301684c9dc23806`.
+
+Infrastructure verification:
+
+- Environment: `cae-jspace-observation-sea-vnet2`; provisioning state `Succeeded`.
+- Workload profile: `gpu-t4 / Consumption-GPU-NC8as-T4`.
+- ACA subnet: `snet-aca-jspace-sea-v2`.
+- Managed identity: `id-jspace-aca-acrpull-sea`.
+- Roles confirmed: `AcrPull`, `Storage Blob Data Contributor`.
+- Storage public network access: `Disabled`.
+- Storage shared-key access: `False`.
+- No key, SAS, GHCR, old environment, or public Storage route was used.
+
+Setup errors before job creation:
+
+1. `bash` resolved to the Windows WSL launcher, but no WSL distribution was installed. No Azure job was created.
+2. Git Bash initially rewrote the Azure environment resource ID to a `C:/Program Files/Git/...` path. Azure returned `LinkedInvalidPropertyId`; no job was created. Setting `MSYS_NO_PATHCONV=1` and `MSYS2_ARG_CONV_EXCL=*` fixed this.
+3. The requested name `job-jspace-p1-criteria-validation` is 33 characters; Container Apps Jobs allow at most 32. Azure returned `ContainerAppInvalidName`; no job was created. The closest valid name, `job-jspace-p1-criteria-val`, was used.
+
+Successful execution:
+
+- Job: `job-jspace-p1-criteria-val`.
+- Execution: `job-jspace-p1-criteria-val-6s8p15p`.
+- Start: `2026-07-10T13:57:24Z`.
+- End: `2026-07-10T14:00:15Z`.
+- Status: `Succeeded`.
+- Execution count for this job: `1`.
+- Blob prefix: `phase1-pilot-criteria-validation/20260710T135655Z`.
+- Container output directory: `/workspace/results/runs/runs/20260710_135907`.
+- Exported files:
+  - `phase1_eval_records.jsonl`
+  - `phase1_generations.jsonl`
+  - `phase1_metrics.csv`
+  - `phase1_summary.md`
+- Blob export: `4 files`, complete.
+- Generation records: `15`.
+
+Depth-wise classifications:
+
+| Depth | Raw strict | Stopped intervention | Postprocessed utility |
+|---|---|---|---|
+| 1 | `surface_answer_only_but_task_failed` | `stopped_intervention_usable` | `postprocessed_answer_recovery_usable` |
+| 2 | `raw_strict_not_established` | `stopped_intervention_not_useful` | `postprocessed_surface_clean_but_warning_high` |
+| 3 | `raw_strict_not_established` | `stopped_surface_compliant_but_task_failed` | `postprocessed_answer_recovery_usable` |
+
+Criteria summary:
+
+- Raw depth 1 passed raw validity, visible-marker, parse-valid, and parse-ambiguity criteria; it failed format-warning and absolute/relative accuracy criteria.
+- Raw depth 2 passed ambiguity and format-warning criteria; it failed raw validity, visible-marker, parse-valid, and accuracy criteria.
+- Raw depth 3 passed parse, ambiguity, format-warning, and relative-accuracy criteria; it failed raw validity and visible-marker criteria.
+- Stopped depth 1 passed all four criteria.
+- Stopped depth 2 passed stopped validity only; it failed stop success, parse validity, and accuracy.
+- Stopped depth 3 passed stopped validity, stop success, and parse validity; it failed accuracy.
+- Postprocessed depth 1 passed all four criteria.
+- Postprocessed depth 2 passed postprocessed validity and non-degradation; it failed recovery success and warning rate.
+- Postprocessed depth 3 passed all four preregistered criteria, including `0.0000 >= 0.0000` accuracy non-degradation.
+
+Scientific boundary:
+
+- Classifications are behavioral and operational only.
+- Stop-controlled validity is intervention-controlled, not spontaneous no-CoT.
+- Postprocessed validity is not raw no-CoT.
+- No hidden-reasoning, internal-workspace, or J-space claim is made.
+- No rerun or scale increase is authorized.
