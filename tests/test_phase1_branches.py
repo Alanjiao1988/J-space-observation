@@ -6,13 +6,21 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from jspace_observation.phase1_branches import (
+    BRANCH_ABSOLUTE_ACCURACY_FLOOR,
+    MIN_BRANCH_CLASSIFICATION_N,
+    MIN_VISIBLE_COT_BASELINE_N,
+    MIN_VISIBLE_COT_PARSE_VALID_RATE,
     PHASE1_BRANCH_CLASSIFICATION_WARNING,
+    PHASE1_BRANCH_SAMPLE_SIZE_WARNING,
     PHASE1_INTERPRETATION_BOUNDARIES,
+    PHASE1_POSTPROCESSING_ACCURACY_WARNING,
+    PHASE1_VISIBLE_COT_BASELINE_WARNING,
     POSTPROCESSED_UTILITY_BRANCH,
     RAW_STRICT_BRANCH,
     STOPPED_INTERVENTION_BRANCH,
     VISIBLE_REASONING_BASELINE_BRANCH,
     classify_branch_result,
+    evaluate_visible_cot_baseline,
     get_phase1_branch,
     get_phase1_branch_metadata,
     render_branch_metrics_table,
@@ -76,33 +84,48 @@ def test_branch_metrics_table_uses_na_for_non_applicable_metrics():
     assert "NA" in table
 
 
+def valid_visible_cot_baseline():
+    return {
+        "visible_cot_n": MIN_VISIBLE_COT_BASELINE_N,
+        "visible_cot_accuracy": 0.60,
+        "visible_cot_parse_valid_rate": MIN_VISIBLE_COT_PARSE_VALID_RATE,
+        "visible_cot_answer_format_warning_rate": 0.0,
+    }
+
+
 def passing_raw_metrics():
     return {
+        "n": MIN_BRANCH_CLASSIFICATION_N,
         "raw_no_cot_valid_rate": 0.90,
         "visible_reasoning_marker_rate": 0.10,
         "parse_valid_rate": 0.80,
         "parse_ambiguous_rate": 0.20,
         "answer_format_warning_rate": 0.20,
         "accuracy_raw": 0.50,
+        **valid_visible_cot_baseline(),
     }
 
 
 def passing_stopped_metrics():
     return {
+        "n": MIN_BRANCH_CLASSIFICATION_N,
         "stopped_no_cot_valid_rate": 0.90,
         "stop_success_rate": 0.80,
         "parse_valid_rate": 0.80,
         "accuracy_stopped": 0.50,
+        **valid_visible_cot_baseline(),
     }
 
 
 def passing_postprocessed_metrics():
     return {
+        "n": MIN_BRANCH_CLASSIFICATION_N,
         "postprocessed_no_cot_valid_rate": 0.90,
         "postprocessing_success_rate": 0.80,
         "postprocessing_warning_rate": 0.20,
-        "accuracy_raw": 0.40,
-        "accuracy_postprocessed": 0.50,
+        "accuracy_raw": 0.30,
+        "accuracy_postprocessed": 0.60,
+        **valid_visible_cot_baseline(),
     }
 
 
@@ -132,14 +155,27 @@ def test_raw_strict_preliminarily_established_at_all_threshold_boundaries():
     assert not result["criteria_failed"]
 
 
-def test_raw_strict_accepts_relative_visible_cot_accuracy_standard():
+def test_raw_strict_relative_gate_does_not_replace_absolute_floor():
     metrics = passing_raw_metrics()
     metrics["accuracy_raw"] = 0.49
-    metrics["visible_cot_accuracy"] = 0.70
 
     result = classify_branch_result(RAW_STRICT_BRANCH, metrics)
 
-    assert result["classification"] == "raw_strict_preliminarily_established"
+    assert result["absolute_accuracy_passed"] is False
+    assert result["relative_accuracy_gate_passed"] is True
+    assert result["classification"] == "surface_answer_only_but_task_failed"
+
+
+def test_raw_strict_valid_visible_cot_baseline_applies_relative_gate():
+    metrics = passing_raw_metrics()
+    metrics["visible_cot_accuracy"] = 0.80
+
+    result = classify_branch_result(RAW_STRICT_BRANCH, metrics)
+
+    assert result["baseline_valid"] is True
+    assert result["relative_accuracy_gate_applicable"] is True
+    assert result["relative_accuracy_gate_passed"] is False
+    assert result["classification"] == "surface_answer_only_but_task_failed"
 
 
 def test_stopped_intervention_surface_compliant_but_task_failed_on_low_accuracy():
@@ -159,6 +195,17 @@ def test_stopped_intervention_usable_when_all_thresholds_pass():
 
     assert result["classification"] == "stopped_intervention_usable"
     assert not result["criteria_failed"]
+
+
+def test_stopped_intervention_valid_baseline_applies_relative_gate():
+    metrics = passing_stopped_metrics()
+    metrics["visible_cot_accuracy"] = 0.80
+
+    result = classify_branch_result(STOPPED_INTERVENTION_BRANCH, metrics)
+
+    assert result["absolute_accuracy_passed"] is True
+    assert result["relative_accuracy_gate_passed"] is False
+    assert result["classification"] == "stopped_surface_compliant_but_task_failed"
 
 
 def test_stopped_intervention_warning_rejects_spontaneous_no_cot_claim():
@@ -181,6 +228,56 @@ def test_postprocessed_answer_recovery_usable_when_accuracy_improves():
     assert not result["criteria_failed"]
 
 
+def test_postprocessed_zero_non_degradation_fails_absolute_floor():
+    metrics = passing_postprocessed_metrics()
+    metrics["accuracy_raw"] = 0.0
+    metrics["accuracy_postprocessed"] = 0.0
+
+    result = classify_branch_result(POSTPROCESSED_UTILITY_BRANCH, metrics)
+
+    assert result["absolute_accuracy_floor"] == BRANCH_ABSOLUTE_ACCURACY_FLOOR
+    assert result["absolute_accuracy_passed"] is False
+    assert result["classification"] == "postprocessed_surface_clean_but_task_failed"
+
+
+def test_postprocessed_non_degradation_below_absolute_floor_is_not_usable():
+    metrics = passing_postprocessed_metrics()
+    metrics["accuracy_raw"] = 0.20
+    metrics["accuracy_postprocessed"] = 0.30
+
+    result = classify_branch_result(POSTPROCESSED_UTILITY_BRANCH, metrics)
+
+    assert any(
+        "accuracy_postprocessed >= accuracy_raw" in criterion
+        for criterion in result["criteria_passed"]
+    )
+    assert result["absolute_accuracy_passed"] is False
+    assert result["classification"] == "postprocessed_surface_clean_but_task_failed"
+
+
+def test_postprocessed_non_degradation_and_absolute_floor_can_be_usable():
+    metrics = passing_postprocessed_metrics()
+    metrics["accuracy_raw"] = 0.30
+    metrics["accuracy_postprocessed"] = 0.60
+
+    result = classify_branch_result(POSTPROCESSED_UTILITY_BRANCH, metrics)
+
+    assert result["absolute_accuracy_passed"] is True
+    assert result["classification"] == "postprocessed_answer_recovery_usable"
+
+
+def test_postprocessed_visible_cot_relative_comparison_is_report_only():
+    metrics = passing_postprocessed_metrics()
+    metrics["visible_cot_accuracy"] = 1.0
+
+    result = classify_branch_result(POSTPROCESSED_UTILITY_BRANCH, metrics)
+
+    assert result["relative_accuracy_gate_applicable"] is True
+    assert result["relative_accuracy_gate_required"] is False
+    assert result["relative_accuracy_gate_passed"] is False
+    assert result["classification"] == "postprocessed_answer_recovery_usable"
+
+
 def test_postprocessed_warning_rejects_raw_no_cot_claim():
     result = classify_branch_result(
         POSTPROCESSED_UTILITY_BRANCH,
@@ -201,6 +298,21 @@ def test_postprocessed_surface_clean_but_warning_high():
     assert any("postprocessing_success_rate" in item for item in result["criteria_failed"])
 
 
+def test_postprocessed_task_failure_takes_priority_over_warning_failure():
+    metrics = passing_postprocessed_metrics()
+    metrics["postprocessing_warning_rate"] = 0.21
+    metrics["accuracy_raw"] = 0.0
+    metrics["accuracy_postprocessed"] = 0.0
+
+    result = classify_branch_result(POSTPROCESSED_UTILITY_BRANCH, metrics)
+
+    assert result["classification"] == "postprocessed_surface_clean_but_task_failed"
+    assert any(
+        "postprocessing_warning_rate" in criterion
+        for criterion in result["criteria_failed"]
+    )
+
+
 def test_postprocessed_utility_not_useful_when_validity_is_low():
     metrics = passing_postprocessed_metrics()
     metrics["postprocessed_no_cot_valid_rate"] = 0.89
@@ -208,6 +320,118 @@ def test_postprocessed_utility_not_useful_when_validity_is_low():
     result = classify_branch_result(POSTPROCESSED_UTILITY_BRANCH, metrics)
 
     assert result["classification"] == "postprocessed_utility_not_useful"
+
+
+def test_visible_cot_zero_accuracy_makes_relative_gate_not_applicable():
+    metrics = passing_raw_metrics()
+    metrics["visible_cot_accuracy"] = 0.0
+
+    result = classify_branch_result(RAW_STRICT_BRANCH, metrics)
+
+    assert result["baseline_valid"] is False
+    assert "visible_cot_accuracy_zero" in result["baseline_failure_reasons"]
+    assert result["relative_accuracy_gate_passed"] is None
+    assert "relative_accuracy_gate" in result["criteria_not_applicable"]
+
+
+def test_visible_cot_parse_invalidates_baseline():
+    metrics = valid_visible_cot_baseline()
+    metrics["visible_cot_parse_valid_rate"] = 0.79
+
+    baseline = evaluate_visible_cot_baseline(metrics)
+
+    assert baseline["baseline_valid"] is False
+    assert "visible_cot_parse_invalid" in baseline["baseline_failure_reasons"]
+
+
+def test_visible_cot_small_sample_invalidates_baseline():
+    metrics = valid_visible_cot_baseline()
+    metrics["visible_cot_n"] = MIN_VISIBLE_COT_BASELINE_N - 1
+
+    baseline = evaluate_visible_cot_baseline(metrics)
+
+    assert baseline["baseline_valid"] is False
+    assert "insufficient_visible_cot_samples" in baseline["baseline_failure_reasons"]
+
+
+def test_visible_cot_valid_baseline_is_available_for_relative_comparison():
+    baseline = evaluate_visible_cot_baseline(valid_visible_cot_baseline())
+
+    assert baseline["baseline_available"] is True
+    assert baseline["baseline_valid"] is True
+    assert baseline["baseline_failure_reasons"] == []
+
+
+def test_raw_strict_success_is_pilot_only_below_minimum_sample_size():
+    metrics = passing_raw_metrics()
+    metrics["n"] = 1
+
+    result = classify_branch_result(RAW_STRICT_BRANCH, metrics)
+
+    assert result["sample_size_sufficient"] is False
+    assert result["classification"] == "raw_strict_pilot_only"
+    assert result["classification_is_provisional"] is True
+
+
+def test_stopped_failure_label_is_preserved_below_minimum_sample_size():
+    metrics = passing_stopped_metrics()
+    metrics["n"] = 1
+    metrics["stop_success_rate"] = 0.0
+    metrics["accuracy_stopped"] = 0.0
+
+    result = classify_branch_result(STOPPED_INTERVENTION_BRANCH, metrics)
+
+    assert result["sample_size_sufficient"] is False
+    assert result["classification"] == "stopped_intervention_not_useful"
+
+
+def test_stopped_success_is_formal_at_minimum_sample_size():
+    result = classify_branch_result(
+        STOPPED_INTERVENTION_BRANCH,
+        passing_stopped_metrics(),
+    )
+
+    assert result["sample_size_sufficient"] is True
+    assert result["classification"] == "stopped_intervention_usable"
+    assert result["classification_is_provisional"] is False
+
+
+def test_postprocessed_success_is_pilot_only_below_minimum_sample_size():
+    metrics = passing_postprocessed_metrics()
+    metrics["n"] = 1
+
+    result = classify_branch_result(POSTPROCESSED_UTILITY_BRANCH, metrics)
+
+    assert result["classification"] == "postprocessed_utility_pilot_only"
+    assert result["classification_is_provisional"] is True
+
+
+def test_postprocessed_success_is_formal_at_minimum_sample_size():
+    result = classify_branch_result(
+        POSTPROCESSED_UTILITY_BRANCH,
+        passing_postprocessed_metrics(),
+    )
+
+    assert result["sample_size_sufficient"] is True
+    assert result["classification"] == "postprocessed_answer_recovery_usable"
+
+
+def test_depth3_zero_non_degradation_regression_is_task_failed_even_at_n_one():
+    metrics = {
+        "n": 1,
+        "raw_no_cot_valid_rate": 0.0,
+        "postprocessed_no_cot_valid_rate": 1.0,
+        "postprocessing_success_rate": 1.0,
+        "postprocessing_warning_rate": 0.0,
+        "accuracy_raw": 0.0,
+        "accuracy_postprocessed": 0.0,
+        **valid_visible_cot_baseline(),
+    }
+
+    result = classify_branch_result(POSTPROCESSED_UTILITY_BRANCH, metrics)
+
+    assert result["classification"] == "postprocessed_surface_clean_but_task_failed"
+    assert result["classification"] != "postprocessed_answer_recovery_usable"
 
 
 def test_branch_classification_summary_has_mandatory_scientific_warning():
@@ -223,10 +447,18 @@ def test_branch_classification_summary_has_mandatory_scientific_warning():
     section = render_branch_success_classification_section([row])
 
     assert PHASE1_BRANCH_CLASSIFICATION_WARNING in section
+    assert PHASE1_BRANCH_SAMPLE_SIZE_WARNING in section
+    assert PHASE1_VISIBLE_COT_BASELINE_WARNING in section
+    assert PHASE1_POSTPROCESSING_ACCURACY_WARNING in section
     assert "hidden reasoning" in section
     assert "internal workspace behavior" in section
     assert "J-space evidence" in section
     assert "raw_strict_preliminarily_established" in section
     assert "| test-model | arithmetic | 1 | raw_strict |" in section
     assert "stop_string_distribution" in section
+    assert "minimum_n" in section
+    assert "sample_size_sufficient" in section
+    assert "visible_cot_baseline_valid" in section
+    assert "relative_accuracy_gate" in section
+    assert "criteria_not_applicable" in section
     assert "NA" in section

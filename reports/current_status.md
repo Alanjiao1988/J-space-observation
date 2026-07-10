@@ -2,11 +2,11 @@
 
 ## Summary
 
-The executable scaffold, private Azure path, preregistered criteria, and one fixed-scope real criteria-validation run are complete.
+The executable scaffold, private Azure path, real criteria-validation run, and prospective Phase 1 branch-gate hardening are complete.
 
 ## Current Phase
 
-**Phase: 15-cell criteria validation succeeded; further runs paused for prospective criteria review**
+**Phase: branch success gates hardened; no follow-up run authorized**
 
 ## ACR Managed Identity Azure Execution (2026-07-08)
 
@@ -419,29 +419,31 @@ The criteria in `docs/phase1_experiment_branches.md` are fixed before any new da
 
 | Branch | Passing classification | Core gate |
 |---|---|---|
-| `raw_strict` | `raw_strict_preliminarily_established` | Raw validity/marker/parsing/format thresholds plus absolute or matching visible-CoT-relative accuracy. |
-| `stopped_intervention` | `stopped_intervention_usable` | Stopped validity, stop success, parse validity, and stopped accuracy. |
-| `postprocessed_utility` | `postprocessed_answer_recovery_usable` | Postprocessed validity, recovery success, warning rate, and no accuracy degradation. |
+| `raw_strict` | `raw_strict_preliminarily_established` | `n >= 3`, surface/parsing/format gates, absolute accuracy `>= 0.50`, plus the relative gate when the visible-CoT baseline is valid. |
+| `stopped_intervention` | `stopped_intervention_usable` | `n >= 3`, stopped validity, stop success, parse validity, absolute accuracy `>= 0.50`, plus the relative gate when the baseline is valid. |
+| `postprocessed_utility` | `postprocessed_answer_recovery_usable` | `n >= 3`, validity/recovery/warning gates, non-degradation, and absolute accuracy `>= 0.50`. |
 
 Report changes:
 
-- Every model x task family x depth x condition row is classified independently.
+- Every reported branch result includes sample-size sufficiency and provisional status.
 - Missing required metrics fail their criterion; non-applicable metrics remain `NA`.
-- Reports include criteria passed/failed, matching visible-CoT accuracy, stop-trigger rate, stop-string distribution, and postprocessing warning/application rates.
+- Visible-CoT relative gates require baseline `n >= 3`, parse-valid rate `>= 0.80`, and accuracy `> 0`; otherwise they are `NA`.
+- Reports include criteria passed/failed/not-applicable, matching baseline fields, stop-trigger rate, stop-string distribution, and postprocessing warning/application rates.
 - The mandatory warning states that classifications are behavioral and operational, not hidden-reasoning, internal-workspace, or J-space evidence.
 
 Local validation:
 
 ```text
 python -m pytest tests\ -q
-92 passed, 2 warnings
+109 passed, 2 warnings
 ```
 
 Execution state:
 
-- One fixed-scope Azure validation run performed: yes.
-- Local model inference performed: no.
-- ACR rebuild performed: yes, from `f94e889ef6089aab8f651a2d14c42341440625a3`.
+- Historical fixed-scope Azure validation run performed: yes.
+- Azure rerun for gate hardening: no.
+- Local model inference for gate hardening: no.
+- ACR rebuild for gate hardening: no.
 - Active environment: `cae-jspace-observation-sea-vnet2`.
 - Active Blob prefix: `phase1-pilot-criteria-validation/20260710T135655Z`.
 - Current infrastructure blocker: none.
@@ -502,7 +504,27 @@ Validation outcome:
 - Postprocessed validity is not raw no-CoT.
 - No hidden-reasoning, internal-workspace, or J-space claim is supported.
 
-Next action: review absolute-floor and zero-baseline guards prospectively before approving any further run.
+## Phase 1 Branch-gate Hardening (2026-07-10)
+
+Prospective rules:
+
+- Formal success labels require `n >= 3`; otherwise an otherwise-passing result becomes `raw_strict_pilot_only`, `stopped_intervention_pilot_only`, or `postprocessed_utility_pilot_only`.
+- Explicit metric failures retain failure labels below the minimum sample size.
+- Raw and stopped branches always require absolute accuracy `>= 0.50`.
+- Their relative gate is applied only when matching visible-CoT `n >= 3`, parse-valid rate `>= 0.80`, and accuracy `> 0`; otherwise it is `NA`.
+- Postprocessed utility requires non-degradation and `accuracy_postprocessed >= 0.50`.
+- Postprocessed visible-CoT comparison is report-only.
+
+Historical regression interpretation:
+
+- The completed Blob summary remains unchanged under the earlier criteria.
+- Depth-1 stopped and postprocessed rows would now be `pilot_only` because `n=1`.
+- The depth-3 postprocessed `0 >= 0` case now becomes `postprocessed_surface_clean_but_task_failed`.
+- The pilot's matching visible-CoT rows have `n=1`, so relative gates are unavailable rather than passed.
+
+No Azure job, model inference, model download, ACR rebuild, or scale increase occurred during hardening. Results remain behavioral and operational only. Stopped output remains intervention-controlled, postprocessed output remains distinct from raw no-CoT, and no hidden-reasoning or J-space claim is supported.
+
+Next action: obtain explicit approval for a bounded validation with at least three observations per branch/depth before rebuilding ACR or running Azure.
 
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 

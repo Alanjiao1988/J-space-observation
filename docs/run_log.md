@@ -1620,3 +1620,46 @@ Scientific boundary:
 - Postprocessed validity is not raw no-CoT.
 - No hidden-reasoning, internal-workspace, or J-space claim is made.
 - No rerun or scale increase is authorized.
+
+## 2026-07-10 — Phase 1 branch gate hardening
+
+Purpose:
+
+- Correct the criteria weaknesses found by the completed 15-cell validation pilot without collecting new data.
+- Preserve the completed Azure execution and Blob artifacts as historical outputs under the earlier registered criteria.
+
+Code and report changes:
+
+- Added `accuracy_postprocessed >= 0.50` as a hard gate in addition to non-degradation.
+- Added visible-CoT baseline validation: `visible_cot_n >= 3`, parse-valid rate `>= 0.80`, and accuracy `> 0`.
+- Invalid or unavailable visible-CoT baselines now make the relative gate `NA` and add a failure reason.
+- Added `n >= 3` for formal branch success and branch-specific `pilot_only` labels.
+- Clear failures remain visible below the minimum sample size.
+- Added sample-size, absolute-floor, baseline-validity, relative-gate, provisional, and not-applicable fields to the classification table.
+- Added mandatory sample-size, visible-CoT baseline, and postprocessing absolute-floor warnings.
+
+Historical metric regression:
+
+- The completed Blob summary is unchanged and remains an audit artifact of the earlier criteria.
+- Under the hardened deterministic classifier, depth-1 stopped success would be `stopped_intervention_pilot_only` because `n=1`.
+- Under the hardened deterministic classifier, depth-1 postprocessed success would be `postprocessed_utility_pilot_only` because `n=1`.
+- The depth-3 postprocessed `0 >= 0` case is now `postprocessed_surface_clean_but_task_failed`, not `postprocessed_answer_recovery_usable`.
+- The matching visible-CoT rows in the pilot have `n=1`, so their relative gates are `NA`.
+
+Local validation:
+
+```text
+python -m pytest tests\ -q
+109 passed, 2 warnings
+```
+
+Execution boundary:
+
+- Azure rerun performed: no.
+- Model inference performed: no.
+- Model downloaded: no.
+- ACR rebuild performed: no.
+- Experiment scale changed: no.
+- Active environment remains `cae-jspace-observation-sea-vnet2`.
+- Latest successful execution remains `job-jspace-p1-criteria-val-6s8p15p`.
+- No hidden-reasoning or J-space claim is made.

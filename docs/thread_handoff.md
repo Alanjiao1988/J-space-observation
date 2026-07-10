@@ -2,7 +2,7 @@
 
 Date: 2026-07-10
 Repository: `Alanjiao1988/J-space-observation`
-Latest verified experiment/reporting code commit: `f94e889ef6089aab8f651a2d14c42341440625a3`
+Latest pushed baseline before gate hardening: `20f17dd2df16171b4b5fda081b8d8c93014468fd`
 Current image commit: `f94e889ef608`
 
 > Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
@@ -32,6 +32,8 @@ Current image commit: `f94e889ef608`
 > Update (2026-07-10 — criteria preregistration): Branch-specific thresholds are now fixed in `docs/phase1_experiment_branches.md` before any new data collection. `classify_branch_result()` independently labels raw strict feasibility, stop-intervention utility, and postprocessed answer recovery. Phase 1 summaries now include a `Branch success classification` table, matching visible-CoT relative accuracy where available, stop-string distribution, `NA` for non-applicable metrics, and mandatory no-hidden-reasoning/no-J-space warnings. Local tests pass (`92 passed, 2 warnings`). No model inference, Azure job, ACR build, or scale increase occurred. The next run requires explicit approval and must remain limited scale.
 >
 > Update (2026-07-10 — criteria validation): Alan approved exactly one fixed 15-cell validation run. ACR build `cma` produced image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608`, digest `sha256:f27cc0e4cea0ae9569dbb384598fb391f3b923022ce9257f8301684c9dc23806`. The valid shortened job name is `job-jspace-p1-criteria-val`; its only execution, `job-jspace-p1-criteria-val-6s8p15p`, succeeded in `cae-jspace-observation-sea-vnet2` and uploaded four files under `phase1-pilot-criteria-validation/20260710T135655Z`. The summary contained 15 records, all three branch classifications, passed/failed criteria, stop-string distribution, and mandatory interpretation warnings. Depth-wise raw classifications were `surface_answer_only_but_task_failed / raw_strict_not_established / raw_strict_not_established`; stopped classifications were `usable / not_useful / surface_compliant_but_task_failed`; postprocessed classifications were `usable / surface_clean_but_warning_high / usable`. The depth 3 postprocessed usable label reflects `0 >= 0` non-degradation and must not be read as task success. No local inference, scale expansion, hidden-reasoning claim, or J-space claim occurred.
+>
+> Update (2026-07-10 — gate hardening): Phase 1 formal success now requires `n >= 3`, an absolute branch accuracy floor of `0.50`, and valid visible-CoT baseline guards before raw/stopped relative gates apply. Postprocessed utility requires both non-degradation and `accuracy_postprocessed >= 0.50`; the depth-3 `0 >= 0` regression now produces `postprocessed_surface_clean_but_task_failed`. A matching visible-CoT baseline is valid only at `n >= 3`, parse-valid rate `>= 0.80`, and accuracy `> 0`; otherwise the relative gate is `NA`. Otherwise-passing single-sample rows use branch-specific `pilot_only` labels, while clear failures retain failure labels. Local tests pass (`109 passed, 2 warnings`). No Azure job, model inference, model download, ACR rebuild, or scale increase occurred. The prior Blob summary remains unchanged as a historical artifact.
 >
 > Update (2026-07-08 22:51 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but Copilot's fresh tool processes could not see them in Process/User/Machine environment scopes. No package-read preflight or Azure job retry was attempted. To continue, set the variables in Windows User environment (or another secure path readable by the agent), e.g. `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`. Do not paste tokens into chat.
 
@@ -424,7 +426,7 @@ GHCR private pull remains historical; do not return to GHCR unless Alan explicit
 
 The new thread should continue from here:
 
-### Step 1: Review criteria limitations before any next run
+### Step 1: Obtain separate approval for a minimum-evidence validation
 
 The Azure ACR managed-identity chain has already succeeded:
 
@@ -437,10 +439,10 @@ small phase 1 pilot execution: job-jspace-phase1-pilot-acr-lhuvwbf
 
 Before any new run:
 
-1. Preserve this run under the preregistered thresholds without reclassification.
-2. Decide prospectively whether postprocessed utility needs an absolute accuracy floor.
-3. Decide prospectively whether the raw relative-accuracy rule needs a nonzero visible-CoT baseline guard.
-4. Log and approve any criteria revision before collecting new data.
+1. Preserve the completed Blob summary as a historical artifact under the earlier criteria.
+2. Use the hardened criteria in `docs/phase1_experiment_branches.md`.
+3. Obtain explicit approval for any run with at least three observations per branch/depth; no such run is currently authorized.
+4. Rebuild ACR from the then-current approved commit only after run approval.
 5. Keep all branches separate and make no hidden-reasoning or J-space claim.
 
 ---
@@ -469,15 +471,16 @@ Current known state:
 - Criteria validation succeeded as `job-jspace-p1-criteria-val-6s8p15p`.
 - Results are under `phase1-pilot-criteria-validation/20260710T135655Z`.
 - Phase 1 has three non-interchangeable branches: raw strict, stopped intervention, and postprocessed utility.
-- Branch-specific success criteria are preregistered in `docs/phase1_experiment_branches.md`.
-- Local tests pass: `92 passed, 2 warnings`.
+- Branch success criteria now include absolute accuracy, visible-CoT baseline validity, and `n >= 3` guards.
+- Local tests pass: `109 passed, 2 warnings`.
 - The real summary generated classifications, passed/failed criteria, and interpretation warnings correctly.
-- Depth 3 postprocessed utility passes non-degradation at zero accuracy; review this criterion prospectively.
-- There is no infrastructure blocker, but further runs are paused pending criteria review and explicit approval.
+- The historical depth-3 `0 >= 0` label is fixed prospectively; the persisted Blob summary is not rewritten.
+- The current ACR image predates gate hardening and was not rebuilt.
+- There is no infrastructure blocker, but further runs are paused pending explicit approval.
 - No Phase 1 result is hidden-reasoning or J-space evidence.
 
 Your first task:
-Review the two identified criteria limitations and log any prospective criteria revision before requesting another run.
+Request explicit approval for a limited minimum-evidence validation only after confirming the proposed scope remains bounded.
 ```
 
 ---

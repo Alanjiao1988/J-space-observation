@@ -658,11 +658,11 @@ Preregistered limited-scale gates:
 
 | Branch | Required thresholds |
 |---|---|
-| `raw_strict` | `raw_no_cot_valid_rate >= 0.90`; reasoning markers `<= 0.10`; parse validity `>= 0.80`; ambiguity/warnings `<= 0.20`; raw accuracy `>= 0.50` or `>= 0.70 * visible_cot_accuracy`. |
-| `stopped_intervention` | stopped validity `>= 0.90`; stop success `>= 0.80`; parse validity `>= 0.80`; stopped accuracy `>= 0.50`. |
-| `postprocessed_utility` | postprocessed validity `>= 0.90`; recovery success `>= 0.80`; warnings `<= 0.20`; postprocessed accuracy `>=` raw accuracy. |
+| `raw_strict` | `n >= 3`; raw validity `>= 0.90`; reasoning markers `<= 0.10`; parse validity `>= 0.80`; ambiguity/warnings `<= 0.20`; raw accuracy `>= 0.50`; plus `>= 0.70 * visible_cot_accuracy` only when the baseline is valid. |
+| `stopped_intervention` | `n >= 3`; stopped validity `>= 0.90`; stop success `>= 0.80`; parse validity `>= 0.80`; stopped accuracy `>= 0.50`; plus the relative gate only when the baseline is valid. |
+| `postprocessed_utility` | `n >= 3`; postprocessed validity `>= 0.90`; recovery success `>= 0.80`; warnings `<= 0.20`; postprocessed accuracy `>=` raw accuracy and `>= 0.50`. |
 
-The detailed and controlling definition is `docs/phase1_experiment_branches.md`. Do not change these thresholds after observing a new run without a new logged decision.
+The visible-CoT baseline is valid only when matching `visible_cot_n >= 3`, parse-valid rate `>= 0.80`, and accuracy `> 0`. Otherwise the relative gate is `NA`. Postprocessed visible-CoT-relative performance is report-only. The detailed and controlling definition is `docs/phase1_experiment_branches.md`.
 
 The criteria-validation run below used these preregistered thresholds without modification.
 
@@ -700,9 +700,32 @@ Observed classifications by depth 1/2/3:
 
 The summary printed all passed/failed criteria and the mandatory interpretation warnings. Blob upload completed through managed identity and the private endpoint. Storage public access and shared-key access remained disabled.
 
-Do not treat the depth 3 postprocessed usable label as task success: both raw and postprocessed accuracy were zero, satisfying only the preregistered non-degradation rule. Review an absolute floor prospectively before any later run. Do not change this completed run after the fact.
+Do not treat the historical depth 3 postprocessed usable label as task success: both raw and postprocessed accuracy were zero, satisfying only the earlier non-degradation rule. The persisted summary remains unchanged as a historical artifact.
 
 No further run is authorized. No hidden-reasoning, internal-workspace, or J-space claim is supported.
+
+## Branch-gate hardening status
+
+The repository now applies the following rules prospectively:
+
+1. `n >= 3` is required for formal success; otherwise an otherwise-passing row uses a branch-specific `pilot_only` label.
+2. Clear failures retain failure labels below the sample minimum.
+3. Absolute branch accuracy `>= 0.50` cannot be replaced by a relative comparison.
+4. Invalid or undersampled visible-CoT baselines make relative gates `NA`.
+5. Postprocessed utility requires both non-degradation and absolute accuracy `>= 0.50`; `0 >= 0` is not usable.
+
+For this hardening update:
+
+```text
+Azure job: not run
+model inference: not run
+model download: not performed
+ACR rebuild: not performed
+active image remains: acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608
+latest successful execution remains: job-jspace-p1-criteria-val-6s8p15p
+```
+
+The current ACR image predates these rules. Rebuild only after a separately approved limited run.
 
 ## Persistent results storage status
 

@@ -751,12 +751,19 @@ def main():
         dict(zip(metrics_rows[0], row))
         for row in metrics_rows[1:]
     ]
-    visible_cot_accuracy_by_cell = {
+    visible_cot_baseline_by_cell = {
         (
             str(row["model"]),
             str(row["task_family"]),
             str(row["depth"]),
-        ): row["accuracy_raw"]
+        ): {
+            "visible_cot_n": row["n"],
+            "visible_cot_accuracy": row["accuracy_raw"],
+            "visible_cot_parse_valid_rate": row["parse_valid_rate"],
+            "visible_cot_answer_format_warning_rate": (
+                row["answer_format_warning_rate"]
+            ),
+        }
         for row in metric_records
         if row["condition"] == "visible_cot"
     }
@@ -780,11 +787,14 @@ def main():
             str(row["task_family"]),
             str(row["depth"]),
         )
-        row["visible_cot_accuracy"] = (
-            visible_cot_accuracy_by_cell.get(cell_key, "NA")
-            if row["branch"] == "raw_strict"
-            else "NA"
-        )
+        visible_cot_baseline = visible_cot_baseline_by_cell.get(cell_key, {})
+        for metric_name in (
+            "visible_cot_n",
+            "visible_cot_accuracy",
+            "visible_cot_parse_valid_rate",
+            "visible_cot_answer_format_warning_rate",
+        ):
+            row[metric_name] = visible_cot_baseline.get(metric_name, "NA")
         stop_key = (*cell_key, str(row["condition"]))
         distribution = stop_string_counts.get(stop_key)
         row["stop_string_distribution"] = (
