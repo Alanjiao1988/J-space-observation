@@ -782,3 +782,64 @@ Consequence:
 - `n=3` meets only the registered minimum and does not establish statistical stability.
 - Counts and aggregate rows passed audit. Record-level duplicate IDs, exact item membership, and field equality remain inconclusive because private Blob data cannot be read from the local machine without changing network policy; no key, SAS, or public-network workaround was used.
 - No result establishes hidden reasoning, internal workspace behavior, or J-space evidence.
+
+## 2026-07-11 — complete read-only Phase 1 record-level artifact audit
+
+Decision:
+
+- Accept one model-free, CPU-only audit of the immutable bounded n=3 source
+  prefix through the existing VNet, private endpoint, and managed identity.
+- Keep source and audit-output prefixes disjoint and use `overwrite=False` for
+  audit reports.
+- Treat deterministic artifact checks separately from LLM semantic review.
+- Do not alter stored parser fields, correctness, metrics, classifications,
+  thresholds, prompts, or historical summaries.
+
+Reason:
+
+- Local access could not inspect the private source artifacts at record level.
+- Counts and aggregate classifications were known, but duplicate keys, exact
+  membership, common-field equality, transformation derivation, parser replay,
+  and all 18 ambiguous records still required direct review.
+- A private-path audit resolves integrity questions without running the model or
+  weakening Storage network controls.
+
+Evidence:
+
+- Audit implementation commit:
+  `9537ed8e0b5da95b68714b73fa11236b48ee046a`.
+- Tests: `139 passed, 2 warnings`.
+- ACR build `cmc`; digest
+  `sha256:90adfc1b6be6fbb7a17a878bed7970ffd71c62b72263a36b41110ba6f19b169b`.
+- CPU-only execution `job-jspace-p1-record-audit-d9q5uy8` succeeded on the
+  `Consumption` profile.
+- Eight files were uploaded under
+  `phase1-audits/n3-gates-20260710T152820Z/20260711T010339Z`.
+- Source Blob properties remained unchanged.
+- Deterministic status: `completed_clean`.
+- Pairing: 45 unique generation keys, 45 unique eval keys, zero duplicates or
+  one-sided keys.
+- Membership: all 15 cells contain exactly three registered unique items.
+- Common-field, transformation, parser, metric, and branch mismatches: zero.
+- All 15 metric rows and nine branch classifications match; depth-3
+  postprocessed `0 >= 0` remains task-failed.
+- Two independent reviewers assessed all 18 stored ambiguous records. Category
+  agreement was 17/18; an arbiter resolved all 14 records with any field-level
+  disagreement.
+
+Consequence:
+
+- The prior record-integrity limitation is resolved as `PASS`, evidence-bounded.
+- Final LLM audit opinion is 17 parser overflags and one true
+  multiple-candidate ambiguity, with zero unresolved after arbitration.
+- The semantic review does not rewrite stored fields and is not human ground
+  truth.
+- Records 2 and 3 demonstrate a last-number answer-extraction limitation while
+  remaining mechanically consistent with the stored evaluator.
+- Reviewing only flagged records cannot exclude parser underflags among the
+  other 27 records.
+- No higher-n replication is authorized. The next decision must preregister
+  whether to audit all 45 outputs for underflags or revise parser methodology
+  prospectively.
+- This audit generated no behavioral observation and supports no
+  hidden-reasoning, internal-workspace, or J-space claim.

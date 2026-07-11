@@ -761,7 +761,64 @@ Runtime evidence:
 - Depth-3 visible-CoT accuracy was zero, so relative gates were `NA`.
 - Depth-3 `0 >= 0` postprocessed non-degradation did not pass the absolute accuracy floor.
 
-Local Entra Blob listing remains blocked by network rules, as expected. Do not enable public access or use keys/SAS. Record-level duplicate and item-membership checks therefore remain pending; no model rerun is authorized.
+Local Entra Blob listing remains blocked by network rules, as expected. Do not enable public access or use keys/SAS. The record-level checks were completed with the CPU-only private-path audit below; no model rerun is authorized.
+
+## CPU-only Phase 1 record audit status
+
+The reusable audit path reads the existing source prefix without loading a
+model:
+
+```text
+implementation commit: 9537ed8e0b5da95b68714b73fa11236b48ee046a
+ACR build: cmc
+image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:9537ed8e0b5d
+digest: sha256:90adfc1b6be6fbb7a17a878bed7970ffd71c62b72263a36b41110ba6f19b169b
+environment: cae-jspace-observation-sea-vnet2
+workload profile: Consumption
+resources: 2 CPU / 4Gi
+GPU: none
+job: job-jspace-p1-record-audit
+execution: job-jspace-p1-record-audit-d9q5uy8
+status: Succeeded
+source: phase1-limited-n3-gates/20260710T152820Z
+output: phase1-audits/n3-gates-20260710T152820Z/20260711T010339Z
+```
+
+Use these audit-specific helper variables:
+
+```bash
+export WORKLOAD_PROFILE_NAME="Consumption"
+export CPU_CORES="2.0"
+export MEMORY="4Gi"
+export JSPACE_AUDIT_SOURCE_PREFIX="<immutable-source-prefix>"
+export JSPACE_AUDIT_OUTPUT_PREFIX="<separate-audit-prefix>"
+export JSPACE_AUDIT_IMPLEMENTATION_COMMIT="$(git rev-parse HEAD)"
+```
+
+The Consumption profile rejects `1 CPU / 4Gi`; use a supported paired shape
+such as `2 CPU / 4Gi`. The helper rejects audit mode when
+`WORKLOAD_PROFILE_NAME` is a GPU profile.
+
+The helper automatically starts the job. Do not issue another start command.
+Audit reports upload with `overwrite=False`; the source and output prefixes
+must not overlap in either direction.
+
+Result:
+
+- four source files remained unchanged;
+- 45/45 generation/eval records paired;
+- 15/15 cells had exact registered membership;
+- field, transformation, parser, metrics, and classification mismatches were
+  zero;
+- eight audit files uploaded;
+- no model inference or new observation occurred.
+
+Direct replica logs may disappear after a short CPU job. The active environment
+uses Log Analytics, so retrieve the same execution's persisted
+`ContainerAppConsoleLogs_CL` rows instead of rerunning the audit.
+
+Detailed findings and ambiguity adjudication:
+`reports/phase1_n3_record_audit.md`.
 
 ## Persistent results storage status
 

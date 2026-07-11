@@ -6,7 +6,7 @@ The executable scaffold, private Azure path, hardened branch gates, and bounded 
 
 ## Current Phase
 
-**Phase: bounded n=3 validation complete; record-level artifact audit pending**
+**Phase: bounded n=3 validation and record-level artifact audit complete**
 
 ## ACR Managed Identity Azure Execution (2026-07-08)
 
@@ -564,10 +564,70 @@ Key interpretation:
 - Depth-3 postprocessed non-degradation is `0 >= 0`, but absolute accuracy fails, so it is not usable.
 - Depth-3 relative gates are `NA`, not passed or failed.
 - Classification audit independently recomputed all nine rows with zero mismatches.
-- Count/aggregate audits passed. Record-level duplicates, item membership, and field equality remain inconclusive because local Entra Blob access is blocked by private network rules.
+- Count/aggregate audits passed. The subsequent private-path record audit found zero duplicate, missing, membership, common-field, transformation, parser, metric, or classification mismatches.
 - No hidden-reasoning, internal-workspace, genuine invisible-reasoning, or J-space claim is supported.
 
-Next action: complete a read-only record-level audit of the existing 45 generation/eval pairs, including the 18 ambiguous parses, before requesting any higher-n replication.
+Next action: decide whether to preregister an all-45 parser-underflag review or a parser-method change before requesting any higher-n replication.
+
+## Phase 1 n=3 Record-Level Artifact Audit (2026-07-11)
+
+Provenance:
+
+```text
+starting commit: a4bbf8911e0f758eb10230e52c6e953ef8df9cee
+audit implementation commit: 9537ed8e0b5da95b68714b73fa11236b48ee046a
+tests: 139 passed, 2 warnings
+ACR build: cmc
+image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:9537ed8e0b5d
+digest: sha256:90adfc1b6be6fbb7a17a878bed7970ffd71c62b72263a36b41110ba6f19b169b
+environment/profile: cae-jspace-observation-sea-vnet2 / Consumption
+job: job-jspace-p1-record-audit
+execution: job-jspace-p1-record-audit-d9q5uy8
+status: Succeeded
+GPU used: no
+model inference: no
+new observations: no
+```
+
+Source and output:
+
+```text
+source: phase1-limited-n3-gates/20260710T152820Z
+audit output: phase1-audits/n3-gates-20260710T152820Z/20260711T010339Z
+source modified: no
+audit files uploaded: 8
+```
+
+Deterministic result:
+
+- 45/45 generation records and 45/45 eval records are valid JSONL.
+- Composite key: `model_name, task_family, depth, condition, task_id`.
+- 45 unique keys per side; zero duplicates or one-sided keys.
+- All 15 cells contain exactly three registered, unique items.
+- Registered answers, common fields, selected-output transformations, parser
+  replay, and correctness aliases have zero mismatches.
+- All 15 metric rows match with maximum absolute difference `0.0`.
+- All nine branch classifications and criteria lists match.
+- Depth-3 postprocessed `0 >= 0` remains task-failed because the absolute floor
+  fails.
+- Before/after source Blob properties are unchanged.
+
+Ambiguous-parse review:
+
+- Two independent `gpt-5.6-sol/max` reviewers audited all 18 flagged records.
+- Exact category agreement: `17/18`; Cohen's kappa: `0.6471`.
+- Any field-level disagreement triggered arbitration: `14` records.
+- Arbiter unresolved records: `0`.
+- Final audit opinion: `17` parser overflags and `1` true multiple-candidate
+  ambiguity.
+- Final answer statuses: `6` correct, `1` incorrect, `1` ambiguous, and `10`
+  with no answer.
+- Stored parser/correctness fields are mechanically consistent for all 18.
+  Records 2 and 3 expose semantic answer-extraction limitations rather than
+  artifact corruption.
+- Reviewing only flagged records cannot rule out underflags among the other 27.
+
+Detailed report: `reports/phase1_n3_record_audit.md`.
 
 ## GHCR Workflow Run + T4 Quota Findings (2026-07-08 22:00 +08:00)
 
@@ -1189,5 +1249,5 @@ J-space-observation/
 ✓ **Pilot**: Small stop-controlled Phase 1 run persisted successfully
 ✓ **Reporting**: Raw strict, stopped intervention, and postprocessed utility are separate
 ✓ **Criteria**: Branch-specific thresholds preregistered before further runs
-⏳ **Pending**: Explicit approval for one limited-scale run scope
+⏳ **Pending**: Preregistered parser follow-up decision before any new model run
 ⏳ **Pending**: Actual J-lens fitting and validation

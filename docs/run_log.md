@@ -1807,3 +1807,174 @@ Scientific boundary:
 - Stopped depth-1 usability is intervention utility, not spontaneous no-CoT.
 - Postprocessed depth-1 usability is answer-recovery utility, not raw no-CoT.
 - No hidden-reasoning, internal-workspace, genuine invisible-reasoning, or J-space claim is made.
+
+## Azure ACR managed-identity job - 2026-07-11T01:04:00Z
+
+- Command: `bash infra/azure/scripts/06_run_job_acr_mi.sh`
+- Job: job-jspace-p1-record-audit
+- Image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:9537ed8e0b5d
+- Registry: acrjspaceobssea0708231738.azurecr.io via user-assigned managed identity
+- Container command: `python scripts/audit_phase1_blob_run.py --storage-account "$JSPACE_BLOB_ACCOUNT" --container "$JSPACE_BLOB_CONTAINER" --source-prefix "$JSPACE_AUDIT_SOURCE_PREFIX" --audit-output-prefix "$JSPACE_AUDIT_OUTPUT_PREFIX" --download-dir /tmp/jspace-record-audit --require-exact-generation-count 45 --require-exact-eval-count 45 --expected-items-per-cell 3 --emit-ambiguous-records --upload-audit-report`
+
+## 2026-07-11 — read-only bounded n=3 record audit
+
+Authorization and boundaries:
+
+- Audit existing source prefix
+  `phase1-limited-n3-gates/20260710T152820Z`.
+- Read source through the existing private endpoint and managed identity.
+- Write only under
+  `phase1-audits/n3-gates-20260710T152820Z/20260711T010339Z`.
+- No model loading, model generation, new observation, threshold change, parser
+  retuning, source overwrite, key, SAS, or public-network change.
+
+Parallel pre-run design audits:
+
+- Requested model: `gpt-5.6 soil`; actual model: `gpt-5.6-sol`; reasoning:
+  `max`.
+- Agents: `record-schema-audit`, `record-metrics-audit`,
+  `record-ambiguity-audit`.
+- Pairing key selected:
+  `model_name, task_family, depth, condition, task_id`.
+- The metric audit identified `avg_latency_s` as requiring generation records;
+  the audit therefore used paired generation/eval artifacts.
+- The ambiguity audit established that flagged-only review can identify
+  overflags but cannot exclude underflags among unflagged records.
+
+Implementation and review:
+
+- Starting commit: `a4bbf8911e0f758eb10230e52c6e953ef8df9cee`.
+- Audit implementation commit:
+  `9537ed8e0b5da95b68714b73fa11236b48ee046a`.
+- Added `record_audit.py`, Blob audit CLI, 28 audit tests, and CPU audit helper
+  guards.
+- Full test command: `python -m pytest tests\ -q`.
+- Result: `139 passed, 2 warnings`.
+- Read-only implementation reviews: `record-implementation-review` and
+  `record-fix-review`, both `gpt-5.6-sol/max`.
+- Review fixes covered strict JSONL/CSV syntax, key types, registered answers,
+  parser aliases, summary multiplicity, zero-specific D3 regression,
+  bidirectional prefix isolation, direct CLI import, CPU guard, selected-output
+  transformation replay, malformed-key handling, and empty JSONL.
+
+ACR:
+
+- Build command: `az acr build` from implementation commit.
+- Build run: `cmc`; status `Succeeded`.
+- Image:
+  `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9537ed8e0b5d`.
+- Digest:
+  `sha256:90adfc1b6be6fbb7a17a878bed7970ffd71c62b72263a36b41110ba6f19b169b`.
+- `latest` resolved to the same digest.
+
+Private infrastructure:
+
+- Environment: `cae-jspace-observation-sea-vnet2`; state `Succeeded`.
+- CPU profile: `Consumption`.
+- GPU profile remained available but was not used.
+- Managed identity: `id-jspace-aca-acrpull-sea`.
+- Roles: `AcrPull` on ACR and `Storage Blob Data Contributor` on the Blob
+  account.
+- Storage public network access: `Disabled`.
+- Shared-key access: `False`.
+- Private endpoint `pe-stjspacefiles-blob-sea`: `Succeeded / Approved`.
+
+Execution:
+
+- Job: `job-jspace-p1-record-audit`.
+- Suggested `1 CPU / 4Gi` create request failed before job/execution creation
+  because Consumption requires a supported paired shape.
+- Successful shape: `2 CPU / 4Gi`; GPU: none.
+- All execution IDs: `job-jspace-p1-record-audit-d9q5uy8`.
+- Start: `2026-07-11T01:03:59Z`.
+- End: `2026-07-11T01:05:25Z`.
+- Status: `Succeeded`.
+- Execution retries: `0`.
+- The helper automatically started the sole execution; no duplicate start was
+  issued.
+
+Source manifest:
+
+| Artifact | Bytes | Lines | SHA-256 | ETag | Unchanged |
+|---|---:|---:|---|---|---|
+| `phase1_generations.jsonl` | 138133 | 45 | `b45c972af6f8a2be771e308d943ff793bdafd44c486a4eae9ea8a4e7f1ec11a0` | `"0x8DEDE985A8ECD24"` | true |
+| `phase1_eval_records.jsonl` | 84824 | 45 | `57aee97ef98a9be14e489bf6aa4a6e09a80fd5ceedb2df8fadc8d991be98538b` | `"0x8DEDE985A8CF8AF"` | true |
+| `phase1_metrics.csv` | 4223 | 16 | `14df044221ed34320d797c66aee17948e756aacb316c882e36cdf84ab496a3d1` | `"0x8DEDE985A918BD4"` | true |
+| `phase1_summary.md` | 15814 | 98 | `fcc8a33efd8462e39b4f3d9fb704379bf740e0fc2cb7593d087f6de0b4c76173` | `"0x8DEDE985A933949"` | true |
+
+Audit outputs:
+
+- Eight files uploaded with `overwrite=False`: manifest, JSON/Markdown report,
+  pairing mismatches, ambiguous records, deterministic ambiguous review,
+  recomputed metrics, and recomputed classifications.
+- Source prefix was not modified.
+
+Deterministic result:
+
+- Overall: `completed_clean`.
+- JSONL syntax: generation `45/45`, eval `45/45`; no invalid or blank lines.
+- Pairing: 45/45; duplicate and one-sided keys `0`.
+- Membership: 15/15 cells; each has three registered unique items.
+- Registered-answer mismatches: `0`.
+- Common-field and selected-output transformation mismatches: `0`.
+- Current parser and correctness replay mismatches: `0`.
+- Metrics: `15/15` rows; max absolute difference `0.0`; no latency field was
+  skipped.
+- Branches: `9/9`; classification and criterion-list mismatches `0`.
+- Depth-3 `0 >= 0` absolute-floor regression: `PASS`.
+
+Parallel post-run reviews:
+
+- Requested model: `gpt-5.6 soil`; actual model: `gpt-5.6-sol`; reasoning:
+  `max`.
+- Agents: `record-integrity-review`, `metrics-classification-review`,
+  `ambiguous-review-a`, `ambiguous-review-b`, `science-boundary-review`.
+- Record-integrity verdict: `PASS`, evidence-bounded.
+- Metrics/classification verdict: classification `PASS`; independent
+  row-by-row metrics inspection `INCONCLUSIVE` because recovered stdout
+  contained aggregate comparison results rather than all 15 row payloads.
+- Science review required completion of the then-pending documentation and the
+  flagged-only underflag caveat; no mechanistic overclaim was found.
+
+Ambiguous review and arbitration:
+
+- Records reviewed independently: `18 / 18`.
+- Category agreement: `17/18`; Cohen's kappa `0.6471`.
+- Answer-status agreement: `17/18`; Cohen's kappa `0.9082`.
+- Best-answer agreement: `18/18`.
+- Exact issue-set agreement: `4/18`; mean Jaccard `0.7565`.
+- Any field-level disagreement triggered arbitration: `14` records.
+- Arbiter: `ambiguous-review-arbiter`, `gpt-5.6-sol/max`.
+- Unresolved after arbitration: `0`.
+- Final categories: 17 `parser_overflag`, one
+  `true_multiple_candidate_ambiguity`.
+- Final answer statuses: six correct, one incorrect, one ambiguous, ten with no
+  answer.
+- Mechanical stored parser/correctness consistency: `18/18`.
+- Records 2 and 3 contain unique correct semantic claims missed by the
+  last-number parser; this is evaluator limitation, not data corruption.
+- Parser underflags among the other 27 records were not assessed.
+
+Operational errors and handling:
+
+1. `az acr run show --run-id` was unsupported. Existing build `cmc` was checked
+   with `az acr task show-run`; no rebuild occurred.
+2. `1 CPU / 4Gi` was rejected before job/execution creation. The valid
+   `2 CPU / 4Gi` shape was used.
+3. A local JMESPath polling expression was split by Windows command parsing.
+   The Azure execution continued; no duplicate start occurred.
+4. The completed replica was cleaned before direct log retrieval. The same
+   execution's 43 rows were recovered from Log Analytics; no rerun occurred.
+5. One large branch JSON console event was transport-split and reconstructed
+   from two ordered Log Analytics rows.
+
+Scientific boundary:
+
+- The audit evaluates artifact integrity and evaluator consistency only.
+- It generated no new behavioral evidence.
+- `n=3` is not stability, robustness, or generalizability evidence.
+- Stopped remains intervention-controlled.
+- Postprocessed remains answer-recovery utility, not raw no-CoT.
+- LLM review is audit opinion, not human ground truth.
+- Flagged-only review cannot exclude underflags.
+- No hidden-reasoning, internal-workspace, or J-space claim is made.

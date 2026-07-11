@@ -3,7 +3,8 @@
 Date: 2026-07-10
 Repository: `Alanjiao1988/J-space-observation`
 Latest experiment source commit: `359643b7b5eb8f95c13cca2e60fa753df8701282`
-Current image commit: `359643b7b5eb`
+Current experiment image commit: `359643b7b5eb`
+Current audit image commit: `9537ed8e0b5d`
 
 > Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
 >
@@ -36,6 +37,8 @@ Current image commit: `359643b7b5eb`
 > Update (2026-07-10 — gate hardening): Phase 1 formal success now requires `n >= 3`, an absolute branch accuracy floor of `0.50`, and valid visible-CoT baseline guards before raw/stopped relative gates apply. Postprocessed utility requires both non-degradation and `accuracy_postprocessed >= 0.50`; the depth-3 `0 >= 0` regression now produces `postprocessed_surface_clean_but_task_failed`. A matching visible-CoT baseline is valid only at `n >= 3`, parse-valid rate `>= 0.80`, and accuracy `> 0`; otherwise the relative gate is `NA`. Otherwise-passing single-sample rows use branch-specific `pilot_only` labels, while clear failures retain failure labels. Local tests pass (`109 passed, 2 warnings`). No Azure job, model inference, model download, ACR rebuild, or scale increase occurred. The prior Blob summary remains unchanged as a historical artifact.
 >
 > Update (2026-07-10 — bounded n=3 validation): Parallel pre-run audits found arithmetic prompt capacity `3/3/2`; Alan explicitly approved one unique third depth-3 item. Commit `359643b7b5eb` added it plus capacity-aware dry-run validation. Local tests pass (`111 passed, 2 warnings`), and dry-run confirmed 15 configurations x 3 items = 45 observations. ACR build `cmb` produced digest `sha256:004ec8bff66fbc8a23b122660aeb58914b2ee3cedfc5246429046eef252c9069`. The sole execution `job-jspace-p1-n3-gates-02ilmgm` succeeded in `cae-jspace-observation-sea-vnet2` and uploaded four artifacts under `phase1-limited-n3-gates/20260710T152820Z`. Raw strict was not established at any depth; stopped intervention was usable only at depth 1; postprocessed answer recovery was usable only at depth 1. Depth-3 visible-CoT accuracy was zero, so relative gates were `NA`; depth-3 postprocessing remained task-failed despite `0 >= 0`. Post-run classification audit found zero mismatches. Counts passed, but record-level duplicate/item-membership checks remain inconclusive because local access to private Blob is blocked. Results are behavioral/operational only; `n=3` is not stability evidence.
+>
+> Update (2026-07-11 — record-level artifact audit): Commit `9537ed8e0b5d` added a model-free read-only audit with `139 passed, 2 warnings`. ACR build `cmc` produced digest `sha256:90adfc1b6be6fbb7a17a878bed7970ffd71c62b72263a36b41110ba6f19b169b`. CPU-only execution `job-jspace-p1-record-audit-d9q5uy8` succeeded on the `Consumption` profile and read the immutable source prefix through the existing managed identity/private endpoint. The audit paired 45/45 records, found zero duplicates/missing/field/transformation/parser/metric/classification mismatches, verified all 15 cells at `n=3`, and confirmed source Blob properties unchanged. Eight reports were uploaded under `phase1-audits/n3-gates-20260710T152820Z/20260711T010339Z`. Two independent reviews of all 18 flagged parses agreed on category for 17/18; an arbiter resolved 14 records with any field-level disagreement. Final opinion: 17 parser overflags, one true multiple-candidate ambiguity, and zero unresolved. Reviewing only flagged records cannot exclude underflags among the other 27. No model inference or new observation occurred.
 >
 > Update (2026-07-08 22:51 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but Copilot's fresh tool processes could not see them in Process/User/Machine environment scopes. No package-read preflight or Azure job retry was attempted. To continue, set the variables in Windows User environment (or another secure path readable by the agent), e.g. `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`. Do not paste tokens into chat.
 
@@ -116,11 +119,13 @@ Implemented modules include:
 - `src/jspace_observation/blob_export.py`
 - `src/jspace_observation/postprocess.py`
 - `src/jspace_observation/phase1_branches.py`
+- `src/jspace_observation/record_audit.py`
 
 Experiment scripts:
 
 - `experiments/phase0_5_jlens_spike.py`
 - `experiments/phase1_depth_gradient.py`
+- `scripts/audit_phase1_blob_run.py`
 
 Infrastructure:
 
@@ -138,11 +143,12 @@ Tests:
 - `tests/test_blob_export.py`
 - `tests/test_postprocess.py`
 - `tests/test_phase1_branches.py`
+- `tests/test_record_audit.py`
 
 Latest known test status:
 
 ```text
-python -m pytest tests/ -q -> 92 passed, 2 warnings
+python -m pytest tests/ -q -> 139 passed, 2 warnings
 ```
 
 Phase 1 dry run status:
@@ -428,7 +434,7 @@ GHCR private pull remains historical; do not return to GHCR unless Alan explicit
 
 The new thread should continue from here:
 
-### Step 1: Complete a record-level artifact audit
+### Step 1: Decide the parser follow-up before any new model run
 
 The Azure ACR managed-identity chain has already succeeded:
 
@@ -439,13 +445,18 @@ phase 1 dry-run execution: job-jspace-phase1-dryrun-acr-v0j1bkd
 small phase 1 pilot execution: job-jspace-phase1-pilot-acr-lhuvwbf
 ```
 
-Before any new model run:
+The record-level audit is complete:
 
-1. Audit all 45 generation/eval records from within the existing private data path or another explicitly approved read-only method.
-2. Check duplicate task/condition/depth combinations, exact item membership, and raw/stopped/postprocessed field consistency.
-3. Review the 18 ambiguous parses without changing validators or thresholds post hoc.
-4. Do not run a higher-n replication without separate approval.
-5. Keep all branches separate and make no hidden-reasoning or J-space claim.
+1. All 45 generation/eval pairs passed syntax, pairing, membership, field,
+   transformation, parser, metric, and branch checks.
+2. The 18 stored ambiguous records received two independent reviews and
+   arbitration; see `reports/phase1_n3_record_audit.md`.
+3. The review found a last-number extraction limitation, including two records
+   with unique correct answer claims that stored parsing missed.
+4. The flagged-only review cannot exclude parser underflags among the other 27
+   records.
+5. Do not run a higher-n replication without a new preregistered decision.
+6. Keep all branches separate and make no hidden-reasoning or J-space claim.
 
 ---
 
@@ -467,23 +478,25 @@ Please read docs/thread_handoff.md first, then use the repo documents as source 
 - reports/current_status.md
 
 Current known state:
-- Active ACR image is `acrjspaceobssea0708231738.azurecr.io/j-space-observation:359643b7b5eb`.
+- Audit ACR image is `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9537ed8e0b5d`; the experiment image remains `359643b7b5eb`.
 - Azure-first execution policy remains in force; the local PC is orchestration-only.
 - Private Blob persistence is working through `cae-jspace-observation-sea-vnet2`.
 - Bounded n=3 validation succeeded as `job-jspace-p1-n3-gates-02ilmgm`.
 - Results are under `phase1-limited-n3-gates/20260710T152820Z`.
 - Phase 1 has three non-interchangeable branches: raw strict, stopped intervention, and postprocessed utility.
 - Branch success criteria now include absolute accuracy, visible-CoT baseline validity, and `n >= 3` guards.
-- Local tests pass: `111 passed, 2 warnings`.
+- Local tests pass: `139 passed, 2 warnings`.
 - The run produced 45 generation and 45 eval records plus 15 metric rows with `n=3`.
 - Raw strict failed at all depths; stopped and postprocessed utility passed only at depth 1.
 - Depth-3 visible-CoT baseline is invalid (`visible_cot_accuracy_zero`), so relative gates are `NA`.
-- Record-level duplicate/item-membership audit remains incomplete because private Blob is not reachable from the local machine.
+- CPU-only record audit `job-jspace-p1-record-audit-d9q5uy8` completed cleanly through the private Blob path.
+- All 45 pairs and 15 metric rows passed deterministic audit; 18 flagged parses were independently reviewed and arbitrated.
+- Final LLM audit opinion: 17 parser overflags and one true multiple-candidate ambiguity; underflags outside the flagged set were not assessed.
 - No further model run is authorized.
 - No Phase 1 result is hidden-reasoning or J-space evidence.
 
 Your first task:
-Complete a read-only record-level audit of the existing 45 generation/eval pairs without rerunning the model or opening Storage public access.
+Review `reports/phase1_n3_record_audit.md` and preregister whether the next step is an all-45 parser-underflag audit or a parser-method decision. Do not rerun the model or rewrite historical artifacts.
 ```
 
 ---
