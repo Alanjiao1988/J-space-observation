@@ -30,6 +30,9 @@ JSPACE_BLOB_ACCOUNT="${JSPACE_BLOB_ACCOUNT:-}"
 JSPACE_BLOB_CONTAINER="${JSPACE_BLOB_CONTAINER:-}"
 JSPACE_BLOB_PREFIX="${JSPACE_BLOB_PREFIX:-}"
 JSPACE_RESULTS_ROOT="${JSPACE_RESULTS_ROOT:-}"
+JSPACE_AUDIT_SOURCE_PREFIX="${JSPACE_AUDIT_SOURCE_PREFIX:-}"
+JSPACE_AUDIT_OUTPUT_PREFIX="${JSPACE_AUDIT_OUTPUT_PREFIX:-}"
+JSPACE_AUDIT_IMPLEMENTATION_COMMIT="${JSPACE_AUDIT_IMPLEMENTATION_COMMIT:-}"
 PYTHONPATH_VALUE="${PYTHONPATH_VALUE:-/workspace/src}"
 ENABLE_RESULTS_MOUNT="${ENABLE_RESULTS_MOUNT:-false}"
 STORAGE_MOUNT_NAME="${STORAGE_MOUNT_NAME:-jspace-results-storage}"
@@ -37,6 +40,17 @@ RESULTS_MOUNT_PATH="${RESULTS_MOUNT_PATH:-/mnt/results}"
 
 if [[ "$ENABLE_RESULTS_MOUNT" == "true" && "${RESULTS_DIR:-/tmp/results}" == "/tmp/results" ]]; then
     RESULTS_DIR="$RESULTS_MOUNT_PATH"
+fi
+
+if [[ -n "$JSPACE_AUDIT_SOURCE_PREFIX" || -n "$JSPACE_AUDIT_OUTPUT_PREFIX" ]]; then
+    if [[ -z "$JSPACE_AUDIT_SOURCE_PREFIX" || -z "$JSPACE_AUDIT_OUTPUT_PREFIX" ]]; then
+        echo "[FAIL] Audit mode requires both JSPACE_AUDIT_SOURCE_PREFIX and JSPACE_AUDIT_OUTPUT_PREFIX"
+        exit 1
+    fi
+    if [[ "$WORKLOAD_PROFILE_NAME" == gpu-* ]]; then
+        echo "[FAIL] Audit mode requires an explicit non-GPU WORKLOAD_PROFILE_NAME"
+        exit 1
+    fi
 fi
 
 if [[ -z "$ACR_LOGIN_SERVER" && -n "$ACR_NAME" ]]; then
@@ -63,6 +77,7 @@ echo "Image: ${ACR_IMAGE}"
 echo "Registry server: ${ACR_LOGIN_SERVER}"
 echo "Identity: ${IDENTITY_NAME}"
 echo "Command: ${JOB_COMMAND}"
+echo "Workload profile: ${WORKLOAD_PROFILE_NAME}"
 echo "CPU: ${CPU_CORES}"
 echo "Memory: ${MEMORY}"
 echo "Results mount enabled: ${ENABLE_RESULTS_MOUNT}"
@@ -86,7 +101,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-python - "$BODY_FILE" "$LOCATION" "$ENVIRONMENT_ID" "$ACR_IMAGE" "$ACR_LOGIN_SERVER" "$IDENTITY_ID" "$JOB_COMMAND" "$WORKLOAD_PROFILE_NAME" "$REPLICA_TIMEOUT" "$CPU_CORES" "$MEMORY" "$HF_HOME" "$TRANSFORMERS_CACHE" "$RESULTS_DIR" "$AZURE_CLIENT_ID" "$JSPACE_BLOB_ACCOUNT" "$JSPACE_BLOB_CONTAINER" "$JSPACE_BLOB_PREFIX" "$JSPACE_RESULTS_ROOT" "$PYTHONPATH_VALUE" "$ENABLE_RESULTS_MOUNT" "$STORAGE_MOUNT_NAME" "$RESULTS_MOUNT_PATH" <<'PY'
+python - "$BODY_FILE" "$LOCATION" "$ENVIRONMENT_ID" "$ACR_IMAGE" "$ACR_LOGIN_SERVER" "$IDENTITY_ID" "$JOB_COMMAND" "$WORKLOAD_PROFILE_NAME" "$REPLICA_TIMEOUT" "$CPU_CORES" "$MEMORY" "$HF_HOME" "$TRANSFORMERS_CACHE" "$RESULTS_DIR" "$AZURE_CLIENT_ID" "$JSPACE_BLOB_ACCOUNT" "$JSPACE_BLOB_CONTAINER" "$JSPACE_BLOB_PREFIX" "$JSPACE_RESULTS_ROOT" "$JSPACE_AUDIT_SOURCE_PREFIX" "$JSPACE_AUDIT_OUTPUT_PREFIX" "$JSPACE_AUDIT_IMPLEMENTATION_COMMIT" "$PYTHONPATH_VALUE" "$ENABLE_RESULTS_MOUNT" "$STORAGE_MOUNT_NAME" "$RESULTS_MOUNT_PATH" <<'PY'
 import json
 import sys
 
@@ -110,6 +125,9 @@ import sys
     blob_container,
     blob_prefix,
     results_root,
+    audit_source_prefix,
+    audit_output_prefix,
+    audit_implementation_commit,
     pythonpath_value,
     enable_results_mount,
     storage_mount_name,
@@ -138,6 +156,9 @@ optional_env = {
     "JSPACE_BLOB_CONTAINER": blob_container,
     "JSPACE_BLOB_PREFIX": blob_prefix,
     "JSPACE_RESULTS_ROOT": results_root,
+    "JSPACE_AUDIT_SOURCE_PREFIX": audit_source_prefix,
+    "JSPACE_AUDIT_OUTPUT_PREFIX": audit_output_prefix,
+    "JSPACE_AUDIT_IMPLEMENTATION_COMMIT": audit_implementation_commit,
     "PYTHONPATH": pythonpath_value,
 }
 for key, value in optional_env.items():

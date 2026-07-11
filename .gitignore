@@ -29,3 +29,6 @@ secrets/
 
 # Local Azure execution context (resource IDs, generated values; not source)
 .azure_*.tmp
+
+# Read-only audit downloads and raw job logs
+artifacts/record_audit/
