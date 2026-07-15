@@ -27,8 +27,6 @@ BAKED_BUILD_ATTESTATION_PATH = Path(
     "/opt/jspace/semantic-audit-build-provenance.json"
 )
 PROTOCOL_RUNTIME_FILES = (
-    ".dockerignore",
-    ".gitignore",
     "Dockerfile",
     "docs/phase1_semantic_review_protocol.md",
     "infra/azure/scripts/00_check_prereqs.ps1",
@@ -67,8 +65,6 @@ _BEHAVIOR_ROOTS = (
     "Dockerfile",
     "requirements.txt",
     "docs/phase1_semantic_review_protocol.md",
-    ".dockerignore",
-    ".gitignore",
 )
 _ATTESTATION_FIELDS = {
     "schema_version",

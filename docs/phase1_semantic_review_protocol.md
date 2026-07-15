@@ -39,6 +39,11 @@ SHA-256, exact ordered file list, every file SHA-256, and
 
 The canonical bundle hashes domain `jspace-semantic-audit/protocol-bundle/v1\0`, then each frozen relative path, path length, byte length, and exact file bytes in `PROTOCOL_RUNTIME_FILES` order. The generated file is Git-ignored but explicitly admitted to the Docker context. `Dockerfile` requires it, validates it with stdlib code after copying the complete runtime, and installs it read-only at `/opt/jspace/semantic-audit-build-provenance.json`. The image then makes `/workspace` and `/opt/jspace` root-owned and non-writable and runs as the fixed unprivileged `jspace` user; only registered cache/result/test temporary paths are writable. There are no commit or bundle Docker build arguments and no runtime bundle-digest assertion supplied by a caller.
 
+`.dockerignore` and `.gitignore` are clean-Git build-control files rather than
+runtime files. The preparation gate still rejects tracked changes to either
+file, but the runtime bundle excludes them because ACR/Docker may consume or
+drop ignore-control files instead of copying them into the image.
+
 Each production CLI rejects nonempty `PYTHONPATH` and requires `python -I -S`, then verifies that every bootstrap stdlib module resolves from the interpreter's resolved `sysconfig` stdlib roots before any project or Azure import. It uses only that verified stdlib to check local clean Git or the fixed baked attestation, including its own script. Azure imports are restricted to the exact resolved interpreter `purelib`/`platlib` roots, with symlink resolution, and must be outside the project, current directory, script directory, and `src`; a path component merely named `site-packages` confers no trust. Only after provenance and Azure-origin verification does the exporter prepend the already-attested project `src`; the finalizer follows the same order. Every loaded `jspace_observation` module must resolve under the attested `src` root and to a bundled file. In an image, `JSPACE_SEMANTIC_PROTOCOL_COMMIT` is only an optional expected-commit check and must equal the baked commit; it cannot replace or override the attestation.
 
 ## Source gate

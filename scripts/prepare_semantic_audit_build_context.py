@@ -28,8 +28,6 @@ ATTESTATION_FILENAME = ".semantic_audit_build_provenance.json"
 ATTESTATION_SCHEMA_VERSION = "phase1-semantic-audit-build-provenance/v1"
 BUNDLE_HASH_DOMAIN = b"jspace-semantic-audit/protocol-bundle/v1\0"
 RUNTIME_FILES = (
-    ".dockerignore",
-    ".gitignore",
     "Dockerfile",
     "docs/phase1_semantic_review_protocol.md",
     "infra/azure/scripts/00_check_prereqs.ps1",
@@ -68,8 +66,6 @@ BEHAVIOR_ROOTS = (
     "Dockerfile",
     "requirements.txt",
     "docs/phase1_semantic_review_protocol.md",
-    ".dockerignore",
-    ".gitignore",
 )
 ATTESTATION_FIELDS = frozenset(
     {
@@ -183,8 +179,6 @@ def _listed_behavior_files(root: Path) -> set[str]:
         "Dockerfile",
         "requirements.txt",
         "docs/phase1_semantic_review_protocol.md",
-        ".dockerignore",
-        ".gitignore",
     ):
         if root.joinpath(*relative.split("/")).is_file():
             files.add(relative)

@@ -1,7 +1,6 @@
 # Git
 .git
 .gitignore
-!.gitignore
 !.semantic_audit_build_provenance.json
 
 # Python caches

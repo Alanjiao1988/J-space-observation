@@ -74,8 +74,6 @@ BAKED_BUILD_ATTESTATION_PATH = Path(
     "/opt/jspace/semantic-audit-build-provenance.json"
 )
 PROTOCOL_RUNTIME_FILES = (
-    ".dockerignore",
-    ".gitignore",
     "Dockerfile",
     "docs/phase1_semantic_review_protocol.md",
     "infra/azure/scripts/00_check_prereqs.ps1",
@@ -114,8 +112,6 @@ PROTOCOL_BEHAVIOR_ROOTS = (
     "Dockerfile",
     "requirements.txt",
     "docs/phase1_semantic_review_protocol.md",
-    ".dockerignore",
-    ".gitignore",
 )
 
 SOURCE_ARTIFACT_HASHES = {
@@ -646,8 +642,6 @@ def _listed_behavior_files(project_root: Path) -> set[str]:
         "Dockerfile",
         "requirements.txt",
         "docs/phase1_semantic_review_protocol.md",
-        ".dockerignore",
-        ".gitignore",
     ):
         if project_root.joinpath(*relative.split("/")).is_file():
             files.add(relative)
