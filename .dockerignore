@@ -26,6 +26,13 @@ results/runs/*
 !results/runs/.gitkeep
 artifacts/
 **/all45_*
+evaluator_sets/
+**/locked_inputs.jsonl
+**/locked_reference_labels.jsonl
+**/locked_case_mapping.json
+**/locked_manifest.json
+**/reviewer_*_locked*.jsonl
+**/arbitration_locked*.jsonl
 **/*session_paste*
 **/*session-paste*
 **/*sessionpaste*

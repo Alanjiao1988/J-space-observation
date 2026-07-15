@@ -1,0 +1,220 @@
+{
+  "schema_version": "phase1-parser-v2-acceptance-gates/v1",
+  "status": "preregistered_before_case_construction",
+  "dataset_contract": {
+    "total_cases": 120,
+    "strata": [
+      "S01",
+      "S02",
+      "S03",
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S09",
+      "S10",
+      "S11",
+      "S12"
+    ],
+    "cases_per_stratum": 10,
+    "typed_decision_support": {
+      "present": 80,
+      "ambiguous": 10,
+      "no_answer": 30
+    },
+    "answer_bearing_strata": [
+      "S01",
+      "S02",
+      "S03",
+      "S04",
+      "S05",
+      "S06",
+      "S09",
+      "S12"
+    ],
+    "clean_strata": [
+      "S01",
+      "S02",
+      "S03",
+      "S12"
+    ],
+    "critical_strata": [
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S09",
+      "S10",
+      "S11"
+    ]
+  },
+  "typed_decision": {
+    "labels": [
+      "present:<canonical_value>",
+      "ambiguous",
+      "no_answer"
+    ],
+    "equality": "exact_string_equality",
+    "null_collapse_prohibited": true
+  },
+  "numeric_normalization": {
+    "decimal_scientific_grammar": "[+-]?(?:(?:[0-9]+(?:\\.[0-9]*)?)|(?:\\.[0-9]+))(?:[eE][+-]?[0-9]+)?",
+    "fraction_grammar": "[+-]?[0-9]+/[0-9]+",
+    "fraction_internal_whitespace": false,
+    "fraction_signed_denominator": false,
+    "fraction_decimal_components": false,
+    "fraction_zero_denominator": false,
+    "maximum_literal_characters": 100,
+    "canonical_form": "reduced_rational_positive_denominator_integer_without_slash_one",
+    "signed_zero": "0",
+    "float_or_tolerance": false,
+    "calculation_or_repair": false
+  },
+  "absolute_gates": {
+    "overall_exact_typed_decision": {
+      "minimum_correct": 114,
+      "denominator": 120,
+      "threshold_numerator": 19,
+      "threshold_denominator": 20
+    },
+    "answer_bearing_per_stratum": {
+      "minimum_correct": 9,
+      "denominator": 10,
+      "threshold_numerator": 17,
+      "threshold_denominator": 20
+    },
+    "every_stratum_floor": {
+      "minimum_correct": 8,
+      "denominator": 10,
+      "threshold_numerator": 4,
+      "threshold_denominator": 5
+    },
+    "answer_presence_macro_f1": {
+      "classes": [
+        "present",
+        "ambiguous",
+        "no_answer"
+      ],
+      "minimum_numerator": 19,
+      "minimum_denominator": 20,
+      "class_f1": "2*tp/(2*tp+fp+fn)",
+      "macro_average": "unweighted"
+    },
+    "ambiguity": {
+      "positive_label": "ambiguous",
+      "positive_support": 10,
+      "minimum_precision_numerator": 9,
+      "minimum_precision_denominator": 10,
+      "minimum_recall_numerator": 9,
+      "minimum_recall_denominator": 10,
+      "zero_denominator": "NA_INVALID"
+    },
+    "no_answer": {
+      "positive_label": "no_answer",
+      "positive_support": 30,
+      "minimum_precision_numerator": 9,
+      "minimum_precision_denominator": 10,
+      "minimum_recall_numerator": 9,
+      "minimum_recall_denominator": 10,
+      "zero_denominator": "NA_INVALID"
+    },
+    "boxed_final_miss": {
+      "strata": [
+        "S01",
+        "S02"
+      ],
+      "denominator": 20,
+      "maximum_errors": 0,
+      "maximum_rate_numerator": 1,
+      "maximum_rate_denominator": 50,
+      "error_definition": "expected_value_or_registered_selected_span_not_recovered"
+    },
+    "last_number_trap": {
+      "stratum": "S06",
+      "denominator": 10,
+      "maximum_errors": 0,
+      "maximum_rate_numerator": 1,
+      "maximum_rate_denominator": 20,
+      "error_definition": "registered_rightmost_distractor_span_selected"
+    },
+    "wrong_span": {
+      "population": "expected_present",
+      "denominator": 80,
+      "maximum_errors": 1,
+      "maximum_rate_numerator": 1,
+      "maximum_rate_denominator": 50,
+      "offset_units": "zero_based_half_open_unicode_code_points"
+    },
+    "material_correctness": {
+      "denominator": 120,
+      "maximum_errors": 1,
+      "definition": "xor(parser_correctness,operational_expected_correctness)",
+      "S01_maximum_errors": 0,
+      "S02_maximum_errors": 0
+    }
+  },
+  "legacy_comparison_gates": {
+    "legacy_adapter": {
+      "precedence": [
+        "parse_ambiguous_true_maps_to_ambiguous",
+        "parse_valid_and_normalizable_nonnull_answer_maps_to_present",
+        "otherwise_maps_to_no_answer"
+      ],
+      "reference_answer_available_to_adapter": false,
+      "warnings_affect_decision": false,
+      "nonnormalizable_answer": "no_answer_with_adapter_failure_diagnostic",
+      "stored_legacy_artifacts_modified": false
+    },
+    "clean_pooled_non_regression": {
+      "strata": [
+        "S01",
+        "S02",
+        "S03",
+        "S12"
+      ],
+      "denominator": 40,
+      "metric": "exact_typed_decision_count",
+      "rule": "parser_v2_correct_count>=legacy_correct_count",
+      "nominal_maximum_drop_numerator": 1,
+      "nominal_maximum_drop_denominator": 50,
+      "paired_regressions": "report_only"
+    },
+    "critical_strict_improvement": {
+      "strata": [
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11"
+      ],
+      "metric": "exact_typed_decision_count",
+      "minimum_net_gain_in_at_least_one_stratum": 1,
+      "other_critical_regressions": "allowed_only_subject_to_all_absolute_gates_and_reported"
+    }
+  },
+  "correctness_mapping": {
+    "present": "canonical_value_equals_canonical_registered_reference",
+    "ambiguous": false,
+    "no_answer": false
+  },
+  "status_logic": {
+    "PASS": "all_absolute_and_legacy_comparison_gates_pass",
+    "FAIL": "all_metrics_defined_and_any_hard_gate_fails",
+    "INVALID": "integrity_representation_schema_consensus_denominator_or_scorer_failure",
+    "rounded_display_values_used_for_gates": false,
+    "missing_cases_dropped": false
+  },
+  "one_shot": {
+    "implementation_commit_before_input_read": true,
+    "predictions_sealed_before_label_read": true,
+    "formal_evaluations_per_holdout": 1,
+    "pass_or_fail_retires_holdout": true,
+    "metric_failure_retry_allowed": false,
+    "modified_parser_requires_new_holdout": true
+  }
+}
