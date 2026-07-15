@@ -2,7 +2,7 @@
 
 ## Registration
 
-- Protocol version: **parser-v2-v1.1**
+- Protocol version: **parser-v2-v1.2**
 - Phase: **1.2A / Path C**
 - Status: **preregistered before fixture construction**
 - Historical experimental target:
@@ -17,10 +17,12 @@ The first Git commit containing this document,
 `docs/phase1_parser_v2_acceptance_gates.json` freezes the protocol. Case
 construction cannot begin before that commit is pushed to `origin/main`.
 
-Version 1.1 adds the finite canonical-rendering bound required to make
-scientific-notation normalization executable under adversarial exponents. Any
-candidate pool produced under the superseded version 1.0 bytes is
-construction-ineligible and must be regenerated after the version 1.1 commit.
+Version 1.1 added the finite canonical-rendering bound required to make
+scientific-notation normalization executable under adversarial exponents.
+Version 1.2 adds machine-bound independent curator-pool seals and an immutable
+Stage-2 reference packet. Any candidate pool produced under superseded protocol
+bytes is construction-ineligible and must be regenerated after the version 1.2
+commit.
 
 ## Scientific boundary
 

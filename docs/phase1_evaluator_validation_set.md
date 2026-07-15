@@ -13,7 +13,7 @@ The phase stops after set validation and sealing. It does not implement parser
 v2, run the locked parser evaluation, run
 `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`, or authorize higher-n replication.
 
-Only fixtures constructed after the final parser-v2-v1.1 protocol commit are
+Only fixtures constructed after the final parser-v2-v1.2 protocol commit are
 eligible. Candidate pools produced under superseded protocol bytes are
 discarded, are not inputs to selection or labeling, and contribute no
 development or locked evidence.
@@ -195,6 +195,30 @@ Curator A and Curator B:
 - do not inspect the legacy parser, legacy predictions, historical output
   text, future parser implementation, or each other's candidates.
 
+Each curator writes a canonical candidate JSONL and a separate canonical pool
+seal. The seal contains exactly:
+
+```text
+schema_version
+curator_id
+curator_model_id
+curator_reasoning_effort
+protocol_commit
+protocol_bundle_sha256
+acceptance_gate_sha256
+candidate_schema_version
+candidate_count
+ordered_candidate_ids_sha256
+candidate_jsonl_sha256
+constructed_after_protocol_utc
+no_model_run_attestation
+```
+
+The candidate count is exactly 144. The seal is derived from the exact JSONL
+bytes and validated before Curator C receives either pool. A free-form
+provenance string or unsealed pool is ineligible. Curator C's selection record
+binds both pool-seal hashes and both candidate-JSONL hashes.
+
 Curator C:
 
 - receives both independently sealed candidate pools and the frozen protocol;
@@ -323,10 +347,15 @@ Stage-1 arbitration:
 Stage 2:
 
 - begins only after the complete Stage-1 arbitration/consensus seal exists;
-- each reviewer receives the same sealed final extraction consensus plus
-  registered reference answers and the critical/material rubric;
+- the custodian creates and seals an immutable
+  `stage2_reference_packet.jsonl` containing only case ID and registered
+  reference answer;
+- each reviewer receives the same sealed final extraction consensus, exact
+  Stage-2 reference packet, and critical/material rubric;
 - extraction fields cannot be changed;
 - each completes correctness, critical, and material fields for all 120;
+- each Stage-2 row binds both the Stage-1 consensus hash and Stage-2 reference
+  packet hash;
 - each Stage-2 submission is canonical, complete, hashed, and sealed.
 
 Stage-2 arbitration is separate. It sees the sealed final Stage-1 consensus,
@@ -381,11 +410,12 @@ Registered leaf prefixes and exact membership follow.
 3. `reviewer_b_stage1.jsonl`
 4. `arbitration_stage1.jsonl`
 5. `stage1_consensus.jsonl`
-6. `reviewer_a_stage2.jsonl`
-7. `reviewer_b_stage2.jsonl`
-8. `arbitration_stage2.jsonl`
-9. `locked_reference_labels.jsonl`
-10. `locked_labels_manifest.json`, last
+6. `stage2_reference_packet.jsonl`
+7. `reviewer_a_stage2.jsonl`
+8. `reviewer_b_stage2.jsonl`
+9. `arbitration_stage2.jsonl`
+10. `locked_reference_labels.jsonl`
+11. `locked_labels_manifest.json`, last
 
 `P/reports`:
 
