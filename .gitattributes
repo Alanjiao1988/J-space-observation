@@ -1,3 +1,4 @@
 docs/phase1_parser_v2_protocol.md text eol=lf
 docs/phase1_evaluator_validation_set.md text eol=lf
 docs/phase1_parser_v2_acceptance_gates.json text eol=lf
+evaluator_sets/parser_v2_v1/development_cases.jsonl text eol=lf
