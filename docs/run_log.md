@@ -2010,3 +2010,155 @@ Planned local validation:
 - Run only model-free synthetic/unit tests and shell syntax checks.
 - Do not open source records, run models, or execute Azure/ACR/Blob commands.
 - This entry preregisters tooling and reports no semantic-audit result.
+
+## 2026-07-15 — all-45 semantic audit image build
+
+Protocol/build provenance:
+
+- Initial preregistration commit:
+  `68feeaee237fd9f1603093f2bdd282c7bde37c4e`.
+- Build-control follow-up commit:
+  `cfa99fc6e204db5cf1076a13a8975e13db226931`.
+- The follow-up removed Docker/ACR-consumed `.dockerignore` and `.gitignore`
+  from the runtime bundle while retaining clean-Git control.
+- Local no-model validation: `217 passed, 2 warnings`.
+
+ACR:
+
+- Registry: `acrjspaceobssea0708231738`.
+- Failed build run `cmd`: stopped during Docker attestation membership
+  validation; no image was published.
+- Successful build run `cme`.
+- Image:
+  `acrjspaceobssea0708231738.azurecr.io/j-space-observation:cfa99fc6e204`.
+- Digest:
+  `sha256:43af06291f6196d5426fe5e014196c86d3d00aae978470d369a9c1c2bd3dfeac`.
+- Model inference/download/load: none.
+
+## 2026-07-15 — all-45 two-stage semantic parser audit
+
+Scope:
+
+- Experimental target in the historical records:
+  `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`.
+- Engineering reviewers: `gpt-5.6-sol`, reasoning effort `max`.
+- Source writer commit:
+  `359643b7b5eb8f95c13cca2e60fa753df8701282`.
+- Immutable source:
+  `phase1-limited-n3-gates/20260710T152820Z`.
+- Semantic parent prefix:
+  `phase1-semantic-audits/all45-parser-underflag-20260715T094500Z`.
+- New model inference or behavioral observations: none.
+
+Azure configuration:
+
+- Environment: `cae-jspace-observation-sea-vnet2`.
+- Profile/resources: `Consumption`, 2 CPU / 4Gi.
+- GPU: none.
+- Job: `job-jspace-p1-all45-pack`.
+- Identity: `id-jspace-aca-acrpull-sea`.
+- Storage authentication: managed identity only; no key/SAS/public network.
+- Replica retry limit: zero.
+
+Executions:
+
+| Execution | Status | Purpose |
+|---|---|---|
+| `job-jspace-p1-all45-pack-2f0w7do` | Succeeded | Stage-1 append-only private release |
+| `job-jspace-p1-all45-pack-yfn9b09` | Failed | Read-only print used a non-writable directory; no Blob write |
+| `job-jspace-p1-all45-pack-k5jb2g8` | Succeeded | Deterministic Stage-1 packet print |
+| `job-jspace-p1-all45-pack-t2vz2b1` | Succeeded | Stage-1 release-byte verification |
+| `job-jspace-p1-all45-pack-kuw8801` | Succeeded | Stage-2 append-only release and print |
+| `job-jspace-p1-all45-pack-kc3kot4` | Succeeded | Private immutable-source byte verification |
+
+Operational notes:
+
+- The first Git Bash ARM PUT was rejected before job creation because MSYS
+  rewrote the `/subscriptions/...` resource ID. Native PowerShell ARM payloads
+  were used after that; no execution was created by the failed PUT.
+- The failed print execution wrote nothing to Blob. Its retry used the
+  registered `/tmp/results` writable root.
+- Local Entra Blob listing remained blocked by network rules, as expected.
+  Packet/release/source bytes were transported through the private ACA job
+  logs and accepted only after exact SHA-256 verification.
+
+Release provenance:
+
+- Stage-1 packet: 45 records, SHA-256
+  `4e6b9b5085fcd859d03cbd5ddccd3749904af19edd875c12c1965f713476f622`.
+- Stage-2 packet: 45 records, SHA-256
+  `06f1d5b5a95e7cd39fb692a4ce798fa64747b362aaefcbb6532c6630db73ed3d`.
+- Stage-1 manifest SHA-256:
+  `bb0e4a5c8a78b04e623cf6970ef28c92bdf12221e1a14100df64003198ed71b8`.
+- Stage-2 manifest SHA-256:
+  `0d423f9bbb40c1f87eb936fd88b5386745d4422f8a18965bb184855f2b027371`.
+- Source generation/evaluation hashes exactly matched the registered values;
+  Blob properties remained unchanged and no source write was attempted.
+
+Review:
+
+- Reviewer A and B each completed 45 Stage-1 and 45 Stage-2 rows with exact
+  IDs and sealed bindings.
+- Arbitration triggers: `R002`, `R009`, `R018`, `R022`.
+- Distinct arbiter rows: 4.
+- Unresolved rows: 0.
+
+Result:
+
+- True ambiguity: 0.
+- Parser overflags: 18.
+- Parser underflags: 0.
+- Observed extraction errors: 14.
+- Material correctness errors: 2 (`R019`, `R038`).
+- Material evaluator issues: 19.
+- Final branch classification labels changed: 0.
+- Official stored metrics/classifications modified: no.
+- Decision: Path C; higher-n remains paused pending a locked evaluator
+  validation set and prospective parser-v2 protocol.
+- Detailed report: `reports/phase1_n3_all45_semantic_audit.md`.
+
+Scientific boundary:
+
+- This is a post hoc audit of stored outputs, not human ground truth.
+- Every experimental cell remains `n=3`.
+- Stopped remains intervention-controlled.
+- Postprocessed remains answer-recovery utility, not raw no-CoT.
+- No hidden-reasoning, internal-workspace, invisible-CoT, or J-space claim is
+  made.
+
+Final persistence:
+
+- Machine-artifact execution:
+  `job-jspace-p1-all45-pack-vi79nml`, Succeeded.
+- Exact machine prefix:
+  `phase1-semantic-audits/all45-parser-underflag-20260715T094500Z/final`.
+- Nine manifest-bound files uploaded with `overwrite=false`; the manifest was
+  uploaded last. Every file was downloaded again, SHA-256 checked, and exact
+  prefix membership verified.
+- Report execution:
+  `job-jspace-p1-all45-pack-61s3ggf`, Succeeded.
+- Separate report prefix:
+  `phase1-semantic-audits/all45-parser-underflag-20260715T094500Z/report`.
+- Report SHA-256:
+  `a521e3f05242beb62b41698b272597fc2320b8a44dc2478198201a7270e01521`.
+- The report was downloaded again and hash/membership verified.
+- The temporary payload secret and environment reference were removed after
+  transport. Current job secret count is zero and its command is the
+  side-effect-free `echo semantic-audit-transport-idle`.
+
+Independent post-run checks:
+
+| Check | Agent | Model / effort | Result |
+|---|---|---|---|
+| integrity and provenance | `all45-integrity-review` | `gpt-5.6-sol` / `max` | PASS |
+| reviewer agreement | `all45-agreement-review` | `gpt-5.6-sol` / `max` | PASS |
+| confusion matrices | `all45-confusion-review` | `gpt-5.6-sol` / `max` | PASS |
+| material impact | `all45-material-impact-review` | `gpt-5.6-sol` / `max` | PASS |
+| scientific boundaries | `all45-science-boundary-review` | `gpt-5.6-sol` / `max` | PASS |
+
+Final local validation:
+
+```text
+python -m pytest tests\ -q
+217 passed, 2 warnings
+```

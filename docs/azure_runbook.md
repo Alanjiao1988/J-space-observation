@@ -830,6 +830,81 @@ uses Log Analytics, so retrieve the same execution's persisted
 Detailed findings and ambiguity adjudication:
 `reports/phase1_n3_record_audit.md`.
 
+## CPU-only all-45 semantic audit status
+
+The preregistered all-45 review uses the same private VNet/managed-identity
+path and never loads a model:
+
+```text
+protocol commit: cfa99fc6e204db5cf1076a13a8975e13db226931
+ACR build: cme
+image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:cfa99fc6e204
+digest: sha256:43af06291f6196d5426fe5e014196c86d3d00aae978470d369a9c1c2bd3dfeac
+environment: cae-jspace-observation-sea-vnet2
+workload profile: Consumption
+resources: 2 CPU / 4Gi
+GPU: none
+job: job-jspace-p1-all45-pack
+source: phase1-limited-n3-gates/20260710T152820Z
+semantic parent: phase1-semantic-audits/all45-parser-underflag-20260715T094500Z
+```
+
+Successful release executions:
+
+- Stage 1: `job-jspace-p1-all45-pack-2f0w7do`.
+- Stage-1 deterministic print:
+  `job-jspace-p1-all45-pack-k5jb2g8`.
+- Stage-1 release-byte check:
+  `job-jspace-p1-all45-pack-t2vz2b1`.
+- Stage 2: `job-jspace-p1-all45-pack-kuw8801`.
+- Private source-byte check:
+  `job-jspace-p1-all45-pack-kc3kot4`.
+
+One read-only print execution,
+`job-jspace-p1-all45-pack-yfn9b09`, failed because `/tmp/semantic-stage1`
+was not writable for the non-root runtime. It performed no Blob write. Use
+`/tmp/results/<name>` for transient audit files.
+
+The Stage-1 and Stage-2 release prefixes are immutable and contain exactly
+reservation, packet, and manifest-last files. Do not rerun either upload into
+those prefixes.
+
+Result:
+
+- 45/45 records reviewed in two blinded stages by two independent
+  `gpt-5.6-sol/max` reviewers;
+- four records arbitrated, zero unresolved;
+- 18 parser overflags, zero parser underflags, two material correctness
+  errors, and 19 material evaluator issues;
+- no final branch label changed;
+- official stored results and source artifacts remain unchanged;
+- no model inference, GPU, key, SAS, public Storage path, or Azure Files mount.
+
+Final append-only persistence:
+
+- Machine prefix:
+  `phase1-semantic-audits/all45-parser-underflag-20260715T094500Z/final`.
+- Machine execution:
+  `job-jspace-p1-all45-pack-vi79nml`, Succeeded.
+- Membership: exactly nine machine artifacts; manifest uploaded last.
+- Report prefix:
+  `phase1-semantic-audits/all45-parser-underflag-20260715T094500Z/report`.
+- Report execution:
+  `job-jspace-p1-all45-pack-61s3ggf`, Succeeded.
+- Every uploaded file was downloaded through the same private path and matched
+  its local SHA-256. Both destination memberships matched exactly.
+
+After transport, remove the payload secret and secret-backed environment
+variable. The current job has zero secrets and uses
+`echo semantic-audit-transport-idle`; do not start it unless a separately
+approved command is configured.
+
+The registered next path is Path C. Do not start higher-n or another model
+run. First preregister and validate an evaluator validation set and prospective
+parser-v2 protocol.
+
+Detailed report: `reports/phase1_n3_all45_semantic_audit.md`.
+
 ## Persistent results storage status
 
 Azure Files was attempted as the first persistence path and is currently blocked by organization/subscription policy.

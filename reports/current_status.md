@@ -567,7 +567,81 @@ Key interpretation:
 - Count/aggregate audits passed. The subsequent private-path record audit found zero duplicate, missing, membership, common-field, transformation, parser, metric, or classification mismatches.
 - No hidden-reasoning, internal-workspace, genuine invisible-reasoning, or J-space claim is supported.
 
-Next action: decide whether to preregister an all-45 parser-underflag review or a parser-method change before requesting any higher-n replication.
+This decision was superseded by the completed all-45 semantic audit below.
+
+## Phase 1 All-45 Semantic Parser Audit (2026-07-15)
+
+The preregistered two-stage blinded review of all 45 historical arithmetic
+records from `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B` is complete.
+
+Provenance:
+
+```text
+protocol/tooling commit: cfa99fc6e204db5cf1076a13a8975e13db226931
+source writer commit: 359643b7b5eb8f95c13cca2e60fa753df8701282
+source prefix: phase1-limited-n3-gates/20260710T152820Z
+semantic parent prefix: phase1-semantic-audits/all45-parser-underflag-20260715T094500Z
+image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:cfa99fc6e204
+digest: sha256:43af06291f6196d5426fe5e014196c86d3d00aae978470d369a9c1c2bd3dfeac
+environment/profile: cae-jspace-observation-sea-vnet2 / Consumption
+resources/GPU: 2 CPU / 4Gi / none
+```
+
+Review completion:
+
+- Two independent `gpt-5.6-sol/max` reviewers completed 45 Stage-1 and 45
+  Stage-2 rows each.
+- Four records (`R002`, `R009`, `R018`, `R022`) required blinded arbitration
+  by a distinct `gpt-5.6-sol/max` arbiter.
+- Final unresolved count is zero.
+- Semantic category, presence, and status exact agreement were `0.9556`,
+  `0.9778`, and `0.9778`.
+
+Audit-only result:
+
+- true multiple-candidate ambiguity: `0`;
+- parser overflags: `18`, all in visible-reasoning conditions;
+- parser underflags: `0`;
+- observed extraction errors: `14`;
+- material correctness errors: `2` (`R019`, `R038`, both `visible_cot`
+  depth 1);
+- material evaluator issues: `19`;
+- official stored metrics/classifications modified: no.
+
+The audit-only `visible_cot` depth-1 accuracy is `1.0000`, versus stored
+`0.3333`. The audit-only depth-2 visible-CoT parse-valid rate is `0.6667`, so
+that baseline becomes invalid and associated relative gates become `NA`.
+Four baseline/gate fields change, but none of the nine final branch
+classification labels changes.
+
+Decision: preregistered **Path C**. Higher-n replication remains paused.
+The next action is a locked evaluator validation set and prospective parser-v2
+protocol before any new model run. No parser or historical artifact was
+changed.
+
+Detailed report: `reports/phase1_n3_all45_semantic_audit.md`.
+
+Persistent outputs:
+
+```text
+final machine prefix:
+phase1-semantic-audits/all45-parser-underflag-20260715T094500Z/final
+
+machine upload execution:
+job-jspace-p1-all45-pack-vi79nml
+
+report prefix:
+phase1-semantic-audits/all45-parser-underflag-20260715T094500Z/report
+
+report upload execution:
+job-jspace-p1-all45-pack-61s3ggf
+```
+
+Both executions succeeded through the private managed-identity path. The nine
+machine artifacts used exact membership, manifest-last upload, and per-file
+download/hash verification. The report was kept outside that membership and
+was independently downloaded and hash-verified. All five independent post-run
+checks passed. The transport secret was removed and the job is idle.
 
 ## Phase 1 n=3 Record-Level Artifact Audit (2026-07-11)
 

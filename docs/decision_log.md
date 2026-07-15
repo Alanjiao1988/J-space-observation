@@ -883,3 +883,47 @@ Scientific boundary:
 - No hidden-reasoning, internal-workspace, invisible-CoT, genuine no-CoT, or
   J-space inference is authorized.
 - This entry preregisters a procedure and claims no semantic-audit result.
+
+## 2026-07-15 — select Path C after the all-45 semantic audit
+
+Decision:
+
+- Complete the selected all-45 parser-underflag audit without changing the
+  parser, thresholds, source records, historical metrics, or historical
+  classifications.
+- Select preregistered **Path C**.
+- Pause higher-n replication.
+- Require a locked evaluator validation set and prospective parser-v2
+  protocol before any new model run.
+- Future work must dual-report the legacy parser and prospective parser v2;
+  it must not rewrite the bounded n=3 history.
+
+Evidence:
+
+- Two independent blinded `gpt-5.6-sol/max` reviewers completed all 45 records
+  in both stages.
+- A distinct arbiter resolved four triggered disagreements; unresolved count
+  is zero.
+- Final semantic audit opinion: 18 parser overflags, zero underflags, zero
+  true multiple-candidate ambiguities, 14 observed extraction errors, two
+  material correctness errors, and 19 material evaluator issues.
+- Both material correctness errors are `visible_cot`, depth 1. The audit-only
+  semantic alternative accuracy is `1.0000` versus stored/recomputed
+  `0.3333`.
+- The audit-only depth-2 visible-CoT parse-valid rate is `0.6667`; baseline
+  validity becomes false and relative gates become `NA`.
+- Four baseline/gate fields differ, but none of the nine final branch
+  classification labels changes.
+
+Consequence:
+
+- Official stored metrics and classifications remain authoritative and
+  unchanged.
+- Audit-only alternatives are post hoc, noncanonical sensitivity estimates,
+  not corrected or replacement results.
+- Parser v2 was not implemented in this audit.
+- Higher-n is not authorized until evaluator validation is preregistered and
+  completed.
+- The review adds no behavioral observations, leaves each cell at `n=3`, and
+  supports no hidden-reasoning, internal-workspace, invisible-CoT, genuine
+  no-CoT, or J-space claim.

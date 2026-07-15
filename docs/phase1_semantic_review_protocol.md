@@ -138,3 +138,38 @@ Correctness tables retain all semantic statuses against stored `true`, `false`, 
 4. overall material evaluator errors.
 
 Risk is never promoted automatically to observed or material error. Audit-only alternatives are computed on private copies only after zero unresolved judgments, reuse historical pure metric/classification helpers, preserve raw/stopped/postprocessed distinctions, and are labeled **audit-only semantic alternative estimates: post hoc, noncanonical sensitivity estimates**. Official stored history remains unchanged.
+
+## Post-run execution record
+
+This section records execution outcome and does not modify the frozen v1
+method above. The review releases remain bound to protocol/tooling commit
+`cfa99fc6e204db5cf1076a13a8975e13db226931` and protocol bundle SHA-256
+`21e713bab3ad54362e0e8571c5c61cca0f4ae5312230ad9760c6264ea9e9d633`.
+
+- Source prefix:
+  `phase1-limited-n3-gates/20260710T152820Z`.
+- Semantic parent prefix:
+  `phase1-semantic-audits/all45-parser-underflag-20260715T094500Z`.
+- Stage-1 packet: 45 records,
+  `4e6b9b5085fcd859d03cbd5ddccd3749904af19edd875c12c1965f713476f622`.
+- Stage-2 packet: 45 records,
+  `06f1d5b5a95e7cd39fb692a4ce798fa64747b362aaefcbb6532c6630db73ed3d`.
+- Two independent reviewers completed both stages; four records required a
+  distinct arbiter; unresolved count is zero.
+- The nine final machine artifacts were persisted with exact membership and
+  manifest-last semantics under the sibling `final` prefix. The Markdown
+  report was separately persisted under `report`.
+- Upload executions `job-jspace-p1-all45-pack-vi79nml` and
+  `job-jspace-p1-all45-pack-61s3ggf` succeeded; all uploaded bytes were
+  downloaded and SHA-256 verified.
+- Five independent post-run checks covering integrity, agreement, confusion
+  matrices, material impact, and scientific boundaries all passed.
+- Final audit opinion: 18 overflags, zero underflags, zero true ambiguity,
+  two material correctness errors, and 19 material evaluator issues.
+- Official stored metrics/classifications and source artifacts remain
+  unchanged.
+- No model inference, model loading/download, GPU use, parser change, new
+  behavioral observation, hidden-reasoning claim, or J-space claim occurred.
+
+Detailed results are in
+`reports/phase1_n3_all45_semantic_audit.md`.

@@ -478,25 +478,34 @@ Please read docs/thread_handoff.md first, then use the repo documents as source 
 - reports/current_status.md
 
 Current known state:
-- Audit ACR image is `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9537ed8e0b5d`; the experiment image remains `359643b7b5eb`.
+- The all-45 semantic-audit image is `acrjspaceobssea0708231738.azurecr.io/j-space-observation:cfa99fc6e204`, digest `sha256:43af06291f6196d5426fe5e014196c86d3d00aae978470d369a9c1c2bd3dfeac`.
 - Azure-first execution policy remains in force; the local PC is orchestration-only.
 - Private Blob persistence is working through `cae-jspace-observation-sea-vnet2`.
 - Bounded n=3 validation succeeded as `job-jspace-p1-n3-gates-02ilmgm`.
 - Results are under `phase1-limited-n3-gates/20260710T152820Z`.
 - Phase 1 has three non-interchangeable branches: raw strict, stopped intervention, and postprocessed utility.
 - Branch success criteria now include absolute accuracy, visible-CoT baseline validity, and `n >= 3` guards.
-- Local tests pass: `139 passed, 2 warnings`.
+- Protocol v1 was frozen before review at `cfa99fc6e204db5cf1076a13a8975e13db226931`.
+- Local model-free tests pass: `217 passed, 2 warnings`.
 - The run produced 45 generation and 45 eval records plus 15 metric rows with `n=3`.
 - Raw strict failed at all depths; stopped and postprocessed utility passed only at depth 1.
 - Depth-3 visible-CoT baseline is invalid (`visible_cot_accuracy_zero`), so relative gates are `NA`.
 - CPU-only record audit `job-jspace-p1-record-audit-d9q5uy8` completed cleanly through the private Blob path.
-- All 45 pairs and 15 metric rows passed deterministic audit; 18 flagged parses were independently reviewed and arbitrated.
-- Final LLM audit opinion: 17 parser overflags and one true multiple-candidate ambiguity; underflags outside the flagged set were not assessed.
+- The all-45 two-stage blinded semantic review completed with two independent `gpt-5.6-sol/max` reviewers and a distinct arbiter.
+- Final result: 18 parser overflags, zero underflags, zero true ambiguity, 14 observed extraction errors, 2 material correctness errors, and 19 material evaluator issues.
+- The two correctness errors are `visible_cot` depth-1 records; audit-only visible-CoT depth-1 accuracy is `1.0000` versus stored `0.3333`.
+- Depth-2 visible-CoT becomes invalid under the audit-only parse-valid rate, changing relative-gate applicability but no final branch label.
+- Official stored metrics, classifications, parser behavior, and source artifacts remain unchanged.
+- Nine final machine artifacts are under `phase1-semantic-audits/all45-parser-underflag-20260715T094500Z/final`; the separately verified report is under the sibling `report` prefix.
+- Upload executions `job-jspace-p1-all45-pack-vi79nml` and `job-jspace-p1-all45-pack-61s3ggf` succeeded with exact membership and download/hash verification.
+- All five post-run integrity/agreement/confusion/material-impact/scientific-boundary checks passed.
+- The audit job is idle and contains no temporary transport secret.
+- The preregistered decision is Path C: pause higher-n and validate a locked evaluator/parser-v2 protocol first.
 - No further model run is authorized.
 - No Phase 1 result is hidden-reasoning or J-space evidence.
 
 Your first task:
-Review `reports/phase1_n3_record_audit.md` and preregister whether the next step is an all-45 parser-underflag audit or a parser-method decision. Do not rerun the model or rewrite historical artifacts.
+Review `reports/phase1_n3_all45_semantic_audit.md`, then design and preregister an evaluator validation set plus prospective parser-v2 protocol. Do not run the model, authorize higher-n, or rewrite historical artifacts.
 ```
 
 ---
