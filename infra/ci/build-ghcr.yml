@@ -59,6 +59,13 @@ jobs:
           echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
           echo "sha_tag=$SHA_TAG" >> "$GITHUB_OUTPUT"
 
+      - name: Prepare semantic-audit build attestation
+        run: |
+          env -u PYTHONPATH python -I -S \
+            scripts/prepare_semantic_audit_build_context.py \
+            --project-root . \
+            --protocol-commit "${{ github.sha }}"
+
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
@@ -67,6 +74,10 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.tags }}
           provenance: false
+
+      - name: Remove generated build attestation
+        if: always()
+        run: rm -f .semantic_audit_build_provenance.json
 
       - name: Print pushed image reference
         run: |

@@ -20,6 +20,21 @@ if [[ -z "${AZURE_CONTAINER_REGISTRY:-}" ]]; then
     echo "[FAIL] AZURE_CONTAINER_REGISTRY is empty in variables.env"
     exit 1
 fi
+if [[ -z "${JSPACE_SEMANTIC_PROTOCOL_COMMIT:-}" ]]; then
+    echo "[FAIL] JSPACE_SEMANTIC_PROTOCOL_COMMIT must be the explicit clean HEAD commit"
+    exit 1
+fi
+
+ATTESTATION_PATH="$PROJECT_ROOT/.semantic_audit_build_provenance.json"
+cleanup_attestation() {
+    rm -f "$ATTESTATION_PATH"
+}
+trap cleanup_attestation EXIT
+
+env -u PYTHONPATH python -I -S \
+    "$PROJECT_ROOT/scripts/prepare_semantic_audit_build_context.py" \
+    --project-root "$PROJECT_ROOT" \
+    --protocol-commit "$JSPACE_SEMANTIC_PROTOCOL_COMMIT"
 
 ACR_LOGIN_SERVER="${AZURE_CONTAINER_REGISTRY}.azurecr.io"
 IMAGE_REF="${ACR_LOGIN_SERVER}/${AZURE_IMAGE_NAME}:${AZURE_IMAGE_TAG}"

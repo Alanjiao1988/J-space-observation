@@ -33,6 +33,8 @@ JSPACE_RESULTS_ROOT="${JSPACE_RESULTS_ROOT:-}"
 JSPACE_AUDIT_SOURCE_PREFIX="${JSPACE_AUDIT_SOURCE_PREFIX:-}"
 JSPACE_AUDIT_OUTPUT_PREFIX="${JSPACE_AUDIT_OUTPUT_PREFIX:-}"
 JSPACE_AUDIT_IMPLEMENTATION_COMMIT="${JSPACE_AUDIT_IMPLEMENTATION_COMMIT:-}"
+JSPACE_SEMANTIC_AUDIT_OUTPUT_PREFIX="${JSPACE_SEMANTIC_AUDIT_OUTPUT_PREFIX:-}"
+JSPACE_SEMANTIC_PROTOCOL_COMMIT="${JSPACE_SEMANTIC_PROTOCOL_COMMIT:-${JSPACE_SEMANTIC_AUDIT_PROTOCOL_COMMIT:-}}"
 PYTHONPATH_VALUE="${PYTHONPATH_VALUE:-/workspace/src}"
 ENABLE_RESULTS_MOUNT="${ENABLE_RESULTS_MOUNT:-false}"
 STORAGE_MOUNT_NAME="${STORAGE_MOUNT_NAME:-jspace-results-storage}"
@@ -42,15 +44,33 @@ if [[ "$ENABLE_RESULTS_MOUNT" == "true" && "${RESULTS_DIR:-/tmp/results}" == "/t
     RESULTS_DIR="$RESULTS_MOUNT_PATH"
 fi
 
-if [[ -n "$JSPACE_AUDIT_SOURCE_PREFIX" || -n "$JSPACE_AUDIT_OUTPUT_PREFIX" ]]; then
+AUDIT_MODE=false
+SEMANTIC_AUDIT_MODE=false
+if [[ -n "$JSPACE_SEMANTIC_AUDIT_OUTPUT_PREFIX" || -n "$JSPACE_SEMANTIC_PROTOCOL_COMMIT" ]]; then
+    if [[ -z "$JSPACE_AUDIT_SOURCE_PREFIX" || -z "$JSPACE_SEMANTIC_AUDIT_OUTPUT_PREFIX" || -z "$JSPACE_SEMANTIC_PROTOCOL_COMMIT" ]]; then
+        echo "[FAIL] Semantic audit mode requires JSPACE_AUDIT_SOURCE_PREFIX, JSPACE_SEMANTIC_AUDIT_OUTPUT_PREFIX, and JSPACE_SEMANTIC_PROTOCOL_COMMIT"
+        exit 1
+    fi
+    AUDIT_MODE=true
+    SEMANTIC_AUDIT_MODE=true
+elif [[ -n "$JSPACE_AUDIT_SOURCE_PREFIX" || -n "$JSPACE_AUDIT_OUTPUT_PREFIX" ]]; then
     if [[ -z "$JSPACE_AUDIT_SOURCE_PREFIX" || -z "$JSPACE_AUDIT_OUTPUT_PREFIX" ]]; then
         echo "[FAIL] Audit mode requires both JSPACE_AUDIT_SOURCE_PREFIX and JSPACE_AUDIT_OUTPUT_PREFIX"
         exit 1
     fi
-    if [[ "$WORKLOAD_PROFILE_NAME" == gpu-* ]]; then
-        echo "[FAIL] Audit mode requires an explicit non-GPU WORKLOAD_PROFILE_NAME"
+    AUDIT_MODE=true
+fi
+if [[ "$AUDIT_MODE" == "true" && "$WORKLOAD_PROFILE_NAME" == gpu-* ]]; then
+    echo "[FAIL] Audit mode requires an explicit non-GPU WORKLOAD_PROFILE_NAME"
+    exit 1
+fi
+if [[ "$SEMANTIC_AUDIT_MODE" == "true" ]]; then
+    SAFE_SEMANTIC_COMMAND='^python[[:space:]]+-I[[:space:]]+-S[[:space:]]+/workspace/scripts/(export_phase1_semantic_review_pack|finalize_phase1_semantic_audit)\.py([[:space:]][A-Za-z0-9_./:@+=,-]+)*$'
+    if [[ ! "$JOB_COMMAND" =~ $SAFE_SEMANTIC_COMMAND ]]; then
+        echo "[FAIL] Semantic audit JOB_COMMAND must be a single python -I -S invocation of an approved semantic CLI"
         exit 1
     fi
+    JOB_COMMAND="env -u PYTHONPATH ${JOB_COMMAND}"
 fi
 
 if [[ -z "$ACR_LOGIN_SERVER" && -n "$ACR_NAME" ]]; then
@@ -101,7 +121,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-python - "$BODY_FILE" "$LOCATION" "$ENVIRONMENT_ID" "$ACR_IMAGE" "$ACR_LOGIN_SERVER" "$IDENTITY_ID" "$JOB_COMMAND" "$WORKLOAD_PROFILE_NAME" "$REPLICA_TIMEOUT" "$CPU_CORES" "$MEMORY" "$HF_HOME" "$TRANSFORMERS_CACHE" "$RESULTS_DIR" "$AZURE_CLIENT_ID" "$JSPACE_BLOB_ACCOUNT" "$JSPACE_BLOB_CONTAINER" "$JSPACE_BLOB_PREFIX" "$JSPACE_RESULTS_ROOT" "$JSPACE_AUDIT_SOURCE_PREFIX" "$JSPACE_AUDIT_OUTPUT_PREFIX" "$JSPACE_AUDIT_IMPLEMENTATION_COMMIT" "$PYTHONPATH_VALUE" "$ENABLE_RESULTS_MOUNT" "$STORAGE_MOUNT_NAME" "$RESULTS_MOUNT_PATH" <<'PY'
+python - "$BODY_FILE" "$LOCATION" "$ENVIRONMENT_ID" "$ACR_IMAGE" "$ACR_LOGIN_SERVER" "$IDENTITY_ID" "$JOB_COMMAND" "$WORKLOAD_PROFILE_NAME" "$REPLICA_TIMEOUT" "$CPU_CORES" "$MEMORY" "$HF_HOME" "$TRANSFORMERS_CACHE" "$RESULTS_DIR" "$AZURE_CLIENT_ID" "$JSPACE_BLOB_ACCOUNT" "$JSPACE_BLOB_CONTAINER" "$JSPACE_BLOB_PREFIX" "$JSPACE_RESULTS_ROOT" "$JSPACE_AUDIT_SOURCE_PREFIX" "$JSPACE_AUDIT_OUTPUT_PREFIX" "$JSPACE_AUDIT_IMPLEMENTATION_COMMIT" "$JSPACE_SEMANTIC_AUDIT_OUTPUT_PREFIX" "$JSPACE_SEMANTIC_PROTOCOL_COMMIT" "$SEMANTIC_AUDIT_MODE" "$PYTHONPATH_VALUE" "$ENABLE_RESULTS_MOUNT" "$STORAGE_MOUNT_NAME" "$RESULTS_MOUNT_PATH" <<'PY'
 import json
 import sys
 
@@ -128,6 +148,9 @@ import sys
     audit_source_prefix,
     audit_output_prefix,
     audit_implementation_commit,
+    semantic_audit_output_prefix,
+    semantic_protocol_commit,
+    semantic_audit_mode,
     pythonpath_value,
     enable_results_mount,
     storage_mount_name,
@@ -159,8 +182,11 @@ optional_env = {
     "JSPACE_AUDIT_SOURCE_PREFIX": audit_source_prefix,
     "JSPACE_AUDIT_OUTPUT_PREFIX": audit_output_prefix,
     "JSPACE_AUDIT_IMPLEMENTATION_COMMIT": audit_implementation_commit,
-    "PYTHONPATH": pythonpath_value,
+    "JSPACE_SEMANTIC_AUDIT_OUTPUT_PREFIX": semantic_audit_output_prefix,
+    "JSPACE_SEMANTIC_PROTOCOL_COMMIT": semantic_protocol_commit,
 }
+if semantic_audit_mode.lower() != "true":
+    optional_env["PYTHONPATH"] = pythonpath_value
 for key, value in optional_env.items():
     if value:
         container["env"].append({"name": key, "value": value})

@@ -843,3 +843,43 @@ Consequence:
   prospectively.
 - This audit generated no behavioral observation and supports no
   hidden-reasoning, internal-workspace, or J-space claim.
+
+## 2026-07-13 — preregister all-45 semantic parser audit protocol v1
+
+Decision:
+
+- Freeze `docs/phase1_semantic_review_protocol.md` as protocol v1 before any
+  all-45 packet review.
+- Select the all-45 parser-underflag audit path for the 45 already-stored
+  arithmetic records from
+  `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`.
+- Use two independent blinded stages followed by prospectively triggered
+  arbitration by `gpt-5.6-sol` with reasoning effort `max`.
+- Make no prospective parser change in this round. Stored parser behavior,
+  thresholds, branch logic, historical metrics, classifications, summaries,
+  and source artifacts remain unchanged.
+- Admit production releases only from hard-coded-hash-verified source bytes
+  with before/after Blob evidence; synthetic fixtures are permanently
+  release-ineligible.
+- Require clean-Git build preparation and a baked immutable provenance
+  attestation before any project or Azure import.
+- Reserve every new release prefix atomically and validate exact membership.
+- Treat reviewer-derived recomputations only as audit-only semantic alternative
+  estimates: post hoc, noncanonical sensitivity estimates.
+
+Material-impact rule:
+
+- A material evaluator error is a stored-versus-semantic disagreement that
+  could change correctness, condition-depth accuracy, a branch absolute or
+  relative gate, visible-CoT baseline validity, or branch classification.
+- Last-number risk, observed extraction error, and material correctness error
+  are reported separately.
+
+Scientific boundary:
+
+- Reviewing stored outputs generates no new behavioral observations and leaves
+  every experimental cell at `n=3`.
+- Reviewer judgments are audit opinion, not human ground truth.
+- No hidden-reasoning, internal-workspace, invisible-CoT, genuine no-CoT, or
+  J-space inference is authorized.
+- This entry preregisters a procedure and claims no semantic-audit result.

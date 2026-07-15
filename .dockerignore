@@ -1,6 +1,8 @@
 # Git
 .git
 .gitignore
+!.gitignore
+!.semantic_audit_build_provenance.json
 
 # Python caches
 __pycache__/
@@ -23,6 +25,11 @@ secrets/
 # Results and model artifacts (must not be baked into image)
 results/runs/*
 !results/runs/.gitkeep
+artifacts/
+**/all45_*
+**/*session_paste*
+**/*session-paste*
+**/*sessionpaste*
 models/
 checkpoints/
 *.safetensors

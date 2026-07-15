@@ -32,3 +32,7 @@ secrets/
 
 # Read-only audit downloads and raw job logs
 artifacts/record_audit/
+artifacts/semantic_audit/
+
+# Generated only by the checked semantic-audit build preparation command
+.semantic_audit_build_provenance.json

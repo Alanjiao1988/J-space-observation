@@ -137,8 +137,18 @@ Do not run these until readiness and quota gates pass.
 1. Build/push image to ACR:
 
 ```bash
+export JSPACE_SEMANTIC_PROTOCOL_COMMIT="<explicit 40-hex clean HEAD commit>"
 bash infra/azure/scripts/01_build_and_push_image.sh
 ```
+
+The build script fails unless the tracked worktree/index and registered behavior
+roots are clean at that exact commit. It runs
+`scripts/prepare_semantic_audit_build_context.py` with `python -I -S` and no
+`PYTHONPATH` before `az acr build` and
+removes the generated `.semantic_audit_build_provenance.json` in an exit trap.
+The Docker build has no caller-supplied provenance build arguments: it requires
+and validates the generated attestation. The manual GHCR workflow performs the
+same preparation from `${{ github.sha }}`.
 
 2. Run Phase 0.5 availability/model-loading check on Azure:
 
