@@ -13,6 +13,11 @@ The phase stops after set validation and sealing. It does not implement parser
 v2, run the locked parser evaluation, run
 `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`, or authorize higher-n replication.
 
+Only fixtures constructed after the final parser-v2-v1.1 protocol commit are
+eligible. Candidate pools produced under superseded protocol bytes are
+discarded, are not inputs to selection or labeling, and contribute no
+development or locked evidence.
+
 ## Exact set composition
 
 | Stratum | Description | Development | Locked | Reference presence |

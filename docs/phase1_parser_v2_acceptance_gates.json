@@ -67,6 +67,8 @@
     "fraction_decimal_components": false,
     "fraction_zero_denominator": false,
     "maximum_literal_characters": 100,
+    "maximum_canonical_characters": 4096,
+    "canonical_size_preflight_before_allocation": true,
     "canonical_form": "reduced_rational_positive_denominator_integer_without_slash_one",
     "signed_zero": "0",
     "float_or_tolerance": false,

@@ -2,7 +2,7 @@
 
 ## Registration
 
-- Protocol version: **parser-v2-v1**
+- Protocol version: **parser-v2-v1.1**
 - Phase: **1.2A / Path C**
 - Status: **preregistered before fixture construction**
 - Historical experimental target:
@@ -16,6 +16,11 @@ The first Git commit containing this document,
 `docs/phase1_evaluator_validation_set.md`, and
 `docs/phase1_parser_v2_acceptance_gates.json` freezes the protocol. Case
 construction cannot begin before that commit is pushed to `origin/main`.
+
+Version 1.1 adds the finite canonical-rendering bound required to make
+scientific-notation normalization executable under adversarial exponents. Any
+candidate pool produced under the superseded version 1.0 bytes is
+construction-ineligible and must be regenerated after the version 1.1 commit.
 
 ## Scientific boundary
 
@@ -211,8 +216,12 @@ Simple fraction grammar:
 
 Fractions permit no internal whitespace, decimal/scientific numerator or
 denominator, signed denominator, mixed number, or zero denominator. Numeric
-tokens are at most 100 ASCII characters and must not be embedded in an
-identifier, version, date, percentage, or unit-bearing token.
+tokens are at most 100 ASCII characters. Their canonical reduced-rational
+rendering is at most 4096 ASCII characters, including a slash and sign.
+Exponent magnitude and resulting rendering length are checked before any
+power, integer, or output allocation. A surface that would exceed this bound is
+unsupported and fails deterministically. Numeric tokens must not be embedded
+in an identifier, version, date, percentage, or unit-bearing token.
 
 Every accepted literal is converted exactly to a reduced rational:
 
