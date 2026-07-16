@@ -3827,6 +3827,63 @@ def test_final_label_private_spans_are_derived_only_from_stage1_consensus(
     )
 
 
+def test_final_label_quota_tags_are_rederived_from_stage1_consensus(dataset):
+    _, _, stage1 = _stage1_consensus_bundle(dataset)
+    consensus = deepcopy(stage1["consensus"])
+    labels = deepcopy(dataset["materialized"]["locked_draft_labels"])
+    target = next(
+        label
+        for label in labels
+        if label["stratum"] == "S01"
+        and "incidental_numeric_distractor" not in label["secondary_tags"]
+    )
+    selected = next(
+        span
+        for span in target["expected_evidence_spans"]
+        if span["disposition"] == "selected"
+    )
+    suffix = f" Equivalent answer: {selected['text']}"
+    target["output_text"] += suffix
+    equivalent_start = len(target["output_text"]) - len(selected["text"])
+    equivalent = {
+        "start": equivalent_start,
+        "end": len(target["output_text"]),
+        "text": selected["text"],
+        "kind": selected["kind"],
+        "normalized_answer": selected["normalized_answer"],
+        "disposition": "equivalent",
+    }
+    target["expected_evidence_spans"].append(equivalent)
+    target["acceptable_selected_spans"].append(
+        {
+            "start": equivalent["start"],
+            "end": equivalent["end"],
+            "text": equivalent["text"],
+        }
+    )
+    final_stage2 = [
+        {
+            "case_id": label["case_id"],
+            "source": "reviewer_agreement",
+            "correctness": (
+                "correct" if label["expected_correctness"] else "incorrect"
+            ),
+            "critical_case": label["critical_case"],
+            "material_error_if_missed": label["material_error_if_missed"],
+        }
+        for label in labels
+    ]
+
+    final = v.build_final_labels(
+        labels,
+        consensus,
+        v.build_stage2_reference_packet(labels),
+        final_stage2,
+    )
+    derived = next(row for row in final if row["case_id"] == target["case_id"])
+    assert "incidental_numeric_distractor" in derived["secondary_tags"]
+
+
 def test_stage2_agreed_inconclusive_is_unresolved(dataset):
     _, _, stage1 = _stage1_consensus_bundle(dataset)
     reviewer_a = _stage2_rows(dataset, stage1["consensus"], "reviewer_a")
@@ -4417,6 +4474,153 @@ def test_historical_fingerprint_bundle_is_canonical_bound_and_non_content(
         historical_fingerprint_bundle["fingerprint_bytes"],
         historical_fingerprint_bundle["summary_bytes"],
     ) == historical_fingerprint_bundle["rows"]
+
+
+def test_registered_historical_summary_schema_is_strictly_normalized(monkeypatch):
+    exact_a = "a" * 64
+    exact_b = "b" * 64
+    normalized = "c" * 64
+    rows = [
+        {
+            "source": f"generation:0:output:{exact_a[:16]}",
+            "exact_sha256": exact_a,
+            "normalized_sha256": normalized,
+        },
+        {
+            "source": f"evaluation:0:output:{exact_a[:16]}",
+            "exact_sha256": exact_a,
+            "normalized_sha256": normalized,
+        },
+        {
+            "source": f"generation:1:output:{exact_b[:16]}",
+            "exact_sha256": exact_b,
+            "normalized_sha256": normalized,
+        },
+    ]
+    fingerprint_bytes = v.canonical_jsonl_bytes(rows)
+    summary = {
+        "schema_version": "phase1-parser-v2-history-fingerprints/v1",
+        "fingerprint_records": len(rows),
+        "fingerprint_sha256": v.sha256_bytes(fingerprint_bytes),
+        "historical_text_in_artifact": False,
+        "protocol_commit": v.FROZEN_PROTOCOL_COMMIT,
+        "source_hashes": deepcopy(v.HISTORICAL_SOURCE_HASHES),
+        "unique_exact_hashes": len({row["exact_sha256"] for row in rows}),
+        "unique_normalized_hashes": len(
+            {row["normalized_sha256"] for row in rows}
+        ),
+    }
+    summary_bytes = v.canonical_json_bytes(summary)
+    monkeypatch.setattr(
+        v,
+        "HISTORICAL_FINGERPRINT_ARTIFACT_HASHES",
+        {
+            "historical_output_fingerprints.jsonl": v.sha256_bytes(
+                fingerprint_bytes
+            ),
+            "historical_output_fingerprint_summary.json": v.sha256_bytes(
+                summary_bytes
+            ),
+        },
+    )
+    assert v.validate_historical_fingerprint_bundle(
+        fingerprint_bytes, summary_bytes
+    ) == rows
+
+    for field in ("unique_exact_hashes", "unique_normalized_hashes"):
+        invalid = deepcopy(summary)
+        invalid[field] += 1
+        invalid_bytes = v.canonical_json_bytes(invalid)
+        monkeypatch.setitem(
+            v.HISTORICAL_FINGERPRINT_ARTIFACT_HASHES,
+            "historical_output_fingerprint_summary.json",
+            v.sha256_bytes(invalid_bytes),
+        )
+        with pytest.raises(v.ValidationSetError, match="binding is invalid"):
+            v.validate_historical_fingerprint_bundle(
+                fingerprint_bytes, invalid_bytes
+            )
+
+
+def test_registered_historical_row_schema_is_strictly_normalized(monkeypatch):
+    first_exact = "a" * 64
+    second_exact = "b" * 64
+    normalized = "c" * 64
+    external = [
+        {
+            "source_file": "phase1_generations.jsonl",
+            "record_index": 1,
+            "field": "output",
+            "exact_sha256": first_exact,
+            "normalized_sha256": normalized,
+            "masked_5gram_sha256": ["d" * 64],
+        },
+        {
+            "source_file": "phase1_eval_records.jsonl",
+            "record_index": 45,
+            "field": "eval_output",
+            "exact_sha256": second_exact,
+            "normalized_sha256": normalized,
+            "masked_5gram_sha256": ["e" * 64, "f" * 64],
+        },
+    ]
+    internal = [
+        {
+            "source": f"generation:0:output:{first_exact[:16]}",
+            "exact_sha256": first_exact,
+            "normalized_sha256": normalized,
+        },
+        {
+            "source": f"evaluation:44:eval_output:{second_exact[:16]}",
+            "exact_sha256": second_exact,
+            "normalized_sha256": normalized,
+        },
+    ]
+    fingerprint_bytes = v.canonical_jsonl_bytes(external)
+    summary = {
+        "schema_version": "phase1-parser-v2-history-fingerprints/v1",
+        "fingerprint_records": 2,
+        "fingerprint_sha256": v.sha256_bytes(fingerprint_bytes),
+        "historical_text_in_artifact": False,
+        "protocol_commit": v.FROZEN_PROTOCOL_COMMIT,
+        "source_hashes": deepcopy(v.HISTORICAL_SOURCE_HASHES),
+        "unique_exact_hashes": 2,
+        "unique_normalized_hashes": 1,
+    }
+    summary_bytes = v.canonical_json_bytes(summary)
+    hashes = {
+        "historical_output_fingerprints.jsonl": v.sha256_bytes(
+            fingerprint_bytes
+        ),
+        "historical_output_fingerprint_summary.json": v.sha256_bytes(
+            summary_bytes
+        ),
+    }
+    monkeypatch.setattr(v, "HISTORICAL_FINGERPRINT_ARTIFACT_HASHES", hashes)
+    assert v.validate_historical_fingerprint_bundle(
+        fingerprint_bytes, summary_bytes
+    ) == internal
+
+    invalid_rows = []
+    mixed = deepcopy(external)
+    mixed.append(internal[0])
+    invalid_rows.append((mixed, "mixed or invalid schemas"))
+    for record_index in (0, 46):
+        invalid = deepcopy(external)
+        invalid[0]["record_index"] = record_index
+        invalid_rows.append((invalid, "record_index"))
+    empty = deepcopy(external)
+    empty[0]["masked_5gram_sha256"] = []
+    invalid_rows.append((empty, "nonempty list"))
+    duplicate = deepcopy(external)
+    duplicate[0]["masked_5gram_sha256"] = ["d" * 64, "d" * 64]
+    invalid_rows.append((duplicate, "sorted and unique"))
+    unsorted = deepcopy(external)
+    unsorted[0]["masked_5gram_sha256"] = ["e" * 64, "d" * 64]
+    invalid_rows.append((unsorted, "sorted and unique"))
+    for rows, message in invalid_rows:
+        with pytest.raises(v.ValidationSetError, match=message):
+            v._normalize_historical_fingerprint_rows(rows)
 
 
 class _FakeBlobService:

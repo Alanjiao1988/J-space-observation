@@ -2995,13 +2995,110 @@ def historical_output_fingerprints(
 _HISTORICAL_FINGERPRINT_FIELDS = frozenset(
     HistoricalFingerprintRow.__required_keys__
 )
+_REGISTERED_HISTORICAL_FINGERPRINT_FIELDS = frozenset(
+    {
+        "source_file",
+        "record_index",
+        "field",
+        "exact_sha256",
+        "normalized_sha256",
+        "masked_5gram_sha256",
+    }
+)
+_REGISTERED_HISTORICAL_SOURCE_FILES = {
+    "phase1_generations.jsonl": "generation",
+    "phase1_eval_records.jsonl": "evaluation",
+}
 _HISTORICAL_FINGERPRINT_SUMMARY_FIELDS = frozenset(
     HistoricalFingerprintSummary.__required_keys__
+)
+_REGISTERED_HISTORICAL_FINGERPRINT_SUMMARY_FIELDS = frozenset(
+    {
+        "schema_version",
+        "fingerprint_records",
+        "fingerprint_sha256",
+        "historical_text_in_artifact",
+        "protocol_commit",
+        "source_hashes",
+        "unique_exact_hashes",
+        "unique_normalized_hashes",
+    }
+)
+_REGISTERED_HISTORICAL_FINGERPRINT_SUMMARY_SCHEMA_VERSION = (
+    "phase1-parser-v2-history-fingerprints/v1"
 )
 _HISTORICAL_FINGERPRINT_SOURCE_PATTERN = re.compile(
     r"(generation|evaluation):([0-9]+):([a-z_]+):([0-9a-f]{16})\Z",
     re.ASCII,
 )
+
+
+def _normalize_historical_fingerprint_rows(
+    rows: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    if not rows:
+        raise ValidationSetError("historical fingerprint rows must not be empty")
+    if any(not isinstance(row, Mapping) for row in rows):
+        raise ValidationSetError("historical fingerprint rows must be objects")
+    field_sets = {frozenset(row) for row in rows}
+    if len(field_sets) != 1:
+        raise ValidationSetError(
+            "historical fingerprint rows use mixed or invalid schemas"
+        )
+    fields = next(iter(field_sets))
+    if fields == _HISTORICAL_FINGERPRINT_FIELDS:
+        return [dict(row) for row in rows]
+    if fields != _REGISTERED_HISTORICAL_FINGERPRINT_FIELDS:
+        raise ValidationSetError(
+            "historical fingerprint row schema is not registered"
+        )
+    normalized: list[dict[str, Any]] = []
+    for index, row in enumerate(rows):
+        name = f"registered historical fingerprint[{index}]"
+        _require_exact_fields(
+            row, _REGISTERED_HISTORICAL_FINGERPRINT_FIELDS, name
+        )
+        source_file = _require_enum(
+            row["source_file"],
+            tuple(_REGISTERED_HISTORICAL_SOURCE_FILES),
+            f"{name}.source_file",
+        )
+        record_index = _require_int(
+            row["record_index"], f"{name}.record_index", minimum=1
+        )
+        if record_index > 45:
+            raise ValidationSetError(f"{name}.record_index is out of range")
+        field = _require_enum(
+            row["field"], _HISTORICAL_OUTPUT_FIELDS, f"{name}.field"
+        )
+        exact = _require_sha256(row["exact_sha256"], f"{name}.exact_sha256")
+        normalized_hash = _require_sha256(
+            row["normalized_sha256"], f"{name}.normalized_sha256"
+        )
+        masked = row["masked_5gram_sha256"]
+        if not isinstance(masked, list) or not masked:
+            raise ValidationSetError(
+                f"{name}.masked_5gram_sha256 must be a nonempty list"
+            )
+        masked_hashes = [
+            _require_sha256(item, f"{name}.masked_5gram_sha256[{item_index}]")
+            for item_index, item in enumerate(masked)
+        ]
+        if masked_hashes != sorted(set(masked_hashes)):
+            raise ValidationSetError(
+                f"{name}.masked_5gram_sha256 must be sorted and unique"
+            )
+        source_kind = _REGISTERED_HISTORICAL_SOURCE_FILES[source_file]
+        normalized.append(
+            {
+                "source": (
+                    f"{source_kind}:{record_index - 1}:{field}:{exact[:16]}"
+                ),
+                "exact_sha256": exact,
+                "normalized_sha256": normalized_hash,
+            }
+        )
+    return normalized
 
 
 def _validate_historical_fingerprint_rows(
@@ -3048,6 +3145,69 @@ def _validate_historical_fingerprint_rows(
     return validated
 
 
+def _normalize_historical_fingerprint_summary(
+    summary: Mapping[str, Any],
+    fingerprint_jsonl: bytes,
+    rows: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    if set(summary) == _HISTORICAL_FINGERPRINT_SUMMARY_FIELDS:
+        return dict(summary)
+    _require_exact_fields(
+        summary,
+        _REGISTERED_HISTORICAL_FINGERPRINT_SUMMARY_FIELDS,
+        "registered historical fingerprint summary",
+    )
+    source_hashes = summary["source_hashes"]
+    _require_exact_fields(
+        source_hashes,
+        HISTORICAL_SOURCE_HASHES,
+        "registered historical fingerprint summary source hashes",
+    )
+    if (
+        summary["schema_version"]
+        != _REGISTERED_HISTORICAL_FINGERPRINT_SUMMARY_SCHEMA_VERSION
+        or summary["protocol_commit"] != FROZEN_PROTOCOL_COMMIT
+        or source_hashes != HISTORICAL_SOURCE_HASHES
+        or _require_sha256(
+            summary["fingerprint_sha256"],
+            "registered historical fingerprint summary JSONL hash",
+        )
+        != sha256_bytes(fingerprint_jsonl)
+        or _require_int(
+            summary["fingerprint_records"],
+            "registered historical fingerprint summary count",
+            minimum=1,
+        )
+        != len(rows)
+        or _require_int(
+            summary["unique_exact_hashes"],
+            "registered historical fingerprint summary unique exact count",
+            minimum=1,
+        )
+        != len({row["exact_sha256"] for row in rows})
+        or _require_int(
+            summary["unique_normalized_hashes"],
+            "registered historical fingerprint summary unique normalized count",
+            minimum=1,
+        )
+        != len({row["normalized_sha256"] for row in rows})
+        or summary["historical_text_in_artifact"] is not False
+    ):
+        raise ValidationSetError(
+            "registered historical fingerprint summary binding is invalid"
+        )
+    return {
+        "schema_version": HISTORICAL_FINGERPRINT_SUMMARY_SCHEMA_VERSION,
+        "fingerprint_schema_version": HISTORICAL_FINGERPRINT_SCHEMA_VERSION,
+        "status": "PASS",
+        "protocol_commit": summary["protocol_commit"],
+        "source_artifact_sha256s": dict(source_hashes),
+        "fingerprint_jsonl_sha256": summary["fingerprint_sha256"],
+        "fingerprint_count": summary["fingerprint_records"],
+        "contains_historical_text": summary["historical_text_in_artifact"],
+    }
+
+
 def validate_historical_fingerprint_bundle(
     fingerprint_jsonl: bytes,
     summary_json: bytes,
@@ -3067,11 +3227,18 @@ def validate_historical_fingerprint_bundle(
         raise ValidationSetError(
             "historical fingerprint artifacts failed registered hash checks"
         )
-    rows = parse_jsonl_strict(
-        fingerprint_jsonl, "historical_output_fingerprints.jsonl"
+    rows = _validate_historical_fingerprint_rows(
+        _normalize_historical_fingerprint_rows(
+            parse_jsonl_strict(
+                fingerprint_jsonl, "historical_output_fingerprints.jsonl"
+            )
+        )
     )
     summary = parse_json_strict(
         summary_json, "historical_output_fingerprint_summary.json"
+    )
+    summary = _normalize_historical_fingerprint_summary(
+        summary, fingerprint_jsonl, rows
     )
     _require_exact_fields(
         summary,
@@ -3116,7 +3283,7 @@ def validate_historical_fingerprint_bundle(
         raise ValidationSetError(
             "historical fingerprint summary payload binding is invalid"
         )
-    return _validate_historical_fingerprint_rows(rows)
+    return rows
 
 
 def _pair_report(
@@ -7263,6 +7430,22 @@ def build_final_labels(
             if field == "answer_presence":
                 value = presence_map[value]
             base[target] = value
+        derived_quota_tags = (
+            _surface_features(
+                {
+                    "output_text": base["output_text"],
+                    "expected_parsed_answer": base["expected_parsed_answer"],
+                    "expected_evidence_spans": base["expected_evidence_spans"],
+                }
+            )
+            & QUOTA_DIAGNOSTIC_TAGS
+        )
+        nonquota_tags = set(base["secondary_tags"]) - QUOTA_DIAGNOSTIC_TAGS
+        base["secondary_tags"] = [
+            tag
+            for tag in SECONDARY_TAGS
+            if tag in nonquota_tags or tag in derived_quota_tags
+        ]
         (
             base["acceptable_selected_spans"],
             base["last_number_distractor_span"],
