@@ -3,6 +3,8 @@
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from jspace_observation.phase1_branches import (
@@ -15,14 +17,24 @@ from jspace_observation.phase1_branches import (
     PHASE1_INTERPRETATION_BOUNDARIES,
     PHASE1_POSTPROCESSING_ACCURACY_WARNING,
     PHASE1_VISIBLE_COT_BASELINE_WARNING,
+    PHASE1_PREFILL_CLASSIFICATION_WARNING,
+    LEGACY_BRANCH_TAXONOMY_VERSION,
+    PROSPECTIVE_BRANCH_TAXONOMY_VERSION,
+    LEGACY_CONDITION_TO_BRANCH,
     POSTPROCESSED_UTILITY_BRANCH,
+    PREFILL_INTERVENTION_BRANCH,
+    PROMPT_ONLY_RAW_STRICT_BRANCH,
     RAW_STRICT_BRANCH,
     STOPPED_INTERVENTION_BRANCH,
+    UNCLASSIFIED_BRANCH,
     VISIBLE_REASONING_BASELINE_BRANCH,
     classify_branch_result,
     evaluate_visible_cot_baseline,
+    get_legacy_phase1_branch,
     get_phase1_branch,
     get_phase1_branch_metadata,
+    get_prospective_phase1_branch,
+    resolve_branch_taxonomy_version,
     render_branch_metrics_table,
     render_branch_success_classification_section,
 )
@@ -31,6 +43,70 @@ from jspace_observation.phase1_branches import (
 def test_raw_strict_conditions_share_branch():
     assert get_phase1_branch("strict_answer_only") == RAW_STRICT_BRANCH
     assert get_phase1_branch("strict_answer_only_prefill_answer") == RAW_STRICT_BRANCH
+
+
+@pytest.mark.parametrize(
+    ("condition", "legacy_branch", "prospective_branch"),
+    [
+        (
+            "strict_answer_only",
+            RAW_STRICT_BRANCH,
+            PROMPT_ONLY_RAW_STRICT_BRANCH,
+        ),
+        (
+            "strict_answer_only_prefill_answer",
+            RAW_STRICT_BRANCH,
+            PREFILL_INTERVENTION_BRANCH,
+        ),
+        (
+            "strict_answer_only_empty_think_prefill",
+            UNCLASSIFIED_BRANCH,
+            PREFILL_INTERVENTION_BRANCH,
+        ),
+        (
+            "strict_answer_only_stopped",
+            STOPPED_INTERVENTION_BRANCH,
+            STOPPED_INTERVENTION_BRANCH,
+        ),
+        (
+            "strict_answer_only_postprocessed",
+            POSTPROCESSED_UTILITY_BRANCH,
+            POSTPROCESSED_UTILITY_BRANCH,
+        ),
+        (
+            "visible_cot",
+            VISIBLE_REASONING_BASELINE_BRANCH,
+            VISIBLE_REASONING_BASELINE_BRANCH,
+        ),
+        (
+            "r1_style_thinking",
+            VISIBLE_REASONING_BASELINE_BRANCH,
+            VISIBLE_REASONING_BASELINE_BRANCH,
+        ),
+    ],
+)
+def test_v1_and_v2_crosswalk_rows(condition, legacy_branch, prospective_branch):
+    assert get_legacy_phase1_branch(condition) == legacy_branch
+    assert get_phase1_branch(condition) == legacy_branch
+    assert (
+        get_phase1_branch(condition, LEGACY_BRANCH_TAXONOMY_VERSION)
+        == legacy_branch
+    )
+    assert get_prospective_phase1_branch(condition) == prospective_branch
+    assert (
+        get_phase1_branch(condition, PROSPECTIVE_BRANCH_TAXONOMY_VERSION)
+        == prospective_branch
+    )
+
+
+def test_missing_taxonomy_version_is_v1_and_legacy_mapping_is_immutable():
+    assert resolve_branch_taxonomy_version(None) == LEGACY_BRANCH_TAXONOMY_VERSION
+    assert (
+        get_phase1_branch("strict_answer_only_prefill_answer")
+        == RAW_STRICT_BRANCH
+    )
+    with pytest.raises(TypeError):
+        LEGACY_CONDITION_TO_BRANCH["strict_answer_only"] = "changed"
 
 
 def test_stopped_condition_maps_to_intervention_branch():
@@ -47,6 +123,18 @@ def test_visible_conditions_are_labeled_as_baselines():
 
 
 def test_branch_metadata_is_record_ready():
+    metadata = get_phase1_branch_metadata(
+        "strict_answer_only_prefill_answer",
+        taxonomy_version=PROSPECTIVE_BRANCH_TAXONOMY_VERSION,
+    )
+    assert (
+        metadata["branch_taxonomy_version"]
+        == PROSPECTIVE_BRANCH_TAXONOMY_VERSION
+    )
+    assert metadata["legacy_phase1_branch"] == RAW_STRICT_BRANCH
+    assert metadata["prospective_phase1_branch"] == PREFILL_INTERVENTION_BRANCH
+    assert metadata["phase1_branch"] == metadata["legacy_phase1_branch"]
+
     metadata = get_phase1_branch_metadata("strict_answer_only_stopped")
     assert metadata["phase1_branch"] == STOPPED_INTERVENTION_BRANCH
     assert "Stop-controlled" in metadata["phase1_branch_label"]
@@ -82,6 +170,29 @@ def test_branch_metrics_table_uses_na_for_non_applicable_metrics():
     assert "| raw_strict | strict_answer_only_prefill_answer |" in table
     assert "1.0000" in table
     assert "NA" in table
+
+
+def test_prospective_prefill_report_does_not_reuse_raw_success_criteria():
+    section = render_branch_success_classification_section(
+        [
+            {
+                "model": "test-model",
+                "task_family": "arithmetic",
+                "depth": 1,
+                "condition": "strict_answer_only_prefill_answer",
+                "branch_taxonomy_version": "v2",
+                "legacy_phase1_branch": RAW_STRICT_BRANCH,
+                "prospective_phase1_branch": PREFILL_INTERVENTION_BRANCH,
+                "branch": PREFILL_INTERVENTION_BRANCH,
+                **passing_raw_metrics(),
+            }
+        ]
+    )
+
+    assert "| prefill_intervention | strict_answer_only_prefill_answer | v2 |" in section
+    assert "not_applicable" in section
+    assert "prospective_prefill_intervention_success_criteria" in section
+    assert "raw_strict_preliminarily_established" not in section
 
 
 def valid_visible_cot_baseline():
@@ -127,6 +238,34 @@ def passing_postprocessed_metrics():
         "accuracy_postprocessed": 0.60,
         **valid_visible_cot_baseline(),
     }
+
+
+def test_prospective_prefill_classification_is_explicitly_not_applicable():
+    result = classify_branch_result(
+        PREFILL_INTERVENTION_BRANCH,
+        passing_raw_metrics(),
+    )
+
+    assert result["classification"] == "not_applicable"
+    assert result["absolute_accuracy_passed"] is None
+    assert result["classification_criteria_version"] is None
+    assert result["criteria_passed"] == []
+    assert result["criteria_failed"] == []
+    assert result["criteria_not_applicable"] == [
+        "prospective_prefill_intervention_success_criteria"
+    ]
+    assert "not spontaneous no-CoT" in result["interpretation_warning"]
+
+
+def test_prompt_only_branch_labels_reused_raw_criteria_as_historical_v1():
+    result = classify_branch_result(
+        PROMPT_ONLY_RAW_STRICT_BRANCH,
+        passing_raw_metrics(),
+    )
+
+    assert result["classification"] == "raw_strict_preliminarily_established"
+    assert result["classification_criteria_version"] == "v1"
+    assert result["classification_criteria_branch"] == RAW_STRICT_BRANCH
 
 
 def test_raw_strict_fails_when_raw_validity_is_low():
@@ -450,6 +589,7 @@ def test_branch_classification_summary_has_mandatory_scientific_warning():
     assert PHASE1_BRANCH_SAMPLE_SIZE_WARNING in section
     assert PHASE1_VISIBLE_COT_BASELINE_WARNING in section
     assert PHASE1_POSTPROCESSING_ACCURACY_WARNING in section
+    assert PHASE1_PREFILL_CLASSIFICATION_WARNING in section
     assert "hidden reasoning" in section
     assert "internal workspace behavior" in section
     assert "J-space evidence" in section

@@ -7,11 +7,15 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from jspace_observation import (
+    EMPTY_THINK_PREFILL,
+    SUPPORTED_PHASE1_CONDITIONS,
     construct_empty_think_prefill_prompt,
     construct_answer_only_prompt,
     construct_prefill_answer_prompt,
     construct_visible_cot_prompt,
     construct_r1_style_thinking_prompt,
+    render_empty_think_prefill_metadata,
+    validate_phase1_conditions,
     get_generation_config_for_condition,
     STRICT_ANSWER_ONLY_STOP_STRINGS,
     apply_stop_control_cleanup,
@@ -26,13 +30,12 @@ def test_empty_think_prefill_prompt():
     """Test empty think prefill prompt construction."""
     base = "What is 2+2?"
     result = construct_empty_think_prefill_prompt(base)
-    assert "<think>" in result
-    assert "</think>" in result
+    assert EMPTY_THINK_PREFILL in result
+    assert result.count("<think>") == 1
+    assert result.count("</think>") == 1
     assert base in result
-    assert result.startswith(base)
-    assert result.endswith("Answer:")
-    assert result.index(base) < result.index("<think>")
-    assert result.index("</think>") < result.index("Answer:")
+    assert result.endswith(EMPTY_THINK_PREFILL)
+    assert result.index(base) < result.index(EMPTY_THINK_PREFILL)
 
 
 def test_answer_only_prompt():
@@ -41,6 +44,8 @@ def test_answer_only_prompt():
     result = construct_answer_only_prompt(base)
     assert base in result
     assert "Answer" in result or "answer" in result
+    assert "<think>" not in result
+    assert "</think>" not in result
 
 
 def test_prefill_answer_prompt_is_strict_and_ends_with_answer():
@@ -49,9 +54,79 @@ def test_prefill_answer_prompt_is_strict_and_ends_with_answer():
     assert result.startswith(base)
     assert "Do not explain" in result
     assert "Do not show steps" in result
-    assert "Do not include <think> tags" in result
+    assert "<think>" not in result
+    assert "</think>" not in result
     assert "show your reasoning" not in result.lower()
     assert result.endswith("Answer:")
+
+
+class DeterministicFakeTokenizer:
+    def __init__(self):
+        self.calls = []
+
+    def __call__(self, *_args, **_kwargs):
+        raise AssertionError("rendering helper must not retokenize rendered strings")
+
+    def apply_chat_template(
+        self,
+        messages,
+        *,
+        tokenize,
+        add_generation_prompt=False,
+        continue_final_message=False,
+        chat_template=None,
+    ):
+        self.calls.append(
+            {
+                "tokenize": tokenize,
+                "add_generation_prompt": add_generation_prompt,
+                "continue_final_message": continue_final_message,
+                "chat_template": chat_template,
+            }
+        )
+        text = "<bos>"
+        for message in messages:
+            if message["role"] == "user":
+                text += f"<user>{message['content']}</user>"
+            else:
+                text += f"<assistant>{message['content']}"
+                if not continue_final_message:
+                    text += "</assistant>"
+        if add_generation_prompt:
+            text += "<assistant>"
+        return [ord(character) for character in text] if tokenize else text
+
+    def decode(self, token_ids, **_kwargs):
+        return "".join(chr(int(token_id)) for token_id in token_ids)
+
+
+def test_empty_think_rendering_metadata_uses_chat_template_tokenization():
+    tokenizer = DeterministicFakeTokenizer()
+
+    metadata = render_empty_think_prefill_metadata(
+        tokenizer,
+        "Only answer.\n\nWhat is 2+2?",
+        chat_template="deterministic-template",
+    )
+
+    assert metadata["raw_prefill"] == "<think>\n</think>"
+    assert metadata["rendered_chat_text"].endswith(metadata["raw_prefill"])
+    assert metadata["token_ids"] == [
+        ord(character) for character in metadata["rendered_chat_text"]
+    ]
+    assert "".join(metadata["decoded_tokens"]) == metadata["rendered_chat_text"]
+    boundary = metadata["assistant_prefix_boundary"]
+    assert (
+        metadata["rendered_chat_text"][boundary["character_index"]:]
+        == metadata["raw_prefill"]
+    )
+    assert metadata["token_ids"][boundary["token_index"]:] == [
+        ord(character) for character in metadata["raw_prefill"]
+    ]
+    assert all(
+        call["chat_template"] == "deterministic-template"
+        for call in tokenizer.calls
+    )
 
 
 def test_visible_cot_prompt():
@@ -74,7 +149,7 @@ def test_strict_generation_config_uses_small_budget():
     assert cfg.max_new_tokens == 12
     assert cfg.temperature == 0.0
     assert not cfg.do_sample
-    assert "strict" in cfg.decoding_profile
+    assert cfg.decoding_profile == "strict_prompt_only_answer_only_max12"
 
 
 def test_prefill_generation_config_uses_tiny_budget():
@@ -83,6 +158,23 @@ def test_prefill_generation_config_uses_tiny_budget():
     assert cfg.temperature == 0.0
     assert not cfg.do_sample
     assert "prefill" in cfg.decoding_profile
+
+
+def test_empty_think_condition_is_explicit_and_uses_tiny_budget():
+    assert "strict_answer_only_empty_think_prefill" in SUPPORTED_PHASE1_CONDITIONS
+    cfg = get_generation_config_for_condition(
+        "strict_answer_only_empty_think_prefill",
+        64,
+    )
+    assert cfg.max_new_tokens == 8
+    assert cfg.decoding_profile == "strict_empty_think_prefill_answer_only_max8"
+
+
+def test_unknown_condition_fails_instead_of_using_thinking_defaults():
+    with pytest.raises(ValueError, match="unknown Phase 1 condition"):
+        validate_phase1_conditions(["strict_answer_only", "typo_condition"])
+    with pytest.raises(ValueError, match="typo_condition"):
+        get_generation_config_for_condition("typo_condition", 64)
 
 
 def test_visible_generation_config_is_not_tightened():

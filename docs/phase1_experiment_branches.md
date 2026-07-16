@@ -2,21 +2,47 @@
 
 ## Purpose
 
-Phase 1 uses three non-interchangeable answer-control branches. They answer different questions and must not be collapsed into a single "answer-only" result.
+Phase 1 branch records are versioned. Missing `branch_taxonomy_version` means historical `v1`; prospective work must write `v2`. Historical mappings, classifications, reports, and stored records are immutable.
 
 Visible-CoT conditions remain baselines and are not an answer-control branch.
 
+## Prospective taxonomy `v2`
+
 | Branch | Canonical key | Conditions | Experimental question |
 |---|---|---|---|
-| A - Raw strict no-CoT feasibility | `raw_strict` | `strict_answer_only`, `strict_answer_only_prefill_answer` | Can the raw model output satisfy answer-only constraints without stop intervention or post-hoc extraction? |
-| B - Stop-controlled generation intervention | `stopped_intervention` | `strict_answer_only_stopped` | Can generation-time stopping suppress visible reasoning leakage while retaining a usable answer? |
-| C - Postprocessed answer-recovery utility | `postprocessed_utility` | `strict_answer_only_postprocessed` | Can deterministic postprocessing recover a usable final-answer span from a reasoning-prone raw output? |
+| Prompt-only raw strict no-CoT | `prompt_only_raw_strict` | `strict_answer_only` | Can the raw model satisfy answer-only constraints from instructions alone? |
+| Prefill intervention | `prefill_intervention` | `strict_answer_only_prefill_answer`, `strict_answer_only_empty_think_prefill` | What happens under an answer-prefix or structural empty-think intervention? |
+| Stop-controlled generation intervention | `stopped_intervention` | `strict_answer_only_stopped` | Can generation-time stopping suppress visible reasoning leakage while retaining a usable answer? |
+| Postprocessed answer-recovery utility | `postprocessed_utility` | `strict_answer_only_postprocessed` | Can deterministic postprocessing recover a usable final-answer span from a reasoning-prone raw output? |
+| Visible-reasoning baseline | `visible_reasoning_baseline` | `visible_cot`, `r1_style_thinking` | What is performance when visible reasoning is allowed? |
 
-## Branch A - Raw strict no-CoT feasibility
+Only `prompt_only_raw_strict` supports the strongest discussion of spontaneous surface no-CoT behavior. It remains behavioral evidence and does not itself establish hidden reasoning.
+
+## Historical taxonomy `v1`
+
+| Condition | Historical `v1` branch |
+|---|---|
+| `strict_answer_only` | `raw_strict` |
+| `strict_answer_only_prefill_answer` | `raw_strict` |
+| `strict_answer_only_empty_think_prefill` | `unclassified` |
+| `strict_answer_only_stopped` | `stopped_intervention` |
+| `strict_answer_only_postprocessed` | `postprocessed_utility` |
+| `visible_cot`, `r1_style_thinking` | `visible_reasoning_baseline` |
+
+Historical answer-prefill results remain `raw_strict` only as legacy history. They must not be reclassified in stored Blob data, old reports, historical logs, hashes, or labels.
+
+Every new record includes:
+
+- `branch_taxonomy_version`
+- `legacy_phase1_branch`
+- `prospective_phase1_branch`
+- deprecated `phase1_branch`, always equal to `legacy_phase1_branch`
+
+## `prompt_only_raw_strict`
 
 ### Definition
 
-The model is prompted and decoded to produce an answer-only response without generation-time stop intervention or post-hoc answer extraction. The raw model output itself is evaluated for no-CoT compliance.
+The model is prompted and decoded to produce an answer-only response without prefill, generation-time stop intervention, or post-hoc answer extraction. `strict_answer_only` uses the same prompt-only construction for every model and contains no think tags.
 
 ### Primary metrics
 
@@ -37,11 +63,28 @@ The model is prompted and decoded to produce an answer-only response without gen
 - Do not infer hidden reasoning from raw answer-only behavior alone.
 - Do not infer J-space evidence from this branch.
 
+## `prefill_intervention`
+
+### Definition
+
+This branch contains two distinct interventions:
+
+- `strict_answer_only_prefill_answer`: answer-prefix intervention ending at the answer cue.
+- `strict_answer_only_empty_think_prefill`: structural assistant prefill with raw content exactly `<think>\n</think>`.
+
+Empty-think is selected only by its explicit condition, never by model-name routing. The tokenizer/chat-template rendering record preserves the raw prefill, rendered chat text, token IDs, decoded tokens, and assistant-prefix boundary.
+
+### Interpretation boundary
+
+Prefill results are not raw prompt-only behavior. They may at most support an internal-representation study under structural suppression; they never support a spontaneous hidden-reasoning claim.
+
+Prospective `prefill_intervention` has no preregistered success criteria. Reports must show `not_applicable`/`NA`, not historical `raw_strict` classifications.
+
 ## Branch B - Stop-controlled generation intervention
 
 ### Definition
 
-Generation-time stop criteria constrain the emitted sequence. The exact generated output before stop cleanup and the cleaned stopped output are preserved separately.
+Generation-time stop criteria constrain a prompt-only emitted sequence. The exact generated output before stop cleanup and the cleaned stopped output are preserved separately. This condition does not add a prefill intervention.
 
 ### Primary metrics
 
@@ -82,7 +125,7 @@ The stop string was `\n\n` in all three cells. Depth 2 stopped at a non-answer p
 
 ### Definition
 
-The raw model output may contain visible reasoning. A deterministic postprocessor extracts or truncates a final-answer span. This branch measures answer-recovery utility, not no-CoT generation.
+The prompt-only raw model output may contain visible reasoning. A deterministic postprocessor extracts or truncates a final-answer span. This branch measures post-hoc answer-recovery utility, not no-CoT generation, and does not add a prefill intervention.
 
 ### Primary metrics
 
@@ -107,7 +150,9 @@ If raw validity is low while postprocessed validity is high, the model still lea
 
 ## Branch-specific success criteria
 
-These thresholds are registered before any new limited-scale Phase 1 run. They do not authorize a run or a scale increase. The absolute-accuracy, baseline-validity, and sample-size guards below were added prospectively after the 2026-07-10 criteria-validation pilot exposed weaknesses in the earlier rules. The completed pilot and its persisted summary remain unchanged.
+The criteria below are historical `v1` raw/stopped/postprocessed classifier semantics. They are retained exactly for audit recomputation and do not authorize a run or scale increase. The absolute-accuracy, baseline-validity, and sample-size guards were added after the 2026-07-10 criteria-validation pilot exposed weaknesses in the earlier rules. The completed pilot and its persisted summary remain unchanged.
+
+When the `v1` raw criteria are explicitly shown for a prospective `prompt_only_raw_strict` row, reports identify `classification_criteria_version=v1` and `classification_criteria_branch=raw_strict`. They are not silently applied to `prefill_intervention`; that branch reports `not_applicable`/`NA`.
 
 For each reported model x task family x depth x branch result, `n` is the number of observations entering the classification. Missing required metrics fail the corresponding criterion rather than being imputed. Non-applicable metrics remain `NA`. Any later roll-up must preserve branch separation and must not average across answer-control branches.
 
@@ -250,6 +295,9 @@ Branch classifications are behavioral and operational. Success labels require th
 
 Every applicable record must preserve:
 
+- `branch_taxonomy_version`
+- `legacy_phase1_branch`
+- `prospective_phase1_branch`
 - `phase1_branch`
 - `phase1_branch_label`
 - `phase1_branch_interpretation`

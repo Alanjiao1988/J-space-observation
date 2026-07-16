@@ -647,24 +647,30 @@ Interpretation:
 
 ## Phase 1 branch reporting policy
 
-Every future Phase 1 run must use the taxonomy in `docs/phase1_experiment_branches.md`:
+Every future Phase 1 run must use prospective taxonomy `v2` from `docs/phase1_experiment_branches.md` and `docs/phase1_no_cot_conditions.md`:
 
 | Branch | Key | Conditions | Meaning |
 |---|---|---|---|
-| Raw strict no-CoT feasibility | `raw_strict` | `strict_answer_only`, `strict_answer_only_prefill_answer` | Evaluate unmodified raw output without stop intervention or extraction. |
+| Prompt-only raw strict no-CoT | `prompt_only_raw_strict` | `strict_answer_only` | Evaluate raw prompt-only output; the only branch eligible for the strongest spontaneous surface no-CoT discussion. |
+| Prefill intervention | `prefill_intervention` | `strict_answer_only_prefill_answer`, `strict_answer_only_empty_think_prefill` | Evaluate explicit answer-prefix or structural prefill interventions, never spontaneous behavior. |
 | Stop-controlled generation intervention | `stopped_intervention` | `strict_answer_only_stopped` | Test generation-time suppression of visible reasoning. |
 | Postprocessed answer-recovery utility | `postprocessed_utility` | `strict_answer_only_postprocessed` | Test deterministic answer-span recovery, not no-CoT generation. |
+| Visible-reasoning baseline | `visible_reasoning_baseline` | `visible_cot`, `r1_style_thinking` | Allow visible reasoning. |
+
+Historical records with missing taxonomy version remain `v1`: `strict_answer_only` and `strict_answer_only_prefill_answer` map to `raw_strict`; the new explicit empty-think condition maps to legacy `unclassified`. Do not rewrite stored results, labels, hashes, logs, or Blob objects.
 
 Operational reporting rules:
 
-1. Preserve raw, stopped, and postprocessed outputs and validity fields separately.
-2. Report `accuracy_raw`, `accuracy_stopped`, and `accuracy_postprocessed` separately.
-3. Use `NA` for metrics that do not apply to a branch.
-4. If stop triggering occurs, describe the output as intervention-controlled.
-5. Postprocessed validity never replaces raw validity.
-6. Do not use any Phase 1 branch as hidden-reasoning or J-space evidence.
+1. Record `branch_taxonomy_version`, `legacy_phase1_branch`, and `prospective_phase1_branch`; deprecated `phase1_branch` remains equal to the legacy field.
+2. Preserve raw, stopped, and postprocessed outputs and validity fields separately.
+3. Report `accuracy_raw`, `accuracy_stopped`, and `accuracy_postprocessed` separately.
+4. Use `NA` for metrics that do not apply to a branch.
+5. If stop triggering occurs, describe the output as intervention-controlled.
+6. Postprocessed validity never replaces raw validity.
+7. `prefill_intervention` has no preregistered success criteria and reports `not_applicable` / `NA`, never a reused `raw_strict` classification.
+8. Do not use any Phase 1 branch as hidden-reasoning or J-space evidence.
 
-Preregistered limited-scale gates:
+Historical `v1` limited-scale classifier gates retained for audit recomputation:
 
 | Branch | Required thresholds |
 |---|---|

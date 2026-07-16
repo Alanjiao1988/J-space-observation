@@ -111,6 +111,8 @@ RQ3 只在 ability-matched 任务子集上解释。
 
 ## 4. Prompt / no-CoT 条件
 
+前瞻记录使用 branch taxonomy `v2`；缺失版本的历史记录按 `v1` 读取。完整 crosswalk 和记录字段见 `docs/phase1_no_cot_conditions.md`。
+
 ### 4.1 visible_cot
 
 允许模型显式输出推理步骤。
@@ -119,11 +121,17 @@ RQ3 只在 ability-matched 任务子集上解释。
 
 使用 R1 风格 `<think>...</think>` 输出。
 
-### 4.3 strict_answer_only / structural_no_cot
+### 4.3 strict_answer_only
 
-这是本项目 no-CoT 主条件。
+这是模型无关的 prompt-only raw strict 条件，对所有模型使用同一个 answer-only prompt，prompt 中不含 think tags，也不按模型名切换策略。它映射到 `prompt_only_raw_strict`，是唯一可用于最强 spontaneous surface no-CoT 讨论的条件；行为结果本身仍不能证明 hidden reasoning。
 
-对 R1-Distill：主方法是 **empty-think prefill**，而不是优先 logit mask。
+### 4.4 strict_answer_only_prefill_answer
+
+answer-prefix prefill 干预，映射到 `prefill_intervention`，不能当作 raw 或 spontaneous 行为。
+
+### 4.5 strict_answer_only_empty_think_prefill
+
+显式的 structural prefill 干预；只由该 condition 选择，绝不按模型名路由。raw assistant prefill 严格为：
 
 格式：
 
@@ -133,14 +141,24 @@ RQ3 只在 ability-matched 任务子集上解释。
 
 ```
 
-然后限制模型只生成最终答案。
+tokenizer-only metadata helper 必须使用传入 tokenizer/chat template 记录 raw prefill、rendered chat text、token IDs、decoded tokens 与 assistant-prefix boundary，且生成使用捕获的 token IDs。
 
-原因：R1 蒸馏模型被训练成先输出 `<think>`。直接 ban think token 可能把模型推到 OOD，或让它用无标签散文继续推理。empty-think prefill 让模型留在熟悉格式内，但把 visible thinking budget 压到零。
+该条件映射到 `prefill_intervention`。它最多支持 structural suppression 下的 internal-representation study，不能支持 spontaneous hidden reasoning。前瞻 `prefill_intervention` 没有 preregistered success criteria，分类必须为 `not_applicable` / `NA`。
 
-对 Qwen2.5-Math：默认使用普通 strict answer-only prompt、max_new_tokens 限制、停止规则和 visible-reasoning validation。
+### 4.6 strict_answer_only_stopped
+
+prompt-only 输入上的 generation-time stop 干预，映射到 `stopped_intervention`。stopped validity 不代表 spontaneous validity。
+
+### 4.7 strict_answer_only_postprocessed
+
+prompt-only raw 输出上的 post-hoc utility 操作，映射到 `postprocessed_utility`，只衡量 answer recovery。
 
 所有 generation 必须记录：
 
+- `branch_taxonomy_version`
+- `legacy_phase1_branch`
+- `prospective_phase1_branch`
+- deprecated `phase1_branch`（始终等于 `legacy_phase1_branch`）
 - `no_cot_method`
 - `no_cot_validity`
 - `reason_for_invalidity`
@@ -148,7 +166,7 @@ RQ3 只在 ability-matched 任务子集上解释。
 - 是否出现显式中间步骤
 - 是否超过 token budget
 
-只有 `no_cot_validity=true` 的 strict no-CoT 运行，才能支持 hidden reasoning 结论。
+只有满足设计边界的有效记录才可进入后续机制分析；任何 Phase 1 行为条件本身都不能支持 hidden reasoning 结论。
 
 ---
 

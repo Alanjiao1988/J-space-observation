@@ -125,14 +125,21 @@ Implement Phase 0.5 J-lens feasibility spike
 Prompt conditions：
 
 - `strict_answer_only`
+- `strict_answer_only_prefill_answer`
+- `strict_answer_only_empty_think_prefill`
+- `strict_answer_only_stopped`
+- `strict_answer_only_postprocessed`
 - `visible_cot`
 - `r1_style_thinking`
 
 strict no-CoT 要求：
 
-- R1-Distill 主方法是 empty-think prefill。
-- Qwen2.5-Math 使用普通 strict answer-only + max token / stop rules。
-- 每条 generation 记录 `no_cot_method`、`no_cot_validity`、invalid reason。
+- 前瞻 branch taxonomy 使用 `v2`；缺失版本按历史 `v1` 读取。
+- `strict_answer_only` 对所有模型都是真正的 prompt-only，不含 think tags，不按模型名路由。
+- answer prefill、empty-think prefill、generation-time stop、post-hoc processing 分别作为明确干预/utility 分支记录。
+- empty-think 只由显式 condition 选择，raw prefill 严格为 `<think>\n</think>`，并用传入 tokenizer/chat template 捕获 rendering metadata。
+- 每条 generation 记录 taxonomy crosswalk、`no_cot_method`、`no_cot_validity`、invalid reason。
+- `prefill_intervention` 不复用历史 `raw_strict` success criteria，报告 `not_applicable` / `NA`。
 
 指标：
 

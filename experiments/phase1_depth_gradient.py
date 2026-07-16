@@ -27,7 +27,7 @@ import traceback
 import os
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Sequence, Tuple
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -43,11 +43,12 @@ from jspace_observation import (
     load_model_and_tokenizer,
     log_model_info,
     generate_all_pilot_prompt_sets,
-    construct_empty_think_prefill_prompt,
     construct_answer_only_prompt,
     construct_prefill_answer_prompt,
     construct_visible_cot_prompt,
     construct_r1_style_thinking_prompt,
+    render_empty_think_prefill_metadata,
+    validate_phase1_conditions,
     get_generation_config_for_condition,
     StopStringCriteria,
     apply_stop_control_cleanup,
@@ -61,11 +62,53 @@ from jspace_observation import (
     compute_slope,
     upload_directory_to_blob,
     postprocess_answer_only,
+    PROSPECTIVE_BRANCH_TAXONOMY_VERSION,
     PHASE1_INTERPRETATION_BOUNDARIES,
     get_phase1_branch_metadata,
     render_branch_metrics_table,
     render_branch_success_classification_section,
 )
+
+
+def prepare_condition_prompt(
+    condition: str,
+    base_prompt: str,
+    tokenizer=None,
+) -> Tuple[str, str, Dict[str, Any], Optional[Sequence[int]]]:
+    """Build one registered condition without model-name-dependent routing."""
+    validate_phase1_conditions((condition,))
+    if condition == "strict_answer_only":
+        return construct_answer_only_prompt(base_prompt), "answer_only_prompt", {}, None
+    if condition == "strict_answer_only_prefill_answer":
+        return construct_prefill_answer_prompt(base_prompt), "answer_prefill", {}, None
+    if condition == "strict_answer_only_empty_think_prefill":
+        if tokenizer is None:
+            raise ValueError("empty-think prefill rendering requires a tokenizer")
+        metadata = render_empty_think_prefill_metadata(
+            tokenizer,
+            construct_answer_only_prompt(base_prompt),
+        )
+        return (
+            metadata["rendered_chat_text"],
+            "empty_think_prefill",
+            metadata,
+            metadata["token_ids"],
+        )
+    if condition in {
+        "strict_answer_only_postprocessed",
+        "strict_answer_only_stopped",
+    }:
+        return construct_answer_only_prompt(base_prompt), "answer_only_prompt", {}, None
+    if condition == "visible_cot":
+        return construct_visible_cot_prompt(base_prompt), "visible_cot", {}, None
+    if condition == "r1_style_thinking":
+        return (
+            construct_r1_style_thinking_prompt(base_prompt),
+            "r1_style_thinking",
+            {},
+            None,
+        )
+    raise AssertionError(f"validated condition is not implemented: {condition}")
 
 
 def run_generation(
@@ -80,6 +123,7 @@ def run_generation(
     device = None,
     stop_control_enabled: bool = False,
     stop_strings: Tuple[str, ...] = (),
+    input_token_ids: Optional[Sequence[int]] = None,
 ) -> Tuple[str, float, Dict[str, Any]]:
     """
     Generate response and measure latency.
@@ -90,8 +134,19 @@ def run_generation(
     import torch
     from transformers import StoppingCriteriaList
     
-    # Tokenize
-    inputs = tokenizer(prompt, return_tensors="pt").to(device)
+    if input_token_ids is None:
+        inputs = tokenizer(prompt, return_tensors="pt").to(device)
+    else:
+        input_ids = torch.tensor(
+            [list(input_token_ids)],
+            dtype=torch.long,
+            device=device,
+        )
+        inputs = {
+            "input_ids": input_ids,
+            "attention_mask": torch.ones_like(input_ids),
+        }
+    prompt_length = inputs["input_ids"].shape[-1]
     
     start_time = time.time()
     
@@ -100,7 +155,7 @@ def run_generation(
     if stop_control_enabled and stop_strings:
         stop_criterion = StopStringCriteria(
             tokenizer=tokenizer,
-            prompt_length=inputs["input_ids"].shape[-1],
+            prompt_length=prompt_length,
             stop_strings=stop_strings,
         )
         stopping_criteria = StoppingCriteriaList([stop_criterion])
@@ -123,13 +178,10 @@ def run_generation(
     
     gen_time = time.time() - start_time
     
-    # Decode
-    output_text = tokenizer.decode(outputs[0], skip_special_tokens=False)
-    
-    # Remove input from output
-    input_text = tokenizer.decode(inputs["input_ids"][0], skip_special_tokens=False)
-    if output_text.startswith(input_text):
-        output_text = output_text[len(input_text):]
+    output_text = tokenizer.decode(
+        outputs[0][prompt_length:],
+        skip_special_tokens=False,
+    )
     
     stop_metadata = {
         "stop_triggered_by_criteria": bool(stop_criterion.triggered) if stop_criterion else False,
@@ -138,7 +190,7 @@ def run_generation(
     return output_text, gen_time, stop_metadata
 
 
-def main():
+def main(argv: Optional[List[str]] = None):
     parser = argparse.ArgumentParser(
         description="Phase 1: Behavioral reasoning-depth gradient"
     )
@@ -201,34 +253,39 @@ def main():
         help="Fail if configured Blob export does not complete",
     )
     
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     
     # Parse arguments
     models = [m.strip() for m in args.models.split(",")]
     task_families = [t.strip() for t in args.task_families.split(",")]
     depths = [int(d.strip()) for d in args.depths.split(",")]
     conditions = [c.strip() for c in args.conditions.split(",")]
-    
-    # Setup
-    config = ExperimentConfig()
-    results_root = os.getenv("JSPACE_RESULTS_ROOT")
-    if args.output_dir:
-        run_dir = Path(args.output_dir)
-    elif results_root:
-        logger = RunLogger(Path(results_root))
-        run_dir = logger.create_run_directory("phase1")
-    else:
-        logger = RunLogger(config.results_dir)
-        run_dir = logger.create_run_directory("phase1")
-    run_dir.mkdir(parents=True, exist_ok=True)
-    
+    try:
+        conditions = list(validate_phase1_conditions(conditions))
+    except ValueError as exc:
+        parser.error(str(exc))
+
+    branch_plan = [
+        get_phase1_branch_metadata(
+            condition,
+            taxonomy_version=PROSPECTIVE_BRANCH_TAXONOMY_VERSION,
+        )
+        for condition in conditions
+    ]
+
     print("Phase 1: Behavioral Reasoning-Depth Gradient")
     print("=" * 60)
-    print(f"Run directory: {run_dir}")
     print(f"Models: {models}")
     print(f"Task families: {task_families}")
     print(f"Depths: {depths}")
     print(f"Conditions: {conditions}")
+    print(f"Branch taxonomy: {PROSPECTIVE_BRANCH_TAXONOMY_VERSION}")
+    for condition, metadata in zip(conditions, branch_plan):
+        print(
+            "  "
+            f"{condition}: legacy={metadata['legacy_phase1_branch']}, "
+            f"prospective={metadata['prospective_phase1_branch']}"
+        )
     print()
 
     prompt_sets = generate_all_pilot_prompt_sets()
@@ -277,7 +334,20 @@ def main():
             raise SystemExit(2)
         print("[DRY RUN] Not running actual experiments")
         return
-    
+
+    config = ExperimentConfig()
+    results_root = os.getenv("JSPACE_RESULTS_ROOT")
+    if args.output_dir:
+        run_dir = Path(args.output_dir)
+    elif results_root:
+        logger = RunLogger(Path(results_root))
+        run_dir = logger.create_run_directory("phase1")
+    else:
+        logger = RunLogger(config.results_dir)
+        run_dir = logger.create_run_directory("phase1")
+    run_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Run directory: {run_dir}")
+
     # Load prompt sets
     print("Loading prompt sets...")
     print(f"Loaded {len(prompt_sets)} task families")
@@ -289,7 +359,9 @@ def main():
     generation_records = []
     eval_records = []
     metrics_rows = [[
-        "model", "task_family", "depth", "condition", "branch", "branch_label", "n",
+        "model", "task_family", "depth", "condition",
+        "branch_taxonomy_version", "phase1_branch", "legacy_phase1_branch",
+        "prospective_phase1_branch", "branch", "branch_label", "n",
         "accuracy", "eval_accuracy", "parse_valid_rate", "parse_ambiguous_rate",
         "no_cot_valid_rate", "visible_reasoning_marker_rate",
         "answer_format_warning_rate", "raw_no_cot_valid_rate",
@@ -333,11 +405,16 @@ def main():
                 items = items_by_depth[depth]
                 if args.items_per_cell:
                     items = items[:args.items_per_cell]
-                
+
                 for condition in conditions:
-                    branch_metadata = get_phase1_branch_metadata(condition)
-                    phase1_branch = branch_metadata["phase1_branch"]
-                    phase1_branch_label = branch_metadata["phase1_branch_label"]
+                    branch_metadata = get_phase1_branch_metadata(
+                        condition,
+                        taxonomy_version=PROSPECTIVE_BRANCH_TAXONOMY_VERSION,
+                    )
+                    phase1_branch = branch_metadata["prospective_phase1_branch"]
+                    phase1_branch_label = branch_metadata[
+                        "prospective_phase1_branch_label"
+                    ]
                     print(
                         f"\n{model_name} | {task_family} | depth={depth} | "
                         f"{condition} | branch={phase1_branch}"
@@ -368,28 +445,18 @@ def main():
                     stopped_correct_count = 0
                     postprocessed_correct_count = 0
                     latencies = []
-                    
+
                     for item in items:
-                        # Construct prompt
-                        if condition == "strict_answer_only":
-                            if "R1-Distill" in model_name or "deepseek" in model_name.lower():
-                                full_prompt = construct_empty_think_prefill_prompt(item.prompt_base)
-                                no_cot_method = "empty_think_prefill"
-                            else:
-                                full_prompt = construct_answer_only_prompt(item.prompt_base)
-                                no_cot_method = "answer_only_prompt"
-                        elif condition == "strict_answer_only_prefill_answer":
-                            full_prompt = construct_prefill_answer_prompt(item.prompt_base)
-                            no_cot_method = "answer_prefill"
-                        elif condition in {"strict_answer_only_postprocessed", "strict_answer_only_stopped"}:
-                            full_prompt = construct_prefill_answer_prompt(item.prompt_base)
-                            no_cot_method = "answer_prefill"
-                        elif condition == "visible_cot":
-                            full_prompt = construct_visible_cot_prompt(item.prompt_base)
-                            no_cot_method = "visible_cot"
-                        else:  # r1_style_thinking
-                            full_prompt = construct_r1_style_thinking_prompt(item.prompt_base)
-                            no_cot_method = "r1_style_thinking"
+                        (
+                            full_prompt,
+                            no_cot_method,
+                            rendering_metadata,
+                            input_token_ids,
+                        ) = prepare_condition_prompt(
+                            condition,
+                            item.prompt_base,
+                            tokenizer,
+                        )
 
                         generation_config = get_generation_config_for_condition(
                             condition,
@@ -407,6 +474,7 @@ def main():
                                 device=device,
                                 stop_control_enabled=generation_config.stop_control_enabled,
                                 stop_strings=generation_config.stop_strings,
+                                input_token_ids=input_token_ids,
                             )
                             latencies.append(gen_time)
                         except Exception as e:
@@ -439,6 +507,7 @@ def main():
                             stop_strings=list(generation_config.stop_strings),
                             stop_mode=generation_config.stop_mode,
                             **branch_metadata,
+                            **rendering_metadata,
                         )
                         raw_eval_record = create_eval_record(
                             output=output,
@@ -713,6 +782,10 @@ def main():
                         task_family,
                         depth,
                         condition,
+                        branch_metadata["branch_taxonomy_version"],
+                        branch_metadata["phase1_branch"],
+                        branch_metadata["legacy_phase1_branch"],
+                        branch_metadata["prospective_phase1_branch"],
                         phase1_branch,
                         phase1_branch_label,
                         n_items,
@@ -777,6 +850,7 @@ def main():
         f"- Task families: {', '.join(task_families)}\n"
         f"- Depths: {depths}\n"
         f"- Conditions: {', '.join(conditions)}\n"
+        f"- Branch taxonomy: {PROSPECTIVE_BRANCH_TAXONOMY_VERSION}\n"
         f"- Generation records: {len(generation_records)}"
     )
     
@@ -809,7 +883,7 @@ def main():
     }
     stop_string_counts: dict[tuple[str, str, str, str], Counter[str]] = defaultdict(Counter)
     for record in generation_records:
-        if record.get("phase1_branch") != "stopped_intervention":
+        if record.get("prospective_phase1_branch") != "stopped_intervention":
             continue
         cell_key = (
             str(record.get("model_name")),
@@ -866,6 +940,8 @@ def main():
         "- Ambiguous numeric parsing is flagged via parse_ambiguous and answer_format_warning.",
         "- Postprocessed answer-only validity does not imply raw no-CoT compliance.",
         "- Stop-controlled answer-only validity does not imply spontaneous raw no-CoT compliance.",
+        "- Prefill interventions are not prompt-only raw behavior and cannot support spontaneous hidden-reasoning claims.",
+        "- Prospective prefill_intervention success classification is not_applicable because no criteria are preregistered.",
     ]
     strict_records = [
         r for r in generation_records
@@ -883,7 +959,7 @@ def main():
     
     summary_builder.add_section(
         "Next Steps",
-        "1. Review each branch against its preregistered success criteria\n"
+        "1. Review only branches with explicitly applicable success criteria\n"
         "2. Require explicit approval before any new limited-scale model or Azure run\n"
         "3. Do not expand models, task families, or items per cell without a new decision\n"
         "4. Treat all classifications as behavioral and operational evidence only"

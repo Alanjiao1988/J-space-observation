@@ -5,6 +5,19 @@ from typing import Dict, Any, Optional, Tuple, Sequence
 from dataclasses import dataclass
 
 
+EMPTY_THINK_PREFILL = "<think>\n</think>"
+
+SUPPORTED_PHASE1_CONDITIONS: Tuple[str, ...] = (
+    "strict_answer_only",
+    "strict_answer_only_prefill_answer",
+    "strict_answer_only_empty_think_prefill",
+    "strict_answer_only_stopped",
+    "strict_answer_only_postprocessed",
+    "visible_cot",
+    "r1_style_thinking",
+)
+
+
 @dataclass
 class NoCoTValidationResult:
     """Result of no-CoT validation."""
@@ -158,19 +171,11 @@ def apply_stop_control_cleanup(
 
 def construct_empty_think_prefill_prompt(base_prompt: str) -> str:
     """
-    Construct strict no-CoT prompt with empty-think prefill for R1-Distill.
+    Construct the explicit structural empty-think prefill condition.
     
-    Format:
-    {base_prompt}
-
-    <think>
-    </think>
-
-    Answer:
-
-    The question appears first. The already-closed empty think block then keeps
-    R1-style models in-distribution while forcing zero visible thinking budget
-    before final answer generation.
+    This string-only constructor is useful for inspection. Generation code should
+    use ``render_empty_think_prefill_metadata`` so the supplied chat template
+    controls rendering and tokenization.
     
     Args:
         base_prompt: The actual question/prompt
@@ -178,12 +183,7 @@ def construct_empty_think_prefill_prompt(base_prompt: str) -> str:
     Returns:
         Full prompt with empty think prefill
     """
-    instruction = (
-        "You must output only the final answer. Do not explain. Do not show "
-        "steps. Do not include reasoning. Do not include a step-by-step "
-        "explanation."
-    )
-    return f"{base_prompt}\n\n{instruction}\n\n<think>\n</think>\n\nAnswer:"
+    return f"{construct_answer_only_prompt(base_prompt)}\n\n{EMPTY_THINK_PREFILL}"
 
 
 def construct_prefill_answer_prompt(base_prompt: str) -> str:
@@ -191,7 +191,7 @@ def construct_prefill_answer_prompt(base_prompt: str) -> str:
     instruction = (
         "You must output only the final answer. Do not explain. Do not show "
         "steps. Do not include reasoning. Do not include a step-by-step "
-        "explanation. Do not include <think> tags."
+        "explanation."
     )
     return f"{base_prompt}\n\n{instruction}\n\nAnswer:"
 
@@ -210,18 +210,142 @@ def construct_answer_only_prompt(base_prompt: str) -> str:
     return instruction + base_prompt
 
 
+def _normalize_chat_template_token_ids(token_ids: Any) -> list[int]:
+    if isinstance(token_ids, dict):
+        token_ids = token_ids.get("input_ids")
+    if hasattr(token_ids, "tolist"):
+        token_ids = token_ids.tolist()
+    if (
+        isinstance(token_ids, (list, tuple))
+        and len(token_ids) == 1
+        and isinstance(token_ids[0], (list, tuple))
+    ):
+        token_ids = token_ids[0]
+    if not isinstance(token_ids, (list, tuple)):
+        raise TypeError("chat template tokenization did not return a token-id sequence")
+    try:
+        return [int(token_id) for token_id in token_ids]
+    except (TypeError, ValueError) as exc:
+        raise TypeError("chat template returned non-integer token IDs") from exc
+
+
+def render_empty_think_prefill_metadata(
+    tokenizer,
+    user_prompt: str,
+    *,
+    chat_template: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Render and capture an empty-think assistant prefill without retokenizing text."""
+    template_kwargs: Dict[str, Any] = {}
+    if chat_template is not None:
+        template_kwargs["chat_template"] = chat_template
+
+    user_messages = [{"role": "user", "content": user_prompt}]
+    prefill_messages = [
+        *user_messages,
+        {"role": "assistant", "content": EMPTY_THINK_PREFILL},
+    ]
+    rendered_chat_text = tokenizer.apply_chat_template(
+        prefill_messages,
+        tokenize=False,
+        add_generation_prompt=False,
+        continue_final_message=True,
+        **template_kwargs,
+    )
+    token_ids = _normalize_chat_template_token_ids(
+        tokenizer.apply_chat_template(
+            prefill_messages,
+            tokenize=True,
+            add_generation_prompt=False,
+            continue_final_message=True,
+            **template_kwargs,
+        )
+    )
+    assistant_prefix_text = tokenizer.apply_chat_template(
+        user_messages,
+        tokenize=False,
+        add_generation_prompt=True,
+        **template_kwargs,
+    )
+    assistant_prefix_token_ids = _normalize_chat_template_token_ids(
+        tokenizer.apply_chat_template(
+            user_messages,
+            tokenize=True,
+            add_generation_prompt=True,
+            **template_kwargs,
+        )
+    )
+
+    if not isinstance(rendered_chat_text, str) or not isinstance(
+        assistant_prefix_text, str
+    ):
+        raise TypeError("chat template text rendering did not return strings")
+    if (
+        not rendered_chat_text.startswith(assistant_prefix_text)
+        or rendered_chat_text[len(assistant_prefix_text):] != EMPTY_THINK_PREFILL
+    ):
+        raise ValueError(
+            "chat template did not render the empty-think block immediately after "
+            "the assistant prefix"
+        )
+    if token_ids[:len(assistant_prefix_token_ids)] != assistant_prefix_token_ids:
+        raise ValueError(
+            "assistant-prefix token IDs are not a prefix of the rendered prefill"
+        )
+
+    decoded_tokens = []
+    for token_id in token_ids:
+        try:
+            decoded = tokenizer.decode(
+                [token_id],
+                skip_special_tokens=False,
+                clean_up_tokenization_spaces=False,
+            )
+        except TypeError:
+            decoded = tokenizer.decode([token_id], skip_special_tokens=False)
+        decoded_tokens.append(decoded)
+
+    return {
+        "raw_prefill": EMPTY_THINK_PREFILL,
+        "rendered_chat_text": rendered_chat_text,
+        "token_ids": token_ids,
+        "decoded_tokens": decoded_tokens,
+        "assistant_prefix_boundary": {
+            "character_index": len(assistant_prefix_text),
+            "token_index": len(assistant_prefix_token_ids),
+        },
+        "assistant_prefix_text": assistant_prefix_text,
+        "assistant_prefix_token_ids": assistant_prefix_token_ids,
+    }
+
+
+def validate_phase1_conditions(conditions: Sequence[str]) -> Tuple[str, ...]:
+    """Validate condition names before any experiment side effect."""
+    normalized = tuple(conditions)
+    unknown = sorted(set(normalized) - set(SUPPORTED_PHASE1_CONDITIONS))
+    if unknown:
+        raise ValueError(
+            "unknown Phase 1 condition(s): "
+            + ", ".join(repr(condition) for condition in unknown)
+        )
+    if not normalized:
+        raise ValueError("at least one Phase 1 condition is required")
+    return normalized
+
+
 def get_generation_config_for_condition(
     condition: str,
     default_max_new_tokens: int,
 ) -> ConditionGenerationConfig:
     """Return condition-specific decoding settings."""
+    validate_phase1_conditions((condition,))
     if condition == "strict_answer_only":
         return ConditionGenerationConfig(
             max_new_tokens=min(default_max_new_tokens, 12),
             temperature=0.0,
             top_p=1.0,
             do_sample=False,
-            decoding_profile="strict_empty_think_answer_only_max12",
+            decoding_profile="strict_prompt_only_answer_only_max12",
         )
     if condition == "strict_answer_only_prefill_answer":
         return ConditionGenerationConfig(
@@ -230,6 +354,14 @@ def get_generation_config_for_condition(
             top_p=1.0,
             do_sample=False,
             decoding_profile="strict_prefill_answer_only_max8",
+        )
+    if condition == "strict_answer_only_empty_think_prefill":
+        return ConditionGenerationConfig(
+            max_new_tokens=min(default_max_new_tokens, 8),
+            temperature=0.0,
+            top_p=1.0,
+            do_sample=False,
+            decoding_profile="strict_empty_think_prefill_answer_only_max8",
         )
     if condition == "strict_answer_only_postprocessed":
         return ConditionGenerationConfig(
@@ -250,13 +382,15 @@ def get_generation_config_for_condition(
             stop_strings=STRICT_ANSWER_ONLY_STOP_STRINGS,
             stop_mode="truncate_at_stop_string",
         )
-    return ConditionGenerationConfig(
-        max_new_tokens=default_max_new_tokens,
-        temperature=1.0,
-        top_p=1.0,
-        do_sample=False,
-        decoding_profile="default_greedy",
-    )
+    if condition in {"visible_cot", "r1_style_thinking"}:
+        return ConditionGenerationConfig(
+            max_new_tokens=default_max_new_tokens,
+            temperature=1.0,
+            top_p=1.0,
+            do_sample=False,
+            decoding_profile="default_greedy",
+        )
+    raise AssertionError(f"validated condition is not configured: {condition}")
 
 
 def construct_visible_cot_prompt(base_prompt: str) -> str:

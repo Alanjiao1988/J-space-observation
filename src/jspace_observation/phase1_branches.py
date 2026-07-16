@@ -4,10 +4,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+from types import MappingProxyType
 from typing import Any, Mapping, Sequence
 
 
+LEGACY_BRANCH_TAXONOMY_VERSION = "v1"
+PROSPECTIVE_BRANCH_TAXONOMY_VERSION = "v2"
+
 RAW_STRICT_BRANCH = "raw_strict"
+PROMPT_ONLY_RAW_STRICT_BRANCH = "prompt_only_raw_strict"
+PREFILL_INTERVENTION_BRANCH = "prefill_intervention"
 STOPPED_INTERVENTION_BRANCH = "stopped_intervention"
 POSTPROCESSED_UTILITY_BRANCH = "postprocessed_utility"
 VISIBLE_REASONING_BASELINE_BRANCH = "visible_reasoning_baseline"
@@ -30,7 +36,7 @@ class Phase1BranchDefinition:
     interpretation: str
 
 
-BRANCH_DEFINITIONS: dict[str, Phase1BranchDefinition] = {
+LEGACY_BRANCH_DEFINITIONS: Mapping[str, Phase1BranchDefinition] = MappingProxyType({
     RAW_STRICT_BRANCH: Phase1BranchDefinition(
         key=RAW_STRICT_BRANCH,
         label="Raw strict no-CoT feasibility",
@@ -61,21 +67,101 @@ BRANCH_DEFINITIONS: dict[str, Phase1BranchDefinition] = {
         conditions=(),
         interpretation="Condition is not registered in the Phase 1 branch taxonomy.",
     ),
-}
+})
 
-CONDITION_TO_BRANCH = {
-    condition: definition.key
-    for definition in BRANCH_DEFINITIONS.values()
-    for condition in definition.conditions
-}
+PROSPECTIVE_BRANCH_DEFINITIONS: Mapping[str, Phase1BranchDefinition] = MappingProxyType({
+    PROMPT_ONLY_RAW_STRICT_BRANCH: Phase1BranchDefinition(
+        key=PROMPT_ONLY_RAW_STRICT_BRANCH,
+        label="Prompt-only raw strict no-CoT",
+        conditions=("strict_answer_only",),
+        interpretation=(
+            "The raw model response follows a prompt-only answer constraint. This is "
+            "the only Phase 1 branch that can support discussion of spontaneous "
+            "surface no-CoT behavior."
+        ),
+    ),
+    PREFILL_INTERVENTION_BRANCH: Phase1BranchDefinition(
+        key=PREFILL_INTERVENTION_BRANCH,
+        label="Prefill intervention",
+        conditions=(
+            "strict_answer_only_prefill_answer",
+            "strict_answer_only_empty_think_prefill",
+        ),
+        interpretation=(
+            "Answer-prefix and empty-think prefills are interventions. They may support "
+            "an internal-representation study under structural suppression, but never "
+            "a spontaneous hidden-reasoning claim."
+        ),
+    ),
+    STOPPED_INTERVENTION_BRANCH: Phase1BranchDefinition(
+        key=STOPPED_INTERVENTION_BRANCH,
+        label="Stop-controlled generation intervention",
+        conditions=("strict_answer_only_stopped",),
+        interpretation=(
+            "Generation-time stopping is an intervention; stopped validity is not "
+            "spontaneous no-CoT."
+        ),
+    ),
+    POSTPROCESSED_UTILITY_BRANCH: Phase1BranchDefinition(
+        key=POSTPROCESSED_UTILITY_BRANCH,
+        label="Postprocessed answer-recovery utility",
+        conditions=("strict_answer_only_postprocessed",),
+        interpretation=(
+            "Postprocessing is a post-hoc utility operation and does not establish raw "
+            "no-CoT compliance."
+        ),
+    ),
+    VISIBLE_REASONING_BASELINE_BRANCH: Phase1BranchDefinition(
+        key=VISIBLE_REASONING_BASELINE_BRANCH,
+        label="Visible-reasoning baseline",
+        conditions=("visible_cot", "r1_style_thinking"),
+        interpretation="Visible-reasoning baselines are not answer-control branches.",
+    ),
+    UNCLASSIFIED_BRANCH: Phase1BranchDefinition(
+        key=UNCLASSIFIED_BRANCH,
+        label="Unclassified condition",
+        conditions=(),
+        interpretation="Condition is not registered in the Phase 1 branch taxonomy.",
+    ),
+})
+
+# These crosswalks are explicit and immutable so prospective edits cannot alter
+# historical audit recomputation.
+LEGACY_CONDITION_TO_BRANCH: Mapping[str, str] = MappingProxyType({
+    "strict_answer_only": RAW_STRICT_BRANCH,
+    "strict_answer_only_prefill_answer": RAW_STRICT_BRANCH,
+    "strict_answer_only_stopped": STOPPED_INTERVENTION_BRANCH,
+    "strict_answer_only_postprocessed": POSTPROCESSED_UTILITY_BRANCH,
+    "visible_cot": VISIBLE_REASONING_BASELINE_BRANCH,
+    "r1_style_thinking": VISIBLE_REASONING_BASELINE_BRANCH,
+})
+
+PROSPECTIVE_CONDITION_TO_BRANCH: Mapping[str, str] = MappingProxyType({
+    "strict_answer_only": PROMPT_ONLY_RAW_STRICT_BRANCH,
+    "strict_answer_only_prefill_answer": PREFILL_INTERVENTION_BRANCH,
+    "strict_answer_only_empty_think_prefill": PREFILL_INTERVENTION_BRANCH,
+    "strict_answer_only_stopped": STOPPED_INTERVENTION_BRANCH,
+    "strict_answer_only_postprocessed": POSTPROCESSED_UTILITY_BRANCH,
+    "visible_cot": VISIBLE_REASONING_BASELINE_BRANCH,
+    "r1_style_thinking": VISIBLE_REASONING_BASELINE_BRANCH,
+})
+
+# Backward-compatible public aliases are intentionally pinned to v1.
+BRANCH_DEFINITIONS = LEGACY_BRANCH_DEFINITIONS
+CONDITION_TO_BRANCH = LEGACY_CONDITION_TO_BRANCH
 
 
-PHASE1_INTERPRETATION_BOUNDARIES = """This run includes multiple answer-control branches:
-1. Raw strict no-CoT feasibility
-2. Stop-controlled generation intervention
-3. Postprocessed answer-recovery utility
+PHASE1_INTERPRETATION_BOUNDARIES = """Prospective taxonomy v2 separates:
+1. Prompt-only raw strict no-CoT
+2. Prefill intervention
+3. Stop-controlled generation intervention
+4. Postprocessed answer-recovery utility
 
 Metrics from these branches are not interchangeable.
+
+Only prompt_only_raw_strict can support the strongest discussion of spontaneous surface no-CoT behavior.
+
+Prefill interventions may at most support an internal-representation study under structural suppression. They never establish spontaneous hidden reasoning.
 
 High stopped_no_cot_valid_rate means the stopped output satisfies surface no-CoT constraints after generation-time intervention. It does not prove spontaneous no-CoT.
 
@@ -107,10 +193,26 @@ PHASE1_POSTPROCESSING_ACCURACY_WARNING = (
     "also requires an absolute accuracy floor."
 )
 
+PHASE1_PREFILL_CLASSIFICATION_WARNING = (
+    "Prospective prefill_intervention has no preregistered success criteria. Its "
+    "classification and criteria are reported as not_applicable/NA rather than "
+    "reusing historical raw_strict thresholds."
+)
+
 BRANCH_INTERPRETATION_WARNINGS = {
     RAW_STRICT_BRANCH: (
         "Raw strict classification evaluates behavioral surface compliance and task utility only; "
         "it does not establish hidden reasoning, internal workspace behavior, or J-space evidence."
+    ),
+    PROMPT_ONLY_RAW_STRICT_BRANCH: (
+        "Prompt-only raw strict classification evaluates behavioral surface compliance and task "
+        "utility only; it does not establish hidden reasoning, internal workspace behavior, or "
+        "J-space evidence."
+    ),
+    PREFILL_INTERVENTION_BRANCH: (
+        "Prefill is an intervention. It may at most support an internal-representation study under "
+        "structural suppression; it is not spontaneous no-CoT and cannot establish spontaneous "
+        "hidden reasoning."
     ),
     STOPPED_INTERVENTION_BRANCH: (
         "Generation-time stopping is an intervention; stopped validity is not spontaneous no-CoT "
@@ -135,23 +237,76 @@ BRANCH_METRIC_COLUMNS = (
 )
 
 
-def get_phase1_branch(condition: str) -> str:
-    """Return the stable branch key for a condition."""
-    return CONDITION_TO_BRANCH.get(condition, UNCLASSIFIED_BRANCH)
+def resolve_branch_taxonomy_version(taxonomy_version: str | None) -> str:
+    """Resolve a stored taxonomy version, treating a missing value as historical v1."""
+    if taxonomy_version is None or taxonomy_version == "":
+        return LEGACY_BRANCH_TAXONOMY_VERSION
+    if taxonomy_version not in {
+        LEGACY_BRANCH_TAXONOMY_VERSION,
+        PROSPECTIVE_BRANCH_TAXONOMY_VERSION,
+    }:
+        raise ValueError(f"unsupported Phase 1 branch taxonomy version: {taxonomy_version}")
+    return taxonomy_version
 
 
-def get_phase1_branch_definition(condition: str) -> Phase1BranchDefinition:
+def get_legacy_phase1_branch(condition: str) -> str:
+    """Return the immutable historical v1 branch for audit recomputation."""
+    return LEGACY_CONDITION_TO_BRANCH.get(condition, UNCLASSIFIED_BRANCH)
+
+
+def get_prospective_phase1_branch(condition: str) -> str:
+    """Return the prospective v2 branch for a condition."""
+    return PROSPECTIVE_CONDITION_TO_BRANCH.get(condition, UNCLASSIFIED_BRANCH)
+
+
+def get_phase1_branch(
+    condition: str,
+    taxonomy_version: str | None = None,
+) -> str:
+    """Return the branch key, defaulting missing taxonomy versions to v1."""
+    version = resolve_branch_taxonomy_version(taxonomy_version)
+    if version == LEGACY_BRANCH_TAXONOMY_VERSION:
+        return get_legacy_phase1_branch(condition)
+    return get_prospective_phase1_branch(condition)
+
+
+def get_phase1_branch_definition(
+    condition: str,
+    taxonomy_version: str | None = None,
+) -> Phase1BranchDefinition:
     """Return the complete branch definition for a condition."""
-    return BRANCH_DEFINITIONS[get_phase1_branch(condition)]
+    version = resolve_branch_taxonomy_version(taxonomy_version)
+    definitions = (
+        LEGACY_BRANCH_DEFINITIONS
+        if version == LEGACY_BRANCH_TAXONOMY_VERSION
+        else PROSPECTIVE_BRANCH_DEFINITIONS
+    )
+    return definitions[get_phase1_branch(condition, version)]
 
 
-def get_phase1_branch_metadata(condition: str) -> dict[str, str]:
-    """Return record-ready branch metadata."""
-    definition = get_phase1_branch_definition(condition)
+def get_phase1_branch_metadata(
+    condition: str,
+    taxonomy_version: str | None = None,
+) -> dict[str, str]:
+    """Return versioned record metadata with a v1-compatible alias."""
+    version = resolve_branch_taxonomy_version(taxonomy_version)
+    legacy_branch = get_legacy_phase1_branch(condition)
+    prospective_branch = get_prospective_phase1_branch(condition)
+    legacy_definition = LEGACY_BRANCH_DEFINITIONS[legacy_branch]
+    prospective_definition = PROSPECTIVE_BRANCH_DEFINITIONS[prospective_branch]
     return {
-        "phase1_branch": definition.key,
-        "phase1_branch_label": definition.label,
-        "phase1_branch_interpretation": definition.interpretation,
+        "branch_taxonomy_version": version,
+        "legacy_phase1_branch": legacy_branch,
+        "prospective_phase1_branch": prospective_branch,
+        "phase1_branch": legacy_branch,
+        "phase1_branch_label": legacy_definition.label,
+        "phase1_branch_interpretation": legacy_definition.interpretation,
+        "legacy_phase1_branch_label": legacy_definition.label,
+        "legacy_phase1_branch_interpretation": legacy_definition.interpretation,
+        "prospective_phase1_branch_label": prospective_definition.label,
+        "prospective_phase1_branch_interpretation": (
+            prospective_definition.interpretation
+        ),
     }
 
 
@@ -224,7 +379,7 @@ def evaluate_visible_cot_baseline(metrics: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def classify_branch_result(branch: str, metrics: Mapping[str, Any]) -> dict[str, Any]:
-    """Classify one answer-control branch against preregistered thresholds."""
+    """Classify a branch using the explicitly identified historical v1 criteria."""
     passed: list[str] = []
     failed: list[str] = []
     not_applicable: list[str] = []
@@ -240,9 +395,41 @@ def classify_branch_result(branch: str, metrics: Mapping[str, Any]) -> dict[str,
     )
     (passed if sample_size_sufficient else failed).append(sample_size_criterion)
     baseline = evaluate_visible_cot_baseline(metrics)
+
+    if branch == PREFILL_INTERVENTION_BRANCH:
+        return {
+            "branch": branch,
+            "sample_size": sample_size,
+            "minimum_sample_size": None,
+            "sample_size_sufficient": sample_size_sufficient,
+            "absolute_accuracy_floor": None,
+            "absolute_accuracy_passed": None,
+            **baseline,
+            "relative_accuracy_gate_applicable": False,
+            "relative_accuracy_gate_required": False,
+            "relative_accuracy_gate_passed": None,
+            "classification": "not_applicable",
+            "classification_is_provisional": False,
+            "classification_criteria_version": None,
+            "classification_criteria_branch": None,
+            "criteria_passed": [],
+            "criteria_failed": [],
+            "criteria_not_applicable": [
+                "prospective_prefill_intervention_success_criteria"
+            ],
+            "interpretation_warning": BRANCH_INTERPRETATION_WARNINGS[
+                PREFILL_INTERVENTION_BRANCH
+            ],
+        }
+
+    criteria_branch = (
+        RAW_STRICT_BRANCH
+        if branch == PROMPT_ONLY_RAW_STRICT_BRANCH
+        else branch
+    )
     absolute_accuracy_passed = False
     relative_accuracy_gate_applicable = baseline["baseline_valid"]
-    relative_accuracy_gate_required = branch in {
+    relative_accuracy_gate_required = criteria_branch in {
         RAW_STRICT_BRANCH,
         STOPPED_INTERVENTION_BRANCH,
     }
@@ -292,7 +479,7 @@ def classify_branch_result(branch: str, metrics: Mapping[str, Any]) -> dict[str,
             return relative_accuracy_gate_passed
         return True
 
-    if branch == RAW_STRICT_BRANCH:
+    if criteria_branch == RAW_STRICT_BRANCH:
         surface_checks = (
             check("raw_no_cot_valid_rate", ">=", 0.90),
             check("visible_reasoning_marker_rate", "<=", 0.10),
@@ -324,7 +511,7 @@ def classify_branch_result(branch: str, metrics: Mapping[str, Any]) -> dict[str,
         else:
             classification = "raw_strict_preliminarily_established"
 
-    elif branch == STOPPED_INTERVENTION_BRANCH:
+    elif criteria_branch == STOPPED_INTERVENTION_BRANCH:
         surface_checks = (
             check("stopped_no_cot_valid_rate", ">=", 0.90),
             check("stop_success_rate", ">=", 0.80),
@@ -351,7 +538,7 @@ def classify_branch_result(branch: str, metrics: Mapping[str, Any]) -> dict[str,
         else:
             classification = "stopped_intervention_usable"
 
-    elif branch == POSTPROCESSED_UTILITY_BRANCH:
+    elif criteria_branch == POSTPROCESSED_UTILITY_BRANCH:
         validity_pass = check("postprocessed_no_cot_valid_rate", ">=", 0.90)
         success_pass = check("postprocessing_success_rate", ">=", 0.80)
         warning_pass = check("postprocessing_warning_rate", "<=", 0.20)
@@ -412,9 +599,11 @@ def classify_branch_result(branch: str, metrics: Mapping[str, Any]) -> dict[str,
             "relative_accuracy_gate_passed": None,
             "classification": "not_applicable",
             "classification_is_provisional": False,
+            "classification_criteria_version": None,
+            "classification_criteria_branch": None,
             "criteria_passed": [],
             "criteria_failed": [],
-            "criteria_not_applicable": ["relative_accuracy_gate"],
+            "criteria_not_applicable": ["branch_success_criteria"],
             "interpretation_warning": PHASE1_BRANCH_CLASSIFICATION_WARNING,
         }
 
@@ -428,7 +617,7 @@ def classify_branch_result(branch: str, metrics: Mapping[str, Any]) -> dict[str,
         interpretation_warnings.append(
             f"Relative accuracy comparison is unavailable ({reasons})."
         )
-    if branch == POSTPROCESSED_UTILITY_BRANCH:
+    if criteria_branch == POSTPROCESSED_UTILITY_BRANCH:
         interpretation_warnings.append(PHASE1_POSTPROCESSING_ACCURACY_WARNING)
 
     return {
@@ -444,6 +633,8 @@ def classify_branch_result(branch: str, metrics: Mapping[str, Any]) -> dict[str,
         "relative_accuracy_gate_passed": relative_accuracy_gate_passed,
         "classification": classification,
         "classification_is_provisional": not sample_size_sufficient,
+        "classification_criteria_version": LEGACY_BRANCH_TAXONOMY_VERSION,
+        "classification_criteria_branch": criteria_branch,
         "criteria_passed": passed,
         "criteria_failed": failed,
         "criteria_not_applicable": not_applicable,
@@ -461,6 +652,24 @@ def _format_metric(value: Any) -> str:
     return str(value)
 
 
+def _get_row_branch(
+    row: Mapping[str, Any],
+    condition: str,
+    taxonomy_version: str,
+) -> str:
+    if taxonomy_version == PROSPECTIVE_BRANCH_TAXONOMY_VERSION:
+        return str(
+            row.get("prospective_phase1_branch")
+            or row.get("branch")
+            or get_prospective_phase1_branch(condition)
+        )
+    return str(
+        row.get("legacy_phase1_branch")
+        or row.get("branch")
+        or get_legacy_phase1_branch(condition)
+    )
+
+
 def render_branch_metrics_table(metric_rows: Sequence[Mapping[str, Any]]) -> str:
     """Render a Markdown table that keeps branch-specific metrics separate."""
     if not metric_rows:
@@ -472,6 +681,7 @@ def render_branch_metrics_table(metric_rows: Sequence[Mapping[str, Any]]) -> str
         "depth",
         "branch",
         "condition",
+        "branch_taxonomy_version",
         *BRANCH_METRIC_COLUMNS,
         "interpretation",
     )
@@ -482,10 +692,14 @@ def render_branch_metrics_table(metric_rows: Sequence[Mapping[str, Any]]) -> str
 
     for row in metric_rows:
         condition = str(row.get("condition", ""))
-        definition = get_phase1_branch_definition(condition)
+        taxonomy_version = resolve_branch_taxonomy_version(
+            row.get("branch_taxonomy_version")
+        )
+        definition = get_phase1_branch_definition(condition, taxonomy_version)
         values = {
             **row,
-            "branch": row.get("branch") or definition.key,
+            "branch": _get_row_branch(row, condition, taxonomy_version),
+            "branch_taxonomy_version": taxonomy_version,
             "interpretation": definition.interpretation,
         }
         lines.append("| " + " | ".join(_format_metric(values.get(column)) for column in columns) + " |")
@@ -499,19 +713,25 @@ def render_branch_success_classification_table(
     """Render preregistered classifications for answer-control branches."""
     answer_control_branches = {
         RAW_STRICT_BRANCH,
+        PROMPT_ONLY_RAW_STRICT_BRANCH,
+        PREFILL_INTERVENTION_BRANCH,
         STOPPED_INTERVENTION_BRANCH,
         POSTPROCESSED_UTILITY_BRANCH,
     }
     classified_rows = []
     for row in metric_rows:
         condition = str(row.get("condition", ""))
-        branch = str(row.get("branch") or get_phase1_branch(condition))
+        taxonomy_version = resolve_branch_taxonomy_version(
+            row.get("branch_taxonomy_version")
+        )
+        branch = _get_row_branch(row, condition, taxonomy_version)
         if branch not in answer_control_branches:
             continue
         result = classify_branch_result(branch, row)
         classified_rows.append({
             **row,
             **result,
+            "branch_taxonomy_version": taxonomy_version,
             "n": result["sample_size"],
             "minimum_n": result["minimum_sample_size"],
             "provisional": result["classification_is_provisional"],
@@ -552,6 +772,9 @@ def render_branch_success_classification_table(
         "depth",
         "branch",
         "condition",
+        "branch_taxonomy_version",
+        "classification_criteria_version",
+        "classification_criteria_branch",
         "n",
         "minimum_n",
         "sample_size_sufficient",
@@ -600,5 +823,6 @@ def render_branch_success_classification_section(
         f"{PHASE1_BRANCH_SAMPLE_SIZE_WARNING}\n\n"
         f"{PHASE1_VISIBLE_COT_BASELINE_WARNING}\n\n"
         f"{PHASE1_POSTPROCESSING_ACCURACY_WARNING}\n\n"
+        f"{PHASE1_PREFILL_CLASSIFICATION_WARNING}\n\n"
         f"{render_branch_success_classification_table(metric_rows)}"
     )
