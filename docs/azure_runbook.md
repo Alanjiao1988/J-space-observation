@@ -977,6 +977,72 @@ Environment variable visibility note:
 
 - Do not paste token values into chat and do not commit them.
 
+## CPU-only parser-v2 evaluator-set sealing status
+
+Phase 1.2A is sealed. This was a one-time private Blob persistence operation,
+not a model or parser evaluation.
+
+```text
+parent:
+phase1-evaluator-validation/parser-v2-v1/20260716T024856Z
+
+implementation commit:
+9b4262a9d35e6342935b8d2f72887a56c5f98486
+
+immutable base:
+acrjspaceobssea0708231738.azurecr.io/j-space-observation@sha256:43af06291f6196d5426fe5e014196c86d3d00aae978470d369a9c1c2bd3dfeac
+
+encrypted overlay build:
+cmg
+
+job:
+job-jspace-parser-v2-set
+
+sole execution:
+job-jspace-parser-v2-set-ib7uc0e
+
+status:
+Succeeded
+
+profile/resources:
+Consumption / 2 CPU / 4Gi / no GPU
+```
+
+The runtime used `ManagedIdentityCredential` through
+`id-jspace-aca-acrpull-sea`, the VNet-integrated
+`cae-jspace-observation-sea-vnet2` environment, and the private Blob endpoint.
+Shared keys, SAS, public Storage access, and Azure Files were not used.
+
+The exact 26 registered artifacts were uploaded with `overwrite=false`.
+Reservations were first, leaf manifests were last, and the overall manifest was
+last overall. The job verified exact remote membership and downloaded every
+object again to check size, SHA-256, and ETag before returning success.
+
+Mandatory post-run state:
+
+- one terminal execution only;
+- job image reset to the immutable base;
+- job command `/bin/true`;
+- zero job secrets and zero secret references;
+- temporary transport ACR tag and manifest deleted;
+- local encrypted build context deleted.
+
+These conditions were verified. Do not start
+`job-jspace-parser-v2-set` again for Phase 1.2A and do not write to the sealed
+parent. A direct full-repository build `cmf` failed safely against the frozen
+all-45 image attestation and published no image; do not weaken that attestation.
+
+Future one-shot locked evaluation is a separate operation. It requires:
+
+1. parser v2 implemented using only the open development set;
+2. implementation commit frozen and pushed before any locked-input read;
+3. explicit authorization;
+4. predictions sealed before labels are read;
+5. PASS or FAIL retained as final, with the holdout retired.
+
+No parser-v2 implementation, locked evaluation, higher-n run, target-model
+inference, or GPU execution occurred during sealing.
+
 ## Required run logging
 
 Every Azure resource creation or job start must append to `docs/run_log.md`:

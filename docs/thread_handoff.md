@@ -1,527 +1,367 @@
-# Thread handoff — J-space observation project
+# Thread handoff - J-space observation project
 
-Date: 2026-07-10
+Date: 2026-07-16
+
 Repository: `Alanjiao1988/J-space-observation`
-Latest experiment source commit: `359643b7b5eb8f95c13cca2e60fa753df8701282`
-Current experiment image commit: `359643b7b5eb`
-Current audit image commit: `9537ed8e0b5d`
 
-> Update (2026-07-08 22:15 +08:00): Alan approved minimal Azure resource creation. Created `rg-jspace-observation-sea`, `law-jspace-observation-sea`, `cae-jspace-observation-sea`, and T4 workload profile `gpu-t4` (`Consumption-GPU-NC8as-T4`). This confirms the T4 profile can be configured; no quota error occurred during profile creation. First GHCR smoke job creation failed before execution because Azure Container Apps could not pull the GHCR image anonymously: `InvalidParameterValueInContainerTemplate` with `UNAUTHORIZED: authentication required`. No Container Apps job was created successfully. Next gate is GHCR pull auth: make package public or provide `GHCR_USERNAME` + `GHCR_PAT` through a secure env/Azure secret path. Do not print or commit token values. See `reports/current_status.md` for latest details.
->
-> Update (2026-07-08 22:34 +08:00): Retried GHCR smoke job using `gh auth token` as the Azure registry secret because `GHCR_PAT` was not set. Token value was not printed/logged. Job creation still failed with `InvalidParameterValueInContainerTemplate` and `DENIED: requested access to the resource is denied`. This confirms the available `gh auth token` is insufficient for Azure to pull the private GHCR package. `infra/azure/scripts/05_run_job_ghcr.sh` was updated to use ARM REST job creation, place `workloadProfileName` at `properties.workloadProfileName`, use actual `*-sea` resource names, avoid failed T4 min/max and `--enable-dedicated-gpu` args, and fallback to `gh auth token` only if `GHCR_PAT` is absent. No jobs were created successfully; Phase 0.5 / Phase 1 dry-run / small pilot were not attempted.
->
-> Update (2026-07-08 22:43 +08:00): `GHCR_PAT` remains unset. Current `gh auth token` was tested against the GHCR package versions API and returned `403` / `read:packages` required, so no Azure job retry was attempted with the known-insufficient token. `infra/azure/scripts/05_run_job_ghcr.sh` now also supports the env aliases `JOB_NAME`, `CONTAINERAPPS_ENVIRONMENT`, and `WORKLOAD_PROFILE_NAME`, and avoids passing token values as helper Python command-line arguments. Next step is still to make the GHCR package public or provide a classic PAT with `read:packages` via secure env/Azure secret path. Do not paste tokens into chat.
->
-> Update (2026-07-08 22:56 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` as Windows User environment variables and restarting tools, but Copilot's fresh command processes still cannot see them in Process/User/Machine scopes. No package-read preflight or Azure job retry was attempted. Current blocker remains: the agent needs a secure token path it can actually read, or the GHCR package must be made public.
->
-> Update (2026-07-08 23:16 +08:00): Alan instructed to abandon GHCR auth and switch to ACR + Azure managed identity. Created ACR `acrjspaceobssea0708231738`, built image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:d69187c7a147` via `az acr build`, created user-assigned identity `id-jspace-aca-acrpull-sea`, assigned `AcrPull`, and successfully ran ACR jobs: smoke (`job-jspace-acr-smoke-9b9wb4z`), Phase 0.5 (`job-jspace-phase05-acr-i110lnu`), Phase 1 dry-run (`job-jspace-phase1-dryrun-acr-v0j1bkd`), and small Phase 1 pilot (`job-jspace-phase1-pilot-acr-lhuvwbf`). No local model execution occurred. The pilot is behavioral only and not J-space evidence. Next blocker: results are currently ephemeral in job containers; decide persistent result export/storage before broader runs.
->
-> Update (2026-07-09 08:33 +08:00): Attempted Azure Files persistence. Created storage accounts `stjspaceobssea07090835` and `stjspacefiles0709085305`, but both have `allowSharedKeyAccess=False` due policy, and Azure Files key-based operations fail with `KeyBasedAuthenticationNotPermitted`. Registered env storage `jspace-results-storage`, but the storage smoke job hung; stopped execution `job-jspace-storage-smoke-acr-1s1g5d8`, deleted job `job-jspace-storage-smoke-acr`, and removed the env storage registration. `infra/azure/scripts/06_run_job_acr_mi.sh` now supports Azure Files volume mounting, but `ENABLE_RESULTS_MOUNT=true` should not be used until storage is fixed. Next blocker: choose persistence alternative (admin exception for Azure Files shared-key, Azure Blob upload with managed identity, or identity-based Container Apps storage).
->
-> Update (2026-07-09 09:08 +08:00): Switched to Azure Blob upload with managed identity. Added Blob export utility and smoke script, rebuilt ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:afd647a6b53e`, assigned `Storage Blob Data Contributor` to `id-jspace-aca-acrpull-sea`, and verified Blob upload. Blob smoke succeeded (`job-jspace-blob-smoke-acr-o7kl7s2`) and uploaded `smoke/20260709T013310Z/smoke.txt`. Persistent Phase 1 pilot succeeded (`job-jspace-phase1-pilot-blob-acr-9voxpdm`) and uploaded 4 files under `phase1-pilot/20260709T014336Z`. Pilot review found a blocker before scaling: strict answer-only outputs can contain visible reasoning that current no-CoT validation fails to flag. Next action: fix no-CoT visible-reasoning validation before any broader Phase 1 run.
->
-> Update (2026-07-09 10:02 +08:00): Hardened no-CoT validation and parser ambiguity reporting. Local tests now `54 passed, 2 warnings`. Rebuilt ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:937288cfb8ef` (build `cm4`). Reran minimal persistent validator pilot (`job-jspace-p1-validator-xkqro3f`) and uploaded outputs under `phase1-pilot-validator/20260709T022001Z`. Result: strict_answer_only no-CoT valid rate is now `0.0000` for depths 1/2/3, visible reasoning marker rate is `1.0000`, parse ambiguity is `1.0000` for all cells. This fixes the false-negative validator bug and shows the current strict-answer-only prompt/decoding still leaks visible reasoning. Do not broaden Phase 1 until strict answer-only prompting/decoding and parser policy are reviewed.
->
-> Update (2026-07-09 10:32 +08:00): Added `strict_answer_only_prefill_answer` and condition-specific strict decoding. Final ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9b5895db173f` (build `cm6`). Reran minimal persistent pilot as `job-jspace-p1-strictfix2-1sjj2n5`, Blob prefix `phase1-pilot-strictfix2/20260709T025356Z`. Existing `strict_answer_only` remains no-CoT invalid for all depths. New direct `Answer:` prefill suppresses visible reasoning only on depth 1 but gives incomplete/wrong answer; depths 2/3 still leak meta-reasoning (`Alright`, `Wait`) and are invalid. Do not broaden Phase 1. Next likely experiment: stop-sequence or explicitly labeled post-processing while preserving raw output.
->
-> Update (2026-07-09 12:45 +08:00): Added explicitly labeled raw-vs-postprocessed answer-only evaluation via `strict_answer_only_postprocessed`. Final ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:9342ef130d46` (build `cm8`, digest `sha256:3fc9e9d58b0ce6d5ea8a260cb7c172aa7cebfbe31427f94ee8cdae8d3b2a9ed1`). Reran small persistent pilot as `job-jspace-p1-postprocess-gor0o1r`, Blob prefix `phase1-pilot-postprocess/20260709T044224Z`. Raw no-CoT validity for the postprocessed condition remained `0.0000` for depths 1/2/3; postprocessed no-CoT validity was `1.0000`; postprocessed accuracy was `1.0000/0.0000/0.0000` for depths 1/2/3. This is answer-recovery evaluation only, not no-CoT proof and not J-space evidence.
->
-> Update (2026-07-10 15:30 +08:00): Added `strict_answer_only_stopped` and rebuilt ACR image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5` (build `cm9`, digest `sha256:2919bfa04dbcef0998cd9d770ffc91992958840d52ad512ab8b20b41dd434098`). Storage public access is disabled, so a private path was created: VNet `vnet-jspace-observation-sea`, Blob private endpoint `pe-stjspacefiles-blob-sea`, private DNS zone `privatelink.blob.core.windows.net`, and active VNet-integrated environment `cae-jspace-observation-sea-vnet2`. The first environment `cae-jspace-observation-sea-vnet` was created before `Microsoft.Network/AllowBringYourOwnPublicIpAddress` was registered and cannot start containers; it was retained, not deleted. Blob smoke `job-jspace-blob-net-smoke-v2-l02nljz` succeeded. The 15-cell pilot `job-jspace-p1-stopcontrol-vnet-b55p4c6` succeeded and uploaded four files under `phase1-pilot-stopcontrol-vnet/20260710T072107Z`. For `strict_answer_only_stopped`, raw/stopped no-CoT validity and stop-trigger rate were `1.0000` at all depths; stopped accuracy was `1.0000/0.0000/0.0000`. All stops were triggered by `\n\n`; depth 2 was truncated to a non-answer placeholder and depth 3 to a wrong boxed answer. Stop control is an intervention, not proof of spontaneous no-CoT and not J-space evidence.
->
-> Update (2026-07-10 — branch formalization): Phase 1 now has three non-interchangeable answer-control branches: `raw_strict`, `stopped_intervention`, and `postprocessed_utility`. Records and summaries preserve branch labels plus raw/stopped/postprocessed outputs, validity, and correctness separately. Summary tables use `NA` when a metric does not apply. Local tests pass (`80 passed, 2 warnings`). No model inference, Azure job, ACR build, experiment scaling, J-lens fitting, or activation patching occurred in this update. Current blocker is none; scaling remains paused pending branch-specific success criteria.
->
-> Update (2026-07-10 — criteria preregistration): Branch-specific thresholds are now fixed in `docs/phase1_experiment_branches.md` before any new data collection. `classify_branch_result()` independently labels raw strict feasibility, stop-intervention utility, and postprocessed answer recovery. Phase 1 summaries now include a `Branch success classification` table, matching visible-CoT relative accuracy where available, stop-string distribution, `NA` for non-applicable metrics, and mandatory no-hidden-reasoning/no-J-space warnings. Local tests pass (`92 passed, 2 warnings`). No model inference, Azure job, ACR build, or scale increase occurred. The next run requires explicit approval and must remain limited scale.
->
-> Update (2026-07-10 — criteria validation): Alan approved exactly one fixed 15-cell validation run. ACR build `cma` produced image `acrjspaceobssea0708231738.azurecr.io/j-space-observation:f94e889ef608`, digest `sha256:f27cc0e4cea0ae9569dbb384598fb391f3b923022ce9257f8301684c9dc23806`. The valid shortened job name is `job-jspace-p1-criteria-val`; its only execution, `job-jspace-p1-criteria-val-6s8p15p`, succeeded in `cae-jspace-observation-sea-vnet2` and uploaded four files under `phase1-pilot-criteria-validation/20260710T135655Z`. The summary contained 15 records, all three branch classifications, passed/failed criteria, stop-string distribution, and mandatory interpretation warnings. Depth-wise raw classifications were `surface_answer_only_but_task_failed / raw_strict_not_established / raw_strict_not_established`; stopped classifications were `usable / not_useful / surface_compliant_but_task_failed`; postprocessed classifications were `usable / surface_clean_but_warning_high / usable`. The depth 3 postprocessed usable label reflects `0 >= 0` non-degradation and must not be read as task success. No local inference, scale expansion, hidden-reasoning claim, or J-space claim occurred.
->
-> Update (2026-07-10 — gate hardening): Phase 1 formal success now requires `n >= 3`, an absolute branch accuracy floor of `0.50`, and valid visible-CoT baseline guards before raw/stopped relative gates apply. Postprocessed utility requires both non-degradation and `accuracy_postprocessed >= 0.50`; the depth-3 `0 >= 0` regression now produces `postprocessed_surface_clean_but_task_failed`. A matching visible-CoT baseline is valid only at `n >= 3`, parse-valid rate `>= 0.80`, and accuracy `> 0`; otherwise the relative gate is `NA`. Otherwise-passing single-sample rows use branch-specific `pilot_only` labels, while clear failures retain failure labels. Local tests pass (`109 passed, 2 warnings`). No Azure job, model inference, model download, ACR rebuild, or scale increase occurred. The prior Blob summary remains unchanged as a historical artifact.
->
-> Update (2026-07-10 — bounded n=3 validation): Parallel pre-run audits found arithmetic prompt capacity `3/3/2`; Alan explicitly approved one unique third depth-3 item. Commit `359643b7b5eb` added it plus capacity-aware dry-run validation. Local tests pass (`111 passed, 2 warnings`), and dry-run confirmed 15 configurations x 3 items = 45 observations. ACR build `cmb` produced digest `sha256:004ec8bff66fbc8a23b122660aeb58914b2ee3cedfc5246429046eef252c9069`. The sole execution `job-jspace-p1-n3-gates-02ilmgm` succeeded in `cae-jspace-observation-sea-vnet2` and uploaded four artifacts under `phase1-limited-n3-gates/20260710T152820Z`. Raw strict was not established at any depth; stopped intervention was usable only at depth 1; postprocessed answer recovery was usable only at depth 1. Depth-3 visible-CoT accuracy was zero, so relative gates were `NA`; depth-3 postprocessing remained task-failed despite `0 >= 0`. Post-run classification audit found zero mismatches. Counts passed, but record-level duplicate/item-membership checks remain inconclusive because local access to private Blob is blocked. Results are behavioral/operational only; `n=3` is not stability evidence.
->
-> Update (2026-07-11 — record-level artifact audit): Commit `9537ed8e0b5d` added a model-free read-only audit with `139 passed, 2 warnings`. ACR build `cmc` produced digest `sha256:90adfc1b6be6fbb7a17a878bed7970ffd71c62b72263a36b41110ba6f19b169b`. CPU-only execution `job-jspace-p1-record-audit-d9q5uy8` succeeded on the `Consumption` profile and read the immutable source prefix through the existing managed identity/private endpoint. The audit paired 45/45 records, found zero duplicates/missing/field/transformation/parser/metric/classification mismatches, verified all 15 cells at `n=3`, and confirmed source Blob properties unchanged. Eight reports were uploaded under `phase1-audits/n3-gates-20260710T152820Z/20260711T010339Z`. Two independent reviews of all 18 flagged parses agreed on category for 17/18; an arbiter resolved 14 records with any field-level disagreement. Final opinion: 17 parser overflags, one true multiple-candidate ambiguity, and zero unresolved. Reviewing only flagged records cannot exclude underflags among the other 27. No model inference or new observation occurred.
->
-> Update (2026-07-08 22:51 +08:00): Alan reported setting `GHCR_USERNAME` / `GHCR_PAT` in a local PowerShell shell, but Copilot's fresh tool processes could not see them in Process/User/Machine environment scopes. No package-read preflight or Azure job retry was attempted. To continue, set the variables in Windows User environment (or another secure path readable by the agent), e.g. `[Environment]::SetEnvironmentVariable("GHCR_PAT", "<classic PAT with read:packages>", "User")`. Do not paste tokens into chat.
+Current pre-lock implementation commit:
+`9b4262a9d35e6342935b8d2f72887a56c5f98486`
 
-This document is intended to let a new ChatGPT / Copilot thread continue the project without reading the full previous conversation.
+## 1. Authoritative identities
 
----
-
-## 1. Project goal
-
-The project studies whether `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B` internalizes reasoning as hidden workspace / J-space-like representations under strict no-CoT / answer-only conditions, or whether it mainly relies on visible CoT tokens as an external scratchpad.
-
-Main method path:
-
-- Plan A: real Jacobian Lens / J-space observation where feasible.
-- Plan B: fallback to weaker hidden-representation evidence, such as logit lens, target-token probes, and activation patching, only if real J-lens is infeasible.
-
-Important scientific boundary:
-
-- Do not call ordinary logit lens a J-space result.
-- Do not treat final-layer motor/output readout as hidden reasoning evidence.
-- Do not treat prompt-based answer-only as automatically equivalent to strict no-CoT.
-- Do not use naked CoT-vs-answer-only robustness differences as ablation evidence.
-- RQ3 base-vs-distill comparisons must be ability-matched.
-
-Core documents:
-
-- `README.md`
-- `docs/experiment_plan.md`
-- `docs/copilot_prompt.md`
-- `docs/implementation_notes.md`
-- `docs/azure_runbook.md`
-- `docs/decision_log.md`
-- `docs/run_log.md`
-- `reports/current_status.md`
-
----
-
-## 2. Current execution policy
-
-Alan clarified an execution principle:
-
-> Use Azure cloud resources as much as possible. Use the local PC as little as possible.
-
-Therefore:
-
-- Local PC is orchestration-only.
-- Local PC may run:
-  - `git status`
-  - tests
-  - dry-run commands
-  - documentation updates
-  - Azure CLI orchestration
-- Local PC should not run:
-  - real model downloads
-  - real model inference
-  - real Phase 1 generation
-  - J-lens fitting
-  - activation patching or ablation experiments
-
-Heavy execution should run in Azure GPU containers.
-
----
-
-## 3. Repository implementation status
-
-The executable scaffold is already implemented and pushed.
-
-Implemented modules include:
-
-- `src/jspace_observation/config.py`
-- `src/jspace_observation/model_loader.py`
-- `src/jspace_observation/no_cot.py`
-- `src/jspace_observation/prompt_sets.py`
-- `src/jspace_observation/eval_parsing.py`
-- `src/jspace_observation/stats.py`
-- `src/jspace_observation/run_logging.py`
-- `src/jspace_observation/jlens_utils.py`
-- `src/jspace_observation/blob_export.py`
-- `src/jspace_observation/postprocess.py`
-- `src/jspace_observation/phase1_branches.py`
-- `src/jspace_observation/record_audit.py`
-
-Experiment scripts:
-
-- `experiments/phase0_5_jlens_spike.py`
-- `experiments/phase1_depth_gradient.py`
-- `scripts/audit_phase1_blob_run.py`
-
-Infrastructure:
-
-- `infra/azure/scripts/`
-- `infra/ci/build-ghcr.yml`
-- `infra/azure/scripts/05_run_job_ghcr.sh`
-- `.dockerignore`
-- Dockerfile and packaging files
-
-Tests:
-
-- `tests/test_no_cot.py`
-- `tests/test_eval_parsing.py`
-- `tests/test_stats.py`
-- `tests/test_blob_export.py`
-- `tests/test_postprocess.py`
-- `tests/test_phase1_branches.py`
-- `tests/test_record_audit.py`
-
-Latest known test status:
+Historical experimental target:
 
 ```text
-python -m pytest tests/ -q -> 139 passed, 2 warnings
+Display name:
+DeepSeek-R1-Distill-Qwen-1.5B
+
+Hugging Face model ID:
+deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+
+Role:
+historical target of the bounded n=3 behavioral records
 ```
 
-Phase 1 dry run status:
+Engineering, curation, labeling, arbitration, and audit agents:
 
 ```text
-python experiments\phase1_depth_gradient.py --dry-run
+gpt-5.6-sol
+reasoning=max
 ```
 
-Result:
+Do not confuse the engineering agent with the experimental target.
 
-- completed
-- total cells: 54
-- conditions include:
-  - `strict_answer_only`
-  - `visible_cot`
-  - `r1_style_thinking`
+## 2. Current phase
 
----
-
-## 4. Key fixes already completed
-
-### 4.1 Strict no-CoT empty-think prefill
-
-The empty-think prompt order was corrected.
-
-Correct structure:
+Preregistered Path C Phase 1.2A is complete:
 
 ```text
-{base_prompt}
-
-<think>
-</think>
-
-Answer:
+status: SEALED
+development cases: 60
+locked cases: 120
+parser v2 implemented: no
+locked evaluation performed: no
+higher-n performed: no
+target model loaded/downloaded/run: no
+GPU used: no
 ```
 
-This keeps R1-style models closer to their expected format while forcing zero visible thinking budget before final answer generation.
+The phase constructed, independently labeled, validated, and privately sealed
+a prospective parser-v2 evaluator set. It generated no target-model behavior
+and no parser-v2 acceptance result.
 
-### 4.2 Phase 1 default conditions
+Detailed report:
+`reports/phase1_parser_v2_validation_set.md`.
 
-Phase 1 now defaults to:
+## 3. Frozen protocol
 
 ```text
-strict_answer_only,visible_cot,r1_style_thinking
+starting commit:
+58d299bb66c5536a0f1b7d0617204472fbb8c212
+
+final protocol commit:
+cc93ffe603ab8338ed860586a52b1911af4b3277
+
+tooling/development commit:
+e7a95a458d05d4ef211bb6902c2a20cb5f16bf60
+
+production-ingress hardening:
+297420abfebb65c9f3702c56f28fe5a193913cd0
+
+sealed no-Git validation:
+9b4262a9d35e6342935b8d2f72887a56c5f98486
+
+protocol bundle SHA-256:
+5d486a53b532012c3a64eb6bd962be325fb9892ebbb042807b919f9e41b23666
+
+acceptance-gate SHA-256:
+a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988
 ```
 
-### 4.3 Phase 0.5 scope clarified
+Frozen files:
 
-`phase0_5_jlens_spike.py` currently does not perform actual tiny J-lens fitting. It is an availability / model-loading / sweep-plan check unless future code implements real fitting.
+- `docs/phase1_parser_v2_protocol.md`
+- `docs/phase1_evaluator_validation_set.md`
+- `docs/phase1_parser_v2_acceptance_gates.json`
 
-The summary should distinguish:
+The final protocol was pushed before eligible construction. Do not amend these
+v1 gates after seeing a locked result.
 
-- prefitted lens search
-- jacobian-lens package availability
-- model loading check
-- actual tiny fitting attempted: yes/no
-- actual tiny fitting success: yes/no/not attempted
+## 4. Evaluator set
 
----
+Composition:
 
-## 5. Local environment status
+| Property | Development | Locked |
+|---|---:|---:|
+| Total | 60 | 120 |
+| Per S01-S12 stratum | 5 | 10 |
+| Present | 40 | 80 |
+| Ambiguous | 5 | 10 |
+| No answer | 15 | 30 |
 
-Local Python environment was fixed and validated.
+Locked critical cases: 80.
 
-Known details:
+Locked material cases: 68.
 
-- Active Python executable:
-  - `C:\Users\alanjiao\AppData\Local\Programs\Python\Python313\python.exe`
-- `requirements.txt` installed successfully.
-- Core imports passed:
-  - `torch`
-  - `transformers`
-  - `accelerate`
-  - `safetensors`
-  - `sentencepiece`
-- `jacobian-lens` installed externally at:
-  - `C:\Users\alanjiao\external\jacobian-lens`
-- `import jlens` succeeded.
-- Local Phase 0.5 check showed:
-  - `jacobian-lens installed/importable: yes / yes`
-  - prefitted lenses found locally: no
-  - both configured 1.5B models loaded on CPU locally
-
-Important: despite local model loading success, future model loading should happen in Azure, not on the local PC.
-
----
-
-## 6. Azure status
-
-Subscription:
+Public development path:
 
 ```text
-MCAPS-Hybrid-REQ-125620-2025-alanjiao
+evaluator_sets/parser_v2_v1/development_cases.jsonl
+SHA-256: bfaeca837ecfe8673df834c5b8a4fc1626f0835c6ae35c0821acf59bd6e4ac27
 ```
 
-Known provider status after the latest checks:
+Hard exact, normalized, cross-set template, and historical overlaps are zero.
+Thirty-seven near-duplicate findings were reviewed and dispositioned.
+
+## 5. Labeling result
+
+- Curator A/B independently produced 144 candidates each.
+- Curator C selected the exact 60/120 set.
+- Stage-1 Reviewer A/B completed 120/120 each, reference-blind.
+- Stage-1 disagreements and arbitration rows: 57.
+- Stage-2 Reviewer A/B completed 120/120 each.
+- Stage-2 disagreements and arbitration rows: 0.
+- Final labels: 120.
+- Unresolved: 0.
+- Review seals: 7.
+
+Key agreement:
 
 ```text
-Microsoft.App = Registered
-Microsoft.ContainerRegistry = Registered
+presence/validity/ambiguity/strategy: 120/120
+output quality: 112/120; rate 14/15; kappa 491/571
+parsed answer: 120/120
+candidate lists: 120/120; mean Jaccard 1
+selected spans: 119/120; mean Jaccard 119/120
+failure reasons: 111/120; mean Jaccard 229/240
+format warnings: 73/120; mean Jaccard 199/240
+Stage-2 correctness: 120/120; kappa 1
 ```
 
-Earlier, `Microsoft.ContainerRegistry` was stuck at `Registering` for several checks. A provider retry was attempted:
+These are LLM operational consensus references, not human ground truth.
 
-```powershell
-az provider register --namespace Microsoft.ContainerRegistry --wait
-```
+Visibility:
 
-It returned exit code 0 but initially remained `Registering`. Later read-only checks showed it finally became `Registered`.
+- Curators saw frozen construction protocols, not legacy/future parser
+  predictions.
+- The historical custodian produced non-content fingerprints; historical text
+  was not supplied to curators or reviewers.
+- Stage 1 was reference-blind for both reviewers and the extraction arbiter.
+- Stage 2 saw sealed consensus plus immutable references and could not revise
+  extraction.
+- Validation/sealing agents handled private artifacts only for workflow,
+  integrity, and persistence checks.
+- No prospective parser-v2 implementation agent exists or has seen locked
+  inputs/labels.
+- The private visibility ledger records the full role transitions.
 
-Azure resources created so far:
+This is procedural, hash-audited isolation, not a security-enforced boundary.
+
+## 6. Private release and Azure state
+
+Sealed parent:
 
 ```text
-resource group: rg-jspace-observation-sea
-log analytics workspace: law-jspace-observation-sea
-container apps environment: cae-jspace-observation-sea
-workload profile: gpu-t4 (Consumption-GPU-NC8as-T4)
-ACR: acrjspaceobssea0708231738
-managed identity: id-jspace-aca-acrpull-sea
-jobs:
-  job-jspace-acr-smoke
-  job-jspace-phase05-acr
-  job-jspace-phase1-dryrun-acr
-  job-jspace-phase1-pilot-acr
+phase1-evaluator-validation/parser-v2-v1/20260716T024856Z
 ```
 
-Active private execution path:
+Registered leaves:
+
+- `development`
+- `locked-inputs`
+- `locked-labels`
+- `reports`
+- `manifests`
+
+Key bindings:
 
 ```text
-VNet: vnet-jspace-observation-sea
-active ACA subnet: snet-aca-jspace-sea-v2
-private endpoint subnet: snet-pe-jspace-sea
-Blob private endpoint: pe-stjspacefiles-blob-sea
-Blob private IP: 10.80.2.4
-private DNS zone: privatelink.blob.core.windows.net
-active ACA environment: cae-jspace-observation-sea-vnet2
-inactive retained environment: cae-jspace-observation-sea-vnet
-latest successful stop pilot: job-jspace-p1-stopcontrol-vnet-b55p4c6
-latest stop-pilot Blob prefix: phase1-pilot-stopcontrol-vnet/20260710T072107Z
+artifact count:
+26
+
+locked inputs:
+2d60483e7f7a2ce1883acca2dcf9a6771f84b54d596ab2e02ed4a39d937c4e3e
+
+final labels:
+44d3830c5ce3f9fdd5ba3059f63ba5d8a89f76152c0fe2eb128080b40af448af
+
+locked-label manifest:
+aa53cb8a808a213423f8deb7370d880c5b1c934073301356aabb593db17fd5b6
+
+overall manifest:
+f73bc80b2d5a2c0ba720b021385fb3343dedfbe4867351376ca52b086a824260
+
+validation report:
+5b3daf44553a7c99d57c8d5a117ef82de113c4b5cde74ef13dd218c11c56b641
 ```
 
-T4 quota status:
+Azure:
 
 ```text
-region availability: CONFIRMED (Consumption-GPU-NC8as-T4 is offered in southeastasia)
-workload profile creation: SUCCEEDED (gpu-t4 added to cae-jspace-observation-sea)
-job execution: VALIDATED (ACR managed identity smoke, Phase 0.5, Phase 1 dry-run, and small pilot succeeded)
+environment:
+cae-jspace-observation-sea-vnet2
+
+profile/resources:
+Consumption / 2 CPU / 4Gi / no GPU
+
+job:
+job-jspace-parser-v2-set
+
+sole execution:
+job-jspace-parser-v2-set-ib7uc0e
+
+status:
+Succeeded
+
+authentication:
+ManagedIdentityCredential
+
+identity:
+id-jspace-aca-acrpull-sea
 ```
 
-Current blocker: none. The next decision gate is approval of branch-specific success criteria; no Phase 1 scaling is approved.
+The upload used `overwrite=false`, reservation-first/manifest-last ordering,
+exact 26-object membership, and per-object re-download size/SHA-256/ETag
+verification.
 
-If Alan says the PAT is set but Copilot cannot see it, check all scopes:
+After persistence:
 
-```powershell
-[Environment]::GetEnvironmentVariable("GHCR_PAT", "Process")
-[Environment]::GetEnvironmentVariable("GHCR_PAT", "User")
-[Environment]::GetEnvironmentVariable("GHCR_PAT", "Machine")
-```
+- the job was reset to the immutable base image and `/bin/true`;
+- job secrets and secret references are zero;
+- exactly one terminal execution exists;
+- the temporary ACR transport tag and digest were deleted;
+- the local encrypted build context was deleted.
 
-Do not print the token value; only report whether each scope is set.
+Do not restart this job for Phase 1.2A and do not write to the sealed parent.
 
----
+## 7. One-shot holdout rule
 
-## 7. Registry decision
+The holdout is at `SEALED`. It has not advanced to
+`IMPLEMENTATION_FROZEN`, `UNSEAL_AUTHORIZED`, or `INPUTS_READ`.
 
-Current active decision:
+Future workflow:
+
+1. Implement parser v2 using only the public development set.
+2. Freeze and push its implementation commit.
+3. Obtain separate authorization for one locked evaluation.
+4. Produce and seal predictions before labels are read.
+5. Score once against the frozen gates.
+6. Retain PASS or FAIL and retire the holdout.
+
+A parser, schema, assertion, threshold, or scientific failure is not retryable.
+A modified parser requires a new independent holdout.
+
+## 8. Frozen acceptance gates
+
+- overall typed decision: at least 114/120;
+- each answer-bearing stratum: at least 9/10;
+- every stratum: at least 8/10;
+- answer-presence macro-F1: at least 0.95;
+- ambiguity precision/recall: each at least 0.90;
+- no-answer precision/recall: each at least 0.90;
+- boxed/final misses: zero;
+- last-number trap errors: zero;
+- wrong-span errors: at most 1/80;
+- material correctness errors: at most 1/120 and zero in S01/S02;
+- clean pooled parser-v2 count cannot regress versus legacy;
+- at least one critical stratum must strictly improve.
+
+These gates are unevaluated. No parser-v2 PASS/FAIL exists.
+
+## 9. Validation status
 
 ```text
-Active registry path: ACR + user-assigned managed identity
-GHCR: historical/secondary only
+python -m pytest tests\ -q
+460 passed, 2 warnings
 ```
 
-Current ACR state:
+Five post-sealing `gpt-5.6-sol/max` reviews passed:
+
+- `postseal-integrity`
+- `postseal-strata`
+- `postseal-agreement`
+- `postseal-one-shot`
+- `postseal-boundaries`
+
+The secure transport separately passed `secure-persistence-review`.
+
+## 10. Historical behavioral boundary
+
+The last target-model run remains the bounded arithmetic n=3 run:
 
 ```text
-ACR: acrjspaceobssea0708231738
-login server: acrjspaceobssea0708231738.azurecr.io
-image: acrjspaceobssea0708231738.azurecr.io/j-space-observation:c29852ab97b5
-identity: id-jspace-aca-acrpull-sea
-AcrPull: assigned
+source writer commit:
+359643b7b5eb8f95c13cca2e60fa753df8701282
+
+source prefix:
+phase1-limited-n3-gates/20260710T152820Z
+
+observations:
+45
+
+cells:
+15
+
+observations per cell:
+3
 ```
 
-Reason for switching away from GHCR: private GHCR pull auth was blocked (`GHCR_PAT` not visible to agent; `gh auth token` lacked `read:packages`). ACR avoids registry password handling through managed identity.
+The all-45 post hoc audit found 18 parser overflags, zero underflags, 14
+observed extraction errors, two material correctness errors, and 19 material
+evaluator issues. It selected Path C but did not change historical records,
+metrics, classifications, or parser behavior.
 
----
+Raw strict, stopped intervention, and postprocessed utility remain separate.
+Stopped validity is intervention-controlled. Postprocessed validity is
+answer-recovery utility, not raw no-CoT.
 
-## 8. GHCR workflow status
+## 11. Scientific boundaries
 
-The GHCR workflow template exists at:
+- No target-model download, load, or inference occurred in Phase 1.2A.
+- No parser v2 was implemented or evaluated.
+- No locked labels are in the repository.
+- No higher-n or GPU run occurred.
+- Fixtures and consensus labels are not target-model evidence.
+- LLM consensus is not human ground truth.
+- Isolation is procedural and hash-audited, not security-enforced.
+- Historical cells remain n=3 and are not stability evidence.
+- No hidden-reasoning, internal-workspace, invisible-CoT, genuine-no-CoT, or
+  J-space claim is supported.
+
+## 12. Next authorized action
+
+Implement prospective parser v2 using only
+`evaluator_sets/parser_v2_v1/development_cases.jsonl`. Do not read the locked
+inputs or labels. Freeze and push the implementation before requesting separate
+authorization for the one-shot locked evaluation.
+
+Higher-n and every new target-model run remain paused.
+
+## 13. Prompt for the next thread
 
 ```text
-infra/ci/build-ghcr.yml
+Continue Alanjiao1988/J-space-observation from Path C Phase 1.2A.
+
+Read:
+- reports/phase1_parser_v2_validation_set.md
+- docs/phase1_parser_v2_protocol.md
+- docs/phase1_evaluator_validation_set.md
+- docs/phase1_parser_v2_acceptance_gates.json
+- docs/thread_handoff.md
+
+Authoritative historical target:
+deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+
+Current state:
+- Phase 1.2A is SEALED.
+- Public development set: 60 cases.
+- Private locked set: 120 cases.
+- Parser v2 is not implemented.
+- Locked evaluation and higher-n are not authorized.
+- No target-model run occurred.
+
+Task:
+Implement prospective parser v2 using only the public development set. Do not
+access locked inputs or labels. Freeze and push the implementation commit, then
+stop and request separate authorization for the one-shot locked evaluation.
 ```
-
-The workflow is installed at:
-
-```text
-.github/workflows/build-ghcr.yml
-```
-
-Installation commit:
-
-```text
-c07db5c9625a9f9ad96c55f77385c078e11d4a66
-```
-
-The local `gh` token could not install the workflow because it lacked `workflow` scope, but the workflow was successfully installed through the GitHub connector / GitHub App path.
-
-Workflow run:
-
-```text
-run id: 28947916765
-status: completed
-conclusion: success
-url: https://github.com/Alanjiao1988/J-space-observation/actions/runs/28947916765
-```
-
-Images pushed:
-
-```text
-ghcr.io/alanjiao1988/j-space-observation:c07db5c9625a9f9ad96c55f77385c078e11d4a66
-ghcr.io/alanjiao1988/j-space-observation:latest
-```
-
-Package page:
-
-```text
-https://github.com/alanjiao1988/j-space-observation/pkgs/container/j-space-observation
-```
-
-The current `gh` token lacks `read:packages`, so the package versions API returns 403. Workflow logs confirm both tags were pushed. If the GHCR package is private, Azure Container Apps must use GHCR credentials through Azure secrets. Never commit GHCR tokens to the repo.
-
----
-
-## 9. Azure GHCR job script status
-
-GHCR Azure job script exists at:
-
-```text
-infra/azure/scripts/05_run_job_ghcr.sh
-```
-
-Known properties:
-
-- parameterized
-- no hardcoded token
-- reads `GHCR_PAT` from environment / Azure secret only
-- uses GHCR image path
-- supports `JOB_COMMAND` override
-- defaults match the actual created Azure resources:
-  - `rg-jspace-observation-sea`
-  - `cae-jspace-observation-sea`
-  - `job-jspace-ghcr-smoke`
-- has been updated to avoid the live CLI failures:
-  - no `--enable-dedicated-gpu true`
-  - no `--min-nodes/--max-nodes` on `Consumption-GPU-NC8as-T4`
-- uses ARM REST job create/update to avoid Azure CLI `--args -lc ...` parsing failures
-- uses `properties.workloadProfileName` for `gpu-t4`
-- falls back to `gh auth token` only if `GHCR_PAT` is absent, but the available `gh auth token` has already proven insufficient for private GHCR pull
-- supports env aliases:
-  - `JOB_NAME`
-  - `CONTAINERAPPS_ENVIRONMENT`
-  - `WORKLOAD_PROFILE_NAME`
-- avoids passing token values as helper Python command-line arguments
-- can run commands equivalent to:
-
-```bash
-python experiments/phase0_5_jlens_spike.py --skip-fit
-python experiments/phase1_depth_gradient.py --dry-run
-python experiments/phase1_depth_gradient.py \
-  --models deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B \
-  --task-families arithmetic \
-  --depths 1,2,3 \
-  --conditions strict_answer_only,visible_cot,r1_style_thinking \
-  --max-new-tokens 64
-```
-
-GHCR private pull remains historical; do not return to GHCR unless Alan explicitly asks. Active path is ACR managed identity.
-
----
-
-## 10. Immediate next steps for a new thread
-
-The new thread should continue from here:
-
-### Step 1: Decide the parser follow-up before any new model run
-
-The Azure ACR managed-identity chain has already succeeded:
-
-```text
-smoke execution: job-jspace-acr-smoke-9b9wb4z
-phase 0.5 execution: job-jspace-phase05-acr-i110lnu
-phase 1 dry-run execution: job-jspace-phase1-dryrun-acr-v0j1bkd
-small phase 1 pilot execution: job-jspace-phase1-pilot-acr-lhuvwbf
-```
-
-The record-level audit is complete:
-
-1. All 45 generation/eval pairs passed syntax, pairing, membership, field,
-   transformation, parser, metric, and branch checks.
-2. The 18 stored ambiguous records received two independent reviews and
-   arbitration; see `reports/phase1_n3_record_audit.md`.
-3. The review found a last-number extraction limitation, including two records
-   with unique correct answer claims that stored parsing missed.
-4. The flagged-only review cannot exclude parser underflags among the other 27
-   records.
-5. Do not run a higher-n replication without a new preregistered decision.
-6. Keep all branches separate and make no hidden-reasoning or J-space claim.
-
----
-
-## 11. Prompt for the next ChatGPT thread
-
-Alan can paste the following into a new thread:
-
-```text
-We are continuing the J-space observation project.
-
-Repository:
-Alanjiao1988/J-space-observation
-
-Please read docs/thread_handoff.md first, then use the repo documents as source of truth:
-- docs/experiment_plan.md
-- docs/azure_runbook.md
-- docs/decision_log.md
-- docs/run_log.md
-- reports/current_status.md
-
-Current known state:
-- The all-45 semantic-audit image is `acrjspaceobssea0708231738.azurecr.io/j-space-observation:cfa99fc6e204`, digest `sha256:43af06291f6196d5426fe5e014196c86d3d00aae978470d369a9c1c2bd3dfeac`.
-- Azure-first execution policy remains in force; the local PC is orchestration-only.
-- Private Blob persistence is working through `cae-jspace-observation-sea-vnet2`.
-- Bounded n=3 validation succeeded as `job-jspace-p1-n3-gates-02ilmgm`.
-- Results are under `phase1-limited-n3-gates/20260710T152820Z`.
-- Phase 1 has three non-interchangeable branches: raw strict, stopped intervention, and postprocessed utility.
-- Branch success criteria now include absolute accuracy, visible-CoT baseline validity, and `n >= 3` guards.
-- Protocol v1 was frozen before review at `cfa99fc6e204db5cf1076a13a8975e13db226931`.
-- Local model-free tests pass: `217 passed, 2 warnings`.
-- The run produced 45 generation and 45 eval records plus 15 metric rows with `n=3`.
-- Raw strict failed at all depths; stopped and postprocessed utility passed only at depth 1.
-- Depth-3 visible-CoT baseline is invalid (`visible_cot_accuracy_zero`), so relative gates are `NA`.
-- CPU-only record audit `job-jspace-p1-record-audit-d9q5uy8` completed cleanly through the private Blob path.
-- The all-45 two-stage blinded semantic review completed with two independent `gpt-5.6-sol/max` reviewers and a distinct arbiter.
-- Final result: 18 parser overflags, zero underflags, zero true ambiguity, 14 observed extraction errors, 2 material correctness errors, and 19 material evaluator issues.
-- The two correctness errors are `visible_cot` depth-1 records; audit-only visible-CoT depth-1 accuracy is `1.0000` versus stored `0.3333`.
-- Depth-2 visible-CoT becomes invalid under the audit-only parse-valid rate, changing relative-gate applicability but no final branch label.
-- Official stored metrics, classifications, parser behavior, and source artifacts remain unchanged.
-- Nine final machine artifacts are under `phase1-semantic-audits/all45-parser-underflag-20260715T094500Z/final`; the separately verified report is under the sibling `report` prefix.
-- Upload executions `job-jspace-p1-all45-pack-vi79nml` and `job-jspace-p1-all45-pack-61s3ggf` succeeded with exact membership and download/hash verification.
-- All five post-run integrity/agreement/confusion/material-impact/scientific-boundary checks passed.
-- The audit job is idle and contains no temporary transport secret.
-- The preregistered decision is Path C: pause higher-n and validate a locked evaluator/parser-v2 protocol first.
-- No further model run is authorized.
-- No Phase 1 result is hidden-reasoning or J-space evidence.
-
-Your first task:
-Review `reports/phase1_n3_all45_semantic_audit.md`, then design and preregister an evaluator validation set plus prospective parser-v2 protocol. Do not run the model, authorize higher-n, or rewrite historical artifacts.
-```
-
----
-
-## 12. Non-negotiable constraints
-
-- Do not commit secrets.
-- Do not commit model weights.
-- Do not commit Hugging Face cache.
-- Do not commit GHCR PAT.
-- Do not log secret values.
-- Do not run heavy inference locally.
-- Do not fall back to local model inference if Azure quota is missing.
-- Do not create Azure GPU jobs before T4 quota confirmation.
-- Do not claim J-space evidence from Phase 1 behavioral results alone.
-- Do not claim Plan A feasibility until actual J-lens fitting / validation succeeds.
-- Do not merge raw strict, stopped intervention, and postprocessed utility metrics.
-- Do not describe stopped validity as spontaneous no-CoT.
-- Do not describe postprocessed validity as raw no-CoT.

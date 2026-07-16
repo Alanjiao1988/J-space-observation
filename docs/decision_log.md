@@ -927,3 +927,91 @@ Consequence:
 - The review adds no behavioral observations, leaves each cell at `n=3`, and
   supports no hidden-reasoning, internal-workspace, invisible-CoT, genuine
   no-CoT, or J-space claim.
+
+## 2026-07-15 — freeze the Phase 1.2A parser-v2 validation protocol
+
+Decision:
+
+- Freeze the parser-v2 extraction contract, 12-stratum evaluator-set design,
+  machine-readable acceptance gates, two-stage independent labeling workflow,
+  private Blob layout, and one-shot retirement policy before eligible case
+  construction.
+- Use 60 open development cases and 120 private locked cases.
+- Keep locked inputs, labels, mappings, salts, and reviewer rows outside normal
+  Git paths.
+
+Registered provenance:
+
+```text
+final protocol commit: cc93ffe603ab8338ed860586a52b1911af4b3277
+protocol bundle SHA-256: 5d486a53b532012c3a64eb6bd962be325fb9892ebbb042807b919f9e41b23666
+acceptance-gate SHA-256: a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988
+```
+
+Reason:
+
+- The all-45 audit showed that historical parser behavior was not adequate for
+  a higher-n decision.
+- A prospective, reference-isolated, typed-decision evaluator was required
+  before parser changes or new target-model observations.
+- Acceptance thresholds must be fixed before construction and before any
+  locked result.
+
+Consequence:
+
+- Candidate material created before final amendments was discarded.
+- Parser v2 may later be developed only against the open set.
+- The future locked evaluation is formal and one-shot. PASS and FAIL both
+  retire the holdout; a changed parser requires a new independent holdout.
+
+## 2026-07-16 — lock the Phase 1.2A evaluator validation set
+
+Decision:
+
+- Accept the independently constructed and labeled 60/120 evaluator set as
+  `SEALED`.
+- Persist the exact 26 registered artifacts under:
+  `phase1-evaluator-validation/parser-v2-v1/20260716T024856Z`.
+- Stop before parser-v2 implementation, locked evaluation, or higher-n.
+
+Evidence:
+
+- All S01-S12 quotas are exact: development 5 and locked 10 per stratum.
+- Locked support is 80 present, 10 ambiguous, and 30 no answer.
+- Stage-1 reviewers completed 120/120 each; 57 disagreements were arbitrated.
+- Stage-2 reviewers completed 120/120 each with zero disagreements.
+- Final labels are 120/120 with zero unresolved and seven valid review seals.
+- Exact, normalized, cross-set template, and historical hard overlaps are zero;
+  all 37 near-duplicate findings are dispositioned.
+- All five independent `gpt-5.6-sol/max` post-sealing reviews passed.
+- Final model-free validation is `460 passed, 2 warnings`.
+
+Private release bindings:
+
+```text
+final labels: 44d3830c5ce3f9fdd5ba3059f63ba5d8a89f76152c0fe2eb128080b40af448af
+locked-label manifest: aa53cb8a808a213423f8deb7370d880c5b1c934073301356aabb593db17fd5b6
+overall manifest: f73bc80b2d5a2c0ba720b021385fb3343dedfbe4867351376ca52b086a824260
+validation report: 5b3daf44553a7c99d57c8d5a117ef82de113c4b5cde74ef13dd218c11c56b641
+```
+
+Azure consequence:
+
+- The sole persistence execution
+  `job-jspace-parser-v2-set-ib7uc0e` succeeded on Consumption with 2 CPU /
+  4 GiB and no GPU.
+- Uploads used managed identity, the private Blob endpoint,
+  `overwrite=false`, reservation-first/manifest-last ordering, exact membership,
+  and per-object re-download verification.
+- The job is idle on the immutable base with `/bin/true`, zero secrets, and
+  zero secret references. The temporary transport image was deleted.
+- Do not rerun the sealing execution or write to the sealed parent.
+
+Scientific consequence:
+
+- LLM labels are operational consensus references, not human ground truth.
+- Procedural blindness is hash-audited, not security-enforced.
+- No parser-v2 PASS/FAIL exists because locked evaluation was not run.
+- No target-model download/load/inference, higher-n run, new behavioral
+  evidence, hidden-reasoning result, internal-workspace result, or J-space
+  result was produced.

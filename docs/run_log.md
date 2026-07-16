@@ -2162,3 +2162,175 @@ Final local validation:
 python -m pytest tests\ -q
 217 passed, 2 warnings
 ```
+
+## 2026-07-15 to 2026-07-16 — Phase 1.2A evaluator-set construction
+
+Scope:
+
+- Selected preregistered Path C.
+- Froze the prospective parser-v2 protocol, evaluator-set design, acceptance
+  gates, independent labeling workflow, sealing layout, and one-shot policy
+  before eligible construction.
+- Historical experimental target:
+  `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`.
+- Engineering, curation, review, and arbitration agents:
+  `gpt-5.6-sol`, reasoning effort `max`.
+
+Protocol:
+
+```text
+final protocol commit: cc93ffe603ab8338ed860586a52b1911af4b3277
+protocol bundle: 5d486a53b532012c3a64eb6bd962be325fb9892ebbb042807b919f9e41b23666
+acceptance gates: a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988
+tooling/development commit: e7a95a458d05d4ef211bb6902c2a20cb5f16bf60
+production-ingress commit: 297420abfebb65c9f3702c56f28fe5a193913cd0
+no-Git validation commit: 9b4262a9d35e6342935b8d2f72887a56c5f98486
+```
+
+Construction:
+
+- Curator A and B independently produced 144 post-freeze candidates each.
+- Curator C selected exactly 60 development and 120 locked cases.
+- Development and locked quotas are exactly 5/10 for every S01-S12 stratum.
+- Locked support: 80 present, 10 ambiguous, 30 no answer.
+- Historical hard overlaps: 0.
+- Near-duplicate findings: 37, all dispositioned.
+
+Labeling:
+
+- Stage-1 A/B: 120/120 each; 57 disagreements and 57 arbitration rows.
+- Stage-1 consensus: 120; unresolved: 0.
+- Stage-2 A/B: 120/120 each; disagreements/arbitrations: 0.
+- Final operational labels: 120; unresolved: 0.
+- Seven immutable review seals passed.
+- These are LLM operational consensus references, not human ground truth.
+
+Local release:
+
+```text
+parent: phase1-evaluator-validation/parser-v2-v1/20260716T024856Z
+artifacts: 26
+development: 60
+locked: 120
+final labels: 44d3830c5ce3f9fdd5ba3059f63ba5d8a89f76152c0fe2eb128080b40af448af
+locked-label manifest: aa53cb8a808a213423f8deb7370d880c5b1c934073301356aabb593db17fd5b6
+overall manifest: f73bc80b2d5a2c0ba720b021385fb3343dedfbe4867351376ca52b086a824260
+validation report: 5b3daf44553a7c99d57c8d5a117ef82de113c4b5cde74ef13dd218c11c56b641
+```
+
+Execution boundary:
+
+- Target-model download/load/inference: none.
+- Parser-v2 implementation: none.
+- Locked evaluation: none.
+- Higher-n run: none.
+- GPU: none.
+
+## 2026-07-16 — Phase 1.2A CPU-only private Blob sealing
+
+Read-only preflight:
+
+- Environment `cae-jspace-observation-sea-vnet2`: Succeeded.
+- Workload profile: Consumption.
+- Storage public network: Disabled.
+- Blob private endpoint and private DNS: present.
+- Shared-key access: disabled.
+- Managed identity `id-jspace-aca-acrpull-sea`: `AcrPull` and
+  `Storage Blob Data Contributor`.
+- Fixed job `job-jspace-parser-v2-set`: absent before creation.
+- Stale `parser-v2-seal-*` ACR tags: none.
+
+Failed safe build:
+
+```text
+ACR run: cmf
+status: Failed
+start: 2026-07-16T04:05:15Z
+finish: 2026-07-16T04:07:55Z
+```
+
+The direct full-repository build stopped on the frozen all-45 Docker attestation
+because new Phase 1.2A behavior files are intentionally outside that image
+contract. No image was published, no Container Apps execution was created, and
+no Blob was written. The frozen attestation was not weakened.
+
+Secure transport:
+
+- Independent reviewer: `secure-persistence-review`,
+  `gpt-5.6-sol/max`, PASS.
+- Exact implementation commit:
+  `9b4262a9d35e6342935b8d2f72887a56c5f98486`.
+- Immutable base:
+  `acrjspaceobssea0708231738.azurecr.io/j-space-observation@sha256:43af06291f6196d5426fe5e014196c86d3d00aae978470d369a9c1c2bd3dfeac`.
+- Encrypted overlay build: `cmg`, Succeeded.
+- Build start/finish:
+  `2026-07-16T04:58:14Z` / `2026-07-16T05:00:29Z`.
+- Temporary digest:
+  `sha256:cd7371b7959b4eb577f75d40f0a5a7c71b585109c5ca5a072dfaccc6492efa54`.
+- Sealing-code manifest:
+  `1e6100a97cfc914b587cc6e4a1b11f3ce4483da45ae96543cc5c0c237aaf3c59`.
+
+Azure execution:
+
+```text
+Date: 2026-07-16
+Command: one manual CPU-only parser-v2 validation-set persistence start
+Resource: job-jspace-parser-v2-set
+Region: Southeast Asia
+Environment: cae-jspace-observation-sea-vnet2
+SKU / workload profile: Consumption
+Resources: 2 CPU / 4Gi
+GPU: none
+Run ID / job execution: job-jspace-parser-v2-set-ib7uc0e
+Start time: 2026-07-16T05:02:37Z
+End time: 2026-07-16T05:04:04Z
+Status: Succeeded
+Blob parent: phase1-evaluator-validation/parser-v2-v1/20260716T024856Z
+Authentication: ManagedIdentityCredential
+Overwrite: false
+```
+
+Persistence result:
+
+- Exact registered membership: 26 objects.
+- Reservations were first; every leaf manifest and the overall manifest were
+  last.
+- Exact membership was checked before and after each manifest.
+- All 26 objects were downloaded again and verified by size, SHA-256, and ETag
+  before the container returned success.
+- Source prefixes were not opened for write or modified.
+
+Cleanup:
+
+- Actual execution count: 1; all executions terminal.
+- Job reset to the immutable base image and `/bin/true`.
+- Job secret count: 0; secret-reference count: 0.
+- Temporary ACR tag and digest: deleted and absence verified.
+- Local encrypted build context: deleted.
+- Stop/cost note: one 87-second Consumption execution; no GPU and no retry.
+
+Post-sealing reviews:
+
+| Check | Agent | Result |
+|---|---|---|
+| integrity | `postseal-integrity` | PASS |
+| strata | `postseal-strata` | PASS |
+| label agreement | `postseal-agreement` | PASS |
+| sealing / one-shot | `postseal-one-shot` | PASS |
+| scientific boundaries | `postseal-boundaries` | PASS |
+
+Final local model-free validation:
+
+```text
+python -m pytest tests\ -q
+460 passed, 2 warnings
+```
+
+Scientific boundary:
+
+- Phase state is `SEALED`, not evaluated.
+- No parser-v2 PASS/FAIL exists.
+- No target model was loaded, downloaded, or run.
+- No new behavioral observation or higher-n cell was created.
+- No human-ground-truth, hidden-reasoning, internal-workspace, or J-space claim
+  is made.

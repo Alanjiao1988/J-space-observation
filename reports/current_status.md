@@ -2,11 +2,13 @@
 
 ## Summary
 
-The executable scaffold, private Azure path, hardened branch gates, and bounded n=3 Phase 1 validation are complete.
+The executable scaffold, bounded n=3 audit, and Path C Phase 1.2A evaluator
+validation set are complete. The 60-case development set is public; the
+120-case locked set is privately sealed and unevaluated.
 
 ## Current Phase
 
-**Phase: bounded n=3 validation and record-level artifact audit complete**
+**Phase: Path C Phase 1.2A complete at SEALED; parser-v2 implementation pending**
 
 ## ACR Managed Identity Azure Execution (2026-07-08)
 
@@ -642,6 +644,80 @@ machine artifacts used exact membership, manifest-last upload, and per-file
 download/hash verification. The report was kept outside that membership and
 was independently downloaded and hash-verified. All five independent post-run
 checks passed. The transport secret was removed and the job is idle.
+
+## Path C Phase 1.2A Evaluator Validation Set (2026-07-16)
+
+Phase 1.2A preregistered, constructed, independently labeled, validated, and
+privately sealed the prospective parser-v2 evaluator set.
+
+Frozen provenance:
+
+```text
+starting commit: 58d299bb66c5536a0f1b7d0617204472fbb8c212
+final protocol commit: cc93ffe603ab8338ed860586a52b1911af4b3277
+tooling/development commit: e7a95a458d05d4ef211bb6902c2a20cb5f16bf60
+sealed no-Git validation commit: 9b4262a9d35e6342935b8d2f72887a56c5f98486
+protocol bundle: 5d486a53b532012c3a64eb6bd962be325fb9892ebbb042807b919f9e41b23666
+acceptance gates: a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988
+```
+
+Dataset:
+
+- Development: 60, exactly five per S01-S12.
+- Locked: 120, exactly ten per S01-S12.
+- Locked support: 80 present, 10 ambiguous, 30 no answer.
+- Locked critical/material cases: 80/68.
+- Exact, normalized, cross-set template, and historical hard overlaps: zero.
+- Reviewed near-duplicate findings: 37, all dispositioned.
+- Public development SHA-256:
+  `bfaeca837ecfe8673df834c5b8a4fc1626f0835c6ae35c0821acf59bd6e4ac27`.
+
+Independent labeling:
+
+- Stage-1 A/B: 120/120 each, reference-blind.
+- Stage-1 arbitration: 57; Stage-2 arbitration: 0.
+- Stage-2 A/B correctness agreement: 120/120, kappa 1.
+- Final labels: 120; unresolved: 0.
+- Seven review seals validate.
+- Labels are LLM operational consensus references, not human ground truth.
+
+Private release:
+
+```text
+parent: phase1-evaluator-validation/parser-v2-v1/20260716T024856Z
+artifacts: 26
+final labels: 44d3830c5ce3f9fdd5ba3059f63ba5d8a89f76152c0fe2eb128080b40af448af
+locked-label manifest: aa53cb8a808a213423f8deb7370d880c5b1c934073301356aabb593db17fd5b6
+overall manifest: f73bc80b2d5a2c0ba720b021385fb3343dedfbe4867351376ca52b086a824260
+validation report: 5b3daf44553a7c99d57c8d5a117ef82de113c4b5cde74ef13dd218c11c56b641
+```
+
+Azure persistence:
+
+- ACR build `cmf` failed safely against the frozen all-45 Docker attestation;
+  no image, execution, or Blob write resulted.
+- Encrypted overlay build `cmg` used immutable base digest
+  `sha256:43af06291f6196d5426fe5e014196c86d3d00aae978470d369a9c1c2bd3dfeac`.
+- The sole CPU execution, `job-jspace-parser-v2-set-ib7uc0e`, succeeded in
+  `cae-jspace-observation-sea-vnet2` on Consumption with 2 CPU / 4 GiB and no
+  GPU.
+- Managed identity, private Blob, `overwrite=false`, reservation-first,
+  manifest-last, exact 26-object membership, and per-object re-download
+  verification were enforced.
+- The job is reset to the immutable base with `/bin/true`; secrets and secret
+  references are zero.
+- The temporary transport tag/digest and local encrypted build context were
+  deleted.
+
+All five independent post-sealing reviews passed. Final model-free tests:
+`460 passed, 2 warnings`.
+
+The holdout is `SEALED`, not evaluated. Parser v2 is not implemented, locked
+inputs have not been exposed for evaluation, and no acceptance-gate result
+exists. No target-model download/load/inference, higher-n run, new behavioral
+evidence, hidden-reasoning claim, or J-space claim occurred.
+
+Detailed report: `reports/phase1_parser_v2_validation_set.md`.
 
 ## Phase 1 n=3 Record-Level Artifact Audit (2026-07-11)
 
@@ -1310,10 +1386,13 @@ J-space-observation/
 
 ## Next Immediate Actions
 
-1. Obtain explicit approval for one limited-scale Phase 1 run scope.
-2. Keep the existing models, task families, and items per cell unchanged.
-3. Apply the preregistered criteria without post-hoc threshold changes.
-4. Keep raw, stopped, and postprocessed classifications separate.
+1. Implement prospective parser v2 using only the open development set.
+2. Freeze and push the parser implementation commit before any locked-input
+   read.
+3. Separately authorize one locked evaluation against the frozen gates.
+4. Retire the holdout after PASS or FAIL; use a new holdout for any modified
+   parser.
+5. Keep higher-n and all new target-model runs paused.
 
 ## Success Criteria
 
@@ -1323,5 +1402,8 @@ J-space-observation/
 ✓ **Pilot**: Small stop-controlled Phase 1 run persisted successfully
 ✓ **Reporting**: Raw strict, stopped intervention, and postprocessed utility are separate
 ✓ **Criteria**: Branch-specific thresholds preregistered before further runs
-⏳ **Pending**: Preregistered parser follow-up decision before any new model run
+✓ **Path C Phase 1.2A**: 60/120 evaluator set validated and privately sealed
+✓ **Isolation**: Locked inputs/labels remain outside Git; five post-sealing reviews passed
+⏳ **Pending**: Development-only prospective parser-v2 implementation and freeze
+⏳ **Pending**: One separately authorized locked validation evaluation
 ⏳ **Pending**: Actual J-lens fitting and validation
