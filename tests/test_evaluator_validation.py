@@ -1264,6 +1264,34 @@ def test_frozen_protocol_hash_uses_git_blobs_not_checkout_line_endings():
     assert v.protocol_bundle_sha256(ROOT) == digest
 
 
+def test_frozen_protocol_hash_uses_pinned_files_when_git_is_unavailable(
+    workdir, monkeypatch
+):
+    for relative in v.PROTOCOL_FILES:
+        destination = workdir.joinpath(*relative.split("/"))
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(
+            v.git_blob_bytes(ROOT, v.FROZEN_PROTOCOL_COMMIT, relative)
+        )
+    monkeypatch.setattr(
+        v.subprocess,
+        "run",
+        lambda *args, **kwargs: SimpleNamespace(returncode=1, stdout=b""),
+    )
+    assert v.protocol_bundle_sha256(workdir) == v.FROZEN_PROTOCOL_BUNDLE_SHA256
+    assert (
+        v.acceptance_gates_sha256(workdir)
+        == v.FROZEN_ACCEPTANCE_GATE_SHA256
+    )
+    with pytest.raises(v.ValidationSetError, match="Git blob is unavailable"):
+        v.git_blob_bytes(workdir, "a" * 40, v.PROTOCOL_FILES[0])
+
+    tampered = workdir.joinpath(*v.PROTOCOL_FILES[0].split("/"))
+    tampered.write_bytes(tampered.read_bytes() + b"x")
+    with pytest.raises(v.ValidationSetError, match="hash mismatch"):
+        v.protocol_bundle_sha256(workdir)
+
+
 def test_final_v12_protocol_bindings_are_exact():
     assert (
         v.FROZEN_PROTOCOL_COMMIT

@@ -1430,11 +1430,24 @@ def git_blob_bytes(
         check=False,
         capture_output=True,
     )
-    if completed.returncode != 0:
+    if completed.returncode == 0:
+        return completed.stdout
+    expected = FROZEN_PROTOCOL_FILE_SHA256S.get(normalized)
+    if commit != FROZEN_PROTOCOL_COMMIT or expected is None:
         raise ValidationSetError(
             f"Git blob is unavailable at {commit}:{normalized}"
         )
-    return completed.stdout
+    try:
+        content = root.joinpath(*normalized.split("/")).read_bytes()
+    except OSError as exc:
+        raise ValidationSetError(
+            f"frozen protocol file is unavailable: {normalized}"
+        ) from exc
+    if sha256_bytes(content) != expected:
+        raise ValidationSetError(
+            f"frozen protocol file hash mismatch: {normalized}"
+        )
+    return content
 
 
 def protocol_bundle_sha256(
