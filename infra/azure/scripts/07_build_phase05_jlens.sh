@@ -88,6 +88,48 @@ if [[ ! "$DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
     exit 1
 fi
 
+az acr repository update \
+    --name "$ACR_NAME" \
+    --image "${IMAGE_REPOSITORY}:${PROJECT_SHA}" \
+    --write-enabled false \
+    --delete-enabled false \
+    --output none
+az acr repository update \
+    --name "$ACR_NAME" \
+    --image "${IMAGE_REPOSITORY}@${DIGEST}" \
+    --write-enabled false \
+    --delete-enabled false \
+    --output none
+TAG_WRITE_ENABLED="$(az acr repository show \
+    --name "$ACR_NAME" \
+    --image "${IMAGE_REPOSITORY}:${PROJECT_SHA}" \
+    --query writeEnabled -o tsv)"
+TAG_DELETE_ENABLED="$(az acr repository show \
+    --name "$ACR_NAME" \
+    --image "${IMAGE_REPOSITORY}:${PROJECT_SHA}" \
+    --query deleteEnabled -o tsv)"
+MANIFEST_WRITE_ENABLED="$(az acr repository show \
+    --name "$ACR_NAME" \
+    --image "${IMAGE_REPOSITORY}@${DIGEST}" \
+    --query writeEnabled -o tsv)"
+MANIFEST_DELETE_ENABLED="$(az acr repository show \
+    --name "$ACR_NAME" \
+    --image "${IMAGE_REPOSITORY}@${DIGEST}" \
+    --query deleteEnabled -o tsv)"
+LOCKED_TAG_DIGEST="$(az acr repository show-manifests \
+    --name "$ACR_NAME" \
+    --repository "$IMAGE_REPOSITORY" \
+    --query "[?tags[?@=='${PROJECT_SHA}']].digest | [0]" \
+    -o tsv)"
+if [[ "${TAG_WRITE_ENABLED,,}" != "false" \
+    || "${TAG_DELETE_ENABLED,,}" != "false" \
+    || "${MANIFEST_WRITE_ENABLED,,}" != "false" \
+    || "${MANIFEST_DELETE_ENABLED,,}" != "false" \
+    || "$LOCKED_TAG_DIGEST" != "$DIGEST" ]]; then
+    echo "[FAIL] ACR tag/manifest immutability lock verification failed"
+    exit 1
+fi
+
 REQUIREMENTS_SHA="$(sha256sum "$PROJECT_ROOT/requirements-jlens.txt" | awk '{print $1}')"
 DOCKERFILE_SHA="$(sha256sum "$PROJECT_ROOT/Dockerfile.jlens" | awk '{print $1}')"
 python - "$RECORD_DIR/phase05_jlens_acr_build.json" <<PY
@@ -106,8 +148,14 @@ record = {
     "image_tag": "$PROJECT_SHA",
     "image_ref": "$IMAGE_REF",
     "image_digest": "$DIGEST",
+    "locked_tag_digest": "$LOCKED_TAG_DIGEST",
     "acr_build_run_id": "$RUN_ID",
     "acr_build_status": "$STATUS",
+    "tag_write_enabled": False,
+    "tag_delete_enabled": False,
+    "manifest_write_enabled": False,
+    "manifest_delete_enabled": False,
+    "immutability_verified": True,
     "latest_used": False,
 }
 Path("$RECORD_DIR/phase05_jlens_acr_build.json").write_text(

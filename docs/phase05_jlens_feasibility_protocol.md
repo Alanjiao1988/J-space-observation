@@ -108,7 +108,13 @@ When Blob variables are configured, each snapshot is uploaded with
 `DefaultAzureCredential` restricted to managed identity. Blob writes use
 `overwrite=False`; the artifact manifest is last. An operational retry can set
 `JSPACE_BLOB_RESUME_PREFIX` to restore the newest prior snapshot before
-continuing. Upload failure is explicit in local stage/environment output.
+continuing. Upload history is explicit and every stage/final write is required.
+A required failure is `checkpoint_failure`, makes the decision BLOCKED, and
+forces nonzero exit. Before real F2 that is UNRATED; after real F2 it is AMBER.
+The final snapshot keeps local outputs BLOCKED while a sibling completion
+payload is staged, is valid only when its manifest upload is confirmed last,
+and promotes identical bytes locally after confirmation with the same snapshot
+timestamp. Unconfigured local runs do not require Blob.
 
 Stage ordering is strict: F0 → F1 → F2 → F3 → F4, then optional F5. A failed
 prerequisite blocks all later stages.
@@ -154,9 +160,11 @@ It selects the observed middle source layer (13 for 28 layers), target layer
 
 F2 records wall time, peak allocated/reserved VRAM, free/total VRAM, host RSS,
 sequence length, valid positions, passes, layers, shape/dtype/norm, and saves a
-hashed F2 artifact. Before F3, a conservative two-prompt projection at the
-measured F2 rate plus export reserve must remain inside the 6120-second
-planning budget.
+hashed F2 artifact. Before F3, the dim-1 projection scales measured F2 time by
+both prompt count and the backward layer span. For this layout, F2 spans
+13→27 while F3's earliest layer spans 6→27, so the conservative multiplier is
+`2 × (21/14) = 3`. That projection plus export reserve must remain inside the
+6120-second planning budget.
 
 ### F3 — two-prompt, three-layer fit
 
@@ -170,10 +178,15 @@ The ordered two-prompt generic corpus is
 recorded. It contains no Phase 1 tasks, answers, answer-only output, reference
 answers, or evaluator fixtures.
 
-The official `fit` call uses `checkpoint_every=1` and `resume=True`. Success
-requires `n_prompts=2`, exactly three finite fp32 `[1536,1536]` matrices, valid
-official checkpoint state, an external controls manifest, successful
-`JacobianLens.save/load`, hashes, and bounded fp16 save/load numerical error.
+Official `fit` always uses `checkpoint_every=1` and `resume=True`. From state
+0/0 it first fits the one-prompt prefix, verifies `n_done=next_idx=1`, updates
+and hashes the external progress manifest, and persists the versioned
+`F3-prompt-1` snapshot. State 1/1 re-persists that checkpoint; state 2/2 loads
+the completed checkpoint. It then resumes official fit over both prompts.
+Success requires `n_prompts=2`, exactly three finite fp32 `[1536,1536]`
+matrices, valid official checkpoint state, an external controls manifest,
+successful `JacobianLens.save/load`, hashes, and bounded fp16 save/load error.
+Any other `(n_done,next_idx)` pair is a checkpoint failure.
 
 Measured F0/F1 environment/model-load overhead plus per-prompt fit time
 produces two explicit scaling projections:
@@ -221,7 +234,8 @@ watchdog, with green memory. Otherwise its terminal status is
 - Host hard stop: process RSS ≥90%
 
 The F2/F3 peak/free measurements, not nominal model size, control continuation
-and the final decision.
+and the final decision. A successful F3 measurement classified `stop`
+immediately blocks F4/F5 and exits nonzero.
 
 ## Failure and decision taxonomy
 
@@ -274,8 +288,10 @@ ACR_NAME=<private-acr> \
 
 The repository/tag is exactly
 `j-space-observation-jlens:<PROJECT_SHA>`; `:latest` and tag overwrite are
-rejected. The script records ACR run ID, image reference/digest, project SHA,
-and requirements/Dockerfile hashes under ignored `results/runs/`.
+rejected. After build, both the project-SHA tag and resolved manifest have
+write/delete disabled and those attributes are read back before success. The
+script records ACR run ID, image reference/digest, locks, project SHA, and
+requirements/Dockerfile hashes under ignored `results/runs/`.
 
 Start the primary execution:
 
@@ -298,19 +314,29 @@ The script fixes:
   key/SAS, no public network, and no Azure Files;
 - `replicaRetryLimit=0`.
 
+The job template uses the immutable `repository@sha256:...` image reference
+while recording both tag and digest references. After ARM PUT, the run script
+polls `properties.provisioningState` to `Succeeded` and will not call
+`job start` on terminal failure or timeout.
+
 At most one operational correction is permitted. It must reuse the primary
 run timestamp and document the correction:
 
 ```bash
 ACR_NAME=<private-acr> ATTEMPT_KIND=operational-fix \
 JSPACE_PHASE05_RUN_ID=<same UTC timestamp> \
+PRIMARY_PROJECT_SHA=<primary 40-hex project SHA> \
 OPERATIONAL_FIX_NOTE='<documented operational correction>' \
   bash infra/azure/scripts/08_run_phase05_jlens.sh
 ```
 
-The run script queries prior executions and rejects a second primary, a retry
-without exactly one prior execution, or any third execution. It never retries
-the job automatically. If and only if main separately authorized a targeted
-J-lens compatibility change, add
+The run script requires exactly one prior execution and refuses retry unless it
+is terminal and failed (never running or succeeded). Before overwriting the job
+template it verifies the existing run-ID/primary-attempt environment plus
+project, phase, policy, run-ID, primary SHA, and project-SHA tags.
+`PRIMARY_PROJECT_SHA` is mandatory even when the retry uses the same SHA; a
+different retry SHA is allowed only after matching the stored primary SHA.
+Any third execution is rejected and no job is retried automatically. If and
+only if main separately authorized a targeted J-lens compatibility change, add
 `AUTHORIZED_COMPATIBILITY_FIX_ATTEMPTED=true`; the primary attempt rejects
 that flag.

@@ -287,6 +287,45 @@ def test_dynamic_dim_batch_uses_registered_f2_margin():
     )
 
 
+def test_f3_dim1_time_guard_scales_by_prompt_count_and_layer_span():
+    guard = p05.f3_dim1_time_guard(
+        elapsed_seconds=100,
+        f2_wall_seconds=200,
+        f2_source_layer=13,
+        f3_source_layers=[6, 13, 20],
+        target_layer=27,
+    )
+    assert guard["f2_layer_span"] == 14
+    assert guard["f3_earliest_layer_span"] == 21
+    assert guard["layer_span_ratio"] == 1.5
+    assert guard["conservative_multiplier"] == 3.0
+    assert guard["projected_fit_seconds"] == 600
+
+
+def test_f3_checkpoint_actions_cover_zero_one_and_two_prompt_states():
+    assert p05.f3_checkpoint_actions(0, 0) == [
+        "fit_prompt_1",
+        "persist_prompt_1",
+        "fit_full_resume",
+    ]
+    assert p05.f3_checkpoint_actions(1, 1) == [
+        "persist_prompt_1",
+        "fit_full_resume",
+    ]
+    assert p05.f3_checkpoint_actions(2, 2) == ["load_full_resume"]
+    with pytest.raises(p05.CheckpointValidationError):
+        p05.f3_checkpoint_actions(1, 2)
+
+
+def test_f3_memory_stop_is_a_hard_stop():
+    assert p05.f3_memory_requires_stop(
+        {"details": {"memory": {"classification": "stop"}}}
+    )
+    assert not p05.f3_memory_requires_stop(
+        {"details": {"memory": {"classification": "green"}}}
+    )
+
+
 def test_f5_cost_guard_skips_without_time_or_memory_margin():
     allowed = p05.f5_cost_guard(
         elapsed_seconds=100,
@@ -392,6 +431,9 @@ def test_checkpoint_external_manifest_controls_and_hash():
 def test_manifest_ordering_hash_and_corpus_order(tmp_path):
     (tmp_path / "z.txt").write_text("z", encoding="utf-8")
     (tmp_path / "a.txt").write_text("a", encoding="utf-8")
+    hidden = tmp_path / ".snapshot-staging"
+    hidden.mkdir()
+    (hidden / "partial.json").write_text("incomplete", encoding="utf-8")
     manifest = p05.build_artifact_manifest(
         tmp_path, generated_at_utc="2026-07-16T00:00:00Z"
     )
@@ -422,6 +464,54 @@ def test_managed_identity_auth_rejects_secret_bearing_configuration():
         )
     with pytest.raises(p05.Phase05ValidationError):
         p05.validate_blob_auth_config({"credential_mode": "shared_key"})
+
+
+def test_persistence_gate_requires_every_upload_and_final_manifest():
+    awaiting = p05.persistence_summary([], configured=True)
+    assert awaiting["ready"] is False
+    assert awaiting["status"] == "awaiting_final_manifest_completion"
+
+    final = {
+        "stage_label": "final",
+        "required": True,
+        "status": "confirmed",
+        "manifest_uploaded_last": True,
+    }
+    assert p05.persistence_summary([final], configured=True)["ready"] is True
+
+    failed_stage = {
+        "stage_label": "F3-prompt-1",
+        "required": True,
+        "status": "failed",
+        "manifest_uploaded_last": False,
+    }
+    failed = p05.persistence_summary([failed_stage, final], configured=True)
+    assert failed["ready"] is False
+    assert failed["failure_class"] == "checkpoint_failure"
+    assert p05.persistence_summary([], configured=False)["ready"] is True
+
+
+def test_persistence_failure_blocks_green_after_real_f2():
+    persistence = p05.persistence_summary(
+        [
+            {
+                "stage_label": "final",
+                "required": True,
+                "status": "failed",
+                "manifest_uploaded_last": False,
+            }
+        ],
+        configured=True,
+    )
+    decision = p05.derive_decision(
+        successful_results(),
+        authorized_compatibility_fix_attempted=False,
+        scaling_plan=executable_scaling(),
+        persistence=persistence,
+    )
+    assert decision["decision"] == "AMBER"
+    assert decision["gate_status"] == "BLOCKED"
+    assert decision["persistence_failure_class"] == "checkpoint_failure"
 
 
 def test_default_credential_chain_leaves_only_managed_identity():
@@ -505,6 +595,79 @@ def test_failed_blob_recovery_blocks_before_model_or_gpu(monkeypatch, tmp_path):
     assert all(stages[stage]["status"] == "blocked" for stage in p05.STAGES[1:])
 
 
+def test_configured_upload_failure_never_returns_success(monkeypatch, tmp_path):
+    monkeypatch.delenv("JSPACE_BLOB_RESUME_PREFIX", raising=False)
+    args = runner_module.parse_args(
+        [
+            "--output-dir",
+            str(tmp_path),
+            "--corpus",
+            str(ROOT / "data" / "jlens_feasibility_prompts.jsonl"),
+        ]
+    )
+    runner = runner_module.Phase05Runner(args)
+    runner.blob.account = "configured-account"
+    runner.blob.container = "configured-container"
+
+    def fail_upload(*_args, **_kwargs):
+        raise RuntimeError("simulated upload failure")
+
+    monkeypatch.setattr(runner.blob, "upload_snapshot", fail_upload)
+    assert runner.run() == 6
+    decision = json.loads(
+        (tmp_path / "phase05_jlens_decision.json").read_text(encoding="utf-8")
+    )
+    assert decision["decision"] == "UNRATED"
+    assert decision["gate_status"] == "BLOCKED"
+    assert decision["persistence"]["status"] == "checkpoint_failure"
+    assert "GREEN" not in (tmp_path / "phase05_jlens_report.md").read_text(
+        encoding="utf-8"
+    )
+
+
+def test_final_manifest_snapshot_matches_local_outputs(monkeypatch, tmp_path):
+    args = runner_module.parse_args(
+        [
+            "--output-dir",
+            str(tmp_path),
+            "--corpus",
+            str(ROOT / "data" / "jlens_feasibility_prompts.jsonl"),
+        ]
+    )
+    runner = runner_module.Phase05Runner(args)
+    runner.blob.account = "configured-account"
+    runner.blob.container = "configured-container"
+    runner.results = successful_results()
+    runner.scaling_plan = executable_scaling()
+    captured = {}
+
+    def successful_upload(output_dir, stage, sequence):
+        files = runner.blob.snapshot_files(output_dir)
+        captured.update(
+            {
+                path.relative_to(output_dir).as_posix(): path.read_bytes()
+                for path in files
+            }
+        )
+        return {
+            "status": "uploaded",
+            "uploaded": len(files),
+            "prefix": runner.blob.snapshot_destination(stage, sequence),
+            "manifest_uploaded_last": True,
+        }
+
+    monkeypatch.setattr(runner.blob, "upload_snapshot", successful_upload)
+    assert runner.persist("final") is True
+    assert runner.persistence_status()["final_manifest_completion_confirmed"] is True
+    for relative, blob_bytes in captured.items():
+        assert (tmp_path / relative).read_bytes() == blob_bytes
+    assert not (tmp_path / ".snapshot-staging").exists()
+    decision = json.loads(
+        (tmp_path / "phase05_jlens_decision.json").read_text(encoding="utf-8")
+    )
+    assert decision["decision"] == "GREEN"
+
+
 def test_output_schema_validator_rejects_wrong_metrics_header():
     with pytest.raises(p05.Phase05ValidationError):
         p05.validate_output_schema(
@@ -530,6 +693,11 @@ def test_runner_contains_real_official_calls_and_no_substitution():
     assert "torch.no_grad" not in source
     assert "protocol.MODEL_ID" in source
     assert "protocol.MODEL_REVISION" in source
+    assert "prompts=prompts[:1]" in source
+    assert 'self.persist("F3-prompt-1")' in source
+    assert source.index("f3_memory_requires_stop") < source.index(
+        'self.execute("F4"'
+    )
 
 
 def test_requirements_and_image_are_exact_and_isolated():
@@ -563,6 +731,9 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     assert ":latest" not in build
     assert "refusing overwrite" in build
     assert "image_digest" in build
+    assert "--write-enabled false" in build
+    assert "--delete-enabled false" in build
+    assert "immutability_verified" in build
     assert 'JOB_NAME="job-jspace-p05-jlens"' in run
     assert 'CONTAINER_APP_ENV="cae-jspace-observation-sea-vnet2"' in run
     assert 'WORKLOAD_PROFILE_NAME="gpu-t4"' in run
@@ -576,6 +747,19 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     assert "6900s" in run
     assert "EXECUTION_COUNT" in run
     assert "operational-fix" in run
+    assert "PRIMARY_PROJECT_SHA" in run
+    assert "PRIMARY_EXECUTION_STATUS" in run
+    assert "properties.provisioningState" in run
+    assert '"image": "$IMAGE_DIGEST_REF"' in run
+    assert "IMAGE_TAG_REF" in run
+    assert "IMAGE_DIGEST_REF" in run
+    assert "A succeeded primary execution must never be retried" in run
+    assert "JSPACE_PHASE05_RUN_ID" in run
+    assert "JSPACE_ATTEMPT_ID" in run
+    assert 'tags."primary-project-sha"' in run
+    assert run.index("properties.provisioningState") < run.index(
+        "az containerapp job start"
+    )
     assert '"volumes"' not in run
     assert '"secrets"' not in run
 

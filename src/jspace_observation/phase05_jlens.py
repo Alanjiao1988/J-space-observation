@@ -447,6 +447,68 @@ def choose_f3_dim_batch(
     )
 
 
+def f3_dim1_time_guard(
+    *,
+    elapsed_seconds: float,
+    f2_wall_seconds: float,
+    f2_source_layer: int,
+    f3_source_layers: Sequence[int],
+    target_layer: int,
+    prompt_count: int = 2,
+) -> dict[str, Any]:
+    """Conservatively scale F2 time by prompt count and backward layer span."""
+
+    ensure_source_before_target([f2_source_layer], target_layer, target_layer + 1)
+    ensure_source_before_target(f3_source_layers, target_layer, target_layer + 1)
+    if prompt_count < 1 or not math.isfinite(f2_wall_seconds) or f2_wall_seconds <= 0:
+        raise Phase05ValidationError("invalid F3 time-guard inputs")
+    f2_span = target_layer - f2_source_layer
+    f3_span = target_layer - min(f3_source_layers)
+    layer_span_ratio = f3_span / f2_span
+    multiplier = prompt_count * max(1.0, layer_span_ratio)
+    projected_fit_seconds = f2_wall_seconds * multiplier
+    projected_completion = (
+        elapsed_seconds + projected_fit_seconds + EXPORT_RESERVE_SECONDS
+    )
+    return {
+        "f2_source_layer": f2_source_layer,
+        "f3_earliest_source_layer": min(f3_source_layers),
+        "target_layer": target_layer,
+        "f2_layer_span": f2_span,
+        "f3_earliest_layer_span": f3_span,
+        "layer_span_ratio": layer_span_ratio,
+        "prompt_count": prompt_count,
+        "conservative_multiplier": multiplier,
+        "projected_fit_seconds": projected_fit_seconds,
+        "projected_completion_seconds": projected_completion,
+        "planning_budget_seconds": PLANNING_BUDGET_SECONDS,
+        "continue_allowed": projected_completion <= PLANNING_BUDGET_SECONDS,
+    }
+
+
+def f3_checkpoint_actions(n_done: int, next_idx: int) -> list[str]:
+    """Return the required official-fit/persistence actions for a checkpoint."""
+
+    if (n_done, next_idx) not in {(0, 0), (1, 1), (2, 2)}:
+        raise CheckpointValidationError(
+            f"invalid F3 checkpoint progress: n_done={n_done}, next_idx={next_idx}"
+        )
+    if n_done == 0:
+        return ["fit_prompt_1", "persist_prompt_1", "fit_full_resume"]
+    if n_done == 1:
+        return ["persist_prompt_1", "fit_full_resume"]
+    return ["load_full_resume"]
+
+
+def f3_memory_requires_stop(f3_result: Mapping[str, Any]) -> bool:
+    return (
+        f3_result.get("details", {})
+        .get("memory", {})
+        .get("classification")
+        == "stop"
+    )
+
+
 def f5_cost_guard(
     *,
     elapsed_seconds: float,
@@ -565,11 +627,59 @@ def validate_blob_auth_config(config: Mapping[str, Any]) -> None:
             raise Phase05ValidationError(f"secret-bearing Blob field forbidden: {key}")
 
 
+def persistence_summary(
+    upload_history: Sequence[Mapping[str, Any]], *, configured: bool
+) -> dict[str, Any]:
+    """Evaluate the required Blob persistence transaction history."""
+
+    if not configured:
+        return {
+            "configured": False,
+            "required": False,
+            "ready": True,
+            "status": "not_configured",
+            "required_uploads": 0,
+            "failed_uploads": [],
+            "final_manifest_completion_confirmed": False,
+        }
+    required = [dict(item) for item in upload_history if item.get("required")]
+    failed = [
+        item
+        for item in required
+        if item.get("status") != "confirmed"
+        or not item.get("manifest_uploaded_last")
+    ]
+    final_confirmed = any(
+        item.get("stage_label") == "final"
+        and item.get("status") == "confirmed"
+        and item.get("manifest_uploaded_last") is True
+        for item in required
+    )
+    ready = not failed and final_confirmed
+    if failed:
+        status = "checkpoint_failure"
+    elif not final_confirmed:
+        status = "awaiting_final_manifest_completion"
+    else:
+        status = "confirmed"
+    return {
+        "configured": True,
+        "required": True,
+        "ready": ready,
+        "status": status,
+        "failure_class": None if ready else "checkpoint_failure",
+        "required_uploads": len(required),
+        "failed_uploads": failed,
+        "final_manifest_completion_confirmed": final_confirmed,
+    }
+
+
 def derive_decision(
     results: Mapping[str, Mapping[str, Any]],
     *,
     authorized_compatibility_fix_attempted: bool,
     scaling_plan: Mapping[str, Any] | None,
+    persistence: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     f0 = results.get("F0", {})
     f1 = results.get("F1", {})
@@ -578,56 +688,74 @@ def derive_decision(
     f4 = results.get("F4", {})
 
     if f0.get("status") != "success" or f1.get("status") != "success":
-        return {
+        decision = {
             "decision": "UNRATED",
             "gate_status": "BLOCKED",
             "reason": "Pinned dependency/provenance or F1 adapter gate is blocked.",
             "plan_b_triggered": False,
         }
-    if f2.get("status") != "success":
+    elif f2.get("status") != "success":
         if authorized_compatibility_fix_attempted and f2.get("status") == "failed":
-            return {
+            decision = {
                 "decision": "RED",
                 "gate_status": "COMPLETE",
                 "reason": "The minimal real Jacobian failed after one authorized compatibility fix.",
                 "plan_b_triggered": False,
             }
-        return {
-            "decision": "UNRATED",
-            "gate_status": "BLOCKED",
-            "reason": "F2 failed; RED requires one separately authorized compatibility fix.",
-            "plan_b_triggered": False,
-        }
-    if f3.get("status") != "success" or f4.get("status") != "success":
-        return {
+        else:
+            decision = {
+                "decision": "UNRATED",
+                "gate_status": "BLOCKED",
+                "reason": "F2 failed; RED requires one separately authorized compatibility fix.",
+                "plan_b_triggered": False,
+            }
+    elif f3.get("status") != "success" or f4.get("status") != "success":
+        decision = {
             "decision": "AMBER",
             "gate_status": "COMPLETE",
             "reason": "Real F2 worked, but fit/checkpoint/apply did not complete safely.",
             "plan_b_triggered": False,
         }
+    else:
+        memory_classes = [
+            f2.get("details", {}).get("memory", {}).get("classification"),
+            f3.get("details", {}).get("memory", {}).get("classification"),
+        ]
+        scaling_ready = bool(
+            scaling_plan
+            and scaling_plan.get("ten_prompt", {}).get("executable")
+            and scaling_plan.get("sliced_25_prompt", {}).get("executable")
+        )
+        if any(item != "green" for item in memory_classes) or not scaling_ready:
+            decision = {
+                "decision": "AMBER",
+                "gate_status": "COMPLETE",
+                "reason": "F0-F4 worked, but measured memory or scaling margin is borderline.",
+                "plan_b_triggered": False,
+            }
+        else:
+            decision = {
+                "decision": "GREEN",
+                "gate_status": "COMPLETE",
+                "reason": "F0-F4, save/load/apply, memory, and measured scaling gates passed.",
+                "plan_b_triggered": False,
+            }
 
-    memory_classes = [
-        f2.get("details", {}).get("memory", {}).get("classification"),
-        f3.get("details", {}).get("memory", {}).get("classification"),
-    ]
-    scaling_ready = bool(
-        scaling_plan
-        and scaling_plan.get("ten_prompt", {}).get("executable")
-        and scaling_plan.get("sliced_25_prompt", {}).get("executable")
-    )
-    if any(item != "green" for item in memory_classes) or not scaling_ready:
+    if persistence and persistence.get("required") and not persistence.get("ready"):
+        scientific_decision = decision["decision"]
+        after_real_f2 = f2.get("status") == "success"
         return {
-            "decision": "AMBER",
-            "gate_status": "COMPLETE",
-            "reason": "F0-F4 worked, but measured memory or scaling margin is borderline.",
+            "decision": "AMBER" if after_real_f2 else "UNRATED",
+            "gate_status": "BLOCKED",
+            "reason": (
+                "Required Blob persistence is incomplete or failed; "
+                "checkpoint/manifest durability is not established."
+            ),
             "plan_b_triggered": False,
+            "scientific_decision_before_persistence_gate": scientific_decision,
+            "persistence_failure_class": "checkpoint_failure",
         }
-    return {
-        "decision": "GREEN",
-        "gate_status": "COMPLETE",
-        "reason": "F0-F4, save/load/apply, memory, and measured scaling gates passed.",
-        "plan_b_triggered": False,
-    }
+    return decision
 
 
 def build_artifact_manifest(
@@ -639,14 +767,15 @@ def build_artifact_manifest(
     root = Path(output_dir)
     entries = []
     for path in sorted(root.rglob("*"), key=lambda item: item.as_posix()):
+        relative_path = path.relative_to(root)
         if (
             not path.is_file()
             or path.name in exclude_names
-            or path.name.startswith(".")
+            or any(part.startswith(".") for part in relative_path.parts)
             or ".tmp." in path.name
         ):
             continue
-        relative = path.relative_to(root).as_posix()
+        relative = relative_path.as_posix()
         entries.append(
             {
                 "path": relative,

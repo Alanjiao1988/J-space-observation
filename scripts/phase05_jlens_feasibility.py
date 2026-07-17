@@ -178,17 +178,40 @@ class BlobTransport:
             )
         prefix = resume_prefix.strip("/")
         client = self._client()
-        candidates = [
-            blob
-            for blob in client.list_blobs(name_starts_with=prefix)
-            if blob.name.endswith("/phase05_jlens_stage_results.json")
-            and "/snapshots/" in blob.name
-        ]
+        available = list(client.list_blobs(name_starts_with=prefix))
+        candidates = []
+        for blob in available:
+            if (
+                not blob.name.endswith("/phase05_jlens_stage_results.json")
+                or "/snapshots/" not in blob.name
+            ):
+                continue
+            snapshot_prefix = blob.name.rsplit("/", 1)[0] + "/"
+            members = [
+                member for member in available if member.name.startswith(snapshot_prefix)
+            ]
+            manifests = [
+                member
+                for member in members
+                if member.name
+                == snapshot_prefix + "phase05_jlens_artifact_manifest.json"
+            ]
+            if not manifests:
+                continue
+            manifest_blob = manifests[0]
+            if any(
+                member.last_modified > manifest_blob.last_modified
+                for member in members
+            ):
+                continue
+            candidates.append((blob, manifest_blob))
         if not candidates:
             raise protocol.CheckpointValidationError(
-                f"no recoverable stage snapshot exists under {prefix}"
+                f"no manifest-complete recoverable stage snapshot exists under {prefix}"
             )
-        selected = max(candidates, key=lambda blob: blob.last_modified)
+        selected, selected_manifest = max(
+            candidates, key=lambda item: item[1].last_modified
+        )
         snapshot_prefix = selected.name.rsplit("/", 1)[0] + "/"
         restored = 0
         for blob in client.list_blobs(name_starts_with=snapshot_prefix):
@@ -200,32 +223,48 @@ class BlobTransport:
             destination.parent.mkdir(parents=True, exist_ok=True)
             atomic_write_bytes(destination, client.download_blob(blob.name).readall())
             restored += 1
+        restored_manifest = read_json(
+            output_dir / "phase05_jlens_artifact_manifest.json"
+        )
+        if (
+            restored_manifest.get("schema_version")
+            != "phase05-jlens-artifact-manifest-v1"
+        ):
+            raise protocol.CheckpointValidationError(
+                "restored artifact manifest schema is invalid"
+            )
+        for artifact in restored_manifest.get("artifacts", []):
+            relative_path = Path(str(artifact.get("path", "")))
+            if (
+                relative_path.is_absolute()
+                or ".." in relative_path.parts
+                or not relative_path.parts
+            ):
+                raise protocol.CheckpointValidationError(
+                    "restored artifact manifest contains an unsafe path"
+                )
+            artifact_path = output_dir / relative_path
+            if (
+                not artifact_path.is_file()
+                or artifact_path.stat().st_size != artifact.get("bytes")
+                or protocol.sha256_file(artifact_path) != artifact.get("sha256")
+            ):
+                raise protocol.CheckpointValidationError(
+                    f"restored artifact failed manifest validation: {relative_path}"
+                )
         return {
             "status": "restored",
             "source_prefix": snapshot_prefix.rstrip("/"),
             "files": restored,
+            "manifest_last_modified": selected_manifest.last_modified.isoformat(),
+            "manifest_completion_verified": True,
         }
 
     def upload_snapshot(self, output_dir: Path, stage: str, sequence: int) -> dict[str, Any]:
         if not self.configured:
             return {"status": "not_configured", "uploaded": 0}
-        destination = (
-            f"{self.run_prefix}/attempts/{self.attempt_id}/snapshots/"
-            f"{sequence:02d}-{stage}"
-        )
-        files = sorted(
-            (
-                path
-                for path in output_dir.rglob("*")
-                if path.is_file()
-                and not path.name.startswith(".")
-                and ".tmp." not in path.name
-            ),
-            key=lambda path: (
-                path.name == "phase05_jlens_artifact_manifest.json",
-                path.relative_to(output_dir).as_posix(),
-            ),
-        )
+        destination = self.snapshot_destination(stage, sequence)
+        files = self.snapshot_files(output_dir)
         client = self._client()
         uploaded = []
         for path in files:
@@ -244,6 +283,31 @@ class BlobTransport:
             ),
         }
 
+    def snapshot_destination(self, stage: str, sequence: int) -> str:
+        return (
+            f"{self.run_prefix}/attempts/{self.attempt_id}/snapshots/"
+            f"{sequence:02d}-{stage}"
+        )
+
+    @staticmethod
+    def snapshot_files(output_dir: Path) -> list[Path]:
+        return sorted(
+            (
+                path
+                for path in output_dir.rglob("*")
+                if path.is_file()
+                and not any(
+                    part.startswith(".")
+                    for part in path.relative_to(output_dir).parts
+                )
+                and ".tmp." not in path.name
+            ),
+            key=lambda path: (
+                path.name == "phase05_jlens_artifact_manifest.json",
+                path.relative_to(output_dir).as_posix(),
+            ),
+        )
+
 
 class Phase05Runner:
     def __init__(self, args: argparse.Namespace) -> None:
@@ -259,6 +323,7 @@ class Phase05Runner:
         self.snapshot_sequence = 0
         self.restore_record: dict[str, Any] | None = None
         self.restore_error: dict[str, str] | None = None
+        self.upload_history: list[dict[str, Any]] = []
 
         results_path = self.output_dir / "phase05_jlens_stage_results.json"
         resume_prefix = os.getenv("JSPACE_BLOB_RESUME_PREFIX", "").strip()
@@ -304,6 +369,7 @@ class Phase05Runner:
                 "attempt_id": self.attempt_id,
                 "credential_mode": "default_credential_managed_identity_only",
                 "restore": self.restore_record,
+                "upload_history": self.upload_history,
             },
         }
         self._load_resume_state()
@@ -339,6 +405,21 @@ class Phase05Runner:
         if environment_path.exists():
             previous = read_json(environment_path)
             self.environment["resumed_from_run_id"] = previous.get("run_id")
+            previous_attempt = previous.get("attempt_id")
+            for record in previous.get("blob", {}).get("upload_history", []):
+                carried = dict(record)
+                if previous_attempt != self.attempt_id:
+                    carried["required"] = False
+                    carried["carried_from_attempt"] = previous_attempt
+                self.upload_history.append(carried)
+            self.snapshot_sequence = max(
+                (
+                    int(record.get("sequence", 0))
+                    for record in self.upload_history
+                    if record.get("attempt_id") == self.attempt_id
+                ),
+                default=self.snapshot_sequence,
+            )
         if metrics_path.exists():
             with metrics_path.open("r", encoding="utf-8", newline="") as handle:
                 reader = csv.DictReader(handle)
@@ -372,32 +453,41 @@ class Phase05Runner:
                 }
             )
 
-    def stage_document(self) -> dict[str, Any]:
+    def persistence_status(self) -> dict[str, Any]:
+        return protocol.persistence_summary(
+            self.upload_history, configured=self.blob.configured
+        )
+
+    def stage_document(self, generated_at_utc: str | None = None) -> dict[str, Any]:
         return {
             "schema_version": "phase05-jlens-stage-results-v1",
             "run_id": self.run_id,
             "attempt_id": self.attempt_id,
-            "updated_at_utc": utc_now(),
+            "updated_at_utc": generated_at_utc or utc_now(),
             "stage_order": list(protocol.STAGES),
             "stages": self.results,
             "scaling_plan": self.scaling_plan,
+            "persistence": self.persistence_status(),
             "authorized_compatibility_fix_attempted": (
                 self.args.authorized_compatibility_fix_attempted
             ),
         }
 
-    def decision_document(self) -> dict[str, Any]:
+    def decision_document(self, generated_at_utc: str | None = None) -> dict[str, Any]:
+        persistence = self.persistence_status()
         decision = protocol.derive_decision(
             self.results,
             authorized_compatibility_fix_attempted=(
                 self.args.authorized_compatibility_fix_attempted
             ),
             scaling_plan=self.scaling_plan,
+            persistence=persistence,
         )
         return {
             "schema_version": "phase05-jlens-decision-v1",
-            "generated_at_utc": utc_now(),
+            "generated_at_utc": generated_at_utc or utc_now(),
             **decision,
+            "persistence": persistence,
             "red_requires_authorized_fix": True,
             "automatic_plan_b": False,
         }
@@ -411,6 +501,7 @@ class Phase05Runner:
             f"- Reason: {decision['reason']}",
             f"- Official source: `{protocol.OFFICIAL_REPOSITORY}@{protocol.OFFICIAL_COMMIT}`",
             f"- Target: `{protocol.MODEL_ID}@{protocol.MODEL_REVISION}` in fp16",
+            f"- Persistence: **{decision['persistence']['status']}**",
             "- Plan B was not triggered automatically.",
             "",
             "## Stages",
@@ -443,65 +534,167 @@ class Phase05Runner:
         )
         return "\n".join(lines)
 
-    def persist(self, stage_label: str, *, upload: bool = True) -> None:
-        self.environment["updated_at_utc"] = utc_now()
-        decision = self.decision_document()
+    def _write_outputs(
+        self, generated_at_utc: str, output_dir: Path | None = None
+    ) -> None:
+        target_dir = output_dir or self.output_dir
+        target_dir.mkdir(parents=True, exist_ok=True)
+        self.environment["updated_at_utc"] = generated_at_utc
+        self.environment["blob"]["configured"] = self.blob.configured
+        self.environment["blob"]["persistence"] = self.persistence_status()
+        decision = self.decision_document(generated_at_utc)
         atomic_write_json(
-            self.output_dir / "phase05_jlens_environment.json", self.environment
+            target_dir / "phase05_jlens_environment.json", self.environment
         )
         atomic_write_json(
-            self.output_dir / "phase05_jlens_stage_results.json", self.stage_document()
+            target_dir / "phase05_jlens_stage_results.json",
+            self.stage_document(generated_at_utc),
         )
-        metrics_path = self.output_dir / "phase05_jlens_metrics.csv"
+        metrics_path = target_dir / "phase05_jlens_metrics.csv"
         temporary = metrics_path.with_name(f".{metrics_path.name}.tmp.{os.getpid()}")
         with temporary.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.DictWriter(handle, fieldnames=protocol.METRICS_COLUMNS)
             writer.writeheader()
             writer.writerows(self.metrics)
         os.replace(temporary, metrics_path)
-        atomic_write_json(self.output_dir / "phase05_jlens_decision.json", decision)
+        atomic_write_json(target_dir / "phase05_jlens_decision.json", decision)
         atomic_write_bytes(
-            self.output_dir / "phase05_jlens_report.md",
+            target_dir / "phase05_jlens_report.md",
             self.render_report(decision).encode("utf-8"),
         )
         manifest = protocol.build_artifact_manifest(
-            self.output_dir, generated_at_utc=utc_now()
+            target_dir, generated_at_utc=generated_at_utc
         )
         atomic_write_json(
-            self.output_dir / "phase05_jlens_artifact_manifest.json", manifest
+            target_dir / "phase05_jlens_artifact_manifest.json", manifest
         )
         protocol.validate_output_schema(
             environment=self.environment,
-            stage_results=self.stage_document(),
+            stage_results=self.stage_document(generated_at_utc),
             decision=decision,
             metrics_header=protocol.METRICS_COLUMNS,
             manifest=manifest,
         )
 
-        if upload:
-            self.snapshot_sequence += 1
-            try:
-                result = self.blob.upload_snapshot(
-                    self.output_dir, stage_label, self.snapshot_sequence
-                )
-            except Exception as error:
-                result = {
-                    "status": "upload_failed",
-                    "error_type": type(error).__name__,
-                    "error": safe_error(error),
-                    "uploaded": 0,
-                }
+    def persist(
+        self, stage_label: str, *, upload: bool = True, required: bool = True
+    ) -> bool:
+        generated_at = utc_now()
+        if not upload:
+            self._write_outputs(generated_at)
+            return self.persistence_status()["ready"]
+
+        self.snapshot_sequence += 1
+        is_required = bool(required and self.blob.configured)
+        if self.blob.configured:
+            destination = self.blob.snapshot_destination(
+                stage_label, self.snapshot_sequence
+            )
+            final_transaction = stage_label == "final"
+            event = {
+                "sequence": self.snapshot_sequence,
+                "stage_label": stage_label,
+                "attempt_id": self.attempt_id,
+                "required": is_required,
+                "status": "pending" if final_transaction else "confirmed",
+                "transport_status": (
+                    "upload_pending" if final_transaction else "uploaded"
+                ),
+                "failure_class": None,
+                "prefix": destination,
+                "manifest_uploaded_last": not final_transaction,
+                "completed_at_utc": generated_at,
+            }
+            self.upload_history.append(event)
+            self.environment["blob"]["last_snapshot"] = event
             if stage_label in self.results:
                 self.results[stage_label].setdefault("details", {})[
                     "blob_snapshot"
-                ] = result
-            self.environment["blob"]["last_snapshot"] = result
+                ] = event
+            self._write_outputs(generated_at)
+            event["uploaded"] = len(self.blob.snapshot_files(self.output_dir))
+            self._write_outputs(generated_at)
+            upload_source = self.output_dir
+            staging_dir: Path | None = None
+            try:
+                if final_transaction:
+                    staging_root = self.output_dir / ".snapshot-staging"
+                    staging_root.mkdir(parents=True, exist_ok=True)
+                    staging_dir = staging_root / (
+                        f"final-snapshot-"
+                        f"{os.getpid()}-{self.snapshot_sequence}"
+                    )
+                    if staging_dir.exists():
+                        shutil.rmtree(staging_dir)
+                    event.update(
+                        {
+                            "status": "confirmed",
+                            "transport_status": "uploaded",
+                            "manifest_uploaded_last": True,
+                        }
+                    )
+                    shutil.copytree(
+                        self.output_dir,
+                        staging_dir,
+                        ignore=shutil.ignore_patterns(".*"),
+                    )
+                    self._write_outputs(generated_at, staging_dir)
+                    upload_source = staging_dir
+                result = self.blob.upload_snapshot(
+                    upload_source, stage_label, self.snapshot_sequence
+                )
+                if (
+                    result.get("status") != "uploaded"
+                    or result.get("prefix") != destination
+                    or result.get("uploaded") != event["uploaded"]
+                    or result.get("manifest_uploaded_last") is not True
+                ):
+                    raise protocol.CheckpointValidationError(
+                        f"Blob snapshot confirmation mismatch: {result}"
+                    )
+            except Exception as error:
+                event.update(
+                    {
+                        "status": "failed",
+                        "transport_status": "upload_failed",
+                        "failure_class": "checkpoint_failure",
+                        "manifest_uploaded_last": False,
+                        "error_type": type(error).__name__,
+                        "error": safe_error(error),
+                    }
+                )
+            finally:
+                if staging_dir is not None and staging_dir.exists():
+                    shutil.rmtree(staging_dir)
+                    staging_root = staging_dir.parent
+                    if staging_root.exists() and not any(staging_root.iterdir()):
+                        staging_root.rmdir()
+            self._write_outputs(generated_at)
             print(
-                f"Blob snapshot {stage_label}: {result.get('status')} "
-                f"({result.get('uploaded', 0)} files)",
+                f"Blob snapshot {stage_label}: {event['status']} "
+                f"({event.get('uploaded', 0)} files)",
                 flush=True,
             )
-            self.persist(stage_label, upload=False)
+            return event["status"] == "confirmed"
+
+        event = {
+            "sequence": self.snapshot_sequence,
+            "stage_label": stage_label,
+            "attempt_id": self.attempt_id,
+            "required": False,
+            "status": "not_configured",
+            "transport_status": "not_configured",
+            "failure_class": None,
+            "manifest_uploaded_last": False,
+            "uploaded": 0,
+            "completed_at_utc": generated_at,
+        }
+        self.upload_history.append(event)
+        if stage_label in self.results:
+            self.results[stage_label].setdefault("details", {})["blob_snapshot"] = event
+        self.environment["blob"]["last_snapshot"] = event
+        self._write_outputs(generated_at)
+        return True
 
     def execute(self, stage: str, function: Any) -> bool:
         if not protocol.can_start_stage(stage, self.results):
@@ -525,7 +718,23 @@ class Phase05Runner:
             "failure_class": None,
             "details": {},
         }
-        self.persist(stage)
+        if not self.persist(stage):
+            now = utc_now()
+            self.results[stage].update(
+                {
+                    "status": "failed",
+                    "finished_at_utc": now,
+                    "duration_seconds": time.monotonic() - started,
+                    "failure_class": "checkpoint_failure",
+                    "error_type": "BlobPersistenceError",
+                    "error": "required stage-entry snapshot upload failed",
+                    "details": {
+                        "persistence": self.persistence_status(),
+                    },
+                }
+            )
+            self.persist(stage, upload=False)
+            return False
         try:
             details = function()
             status = details.pop("_status", "success")
@@ -545,8 +754,14 @@ class Phase05Runner:
             )
             self.add_metrics(stage, status, metric_values)
             self.add_metrics(stage, status, {"wall_seconds": (duration, "seconds")})
-            self.persist(stage)
-            return status in {"success", "skipped_cost_guard"}
+            persisted = self.persist(stage)
+            if not persisted:
+                self.results[stage]["details"]["persistence_failure"] = {
+                    "failure_class": "checkpoint_failure",
+                    "status": self.persistence_status(),
+                }
+                self.persist(stage, upload=False)
+            return status in {"success", "skipped_cost_guard"} and persisted
         except Exception as error:
             duration = time.monotonic() - started
             failure_class = protocol.classify_failure(error, stage)
@@ -1162,13 +1377,12 @@ class Phase05Runner:
             "bytes": artifact_path.stat().st_size,
             "sha256": protocol.sha256_file(artifact_path),
         }
-        projected_f3_completion = (
-            self.elapsed_seconds
-            + 2 * wall_seconds
-            + protocol.EXPORT_RESERVE_SECONDS
-        )
-        time_continue_allowed = (
-            projected_f3_completion <= protocol.PLANNING_BUDGET_SECONDS
+        f3_time_guard = protocol.f3_dim1_time_guard(
+            elapsed_seconds=self.elapsed_seconds,
+            f2_wall_seconds=wall_seconds,
+            f2_source_layer=source_layer,
+            f3_source_layers=self.layers["f3_source_layers"],
+            target_layer=target_layer,
         )
         return {
             "real_official_jacobian": True,
@@ -1193,15 +1407,10 @@ class Phase05Runner:
                 "nonzero": norm > 0,
             },
             "memory": memory,
-            "f3_time_guard": {
-                "projected_completion_seconds_using_f2_dim1_rate": (
-                    projected_f3_completion
-                ),
-                "planning_budget_seconds": protocol.PLANNING_BUDGET_SECONDS,
-                "continue_allowed": time_continue_allowed,
-            },
+            "f3_time_guard": f3_time_guard,
             "continue_allowed": (
-                memory["classification"] != "stop" and time_continue_allowed
+                memory["classification"] != "stop"
+                and f3_time_guard["continue_allowed"]
             ),
             "artifact": artifact,
             "_metrics": {
@@ -1252,6 +1461,7 @@ class Phase05Runner:
         checkpoint_path = checkpoint_dir / "phase05_jlens_f3_fit_checkpoint.pt"
         manifest_path = checkpoint_dir / "phase05_jlens_f3_checkpoint.manifest.json"
         initial_n_done = 0
+        initial_next_idx = 0
         if checkpoint_path.exists():
             if not manifest_path.exists():
                 raise protocol.CheckpointValidationError(
@@ -1262,10 +1472,8 @@ class Phase05Runner:
                 checkpoint_path, map_location="cpu", weights_only=True
             )
             initial_n_done = int(initial_state.get("n_done", -1))
-            if not 0 <= initial_n_done <= 2:
-                raise protocol.CheckpointValidationError(
-                    "resumable checkpoint prompt count is invalid"
-                )
+            initial_next_idx = int(initial_state.get("next_idx", -1))
+            protocol.f3_checkpoint_actions(initial_n_done, initial_next_idx)
             resumed = True
         else:
             if manifest_path.exists():
@@ -1276,8 +1484,80 @@ class Phase05Runner:
                 atomic_write_json(manifest_path, manifest)
             resumed = False
 
+        actions = protocol.f3_checkpoint_actions(initial_n_done, initial_next_idx)
         self._start_gpu_measurement()
-        started = time.monotonic()
+        fit_segments: list[dict[str, Any]] = []
+        prompt_1_snapshot: dict[str, Any] | None = None
+        if "fit_prompt_1" in actions:
+            segment_started = time.monotonic()
+            prompt_1_lens = self.jlens.fit(
+                self.lens_model,
+                prompts=prompts[:1],
+                source_layers=source_layers,
+                target_layer=target_layer,
+                dim_batch=dim_batch,
+                max_seq_len=protocol.MAX_SEQ_LEN,
+                skip_first=protocol.SKIP_FIRST,
+                checkpoint_path=str(checkpoint_path),
+                checkpoint_every=1,
+                resume=True,
+            )
+            fit_segments.append(
+                {
+                    "segment": "prompt_1_prefix",
+                    "seconds": time.monotonic() - segment_started,
+                    "prompts_computed": 1,
+                }
+            )
+            if prompt_1_lens.n_prompts != 1:
+                raise protocol.CheckpointValidationError(
+                    "official prompt-1 prefix fit did not produce n_prompts=1"
+                )
+
+        if "persist_prompt_1" in actions:
+            prompt_1_state = self.torch.load(
+                checkpoint_path, map_location="cpu", weights_only=True
+            )
+            if (
+                prompt_1_state.get("n_done") != 1
+                or prompt_1_state.get("next_idx") != 1
+                or prompt_1_state.get("source_layers") != source_layers
+                or prompt_1_state.get("target_layer") != target_layer
+            ):
+                raise protocol.CheckpointValidationError(
+                    "official prompt-1 checkpoint state is invalid"
+                )
+            prompt_1_progress = {
+                "n_done": 1,
+                "next_idx": 1,
+                "prompt_prefix_count": 1,
+                "prompt_prefix_sha256": protocol.canonical_jsonl_sha256(
+                    self.corpus_records[:1]
+                ),
+                "checkpoint": {
+                    "path": checkpoint_path.relative_to(self.output_dir).as_posix(),
+                    "bytes": checkpoint_path.stat().st_size,
+                    "sha256": protocol.sha256_file(checkpoint_path),
+                },
+            }
+            checkpoint_manifest = read_json(manifest_path)
+            checkpoint_manifest["progress"] = prompt_1_progress
+            checkpoint_manifest["progress_sha256"] = protocol.sha256_bytes(
+                protocol.canonical_json_bytes(prompt_1_progress)
+            )
+            checkpoint_manifest["updated_at_utc"] = utc_now()
+            atomic_write_json(manifest_path, checkpoint_manifest)
+            self.results["F3"]["details"]["prompt_1_checkpoint"] = prompt_1_progress
+            if not self.persist("F3-prompt-1"):
+                raise protocol.CheckpointValidationError(
+                    "required F3 prompt-1 checkpoint snapshot was not durable"
+                )
+            prompt_1_snapshot = {
+                **prompt_1_progress,
+                "blob_persistence": self.upload_history[-1],
+            }
+
+        segment_started = time.monotonic()
         self.fitted_lens = self.jlens.fit(
             self.lens_model,
             prompts=prompts,
@@ -1290,7 +1570,17 @@ class Phase05Runner:
             checkpoint_every=1,
             resume=True,
         )
-        fit_seconds = time.monotonic() - started
+        final_segment_seconds = time.monotonic() - segment_started
+        fit_segments.append(
+            {
+                "segment": "full_corpus_resume",
+                "seconds": final_segment_seconds,
+                "prompts_computed": max(0, 2 - max(1, initial_n_done))
+                if "persist_prompt_1" in actions
+                else 0,
+            }
+        )
+        fit_seconds = sum(float(item["seconds"]) for item in fit_segments)
         memory = self._finish_gpu_measurement()
         if self.fitted_lens.n_prompts != 2:
             raise protocol.CheckpointValidationError("F3 must fit exactly two prompts")
@@ -1372,6 +1662,16 @@ class Phase05Runner:
             "bytes": lens_path.stat().st_size,
             "sha256": protocol.sha256_file(lens_path),
         }
+        completion_progress = {
+            "n_done": checkpoint_state["n_done"],
+            "next_idx": checkpoint_state["next_idx"],
+            "checkpoint_sha256": checkpoint_manifest["checkpoint"]["sha256"],
+            "lens_sha256": checkpoint_manifest["lens"]["sha256"],
+        }
+        checkpoint_manifest["completion"] = completion_progress
+        checkpoint_manifest["completion_sha256"] = protocol.sha256_bytes(
+            protocol.canonical_json_bytes(completion_progress)
+        )
         atomic_write_json(manifest_path, checkpoint_manifest)
         processed_this_run = 2 - initial_n_done
         if processed_this_run > 0:
@@ -1408,7 +1708,11 @@ class Phase05Runner:
             "resume_enabled": True,
             "resumed_checkpoint": resumed,
             "initial_checkpoint_n_done": initial_n_done,
+            "initial_checkpoint_next_idx": initial_next_idx,
             "prompts_processed_this_run": processed_this_run,
+            "checkpoint_actions": actions,
+            "fit_segments": fit_segments,
+            "prompt_1_snapshot": prompt_1_snapshot,
             "prompt_order_sha256": self.corpus_sha256,
             "prompt_token_lengths": prompt_token_lengths,
             "fit_seconds": fit_seconds,
@@ -1698,7 +2002,21 @@ class Phase05Runner:
         }
 
     def run(self) -> int:
-        self.persist("tooling-initial")
+        if not self.persist("tooling-initial"):
+            now = utc_now()
+            self.results["F0"] = {
+                "status": "failed",
+                "started_at_utc": now,
+                "finished_at_utc": now,
+                "duration_seconds": 0.0,
+                "failure_class": "checkpoint_failure",
+                "error_type": "BlobPersistenceError",
+                "error": "required initial snapshot upload failed",
+                "details": {"persistence": self.persistence_status()},
+            }
+            self.persist("F0-initial-persistence-failed", upload=False)
+            self.block_remaining("F0", "required Blob persistence failed")
+            return 6
         if self.restore_error is not None:
             now = utc_now()
             self.results["F0"] = {
@@ -1723,7 +2041,9 @@ class Phase05Runner:
         f2_relative = "checkpoint/phase05_jlens_f2_jacobian.pt"
         if self._valid_prior_artifact("F2", f2_relative):
             self.results["F2"]["details"]["resume_reused_complete_artifact"] = True
-            self.persist("F2-resumed")
+            if not self.persist("F2-resumed"):
+                self.block_remaining("F2", "required F2 resume snapshot upload failed")
+                return 6
         elif not self.execute("F2", self.run_f2):
             self.block_remaining("F2", "F2 real-Jacobian gate failed")
             return 3
@@ -1738,18 +2058,27 @@ class Phase05Runner:
         except protocol.CheckpointValidationError:
             reused_f3 = False
         if reused_f3:
-            self.persist("F3-resumed")
+            if not self.persist("F3-resumed"):
+                self.block_remaining("F3", "required F3 resume snapshot upload failed")
+                return 6
         elif not self.execute("F3", self.run_f3):
             self.block_remaining("F3", "F3 fit/checkpoint gate failed")
+            return 4
+        if protocol.f3_memory_requires_stop(self.results["F3"]):
+            self.block_remaining(
+                "F3", "F3 crossed the preregistered memory hard-stop threshold"
+            )
             return 4
         if not self.execute("F4", self.run_f4):
             self.block_remaining("F4", "F4 save/load/apply gate failed")
             return 4
         self.execute("F5", self.run_f5)
         self.environment["tooling_state"] = "EXECUTED"
-        self.persist("final")
+        final_persisted = self.persist("final")
         decision = self.decision_document()["decision"]
         print(f"Phase 0.5A complete: {decision}; outputs={self.output_dir}")
+        if not final_persisted or not self.persistence_status()["ready"]:
+            return 6
         return 0 if decision in {"GREEN", "AMBER"} else 5
 
 
