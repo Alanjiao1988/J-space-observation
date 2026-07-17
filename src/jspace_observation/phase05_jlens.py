@@ -615,6 +615,97 @@ def validate_checkpoint_manifest(
         raise CheckpointValidationError("checkpoint controls hash is invalid")
 
 
+def validate_f3_resume_binding(
+    manifest: Mapping[str, Any],
+    expected_controls: Mapping[str, Any],
+    *,
+    n_done: int,
+    next_idx: int,
+    checkpoint_sha256: str | None,
+    expected_prompt_prefix_sha256: str,
+    expected_complete_corpus_sha256: str,
+    lens_sha256: str | None = None,
+) -> None:
+    """Bind resumable official state to exact prompts, checkpoint, and lens."""
+
+    validate_checkpoint_manifest(manifest, expected_controls)
+    f3_checkpoint_actions(n_done, next_idx)
+    controls_sha256 = sha256_bytes(canonical_json_bytes(dict(expected_controls)))
+    progress = manifest.get("progress")
+    completion = manifest.get("completion")
+
+    if n_done == 0:
+        if progress is not None or completion is not None:
+            raise CheckpointValidationError(
+                "zero-prompt checkpoint has stale progress/completion binding"
+            )
+        return
+
+    if not checkpoint_sha256:
+        raise CheckpointValidationError("resumed checkpoint SHA256 is required")
+
+    if n_done == 1:
+        if not isinstance(progress, Mapping) or completion is not None:
+            raise CheckpointValidationError(
+                "one-prompt checkpoint requires progress and no completion binding"
+            )
+        expected_progress_hash = sha256_bytes(canonical_json_bytes(dict(progress)))
+        if manifest.get("progress_sha256") != expected_progress_hash:
+            raise CheckpointValidationError("prompt-prefix progress hash mismatch")
+        checkpoint = progress.get("checkpoint")
+        if not isinstance(checkpoint, Mapping):
+            raise CheckpointValidationError("prompt-prefix checkpoint binding missing")
+        expected = {
+            "n_done": 1,
+            "next_idx": 1,
+            "prompt_prefix_count": 1,
+            "prompt_prefix_sha256": expected_prompt_prefix_sha256,
+            "controls_sha256": controls_sha256,
+            "checkpoint_sha256": checkpoint_sha256,
+        }
+        actual = {
+            "n_done": progress.get("n_done"),
+            "next_idx": progress.get("next_idx"),
+            "prompt_prefix_count": progress.get("prompt_prefix_count"),
+            "prompt_prefix_sha256": progress.get("prompt_prefix_sha256"),
+            "controls_sha256": progress.get("controls_sha256"),
+            "checkpoint_sha256": checkpoint.get("sha256"),
+        }
+        if actual != expected:
+            raise CheckpointValidationError(
+                f"prompt-prefix resume binding mismatch: {actual}"
+            )
+        return
+
+    if not isinstance(completion, Mapping):
+        raise CheckpointValidationError("complete checkpoint binding missing")
+    expected_completion_hash = sha256_bytes(canonical_json_bytes(dict(completion)))
+    if manifest.get("completion_sha256") != expected_completion_hash:
+        raise CheckpointValidationError("complete checkpoint binding hash mismatch")
+    if not lens_sha256:
+        raise CheckpointValidationError("complete resume requires a saved lens SHA256")
+    expected = {
+        "n_done": 2,
+        "next_idx": 2,
+        "complete_corpus_sha256": expected_complete_corpus_sha256,
+        "controls_sha256": controls_sha256,
+        "checkpoint_sha256": checkpoint_sha256,
+        "lens_sha256": lens_sha256,
+    }
+    actual = {
+        "n_done": completion.get("n_done"),
+        "next_idx": completion.get("next_idx"),
+        "complete_corpus_sha256": completion.get("complete_corpus_sha256"),
+        "controls_sha256": completion.get("controls_sha256"),
+        "checkpoint_sha256": completion.get("checkpoint_sha256"),
+        "lens_sha256": completion.get("lens_sha256"),
+    }
+    if actual != expected:
+        raise CheckpointValidationError(
+            f"complete resume binding mismatch: {actual}"
+        )
+
+
 def validate_blob_auth_config(config: Mapping[str, Any]) -> None:
     if config.get("credential_mode") != "default_credential_managed_identity_only":
         raise Phase05ValidationError("Blob auth must use managed identity only")

@@ -188,6 +188,15 @@ matrices, valid official checkpoint state, an external controls manifest,
 successful `JacobianLens.save/load`, hashes, and bounded fp16 save/load error.
 Any other `(n_done,next_idx)` pair is a checkpoint failure.
 
+Official checkpoints do not contain prompt identity, so resume additionally
+requires the external binding. State 1/1 must match the current controls hash,
+the exact registered first-prompt canonical hash, and the actual checkpoint
+file SHA256. State 2/2 must match the controls hash, complete ordered-corpus
+SHA256, actual checkpoint SHA256, and actual saved-lens SHA256 through a hashed
+completion record. Missing, stale, or mismatched progress/completion fields
+fail closed before official state is averaged or reused. State 0/0 accepts only
+a controls-only manifest with no stale progress/completion binding.
+
 Measured F0/F1 environment/model-load overhead plus per-prompt fit time
 produces two explicit scaling projections:
 
@@ -288,10 +297,16 @@ ACR_NAME=<private-acr> \
 
 The repository/tag is exactly
 `j-space-observation-jlens:<PROJECT_SHA>`; `:latest` and tag overwrite are
-rejected. After build, both the project-SHA tag and resolved manifest have
-write/delete disabled and those attributes are read back before success. The
-script records ACR run ID, image reference/digest, locks, project SHA, and
-requirements/Dockerfile hashes under ignored `results/runs/`.
+rejected. Repository/tag listing must successfully prove absence; lookup
+errors are never treated as absence. Each build writes only a unique staging
+tag and binds its ACR run output digest. Immediately before claim, absence is
+rechecked and an ARM deployment resource named for the project SHA is created
+with `If-None-Match: *`; a competing/stale claim (409/412) requires manual
+intervention. The CAS winner imports by digest without a force/overwrite
+option, compares the final digest, disables and verifies write/delete on both
+tag and manifest, then removes only its staging tag. The script records claim,
+ACR run, digest, locks, project SHA, and requirements/Dockerfile hashes under
+ignored `results/runs/`.
 
 Start the primary execution:
 
@@ -318,6 +333,18 @@ The job template uses the immutable `repository@sha256:...` image reference
 while recording both tag and digest references. After ARM PUT, the run script
 polls `properties.provisioningState` to `Succeeded` and will not call
 `job start` on terminal failure or timeout.
+
+Launch is itself a distributed CAS. A primary can create the job only with
+`If-None-Match: *`; an existing job/claim is never overwritten. A retry reads
+one matching failed primary plus its ARM ETag, then transitions it with
+`If-Match`. Launch invocation, state, run, attempt, primary/current SHA, and
+image digest are stored in tags. After the CAS, execution count/status and all
+provenance are revalidated, then the same invocation/image claim is checked
+again immediately before start. The returned execution name and total count
+must be observed after start. Any 409/412, missing ETag, stale state, changed
+claim, running/succeeded primary, or unverifiable execution fails closed; a
+crash-before-start leaves a manual-intervention claim rather than permitting a
+duplicate launch.
 
 At most one operational correction is permitted. It must reuse the primary
 run timestamp and document the correction:

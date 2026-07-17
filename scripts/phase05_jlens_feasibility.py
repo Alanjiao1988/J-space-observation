@@ -1273,14 +1273,30 @@ class Phase05Runner:
             target_layer=self.layers["target_layer"],
             dim_batch=int(details["dim_batch"]),
         )
-        protocol.validate_checkpoint_manifest(read_json(manifest_path), controls)
         checkpoint_state = self.torch.load(
             checkpoint_path, map_location="cpu", weights_only=True
         )
-        if checkpoint_state.get("n_done") != 2:
+        if (
+            checkpoint_state.get("n_done") != 2
+            or checkpoint_state.get("next_idx") != 2
+        ):
             raise protocol.CheckpointValidationError(
                 "reused F3 checkpoint is not complete"
             )
+        checkpoint_sha256 = protocol.sha256_file(checkpoint_path)
+        lens_sha256 = protocol.sha256_file(lens_path)
+        protocol.validate_f3_resume_binding(
+            read_json(manifest_path),
+            controls,
+            n_done=2,
+            next_idx=2,
+            checkpoint_sha256=checkpoint_sha256,
+            expected_prompt_prefix_sha256=protocol.canonical_jsonl_sha256(
+                self.corpus_records[:1]
+            ),
+            expected_complete_corpus_sha256=self.corpus_sha256,
+            lens_sha256=lens_sha256,
+        )
         jacobians = {
             layer: checkpoint_state["jacobian_sum"][layer] / 2
             for layer in self.layers["f3_source_layers"]
@@ -1454,12 +1470,19 @@ class Phase05Runner:
             target_layer=target_layer,
             dim_batch=dim_batch,
         )
+        controls_sha256 = protocol.sha256_bytes(
+            protocol.canonical_json_bytes(controls)
+        )
         checkpoint_dir = self.output_dir / "checkpoint"
         lens_dir = self.output_dir / "lens"
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
         lens_dir.mkdir(parents=True, exist_ok=True)
         checkpoint_path = checkpoint_dir / "phase05_jlens_f3_fit_checkpoint.pt"
         manifest_path = checkpoint_dir / "phase05_jlens_f3_checkpoint.manifest.json"
+        lens_path = lens_dir / "phase05_jlens.pt"
+        prompt_prefix_sha256 = protocol.canonical_jsonl_sha256(
+            self.corpus_records[:1]
+        )
         initial_n_done = 0
         initial_next_idx = 0
         if checkpoint_path.exists():
@@ -1467,17 +1490,40 @@ class Phase05Runner:
                 raise protocol.CheckpointValidationError(
                     "resumable checkpoint has no external controls manifest"
                 )
-            protocol.validate_checkpoint_manifest(read_json(manifest_path), controls)
+            checkpoint_manifest = read_json(manifest_path)
             initial_state = self.torch.load(
                 checkpoint_path, map_location="cpu", weights_only=True
             )
             initial_n_done = int(initial_state.get("n_done", -1))
             initial_next_idx = int(initial_state.get("next_idx", -1))
             protocol.f3_checkpoint_actions(initial_n_done, initial_next_idx)
+            complete_lens_sha256 = (
+                protocol.sha256_file(lens_path)
+                if initial_n_done == 2 and lens_path.is_file()
+                else None
+            )
+            protocol.validate_f3_resume_binding(
+                checkpoint_manifest,
+                controls,
+                n_done=initial_n_done,
+                next_idx=initial_next_idx,
+                checkpoint_sha256=protocol.sha256_file(checkpoint_path),
+                expected_prompt_prefix_sha256=prompt_prefix_sha256,
+                expected_complete_corpus_sha256=self.corpus_sha256,
+                lens_sha256=complete_lens_sha256,
+            )
             resumed = True
         else:
             if manifest_path.exists():
-                protocol.validate_checkpoint_manifest(read_json(manifest_path), controls)
+                protocol.validate_f3_resume_binding(
+                    read_json(manifest_path),
+                    controls,
+                    n_done=0,
+                    next_idx=0,
+                    checkpoint_sha256=None,
+                    expected_prompt_prefix_sha256=prompt_prefix_sha256,
+                    expected_complete_corpus_sha256=self.corpus_sha256,
+                )
             else:
                 manifest = protocol.make_checkpoint_manifest(controls)
                 manifest["created_at_utc"] = utc_now()
@@ -1531,9 +1577,8 @@ class Phase05Runner:
                 "n_done": 1,
                 "next_idx": 1,
                 "prompt_prefix_count": 1,
-                "prompt_prefix_sha256": protocol.canonical_jsonl_sha256(
-                    self.corpus_records[:1]
-                ),
+                "prompt_prefix_sha256": prompt_prefix_sha256,
+                "controls_sha256": controls_sha256,
                 "checkpoint": {
                     "path": checkpoint_path.relative_to(self.output_dir).as_posix(),
                     "bytes": checkpoint_path.stat().st_size,
@@ -1547,6 +1592,15 @@ class Phase05Runner:
             )
             checkpoint_manifest["updated_at_utc"] = utc_now()
             atomic_write_json(manifest_path, checkpoint_manifest)
+            protocol.validate_f3_resume_binding(
+                read_json(manifest_path),
+                controls,
+                n_done=1,
+                next_idx=1,
+                checkpoint_sha256=prompt_1_progress["checkpoint"]["sha256"],
+                expected_prompt_prefix_sha256=prompt_prefix_sha256,
+                expected_complete_corpus_sha256=self.corpus_sha256,
+            )
             self.results["F3"]["details"]["prompt_1_checkpoint"] = prompt_1_progress
             if not self.persist("F3-prompt-1"):
                 raise protocol.CheckpointValidationError(
@@ -1617,7 +1671,6 @@ class Phase05Runner:
         ):
             raise protocol.CheckpointValidationError("official checkpoint state is invalid")
 
-        lens_path = lens_dir / "phase05_jlens.pt"
         temporary_lens_path = lens_path.with_name(
             f".{lens_path.name}.tmp.{os.getpid()}"
         )
@@ -1665,6 +1718,8 @@ class Phase05Runner:
         completion_progress = {
             "n_done": checkpoint_state["n_done"],
             "next_idx": checkpoint_state["next_idx"],
+            "complete_corpus_sha256": self.corpus_sha256,
+            "controls_sha256": controls_sha256,
             "checkpoint_sha256": checkpoint_manifest["checkpoint"]["sha256"],
             "lens_sha256": checkpoint_manifest["lens"]["sha256"],
         }
@@ -1673,6 +1728,16 @@ class Phase05Runner:
             protocol.canonical_json_bytes(completion_progress)
         )
         atomic_write_json(manifest_path, checkpoint_manifest)
+        protocol.validate_f3_resume_binding(
+            read_json(manifest_path),
+            controls,
+            n_done=2,
+            next_idx=2,
+            checkpoint_sha256=completion_progress["checkpoint_sha256"],
+            expected_prompt_prefix_sha256=prompt_prefix_sha256,
+            expected_complete_corpus_sha256=self.corpus_sha256,
+            lens_sha256=completion_progress["lens_sha256"],
+        )
         processed_this_run = 2 - initial_n_done
         if processed_this_run > 0:
             seconds_per_prompt = fit_seconds / processed_this_run

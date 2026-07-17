@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import sys
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -428,6 +429,157 @@ def test_checkpoint_external_manifest_controls_and_hash():
     assert controls["backend"] == "official-jlens-fit"
 
 
+def test_f3_resume_bindings_accept_only_exact_zero_one_two_states():
+    controls = p05.make_checkpoint_controls(
+        prompt_order_sha256="a" * 64,
+        source_layers=[6, 13, 20],
+        target_layer=27,
+        dim_batch=1,
+    )
+    prefix_sha = "b" * 64
+    checkpoint_sha = "c" * 64
+    lens_sha = "d" * 64
+    zero = p05.make_checkpoint_manifest(controls)
+    p05.validate_f3_resume_binding(
+        zero,
+        controls,
+        n_done=0,
+        next_idx=0,
+        checkpoint_sha256=None,
+        expected_prompt_prefix_sha256=prefix_sha,
+        expected_complete_corpus_sha256=controls["prompt_order_sha256"],
+    )
+
+    one = p05.make_checkpoint_manifest(controls)
+    one["progress"] = {
+        "n_done": 1,
+        "next_idx": 1,
+        "prompt_prefix_count": 1,
+        "prompt_prefix_sha256": prefix_sha,
+        "controls_sha256": one["controls_sha256"],
+        "checkpoint": {"sha256": checkpoint_sha},
+    }
+    one["progress_sha256"] = p05.sha256_bytes(
+        p05.canonical_json_bytes(one["progress"])
+    )
+    p05.validate_f3_resume_binding(
+        one,
+        controls,
+        n_done=1,
+        next_idx=1,
+        checkpoint_sha256=checkpoint_sha,
+        expected_prompt_prefix_sha256=prefix_sha,
+        expected_complete_corpus_sha256=controls["prompt_order_sha256"],
+    )
+
+    two = deepcopy(one)
+    two["completion"] = {
+        "n_done": 2,
+        "next_idx": 2,
+        "complete_corpus_sha256": controls["prompt_order_sha256"],
+        "controls_sha256": two["controls_sha256"],
+        "checkpoint_sha256": checkpoint_sha,
+        "lens_sha256": lens_sha,
+    }
+    two["completion_sha256"] = p05.sha256_bytes(
+        p05.canonical_json_bytes(two["completion"])
+    )
+    p05.validate_f3_resume_binding(
+        two,
+        controls,
+        n_done=2,
+        next_idx=2,
+        checkpoint_sha256=checkpoint_sha,
+        expected_prompt_prefix_sha256=prefix_sha,
+        expected_complete_corpus_sha256=controls["prompt_order_sha256"],
+        lens_sha256=lens_sha,
+    )
+
+
+def test_f3_resume_binding_rejects_prefix_and_checkpoint_mismatch():
+    controls = p05.make_checkpoint_controls(
+        prompt_order_sha256="a" * 64,
+        source_layers=[6, 13, 20],
+        target_layer=27,
+        dim_batch=1,
+    )
+    manifest = p05.make_checkpoint_manifest(controls)
+    manifest["progress"] = {
+        "n_done": 1,
+        "next_idx": 1,
+        "prompt_prefix_count": 1,
+        "prompt_prefix_sha256": "b" * 64,
+        "controls_sha256": manifest["controls_sha256"],
+        "checkpoint": {"sha256": "c" * 64},
+    }
+    manifest["progress_sha256"] = p05.sha256_bytes(
+        p05.canonical_json_bytes(manifest["progress"])
+    )
+    with pytest.raises(p05.CheckpointValidationError):
+        p05.validate_f3_resume_binding(
+            manifest,
+            controls,
+            n_done=1,
+            next_idx=1,
+            checkpoint_sha256="c" * 64,
+            expected_prompt_prefix_sha256="e" * 64,
+            expected_complete_corpus_sha256=controls["prompt_order_sha256"],
+        )
+    with pytest.raises(p05.CheckpointValidationError):
+        p05.validate_f3_resume_binding(
+            manifest,
+            controls,
+            n_done=1,
+            next_idx=1,
+            checkpoint_sha256="f" * 64,
+            expected_prompt_prefix_sha256="b" * 64,
+            expected_complete_corpus_sha256=controls["prompt_order_sha256"],
+        )
+
+
+def test_f3_complete_resume_rejects_corpus_and_lens_mismatch():
+    controls = p05.make_checkpoint_controls(
+        prompt_order_sha256="a" * 64,
+        source_layers=[6, 13, 20],
+        target_layer=27,
+        dim_batch=1,
+    )
+    manifest = p05.make_checkpoint_manifest(controls)
+    manifest["completion"] = {
+        "n_done": 2,
+        "next_idx": 2,
+        "complete_corpus_sha256": controls["prompt_order_sha256"],
+        "controls_sha256": manifest["controls_sha256"],
+        "checkpoint_sha256": "c" * 64,
+        "lens_sha256": "d" * 64,
+    }
+    manifest["completion_sha256"] = p05.sha256_bytes(
+        p05.canonical_json_bytes(manifest["completion"])
+    )
+    with pytest.raises(p05.CheckpointValidationError):
+        p05.validate_f3_resume_binding(
+            manifest,
+            controls,
+            n_done=2,
+            next_idx=2,
+            checkpoint_sha256="c" * 64,
+            expected_prompt_prefix_sha256="b" * 64,
+            expected_complete_corpus_sha256="e" * 64,
+            lens_sha256="d" * 64,
+        )
+    with pytest.raises(p05.CheckpointValidationError):
+        p05.validate_f3_resume_binding(
+            manifest,
+            controls,
+            n_done=2,
+            next_idx=2,
+            checkpoint_sha256="c" * 64,
+            expected_prompt_prefix_sha256="b" * 64,
+            expected_complete_corpus_sha256=controls["prompt_order_sha256"],
+            lens_sha256="f" * 64,
+        )
+
+
 def test_manifest_ordering_hash_and_corpus_order(tmp_path):
     (tmp_path / "z.txt").write_text("z", encoding="utf-8")
     (tmp_path / "a.txt").write_text("a", encoding="utf-8")
@@ -729,11 +881,20 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     assert 'IMAGE_REPOSITORY="j-space-observation-jlens"' in build
     assert "--file \"$PROJECT_ROOT/Dockerfile.jlens\"" in build
     assert ":latest" not in build
-    assert "refusing overwrite" in build
     assert "image_digest" in build
     assert "--write-enabled false" in build
     assert "--delete-enabled false" in build
     assert "immutability_verified" in build
+    assert "2>/dev/null" not in build
+    assert "|| true" not in build
+    assert "STAGING_IMAGE_TAG" in build
+    assert "--image \"$STAGING_IMAGE_TAG\"" in build
+    assert "RUN_OUTPUT_DIGEST" in build
+    assert "If-None-Match=*" in build
+    assert "require_confirmed_absence" in build
+    assert "az acr import" in build
+    assert "--force" not in build
+    assert "Distributed image claim" in build
     assert 'JOB_NAME="job-jspace-p05-jlens"' in run
     assert 'CONTAINER_APP_ENV="cae-jspace-observation-sea-vnet2"' in run
     assert 'WORKLOAD_PROFILE_NAME="gpu-t4"' in run
@@ -756,10 +917,21 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     assert "A succeeded primary execution must never be retried" in run
     assert "JSPACE_PHASE05_RUN_ID" in run
     assert "JSPACE_ATTEMPT_ID" in run
-    assert 'tags."primary-project-sha"' in run
+    assert '"primary-project-sha"' in run
     assert run.index("properties.provisioningState") < run.index(
         "az containerapp job start"
     )
+    assert "LAUNCH_INVOCATION_ID" in run
+    assert '"launch-state": "claimed-for-start"' in run
+    assert '"launch-invocation-id": "$LAUNCH_INVOCATION_ID"' in run
+    assert "If-None-Match=*" in run
+    assert "If-Match=${EXISTING_ETAG}" in run
+    assert '"$CAS_HEADER"' in run
+    assert "409/412" in run
+    assert "verify_claimed_job" in run
+    assert run.index("PRESTART_ETAG") < run.index("az containerapp job start")
+    assert "STARTED_EXECUTION_COUNT" in run
+    assert "execution_name_verified" in run
     assert '"volumes"' not in run
     assert '"secrets"' not in run
 

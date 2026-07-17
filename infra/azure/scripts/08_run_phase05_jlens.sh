@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run one primary Phase 0.5A attempt or its sole documented operational retry.
+# CAS-claim and start one primary Phase 0.5A job or its sole operational retry.
 
 set -euo pipefail
 
@@ -21,6 +21,7 @@ RUN_ID_INPUT="${JSPACE_PHASE05_RUN_ID:-}"
 RUN_ID="${RUN_ID_INPUT:-$(date -u +'%Y%m%dT%H%M%SZ')}"
 OPERATIONAL_FIX_NOTE="${OPERATIONAL_FIX_NOTE:-}"
 AUTHORIZED_COMPATIBILITY_FIX_ATTEMPTED="${AUTHORIZED_COMPATIBILITY_FIX_ATTEMPTED:-false}"
+LAUNCH_INVOCATION_ID="${LAUNCH_INVOCATION_ID:-$(date -u +'%Y%m%d%H%M%S')-$$-${RANDOM}}"
 
 if [[ ! "$PROJECT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
     echo "[FAIL] PROJECT_SHA must be a full 40-character commit"
@@ -28,6 +29,10 @@ if [[ ! "$PROJECT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
 fi
 if [[ "$ATTEMPT_KIND" != "primary" && "$ATTEMPT_KIND" != "operational-fix" ]]; then
     echo "[FAIL] ATTEMPT_KIND must be primary or operational-fix"
+    exit 1
+fi
+if [[ ! "$LAUNCH_INVOCATION_ID" =~ ^[A-Za-z0-9._-]+$ ]]; then
+    echo "[FAIL] LAUNCH_INVOCATION_ID contains invalid tag characters"
     exit 1
 fi
 if [[ "$ATTEMPT_KIND" == "primary" ]]; then
@@ -58,6 +63,12 @@ if [[ ! "$RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]; then
     echo "[FAIL] JSPACE_PHASE05_RUN_ID must be a UTC timestamp like 20260716T080000Z"
     exit 1
 fi
+if [[ "$ATTEMPT_KIND" == "operational-fix" ]]; then
+    if [[ -z "$RUN_ID_INPUT" || -z "$OPERATIONAL_FIX_NOTE" ]]; then
+        echo "[FAIL] Retry requires the primary run ID and OPERATIONAL_FIX_NOTE"
+        exit 1
+    fi
+fi
 
 LOGIN_SERVER="$(az acr show \
     --name "$ACR_NAME" \
@@ -74,6 +85,20 @@ if [[ ! "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
     exit 1
 fi
 IMAGE_DIGEST_REF="${LOGIN_SERVER}/${IMAGE_REPOSITORY}@${IMAGE_DIGEST}"
+if [[ "$PRIMARY_PROJECT_SHA" == "$PROJECT_SHA" ]]; then
+    PRIMARY_IMAGE_DIGEST="$IMAGE_DIGEST"
+else
+    PRIMARY_IMAGE_DIGEST="$(az acr repository show-manifests \
+        --name "$ACR_NAME" \
+        --repository "$IMAGE_REPOSITORY" \
+        --query "[?tags[?@=='${PRIMARY_PROJECT_SHA}']].digest | [0]" \
+        -o tsv)"
+fi
+if [[ ! "$PRIMARY_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+    echo "[FAIL] Primary project-SHA image digest could not be resolved"
+    exit 1
+fi
+PRIMARY_IMAGE_DIGEST_REF="${LOGIN_SERVER}/${IMAGE_REPOSITORY}@${PRIMARY_IMAGE_DIGEST}"
 TAG_WRITE_ENABLED="$(az acr repository show \
     --name "$ACR_NAME" \
     --image "${IMAGE_REPOSITORY}:${PROJECT_SHA}" \
@@ -105,7 +130,6 @@ if [[ "$PUBLIC_NETWORK" != "Disabled" ]]; then
     echo "[FAIL] Blob account public network access must be Disabled"
     exit 1
 fi
-
 IDENTITY_ID="$(az identity show \
     --name "$IDENTITY_NAME" \
     --resource-group "$RESOURCE_GROUP" \
@@ -120,37 +144,118 @@ ENVIRONMENT_ID="$(az containerapp env show \
     --query id -o tsv)"
 SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 
-JOB_EXISTS=false
+API_VERSION="2024-03-01"
+JOBS_URL="https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.App/jobs?api-version=${API_VERSION}"
+JOB_URL="https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.App/jobs/${JOB_NAME}?api-version=${API_VERSION}"
+RECORD_DIR="${JLENS_RUN_RECORD_DIR:-$PROJECT_ROOT/results/runs/phase05-jlens-${RUN_ID}}"
+mkdir -p "$RECORD_DIR"
+BODY_FILE="$RECORD_DIR/.azure_phase05_jlens_job_body.json"
+EXISTING_JOB_FILE="$RECORD_DIR/.azure_phase05_jlens_existing_job.json"
+CLAIMED_JOB_FILE="$RECORD_DIR/.azure_phase05_jlens_claimed_job.json"
+cleanup_files() {
+    rm -f "$BODY_FILE" "$EXISTING_JOB_FILE" "$CLAIMED_JOB_FILE"
+}
+trap cleanup_files EXIT
+
+JOB_COUNT="$(az rest \
+    --method get \
+    --url "$JOBS_URL" \
+    --query "length(value[?name=='${JOB_NAME}'])" -o tsv)"
+if [[ "$JOB_COUNT" != "0" && "$JOB_COUNT" != "1" ]]; then
+    echo "[FAIL] Could not establish unique Container Apps job existence"
+    exit 1
+fi
+
+EXECUTION_COUNT=0
 PRIMARY_EXECUTION_STATUS=""
-if az containerapp job show \
-    --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP" >/dev/null 2>&1; then
-    JOB_EXISTS=true
+CAS_HEADER=""
+if [[ "$ATTEMPT_KIND" == "primary" ]]; then
+    if [[ "$JOB_COUNT" != "0" ]]; then
+        echo "[FAIL] Existing job/launch claim requires manual intervention"
+        exit 1
+    fi
+    CAS_HEADER="If-None-Match=*"
+else
+    if [[ "$JOB_COUNT" != "1" ]]; then
+        echo "[FAIL] Operational retry requires exactly one existing primary job"
+        exit 1
+    fi
+    az rest --method get --url "$JOB_URL" --output json >"$EXISTING_JOB_FILE"
+    mapfile -t EXISTING_FIELDS < <(python - "$EXISTING_JOB_FILE" <<'PY'
+import json
+import sys
+
+job = json.load(open(sys.argv[1], encoding="utf-8"))
+tags = job.get("tags") or {}
+containers = job.get("properties", {}).get("template", {}).get("containers", [])
+container = containers[0] if containers else {}
+environment = {
+    item.get("name"): item.get("value") for item in container.get("env", [])
+}
+fields = [
+    job.get("etag"),
+    environment.get("JSPACE_PHASE05_RUN_ID"),
+    environment.get("JSPACE_ATTEMPT_ID"),
+    tags.get("project"),
+    tags.get("phase"),
+    tags.get("attempt-policy"),
+    tags.get("run-id"),
+    tags.get("project-sha"),
+    tags.get("primary-project-sha"),
+    tags.get("launch-attempt"),
+    tags.get("launch-state"),
+    tags.get("launch-invocation-id"),
+    tags.get("image-digest"),
+    container.get("image"),
+    tags.get("prior-execution-status"),
+]
+for field in fields:
+    print("" if field is None else field)
+PY
+)
+    if [[ "${#EXISTING_FIELDS[@]}" -ne 15 ]]; then
+        echo "[FAIL] Existing job claim fields could not be parsed"
+        exit 1
+    fi
+    EXISTING_ETAG="${EXISTING_FIELDS[0]}"
+    EXISTING_RUN_ID="${EXISTING_FIELDS[1]}"
+    EXISTING_ATTEMPT="${EXISTING_FIELDS[2]}"
+    EXISTING_PROJECT_TAG="${EXISTING_FIELDS[3]}"
+    EXISTING_PHASE_TAG="${EXISTING_FIELDS[4]}"
+    EXISTING_POLICY_TAG="${EXISTING_FIELDS[5]}"
+    EXISTING_RUN_TAG="${EXISTING_FIELDS[6]}"
+    EXISTING_PROJECT_SHA_TAG="${EXISTING_FIELDS[7]}"
+    EXISTING_PRIMARY_SHA_TAG="${EXISTING_FIELDS[8]}"
+    EXISTING_LAUNCH_ATTEMPT="${EXISTING_FIELDS[9]}"
+    EXISTING_LAUNCH_STATE="${EXISTING_FIELDS[10]}"
+    EXISTING_LAUNCH_INVOCATION="${EXISTING_FIELDS[11]}"
+    EXISTING_IMAGE_DIGEST_TAG="${EXISTING_FIELDS[12]}"
+    EXISTING_IMAGE_REF="${EXISTING_FIELDS[13]}"
+    EXISTING_PRIOR_STATUS_TAG="${EXISTING_FIELDS[14]}"
+    if [[ -z "$EXISTING_ETAG" \
+        || -z "$EXISTING_LAUNCH_INVOCATION" \
+        || "$EXISTING_RUN_ID" != "$RUN_ID" \
+        || "$EXISTING_ATTEMPT" != "primary" \
+        || "$EXISTING_PROJECT_TAG" != "jspace-observation" \
+        || "$EXISTING_PHASE_TAG" != "0.5A" \
+        || "$EXISTING_POLICY_TAG" != "one-primary-one-operational-fix" \
+        || "$EXISTING_RUN_TAG" != "$RUN_ID" \
+        || "$EXISTING_PROJECT_SHA_TAG" != "$PRIMARY_PROJECT_SHA" \
+        || "$EXISTING_PRIMARY_SHA_TAG" != "$PRIMARY_PROJECT_SHA" \
+        || "$EXISTING_LAUNCH_ATTEMPT" != "primary" \
+        || "$EXISTING_LAUNCH_STATE" != "claimed-for-start" \
+        || "$EXISTING_IMAGE_DIGEST_TAG" != "$PRIMARY_IMAGE_DIGEST" \
+        || "$EXISTING_IMAGE_REF" != "$PRIMARY_IMAGE_DIGEST_REF" \
+        || "$EXISTING_PRIOR_STATUS_TAG" != "none" ]]; then
+        echo "[FAIL] Existing job is not the matching primary launch claim"
+        exit 1
+    fi
     EXECUTION_COUNT="$(az containerapp job execution list \
         --name "$JOB_NAME" \
         --resource-group "$RESOURCE_GROUP" \
         --query 'length(@)' -o tsv)"
-else
-    EXECUTION_COUNT=0
-fi
-if [[ "$ATTEMPT_KIND" == "primary" && "$EXECUTION_COUNT" -ne 0 ]]; then
-    echo "[FAIL] Primary attempt is allowed only before any job execution"
-    exit 1
-fi
-if [[ "$ATTEMPT_KIND" == "operational-fix" ]]; then
-    if [[ -z "$RUN_ID_INPUT" ]]; then
-        echo "[FAIL] Operational retry must set the primary JSPACE_PHASE05_RUN_ID"
-        exit 1
-    fi
     if [[ "$EXECUTION_COUNT" -ne 1 ]]; then
-        echo "[FAIL] The sole operational retry requires exactly one prior execution"
-        exit 1
-    fi
-    if [[ -z "$OPERATIONAL_FIX_NOTE" ]]; then
-        echo "[FAIL] OPERATIONAL_FIX_NOTE must document the operational correction"
-        exit 1
-    fi
-    if [[ "$JOB_EXISTS" != "true" ]]; then
-        echo "[FAIL] Operational retry requires the existing primary job"
+        echo "[FAIL] Retry requires exactly one primary execution"
         exit 1
     fi
     PRIMARY_EXECUTION_STATUS="$(az containerapp job execution list \
@@ -165,54 +270,18 @@ if [[ "$ATTEMPT_KIND" == "operational-fix" ]]; then
             exit 1
             ;;
         *)
-            echo "[FAIL] Primary execution is not a failed terminal execution: $PRIMARY_EXECUTION_STATUS"
+            echo "[FAIL] Primary is not a failed terminal execution: $PRIMARY_EXECUTION_STATUS"
             exit 1
             ;;
     esac
-    EXISTING_RUN_ID="$(az containerapp job show \
-        --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP" \
-        --query 'properties.template.containers[0].env[?name==`JSPACE_PHASE05_RUN_ID`].value | [0]' \
-        -o tsv)"
-    EXISTING_ATTEMPT="$(az containerapp job show \
-        --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP" \
-        --query 'properties.template.containers[0].env[?name==`JSPACE_ATTEMPT_ID`].value | [0]' \
-        -o tsv)"
-    EXISTING_PROJECT_TAG="$(az containerapp job show \
-        --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP" \
-        --query 'tags.project' -o tsv)"
-    EXISTING_PHASE_TAG="$(az containerapp job show \
-        --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP" \
-        --query 'tags.phase' -o tsv)"
-    EXISTING_POLICY_TAG="$(az containerapp job show \
-        --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP" \
-        --query 'tags."attempt-policy"' -o tsv)"
-    EXISTING_RUN_TAG="$(az containerapp job show \
-        --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP" \
-        --query 'tags."run-id"' -o tsv)"
-    EXISTING_PROJECT_SHA_TAG="$(az containerapp job show \
-        --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP" \
-        --query 'tags."project-sha"' -o tsv)"
-    EXISTING_PRIMARY_SHA_TAG="$(az containerapp job show \
-        --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP" \
-        --query 'tags."primary-project-sha"' -o tsv)"
-    if [[ "$EXISTING_RUN_ID" != "$RUN_ID" \
-        || "$EXISTING_ATTEMPT" != "primary" \
-        || "$EXISTING_PROJECT_TAG" != "jspace-observation" \
-        || "$EXISTING_PHASE_TAG" != "0.5A" \
-        || "$EXISTING_POLICY_TAG" != "one-primary-one-operational-fix" \
-        || "$EXISTING_RUN_TAG" != "$RUN_ID" \
-        || "$EXISTING_PROJECT_SHA_TAG" != "$PRIMARY_PROJECT_SHA" \
-        || "$EXISTING_PRIMARY_SHA_TAG" != "$PRIMARY_PROJECT_SHA" ]]; then
-        echo "[FAIL] Existing job does not match the sole primary provenance"
-        exit 1
-    fi
-fi
-if [[ "$EXECUTION_COUNT" -ge 2 ]]; then
-    echo "[FAIL] Maximum one primary plus one operational-fix retry has been reached"
-    exit 1
+    CAS_HEADER="If-Match=${EXISTING_ETAG}"
 fi
 
 BLOB_PREFIX="phase05-jlens-feasibility/${RUN_ID}"
+if [[ -z "$CAS_HEADER" ]]; then
+    echo "[FAIL] Distributed launch CAS header was not established"
+    exit 1
+fi
 RESUME_PREFIX=""
 if [[ "$ATTEMPT_KIND" == "operational-fix" ]]; then
     RESUME_PREFIX="${BLOB_PREFIX}/attempts/primary"
@@ -222,14 +291,7 @@ if [[ "$AUTHORIZED_COMPATIBILITY_FIX_ATTEMPTED" == "true" ]]; then
     COMPATIBILITY_FLAG=" --authorized-compatibility-fix-attempted"
 fi
 COMMAND="timeout --signal=TERM --kill-after=30s 6900s python /workspace/scripts/phase05_jlens_feasibility.py --output-dir /workspace/runtime/results --resume${COMPATIBILITY_FLAG}"
-JOB_URL="https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.App/jobs/${JOB_NAME}?api-version=2024-03-01"
-RECORD_DIR="${JLENS_RUN_RECORD_DIR:-$PROJECT_ROOT/results/runs/phase05-jlens-${RUN_ID}}"
-mkdir -p "$RECORD_DIR"
-BODY_FILE="$RECORD_DIR/.azure_phase05_jlens_job_body.json"
-cleanup_body() {
-    rm -f "$BODY_FILE"
-}
-trap cleanup_body EXIT
+PRIOR_STATUS_TAG="${PRIMARY_EXECUTION_STATUS:-none}"
 
 python - "$BODY_FILE" <<PY
 import json
@@ -252,7 +314,6 @@ if "$RESUME_PREFIX":
     environment.append(
         {"name": "JSPACE_BLOB_RESUME_PREFIX", "value": "$RESUME_PREFIX"}
     )
-
 body = {
     "location": "southeastasia",
     "identity": {
@@ -266,6 +327,11 @@ body = {
         "run-id": "$RUN_ID",
         "project-sha": "$PROJECT_SHA",
         "primary-project-sha": "$PRIMARY_PROJECT_SHA",
+        "launch-attempt": "$ATTEMPT_KIND",
+        "launch-state": "claimed-for-start",
+        "launch-invocation-id": "$LAUNCH_INVOCATION_ID",
+        "image-digest": "$IMAGE_DIGEST",
+        "prior-execution-status": "$PRIOR_STATUS_TAG",
     },
     "properties": {
         "environmentId": "$ENVIRONMENT_ID",
@@ -301,12 +367,16 @@ Path("$BODY_FILE").write_text(
 )
 PY
 
-az rest \
+if ! az rest \
     --method put \
     --url "$JOB_URL" \
-    --headers "Content-Type=application/json" \
+    --headers "Content-Type=application/json" "$CAS_HEADER" \
     --body "@$BODY_FILE" \
-    --output none
+    --output none; then
+    echo "[FAIL] Distributed launch claim lost or failed (409/412/stale/unknown)"
+    exit 1
+fi
+
 PROVISIONING_STATE=""
 for _ in $(seq 1 120); do
     PROVISIONING_STATE="$(az rest \
@@ -318,21 +388,137 @@ for _ in $(seq 1 120); do
             break
             ;;
         Failed|Canceled|Cancelled|Deleted)
-            echo "[FAIL] Job provisioning ended in $PROVISIONING_STATE"
+            echo "[FAIL] Job claim provisioning ended in $PROVISIONING_STATE"
             exit 1
             ;;
     esac
     sleep 5
 done
 if [[ "$PROVISIONING_STATE" != "Succeeded" ]]; then
-    echo "[FAIL] Timed out waiting for job provisioningState=Succeeded"
+    echo "[FAIL] Timed out waiting for claimed job provisioning"
     exit 1
 fi
+
+verify_claimed_job() {
+    local file="$1"
+    az rest --method get --url "$JOB_URL" --output json >"$file"
+    python - "$file" "$RUN_ID" "$ATTEMPT_KIND" "$PROJECT_SHA" \
+        "$PRIMARY_PROJECT_SHA" "$LAUNCH_INVOCATION_ID" "$IMAGE_DIGEST" \
+        "$IMAGE_DIGEST_REF" "$PRIOR_STATUS_TAG" <<'PY'
+import json
+import sys
+
+(
+    path,
+    run_id,
+    attempt,
+    project_sha,
+    primary_sha,
+    invocation_id,
+    image_digest,
+    image_ref,
+    prior_status,
+) = sys.argv[1:]
+job = json.load(open(path, encoding="utf-8"))
+tags = job.get("tags") or {}
+containers = job.get("properties", {}).get("template", {}).get("containers", [])
+if len(containers) != 1:
+    raise SystemExit("claimed job must have exactly one container")
+container = containers[0]
+environment = {
+    item.get("name"): item.get("value") for item in container.get("env", [])
+}
+expected_tags = {
+    "project": "jspace-observation",
+    "phase": "0.5A",
+    "attempt-policy": "one-primary-one-operational-fix",
+    "run-id": run_id,
+    "project-sha": project_sha,
+    "primary-project-sha": primary_sha,
+    "launch-attempt": attempt,
+    "launch-state": "claimed-for-start",
+    "launch-invocation-id": invocation_id,
+    "image-digest": image_digest,
+    "prior-execution-status": prior_status,
+}
+actual_tags = {key: tags.get(key) for key in expected_tags}
+if actual_tags != expected_tags:
+    raise SystemExit(f"claimed launch tag mismatch: {actual_tags}")
+if environment.get("JSPACE_PHASE05_RUN_ID") != run_id:
+    raise SystemExit("claimed run ID mismatch")
+if environment.get("JSPACE_ATTEMPT_ID") != attempt:
+    raise SystemExit("claimed attempt mismatch")
+if container.get("image") != image_ref:
+    raise SystemExit("claimed image digest mismatch")
+if not job.get("etag"):
+    raise SystemExit("claimed job ETag missing")
+print(job["etag"])
+PY
+}
+
+CLAIMED_ETAG="$(verify_claimed_job "$CLAIMED_JOB_FILE")"
+POST_CLAIM_EXECUTION_COUNT="$(az containerapp job execution list \
+    --name "$JOB_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --query 'length(@)' -o tsv)"
+if [[ "$POST_CLAIM_EXECUTION_COUNT" -ne "$EXECUTION_COUNT" ]]; then
+    echo "[FAIL] Execution count changed while launch claim was established"
+    exit 1
+fi
+if [[ "$ATTEMPT_KIND" == "operational-fix" ]]; then
+    REVALIDATED_PRIMARY_STATUS="$(az containerapp job execution list \
+        --name "$JOB_NAME" \
+        --resource-group "$RESOURCE_GROUP" \
+        --query '[0].properties.status' -o tsv)"
+    if [[ "$REVALIDATED_PRIMARY_STATUS" != "$PRIMARY_EXECUTION_STATUS" ]]; then
+        echo "[FAIL] Primary execution status changed under retry claim"
+        exit 1
+    fi
+fi
+
+# A second GET immediately before start must retain the exact CAS winner.
+PRESTART_ETAG="$(verify_claimed_job "$CLAIMED_JOB_FILE")"
+if [[ "$PRESTART_ETAG" != "$CLAIMED_ETAG" ]]; then
+    echo "[FAIL] Claimed job changed before start; manual intervention required"
+    exit 1
+fi
+
 EXECUTION_NAME="$(az containerapp job start \
     --name "$JOB_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --query name -o tsv)"
-rm -f "$BODY_FILE"
+if [[ -z "$EXECUTION_NAME" ]]; then
+    echo "[FAIL] Job start returned no execution name"
+    exit 1
+fi
+EXPECTED_EXECUTION_COUNT=$((EXECUTION_COUNT + 1))
+STARTED_EXECUTION_COUNT=0
+ACTUAL_EXECUTION_COUNT=0
+for _ in $(seq 1 60); do
+    STARTED_EXECUTION_COUNT="$(az containerapp job execution list \
+        --name "$JOB_NAME" \
+        --resource-group "$RESOURCE_GROUP" \
+        --query "[?name=='${EXECUTION_NAME}'] | length(@)" -o tsv)"
+    ACTUAL_EXECUTION_COUNT="$(az containerapp job execution list \
+        --name "$JOB_NAME" \
+        --resource-group "$RESOURCE_GROUP" \
+        --query 'length(@)' -o tsv)"
+    if [[ "$ACTUAL_EXECUTION_COUNT" -gt "$EXPECTED_EXECUTION_COUNT" ]]; then
+        echo "[FAIL] Concurrent or duplicate execution appeared after start"
+        exit 1
+    fi
+    if [[ "$STARTED_EXECUTION_COUNT" -eq 1 \
+        && "$ACTUAL_EXECUTION_COUNT" -eq "$EXPECTED_EXECUTION_COUNT" ]]; then
+        break
+    fi
+    sleep 2
+done
+if [[ "$STARTED_EXECUTION_COUNT" -ne 1 \
+    || "$ACTUAL_EXECUTION_COUNT" -ne "$EXPECTED_EXECUTION_COUNT" ]]; then
+    echo "[FAIL] Started execution name/count could not be verified"
+    exit 1
+fi
+POSTSTART_ETAG="$(verify_claimed_job "$CLAIMED_JOB_FILE")"
 
 python - "$RECORD_DIR/phase05_jlens_job_start.json" "$OPERATIONAL_FIX_NOTE" <<PY
 import json
@@ -340,16 +526,21 @@ import sys
 from pathlib import Path
 
 record = {
-    "schema_version": "phase05-jlens-job-start-v1",
+    "schema_version": "phase05-jlens-job-start-v2",
     "started_at_utc": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
     "run_id": "$RUN_ID",
     "attempt": "$ATTEMPT_KIND",
+    "launch_invocation_id": "$LAUNCH_INVOCATION_ID",
+    "launch_claim_etag": "$CLAIMED_ETAG",
+    "post_start_job_etag": "$POSTSTART_ETAG",
+    "launch_state": "claimed-for-start",
     "operational_fix_note": sys.argv[2],
     "authorized_compatibility_fix_attempted": (
         "$AUTHORIZED_COMPATIBILITY_FIX_ATTEMPTED" == "true"
     ),
     "job_name": "$JOB_NAME",
     "execution_name": "$EXECUTION_NAME",
+    "execution_name_verified": True,
     "environment": "$CONTAINER_APP_ENV",
     "workload_profile": "$WORKLOAD_PROFILE_NAME",
     "replicas": 1,
@@ -378,7 +569,9 @@ Path("$RECORD_DIR/phase05_jlens_job_start.json").write_text(
 )
 PY
 
-echo "[OK] Started $EXECUTION_NAME ($ATTEMPT_KIND)"
+rm -f "$BODY_FILE" "$EXISTING_JOB_FILE" "$CLAIMED_JOB_FILE"
+echo "[OK] Started and verified $EXECUTION_NAME ($ATTEMPT_KIND)"
+echo "[OK] Launch claim: $LAUNCH_INVOCATION_ID etag=$CLAIMED_ETAG"
 echo "[OK] Blob prefix: $BLOB_PREFIX"
 echo "[OK] No platform retry; no Azure Files; managed identity only"
 echo "[OK] Record: $RECORD_DIR/phase05_jlens_job_start.json"
