@@ -1,0 +1,71 @@
+FROM python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d
+
+ARG JLENS_REPOSITORY=https://github.com/anthropics/jacobian-lens
+ARG JLENS_COMMIT=581d398613e5602a5af361e1c34d3a92ea82ba8e
+ARG JLENS_UV_LOCK_SHA256=981e580531e517be1bd1a3fef98ac12822f40d626ba8f365e59973ff258f36ea
+
+LABEL org.opencontainers.image.title="J-space Phase 0.5A J-lens feasibility"
+LABEL org.opencontainers.image.source="${JLENS_REPOSITORY}"
+LABEL org.opencontainers.image.revision="${JLENS_COMMIT}"
+LABEL io.jspace.jlens.uv-lock-sha256="${JLENS_UV_LOCK_SHA256}"
+LABEL io.jspace.jlens.source-pin="https://github.com/anthropics/jacobian-lens@581d398613e5602a5af361e1c34d3a92ea82ba8e"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates git tini \
+    && groupadd --system --gid 10001 jspace \
+    && useradd --system --uid 10001 --gid jspace --create-home \
+        --home-dir /workspace/runtime/home --shell /usr/sbin/nologin jspace \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+COPY requirements-jlens.txt Dockerfile.jlens /workspace/
+
+RUN test "${JLENS_REPOSITORY}" = "https://github.com/anthropics/jacobian-lens" \
+    && test "${JLENS_COMMIT}" = "581d398613e5602a5af361e1c34d3a92ea82ba8e" \
+    && grep -Fq \
+        "git+https://github.com/anthropics/jacobian-lens.git@${JLENS_COMMIT}" \
+        /workspace/requirements-jlens.txt \
+    && python -m pip install --no-cache-dir \
+        pip==26.1.2 setuptools==81.0.0 wheel==0.47.0 \
+    && python -m pip install --no-cache-dir --no-build-isolation \
+        -r /workspace/requirements-jlens.txt \
+    && python -c "import importlib.metadata as m; assert m.version('jlens') == '0.1.0'; assert m.version('torch') == '2.12.0'; assert m.version('transformers') == '5.9.0'"
+
+COPY scripts/phase05_jlens_feasibility.py /workspace/scripts/
+COPY src/jspace_observation/phase05_jlens.py /workspace/src/jspace_observation/
+COPY data/jlens_feasibility_prompts.jsonl /workspace/data/
+
+RUN install -d -o jspace -g jspace -m 0700 \
+        /workspace/runtime/home \
+        /workspace/runtime/hf-cache \
+        /workspace/runtime/results \
+        /workspace/runtime/checkpoints \
+        /workspace/runtime/cache \
+        /workspace/runtime/cache/tmp \
+        /workspace/runtime/pycache \
+    && chown -R 0:0 \
+        /workspace/requirements-jlens.txt \
+        /workspace/Dockerfile.jlens \
+        /workspace/scripts \
+        /workspace/src \
+        /workspace/data \
+    && chmod -R a-w /workspace/scripts /workspace/src /workspace/data \
+        /workspace/requirements-jlens.txt /workspace/Dockerfile.jlens
+
+ENV HOME=/workspace/runtime/home \
+    HF_HOME=/workspace/runtime/hf-cache \
+    HUGGINGFACE_HUB_CACHE=/workspace/runtime/hf-cache/hub \
+    TRANSFORMERS_CACHE=/workspace/runtime/hf-cache \
+    XDG_CACHE_HOME=/workspace/runtime/cache \
+    TMPDIR=/workspace/runtime/cache/tmp \
+    PYTHONPYCACHEPREFIX=/workspace/runtime/pycache \
+    RESULTS_DIR=/workspace/runtime/results
+
+USER 10001:10001
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["python", "/workspace/scripts/phase05_jlens_feasibility.py", "--output-dir", "/workspace/runtime/results", "--resume"]
