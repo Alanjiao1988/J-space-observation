@@ -500,6 +500,34 @@ def f3_checkpoint_actions(n_done: int, next_idx: int) -> list[str]:
     return ["load_full_resume"]
 
 
+def f3_segment_time_guard(
+    *,
+    elapsed_seconds: float,
+    estimated_remaining_fit_seconds: float,
+    export_reserve_seconds: int = EXPORT_RESERVE_SECONDS,
+) -> dict[str, Any]:
+    if (
+        not math.isfinite(elapsed_seconds)
+        or not math.isfinite(estimated_remaining_fit_seconds)
+        or elapsed_seconds < 0
+        or estimated_remaining_fit_seconds < 0
+    ):
+        raise Phase05ValidationError("invalid F3 segment admission inputs")
+    projected_completion = (
+        elapsed_seconds
+        + estimated_remaining_fit_seconds
+        + export_reserve_seconds
+    )
+    return {
+        "elapsed_seconds": elapsed_seconds,
+        "estimated_remaining_fit_seconds": estimated_remaining_fit_seconds,
+        "export_reserve_seconds": export_reserve_seconds,
+        "planning_boundary_seconds": PLANNING_BUDGET_SECONDS,
+        "projected_completion_seconds": projected_completion,
+        "admitted": projected_completion <= PLANNING_BUDGET_SECONDS,
+    }
+
+
 def f3_memory_requires_stop(f3_result: Mapping[str, Any]) -> bool:
     return (
         f3_result.get("details", {})
@@ -603,6 +631,26 @@ def make_checkpoint_manifest(controls: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def validate_registered_f3_controls(
+    controls: Mapping[str, Any], *, corpus_sha256: str
+) -> dict[str, Any]:
+    layers = representative_layers(MODEL_LAYERS)
+    dim_batch = controls.get("dim_batch")
+    if dim_batch not in {1, 2}:
+        raise CheckpointValidationError("registered F3 dim_batch must be 1 or 2")
+    expected = make_checkpoint_controls(
+        prompt_order_sha256=corpus_sha256,
+        source_layers=layers["f3_source_layers"],
+        target_layer=layers["target_layer"],
+        dim_batch=int(dim_batch),
+    )
+    if dict(controls) != expected:
+        raise CheckpointValidationError(
+            "checkpoint controls do not match the registered corpus/runtime"
+        )
+    return expected
+
+
 def validate_checkpoint_manifest(
     manifest: Mapping[str, Any], expected_controls: Mapping[str, Any]
 ) -> None:
@@ -625,6 +673,8 @@ def validate_f3_resume_binding(
     expected_prompt_prefix_sha256: str,
     expected_complete_corpus_sha256: str,
     lens_sha256: str | None = None,
+    prefix_checkpoint_sha256: str | None = None,
+    expected_prefix_progress_sha256: str | None = None,
 ) -> None:
     """Bind resumable official state to exact prompts, checkpoint, and lens."""
 
@@ -635,45 +685,57 @@ def validate_f3_resume_binding(
     completion = manifest.get("completion")
 
     if n_done == 0:
-        if progress is not None or completion is not None:
+        if (
+            checkpoint_sha256 is not None
+            or progress is not None
+            or completion is not None
+        ):
             raise CheckpointValidationError(
-                "zero-prompt checkpoint has stale progress/completion binding"
+                "zero-prompt state must not have a checkpoint/progress/completion"
             )
         return
 
     if not checkpoint_sha256:
         raise CheckpointValidationError("resumed checkpoint SHA256 is required")
 
+    if not isinstance(progress, Mapping):
+        raise CheckpointValidationError("durable prompt-prefix progress is missing")
+    expected_progress_hash = sha256_bytes(canonical_json_bytes(dict(progress)))
+    if manifest.get("progress_sha256") != expected_progress_hash:
+        raise CheckpointValidationError("prompt-prefix progress hash mismatch")
+    checkpoint = progress.get("checkpoint")
+    if not isinstance(checkpoint, Mapping):
+        raise CheckpointValidationError("prompt-prefix checkpoint binding missing")
+    durable_prefix_sha = prefix_checkpoint_sha256 or checkpoint_sha256
+    expected_progress = {
+        "n_done": 1,
+        "next_idx": 1,
+        "prompt_prefix_count": 1,
+        "prompt_prefix_sha256": expected_prompt_prefix_sha256,
+        "controls_sha256": controls_sha256,
+        "checkpoint_sha256": durable_prefix_sha,
+    }
+    actual_progress = {
+        "n_done": progress.get("n_done"),
+        "next_idx": progress.get("next_idx"),
+        "prompt_prefix_count": progress.get("prompt_prefix_count"),
+        "prompt_prefix_sha256": progress.get("prompt_prefix_sha256"),
+        "controls_sha256": progress.get("controls_sha256"),
+        "checkpoint_sha256": checkpoint.get("sha256"),
+    }
+    if actual_progress != expected_progress:
+        raise CheckpointValidationError(
+            f"prompt-prefix resume binding mismatch: {actual_progress}"
+        )
+
     if n_done == 1:
-        if not isinstance(progress, Mapping) or completion is not None:
+        if completion is not None:
             raise CheckpointValidationError(
-                "one-prompt checkpoint requires progress and no completion binding"
+                "one-prompt checkpoint must not have completion binding"
             )
-        expected_progress_hash = sha256_bytes(canonical_json_bytes(dict(progress)))
-        if manifest.get("progress_sha256") != expected_progress_hash:
-            raise CheckpointValidationError("prompt-prefix progress hash mismatch")
-        checkpoint = progress.get("checkpoint")
-        if not isinstance(checkpoint, Mapping):
-            raise CheckpointValidationError("prompt-prefix checkpoint binding missing")
-        expected = {
-            "n_done": 1,
-            "next_idx": 1,
-            "prompt_prefix_count": 1,
-            "prompt_prefix_sha256": expected_prompt_prefix_sha256,
-            "controls_sha256": controls_sha256,
-            "checkpoint_sha256": checkpoint_sha256,
-        }
-        actual = {
-            "n_done": progress.get("n_done"),
-            "next_idx": progress.get("next_idx"),
-            "prompt_prefix_count": progress.get("prompt_prefix_count"),
-            "prompt_prefix_sha256": progress.get("prompt_prefix_sha256"),
-            "controls_sha256": progress.get("controls_sha256"),
-            "checkpoint_sha256": checkpoint.get("sha256"),
-        }
-        if actual != expected:
+        if checkpoint_sha256 != durable_prefix_sha:
             raise CheckpointValidationError(
-                f"prompt-prefix resume binding mismatch: {actual}"
+                "one-prompt working checkpoint differs from durable prefix"
             )
         return
 
@@ -684,6 +746,14 @@ def validate_f3_resume_binding(
         raise CheckpointValidationError("complete checkpoint binding hash mismatch")
     if not lens_sha256:
         raise CheckpointValidationError("complete resume requires a saved lens SHA256")
+    if not prefix_checkpoint_sha256 or not expected_prefix_progress_sha256:
+        raise CheckpointValidationError(
+            "complete resume requires durable prefix checkpoint/progress bindings"
+        )
+    if manifest.get("progress_sha256") != expected_prefix_progress_sha256:
+        raise CheckpointValidationError(
+            "complete resume prefix progress differs from durable prefix manifest"
+        )
     expected = {
         "n_done": 2,
         "next_idx": 2,
@@ -691,6 +761,8 @@ def validate_f3_resume_binding(
         "controls_sha256": controls_sha256,
         "checkpoint_sha256": checkpoint_sha256,
         "lens_sha256": lens_sha256,
+        "prefix_checkpoint_sha256": prefix_checkpoint_sha256,
+        "prefix_progress_sha256": expected_prefix_progress_sha256,
     }
     actual = {
         "n_done": completion.get("n_done"),
@@ -699,6 +771,10 @@ def validate_f3_resume_binding(
         "controls_sha256": completion.get("controls_sha256"),
         "checkpoint_sha256": completion.get("checkpoint_sha256"),
         "lens_sha256": completion.get("lens_sha256"),
+        "prefix_checkpoint_sha256": completion.get(
+            "prefix_checkpoint_sha256"
+        ),
+        "prefix_progress_sha256": completion.get("prefix_progress_sha256"),
     }
     if actual != expected:
         raise CheckpointValidationError(

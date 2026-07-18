@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+import shutil
 import sys
 from copy import deepcopy
 from pathlib import Path
@@ -336,6 +337,32 @@ def test_f3_dim1_time_guard_scales_by_prompt_count_and_layer_span():
     assert guard["projected_fit_seconds"] == 600
 
 
+def test_fresh_segment_admission_blocks_after_slow_persistence():
+    class FakeClock:
+        def __init__(self):
+            self.now = 100.0
+
+        def monotonic(self):
+            return self.now
+
+        def advance(self, seconds):
+            self.now += seconds
+
+    clock = FakeClock()
+    first = p05.f3_segment_time_guard(
+        elapsed_seconds=clock.monotonic(),
+        estimated_remaining_fit_seconds=1000,
+    )
+    assert first["admitted"] is True
+    clock.advance(5500)
+    second = p05.f3_segment_time_guard(
+        elapsed_seconds=clock.monotonic(),
+        estimated_remaining_fit_seconds=500,
+    )
+    assert second["admitted"] is False
+    assert second["projected_completion_seconds"] > 6120
+
+
 def test_f3_checkpoint_actions_cover_zero_one_and_two_prompt_states():
     assert p05.f3_checkpoint_actions(0, 0) == [
         "fit_prompt_1",
@@ -471,6 +498,7 @@ def test_f3_resume_bindings_accept_only_exact_zero_one_two_states():
     )
     prefix_sha = "b" * 64
     checkpoint_sha = "c" * 64
+    prefix_checkpoint_sha = "e" * 64
     lens_sha = "d" * 64
     zero = p05.make_checkpoint_manifest(controls)
     p05.validate_f3_resume_binding(
@@ -482,6 +510,16 @@ def test_f3_resume_bindings_accept_only_exact_zero_one_two_states():
         expected_prompt_prefix_sha256=prefix_sha,
         expected_complete_corpus_sha256=controls["prompt_order_sha256"],
     )
+    with pytest.raises(p05.CheckpointValidationError):
+        p05.validate_f3_resume_binding(
+            zero,
+            controls,
+            n_done=0,
+            next_idx=0,
+            checkpoint_sha256="0" * 64,
+            expected_prompt_prefix_sha256=prefix_sha,
+            expected_complete_corpus_sha256=controls["prompt_order_sha256"],
+        )
 
     one = p05.make_checkpoint_manifest(controls)
     one["progress"] = {
@@ -490,7 +528,7 @@ def test_f3_resume_bindings_accept_only_exact_zero_one_two_states():
         "prompt_prefix_count": 1,
         "prompt_prefix_sha256": prefix_sha,
         "controls_sha256": one["controls_sha256"],
-        "checkpoint": {"sha256": checkpoint_sha},
+        "checkpoint": {"sha256": prefix_checkpoint_sha},
     }
     one["progress_sha256"] = p05.sha256_bytes(
         p05.canonical_json_bytes(one["progress"])
@@ -500,7 +538,7 @@ def test_f3_resume_bindings_accept_only_exact_zero_one_two_states():
         controls,
         n_done=1,
         next_idx=1,
-        checkpoint_sha256=checkpoint_sha,
+        checkpoint_sha256=prefix_checkpoint_sha,
         expected_prompt_prefix_sha256=prefix_sha,
         expected_complete_corpus_sha256=controls["prompt_order_sha256"],
     )
@@ -513,6 +551,8 @@ def test_f3_resume_bindings_accept_only_exact_zero_one_two_states():
         "controls_sha256": two["controls_sha256"],
         "checkpoint_sha256": checkpoint_sha,
         "lens_sha256": lens_sha,
+        "prefix_checkpoint_sha256": prefix_checkpoint_sha,
+        "prefix_progress_sha256": two["progress_sha256"],
     }
     two["completion_sha256"] = p05.sha256_bytes(
         p05.canonical_json_bytes(two["completion"])
@@ -526,7 +566,33 @@ def test_f3_resume_bindings_accept_only_exact_zero_one_two_states():
         expected_prompt_prefix_sha256=prefix_sha,
         expected_complete_corpus_sha256=controls["prompt_order_sha256"],
         lens_sha256=lens_sha,
+        prefix_checkpoint_sha256=prefix_checkpoint_sha,
+        expected_prefix_progress_sha256=two["progress_sha256"],
     )
+    malformed_prefix = deepcopy(two)
+    malformed_prefix["progress"]["prompt_prefix_count"] = 2
+    malformed_prefix["progress_sha256"] = p05.sha256_bytes(
+        p05.canonical_json_bytes(malformed_prefix["progress"])
+    )
+    malformed_prefix["completion"]["prefix_progress_sha256"] = malformed_prefix[
+        "progress_sha256"
+    ]
+    malformed_prefix["completion_sha256"] = p05.sha256_bytes(
+        p05.canonical_json_bytes(malformed_prefix["completion"])
+    )
+    with pytest.raises(p05.CheckpointValidationError):
+        p05.validate_f3_resume_binding(
+            malformed_prefix,
+            controls,
+            n_done=2,
+            next_idx=2,
+            checkpoint_sha256=checkpoint_sha,
+            expected_prompt_prefix_sha256=prefix_sha,
+            expected_complete_corpus_sha256=controls["prompt_order_sha256"],
+            lens_sha256=lens_sha,
+            prefix_checkpoint_sha256=prefix_checkpoint_sha,
+            expected_prefix_progress_sha256=malformed_prefix["progress_sha256"],
+        )
 
 
 def test_f3_resume_binding_rejects_prefix_and_checkpoint_mismatch():
@@ -578,6 +644,18 @@ def test_f3_complete_resume_rejects_corpus_and_lens_mismatch():
         dim_batch=1,
     )
     manifest = p05.make_checkpoint_manifest(controls)
+    prefix_checkpoint_sha = "e" * 64
+    manifest["progress"] = {
+        "n_done": 1,
+        "next_idx": 1,
+        "prompt_prefix_count": 1,
+        "prompt_prefix_sha256": "b" * 64,
+        "controls_sha256": manifest["controls_sha256"],
+        "checkpoint": {"sha256": prefix_checkpoint_sha},
+    }
+    manifest["progress_sha256"] = p05.sha256_bytes(
+        p05.canonical_json_bytes(manifest["progress"])
+    )
     manifest["completion"] = {
         "n_done": 2,
         "next_idx": 2,
@@ -585,6 +663,8 @@ def test_f3_complete_resume_rejects_corpus_and_lens_mismatch():
         "controls_sha256": manifest["controls_sha256"],
         "checkpoint_sha256": "c" * 64,
         "lens_sha256": "d" * 64,
+        "prefix_checkpoint_sha256": prefix_checkpoint_sha,
+        "prefix_progress_sha256": manifest["progress_sha256"],
     }
     manifest["completion_sha256"] = p05.sha256_bytes(
         p05.canonical_json_bytes(manifest["completion"])
@@ -599,6 +679,8 @@ def test_f3_complete_resume_rejects_corpus_and_lens_mismatch():
             expected_prompt_prefix_sha256="b" * 64,
             expected_complete_corpus_sha256="e" * 64,
             lens_sha256="d" * 64,
+            prefix_checkpoint_sha256=prefix_checkpoint_sha,
+            expected_prefix_progress_sha256=manifest["progress_sha256"],
         )
     with pytest.raises(p05.CheckpointValidationError):
         p05.validate_f3_resume_binding(
@@ -610,6 +692,8 @@ def test_f3_complete_resume_rejects_corpus_and_lens_mismatch():
             expected_prompt_prefix_sha256="b" * 64,
             expected_complete_corpus_sha256=controls["prompt_order_sha256"],
             lens_sha256="f" * 64,
+            prefix_checkpoint_sha256=prefix_checkpoint_sha,
+            expected_prefix_progress_sha256=manifest["progress_sha256"],
         )
 
 
@@ -780,6 +864,90 @@ def test_failed_blob_recovery_blocks_before_model_or_gpu(monkeypatch, tmp_path):
     assert all(stages[stage]["status"] == "blocked" for stage in p05.STAGES[1:])
 
 
+def test_restore_falls_back_from_incomplete_n2_to_valid_prefix(tmp_path):
+    records, corpus_sha = runner_module.load_corpus(
+        ROOT / "data" / "jlens_feasibility_prompts.jsonl"
+    )
+    controls = p05.make_checkpoint_controls(
+        prompt_order_sha256=corpus_sha,
+        source_layers=[6, 13, 20],
+        target_layer=27,
+        dim_batch=1,
+    )
+    prefix_dir = tmp_path / "older-prefix"
+    checkpoint_dir = prefix_dir / "checkpoint"
+    checkpoint_dir.mkdir(parents=True)
+    working = checkpoint_dir / "phase05_jlens_f3_fit_checkpoint.pt"
+    durable = checkpoint_dir / "phase05_jlens_f3_prompt1_checkpoint.pt"
+    state_1 = {
+        "n_done": 1,
+        "next_idx": 1,
+        "source_layers": [6, 13, 20],
+        "target_layer": 27,
+        "skip_first": 16,
+    }
+    checkpoint_bytes = p05.canonical_json_bytes(state_1)
+    working.write_bytes(checkpoint_bytes)
+    durable.write_bytes(checkpoint_bytes)
+    manifest = p05.make_checkpoint_manifest(controls)
+    manifest["progress"] = {
+        "n_done": 1,
+        "next_idx": 1,
+        "prompt_prefix_count": 1,
+        "prompt_prefix_sha256": p05.canonical_jsonl_sha256(records[:1]),
+        "controls_sha256": manifest["controls_sha256"],
+        "checkpoint": {
+            "path": "checkpoint/phase05_jlens_f3_prompt1_checkpoint.pt",
+            "bytes": len(checkpoint_bytes),
+            "sha256": p05.sha256_file(durable),
+        },
+    }
+    manifest["progress_sha256"] = p05.sha256_bytes(
+        p05.canonical_json_bytes(manifest["progress"])
+    )
+    for name in (
+        "phase05_jlens_f3_checkpoint.manifest.json",
+        "phase05_jlens_f3_prompt1_checkpoint.manifest.json",
+    ):
+        (checkpoint_dir / name).write_bytes(p05.canonical_json_bytes(manifest))
+
+    incomplete_dir = tmp_path / "newer-incomplete-n2"
+    shutil.copytree(prefix_dir, incomplete_dir)
+    incomplete_working = (
+        incomplete_dir / "checkpoint" / "phase05_jlens_f3_fit_checkpoint.pt"
+    )
+    incomplete_working.write_bytes(
+        p05.canonical_json_bytes(
+            {
+                **state_1,
+                "n_done": 2,
+                "next_idx": 2,
+            }
+        )
+    )
+
+    selected = runner_module.select_semantically_valid_snapshot(
+        [
+            {
+                "path": incomplete_dir,
+                "source_prefix": "run/snapshots/009-F3-failed",
+            },
+            {
+                "path": prefix_dir,
+                "source_prefix": "run/snapshots/008-F3-prompt-1",
+            },
+        ],
+        records,
+        checkpoint_loader=lambda path: json.loads(path.read_text(encoding="utf-8")),
+    )
+    assert selected["source_prefix"].endswith("008-F3-prompt-1")
+    assert selected["semantics"]["n_done"] == 1
+    assert selected["fallback_used"] is True
+    assert selected["rejected_newer_snapshots"][0]["source_prefix"].endswith(
+        "009-F3-failed"
+    )
+
+
 def test_configured_upload_failure_never_returns_success(monkeypatch, tmp_path):
     monkeypatch.delenv("JSPACE_BLOB_RESUME_PREFIX", raising=False)
     args = runner_module.parse_args(
@@ -880,6 +1048,11 @@ def test_runner_contains_real_official_calls_and_no_substitution():
     assert "protocol.MODEL_REVISION" in source
     assert "prompts=prompts[:1]" in source
     assert 'self.persist("F3-prompt-1")' in source
+    assert "phase05_jlens_f3_prompt1_checkpoint.pt" in source
+    assert source.count("f3_segment_time_guard(") >= 2
+    assert source.index('self.persist("F3-prompt-1")') < source.index(
+        "segment_2_admission"
+    )
     assert source.index("f3_memory_requires_stop") < source.index(
         'self.execute("F4"'
     )
@@ -954,6 +1127,23 @@ def test_claim_invocation_ids_are_cryptographic_and_unique(capsys):
     assert first != second
 
 
+def test_invocation_scratch_paths_are_isolated(tmp_path):
+    first = claim_election.invocation_scratch_path(
+        tmp_path, "build", "1" * 32
+    )
+    second = claim_election.invocation_scratch_path(
+        tmp_path, "build", "2" * 32
+    )
+    launch = claim_election.invocation_scratch_path(
+        tmp_path, "launch", "1" * 32
+    )
+    assert first.parent == second.parent == launch.parent == tmp_path.resolve()
+    assert len({first, second, launch}) == 3
+    assert first.name == ".p05-build-" + "1" * 32
+    with pytest.raises(claim_election.ClaimValidationError):
+        claim_election.invocation_scratch_path(tmp_path, "build", "../bad")
+
+
 def test_earliest_failed_or_in_progress_claim_remains_blocking_winner():
     prefix = "p05b-0123456789abcdef0123--"
     fixed = {
@@ -1025,6 +1215,43 @@ def test_claim_election_rejects_invalid_or_ambiguous_ticket_sets(mutation):
         claim_election.elect_claim(claims, prefix=prefix, fixed=fixed)
 
 
+def test_global_primary_claim_blocks_a_different_run_id():
+    prefix = "p05l-global-singleton--"
+    earlier_fixed = {
+        "operation": "launch",
+        "claimPrefix": prefix,
+        "runId": "20260718T120000Z",
+        "attempt": "primary",
+        "primaryProjectSha": "a" * 40,
+        "jobName": "job-jspace-p05-jlens",
+    }
+    earlier = deployment_claim(
+        name=prefix + "1" * 32,
+        prefix=prefix,
+        timestamp="2026-07-18T12:00:00Z",
+        fixed=earlier_fixed,
+        dynamic={
+            "projectSha": "a" * 40,
+            "imageDigest": "sha256:" + "b" * 64,
+        },
+    )
+    later_fixed = {**earlier_fixed, "runId": "20260719T120000Z"}
+    later = deployment_claim(
+        name=prefix + "2" * 32,
+        prefix=prefix,
+        timestamp="2026-07-19T12:00:00Z",
+        fixed=later_fixed,
+        dynamic={
+            "projectSha": "c" * 40,
+            "imageDigest": "sha256:" + "d" * 64,
+        },
+    )
+    with pytest.raises(claim_election.ClaimValidationError):
+        claim_election.elect_claim(
+            [earlier, later], prefix=prefix, fixed=later_fixed
+        )
+
+
 def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     build = (
         ROOT / "infra" / "azure" / "scripts" / "07_build_phase05_jlens.sh"
@@ -1054,6 +1281,9 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     assert "SECOND_WINNER_TIME" in build
     assert "winner changed before promotion" in build
     assert "claim_deployment_retained" in build
+    assert 'SCRATCH_DIR="$(python "$CLAIM_HELPER" scratch-path' in build
+    assert 'rm -rf "$SCRATCH_DIR"' in build
+    assert "$RECORD_DIR/.azure_phase05_jlens" not in build
     assert 'JOB_NAME="job-jspace-p05-jlens"' in run
     assert 'CONTAINER_APP_ENV="cae-jspace-observation-sea-vnet2"' in run
     assert 'WORKLOAD_PROFILE_NAME="gpu-t4"' in run
@@ -1095,6 +1325,29 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     )
     assert "STARTED_EXECUTION_COUNT" in run
     assert "execution_name_verified" in run
+    assert 'SCRATCH_DIR="$(python "$CLAIM_HELPER" scratch-path' in run
+    assert 'rm -rf "$SCRATCH_DIR"' in run
+    assert "$RECORD_DIR/.azure_phase05_jlens" not in run
+    assert '"${JOB_NAME}|primary"' in run
+    assert '"${JOB_NAME}|operational-fix"' in run
+    assert '"${RUN_ID}|${ATTEMPT_KIND}"' not in run
+
+    def continued_commands(source):
+        command = []
+        for line in source.splitlines():
+            stripped = line.strip()
+            if command or stripped.startswith("az acr repository "):
+                command.append(stripped.rstrip("\\").strip())
+                if not stripped.endswith("\\"):
+                    yield " ".join(command)
+                    command = []
+
+    repository_commands = [
+        *continued_commands(build),
+        *continued_commands(run),
+    ]
+    assert repository_commands
+    assert all("--resource-group" not in command for command in repository_commands)
     for unsupported in ("If-Match", "If-None-Match", "etag", "ETAG", "ETag"):
         assert unsupported not in build
         assert unsupported not in run

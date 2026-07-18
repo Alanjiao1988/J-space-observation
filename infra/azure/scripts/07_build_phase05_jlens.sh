@@ -56,7 +56,6 @@ confirm_project_tag_absent() {
     local repositories tags
     if ! repositories="$(az acr repository list \
         --name "$ACR_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
         --output tsv)"; then
         echo "[FAIL] Could not establish ACR repository existence"
         return 2
@@ -96,12 +95,21 @@ require_confirmed_absence
 
 RECORD_DIR="${JLENS_BUILD_RECORD_DIR:-$PROJECT_ROOT/results/runs/phase05-jlens-build-${PROJECT_SHA}}"
 mkdir -p "$RECORD_DIR"
-CLAIM_BODY="$RECORD_DIR/.azure_phase05_jlens_image_claim.json"
-CLAIMS_FILE="$RECORD_DIR/.azure_phase05_jlens_build_claims.json"
-FIXED_FILE="$RECORD_DIR/.azure_phase05_jlens_build_fixed.json"
-WINNER_FILE="$RECORD_DIR/.azure_phase05_jlens_build_winner.json"
+SCRATCH_DIR="$(python "$CLAIM_HELPER" scratch-path \
+    --record-dir "$RECORD_DIR" \
+    --operation build \
+    --invocation-id "$BUILD_INVOCATION_ID")"
+umask 077
+if ! mkdir "$SCRATCH_DIR"; then
+    echo "[FAIL] Invocation-specific build scratch already exists"
+    exit 1
+fi
+CLAIM_BODY="$SCRATCH_DIR/image_claim.json"
+CLAIMS_FILE="$SCRATCH_DIR/build_claims.json"
+FIXED_FILE="$SCRATCH_DIR/build_fixed.json"
+WINNER_FILE="$SCRATCH_DIR/build_winner.json"
 cleanup_files() {
-    rm -f "$CLAIM_BODY" "$CLAIMS_FILE" "$FIXED_FILE" "$WINNER_FILE"
+    rm -rf "$SCRATCH_DIR"
 }
 trap cleanup_files EXIT
 STARTED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"

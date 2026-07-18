@@ -155,26 +155,40 @@ SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 API_VERSION="2024-03-01"
 JOBS_URL="https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.App/jobs?api-version=${API_VERSION}"
 JOB_URL="https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.App/jobs/${JOB_NAME}?api-version=${API_VERSION}"
-RUN_ATTEMPT_KEY="$(printf '%s' "${RUN_ID}|${ATTEMPT_KIND}" | sha256sum | awk '{print substr($1,1,20)}')"
-CLAIM_PREFIX="p05l-${RUN_ATTEMPT_KEY}--"
+PRIMARY_CLAIM_KEY="$(printf '%s' "${JOB_NAME}|primary" | sha256sum | awk '{print substr($1,1,20)}')"
+RETRY_CLAIM_KEY="$(printf '%s' "${JOB_NAME}|operational-fix" | sha256sum | awk '{print substr($1,1,20)}')"
+PRIMARY_CLAIM_PREFIX="p05l-${PRIMARY_CLAIM_KEY}--"
+RETRY_CLAIM_PREFIX="p05l-${RETRY_CLAIM_KEY}--"
+if [[ "$ATTEMPT_KIND" == "primary" ]]; then
+    CLAIM_PREFIX="$PRIMARY_CLAIM_PREFIX"
+else
+    CLAIM_PREFIX="$RETRY_CLAIM_PREFIX"
+fi
 CLAIM_NAME="${CLAIM_PREFIX}${LAUNCH_INVOCATION_ID}"
 CLAIM_URL="https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Resources/deployments/${CLAIM_NAME}?api-version=2022-09-01"
 
 RECORD_DIR="${JLENS_RUN_RECORD_DIR:-$PROJECT_ROOT/results/runs/phase05-jlens-${RUN_ID}}"
 mkdir -p "$RECORD_DIR"
-BODY_FILE="$RECORD_DIR/.azure_phase05_jlens_job_body.json"
-CLAIM_BODY="$RECORD_DIR/.azure_phase05_jlens_launch_claim.json"
-CLAIMS_FILE="$RECORD_DIR/.azure_phase05_jlens_launch_claims.json"
-FIXED_FILE="$RECORD_DIR/.azure_phase05_jlens_launch_fixed.json"
-WINNER_FILE="$RECORD_DIR/.azure_phase05_jlens_launch_winner.json"
-PRIMARY_FIXED_FILE="$RECORD_DIR/.azure_phase05_jlens_primary_fixed.json"
-PRIMARY_WINNER_FILE="$RECORD_DIR/.azure_phase05_jlens_primary_winner.json"
-EXISTING_JOB_FILE="$RECORD_DIR/.azure_phase05_jlens_existing_job.json"
-CLAIMED_JOB_FILE="$RECORD_DIR/.azure_phase05_jlens_claimed_job.json"
+SCRATCH_DIR="$(python "$CLAIM_HELPER" scratch-path \
+    --record-dir "$RECORD_DIR" \
+    --operation launch \
+    --invocation-id "$LAUNCH_INVOCATION_ID")"
+umask 077
+if ! mkdir "$SCRATCH_DIR"; then
+    echo "[FAIL] Invocation-specific launch scratch already exists"
+    exit 1
+fi
+BODY_FILE="$SCRATCH_DIR/job_body.json"
+CLAIM_BODY="$SCRATCH_DIR/launch_claim.json"
+CLAIMS_FILE="$SCRATCH_DIR/launch_claims.json"
+FIXED_FILE="$SCRATCH_DIR/launch_fixed.json"
+WINNER_FILE="$SCRATCH_DIR/launch_winner.json"
+PRIMARY_FIXED_FILE="$SCRATCH_DIR/primary_fixed.json"
+PRIMARY_WINNER_FILE="$SCRATCH_DIR/primary_winner.json"
+EXISTING_JOB_FILE="$SCRATCH_DIR/existing_job.json"
+CLAIMED_JOB_FILE="$SCRATCH_DIR/claimed_job.json"
 cleanup_files() {
-    rm -f "$BODY_FILE" "$CLAIM_BODY" "$CLAIMS_FILE" "$FIXED_FILE" \
-        "$WINNER_FILE" "$PRIMARY_FIXED_FILE" "$PRIMARY_WINNER_FILE" \
-        "$EXISTING_JOB_FILE" "$CLAIMED_JOB_FILE"
+    rm -rf "$SCRATCH_DIR"
 }
 trap cleanup_files EXIT
 
@@ -255,8 +269,6 @@ PY
     EXISTING_IMAGE_DIGEST_TAG="${EXISTING_FIELDS[14]}"
     EXISTING_PRIOR_STATUS_TAG="${EXISTING_FIELDS[15]}"
     EXISTING_IMAGE_REF="${EXISTING_FIELDS[16]}"
-    PRIMARY_ATTEMPT_KEY="$(printf '%s' "${RUN_ID}|primary" | sha256sum | awk '{print substr($1,1,20)}')"
-    PRIMARY_CLAIM_PREFIX="p05l-${PRIMARY_ATTEMPT_KEY}--"
     if [[ -z "$EXISTING_LAUNCH_INVOCATION" \
         || "$EXISTING_RUN_ID" != "$RUN_ID" \
         || "$EXISTING_ATTEMPT" != "primary" \
@@ -820,9 +832,7 @@ Path("$RECORD_DIR/phase05_jlens_job_start.json").write_text(
 )
 PY
 
-rm -f "$BODY_FILE" "$CLAIM_BODY" "$CLAIMS_FILE" "$FIXED_FILE" \
-    "$WINNER_FILE" "$PRIMARY_FIXED_FILE" "$PRIMARY_WINNER_FILE" \
-    "$EXISTING_JOB_FILE" "$CLAIMED_JOB_FILE"
+rm -rf "$SCRATCH_DIR"
 echo "[OK] Started and verified $EXECUTION_NAME ($ATTEMPT_KIND)"
 echo "[OK] Durable launch ticket: $CLAIM_NAME at $FIRST_WINNER_TIME"
 echo "[OK] Blob prefix: $BLOB_PREFIX"

@@ -79,6 +79,13 @@ def atomic_torch_save(torch_module: Any, value: Any, path: Path) -> None:
     os.replace(temporary, path)
 
 
+def atomic_copy_file(source: Path, destination: Path) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_name(f".{destination.name}.tmp.{os.getpid()}")
+    shutil.copyfile(source, temporary)
+    os.replace(temporary, destination)
+
+
 def safe_error(error: BaseException) -> str:
     message = re.sub(r"(?i)(sig|token|secret|password)=\S+", r"\1=<redacted>", str(error))
     return message[:2000]
@@ -121,6 +128,179 @@ def load_corpus(path: Path) -> tuple[list[dict[str, str]], str]:
     if len({record["id"] for record in records}) != len(records):
         raise protocol.Phase05ValidationError("fit corpus IDs must be unique")
     return records, protocol.canonical_jsonl_sha256(records)
+
+
+def _default_checkpoint_loader(path: Path) -> dict[str, Any]:
+    torch = importlib.import_module("torch")
+    return torch.load(path, map_location="cpu", weights_only=True)
+
+
+def validate_snapshot_resume_semantics(
+    snapshot_dir: Path,
+    corpus_records: list[dict[str, str]],
+    *,
+    checkpoint_loader: Any = _default_checkpoint_loader,
+) -> dict[str, Any]:
+    checkpoint_dir = snapshot_dir / "checkpoint"
+    working_checkpoint = checkpoint_dir / "phase05_jlens_f3_fit_checkpoint.pt"
+    working_manifest = (
+        checkpoint_dir / "phase05_jlens_f3_checkpoint.manifest.json"
+    )
+    prefix_checkpoint = (
+        checkpoint_dir / "phase05_jlens_f3_prompt1_checkpoint.pt"
+    )
+    prefix_manifest_path = (
+        checkpoint_dir / "phase05_jlens_f3_prompt1_checkpoint.manifest.json"
+    )
+    lens_path = snapshot_dir / "lens" / "phase05_jlens.pt"
+    f3_paths = (
+        working_checkpoint,
+        working_manifest,
+        prefix_checkpoint,
+        prefix_manifest_path,
+        lens_path,
+    )
+    if not working_checkpoint.exists() and not working_manifest.exists():
+        if any(path.exists() for path in f3_paths[2:]):
+            raise protocol.CheckpointValidationError(
+                "orphaned F3 prefix/lens artifacts without working state"
+            )
+        return {"resume_state": "no_f3_checkpoint", "n_done": 0, "next_idx": 0}
+    if not working_checkpoint.is_file() or not working_manifest.is_file():
+        raise protocol.CheckpointValidationError(
+            "F3 working checkpoint/manifest pair is incomplete"
+        )
+
+    corpus_sha256 = protocol.canonical_jsonl_sha256(corpus_records)
+    prompt_prefix_sha256 = protocol.canonical_jsonl_sha256(corpus_records[:1])
+    manifest = read_json(working_manifest)
+    controls = protocol.validate_registered_f3_controls(
+        manifest.get("controls") or {}, corpus_sha256=corpus_sha256
+    )
+    state = checkpoint_loader(working_checkpoint)
+    if not isinstance(state, dict):
+        raise protocol.CheckpointValidationError("F3 checkpoint state is not a mapping")
+    n_done = int(state.get("n_done", -1))
+    next_idx = int(state.get("next_idx", -1))
+    if (
+        state.get("source_layers") != controls["source_layers"]
+        or state.get("target_layer") != controls["target_layer"]
+        or state.get("skip_first") != controls["skip_first"]
+    ):
+        raise protocol.CheckpointValidationError(
+            "F3 checkpoint state controls do not match external controls"
+        )
+    checkpoint_sha256 = protocol.sha256_file(working_checkpoint)
+
+    prefix_checkpoint_sha256 = None
+    prefix_progress_sha256 = None
+    if n_done in {1, 2}:
+        if not prefix_checkpoint.is_file() or not prefix_manifest_path.is_file():
+            raise protocol.CheckpointValidationError(
+                "F3 resumable state lacks immutable prompt-1 artifacts"
+            )
+        prefix_checkpoint_sha256 = protocol.sha256_file(prefix_checkpoint)
+        prefix_manifest = read_json(prefix_manifest_path)
+        prefix_progress_sha256 = prefix_manifest.get("progress_sha256")
+        protocol.validate_f3_resume_binding(
+            prefix_manifest,
+            controls,
+            n_done=1,
+            next_idx=1,
+            checkpoint_sha256=prefix_checkpoint_sha256,
+            expected_prompt_prefix_sha256=prompt_prefix_sha256,
+            expected_complete_corpus_sha256=corpus_sha256,
+            prefix_checkpoint_sha256=prefix_checkpoint_sha256,
+        )
+
+    lens_sha256 = protocol.sha256_file(lens_path) if lens_path.is_file() else None
+    protocol.validate_f3_resume_binding(
+        manifest,
+        controls,
+        n_done=n_done,
+        next_idx=next_idx,
+        checkpoint_sha256=checkpoint_sha256,
+        expected_prompt_prefix_sha256=prompt_prefix_sha256,
+        expected_complete_corpus_sha256=corpus_sha256,
+        lens_sha256=lens_sha256,
+        prefix_checkpoint_sha256=prefix_checkpoint_sha256,
+        expected_prefix_progress_sha256=prefix_progress_sha256,
+    )
+    return {
+        "resume_state": f"f3_n_done_{n_done}",
+        "n_done": n_done,
+        "next_idx": next_idx,
+        "checkpoint_sha256": checkpoint_sha256,
+        "prefix_checkpoint_sha256": prefix_checkpoint_sha256,
+        "lens_sha256": lens_sha256,
+    }
+
+
+def select_semantically_valid_snapshot(
+    candidates: list[dict[str, Any]],
+    corpus_records: list[dict[str, str]],
+    *,
+    checkpoint_loader: Any = _default_checkpoint_loader,
+) -> dict[str, Any]:
+    rejected: list[dict[str, str]] = []
+    for candidate in candidates:
+        try:
+            semantics = validate_snapshot_resume_semantics(
+                Path(candidate["path"]),
+                corpus_records,
+                checkpoint_loader=checkpoint_loader,
+            )
+        except Exception as error:
+            rejected.append(
+                {
+                    "source_prefix": str(candidate["source_prefix"]),
+                    "reason": safe_error(error),
+                    "error_type": type(error).__name__,
+                }
+            )
+            continue
+        return {
+            **candidate,
+            "semantics": semantics,
+            "rejected_newer_snapshots": rejected,
+            "fallback_used": bool(rejected),
+            "fallback_reason": (
+                "newer snapshot(s) had invalid F3 resume bindings"
+                if rejected
+                else None
+            ),
+        }
+    raise protocol.CheckpointValidationError(
+        f"no semantically valid recoverable snapshot: {rejected}"
+    )
+
+
+def validate_artifact_snapshot(snapshot_dir: Path) -> None:
+    manifest_path = snapshot_dir / "phase05_jlens_artifact_manifest.json"
+    manifest = read_json(manifest_path)
+    if manifest.get("schema_version") != "phase05-jlens-artifact-manifest-v1":
+        raise protocol.CheckpointValidationError(
+            "restored artifact manifest schema is invalid"
+        )
+    for artifact in manifest.get("artifacts", []):
+        relative_path = Path(str(artifact.get("path", "")))
+        if (
+            relative_path.is_absolute()
+            or ".." in relative_path.parts
+            or not relative_path.parts
+        ):
+            raise protocol.CheckpointValidationError(
+                "restored artifact manifest contains an unsafe path"
+            )
+        artifact_path = snapshot_dir / relative_path
+        if (
+            not artifact_path.is_file()
+            or artifact_path.stat().st_size != artifact.get("bytes")
+            or protocol.sha256_file(artifact_path) != artifact.get("sha256")
+        ):
+            raise protocol.CheckpointValidationError(
+                f"restored artifact failed manifest validation: {relative_path}"
+            )
 
 
 class BlobTransport:
@@ -171,7 +351,12 @@ class BlobTransport:
         self._container_client = service.get_container_client(self.container)
         return self._container_client
 
-    def restore_latest_snapshot(self, output_dir: Path, resume_prefix: str) -> dict[str, Any]:
+    def restore_latest_snapshot(
+        self,
+        output_dir: Path,
+        resume_prefix: str,
+        corpus_records: list[dict[str, str]],
+    ) -> dict[str, Any]:
         if not self.configured:
             raise protocol.CheckpointValidationError(
                 "Blob resume requested without account/container configuration"
@@ -209,56 +394,94 @@ class BlobTransport:
             raise protocol.CheckpointValidationError(
                 f"no manifest-complete recoverable stage snapshot exists under {prefix}"
             )
-        selected, selected_manifest = max(
-            candidates, key=lambda item: item[1].last_modified
-        )
-        snapshot_prefix = selected.name.rsplit("/", 1)[0] + "/"
-        restored = 0
-        for blob in client.list_blobs(name_starts_with=snapshot_prefix):
-            relative = blob.name[len(snapshot_prefix) :]
-            relative_path = Path(relative)
-            if not relative or relative_path.is_absolute() or ".." in relative_path.parts:
-                raise protocol.CheckpointValidationError("unsafe Blob snapshot path")
-            destination = output_dir / relative_path
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            atomic_write_bytes(destination, client.download_blob(blob.name).readall())
-            restored += 1
-        restored_manifest = read_json(
-            output_dir / "phase05_jlens_artifact_manifest.json"
-        )
-        if (
-            restored_manifest.get("schema_version")
-            != "phase05-jlens-artifact-manifest-v1"
-        ):
-            raise protocol.CheckpointValidationError(
-                "restored artifact manifest schema is invalid"
-            )
-        for artifact in restored_manifest.get("artifacts", []):
-            relative_path = Path(str(artifact.get("path", "")))
-            if (
-                relative_path.is_absolute()
-                or ".." in relative_path.parts
-                or not relative_path.parts
-            ):
+        ordered = sorted(candidates, key=lambda item: item[1].last_modified, reverse=True)
+        restore_root = output_dir / ".restore-staging"
+        if restore_root.exists():
+            shutil.rmtree(restore_root)
+        restore_root.mkdir(parents=True)
+        rejected: list[dict[str, str]] = []
+        selected_record: dict[str, Any] | None = None
+        try:
+            for index, (stage_blob, manifest_blob) in enumerate(ordered):
+                snapshot_prefix = stage_blob.name.rsplit("/", 1)[0] + "/"
+                candidate_dir = restore_root / f"candidate-{index:03d}"
+                candidate_dir.mkdir()
+                restored = 0
+                try:
+                    members = [
+                        blob
+                        for blob in available
+                        if blob.name.startswith(snapshot_prefix)
+                    ]
+                    for blob in members:
+                        relative = blob.name[len(snapshot_prefix) :]
+                        relative_path = Path(relative)
+                        if (
+                            not relative
+                            or relative_path.is_absolute()
+                            or ".." in relative_path.parts
+                        ):
+                            raise protocol.CheckpointValidationError(
+                                "unsafe Blob snapshot path"
+                            )
+                        destination = candidate_dir / relative_path
+                        destination.parent.mkdir(parents=True, exist_ok=True)
+                        atomic_write_bytes(
+                            destination,
+                            client.download_blob(blob.name).readall(),
+                        )
+                        restored += 1
+                    validate_artifact_snapshot(candidate_dir)
+                    semantics = validate_snapshot_resume_semantics(
+                        candidate_dir, corpus_records
+                    )
+                except Exception as error:
+                    rejected.append(
+                        {
+                            "source_prefix": snapshot_prefix.rstrip("/"),
+                            "error_type": type(error).__name__,
+                            "reason": safe_error(error),
+                        }
+                    )
+                    continue
+                selected_record = {
+                    "candidate_dir": candidate_dir,
+                    "source_prefix": snapshot_prefix.rstrip("/"),
+                    "files": restored,
+                    "manifest_last_modified": manifest_blob.last_modified.isoformat(),
+                    "semantics": semantics,
+                }
+                break
+            if selected_record is None:
                 raise protocol.CheckpointValidationError(
-                    "restored artifact manifest contains an unsafe path"
+                    f"no semantically valid recoverable snapshot: {rejected}"
                 )
-            artifact_path = output_dir / relative_path
-            if (
-                not artifact_path.is_file()
-                or artifact_path.stat().st_size != artifact.get("bytes")
-                or protocol.sha256_file(artifact_path) != artifact.get("sha256")
-            ):
-                raise protocol.CheckpointValidationError(
-                    f"restored artifact failed manifest validation: {relative_path}"
-                )
-        return {
-            "status": "restored",
-            "source_prefix": snapshot_prefix.rstrip("/"),
-            "files": restored,
-            "manifest_last_modified": selected_manifest.last_modified.isoformat(),
-            "manifest_completion_verified": True,
-        }
+            selected_dir = Path(selected_record["candidate_dir"])
+            for path in selected_dir.rglob("*"):
+                if not path.is_file():
+                    continue
+                relative = path.relative_to(selected_dir)
+                atomic_copy_file(path, output_dir / relative)
+            return {
+                "status": "restored",
+                "source_prefix": selected_record["source_prefix"],
+                "files": selected_record["files"],
+                "manifest_last_modified": selected_record[
+                    "manifest_last_modified"
+                ],
+                "manifest_completion_verified": True,
+                "semantic_resume": selected_record["semantics"],
+                "fallback_used": bool(rejected),
+                "fallback_reason": (
+                    "newer snapshot(s) had invalid F3 checkpoint bindings"
+                    if rejected
+                    else None
+                ),
+                "rejected_newer_snapshots": rejected,
+            }
+        finally:
+            if restore_root.exists():
+                shutil.rmtree(restore_root)
 
     def upload_snapshot(self, output_dir: Path, stage: str, sequence: int) -> dict[str, Any]:
         if not self.configured:
@@ -324,13 +547,18 @@ class Phase05Runner:
         self.restore_record: dict[str, Any] | None = None
         self.restore_error: dict[str, str] | None = None
         self.upload_history: list[dict[str, Any]] = []
+        registered_corpus_records, registered_corpus_sha256 = load_corpus(
+            Path(args.corpus)
+        )
 
         results_path = self.output_dir / "phase05_jlens_stage_results.json"
         resume_prefix = os.getenv("JSPACE_BLOB_RESUME_PREFIX", "").strip()
         if args.resume and not results_path.exists() and resume_prefix:
             try:
                 self.restore_record = self.blob.restore_latest_snapshot(
-                    self.output_dir, resume_prefix
+                    self.output_dir,
+                    resume_prefix,
+                    registered_corpus_records,
                 )
             except Exception as error:
                 self.restore_error = {
@@ -387,8 +615,8 @@ class Phase05Runner:
         self.fitted_lens: Any = None
         self.loaded_lens: Any = None
         self.layers: dict[str, Any] | None = None
-        self.corpus_records: list[dict[str, str]] = []
-        self.corpus_sha256 = ""
+        self.corpus_records = registered_corpus_records
+        self.corpus_sha256 = registered_corpus_sha256
 
     def _load_resume_state(self) -> None:
         if not self.args.resume:
@@ -1265,7 +1493,24 @@ class Phase05Runner:
         manifest_path = (
             self.output_dir / "checkpoint" / "phase05_jlens_f3_checkpoint.manifest.json"
         )
-        if not manifest_path.is_file():
+        prefix_checkpoint_path = (
+            self.output_dir
+            / "checkpoint"
+            / "phase05_jlens_f3_prompt1_checkpoint.pt"
+        )
+        prefix_manifest_path = (
+            self.output_dir
+            / "checkpoint"
+            / "phase05_jlens_f3_prompt1_checkpoint.manifest.json"
+        )
+        if not all(
+            path.is_file()
+            for path in (
+                manifest_path,
+                prefix_checkpoint_path,
+                prefix_manifest_path,
+            )
+        ):
             return False
         controls = protocol.make_checkpoint_controls(
             prompt_order_sha256=self.corpus_sha256,
@@ -1285,17 +1530,33 @@ class Phase05Runner:
             )
         checkpoint_sha256 = protocol.sha256_file(checkpoint_path)
         lens_sha256 = protocol.sha256_file(lens_path)
+        prefix_checkpoint_sha256 = protocol.sha256_file(prefix_checkpoint_path)
+        prefix_manifest = read_json(prefix_manifest_path)
+        prefix_progress_sha256 = prefix_manifest.get("progress_sha256")
+        expected_prefix_sha256 = protocol.canonical_jsonl_sha256(
+            self.corpus_records[:1]
+        )
+        protocol.validate_f3_resume_binding(
+            prefix_manifest,
+            controls,
+            n_done=1,
+            next_idx=1,
+            checkpoint_sha256=prefix_checkpoint_sha256,
+            expected_prompt_prefix_sha256=expected_prefix_sha256,
+            expected_complete_corpus_sha256=self.corpus_sha256,
+            prefix_checkpoint_sha256=prefix_checkpoint_sha256,
+        )
         protocol.validate_f3_resume_binding(
             read_json(manifest_path),
             controls,
             n_done=2,
             next_idx=2,
             checkpoint_sha256=checkpoint_sha256,
-            expected_prompt_prefix_sha256=protocol.canonical_jsonl_sha256(
-                self.corpus_records[:1]
-            ),
+            expected_prompt_prefix_sha256=expected_prefix_sha256,
             expected_complete_corpus_sha256=self.corpus_sha256,
             lens_sha256=lens_sha256,
+            prefix_checkpoint_sha256=prefix_checkpoint_sha256,
+            expected_prefix_progress_sha256=prefix_progress_sha256,
         )
         jacobians = {
             layer: checkpoint_state["jacobian_sum"][layer] / 2
@@ -1479,6 +1740,12 @@ class Phase05Runner:
         lens_dir.mkdir(parents=True, exist_ok=True)
         checkpoint_path = checkpoint_dir / "phase05_jlens_f3_fit_checkpoint.pt"
         manifest_path = checkpoint_dir / "phase05_jlens_f3_checkpoint.manifest.json"
+        prefix_checkpoint_path = (
+            checkpoint_dir / "phase05_jlens_f3_prompt1_checkpoint.pt"
+        )
+        prefix_manifest_path = (
+            checkpoint_dir / "phase05_jlens_f3_prompt1_checkpoint.manifest.json"
+        )
         lens_path = lens_dir / "phase05_jlens.pt"
         prompt_prefix_sha256 = protocol.canonical_jsonl_sha256(
             self.corpus_records[:1]
@@ -1497,6 +1764,32 @@ class Phase05Runner:
             initial_n_done = int(initial_state.get("n_done", -1))
             initial_next_idx = int(initial_state.get("next_idx", -1))
             protocol.f3_checkpoint_actions(initial_n_done, initial_next_idx)
+            prefix_checkpoint_sha256 = (
+                protocol.sha256_file(prefix_checkpoint_path)
+                if prefix_checkpoint_path.is_file()
+                else None
+            )
+            prefix_progress_sha256 = None
+            if prefix_manifest_path.is_file():
+                prefix_manifest = read_json(prefix_manifest_path)
+                prefix_progress_sha256 = prefix_manifest.get("progress_sha256")
+                protocol.validate_f3_resume_binding(
+                    prefix_manifest,
+                    controls,
+                    n_done=1,
+                    next_idx=1,
+                    checkpoint_sha256=prefix_checkpoint_sha256,
+                    expected_prompt_prefix_sha256=prompt_prefix_sha256,
+                    expected_complete_corpus_sha256=self.corpus_sha256,
+                    prefix_checkpoint_sha256=prefix_checkpoint_sha256,
+                )
+            if initial_n_done in {1, 2} and (
+                prefix_checkpoint_sha256 is None
+                or prefix_progress_sha256 is None
+            ):
+                raise protocol.CheckpointValidationError(
+                    "resumed F3 state lacks durable prompt-1 artifacts"
+                )
             complete_lens_sha256 = (
                 protocol.sha256_file(lens_path)
                 if initial_n_done == 2 and lens_path.is_file()
@@ -1511,9 +1804,15 @@ class Phase05Runner:
                 expected_prompt_prefix_sha256=prompt_prefix_sha256,
                 expected_complete_corpus_sha256=self.corpus_sha256,
                 lens_sha256=complete_lens_sha256,
+                prefix_checkpoint_sha256=prefix_checkpoint_sha256,
+                expected_prefix_progress_sha256=prefix_progress_sha256,
             )
             resumed = True
         else:
+            if prefix_checkpoint_path.exists() or prefix_manifest_path.exists():
+                raise protocol.CheckpointValidationError(
+                    "durable prefix artifacts exist without a working checkpoint"
+                )
             if manifest_path.exists():
                 protocol.validate_f3_resume_binding(
                     read_json(manifest_path),
@@ -1533,8 +1832,24 @@ class Phase05Runner:
         actions = protocol.f3_checkpoint_actions(initial_n_done, initial_next_idx)
         self._start_gpu_measurement()
         fit_segments: list[dict[str, Any]] = []
+        time_admissions: list[dict[str, Any]] = []
         prompt_1_snapshot: dict[str, Any] | None = None
         if "fit_prompt_1" in actions:
+            segment_1_admission = protocol.f3_segment_time_guard(
+                elapsed_seconds=self.elapsed_seconds,
+                estimated_remaining_fit_seconds=float(
+                    self.results["F2"]["details"]["f3_time_guard"][
+                        "projected_fit_seconds"
+                    ]
+                ),
+            )
+            segment_1_admission["segment"] = "prompt_1_prefix"
+            time_admissions.append(segment_1_admission)
+            self.results["F3"]["details"]["time_admissions"] = time_admissions
+            if not segment_1_admission["admitted"]:
+                raise protocol.ApplicationTimeoutError(
+                    "F3 prompt-1 segment failed fresh planning admission"
+                )
             segment_started = time.monotonic()
             prompt_1_lens = self.jlens.fit(
                 self.lens_model,
@@ -1573,6 +1888,14 @@ class Phase05Runner:
                 raise protocol.CheckpointValidationError(
                     "official prompt-1 checkpoint state is invalid"
                 )
+            atomic_copy_file(checkpoint_path, prefix_checkpoint_path)
+            prefix_checkpoint_sha256 = protocol.sha256_file(
+                prefix_checkpoint_path
+            )
+            if protocol.sha256_file(checkpoint_path) != prefix_checkpoint_sha256:
+                raise protocol.CheckpointValidationError(
+                    "durable prompt-1 checkpoint copy mismatch"
+                )
             prompt_1_progress = {
                 "n_done": 1,
                 "next_idx": 1,
@@ -1580,9 +1903,11 @@ class Phase05Runner:
                 "prompt_prefix_sha256": prompt_prefix_sha256,
                 "controls_sha256": controls_sha256,
                 "checkpoint": {
-                    "path": checkpoint_path.relative_to(self.output_dir).as_posix(),
-                    "bytes": checkpoint_path.stat().st_size,
-                    "sha256": protocol.sha256_file(checkpoint_path),
+                    "path": prefix_checkpoint_path.relative_to(
+                        self.output_dir
+                    ).as_posix(),
+                    "bytes": prefix_checkpoint_path.stat().st_size,
+                    "sha256": prefix_checkpoint_sha256,
                 },
             }
             checkpoint_manifest = read_json(manifest_path)
@@ -1592,6 +1917,18 @@ class Phase05Runner:
             )
             checkpoint_manifest["updated_at_utc"] = utc_now()
             atomic_write_json(manifest_path, checkpoint_manifest)
+            atomic_copy_file(manifest_path, prefix_manifest_path)
+            prefix_progress_sha256 = checkpoint_manifest["progress_sha256"]
+            protocol.validate_f3_resume_binding(
+                read_json(prefix_manifest_path),
+                controls,
+                n_done=1,
+                next_idx=1,
+                checkpoint_sha256=prefix_checkpoint_sha256,
+                expected_prompt_prefix_sha256=prompt_prefix_sha256,
+                expected_complete_corpus_sha256=self.corpus_sha256,
+                prefix_checkpoint_sha256=prefix_checkpoint_sha256,
+            )
             protocol.validate_f3_resume_binding(
                 read_json(manifest_path),
                 controls,
@@ -1600,6 +1937,7 @@ class Phase05Runner:
                 checkpoint_sha256=prompt_1_progress["checkpoint"]["sha256"],
                 expected_prompt_prefix_sha256=prompt_prefix_sha256,
                 expected_complete_corpus_sha256=self.corpus_sha256,
+                prefix_checkpoint_sha256=prefix_checkpoint_sha256,
             )
             self.results["F3"]["details"]["prompt_1_checkpoint"] = prompt_1_progress
             if not self.persist("F3-prompt-1"):
@@ -1608,8 +1946,46 @@ class Phase05Runner:
                 )
             prompt_1_snapshot = {
                 **prompt_1_progress,
+                "manifest": {
+                    "path": prefix_manifest_path.relative_to(
+                        self.output_dir
+                    ).as_posix(),
+                    "sha256": protocol.sha256_file(prefix_manifest_path),
+                },
                 "blob_persistence": self.upload_history[-1],
             }
+
+        registered_remaining_per_prompt = float(
+            self.results["F2"]["details"]["f3_time_guard"][
+                "projected_fit_seconds"
+            ]
+        ) / 2
+        measured_first_prompt = max(
+            (
+                float(segment["seconds"])
+                for segment in fit_segments
+                if segment["segment"] == "prompt_1_prefix"
+            ),
+            default=0.0,
+        )
+        remaining_prompts = 0 if initial_n_done == 2 else 1
+        segment_2_estimate = (
+            max(registered_remaining_per_prompt, measured_first_prompt)
+            * remaining_prompts
+        )
+        segment_2_admission = protocol.f3_segment_time_guard(
+            elapsed_seconds=self.elapsed_seconds,
+            estimated_remaining_fit_seconds=segment_2_estimate,
+        )
+        segment_2_admission["segment"] = "full_corpus_resume"
+        time_admissions.append(segment_2_admission)
+        self.results["F3"]["details"]["time_admissions"] = time_admissions
+        if not segment_2_admission["admitted"]:
+            if initial_n_done == 1 or "persist_prompt_1" in actions:
+                self.persist("F3-prompt-1-time-block")
+            raise protocol.ApplicationTimeoutError(
+                "F3 second segment failed fresh planning admission"
+            )
 
         segment_started = time.monotonic()
         self.fitted_lens = self.jlens.fit(
@@ -1722,6 +2098,8 @@ class Phase05Runner:
             "controls_sha256": controls_sha256,
             "checkpoint_sha256": checkpoint_manifest["checkpoint"]["sha256"],
             "lens_sha256": checkpoint_manifest["lens"]["sha256"],
+            "prefix_checkpoint_sha256": prefix_checkpoint_sha256,
+            "prefix_progress_sha256": prefix_progress_sha256,
         }
         checkpoint_manifest["completion"] = completion_progress
         checkpoint_manifest["completion_sha256"] = protocol.sha256_bytes(
@@ -1737,6 +2115,8 @@ class Phase05Runner:
             expected_prompt_prefix_sha256=prompt_prefix_sha256,
             expected_complete_corpus_sha256=self.corpus_sha256,
             lens_sha256=completion_progress["lens_sha256"],
+            prefix_checkpoint_sha256=prefix_checkpoint_sha256,
+            expected_prefix_progress_sha256=prefix_progress_sha256,
         )
         processed_this_run = 2 - initial_n_done
         if processed_this_run > 0:
@@ -1777,6 +2157,7 @@ class Phase05Runner:
             "prompts_processed_this_run": processed_this_run,
             "checkpoint_actions": actions,
             "fit_segments": fit_segments,
+            "time_admissions": time_admissions,
             "prompt_1_snapshot": prompt_1_snapshot,
             "prompt_order_sha256": self.corpus_sha256,
             "prompt_token_lengths": prompt_token_lengths,

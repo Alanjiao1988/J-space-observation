@@ -173,6 +173,16 @@ def _read_json(path: str) -> Any:
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+def invocation_scratch_path(
+    record_dir: str | Path, operation: str, invocation_id: str
+) -> Path:
+    if operation not in {"build", "launch"}:
+        raise ClaimValidationError("scratch operation must be build or launch")
+    if not INVOCATION.fullmatch(invocation_id):
+        raise ClaimValidationError("scratch invocation ID is invalid")
+    return Path(record_dir).resolve() / f".p05-{operation}-{invocation_id}"
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -189,6 +199,11 @@ def main(argv: list[str] | None = None) -> int:
     get = subparsers.add_parser("get")
     get.add_argument("--json", required=True)
     get.add_argument("--field", required=True)
+
+    scratch = subparsers.add_parser("scratch-path")
+    scratch.add_argument("--record-dir", required=True)
+    scratch.add_argument("--operation", required=True)
+    scratch.add_argument("--invocation-id", required=True)
 
     args = parser.parse_args(argv)
     if args.command == "new-id":
@@ -210,6 +225,13 @@ def main(argv: list[str] | None = None) -> int:
         )
         Path(args.output).write_text(
             json.dumps(winner, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        return 0
+    if args.command == "scratch-path":
+        print(
+            invocation_scratch_path(
+                args.record_dir, args.operation, args.invocation_id
+            )
         )
         return 0
 

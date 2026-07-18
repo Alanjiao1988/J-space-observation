@@ -116,6 +116,13 @@ payload is staged, is valid only when its manifest upload is confirmed last,
 and promotes identical bytes locally after confirmation with the same snapshot
 timestamp. Unconfigured local runs do not require Blob.
 
+Restore does not trust the newest artifact-complete snapshot blindly. It scans
+manifest-complete snapshots newest to oldest, validates registered controls and
+the semantic F3 checkpoint/lens bindings, and restores the newest valid state.
+A newer failure snapshot containing an unbound `n_done=2` working checkpoint is
+rejected in favor of the immutable older prompt-1 state; rejection reason and
+selected source prefix are recorded.
+
 Stage ordering is strict: F0 → F1 → F2 → F3 → F4, then optional F5. A failed
 prerequisite blocks all later stages.
 
@@ -195,7 +202,19 @@ file SHA256. State 2/2 must match the controls hash, complete ordered-corpus
 SHA256, actual checkpoint SHA256, and actual saved-lens SHA256 through a hashed
 completion record. Missing, stale, or mismatched progress/completion fields
 fail closed before official state is averaged or reused. State 0/0 accepts only
-a controls-only manifest with no stale progress/completion binding.
+a controls-only manifest with no checkpoint file or stale progress/completion
+binding. Prompt-1 checkpoint and manifest are copied atomically to immutable
+paths before the working checkpoint can advance. State 2/2 must also validate
+that exact durable prefix checkpoint SHA and progress hash, and its completion
+record binds both.
+
+The F2 projection is only preregistration input, not a reusable admission
+boolean. Immediately before each official F3 fit segment the runner samples
+fresh monotonic elapsed time and recomputes projected remaining fit plus export
+reserve against the 6120-second admission boundary. After prompt-1 persistence,
+segment 2 uses the more conservative of measured prompt-1 time and the
+registered F2/layer-span estimate. A slow upload can therefore leave the valid
+prefix checkpoint durable while blocking segment 2 and all later stages.
 
 Measured F0/F1 environment/model-load overhead plus per-prompt fit time
 produces two explicit scaling projections:
@@ -313,6 +332,12 @@ and manifest, then removes only its staging tag. The script records ticket,
 ACR run, digest, locks, project SHA, and requirements/Dockerfile hashes under
 ignored `results/runs/`.
 
+Every build invocation keeps claim body/list/fixed/winner files in a
+cryptographically invocation-specific mode-0700 scratch directory under its
+record directory; its trap removes only that directory. `az acr repository`
+commands use their supported registry/image/repository shapes and all lookup
+failures remain fatal.
+
 Start the primary execution:
 
 ```bash
@@ -340,10 +365,14 @@ polls `properties.provisioningState` to `Succeeded` and will not call
 `job start` on terminal failure or timeout.
 
 Launch uses the same durable ticket election rather than conditional Job API
-semantics. The exact run ID plus primary/retry attempt deterministically derive
-the protected-operation prefix; every invocation creates a unique no-op ARM
-deployment ticket binding run, attempt, primary/current SHA, image digest, and
-job. After settling, all prefix tickets are validated and the earliest server
+semantics. Primary and operational-retry prefixes are global to the singleton
+`job-jspace-p05-jlens`, not scoped by run ID. Each ticket still binds exact run
+ID, attempt, primary/current SHA, image digest, and job. Thus a later primary
+for a different run ID encounters the durable global primary ticket and blocks
+before Job PUT/start; conflicting provenance fails closed. A retry must match
+the globally elected primary ticket's run ID and the sole failed terminal
+primary execution before entering the distinct global retry election. After
+settling, all prefix tickets are validated and the earliest server
 `(timestamp, name)` wins. Two separated reads must elect the same current
 ticket before Job PUT. The durable ticket name/timestamp/invocation are stored
 in job tags. Execution count/status and provenance are then revalidated, and a
@@ -355,6 +384,10 @@ timestamps, stale/failed/in-progress earlier tickets, changed winners, a
 running/succeeded primary, or unverifiable execution fail closed. A crashed
 earliest ticket remains a manual-intervention block instead of permitting a
 duplicate launch.
+
+Like builds, every launcher uses a cryptographically invocation-specific
+scratch directory and removes only its own scratch. Only an elected winner can
+write the shared durable build/start record.
 
 At most one operational correction is permitted. It must reuse the primary
 run timestamp and document the correction:
