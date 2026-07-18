@@ -862,7 +862,11 @@ def derive_decision(
             "plan_b_triggered": False,
         }
     elif f2.get("status") != "success":
-        if authorized_compatibility_fix_attempted and f2.get("status") == "failed":
+        if (
+            authorized_compatibility_fix_attempted
+            and f2.get("status") == "failed"
+            and f2.get("failure_class") != "checkpoint_failure"
+        ):
             decision = {
                 "decision": "RED",
                 "gate_status": "COMPLETE",

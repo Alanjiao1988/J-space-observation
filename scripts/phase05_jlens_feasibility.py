@@ -86,6 +86,150 @@ def atomic_copy_file(source: Path, destination: Path) -> None:
     os.replace(temporary, destination)
 
 
+def validate_lossless_lens_payload(
+    torch_module: Any,
+    raw: Any,
+    expected_lens: Any,
+    loaded_lens: Any,
+) -> dict[str, Any]:
+    if not isinstance(raw, dict) or set(raw) != {
+        "J",
+        "n_prompts",
+        "source_layers",
+        "d_model",
+    }:
+        raise protocol.CheckpointValidationError(
+            "saved lens raw payload keys are not exact"
+        )
+    source_layers = list(expected_lens.source_layers)
+    if (
+        raw.get("n_prompts") != expected_lens.n_prompts
+        or raw.get("source_layers") != source_layers
+        or raw.get("d_model") != expected_lens.d_model
+        or loaded_lens.n_prompts != expected_lens.n_prompts
+        or loaded_lens.source_layers != source_layers
+        or loaded_lens.d_model != expected_lens.d_model
+    ):
+        raise protocol.CheckpointValidationError(
+            "saved lens raw/official metadata mismatch"
+        )
+    raw_jacobians = raw.get("J")
+    if not isinstance(raw_jacobians, dict) or set(raw_jacobians) != set(
+        source_layers
+    ):
+        raise protocol.CheckpointValidationError("saved lens raw layer set mismatch")
+    exact_max_abs: dict[str, float] = {}
+    raw_dtypes: dict[str, str] = {}
+    for layer in source_layers:
+        raw_matrix = raw_jacobians[layer]
+        expected_matrix = expected_lens.jacobians[layer]
+        loaded_matrix = loaded_lens.jacobians[layer]
+        if (
+            raw_matrix.dtype != torch_module.float32
+            or loaded_matrix.dtype != torch_module.float32
+            or list(raw_matrix.shape)
+            != [expected_lens.d_model, expected_lens.d_model]
+            or not bool(torch_module.isfinite(raw_matrix).all().item())
+            or not torch_module.equal(raw_matrix, expected_matrix)
+            or not torch_module.equal(loaded_matrix, expected_matrix)
+        ):
+            raise protocol.CheckpointValidationError(
+                f"saved lens is not exact fp32 at layer {layer}"
+            )
+        exact_max_abs[str(layer)] = 0.0
+        raw_dtypes[str(layer)] = str(raw_matrix.dtype)
+    return {
+        "lens_save_dtype": str(torch_module.float32),
+        "raw_payload_keys_exact": True,
+        "raw_metadata_exact": True,
+        "raw_layer_dtypes": raw_dtypes,
+        "torch_equal_all_layers": True,
+        "exact_max_abs": exact_max_abs,
+    }
+
+
+def save_lossless_jacobian_lens(
+    torch_module: Any,
+    jlens_module: Any,
+    lens: Any,
+    path: Path,
+) -> tuple[Any, dict[str, Any]]:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.fp32.tmp.{os.getpid()}")
+    try:
+        lens.save(str(temporary), dtype=torch_module.float32)
+        raw = torch_module.load(temporary, map_location="cpu", weights_only=True)
+        loaded = jlens_module.JacobianLens.load(str(temporary))
+        validate_lossless_lens_payload(torch_module, raw, lens, loaded)
+        os.replace(temporary, path)
+        final_raw = torch_module.load(path, map_location="cpu", weights_only=True)
+        final_loaded = jlens_module.JacobianLens.load(str(path))
+        audit = validate_lossless_lens_payload(
+            torch_module, final_raw, lens, final_loaded
+        )
+        audit["path"] = str(path)
+        audit["bytes"] = path.stat().st_size
+        audit["sha256"] = protocol.sha256_file(path)
+        return final_loaded, audit
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+
+
+def reconstruct_complete_f3_lens(
+    torch_module: Any,
+    jlens_module: Any,
+    checkpoint_state: Any,
+    *,
+    source_layers: list[int],
+    target_layer: int,
+    d_model: int,
+) -> Any:
+    if not isinstance(checkpoint_state, dict) or set(checkpoint_state) != {
+        "jacobian_sum",
+        "n_done",
+        "next_idx",
+        "source_layers",
+        "target_layer",
+        "skip_first",
+    }:
+        raise protocol.CheckpointValidationError(
+            "complete F3 checkpoint fields are not exact"
+        )
+    if (
+        checkpoint_state["n_done"] != 2
+        or checkpoint_state["next_idx"] != 2
+        or checkpoint_state["source_layers"] != source_layers
+        or checkpoint_state["target_layer"] != target_layer
+        or checkpoint_state["skip_first"] != protocol.SKIP_FIRST
+    ):
+        raise protocol.CheckpointValidationError(
+            "complete F3 checkpoint metadata mismatch"
+        )
+    sums = checkpoint_state["jacobian_sum"]
+    if not isinstance(sums, dict) or set(sums) != set(source_layers):
+        raise protocol.CheckpointValidationError(
+            "complete F3 checkpoint Jacobian layer set mismatch"
+        )
+    jacobians = {}
+    for layer in source_layers:
+        matrix = sums[layer]
+        if (
+            matrix.dtype != torch_module.float32
+            or list(matrix.shape) != [d_model, d_model]
+            or not bool(torch_module.isfinite(matrix).all().item())
+        ):
+            raise protocol.CheckpointValidationError(
+                f"complete F3 checkpoint sum invalid at layer {layer}"
+            )
+        jacobians[layer] = matrix / checkpoint_state["n_done"]
+    return jlens_module.JacobianLens(
+        jacobians=jacobians,
+        n_prompts=checkpoint_state["n_done"],
+        d_model=d_model,
+    )
+
+
 def safe_error(error: BaseException) -> str:
     message = re.sub(r"(?i)(sig|token|secret|password)=\S+", r"\1=<redacted>", str(error))
     return message[:2000]
@@ -686,6 +830,27 @@ class Phase05Runner:
             self.upload_history, configured=self.blob.configured
         )
 
+    def assert_artifact_manifest_current(self, relative_paths: list[str]) -> None:
+        manifest_path = self.output_dir / "phase05_jlens_artifact_manifest.json"
+        manifest = read_json(manifest_path)
+        records = {
+            record.get("path"): record
+            for record in manifest.get("artifacts", [])
+            if isinstance(record, dict)
+        }
+        for relative in relative_paths:
+            path = self.output_dir / relative
+            record = records.get(relative)
+            if (
+                not path.is_file()
+                or not isinstance(record, dict)
+                or record.get("bytes") != path.stat().st_size
+                or record.get("sha256") != protocol.sha256_file(path)
+            ):
+                raise protocol.CheckpointValidationError(
+                    f"artifact manifest is stale/missing for {relative}"
+                )
+
     def stage_document(self, generated_at_utc: str | None = None) -> dict[str, Any]:
         return {
             "schema_version": "phase05-jlens-stage-results-v1",
@@ -1019,6 +1184,28 @@ class Phase05Runner:
                 "details": {},
             }
         self.persist(f"{after_stage}-blocked")
+
+    def mark_operational_retry_checkpoint_failure(
+        self, stage: str, reason: str
+    ) -> None:
+        previous = self.results.get(stage, {})
+        now = utc_now()
+        self.results[stage] = {
+            "status": "failed",
+            "started_at_utc": now,
+            "finished_at_utc": now,
+            "duration_seconds": 0.0,
+            "failure_class": "checkpoint_failure",
+            "error_type": "OperationalRetryCheckpointError",
+            "error": reason,
+            "details": {
+                "authorized_operational_retry": True,
+                "no_recompute_enforced": True,
+                "audit_reason": reason,
+                "prior_status": previous.get("status"),
+            },
+        }
+        self.persist(f"{stage}-operational-retry-checkpoint-failed")
 
     def _runtime_memory(self) -> dict[str, Any]:
         psutil = importlib.import_module("psutil")
@@ -1463,6 +1650,12 @@ class Phase05Runner:
             },
         }
 
+    def _is_authorized_operational_fix(self) -> bool:
+        return bool(
+            self.attempt_id == "operational-fix"
+            and self.args.authorized_compatibility_fix_attempted
+        )
+
     def _valid_prior_artifact(self, stage: str, relative_path: str) -> bool:
         if stage not in self.prior_success:
             return False
@@ -1476,7 +1669,12 @@ class Phase05Runner:
         return bool(path.exists() and expected and protocol.sha256_file(path) == expected)
 
     def _reuse_complete_f3(self) -> bool:
+        strict_retry = self._is_authorized_operational_fix()
         if "F3" not in self.prior_success:
+            if strict_retry:
+                raise protocol.CheckpointValidationError(
+                    "authorized retry has no successful prior F3 result"
+                )
             return False
         details = self.results.get("F3", {}).get("details", {})
         lens_record = details.get("lens", {})
@@ -1489,6 +1687,10 @@ class Phase05Runner:
             or protocol.sha256_file(lens_path) != lens_record.get("sha256")
             or protocol.sha256_file(checkpoint_path) != checkpoint_record.get("sha256")
         ):
+            if strict_retry:
+                raise protocol.CheckpointValidationError(
+                    "authorized retry F3 stage-detail lens/checkpoint hash mismatch"
+                )
             return False
         manifest_path = (
             self.output_dir / "checkpoint" / "phase05_jlens_f3_checkpoint.manifest.json"
@@ -1511,7 +1713,36 @@ class Phase05Runner:
                 prefix_manifest_path,
             )
         ):
+            if strict_retry:
+                raise protocol.CheckpointValidationError(
+                    "authorized retry lacks complete F3 prefix/manifest artifacts"
+                )
             return False
+        if strict_retry:
+            prompt_record = details.get("prompt_1_snapshot") or {}
+            prompt_checkpoint_record = prompt_record.get("checkpoint") or {}
+            prompt_manifest_record = prompt_record.get("manifest") or {}
+            expected_prefix_checkpoint_rel = prefix_checkpoint_path.relative_to(
+                self.output_dir
+            ).as_posix()
+            expected_prefix_manifest_rel = prefix_manifest_path.relative_to(
+                self.output_dir
+            ).as_posix()
+            if (
+                prompt_checkpoint_record.get("path")
+                != expected_prefix_checkpoint_rel
+                or prompt_checkpoint_record.get("bytes")
+                != prefix_checkpoint_path.stat().st_size
+                or prompt_checkpoint_record.get("sha256")
+                != protocol.sha256_file(prefix_checkpoint_path)
+                or prompt_manifest_record.get("path")
+                != expected_prefix_manifest_rel
+                or prompt_manifest_record.get("sha256")
+                != protocol.sha256_file(prefix_manifest_path)
+            ):
+                raise protocol.CheckpointValidationError(
+                    "authorized retry F3 prompt-prefix stage-detail binding mismatch"
+                )
         controls = protocol.make_checkpoint_controls(
             prompt_order_sha256=self.corpus_sha256,
             source_layers=self.layers["f3_source_layers"],
@@ -1521,13 +1752,14 @@ class Phase05Runner:
         checkpoint_state = self.torch.load(
             checkpoint_path, map_location="cpu", weights_only=True
         )
-        if (
-            checkpoint_state.get("n_done") != 2
-            or checkpoint_state.get("next_idx") != 2
-        ):
-            raise protocol.CheckpointValidationError(
-                "reused F3 checkpoint is not complete"
-            )
+        self.fitted_lens = reconstruct_complete_f3_lens(
+            self.torch,
+            self.jlens,
+            checkpoint_state,
+            source_layers=list(self.layers["f3_source_layers"]),
+            target_layer=self.layers["target_layer"],
+            d_model=protocol.MODEL_WIDTH,
+        )
         checkpoint_sha256 = protocol.sha256_file(checkpoint_path)
         lens_sha256 = protocol.sha256_file(lens_path)
         prefix_checkpoint_sha256 = protocol.sha256_file(prefix_checkpoint_path)
@@ -1558,16 +1790,141 @@ class Phase05Runner:
             prefix_checkpoint_sha256=prefix_checkpoint_sha256,
             expected_prefix_progress_sha256=prefix_progress_sha256,
         )
-        jacobians = {
-            layer: checkpoint_state["jacobian_sum"][layer] / 2
-            for layer in self.layers["f3_source_layers"]
-        }
-        self.fitted_lens = self.jlens.JacobianLens(
-            jacobians=jacobians,
-            n_prompts=2,
-            d_model=protocol.MODEL_WIDTH,
-        )
-        self.loaded_lens = self.jlens.JacobianLens.load(str(lens_path))
+        if strict_retry:
+            old_raw = self.torch.load(
+                lens_path, map_location="cpu", weights_only=True
+            )
+            if (
+                not isinstance(old_raw, dict)
+                or set(old_raw)
+                != {"J", "n_prompts", "source_layers", "d_model"}
+                or old_raw.get("n_prompts") != 2
+                or old_raw.get("source_layers")
+                != list(self.layers["f3_source_layers"])
+                or old_raw.get("d_model") != protocol.MODEL_WIDTH
+                or not isinstance(old_raw.get("J"), dict)
+                or set(old_raw["J"]) != set(self.layers["f3_source_layers"])
+            ):
+                raise protocol.CheckpointValidationError(
+                    "authorized retry old lens raw metadata mismatch"
+                )
+            old_raw_dtypes = {
+                str(layer): str(old_raw["J"][layer].dtype)
+                for layer in self.layers["f3_source_layers"]
+            }
+            if any(
+                old_raw["J"][layer].dtype != self.torch.float16
+                or list(old_raw["J"][layer].shape)
+                != [protocol.MODEL_WIDTH, protocol.MODEL_WIDTH]
+                or not bool(
+                    self.torch.isfinite(old_raw["J"][layer]).all().item()
+                )
+                for layer in self.layers["f3_source_layers"]
+            ):
+                raise protocol.CheckpointValidationError(
+                    "authorized retry expected the primary default-fp16 lens"
+                )
+            old_lens_audit = {
+                "path": lens_record.get("path"),
+                "bytes": lens_path.stat().st_size,
+                "sha256": lens_sha256,
+                "raw_layer_dtypes": old_raw_dtypes,
+                "f3_save_load_max_abs": details.get("save_load_max_abs"),
+                "f3_lens_save_dtype": details.get(
+                    "lens_save_dtype", "torch.float16 (official default)"
+                ),
+            }
+            prefix_checkpoint_hash_before = protocol.sha256_file(
+                prefix_checkpoint_path
+            )
+            prefix_manifest_hash_before = protocol.sha256_file(
+                prefix_manifest_path
+            )
+            self.loaded_lens, lossless_audit = save_lossless_jacobian_lens(
+                self.torch,
+                self.jlens,
+                self.fitted_lens,
+                lens_path,
+            )
+            new_lens_record = {
+                "path": lens_path.relative_to(self.output_dir).as_posix(),
+                "bytes": lens_path.stat().st_size,
+                "sha256": protocol.sha256_file(lens_path),
+                "save_dtype": str(self.torch.float32),
+                "torch_equal_to_fitted": True,
+            }
+            updated_manifest = read_json(manifest_path)
+            updated_manifest["lens"] = new_lens_record
+            updated_completion = dict(updated_manifest.get("completion") or {})
+            updated_completion["lens_sha256"] = new_lens_record["sha256"]
+            updated_manifest["completion"] = updated_completion
+            updated_manifest["completion_sha256"] = protocol.sha256_bytes(
+                protocol.canonical_json_bytes(updated_completion)
+            )
+            updated_manifest["lossless_reserialization"] = {
+                "authorized_operational_retry": True,
+                "reason": (
+                    "official default-fp16 lens serialization changed "
+                    "transport/unembedding output"
+                ),
+                "old_lens": old_lens_audit,
+                "new_lens": new_lens_record,
+                "exact_fidelity": lossless_audit,
+            }
+            updated_manifest["updated_at_utc"] = utc_now()
+            atomic_write_json(manifest_path, updated_manifest)
+            if (
+                protocol.sha256_file(prefix_checkpoint_path)
+                != prefix_checkpoint_hash_before
+                or protocol.sha256_file(prefix_manifest_path)
+                != prefix_manifest_hash_before
+            ):
+                raise protocol.CheckpointValidationError(
+                    "authorized retry altered durable prompt-prefix artifacts"
+                )
+            protocol.validate_f3_resume_binding(
+                read_json(prefix_manifest_path),
+                controls,
+                n_done=1,
+                next_idx=1,
+                checkpoint_sha256=prefix_checkpoint_sha256,
+                expected_prompt_prefix_sha256=expected_prefix_sha256,
+                expected_complete_corpus_sha256=self.corpus_sha256,
+                prefix_checkpoint_sha256=prefix_checkpoint_sha256,
+            )
+            protocol.validate_f3_resume_binding(
+                read_json(manifest_path),
+                controls,
+                n_done=2,
+                next_idx=2,
+                checkpoint_sha256=checkpoint_sha256,
+                expected_prompt_prefix_sha256=expected_prefix_sha256,
+                expected_complete_corpus_sha256=self.corpus_sha256,
+                lens_sha256=new_lens_record["sha256"],
+                prefix_checkpoint_sha256=prefix_checkpoint_sha256,
+                expected_prefix_progress_sha256=prefix_progress_sha256,
+            )
+            details.update(
+                {
+                    "lens": new_lens_record,
+                    "lens_save_dtype": str(self.torch.float32),
+                    "lens_raw_validation": lossless_audit,
+                    "lens_exact_fidelity": True,
+                    "save_load_max_abs": dict(
+                        lossless_audit["exact_max_abs"]
+                    ),
+                    "old_primary_lens_audit": old_lens_audit,
+                    "old_lens_sha256": lens_sha256,
+                    "new_lens_sha256": new_lens_record["sha256"],
+                    "lossless_reserialized_on_operational_retry": True,
+                    "authorized_compatibility_fix_reason": (
+                        "official default-fp16 lens serialization changed "
+                        "transport/unembedding output"
+                    ),
+                }
+            )
+        else:
+            self.loaded_lens = self.jlens.JacobianLens.load(str(lens_path))
         self.scaling_plan = details.get("scaling_plan") or self.scaling_plan
         details["resume_reused_complete_artifacts"] = True
         return True
@@ -2047,35 +2404,13 @@ class Phase05Runner:
         ):
             raise protocol.CheckpointValidationError("official checkpoint state is invalid")
 
-        temporary_lens_path = lens_path.with_name(
-            f".{lens_path.name}.tmp.{os.getpid()}"
+        self.loaded_lens, lens_fidelity = save_lossless_jacobian_lens(
+            self.torch,
+            self.jlens,
+            self.fitted_lens,
+            lens_path,
         )
-        self.fitted_lens.save(str(temporary_lens_path))
-        os.replace(temporary_lens_path, lens_path)
-        self.loaded_lens = self.jlens.JacobianLens.load(str(lens_path))
-        if (
-            self.loaded_lens.n_prompts != 2
-            or self.loaded_lens.source_layers != source_layers
-            or self.loaded_lens.d_model != protocol.MODEL_WIDTH
-        ):
-            raise protocol.CheckpointValidationError("saved lens failed load validation")
-        save_load_max_abs = {}
-        for layer in source_layers:
-            difference = (
-                self.fitted_lens.jacobians[layer]
-                - self.loaded_lens.jacobians[layer]
-            )
-            maximum = float(difference.abs().max().item())
-            save_load_max_abs[str(layer)] = maximum
-            if not self.torch.allclose(
-                self.fitted_lens.jacobians[layer],
-                self.loaded_lens.jacobians[layer],
-                rtol=5e-3,
-                atol=5e-3,
-            ):
-                raise protocol.CheckpointValidationError(
-                    f"lens save/load numeric mismatch at layer {layer}"
-                )
+        save_load_max_abs = dict(lens_fidelity["exact_max_abs"])
 
         checkpoint_manifest = read_json(manifest_path)
         checkpoint_manifest["completed_at_utc"] = utc_now()
@@ -2090,6 +2425,8 @@ class Phase05Runner:
             "path": lens_path.relative_to(self.output_dir).as_posix(),
             "bytes": lens_path.stat().st_size,
             "sha256": protocol.sha256_file(lens_path),
+            "save_dtype": str(self.torch.float32),
+            "torch_equal_to_fitted": True,
         }
         completion_progress = {
             "n_done": checkpoint_state["n_done"],
@@ -2170,6 +2507,10 @@ class Phase05Runner:
             "checkpoint": checkpoint_manifest["checkpoint"],
             "lens": checkpoint_manifest["lens"],
             "save_load_max_abs": save_load_max_abs,
+            "lens_save_dtype": lens_fidelity["lens_save_dtype"],
+            "lens_raw_validation": lens_fidelity,
+            "lens_exact_fidelity": True,
+            "lossless_reserialized_on_operational_retry": False,
             "memory": memory,
             "scaling_plan": self.scaling_plan,
             "_metrics": {
@@ -2196,9 +2537,13 @@ class Phase05Runner:
             layers=source_layers,
         )
         if self.fitted_lens is None or self.loaded_lens is None:
-            lens_path = self.output_dir / "lens" / "phase05_jlens.pt"
-            self.fitted_lens = self.jlens.JacobianLens.load(str(lens_path))
-            self.loaded_lens = self.jlens.JacobianLens.load(str(lens_path))
+            raise protocol.CheckpointValidationError(
+                "F4 requires independent in-memory fitted and saved/reloaded lenses"
+            )
+        if self.fitted_lens is self.loaded_lens:
+            raise protocol.CheckpointValidationError(
+                "F4 fitted/reloaded lenses must be independent objects"
+            )
         top_k_records = []
         all_consistent = True
         for prompt in SANITY_PROMPTS:
@@ -2484,12 +2829,23 @@ class Phase05Runner:
             self.block_remaining("F1", "F1 model/official-adapter gate failed")
             return 2
 
+        authorized_retry = self._is_authorized_operational_fix()
         f2_relative = "checkpoint/phase05_jlens_f2_jacobian.pt"
         if self._valid_prior_artifact("F2", f2_relative):
             self.results["F2"]["details"]["resume_reused_complete_artifact"] = True
             if not self.persist("F2-resumed"):
                 self.block_remaining("F2", "required F2 resume snapshot upload failed")
                 return 6
+        elif authorized_retry:
+            self.mark_operational_retry_checkpoint_failure(
+                "F2",
+                "authorized operational retry requires the exact prior F2 artifact; "
+                "F2 recomputation is forbidden",
+            )
+            self.block_remaining(
+                "F2", "authorized operational retry prior F2 artifact invalid"
+            )
+            return 7
         elif not self.execute("F2", self.run_f2):
             self.block_remaining("F2", "F2 real-Jacobian gate failed")
             return 3
@@ -2499,14 +2855,55 @@ class Phase05Runner:
             )
             return 4
 
-        try:
-            reused_f3 = self._reuse_complete_f3()
-        except protocol.CheckpointValidationError:
-            reused_f3 = False
+        if authorized_retry:
+            try:
+                reused_f3 = self._reuse_complete_f3()
+            except Exception as error:
+                self.mark_operational_retry_checkpoint_failure(
+                    "F3",
+                    "authorized operational retry could not validate/reserialize "
+                    f"prior F3: {safe_error(error)}",
+                )
+                self.block_remaining(
+                    "F3", "authorized operational retry prior F3 invalid"
+                )
+                return 7
+            if not reused_f3:
+                self.mark_operational_retry_checkpoint_failure(
+                    "F3",
+                    "authorized operational retry requires complete prior F3; "
+                    "F3 recomputation is forbidden",
+                )
+                self.block_remaining(
+                    "F3", "authorized operational retry prior F3 unavailable"
+                )
+                return 7
+        else:
+            try:
+                reused_f3 = self._reuse_complete_f3()
+            except protocol.CheckpointValidationError:
+                reused_f3 = False
         if reused_f3:
             if not self.persist("F3-resumed"):
                 self.block_remaining("F3", "required F3 resume snapshot upload failed")
                 return 6
+            try:
+                self.assert_artifact_manifest_current(
+                    [
+                        "lens/phase05_jlens.pt",
+                        "checkpoint/phase05_jlens_f3_fit_checkpoint.pt",
+                        "checkpoint/phase05_jlens_f3_checkpoint.manifest.json",
+                        "checkpoint/phase05_jlens_f3_prompt1_checkpoint.pt",
+                        "checkpoint/phase05_jlens_f3_prompt1_checkpoint.manifest.json",
+                    ]
+                )
+            except protocol.CheckpointValidationError as error:
+                if authorized_retry:
+                    self.mark_operational_retry_checkpoint_failure(
+                        "F3", safe_error(error)
+                    )
+                self.block_remaining("F3", "F3 resumed artifact manifest invalid")
+                return 7 if authorized_retry else 4
         elif not self.execute("F3", self.run_f3):
             self.block_remaining("F3", "F3 fit/checkpoint gate failed")
             return 4
@@ -2518,7 +2915,26 @@ class Phase05Runner:
         if not self.execute("F4", self.run_f4):
             self.block_remaining("F4", "F4 save/load/apply gate failed")
             return 4
-        self.execute("F5", self.run_f5)
+        if authorized_retry:
+            now = utc_now()
+            self.results["F5"] = {
+                "status": "skipped_cost_guard",
+                "started_at_utc": now,
+                "finished_at_utc": now,
+                "duration_seconds": 0.0,
+                "failure_class": None,
+                "reason": (
+                    "authorized operational retry forbids any additional "
+                    "Jacobian fit/recomputation"
+                ),
+                "details": {
+                    "authorized_operational_retry": True,
+                    "no_recompute_enforced": True,
+                },
+            }
+            self.persist("F5-operational-retry-skipped")
+        else:
+            self.execute("F5", self.run_f5)
         self.environment["tooling_state"] = "EXECUTED"
         final_persisted = self.persist("final")
         decision = self.decision_document()["decision"]

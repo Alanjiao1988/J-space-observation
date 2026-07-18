@@ -8,6 +8,7 @@ import shutil
 import sys
 from copy import deepcopy
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -29,6 +30,41 @@ class FakeTokenizer:
         assert truncation is True
         assert add_special_tokens is True
         return {"input_ids": list(range(min(self.length, max_length)))}
+
+
+class FakeJacobianLens:
+    def __init__(self, jacobians, *, n_prompts, d_model):
+        self.jacobians = {layer: matrix.float() for layer, matrix in jacobians.items()}
+        self.source_layers = sorted(self.jacobians)
+        self.n_prompts = n_prompts
+        self.d_model = d_model
+
+    def save(self, path, *, dtype):
+        import torch
+
+        torch.save(
+            {
+                "J": {
+                    layer: matrix.to(dtype)
+                    for layer, matrix in self.jacobians.items()
+                },
+                "n_prompts": self.n_prompts,
+                "source_layers": self.source_layers,
+                "d_model": self.d_model,
+            },
+            path,
+        )
+
+    @classmethod
+    def load(cls, path):
+        import torch
+
+        raw = torch.load(path, map_location="cpu", weights_only=True)
+        return cls(
+            raw["J"],
+            n_prompts=raw["n_prompts"],
+            d_model=raw["d_model"],
+        )
 
 
 def successful_results(memory: str = "green"):
@@ -253,6 +289,121 @@ def test_finite_full_jacobian_validation():
             p05.validate_jacobian_summary(**(baseline | mutation))
 
 
+def test_lossless_lens_save_is_explicit_fp32_and_torch_equal(tmp_path):
+    import torch
+
+    lens = FakeJacobianLens(
+        {
+            1: torch.tensor([[0.1, -0.2], [0.3, 0.4]], dtype=torch.float32),
+            2: torch.tensor([[1.1, 1.2], [-1.3, 1.4]], dtype=torch.float32),
+        },
+        n_prompts=2,
+        d_model=2,
+    )
+    module = SimpleNamespace(JacobianLens=FakeJacobianLens)
+    path = tmp_path / "lens.pt"
+    loaded, audit = runner_module.save_lossless_jacobian_lens(
+        torch, module, lens, path
+    )
+    raw = torch.load(path, map_location="cpu", weights_only=True)
+    assert all(matrix.dtype == torch.float32 for matrix in raw["J"].values())
+    assert all(
+        torch.equal(loaded.jacobians[layer], lens.jacobians[layer])
+        for layer in lens.source_layers
+    )
+    assert audit["lens_save_dtype"] == "torch.float32"
+    assert audit["torch_equal_all_layers"] is True
+    assert set(audit["exact_max_abs"].values()) == {0.0}
+
+
+def test_lossless_lens_save_failures_never_return_success(monkeypatch, tmp_path):
+    import torch
+
+    lens = FakeJacobianLens(
+        {1: torch.eye(2, dtype=torch.float32)},
+        n_prompts=2,
+        d_model=2,
+    )
+    module = SimpleNamespace(JacobianLens=FakeJacobianLens)
+    path = tmp_path / "lens.pt"
+    path.write_bytes(b"old")
+
+    class WrongDtypeLens(FakeJacobianLens):
+        def save(self, target, *, dtype):
+            assert dtype == torch.float32
+            torch.save(
+                {
+                    "J": {1: self.jacobians[1].half()},
+                    "n_prompts": 2,
+                    "source_layers": [1],
+                    "d_model": 2,
+                },
+                target,
+            )
+
+    wrong = WrongDtypeLens(lens.jacobians, n_prompts=2, d_model=2)
+    with pytest.raises(p05.CheckpointValidationError):
+        runner_module.save_lossless_jacobian_lens(torch, module, wrong, path)
+    assert path.read_bytes() == b"old"
+
+    calls = 0
+    original_validate = runner_module.validate_lossless_lens_payload
+
+    def fail_after_replace(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        result = original_validate(*args, **kwargs)
+        if calls == 2:
+            raise p05.CheckpointValidationError("post-replace validation failed")
+        return result
+
+    monkeypatch.setattr(
+        runner_module, "validate_lossless_lens_payload", fail_after_replace
+    )
+    with pytest.raises(p05.CheckpointValidationError):
+        runner_module.save_lossless_jacobian_lens(torch, module, lens, path)
+    assert path.read_bytes() != b"old"
+
+
+def test_complete_checkpoint_reconstruction_is_exact_and_fail_closed():
+    import torch
+
+    module = SimpleNamespace(JacobianLens=FakeJacobianLens)
+    state = {
+        "jacobian_sum": {
+            1: torch.tensor([[2.0, 4.0], [6.0, 8.0]], dtype=torch.float32)
+        },
+        "n_done": 2,
+        "next_idx": 2,
+        "source_layers": [1],
+        "target_layer": 2,
+        "skip_first": 16,
+    }
+    lens = runner_module.reconstruct_complete_f3_lens(
+        torch,
+        module,
+        state,
+        source_layers=[1],
+        target_layer=2,
+        d_model=2,
+    )
+    assert torch.equal(
+        lens.jacobians[1],
+        torch.tensor([[1.0, 2.0], [3.0, 4.0]], dtype=torch.float32),
+    )
+    tampered = deepcopy(state)
+    tampered["jacobian_sum"][1] = tampered["jacobian_sum"][1].half()
+    with pytest.raises(p05.CheckpointValidationError):
+        runner_module.reconstruct_complete_f3_lens(
+            torch,
+            module,
+            tampered,
+            source_layers=[1],
+            target_layer=2,
+            d_model=2,
+        )
+
+
 @pytest.mark.parametrize(
     ("error", "stage", "expected"),
     [
@@ -460,6 +611,14 @@ def test_green_amber_red_and_unrated_decisions():
         scaling_plan=None,
     )
     assert red["decision"] == "RED"
+    checkpoint_block = deepcopy(f2_failure)
+    checkpoint_block["F2"]["failure_class"] = "checkpoint_failure"
+    checkpoint_decision = p05.derive_decision(
+        checkpoint_block,
+        authorized_compatibility_fix_attempted=True,
+        scaling_plan=None,
+    )
+    assert checkpoint_decision["decision"] == "UNRATED"
 
     dependency_block = p05.derive_decision(
         {"F0": {"status": "failed"}},
@@ -489,6 +648,285 @@ def test_checkpoint_external_manifest_controls_and_hash():
     assert controls["model_revision"] == p05.MODEL_REVISION
     assert controls["prompt_order_sha256"] == "a" * 64
     assert controls["backend"] == "official-jlens-fit"
+
+
+def build_operational_retry_fixture(monkeypatch, tmp_path):
+    import torch
+
+    monkeypatch.delenv("JSPACE_BLOB_ACCOUNT", raising=False)
+    monkeypatch.delenv("JSPACE_BLOB_CONTAINER", raising=False)
+    monkeypatch.delenv("JSPACE_BLOB_RESUME_PREFIX", raising=False)
+    monkeypatch.setenv("JSPACE_ATTEMPT_ID", "operational-fix")
+    monkeypatch.setattr(p05, "MODEL_WIDTH", 2)
+    args = runner_module.parse_args(
+        [
+            "--output-dir",
+            str(tmp_path),
+            "--corpus",
+            str(ROOT / "data" / "jlens_feasibility_prompts.jsonl"),
+            "--resume",
+            "--authorized-compatibility-fix-attempted",
+        ]
+    )
+    runner = runner_module.Phase05Runner(args)
+    runner.torch = torch
+    runner.jlens = SimpleNamespace(JacobianLens=FakeJacobianLens)
+    runner.layers = {
+        "target_layer": 27,
+        "f2_source_layer": 13,
+        "f3_source_layers": [6, 13, 20],
+    }
+    checkpoint_dir = tmp_path / "checkpoint"
+    lens_dir = tmp_path / "lens"
+    checkpoint_dir.mkdir()
+    lens_dir.mkdir()
+    checkpoint_path = checkpoint_dir / "phase05_jlens_f3_fit_checkpoint.pt"
+    prefix_checkpoint_path = (
+        checkpoint_dir / "phase05_jlens_f3_prompt1_checkpoint.pt"
+    )
+    manifest_path = checkpoint_dir / "phase05_jlens_f3_checkpoint.manifest.json"
+    prefix_manifest_path = (
+        checkpoint_dir / "phase05_jlens_f3_prompt1_checkpoint.manifest.json"
+    )
+    lens_path = lens_dir / "phase05_jlens.pt"
+    layers = runner.layers["f3_source_layers"]
+    prefix_state = {
+        "jacobian_sum": {
+            layer: torch.full((2, 2), float(layer), dtype=torch.float32)
+            for layer in layers
+        },
+        "n_done": 1,
+        "next_idx": 1,
+        "source_layers": layers,
+        "target_layer": 27,
+        "skip_first": 16,
+    }
+    complete_state = {
+        **prefix_state,
+        "jacobian_sum": {
+            layer: torch.full((2, 2), float(layer * 2), dtype=torch.float32)
+            for layer in layers
+        },
+        "n_done": 2,
+        "next_idx": 2,
+    }
+    torch.save(prefix_state, prefix_checkpoint_path)
+    torch.save(complete_state, checkpoint_path)
+    controls = p05.make_checkpoint_controls(
+        prompt_order_sha256=runner.corpus_sha256,
+        source_layers=layers,
+        target_layer=27,
+        dim_batch=1,
+    )
+    manifest = p05.make_checkpoint_manifest(controls)
+    progress = {
+        "n_done": 1,
+        "next_idx": 1,
+        "prompt_prefix_count": 1,
+        "prompt_prefix_sha256": p05.canonical_jsonl_sha256(
+            runner.corpus_records[:1]
+        ),
+        "controls_sha256": manifest["controls_sha256"],
+        "checkpoint": {
+            "path": prefix_checkpoint_path.relative_to(tmp_path).as_posix(),
+            "bytes": prefix_checkpoint_path.stat().st_size,
+            "sha256": p05.sha256_file(prefix_checkpoint_path),
+        },
+    }
+    manifest["progress"] = progress
+    manifest["progress_sha256"] = p05.sha256_bytes(
+        p05.canonical_json_bytes(progress)
+    )
+    runner_module.atomic_write_json(prefix_manifest_path, manifest)
+    reconstructed = FakeJacobianLens(
+        {
+            layer: complete_state["jacobian_sum"][layer] / 2
+            for layer in layers
+        },
+        n_prompts=2,
+        d_model=2,
+    )
+    reconstructed.save(str(lens_path), dtype=torch.float16)
+    lens_sha = p05.sha256_file(lens_path)
+    completion = {
+        "n_done": 2,
+        "next_idx": 2,
+        "complete_corpus_sha256": runner.corpus_sha256,
+        "controls_sha256": manifest["controls_sha256"],
+        "checkpoint_sha256": p05.sha256_file(checkpoint_path),
+        "lens_sha256": lens_sha,
+        "prefix_checkpoint_sha256": p05.sha256_file(prefix_checkpoint_path),
+        "prefix_progress_sha256": manifest["progress_sha256"],
+    }
+    manifest["lens"] = {
+        "path": lens_path.relative_to(tmp_path).as_posix(),
+        "bytes": lens_path.stat().st_size,
+        "sha256": lens_sha,
+    }
+    manifest["completion"] = completion
+    manifest["completion_sha256"] = p05.sha256_bytes(
+        p05.canonical_json_bytes(completion)
+    )
+    runner_module.atomic_write_json(manifest_path, manifest)
+    details = {
+        "dim_batch": 1,
+        "checkpoint": {
+            "path": checkpoint_path.relative_to(tmp_path).as_posix(),
+            "bytes": checkpoint_path.stat().st_size,
+            "sha256": p05.sha256_file(checkpoint_path),
+        },
+        "lens": dict(manifest["lens"]),
+        "prompt_1_snapshot": {
+            **progress,
+            "manifest": {
+                "path": prefix_manifest_path.relative_to(tmp_path).as_posix(),
+                "sha256": p05.sha256_file(prefix_manifest_path),
+            },
+        },
+        "save_load_max_abs": {"6": 0.0003, "13": 0.0004, "20": 0.0005},
+        "memory": {"classification": "green"},
+        "scaling_plan": executable_scaling(),
+    }
+    runner.results = {
+        "F2": {"status": "success", "details": {}},
+        "F3": {"status": "success", "details": details},
+    }
+    runner.prior_success = {"F2", "F3"}
+    return runner, {
+        "checkpoint": checkpoint_path,
+        "prefix_checkpoint": prefix_checkpoint_path,
+        "manifest": manifest_path,
+        "prefix_manifest": prefix_manifest_path,
+        "lens": lens_path,
+    }
+
+
+def test_operational_retry_atomically_reserializes_and_updates_completion(
+    monkeypatch, tmp_path
+):
+    import torch
+
+    runner, paths = build_operational_retry_fixture(monkeypatch, tmp_path)
+    old_hash = p05.sha256_file(paths["lens"])
+    assert runner._reuse_complete_f3() is True
+    details = runner.results["F3"]["details"]
+    raw = torch.load(paths["lens"], map_location="cpu", weights_only=True)
+    assert all(matrix.dtype == torch.float32 for matrix in raw["J"].values())
+    assert details["old_lens_sha256"] == old_hash
+    assert details["new_lens_sha256"] == p05.sha256_file(paths["lens"])
+    assert details["lossless_reserialized_on_operational_retry"] is True
+    assert set(details["save_load_max_abs"].values()) == {0.0}
+    manifest = json.loads(paths["manifest"].read_text(encoding="utf-8"))
+    assert manifest["lens"]["sha256"] == details["new_lens_sha256"]
+    assert manifest["completion"]["lens_sha256"] == details["new_lens_sha256"]
+    assert manifest["completion_sha256"] == p05.sha256_bytes(
+        p05.canonical_json_bytes(manifest["completion"])
+    )
+    assert (
+        manifest["lossless_reserialization"]["old_lens"]["sha256"]
+        == old_hash
+    )
+    assert manifest["lossless_reserialization"]["exact_fidelity"][
+        "torch_equal_all_layers"
+    ]
+    assert all(
+        torch.equal(
+            runner.fitted_lens.jacobians[layer],
+            runner.loaded_lens.jacobians[layer],
+        )
+        for layer in runner.layers["f3_source_layers"]
+    )
+
+
+@pytest.mark.parametrize("tamper", ["checkpoint", "prefix", "completion"])
+def test_operational_retry_rejects_tampered_f3_bindings(
+    monkeypatch, tmp_path, tamper
+):
+    runner, paths = build_operational_retry_fixture(monkeypatch, tmp_path)
+    if tamper == "checkpoint":
+        paths["checkpoint"].write_bytes(b"tampered")
+    elif tamper == "prefix":
+        paths["prefix_manifest"].write_text("{}", encoding="utf-8")
+    else:
+        manifest = json.loads(paths["manifest"].read_text(encoding="utf-8"))
+        manifest["completion"]["complete_corpus_sha256"] = "0" * 64
+        manifest["completion_sha256"] = p05.sha256_bytes(
+            p05.canonical_json_bytes(manifest["completion"])
+        )
+        paths["manifest"].write_bytes(p05.canonical_json_bytes(manifest))
+    with pytest.raises(p05.CheckpointValidationError):
+        runner._reuse_complete_f3()
+
+
+def test_operational_retry_manifest_failure_after_replace_is_fail_closed(
+    monkeypatch, tmp_path
+):
+    import torch
+
+    runner, paths = build_operational_retry_fixture(monkeypatch, tmp_path)
+    original_write = runner_module.atomic_write_json
+
+    def fail_manifest(path, value):
+        if Path(path) == paths["manifest"]:
+            raise p05.CheckpointValidationError("simulated manifest failure")
+        return original_write(path, value)
+
+    monkeypatch.setattr(runner_module, "atomic_write_json", fail_manifest)
+    with pytest.raises(p05.CheckpointValidationError):
+        runner._reuse_complete_f3()
+    raw = torch.load(paths["lens"], map_location="cpu", weights_only=True)
+    assert all(matrix.dtype == torch.float32 for matrix in raw["J"].values())
+    stale = json.loads(paths["manifest"].read_text(encoding="utf-8"))
+    assert stale["completion"]["lens_sha256"] != p05.sha256_file(paths["lens"])
+
+
+@pytest.mark.parametrize("failure_stage", ["F2", "F3"])
+def test_operational_retry_never_recomputes_f2_or_f3(
+    monkeypatch, tmp_path, failure_stage
+):
+    monkeypatch.delenv("JSPACE_BLOB_ACCOUNT", raising=False)
+    monkeypatch.delenv("JSPACE_BLOB_CONTAINER", raising=False)
+    monkeypatch.setenv("JSPACE_ATTEMPT_ID", "operational-fix")
+    args = runner_module.parse_args(
+        [
+            "--output-dir",
+            str(tmp_path),
+            "--corpus",
+            str(ROOT / "data" / "jlens_feasibility_prompts.jsonl"),
+            "--authorized-compatibility-fix-attempted",
+        ]
+    )
+    runner = runner_module.Phase05Runner(args)
+    runner.results["F2"] = {
+        "status": "success",
+        "details": {"continue_allowed": True},
+    }
+    monkeypatch.setattr(runner, "persist", lambda *_args, **_kwargs: True)
+    monkeypatch.setattr(
+        runner,
+        "execute",
+        lambda stage, _function: True
+        if stage in {"F0", "F1"}
+        else (_ for _ in ()).throw(AssertionError(f"computed {stage}")),
+    )
+    monkeypatch.setattr(
+        runner, "mark_operational_retry_checkpoint_failure", lambda *_args: None
+    )
+    monkeypatch.setattr(runner, "block_remaining", lambda *_args: None)
+    monkeypatch.setattr(
+        runner,
+        "_valid_prior_artifact",
+        lambda *_args: failure_stage != "F2",
+    )
+    if failure_stage == "F3":
+        monkeypatch.setattr(
+            runner,
+            "_reuse_complete_f3",
+            lambda: (_ for _ in ()).throw(
+                p05.CheckpointValidationError("invalid prior F3")
+            ),
+        )
+    assert runner.run() == 7
 
 
 def test_f3_resume_bindings_accept_only_exact_zero_one_two_states():
@@ -813,6 +1251,30 @@ def test_logit_lens_substitution_is_rejected():
         p05.validate_apply_controls(use_jacobian=True, layers=[])
 
 
+def test_f4_requires_independent_fitted_and_reloaded_lenses(monkeypatch, tmp_path):
+    monkeypatch.delenv("JSPACE_BLOB_ACCOUNT", raising=False)
+    monkeypatch.delenv("JSPACE_BLOB_CONTAINER", raising=False)
+    args = runner_module.parse_args(
+        [
+            "--output-dir",
+            str(tmp_path),
+            "--corpus",
+            str(ROOT / "data" / "jlens_feasibility_prompts.jsonl"),
+        ]
+    )
+    runner = runner_module.Phase05Runner(args)
+    runner.layers = {"f3_source_layers": [6, 13, 20]}
+    runner.fitted_lens = None
+    runner.loaded_lens = object()
+    with pytest.raises(p05.CheckpointValidationError):
+        runner.run_f4()
+    same = object()
+    runner.fitted_lens = same
+    runner.loaded_lens = same
+    with pytest.raises(p05.CheckpointValidationError):
+        runner.run_f4()
+
+
 def test_runner_writes_exact_model_free_output_schema(monkeypatch, tmp_path):
     monkeypatch.delenv("JSPACE_BLOB_ACCOUNT", raising=False)
     monkeypatch.delenv("JSPACE_BLOB_CONTAINER", raising=False)
@@ -839,6 +1301,38 @@ def test_runner_writes_exact_model_free_output_schema(monkeypatch, tmp_path):
     assert decision["decision"] == "UNRATED"
     assert decision["gate_status"] == "BLOCKED"
     assert decision["automatic_plan_b"] is False
+
+
+def test_f3_resumed_persistence_manifest_covers_current_artifacts(
+    monkeypatch, tmp_path
+):
+    monkeypatch.delenv("JSPACE_BLOB_ACCOUNT", raising=False)
+    monkeypatch.delenv("JSPACE_BLOB_CONTAINER", raising=False)
+    args = runner_module.parse_args(
+        [
+            "--output-dir",
+            str(tmp_path),
+            "--corpus",
+            str(ROOT / "data" / "jlens_feasibility_prompts.jsonl"),
+        ]
+    )
+    runner = runner_module.Phase05Runner(args)
+    relative_paths = [
+        "lens/phase05_jlens.pt",
+        "checkpoint/phase05_jlens_f3_fit_checkpoint.pt",
+        "checkpoint/phase05_jlens_f3_checkpoint.manifest.json",
+        "checkpoint/phase05_jlens_f3_prompt1_checkpoint.pt",
+        "checkpoint/phase05_jlens_f3_prompt1_checkpoint.manifest.json",
+    ]
+    for relative in relative_paths:
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(relative, encoding="utf-8")
+    assert runner.persist("F3-resumed") is True
+    runner.assert_artifact_manifest_current(relative_paths)
+    (tmp_path / relative_paths[0]).write_text("tampered", encoding="utf-8")
+    with pytest.raises(p05.CheckpointValidationError):
+        runner.assert_artifact_manifest_current(relative_paths)
 
 
 def test_failed_blob_recovery_blocks_before_model_or_gpu(monkeypatch, tmp_path):
@@ -1048,6 +1542,16 @@ def test_runner_contains_real_official_calls_and_no_substitution():
     assert "torch.no_grad" not in source
     assert "protocol.MODEL_ID" in source
     assert "protocol.MODEL_REVISION" in source
+    assert "lens.save(str(temporary), dtype=torch_module.float32)" in source
+    assert "torch_module.equal(raw_matrix, expected_matrix)" in source
+    assert "lossless_reserialized_on_operational_retry" in source
+    assert "F2 recomputation is forbidden" in source
+    assert "F3 recomputation is forbidden" in source
+    assert (
+        "self.fitted_lens = self.jlens.JacobianLens.load(str(lens_path))"
+        not in source
+    )
+    assert "rtol=5e-3, atol=5e-3" in source
     assert "prompts=prompts[:1]" in source
     assert 'self.persist("F3-prompt-1")' in source
     assert "phase05_jlens_f3_prompt1_checkpoint.pt" in source

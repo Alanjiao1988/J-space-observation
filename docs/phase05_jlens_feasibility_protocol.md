@@ -94,7 +94,9 @@ jlens.JacobianLens.merge(lenses)
 The likely direct Qwen2 `model.layers` layout must be selected by the official
 auto-layout. This track contains no source fork, vendored implementation, or
 preemptive architecture adapter. Only a real F1/F2 failure may motivate one
-targeted compatibility change, and main must authorize that separately.
+targeted architecture compatibility change, and main must authorize that
+separately. The sole separately authorized operational retry described below
+is checkpoint serialization only and does not modify official source.
 
 ## Stages and recovery
 
@@ -192,8 +194,11 @@ and hashes the external progress manifest, and persists the versioned
 the completed checkpoint. It then resumes official fit over both prompts.
 Success requires `n_prompts=2`, exactly three finite fp32 `[1536,1536]`
 matrices, valid official checkpoint state, an external controls manifest,
-successful `JacobianLens.save/load`, hashes, and bounded fp16 save/load error.
-Any other `(n_done,next_idx)` pair is a checkpoint failure.
+successful `JacobianLens.save/load`, and hashes. The saved F4 lens is explicitly
+serialized through the official `save(..., dtype=torch.float32)` option. Its
+raw payload must contain only fp32 `J` tensors with exact metadata, and official
+reload must be `torch.equal` to every fitted matrix (recorded max-abs exactly
+zero). Any other `(n_done,next_idx)` pair or lossy save is a checkpoint failure.
 
 Official checkpoints do not contain prompt identity, so resume additionally
 requires the external binding. State 1/1 must match the current controls hash,
@@ -237,6 +242,28 @@ numerically consistent output from the saved/reloaded lens. The top-k artifact
 states `technical_sanity_only_no_semantic_claim`.
 
 A forward/logit lens or `use_jacobian=False` is never a substitute.
+F4 requires two independent objects: the reconstructed/fresh in-memory fp32
+fitted lens and an independently official-loaded saved lens. It never loads the
+same file twice as both sides of the fidelity gate, and its existing
+`rtol=atol=5e-3` output gate is unchanged.
+
+### Authorized serialization-only operational retry
+
+The primary run completed F0–F3, but official default-fp16 lens serialization
+introduced fitted-vs-loaded Jacobian max-abs differences of
+`0.000309/0.000472/0.000488`; F4 then diverged after transport/unembedding even
+though model logits matched. The single authorized retry may therefore
+reconstruct the exact fp32 means from the already validated complete F3
+checkpoint and atomically reserialize only the lens with official
+`dtype=torch.float32`.
+
+This retry validates old stage-detail hashes, checkpoint sums/metadata,
+immutable prefix bindings, completion binding, and old fp16 lens audit before
+replacement. It updates lens/completion hashes atomically, revalidates all
+actual files, persists/uploads `F3-resumed` manifest-last, and then reruns real
+F4 forwards. Missing/tampered F2 or F3 artifacts block with
+`checkpoint_failure`; F2/F3/F5 fitting is never recomputed. This registration
+does not claim that the retry or F4 has succeeded.
 
 ### F5 — optional merge equivalence
 
