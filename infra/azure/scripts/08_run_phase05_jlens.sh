@@ -167,7 +167,6 @@ ENVIRONMENT_ID="$(az containerapp env show \
 SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 
 API_VERSION="2024-03-01"
-JOBS_URL="https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.App/jobs?api-version=${API_VERSION}"
 JOB_URL="https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.App/jobs/${JOB_NAME}?api-version=${API_VERSION}"
 PRIMARY_CLAIM_KEY="$(printf '%s' "${JOB_NAME}|primary" | sha256sum | awk '{print substr($1,1,20)}')"
 RETRY_CLAIM_KEY="$(printf '%s' "${JOB_NAME}|operational-fix" | sha256sum | awk '{print substr($1,1,20)}')"
@@ -201,15 +200,26 @@ PRIMARY_FIXED_FILE="$SCRATCH_DIR/primary_fixed.json"
 PRIMARY_WINNER_FILE="$SCRATCH_DIR/primary_winner.json"
 EXISTING_JOB_FILE="$SCRATCH_DIR/existing_job.json"
 CLAIMED_JOB_FILE="$SCRATCH_DIR/claimed_job.json"
+JOB_LIST_FILE="$SCRATCH_DIR/job_list.json"
 cleanup_files() {
     rm -rf "$SCRATCH_DIR"
 }
 trap cleanup_files EXIT
 
-JOB_COUNT="$(az rest \
-    --method get \
-    --url "$JOBS_URL" \
-    --query "length(value[?name=='${JOB_NAME}'])" -o tsv)"
+az containerapp job list \
+    --resource-group "$RESOURCE_GROUP" \
+    --output json >"$JOB_LIST_FILE"
+JOB_COUNT="$(python - "$JOB_LIST_FILE" "$JOB_NAME" <<'PY'
+import json
+import sys
+
+records = json.load(open(sys.argv[1], encoding="utf-8"))
+if not isinstance(records, list):
+    raise SystemExit("Container Apps job listing is not an array")
+matches = [record for record in records if record.get("name") == sys.argv[2]]
+print(len(matches))
+PY
+)"
 if [[ "$JOB_COUNT" != "0" && "$JOB_COUNT" != "1" ]]; then
     echo "[FAIL] Could not establish unique Container Apps job existence"
     exit 1

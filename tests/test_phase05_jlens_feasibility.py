@@ -1930,6 +1930,10 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     assert 'Path("$' not in run
     assert build.count("Path(sys.argv[1]).write_text(") == 2
     assert run.count("Path(sys.argv[1]).write_text(") == 2
+    assert "az containerapp job list \\" in run
+    assert 'JOB_LIST_FILE="$SCRATCH_DIR/job_list.json"' in run
+    assert 'record.get("name") == sys.argv[2]' in run
+    assert "providers/Microsoft.App/jobs?api-version" not in run
     for unsupported in ("If-Match", "If-None-Match", "etag", "ETAG", "ETag"):
         assert unsupported not in build
         assert unsupported not in run
