@@ -238,7 +238,8 @@ else
         exit 1
     fi
     az rest --method get --url "$JOB_URL" --output json >"$EXISTING_JOB_FILE"
-    mapfile -t EXISTING_FIELDS < <(python - "$EXISTING_JOB_FILE" <<'PY'
+    mapfile -t EXISTING_FIELDS < <(
+        python - "$EXISTING_JOB_FILE" <<'PY' | tr -d '\r'
 import json
 import sys
 

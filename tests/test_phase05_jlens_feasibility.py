@@ -1934,6 +1934,7 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     assert 'JOB_LIST_FILE="$SCRATCH_DIR/job_list.json"' in run
     assert 'record.get("name") == sys.argv[2]' in run
     assert "providers/Microsoft.App/jobs?api-version" not in run
+    assert "python - \"$EXISTING_JOB_FILE\" <<'PY' | tr -d '\\r'" in run
     for unsupported in ("If-Match", "If-None-Match", "etag", "ETAG", "ETag"):
         assert unsupported not in build
         assert unsupported not in run
