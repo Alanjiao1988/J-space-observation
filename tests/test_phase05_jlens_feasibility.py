@@ -1422,6 +1422,10 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     assert '"launcherSha": launcher_sha' in run
     assert '"image_project_sha": "$PROJECT_SHA"' in run
     assert '"launcher_sha": "$LAUNCHER_SHA"' in run
+    assert 'Path("$' not in build
+    assert 'Path("$' not in run
+    assert build.count("Path(sys.argv[1]).write_text(") == 2
+    assert run.count("Path(sys.argv[1]).write_text(") == 2
     for unsupported in ("If-Match", "If-None-Match", "etag", "ETAG", "ETag"):
         assert unsupported not in build
         assert unsupported not in run

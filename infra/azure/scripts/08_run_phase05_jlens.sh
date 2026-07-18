@@ -566,6 +566,7 @@ fi
 
 python - "$BODY_FILE" <<PY
 import json
+import sys
 from pathlib import Path
 
 environment = [
@@ -638,7 +639,7 @@ body = {
         },
     },
 }
-Path("$BODY_FILE").write_text(
+Path(sys.argv[1]).write_text(
     json.dumps(body, indent=2, sort_keys=True) + "\n", encoding="utf-8"
 )
 PY
@@ -862,7 +863,7 @@ record = {
     "launcher_sha": "$LAUNCHER_SHA",
     "primary_project_sha": "$PRIMARY_PROJECT_SHA",
 }
-Path("$RECORD_DIR/phase05_jlens_job_start.json").write_text(
+Path(sys.argv[1]).write_text(
     json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8"
 )
 PY

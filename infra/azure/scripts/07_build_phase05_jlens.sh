@@ -274,6 +274,7 @@ PY
         "${PROJECT_SHA}:requirements-jlens.txt" | sha256sum | awk '{print $1}')"
     python - "$RECORD_DIR/phase05_jlens_acr_build.json" <<PY
 import json
+import sys
 from pathlib import Path
 
 record = {
@@ -321,7 +322,7 @@ record = {
     "latest_used": False,
     "overwrite_used": False,
 }
-Path("$RECORD_DIR/phase05_jlens_acr_build.json").write_text(
+Path(sys.argv[1]).write_text(
     json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8"
 )
 PY
@@ -613,6 +614,7 @@ REQUIREMENTS_SHA="$(sha256sum "$PROJECT_ROOT/requirements-jlens.txt" | awk '{pri
 DOCKERFILE_SHA="$(sha256sum "$PROJECT_ROOT/Dockerfile.jlens" | awk '{print $1}')"
 python - "$RECORD_DIR/phase05_jlens_acr_build.json" <<PY
 import json
+import sys
 from pathlib import Path
 
 record = {
@@ -658,7 +660,7 @@ record = {
     "latest_used": False,
     "overwrite_used": False,
 }
-Path("$RECORD_DIR/phase05_jlens_acr_build.json").write_text(
+Path(sys.argv[1]).write_text(
     json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8"
 )
 PY
