@@ -299,12 +299,17 @@ The repository/tag is exactly
 `j-space-observation-jlens:<PROJECT_SHA>`; `:latest` and tag overwrite are
 rejected. Repository/tag listing must successfully prove absence; lookup
 errors are never treated as absence. Each build writes only a unique staging
-tag and binds its ACR run output digest. Immediately before claim, absence is
-rechecked and an ARM deployment resource named for the project SHA is created
-with `If-None-Match: *`; a competing/stale claim (409/412) requires manual
-intervention. The CAS winner imports by digest without a force/overwrite
-option, compares the final digest, disables and verifies write/delete on both
-tag and manifest, then removes only its staging tag. The script records claim,
+tag and binds its ACR run output digest. It then creates a cryptographically
+unique, no-op ARM deployment ticket under a deterministic prefix derived from
+the full project SHA. All tickets under that exact prefix remain durable.
+After a settling interval, every ticket (including failed/in-progress tickets)
+is validated by the shared `phase05_claim_election.py` helper and ordered by
+ARM's server timestamp then name. Missing timestamps/outputs, duplicate names,
+prefix/provenance mismatches, or ambiguity fail closed. An earlier stale
+ticket blocks safely. Only the elected ticket is re-elected on a second read,
+reconfirms tag absence, and imports by digest without a force/overwrite option.
+It compares the final digest, disables and verifies write/delete on both tag
+and manifest, then removes only its staging tag. The script records ticket,
 ACR run, digest, locks, project SHA, and requirements/Dockerfile hashes under
 ignored `results/runs/`.
 
@@ -334,16 +339,21 @@ while recording both tag and digest references. After ARM PUT, the run script
 polls `properties.provisioningState` to `Succeeded` and will not call
 `job start` on terminal failure or timeout.
 
-Launch is itself a distributed CAS. A primary can create the job only with
-`If-None-Match: *`; an existing job/claim is never overwritten. A retry reads
-one matching failed primary plus its ARM ETag, then transitions it with
-`If-Match`. Launch invocation, state, run, attempt, primary/current SHA, and
-image digest are stored in tags. After the CAS, execution count/status and all
-provenance are revalidated, then the same invocation/image claim is checked
-again immediately before start. The returned execution name and total count
-must be observed after start. Any 409/412, missing ETag, stale state, changed
-claim, running/succeeded primary, or unverifiable execution fails closed; a
-crash-before-start leaves a manual-intervention claim rather than permitting a
+Launch uses the same durable ticket election rather than conditional Job API
+semantics. The exact run ID plus primary/retry attempt deterministically derive
+the protected-operation prefix; every invocation creates a unique no-op ARM
+deployment ticket binding run, attempt, primary/current SHA, image digest, and
+job. After settling, all prefix tickets are validated and the earliest server
+`(timestamp, name)` wins. Two separated reads must elect the same current
+ticket before Job PUT. The durable ticket name/timestamp/invocation are stored
+in job tags. Execution count/status and provenance are then revalidated, and a
+third election plus job-tag check occurs immediately before start. Retry first
+proves the existing failed primary job matches the durable elected primary
+ticket, then elects under a distinct retry prefix. The returned execution name
+and total count must be observed after start. Missing/invalid outputs or server
+timestamps, stale/failed/in-progress earlier tickets, changed winners, a
+running/succeeded primary, or unverifiable execution fail closed. A crashed
+earliest ticket remains a manual-intervention block instead of permitting a
 duplicate launch.
 
 At most one operational correction is permitted. It must reuse the primary

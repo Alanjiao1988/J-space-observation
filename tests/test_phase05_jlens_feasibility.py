@@ -12,9 +12,11 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src" / "jspace_observation"))
+sys.path.insert(0, str(ROOT / "infra" / "azure" / "scripts"))
 sys.path.insert(0, str(ROOT))
 
 import phase05_jlens as p05
+import phase05_claim_election as claim_election
 from scripts import phase05_jlens_feasibility as runner_module
 
 
@@ -47,6 +49,37 @@ def executable_scaling():
     return {
         "ten_prompt": {"executable": True},
         "sliced_25_prompt": {"executable": True},
+    }
+
+
+def deployment_claim(
+    *,
+    name,
+    prefix,
+    timestamp,
+    state="Succeeded",
+    operation="launch",
+    fixed=None,
+    dynamic=None,
+):
+    values = {
+        "claimName": name,
+        "claimPrefix": prefix,
+        "invocationId": name.removeprefix(prefix),
+        "operation": operation,
+        **(fixed or {}),
+        **(dynamic or {}),
+    }
+    return {
+        "name": name,
+        "properties": {
+            "timestamp": timestamp,
+            "provisioningState": state,
+            "outputs": {
+                key: {"type": "String", "value": value}
+                for key, value in values.items()
+            },
+        },
     }
 
 
@@ -871,6 +904,127 @@ def test_requirements_and_image_are_exact_and_isolated():
     assert ":latest" not in dockerfile
 
 
+def test_durable_claim_election_uses_server_time_before_random_name():
+    prefix = "p05l-0123456789abcdef0123--"
+    fixed = {
+        "operation": "launch",
+        "claimPrefix": prefix,
+        "runId": "20260718T120000Z",
+        "attempt": "primary",
+        "primaryProjectSha": "a" * 40,
+        "jobName": "job-jspace-p05-jlens",
+    }
+    early_name = prefix + "f" * 32
+    late_name = prefix + "0" * 32
+    dynamic = {
+        "projectSha": "a" * 40,
+        "imageDigest": "sha256:" + "b" * 64,
+    }
+    winner = claim_election.elect_claim(
+        [
+            deployment_claim(
+                name=late_name,
+                prefix=prefix,
+                timestamp="2026-07-18T12:00:02Z",
+                fixed=fixed,
+                dynamic=dynamic,
+            ),
+            deployment_claim(
+                name=early_name,
+                prefix=prefix,
+                timestamp="2026-07-18T12:00:01Z",
+                fixed=fixed,
+                dynamic=dynamic,
+            ),
+        ],
+        prefix=prefix,
+        fixed=fixed,
+    )
+    assert winner["name"] == early_name
+    assert winner["candidate_count"] == 2
+
+
+def test_claim_invocation_ids_are_cryptographic_and_unique(capsys):
+    assert claim_election.main(["new-id"]) == 0
+    first = capsys.readouterr().out.strip()
+    assert claim_election.main(["new-id"]) == 0
+    second = capsys.readouterr().out.strip()
+    assert len(first) == len(second) == 32
+    assert int(first, 16) >= 0
+    assert first != second
+
+
+def test_earliest_failed_or_in_progress_claim_remains_blocking_winner():
+    prefix = "p05b-0123456789abcdef0123--"
+    fixed = {
+        "operation": "build",
+        "claimPrefix": prefix,
+        "projectSha": "a" * 40,
+        "imageRepository": "j-space-observation-jlens",
+    }
+    dynamic = {
+        "buildRunId": "run-1",
+        "imageDigest": "sha256:" + "b" * 64,
+        "stagingTag": "staging-" + "a" * 40 + "-ticket",
+    }
+    failed = deployment_claim(
+        name=prefix + "1" * 32,
+        prefix=prefix,
+        timestamp="2026-07-18T12:00:00Z",
+        state="Failed",
+        operation="build",
+        fixed=fixed,
+        dynamic=dynamic,
+    )
+    succeeded = deployment_claim(
+        name=prefix + "2" * 32,
+        prefix=prefix,
+        timestamp="2026-07-18T12:00:01Z",
+        operation="build",
+        fixed=fixed,
+        dynamic=dynamic | {"buildRunId": "run-2"},
+    )
+    winner = claim_election.elect_claim(
+        [succeeded, failed], prefix=prefix, fixed=fixed
+    )
+    assert winner["name"] == failed["name"]
+    assert winner["provisioning_state"] == "Failed"
+
+
+@pytest.mark.parametrize("mutation", ["timestamp", "outputs", "duplicate", "provenance"])
+def test_claim_election_rejects_invalid_or_ambiguous_ticket_sets(mutation):
+    prefix = "p05l-fedcba9876543210fedc--"
+    fixed = {
+        "operation": "launch",
+        "claimPrefix": prefix,
+        "runId": "20260718T120000Z",
+        "attempt": "operational-fix",
+        "primaryProjectSha": "a" * 40,
+        "jobName": "job-jspace-p05-jlens",
+    }
+    claim = deployment_claim(
+        name=prefix + "3" * 32,
+        prefix=prefix,
+        timestamp="2026-07-18T12:00:00Z",
+        fixed=fixed,
+        dynamic={
+            "projectSha": "c" * 40,
+            "imageDigest": "sha256:" + "d" * 64,
+        },
+    )
+    claims = [claim]
+    if mutation == "timestamp":
+        claim["properties"].pop("timestamp")
+    elif mutation == "outputs":
+        claim["properties"].pop("outputs")
+    elif mutation == "duplicate":
+        claims.append(deepcopy(claim))
+    else:
+        claim["properties"]["outputs"]["runId"]["value"] = "20260718T130000Z"
+    with pytest.raises(claim_election.ClaimValidationError):
+        claim_election.elect_claim(claims, prefix=prefix, fixed=fixed)
+
+
 def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     build = (
         ROOT / "infra" / "azure" / "scripts" / "07_build_phase05_jlens.sh"
@@ -890,11 +1044,16 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     assert "STAGING_IMAGE_TAG" in build
     assert "--image \"$STAGING_IMAGE_TAG\"" in build
     assert "RUN_OUTPUT_DIGEST" in build
-    assert "If-None-Match=*" in build
     assert "require_confirmed_absence" in build
     assert "az acr import" in build
     assert "--force" not in build
-    assert "Distributed image claim" in build
+    assert "phase05_claim_election.py" in build
+    assert "az deployment group list" in build
+    assert "CLAIM_SETTLE_SECONDS" in build
+    assert "FIRST_WINNER_TIME" in build
+    assert "SECOND_WINNER_TIME" in build
+    assert "winner changed before promotion" in build
+    assert "claim_deployment_retained" in build
     assert 'JOB_NAME="job-jspace-p05-jlens"' in run
     assert 'CONTAINER_APP_ENV="cae-jspace-observation-sea-vnet2"' in run
     assert 'WORKLOAD_PROFILE_NAME="gpu-t4"' in run
@@ -924,14 +1083,21 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     assert "LAUNCH_INVOCATION_ID" in run
     assert '"launch-state": "claimed-for-start"' in run
     assert '"launch-invocation-id": "$LAUNCH_INVOCATION_ID"' in run
-    assert "If-None-Match=*" in run
-    assert "If-Match=${EXISTING_ETAG}" in run
-    assert '"$CAS_HEADER"' in run
-    assert "409/412" in run
+    assert "phase05_claim_election.py" in run
+    assert "az deployment group list" in run
+    assert "CLAIM_SETTLE_SECONDS" in run
+    assert "FIRST_WINNER_TIME" in run
+    assert "SECOND_WINNER_TIME" in run
+    assert "Durable launch winner changed before start" in run
     assert "verify_claimed_job" in run
-    assert run.index("PRESTART_ETAG") < run.index("az containerapp job start")
+    assert run.index("PRESTART_WINNER_NAME") < run.index(
+        "az containerapp job start"
+    )
     assert "STARTED_EXECUTION_COUNT" in run
     assert "execution_name_verified" in run
+    for unsupported in ("If-Match", "If-None-Match", "etag", "ETAG", "ETag"):
+        assert unsupported not in build
+        assert unsupported not in run
     assert '"volumes"' not in run
     assert '"secrets"' not in run
 

@@ -1,22 +1,30 @@
 #!/usr/bin/env bash
-# Build to a unique staging tag, CAS-claim the project tag, then lock both.
+# Build to a unique staging tag and elect one durable deployment-ticket winner.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../" && pwd)"
+CLAIM_HELPER="$SCRIPT_DIR/phase05_claim_election.py"
 ACR_NAME="${ACR_NAME:?Set ACR_NAME to the existing private registry name}"
 RESOURCE_GROUP="${RESOURCE_GROUP:-rg-jspace-observation-sea}"
 IMAGE_REPOSITORY="j-space-observation-jlens"
 PROJECT_SHA="${PROJECT_SHA:-$(git -C "$PROJECT_ROOT" rev-parse HEAD)}"
-BUILD_INVOCATION_ID="${BUILD_INVOCATION_ID:-$(date -u +'%Y%m%d%H%M%S')-$$-${RANDOM}}"
+CLAIM_SETTLE_SECONDS="${CLAIM_SETTLE_SECONDS:-15}"
+CLAIM_RECHECK_SECONDS="${CLAIM_RECHECK_SECONDS:-3}"
+BUILD_INVOCATION_ID="$(python "$CLAIM_HELPER" new-id)"
 
 if [[ ! "$PROJECT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
     echo "[FAIL] PROJECT_SHA must be a full 40-character commit"
     exit 1
 fi
-if [[ ! "$BUILD_INVOCATION_ID" =~ ^[A-Za-z0-9._-]+$ ]]; then
-    echo "[FAIL] BUILD_INVOCATION_ID contains invalid tag characters"
+if [[ ! "$BUILD_INVOCATION_ID" =~ ^[0-9a-f]{32}$ ]]; then
+    echo "[FAIL] BUILD_INVOCATION_ID must be a cryptographic 32-hex ID"
+    exit 1
+fi
+if [[ ! "$CLAIM_SETTLE_SECONDS" =~ ^[0-9]+$ \
+    || ! "$CLAIM_RECHECK_SECONDS" =~ ^[0-9]+$ ]]; then
+    echo "[FAIL] Claim settling intervals must be nonnegative integers"
     exit 1
 fi
 if ! git -C "$PROJECT_ROOT" diff --quiet \
@@ -39,7 +47,9 @@ IMAGE_REF="${LOGIN_SERVER}/${IMAGE_TAG}"
 STAGING_TAG="staging-${PROJECT_SHA}-${BUILD_INVOCATION_ID}"
 STAGING_IMAGE_TAG="${IMAGE_REPOSITORY}:${STAGING_TAG}"
 STAGING_IMAGE_REF="${LOGIN_SERVER}/${STAGING_IMAGE_TAG}"
-CLAIM_NAME="jlens-image-${PROJECT_SHA}"
+PROJECT_CLAIM_KEY="$(printf '%s' "$PROJECT_SHA" | sha256sum | awk '{print substr($1,1,20)}')"
+CLAIM_PREFIX="p05b-${PROJECT_CLAIM_KEY}--"
+CLAIM_NAME="${CLAIM_PREFIX}${BUILD_INVOCATION_ID}"
 CLAIM_URL="https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Resources/deployments/${CLAIM_NAME}?api-version=2022-09-01"
 
 confirm_project_tag_absent() {
@@ -87,10 +97,13 @@ require_confirmed_absence
 RECORD_DIR="${JLENS_BUILD_RECORD_DIR:-$PROJECT_ROOT/results/runs/phase05-jlens-build-${PROJECT_SHA}}"
 mkdir -p "$RECORD_DIR"
 CLAIM_BODY="$RECORD_DIR/.azure_phase05_jlens_image_claim.json"
-cleanup_claim_body() {
-    rm -f "$CLAIM_BODY"
+CLAIMS_FILE="$RECORD_DIR/.azure_phase05_jlens_build_claims.json"
+FIXED_FILE="$RECORD_DIR/.azure_phase05_jlens_build_fixed.json"
+WINNER_FILE="$RECORD_DIR/.azure_phase05_jlens_build_winner.json"
+cleanup_files() {
+    rm -f "$CLAIM_BODY" "$CLAIMS_FILE" "$FIXED_FILE" "$WINNER_FILE"
 }
-trap cleanup_claim_body EXIT
+trap cleanup_files EXIT
 STARTED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 
 echo "[RUN] Building staging image $STAGING_IMAGE_REF from Dockerfile.jlens"
@@ -144,28 +157,35 @@ if [[ ! "$RUN_OUTPUT_DIGEST" =~ ^sha256:[0-9a-f]{64}$ \
 fi
 DIGEST="$RUN_OUTPUT_DIGEST"
 
-# Both contenders may have built, so re-check immediately before the CAS claim.
-require_confirmed_absence
-
-python - "$CLAIM_BODY" "$PROJECT_SHA" "$BUILD_INVOCATION_ID" "$RUN_ID" "$DIGEST" <<'PY'
+python - "$CLAIM_BODY" "$CLAIM_PREFIX" "$CLAIM_NAME" "$BUILD_INVOCATION_ID" \
+    "$PROJECT_SHA" "$IMAGE_REPOSITORY" "$RUN_ID" "$DIGEST" "$STAGING_TAG" <<'PY'
 import json
 import sys
 from pathlib import Path
 
-path, project_sha, invocation_id, run_id, digest = sys.argv[1:]
-parameters = {
-    "projectSha": {"value": project_sha},
-    "invocationId": {"value": invocation_id},
-    "buildRunId": {"value": run_id},
-    "imageDigest": {"value": digest},
+(
+    path,
+    claim_prefix,
+    claim_name,
+    invocation_id,
+    project_sha,
+    repository,
+    run_id,
+    digest,
+    staging_tag,
+) = sys.argv[1:]
+values = {
+    "claimPrefix": claim_prefix,
+    "claimName": claim_name,
+    "invocationId": invocation_id,
+    "operation": "build",
+    "projectSha": project_sha,
+    "imageRepository": repository,
+    "buildRunId": run_id,
+    "imageDigest": digest,
+    "stagingTag": staging_tag,
 }
-template_parameters = {
-    key: {"type": "string"} for key in parameters
-}
-outputs = {
-    key: {"type": "string", "value": f"[parameters('{key}')]"}
-    for key in parameters
-}
+parameters = {key: {"value": value} for key, value in values.items()}
 body = {
     "properties": {
         "mode": "Incremental",
@@ -176,22 +196,46 @@ body = {
                 "2019-04-01/deploymentTemplate.json#"
             ),
             "contentVersion": "1.0.0.0",
-            "parameters": template_parameters,
+            "parameters": {key: {"type": "string"} for key in values},
             "resources": [],
-            "outputs": outputs,
+            "outputs": {
+                key: {"type": "string", "value": f"[parameters('{key}')]"}
+                for key in values
+            },
         },
     }
 }
 Path(path).write_text(json.dumps(body, sort_keys=True) + "\n", encoding="utf-8")
 PY
+python - "$FIXED_FILE" "$CLAIM_PREFIX" "$PROJECT_SHA" "$IMAGE_REPOSITORY" <<'PY'
+import json
+import sys
+from pathlib import Path
 
+path, prefix, project_sha, repository = sys.argv[1:]
+Path(path).write_text(
+    json.dumps(
+        {
+            "operation": "build",
+            "claimPrefix": prefix,
+            "projectSha": project_sha,
+            "imageRepository": repository,
+        },
+        sort_keys=True,
+    )
+    + "\n",
+    encoding="utf-8",
+)
+PY
+
+# The deployment name is cryptographically unique; no shared resource is updated.
 if ! az rest \
     --method put \
     --url "$CLAIM_URL" \
-    --headers "Content-Type=application/json" "If-None-Match=*" \
+    --headers "Content-Type=application/json" \
     --body "@$CLAIM_BODY" \
     --output none; then
-    echo "[FAIL] Distributed image claim lost or could not be established (409/412/unknown)"
+    echo "[FAIL] Unique durable build ticket could not be created"
     exit 1
 fi
 
@@ -206,37 +250,66 @@ for _ in $(seq 1 120); do
             break
             ;;
         Failed|Canceled|Cancelled|Deleted)
-            echo "[FAIL] Image claim deployment ended in $CLAIM_STATE"
+            echo "[FAIL] Build ticket deployment ended in $CLAIM_STATE"
             exit 1
             ;;
     esac
     sleep 5
 done
 if [[ "$CLAIM_STATE" != "Succeeded" ]]; then
-    echo "[FAIL] Timed out establishing distributed image claim"
-    exit 1
-fi
-CLAIMED_INVOCATION="$(az rest \
-    --method get --url "$CLAIM_URL" \
-    --query properties.outputs.invocationId.value -o tsv)"
-CLAIMED_RUN_ID="$(az rest \
-    --method get --url "$CLAIM_URL" \
-    --query properties.outputs.buildRunId.value -o tsv)"
-CLAIMED_DIGEST="$(az rest \
-    --method get --url "$CLAIM_URL" \
-    --query properties.outputs.imageDigest.value -o tsv)"
-CLAIMED_PROJECT_SHA="$(az rest \
-    --method get --url "$CLAIM_URL" \
-    --query properties.outputs.projectSha.value -o tsv)"
-if [[ "$CLAIMED_INVOCATION" != "$BUILD_INVOCATION_ID" \
-    || "$CLAIMED_RUN_ID" != "$RUN_ID" \
-    || "$CLAIMED_DIGEST" != "$DIGEST" \
-    || "$CLAIMED_PROJECT_SHA" != "$PROJECT_SHA" ]]; then
-    echo "[FAIL] Distributed image claim provenance mismatch"
+    echo "[FAIL] Timed out creating durable build ticket"
     exit 1
 fi
 
-# The claim is held; any tag appearing now is foreign and must not be overwritten.
+cleanup_own_staging() {
+    az acr repository untag \
+        --name "$ACR_NAME" \
+        --image "${IMAGE_REPOSITORY}:${STAGING_TAG}"
+}
+
+elect_build_winner() {
+    az deployment group list \
+        --resource-group "$RESOURCE_GROUP" \
+        --output json >"$CLAIMS_FILE"
+    python "$CLAIM_HELPER" elect \
+        --claims-json "$CLAIMS_FILE" \
+        --prefix "$CLAIM_PREFIX" \
+        --fixed-json "$FIXED_FILE" \
+        --output "$WINNER_FILE"
+}
+
+sleep "$CLAIM_SETTLE_SECONDS"
+if ! elect_build_winner; then
+    cleanup_own_staging
+    echo "[FAIL] Build ticket set is invalid; manual intervention required"
+    exit 1
+fi
+FIRST_WINNER_NAME="$(python "$CLAIM_HELPER" get --json "$WINNER_FILE" --field name)"
+FIRST_WINNER_TIME="$(python "$CLAIM_HELPER" get --json "$WINNER_FILE" --field server_timestamp)"
+FIRST_WINNER_STATE="$(python "$CLAIM_HELPER" get --json "$WINNER_FILE" --field provisioning_state)"
+if [[ "$FIRST_WINNER_NAME" != "$CLAIM_NAME" \
+    || "$FIRST_WINNER_STATE" != "Succeeded" ]]; then
+    cleanup_own_staging
+    echo "[FAIL] Earlier build ticket won or blocks promotion; manual intervention required"
+    exit 1
+fi
+
+sleep "$CLAIM_RECHECK_SECONDS"
+if ! elect_build_winner; then
+    cleanup_own_staging
+    echo "[FAIL] Build ticket re-election failed; manual intervention required"
+    exit 1
+fi
+SECOND_WINNER_NAME="$(python "$CLAIM_HELPER" get --json "$WINNER_FILE" --field name)"
+SECOND_WINNER_TIME="$(python "$CLAIM_HELPER" get --json "$WINNER_FILE" --field server_timestamp)"
+if [[ "$SECOND_WINNER_NAME" != "$FIRST_WINNER_NAME" \
+    || "$SECOND_WINNER_TIME" != "$FIRST_WINNER_TIME" ]]; then
+    cleanup_own_staging
+    echo "[FAIL] Build ticket winner changed before promotion"
+    exit 1
+fi
+
+# Only the durable winner may re-confirm absence and promote without overwrite.
 require_confirmed_absence
 az acr import \
     --name "$ACR_NAME" \
@@ -244,14 +317,13 @@ az acr import \
     --source "${LOGIN_SERVER}/${IMAGE_REPOSITORY}@${DIGEST}" \
     --image "$IMAGE_TAG" \
     --output none
-
 CLAIMED_TAG_DIGEST="$(az acr repository show-manifests \
     --name "$ACR_NAME" \
     --repository "$IMAGE_REPOSITORY" \
     --query "[?tags[?@=='${PROJECT_SHA}']].digest | [0]" \
     -o tsv)"
 if [[ "$CLAIMED_TAG_DIGEST" != "$DIGEST" ]]; then
-    echo "[FAIL] Claimed project tag does not match this build output"
+    echo "[FAIL] Promoted project tag does not match the elected build output"
     exit 1
 fi
 
@@ -297,10 +369,8 @@ if [[ "${TAG_WRITE_ENABLED,,}" != "false" \
     exit 1
 fi
 
-# Remove only this invocation's staging tag after the final claim is locked.
-az acr repository untag \
-    --name "$ACR_NAME" \
-    --image "${IMAGE_REPOSITORY}:${STAGING_TAG}"
+# Winner cleanup occurs only after promotion and immutability verification.
+cleanup_own_staging
 REMAINING_TAGS="$(az acr repository show-tags \
     --name "$ACR_NAME" \
     --repository "$IMAGE_REPOSITORY" \
@@ -310,6 +380,8 @@ if grep -Fxq "$STAGING_TAG" <<<"$REMAINING_TAGS"; then
     exit 1
 fi
 
+CANDIDATE_COUNT="$(python "$CLAIM_HELPER" get \
+    --json "$WINNER_FILE" --field candidate_count)"
 REQUIREMENTS_SHA="$(sha256sum "$PROJECT_ROOT/requirements-jlens.txt" | awk '{print $1}')"
 DOCKERFILE_SHA="$(sha256sum "$PROJECT_ROOT/Dockerfile.jlens" | awk '{print $1}')"
 python - "$RECORD_DIR/phase05_jlens_acr_build.json" <<PY
@@ -317,13 +389,18 @@ import json
 from pathlib import Path
 
 record = {
-    "schema_version": "phase05-jlens-acr-build-v2",
+    "schema_version": "phase05-jlens-acr-build-v3",
     "started_at_utc": "$STARTED_AT",
     "finished_at_utc": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
     "project_sha": "$PROJECT_SHA",
     "build_invocation_id": "$BUILD_INVOCATION_ID",
+    "claim_prefix": "$CLAIM_PREFIX",
     "claim_name": "$CLAIM_NAME",
     "claim_state": "$CLAIM_STATE",
+    "claim_server_timestamp": "$FIRST_WINNER_TIME",
+    "claim_candidate_count": int("$CANDIDATE_COUNT"),
+    "winner_rechecked": True,
+    "claim_deployment_retained": True,
     "dockerfile": "Dockerfile.jlens",
     "dockerfile_sha256": "$DOCKERFILE_SHA",
     "requirements_sha256": "$REQUIREMENTS_SHA",
