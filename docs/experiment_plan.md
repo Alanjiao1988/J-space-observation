@@ -31,11 +31,16 @@ Plan A 是主路径。
 
 Plan B 只是保险，不提前投入过多脚手架。
 
-触发条件：
+以下情况只能触发独立复核，不能自动触发 Plan B：
 
-1. 没有目标模型的预拟合 J-lens。
-2. T4 上无法拟合可用 J-lens。
-3. A100 子集仍不可行，或预算不允许。
+1. 在精确 pin 和一次另行授权的 compatibility-fix 后，真实 J-lens 的
+   F1/F2 仍不可执行。
+2. T4 实测资源 gate 失败，且另行审核后 A100 小子集也不可行。
+3. 已记录的预算/资源限制使注册的最小真实 J-lens 设计不可执行。
+
+缺少预拟合 lens 本身不是 Plan B 触发条件。出现上述情况时必须先记录
+AMBER/RED 和 failure class，再由新的 decision entry 明确授权；任何结果
+都不会自动启动 Plan B。
 
 Plan B 结论只能写为：
 
@@ -272,10 +277,10 @@ RQ3 用于比较 distill vs base，必须使用 ability-matched 任务：
 
 ### 6.5 Phase 0.5 决策
 
-- 如果 T4 上 100-prompt fitting 可行，继续 Plan A。
-- 如果 T4 慢但可运行，继续 Plan A，用 sliced fitting / merge。
-- 如果 T4 内存失败，预算允许时跑 A100 小子集。
-- 如果 A100 不可用或仍失败，触发 Plan B。
+- Phase 0.5 首先按注册的 F0-F4、memory、persistence 和 measured-scaling projection gates 判断 bounded technical feasibility。
+- GREEN 只允许进入另行审核的 Plan A engineering decision；不等于 100-prompt 实跑、scientifically usable lens 或 J-space evidence。
+- 如果 T4 速度或内存不足，必须先记录 AMBER/RED、失败类别和资源测量，再单独决定是否批准 A100 小子集。
+- 任何结果都不会自动启动 Plan B。只有在独立 decision entry 明确认定真实 J-lens 对注册问题不可行后，才可授权 Plan B。
 
 ---
 
@@ -549,17 +554,16 @@ logit lens / probe / patching 提供 hidden reasoning representation 的弱证�
 
 ---
 
-## 16. 立即执行优先级
+## 16. 当前注册优先级
 
-停止继续纸面设计。
+Phase 0.5A bounded real-Jacobian technical feasibility 已完成并获得 GREEN；
+历史 Phase 1 bounded `n=3` 已冻结。两者都不自动授权扩大实验。
 
-下一步只跑：
+下一 gate 仅为另行授权的一次性 parser-v2 locked evaluation：
 
-1. Phase 0.5 J-lens feasibility and saturation spike。
-2. Phase 1 behavioral reasoning-depth gradient。
+1. 使用已冻结的 public-development-only parser v2；
+2. 在读取 locked labels 前封存 predictions；
+3. PASS 或 FAIL 后退役该 holdout。
 
-根据结果决定：
-
-- full Plan A J-lens runs；
-- RQ3 ability-matched patching/probe；
-- 7B scale-anchor subset。
+在新的 preregistration 和明确授权前，不运行 higher-n、full Plan A、
+RQ3 patching/probe、7B scale-anchor 或更大的 J-lens fit。

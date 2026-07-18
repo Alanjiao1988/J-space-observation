@@ -2334,3 +2334,217 @@ Scientific boundary:
 - No new behavioral observation or higher-n cell was created.
 - No human-ground-truth, hidden-reasoning, internal-workspace, or J-space claim
   is made.
+
+## 2026-07-18 — Phase 0.5A official real-Jacobian T4 feasibility
+
+Scope and authorization:
+
+- One primary GPU execution and at most one separately reviewed operational
+  retry.
+- Target:
+  `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B@ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562`.
+- Official source:
+  `https://github.com/anthropics/jacobian-lens@581d398613e5602a5af361e1c34d3a92ea82ba8e`.
+- Generic two-prompt fit corpus only; no Phase 1 task fixture, locked evaluator
+  material, higher-n behavior, patching, or ablation.
+
+### Dedicated image build and immutable finalization
+
+Command family:
+
+```text
+bash infra/azure/scripts/07_build_phase05_jlens.sh
+```
+
+Primary image:
+
+```text
+source: 86922df02143d191dfa3d9fcf1d92adfaffc0062
+ACR run: cmh
+image: acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens:86922df02143d191dfa3d9fcf1d92adfaffc0062
+digest: sha256:d3ffaba4fea1d4ee9b03dc5dd369f5b2c5100c84d183f7a729f609d2187bb22f
+status: Succeeded
+latest used: no
+tag/manifest write enabled: false/false
+tag/manifest delete enabled: false/false
+```
+
+The image built successfully. The first local metadata check then failed
+safely because it read top-level ACR lock properties instead of
+`changeableAttributes.*`. No rebuild or unlock occurred. Commit `b3e07bb`
+fixed metadata interpretation; commit `d7bde7f` fixed Windows Git-Bash path
+transport. Historical finalization verified and locked the existing digest.
+Its immutable staging alias remains retained as build provenance.
+
+### Primary execution
+
+Command:
+
+```text
+bash infra/azure/scripts/08_run_phase05_jlens.sh
+```
+
+Execution:
+
+```text
+Date: 2026-07-18
+Resource: job-jspace-p05-jlens
+Region: Southeast Asia
+Environment: cae-jspace-observation-sea-vnet2
+Workload profile: gpu-t4 / Consumption-GPU-NC8as-T4
+Resources: 1 T4 / 8 CPU / 56Gi
+Run ID: 20260718T184445Z
+Execution: job-jspace-p05-jlens-l7tipil
+Status: Failed
+Exit code: 4
+Blob root: phase05-jlens-feasibility/20260718T184445Z
+Primary final blocked snapshot: attempts/primary/snapshots/13-F4-blocked
+```
+
+Stage result:
+
+- F0/F1/F2/F3: success.
+- F2: 1536/1536 successful autograd calls; `[1536,1536]` fp32 CPU
+  Jacobian; `35.0547s`; green memory.
+- F3: two prompts, layers `[6,13,20]`, target 27; `55.0273s`; green
+  memory; prompt-1 and complete checkpoints persisted.
+- F4: failed after `1.2089s`.
+- Exact error:
+  `phase05_jlens.CheckpointValidationError: F4 saved/reloaded apply mismatch at layer 13`.
+- F5: blocked.
+- Decision: AMBER / BLOCKED because no completed final transaction existed.
+
+### First CPU-only artifact reader
+
+```text
+Job/execution: job-jspace-p05-artifact-read-sq8pyw3
+Profile: Consumption
+GPU: none
+Access: managed identity / private Blob / read-only
+Blob writes: none
+Model load/inference: none
+Purpose: retrieve primary text artifacts for failure diagnosis
+Status: Succeeded
+```
+
+The reader confirmed that official default-fp16 lens serialization introduced
+matrix errors of approximately `0.000309`, `0.000472`, and `0.000488`.
+The error was operational checkpoint fidelity, not a scientific finding.
+
+### Authorized operational fix and image
+
+An independent `gpt-5.6-sol/max` review authorized exactly one
+serialization-only retry and rejected tolerance widening or comparing two
+identically reloaded objects.
+
+Implementation:
+
+```text
+commit: 5d4945b6ec477b6da485d19d90daeeb274b919e7
+validation: 597 passed, 2 warnings
+ACR run: cmj
+image: acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens:5d4945b6ec477b6da485d19d90daeeb274b919e7
+digest: sha256:345dde4f70235af3ad2542f79ea1445b66f4f53abe6fd569cd0818b8c4e8db35
+status: Succeeded
+staging tag removed: yes
+latest used: no
+tag/manifest write enabled: false/false
+tag/manifest delete enabled: false/false
+```
+
+Two launcher invocations then failed before creating a retry ticket, updating
+the Job, or starting an execution:
+
+1. ARM `/jobs` list pagination omitted the singleton job. Commit `03fbf48`
+   switched to auto-paginated CLI listing and local exact counting.
+2. Windows Python emitted CRLF into Bash `mapfile` fields. Commit `be997ee`
+   normalized carriage returns.
+
+These were launcher-only failures and did not consume the authorized retry.
+
+### Sole operational retry
+
+Command:
+
+```text
+bash infra/azure/scripts/08_run_phase05_jlens.sh
+```
+
+Execution:
+
+```text
+Date: 2026-07-18
+Resource: job-jspace-p05-jlens
+Region: Southeast Asia
+Environment: cae-jspace-observation-sea-vnet2
+Workload profile: gpu-t4 / Consumption-GPU-NC8as-T4
+Resources: 1 T4 / 8 CPU / 56Gi
+Run ID: 20260718T184445Z
+Execution: job-jspace-p05-jlens-m1sazlr
+Start: 2026-07-18T20:21:53Z
+Status: Succeeded
+Platform retry limit: 0
+Image: acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens@sha256:345dde4f70235af3ad2542f79ea1445b66f4f53abe6fd569cd0818b8c4e8db35
+Blob root: phase05-jlens-feasibility/20260718T184445Z
+Final snapshot: attempts/operational-fix/snapshots/11-final
+```
+
+Retry behavior and result:
+
+- F0/F1 reran.
+- Restored primary `13-F4-blocked` with verified `n_done=2`,
+  `next_idx=2`, checkpoint hashes, control bindings, and old fp16 lens audit.
+- F2/F3 were reused; no Jacobian recomputation occurred.
+- F3 was losslessly reserialized with official
+  `JacobianLens.save(..., dtype=torch.float32)`.
+- Final fitted/reloaded matrices were exactly equal; max absolute error zero.
+- F4 passed on three technical prompts and three fitted layers with the
+  unchanged tolerance.
+- F5 recorded `skipped_cost_guard`; actual reason was the no-recomputation
+  retry rule.
+- Final decision: GREEN / COMPLETE.
+- Final manifest uploaded last; persistence confirmed; failed uploads zero.
+- Plan B not triggered.
+
+### Final CPU-only artifact reader
+
+```text
+Job/execution: job-jspace-p05-artifact-read-0g9i4bz
+Profile: Consumption
+GPU: none
+Access: managed identity / private Blob / read-only
+Blob writes: none
+Model load/inference: none
+Purpose: retrieve final text artifacts for review/publication
+Status: Succeeded
+```
+
+Both readers were operational retrieval only and produced no behavioral or
+mechanistic observation.
+
+### Post-run reviews and publication boundary
+
+Seven `gpt-5.6-sol/max` reviews covered provenance, runtime, method,
+parser-v2 isolation, no-CoT taxonomy, headroom protocol, and scientific
+boundaries. All passed after stale publication text was corrected.
+
+Final boundary:
+
+- Real official Jacobian Lens: yes.
+- Tiny lens scientifically validated: no.
+- Actual 10-/25-prompt fits: no; projections only.
+- New behavioral observations: none.
+- Locked parser-v2 evaluation: not performed.
+- Hidden reasoning/internal workspace/J-space claim: none.
+- Further Azure/model run authorized: no.
+
+Final local publication validation:
+
+```text
+python -m pytest tests\ -q
+597 passed, 2 warnings in 354.19s
+```
+
+`git diff --check` passed. The pre-commit tracked-file scan found no
+credential-like assignment, account key, SAS signature, or file larger than
+10 MiB. The final scientific-boundary re-review returned PASS.

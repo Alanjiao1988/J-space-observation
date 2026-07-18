@@ -1,11 +1,11 @@
 # Thread handoff - J-space observation project
 
-Date: 2026-07-16
+Date: 2026-07-18
 
 Repository: `Alanjiao1988/J-space-observation`
 
-Current pre-lock implementation commit:
-`9b4262a9d35e6342935b8d2f72887a56c5f98486`
+Current Phase 0.5 runtime launcher commit:
+`be997eefbaec410107045dac7c50423f7297c633`
 
 ## 1. Authoritative identities
 
@@ -19,7 +19,8 @@ Hugging Face model ID:
 deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
 
 Role:
-historical target of the bounded n=3 behavioral records
+historical target of the bounded n=3 behavioral records and target of the
+bounded Phase 0.5A technical Jacobian run
 ```
 
 Engineering, curation, labeling, arbitration, and audit agents:
@@ -33,25 +34,41 @@ Do not confuse the engineering agent with the experimental target.
 
 ## 2. Current phase
 
-Preregistered Path C Phase 1.2A is complete:
+Path C remains preserved:
 
 ```text
 status: SEALED
 development cases: 60
 locked cases: 120
-parser v2 implemented: no
+parser v2 implemented from public development cases: yes
 locked evaluation performed: no
 higher-n performed: no
-target model loaded/downloaded/run: no
-GPU used: no
+new target-model behavioral run: no
 ```
 
-The phase constructed, independently labeled, validated, and privately sealed
-a prospective parser-v2 evaluator set. It generated no target-model behavior
-and no parser-v2 acceptance result.
+The sealing phase constructed, independently labeled, validated, and privately
+sealed a prospective parser-v2 evaluator set. Parser v2 was later implemented
+using only the public development set. It has no locked PASS/FAIL result.
+
+Phase 0.5A is also complete:
+
+```text
+run ID: 20260718T184445Z
+official source: anthropics/jacobian-lens@581d398613e5602a5af361e1c34d3a92ea82ba8e
+primary: job-jspace-p05-jlens-l7tipil / Failed at F4
+sole operational retry: job-jspace-p05-jlens-m1sazlr / Succeeded
+F2/F3 recomputed on retry: no
+F4: passed with unchanged tolerance after exact fp32 serialization
+F5: not run
+final decision: GREEN / COMPLETE for bounded technical feasibility only
+Plan B: not triggered
+```
 
 Detailed report:
-`reports/phase1_parser_v2_validation_set.md`.
+
+- `reports/phase1_parser_v2_validation_set.md`
+- `reports/phase1_parser_v2_development.md`
+- `reports/phase05_jlens_feasibility.md`
 
 ## 3. Frozen protocol
 
@@ -318,7 +335,9 @@ answer-recovery utility, not raw no-CoT.
 ## 11. Scientific boundaries
 
 - No target-model download, load, or inference occurred in Phase 1.2A.
-- No parser v2 was implemented or evaluated.
+- No parser v2 was implemented or evaluated during Phase 1.2A sealing. It was
+  subsequently implemented against only the public development set; the
+  locked evaluation remains unperformed.
 - No locked labels are in the repository.
 - No higher-n or GPU run occurred.
 - Fixtures and consensus labels are not target-model evidence.
@@ -330,23 +349,27 @@ answer-recovery utility, not raw no-CoT.
 
 ## 12. Next authorized action
 
-Implement prospective parser v2 using only
-`evaluator_sets/parser_v2_v1/development_cases.jsonl`. Do not read the locked
-inputs or labels. Freeze and push the implementation before requesting separate
-authorization for the one-shot locked evaluation.
+Request explicit authorization for the one-shot parser-v2 locked evaluation
+against the already frozen implementation and gates. Predictions must be
+sealed before labels are read, and PASS or FAIL retires the holdout.
 
-Higher-n and every new target-model run remain paused.
+Do not run that evaluation automatically. Higher-n, every new target-model
+behavioral run, and any larger J-lens fit remain paused.
 
 ## 13. Prompt for the next thread
 
 ```text
-Continue Alanjiao1988/J-space-observation from Path C Phase 1.2A.
+Continue Alanjiao1988/J-space-observation after the critical-path reset and
+Phase 0.5A technical feasibility result.
 
 Read:
 - reports/phase1_parser_v2_validation_set.md
+- reports/phase1_parser_v2_development.md
+- reports/phase05_jlens_feasibility.md
 - docs/phase1_parser_v2_protocol.md
 - docs/phase1_evaluator_validation_set.md
 - docs/phase1_parser_v2_acceptance_gates.json
+- docs/phase05_jlens_feasibility_protocol.md
 - docs/thread_handoff.md
 
 Authoritative historical target:
@@ -356,12 +379,16 @@ Current state:
 - Phase 1.2A is SEALED.
 - Public development set: 60 cases.
 - Private locked set: 120 cases.
-- Parser v2 is not implemented.
+- Parser v2 is implemented and frozen from public development material only.
 - Locked evaluation and higher-n are not authorized.
-- No target-model run occurred.
+- Phase 0.5A is GREEN for bounded real-Jacobian technical feasibility only.
+- F5 and actual 10-/25-prompt fits were not run.
+- No new formal behavioral observation was generated.
 
 Task:
-Implement prospective parser v2 using only the public development set. Do not
-access locked inputs or labels. Freeze and push the implementation commit, then
-stop and request separate authorization for the one-shot locked evaluation.
+If separately authorized, execute the registered one-shot parser-v2 locked
+evaluation exactly once against the frozen implementation. Seal predictions
+before labels are read, retain PASS or FAIL, and retire the holdout. Otherwise
+stop. Do not start higher-n, a new target-model behavioral run, or a larger
+J-lens fit.
 ```

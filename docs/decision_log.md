@@ -1015,3 +1015,66 @@ Scientific consequence:
 - No target-model download/load/inference, higher-n run, new behavioral
   evidence, hidden-reasoning result, internal-workspace result, or J-space
   result was produced.
+
+## 2026-07-18 — accept bounded real J-lens technical feasibility as GREEN
+
+Decision:
+
+- Accept Phase 0.5A as **GREEN / COMPLETE for bounded technical feasibility
+  only** on one Tesla T4.
+- Retain the primary F4 checkpoint failure as immutable history and accept the
+  single separately reviewed operational retry.
+- Treat the retry as a serialization-only repair: restore and reuse F2/F3,
+  save the exact fitted lens as fp32, preserve the registered F4 tolerance, and
+  prohibit F2/F3/F5 recomputation.
+- Do not automatically start Plan B, a larger J-lens fit, higher-n behavior, or
+  the locked parser-v2 evaluation.
+
+Reason:
+
+- The pinned official `jlens` package imported, wrapped the exact target
+  revision, computed one real Jacobian with 1536 successful autograd calls,
+  fit three fp32 matrices from two generic prompts, checkpointed durably, and
+  remained comfortably inside T4 memory/time guards.
+- The primary failure was caused by official `JacobianLens.save` defaulting to
+  fp16, not by an unsupported Jacobian, CUDA OOM, timeout, or scientific
+  quality result.
+- The retry verified and reconstructed the completed primary F3 checkpoint,
+  produced exact fitted/reloaded fp32 matrix equality, passed the unchanged F4
+  save/load/apply gate, and completed final manifest-last persistence.
+- Measured 10-prompt and `[10,10,5]` 25-prompt projections fit the registered
+  watchdog, but those larger fits were not actually executed.
+
+Evidence:
+
+- Target:
+  `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B@ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562`.
+- Official source:
+  `anthropics/jacobian-lens@581d398613e5602a5af361e1c34d3a92ea82ba8e`.
+- Run ID / Blob root:
+  `20260718T184445Z` /
+  `phase05-jlens-feasibility/20260718T184445Z`.
+- Primary execution: `job-jspace-p05-jlens-l7tipil`, Failed at F4 with
+  `CheckpointValidationError: F4 saved/reloaded apply mismatch at layer 13`.
+- Operational retry: `job-jspace-p05-jlens-m1sazlr`, Succeeded.
+- Final lens SHA-256:
+  `8551dea7d3eba03930765ad65d108dec79a022a779755a3aec63f3c0da716318`.
+- Final snapshot:
+  `attempts/operational-fix/snapshots/11-final`; manifest uploaded last,
+  persistence confirmed, failed uploads zero.
+- Seven post-run `gpt-5.6-sol/max` reviews passed after stale publication text
+  was corrected.
+- Final model-free validation: `597 passed, 2 warnings`.
+
+Consequence:
+
+- Plan A has passed a tiny-scale engineering feasibility gate, not a
+  scientific evidence gate.
+- F5 was not run because the retry prohibited additional fitting.
+- Token rankings and F4 top-k output remain technical transport/application
+  sanity only.
+- No new formal behavioral observation, higher-n result, locked evaluation,
+  hidden-reasoning result, internal-workspace result, or J-space result was
+  produced.
+- The next registered gate is a separately authorized one-shot parser-v2
+  locked evaluation. Until authorization, stop.

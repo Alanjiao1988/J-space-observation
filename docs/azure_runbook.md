@@ -1084,3 +1084,122 @@ Stop and update `docs/decision_log.md` if any of these occur:
 Note: If only `Microsoft.ContainerRegistry` is blocked, prefer the GHCR fallback (see above) instead of stopping the whole pipeline.
 
 Do not compensate by running full model inference, J-lens fitting, or heavy experiments locally.
+
+## Dedicated Phase 0.5A real J-lens job
+
+The completed official-Jacobian path is separate from the historical
+`experiments/phase0_5_jlens_spike.py --skip-fit` availability check.
+
+### Immutable build
+
+Use:
+
+```bash
+bash infra/azure/scripts/07_build_phase05_jlens.sh
+```
+
+The helper:
+
+1. requires a clean, pushed source commit;
+2. uses a durable ARM deployment claim to elect one builder;
+3. builds a staging tag and resolves its digest;
+4. promotes the source-SHA tag without using `latest`;
+5. removes the staging tag when safe;
+6. disables write/delete on both tag and manifest; and
+7. writes `phase05_jlens_acr_build.json`.
+
+ACR lock properties are under `changeableAttributes.*`, not top-level
+properties. Do not rebuild or unlock an image merely because a client queried
+the wrong JSON path.
+
+Final runtime image:
+
+```text
+source: 5d4945b6ec477b6da485d19d90daeeb274b919e7
+ACR run: cmj
+digest: sha256:345dde4f70235af3ad2542f79ea1445b66f4f53abe6fd569cd0818b8c4e8db35
+tag/manifest write enabled: false/false
+tag/manifest delete enabled: false/false
+```
+
+### Digest-pinned launch
+
+Use:
+
+```bash
+bash infra/azure/scripts/08_run_phase05_jlens.sh
+```
+
+The helper uses a durable launch claim, waits for ARM provisioning, launches
+the image by digest, verifies run/source/image provenance, sets platform
+retries to zero, and starts exactly one manual execution.
+
+Operational requirements:
+
+- Container Apps ARM/CLI job listings are paginated. Use auto-pagination and
+  count the exact job locally.
+- When Windows Python feeds Git Bash `mapfile`, strip `\r` from every field.
+- Pass embedded Git-Bash paths to Windows Python through argv rather than
+  interpolating them into Python source.
+- Do not issue a second `az containerapp job start`; the helper starts the
+  job.
+
+Completed run:
+
+```text
+job: job-jspace-p05-jlens
+run ID: 20260718T184445Z
+primary execution: job-jspace-p05-jlens-l7tipil / Failed at F4
+sole operational retry: job-jspace-p05-jlens-m1sazlr / Succeeded
+Blob root: phase05-jlens-feasibility/20260718T184445Z
+final snapshot: attempts/operational-fix/snapshots/11-final
+decision: GREEN / COMPLETE for bounded technical feasibility only
+```
+
+Do not rerun either attempt. The operational retry allocation is exhausted.
+
+### Retry rule
+
+The only authorized retry repaired official default-fp16 lens serialization.
+It restored the complete primary F3 checkpoint, validated all bindings,
+reserialized the exact fitted lens with official fp32 save, preserved the F4
+tolerance, and prohibited F2/F3/F5 recomputation.
+
+Future jobs must not:
+
+- widen F4 tolerance;
+- compare two objects loaded from the same file;
+- refit F2/F3 under the old run ID;
+- overwrite any existing snapshot;
+- treat F5 as passed; or
+- interpret top-k output semantically.
+
+### Private persistence and retrieval
+
+The run uses:
+
+```text
+account/container: stjspacefiles0709085305/jspace-results
+identity: id-jspace-aca-acrpull-sea
+environment: cae-jspace-observation-sea-vnet2
+credential: ManagedIdentityCredential
+public network: disabled
+shared key: false
+Azure Files: not used
+```
+
+Every required snapshot is manifest-last. Final success requires a confirmed
+final manifest and zero failed uploads.
+
+Two completed CPU-only readers retrieved text artifacts:
+
+```text
+job-jspace-p05-artifact-read-sq8pyw3
+job-jspace-p05-artifact-read-0g9i4bz
+```
+
+They used the private endpoint and managed identity, loaded no model, used no
+GPU, and wrote no Blob object. Do not rerun the GPU job to recover logs or
+artifacts.
+
+Detailed result: `reports/phase05_jlens_feasibility.md`.

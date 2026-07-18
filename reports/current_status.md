@@ -2,13 +2,39 @@
 
 ## Summary
 
-The executable scaffold, bounded n=3 audit, and Path C Phase 1.2A evaluator
-validation set are complete. The 60-case development set is public; the
-120-case locked set is privately sealed and unevaluated.
+The critical-path reset is complete through bounded real-Jacobian technical
+feasibility. The historical bounded n=3 record remains frozen, prospective
+parser v2 is implemented from the 60-case public development set, and the
+120-case locked set remains privately sealed and unevaluated. The no-CoT
+taxonomy v2 and 450-item headroom candidate bank are design artifacts; no new
+behavioral calibration was run.
 
 ## Current Phase
 
-**Phase: Path C Phase 1.2A complete at SEALED; parser-v2 implementation pending**
+**Phase: Phase 0.5A GREEN for technical feasibility; parser-v2 locked evaluation pending separate authorization**
+
+## Authoritative Phase 0.5A result (2026-07-18)
+
+- Target: `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B` at
+  `ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562`.
+- Official source:
+  `anthropics/jacobian-lens@581d398613e5602a5af361e1c34d3a92ea82ba8e`.
+- Run ID: `20260718T184445Z`.
+- Primary execution `job-jspace-p05-jlens-l7tipil` completed F0-F3 and failed
+  F4 because official default-fp16 lens serialization did not preserve the
+  fitted fp32 transport output.
+- The sole authorized retry `job-jspace-p05-jlens-m1sazlr` restored and reused
+  F2/F3, losslessly reserialized the exact lens as fp32, passed the unchanged
+  F4 gate, and completed final manifest-last Blob persistence.
+- Final decision: **GREEN / COMPLETE for bounded technical feasibility only**.
+- F5 and actual 10-/25-prompt fits were not run; the scaling results are
+  measured projections.
+- No new formal behavioral observations or locked parser evaluation were
+  produced. No hidden-reasoning, internal-workspace, or J-space claim is
+  supported.
+- Final model-free validation: `597 passed, 2 warnings`.
+
+Detailed report: `reports/phase05_jlens_feasibility.md`.
 
 ## ACR Managed Identity Azure Execution (2026-07-08)
 
@@ -61,7 +87,9 @@ GHCR route was abandoned for execution because private package pull authenticati
 ### Current caveats
 
 - Blob persistence is now configured and has persisted the small Phase 1 pilot outputs.
-- Phase 0.5 does not include real J-lens fitting; `jacobian-lens` is not installed in the ACR image.
+- At this historical 2026-07-08 execution, Phase 0.5 did not include real
+  fitting and its general-purpose ACR image lacked `jacobian-lens`. This was
+  superseded by the dedicated pinned Phase 0.5A run recorded above.
 - The small Phase 1 pilot is behavioral only and is not J-space evidence.
 - Review exported logs/metrics before broadening the run.
 
@@ -712,10 +740,11 @@ Azure persistence:
 All five independent post-sealing reviews passed. Final model-free tests:
 `460 passed, 2 warnings`.
 
-The holdout is `SEALED`, not evaluated. Parser v2 is not implemented, locked
+The holdout is `SEALED`, not evaluated. At sealing time parser v2 was not
+implemented; it was subsequently developed from only the public set. Locked
 inputs have not been exposed for evaluation, and no acceptance-gate result
 exists. No target-model download/load/inference, higher-n run, new behavioral
-evidence, hidden-reasoning claim, or J-space claim occurred.
+evidence, hidden-reasoning claim, or J-space claim occurred during sealing.
 
 Detailed report: `reports/phase1_parser_v2_validation_set.md`.
 
@@ -1278,25 +1307,23 @@ make azure-phase1
   - Synthetic relations (1-3 hops, facts in prompt)
   - Factual/counterfactual (1-2 hops)
 
-### J-lens Availability Check
+### Historical J-lens availability scaffold (superseded)
 
-Phase 0.5 prioritizes:
-1. Checking if pre-fitted lenses exist
-2. Reporting jacobian-lens installation instructions
-3. Not failing if jacobian-lens is unavailable
-4. Checking target model loading
-5. Planning cost sweeps for a future actual fitting run
-
-The current Phase 0.5 script does not perform actual tiny fitting and must not be treated as proof that Plan A is feasible.
+The original `experiments/phase0_5_jlens_spike.py` checked package/model
+availability and did not perform fitting. The dedicated pinned runner
+`scripts/phase05_jlens_feasibility.py` subsequently completed the bounded real
+Jacobian run described in the authoritative 2026-07-18 section. The resulting
+GREEN status is technical feasibility only, not Plan A scientific validation.
 
 ## What Remains
 
 ### Before Production Experiments
 
-1. **Phase 0.5 Execution** (depends on jacobian-lens)
-   - Actual J-lens fitting (if available)
-   - Cost measurement across parameter sweeps
-   - Feasibility decision for Plan A
+1. **Post-Phase-0.5 decision**
+   - Phase 0.5A bounded technical feasibility is complete.
+   - Any larger fit or scientific lens validation requires a new registered
+     design and explicit authorization.
+   - Actual 10-/25-prompt fitting was not performed.
 
 2. **Phase 1.5: Layer Taxonomy**
    - Empirically identify sensory/workspace/motor layers
@@ -1386,13 +1413,13 @@ J-space-observation/
 
 ## Next Immediate Actions
 
-1. Implement prospective parser v2 using only the open development set.
-2. Freeze and push the parser implementation commit before any locked-input
-   read.
-3. Separately authorize one locked evaluation against the frozen gates.
-4. Retire the holdout after PASS or FAIL; use a new holdout for any modified
+1. Separately authorize one one-shot parser-v2 locked evaluation against the
+   already frozen implementation and gates.
+2. Seal predictions before labels are read.
+3. Retire the holdout after PASS or FAIL; use a new holdout for any modified
    parser.
-5. Keep higher-n and all new target-model runs paused.
+4. Keep higher-n and every new target-model behavioral run paused.
+5. Treat any larger J-lens fit as a separate preregistered decision.
 
 ## Success Criteria
 
@@ -1404,6 +1431,7 @@ J-space-observation/
 ✓ **Criteria**: Branch-specific thresholds preregistered before further runs
 ✓ **Path C Phase 1.2A**: 60/120 evaluator set validated and privately sealed
 ✓ **Isolation**: Locked inputs/labels remain outside Git; five post-sealing reviews passed
-⏳ **Pending**: Development-only prospective parser-v2 implementation and freeze
+✓ **Parser v2**: Public-development-only prospective implementation frozen; locked labels not accessed
 ⏳ **Pending**: One separately authorized locked validation evaluation
-⏳ **Pending**: Actual J-lens fitting and validation
+✓ **Phase 0.5A**: Real official J-lens bounded T4 technical feasibility GREEN
+⏳ **Pending**: Scientific lens-quality validation; not implied by Phase 0.5A

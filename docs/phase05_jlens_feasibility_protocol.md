@@ -2,9 +2,10 @@
 
 ## Status and boundary
 
-This file preregisters Track A Phase 0.5A tooling. Tooling alone is
-**UNRATED**. Main will build and execute it after integration. This track does
-not download or run the target model, use GPU/Azure/ACR, inspect locked
+This file preregistered Track A Phase 0.5A tooling before execution. Tooling
+alone was **UNRATED**. The bounded run is now complete with a **GREEN**
+technical-feasibility decision; the authoritative result is
+`reports/phase05_jlens_feasibility.md`. The run did not inspect locked
 evaluator material, change parser-v2 labels, or trigger Plan B.
 
 The run asks only whether the official Jacobian-lens implementation can
@@ -192,13 +193,18 @@ Official `fit` always uses `checkpoint_every=1` and `resume=True`. From state
 and hashes the external progress manifest, and persists the versioned
 `F3-prompt-1` snapshot. State 1/1 re-persists that checkpoint; state 2/2 loads
 the completed checkpoint. It then resumes official fit over both prompts.
-Success requires `n_prompts=2`, exactly three finite fp32 `[1536,1536]`
-matrices, valid official checkpoint state, an external controls manifest,
-successful `JacobianLens.save/load`, and hashes. The saved F4 lens is explicitly
-serialized through the official `save(..., dtype=torch.float32)` option. Its
-raw payload must contain only fp32 `J` tensors with exact metadata, and official
-reload must be `torch.equal` to every fitted matrix (recorded max-abs exactly
-zero). Any other `(n_done,next_idx)` pair or lossy save is a checkpoint failure.
+Core F3 fit success requires `n_prompts=2`, exactly three finite fp32
+`[1536,1536]` matrices, valid official checkpoint state, an external controls
+manifest, successful official `JacobianLens.save/load`, and hashes. The
+historical primary attempt used the official default fp16 save and remained F3
+fit-successful, but that lens later failed F4 transport fidelity.
+
+For the authorized retry and final reusable F3 state, the saved F4 lens must be
+serialized through official `save(..., dtype=torch.float32)`. Its raw payload
+must contain only fp32 `J` tensors with exact metadata, and official reload must
+be `torch.equal` to every fitted matrix (recorded max-abs exactly zero). Any
+other `(n_done,next_idx)` pair, or a lossy save in the final retry state, is a
+checkpoint failure.
 
 Official checkpoints do not contain prompt identity, so resume additionally
 requires the external binding. State 1/1 must match the current controls hash,
@@ -227,7 +233,8 @@ produces two explicit scaling projections:
 - one 10-prompt job;
 - a 25-prompt path sliced `[10,10,5]`, followed by weighted merge.
 
-Both must fit the planning/watchdog and green-memory controls for GREEN.
+Both projections must fit the planning/watchdog and green-memory controls for
+GREEN. They are not actual 10- or 25-prompt executions.
 
 ### F4 — technical apply sanity
 
@@ -247,23 +254,24 @@ fitted lens and an independently official-loaded saved lens. It never loads the
 same file twice as both sides of the fidelity gate, and its existing
 `rtol=atol=5e-3` output gate is unchanged.
 
-### Authorized serialization-only operational retry
+### Authorized serialization-only operational retry and result
 
 The primary run completed F0–F3, but official default-fp16 lens serialization
 introduced fitted-vs-loaded Jacobian max-abs differences of
 `0.000309/0.000472/0.000488`; F4 then diverged after transport/unembedding even
-though model logits matched. The single authorized retry may therefore
-reconstruct the exact fp32 means from the already validated complete F3
-checkpoint and atomically reserialize only the lens with official
+though model logits matched. The single authorized retry therefore
+reconstructed the exact fp32 means from the already validated complete F3
+checkpoint and atomically reserialized only the lens with official
 `dtype=torch.float32`.
 
-This retry validates old stage-detail hashes, checkpoint sums/metadata,
+This retry validated old stage-detail hashes, checkpoint sums/metadata,
 immutable prefix bindings, completion binding, and old fp16 lens audit before
-replacement. It updates lens/completion hashes atomically, revalidates all
-actual files, persists/uploads `F3-resumed` manifest-last, and then reruns real
+replacement. It updated lens/completion hashes atomically, revalidated all
+actual files, persisted/uploaded `F3-resumed` manifest-last, and then reran real
 F4 forwards. Missing/tampered F2 or F3 artifacts block with
 `checkpoint_failure`; F2/F3/F5 fitting is never recomputed. This registration
-does not claim that the retry or F4 has succeeded.
+did not predetermine the result. The retry passed F4 with unchanged tolerance;
+the full result and limitations are recorded in the report.
 
 ### F5 — optional merge equivalence
 
@@ -300,7 +308,7 @@ Failure classes are:
 `timeout`, `numerical_failure`, `checkpoint_failure`, and `unknown`.
 
 - **GREEN**: F0–F4 succeed, memory is green, checkpoint/save/load/apply pass,
-  and measured 10-prompt plus `[10,10,5]` scaling paths are executable.
+  and measured 10-prompt plus `[10,10,5]` scaling projections are executable.
 - **AMBER**: real F2 works, but F3/F4 or measured scaling/memory is
   incomplete/borderline.
 - **RED**: pinned dependencies and F1 adapter were checked and minimal F2 still
@@ -309,6 +317,18 @@ Failure classes are:
   failure that has not received the one authorized compatibility attempt.
 
 No result automatically starts Plan B.
+
+### Recorded outcome
+
+- Run ID: `20260718T184445Z`.
+- Primary execution `job-jspace-p05-jlens-l7tipil` failed the F4 checkpoint
+  fidelity gate and remained AMBER/BLOCKED.
+- The sole authorized operational retry
+  `job-jspace-p05-jlens-m1sazlr` reused F2/F3, saved the exact fp32 lens,
+  passed the unchanged F4 gate, and completed final manifest-last persistence.
+- F5 was not run because retry recomputation was prohibited.
+- Final decision: **GREEN / COMPLETE for bounded technical feasibility only**.
+- Plan B was not triggered.
 
 ## Outputs
 

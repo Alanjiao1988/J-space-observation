@@ -107,7 +107,7 @@ boolean record).
 Canonical bank:
 
 - `data/phase1_task_headroom_candidates.jsonl`
-- SHA256:
+- Canonical LF-byte SHA256 (enforced by `.gitattributes`):
   `acf59ec44b7afb73c03392d2c9b7223eff7311e29e2261ff0d65b38a3a416407`
 - exact schema:
   `data/phase1_task_headroom_candidate.schema.json`
