@@ -30,6 +30,20 @@ if [[ ! "$PROJECT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
     echo "[FAIL] PROJECT_SHA must be a full 40-character commit"
     exit 1
 fi
+LAUNCHER_SHA="$(git -C "$PROJECT_ROOT" rev-parse HEAD)"
+if [[ ! "$LAUNCHER_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+    echo "[FAIL] Launcher HEAD must resolve to a full commit SHA"
+    exit 1
+fi
+if ! git -C "$PROJECT_ROOT" diff --quiet \
+    || ! git -C "$PROJECT_ROOT" diff --cached --quiet; then
+    echo "[FAIL] Launcher worktree must be clean"
+    exit 1
+fi
+if ! git -C "$PROJECT_ROOT" cat-file -e "${PROJECT_SHA}^{commit}"; then
+    echo "[FAIL] IMAGE PROJECT_SHA must exist in local git history"
+    exit 1
+fi
 if [[ "$ATTEMPT_KIND" != "primary" && "$ATTEMPT_KIND" != "operational-fix" ]]; then
     echo "[FAIL] ATTEMPT_KIND must be primary or operational-fix"
     exit 1
@@ -110,19 +124,19 @@ PRIMARY_IMAGE_DIGEST_REF="${LOGIN_SERVER}/${IMAGE_REPOSITORY}@${PRIMARY_IMAGE_DI
 TAG_WRITE_ENABLED="$(az acr repository show \
     --name "$ACR_NAME" \
     --image "${IMAGE_REPOSITORY}:${PROJECT_SHA}" \
-    --query writeEnabled -o tsv)"
+    --query changeableAttributes.writeEnabled -o tsv)"
 TAG_DELETE_ENABLED="$(az acr repository show \
     --name "$ACR_NAME" \
     --image "${IMAGE_REPOSITORY}:${PROJECT_SHA}" \
-    --query deleteEnabled -o tsv)"
-MANIFEST_WRITE_ENABLED="$(az acr repository show \
-    --name "$ACR_NAME" \
-    --image "${IMAGE_REPOSITORY}@${IMAGE_DIGEST}" \
-    --query writeEnabled -o tsv)"
-MANIFEST_DELETE_ENABLED="$(az acr repository show \
-    --name "$ACR_NAME" \
-    --image "${IMAGE_REPOSITORY}@${IMAGE_DIGEST}" \
-    --query deleteEnabled -o tsv)"
+    --query changeableAttributes.deleteEnabled -o tsv)"
+MANIFEST_WRITE_ENABLED="$(az acr manifest show-metadata \
+    --registry "$ACR_NAME" \
+    --name "${IMAGE_REPOSITORY}@${IMAGE_DIGEST}" \
+    --query changeableAttributes.writeEnabled -o tsv)"
+MANIFEST_DELETE_ENABLED="$(az acr manifest show-metadata \
+    --registry "$ACR_NAME" \
+    --name "${IMAGE_REPOSITORY}@${IMAGE_DIGEST}" \
+    --query changeableAttributes.deleteEnabled -o tsv)"
 if [[ "${TAG_WRITE_ENABLED,,}" != "false" \
     || "${TAG_DELETE_ENABLED,,}" != "false" \
     || "${MANIFEST_WRITE_ENABLED,,}" != "false" \
@@ -233,6 +247,8 @@ fields = [
     tags.get("attempt-policy"),
     tags.get("run-id"),
     tags.get("project-sha"),
+    tags.get("image-project-sha"),
+    tags.get("launcher-sha"),
     tags.get("primary-project-sha"),
     tags.get("launch-attempt"),
     tags.get("launch-state"),
@@ -248,7 +264,7 @@ for field in fields:
     print("" if field is None else field)
 PY
 )
-    if [[ "${#EXISTING_FIELDS[@]}" -ne 17 ]]; then
+    if [[ "${#EXISTING_FIELDS[@]}" -ne 19 ]]; then
         echo "[FAIL] Existing primary job provenance could not be parsed"
         exit 1
     fi
@@ -259,16 +275,18 @@ PY
     EXISTING_POLICY_TAG="${EXISTING_FIELDS[4]}"
     EXISTING_RUN_TAG="${EXISTING_FIELDS[5]}"
     EXISTING_PROJECT_SHA_TAG="${EXISTING_FIELDS[6]}"
-    EXISTING_PRIMARY_SHA_TAG="${EXISTING_FIELDS[7]}"
-    EXISTING_LAUNCH_ATTEMPT="${EXISTING_FIELDS[8]}"
-    EXISTING_LAUNCH_STATE="${EXISTING_FIELDS[9]}"
-    EXISTING_LAUNCH_INVOCATION="${EXISTING_FIELDS[10]}"
-    EXISTING_CLAIM_PREFIX="${EXISTING_FIELDS[11]}"
-    EXISTING_CLAIM_NAME="${EXISTING_FIELDS[12]}"
-    EXISTING_CLAIM_TIMESTAMP="${EXISTING_FIELDS[13]}"
-    EXISTING_IMAGE_DIGEST_TAG="${EXISTING_FIELDS[14]}"
-    EXISTING_PRIOR_STATUS_TAG="${EXISTING_FIELDS[15]}"
-    EXISTING_IMAGE_REF="${EXISTING_FIELDS[16]}"
+    EXISTING_IMAGE_PROJECT_SHA_TAG="${EXISTING_FIELDS[7]}"
+    EXISTING_LAUNCHER_SHA_TAG="${EXISTING_FIELDS[8]}"
+    EXISTING_PRIMARY_SHA_TAG="${EXISTING_FIELDS[9]}"
+    EXISTING_LAUNCH_ATTEMPT="${EXISTING_FIELDS[10]}"
+    EXISTING_LAUNCH_STATE="${EXISTING_FIELDS[11]}"
+    EXISTING_LAUNCH_INVOCATION="${EXISTING_FIELDS[12]}"
+    EXISTING_CLAIM_PREFIX="${EXISTING_FIELDS[13]}"
+    EXISTING_CLAIM_NAME="${EXISTING_FIELDS[14]}"
+    EXISTING_CLAIM_TIMESTAMP="${EXISTING_FIELDS[15]}"
+    EXISTING_IMAGE_DIGEST_TAG="${EXISTING_FIELDS[16]}"
+    EXISTING_PRIOR_STATUS_TAG="${EXISTING_FIELDS[17]}"
+    EXISTING_IMAGE_REF="${EXISTING_FIELDS[18]}"
     if [[ -z "$EXISTING_LAUNCH_INVOCATION" \
         || "$EXISTING_RUN_ID" != "$RUN_ID" \
         || "$EXISTING_ATTEMPT" != "primary" \
@@ -277,6 +295,8 @@ PY
         || "$EXISTING_POLICY_TAG" != "one-primary-one-operational-fix" \
         || "$EXISTING_RUN_TAG" != "$RUN_ID" \
         || "$EXISTING_PROJECT_SHA_TAG" != "$PRIMARY_PROJECT_SHA" \
+        || "$EXISTING_IMAGE_PROJECT_SHA_TAG" != "$PRIMARY_PROJECT_SHA" \
+        || ! "$EXISTING_LAUNCHER_SHA_TAG" =~ ^[0-9a-f]{40}$ \
         || "$EXISTING_PRIMARY_SHA_TAG" != "$PRIMARY_PROJECT_SHA" \
         || "$EXISTING_LAUNCH_ATTEMPT" != "primary" \
         || "$EXISTING_LAUNCH_STATE" != "claimed-for-start" \
@@ -331,6 +351,8 @@ PY
         --json "$PRIMARY_WINNER_FILE" --field outputs.invocationId)"
     PRIMARY_WINNER_PROJECT_SHA="$(python "$CLAIM_HELPER" get \
         --json "$PRIMARY_WINNER_FILE" --field outputs.projectSha)"
+    PRIMARY_WINNER_LAUNCHER_SHA="$(python "$CLAIM_HELPER" get \
+        --json "$PRIMARY_WINNER_FILE" --field outputs.launcherSha)"
     PRIMARY_WINNER_DIGEST="$(python "$CLAIM_HELPER" get \
         --json "$PRIMARY_WINNER_FILE" --field outputs.imageDigest)"
     if [[ "$PRIMARY_WINNER_NAME" != "$EXISTING_CLAIM_NAME" \
@@ -338,6 +360,7 @@ PY
         || "$PRIMARY_WINNER_STATE" != "Succeeded" \
         || "$PRIMARY_WINNER_INVOCATION" != "$EXISTING_LAUNCH_INVOCATION" \
         || "$PRIMARY_WINNER_PROJECT_SHA" != "$PRIMARY_PROJECT_SHA" \
+        || "$PRIMARY_WINNER_LAUNCHER_SHA" != "$EXISTING_LAUNCHER_SHA_TAG" \
         || "$PRIMARY_WINNER_DIGEST" != "$PRIMARY_IMAGE_DIGEST" ]]; then
         echo "[FAIL] Existing primary job does not match its durable winning ticket"
         exit 1
@@ -383,7 +406,7 @@ PRIOR_STATUS_TAG="${PRIMARY_EXECUTION_STATUS:-none}"
 
 python - "$CLAIM_BODY" "$CLAIM_PREFIX" "$CLAIM_NAME" "$LAUNCH_INVOCATION_ID" \
     "$RUN_ID" "$ATTEMPT_KIND" "$PROJECT_SHA" "$PRIMARY_PROJECT_SHA" \
-    "$IMAGE_DIGEST" "$JOB_NAME" <<'PY'
+    "$LAUNCHER_SHA" "$IMAGE_DIGEST" "$JOB_NAME" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -397,6 +420,7 @@ from pathlib import Path
     attempt,
     project_sha,
     primary_sha,
+    launcher_sha,
     image_digest,
     job_name,
 ) = sys.argv[1:]
@@ -409,6 +433,7 @@ values = {
     "attempt": attempt,
     "projectSha": project_sha,
     "primaryProjectSha": primary_sha,
+    "launcherSha": launcher_sha,
     "imageDigest": image_digest,
     "jobName": job_name,
 }
@@ -512,12 +537,15 @@ FIRST_WINNER_INVOCATION="$(python "$CLAIM_HELPER" get \
     --json "$WINNER_FILE" --field outputs.invocationId)"
 FIRST_WINNER_PROJECT_SHA="$(python "$CLAIM_HELPER" get \
     --json "$WINNER_FILE" --field outputs.projectSha)"
+FIRST_WINNER_LAUNCHER_SHA="$(python "$CLAIM_HELPER" get \
+    --json "$WINNER_FILE" --field outputs.launcherSha)"
 FIRST_WINNER_DIGEST="$(python "$CLAIM_HELPER" get \
     --json "$WINNER_FILE" --field outputs.imageDigest)"
 if [[ "$FIRST_WINNER_NAME" != "$CLAIM_NAME" \
     || "$FIRST_WINNER_STATE" != "Succeeded" \
     || "$FIRST_WINNER_INVOCATION" != "$LAUNCH_INVOCATION_ID" \
     || "$FIRST_WINNER_PROJECT_SHA" != "$PROJECT_SHA" \
+    || "$FIRST_WINNER_LAUNCHER_SHA" != "$LAUNCHER_SHA" \
     || "$FIRST_WINNER_DIGEST" != "$IMAGE_DIGEST" ]]; then
     echo "[FAIL] Earlier launch ticket won or blocks launch; manual intervention required"
     exit 1
@@ -569,6 +597,8 @@ body = {
         "attempt-policy": "one-primary-one-operational-fix",
         "run-id": "$RUN_ID",
         "project-sha": "$PROJECT_SHA",
+        "image-project-sha": "$PROJECT_SHA",
+        "launcher-sha": "$LAUNCHER_SHA",
         "primary-project-sha": "$PRIMARY_PROJECT_SHA",
         "launch-attempt": "$ATTEMPT_KIND",
         "launch-state": "claimed-for-start",
@@ -646,7 +676,7 @@ verify_claimed_job() {
     local file="$1"
     az rest --method get --url "$JOB_URL" --output json >"$file"
     python - "$file" "$RUN_ID" "$ATTEMPT_KIND" "$PROJECT_SHA" \
-        "$PRIMARY_PROJECT_SHA" "$LAUNCH_INVOCATION_ID" "$CLAIM_PREFIX" \
+        "$PRIMARY_PROJECT_SHA" "$LAUNCHER_SHA" "$LAUNCH_INVOCATION_ID" "$CLAIM_PREFIX" \
         "$CLAIM_NAME" "$FIRST_WINNER_TIME" "$IMAGE_DIGEST" \
         "$IMAGE_DIGEST_REF" "$PRIOR_STATUS_TAG" <<'PY'
 import json
@@ -658,6 +688,7 @@ import sys
     attempt,
     project_sha,
     primary_sha,
+    launcher_sha,
     invocation_id,
     claim_prefix,
     claim_name,
@@ -681,6 +712,8 @@ expected_tags = {
     "attempt-policy": "one-primary-one-operational-fix",
     "run-id": run_id,
     "project-sha": project_sha,
+    "image-project-sha": project_sha,
+    "launcher-sha": launcher_sha,
     "primary-project-sha": primary_sha,
     "launch-attempt": attempt,
     "launch-state": "claimed-for-start",
@@ -825,6 +858,8 @@ record = {
     "image_digest_ref": "$IMAGE_DIGEST_REF",
     "image_digest": "$IMAGE_DIGEST",
     "project_sha": "$PROJECT_SHA",
+    "image_project_sha": "$PROJECT_SHA",
+    "launcher_sha": "$LAUNCHER_SHA",
     "primary_project_sha": "$PRIMARY_PROJECT_SHA",
 }
 Path("$RECORD_DIR/phase05_jlens_job_start.json").write_text(

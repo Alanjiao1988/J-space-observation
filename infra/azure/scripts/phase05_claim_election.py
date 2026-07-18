@@ -83,7 +83,7 @@ def _validate_outputs(
     operation = outputs["operation"]
     if operation not in {"build", "launch"}:
         raise ClaimValidationError(f"claim {name} operation is invalid")
-    for key in ("projectSha", "primaryProjectSha"):
+    for key in ("projectSha", "primaryProjectSha", "launcherSha"):
         if key in outputs and not HEX_40.fullmatch(outputs[key]):
             raise ClaimValidationError(f"claim {name} has invalid {key}")
     if "imageDigest" in outputs and not DIGEST.fullmatch(outputs["imageDigest"]):
@@ -108,6 +108,7 @@ def _validate_outputs(
             "attempt",
             "projectSha",
             "primaryProjectSha",
+            "launcherSha",
             "imageDigest",
             "jobName",
         ):

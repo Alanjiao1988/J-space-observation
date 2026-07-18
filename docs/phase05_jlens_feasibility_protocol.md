@@ -314,6 +314,16 @@ ACR_NAME=<private-acr> \
   bash infra/azure/scripts/07_build_phase05_jlens.sh
 ```
 
+Finalize an already-built historical immutable image without build/import or
+unlock:
+
+```bash
+ACR_NAME=<private-acr> \
+PROJECT_SHA=<historical-full-sha> \
+JLENS_FINALIZE_EXISTING_BUILD=true \
+  bash infra/azure/scripts/07_build_phase05_jlens.sh
+```
+
 The repository/tag is exactly
 `j-space-observation-jlens:<PROJECT_SHA>`; `:latest` and tag overwrite are
 rejected. Repository/tag listing must successfully prove absence; lookup
@@ -328,7 +338,11 @@ prefix/provenance mismatches, or ambiguity fail closed. An earlier stale
 ticket blocks safely. Only the elected ticket is re-elected on a second read,
 reconfirms tag absence, and imports by digest without a force/overwrite option.
 It compares the final digest, disables and verifies write/delete on both tag
-and manifest, then removes only its staging tag. The script records ticket,
+and manifest. In normal builds, its own staging alias is removed and verified
+after project-tag digest verification but before either tag/manifest is made
+immutable. Lock verification reads the ACR CLI's nested
+`changeableAttributes.writeEnabled/deleteEnabled` fields (repository metadata
+for the tag and manifest metadata for the digest). The script records ticket,
 ACR run, digest, locks, project SHA, and requirements/Dockerfile hashes under
 ignored `results/runs/`.
 
@@ -337,6 +351,17 @@ cryptographically invocation-specific mode-0700 scratch directory under its
 record directory; its trap removes only that directory. `az acr repository`
 commands use their supported registry/image/repository shapes and all lookup
 failures remain fatal.
+
+`JLENS_FINALIZE_EXISTING_BUILD=true` is a fail-closed recovery path for a build
+that already promoted and locked successfully but failed local metadata
+verification. It requires an explicit historical `PROJECT_SHA`, a clean
+worktree, and a locally existing commit, while allowing launcher HEAD to be
+newer. It creates no build/import/claim and performs no unlock or deletion. It
+re-elects the retained durable claim, verifies claim outputs, ACR run/digest,
+project tag, and nested immutable attributes, then hashes
+`Dockerfile.jlens`/`requirements-jlens.txt` from that historical git object.
+An already-immutable staging alias is validated against the digest and recorded
+as retained; it is never unlocked merely for cleanup.
 
 Start the primary execution:
 
@@ -388,6 +413,12 @@ duplicate launch.
 Like builds, every launcher uses a cryptographically invocation-specific
 scratch directory and removes only its own scratch. Only an elected winner can
 write the shared durable build/start record.
+
+Image and launcher provenance are distinct. `PROJECT_SHA` identifies the
+possibly historical immutable image and must exist in local git history;
+`launcher_sha` is the current clean HEAD running these controls. Both are bound
+into launch-ticket outputs, job tags, validation, and the local launch record,
+alongside the immutable image digest.
 
 At most one operational correction is permitted. It must reuse the primary
 run timestamp and document the correction:

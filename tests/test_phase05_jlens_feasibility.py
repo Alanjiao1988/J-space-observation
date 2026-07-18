@@ -71,6 +71,8 @@ def deployment_claim(
         **(fixed or {}),
         **(dynamic or {}),
     }
+    if operation == "launch" and "launcherSha" not in values:
+        values["launcherSha"] = "f" * 40
     return {
         "name": name,
         "properties": {
@@ -1252,6 +1254,31 @@ def test_global_primary_claim_blocks_a_different_run_id():
         )
 
 
+def test_launch_claim_requires_launcher_sha_provenance():
+    prefix = "p05l-launcher-binding--"
+    fixed = {
+        "operation": "launch",
+        "claimPrefix": prefix,
+        "runId": "20260719T010000Z",
+        "attempt": "primary",
+        "primaryProjectSha": "a" * 40,
+        "jobName": "job-jspace-p05-jlens",
+    }
+    claim = deployment_claim(
+        name=prefix + "4" * 32,
+        prefix=prefix,
+        timestamp="2026-07-19T01:00:00Z",
+        fixed=fixed,
+        dynamic={
+            "projectSha": "a" * 40,
+            "imageDigest": "sha256:" + "b" * 64,
+        },
+    )
+    claim["properties"]["outputs"].pop("launcherSha")
+    with pytest.raises(claim_election.ClaimValidationError):
+        claim_election.elect_claim([claim], prefix=prefix, fixed=fixed)
+
+
 def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     build = (
         ROOT / "infra" / "azure" / "scripts" / "07_build_phase05_jlens.sh"
@@ -1332,27 +1359,101 @@ def test_azure_scripts_enforce_dedicated_immutable_build_and_bounded_job():
     assert '"${JOB_NAME}|operational-fix"' in run
     assert '"${RUN_ID}|${ATTEMPT_KIND}"' not in run
 
-    def continued_commands(source):
+    def continued_commands(source, prefixes):
         command = []
         for line in source.splitlines():
             stripped = line.strip()
-            if command or stripped.startswith("az acr repository "):
+            if not command:
+                matching_prefix = next(
+                    (prefix for prefix in prefixes if prefix in stripped),
+                    None,
+                )
+                if matching_prefix is None:
+                    continue
+                stripped = stripped[stripped.index(matching_prefix) :]
+            if command or stripped:
                 command.append(stripped.rstrip("\\").strip())
                 if not stripped.endswith("\\"):
                     yield " ".join(command)
                     command = []
 
     repository_commands = [
-        *continued_commands(build),
-        *continued_commands(run),
+        *continued_commands(build, ("az acr repository ",)),
+        *continued_commands(run, ("az acr repository ",)),
     ]
     assert repository_commands
     assert all("--resource-group" not in command for command in repository_commands)
+    attribute_commands = [
+        *continued_commands(
+            build,
+            ("az acr repository show ", "az acr manifest show-metadata "),
+        ),
+        *continued_commands(
+            run,
+            ("az acr repository show ", "az acr manifest show-metadata "),
+        ),
+    ]
+    assert len(attribute_commands) == 12
+    assert all(
+        "--query changeableAttributes.writeEnabled" in command
+        or "--query changeableAttributes.deleteEnabled" in command
+        for command in attribute_commands
+    )
+    assert build.rindex("cleanup_own_staging") < build.index(
+        "az acr repository update"
+    )
+    assert "JLENS_FINALIZE_EXISTING_BUILD" in build
+    assert 'cat-file -e "${PROJECT_SHA}^{commit}"' in build
+    assert 'cat-file blob \\' in build
+    assert '"finalize_existing_build": True' in build
+    assert '"acr_build_skipped": True' in build
+    assert '"image_import_skipped": True' in build
+    assert '"new_claim_skipped": True' in build
+    assert '"unlock_performed": False' in build
+    assert '"source_hash_mode": "historical_git_objects"' in build
+    assert '"staging_tag_removed": "$STAGING_TAG_REMOVED" == "true"' in build
+    assert "staging_tag_retained_immutable" in build
+    assert build.index('if [[ "$FINALIZE_EXISTING_BUILD" == "true" ]]') < build.index(
+        'echo "[RUN] Building staging image'
+    )
+    assert 'LAUNCHER_SHA="$(git -C "$PROJECT_ROOT" rev-parse HEAD)"' in run
+    assert '"image-project-sha": "$PROJECT_SHA"' in run
+    assert '"launcher-sha": "$LAUNCHER_SHA"' in run
+    assert '"launcherSha": launcher_sha' in run
+    assert '"image_project_sha": "$PROJECT_SHA"' in run
+    assert '"launcher_sha": "$LAUNCHER_SHA"' in run
     for unsupported in ("If-Match", "If-None-Match", "etag", "ETAG", "ETag"):
         assert unsupported not in build
         assert unsupported not in run
     assert '"volumes"' not in run
     assert '"secrets"' not in run
+
+
+def test_finalize_existing_build_is_read_only_and_historical():
+    build = (
+        ROOT / "infra" / "azure" / "scripts" / "07_build_phase05_jlens.sh"
+    ).read_text(encoding="utf-8")
+    start = build.index('if [[ "$FINALIZE_EXISTING_BUILD" == "true" ]]')
+    end = build.index("\nfi\n\nrequire_confirmed_absence", start)
+    finalize = build[start:end]
+    for forbidden in (
+        "az acr build",
+        "az acr import",
+        "az acr repository update",
+        "az acr repository untag",
+        "--method put",
+    ):
+        assert forbidden not in finalize
+    assert "az deployment group list" in finalize
+    assert "outputs.buildRunId" in finalize
+    assert "outputs.imageDigest" in finalize
+    assert "outputs.stagingTag" in finalize
+    assert "changeableAttributes.writeEnabled" in finalize
+    assert "changeableAttributes.deleteEnabled" in finalize
+    assert 'cat-file blob \\' in finalize
+    assert '"finalize_existing_build": True' in finalize
+    assert '"staging_tag_retained_immutable"' in finalize
+    assert "exit 0" in finalize
 
 
 def test_checked_corpus_is_small_generic_and_canonically_hashed():
