@@ -5,13 +5,46 @@
 The critical-path reset is complete through bounded real-Jacobian technical
 feasibility. The historical bounded n=3 record remains frozen, prospective
 parser v2 is implemented from the 60-case public development set, and the
-120-case locked set remains privately sealed and unevaluated. The no-CoT
-taxonomy v2 and 450-item headroom candidate bank are design artifacts; no new
-behavioral calibration was run.
+120-case locked set remains privately sealed and unevaluated. The model-free
+Phase 1.2B release candidate now includes one-shot Azure coordination,
+authenticated crash recovery, and deterministic post-label `CLOSED/INVALID`
+closure. Release audits and repository-wide validation are still in progress.
+The no-CoT taxonomy v2 and 450-item headroom candidate bank are design
+artifacts; no new behavioral calibration was run.
 
 ## Current Phase
 
-**Phase: Phase 0.5A GREEN for technical feasibility; parser-v2 locked evaluation pending separate authorization**
+**Phase: Phase 0.5A GREEN; parser-v2 tooling release validation in progress; locked evaluation not started**
+
+## Phase 1.2B tooling release candidate (2026-07-23)
+
+- Stage P remains label-blind and Stage E remains parser-free.
+- Private DNS TXT create-only records provide separate build, launch, and
+  dispatch capabilities; recovery cannot recreate a PUT/start capability.
+- ACA dispatch is delayed until the exact immutable Job reaches authenticated
+  `Succeeded` provisioning state.
+- Bootstrap authenticates pending primary or scorer-retry attempts without
+  rereading locked inputs or labels.
+- Complete immutable predictions can be adopted without rerunning a parser.
+- Any authenticated post-label attempt lacking one intact score transaction
+  closes deterministically as `CLOSED/INVALID` without labels reread, scoring,
+  parser invocation, or metric/decision acceptance.
+- Score payloads are checked against both their manifest and the original
+  scoring transaction, including coordinated payload/manifest/attestation
+  replacement attempts.
+- The launcher is restricted to a private Debian 12 VNet orchestrator with
+  separate control-plane and runtime data identities. No such VM has been
+  provisioned; explicit approval is still required before cost-bearing
+  infrastructure creation.
+- Focused locked-evaluation validation: `162 passed`.
+- Complete repository validation: `759 passed, 2 warnings`.
+- Python compilation, both Azure Bash syntax checks, `git diff --check`,
+  changed-file credential scan, 10 MiB size gate, and frozen
+  parser/gate/data-path checks passed.
+- Four independent release audits are pending.
+- No Azure command, image build, private holdout read, label read, parser
+  evaluation, model load, GPU use, or scientific observation occurred in this
+  tooling step.
 
 ## Authoritative Phase 0.5A result (2026-07-18)
 

@@ -14,8 +14,10 @@ from typing import Any
 
 HEX_40 = re.compile(r"^[0-9a-f]{40}$")
 DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
+SHA256 = re.compile(r"^[0-9a-f]{64}$")
 RUN_ID = re.compile(r"^[0-9]{8}T[0-9]{6}Z$")
 INVOCATION = re.compile(r"^[0-9a-f]{32}$")
+VERIFICATION_STATES = {"LABELS_READ", "SCORES_VERIFIED", "CLOSED"}
 
 
 class ClaimValidationError(ValueError):
@@ -114,6 +116,41 @@ def _validate_outputs(
         ):
             if key not in outputs:
                 raise ClaimValidationError(f"launch claim {name} missing {key}")
+        if outputs.get("retryKind") == "verification_only":
+            verification_fields = {
+                "verificationState",
+                "authenticatedState",
+                "authenticatedStateReceiptSha256",
+                "stagePriorReceiptSha256",
+                "predictionManifestSha256",
+                "labelsSha256",
+                "labelsManifestSha256",
+                "scoresManifestSha256",
+            }
+            missing_verification = sorted(
+                verification_fields - outputs.keys()
+            )
+            if missing_verification:
+                raise ClaimValidationError(
+                    f"verification claim {name} missing "
+                    f"{missing_verification}"
+                )
+            if (
+                outputs["verificationState"] not in VERIFICATION_STATES
+                or outputs["authenticatedState"] not in VERIFICATION_STATES
+                or any(
+                    not SHA256.fullmatch(outputs[key])
+                    for key in verification_fields
+                    - {"verificationState", "authenticatedState"}
+                )
+                or (
+                    "closedReceiptSha256" in outputs
+                    and not SHA256.fullmatch(outputs["closedReceiptSha256"])
+                )
+            ):
+                raise ClaimValidationError(
+                    f"verification claim {name} state/hash binding is invalid"
+                )
 
 
 def elect_claim(

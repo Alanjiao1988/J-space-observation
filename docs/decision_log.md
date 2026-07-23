@@ -1078,3 +1078,264 @@ Consequence:
   produced.
 - The next registered gate is a separately authorized one-shot parser-v2
   locked evaluation. Until authorization, stop.
+
+## 2026-07-23 — preserve at-most-once dispatch by accepting fail-closed stranding
+
+> The mutable ACA Job-state mechanism below is superseded by the Private DNS
+> launch/dispatch decision later in this log. The no-retry/stranding policy
+> remains in force.
+
+Decision:
+
+- Keep the parser-v2 locked evaluation on the registered Azure Container Apps
+  Job path and issue at most one non-retrying `start` request per durable claim.
+- If the request result cannot be tied to exactly one new ACA execution, persist
+  `dispatch-stranded` as a permanent no-retry launcher state.
+- Permit only observation or adoption of one late execution after stranding;
+  never issue another start from `start-requested`, `dispatch-stranded`, or
+  `execution-established`.
+- Apply the same fail-closed principle to an ambiguous ACR quick-build
+  submission before any private holdout access.
+
+Rejected:
+
+- Do not use a caller-selected ACA execution name; the 2024-03-01 Jobs Start
+  contract does not expose one.
+- Do not treat `x-ms-client-request-id` as an idempotency key.
+- Do not add an Azure Automation runbook broker. Automation can restart an
+  interrupted runbook from the beginning, so one deterministic Automation Job
+  can still replay the downstream non-idempotent ACA start request.
+- Do not rely on repeated ACR TaskRun PUT requests as a new hard guarantee;
+  `forceUpdateTag` exists, but the service documentation does not state the
+  at-most-once behavior required here for identical repeated updates.
+
+Reason:
+
+- No available documented ACA primitive can atomically combine the durable
+  local start intent with the service-generated execution identity.
+- Retrying an ambiguous start can produce two scientific executions. Refusing
+  every retry can lose liveness but preserves the controlling one-shot
+  invariant.
+- A stranded claim occurs before an execution is proved. If it happens after
+  the holdout has already been spent by an earlier stage, the evaluation may
+  remain incomplete; safety takes precedence over manufacturing a result.
+
+Consequence:
+
+- The normal no-crash path remains executable.
+- A launcher/control-plane failure in the irreducible dispatch window can
+  permanently stop Phase 1.2B. Such a stop is an operational INVALID/incomplete
+  outcome, not permission to rerun a parser, reread labels, or replace the
+  holdout.
+- This decision changes only Azure launcher control state. It does not modify
+  frozen parser bytes, metric semantics, gates, scientific state receipts, or
+  retry authorization.
+
+## 2026-07-23 — bind the one-shot image build through a named ACR TaskRun
+
+> The deployment-reservation mechanism below is superseded by the Private DNS
+> build-slot decision later in this log. Its TaskRun `If-None-Match` use is also
+> superseded: an exact immediate `404` baseline and the DNS capability dominate
+> one unconditional TaskRun PUT. The named TaskRun and GET-only recovery policy
+> remain in force.
+
+Decision:
+
+- Replace `az acr build` with one raw HTTP PUT to a deterministic
+  `Microsoft.ContainerRegistry/registries/taskRuns` resource after the durable
+  build reservation wins its sole ETag-CAS transition.
+- Disable curl retries and redirects, use `If-None-Match: *`, and permit no
+  second PUT under any response or transport outcome. Recovery is GET-only; an
+  absent TaskRun leaves the reservation permanently stranded.
+- Authenticate the persisted TaskRun `runRequest` separately from its child
+  `QuickRun`, which binds the service run ID, terminal status, staging image,
+  and output digest.
+- Bind TaskRun name/resource ID, request SHA-256, child Run ID, ACR location,
+  exact Git source, OCI provenance, and immutable tag/manifest locks through
+  the durable claim, image binding, runtime configuration, and launch-time
+  live reauthentication.
+- Reject Git replacement refs and require clean fetched
+  `HEAD == origin/main == SOURCE_SHA` before any source-selected helper is
+  snapshotted or executed.
+- In persisted-state authentication, re-download every prediction and score
+  payload member against its manifest SHA-256, size, and ETag, and validate all
+  authorization-scoped Blob leaves even before `PREDICTIONS_VERIFIED`.
+
+Reason:
+
+- ACR Run GET responses expose `runType=QuickRun` and output metadata but do
+  not expose `runRequest`; that request belongs to TaskRun properties.
+- `az acr build` calls a retrying SDK `schedule_run` path, so it cannot prove
+  one non-idempotent submission after transient 500/503/504 responses.
+- A deterministic named TaskRun provides a durable request-bearing resource,
+  while the external reservation CAS and the code's single PUT site preserve
+  the required at-most-once caller behavior without assuming repeated PUT
+  idempotency.
+- Metadata-only payload checks and late-only leaf membership checks did not
+  authenticate the complete persisted graph that authorizes a launch.
+
+Consequence:
+
+- Image construction remains model-free, CPU-only, and entirely before private
+  holdout access, but it now fails closed on unprovable TaskRun creation,
+  request mutation, child Run mutation, source substitution, payload
+  replacement, or extra authorization-leaf objects.
+- These changes harden operational provenance only. They do not alter frozen
+  parser bytes, metrics, gates, holdout contents, or scientific interpretation.
+
+## 2026-07-23 — use locked Private DNS TXT slots for operational CAS
+
+Decision:
+
+- Do not use `Microsoft.Resources/deployments` or ACA Job ETags as a
+  compare-and-swap primitive. Their documented APIs provide no applicable
+  conditional-write contract.
+- Bind one existing, dedicated Azure Private DNS coordination zone in runtime
+  configuration. It must be `global`, have exactly zero VNet links, retain the
+  configured `internalId`, and have the exact direct or inherited
+  `CanNotDelete` lock. Build and launch scripts validate these facts read-only
+  and never create or delete the zone.
+- Use deterministic build, launch, and dispatch TXT RecordSet names containing
+  the complete SHA-256 claim domain. Create each once with API `2024-06-01` and
+  `If-None-Match: *`. Only an exact HTTP `201` response followed by exact
+  response/re-GET validation grants an ephemeral in-process capability.
+- Permit only that build capability to reach the sole TaskRun PUT, only that
+  launch capability to reach the sole immutable Job PUT, and only that dispatch
+  capability to reach the sole ACA start. Every ambiguous or non-`201` create,
+  ambiguous downstream request, and recovery path is no-retry and GET/list-only.
+- Keep TXT payloads canonical ASCII and nonsecret. They may contain hashes and
+  opaque authorization identifiers, but never secrets, labels, outputs, case
+  IDs, raw holdout bytes, or other low-entropy private values.
+
+Reason:
+
+- Private DNS RecordSets CreateOrUpdate explicitly documents create-only
+  `If-None-Match: *` and returns an ETag-bearing RecordSet.
+- ACA Job PUT/PATCH and deployment PUT do not document the ETag/conditional
+  semantics needed to authorize scientific work. Treating them as CAS could
+  admit multiple contenders or unsafe retries.
+- Separate launch and dispatch slots preserve the authorization boundary
+  between immutable Job provisioning and the non-idempotent start request.
+
+Consequence:
+
+- A transport ambiguity can permanently strand a build or execution. GET may
+  authenticate existing evidence and adopt exactly one remove-one execution,
+  but can never recreate an ephemeral capability.
+- Operational schemas now bind coordination-zone, build-slot, and launch-slot
+  evidence. Frozen parser, evaluator, metric, gate, and holdout semantics are
+  unchanged.
+
+## 2026-07-23 — close one-shot parser and scoring crashes without rereads
+
+Decision:
+
+- At `INPUTS_READ`, allow one distinct parser-disabled prediction-adoption
+  launch only when bootstrap authenticates exactly one complete immutable
+  producer attempt. The adoption entrypoint may persist only the missing
+  `PREDICTIONS_VERIFIED` receipt and receives no locked-input or parser options.
+- After the labels payload is opened, adopt an ambiguous `LABELS_READ` create
+  only by authenticating the exact receipt bytes. Never reread labels or
+  rescore from a later process.
+- If complete sealed score provenance is unavailable, create or exactly adopt
+  an `INVALID` closure manifest that binds the labels transaction and receipt,
+  producer identity, and observed score/state membership, then create or
+  exactly adopt `CLOSED`.
+
+Reason:
+
+- Transport ambiguity must not turn an immutable-artifact recovery into a
+  second parser execution, label read, or scoring attempt.
+- A terminal `INVALID` graph proves holdout retirement and non-acceptance of
+  metrics without emitting labels, case records, or raw predictions.
+
+Consequence:
+
+- Recovery may lose liveness when exact immutable evidence cannot be
+  authenticated, but it cannot manufacture a scientific result.
+- Normal PASS/FAIL and scientifically evaluated INVALID closures remain
+  unchanged; this adds only an operational INVALID-to-CLOSED terminal variant.
+
+## 2026-07-23 — require a private Linux orchestrator and separate identities
+
+Decision:
+
+- Execute parser-v2 build, bootstrap, launch, and recovery only from one
+  private Debian 12 VM attached to the execution VNet with no public IP and
+  private Blob DNS/connectivity. The local Windows host remains limited to
+  planning, source control, and model-free local tests.
+- Attach a dedicated control-plane user-assigned identity and the frozen
+  runtime data identity to the VM. Authenticate Azure CLI with the control
+  identity; derive and export the data identity client ID from the
+  authenticated runtime binding for Blob SDK bootstrap.
+- Attach only the runtime data identity to Stage P and Stage E Jobs. Never
+  attach the control identity to either scientific stage.
+- Treat VM, NIC/subnet placement, and identity provisioning as explicit,
+  cost-bearing infrastructure that requires user approval before creation.
+
+Reason:
+
+- The local host resolves the storage account through the public path and has
+  no managed-identity endpoint, while the locked source has public network
+  access disabled.
+- The launcher requires both ARM control-plane access and private Blob
+  data-plane access, but those authorities must not be collapsed into the
+  identity visible to scientific stage containers.
+- The launcher and entrypoints rely on protected Bash, Linux absolute paths,
+  and managed-identity selection and are not a supported Windows execution
+  path.
+
+Consequence:
+
+- No private holdout operation can start from the local PC.
+- Control-plane compromise does not automatically grant Stage P/E Blob data
+  authority, and Stage P/E cannot create coordination records, Jobs, or
+  executions through the control identity.
+- No orchestrator resources are provisioned by the locked build/launch
+  scripts or by this decision.
+
+## 2026-07-23 — make dispatch and INVALID crash closure independently durable
+
+Decision:
+
+- Do not create a dispatch TXT record until the exact immutable ACA Job has
+  reached authenticated `Succeeded` provisioning state and its full protected
+  projection still matches the launch claim.
+- Require recovery to authenticate both the launch TXT record and the exact
+  deterministically derived dispatch TXT record. Recovery is GET/list-only,
+  contains no Job PUT or ACA start capability, and may adopt only one
+  remove-one execution relative to the launch-bound baseline.
+- If bootstrap authenticates a labels-open transaction but cannot
+  authenticate one complete sealed score graph, launch a distinct
+  `invalid_closure`-only Stage E execution bound to the original scorer
+  retry/execution. Pass no accepted score-manifest hash and permit no label
+  payload read, scoring, parser invocation, or metric acceptance.
+- Rebuild the labels-open transaction from authenticated prediction, label
+  manifest, visibility, reservation, authorization, image, config, actor,
+  retry, and execution provenance before writing or adopting deterministic
+  `LABELS_READ`, redacted incomplete evidence, `INVALID`, and `CLOSED`.
+- Clear coordination and execution-baseline evidence before each read and
+  explicitly propagate every command failure, including when Bash disables
+  `errexit` inside a conditional or command substitution.
+
+Reason:
+
+- ACA Job provisioning is asynchronous; consuming dispatch before a usable
+  immutable Job exists can strand the only start authorization.
+- A launch claim proves Job construction authority, not that the one-shot
+  start was authorized. Recovery without dispatch proof could adopt an
+  execution outside the intended mutation boundary.
+- Labels may already have been exposed when a scorer crashes. Rescoring or
+  rereading labels would violate the one-shot protocol, while leaving
+  authenticated partial state open would fail to retire the holdout.
+- Stale files plus implicit `errexit` behavior can otherwise turn a failed
+  control-plane read into apparent authenticated evidence.
+
+Consequence:
+
+- Missing dispatch evidence or ambiguous Job provisioning may permanently
+  strand the evaluation; safety dominates liveness.
+- Pending or tampered post-label score state can terminate only as
+  `CLOSED/INVALID`, with metrics and decision explicitly unaccepted.
+- Frozen parser bytes, holdout bytes, metric semantics, gates, and normal
+  PASS/FAIL scoring behavior remain unchanged.

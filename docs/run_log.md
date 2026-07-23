@@ -2548,3 +2548,76 @@ python -m pytest tests\ -q
 `git diff --check` passed. The pre-commit tracked-file scan found no
 credential-like assignment, account key, SAS signature, or file larger than
 10 MiB. The final scientific-boundary re-review returned PASS.
+
+## 2026-07-23 — Phase 1.2B one-shot and crash-closure hardening
+
+Scope:
+
+- Model-free tooling, provenance, Azure control flow, tests, and
+  documentation only.
+- No private holdout payload, locked labels, target model, GPU, Azure
+  evaluation, image build, Job start, resource creation, commit, or push.
+
+Implemented:
+
+- Replaced unsupported Azure ETag assumptions with dedicated Private DNS TXT
+  create-only build, launch, and dispatch capabilities.
+- Bound ACR construction to one deterministic named TaskRun PUT with GET-only
+  recovery and authenticated official ARM response variants.
+- Delayed dispatch until the exact immutable ACA Job is fully provisioned and
+  its protected projection is authenticated.
+- Required both launch and dispatch proof for GET/list-only execution
+  recovery; recovery has no Job PUT or start path.
+- Cleared stale coordination, topology, image, and execution-baseline evidence
+  before reads and explicitly propagated failures across Bash conditional and
+  command-substitution contexts.
+- Added parser-disabled prediction adoption for complete immutable Stage P
+  artifacts.
+- Added authenticated pending Stage E recovery for primary and
+  scorer-infrastructure attempts.
+- Added closure-only `CLOSED/INVALID` recovery for incomplete or tampered
+  post-label scoring without labels reread, rescoring, parser invocation, or
+  metric acceptance.
+- Bound scorer-retry labels-open and `LABELS_READ` provenance to the
+  authenticated retry receipt rather than the original prediction receipt.
+- Required downloaded score bytes to match both the score manifest and the
+  original scoring transaction.
+- Documented a private Debian 12 VNet orchestrator with separate control-plane
+  and runtime data identities. Provisioning remains approval-gated.
+
+Validation commands:
+
+```text
+python -m py_compile scripts/bootstrap_parser_v2_locked_evaluation.py scripts/finalize_parser_v2_locked_evaluation.py tests/test_parser_v2_locked_evaluation.py
+bash -n infra/azure/scripts/09_build_parser_v2_eval.sh
+bash -n infra/azure/scripts/10_run_parser_v2_locked_eval.sh
+python -m pytest tests/test_parser_v2_locked_evaluation.py -q
+```
+
+Result:
+
+```text
+162 passed
+```
+
+Adversarial coverage includes pending labels-open bootstrap, scorer-retry
+predecessor recovery, complete coordinated score replacement, forged
+labels-open provenance, closure-only no-reread behavior, stale/failed
+coordination reads, asynchronous Job provisioning before dispatch, exact
+dispatch-required recovery, GET/list-only adoption, and official TaskRun shape
+handling.
+
+Release status:
+
+- Complete repository tests passed:
+
+```text
+python -m pytest tests -q
+759 passed, 2 warnings in 785.86s
+```
+
+- Python compilation, both Azure Bash syntax checks, `git diff --check`,
+  changed-file credential scan, untracked-file 10 MiB size gate, and frozen
+  parser/gate/data-path checks passed.
+- Four independent release audits are running.
+- The locked holdout remains sealed and unevaluated.
