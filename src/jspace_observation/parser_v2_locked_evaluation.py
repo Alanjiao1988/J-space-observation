@@ -384,6 +384,9 @@ _AZURE_CLIENT_ID_PATTERN = re.compile(
     r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z",
     re.ASCII | re.IGNORECASE,
 )
+_AZURE_OPAQUE_INTERNAL_ID_PATTERN = re.compile(
+    r"[A-Za-z0-9+/]{16,252}={0,2}\Z", re.ASCII
+)
 _AZURE_RESOURCE_ID_PATTERN = re.compile(
     r"/subscriptions/(?P<subscription>[0-9a-f-]{36})"
     r"/resourceGroups/(?P<resource_group>[A-Za-z0-9._()-]{1,90})"
@@ -1807,6 +1810,26 @@ def validate_runtime_source_bindings(
     return checked
 
 
+def _require_coordination_internal_id(value: Any) -> str:
+    internal_id = _require_string(value, "coordination zone internal ID")
+    if _AZURE_CLIENT_ID_PATTERN.fullmatch(internal_id):
+        return internal_id.casefold()
+    if not _AZURE_OPAQUE_INTERNAL_ID_PATTERN.fullmatch(internal_id):
+        raise LockedEvaluationError("coordination zone internal ID is invalid")
+    try:
+        decoded = base64.b64decode(internal_id, validate=True)
+    except (binascii.Error, ValueError):
+        raise LockedEvaluationError(
+            "coordination zone internal ID is invalid"
+        ) from None
+    if (
+        len(decoded) < 16
+        or base64.b64encode(decoded).decode("ascii") != internal_id
+    ):
+        raise LockedEvaluationError("coordination zone internal ID is invalid")
+    return internal_id
+
+
 def validate_coordination_binding(value: Any) -> dict[str, Any]:
     _require_exact_fields(
         value,
@@ -1853,11 +1876,9 @@ def validate_coordination_binding(value: Any) -> dict[str, Any]:
         raise LockedEvaluationError(
             "coordination zone resource ID is not exact"
         )
-    internal_id = _require_string(
-        value["zone_internal_id"], "coordination zone internal ID"
-    ).casefold()
-    if not _AZURE_CLIENT_ID_PATTERN.fullmatch(internal_id):
-        raise LockedEvaluationError("coordination zone internal ID is invalid")
+    internal_id = _require_coordination_internal_id(
+        value["zone_internal_id"]
+    )
     ttl = value["record_ttl"]
     link_count = value["expected_vnet_link_count"]
     if (

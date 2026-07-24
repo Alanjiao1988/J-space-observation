@@ -9349,6 +9349,46 @@ def test_coordination_zone_rejects_link_lock_or_recreation():
     assert azure_contract.validate_coordination_zone(
         binding, zone, links, lock
     )["status"] == "COORDINATION_ZONE_AUTHENTICATED"
+    opaque_internal_id = base64.b64encode(
+        b"ImmutableZoneIdentity;44444444-4444-4444-8444-444444444444;0"
+    ).decode("ascii")
+    opaque_binding = {**binding, "zone_internal_id": opaque_internal_id}
+    opaque_zone = deepcopy(zone)
+    opaque_zone["properties"]["internalId"] = opaque_internal_id
+    assert (
+        azure_contract.validate_coordination_binding(opaque_binding)[
+            "zone_internal_id"
+        ]
+        == opaque_internal_id
+    )
+    assert (
+        core.validate_coordination_binding(opaque_binding)[
+            "zone_internal_id"
+        ]
+        == opaque_internal_id
+    )
+    assert azure_contract.validate_coordination_zone(
+        opaque_binding, opaque_zone, links, lock
+    )["status"] == "COORDINATION_ZONE_AUTHENTICATED"
+    case_changed = deepcopy(opaque_zone)
+    case_changed["properties"]["internalId"] = (
+        opaque_internal_id[0].swapcase() + opaque_internal_id[1:]
+    )
+    with pytest.raises(azure_contract.AzureContractError, match="recreated"):
+        azure_contract.validate_coordination_zone(
+            opaque_binding, case_changed, links, lock
+        )
+    for invalid_internal_id in ("not-base64", "A" * 16):
+        invalid_binding = {
+            **binding,
+            "zone_internal_id": invalid_internal_id,
+        }
+        with pytest.raises(
+            azure_contract.AzureContractError, match="internal ID"
+        ):
+            azure_contract.validate_coordination_binding(invalid_binding)
+        with pytest.raises(core.LockedEvaluationError, match="internal ID"):
+            core.validate_coordination_binding(invalid_binding)
     linked = [{"name": "forbidden-link"}]
     with pytest.raises(azure_contract.AzureContractError, match="zero VNet links"):
         azure_contract.validate_coordination_zone(

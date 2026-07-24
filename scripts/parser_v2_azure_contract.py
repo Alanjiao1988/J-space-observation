@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import binascii
 import hashlib
 import importlib.util
 import json
@@ -117,6 +118,14 @@ _OPAQUE_AUTHORIZATION_PATTERN = re.compile(
     r"^[A-Za-z0-9][A-Za-z0-9._-]{15,127}$", re.ASCII
 )
 _LOCK_NAME_PATTERN = re.compile(r"^[A-Za-z0-9._()-]{1,90}$", re.ASCII)
+_AZURE_UUID_PATTERN = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-"
+    r"[0-9a-f]{4}-[0-9a-f]{12}$",
+    re.ASCII | re.IGNORECASE,
+)
+_OPAQUE_INTERNAL_ID_PATTERN = re.compile(
+    r"^[A-Za-z0-9+/]{16,252}={0,2}$", re.ASCII
+)
 _COORDINATION_BINDING_FIELDS = frozenset(
     {
         "schema_version",
@@ -397,6 +406,28 @@ def _coordination_zone_id(value: Any, zone_name: str) -> str:
     return checked
 
 
+def _coordination_internal_id(value: Any) -> str:
+    internal_id = _require_safe_string(
+        value, "coordination zone internal ID"
+    )
+    if _AZURE_UUID_PATTERN.fullmatch(internal_id):
+        return internal_id.casefold()
+    if not _OPAQUE_INTERNAL_ID_PATTERN.fullmatch(internal_id):
+        raise AzureContractError("coordination zone internal ID is invalid")
+    try:
+        decoded = base64.b64decode(internal_id, validate=True)
+    except (binascii.Error, ValueError):
+        raise AzureContractError(
+            "coordination zone internal ID is invalid"
+        ) from None
+    if (
+        len(decoded) < 16
+        or base64.b64encode(decoded).decode("ascii") != internal_id
+    ):
+        raise AzureContractError("coordination zone internal ID is invalid")
+    return internal_id
+
+
 def validate_coordination_binding(value: Mapping[str, Any]) -> dict[str, Any]:
     """Validate the immutable, unlinked Private DNS coordination binding."""
     if not isinstance(value, Mapping) or set(value) != _COORDINATION_BINDING_FIELDS:
@@ -409,16 +440,7 @@ def validate_coordination_binding(value: Mapping[str, Any]) -> dict[str, Any]:
             "coordination zone must not be the Blob private-link zone"
         )
     zone_id = _coordination_zone_id(value["zone_resource_id"], zone_name)
-    internal_id = _require_safe_string(
-        value["zone_internal_id"], "coordination zone internal ID"
-    ).casefold()
-    if not re.fullmatch(
-        r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-"
-        r"[0-9a-f]{4}-[0-9a-f]{12}",
-        internal_id,
-        re.ASCII,
-    ):
-        raise AzureContractError("coordination zone internal ID is invalid")
+    internal_id = _coordination_internal_id(value["zone_internal_id"])
     ttl = value["record_ttl"]
     links = value["expected_vnet_link_count"]
     if (
@@ -503,8 +525,7 @@ def validate_coordination_zone(
     properties = live_zone.get("properties")
     if (
         not isinstance(properties, Mapping)
-        or str(properties.get("internalId", "")).casefold()
-        != checked["zone_internal_id"]
+        or properties.get("internalId") != checked["zone_internal_id"]
         or properties.get("provisioningState") not in {None, "Succeeded"}
     ):
         raise AzureContractError(
