@@ -7382,6 +7382,14 @@ def test_build_and_launcher_static_hardening_contract():
         "the one-shot build is permanently stranded",
         "curl is required for OCI provenance verification",
         "OCI registry token retrieval failed",
+        "--query refreshToken",
+        'data-urlencode = "grant_type=refresh_token"',
+        'data-urlencode = "service=%s"',
+        'data-urlencode = "scope=repository:%s:pull"',
+        'data-urlencode = "refresh_token=%s"',
+        '"https://${LOGIN_SERVER}/oauth2/token"',
+        "OCI scoped registry token exchange failed",
+        'header = "Authorization: Bearer %s"',
         '".dockerignore"',
         "changeableAttributes.writeEnabled",
         "changeableAttributes.deleteEnabled",
@@ -7407,6 +7415,10 @@ def test_build_and_launcher_static_hardening_contract():
         build.index("raw_arm_request_once() {"):
         build.index("readonly -f raw_arm_request_once")
     ]
+    oci_helper = build[
+        build.index("authenticate_oci_provenance_label() {"):
+        build.index('mkdir "$CONTEXT_DIR"')
+    ]
     assert build_raw_helper.count("--retry 0") == 1
     assert build.index("GIT_NO_REPLACE_OBJECTS=1") < build.index(
         'git -C "$PROJECT_ROOT"'
@@ -7416,8 +7428,21 @@ def test_build_and_launcher_static_hardening_contract():
     )
     assert "RESERVATION_OWNER" not in build
     assert "OCI config label retrieval unavailable" not in build
-    assert "--user " not in build
+    assert "--user " not in oci_helper
+    assert 'user = "%s:%s"' not in oci_helper
+    assert "--query accessToken" not in oci_helper
+    assert oci_helper.count('header = "Authorization: Bearer %s"') == 2
+    assert oci_helper.count('data-urlencode = "refresh_token=%s"') == 1
+    assert oci_helper.index("--query refreshToken") < oci_helper.index(
+        '"https://${LOGIN_SERVER}/oauth2/token"'
+    )
+    assert oci_helper.index(
+        '"https://${LOGIN_SERVER}/oauth2/token"'
+    ) < oci_helper.index(
+        '"https://${LOGIN_SERVER}/v2/${IMAGE_REPOSITORY}/manifests/${digest}"'
+    )
     assert 'echo "$access_token"' not in build
+    assert 'echo "$refresh_token"' not in build
     assert 'echo "$management_token"' not in build
     assert '"$TASK_RUN_URL"' in build
     assert '"$CONTEXT_DIR")' not in build

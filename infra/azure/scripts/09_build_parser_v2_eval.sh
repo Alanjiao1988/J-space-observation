@@ -773,6 +773,7 @@ authenticate_build_txt_record() {
 authenticate_oci_provenance_label() {
     local digest="$1"
     local expected_evidence_sha256="${2:-}"
+    local refresh_token
     local access_token
     local manifest_file="$SCRATCH_DIR/oci_manifest.json"
     local config_file="$SCRATCH_DIR/oci_config.json"
@@ -782,20 +783,45 @@ authenticate_oci_provenance_label() {
         echo "[FAIL] curl is required for OCI provenance verification"
         exit 1
     fi
-    if ! access_token="$(scalar az acr login \
-        --name "$ACR_NAME" --expose-token --query accessToken -o tsv \
+    if ! refresh_token="$(scalar az acr login \
+        --name "$ACR_NAME" --expose-token --query refreshToken -o tsv \
         2>/dev/null)"; then
         echo "[FAIL] OCI registry token retrieval failed"
         exit 1
     fi
-    if [[ -z "$access_token" \
-        || "$access_token" == *'"'* \
-        || "$access_token" == *'\'* ]]; then
-        echo "[FAIL] ACR exposed an invalid registry access token"
+    if [[ ! "$refresh_token" =~ ^[A-Za-z0-9._~-]+$ ]]; then
+        unset refresh_token
+        echo "[FAIL] ACR exposed an invalid registry refresh token"
         exit 1
     fi
-    if ! printf 'user = "%s:%s"\n' \
-        "00000000-0000-0000-0000-000000000000" "$access_token" \
+    if ! access_token="$(
+        {
+            printf 'data-urlencode = "grant_type=refresh_token"\n'
+            printf 'data-urlencode = "service=%s"\n' "$LOGIN_SERVER"
+            printf 'data-urlencode = "scope=repository:%s:pull"\n' \
+                "$IMAGE_REPOSITORY"
+            printf 'data-urlencode = "refresh_token=%s"\n' "$refresh_token"
+        } | curl --disable --config - --fail --silent --show-error \
+            --proto '=https' --retry 0 --request POST \
+            "https://${LOGIN_SERVER}/oauth2/token" \
+        | python -c '
+import json
+import re
+import sys
+
+response = json.load(sys.stdin)
+token = response.get("access_token") if isinstance(response, dict) else None
+if not isinstance(token, str) or not re.fullmatch(r"[A-Za-z0-9._~-]+", token):
+    raise SystemExit("ACR token exchange returned no valid access token")
+print(token)
+'
+    )"; then
+        unset refresh_token
+        echo "[FAIL] OCI scoped registry token exchange failed"
+        exit 1
+    fi
+    unset refresh_token
+    if ! printf 'header = "Authorization: Bearer %s"\n' "$access_token" \
         | curl --disable --config - --fail --silent --show-error \
             --proto '=https' --proto-redir '=https' --location --max-redirs 3 \
             --retry 0 \
@@ -826,8 +852,7 @@ if not isinstance(digest, str) or not re.fullmatch(
 print(digest)
 PY
 )"
-    if ! printf 'user = "%s:%s"\n' \
-        "00000000-0000-0000-0000-000000000000" "$access_token" \
+    if ! printf 'header = "Authorization: Bearer %s"\n' "$access_token" \
         | curl --disable --config - --fail --silent --show-error \
             --proto '=https' --proto-redir '=https' --location --max-redirs 3 \
             --retry 0 \
