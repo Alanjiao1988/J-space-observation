@@ -2617,6 +2617,11 @@ def validate_private_endpoint_topology(
         f"{storage_binding['container']}"
     )
     container_properties = storage_container.get("properties")
+    live_container_public_access = (
+        container_properties.get("publicAccess")
+        if isinstance(container_properties, Mapping)
+        else object()
+    )
     if (
         _resource_id(storage_container).casefold()
         != expected_container_id.casefold()
@@ -2625,8 +2630,8 @@ def validate_private_endpoint_topology(
         or str(storage_container.get("type", "")).casefold()
         != "microsoft.storage/storageaccounts/blobservices/containers"
         or not isinstance(container_properties, Mapping)
-        or container_properties.get("publicAccess")
-        is not storage_binding["container_public_access"]
+        or storage_binding["container_public_access"] is not None
+        or live_container_public_access not in (None, "None")
     ):
         raise AzureContractError(
             "bound Blob container is missing, ambiguous, or publicly accessible"

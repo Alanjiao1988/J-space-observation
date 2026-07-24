@@ -10656,6 +10656,24 @@ def test_private_endpoint_topology_is_exact_and_dns_is_pe_nic_only():
     }
     assert result["storage_container_public_access"] is None
     assert result["storage_allow_blob_public_access"] is False
+    arm_none_container = deepcopy(storage_container)
+    arm_none_container["properties"]["publicAccess"] = "None"
+    arm_none_result = azure_contract.validate_private_endpoint_topology(
+        destination,
+        storage=storage,
+        storage_container=arm_none_container,
+        environment=environment,
+        workload_profile_states=workload_profiles,
+        private_endpoint=endpoint,
+        storage_private_link_resources=private_link_resources,
+        storage_connections=connections,
+        dns_zone_groups=groups,
+        dns_links=links,
+        dns_record=dns,
+        nics=nics,
+        resolved_ips=["10.0.2.4"],
+    )
+    assert arm_none_result["storage_container_public_access"] is None
     for public_access in ("Blob", "Container"):
         public_container = deepcopy(storage_container)
         public_container["properties"]["publicAccess"] = public_access
