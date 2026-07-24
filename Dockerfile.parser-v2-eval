@@ -19,9 +19,12 @@ RUN test "${PYTHON_BASE_IMAGE}" = "python:3.11.14-slim-bookworm@sha256:65a93d69f
     && test "$(readlink -f /usr/local/bin/python3.11)" = "/usr/local/bin/python3.11" \
     && test "${#BUILD_PROVENANCE_SHA256}" -eq 64 \
     && test -z "$(printf '%s' "${BUILD_PROVENANCE_SHA256}" | tr -d '0-9a-f')" \
-    && groupadd --system --gid 10001 parser-eval \
-    && useradd --system --uid 10001 --gid parser-eval --no-create-home \
-       --home-dir /nonexistent --shell /usr/sbin/nologin parser-eval \
+    && test -x /usr/bin/grep \
+    && ! /usr/bin/grep -Eq '^[^:]+:[^:]*:10001:' /etc/group \
+    && ! /usr/bin/grep -Eq '^[^:]+:[^:]*:10001:' /etc/passwd \
+    && printf '%s\n' 'parser-eval:x:10001:' >> /etc/group \
+    && printf '%s\n' \
+       'parser-eval:x:10001:10001::/nonexistent:/bin/false' >> /etc/passwd \
     && install -d -o parser-eval -g parser-eval -m 0700 /runtime /runtime/work
 
 COPY requirements-parser-v2-eval.txt /workspace/

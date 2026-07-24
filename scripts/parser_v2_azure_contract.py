@@ -1772,28 +1772,39 @@ def _validate_acr_run_request(
         expected_sha256=build_provenance_sha256_value,
     )
     normalized = normalize_azure_value(request)
-    if not isinstance(normalized, Mapping) or set(normalized) != BUILD_RUN_REQUEST_FIELDS:
+    required_fields = BUILD_RUN_REQUEST_FIELDS - {"credentials"}
+    if (
+        not isinstance(normalized, Mapping)
+        or not required_fields.issubset(normalized)
+        or not set(normalized).issubset(BUILD_RUN_REQUEST_FIELDS)
+    ):
         raise AzureContractError("ACR runRequest fields are not the exact allowlist")
+    canonical_request = dict(normalized)
+    credentials = canonical_request.setdefault("credentials", {})
+    if credentials != {}:
+        raise AzureContractError("ACR runRequest credentials are not empty")
     expected_request = build_acr_run_request(
         build_provenance=provenance,
         build_provenance_sha256_value=build_provenance_sha256_value,
         staging_tag=staging_tag,
     )
-    if _canonical_bytes(normalized) != _canonical_bytes(expected_request):
+    if _canonical_bytes(canonical_request) != _canonical_bytes(expected_request):
         raise AzureContractError("ACR runRequest differs from frozen provenance")
     validate_remote_git_source(
-        normalized["sourceLocation"],
+        canonical_request["sourceLocation"],
         repository_url=provenance["remote_source"]["repository_url"],
         source_commit=provenance["source_commit"],
     )
-    request_sha256 = hashlib.sha256(_canonical_bytes(normalized)).hexdigest()
+    request_sha256 = hashlib.sha256(
+        _canonical_bytes(canonical_request)
+    ).hexdigest()
     if expected_run_request_sha256 is not None and (
         not isinstance(expected_run_request_sha256, str)
         or not _SHA256_PATTERN.fullmatch(expected_run_request_sha256)
         or request_sha256 != expected_run_request_sha256
     ):
         raise AzureContractError("ACR runRequest differs from durable claim")
-    return dict(normalized), request_sha256
+    return canonical_request, request_sha256
 
 
 def build_acr_task_run_body(

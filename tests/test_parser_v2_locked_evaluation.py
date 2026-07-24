@@ -5398,6 +5398,13 @@ def test_cpu_image_and_launch_scaffold_have_no_model_secret_or_gpu_path():
         re.I,
     )
     assert not re.search(r"cuda|nvidia|--gpus", dockerfile, re.I)
+    assert "groupadd" not in dockerfile
+    assert "useradd" not in dockerfile
+    assert "'parser-eval:x:10001:' >> /etc/group" in dockerfile
+    assert (
+        "'parser-eval:x:10001:10001::/nonexistent:/bin/false'"
+        in dockerfile
+    )
     assert "scripts/stage_p_entrypoint.sh /workspace/bin/stage-p" in dockerfile
     assert (
         "scripts/stage_p_adopt_entrypoint.sh /workspace/bin/stage-p-adopt"
@@ -10062,6 +10069,21 @@ def test_acr_task_run_body_and_response_bind_exact_full_provenance():
     assert accepted["output_digest"] == IMAGE_DIGEST
     assert accepted["task_run_name"] == "pv2tr-" + "4" * 20
     assert accepted["build_provenance_sha256"] == provenance_sha256
+    response_without_empty_credentials = deepcopy(task_run)
+    del response_without_empty_credentials["properties"]["runRequest"][
+        "credentials"
+    ]
+    normalized = _validate_task_run(
+        response_without_empty_credentials,
+        provenance,
+        provenance_sha256,
+        tag,
+        require_succeeded=True,
+        expected_digest=IMAGE_DIGEST,
+        expected_run_id="ca1",
+        expected_run_request_sha256=accepted["run_request_sha256"],
+    )
+    assert normalized["run_request_sha256"] == accepted["run_request_sha256"]
     response_without_force_tag = deepcopy(task_run)
     del response_without_force_tag["properties"]["forceUpdateTag"]
     assert _validate_task_run(
@@ -10083,7 +10105,7 @@ def test_acr_task_run_rejects_missing_or_forged_request_fields():
                 "runRequest"
             ].pop(field)
         )
-        for field in azure_contract.BUILD_RUN_REQUEST_FIELDS
+        for field in azure_contract.BUILD_RUN_REQUEST_FIELDS - {"credentials"}
     ]
     mutations.extend(
         (
@@ -10107,6 +10129,9 @@ def test_acr_task_run_rejects_missing_or_forged_request_fields():
             ][0].update({"isSecret": True}),
             lambda value: value["properties"]["runRequest"].update(
                 {"extraControl": True}
+            ),
+            lambda value: value["properties"]["runRequest"].update(
+                {"credentials": {"sourceRegistry": "forbidden"}}
             ),
         )
     )
