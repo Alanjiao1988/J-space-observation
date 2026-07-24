@@ -2664,6 +2664,14 @@ def validate_private_endpoint_topology(
         != "microsoft.storage/storageaccounts/privatelinkresources"
         or private_link_resource_properties.get("groupId")
         != private_link_group_id
+        or _canonical_bytes(
+            private_link_resource_properties.get("requiredMembers")
+        )
+        != _canonical_bytes([private_link_subresource])
+        or _canonical_bytes(
+            private_link_resource_properties.get("requiredZoneNames")
+        )
+        != _canonical_bytes([network["private_dns_zone_name"]])
     ):
         raise AzureContractError(
             "storage private-link resource is not explicit Blob evidence"
@@ -2763,7 +2771,7 @@ def validate_private_endpoint_topology(
         raise AzureContractError("private endpoint NIC private IPs changed")
     fqdn = f"{storage_binding['account_name']}.blob.core.windows.net"
     custom_dns = pe_properties.get("customDnsConfigs")
-    if (
+    if custom_dns not in (None, []) and (
         not isinstance(custom_dns, list)
         or len(custom_dns) != 1
         or custom_dns[0].get("fqdn") != fqdn
@@ -2845,6 +2853,7 @@ def validate_private_endpoint_topology(
         "private_endpoint_ips": sorted(expected_ips),
         "private_link_group_id": private_link_group_id,
         "private_link_subresource": private_link_subresource,
+        "private_link_required_zone_names": [network["private_dns_zone_name"]],
         "private_dns_zone": "privatelink.blob.core.windows.net",
     }
 

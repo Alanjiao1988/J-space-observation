@@ -10490,7 +10490,11 @@ def _private_topology_records():
             ),
             "name": network["private_link_subresource"],
             "type": "Microsoft.Storage/storageAccounts/privateLinkResources",
-            "properties": {"groupId": network["private_link_group_id"]},
+            "properties": {
+                "groupId": network["private_link_group_id"],
+                "requiredMembers": [network["private_link_subresource"]],
+                "requiredZoneNames": [network["private_dns_zone_name"]],
+            },
         }
     ]
     environment = {
@@ -10650,6 +10654,9 @@ def test_private_endpoint_topology_is_exact_and_dns_is_pe_nic_only():
     assert result["private_endpoint_ips"] == ["10.0.2.4"]
     assert result["private_link_group_id"] == "blob"
     assert result["private_link_subresource"] == "blob"
+    assert result["private_link_required_zone_names"] == [
+        "privatelink.blob.core.windows.net"
+    ]
     assert result["workload_profile"] == {
         "name": "Consumption",
         "workload_profile_type": "Consumption",
@@ -10674,6 +10681,24 @@ def test_private_endpoint_topology_is_exact_and_dns_is_pe_nic_only():
         resolved_ips=["10.0.2.4"],
     )
     assert arm_none_result["storage_container_public_access"] is None
+    empty_custom_dns = deepcopy(endpoint)
+    empty_custom_dns["properties"]["customDnsConfigs"] = []
+    empty_custom_dns_result = azure_contract.validate_private_endpoint_topology(
+        destination,
+        storage=storage,
+        storage_container=storage_container,
+        environment=environment,
+        workload_profile_states=workload_profiles,
+        private_endpoint=empty_custom_dns,
+        storage_private_link_resources=private_link_resources,
+        storage_connections=connections,
+        dns_zone_groups=groups,
+        dns_links=links,
+        dns_record=dns,
+        nics=nics,
+        resolved_ips=["10.0.2.4"],
+    )
+    assert empty_custom_dns_result["private_endpoint_ips"] == ["10.0.2.4"]
     for public_access in ("Blob", "Container"):
         public_container = deepcopy(storage_container)
         public_container["properties"]["publicAccess"] = public_access
@@ -10803,6 +10828,24 @@ def test_private_endpoint_topology_is_exact_and_dns_is_pe_nic_only():
             dns_record=dns,
             nics=nics,
             resolved_ips=["10.0.2.4"],
+        )
+    missing_required_zone = deepcopy(private_link_resources)
+    del missing_required_zone[0]["properties"]["requiredZoneNames"]
+    with pytest.raises(azure_contract.AzureContractError):
+        azure_contract.validate_private_endpoint_topology(
+        destination,
+        storage=storage,
+        storage_container=storage_container,
+        environment=environment,
+        workload_profile_states=workload_profiles,
+        private_endpoint=empty_custom_dns,
+        storage_private_link_resources=missing_required_zone,
+        storage_connections=connections,
+        dns_zone_groups=groups,
+        dns_links=links,
+        dns_record=dns,
+        nics=nics,
+        resolved_ips=["10.0.2.4"],
         )
     missing_profile_type = deepcopy(workload_profiles)
     del missing_profile_type[0]["properties"]["workloadProfileType"]
