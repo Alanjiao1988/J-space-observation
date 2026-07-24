@@ -7521,7 +7521,30 @@ def test_build_and_launcher_static_hardening_contract():
     assert "replicaRetryLimit\": 0" in launch
     assert "role assignment list --all" not in launch
     assert "auto-follow service pagination" not in launch
-    assert "echo \"$registry_token\"" not in launch
+    launcher_oci_helper = launch[
+        launch.index("reauthenticate_runtime_destination() {"):
+        launch.index("authenticate_persisted_state() {")
+    ]
+    assert "--query accessToken" not in launcher_oci_helper
+    assert "--query refreshToken" in launcher_oci_helper
+    assert 'data-urlencode = "grant_type=refresh_token"' in launcher_oci_helper
+    assert 'data-urlencode = "service=%s"' in launcher_oci_helper
+    assert (
+        'data-urlencode = "scope=repository:%s:pull"'
+        in launcher_oci_helper
+    )
+    assert (
+        'data-urlencode = "refresh_token=%s"' in launcher_oci_helper
+    )
+    assert (
+        '"https://${LOGIN_SERVER}/oauth2/token"' in launcher_oci_helper
+    )
+    assert 'user = "%s:%s"' not in launcher_oci_helper
+    assert launcher_oci_helper.count(
+        'header = "Authorization: ******"'
+    ) == 2
+    assert 'echo "$access_token"' not in launcher_oci_helper
+    assert 'echo "$refresh_token"' not in launcher_oci_helper
     assert launch.index("GIT_NO_REPLACE_OBJECTS=1") < launch.index(
         '"git", "-C", project_root'
     )

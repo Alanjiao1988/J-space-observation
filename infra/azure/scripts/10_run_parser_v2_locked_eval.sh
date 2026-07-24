@@ -1663,7 +1663,7 @@ for records, scope, role_id in roles:
         raise SystemExit("managed identity role assignment is not exact")
 PY
     local resolved_digest tag_write tag_delete manifest_write manifest_delete
-    local registry_token config_digest authenticated_binding_sha256
+    local refresh_token access_token config_digest authenticated_binding_sha256
     az rest --method get \
         --url "https://management.azure.com${ACR_BUILD_TASK_RUN_RESOURCE_ID}?api-version=2019-06-01-preview" \
         --output json >"$acr_task_run_file" || return 1
@@ -1686,27 +1686,52 @@ PY
         echo "[FAIL] curl is required for live OCI provenance verification"
         exit 1
     fi
-    if ! registry_token="$(scalar az acr login \
-        --name "$ACR_NAME" --expose-token --query accessToken -o tsv \
+    if ! refresh_token="$(scalar az acr login \
+        --name "$ACR_NAME" --expose-token --query refreshToken -o tsv \
         2>/dev/null)"; then
         echo "[FAIL] Live OCI registry token retrieval failed"
         exit 1
     fi
-    if [[ -z "$registry_token" \
-        || "$registry_token" == *'"'* || "$registry_token" == *'\'* ]]; then
-        unset registry_token
-        echo "[FAIL] ACR returned an invalid live registry token"
+    if [[ ! "$refresh_token" =~ ^[A-Za-z0-9._~-]+$ ]]; then
+        unset refresh_token
+        echo "[FAIL] ACR exposed an invalid live registry refresh token"
         exit 1
     fi
-    if ! printf 'user = "%s:%s"\n' \
-        "00000000-0000-0000-0000-000000000000" "$registry_token" \
+    if ! access_token="$(
+        {
+            printf 'data-urlencode = "grant_type=refresh_token"\n'
+            printf 'data-urlencode = "service=%s"\n' "$LOGIN_SERVER"
+            printf 'data-urlencode = "scope=repository:%s:pull"\n' \
+                "$IMAGE_REPOSITORY"
+            printf 'data-urlencode = "refresh_token=%s"\n' "$refresh_token"
+        } | curl --disable --config - --fail --silent --show-error \
+            --proto '=https' --retry 0 --request POST \
+            "https://${LOGIN_SERVER}/oauth2/token" \
+        | python -c '
+import json
+import re
+import sys
+
+response = json.load(sys.stdin)
+token = response.get("access_token") if isinstance(response, dict) else None
+if not isinstance(token, str) or not re.fullmatch(r"[A-Za-z0-9._~-]+", token):
+    raise SystemExit("ACR token exchange returned no valid access token")
+print(token)
+'
+    )"; then
+        unset refresh_token
+        echo "[FAIL] Live OCI scoped registry token exchange failed"
+        exit 1
+    fi
+    unset refresh_token
+    if ! printf 'header = "Authorization: ******"\n' "$access_token" \
         | curl --disable --config - --fail --silent --show-error \
             --proto '=https' --proto-redir '=https' --location --max-redirs 3 \
             --retry 0 \
             --header "Accept: application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json" \
             "https://${LOGIN_SERVER}/v2/${IMAGE_REPOSITORY}/manifests/${IMAGE_DIGEST}" \
             --output "$oci_manifest_file"; then
-        unset registry_token
+        unset access_token
         echo "[FAIL] Live OCI manifest retrieval failed"
         exit 1
     fi
@@ -1726,18 +1751,17 @@ if not isinstance(digest, str) or not re.fullmatch(
 print(digest)
 PY
 )" || return 1
-    if ! printf 'user = "%s:%s"\n' \
-        "00000000-0000-0000-0000-000000000000" "$registry_token" \
+    if ! printf 'header = "Authorization: ******"\n' "$access_token" \
         | curl --disable --config - --fail --silent --show-error \
             --proto '=https' --proto-redir '=https' --location --max-redirs 3 \
             --retry 0 \
             "https://${LOGIN_SERVER}/v2/${IMAGE_REPOSITORY}/blobs/${config_digest}" \
             --output "$oci_config_file"; then
-        unset registry_token
+        unset access_token
         echo "[FAIL] Live OCI config retrieval failed"
         exit 1
     fi
-    unset registry_token
+    unset access_token
     authenticated_binding_sha256="$(scalar python "$AZURE_HELPER" \
         validate-live-image-binding \
         --image-binding "$IMAGE_BINDING_SNAPSHOT_FILE" \
