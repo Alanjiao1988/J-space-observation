@@ -1513,3 +1513,29 @@ Consequence:
 - The independence evidence that was obtainable is strong: zero exact, normalized and
   numeric-normalized collisions against every reachable prior corpus. The residual
   risk is confined to the one corpus that could not be reached.
+
+## 2026-07-25 — Report the outstanding parser-v3 cross-check as NOT PERFORMED
+
+Decision:
+
+- Cross-check 1 for the parser-v3-v1 seal is recorded as **NOT PERFORMED**, with the
+  exact blocking reason, rather than being skipped silently or inferred from the
+  checks that did run.
+
+Rationale:
+
+- Two of the three registered pre-seal overlap checks returned zero collisions and a
+  third is vacuous by construction. It would have been easy, and wrong, to treat the
+  outstanding check as a formality. The retired parser-v2 holdout is precisely the
+  corpus with the highest prior probability of overlap, because parser v3 was
+  developed from its failure analysis.
+- The blocker was a wedged Azure Run Command extension, which says nothing about
+  overlap. Reporting an untested claim as tested is the specific failure mode this
+  project exists to avoid.
+
+Consequence:
+
+- The parser-v3-v1 set stays unsealed and unlocked. No parser-v3 evaluation may be
+  run against it and no formal parser-v3 result may be claimed.
+- The temporary read grant created for the attempt was deleted and its removal
+  verified; no privilege was left standing to make a later attempt easier.

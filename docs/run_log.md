@@ -2895,3 +2895,35 @@ Results:
 - Boundary: reviewer agreement is LLM operational consensus, not human ground truth.
   Isolation between set construction and parser-v3 development is procedural, not
   security-enforced, and both happened in the same worktree during the same round.
+
+## 2026-07-25 — Parser-v3 pre-seal cross-check 1 attempted and BLOCKED
+
+- Objective: execute the one outstanding registered pre-seal check, namely whether
+  any case in the new `parser-v3-v1` locked set collides with the **retired**
+  parser-v2 locked inputs held at
+  `phase1-evaluator-validation/parser-v2-v1/20260716T024856Z/locked-inputs/`.
+- Design of the attempt, so it can be repeated: the comparison was to run entirely on
+  the orchestrator VM using only one-way hashes. The committed
+  `evaluator_sets/parser_v3_v1/manifests/inputs_manifest.json` carries the locked
+  set's fingerprints and nothing else, so only hashes would have left this machine,
+  and only collision counts would have come back. The retired inputs would have been
+  read for **diagnosis only**; no rescoring, and no label material touched.
+- A temporary `Storage Blob Data Reader` assignment was created for principal
+  `1ec93a23-1126-4058-a537-4f1016b8c325`, ABAC-conditioned to the prefix
+  `phase1-evaluator-validation/parser-v2-v1/20260716T024856Z/locked-inputs/`.
+- **Outcome: NOT PERFORMED.** The Azure VM Run Command extension entered a wedged
+  `Conflict: Run command extension execution is in progress` state during payload
+  staging and did not clear across roughly 25 minutes of retries, including on a
+  trivial `echo` probe. This is an infrastructure fault on the transport, not a
+  scientific result, and it must not be reported as a passed check.
+- The temporary role assignment was deleted immediately and removal was verified
+  twice: the container-scope list for that principal is empty, and a
+  subscription-wide query for any role whose name contains `Blob` also returns
+  empty. No standing privilege was left behind.
+- Consequence: the parser-v3-v1 seal remains **NOT PERFORMED**, and cross-check 1
+  remains outstanding. The set is not locked and no parser-v3 evaluation may be run
+  against it.
+- To resume: clear the Run Command extension on `vm-pv2-orchestrator-sea`, re-create
+  the same prefix-conditioned read grant, stage
+  `scripts/build_parser_v3_validation_set.py` and the inputs manifest, run the
+  fingerprint comparison, then remove the grant again and record the result.

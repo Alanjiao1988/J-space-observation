@@ -71,9 +71,10 @@ was run.
 - One registered cross-check is vacuous, not passed: the 18-record historical
   audit extract has no output-bearing field.
 - **The set is not sealed.** The registered overlap check against the retired
-  parser-v2 locked inputs was not executed and no write grant was created.
-  Until the seal exists the holdout is not locked, and **no parser-v3 evaluation
-  may be run against it**.
+  parser-v2 locked inputs was attempted on 2026-07-25 and is recorded as **NOT
+  PERFORMED** after the Azure Run Command transport wedged; no write grant was
+  created either. Until the seal exists the holdout is not locked, and **no
+  parser-v3 evaluation may be run against it**.
 - Reviewer agreement is LLM operational consensus, not human ground truth.
   Isolation from parser-v3 development is procedural, not enforced, and both
   happened in the same worktree in the same round.

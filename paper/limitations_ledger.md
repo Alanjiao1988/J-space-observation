@@ -107,8 +107,11 @@ set is not locked: it lives in a mutable worktree, its integrity rests on local
 manifests rather than on immutable blob storage, and it therefore cannot support a
 one-shot evaluation. No parser-v3 evaluation may be run against it and no formal
 parser-v3 result may be claimed. One registered pre-seal cross-check, the overlap
-comparison against the retired parser-v2 locked inputs, also remains unexecuted, so
-the independence evidence is strong but not complete.
+comparison against the retired parser-v2 locked inputs, was attempted on 2026-07-25
+and is recorded as NOT PERFORMED after the Azure Run Command transport wedged, so
+the independence evidence is strong but not complete. That corpus carries the
+highest prior probability of overlap, because parser v3 was developed from its
+failure analysis, so the gap is material rather than cosmetic.
 
 ## L-14 — The parser-v3 set was built in the same worktree as parser v3
 
