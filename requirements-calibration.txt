@@ -1,0 +1,44 @@
+# Phase 1.0C Track B headroom-calibration image lock.
+#
+# Base image supplies Python 3.11 and torch 2.4.1 and is pinned by digest in
+# Dockerfile.calibration, so nothing installed by the base is restated here.
+# Everything added on top is pinned exactly and installed with --no-deps, so a
+# missing transitive dependency fails the build loudly instead of floating.
+
+# Target-model runtime.
+transformers==4.46.3
+tokenizers==0.20.3
+huggingface-hub==0.26.2
+safetensors==0.4.5
+regex==2024.11.6
+tqdm==4.67.1
+filelock==3.16.1
+fsspec==2024.10.0
+packaging==24.2
+pyyaml==6.0.2
+numpy==1.26.4
+
+# Repository package import surface (jspace_observation.stats imports scipy).
+scipy==1.14.1
+
+# Managed-identity Blob export over the private endpoint.
+azure-identity==1.19.0
+azure-storage-blob==12.24.0
+azure-core==1.32.0
+msal==1.31.1
+msal-extensions==1.2.0
+portalocker==2.10.1
+cryptography==43.0.3
+cffi==1.17.1
+pycparser==2.22
+PyJWT==2.10.1
+isodate==0.7.2
+six==1.16.0
+typing_extensions==4.12.2
+
+# HTTP stack shared by transformers and the Azure SDK.
+requests==2.32.3
+certifi==2024.8.30
+charset-normalizer==3.4.0
+idna==3.10
+urllib3==2.2.3

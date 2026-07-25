@@ -1,0 +1,111 @@
+FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime@sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126
+
+# Dedicated Phase 1.0C Track B calibration image.
+#
+# The generic Dockerfile validates `.semantic_audit_build_provenance.json`,
+# whose generator only accepts a repository whose behaviour-file set is exactly
+# the frozen 32-file list from commit b33eea61.  That list has not matched any
+# reachable commit on main since Phase 0.5A, so the generic image cannot be
+# built at all today.  This image is a separate execution path with its own
+# deterministic, pre-committed provenance record.  It changes no frozen
+# scientific protocol.
+
+LABEL org.opencontainers.image.title="J-space Phase 1.0C Track B headroom calibration"
+LABEL org.opencontainers.image.base.name="pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime"
+LABEL org.opencontainers.image.base.digest="sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126"
+LABEL io.jspace.calibration.model-id="deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+LABEL io.jspace.calibration.model-revision="ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+LABEL io.jspace.calibration.tokenizer-revision="ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+LABEL io.jspace.calibration.provenance="/opt/jspace/calibration-build-provenance.json"
+LABEL io.jspace.calibration.claim-boundary="task calibration only; licenses no claim about hidden reasoning or internal representations"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN groupadd --system --gid 10001 jspace \
+    && useradd --system --uid 10001 --gid jspace --create-home \
+        --home-dir /workspace/runtime/home --shell /usr/sbin/nologin jspace
+
+WORKDIR /workspace
+
+COPY requirements-calibration.txt Dockerfile.calibration /workspace/
+COPY scripts/calibration_build_provenance.py /workspace/scripts/
+COPY calibration_build_provenance.json /opt/jspace/calibration-build-provenance.json
+
+# --no-deps keeps every installed version exactly at its pin; verify-runtime
+# then fails the build if any pin, the interpreter, or the base torch drifts.
+RUN python -m pip install --no-cache-dir --no-deps \
+        -r /workspace/requirements-calibration.txt \
+    && python -I /workspace/scripts/calibration_build_provenance.py \
+        verify-runtime --requirements /workspace/requirements-calibration.txt \
+    && python -c "import torch, transformers, scipy, numpy, azure.identity, azure.storage.blob"
+
+COPY scripts/ingest_headroom_semantic_review.py /workspace/scripts/
+COPY scripts/run_phase1_headroom_calibration.py /workspace/scripts/
+COPY src/jspace_observation/__init__.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/blob_export.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/config.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/eval_parsing.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/eval_parsing_v2.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/eval_parsing_v3.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/evaluator_validation.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/headroom_blob_transport.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/headroom_calibration.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/headroom_candidates.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/jlens_utils.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/model_loader.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/no_cot.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/phase1_branches.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/postprocess.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/prompt_sets.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/run_logging.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/stats.py /workspace/src/jspace_observation/
+COPY data/phase1_task_headroom_candidates.jsonl /workspace/data/
+COPY docs/phase1_headroom_calibration_protocol.md /workspace/docs/
+
+RUN python -I /workspace/scripts/calibration_build_provenance.py \
+        --project-root /workspace verify-image-context \
+        --provenance /opt/jspace/calibration-build-provenance.json \
+    && python -c "import sys; sys.path.insert(0, '/workspace/src'); import jspace_observation.headroom_calibration as hc; assert hc.EXPECTED_GENERATION_COUNT == 300; assert hc.MODEL_REVISION == 'ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562'" \
+    && install -d -o jspace -g jspace -m 0700 \
+        /workspace/runtime/home \
+        /workspace/runtime/hf-cache \
+        /workspace/runtime/results \
+        /workspace/runtime/cache \
+        /workspace/runtime/cache/tmp \
+        /workspace/runtime/pycache \
+    && chown -R 0:0 \
+        /workspace/scripts \
+        /workspace/src \
+        /workspace/data \
+        /workspace/docs \
+        /workspace/requirements-calibration.txt \
+        /workspace/Dockerfile.calibration \
+        /opt/jspace \
+    && chmod -R a-w \
+        /workspace/scripts \
+        /workspace/src \
+        /workspace/data \
+        /workspace/docs \
+        /workspace/requirements-calibration.txt \
+        /workspace/Dockerfile.calibration \
+    && chmod 0444 /opt/jspace/calibration-build-provenance.json
+
+ENV HOME=/workspace/runtime/home \
+    HF_HOME=/workspace/runtime/hf-cache \
+    HUGGINGFACE_HUB_CACHE=/workspace/runtime/hf-cache/hub \
+    TRANSFORMERS_CACHE=/workspace/runtime/hf-cache \
+    XDG_CACHE_HOME=/workspace/runtime/cache \
+    TMPDIR=/workspace/runtime/cache/tmp \
+    PYTHONPYCACHEPREFIX=/workspace/runtime/pycache \
+    RESULTS_DIR=/workspace/runtime/results \
+    JSPACE_CALIBRATION_PROVENANCE=/opt/jspace/calibration-build-provenance.json
+
+USER 10001:10001
+
+CMD ["python", "/workspace/scripts/run_phase1_headroom_calibration.py", \
+     "--mode", "generate", \
+     "--output-root", "/workspace/runtime/results", \
+     "--upload-blob"]

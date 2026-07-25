@@ -19,6 +19,7 @@ import io
 import json
 import math
 import re
+from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from hashlib import sha256
@@ -211,6 +212,17 @@ CLASSIFICATIONS: tuple[str, ...] = (
     "excluded_quality_gate",
     "not_adjudicated",
     "selected_headroom",
+)
+
+# Track B outcome vocabulary. This is a reporting view over the already-frozen
+# cell classifications; it adds no rule and changes no threshold. The frozen
+# pack `status` vocabulary (BLOCKED / INCONCLUSIVE / COMPLETE / FAIL) is
+# unchanged and is emitted alongside it.
+TRACK_B_DECISIONS: tuple[str, ...] = (
+    "CONTROLS_ONLY",
+    "HEADROOM_CELLS_SELECTED",
+    "INCONCLUSIVE",
+    "NO_USABLE_CELLS",
 )
 
 REVIEW_REASON_CODES: tuple[str, ...] = (
@@ -1365,6 +1377,9 @@ def score_cells(records: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
         unresolved = n - correct - incorrect
         truncated = sum(1 for row in rows if row["evaluation"]["truncated"])
         no_answer = sum(1 for row in rows if row["evaluation"]["no_answer"])
+        ambiguous = sum(
+            1 for row in rows if row["evaluation"]["triage"]["parse_ambiguous"]
+        )
         flagged = [row for row in rows if row["evaluation"]["review_required"]]
         adjudicated = [
             row
@@ -1420,6 +1435,8 @@ def score_cells(records: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
         cells.append(
             {
                 "accuracy": accuracy,
+                "ambiguous": ambiguous,
+                "ambiguous_rate": _rate(ambiguous, n),
                 "cell_id": cell_id,
                 "ci_lower": ci_lower,
                 "ci_upper": ci_upper,
@@ -1625,6 +1642,64 @@ def build_metrics_rows(
                 not_applicable_reason=(
                     "" if cell["accuracy"] is not None else "labels_not_semantically_adjudicated"
                 ),
+            )
+        )
+        stratum = f"{cell['task_family']}|{cell['difficulty_band']}"
+        condition = str(cell["condition"])
+        rows.append(
+            _metric_row(
+                run_id,
+                "truncation_rate",
+                stratum,
+                condition,
+                cell["truncated"],
+                cell["n"],
+                threshold=MAX_TRUNCATION_RATE,
+                passed=cell["truncation_rate"] <= MAX_TRUNCATION_RATE,
+            )
+        )
+        rows.append(
+            _metric_row(
+                run_id,
+                "no_answer_rate",
+                stratum,
+                condition,
+                cell["no_answer"],
+                cell["n"],
+                threshold=MAX_NO_ANSWER_RATE,
+                passed=cell["no_answer_rate"] <= MAX_NO_ANSWER_RATE,
+            )
+        )
+        rows.append(
+            _metric_row(
+                run_id,
+                "ambiguous_rate",
+                stratum,
+                condition,
+                cell["ambiguous"],
+                cell["n"],
+            )
+        )
+        rows.append(
+            _metric_row(
+                run_id,
+                "semantic_review_rate",
+                stratum,
+                condition,
+                cell["review_required"],
+                cell["n"],
+            )
+        )
+        rows.append(
+            _metric_row(
+                run_id,
+                "unresolved_label_rate",
+                stratum,
+                condition,
+                cell["unresolved"],
+                cell["n"],
+                threshold=0.0,
+                passed=cell["unresolved"] == 0,
             )
         )
 
@@ -2122,6 +2197,106 @@ never invoked otherwise.
 """
 
 
+ATTESTATION_RECOVERY_EVIDENCE: dict[str, Any] = {
+    "checked_sources": {
+        "acr": (
+            "repositories are exactly j-space-observation, "
+            "j-space-observation-jlens and j-space-observation-parser-eval; no "
+            "calibration repository exists, and ACR run records do not carry "
+            "the attestation payload"
+        ),
+        "blob_build_artifacts": "no Blob build artifact carries the attestation",
+        "git_history": (
+            "git log --all -- .semantic_audit_build_provenance.json returns "
+            "nothing; the file is gitignored (.gitignore:50) and was never "
+            "committed on any branch"
+        ),
+        "registered_generator": (
+            "scripts/prepare_semantic_audit_build_context.py --protocol-commit, "
+            "invoked correctly as python -I -S in a clean detached worktree at "
+            "a91db884179911329eae3aadee506ab09b3a0e26, exits with 'tracked "
+            "behavior file list differs from the frozen list' and writes no "
+            "attestation file"
+        ),
+        "working_tree": (
+            "the only *provenance* file present is an unrelated local parser "
+            "recovery note"
+        ),
+    },
+    "generator_equality_measurement": {
+        "extra_files_not_in_frozen_list": 33,
+        "frozen_runtime_files": 30,
+        "measured_at_commit": "a91db884179911329eae3aadee506ab09b3a0e26",
+        "missing_files_from_tree": 0,
+        "scope": (
+            "git ls-files -- src scripts infra/azure/scripts Dockerfile "
+            "requirements.txt docs/phase1_semantic_review_protocol.md"
+        ),
+        "tracked_behavior_files": 63,
+    },
+    "outcome": "unrecoverable_and_unregenerable",
+    "verified_by": "main agent (Azure and git-write authority)",
+}
+
+EXECUTION_IMPLEMENTATION_CHANGES: tuple[dict[str, str], ...] = (
+    {
+        "change": (
+            "A dedicated calibration container image (Dockerfile.calibration) was "
+            "introduced for this run."
+        ),
+        "effect_on_protocol": "none",
+        "reason": (
+            "The generic image requires a historical build attestation that is "
+            "unrecoverable from git history, ACR and Blob, and is unregenerable "
+            "because the registered generator asserts equality against a "
+            "30-file frozen list while the repository now tracks 63 behavior "
+            "files (33 extra, 0 missing). The calibration image carries its own "
+            "pre-committed, deterministic build provenance instead."
+        ),
+        "scope": "execution_implementation",
+    },
+    {
+        "change": (
+            "cell_selection/ additionally emits high_accuracy_controls.csv and "
+            "difficulty_boundaries.csv."
+        ),
+        "effect_on_protocol": "none",
+        "reason": (
+            "Both files are derived views of rows already classified by the "
+            "frozen selection rule; no threshold, gate or classification "
+            "changed."
+        ),
+        "scope": "execution_implementation",
+    },
+    {
+        "change": (
+            "The artifact pack is uploaded by headroom_blob_transport, which "
+            "writes artifact_manifest.json last."
+        ),
+        "effect_on_protocol": "none",
+        "reason": (
+            "The generic directory uploader walks the pack in filesystem order "
+            "and cannot guarantee the registered manifest-last rule."
+        ),
+        "scope": "execution_implementation",
+    },
+    {
+        "change": (
+            "04_decision.json additionally carries track_b_decision and "
+            "track_b_decision_vocabulary."
+        ),
+        "effect_on_protocol": "none",
+        "reason": (
+            "The registered status vocabulary (BLOCKED / INCONCLUSIVE / "
+            "COMPLETE / FAIL) is emitted unchanged. track_b_decision is a "
+            "deterministic reporting view over the already-frozen cell "
+            "classifications and applies no additional rule."
+        ),
+        "scope": "execution_implementation",
+    },
+)
+
+
 def _artifact_entry(
     path: str,
     digest: str,
@@ -2378,6 +2553,13 @@ def run_calibration(config: RunConfig) -> dict[str, Any]:
     deviations_payload = {
         "deviations": deviations,
         "effect_on_interpretation": "none" if not deviations else "documented_above",
+        "execution_implementation_changes": [
+            dict(change) for change in EXECUTION_IMPLEMENTATION_CHANGES
+        ],
+        "protocol_deviation": "none",
+        "semantic_audit_attestation_evidence": deepcopy(
+            ATTESTATION_RECOVERY_EVIDENCE
+        ),
         "unregistered_changes": [],
     }
     _emit(root, "08_deviations.json", canonical_json(deviations_payload), entries)
@@ -2504,6 +2686,46 @@ def _emit_review_pack(
         )
 
 
+def _emit_classification_view(
+    root: Path,
+    run_id: str,
+    cells: Sequence[Mapping[str, Any]],
+    entries: list[dict[str, Any]],
+    filename: str,
+    classification: str,
+    empty_reason: str,
+) -> None:
+    """Emit a derived per-classification view of the already-scored cells.
+
+    These files are views over ``excluded_cells.csv``; they apply no additional
+    rule and change no threshold.
+    """
+
+    matching = [cell for cell in cells if cell["classification"] == classification]
+    if matching:
+        _emit(
+            root,
+            f"{CELL_SELECTION_DIR}/{filename}",
+            canonical_csv(
+                EXCLUDED_CELL_HEADER,
+                [
+                    _cell_row(cell, run_id) + [";".join(cell["exclusion_reasons"])]
+                    for cell in matching
+                ],
+            ),
+            entries,
+        )
+    else:
+        _emit(
+            root,
+            f"{CELL_SELECTION_DIR}/{filename}",
+            _not_applicable_csv(empty_reason),
+            entries,
+            "not_applicable",
+            empty_reason,
+        )
+
+
 def _emit_cell_selection(
     root: Path,
     run_id: str,
@@ -2559,6 +2781,25 @@ def _emit_cell_selection(
             reason,
         )
 
+    _emit_classification_view(
+        root,
+        run_id,
+        cells,
+        entries,
+        "high_accuracy_controls.csv",
+        "control_sanity_high_accuracy",
+        "no cell exceeded the 0.90 accuracy band as a high-accuracy control",
+    )
+    _emit_classification_view(
+        root,
+        run_id,
+        cells,
+        entries,
+        "difficulty_boundaries.csv",
+        "difficulty_boundary_excluded",
+        "no cell fell below the 0.70 accuracy band as a difficulty boundary",
+    )
+
     reasons_payload = {
         "cells": {
             str(cell["cell_id"]): {
@@ -2602,6 +2843,24 @@ def _emit_cell_selection(
         canonical_json(reasons_payload),
         entries,
     )
+
+
+def _track_b_decision(
+    status: str,
+    cells: Sequence[Mapping[str, Any]],
+    selected_cells: Sequence[Mapping[str, Any]],
+) -> str:
+    """Map the frozen cell classifications onto the Track B outcome vocabulary."""
+
+    if status != "COMPLETE":
+        return "INCONCLUSIVE"
+    if selected_cells:
+        return "HEADROOM_CELLS_SELECTED"
+    if any(
+        cell["classification"] == "control_sanity_high_accuracy" for cell in cells
+    ):
+        return "CONTROLS_ONLY"
+    return "NO_USABLE_CELLS"
 
 
 def _build_decision(
@@ -2730,5 +2989,7 @@ def _build_decision(
         "selected_headroom_cells": [str(cell["cell_id"]) for cell in selected_cells],
         "status": status,
         "supplementary_review_required": list(pending_review_cells),
+        "track_b_decision": _track_b_decision(status, cells, selected_cells),
+        "track_b_decision_vocabulary": list(TRACK_B_DECISIONS),
         "unresolved_rows": unresolved_rows,
     }
