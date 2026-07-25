@@ -38,11 +38,13 @@ artifacts/evaluator_validation/
 # Parser-v2 locked holdout material must remain outside normal Git paths
 evaluator_sets/**/private/
 evaluator_sets/**/locked_inputs.jsonl
+evaluator_sets/**/locked_labels.jsonl
 evaluator_sets/**/locked_reference_labels.jsonl
 evaluator_sets/**/locked_case_mapping.json
 evaluator_sets/**/locked_manifest.json
 evaluator_sets/**/reviewer_*_locked*.jsonl
 evaluator_sets/**/arbitration_locked*.jsonl
+evaluator_sets/**/labels_*.jsonl
 
 # Generated only by the checked semantic-audit build preparation command
 .semantic_audit_build_provenance.json

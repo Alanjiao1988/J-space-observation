@@ -1,11 +1,14 @@
 # Thread handoff - J-space observation project
 
-Date: 2026-07-18
+Date: 2026-07-25
 
 Repository: `Alanjiao1988/J-space-observation`
 
 Current Phase 0.5 runtime launcher commit:
 `be997eefbaec410107045dac7c50423f7297c633`
+
+Parser-v2 frozen implementation commit:
+`654f3bb463fedc33b0638b77fefdd9b2b9d1c9c2`
 
 ## 1. Authoritative identities
 
@@ -37,18 +40,26 @@ Do not confuse the engineering agent with the experimental target.
 Path C remains preserved:
 
 ```text
-status: SEALED
+status: CLOSED / FAIL / RETIRED
 development cases: 60
 locked cases: 120
 parser v2 implemented from public development cases: yes
-locked evaluation performed: no
+locked evaluation performed: yes (one shot, 2026-07-25)
+formal outcome: FAIL (32/34 mandatory gates passed)
+holdout: spent and retired
 higher-n performed: no
 new target-model behavioral run: no
 ```
 
 The sealing phase constructed, independently labeled, validated, and privately
 sealed a prospective parser-v2 evaluator set. Parser v2 was later implemented
-using only the public development set. It has no locked PASS/FAIL result.
+using only the public development set. The single authorized one-shot locked
+evaluation was executed on 2026-07-25 and closed with formal outcome **FAIL**:
+`boxed_final_miss` 1/20 against a limit of 0, and `wrong_span` 2/80 against a
+limit of 1. Report-only typed agreement was 116/120. The holdout is now spent
+and retired; formal reuse and formal rescoring are strictly prohibited, and
+post-retirement reads are permitted only for diagnosis and parser-v3
+development.
 
 Phase 0.5A is also complete:
 
@@ -253,10 +264,11 @@ Do not restart this job for Phase 1.2A and do not write to the sealed parent.
 
 ## 7. One-shot holdout rule
 
-The holdout is at `SEALED`. It has not advanced to
-`IMPLEMENTATION_FROZEN`, `UNSEAL_AUTHORIZED`, or `INPUTS_READ`.
+The holdout has completed the full one-shot workflow and is at `CLOSED`.
+The recorded state chain ran `00_draft_protocol` → `12_closed` with
+`outcome = FAIL`, `holdout_retired = true`, and `holdout_spent = true`.
 
-Future workflow:
+The workflow that was executed:
 
 1. Implement parser v2 using only the public development set.
 2. Freeze and push its implementation commit.
@@ -266,7 +278,10 @@ Future workflow:
 6. Retain PASS or FAIL and retire the holdout.
 
 A parser, schema, assertion, threshold, or scientific failure is not retryable.
-A modified parser requires a new independent holdout.
+A modified parser requires a new independent holdout. Because parser v2 failed,
+any parser v3 must be validated against a newly constructed locked set; the
+retired parser-v2 holdout must not be reused for a formal result and must not
+be rescored.
 
 ## 8. Frozen acceptance gates
 
@@ -283,7 +298,10 @@ A modified parser requires a new independent holdout.
 - clean pooled parser-v2 count cannot regress versus legacy;
 - at least one critical stratum must strictly improve.
 
-These gates are unevaluated. No parser-v2 PASS/FAIL exists.
+These gates were evaluated exactly once, on 2026-07-25. Thirty-two of the 34
+mandatory gates passed; `boxed_final_miss` (1/20, limit 0) and `wrong_span`
+(2/80, limit 1) failed, so the formal parser-v2 outcome is FAIL. The gates must
+not be amended retrospectively.
 
 ## 9. Validation status
 

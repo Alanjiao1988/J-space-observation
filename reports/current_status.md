@@ -41,7 +41,15 @@ no new behavioral calibration was run.
   was downloaded, loaded, or run, and no GPU was used. No hidden-reasoning,
   invisible-CoT, internal-workspace, or J-space claim follows.
 
-## Phase 1.2B tooling release candidate (2026-07-23)
+## Historical prerelease snapshot — superseded (2026-07-23)
+
+> The content below describes the historical state *before* the formal locked
+> evaluation was executed. It has been superseded by the 2026-07-25 CLOSED/FAIL
+> result recorded above. Statements such as "no VM has been provisioned",
+> "audits are pending", and "no Azure command … occurred" were accurate on
+> 2026-07-23 and are retained verbatim as a point-in-time record; they no longer
+> describe the current state. Nothing in this section has been renumbered or
+> back-dated.
 
 - Stage P remains label-blind and Stage E remains parser-free.
 - Private DNS TXT create-only records provide separate build, launch, and

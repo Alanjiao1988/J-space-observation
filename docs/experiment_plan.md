@@ -559,11 +559,27 @@ logit lens / probe / patching 提供 hidden reasoning representation 的弱证�
 Phase 0.5A bounded real-Jacobian technical feasibility 已完成并获得 GREEN；
 历史 Phase 1 bounded `n=3` 已冻结。两者都不自动授权扩大实验。
 
-下一 gate 仅为另行授权的一次性 parser-v2 locked evaluation：
+一次性 parser-v2 locked evaluation 这个 gate 已于 2026-07-25 执行并关闭，正式
+结论为 **FAIL**（34 条强制 gate 中 32 条通过；`boxed_final_miss` 1/20，限值 0；
+`wrong_span` 2/80，限值 1）。该 120 条 locked holdout 已作废退役：不得重用于
+正式结论，不得重新评分，退役后的读取仅限诊断与 parser-v3 开发。
+
+历史记录（该 gate 执行前的注册文本）：
 
 1. 使用已冻结的 public-development-only parser v2；
 2. 在读取 locked labels 前封存 predictions；
 3. PASS 或 FAIL 后退役该 holdout。
+
+当前注册的下一批 gate 为 Parallel Scientific Advancement Phase 的四条并行 track：
+
+- Track A：Phase 0.5B J-lens saturation（10-prompt fit、25-prompt sharded fit
+  与 merge、convergence 与 apply stability）。仅限工程结论。
+- Track B：Phase 1.0C bounded capability/headroom calibration（150 items ×
+  2 conditions = 300 generations），属于任务校准，不是正式 RQ1/RQ2 结果。
+- Track C：Phase 1.2C parser-v3 failure-directed development，仅 development
+  gates，不构成 validation。
+- Track D：Phase 1.2C 独立 parser-v3 locked holdout 构建与密封；本轮不执行
+  parser-v3 locked evaluation。
 
 在新的 preregistration 和明确授权前，不运行 higher-n、full Plan A、
 RQ3 patching/probe、7B scale-anchor 或更大的 J-lens fit。
