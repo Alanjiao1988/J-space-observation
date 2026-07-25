@@ -1,0 +1,4 @@
+condition,n,parser_v2_typed_agreement,parser_v3_typed_agreement,parser_v3_boxed_final_miss,parser_v3_wrong_span,evidence_class
+public_development_60,60,60,60,0,0,development_only
+adversarial_development_65,65,50,65,0,0,development_only
+retired_holdout_mismatch_4,4,not_applicable,not_applicable,not_applicable,not_applicable,blocked_case_text_unavailable

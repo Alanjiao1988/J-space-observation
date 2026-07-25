@@ -1,0 +1,90 @@
+{
+  "schema_version": "jspace-stage-manifest/v1",
+  "phase": "phase1.2C",
+  "track": "track-c",
+  "run_id": "phase1-parser-v3-track-c-20260725T114448Z",
+  "status": "COMPLETE",
+  "start_time_utc": "2026-07-25T11:44:48Z",
+  "end_time_utc": "2026-07-25T11:44:48Z",
+  "objective": "Diagnose the two failed parser-v2 locked-evaluation gates and develop a standalone parser v3 against public development material only.",
+  "hypothesis": "The parser-v2 boxed_final_miss and wrong_span failures are caused by decoration-intolerant payload grammars and by separator and continuation rules narrower than the registered protocol, so widening exactly those rules recovers the lost claims without weakening any fail-closed guard.",
+  "scope": [
+    "failure-directed diagnosis of the four retired mismatch case IDs",
+    "standalone parser-v3 module with reference-blind extraction",
+    "public adversarial development fixtures",
+    "development-gate evaluation on public material only"
+  ],
+  "out_of_scope": [
+    "any formal or validation claim for parser v3",
+    "any modification of frozen parser-v2 or legacy sources",
+    "any reuse of the retired parser-v2 holdout as a validation set",
+    "construction of the new independent locked holdout"
+  ],
+  "model_id": "not_applicable",
+  "model_revision": "not_applicable",
+  "image_digest": "not_applicable",
+  "hardware": "not_applicable",
+  "not_applicable_reason": "this track is a deterministic, model-free, CPU-only parser development stage; it invokes no model, no container image, and no accelerator",
+  "code_commit": "bc6d7b70c7794055a33401b8b7b0aa7c027f2e3f",
+  "working_tree_state": "uncommitted_track_c_additions_on_main",
+  "subagents": [],
+  "inputs": [
+    {
+      "path": "evaluator_sets/parser_v2_v1/development_cases.jsonl",
+      "role": "frozen public development oracle",
+      "sha256": "bfaeca837ecfe8673df834c5b8a4fc1626f0835c6ae35c0821acf59bd6e4ac27",
+      "n": 60
+    },
+    {
+      "path": "evaluator_sets/parser_v3_v1/adversarial_development_cases.jsonl",
+      "role": "new public adversarial development oracle",
+      "sha256": "109690e89d0ab2d949fcbb0ec12232807c0c662114745a1e986b529519d7e0ae",
+      "n": 65
+    },
+    {
+      "path": "docs/phase1_parser_v2_protocol.md",
+      "role": "frozen extraction protocol",
+      "sha256": "417d9ff5d27b17ce588b7713a1b1072fb32ef21a03fd135e4e339719db28866b"
+    },
+    {
+      "path": "docs/phase1_parser_v2_acceptance_gates.json",
+      "role": "frozen gate definitions reused as development gates",
+      "sha256": "a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988"
+    },
+    {
+      "path": "docs/phase1_evaluator_validation_set.md",
+      "role": "frozen stratum taxonomy",
+      "sha256": "d019c446393bc60dc524178c2a91018ceb8f04f881dcc80018f0282b0919f3f8"
+    },
+    {
+      "path": "src/jspace_observation/eval_parsing_v2.py",
+      "role": "frozen reference implementation (read-only)",
+      "sha256": "fe02781545e26c2f97d1731e985d081a2f1468950bec4d88700647849243d182"
+    },
+    {
+      "path": "src/jspace_observation/eval_parsing.py",
+      "role": "frozen legacy implementation (read-only)",
+      "sha256": "4b07b91859aca33b51af9c15b08f07026f11b0141f1300fd3f942138b731177e"
+    }
+  ],
+  "protocol_hash": "417d9ff5d27b17ce588b7713a1b1072fb32ef21a03fd135e4e339719db28866b",
+  "parser_v3": {
+    "algorithm_id": "jspace-parser-v3-reference-blind-extraction/v1",
+    "parser_version": "0ce0f3cd5e0a1d4c5b4c9eff9a2968deecd04c594f435a2fa2bfec332fd3cace",
+    "source_sha256": "76dc58684f4e3818a3f557a1828571674e799f65a9f0a97d07706839ff859ea9",
+    "result_schema_version": "phase1-parser-v2-result/v1"
+  },
+  "parser_v2_reference_version": "6cfaec62db37562930a4cb7d3a252bcbf80e1eaf748de98213863ff2566a7f86",
+  "output_files": [
+    "00_stage_manifest.json",
+    "01_protocol_snapshot.json",
+    "02_records.jsonl",
+    "03_metrics.csv",
+    "04_decision.json",
+    "05_summary.md",
+    "06_paper_table.csv",
+    "07_figure_data.csv",
+    "08_deviations.json",
+    "artifact_manifest.json"
+  ]
+}

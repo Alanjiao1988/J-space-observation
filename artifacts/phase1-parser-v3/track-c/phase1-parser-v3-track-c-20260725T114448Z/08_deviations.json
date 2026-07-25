@@ -1,0 +1,14 @@
+{
+  "deviations": [
+    {
+      "id": "DEV-C-001",
+      "kind": "unevaluated_criterion",
+      "criterion": "retired_mismatch_resolution",
+      "description": "The four retired parser-v2 mismatch cases could not be re-scored: their case text and labels are not present in this worktree and this track is not permitted to retrieve them.",
+      "effect": "The diagnosis for those cases is hypothesis-ranked rather than confirmed, and no development gate can assert that they are resolved.",
+      "registered_before_run": true
+    }
+  ],
+  "unregistered_changes": [],
+  "effect_on_interpretation": "One development criterion is not_applicable; no metric was altered, dropped, or recomputed. All reported metrics remain development evidence only."
+}

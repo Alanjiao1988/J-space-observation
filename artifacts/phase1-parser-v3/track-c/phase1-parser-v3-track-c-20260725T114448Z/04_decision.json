@@ -1,0 +1,45 @@
+{
+  "schema_version": "jspace-decision/v1",
+  "run_id": "phase1-parser-v3-track-c-20260725T114448Z",
+  "status": "COMPLETE",
+  "decision": "Parser v3 is COMPLETE as a development artifact: it reproduces parser v2 field-exactly on all 60 frozen public development rows, agrees with the declared oracle on all 65 new public adversarial rows, and records zero boxed/final misses and zero wrong-span errors on pooled development material. Parser v3 is NOT validated.",
+  "criteria_passed": [
+    "development_no_regression_vs_parser_v2[public_development_60|all]",
+    "typed_decision_agreement[public_development_60|all]",
+    "typed_decision_agreement[adversarial_development_65|all]",
+    "boxed_final_miss[development_pooled_125|S01+S02]",
+    "wrong_span[development_pooled_expected_present|all]",
+    "last_number_trap[development_pooled_125|S06]",
+    "material_correctness_error[development_pooled_125|all]",
+    "reference_blind_extraction_structural[source_inspection|all]",
+    "frozen_sources_byte_identical[git_diff_vs_bc6d7b7|all]",
+    "typed_decision_agreement[development_pooled_125|S01]",
+    "typed_decision_agreement[development_pooled_125|S02]",
+    "typed_decision_agreement[development_pooled_125|S03]",
+    "typed_decision_agreement[development_pooled_125|S04]",
+    "typed_decision_agreement[development_pooled_125|S05]",
+    "typed_decision_agreement[development_pooled_125|S06]",
+    "typed_decision_agreement[development_pooled_125|S07]",
+    "typed_decision_agreement[development_pooled_125|S08]",
+    "typed_decision_agreement[development_pooled_125|S09]",
+    "typed_decision_agreement[development_pooled_125|S10]",
+    "typed_decision_agreement[development_pooled_125|S11]",
+    "typed_decision_agreement[development_pooled_125|S12]"
+  ],
+  "criteria_failed": [],
+  "criteria_not_applicable": [
+    "retired_mismatch_resolution[retired_holdout_mismatch_4|all]"
+  ],
+  "deviations": [
+    "retired_mismatch_resolution could not be evaluated because the retired holdout case text is unavailable to this track"
+  ],
+  "scientific_interpretation": "The parser-v2 locked failures are consistent with a family of recall defects in which decoration, generalized separators, and unit prose blocked otherwise unambiguous claims. Parser v3 widens exactly those rules, each justified from the frozen protocol and each exercised by new adversarial fixtures that are independent of any retired case. On development material parser v3 is a strict superset of parser-v2 behaviour with no observed loss.",
+  "prohibited_interpretations": [
+    "Parser v3 is NOT validated. Nothing in this run is a validation result.",
+    "These development gates are not the preregistered acceptance gates and must never be reported as a parser-v3 PASS.",
+    "Development-set agreement must not be read as an estimate of held-out accuracy; parser v3 was developed against this material.",
+    "The retired parser-v2 holdout was not scored here and must never be scored for a parser-v3 formal result.",
+    "The parser-v2 locked FAIL stands as the only formal parser result; parser v3 does not overturn or amend it."
+  ],
+  "next_gate": "One-shot locked evaluation of parser v3 against the new independent locked holdout being constructed separately, scored once under the frozen acceptance gates with predictions sealed before any label is read."
+}

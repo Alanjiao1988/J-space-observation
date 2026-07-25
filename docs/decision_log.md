@@ -1384,3 +1384,45 @@ Consequence:
   remaining evaluator-validation work must be planned against a new set.
 - No hidden-reasoning, invisible-CoT, internal-workspace, or J-space claim
   follows from this result.
+
+## 2026-07-25 — adopt five parser-v3 rule changes and leave two retired cases unaddressed
+
+Decision:
+
+- Adopt five extraction rule changes in the new standalone parser v3, each
+  stated as a general principle rather than a case patch, and each guarded by
+  independent fixtures:
+  - **C1** boxed payloads are decoration-tolerant.
+  - **C2** decoration is transparent for markers and equations.
+  - **C3** the `is` separator generalizes to all marker labels.
+  - **C4** the unit-word list is removed from continuation invalidation.
+  - **C5** the placeholder test runs before the operator test.
+- Deliberately change nothing in response to the retired mismatch cases
+  `PV2-406d4d4c3ba1a1b8c286` and `PV2-78396f528ee910ba7a09`.
+- Keep parser v2 and the legacy parser frozen and byte-identical.
+
+Reason:
+
+- The two failed gates are both span- and recall-shaped, and every adopted
+  change is derivable from a stated principle that also fixes independently
+  authored fixtures, so the changes are not case-specific overfitting to the
+  two known offenders.
+- For `406d…` and `7839…` no locally derivable fix existed: every candidate
+  rule contradicted at least one row of the frozen 60-case development set.
+  Contradicting frozen development evidence to close two cases whose text was
+  not read would have been a worse trade than leaving them open.
+- Freezing v2 and legacy keeps the retired FAIL reproducible and keeps any
+  future v2-vs-v3 comparison honest.
+
+Consequence:
+
+- All five changes are recall-increasing. Parser v3 therefore has an
+  unprobed precision blind spot, and the one deducibly precision-shaped
+  retired failure (`PV2-406d4d4c3ba1a1b8c286`) remains unaddressed. If
+  over-extraction dominates a future holdout, v3 could score worse than v2.
+  This is the primary caveat on the whole track.
+- Parser v3 is not validated and no formal result may be claimed for it. A
+  formal result requires a newly constructed, independently authored locked
+  holdout and a separately authorized one-shot evaluation.
+- The 65 adversarial fixtures share authorship with parser v3 and therefore
+  cannot serve as the independent oracle.

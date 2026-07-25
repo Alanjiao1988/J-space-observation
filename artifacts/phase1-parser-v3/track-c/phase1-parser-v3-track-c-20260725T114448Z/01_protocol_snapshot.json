@@ -1,0 +1,56 @@
+{
+  "schema_version": "jspace-protocol-snapshot/v1",
+  "status": "complete",
+  "research_question": "Can the two failed parser-v2 locked gates be attributed to specific, generally justifiable extraction rules, and can a standalone parser v3 repair them on public development material without weakening any fail-closed guard?",
+  "primary_metric": "exact typed-decision agreement with the declared oracle",
+  "secondary_metrics": [
+    "boxed_final_miss error count on S01+S02",
+    "wrong_span error count on expected-present rows",
+    "last_number_trap error count on S06",
+    "material correctness error count",
+    "field-exact extraction agreement (all ten extraction fields)",
+    "parser-v2 typed-decision agreement on the same material"
+  ],
+  "decision_rules": {
+    "development_no_regression_vs_parser_v2": "parser v3 must reproduce parser v2 field-exactly on all 60 frozen public development rows",
+    "adversarial_typed_decision_agreement": "at least 38/40 (0.95) typed-decision agreement on the new public adversarial development set",
+    "boxed_final_miss": "0 errors on pooled S01+S02 development rows",
+    "wrong_span": "0 errors on pooled expected-present development rows",
+    "reference_blind_extraction": "the extraction entry point must accept output text only, structurally, verified by signature and AST inspection",
+    "frozen_sources_byte_identical": "git diff --stat against the frozen commit must be empty for eval_parsing.py and eval_parsing_v2.py",
+    "status_logic": "COMPLETE when every applicable development gate passes; FAIL when any applicable development gate fails; these gates are development gates and can never yield a validated PASS"
+  },
+  "sample_size": {
+    "public_development_60": 60,
+    "adversarial_development_65": 65,
+    "development_pooled": 125,
+    "retired_holdout_mismatch_4": 4
+  },
+  "seeds": {
+    "status": "not_applicable",
+    "reason": "the parser is fully deterministic; no sampling, shuffling, or stochastic component exists in this track"
+  },
+  "conditions": [
+    "parser_v3 on public_development_60",
+    "parser_v2 on public_development_60 (reference)",
+    "parser_v3 on adversarial_development_65",
+    "parser_v2 on adversarial_development_65 (reference)"
+  ],
+  "inclusion_rules": [
+    "every row of the frozen 60-case public development set",
+    "every row of the new public adversarial development set"
+  ],
+  "exclusion_rules": [
+    "the retired 120-case parser-v2 holdout is excluded from every metric; it may be read for diagnosis only and is never scored here",
+    "no private locked material is read by this track"
+  ],
+  "stopping_rules": [
+    "all declared development gates evaluated exactly once per run",
+    "no metric-driven iteration after the gates are computed"
+  ],
+  "retry_rules": [
+    "the runner is deterministic and idempotent; re-running produces identical metrics for identical inputs",
+    "no failed-gate retry loop exists, because these are development gates and carry no one-shot budget"
+  ],
+  "scientific_claim_boundary": "Results here describe parser v3 on material that was available during its development. They are development evidence only. They do not establish generalization, they are not a validation result, and they must never be reported as a parser-v3 PASS. A formal parser-v3 result requires a new independent locked holdout built separately, scored once."
+}

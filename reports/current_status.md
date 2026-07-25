@@ -41,6 +41,29 @@ no new behavioral calibration was run.
   was downloaded, loaded, or run, and no GPU was used. No hidden-reasoning,
   invisible-CoT, internal-workspace, or J-space claim follows.
 
+## Parser v3 development status (2026-07-25) — NOT VALIDATED
+
+- Parser v3 exists as a standalone reference-blind extractor and passed every
+  preregistered **development** gate: 60/60 non-regression on the frozen
+  60-case public development set, 65/65 typed agreement on 65 new adversarial
+  development fixtures, and zero `boxed_final_miss`, `wrong_span`,
+  `last_number_trap`, and material-correctness errors across the 125 pooled
+  development rows.
+- **Parser v3 is not validated.** It has no formal result, no locked-holdout
+  evidence, and no acceptance decision. Development-set performance is not
+  evaluator validation, and no parser-v3 locked evaluation has been authorized
+  or run.
+- The 65 adversarial fixtures were authored by the same agent that wrote parser
+  v3, so they are a development signal and not an independent oracle.
+- Every adopted rule change is recall-increasing, so v3 carries an unprobed
+  precision risk. The one deducibly precision-shaped retired failure remains
+  unaddressed.
+- Parser v2 and the legacy parser remain byte-identical to `bc6d7b7`; the
+  retired FAIL is unaffected.
+- A formal parser-v3 result would require a newly constructed, independently
+  authored locked holdout and a separately authorized one-shot evaluation.
+- Detail: `reports/phase1_parser_v3_development.md`.
+
 ## Historical prerelease snapshot — superseded (2026-07-23)
 
 > The content below describes the historical state *before* the formal locked

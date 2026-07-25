@@ -2718,3 +2718,55 @@ Post-result handling (same day):
 - Retained unchanged: the immutable claims, DNS TXT records, the three ACA
   Jobs, seals, decisions, coordination evidence, build and runtime records,
   and the orchestrator VM.
+
+## 2026-07-25 — Phase 1.2C parser-v3 failure-directed development (Track C)
+
+Action:
+
+- Diagnosed the two failed parser-v2 gates and built parser v3 as a standalone
+  reference-blind extractor, then evaluated it against preregistered
+  development gates. No locked holdout was read, opened, or scored.
+
+Azure resources:
+
+- None. This track ran entirely on local CPU. No Azure CLI command, no image,
+  no job, no Blob access.
+
+Model and parameters:
+
+- No model. `model_id`, `model_revision`, `image_digest`, and `hardware` are
+  recorded `not_applicable` throughout the artifact pack.
+
+Runtime:
+
+- Run `phase1-parser-v3-track-c-20260725T114448Z`, local, deterministic.
+
+Results:
+
+- Status **COMPLETE as development**. Parser v3 is **not validated**; it has no
+  formal result and no locked-holdout evidence of any kind.
+- Development gates: 60/60 field-exact non-regression on the frozen 60-case
+  public development set, 60/60 typed agreement, 65/65 typed agreement on the
+  new 65-case adversarial development fixtures, `boxed_final_miss` 0/29,
+  `wrong_span` 0/88, `last_number_trap` 0/9, material-correctness errors 0/125.
+- Reference-blind extraction is structurally enforced and verified by AST plus
+  `co_names`/`co_varnames` inspection, so v3 cannot read a registered answer
+  while extracting.
+- The frozen parsers are byte-identical to `bc6d7b7`: `git diff` on
+  `src/jspace_observation/eval_parsing.py` and
+  `src/jspace_observation/eval_parsing_v2.py` returned empty output, and the
+  v3 suite independently pins their LF-normalized SHA-256 values.
+- The gate covering the four retired mismatch cases is recorded
+  **NOT_APPLICABLE**: their case text is in the retired holdout and was not
+  read, so only structural explanations were possible.
+- Parser v2 scores 50/65 on the same adversarial fixtures. All 15 differences
+  are v2 fail-closed recall losses that v3 recovers; there is no case where v2
+  is correct and v3 is not.
+- Tests: `python -m pytest tests/test_eval_parsing_v3.py tests/test_eval_parsing_v2.py tests/test_eval_parsing.py -q`
+  → 144 passed (v3 87, v2 36, legacy 21).
+- Report: `reports/phase1_parser_v3_development.md`.
+- Boundary: the 65 adversarial fixtures were authored by the same agent that
+  wrote parser v3, so 65/65 is a development signal and not an independent
+  oracle. No hidden-reasoning, invisible-CoT, internal-workspace, or J-space
+  claim follows from any of it.
+

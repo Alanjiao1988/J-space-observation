@@ -1,0 +1,66 @@
+{
+  "schema_version": "jspace-artifact-manifest/v1",
+  "run_id": "phase1-parser-v3-track-c-20260725T114448Z",
+  "phase": "phase1.2C",
+  "track": "track-c",
+  "status": "COMPLETE",
+  "generated_at_utc": "2026-07-25T11:44:48Z",
+  "code_commit": "bc6d7b70c7794055a33401b8b7b0aa7c027f2e3f",
+  "files": [
+    {
+      "name": "00_stage_manifest.json",
+      "sha256": "f51675f542b62397ff888ef2c9060e55ed358ca2452d8ea47b8bb50c1819c7a8",
+      "bytes": 4039,
+      "status": "complete"
+    },
+    {
+      "name": "01_protocol_snapshot.json",
+      "sha256": "f434176f64645a851828c17bf78712f9d7c59c9bc140107d8bb806d4e1dab622",
+      "bytes": 3394,
+      "status": "complete"
+    },
+    {
+      "name": "02_records.jsonl",
+      "sha256": "c43909fb97ce25be5e113570b43726f9cb06a76beeccd99917233ef21adbc7c4",
+      "bytes": 132688,
+      "status": "complete"
+    },
+    {
+      "name": "03_metrics.csv",
+      "sha256": "887ec98fb2f1f3255166cedcbff032618447c98c4ba4c2395ab076465773462a",
+      "bytes": 4309,
+      "status": "complete"
+    },
+    {
+      "name": "04_decision.json",
+      "sha256": "9d2f93e65339e21984e4401930482484bfcffc682902d10384fc21f4ceea9ea4",
+      "bytes": 3347,
+      "status": "complete"
+    },
+    {
+      "name": "05_summary.md",
+      "sha256": "48db2718f32ab6e520cfae1675e357c5c13ae1c0567dffbce340a641179811e1",
+      "bytes": 3761,
+      "status": "complete"
+    },
+    {
+      "name": "06_paper_table.csv",
+      "sha256": "1ff67e7503f303776f1304c62241e5d00d4f5c89957b95e0915484f75589abd5",
+      "bytes": 355,
+      "status": "complete"
+    },
+    {
+      "name": "07_figure_data.csv",
+      "sha256": "cb9c96e26f11f3854ef0c0f9f90619ad8f867ba45e7351c36fce67027e08b77b",
+      "bytes": 1992,
+      "status": "complete"
+    },
+    {
+      "name": "08_deviations.json",
+      "sha256": "da9109fe2de07dd5a8e8284c43871737add961ade954ed0203bed9600a15a2c9",
+      "bytes": 750,
+      "status": "complete"
+    }
+  ],
+  "manifest_written_last": true
+}
