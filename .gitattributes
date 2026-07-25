@@ -28,3 +28,4 @@ docs/phase05_jlens_saturation_run.md text eol=lf
 scripts/phase05_jlens_saturation.py text eol=lf
 src/jspace_observation/phase05_jlens_saturation.py text eol=lf
 tests/test_phase05_jlens_saturation.py text eol=lf
+infra/azure/scripts/11_run_phase05b_jlens_saturation.sh text eol=lf
