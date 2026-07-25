@@ -1724,7 +1724,7 @@ print(token)
         exit 1
     fi
     unset refresh_token
-    if ! printf 'header = "Authorization: ******"\n' "$access_token" \
+    if ! printf 'header = "Authorization: %s %s"\n' "Bearer" "$access_token" \
         | curl --disable --config - --fail --silent --show-error \
             --proto '=https' --proto-redir '=https' --location --max-redirs 3 \
             --retry 0 \
@@ -1751,7 +1751,7 @@ if not isinstance(digest, str) or not re.fullmatch(
 print(digest)
 PY
 )" || return 1
-    if ! printf 'header = "Authorization: ******"\n' "$access_token" \
+    if ! printf 'header = "Authorization: %s %s"\n' "Bearer" "$access_token" \
         | curl --disable --config - --fail --silent --show-error \
             --proto '=https' --proto-redir '=https' --location --max-redirs 3 \
             --retry 0 \

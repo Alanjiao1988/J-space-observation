@@ -7541,8 +7541,13 @@ def test_build_and_launcher_static_hardening_contract():
     )
     assert 'user = "%s:%s"' not in launcher_oci_helper
     assert launcher_oci_helper.count(
-        'header = "Authorization: ******"'
+        'header = "Authorization: %s %s"'
     ) == 2
+    assert launcher_oci_helper.count('"Bearer" "$access_token"') == 2
+    assert (
+        'header = "Authorization: ' + ("*" * 6) + '"'
+        not in launcher_oci_helper
+    )
     assert 'echo "$access_token"' not in launcher_oci_helper
     assert 'echo "$refresh_token"' not in launcher_oci_helper
     assert launch.index("GIT_NO_REPLACE_OBJECTS=1") < launch.index(
