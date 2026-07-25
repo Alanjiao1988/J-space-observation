@@ -265,3 +265,100 @@ independently by `scripts/crosscheck_parser_v3_locked_set.py`. Protocol hash
 requires the outstanding overlap check against the retired parser-v2 locked inputs
 and a write grant that was not created. Parser v3 is not validated and no formal
 parser-v3 result exists.
+
+---
+
+## Phase 0.5C — J-lens disjoint-fit replication (executed 2026-07-25)
+
+Run `20260725T174743Z`, one Tesla T4, single Container Apps job execution
+`job-jspace-p05c-jlens-disjoint-nfrnhcr`, 17:49:26Z to 18:13:07Z UTC (23m41s).
+GPU access was serialised behind the Phase 1.0C calibration run.
+
+Provenance: code commit `39dc6e09d0ccc2431bd3c695666033b0eeeb302d`; image digest
+`sha256:1fdf406fa34d76f228bd8a3570e9564c0a63baadda8e5b3e58f9c0e1b9ad3a37`;
+protocol hash `49059665f6c0c720beb712f99941f6cbf3a7a0207bac3e94cc4ac73f5af11980`;
+official lens source `anthropics/jacobian-lens@581d398613e5602a5af361e1c34d3a92ea82ba8e`;
+target `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B@ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562`
+in float16 with float32 lens serialization. Environment: Python 3.11.14,
+Linux-6.6.139.1-1.azl3-x86_64-with-glibc2.36, torch 2.12.0, transformers 5.9.0,
+jlens 0.1.0, safetensors 0.7.0, Tesla T4 with 16,704,405,504 B device memory.
+A new image was required because the previous J-lens image contained neither the
+Phase 0.5C modules nor the amended corpus.
+
+Corpus amendment. Phase 0.5B froze a 50-record corpus of 25 fit, 15 reserve and
+10 held-out prompts, so no disjoint 25-prompt sample existed. Ten new
+`role=reserve` prompts, `sat-reserve-016` through `sat-reserve-025`, were
+appended under the identical registered generation constraints, producing corpus
+revision `r2-60`: 60 records, 16,087 B, SHA-256
+`dd5d97498324e8b5153c106f0edbc4d962d47771db7dfa2093b48fc36f5962fa`, roles 25 fit
+/ 25 reserve / 10 held-out. The amendment is append-only and provably so:
+`sha256(bytes[:13452])` is still
+`41e104efec1cd0e0eebae504cd888e60c4e81f6f8c7774d75c895eac98862b4b`, so every
+prompt Phase 0.5B fitted or applied is byte-identical and in unchanged order and
+every Phase 0.5B number remains reproducible. `CORPUS_REVISIONS` in
+`src/jspace_observation/phase05_jlens_saturation.py` records the relationship and
+rejects the corpus if the prefix bytes ever change.
+`scripts/verify_jlens_corpus_amendment.py` re-checks the amendment
+deterministically: 84 checks, 0 failed, including zero exact and zero normalised
+text overlap against 22,460 candidate strings from four other corpora.
+
+Design as executed, unchanged from registration. 25A = `sat-fit-001` …
+`sat-fit-025`, the merged 25-prompt lens produced by Phase 0.5B, **loaded and
+never re-fitted**: the job read
+`jspace-results/phase05-jlens-saturation/20260725T122016Z/attempts/primary/01-lens-binaries/fit_b_merged_lens.pt`
+with its own user-assigned managed identity over the private endpoint and
+verified SHA-256
+`cb17a634e46e4b219b6dc16b98662ba82e986abbcc154fd650e5a8a5b828949d` and 28,314,032
+bytes **before** deserialising it; the runner also recomputed the prompt-order
+SHA-256 of the 25 `role=fit` prompts and required it to equal the Phase 0.5B
+value. 25B = `sat-reserve-001` … `sat-reserve-025`, disjoint from 25A, fitted as
+shards `[10, 10, 5]` and merged with the official merge. 50M = the official
+25/25 weighted merge of 25A and 25B. Held-out apply set `sat-heldout-001` …
+`sat-heldout-010`, disjoint from both fits. Source layers `[6, 13, 20]`, target
+layer `27`, `max_seq_len=32`, `skip_first=16`, `dim_batch=1`.
+
+**No direct 50-prompt fit was performed.** It was omitted by registration because
+Phase 0.5B already measured the official merge against a direct subset fit on the
+same prompts: `shard_merge_vs_direct_max_abs` 2.384e-07 against a 1e-05 limit and
+relative Frobenius 4.862e-08 against 1e-06.
+
+Stages S0 through S7 all completed `success`, with durations 0.30, 36.72, 3.74,
+1289.91, 0.06, 0.38, 85.88 and 0.07 s. 25 records, 316 metric rows, 28 paper
+rows, 58 figure rows.
+
+Measurements. 25B fit 1289.78 s, 51.59 s/prompt, peak reserved 3,829,399,552 B,
+checkpoint 84,942,369 B, lens 28,313,996 B. Transport gates all passed:
+`matrix_finite_rate` 1.0 over 18 lens-layer matrices, `save_load_max_abs` 0.0,
+`apply_save_load_consistency` 1.0. Replicate criteria both failed:
+`25A_vs_25B_relative_frobenius` 0.4831 against a 0.10 limit and
+`25A_vs_25B_cosine` 0.8781 against a 0.99 limit. Merged comparisons:
+`25A_vs_50M_relative_frobenius` 0.2565246384392308 and
+`25B_vs_50M_relative_frobenius` 0.25652465564092874, agreeing to 1.7e-08;
+cosines 0.9673 and 0.9710. Held-out apply per pair: top-k overlap 0.7400
+(25A/25B), 0.8667 (25A/50M), 0.8533 (25B/50M); rank correlation 0.9555, 0.9884,
+0.9886. Per lens: 25A 0.8033 / 0.9719, 25B 0.7967 / 0.9721, 50M 0.8600 / 0.9885.
+Overall logit cosine 0.9858, rank correlation 0.9775, top-k overlap 0.8200,
+secondary top-k overlap 0.8136. Preregistered merged improvement met on both
+statistics: top-k +0.1200 against a 0.02 margin, rank correlation +0.0330 against
+a 0.005 margin.
+
+Outcome: status COMPLETE, decision **REPLICATE_IMPROVING**. Zero runtime
+deviations from the Phase 0.5C protocol.
+
+Note on serialisation bytes. The S5 round trip re-saved all three lenses at
+28,313,996 B, 36 B smaller than the 28,314,032 B Phase 0.5B object, and with
+different file digests. This is serialisation container framing under torch
+2.12.0 versus the Phase 0.5B environment, not a change of content:
+`save_load_max_abs` is exactly 0.0, so the tensor values round-trip bit-exactly,
+and 25A's source object was digest-verified before load.
+
+Boundary: engineering numerics only. Both registered replicate criteria failed;
+two independent same-size fits differ by 0.4831 relative Frobenius and 0.8781
+cosine. `REPLICATE_IMPROVING` states that numerical transport worked and that the
+weighted merge lands between its two inputs. Because a weighted mean must lie
+between its inputs, the merged improvement is close to arithmetically forced and
+is not independent evidence of convergence (`L-18`). Top-k overlap and rank
+correlation are technical stability statistics for fitted linear operators and
+are never semantic evidence. Nothing here supports any claim about a workspace,
+hidden reasoning, an internal chain-of-thought, J-space, semantic convergence, or
+any lens being scientifically usable.

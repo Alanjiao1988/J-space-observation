@@ -1539,3 +1539,99 @@ Consequence:
   run against it and no formal parser-v3 result may be claimed.
 - The temporary read grant created for the attempt was deleted and its removal
   verified; no privilege was left standing to make a later attempt easier.
+
+## 2026-07-25 — Seal the parser-v3-v1 holdout, and disclose that ABAC enforced nothing
+
+Decision:
+
+- The registered pre-seal cross-check against the retired parser-v2 locked inputs
+  returned zero collisions on all three registered fingerprints, so the
+  `parser-v3-v1` holdout was sealed to immutable storage at
+  `phase1-evaluator-validation/parser-v3-v1/20260725T160340Z/`, 12 objects,
+  `set_manifest.json` last.
+- The teardown result that did **not** meet its expectation is recorded as
+  measured, not as met. Subscription-wide Blob roles for the sealing identity are
+  `1`, not `0`.
+
+Rationale:
+
+- The gate was defined in advance and was binary: seal if and only if exact,
+  normalised and numeric-normalised collision counts are all zero. They were all
+  zero, against the corpus with the highest prior probability of overlap, so the
+  gate opened. Had any been non-zero the set would not have been sealed and no
+  case would have been swapped this round.
+- The alternative to disclosing the standing role was to report the specified
+  expectation as met. That would have been false, and it would have propagated a
+  security claim the project cannot support. The seal's integrity rests on
+  digests and round-trip verification, which are unaffected; only the isolation
+  claim is affected, and only the isolation claim has been weakened in the
+  ledgers.
+
+Consequence:
+
+- `EV-0007` moves from `CONSTRUCTED_NOT_SEALED` to `SEALED`. `CL-06` records
+  holdout sealed = yes, and its status stays **unsupported**, because the
+  parser-v3 one-shot locked evaluation has not been run and was explicitly out of
+  scope this round.
+- `L-13` is rewritten from "not sealed" to the sealed reality with its residual
+  caveats. `L-17` is added for the RBAC finding.
+- The next gate is a separate, later round: a one-shot parser-v3 evaluation
+  against the sealed holdout, run once, with predictions and scores produced
+  under their own protocol. Nothing in this round licenses any parser-v3 accuracy
+  claim.
+
+## 2026-07-25 — Amend the J-lens fit corpus and accept REPLICATE_IMPROVING as the Phase 0.5C result
+
+Decision:
+
+- The Phase 0.5B fit corpus was amended from 50 to 60 records by appending ten
+  `role=reserve` prompts, because the disjoint 25-prompt sample the round
+  required did not exist and could not be produced any other way without
+  invalidating Phase 0.5B. The amendment was made append-only, registered in the
+  Phase 0.5C protocol before the run, and machine-verified.
+- The Phase 0.5C outcome is accepted as measured: status COMPLETE, decision
+  **REPLICATE_IMPROVING**, with **both** replicate criteria recorded as FAILED.
+- No direct 50-prompt fit was performed, and none will be commissioned on the
+  strength of this result.
+
+Rationale:
+
+- Amending the corpus was preferred over the alternatives. Re-partitioning the
+  existing 50 records would have moved prompts out of the Phase 0.5B fit set and
+  broken the reproducibility of an already-recorded run. Reusing the 15 reserve
+  prompts alone would have compared n=25 against n=15, which answers a different
+  question. Appending is the only option that leaves every prior byte and every
+  prior number intact, and the prefix hash proves it did.
+- The decision rules were frozen before the run, including the exact numeric
+  definition of "the merge improves" (`mean(pair(25A,50M), pair(25B,50M)) -
+  pair(25A,25B)` clearing 0.02 for top-k overlap and 0.005 for rank correlation
+  simultaneously). The measured values cleared both margins and the replicate
+  thresholds failed, so `REPLICATE_IMPROVING` is the outcome the pre-registration
+  compels. It is being recorded, not celebrated.
+- The failed criteria are not softened. Two same-size lenses fitted on prompts
+  with nothing in common differ by 0.4831 relative Frobenius, which is the same
+  order as the 0.4170 that Phase 0.5B measured between a 10-prompt fit and the
+  25-prompt fit containing it. Sampling variability alone is therefore large
+  enough to account for the earlier movement, so the nested result cannot be read
+  as approaching saturation.
+- The merged improvement is not treated as convergence evidence. The merge is an
+  exact weighted mean of its two inputs and its distances to them agree to
+  1.7e-08, which is the arithmetic signature of a midpoint rather than a finding.
+
+Consequence:
+
+- `EV-0009` is added with `claim_strength = engineering_only`. `CL-02` stays
+  **unsupported**: independent replication has now been measured and not
+  achieved, and no validity criterion exists or is designed.
+- `L-15` is rewritten from "the comparison is nested" to the disjoint result and
+  its weakening effect on any saturation reading. `L-18` is added for the
+  arithmetic near-inevitability of the merged improvement. `L-19` is added for
+  the provenance asymmetry between the two fit samples.
+- The corpus amendment is recorded as round-level deviation `D14`. The executed
+  pack's `08_deviations.json` stays empty, because zero runtime deviations from
+  the Phase 0.5C protocol occurred and the pack is an immutable record of the
+  run, not of the round.
+- Next gate: main-agent review only. No behavioural, semantic or scientific gate
+  is opened. A variance estimate would need many independent same-size fits and
+  is not budgeted; a validity criterion remains undesigned and is the actual
+  blocker for `CL-02`.

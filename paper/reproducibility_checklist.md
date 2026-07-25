@@ -52,12 +52,13 @@ Status vocabulary: `yes`, `partial`, `no`, `not_applicable`.
 | Software versions are recorded | yes | Python, torch, transformers, huggingface-hub, numpy, CUDA and cuDNN versions in `paper/methods_ledger.md`. |
 | The committed tree alone reproduces the run environment | no | See limitation L-12: two infrastructure-only workarounds were applied on the orchestrator host outside the repository. |
 | Storage access uses managed identity only | yes | Private endpoint, no key, no SAS, public network access disabled. |
-| Temporary privilege grants are removed and the removal is verified | yes | The one temporary `Storage Blob Data Reader` grant was removed and its absence confirmed at both container and subscription scope. |
+| Temporary privilege grants are removed and the removal is verified | yes | Phase 0.5B used one temporary `Storage Blob Data Reader` grant, removed and confirmed absent at container and subscription scope. Phase 0.5C used one temporary ABAC grant scoped by `blobs:path` to a single blob for the launcher preflight, deleted afterwards, with container-scope assignments measured as 0 and the control identity holding 0 blob-data roles. Note the standing account-scope assignment described in L-17, which was not removed. |
 
 ## Replication
 
 | Item | Status | Notes |
 | --- | --- | --- |
-| Runs are replicated | no | Every execution is a single run under one-shot discipline. See limitation L-10. |
+| Runs are replicated | no | Every execution is a single run under one-shot discipline. See limitation L-10. Phase 0.5C fitted a second same-size J-lens on a disjoint sample, which measures independent-fit disagreement once; it is not a replication of a run and yields one difference, not a distribution. |
+| An independent same-size refit was performed | yes, once | Phase 0.5C run `20260725T174743Z` fitted 25B on prompts disjoint from 25A. The two lenses disagree by 0.4831 relative Frobenius and 0.8781 cosine, both outside their registered limits. |
 | Results are replicated across hardware | no | Single T4 configuration only. |
 | An independent recomputation was performed | yes | The parser-v2 result was independently recomputed from the sealed ledger and the frozen gate contract; 38 of 38 checks agreed. |

@@ -2927,3 +2927,155 @@ Results:
   the same prefix-conditioned read grant, stage
   `scripts/build_parser_v3_validation_set.py` and the inputs manifest, run the
   fingerprint comparison, then remove the grant again and record the result.
+
+## 2026-07-25 — Parser-v3-v1 pre-seal cross-check PASSED and the holdout is SEALED
+
+- Objective: execute the one outstanding registered pre-seal check, then seal the
+  120-case `parser-v3-v1` holdout if and only if that check passed.
+- Transport: the check did **not** run on the orchestrator VM. It ran as a
+  short-lived Azure Container Apps CPU job, `job-jspace-parser-v3-seal`, in the
+  VNet-integrated environment `cae-jspace-observation-sea-vnet2` on the
+  `Consumption` profile, 2 CPU / 4Gi, no GPU. Storage
+  `stjspacefiles0709085305` has public network access `Disabled`, so managed
+  identity inside the VNet was the only reachable path. No account key and no SAS
+  were created, referenced or logged. The VM was separately repaired during this
+  round, but it was not used for this work.
+- **Cross-check 1 result: PASS.** New set 120 records, retired set 120 records,
+  exact collisions 0, normalised collisions 0, numeric-normalised collisions 0.
+  Decision `PROCEED_TO_SEAL`. The retired object hashed to its registered digest
+  `2d60483e7f7a2ce1883acca2dcf9a6771f84b54d596ab2e02ed4a39d937c4e3e`
+  (26651 bytes), so provenance matched.
+- Isolation actually exercised: of the three objects under the retired
+  locked-inputs leaf, only `locked_inputs.jsonl` was read.
+  `.locked_inputs_reservation.json` and `locked_inputs_manifest.json` were listed
+  and not read. The report records `label_material_touched: false`,
+  `score_material_touched: false`, `rescoring_performed: false`. No retired input
+  text left the container; only counts and one-way digests did.
+- Guards that had to pass before any comparison was allowed: the registered
+  fingerprint functions `fingerprints`, `normalize_text` and
+  `numeric_normalized_text` were imported from
+  `scripts/build_parser_v3_validation_set.py` and reproduced 5 pinned
+  known-answer vectors, and reproduced all 120 records of the committed
+  `evaluator_sets/parser_v3_v1/manifests/inputs_manifest.json`.
+- **Seal: 12 objects at `phase1-evaluator-validation/parser-v3-v1/20260725T160340Z/`.**
+  `overwrite=false` on every write; size, SHA-256 and ETag round-trip verified for
+  all 12; exact membership 12 of 12; `manifests/set_manifest.json` written last at
+  order 12. The cross-check report and the seal record are in the sibling prefix
+  `20260725T160340Z-runlog/`, which keeps the sealed parent at exactly 12 objects.
+- Membership was verified independently of the job: a separate listing under a
+  separate identity returned exactly 12 objects in the parent, with byte counts
+  matching the staged payload one for one, and 2 objects in the sibling runlog.
+- Executions: `job-jspace-parser-v3-seal-57w51qd` (crosscheck, Succeeded),
+  `job-jspace-parser-v3-seal-0fz4tkj` (seal attempt 1, Failed by design),
+  `job-jspace-parser-v3-seal-61zgric` (seal, Succeeded). Image digest
+  `sha256:f13220aed82c320150a63868e4519ec8d3d4dae7331ae4d421257f191c7d2388` for
+  both tags; base `python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d`.
+- **Deviation: the first seal attempt aborted, and that was correct.** Under
+  timestamp `20260725T155224Z` the recommended dry pass had already written
+  `crosscheck_report.json`; seal mode re-runs the cross-check and re-writes that
+  report, so the upload hit its own `overwrite=false` guard with
+  `ResourceExistsError` and the job failed closed with
+  `state=BLOCKED_INFRASTRUCTURE`. No seal object was written under that timestamp
+  and nothing was overwritten. The timestamp was rotated to `20260725T160340Z`,
+  the stale write grant was deleted, a fresh grant was pinned to the new
+  timestamp, and mode `seal` ran exactly once.
+- **Deviation: no rebuild for the rotation.** The existing image was imported to
+  the new tag, so the bytes that sealed the set are provably the bytes that were
+  reviewed and that ran the passing cross-check.
+- **Deviation, and the one that matters: the ABAC grants enforced nothing.**
+  Teardown measured subscription-wide Blob roles for the sealing identity
+  `id-jspace-aca-acrpull-sea` (principal
+  `78d4348b-57eb-4fb9-aaa7-99148b303292`) as **1, not 0**: an unconditioned
+  `Storage Blob Data Contributor` at account scope on
+  `stjspacefiles0709085305`, created 2026-07-09, sixteen days before this round.
+  Because that assignment was already unconditioned and account-scoped, the two
+  temporary prefix-conditioned grants created for this run did not narrow the
+  identity's effective permissions at all. The isolation of the retired parser-v2
+  labels, scores and scoring ledger therefore rested on the payload's code path,
+  on the Track D tests that pin that code path, and on the report's own
+  attestations — not on RBAC. The standing assignment was **not** removed: it
+  pre-dates this round and other Container Apps jobs depend on it to write
+  results. This is recorded as deviation D13 and as limitation L-17.
+- Teardown, with actual outputs: both temporary grants deleted; container-scope
+  assignments for any principal `0`; control identity
+  `1ec93a23-1126-4058-a537-4f1016b8c325` blob-data roles `0`; sealing identity
+  blob-data roles `1` (the standing assignment above); job reset to base image
+  `j-space-observation@sha256:43af06291f6196d5426fe5e014196c86d3d00aae978470d369a9c1c2bd3dfeac`
+  with command `/bin/true`; job secrets `0` and secret references `0`; storage
+  `publicNetworkAccess` still `Disabled`; the single-use repository
+  `j-space-observation-pv3seal` deleted from ACR; staging context removed.
+- Artifact pack:
+  `artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/`,
+  final state `SEALED`. It is built from the two durable Blob objects rather than
+  from the in-container summary, which was ephemeral and is gone; the generator
+  re-verifies the seal record's pinned report digest, the verdict and the three
+  collision counts across both objects, and every sealed object's digest, byte
+  count and order against the registered staging pins.
+- Boundary, unchanged: **sealing validates nothing.** No parser-v3 evaluation was
+  run, no parser-v3 prediction exists, nothing was scored, and no parser was
+  imported. The sealed labels are a two-reviewer-plus-arbiter LLM operational
+  consensus, not human ground truth. Isolation between holdout construction and
+  parser-v3 development remains procedural, not security-enforced, and this round
+  produced a concrete instance of that.
+
+## 2026-07-25 — Phase 0.5C J-lens disjoint-fit replication (Track A1), executed on GPU
+
+- Question, registered before the run and stated as engineering only: how far do
+  two independently fitted same-size (n=25) J-lenses on disjoint prompt samples
+  differ numerically, and does their official weighted merge behave numerically
+  like a well-formed lens on held-out apply.
+- **D14 — the fit corpus was amended to make the question answerable.** The
+  round brief assumed a disjoint 25-prompt fit sample already existed inside the
+  frozen Phase 0.5B corpus. It did not: that corpus is 25 fit, 15 reserve and 10
+  held-out, and all 25 fit prompts were consumed by Phase 0.5B. Ten new
+  `role=reserve` prompts `sat-reserve-016` … `sat-reserve-025` were appended
+  under the identical registered generation constraints, giving corpus revision
+  `r2-60`, 60 records, 16,087 B, SHA-256 `dd5d9749…62fa`. The amendment is
+  append-only and proven so: `sha256(bytes[:13452])` is still `41e104ef…62b4b`,
+  so every Phase 0.5B fit and held-out prompt is byte-identical and in unchanged
+  order, and every Phase 0.5B number remains reproducible.
+  `scripts/verify_jlens_corpus_amendment.py` re-checks it: 84 checks, 0 failed,
+  with 0 exact and 0 normalised overlaps against 22,460 strings from four other
+  corpora. This is recorded as a **round-level** change, not a runtime deviation:
+  it was registered in the Phase 0.5C protocol before the run, so the executed
+  pack's `08_deviations.json` is legitimately empty. See L-19 for the residual
+  provenance asymmetry it creates.
+- Provenance: commit `39dc6e09d0ccc2431bd3c695666033b0eeeb302d`; image rebuilt as
+  required because the previous J-lens image contained neither the Phase 0.5C
+  modules nor the 60-record corpus — ACR run `cm10`, digest
+  `sha256:1fdf406fa34d76f228bd8a3570e9564c0a63baadda8e5b3e58f9c0e1b9ad3a37`;
+  protocol hash `49059665f6c0c720beb712f99941f6cbf3a7a0207bac3e94cc4ac73f5af11980`.
+- Execution: job `job-jspace-p05c-jlens-disjoint`, execution
+  `job-jspace-p05c-jlens-disjoint-nfrnhcr`, run `20260725T174743Z`, `gpu-t4`
+  Tesla T4, parallelism 1, completions 1, platform retry 0, managed identity
+  only, blob prefix `phase05c-jlens-disjoint/20260725T174743Z`. Succeeded.
+  17:49:26Z to 18:13:07Z, 23m41s. GPU serialised behind Track B1.
+- **25A was loaded, never re-fitted.** The job read
+  `phase05-jlens-saturation/20260725T122016Z/attempts/primary/01-lens-binaries/fit_b_merged_lens.pt`
+  with its own job identity over the private endpoint and verified SHA-256
+  `cb17a634…949d` and 28,314,032 B **before** deserialising. Launcher preflight
+  logged `[OK] 25A lens preflight: … (28314032 bytes)` under a single temporary
+  ABAC grant scoped by `blobs:path` to that one blob, deleted afterwards;
+  container-scope assignments 0, control identity blob-data roles 0.
+  `existing_lens_refitted: false`, `direct_50_fit_performed: false`.
+- Result: status COMPLETE, decision **REPLICATE_IMPROVING**. All eight stages
+  `success`. Transport gates passed (`matrix_finite_rate` 1.0,
+  `save_load_max_abs` 0.0, `apply_save_load_consistency` 1.0). **Both replicate
+  criteria failed**: `25A_vs_25B_relative_frobenius` 0.4831 against 0.10, and
+  `25A_vs_25B_cosine` 0.8781 against 0.99. Merged comparisons 0.2565246384 and
+  0.2565246556 relative Frobenius, cosines 0.9673 and 0.9710. Held-out apply
+  overall: logit cosine 0.9858, rank correlation 0.9775, top-k overlap 0.8200.
+  Preregistered merged improvement met on both statistics: top-k +0.1200 against
+  a 0.02 margin, rank correlation +0.0330 against a 0.005 margin. Cost: 1289.78 s
+  for 25B, 51.59 s/prompt, peak reserved 3,829,399,552 B.
+- Verification: `scripts/analyze_phase05c_jlens_disjoint.py --write` run twice
+  produced byte-identical output. Corpus verifier and the two targeted test
+  modules were run before commit: 84 checks / 0 failed, and 104 tests passed.
+- Boundary: **this is not good news about lens quality.** Both registered
+  replicate criteria failed. `REPLICATE_IMPROVING` means the numerical transport
+  worked, two independent fits disagree substantially, and the merge lands
+  between them — and a weighted mean must lie between its inputs, which is why
+  the two merged-versus-input distances agree to 1.7e-08. Recorded as L-18.
+  Nothing here licenses a claim about semantic validity, scientific usability, a
+  workspace, hidden reasoning, an internal chain-of-thought, J-space, or semantic
+  convergence.
