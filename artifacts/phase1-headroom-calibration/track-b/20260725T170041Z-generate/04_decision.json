@@ -1,0 +1,38 @@
+{
+  "arbitration_rows": 0,
+  "criteria_failed": [],
+  "criteria_not_applicable": [
+    {
+      "criterion": "headroom_cell_selection",
+      "reason": "semantic adjudication has not been ingested yet"
+    }
+  ],
+  "criteria_passed": [
+    "generation_plan_size_is_300",
+    "no_generation_errors"
+  ],
+  "decision": "Generations complete and deterministically triaged. Final calibration labels are withheld until the bounded semantic review pack is adjudicated, because parser v2 is not locked-validated and may not decide labels.",
+  "deviations": [],
+  "next_gate": "Main agent hands review_pack/ to a semantic reviewer agent, then reruns this module in finalize mode with the returned judgments.",
+  "prohibited_interpretations": [
+    "Any claim that this run observes, measures, or bounds hidden reasoning.",
+    "Any claim about an internal workspace, latent scratchpad, or invisible chain-of-thought.",
+    "Any claim about 'J-space' existence, structure, capacity, or dynamics.",
+    "Any RQ1 or RQ2 result claim; this is task calibration, not a formal result.",
+    "Any pass@k or sampling-capability claim; one sample per item/condition is drawn.",
+    "Any claim that parser v2 output is a validated correctness label.",
+    "Any generalisation to conditions deferred this round."
+  ],
+  "scientific_interpretation": "This run estimates observable answer accuracy of a single target model on a frozen task bank under two visible-reasoning prompt conditions, for the sole purpose of selecting task cells with measurable headroom. It licenses no claim about hidden reasoning, internal representations, or 'J-space', and it is not a formal RQ1/RQ2 result.",
+  "selected_headroom_cells": [],
+  "status": "INCONCLUSIVE",
+  "supplementary_review_required": [],
+  "track_b_decision": "INCONCLUSIVE",
+  "track_b_decision_vocabulary": [
+    "CONTROLS_ONLY",
+    "HEADROOM_CELLS_SELECTED",
+    "INCONCLUSIVE",
+    "NO_USABLE_CELLS"
+  ],
+  "unresolved_rows": 225
+}

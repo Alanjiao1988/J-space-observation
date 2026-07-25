@@ -1,0 +1,27 @@
+{
+  "conflict_matrix": {
+    "triage_correct": {
+      "reviewer_correct": 30,
+      "reviewer_incorrect": 0,
+      "reviewer_unresolved": 0
+    },
+    "triage_incorrect": {
+      "reviewer_correct": 0,
+      "reviewer_incorrect": 82,
+      "reviewer_unresolved": 2
+    },
+    "triage_undecided": {
+      "reviewer_correct": 51,
+      "reviewer_incorrect": 18,
+      "reviewer_unresolved": 42
+    }
+  },
+  "direct_contradictions_correct_vs_incorrect": 0,
+  "note": "The registered arbitration trigger fires only when the primary reviewer returns correct or incorrect and that label differs from a decisive deterministic screening verdict. It does not fire when the reviewer returns unresolved.",
+  "reviewed_rows": 225,
+  "rows_triggering_registered_arbitration": 0,
+  "triage_decisive_reviewer_unresolved": [
+    "p1hd-cf-medium-calibration-10::visible_cot::r0",
+    "p1hd-err-hard-calibration-10::r1_style_thinking::r0"
+  ]
+}

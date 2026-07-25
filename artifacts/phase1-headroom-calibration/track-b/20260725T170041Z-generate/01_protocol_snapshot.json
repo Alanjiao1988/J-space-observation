@@ -1,0 +1,151 @@
+{
+  "conditions": {
+    "deferred_this_round": [
+      "answer_prefill",
+      "empty_think_prefill",
+      "postprocessed",
+      "prompt_only_raw_strict",
+      "stopped"
+    ],
+    "enabled": [
+      "r1_style_thinking",
+      "visible_cot"
+    ],
+    "prompt_override_id": "prompt_override_v1",
+    "prompt_override_sha256": "f6ed495be20708b6d63dc1932f2928e4fa8ab50ac87f7372b018259d79da73bd",
+    "prompt_override_text": "\n\nFormat override for this run (supersedes any earlier instruction in this prompt that tells you not to explain or to answer only): you may reason first, then end your reply with a single final line in exactly this form:\nFinal answer: <answer>"
+  },
+  "decision_rules": [
+    "A cell qualifies only when n = 10.",
+    "A cell qualifies only when adjudicated semantic accuracy lies in [0.70, 0.90].",
+    "A cell qualifies only when at least 7 of 10 items are adjudicated correct.",
+    "A cell qualifies only when its truncation rate is <= 0.10.",
+    "A cell qualifies only when its no-answer rate is <= 0.10.",
+    "A cell qualifies only when it has zero unresolved semantic labels.",
+    "A cell qualifies only when every row flagged for review has an adjudicated label.",
+    "Accuracy > 0.90 makes a cell a sanity/control cell, deprioritized for ablation.",
+    "Accuracy < 0.70 excludes a cell from ablation but retains it as a difficulty boundary.",
+    "Parser v2 never decides a final label; it screens only."
+  ],
+  "evaluation": {
+    "adjudication_authority": "semantic_reviewer",
+    "arbiter_trigger": "primary_reviewer_conflicts_with_deterministic_result",
+    "entity_triage_engine": "entity_surface_match_v1",
+    "mandatory_review_categories": [
+      "parse_invalid",
+      "ambiguous_parse",
+      "truncated_output",
+      "no_answer",
+      "triage_disagrees_with_registered_answer",
+      "provisional_headroom_cell",
+      "deterministic_random_sample"
+    ],
+    "numeric_triage_engine": "parser_v2_read_only",
+    "parser_v2_locked_validation_status": "failed_2026-07-25:boxed_final_miss=1/20,wrong_span=2/80",
+    "parser_v2_version": "6cfaec62db37562930a4cb7d3a252bcbf80e1eaf748de98213863ff2566a7f86",
+    "review_sample_fraction": 0.1,
+    "triage_authority": "screening_only_not_locked"
+  },
+  "exclusion_rules": [
+    "The confirmation and mechanistic splits stay held out and are not run.",
+    "No item-level filtering, dropping, or re-sampling after outputs are seen.",
+    "No condition outside the two registered conditions is scored this round.",
+    "No pass@k aggregation; a single sample per item/condition is drawn."
+  ],
+  "generation_profile": {
+    "decoding_profile": "official_style",
+    "do_sample": true,
+    "max_new_tokens": 512,
+    "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    "model_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+    "samples_per_item_condition": 1,
+    "temperature": 0.6,
+    "top_p": 0.95
+  },
+  "inclusion_rules": [
+    "Only the frozen calibration split of data/phase1_task_headroom_candidates.jsonl.",
+    "Whole cells only: all 10 items of each family x band cell are run.",
+    "Only conditions visible_cot and r1_style_thinking this round.",
+    "Exactly one sample per item per condition."
+  ],
+  "primary_metric": "semantic_accuracy_per_cell",
+  "protocol_version": "phase1-headroom-calibration-protocol-v1",
+  "research_question": "Which frozen Phase 1 task cells (task family x difficulty band x visible-reasoning condition) leave the target model measurable observable-answer headroom, so that later ablation and activation-patching experiments are not run on saturated or impossible tasks?",
+  "retry_rules": [
+    "A unit may be retried only after an infrastructure fault, never after an unwanted result.",
+    "A retry reuses the identical frozen seed, prompt, and decoding profile.",
+    "Every retry is recorded in 08_deviations.json with its cause.",
+    "No prompt, seed, decoding, or scoring parameter may change during a retry."
+  ],
+  "sample_size": {
+    "conditions": 2,
+    "generations": 300,
+    "items": 150,
+    "items_per_cell": 10
+  },
+  "schema_version": "phase1-headroom-calibration-v1",
+  "scientific_claim_boundary": "This run estimates observable answer accuracy of a single target model on a frozen task bank under two visible-reasoning prompt conditions, for the sole purpose of selecting task cells with measurable headroom. It licenses no claim about hidden reasoning, internal representations, or 'J-space', and it is not a formal RQ1/RQ2 result.",
+  "secondary_metrics": [
+    "truncation_rate",
+    "no_answer_rate",
+    "triage_parse_valid_rate",
+    "unresolved_label_rate",
+    "review_coverage_rate",
+    "review_load_fraction",
+    "selected_headroom_cell_count"
+  ],
+  "seeds": {
+    "per_generation_seed_rule": "headroom_candidates.derive_run_seed(task_id, condition, 512, 'official_style', 0)",
+    "review_sample_domain": "jspace-headroom-calibration/review-sample/v1",
+    "run_base_seed": 20260725,
+    "selection_seed": 20260725
+  },
+  "selection": {
+    "item_count": 150,
+    "per_band": {
+      "easy": 50,
+      "hard": 50,
+      "medium": 50
+    },
+    "per_family": {
+      "arithmetic": 30,
+      "counterfactual_entity_replacement": 30,
+      "prompt_grounded_two_hop_factual": 30,
+      "synthetic_relation": 30,
+      "wrong_cot_error_detection": 30
+    },
+    "per_family_band": {
+      "arithmetic|easy": 10,
+      "arithmetic|hard": 10,
+      "arithmetic|medium": 10,
+      "counterfactual_entity_replacement|easy": 10,
+      "counterfactual_entity_replacement|hard": 10,
+      "counterfactual_entity_replacement|medium": 10,
+      "prompt_grounded_two_hop_factual|easy": 10,
+      "prompt_grounded_two_hop_factual|hard": 10,
+      "prompt_grounded_two_hop_factual|medium": 10,
+      "synthetic_relation|easy": 10,
+      "synthetic_relation|hard": 10,
+      "synthetic_relation|medium": 10,
+      "wrong_cot_error_detection|easy": 10,
+      "wrong_cot_error_detection|hard": 10,
+      "wrong_cot_error_detection|medium": 10
+    },
+    "split": "calibration",
+    "task_bank_sha256": "acf59ec44b7afb73c03392d2c9b7223eff7311e29e2261ff0d65b38a3a416407",
+    "task_ids_sha256": "d5120ea87f610ee3c990e00078ea48d7cbcadf3c3c363d95b65c649ed078e53a"
+  },
+  "stopping_rules": [
+    "Generation stops after exactly 300 units of work (150 items x 2 conditions).",
+    "Generation stops early only on an infrastructure fault; partial packs are marked BLOCKED.",
+    "No adaptive stopping on observed accuracy is permitted."
+  ],
+  "thresholds": {
+    "accuracy_band_high": 0.9,
+    "accuracy_band_low": 0.7,
+    "max_no_answer_rate": 0.1,
+    "max_truncation_rate": 0.1,
+    "min_correct_count": 7,
+    "required_cell_n": 10
+  }
+}

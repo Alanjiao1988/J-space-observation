@@ -1,0 +1,66 @@
+{
+  "code_commit": "661eff7803d33d3be7be516f76eaf8dcb9e50d4f",
+  "end_time_utc": "2026-07-25T17:34:55Z",
+  "hardware": "Azure Container Apps gpu-t4 workload profile, NVIDIA Tesla T4",
+  "hypothesis": "At least one family x band x condition cell yields adjudicated accuracy in [0.70, 0.90] with acceptable truncation and no-answer rates, providing measurable headroom for later interventions.",
+  "image_digest": "sha256:c65795e1ab7233d4f2b362d7da339ce8d10de23d83a750947239d155c7ee0ce9",
+  "inputs": {
+    "arbiter_judgments": null,
+    "conditions": [
+      "r1_style_thinking",
+      "visible_cot"
+    ],
+    "judgments": null,
+    "records": null,
+    "task_bank": "data/phase1_task_headroom_candidates.jsonl",
+    "task_bank_sha256": "acf59ec44b7afb73c03392d2c9b7223eff7311e29e2261ff0d65b38a3a416407"
+  },
+  "mode": "generate",
+  "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+  "model_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+  "objective": "Screen the frozen Phase 1 task bank for cells with measurable observable answer headroom under two visible-reasoning conditions.",
+  "out_of_scope": [
+    "Any claim that this run observes, measures, or bounds hidden reasoning.",
+    "Any claim about an internal workspace, latent scratchpad, or invisible chain-of-thought.",
+    "Any claim about 'J-space' existence, structure, capacity, or dynamics.",
+    "Any RQ1 or RQ2 result claim; this is task calibration, not a formal result.",
+    "Any pass@k or sampling-capability claim; one sample per item/condition is drawn.",
+    "Any claim that parser v2 output is a validated correctness label.",
+    "Any generalisation to conditions deferred this round."
+  ],
+  "output_files": [
+    "00_stage_manifest.json",
+    "01_protocol_snapshot.json",
+    "02_records.jsonl",
+    "03_metrics.csv",
+    "04_decision.json",
+    "05_summary.md",
+    "06_paper_table.csv",
+    "07_figure_data.csv",
+    "08_deviations.json",
+    "artifact_manifest.json"
+  ],
+  "phase": "1.0C",
+  "protocol_hash": "d778736ff8a2f0c7e82ee14a529abc05afb44ce3c8a9b2b47fd02771c405719d",
+  "run_id": "20260725T170041Z",
+  "schema_version": "phase1-headroom-calibration-v1",
+  "scope": [
+    "Deterministic 150-item selection from the frozen calibration split.",
+    "Two visible-reasoning conditions; 300 single-sample generations.",
+    "Deterministic triage plus bounded semantic adjudication.",
+    "Headroom cell selection and exclusion with machine-readable reasons."
+  ],
+  "start_time_utc": "2026-07-25T17:34:55Z",
+  "status": "INCONCLUSIVE",
+  "subagents": [
+    {
+      "invoked": false,
+      "role": "primary_semantic_reviewer"
+    },
+    {
+      "invoked": false,
+      "role": "arbiter"
+    }
+  ],
+  "track": "track-b"
+}

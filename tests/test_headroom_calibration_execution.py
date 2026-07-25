@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import csv
 import importlib.util
+import inspect
 import json
 import math
 import os
@@ -1290,6 +1291,132 @@ def test_pack_still_has_exactly_the_registered_ten_files(execution_pack: Path) -
     assert len(hc.ARTIFACT_FILES) == 10
     for name in hc.ARTIFACT_FILES:
         assert (execution_pack / name).is_file(), name
+
+
+def _finalize_decision(unresolved_rows: int, outstanding_reviews: int) -> dict:
+    records = [
+        {"status": hc.STATUS_GENERATED, "evaluation": {}}
+        for _ in range(hc.EXPECTED_GENERATION_COUNT)
+    ]
+    return hc._build_decision(
+        "finalize",
+        records,
+        [],
+        [],
+        unresolved_rows,
+        outstanding_reviews,
+        [],
+        [],
+        [],
+    )
+
+
+def test_finalize_stays_inconclusive_whenever_any_label_is_unresolved() -> None:
+    """The registered finalize rule is 'outstanding reviews OR unresolved labels'."""
+
+    for unresolved, outstanding in ((44, 0), (0, 3), (44, 3)):
+        decision = _finalize_decision(unresolved, outstanding)
+        assert decision["status"] == "INCONCLUSIVE", (unresolved, outstanding)
+        assert "all_flagged_rows_adjudicated" in decision["criteria_failed"]
+    complete = _finalize_decision(0, 0)
+    assert complete["status"] == "COMPLETE"
+    assert "all_flagged_rows_adjudicated" in complete["criteria_passed"]
+
+
+def test_finalize_prose_separates_unadjudicated_from_unresolvable_rows() -> None:
+    """A fully adjudicated pack must not be told to return rows for adjudication."""
+
+    adjudicated = _finalize_decision(44, 0)
+    assert adjudicated["outstanding_review_rows"] == 0
+    assert adjudicated["unresolved_rows"] == 44
+    assert "Every flagged row carries an adjudicated label" in adjudicated["decision"]
+    assert "return" not in adjudicated["next_gate"].lower()
+
+    outstanding = _finalize_decision(44, 3)
+    assert outstanding["outstanding_review_rows"] == 3
+    assert "3 flagged row(s) lack an adjudicated label" in outstanding["decision"]
+    assert "Return the outstanding review rows" in outstanding["next_gate"]
+
+
+def test_prose_change_does_not_move_any_registered_gate() -> None:
+    """Only wording and one derived count were added; the gates are untouched."""
+
+    gated = {
+        key: _finalize_decision(*args)
+        for key, args in {"unresolvable": (44, 0), "outstanding": (44, 3)}.items()
+    }
+    for decision in gated.values():
+        assert decision["status"] == "INCONCLUSIVE"
+        assert decision["criteria_failed"] == ["all_flagged_rows_adjudicated"]
+        assert decision["criteria_passed"] == [
+            "generation_plan_size_is_300",
+            "no_generation_errors",
+        ]
+
+
+def test_summary_reports_execution_changes_instead_of_none_recorded(
+    execution_pack: Path,
+) -> None:
+    """08_deviations.json already records them; the summary must not omit them."""
+
+    summary = (execution_pack / "05_summary.md").read_text(encoding="utf-8")
+    body = summary.split("## Deviations and errors", 1)[1].split("##", 1)[0]
+    assert "Protocol deviations:" in body
+    assert "Execution implementation changes (protocol effect: none):" in body
+    for change in hc.EXECUTION_IMPLEMENTATION_CHANGES:
+        assert change["change"] in body
+
+
+def test_summary_renders_protocol_deviations_as_prose_not_dict_reprs(
+    execution_pack: Path,
+) -> None:
+    summary = (execution_pack / "05_summary.md").read_text(encoding="utf-8")
+    body = summary.split("## Deviations and errors", 1)[1].split("##", 1)[0]
+    assert "{'deviation'" not in body and '{"deviation"' not in body
+    assert "'registered': True" not in body
+    assert (
+        "self-test mode used a scripted offline backend and synthetic reviewer labels"
+        in body
+    )
+
+
+def test_summary_says_none_recorded_when_no_protocol_deviation_exists() -> None:
+    section = "\n".join(hc._deviations_section([]))
+    assert "Protocol deviations:\n- None recorded." in section
+    assert "Execution implementation changes (protocol effect: none):" in section
+    for change in hc.EXECUTION_IMPLEMENTATION_CHANGES:
+        assert change["change"] in section
+
+
+def test_deviations_section_never_hides_execution_changes() -> None:
+    """An empty protocol-deviation list must not read as 'nothing changed'."""
+
+    empty = "\n".join(hc._deviations_section([]))
+    populated = "\n".join(
+        hc._deviations_section(
+            [{"deviation": "example deviation", "effect": "example effect"}]
+        )
+    )
+    for section in (empty, populated):
+        for change in hc.EXECUTION_IMPLEMENTATION_CHANGES:
+            assert change["change"] in section
+    assert "- example deviation Effect: example effect" in populated
+    assert "- None recorded." not in populated
+
+
+def test_summary_states_the_n_equals_ten_screening_limit(execution_pack: Path) -> None:
+    summary = (execution_pack / "05_summary.md").read_text(encoding="utf-8")
+    limitations = summary.split("## Limitations", 1)[1].split("##", 1)[0]
+    assert "n = 10 is a screen, never a stable performance estimate" in limitations
+    assert "parser v2 answer-presence detection" in limitations
+
+
+def test_quality_gate_rates_come_from_the_screening_flags_not_the_reviewer() -> None:
+    """score_cells reads evaluation.truncated / evaluation.no_answer by design."""
+
+    source = inspect.getsource(hc.score_cells)
+    assert 'row["evaluation"]["truncated"]' in source
+    assert 'row["evaluation"]["no_answer"]' in source
 
 
 def test_track_b_decision_vocabulary_is_available_alongside_the_frozen_status(

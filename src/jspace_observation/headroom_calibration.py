@@ -2024,6 +2024,35 @@ def _not_applicable_jsonl(reason: str) -> str:
     return canonical_jsonl([{"reason": reason, "status": "not_applicable"}])
 
 
+def _deviations_section(deviations: Sequence[Any]) -> list[str]:
+    """Render the deviations section.
+
+    Protocol deviations and execution implementation changes are reported
+    separately so that an empty protocol-deviation list is never mistaken for
+    "nothing changed at all".
+    """
+
+    lines = ["Protocol deviations:"]
+    if deviations:
+        for deviation in deviations:
+            if isinstance(deviation, Mapping):
+                text = str(deviation.get("deviation", deviation))
+                effect = deviation.get("effect")
+                if effect:
+                    text = f"{text} Effect: {effect}"
+            else:
+                text = str(deviation)
+            lines.append(f"- {text}")
+    else:
+        lines.append("- None recorded.")
+    lines.append("")
+    lines.append("Execution implementation changes (protocol effect: none):")
+    for change in EXECUTION_IMPLEMENTATION_CHANGES:
+        lines.append(f"- {change['change']} Reason: {change['reason']}")
+    lines.append("")
+    return lines
+
+
 def _summary_markdown(
     run_id: str,
     config: RunConfig,
@@ -2116,13 +2145,7 @@ def _summary_markdown(
     lines.append("")
     lines.append("## Deviations and errors")
     lines.append("")
-    deviations = decision.get("deviations") or []
-    if deviations:
-        for deviation in deviations:
-            lines.append(f"- {deviation}")
-    else:
-        lines.append("- None recorded.")
-    lines.append("")
+    lines.extend(_deviations_section(decision.get("deviations") or []))
     lines.append("## Scientific interpretation")
     lines.append("")
     lines.append(decision["scientific_interpretation"])
@@ -2136,7 +2159,16 @@ def _summary_markdown(
     lines.append("- Parser v2 screening is not locked-validated and is never authoritative.")
     lines.append("- No locked typed-entity evaluator exists; entity rows rely on adjudication.")
     lines.append("- Only two visible-reasoning conditions were run; others are deferred.")
-    lines.append("- Cell-level n = 10 gives wide binomial intervals; screening only.")
+    lines.append(
+        "- Cell-level n = 10 is a screen, never a stable performance estimate; the "
+        "Wilson intervals are correspondingly wide."
+    )
+    lines.append(
+        "- Cell truncation and no-answer rates are computed from the deterministic "
+        "screening flags, not from reviewer flags; the truncation flag is the "
+        "objective token-cap signal, but the no-answer flag reflects parser v2 "
+        "answer-presence detection, which is screening only."
+    )
     lines.append("")
     lines.append("## Paper relevance")
     lines.append("")
@@ -2291,6 +2323,37 @@ EXECUTION_IMPLEMENTATION_CHANGES: tuple[dict[str, str], ...] = (
             "COMPLETE / FAIL) is emitted unchanged. track_b_decision is a "
             "deterministic reporting view over the already-frozen cell "
             "classifications and applies no additional rule."
+        ),
+        "scope": "execution_implementation",
+    },
+    {
+        "change": (
+            "04_decision.json additionally carries outstanding_review_rows, and the "
+            "finalize INCONCLUSIVE decision/next_gate prose distinguishes rows that "
+            "are not yet adjudicated from rows adjudicated as unresolved."
+        ),
+        "effect_on_protocol": "none",
+        "reason": (
+            "The registered finalize rule ('Outstanding mandatory reviews or "
+            "unresolved labels remain' -> INCONCLUSIVE) is evaluated unchanged, and "
+            "status, criteria_passed and criteria_failed are byte-identical. Only "
+            "the human-readable explanation and one derived count were added, "
+            "because the previous prose told the reader to return rows for "
+            "adjudication even when every flagged row already carried a label."
+        ),
+        "scope": "execution_implementation",
+    },
+    {
+        "change": (
+            "05_summary.md now lists the execution implementation changes under "
+            "'Deviations and errors' instead of reporting 'None recorded'."
+        ),
+        "effect_on_protocol": "none",
+        "reason": (
+            "08_deviations.json already recorded them; the summary silently omitted "
+            "them, which under-reported the pack against its own machine-readable "
+            "record. The protocol-deviation list is still rendered separately and "
+            "is still empty."
         ),
         "scope": "execution_implementation",
     },
@@ -2936,14 +2999,31 @@ def _build_decision(
             next_gate = "Execute the remaining generations before finalizing."
         elif outstanding_reviews or unresolved_rows:
             status = "INCONCLUSIVE"
-            decision_text = (
-                f"{outstanding_reviews} flagged row(s) lack an adjudicated label and "
-                f"{unresolved_rows} row(s) remain unresolved, so cell selection is not final."
-            )
-            next_gate = (
-                "Return the outstanding review rows (and any arbitration packet) for "
-                "adjudication, then rerun finalize."
-            )
+            if outstanding_reviews:
+                decision_text = (
+                    f"{outstanding_reviews} flagged row(s) lack an adjudicated label and "
+                    f"{unresolved_rows} row(s) remain unresolved, so cell selection is "
+                    "not final."
+                )
+                next_gate = (
+                    "Return the outstanding review rows (and any arbitration packet) for "
+                    "adjudication, then rerun finalize."
+                )
+            else:
+                decision_text = (
+                    "Every flagged row carries an adjudicated label, but "
+                    f"{unresolved_rows} row(s) were adjudicated as unresolved, so under "
+                    "the registered finalize rule cell selection is not final. An "
+                    "unresolved row is one whose emitted output states no answer the "
+                    "reviewer could read; further adjudication of the same output cannot "
+                    "resolve it."
+                )
+                next_gate = (
+                    "Main agent decides whether to accept INCONCLUSIVE for this run or to "
+                    "preregister a change to the generation profile (for example a larger "
+                    "token budget) and rerun; the unresolved rows cannot be cleared by "
+                    "re-reviewing the existing outputs."
+                )
             criteria_failed.append("all_flagged_rows_adjudicated")
         else:
             status = "COMPLETE"
@@ -2984,6 +3064,7 @@ def _build_decision(
         "decision": decision_text,
         "deviations": list(deviations),
         "next_gate": next_gate,
+        "outstanding_review_rows": outstanding_reviews,
         "prohibited_interpretations": list(PROHIBITED_INTERPRETATIONS),
         "scientific_interpretation": SCIENTIFIC_CLAIM_BOUNDARY,
         "selected_headroom_cells": [str(cell["cell_id"]) for cell in selected_cells],

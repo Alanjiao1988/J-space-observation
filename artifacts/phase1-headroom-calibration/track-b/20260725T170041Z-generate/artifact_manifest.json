@@ -1,0 +1,160 @@
+{
+  "artifact_count": 20,
+  "code_commit": "661eff7803d33d3be7be516f76eaf8dcb9e50d4f",
+  "files": [
+    {
+      "bytes": 2721,
+      "path": "00_stage_manifest.json",
+      "reason": "",
+      "sha256": "4762dc5bba1f2cc9998ecf55957c730cb5defcfe181037bd011b2510baf5a60f",
+      "status": "generated"
+    },
+    {
+      "bytes": 6712,
+      "path": "01_protocol_snapshot.json",
+      "reason": "",
+      "sha256": "f8ab5b4b7247b964924bbd3c8386ef40a75d40af2e03fe5b950d0b10981a8423",
+      "status": "generated"
+    },
+    {
+      "bytes": 957070,
+      "path": "02_records.jsonl",
+      "reason": "",
+      "sha256": "5106fded21c24dff8a395827e679abe03eed4c0a39709bc1b9d24476d1e1ceaa",
+      "status": "generated"
+    },
+    {
+      "bytes": 25258,
+      "path": "03_metrics.csv",
+      "reason": "",
+      "sha256": "530509ed153408dc17ef906eab03dcdc42f68f8601bd9a75b49fa0e5f16d8ad1",
+      "status": "generated"
+    },
+    {
+      "bytes": 1965,
+      "path": "04_decision.json",
+      "reason": "",
+      "sha256": "a7d71903464d09a320a0ae777c87c780cca9892ff88a97b60161efe78b9420eb",
+      "status": "generated"
+    },
+    {
+      "bytes": 3715,
+      "path": "05_summary.md",
+      "reason": "",
+      "sha256": "4e3441f680c19b62378aa6e0aa5f102adca8d469c5bebeb97e72e4c8eb346691",
+      "status": "generated"
+    },
+    {
+      "bytes": 88,
+      "path": "06_paper_table.csv",
+      "reason": "no semantically adjudicated cell accuracy is available yet",
+      "sha256": "91c3e47dcbbe7f90c4b763e14d51a9dda27e0b18a95b2890a5cce787b08d9657",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 88,
+      "path": "07_figure_data.csv",
+      "reason": "no semantically adjudicated cell accuracy is available yet",
+      "sha256": "91c3e47dcbbe7f90c4b763e14d51a9dda27e0b18a95b2890a5cce787b08d9657",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 3392,
+      "path": "08_deviations.json",
+      "reason": "",
+      "sha256": "38db238b31d058410c759a5e361a81f57b9e34b1fa6ace6896251c23993f1554",
+      "status": "generated"
+    },
+    {
+      "bytes": 11157,
+      "path": "cell_selection/cell_exclusion_reasons.json",
+      "reason": "",
+      "sha256": "fcc1d6e9049657d62ff6cca75366f42e28ba34d545f4e3e65cbdf185cf805bc5",
+      "status": "generated"
+    },
+    {
+      "bytes": 96,
+      "path": "cell_selection/difficulty_boundaries.csv",
+      "reason": "no cell fell below the 0.70 accuracy band as a difficulty boundary",
+      "sha256": "5dc541ee675e1604e0957786fa451e2dba7007d9402e1bd3ad7500e44e8e6bf1",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 7521,
+      "path": "cell_selection/excluded_cells.csv",
+      "reason": "",
+      "sha256": "68149b5759d3259629b8e43fd9d9fae966583878d6d1d311fa57e26a7818254b",
+      "status": "generated"
+    },
+    {
+      "bytes": 96,
+      "path": "cell_selection/high_accuracy_controls.csv",
+      "reason": "no cell exceeded the 0.90 accuracy band as a high-accuracy control",
+      "sha256": "4a0bc7f8372b94f0ce074c9290316cc8e8ceb67bf3956c2a8dce023d7690766f",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 81,
+      "path": "cell_selection/selected_headroom_cells.csv",
+      "reason": "no cell satisfied every headroom qualification rule",
+      "sha256": "ef8ff2512fa728290215bfb688331beb30f370199d1789d175e7f2333832ab75",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 100,
+      "path": "review_pack/arbitration_packet.jsonl",
+      "reason": "no primary reviewer conflicted with the deterministic result",
+      "sha256": "75ee69f4e335cf6e346fe15822818bac880f45719f25209de40c78aa3b7284b5",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 142577,
+      "path": "review_pack/deterministic_triage.jsonl",
+      "reason": "",
+      "sha256": "8c78d28cdbbae2d5ed9170487ed381f457510b91549c8c483faab00b022f9405",
+      "status": "generated"
+    },
+    {
+      "bytes": 1484,
+      "path": "review_pack/review_instructions.md",
+      "reason": "",
+      "sha256": "043437a90794c322f42c24f294314fbc4046b76f5c0df8cafef001d34eaeee77",
+      "status": "generated"
+    },
+    {
+      "bytes": 523664,
+      "path": "review_pack/review_pack.jsonl",
+      "reason": "",
+      "sha256": "bff9700839e8e4a0cc2b8418b8bcfe9b30fe2b8839457b469eee17dd142ae2e9",
+      "status": "generated"
+    },
+    {
+      "bytes": 893,
+      "path": "review_pack/review_pack_manifest.json",
+      "reason": "",
+      "sha256": "a38706e1ff0a1b5d5061639075e613cf3588d00ecb043c18325f0b1fb1efe423",
+      "status": "generated"
+    }
+  ],
+  "generated_at_utc": "2026-07-25T17:34:55Z",
+  "image_digest": "sha256:c65795e1ab7233d4f2b362d7da339ce8d10de23d83a750947239d155c7ee0ce9",
+  "mode": "generate",
+  "phase": "1.0C",
+  "protocol_hash": "d778736ff8a2f0c7e82ee14a529abc05afb44ce3c8a9b2b47fd02771c405719d",
+  "required_files": [
+    "00_stage_manifest.json",
+    "01_protocol_snapshot.json",
+    "02_records.jsonl",
+    "03_metrics.csv",
+    "04_decision.json",
+    "05_summary.md",
+    "06_paper_table.csv",
+    "07_figure_data.csv",
+    "08_deviations.json",
+    "artifact_manifest.json"
+  ],
+  "run_id": "20260725T170041Z",
+  "schema_version": "phase1-headroom-calibration-v1",
+  "status": "INCONCLUSIVE",
+  "track": "track-b"
+}

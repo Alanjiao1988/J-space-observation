@@ -1,0 +1,51 @@
+{
+  "deviations": [],
+  "effect_on_interpretation": "none",
+  "execution_implementation_changes": [
+    {
+      "change": "A dedicated calibration container image (Dockerfile.calibration) was introduced for this run.",
+      "effect_on_protocol": "none",
+      "reason": "The generic image requires a historical build attestation that is unrecoverable from git history, ACR and Blob, and is unregenerable because the registered generator asserts equality against a 30-file frozen list while the repository now tracks 63 behavior files (33 extra, 0 missing). The calibration image carries its own pre-committed, deterministic build provenance instead.",
+      "scope": "execution_implementation"
+    },
+    {
+      "change": "cell_selection/ additionally emits high_accuracy_controls.csv and difficulty_boundaries.csv.",
+      "effect_on_protocol": "none",
+      "reason": "Both files are derived views of rows already classified by the frozen selection rule; no threshold, gate or classification changed.",
+      "scope": "execution_implementation"
+    },
+    {
+      "change": "The artifact pack is uploaded by headroom_blob_transport, which writes artifact_manifest.json last.",
+      "effect_on_protocol": "none",
+      "reason": "The generic directory uploader walks the pack in filesystem order and cannot guarantee the registered manifest-last rule.",
+      "scope": "execution_implementation"
+    },
+    {
+      "change": "04_decision.json additionally carries track_b_decision and track_b_decision_vocabulary.",
+      "effect_on_protocol": "none",
+      "reason": "The registered status vocabulary (BLOCKED / INCONCLUSIVE / COMPLETE / FAIL) is emitted unchanged. track_b_decision is a deterministic reporting view over the already-frozen cell classifications and applies no additional rule.",
+      "scope": "execution_implementation"
+    }
+  ],
+  "protocol_deviation": "none",
+  "semantic_audit_attestation_evidence": {
+    "checked_sources": {
+      "acr": "repositories are exactly j-space-observation, j-space-observation-jlens and j-space-observation-parser-eval; no calibration repository exists, and ACR run records do not carry the attestation payload",
+      "blob_build_artifacts": "no Blob build artifact carries the attestation",
+      "git_history": "git log --all -- .semantic_audit_build_provenance.json returns nothing; the file is gitignored (.gitignore:50) and was never committed on any branch",
+      "registered_generator": "scripts/prepare_semantic_audit_build_context.py --protocol-commit, invoked correctly as python -I -S in a clean detached worktree at a91db884179911329eae3aadee506ab09b3a0e26, exits with 'tracked behavior file list differs from the frozen list' and writes no attestation file",
+      "working_tree": "the only *provenance* file present is an unrelated local parser recovery note"
+    },
+    "generator_equality_measurement": {
+      "extra_files_not_in_frozen_list": 33,
+      "frozen_runtime_files": 30,
+      "measured_at_commit": "a91db884179911329eae3aadee506ab09b3a0e26",
+      "missing_files_from_tree": 0,
+      "scope": "git ls-files -- src scripts infra/azure/scripts Dockerfile requirements.txt docs/phase1_semantic_review_protocol.md",
+      "tracked_behavior_files": 63
+    },
+    "outcome": "unrecoverable_and_unregenerable",
+    "verified_by": "main agent (Azure and git-write authority)"
+  },
+  "unregistered_changes": []
+}
