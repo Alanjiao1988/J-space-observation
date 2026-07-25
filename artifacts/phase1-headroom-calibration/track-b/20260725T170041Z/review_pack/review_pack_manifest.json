@@ -1,0 +1,28 @@
+{
+  "arbitration_rows": 0,
+  "blinding": "primary review rows omit the deterministic screening verdict",
+  "parser_v2_locked_validation_status": "failed_2026-07-25:boxed_final_miss=1/20,wrong_span=2/80",
+  "review_reason_codes": [
+    "ambiguous_parse",
+    "deterministic_random_sample",
+    "no_answer",
+    "parse_invalid",
+    "provisional_headroom_cell",
+    "triage_disagrees_with_registered_answer",
+    "truncated_output"
+  ],
+  "review_reason_counts": {
+    "ambiguous_parse": 55,
+    "deterministic_random_sample": 9,
+    "no_answer": 57,
+    "parse_invalid": 112,
+    "provisional_headroom_cell": 30,
+    "triage_disagrees_with_registered_answer": 84,
+    "truncated_output": 79
+  },
+  "review_row_count": 225,
+  "review_sample_fraction": 0.1,
+  "run_id": "20260725T170041Z",
+  "schema_version": "phase1-headroom-calibration-v1",
+  "triage_authority": "screening_only_not_locked"
+}

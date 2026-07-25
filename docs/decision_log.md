@@ -1635,3 +1635,65 @@ Consequence:
   is opened. A variance estimate would need many independent same-size fits and
   is not budgeted; a validity criterion remains undesigned and is the actual
   blocker for `CL-02`.
+
+## 2026-07-25 — Accept INCONCLUSIVE as the Phase 1.0C Track B result, and do not relax the finalize rule
+
+Context:
+
+- The calibration ran and produced real data: 300/300 generations, 0 errors, 30
+  cells. All 225 flagged rows were semantically adjudicated with complete
+  coverage and zero rows meeting the registered arbitration trigger.
+- Ten of thirty cells received a scored accuracy. Two of those met every
+  preregistered per-cell gate. The other twenty cells contain at least one row
+  adjudicated `unresolved`, which the preregistered per-cell rule
+  ("A cell qualifies only when it has zero unresolved semantic labels") excludes.
+- The pack-level status is governed by a separate preregistered rule recorded in
+  `docs/phase1_headroom_calibration_protocol.md:329`: a `finalize` pack is
+  `INCONCLUSIVE` when "Outstanding mandatory reviews **or unresolved labels**
+  remain". 44 of 300 rows were adjudicated unresolved, so the pack is
+  `INCONCLUSIVE` even though there are zero outstanding reviews.
+
+Decision:
+
+- **Accept `INCONCLUSIVE`.** The tooling implements the frozen rule correctly and
+  the rule was registered before any data existed. Relaxing the pack-level gate
+  after seeing that it blocks a `HEADROOM_CELLS_SELECTED` outcome would be
+  outcome-dependent analysis, and it was explicitly considered and rejected on
+  those grounds. The gate was not touched.
+- The 44 unresolved rows are not an adjudication backlog. They are rows whose
+  emitted output states no answer a reviewer could read — token-cap truncation
+  mid-derivation, degenerate repetition loops, and unfilled answer templates.
+  Re-reviewing the same outputs cannot resolve them. Only a changed generation
+  profile could, and that would require a new preregistration.
+- The two qualifying cells are recorded as **candidate** ablation substrates.
+  They are not promoted to an established result, because `n = 10` per cell is a
+  screen and a 7/10 cell's Wilson 95% interval spans `[0.397, 0.892]`.
+
+Consequence:
+
+- `EV-0004` moves from `REGISTERED_NOT_RUN` to `COMPLETE_INCONCLUSIVE` with
+  `claim_strength = preliminary`. `CL-05` moves from **not yet measured** to
+  **preliminary** and is capped there; it may not be promoted on this evidence.
+- `L-16` is rewritten. It previously said Phase 1.0C was "registered but
+  unmeasured", which is now false; it now records the n=10 screening limit, the
+  44 unresolved rows, the token-cap-driven truncation, and the single-reviewer
+  adjudication.
+- Three reporting defects found in the round's own tooling were fixed, with no
+  gate, threshold or classification changed and status/`criteria_passed`/
+  `criteria_failed` byte-identical: `05_summary.md` reported "None recorded"
+  under deviations while `08_deviations.json` already carried four execution
+  implementation changes; protocol deviations rendered as raw Python dict reprs;
+  and the finalize `next_gate` told the reader to return rows for adjudication
+  even when every flagged row already carried a label. `04_decision.json` now
+  also carries `outstanding_review_rows` so the two conditions are separable by
+  machine.
+- Round-level deviation framing, recorded in `08_deviations.json` with measured
+  numbers: `protocol deviation: none`; `execution implementation change: a
+  dedicated calibration image was introduced because the generic image required
+  an unavailable historical attestation`. The attestation is unrecoverable from
+  git history, ACR and Blob, and unregenerable because the registered generator
+  asserts equality against a frozen 30-entry `RUNTIME_FILES` list while the
+  repository now tracks 63 behavior files (33 extra, 0 missing).
+- Next gate: main-agent review only. No behavioural, semantic or scientific gate
+  is opened. Nothing in this pack licenses a claim about hidden reasoning, an
+  internal workspace, invisible chain-of-thought, or a J-space.

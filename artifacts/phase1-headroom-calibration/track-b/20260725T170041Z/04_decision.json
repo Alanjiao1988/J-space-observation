@@ -1,0 +1,39 @@
+{
+  "arbitration_rows": 0,
+  "criteria_failed": [
+    "all_flagged_rows_adjudicated"
+  ],
+  "criteria_not_applicable": [],
+  "criteria_passed": [
+    "generation_plan_size_is_300",
+    "no_generation_errors"
+  ],
+  "decision": "Every flagged row carries an adjudicated label, but 44 row(s) were adjudicated as unresolved, so under the registered finalize rule cell selection is not final. An unresolved row is one whose emitted output states no answer the reviewer could read; further adjudication of the same output cannot resolve it.",
+  "deviations": [],
+  "next_gate": "Main agent decides whether to accept INCONCLUSIVE for this run or to preregister a change to the generation profile (for example a larger token budget) and rerun; the unresolved rows cannot be cleared by re-reviewing the existing outputs.",
+  "outstanding_review_rows": 0,
+  "prohibited_interpretations": [
+    "Any claim that this run observes, measures, or bounds hidden reasoning.",
+    "Any claim about an internal workspace, latent scratchpad, or invisible chain-of-thought.",
+    "Any claim about 'J-space' existence, structure, capacity, or dynamics.",
+    "Any RQ1 or RQ2 result claim; this is task calibration, not a formal result.",
+    "Any pass@k or sampling-capability claim; one sample per item/condition is drawn.",
+    "Any claim that parser v2 output is a validated correctness label.",
+    "Any generalisation to conditions deferred this round."
+  ],
+  "scientific_interpretation": "This run estimates observable answer accuracy of a single target model on a frozen task bank under two visible-reasoning prompt conditions, for the sole purpose of selecting task cells with measurable headroom. It licenses no claim about hidden reasoning, internal representations, or 'J-space', and it is not a formal RQ1/RQ2 result.",
+  "selected_headroom_cells": [
+    "prompt_grounded_two_hop_factual|hard|r1_style_thinking",
+    "synthetic_relation|hard|r1_style_thinking"
+  ],
+  "status": "INCONCLUSIVE",
+  "supplementary_review_required": [],
+  "track_b_decision": "INCONCLUSIVE",
+  "track_b_decision_vocabulary": [
+    "CONTROLS_ONLY",
+    "HEADROOM_CELLS_SELECTED",
+    "INCONCLUSIVE",
+    "NO_USABLE_CELLS"
+  ],
+  "unresolved_rows": 44
+}

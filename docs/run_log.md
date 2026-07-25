@@ -3079,3 +3079,157 @@ Results:
   Nothing here licenses a claim about semantic validity, scientific usability, a
   workspace, hidden reasoning, an internal chain-of-thought, J-space, or semantic
   convergence.
+
+## 2026-07-25 — Phase 1.0C Track B headroom calibration executed on GPU, adjudicated, INCONCLUSIVE
+
+- Scope: bounded capability/headroom calibration, protocol hash
+  `d778736ff8a2f0c7e82ee14a529abc05afb44ce3c8a9b2b47fd02771c405719d`, executed
+  unchanged. Same 150 item IDs, 300 generation units, task families, difficulty
+  bands, conditions, generation settings, selection thresholds and semantic
+  review rules as preregistered.
+- Build: the generic image could not be used. `.semantic_audit_build_provenance.json`
+  is gitignored (`.gitignore:50`), was never committed on any branch, and is
+  absent from ACR and Blob. It is also unregenerable:
+  `scripts/prepare_semantic_audit_build_context.py` asserts that the tracked
+  behavior-file set equals a frozen 30-entry `RUNTIME_FILES` list, while the
+  repository now tracks 63 such files (33 extra, 0 missing), so the generator
+  fails by construction. A dedicated `Dockerfile.calibration` plus a
+  deterministic two-part `calibration_build_provenance.json` was introduced.
+  Commit A `5d18b708304984ce82f72028f335d7a970afa5b8` (code), commit B
+  `661eff7803d33d3be7be516f76eaf8dcb9e50d4f` (provenance, generated at a
+  verified-clean detached checkout of commit A, prebuild digest
+  `a0dae9ec81baada7001ba2a752d8e7798c891a48f5e56528077de50a89212c8b`).
+  ACR run `cmy`, immutable tag
+  `j-space-observation-calibration:661eff7803d33d3be7be516f76eaf8dcb9e50d4f`,
+  digest `sha256:c65795e1ab7233d4f2b362d7da339ce8d10de23d83a750947239d155c7ee0ce9`,
+  `immutability_verified=true`.
+- Execution: job `job-jspace-p10c-headroom`, execution
+  `job-jspace-p10c-headroom-0pdexaa`, run ID `20260725T170041Z`, environment
+  `cae-jspace-observation-sea-vnet2`, profile `gpu-t4`, NVIDIA Tesla T4,
+  parallelism 1, completions 1, platform retry 0, managed identity only over the
+  private endpoint, no storage key and no SAS. Blob prefix
+  `phase1-headroom-calibration/20260725T170041Z`. Status Succeeded, wall clock
+  approximately 36 minutes. 300 records emitted, 300 generated, 0 planned-only,
+  0 errors, 30 cells scored.
+- Adjudication: deterministic triage flagged 225 of 300 rows under the registered
+  scope (reason counts: `parse_invalid` 112, `triage_disagrees_with_registered_answer`
+  84, `truncated_output` 79, `no_answer` 57, `ambiguous_parse` 55,
+  `provisional_headroom_cell` 30, `deterministic_random_sample` 9; rows carry
+  multiple reasons). A single primary semantic reviewer labelled all 225 in the
+  registered nine-field form while blinded to the deterministic verdicts.
+  Coverage complete, 0 outstanding mandatory rows. Reviewer totals: 81 correct,
+  100 incorrect, 44 unresolved.
+- Reviewer versus screen: 112 of 225 rows agreed outright (30 correct, 82
+  incorrect). There were **zero** direct correctness contradictions — no row
+  where the screen said correct and the reviewer said incorrect, or the reverse.
+  111 rows carried no deterministic verdict at all; on those the reviewer read a
+  matching stated answer on 51, a non-matching stated answer on 18, and agreed
+  the row was unresolvable on 42. Two rows (`R039`, `R151`) had a decisive
+  screening verdict of `incorrect` where the reviewer recorded `unresolved`,
+  which is the more conservative direction. **Zero rows met the registered
+  arbitration trigger**, so no arbiter was invoked.
+- Flag agreement: the reviewer's `truncated` flag matched the objective
+  512-token-cap signal on all 225 rows (79 at the cap, 0 disagreements in either
+  direction). The `no_answer` flag disagreed on 62 rows: on 38 the parser
+  reported no answer where the reviewer read a stated answer, and on 24 the
+  parser reported an answer where the reviewer judged nothing was designated.
+- Result: final labels across 300 rows are 156 correct, 100 incorrect, 44
+  unresolved (225 from the primary reviewer, 75 inherited from screening on rows
+  never flagged). Two cells classified `selected_headroom`:
+  `prompt_grounded_two_hop_factual|hard|r1_style_thinking` and
+  `synthetic_relation|hard|r1_style_thinking`, both 7/10, accuracy 0.70, Wilson
+  95% CI `[0.396778, 0.892209]`. One high-accuracy control
+  (`arithmetic|hard|visible_cot`, 10/10), four difficulty boundaries, three
+  excluded on quality gates, twenty `not_adjudicated` because they contain at
+  least one unresolved row. Track B decision **INCONCLUSIVE**.
+- Verification: `--mode finalize` run twice with `--frozen-time` produced
+  byte-identical output across all 20 pack files. Targeted suites 308 passed;
+  parser suites 144 passed; `eval_parsing_v3.py` LF SHA-256 re-verified as
+  `dd729c3c23771fb112811e382bf7e55f531ce534cbbd1cfec4f0527056c8908e`, unchanged.
+- Boundary: **n = 10 per cell is a screen, never a stable performance estimate.**
+  A 7/10 cell's 95% interval spans `[0.397, 0.892]`. The two selected cells are
+  candidate ablation substrates, not cells with established headroom. 79 of 225
+  reviewed rows hit the token cap, so truncation reflects the 512-token budget
+  rather than model competence. Adjudication was single-reviewer, and the zero
+  arbitration count is an absence of contradiction with a deterministic screen,
+  not an inter-reviewer agreement statistic. Parser v2 was automated triage only
+  and never produced a final label. Nothing here licenses a claim about hidden
+  reasoning, an internal workspace, invisible chain-of-thought, or a J-space.
+
+## 2026-07-25 — Main-agent provenance corrections to the Track B pack and the artifact index
+
+- Scope: corrections applied by the main agent while reviewing the Track B
+  artifact pack and the paper ledgers before commit. No metric, threshold,
+  gate, label or classification changed. The finalize stage was re-run and its
+  scientific content is byte-identical to the independently produced pack:
+  `04_decision.json` agrees on all 16 keys, and `03_metrics.csv`,
+  `06_paper_table.csv`, `07_figure_data.csv` and all four `cell_selection/`
+  CSVs are byte-identical. 17 of the 20 files matched exactly; the 3 that
+  differ are `00_stage_manifest.json`, `05_summary.md` and
+  `artifact_manifest.json`, which are precisely the files that carry
+  provenance.
+
+- **The generate and finalize stages are now stored as separate packs.**
+  `artifacts/phase1-headroom-calibration/track-b/20260725T170041Z-generate/`
+  holds the pack exactly as the GPU job wrote and uploaded it, and
+  `artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/` holds the
+  finalize pack. Both carry run id `20260725T170041Z`, because they are two
+  stages of one run.
+
+- **Reason: the stage manifest's `hardware` and `image_digest` fields are
+  stage-scoped, not run-scoped.** The repository's own precedent settles this:
+  the plan-stage manifest records `image_digest: not_recorded` and
+  `hardware: aca-gpu-t4-pending`, describing the stage's own execution rather
+  than the run's intended target. The finalize stage ran on a local x86-64
+  Windows CPU host, outside any container image, under code that postdates the
+  image. Recording `NVIDIA Tesla T4` and the calibration image digest against
+  `mode: finalize` would have asserted three false things: that the stage ran
+  on a T4, that it ran inside that image, and that commit `661eff78` computed
+  the metrics. The finalize manifest now records `image_digest: not_recorded`,
+  the local CPU host, and the commit that actually contains the finalize code.
+  The generation provenance is not lost: it is stated truthfully in the
+  generate pack's own manifest, and `inputs.records` in the finalize manifest
+  points at that pack by repository-relative path.
+
+- The finalize manifest's `inputs` previously contained absolute local
+  Windows paths. They are now repository-relative.
+
+- Finalize was run twice from the committed inputs and produced byte-identical
+  output both times, so the pack is reproducible from what is in the
+  repository. Reproduction requires `--frozen-time`; without it `start_time_utc`
+  becomes wall-clock and every manifest digest drifts.
+
+- **The finalize pack is not in Blob.** Only the generate pack was uploaded, at
+  prefix `phase1-headroom-calibration/20260725T170041Z`. Storage has public
+  network access Disabled and is reachable only from inside the VNet, and the
+  finalize stage ran outside it. The finalize pack is a deterministic function
+  of the generate pack and of the reviewer labels, both of which are committed,
+  so it is reproducible without the Blob copy. `EV-0004.artifact_prefix` refers
+  to the generate pack.
+
+- **`AR-0028` was re-pinned to an immutable commit.** It registers the J-lens
+  fit corpus as Phase 0.5B consumed it, digest
+  `41e104efec1cd0e0eebae504cd888e60c4e81f6f8c7774d75c895eac98862b4b`, 13452
+  bytes. The Track A1 corpus amendment (`D14`) changed the file at that path in
+  commit `39dc6e0`, so the row stopped verifying against the working tree even
+  though it was correct for its own run. Its `storage_location` now pins commit
+  `f97ea59c5826d7195602189f9d31f93c91066ee5`. The digest and byte count are
+  unchanged. The current corpus is registered separately as `AR-0039`.
+  All 27 repository-backed rows of `paper/artifact_index.csv` now verify
+  against either the working tree or the pinned blob.
+
+- **Defect recorded, not corrected in place: commit `422d379` silently
+  included two Track B ledger edits its message does not describe.**
+  `EV-0004` moved from `REGISTERED_NOT_RUN` to `COMPLETE_INCONCLUSIVE` and
+  `L-16` was rewritten from "registered but unmeasured" to the measured
+  result. The Track B agent wrote those two files into the working tree
+  between that commit's status check and its staging step. Both edits are
+  correct and are retained. History was not rewritten and nothing was
+  force-pushed.
+
+- Process note for later rounds: subagents were instructed to make no git
+  writes, and none did, but they did write working-tree files concurrently
+  with the main agent's staging. Working-tree writes by a concurrent agent are
+  functionally a race against `git add`. Future rounds should either have
+  subagents write drafts outside the repository or have the main agent stage
+  by explicit path immediately after a fresh status check.

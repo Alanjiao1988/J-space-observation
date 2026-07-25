@@ -222,7 +222,7 @@ technical stability statistics and are never semantic evidence.
 
 ---
 
-## Phase 1.0C — bounded capability headroom calibration (preregistered, NOT run)
+## Phase 1.0C — bounded capability headroom calibration (executed 2026-07-25)
 
 Preregistered 2026-07-25 with protocol hash
 `d778736ff8a2f0c7e82ee14a529abc05afb44ce3c8a9b2b47fd02771c405719d` and frozen
@@ -233,11 +233,51 @@ before any data exists. Registered design: deterministic 150-item sample from th
 fixed recorded seed. Parser v2 is used only as a triage tool; final labels require
 semantic adjudication because parser v2's formal locked validation FAILED.
 
-Execution status: **BLOCKED, no model was run and no measurement exists.** The main
-`Dockerfile` validates a build attestation from `.semantic_audit_build_provenance.json`,
-which is gitignored and absent from the worktree, and no calibration image exists in
-the registry. The emitted pack therefore carries status `BLOCKED` by design rather
-than a fabricated result.
+**Execution status: RUN, pack status `INCONCLUSIVE`.** Run `20260725T170041Z`
+executed on Azure Container Apps (`gpu-t4` workload profile, NVIDIA Tesla T4,
+parallelism 1, completions 1, platform retry 0) under managed identity over a
+private endpoint. 300/300 generations, 0 errors, 30 cells scored. The frozen
+protocol executed unchanged: the same 150 item IDs, 300 generation units, task
+families, difficulty bands, conditions, generation settings, selection thresholds
+and semantic review rules.
+
+**Execution implementation change (protocol effect: none).** The generic
+`Dockerfile` validates a build attestation from
+`.semantic_audit_build_provenance.json`, which is gitignored, was never committed
+on any branch, and is absent from ACR and Blob. It also cannot be regenerated:
+`scripts/prepare_semantic_audit_build_context.py` asserts that the tracked
+behavior-file set equals a frozen 30-entry `RUNTIME_FILES` list, while the
+repository now tracks 63 such files (33 extra, 0 missing), so the generator fails
+by construction and always will. A dedicated `Dockerfile.calibration` plus a
+deterministic two-part `calibration_build_provenance.json` was introduced instead:
+a pre-build section fully determined by the source tree and committed before the
+run, plus a post-build section carrying the ACR build ID and image digest and
+bound to the pre-build section by its SHA-256. Image
+`j-space-observation-calibration:661eff7803d33d3be7be516f76eaf8dcb9e50d4f`, digest
+`sha256:c65795e1ab7233d4f2b362d7da339ce8d10de23d83a750947239d155c7ee0ce9`.
+
+**Adjudication.** Deterministic triage flagged 225 of 300 rows under the registered
+scope (all parse-invalid, ambiguous, truncated, no-answer, parser/reference
+mismatch and candidate-selected-cell rows, plus a 10% deterministic sample of
+otherwise-clean rows). A single primary semantic reviewer labelled all 225 in the
+registered nine-field form, blinded to the deterministic verdicts. Coverage was
+complete: 0 outstanding mandatory rows. **Zero rows met the registered arbitration
+trigger** (`deterministic verdict is not null AND primary label is correct or
+incorrect AND they differ`), so no arbiter was invoked. That is an absence of
+direct contradiction with a deterministic screen, not an inter-reviewer agreement
+statistic, and no agreement rate may be quoted from it.
+
+**Outcome.** Final labels across 300 rows: 156 correct, 100 incorrect, 44
+unresolved. Two cells were classified `selected_headroom`
+(`prompt_grounded_two_hop_factual|hard|r1_style_thinking` and
+`synthetic_relation|hard|r1_style_thinking`, both 7/10, accuracy 0.70, Wilson 95%
+CI `[0.397, 0.892]`), one high-accuracy control, four difficulty boundaries, three
+excluded on quality gates, twenty `not_adjudicated`. The Track B decision is
+`INCONCLUSIVE` under the preregistered finalize rule, which makes a pack
+inconclusive whenever outstanding mandatory reviews **or unresolved labels**
+remain; 44 rows were adjudicated unresolved because the emitted output states no
+answer a reviewer could read. **n = 10 per cell is a screen, never a stable
+performance estimate.**
 
 ---
 

@@ -1,0 +1,299 @@
+{
+  "cells": {
+    "arithmetic|easy|r1_style_thinking": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "no_answer_rate_above_threshold",
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "arithmetic|easy|visible_cot": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "no_answer_rate_above_threshold",
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "arithmetic|hard|r1_style_thinking": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "no_answer_rate_above_threshold",
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "arithmetic|hard|visible_cot": {
+      "accuracy": 1.0,
+      "classification": "control_sanity_high_accuracy",
+      "exclusion_reasons": [
+        "accuracy_above_band_control_only",
+        "no_answer_rate_above_threshold",
+        "truncation_rate_above_threshold"
+      ],
+      "selected": false
+    },
+    "arithmetic|medium|r1_style_thinking": {
+      "accuracy": 0.7,
+      "classification": "excluded_quality_gate",
+      "exclusion_reasons": [
+        "no_answer_rate_above_threshold",
+        "truncation_rate_above_threshold"
+      ],
+      "selected": false
+    },
+    "arithmetic|medium|visible_cot": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "no_answer_rate_above_threshold",
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "counterfactual_entity_replacement|easy|r1_style_thinking": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "no_answer_rate_above_threshold",
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "counterfactual_entity_replacement|easy|visible_cot": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "counterfactual_entity_replacement|hard|r1_style_thinking": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "counterfactual_entity_replacement|hard|visible_cot": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "counterfactual_entity_replacement|medium|r1_style_thinking": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "counterfactual_entity_replacement|medium|visible_cot": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "prompt_grounded_two_hop_factual|easy|r1_style_thinking": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "prompt_grounded_two_hop_factual|easy|visible_cot": {
+      "accuracy": 0.6,
+      "classification": "difficulty_boundary_excluded",
+      "exclusion_reasons": [
+        "accuracy_below_band_difficulty_boundary",
+        "insufficient_correct_count"
+      ],
+      "selected": false
+    },
+    "prompt_grounded_two_hop_factual|hard|r1_style_thinking": {
+      "accuracy": 0.7,
+      "classification": "selected_headroom",
+      "exclusion_reasons": [],
+      "selected": true
+    },
+    "prompt_grounded_two_hop_factual|hard|visible_cot": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "prompt_grounded_two_hop_factual|medium|r1_style_thinking": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "prompt_grounded_two_hop_factual|medium|visible_cot": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "synthetic_relation|easy|r1_style_thinking": {
+      "accuracy": 0.6,
+      "classification": "difficulty_boundary_excluded",
+      "exclusion_reasons": [
+        "accuracy_below_band_difficulty_boundary",
+        "insufficient_correct_count",
+        "truncation_rate_above_threshold"
+      ],
+      "selected": false
+    },
+    "synthetic_relation|easy|visible_cot": {
+      "accuracy": 0.8,
+      "classification": "excluded_quality_gate",
+      "exclusion_reasons": [
+        "truncation_rate_above_threshold"
+      ],
+      "selected": false
+    },
+    "synthetic_relation|hard|r1_style_thinking": {
+      "accuracy": 0.7,
+      "classification": "selected_headroom",
+      "exclusion_reasons": [],
+      "selected": true
+    },
+    "synthetic_relation|hard|visible_cot": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "synthetic_relation|medium|r1_style_thinking": {
+      "accuracy": 0.5,
+      "classification": "difficulty_boundary_excluded",
+      "exclusion_reasons": [
+        "accuracy_below_band_difficulty_boundary",
+        "insufficient_correct_count"
+      ],
+      "selected": false
+    },
+    "synthetic_relation|medium|visible_cot": {
+      "accuracy": 0.9,
+      "classification": "excluded_quality_gate",
+      "exclusion_reasons": [
+        "truncation_rate_above_threshold"
+      ],
+      "selected": false
+    },
+    "wrong_cot_error_detection|easy|r1_style_thinking": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "no_answer_rate_above_threshold",
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "wrong_cot_error_detection|easy|visible_cot": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "no_answer_rate_above_threshold",
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "wrong_cot_error_detection|hard|r1_style_thinking": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "no_answer_rate_above_threshold",
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "wrong_cot_error_detection|hard|visible_cot": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "no_answer_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    },
+    "wrong_cot_error_detection|medium|r1_style_thinking": {
+      "accuracy": 0.3,
+      "classification": "difficulty_boundary_excluded",
+      "exclusion_reasons": [
+        "accuracy_below_band_difficulty_boundary",
+        "insufficient_correct_count",
+        "no_answer_rate_above_threshold"
+      ],
+      "selected": false
+    },
+    "wrong_cot_error_detection|medium|visible_cot": {
+      "accuracy": null,
+      "classification": "not_adjudicated",
+      "exclusion_reasons": [
+        "no_answer_rate_above_threshold",
+        "truncation_rate_above_threshold",
+        "unresolved_semantic_labels_present"
+      ],
+      "selected": false
+    }
+  },
+  "reason_code_definitions": {
+    "accuracy_above_band_control_only": "Accuracy exceeds 0.90; usable as a sanity/control cell but deprioritized as a main ablation cell because damage headroom is small.",
+    "accuracy_below_band_difficulty_boundary": "Accuracy is below 0.70; excluded from main patching/ablation but retained as a difficulty boundary.",
+    "incomplete_cell_n": "The cell does not contain exactly 10 scored items.",
+    "incomplete_review_coverage": "At least one row flagged for review has no adjudicated label, so the cell cannot be selected on screening evidence alone.",
+    "insufficient_correct_count": "Fewer than 7 of 10 items were adjudicated correct.",
+    "labels_not_semantically_adjudicated": "The cell has rows without a final semantic label (for example a plan-only pack).",
+    "no_answer_rate_above_threshold": "The no-answer rate exceeds 0.10.",
+    "truncation_rate_above_threshold": "The truncation rate exceeds 0.10.",
+    "unresolved_semantic_labels_present": "At least one row is labelled unresolved."
+  },
+  "reason_codes": [
+    "accuracy_above_band_control_only",
+    "accuracy_below_band_difficulty_boundary",
+    "incomplete_cell_n",
+    "incomplete_review_coverage",
+    "insufficient_correct_count",
+    "labels_not_semantically_adjudicated",
+    "no_answer_rate_above_threshold",
+    "truncation_rate_above_threshold",
+    "unresolved_semantic_labels_present"
+  ],
+  "run_id": "20260725T170041Z",
+  "schema_version": "phase1-headroom-calibration-v1",
+  "supplementary_review_required": []
+}

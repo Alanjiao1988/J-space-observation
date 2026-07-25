@@ -728,7 +728,7 @@ def test_self_test_is_forced_inconclusive(self_test_pack: Path) -> None:
 
 
 def test_scaffold_exists_and_conforms(self_test_pack: Path) -> None:
-    names = sorted(path.name for path in SCAFFOLD.iterdir())
+    names = sorted(path.name for path in SCAFFOLD.iterdir() if path.is_file())
     assert names == sorted(sat.ARTIFACT_FILENAMES)
     dis.validate_artifact_pack(SCAFFOLD)
     snapshot = SCAFFOLD / "01_protocol_snapshot.json"
@@ -778,7 +778,9 @@ def test_scaffold_is_deterministically_regenerable(tmp_path: Path) -> None:
     }
     assert first == second
     committed = {
-        path.name: base.sha256_file(path) for path in sorted(SCAFFOLD.iterdir())
+        path.name: base.sha256_file(path)
+        for path in sorted(SCAFFOLD.iterdir())
+        if path.is_file()
     }
     assert first == committed
 

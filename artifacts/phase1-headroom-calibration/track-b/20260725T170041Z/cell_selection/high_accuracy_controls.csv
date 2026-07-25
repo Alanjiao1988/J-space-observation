@@ -1,0 +1,2 @@
+run_id,cell_id,task_family,difficulty_band,condition,n,correct,accuracy,ci_lower,ci_upper,truncation_rate,no_answer_rate,unresolved_labels,review_coverage_complete,classification,exclusion_reasons
+20260725T170041Z,arithmetic|hard|visible_cot,arithmetic,hard,visible_cot,10,10,1.0,0.722467,1.0,0.6,0.6,0,true,control_sanity_high_accuracy,accuracy_above_band_control_only;no_answer_rate_above_threshold;truncation_rate_above_threshold

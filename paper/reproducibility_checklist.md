@@ -40,9 +40,10 @@ Status vocabulary: `yes`, `partial`, `no`, `not_applicable`.
 | Item | Status | Notes |
 | --- | --- | --- |
 | Sample sizes are reported per cell | yes | `03_metrics.csv` carries `n`, `numerator`, and `denominator` on every row. |
-| Confidence intervals are reported | partial | Required for the headroom calibration; not meaningful for the deterministic parser evaluation. |
-| Seeds are fixed and recorded | yes | Recorded in `01_protocol_snapshot.json`. |
-| Multiple-comparison exposure is acknowledged | partial | Acceptance gates are preregistered, but per-cell headroom screening across 15 cells is not corrected and is described as a screen, not a test. |
+| Confidence intervals are reported | yes | Wilson 95% score intervals are emitted per cell in `03_metrics.csv` and the four `cell_selection/` tables for Phase 1.0C run `20260725T170041Z`; the implementation is unit-tested against known values. Not meaningful for the deterministic parser evaluation. |
+| Seeds are fixed and recorded | yes | Recorded in `01_protocol_snapshot.json`. Phase 1.0C used selection seed `20260725` and run base seed `20260725`. |
+| Multiple-comparison exposure is acknowledged | partial | Acceptance gates are preregistered, but per-cell headroom screening across 30 family x band x condition cells is not corrected and is described as a screen, not a test. n=10 per cell is a screen and never a stable performance estimate. |
+| Inconclusive outcomes are reported as such | yes | Phase 1.0C run `20260725T170041Z` carries the preregistered status `INCONCLUSIVE` because 44 of 300 rows were adjudicated unresolved; the two qualifying cells are reported as candidate substrates, not as established results. |
 
 ## Environment
 
