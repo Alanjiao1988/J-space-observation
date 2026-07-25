@@ -2770,3 +2770,128 @@ Results:
   oracle. No hidden-reasoning, invisible-CoT, internal-workspace, or J-space
   claim follows from any of it.
 
+
+## 2026-07-25 — Phase 0.5B J-lens saturation (Track A), executed on GPU
+
+- Job: `job-jspace-p05-jlens-saturation` execution `job-jspace-p05-jlens-saturation-jxkk7fk`;
+  exactly one execution was ever created.
+- Run id `20260725T122016Z`; blob prefix `phase05-jlens-saturation/20260725T122016Z`;
+  attempt `primary`. Started 2026-07-25T12:21:57Z, ended 2026-07-25T12:58:16Z
+  (36m19s wall on one Tesla T4, 15,637,086,208 bytes total GPU memory).
+- Code commit `408cd00540d5ded2b94ba75fc3616f8702e85465`; image digest
+  `sha256:a15016dfd025cb4e5dc166638129cc4abf7895cdddbbc1b7638672aab7a3524f`.
+  The image tag, the `project-sha` label, and `JSPACE_CODE_COMMIT` all agree.
+- Fit corpus `data/jlens_saturation_prompts.jsonl`, file and canonical SHA-256 both
+  `41e104efec1cd0e0eebae504cd888e60c4e81f6f8c7774d75c895eac98862b4b`
+  (25 fit / 10 held-out / 15 reserve). Protocol hash
+  `b4422756bec723534b78981d79837f3cf9422244f4c1bf40eba205fcce29d32e`.
+- All seven stages succeeded: S0_environment 0.33 s, S1_model 36.36 s,
+  S2_fit_a10 528.62 s, S3_fit_b25_sharded_merge 1317.65 s, S4_merge_control 263.92 s,
+  S5_convergence 0.03 s, S6_apply_stability 28.73 s.
+- Outcome: **status COMPLETE, decision ENGINEERING_IMPROVING**. Seven of nine
+  registered criteria passed; two failed.
+  - Passed: matrix_finite_rate 1.0 (limit 1.0); lens_save_load_max_abs 0.0 (limit 0.0);
+    shard_merge_vs_direct_max_abs 2.384e-07 (limit 1e-05);
+    shard_merge_vs_direct_relative_frobenius 4.862e-08 (limit 1e-06);
+    apply_save_load_consistency 1.0 (limit 1.0);
+    heldout_topk_overlap_mean 0.82 (limit 0.80);
+    heldout_rank_correlation_mean 0.9691 (limit 0.95).
+  - Failed: convergence_relative_frobenius_10_vs_25 0.4170 (limit 0.10);
+    convergence_cosine_10_vs_25 0.9205 (limit 0.99).
+- Interpretation, stated exactly as the pack states it: numerics, sharding, merge,
+  serialization and apply were stable, but the 10-to-25-prompt comparison has not
+  reached the registered convergence thresholds. More fit prompts still change the
+  lens. `ENGINEERING_IMPROVING` is a legitimate preregistered outcome and is
+  recorded as the result, not as a partial success.
+- Resource measurements: Fit A (10 prompts) 528.47 s total / 52.85 s per prompt,
+  3,829,399,552 bytes peak reserved, 28,314,032-byte lens. Fit B (25 prompts, 3 shards
+  merged) 1316.87 s total / 52.67 s per prompt, 3,774,873,600 bytes peak reserved,
+  84,942,315-byte checkpoint and a 28,314,032-byte merged lens. Cost per prompt is
+  essentially flat between the two configurations.
+- `08_deviations.json` records `{"deviations": [], "unregistered_changes": [],
+  "effect_on_interpretation": "none"}`. There were no deviations, and in particular
+  no `merge-weighting-differs` deviation was raised.
+- Upload: 23 objects (13 lens binaries under `attempts/primary/01-lens-binaries/`,
+  10 artifact-pack files under `attempts/primary/02-artifact-pack/`).
+  The uploader reported `manifest_uploaded_last: false` for both groups. This is a
+  **stale reporting flag, not an ordering deviation**: the transport is inherited from
+  Phase 0.5A and tests for the filename `phase05_jlens_artifact_manifest.json`, while
+  the 0.5B pack writes `artifact_manifest.json`. The pack's own
+  `manifest_written_last` is `true` and the independently re-run validator confirms
+  the manifest is last in `manifest_order`. The lens-binaries group has no manifest at
+  all, so the flag is vacuous there by construction.
+- Retrieval: a temporary `Storage Blob Data Reader` assignment was created on the
+  `jspace-results` container for principal `1ec93a23-1126-4058-a537-4f1016b8c325`,
+  conditioned (ABAC v2.0) to the prefix `phase05-jlens-saturation/20260725T122016Z/`.
+  Note for future runs: an ABAC condition written only against
+  `blobs:path` denies `List Blobs`, which evaluates `blobs:prefix` instead; the
+  condition needed both clauses.
+- The 10 pack files were downloaded on the VM, packed to a deterministic tarball
+  (SHA-256 `05ff5453781cbd1764298e7afc962d373b364de167658a882eb1c7a976e28f1f`),
+  transferred in 14 base64 chunks, and the tarball digest was re-verified on arrival
+  before extraction, so the local copy is provably byte-identical to what the job wrote.
+- `phase05_jlens_saturation.validate_artifact_pack` was re-run locally against the
+  downloaded pack and passed: 10 files, 22 records, 184 metric rows,
+  `manifest_written_last` true, status COMPLETE, decision ENGINEERING_IMPROVING.
+- The temporary role assignment was then deleted and removal was verified twice: the
+  container-scope assignment list for that principal is empty, and a subscription-wide
+  query for any role whose name contains `Blob` also returns empty.
+- Pack committed to `artifacts/phase05b-jlens-saturation/track-a/20260725T122016Z/`.
+- Boundary: top-k overlap and rank correlation are technical stability statistics about
+  two fitted linear operators. They are not semantic, behavioural, or interpretive
+  evidence, and nothing here supports a workspace, hidden-reasoning, invisible-CoT, or
+  J-space claim. The 10-prompt fit set is nested inside the 25-prompt set, so the
+  convergence comparison measures estimator movement, not independent replication.
+
+## 2026-07-25 — Phase 1.0C capability headroom calibration (Track B), preregistered only
+
+- Artifact pack `artifacts/phase1-headroom-calibration/track-b/p10c-trackb-plan-d778736ff8a2`
+  (17 files), protocol hash
+  `d778736ff8a2f0c7e82ee14a529abc05afb44ce3c8a9b2b47fd02771c405719d`.
+  Design, protocol, selection rules and analysis code are complete; 100 tests pass.
+- The emitted pack status is **BLOCKED**, which is the correct and honest status: no
+  model was run, so there is no measurement.
+- Reason the GPU run was not executed: the main `Dockerfile` runs
+  `scripts/prepare_semantic_audit_build_context.py --validate-attestation`, which
+  requires `.semantic_audit_build_provenance.json`. That file is gitignored
+  (`.gitignore:50`) and is absent from the worktree, so the
+  `j-space-observation` image cannot be rebuilt from this commit. No
+  `j-space-observation-calibration` repository exists in the registry either.
+  Executing Track B therefore requires new build infrastructure, which is out of
+  scope for this round. This is deferred, not silently dropped.
+- Boundary: n=10 per cell is a screening design, not an estimation design. Nothing in
+  this pack is a measurement of the model.
+
+## 2026-07-25 — Phase 1.2C parser-v3 locked holdout construction (Track D), constructed, NOT sealed
+
+- Artifact pack
+  `artifacts/phase1-evaluator-validation/track-d/20260725T121557Z-track-d-parser-v3-locked-set`;
+  protocol hash `27becc4e7731e6326e1bfbea39dd2734110a131ab307f72253714406ac76fcba`.
+- Composition: 120 cases across 12 strata (10 per stratum), 80 of them critical
+  (strata outside S01, S02, S03, S12).
+- Labeling: two reference-blind reviewers each covered all 120 cases independently.
+  Whole-row exact agreement was 113/120 before arbitration; 7 disagreement rows were
+  arbitrated; **0 labels remain unresolved**, which was the required threshold.
+  Per-field agreement ranged from 117/120 to 119/120
+  (answer_presence kappa 0.9787, output_quality kappa 0.9434,
+  candidate_answers mean Jaccard 0.9917, failure_reasons mean Jaccard 0.9833).
+- Independence cross-checks, re-run by the main agent via
+  `scripts/crosscheck_parser_v3_locked_set.py`: **zero** exact collisions, **zero**
+  normalized collisions and **zero** numeric-normalized collisions against both the
+  65-case parser-v3 adversarial fixture set and the 60-case parser-v2 public
+  development set.
+- One registered cross-check is recorded as vacuous rather than passed: the 18-record
+  historical audit extract `artifacts/record_audit/ambiguous_records_for_review.jsonl`
+  contains no output-bearing field, so it cannot collide with anything by construction.
+- **The set was NOT sealed to immutable storage this round.** Sealing was not performed
+  because (a) the registered pre-seal cross-check against the retired parser-v2 locked
+  inputs in Blob was not executed, and (b) writing the 12-object seal requires a
+  `Storage Blob Data Contributor` grant that was not created. Until the seal exists,
+  the holdout is not locked and **no parser-v3 evaluation may be run against it**.
+- The locked inputs and labels are deliberately kept out of git (`.gitignore` rules
+  38-47). Reviewability is via the committed fingerprint manifests
+  `manifests/inputs_manifest.json`, `manifests/labels_manifest.json` and
+  `manifests/set_manifest.json`.
+- Boundary: reviewer agreement is LLM operational consensus, not human ground truth.
+  Isolation between set construction and parser-v3 development is procedural, not
+  security-enforced, and both happened in the same worktree during the same round.

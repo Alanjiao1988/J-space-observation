@@ -11,11 +11,13 @@ CLAIM_HELPER="$SCRIPT_DIR/phase05_claim_election.py"
 # 09_build_parser_v2_eval.sh does. Debian 12 ships python3 with no `python`
 # alias, so an unqualified `python` is both unportable and PATH-hijackable.
 readonly PYTHON_BIN="$(/usr/bin/readlink -f /usr/bin/python3)"
-readonly PYTHON_MODE="$(/usr/bin/stat -c '%a' "$PYTHON_BIN" 2>/dev/null || true)"
-if [[ ! "$PYTHON_BIN" =~ ^/usr/bin/python3([.][0-9]+)?$ \
-    || ! -x "$PYTHON_BIN" \
-    || "$(/usr/bin/stat -c '%u' "$PYTHON_BIN" 2>/dev/null || true)" != "0" \
-    || ! "$PYTHON_MODE" =~ ^[0-7]{3,4}$ ]]; then
+if [[ ! "$PYTHON_BIN" =~ ^/usr/bin/python3([.][0-9]+)?$ || ! -x "$PYTHON_BIN" ]]; then
+    echo "[FAIL] Authenticated absolute Python interpreter is unavailable"
+    exit 1
+fi
+readonly PYTHON_OWNER="$(/usr/bin/stat -c '%u' "$PYTHON_BIN")"
+readonly PYTHON_MODE="$(/usr/bin/stat -c '%a' "$PYTHON_BIN")"
+if [[ "$PYTHON_OWNER" != "0" || ! "$PYTHON_MODE" =~ ^[0-7]{3,4}$ ]]; then
     echo "[FAIL] Authenticated absolute Python interpreter is unavailable"
     exit 1
 fi

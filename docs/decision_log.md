@@ -1426,3 +1426,90 @@ Consequence:
   holdout and a separately authorized one-shot evaluation.
 - The 65 adversarial fixtures share authorship with parser v3 and therefore
   cannot serve as the independent oracle.
+
+## 2026-07-25 — Accept ENGINEERING_IMPROVING as the Phase 0.5B result
+
+Decision:
+
+- The Phase 0.5B J-lens saturation run `20260725T122016Z` is recorded with its
+  emitted outcome, **ENGINEERING_IMPROVING**, and is neither re-run nor re-framed.
+
+Rationale:
+
+- `ENGINEERING_IMPROVING` is one of the preregistered outcomes of this stage. It
+  means the transport-and-numerics half of the protocol passed cleanly while the
+  convergence half did not yet reach threshold. That is information, not failure, and
+  reporting it as anything softer would be a misrepresentation.
+- Every stability criterion passed with very large margin: shard-merge versus direct
+  fit differed by 2.384e-07 against a 1e-05 limit and by 4.862e-08 relative Frobenius
+  against a 1e-06 limit, save/load was bit-exact, and the finite rate was 1.0. The
+  fitting, sharding, merging and serialization pipeline is therefore demonstrably
+  sound.
+- The two convergence criteria failed by wide margins (relative Frobenius 0.4170
+  against a 0.10 limit; cosine 0.9205 against a 0.99 limit). This is not marginal and
+  must not be described as "nearly converged".
+
+Consequence:
+
+- No larger J-lens fit is authorized until the main agent reviews these measurements.
+  No behavioural or semantic gate is opened by this run.
+- The measured cost is essentially linear at roughly 52.8 s per fit prompt with peak
+  reserved memory near 3.8 GB in both configurations, so a larger fit is affordable on
+  the same T4; the open question is scientific, not budgetary.
+- The nested design (the 10-prompt set is a subset of the 25-prompt set) means the
+  comparison measures estimator movement as data is added, not independent
+  replication. Any future saturation claim needs disjoint fit sets.
+- Top-k overlap of 0.82 and rank correlation of 0.969 are recorded as technical
+  stability statistics only. They are explicitly not semantic evidence and support no
+  workspace, hidden-reasoning, invisible-CoT, or J-space claim.
+
+## 2026-07-25 — Defer the Phase 1.0C headroom calibration GPU run
+
+Decision:
+
+- Track B is recorded as preregistered-and-blocked. The pack ships with status
+  **BLOCKED** and no measurement is claimed.
+
+Rationale:
+
+- The main `Dockerfile` validates a build attestation from
+  `.semantic_audit_build_provenance.json`, which is gitignored and absent from the
+  worktree, so the `j-space-observation` image cannot be rebuilt at this commit and
+  no calibration image exists in the registry.
+- Fabricating a substitute Dockerfile to unblock the run would have changed the build
+  provenance of a scientific artifact in the same round it was first used. That is a
+  worse outcome than deferring.
+
+Consequence:
+
+- The preregistration, selection rules, thresholds and analysis code are frozen and
+  committed now, before any data exists, which is the property that makes the eventual
+  run credible.
+- Restoring the build attestation, or authoring a dedicated calibration image with
+  recorded provenance, is a prerequisite for executing Track B.
+
+## 2026-07-25 — Do not seal the parser-v3 locked holdout this round
+
+Decision:
+
+- The parser-v3-v1 locked set is recorded as **constructed but not sealed**.
+
+Rationale:
+
+- One registered pre-seal cross-check, the overlap comparison against the retired
+  parser-v2 locked inputs held in Blob, was not executed. Sealing before running a
+  registered check would defeat the point of registering it.
+- The seal itself requires a `Storage Blob Data Contributor` grant on the results
+  container. That is a write privilege on immutable scientific storage and was not
+  created for an operation that could not yet be completed correctly.
+
+Consequence:
+
+- The holdout is **not** locked. No parser-v3 evaluation may be run against it, and no
+  parser-v3 result may be claimed, until the seal exists.
+- The set, its labels, its manifests and the full sealing specification
+  (`docs/phase1_parser_v3_sealing_run.md`, 12 objects, `set_manifest.json` written
+  last, `overwrite=false`) are complete and carried forward unchanged.
+- The independence evidence that was obtainable is strong: zero exact, normalized and
+  numeric-normalized collisions against every reachable prior corpus. The residual
+  risk is confined to the one corpus that could not be reached.

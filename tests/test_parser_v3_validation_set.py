@@ -123,15 +123,21 @@ def test_manifests_directory_and_public_manifests_are_not_gitignored():
 
 
 def test_public_manifests_are_untracked_and_stageable():
-    result = subprocess.run(
+    """The public manifests must be visible to git: tracked, or stageable.
+
+    Before the first commit they show up as untracked-and-stageable; after it
+    they are tracked and no longer appear in `git status`. Either state is
+    correct. What must never happen is that they become invisible to git.
+    """
+    status = subprocess.run(
         ["git", "status", "--porcelain", "--untracked-files=all", "--", SET_PREFIX],
         cwd=ROOT,
         capture_output=True,
         text=True,
         check=False,
     )
-    assert result.returncode == 0
-    listed = {line[3:].strip().strip('"') for line in result.stdout.splitlines()}
+    assert status.returncode == 0
+    listed = {line[3:].strip().strip('"') for line in status.stdout.splitlines()}
     for name in (
         builder.INPUTS_MANIFEST_NAME,
         builder.LABELS_MANIFEST_NAME,
@@ -140,7 +146,16 @@ def test_public_manifests_are_untracked_and_stageable():
         relative = f"{SET_PREFIX}manifests/{name}"
         if not (MANIFEST_ROOT / name).is_file():
             continue
-        assert relative in listed, f"{relative} is not visible to git as a stageable file"
+        tracked = subprocess.run(
+            ["git", "ls-files", "--error-unmatch", "--", relative],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert tracked.returncode == 0 or relative in listed, (
+            f"{relative} is neither tracked nor visible to git as a stageable file"
+        )
 
 
 def test_no_holdout_file_is_stageable():

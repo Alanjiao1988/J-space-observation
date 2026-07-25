@@ -178,34 +178,90 @@ invisible-CoT, internal-workspace, or J-space claim follows.
 
 ---
 
-## Phase 0.5B — J-lens saturation (planned)
+## Phase 0.5B — J-lens saturation (executed 2026-07-25)
 
-Method record to be completed by Track A when the run executes. Registered
-design: 50-prompt generic fit corpus, disjoint from all behavioral and evaluator
-sets; Fit A at 10 prompts; Fit B at 25 prompts sharded `[10, 10, 5]` and merged;
-source layers `[6, 13, 20]`, target layer `27`; fp16 model with fp32 lens
-serialization; `dim_batch` preferred 1.
+Run `20260725T122016Z`, one Tesla T4, single Container Apps job execution
+`job-jspace-p05-jlens-saturation-jxkk7fk`, 12:21:57Z to 12:58:16Z UTC.
+
+Provenance: code commit `408cd00540d5ded2b94ba75fc3616f8702e85465`; image digest
+`sha256:a15016dfd025cb4e5dc166638129cc4abf7895cdddbbc1b7638672aab7a3524f`;
+protocol hash `b4422756bec723534b78981d79837f3cf9422244f4c1bf40eba205fcce29d32e`;
+official lens source `anthropics/jacobian-lens@581d398613e5602a5af361e1c34d3a92ea82ba8e`;
+target `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B@ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562`
+in float16 with float32 lens serialization.
+
+Design as executed, unchanged from registration: fit corpus
+`data/jlens_saturation_prompts.jsonl` (SHA-256
+`41e104efec1cd0e0eebae504cd888e60c4e81f6f8c7774d75c895eac98862b4b`, 25 fit / 10
+held-out / 15 reserve, disjoint from all behavioural and evaluator sets); Fit A at
+10 prompts fitted directly; Fit B at 25 prompts fitted as shards `[10, 10, 5]` and
+merged with the official merge; a direct-subset merge control over 5 prompts;
+source layers `[6, 13, 20]`, target layer `27`; `max_seq_len=32`, `skip_first=16`,
+`dim_batch=1`.
+
+Measurements: Fit A 528.47 s (52.85 s/prompt), peak reserved 3,829,399,552 B, lens
+28,314,032 B. Fit B 1316.87 s (52.67 s/prompt), peak reserved 3,774,873,600 B,
+checkpoint 84,942,315 B, merged lens 28,314,032 B. 22 records, 184 metric rows.
+
+Outcome: status COMPLETE, decision **ENGINEERING_IMPROVING**. Stability criteria all
+passed (finite rate 1.0; save/load max_abs 0.0; shard-merge vs direct max_abs
+2.384e-07 against 1e-05; relative Frobenius 4.862e-08 against 1e-06; apply save/load
+consistency 1.0). Convergence criteria failed (relative Frobenius 0.4170 against
+0.10; cosine 0.9205 against 0.99). Held-out apply stability: top-k overlap 0.82,
+rank correlation 0.9691, logit cosine 0.9794. Zero deviations recorded.
+
+Verification: the artifact pack was retrieved under a temporary prefix-conditioned
+`Storage Blob Data Reader` grant that was deleted and verified removed, transferred
+with an end-to-end tarball digest check, and `validate_artifact_pack` was re-run
+independently against the local copy.
+
+Boundary: engineering feasibility and numerical stability only. The 10-prompt fit
+set is nested inside the 25-prompt set, so this measures estimator movement under
+added data, not independent replication. Top-k overlap and rank correlation are
+technical stability statistics and are never semantic evidence.
 
 ---
 
-## Phase 1.0C — bounded capability headroom calibration (planned)
+## Phase 1.0C — bounded capability headroom calibration (preregistered, NOT run)
 
-Method record to be completed by Track B when the run executes. Registered
-design: deterministic 150-item sample from the 450-item bank (5 task families x
-3 difficulty bands x 10 items); conditions `visible_cot` and
-`r1_style_thinking` only, giving 300 generations; `max_new_tokens=512`,
-`temperature=0.6`, `top_p=0.95`, 1 sample per item/condition, fixed recorded
-seed. Parser v2 is used only as a triage tool; final labels require semantic
-adjudication because parser v2's formal locked validation FAILED.
+Preregistered 2026-07-25 with protocol hash
+`d778736ff8a2f0c7e82ee14a529abc05afb44ce3c8a9b2b47fd02771c405719d` and frozen
+before any data exists. Registered design: deterministic 150-item sample from the
+450-item bank (5 task families x 3 difficulty bands x 10 items); conditions
+`visible_cot` and `r1_style_thinking` only, giving 300 generations;
+`max_new_tokens=512`, `temperature=0.6`, `top_p=0.95`, 1 sample per item/condition,
+fixed recorded seed. Parser v2 is used only as a triage tool; final labels require
+semantic adjudication because parser v2's formal locked validation FAILED.
+
+Execution status: **BLOCKED, no model was run and no measurement exists.** The main
+`Dockerfile` validates a build attestation from `.semantic_audit_build_provenance.json`,
+which is gitignored and absent from the worktree, and no calibration image exists in
+the registry. The emitted pack therefore carries status `BLOCKED` by design rather
+than a fabricated result.
 
 ---
 
-## Phase 1.2C — parser-v3 development and new locked-set construction (planned)
+## Phase 1.2C — parser-v3 development and new locked-set construction (2026-07-25)
 
-Method records to be completed by Tracks C and D. Registered design: parser v3
-implemented in a new standalone module with reference-blind extraction; at least
-40 new public adversarial development fixtures; development gates only, never
-validation. The new `parser-v3-v1` locked set is 120 cases across 12 strata with
-hard exact and normalized overlap of zero against all prior sets, dual
-independent reviewers at 120/120, arbiter only on disagreements, and required
-unresolved count of zero. No parser-v3 locked evaluation is executed this round.
+**Track C, parser-v3 development (complete, NOT validated).** Parser v3 was
+implemented in a new standalone module with reference-blind extraction, verified by
+`co_names`/`co_varnames` inspection so it cannot read a registered answer while
+extracting. The frozen parsers are byte-identical to `bc6d7b7`. 65 new public
+adversarial fixtures were authored. Results: 9 development gates passed, 1
+NOT_APPLICABLE, 60/60 non-regression and 65/65 adversarial typed agreement, against
+parser v2's 50/65 on the same fixtures with all 15 differences being v2 fail-closed
+recall losses. Protocol hash
+`417d9ff5d27b17ce588b7713a1b1072fb32ef21a03fd135e4e339719db28866b`.
+
+**Track D, locked-set construction (constructed, NOT sealed).** 120 cases across 12
+strata, 80 critical. Two reference-blind reviewers each covered 120/120
+independently; whole-row exact agreement 113/120 pre-arbitration; 7 rows arbitrated;
+0 unresolved labels. Zero exact, normalized and numeric-normalized collisions
+against the parser-v3 adversarial set and the parser-v2 development set, re-verified
+independently by `scripts/crosscheck_parser_v3_locked_set.py`. Protocol hash
+`27becc4e7731e6326e1bfbea39dd2734110a131ab307f72253714406ac76fcba`.
+
+**No parser-v3 locked evaluation was executed and the set is not sealed.** The seal
+requires the outstanding overlap check against the retired parser-v2 locked inputs
+and a write grant that was not created. Parser v3 is not validated and no formal
+parser-v3 result exists.

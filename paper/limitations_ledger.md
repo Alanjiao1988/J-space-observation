@@ -39,16 +39,21 @@ independence is claimed.
 
 Phase 0.5A demonstrated that the pinned official lens runs end to end on a T4
 with two fit prompts. It says nothing about lens quality, correctness, or
-meaning. F5 was not run. Even after Phase 0.5B saturation, engineering
-convergence is a necessary but far from sufficient condition for scientific
-usability, and no validity criterion tying lens output to any ground truth
-currently exists.
+meaning. F5 was not run. Phase 0.5B then measured saturation directly and
+returned `ENGINEERING_IMPROVING`: the lens did **not** converge between 10 and 25
+fit prompts (relative Frobenius 0.4170 against a 0.10 limit; cosine 0.9205
+against a 0.99 limit). Engineering convergence is a necessary but far from
+sufficient condition for scientific usability, and it has not been reached. No
+validity criterion tying lens output to any ground truth currently exists or is
+currently designed.
 
 ## L-06 — Top-k overlap is not semantic evidence
 
 Top-k overlap and rank correlation between lens applications are numerical
 stability statistics. They must never be presented as evidence about
-representations, reasoning, or meaning.
+representations, reasoning, or meaning. The Phase 0.5B values (top-k overlap
+0.82, rank correlation 0.9691, logit cosine 0.9794) are reported for transport
+and serialization stability only.
 
 ## L-07 — No hidden-workspace claim is available
 
@@ -93,3 +98,36 @@ Azure SDK modules before the subprocess audit guard activated, and accepting
 additional label-manifest metadata). Neither changed scientific behaviour, but
 they mean the committed tree alone does not reproduce the run environment
 exactly.
+
+## L-13 — The parser-v3 locked holdout is not sealed
+
+The 120-case `parser-v3-v1` set is constructed, blind-labeled and manifested,
+but it was not written to immutable storage this round. Until the seal exists the
+set is not locked: it lives in a mutable worktree, its integrity rests on local
+manifests rather than on immutable blob storage, and it therefore cannot support a
+one-shot evaluation. No parser-v3 evaluation may be run against it and no formal
+parser-v3 result may be claimed. One registered pre-seal cross-check, the overlap
+comparison against the retired parser-v2 locked inputs, also remains unexecuted, so
+the independence evidence is strong but not complete.
+
+## L-14 — The parser-v3 set was built in the same worktree as parser v3
+
+Track C developed parser v3 and Track D constructed the new locked holdout during
+the same round, on the same machine, in the same checkout. The separation was
+enforced by task boundaries and by keeping locked inputs out of git, not by any
+technical control. This is weaker isolation than an independently staffed holdout
+and must be disclosed alongside any future parser-v3 result.
+
+## L-15 — The 10-vs-25 J-lens comparison is nested, not independent
+
+The 10-prompt fit corpus is a strict subset of the 25-prompt corpus. The measured
+difference between the two fitted lenses therefore describes how the estimator
+moves as data is added, not whether two independent fits agree. A genuine
+saturation claim requires disjoint fit sets, which this run did not use.
+
+## L-16 — Phase 1.0C is registered but unmeasured
+
+The headroom calibration protocol, item sample, generation settings, selection
+thresholds and analysis code are frozen, but no model was ever run. The pack
+status is `BLOCKED`. Nothing in it may be quoted as a property of the target
+model, and the 450-item bank remains a design artifact rather than a measurement.

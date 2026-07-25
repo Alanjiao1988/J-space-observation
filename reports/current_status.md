@@ -9,13 +9,74 @@ single authorized one-shot parser-v2 locked evaluation has now been executed
 and closed. Its formal outcome is **FAIL**, and the 120-case locked holdout is
 spent and retired. The model-free Phase 1.2B tooling delivered one-shot Azure
 coordination, authenticated crash recovery, and deterministic post-label
-`CLOSED/INVALID` closure, all of which were exercised in the real run. The
-no-CoT taxonomy v2 and 450-item headroom candidate bank are design artifacts;
-no new behavioral calibration was run.
+`CLOSED/INVALID` closure, all of which were exercised in the real run.
+
+A four-track parallel advancement round then ran on 2026-07-25. Phase 0.5B
+J-lens saturation executed on a T4 and returned **ENGINEERING_IMPROVING**:
+sharding, merge, serialization and apply are numerically sound, but the lens has
+not converged between 10 and 25 fit prompts. Phase 1.0C headroom calibration is
+preregistered and frozen but **BLOCKED** with no model run. Parser v3 is
+developed but **NOT VALIDATED**. A new 120-case parser-v3 locked holdout is
+constructed with zero measured overlap but is **NOT SEALED**, so it is not yet
+locked and cannot be evaluated against. The no-CoT taxonomy v2 and 450-item
+headroom candidate bank remain design artifacts; no new behavioral calibration
+was run.
 
 ## Current Phase
 
-**Phase: Phase 0.5A GREEN; parser-v2 locked evaluation CLOSED with formal outcome FAIL; locked holdout retired**
+**Phase: Phase 0.5A GREEN; Phase 0.5B COMPLETE with decision ENGINEERING_IMPROVING; parser-v2 locked evaluation CLOSED with formal outcome FAIL and holdout retired; parser v3 developed but NOT VALIDATED; parser-v3 holdout constructed but NOT SEALED; Phase 1.0C preregistered but BLOCKED**
+
+## Phase 0.5B J-lens saturation result (2026-07-25)
+
+- Run `20260725T122016Z`; status **COMPLETE**; decision **ENGINEERING_IMPROVING**.
+- Code commit `408cd00`; image digest `sha256:a15016df…3524f`; corpus SHA-256
+  `41e104ef…62b4b`; protocol hash `b4422756…9d32e`. Zero deviations.
+- All five stability criteria passed, with shard-merge versus direct fit agreeing
+  to 2.384e-07 max_abs against a 1e-05 limit and 4.862e-08 relative Frobenius
+  against a 1e-06 limit, and bit-exact save/load.
+- Both convergence criteria failed: relative Frobenius 0.4170 against a 0.10
+  limit and cosine 0.9205 against a 0.99 limit. More fit prompts still change the
+  lens. This is the honest result, not a partial success.
+- Held-out apply stability: top-k overlap 0.82, rank correlation 0.9691, logit
+  cosine 0.9794. **These are technical stability statistics only and are never
+  semantic evidence.**
+- Cost is essentially flat per prompt: 52.85 s/prompt at 10 prompts and 52.67
+  s/prompt at 25, with peak reserved memory near 3.8 GB in both cases.
+- Next gate: main-agent review before any larger fit is authorized. No behavioural
+  or semantic gate is opened. No workspace, hidden-reasoning, invisible-CoT or
+  J-space claim follows from any of this.
+- Artifacts: `artifacts/phase05b-jlens-saturation/track-a/20260725T122016Z/`.
+
+## Phase 1.0C headroom calibration status (2026-07-25) — BLOCKED, NOT RUN
+
+- Design, protocol, selection rules and analysis code are complete and frozen
+  before any data exists; 100 tests pass; protocol hash `d778736f…5719d`.
+- The emitted pack status is **BLOCKED**: no model was run, so there is no
+  measurement of the model and none may be quoted.
+- Blocker: the main `Dockerfile` validates a build attestation from
+  `.semantic_audit_build_provenance.json`, which is gitignored and absent from the
+  worktree, and no calibration image exists in the registry. The image cannot be
+  rebuilt at this commit.
+- Artifacts:
+  `artifacts/phase1-headroom-calibration/track-b/p10c-trackb-plan-d778736ff8a2/`.
+
+## Parser-v3 locked holdout status (2026-07-25) — CONSTRUCTED, NOT SEALED
+
+- 120 cases across 12 strata, 80 critical. Dual reference-blind reviewers at
+  120/120 each; 113/120 whole-row agreement pre-arbitration; 7 rows arbitrated;
+  **0 unresolved labels**.
+- Zero exact, zero normalized and zero numeric-normalized collisions against the
+  65-case parser-v3 adversarial set and the 60-case parser-v2 development set,
+  independently re-verified by `scripts/crosscheck_parser_v3_locked_set.py`.
+- One registered cross-check is vacuous, not passed: the 18-record historical
+  audit extract has no output-bearing field.
+- **The set is not sealed.** The registered overlap check against the retired
+  parser-v2 locked inputs was not executed and no write grant was created.
+  Until the seal exists the holdout is not locked, and **no parser-v3 evaluation
+  may be run against it**.
+- Reviewer agreement is LLM operational consensus, not human ground truth.
+  Isolation from parser-v3 development is procedural, not enforced, and both
+  happened in the same worktree in the same round.
 
 ## Phase 1.2B parser-v2 locked evaluation result (2026-07-25)
 
