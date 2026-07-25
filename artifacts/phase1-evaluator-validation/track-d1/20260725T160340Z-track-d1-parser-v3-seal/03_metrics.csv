@@ -1,0 +1,11 @@
+run_id,phase,track,metric,stratum,condition,n,numerator,denominator,value,ci_lower,ci_upper,threshold,passed,not_applicable_reason
+20260725T160340Z-track-d1-parser-v3-seal,phase-1.2C,D,seal_objects_registered,,seal,12,12,12,12,,,12,true,
+20260725T160340Z-track-d1-parser-v3-seal,phase-1.2C,D,seal_objects_sealed,,seal,12,12,12,12,,,12,true,
+20260725T160340Z-track-d1-parser-v3-seal,phase-1.2C,D,fingerprint_registration_vectors,,preseal_crosscheck_1,5,5,5,5,,,5,true,
+20260725T160340Z-track-d1-parser-v3-seal,phase-1.2C,D,manifest_reproduction_records,,preseal_crosscheck_1,120,120,120,120,,,120,true,
+20260725T160340Z-track-d1-parser-v3-seal,phase-1.2C,D,exact_collision_count,,preseal_crosscheck_1,120,0,120,0,,,0,true,
+20260725T160340Z-track-d1-parser-v3-seal,phase-1.2C,D,normalised_collision_count,,preseal_crosscheck_1,120,0,120,0,,,0,true,
+20260725T160340Z-track-d1-parser-v3-seal,phase-1.2C,D,numeric_normalised_collision_count,,preseal_crosscheck_1,120,0,120,0,,,0,true,
+20260725T160340Z-track-d1-parser-v3-seal,phase-1.2C,D,crosscheck_2_adversarial_development_set,,preseal_crosscheck_2,65,0,65,0,,,0,true,already executed by scripts/crosscheck_parser_v3_locked_set.py; zero on all three fingerprints
+20260725T160340Z-track-d1-parser-v3-seal,phase-1.2C,D,crosscheck_2b_parser_v2_development_set,,preseal_crosscheck_2,60,0,60,0,,,0,true,public parser-v2 development set; zero on all three fingerprints
+20260725T160340Z-track-d1-parser-v3-seal,phase-1.2C,D,crosscheck_3_historical_audit_extract,,preseal_crosscheck_3,18,,18,,,,,,"VACUOUS: the 18-record extract carries no output-bearing field, so it cannot collide; never report this as passed"

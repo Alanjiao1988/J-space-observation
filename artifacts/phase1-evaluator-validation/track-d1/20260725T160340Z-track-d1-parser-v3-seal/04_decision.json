@@ -1,0 +1,54 @@
+{
+  "criteria_failed": [
+    "RBAC-enforced isolation: the sealing identity already held an unconditioned account-scope Storage Blob Data Contributor assignment, so the two temporary prefix-conditioned ABAC grants narrowed nothing. Isolation of the retired parser-v2 label, score and ledger material rests on the payload code path, the Track D tests and the report's own attestations, not on RBAC. See deviation D13."
+  ],
+  "criteria_not_applicable": [
+    {
+      "criterion": "parser-v3 extraction accuracy against the locked set",
+      "reason": "this round is sealing only; running an evaluation is explicitly forbidden"
+    },
+    {
+      "criterion": "cross-check 3 against the full historical model outputs",
+      "reason": "only an 18-record audit extract is reachable and it carries no output-bearing field, so the check is vacuous, not passed"
+    }
+  ],
+  "criteria_passed": [
+    "the job reuses the registered fingerprint functions and refuses to run if they do not reproduce the pinned vectors and the committed manifest",
+    "the job can list and read only the retired locked-INPUTS leaf, and only one blob inside it",
+    "no parser was imported, no prediction was produced and nothing was scored",
+    "all twelve seal objects verify locally against the Track D build digests",
+    "cross-check 1: exact, normalised and numeric-normalised collision counts against the retired parser-v2 locked inputs are all zero",
+    "twelve-object exact membership, overwrite=false on every write, round-trip SHA-256 and ETag verification, set manifest written last"
+  ],
+  "cross_check": {
+    "exact_collision_count": 0,
+    "executed": true,
+    "new_count": 120,
+    "normalised_collision_count": 0,
+    "numeric_normalised_collision_count": 0,
+    "reason": null,
+    "retired_count": 120,
+    "verdict": "PASS"
+  },
+  "decision": "The parser-v3-v1 holdout is sealed. The seal establishes only that a specific 120-case instrument existed, with specific bytes, at a specific time, before any parser-v3 result was known.",
+  "deviations": [
+    "the cross-check moved from the orchestrator VM to a Container Apps job after the VM Run Command extension wedged; the VM was later repaired but the Container Apps job stays the authoritative path",
+    "the cross-check report and the seal record are written to a sibling runlog prefix, not into the sealed prefix, because the sealed prefix has an exact twelve-object membership rule"
+  ],
+  "next_gate": "Teardown is done and measured: both temporary grants deleted, container-scope assignments 0, job reset to the base image with /bin/true, job secrets 0, storage public network access Disabled, single-use image deleted. One expectation was NOT met and is disclosed rather than restated as met: subscription-wide blob roles for the sealing identity are 1, not 0, because of a pre-existing unconditioned account-scope assignment. Next: update the paper ledgers so EV-0007 is sealed and CL-06 records holdout sealed = yes while parser-v3 formal validation stays unsupported, then schedule the one-shot parser-v3 locked evaluation as a separate, later round.",
+  "prohibited_interpretations": [
+    "NO PARSER-V3 EVALUATION WAS RUN IN THIS ROUND AND NO PARSER-V3 RESULT EXISTS.",
+    "Sealing a holdout does not validate parser v3; it fixes the instrument in time.",
+    "Do not read any number in this pack as a parser-v3 accuracy, precision, recall or error rate.",
+    "Do not treat the labels as human ground truth; they are a two-reviewer plus arbiter LLM operational consensus.",
+    "Do not treat zero overlap as unconditional; it holds only against the corpora actually compared.",
+    "Do not describe the isolation as a security or RBAC boundary; it is procedural.",
+    "A NOT PERFORMED cross-check is not a passed cross-check.",
+    "Do not restate a NOT PERFORMED cross-check as a passed cross-check."
+  ],
+  "run_id": "20260725T160340Z-track-d1-parser-v3-seal",
+  "schema_version": "jspace-decision/v1",
+  "scientific_interpretation": "This track produced a gate, not a measurement. A passing cross-check shows only that the new instrument does not reuse retired holdout text under three registered fingerprints; it says nothing about parser-v3 accuracy. The labels being sealed are an LLM operational consensus, not human ground truth. Isolation between set construction and parser-v3 development is procedural and hash-audited, not security-enforced.",
+  "status": "SEALED",
+  "status_reason": "the cross-check passed and all twelve objects sealed"
+}

@@ -52,3 +52,5 @@ scripts/verify_jlens_corpus_amendment.py text eol=lf
 src/jspace_observation/phase05c_jlens_disjoint.py text eol=lf
 tests/test_phase05c_jlens_disjoint.py text eol=lf
 infra/azure/scripts/12_run_phase05c_jlens_disjoint.sh text eol=lf
+docs/phase1_parser_v3_seal_execution_record.json text eol=lf
+docs/phase1_parser_v3_seal_ledger_drafts.md text eol=lf

@@ -1,0 +1,11 @@
+table_id,row_label,measure,value,denominator,note
+parser_v3_seal_gate,Cases in the holdout,count,120,120,12 strata x 10
+parser_v3_seal_gate,Registered seal objects,count,12,12,set manifest written last
+parser_v3_seal_gate,Cross-check 1 verdict,state,PASS,,retired parser-v2 locked inputs
+parser_v3_seal_gate,Cross-check 1 retired records compared,count,120,,retired locked inputs
+parser_v3_seal_gate,Cross-check 1 exact collisions,count,0,,zero required
+parser_v3_seal_gate,Cross-check 1 normalised collisions,count,0,,zero required
+parser_v3_seal_gate,Cross-check 1 numeric-normalised collisions,count,0,,zero required
+parser_v3_seal_gate,Cross-check 2 collisions,count,0,65,"parser-v3 adversarial development set, executed locally"
+parser_v3_seal_gate,Cross-check 3,state,VACUOUS,18,no output-bearing field in the audit extract
+parser_v3_seal_gate,Final state,state,SEALED,,Track D vocabulary

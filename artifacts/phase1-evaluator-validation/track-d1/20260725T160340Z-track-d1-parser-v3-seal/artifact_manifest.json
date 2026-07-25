@@ -1,0 +1,143 @@
+{
+  "code_commit": "661eff7803d33d3be7be516f76eaf8dcb9e50d4f",
+  "content_disclosure": "this pack contains no case text, no label values, no retired input text and no per-case stratum; only digests, counts and states",
+  "cross_check": {
+    "exact_collision_count": 0,
+    "executed": true,
+    "new_count": 120,
+    "normalised_collision_count": 0,
+    "numeric_normalised_collision_count": 0,
+    "reason": null,
+    "retired_count": 120,
+    "verdict": "PASS"
+  },
+  "evidence_sources": [
+    {
+      "artifact": "crosscheck_report.json",
+      "blob_class": "runlog sidecar",
+      "bytes": 2900,
+      "sha256": "893b24a52172aed1b3223dcf15d85d2e286762c50b4258ad10e5586678a0aefc"
+    },
+    {
+      "artifact": "seal_record.json",
+      "blob_class": "runlog sidecar",
+      "bytes": 6427,
+      "sha256": "eb11b1f0658ef50d003a2723a846221f22c448ec2e3c6bf117177f2e18a37dd8"
+    }
+  ],
+  "files": [
+    {
+      "bytes": 5502,
+      "path": "00_stage_manifest.json",
+      "sha256": "d63c24999f54f0239a3f7c1bd15ddd1f72449bac07fc2035697651107c96519c",
+      "status": "ok"
+    },
+    {
+      "bytes": 3765,
+      "path": "01_protocol_snapshot.json",
+      "sha256": "ea660798d1861ff1bd9999371d152657fee1d30ceaf9ef683431a923848ea998",
+      "status": "ok"
+    },
+    {
+      "bytes": 7308,
+      "path": "02_records.jsonl",
+      "sha256": "a111a821e22e83e779c1defbf2963afc1a665aeec48ddcdc67524975bc3701c6",
+      "status": "ok"
+    },
+    {
+      "bytes": 1653,
+      "path": "03_metrics.csv",
+      "sha256": "ea846fea4adbf6a9f808f40148ff7453df661936354d3b6ddf07f6f5668cacad",
+      "status": "ok"
+    },
+    {
+      "bytes": 4522,
+      "path": "04_decision.json",
+      "sha256": "a541bd34bd103ff566d30ca79aef383c1fad42c89813f2fb28276c3a1b01c3a8",
+      "status": "ok"
+    },
+    {
+      "bytes": 5711,
+      "path": "05_summary.md",
+      "sha256": "769cb2eb8954026f31fad9104c41aed0437292cbf4a950202ec8e68db2a37128",
+      "status": "ok"
+    },
+    {
+      "bytes": 895,
+      "path": "06_paper_table.csv",
+      "sha256": "58d76e653371cc5ce0c4284aa4d98ba70e90dcfa9ffbb95ec0290685e17d85bd",
+      "status": "ok"
+    },
+    {
+      "bytes": 44,
+      "path": "07_figure_data.csv",
+      "reason": "a sealing gate produces no figure series; the file is emitted with its registered header and no rows",
+      "sha256": "4b292b5a94d6b05375d70d3d2e966b08a854e3106a9eb74139152ecda0235afe",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 7604,
+      "path": "08_deviations.json",
+      "sha256": "0504f42f5dad8cbfb6c03a7bf8380bbceb03f110f1c8825a951d989f589ac8ee",
+      "status": "ok"
+    }
+  ],
+  "generated_at_utc": "2026-07-25T16:24:00Z",
+  "manifest_written_last": true,
+  "phase": "phase-1.2C",
+  "protocol_hash": "be350c66d24062d6cc628a7908da59b3777c1f99b8167ee0a0f7766f6020618d",
+  "referenced_artifacts": [
+    {
+      "committed_to_git": true,
+      "path": "scripts/parser_v3_seal_job.py",
+      "role": "container job payload: cross-check and gated seal"
+    },
+    {
+      "committed_to_git": true,
+      "path": "scripts/stage_parser_v3_seal_payload.py",
+      "role": "out-of-tree build context staging"
+    },
+    {
+      "committed_to_git": true,
+      "path": "docs/phase1_parser_v3_seal_job_spec.md",
+      "role": "Azure job specification and ABAC conditions"
+    },
+    {
+      "committed_to_git": false,
+      "note": "gitignored; sealed, never committed",
+      "path": "evaluator_sets/parser_v3_v1/locked_inputs.jsonl",
+      "role": "private holdout inputs"
+    },
+    {
+      "committed_to_git": false,
+      "note": "gitignored; must never be committed",
+      "path": "evaluator_sets/parser_v3_v1/locked_labels.jsonl",
+      "role": "private holdout labels"
+    }
+  ],
+  "run_id": "20260725T160340Z-track-d1-parser-v3-seal",
+  "schema_version": "jspace-artifact-manifest/v1",
+  "seal": {
+    "object_count": 12,
+    "overwrite": false,
+    "parent_prefix": "phase1-evaluator-validation/parser-v3-v1/20260725T160340Z",
+    "roundtrip_verification": "size, SHA-256 and ETag verified for all 12 objects",
+    "written_last": "phase1-evaluator-validation/parser-v3-v1/20260725T160340Z/manifests/set_manifest.json"
+  },
+  "status": "SEALED",
+  "status_reason": "the cross-check passed and all twelve objects sealed",
+  "track": "D",
+  "track_directory": "track-d1",
+  "write_order": [
+    "00_stage_manifest.json",
+    "01_protocol_snapshot.json",
+    "02_records.jsonl",
+    "03_metrics.csv",
+    "04_decision.json",
+    "05_summary.md",
+    "06_paper_table.csv",
+    "07_figure_data.csv",
+    "08_deviations.json",
+    "artifact_manifest.json"
+  ]
+}

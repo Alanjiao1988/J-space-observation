@@ -1,0 +1,108 @@
+{
+  "schema_version": "phase1-parser-v3-seal-execution-record/v1",
+  "purpose": "Operator-attested facts about the parser-v3-v1 seal execution that are NOT recoverable from the two durable Blob artifacts. Everything recoverable from those artifacts is read from them directly and is not duplicated here. Each block names how it was established.",
+  "evidence_class": "operator attestation, measured by the main agent with az; not independently re-measured by Track D, which holds no Azure access",
+  "job": {
+    "name": "job-jspace-parser-v3-seal",
+    "environment": "cae-jspace-observation-sea-vnet2",
+    "workload_profile": "Consumption",
+    "cpu": 2,
+    "memory": "4Gi",
+    "gpu": "none",
+    "parallelism": 1,
+    "completions": 1
+  },
+  "identity": {
+    "name": "id-jspace-aca-acrpull-sea",
+    "principal_id": "78d4348b-57eb-4fb9-aaa7-99148b303292",
+    "dedicated": false,
+    "note": "the sealing round specified a dedicated managed identity; the shared Container Apps job identity was used instead"
+  },
+  "image": {
+    "digest": "sha256:f13220aed82c320150a63868e4519ec8d3d4dae7331ae4d421257f191c7d2388",
+    "tags": [
+      "j-space-observation-pv3seal:20260725T155224Z",
+      "j-space-observation-pv3seal:20260725T160340Z"
+    ],
+    "acr_run_id": "cmx",
+    "base_image": "python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d",
+    "staged_dockerfile_sha256": "e511a1e5105c70e3eab5d0c78c2e78db01f1721225df24d7d82045faa5f2ace5",
+    "rebuilt_for_second_timestamp": false,
+    "retag_method": "az acr import of the identical digest under the new tag; no source changed, so the bytes that ran are provably the bytes that were reviewed"
+  },
+  "timestamps": {
+    "attempted": "20260725T155224Z",
+    "resolved": "20260725T160340Z",
+    "rotation_reason": "seal mode re-runs the cross-check and re-writes crosscheck_report.json, which collided with the dry pass's report already present under the same runlog prefix; overwrite=false refused it"
+  },
+  "executions": [
+    {
+      "id": "job-jspace-parser-v3-seal-57w51qd",
+      "mode": "crosscheck",
+      "seal_timestamp": "20260725T155224Z",
+      "result": "Succeeded",
+      "outcome": "cross-check PASS, dry pass, nothing sealed"
+    },
+    {
+      "id": "job-jspace-parser-v3-seal-0fz4tkj",
+      "mode": "seal",
+      "seal_timestamp": "20260725T155224Z",
+      "result": "Failed",
+      "outcome": "ABORT on the overwrite=false guard: the runlog crosscheck_report.json already existed from the dry pass. No seal object was written. This is the guard working as designed, not a defect."
+    },
+    {
+      "id": "job-jspace-parser-v3-seal-61zgric",
+      "mode": "seal",
+      "seal_timestamp": "20260725T160340Z",
+      "result": "Succeeded",
+      "outcome": "cross-check PASS then twelve objects sealed"
+    }
+  ],
+  "independent_membership_verification": {
+    "performed_by": "the main agent, under a separate identity, by listing the sealed parent rather than trusting the job's own record",
+    "parent_object_count": 12,
+    "runlog_sibling_object_count": 2,
+    "byte_counts_matched_staged_payload": true
+  },
+  "evidence_transport": {
+    "method": "pulled through the VNet, gzipped, base64-encoded, digest-compared on both sides, then each file re-verified locally against its remotely measured digest",
+    "ephemeral_summary_lost": true,
+    "ephemeral_summary_note": "the in-container /runtime/work/summary.json was not retained, so the artifact pack is rebuilt as a function of crosscheck_report.json and seal_record.json instead"
+  },
+  "teardown": {
+    "temporary_grants_deleted": true,
+    "container_scope_assignments_any_principal": 0,
+    "control_identity_blob_roles": {
+      "principal_id": "1ec93a23-1126-4058-a537-4f1016b8c325",
+      "count": 0
+    },
+    "sealing_identity_blob_roles": {
+      "count": 1,
+      "expected_by_spec": 0,
+      "matches_expectation": false,
+      "standing_assignment": {
+        "role": "Storage Blob Data Contributor",
+        "scope": "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/rg-jspace-observation-sea/providers/Microsoft.Storage/storageAccounts/stjspacefiles0709085305",
+        "condition": null,
+        "created_on": "2026-07-09T09:15:03Z",
+        "pre_existing": true,
+        "removed": false,
+        "not_removed_reason": "it pre-dates this round and other Container Apps jobs depend on it to write results; removing it was out of scope and would break unrelated infrastructure"
+      }
+    },
+    "job_reset_image": "j-space-observation@sha256:43af06291f6196d5426fe5e014196c86d3d00aae978470d369a9c1c2bd3dfeac",
+    "job_reset_command": "/bin/true",
+    "job_secrets": 0,
+    "job_secret_references": 0,
+    "registry_password_secret_ref_empty": true,
+    "storage_public_network_access": "Disabled",
+    "single_use_image_deleted": true,
+    "single_use_repository_deleted": "j-space-observation-pv3seal",
+    "remaining_repositories": [
+      "j-space-observation",
+      "j-space-observation-jlens",
+      "j-space-observation-parser-eval"
+    ],
+    "staging_context_removed": true
+  }
+}

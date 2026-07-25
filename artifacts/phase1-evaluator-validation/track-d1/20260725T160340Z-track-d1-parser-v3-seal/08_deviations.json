@@ -1,0 +1,58 @@
+{
+  "deviations": [
+    {
+      "description": "The registered pre-seal cross-check was attempted on the orchestrator VM and did not complete: the Azure Run Command extension wedged in a Conflict state and did not clear.",
+      "detected_by": "roughly 25 minutes of retries, including a trivial echo probe",
+      "effect": "the check was recorded as NOT PERFORMED, never as skipped, inferred or passed",
+      "id": "D6-transport-moved-to-container-apps",
+      "later_infrastructure_note": "the VM was subsequently repaired: the root cause was provisioningState Failed with zero extensions installed, an az vm update on tags reconciled it to Succeeded, and a Run Command probe now returns Enable succeeded. The Container Apps job remains the authoritative path and the VM is a fallback transport only. The repair does not convert the failed attempt into a performed check.",
+      "resolution": "the comparison was rebuilt as a short-lived Container Apps CPU job in the VNet-integrated environment, which also removes the need for the storage account to be reachable from outside the VNet"
+    },
+    {
+      "description": "The sealed prefix has an exact twelve-object membership rule, so the cross-check report and the seal record cannot be written inside it without failing that rule.",
+      "detected_by": "docs/phase1_parser_v3_sealing_run.md section 6",
+      "effect": "the seal keeps exactly twelve objects; the evidence is still durable and still inside the same VNet-only account",
+      "id": "D7-runlog-prefix-outside-the-seal",
+      "resolution": "both are written to a sibling prefix `<parent>-runlog/`, which the write grant covers and the membership listing does not"
+    },
+    {
+      "description": "Four of the twelve registered objects are stored with CRLF line endings on the curator's disk, while the sealing specification says Track D artifacts are written with LF.",
+      "detected_by": "byte-level digest verification of all twelve objects",
+      "effect": "none on integrity: the recorded Track D digests are the digests of the exact on-disk bytes, and the seal uploads those exact bytes with no re-serialisation or newline translation, as section 4 requires",
+      "id": "D8-public-document-line-endings",
+      "resolution": "the job pins the on-disk digest and byte count of every object and aborts on any mismatch, so no silent normalisation is possible"
+    },
+    {
+      "description": "The first seal attempt, under timestamp 20260725T155224Z, aborted. The recommended dry pass in mode crosscheck had already written crosscheck_report.json to that timestamp's runlog prefix, and seal mode re-runs the cross-check and re-writes that report, so the upload hit its own overwrite=false guard with ResourceExistsError.",
+      "detected_by": "the job's own overwrite=false guard, execution job-jspace-parser-v3-seal-0fz4tkj, which failed closed with state=BLOCKED_INFRASTRUCTURE",
+      "effect": "none on integrity, and this is the guard working as designed rather than a defect: no seal object was written under the aborted timestamp, and no object was ever overwritten",
+      "id": "D10-seal-timestamp-rotated-after-an-overwrite-false-abort",
+      "resolution": "the timestamp was rotated to 20260725T160340Z, the old write grant was deleted, a fresh write grant was pinned to the new timestamp, and mode seal was run exactly once and succeeded",
+      "specification_update": "running mode crosscheck and then mode seal under one timestamp is guaranteed to abort; the dry pass must use its own throwaway timestamp or be skipped when the grants are already trusted"
+    },
+    {
+      "description": "The rotated timestamp did not trigger a rebuild. The existing image was imported to the new tag with az acr import.",
+      "detected_by": "the main agent's execution record; both tags resolve to digest sha256:f13220aed82c320150a63868e4519ec8d3d4dae7331ae4d421257f191c7d2388",
+      "effect": "strictly positive for provenance: no source changed between the two attempts, so the bytes that sealed the set are provably the same bytes that were reviewed and that ran the passing cross-check",
+      "id": "D11-image-retagged-not-rebuilt-for-the-second-timestamp",
+      "resolution": "recorded, with the shared digest, as the binding between the two executions"
+    },
+    {
+      "description": "The seal ran under the shared Container Apps job identity id-jspace-aca-acrpull-sea, principal 78d4348b-57eb-4fb9-aaa7-99148b303292, not under a dedicated single-purpose managed identity as the round specification asked.",
+      "detected_by": "the main agent's teardown measurement",
+      "effect": "the sealing principal is not separable from other Container Apps workloads, so per-identity audit cannot attribute blob activity to this seal alone",
+      "id": "D12-shared-identity-instead-of-a-dedicated-one",
+      "resolution": "recorded, not repaired: see D13, which is the consequence that actually matters"
+    },
+    {
+      "description": "The sealing identity already held an unconditioned Storage Blob Data Contributor assignment at ACCOUNT scope, created 2026-07-09, sixteen days before this round. The two temporary prefix-conditioned ABAC grants created for this run therefore did not narrow its effective permissions at all.",
+      "detected_by": "the main agent's post-run teardown query: subscription-wide blob roles for the sealing identity returned 1, not the 0 the specification expected, and the surviving assignment carries no condition",
+      "effect": "material and must not be softened. The two ABAC conditions were defence in depth on paper and enforced nothing in practice. Isolation of the retired parser-v2 labels, scores and scoring ledger therefore rests entirely on the payload's code path, on the Track D tests that pin that code path, and on the cross-check report's own attestations label_material_touched=false and score_material_touched=false. It does not rest on RBAC. This is a concrete, evidenced instance of the project's standing caveat that isolation is procedural, not security-enforced, and it should be cited as that instance rather than left abstract.",
+      "id": "D13-standing-unconditioned-role-meant-abac-enforced-nothing",
+      "residual_risk": "any future round that wants RBAC-enforced isolation must run under a dedicated identity that holds no standing account-scope blob role, and must verify that before granting, not after running",
+      "resolution": "not removed, and deliberately so: the assignment pre-dates this round and other Container Apps jobs depend on it to write results, so removing it was out of scope and would have broken unrelated infrastructure. The teardown expectation in docs/phase1_parser_v3_seal_job_spec.md section 9 was corrected to require recording the actual value and disclosing a non-zero result as a limitation, rather than presenting 0 as a pass condition to be met."
+    }
+  ],
+  "effect_on_interpretation": "none on any scientific claim: the transport changed, the evidence location for the report changed, the seal timestamp rotated after a guard fired, and the digest discipline tightened. No decision rule, no fixture, no parser and no gate was altered or waived. The one deviation with real interpretive weight is D13: the prefix-conditioned ABAC grants did not narrow anything, so the isolation of the retired parser-v2 label and score material is procedural and test-enforced, not RBAC-enforced. That weakens the security argument for isolation; it does not weaken the integrity argument for the seal, which rests on digests.",
+  "unregistered_changes": []
+}

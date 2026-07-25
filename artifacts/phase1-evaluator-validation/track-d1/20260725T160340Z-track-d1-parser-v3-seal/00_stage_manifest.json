@@ -1,0 +1,135 @@
+{
+  "code_commit": "661eff7803d33d3be7be516f76eaf8dcb9e50d4f",
+  "cross_check": {
+    "exact_collision_count": 0,
+    "executed": true,
+    "new_count": 120,
+    "normalised_collision_count": 0,
+    "numeric_normalised_collision_count": 0,
+    "reason": null,
+    "retired_count": 120,
+    "verdict": "PASS"
+  },
+  "end_time_utc": "2026-07-25T16:24:00Z",
+  "evidence_sources": [
+    {
+      "artifact": "crosscheck_report.json",
+      "blob_class": "runlog sidecar",
+      "bytes": 2900,
+      "sha256": "893b24a52172aed1b3223dcf15d85d2e286762c50b4258ad10e5586678a0aefc"
+    },
+    {
+      "artifact": "seal_record.json",
+      "blob_class": "runlog sidecar",
+      "bytes": 6427,
+      "sha256": "eb11b1f0658ef50d003a2723a846221f22c448ec2e3c6bf117177f2e18a37dd8"
+    }
+  ],
+  "execution": {
+    "attested_by": "main agent execution record; Track D holds no Azure access and did not re-measure any of it",
+    "executions": [
+      {
+        "id": "job-jspace-parser-v3-seal-57w51qd",
+        "mode": "crosscheck",
+        "result": "Succeeded"
+      },
+      {
+        "id": "job-jspace-parser-v3-seal-0fz4tkj",
+        "mode": "seal",
+        "result": "Failed"
+      },
+      {
+        "id": "job-jspace-parser-v3-seal-61zgric",
+        "mode": "seal",
+        "result": "Succeeded"
+      }
+    ],
+    "job_name": "job-jspace-parser-v3-seal",
+    "seal_timestamp": "20260725T160340Z"
+  },
+  "hardware": {
+    "accelerator": "none",
+    "azure_used": true,
+    "environment": "cae-jspace-observation-sea-vnet2",
+    "environment_workload_profiles": [
+      "Consumption",
+      "gpu-t4"
+    ],
+    "execution": "Azure Container Apps Consumption job, 2 CPU / 4Gi",
+    "gpu_contention": "none; the single gpu-t4 profile is occupied by another track and this job does not request it",
+    "os": "Windows_NT",
+    "workload_profile": "Consumption"
+  },
+  "hypothesis": "The new 120-case parser-v3-v1 holdout shares no output text with the retired parser-v2-v1 locked inputs under the registered exact, normalised and numeric-normalised fingerprints. This is an instrument property, not a parser-v3 result.",
+  "image_digest": {
+    "attested_by": "main agent execution record; Track D holds no Azure access and did not re-measure it",
+    "base_image": "python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d",
+    "digest": "sha256:f13220aed82c320150a63868e4519ec8d3d4dae7331ae4d421257f191c7d2388",
+    "staged_dockerfile_sha256": "e511a1e5105c70e3eab5d0c78c2e78db01f1721225df24d7d82045faa5f2ace5"
+  },
+  "inputs": [
+    {
+      "path": "evaluator_sets/parser_v3_v1/manifests/inputs_manifest.json",
+      "records": 120,
+      "role": "the new set's fingerprints; the only carrier of its identity",
+      "sha256": "ec954093648cb68ce8e6a83db07639bf7de426cc14e35c0a4503b0a6d75ede9d"
+    },
+    {
+      "path": "scripts/build_parser_v3_validation_set.py",
+      "role": "registered fingerprint functions, reused not reimplemented"
+    },
+    {
+      "blob_prefix": "phase1-evaluator-validation/parser-v2-v1/20260716T024856Z/locked-inputs/",
+      "read_leaves": [
+        "locked_inputs.jsonl"
+      ],
+      "role": "retired parser-v2 locked INPUTS, read for overlap diagnosis only; labels, scores and the scoring ledger are never touched"
+    }
+  ],
+  "model_id": "claude-opus-5",
+  "model_revision": "not-reported-by-provider",
+  "objective": "Execute the outstanding registered pre-seal overlap cross-check against the retired parser-v2-v1 locked inputs, and seal the parser-v3-v1 holdout to immutable Blob storage if and only if that cross-check passes.",
+  "out_of_scope": [
+    "running any parser-v3 evaluation or producing any parser-v3 prediction",
+    "scoring anything",
+    "modifying any parser or any parser-v3 fixture, decision rule or protocol",
+    "re-running, re-scoring or re-opening the retired parser-v2 holdout",
+    "reading parser-v2 locked labels, parser-v2 scores or the parser-v2 scoring ledger",
+    "committing locked inputs or locked labels to GitHub",
+    "executing any Azure command or any git write from this track"
+  ],
+  "output_files": [
+    "00_stage_manifest.json",
+    "01_protocol_snapshot.json",
+    "02_records.jsonl",
+    "03_metrics.csv",
+    "04_decision.json",
+    "05_summary.md",
+    "06_paper_table.csv",
+    "07_figure_data.csv",
+    "08_deviations.json",
+    "artifact_manifest.json"
+  ],
+  "phase": "phase-1.2C",
+  "protocol_hash": "be350c66d24062d6cc628a7908da59b3777c1f99b8167ee0a0f7766f6020618d",
+  "run_id": "20260725T160340Z-track-d1-parser-v3-seal",
+  "schema_version": "jspace-stage-manifest/v1",
+  "scope": [
+    "authoring the container job payload for the cross-check and the seal",
+    "authoring the Azure Container Apps job specification and the minimum prefix-conditioned ABAC grants",
+    "authoring the staging path for an out-of-tree build context",
+    "recording the decision rule and the current state honestly"
+  ],
+  "start_time_utc": "2026-07-25T16:24:00Z",
+  "status": "SEALED",
+  "status_reason": "the cross-check passed and all twelve objects sealed",
+  "subagents": [
+    {
+      "name": "holdout-sealing-opus5",
+      "role": "authored the container job payload, the Azure job specification, the artifact pack and the targeted tests; executed no Azure command and no git write"
+    }
+  ],
+  "time_basis": "pack generation time; the job's own start and finish times are carried in the cross-check report and the seal record",
+  "track": "D",
+  "track_directory": "track-d1"
+}

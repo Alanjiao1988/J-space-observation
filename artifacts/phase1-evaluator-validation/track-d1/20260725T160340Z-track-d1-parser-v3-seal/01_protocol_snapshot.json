@@ -1,0 +1,73 @@
+{
+  "code_commit": "661eff7803d33d3be7be516f76eaf8dcb9e50d4f",
+  "conditions": [
+    {
+      "description": "new parser-v3-v1 fingerprints against the retired parser-v2-v1 locked inputs",
+      "id": "preseal_crosscheck_1"
+    },
+    {
+      "description": "twelve registered objects to an append-only prefix, set manifest written last",
+      "id": "seal"
+    }
+  ],
+  "decision_rules": [
+    "the cross-check must reuse the registered fingerprint functions; a divergent normaliser invalidates the result and the job must refuse to run",
+    "cross_check = PASS if and only if exact, normalised and numeric-normalised collision counts are all zero",
+    "any collision greater than zero is FAIL: do not seal, do not swap cases this round, do not run any evaluation, and record the conflicting hashes",
+    "a guard, provenance or transport fault is ABORT, which is neither PASS nor FAIL and never licenses a seal",
+    "the seal proceeds only on PASS",
+    "every seal write uses overwrite=false; a conflict is a hard failure",
+    "exact twelve-object membership and per-object round-trip SHA-256 and ETag verification must both pass",
+    "manifests/set_manifest.json is the last write of the entire operation",
+    "cross-check 3 against the 18-record historical audit extract is VACUOUS because that extract has no output-bearing field, and is never reported as passed"
+  ],
+  "exclusion_rules": [
+    "no blob outside the retired locked-inputs prefix may be listed or read",
+    "no retired record may carry a field outside the frozen label-free parser-v2 locked-input key set",
+    "no retired input body text may be emitted, logged or returned",
+    "no account key and no SAS may be created, referenced or logged"
+  ],
+  "phase": "phase-1.2C",
+  "prohibited_interpretations": [
+    "NO PARSER-V3 EVALUATION WAS RUN IN THIS ROUND AND NO PARSER-V3 RESULT EXISTS.",
+    "Sealing a holdout does not validate parser v3; it fixes the instrument in time.",
+    "Do not read any number in this pack as a parser-v3 accuracy, precision, recall or error rate.",
+    "Do not treat the labels as human ground truth; they are a two-reviewer plus arbiter LLM operational consensus.",
+    "Do not treat zero overlap as unconditional; it holds only against the corpora actually compared.",
+    "Do not describe the isolation as a security or RBAC boundary; it is procedural.",
+    "A NOT PERFORMED cross-check is not a passed cross-check."
+  ],
+  "protocol_hash": "be350c66d24062d6cc628a7908da59b3777c1f99b8167ee0a0f7766f6020618d",
+  "registered_constants": {
+    "fingerprint_fields": [
+      "exact_sha256",
+      "normalized_sha256",
+      "numeric_normalized_sha256"
+    ],
+    "retired_inputs_leaf_read": "locked_inputs.jsonl",
+    "retired_inputs_prefix": "phase1-evaluator-validation/parser-v2-v1/20260716T024856Z/locked-inputs/",
+    "seal_object_count": 12,
+    "seal_root": "phase1-evaluator-validation/parser-v3-v1",
+    "seal_write_order": [
+      "locked-inputs/locked_inputs.jsonl",
+      "locked-labels/locked_labels.jsonl",
+      "locked-labels/reviewer_a_locked_labels.jsonl",
+      "locked-labels/reviewer_b_locked_labels.jsonl",
+      "locked-labels/arbitration_locked_labels.jsonl",
+      "reports/strata_definitions.md",
+      "reports/phase1_parser_v3_locked_set.md",
+      "reports/phase1_parser_v3_validation_set.md",
+      "reports/phase1_parser_v3_sealing_run.md",
+      "manifests/inputs_manifest.json",
+      "manifests/labels_manifest.json",
+      "manifests/set_manifest.json"
+    ]
+  },
+  "registered_in": [
+    "docs/phase1_parser_v3_sealing_run.md sections 1 to 9",
+    "docs/phase1_parser_v3_seal_job_spec.md"
+  ],
+  "run_id": "20260725T160340Z-track-d1-parser-v3-seal",
+  "schema_version": "jspace-protocol-snapshot/v1",
+  "track": "D"
+}
