@@ -2699,3 +2699,22 @@ Independent post-result verification:
 38 of 38 checks agree (recomputed from scoring_ledger.jsonl and
 docs/phase1_parser_v2_acceptance_gates.json)
 ```
+
+Post-result handling (same day):
+
+- The formal record was committed as `e88a6df` and pushed to `origin/main`.
+- Post-result authentication required a temporary `Storage Blob Data Reader`
+  role for the control identity `id-jspace-parser-v2-control-sea`, scoped to
+  the `jspace-results` container only. It was removed after the artifact hashes
+  were verified, and removal was confirmed: the container scope now carries no
+  role assignments and the identity holds no blob-data role anywhere in the
+  subscription.
+- The locally downloaded copy of the retired evaluation artifact graph was
+  shredded from the orchestrator host, including the only on-host file holding
+  label bytes (`scoring_ledger.jsonl`, 120 `label_record_base64` values). Its
+  identity was confirmed against
+  `c8ace06e413f7915188eb2ff3d0ee6f0b857bc8b79a77bce13c8be298c674eeb`
+  immediately before deletion. The immutable originals remain in Blob storage.
+- Retained unchanged: the immutable claims, DNS TXT records, the three ACA
+  Jobs, seals, decisions, coordination evidence, build and runtime records,
+  and the orchestrator VM.

@@ -194,3 +194,24 @@ the repository to let the frozen finalizer run at all:
 Neither workaround touched parser bytes, holdout bytes, metric semantics,
 acceptance gates, or PASS/FAIL scoring behaviour, and both were confined to the
 orchestrator host outside the committed tree.
+
+## Post-result handling
+
+Authenticating the artifact hashes above required read access to the results
+container, which the control identity did not hold. A temporary
+`Storage Blob Data Reader` assignment was granted to
+`id-jspace-parser-v2-control-sea`, scoped to the `jspace-results` container
+only, and removed once verification was complete. Removal is confirmed: the
+container scope carries no role assignments, and the identity holds no
+blob-data role anywhere in the subscription.
+
+The locally downloaded copy of the artifact graph was then shredded from the
+orchestrator host. This included the only on-host file containing label bytes,
+`scoring_ledger.jsonl` (120 `label_record_base64` values), whose identity was
+re-confirmed against
+`c8ace06e413f7915188eb2ff3d0ee6f0b857bc8b79a77bce13c8be298c674eeb`
+immediately before deletion. Every deleted file is immutable in Blob storage
+and its SHA-256 is recorded above, so no unique evidence was lost.
+
+All immutable claims, DNS TXT records, the three ACA Jobs, seals, decisions,
+coordination evidence, and build and runtime records were retained unchanged.
