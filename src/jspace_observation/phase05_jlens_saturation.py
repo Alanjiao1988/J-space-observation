@@ -68,6 +68,42 @@ CONTROL_SUBSET_SIZE = 5
 CONTROL_SUBSET_SHARDS = (3, 2)
 MIN_PROXY_TOKENS = 33
 
+# ``CORPUS_TOTAL`` and ``RESERVE_PROMPTS`` above are the *Phase 0.5B registered*
+# sample-size values. They are frozen because they are serialized into the
+# Phase 0.5B protocol snapshot and therefore into its protocol hash; they are
+# not used to validate the corpus file. File validation goes through
+# ``CORPUS_REVISIONS`` so the corpus can be extended for a later phase without
+# changing any Phase 0.5B number: revision ``r2-60`` appends ten ``reserve``
+# prompts after the byte-identical first 50 records, so the Phase 0.5B fit and
+# held-out sets, their order, and every fitted quantity are unchanged.
+CORPUS_REVISIONS: dict[str, dict[str, Any]] = {
+    "r1-50": {
+        "records": 50,
+        "roles": {"fit": 25, "heldout": 10, "reserve": 15},
+        "file_sha256": (
+            "41e104efec1cd0e0eebae504cd888e60c4e81f6f8c7774d75c895eac98862b4b"
+        ),
+        "bytes": 13452,
+        "registered_by": "phase05-jlens-saturation",
+        "supersedes": None,
+    },
+    "r2-60": {
+        "records": 60,
+        "roles": {"fit": 25, "heldout": 10, "reserve": 25},
+        "file_sha256": (
+            "dd5d97498324e8b5153c106f0edbc4d962d47771db7dfa2093b48fc36f5962fa"
+        ),
+        "bytes": 16087,
+        "registered_by": "phase05c-jlens-disjoint",
+        "supersedes": "r1-50",
+        "prefix_bytes": 13452,
+        "prefix_sha256": (
+            "41e104efec1cd0e0eebae504cd888e60c4e81f6f8c7774d75c895eac98862b4b"
+        ),
+        "appended_ids": tuple(f"sat-reserve-{index:03d}" for index in range(16, 26)),
+    },
+}
+
 TOP_K = 10
 TOP_K_SECONDARY = 50
 SEEDS = {"python": 0, "numpy": 0, "torch": 0}
@@ -547,10 +583,6 @@ def load_saturation_corpus(path: str | Path) -> dict[str, Any]:
                 "text_sha256": sha256_text(record["text"]),
             }
         )
-    if len(records) != CORPUS_TOTAL:
-        raise CorpusValidationError(
-            f"saturation corpus must contain exactly {CORPUS_TOTAL} prompts"
-        )
     if len({record["id"] for record in records}) != len(records):
         raise CorpusValidationError("corpus IDs must be unique")
     if len({record["text"] for record in records}) != len(records):
@@ -559,15 +591,25 @@ def load_saturation_corpus(path: str | Path) -> dict[str, Any]:
         role: [record["id"] for record in records if record["role"] == role]
         for role in ("fit", "heldout", "reserve")
     }
-    expected_counts = {
-        "fit": FIT_PROMPTS,
-        "heldout": HELDOUT_PROMPTS,
-        "reserve": RESERVE_PROMPTS,
-    }
     actual_counts = {role: len(ids) for role, ids in roles.items()}
-    if actual_counts != expected_counts:
+    revision = None
+    for name, spec in CORPUS_REVISIONS.items():
+        if len(records) == spec["records"] and actual_counts == spec["roles"]:
+            revision = name
+            break
+    if revision is None:
         raise CorpusValidationError(
-            f"corpus role counts {actual_counts} do not match {expected_counts}"
+            f"corpus shape {len(records)} records {actual_counts} does not match any "
+            f"registered revision {sorted(CORPUS_REVISIONS)}"
+        )
+    spec = CORPUS_REVISIONS[revision]
+    prefix_bytes = spec.get("prefix_bytes")
+    if prefix_bytes is not None and (
+        sha256_bytes(raw[:prefix_bytes]) != spec["prefix_sha256"]
+    ):
+        raise CorpusValidationError(
+            f"corpus revision {revision} must keep its first {prefix_bytes} bytes "
+            "byte-identical to the superseded revision"
         )
     canonical = base.canonical_jsonl_sha256(
         [
@@ -580,6 +622,7 @@ def load_saturation_corpus(path: str | Path) -> dict[str, Any]:
         "file_sha256": sha256_bytes(raw),
         "canonical_sha256": canonical,
         "bytes": len(raw),
+        "revision": revision,
         "records": records,
         "roles": roles,
         "counts": actual_counts,
@@ -1215,15 +1258,18 @@ def make_record(
     input_payload: Any,
     evaluation: Mapping[str, Any],
     output_hash: str | None = None,
+    phase: str = PHASE,
+    track: str = TRACK,
+    conditions: Sequence[str] = CONDITIONS,
 ) -> dict[str, Any]:
-    if condition not in CONDITIONS:
+    if condition not in conditions:
         raise ArtifactValidationError(f"unregistered record condition: {condition}")
     evaluation_payload = dict(evaluation)
     return {
         "record_id": record_id,
         "run_id": run_id,
-        "phase": PHASE,
-        "track": TRACK,
+        "phase": phase,
+        "track": track,
         "source_item_id": source_item_id,
         "condition": condition,
         "status": status,
@@ -1247,11 +1293,13 @@ def make_metric_row(
     threshold: Any = "",
     passed: Any = "",
     not_applicable_reason: str = "",
+    phase: str = PHASE,
+    track: str = TRACK,
 ) -> dict[str, str]:
     return {
         "run_id": run_id,
-        "phase": PHASE,
-        "track": TRACK,
+        "phase": phase,
+        "track": track,
         "metric": metric,
         "stratum": stratum,
         "condition": condition,
@@ -1288,11 +1336,13 @@ def make_paper_row(
     unit: str,
     status: str = "measured",
     not_applicable_reason: str = "",
+    phase: str = PHASE,
+    track: str = TRACK,
 ) -> dict[str, str]:
     return {
         "run_id": run_id,
-        "phase": PHASE,
-        "track": TRACK,
+        "phase": phase,
+        "track": track,
         "row_label": row_label,
         "condition": condition,
         "n_prompts": _render_cell(n_prompts),
@@ -1315,11 +1365,13 @@ def make_figure_row(
     y_value: Any,
     status: str = "measured",
     not_applicable_reason: str = "",
+    phase: str = PHASE,
+    track: str = TRACK,
 ) -> dict[str, str]:
     return {
         "run_id": run_id,
-        "phase": PHASE,
-        "track": TRACK,
+        "phase": phase,
+        "track": track,
         "figure_id": figure_id,
         "series": series,
         "x_label": x_label,
@@ -1339,7 +1391,7 @@ def empty_deviations() -> dict[str, Any]:
     }
 
 
-def not_applicable_record(run_id: str, reason: str) -> dict[str, Any]:
+def not_applicable_record(run_id: str, reason: str, **identity: str) -> dict[str, Any]:
     return make_record(
         record_id="not-applicable",
         run_id=run_id,
@@ -1348,10 +1400,13 @@ def not_applicable_record(run_id: str, reason: str) -> dict[str, Any]:
         status="not_applicable",
         input_payload={"reason": reason},
         evaluation={"status": "not_applicable", "reason": reason},
+        **identity,
     )
 
 
-def not_applicable_metric_row(run_id: str, reason: str) -> dict[str, str]:
+def not_applicable_metric_row(
+    run_id: str, reason: str, **identity: str
+) -> dict[str, str]:
     return make_metric_row(
         run_id=run_id,
         metric="not_applicable",
@@ -1359,10 +1414,13 @@ def not_applicable_metric_row(run_id: str, reason: str) -> dict[str, str]:
         stratum="all",
         condition="not_applicable",
         not_applicable_reason=reason,
+        **identity,
     )
 
 
-def not_applicable_paper_row(run_id: str, reason: str) -> dict[str, str]:
+def not_applicable_paper_row(
+    run_id: str, reason: str, **identity: str
+) -> dict[str, str]:
     return make_paper_row(
         run_id=run_id,
         row_label="not_applicable",
@@ -1373,10 +1431,13 @@ def not_applicable_paper_row(run_id: str, reason: str) -> dict[str, str]:
         unit="",
         status="not_applicable",
         not_applicable_reason=reason,
+        **identity,
     )
 
 
-def not_applicable_figure_row(run_id: str, reason: str) -> dict[str, str]:
+def not_applicable_figure_row(
+    run_id: str, reason: str, **identity: str
+) -> dict[str, str]:
     return make_figure_row(
         run_id=run_id,
         figure_id="not_applicable",
@@ -1387,20 +1448,29 @@ def not_applicable_figure_row(run_id: str, reason: str) -> dict[str, str]:
         y_value=None,
         status="not_applicable",
         not_applicable_reason=reason,
+        **identity,
     )
 
 
 def render_summary_markdown(context: Mapping[str, Any]) -> str:
-    """Render 05_summary.md with the registered sections in order."""
+    """Render 05_summary.md with the registered sections in order.
+
+    Every phase-specific string falls back to the Phase 0.5B constant, so a
+    caller that passes no override renders byte-identically to the Phase 0.5B
+    behaviour. A later phase reusing this schema supplies its own text through
+    the context mapping instead of duplicating the renderer.
+    """
 
     def block(items: Sequence[str]) -> list[str]:
         return [f"- {item}" for item in items] or ["- not_applicable"]
 
     decision = context["decision"]
+    stage_names = tuple(context.get("stage_names", STAGES))
     lines: list[str] = [
         SUMMARY_SECTIONS[0],
         "",
-        f"- Phase: `{PHASE}` / track `{TRACK}`",
+        f"- Phase: `{context.get('phase', PHASE)}` / track "
+        f"`{context.get('track', TRACK)}`",
         f"- Run: `{context['run_id']}`",
         f"- Status: **{decision['status']}**",
         f"- Decision: **{decision['decision']}**",
@@ -1408,17 +1478,17 @@ def render_summary_markdown(context: Mapping[str, Any]) -> str:
         "",
         SUMMARY_SECTIONS[1],
         "",
-        OBJECTIVE,
+        context.get("objective", OBJECTIVE),
         "",
-        HYPOTHESIS,
+        context.get("hypothesis", HYPOTHESIS),
         "",
         SUMMARY_SECTIONS[2],
         "",
         "In scope:",
-        *block(list(SCOPE)),
+        *block(list(context.get("scope", SCOPE))),
         "",
         "Out of scope:",
-        *block(list(OUT_OF_SCOPE)),
+        *block(list(context.get("out_of_scope", OUT_OF_SCOPE))),
         "",
         SUMMARY_SECTIONS[3],
         "",
@@ -1433,13 +1503,14 @@ def render_summary_markdown(context: Mapping[str, Any]) -> str:
         f"canonical SHA-256 `{context.get('corpus_canonical_sha256')}`)",
         f"- Code commit: `{context.get('code_commit')}`; image digest: "
         f"`{context.get('image_digest')}`",
+        *[f"- {item}" for item in context.get("extra_provenance", [])],
         "",
         SUMMARY_SECTIONS[4],
         "",
         "| Stage | Status | Duration (s) |",
         "|---|---|---:|",
     ]
-    for stage in STAGES:
+    for stage in stage_names:
         result = context.get("stages", {}).get(stage, {})
         duration = result.get("duration_seconds")
         rendered = "" if duration is None else format(float(duration), ".2f")
@@ -1492,41 +1563,60 @@ def render_summary_markdown(context: Mapping[str, Any]) -> str:
             "",
             SUMMARY_SECTIONS[8],
             "",
-            SCIENTIFIC_CLAIM_BOUNDARY,
+            context.get("claim_boundary", SCIENTIFIC_CLAIM_BOUNDARY),
             "",
             "Prohibited interpretations of this artifact pack:",
-            *block(list(PROHIBITED_INTERPRETATIONS)),
+            *block(
+                list(
+                    context.get(
+                        "prohibited_interpretations", PROHIBITED_INTERPRETATIONS
+                    )
+                )
+            ),
             "",
             SUMMARY_SECTIONS[9],
             "",
             *block(
-                [
-                    "One GPU, one model, one revision, one prompt corpus.",
-                    "Fit sets are nested (the 10-prompt set is a subset of the "
-                    "25-prompt set), so the 10-vs-25 comparison measures "
-                    "estimator movement, not independent replication.",
-                    "Held-out apply stability uses 10 generic prompts at the "
-                    "final position only.",
-                    "No lens-quality, calibration, or semantic validation was "
-                    "attempted.",
-                ]
+                list(
+                    context.get(
+                        "limitations",
+                        (
+                            "One GPU, one model, one revision, one prompt corpus.",
+                            "Fit sets are nested (the 10-prompt set is a subset of "
+                            "the 25-prompt set), so the 10-vs-25 comparison "
+                            "measures estimator movement, not independent "
+                            "replication.",
+                            "Held-out apply stability uses 10 generic prompts at "
+                            "the final position only.",
+                            "No lens-quality, calibration, or semantic validation "
+                            "was attempted.",
+                        ),
+                    )
+                )
             ),
             "",
             SUMMARY_SECTIONS[10],
             "",
             *block(
-                [
-                    "Supplies the engineering feasibility row for J-lens "
-                    "scaling: measured wall-clock, memory, checkpoint and lens "
-                    "sizes at 10 and 25 prompts.",
-                    "Supplies the sharded-fit-plus-merge equivalence control.",
-                    "Supplies no behavioral, semantic, or workspace result.",
-                ]
+                list(
+                    context.get(
+                        "paper_relevance",
+                        (
+                            "Supplies the engineering feasibility row for J-lens "
+                            "scaling: measured wall-clock, memory, checkpoint and "
+                            "lens sizes at 10 and 25 prompts.",
+                            "Supplies the sharded-fit-plus-merge equivalence "
+                            "control.",
+                            "Supplies no behavioral, semantic, or workspace "
+                            "result.",
+                        ),
+                    )
+                )
             ),
             "",
             SUMMARY_SECTIONS[11],
             "",
-            NEXT_GATE,
+            context.get("next_gate", NEXT_GATE),
             "",
         ]
     )
@@ -1547,6 +1637,9 @@ def _csv_bytes(columns: Sequence[str], rows: Sequence[Mapping[str, Any]]) -> byt
     return buffer.getvalue().encode("utf-8")
 
 
+csv_bytes = _csv_bytes
+
+
 def write_artifact_pack(
     pack_dir: str | Path,
     *,
@@ -1562,24 +1655,30 @@ def write_artifact_pack(
     deviations: Mapping[str, Any] | None = None,
     generated_at_utc: str = "",
     writer: Callable[[Path, bytes], None] | None = None,
+    phase: str = PHASE,
+    track: str = TRACK,
+    schema_version: str = SCHEMA_VERSION,
 ) -> dict[str, Any]:
     """Write the standard artifact pack with artifact_manifest.json last."""
 
     directory = Path(pack_dir)
     directory.mkdir(parents=True, exist_ok=True)
     emit = writer or _write_bytes
+    identity = {"phase": phase, "track": track}
 
     payload_records = list(records) or [
-        not_applicable_record(run_id, "no per-item record was produced")
+        not_applicable_record(
+            run_id, "no per-item record was produced", **identity
+        )
     ]
     payload_metrics = list(metrics) or [
-        not_applicable_metric_row(run_id, "no metric was produced")
+        not_applicable_metric_row(run_id, "no metric was produced", **identity)
     ]
     payload_paper = list(paper_rows) or [
-        not_applicable_paper_row(run_id, "no paper row was produced")
+        not_applicable_paper_row(run_id, "no paper row was produced", **identity)
     ]
     payload_figures = list(figure_rows) or [
-        not_applicable_figure_row(run_id, "no figure series was produced")
+        not_applicable_figure_row(run_id, "no figure series was produced", **identity)
     ]
 
     emit(directory / "00_stage_manifest.json", canonical_json_bytes(stage_manifest))
@@ -1621,9 +1720,9 @@ def write_artifact_pack(
             }
         )
     manifest = {
-        "schema_version": f"{SCHEMA_VERSION}-artifact-manifest",
-        "phase": PHASE,
-        "track": TRACK,
+        "schema_version": f"{schema_version}-artifact-manifest",
+        "phase": phase,
+        "track": track,
         "run_id": run_id,
         "generated_at_utc": generated_at_utc,
         "manifest_written_last": True,
@@ -1643,7 +1742,15 @@ def read_records(pack_dir: str | Path) -> list[dict[str, Any]]:
     ]
 
 
-def validate_artifact_pack(pack_dir: str | Path) -> dict[str, Any]:
+def validate_artifact_pack(
+    pack_dir: str | Path,
+    *,
+    phase: str = PHASE,
+    track: str = TRACK,
+    decisions: Sequence[str] = DECISIONS,
+    decision_statuses: Sequence[str] = DECISION_STATUSES,
+    summary_sections: Sequence[str] = SUMMARY_SECTIONS,
+) -> dict[str, Any]:
     """Validate presence, required fields, and manifest completeness."""
 
     directory = Path(pack_dir)
@@ -1666,7 +1773,7 @@ def validate_artifact_pack(pack_dir: str | Path) -> dict[str, Any]:
     absent = [field for field in STAGE_MANIFEST_FIELDS if field not in stage_manifest]
     if absent:
         raise ArtifactValidationError(f"00_stage_manifest.json is missing {absent}")
-    if stage_manifest["phase"] != PHASE or stage_manifest["track"] != TRACK:
+    if stage_manifest["phase"] != phase or stage_manifest["track"] != track:
         raise ArtifactValidationError("stage manifest phase/track mismatch")
 
     snapshot = json.loads(
@@ -1698,14 +1805,14 @@ def validate_artifact_pack(pack_dir: str | Path) -> dict[str, Any]:
     absent = [field for field in DECISION_FIELDS if field not in decision]
     if absent:
         raise ArtifactValidationError(f"04_decision.json is missing {absent}")
-    if decision["status"] not in DECISION_STATUSES:
+    if decision["status"] not in decision_statuses:
         raise ArtifactValidationError(f"invalid decision status: {decision['status']}")
-    if decision["decision"] not in DECISIONS:
+    if decision["decision"] not in decisions:
         raise ArtifactValidationError(f"invalid decision: {decision['decision']}")
 
     summary = (directory / "05_summary.md").read_text(encoding="utf-8")
     position = -1
-    for section in SUMMARY_SECTIONS:
+    for section in summary_sections:
         found = summary.find(f"\n{section}\n" if position >= 0 else f"{section}\n")
         if found <= position:
             raise ArtifactValidationError(

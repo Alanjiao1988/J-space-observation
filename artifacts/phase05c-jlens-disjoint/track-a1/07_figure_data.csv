@@ -1,0 +1,2 @@
+run_id,phase,track,figure_id,series,x_label,x_value,y_label,y_value,status,not_applicable_reason
+PENDING,phase05c-jlens-disjoint,track-a1,not_applicable,not_applicable,not_applicable,,,,not_applicable,"pre-run scaffold: the Phase 0.5C container job has not executed, so no measured value exists yet"

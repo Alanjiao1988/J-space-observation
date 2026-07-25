@@ -18,7 +18,12 @@ import phase05_jlens_saturation as sat
 from scripts import phase05_jlens_saturation as runner
 
 CORPUS_PATH = ROOT / "data" / "jlens_saturation_prompts.jsonl"
-CORPUS_SHA256 = "41e104efec1cd0e0eebae504cd888e60c4e81f6f8c7774d75c895eac98862b4b"
+# Phase 0.5B registered the 50-record corpus. Phase 0.5C appended ten
+# role=reserve prompts after byte 13452; the first 50 records are byte-identical
+# and in unchanged order, so every Phase 0.5B fit and held-out set is unchanged.
+BASE_CORPUS_SHA256 = "41e104efec1cd0e0eebae504cd888e60c4e81f6f8c7774d75c895eac98862b4b"
+BASE_CORPUS_BYTES = 13452
+CORPUS_SHA256 = "dd5d97498324e8b5153c106f0edbc4d962d47771db7dfa2093b48fc36f5962fa"
 
 
 @pytest.fixture(scope="module")
@@ -57,13 +62,15 @@ def test_corpus_bytes_are_lf_utf8_and_pinned() -> None:
     assert b"\r" not in raw
     assert raw.endswith(b"\n")
     assert base.sha256_file(CORPUS_PATH) == CORPUS_SHA256
+    assert base.sha256_bytes(raw[:BASE_CORPUS_BYTES]) == BASE_CORPUS_SHA256
     raw.decode("utf-8")
 
 
 def test_corpus_shape_roles_and_uniqueness(corpus: dict) -> None:
     assert corpus["file_sha256"] == CORPUS_SHA256
-    assert corpus["counts"] == {"fit": 25, "heldout": 10, "reserve": 15}
-    assert len(corpus["records"]) == sat.CORPUS_TOTAL
+    assert corpus["revision"] == "r2-60"
+    assert corpus["counts"] == {"fit": 25, "heldout": 10, "reserve": 25}
+    assert len(corpus["records"]) == sat.CORPUS_REVISIONS["r2-60"]["records"]
     identifiers = [record["id"] for record in corpus["records"]]
     texts = [record["text"] for record in corpus["records"]]
     assert len(set(identifiers)) == len(identifiers)

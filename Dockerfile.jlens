@@ -38,8 +38,10 @@ RUN test "${JLENS_REPOSITORY}" = "https://github.com/anthropics/jacobian-lens" \
 
 COPY scripts/phase05_jlens_feasibility.py /workspace/scripts/
 COPY scripts/phase05_jlens_saturation.py /workspace/scripts/
+COPY scripts/phase05c_jlens_disjoint.py /workspace/scripts/
 COPY src/jspace_observation/phase05_jlens.py /workspace/src/jspace_observation/
 COPY src/jspace_observation/phase05_jlens_saturation.py /workspace/src/jspace_observation/
+COPY src/jspace_observation/phase05c_jlens_disjoint.py /workspace/src/jspace_observation/
 COPY data/jlens_feasibility_prompts.jsonl /workspace/data/
 COPY data/jlens_saturation_prompts.jsonl /workspace/data/
 
@@ -48,6 +50,7 @@ RUN install -d -o jspace -g jspace -m 0700 \
         /workspace/runtime/hf-cache \
         /workspace/runtime/results \
         /workspace/runtime/checkpoints \
+        /workspace/runtime/staged \
         /workspace/runtime/cache \
         /workspace/runtime/cache/tmp \
         /workspace/runtime/pycache \

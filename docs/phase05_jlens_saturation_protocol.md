@@ -369,3 +369,26 @@ reloaded, and applied with stable numerics on one T4. Top-k overlap and rank
 correlation are technical stability evidence about transport and
 serialization. They are not semantic evidence and support no claim about a
 workspace, hidden reasoning, an internal chain-of-thought, or J-space.
+
+## Corpus amendment note (added by Phase 0.5C, not part of this preregistration)
+
+Everything above is the Phase 0.5B preregistration and is left unchanged: run
+`20260725T122016Z` executed against corpus revision `r1-50`, 50 records,
+13452 bytes, SHA-256
+`41e104efec1cd0e0eebae504cd888e60c4e81f6f8c7774d75c895eac98862b4b`.
+
+Phase 0.5C later appended ten `role=reserve` prompts (`sat-reserve-016` ...
+`sat-reserve-025`) to `data/jlens_saturation_prompts.jsonl`, producing corpus
+revision `r2-60`: 60 records, 16087 bytes, SHA-256
+`dd5d97498324e8b5153c106f0edbc4d962d47771db7dfa2093b48fc36f5962fa`, roles
+`fit` 25 / `heldout` 10 / `reserve` 25.
+
+The amendment is append-only and provably so: `sha256(new_bytes[:13452])` is
+still `41e104efec1cd0e0eebae504cd888e60c4e81f6f8c7774d75c895eac98862b4b`, so
+every prompt Phase 0.5B fitted or applied is byte-identical and in unchanged
+order, and every Phase 0.5B number above remains reproducible.
+`CORPUS_REVISIONS` in `src/jspace_observation/phase05_jlens_saturation.py`
+records the relationship and rejects the corpus if the prefix bytes ever
+change.
+
+See `docs/phase05c_jlens_disjoint_replication_protocol.md`.
