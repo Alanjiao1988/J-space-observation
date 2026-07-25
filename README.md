@@ -14,10 +14,12 @@
 
 1. Phase 0.5A 在单张 Tesla T4 上完成真实 Jacobian Lens 技术可行性验证，结论为 **GREEN（仅限技术可行性）**。
 2. Phase 1 历史 bounded `n=3` 结果保持冻结；不授权 higher-n 扩展。
-3. Prospective parser v2 已仅使用 60 条公开 development cases 完成并冻结；120 条 private locked cases 尚未评估。
+3. Prospective parser v2 已仅使用 60 条公开 development cases 完成并冻结；一次性 locked evaluation 已于 2026-07-25 执行并关闭，正式结论为 **FAIL**（34 条强制 gate 中 32 条通过，`boxed_final_miss` 与 `wrong_span` 未通过），120 条 private locked holdout 已作废退役。
 4. No-CoT taxonomy v2 与 450-item capability/headroom candidate bank 已完成，但未执行新的行为校准。
 
-下一注册 gate 是另行授权的一次性 parser-v2 locked evaluation。Phase 0.5A 的 GREEN 不代表 lens scientific quality，也不构成 hidden reasoning、internal workspace 或 J-space evidence。
+一次性 parser-v2 locked evaluation 这个注册 gate 已经用尽：该 holdout 不得重用、重评或重读。任何修改后的 parser 必须先重建并密封新的 locked holdout，再另行授权评估。完整结果与全部工件哈希见 [parser-v2 locked evaluation 报告](reports/phase1_parser_v2_locked_evaluation.md)。
+
+该评估属于 evaluator validation，不是 model evaluation：全程未下载、未加载、未运行目标模型，也未使用 GPU。Phase 0.5A 的 GREEN 不代表 lens scientific quality，也不构成 hidden reasoning、internal workspace 或 J-space evidence。
 
 ## 重要边界
 
@@ -37,3 +39,4 @@
 - [运行日志](docs/run_log.md)
 - [文献笔记](docs/literature_notes.md)
 - [Phase 0.5A real J-lens feasibility report](reports/phase05_jlens_feasibility.md)
+- [Parser-v2 locked evaluation formal result](reports/phase1_parser_v2_locked_evaluation.md)

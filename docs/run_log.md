@@ -2621,3 +2621,81 @@ python -m pytest tests -q
   parser/gate/data-path checks passed.
 - Four independent release audits are running.
 - The locked holdout remains sealed and unevaluated.
+
+## 2026-07-25 — Phase 1.2B parser-v2 locked evaluation (one-shot, CLOSED/FAIL)
+
+Action:
+
+- Executed the single authorized one-shot parser-v2 locked evaluation against
+  the frozen implementation `654f3bb463fedc33b0638b77fefdd9b2b9d1c9c2` and the
+  frozen acceptance gates.
+- Sealed 120 parser-v2 and 120 legacy predictions before any label access, then
+  opened, scored, and retired the 120-case locked holdout exactly once.
+
+Azure resources:
+
+- Subscription `943bacdf-8b6e-4e3a-8126-a149f623d32e`, region `southeastasia`.
+- Orchestrator VM `rg-jspace-observation-sea / vm-pv2-orchestrator-sea`
+  (private Debian 12, control-plane identity `id-jspace-parser-v2-control-sea`).
+- Container Apps environment `cae-jspace-observation-sea-vnet2`, job
+  `job-jspace-parser-v2-locked-eval`, runtime identity
+  `id-jspace-aca-acrpull-sea`.
+- Image `acrjspaceobssea0708231738.azurecr.io/j-space-observation-parser-eval@sha256:7ef281187f04692fa17a476c2a3265de051de2300bcd8c3242639b8b4ca6a489`.
+- Results storage `stjspacefiles0709085305`, container `jspace-results`,
+  parent prefix `phase1-evaluator-validation/parser-v2-v1/20260716T024856Z`.
+
+Model and parameters:
+
+- No model. No target model was downloaded, loaded, or run; no GPU was used.
+- Each execution used 2 vCPU / 4 GiB, `parallelism=1`, `completions=1`,
+  automatic `retry=0`, and an immutable Job body bound by DNS TXT launch and
+  dispatch claims.
+
+Runtime:
+
+- Stage P `pv2-p-76a4018ffd782aa1e8398853-mqmkmxg`, completed
+  `2026-07-25T04:15:48Z`: `PREDICTIONS_VERIFIED`, `input_count=120`,
+  `parser_v2_prediction_count=120`, `legacy_prediction_count=120`,
+  `labels_accessed=false`.
+- Stage E primary `pv2-e-66f225af8c562425fe168b8c-8tgogbi`,
+  `2026-07-25T06:28:32Z`: `STAGE_E_ERROR:EXECUTION_REJECTED:RuntimeError`.
+- Stage E `scorer_infrastructure` retry
+  `pv2-e-f2fcd3f9456d44ff15224f25-l33zhbh`,
+  `2026-07-25T08:01:07Z`–`08:01:42Z`: `Succeeded`.
+
+Results:
+
+- Blob prefixes `.../state/pv2-locked-654f3bb-66588c8b-canon` and
+  `.../scores/pv2-locked-654f3bb-66588c8b-canon/attempts/scorer_infrastructure/78ddfd37791611e08c59c834221608357212def40de544925137a8dc2d08442a`.
+- Formal decision **FAIL**; state chain closed at `12_closed_receipt.json`
+  (`state=CLOSED`, `outcome=FAIL`, `holdout_retired=true`).
+- 34 mandatory gates: 32 passed, 2 failed, 0 NA/invalid. Failing gates are
+  `boxed_final_miss` (1/20) and `wrong_span` (2/80).
+- Report-only: typed agreement 116/120, 4 mismatched cases, 1 material-error
+  case.
+- `locked_evaluation_metrics.json`
+  `7e735622f89ef50d725a60d389f74ab83e6dccaef84e8024bd5e8e84c7a8a521`;
+  `scoring_ledger.jsonl`
+  `c8ace06e413f7915188eb2ff3d0ee6f0b857bc8b79a77bce13c8be298c674eeb`
+  (650946 bytes, 120 rows).
+- Full result record: `reports/phase1_parser_v2_locked_evaluation.md`.
+
+Errors:
+
+- The primary Stage-E attempt was rejected before any label access or
+  scientific write. After the frozen finalizer installed its subprocess audit
+  guard, a lazy Azure Identity import called `platform.platform()`, which
+  shells out to `uname -p`; the guard blocked it. It is recorded as an
+  abandoned attempt and consumed the single `scorer_infrastructure` retry.
+- Two infrastructure-only workarounds were applied outside the repository on
+  the orchestrator host: pre-importing Azure SDK modules before guard
+  activation, and accepting the authenticated label manifest's additional
+  reviewer/consensus/arbitration metadata. Neither changed parser bytes,
+  holdout bytes, metric semantics, gates, or PASS/FAIL behaviour.
+
+Independent post-result verification:
+
+```text
+38 of 38 checks agree (recomputed from scoring_ledger.jsonl and
+docs/phase1_parser_v2_acceptance_gates.json)
+```

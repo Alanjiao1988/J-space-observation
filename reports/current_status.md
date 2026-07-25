@@ -4,17 +4,42 @@
 
 The critical-path reset is complete through bounded real-Jacobian technical
 feasibility. The historical bounded n=3 record remains frozen, prospective
-parser v2 is implemented from the 60-case public development set, and the
-120-case locked set remains privately sealed and unevaluated. The model-free
-Phase 1.2B release candidate now includes one-shot Azure coordination,
-authenticated crash recovery, and deterministic post-label `CLOSED/INVALID`
-closure. Release audits and repository-wide validation are still in progress.
-The no-CoT taxonomy v2 and 450-item headroom candidate bank are design
-artifacts; no new behavioral calibration was run.
+parser v2 was implemented from the 60-case public development set, and the
+single authorized one-shot parser-v2 locked evaluation has now been executed
+and closed. Its formal outcome is **FAIL**, and the 120-case locked holdout is
+spent and retired. The model-free Phase 1.2B tooling delivered one-shot Azure
+coordination, authenticated crash recovery, and deterministic post-label
+`CLOSED/INVALID` closure, all of which were exercised in the real run. The
+no-CoT taxonomy v2 and 450-item headroom candidate bank are design artifacts;
+no new behavioral calibration was run.
 
 ## Current Phase
 
-**Phase: Phase 0.5A GREEN; parser-v2 tooling release validation in progress; locked evaluation not started**
+**Phase: Phase 0.5A GREEN; parser-v2 locked evaluation CLOSED with formal outcome FAIL; locked holdout retired**
+
+## Phase 1.2B parser-v2 locked evaluation result (2026-07-25)
+
+- Formal decision: **FAIL**, decided `2026-07-25T08:01:34Z`, formal evaluation
+  ordinal 1, manual override no.
+- Holdout retired and spent; parser was not re-run; metric retry and prediction
+  re-run are both disallowed by the sealed attestation.
+- 34 mandatory gates: 32 passed, 2 failed, 0 NA/invalid.
+  - `boxed_final_miss`: 1/20 against a limit of 0 errors.
+  - `wrong_span`: 2/80 against a limit of 1 error.
+- Report-only aggregates: typed agreement 116/120, 4 mismatched cases, 1
+  material-error case, across 120 cases in 12 strata.
+- The state chain reached `CLOSED` (`12_closed_receipt.json`,
+  `outcome = FAIL`), and the single authorized post-result review agreed with
+  the sealed artifacts on all 38 independent checks.
+- Exactly three container executions ran: one Stage-P prediction run, one
+  Stage-E attempt rejected for an infrastructure reason before any label
+  access, and one successful `scorer_infrastructure` retry that opened, scored,
+  and retired the holdout once.
+- Full record, including every authenticated artifact hash:
+  `reports/phase1_parser_v2_locked_evaluation.md`.
+- Boundary: this is evaluator validation, not model evaluation. No target model
+  was downloaded, loaded, or run, and no GPU was used. No hidden-reasoning,
+  invisible-CoT, internal-workspace, or J-space claim follows.
 
 ## Phase 1.2B tooling release candidate (2026-07-23)
 
@@ -1446,11 +1471,12 @@ J-space-observation/
 
 ## Next Immediate Actions
 
-1. Separately authorize one one-shot parser-v2 locked evaluation against the
-   already frozen implementation and gates.
-2. Seal predictions before labels are read.
-3. Retire the holdout after PASS or FAIL; use a new holdout for any modified
-   parser.
+1. Treat the parser-v2 locked evaluation as finished. Do not re-score, re-read,
+   or reuse the retired 120-case holdout under any circumstance.
+2. If parser v2 is to be revised, first fix the span-recovery failures behind
+   `wrong_span` and `boxed_final_miss` using only public development cases.
+3. Construct and privately seal a new locked holdout before any further locked
+   validation; a modified parser may not be validated on the retired set.
 4. Keep higher-n and every new target-model behavioral run paused.
 5. Treat any larger J-lens fit as a separate preregistered decision.
 
@@ -1464,7 +1490,9 @@ J-space-observation/
 ✓ **Criteria**: Branch-specific thresholds preregistered before further runs
 ✓ **Path C Phase 1.2A**: 60/120 evaluator set validated and privately sealed
 ✓ **Isolation**: Locked inputs/labels remain outside Git; five post-sealing reviews passed
-✓ **Parser v2**: Public-development-only prospective implementation frozen; locked labels not accessed
-⏳ **Pending**: One separately authorized locked validation evaluation
+✓ **Parser v2**: Public-development-only prospective implementation frozen; locked labels not accessed before sealing
+✓ **Locked evaluation**: One-shot evaluation executed once and closed; holdout retired
+✗ **Parser v2 locked acceptance**: Formal outcome **FAIL** (32/34 mandatory gates; `boxed_final_miss` and `wrong_span` failed)
 ✓ **Phase 0.5A**: Real official J-lens bounded T4 technical feasibility GREEN
 ⏳ **Pending**: Scientific lens-quality validation; not implied by Phase 0.5A
+⏳ **Pending**: A new locked holdout before any revised parser can be validated

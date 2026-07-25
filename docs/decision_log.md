@@ -1339,3 +1339,48 @@ Consequence:
   `CLOSED/INVALID`, with metrics and decision explicitly unaccepted.
 - Frozen parser bytes, holdout bytes, metric semantics, gates, and normal
   PASS/FAIL scoring behavior remain unchanged.
+
+## 2026-07-25 — accept the one-shot parser-v2 locked evaluation FAIL and retire the holdout
+
+Decision:
+
+- Accept **FAIL** as the formal, final outcome of the single authorized
+  parser-v2 locked evaluation.
+- Treat the 120-case locked holdout as spent and retired. It must not be
+  reused, re-scored, or re-read.
+- Do not enter a parser-v2 acceptance stage. Do not run higher-n or any new
+  target-model behavioural work on the basis of this result.
+- Do not attempt a metric retry or a prediction re-run. The sealed attestation
+  and decision both record `metric_recompute_allowed = false` and
+  `prediction_rerun_allowed = false`.
+- Any modified parser requires a newly constructed locked holdout and a new,
+  separately authorized one-shot evaluation.
+
+Reason:
+
+- Two mandatory gates failed against preregistered frozen limits:
+  `boxed_final_miss` at 1/20 (limit 0 errors) and `wrong_span` at 2/80
+  (limit 1 error). A single mandatory gate failure is sufficient for FAIL.
+- The result is authenticated end to end: the state chain reaches `CLOSED`
+  with `outcome = FAIL`, and the decision, metrics, closure manifest,
+  retirement record, scoring attestation, and every scoring-ledger row agree
+  on the same frozen input, prediction, label, image, and execution bindings.
+- The single authorized post-result review independently recomputed the
+  outcome from the sealed ledger and the frozen gate contract and agreed on
+  all 38 checks, so the FAIL is not an artifact of the aggregation code.
+- The primary Stage-E attempt failed for an infrastructure reason only and
+  never opened the labels, so consuming the `scorer_infrastructure` retry did
+  not expose the holdout to more than one scoring pass.
+
+Consequence:
+
+- Parser v2 is not validated on the locked set. Prior parser-v2 claims remain
+  restricted to the 60-case public development set.
+- The failure is concentrated in span recovery: `PV2-558779a7e52af7e736d3`
+  trips both failing gates and `PV2-73e4060ef6bd6cd63e40` trips `wrong_span`.
+  Report-only typed agreement remains high at 116/120, so the gap is narrow
+  but preregistered and binding.
+- The locked-evaluation capability is now exhausted for this holdout;
+  remaining evaluator-validation work must be planned against a new set.
+- No hidden-reasoning, invisible-CoT, internal-workspace, or J-space claim
+  follows from this result.
