@@ -6,6 +6,28 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../" && pwd)"
 CLAIM_HELPER="$SCRIPT_DIR/phase05_claim_election.py"
+
+# Bind `python` to the authenticated absolute interpreter, as
+# 09_build_parser_v2_eval.sh does. Debian 12 ships python3 with no `python`
+# alias, so an unqualified `python` is both unportable and PATH-hijackable.
+readonly PYTHON_BIN="$(/usr/bin/readlink -f /usr/bin/python3)"
+readonly PYTHON_MODE="$(/usr/bin/stat -c '%a' "$PYTHON_BIN" 2>/dev/null || true)"
+if [[ ! "$PYTHON_BIN" =~ ^/usr/bin/python3([.][0-9]+)?$ \
+    || ! -x "$PYTHON_BIN" \
+    || "$(/usr/bin/stat -c '%u' "$PYTHON_BIN" 2>/dev/null || true)" != "0" \
+    || ! "$PYTHON_MODE" =~ ^[0-7]{3,4}$ ]]; then
+    echo "[FAIL] Authenticated absolute Python interpreter is unavailable"
+    exit 1
+fi
+if (( (8#$PYTHON_MODE & 8#022) != 0 )); then
+    echo "[FAIL] Authenticated absolute Python interpreter is unavailable"
+    exit 1
+fi
+python() {
+    "$PYTHON_BIN" -I "$@"
+}
+readonly -f python
+
 ACR_NAME="${ACR_NAME:?Set ACR_NAME to the existing private registry name}"
 RESOURCE_GROUP="${RESOURCE_GROUP:-rg-jspace-observation-sea}"
 IMAGE_REPOSITORY="j-space-observation-jlens"
