@@ -1,0 +1,146 @@
+{
+  "artifact_count": 18,
+  "code_commit": "ad05e74d58ce293076944b9a6a84b26cac29d0c9",
+  "files": [
+    {
+      "bytes": 2623,
+      "path": "00_stage_manifest.json",
+      "reason": "",
+      "sha256": "fc2870dfb03c69c41aa04dd08af7f1cbf660c7be8fce1d62a0fabd52ef2c5f5e",
+      "status": "generated"
+    },
+    {
+      "bytes": 6712,
+      "path": "01_protocol_snapshot.json",
+      "reason": "",
+      "sha256": "f8ab5b4b7247b964924bbd3c8386ef40a75d40af2e03fe5b950d0b10981a8423",
+      "status": "generated"
+    },
+    {
+      "bytes": 696725,
+      "path": "02_records.jsonl",
+      "reason": "",
+      "sha256": "43a0641e04141ae7bcbae059c064deb68119de6105d3d1f24028f80d9607f0ae",
+      "status": "generated"
+    },
+    {
+      "bytes": 6388,
+      "path": "03_metrics.csv",
+      "reason": "",
+      "sha256": "c4bdd978d2b76c31fdddfd42ba4e130ce1cb1f071211f22f5b1857a7fe0c50c9",
+      "status": "generated"
+    },
+    {
+      "bytes": 1780,
+      "path": "04_decision.json",
+      "reason": "",
+      "sha256": "44067a5c3fa90660e01a3c8b67768f39f2b1ca02be8fd4ab907aaa1cddb75a5b",
+      "status": "generated"
+    },
+    {
+      "bytes": 3516,
+      "path": "05_summary.md",
+      "reason": "",
+      "sha256": "fa6cae4e8aad1a58f7b5425f6d6f6f3f1dbc129a0ddf0f2434f5d1c54141306b",
+      "status": "generated"
+    },
+    {
+      "bytes": 88,
+      "path": "06_paper_table.csv",
+      "reason": "no semantically adjudicated cell accuracy is available yet",
+      "sha256": "91c3e47dcbbe7f90c4b763e14d51a9dda27e0b18a95b2890a5cce787b08d9657",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 88,
+      "path": "07_figure_data.csv",
+      "reason": "no semantically adjudicated cell accuracy is available yet",
+      "sha256": "91c3e47dcbbe7f90c4b763e14d51a9dda27e0b18a95b2890a5cce787b08d9657",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 91,
+      "path": "08_deviations.json",
+      "reason": "",
+      "sha256": "e423e4f3d51b81b52fc16ba555253507ea0f7749cc481008482ba8f27076e0c2",
+      "status": "generated"
+    },
+    {
+      "bytes": 10034,
+      "path": "cell_selection/cell_exclusion_reasons.json",
+      "reason": "",
+      "sha256": "106e1df7ed7c2822180c4233f03d7222c16acc43ab7c4b97a93b1575d596a1be",
+      "status": "generated"
+    },
+    {
+      "bytes": 7131,
+      "path": "cell_selection/excluded_cells.csv",
+      "reason": "",
+      "sha256": "d578eab05505fb5306ce8b62103fa4707ffc77f22dea5dba45e37e486479556b",
+      "status": "generated"
+    },
+    {
+      "bytes": 81,
+      "path": "cell_selection/selected_headroom_cells.csv",
+      "reason": "no cell satisfied every headroom qualification rule",
+      "sha256": "ef8ff2512fa728290215bfb688331beb30f370199d1789d175e7f2333832ab75",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 100,
+      "path": "review_pack/arbitration_packet.jsonl",
+      "reason": "no primary reviewer conflicted with the deterministic result",
+      "sha256": "75ee69f4e335cf6e346fe15822818bac880f45719f25209de40c78aa3b7284b5",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 78,
+      "path": "review_pack/deterministic_triage.jsonl",
+      "reason": "no row met a mandatory review category",
+      "sha256": "a6ff45e2865fd4df33bdaf7e63185184b3bb4d7d1dacc4c5eccac92e636ad5d1",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 1484,
+      "path": "review_pack/review_instructions.md",
+      "reason": "",
+      "sha256": "043437a90794c322f42c24f294314fbc4046b76f5c0df8cafef001d34eaeee77",
+      "status": "generated"
+    },
+    {
+      "bytes": 78,
+      "path": "review_pack/review_pack.jsonl",
+      "reason": "no row met a mandatory review category",
+      "sha256": "a6ff45e2865fd4df33bdaf7e63185184b3bb4d7d1dacc4c5eccac92e636ad5d1",
+      "status": "not_applicable"
+    },
+    {
+      "bytes": 674,
+      "path": "review_pack/review_pack_manifest.json",
+      "reason": "",
+      "sha256": "b373c8570af648050f17956183d408e346fffa24e484d97b78eb33a8302c7180",
+      "status": "generated"
+    }
+  ],
+  "generated_at_utc": "2026-07-25T00:00:00Z",
+  "image_digest": "not_recorded",
+  "mode": "plan",
+  "phase": "1.0C",
+  "protocol_hash": "d778736ff8a2f0c7e82ee14a529abc05afb44ce3c8a9b2b47fd02771c405719d",
+  "required_files": [
+    "00_stage_manifest.json",
+    "01_protocol_snapshot.json",
+    "02_records.jsonl",
+    "03_metrics.csv",
+    "04_decision.json",
+    "05_summary.md",
+    "06_paper_table.csv",
+    "07_figure_data.csv",
+    "08_deviations.json",
+    "artifact_manifest.json"
+  ],
+  "run_id": "p10c-trackb-plan-d778736ff8a2",
+  "schema_version": "phase1-headroom-calibration-v1",
+  "status": "BLOCKED",
+  "track": "track-b"
+}

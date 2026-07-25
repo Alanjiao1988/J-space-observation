@@ -1,0 +1,20 @@
+{
+  "arbitration_rows": 0,
+  "blinding": "primary review rows omit the deterministic screening verdict",
+  "parser_v2_locked_validation_status": "failed_2026-07-25:boxed_final_miss=1/20,wrong_span=2/80",
+  "review_reason_codes": [
+    "ambiguous_parse",
+    "deterministic_random_sample",
+    "no_answer",
+    "parse_invalid",
+    "provisional_headroom_cell",
+    "triage_disagrees_with_registered_answer",
+    "truncated_output"
+  ],
+  "review_reason_counts": {},
+  "review_row_count": 0,
+  "review_sample_fraction": 0.1,
+  "run_id": "p10c-trackb-plan-d778736ff8a2",
+  "schema_version": "phase1-headroom-calibration-v1",
+  "triage_authority": "screening_only_not_locked"
+}
