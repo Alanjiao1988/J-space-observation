@@ -1,0 +1,41 @@
+{
+  "deviations": [
+    {
+      "description": "The published reviewer protocol asks reviewers to quote the whole licensing construct including its marker as an evidence span, while the curator had registered bare numeric literals. Character-offset comparison between the two was therefore meaningless.",
+      "detected_by": "builder failure resolving reviewer spans as numeric literals",
+      "effect": "diagnostic only; no label was changed by the curator",
+      "id": "D1-span-convention",
+      "resolution": "the builder now derives a span's canonical value from the last legal numeric surface inside the span, and curator-versus-consensus comparison uses (kind, disposition, canonical value) rather than character offsets; reviewer-versus-reviewer comparison is unaffected because both reviewers received the same protocol"
+    },
+    {
+      "description": "The curator's registration set candidate_answers to the single parsed answer for present cases, while the published protocol requires candidate_answers to be empty unless the case is ambiguous.",
+      "detected_by": "curator-versus-consensus diagnostic showing 36/120 on a field with 119/120 reviewer agreement",
+      "effect": "diagnostic only; no reviewer label was altered",
+      "id": "D2-candidate-answers-convention",
+      "resolution": "the registration was corrected to match the published protocol and the build re-run"
+    },
+    {
+      "description": "The overlap gates rejected an initial draft: one case was an exact duplicate of a parser-v2 development case, and a family of very short marker-only fixtures collided with each other and with a parser-v2 case on the masked-template near-duplicate measure.",
+      "detected_by": "hard exact overlap gate and the 0.85 masked-template Jaccard screen",
+      "effect": "final set has zero exact, normalized and numeric-normalized overlap and zero near-duplicates; no gate was relaxed",
+      "id": "D3-overlap-gate-hits-during-construction",
+      "resolution": "the affected cases were rewritten with digit-free distinguishing prose and the build re-run from scratch until every gate passed with zero waivers"
+    },
+    {
+      "description": "The main agent, who owns .gitignore, extended it with a locked-holdout block whose rules also matched the manifest filenames Track D had originally chosen (evaluator_sets/**/locked_manifest.json) and directed Track D to rename its manifests so that the reviewable surface of the set stays committable.",
+      "detected_by": "main-agent instruction plus a git check-ignore audit of every Track D path",
+      "effect": "no case, label or reviewer row changed; the locked-inputs and locked-labels digests are byte-identical before and after the migration and only the manifest digests moved, because the manifests embed the renamed paths",
+      "id": "D4-artifact-path-migration",
+      "resolution": "manifests renamed input_manifest.json -> inputs_manifest.json, label_manifest.json -> labels_manifest.json and overall_manifest.json -> set_manifest.json; the reviewer and arbiter row files moved out of private/ to reviewer_a_locked_labels.jsonl, reviewer_b_locked_labels.jsonl and arbitration_locked_labels.jsonl, which the main agent's rules 45 and 46 already cover; a single SECRECY table in the builder is now the only source of truth for path and secrecy, and the tests assert it against git check-ignore in both directions"
+    },
+    {
+      "description": "The main agent offered to make the locked case inputs committable under the name locked_case_inputs.jsonl. Track D declined and kept the inputs private.",
+      "detected_by": "explicit curator decision, not an error",
+      "effect": "publishing the 120 case strings in the same worktree where parser-v3 is being developed would let the parser be tuned to the holdout and would void the pre-registration claim; the parser-v2 precedent also kept locked inputs private and published only the development set",
+      "id": "D5-inputs-kept-private",
+      "resolution": "inputs remain at evaluator_sets/parser_v3_v1/locked_inputs.jsonl, covered by .gitignore rule 40; reviewability is preserved by the committed inputs manifest, which publishes four fingerprints, a character count and a byte count per record without any case text"
+    }
+  ],
+  "effect_on_interpretation": "none on the label set or on any claim: D1 and D2 affected only the curator-intent diagnostic, D3 was the overlap gates working as designed, and D4 and D5 are path and secrecy decisions that left every case, label and reviewer row byte-identical. No frozen artifact was modified and no gate was waived.",
+  "unregistered_changes": []
+}

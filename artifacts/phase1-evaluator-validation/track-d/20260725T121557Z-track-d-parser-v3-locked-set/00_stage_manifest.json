@@ -1,0 +1,143 @@
+{
+  "code_commit": "62e9b961a391e8f346e37bd9cbbf710e9b551c24",
+  "end_time_utc": "2026-07-25T12:38:49Z",
+  "hardware": {
+    "accelerator": "none",
+    "azure_used": false,
+    "execution": "local workstation",
+    "os": "Windows_NT"
+  },
+  "hypothesis": "A 120-case, 12-stratum holdout constructed in procedural isolation from parser-v3 development, with zero overlap against prior corpora and increased span-boundary variation in the marker-bearing strata, is a defensible instrument for a later pre-registered parser-v3 evaluation. The hypothesis is NOT tested in this round.",
+  "image_digest": {
+    "reason": "construction ran locally on CPU; no container image was built or pulled",
+    "status": "not_applicable"
+  },
+  "inputs": [
+    {
+      "path": "evaluator_sets/parser_v2_v1/development_cases.jsonl",
+      "records": 60,
+      "role": "overlap corpus and span-boundary baseline",
+      "sha256": "bfaeca837ecfe8673df834c5b8a4fc1626f0835c6ae35c0821acf59bd6e4ac27"
+    },
+    {
+      "path": "artifacts/record_audit/ambiguous_records_for_review.jsonl",
+      "records": 18,
+      "role": "historical model-output overlap corpus",
+      "sha256": "b9062e851a1dd1f4e41da6b598ac4c40d391d60b428d4ff524eaeb4ea02a5614"
+    },
+    {
+      "path": "docs/phase1_parser_v2_protocol.md",
+      "role": "frozen result schema, vocabularies, numeric grammar, correctness rule",
+      "sha256": "daa3bdaf51e08d3a2b52bc19787d8c2cefc70ad3d7e51da4240856dee6dee134"
+    }
+  ],
+  "model_id": "claude-opus-5",
+  "model_revision": "not-reported-by-provider",
+  "objective": "Construct, blind-label, fingerprint and manifest an independent 120-case parser-v3 locked evaluator holdout (parser-v3-v1), and produce a complete sealing specification for the main agent to execute.",
+  "out_of_scope": [
+    "running any parser-v3 evaluation",
+    "producing or reading any parser-v3 prediction",
+    "reading parser-v3 development sources, reports or adversarial cases",
+    "executing any Azure CLI command or uploading any artifact",
+    "creating git commits or switching branches",
+    "modifying any frozen parser-v2 artifact"
+  ],
+  "output_files": [
+    "00_stage_manifest.json",
+    "01_protocol_snapshot.json",
+    "02_records.jsonl",
+    "03_metrics.csv",
+    "04_decision.json",
+    "05_summary.md",
+    "06_paper_table.csv",
+    "07_figure_data.csv",
+    "08_deviations.json",
+    "artifact_manifest.json"
+  ],
+  "phase": "phase-1.2C",
+  "protocol_hash": "27becc4e7731e6326e1bfbea39dd2734110a131ab307f72253714406ac76fcba",
+  "run_id": "20260725T121557Z-track-d-parser-v3-locked-set",
+  "schema_version": "jspace-stage-manifest/v1",
+  "scope": [
+    "authoring 120 model-free fixture cases across 12 strata",
+    "two independent reference-blind LLM labeling passes over 120/120",
+    "arbitration restricted to reviewer-disagreement rows only",
+    "four-way fingerprint overlap checking against reachable prior corpora",
+    "span-boundary variation gate for S01, S02, S05, S06",
+    "inputs, labels and set manifests with per-record fingerprints",
+    "public construction protocol, strata definitions and validation report",
+    "sealing specification for the main agent"
+  ],
+  "start_time_utc": "2026-07-25T11:07:16Z",
+  "status": "COMPLETE",
+  "subagents": [
+    {
+      "actual_model": "claude-opus-5",
+      "actual_reasoning_effort": "max",
+      "denied": [
+        "case sources",
+        "reference answers",
+        "stratum assignments",
+        "reviewer B output",
+        "arbiter output",
+        "parser sources",
+        "parser predictions"
+      ],
+      "inputs_seen": [
+        "reviewer packet (case_id, output_text, parse_type)",
+        "labeling protocol"
+      ],
+      "requested_model": "Claude Opus 5 (claude-opus-5)",
+      "requested_reasoning_effort": "max",
+      "role": "reviewer_a",
+      "rows_labeled": 120,
+      "substitution": false
+    },
+    {
+      "actual_model": "claude-opus-5",
+      "actual_reasoning_effort": "max",
+      "denied": [
+        "case sources",
+        "reference answers",
+        "stratum assignments",
+        "reviewer A output",
+        "arbiter output",
+        "parser sources",
+        "parser predictions"
+      ],
+      "inputs_seen": [
+        "reviewer packet (case_id, output_text, parse_type)",
+        "labeling protocol"
+      ],
+      "requested_model": "Claude Opus 5 (claude-opus-5)",
+      "requested_reasoning_effort": "max",
+      "role": "reviewer_b",
+      "rows_labeled": 120,
+      "substitution": false
+    },
+    {
+      "actual_model": "claude-opus-5",
+      "actual_reasoning_effort": "max",
+      "denied": [
+        "agreeing rows",
+        "reviewer identities",
+        "reference answers",
+        "stratum assignments",
+        "parser sources",
+        "parser predictions"
+      ],
+      "inputs_seen": [
+        "disagreement rows only (output_text, differing fields)",
+        "two anonymised competing judgements",
+        "labeling protocol"
+      ],
+      "requested_model": "Claude Opus 5 (claude-opus-5)",
+      "requested_reasoning_effort": "max",
+      "role": "arbiter",
+      "rows_labeled": 7,
+      "substitution": false
+    }
+  ],
+  "time_basis": "start_time_utc is the earliest modification time of the private case-source modules and end_time_utc is the modification time of the set manifest; both are filesystem-derived rather than instrumented wall-clock marks",
+  "track": "D"
+}

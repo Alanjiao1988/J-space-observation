@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "description": "authoring and registration of 120 fixtures",
+      "id": "holdout_construction"
+    },
+    {
+      "description": "two independent reference-blind reviewers, 120/120 each",
+      "id": "blind_labeling"
+    },
+    {
+      "description": "disagreement rows only, reference-blind",
+      "id": "arbitration"
+    }
+  ],
+  "decision_rules": [
+    "COMPLETE requires exactly 120 cases in exactly 12 strata at 10 per stratum",
+    "COMPLETE requires hard exact overlap = 0 and normalized overlap = 0",
+    "COMPLETE requires unresolved labels = 0",
+    "COMPLETE requires arbitration membership to equal the reviewer disagreement set exactly",
+    "COMPLETE requires the span-boundary variation gate to pass for S01, S02, S05 and S06",
+    "COMPLETE requires the locked label path to be gitignored and unstageable",
+    "COMPLETE requires every path marked private in the builder SECRECY table to be gitignored, and every path marked public to be NOT gitignored",
+    "any registered quota shortfall, any overlap hit, or any unresolved label is a FAIL"
+  ],
+  "exclusion_rules": [
+    "any case whose exact, normalized or numeric-normalized fingerprint collides with a reachable prior corpus",
+    "any case duplicating another case in the set on exact or normalized fingerprint",
+    "any case at or above masked-template Jaccard 0.85 with a prior case or another case in the set",
+    "any empty or whitespace-only output, because it would collide with the parser-v2 development set"
+  ],
+  "inclusion_rules": [
+    "case must be a hand-authored model-free fixture",
+    "case must belong to exactly one registered stratum and subtype slot",
+    "case must carry a registered reference answer that is a legal numeric literal",
+    "registered correctness must equal the value computed by the frozen correctness rule",
+    "every S11 case must carry at least two distinct canonical candidates",
+    "every S06 trailing distractor must canonicalise to a value different from the answer"
+  ],
+  "primary_metric": {
+    "definition": "120 cases across 12 strata at 10 per stratum, all registered quotas satisfied, zero unresolved labels",
+    "name": "construction_completeness",
+    "note": "this round measures the instrument, not any parser"
+  },
+  "research_question": "Does a locked, independently curated, never-seen 120-case evaluator set spanning 12 answer-extraction failure strata, constructed in procedural isolation from the parser under test, give a defensible estimate of answer-extraction reliability?",
+  "retry_rules": [
+    "a reviewer file that violates the protocol is returned for correction, never silently repaired by the curator",
+    "a case that collides with a prior corpus is rewritten and the whole build is re-run from scratch",
+    "the arbiter is never re-run on a row the reviewers agreed on",
+    "no retry may relax a registered quota or an overlap gate"
+  ],
+  "sample_size": {
+    "cases": 120,
+    "cases_per_stratum": 10,
+    "cases_per_subtype_slot": 2,
+    "strata": 12,
+    "subtype_slots_per_stratum": 5
+  },
+  "schema_version": "jspace-protocol-snapshot/v1",
+  "scientific_claim_boundary": [
+    "no parser-v3 evaluation was run in this round and no parser-v3 result exists",
+    "nothing here supports any claim about parser-v3 accuracy, parser-v3 versus parser-v2, or remaining headroom",
+    "labels are an LLM operational consensus reference, not human ground truth",
+    "zero overlap is proven only against reachable corpora; the retired parser-v2 holdout, the parser-v3 adversarial development set and the full historical records were not reachable from this track",
+    "isolation from parser-v3 development is procedural and hash-audited, not security-enforced",
+    "the set is not yet sealed, so it is not yet a pre-registered holdout"
+  ],
+  "secondary_metrics": [
+    "hard_exact_overlap_vs_reachable_prior_corpora",
+    "normalized_overlap_vs_reachable_prior_corpora",
+    "numeric_normalized_overlap_vs_reachable_prior_corpora",
+    "reviewer_a_vs_b_whole_row_exact_agreement",
+    "reviewer_a_vs_b_per_field_exact_agreement",
+    "cohen_kappa_answer_presence",
+    "cohen_kappa_output_quality",
+    "arbitrated_row_count",
+    "unresolved_label_count",
+    "span_boundary_variation_gate_S01_S02_S05_S06",
+    "construction_intent_versus_consensus_agreement"
+  ],
+  "seeds": {
+    "note": "construction is fully deterministic; the only stored entropy is a private salt file generated once and reused so that case ids and label fingerprints are stable across rebuilds",
+    "randomness_used": false
+  },
+  "stopping_rules": [
+    "construction stops when all registered quotas are satisfied and every gate passes",
+    "labeling stops when both reviewers have labeled 120/120 and unresolved = 0",
+    "arbitration stops when every disagreement row has exactly one arbitrated judgement",
+    "the build aborts immediately on any gate failure; gates are not waived"
+  ]
+}

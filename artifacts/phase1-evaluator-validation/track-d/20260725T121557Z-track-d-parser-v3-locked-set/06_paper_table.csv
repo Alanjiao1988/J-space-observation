@@ -1,0 +1,22 @@
+table_id,row_label,measure,value,denominator,note
+parser_v3_locked_set_construction,Cases,count,120,120,12 strata x 10
+parser_v3_locked_set_construction,Strata,count,12,12,S01-S12
+parser_v3_locked_set_construction,Critical cases,count,80,120,"strata outside S01,S02,S03,S12"
+parser_v3_locked_set_construction,Hard exact overlap,count,0,120,vs reachable prior corpora
+parser_v3_locked_set_construction,Normalized overlap,count,0,120,vs reachable prior corpora
+parser_v3_locked_set_construction,Reviewer A coverage,count,120,120,reference-blind
+parser_v3_locked_set_construction,Reviewer B coverage,count,120,120,"reference-blind, independent"
+parser_v3_locked_set_construction,Whole-row exact agreement,count,113,120,"A vs B, pre-arbitration"
+parser_v3_locked_set_construction,Arbitrated rows,count,7,120,disagreement rows only
+parser_v3_locked_set_construction,Unresolved labels,count,0,120,required 0
+parser_v3_reviewer_agreement,answer_presence,exact_agreement,119,120,kappa=0.9787
+parser_v3_reviewer_agreement,parse_valid,exact_agreement,119,120,
+parser_v3_reviewer_agreement,parse_ambiguous,exact_agreement,119,120,
+parser_v3_reviewer_agreement,parsed_answer,exact_agreement,119,120,
+parser_v3_reviewer_agreement,candidate_answers,exact_agreement,119,120,mean_jaccard=0.9917
+parser_v3_reviewer_agreement,evidence_spans,exact_agreement,118,120,
+parser_v3_reviewer_agreement,extraction_strategy,exact_agreement,119,120,
+parser_v3_reviewer_agreement,output_quality,exact_agreement,117,120,kappa=0.9434
+parser_v3_reviewer_agreement,failure_reasons,exact_agreement,118,120,mean_jaccard=0.9833
+parser_v3_reviewer_agreement,format_warnings,exact_agreement,117,120,mean_jaccard=0.9903
+parser_v3_locked_evaluation,parser-v3 accuracy,not_applicable,,,no parser-v3 evaluation was run; no parser-v3 result exists

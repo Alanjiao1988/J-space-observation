@@ -1,0 +1,62 @@
+{
+  "criteria_failed": [],
+  "criteria_not_applicable": [
+    {
+      "criterion": "parser-v3 extraction accuracy against the locked set",
+      "reason": "this round constructs and seals only; no locked evaluation was executed"
+    },
+    {
+      "criterion": "sealing completion and Blob object verification",
+      "reason": "the main agent owns all Azure execution; Track D ran no Azure command and uploaded nothing"
+    },
+    {
+      "criterion": "overlap against the retired parser-v2 locked holdout and the parser-v3 adversarial development set",
+      "reason": "both are unreachable from Track D under isolation; per-record fingerprints are published so the main agent can complete the cross-check before sealing"
+    },
+    {
+      "criterion": "empty-output coverage",
+      "reason": "the parser-v2 protocol placed its only empty-output case in the parser-v2 development set, so a whitespace-only case would violate the zero-normalized-overlap gate"
+    }
+  ],
+  "criteria_passed": [
+    "120 cases across 12 strata at exactly 10 per stratum",
+    "registered presence split 80 present / 30 no_answer / 10 ambiguous",
+    "all cross-cutting feature quotas met or exceeded",
+    "hard exact overlap = 0 against reachable prior corpora",
+    "normalized overlap = 0 against reachable prior corpora",
+    "numeric-normalized overlap = 0",
+    "zero internal duplicates and zero near-duplicates at Jaccard 0.85",
+    "span-boundary variation gate passed for S01, S02, S05 and S06",
+    "reviewer A 120/120 and reviewer B 120/120, both reference-blind",
+    "arbitration confined to the 7 disagreement rows, verified by an equality assertion",
+    "unresolved labels = 0",
+    "locked label path gitignored and confirmed unstageable",
+    "locked inputs and all reviewer/arbiter row files gitignored and confirmed unstageable",
+    "manifests directory and all three manifests confirmed NOT gitignored and stageable",
+    "inputs, labels and set manifests generated with SHA-256, byte counts and per-record fingerprints",
+    "targeted test suite passes 26/26"
+  ],
+  "decision": "The parser-v3-v1 locked evaluator set is constructed, blind-labeled, fingerprinted, manifested and ready to seal. Track D hands the set, the labels, the manifests and a complete sealing specification to the main agent. No parser-v3 evaluation was run.",
+  "deviations": [
+    "reviewer span convention (marker-inclusive) differs from the curator's registration convention (bare literal); resolved by comparing span kind, disposition and canonical value rather than character offsets",
+    "the curator's registered candidate_answers convention for present cases was corrected mid-run to match the published protocol",
+    "one exact overlap and a family of masked-template near-duplicates were found by the gates and fixed by rewriting the affected cases; no gate was waived",
+    "manifest and reviewer-row filenames were migrated on main-agent instruction so that the manifests stay committable under the shared .gitignore; no case, label or reviewer row changed",
+    "the locked case inputs were deliberately kept private rather than committed, so that parser-v3 development in this same worktree cannot be tuned to the holdout"
+  ],
+  "next_gate": "Main agent: run the three cross-checks in docs/phase1_parser_v3_sealing_run.md section 9 against the published per-record fingerprints; if all intersections are empty, seal to phase1-evaluator-validation/parser-v3-v1/<timestamp> with the set manifest written last; only then schedule a parser-v3 locked evaluation.",
+  "prohibited_interpretations": [
+    "NO PARSER-V3 EVALUATION WAS RUN IN THIS ROUND AND NO PARSER-V3 RESULT EXISTS.",
+    "Do not read any number in this artifact pack as a parser-v3 accuracy, precision, recall or error rate.",
+    "Do not compare anything here against parser-v2 locked-evaluation results.",
+    "Do not treat the labels as human ground truth; they are a two-reviewer-plus-arbiter LLM consensus.",
+    "Do not treat zero overlap as unconditional; it is proven only against reachable corpora.",
+    "Do not describe the isolation as a security or RBAC boundary; it is procedural and hash-audited.",
+    "Do not treat this set as sealed or pre-registered until the main agent completes the sealing run.",
+    "Do not infer any headroom, calibration or J-lens claim from this pack."
+  ],
+  "run_id": "20260725T121557Z-track-d-parser-v3-locked-set",
+  "schema_version": "jspace-decision/v1",
+  "scientific_interpretation": "Track D produced an instrument, not a measurement. Two independent reference-blind LLM reviewers reached whole-row exact agreement on 113/120 cases, and an arbiter resolved the remaining 7 without ever seeing an agreeing row. The resulting labels are an LLM operational consensus reference. Zero overlap is demonstrated against every corpus Track D could read and is asserted-pending-verification against the two it could not. Isolation from parser-v3 development is procedural and hash-audited, not security-enforced. The instrument becomes a genuine pre-registered holdout only once the main agent seals it.",
+  "status": "COMPLETE"
+}

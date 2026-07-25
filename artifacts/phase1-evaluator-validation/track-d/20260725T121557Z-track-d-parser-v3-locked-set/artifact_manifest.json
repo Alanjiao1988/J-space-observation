@@ -1,0 +1,114 @@
+{
+  "code_commit": "62e9b961a391e8f346e37bd9cbbf710e9b551c24",
+  "content_disclosure": "this pack contains no case text, no label values and no per-case stratum; 02_records.jsonl carries fingerprints and provenance only",
+  "files": [
+    {
+      "bytes": 5399,
+      "path": "00_stage_manifest.json",
+      "sha256": "1e0c1faaf707b50255fcbcefc35b857dd9fba089020dd7aa7aa05605723d5282",
+      "status": "ok"
+    },
+    {
+      "bytes": 4967,
+      "path": "01_protocol_snapshot.json",
+      "sha256": "5668e40ca276ed9c04c71539d0bec43e5851fc5bb6b69d6fe2c743781ce2d7cc",
+      "status": "ok"
+    },
+    {
+      "bytes": 115229,
+      "path": "02_records.jsonl",
+      "sha256": "ff80ebe1bb22494fe2e43332f1e9aa3093130525946884c553a5b00b297b001d",
+      "status": "ok"
+    },
+    {
+      "bytes": 11563,
+      "path": "03_metrics.csv",
+      "sha256": "bb7e29db3a59a924752e60bcf0d02310a9042d5f27741695bd2332198a2e3967",
+      "status": "ok"
+    },
+    {
+      "bytes": 5135,
+      "path": "04_decision.json",
+      "sha256": "1cb1a570b2c03f2fc5a089245d1c209b5c75b777a2a0b922cb118696cfd51f8b",
+      "status": "ok"
+    },
+    {
+      "bytes": 8354,
+      "path": "05_summary.md",
+      "sha256": "c83592daa1a05e079fb26ca32ca1ef8138e54167f42b80745434040ff49ba3d8",
+      "status": "ok"
+    },
+    {
+      "bytes": 1805,
+      "path": "06_paper_table.csv",
+      "sha256": "711de2a55e4809c951910b153d0916bbf04df33c8dc1ce7724a6bf2b3de09592",
+      "status": "ok"
+    },
+    {
+      "bytes": 6161,
+      "path": "07_figure_data.csv",
+      "sha256": "56638b4a95a0eb37a16e6a8972dbac54e380376ea585861486497d1120ea89d8",
+      "status": "ok"
+    },
+    {
+      "bytes": 4653,
+      "path": "08_deviations.json",
+      "sha256": "c2fed71924bd65cfa687891eb0a943576cc823a07ac2eb64df7311ccae400909",
+      "status": "ok"
+    }
+  ],
+  "generated_at_utc": "2026-07-25T12:39:52Z",
+  "manifest_written_last": true,
+  "phase": "phase-1.2C",
+  "protocol_hash": "27becc4e7731e6326e1bfbea39dd2734110a131ab307f72253714406ac76fcba",
+  "referenced_artifacts": [
+    {
+      "bytes": 32430,
+      "committed_to_git": false,
+      "note": "gitignored; private holdout material",
+      "path": "evaluator_sets/parser_v3_v1/locked_inputs.jsonl",
+      "sha256": "946218357432d6f271e403a883559235a7b59da7832f534bdf7eb33e934c4e06"
+    },
+    {
+      "bytes": 109411,
+      "committed_to_git": false,
+      "note": "gitignored; must never be committed",
+      "path": "evaluator_sets/parser_v3_v1/locked_labels.jsonl",
+      "sha256": "3e4f1b1bca3862d97a6db37854d1b046ac7a3c606f031b692b58ef1940be2743"
+    },
+    {
+      "bytes": 53703,
+      "committed_to_git": true,
+      "path": "evaluator_sets/parser_v3_v1/manifests/inputs_manifest.json",
+      "sha256": "ec954093648cb68ce8e6a83db07639bf7de426cc14e35c0a4503b0a6d75ede9d"
+    },
+    {
+      "bytes": 17786,
+      "committed_to_git": true,
+      "path": "evaluator_sets/parser_v3_v1/manifests/labels_manifest.json",
+      "sha256": "ab32c559cd62c72d059fc2527e17d3e806d5ddc9227f8bd8f8f6b0295d7e67a2"
+    },
+    {
+      "bytes": 8086,
+      "committed_to_git": true,
+      "path": "evaluator_sets/parser_v3_v1/manifests/set_manifest.json",
+      "sha256": "13f021abd7a052b3b7153b6a0af8ccc13f3bced4b4c280dd3abaa7ab65b949f3"
+    }
+  ],
+  "run_id": "20260725T121557Z-track-d-parser-v3-locked-set",
+  "schema_version": "jspace-artifact-manifest/v1",
+  "status": "COMPLETE",
+  "track": "D",
+  "write_order": [
+    "00_stage_manifest.json",
+    "01_protocol_snapshot.json",
+    "02_records.jsonl",
+    "03_metrics.csv",
+    "04_decision.json",
+    "05_summary.md",
+    "06_paper_table.csv",
+    "07_figure_data.csv",
+    "08_deviations.json",
+    "artifact_manifest.json"
+  ]
+}

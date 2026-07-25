@@ -35,7 +35,7 @@ artifacts/record_audit/
 artifacts/semantic_audit/
 artifacts/evaluator_validation/
 
-# Parser-v2 locked holdout material must remain outside normal Git paths
+# Locked-holdout material (parser-v2 and parser-v3) must remain outside normal Git paths
 evaluator_sets/**/private/
 evaluator_sets/**/locked_inputs.jsonl
 evaluator_sets/**/locked_labels.jsonl
