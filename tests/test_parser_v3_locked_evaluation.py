@@ -1357,3 +1357,123 @@ class TestPreflightAuditFindingsRemainFixed:
         source = _lf_bytes(self.BOOTSTRAP).decode("utf-8")
         assert '"phase1-parser-v3-custodian"' in source
         assert '"phase1-parser-v2-custodian"' in source
+
+
+# ---------------------------------------------------------------------------
+# Frozen-instrument adapter coverage.
+#
+# The frozen validation instrument is hash-pinned and only knows the
+# parser-v2 namespace. Every call into it therefore has to translate this
+# profile's namespace on the way in. A call site that forgets is invisible
+# under the default parser-v2 profile -- the translation is the identity
+# there -- and only fails once a non-default profile actually runs. These
+# tests make the omission fail at test time instead.
+# ---------------------------------------------------------------------------
+
+
+_FROZEN_CALL_SOURCES = (
+    ROOT / "src" / "jspace_observation" / "parser_v2_locked_evaluation.py",
+    ROOT / "scripts" / "bootstrap_parser_v2_locked_evaluation.py",
+    ROOT / "scripts" / "finalize_parser_v2_locked_evaluation.py",
+    ROOT / "scripts" / "run_parser_v2_locked_predictions.py",
+    ROOT / "scripts" / "parser_v3_seal_job.py",
+)
+
+# Attribute reads and calls that carry no namespace at all.
+_NAMESPACE_FREE_FROZEN_MEMBERS = (
+    "STRATA",
+    "CRITICAL_STRATA",
+    "REGISTERED_LEAF_MEMBERS",
+    "validate_implementation_manifest",
+)
+
+
+class TestFrozenInstrumentCallSitesTranslateNamespace:
+    def test_every_frozen_call_site_applies_an_adapter(self) -> None:
+        unadapted: list[str] = []
+        for path in _FROZEN_CALL_SOURCES:
+            if not path.exists():
+                continue
+            lines = path.read_text(encoding="utf-8").replace("\r", "").split("\n")
+            for index, line in enumerate(lines):
+                if "_load_frozen_validation()" not in line:
+                    continue
+                if line.lstrip().startswith(("#", "def ")):
+                    continue
+                block = "\n".join(lines[max(0, index - 3) : index + 30])
+                if any(
+                    token in block for token in _NAMESPACE_FREE_FROZEN_MEMBERS
+                ):
+                    continue
+                if "_to_frozen" in block or "_from_frozen" in block:
+                    continue
+                if "_NAMESPACE_TRANSLATION_REQUIRED" in block:
+                    continue
+                unadapted.append(f"{path.name}:{index + 1}: {line.strip()}")
+        assert unadapted == []
+
+    def test_bootstrap_parent_membership_is_translated_both_ways(self) -> None:
+        source = (
+            ROOT / "scripts" / "bootstrap_parser_v2_locked_evaluation.py"
+        ).read_text(encoding="utf-8")
+        marker = source.index("expected_parent_membership(")
+        window = source[max(0, marker - 300) : marker + 200]
+        assert "_to_frozen_namespace(" in window
+        assert "_from_frozen_namespace(" in window
+
+    def test_bootstrap_authorization_lock_is_translated_both_ways(self) -> None:
+        source = (
+            ROOT / "scripts" / "bootstrap_parser_v2_locked_evaluation.py"
+        ).read_text(encoding="utf-8")
+        marker = source.index("build_authorization_lock(")
+        window = source[max(0, marker - 300) : marker + 400]
+        assert "_to_frozen_receipts(" in window
+        assert "_from_frozen_namespace(" in window
+
+    def test_frozen_rejects_an_untranslated_v3_parent_prefix(self) -> None:
+        core = _core("frozen_reject", "parser-v3-v1")
+        frozen = core._load_frozen_validation()
+        with pytest.raises(Exception):
+            frozen.expected_parent_membership(V3_PARENT)
+
+    def test_frozen_accepts_the_translated_v3_parent_prefix(self) -> None:
+        core = _core("frozen_accept", "parser-v3-v1")
+        frozen = core._load_frozen_validation()
+        translated = core._to_frozen_namespace(V3_PARENT)
+        assert translated.startswith("phase1-evaluator-validation/parser-v2-v1/")
+        members = frozen.expected_parent_membership(translated)
+        restored = core._from_frozen_namespace(members)
+        assert restored
+        for member in restored:
+            assert member.startswith(V3_PARENT)
+
+    def test_adapter_translates_sets_and_frozensets(self) -> None:
+        core = _core("frozen_sets", "parser-v3-v1")
+        member = f"{V3_PARENT}/locked-labels/arbitration_stage2.jsonl"
+        frozen_member = member.replace("parser-v3-v1", "parser-v2-v1")
+        assert core._to_frozen_namespace({member}) == {frozen_member}
+        assert core._from_frozen_namespace({frozen_member}) == {member}
+        result = core._from_frozen_namespace(frozenset({frozen_member}))
+        assert isinstance(result, frozenset)
+        assert result == frozenset({member})
+
+    def test_v2_profile_adapters_are_the_identity(self) -> None:
+        core = _core("frozen_identity_v2")
+        assert core._NAMESPACE_TRANSLATION_REQUIRED is False
+        sample = {"registered_parent_prefix": V2_PARENT, "case_id": "PV2-" + "a" * 20}
+        assert core._to_frozen_namespace(sample) is sample
+        assert core._from_frozen_namespace(sample) is sample
+
+    def test_locked_label_manifest_validation_is_translated(self) -> None:
+        source = (
+            ROOT / "src" / "jspace_observation" / "parser_v2_locked_evaluation.py"
+        ).read_text(encoding="utf-8")
+        assert "frozen.validate_manifest(_to_frozen_namespace(manifest))" in source
+        assert "frozen.validate_manifest(manifest)" not in source
+
+    def test_bootstrap_manifest_validation_is_translated(self) -> None:
+        source = (
+            ROOT / "scripts" / "bootstrap_parser_v2_locked_evaluation.py"
+        ).read_text(encoding="utf-8")
+        assert "frozen.validate_manifest(core._to_frozen_namespace(record))" in source
+        assert "frozen.validate_manifest(record)" not in source

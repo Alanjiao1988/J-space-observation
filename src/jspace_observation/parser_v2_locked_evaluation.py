@@ -871,6 +871,9 @@ def _rewrite_namespace(value: Any, **kwargs: Any) -> Any:
     if isinstance(value, (list, tuple)):
         rebuilt = [_rewrite_namespace(item, **kwargs) for item in value]
         return tuple(rebuilt) if isinstance(value, tuple) else rebuilt
+    if isinstance(value, (set, frozenset)):
+        rebuilt_members = {_rewrite_namespace(item, **kwargs) for item in value}
+        return frozenset(rebuilt_members) if isinstance(value, frozenset) else rebuilt_members
     return value
 
 
@@ -5501,7 +5504,7 @@ def validate_locked_labels_manifest(
     manifest = parse_json_strict(data, "locked label manifest")
     frozen = _load_frozen_validation()
     try:
-        frozen.validate_manifest(manifest)
+        frozen.validate_manifest(_to_frozen_namespace(manifest))
     except Exception:
         raise LockedEvaluationError("locked label manifest schema is invalid") from None
     expected_files = tuple(

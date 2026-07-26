@@ -720,3 +720,107 @@ belongs to a later round, not to this one.
 found and fixed before preregistration was re-issued, before the image was
 rebuilt, before the state chain was bootstrapped, before any locked input was
 read, before any prediction existed, and before any locked label was touched.
+
+### 14.6 Second preflight finding set: frozen-instrument namespace adapter coverage
+
+The re-preregistration at `a38d7daa4fba7e9e5b8ba25a014020b84460e07a` was
+exercised against the real sealed holdout in two pre-claim launcher
+attempts. Both attempts failed **before** the irreversible claim, before any
+prediction was generated and before any locked label was read. The holdout
+was not touched by either attempt. The first failure was an Azure Resource
+Manager identifier-case defect in the runtime configuration arguments and is
+recorded in the run log. The second failure exposed a further defect class in
+the orchestrator itself, described here.
+
+#### 14.6.1 The defect class
+
+The frozen validation instrument
+(`src/jspace_observation/evaluator_validation.py`, SHA-256
+`63eb1c7d8b229dddafdd3d54a0d62bb415d76ae8dd5aab220bd91ff054f08344`) is
+hash-pinned and only recognises the `parser-v2-v1` sealed family namespace.
+The orchestrator therefore translates this profile's namespace onto the
+instrument's on the way in (`_to_frozen_namespace`, `_to_frozen_receipts`)
+and back on the way out (`_from_frozen_namespace`).
+
+Under the default parser-v2 profile both translations are the identity. A
+call site that omits the adapter is consequently **invisible to every
+parser-v2 test and to every parser-v2 execution**, and only fails when a
+non-default profile actually runs. This is the same structural defect class
+already disclosed in §14.4 and §14.5: a profile-scoped producer paired with a
+consumer that is not profile-scoped.
+
+#### 14.6.2 Findings
+
+| ID | Location | Defect | Consequence if unfixed |
+| --- | --- | --- | --- |
+| G1 | `scripts/bootstrap_parser_v2_locked_evaluation.py` `_load_manifest_only_bindings` | The five sealed parent manifests were passed to `frozen.validate_manifest` without namespace translation. | Bootstrap aborts; state chain cannot be created. |
+| G2 | `scripts/bootstrap_parser_v2_locked_evaluation.py` `run_bootstrap` | `expected_parent_membership` was called directly on the untranslated profile parent prefix, bypassing the orchestrator's adapted wrapper. | **This is the observed Stage P attempt-2 failure**: raw `ValidationSetError: parent prefix must equal phase1-evaluator-validation/parser-v2-v1/YYYYMMDDTHHMMSSZ`. |
+| G3 | `scripts/bootstrap_parser_v2_locked_evaluation.py` `run_bootstrap` | `build_authorization_lock` was called with an untranslated receipt and provisional implementation manifest. | Authorization lock cannot be built; UNSEAL cannot be authorized. |
+| G4 | `src/jspace_observation/parser_v2_locked_evaluation.py` locked-label manifest validation | `frozen.validate_manifest` was called on the locked-label manifest without translation. | Latent **Stage E** blocker: label manifest would be rejected as schema-invalid after the holdout had already been spent. |
+| G5 | `src/jspace_observation/parser_v2_locked_evaluation.py` `_rewrite_namespace` | The recursive rewriter descended into `str`, `Mapping`, `list` and `tuple` but **not** `set` or `frozenset`, so any set-valued translation silently returned its input unchanged. | Silent, non-erroring mistranslation. It made the G2 fix ineffective and would have produced a false parent-membership mismatch with no indication that a translation had been skipped. |
+
+G4 is the most serious of the five. G1, G2, G3 and G5 fail loudly and
+pre-claim. G4 would have failed **after** the first locked-label read, i.e.
+after the holdout was irreversibly spent, and would have forced the round to
+terminate without a formal result.
+
+G5 is the most instructive. It is a silent failure: no exception, no
+mismatch report, simply an untranslated value flowing onward. It was found
+only because a test asserted the round-trip property of the adapter rather
+than the absence of an exception.
+
+#### 14.6.3 Remediation
+
+All five findings are fixed at the preregistration commit recorded in §1.
+
+The remediation is not only the five point fixes. A structural regression
+test, `TestFrozenInstrumentCallSitesTranslateNamespace`, now enumerates every
+`_load_frozen_validation()` call site across the orchestrator core, the
+bootstrap, the Stage P worker, the Stage E finalizer and the seal job, and
+fails if any site reaches the frozen instrument without an adapter in its
+call block. Namespace-free members (`STRATA`, `CRITICAL_STRATA`,
+`REGISTERED_LEAF_MEMBERS`, `validate_implementation_manifest`) and sites
+explicitly guarded by `_NAMESPACE_TRANSLATION_REQUIRED` are exempt. The suite
+additionally asserts the adapter round-trip over `set` and `frozenset`, and
+re-asserts that both adapters remain the identity under the parser-v2
+profile.
+
+A write-blocked dry run was also added to the pre-claim procedure. It
+executes the real custodian bootstrap against the real sealed holdout with
+the single blob write entry point replaced by a sentinel raise, so the entire
+read-side validation path is exercised against real data with no persisted
+side effect of any kind. Attempts 1 and 2 consumed a full freeze-build-launch
+cycle each to discover one defect; the dry run exercises the same code path
+without a claim, without an Azure Container Apps execution and without any
+state receipt.
+
+#### 14.6.4 Honest statement of residual risk
+
+The dry run covers the custodian bootstrap up to its first write. It does not
+cover the Stage P worker after the claim, the sealing job, or Stage E. Those
+paths remain covered only by the test suite and by the structural adapter
+test introduced here.
+
+The five findings in this section were all found in one sitting after two
+attempts. That is evidence that the defect class is real and recurrent, not
+evidence that it is now exhausted. The structural test converts the class
+from "found one per launch attempt" to "found at test time", which is a
+material improvement, but it is a text-proximity check over call blocks and
+can be defeated by an unusual call shape.
+
+#### 14.6.5 Impact on the formal evaluation
+
+```
+Defects found before preregistration commit:      yes
+Defects found before image build:                 yes
+Defects found before Stage P claim:               yes
+Predictions generated at time of discovery:       none
+Locked labels read at time of discovery:          none
+Holdout state at time of discovery:               SEALED, unspent
+Impact on the formal parser-v3 result:            none
+```
+
+No locked label, no locked input payload and no reference decision was read
+at any point during the discovery or remediation of G1-G5. The holdout
+remains sealed and unspent at the preregistration commit that supersedes
+`a38d7daa4fba7e9e5b8ba25a014020b84460e07a`.

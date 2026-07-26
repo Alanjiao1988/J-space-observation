@@ -279,7 +279,7 @@ def _load_manifest_only_bindings(
                 f"{relative} is not canonical immutable JSON"
             )
         try:
-            frozen.validate_manifest(record)
+            frozen.validate_manifest(core._to_frozen_namespace(record))
         except Exception:
             raise core.LockedEvaluationError(
                 f"{relative} is not a registered frozen manifest"
@@ -549,7 +549,11 @@ def run_bootstrap(
         )
     active_service = service or active_core.create_blob_service(args.account_url)
     frozen_parent = set(
-        active_core._load_frozen_validation().expected_parent_membership(parent)
+        active_core._from_frozen_namespace(
+            active_core._load_frozen_validation().expected_parent_membership(
+                active_core._to_frozen_namespace(parent)
+            )
+        )
     )
     evaluation = active_core.evaluation_prefixes(parent, authorization_id)
     existing_state_members = active_core.list_exact_prefix(
@@ -732,10 +736,12 @@ def run_bootstrap(
         authorization_lock_sha256="1" * 64,
     )
     frozen = active_core._load_frozen_validation()
-    authorization_lock = frozen.build_authorization_lock(
-        receipts[-1],
-        provisional_implementation,
-        implementation_bytes,
+    authorization_lock = active_core._from_frozen_namespace(
+        frozen.build_authorization_lock(
+            active_core._to_frozen_receipts(receipts)[-1],
+            active_core._to_frozen_namespace(provisional_implementation),
+            implementation_bytes,
+        )
     )
     if existing_authorization_lock is not None:
         if (
