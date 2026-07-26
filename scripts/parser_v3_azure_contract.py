@@ -220,14 +220,22 @@ class AzureContractError(RuntimeError):
     """Raised when an Azure response differs from the immutable contract."""
 
 
+CORE_PROFILE_ID = "parser-v3-v1"
+
+
 def _load_core() -> ModuleType:
     spec = importlib.util.spec_from_file_location(
-        "_jspace_parser_v2_azure_contract_core", CORE_PATH
+        "_jspace_parser_v3_azure_contract_core", CORE_PATH
     )
     if spec is None or spec.loader is None:
         raise AzureContractError("cannot load locked-evaluation core")
     module = importlib.util.module_from_spec(spec)
+    module.__dict__["_PRESEEDED_PARSER_PROFILE_ID"] = CORE_PROFILE_ID
     spec.loader.exec_module(module)
+    if module.ACTIVE_PARSER_PROFILE_ID != CORE_PROFILE_ID:
+        raise AzureContractError("locked-evaluation core ignored the parser-v3 profile")
+    if "_PRESEEDED_PARSER_PROFILE_ID" in module.__dict__:
+        raise AzureContractError("locked-evaluation core leaked its profile seed")
     return module
 
 

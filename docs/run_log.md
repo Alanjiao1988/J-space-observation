@@ -3402,3 +3402,55 @@ Scientific impact: none. No locked input was read, no prediction was generated,
 no label was accessed, and no evaluation semantics changed. The event is
 recorded because a stranded durable claim is a permanent, publicly visible
 artifact of the coordination zone.
+
+
+### Second pre-execution defect: the v3 Azure helper validated against the v2 profile
+
+The first real one-shot build (source commit
+`1c5ace45bfb8b6641ebaa5e184cfb14f04309a15`) created its durable claim, started
+its ACR TaskRun, **built and pushed the image successfully**, and then failed at
+the final gate:
+
+`	ext
+[FAIL] immutable image binding is invalid
+[FAIL] Final immutable image binding validation failed
+`
+
+Cause. `scripts/parser_v3_azure_contract.py` loaded the locked-evaluation core
+with raw `importlib` and never seeded the parser-v3 profile, so the helper
+resolved the **default parser-v2 profile**. It therefore demanded
+`Dockerfile.parser-v2-eval` and `j-space-observation-parser-eval` while the
+binding correctly carried the parser-v3 Dockerfile and repository. Validating the
+same binding directly against a v3-profile core returned `VALIDATION_OK`,
+which isolated the fault to the helper rather than to the image.
+
+The helper had been derived from the parser-v2 helper, where loading the default
+profile is correct because parser v2 *is* the default. The derivation was an
+exact substitution and so faithfully reproduced a line that is right for v2 and
+wrong for v3.
+
+Scope. This is a **build-and-runtime provenance validation** defect. It does not
+touch parser bytes, the gate contract, prediction semantics or scoring
+semantics. It would also have broken Stage P and Stage E, because the runtime
+launcher validates the runtime configuration and the prediction seals through
+the same helper, and those validators are profile-scoped by member name and
+binding path. Finding it at the build gate prevented a later failure during
+prediction generation.
+
+Fix. `_load_core` now seeds `_PRESEEDED_PARSER_PROFILE_ID = "parser-v3-v1"`
+before `exec_module` and asserts both that the profile took effect and that
+the seed did not leak, matching `scripts/load_locked_evaluation_core.py`. The
+parser-v2 helper is unchanged and still resolves the parser-v2 profile. Three
+regression tests were added; the full suite is 1323 passing.
+
+Consequences for the freeze. `scripts/parser_v3_azure_contract.py` is a bound
+image-binding source path, so this fix changes the image binding and requires a
+new source commit and a new build. The semantic freeze established by
+`e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea` is unaffected: parser v3, the
+candidate worker, the gate contract, the profile table, Stage P prediction
+semantics, Stage E scoring semantics and the membership rules are all
+byte-identical. The build at `1c5ace45` is abandoned with its claim stranded;
+its image is not used.
+
+No locked input was read, no prediction was generated and no label was accessed
+at any point.

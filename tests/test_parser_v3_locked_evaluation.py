@@ -832,3 +832,41 @@ class TestParserV3BuildProvenance:
             if line.strip() and not line.endswith(": eol: lf")
         ]
         assert unspecified == []
+
+
+class TestAzureContractHelpersBindTheirOwnProfile:
+    """The Azure provenance helpers must validate against their own profile."""
+
+    def test_v3_helper_loads_the_parser_v3_profile(self):
+        helper = _load_module(
+            "_test_v3_azure_contract", ROOT / "scripts" / "parser_v3_azure_contract.py"
+        )
+        core = helper._load_core()
+        assert core.ACTIVE_PARSER_PROFILE_ID == "parser-v3-v1"
+        assert core.EVAL_DOCKERFILE_PATH == "Dockerfile.parser-v3-eval"
+        assert core.EVAL_IMAGE_REPOSITORY == "j-space-observation-parser-v3-eval"
+        assert "_PRESEEDED_PARSER_PROFILE_ID" not in core.__dict__
+
+    def test_v2_helper_still_loads_the_parser_v2_profile(self):
+        helper = _load_module(
+            "_test_v2_azure_contract", ROOT / "scripts" / "parser_v2_azure_contract.py"
+        )
+        core = helper._load_core()
+        assert core.ACTIVE_PARSER_PROFILE_ID == "parser-v2-v1"
+        assert core.EVAL_DOCKERFILE_PATH == "Dockerfile.parser-v2-eval"
+        assert core.EVAL_IMAGE_REPOSITORY == "j-space-observation-parser-eval"
+
+    def test_v3_helper_accepts_a_v3_image_binding_the_v2_profile_rejects(self):
+        helper3 = _load_module(
+            "_test_v3_azure_contract_b", ROOT / "scripts" / "parser_v3_azure_contract.py"
+        )
+        helper2 = _load_module(
+            "_test_v2_azure_contract_b", ROOT / "scripts" / "parser_v2_azure_contract.py"
+        )
+        core3 = helper3._load_core()
+        core2 = helper2._load_core()
+        assert core3.EVAL_IMAGE_REPOSITORY != core2.EVAL_IMAGE_REPOSITORY
+        assert core3.EVAL_DOCKERFILE_PATH != core2.EVAL_DOCKERFILE_PATH
+        assert core3.EVAL_BUILD_SCRIPT_PATH != core2.EVAL_BUILD_SCRIPT_PATH
+        assert core3.EVAL_AZURE_CONTRACT_PATH != core2.EVAL_AZURE_CONTRACT_PATH
+        assert core3.EVAL_RUNTIME_LAUNCHER_PATH != core2.EVAL_RUNTIME_LAUNCHER_PATH
