@@ -72,6 +72,19 @@ _PARSER_EVALUATION_PROFILES = {
         "sealed_holdout_family": "parser-v2-v1",
         "candidate_predictions_filename": "parser_v2_locked_predictions.jsonl",
         "comparator_predictions_filenames": ("legacy_locked_predictions.jsonl",),
+        "comparator_parser_identities": {
+            "legacy": {
+                "role": "comparator_1",
+                "parser": "legacy",
+                "algorithm_id": None,
+                "parser_version": None,
+                "parser_source_sha256": (
+                    "4b07b91859aca33b51af9c15b08f07026f11b0141f1300fd3f942138b731177e"
+                ),
+                "predictions_filename": "legacy_locked_predictions.jsonl",
+                "stream_kind": "legacy",
+            },
+        },
         "extra_source_binding_paths": (),
         "extra_image_binding_paths": (),
     },
@@ -106,6 +119,34 @@ _PARSER_EVALUATION_PROFILES = {
             "parser_v2_comparator_predictions.jsonl",
             "legacy_comparator_predictions.jsonl",
         ),
+        "comparator_parser_identities": {
+            "parser_v2": {
+                "role": "comparator_1",
+                "parser": "parser_v2",
+                "algorithm_id": (
+                    "jspace-parser-v2-reference-blind-extraction/v1"
+                ),
+                "parser_version": (
+                    "6cfaec62db37562930a4cb7d3a252bcbf80e1eaf748de98213863ff2566a7f86"
+                ),
+                "parser_source_sha256": (
+                    "f538add0bdd6e5a3281d0298b374a99fecea962a91a4cbaa5b4a20795d9a6918"
+                ),
+                "predictions_filename": "parser_v2_comparator_predictions.jsonl",
+                "stream_kind": "envelope",
+            },
+            "legacy": {
+                "role": "comparator_2",
+                "parser": "legacy",
+                "algorithm_id": None,
+                "parser_version": None,
+                "parser_source_sha256": (
+                    "4b07b91859aca33b51af9c15b08f07026f11b0141f1300fd3f942138b731177e"
+                ),
+                "predictions_filename": "legacy_comparator_predictions.jsonl",
+                "stream_kind": "legacy",
+            },
+        },
         "extra_source_binding_paths": (
             "src/jspace_observation/eval_parsing_v3.py",
             "scripts/parser_v3_process_worker.py",
@@ -148,6 +189,23 @@ FROZEN_LEGACY_PARSER_GIT_BLOB_OID = (
 )
 FROZEN_LEGACY_PARSER_SOURCE_SHA256 = (
     "4b07b91859aca33b51af9c15b08f07026f11b0141f1300fd3f942138b731177e"
+)
+FROZEN_COMPARATOR_PARSER_IDENTITIES = {
+    name: dict(identity)
+    for name, identity in ACTIVE_PARSER_PROFILE[
+        "comparator_parser_identities"
+    ].items()
+}
+# Every parser version this evaluation is allowed to attribute a prediction to.
+# A caller may name a comparator, but only one the profile already pins, so no
+# argument can introduce a parser identity that was not preregistered.
+FROZEN_ATTRIBUTABLE_PARSER_VERSIONS = frozenset(
+    {ACTIVE_PARSER_PROFILE["parser_version"]}
+    | {
+        identity["parser_version"]
+        for identity in FROZEN_COMPARATOR_PARSER_IDENTITIES.values()
+        if identity["parser_version"] is not None
+    }
 )
 
 LOCKED_INPUT_SCHEMA_VERSION = "phase1-parser-v2-locked-input/v1"
@@ -3712,7 +3770,7 @@ def compute_protocol_bundle_sha256(project_root: str | Path) -> str:
 
 def load_frozen_gate_bytes(project_root: str | Path) -> bytes:
     data = read_git_blob_bytes(
-        project_root, "docs/phase1_parser_v2_acceptance_gates.json"
+        project_root, ACTIVE_PARSER_PROFILE["acceptance_gate_path"]
     )
     if sha256_bytes(data) != FROZEN_ACCEPTANCE_GATE_SHA256:
         raise LockedEvaluationError("frozen acceptance-gate blob hash mismatch")
@@ -4237,16 +4295,36 @@ _FINAL_LABEL_FIELDS = {
 }
 
 
+def _resolve_expected_parser_version(expected_parser_version: str | None) -> str:
+    """Return the parser version a result must carry to be attributable.
+
+    `None` means the candidate, preserving every pre-existing call. A caller may
+    name a comparator instead, but only one the active profile already pins.
+    """
+    if expected_parser_version is None:
+        return FROZEN_PARSER_VERSION
+    if expected_parser_version not in FROZEN_ATTRIBUTABLE_PARSER_VERSIONS:
+        raise LockedEvaluationError(
+            "parser result version is not attributable under this profile"
+        )
+    return expected_parser_version
+
+
 def validate_parser_result(
-    record: Mapping[str, Any], output_text: str, *, name: str = "parser result"
+    record: Mapping[str, Any],
+    output_text: str,
+    *,
+    name: str = "parser result",
+    expected_parser_version: str | None = None,
 ) -> dict[str, Any]:
+    required_version = _resolve_expected_parser_version(expected_parser_version)
     try:
         checked = _load_frozen_validation().validate_parser_result(
             record, output_text, name=name
         )
     except Exception:
         raise LockedEvaluationError("parser result schema/invariants are invalid") from None
-    if record.get("parser_version") != FROZEN_PARSER_VERSION:
+    if record.get("parser_version") != required_version:
         raise LockedEvaluationError("parser result frozen version binding is invalid")
     return checked
 
@@ -4269,7 +4347,10 @@ def typed_decision_class(decision: str) -> str:
 
 
 def validate_prediction_envelope(
-    envelope: Mapping[str, Any], locked_input: Mapping[str, Any]
+    envelope: Mapping[str, Any],
+    locked_input: Mapping[str, Any],
+    *,
+    expected_parser_version: str | None = None,
 ) -> dict[str, Any]:
     fields = {
         "schema_version",
@@ -4293,12 +4374,19 @@ def validate_prediction_envelope(
         envelope["parser_request_sha256"], "prediction request SHA-256"
     ) != sha256_bytes(canonical_json_bytes(request)):
         raise LockedEvaluationError("prediction request hash mismatch")
-    validate_parser_result(envelope["parser_result"], locked["output_text"])
+    validate_parser_result(
+        envelope["parser_result"],
+        locked["output_text"],
+        expected_parser_version=expected_parser_version,
+    )
     return dict(envelope)
 
 
 def build_prediction_envelope(
-    locked_input: Mapping[str, Any], parser_result: Mapping[str, Any]
+    locked_input: Mapping[str, Any],
+    parser_result: Mapping[str, Any],
+    *,
+    expected_parser_version: str | None = None,
 ) -> dict[str, Any]:
     locked = validate_locked_input(locked_input)
     request = project_parser_request(locked_input)
@@ -4311,7 +4399,9 @@ def build_prediction_envelope(
         "parser_request_sha256": sha256_bytes(canonical_json_bytes(request)),
         "parser_result": dict(parser_result),
     }
-    validate_prediction_envelope(envelope, locked_input)
+    validate_prediction_envelope(
+        envelope, locked_input, expected_parser_version=expected_parser_version
+    )
     return envelope
 
 
@@ -4515,6 +4605,16 @@ def _contains_prohibited_stage_p_value(value: str) -> bool:
     )
 
 
+# Stage P never reads label content, but it does list the registered parent
+# prefix and therefore observes label blob *names*. Under the parser-v3 profile
+# the manifest states both facts separately instead of a single bare claim.
+_STAGE_P_ACCESS_ATTESTATION_KEYS = frozenset(
+    {"labels_accessed"}
+    if ACTIVE_PARSER_PROFILE_ID == DEFAULT_PARSER_EVALUATION_PROFILE_ID
+    else {"labels_accessed", "labels_content_accessed", "labels_prefix_listed"}
+)
+
+
 def assert_label_blind_payload(
     value: Any, *, path: str = "$", allow_access_attestation: bool = True
 ) -> None:
@@ -4522,7 +4622,10 @@ def assert_label_blind_payload(
         for key, item in value.items():
             if not isinstance(key, str):
                 raise LockedEvaluationError("Stage-P payload contains an invalid key")
-            allowed = allow_access_attestation and key == "labels_accessed"
+            allowed = (
+                allow_access_attestation
+                and key in _STAGE_P_ACCESS_ATTESTATION_KEYS
+            )
             if _contains_prohibited_stage_p_key(key) and not allowed:
                 raise LockedEvaluationError("Stage-P payload contains a prohibited channel")
             assert_label_blind_payload(
@@ -6188,10 +6291,38 @@ def _reconstruct_locked_input(label: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+COMPARATOR_DECISION_ADAPTER_ID = "jspace-parser-envelope-to-comparator-decision/v1"
+
+
+def adapt_parser_envelope_to_comparator(
+    envelope: Mapping[str, Any], locked_input: Mapping[str, Any], *, parser_version: str
+) -> dict[str, Any]:
+    """Project a parser prediction envelope onto the comparator decision shape.
+
+    The projection is total and deterministic: it reads only the typed decision
+    the parser already committed to, adds nothing, and can never fail in a way
+    the legacy adapter can, so `adapter_failure` is always null. It exists so a
+    parser comparator and the legacy comparator can be scored by one code path,
+    not to make either look like the other.
+    """
+    checked = validate_prediction_envelope(
+        envelope, locked_input, expected_parser_version=parser_version
+    )
+    return {
+        "case_id": checked["case_id"],
+        "adapter": {
+            "typed_decision": derive_typed_decision(checked["parser_result"]),
+            "adapter_failure": None,
+        },
+    }
+
+
 def _prediction_indexes(
     predictions: Sequence[Mapping[str, Any]],
     legacy_predictions: Sequence[Mapping[str, Any]],
     labels: Mapping[str, Mapping[str, Any]],
+    *,
+    comparator_parser_version: str | None = None,
 ) -> tuple[dict[str, Mapping[str, Any]], dict[str, Mapping[str, Any]]]:
     if len(predictions) != len(labels) or len(legacy_predictions) != len(labels):
         raise LockedEvaluationError("prediction membership is incomplete")
@@ -6212,8 +6343,13 @@ def _prediction_indexes(
         if case_id not in labels or case_id in legacy_index:
             raise LockedEvaluationError("legacy prediction case ID is unknown or duplicate")
         locked = _reconstruct_locked_input(labels[case_id]["raw"])
-        validate_legacy_prediction(legacy, locked)
-        legacy_index[case_id] = legacy
+        if comparator_parser_version is None:
+            validate_legacy_prediction(legacy, locked)
+            legacy_index[case_id] = legacy
+        else:
+            legacy_index[case_id] = adapt_parser_envelope_to_comparator(
+                legacy, locked, parser_version=comparator_parser_version
+            )
         legacy_ids.append(case_id)
     expected_ids = sorted(labels)
     if not exact_json_equal(
@@ -6454,6 +6590,34 @@ def _metrics_topology_summary(gates: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _gating_comparator_parser_version(gates: Mapping[str, Any]) -> str | None:
+    """Return the parser version the contract's comparison gates score against.
+
+    The contract, not the caller, decides which stream gates the candidate. A
+    contract naming `legacy` keeps the frozen legacy-adapter comparator; one
+    naming a parser must name a parser the active profile already pins.
+    """
+    comparison_gates = gates["legacy_comparison_gates"]
+    named = {
+        comparison_gates[gate]["comparator"]
+        for gate in ("clean_pooled_non_regression", "critical_strict_improvement")
+        if "comparator" in comparison_gates[gate]
+    }
+    if not named or named == {"legacy"}:
+        return None
+    if len(named) != 1:
+        raise LockedEvaluationError(
+            "acceptance gates name more than one gating comparator"
+        )
+    comparator = named.pop()
+    identity = FROZEN_COMPARATOR_PARSER_IDENTITIES.get(comparator)
+    if identity is None or identity["parser_version"] is None:
+        raise LockedEvaluationError(
+            "acceptance gates name a comparator this profile does not pin"
+        )
+    return identity["parser_version"]
+
+
 def _score_locked_evaluation(
     labels: Sequence[Mapping[str, Any]],
     predictions: Sequence[Mapping[str, Any]],
@@ -6462,7 +6626,10 @@ def _score_locked_evaluation(
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     label_index = _labels_index(labels, gates)
     parser_index, legacy_index = _prediction_indexes(
-        predictions, legacy_predictions, label_index
+        predictions,
+        legacy_predictions,
+        label_index,
+        comparator_parser_version=_gating_comparator_parser_version(gates),
     )
     dataset = gates["dataset_contract"]
     absolute = gates["absolute_gates"]
@@ -7046,6 +7213,68 @@ def score_locked_evaluation_bytes(
         except Exception:
             gates = None
         return _invalid_metrics(type(exc).__name__, gates=gates), []
+
+
+def score_reporting_only_legacy_comparator(
+    labels_bytes: bytes,
+    predictions_bytes: bytes,
+    legacy_predictions_bytes: bytes,
+    gate_bytes: bytes,
+) -> dict[str, Any]:
+    """Score the legacy stream when the contract makes it reporting-only.
+
+    The frozen contract is used unmodified and the comparator is forced to the
+    legacy adapter here, not chosen by a caller. Only the legacy aggregates are
+    returned: this pass has no verdict and cannot reach the formal decision.
+    """
+    gates = load_acceptance_gates(gate_bytes)
+    if _gating_comparator_parser_version(gates) is None:
+        raise LockedEvaluationError(
+            "legacy is already the gating comparator for this contract"
+        )
+    labels = parse_jsonl_strict(labels_bytes, "locked_reference_labels.jsonl")
+    predictions = parse_jsonl_strict(
+        predictions_bytes, ACTIVE_PARSER_PROFILE["candidate_predictions_filename"]
+    )
+    legacy = parse_jsonl_strict(
+        legacy_predictions_bytes,
+        FROZEN_COMPARATOR_PARSER_IDENTITIES["legacy"]["predictions_filename"],
+    )
+    label_index = _labels_index(labels, gates)
+    _, legacy_index = _prediction_indexes(
+        predictions, legacy, label_index, comparator_parser_version=None
+    )
+    strata = gates["dataset_contract"]["strata"]
+    per_stratum = {stratum: {"denominator": 0, "correct": 0} for stratum in strata}
+    correct = 0
+    adapter_failures: list[str] = []
+    for case_id in sorted(label_index):
+        label = label_index[case_id]
+        row = legacy_index[case_id]
+        if row["adapter"]["adapter_failure"] is not None:
+            adapter_failures.append(case_id)
+        exact = row["adapter"]["typed_decision"] == derive_typed_decision(
+            label["raw"], expected=True
+        )
+        correct += int(exact)
+        values = per_stratum[label["stratum"]]
+        values["denominator"] += 1
+        values["correct"] += int(exact)
+    total = len(label_index)
+    return {
+        "comparator": "legacy",
+        "gating": False,
+        "parser_source_sha256": FROZEN_COMPARATOR_PARSER_IDENTITIES["legacy"][
+            "parser_source_sha256"
+        ],
+        "exact_typed_decision": metric_record(correct, total),
+        "per_stratum": {
+            stratum: metric_record(values["correct"], values["denominator"])
+            for stratum, values in per_stratum.items()
+        },
+        "adapter_failures": metric_record(len(adapter_failures), total),
+        "adapter_failure_case_ids": adapter_failures,
+    }
 
 
 _SCORING_LEDGER_CONTEXT_FIELDS = frozenset(
@@ -13599,6 +13828,67 @@ def persist_manifest_last_prefix(
     }
 
 
+def build_parser_stream_records(
+    payload_members: Sequence[Mapping[str, Any]],
+    *,
+    ordered_case_ids: Sequence[str],
+) -> list[dict[str, Any]]:
+    """Describe each prediction stream from the profile, not from its caller.
+
+    Every identity field is read from the active profile, so a stream record
+    cannot claim a parser the preregistered profile does not pin. Roles,
+    members, and artifact hashes must all be distinct.
+    """
+    by_name = {item["name"]: item for item in payload_members}
+    ordered_ids_sha256 = sha256_bytes(canonical_json_bytes(list(ordered_case_ids)))
+    row_count = len(ordered_case_ids)
+    entries = [
+        {
+            "role": "candidate",
+            "parser": ACTIVE_PARSER_PROFILE["candidate_parser"],
+            "algorithm_id": ACTIVE_PARSER_PROFILE["candidate_parser_algorithm_id"],
+            "parser_version": FROZEN_PARSER_VERSION,
+            "parser_source_sha256": FROZEN_PARSER_SOURCE_SHA256,
+            "predictions_member": ACTIVE_PARSER_PROFILE[
+                "candidate_predictions_filename"
+            ],
+        }
+    ]
+    for name in ACTIVE_PARSER_PROFILE["comparator_parsers"]:
+        identity = FROZEN_COMPARATOR_PARSER_IDENTITIES[name]
+        entries.append(
+            {
+                "role": identity["role"],
+                "parser": identity["parser"],
+                "algorithm_id": identity["algorithm_id"],
+                "parser_version": identity["parser_version"],
+                "parser_source_sha256": identity["parser_source_sha256"],
+                "predictions_member": identity["predictions_filename"],
+            }
+        )
+    records: list[dict[str, Any]] = []
+    for entry in entries:
+        member = by_name.get(entry["predictions_member"])
+        if member is None:
+            raise LockedEvaluationError("prediction stream member is missing")
+        records.append(
+            {
+                **entry,
+                "record_count": row_count,
+                "ordered_case_ids_sha256": ordered_ids_sha256,
+                "artifact_sha256": member["sha256"],
+            }
+        )
+    if (
+        len({item["role"] for item in records}) != len(records)
+        or len({item["predictions_member"] for item in records}) != len(records)
+        or len({item["artifact_sha256"] for item in records}) != len(records)
+        or len({item["parser_source_sha256"] for item in records}) != len(records)
+    ):
+        raise LockedEvaluationError("prediction stream records are not distinct")
+    return records
+
+
 def build_prediction_artifact_manifest(
     *,
     metadata: Sequence[Mapping[str, Any]],
@@ -13736,6 +14026,14 @@ def build_prediction_artifact_manifest(
         "manifest_uploaded_last": True,
         "created_utc": _require_utc(created_utc, "prediction manifest created_utc"),
     }
+    if ACTIVE_PARSER_PROFILE_ID != DEFAULT_PARSER_EVALUATION_PROFILE_ID:
+        record["evaluation_profile"] = ACTIVE_PARSER_PROFILE_ID
+        record["parser_streams"] = build_parser_stream_records(
+            checked_metadata,
+            ordered_case_ids=request_manifest["ordered_case_ids"],
+        )
+        record["labels_content_accessed"] = False
+        record["labels_prefix_listed"] = True
     assert_label_blind_payload(record)
     return record
 
@@ -13786,6 +14084,17 @@ _PREDICTION_MANIFEST_FIELDS = frozenset(
         "manifest_uploaded_last",
         "created_utc",
     }
+) | (
+    frozenset()
+    if ACTIVE_PARSER_PROFILE_ID == DEFAULT_PARSER_EVALUATION_PROFILE_ID
+    else frozenset(
+        {
+            "evaluation_profile",
+            "parser_streams",
+            "labels_content_accessed",
+            "labels_prefix_listed",
+        }
+    )
 )
 
 
@@ -13841,6 +14150,22 @@ def validate_prediction_artifact_manifest(
         or record.get("manifest_uploaded_last") is not True
     ):
         raise LockedEvaluationError("prediction artifact manifest binding mismatch")
+    if ACTIVE_PARSER_PROFILE_ID != DEFAULT_PARSER_EVALUATION_PROFILE_ID:
+        if (
+            record.get("evaluation_profile") != ACTIVE_PARSER_PROFILE_ID
+            or record.get("labels_content_accessed") is not False
+            or record.get("labels_prefix_listed") is not True
+            or not exact_json_equal(
+                record.get("parser_streams"),
+                build_parser_stream_records(
+                    record["payload_members"],
+                    ordered_case_ids=record["ordered_case_ids"],
+                ),
+            )
+        ):
+            raise LockedEvaluationError(
+                "prediction artifact parser-stream attribution mismatch"
+            )
     fixed = {
         "parser_source_sha256": FROZEN_PARSER_SOURCE_SHA256,
         "parser_version": FROZEN_PARSER_VERSION,
@@ -14848,6 +15173,12 @@ __all__ = [
     "FROZEN_LEGACY_PARSER_COMMIT",
     "FROZEN_LEGACY_PARSER_GIT_BLOB_OID",
     "FROZEN_LEGACY_PARSER_SOURCE_SHA256",
+    "FROZEN_COMPARATOR_PARSER_IDENTITIES",
+    "FROZEN_ATTRIBUTABLE_PARSER_VERSIONS",
+    "build_parser_stream_records",
+    "score_reporting_only_legacy_comparator",
+    "adapt_parser_envelope_to_comparator",
+    "COMPARATOR_DECISION_ADAPTER_ID",
     "RUNTIME_CONFIG_SCHEMA_VERSION",
     "IMAGE_BINDING_SCHEMA_VERSION",
     "IMAGE_BINDING_ESSENTIAL_SCHEMA_VERSION",

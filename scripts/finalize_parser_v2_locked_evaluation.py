@@ -26,9 +26,34 @@ CORE_PATH = (
     / "jspace_observation"
     / "parser_v2_locked_evaluation.py"
 )
-FORBIDDEN_MODULE_PARTS = ("eval_parsing", "eval_parsing_v2", "eval_parsing_v3")
-FORBIDDEN_FILENAMES = frozenset(
+FORBIDDEN_MODULE_PARTS = (
+    "eval_parsing",
+    "eval_parsing_v2",
+    "eval_parsing_v3",
+    "parser_v2_process_worker",
+    "parser_v3_process_worker",
+    "run_parser_v2_locked_predictions",
+    "run_parser_v3_locked_predictions",
+)
+# Parser modules live in the package; the workers and Stage P launchers live in
+# scripts/ and reach a parser transitively, so both routes are denied by name
+# and by resolved path.
+_FORBIDDEN_PARSER_MODULE_FILENAMES = frozenset(
     {"eval_parsing.py", "eval_parsing_v2.py", "eval_parsing_v3.py"}
+)
+_FORBIDDEN_PARSER_SCRIPT_FILENAMES = frozenset(
+    {
+        "parser_v2_process_worker.py",
+        "parser_v3_process_worker.py",
+        "run_parser_v2_locked_predictions.py",
+        "run_parser_v3_locked_predictions.py",
+    }
+)
+FORBIDDEN_FILENAMES = (
+    _FORBIDDEN_PARSER_MODULE_FILENAMES | _FORBIDDEN_PARSER_SCRIPT_FILENAMES
+)
+_FORBIDDEN_PYC_STEMS = frozenset(
+    name.removesuffix(".py") for name in FORBIDDEN_FILENAMES
 )
 _ORIGINAL_SPEC_FROM_FILE_LOCATION = importlib.util.spec_from_file_location
 _ORIGINAL_SOURCE_FILE_LOADER = importlib.machinery.SourceFileLoader
@@ -52,6 +77,40 @@ _FORBIDDEN_CODE_NAMES = frozenset(
     }
 )
 _EXECUTION_ID_PATTERN = re.compile(r"stage-e-[0-9a-f]{32}\Z", re.ASCII)
+
+# Fixed when this module is imported, before any sealed artifact or label byte
+# is read, from a name seeded by a hardcoded launcher. It selects a *scoring*
+# profile only: Stage E never loads a parser under any profile.
+STAGE_E_PROFILE_ID = globals().pop("_PRESEEDED_PARSER_PROFILE_ID", "parser-v2-v1")
+STAGE_E_PROFILE_RESOLVED_UTC = datetime.now(timezone.utc).strftime(
+    "%Y-%m-%dT%H:%M:%SZ"
+)
+# Stage E restates the stream member names independently of the core and then
+# cross-checks them once the core is loaded, so a rename on either side is a
+# hard failure rather than a silent re-attribution.
+_STAGE_E_STREAM_MEMBERS = {
+    "parser-v2-v1": {
+        "candidate": "parser_v2_locked_predictions.jsonl",
+        "parser_v2_comparator": None,
+        "legacy": "legacy_locked_predictions.jsonl",
+    },
+    "parser-v3-v1": {
+        "candidate": "parser_v3_candidate_predictions.jsonl",
+        "parser_v2_comparator": "parser_v2_comparator_predictions.jsonl",
+        "legacy": "legacy_comparator_predictions.jsonl",
+    },
+}[STAGE_E_PROFILE_ID]
+_CANDIDATE_PREDICTIONS_MEMBER = _STAGE_E_STREAM_MEMBERS["candidate"]
+_V2_COMPARATOR_PREDICTIONS_MEMBER = _STAGE_E_STREAM_MEMBERS["parser_v2_comparator"]
+_LEGACY_PREDICTIONS_MEMBER = _STAGE_E_STREAM_MEMBERS["legacy"]
+# The stream the acceptance contract's comparison gates score against. Under
+# parser v2 that is the legacy parser; under parser v3 the contract names
+# parser v2, and the legacy stream becomes reporting-only.
+_GATING_COMPARATOR_PREDICTIONS_MEMBER = (
+    _LEGACY_PREDICTIONS_MEMBER
+    if _V2_COMPARATOR_PREDICTIONS_MEMBER is None
+    else _V2_COMPARATOR_PREDICTIONS_MEMBER
+)
 
 
 class _RedactedArgumentError(Exception):
@@ -112,16 +171,18 @@ def _forbidden_parser_path(location: object) -> bool:
         return False
     if path.name in FORBIDDEN_FILENAMES:
         return True
-    if path.suffix == ".pyc" and path.stem.split(".", 1)[0] in {
-        "eval_parsing",
-        "eval_parsing_v2",
-        "eval_parsing_v3",
-    }:
+    if path.suffix == ".pyc" and path.stem.split(".", 1)[0] in _FORBIDDEN_PYC_STEMS:
         return True
-    return path in {
-        (PROJECT_ROOT / "src" / "jspace_observation" / name).resolve()
-        for name in FORBIDDEN_FILENAMES
-    }
+    return path in (
+        {
+            (PROJECT_ROOT / "src" / "jspace_observation" / name).resolve()
+            for name in _FORBIDDEN_PARSER_MODULE_FILENAMES
+        }
+        | {
+            (PROJECT_ROOT / "scripts" / name).resolve()
+            for name in _FORBIDDEN_PARSER_SCRIPT_FILENAMES
+        }
+    )
 
 
 def _guarded_spec_from_file_location(
@@ -388,6 +449,67 @@ def _assert_runtime_isolation() -> None:
         _install_dynamic_loader_guards()
 
 
+def _score_reporting_only_comparator(
+    core: ModuleType,
+    *,
+    labels_bytes: bytes,
+    candidate_bytes: bytes,
+    gate_bytes: bytes,
+    prediction_artifacts: Mapping[str, bytes],
+) -> dict[str, Any] | None:
+    """Score the reporting-only comparator, for the record and nothing else.
+
+    Under parser v2 the legacy stream already gates, so there is nothing extra
+    to report. Under parser v3 the contract makes legacy reporting-only, so it
+    is scored here in a separate pass whose gate verdict is discarded: only the
+    legacy aggregates are kept, and they cannot move the formal decision.
+    """
+    if _V2_COMPARATOR_PREDICTIONS_MEMBER is None:
+        return None
+    return core.score_reporting_only_legacy_comparator(
+        labels_bytes,
+        candidate_bytes,
+        prediction_artifacts[_LEGACY_PREDICTIONS_MEMBER],
+        gate_bytes,
+    )
+
+
+def _assert_stream_member_agreement(core: ModuleType) -> None:
+    """Fail unless the scorer and the core name the same streams, in order.
+
+    Stage E holds its own copy of the member names. Agreement here is what makes
+    the scorer's attribution independent of the artifact it is scoring.
+    """
+    profile = core.ACTIVE_PARSER_PROFILE
+    identities = core.FROZEN_COMPARATOR_PARSER_IDENTITIES
+    expected_v2 = (
+        identities["parser_v2"]["predictions_filename"]
+        if "parser_v2" in identities
+        else None
+    )
+    if (
+        profile["candidate_predictions_filename"] != _CANDIDATE_PREDICTIONS_MEMBER
+        or identities["legacy"]["predictions_filename"]
+        != _LEGACY_PREDICTIONS_MEMBER
+        or expected_v2 != _V2_COMPARATOR_PREDICTIONS_MEMBER
+    ):
+        raise RuntimeError("Stage E and the core disagree on prediction streams")
+    members = tuple(core.PREDICTION_MEMBER_NAMES)
+    expected_streams = tuple(
+        name
+        for name in (
+            _CANDIDATE_PREDICTIONS_MEMBER,
+            _V2_COMPARATOR_PREDICTIONS_MEMBER,
+            _LEGACY_PREDICTIONS_MEMBER,
+        )
+        if name is not None
+    )
+    if tuple(name for name in members if name.endswith(".jsonl")) != expected_streams:
+        raise RuntimeError("Stage E prediction stream order is not exact")
+    if len(set(expected_streams)) != len(expected_streams):
+        raise RuntimeError("Stage E prediction streams are not distinct")
+
+
 def _load_core() -> ModuleType:
     _source_import_guard(Path(__file__).resolve())
     _source_import_guard(CORE_PATH)
@@ -397,8 +519,14 @@ def _load_core() -> ModuleType:
     if spec is None or spec.loader is None:
         raise RuntimeError("cannot direct-load parser-free scorer core")
     module = importlib.util.module_from_spec(spec)
+    module.__dict__["_PRESEEDED_PARSER_PROFILE_ID"] = STAGE_E_PROFILE_ID
     sys.modules[name] = module
     spec.loader.exec_module(module)
+    if module.ACTIVE_PARSER_PROFILE_ID != STAGE_E_PROFILE_ID:
+        raise RuntimeError("Stage E core ignored the requested scoring profile")
+    if "_PRESEEDED_PARSER_PROFILE_ID" in module.__dict__:
+        raise RuntimeError("Stage E core leaked its profile seed")
+    _assert_stream_member_agreement(module)
     module.assert_parser_free_source(
         Path(__file__).read_bytes(), str(Path(__file__).resolve())
     )
@@ -1466,12 +1594,8 @@ def _authenticate_invalid_closure_provenance(
         request_manifest_bytes=prediction_artifacts[
             "prediction_request_manifest.json"
         ],
-        predictions_bytes=prediction_artifacts[
-            "parser_v2_locked_predictions.jsonl"
-        ],
-        legacy_predictions_bytes=prediction_artifacts[
-            "legacy_locked_predictions.jsonl"
-        ],
+        predictions_bytes=prediction_artifacts[_CANDIDATE_PREDICTIONS_MEMBER],
+        legacy_predictions_bytes=prediction_artifacts[_LEGACY_PREDICTIONS_MEMBER],
         expected_authorization_id=args.authorization_id,
         expected_parent_prefix=args.parent_prefix,
         expected_retry_kind=prediction_context["retry_kind"],
@@ -3006,8 +3130,8 @@ def _legacy_verify_score_prefix(
     )
     ledger_validation = core.validate_scoring_ledger_bytes(
         payloads[core.SCORING_LEDGER_FILENAME],
-        prediction_artifacts["parser_v2_locked_predictions.jsonl"],
-        prediction_artifacts["legacy_locked_predictions.jsonl"],
+        prediction_artifacts[_CANDIDATE_PREDICTIONS_MEMBER],
+        prediction_artifacts[_GATING_COMPARATOR_PREDICTIONS_MEMBER],
         gate_bytes,
         context=ledger_context,
         expected_ordered_case_ids=prediction_manifest["ordered_case_ids"],
@@ -4738,12 +4862,8 @@ def _run_stage_e(
         request_manifest_bytes=prediction_artifacts[
             "prediction_request_manifest.json"
         ],
-        predictions_bytes=prediction_artifacts[
-            "parser_v2_locked_predictions.jsonl"
-        ],
-        legacy_predictions_bytes=prediction_artifacts[
-            "legacy_locked_predictions.jsonl"
-        ],
+        predictions_bytes=prediction_artifacts[_CANDIDATE_PREDICTIONS_MEMBER],
+        legacy_predictions_bytes=prediction_artifacts[_LEGACY_PREDICTIONS_MEMBER],
         expected_authorization_id=args.authorization_id,
         expected_parent_prefix=args.parent_prefix,
         expected_retry_kind=prediction_context["retry_kind"],
@@ -5042,22 +5162,29 @@ def _run_stage_e(
     )
     scoring_ledger_bytes, _, _ = active_core.build_scoring_ledger_bytes(
         labels_bytes,
-        prediction_artifacts["parser_v2_locked_predictions.jsonl"],
-        prediction_artifacts["legacy_locked_predictions.jsonl"],
+        prediction_artifacts[_CANDIDATE_PREDICTIONS_MEMBER],
+        prediction_artifacts[_GATING_COMPARATOR_PREDICTIONS_MEMBER],
         gate_bytes,
         context=ledger_context,
         expected_ordered_case_ids=prediction_graph["ordered_case_ids"],
     )
     ledger_validation = active_core.validate_scoring_ledger_bytes(
         scoring_ledger_bytes,
-        prediction_artifacts["parser_v2_locked_predictions.jsonl"],
-        prediction_artifacts["legacy_locked_predictions.jsonl"],
+        prediction_artifacts[_CANDIDATE_PREDICTIONS_MEMBER],
+        prediction_artifacts[_GATING_COMPARATOR_PREDICTIONS_MEMBER],
         gate_bytes,
         context=ledger_context,
         expected_ordered_case_ids=prediction_graph["ordered_case_ids"],
     )
     metrics = ledger_validation["metrics"]
     failures = ledger_validation["failures"]
+    diagnostic_metrics = _score_reporting_only_comparator(
+        active_core,
+        labels_bytes=labels_bytes,
+        candidate_bytes=prediction_artifacts[_CANDIDATE_PREDICTIONS_MEMBER],
+        gate_bytes=gate_bytes,
+        prediction_artifacts=prediction_artifacts,
+    )
     if adopted_score_reservation_bytes is None:
         score_nonce = secrets.token_hex(16)
         score_reservation_bytes = active_core.canonical_json_bytes(

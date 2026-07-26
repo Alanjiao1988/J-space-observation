@@ -28,6 +28,7 @@ CORE_PATH = (
     / "parser_v2_locked_evaluation.py"
 )
 PARSER_V2_WORKER_PATH = PROJECT_ROOT / "scripts" / "parser_v2_process_worker.py"
+PARSER_V3_WORKER_PATH = PROJECT_ROOT / "scripts" / "parser_v3_process_worker.py"
 LEGACY_PARSER_PATH = (
     PROJECT_ROOT / "src" / "jspace_observation" / "eval_parsing.py"
 )
@@ -37,6 +38,17 @@ _PARSER_REQUEST_SCHEMA = "phase1-parser-v2-request/v1"
 _PARSER_RESULT_SCHEMA = "phase1-parser-v2-result/v1"
 _PARSER_V2_VERSION = (
     "6cfaec62db37562930a4cb7d3a252bcbf80e1eaf748de98213863ff2566a7f86"
+)
+_PARSER_V3_VERSION = (
+    "0ce0f3cd5e0a1d4c5b4c9eff9a2968deecd04c594f435a2fa2bfec332fd3cace"
+)
+# Fixed when this module is imported, before any locked input is opened, from a
+# name seeded by a hardcoded launcher. It is never read from argv, the
+# environment, or a locked input, so the candidate parser cannot be redirected
+# at run time. Absent a seed the profile is parser v2, as it has always been.
+STAGE_P_PROFILE_ID = globals().pop("_PRESEEDED_PARSER_PROFILE_ID", "parser-v2-v1")
+STAGE_P_PROFILE_RESOLVED_UTC = datetime.now(timezone.utc).strftime(
+    "%Y-%m-%dT%H:%M:%SZ"
 )
 _PARSER_RESULT_FIELDS = {
     "schema_version",
@@ -118,7 +130,24 @@ def _load_file_module(name: str, path: Path) -> ModuleType:
 
 
 def _load_core() -> ModuleType:
-    return _load_file_module("_jspace_parser_v2_locked_eval_stage_p", CORE_PATH)
+    name = "_jspace_parser_v2_locked_eval_stage_p"
+    existing = sys.modules.get(name)
+    if existing is not None:
+        return existing
+    spec = importlib.util.spec_from_file_location(name, CORE_PATH)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load module from {CORE_PATH}")
+    module = importlib.util.module_from_spec(spec)
+    module.__dict__["_PRESEEDED_PARSER_PROFILE_ID"] = STAGE_P_PROFILE_ID
+    sys.modules[name] = module
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        sys.modules.pop(name, None)
+        raise
+    if module.ACTIVE_PARSER_PROFILE_ID != STAGE_P_PROFILE_ID:
+        raise RuntimeError("Stage P core ignored the requested parser profile")
+    return module
 
 
 def _git_blob_oid(data: bytes) -> str:
@@ -234,7 +263,18 @@ def _parser_worker_environment() -> dict[str, str]:
     return {"LANG": "C.UTF-8", "LC_ALL": "C.UTF-8"}
 
 
-def _invoke_parser_v2_worker(request: Mapping[str, Any]) -> dict[str, Any]:
+def _invoke_parser_worker(
+    request: Mapping[str, Any],
+    *,
+    worker_path: Path,
+    expected_version: str,
+    role: str,
+) -> dict[str, Any]:
+    """Run one request through an isolated worker that self-attests its parser.
+
+    The worker path and expected version come from the import-time profile, so
+    a caller cannot redirect extraction by argument, environment, or input.
+    """
     if (
         type(request) is not dict
         or set(request) != _PARSER_REQUEST_FIELDS
@@ -242,15 +282,15 @@ def _invoke_parser_v2_worker(request: Mapping[str, Any]) -> dict[str, Any]:
         or request["schema_version"] != _PARSER_REQUEST_SCHEMA
         or request["answer_type"] != "numeric"
     ):
-        raise RuntimeError("isolated parser-v2 request rejected")
-    worker = PARSER_V2_WORKER_PATH.resolve(strict=True)
+        raise RuntimeError(f"isolated {role} request rejected")
+    worker = worker_path.resolve(strict=True)
     interpreter = Path(sys.executable).resolve(strict=True)
     if (
         not worker.is_file()
         or not interpreter.is_file()
         or not worker.is_relative_to(PROJECT_ROOT.resolve(strict=True))
     ):
-        raise RuntimeError("isolated parser-v2 runtime rejected")
+        raise RuntimeError(f"isolated {role} runtime rejected")
     request_bytes = (
         json.dumps(
             request,
@@ -281,7 +321,7 @@ def _invoke_parser_v2_worker(request: Mapping[str, Any]) -> dict[str, Any]:
             timeout=30,
         )
     except (OSError, subprocess.SubprocessError):
-        raise RuntimeError("isolated parser-v2 worker unavailable") from None
+        raise RuntimeError(f"isolated {role} worker unavailable") from None
     stdout = completed.stdout
     if (
         completed.returncode != 0
@@ -290,7 +330,7 @@ def _invoke_parser_v2_worker(request: Mapping[str, Any]) -> dict[str, Any]:
         or len(stdout) > _MAX_PARSER_WORKER_RESPONSE_BYTES
         or b"\n" in stdout[:-1]
     ):
-        raise RuntimeError("isolated parser-v2 worker rejected request")
+        raise RuntimeError(f"isolated {role} worker rejected request")
     try:
         result = json.loads(
             stdout[:-1].decode("utf-8"),
@@ -307,19 +347,37 @@ def _invoke_parser_v2_worker(request: Mapping[str, Any]) -> dict[str, Any]:
             + b"\n"
         )
     except (UnicodeDecodeError, ValueError, TypeError):
-        raise RuntimeError("isolated parser-v2 worker returned invalid data") from None
+        raise RuntimeError(f"isolated {role} worker returned invalid data") from None
     if (
         type(result) is not dict
         or canonical != stdout
         or set(result) != _PARSER_RESULT_FIELDS
         or result.get("schema_version") != _PARSER_RESULT_SCHEMA
-        or result.get("parser_version") != _PARSER_V2_VERSION
+        or result.get("parser_version") != expected_version
         or result.get("answer_type") != "numeric"
         or result.get("input_sha256")
         != hashlib.sha256(request["output_text"].encode("utf-8")).hexdigest()
     ):
-        raise RuntimeError("isolated parser-v2 worker returned noncanonical data")
+        raise RuntimeError(f"isolated {role} worker returned noncanonical data")
     return result
+
+
+def _invoke_parser_v2_worker(request: Mapping[str, Any]) -> dict[str, Any]:
+    return _invoke_parser_worker(
+        request,
+        worker_path=PARSER_V2_WORKER_PATH,
+        expected_version=_PARSER_V2_VERSION,
+        role="parser-v2",
+    )
+
+
+def _invoke_parser_v3_worker(request: Mapping[str, Any]) -> dict[str, Any]:
+    return _invoke_parser_worker(
+        request,
+        worker_path=PARSER_V3_WORKER_PATH,
+        expected_version=_PARSER_V3_VERSION,
+        role="parser-v3",
+    )
 
 
 class _ParserV2ProcessFacade:
@@ -336,7 +394,28 @@ class _ParserV2ProcessFacade:
         return _invoke_parser_v2_worker(request)
 
 
-def _load_stage_p_parsers() -> tuple[Callable[..., Any], Callable[..., Any]]:
+class _ParserV3ProcessFacade:
+    __slots__ = ()
+
+    def __getattribute__(self, name: str) -> Any:
+        del name
+        raise AttributeError("isolated parser-v3 facade exposes no attributes")
+
+    def __dir__(self) -> list[str]:
+        return []
+
+    def __call__(self, request: Mapping[str, Any]) -> Mapping[str, Any]:
+        return _invoke_parser_v3_worker(request)
+
+
+def _load_stage_p_parsers() -> tuple[Callable[..., Any], ...]:
+    """Return the candidate parser followed by its comparators, in profile order."""
+    if STAGE_P_PROFILE_ID == "parser-v3-v1":
+        return (
+            _ParserV3ProcessFacade(),
+            _ParserV2ProcessFacade(),
+            _load_frozen_legacy_numeric_parser(),
+        )
     return _ParserV2ProcessFacade(), _load_frozen_legacy_numeric_parser()
 
 
@@ -350,12 +429,21 @@ def generate_prediction_rows(
     parse_v2: Callable[[Mapping[str, Any]], Mapping[str, Any]],
     parse_legacy: Callable[[str], Any],
     core: ModuleType,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Invoke each frozen parser exactly once for every ordered input."""
+    parse_v2_comparator: Callable[[Mapping[str, Any]], Mapping[str, Any]] | None = None,
+) -> tuple[list[dict[str, Any]], ...]:
+    """Invoke each frozen parser exactly once for every ordered input.
+
+    `parse_v2` is the candidate slot and holds parser v3 under the v3 profile.
+    When `parse_v2_comparator` is supplied a third stream is produced and the
+    return widens to three lists; without it the parser-v2 profile keeps its
+    original two-stream shape exactly.
+    """
     predictions: list[dict[str, Any]] = []
     legacy_predictions: list[dict[str, Any]] = []
+    comparator_predictions: list[dict[str, Any]] = []
     v2_calls = 0
     legacy_calls = 0
+    comparator_calls = 0
     for locked_input in locked_inputs:
         request = core.project_parser_request(locked_input)
         if set(request) != {"schema_version", "answer_type", "output_text"}:
@@ -377,9 +465,69 @@ def generate_prediction_rows(
         legacy_predictions.append(
             core.build_legacy_prediction(locked_input, legacy_result)
         )
+        if parse_v2_comparator is not None:
+            comparator_result = dict(parse_v2_comparator(request))
+            comparator_calls += 1
+            comparator_predictions.append(
+                core.build_prediction_envelope(
+                    locked_input,
+                    comparator_result,
+                    expected_parser_version=core.FROZEN_COMPARATOR_PARSER_IDENTITIES[
+                        "parser_v2"
+                    ]["parser_version"],
+                )
+            )
     if v2_calls != len(locked_inputs) or legacy_calls != len(locked_inputs):
         raise core.LockedEvaluationError("parser invocation count is not exact")
-    return predictions, legacy_predictions
+    if parse_v2_comparator is None:
+        return predictions, legacy_predictions
+    if comparator_calls != len(locked_inputs):
+        raise core.LockedEvaluationError("parser invocation count is not exact")
+    return predictions, comparator_predictions, legacy_predictions
+
+
+def _validate_comparator_stream(
+    core: ModuleType,
+    *,
+    candidate: Sequence[Mapping[str, Any]],
+    comparator: Sequence[Mapping[str, Any]],
+    locked_inputs: Sequence[Mapping[str, Any]],
+) -> None:
+    """Reject any comparator stream that is not a same-membership sibling.
+
+    Membership, order, and per-case input binding must match the candidate
+    exactly, and the two streams must carry different parser identities, so a
+    swapped or duplicated stream cannot reach the seal.
+    """
+    identity = core.FROZEN_COMPARATOR_PARSER_IDENTITIES["parser_v2"]
+    if len(comparator) != len(locked_inputs) or len(candidate) != len(comparator):
+        raise core.LockedEvaluationError("comparator stream row count is not exact")
+    candidate_ids = [row["case_id"] for row in candidate]
+    comparator_ids = [row["case_id"] for row in comparator]
+    if comparator_ids != candidate_ids:
+        raise core.LockedEvaluationError(
+            "comparator stream case membership differs from the candidate"
+        )
+    for row, locked_input in zip(comparator, locked_inputs, strict=True):
+        core.validate_prediction_envelope(
+            row,
+            locked_input,
+            expected_parser_version=identity["parser_version"],
+        )
+    if identity["parser_version"] == core.FROZEN_PARSER_VERSION:
+        raise core.LockedEvaluationError(
+            "comparator parser version equals the candidate parser version"
+        )
+    for row in candidate:
+        if row["parser_result"]["parser_version"] != core.FROZEN_PARSER_VERSION:
+            raise core.LockedEvaluationError(
+                "candidate stream is not attributed to the candidate parser"
+            )
+    for row in comparator:
+        if row["parser_result"]["parser_version"] != identity["parser_version"]:
+            raise core.LockedEvaluationError(
+                "comparator stream is not attributed to the comparator parser"
+            )
 
 
 def _assert_exact_source_names(
@@ -1251,8 +1399,14 @@ def _verify_persisted_prediction_leaf(
     seal_binding = core.validate_locked_prediction_seal(
         seal,
         request_manifest_bytes=artifacts["prediction_request_manifest.json"],
-        predictions_bytes=artifacts["parser_v2_locked_predictions.jsonl"],
-        legacy_predictions_bytes=artifacts["legacy_locked_predictions.jsonl"],
+        predictions_bytes=artifacts[
+            core.ACTIVE_PARSER_PROFILE["candidate_predictions_filename"]
+        ],
+        legacy_predictions_bytes=artifacts[
+            core.FROZEN_COMPARATOR_PARSER_IDENTITIES["legacy"][
+                "predictions_filename"
+            ]
+        ],
         expected_authorization_id=args.authorization_id,
         expected_parent_prefix=args.parent_prefix,
         expected_retry_kind=args.retry_kind,
@@ -1426,8 +1580,9 @@ def _verify_persisted_prediction_leaf(
                 "persisted prediction JSON bytes are not canonical"
             )
     for name in (
-        "parser_v2_locked_predictions.jsonl",
-        "legacy_locked_predictions.jsonl",
+        name
+        for name in core.PREDICTION_MEMBER_NAMES
+        if name.endswith(".jsonl")
     ):
         rows = core.parse_jsonl_strict(artifacts[name], name)
         if artifacts[name] != core.canonical_jsonl_bytes(rows):
@@ -2292,11 +2447,21 @@ def _run_stage_p(
         if parser_functions is None
         else parser_functions
     )
-    if type(loaded_parsers) is not tuple or len(loaded_parsers) != 2:
+    expected_parser_count = 1 + len(
+        active_core.ACTIVE_PARSER_PROFILE["comparator_parsers"]
+    )
+    if (
+        type(loaded_parsers) is not tuple
+        or len(loaded_parsers) != expected_parser_count
+    ):
         raise active_core.LockedEvaluationError(
             "Stage P parser function membership is not exact"
         )
-    parse_v2, parse_legacy = loaded_parsers
+    if expected_parser_count == 3:
+        parse_candidate, parse_v2, parse_legacy = loaded_parsers
+    else:
+        parse_candidate, parse_legacy = loaded_parsers
+        parse_v2 = None
 
     if existing_visibility is None:
         timestamp = now()
@@ -2533,15 +2698,34 @@ def _run_stage_p(
             retry_kind=args.retry_kind,
             execution_id=args.execution_id,
         )
-        predictions, legacy_predictions = generate_prediction_rows(
+        prediction_streams = generate_prediction_rows(
             locked_inputs,
-            parse_v2=parse_v2,
+            parse_v2=parse_candidate,
             parse_legacy=parse_legacy,
             core=active_core,
+            parse_v2_comparator=parse_v2,
         )
+        if len(prediction_streams) != expected_parser_count:
+            raise active_core.LockedEvaluationError(
+                "Stage P prediction stream membership is not exact"
+            )
+        if expected_parser_count == 3:
+            predictions, v2_comparator_predictions, legacy_predictions = (
+                prediction_streams
+            )
+        else:
+            predictions, legacy_predictions = prediction_streams
+            v2_comparator_predictions = None
         active_core.validate_prediction_rows(
             predictions, legacy_predictions, locked_inputs, gates
         )
+        if v2_comparator_predictions is not None:
+            _validate_comparator_stream(
+                active_core,
+                candidate=predictions,
+                comparator=v2_comparator_predictions,
+                locked_inputs=locked_inputs,
+            )
         seal = active_core.build_locked_prediction_seal(
             request_manifest=request_manifest,
             predictions=predictions,
@@ -2581,19 +2765,26 @@ def _run_stage_p(
         else:
             reservation = adopted_reservation
             reservation_bytes = adopted_reservation_bytes
+        profile = active_core.ACTIVE_PARSER_PROFILE
         payloads = {
             ".prediction_reservation.json": reservation_bytes,
             "prediction_request_manifest.json": active_core.canonical_json_bytes(
                 request_manifest
             ),
-            "parser_v2_locked_predictions.jsonl": (
+            profile["candidate_predictions_filename"]: (
                 active_core.canonical_jsonl_bytes(predictions)
             ),
-            "legacy_locked_predictions.jsonl": (
-                active_core.canonical_jsonl_bytes(legacy_predictions)
-            ),
+            active_core.FROZEN_COMPARATOR_PARSER_IDENTITIES["legacy"][
+                "predictions_filename"
+            ]: active_core.canonical_jsonl_bytes(legacy_predictions),
             "prediction_seal.json": active_core.canonical_json_bytes(seal),
         }
+        if v2_comparator_predictions is not None:
+            payloads[
+                active_core.FROZEN_COMPARATOR_PARSER_IDENTITIES["parser_v2"][
+                    "predictions_filename"
+                ]
+            ] = active_core.canonical_jsonl_bytes(v2_comparator_predictions)
         seal_sha256 = active_core.sha256_bytes(
             payloads["prediction_seal.json"]
         )
