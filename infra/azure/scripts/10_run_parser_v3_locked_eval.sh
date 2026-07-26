@@ -907,11 +907,17 @@ import sys
     project_root,
     head,
 ) = sys.argv[1:]
-spec = importlib.util.spec_from_file_location("_pv2_launcher_core", core_path)
+spec = importlib.util.spec_from_file_location("_pv3_launcher_core", core_path)
 if spec is None or spec.loader is None:
     raise SystemExit("cannot load locked evaluation core")
 core = importlib.util.module_from_spec(spec)
+core.__dict__["_PRESEEDED_PARSER_PROFILE_ID"] = "parser-v3-v1"
+sys.modules["_pv3_launcher_core"] = core
 spec.loader.exec_module(core)
+if core.ACTIVE_PARSER_PROFILE_ID != "parser-v3-v1":
+    raise SystemExit("locked evaluation core ignored the requested profile")
+if "_PRESEEDED_PARSER_PROFILE_ID" in core.__dict__:
+    raise SystemExit("locked evaluation core leaked its profile seed")
 runtime_bytes = pathlib.Path(config_path).read_bytes()
 implementation_bytes = pathlib.Path(implementation_path).read_bytes()
 image_binding_bytes = pathlib.Path(image_binding_path).read_bytes()
@@ -963,9 +969,7 @@ for path in core.RUNTIME_SOURCE_BINDING_PATHS:
         "git_blob_oid": oid,
         "sha256": hashlib.sha256(data).hexdigest(),
     }
-launcher = source_bindings[
-    "infra/azure/scripts/10_run_parser_v3_locked_eval.sh"
-]
+launcher = source_bindings[core.EVAL_RUNTIME_LAUNCHER_PATH]
 runtime = core.validate_runtime_configuration(
     runtime_bytes,
     expected_sha256=config_sha,
@@ -1169,7 +1173,7 @@ if [[ ! "$ACR_BUILD_TASK_RUN_NAME" \
 fi
 IMPLEMENTATION_COMMIT="$SOURCE_SHA"
 RUN_ID="${PARENT_PREFIX##*/}"
-RECORD_DIR="$PROJECT_ROOT/results/runs/parser-v2-eval-${AUTHORIZATION_ID}"
+RECORD_DIR="$PROJECT_ROOT/results/runs/parser-v3-eval-${AUTHORIZATION_ID}"
 
 if [[ "$STAGE" == "P" ]]; then
     if [[ "$RETRY_KIND" == "prediction_adoption" ]]; then
@@ -1824,6 +1828,7 @@ authenticate_persisted_state() {
     reauthenticate_runtime_destination || return 1
     JSPACE_LOCKED_EVAL_ROLE=custodian \
         python "$BOOTSTRAP" \
+        --evaluation-profile parser-v3-v1 \
         --runtime-config-file "$RUNTIME_CONFIG_SNAPSHOT_FILE" \
         --runtime-config-sha256 "$CONFIG_SHA256" \
         --implementation-manifest-file \
@@ -1951,12 +1956,18 @@ import sys
     supplied_prior_receipt_sha,
 ) = sys.argv[1:]
 spec = importlib.util.spec_from_file_location(
-    "_pv2_effective_attempt_core", core_path
+    "_pv3_effective_attempt_core", core_path
 )
 if spec is None or spec.loader is None:
     raise SystemExit("cannot load verified locked-evaluation core")
 core = importlib.util.module_from_spec(spec)
+core.__dict__["_PRESEEDED_PARSER_PROFILE_ID"] = "parser-v3-v1"
+sys.modules["_pv3_effective_attempt_core"] = core
 spec.loader.exec_module(core)
+if core.ACTIVE_PARSER_PROFILE_ID != "parser-v3-v1":
+    raise SystemExit("locked evaluation core ignored the requested profile")
+if "_PRESEEDED_PARSER_PROFILE_ID" in core.__dict__:
+    raise SystemExit("locked evaluation core leaked its profile seed")
 runtime = core.parse_json_strict(
     pathlib.Path(runtime_path).read_bytes(), "runtime configuration"
 )
@@ -2560,6 +2571,7 @@ if [[ "$INITIAL_BOOTSTRAP" == "true" ]]; then
     verify_immutable_launch_inputs || exit 1
     JSPACE_LOCKED_EVAL_ROLE=custodian \
         python "$BOOTSTRAP" \
+        --evaluation-profile parser-v3-v1 \
         --runtime-config-file "$RUNTIME_CONFIG_SNAPSHOT_FILE" \
         --runtime-config-sha256 "$CONFIG_SHA256" \
         --implementation-manifest-file \
@@ -2569,7 +2581,7 @@ if [[ "$INITIAL_BOOTSTRAP" == "true" ]]; then
         --image-binding-sha256 "$IMAGE_BINDING_SHA256" \
         --helper-snapshot-set-sha256 "$HELPER_SNAPSHOT_SET_SHA256" \
         --execution-id "custodian-${INVOCATION_ID}" \
-        --actor phase1-parser-v2-custodian >"$BOOTSTRAP_RESULT" || exit 1
+        --actor phase1-parser-v3-custodian >"$BOOTSTRAP_RESULT" || exit 1
     python - "$BOOTSTRAP_RESULT" <<'PY' | tr -d '\r' \
         >"$BOOTSTRAP_HASHES_FILE" || exit 1
 import json
@@ -2894,7 +2906,7 @@ body = {
         },
         "template": {
             "containers": [{
-                "name": "parser-v2-locked-eval",
+                "name": "parser-v3-locked-eval",
                 "image": d["image"]["reference"],
                 "command": command,
                 "args": arguments,

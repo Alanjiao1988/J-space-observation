@@ -2427,7 +2427,7 @@ def test_synthetic_end_to_end_stage_p_stage_e_and_verify_only(
     service = _FakeService()
     authenticated_service = [service]
     monkeypatch.setattr(
-        bootstrap, "_git_source_bindings", lambda _commit: _runtime_source_bindings()
+        bootstrap, "_git_source_bindings", lambda _commit, **_kwargs: _runtime_source_bindings()
     )
     monkeypatch.setattr(
         core, "validate_private_endpoint_resolution", lambda *_args: None
@@ -6388,7 +6388,7 @@ def test_bootstrap_latest_authenticates_the_actual_advanced_state(monkeypatch):
     monkeypatch.setattr(
         bootstrap,
         "_git_source_bindings",
-        lambda _commit: _runtime_source_bindings(),
+        lambda _commit, **_kwargs: _runtime_source_bindings(),
     )
     monkeypatch.setattr(
         core,
@@ -6586,7 +6586,7 @@ def test_custodian_bootstrap_is_manifest_only_and_authenticates_full_chain(
     monkeypatch.setattr(
         bootstrap,
         "_git_source_bindings",
-        lambda _commit: _runtime_source_bindings(),
+        lambda _commit, **_kwargs: _runtime_source_bindings(),
     )
     service = _FakeService()
     frozen_parent = _seed_manifest_only_registered_parent(
@@ -6727,7 +6727,7 @@ def test_bootstrap_competing_lock_wins_before_authorization_prefix_writes(
     monkeypatch.setattr(
         bootstrap,
         "_git_source_bindings",
-        lambda _commit: _runtime_source_bindings(),
+        lambda _commit, **_kwargs: _runtime_source_bindings(),
     )
     service = CompetingLockService()
     _seed_manifest_only_registered_parent(service, synthetic_bundle)
@@ -6806,7 +6806,7 @@ def test_bootstrap_recovers_after_global_lock_only_crash(
     monkeypatch.setattr(
         bootstrap,
         "_git_source_bindings",
-        lambda _commit: _runtime_source_bindings(),
+        lambda _commit, **_kwargs: _runtime_source_bindings(),
     )
     state_prefix = core.evaluation_prefixes(PARENT, AUTHORIZATION)["state"]
     service = CrashAfterLockService(state_prefix)
@@ -6889,7 +6889,7 @@ def test_bootstrap_lock_only_rejects_competing_authorization(
     monkeypatch.setattr(
         bootstrap,
         "_git_source_bindings",
-        lambda _commit: _runtime_source_bindings(),
+        lambda _commit, **_kwargs: _runtime_source_bindings(),
     )
     service = _FakeService()
     _seed_manifest_only_registered_parent(service, synthetic_bundle)

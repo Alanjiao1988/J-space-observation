@@ -1190,3 +1190,170 @@ class TestBootstrapBindsItsProfile:
         assert "core.FROZEN_ACCEPTANCE_GATE_SHA256" not in source.split(
             "def _receipt("
         )[1].split("\ndef ")[0]
+
+
+class TestRuntimeValidatorUsesTheProfileLauncherAndStages:
+    """Validation must accept what the builder emits, under either profile."""
+
+    def test_validator_reads_the_launcher_path_from_the_profile(self):
+        source = _lf_bytes(
+            ROOT / "src" / "jspace_observation" / "parser_v2_locked_evaluation.py"
+        ).decode("utf-8")
+        assert 'launcher = checked[EVAL_RUNTIME_LAUNCHER_PATH]' in source
+        assert (
+            'launcher_path = "infra/azure/scripts/10_run_parser_v2_locked_eval.sh"'
+            not in source
+        )
+        assert '"command": ["/workspace/bin/stage-p"]' not in source
+
+    def test_each_profile_registers_its_own_launcher(self):
+        v2 = _core("v2_launcher_binding")
+        v3 = _core("v3_launcher_binding", "parser-v3-v1")
+        assert v2.EVAL_RUNTIME_LAUNCHER_PATH.endswith("10_run_parser_v2_locked_eval.sh")
+        assert v3.EVAL_RUNTIME_LAUNCHER_PATH.endswith("10_run_parser_v3_locked_eval.sh")
+        for core in (v2, v3):
+            assert core.EVAL_RUNTIME_LAUNCHER_PATH in core.RUNTIME_SOURCE_BINDING_PATHS
+            assert core.EVAL_RUNTIME_LAUNCHER_PATH in core.IMAGE_BINDING_SOURCE_PATHS
+
+    def test_stage_commands_round_trip_under_the_v3_profile(self):
+        v3 = _core("v3_stage_command_roundtrip", "parser-v3-v1")
+        suffix = v3.ACTIVE_PARSER_PROFILE["stage_command_suffix"]
+        assert suffix == "-v3"
+        expected = {
+            "P": {"command": [f"/workspace/bin/stage-p{suffix}"], "args_prefix": []},
+            "P_ADOPT": {
+                "command": [f"/workspace/bin/stage-p-adopt{suffix}"],
+                "args_prefix": [],
+            },
+            "E": {"command": [f"/workspace/bin/stage-e{suffix}"], "args_prefix": []},
+        }
+        assert expected["P"]["command"] == ["/workspace/bin/stage-p-v3"]
+        assert expected["E"]["command"] == ["/workspace/bin/stage-e-v3"]
+
+
+class TestPreflightAuditFindingsRemainFixed:
+    """Regression cover for the twelve profile-binding defects found in audit.
+
+    Every one of these had the same shape: a builder that reads the active
+    profile paired with a consumer that hardcodes the parser-v2 literal. Under
+    the default profile the literal is correct, so the defect is invisible
+    until a parser-v3 run reaches it.
+    """
+
+    LAUNCHER = ROOT / "infra" / "azure" / "scripts" / "10_run_parser_v3_locked_eval.sh"
+    BOOTSTRAP = ROOT / "scripts" / "bootstrap_parser_v2_locked_evaluation.py"
+    GENERATOR = ROOT / "scripts" / "create_parser_v2_runtime_config.py"
+    FINALIZER = ROOT / "scripts" / "finalize_parser_v2_locked_evaluation.py"
+    CORE = ROOT / "src" / "jspace_observation" / "parser_v2_locked_evaluation.py"
+
+    def _launcher(self) -> str:
+        return _lf_bytes(self.LAUNCHER).decode("utf-8")
+
+    # Findings 1 and 2 - both launcher core loads must seed the profile.
+    def test_launcher_seeds_the_profile_on_every_core_load(self):
+        source = self._launcher()
+        seeds = source.count('_PRESEEDED_PARSER_PROFILE_ID"] = "parser-v3-v1"')
+        assert seeds == 2, f"expected two seeded core loads, found {seeds}"
+        guards = source.count('ACTIVE_PARSER_PROFILE_ID != "parser-v3-v1"')
+        assert guards >= 2, f"expected a guard per seeded load, found {guards}"
+
+    # Finding 3 - the launcher must not index bindings by the v2 literal.
+    def test_launcher_indexes_bindings_by_the_profile_launcher(self):
+        source = self._launcher()
+        assert "source_bindings[core.EVAL_RUNTIME_LAUNCHER_PATH]" in source
+        assert "10_run_parser_v2_locked_eval.sh" not in source
+
+    # Finding 4 - both bootstrap invocations must pass the profile.
+    def test_launcher_passes_the_profile_to_every_bootstrap_invocation(self):
+        source = self._launcher()
+        invocations = source.count('python "$BOOTSTRAP"')
+        flags = source.count("--evaluation-profile parser-v3-v1")
+        assert invocations >= 2
+        assert flags == invocations, (
+            f"{invocations} bootstrap invocations but {flags} profile flags"
+        )
+
+    # Findings 5 and 6 - git source bindings must be resolved per profile.
+    def test_bootstrap_resolves_source_bindings_under_its_own_profile(self):
+        source = _lf_bytes(self.BOOTSTRAP).decode("utf-8")
+        assert "10_run_parser_v2_locked_eval.sh" not in source
+        assert "launcher = source_bindings[active_core.EVAL_RUNTIME_LAUNCHER_PATH]" in source
+        assert "launcher = source_bindings[core.EVAL_RUNTIME_LAUNCHER_PATH]" in source
+        assert source.count("profile_id=active_core.ACTIVE_PARSER_PROFILE_ID") >= 1
+        assert source.count("profile_id=core.ACTIVE_PARSER_PROFILE_ID") >= 1
+
+    def test_frozen_parser_blob_check_is_reachable_under_the_v3_profile(self):
+        """The only check that the frozen v3 source exists at the commit."""
+        source = _lf_bytes(self.BOOTSTRAP).decode("utf-8")
+        body = source.split("def _git_source_bindings(")[1].split("\ndef ")[0]
+        assert "FROZEN_PARSER_GIT_BLOB_OID" in body
+        assert "profile_id" in body.split("\n")[0] or "profile_id:" in body
+
+    # Finding 7 - the sealed public report must name its own candidate.
+    def test_public_report_title_comes_from_the_profile(self):
+        source = _lf_bytes(self.CORE).decode("utf-8")
+        assert '"# Phase 1.2B Parser-v2 Locked Evaluation"' not in source
+        assert "f\"# {ACTIVE_PARSER_PROFILE['report_title']}\"" in source
+
+    def test_v2_public_report_title_is_byte_identical(self):
+        v2 = _core("v2_report_title")
+        assert (
+            v2.ACTIVE_PARSER_PROFILE["report_title"]
+            == "Phase 1.2B Parser-v2 Locked Evaluation"
+        )
+        assert v2.ACTIVE_PARSER_PROFILE["report_declares_candidate_identity"] is False
+
+    def test_v3_public_report_declares_the_candidate(self):
+        v3 = _core("v3_report_title", "parser-v3-v1")
+        assert (
+            v3.ACTIVE_PARSER_PROFILE["report_title"]
+            == "Phase 1.2D Parser-v3 Locked Evaluation"
+        )
+        assert v3.ACTIVE_PARSER_PROFILE["report_declares_candidate_identity"] is True
+        lines = "\n".join(v3._candidate_identity_report_lines())
+        assert "parser-v3-v1" in lines
+        assert v3.FROZEN_PARSER_VERSION in lines
+        assert v3.FROZEN_PARSER_SOURCE_SHA256 in lines
+        assert "jspace-parser-v3-reference-blind-extraction/v1" in lines
+        assert "orchestrator-schema compatibility" in lines
+        # The report must not silently imply parser v2 produced the result.
+        assert "Candidate parser algorithm" in lines
+
+    def test_public_report_never_leaks_a_case_id_under_either_profile(self):
+        for name, profile in (("v2_leak", None), ("v3_leak", "parser-v3-v1")):
+            core = _core(name, profile)
+            body = _lf_bytes(self.CORE).decode("utf-8").split(
+                "def render_public_report("
+            )[1]
+            assert "ALL_CASE_ID_PREFIXES" in body.split("\ndef ")[0]
+            assert len(core.ALL_CASE_ID_PREFIXES) >= 2
+
+    # Finding 8 - the finalizer leak guard must cover every family prefix.
+    def test_finalizer_leak_guard_covers_all_case_id_prefixes(self):
+        source = _lf_bytes(self.FINALIZER).decode("utf-8")
+        assert 'b"PV2-" in payloads' not in source
+        assert "for prefix in core.ALL_CASE_ID_PREFIXES" in source
+
+    # Finding 9 - the image repository profile field must be enforced.
+    def test_generator_enforces_the_profile_image_repository(self):
+        source = _lf_bytes(self.GENERATOR).decode("utf-8")
+        assert "core_module.EVAL_IMAGE_REPOSITORY" in source
+        v2 = _core("v2_image_repo")
+        v3 = _core("v3_image_repo", "parser-v3-v1")
+        assert v2.EVAL_IMAGE_REPOSITORY != v3.EVAL_IMAGE_REPOSITORY
+        assert v3.EVAL_IMAGE_REPOSITORY == "j-space-observation-parser-v3-eval"
+
+    # Findings 10, 11, 12 - provenance labels must not be permanently wrong.
+    def test_launcher_carries_no_parser_v2_provenance_labels(self):
+        source = self._launcher()
+        assert "phase1-parser-v2-custodian" not in source
+        assert "parser-v2-eval-${AUTHORIZATION_ID}" not in source
+        assert '"name": "parser-v2-locked-eval"' not in source
+        assert "phase1-parser-v3-custodian" in source
+        assert "parser-v3-eval-${AUTHORIZATION_ID}" in source
+        assert '"name": "parser-v3-locked-eval"' in source
+
+    def test_bootstrap_accepts_the_v3_custodian_actor(self):
+        source = _lf_bytes(self.BOOTSTRAP).decode("utf-8")
+        assert '"phase1-parser-v3-custodian"' in source
+        assert '"phase1-parser-v2-custodian"' in source

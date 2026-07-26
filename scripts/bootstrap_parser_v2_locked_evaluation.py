@@ -504,10 +504,11 @@ def run_bootstrap(
         raise active_core.LockedEvaluationError(
             "bootstrap state prefix is not authorization-specific"
         )
-    source_bindings = _git_source_bindings(args.implementation_commit)
-    launcher = source_bindings[
-        "infra/azure/scripts/10_run_parser_v2_locked_eval.sh"
-    ]
+    source_bindings = _git_source_bindings(
+        args.implementation_commit,
+        profile_id=active_core.ACTIVE_PARSER_PROFILE_ID,
+    )
+    launcher = source_bindings[active_core.EVAL_RUNTIME_LAUNCHER_PATH]
     runtime = active_core.validate_runtime_configuration(
         runtime_bytes,
         expected_sha256=runtime_sha256,
@@ -988,7 +989,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--helper-snapshot-set-sha256", required=True)
     parser.add_argument("--execution-id")
     parser.add_argument(
-        "--actor", choices=("phase1-parser-v2-custodian",)
+        "--actor",
+        choices=(
+            "phase1-parser-v2-custodian",
+            "phase1-parser-v3-custodian",
+        ),
     )
     parser.add_argument(
         "--authenticate-only-state",
@@ -2278,11 +2283,10 @@ def _authenticate_persisted(
         runtime["azure_destination"]
     )
     source_bindings = _git_source_bindings(
-        implementation["implementation_commit"]
+        implementation["implementation_commit"],
+        profile_id=core.ACTIVE_PARSER_PROFILE_ID,
     )
-    launcher = source_bindings[
-        "infra/azure/scripts/10_run_parser_v2_locked_eval.sh"
-    ]
+    launcher = source_bindings[core.EVAL_RUNTIME_LAUNCHER_PATH]
     checked_runtime = core.validate_runtime_configuration(
         runtime_bytes,
         expected_sha256=runtime_sha256,

@@ -3388,7 +3388,11 @@ def _legacy_verify_score_prefix(
         != decision.get("implementation_commit")
         or manifest["image_digest"] != decision.get("image_digest")
         or manifest["config_sha256"] != decision.get("config_sha256")
-        or b"PV2-" in payloads["locked_evaluation_report.md"]
+        or any(
+            f"{prefix}-".encode("utf-8")
+            in payloads["locked_evaluation_report.md"]
+            for prefix in core.ALL_CASE_ID_PREFIXES
+        )
     ):
         raise core.LockedEvaluationError(
             "persisted score artifacts do not match the score manifest"

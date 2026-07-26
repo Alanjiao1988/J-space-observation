@@ -351,6 +351,10 @@ def _destination(
 ) -> dict[str, Any]:
     image_digest = image_binding["image_digest"]
     base_image = image_binding["base_image"]
+    if args.acr_repository != core_module.EVAL_IMAGE_REPOSITORY:
+        raise core_module.LockedEvaluationError(
+            "acr repository does not match the active evaluation profile"
+        )
     image_ref = f"{args.acr_login_server}/{args.acr_repository}@{image_digest}"
     return {
         "subscription_id": args.subscription_id,

@@ -601,3 +601,122 @@ distinguish it from the retired parser-v2 round. No identity, hash, or gate
 depends on the job name; the launch-domain digest binds the parser-v3 image
 digest and config. It is recorded because a reader inspecting Azure resource
 names alone could otherwise misattribute the execution.
+### 14.4 Defects found after the first preregistration commit
+
+The first preregistration commit was `bdd5e10d7916d96494d3955cee386c5345b6c391`.
+Generating the parser-v3 runtime configuration against that commit failed
+immediately, revealing a further instance of the same family:
+
+| # | Defect | Class | Where |
+| --- | --- | --- | --- |
+| D9 | `validate_runtime_source_bindings` indexed the launcher by the hardcoded parser-v2 path instead of `EVAL_RUNTIME_LAUNCHER_PATH` | Profile binding | core |
+| D10 | `validate_runtime_configuration` hardcoded the parser-v2 launcher path | Profile binding | core |
+| D11 | `validate_runtime_configuration` hardcoded the unsuffixed stage commands `/workspace/bin/stage-p`, `-p-adopt`, `-e`, so it rejected the `-v3` commands its own builder emits | Profile binding | core |
+
+D9–D11 share a sharper diagnosis than D2–D4: in each case the **builder** was
+correctly profile-scoped and the corresponding **validator** was not. The core
+would therefore construct a valid parser-v3 runtime configuration and then
+refuse to accept it. This asymmetry is the reason the round could not start, and
+it is the pattern that the follow-up audit was directed at.
+
+**The preregistration was re-issued.** Because D9–D11 make a parser-v3 run
+impossible, they had to be fixed, and fixing them changes bound source. The
+freeze was therefore re-taken at a later commit, and the image rebuilt from it.
+
+This is disclosed in full because "preregistration" is a claim about *ordering*,
+and the ordering claim must be exact. What is preserved is the only thing the
+one-shot design actually depends on:
+
+```text
+locked inputs read      : no
+predictions generated   : no
+locked labels read      : no
+holdout state           : SEALED, unspent
+```
+
+No datum from the holdout — not an input, not a label, not a prediction, not a
+score — was observed at any point before or during the re-freeze. The gate
+contract, its thresholds, the metric definitions, the population, the candidate
+parser bytes, and the comparator bindings are **byte-identical** across the
+first and the re-issued preregistration commit; the diff is confined to profile
+plumbing in the orchestrator, its regression tests, and this document. The
+re-freeze therefore cannot have been informed by the data, which is the property
+preregistration exists to guarantee.
+
+The superseded commit is retained in history and is named here rather than
+being rewritten away.
+
+
+### 14.5 The commissioned preflight audit, and the twelve findings it returned
+
+D9–D11 were found by *running* the tooling, not by reading it. That is a bad way
+to find this defect family: each instance is silent under the default profile,
+so the only signal is a crash at the moment the instance happens to be reached,
+and the instances are reached in sequence over a run that costs an image
+rebuild each time. Discovering them one per rebuild would have been slow, and —
+much worse — it would have provided no assurance whatsoever about the instances
+that sit *after* the first irreversible action.
+
+Before re-freezing, an independent read-only audit was therefore commissioned
+(`claude-opus-5`, maximum reasoning effort) with a single question: find every
+remaining place where a parser-v2 identifier is hardcoded on a path that a
+parser-v3 run will execute. It returned twelve findings plus two informational
+notes. All twelve are fixed in the re-issued preregistration commit, and each
+carries a regression test in
+`tests/test_parser_v3_locked_evaluation.py::TestPreflightAuditFindingsRemainFixed`.
+
+| ID | Severity | Location | Defect | Consequence had it run |
+| --- | --- | --- | --- | --- |
+| F1 | BLOCKER | launcher, first core load | core imported without seeding the profile | every launcher-side identity check would have validated parser v2 |
+| F2 | BLOCKER | launcher, second core load | same, on the attempt-evaluation path | as F1, on the adoption path |
+| F3 | BLOCKER | launcher | source bindings indexed by the literal v2 launcher path | `KeyError`, run aborts |
+| F4 | BLOCKER | launcher, both `python "$BOOTSTRAP"` invocations | `--evaluation-profile` never passed, so argparse defaulted to `parser-v2-v1` | **the entire state-chain bootstrap, and every pre-stage re-authentication, would have run on the parser-v2 core** |
+| F5 | BLOCKER | `bootstrap…py` `_git_source_bindings` call in the main path | `profile_id` omitted, launcher key hardcoded | **the only check in the system that the frozen parser-v3 source exists at the implementation commit would have silently checked parser v2 and passed** |
+| F6 | BLOCKER | `bootstrap…py` `_authenticate_persisted` | identical defect, on the path that runs before *every* stage | as F5, repeatedly |
+| F7 | BLOCKER | core `render_public_report` | report title hardcoded `"Phase 1.2B Parser-v2 Locked Evaluation"`, no profile symbol referenced | **the permanently sealed, published, human-readable artifact of a parser-v3 evaluation would have been titled "Parser-v2" and would never have stated which parser was evaluated — uncorrectable after sealing** |
+| F8 | MEDIUM | `finalize…py` report leak guard | tested only the `PV2-` case-ID prefix | v3 case IDs could have leaked into the public report undetected |
+| F9 | MEDIUM | `EVAL_IMAGE_REPOSITORY` | dead profile field, zero enforcing consumers | a v3 run could have been bound to the v2 image repository |
+| F10 | LOW | launcher `--actor` | `phase1-parser-v2-custodian` | permanent parser-v2 label on parser-v3 provenance |
+| F11 | LOW | launcher `RECORD_DIR` | `results/runs/parser-v2-eval-…` | as F10 |
+| F12 | LOW | launcher ACA container name | `parser-v2-locked-eval`, validated as *set* but never by value | as F10 |
+
+F7 deserves emphasis because it is not a mechanical failure. F1–F6 would have
+produced a crash or a vacuous check — bad, but detectable. F7 would have
+produced a run that *succeeded*, sealed cleanly, passed every integrity
+recomputation, and published a correct-looking report whose title asserted the
+wrong candidate. The score members are hashed into the score manifest, the
+decision, and the closure manifest, and are re-derived byte-identically by
+Stage E; there is no post-sealing correction path. The fix makes the title a
+profile field and requires the parser-v3 report to state its evaluation
+profile, candidate algorithm ID, candidate version, candidate source SHA-256,
+candidate implementation commit, and both comparator bindings, together with an
+explicit note that retained `parser_v2_*` field names do not identify the
+candidate. The parser-v2 report bytes are unchanged, which is asserted by test.
+
+Two informational notes were accepted rather than fixed: the `pv2-` authorization
+prefix (already disclosed in §14.3) and a set of inert `_pv2_*` internal shell
+identifiers. Neither crosses a profile boundary or reaches a sealed artifact.
+
+The audit also stated its own coverage limits: several thousand lines of
+`finalize_parser_v2_locked_evaluation.py` and
+`run_parser_v2_locked_predictions.py` were not read line-by-line, and
+`scripts/parser_v3_seal_job.py` was not examined. A defect that encodes no
+parser-v2 literal and creates no builder/validator asymmetry would not have been
+caught. The residual risk is therefore not zero, and is not claimed to be. It is
+mitigated by executing the launcher end-to-end in verify-only mode before any
+irreversible claim, which exercises the identity, binding, and authentication
+paths without spending the holdout.
+
+Finally, the honest generalisation. The mitigation now used at every core load —
+seed the profile name into the module namespace, then assert twice that it took
+— is a *convention*, not a construction. It is applied consistently in the
+current tree and is regression-tested, but a future script written without it
+will silently resolve to parser v2 again. The defect class is contained, not
+eliminated. Eliminating it would require making an unseeded core load fail
+loudly rather than default, which is a change to bound source and therefore
+belongs to a later round, not to this one.
+
+**Effect on the formal evaluation: none.** Every defect in D1–D11 and F1–F12 was
+found and fixed before preregistration was re-issued, before the image was
+rebuilt, before the state chain was bootstrapped, before any locked input was
+read, before any prediction existed, and before any locked label was touched.

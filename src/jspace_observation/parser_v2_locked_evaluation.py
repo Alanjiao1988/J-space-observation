@@ -72,6 +72,8 @@ _PARSER_EVALUATION_PROFILES = {
         "sealed_holdout_family": "parser-v2-v1",
         "case_id_prefix": "PV2",
         "holdout_id_domain": "phase1-parser-v2-holdout-id/v1",
+        "report_title": "Phase 1.2B Parser-v2 Locked Evaluation",
+        "report_declares_candidate_identity": False,
         "candidate_predictions_filename": "parser_v2_locked_predictions.jsonl",
         "dockerfile_path": "Dockerfile.parser-v2-eval",
         "image_repository": "j-space-observation-parser-eval",
@@ -126,6 +128,8 @@ _PARSER_EVALUATION_PROFILES = {
         "sealed_holdout_family": "parser-v3-v1",
         "case_id_prefix": "PV3",
         "holdout_id_domain": "phase1-parser-v3-holdout-id/v1",
+        "report_title": "Phase 1.2D Parser-v3 Locked Evaluation",
+        "report_declares_candidate_identity": True,
         "candidate_predictions_filename": "parser_v3_candidate_predictions.jsonl",
         "dockerfile_path": "Dockerfile.parser-v3-eval",
         "image_repository": "j-space-observation-parser-v3-eval",
@@ -2282,7 +2286,7 @@ def validate_runtime_source_bindings(
                 binding["sha256"], f"source binding {path} SHA-256"
             ),
         }
-    launcher = checked["infra/azure/scripts/10_run_parser_v2_locked_eval.sh"]
+    launcher = checked[EVAL_RUNTIME_LAUNCHER_PATH]
     if launcher_sha256 is not None and launcher["sha256"] != _require_sha256(
         launcher_sha256, "expected launcher SHA-256"
     ):
@@ -3841,18 +3845,25 @@ def validate_runtime_configuration(
     _require_exact_fields(
         launcher, {"path", "git_blob_oid", "sha256"}, "runtime launcher"
     )
-    launcher_path = "infra/azure/scripts/10_run_parser_v2_locked_eval.sh"
+    launcher_path = ACTIVE_PARSER_PROFILE["runtime_launcher_path"]
     if not exact_json_equal(
         launcher, {"path": launcher_path, **source_bindings[launcher_path]}
     ):
         raise LockedEvaluationError("runtime launcher binding is not registered")
+    stage_suffix = ACTIVE_PARSER_PROFILE["stage_command_suffix"]
     expected_commands = {
-        "P": {"command": ["/workspace/bin/stage-p"], "args_prefix": []},
-        "P_ADOPT": {
-            "command": ["/workspace/bin/stage-p-adopt"],
+        "P": {
+            "command": [f"/workspace/bin/stage-p{stage_suffix}"],
             "args_prefix": [],
         },
-        "E": {"command": ["/workspace/bin/stage-e"], "args_prefix": []},
+        "P_ADOPT": {
+            "command": [f"/workspace/bin/stage-p-adopt{stage_suffix}"],
+            "args_prefix": [],
+        },
+        "E": {
+            "command": [f"/workspace/bin/stage-e{stage_suffix}"],
+            "args_prefix": [],
+        },
     }
     if not exact_json_equal(record["stage_commands"], expected_commands):
         raise LockedEvaluationError("runtime stage commands are not exact")
@@ -9938,6 +9949,44 @@ def build_closure_manifest(
     }
 
 
+def _candidate_identity_report_lines() -> list[str]:
+    profile = ACTIVE_PARSER_PROFILE
+    lines = [
+        "## Candidate identity",
+        "",
+        f"- Evaluation profile: **{ACTIVE_PARSER_PROFILE_ID}**",
+        f"- Candidate parser algorithm: **{profile['candidate_parser_algorithm_id']}**",
+        f"- Candidate parser version: `{profile['parser_version']}`",
+        (
+            "- Candidate parser source SHA-256: "
+            f"`{profile['parser_source_sha256']}`"
+        ),
+        (
+            "- Candidate parser implementation commit: "
+            f"`{profile['parser_implementation_commit']}`"
+        ),
+    ]
+    for name in profile["comparator_parsers"]:
+        identity = profile["comparator_parser_identities"][name]
+        version = identity["parser_version"] or identity["parser_source_sha256"]
+        lines.append(
+            f"- Comparator ({identity['role']}) **{name}**: `{version}`"
+        )
+    lines.extend(
+        [
+            (
+                "- Field names beginning with `parser_v2_` are retained for "
+                "orchestrator-schema compatibility and do not identify the "
+                "candidate parser."
+            ),
+            "",
+            "## Formal decision",
+            "",
+        ]
+    )
+    return lines
+
+
 def render_public_report(
     metrics: Mapping[str, Any],
     decision: Mapping[str, Any],
@@ -9949,8 +9998,12 @@ def render_public_report(
     status = decision["formal_decision"]
     error_summary = metrics["error_summary"]
     lines = [
-        "# Phase 1.2B Parser-v2 Locked Evaluation",
+        f"# {ACTIVE_PARSER_PROFILE['report_title']}",
         "",
+    ]
+    if ACTIVE_PARSER_PROFILE["report_declares_candidate_identity"]:
+        lines.extend(_candidate_identity_report_lines())
+    lines.extend([
         f"- Formal decision: **{status}**",
         "- Holdout retired: **yes**",
         "- Formal evaluation count: **1**",
@@ -9976,7 +10029,7 @@ def render_public_report(
         "- Operational consensus references are not human ground truth.",
         "- No hidden-reasoning, invisible-CoT, internal-workspace, or J-space claim follows.",
         "",
-    ]
+    ])
     rendered = "\n".join(lines).encode("utf-8")
     prohibited = (
         "output_text",
