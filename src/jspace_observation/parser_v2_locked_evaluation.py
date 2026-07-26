@@ -32,24 +32,108 @@ from typing import Any, Callable, Iterable, Mapping, Sequence
 from urllib.parse import urlsplit
 
 
+PARSER_EVALUATION_PROFILE_SCHEMA_VERSION = "phase1-parser-evaluation-profile/v1"
+DEFAULT_PARSER_EVALUATION_PROFILE_ID = "parser-v2-v1"
+
+# The candidate parser's identity reaches the rest of this module through the
+# five FROZEN_PARSER_*/FROZEN_ACCEPTANCE_GATE_SHA256 names bound below. Every
+# other site reads them by name, so selecting a candidate is a matter of
+# binding these once at import rather than editing any call site.
+#
+# FROZEN_PROTOCOL_COMMIT and FROZEN_PROTOCOL_BUNDLE_SHA256 are deliberately not
+# profile-scoped: parser v3 binds the parser-v2 protocol bundle inside its own
+# parser_version, so varying them would contradict the candidate's own identity.
+_PARSER_EVALUATION_PROFILES = {
+    "parser-v2-v1": {
+        "profile_id": "parser-v2-v1",
+        "candidate_parser": "parser_v2",
+        "comparator_parsers": ("legacy",),
+        "parser_source_path": "src/jspace_observation/eval_parsing_v2.py",
+        "parser_entry_symbol": "parse_v2",
+        "parser_worker_path": "scripts/parser_v2_process_worker.py",
+        "parser_source_sha256": (
+            "f538add0bdd6e5a3281d0298b374a99fecea962a91a4cbaa5b4a20795d9a6918"
+        ),
+        "parser_git_blob_oid": "7428dd3fe5be621e32a6331e2d34fd62cea0fb91",
+        "parser_version": (
+            "6cfaec62db37562930a4cb7d3a252bcbf80e1eaf748de98213863ff2566a7f86"
+        ),
+        "parser_implementation_commit": (
+            "ab6abec42a13d0e1c193fad7db420dbd512c2f03"
+        ),
+        "acceptance_gate_path": "docs/phase1_parser_v2_acceptance_gates.json",
+        "acceptance_gate_sha256": (
+            "a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988"
+        ),
+        "sealed_holdout_family": "parser-v2-v1",
+        "candidate_predictions_filename": "parser_v2_locked_predictions.jsonl",
+        "comparator_predictions_filenames": ("legacy_locked_predictions.jsonl",),
+        "extra_source_binding_paths": (),
+        "extra_image_binding_paths": (),
+    },
+    "parser-v3-v1": {
+        "profile_id": "parser-v3-v1",
+        "candidate_parser": "parser_v3",
+        "comparator_parsers": ("parser_v2", "legacy"),
+        "parser_source_path": "src/jspace_observation/eval_parsing_v3.py",
+        "parser_entry_symbol": "parse_v3",
+        "parser_worker_path": "scripts/parser_v3_process_worker.py",
+        "parser_source_sha256": (
+            "76dc58684f4e3818a3f557a1828571674e799f65a9f0a97d07706839ff859ea9"
+        ),
+        "parser_git_blob_oid": "18676eefff3e4f3ed0ce4e592e41e1794365006e",
+        "parser_version": (
+            "0ce0f3cd5e0a1d4c5b4c9eff9a2968deecd04c594f435a2fa2bfec332fd3cace"
+        ),
+        "parser_implementation_commit": (
+            "310277bcadd67ca9e77986fc292fae47dc5ceda2"
+        ),
+        "acceptance_gate_path": "docs/phase1_parser_v3_acceptance_gates.json",
+        "acceptance_gate_sha256": (
+            "2fcc323481221fbc5c1f56b5beccd238fd835303c46df61087e1483dfc28dda7"
+        ),
+        "sealed_holdout_family": "parser-v3-v1",
+        "candidate_predictions_filename": "parser_v3_candidate_predictions.jsonl",
+        "comparator_predictions_filenames": (
+            "parser_v2_comparator_predictions.jsonl",
+            "legacy_comparator_predictions.jsonl",
+        ),
+        "extra_source_binding_paths": (
+            "src/jspace_observation/eval_parsing_v3.py",
+            "scripts/parser_v3_process_worker.py",
+        ),
+        "extra_image_binding_paths": (
+            "src/jspace_observation/eval_parsing_v3.py",
+            "scripts/parser_v3_process_worker.py",
+            "docs/phase1_parser_v3_acceptance_gates.json",
+        ),
+    },
+}
+
+# Selected once, at import, by a loader that seeds this name into the module
+# namespace before execution. Absent a deliberate choice the profile is v2, so
+# every pre-existing loader keeps the behaviour it already had.
+ACTIVE_PARSER_PROFILE_ID = globals().pop(
+    "_PRESEEDED_PARSER_PROFILE_ID", DEFAULT_PARSER_EVALUATION_PROFILE_ID
+)
+if ACTIVE_PARSER_PROFILE_ID not in _PARSER_EVALUATION_PROFILES:
+    raise RuntimeError(
+        f"unknown parser evaluation profile: {ACTIVE_PARSER_PROFILE_ID!r}"
+    )
+ACTIVE_PARSER_PROFILE = dict(_PARSER_EVALUATION_PROFILES[ACTIVE_PARSER_PROFILE_ID])
+
 FROZEN_PROTOCOL_COMMIT = "cc93ffe603ab8338ed860586a52b1911af4b3277"
 FROZEN_PROTOCOL_BUNDLE_SHA256 = (
     "5d486a53b532012c3a64eb6bd962be325fb9892ebbb042807b919f9e41b23666"
 )
-FROZEN_ACCEPTANCE_GATE_SHA256 = (
-    "a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988"
-)
-FROZEN_PARSER_SOURCE_SHA256 = (
-    "f538add0bdd6e5a3281d0298b374a99fecea962a91a4cbaa5b4a20795d9a6918"
-)
-FROZEN_PARSER_GIT_BLOB_OID = "7428dd3fe5be621e32a6331e2d34fd62cea0fb91"
-FROZEN_PARSER_VERSION = (
-    "6cfaec62db37562930a4cb7d3a252bcbf80e1eaf748de98213863ff2566a7f86"
-)
+FROZEN_ACCEPTANCE_GATE_SHA256 = ACTIVE_PARSER_PROFILE["acceptance_gate_sha256"]
+FROZEN_PARSER_SOURCE_SHA256 = ACTIVE_PARSER_PROFILE["parser_source_sha256"]
+FROZEN_PARSER_GIT_BLOB_OID = ACTIVE_PARSER_PROFILE["parser_git_blob_oid"]
+FROZEN_PARSER_VERSION = ACTIVE_PARSER_PROFILE["parser_version"]
 FROZEN_STARTING_COMMIT = "02577a272e2f3740485fa97630f6c82450fe6017"
-FROZEN_PARSER_IMPLEMENTATION_COMMIT = (
-    "ab6abec42a13d0e1c193fad7db420dbd512c2f03"
-)
+FROZEN_PARSER_IMPLEMENTATION_COMMIT = ACTIVE_PARSER_PROFILE[
+    "parser_implementation_commit"
+]
 FROZEN_LEGACY_PARSER_COMMIT = FROZEN_STARTING_COMMIT
 FROZEN_LEGACY_PARSER_GIT_BLOB_OID = (
     "d9b0bd56f7757af64b79f71332f45570b4b8cb6d"
@@ -264,13 +348,21 @@ PARSER_V2_EVAL_BASE_IMAGE = (
     "sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d"
 )
 
+CANDIDATE_PREDICTION_FILENAME = ACTIVE_PARSER_PROFILE["candidate_predictions_filename"]
+COMPARATOR_PREDICTION_FILENAMES = ACTIVE_PARSER_PROFILE[
+    "comparator_predictions_filenames"
+]
 PREDICTION_MEMBER_NAMES = (
-    ".prediction_reservation.json",
-    "prediction_request_manifest.json",
-    "parser_v2_locked_predictions.jsonl",
-    "legacy_locked_predictions.jsonl",
-    "prediction_seal.json",
-    "prediction_artifact_manifest.json",
+    (
+        ".prediction_reservation.json",
+        "prediction_request_manifest.json",
+        CANDIDATE_PREDICTION_FILENAME,
+    )
+    + COMPARATOR_PREDICTION_FILENAMES
+    + (
+        "prediction_seal.json",
+        "prediction_artifact_manifest.json",
+    )
 )
 SCORE_MEMBER_NAMES = (
     ".scores_reservation.json",
@@ -302,7 +394,7 @@ RUNTIME_SOURCE_BINDING_PATHS = (
     "src/jspace_observation/eval_parsing.py",
     "src/jspace_observation/eval_parsing_v2.py",
     "src/jspace_observation/parser_v2_locked_evaluation.py",
-)
+) + ACTIVE_PARSER_PROFILE["extra_source_binding_paths"]
 IMAGE_BINDING_SOURCE_PATHS = (
     ".dockerignore",
     ".gitattributes",
@@ -326,7 +418,7 @@ IMAGE_BINDING_SOURCE_PATHS = (
     "docs/phase1_parser_v2_protocol.md",
     "docs/phase1_evaluator_validation_set.md",
     "docs/phase1_parser_v2_acceptance_gates.json",
-)
+) + ACTIVE_PARSER_PROFILE["extra_image_binding_paths"]
 
 _PROTOCOL_FILES = (
     "docs/phase1_parser_v2_protocol.md",
@@ -14733,6 +14825,10 @@ def validate_no_model_gpu_configuration(environment: Mapping[str, str]) -> None:
 
 __all__ = [
     "LockedEvaluationError",
+    "PARSER_EVALUATION_PROFILE_SCHEMA_VERSION",
+    "DEFAULT_PARSER_EVALUATION_PROFILE_ID",
+    "ACTIVE_PARSER_PROFILE_ID",
+    "ACTIVE_PARSER_PROFILE",
     "FROZEN_PROTOCOL_COMMIT",
     "FROZEN_PROTOCOL_BUNDLE_SHA256",
     "FROZEN_ACCEPTANCE_GATE_SHA256",

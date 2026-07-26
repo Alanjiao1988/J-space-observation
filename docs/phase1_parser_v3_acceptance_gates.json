@@ -1,0 +1,278 @@
+{
+  "absolute_gates": {
+    "ambiguity": {
+      "minimum_precision_denominator": 10,
+      "minimum_precision_numerator": 9,
+      "minimum_recall_denominator": 10,
+      "minimum_recall_numerator": 9,
+      "positive_label": "ambiguous",
+      "positive_support": 10,
+      "zero_denominator": "NA_INVALID"
+    },
+    "answer_bearing_per_stratum": {
+      "denominator": 10,
+      "minimum_correct": 9,
+      "threshold_denominator": 20,
+      "threshold_numerator": 17
+    },
+    "answer_presence_macro_f1": {
+      "class_f1": "2*tp/(2*tp+fp+fn)",
+      "classes": [
+        "present",
+        "ambiguous",
+        "no_answer"
+      ],
+      "macro_average": "unweighted",
+      "minimum_denominator": 20,
+      "minimum_numerator": 19
+    },
+    "boxed_final_miss": {
+      "denominator": 20,
+      "error_definition": "expected_value_or_registered_selected_span_not_recovered",
+      "maximum_errors": 0,
+      "maximum_rate_denominator": 50,
+      "maximum_rate_numerator": 1,
+      "strata": [
+        "S01",
+        "S02"
+      ]
+    },
+    "every_stratum_floor": {
+      "denominator": 10,
+      "minimum_correct": 8,
+      "threshold_denominator": 5,
+      "threshold_numerator": 4
+    },
+    "last_number_trap": {
+      "denominator": 10,
+      "error_definition": "registered_rightmost_distractor_span_selected",
+      "maximum_errors": 0,
+      "maximum_rate_denominator": 20,
+      "maximum_rate_numerator": 1,
+      "stratum": "S06"
+    },
+    "material_correctness": {
+      "S01_maximum_errors": 0,
+      "S02_maximum_errors": 0,
+      "definition": "xor(parser_correctness,operational_expected_correctness)",
+      "denominator": 120,
+      "maximum_errors": 1
+    },
+    "no_answer": {
+      "minimum_precision_denominator": 10,
+      "minimum_precision_numerator": 9,
+      "minimum_recall_denominator": 10,
+      "minimum_recall_numerator": 9,
+      "positive_label": "no_answer",
+      "positive_support": 30,
+      "zero_denominator": "NA_INVALID"
+    },
+    "overall_exact_typed_decision": {
+      "denominator": 120,
+      "minimum_correct": 114,
+      "threshold_denominator": 20,
+      "threshold_numerator": 19
+    },
+    "wrong_span": {
+      "denominator": 80,
+      "maximum_errors": 1,
+      "maximum_rate_denominator": 50,
+      "maximum_rate_numerator": 1,
+      "offset_units": "zero_based_half_open_unicode_code_points",
+      "population": "expected_present"
+    }
+  },
+  "candidate_parser": {
+    "algorithm_id": "jspace-parser-v3-reference-blind-extraction/v1",
+    "implementation_commit": "310277bcadd67ca9e77986fc292fae47dc5ceda2",
+    "module": "src/jspace_observation/eval_parsing_v3.py",
+    "normalizer_id": "jspace_observation.evaluator_validation.normalize_rational_literal",
+    "parser": "parser_v3",
+    "parser_version": "0ce0f3cd5e0a1d4c5b4c9eff9a2968deecd04c594f435a2fa2bfec332fd3cace",
+    "source_blob_sha256": "dd729c3c23771fb112811e382bf7e55f531ce534cbbd1cfec4f0527056c8908e",
+    "source_sha256": "76dc58684f4e3818a3f557a1828571674e799f65a9f0a97d07706839ff859ea9"
+  },
+  "comparators": {
+    "non_regression": {
+      "algorithm_id": "jspace-parser-v2-reference-blind-extraction/v1",
+      "module": "src/jspace_observation/eval_parsing_v2.py",
+      "normalizer_id": "jspace_observation.evaluator_validation.normalize_rational_literal",
+      "parser": "parser_v2",
+      "parser_version": "6cfaec62db37562930a4cb7d3a252bcbf80e1eaf748de98213863ff2566a7f86",
+      "source_blob_sha256": "fe02781545e26c2f97d1731e985d081a2f1468950bec4d88700647849243d182",
+      "source_sha256": "f538add0bdd6e5a3281d0298b374a99fecea962a91a4cbaa5b4a20795d9a6918"
+    },
+    "note": "parser_v2 is the gating non-regression comparator; the legacy parser is reported for continuity and gates nothing in this contract",
+    "secondary_reporting_only": {
+      "module": "src/jspace_observation/eval_parsing.py",
+      "parser": "legacy",
+      "source_blob_sha256": "4b07b91859aca33b51af9c15b08f07026f11b0141f1300fd3f942138b731177e"
+    }
+  },
+  "correctness_mapping": {
+    "ambiguous": false,
+    "no_answer": false,
+    "present": "canonical_value_equals_canonical_registered_reference"
+  },
+  "dataset_contract": {
+    "answer_bearing_strata": [
+      "S01",
+      "S02",
+      "S03",
+      "S04",
+      "S05",
+      "S06",
+      "S09",
+      "S12"
+    ],
+    "cases_per_stratum": 10,
+    "clean_strata": [
+      "S01",
+      "S02",
+      "S03",
+      "S12"
+    ],
+    "critical_strata": [
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S09",
+      "S10",
+      "S11"
+    ],
+    "strata": [
+      "S01",
+      "S02",
+      "S03",
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S09",
+      "S10",
+      "S11",
+      "S12"
+    ],
+    "total_cases": 120,
+    "typed_decision_support": {
+      "ambiguous": 10,
+      "no_answer": 30,
+      "present": 80
+    }
+  },
+  "derivation": {
+    "derivation_script": "scripts/derive_parser_v3_gate_contract.py",
+    "manual_threshold_entry": false,
+    "registered_change_categories": [
+      "candidate",
+      "comparator",
+      "holdout",
+      "provenance"
+    ],
+    "source_contract": "docs/phase1_parser_v2_acceptance_gates.json",
+    "source_contract_sha256": "a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988",
+    "threshold_preregistration_note": "every numeric threshold is inherited unchanged from a contract that was preregistered before any case of either holdout existed; this v3 instantiation is preregistered before prediction generation and before any parser-v3 label access, but after parser-v3 holdout construction",
+    "thresholds_inherited_verbatim": true
+  },
+  "holdout": {
+    "attestation_source": "artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/02_records.jsonl",
+    "holdout_id": "parser-v3-v1",
+    "inputs_manifest_sha256": "ec954093648cb68ce8e6a83db07639bf7de426cc14e35c0a4503b0a6d75ede9d",
+    "labels_manifest_sha256": "ab32c559cd62c72d059fc2527e17d3e806d5ddc9227f8bd8f8f6b0295d7e67a2",
+    "live_verification_required_before_predictions": true,
+    "locked_inputs_sha256": "946218357432d6f271e403a883559235a7b59da7832f534bdf7eb33e934c4e06",
+    "locked_labels_sha256": "3e4f1b1bca3862d97a6db37854d1b046ac7a3c606f031b692b58ef1940be2743",
+    "object_count": 12,
+    "sealed_prefix": "phase1-evaluator-validation/parser-v3-v1/20260725T160340Z",
+    "set_manifest_sha256": "13f021abd7a052b3b7153b6a0af8ccc13f3bced4b4c280dd3abaa7ab65b949f3"
+  },
+  "legacy_comparison_gates": {
+    "clean_pooled_non_regression": {
+      "comparator": "parser_v2",
+      "denominator": 40,
+      "metric": "exact_typed_decision_count",
+      "nominal_maximum_drop_denominator": 50,
+      "nominal_maximum_drop_numerator": 1,
+      "paired_regressions": "report_only",
+      "rule": "parser_v3_correct_count>=parser_v2_correct_count",
+      "strata": [
+        "S01",
+        "S02",
+        "S03",
+        "S12"
+      ]
+    },
+    "critical_strict_improvement": {
+      "comparator": "parser_v2",
+      "metric": "exact_typed_decision_count",
+      "minimum_net_gain_in_at_least_one_stratum": 1,
+      "other_critical_regressions": "allowed_only_subject_to_all_absolute_gates_and_reported",
+      "strata": [
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11"
+      ]
+    },
+    "legacy_adapter": {
+      "applies_to": "legacy_comparator_reporting_only",
+      "nonnormalizable_answer": "no_answer_with_adapter_failure_diagnostic",
+      "precedence": [
+        "parse_ambiguous_true_maps_to_ambiguous",
+        "parse_valid_and_normalizable_nonnull_answer_maps_to_present",
+        "otherwise_maps_to_no_answer"
+      ],
+      "reference_answer_available_to_adapter": false,
+      "stored_legacy_artifacts_modified": false,
+      "warnings_affect_decision": false
+    }
+  },
+  "numeric_normalization": {
+    "calculation_or_repair": false,
+    "canonical_form": "reduced_rational_positive_denominator_integer_without_slash_one",
+    "canonical_size_preflight_before_allocation": true,
+    "decimal_scientific_grammar": "[+-]?(?:(?:[0-9]+(?:\\.[0-9]*)?)|(?:\\.[0-9]+))(?:[eE][+-]?[0-9]+)?",
+    "float_or_tolerance": false,
+    "fraction_decimal_components": false,
+    "fraction_grammar": "[+-]?[0-9]+/[0-9]+",
+    "fraction_internal_whitespace": false,
+    "fraction_signed_denominator": false,
+    "fraction_zero_denominator": false,
+    "maximum_canonical_characters": 4096,
+    "maximum_literal_characters": 100,
+    "signed_zero": "0"
+  },
+  "one_shot": {
+    "formal_evaluations_per_holdout": 1,
+    "implementation_commit_before_input_read": true,
+    "metric_failure_retry_allowed": false,
+    "modified_parser_requires_new_holdout": true,
+    "pass_or_fail_retires_holdout": true,
+    "predictions_sealed_before_label_read": true
+  },
+  "schema_version": "phase1-parser-v3-acceptance-gates/v1",
+  "status": "preregistered_before_prediction_generation_and_label_access",
+  "status_logic": {
+    "FAIL": "all_metrics_defined_and_any_hard_gate_fails",
+    "INVALID": "integrity_representation_schema_consensus_denominator_or_scorer_failure",
+    "PASS": "all_absolute_and_legacy_comparison_gates_pass",
+    "missing_cases_dropped": false,
+    "rounded_display_values_used_for_gates": false
+  },
+  "typed_decision": {
+    "equality": "exact_string_equality",
+    "labels": [
+      "present:<canonical_value>",
+      "ambiguous",
+      "no_answer"
+    ],
+    "null_collapse_prohibited": true
+  }
+}

@@ -26,8 +26,10 @@ CORE_PATH = (
     / "jspace_observation"
     / "parser_v2_locked_evaluation.py"
 )
-FORBIDDEN_MODULE_PARTS = ("eval_parsing", "eval_parsing_v2")
-FORBIDDEN_FILENAMES = frozenset({"eval_parsing.py", "eval_parsing_v2.py"})
+FORBIDDEN_MODULE_PARTS = ("eval_parsing", "eval_parsing_v2", "eval_parsing_v3")
+FORBIDDEN_FILENAMES = frozenset(
+    {"eval_parsing.py", "eval_parsing_v2.py", "eval_parsing_v3.py"}
+)
 _ORIGINAL_SPEC_FROM_FILE_LOCATION = importlib.util.spec_from_file_location
 _ORIGINAL_SOURCE_FILE_LOADER = importlib.machinery.SourceFileLoader
 _ORIGINAL_SOURCELESS_FILE_LOADER = importlib.machinery.SourcelessFileLoader
@@ -46,6 +48,7 @@ _FORBIDDEN_CODE_NAMES = frozenset(
         "parse_and_score",
         "parse_numeric_answer",
         "parse_v2",
+        "parse_v3",
     }
 )
 _EXECUTION_ID_PATTERN = re.compile(r"stage-e-[0-9a-f]{32}\Z", re.ASCII)
@@ -112,6 +115,7 @@ def _forbidden_parser_path(location: object) -> bool:
     if path.suffix == ".pyc" and path.stem.split(".", 1)[0] in {
         "eval_parsing",
         "eval_parsing_v2",
+        "eval_parsing_v3",
     }:
         return True
     return path in {
@@ -189,7 +193,7 @@ def _source_defines_parser(source: object) -> bool:
     return bool(
         re.search(
             r"(?m)^\s*(?:async\s+)?def\s+"
-            r"(?:parse_numeric_answer|parse_v2|evaluate_answer|"
+            r"(?:parse_numeric_answer|parse_v2|parse_v3|evaluate_answer|"
             r"create_eval_record|compare_parsed_answer_to_reference)\s*\(",
             source,
         )

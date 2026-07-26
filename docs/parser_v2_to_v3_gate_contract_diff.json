@@ -1,0 +1,52 @@
+{
+  "added_nested_keys": {
+    "/legacy_comparison_gates/clean_pooled_non_regression/comparator": "comparator",
+    "/legacy_comparison_gates/critical_strict_improvement/comparator": "comparator",
+    "/legacy_comparison_gates/legacy_adapter/applies_to": "comparator"
+  },
+  "added_top_level_keys": [
+    "candidate_parser",
+    "comparators",
+    "holdout",
+    "derivation"
+  ],
+  "changed_leaves": [
+    {
+      "category": "comparator",
+      "from": "parser_v2_correct_count>=legacy_correct_count",
+      "path": "/legacy_comparison_gates/clean_pooled_non_regression/rule",
+      "to": "parser_v3_correct_count>=parser_v2_correct_count"
+    },
+    {
+      "category": "candidate",
+      "from": "phase1-parser-v2-acceptance-gates/v1",
+      "path": "/schema_version",
+      "to": "phase1-parser-v3-acceptance-gates/v1"
+    },
+    {
+      "category": "provenance",
+      "from": "preregistered_before_case_construction",
+      "path": "/status",
+      "to": "preregistered_before_prediction_generation_and_label_access"
+    }
+  ],
+  "derived_contract": "docs/phase1_parser_v3_acceptance_gates.json",
+  "derived_contract_sha256": "2fcc323481221fbc5c1f56b5beccd238fd835303c46df61087e1483dfc28dda7",
+  "frozen_loader_accepts_derived_contract": true,
+  "inherited_numeric_leaf_count": 52,
+  "metric_semantic_change_paths": [],
+  "metric_semantic_changes": 0,
+  "numeric_threshold_change_paths": [],
+  "numeric_threshold_changes": 0,
+  "path_renames": {},
+  "population_definition_change_paths": [],
+  "population_definition_changes": 0,
+  "removed_paths": [],
+  "schema_version": "phase1-parser-v2-to-v3-gate-contract-diff/v1",
+  "source_contract": "docs/phase1_parser_v2_acceptance_gates.json",
+  "source_contract_sha256": "a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988",
+  "unexpectedly_introduced_paths": [],
+  "unregistered_change_paths": [],
+  "unregistered_changes": 0,
+  "verdict": "DERIVATION_FAITHFUL"
+}
