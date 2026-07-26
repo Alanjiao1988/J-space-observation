@@ -3354,3 +3354,51 @@ source path is byte-identical to its state at the freeze, which the image
 binding hashes prove independently of the commit name. No parser, gate
 contract, orchestrator semantic, profile binding or membership rule may change
 after the freeze, and none has.
+
+
+### Build-host recovery and one stranded build claim (parser v3)
+
+The preregistered build launcher requires a POSIX host. It was executed on the
+pre-existing orchestrator VM `vm-pv2-orchestrator-sea`
+(`rg-jspace-observation-sea`, Debian 12, `/usr/bin/python3` -> 
+`/usr/bin/python3.11`, root-owned, mode 755), which is the same class of host
+used for the parser-v2 round. No new infrastructure was created.
+
+The first attempt was run as the unprivileged operator account and failed:
+
+`	ext
+PermissionError: [Errno 13] Permission denied:
+  .../build-<invocation>/acr_task_run_body.json
+`
+
+Cause: the launcher writes `acr_task_run_body.json`, then `chmod 400` s it,
+then writes the same path a second time after the durable build claim is
+authenticated. Under a non-root operator the second write fails with `EACCES`;
+under root it succeeds because root bypasses the permission bits. The identical
+sequence is present in the frozen parser-v2 launcher at the corresponding
+lines, so this is inherited behaviour and **not** a parser-v3 derivation defect.
+It also implies the parser-v2 round was executed as root.
+
+Consequence. The failed attempt died **after** creating its durable build TXT
+claim in the coordination zone and **before** the one-shot ACR TaskRun PUT. Only
+the process that wins the claim with a `201` create may start the TaskRun; any
+later process gets `412` and is restricted to GET-only adoption. The build for
+source commit `c2ab05c94398dc6c8a8c9df8db746712b95dc216` is therefore
+permanently stranded and can never be completed. Coordination-zone record sets
+went from 15 to 16; the extra record is that stranded claim. It is retained, not
+deleted.
+
+Recovery. A build claim's domain is derived from the source commit, so a
+different source commit yields a different claim name and a fresh one-shot
+build. A rehearsal was then run as root at the stranded commit to prove the
+environment: it passed every environment, snapshot, LF, source-binding, ACR,
+coordination-zone, provenance, claim-envelope and ACR-task-run-body stage,
+reported `[INFO] Build TXT create returned 412; GET-only recovery` exactly as
+predicted, and entered the TaskRun discovery loop. It was then stopped, because
+its claim has no TaskRun and never will. That rehearsal consumed no new claim
+and produced no image.
+
+Scientific impact: none. No locked input was read, no prediction was generated,
+no label was accessed, and no evaluation semantics changed. The event is
+recorded because a stranded durable claim is a permanent, publicly visible
+artifact of the coordination zone.
