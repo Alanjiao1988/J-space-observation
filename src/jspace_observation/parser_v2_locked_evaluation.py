@@ -47,6 +47,10 @@ _PARSER_EVALUATION_PROFILES = {
     "parser-v2-v1": {
         "profile_id": "parser-v2-v1",
         "candidate_parser": "parser_v2",
+        "candidate_parser_algorithm_id": (
+            "jspace-parser-v2-reference-blind-extraction/v1"
+        ),
+        "orchestrator_schema_compatibility": "parser_v2_field_names_v1",
         "comparator_parsers": ("legacy",),
         "parser_source_path": "src/jspace_observation/eval_parsing_v2.py",
         "parser_entry_symbol": "parse_v2",
@@ -74,6 +78,10 @@ _PARSER_EVALUATION_PROFILES = {
     "parser-v3-v1": {
         "profile_id": "parser-v3-v1",
         "candidate_parser": "parser_v3",
+        "candidate_parser_algorithm_id": (
+            "jspace-parser-v3-reference-blind-extraction/v1"
+        ),
+        "orchestrator_schema_compatibility": "parser_v2_field_names_v1",
         "comparator_parsers": ("parser_v2", "legacy"),
         "parser_source_path": "src/jspace_observation/eval_parsing_v3.py",
         "parser_entry_symbol": "parse_v3",

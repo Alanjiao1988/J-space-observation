@@ -235,16 +235,45 @@ class TestParserEvaluationProfiles:
     def test_v3_adds_a_candidate_stream_without_mislabelling_it(self):
         """v3 predictions must never land in a file named for parser v2."""
         v3 = self._load("_test_v3_core_members_v3", profile_id="parser-v3-v1")
-        assert v3.CANDIDATE_PREDICTION_FILENAME == "parser_v3_locked_predictions.jsonl"
+        assert (
+            v3.CANDIDATE_PREDICTION_FILENAME == "parser_v3_candidate_predictions.jsonl"
+        )
         assert v3.PREDICTION_MEMBER_NAMES == (
             ".prediction_reservation.json",
             "prediction_request_manifest.json",
-            "parser_v3_locked_predictions.jsonl",
-            "parser_v2_locked_predictions.jsonl",
-            "legacy_locked_predictions.jsonl",
+            "parser_v3_candidate_predictions.jsonl",
+            "parser_v2_comparator_predictions.jsonl",
+            "legacy_comparator_predictions.jsonl",
             "prediction_seal.json",
             "prediction_artifact_manifest.json",
         )
+
+    def test_v3_stream_names_state_their_role(self):
+        """Role must be readable from the artifact name, not inferred."""
+        v3 = self._load("_test_v3_core_roles", profile_id="parser-v3-v1")
+        assert "candidate" in v3.CANDIDATE_PREDICTION_FILENAME
+        assert all(
+            "comparator" in name for name in v3.COMPARATOR_PREDICTION_FILENAMES
+        )
+
+    def test_candidate_algorithm_ids_match_the_parser_sources(self):
+        """Guard against a transcribed identifier drifting from the parser."""
+        import re
+
+        for profile_id, filename in (
+            ("parser-v2-v1", "eval_parsing_v2.py"),
+            ("parser-v3-v1", "eval_parsing_v3.py"),
+        ):
+            core = self._load(f"_test_v3_core_algo_{profile_id}", profile_id=profile_id)
+            source = (ROOT / "src" / "jspace_observation" / filename).read_text("utf-8")
+            declared = re.search(
+                r'^PARSER_ALGORITHM_ID = "([^"]+)"', source, re.MULTILINE
+            )
+            assert declared is not None
+            assert (
+                core.ACTIVE_PARSER_PROFILE["candidate_parser_algorithm_id"]
+                == declared.group(1)
+            )
 
     def test_v3_runs_three_parsers_because_v2_is_now_a_comparator(self):
         v3 = self._load("_test_v3_core_arity", profile_id="parser-v3-v1")
