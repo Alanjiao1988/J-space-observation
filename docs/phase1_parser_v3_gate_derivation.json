@@ -1,0 +1,63 @@
+{
+  "core_parameterisation": {
+    "default_profile_id": "parser-v2-v1",
+    "default_profile_is_parser_v2": true,
+    "module": "src/jspace_observation/parser_v2_locked_evaluation.py",
+    "parser_v2_behaviour_byte_identical": true,
+    "profile_resolution": "import_time",
+    "profile_seed_name": "_PRESEEDED_PARSER_PROFILE_ID"
+  },
+  "entrypoint_derivations": [
+    {
+      "changed_line_count": 1,
+      "derived": "scripts/stage_p_v3_entrypoint.sh",
+      "derived_sha256": "d019d6f9a900960af04bd3693afa0e3362e9c04476b2f70b6f3ee993b1015028",
+      "source": "scripts/stage_p_entrypoint.sh",
+      "source_sha256": "e8b72d6ecb71bb9b20eb0c781f6d5aca6a3540da1bb96f2b4ff75f592daf9396"
+    },
+    {
+      "changed_line_count": 1,
+      "derived": "scripts/stage_p_adopt_v3_entrypoint.sh",
+      "derived_sha256": "0b660f0605848252b429aa2fb83663a643a18d6c87bd2cb8317de1a6dab6df5f",
+      "source": "scripts/stage_p_adopt_entrypoint.sh",
+      "source_sha256": "b8aa168e324a43b1bc8dd271716ad284a206beb81de400cb0af4333921ed37dd"
+    },
+    {
+      "changed_line_count": 1,
+      "derived": "scripts/stage_e_v3_entrypoint.sh",
+      "derived_sha256": "49663f2676708555db7a9572fce9a243447ab642e5d9f8b6e0d7d7e508b0afcf",
+      "source": "scripts/stage_e_entrypoint.sh",
+      "source_sha256": "f08afcdc176bd7630cee30d1b47006e0cacadc03393784c0f180e25bbadbc1b0"
+    }
+  ],
+  "gate_contract_derivation": {
+    "candidate_comparator_profile_changes_only": true,
+    "derivation_diff_record": "docs/parser_v2_to_v3_gate_contract_diff.json",
+    "derivation_diff_record_sha256": "ea4696eb78cd1dfb72cd71ae981bfa075b026013833c22893141800fca3c57a1",
+    "derived_gate_contract": "docs/phase1_parser_v3_acceptance_gates.json",
+    "derived_gate_contract_sha256": "2fcc323481221fbc5c1f56b5beccd238fd835303c46df61087e1483dfc28dda7",
+    "frozen_loader_accepts_derived_contract": true,
+    "idempotence_verified": true,
+    "inherited_numeric_leaf_count": 52,
+    "metric_semantic_changes": 0,
+    "numeric_threshold_changes": 0,
+    "population_definition_changes": 0,
+    "source_gate_contract": "docs/phase1_parser_v2_acceptance_gates.json",
+    "source_gate_contract_sha256": "a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988",
+    "verdict": "DERIVATION_FAITHFUL"
+  },
+  "runtime_worker_derivation": {
+    "changed_line_count": 6,
+    "derivation_idempotent": true,
+    "derived_worker": "scripts/parser_v3_process_worker.py",
+    "derived_worker_sha256": "840c8c69a986391b2dcb726c9e9d0e6ec31cdc427dc96bd9a0bde1525d548106",
+    "environment_lock_verified": true,
+    "selects_parser_from_argv": false,
+    "selects_parser_from_environment": false,
+    "source_worker": "scripts/parser_v2_process_worker.py",
+    "source_worker_sha256": "32c90a46ed6d4466a38021dcb8afbe84e7c95c2400f02f9cdf2a0ede414f087c",
+    "substitution_count": 6,
+    "unexpected_diff_count": 0
+  },
+  "schema_version": "phase1-parser-v3-derivation-record/v1"
+}

@@ -207,6 +207,10 @@ class TestParserEvaluationProfiles:
         v3 = self._load("_test_v3_core_paths_v3", profile_id="parser-v3-v1")
         added = set(v3.IMAGE_BINDING_SOURCE_PATHS) - set(v2.IMAGE_BINDING_SOURCE_PATHS)
         assert added == {
+            "Dockerfile.parser-v3-eval",
+            "infra/azure/scripts/09_build_parser_v3_eval.sh",
+            "infra/azure/scripts/10_run_parser_v3_locked_eval.sh",
+            "scripts/parser_v3_azure_contract.py",
             "src/jspace_observation/eval_parsing_v3.py",
             "scripts/parser_v3_process_worker.py",
             "scripts/run_parser_v3_locked_predictions.py",
@@ -216,6 +220,15 @@ class TestParserEvaluationProfiles:
             "scripts/stage_e_v3_entrypoint.sh",
             "docs/phase1_parser_v3_acceptance_gates.json",
             "docs/phase1_parser_v3_locked_evaluation_protocol.md",
+        }
+        removed = set(v2.IMAGE_BINDING_SOURCE_PATHS) - set(
+            v3.IMAGE_BINDING_SOURCE_PATHS
+        )
+        assert removed == {
+            "Dockerfile.parser-v2-eval",
+            "infra/azure/scripts/09_build_parser_v2_eval.sh",
+            "infra/azure/scripts/10_run_parser_v2_locked_eval.sh",
+            "scripts/parser_v2_azure_contract.py",
         }
 
     def test_v2_binding_paths_are_unchanged_by_the_new_profile(self):
@@ -686,3 +699,136 @@ class TestStageEStillRefusesEveryParserV3Artefact:
         ):
             path = ROOT / "scripts" / name
             core.assert_parser_free_source(path.read_bytes(), name)
+
+
+class TestParserV3BuildProvenance:
+    """The v3 image must be built from v3 bytes and tagged immutably."""
+
+    DOCKERFILE = ROOT / "Dockerfile.parser-v3-eval"
+    BUILD_SCRIPT = ROOT / "infra" / "azure" / "scripts" / "09_build_parser_v3_eval.sh"
+    LAUNCHER = ROOT / "infra" / "azure" / "scripts" / "10_run_parser_v3_locked_eval.sh"
+    CONTRACT = ROOT / "scripts" / "parser_v3_azure_contract.py"
+
+    def test_every_derived_build_file_exists(self):
+        for path in (self.DOCKERFILE, self.BUILD_SCRIPT, self.LAUNCHER,
+                     self.CONTRACT):
+            assert path.exists(), path
+
+    def test_dockerfile_installs_the_three_v3_entrypoints(self):
+        source = _lf_bytes(self.DOCKERFILE).decode()
+        for name in ("stage-p-v3", "stage-p-adopt-v3", "stage-e-v3"):
+            assert f"/workspace/bin/{name}" in source
+
+    def test_dockerfile_copies_the_candidate_parser_and_worker(self):
+        source = _lf_bytes(self.DOCKERFILE).decode()
+        assert "src/jspace_observation/eval_parsing_v3.py" in source
+        assert "scripts/parser_v3_process_worker.py" in source
+        assert "scripts/run_parser_v3_locked_predictions.py" in source
+        assert "scripts/finalize_parser_v3_locked_evaluation.py" in source
+
+    def test_dockerfile_pins_the_v3_gate_contract_digest(self):
+        source = _lf_bytes(self.DOCKERFILE).decode()
+        digest = hashlib.sha256(_lf_bytes(GATE_CONTRACT_PATH)).hexdigest()
+        assert f"'phase1_parser_v3_acceptance_gates.json':'{digest}'" in source
+
+    def test_dockerfile_pins_the_protocol_document_digest(self):
+        source = _lf_bytes(self.DOCKERFILE).decode()
+        protocol = ROOT / "docs" / "phase1_parser_v3_locked_evaluation_protocol.md"
+        digest = hashlib.sha256(_lf_bytes(protocol)).hexdigest()
+        assert (
+            f"'phase1_parser_v3_locked_evaluation_protocol.md':'{digest}'"
+            in source
+        )
+
+    def test_no_runtime_dependency_installation_or_floating_tag(self):
+        source = _lf_bytes(self.DOCKERFILE).decode()
+        assert "--require-hashes" in source
+        assert "--only-binary=:all:" in source
+        assert ":latest" not in source
+        assert source.count("pip install") == 1
+
+    def test_build_script_targets_the_v3_repository_and_dockerfile(self):
+        source = _lf_bytes(self.BUILD_SCRIPT).decode()
+        assert 'IMAGE_REPOSITORY="j-space-observation-parser-v3-eval"' in source
+        assert "scripts/parser_v3_azure_contract.py" in source
+        assert "Dockerfile.parser-v2-eval" not in source
+
+    def test_build_script_tag_is_the_immutable_source_commit(self):
+        source = _lf_bytes(self.BUILD_SCRIPT).decode()
+        assert 'FINAL_TAG="$SOURCE_SHA"' in source
+        assert 'FINAL_TAG="latest"' not in source
+        assert "Mutable latest is forbidden" in source
+
+    def test_azure_contract_points_at_the_v3_dockerfile(self):
+        source = _lf_bytes(self.CONTRACT).decode()
+        assert 'BUILD_DOCKERFILE_PATH = "Dockerfile.parser-v3-eval"' in source
+
+    def test_build_inputs_match_the_registered_image_binding_paths(self):
+        core = _v3_core()
+        source = _lf_bytes(self.BUILD_SCRIPT).decode()
+        for path in core.IMAGE_BINDING_SOURCE_PATHS:
+            assert f'"{path}"' in source, path
+
+    def test_launcher_expects_exactly_the_registered_source_bindings(self):
+        core = _v3_core()
+        source = _lf_bytes(self.LAUNCHER).decode()
+        for path in core.RUNTIME_SOURCE_BINDING_PATHS:
+            assert f'"{path}"' in source, path
+        assert "Dockerfile.parser-v2-eval" not in source
+        assert "scripts/parser_v2_azure_contract.py" not in source
+
+    def test_profile_scoped_build_identity_is_exported(self):
+        core = _v3_core()
+        v2 = _load_module(
+            "_test_v3_build_loader", ROOT / "scripts" / "load_locked_evaluation_core.py"
+        ).load_locked_evaluation_core("_test_v3_build_core_v2")
+        assert core.EVAL_DOCKERFILE_PATH == "Dockerfile.parser-v3-eval"
+        assert core.EVAL_IMAGE_REPOSITORY == "j-space-observation-parser-v3-eval"
+        assert v2.EVAL_DOCKERFILE_PATH == "Dockerfile.parser-v2-eval"
+        assert v2.EVAL_IMAGE_REPOSITORY == "j-space-observation-parser-eval"
+
+    def test_v2_binding_tuples_are_unchanged_by_parameterisation(self):
+        v2 = _load_module(
+            "_test_v3_build_loader2",
+            ROOT / "scripts" / "load_locked_evaluation_core.py",
+        ).load_locked_evaluation_core("_test_v3_build_core_v2b")
+        assert v2.RUNTIME_SOURCE_BINDING_PATHS == (
+            "Dockerfile.parser-v2-eval",
+            "requirements-parser-v2-eval.txt",
+            "infra/azure/scripts/09_build_parser_v2_eval.sh",
+            "infra/azure/scripts/10_run_parser_v2_locked_eval.sh",
+            "scripts/create_parser_v2_runtime_config.py",
+            "scripts/bootstrap_parser_v2_locked_evaluation.py",
+            "scripts/parser_v2_azure_contract.py",
+            "scripts/parser_v2_process_worker.py",
+            "scripts/run_parser_v2_locked_predictions.py",
+            "scripts/finalize_parser_v2_locked_evaluation.py",
+            "scripts/stage_p_entrypoint.sh",
+            "scripts/stage_p_adopt_entrypoint.sh",
+            "scripts/stage_e_entrypoint.sh",
+            "src/jspace_observation/evaluator_validation.py",
+            "src/jspace_observation/eval_parsing.py",
+            "src/jspace_observation/eval_parsing_v2.py",
+            "src/jspace_observation/parser_v2_locked_evaluation.py",
+        )
+
+    def test_every_v3_runtime_file_is_committed_as_lf(self):
+        core = _v3_core()
+        import subprocess
+
+        paths = sorted(
+            set(core.IMAGE_BINDING_SOURCE_PATHS)
+            | set(core.RUNTIME_SOURCE_BINDING_PATHS)
+        )
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), "check-attr", "eol", "--"] + paths,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        unspecified = [
+            line
+            for line in result.stdout.splitlines()
+            if line.strip() and not line.endswith(": eol: lf")
+        ]
+        assert unspecified == []

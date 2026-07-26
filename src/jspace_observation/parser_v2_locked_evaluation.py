@@ -71,6 +71,10 @@ _PARSER_EVALUATION_PROFILES = {
         ),
         "sealed_holdout_family": "parser-v2-v1",
         "candidate_predictions_filename": "parser_v2_locked_predictions.jsonl",
+        "dockerfile_path": "Dockerfile.parser-v2-eval",
+        "image_repository": "j-space-observation-parser-eval",
+        "build_script_path": "infra/azure/scripts/09_build_parser_v2_eval.sh",
+        "azure_contract_path": "scripts/parser_v2_azure_contract.py",
         "runtime_launcher_path": (
             "infra/azure/scripts/10_run_parser_v2_locked_eval.sh"
         ),
@@ -119,8 +123,12 @@ _PARSER_EVALUATION_PROFILES = {
         ),
         "sealed_holdout_family": "parser-v3-v1",
         "candidate_predictions_filename": "parser_v3_candidate_predictions.jsonl",
+        "dockerfile_path": "Dockerfile.parser-v3-eval",
+        "image_repository": "j-space-observation-parser-v3-eval",
+        "build_script_path": "infra/azure/scripts/09_build_parser_v3_eval.sh",
+        "azure_contract_path": "scripts/parser_v3_azure_contract.py",
         "runtime_launcher_path": (
-            "infra/azure/scripts/10_run_parser_v2_locked_eval.sh"
+            "infra/azure/scripts/10_run_parser_v3_locked_eval.sh"
         ),
         "stage_command_suffix": "-v3",
         "comparator_predictions_filenames": (
@@ -578,14 +586,20 @@ SCORE_MEMBER_NAMES = (
     "scores_manifest.json",
 )
 
+EVAL_DOCKERFILE_PATH = ACTIVE_PARSER_PROFILE["dockerfile_path"]
+EVAL_IMAGE_REPOSITORY = ACTIVE_PARSER_PROFILE["image_repository"]
+EVAL_BUILD_SCRIPT_PATH = ACTIVE_PARSER_PROFILE["build_script_path"]
+EVAL_AZURE_CONTRACT_PATH = ACTIVE_PARSER_PROFILE["azure_contract_path"]
+EVAL_RUNTIME_LAUNCHER_PATH = ACTIVE_PARSER_PROFILE["runtime_launcher_path"]
+
 RUNTIME_SOURCE_BINDING_PATHS = (
-    "Dockerfile.parser-v2-eval",
+    EVAL_DOCKERFILE_PATH,
     "requirements-parser-v2-eval.txt",
-    "infra/azure/scripts/09_build_parser_v2_eval.sh",
-    "infra/azure/scripts/10_run_parser_v2_locked_eval.sh",
+    EVAL_BUILD_SCRIPT_PATH,
+    EVAL_RUNTIME_LAUNCHER_PATH,
     "scripts/create_parser_v2_runtime_config.py",
     "scripts/bootstrap_parser_v2_locked_evaluation.py",
-    "scripts/parser_v2_azure_contract.py",
+    EVAL_AZURE_CONTRACT_PATH,
     "scripts/parser_v2_process_worker.py",
     "scripts/run_parser_v2_locked_predictions.py",
     "scripts/finalize_parser_v2_locked_evaluation.py",
@@ -600,13 +614,13 @@ RUNTIME_SOURCE_BINDING_PATHS = (
 IMAGE_BINDING_SOURCE_PATHS = (
     ".dockerignore",
     ".gitattributes",
-    "Dockerfile.parser-v2-eval",
+    EVAL_DOCKERFILE_PATH,
     "requirements-parser-v2-eval.txt",
-    "infra/azure/scripts/09_build_parser_v2_eval.sh",
-    "infra/azure/scripts/10_run_parser_v2_locked_eval.sh",
+    EVAL_BUILD_SCRIPT_PATH,
+    EVAL_RUNTIME_LAUNCHER_PATH,
     "scripts/create_parser_v2_runtime_config.py",
     "scripts/bootstrap_parser_v2_locked_evaluation.py",
-    "scripts/parser_v2_azure_contract.py",
+    EVAL_AZURE_CONTRACT_PATH,
     "scripts/parser_v2_process_worker.py",
     "scripts/run_parser_v2_locked_predictions.py",
     "scripts/finalize_parser_v2_locked_evaluation.py",
@@ -2521,8 +2535,8 @@ def _validate_image_build_provenance(
         or not exact_json_equal(
             dockerfile,
             {
-            "path": "Dockerfile.parser-v2-eval",
-            **source["files"]["Dockerfile.parser-v2-eval"],
+            "path": EVAL_DOCKERFILE_PATH,
+            **source["files"][EVAL_DOCKERFILE_PATH],
             }
         )
         or not exact_json_equal(
@@ -2581,7 +2595,7 @@ def _validate_image_build_provenance(
             "type": "DockerBuildRequest",
             "run_type": "QuickRun",
             "source_location": source["remote_source_location"],
-            "dockerfile_path": "Dockerfile.parser-v2-eval",
+            "dockerfile_path": EVAL_DOCKERFILE_PATH,
             "platform": {"os": "Linux", "architecture": "amd64"},
             "is_push_enabled": True,
             "no_cache": False,
@@ -15579,6 +15593,11 @@ __all__ = [
     "COORDINATION_BINDING_SCHEMA_VERSION",
     "PRIVATE_DNS_RECORD_SET_API_VERSION",
     "MANAGEMENT_LOCK_API_VERSION",
+    "EVAL_DOCKERFILE_PATH",
+    "EVAL_IMAGE_REPOSITORY",
+    "EVAL_BUILD_SCRIPT_PATH",
+    "EVAL_AZURE_CONTRACT_PATH",
+    "EVAL_RUNTIME_LAUNCHER_PATH",
     "IMAGE_BINDING_SOURCE_PATHS",
     "RUNTIME_SOURCE_BINDING_PATHS",
     "IMPLEMENTATION_MANIFEST_SCHEMA_VERSION",

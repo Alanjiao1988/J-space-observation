@@ -421,3 +421,98 @@ re-running headroom calibration; running DeepSeek; running J-lens; using a GPU;
 committing locked inputs, locked labels, or the full scoring ledger to GitHub;
 rewriting the one-shot orchestrator; and any claim about hidden reasoning, an
 internal workspace, or J-space.
+
+
+## 11. Three prediction streams and their roles
+
+Stage P produces three independent, separately bound prediction streams over
+the same 120 locked inputs:
+
+```text
+candidate      parser v3     parser_v3_candidate_predictions.jsonl
+comparator_1   parser v2     parser_v2_comparator_predictions.jsonl
+comparator_2   legacy        legacy_comparator_predictions.jsonl
+```
+
+All three are sealed together. Their ordered case membership must be identical;
+any divergence is an integrity fault.
+
+The **gating** comparator for this contract is **parser v2**. The derived
+contract's `clean_pooled_non_regression` and `critical_strict_improvement`
+gates compare parser v3 against parser v2, not against the legacy parser. The
+legacy stream is **reporting-only** in this round: it is carried for
+non-regression narrative and paper tables, it is scored only after the holdout
+has been retired, and a defect in that pass cannot alter `PASS` or `FAIL`. Its
+aggregates are published in the Stage E result and report rather than in the
+sealed score members.
+
+Legacy output is never re-interpreted through a parser-v2 or parser-v3 adapter
+and then presented as legacy output. Where the parser-v2 comparator has to be
+expressed in the frozen comparator schema, a total, deterministic adapter is
+applied to the parser envelope only, and its identity is recorded:
+
+```text
+adapter_id  jspace-parser-envelope-to-comparator-decision/v1
+applies_to  parser envelopes only
+```
+
+## 12. Orchestrator schema compatibility
+
+Historical `parser_v2_*` field names are retained for orchestration-schema
+compatibility.
+
+> Fields whose historical names begin with `parser_v2_` are retained for
+> orchestration-schema compatibility. They do not identify the candidate parser
+> used by the current evaluation. Candidate identity is controlled exclusively
+> by the import-time profile, hardcoded worker identity, algorithm ID, parser
+> version, source SHA-256 and prediction-seal bindings.
+
+Under `evaluation_profile = parser_v3` the scoring ledger's
+`parser_v2_prediction_row_*` fields hold **candidate parser-v3** rows and its
+`legacy_prediction_row_*` fields hold **parser-v2 comparator** rows. Every
+metrics record carries a `parser_attribution` block that names the parser behind
+each field prefix; that block is authoritative, not the field name. No report
+and no paper table may describe these compatibility fields as parser-v2
+candidate output.
+
+The full record is `docs/phase1_parser_v3_orchestrator_schema_compatibility.md`.
+
+## 13. Runtime profile lock
+
+The evaluation profile is resolved at import time, before any locked input is
+read, by a loader that seeds the profile identifier into the module namespace
+prior to execution. After import it cannot be changed by `argv` or by the
+environment. Parser v2 remains the default profile, so every pre-existing
+caller observes byte-identical behaviour.
+
+Stage P and Stage E run from the same image and the same source digest but
+through different hardcoded entrypoints and therefore different identities. The
+Stage E profile denotes a **scoring** profile only: Stage E cannot load,
+import, or call any parser, and the candidate parser's filename, module name,
+bytecode stem, code-object names, and dynamic-import strings are all in its
+deny lists.
+
+The machine-readable record is `docs/phase1_parser_v3_runtime_profile.json`;
+the derivation evidence is `docs/phase1_parser_v3_gate_derivation.json`.
+
+## 14. Defect found and fixed before preregistration
+
+Stage E's parser-import prohibition initially omitted parser v3 from several
+exact-match deny lists and probes, and the three-stream wiring contained four
+further defects that would have surfaced only after prediction generation or
+after the first label read.
+
+```text
+Found and fixed before:
+  preregistration
+  prediction generation
+  holdout access
+  label access
+
+Impact on formal evaluation:
+  none
+```
+
+The defects are recorded here and in the paper's limitations and methods
+ledgers rather than hidden, because they are reproducibility and
+safety-boundary evidence.

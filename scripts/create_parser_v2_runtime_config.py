@@ -495,9 +495,7 @@ def main(argv: list[str] | None = None) -> int:
         }
         for path in core.RUNTIME_SOURCE_BINDING_PATHS
     }
-    launcher = source_bindings[
-        "infra/azure/scripts/10_run_parser_v2_locked_eval.sh"
-    ]
+    launcher = source_bindings[core.EVAL_RUNTIME_LAUNCHER_PATH]
     record = core.build_runtime_configuration(
         source_commit=args.source_commit,
         parent_prefix=args.parent_prefix,

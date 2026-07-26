@@ -1,0 +1,84 @@
+ARG PYTHON_BASE_IMAGE=python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d
+FROM ${PYTHON_BASE_IMAGE}
+ARG PYTHON_BASE_IMAGE
+ARG BUILD_PROVENANCE_SHA256
+
+LABEL org.opencontainers.image.build-provenance-sha256="${BUILD_PROVENANCE_SHA256}"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONHASHSEED=0 \
+    HOME=/nonexistent \
+    TMPDIR=/runtime/work \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PATH=/usr/local/bin:/usr/bin:/bin
+
+WORKDIR /workspace
+
+RUN test "${PYTHON_BASE_IMAGE}" = "python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d" \
+    && test "$(readlink -f /usr/local/bin/python3.11)" = "/usr/local/bin/python3.11" \
+    && test "${#BUILD_PROVENANCE_SHA256}" -eq 64 \
+    && test -z "$(printf '%s' "${BUILD_PROVENANCE_SHA256}" | tr -d '0-9a-f')" \
+    && test -x /usr/bin/grep \
+    && ! /usr/bin/grep -Eq '^[^:]+:[^:]*:10001:' /etc/group \
+    && ! /usr/bin/grep -Eq '^[^:]+:[^:]*:10001:' /etc/passwd \
+    && printf '%s\n' 'parser-eval:x:10001:' >> /etc/group \
+    && printf '%s\n' \
+       'parser-eval:x:10001:10001::/nonexistent:/bin/false' >> /etc/passwd \
+    && install -d -o parser-eval -g parser-eval -m 0700 /runtime /runtime/work
+
+COPY requirements-parser-v2-eval.txt /workspace/
+RUN /usr/local/bin/python3.11 -I -m pip install --no-cache-dir \
+    --only-binary=:all: \
+    --require-hashes \
+    -r requirements-parser-v2-eval.txt
+
+COPY src/jspace_observation/evaluator_validation.py \
+     src/jspace_observation/eval_parsing.py \
+     src/jspace_observation/eval_parsing_v2.py \
+     src/jspace_observation/eval_parsing_v3.py \
+     src/jspace_observation/parser_v2_locked_evaluation.py \
+     /workspace/src/jspace_observation/
+COPY scripts/run_parser_v2_locked_predictions.py \
+     scripts/parser_v2_process_worker.py \
+     scripts/finalize_parser_v2_locked_evaluation.py \
+     scripts/bootstrap_parser_v2_locked_evaluation.py \
+     scripts/parser_v3_azure_contract.py \
+     scripts/run_parser_v3_locked_predictions.py \
+     scripts/parser_v3_process_worker.py \
+     scripts/finalize_parser_v3_locked_evaluation.py \
+     /workspace/scripts/
+COPY scripts/stage_p_entrypoint.sh /workspace/bin/stage-p
+COPY scripts/stage_p_adopt_entrypoint.sh /workspace/bin/stage-p-adopt
+COPY scripts/stage_e_entrypoint.sh /workspace/bin/stage-e
+COPY scripts/stage_p_v3_entrypoint.sh /workspace/bin/stage-p-v3
+COPY scripts/stage_p_adopt_v3_entrypoint.sh /workspace/bin/stage-p-adopt-v3
+COPY scripts/stage_e_v3_entrypoint.sh /workspace/bin/stage-e-v3
+COPY docs/phase1_parser_v2_protocol.md \
+     docs/phase1_evaluator_validation_set.md \
+     docs/phase1_parser_v2_acceptance_gates.json \
+     docs/phase1_parser_v3_acceptance_gates.json \
+     docs/phase1_parser_v3_locked_evaluation_protocol.md \
+     /workspace/docs/
+
+RUN /usr/local/bin/python3.11 -I -c "from pathlib import Path; import hashlib; expected={'phase1_parser_v2_protocol.md':'417d9ff5d27b17ce588b7713a1b1072fb32ef21a03fd135e4e339719db28866b','phase1_evaluator_validation_set.md':'d019c446393bc60dc524178c2a91018ceb8f04f881dcc80018f0282b0919f3f8','phase1_parser_v2_acceptance_gates.json':'a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988','phase1_parser_v3_acceptance_gates.json':'2fcc323481221fbc5c1f56b5beccd238fd835303c46df61087e1483dfc28dda7','phase1_parser_v3_locked_evaluation_protocol.md':'b2e60d899375ab9a9d9433bbfb485df5047d4dbabe9bf0471b6aa9a9d43ec617'}; paths=[Path('/workspace/docs')/name for name in expected]; [path.write_bytes(path.read_bytes().replace(b'\r\n',b'\n').replace(b'\r',b'\n')) for path in paths]; assert all(hashlib.sha256(path.read_bytes()).hexdigest()==expected[path.name] for path in paths)" \
+    && /usr/local/bin/python3.11 -I -m py_compile \
+       /workspace/src/jspace_observation/parser_v2_locked_evaluation.py \
+       /workspace/scripts/bootstrap_parser_v2_locked_evaluation.py \
+       /workspace/scripts/parser_v3_azure_contract.py \
+       /workspace/scripts/parser_v2_process_worker.py \
+       /workspace/scripts/run_parser_v2_locked_predictions.py \
+       /workspace/scripts/finalize_parser_v2_locked_evaluation.py \
+       /workspace/scripts/parser_v3_process_worker.py \
+       /workspace/scripts/run_parser_v3_locked_predictions.py \
+       /workspace/scripts/finalize_parser_v3_locked_evaluation.py \
+    && find /workspace -type d -name __pycache__ -prune -exec rm -rf {} + \
+    && chown -R 0:0 /workspace \
+    && chmod -R a-w /workspace \
+    && chmod 0555 /workspace/bin/stage-p /workspace/bin/stage-p-adopt \
+       /workspace/bin/stage-e /workspace/bin/stage-p-v3 \
+       /workspace/bin/stage-p-adopt-v3 /workspace/bin/stage-e-v3
+
+USER parser-eval
+
+CMD ["/usr/local/bin/python3.11", "-I", "--version"]
