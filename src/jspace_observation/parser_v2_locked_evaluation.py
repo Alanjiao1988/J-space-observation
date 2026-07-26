@@ -70,6 +70,8 @@ _PARSER_EVALUATION_PROFILES = {
             "a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988"
         ),
         "sealed_holdout_family": "parser-v2-v1",
+        "case_id_prefix": "PV2",
+        "holdout_id_domain": "phase1-parser-v2-holdout-id/v1",
         "candidate_predictions_filename": "parser_v2_locked_predictions.jsonl",
         "dockerfile_path": "Dockerfile.parser-v2-eval",
         "image_repository": "j-space-observation-parser-eval",
@@ -122,6 +124,8 @@ _PARSER_EVALUATION_PROFILES = {
             "2fcc323481221fbc5c1f56b5beccd238fd835303c46df61087e1483dfc28dda7"
         ),
         "sealed_holdout_family": "parser-v3-v1",
+        "case_id_prefix": "PV3",
+        "holdout_id_domain": "phase1-parser-v3-holdout-id/v1",
         "candidate_predictions_filename": "parser_v3_candidate_predictions.jsonl",
         "dockerfile_path": "Dockerfile.parser-v3-eval",
         "image_repository": "j-space-observation-parser-v3-eval",
@@ -204,10 +208,43 @@ ACTIVE_PARSER_PROFILE_SEED_NAME = "_PRESEEDED_PARSER_PROFILE_ID"
 ACTIVE_PARSER_PROFILE_RESOLVED_UTC = datetime.now(timezone.utc).strftime(
     "%Y-%m-%dT%H:%M:%SZ"
 )
+# The sealed holdout family and case-ID prefix name the candidate's own locked
+# set. They are profile-scoped so a candidate can never read, write, or lock
+# against another candidate's sealed namespace.
+SEALED_HOLDOUT_FAMILY = ACTIVE_PARSER_PROFILE["sealed_holdout_family"]
+CASE_ID_PREFIX = ACTIVE_PARSER_PROFILE["case_id_prefix"]
+HOLDOUT_ID_DOMAIN = ACTIVE_PARSER_PROFILE["holdout_id_domain"]
+ALL_CASE_ID_PREFIXES = tuple(
+    sorted(
+        {
+            profile["case_id_prefix"]
+            for profile in _PARSER_EVALUATION_PROFILES.values()
+        }
+    )
+)
 
 FROZEN_PROTOCOL_COMMIT = "cc93ffe603ab8338ed860586a52b1911af4b3277"
 FROZEN_PROTOCOL_BUNDLE_SHA256 = (
     "5d486a53b532012c3a64eb6bd962be325fb9892ebbb042807b919f9e41b23666"
+)
+# A state receipt carries two different gate bindings, and they answer two
+# different questions.
+#
+# PROTOCOL_ACCEPTANCE_GATES_SHA256 belongs to the protocol triple
+# (protocol_commit, protocol_bundle_sha256, acceptance_gates_sha256). It names
+# the frozen protocol bundle's own gate contract and is therefore NOT
+# profile-scoped, exactly like the two constants above it: a candidate does not
+# get to restate the protocol it is being measured under. The frozen validator
+# enforces this, so the same unmodified instrument validates the state chain of
+# every candidate.
+#
+# The candidate's own gate contract is bound separately and just as strongly,
+# through artifact_manifest_hashes["acceptance_gates"] in the state chain and
+# through the authorization manifest, the prediction seal, the scoring ledger
+# and the reported metrics -- all of which read FROZEN_ACCEPTANCE_GATE_SHA256
+# below and are therefore profile-scoped.
+PROTOCOL_ACCEPTANCE_GATES_SHA256 = (
+    "a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988"
 )
 FROZEN_ACCEPTANCE_GATE_SHA256 = ACTIVE_PARSER_PROFILE["acceptance_gate_sha256"]
 FROZEN_PARSER_SOURCE_SHA256 = ACTIVE_PARSER_PROFILE["parser_source_sha256"]
@@ -536,7 +573,7 @@ STATE_RETRY_RECEIPT_FILENAMES = {
     )
 }
 AUTHORIZATION_LOCK_BLOB_PREFIX = (
-    "phase1-evaluator-validation/parser-v2-v1/authorization-locks"
+    f"phase1-evaluator-validation/{SEALED_HOLDOUT_FAMILY}/authorization-locks"
 )
 IMPLEMENTATION_MANIFEST_FILENAME = "implementation_manifest.json"
 RUNTIME_CONFIG_FILENAME = "runtime_config.json"
@@ -661,12 +698,14 @@ _ACR_RUN_ID_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\Z", re.ASCII
 _ACR_TASK_RUN_NAME_PATTERN = re.compile(
     r"[a-z0-9](?:[a-z0-9-]{3,48}[a-z0-9])\Z", re.ASCII
 )
-_CASE_ID_PATTERN = re.compile(r"PV2-[0-9a-f]{20}\Z", re.ASCII)
+_CASE_ID_PATTERN = re.compile(
+    rf"{re.escape(CASE_ID_PREFIX)}-[0-9a-f]{{20}}\Z", re.ASCII
+)
 _AUTHORIZATION_ID_PATTERN = re.compile(
     r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\Z", re.ASCII
 )
 _REGISTERED_PARENT_PATTERN = re.compile(
-    r"phase1-evaluator-validation/parser-v2-v1/"
+    rf"phase1-evaluator-validation/{re.escape(SEALED_HOLDOUT_FAMILY)}/"
     r"(?P<timestamp>[0-9]{8}T[0-9]{6}Z)\Z",
     re.ASCII,
 )
@@ -768,6 +807,138 @@ _MAX_CANONICAL_CHARACTERS = 4096
 
 class LockedEvaluationError(ValueError):
     """Raised when a locked-evaluation artifact fails closed."""
+
+
+# The frozen validator is the immutable parser-v2 evaluator-validation
+# instrument. Its namespace constants are baked into its pinned bytes, so a
+# candidate that owns a different sealed family cannot be validated by it
+# directly. The instrument is never edited. Instead, records are rewritten onto
+# its namespace on the way in and back onto this profile's namespace on the way
+# out. Only the namespace label moves; every schema, invariant and cross-record
+# check the instrument performs is applied to the same values it would have
+# seen for the parser-v2 family.
+#
+# Under the default parser-v2 profile both constants already equal the frozen
+# ones, so _to_frozen_namespace and _from_frozen_namespace return the caller's
+# own object unchanged and parser-v2 behaviour is identical by construction.
+_FROZEN_CASE_ID_PREFIX = "PV2"
+_FROZEN_SEALED_HOLDOUT_FAMILY = "parser-v2-v1"
+_NAMESPACE_TRANSLATION_REQUIRED = (
+    CASE_ID_PREFIX != _FROZEN_CASE_ID_PREFIX
+    or SEALED_HOLDOUT_FAMILY != _FROZEN_SEALED_HOLDOUT_FAMILY
+)
+_ACTIVE_CASE_ID_TOKEN = re.compile(
+    rf"{re.escape(CASE_ID_PREFIX)}-[0-9a-f]{{20}}\Z", re.ASCII
+)
+_FROZEN_CASE_ID_TOKEN = re.compile(
+    rf"{re.escape(_FROZEN_CASE_ID_PREFIX)}-[0-9a-f]{{20}}\Z", re.ASCII
+)
+_ACTIVE_FAMILY_ROOT = f"phase1-evaluator-validation/{SEALED_HOLDOUT_FAMILY}"
+_FROZEN_FAMILY_ROOT = (
+    f"phase1-evaluator-validation/{_FROZEN_SEALED_HOLDOUT_FAMILY}"
+)
+
+
+def _rewrite_namespace_string(
+    value: str,
+    *,
+    case_pattern: "re.Pattern[str]",
+    case_prefix: str,
+    family_from: str,
+    family_to: str,
+) -> str:
+    if case_pattern.fullmatch(value):
+        return f"{case_prefix}-{value.split('-', 1)[1]}"
+    if value == family_from:
+        return family_to
+    if value.startswith(family_from + "/"):
+        return family_to + value[len(family_from):]
+    return value
+
+
+def _rewrite_namespace(value: Any, **kwargs: Any) -> Any:
+    if isinstance(value, str):
+        return _rewrite_namespace_string(value, **kwargs)
+    if isinstance(value, Mapping):
+        return {
+            _rewrite_namespace(key, **kwargs): _rewrite_namespace(item, **kwargs)
+            for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        rebuilt = [_rewrite_namespace(item, **kwargs) for item in value]
+        return tuple(rebuilt) if isinstance(value, tuple) else rebuilt
+    return value
+
+
+def _to_frozen_namespace(value: Any) -> Any:
+    """Rewrite this profile's namespace onto the frozen instrument's."""
+    if not _NAMESPACE_TRANSLATION_REQUIRED:
+        return value
+    return _rewrite_namespace(
+        value,
+        case_pattern=_ACTIVE_CASE_ID_TOKEN,
+        case_prefix=_FROZEN_CASE_ID_PREFIX,
+        family_from=_ACTIVE_FAMILY_ROOT,
+        family_to=_FROZEN_FAMILY_ROOT,
+    )
+
+
+def _from_frozen_namespace(value: Any) -> Any:
+    """Rewrite the frozen instrument's namespace back onto this profile's."""
+    if not _NAMESPACE_TRANSLATION_REQUIRED:
+        return value
+    return _rewrite_namespace(
+        value,
+        case_pattern=_FROZEN_CASE_ID_TOKEN,
+        case_prefix=CASE_ID_PREFIX,
+        family_from=_FROZEN_FAMILY_ROOT,
+        family_to=_ACTIVE_FAMILY_ROOT,
+    )
+
+
+def _to_frozen_receipts(receipts: Sequence[Mapping[str, Any]]) -> list[Any]:
+    """Translate a receipt set and re-link it inside the frozen namespace.
+
+    ``previous_receipt_sha256`` is a hash of the predecessor's exact bytes, so
+    rewriting the namespace necessarily changes it. Each link is recomputed over
+    the translated predecessor, in dependency order, so the frozen instrument
+    checks exactly the chain topology it would see for its own family.
+
+    Nothing here is persisted. The receipts written to storage keep this
+    profile's true namespace and their own hashes, so an independent auditor who
+    recomputes ``sha256(canonical_json(receipt))`` over the stored bytes still
+    reproduces every stored link.
+    """
+    originals = list(receipts)
+    if not _NAMESPACE_TRANSLATION_REQUIRED:
+        return originals
+    frozen = _load_frozen_validation()
+    index_by_true_hash: dict[str, int] = {}
+    for position, item in enumerate(originals):
+        index_by_true_hash.setdefault(state_receipt_sha256(item), position)
+    translated: list[Any] = [None] * len(originals)
+    frozen_hashes: dict[int, str] = {}
+
+    def resolve(position: int, pending: frozenset[int]) -> str:
+        if translated[position] is not None:
+            return frozen_hashes[position]
+        if position in pending:
+            raise LockedEvaluationError("state receipt chain is cyclic")
+        item = dict(_to_frozen_namespace(originals[position]))
+        link = originals[position].get("previous_receipt_sha256")
+        if link is not None:
+            predecessor = index_by_true_hash.get(link)
+            if predecessor is not None:
+                item["previous_receipt_sha256"] = resolve(
+                    predecessor, pending | {position}
+                )
+        translated[position] = item
+        frozen_hashes[position] = frozen.state_receipt_sha256(item)
+        return frozen_hashes[position]
+
+    for position in range(len(originals)):
+        resolve(position, frozenset())
+    return translated
 
 
 def _normalized_source_bytes(path: Path) -> bytes:
@@ -1058,7 +1229,9 @@ def _require_image_digest(value: Any, name: str) -> str:
 def _require_case_id(value: Any, name: str = "case_id") -> str:
     checked = _require_string(value, name)
     if not _CASE_ID_PATTERN.fullmatch(checked):
-        raise LockedEvaluationError(f"{name} must match PV2-<20 lowercase hex>")
+        raise LockedEvaluationError(
+            f"{name} must match {CASE_ID_PREFIX}-<20 lowercase hex>"
+        )
     return checked
 
 
@@ -4159,7 +4332,11 @@ def validate_locked_input(
     record: Mapping[str, Any], *, name: str = "locked input"
 ) -> dict[str, Any]:
     try:
-        return _load_frozen_validation().validate_locked_input(record, name=name)
+        return _from_frozen_namespace(
+            _load_frozen_validation().validate_locked_input(
+                _to_frozen_namespace(record), name=name
+            )
+        )
     except Exception:
         raise LockedEvaluationError("locked input schema/invariants are invalid") from None
 
@@ -4518,8 +4695,10 @@ def validate_parser_result(
 ) -> dict[str, Any]:
     required_version = _resolve_expected_parser_version(expected_parser_version)
     try:
-        checked = _load_frozen_validation().validate_parser_result(
-            record, output_text, name=name
+        checked = _from_frozen_namespace(
+            _load_frozen_validation().validate_parser_result(
+                _to_frozen_namespace(record), output_text, name=name
+            )
         )
     except Exception:
         raise LockedEvaluationError("parser result schema/invariants are invalid") from None
@@ -4531,7 +4710,9 @@ def validate_parser_result(
 def derive_typed_decision(record: Mapping[str, Any], *, expected: bool = False) -> str:
     del expected
     try:
-        return _load_frozen_validation().derive_typed_decision(record)
+        return _load_frozen_validation().derive_typed_decision(
+            _to_frozen_namespace(record)
+        )
     except Exception:
         raise LockedEvaluationError("extraction does not derive a typed decision") from None
 
@@ -4617,7 +4798,11 @@ _LEGACY_RESULT_FIELDS = {
 
 def adapt_legacy_result(record: Mapping[str, Any]) -> dict[str, Any]:
     try:
-        return _load_frozen_validation().adapt_legacy_result(record)
+        return _from_frozen_namespace(
+            _load_frozen_validation().adapt_legacy_result(
+                _to_frozen_namespace(record)
+            )
+        )
     except Exception:
         raise LockedEvaluationError("legacy result schema/invariants are invalid") from None
 
@@ -5012,7 +5197,9 @@ def validate_locked_source_manifest(
     if canonical_json_bytes(manifest) != data:
         raise LockedEvaluationError("locked source manifest is not canonical")
     try:
-        _load_frozen_validation().validate_manifest(manifest)
+        _load_frozen_validation().validate_manifest(
+            _to_frozen_namespace(manifest)
+        )
     except Exception:
         raise LockedEvaluationError("locked source manifest schema is invalid") from None
     assert_label_blind_payload(
@@ -5145,7 +5332,9 @@ def validate_locked_input_source_binding(
         raise LockedEvaluationError("locked overall manifest hash mismatch")
     overall = parse_json_strict(locked_manifest_bytes, "locked overall manifest")
     try:
-        _load_frozen_validation().validate_manifest(overall)
+        _load_frozen_validation().validate_manifest(
+            _to_frozen_namespace(overall)
+        )
     except Exception:
         raise LockedEvaluationError("locked overall manifest is invalid") from None
     if (
@@ -5198,8 +5387,12 @@ def validate_locked_input_source_binding(
         reservation_bytes, "locked input preregistered reservation"
     )
     try:
-        checked_reservation = _load_frozen_validation().validate_reservation(
-            reservation, leaf="locked-inputs", parent_prefix=parent
+        checked_reservation = _from_frozen_namespace(
+            _load_frozen_validation().validate_reservation(
+                _to_frozen_namespace(reservation),
+                leaf="locked-inputs",
+                parent_prefix=_to_frozen_namespace(parent),
+            )
         )
     except Exception:
         raise LockedEvaluationError(
@@ -6524,7 +6717,11 @@ def validate_final_label(
     record: Mapping[str, Any], gates: Mapping[str, Any], *, name: str
 ) -> dict[str, Any]:
     try:
-        checked = _load_frozen_validation().validate_final_label(record, name=name)
+        checked = _from_frozen_namespace(
+            _load_frozen_validation().validate_final_label(
+                _to_frozen_namespace(record), name=name
+            )
+        )
     except Exception:
         raise LockedEvaluationError("final label schema/invariants are invalid") from None
     dataset = gates["dataset_contract"]
@@ -6582,7 +6779,9 @@ def _labels_index(
     ):
         raise LockedEvaluationError("locked labels violate typed-decision support")
     try:
-        _load_frozen_validation()._validate_locked_label_support(labels)
+        _load_frozen_validation()._validate_locked_label_support(
+            _to_frozen_namespace(labels)
+        )
     except Exception:
         raise LockedEvaluationError(
             "locked labels violate frozen cross-record support invariants"
@@ -9786,8 +9985,7 @@ def render_public_report(
         "label_record_base64",
         "scoring_ledger",
         "case_id",
-        "PV2-",
-    )
+    ) + tuple(f"{prefix}-" for prefix in ALL_CASE_ID_PREFIXES)
     if any(token.encode("utf-8") in rendered for token in prohibited):
         raise AssertionError("public report leaked a private-detail field")
     return rendered
@@ -11288,8 +11486,10 @@ def validate_state_receipt(
     receipt: Mapping[str, Any], *, name: str = "state receipt"
 ) -> dict[str, Any]:
     try:
-        checked = _load_frozen_validation().validate_state_receipt(
-            receipt, name=name
+        checked = _from_frozen_namespace(
+            _load_frozen_validation().validate_state_receipt(
+                _to_frozen_namespace(receipt), name=name
+            )
         )
     except Exception:
         raise LockedEvaluationError("state receipt schema/invariants are invalid") from None
@@ -11313,7 +11513,11 @@ def validate_implementation_manifest(data: bytes) -> dict[str, str]:
 
 def validate_authorization_lock(record: Mapping[str, Any]) -> dict[str, Any]:
     try:
-        return _load_frozen_validation().validate_authorization_lock(record)
+        return _from_frozen_namespace(
+            _load_frozen_validation().validate_authorization_lock(
+                _to_frozen_namespace(record)
+            )
+        )
     except Exception:
         raise LockedEvaluationError("authorization lock is invalid") from None
 
@@ -11329,12 +11533,36 @@ def authorization_lock_blob_name(record: Mapping[str, Any]) -> str:
 
 
 def derive_holdout_id(parent_prefix: str, locked_manifest_sha256: str) -> str:
+    # The holdout identity is a domain-separated binding, not a measurement.
+    # Under the default profile it is delegated to the frozen instrument so the
+    # parser-v2 identity stays byte-identical. A non-default profile must bind
+    # its own true parent prefix and its own domain: translating the prefix onto
+    # the parser-v2 namespace here would encode a false family into a permanent
+    # provenance record. The construction below is the frozen algorithm with
+    # only those two profile-scoped values substituted.
+    if not _NAMESPACE_TRANSLATION_REQUIRED:
+        try:
+            return _load_frozen_validation().derive_holdout_id(
+                parent_prefix, locked_manifest_sha256
+            )
+        except Exception:
+            raise LockedEvaluationError("holdout identity binding is invalid") from None
     try:
-        return _load_frozen_validation().derive_holdout_id(
-            parent_prefix, locked_manifest_sha256
+        parent = validate_registered_parent_prefix(parent_prefix)
+        locked_hash = _require_sha256(
+            locked_manifest_sha256, "locked_manifest_sha256"
         )
     except Exception:
         raise LockedEvaluationError("holdout identity binding is invalid") from None
+    return sha256_bytes(
+        canonical_json_bytes(
+            {
+                "domain": HOLDOUT_ID_DOMAIN,
+                "locked_manifest_sha256": locked_hash,
+                "registered_parent_prefix": parent,
+            }
+        )
+    )
 
 
 _AUTHORIZATION_MANIFEST_FIELDS = frozenset(
@@ -11676,7 +11904,7 @@ def build_next_state_receipt(
         "registered_parent_prefix": previous["registered_parent_prefix"],
         "protocol_commit": FROZEN_PROTOCOL_COMMIT,
         "protocol_bundle_sha256": FROZEN_PROTOCOL_BUNDLE_SHA256,
-        "acceptance_gates_sha256": FROZEN_ACCEPTANCE_GATE_SHA256,
+        "acceptance_gates_sha256": PROTOCOL_ACCEPTANCE_GATES_SHA256,
         **implementation_binding,
         "artifact_manifest_hashes": manifests,
         "retry_kind": "none",
@@ -11911,11 +12139,12 @@ def validate_state_transition(
         )
         return
     try:
+        translated = _to_frozen_receipts([*history, previous, current])
         _load_frozen_validation().validate_state_transition(
-            previous,
-            current,
-            history=history,
-            authorization_lock=authorization_lock,
+            translated[-2],
+            translated[-1],
+            history=translated[:-2],
+            authorization_lock=_to_frozen_namespace(authorization_lock),
             implementation_manifest_bytes=implementation_manifest_bytes,
         )
     except Exception:
@@ -11966,12 +12195,19 @@ def validate_state_receipt_chain(
     )
     try:
         result = _load_frozen_validation().validate_state_receipt_chain(
-            frozen_prefix,
-            authorization_lock=authorization_lock,
+            _to_frozen_receipts(frozen_prefix),
+            authorization_lock=_to_frozen_namespace(authorization_lock),
             implementation_manifest_bytes=implementation_manifest_bytes,
         )
     except Exception:
         raise LockedEvaluationError("state receipt chain is invalid") from None
+    if _NAMESPACE_TRANSLATION_REQUIRED and frozen_prefix:
+        # chain_sha256 must name the receipt as it is persisted, not the
+        # transient frozen-namespace form used for validation.
+        result = {
+            **result,
+            "chain_sha256": state_receipt_sha256(frozen_prefix[-1]),
+        }
     if invalid_terminal is not None:
         if result["state"] != "LABELS_READ":
             raise LockedEvaluationError(
@@ -11992,6 +12228,23 @@ def validate_state_receipt_chain(
     if require_closed and result["state"] != "CLOSED":
         raise LockedEvaluationError("state receipt chain is not CLOSED")
     return result
+
+
+def _terminal_receipt(
+    receipts: Sequence[Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    """Return the receipt no other receipt in the set points back to."""
+    linked = {
+        item["previous_receipt_sha256"]
+        for item in receipts
+        if item.get("previous_receipt_sha256") is not None
+    }
+    terminals = [
+        item for item in receipts if state_receipt_sha256(item) not in linked
+    ]
+    if len(terminals) != 1:
+        raise LockedEvaluationError("state receipt graph has no unique terminal")
+    return terminals[0]
 
 
 def validate_state_receipt_graph(
@@ -12080,14 +12333,21 @@ def validate_state_receipt_graph(
         )
     try:
         result = _load_frozen_validation().validate_state_receipt_graph(
-            frozen_receipts,
-            authorization_lock=authorization_lock,
+            _to_frozen_receipts(frozen_receipts),
+            authorization_lock=_to_frozen_namespace(authorization_lock),
             implementation_manifest_bytes=implementation_manifest_bytes,
         )
     except Exception:
         raise LockedEvaluationError(
             "state receipt graph is missing, disconnected, reused, or forked"
         ) from None
+    if _NAMESPACE_TRANSLATION_REQUIRED and frozen_receipts:
+        result = {
+            **result,
+            "chain_sha256": state_receipt_sha256(
+                _terminal_receipt(frozen_receipts)
+            ),
+        }
     if invalid_terminal is not None:
         if result["state"] != "LABELS_READ":
             raise LockedEvaluationError(
@@ -13207,7 +13467,11 @@ def expected_registered_parent_membership(
     parent = validate_registered_parent_prefix(parent_prefix)
     try:
         frozen_members = set(
-            _load_frozen_validation().expected_parent_membership(parent)
+            _from_frozen_namespace(
+                _load_frozen_validation().expected_parent_membership(
+                    _to_frozen_namespace(parent)
+                )
+            )
         )
     except Exception:
         raise LockedEvaluationError(
@@ -13759,8 +14023,8 @@ def authenticate_authorization_bundle(
     if final_state == "UNSEAL_AUTHORIZED":
         try:
             _load_frozen_validation().assert_holdout_available(
-                chain,
-                authorization_lock=lock_record,
+                _to_frozen_receipts(chain),
+                authorization_lock=_to_frozen_namespace(lock_record),
                 implementation_manifest_bytes=implementation_bytes,
             )
         except Exception:

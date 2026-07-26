@@ -26,15 +26,27 @@ CORE_RELATIVE_PATH = (
 FROZEN_VALIDATION_RELATIVE_PATH = (
     "src/jspace_observation/evaluator_validation.py"
 )
+DEFAULT_EVALUATION_PROFILE = "parser-v2-v1"
+SUPPORTED_EVALUATION_PROFILES = ("parser-v2-v1", "parser-v3-v1")
 
 
 def _load_module_from_git_bytes(
-    name: str, source: bytes, *, git_blob_oid: str, relative_path: str
+    name: str,
+    source: bytes,
+    *,
+    git_blob_oid: str,
+    relative_path: str,
+    profile_id: str | None = None,
 ) -> ModuleType:
     source_name = f"<git-blob:{git_blob_oid}:{relative_path}>"
     module = ModuleType(name)
     module.__file__ = source_name
     module.__package__ = ""
+    if profile_id is not None:
+        # The profile has to exist in the module namespace before the first
+        # statement executes: the core resolves and locks it at import time and
+        # refuses to be re-pointed afterwards.
+        module.__dict__["_PRESEEDED_PARSER_PROFILE_ID"] = profile_id
     sys.modules[name] = module
     try:
         exec(compile(source, source_name, "exec"), module.__dict__)
@@ -94,17 +106,22 @@ def _git_blob_bytes(commit: str, relative_path: str) -> tuple[str, bytes]:
     return oid, completed.stdout
 
 
-def _load_core(commit: str) -> ModuleType:
+def _load_core(commit: str, profile_id: str = DEFAULT_EVALUATION_PROFILE) -> ModuleType:
     core_oid, core_source = _git_blob_bytes(commit, CORE_RELATIVE_PATH)
     validation_oid, validation_source = _git_blob_bytes(
         commit, FROZEN_VALIDATION_RELATIVE_PATH
     )
     core_module = _load_module_from_git_bytes(
-        f"_jspace_parser_v2_runtime_core_{core_oid}",
+        f"_jspace_parser_v2_runtime_core_{core_oid}_{profile_id}",
         core_source,
         git_blob_oid=core_oid,
         relative_path=CORE_RELATIVE_PATH,
+        profile_id=profile_id,
     )
+    if core_module.ACTIVE_PARSER_PROFILE_ID != profile_id:
+        raise RuntimeError("locked-evaluation core ignored the requested profile")
+    if "_PRESEEDED_PARSER_PROFILE_ID" in core_module.__dict__:
+        raise RuntimeError("locked-evaluation core leaked its profile seed")
     normalized_validation = (
         validation_source.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
     )
@@ -315,6 +332,15 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--implementation-manifest-output", type=Path, required=True
     )
+    parser.add_argument(
+        "--evaluation-profile",
+        default=DEFAULT_EVALUATION_PROFILE,
+        choices=SUPPORTED_EVALUATION_PROFILES,
+        help=(
+            "Parser evaluation profile fixed in the core at import time, "
+            "before any input is read."
+        ),
+    )
     return parser
 
 
@@ -455,7 +481,7 @@ def main(argv: list[str] | None = None) -> int:
         raise RuntimeError(
             "executing runtime generator differs from its committed Git blob"
         )
-    core = _load_core(args.source_commit)
+    core = _load_core(args.source_commit, args.evaluation_profile)
     image_binding_bytes = _stable_read(args.image_binding)
     image_binding = core.validate_image_binding(
         image_binding_bytes,

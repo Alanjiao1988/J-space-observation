@@ -414,6 +414,44 @@ happens to define `compare_parsed_answer_to_reference`. The filename, its
 bytecode stem, the code-name list, and the source-defines probe are all
 extended, and a regression test asserts the parser-free property directly.
 
+### 9.1 The evaluator-validation instrument is not parameterised
+
+`evaluator_validation.py` is the immutable evaluator-validation instrument. It
+is hash-pinned, it fails hard on any digest mismatch, and it is never edited. It
+also hardcodes the parser-v2 sealed-family namespace — the `PV2` case-ID family
+and the `parser-v2-v1` parent-prefix family — inside its own bytes.
+
+Forking it for parser v3 would give the two evaluations two different measuring
+devices, and any v2-versus-v3 difference could then be an artifact of that
+difference. Instead the editable core rewrites records onto the instrument's
+namespace on the way in and back on the way out. The mapping moves only the
+family label; the 20-hex case suffix, and therefore case identity, is preserved
+exactly. Under the parser-v2 profile the rewrite short-circuits to the identity
+function before doing any work, so v2 behaviour is unchanged by construction.
+Nothing translated is ever persisted: every stored artifact carries the true
+parser-v3 namespace.
+
+Receipt links need one extra step. `previous_receipt_sha256` hashes the
+predecessor's exact bytes, so translation necessarily changes it; inside a
+validation call the links are recomputed over translated predecessors in
+dependency order, and `chain_sha256` is reported in the persisted namespace. An
+independent auditor recomputing `sha256(canonical_json(receipt))` over the
+stored bytes therefore reproduces every stored link.
+
+### 9.2 Protocol binding versus candidate binding
+
+A state receipt's `acceptance_gates_sha256` belongs to the protocol triple
+alongside `protocol_commit` and `protocol_bundle_sha256`, and is **not**
+profile-scoped, for the same reason those two are not: parser v3 binds the
+parser-v2 protocol bundle inside its own `parser_version`, and a candidate does
+not restate the protocol it is measured under. The parser-v3 gate contract is
+bound in the receipt's `artifact_manifest_hashes.acceptance_gates`, and again in
+the authorization manifest, the prediction request manifest, the prediction
+seal, the scoring ledger, and the reported metrics. No threshold, metric
+definition, population, or gate depends on the protocol-triple value. The full
+statement, including the reporting obligation, is in
+`docs/phase1_parser_v3_orchestrator_schema_compatibility.md` §9.
+
 ## 10. Prohibited in this round
 
 Developing parser v4; rebuilding the locked set; re-reviewing the 120 labels;
@@ -516,3 +554,50 @@ Impact on formal evaluation:
 The defects are recorded here and in the paper's limitations and methods
 ledgers rather than hidden, because they are reproducibility and
 safety-boundary evidence.
+### 14.1 Full defect register
+
+Every defect below was found by pre-launch review, is fixed, and is covered by a
+regression test. All of them were found **before** preregistration, prediction
+generation, holdout access, and label access, so the impact on the formal
+evaluation is `none` in every case.
+
+| # | Defect | Class | Would have surfaced |
+| --- | --- | --- | --- |
+| D1 | Stage E's parser-import prohibition omitted parser v3 from `FORBIDDEN_FILENAMES`, the `.pyc` stem set, `_FORBIDDEN_CODE_NAMES`, and the source probe | Safety boundary | Never — it would have silently failed open |
+| D2 | `scripts/parser_v3_azure_contract.py` loaded the core without seeding the profile | Profile binding | Contract generation, before launch |
+| D3 | `scripts/create_parser_v2_runtime_config.py` loaded the core without seeding the profile, and hardcoded the `PV2-` / `parser-v2-v1` namespace | Profile binding | Runtime-config generation, before launch |
+| D4 | `scripts/bootstrap_parser_v2_locked_evaluation.py` loaded the core without seeding the profile and hardcoded the parser source path | Profile binding | State-chain bootstrap, before launch |
+| D5 | The hash-pinned evaluator-validation instrument rejected every parser-v3 case ID and parent prefix | Namespace | First validated record, before launch |
+| D6 | The same instrument pinned the parser-v2 gate hash into the state receipt's protocol triple, so no parser-v3 receipt could validate | Protocol binding | State-chain bootstrap, before launch |
+| D7 | Namespace translation changed receipt bytes, so `previous_receipt_sha256` links no longer matched under translation | Chain integrity | Chain validation, before launch |
+| D8 | No parser-v3 state chain existed; only the v2 chain had ever been bootstrapped | Missing artifact | Launch, before any claim |
+
+D1 is the most serious: it is the only one that would have failed **open** —
+Stage E would have run and produced a formal result while the property it claims
+to enforce was unenforced. Every other defect fails closed and loudly.
+
+### 14.2 The pattern, stated plainly
+
+D2, D3, and D4 are three instances of one defect family: a helper script loads
+the profile-aware core without seeding the profile, silently gets the parser-v2
+default, and then writes parser-v2 identity into a parser-v3 artifact. D3 and D4
+additionally hardcoded v2 namespace literals.
+
+That the same defect recurred three times across three independently written
+scripts is itself a finding, and is reported as one. It indicates that
+import-time profile seeding was, until this round, a convention enforced by
+attention rather than by construction. The mitigation now applied is that every
+core load asserts twice — that the resolved profile ID is the requested one, and
+that a v3 load did not silently return v2 constants — so a future omission
+fails at load rather than at write. That is a mitigation, not a proof: the
+seeding call itself is still hand-written in each script, and a fifth script
+written without it would still default to v2. It is disclosed on that basis.
+
+### 14.3 Provenance note, not a defect
+
+The launcher derives its Azure Container Apps job name with a hardcoded `pv2-`
+prefix on both profiles, so a parser-v3 Stage P job carries a name that does not
+distinguish it from the retired parser-v2 round. No identity, hash, or gate
+depends on the job name; the launch-domain digest binds the parser-v3 image
+digest and config. It is recorded because a reader inspecting Azure resource
+names alone could otherwise misattribute the execution.

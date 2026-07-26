@@ -28,21 +28,40 @@ CORE_PATH = Path(
         / "parser_v2_locked_evaluation.py",
     )
 ).resolve()
-PARSER_SOURCE_PATH = "src/jspace_observation/eval_parsing_v2.py"
+DEFAULT_EVALUATION_PROFILE = "parser-v2-v1"
+SUPPORTED_EVALUATION_PROFILES = ("parser-v2-v1", "parser-v3-v1")
 BOOTSTRAP_VISIBILITY = [
     "custodian-only-bootstrap",
     "manifest-only:no-locked-payload-or-label-read",
 ]
 
 
-def _load_core() -> ModuleType:
-    name = "_jspace_parser_v2_locked_eval_bootstrap"
+def _load_core(
+    profile_id: str = DEFAULT_EVALUATION_PROFILE,
+) -> ModuleType:
+    name = f"_jspace_parser_v2_locked_eval_bootstrap_{profile_id}"
+    existing = sys.modules.get(name)
+    if existing is not None:
+        return existing
     spec = importlib.util.spec_from_file_location(name, CORE_PATH)
     if spec is None or spec.loader is None:
         raise RuntimeError("cannot direct-load locked-evaluation core")
     module = importlib.util.module_from_spec(spec)
+    # The core resolves and locks its profile at import time, so the seed has to
+    # be present before the first statement runs.
+    module.__dict__["_PRESEEDED_PARSER_PROFILE_ID"] = profile_id
     sys.modules[name] = module
-    spec.loader.exec_module(module)
+    try:
+        spec.loader.exec_module(module)
+    except Exception:
+        sys.modules.pop(name, None)
+        raise
+    if module.ACTIVE_PARSER_PROFILE_ID != profile_id:
+        sys.modules.pop(name, None)
+        raise RuntimeError("locked-evaluation core ignored the requested profile")
+    if "_PRESEEDED_PARSER_PROFILE_ID" in module.__dict__:
+        sys.modules.pop(name, None)
+        raise RuntimeError("locked-evaluation core leaked its profile seed")
     return module
 
 
@@ -67,6 +86,7 @@ def _git_source_bindings(
     implementation_commit: str,
     *,
     project_root: Path = PROJECT_ROOT,
+    profile_id: str = DEFAULT_EVALUATION_PROFILE,
 ) -> dict[str, dict[str, str]]:
     commit = implementation_commit
     checked = subprocess.run(
@@ -77,9 +97,10 @@ def _git_source_bindings(
     )
     if checked.returncode != 0:
         raise RuntimeError("implementation commit is not present in the repository")
-    core = _load_core()
+    core = _load_core(profile_id)
+    parser_source_path = core.ACTIVE_PARSER_PROFILE["parser_source_path"]
     parser_oid = subprocess.run(
-        ["git", "--no-replace-objects", "rev-parse", f"{commit}:{PARSER_SOURCE_PATH}"],
+        ["git", "--no-replace-objects", "rev-parse", f"{commit}:{parser_source_path}"],
         cwd=project_root,
         capture_output=True,
         check=False,
@@ -408,7 +429,7 @@ def _receipt(
         "registered_parent_prefix": parent_prefix,
         "protocol_commit": core.FROZEN_PROTOCOL_COMMIT,
         "protocol_bundle_sha256": core.FROZEN_PROTOCOL_BUNDLE_SHA256,
-        "acceptance_gates_sha256": core.FROZEN_ACCEPTANCE_GATE_SHA256,
+        "acceptance_gates_sha256": core.PROTOCOL_ACCEPTANCE_GATES_SHA256,
         "implementation_commit": implementation_commit,
         "image_digest": image_digest,
         "config_sha256": config_sha256,
@@ -435,7 +456,9 @@ def run_bootstrap(
     implementation_manifest_bytes: bytes | None = None,
     image_binding_bytes: bytes | None = None,
 ) -> dict[str, Any]:
-    active_core = core or _load_core()
+    active_core = core or _load_core(
+        getattr(args, "evaluation_profile", DEFAULT_EVALUATION_PROFILE)
+    )
     if type(custodian_authorized) is not bool or not custodian_authorized:
         raise active_core.LockedEvaluationError(
             "bootstrap is restricted to the custodian execution role"
@@ -982,6 +1005,15 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--prior-state-receipt-sha256")
     parser.add_argument("--authorization-lock-sha256")
     parser.add_argument("--authorization-manifest-sha256")
+    parser.add_argument(
+        "--evaluation-profile",
+        default=DEFAULT_EVALUATION_PROFILE,
+        choices=SUPPORTED_EVALUATION_PROFILES,
+        help=(
+            "Parser evaluation profile fixed in the core at import time, "
+            "before any input is read."
+        ),
+    )
     return parser
 
 
@@ -2645,7 +2677,7 @@ def _authenticate_persisted(
 def main() -> int:
     cli = _parser().parse_args()
     try:
-        core = _load_core()
+        core = _load_core(cli.evaluation_profile)
         runtime_bytes = cli.runtime_config_file.read_bytes()
         implementation_bytes = cli.implementation_manifest_file.read_bytes()
         image_binding_bytes = cli.image_binding_file.read_bytes()
@@ -2686,6 +2718,7 @@ def main() -> int:
             helper_snapshot_set_sha256=cli.helper_snapshot_set_sha256,
             execution_id=cli.execution_id,
             actor=cli.actor,
+            evaluation_profile=cli.evaluation_profile,
         )
         if os.environ.get("JSPACE_LOCKED_EVAL_ROLE") != "custodian":
             raise core.LockedEvaluationError(

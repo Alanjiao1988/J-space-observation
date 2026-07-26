@@ -7564,7 +7564,24 @@ def test_build_and_launcher_static_hardening_contract():
     assert "_stable_read(Path(__file__).resolve()) != committed_self" in (
         runtime_generator
     )
-    assert "core = _load_core(args.source_commit)" in runtime_generator
+    assert (
+        "core = _load_core(args.source_commit, args.evaluation_profile)"
+        in runtime_generator
+    )
+    # The unseeded-core defect family: the profile has to be fixed before
+    # the core executes, and both directions must be asserted.
+    assert (
+        'module.__dict__["_PRESEEDED_PARSER_PROFILE_ID"] = profile_id'
+        in runtime_generator
+    )
+    assert (
+        "if core_module.ACTIVE_PARSER_PROFILE_ID != profile_id:"
+        in runtime_generator
+    )
+    assert (
+        'if "_PRESEEDED_PARSER_PROFILE_ID" in core_module.__dict__:'
+        in runtime_generator
+    )
     assert "compile(source, source_name, \"exec\")" in runtime_generator
     assert "spec_from_file_location" not in runtime_generator
     assert (
@@ -10038,6 +10055,9 @@ def test_runtime_generator_loads_only_committed_core_and_validator_bytes(
     validator_sha256 = hashlib.sha256(validator_source).hexdigest()
     core_source = (
         f'_FROZEN_EVALUATOR_VALIDATION_SHA256 = "{validator_sha256}"\n'
+        'ACTIVE_PARSER_PROFILE_ID = globals().pop(\n'
+        '    "_PRESEEDED_PARSER_PROFILE_ID", "parser-v2-v1"\n'
+        ")\n"
         'CONSTRUCTION_STATE_SEQUENCE = ("A",)\n'
         'EVALUATION_STATE_SEQUENCE = ("B",)\n'
         'STATE_AUTHORIZED_ARTIFACT_BINDINGS = {"A": frozenset({"x"})}\n'

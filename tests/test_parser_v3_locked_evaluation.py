@@ -401,20 +401,61 @@ def v3_bundle():
     """Three synthetic streams over the frozen validation dataset.
 
     Nothing here touches a sealed holdout, a locked input or a locked label.
+
+    The frozen dataset is the parser-v2 fixture, so its case IDs carry the
+    ``PV2`` family prefix. The parser-v3 profile owns the ``PV3`` family and
+    rejects foreign IDs, so the identifiers are remapped onto the v3 family
+    before anything consumes them. Only the family prefix changes; the
+    20-hex case suffix, and therefore case identity within the fixture, is
+    preserved exactly.
     """
     from copy import deepcopy
 
     from tests import test_evaluator_validation as frozen_tests
 
     core = _v3_core()
+
+    def _to_v3_family(value):
+        if isinstance(value, str):
+            if value.startswith("PV2-"):
+                return "PV3-" + value[4:]
+            return value
+        if isinstance(value, list):
+            return [_to_v3_family(item) for item in value]
+        if isinstance(value, tuple):
+            return tuple(_to_v3_family(item) for item in value)
+        if isinstance(value, dict):
+            return {key: _to_v3_family(item) for key, item in value.items()}
+        return value
+
     dataset = frozen_tests._dataset()
     labels = deepcopy(dataset["materialized"]["locked_draft_labels"])
     locked_inputs = deepcopy(dataset["materialized"]["locked_inputs"])
+
+    # The frozen builder is the parser-v2 instrument and only accepts PV2 IDs,
+    # so it is fed the fixture unchanged. Everything handed to the parser-v3
+    # core is remapped onto the v3 family instead.
+    candidate = frozen_tests._prediction_envelopes(labels, locked_inputs)
+    legacy_source = frozen_tests._legacy_predictions(labels)
+
+    labels = _to_v3_family(labels)
+    locked_inputs = _to_v3_family(locked_inputs)
+    candidate = _to_v3_family(candidate)
     locked_by_id = {item["case_id"]: item for item in locked_inputs}
 
-    candidate = frozen_tests._prediction_envelopes(labels, locked_inputs)
+    # Remapping the family changes the locked-input bytes, so the envelope's
+    # input_record_sha256 and parser_request_sha256 have to be rebuilt over the
+    # remapped record. The parser_result payload is carried across untouched
+    # apart from the candidate's parser version, which the builder validates.
     for row in candidate:
         row["parser_result"]["parser_version"] = core.FROZEN_PARSER_VERSION
+
+    candidate = [
+        core.build_prediction_envelope(
+            locked_by_id[row["case_id"]], row["parser_result"]
+        )
+        for row in candidate
+    ]
 
     v2_version = core.FROZEN_COMPARATOR_PARSER_IDENTITIES["parser_v2"][
         "parser_version"
@@ -424,11 +465,11 @@ def v3_bundle():
         row["parser_result"]["parser_version"] = v2_version
 
     legacy_rows = []
-    for row in frozen_tests._legacy_predictions(labels):
+    for row in legacy_source:
         parsed = row["parsed_answer"]
         legacy_rows.append(
             core.build_legacy_prediction(
-                locked_by_id[row["case_id"]],
+                locked_by_id["PV3-" + row["case_id"][4:]],
                 {
                     "parsed_answer": parsed,
                     "parse_valid": row["parse_valid"],
@@ -870,3 +911,282 @@ class TestAzureContractHelpersBindTheirOwnProfile:
         assert core3.EVAL_BUILD_SCRIPT_PATH != core2.EVAL_BUILD_SCRIPT_PATH
         assert core3.EVAL_AZURE_CONTRACT_PATH != core2.EVAL_AZURE_CONTRACT_PATH
         assert core3.EVAL_RUNTIME_LAUNCHER_PATH != core2.EVAL_RUNTIME_LAUNCHER_PATH
+
+
+# ---------------------------------------------------------------------------
+# Namespace isolation between the sealed families, and the protocol/candidate
+# split in the state chain.
+# ---------------------------------------------------------------------------
+
+
+def _core(name: str, profile_id: str | None = None):
+    loader = _load_module(
+        f"_test_ns_loader_{name}", ROOT / "scripts" / "load_locked_evaluation_core.py"
+    )
+    if profile_id is None:
+        return loader.load_locked_evaluation_core(f"_test_ns_core_{name}")
+    return loader.load_locked_evaluation_core(
+        f"_test_ns_core_{name}", profile_id=profile_id
+    )
+
+
+V3_PARENT = "phase1-evaluator-validation/parser-v3-v1/20260725T160340Z"
+V2_PARENT = "phase1-evaluator-validation/parser-v2-v1/20260715T000000Z"
+
+
+def _draft(core, parent):
+    return {
+        "schema_version": core.STATE_RECEIPT_SCHEMA_VERSION,
+        "authorization_id": "synthetic-authorization",
+        "state": "DRAFT_PROTOCOL",
+        "previous_state": None,
+        "previous_receipt_sha256": None,
+        "timestamp_utc": "2026-07-25T16:03:40Z",
+        "execution_id": "synthetic-execution",
+        "actor": "synthetic",
+        "visibility": [],
+        "registered_parent_prefix": parent,
+        "protocol_commit": core.FROZEN_PROTOCOL_COMMIT,
+        "protocol_bundle_sha256": core.FROZEN_PROTOCOL_BUNDLE_SHA256,
+        "acceptance_gates_sha256": core.PROTOCOL_ACCEPTANCE_GATES_SHA256,
+        "implementation_commit": None,
+        "image_digest": None,
+        "config_sha256": None,
+        "authorization_lock_sha256": None,
+        "artifact_manifest_hashes": {},
+        "retry_kind": "none",
+        "outcome": None,
+        "holdout_spent": False,
+        "holdout_retired": False,
+    }
+
+
+def _protocol_frozen(core, draft):
+    receipt = dict(draft)
+    receipt.update(
+        {
+            "state": "PROTOCOL_FROZEN",
+            "previous_state": "DRAFT_PROTOCOL",
+            "previous_receipt_sha256": core.state_receipt_sha256(draft),
+            "timestamp_utc": "2026-07-25T16:04:40Z",
+            "artifact_manifest_hashes": {
+                "protocol_manifest": "b" * 64,
+                "acceptance_gates": core.FROZEN_ACCEPTANCE_GATE_SHA256,
+            },
+        }
+    )
+    return receipt
+
+
+class TestSealedFamilyNamespaceIsolation:
+    """A candidate may only ever touch its own sealed family."""
+
+    def test_v2_translation_is_a_no_op_by_construction(self):
+        v2 = _core("v2_identity")
+        assert v2._NAMESPACE_TRANSLATION_REQUIRED is False
+        for value in (V2_PARENT, "PV2-0123456789abcdef0123", {"a": ["b"]}):
+            assert v2._to_frozen_namespace(value) is value
+            assert v2._from_frozen_namespace(value) is value
+
+    def test_v3_case_ids_round_trip_exactly(self):
+        v3 = _core("v3_roundtrip", "parser-v3-v1")
+        assert v3._NAMESPACE_TRANSLATION_REQUIRED is True
+        case = "PV3-0123456789abcdef0123"
+        translated = v3._to_frozen_namespace(case)
+        assert translated == "PV2-0123456789abcdef0123"
+        assert v3._from_frozen_namespace(translated) == case
+
+    def test_v3_parent_prefixes_round_trip_exactly(self):
+        v3 = _core("v3_parent", "parser-v3-v1")
+        translated = v3._to_frozen_namespace(V3_PARENT)
+        assert translated.startswith("phase1-evaluator-validation/parser-v2-v1/")
+        assert v3._from_frozen_namespace(translated) == V3_PARENT
+
+    def test_translation_reaches_nested_structures(self):
+        v3 = _core("v3_nested", "parser-v3-v1")
+        payload = {"rows": [{"case_id": "PV3-0123456789abcdef0123"}]}
+        translated = v3._to_frozen_namespace(payload)
+        assert translated["rows"][0]["case_id"] == "PV2-0123456789abcdef0123"
+        assert v3._from_frozen_namespace(translated) == payload
+
+    def test_each_profile_rejects_the_other_family_parent_prefix(self):
+        v2 = _core("v2_reject", )
+        v3 = _core("v3_reject", "parser-v3-v1")
+        with pytest.raises(Exception):
+            v2.validate_registered_parent_prefix(V3_PARENT)
+        with pytest.raises(Exception):
+            v3.validate_registered_parent_prefix(V2_PARENT)
+        assert v2.validate_registered_parent_prefix(V2_PARENT) == V2_PARENT
+        assert v3.validate_registered_parent_prefix(V3_PARENT) == V3_PARENT
+
+    def test_each_profile_rejects_the_other_family_case_ids(self):
+        v2 = _core("v2_case")
+        v3 = _core("v3_case", "parser-v3-v1")
+        with pytest.raises(Exception):
+            v2._require_case_id("PV3-0123456789abcdef0123")
+        with pytest.raises(Exception):
+            v3._require_case_id("PV2-0123456789abcdef0123")
+
+    def test_authorization_locks_are_written_into_the_owning_family(self):
+        v2 = _core("v2_lock")
+        v3 = _core("v3_lock", "parser-v3-v1")
+        assert v2.AUTHORIZATION_LOCK_BLOB_PREFIX != v3.AUTHORIZATION_LOCK_BLOB_PREFIX
+        assert "parser-v2-v1" in v2.AUTHORIZATION_LOCK_BLOB_PREFIX
+        assert "parser-v3-v1" in v3.AUTHORIZATION_LOCK_BLOB_PREFIX
+
+    def test_holdout_identity_is_family_scoped(self):
+        v2 = _core("v2_holdout")
+        v3 = _core("v3_holdout", "parser-v3-v1")
+        manifest = "1" * 64
+        assert v3.HOLDOUT_ID_DOMAIN == "phase1-parser-v3-holdout-id/v1"
+        assert v2.HOLDOUT_ID_DOMAIN == "phase1-parser-v2-holdout-id/v1"
+        assert v3.derive_holdout_id(V3_PARENT, manifest) != v2.derive_holdout_id(
+            V2_PARENT, manifest
+        )
+
+    def test_v2_holdout_identity_still_comes_from_the_frozen_instrument(self):
+        v2 = _core("v2_holdout_frozen")
+        manifest = "1" * 64
+        assert v2.derive_holdout_id(V2_PARENT, manifest) == v2._load_frozen_validation(
+        ).derive_holdout_id(V2_PARENT, manifest)
+
+    def test_public_report_guard_covers_every_family(self):
+        v3 = _core("v3_guard", "parser-v3-v1")
+        assert set(v3.ALL_CASE_ID_PREFIXES) == {"PV2", "PV3"}
+
+
+class TestStateChainProtocolVersusCandidateBinding:
+    """The protocol triple names the protocol; the candidate binds separately."""
+
+    def test_protocol_gate_hash_is_not_profile_scoped(self):
+        v2 = _core("v2_triple")
+        v3 = _core("v3_triple", "parser-v3-v1")
+        assert (
+            v2.PROTOCOL_ACCEPTANCE_GATES_SHA256
+            == v3.PROTOCOL_ACCEPTANCE_GATES_SHA256
+        )
+        assert v2.PROTOCOL_ACCEPTANCE_GATES_SHA256 == (
+            v2._load_frozen_validation().FROZEN_ACCEPTANCE_GATE_SHA256
+        )
+
+    def test_candidate_gate_contract_is_profile_scoped(self):
+        v2 = _core("v2_candidate_gate")
+        v3 = _core("v3_candidate_gate", "parser-v3-v1")
+        assert v2.FROZEN_ACCEPTANCE_GATE_SHA256 != v3.FROZEN_ACCEPTANCE_GATE_SHA256
+
+    def test_the_candidate_gate_contract_is_still_bound_into_the_chain(self):
+        v3 = _core("v3_bound_gate", "parser-v3-v1")
+        receipt = _protocol_frozen(v3, _draft(v3, V3_PARENT))
+        assert (
+            receipt["artifact_manifest_hashes"]["acceptance_gates"]
+            == v3.FROZEN_ACCEPTANCE_GATE_SHA256
+        )
+        assert receipt["acceptance_gates_sha256"] == (
+            v3.PROTOCOL_ACCEPTANCE_GATES_SHA256
+        )
+
+    @pytest.mark.parametrize(
+        "profile,parent",
+        [(None, V2_PARENT), ("parser-v3-v1", V3_PARENT)],
+    )
+    def test_state_receipts_validate_under_both_profiles(self, profile, parent):
+        core = _core(f"receipt_{profile}", profile)
+        assert core.validate_state_receipt(_draft(core, parent))["state"] == (
+            "DRAFT_PROTOCOL"
+        )
+
+    @pytest.mark.parametrize(
+        "profile,parent",
+        [(None, V2_PARENT), ("parser-v3-v1", V3_PARENT)],
+    )
+    def test_chain_graph_and_transition_validate_under_both_profiles(
+        self, profile, parent
+    ):
+        core = _core(f"chain_{profile}", profile)
+        draft = _draft(core, parent)
+        nxt = _protocol_frozen(core, draft)
+        assert core.validate_state_receipt_chain([draft, nxt])["receipt_count"] == 2
+        assert core.validate_state_receipt_graph([draft, nxt])["receipt_count"] == 2
+        core.validate_state_transition(draft, nxt)
+
+    def test_persisted_links_are_reproducible_from_the_stored_bytes(self):
+        """An auditor must reproduce every link from the receipts on disk."""
+        v3 = _core("v3_links", "parser-v3-v1")
+        draft = _draft(v3, V3_PARENT)
+        nxt = _protocol_frozen(v3, draft)
+        recomputed = v3.sha256_bytes(v3.canonical_json_bytes(dict(draft)))
+        assert nxt["previous_receipt_sha256"] == recomputed
+        assert (
+            v3.validate_state_receipt_chain([draft, nxt])["chain_sha256"]
+            == v3.sha256_bytes(v3.canonical_json_bytes(dict(nxt)))
+        )
+
+    def test_persisted_receipts_never_carry_a_foreign_family(self):
+        v3 = _core("v3_no_leak", "parser-v3-v1")
+        draft = _draft(v3, V3_PARENT)
+        nxt = _protocol_frozen(v3, draft)
+        v3.validate_state_receipt_chain([draft, nxt])
+        for receipt in (draft, nxt):
+            assert "parser-v2-v1" not in json.dumps(receipt)
+            assert "PV2-" not in json.dumps(receipt)
+
+
+class TestRuntimeGeneratorBindsItsProfile:
+    """The runtime-config generator must fix the profile before the core runs."""
+
+    def test_generator_defaults_to_parser_v2(self):
+        generator = _load_module(
+            "_test_ns_runtime_generator",
+            ROOT / "scripts" / "create_parser_v2_runtime_config.py",
+        )
+        assert generator.DEFAULT_EVALUATION_PROFILE == "parser-v2-v1"
+        assert "parser-v3-v1" in generator.SUPPORTED_EVALUATION_PROFILES
+
+    def test_generator_seeds_and_verifies_the_profile(self):
+        source = _lf_bytes(
+            ROOT / "scripts" / "create_parser_v2_runtime_config.py"
+        ).decode("utf-8")
+        assert 'module.__dict__["_PRESEEDED_PARSER_PROFILE_ID"] = profile_id' in source
+        assert "if core_module.ACTIVE_PARSER_PROFILE_ID != profile_id:" in source
+        assert 'if "_PRESEEDED_PARSER_PROFILE_ID" in core_module.__dict__:' in source
+
+    def test_runtime_config_declares_the_profile_only_when_non_default(self):
+        v2 = _core("v2_runtime_field")
+        v3 = _core("v3_runtime_field", "parser-v3-v1")
+        assert v2._RUNTIME_CONFIG_PROFILE_FIELDS == frozenset()
+        assert v3._RUNTIME_CONFIG_PROFILE_FIELDS == frozenset({"evaluation_profile"})
+
+
+class TestBootstrapBindsItsProfile:
+    """The state-chain bootstrap must fix the profile before the core runs."""
+
+    SCRIPT = ROOT / "scripts" / "bootstrap_parser_v2_locked_evaluation.py"
+
+    def test_bootstrap_defaults_to_parser_v2(self):
+        source = _lf_bytes(self.SCRIPT).decode("utf-8")
+        assert 'DEFAULT_EVALUATION_PROFILE = "parser-v2-v1"' in source
+        assert '"parser-v3-v1"' in source
+        assert "SUPPORTED_EVALUATION_PROFILES" in source
+
+    def test_bootstrap_seeds_and_verifies_the_profile(self):
+        source = _lf_bytes(self.SCRIPT).decode("utf-8")
+        assert 'module.__dict__["_PRESEEDED_PARSER_PROFILE_ID"] = profile_id' in source
+        assert "if module.ACTIVE_PARSER_PROFILE_ID != profile_id:" in source
+        assert 'if "_PRESEEDED_PARSER_PROFILE_ID" in module.__dict__:' in source
+
+    def test_bootstrap_exposes_the_profile_on_the_command_line(self):
+        source = _lf_bytes(self.SCRIPT).decode("utf-8")
+        assert '"--evaluation-profile"' in source
+        assert "evaluation_profile=cli.evaluation_profile" in source
+
+    def test_bootstrap_reads_the_parser_source_path_from_the_profile(self):
+        source = _lf_bytes(self.SCRIPT).decode("utf-8")
+        assert 'core.ACTIVE_PARSER_PROFILE["parser_source_path"]' in source
+        assert "PARSER_SOURCE_PATH = " not in source
+
+    def test_bootstrap_receipts_use_the_protocol_gate_binding(self):
+        source = _lf_bytes(self.SCRIPT).decode("utf-8")
+        assert "core.PROTOCOL_ACCEPTANCE_GATES_SHA256" in source
+        assert "core.FROZEN_ACCEPTANCE_GATE_SHA256" not in source.split(
+            "def _receipt("
+        )[1].split("\ndef ")[0]
