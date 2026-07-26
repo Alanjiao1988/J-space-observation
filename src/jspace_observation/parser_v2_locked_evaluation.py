@@ -24,7 +24,7 @@ import socket
 import subprocess
 import sys
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timezone
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
@@ -71,6 +71,10 @@ _PARSER_EVALUATION_PROFILES = {
         ),
         "sealed_holdout_family": "parser-v2-v1",
         "candidate_predictions_filename": "parser_v2_locked_predictions.jsonl",
+        "runtime_launcher_path": (
+            "infra/azure/scripts/10_run_parser_v2_locked_eval.sh"
+        ),
+        "stage_command_suffix": "",
         "comparator_predictions_filenames": ("legacy_locked_predictions.jsonl",),
         "comparator_parser_identities": {
             "legacy": {
@@ -115,6 +119,10 @@ _PARSER_EVALUATION_PROFILES = {
         ),
         "sealed_holdout_family": "parser-v3-v1",
         "candidate_predictions_filename": "parser_v3_candidate_predictions.jsonl",
+        "runtime_launcher_path": (
+            "infra/azure/scripts/10_run_parser_v2_locked_eval.sh"
+        ),
+        "stage_command_suffix": "-v3",
         "comparator_predictions_filenames": (
             "parser_v2_comparator_predictions.jsonl",
             "legacy_comparator_predictions.jsonl",
@@ -150,11 +158,22 @@ _PARSER_EVALUATION_PROFILES = {
         "extra_source_binding_paths": (
             "src/jspace_observation/eval_parsing_v3.py",
             "scripts/parser_v3_process_worker.py",
+            "scripts/run_parser_v3_locked_predictions.py",
+            "scripts/finalize_parser_v3_locked_evaluation.py",
+            "scripts/stage_p_v3_entrypoint.sh",
+            "scripts/stage_p_adopt_v3_entrypoint.sh",
+            "scripts/stage_e_v3_entrypoint.sh",
         ),
         "extra_image_binding_paths": (
             "src/jspace_observation/eval_parsing_v3.py",
             "scripts/parser_v3_process_worker.py",
+            "scripts/run_parser_v3_locked_predictions.py",
+            "scripts/finalize_parser_v3_locked_evaluation.py",
+            "scripts/stage_p_v3_entrypoint.sh",
+            "scripts/stage_p_adopt_v3_entrypoint.sh",
+            "scripts/stage_e_v3_entrypoint.sh",
             "docs/phase1_parser_v3_acceptance_gates.json",
+            "docs/phase1_parser_v3_locked_evaluation_protocol.md",
         ),
     },
 }
@@ -170,6 +189,13 @@ if ACTIVE_PARSER_PROFILE_ID not in _PARSER_EVALUATION_PROFILES:
         f"unknown parser evaluation profile: {ACTIVE_PARSER_PROFILE_ID!r}"
     )
 ACTIVE_PARSER_PROFILE = dict(_PARSER_EVALUATION_PROFILES[ACTIVE_PARSER_PROFILE_ID])
+# The instant the candidate was fixed. It is recorded before any locked input is
+# opened, which is the property that makes the choice prospective rather than
+# reactive.
+ACTIVE_PARSER_PROFILE_SEED_NAME = "_PRESEEDED_PARSER_PROFILE_ID"
+ACTIVE_PARSER_PROFILE_RESOLVED_UTC = datetime.now(timezone.utc).strftime(
+    "%Y-%m-%dT%H:%M:%SZ"
+)
 
 FROZEN_PROTOCOL_COMMIT = "cc93ffe603ab8338ed860586a52b1911af4b3277"
 FROZEN_PROTOCOL_BUNDLE_SHA256 = (
@@ -208,6 +234,100 @@ FROZEN_ATTRIBUTABLE_PARSER_VERSIONS = frozenset(
     }
 )
 
+EVALUATION_PROFILE_RECORD_SCHEMA_VERSION = (
+    "phase1-parser-locked-evaluation-profile/v1"
+)
+_EVALUATION_PROFILE_STATIC_FIELDS = (
+    "schema_version",
+    "evaluation_profile",
+    "profile_id",
+    "profile_seed_name",
+    "profile_locked_before_input_read",
+    "candidate_worker_module",
+    "candidate_algorithm_id",
+    "candidate_version",
+    "candidate_source_sha256",
+    "orchestrator_schema_compatibility",
+)
+
+
+def evaluation_profile_record(
+    *, include_resolution_time: bool = False
+) -> dict[str, Any]:
+    """The candidate binding this process resolved at import time.
+
+    ``include_resolution_time`` is off for build-time artefacts (a wall clock
+    reading would make them non-reproducible) and on for run-time attestations,
+    where the instant the candidate was fixed is the evidence that it was fixed
+    before any locked input was opened.
+    """
+
+    record: dict[str, Any] = {
+        "schema_version": EVALUATION_PROFILE_RECORD_SCHEMA_VERSION,
+        "evaluation_profile": ACTIVE_PARSER_PROFILE["candidate_parser"],
+        "profile_id": ACTIVE_PARSER_PROFILE_ID,
+        "profile_seed_name": ACTIVE_PARSER_PROFILE_SEED_NAME,
+        "profile_locked_before_input_read": True,
+        "candidate_worker_module": ACTIVE_PARSER_PROFILE["parser_worker_path"],
+        "candidate_algorithm_id": ACTIVE_PARSER_PROFILE[
+            "candidate_parser_algorithm_id"
+        ],
+        "candidate_version": ACTIVE_PARSER_PROFILE["parser_version"],
+        "candidate_source_sha256": ACTIVE_PARSER_PROFILE[
+            "parser_source_sha256"
+        ],
+        "orchestrator_schema_compatibility": ACTIVE_PARSER_PROFILE[
+            "orchestrator_schema_compatibility"
+        ],
+    }
+    if include_resolution_time:
+        record["profile_resolution_time"] = ACTIVE_PARSER_PROFILE_RESOLVED_UTC
+    return record
+
+
+def _profile_attestation_fields() -> dict[str, Any]:
+    """Profile evidence for records that validators rebuild and compare.
+
+    Deterministic by construction: no wall-clock reading, so a later
+    independent recomputation reproduces the record byte for byte.
+    """
+
+    if ACTIVE_PARSER_PROFILE_ID == DEFAULT_PARSER_EVALUATION_PROFILE_ID:
+        return {}
+    return {"evaluation_profile": evaluation_profile_record()}
+
+
+_PROFILE_ATTESTATION_FIELD_NAMES = (
+    frozenset()
+    if ACTIVE_PARSER_PROFILE_ID == DEFAULT_PARSER_EVALUATION_PROFILE_ID
+    else frozenset({"evaluation_profile"})
+)
+
+
+def validate_evaluation_profile_record(
+    record: Any, *, require_resolution_time: bool = False
+) -> dict[str, Any]:
+    if not isinstance(record, Mapping):
+        raise LockedEvaluationError("evaluation profile record must be object")
+    expected_fields = set(_EVALUATION_PROFILE_STATIC_FIELDS)
+    if require_resolution_time:
+        expected_fields.add("profile_resolution_time")
+    _require_exact_fields(record, expected_fields, "evaluation profile record")
+    reference = evaluation_profile_record(
+        include_resolution_time=require_resolution_time
+    )
+    for field in _EVALUATION_PROFILE_STATIC_FIELDS:
+        if record[field] != reference[field]:
+            raise LockedEvaluationError(
+                f"evaluation profile {field} does not match the active profile"
+            )
+    if require_resolution_time:
+        _require_utc(
+            record["profile_resolution_time"], "profile resolution time"
+        )
+    return dict(record)
+
+
 LOCKED_INPUT_SCHEMA_VERSION = "phase1-parser-v2-locked-input/v1"
 FINAL_LABEL_SCHEMA_VERSION = "phase1-parser-v2-locked-reference-label/v1"
 PARSER_REQUEST_SCHEMA_VERSION = "phase1-parser-v2-request/v1"
@@ -225,10 +345,23 @@ PREDICTION_MANIFEST_SCHEMA_VERSION = (
     "phase1-parser-v2-locked-prediction-manifest/v1"
 )
 SCORE_MANIFEST_SCHEMA_VERSION = "phase1-parser-v2-locked-score-manifest/v2"
+PARSER_ATTRIBUTION_SCHEMA_VERSION = "phase1-parser-locked-attribution/v1"
+_METRICS_PROFILE_FIELDS = (
+    frozenset()
+    if ACTIVE_PARSER_PROFILE_ID == DEFAULT_PARSER_EVALUATION_PROFILE_ID
+    else frozenset({"parser_attribution"})
+)
 METRICS_SCHEMA_VERSION = "phase1-parser-v2-locked-metrics/v2"
 DECISION_SCHEMA_VERSION = "phase1-parser-v2-locked-decision/v2"
 RETIREMENT_SCHEMA_VERSION = "phase1-parser-v2-locked-retirement/v2"
 RUNTIME_CONFIG_SCHEMA_VERSION = "phase1-parser-v2-runtime-config/v5"
+# Fields the profile adds to the runtime config.  Parser v2 adds none, so its
+# config stays byte-identical to the one already used in production.
+_RUNTIME_CONFIG_PROFILE_FIELDS = (
+    frozenset()
+    if ACTIVE_PARSER_PROFILE_ID == DEFAULT_PARSER_EVALUATION_PROFILE_ID
+    else frozenset({"evaluation_profile"})
+)
 IMAGE_BINDING_SCHEMA_VERSION = "phase1-parser-v2-eval-image-binding/v6"
 IMAGE_BINDING_ESSENTIAL_SCHEMA_VERSION = (
     "phase1-parser-v2-runtime-image-provenance/v3"
@@ -430,6 +563,9 @@ PREDICTION_MEMBER_NAMES = (
         "prediction_artifact_manifest.json",
     )
 )
+LEGACY_PREDICTION_FILENAME = FROZEN_COMPARATOR_PARSER_IDENTITIES["legacy"][
+    "predictions_filename"
+]
 SCORE_MEMBER_NAMES = (
     ".scores_reservation.json",
     SCORING_LEDGER_FILENAME,
@@ -584,6 +720,11 @@ _PROHIBITED_CREDENTIAL_ENV = (
 _FORBIDDEN_PARSER_MODULE_PARTS = (
     "eval_parsing",
     "eval_parsing_v2",
+    "eval_parsing_v3",
+    "parser_v2_process_worker",
+    "parser_v3_process_worker",
+    "run_parser_v2_locked_predictions",
+    "run_parser_v3_locked_predictions",
 )
 _STAGE_P_FEATURE_COUNT_FIELDS = frozenset(
     {
@@ -3446,9 +3587,12 @@ def validate_runtime_configuration(
             "image_binding",
             "image_binding_sha256",
             "retry_policy",
-        },
+        }
+        | _RUNTIME_CONFIG_PROFILE_FIELDS,
         "runtime config",
     )
+    if _RUNTIME_CONFIG_PROFILE_FIELDS:
+        validate_evaluation_profile_record(record["evaluation_profile"])
     if record["schema_version"] != RUNTIME_CONFIG_SCHEMA_VERSION:
         raise LockedEvaluationError("runtime config schema version is invalid")
     commit = _require_commit(record["source_commit"], "runtime source commit")
@@ -3639,7 +3783,8 @@ def build_runtime_configuration(
         "provenance": image_binding_essential_record(checked_image_binding),
     }
     destination = validate_runtime_azure_destination(raw_destination)
-    launcher_path = "infra/azure/scripts/10_run_parser_v2_locked_eval.sh"
+    launcher_path = ACTIVE_PARSER_PROFILE["runtime_launcher_path"]
+    suffix = ACTIVE_PARSER_PROFILE["stage_command_suffix"]
     record = {
         "schema_version": RUNTIME_CONFIG_SCHEMA_VERSION,
         "source_commit": _require_commit(source_commit, "source commit"),
@@ -3649,12 +3794,12 @@ def build_runtime_configuration(
         ),
         "launcher": {"path": launcher_path, **checked_sources[launcher_path]},
         "stage_commands": {
-            "P": {"command": ["/workspace/bin/stage-p"], "args_prefix": []},
+            "P": {"command": [f"/workspace/bin/stage-p{suffix}"], "args_prefix": []},
             "P_ADOPT": {
-                "command": ["/workspace/bin/stage-p-adopt"],
+                "command": [f"/workspace/bin/stage-p-adopt{suffix}"],
                 "args_prefix": [],
             },
-            "E": {"command": ["/workspace/bin/stage-e"], "args_prefix": []},
+            "E": {"command": [f"/workspace/bin/stage-e{suffix}"], "args_prefix": []},
         },
         "job": {
             "trigger_type": "Manual",
@@ -3692,6 +3837,8 @@ def build_runtime_configuration(
             "verification_only_new_bytes": False,
         },
     }
+    if _RUNTIME_CONFIG_PROFILE_FIELDS:
+        record["evaluation_profile"] = evaluation_profile_record()
     data = canonical_json_bytes(record)
     validate_runtime_configuration(
         data,
@@ -3768,10 +3915,48 @@ def compute_protocol_bundle_sha256(project_root: str | Path) -> str:
     return result
 
 
-def load_frozen_gate_bytes(project_root: str | Path) -> bytes:
-    data = read_git_blob_bytes(
-        project_root, ACTIVE_PARSER_PROFILE["acceptance_gate_path"]
+def _read_hash_bound_file(
+    project_root: str | Path, relative_path: str, expected_sha256: str
+) -> bytes:
+    """Read a frozen file bound by its own SHA-256 rather than by a commit.
+
+    Used for artefacts that postdate the frozen protocol commit, so they are
+    not in that commit's tree. The hash binding is the security property; Git
+    was only ever a delivery mechanism for it.
+    """
+
+    root = Path(project_root).resolve()
+    normalized = _require_string(relative_path, "frozen file path").replace(
+        "\\", "/"
     )
+    if (
+        normalized != relative_path
+        or normalized.startswith("/")
+        or any(part in {"", ".", ".."} for part in normalized.split("/"))
+    ):
+        raise LockedEvaluationError("frozen file path must be normalized")
+    path = root.joinpath(*normalized.split("/"))
+    try:
+        data = path.read_bytes()
+    except OSError as exc:
+        raise LockedEvaluationError(
+            f"frozen file is unavailable: {normalized}"
+        ) from exc
+    if sha256_bytes(data) != _require_sha256(
+        expected_sha256, "frozen file SHA-256"
+    ):
+        raise LockedEvaluationError(f"frozen file hash mismatch: {normalized}")
+    return data
+
+
+def load_frozen_gate_bytes(project_root: str | Path) -> bytes:
+    relative = ACTIVE_PARSER_PROFILE["acceptance_gate_path"]
+    if ACTIVE_PARSER_PROFILE_ID == DEFAULT_PARSER_EVALUATION_PROFILE_ID:
+        data = read_git_blob_bytes(project_root, relative)
+    else:
+        data = _read_hash_bound_file(
+            project_root, relative, FROZEN_ACCEPTANCE_GATE_SHA256
+        )
     if sha256_bytes(data) != FROZEN_ACCEPTANCE_GATE_SHA256:
         raise LockedEvaluationError("frozen acceptance-gate blob hash mismatch")
     return data
@@ -5473,6 +5658,8 @@ def build_locked_prediction_seal(
     sealed_utc: str,
     retry_kind: str = "none",
     execution_id: str | None = None,
+    comparator_predictions: Mapping[str, Sequence[Mapping[str, Any]]]
+    | None = None,
 ) -> dict[str, Any]:
     validate_prediction_request_manifest(
         request_manifest,
@@ -5562,8 +5749,50 @@ def build_locked_prediction_seal(
         "gpu_used": False,
         "sealed_utc": _require_utc(sealed_utc, "prediction sealed_utc"),
     }
+    if _SEAL_PROFILE_FIELDS:
+        record["evaluation_profile"] = evaluation_profile_record(
+            include_resolution_time=True
+        )
+        record["comparator_predictions_sha256"] = (
+            _comparator_prediction_hashes(comparator_predictions)
+        )
+    elif comparator_predictions:
+        raise LockedEvaluationError(
+            "profile does not seal comparator prediction streams"
+        )
     assert_label_blind_payload(record)
     return record
+
+
+# Comparator streams other than the frozen legacy one are only sealed by
+# profiles that produce them.  Parser v2 seals exactly the two streams it always
+# did, so its seal bytes are unchanged.
+_SEAL_PROFILE_FIELDS = (
+    frozenset()
+    if ACTIVE_PARSER_PROFILE_ID == DEFAULT_PARSER_EVALUATION_PROFILE_ID
+    else frozenset({"evaluation_profile", "comparator_predictions_sha256"})
+)
+# The comparator streams this profile seals separately from the frozen legacy
+# stream, which keeps its own historical field.
+_SEALED_COMPARATOR_NAMES = tuple(
+    name
+    for name in ACTIVE_PARSER_PROFILE["comparator_parsers"]
+    if name != "legacy"
+)
+
+
+def _comparator_prediction_hashes(
+    comparator_predictions: Mapping[str, Sequence[Mapping[str, Any]]] | None,
+) -> dict[str, str]:
+    supplied = dict(comparator_predictions or {})
+    if set(supplied) != set(_SEALED_COMPARATOR_NAMES):
+        raise LockedEvaluationError(
+            "prediction seal comparator streams do not match the profile"
+        )
+    return {
+        name: sha256_bytes(canonical_jsonl_bytes(list(supplied[name])))
+        for name in _SEALED_COMPARATOR_NAMES
+    }
 
 
 _LOCKED_PREDICTION_SEAL_FIELDS = frozenset(
@@ -5615,7 +5844,32 @@ _LOCKED_PREDICTION_SEAL_FIELDS = frozenset(
         "gpu_used",
         "sealed_utc",
     }
+    | _SEAL_PROFILE_FIELDS
 )
+
+
+def sealed_comparator_predictions_filenames() -> dict[str, str]:
+    """Comparator streams this profile seals separately from frozen legacy."""
+
+    return {
+        name: FROZEN_COMPARATOR_PARSER_IDENTITIES[name]["predictions_filename"]
+        for name in _SEALED_COMPARATOR_NAMES
+    }
+
+
+def _require_comparator_hash_shape(value: Any) -> dict[str, str]:
+    if not isinstance(value, Mapping):
+        raise LockedEvaluationError(
+            "comparator prediction hashes must be an object"
+        )
+    if set(value) != set(_SEALED_COMPARATOR_NAMES):
+        raise LockedEvaluationError(
+            "comparator prediction hashes do not match the profile"
+        )
+    return {
+        name: _require_sha256(value[name], f"{name} comparator predictions")
+        for name in _SEALED_COMPARATOR_NAMES
+    }
 
 
 def validate_locked_prediction_seal_metadata(
@@ -5670,6 +5924,11 @@ def validate_locked_prediction_seal_metadata(
         for field, value in fixed.items()
     ):
         raise LockedEvaluationError("locked prediction frozen binding mismatch")
+    if _SEAL_PROFILE_FIELDS:
+        validate_evaluation_profile_record(
+            record["evaluation_profile"], require_resolution_time=True
+        )
+        _require_comparator_hash_shape(record["comparator_predictions_sha256"])
     if any(
         record[field] is not False
         for field in (
@@ -5795,9 +6054,9 @@ def validate_locked_prediction_seal_metadata(
     if (
         by_name["prediction_request_manifest.json"].get("sha256")
         != record["prediction_request_manifest_sha256"]
-        or by_name["parser_v2_locked_predictions.jsonl"].get("sha256")
+        or by_name[CANDIDATE_PREDICTION_FILENAME].get("sha256")
         != record["parser_v2_predictions_sha256"]
-        or by_name["legacy_locked_predictions.jsonl"].get("sha256")
+        or by_name[LEGACY_PREDICTION_FILENAME].get("sha256")
         != record["legacy_predictions_sha256"]
         or prediction_manifest.get("prediction_seal_sha256")
         != by_name["prediction_seal.json"].get("sha256")
@@ -5805,6 +6064,18 @@ def validate_locked_prediction_seal_metadata(
         raise LockedEvaluationError(
             "prediction seal differs from prediction manifest metadata"
         )
+    if _SEAL_PROFILE_FIELDS:
+        sealed_comparators = _require_comparator_hash_shape(
+            record["comparator_predictions_sha256"]
+        )
+        filenames = sealed_comparator_predictions_filenames()
+        if any(
+            by_name[filenames[name]].get("sha256") != sealed_comparators[name]
+            for name in sealed_comparators
+        ):
+            raise LockedEvaluationError(
+                "prediction seal differs from prediction manifest metadata"
+            )
     ids = [_require_case_id(item) for item in record["ordered_case_ids"]]
     frozen = record["frozen_v2_seal"]
     _require_exact_fields(
@@ -5854,6 +6125,7 @@ def validate_locked_prediction_seal(
     expected_parent_prefix: str,
     expected_retry_kind: str = "none",
     expected_execution_id: str | None = None,
+    comparator_predictions_bytes: Mapping[str, bytes] | None = None,
 ) -> dict[str, Any]:
     _require_exact_fields(
         record, _LOCKED_PREDICTION_SEAL_FIELDS, "locked prediction seal"
@@ -5942,6 +6214,29 @@ def validate_locked_prediction_seal(
     for field, data in byte_bindings.items():
         if _require_sha256(record[field], field) != sha256_bytes(data):
             raise LockedEvaluationError(f"prediction seal {field} mismatch")
+    if _SEAL_PROFILE_FIELDS:
+        validate_evaluation_profile_record(
+            record["evaluation_profile"], require_resolution_time=True
+        )
+        sealed_comparators = _require_comparator_hash_shape(
+            record["comparator_predictions_sha256"]
+        )
+        supplied_comparators = dict(comparator_predictions_bytes or {})
+        if set(supplied_comparators) != set(_SEALED_COMPARATOR_NAMES):
+            raise LockedEvaluationError(
+                "comparator prediction bytes do not match the profile"
+            )
+        for name in _SEALED_COMPARATOR_NAMES:
+            if sealed_comparators[name] != sha256_bytes(
+                supplied_comparators[name]
+            ):
+                raise LockedEvaluationError(
+                    f"prediction seal {name} comparator predictions mismatch"
+                )
+    elif comparator_predictions_bytes:
+        raise LockedEvaluationError(
+            "profile does not seal comparator prediction streams"
+        )
     request_manifest = parse_json_strict(
         request_manifest_bytes, "prediction request manifest"
     )
@@ -6005,10 +6300,10 @@ def validate_locked_prediction_seal(
     if record["visibility_blob"] != expected_visibility_blob:
         raise LockedEvaluationError("Stage-P visibility binding mismatch")
     predictions = parse_jsonl_strict(
-        predictions_bytes, "parser_v2_locked_predictions.jsonl"
+        predictions_bytes, CANDIDATE_PREDICTION_FILENAME
     )
     legacy = parse_jsonl_strict(
-        legacy_predictions_bytes, "legacy_locked_predictions.jsonl"
+        legacy_predictions_bytes, LEGACY_PREDICTION_FILENAME
     )
     ids = [_require_case_id(item) for item in record["ordered_case_ids"]]
     if (
@@ -6618,6 +6913,52 @@ def _gating_comparator_parser_version(gates: Mapping[str, Any]) -> str | None:
     return identity["parser_version"]
 
 
+def _parser_attribution_fields(
+    gates: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Name the parsers behind the historical ``*_v2``/``*_legacy`` fields.
+
+    The storage schema keeps its original field names for orchestrator
+    compatibility, so this block is what says which parser actually produced
+    each stream and which one gated the verdict.
+    """
+
+    if ACTIVE_PARSER_PROFILE_ID == DEFAULT_PARSER_EVALUATION_PROFILE_ID:
+        return {}
+    gating_version: str | None = None
+    if gates is not None:
+        try:
+            gating_version = _gating_comparator_parser_version(gates)
+        except Exception:
+            gating_version = None
+    gating_name = "legacy"
+    for name, identity in FROZEN_COMPARATOR_PARSER_IDENTITIES.items():
+        if (
+            gating_version is not None
+            and identity["parser_version"] == gating_version
+        ):
+            gating_name = name
+    return {
+        "parser_attribution": {
+            "schema_version": PARSER_ATTRIBUTION_SCHEMA_VERSION,
+            "orchestrator_schema_compatibility": ACTIVE_PARSER_PROFILE[
+                "orchestrator_schema_compatibility"
+            ],
+            "candidate_parser": ACTIVE_PARSER_PROFILE["candidate_parser"],
+            "candidate_parser_version": ACTIVE_PARSER_PROFILE["parser_version"],
+            "candidate_field_prefix": "v2",
+            "gating_comparator_parser": gating_name,
+            "gating_comparator_parser_version": gating_version,
+            "gating_comparator_field_prefix": "legacy",
+            "reporting_only_comparators": [
+                name
+                for name in FROZEN_COMPARATOR_PARSER_IDENTITIES
+                if name != gating_name
+            ],
+        }
+    }
+
+
 def _score_locked_evaluation(
     labels: Sequence[Mapping[str, Any]],
     predictions: Sequence[Mapping[str, Any]],
@@ -7008,6 +7349,7 @@ def _score_locked_evaluation(
         "schema_version": METRICS_SCHEMA_VERSION,
         "status": status,
         "gate_contract_sha256": FROZEN_ACCEPTANCE_GATE_SHA256,
+        **_parser_attribution_fields(gates),
         "dataset_summary": _metrics_dataset_summary(gates),
         "topology_summary": _metrics_topology_summary(gates),
         "overall_typed_agreement": metric_record(typed_correct, total),
@@ -7144,6 +7486,7 @@ def _invalid_metrics(
         "schema_version": METRICS_SCHEMA_VERSION,
         "status": "INVALID",
         "gate_contract_sha256": FROZEN_ACCEPTANCE_GATE_SHA256,
+        **_parser_attribution_fields(),
         "invalid_reason": reason_code,
         "invalid_detail": "redacted",
         "dataset_summary": dataset_summary,
@@ -7195,10 +7538,10 @@ def score_locked_evaluation_bytes(
     try:
         labels = parse_jsonl_strict(labels_bytes, "locked_reference_labels.jsonl")
         predictions = parse_jsonl_strict(
-            predictions_bytes, "parser_v2_locked_predictions.jsonl"
+            predictions_bytes, CANDIDATE_PREDICTION_FILENAME
         )
         legacy = parse_jsonl_strict(
-            legacy_predictions_bytes, "legacy_locked_predictions.jsonl"
+            legacy_predictions_bytes, LEGACY_PREDICTION_FILENAME
         )
         return score_locked_evaluation(
             labels,
@@ -7470,10 +7813,24 @@ def _scoring_ledger_row(
     )
     locked_input = _reconstruct_locked_input(label)
     validate_prediction_envelope(prediction, locked_input)
-    validate_legacy_prediction(legacy, locked_input)
+    # Which stream gates the verdict is decided by the frozen contract, so the
+    # ledger validates the comparator row in whatever shape that stream has.
+    comparator_parser_version = _gating_comparator_parser_version(gates)
+    if comparator_parser_version is None:
+        validate_legacy_prediction(legacy, locked_input)
+        comparator = legacy
+    else:
+        validate_prediction_envelope(
+            legacy,
+            locked_input,
+            expected_parser_version=comparator_parser_version,
+        )
+        comparator = adapt_parser_envelope_to_comparator(
+            legacy, locked_input, parser_version=comparator_parser_version
+        )
     if (
         prediction["case_id"] != checked_label["case_id"]
-        or legacy["case_id"] != checked_label["case_id"]
+        or comparator["case_id"] != checked_label["case_id"]
     ):
         raise LockedEvaluationError(
             "scoring ledger prediction membership is not exact"
@@ -7481,7 +7838,7 @@ def _scoring_ledger_row(
     parser_result = prediction["parser_result"]
     expected_decision = derive_typed_decision(label, expected=True)
     parser_decision = derive_typed_decision(parser_result)
-    legacy_decision = legacy["adapter"]["typed_decision"]
+    legacy_decision = comparator["adapter"]["typed_decision"]
     v2_exact = parser_decision == expected_decision
     legacy_exact = legacy_decision == expected_decision
     parsed_exact = parser_result["parsed_answer"] == label[
@@ -7524,7 +7881,7 @@ def _scoring_ledger_row(
     material_error = bool(
         parser_correctness ^ checked_label["expected_correctness"]
     )
-    legacy_adapter_failure = legacy["adapter"]["adapter_failure"] is not None
+    legacy_adapter_failure = comparator["adapter"]["adapter_failure"] is not None
     if v2_exact and legacy_exact:
         agreement_category = "both_correct"
     elif v2_exact:
@@ -7898,6 +8255,7 @@ _VALID_METRICS_FIELDS = frozenset(
         "rounded_values_used_for_gates",
         "manual_override",
     }
+    | _METRICS_PROFILE_FIELDS
 )
 _INVALID_METRICS_FIELDS = frozenset(
     {
@@ -7916,6 +8274,7 @@ _INVALID_METRICS_FIELDS = frozenset(
         "rounded_values_used_for_gates",
         "manual_override",
     }
+    | _METRICS_PROFILE_FIELDS
 )
 
 
@@ -9029,6 +9388,7 @@ def build_decision(
         "manual_override": False,
         "metric_retry_allowed": False,
         "decided_utc": _require_utc(decided_utc, "decision timestamp"),
+        **_profile_attestation_fields(),
     }
 
 
@@ -9073,6 +9433,7 @@ _DECISION_FIELDS = frozenset(
         "metric_retry_allowed",
         "decided_utc",
     }
+    | _PROFILE_ATTESTATION_FIELD_NAMES
 )
 
 
@@ -9233,6 +9594,7 @@ def build_retirement_record(
         "metric_retry_allowed": False,
         "future_formal_claim_reuse_allowed": False,
         "retired_utc": _require_utc(retired_utc, "retirement timestamp"),
+        **_profile_attestation_fields(),
     }
 
 
@@ -9278,6 +9640,7 @@ _RETIREMENT_FIELDS = frozenset(
         "future_formal_claim_reuse_allowed",
         "retired_utc",
     }
+    | _PROFILE_ATTESTATION_FIELD_NAMES
 )
 
 
@@ -9460,6 +9823,7 @@ _LABELS_OPEN_TRANSACTION_FIELDS = frozenset(
         "overwrite",
         "created_utc",
     }
+    | _PROFILE_ATTESTATION_FIELD_NAMES
 )
 
 
@@ -9585,6 +9949,7 @@ def build_labels_open_transaction(
         "formal_evaluation_ordinal": 1,
         "overwrite": False,
         "created_utc": _require_utc(created_utc, "transaction created_utc"),
+        **_profile_attestation_fields(),
     }
 
 
@@ -14027,7 +14392,9 @@ def build_prediction_artifact_manifest(
         "created_utc": _require_utc(created_utc, "prediction manifest created_utc"),
     }
     if ACTIVE_PARSER_PROFILE_ID != DEFAULT_PARSER_EVALUATION_PROFILE_ID:
-        record["evaluation_profile"] = ACTIVE_PARSER_PROFILE_ID
+        record["evaluation_profile"] = evaluation_profile_record(
+            include_resolution_time=True
+        )
         record["parser_streams"] = build_parser_stream_records(
             checked_metadata,
             ordered_case_ids=request_manifest["ordered_case_ids"],
@@ -14151,9 +14518,11 @@ def validate_prediction_artifact_manifest(
     ):
         raise LockedEvaluationError("prediction artifact manifest binding mismatch")
     if ACTIVE_PARSER_PROFILE_ID != DEFAULT_PARSER_EVALUATION_PROFILE_ID:
+        validate_evaluation_profile_record(
+            record.get("evaluation_profile"), require_resolution_time=True
+        )
         if (
-            record.get("evaluation_profile") != ACTIVE_PARSER_PROFILE_ID
-            or record.get("labels_content_accessed") is not False
+            record.get("labels_content_accessed") is not False
             or record.get("labels_prefix_listed") is not True
             or not exact_json_equal(
                 record.get("parser_streams"),
@@ -14358,12 +14727,18 @@ def validate_prediction_artifact_graph(
     seal_binding = validate_locked_prediction_seal(
         seal,
         request_manifest_bytes=request_bytes,
-        predictions_bytes=artifacts["parser_v2_locked_predictions.jsonl"],
-        legacy_predictions_bytes=artifacts["legacy_locked_predictions.jsonl"],
+        predictions_bytes=artifacts[CANDIDATE_PREDICTION_FILENAME],
+        legacy_predictions_bytes=artifacts[LEGACY_PREDICTION_FILENAME],
         expected_authorization_id=expected_authorization_id,
         expected_parent_prefix=expected_parent_prefix,
         expected_retry_kind=expected_retry_kind,
         expected_execution_id=expected_execution_id,
+        comparator_predictions_bytes={
+            name: artifacts[filename]
+            for name, filename in (
+                sealed_comparator_predictions_filenames().items()
+            )
+        },
     )
     reservation = parse_json_strict(
         artifacts[".prediction_reservation.json"], "prediction reservation"
@@ -14540,15 +14915,25 @@ def validate_prediction_artifact_graph(
         )
 
     predictions = parse_jsonl_strict(
-        artifacts["parser_v2_locked_predictions.jsonl"],
-        "parser-v2 predictions",
+        artifacts[CANDIDATE_PREDICTION_FILENAME],
+        "candidate predictions",
     )
     legacy = parse_jsonl_strict(
-        artifacts["legacy_locked_predictions.jsonl"], "legacy predictions"
+        artifacts[LEGACY_PREDICTION_FILENAME], "legacy predictions"
     )
+    comparator_streams = [
+        parse_jsonl_strict(artifacts[filename], f"{name} comparator predictions")
+        for name, filename in (
+            sealed_comparator_predictions_filenames().items()
+        )
+    ]
     if (
         [item.get("case_id") for item in predictions] != ids
         or [item.get("case_id") for item in legacy] != ids
+        or any(
+            [item.get("case_id") for item in stream] != ids
+            for stream in comparator_streams
+        )
         or checked_manifest["case_universe_sha256"] != case_universe_sha256(ids)
     ):
         raise LockedEvaluationError(
@@ -15112,7 +15497,10 @@ def assert_parser_free_subprocess(paths: Sequence[str | Path]) -> None:
     checked_paths = [str(Path(path).resolve()) for path in paths]
     scanner = (
         "import ast,pathlib,sys;"
-        "bad=('eval_'+'parsing','eval_'+'parsing_v2');"
+        "bad=('eval_'+'parsing','eval_'+'parsing_v2','eval_'+'parsing_v3',"
+        "'parser_v2_'+'process_worker','parser_v3_'+'process_worker',"
+        "'run_parser_v2_'+'locked_predictions',"
+        "'run_parser_v3_'+'locked_predictions');"
         "trees=[(p,ast.parse(pathlib.Path(p).read_text(encoding='utf-8'))) "
         "for p in sys.argv[1:]];"
         "names=[(p,a.name) for p,t in trees for n in ast.walk(t) "
@@ -15162,6 +15550,12 @@ __all__ = [
     "DEFAULT_PARSER_EVALUATION_PROFILE_ID",
     "ACTIVE_PARSER_PROFILE_ID",
     "ACTIVE_PARSER_PROFILE",
+    "ACTIVE_PARSER_PROFILE_SEED_NAME",
+    "ACTIVE_PARSER_PROFILE_RESOLVED_UTC",
+    "EVALUATION_PROFILE_RECORD_SCHEMA_VERSION",
+    "evaluation_profile_record",
+    "validate_evaluation_profile_record",
+    "sealed_comparator_predictions_filenames",
     "FROZEN_PROTOCOL_COMMIT",
     "FROZEN_PROTOCOL_BUNDLE_SHA256",
     "FROZEN_ACCEPTANCE_GATE_SHA256",

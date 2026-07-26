@@ -133,7 +133,7 @@ def _load_core() -> ModuleType:
     name = "_jspace_parser_v2_locked_eval_stage_p"
     existing = sys.modules.get(name)
     if existing is not None:
-        return existing
+        return _assert_core_profile(existing)
     spec = importlib.util.spec_from_file_location(name, CORE_PATH)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load module from {CORE_PATH}")
@@ -145,8 +145,15 @@ def _load_core() -> ModuleType:
     except BaseException:
         sys.modules.pop(name, None)
         raise
-    if module.ACTIVE_PARSER_PROFILE_ID != STAGE_P_PROFILE_ID:
+    return _assert_core_profile(module)
+
+
+def _assert_core_profile(module: ModuleType) -> ModuleType:
+    """Every hand-out of the core re-checks the candidate it is bound to."""
+    if getattr(module, "ACTIVE_PARSER_PROFILE_ID", None) != STAGE_P_PROFILE_ID:
         raise RuntimeError("Stage P core ignored the requested parser profile")
+    if "_PRESEEDED_PARSER_PROFILE_ID" in module.__dict__:
+        raise RuntimeError("Stage P core leaked its profile seed")
     return module
 
 
@@ -1411,6 +1418,12 @@ def _verify_persisted_prediction_leaf(
         expected_parent_prefix=args.parent_prefix,
         expected_retry_kind=args.retry_kind,
         expected_execution_id=producer_execution_id,
+        comparator_predictions_bytes={
+            name: artifacts[filename]
+            for name, filename in (
+                core.sealed_comparator_predictions_filenames().items()
+            )
+        },
     )
     request_manifest = core.parse_json_strict(
         artifacts["prediction_request_manifest.json"],
@@ -2734,6 +2747,11 @@ def _run_stage_p(
             sealed_utc=timestamp,
             retry_kind=args.retry_kind,
             execution_id=args.execution_id,
+            comparator_predictions=(
+                {"parser_v2": v2_comparator_predictions}
+                if v2_comparator_predictions is not None
+                else None
+            ),
         )
     except Exception:
         _persist_spent_incomplete(
@@ -2766,7 +2784,7 @@ def _run_stage_p(
             reservation = adopted_reservation
             reservation_bytes = adopted_reservation_bytes
         profile = active_core.ACTIVE_PARSER_PROFILE
-        payloads = {
+        named_payloads = {
             ".prediction_reservation.json": reservation_bytes,
             "prediction_request_manifest.json": active_core.canonical_json_bytes(
                 request_manifest
@@ -2780,11 +2798,19 @@ def _run_stage_p(
             "prediction_seal.json": active_core.canonical_json_bytes(seal),
         }
         if v2_comparator_predictions is not None:
-            payloads[
+            named_payloads[
                 active_core.FROZEN_COMPARATOR_PARSER_IDENTITIES["parser_v2"][
                     "predictions_filename"
                 ]
             ] = active_core.canonical_jsonl_bytes(v2_comparator_predictions)
+        # Upload order is the registered member order, not the order the
+        # streams happened to be assembled in.
+        registered_order = list(active_core.PREDICTION_MEMBER_NAMES[:-1])
+        if sorted(named_payloads) != sorted(registered_order):
+            raise active_core.LockedEvaluationError(
+                "Stage P payload membership is not the registered set"
+            )
+        payloads = {name: named_payloads[name] for name in registered_order}
         seal_sha256 = active_core.sha256_bytes(
             payloads["prediction_seal.json"]
         )

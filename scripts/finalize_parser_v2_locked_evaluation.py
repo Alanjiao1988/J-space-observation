@@ -466,12 +466,28 @@ def _score_reporting_only_comparator(
     """
     if _V2_COMPARATOR_PREDICTIONS_MEMBER is None:
         return None
-    return core.score_reporting_only_legacy_comparator(
-        labels_bytes,
-        candidate_bytes,
-        prediction_artifacts[_LEGACY_PREDICTIONS_MEMBER],
-        gate_bytes,
-    )
+    # A defect in a stream that cannot move the verdict must not be able to
+    # invalidate a round whose holdout is already spent.
+    try:
+        aggregates = core.score_reporting_only_legacy_comparator(
+            labels_bytes,
+            candidate_bytes,
+            prediction_artifacts[_LEGACY_PREDICTIONS_MEMBER],
+            gate_bytes,
+        )
+    except Exception as exc:  # reporting-only: never gates, never invalidates
+        return {
+            "reporting_only": True,
+            "comparator": "legacy",
+            "available": False,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+    return {
+        "reporting_only": True,
+        "comparator": "legacy",
+        "available": True,
+        "aggregates": aggregates,
+    }
 
 
 def _assert_stream_member_agreement(core: ModuleType) -> None:
@@ -1600,6 +1616,12 @@ def _authenticate_invalid_closure_provenance(
         expected_parent_prefix=args.parent_prefix,
         expected_retry_kind=prediction_context["retry_kind"],
         expected_execution_id=prediction_context["execution_id"],
+        comparator_predictions_bytes={
+            name: prediction_artifacts[filename]
+            for name, filename in (
+                core.sealed_comparator_predictions_filenames().items()
+            )
+        },
     )
     input_receipts = [
         receipt
@@ -4868,6 +4890,12 @@ def _run_stage_e(
         expected_parent_prefix=args.parent_prefix,
         expected_retry_kind=prediction_context["retry_kind"],
         expected_execution_id=prediction_context["execution_id"],
+        comparator_predictions_bytes={
+            name: prediction_artifacts[filename]
+            for name, filename in (
+                active_core.sealed_comparator_predictions_filenames().items()
+            )
+        },
     )
     if (
         seal_binding["implementation_commit"] != args.implementation_commit
@@ -5737,6 +5765,7 @@ def _run_stage_e(
         "retry_receipt_sha256": (
             None if retry_persistence is None else retry_persistence["sha256"]
         ),
+        "reporting_only_comparator": diagnostic_metrics,
     }
 
 
@@ -5895,6 +5924,14 @@ def main(argv: list[str] | None = None) -> int:
             "holdout_retired": result.get("holdout_retired", True),
             "parser_rerun": False,
         }
+        # Published only once the holdout is retired, and only for a stream that
+        # cannot move the verdict.
+        if result.get("holdout_retired") and result.get(
+            "reporting_only_comparator"
+        ):
+            public["reporting_only_comparator"] = result[
+                "reporting_only_comparator"
+            ]
         print(json.dumps(public, sort_keys=True, separators=(",", ":")))
         return 0
     except SystemExit as exc:

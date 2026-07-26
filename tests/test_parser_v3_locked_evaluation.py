@@ -209,7 +209,13 @@ class TestParserEvaluationProfiles:
         assert added == {
             "src/jspace_observation/eval_parsing_v3.py",
             "scripts/parser_v3_process_worker.py",
+            "scripts/run_parser_v3_locked_predictions.py",
+            "scripts/finalize_parser_v3_locked_evaluation.py",
+            "scripts/stage_p_v3_entrypoint.sh",
+            "scripts/stage_p_adopt_v3_entrypoint.sh",
+            "scripts/stage_e_v3_entrypoint.sh",
             "docs/phase1_parser_v3_acceptance_gates.json",
+            "docs/phase1_parser_v3_locked_evaluation_protocol.md",
         }
 
     def test_v2_binding_paths_are_unchanged_by_the_new_profile(self):
@@ -361,3 +367,322 @@ class TestParserV3GateContract:
             contract["status_logic"]["PASS"]
             == "all_absolute_and_legacy_comparison_gates_pass"
         )
+
+
+# ---------------------------------------------------------------------------
+# End-to-end coverage of the three-stream path, exercised through the core.
+# ---------------------------------------------------------------------------
+
+
+def _v3_core():
+    loader = _load_module(
+        "_test_v3_e2e_loader", ROOT / "scripts" / "load_locked_evaluation_core.py"
+    )
+    return loader.load_locked_evaluation_core(
+        "_test_v3_e2e_core", profile_id="parser-v3-v1"
+    )
+
+
+@pytest.fixture(scope="module")
+def v3_bundle():
+    """Three synthetic streams over the frozen validation dataset.
+
+    Nothing here touches a sealed holdout, a locked input or a locked label.
+    """
+    from copy import deepcopy
+
+    from tests import test_evaluator_validation as frozen_tests
+
+    core = _v3_core()
+    dataset = frozen_tests._dataset()
+    labels = deepcopy(dataset["materialized"]["locked_draft_labels"])
+    locked_inputs = deepcopy(dataset["materialized"]["locked_inputs"])
+    locked_by_id = {item["case_id"]: item for item in locked_inputs}
+
+    candidate = frozen_tests._prediction_envelopes(labels, locked_inputs)
+    for row in candidate:
+        row["parser_result"]["parser_version"] = core.FROZEN_PARSER_VERSION
+
+    v2_version = core.FROZEN_COMPARATOR_PARSER_IDENTITIES["parser_v2"][
+        "parser_version"
+    ]
+    comparator = deepcopy(candidate)
+    for row in comparator:
+        row["parser_result"]["parser_version"] = v2_version
+
+    legacy_rows = []
+    for row in frozen_tests._legacy_predictions(labels):
+        parsed = row["parsed_answer"]
+        legacy_rows.append(
+            core.build_legacy_prediction(
+                locked_by_id[row["case_id"]],
+                {
+                    "parsed_answer": parsed,
+                    "parse_valid": row["parse_valid"],
+                    "parse_error_type": (
+                        None if row["parse_valid"] else "no_numeric_found"
+                    ),
+                    "parse_ambiguous": row["parse_ambiguous"],
+                    "parse_strategy": "synthetic_frozen_legacy",
+                    "candidate_answers": [] if parsed is None else [parsed],
+                    "answer_format_warning": None,
+                },
+            )
+        )
+    return {
+        "core": core,
+        "labels": labels,
+        "locked_inputs": locked_inputs,
+        "candidate": candidate,
+        "comparator": comparator,
+        "legacy": legacy_rows,
+        "gates": core.load_frozen_gate_bytes(ROOT),
+    }
+
+
+class TestParserV3ThreeStreamScoring:
+    """The v3 contract gates against parser v2, so the scorer must too."""
+
+    def test_gating_comparator_is_parser_v2_not_legacy(self, v3_bundle):
+        core = v3_bundle["core"]
+        gates = core.load_acceptance_gates(v3_bundle["gates"])
+        assert core._gating_comparator_parser_version(gates) == (
+            core.FROZEN_COMPARATOR_PARSER_IDENTITIES["parser_v2"][
+                "parser_version"
+            ]
+        )
+
+    def test_scoring_the_v2_comparator_stream_succeeds(self, v3_bundle):
+        core = v3_bundle["core"]
+        metrics, _failures = core.score_locked_evaluation(
+            v3_bundle["labels"],
+            v3_bundle["candidate"],
+            v3_bundle["comparator"],
+            v3_bundle["gates"],
+            raise_on_invalid=True,
+        )
+        assert metrics["status"] in {"PASS", "FAIL"}
+
+    def test_metrics_name_the_parsers_behind_the_legacy_field_names(
+        self, v3_bundle
+    ):
+        core = v3_bundle["core"]
+        metrics, _failures = core.score_locked_evaluation(
+            v3_bundle["labels"],
+            v3_bundle["candidate"],
+            v3_bundle["comparator"],
+            v3_bundle["gates"],
+            raise_on_invalid=True,
+        )
+        attribution = metrics["parser_attribution"]
+        assert attribution["candidate_parser"] == "parser_v3"
+        assert attribution["gating_comparator_parser"] == "parser_v2"
+        assert attribution["gating_comparator_field_prefix"] == "legacy"
+        assert attribution["reporting_only_comparators"] == ["legacy"]
+
+    def test_scoring_ledger_accepts_the_envelope_shaped_comparator(
+        self, v3_bundle
+    ):
+        """The gating stream is a parser envelope, not a legacy adapter row."""
+        core = v3_bundle["core"]
+        gates = core.load_acceptance_gates(v3_bundle["gates"])
+        label = v3_bundle["labels"][0]
+        case_id = label["case_id"]
+        prediction = next(
+            row for row in v3_bundle["candidate"] if row["case_id"] == case_id
+        )
+        comparator = next(
+            row for row in v3_bundle["comparator"] if row["case_id"] == case_id
+        )
+        row = core._scoring_ledger_row(
+            label,
+            prediction,
+            comparator,
+            label_row_bytes=core.canonical_json_bytes(label),
+            prediction_row_bytes=core.canonical_json_bytes(prediction),
+            legacy_row_bytes=core.canonical_json_bytes(comparator),
+            row_index=0,
+            context={},
+            gates=gates,
+        )
+        assert row["case_id"] == case_id
+
+    def test_reporting_only_legacy_pass_has_no_verdict(self, v3_bundle):
+        core = v3_bundle["core"]
+        aggregates = core.score_reporting_only_legacy_comparator(
+            core.canonical_jsonl_bytes(v3_bundle["labels"]),
+            core.canonical_jsonl_bytes(v3_bundle["candidate"]),
+            core.canonical_jsonl_bytes(v3_bundle["legacy"]),
+            v3_bundle["gates"],
+        )
+        assert "status" not in aggregates
+
+
+class TestParserV3StreamMembership:
+    """Membership, ordering and identity must be exact across three streams."""
+
+    def test_registered_upload_order_places_streams_in_member_order(
+        self, v3_bundle
+    ):
+        core = v3_bundle["core"]
+        assert core.PREDICTION_MEMBER_NAMES[2:5] == (
+            "parser_v3_candidate_predictions.jsonl",
+            "parser_v2_comparator_predictions.jsonl",
+            "legacy_comparator_predictions.jsonl",
+        )
+
+    def test_candidate_never_writes_into_the_v2_member_path(self, v3_bundle):
+        core = v3_bundle["core"]
+        assert (
+            core.CANDIDATE_PREDICTION_FILENAME
+            != "parser_v2_locked_predictions.jsonl"
+        )
+        assert "parser_v2_locked_predictions.jsonl" not in (
+            core.PREDICTION_MEMBER_NAMES
+        )
+
+    def test_all_three_streams_share_one_case_membership(self, v3_bundle):
+        ids = [row["case_id"] for row in v3_bundle["candidate"]]
+        assert [row["case_id"] for row in v3_bundle["comparator"]] == ids
+        assert [row["case_id"] for row in v3_bundle["legacy"]] == ids
+
+    def test_swapped_candidate_and_comparator_streams_are_rejected(
+        self, v3_bundle
+    ):
+        core = v3_bundle["core"]
+        with pytest.raises(core.LockedEvaluationError):
+            core.score_locked_evaluation(
+                v3_bundle["labels"],
+                v3_bundle["comparator"],
+                v3_bundle["candidate"],
+                v3_bundle["gates"],
+                raise_on_invalid=True,
+            )
+
+    def test_comparator_identity_cannot_be_invented_by_a_caller(
+        self, v3_bundle
+    ):
+        core = v3_bundle["core"]
+        locked = v3_bundle["locked_inputs"][0]
+        envelope = next(
+            row
+            for row in v3_bundle["candidate"]
+            if row["case_id"] == locked["case_id"]
+        )
+        with pytest.raises(core.LockedEvaluationError):
+            core.validate_prediction_envelope(
+                envelope, locked, expected_parser_version="0" * 64
+            )
+
+
+class TestParserV3ProfileIsNotOverridable:
+    """The candidate is chosen by entrypoint, never by argv or environment."""
+
+    def test_candidate_identity_is_not_taken_from_argv(self):
+        source = (
+            ROOT / "scripts" / "run_parser_v3_locked_predictions.py"
+        ).read_text("utf-8")
+        assert 'PROFILE_ID = "parser-v3-v1"' in source
+        assert "argv" not in source.split("def main")[0]
+
+    def test_candidate_identity_is_not_taken_from_the_environment(self):
+        source = (
+            ROOT / "scripts" / "run_parser_v3_locked_predictions.py"
+        ).read_text("utf-8")
+        assert "os.environ" not in source
+        assert "getenv" not in source
+
+    def test_profile_is_immutable_after_import(self):
+        core = _v3_core()
+        assert "_PRESEEDED_PARSER_PROFILE_ID" not in core.__dict__
+        assert core.ACTIVE_PARSER_PROFILE_ID == "parser-v3-v1"
+
+    def test_stage_e_launcher_pins_the_scoring_profile(self):
+        source = (
+            ROOT / "scripts" / "finalize_parser_v3_locked_evaluation.py"
+        ).read_text("utf-8")
+        assert 'PROFILE_ID = "parser-v3-v1"' in source
+        assert "os.environ" not in source
+
+
+class TestFrozenSourcesRemainByteIdentical:
+    """A source freeze that is not checked is not a freeze."""
+
+    @pytest.mark.parametrize(
+        "relative,digest",
+        [
+            (
+                "src/jspace_observation/eval_parsing_v3.py",
+                "dd729c3c23771fb112811e382bf7e55f531ce534cbbd1cfec4f0527056c8908e",
+            ),
+            (
+                "src/jspace_observation/eval_parsing_v2.py",
+                "fe02781545e26c2f97d1731e985d081a2f1468950bec4d88700647849243d182",
+            ),
+            (
+                "src/jspace_observation/eval_parsing.py",
+                "4b07b91859aca33b51af9c15b08f07026f11b0141f1300fd3f942138b731177e",
+            ),
+        ],
+    )
+    def test_frozen_parser_source_bytes_are_unchanged(self, relative, digest):
+        """Plain byte identity of the checked-in source, newline-normalised."""
+        path = ROOT.joinpath(*relative.split("/"))
+        assert hashlib.sha256(_lf_bytes(path)).hexdigest() == digest
+
+    def test_registered_canonical_parser_identities_are_unchanged(self):
+        """The registered digests are domain-separated, not plain file hashes."""
+        core = _v3_core()
+        assert core.FROZEN_PARSER_SOURCE_SHA256 == (
+            "76dc58684f4e3818a3f557a1828571674e799f65a9f0a97d07706839ff859ea9"
+        )
+        assert core.FROZEN_PARSER_VERSION == (
+            "0ce0f3cd5e0a1d4c5b4c9eff9a2968deecd04c594f435a2fa2bfec332fd3cace"
+        )
+        assert core.FROZEN_COMPARATOR_PARSER_IDENTITIES["parser_v2"][
+            "parser_source_sha256"
+        ] == (
+            "f538add0bdd6e5a3281d0298b374a99fecea962a91a4cbaa5b4a20795d9a6918"
+        )
+        assert core.FROZEN_LEGACY_PARSER_SOURCE_SHA256 == (
+            "4b07b91859aca33b51af9c15b08f07026f11b0141f1300fd3f942138b731177e"
+        )
+
+
+class TestStageEStillRefusesEveryParserV3Artefact:
+    """The deny lists must cover the derived worker and the v3 launchers."""
+
+    @pytest.mark.parametrize(
+        "name",
+        [
+            "eval_parsing_v3.py",
+            "eval_parsing_v3.pyc",
+            "eval_parsing_v3.cpython-311.pyc",
+            "parser_v3_process_worker.py",
+            "run_parser_v3_locked_predictions.py",
+        ],
+    )
+    def test_forbidden_artefact_name(self, name, tmp_path):
+        candidate = tmp_path / name
+        candidate.write_bytes(b"")
+        assert finalizer._forbidden_parser_path(candidate) is True
+
+    def test_dynamic_import_string_for_v3_is_rejected(self, tmp_path):
+        core = _v3_core()
+        bad = tmp_path / "sneaky.py"
+        bad.write_text(
+            "import importlib\n"
+            "m = importlib.import_module('jspace_observation.eval_parsing_v3')\n",
+            encoding="utf-8",
+        )
+        with pytest.raises(core.LockedEvaluationError):
+            core.assert_parser_free_source(bad.read_bytes(), "sneaky")
+
+    def test_stage_e_entrypoint_source_stays_parser_free(self):
+        core = _v3_core()
+        for name in (
+            "finalize_parser_v2_locked_evaluation.py",
+            "finalize_parser_v3_locked_evaluation.py",
+        ):
+            path = ROOT / "scripts" / name
+            core.assert_parser_free_source(path.read_bytes(), name)
