@@ -3454,3 +3454,42 @@ its image is not used.
 
 No locked input was read, no prediction was generated and no label was accessed
 at any point.
+
+
+### Parser-v3 evaluation image built (source commit `ec3801d3`)
+
+`	ext
+source commit      ec3801d39677f1568e6940c5593a7af07999a8f3
+repository         j-space-observation-parser-v3-eval
+tag                ec3801d39677f1568e6940c5593a7af07999a8f3
+image digest       sha256:2d85fc9be656d5af992d2ec28e4749583c6c4873ce0c0c38b0e6e811d3fb1ad8
+image binding      c9f82d9253650f57bbe0e945027cb4c74c1ce6d29369b453d02871c022203cfb
+registry           acrjspaceobssea0708231738.azurecr.io
+base image         python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d
+`
+
+Launcher output:
+
+`	ext
+[OK] acrjspaceobssea0708231738.azurecr.io/j-space-observation-parser-v3-eval@sha256:2d85fc9be656d5af992d2ec28e4749583c6c4873ce0c0c38b0e6e811d3fb1ad8
+[OK] Image binding SHA-256: c9f82d9253650f57bbe0e945027cb4c74c1ce6d29369b453d02871c022203cfb
+[OK] CPU-only image and source tag are immutable; no latest tag
+`
+
+The tag is the immutable source commit; there is no `latest` tag; Stage P and
+Stage E share this one digest and differ only by hardcoded entrypoint.
+
+Build host: `vm-pv2-orchestrator-sea` in `rg-jspace-observation-sea`, the
+pre-existing parser-v2 orchestrator VM, running as root with the user-assigned
+identity `id-jspace-parser-v2-control-sea`. As in the parser-v2 round, the
+build record files remain on the orchestrator host, outside the committed tree,
+at `/home/jspaceadmin/J-space-observation/results/runs/parser-v3-eval-build-ec3801d39677f1568e6940c5593a7af07999a8f3`
+(`build_provenance.json`, `image_binding.json`, `image_binding.sha256`).
+Their authoritative digests are recorded above.
+
+Three build claims now exist in the coordination zone for parser v3: two
+stranded (`c2ab05c9` and `1c5ace45`) and one completed (`ec3801d3`). Only
+the completed one has an image, and only that image may be used.
+
+Holdout state after the build: still `SEALED`. No locked input was read, no
+prediction was generated, no label was accessed.
