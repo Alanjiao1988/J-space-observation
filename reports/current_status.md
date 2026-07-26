@@ -1,7 +1,8 @@
 # Project Status Report
 
 > **Phase 1.2D status (e3f86ae39ece):** the parser-v3 one-shot locked
-> evaluation is **preregistered and frozen but not executed**. No prediction
+> evaluation is **preregistered, frozen, and its evaluation image is built**;
+> Stage P has not run. No prediction
 > exists, no locked label has been read, and the 120-case parser-v3 holdout is
 > **unspent**. Parser v3 has no result and must not be called validated. See
 > "Phase 1.2D" below.

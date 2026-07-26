@@ -484,3 +484,67 @@ source path is byte-identical to its state at the freeze, which the image
 binding hashes prove independently of the commit name. No parser, gate
 contract, orchestrator semantic, profile binding or membership rule may change
 after the freeze, and none has.
+
+
+## Parser-v3 execution state after the image build
+
+`	ext
+preregistration freeze   e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea
+image source commit      ec3801d39677f1568e6940c5593a7af07999a8f3
+image digest             sha256:2d85fc9be656d5af992d2ec28e4749583c6c4873ce0c0c38b0e6e811d3fb1ad8
+image binding sha256     c9f82d9253650f57bbe0e945027cb4c74c1ce6d29369b453d02871c022203cfb
+holdout state            SEALED (unspent)
+predictions              none
+labels accessed          none
+formal result            none
+full test suite          1323 passed
+`
+
+Build host, already provisioned and ready:
+
+`	ext
+vm-pv2-orchestrator-sea   rg-jspace-observation-sea, Debian 12, running
+repo clone                /home/jspaceadmin/J-space-observation (root-owned)
+operator                  root, PATH=/usr/local/bin:/usr/bin:/bin
+identity                  id-jspace-parser-v2-control-sea
+                          clientId 3a34885b-f76c-493a-965a-6ac13c7c2530
+driven from Windows by    az vm run-command invoke (output truncates at ~4 KB)
+`
+
+**The launcher must be run as root.** It writes `acr_task_run_body.json`,
+`chmod 400` s it, then rewrites the same path; a non-root operator fails with
+`EACCES` after the durable claim already exists, which strands the claim
+permanently. Two parser-v3 build claims were stranded this way before the cause
+was found.
+
+### Remaining steps
+
+`	ext
+1. Stage P    infra/azure/scripts/10_run_parser_v3_locked_eval.sh
+              PARSER_EVAL_STAGE=P
+              PARSER_EVAL_RUNTIME_CONFIG_FILE=<generated>
+              PARSER_EVAL_IMPLEMENTATION_MANIFEST_FILE=<generated>
+              PARSER_EVAL_IMAGE_BINDING_FILE=<build record image_binding.json>
+              plus the same coordination-zone variables used for the build
+2. seal three prediction streams
+3. labels-open transaction, then Stage E
+4. formal PASS or FAIL, holdout RETIRED
+5. independent claude-opus-5 reasoning=max recomputation
+6. paper ledgers, commit and push
+`
+
+The runtime configuration is produced by
+`scripts/create_parser_v2_runtime_config.py`, which resolves the launcher path
+through `core.EVAL_RUNTIME_LAUNCHER_PATH` and therefore selects
+`10_run_parser_v3_locked_eval.sh` under the parser-v3 profile.
+
+### Warning carried into the next round
+
+Every launch attempt takes a durable one-shot claim in the coordination zone.
+A launch that dies after claiming and before dispatching strands the claim, and
+a stranded launch claim cannot be recovered by any later process. Stage P must
+therefore not be started without enough capacity to carry it to a sealed
+prediction set in one pass. The launcher requires clean
+`HEAD == origin/main`; it does **not** require `HEAD` to equal the image's
+source commit, so documentation-only commits made after the build are safe as
+long as no bound source path changes.
