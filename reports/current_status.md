@@ -1,5 +1,11 @@
 # Project Status Report
 
+> **Phase 1.2D status (e3f86ae39ece):** the parser-v3 one-shot locked
+> evaluation is **preregistered and frozen but not executed**. No prediction
+> exists, no locked label has been read, and the 120-case parser-v3 holdout is
+> **unspent**. Parser v3 has no result and must not be called validated. See
+> "Phase 1.2D" below.
+
 ## Summary
 
 The critical-path reset is complete through bounded real-Jacobian technical
@@ -1589,3 +1595,85 @@ J-space-observation/
 ✓ **Phase 0.5A**: Real official J-lens bounded T4 technical feasibility GREEN
 ⏳ **Pending**: Scientific lens-quality validation; not implied by Phase 0.5A
 ⏳ **Pending**: A new locked holdout before any revised parser can be validated
+
+
+## Phase 1.2D - parser-v3 locked evaluation (preregistered, not executed)
+
+**Preregistration commit (source freeze):** `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea`, pushed to
+`Alanjiao1988/J-space-observation`. Working tree clean, local `HEAD` equal to
+`origin/main`.
+
+**Holdout state:** `SEALED`. Unspent. Formal evaluation ordinal 0.
+
+```text
+holdout touched         no
+predictions generated   no
+locked labels accessed  no
+formal result           none
+```
+
+### What is frozen
+
+| Item | Identity |
+| --- | --- |
+| Candidate | parser v3, `jspace-parser-v3-reference-blind-extraction/v1` |
+| Candidate version | `0ce0f3cd5e0a1d4c5b4c9eff9a2968deecd04c594f435a2fa2bfec332fd3cace` |
+| Candidate source digest | `76dc58684f4e3818a3f557a1828571674e799f65a9f0a97d07706839ff859ea9` |
+| Gating comparator | parser v2, `6cfaec62db37562930a4cb7d3a252bcbf80e1eaf748de98213863ff2566a7f86` |
+| Reporting comparator | legacy, `4b07b91859aca33b51af9c15b08f07026f11b0141f1300fd3f942138b731177e` |
+| Gate contract | `docs/phase1_parser_v3_acceptance_gates.json`, `2fcc323481221fbc5c1f56b5beccd238fd835303c46df61087e1483dfc28dda7` |
+| Evaluation image | `j-space-observation-parser-v3-eval:e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea` (not yet built) |
+
+The gate contract was derived from the frozen parser-v2 contract with 0 numeric
+threshold changes, 0 metric semantic changes and 0 population changes. The
+candidate worker was derived from the parser-v2 worker with 6 counted
+substitutions and 0 unexpected diffs. Both derivations are machine-checked and
+idempotent.
+
+### Verification at the freeze
+
+```text
+full test suite     1320 passed (the one permitted full run)
+targeted suites       240 passed
+parser-v3 tests        78
+```
+
+The 78 parser-v3 tests include all 14 mandatory regressions: Stage E rejects a
+`eval_parsing_v3.py` file, a `eval_parsing_v3.pyc` file, a code object named
+`parse_v3`, and a dynamic-import string for the candidate module; the candidate
+identity cannot be changed by argument or by environment after import; parser
+v2's default profile stays byte-identical; the candidate never writes into a
+parser-v2 member path; the three streams must share identical, identically
+ordered case membership; swapped streams are rejected; the finalizer cannot
+import the candidate indirectly; and all three frozen parser sources remain
+byte-identical.
+
+### Safety defect disclosed
+
+Stage E's parser-import prohibition initially omitted parser v3 from several
+exact-match deny lists and probes. Two independent read-only preflight reviews
+(`claude-opus-5`, `reasoning=max`) found four further CRITICAL defects in the
+three-stream wiring, two of which would have surfaced only after prediction
+generation or after the first label read. All were fixed **before**
+preregistration, prediction generation, holdout access and label access, so the
+impact on the formal evaluation is **none**. Recorded in full in
+`docs/run_log.md` and as limitation `L-24`.
+
+### Why it is not executed
+
+The preregistered build and run launchers are hardened POSIX shell scripts that
+re-exec under `env -i` with `PATH=/usr/local/bin:/usr/bin:/bin` and resolve
+`/usr/bin/python3`. The development machine is Windows with only MSYS/MINGW64
+bash, no `/usr/bin/python3`, no container runtime, and WSL with no distribution
+installed. Earlier Azure phases in this project were driven by Python and were
+unaffected, so this path had never been exercised here.
+
+A POSIX host with Python 3.11 and the Azure CLI is required to build the image
+and run Stage P and Stage E. Nothing needs re-deriving; execution resumes from
+`e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea` exactly as frozen.
+
+### Next gate
+
+Build the immutable image once, validate its digest and provenance, run Stage P,
+seal the three prediction streams, run Stage E, and record one formal `PASS` or
+`FAIL` with the holdout retired.

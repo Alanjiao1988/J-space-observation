@@ -270,3 +270,33 @@ AR-0037,0.5C,20260725T174743Z,07_figure_data.csv,figure_data,repo:artifacts/phas
 AR-0038,0.5C,20260725T174743Z,artifact_manifest.json,manifest,repo:artifacts/phase05c-jlens-disjoint/track-a1/20260725T174743Z,abe0a6125eaa6ac1e184d7949a25a8ba461487dba97914b83584107e48aeebf2,1515,no,no,provenance
 AR-0039,0.5C,20260725T174743Z,jlens_saturation_prompts.jsonl,fit_corpus,repo:data/jlens_saturation_prompts.jsonl,dd5d97498324e8b5153c106f0edbc4d962d47771db7dfa2093b48fc36f5962fa,16087,no,no,public_fixture
 AR-0040,0.5C,20260725T174743Z,j-space-jlens image,container_image,acr:acrjspaceobssea0708231738/j-space-observation-jlens,1fdf406fa34d76f228bd8a3570e9564c0a63baadda8e5b3e58f9c0e1b9ad3a37,not_recorded,yes,no,provenance
+
+
+## L-24 - The parser-v3 safety boundary needed repair before it was trusted
+
+Before the parser-v3 preregistration commit `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea`, Stage E's
+parser-import prohibition omitted parser v3 from several exact-match deny lists
+and probes, and the three-stream orchestration contained four further defects
+that would have surfaced only after prediction generation or after the first
+label read. Two of those four would have spent or wasted the one-shot holdout:
+a payload-ordering fault that fails after all 360 parser invocations, and a
+ledger validator fault that raises **after** the label download and forces
+`INVALID`.
+
+They were found by two independent read-only preflight reviews and fixed before
+preregistration, prediction generation, holdout access and label access, so the
+formal evaluation is unaffected. The limitation that survives into the paper is
+not "a bug existed" but this: **the isolation between parser development and
+holdout scoring in this project is procedural and hash-audited, not
+security-enforced, and it required an explicit adversarial review pass to hold.**
+A reader should treat the parser-v3 result as depending on that review having
+been thorough, not on a mechanism that makes the failure impossible.
+
+## L-25 - Parser v3 has no locked result
+
+As of commit `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea` parser v3 is preregistered and frozen but **not
+evaluated**. No prediction has been generated, no locked label has been read,
+and the holdout is unspent. Parser v3 must not be described as validated,
+non-regressive, or better than parser v2 anywhere, and no automatic parser
+output may be treated as a final label. Parser v2's failed locked evaluation
+(L-01) remains the only locked parser result in this project.

@@ -1697,3 +1697,59 @@ Consequence:
 - Next gate: main-agent review only. No behavioural, semantic or scientific gate
   is opened. Nothing in this pack licenses a claim about hidden reasoning, an
   internal workspace, invisible chain-of-thought, or a J-space.
+
+
+## Phase 1.2D - parser-v3 preregistration decisions (commit `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea`)
+
+- **Terminal outcome is binary.** The round must end in `PASS` or `FAIL`.
+  `INVALID` is reserved for integrity or provenance corruption only. There is no
+  manual override, and both `PASS` and `FAIL` retire the holdout.
+
+- **The gating comparator is parser v2, not the legacy parser.** The derived
+  contract's `clean_pooled_non_regression` and `critical_strict_improvement`
+  gates compare parser v3 against parser v2. `critical_strict_improvement`
+  remains **mandatory** under that remapping, which is strictly harder than the
+  parser-v2 round and can turn `PASS` into `FAIL`. This is preregistered
+  deliberately.
+
+- **The legacy stream is reporting-only.** It is generated and sealed with the
+  other two, but it is scored only after the holdout has been retired, inside a
+  guarded pass whose failure cannot alter `PASS`/`FAIL`. Its aggregates are
+  published in the Stage E result and report rather than in the sealed score
+  members.
+
+- **Historical `parser_v2_*` field names are retained.** Renaming roughly 44
+  sites immediately before a one-shot evaluation would enlarge the risk surface
+  without adding a security property. Candidate identity is carried by the
+  import-time profile, the hardcoded worker identity, the algorithm ID, the
+  parser version, the source SHA-256, and the prediction seal. Every metrics
+  record additionally carries a `parser_attribution` block. Full record:
+  `docs/phase1_parser_v3_orchestrator_schema_compatibility.md`.
+
+- **The candidate parser is selected by entrypoint, never by argument or
+  environment.** The profile is seeded into the module namespace before the
+  module executes, is fixed before any locked input is read, and cannot be
+  rebound afterwards. Parser v2 remains the default profile, so every
+  pre-existing caller is byte-identical.
+
+- **Stage E loads no parser under any profile.** Its profile is a *scoring*
+  profile. The candidate parser's filename, module name, bytecode stem,
+  code-object names and dynamic-import strings are all denied, and the finalizer
+  reads only sealed prediction streams.
+
+- **Build files were derived, not rewritten.** `Dockerfile.parser-v3-eval`,
+  `09_build_parser_v3_eval.sh`, `10_run_parser_v3_locked_eval.sh` and
+  `parser_v3_azure_contract.py` are exact, counted substitutions of their frozen
+  parser-v2 originals. The image is tagged with the immutable source commit;
+  `latest`, mutable tags, runtime `pip install` and floating dependencies are
+  all rejected by the build script.
+
+- **Round paused before execution, not before decision.** No POSIX host is
+  available on the development machine to run the preregistered launchers, so
+  Stage P has not run. Nothing about the freeze depends on that; execution
+  resumes from `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea` unchanged.
+
+- **Next gate:** build the immutable evaluation image once from `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea`, then
+  Stage P, seal, Stage E, and one formal `PASS`/`FAIL`. Nothing in this
+  preregistration licenses any claim about hidden reasoning, an internal
+  workspace, or a J-space.

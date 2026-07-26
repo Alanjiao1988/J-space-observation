@@ -410,3 +410,77 @@ before labels are read, retain PASS or FAIL, and retire the holdout. Otherwise
 stop. Do not start higher-n, a new target-model behavioral run, or a larger
 J-lens fit.
 ```
+
+
+## Phase 1.2D handoff - parser-v3 preregistration complete, execution pending
+
+Preregistration commit (source freeze):
+
+```text
+e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea
+```
+
+State at that commit:
+
+```text
+holdout touched         no
+predictions generated   no
+locked labels accessed  no
+holdout state           SEALED (unspent)
+formal result           none
+full test suite         1320 passed
+working tree            clean, HEAD == origin/main
+```
+
+Frozen after this commit - do not modify: parser v3, the candidate worker,
+Stage P prediction semantics, Stage E scoring semantics, the gate contract, the
+profile binding, and the membership rules.
+
+### What remains
+
+```text
+1. build the immutable image once from e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea
+   tag j-space-observation-parser-v3-eval:e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea
+2. validate image digest and provenance
+3. Stage P            120 candidate + 120 parser-v2 + 120 legacy predictions
+4. seal three prediction streams
+5. Stage E            labels-open transaction, then first label read
+6. formal PASS or FAIL, holdout RETIRED
+7. independent claude-opus-5 reasoning=max recomputation
+8. paper ledgers, commit and push
+```
+
+### Blocker
+
+`infra/azure/scripts/09_build_parser_v3_eval.sh` and
+`10_run_parser_v3_locked_eval.sh` are hardened POSIX shell scripts. They
+re-exec under `env -i` with `PATH=/usr/local/bin:/usr/bin:/bin` and resolve
+`/usr/bin/python3`. The current Windows machine has only MSYS/MINGW64 bash, no
+`/usr/bin/python3`, no `/usr/local/bin`, no container runtime, and WSL with no
+distribution installed. Earlier Azure phases used Python drivers and were
+unaffected.
+
+A POSIX host with Python 3.11 and the Azure CLI, signed in to subscription
+`943bacdf-8b6e-4e3a-8126-a149f623d32e`, is required. The coordination zone
+`parser-v2-coordination.jspace.internal`
+(`rg-jspace-parser-v2-coord-sea`, 0 VNet links) and the registry
+`acrjspaceobssea0708231738` both already exist.
+
+Nothing needs re-deriving. Execution resumes from `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea` exactly as frozen.
+
+
+### Post-freeze commits and the build source SHA
+
+The preregistration freeze is commit `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea`.
+Commits made after it in this round touch **documentation only** and never touch
+any path in `RUNTIME_SOURCE_BINDING_PATHS` (24 paths) or
+`IMAGE_BINDING_SOURCE_PATHS` (31 paths). Verified: the intersection of the
+edited set and both binding sets is empty.
+
+The build script derives its source SHA from `HEAD` at build time, so the
+image tag may name a later commit than the preregistration commit. That is
+audit-visible and intended. The invariant that matters is that every bound
+source path is byte-identical to its state at the freeze, which the image
+binding hashes prove independently of the commit name. No parser, gate
+contract, orchestrator semantic, profile binding or membership rule may change
+after the freeze, and none has.

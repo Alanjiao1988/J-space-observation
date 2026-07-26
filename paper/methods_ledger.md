@@ -402,3 +402,65 @@ correlation are technical stability statistics for fitted linear operators and
 are never semantic evidence. Nothing here supports any claim about a workspace,
 hidden reasoning, an internal chain-of-thought, J-space, semantic convergence, or
 any lens being scientifically usable.
+
+
+---
+
+## Phase 1.2D - parser-v3 prospective one-shot locked evaluation (preregistered e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea)
+
+**Design.** Prospective, preregistered, single-shot evaluation of a candidate
+answer-extraction parser against a sealed 120-case holdout. The preregistration
+commit precedes every prediction and every label read. The holdout is retired on
+first label access regardless of outcome.
+
+**Candidate.** Parser v3,
+`jspace-parser-v3-reference-blind-extraction/v1`, parser version
+`0ce0f3cd5e0a1d4c5b4c9eff9a2968deecd04c594f435a2fa2bfec332fd3cace`, canonical
+source digest
+`76dc58684f4e3818a3f557a1828571674e799f65a9f0a97d07706839ff859ea9`,
+implementation commit `310277bcadd67ca9e77986fc292fae47dc5ceda2`. The registered
+digest is domain-separated and canonicalised, not a plain file hash.
+
+**Comparators.** Two streams over the identical 120 cases. Parser v2
+(`6cfaec62db37562930a4cb7d3a252bcbf80e1eaf748de98213863ff2566a7f86`) is the
+**gating** comparator: the derived contract's non-regression and strict
+improvement gates compare parser v3 against parser v2. The legacy parser
+(`4b07b91859aca33b51af9c15b08f07026f11b0141f1300fd3f942138b731177e`) is
+**reporting-only** and cannot influence the verdict. Where the parser-v2
+comparator must be expressed in the frozen comparator schema, a total
+deterministic adapter
+(`jspace-parser-envelope-to-comparator-decision/v1`) is applied to parser
+envelopes only; legacy output is never re-interpreted and then presented as
+legacy output.
+
+**Gate contract.** `docs/phase1_parser_v3_acceptance_gates.json`, digest
+`2fcc323481221fbc5c1f56b5beccd238fd835303c46df61087e1483dfc28dda7`, derived from
+the frozen parser-v2 contract
+(`a51c7faa4ff6345eb3ffa78b3f1ed49e18db0ff24e4a746bf91938dc3af3f988`) with
+0 numeric threshold changes, 0 metric semantic changes and 0 population
+changes; 52 numeric leaves inherited unchanged; verdict `DERIVATION_FAITHFUL`
+(`docs/parser_v2_to_v3_gate_contract_diff.json`).
+
+**Execution model.** Two stages from one image digest under different hardcoded
+entrypoints. Stage P generates and seals three prediction streams and never
+reads a label. Stage E persists a labels-open transaction before the first label
+byte, imports no parser, calls no parser, and scores only sealed streams.
+Machine-readable runtime record:
+`docs/phase1_parser_v3_runtime_profile.json`; derivation evidence:
+`docs/phase1_parser_v3_gate_derivation.json`.
+
+**Exclusion rules and deviations.** No case exclusions. No protocol deviation.
+One implementation deviation is recorded: a defect in Stage E's parser-import
+deny lists and four defects in the three-stream wiring were found by two
+independent read-only preflight reviews and fixed **before** preregistration,
+prediction generation and label access, with no effect on the formal
+evaluation (see L-24).
+
+**Status at this commit.** Preregistered and frozen; **not executed**. 1320
+tests pass. No prediction exists, no label has been read, the holdout is
+unspent, and no result may be reported (see L-25).
+
+**Label-blindness statement.** Stage P recursively lists the parent prefix and
+therefore observes locked-label blob *names*. The manifest publishes
+`labels_content_accessed: false` together with `labels_prefix_listed: true`; a
+bare `labels_accessed=false` is never published.

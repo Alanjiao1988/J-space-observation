@@ -3233,3 +3233,124 @@ Results:
   functionally a race against `git add`. Future rounds should either have
   subagents write drafts outside the repository or have the main agent stage
   by explicit path immediately after a fresh status check.
+
+
+## Phase 1.2D - parser-v3 locked evaluation preregistration (commit `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea`)
+
+Preregistration commit `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea` was pushed to
+`Alanjiao1988/J-space-observation` **before** any parser-v3 prediction was
+generated and **before** any parser-v3 locked label was read. At that commit:
+
+```text
+holdout touched         no
+predictions generated   no
+locked labels accessed  no
+working tree            clean
+local HEAD == origin/main
+full test suite         1320 passed
+targeted suites         240 passed
+```
+
+The commit freezes the candidate parser, the derived gate contract, the
+three-stream Stage P / Stage E orchestration, the runtime evaluation profile,
+and the evaluation image source.
+
+### Candidate and comparator identities
+
+```text
+candidate                parser v3
+algorithm_id             jspace-parser-v3-reference-blind-extraction/v1
+parser_version           0ce0f3cd5e0a1d4c5b4c9eff9a2968deecd04c594f435a2fa2bfec332fd3cace
+source_sha256            76dc58684f4e3818a3f557a1828571674e799f65a9f0a97d07706839ff859ea9
+implementation_commit    310277bcadd67ca9e77986fc292fae47dc5ceda2
+
+comparator_1 (gating)    parser v2
+parser_version           6cfaec62db37562930a4cb7d3a252bcbf80e1eaf748de98213863ff2566a7f86
+
+comparator_2 (reporting) legacy parser
+source_sha256            4b07b91859aca33b51af9c15b08f07026f11b0141f1300fd3f942138b731177e
+```
+
+### Derivation evidence
+
+```text
+gate contract            docs/phase1_parser_v3_acceptance_gates.json
+                         2fcc323481221fbc5c1f56b5beccd238fd835303c46df61087e1483dfc28dda7
+numeric threshold changes   0
+metric semantic changes     0
+population changes          0
+verdict                     DERIVATION_FAITHFUL
+
+candidate worker         scripts/parser_v3_process_worker.py
+substitutions               6
+unexpected diffs            0
+entrypoint derivations      1 changed line each
+```
+
+### Safety defect found and fixed before preregistration
+
+Stage E's parser-import prohibition initially omitted parser v3 from several
+exact-match deny lists and probes (`FORBIDDEN_FILENAMES`, the `.pyc` stem set,
+`_FORBIDDEN_CODE_NAMES`, and the source probe). Two independent read-only
+preflight reviews (`claude-opus-5`, `reasoning=max`) then found four further
+CRITICAL defects in the three-stream wiring:
+
+1. Stage P assembled its upload payload in construction order rather than in
+   registered member order, so the manifest-last write would have failed
+   **after** all 360 parser invocations.
+2. Three validators hardcoded the parser-v2 prediction member name, guaranteeing
+   a `KeyError` under the parser-v3 profile.
+3. `load_frozen_gate_bytes` asked Git for the v3 contract at a frozen protocol
+   commit that predates the file, so Stage E could not load its own gates.
+4. The scoring ledger applied the legacy-row validator to the parser-v2 gating
+   comparator, which carries parser envelopes; this would have raised **after**
+   the label download, spending the holdout and forcing `INVALID`.
+
+```text
+Found and fixed before:
+  preregistration
+  prediction generation
+  holdout access
+  label access
+
+Impact on formal evaluation:
+  none
+```
+
+All four, plus six HIGH and two MEDIUM findings, were fixed and covered by
+regression tests before the preregistration commit. This is recorded rather
+than hidden because it is reproducibility and safety-boundary evidence.
+
+### Execution environment blocker
+
+The preregistered build and run launchers
+(`infra/azure/scripts/09_build_parser_v3_eval.sh`,
+`infra/azure/scripts/10_run_parser_v3_locked_eval.sh`) are hardened POSIX shell
+scripts that re-exec under `env -i` with `PATH=/usr/local/bin:/usr/bin:/bin`
+and resolve `/usr/bin/python3`. The development machine is Windows with only an
+MSYS/MINGW64 bash, no `/usr/bin/python3` and no `/usr/local/bin`, and WSL has no
+distribution installed. Earlier Azure phases in this project were driven by
+Python scripts and so were unaffected.
+
+No parser-evaluation image has ever been built. Stage P and Stage E are
+therefore **not yet executed**; the round is paused at the preregistration
+freeze rather than at a scientific result. The freeze itself is complete and
+irreversible, so execution can resume from `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea` on any POSIX host without
+re-deriving anything.
+
+
+### Post-freeze commits and the build source SHA
+
+The preregistration freeze is commit `e3f86ae39ecefe5e6b4b68a1e9266708cd1607ea`.
+Commits made after it in this round touch **documentation only** and never touch
+any path in `RUNTIME_SOURCE_BINDING_PATHS` (24 paths) or
+`IMAGE_BINDING_SOURCE_PATHS` (31 paths). Verified: the intersection of the
+edited set and both binding sets is empty.
+
+The build script derives its source SHA from `HEAD` at build time, so the
+image tag may name a later commit than the preregistration commit. That is
+audit-visible and intended. The invariant that matters is that every bound
+source path is byte-identical to its state at the freeze, which the image
+binding hashes prove independently of the commit name. No parser, gate
+contract, orchestrator semantic, profile binding or membership rule may change
+after the freeze, and none has.
