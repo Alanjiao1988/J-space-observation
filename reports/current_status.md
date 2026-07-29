@@ -1678,3 +1678,66 @@ and run Stage P and Stage E. Nothing needs re-deriving; execution resumes from
 Build the immutable image once, validate its digest and provenance, run Stage P,
 seal the three prediction streams, run Stage E, and record one formal `PASS` or
 `FAIL` with the holdout retired.
+
+## Phase 1.2D parser-v3 locked evaluation (2026-07-25) — HALTED, NOT RUN
+
+```
+Outcome:                          HALTED before preregistration
+Formal PASS/FAIL:                 none produced
+Preregistration commit:           none created this round
+Holdout state:                    SEALED, unspent (15 objects)
+Locked labels read:               0
+Predictions generated:            0
+Authorization lock:               not created
+State chain:                      not bootstrapped
+ACA job:                          not created
+Formal evaluation ordinal:        0
+```
+
+The round was stopped in preflight. The sealed parser-v3 validation set, the
+frozen scoring instrument and the parser-v3 acceptance gates are three
+artifacts that do not describe the same thing. Nine findings (`H1`-`H9`) are
+recorded in `docs/phase1_parser_v3_locked_evaluation_protocol.md` §15.
+
+The decisive one is `H9` and it involves no instrument. The gate contract
+`docs/phase1_parser_v3_acceptance_gates.json` admits three typed-decision
+labels and declares `typed_decision_support = {ambiguous: 10, no_answer: 30,
+present: 80}`. The sealed set contains a fourth class,
+`present_unextractable` (4 cases), which `null_collapse_prohibited: true`
+forbids collapsing, and its real support is `{present: 91, no_answer: 23,
+ambiguous: 6}`. Strata are correct at 12 × 10 = 120. Because the `ambiguity`,
+`no_answer`, `answer_presence_macro_f1` and `overall_exact_typed_decision`
+gates are calibrated against the declared support, no instrument can score
+this set against these gates.
+
+Root cause: the v3 gate contract was derived from v2 by substitution rather
+than re-derived from the v3 set — the `last_number_trap` blocks in the two
+contracts are byte-identical, including an `error_definition` naming a
+registered distractor span the v3 set does not contain. In parallel the set
+was built to its own conventions. No artifact-level agreement test existed
+between the two.
+
+Two preflight instruments found all nine and are now standing requirements:
+the **write-blocked dry run** (real bootstrap, real storage,
+`upload_blob_once` replaced by a sentinel `BaseException`, zero side effects)
+and the **projection probe** (project the set into the frozen schema and let
+the *frozen* validator judge it).
+
+Six normalisations (`N1`-`N6`, §15.4) were validated and are kept for reuse.
+They lift the frozen-valid projection from 22 to 105 of 120 with all 105
+typed decisions preserved, and they make the mandatory `last_number_trap`
+gate non-vacuous on all 10 S06 cases — without them that gate would have
+passed unconditionally while appearing to be enforced (`H3`). They cannot
+reach the remaining 15 records, which differ semantically (`H8`).
+
+Nothing irreplaceable was spent. Parser v3 is unchanged and frozen at source
+SHA-256 `76dc58684f4e3818a3f557a1828571674e799f65a9f0a97d07706839ff859ea9`.
+Because no preregistration commit was created, the parser, gate contract,
+profile binding and membership rules remain editable — which the remediation
+in §15.8 requires.
+
+**Next gate:** re-derive the parser-v3 gate contract from the parser-v3 set,
+resolve `present_unextractable` explicitly, reconcile the span convention
+across the set and all three parsers, and add a mechanical preregistration
+check that reproduces every declared support count, gate denominator and enum
+vocabulary from sealed bytes before any image is built.

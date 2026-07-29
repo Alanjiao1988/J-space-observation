@@ -464,3 +464,81 @@ unspent, and no result may be reported (see L-25).
 therefore observes locked-label blob *names*. The manifest publishes
 `labels_content_accessed: false` together with `labels_prefix_listed: true`; a
 bare `labels_accessed=false` is never published.
+
+## Preflight instruments for one-shot locked evaluations
+
+Two read-only preflight instruments were developed during Phase 1.2D. Between
+them they found all five findings in protocol §14 and all nine in §15, every
+one of them before any preregistration commit, image build, prediction or
+label read. Both are standing requirements for any future one-shot round.
+
+### Write-blocked dry run
+
+The real custodian bootstrap is executed against real storage with the
+orchestrator's single write primitive, `core.upload_blob_once`, replaced by a
+sentinel that raises a subclass of `BaseException`. Every read path, binding
+path, manifest validation and namespace translation executes exactly as it
+would in production. The first attempted write aborts the process before any
+byte is committed.
+
+Two implementation details matter and are easy to get wrong:
+
+- the sentinel must derive from `BaseException`, not `Exception`, or the
+  bootstrap's blanket `except Exception` swallows it and the run continues;
+- the bootstrap's `main()` takes no positional arguments, so the probe must
+  set `sys.argv` rather than pass parameters.
+
+Verified side-effect-free: after each run the sealed prefix was re-listed and
+was byte-for-byte the same object set, with no state, prediction, score,
+visibility or authorization-lock object created.
+
+This instrument is the only preflight that exercises the real orchestrator
+against the real sealed prefix. Every defect it found had survived a passing
+full test suite, because the test suite exercises the *v2* profile where the
+hardcoded literals happen to be correct.
+
+### Projection probe
+
+The sealed label set is projected into the scoring instrument's schema and
+then handed to the **frozen** validator. The frozen instrument, not the
+projection, decides whether each record is admissible; the projection cannot
+smuggle in data the instrument would reject.
+
+Two properties make the probe trustworthy:
+
+- it is self-checking — a projection that is wrong produces a validation
+  error rather than a plausible score;
+- it is measured in aggregate — pass counts, failure-message histograms and
+  masked value shapes — so it can be run without reading label values.
+
+Reporting convention: numeric values are masked (every digit replaced by `#`)
+so that grammar and convention mismatches are visible while answer values are
+not. This is what made it possible to diagnose a marker-inclusive versus
+literal-only span convention mismatch without reading a single answer.
+
+### Artifact agreement check (required, not yet implemented)
+
+Phase 1.2D's fatal finding (`H9`) was a disagreement between a gate contract
+and the sealed set it scores, with no instrument involved. It was found by
+direct comparison, late. Any future round must run this check first, before
+any image is built:
+
+```
+for every enum vocabulary declared in the gate contract:
+    reproduce it from the sealed set
+for every support count declared in dataset_contract:
+    recompute it from the sealed set
+for every gate denominator:
+    recompute the population it ranges over from the sealed set
+for every mandatory gate:
+    demonstrate it is non-vacuous - that at least one sealed record
+    is capable of producing an error under its error_definition
+```
+
+The non-vacuity clause is not decorative. Phase 1.2D's mandatory
+`last_number_trap` gate would have passed unconditionally, while appearing in
+the result table as an enforced gate, because the set contains no registered
+distractor span for it to range over.
+
+This check is a pure function of two sealed artifacts. It needs no
+instrument, no image and no execution.

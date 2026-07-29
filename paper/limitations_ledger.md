@@ -300,3 +300,73 @@ and the holdout is unspent. Parser v3 must not be described as validated,
 non-regressive, or better than parser v2 anywhere, and no automatic parser
 output may be treated as a final label. Parser v2's failed locked evaluation
 (L-01) remains the only locked parser result in this project.
+
+## L-26 - The parser-v3 acceptance gates do not describe the parser-v3 set
+
+The parser-v3 gate contract and the sealed parser-v3 validation set were
+built independently and never cross-checked. They disagree, and the
+disagreement is fatal to scoring.
+
+```
+docs/phase1_parser_v3_acceptance_gates.json
+  typed_decision.labels                   3 classes
+  null_collapse_prohibited                true
+  dataset_contract.typed_decision_support {ambiguous: 10, no_answer: 30, present: 80}
+
+evaluator_sets/parser_v3_v1 (sealed)
+  typed-decision classes present          4  (adds present_unextractable, 4 cases)
+  answer-presence support                 {present: 91, no_answer: 23, ambiguous: 6}
+  strata                                  12 x 10 = 120   (correct)
+```
+
+The gates `ambiguity`, `no_answer`, `answer_presence_macro_f1` and
+`overall_exact_typed_decision` are calibrated against the declared support.
+Against the real support their difficulty is different and unknown. The
+fourth decision class has no gate treatment at all and cannot be collapsed
+into `no_answer` without violating `null_collapse_prohibited`.
+
+The contract was derived from the parser-v2 contract by substitution rather
+than re-derived from the parser-v3 set: the `last_number_trap` gate blocks in
+the two contracts are byte-identical, including an `error_definition` naming a
+registered distractor span that the parser-v3 set does not contain.
+
+Consequence for the paper: **no parser-v3 acceptance threshold in this
+repository may be cited as calibrated**, and no parser-v3 gate result may be
+reported, because none was computed. The Phase 1.2D round was halted in
+preflight with the holdout `SEALED` and unspent. Full detail in
+`docs/phase1_parser_v3_locked_evaluation_protocol.md` §15.
+
+## L-27 - The parser-v3 set and the scoring instrument use different span conventions
+
+The sealed parser-v3 set registers **marker-inclusive** evidence spans: 104 of
+its 111 registered spans have `span.text` equal to the enclosing marker phrase
+rather than the numeric literal. All three parsers, including parser v3
+(`eval_parsing_v3.py:390-400`), construct candidates through the frozen
+`validate_evidence_span` and therefore emit **literal-only** spans.
+
+Had this been scored as built, prediction and label spans could never have
+matched, and every span-conditioned gate would have failed for reasons
+unrelated to parser quality. Any future parser-v3 result must state which span
+convention was in force and demonstrate that set and parsers agree on it.
+
+A lossless normalisation exists and is recorded (§15.4, `N1`): each marker span
+maps to its contained numeric literal, uniquely for 109 of 111 spans. It is
+recorded, not adopted, because it does not resolve L-26.
+
+## L-28 - A mandatory parser-v3 gate would have been vacuous
+
+`last_number_trap` is mandatory under `status_logic.PASS =
+all_absolute_and_legacy_comparison_gates_pass`. Its error definition names a
+registered distractor span, and the sealed parser-v3 set contains no distractor
+span in any of its 120 records. Scored as written, `label["distractor"]` would
+have been `None` everywhere, the gate would have counted zero errors
+unconditionally, and it would have appeared in the result table as an enforced
+mandatory gate that passed.
+
+This is recorded as a limitation of the *artifact set*, not of any result: it
+was found in preflight and no evaluation was run. Deriving the distractor by
+the frozen instrument's own rule — the rightmost registered numeric literal,
+which `evaluator_validation.py:2109-2116` already *requires* a registered
+distractor to be — makes the gate non-vacuous on all 10 S06 cases. Any future
+parser-v3 evaluation must demonstrate non-vacuity of every mandatory gate
+before preregistration.

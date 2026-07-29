@@ -548,3 +548,109 @@ prediction set in one pass. The launcher requires clean
 `HEAD == origin/main`; it does **not** require `HEAD` to equal the image's
 source commit, so documentation-only commits made after the build are safe as
 long as no bound source path changes.
+
+---
+
+# HANDOFF — Phase 1.2D halted (supersedes the "Remaining steps" above)
+
+**The remaining steps listed above must not be executed.** Phase 1.2D was
+halted in preflight. The one-shot holdout is `SEALED` and unspent, no
+preregistration commit was created this round, and nothing in the repository is
+frozen by this round.
+
+Read first: `reports/phase1_parser_v3_locked_evaluation.md`, then protocol §15,
+then the `docs/decision_log.md` entry "Phase 1.2D — halt the parser-v3 locked
+evaluation before preregistration".
+
+## State
+
+```
+Holdout                    SEALED, unspent, 15 objects
+                           phase1-evaluator-validation/parser-v3-v1/20260725T160340Z
+Locked labels read         0
+Predictions generated      0
+Authorization lock         not created
+State chain                not bootstrapped
+ACA job                    job-jspace-parser-v3-locked-eval  does not exist
+Formal evaluation ordinal  0
+Preregistration commit     none this round
+Superseded prereg commits  bdd5e10d, a38d7daa, 9e98467e
+Parser v3 source sha256    76dc58684f4e3818a3f557a1828571674e799f65a9f0a97d07706839ff859ea9
+Parser v3 impl commit      310277bcadd67ca9e77986fc292fae47dc5ceda2
+```
+
+Any previously built image and any generated runtime config are **stale** and
+must not be reused: the protocol document changed, so the Dockerfile digest pin
+changed.
+
+## Why it stopped
+
+The sealed parser-v3 set, the frozen scoring instrument and the parser-v3 gate
+contract are three artifacts that do not describe the same thing. Nine findings
+`H1`-`H9` in protocol §15.3.
+
+The fatal one, `H9`, involves no instrument: the gate contract admits three
+typed-decision labels with `null_collapse_prohibited: true` and declares
+`typed_decision_support = {ambiguous: 10, no_answer: 30, present: 80}`, while
+the sealed set contains a fourth class `present_unextractable` (4 cases) and a
+real support of `{present: 91, no_answer: 23, ambiguous: 6}`. Strata are
+correct at 12 × 10 = 120. Gates calibrated against the declared support cannot
+score the real set.
+
+Root cause: the contract was derived from the v2 contract by substitution
+rather than re-derived from the v3 set — the `last_number_trap` blocks in the
+two contracts are byte-identical, naming a distractor span the v3 set does not
+contain.
+
+## Do not repeat these dead ends
+
+- Do **not** try to resolve this by namespace adaptation. `H1` (12-object v3
+  layout versus the frozen 26-object registered-set layout) is not a naming
+  problem.
+- Do **not** drop the 15 non-projectable records. The contract fixes 120 cases,
+  10 per stratum, and every gate denominator.
+- Do **not** map `present_unextractable` onto `no_answer`. That is precisely
+  the collapse `null_collapse_prohibited: true` forbids.
+- Do **not** author a fresh scoring instrument immediately before a one-shot
+  run. The frozen instrument's hash pinning is the protocol's trust anchor.
+
+## Reusable work, already validated
+
+Protocol §15.4 records six normalisations `N1`-`N6` that lift the frozen-valid
+projection from 22 to 105 of 120, preserve all 105 typed decisions, and make
+the mandatory `last_number_trap` gate non-vacuous on all 10 S06 cases. `N4` and
+`N5` are the frozen instrument's own definitions, not inventions. Reuse them
+once the set and contract are reconciled.
+
+The two preflight instruments are documented in `paper/methods_ledger.md` and
+must be kept: the **write-blocked dry run** and the **projection probe**.
+Between them they found all five §14 findings and all nine §15 findings, every
+one before any irreversible action.
+
+## Next round, in order
+
+```
+1. Re-derive docs/phase1_parser_v3_acceptance_gates.json from the sealed
+   parser-v3 set. Every support count, gate denominator and enum vocabulary
+   recomputed from sealed bytes. Never inherited from v2.
+2. Resolve present_unextractable explicitly: admit it with its own gate
+   treatment, or rebuild those 4 cases. Never collapse it silently.
+3. Reconcile the label ontology with the scoring instrument: S11
+   minimum-candidate rule, ambiguous/parse_valid semantics, output_quality=empty.
+4. Freeze one span convention across the set and all three parsers, with an
+   artifact-level agreement test. Parsers currently emit literal-only spans;
+   the set registers marker-inclusive spans.
+5. Implement the artifact agreement check described in paper/methods_ledger.md,
+   including the mandatory-gate non-vacuity clause. Run it before any image is
+   built. It is a pure function of two sealed artifacts.
+6. Only then preregister, build once, and run Stage P.
+```
+
+## Warning that still applies
+
+Every launch attempt takes a durable one-shot claim in the coordination zone.
+A launch that dies after claiming and before dispatching strands the claim
+permanently. Stage P must not be started without enough capacity to carry it to
+a sealed prediction set in one pass. Two stale build-claim strandings from
+earlier rounds (`c2ab05c9`, `1c5ace45`) exist and must never be deleted or
+concealed.

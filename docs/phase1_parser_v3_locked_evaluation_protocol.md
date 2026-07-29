@@ -824,3 +824,243 @@ No locked label, no locked input payload and no reference decision was read
 at any point during the discovery or remediation of G1-G5. The holdout
 remains sealed and unspent at the preregistration commit that supersedes
 `a38d7daa4fba7e9e5b8ba25a014020b84460e07a`.
+
+## 15. Round halted before preregistration: sealed set and gate contract are not scorable
+
+### 15.1 Outcome of this round
+
+```
+Phase 1.2D outcome:                               HALTED before preregistration
+Formal parser-v3 PASS/FAIL produced:              no
+Preregistration commit created for this round:    no
+Locked inputs read:                               no
+Predictions generated:                            no
+Locked labels read from the sealed holdout:       no
+Holdout state:                                    SEALED, unspent
+Holdout one-shot budget consumed:                 0
+```
+
+This round did not fail an evaluation. It never started one. Nine
+incompatibilities (`H1`-`H9`) between the sealed parser-v3 validation set,
+the frozen scoring instrument and the parser-v3 acceptance gates were found
+during preflight, and one of them (`H9`) makes the sealed set unscorable
+against its own preregistered gate contract by any instrument at all.
+
+Halting is the correct outcome. The single irreplaceable asset in this phase
+is the unspent one-shot holdout. Spending it on an evaluation whose gate
+contract does not describe the set being scored would have destroyed that
+asset and produced a result no reviewer could accept.
+
+### 15.2 How the incompatibilities were found
+
+Two preflight instruments found all nine.
+
+1. **The write-blocked dry run.** The real custodian bootstrap is executed
+   against real storage with `core.upload_blob_once` replaced by a sentinel
+   that raises a `BaseException` subclass. Every read path, binding path and
+   validation path executes exactly as it would in production; the first
+   attempted write aborts the process. This has no side effects and is the
+   only preflight in this protocol that exercises the real instrument
+   against the real sealed prefix. It found `H1`.
+
+2. **The projection probe.** The full sealed v3 label set is projected into
+   the frozen final-label schema and then handed to the *frozen* validator
+   `evaluator_validation.validate_final_label`. The frozen instrument, not
+   the projection, decides whether each record is admissible. It found
+   `H2`, `H3`, `H5`, `H6`, `H7` and `H8`. `H9` was then found by comparing
+   the sealed set directly against `docs/phase1_parser_v3_acceptance_gates.json`
+   with no instrument involved at all.
+
+Both are read-only. Neither touched the sealed holdout blobs.
+
+### 15.3 The nine findings
+
+| ID | Severity | Finding |
+|----|----------|---------|
+| H1 | BLOCKER | Sealed v3 parent prefix holds **12** objects with `phase1-parser-v3-*` manifest schemas. The frozen instrument requires the **26**-object `phase1-evaluator-validation-*` registered-set layout (a `development/` split, five dot-prefixed reservations, ten differently-named locked-label objects). Not reachable by namespace adaptation. |
+| H2 | BLOCKER | The v3 locked-label record schema shares only 18 of the frozen instrument's 26 required fields. Missing: `output_text`, `parse_type`, `source_kind`, `secondary_tags`, `acceptable_selected_spans`, `last_number_distractor_span`, `template_family_id`, `construction_provenance`. Extra: `label_source`, `set_id`, `subtype_slot`, `typed_decision`. |
+| H3 | BLOCKER | The mandatory gate `last_number_trap` is uncomputable as written: no registered distractor span exists anywhere in the v3 labels, so `label["distractor"]` would be `None` for all 120 records and the gate would be **vacuous** — passing unconditionally while appearing to be enforced. |
+| H4 | DISCLOSURE | Aggregate structural metadata of the local curator copy of the v3 labels was read during this diagnosis. See §15.7. |
+| H5 | BLOCKER | v3 registers **marker-inclusive** evidence spans (`span.text` is the enclosing marker phrase). 104 of 111 registered spans therefore fail the frozen numeric grammar. All three parsers — including parser v3 at `eval_parsing_v3.py:390-400` — construct candidates through the frozen `validate_evidence_span` and so emit **literal-only** spans. Span identity between prediction and label could never match, and every span-conditioned gate would fail for reasons unrelated to parser quality. |
+| H6 | MAJOR | Two `registered_reference_answer` values are not in frozen canonical form. Neither changes `expected_correctness`. |
+| H7 | MAJOR | For 87 of 120 records `expected_candidate_answers` is a strict subset of the evidence-span values. The frozen instrument defines that field as a pure function of the spans (dedup in first-source order), so under frozen semantics the field carries no independent information. |
+| H8 | BLOCKER | Fifteen records encode a label ontology the frozen instrument cannot represent: 4× `typed_decision = present_unextractable` (S10; `answer_presence=present`, `parse_valid=false`, `parsed_answer=null`), 4× single-candidate S11 (frozen requires ≥2 canonical candidates in S11), 6× `ambiguous` with `parse_valid=false`, 1× `output_quality=empty` on a non-empty output. These are semantic divergences, not representational ones. |
+| H9 | FATAL | The sealed set violates its **own** preregistered gate contract. See §15.5. |
+
+### 15.4 The normalisation design that does work, and is preserved
+
+Six normalisations were designed, implemented as a probe and validated
+against the frozen instrument. All six are deterministic, parser-free, and
+recomputable by any auditor from sealed bytes alone.
+
+```
+N1  span text   marker-inclusive span -> its contained numeric literal
+                unique for 109 of 111 spans; 7 were already literal-only;
+                2 require a rightmost-match tie-break
+N2  reference   registered_reference_answer -> frozen canonical form
+N3  output_text joined from the sealed locked_inputs by case_id
+N4  distractor  S06 rightmost registered numeric literal
+N5  tags        content-derived quota features
+N6  candidates  recomputed from spans in first-source order
+```
+
+`N4` and `N5` are not inventions: they are the frozen instrument's own
+definitions. `evaluator_validation.py:2109-2116` *requires* the registered
+`last_number_distractor_span` to be exactly the rightmost registered numeric
+literal, and `evaluator_validation.py:2036-2041` *requires* `secondary_tags`
+to agree with content-derived quota features. Deriving them therefore adds
+no information that the frozen instrument was not already going to enforce.
+
+Result of the design, measured against the frozen validator:
+
+```
+labels                                   120
+projected and frozen-valid                105
+typed_decision preserved on those         105 of 105
+typed_decision changed                    0
+S06 cases validated                       10
+S06 cases where last_number_trap can fire 10   (gate becomes non-vacuous)
+residual failures                         15   (= H8)
+```
+
+This design is recorded because it is sound and reusable. It is **not**
+adopted, because `H8` and `H9` are not reachable by normalisation.
+
+### 15.5 H9, the fatal finding
+
+`H9` is independent of the frozen instrument. It is a disagreement between
+two parser-v3 artifacts.
+
+```
+docs/phase1_parser_v3_acceptance_gates.json
+  typed_decision.labels           ["present:<canonical_value>", "ambiguous", "no_answer"]
+  typed_decision.null_collapse_prohibited   true
+  dataset_contract.typed_decision_support   {ambiguous: 10, no_answer: 30, present: 80}
+  dataset_contract.total_cases              120
+  dataset_contract.cases_per_stratum        10
+
+evaluator_sets/parser_v3_v1 (sealed)
+  typed-decision classes present   present:<value>        87
+                                   no_answer              23
+                                   ambiguous               6
+                                   present_unextractable   4   <-- not in the contract
+  answer-presence support          {present: 91, no_answer: 23, ambiguous: 6}
+  strata                           12 x 10 = 120               <-- correct
+```
+
+Two violations:
+
+1. The sealed set contains a **fourth** typed-decision class,
+   `present_unextractable`, which the contract's vocabulary does not admit
+   and which `null_collapse_prohibited: true` forbids collapsing into
+   `no_answer`.
+2. The contract's declared `typed_decision_support` does not describe the
+   sealed set. `ambiguous` is 6 not 10, `no_answer` is 23 not 30.
+
+The gates `ambiguity`, `no_answer`, `answer_presence_macro_f1` and
+`overall_exact_typed_decision` are calibrated against the declared support.
+Against the real support their difficulty is different and unknown.
+
+Consequently **no** instrument can score this set against these gates:
+not the frozen instrument, not an adapted instrument, and not a v3-native
+instrument. The defect is in the artifacts, not in the tooling.
+
+### 15.6 Root cause
+
+The v3 gate contract was derived from the v2 gate contract by substitution
+rather than by re-derivation from the v3 set. The evidence is direct: the
+`last_number_trap` gate blocks in the v2 and v3 contracts are
+**byte-identical**, including a `denominator` of 10 and an
+`error_definition` naming a registered distractor span that the v3 set does
+not contain (`H3`). `typed_decision_support` and the typed-decision
+vocabulary were inherited the same way.
+
+In parallel, `scripts/build_parser_v3_validation_set.py` built the set to its
+own conventions — marker-inclusive spans, competing-candidate-only candidate
+lists, a `present_unextractable` decision class — with no cross-check against
+either the frozen instrument or the gate contract it would be scored under.
+
+This is the same defect family recorded in §14, one level up: §14 was
+*profile-scoped producer, non-profile-scoped consumer* inside the
+orchestrator. §15 is *independently-built set, inherited contract*, with no
+artifact-level agreement test between them.
+
+### 15.7 Disclosure: label metadata read during diagnosis
+
+Establishing `H2`, `H3`, `H5`-`H9` required reading the **local curator
+copy** at `evaluator_sets/parser_v3_v1/` (git-ignored). The sealed holdout
+blobs were never read.
+
+```
+Read (aggregate structure only):
+  field names of label and input records
+  disposition / kind / strategy / quality enum values and their counts
+  spans-per-record and candidates-per-record histograms
+  stratum counts and typed-decision class counts
+  masked numeric shapes (every digit replaced by '#')
+  per-record structural facts for the 15 residual records
+  (stratum, presence, flags, counts) - no values
+
+Not read:
+  any registered_reference_answer value
+  any expected_parsed_answer value
+  any expected_candidate_answers value
+  any span text or offsets
+  any output_text content
+```
+
+Bias risk on any future evaluation is nil: parser v3 is frozen at source
+SHA-256 `76dc58684f4e3818a3f557a1828571674e799f65a9f0a97d07706839ff859ea9`
+(implementation commit `310277bcadd67ca9e77986fc292fae47dc5ceda2`) and was
+not modified in this round. It is disclosed regardless.
+
+### 15.8 Required remediation before any future parser-v3 locked evaluation
+
+```
+1. Re-derive the parser-v3 gate contract from the parser-v3 set.
+   typed_decision_support, the typed-decision vocabulary and every gate
+   denominator must be computed from the sealed set, not inherited from v2.
+
+2. Resolve the present_unextractable class explicitly.
+   Either admit it into the contract vocabulary with its own gate treatment,
+   or rebuild those cases. It must not be silently collapsed.
+
+3. Reconcile the label ontology with whichever instrument will score it:
+   S11 minimum-candidate rule, ambiguous parse_valid semantics, and the
+   output_quality=empty definition.
+
+4. Choose and freeze one span convention across the set and all parsers,
+   and add an artifact-level agreement test that fails if a registered span
+   is not admissible to the instrument that will score it.
+
+5. Add a preregistration gate that mechanically checks the gate contract
+   against the sealed set before any image is built: every declared support
+   count, every gate denominator and every enum vocabulary must be
+   reproduced from sealed bytes.
+
+6. Keep the write-blocked dry run and the projection probe as standing
+   preflight steps. Between them they found all nine findings in this
+   section and all five in §14.
+```
+
+Item 5 is the one that would have caught `H9` immediately, and it is cheap:
+it is a pure function of two sealed artifacts and needs no instrument.
+
+### 15.9 State at halt
+
+```
+Preregistration commit for this round:            none created
+Superseded preregistration commits:               bdd5e10d, a38d7daa, 9e98467e
+Sealed holdout:                                   SEALED, unspent, 12 objects
+Locked-label reads:                               0
+Prediction streams generated:                     0
+Authorization lock:                               not created
+State chain:                                      not bootstrapped
+ACA job:                                          not created
+Formal evaluation ordinal:                        0
+```
+
+Parser v3, the candidate worker, the gate contract, the profile binding and
+the membership rules are **not** frozen by this round, because no
+preregistration commit was created. They remain editable, which is what the
+remediation in §15.8 requires.

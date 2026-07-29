@@ -1753,3 +1753,81 @@ Consequence:
   Stage P, seal, Stage E, and one formal `PASS`/`FAIL`. Nothing in this
   preregistration licenses any claim about hidden reasoning, an internal
   workspace, or a J-space.
+
+## Phase 1.2D — halt the parser-v3 locked evaluation before preregistration
+
+**Decision:** Do not preregister, do not build, do not run Stage P. Halt the
+round with the one-shot holdout `SEALED` and unspent, and publish the nine
+findings instead of a `PASS`/`FAIL`.
+
+**Why.** Preflight found that the sealed parser-v3 validation set, the frozen
+scoring instrument and `docs/phase1_parser_v3_acceptance_gates.json` are three
+artifacts that do not describe the same thing. Full detail is in
+`docs/phase1_parser_v3_locked_evaluation_protocol.md` §15.
+
+The decisive finding is `H9`, which involves no instrument at all. The gate
+contract admits three typed-decision labels and declares
+`typed_decision_support = {ambiguous: 10, no_answer: 30, present: 80}`. The
+sealed set contains **four** classes — including `present_unextractable`, which
+`null_collapse_prohibited: true` forbids collapsing — and its real support is
+`{present: 91, no_answer: 23, ambiguous: 6}` plus 4 unextractable. The gates
+`ambiguity`, `no_answer`, `answer_presence_macro_f1` and
+`overall_exact_typed_decision` are calibrated against the declared support, so
+against the real set their difficulty is different and unknown.
+
+No instrument — frozen, adapted or v3-native — can score this set against these
+gates. The defect is in the artifacts, not the tooling.
+
+**Root cause.** The v3 gate contract was derived from v2 by substitution rather
+than re-derived from the v3 set. The `last_number_trap` blocks in the two
+contracts are byte-identical, including an `error_definition` naming a
+registered distractor span the v3 set does not contain. Meanwhile
+`scripts/build_parser_v3_validation_set.py` built the set to its own
+conventions with no cross-check against either the instrument or the contract.
+There was no artifact-level agreement test between set and contract.
+
+**What was rejected.**
+
+- *Score the 105 of 120 records that do validate.* Rejected: the contract fixes
+  `total_cases = 120`, `cases_per_stratum = 10` and every gate denominator.
+  Dropping records is a population change.
+- *Preregister a mapping for the 15 divergent records.* Rejected: they differ
+  semantically, not representationally. Mapping `present_unextractable` to
+  `no_answer` is exactly the collapse the contract prohibits.
+- *Amend the contract now to match the set and run this round.* Rejected: the
+  support counts would be rewritten after observing the set, and the gate
+  thresholds were calibrated against the old support. That is a threshold and
+  population change disguised as a correction, made days before an irreversible
+  scoring run.
+- *Write a v3-native scoring instrument now.* Rejected on the same ground plus
+  one more: the frozen instrument's hash pinning is the trust anchor of the
+  whole protocol. A new instrument authored immediately before a one-shot run,
+  reviewed by nobody, defeats the purpose of having one.
+
+**What is kept.** The six normalisations `N1`-`N6` are validated and recorded
+in §15.4. They lift the frozen-valid projection from 22 to 105 of 120 with all
+105 typed decisions preserved, and they make the mandatory `last_number_trap`
+gate non-vacuous on all 10 S06 cases — it would otherwise have passed
+unconditionally while appearing to be enforced (`H3`). `N4` and `N5` are the
+frozen instrument's own definitions, not inventions. This design is reusable
+once the set and contract are reconciled.
+
+**What this costs.** Nothing irreplaceable. The holdout's one-shot budget is
+untouched. Parser v3 is unchanged and still frozen at source SHA-256
+`76dc58684f4e3818a3f557a1828571674e799f65a9f0a97d07706839ff859ea9`. Because no
+preregistration commit was created, the parser, the gate contract, the profile
+binding and the membership rules remain editable — which is what the
+remediation requires.
+
+**Disclosed.** Diagnosing `H2`, `H3`, `H5`-`H9` required reading aggregate
+structural metadata of the local curator copy of the v3 labels: field names,
+enum vocabularies and counts, histograms, and masked numeric shapes. No
+answer value, span text, offset or output text was read, and the sealed
+holdout blobs were never read. Recorded as `H4` in §15.7.
+
+**Next gate:** re-derive the parser-v3 gate contract from the parser-v3 set,
+resolve `present_unextractable` explicitly, reconcile the span convention
+across set and parsers, and add a mechanical preregistration check that
+reproduces every declared support count, gate denominator and enum vocabulary
+from sealed bytes before any image is built. That check is a pure function of
+two sealed artifacts and would have caught `H9` immediately.
