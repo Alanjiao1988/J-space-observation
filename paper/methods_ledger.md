@@ -542,3 +542,104 @@ distractor span for it to range over.
 
 This check is a pure function of two sealed artifacts. It needs no
 instrument, no image and no execution.
+
+## Separating a prospective evaluation policy from a set-derived facts manifest
+
+Phase 1.2E. A recurring failure mode in preregistered evaluation is a single
+"gate contract" that carries two different kinds of statement at once: a
+prospective commitment about how the experiment will be judged, and an implied
+factual claim about the set that will be judged. When the two drift apart there
+is nothing to detect it, because they live in the same file and are asserted by
+the same author at the same time. Phase 1.2D's `H9` is an instance: the
+contract declared a three-class ontology and 80/30/10 supports, and the sealed
+set had four classes and 91/23/6.
+
+The method separates them into two artifacts with different lifecycles.
+
+**The prospective evaluation policy** is authored by hand and registered before
+a set exists. It contains the ontology, the construction quotas, the threshold
+formulas or numeric thresholds, the comparator policy, the `PASS`/`FAIL`/
+`INVALID` logic and the mandatory-gate definitions. It contains no set-derived
+fact. It is validated in isolation: quotas must be reproducible from the
+registered stratum design, mandatory gates must require a non-zero denominator,
+and a policy with an unresolved threshold may not declare itself `FINAL`.
+
+**The set-derived facts manifest** is produced mechanically from a candidate
+set. It contains the actual enum vocabulary, the actual class supports, the
+stratum counts, the gate denominators, the member list and object count, and
+the set and member hashes. It contains no policy choice.
+
+**The contract compiler** consumes both, checks every declared invariant against
+the corresponding derived fact, and emits a final contract only on complete
+agreement. Two properties make the separation load-bearing rather than
+cosmetic:
+
+1. *"Derive from the set" means reproduce and verify.* The compiler has no code
+   path that edits a quota or a threshold. A disagreement is a statement about
+   the set, never a licence to move the policy. Without this, "derive the
+   contract from the set" degenerates into "describe whatever the set happens
+   to contain", which cannot fail and therefore tests nothing.
+2. *Fail closed on vacuity.* A mandatory gate with a zero denominator is an
+   error. It is never reported as `NA`, never skipped, and never counted as
+   satisfied. A gate that passes because it has nothing to score is worse than
+   an absent gate, because it appears in the result table as an enforced gate
+   that passed.
+
+The compiler additionally refuses to overwrite an existing contract, is
+byte-stable, and supports a `verify` mode that re-derives the contract from its
+declared inputs and requires byte-for-byte reproduction. Provenance bindings
+record the policy digest, the facts digest, the set identity and the truth-table
+identity, so a compiled contract states exactly which two artifacts it reconciles.
+
+## Deterministic label normalisation that quarantines rather than coerces
+
+Phase 1.2E. When an evaluation set and its scoring instrument disagree, the
+disagreements are of two kinds, and conflating them is how a set gets silently
+bent to fit its scorer. *Representational* disagreements are differences of
+encoding that preserve the graded decision: a span registered around
+`Final answer: 3/4` rather than around `3/4`, a reference answer written
+`07.50` rather than in canonical form, a derived field that was never
+populated. *Semantic* disagreements are differences about what the case means:
+a case labelled with a class the ontology does not contain, or an "ambiguous"
+case with only one candidate.
+
+Only the first kind may be repaired mechanically. The method makes that
+distinction enforceable rather than aspirational, by requiring every
+normalisation to be:
+
+* **deterministic** — no ordering, locale or hash-seed dependence;
+* **idempotent** — a second application is a no-op, so the pipeline has a fixed
+  point and cannot be run "one more time" to a different answer;
+* **decision-preserving** — the typed decision before and after must be equal,
+  checked against a pre-image function that recognises out-of-ontology classes
+  explicitly instead of silently reinterpreting them, and then checked again,
+  authoritatively, by validating the normalised record against the formal
+  ontology before it is returned. The second check is the one that matters: the
+  first is a whitelist of fields, and a whitelist can have holes, whereas the
+  ontology validator binds to the scoring instrument and therefore covers every
+  field the scorer reads. A record that survives all six rules but would not be
+  admissible is quarantined as a single case with a reason code, rather than
+  escaping to fail whole-set validation and take the whole set with it;
+* **parser-free** — the normalisation sources reference no parser module and
+  call no parser entry point, checked statically by a source scan and
+  differentially at runtime by comparing `sys.modules` before and after the
+  repair imports, so a normalisation can never be tuned, even accidentally,
+  toward what a candidate parser happens to produce. The check is stated in
+  that differential form because the package `__init__` eagerly imports the
+  parser, which makes any absolute "no parser is loaded" claim unachievable;
+* **fail-closed** — a rule that would have to guess outside its registered
+  tie-break quarantines the case instead of choosing.
+
+Two design details carry most of the weight. First, rules that need a
+definition the scoring instrument already owns — what counts as a registered
+numeric literal, which spans are admissible — delegate to the instrument rather
+than restating it. Restating a definition is how two artifacts drift apart, and
+was the proximate cause of both `H5` and `H9`. Second, the audit receipt is
+content-free: counts, reason-code histograms and digests of shape-reduced
+records, never a value, a span text or a case id. A normalisation run over
+private labels can therefore be reported in full without disclosing anything
+about the labels, which is what makes the method usable on a sealed set at all.
+
+The quarantine set is the useful output. It is the exact list of cases that
+cannot be migrated without a human semantic decision, and it is produced without
+any human having to look at a label to find them.

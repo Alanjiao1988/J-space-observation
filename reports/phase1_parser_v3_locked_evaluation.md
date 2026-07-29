@@ -7,7 +7,9 @@ Outcome                            HALTED in preflight
 Formal PASS / FAIL                 none produced
 Preregistration commit this round  none created
 Holdout state                      SEALED, unspent
-Holdout objects                    15
+sealed_object_count                12
+total_case_count                   120
+residual_semantic_case_count       15
 Locked inputs read                 0
 Locked labels read                 0
 Prediction streams generated       0
@@ -20,6 +22,36 @@ Formal evaluation ordinal          0
 This document reports why the round was stopped. The full technical record is
 `docs/phase1_parser_v3_locked_evaluation_protocol.md` §15; the decision and the
 options rejected are in `docs/decision_log.md`.
+
+> **Erratum, Phase 1.2E.** The first revision of this report published a single
+> line reading `Holdout objects 15`. That was wrong, and it was wrong in a way
+> worth recording rather than quietly deleting: it conflated two different
+> populations that happen to share a number's worth of attention. The sealed
+> parent prefix contains **12 storage objects** (`sealed_object_count = 12`).
+> The **15** is the count of cases that remained semantically inadmissible after
+> the `N1`-`N6` representational normalisations
+> (`residual_semantic_case_count = 15`), out of `total_case_count = 120`.
+>
+> The two figures are numerically unrelated; the collision is a coincidence, and
+> the reconciliation below is offered only so that a later reader who lists the
+> namespace is not misled a second time. On the recorded evidence, a recursive
+> listing of everything written under `parser_v3_v1/` returns **15** entries:
+> the **12** sealed members of the parent prefix, plus **2** objects in the
+> sibling `…160340Z-runlog/` prefix (`artifacts/phase1-evaluator-validation/
+> track-d1/20260725T160340Z-track-d1-parser-v3-seal/05_summary.md:43`, the
+> independent listing performed under a separate identity), plus **1** orphaned
+> `crosscheck_report.json` left under the aborted `…155224Z-runlog/` prefix when
+> the first seal attempt failed closed on its own `overwrite=false` guard
+> (`…/08_deviations.json`, deviation
+> `D10-seal-timestamp-rotated-after-an-overwrite-false-abort`). None of these
+> three runlog objects is a member of the sealed set. This reconciliation is
+> **inferred from artifacts recorded in Phase 1.2D, not observed in Phase
+> 1.2E**: no Blob listing, read, or any other Azure call was made this round.
+>
+> No other statement in this report or in the Phase 1.2D protocol depended on
+> the mistaken figure, and no conclusion changes. The three counts are now
+> separately named, and `tests/test_parser_v3_repair.py` carries a regression
+> test that fails if they are conflated again.
 
 ---
 

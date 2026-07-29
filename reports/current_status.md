@@ -1,10 +1,15 @@
 # Project Status Report
 
-> **Phase 1.2D status (e3f86ae39ece):** the parser-v3 one-shot locked
-> evaluation is **preregistered, frozen, and its evaluation image is built**;
-> Stage P has not run. No prediction
-> exists, no locked label has been read, and the 120-case parser-v3 holdout is
-> **unspent**. Parser v3 has no result and must not be called validated. See
+> **Phase 1.2E status (this round):** the parser-v3 one-shot locked evaluation
+> remains **HALTED**. `parser-v3-v1` is `SEALED / UNSPENT / UNSCORABLE /
+> RETIRED_AS_INELIGIBLE`. Phase 1.2E built the public ontology-repair protocol
+> and tooling only; it read no private data, generated no prediction, and
+> produced no formal result. Parser v3 remains **unvalidated**, formal
+> evaluation ordinal **0**. The round terminated **BLOCKED** on acceptance
+> thresholds. See "Phase 1.2E" below.
+>
+> **Phase 1.2D status (45a18f4):** halted in preflight before preregistration
+> after findings `H1`-`H9`. No formal `PASS` or `FAIL` exists. See
 > "Phase 1.2D" below.
 
 ## Summary
@@ -1685,7 +1690,10 @@ seal the three prediction streams, run Stage E, and record one formal `PASS` or
 Outcome:                          HALTED before preregistration
 Formal PASS/FAIL:                 none produced
 Preregistration commit:           none created this round
-Holdout state:                    SEALED, unspent (15 objects)
+Holdout state:                    SEALED, unspent
+sealed_object_count:              12
+total_case_count:                 120
+residual_semantic_case_count:     15
 Locked labels read:               0
 Predictions generated:            0
 Authorization lock:               not created
@@ -1741,3 +1749,109 @@ resolve `present_unextractable` explicitly, reconcile the span convention
 across the set and all three parsers, and add a mechanical preregistration
 check that reproduces every declared support count, gate denominator and enum
 vocabulary from sealed bytes before any image is built.
+
+## Phase 1.2E parser-v3 evaluation ontology repair (tooling round) — BLOCKED
+
+```
+Terminal status:                  BLOCKED
+Blocking item:                    acceptance thresholds REVIEW_REQUIRED
+Sealed locked inputs read:        0
+Sealed locked labels read:        0
+Local private curator files read: 0
+Predictions generated:            0
+Parser invocations on locked data:0
+Azure writes or resource changes: 0
+Formal evaluation ordinal:        0
+parser-v3-v1 state:               SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE
+```
+
+A public, tooling-only round. It built the machinery a future independently
+curated `parser-v3-v2` set will need, and deliberately did not construct,
+review, seal, preregister or evaluate anything.
+
+**Old set disposition.** `parser-v3-v1` is recorded as `SEALED / UNSPENT /
+UNSCORABLE / RETIRED_AS_INELIGIBLE`. `UNSPENT` records the absence of label
+access; it is not a licence to reuse the set. Its bytes, provenance, and the
+historical invalid gate contract are preserved unchanged, and the repair CLI
+refuses to read or write anything in that namespace.
+
+**Formal ontology.** Exactly three classes — `present:<canonical_value>`,
+`ambiguous`, `no_answer` — with an explicit truth table over
+`answer_presence`, `parse_valid`, `parse_ambiguous`, `parsed_answer`, candidate
+cardinality, evidence-span requirements and `output_quality`.
+`present_unextractable` is excluded from the formal set and may never be
+collapsed into another class. Spans are literal-only everywhere. The full
+specification is `docs/phase1_2e_parser_v3_ontology_repair_protocol.md`.
+
+**`H8` is re-framed against the set's own public specification.** This is not a
+new discovery — Phase 1.2D §15.3 and §15.7 already recorded the ontology and
+support conflicts — but the framing changed, and the change matters. What was
+recorded as "the parser-v3 gate contract was copied from parser-v2" is narrower
+than what the tracked public evidence supports.
+`evaluator_sets/parser_v3_v1/strata_definitions.md` is a tracked public file,
+and the sealed set violates *its own public specification*, not merely the
+v2-inherited contract: `S10` is publicly registered `no_answer` but its cases
+are labelled `present`; the public quota table asserts 80/30/10; the public rule
+that every `S11` case carries at least two distinct candidates is violated; and
+the public statement that the set exercises no `empty` output is violated. The
+root cause of `H9` is therefore broader than contract substitution — there was
+no agreement test between the set, its own public specification, and its gate
+contract. That missing test is what this round supplies. Everything above was
+restated from tracked public files; no private data was opened.
+
+**Count terminology corrected.** `sealed_object_count = 12`,
+`total_case_count = 120`, `residual_semantic_case_count = 15`. The Phase 1.2D
+report line `Holdout objects 15` conflated the first and third; it is corrected
+by an erratum and guarded by a regression test.
+
+**Delivered.** `parser_v3_repair_ontology.py` (truth table, fail-closed
+validator bound to the frozen scoring instrument),
+`parser_v3_repair_normalization.py` (`N1`-`N6` as pure, idempotent,
+parser-free functions with a content-free receipt),
+`parser_v3_repair_contract.py` (count kinds, set-facts builder with mandatory
+re-derivation, agreement validator with `H1/H2/H3/H5/H8/H9` codes, contract
+compiler), `scripts/parser_v3_repair_cli.py`, the prospective policy
+`docs/phase1_parser_v3_v2_evaluation_policy.json`, and 122 synthetic tests.
+
+**Independently audited, and it mattered.** A separate read-only reviewer
+audited the finished implementation and found **ten defects: two critical, five
+major, three minor**, all since fixed. The first critical: the `ambiguous`
+truth-table row declared `parse_valid = false` where the frozen instrument
+requires `true`, which would have made **every `S11` case in a sealed
+`parser-v3-v2` unscorable by construction** — the exact condition that retired
+`parser-v3-v1`. The second: the set-facts manifest was bound to no set, and a
+hand-typed manifest describing a set that had never been built compiled cleanly
+into a fully provenance-bearing contract. Both had one root cause — the tooling
+*restated* the frozen instrument instead of *binding* to it, which is the same
+defect as `H9` — and both are now fixed structurally, by
+`_bind_to_scoring_instrument` and by mandatory re-derivation of every facts
+manifest from the set it claims to describe. Full record:
+`reports/phase1_2e_parser_v3_repair.md` §6. Recorded plainly because it is the
+most useful result of the round: 93 self-authored tests passed against code
+carrying a defect fatal to a tenth of the future set.
+
+A second audit round over the remediation confirmed eight of the ten fixes as
+structural — a 4 490-mutant differential sweep separated the ontology from the
+frozen instrument zero times — and found five further defects, four introduced
+by the remediation itself. All five are fixed. Two accepted observations became
+limitation `L-32`: the sealed object count and member list are operator
+assertions rather than derived facts, because no offline tool can list a blob.
+
+**Why BLOCKED.** The numeric acceptance thresholds cannot be justified in this
+round. Phase 1.0C headroom calibration has not been run, importing the
+parser-v2 constants would carry over exactly the kind of unjustified number
+this phase exists to eliminate, and deriving a threshold from a parser-v3
+observation would select the threshold against the measurement it bounds. They
+are marked `REVIEW_REQUIRED`, and the compiler refuses to emit a contract while
+any of them is open. Everything else in the round is complete and green.
+
+**Not claimed.** Parser v3 is not validated, not shown non-regressive, not
+shown improved, not accepted. The new tooling has synthetic-test evidence only
+and has never been run against a real curated set. No J-space, hidden-reasoning,
+internal-workspace or invisible-CoT conclusion follows from any of it.
+
+**Next gate:** resolve the acceptance thresholds — either run Phase 1.0C
+headroom calibration and derive them, or register an explicit reviewed
+rationale for a threshold family that does not depend on it. No `parser-v3-v2`
+construction, sealing, preregistration, image build, Stage P or Stage E may
+begin before that gate passes.

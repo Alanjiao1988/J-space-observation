@@ -370,3 +370,93 @@ which `evaluator_validation.py:2109-2116` already *requires* a registered
 distractor to be — makes the gate non-vacuous on all 10 S06 cases. Any future
 parser-v3 evaluation must demonstrate non-vacuity of every mandatory gate
 before preregistration.
+
+## L-29 - The parser-v3 repair tooling has synthetic-test evidence only
+
+The Phase 1.2E ontology validator, `N1`-`N6` normalizer, agreement validator and
+contract compiler are exercised exclusively against public synthetic fixtures:
+a constructed 120-case, 12-stratum valid set and one negative fixture per
+historical defect. They have never been run against a real curated evaluation
+set, because no admissible one exists.
+
+Synthetic fixtures are built by the same author as the code they test, so they
+demonstrate that the tooling behaves as specified; they cannot demonstrate that
+the specification anticipates every way a real curated set can be wrong. The
+first application of this tooling to a real `parser-v3-v2` set is therefore
+itself an untested step, and any failure it reports on that first run must be
+investigated as a possible tooling defect before it is treated as a set defect.
+
+This limitation is not hypothetical. The first implementation of this tooling
+passed 93 self-authored tests and was nevertheless found by an independent
+reviewer to declare `parse_valid = false` for `ambiguous`, where the frozen
+scoring instrument requires `true` — a defect that would have rendered every
+`S11` case unscorable by construction. The fixtures did not catch it because
+they encoded the same misunderstanding as the code. Ten defects were found and
+fixed in total, two of them critical; the record is
+`reports/phase1_2e_parser_v3_repair.md` §6. The structural remedy —
+`_bind_to_scoring_instrument`, which requires every accepted record to be
+accepted by the frozen instrument itself — reduces but does not eliminate this
+limitation: it now covers everything the frozen instrument checks, and nothing
+it does not.
+
+## L-30 - The parser-v3 acceptance thresholds have no calibration basis
+
+The prospective policy `docs/phase1_parser_v3_v2_evaluation_policy.json` leaves
+every numeric acceptance threshold `REVIEW_REQUIRED`: the overall exact
+typed-decision minimum, the per-stratum critical floor, the answer-presence
+macro `F1` minimum, and the non-regression margin against parser v2.
+
+There is no basis to set them. Phase 1.0C headroom calibration is preregistered
+but `BLOCKED` with no model run. Importing the parser-v2 constants would carry
+over an unjustified number of exactly the kind that produced `H9`, and deriving
+a threshold from any parser-v3 observation would select the threshold against
+the measurement it is meant to bound.
+
+The mandatory gates are unaffected: they are derived from stratum purpose,
+which is a public design fact, and their zero-tolerance definitions are
+definitional rather than calibrated. But no parser-v3 `PASS` is expressible
+until the thresholds are resolved, and the contract compiler refuses to emit a
+contract while any of them is open.
+
+## L-31 - The sealed parser-v3 set violates its own public specification
+
+`evaluator_sets/parser_v3_v1/strata_definitions.md` is a tracked public file
+that registers, per stratum, the expected answer presence and several
+cross-cutting quotas. The sealed set disagrees with it in four separate ways:
+`S10` is publicly `no_answer` but its cases are labelled `present`; the public
+quota table asserts 80 `present`, 30 `no_answer` and 10 `ambiguous`; the public
+rule that every `S11` case carries at least two distinct canonical candidates is
+violated; and the public statement that the set exercises no `empty` output is
+violated.
+
+This widens the root cause recorded for `H9`. The gate contract was indeed
+derived from parser v2 by substitution, but even a contract correctly derived
+from the public stratum definitions would have disagreed with the set. The
+missing artifact was never merely a better contract — it was any mechanical
+agreement test between the set, its own public specification, and its gates.
+Phase 1.2E supplies that test; it has not been run against the retired set, and
+will not be, because that set is permanently ineligible.
+
+## L-32 - The sealed object count and member list are asserted, not derived
+
+The Phase 1.2E facts manifest separates two kinds of claim that look alike in a
+JSON file. Class supports, stratum counts, gate denominators and every hash are
+*derived*: they are recomputed from the set's own bytes by `build_set_facts`,
+and every entry point re-derives the whole manifest and requires byte-equality
+before using it, so none of them can be misstated without detection.
+
+`sealed_object_count` and the member list are not like that. They describe a
+remote storage prefix, and no offline tool can list a blob. An operator who
+declares twelve objects and supplies twelve fabricated member digests produces a
+self-consistent manifest that the agreement validator accepts, because there is
+nothing available to contradict it. This was demonstrated during the round's
+second audit and is recorded here rather than fixed, because it cannot be fixed
+offline.
+
+The mitigation is procedural and belongs to a future round: the listing artifact
+that witnesses the object count must be named in the manifest and bound into the
+compiled contract, so the assertion is at least attributable. Until then, the
+object count in any compiled parser-v3-v2 contract carries the authority of the
+operator who typed it, not of the tooling that recorded it. The number `12` is
+exactly the figure the Phase 1.2D erratum exists to correct, which is why the
+distinction is written down rather than assumed.

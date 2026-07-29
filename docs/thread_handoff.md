@@ -654,3 +654,117 @@ permanently. Stage P must not be started without enough capacity to carry it to
 a sealed prediction set in one pass. Two stale build-claim strandings from
 earlier rounds (`c2ab05c9`, `1c5ace45`) exist and must never be deleted or
 concealed.
+
+---
+
+# HANDOFF — Phase 1.2E complete, BLOCKED (supersedes the "Next round, in order" above)
+
+Items 1-5 of the previous list are **done in public form**, with one exception
+noted below. Item 6 remains gated.
+
+## State
+
+```
+Round type                        public tooling only
+Terminal status                   BLOCKED
+Blocking item                     acceptance thresholds REVIEW_REQUIRED
+parser-v3-v1                      SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE
+sealed_object_count               12
+total_case_count                  120
+residual_semantic_case_count      15
+Sealed inputs read                0
+Sealed labels read                0
+Local private curator files read  0
+Predictions generated             0
+Parser invocations on locked data 0
+Azure writes or resource changes  0
+Formal evaluation ordinal         0
+Parser v3                         unchanged, unvalidated
+```
+
+## What changed relative to the previous handoff
+
+Item 1 changed shape. The v3 gate contract is **not** re-derived and **not**
+amended. `parser-v3-v1` is retired permanently, so there is nothing to re-derive
+it against. The historical contract is preserved byte-for-byte as the artifact
+found defective. A future contract is a different artifact, compiled by
+`parser_v3_repair_contract.compile_contract` from a prospective policy plus a
+set-derived facts manifest.
+
+Item 2 is resolved by exclusion. `present_unextractable` is not admitted to the
+formal set, is never collapsed, and is permitted only in a separate research-only
+corpus that is never scored.
+
+Items 3, 4 and 5 are delivered: the three-class truth table with the `S11`
+minimum-candidate rule, the `ambiguous`/`parse_valid` semantics and the
+`output_quality = empty` biconditional; the literal-only span convention binding
+labels, parsers, comparators, validation and scoring; and the artifact-agreement
+check including the mandatory-gate non-vacuity clause.
+
+Item 6 is unchanged and still gated.
+
+## Where things are
+
+```
+docs/phase1_2e_parser_v3_ontology_repair_protocol.md   the protocol
+docs/phase1_parser_v3_v2_evaluation_policy.json        prospective policy (REVIEW_REQUIRED)
+src/jspace_observation/parser_v3_repair_ontology.py    truth table + validator
+src/jspace_observation/parser_v3_repair_normalization.py  N1-N6
+src/jspace_observation/parser_v3_repair_contract.py    facts, agreement, compiler
+scripts/parser_v3_repair_cli.py                        facts / check / normalize / compile / verify
+tests/test_parser_v3_repair.py                         122 synthetic tests
+reports/phase1_2e_parser_v3_repair.md                  round report
+```
+
+## The one blocker
+
+Numeric acceptance thresholds. There is no calibration basis: Phase 1.0C
+headroom calibration is `BLOCKED` with no model run, parser-v2 constants would
+import an unjustified number of the kind that produced `H9`, and any
+parser-v3-derived threshold would be selected against the measurement it bounds.
+They are `REVIEW_REQUIRED` in the policy and the compiler refuses to compile
+while any is open.
+
+## Next round, in order
+
+```
+1. Resolve the acceptance thresholds. Either run Phase 1.0C headroom
+   calibration and derive them, or register an explicit reviewed scientific
+   rationale for a threshold family that does not depend on it. Nothing below
+   may start first.
+2. Register the parser-v3-v2 replacement selection rules, before any private
+   review. They must not condition on any parser prediction.
+3. Construct parser-v3-v2 independently: 120 unique cases, 10 per stratum,
+   80/30/10 supports, literal-only spans, every case passing the ontology
+   validator. The 15 quarantined cases get fresh parser-blind review or
+   replacement; no old semantic label may be coerced.
+4. Build the set-derived facts manifest and run the agreement check. It must be
+   empty before sealing.
+5. Seal, then compile the contract, then verify byte-for-byte with --check.
+6. Only then preregister, build the image once, and run Stage P.
+```
+
+## Traps specific to this tooling
+
+* The tooling has **synthetic-test evidence only** (`L-29`). The first real run
+  is itself untested; treat a first-run failure as a possible tooling defect
+  before treating it as a set defect.
+* `jspace_observation/__init__.py` eagerly imports the whole package, so
+  `eval_parsing` lands in `sys.modules` for *any* repo import. The parser-free
+  proof is therefore differential — importing the repair modules must add no
+  module the frozen validator alone would not already have loaded. Do not
+  "fix" this by asserting `eval_parsing` is absent; that assertion cannot hold.
+* `scripts/parser_v3_repair_cli.py` refuses every path inside the
+  `parser_v3_v1` namespace and has no override flag. That is deliberate.
+* `PROTECTED_DIGESTS` in `tests/test_parser_v3_repair.py` pins eleven artifacts
+  by LF-normalised SHA-256. If a legitimate future change touches one of them,
+  update the pin in the same commit and say why in the decision log.
+
+## Warning that still applies
+
+Every launch attempt takes a durable one-shot claim in the coordination zone. A
+launch that dies after claiming and before dispatching strands the claim
+permanently. Stage P must not be started without enough capacity to carry it to
+a sealed prediction set in one pass. Two stale build-claim strandings from
+earlier rounds (`c2ab05c9`, `1c5ace45`) exist and must never be deleted or
+concealed.

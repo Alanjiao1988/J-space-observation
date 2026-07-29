@@ -1,0 +1,209 @@
+{
+  "schema_version": "phase1-parser-v3-prospective-evaluation-policy/v1",
+  "policy_id": "parser-v3-v2-prospective-policy",
+  "status": "REVIEW_REQUIRED",
+  "phase": "1.2E",
+  "purpose": "Prospective evaluation policy for a future independently curated parser-v3-v2 locked evaluation set. This artifact is registered before any set exists and contains no set-derived fact. It is not an authorization to construct, seal, or evaluate a set.",
+  "supersedes": null,
+  "does_not_supersede": [
+    "docs/phase1_parser_v3_acceptance_gates.json"
+  ],
+  "ontology": {
+    "typed_decision_classes": [
+      "present:<canonical_value>",
+      "ambiguous",
+      "no_answer"
+    ],
+    "truth_table_id": "phase1-parser-v3-v2-three-class-truth-table/v1",
+    "span_convention": "literal_only",
+    "null_collapse_prohibited": true,
+    "research_only_classes": [
+      "present_unextractable"
+    ],
+    "research_only_classes_prohibited_in_formal_set": true,
+    "collapse_prohibited_note": "present_unextractable must never be mapped to no_answer, ambiguous, or present. It may be retained only in a separate research-only corpus that is never scored by the frozen instrument."
+  },
+  "population": {
+    "total_case_count": 120,
+    "cases_per_stratum": 10,
+    "strata": [
+      "S01", "S02", "S03", "S04", "S05", "S06",
+      "S07", "S08", "S09", "S10", "S11", "S12"
+    ],
+    "clean_strata": ["S01", "S02", "S03", "S12"],
+    "critical_strata": [
+      "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11"
+    ],
+    "stratum_presence": {
+      "S01": "present",
+      "S02": "present",
+      "S03": "present",
+      "S04": "present",
+      "S05": "present",
+      "S06": "present",
+      "S07": "no_answer",
+      "S08": "no_answer",
+      "S09": "present",
+      "S10": "no_answer",
+      "S11": "ambiguous",
+      "S12": "present"
+    },
+    "typed_decision_support": {
+      "present": 80,
+      "no_answer": 30,
+      "ambiguous": 10
+    },
+    "support_derivation": {
+      "method": "counted from the registered presence of each stratum in evaluator_sets/parser_v3_v1/strata_definitions.md, at the registered 10 cases per stratum",
+      "present": "S01 S02 S03 S04 S05 S06 S09 S12 = 8 strata x 10 = 80",
+      "no_answer": "S07 S08 S10 = 3 strata x 10 = 30",
+      "ambiguous": "S11 = 1 stratum x 10 = 10",
+      "independence_note": "These values are derived from the public stratum definitions and equal the parser-v2 supports only because both sets use the same registered 12-stratum design. They were not copied from the parser-v2 gate contract and were not derived from any parser-v3 prediction."
+    }
+  },
+  "gates": [
+    {
+      "gate_id": "G_S06_last_number_trap",
+      "mandatory": true,
+      "population": "stratum",
+      "population_selector": "S06",
+      "minimum_denominator": 10,
+      "maximum_errors": 0,
+      "justification": "S06 exists only to test that the parser does not select the trailing distractor. A single failure is the failure mode the stratum was built to detect, so zero tolerance follows from the stratum's purpose rather than from calibration."
+    },
+    {
+      "gate_id": "G_S11_ambiguity_detection",
+      "mandatory": true,
+      "population": "stratum",
+      "population_selector": "S11",
+      "minimum_denominator": 10,
+      "maximum_errors": 0,
+      "justification": "S11 exists only to test that genuine multi-candidate ambiguity is reported as ambiguous rather than resolved arbitrarily."
+    },
+    {
+      "gate_id": "G_S10_unrecoverable_no_answer",
+      "mandatory": true,
+      "population": "stratum",
+      "population_selector": "S10",
+      "minimum_denominator": 10,
+      "maximum_errors": 0,
+      "justification": "S10 exists only to test that an unrecoverable malformed output yields no_answer."
+    },
+    {
+      "gate_id": "G_S07_truncated_no_answer",
+      "mandatory": true,
+      "population": "stratum",
+      "population_selector": "S07",
+      "minimum_denominator": 10,
+      "maximum_errors": 0,
+      "justification": "S07 exists only to test that truncation before the final answer yields no_answer."
+    },
+    {
+      "gate_id": "G_S08_explicit_no_answer",
+      "mandatory": true,
+      "population": "stratum",
+      "population_selector": "S08",
+      "minimum_denominator": 10,
+      "maximum_errors": 0,
+      "justification": "S08 exists only to test that an explicit refusal yields no_answer."
+    },
+    {
+      "gate_id": "G_clean_strata_exact",
+      "mandatory": true,
+      "population": "clean_cases",
+      "minimum_denominator": 40,
+      "maximum_errors": 0,
+      "justification": "The clean strata carry unambiguous single answers in registered surface forms. Any error there is a defect in the parser, not a hard case."
+    },
+    {
+      "gate_id": "G_present_class_non_vacuous",
+      "mandatory": true,
+      "population": "typed_decision_class",
+      "population_selector": "present",
+      "minimum_denominator": 80,
+      "justification": "Every declared class must be exercised. A zero denominator is an error, never NA."
+    },
+    {
+      "gate_id": "G_no_answer_class_non_vacuous",
+      "mandatory": true,
+      "population": "typed_decision_class",
+      "population_selector": "no_answer",
+      "minimum_denominator": 30,
+      "justification": "Every declared class must be exercised. A zero denominator is an error, never NA."
+    },
+    {
+      "gate_id": "G_ambiguous_class_non_vacuous",
+      "mandatory": true,
+      "population": "typed_decision_class",
+      "population_selector": "ambiguous",
+      "minimum_denominator": 10,
+      "justification": "Every declared class must be exercised. A zero denominator is an error, never NA."
+    },
+    {
+      "gate_id": "G_null_collapse_prohibited",
+      "mandatory": true,
+      "population": "all_cases",
+      "minimum_denominator": 120,
+      "maximum_errors": 0,
+      "justification": "No answer-bearing case may be scored by collapsing an unextracted answer into no_answer. This is the invariant the parser-v3-v1 set violated by admitting a fourth class."
+    }
+  ],
+  "acceptance_thresholds": {
+    "status": "REVIEW_REQUIRED",
+    "reason": "No calibration basis exists for a numeric acceptance threshold on parser v3. Phase 1.0C headroom calibration has not been run, and choosing a threshold from parser-v2 results or from any parser-v3 observation would either import an unjustified constant or select a threshold against the very measurement it is meant to bound.",
+    "blocking_dependency": "Phase 1.0C headroom calibration (NOT RUN).",
+    "items": [
+      {
+        "threshold_id": "overall_exact_typed_decision_minimum",
+        "status": "REVIEW_REQUIRED",
+        "value": null,
+        "note": "Minimum number of the 120 cases whose typed decision must match exactly."
+      },
+      {
+        "threshold_id": "critical_stratum_floor",
+        "status": "REVIEW_REQUIRED",
+        "value": null,
+        "note": "Per-stratum floor across the eight critical strata."
+      },
+      {
+        "threshold_id": "answer_presence_macro_f1_minimum",
+        "status": "REVIEW_REQUIRED",
+        "value": null,
+        "note": "Macro F1 over the three answer-presence classes."
+      },
+      {
+        "threshold_id": "non_regression_margin_vs_parser_v2",
+        "status": "REVIEW_REQUIRED",
+        "value": null,
+        "note": "Comparator margin. Requires a registered comparator run on the same set, which does not exist."
+      }
+    ],
+    "prohibition": "A threshold must never be adjusted to make a set or a parser acceptable. The contract compiler refuses to emit a contract while any threshold is REVIEW_REQUIRED."
+  },
+  "comparators": {
+    "registered_comparators": ["parser_v2", "legacy_parser"],
+    "span_convention": "literal_only",
+    "requirement": "Every comparator must be run on the identical locked inputs under the identical ontology and the identical span convention before any margin is computed.",
+    "status": "REVIEW_REQUIRED"
+  },
+  "status_logic": {
+    "PASS": "every mandatory gate satisfied AND every acceptance threshold satisfied",
+    "FAIL": "any mandatory gate violated OR any acceptance threshold missed",
+    "INVALID": "any artifact-agreement finding present, any gate denominator below its registered minimum, or any typed decision outside the three formal classes",
+    "vacuity_rule": "A mandatory gate with a zero denominator is an error. It is never reported as NA, never skipped, and never counted as satisfied."
+  },
+  "provenance": {
+    "authored_in_phase": "1.2E",
+    "authored_from": [
+      "evaluator_sets/parser_v3_v1/strata_definitions.md",
+      "docs/phase1_parser_v3_locked_evaluation_protocol.md#15",
+      "docs/phase1_2e_parser_v3_ontology_repair_protocol.md"
+    ],
+    "not_authored_from": [
+      "any sealed locked input",
+      "any locked label",
+      "any parser-v3 prediction",
+      "textual substitution from docs/phase1_parser_v2_acceptance_gates.json"
+    ]
+  }
+}

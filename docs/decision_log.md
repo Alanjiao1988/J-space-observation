@@ -1831,3 +1831,131 @@ across set and parsers, and add a mechanical preregistration check that
 reproduces every declared support count, gate denominator and enum vocabulary
 from sealed bytes before any image is built. That check is a pure function of
 two sealed artifacts and would have caught `H9` immediately.
+
+---
+
+## Phase 1.2E — repair the parser-v3 evaluation ontology in public before touching anything private
+
+**Decision.** After the Phase 1.2D halt, run a tooling-only repair round: define
+the formal ontology, the span convention, the migration rule and the
+policy/facts separation in public, implement and test the machinery, and stop
+before any private construction. Retire `parser-v3-v1` permanently rather than
+repair it. Terminate the round `BLOCKED` on acceptance thresholds rather than
+invent them.
+
+**Why retire rather than repair `parser-v3-v1`.** Its 15 residual cases differ
+from the frozen semantics semantically, not representationally. Any repair
+would require re-labelling them, and re-labelling a sealed one-shot set by a
+party who has already seen its structure is not a blind construction any more.
+The set is preserved as `SEALED / UNSPENT / UNSCORABLE /
+RETIRED_AS_INELIGIBLE`. `UNSPENT` is deliberately worded as a statement about
+what did not happen — no label was read — and explicitly does not authorize
+reuse. Its one-shot budget is not transferable.
+
+**Why the three-class ontology, and why `present_unextractable` is excluded
+rather than mapped.** The candidate parser and the frozen scoring semantics can
+each represent exactly three decisions. Every available mapping of
+`present_unextractable` asserts something false: `no_answer` asserts the text
+contains no answer, `present` asserts the parser should have found one, and
+`ambiguous` asserts multiple candidates. The class is therefore excluded from
+the formal set and permitted only in a separate research-only corpus that is
+never scored. Collapsing it is precisely the `null_collapse_prohibited`
+violation the contract already forbade.
+
+**Why literal-only spans.** All three parsers emit literal-only spans through
+the frozen `validate_evidence_span`, and the frozen scorer enforces
+`normalize_rational_literal(span.text) == span.normalized_answer`. A
+marker-inclusive span can never satisfy that identity, so a set registering one
+could never be scored — that was `H5`. One convention now binds labels,
+parsers, comparators, validation and scoring, and a span the scorer would
+reject invalidates the set before sealing.
+
+**Why the prospective policy and the set-derived facts are two artifacts.** The
+structural cause of `H9` was a single artifact carrying both a prospective
+commitment and an implied factual claim about a set, with no mechanical check
+between them. They are now separate, with separate lifecycles, and the compiler
+fails closed on any disagreement. "Derive from the set" is defined to mean
+mechanically reproduce and verify — never to mean rewrite a quota or threshold
+to match an observed distribution. There is no code path that edits a
+threshold.
+
+**Why the supports are 80/30/10 even though v2 used the same numbers.** They
+were derived from the public stratum definitions — eight answer-bearing strata,
+three no-answer strata, one ambiguous stratum, at ten cases each — not copied.
+The derivation is shown explicitly and is re-checked by `validate_policy`,
+which rejects any support block not reproducible from the declared stratum
+presence. The coincidence with v2 is a consequence of both sets instantiating
+the same registered 12-stratum design.
+
+**Why zero-tolerance mandatory gates are not calibrated thresholds.** They
+follow from stratum purpose, which is a public design fact. `S06` exists only
+to detect selection of a trailing distractor, so a single such selection is the
+failure the stratum was built to find. That is a definition, not a calibration.
+
+**Why the round terminates BLOCKED.** The numeric acceptance thresholds are a
+genuine unresolved scientific choice. Phase 1.0C headroom calibration has not
+been run. The two shortcuts are both inadmissible: parser-v2 constants would
+import an unjustified number of exactly the kind this phase exists to
+eliminate, and any parser-v3-derived threshold would be selected against the
+measurement it is meant to bound. Marking them `REVIEW_REQUIRED` and having the
+compiler refuse to compile is the honest outcome; guessing a number to reach
+`READY_FOR_INDEPENDENT_SET_REPAIR` would have reproduced the original failure
+in a new artifact.
+
+**Why bind to the frozen instrument rather than restate it.** This decision was
+forced by an independent audit, and it is the most important one in the round.
+
+The first implementation described the frozen scorer's invariants in fresh code:
+a truth table in prose and a validator that re-implemented the rules the table
+stated. It looked rigorous and it passed 93 tests. It was also wrong in two
+places at once — `ambiguous` was declared `parse_valid = false` where the
+instrument requires `true`, and the `present` row was materially more permissive
+than the instrument — and the tests could not detect either, because the
+fixtures asserted the same wrong invariants as the code.
+
+Sealed under that table, every `S11` case would have been rejected by the
+scoring instrument: ten cases, a full stratum, unscorable by construction. That
+is the same failure that retired `parser-v3-v1`, reproduced inside the artifact
+written to prevent it.
+
+The mechanism is what matters. `H9` did not happen because someone chose a wrong
+number; it happened because a second description of a thing was allowed to exist
+alongside the thing, free to drift. Any validator that *restates* an invariant
+recreates that freedom. Correcting the two rows would have left it intact.
+
+So the ontology validator now calls the frozen `_validate_extraction_fields` and
+`derive_typed_decision` on every record it accepts and requires agreement. A
+record this tooling admits is a record the scoring instrument admits, by
+construction. The truth table remains in the protocol as documentation of
+intent; it no longer has independent authority.
+
+The same reasoning produced the second structural fix. A set-facts manifest was
+originally trusted on its face, with `set_sha256` digesting the manifest rather
+than any set — so the auditor compiled a fully provenance-bearing contract from
+a manifest describing a set that had never been built. Facts are now re-derived
+from the labels and inputs they claim to describe, and required to match byte
+for byte, before any comparison runs. A deliberate consequence is that several
+agreement detectors become unreachable through the entry points: the manifest
+can no longer disagree with the set, so the check that would have caught the
+disagreement never fires. That is defence in depth working as intended, and the
+detectors are retained and tested directly.
+
+**Why the audit finding is recorded rather than quietly fixed.** The tempting
+alternative was to correct the rows, keep the green test count, and describe the
+round as clean. That would have deleted the round's most useful result. A
+research record whose error log is empty is not a record of careful work; it is
+a record of unexamined work. The general lesson is stated once, here: an
+author's own tests cannot establish that the author understood the
+specification.
+
+**Rejected alternatives.**
+
+| Option | Why rejected |
+| --- | --- |
+| Repair `parser-v3-v1` in place and evaluate it | Requires re-labelling 15 cases in a sealed one-shot set whose structure is already known. Not a blind construction. |
+| Amend `docs/phase1_parser_v3_acceptance_gates.json` | Destroys the evidence of the defect and makes the historical record unauditable. The corrected contract is a different artifact with a different identity. |
+| Score only the 105 structurally valid cases | Changes the population after seeing which cases are inconvenient. Breaks the 12 x 10 design and every gate denominator. |
+| Map `present_unextractable` to `no_answer` | Asserts a falsehood and violates `null_collapse_prohibited`. |
+| Pick thresholds now from parser-v2 values | Reproduces the substitution error that caused `H9`, in a new file. |
+| Declare `READY_FOR_INDEPENDENT_SET_REPAIR` with thresholds open | The brief defines an unresolved scientific design choice as `BLOCKED`. Reporting otherwise would misstate readiness. |
+| Correct the two audit findings without recording them | Deletes the round's most useful result. An empty error log records unexamined work, not careful work. |

@@ -3556,3 +3556,138 @@ resolve `present_unextractable` explicitly, reconcile the span convention
 across the set and all three parsers, and add a mechanical preregistration
 check that reproduces every declared support count, gate denominator and enum
 vocabulary from sealed bytes before any image is built.
+
+---
+
+## Phase 1.2E — parser-v3 evaluation ontology repair, tooling-only round
+
+**Status: BLOCKED on acceptance thresholds. No private data read, no prediction
+generated, no formal evaluation performed.**
+
+A public round. It built the protocol and tooling for a future independently
+curated `parser-v3-v2` set, and touched nothing private.
+
+**Access ledger for the round.** Sealed locked inputs read `0`. Sealed locked
+labels read `0`. Local private curator files read `0`. Predictions generated
+`0`. Parser invocations on locked data `0`. Azure writes or resource changes
+`0`. Formal evaluation ordinal remains `0`.
+
+**Old set disposition.** `parser-v3-v1` is recorded `SEALED / UNSPENT /
+UNSCORABLE / RETIRED_AS_INELIGIBLE`. `UNSPENT` records the absence of label
+access and is not a licence to reuse the set. Bytes, provenance, `H1`-`H9` and
+`N1`-`N6` are preserved unchanged, and the historical gate contract is
+preserved byte-for-byte as the artifact found defective rather than amended in
+place.
+
+**New finding, publicly restatable.** `evaluator_sets/parser_v3_v1/strata_definitions.md`
+is a tracked public file. The sealed set violates its own public specification,
+not merely the v2-inherited contract: `S10` is publicly registered `no_answer`
+but its cases are labelled `present`; the public quota table asserts 80/30/10;
+the public rule that every `S11` case carries at least two distinct canonical
+candidates is violated; and the public statement that no `empty` output is
+exercised is violated. The root cause of `H9` is therefore broader than
+contract substitution from v2 — there was no agreement test between the set,
+its own public specification, and its gate contract.
+
+**Count erratum.** `sealed_object_count = 12`, `total_case_count = 120`,
+`residual_semantic_case_count = 15`. The Phase 1.2D line `Holdout objects 15`
+conflated the first and third and is corrected by an erratum in
+`reports/phase1_parser_v3_locked_evaluation.md`. A recursive listing of
+`parser_v3_v1/` does return 15 entries, but they are a different 15: the 12
+sealed members, plus 2 objects in the sibling `…160340Z-runlog/` prefix, plus 1
+orphaned `crosscheck_report.json` under the aborted `…155224Z-runlog/` prefix
+(`…track-d1-parser-v3-seal/05_summary.md:43` and deviation `D10` of the same
+pack). That reconciliation is inferred from Phase 1.2D records, not observed
+this round — no Blob listing was performed. A regression test now fails if the
+counts are conflated again.
+
+**Delivered.** A three-class truth table with a fail-closed record and set
+validator; `N1`-`N6` as pure, deterministic, idempotent, parser-free
+functions (statically scanned, and proved differentially at runtime rather than
+by an unachievable absolute claim)
+that quarantine rather than coerce; a set-derived facts builder; an agreement
+validator whose rejection codes are the historical defect labels
+`H1/H2/H3/H5/H8/H9`; a byte-stable contract compiler that refuses to overwrite
+and refuses to compile from an unresolved policy; a read-only CLI; the
+prospective policy `docs/phase1_parser_v3_v2_evaluation_policy.json`; and
+`tests/test_parser_v3_repair.py`.
+
+**Test results.** Focused `tests/test_parser_v3_repair.py`: 122 passed. Full
+repository suite: 1497 passed (baseline 1375 + 122 new). No existing test or
+gate was weakened. The first implementation pass passed 93 self-authored
+tests and still contained two critical defects; see the audit record below.
+
+**Independent audit.** After the first implementation was complete and green, a
+separate read-only review agent audited the round against the frozen instrument,
+the 1.2D record, the public strata and the 1.2D sealing artifacts, ran the
+focused suite itself, verified the eleven protected digests against `45a18f4`,
+and probed the tooling adversarially. It found **ten defects: two critical, five
+major, three minor.** All ten were fixed and re-tested.
+
+The two critical findings deserve recording in full, because both are the same
+error this phase exists to prevent.
+
+1. The `ambiguous` truth-table row declared `parse_valid = false`. The frozen
+   instrument requires `true` — a correctly detected ambiguity is a *valid*
+   parse whose outcome is "two or more candidates". Under the original table,
+   **every `S11` case in a sealed `parser-v3-v2` would have been unscorable by
+   construction**, which is exactly the condition that retired `parser-v3-v1`.
+2. The set-facts manifest was bound to nothing: `set_sha256` digested the
+   manifest itself. The auditor compiled a fully provenance-bearing contract from
+   a manifest typed by hand describing a set that had never been built.
+
+Both had one root cause: the repair tooling *restated* the frozen instrument's
+invariants instead of *binding* to them — the same defect as `H9`, which arose
+because the v3 gate contract was copied from v2. The structural fixes are
+`_bind_to_scoring_instrument`, which routes every accepted record through the
+frozen `_validate_extraction_fields` and `derive_typed_decision` and requires
+agreement, and `SetSource` / `_require_derivable`, which re-derives every facts
+manifest from the labels and inputs it claims to describe and requires
+byte-equality before any comparison runs. The remaining eight findings and their
+fixes are recorded in `reports/phase1_2e_parser_v3_repair.md` §6.
+
+The lesson is recorded deliberately: 93 self-authored tests passed against code
+containing a defect fatal to a tenth of the future set, because the fixtures
+encoded the same misunderstanding as the code. Self-authored tests are not
+independent validation.
+
+**Second audit round.** The remediation was itself re-audited, which was the
+right call. The reviewer confirmed eight of the ten fixes as structural — a
+4 490-mutant differential sweep found zero records the ontology accepts and the
+frozen instrument rejects — and found **five further defects, four of them
+introduced by the remediation**. One was major: the decision-preservation fix
+compared a whitelist of projected fields, and seven fields the scorer reads were
+invisible to it, so three constructed cases normalised "successfully" instead of
+quarantining. `normalize_record` now validates its own output against the formal
+ontology before returning, which subsumes the whitelist because the ontology
+binds to the instrument. The other four were one-line defects in the new code: an
+`isinstance` guard a `SetSource` subclass could defeat, `agreement_findings`
+exported as public API when it accepts unverified input, an untested
+`allow_overwrite` flag contradicting the protocol's own never-amend invariant,
+and a bare `KeyError` plus substring-matched quarantine codes in the normalizer.
+All five are fixed; `NormalizationError` now carries its own reason code.
+
+Two observations were accepted without code change and recorded as limitation
+`L-32` instead: `sealed_object_count` and the member list are operator
+*assertions*, not derived facts, because no offline tool can list a blob, and a
+self-consistent misstatement of both is undetectable here. The fixture was also
+extended so the whole-set idempotence properties actually exercise `N1` and
+`N6`, which previously applied zero times.
+
+**Why BLOCKED.** The numeric acceptance thresholds cannot be justified in this
+round: Phase 1.0C headroom calibration has not been run, importing the
+parser-v2 constants would carry over an unjustified number of exactly the kind
+this phase exists to eliminate, and deriving a threshold from any parser-v3
+observation would select the threshold against the measurement it bounds. They
+are marked `REVIEW_REQUIRED` and the compiler refuses to compile while any is
+open. Everything else in the round is complete.
+
+**Not claimed.** Parser v3 is not validated, not non-regressive, not improved,
+not accepted. The tooling has synthetic-test evidence only. No J-space,
+hidden-reasoning, internal-workspace or invisible-CoT conclusion follows.
+
+**Next gate:** resolve the acceptance thresholds, either by running Phase 1.0C
+headroom calibration or by registering an explicit reviewed rationale for a
+threshold family that does not depend on it. No `parser-v3-v2` construction,
+review, sealing, preregistration, image build, Stage P or Stage E may begin
+before that gate passes.
