@@ -1,13 +1,35 @@
 {
-  "schema_version": "phase1-parser-v3-prospective-evaluation-policy/v1",
+  "schema_version": "phase1-parser-v3-prospective-evaluation-policy/v2",
   "policy_id": "parser-v3-v2-prospective-policy",
   "status": "REVIEW_REQUIRED",
-  "phase": "1.2E",
-  "purpose": "Prospective evaluation policy for a future independently curated parser-v3-v2 locked evaluation set. This artifact is registered before any set exists and contains no set-derived fact. It is not an authorization to construct, seal, or evaluate a set.",
-  "supersedes": null,
+  "phase": "1.2F",
+  "supersedes": "phase1-parser-v3-prospective-evaluation-policy/v1 (authored in Phase 1.2E)",
   "does_not_supersede": [
-    "docs/phase1_parser_v3_acceptance_gates.json"
+    {
+      "path": "docs/phase1_parser_v3_acceptance_gates.json",
+      "status": "HISTORICAL_AND_DEFECTIVE",
+      "note": "Retained byte-for-byte as digest-pinned evidence of the H9 substitution defect, not as live policy. It binds to the retired, unscorable parser-v3-v1 set and contains numeric instantiations of three of the four thresholds audited here, carried over verbatim from the parser-v2 contract. Those numbers are the defect this phase exists to eliminate and must not be read as current. Annotated after Audit A finding A10."
+    }
   ],
+  "purpose": "Prospective evaluation policy for a future independently curated parser-v3-v2 locked evaluation set. This artifact is registered before any set exists and contains no set-derived fact. It is not an authorization to construct, seal, or evaluate a set.",
+  "errata": {
+    "note": "This block corrects the record. It is documentation only. Nothing in it is a dependency, an input to any threshold, or reachable from the contract compiler, which reads only acceptance_thresholds.items.",
+    "corrections": [
+      {
+        "erratum_id": "E-1.2F-01",
+        "superseded_claim": "The v1 policy recorded a blocking dependency on the Phase 1.0C headroom calibration and described that calibration as not run.",
+        "correction": "Phase 1.0C was executed. It was preregistered at 62e9b961, unblocked at 5d18b708, executed at 72c3d281, and finalized at 06eec99315ff5b6c838aeaa82e0814fea6e886b4. It generated 300 of 300 target-model outputs and its final Track B decision was INCONCLUSIVE, carrying 156 correct, 100 incorrect, and 44 unresolved semantic labels.",
+        "root_cause": "The v1 policy was authored from a stale current-state summary in reports/current_status.md that had never been updated after the calibration ran. The false claim was already false when written.",
+        "second_and_deeper_error": "Even a completed Phase 1.0C could not have unblocked these thresholds. Phase 1.0C measures target-model observable-answer task headroom, that is, whether the model can answer the question. A parser acceptance threshold concerns parser extraction fidelity, that is, whether the parser can recover the answer from the model's text. These are different quantities measured on different objects. The v1 policy was therefore blocked on a calibration that does not exist and was never designed, not on a calibration that was merely pending.",
+        "classification": "policy-provenance defect. This is not an instance of H9. H9 concerns disagreement between declared and observed artifact vocabulary, support, or set facts. An unjustified threshold source is a distinct failure class and does not redefine or extend the historical H1-H9 findings."
+      }
+    ]
+  },
+  "post_hoc_disclosure": {
+    "statement": "This policy is being written after some parser-v3 development results are already known to the project. Knowledge of those results is a real post-hoc selection hazard.",
+    "mitigation": "No numeric threshold in this policy is derived from, checked against, or tuned toward any observed parser behaviour. The single surviving hard criterion is left REVIEW_REQUIRED precisely because no candidate-independent derivation for its value exists yet. Existing candidate and comparator results were read in this phase only to reconstruct project history.",
+    "residual_risk": "A reader cannot verify from the artifact alone that prior knowledge exerted no influence on the structural decisions recorded here. The structural decisions are therefore accompanied by explicit derivations that can be checked independently of any parser result."
+  },
   "ontology": {
     "typed_decision_classes": [
       "present:<canonical_value>",
@@ -27,13 +49,58 @@
     "total_case_count": 120,
     "cases_per_stratum": 10,
     "strata": [
-      "S01", "S02", "S03", "S04", "S05", "S06",
-      "S07", "S08", "S09", "S10", "S11", "S12"
+      "S01",
+      "S02",
+      "S03",
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S09",
+      "S10",
+      "S11",
+      "S12"
     ],
-    "clean_strata": ["S01", "S02", "S03", "S12"],
+    "clean_strata": [
+      "S01",
+      "S02",
+      "S03",
+      "S12"
+    ],
     "critical_strata": [
-      "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11"
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S09",
+      "S10",
+      "S11"
     ],
+    "zero_gated_critical_strata": [
+      "S07",
+      "S08",
+      "S10",
+      "S11"
+    ],
+    "residual_critical_strata": [
+      "S04",
+      "S05",
+      "S06",
+      "S09"
+    ],
+    "residual_critical_case_count": 40,
+    "sampling_frame": {
+      "kind": "fixed quota-constructed adversarial challenge set",
+      "is_iid_sample": false,
+      "prohibited_interpretations": [
+        "confidence intervals over a deployment population",
+        "generalisation of a measured rate to unseen inputs",
+        "any statement of the form 'the parser is X% accurate in deployment'"
+      ],
+      "note": "Strata are filled to registered quotas to force specific failure modes. A rate measured on this set estimates performance on the quota design, not on any natural population. Interval estimates that assume independent identically distributed sampling are not valid here and must not be reported."
+    },
     "stratum_presence": {
       "S01": "present",
       "S02": "present",
@@ -54,11 +121,12 @@
       "ambiguous": 10
     },
     "support_derivation": {
-      "method": "counted from the registered presence of each stratum in evaluator_sets/parser_v3_v1/strata_definitions.md, at the registered 10 cases per stratum",
+      "method": "counted from the registered presence of each stratum in docs/phase1_parser_v3_v2_stratum_policy.md, at the registered 10 cases per stratum",
       "present": "S01 S02 S03 S04 S05 S06 S09 S12 = 8 strata x 10 = 80",
       "no_answer": "S07 S08 S10 = 3 strata x 10 = 30",
       "ambiguous": "S11 = 1 stratum x 10 = 10",
-      "independence_note": "These values are derived from the public stratum definitions and equal the parser-v2 supports only because both sets use the same registered 12-stratum design. They were not copied from the parser-v2 gate contract and were not derived from any parser-v3 prediction."
+      "independence_note": "These values are derived from the public v2 stratum policy and equal the parser-v2 supports only because both designs use the same registered 12-stratum taxonomy. They were not copied from the parser-v2 gate contract and were not derived from any parser-v3 prediction.",
+      "namespace_note": "Phase 1.2F re-derived these values against the v2 stratum policy. The v1 path evaluator_sets/parser_v3_v1/strata_definitions.md is retired, is refused by the repair CLI, and is no longer a live binding of this policy. It is cited in the v2 stratum policy only as historical ancestry."
     }
   },
   "gates": [
@@ -69,7 +137,11 @@
       "population_selector": "S06",
       "minimum_denominator": 10,
       "maximum_errors": 0,
-      "justification": "S06 exists only to test that the parser does not select the trailing distractor. A single failure is the failure mode the stratum was built to detect, so zero tolerance follows from the stratum's purpose rather than from calibration."
+      "justification": "S06 exists only to test that the parser does not select the trailing distractor. A single failure is the failure mode the stratum was built to detect, so zero tolerance follows from the stratum's purpose rather than from calibration.",
+      "error_definition": "registered_rightmost_distractor_span_selected",
+      "error_scope": "per_case",
+      "pins_exact_typed_decision": false,
+      "error_semantics_note": "This is the narrow definition registered for the S06 gate in docs/phase1_parser_v3_acceptance_gates.json, retained rather than silently broadened. A parser can avoid the trailing distractor and still return a wrong canonical value, or emit no_answer, without violating this gate. S06 is therefore NOT pinned to exact agreement."
     },
     {
       "gate_id": "G_S11_ambiguity_detection",
@@ -78,7 +150,11 @@
       "population_selector": "S11",
       "minimum_denominator": 10,
       "maximum_errors": 0,
-      "justification": "S11 exists only to test that genuine multi-candidate ambiguity is reported as ambiguous rather than resolved arbitrarily."
+      "justification": "S11 exists only to test that genuine multi-candidate ambiguity is reported as ambiguous rather than resolved arbitrarily.",
+      "error_definition": "typed_decision_is_not_ambiguous",
+      "error_scope": "per_case",
+      "pins_exact_typed_decision": true,
+      "error_semantics_note": "ambiguous carries no canonical value, so the typed decision is the whole decision and a zero-error result pins exact agreement."
     },
     {
       "gate_id": "G_S10_unrecoverable_no_answer",
@@ -87,7 +163,11 @@
       "population_selector": "S10",
       "minimum_denominator": 10,
       "maximum_errors": 0,
-      "justification": "S10 exists only to test that an unrecoverable malformed output yields no_answer."
+      "justification": "S10 exists only to test that an unrecoverable malformed output yields no_answer.",
+      "error_definition": "typed_decision_is_not_no_answer",
+      "error_scope": "per_case",
+      "pins_exact_typed_decision": true,
+      "error_semantics_note": "no_answer carries no canonical value, so the typed decision is the whole decision and a zero-error result pins exact agreement."
     },
     {
       "gate_id": "G_S07_truncated_no_answer",
@@ -96,7 +176,11 @@
       "population_selector": "S07",
       "minimum_denominator": 10,
       "maximum_errors": 0,
-      "justification": "S07 exists only to test that truncation before the final answer yields no_answer."
+      "justification": "S07 exists only to test that truncation before the final answer yields no_answer.",
+      "error_definition": "typed_decision_is_not_no_answer",
+      "error_scope": "per_case",
+      "pins_exact_typed_decision": true,
+      "error_semantics_note": "no_answer carries no canonical value, so the typed decision is the whole decision and a zero-error result pins exact agreement."
     },
     {
       "gate_id": "G_S08_explicit_no_answer",
@@ -105,7 +189,11 @@
       "population_selector": "S08",
       "minimum_denominator": 10,
       "maximum_errors": 0,
-      "justification": "S08 exists only to test that an explicit refusal yields no_answer."
+      "justification": "S08 exists only to test that an explicit refusal yields no_answer.",
+      "error_definition": "typed_decision_is_not_no_answer",
+      "error_scope": "per_case",
+      "pins_exact_typed_decision": true,
+      "error_semantics_note": "no_answer carries no canonical value, so the typed decision is the whole decision and a zero-error result pins exact agreement."
     },
     {
       "gate_id": "G_clean_strata_exact",
@@ -113,7 +201,11 @@
       "population": "clean_cases",
       "minimum_denominator": 40,
       "maximum_errors": 0,
-      "justification": "The clean strata carry unambiguous single answers in registered surface forms. Any error there is a defect in the parser, not a hard case."
+      "justification": "The clean strata carry unambiguous single answers in registered surface forms. Any error there is a defect in the parser, not a hard case.",
+      "error_definition": "expected_value_or_registered_selected_span_not_recovered",
+      "error_scope": "per_case",
+      "pins_exact_typed_decision": true,
+      "error_semantics_note": "Recovering the expected value on a clean case is exact typed-decision agreement, so a zero-error result here pins these strata."
     },
     {
       "gate_id": "G_present_class_non_vacuous",
@@ -121,7 +213,11 @@
       "population": "typed_decision_class",
       "population_selector": "present",
       "minimum_denominator": 80,
-      "justification": "Every declared class must be exercised. A zero denominator is an error, never NA."
+      "justification": "Every declared class must be exercised. A zero denominator is an error, never NA.",
+      "error_definition": "reference_support_denominator_is_zero",
+      "error_scope": "set_level",
+      "pins_exact_typed_decision": false,
+      "error_semantics_note": "This gate constrains the reference supports of the set, not the parser's predicted class usage. It cannot pin any case to exact agreement and cannot by itself forbid a parser from never emitting a class."
     },
     {
       "gate_id": "G_no_answer_class_non_vacuous",
@@ -129,7 +225,11 @@
       "population": "typed_decision_class",
       "population_selector": "no_answer",
       "minimum_denominator": 30,
-      "justification": "Every declared class must be exercised. A zero denominator is an error, never NA."
+      "justification": "Every declared class must be exercised. A zero denominator is an error, never NA.",
+      "error_definition": "reference_support_denominator_is_zero",
+      "error_scope": "set_level",
+      "pins_exact_typed_decision": false,
+      "error_semantics_note": "This gate constrains the reference supports of the set, not the parser's predicted class usage. It cannot pin any case to exact agreement and cannot by itself forbid a parser from never emitting a class."
     },
     {
       "gate_id": "G_ambiguous_class_non_vacuous",
@@ -137,7 +237,11 @@
       "population": "typed_decision_class",
       "population_selector": "ambiguous",
       "minimum_denominator": 10,
-      "justification": "Every declared class must be exercised. A zero denominator is an error, never NA."
+      "justification": "Every declared class must be exercised. A zero denominator is an error, never NA.",
+      "error_definition": "reference_support_denominator_is_zero",
+      "error_scope": "set_level",
+      "pins_exact_typed_decision": false,
+      "error_semantics_note": "This gate constrains the reference supports of the set, not the parser's predicted class usage. It cannot pin any case to exact agreement and cannot by itself forbid a parser from never emitting a class."
     },
     {
       "gate_id": "G_null_collapse_prohibited",
@@ -145,65 +249,285 @@
       "population": "all_cases",
       "minimum_denominator": 120,
       "maximum_errors": 0,
-      "justification": "No answer-bearing case may be scored by collapsing an unextracted answer into no_answer. This is the invariant the parser-v3-v1 set violated by admitting a fourth class."
+      "justification": "No answer-bearing case may be scored by collapsing an unextracted answer into no_answer. This is the invariant the parser-v3-v1 set violated by admitting a fourth class.",
+      "error_definition": "parser_emitted_zero_instances_of_a_registered_typed_decision_class_across_the_whole_set",
+      "error_scope": "set_level",
+      "pins_exact_typed_decision": false,
+      "error_semantics_note": "This is a set-level property, not a per-case one. Reading its maximum_errors: 0 as a per-case exact-agreement requirement would pin all 120 cases and make every acceptance criterion vacuous; that reading is explicitly rejected here."
     }
   ],
+  "gate_coverage_analysis": {
+    "note": "Recomputed in Phase 1.2F from the declared per-gate error semantics above, after Audit A finding A2. A gate contributes here only if error_scope=per_case and pins_exact_typed_decision=true.",
+    "derivation_rule": "pinned = union of strata covered by per-case gates that pin exact typed-decision agreement; free = all remaining strata.",
+    "zero_error_pinned_strata": [
+      "S01",
+      "S02",
+      "S03",
+      "S07",
+      "S08",
+      "S10",
+      "S11",
+      "S12"
+    ],
+    "zero_error_pinned_case_count": 80,
+    "free_strata": [
+      "S04",
+      "S05",
+      "S06",
+      "S09"
+    ],
+    "free_case_count": 40,
+    "excluded_gates": {
+      "G_S06_last_number_trap": "per-case, but its registered error definition is narrow and does not entail exact typed-decision agreement.",
+      "G_null_collapse_prohibited": "set-level; pins no individual case.",
+      "G_present_class_non_vacuous": "set-level; constrains reference supports, not parser output.",
+      "G_no_answer_class_non_vacuous": "set-level; constrains reference supports, not parser output.",
+      "G_ambiguous_class_non_vacuous": "set-level; constrains reference supports, not parser output."
+    },
+    "implication": "Satisfying every mandatory gate implies at least 80 of 120 exact typed decisions. Any acceptance criterion whose binding value lies at or below 80 of 120 is vacuous: no gate-passing parser can ever miss it.",
+    "superseded_figures": {
+      "previous_pinned_case_count": 90,
+      "previous_free_strata": [
+        "S04",
+        "S05",
+        "S09"
+      ],
+      "previous_free_case_count": 30,
+      "why_superseded": "Those figures assumed a broad reading of the S06 gate that was never declared and that contradicts the only registered error definition for it."
+    }
+  },
   "acceptance_thresholds": {
     "status": "REVIEW_REQUIRED",
-    "reason": "No calibration basis exists for a numeric acceptance threshold on parser v3. Phase 1.0C headroom calibration has not been run, and choosing a threshold from parser-v2 results or from any parser-v3 observation would either import an unjustified constant or select a threshold against the very measurement it is meant to bound.",
-    "blocking_dependency": "Phase 1.0C headroom calibration (NOT RUN).",
+    "reason": "The four thresholds proposed in the v1 policy were audited in Phase 1.2F. Two were found to express the same constraint as each other, one was found to provide no independent protection while masking the error class that matters most, and one was found to require observing both parsers on a set that does not exist. The single surviving hard criterion is structurally well defined over the 40 cases in S04, S05, S06, S09 that no gate pins to exact agreement, but it has no candidate-independent numeric value.",
+    "blocking_dependency": {
+      "note": "Corrected after Audit A finding A3. This field previously named the absent downstream error budget alone. That was the wrong dependency: supplying a budget would have left the prior blocker untouched, so the block had no working exit.",
+      "primary": "UNMADE SCIENTIFIC DECISION - instrument strictness on the residual designed-failure strata. S04, S05, S06, S09 each exist to force a specific extraction failure, in the same way the already-gated strata do. Either that shared design purpose licenses zero tolerance on them too, in which case the budget is 0 and the policy becomes a demand for 120 of 120 exact agreement; or it does not, in which case the zero-tolerance justification currently carried by the existing per-stratum gates is equally underived and must be restated. This round declines to settle it by fiat in either direction, because the choice determines the strictness of the whole instrument and is not a drafting matter.",
+      "secondary": "ABSENT DOWNSTREAM ERROR BUDGET - required only if the primary decision permits a non-zero tolerance. No registered maximum tolerable parser-induced distortion exists. See docs/phase1_2f_parser_error_budget_calibration_protocol.md for the prospective design that would supply one.",
+      "ordering": "The primary decision must be settled first. Executing the calibration protocol while the primary decision is open would produce a number with no question attached to it.",
+      "withdrawn_argument": "An earlier draft argued that no logical invariant could apply to these strata because they do not already carry zero-error gates. That argument was circular - it offered the absence of the gate as evidence that no gate is warranted, when whether one is warranted is exactly the question. It is withdrawn."
+    },
+    "prohibited_dependency_note": "This policy has no dependency on any target-model task or headroom screening experiment. Such experiments measure whether a model can answer a question; a parser threshold concerns whether a parser can recover an answer from text. No result of the former can bound the latter.",
     "items": [
       {
         "threshold_id": "overall_exact_typed_decision_minimum",
-        "status": "REVIEW_REQUIRED",
+        "status": "FINAL",
+        "disposition": "REPLACE_HARD",
+        "replaced_by": "residual_critical_exact_budget",
+        "binding": false,
         "value": null,
-        "note": "Minimum number of the 120 cases whose typed decision must match exactly."
+        "metric_definition": "Number of the 120 cases whose typed decision matches the reference decision exactly, where a present case matches only if the canonical value also matches.",
+        "numerator": "cases with exact typed-decision agreement",
+        "denominator": "120 registered cases",
+        "inequality_direction": "at_least",
+        "population": "all 120 cases",
+        "failure_risk_controlled": "broad, diffuse extraction failure spread across the set",
+        "relationship_to_existing_gates": "The mandatory gates already pin 80 of 120 cases to exact typed-decision agreement (recomputed in Phase 1.2F from the declared per-gate error semantics). A gate-passing parser therefore scores at least 80 by construction.",
+        "independence_finding": "PARTIALLY_REDUNDANT",
+        "independence_analysis": "Any value at or below 80 is vacuous: no gate-passing parser can miss it. The binding range is 81 to 120, which maps one-for-one onto an allowance of 39 down to 0 errors on the 40 cases in S04, S05, S06, S09. That is an exact identity, not an approximation, because no error can occur outside the free population without first failing a gate. The criterion is therefore the residual budget written over a 120-case denominator that conceals which cases it governs.",
+        "boundary_examples": [
+          "value 80: satisfied by every gate-passing parser; vacuous.",
+          "value 81: equivalent to at most 39 errors in S04, S05, S06, S09.",
+          "value 120: equivalent to zero errors in S04, S05, S06, S09."
+        ],
+        "sensitivity_analysis": "Every unit increase above 80 removes exactly one permitted error from the free population. The criterion has 41 distinguishable states and 81 vacuous ones.",
+        "rationale": "Replaced rather than removed, because the underlying protection is real. Restating it directly over the population it actually constrains removes the false impression of set-wide coverage and makes the integer boundary unambiguous."
       },
       {
         "threshold_id": "critical_stratum_floor",
-        "status": "REVIEW_REQUIRED",
+        "status": "FINAL",
+        "disposition": "MERGE_WITH_EXISTING_GATE",
+        "merged_into": "residual_critical_exact_budget",
+        "binding": false,
         "value": null,
-        "note": "Per-stratum floor across the eight critical strata."
+        "metric_definition": "A common per-stratum maximum error count applied to each of the eight critical strata S04 through S11.",
+        "numerator": "errors within one critical stratum",
+        "denominator": "10 cases per critical stratum",
+        "inequality_direction": "at_most",
+        "population": "each of S04 through S11 separately",
+        "failure_risk_controlled": "concentration of all failures inside a single adversarial stratum",
+        "relationship_to_existing_gates": "The declared critical set is S04, S05, S06, S07, S08, S09, S10, S11. Of these, S07, S08, S10, S11 already carry per-case gates that pin exact typed-decision agreement at zero tolerance. The remaining critical strata are S04, S05, S06, S09.",
+        "independence_finding": "PARTIALLY_REDUNDANT",
+        "independence_analysis": "A per-stratum floor is inert on S07, S08, S10, S11 for every value it can take: at zero errors it duplicates the dedicated gate exactly, and at any looser value the dedicated gate binds first. Its only independent content is S04, S05, S06, S09 - the same 40 cases constrained by threshold 1. Two criteria over one population is not redundancy that merely wastes space: they can disagree at an integer boundary, and the policy would then have no defined answer about which governs.",
+        "boundary_examples": [
+          "floor 10 (zero errors) on any of S07, S08, S10, S11: identical to the existing gate.",
+          "floor 9 or lower on any of S07, S08, S10, S11: strictly weaker than the existing gate; unreachable.",
+          "floor applied to S04, S05, S06, S09: restates the residual budget per stratum instead of over the pooled population."
+        ],
+        "sensitivity_analysis": "Varying the floor from 0 to 10 changes the outcome for no case in S06, S07, S08, S10 or S11. It changes the outcome only within S04, S05 and S09.",
+        "rationale": "Merged rather than kept, because a criterion that is inert on five of the eight strata it names is a misleading way to express a constraint on the other three. The per-stratum shape is preserved inside the successor criterion so that concentration inside one residual stratum can still be controlled."
       },
       {
         "threshold_id": "answer_presence_macro_f1_minimum",
-        "status": "REVIEW_REQUIRED",
+        "status": "FINAL",
+        "disposition": "REPORT_ONLY",
+        "binding": false,
         "value": null,
-        "note": "Macro F1 over the three answer-presence classes."
+        "metric_definition": "Unweighted mean of the per-class F1 scores over the three answer-presence classes present, no_answer and ambiguous, at registered supports 80, 30 and 10.",
+        "numerator": "per-class harmonic mean of precision and recall",
+        "denominator": "three classes, equally weighted",
+        "inequality_direction": "at_least",
+        "population": "all 120 cases, scored on presence class only",
+        "failure_risk_controlled": "claimed: systematic collapse of one presence class",
+        "relationship_to_existing_gates": "Presence-class collapse is already forbidden at zero tolerance by the per-case stratum gates alone: a parser that never emits no_answer fails G_S07, G_S08 and G_S10; one that never emits ambiguous fails G_S11; one that never emits present fails G_clean_strata_exact. The three non-vacuity gates are NOT part of this argument - corrected after Audit A finding A8, which showed they constrain the reference supports of the set rather than the parser's predicted class usage, and so cannot forbid a parser from abandoning a class.",
+        "independence_finding": "FULLY_REDUNDANT_AND_MASKING",
+        "independence_analysis": "Exhaustive enumeration over the 40 free cases yields 861 feasible confusion matrices with the registered supports. Macro F1 ranges from 0.636895 to 1.000000, so any threshold at or below 0.636895 is vacuous by construction. The metric is also non-monotone in error count: runs with identical error counts differ materially depending only on which class absorbed the confusion, so it does not order candidates by severity.",
+        "boundary_examples": [
+          "threshold 0.636895: satisfied by every feasible matrix; vacuous.",
+          "threshold 1.000000: satisfied only by zero presence errors, and still blind to every canonical-value error.",
+          "presence-perfect candidate with 40 value errors: macro F1 1.0000, exact agreement 80/120."
+        ],
+        "sensitivity_analysis": "No choice of threshold repairs the masking defect, because the defect is in what the metric measures rather than in where the line is drawn. Raising the threshold narrows the vacuous region without ever making a canonical-value error visible.",
+        "rationale": "Demoted rather than kept, because as a hard gate it adds no protection that the presence gates do not already give at zero tolerance, and it would let a parser with 30 wrong canonical values present a perfect headline number. Retained as report-only because the per-class breakdown remains informative diagnostic context for a human reader.",
+        "report_only_safeguard": "Not referenced by status_logic. Carries no value and binding=false, so the contract compiler cannot read a criterion from it.",
+        "masking_finding": "Decisive. A candidate that classifies presence perfectly but returns 40 wrong canonical values scores macro F1 exactly 1.0000 while achieving only 80 of 120 exact typed decisions. A metric that awards a perfect score to a candidate that got a third of the set's canonical values wrong cannot be a hard acceptance gate."
       },
       {
         "threshold_id": "non_regression_margin_vs_parser_v2",
-        "status": "REVIEW_REQUIRED",
+        "status": "FINAL",
+        "disposition": "REPORT_ONLY",
+        "binding": false,
         "value": null,
-        "note": "Comparator margin. Requires a registered comparator run on the same set, which does not exist."
+        "metric_definition": "Paired difference in exact typed-decision agreement between parser v3 and parser v2 on the identical locked inputs under the identical ontology and span convention.",
+        "numerator": "parser-v3 exact agreements minus parser-v2 exact agreements",
+        "denominator": "120 registered cases",
+        "inequality_direction": "at_least",
+        "population": "all 120 cases, paired by case",
+        "failure_risk_controlled": "claimed: silent regression relative to the deployed parser",
+        "relationship_to_existing_gates": "The mandatory gates define fitness in absolute terms. A comparator result cannot make a parser that violates an absolute gate acceptable, and cannot make a parser that satisfies every absolute gate unacceptable.",
+        "independence_finding": "NOT_DERIVABLE_PROSPECTIVELY",
+        "independence_analysis": "Corrected after Audit A finding A4. The controlling reason is that every margin-parameterised formulation requires observing at least one parser on the locked set in order to choose the margin, which is exactly what candidate independence forbids. Two arguments carried in an earlier draft are withdrawn: that the predecessor's own failure disqualifies it as a reference (a non-regression floor is an additional necessary condition applied on top of the absolute gates, never an argument that the predecessor was adequate), and that the comparator run does not yet exist (nothing in a prospective policy exists yet, including the set, so this would equally forbid registering any gate).",
+        "boundary_examples": [
+          "margin 0 with equality passing: admits a parser that reproduces every parser-v2 error exactly",
+          "margin 0 with equality failing: requires strict improvement somewhere, which on a 120-case quota set may be satisfied by a single case and is therefore near-arbitrary",
+          "margin +1: indistinguishable in meaning from margin 0 with equality failing, on a set this size"
+        ],
+        "sensitivity_analysis": "On a 120-case quota-constructed set the paired difference is an integer count over a designed population, not an estimate of a deployment effect. Every candidate margin between -5 and +5 is defensible by narrative and none is derivable, which is the signature of an undetermined parameter rather than a calibrated one.",
+        "rationale": "Demoted from hard gate to report-only. Comparison with the previous parser is genuinely informative for a reader and for error analysis, but it cannot carry acceptance weight when its value is underivable, its reference failed its own evaluation, and the absolute gates already define fitness.",
+        "future_comparator_conditions": "If a comparator is ever run it may only be run on the identical locked inputs under the identical ontology and identical span convention, after a separate authorization, and its result is reported as context and never as a PASS or FAIL input.",
+        "report_only_safeguard": "Not referenced by status_logic. Carries no value and binding=false, so the contract compiler cannot read a criterion from it.",
+        "margin_free_formulation_considered": {
+          "formulation": "Per-case dominance: parser v3 must not fail exact typed-decision agreement on any case where parser v2 succeeds, on the identical locked inputs under the identical ontology and span convention.",
+          "why_it_was_considered": "It has no free numeric parameter, so it needs no calibration and no observation to fix its value. It is registrable prospectively on the same footing as the stratum gates.",
+          "disposition": "REJECTED_ON_SUBSTANCE",
+          "reason": "Per-case dominance is not a floor on capability; it is a prohibition on changing behaviour. It fails a candidate for losing a case the predecessor happened to get right for the wrong reason, which is a real and expected consequence of correcting a defective parser, and the predecessor here is known to be defective. It also imports the predecessor's per-case results into the pass condition, making the successor's admissibility depend on the accidents of an instrument that failed. The absolute gates already carry the protection that matters, per case and at zero tolerance, on every stratum the design pins.",
+          "residual_risk_accepted": "A regression confined to the free population would not be caught by any binding criterion. That risk is what the residual budget exists to bound, and it is bounded by an absolute requirement rather than by comparison with a failed predecessor."
+        }
+      },
+      {
+        "threshold_id": "residual_critical_exact_budget",
+        "status": "REVIEW_REQUIRED",
+        "disposition": "REVIEW_REQUIRED",
+        "binding": false,
+        "value": null,
+        "introduced_in_phase": "1.2F",
+        "absorbs": [
+          "overall_exact_typed_decision_minimum",
+          "critical_stratum_floor"
+        ],
+        "metric_definition": "Maximum number of exact typed-decision errors permitted within the residual critical strata S04, S05 and S09, with a companion per-stratum cap so that the budget cannot be spent entirely inside one stratum.",
+        "numerator": "exact typed-decision errors within S04, S05 and S09",
+        "denominator": 40,
+        "inequality_direction": "at_most",
+        "population": "the 40 cases in S04, S05, S06, S09",
+        "failure_risk_controlled": "extraction failure in the three adversarial strata that no zero-error gate covers: multiple intermediate numbers, final answer followed by trailing reasoning, and recoverable malformation",
+        "relationship_to_existing_gates": "Complementary by construction. It governs exactly the 40 cases that no per-case gate pins to exact typed-decision agreement, and nothing else.",
+        "independence_finding": "INDEPENDENT",
+        "structural_derivation_status": "DERIVED",
+        "structural_derivation": "The population is the complement of the exact-agreement coverage of the mandatory gates, recomputed from each gate's declared error definition and scope. The metric is the count of cases failing exact typed-decision agreement, the direction is at_most, the comparison is over integers, and the value B passes when the observed error count equals B. Every element of this derivation is a public design fact. None of it observes a parser.",
+        "numeric_derivation_status": "REVIEW_REQUIRED",
+        "why_numeric_value_is_blocked": "Two dependencies, in order. First, an unmade scientific decision about instrument strictness on S04, S05, S06, S09: each of these strata exists to force a designed extraction failure, so the same argument that licenses zero tolerance on the gated strata is available here in the abstract, and adopting it would set B to 0 and convert the policy into a demand for 120 of 120 exact agreement. Declining it requires an equally explicit reason, which nobody has recorded. Second, and only if a non-zero tolerance is permitted, there is no registered maximum tolerable parser-induced distortion in any downstream scientific metric that an allowable error count could be traced to. Inserting a plausible integer today would settle the first question by accident and the second by assertion.",
+        "prohibited_resolutions": [
+          "adopting a number because parser v2 used a similar one",
+          "adopting a number because parser v3 is believed likely to meet it",
+          "adopting a number from any target-model task or headroom screening result",
+          "adopting zero merely because it is the tidiest available value"
+        ],
+        "next_step": "Settle the strictness decision first and record it with an explicit rationale. If it permits a non-zero tolerance, register a downstream parser-error budget and then execute docs/phase1_2f_parser_error_budget_calibration_protocol.md, which is registered and not executed. Supplying a DOWNSTREAM_ERROR_BUDGET before the strictness decision is settled would produce a number with no question attached to it.",
+        "independence_assertion_deferred": "Withdrawn from this record after Audit A finding A7. Independence flags were asserted about a value that does not exist, which is not truth-apt, and once present they would satisfy the validator's independence check without forcing any re-derivation at the moment a number is finally supplied. They must be asserted in the same change that supplies the value."
       }
     ],
-    "prohibition": "A threshold must never be adjusted to make a set or a parser acceptable. The contract compiler refuses to emit a contract while any threshold is REVIEW_REQUIRED."
+    "prohibition": "A threshold must never be adjusted to make a set or a parser acceptable. The contract compiler refuses to emit a contract while any threshold is REVIEW_REQUIRED.",
+    "audit_provenance": "reports/phase1_2f_parser_acceptance_policy.md and docs/phase1_2f_threshold_dispositions.json",
+    "enforcement_scope": {
+      "note": "Recorded after Audit A finding A6, which found the enforcement claim broader than the enforcement.",
+      "machine_rejected": "Prose naming a headroom or task-screening experiment, an observed or development parser measurement, a locked comparator performance figure, an expectation about how the candidate will perform, a verbatim carry-over from the predecessor gate contract, an unsourced appeal to industry practice, or a value chosen because it would permit a pass. Checked across every threshold record including those still REVIEW_REQUIRED.",
+      "not_machine_rejected": "A prohibited basis expressed without any of the registered phrasings. Substring matching bounds carelessness, not intent, and no claim is made that it bounds intent."
+    }
   },
   "comparators": {
-    "registered_comparators": ["parser_v2", "legacy_parser"],
+    "registered_comparators": [
+      "parser_v2",
+      "legacy_parser"
+    ],
     "span_convention": "literal_only",
     "requirement": "Every comparator must be run on the identical locked inputs under the identical ontology and the identical span convention before any margin is computed.",
+    "role": "REPORT_ONLY",
+    "role_note": "Phase 1.2F demoted comparator results from acceptance inputs to reported context. No comparator result may appear in PASS or FAIL logic.",
     "status": "REVIEW_REQUIRED"
   },
   "status_logic": {
-    "PASS": "every mandatory gate satisfied AND every acceptance threshold satisfied",
-    "FAIL": "any mandatory gate violated OR any acceptance threshold missed",
+    "PASS": "every mandatory gate satisfied AND every binding acceptance criterion satisfied",
+    "FAIL": "any mandatory gate violated OR any binding acceptance criterion missed",
     "INVALID": "any artifact-agreement finding present, any gate denominator below its registered minimum, or any typed decision outside the three formal classes",
-    "vacuity_rule": "A mandatory gate with a zero denominator is an error. It is never reported as NA, never skipped, and never counted as satisfied."
+    "vacuity_rule": "A mandatory gate with a zero denominator is an error. It is never reported as NA, never skipped, and never counted as satisfied.",
+    "non_binding_rule": "A criterion whose disposition is REPLACE_HARD, MERGE_WITH_EXISTING_GATE, REPORT_ONLY or REMOVE_REDUNDANT is not a binding acceptance criterion and must never be named by PASS or FAIL. The policy validator enforces this by refusing any policy whose PASS or FAIL clause mentions such an identifier."
   },
   "provenance": {
     "authored_in_phase": "1.2E",
+    "corrected_in_phase": "1.2F",
     "authored_from": [
-      "evaluator_sets/parser_v3_v1/strata_definitions.md",
+      "docs/phase1_parser_v3_v2_stratum_policy.md",
       "docs/phase1_parser_v3_locked_evaluation_protocol.md#15",
-      "docs/phase1_2e_parser_v3_ontology_repair_protocol.md"
+      "docs/phase1_2e_parser_v3_ontology_repair_protocol.md",
+      "docs/phase1_2f_parser_acceptance_policy_protocol.md"
     ],
     "not_authored_from": [
       "any sealed locked input",
       "any locked label",
       "any parser-v3 prediction",
+      "any parser-v2 or parser-v3 observed performance",
+      "any target-model task or headroom screening result",
       "textual substitution from docs/phase1_parser_v2_acceptance_gates.json"
-    ]
+    ],
+    "retired_binding": {
+      "path": "evaluator_sets/parser_v3_v1/strata_definitions.md",
+      "reason": "Binding a prospective parser-v3-v2 policy to the retired v1 namespace conflicted with the new-set identity rule and with the repair CLI's refusal of any path containing parser_v3_v1. Phase 1.2F re-derived the taxonomy into a public, case-free, versioned v2 stratum policy."
+    }
+  },
+  "gates_error_semantics": {
+    "introduced_in_phase": "1.2F",
+    "finding": "Audit A finding A2 (BLOCKER). Before this correction no gate declared what counted as an error, and the gate-coverage baseline required three mutually inconsistent readings of the same maximum_errors field: broad for S06, exact for the clean strata, and set-level-only for G_null_collapse_prohibited. None was declared.",
+    "rule": "Every gate MUST declare error_definition, error_scope and pins_exact_typed_decision. Only gates with error_scope=per_case AND pins_exact_typed_decision=true contribute to the exact-agreement coverage baseline.",
+    "consequence": "Adopting the registered narrow S06 definition rather than a broadened one moves S06 out of the pinned set. The pinned population falls from 90 to 80 and the free population rises from 30 to 40. This is the conservative direction: the policy now claims less protection than it previously asserted, and every downstream figure has been recomputed rather than rescaled.",
+    "declined_alternative": "Broadening the S06 gate to exact typed-decision agreement would have preserved the earlier 90/30 figures, but it would have been a silent redefinition of a registered gate in the direction that flatters the policy - the same textual-substitution defect this phase exists to eliminate."
+  },
+  "confusion_matrix_analysis_summary": {
+    "note": "Recomputed in Phase 1.2F after Audit A findings A1 and A2. Every figure is an output of an exhaustive enumeration.",
+    "free_population": 40,
+    "feasible_matrices": 861,
+    "macro_f1_min": 0.636895,
+    "macro_f1_min_at": {
+      "errors_to_no_answer": 16,
+      "errors_to_ambiguous": 24
+    },
+    "macro_f1_max": 1.0,
+    "spread_at_equal_error_counts": {
+      "10_errors": [
+        0.866667,
+        0.930159
+      ],
+      "20_errors": [
+        0.783355,
+        0.869048
+      ],
+      "30_errors": [
+        0.708791,
+        0.811966
+      ],
+      "40_errors": [
+        0.636895,
+        0.755556
+      ]
+    }
   }
 }

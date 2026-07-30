@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -53,6 +54,13 @@ __all__ = [
     "FACTS_SCHEMA_VERSION",
     "CONTRACT_SCHEMA_VERSION",
     "GATE_POPULATIONS",
+    "THRESHOLD_BASIS_TYPES",
+    "THRESHOLD_DISPOSITIONS",
+    "BINDING_DISPOSITIONS",
+    "NON_BINDING_DISPOSITIONS",
+    "REQUIRED_THRESHOLD_FIELDS",
+    "INEQUALITY_DIRECTIONS",
+    "validate_acceptance_thresholds",
     "validate_policy",
     "build_set_facts",
     "set_content_digest",
@@ -70,9 +78,497 @@ class ContractError(ValueError):
     """A contract artifact is malformed, disagrees, or would be overwritten."""
 
 
-POLICY_SCHEMA_VERSION = "phase1-parser-v3-prospective-evaluation-policy/v1"
+POLICY_SCHEMA_VERSION = "phase1-parser-v3-prospective-evaluation-policy/v2"
 FACTS_SCHEMA_VERSION = "phase1-parser-v3-set-derived-facts/v1"
 CONTRACT_SCHEMA_VERSION = "phase1-parser-v3-compiled-acceptance-contract/v1"
+
+
+#: The only bases on which a numeric hard acceptance threshold may be set.
+#: Every one of them can be discharged without observing the candidate parser
+#: and without observing the future holdout. Phase 1.2F added this enumeration
+#: because Phase 1.2E carried four numeric thresholds whose only stated
+#: dependency was an unrelated experiment.
+THRESHOLD_BASIS_TYPES: tuple[str, ...] = (
+    "LOGICAL_INVARIANT",
+    "DOWNSTREAM_ERROR_BUDGET",
+    "EXTERNAL_CANDIDATE_INDEPENDENT_CALIBRATION",
+    "REVIEWED_OPERATIONAL_REQUIREMENT",
+)
+
+#: Dispositions a threshold audit may assign.
+THRESHOLD_DISPOSITIONS: tuple[str, ...] = (
+    "KEEP_HARD",
+    "REPLACE_HARD",
+    "MERGE_WITH_EXISTING_GATE",
+    "REPORT_ONLY",
+    "REMOVE_REDUNDANT",
+    "REVIEW_REQUIRED",
+)
+
+#: Dispositions under which a threshold participates in PASS/FAIL.
+BINDING_DISPOSITIONS: tuple[str, ...] = ("KEEP_HARD",)
+
+#: Dispositions under which a threshold must never influence PASS/FAIL.
+#: ``REPLACE_HARD`` retires the identifier in favour of a differently defined
+#: hard criterion, so the retired identifier itself stops binding.
+NON_BINDING_DISPOSITIONS: tuple[str, ...] = (
+    "REPLACE_HARD",
+    "MERGE_WITH_EXISTING_GATE",
+    "REPORT_ONLY",
+    "REMOVE_REDUNDANT",
+)
+
+#: Machine-readable provenance every FINAL hard threshold must carry.
+REQUIRED_THRESHOLD_FIELDS: tuple[str, ...] = (
+    "basis_type",
+    "controlled_risk",
+    "derivation",
+    "evidence_bindings",
+    "candidate_independence",
+    "set_independence",
+    "boundary_semantics",
+    "review_status",
+)
+
+#: Recognised inequality directions for a numeric threshold.
+INEQUALITY_DIRECTIONS: tuple[str, ...] = ("at_least", "at_most")
+
+#: Sources that can never justify a threshold. ``headroom`` covers the Phase
+#: 1.0C target-model task-headroom experiment, which measures whether the model
+#: can answer a question. A parser threshold concerns whether the parser can
+#: read an answer out of text. The two quantities are about different objects,
+#: so no result of the first can bound the second.
+PROHIBITED_BASIS_SOURCES: tuple[tuple[str, str], ...] = (
+    ("1.0c", "Phase 1.0C is target-model task-headroom screening, not parser calibration"),
+    ("headroom", "headroom screening does not measure parser extraction fidelity"),
+    ("task screening", "task screening measures the model, not the parser"),
+    ("observed parser", "a threshold must not be selected from observed parser performance"),
+    ("measured parser", "a threshold must not be selected from measured parser performance"),
+    ("parser v2 accuracy", "the predecessor's locked performance is not a candidate-independent basis"),
+    ("parser v2 performance", "the predecessor's locked performance is not a candidate-independent basis"),
+    ("parser v2 locked", "the predecessor's locked performance is not a candidate-independent basis"),
+    ("locked performance", "a locked evaluation result must not be reused as a threshold basis"),
+    ("development accuracy", "candidate development accuracy is not candidate-independent"),
+    ("development performance", "candidate development performance is not candidate-independent"),
+    ("expected performance", "an expectation about the candidate is not candidate-independent"),
+    ("expected accuracy", "an expectation about the candidate is not candidate-independent"),
+    ("likely to pass", "a value must never be selected because it would permit a pass"),
+    ("would permit a pass", "a value must never be selected because it would permit a pass"),
+    ("industry standard", "an appeal to industry standard needs a primary source and an applicability analysis"),
+    ("industry practice", "an appeal to industry practice needs a primary source and an applicability analysis"),
+    ("industry norm", "an appeal to industry norm needs a primary source and an applicability analysis"),
+    ("benchmark norm", "an appeal to a benchmark norm needs a primary source and an applicability analysis"),
+    ("common practice", "an appeal to common practice needs a primary source and an applicability analysis"),
+    ("inherited verbatim", "a threshold must not be carried over verbatim from a predecessor contract"),
+    ("carried over verbatim", "a threshold must not be carried over verbatim from a predecessor contract"),
+)
+
+#: Prose fields of a threshold record that are scanned for a prohibited basis,
+#: whatever the record's disposition. Audit finding A6/B7 established that the
+#: earlier scope - binding FINAL records only - never reached the one record
+#: that will eventually carry a number.
+SCANNED_THRESHOLD_PROSE_FIELDS: tuple[str, ...] = (
+    "controlled_risk",
+    "derivation",
+    "rationale",
+    "structural_derivation",
+    "independence_analysis",
+    "relationship_to_existing_gates",
+    "why_numeric_value_is_blocked",
+    "next_step",
+    "sensitivity_analysis",
+    "masking_finding",
+)
+
+#: Declared scopes for a gate's error definition. ``per_case`` errors are
+#: counted case by case; ``set_level`` errors are properties of the whole run
+#: and pin no individual case.
+GATE_ERROR_SCOPES: tuple[str, ...] = ("per_case", "set_level")
+
+#: Provenance every gate must declare so that ``maximum_errors`` has a meaning.
+REQUIRED_GATE_SEMANTIC_FIELDS: tuple[str, ...] = (
+    "error_definition",
+    "error_scope",
+    "pins_exact_typed_decision",
+)
+
+
+def _normalise_for_basis_scan(text: str) -> str:
+    """Collapse spelling variation that would otherwise evade the basis scan.
+
+    Substring matching bounds carelessness rather than intent, but it should at
+    least not be defeated by a hyphen or a line wrap.
+    """
+    lowered = text.lower()
+    for separator in ("-", "\u2010", "\u2011", "\u2012", "\u2013", "\u2014", "_", "/"):
+        lowered = lowered.replace(separator, " ")
+    lowered = re.sub(r"\s+", " ", lowered)
+    # ``1.0 c`` and ``1.0c`` must match the same needle.
+    lowered = re.sub(r"\b1\.0\s+c\b", "1.0c", lowered)
+    lowered = re.sub(r"\bparser\s+v\s*2\b", "parser v2", lowered)
+    lowered = re.sub(r"\bparser\s+v\s*3\b", "parser v3", lowered)
+    return lowered
+
+
+def _reject_prohibited_basis(text: str, subject: str) -> None:
+    """Refuse prose that grounds a parser threshold in a disallowed source."""
+    lowered = _normalise_for_basis_scan(text)
+    for needle, why in PROHIBITED_BASIS_SOURCES:
+        if needle in lowered:
+            raise ContractError(
+                f"{subject} cites a prohibited threshold basis {needle!r}: {why}"
+            )
+
+
+def _scan_item_prose(item: Mapping[str, Any], threshold_id: str) -> None:
+    """Scan every registered prose field of one record, whatever its status."""
+    for field in SCANNED_THRESHOLD_PROSE_FIELDS:
+        value = item.get(field)
+        if isinstance(value, str):
+            _reject_prohibited_basis(value, f"threshold {threshold_id} field {field}")
+        elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+            for entry in value:
+                if isinstance(entry, str):
+                    _reject_prohibited_basis(
+                        entry, f"threshold {threshold_id} field {field}"
+                    )
+
+
+
+def _validate_threshold_item(item: Mapping[str, Any], seen: set[str]) -> None:
+    """Validate one acceptance-threshold record."""
+    if not isinstance(item, Mapping):
+        raise ContractError("each acceptance threshold must be an object")
+    threshold_id = item.get("threshold_id")
+    if not isinstance(threshold_id, str) or not threshold_id:
+        raise ContractError("each acceptance threshold must carry a threshold_id")
+    if threshold_id in seen:
+        raise ContractError(f"duplicate threshold_id {threshold_id!r}")
+    seen.add(threshold_id)
+
+    status = item.get("status")
+    if status not in ("FINAL", "REVIEW_REQUIRED"):
+        raise ContractError(f"threshold {threshold_id} has an unrecognised status")
+
+    disposition = item.get("disposition")
+    if disposition not in THRESHOLD_DISPOSITIONS:
+        raise ContractError(
+            f"threshold {threshold_id} has an unrecognised disposition "
+            f"{disposition!r}; Phase 1.2F requires an explicit audit disposition"
+        )
+
+    # The basis scan applies to every record, whatever its disposition. The
+    # record most likely to acquire a bad basis is the one still unresolved.
+    _scan_item_prose(item, threshold_id)
+
+    # A non-binding threshold must not smuggle a live numeric criterion.
+    if disposition in NON_BINDING_DISPOSITIONS:
+        if item.get("value") is not None:
+            raise ContractError(
+                f"threshold {threshold_id} is {disposition} and must not carry a "
+                "numeric value that could re-enter PASS/FAIL logic"
+            )
+        if item.get("binding") is not False:
+            raise ContractError(
+                f"threshold {threshold_id} is {disposition} and must declare "
+                "binding=false"
+            )
+        return
+
+    if disposition == "REVIEW_REQUIRED":
+        if status != "REVIEW_REQUIRED":
+            raise ContractError(
+                f"threshold {threshold_id} is disposed REVIEW_REQUIRED and cannot "
+                "declare itself FINAL"
+            )
+        if item.get("value") is not None:
+            raise ContractError(
+                f"threshold {threshold_id} is unresolved and must not carry a "
+                "placeholder value"
+            )
+        if item.get("binding") is True:
+            raise ContractError(
+                f"threshold {threshold_id} is unresolved and must not declare "
+                "binding=true; an undecided criterion cannot bind PASS/FAIL"
+            )
+        return
+
+    # Remaining dispositions are binding hard thresholds.
+    if status != "FINAL":
+        # A hard threshold that is still under review carries no provenance
+        # burden yet, but it must not carry a number either.
+        if item.get("value") is not None:
+            raise ContractError(
+                f"threshold {threshold_id} is REVIEW_REQUIRED and must not carry a "
+                "placeholder value"
+            )
+        return
+
+    missing = [field for field in REQUIRED_THRESHOLD_FIELDS if field not in item]
+    if missing:
+        raise ContractError(
+            f"threshold {threshold_id} is a FINAL hard criterion and is missing "
+            f"required provenance fields: {', '.join(sorted(missing))}"
+        )
+
+    basis = item.get("basis_type")
+    if basis not in THRESHOLD_BASIS_TYPES:
+        raise ContractError(
+            f"threshold {threshold_id} declares an unrecognised basis_type "
+            f"{basis!r}; recognised bases are {', '.join(THRESHOLD_BASIS_TYPES)}"
+        )
+
+    for field in ("controlled_risk", "derivation"):
+        text = item.get(field)
+        if not isinstance(text, str) or not text.strip():
+            raise ContractError(
+                f"threshold {threshold_id} must carry a non-empty {field}"
+            )
+        _reject_prohibited_basis(text, f"threshold {threshold_id} {field}")
+
+    bindings = item.get("evidence_bindings")
+    if not isinstance(bindings, list) or not bindings:
+        raise ContractError(
+            f"threshold {threshold_id} must bind at least one evidence source"
+        )
+    for binding in bindings:
+        if not isinstance(binding, str) or not binding.strip():
+            raise ContractError(
+                f"threshold {threshold_id} has a malformed evidence binding"
+            )
+        _reject_prohibited_basis(binding, f"threshold {threshold_id} evidence binding")
+
+    for field in ("candidate_independence", "set_independence"):
+        if item.get(field) is not True:
+            raise ContractError(
+                f"threshold {threshold_id} must assert {field}=true; a threshold "
+                "derived from the candidate or from the future set is not "
+                "prospective"
+            )
+
+    if item.get("value") is None:
+        raise ContractError(
+            f"threshold {threshold_id} is FINAL and must carry a numeric value"
+        )
+    if item.get("binding") is not True:
+        raise ContractError(
+            f"threshold {threshold_id} is a hard criterion and must declare "
+            "binding=true"
+        )
+
+    boundary = item.get("boundary_semantics")
+    if not isinstance(boundary, Mapping):
+        raise ContractError(
+            f"threshold {threshold_id} must declare boundary_semantics"
+        )
+    direction = boundary.get("inequality")
+    if direction not in INEQUALITY_DIRECTIONS:
+        raise ContractError(
+            f"threshold {threshold_id} must declare an inequality direction of "
+            f"{' or '.join(INEQUALITY_DIRECTIONS)}"
+        )
+    if not isinstance(boundary.get("at_threshold_passes"), bool):
+        raise ContractError(
+            f"threshold {threshold_id} must state whether the exact threshold "
+            "value passes"
+        )
+    if not isinstance(boundary.get("population"), str) or not boundary["population"]:
+        raise ContractError(
+            f"threshold {threshold_id} must state the population it scores"
+        )
+
+    # A comparator margin must not claim to require improvement while pointing
+    # the inequality at a ceiling, or vice versa.
+    margin = item.get("comparator_margin")
+    if margin is not None:
+        if not isinstance(margin, (int, float)):
+            raise ContractError(
+                f"threshold {threshold_id} comparator_margin must be numeric"
+            )
+        if direction == "at_least" and margin < 0:
+            raise ContractError(
+                f"threshold {threshold_id} declares an at_least comparison with a "
+                "negative margin; the sign contradicts the direction"
+            )
+        if direction == "at_most" and margin > 0:
+            raise ContractError(
+                f"threshold {threshold_id} declares an at_most comparison with a "
+                "positive margin; the sign contradicts the direction"
+            )
+
+    if item.get("review_status") != "REVIEWED":
+        raise ContractError(
+            f"threshold {threshold_id} is FINAL and must record review_status "
+            "REVIEWED"
+        )
+
+
+def _scan_nested_prose(value: Any, subject: str) -> None:
+    """Scan a string, list or mapping of prose for a prohibited basis.
+
+    ``blocking_dependency`` grew from a string into a structured record during
+    Phase 1.2F. A scanner that only understood strings would have stopped
+    checking it at exactly that moment.
+    """
+    if isinstance(value, str):
+        _reject_prohibited_basis(value, subject)
+    elif isinstance(value, Mapping):
+        for key, entry in value.items():
+            _scan_nested_prose(entry, f"{subject}.{key}")
+    elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        for index, entry in enumerate(value):
+            _scan_nested_prose(entry, f"{subject}[{index}]")
+
+
+def _collect_clause_text(value: Any) -> list[str]:
+    """Flatten a status-logic clause into the strings it is built from.
+
+    A clause that is not a plain string must not silently bypass the
+    non-binding re-entry check.
+    """
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, Mapping):
+        return [text for entry in value.values() for text in _collect_clause_text(entry)]
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        return [text for entry in value for text in _collect_clause_text(entry)]
+    if value is None:
+        return []
+    return [str(value)]
+
+
+def _validate_gate_semantics(gate: Mapping[str, Any]) -> None:
+    """Require every gate to declare what one of its errors is.
+
+    Audit finding A2. Without this, ``maximum_errors: 0`` has no meaning, and
+    the coverage baseline that every threshold disposition rests on can be read
+    three incompatible ways from the same field.
+    """
+    gate_id = gate.get("gate_id", "<unnamed>")
+    missing = [f for f in REQUIRED_GATE_SEMANTIC_FIELDS if f not in gate]
+    if missing:
+        raise ContractError(
+            f"gate {gate_id} is missing required error semantics: "
+            f"{', '.join(sorted(missing))}; maximum_errors has no meaning without "
+            "a declared error definition"
+        )
+    definition = gate["error_definition"]
+    if not isinstance(definition, str) or not definition.strip():
+        raise ContractError(f"gate {gate_id} must declare a non-empty error_definition")
+    if gate["error_scope"] not in GATE_ERROR_SCOPES:
+        raise ContractError(
+            f"gate {gate_id} declares an unrecognised error_scope "
+            f"{gate['error_scope']!r}"
+        )
+    if not isinstance(gate["pins_exact_typed_decision"], bool):
+        raise ContractError(
+            f"gate {gate_id} must declare pins_exact_typed_decision as a boolean"
+        )
+    if gate["error_scope"] == "set_level" and gate["pins_exact_typed_decision"]:
+        raise ContractError(
+            f"gate {gate_id} declares a set-level error scope and cannot pin any "
+            "individual case to exact typed-decision agreement"
+        )
+
+
+def validate_acceptance_thresholds(thresholds: Mapping[str, Any]) -> set[str]:
+    """Validate the acceptance-threshold block and its provenance.
+
+    Phase 1.2F requirement. A numeric hard threshold is only prospective if it
+    can be derived without observing the candidate parser and without observing
+    the future holdout, so every FINAL hard threshold must name a recognised
+    basis type and carry a complete derivation.
+
+    Returns the set of threshold identifiers that must never influence
+    PASS/FAIL, so that the caller can police the policy's status logic.
+    """
+    if not isinstance(thresholds, Mapping):
+        raise ContractError("policy.acceptance_thresholds must be an object")
+    if thresholds.get("status") not in ("FINAL", "REVIEW_REQUIRED"):
+        raise ContractError("policy.acceptance_thresholds.status is not recognised")
+
+    for field in ("reason", "blocking_dependency"):
+        _scan_nested_prose(thresholds.get(field), f"acceptance_thresholds.{field}")
+
+    items = thresholds.get("items")
+    if not isinstance(items, list) or not items:
+        raise ContractError("policy.acceptance_thresholds.items must be a list")
+
+    seen: set[str] = set()
+    for item in items:
+        _validate_threshold_item(item, seen)
+
+    binding_ids = {
+        item["threshold_id"]
+        for item in items
+        if item.get("disposition") in BINDING_DISPOSITIONS
+    }
+
+    # A retired threshold must name the criterion that absorbed it, and that
+    # criterion must actually bind. Audit finding A5/B6: without the second
+    # half, every protection could be "absorbed" into something non-binding and
+    # the policy would still compile.
+    for item in items:
+        disposition = item["disposition"]
+        pointer_field = {
+            "REPLACE_HARD": "replaced_by",
+            "MERGE_WITH_EXISTING_GATE": "merged_into",
+            "REMOVE_REDUNDANT": "subsumed_by",
+        }.get(disposition)
+        if pointer_field is None:
+            continue
+        target = item.get(pointer_field)
+        if not isinstance(target, str) or not target:
+            raise ContractError(
+                f"threshold {item['threshold_id']} is {disposition} and must name "
+                f"its successor in {pointer_field}"
+            )
+        if target not in seen and not target.startswith("G_"):
+            raise ContractError(
+                f"threshold {item['threshold_id']} names unknown successor "
+                f"{target!r}"
+            )
+        if (
+            thresholds["status"] == "FINAL"
+            and not target.startswith("G_")
+            and target not in binding_ids
+        ):
+            raise ContractError(
+                f"threshold {item['threshold_id']} is {disposition} into "
+                f"{target!r}, which does not bind; retiring a threshold must "
+                "never silently delete a protection"
+            )
+
+    unresolved = [
+        item["threshold_id"]
+        for item in items
+        if item.get("status") != "FINAL"
+    ]
+    if thresholds["status"] == "FINAL" and unresolved:
+        raise ContractError(
+            "acceptance_thresholds.status is FINAL while these thresholds remain "
+            f"unresolved: {', '.join(sorted(unresolved))}"
+        )
+
+    # A FINAL policy with no binding criterion reduces PASS to a gates-only
+    # condition and leaves the free population wholly unconstrained. Audit
+    # finding A5/B6: that is the failure this phase exists to prevent, and it
+    # was reachable without tripping any check.
+    if thresholds["status"] == "FINAL" and not binding_ids:
+        raise ContractError(
+            "acceptance_thresholds.status is FINAL with no binding acceptance "
+            "criterion; PASS would reduce to the mandatory gates alone and the "
+            "cases they leave free would be unconstrained"
+        )
+
+    # A non-binding metric must not be named by the PASS/FAIL logic.
+    non_binding = {
+        item["threshold_id"]
+        for item in items
+        if item.get("disposition") in NON_BINDING_DISPOSITIONS
+    }
+    return non_binding
+
 
 
 #: Distinct countable populations. Phase 1.2D reported "Holdout objects 15" by
@@ -321,12 +817,30 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
             raise ContractError(
                 f"gate {gate_id} is mandatory and must require a non-zero denominator"
             )
+        _validate_gate_semantics(gate)
 
     thresholds = policy.get("acceptance_thresholds")
-    if not isinstance(thresholds, Mapping):
-        raise ContractError("policy.acceptance_thresholds must be an object")
-    if thresholds.get("status") not in ("FINAL", "REVIEW_REQUIRED"):
-        raise ContractError("policy.acceptance_thresholds.status is not recognised")
+    non_binding = validate_acceptance_thresholds(thresholds)
+
+    # A metric that was removed, merged away, or demoted to report-only must
+    # not be reachable from the PASS/FAIL logic under any spelling. Audit
+    # finding B5: restricting this to string clauses under two fixed keys meant
+    # a list, a nested object, or an extra outcome key bypassed it entirely.
+    status_logic = policy.get("status_logic") or {}
+    if not isinstance(status_logic, Mapping):
+        raise ContractError("policy.status_logic must be an object")
+    reserved_keys = {"non_binding_rule", "note", "notes"}
+    for outcome, clause in sorted(status_logic.items()):
+        if outcome in reserved_keys:
+            continue
+        for text in _collect_clause_text(clause):
+            for threshold_id in sorted(non_binding):
+                if threshold_id in text:
+                    raise ContractError(
+                        f"status_logic.{outcome} references {threshold_id!r}, which "
+                        "is not a binding criterion; a report-only or removed metric "
+                        "must never re-enter PASS/FAIL logic"
+                    )
 
     status = policy.get("status")
     if status not in ("FINAL", "REVIEW_REQUIRED"):

@@ -3682,6 +3682,17 @@ observation would select the threshold against the measurement it bounds. They
 are marked `REVIEW_REQUIRED` and the compiler refuses to compile while any is
 open. Everything else in the round is complete.
 
+> **Erratum E-1.2F-01, appended 2026-07-26 (Phase 1.2F).** The original text
+> above is retained verbatim as the historical record, including its error. The
+> clause "Phase 1.0C headroom calibration has not been run" was **false when
+> written**: Phase 1.0C executed and finalized `INCONCLUSIVE` at `06eec993`,
+> recorded in this log at the 2026-07-25 entry "Phase 1.0C Track B headroom
+> calibration executed on GPU, adjudicated, INCONCLUSIVE". It entered this entry
+> from a stale current-state summary that had never been updated after the run.
+> The clause is also a category error: Phase 1.0C screens target-model
+> observable-answer task headroom, not parser extraction fidelity, so it could
+> never have supplied a parser acceptance threshold.
+
 **Not claimed.** Parser v3 is not validated, not non-regressive, not improved,
 not accepted. The tooling has synthetic-test evidence only. No J-space,
 hidden-reasoning, internal-workspace or invisible-CoT conclusion follows.
@@ -3691,3 +3702,9 @@ headroom calibration or by registering an explicit reviewed rationale for a
 threshold family that does not depend on it. No `parser-v3-v2` construction,
 review, sealing, preregistration, image build, Stage P or Stage E may begin
 before that gate passes.
+
+> **Erratum E-1.2F-01 (continued).** The "next gate" above is superseded. Phase
+> 1.0C cannot be a gate for a parser threshold. Phase 1.2F audited all four
+> thresholds and left one non-vacuous criterion,
+> `residual_critical_exact_budget` over `S04`/`S05`/`S09`, blocked on a
+> downstream parser-error budget the scientific plan does not register.

@@ -1902,6 +1902,16 @@ compiler refuse to compile is the honest outcome; guessing a number to reach
 `READY_FOR_INDEPENDENT_SET_REPAIR` would have reproduced the original failure
 in a new artifact.
 
+> **Erratum E-1.2F-01, appended 2026-07-26 (Phase 1.2F).** The original text
+> above is retained verbatim as the historical record. The sentence "Phase 1.0C
+> headroom calibration has not been run" was **false when written**. Phase 1.0C
+> executed and finalized `INCONCLUSIVE` at `06eec993`, a fact already recorded
+> in this same log at the 2026-07-25 entry "Accept INCONCLUSIVE as the Phase
+> 1.0C Track B result". It is also a category error: Phase 1.0C screens
+> target-model observable-answer task headroom, not parser extraction fidelity.
+> The conclusion of the entry — that guessing a number would reproduce the
+> original failure — is unaffected and was upheld by the Phase 1.2F audit.
+
 **Why bind to the frozen instrument rather than restate it.** This decision was
 forced by an independent audit, and it is the most important one in the round.
 

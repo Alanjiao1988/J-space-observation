@@ -402,11 +402,19 @@ inherits the Phase 1.2D limitation.
 The terminal status is `BLOCKED`, by design rather than by failure.
 
 `docs/phase1_parser_v3_v2_evaluation_policy.json` carries status `REVIEW_REQUIRED`
-because four numeric acceptance thresholds cannot be justified in this round. They depend
-on headroom calibration (Phase 1.0C), which is itself `BLOCKED / NOT RUN`. Choosing them
+because four numeric acceptance thresholds cannot be justified in this round. Choosing them
 now would mean inventing acceptance criteria to fit an instrument whose operating range
 has never been measured — which is the same failure that produced the invalid v3 gate
 contract in the first place.
+
+> **Erratum E-1.2F-01 (Phase 1.2F).** This paragraph originally stated that the
+> thresholds "depend on headroom calibration (Phase 1.0C), which is itself
+> `BLOCKED / NOT RUN`". Both halves are withdrawn. Phase 1.0C had executed and
+> finalized `INCONCLUSIVE` at `06eec993` before this was written, and it is
+> target-model task/headroom screening, so it could not have supplied a parser
+> threshold even if pending. The false claim entered this report from a stale
+> current-state summary in `reports/current_status.md` that had never been
+> updated after the calibration ran.
 
 `compile_contract` therefore refuses to compile while any threshold remains open, and
 that refusal is itself tested (`test_compiler_refuses_a_review_required_policy`). The
@@ -474,9 +482,14 @@ reason this project keeps ledgers:
 
 ## 11. Next gate
 
-Resolve the four `REVIEW_REQUIRED` acceptance thresholds — either by running Phase 1.0C
-headroom calibration, or by registering a reviewed, written rationale that does not
-depend on it — and promote
+*(Superseded by Phase 1.2F — see `reports/phase1_2f_parser_acceptance_policy.md`.
+The four thresholds were audited: two express the same constraint, one provides
+no independent protection while masking value errors, and one is not derivable
+prospectively. The single surviving criterion is
+`residual_critical_exact_budget`, blocked on a downstream parser-error budget
+that the scientific plan does not register.)*
+
+Resolve the `REVIEW_REQUIRED` acceptance thresholds and promote
 `docs/phase1_parser_v3_v2_evaluation_policy.json` to status `FINAL`.
 
 Until that gate is passed, do not begin `parser-v3-v2` construction, sealing,

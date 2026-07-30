@@ -643,3 +643,73 @@ about the labels, which is what makes the method usable on a sealed set at all.
 The quarantine set is the useful output. It is the exact list of cases that
 cannot be migrated without a human semantic decision, and it is produced without
 any human having to look at a label to find them.
+
+
+## Acceptance-threshold provenance (Phase 1.2F)
+
+An acceptance threshold is a number that decides whether an instrument may be
+used for science. The project had four of them proposed and none of them
+derived, and the round that was supposed to derive them blocked on a dependency
+that could not have supplied them. Phase 1.2F replaces the missing derivation
+with a **provenance discipline**: a threshold is admissible only if its value
+can be traced to something outside the candidate being judged.
+
+Four bases are recognised. A `LOGICAL_INVARIANT` follows from a stratum's
+purpose or an integrity requirement, so the number is definitional rather than
+measured. A `DOWNSTREAM_ERROR_BUDGET` traces the allowable parser error to a
+preregistered maximum tolerable distortion in a later scientific metric, so the
+number answers "how wrong may the instrument be before the finding changes?".
+An `EXTERNAL_CANDIDATE_INDEPENDENT_CALIBRATION` comes from a separate design
+preregistered before any candidate output is observed. A
+`REVIEWED_OPERATIONAL_REQUIREMENT` states an evaluator-reliability requirement
+justified independently of both candidate and holdout. Everything else is
+disallowed: parser-v3 development accuracy, parser-v2
+locked performance, expected performance, headroom results, textual
+substitution from a predecessor, and unsourced appeals to industry practice.
+The enforcement of that disallowance is partial and should not be overstated.
+`validate_acceptance_thresholds` rejects an unrecognised `basis_type` outright,
+and it string-scans the declared derivation and the surrounding threshold prose
+for a fixed list of prohibited-source phrases. A string scan catches a
+disallowed basis that is *named*; it cannot catch one that is paraphrased,
+implicit, or simply undeclared. The substantive guarantee therefore remains a
+review guarantee, and the code is a backstop against the naive failure mode
+rather than a proof of provenance.
+
+The discipline's first act was to remove thresholds rather than justify them.
+The test applied is what a criterion constrains *after* the mandatory gates
+have applied, and the answer was usually "nothing that was not already
+constrained". With ninety of a hundred and twenty cases pinned to zero errors
+by gates, a criterion stated over all one hundred and twenty governs only the
+thirty that are free; a second criterion stated over a critical-stratum set that
+is mostly zero-gated governs the same thirty again. Redundancy of that kind is
+not harmless. Two numbers over one population disagree at integer boundaries,
+and the policy then has no defined answer about which one decides.
+
+The sharpest result concerns aggregate classification metrics on a
+quota-constructed set. Because the future evaluation is a fixed adversarial
+challenge set rather than an IID sample, its confusion matrices can be
+enumerated exhaustively instead of approximated. Doing so showed a macro `F1`
+floor above which every feasible matrix already lies, non-monotonicity in error
+count, and — decisively — that a candidate returning thirty wrong canonical
+values with perfect presence classification scores a perfect macro `F1` while
+failing a quarter of the exact typed-decision agreements. Presence errors and
+present-value errors are different failures, and a presence metric cannot see
+the second kind. The method generalises: before adopting an aggregate metric as
+a gate on a constructed set, enumerate what it can and cannot distinguish, and
+check whether its best score is compatible with the failure it is meant to
+prevent.
+
+The comparator question is answered structurally rather than numerically. A
+non-regression margin against a predecessor requires observing a parser on the
+locked set to choose, which is what candidate-independence forbids; and the
+predecessor here failed its own locked evaluation, so "not worse than it" is not
+evidence of fitness. Comparison is retained as reported context, where a
+regression remains informative, and removed from the pass condition, where it
+would give a failed instrument standing to admit its successor.
+
+Where the discipline yields no number, it yields a null. The one criterion that
+survived the redundancy audit has a derivable structure and an underivable
+value, because no downstream parser-error budget is registered anywhere in the
+project. It is left open, the policy remains unusable, and the compiler
+continues to refuse. Recording the gap is the method; filling it with a
+plausible integer would have been the failure the method exists to prevent.

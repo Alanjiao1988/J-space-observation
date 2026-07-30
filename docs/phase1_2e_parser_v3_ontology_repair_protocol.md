@@ -546,12 +546,21 @@ An unresolved scientific design choice remains, so this round terminates
 **The blocker.** The numeric acceptance thresholds — overall exact
 typed-decision minimum, per-stratum critical floor, answer-presence macro `F1`
 minimum, and the non-regression margin against parser v2 — cannot be justified
-in this round. The calibration that would justify them, Phase 1.0C headroom
-calibration, has not been run. The two available shortcuts are both
+in this round. The two available shortcuts are both
 inadmissible: importing the parser-v2 constants would carry over an unjustified
 number of exactly the kind this phase exists to eliminate, and deriving a
 threshold from any parser-v3 observation would select the threshold against the
 measurement it is meant to bound.
+
+> **Erratum E-1.2F-01 (Phase 1.2F).** This paragraph and the next gate below
+> originally named the Phase 1.0C headroom calibration as the calibration that
+> would justify these thresholds, and described it as not run. Both claims are
+> withdrawn. Phase 1.0C had already executed and finalized `INCONCLUSIVE` at
+> `06eec993` when this was written, and it could never have justified a parser
+> threshold in any case: it screens *target-model* observable-answer task
+> headroom, whereas a parser threshold concerns *parser* extraction fidelity.
+> Phase 1.2F re-derived the thresholds; see
+> `docs/phase1_2f_parser_acceptance_policy_protocol.md`.
 
 They are recorded as `REVIEW_REQUIRED` in the prospective policy, and the
 compiler refuses to emit a contract while any of them is open. The refusal is
@@ -563,8 +572,10 @@ one thing that could not be is visibly marked rather than quietly guessed.
 convention, the migration rule, the policy/facts separation, the tooling and the
 tests are all delivered and green.
 
-**The next gate** is the resolution of the acceptance thresholds: either run
-Phase 1.0C headroom calibration and derive them, or register an explicit,
-reviewed scientific rationale for a threshold family that does not depend on it.
+**The next gate** is the resolution of the acceptance thresholds. *(Superseded
+by Phase 1.2F, which audited all four and left one non-vacuous criterion,
+`residual_critical_exact_budget`, blocked on a downstream parser-error budget
+that the scientific plan does not register. See
+`docs/phase1_2f_parser_error_budget_calibration_protocol.md`.)*
 Until that gate passes, no `parser-v3-v2` construction, review, sealing,
 preregistration, image build, Stage P or Stage E may begin.

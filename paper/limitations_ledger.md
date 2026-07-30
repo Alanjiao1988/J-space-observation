@@ -406,11 +406,24 @@ every numeric acceptance threshold `REVIEW_REQUIRED`: the overall exact
 typed-decision minimum, the per-stratum critical floor, the answer-presence
 macro `F1` minimum, and the non-regression margin against parser v2.
 
-There is no basis to set them. Phase 1.0C headroom calibration is preregistered
-but `BLOCKED` with no model run. Importing the parser-v2 constants would carry
-over an unjustified number of exactly the kind that produced `H9`, and deriving
+There is no basis to set them. Importing the parser-v2 constants would carry
+over an unjustified number, and deriving
 a threshold from any parser-v3 observation would select the threshold against
 the measurement it is meant to bound.
+
+> **Erratum E-1.2F-01 (Phase 1.2F).** As first written, this limitation also
+> stated that "Phase 1.0C headroom calibration is preregistered but `BLOCKED`
+> with no model run". That was false when written, and it contradicted `L-16`
+> in this same ledger, which already recorded that Phase 1.0C *was* measured.
+> Phase 1.0C executed and finalized `INCONCLUSIVE` at `06eec993`. It is
+> target-model task/headroom screening and is not a parser calibration, so it
+> was never capable of supplying these thresholds. This limitation also
+> described the unjustified-constant problem as "of exactly the kind that
+> produced `H9`"; that conflation is withdrawn. An unjustified threshold source
+> is a **policy-provenance defect**, a distinct failure class from `H9`, which
+> concerns disagreement among declared and observed artifact vocabulary,
+> support, or set facts. `H1`–`H9` are unchanged. Superseded in substance by
+> `L-33`.
 
 The mandatory gates are unaffected: they are derived from stratum purpose,
 which is a public design fact, and their zero-tolerance definitions are
@@ -460,3 +473,93 @@ object count in any compiled parser-v3-v2 contract carries the authority of the
 operator who typed it, not of the tooling that recorded it. The number `12` is
 exactly the figure the Phase 1.2D erratum exists to correct, which is why the
 distinction is written down rather than assumed.
+
+## L-33 - The acceptance policy is written after some development results are known
+
+Phase 1.2F preregisters acceptance criteria for a `parser-v3-v2` evaluation
+that has not been designed, built, sealed or run. That ordering is correct. What
+it cannot undo is that the operator writing the policy already knows things: how
+parser v2 performed on its locked set, how parser v3 behaved during development
+on non-locked material, and why `parser-v3-v1` was retired as ineligible.
+
+A policy written under those conditions is exposed to a failure mode that no
+amount of care fully removes. A threshold can be chosen because it is defensible
+and *also* because the author quietly expects the candidate to clear it, and the
+author will not reliably be able to tell the two apart from the inside. Stating
+the derivation does not settle it, because a derivation can be selected after
+the fact to reach a number that was picked first.
+
+The round's defence is structural rather than introspective. Every recognised
+basis type requires the value to be traceable to something outside the
+candidate: a logical invariant, a registered downstream error budget, an
+external calibration preregistered before candidate outputs are observed, or a
+stated operational requirement independent of both candidate and holdout.
+The one criterion that survived the redundancy audit,
+`residual_critical_exact_budget`, is left `REVIEW_REQUIRED` with a null
+value for exactly this reason: its structure is derivable today, its number is
+not, and inserting a plausible integer would be the failure this limitation
+describes.
+
+**What the validator actually does, stated precisely.** Audit finding B8
+rejected an earlier version of this paragraph, which claimed the validator
+rejects five prohibited bases. It rejected two. The scan now carries 22
+normalised needles covering parser-v3 development accuracy, parser-v2 locked
+performance, expected performance, Phase 1.0C headroom, verbatim carry-over
+from the predecessor contract, selection because a value would permit a pass,
+and unsourced appeals to industry practice or common practice — applied across
+`reason`, the structured `blocking_dependency`, every evidence binding, and ten
+prose fields of every threshold record whatever its disposition, after
+collapsing hyphens, underscores and line wraps.
+
+That is a **bounded carelessness check, not a semantic guarantee**. It catches a
+prohibited basis that is *named*. It cannot catch one that is paraphrased, and
+it is not a substitute for review. Claiming more of it would itself be an
+instance of the over-claiming this ledger exists to prevent.
+
+This is recorded as a permanent limitation, not a resolved issue. Even after the
+strictness decision is taken and, if needed, a calibration supplies a budget,
+the resulting threshold will have been set by someone who was never blind to the
+candidate. The honest claim is that the number is traceable to a preregistered
+requirement, not that it was chosen in ignorance.
+
+## L-34 - The current-state consistency check bounds a class of error, not all of it
+
+`scripts/check_current_state_consistency.py` exists because Phase 1.2E read a
+stale summary and wrote a false blocking dependency into a policy artifact. Its
+first version could not have caught that: it matched line by line with patterns
+that forbade a newline, while this repository hard-wraps at about 76 columns, so
+the actual defect split across three lines and matched nothing. Its exemption
+list was a substring test against common words, so writing "corrected" anywhere
+on a line disabled the check for that line, and it did not scan the artifact
+class in which the defect occurred. All three were found by the round's second
+independent audit and repaired, and the repaired checker is proved against the
+verbatim `d843984` text of five files.
+
+What remains is a genuine limitation. The check is a pattern matcher over
+whitespace-collapsed paragraphs. It detects the *phrasings* of "Phase 1.0C was
+never run" and "Phase 1.0C supplies a parser threshold" that are registered in
+its pattern tables. A future stale claim expressed in wording nobody anticipated
+will pass, and a document could be uniformly stale in some other respect
+entirely without the check noticing, because it knows about exactly one
+experiment.
+
+Its exemption rule is also a trade. Errata must remain writable, so a paragraph
+structurally anchored as historical or corrective, or a sentence that explicitly
+negates the claim, is skipped. That is deliberately narrower than the first
+version, but an author who anchors a genuinely current-state paragraph with the
+word "Historical" will still evade it. The check reduces the cost of a known
+recurring error; it does not make the class of error impossible, and it must not
+be cited as evidence that a document is accurate.
+
+One further defect was found by the checker itself during Phase 1.2F
+remediation, after both audits had reported. Markdown emphasis delimiters were
+not elided before matching, so `**not**` inserted asterisks into the middle of
+every contiguous phrase pattern. The visible symptom was a false positive on the
+round's own corrective sentence "Phase 1.0C is **not** parser calibration". The
+more serious form was the mirror image: `Phase 1.0C has **not** been run` would
+have passed the check, so a stale claim could have been emphasised into
+invisibility. Emphasis and code-span delimiters are now elided; `_` is not,
+because it is load-bearing inside `NOT_RUN` and `sealed_object_count`. The
+general lesson stands as part of this limitation: a matcher over rendered-prose
+patterns is sensitive to markup that carries no meaning, and no amount of
+pattern tuning converts it into a semantic check.

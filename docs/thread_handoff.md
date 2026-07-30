@@ -682,6 +682,14 @@ Formal evaluation ordinal         0
 Parser v3                         unchanged, unvalidated
 ```
 
+> **Phase 1.2F erratum (Audit B, B11).** The `sealed_object_count 12` line
+> above is preserved as written, but it is an **operator assertion**, not a
+> set-derived fact, and it sits in this table without the qualifier the other
+> counts do not need. Limitation `L-32` governs: a sealed member list and its
+> object count require an authenticated seal-time observation, which no offline
+> round has made. Read the figure as "asserted, unverified". The Phase 1.2F
+> state block below omits the field rather than restating it.
+
 ## What changed relative to the previous handoff
 
 Item 1 changed shape. The v3 gate contract is **not** re-derived and **not**
@@ -718,20 +726,34 @@ reports/phase1_2e_parser_v3_repair.md                  round report
 
 ## The one blocker
 
-Numeric acceptance thresholds. There is no calibration basis: Phase 1.0C
-headroom calibration is `BLOCKED` with no model run, parser-v2 constants would
-import an unjustified number of the kind that produced `H9`, and any
-parser-v3-derived threshold would be selected against the measurement it bounds.
+> **Erratum E-1.2F-01 (Phase 1.2F).** This section as originally written cited
+> the Phase 1.0C headroom calibration as an unrun blocking dependency. That was
+> false when written — Phase 1.0C had executed and finalized `INCONCLUSIVE` at
+> `06eec993` — and it was also a category error, since Phase 1.0C is
+> target-model task/headroom screening and can never supply a parser threshold.
+> It also described the unjustified-constant problem as "of the kind that
+> produced `H9`". That conflation is corrected below. Superseded by Phase 1.2F.
+
+Numeric acceptance thresholds. There is no calibration basis: parser-v2
+constants would import an unjustified number, and any parser-v3-derived
+threshold would be selected against the measurement it bounds.
 They are `REVIEW_REQUIRED` in the policy and the compiler refuses to compile
 while any is open.
+
+**Failure-class note.** An unjustified threshold source is a
+**policy-provenance defect**. It is *not* automatically another occurrence of
+`H9`. `H9` specifically concerns disagreement among declared and observed
+artifact vocabulary, support, or set facts. The historical `H1`–`H9` findings
+are unchanged and are not redefined by this note.
 
 ## Next round, in order
 
 ```
-1. Resolve the acceptance thresholds. Either run Phase 1.0C headroom
-   calibration and derive them, or register an explicit reviewed scientific
-   rationale for a threshold family that does not depend on it. Nothing below
-   may start first.
+1. Resolve the acceptance thresholds. Phase 1.2F audited them and found only
+   one non-vacuous criterion, residual_critical_exact_budget over S04/S05/S09.
+   Its value needs a registered downstream parser-error budget, which does not
+   exist. See docs/phase1_2f_parser_error_budget_calibration_protocol.md.
+   Nothing below may start first.
 2. Register the parser-v3-v2 replacement selection rules, before any private
    review. They must not condition on any parser prediction.
 3. Construct parser-v3-v2 independently: 120 unique cases, 10 per stratum,
@@ -768,3 +790,159 @@ permanently. Stage P must not be started without enough capacity to carry it to
 a sealed prediction set in one pass. Two stale build-claim strandings from
 earlier rounds (`c2ab05c9`, `1c5ace45`) exist and must never be deleted or
 concealed.
+
+
+---
+
+# HANDOFF — Phase 1.2F complete, BLOCKED_ON_ACCEPTANCE_POLICY (supersedes the Phase 1.2E handoff above)
+
+Phase 1.2F did not build tooling for a new capability. It corrected a false
+statement Phase 1.2E had written into a policy artifact, and then audited
+whether the four proposed acceptance thresholds protect anything.
+
+## State
+
+```
+Round type                        policy correction and threshold audit; public only
+Terminal status                   BLOCKED_ON_ACCEPTANCE_POLICY
+Blocking item                     residual_critical_exact_budget REVIEW_REQUIRED
+Primary blocking dependency       undecided instrument strictness on S04 S05 S06 S09
+Secondary blocking dependency     no registered downstream parser-error budget
+parser-v3-v1                      SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE
+Phase 1.0C                        EXECUTED, finalized INCONCLUSIVE at 06eec993
+total_case_count                  120
+gate-pinned cases                 80  (S01 S02 S03 S12 S07 S08 S10 S11)
+free cases                        40  (S04 S05 S06 S09)
+residual_semantic_case_count      15
+Sealed inputs read                0
+Sealed labels read                0
+Local private curator files read  0
+Predictions generated             0
+Parser invocations                0
+Azure writes or resource changes  0
+Formal evaluation ordinal         0
+Parser v3                         unchanged, unvalidated
+```
+
+`sealed_object_count` is deliberately **not** restated here. Limitation `L-32`
+holds: a sealed member list and its object count require an authenticated
+seal-time observation and are not facts an offline document can assert. The
+figure `12` that appears in the Phase 1.2E block above is an operator assertion,
+not a set-derived fact, and must not be treated as one.
+
+## The correction
+
+Phase 1.2E recorded its blocker as the following claim.
+
+> Quoted defect, as-written in `d843984`, false when written: "Phase 1.0C
+> headroom calibration has not been run."
+
+Phase 1.0C was preregistered at
+`62e9b961`, unblocked at `5d18b708`, executed at `72c3d281`, and finalized at
+`06eec99315ff5b6c838aeaa82e0814fea6e886b4`. It generated 300/300 target-model
+outputs and its final Track B decision was `INCONCLUSIVE`, because 44 semantic
+labels were adjudicated unresolved and the preregistered finalize rule treats
+any unresolved label as inconclusive.
+
+The deeper error is a category error that survives the factual fix: Phase 1.0C
+is **target-model observable-answer task/headroom screening**. It measures
+whether the *model* can answer; a parser threshold concerns whether the *parser*
+can recover an answer from the model's text. No Phase 1.0C result can supply,
+bound, or unblock any parser acceptance threshold, whatever its status.
+
+Historical entries were preserved and annotated with errata rather than
+rewritten. `scripts/check_current_state_consistency.py` now enforces this
+mechanically, and is proved against the verbatim `d843984` text of the files it
+would have had to catch.
+
+Note also that `H9` concerns disagreement among declared and observed artifact
+vocabulary, support, and set facts. An unjustified threshold source is a
+**policy-provenance defect**; it is not automatically another occurrence of H9.
+The historical H1-H9 findings are unchanged.
+
+## Threshold outcome
+
+| Threshold | Disposition | Value |
+| --- | --- | --- |
+| `overall_exact_typed_decision_minimum` | `REPLACE_HARD` | — |
+| `critical_stratum_floor` | `MERGE_WITH_EXISTING_GATE` | — |
+| `answer_presence_macro_f1_minimum` | `REPORT_ONLY` | — |
+| `non_regression_margin_vs_parser_v2` | `REPORT_ONLY` | — |
+| `residual_critical_exact_budget` *(new)* | `REVIEW_REQUIRED` | `null` |
+
+Two of the original four constrain the same 40 cases as each other over
+denominators that concealed it. Macro F1 awards **exactly 1.0000** to a
+candidate with 40 wrong canonical values and 80/120 exact agreement, so it
+cannot gate. Non-regression has no prospectively choosable numeric margin, and
+the margin-free per-case-dominance alternative was considered and rejected on
+substance.
+
+## What to know before the next round
+
+* **The block has a specific exit, and it is not the calibration protocol.**
+  The primary dependency is a scientific decision: are `S04`, `S05`, `S06`,
+  `S09` designed-failure strata on which the instrument must be *exactly*
+  correct? If yes, `B = 0` follows on a `LOGICAL_INVARIANT` basis and no
+  calibration is required. Only if a non-zero tolerance is permitted does the
+  registered calibration protocol become the next step. An earlier draft of
+  this round named the calibration as the sole blocker; audit finding A3
+  rejected that, because executing it would have left the round blocked anyway.
+* **Gate coverage is 80/40, not 90/30.** `S06` carries a zero-error gate over a
+  *narrow* registered error definition — selection of the registered rightmost
+  distractor span — so it does not pin exact typed-decision agreement. Every
+  gate now declares `error_definition`, `error_scope` and
+  `pins_exact_typed_decision`; do not reintroduce a coverage count that reads
+  `maximum_errors` without them.
+* **`BINDING_DISPOSITIONS` is `("KEEP_HARD",)`.** `REPLACE_HARD` deliberately
+  does not bind; its successor does. A `FINAL` block with no binding criterion
+  is now refused outright, because PASS would reduce to the mandatory gates and
+  leave the 40 free cases unconstrained.
+* **The prohibited-basis scan is a carelessness check, not a semantic
+  guarantee.** It catches a disallowed source that is *named*, across 22
+  normalised needles and ten prose fields of every record. It cannot catch a
+  paraphrase. Do not describe it as proof of provenance.
+* **The parser-isolation claim is bounded.** `jspace_observation/__init__.py`
+  eagerly imports the legacy parser, so package import is **not** parser-free
+  and no document may say it is. The supportable claims are: the repair modules
+  introduce no *new* parser dependency, contain no parser symbol reference, and
+  invoke no parser. These are proved differentially. Do not refactor
+  `__init__.py` to make a stronger claim true.
+* **The policy is bound to a v2 stratum policy, not to the retired v1
+  namespace.** `docs/phase1_parser_v3_v2_stratum_policy.md` is public,
+  case-free and versioned, and carries an independent decision to retain the
+  12-stratum taxonomy.
+* **Two independent read-only audits raised 26 findings**, two of them
+  blockers, recorded with severity, disposition, fix and residual limitation in
+  `reports/phase1_2f_audit_findings.md`. Self-authored tests are not
+  independent validation.
+
+## Standing statements that every current-state document must carry
+
+* Phase 1.0C was **executed** and finalized **`INCONCLUSIVE`**.
+* Phase 1.0C is **not** parser calibration. It is target-model
+  observable-answer task/headroom screening, and it neither validates a parser
+  nor supplies any parser acceptance threshold.
+* **No private holdout was accessed in Phase 1.2F.** No sealed input, sealed
+  label, private curator file, answer value, output text, span, offset, case
+  identity or case-level label was read.
+* **No prediction was generated.**
+* **No parser was run** — not parser v3, not parser v2, not the legacy parser,
+  on any evaluation or calibration corpus.
+* **No formal evaluation occurred.** The formal parser-v3 evaluation ordinal
+  remains `0`, parser-v3 predictions against a locked set remain `0`, and
+  locked-label reads remain `0`.
+* **Parser v3 remains unvalidated.** It is not improved, not non-regressive,
+  not accepted, and not fit for scientific scoring.
+* **`parser-v3-v1` remains retired and unchanged** —
+  `SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE`. Its bytes,
+  namespace, manifests and historical invalid contract are untouched.
+* **No J-space, hidden-reasoning, invisible-CoT, or internal-workspace
+  conclusion follows** from anything in this round. Phase 1.2F is a policy and
+  tooling correction; it produces no evidence about any model's internals.
+
+## Next authorized action
+
+Take the instrument-strictness decision for `S04`, `S05`, `S06`, `S09` and
+record it with an explicit rationale. Nothing downstream — set repair, case
+migration, replacement review, sealing, preregistration, image construction,
+Stage P or Stage E — is authorized by this round.

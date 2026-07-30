@@ -91,6 +91,11 @@ PROTECTED_DIGESTS = {
     "evaluator_sets/parser_v3_v1/manifests/set_manifest.json": "13f021abd7a052b3b7153b6a0af8ccc13f3bced4b4c280dd3abaa7ab65b949f3",
     "evaluator_sets/parser_v3_v1/manifests/inputs_manifest.json": "ec954093648cb68ce8e6a83db07639bf7de426cc14e35c0a4503b0a6d75ede9d",
     "evaluator_sets/parser_v3_v1/manifests/labels_manifest.json": "ab32c559cd62c72d059fc2527e17d3e806d5ddc9227f8bd8f8f6b0295d7e67a2",
+    # Added in Phase 1.2F. The v2 stratum policy (docs/phase1_parser_v3_v2_stratum_policy.md)
+    # cites this file as design ancestry, so its bytes must be pinned for that citation
+    # to remain checkable. Adding a digest strengthens protection; it does not relax any
+    # existing one.
+    "evaluator_sets/parser_v3_v1/strata_definitions.md": "25d59eb09fdef898e8074ee0439fc0ab7c4ec2ac5a6926cd67fba899a8f841de",
 }
 
 
@@ -308,15 +313,47 @@ def policy():
 
 @pytest.fixture(scope="module")
 def final_policy(policy):
-    """A resolved copy of the shipped policy, used to exercise compilation."""
+    """A resolved copy of the shipped policy, used to exercise compilation.
+
+    The shipped policy is blocked on ``residual_critical_exact_budget``. To
+    exercise compilation at all, this fixture resolves that one criterion with
+    a complete, syntactically valid provenance record. The value is synthetic
+    and carries no scientific claim; it exists only so the compiler has
+    something to compile.
+    """
     resolved = copy.deepcopy(policy)
     resolved["policy_id"] = "parser-v3-v2-synthetic-test-policy"
     resolved["status"] = "FINAL"
     resolved["acceptance_thresholds"]["status"] = "FINAL"
     for item in resolved["acceptance_thresholds"]["items"]:
-        item["status"] = "FINAL"
-        item["value"] = 0
+        if item["disposition"] != "REVIEW_REQUIRED":
+            continue
+        item.update(resolve_threshold(value=0))
     resolved["comparators"]["status"] = "FINAL"
+    return resolved
+
+
+def resolve_threshold(*, value, **overrides):
+    """A syntactically complete FINAL hard-threshold provenance record."""
+    resolved = {
+        "status": "FINAL",
+        "disposition": "KEEP_HARD",
+        "binding": True,
+        "value": value,
+        "basis_type": "LOGICAL_INVARIANT",
+        "controlled_risk": "synthetic fixture risk statement",
+        "derivation": "synthetic fixture derivation with no scientific content",
+        "evidence_bindings": ["docs/phase1_parser_v3_v2_stratum_policy.md"],
+        "candidate_independence": True,
+        "set_independence": True,
+        "boundary_semantics": {
+            "inequality": "at_most",
+            "at_threshold_passes": True,
+            "population": "the 30 cases in S04, S05 and S09",
+        },
+        "review_status": "REVIEWED",
+    }
+    resolved.update(overrides)
     return resolved
 
 

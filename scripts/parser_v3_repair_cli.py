@@ -23,7 +23,14 @@ Subcommands:
 
 The tool refuses to operate on the retired ``parser_v3_v1`` namespace: that set
 is SEALED, UNSPENT, UNSCORABLE and RETIRED_AS_INELIGIBLE, and no tooling in
-this repository may reopen it. It imports no parser module.
+this repository may reopen it.
+
+The repair tooling references no parser symbol and calls no parser entry point.
+It does **not** follow that no parser module is present in the process:
+``jspace_observation/__init__`` eagerly imports the legacy parser, so importing
+any submodule through the package already places parser code in ``sys.modules``.
+The supportable claim, and the one the tests actually prove, is that the repair
+modules introduce **no additional** parser dependency and invoke no parser.
 """
 
 from __future__ import annotations

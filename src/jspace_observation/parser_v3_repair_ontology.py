@@ -15,10 +15,13 @@ the set registered spans the scoring instrument would have rejected.
 
 Public sources of truth for the rules encoded here:
 
-``evaluator_sets/parser_v3_v1/strata_definitions.md``
+``docs/phase1_parser_v3_v2_stratum_policy.md``
     Stratum roles, the registered presence of each stratum, the 12 x 10
     population, the clean/critical split and the cross-cutting quotas. This
-    file is public and contains no case text and no labels.
+    file is public and contains no case text and no labels. Phase 1.2F
+    re-derived it under v2 identity; the retired
+    ``evaluator_sets/parser_v3_v1/strata_definitions.md`` is design ancestry
+    only and is no longer a live binding.
 
 ``src/jspace_observation/evaluator_validation.py``
     Enum vocabularies, canonical numeric grammar and span admissibility.

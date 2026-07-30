@@ -1,0 +1,161 @@
+{
+  "schema_version": "phase1-parser-v3-threshold-disposition/v1",
+  "artifact_id": "phase1-2f-threshold-dispositions",
+  "phase": "1.2F",
+  "status": "FINAL",
+  "purpose": "Machine-readable disposition of every acceptance threshold proposed for a future parser-v3-v2 evaluation. This artifact records the audit outcome. It is not itself an acceptance criterion and the contract compiler does not read it.",
+  "binds_to": {
+    "policy": "docs/phase1_parser_v3_v2_evaluation_policy.json",
+    "policy_schema_version": "phase1-parser-v3-prospective-evaluation-policy/v2",
+    "agreement_rule": "For every threshold_id below, disposition and status must equal the corresponding fields in the policy's acceptance_thresholds.items. A test enforces this so the two artifacts cannot drift."
+  },
+  "recognised_basis_types": [
+    "LOGICAL_INVARIANT",
+    "DOWNSTREAM_ERROR_BUDGET",
+    "EXTERNAL_CANDIDATE_INDEPENDENT_CALIBRATION",
+    "REVIEWED_OPERATIONAL_REQUIREMENT"
+  ],
+  "prohibited_basis_types": [
+    "target-model task or headroom screening results",
+    "parser-v3 development accuracy",
+    "parser-v2 locked performance",
+    "expected parser-v3 performance",
+    "industry standard without a primary source and applicability analysis",
+    "textual substitution from the parser-v2 gate contract",
+    "selecting a number because it would likely permit a pass"
+  ],
+  "gate_coverage_baseline": {
+    "error_definition_note": "Audit finding A2. A gate's maximum_errors is meaningless until the gate declares what one error is. The only registered definition of an S06 error is the narrow one in docs/phase1_parser_v3_acceptance_gates.json, namely selection of the registered rightmost distractor span. That gate therefore does not pin an S06 case to exact typed-decision agreement, and S06 belongs to the free population. The earlier 90/30 baseline was obtained only by reading the same field three incompatible ways.",
+    "zero_error_pinned_case_count": 80,
+    "pinned_strata": [
+      "S01",
+      "S02",
+      "S03",
+      "S07",
+      "S08",
+      "S10",
+      "S11",
+      "S12"
+    ],
+    "free_case_count": 40,
+    "free_strata": [
+      "S04",
+      "S05",
+      "S06",
+      "S09"
+    ],
+    "implication": "Any criterion whose binding value lies at or below 80 of 120 is vacuous under the mandatory gates."
+  },
+  "dispositions": [
+    {
+      "threshold_id": "overall_exact_typed_decision_minimum",
+      "disposition": "REPLACE_HARD",
+      "status": "FINAL",
+      "final_value": null,
+      "basis_type": null,
+      "controlled_risk": "broad diffuse extraction failure across the set",
+      "independence": "PARTIALLY_REDUNDANT",
+      "one_line_finding": "Vacuous at or below 80 of 120; its binding range 81-120 is arithmetically identical to a budget on the free strata S04, S05, S06 and S09.",
+      "successor": "residual_critical_exact_budget"
+    },
+    {
+      "threshold_id": "critical_stratum_floor",
+      "disposition": "MERGE_WITH_EXISTING_GATE",
+      "status": "FINAL",
+      "final_value": null,
+      "basis_type": null,
+      "controlled_risk": "concentration of failures inside a single adversarial stratum",
+      "independence": "PARTIALLY_REDUNDANT",
+      "one_line_finding": "Inert on the critical strata that already carry zero-error gates (S07, S08, S10, S11); its only independent content is S04, S05, S06 and S09, which duplicates threshold 1.",
+      "successor": "residual_critical_exact_budget"
+    },
+    {
+      "threshold_id": "answer_presence_macro_f1_minimum",
+      "disposition": "REPORT_ONLY",
+      "status": "FINAL",
+      "final_value": null,
+      "basis_type": null,
+      "controlled_risk": "claimed: systematic collapse of one presence class; already covered at zero tolerance by existing gates",
+      "independence": "FULLY_REDUNDANT_AND_MASKING",
+      "one_line_finding": "Feasible range is 0.636895 to 1.0 so any threshold at or below 0.636895 is vacuous; and a parser with 40 wrong canonical values scores macro F1 exactly 1.0000 while failing 40 of 120 on exact typed decision.",
+      "successor": null
+    },
+    {
+      "threshold_id": "non_regression_margin_vs_parser_v2",
+      "disposition": "REPORT_ONLY",
+      "status": "FINAL",
+      "final_value": null,
+      "basis_type": null,
+      "controlled_risk": "claimed: silent regression against the deployed parser",
+      "independence": "NOT_DERIVABLE_PROSPECTIVELY",
+      "one_line_finding": "No margin is choosable without observing a parser; the comparator itself failed its own locked evaluation so it is not a fitness reference; and the comparator run does not exist.",
+      "successor": null
+    },
+    {
+      "threshold_id": "residual_critical_exact_budget",
+      "disposition": "REVIEW_REQUIRED",
+      "status": "REVIEW_REQUIRED",
+      "final_value": null,
+      "basis_type": null,
+      "controlled_risk": "extraction failure in the four adversarial strata no zero-error gate covers",
+      "independence": "INDEPENDENT",
+      "one_line_finding": "Structure derived candidate-independently from gate coverage; numeric value blocked primarily because the scientific decision on how strict the instrument must be over designed-failure strata has not been taken, and secondarily because no registered downstream parser-error budget exists.",
+      "successor": null
+    }
+  ],
+  "confusion_matrix_analysis": {
+    "method": "exhaustive enumeration over all feasible confusion matrices",
+    "registered_supports": {
+      "present": 80,
+      "no_answer": 30,
+      "ambiguous": 10
+    },
+    "free_population": {
+      "case_count": 40,
+      "strata": [
+        "S04",
+        "S05",
+        "S06",
+        "S09"
+      ],
+      "presence_class_composition": {
+        "present": 40
+      }
+    },
+    "constraint": "Under the mandatory gates every no_answer case and every ambiguous case is pinned correct, so the only presence errors possible are within the 40 present cases of S04, S05, S06 and S09.",
+    "enumeration_domain": "All (errors_to_no_answer, errors_to_ambiguous) pairs of non-negative integers summing to at most 40, i.e. C(42,2) = 861 matrices.",
+    "feasible_matrices_enumerated": 861,
+    "macro_f1_max": 1.0,
+    "macro_f1_min": 0.636895,
+    "macro_f1_min_at": {
+      "errors_to_no_answer": 16,
+      "errors_to_ambiguous": 24
+    },
+    "monotonicity": "NOT_MONOTONE_IN_ERROR_COUNT",
+    "spread_at_equal_error_counts": {
+      "note": "Audit finding A1. Every bound below is an attained extremum of the enumeration, not a rounded illustration. A test recomputes them.",
+      "10_errors": [
+        0.866667,
+        0.930159
+      ],
+      "20_errors": [
+        0.783355,
+        0.869048
+      ],
+      "30_errors": [
+        0.708791,
+        0.811966
+      ],
+      "40_errors": [
+        0.636895,
+        0.755556
+      ]
+    },
+    "presence_error_vs_value_error": {
+      "modelled_separately": true,
+      "finding": "A present case with a wrong canonical value keeps presence class present. It is a true positive for presence and a failure for exact typed decision. Worst case: exact agreement 80 of 120 while answer-presence macro F1 is exactly 1.0000."
+    }
+  },
+  "post_hoc_disclosure": "This audit was performed after some parser-v3 development results were already known to the project. No numeric value was derived from, checked against, or tuned toward any observed parser behaviour. The single surviving hard criterion was deliberately left unresolved rather than assigned a defensible-sounding number.",
+  "terminal_status": "BLOCKED_ON_ACCEPTANCE_POLICY"
+}
