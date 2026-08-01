@@ -44,6 +44,7 @@ from jspace_observation.parser_v3_repair_contract import (  # noqa: E402
     BINDING_DISPOSITIONS,
     GATE_ERROR_DEFINITIONS,
     NON_BINDING_DISPOSITIONS,
+    POLICY_TOP_LEVEL_KEYS,
     REQUIRED_BINDING_NARRATIVE_FIELDS,
     REQUIRED_THRESHOLD_FIELDS,
     THRESHOLD_BASIS_TYPES,
@@ -2415,6 +2416,10 @@ def test_the_superseded_figure_scan_covers_the_expected_documents():
         "reports/phase1_2g_conformance_policy.md",
         "reports/phase1_2g_audit_findings.md",
         "reports/phase1_2f_parser_acceptance_policy.md",
+        "docs/phase1_2h_independent_set_repair_protocol.md",
+        "docs/phase1_2h_execution_access_ledger.json",
+        "reports/phase1_2h_blocked_set_repair.md",
+        "reports/phase1_2h_audit_findings.md",
         "tests/test_parser_v3_repair.py",
         "paper/methods_ledger.md",
     }
@@ -2777,6 +2782,9 @@ def test_every_documented_cross_reference_resolves():
         ROOT / "docs" / "phase1_2g_conformance_policy_protocol.md",
         ROOT / "reports" / "phase1_2g_conformance_policy.md",
         ROOT / "reports" / "phase1_2g_audit_findings.md",
+        ROOT / "docs" / "phase1_2h_independent_set_repair_protocol.md",
+        ROOT / "reports" / "phase1_2h_blocked_set_repair.md",
+        ROOT / "reports" / "phase1_2h_audit_findings.md",
     )
     reference = re.compile(r"`((?:docs|reports|paper|scripts|tests|src)/[^`]+?)`")
     for document in documents:
@@ -2924,14 +2932,19 @@ def test_r3new02_a_genuine_correction_is_still_exempt():
 
 
 def test_r3new02_the_superseded_scan_does_not_use_the_phase_1_0c_guard():
-    """Structural proof, so the two guards cannot be re-coupled silently."""
+    """Structural proof, so the two guards cannot be re-coupled silently.
+
+    Audit G renamed the call site to `_finditer_raw`, which bypasses the Phase
+    1.0C guard for the same reason `_search_raw` does; both are accepted here.
+    """
     source = (ROOT / "scripts" / "check_current_state_consistency.py").read_text(
         encoding="utf-8"
     )
     body = source[source.index("def scan_superseded_figures") :]
     body = body[: body.index("\ndef ", 1)]
-    assert "_search_raw(" in body
-    assert "_search(" not in body.replace("_search_raw(", "")
+    assert "_finditer_raw(" in body or "_search_raw(" in body
+    stripped = body.replace("_finditer_raw(", "").replace("_search_raw(", "")
+    assert "_search(" not in stripped
 
 
 def test_r3new03_a_delimiter_must_match_the_header_column_count():
@@ -2970,13 +2983,31 @@ def test_r3new04_a_json_errata_subtree_is_still_exempt():
     assert _probe_json(quoted) == []
 
 
-def test_r3new04_a_nested_mapping_is_not_flattened_into_its_parent():
-    """The record window must not manufacture an adjacency the file lacks."""
+def test_r3new04_an_ancestor_scalar_reaches_a_nested_mapping():
+    """Audit F reopened R3-NEW-04: one level of nesting hid the whole claim.
+
+    Every ancestor on the path genuinely co-describes the node, so joining them
+    reports an adjacency the document really makes.
+    """
     split = (
         '{"threshold_id": "critical_stratum_floor", '
         '"nested": {"disposition": "REMOVE_REDUNDANT"}}'
     )
-    assert _probe_json(split) == []
+    assert _probe_json(split) != []
+    deep = (
+        '{"a": {"b": {"threshold_id": "critical_stratum_floor", '
+        '"c": {"d": {"disposition": "REMOVE_REDUNDANT"}}}}}'
+    )
+    assert _probe_json(deep) != []
+
+
+def test_r3new04_unrelated_subtrees_are_still_never_joined():
+    """The anti-false-adjacency invariant that the ancestor join must preserve."""
+    siblings = (
+        '{"one": {"threshold_id": "critical_stratum_floor"}, '
+        '"two": {"disposition": "REMOVE_REDUNDANT"}}'
+    )
+    assert _probe_json(siblings) == []
 
 
 def test_r3new05_the_scoped_sealed_set_counter_is_validated(policy):
@@ -2999,6 +3030,109 @@ def test_r3new05_the_unscoped_counter_name_is_rejected(policy):
     broken["execution_state"]["sealed_sets_constructed"] = 0
     with pytest.raises(ContractError, match="unscoped"):
         validate_policy(broken)
+
+
+# ---------------------------------------------------------------------------
+# 16. Phase 1.2H. Audit F - re-review of the Audit E remediation.
+#
+# Audit F found all six Audit E remediations incomplete. Each test below pins
+# the counterexample the auditor supplied, so the same escape cannot be made
+# twice.
+# ---------------------------------------------------------------------------
+
+
+def test_f02_a_denial_aimed_at_the_replacement_figure_is_not_an_exemption():
+    """Audit F on R3-NEW-02: sentence-wide negation exempted an assertion.
+
+    Both sentences state the retired figure as fact. The negation belongs to
+    the *replacement* number, so it must not buy an exemption.
+    """
+    assert _probe("The gates pin 90 of 120 cases, not 80 of 120 cases.\n") != []
+    assert (
+        _probe("The gates pin 90 of 120 cases rather than 80 of 120 cases.\n") != []
+    )
+    assert _probe("S06 is pinned to exact agreement, not S07.\n") != []
+
+
+def test_f02_a_denial_in_a_different_clause_is_not_an_exemption():
+    """A marker elsewhere in the sentence must not reach the figure."""
+    assert (
+        _probe("The gates pin 90 of 120 cases; the 80 of 120 figure is now retired.\n")
+        != []
+    )
+
+
+def test_f02_attached_denials_and_mention_frames_remain_exempt():
+    """The corrections that must stay writable."""
+    for text in (
+        "The mandatory gates pin 80 of 120 cases, not 90 of 120 cases.\n",
+        "The claim that 90 of 120 cases are pinned was already false when written.\n",
+        "The figure was previously listed as 90 of 120.\n",
+        "The old text said 90 of 120; that is no longer correct.\n",
+        "It used to say 90 of 120.\n",
+        "90 of 120 is now superseded.\n",
+    ):
+        assert _probe(text) == [], text
+
+
+def test_f02_a_mention_frame_alone_is_not_a_denial():
+    """A framed sentence with no falsity marker still asserts the figure."""
+    assert _probe("The claim that 90 of 120 cases are pinned is correct.\n") != []
+
+
+def test_f03_a_malformed_delimiter_cell_does_not_enable_redaction():
+    """Audit F on R3-NEW-03: `---:---` passed the `'--' in cell` test."""
+    assert consistency._is_delimiter_cell("---") is True
+    assert consistency._is_delimiter_cell(":---:") is True
+    assert consistency._is_delimiter_cell("---:---") is False
+    assert consistency._is_delimiter_cell("-") is False
+    assert consistency._is_delimiter_cell("a--b") is False
+    assert consistency._is_table_delimiter("| ---:--- | --- |", columns=2) is False
+    not_a_table = (
+        "| Quoted defect | Note |\n| ---:--- | --- |\n| 90 of 120 cases | live |\n"
+    )
+    assert _probe(not_a_table) != []
+
+
+def test_f05_an_undeclared_execution_counter_is_rejected(policy):
+    """Audit F on R3-NEW-05: only *named* counters were validated.
+
+    An undeclared counter could assert an execution beside the validated
+    zeros and every check still passed.
+    """
+    broken = copy.deepcopy(policy)
+    broken["execution_state"]["parser_v3_v2_evaluations_run"] = 1
+    with pytest.raises(ContractError, match="unrecognised"):
+        validate_policy(broken)
+
+
+def test_f05_an_undeclared_counter_is_rejected_even_when_zero(policy):
+    """The defect is the unvalidated key, not its current value."""
+    broken = copy.deepcopy(policy)
+    broken["execution_state"]["some_future_counter"] = 0
+    with pytest.raises(ContractError, match="unrecognised"):
+        validate_policy(broken)
+
+
+def test_f05_the_closed_key_set_matches_the_shipped_policy(policy):
+    """The schema must be exactly the block the canonical policy carries."""
+    from jspace_observation.parser_v3_repair_contract import EXECUTION_STATE_KEYS
+
+    assert set(policy["execution_state"]) == set(EXECUTION_STATE_KEYS)
+
+
+def test_f01_the_review_provenance_records_every_audit_with_counts(policy):
+    """Audit F on R3-NEW-01: A and B were listed without finding counts."""
+    provenance = _residual(policy)["review_provenance"]
+    reviewers = provenance["reviewers"]
+    assert len(reviewers) == 6
+    for label in ("Audit A", "Audit B", "Audit C", "Audit D", "Audit E", "Audit F"):
+        entry = next(item for item in reviewers if item.startswith(label))
+        assert re.search(r"returned \d+ findings?", entry), entry
+    # The superseded claim that Audit E's remediation was never re-reviewed
+    # must be gone, because Phase 1.2H re-reviewed it.
+    assert "was not itself independently re-reviewed" not in provenance["limitation"]
+    assert provenance["supplementary_record"] == "reports/phase1_2h_audit_findings.md"
 
 
 @pytest.mark.parametrize(
@@ -3037,22 +3171,298 @@ def test_r3new06_the_contract_module_makes_only_the_narrow_isolation_claim():
     assert "eagerly imports the legacy parser" in docstring
 
 
-def test_r3new06_no_module_claims_the_process_is_parser_free():
-    """The unsupportable wording must not reappear anywhere."""
-    overbroad = re.compile(
-        r"(?:imports? (?:or invokes )?no parser|no parser (?:module|code) "
-        r"(?:is|exists) (?:in|loaded)|absolutely parser[- ]free|"
-        r"parser[- ]free (?:process|import))",
-        re.IGNORECASE,
+#: Phrases that assert the unsupportable absolute isolation claim.
+OVERBROAD_ISOLATION = re.compile(
+    r"(?:imports? (?:or invokes )?no parser|no parser (?:module|code) "
+    r"(?:is|exists) (?:in|loaded)|absolutely parser[- ]free|"
+    r"parser[- ]free (?:process|import))",
+    re.IGNORECASE,
+)
+
+#: A document may *mention* the false claim in order to disown it. The
+#: disclaimer must sit close in front of the phrase, so that quoting a withdrawn
+#: wording stays possible while asserting it does not.
+ISOLATION_DISCLAIMERS = re.compile(
+    r"\b(?:narrower|withdrawn|unsupportable|false|cannot|not|never|"
+    r"no longer|rather than|check that|would be)\b",
+    re.IGNORECASE,
+)
+_DISCLAIMER_WINDOW = 120
+
+#: A sentence terminator followed by whitespace or a closing delimiter. Version
+#: strings such as ``1.2H`` are not boundaries because the dot is followed by an
+#: alphanumeric.
+_ISOLATION_SENTENCE_BOUNDARY = re.compile(r"[.!?](?=[\s\"'`)\]]|$)")
+
+
+def _disclaimer_context(text: str, start: int) -> str:
+    """Return the text preceding ``start`` **within the same sentence**.
+
+    Audit G finding G-05: the disclaimer search took a flat 120-character
+    window, so any disclaimer vocabulary in a *neighbouring* sentence
+    suppressed a genuine assertion. "This module cannot process malformed
+    input. Package import is absolutely parser-free." passed because "cannot"
+    belonged to the previous sentence. A disavowal has to be part of the same
+    statement as the claim it disavows.
+    """
+
+    window = text[max(0, start - _DISCLAIMER_WINDOW) : start]
+    boundary = None
+    for candidate in _ISOLATION_SENTENCE_BOUNDARY.finditer(window):
+        boundary = candidate
+    return window[boundary.end() :] if boundary is not None else window
+
+
+def _asserts_overbroad_isolation(text: str) -> list[str]:
+    """Return every overbroad isolation claim that is asserted, not disowned."""
+    offenders = []
+    for match in OVERBROAD_ISOLATION.finditer(text):
+        if not ISOLATION_DISCLAIMERS.search(_disclaimer_context(text, match.start())):
+            offenders.append(match.group(0))
+    return offenders
+
+
+def _isolation_scanned_sources() -> list[str]:
+    """Every repair/policy source that could carry the claim.
+
+    R3-NEW-06 was possible because the file list was written by hand and
+    `parser_v3_repair_normalization.py` was not on it. Enumerating the modules
+    means a new repair module is covered the moment it is added.
+    """
+    found = {
+        path.relative_to(ROOT).as_posix()
+        for pattern in (
+            "src/jspace_observation/parser_v3_*.py",
+            "scripts/*parser_v3*.py",
+        )
+        for path in ROOT.glob(pattern)
+    }
+    found.update(
+        {
+            "scripts/check_current_state_consistency.py",
+            "scripts/generate_current_state.py",
+        }
     )
-    for relative in (
-        "src/jspace_observation/parser_v3_repair_contract.py",
-        "scripts/parser_v3_repair_cli.py",
-        "scripts/check_current_state_consistency.py",
-        "scripts/generate_current_state.py",
+    return sorted(found)
+
+
+def test_r3new06_the_scan_covers_every_repair_module():
+    """The omitted module must now be in scope, and the set must be non-trivial."""
+    scanned = _isolation_scanned_sources()
+    assert (
+        "src/jspace_observation/parser_v3_repair_normalization.py" in scanned
+    ), "the module that carried the false claim must be scanned"
+    assert "src/jspace_observation/parser_v3_repair_contract.py" in scanned
+    assert len(scanned) >= 5
+
+
+def test_r3new06_no_module_claims_the_process_is_parser_free():
+    """The unsupportable wording must not be asserted anywhere."""
+    for relative in _isolation_scanned_sources() + [
         "docs/phase1_2g_conformance_policy_protocol.md",
         "reports/phase1_2g_conformance_policy.md",
         "reports/phase1_2g_audit_findings.md",
-    ):
+    ]:
         text = (ROOT / relative).read_text(encoding="utf-8")
-        assert not overbroad.search(text), relative
+        assert not _asserts_overbroad_isolation(text), relative
+
+
+def test_r3new06_the_normalization_docstring_states_the_narrow_claim():
+    """The module that carried the false claim must now state the true one."""
+    source = (
+        ROOT / "src" / "jspace_observation" / "parser_v3_repair_normalization.py"
+    ).read_text(encoding="utf-8")
+    docstring = ast.get_docstring(ast.parse(source)) or ""
+    assert "no parser import and no parser invocation" not in docstring
+    assert "introduces no parser dependency" in docstring
+    assert "eagerly imports the" in docstring
+
+
+def test_r3new06_the_disclaimer_exemption_does_not_swallow_an_assertion():
+    """A disowned mention is exempt; a bare assertion is not."""
+    assert _asserts_overbroad_isolation("Package import is absolutely parser-free.")
+    assert not _asserts_overbroad_isolation(
+        'That is narrower than "package import is absolutely parser-free".'
+    )
+    # The disclaimer must be near the phrase, not merely somewhere in the file.
+    far = "This is not a claim about anything. " + "x" * 200
+    assert _asserts_overbroad_isolation(far + " Package import is absolutely parser-free.")
+
+
+# --- 17. Audit G: final-state re-review of the Phase 1.2H remediation -------
+
+
+def test_g02_a_correction_does_not_license_a_later_assertion():
+    """Only the first match per pattern was examined, so a correction cloaked
+    every later occurrence in the same window."""
+    hits = consistency.scan_superseded_figures(
+        "probe.md",
+        "90 of 120 is superseded. The mandatory gates pin 90 of 120 cases.\n",
+    )
+    assert [item.kind for item in hits] == ["SUPERSEDED_FIGURE"]
+
+
+def test_g02_a_falsity_marker_must_share_the_framed_clause():
+    """A frame plus a disowning marker in a *different* clause is not a denial."""
+    hits = consistency.scan_superseded_figures(
+        "probe.md",
+        "The claim that 90 of 120 cases are pinned is correct; "
+        "the rejected alternative is false.\n",
+    )
+    assert [item.kind for item in hits] == ["SUPERSEDED_FIGURE"]
+
+
+def test_g02_an_attached_correction_remains_exempt():
+    """The ordinary erratum form must stay writable."""
+    assert (
+        consistency.scan_superseded_figures(
+            "probe.md", "The former figure, 90 of 120 cases, is not correct.\n"
+        )
+        == []
+    )
+    assert (
+        consistency.scan_superseded_figures(
+            "probe.md",
+            "The claim that 90 of 120 cases are pinned was already false "
+            "when written.\n",
+        )
+        == []
+    )
+
+
+def test_g02_the_contrastive_leak_stays_closed():
+    """R3-NEW-02 must not reopen: a denial aimed at the replacement figure."""
+    for text in (
+        "The mandatory gates pin 90 of 120 cases, not 80 of 120 cases.\n",
+        "The mandatory gates pin 90 of 120 cases rather than 80 of 120 cases.\n",
+    ):
+        assert consistency.scan_superseded_figures("probe.md", text), text
+
+
+def test_g02_an_anaphoric_follow_on_clause_still_denies_the_figure():
+    """`; that is no longer correct` refers back; `; the X is false` does not."""
+    assert (
+        consistency.scan_superseded_figures(
+            "probe.md", "The old text said 90 of 120; that is no longer correct.\n"
+        )
+        == []
+    )
+    assert consistency.scan_superseded_figures(
+        "probe.md",
+        "The claim that 90 of 120 cases are pinned is correct; "
+        "the earlier draft is false.\n",
+    )
+
+
+def test_g03_a_scalar_in_a_list_carries_its_ancestor_context():
+    """Moving a value into an array split the claim across windows again."""
+    payload = {
+        "live_disposition_claim": {
+            "threshold_id": "critical_stratum_floor",
+            "decision": {"disposition": ["REMOVE_REDUNDANT"]},
+        }
+    }
+    hits = consistency.scan_superseded_figures(
+        "probe.json", json.dumps(payload, indent=2) + "\n"
+    )
+    assert [item.kind for item in hits] == ["SUPERSEDED_FIGURE"]
+
+
+def test_g03_a_rejected_alternative_subtree_is_not_a_live_claim():
+    """A record of a declined option must not be reported as an assertion."""
+    payload = {
+        "threshold_id": "critical_stratum_floor",
+        "rejected_alternative": {
+            "disposition": "REMOVE_REDUNDANT",
+            "note": "hypothetical option only",
+        },
+    }
+    assert (
+        consistency.scan_superseded_figures(
+            "probe.json", json.dumps(payload, indent=2) + "\n"
+        )
+        == []
+    )
+
+
+def test_g03_a_plain_nested_mapping_is_still_caught():
+    payload = {
+        "threshold_id": "critical_stratum_floor",
+        "decision": {"disposition": "REMOVE_REDUNDANT"},
+    }
+    assert consistency.scan_superseded_figures(
+        "probe.json", json.dumps(payload, indent=2) + "\n"
+    )
+
+
+def test_g03_unrelated_sibling_subtrees_are_still_not_joined():
+    payload = {
+        "a": {"threshold_id": "critical_stratum_floor", "note": "fine"},
+        "b": {"disposition": "REMOVE_REDUNDANT", "note": "fine"},
+    }
+    assert (
+        consistency.scan_superseded_figures(
+            "probe.json", json.dumps(payload, indent=2) + "\n"
+        )
+        == []
+    )
+
+
+def test_g04_the_policy_top_level_schema_is_closed(policy):
+    """A top-level execution claim passed every check while one block was closed."""
+    broken = copy.deepcopy(policy)
+    broken["parser_v3_v2_evaluations_run"] = 1
+    with pytest.raises(ContractError, match="unrecognised top-level"):
+        validate_policy(broken)
+
+
+def test_g04_the_committed_policy_declares_only_known_top_level_keys(policy):
+    assert set(policy) == POLICY_TOP_LEVEL_KEYS
+
+
+def test_g04_the_result_statement_may_not_assert_a_result(policy):
+    """Free text was how the field became 'an evaluation was run'."""
+    for claim in (
+        "A formal evaluation was run and parser v3 was validated.",
+        "Parser v3 has been validated against the locked set.",
+        "Predictions were generated and parser v3 is now accepted.",
+    ):
+        broken = copy.deepcopy(policy)
+        broken["execution_state"]["final_policy_is_not_a_result"] = claim
+        with pytest.raises(ContractError):
+            validate_policy(broken)
+
+
+def test_g04_the_result_statement_may_not_be_emptied_out(policy):
+    """Removing the disclaimers is as bad as asserting the opposite."""
+    broken = copy.deepcopy(policy)
+    broken["execution_state"]["final_policy_is_not_a_result"] = "This is a policy."
+    with pytest.raises(ContractError, match="must state that"):
+        validate_policy(broken)
+
+
+def test_g05_a_disclaimer_in_a_neighbouring_sentence_does_not_exempt():
+    """Any disclaimer token within 120 characters used to suppress the check."""
+    assert _asserts_overbroad_isolation(
+        "This module cannot process malformed input. "
+        "Package import is absolutely parser-free."
+    ) == ["absolutely parser-free"]
+
+
+def test_g05_a_same_sentence_disavowal_still_exempts():
+    """Quoting a withdrawn wording in order to disown it must keep working."""
+    assert (
+        _asserts_overbroad_isolation(
+            "The withdrawn wording claimed package import is absolutely "
+            "parser-free."
+        )
+        == []
+    )
+    assert _asserts_overbroad_isolation("Package import is absolutely parser-free.")
+
+
+def test_g06_the_limitations_ledger_withdraws_the_convergence_claim():
+    text = (ROOT / "paper" / "limitations_ledger.md").read_text(encoding="utf-8")
+    assert "each pass has found fewer" not in text
+    assert "specifically **not** that the" in text
+    assert "neither\ncount nor severity is monotonic" in text or "count nor severity is monotonic" in text

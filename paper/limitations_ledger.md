@@ -645,3 +645,72 @@ The reverse direction is also worth stating, because it is easy to overclaim in
 the other direction. A `FAIL` on this policy is not evidence that the scientific
 conclusion is wrong either. It is evidence that the instrument is not fit to be
 used to reach one.
+
+## L-37 - The successor evaluation set cannot currently be built at all
+
+Phase 1.2H was authorized to repair, construct and seal the successor
+`parser-v3-v2` evaluation set. It could not begin. The authoritative retired
+`parser-v3-v1` sealed source sits behind a storage account with
+`publicNetworkAccess = Disabled`, reachable only by a user-assigned managed
+identity exercised from in-network compute. That access is unobtainable from the
+environment the project is currently operated from.
+
+This is a limitation on the *project*, not only on one round. Until it is
+resolved, no successor set can be constructed, so no evaluation set exists, so
+no preregistration and no evaluation are possible. Every downstream scientific
+claim that depends on a validated parser is therefore blocked behind an
+infrastructure-access problem, not behind a methodological one.
+
+Two things must not be inferred from the block.
+
+First, it is **not** evidence that the retired set is unavailable in principle.
+The infrastructure exists and the objects exist; what is missing is a path from
+the current operating environment to them that satisfies the read-only boundary.
+
+Second, the local curator copies are **not** a workaround. They match the
+committed public manifest exactly, on digest and byte count. That establishes
+agreement with a Git record, not with the sealed source, and the sealed source
+is what the set's identity is defined against. Proceeding from them would
+produce a successor set carrying a provenance claim that is false in a way no
+later check could detect. The correct reading of the byte-only verification is
+narrow: the local files are what the repository says they are. It says nothing
+about whether the repository's record matches the seal.
+
+There is also a design constraint that the eventual fix must respect, and that
+makes the fix harder than "obtain network access". The blind semantic review the
+repair requires executes as reviewing agents *outside* that network. A solution
+that reads private content inside the boundary and then transports it out to
+those reviewers satisfies the network rule in form and breaks it in substance. A
+sound resolution has to place the semantic review inside the boundary, or
+establish an equivalent isolation that the reviewers genuinely operate under.
+
+## L-38 - The audit regress has never reached a fixed point
+
+Seven independent read-only reviews have now been run against this repository's
+policy and instrument set: Audits A and B in Phase 1.2F/1.2G, three
+post-remediation re-reviews C, D and E, and Audits F and G in Phase 1.2H. **Every
+re-review found real defects in the remediation of the one before it.** Audit F
+found all six Audit E remediations incomplete, each with a working
+counterexample; Audit G then found a blocker and four majors in the Audit F
+remediation, including a ledger that would validate a fabricated sealed set.
+
+The regress has been terminated at every stage by *disclosure*, never by a
+review that found nothing. Audit G was the final-state pass of Phase 1.2H, and
+its own remediation is likewise not re-reviewed.
+
+The available inference is therefore weaker than "the instrument set is
+correct". It is: the per-pass defect rate is not low, and the current state is
+the most corrected the artifacts have been. It is specifically **not** that the
+process is converging. The recorded sequence is A = 5 findings / 1 blocker,
+B = 11 / 1, C = 7 / 1, D = 5 / 2, E = 6 / 1, F = 6 / 0, G = 6 / 1 — neither
+count nor severity is monotonic, and A and B were initial audits rather than
+remediation reviews, so they are not comparable terms in such a series anyway.
+An earlier version of this entry claimed each pass found fewer and less severe
+defects than its predecessor. That claim was not supported by these figures and
+is withdrawn; it was identified by Audit G.
+
+A further caveat applies to what "independent" means here. The reviewers are
+automated agents operating on this repository under the same instructions as the
+authoring pass. They are independent **of the pass**; they are not independent
+**of the project**, and no external human reviewer has approved any value,
+threshold, disposition or claim recorded anywhere in it.

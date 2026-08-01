@@ -2036,3 +2036,95 @@ is cheap; a single point of drift is not.
 | Make the comparator binding | No prospectively choosable margin exists, and the one substantive argument for a binding comparator was withdrawn in Phase 1.2F as unsound. |
 | Number the ten defects into the `H` series | `H1`-`H9` are findings about the evaluation instrument and its artifacts' declared-versus-observed facts. `G-01`-`G-10` are internal consistency failures between this project's own documents. Merging them would corrupt the meaning of both series. |
 | Fix the stale figures and describe the round as clean | Six of ten defects were figures no prose pattern covered. Fixing them without adding the generator would have left the mechanism that produced them intact. |
+
+## Phase 1.2H — block at the source-access precondition rather than proceed on an unverified copy
+
+**Decision.** Terminate Phase 1.2H `BLOCKED_ON_PRIVATE_SOURCE_ACCESS` at the
+first precondition, rather than proceed from the local curator copies.
+
+**Why.** The local copies match the committed public manifest exactly, on both
+SHA-256 and byte count. That is agreement with a Git record. It is not agreement
+with the sealed source, and the sealed source is what the set identity is
+defined against. The authorization is explicit that an unverified local copy
+must not be substituted when the sealed source is unavailable, and the reason is
+sound: a repair round that reads the wrong bytes produces a successor set whose
+provenance claim is false, and the falsity would not be detectable later.
+
+**Rejected alternatives.**
+
+| Option | Why rejected |
+| --- | --- |
+| Proceed from the local curator copies | They agree with a Git record, not with the sealed source. The whole point of sealing is that the sealed bytes are authoritative. |
+| Stand up in-network compute to reach the storage account | The blind semantic review executes as reviewing agents outside that network. Reading private content inside the boundary in order to transport it out defeats exactly the isolation the network rules encode. It would also require authoring and running new infrastructure and making irreversible role-assignment and blob writes, which this round was not authorized to do. |
+| Relax the network rules on the storage account | An irreversible weakening of the boundary that protects the retired sealed set, taken to make a blocked round appear to succeed. |
+| Register the full protocol suite anyway (import protocol, review schemas, seal layout, replacement rules) | An unexercised instrument frozen into the permanent record with the vocabulary of a completed procedure is later read as evidence that the procedure happened. This repository's audits have caught that pattern three times. The preconditions and prohibitions were registered; the mechanisms were not. |
+| Record the round as a no-op and change nothing | The round had real, honest deliverables: the disclosed Audit E gap, the live-ledger separation, and the blocking analysis itself. Discarding them would lose information. |
+
+## Phase 1.2H — carry live access state in a ledger, not in the `FINAL` policy
+
+**Decision.** Introduce `docs/phase1_2h_execution_access_ledger.json` and treat
+the policy's `execution_state` block as an immutable finalization snapshot.
+
+**Why.** The artifact that states *how a future evaluation will be judged*
+should not also be the place where *how many things have happened so far* is
+edited. This project has already been bitten by a semantic change smuggled in as
+a routine state update. Separating them means a licensed state edit can never
+move the policy's semantic hash, and a semantic change therefore cannot hide
+behind one.
+
+The ledger is bound to the policy twice: by full-file SHA-256, and by a
+`policy_semantics_sha256` computed over the policy with `execution_state`
+projected out. The second is load-bearing precisely because it is stable across
+future state edits.
+
+**Rejected alternatives.**
+
+| Option | Why rejected |
+| --- | --- |
+| Keep editing `execution_state` in the policy | Makes a `FINAL` rule document mutable for reasons unrelated to the rule, and re-opens the exact smuggling channel a prior audit found. |
+| Record access state in prose only | Prose cannot be validated. Every prior round that relied on prose accumulated drift that a later audit had to find. |
+| A single boolean `private_data_accessed` flag | Cannot express the distinctions that matter: repair access is not evaluation access, and a byte-only digest is not a semantic read. Collapsed flags get restated later as stronger claims than the evidence supports. |
+| Project more than `execution_state` out of the semantic hash | Anything else excluded could then change undetected. The exclusion list is exactly one key and is itself validated. |
+
+## Phase 1.2H — fix the incomplete provenance inside the policy rather than in a report
+
+**Decision.** Edit `review_provenance` in the canonical policy, accepting the
+resulting SHA-256 change, rather than recording the missing audit counts in the
+Phase 1.2H report alone.
+
+**Why.** An incomplete provenance record inside the artifact is a defect *of the
+artifact*. Correcting it elsewhere leaves the artifact wrong and creates a
+second place a reader must consult to learn the first place is unreliable.
+Exactly one block changed; no threshold, gate, population figure, ontology
+entry, comparator role, status rule or `execution_state` value was touched, and
+the ledger records the change and its scope explicitly.
+
+
+## Phase 1.2H — narrow the semantic projection instead of widening the schema
+
+**Decision.** After Audit G, project only the five mutable `execution_state`
+counters out of `policy_semantics_sha256` rather than the whole block, and
+constrain the block's free-text statement against asserting a result. Also close
+the policy's top-level key set.
+
+**Why.** A prior decision in this same log defended excluding exactly one key on
+the grounds that "anything else excluded could then change undetected". Audit G
+showed that argument applied one level down and had been missed: the excluded
+key was a *container*, and the prose statement inside it could be rewritten to
+claim a completed evaluation without moving the hash. The same reasoning that
+justified a one-key exclusion list requires excluding the counters rather than
+their container. The earlier entry was not wrong about the principle; it applied
+it at the wrong granularity, and that is recorded here rather than edited away.
+
+## Phase 1.2H — validate the ledger in the generator, not only in tests
+
+**Decision.** `scripts/generate_current_state.py` validates the ledger before
+rendering it, loading the validator by file path rather than through the
+package.
+
+**Why.** Audit G's blocker was not that an invalid ledger could exist — it was
+that the generator would faithfully publish one into `reports/current_status.md`
+and `docs/thread_handoff.md`. A validator that runs only under pytest does not
+protect the artifact a reader actually reads. The file-path load is deliberate:
+`jspace_observation/__init__.py` eagerly imports the legacy parser, and the
+generator has no business pulling parser code into its process.

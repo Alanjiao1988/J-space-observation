@@ -10,7 +10,11 @@ Design constraints, each of which is enforced by a test:
 
 * deterministic and idempotent;
 * typed-decision preserving, or the case is quarantined instead of forced;
-* no parser import and no parser invocation;
+* introduces no parser dependency: this module contains no parser symbol, adds
+  no parser module to ``sys.modules`` beyond whatever the package baseline
+  already loaded, and invokes no parser function. It is *not* a claim that the
+  process is parser-free, because :mod:`jspace_observation` eagerly imports the
+  legacy parser at package import time;
 * no value-bearing logging: the audit receipt carries counts and hashes only;
 * fail closed whenever a rule would have to guess outside its registered
   tie-break.

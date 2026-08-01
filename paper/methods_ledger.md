@@ -736,3 +736,62 @@ the criterion was answerable from evidence the project already held, and its
 value is zero. Filling the gap with a plausible integer would have been the
 failure the method exists to prevent; so, less obviously, was continuing to
 report a blocker without checking whether the design already answered it.
+
+## Separating live access state from a finalized rule (Phase 1.2H)
+
+A preregistered acceptance policy has two kinds of content that are easy to
+conflate and expensive to conflate: the **rule** by which a future evaluation
+will be judged, and the **state** of what has actually happened so far. Phase
+1.2G's policy carried both — an `execution_state` block sat inside a document
+whose status was `FINAL`.
+
+That is a live hazard, not a stylistic one. If the state block is edited as work
+proceeds, the `FINAL` document becomes mutable for reasons unrelated to the
+rule, and a change to a threshold can be presented as a routine state update.
+This project has already had a semantic change enter through that channel.
+
+Phase 1.2H separates them. The policy's `execution_state` becomes an immutable
+finalization snapshot. Live state moves to an append-only ledger, and the ledger
+binds the policy twice: once by full-file SHA-256, and once by a
+`policy_semantics_sha256` computed over the policy with `execution_state`
+projected out. The second hash is the load-bearing one, because it is *stable*
+across any future licensed state edit — which is precisely what makes it able to
+detect a semantic change that a state edit would otherwise conceal.
+
+Three distinctions are carried as separate counters rather than collapsed into a
+single "accessed" flag, because each has been a source of overclaiming:
+
+* repair access to a retired set is not formal evaluation access to a successor
+  set;
+* a **byte-only integrity verification** — streaming a file to a digest and
+  discarding the bytes — is not a semantic content read, because only the second
+  changes what has been seen;
+* constructing, sealing, obtaining a listing witness, preregistering, generating
+  predictions, opening labels for scoring and running an evaluation are seven
+  different events and get seven different counters.
+
+The ledger's validator refuses a ledger whose counters contradict its declared
+status: a "sealed" outcome with no seal write, or a "blocked before reaching the
+source" outcome that nonetheless records a semantic read. Counters are monotonic
+and events are immutable, so a later round cannot quietly unwind an access it
+already recorded. That is what makes the ledger evidence rather than assertion.
+
+The general point: a negative claim ("nothing was read") is only as good as the
+mechanism that would have recorded the positive. Writing the negative into prose
+costs nothing and proves nothing. Writing it as a validated, monotonic counter
+whose non-zero value the validator knows how to interpret is a different kind of
+claim.
+
+Audit G showed the limit of that argument as first implemented. The counters
+were validated and monotonic, but the *narrative* state blocks beside them were
+not validated at all, and those were the fields the current-state generator
+rendered. A ledger that carries both a validated counter and an unvalidated
+sentence about the same fact will be read through the sentence. Every narrated
+state field is therefore now reconciled against the counter measuring the same
+thing, every access event must be counter-backed, and the generator validates
+before it renders.
+
+The same failure mode appeared in the policy's semantic hash. Excluding a
+*container* key from a hash excludes everything inside it, including free text
+that can be rewritten into a claim the hash was supposed to protect. Exclusion
+lists should name the mutable leaves, not the branch above them.

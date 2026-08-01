@@ -1,6 +1,18 @@
 # Project Status Report
 
-> **Phase 1.2G status (this round):** the parser-v3 one-shot locked evaluation
+> **Phase 1.2H status (this round):** the authorized independent `parser-v3-v2`
+> set-repair round terminated **`BLOCKED_ON_PRIVATE_SOURCE_ACCESS`** at its
+> first precondition. The authoritative retired `parser-v3-v1` sealed source is
+> unreachable from this environment (`publicNetworkAccess = Disabled`;
+> managed-identity, in-network read path only), and an unverified local copy may
+> not be substituted for it. **No private content was read, no set was
+> constructed, no set was sealed, no parser was run, and no prediction was
+> generated.** The round did close the audit gap Phase 1.2G had disclosed —
+> Audit F found all six Audit E remediations incomplete and all six are now
+> fixed — and introduced a live execution/access ledger. See
+> `reports/phase1_2h_blocked_set_repair.md`.
+>
+> **Phase 1.2G status (0480f4f):** the parser-v3 one-shot locked evaluation
 > remains **HALTED**. Phase 1.2G remediated ten post-audit consistency defects
 > and *settled* the acceptance question that Phase 1.2F left open, by adopting
 > **strict finite-suite conformance**: every eligible case admitted to the
@@ -9,8 +21,9 @@
 > prospective acceptance policy is now **`FINAL`**. The round read no private
 > data, ran no parser, generated no prediction, and produced no formal result.
 > Parser v3 remains **unvalidated**, formal evaluation ordinal **0**. The round
-> terminated **`READY_FOR_INDEPENDENT_SET_REPAIR`**, which authorizes nothing
-> beyond a separately authorized set-repair round. See "Phase 1.2G" below.
+> terminated **`READY_FOR_INDEPENDENT_SET_REPAIR`**, which authorized nothing
+> beyond a separately authorized set-repair round — the round that Phase 1.2H
+> then found it could not begin. See "Phase 1.2G" below.
 >
 > **Phase 1.2F status (3d519e1, superseded in part):** corrected the Phase 1.0C
 > historical record and audited the four proposed acceptance thresholds;
@@ -47,6 +60,15 @@
 - Formal parser-v3 evaluation: **NOT_RUN**, ordinal **0**.
 - Predictions generated: **0**. Locked-label reads: **0**. Parser-v3 runs against any locked set: **0**. Sealed `parser-v3-v2` sets constructed: **0** (`parser-v3-v1` was sealed and is retired; this counter is scoped to the successor set).
 
+The block above is the policy's own finalization snapshot. The live
+execution and access state is carried by the ledger, and is rendered
+from it:
+
+- Live access ledger: `phase1_2h_execution_access_ledger.json`, phase **1.2H**, status **BLOCKED_ON_PRIVATE_SOURCE_ACCESS**.
+- Retired `parser-v3-v1` repair access: sealed inputs read **0**, sealed labels read **0**, private curator files read **0**, byte-only integrity verifications **2** (a digest of a file is not a read of its content). State: **SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE**.
+- Successor `parser-v3-v2`: exists **false**, cases constructed **0**, sealed **false**, `sealed_object_count` **null** (undefined under `L-32` without an authenticated seal-time observation; not measured to be zero).
+- Parser execution: invocations on private or locked data **0**, candidate predictions **0**, comparator predictions **0**. Azure: data-plane content reads **0**, data-plane writes **0**, resource creations or changes **0**.
+
 A `FINAL` policy is not a result. It records that the rule for judging
 a future evaluation is settled, and records nothing whatever about any
 parser. Specifically:
@@ -56,6 +78,7 @@ parser. Specifically:
 - No prediction was generated and no parser was run against any evaluation or calibration corpus.
 - No formal parser-v3 evaluation has occurred. Parser v3 remains **unvalidated**.
 - `parser-v3-v1` remains `SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE`, byte-unchanged.
+- Phase 1.2H terminated `BLOCKED_ON_PRIVATE_SOURCE_ACCESS` before any private access. No `parser-v3-v2` set was constructed or sealed, and none exists.
 - No J-space, hidden-reasoning, invisible-CoT or internal-workspace conclusion follows from any of this.
 
 <!-- END GENERATED CURRENT STATE -->

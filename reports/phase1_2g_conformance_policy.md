@@ -269,6 +269,17 @@ added tests and corrected further documents, reaching 399 / 1774, then
 because the differences are the measurable cost of the re-review steps, and
 reporting only the final number would hide it.
 
+**Supersession note, added in Phase 1.2H.** The two SHA-256 values in the table
+above are point-in-time observations at commit `0480f4f`, and they were correct
+then. Phase 1.2H appended an Audit F entry to the policy's `review_provenance`
+block, so `docs/phase1_parser_v3_v2_evaluation_policy.json` now hashes to
+`fda448869aba01bf75e865f38a2e0f35485b83890f9088c50e05e661bfe3421c`. No
+threshold, gate, value, disposition, basis type or `status` field changed, and
+`docs/phase1_2f_threshold_dispositions.json` is byte-identical. The Phase 1.2H
+figure is recorded in `reports/phase1_2h_blocked_set_repair.md` §7. The stale
+value is deliberately left in place rather than rewritten, because this table
+records what was measured when the round closed.
+
 No existing test was weakened, removed, skipped or `xfail`ed. Five Phase 1.2F
 tests pinned the then-correct blocked state and could not survive the policy
 becoming `FINAL`; each was **superseded by a strictly stronger assertion**, with

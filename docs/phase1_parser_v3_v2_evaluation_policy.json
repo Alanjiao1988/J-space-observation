@@ -452,14 +452,16 @@
         "review_provenance": {
           "phase": "1.2G",
           "reviewers": [
-            "Audit A - methodology and statistics, read-only, independent of the authoring pass",
-            "Audit B - repository and instrument consistency, read-only, independent of the authoring pass",
+            "Audit A - methodology and statistics, read-only, independent of the authoring pass; returned 5 findings including 1 blocker",
+            "Audit B - repository and instrument consistency, read-only, independent of the authoring pass; returned 11 findings including 1 blocker, 4 of which duplicated Audit A",
             "Audit C - first post-remediation re-review, read-only; returned 7 findings including 1 blocker",
             "Audit D - second post-remediation re-review, read-only; returned 5 findings including 2 blockers",
-            "Audit E - third post-remediation re-review, read-only; returned 6 findings including 1 blocker"
+            "Audit E - third post-remediation re-review, read-only; returned 6 findings including 1 blocker",
+            "Audit F - Phase 1.2H re-review of the Audit E remediation, read-only; returned 6 findings including 0 blockers and found all six Audit E remediations incomplete"
           ],
           "record": "reports/phase1_2g_audit_findings.md",
-          "limitation": "The reviewers are automated agents operating on this repository under the same instructions as the authoring pass. They are independent of the authoring pass, not of the project. No external human reviewer has approved this value. Each of the three re-reviews found defects in the remediation of the previous one; the remediation of Audit E's findings was not itself independently re-reviewed, and the review regress was terminated by disclosure rather than by reaching a fixed point."
+          "supplementary_record": "reports/phase1_2h_audit_findings.md",
+          "limitation": "The reviewers are automated agents operating on this repository under the same instructions as the authoring pass. They are independent of the authoring pass, not of the project. No external human reviewer has approved this value. Every re-review so far has found defects in the remediation of the previous one, including Audit F, which reopened all six Audit E items. The Audit F remediation is covered by a final-state re-review recorded in the supplementary record. The regress has been terminated by disclosure at each stage rather than by reaching a fixed point, so the correct reading is that this artifact has been repeatedly corrected, not that it has been proven correct."
         },
         "metric_definition": "Maximum number of exact typed-decision mismatches permitted within the residual strata S04, S05, S06 and S09, pooled, together with a per-stratum maximum so that the pooled limit cannot be satisfied while one stratum absorbs every mismatch.",
         "numerator": "exact typed-decision mismatches within S04, S05, S06 and S09",

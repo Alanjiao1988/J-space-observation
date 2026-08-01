@@ -68,6 +68,8 @@ CURRENT_STATE_FILES: tuple[str, ...] = (
     "docs/thread_handoff.md",
     "docs/phase1_parser_v3_v2_evaluation_policy.json",
     "docs/phase1_2f_threshold_dispositions.json",
+    "docs/phase1_2h_execution_access_ledger.json",
+    "reports/phase1_2h_blocked_set_repair.md",
 )
 
 #: Phrases asserting that Phase 1.0C never executed. Applied to
@@ -186,6 +188,12 @@ EXEMPT_JSON_KEYS: tuple[str, ...] = (
     "withdrawn_argument",
     "as_written",
     "quoted_defect",
+    # Audit G finding G-03: a subtree that records an option the round
+    # *declined* is not a live claim, and flagging it manufactures a
+    # contradiction out of a decision record. This sits alongside
+    # ``withdrawn_argument`` for the same reason.
+    "rejected",
+    "considered_and_rejected",
 )
 
 
@@ -229,6 +237,10 @@ SUPERSEDED_FIGURE_FILES: tuple[str, ...] = (
     "reports/phase1_2g_conformance_policy.md",
     "reports/phase1_2g_audit_findings.md",
     "reports/phase1_2f_parser_acceptance_policy.md",
+    "docs/phase1_2h_independent_set_repair_protocol.md",
+    "docs/phase1_2h_execution_access_ledger.json",
+    "reports/phase1_2h_blocked_set_repair.md",
+    "reports/phase1_2h_audit_findings.md",
     "tests/test_parser_v3_repair.py",
     "paper/methods_ledger.md",
 )
@@ -406,14 +418,33 @@ def _is_exempt(block: str) -> bool:
 _TABLE_DELIMITER_CHARS = frozenset(" \t:|-")
 
 
+def _is_delimiter_cell(cell: str) -> bool:
+    """True when one cell is a well-formed Markdown alignment cell.
+
+    Audit E re-review finding R3-NEW-03: the earlier test asked only whether
+    the cell *contained* ``--``, so ``---:---`` passed and an invalid delimiter
+    row still activated quoted-column redaction. The grammar is an optional
+    leading colon, a run of at least two dashes, and an optional trailing
+    colon, with nothing else. Implemented by stripping the two optional colons
+    and requiring the remainder to be dashes only, which is linear and has no
+    quantifier to backtrack over.
+    """
+    body = cell.strip()
+    if body.startswith(":"):
+        body = body[1:]
+    if body.endswith(":"):
+        body = body[:-1]
+    return len(body) >= 2 and set(body) == {"-"}
+
+
 def _is_table_delimiter(line: str, columns: int | None = None) -> bool:
     """True when ``line`` is a Markdown delimiter row of ``columns`` cells.
 
     Third re-review finding R3-NEW-03: the earlier test accepted any
     dash-containing line, so a bare ``---`` under a two-column header was read
     as that table's delimiter and enabled column redaction on text that is not
-    a table at all. Every cell must itself be a delimiter, and when the header's
-    column count is supplied the counts must agree.
+    a table at all. Every cell must itself be a well-formed delimiter, and when
+    the header's column count is supplied the counts must agree.
     """
     stripped = line.strip()
     if not stripped:
@@ -426,7 +457,7 @@ def _is_table_delimiter(line: str, columns: int | None = None) -> bool:
         cells = cells[:-1]
     if not cells:
         return False
-    if not all("--" in cell for cell in cells):
+    if not all(_is_delimiter_cell(cell) for cell in cells):
         return False
     return columns is None or len(cells) == columns
 
@@ -574,6 +605,20 @@ def _search(window: _Window, patterns: Sequence[str]) -> re.Match[str] | None:
     return None
 
 
+def _finditer_raw(window: _Window, pattern: str) -> list[re.Match[str]]:
+    """Return **every** match, not only the first.
+
+    Audit G finding G-02: :func:`scan_superseded_figures` examined
+    ``_search_raw``'s single first match per pattern. When that first occurrence
+    was a legitimate correction --- "90 of 120 is superseded." --- the whole
+    pattern was skipped, so a later live assertion in the same window was never
+    examined at all. A correction earlier in a document must not license an
+    assertion after it.
+    """
+
+    return list(re.finditer(pattern, window.text, re.IGNORECASE))
+
+
 def _search_raw(window: _Window, pattern: str) -> re.Match[str] | None:
     """Match without applying the Phase 1.0C negation guard.
 
@@ -593,11 +638,21 @@ def _enclosing_sentence(text: str, match: re.Match[str]) -> str:
     Every pattern in this module forbids a full stop inside the match, so the
     sentence boundaries are simply the nearest full stops on either side.
     """
+    return _enclosing_sentence_with_offset(text, match)[0]
+
+
+def _enclosing_sentence_with_offset(text: str, match: re.Match[str]) -> tuple[str, int]:
+    """Return the enclosing sentence and the match's offset within it.
+
+    The offset is what lets the superseded-figure guard ask whether a denial is
+    attached to *this* figure rather than merely present somewhere in the same
+    sentence (finding R3-NEW-02).
+    """
     left = text.rfind(".", 0, match.start())
     right = text.find(".", match.end())
     start = 0 if left < 0 else left + 1
     end = len(text) if right < 0 else right
-    return text[start:end]
+    return text[start:end], match.start() - start
 
 
 def _is_negated(text: str, match: re.Match[str]) -> bool:
@@ -624,9 +679,21 @@ def _json_windows(text: str) -> list[_Window]:
     contains both halves, so a two-part pattern could never match. Each mapping
     therefore also contributes a window joining its own scalar fields as
     ``key: value`` pairs, separated by ``;`` rather than ``.`` so that a
-    sentence-scoped pattern can span two fields of one record. Nested mappings
-    are not flattened into the parent, so the join cannot manufacture an
-    adjacency the document does not have.
+    sentence-scoped pattern can span two fields of one record.
+
+    Audit E re-review finding R3-NEW-04 (reopened): restricting the join to a
+    mapping's *own* scalars left a blind spot one level down. Moving the
+    disposition into a nested ``{"decision": {...}}`` object split the claim
+    across two records and neither window saw both halves. Each mapping's
+    window now also carries the scalar fields of its ancestors. That is not the
+    manufactured adjacency the earlier note warned about: every ancestor on the
+    path genuinely co-describes the node, so the pairing is one the document
+    really makes. Siblings in unrelated subtrees are still never joined.
+    Audit G finding G-03: a scalar inside a *list* received no context at all,
+    so moving a value one step into an array --- ``{"disposition":
+    ["REMOVE_REDUNDANT"]}`` --- split the claim again. Scalar list members are
+    now expanded into ``key: value`` fields of the mapping that owns the list,
+    which is what the document means by them.
     """
     try:
         payload = json.loads(text)
@@ -647,38 +714,47 @@ def _json_windows(text: str) -> list[_Window]:
     def add(collapsed: str, number: int) -> None:
         windows.append(_Window(collapsed, tuple([number] * len(collapsed)), number))
 
-    def walk(node: object, exempt: bool) -> None:
+    def scalar_fields(node: dict) -> tuple[str, ...]:
+        fields: list[str] = []
+        for key, value in node.items():
+            if _is_exempt_json_key(key):
+                continue
+            if isinstance(value, (str, int, float, bool)):
+                fields.append(f"{key}: {value}")
+            elif isinstance(value, list):
+                fields.extend(
+                    f"{key}: {item}"
+                    for item in value
+                    if isinstance(item, (str, int, float, bool))
+                )
+        return tuple(fields)
+
+    def walk(node: object, exempt: bool, ancestors: tuple[str, ...]) -> None:
         if isinstance(node, str):
             if exempt:
                 return
             add(re.sub(r"\s+", " ", _elide_markup(node)), line_of(node))
         elif isinstance(node, dict):
-            if not exempt:
-                fields = [
-                    f"{key}: {value}"
-                    for key, value in node.items()
-                    if isinstance(value, (str, int, float, bool))
-                    and not _is_exempt_json_key(key)
-                ]
-                if len(fields) > 1:
-                    joined = re.sub(r"\s+", " ", _elide_markup("; ".join(fields)))
-                    anchor = next(
-                        (
-                            line_of(value)
-                            for value in node.values()
-                            if isinstance(value, str)
-                        ),
-                        1,
-                    )
-                    add(joined, anchor)
+            context = ancestors + scalar_fields(node)
+            if not exempt and len(context) > 1:
+                joined = re.sub(r"\s+", " ", _elide_markup("; ".join(context)))
+                anchor = next(
+                    (
+                        line_of(value)
+                        for value in node.values()
+                        if isinstance(value, str)
+                    ),
+                    1,
+                )
+                add(joined, anchor)
             for key, value in node.items():
                 key_exempt = exempt or _is_exempt_json_key(key)
-                walk(value, key_exempt)
+                walk(value, key_exempt, context)
         elif isinstance(node, list):
             for value in node:
-                walk(value, exempt)
+                walk(value, exempt, ancestors)
 
-    walk(payload, False)
+    walk(payload, False, ())
     return windows
 
 
@@ -778,54 +854,196 @@ def scan_superseded_figures(path: str, text: str) -> list[Contradiction]:
     windows = _json_windows(text) if path.endswith(".json") else _windows(text)
     for window in windows:
         for pattern, reason, negatable in SUPERSEDED_FIGURE_PATTERNS:
-            match = _search_raw(window, pattern)
-            if match is None:
-                continue
-            # A sentence whose point is that the old figure is wrong must not
-            # be reported as asserting it.
-            if negatable and _is_superseded_negated(window.text, match):
-                continue
-            found.append(
-                Contradiction(
-                    path,
-                    window.line_at(match.start()),
-                    "SUPERSEDED_FIGURE",
-                    f"{match.group(0)} - {reason}",
+            for match in _finditer_raw(window, pattern):
+                # A sentence whose point is that the old figure is wrong must
+                # not be reported as asserting it. Every occurrence is judged
+                # on its own: an earlier correction does not license a later
+                # assertion (G-02).
+                if negatable and _is_superseded_negated(window.text, match):
+                    continue
+                found.append(
+                    Contradiction(
+                        path,
+                        window.line_at(match.start()),
+                        "SUPERSEDED_FIGURE",
+                        f"{match.group(0)} - {reason}",
+                    )
                 )
-            )
     return found
 
 
-#: Sentence-scoped clauses that state a superseded figure in order to deny it.
-#: Deliberately narrow, and required to sit in the same sentence as the match,
-#: so a reassuring word elsewhere in the paragraph cannot buy an exemption.
+#: Clauses that deny a superseded figure, split by where they must sit relative
+#: to the figure they deny.
 #:
-#: Third re-review finding R3-NEW-02 narrowed these further. A bare ``not`` or
-#: ``does not`` anywhere in the sentence used to exempt the match, so
-#: "The gates pin 90 of 120 cases, which does not meet the target" — a live
-#: assertion of the retired figure — was suppressed by a negation aimed at
-#: something else entirely. A denial now qualifies only when it is *about the
-#: figure*: a corrective contrast, an explicit falsity verb, or a supersession
-#: marker.
-SUPERSEDED_NEGATION_PATTERNS: tuple[str, ...] = (
-    r"\bnot\s+(?:\*\*)?(?:\d+|ninety|thirty|three|S\d\d)\b",
-    r"\b(?:was|is|were|are)\s+(?:already\s+)?"
-    r"(?:wrong|false|incorrect|superseded|corrected|retired|withdrawn)\b",
-    r"\bno longer\b",
+#: Audit E re-review finding R3-NEW-02: sentence-wide matching was still too
+#: loose even after the third re-review narrowed the vocabulary. "The mandatory
+#: gates pin 90 of 120 cases, not 80 of 120 cases." asserts the retired figure
+#: and was exempted, because a negation aimed at the *replacement* number
+#: satisfied a sentence-wide search. The same held for "rather than". A denial
+#: now counts only when it is positionally attached to the matched figure:
+#: a pre-marker must sit immediately before the match, a post-marker
+#: immediately after it. Both are still confined to the enclosing sentence.
+SUPERSEDED_NEGATION_PRE_PATTERNS: tuple[str, ...] = (
+    r"\bnot\b",
     r"\b(?:rather than|instead of)\b",
     r"\bpreviously\s+(?:listed|gave|recorded|said|stated|read)\b",
     r"\bused to\s+(?:say|read|state|record)\b",
+    r"\bno longer\b",
     r"\bsupersed(?:ed|es)\b",
+    r"\b(?:was|were)\b",
+)
+SUPERSEDED_NEGATION_POST_PATTERNS: tuple[str, ...] = (
+    r"\b(?:was|is|were|are)\s+(?:already\s+)?"
+    r"(?:wrong|false|incorrect|superseded|corrected|retired|withdrawn)\b",
+    # Audit G finding G-02: the ordinary attached correction form. "The former
+    # figure, 90 of 120 cases, is not correct." was being reported as an
+    # assertion of the figure it corrects. Requiring the copula keeps the bare
+    # "..., not 80 of 120 cases" contrastive form outside this pattern, so the
+    # R3-NEW-02 leak stays closed.
+    r"\b(?:was|is|were|are)\s+not\s+(?:true|correct|accurate|right|current)\b",
+    r"\bno longer\b",
+    r"\bis\s+now\b",
+    r"\bsupersed(?:ed|es)\b",
+    r"\bdo not cite\b",
+)
+
+#: Frames that mark what follows as *mentioned* rather than asserted. A frame
+#: alone is not a denial - "the claim that 90 of 120 cases are pinned is
+#: correct" would still be an assertion - so a frame exempts only when the same
+#: sentence also carries a falsity or supersession marker. That keeps genuine
+#: corrections writable without reopening the R3-NEW-02 leak, where a denial
+#: aimed at a different clause bought an exemption on its own.
+SUPERSEDED_MENTION_FRAMES: tuple[str, ...] = (
+    r"\bclaims?(?:ed)? that\b",
+    r"\bstatement that\b",
+    r"\bassertion that\b",
+    r"\b(?:text|record|entry|document|version)\s+(?:said|read|stated)\b",
+    r"\b(?:said|read|stated)\s+that\b",
+    r"\bwording\b",
+)
+
+#: Falsity vocabulary that may sit anywhere in the mention-framed **clause**.
+#:
+#: Audit G finding G-02: the search was sentence-wide, so "The claim that 90 of
+#: 120 cases are pinned is correct; the rejected alternative is false." bought
+#: an exemption from a falsity marker belonging to a different clause -- while
+#: the framed clause itself affirmed the retired figure. The marker must share
+#: a clause with the figure it disowns.
+SUPERSEDED_FALSITY_MARKERS: tuple[str, ...] = (
+    r"\b(?:wrong|false|incorrect|superseded|withdrawn|retired|stale|obsolete)\b",
+    r"\bno longer\b",
+    r"\bcorrected\b",
+    r"\bnot\s+(?:true|correct|accurate)\b",
+)
+
+#: Clause separators. A semicolon or colon ends the span within which a mention
+#: frame's falsity marker is allowed to sit.
+_CLAUSE_SEPARATORS = r"[;:]"
+
+#: A following clause that opens with a back-reference is still talking about
+#: the same figure --- "The old text said 90 of 120; **that** is no longer
+#: correct." --- so its falsity marker counts. A following clause that opens
+#: with a fresh noun phrase is talking about something else, which is exactly
+#: how Audit G's counterexample bought an exemption: "...is correct; **the
+#: rejected alternative** is false."
+_ANAPHORIC_CLAUSE_OPENERS = re.compile(
+    r"^[\s\W]*(?:that|this|it|which|these|those|the former|the figure|"
+    r"the same|the old (?:one|figure|text|wording))\b",
+    re.IGNORECASE,
+)
+
+#: How far either side of the match a positional marker may sit. Wide enough
+#: for "was previously listed as", narrow enough that a marker attached to a
+#: different clause of the same sentence cannot reach.
+_NEGATION_WINDOW = 36
+
+#: A pre-marker may be separated from the figure it denies by one copular or
+#: prepositional connective, because such a connective still binds the marker
+#: to whatever follows it: "previously listed as 90 of 120" denies exactly that
+#: figure. Without this, "previously listed" could fire only in the ungrammatical
+#: form "previously listed 90 of 120", so the vocabulary entry claimed a
+#: coverage it did not have. No connective is allowed after a post-marker,
+#: where the same latitude would re-admit the R3-NEW-02 leak.
+_PRE_CONNECTIVE = r"(?:\s+(?:as|to|at|of|being|reading))?"
+
+#: A post-marker may be separated from the figure by the unit noun the figure
+#: counts --- "90 of 120 **cases**, is not correct" --- because the noun is part
+#: of the same noun phrase. Audit G finding G-02 surfaced this: the shorter
+#: "90 of 120" pattern matched, leaving " cases," between the figure and its
+#: correction, so an ordinary erratum was reported as an assertion. Only unit
+#: nouns are allowed, so a second clause still cannot reach across.
+_POST_UNIT = r"(?:\s*(?:cases?|figures?|objects?|items?|strata|stratum)\b)?"
+
+#: Retained for callers and tests that ask what vocabulary is recognised.
+SUPERSEDED_NEGATION_PATTERNS: tuple[str, ...] = (
+    SUPERSEDED_NEGATION_PRE_PATTERNS + SUPERSEDED_NEGATION_POST_PATTERNS
 )
 
 
 def _is_superseded_negated(text: str, match: re.Match[str]) -> bool:
-    """True when the enclosing sentence denies the superseded figure."""
-    sentence = _enclosing_sentence(text, match)
-    return any(
-        re.search(pattern, sentence, re.IGNORECASE)
-        for pattern in SUPERSEDED_NEGATION_PATTERNS
+    """True when the enclosing sentence denies *this* superseded figure.
+
+    The denial must be positionally attached to the match. A negation that
+    denies some other quantity in the same sentence no longer buys an
+    exemption, which is the whole of finding R3-NEW-02.
+    """
+    sentence, offset = _enclosing_sentence_with_offset(text, match)
+    start = offset
+    end = offset + len(match.group(0))
+    before = sentence[max(0, start - _NEGATION_WINDOW) : start]
+    after = sentence[end : end + _NEGATION_WINDOW]
+    if any(
+        re.search(pattern + _PRE_CONNECTIVE + r"[\s\W]*$", before, re.IGNORECASE)
+        for pattern in SUPERSEDED_NEGATION_PRE_PATTERNS
+    ):
+        return True
+    if any(
+        re.search(r"^[\s\W]*" + _POST_UNIT + r"[\s\W]*" + pattern, after, re.IGNORECASE)
+        for pattern in SUPERSEDED_NEGATION_POST_PATTERNS
+    ):
+        return True
+    framed = any(
+        re.search(pattern + _PRE_CONNECTIVE + r"[\s\W]*$", before, re.IGNORECASE)
+        for pattern in SUPERSEDED_MENTION_FRAMES
     )
+    if not framed:
+        return False
+    clause = _enclosing_clause(sentence, start, end)
+    return any(
+        re.search(pattern, clause, re.IGNORECASE)
+        for pattern in SUPERSEDED_FALSITY_MARKERS
+    )
+
+
+def _enclosing_clause(sentence: str, start: int, end: int) -> str:
+    """Return the span within which a mention frame's falsity marker counts.
+
+    That span is the semicolon/colon-delimited clause containing
+    ``[start, end)``, extended over the following clause when that clause opens
+    with a back-reference to the same figure.
+
+    A mention frame says the figure is being quoted; the falsity marker says the
+    quotation is wrong. Audit G showed those two can sit in different clauses
+    and still combine into an exemption, which lets an affirming clause hide
+    behind a disowning one about some other subject. Requiring either the same
+    clause or an anaphoric continuation keeps ordinary errata writable while
+    closing that.
+    """
+
+    lower = 0
+    upper = len(sentence)
+    following = len(sentence)
+    for separator in re.finditer(_CLAUSE_SEPARATORS, sentence):
+        position = separator.start()
+        if position < start:
+            lower = max(lower, position + 1)
+        elif position >= end:
+            upper = min(upper, position)
+            following = position + 1
+            break
+    if _ANAPHORIC_CLAUSE_OPENERS.match(sentence[following:]):
+        return sentence[lower:]
+    return sentence[lower:upper]
 
 
 def scan_files(

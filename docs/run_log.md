@@ -3789,3 +3789,112 @@ Azure writes or resource changes `0`. Formal evaluation ordinal `0`.
 `parser-v3-v2`. No construction, migration, replacement review, manifest
 generation, sealing, authorization lock, image build, preregistration, Stage P
 or Stage E is authorized by this round.
+
+## 2026-07-26 — Phase 1.2H: independent `parser-v3-v2` set repair — BLOCKED ON SOURCE ACCESS
+
+**Baseline:** `origin/main` at `0480f4f`.
+**Terminal status:** `BLOCKED_ON_PRIVATE_SOURCE_ACCESS`.
+**Protocol:** `docs/phase1_2h_independent_set_repair_protocol.md` (registered, `UNEXECUTED`).
+**Report:** `reports/phase1_2h_blocked_set_repair.md`.
+**Audit record:** `reports/phase1_2h_audit_findings.md`.
+**Live state:** `docs/phase1_2h_execution_access_ledger.json`.
+
+**What was authorized.** Read-only custodial access to the retired
+`parser-v3-v1` sealed inputs and labels; one-way import under a new
+`parser-v3-v2` identity; `N1`-`N6` normalization; blind semantic review by
+isolated reviewers with an arbiter; replacement curation; construction of
+exactly one 120-case set; pre-seal audits; create-only sealing.
+
+**What happened.** The round terminated at the first hard precondition. The
+authoritative sealed source was resolved from committed evidence and probed for
+reachability at the control plane and container-metadata layer only. The storage
+account reports `publicNetworkAccess = Disabled` and the data plane refused the
+request under its network rules. The registered read path is a user-assigned
+managed identity exercised from in-network compute, which is unobtainable from
+the workstation this round ran on. The authorization forbids substituting an
+unverified local copy when the sealed source is unavailable, so the round
+blocked.
+
+Standing up in-network compute was considered and rejected: the blind semantic
+review executes as reviewing agents outside that network, so reading private
+content inside the boundary in order to ship it out would defeat the isolation
+the network rules encode.
+
+**What the round did produce.**
+
+1. **Audit F** — the independent re-review Phase 1.2G had honestly disclosed as
+   missing. It found **all six** Audit E remediations incomplete (0 blockers,
+   5 majors), with a working counterexample for each. All six were fixed and
+   regression-pinned.
+2. **A live execution/access ledger** and its validator, separating live access
+   state from the `FINAL` policy's finalization snapshot, bound to the policy by
+   both a full-file hash and a `policy_semantics_sha256` computed with
+   `execution_state` projected out.
+3. **A registered, explicitly unexecuted protocol** that states what was
+   deliberately *not* frozen, and why.
+
+**Private-access ledger.** Retired-v1 sealed inputs semantically read `0`.
+Sealed labels semantically read `0`. Private curator files read `0`. Labels
+opened for scoring `0`. Byte-only integrity verifications `2`. Cases constructed
+`0`. Cases reviewed `0`. Sets sealed `0`. Listing witnesses `0`. Final contracts
+`0`. Parser invocations `0`. Candidate predictions `0`. Comparator predictions
+`0`. Preregistrations `0`. Formal evaluations `0`. Azure control-plane reads `6`;
+data-plane content reads `0`; data-plane writes `0`; resource creations or
+changes `0`; job executions `0`.
+
+Because no semantic read occurred, the `REPAIR_ACCESSED` transition did not
+happen. `parser-v3-v1` remains `SEALED / UNSPENT / UNSCORABLE /
+RETIRED_AS_INELIGIBLE`, unqualified and byte-unchanged. `parser-v3-v2` does not
+exist; its `sealed_object_count` is `null`, not `0`, because under `L-32` that
+quantity requires an authenticated seal-time observation.
+
+**Not claimed.** Parser v3 remains unvalidated. Phase 1.0C was executed and
+finalized `INCONCLUSIVE`; it is target-model task/headroom screening, not parser
+calibration. No formal evaluation has occurred. No J-space, hidden-reasoning,
+internal-workspace or invisible-CoT conclusion follows.
+
+**Next gate:** a separately authorized round whose sole objective is to
+establish authenticated, read-only, in-network access to the retired sealed
+source under a boundary in which semantic review also occurs inside the network.
+That round is not preregistration, not evaluation, not construction and not
+sealing.
+
+
+## Phase 1.2H — Audit G final-state re-review and remediation
+
+Audit G reviewed the remediated Phase 1.2H state and returned **1 blocker, 4
+majors and 1 minor**. All six were reproduced with the auditor's counterexample,
+fixed, and re-checked.
+
+The blocker (`G-01`) is the serious one. The ledger's `retired_v1_state` and
+`successor_set_state` blocks were rendered into the current-state documents and
+validated by nothing. The auditor set them to a fully constructed 120-case
+sealed set while `sets_sealed` stayed `0` and the status stayed blocked; the
+ledger validated and the generator published it. A `retired_v1_semantic_read`
+event was accepted with both read counters at zero, and succession accepted a
+status-only jump to `SEALED_READY_FOR_PREREGISTRATION`.
+
+The remediation closes the schemas for the ledger top level, both state blocks
+and every event; reconciles each narrated field against the counter that
+measures the same thing; requires every access event to be counter-backed;
+rejects the three event kinds this phase never authorises; validates both
+records before comparing them for succession; and validates the ledger before
+the generator renders it.
+
+`G-04` narrowed the semantic projection. Excluding the whole `execution_state`
+block also excluded its free-text `final_policy_is_not_a_result` statement, so
+that statement could assert "a formal evaluation was run and parser v3 was
+validated" without moving the hash the ledger binds. Only the five mutable
+counters are now excluded, and the statement is constrained against asserting a
+result. The policy's top-level key set was also closed, because a top-level
+`parser_v3_v2_evaluations_run` had validated cleanly.
+
+`G-02`, `G-03` and `G-05` tightened the consistency scanner and the
+parser-isolation check. `G-06` withdrew an unsupported convergence claim from
+`L-38`.
+
+**Unchanged by all of this.** No private access occurred, no parser ran, no
+prediction was generated, no set was constructed or sealed, and the terminal
+status remains `BLOCKED_ON_PRIVATE_SOURCE_ACCESS`. The policy's threshold, gate,
+ontology, population, comparator and status blocks are byte-identical to Phase
+1.2G.

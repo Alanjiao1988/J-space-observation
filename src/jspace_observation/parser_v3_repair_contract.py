@@ -1527,6 +1527,7 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
         )
 
     _validate_comparators(policy, non_binding)
+    _validate_policy_top_level(policy)
     _validate_execution_state(policy)
     _reject_superseded_figures(policy, coverage)
     return dict(policy)
@@ -1634,18 +1635,117 @@ def _is_zero_count(value: Any) -> bool:
     return isinstance(value, int) and not isinstance(value, bool) and value == 0
 
 
+#: Counters that a FINAL policy must carry and must state as integer zero.
+EXECUTION_STATE_ZERO_COUNTS: tuple[str, ...] = (
+    "predictions_generated",
+    "locked_label_reads",
+    "parser_v3_runs_against_any_locked_set",
+    "parser_v3_v2_sealed_sets_constructed",
+)
+
+#: The complete permitted key set of the policy document itself.
+#:
+#: Audit G finding G-04: only ``execution_state`` was closed, so
+#: ``policy["parser_v3_v2_evaluations_run"] = 1`` sat at the *top* level and
+#: ``validate_policy`` accepted it. Closing one nested block while leaving its
+#: parent open moves the defect rather than fixing it.
+POLICY_TOP_LEVEL_KEYS: frozenset[str] = frozenset(
+    {
+        "schema_version",
+        "policy_id",
+        "status",
+        "phase",
+        "supersedes",
+        "does_not_supersede",
+        "purpose",
+        "errata",
+        "post_hoc_disclosure",
+        "ontology",
+        "population",
+        "gates",
+        "gate_coverage_analysis",
+        "acceptance_thresholds",
+        "comparators",
+        "status_logic",
+        "provenance",
+        "gates_error_semantics",
+        "confusion_matrix_analysis_summary",
+        "canonical_source_of_truth",
+        "execution_state",
+    }
+)
+
+#: Claims the ``final_policy_is_not_a_result`` statement may never make. The
+#: field is free text so that it can be written clearly, but free text is how
+#: Audit G turned it into "A formal evaluation was run and parser v3 was
+#: validated." while every counter stayed zero.
+_FORBIDDEN_RESULT_CLAIMS: tuple[tuple[str, str], ...] = (
+    (r"\bevaluation\s+was\s+run\b", "asserts that an evaluation was run"),
+    (r"\bwas\s+(?:formally\s+)?evaluated\b", "asserts that an evaluation occurred"),
+    (r"\bparser\s+v3\s+(?:was|is)\s+validated\b", "asserts parser-v3 validation"),
+    (r"\bhas\s+been\s+validated\b", "asserts validation"),
+    (r"\bis\s+(?:now\s+)?(?:accepted|non-regressive|fit for)\b", "asserts acceptance"),
+    (r"\bpredictions?\s+(?:were|was)\s+generated\b", "asserts prediction generation"),
+)
+
+#: Statements the field must make. Requiring them means the sentence cannot be
+#: emptied out into something vacuously true.
+_REQUIRED_RESULT_DISCLAIMERS: tuple[tuple[str, str], ...] = (
+    (r"\bparser v3 remains unvalidated\b", "parser v3 remains unvalidated"),
+    (r"\bno evaluation has been run\b", "no evaluation has been run"),
+)
+
+#: The complete permitted key set of ``policy.execution_state``. Closed by
+#: finding R3-NEW-05 so that an unrecognised counter cannot assert an execution
+#: alongside the validated zeros.
+EXECUTION_STATE_KEYS: frozenset[str] = frozenset(
+    {
+        "formal_evaluation_execution_state",
+        "formal_evaluation_ordinal",
+        "final_policy_is_not_a_result",
+        *EXECUTION_STATE_ZERO_COUNTS,
+    }
+)
+
+
 def _validate_execution_state(policy: Mapping[str, Any]) -> None:
     """Require the policy to state, machine-readably, that nothing has run.
 
     A FINAL policy is a decision about how a future evaluation will be judged.
     It is not a result. Recording the execution state next to the policy status
     is what stops the first from being read as the second.
+
+    Audit E re-review finding R3-NEW-05: validating only the *named* counters
+    left the block open. ``"parser_v3_v2_evaluations_run": 1`` sat next to the
+    zeroed fields and every check passed, so the policy could assert an
+    execution that the contract was written to forbid. The key set is therefore
+    closed: an unrecognised counter is a defect, not a free-text annotation.
+    Widening it is a deliberate edit to this list, which is the point.
     """
     execution = policy.get("execution_state")
     if not isinstance(execution, Mapping):
         raise ContractError(
             "policy.execution_state must be an object; a FINAL policy must state "
             "that no evaluation has occurred"
+        )
+    unknown = sorted(set(execution) - EXECUTION_STATE_KEYS)
+    if "sealed_sets_constructed" in execution:
+        raise ContractError(
+            "policy.execution_state.sealed_sets_constructed is unscoped and "
+            "contradicts parser-v3-v1 having been sealed; use "
+            "parser_v3_v2_sealed_sets_constructed"
+        )
+    if unknown:
+        raise ContractError(
+            "policy.execution_state carries unrecognised field(s) "
+            f"{unknown}; the execution-state block is a closed schema so that "
+            "an unvalidated counter cannot assert an execution beside the "
+            "zeroed ones"
+        )
+    missing = sorted(EXECUTION_STATE_KEYS - set(execution))
+    if missing:
+        raise ContractError(
+            f"policy.execution_state is missing required field(s) {missing}"
         )
     if execution.get("formal_evaluation_execution_state") != "NOT_RUN":
         raise ContractError(
@@ -1657,12 +1757,7 @@ def _validate_execution_state(policy: Mapping[str, Any]) -> None:
         raise ContractError(
             "policy.execution_state.formal_evaluation_ordinal must be 0"
         )
-    for field in (
-        "predictions_generated",
-        "locked_label_reads",
-        "parser_v3_runs_against_any_locked_set",
-        "parser_v3_v2_sealed_sets_constructed",
-    ):
+    for field in EXECUTION_STATE_ZERO_COUNTS:
         if field not in execution:
             raise ContractError(
                 f"policy.execution_state.{field} is required; a FINAL policy "
@@ -1670,17 +1765,43 @@ def _validate_execution_state(policy: Mapping[str, Any]) -> None:
             )
         if not _is_zero_count(execution[field]):
             raise ContractError(f"policy.execution_state.{field} must be 0")
-    if "sealed_sets_constructed" in execution:
-        raise ContractError(
-            "policy.execution_state.sealed_sets_constructed is unscoped and "
-            "contradicts parser-v3-v1 having been sealed; use "
-            "parser_v3_v2_sealed_sets_constructed"
-        )
     note = execution.get("final_policy_is_not_a_result")
     if not isinstance(note, str) or not note.strip():
         raise ContractError(
             "policy.execution_state must state that a FINAL policy is not a "
             "parser validation result"
+        )
+    for pattern, description in _FORBIDDEN_RESULT_CLAIMS:
+        if re.search(pattern, note, re.IGNORECASE):
+            raise ContractError(
+                "policy.execution_state.final_policy_is_not_a_result "
+                f"{description}; this field records that the policy is not a "
+                "result and may not be used to assert one"
+            )
+    for pattern, description in _REQUIRED_RESULT_DISCLAIMERS:
+        if not re.search(pattern, note, re.IGNORECASE):
+            raise ContractError(
+                "policy.execution_state.final_policy_is_not_a_result must state "
+                f"that {description}"
+            )
+
+
+def _validate_policy_top_level(policy: Mapping[str, Any]) -> None:
+    """Reject any top-level key the schema does not define.
+
+    Audit G finding G-04. A top-level ``parser_v3_v2_evaluations_run`` passed
+    every check because validation only ever descended into blocks it already
+    knew about. An unrecognised key at the root is a defect for the same reason
+    it is inside ``execution_state``: nothing validates it, and it reads as
+    though it were part of the policy.
+    """
+
+    unknown = sorted(set(policy) - POLICY_TOP_LEVEL_KEYS)
+    if unknown:
+        raise ContractError(
+            f"policy carries unrecognised top-level field(s) {unknown}; the "
+            "policy schema is closed so that an unvalidated field cannot assert "
+            "an execution, a threshold or a result beside the validated ones"
         )
 
 

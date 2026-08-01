@@ -1,0 +1,134 @@
+{
+  "schema_version": "phase1-parser-v3-v2-execution-access-ledger/v1",
+  "ledger_id": "phase1-parser-v3-v2-execution-access-ledger",
+  "phase": "1.2H",
+  "status": "BLOCKED_ON_PRIVATE_SOURCE_ACCESS",
+  "purpose": "Carry the live, append-only, role-scoped execution and access state for the parser-v3-v2 set-repair lifecycle, so that the FINAL Phase 1.2G acceptance policy never has to be edited to record that something happened.",
+  "policy_binding": {
+    "policy_path": "docs/phase1_parser_v3_v2_evaluation_policy.json",
+    "policy_sha256": "fda448869aba01bf75e865f38a2e0f35485b83890f9088c50e05e661bfe3421c",
+    "policy_schema_version": "phase1-parser-v3-prospective-evaluation-policy/v3",
+    "policy_status": "FINAL",
+    "policy_bytes_modified_this_round": true,
+    "policy_semantics_sha256": "ae375481be95ae9f91265c0a9e9ff88ebfa4203cfb518e19287873426138c8ee",
+    "semantic_projection_excludes": [],
+    "bytes_modified_note": "One block changed: review_provenance. Audit A and Audit B were listed without finding counts while C, D and E carried them, and the limitation asserted that the Audit E remediation had not been re-reviewed, which Phase 1.2H made false by re-reviewing it. No threshold, gate, population figure, ontology entry, comparator role, status rule or execution_state value was touched.",
+    "note": "policy_semantics_sha256 is computed over the policy with the five mutable execution_state counters listed in semantic_projection_counter_excludes projected out, and nothing else. It is the load-bearing binding: it stays stable across any future licensed counter increment, so a change to a threshold, gate, ontology entry, population figure, comparator role, status rule or execution-state prose cannot hide behind a routine state update. Audit G rejected the earlier design, which projected out the whole execution_state block: excluding a container also excludes the free text inside it, and that text could then be rewritten to assert a completed evaluation without moving the hash.",
+    "semantic_projection_counter_excludes": [
+      "formal_evaluation_ordinal",
+      "locked_label_reads",
+      "parser_v3_runs_against_any_locked_set",
+      "parser_v3_v2_sealed_sets_constructed",
+      "predictions_generated"
+    ]
+  },
+  "phase_1_2g_finalization_snapshot": {
+    "role": "Immutable snapshot of the execution_state block as the Phase 1.2G policy finalized it. It is history, not live state; live state is live_counters below.",
+    "values": {
+      "formal_evaluation_execution_state": "NOT_RUN",
+      "formal_evaluation_ordinal": 0,
+      "predictions_generated": 0,
+      "locked_label_reads": 0,
+      "parser_v3_runs_against_any_locked_set": 0,
+      "parser_v3_v2_sealed_sets_constructed": 0,
+      "final_policy_is_not_a_result": "status=FINAL records that the rule for judging a future evaluation is settled. It records nothing about any parser. Parser v3 remains unvalidated, parser-v3-v1 remains SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE, no set exists for parser-v3-v2, and no evaluation has been run."
+    }
+  },
+  "live_counters": {
+    "retired_v1_repair_access": {
+      "sealed_input_semantic_reads": 0,
+      "sealed_label_semantic_reads": 0,
+      "private_curator_files_read": 0,
+      "byte_only_integrity_verifications": 2,
+      "labels_opened_for_scoring": 0
+    },
+    "formal_v2_evaluation_access": {
+      "sealed_input_semantic_reads": 0,
+      "sealed_label_semantic_reads": 0,
+      "labels_opened_for_scoring": 0,
+      "formal_evaluations_run": 0,
+      "preregistrations_completed": 0
+    },
+    "v2_construction": {
+      "candidate_cases_constructed": 0,
+      "candidate_cases_reviewed": 0,
+      "replacement_candidates_generated": 0,
+      "sets_sealed": 0,
+      "listing_witnesses_obtained": 0,
+      "final_contracts_compiled": 0
+    },
+    "parser_execution": {
+      "parser_invocations_on_private_or_locked_data": 0,
+      "candidate_predictions_generated": 0,
+      "comparator_predictions_generated": 0
+    },
+    "azure": {
+      "control_plane_reads": 6,
+      "data_plane_content_reads": 0,
+      "data_plane_writes": 0,
+      "resource_creations_or_changes": 0,
+      "job_executions": 0
+    }
+  },
+  "counter_semantics": {
+    "retired_v1_repair_access": "Access to the retired parser-v3-v1 sealed set for repair purposes only. A semantic read decodes case content; a byte-only integrity verification streams bytes to a digest and discards them. They are counted separately because only the first changes what a human has seen.",
+    "formal_v2_evaluation_access": "Access to a future sealed parser-v3-v2 set for formal evaluation. Distinct from repair access: a repair read must never be reported as, or aggregated with, an evaluation read.",
+    "v2_construction": "Construction, sealing, listing-witness and final-contract activity for the successor set.",
+    "parser_execution": "Parser invocations and prediction generation. Must remain zero for the whole of Phase 1.2H.",
+    "azure": "Control-plane reads are configuration and existence queries. Data-plane content reads and writes are object access. They are separate because a reachability probe is not a data access."
+  },
+  "events": [
+    {
+      "sequence": 1,
+      "kind": "baseline_verification",
+      "role": "primary_integrator",
+      "summary": "Verified HEAD == origin/main == 0480f4fae869090d8bd2abc72373e9a0e1dd3e49, clean worktree, focused suite 446 passed, full suite 1821 passed.",
+      "private_content_read": false
+    },
+    {
+      "sequence": 2,
+      "kind": "byte_only_integrity_verification",
+      "role": "primary_integrator",
+      "summary": "Streamed the two local retired-v1 curator files to SHA-256 and compared digest and byte count against the committed public set manifest. Both matched. Bytes were discarded; no record was decoded, parsed, printed or retained.",
+      "private_content_read": false
+    },
+    {
+      "sequence": 3,
+      "kind": "source_authentication_attempt",
+      "role": "primary_integrator",
+      "summary": "Resolved the registered authoritative sealed source from committed evidence and probed reachability at the control plane and at the container metadata layer only. The storage account reports publicNetworkAccess=Disabled and the data plane refused the request under its network rules. The registered set prefix was never listed and no object was requested.",
+      "private_content_read": false
+    },
+    {
+      "sequence": 4,
+      "kind": "terminal_determination",
+      "role": "primary_integrator",
+      "summary": "The authoritative retired-v1 source cannot be authenticated or read with the required read-only boundary from this environment, so the local curator copy may not be substituted for it. Round terminated BLOCKED_ON_PRIVATE_SOURCE_ACCESS before any private access.",
+      "private_content_read": false
+    }
+  ],
+  "retired_v1_state": {
+    "set_id": "parser-v3-v1",
+    "sealed_bytes_unchanged": true,
+    "repair_input_content_accessed": false,
+    "repair_label_content_accessed": false,
+    "repair_access_purpose": "none exercised; this round did not reach the authoritative source",
+    "formal_evaluation_ever_run": false,
+    "prediction_streams_generated_against_v1": 0,
+    "labels_opened_for_scoring": 0,
+    "formally_scorable": false,
+    "formal_eligibility": "RETIRED_AS_INELIGIBLE",
+    "current_state_label": "SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE",
+    "current_state_note": "The Phase 1.2H state transition to REPAIR_ACCESSED did NOT occur, because no semantic read of the retired source took place. UNSPENT therefore remains accurate without qualification."
+  },
+  "successor_set_state": {
+    "set_id": "parser-v3-v2",
+    "exists": false,
+    "cases_constructed": 0,
+    "sealed": false,
+    "sealed_object_count": null,
+    "sealed_object_count_note": "null, not zero. Under limitation L-32 a sealed member list and sealed_object_count require an authenticated seal-time observation. No set was sealed, so the quantity is undefined rather than measured to be zero, and an offline assertion must not stand in for the observation.",
+    "preregistered": false,
+    "formal_evaluation_ordinal": 0
+  }
+}

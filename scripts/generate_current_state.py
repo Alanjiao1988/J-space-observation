@@ -39,13 +39,42 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import hashlib
+import importlib.util
 import json
 import sys
 from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _load_ledger_validator():
+    """Load the ledger validator *by file path*, not through the package.
+
+    ``jspace_observation/__init__.py`` eagerly imports the legacy parser, so a
+    package-level import would pull parser code into this generator's process
+    and cost roughly thirty seconds. The ledger module imports only ``hashlib``,
+    ``json`` and ``typing``, so loading it directly is both faithful and free of
+    any parser dependency.
+    """
+
+    path = REPO_ROOT / "src" / "jspace_observation" / "parser_v3_v2_access_ledger.py"
+    spec = importlib.util.spec_from_file_location("_p12h_access_ledger", path)
+    if spec is None or spec.loader is None:  # pragma: no cover - defensive
+        raise RuntimeError(f"cannot load the ledger validator from {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+_LEDGER = _load_ledger_validator()
+validate_ledger = _LEDGER.validate_ledger
+LedgerError = _LEDGER.LedgerError
+
 POLICY_PATH = REPO_ROOT / "docs" / "phase1_parser_v3_v2_evaluation_policy.json"
+LEDGER_PATH = REPO_ROOT / "docs" / "phase1_2h_execution_access_ledger.json"
 
 BEGIN_MARKER = "<!-- BEGIN GENERATED CURRENT STATE -->"
 END_MARKER = "<!-- END GENERATED CURRENT STATE -->"
@@ -73,6 +102,9 @@ INVARIANT_STATEMENTS: tuple[str, ...] = (
     "**unvalidated**.",
     "`parser-v3-v1` remains `SEALED / UNSPENT / UNSCORABLE / "
     "RETIRED_AS_INELIGIBLE`, byte-unchanged.",
+    "Phase 1.2H terminated `BLOCKED_ON_PRIVATE_SOURCE_ACCESS` before any "
+    "private access. No `parser-v3-v2` set was constructed or sealed, and none "
+    "exists.",
     "No J-space, hidden-reasoning, invisible-CoT or internal-workspace "
     "conclusion follows from any of this.",
 )
@@ -80,6 +112,69 @@ INVARIANT_STATEMENTS: tuple[str, ...] = (
 
 def _load_policy() -> dict[str, Any]:
     return json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+
+
+def _load_ledger() -> dict[str, Any]:
+    """Load the ledger and refuse to render an invalid one.
+
+    Audit G showed the generator faithfully rendering a fabricated sealed
+    successor set --- ``exists true``, ``sealed true``, ``sealed_object_count
+    120`` --- because loading and rendering never asked whether the record was
+    coherent. Validating here means the current-state documents cannot publish a
+    claim the ledger's own validator would reject.
+    """
+
+    ledger = json.loads(LEDGER_PATH.read_text(encoding="utf-8"))
+    policy = _load_policy()
+    policy_sha256 = hashlib.sha256(
+        POLICY_PATH.read_text(encoding="utf-8").replace("\r\n", "\n").encode("utf-8")
+    ).hexdigest()
+    validate_ledger(ledger, policy=policy, policy_sha256=policy_sha256)
+    return ledger
+
+
+def _render_ledger_lines(ledger: dict[str, Any]) -> list[str]:
+    """Render the live access state from the ledger, deriving every figure.
+
+    Phase 1.2H. The policy's ``execution_state`` block is a finalization
+    snapshot, not live state. The live state lives in the ledger, and rendering
+    it here from the file means a current-state document cannot restate an
+    access count that the ledger does not carry.
+    """
+
+    repair = ledger["live_counters"]["retired_v1_repair_access"]
+    execution = ledger["live_counters"]["parser_execution"]
+    azure = ledger["live_counters"]["azure"]
+    successor = ledger["successor_set_state"]
+    retired = ledger["retired_v1_state"]
+    count = successor["sealed_object_count"]
+    return [
+        f"- Live access ledger: `{LEDGER_PATH.name}`, phase "
+        f"**{ledger['phase']}**, status **{ledger['status']}**.",
+        f"- Retired `{retired['set_id']}` repair access: sealed inputs read "
+        f"**{repair['sealed_input_semantic_reads']}**, sealed labels read "
+        f"**{repair['sealed_label_semantic_reads']}**, private curator files "
+        f"read **{repair['private_curator_files_read']}**, byte-only integrity "
+        f"verifications **{repair['byte_only_integrity_verifications']}** "
+        f"(a digest of a file is not a read of its content). State: "
+        f"**{retired['current_state_label']}**.",
+        f"- Successor `{successor['set_id']}`: exists "
+        f"**{str(successor['exists']).lower()}**, cases constructed "
+        f"**{successor['cases_constructed']}**, sealed "
+        f"**{str(successor['sealed']).lower()}**, `sealed_object_count` "
+        f"**{'null' if count is None else count}** "
+        f"(undefined under `L-32` without an authenticated seal-time "
+        f"observation; not measured to be zero).",
+        f"- Parser execution: invocations on private or locked data "
+        f"**{execution['parser_invocations_on_private_or_locked_data']}**, "
+        f"candidate predictions "
+        f"**{execution['candidate_predictions_generated']}**, comparator "
+        f"predictions **{execution['comparator_predictions_generated']}**. "
+        f"Azure: data-plane content reads "
+        f"**{azure['data_plane_content_reads']}**, data-plane writes "
+        f"**{azure['data_plane_writes']}**, resource creations or changes "
+        f"**{azure['resource_creations_or_changes']}**.",
+    ]
 
 
 def _coverage() -> Any:
@@ -153,6 +248,12 @@ def render_block(policy: dict[str, Any] | None = None) -> str:
         f"**{execution['parser_v3_v2_sealed_sets_constructed']}** "
         f"(`parser-v3-v1` was sealed and is retired; this counter is scoped to "
         f"the successor set).",
+        "",
+        "The block above is the policy's own finalization snapshot. The live",
+        "execution and access state is carried by the ledger, and is rendered",
+        "from it:",
+        "",
+        *_render_ledger_lines(_load_ledger()),
         "",
         "A `FINAL` policy is not a result. It records that the rule for judging",
         "a future evaluation is settled, and records nothing whatever about any",
