@@ -225,6 +225,14 @@ def assess(evidence: dict[str, Any]) -> dict[str, dict[str, str]]:
     # are neither satisfied nor violated, because there is nothing to assess.
     # They are listed rather than dropped so that a future round cannot mistake
     # silence for satisfaction.
+    #
+    # Audit F (F-04b): the reason string previously read "no review backend
+    # exists", which is an unscoped claim about the world. What this assessor
+    # observed is narrower and is all it can support: no semantic-review
+    # backend appears in the execution inventory it reads, so no such backend
+    # has been provisioned *and evidenced* to this instrument. A backend that
+    # existed but was never evidenced here would produce the same reading, and
+    # the reason now says so.
     for key in (
         "no_prompt_or_response_reaches_copilot_actions_or_public_telemetry",
         "raw_prompt_logging_disabled_or_confined_to_boundary",
@@ -238,8 +246,11 @@ def assess(evidence: dict[str, Any]) -> dict[str, dict[str, str]]:
         record(
             key,
             "NOT_ASSESSABLE",
-            "no review backend exists, so this property of a review design has "
-            "nothing to be assessed against",
+            "no semantic-review backend is evidenced in the execution "
+            "inventory this assessor reads, so this property of a review "
+            "design has nothing here to be assessed against; this is an "
+            "absence of evidence within the assessed inventory, not a proof "
+            "that no such backend exists anywhere",
         )
 
     missing = set(CONDITION_KEYS) - set(results)
@@ -422,8 +433,16 @@ def derive_expected_anchors(
     What this establishes, exactly: the receipt reports an aggregate over
     per-object digests identical to the committed public set, and an object
     count and byte total identical to the registered ones. That is consistency
-    with external values, and it is worth having --- a receipt naming a
-    different container, a truncated listing, or a partial stream fails it.
+    with external values, and it is worth having --- a truncated listing, a
+    partial stream, or any object whose bytes differ from the published ones
+    fails it.
+
+    Audit F (F-02b) struck a third item from that list. This paragraph also
+    claimed a receipt naming a *different container* would fail. It would not:
+    the anchor is computed over per-object digests and the count and byte
+    total, and no container, account or path name enters it. A copy of the same
+    twelve objects in another container reproduces the anchor exactly. The
+    check constrains the bytes, not their location.
 
     What it does **not** establish, and Audit F was right to press on this: the
     anchor is itself public, so copying it is available to anyone with the

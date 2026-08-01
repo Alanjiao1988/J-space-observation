@@ -39,49 +39,49 @@
       "verdict": "FAIL"
     },
     {
-      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "basis": "no semantic-review backend is evidenced in the execution inventory this assessor reads, so this property of a review design has nothing here to be assessed against; this is an absence of evidence within the assessed inventory, not a proof that no such backend exists anywhere",
       "frozen_condition": "prompts and responses never reach Copilot, GitHub Actions, external subagents, public telemetry or public artifact storage",
       "key": "no_prompt_or_response_reaches_copilot_actions_or_public_telemetry",
       "verdict": "NOT_ASSESSABLE"
     },
     {
-      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "basis": "no semantic-review backend is evidenced in the execution inventory this assessor reads, so this property of a review design has nothing here to be assessed against; this is an absence of evidence within the assessed inventory, not a proof that no such backend exists anywhere",
       "frozen_condition": "raw prompt and response logging is disabled or confined to the same private boundary with explicit retention and access controls",
       "key": "raw_prompt_logging_disabled_or_confined_to_boundary",
       "verdict": "NOT_ASSESSABLE"
     },
     {
-      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "basis": "no semantic-review backend is evidenced in the execution inventory this assessor reads, so this property of a review design has nothing here to be assessed against; this is an absence of evidence within the assessed inventory, not a proof that no such backend exists anywhere",
       "frozen_condition": "identity, role and storage scopes are least privilege",
       "key": "identity_role_and_storage_scopes_least_privilege",
       "verdict": "NOT_ASSESSABLE"
     },
     {
-      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "basis": "no semantic-review backend is evidenced in the execution inventory this assessor reads, so this property of a review design has nothing here to be assessed against; this is an absence of evidence within the assessed inventory, not a proof that no such backend exists anywhere",
       "frozen_condition": "separate R1 and R2 sessions can be isolated and their outputs hidden from each other",
       "key": "r1_and_r2_sessions_isolable",
       "verdict": "NOT_ASSESSABLE"
     },
     {
-      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "basis": "no semantic-review backend is evidenced in the execution inventory this assessor reads, so this property of a review design has nothing here to be assessed against; this is an absence of evidence within the assessed inventory, not a proof that no such backend exists anywhere",
       "frozen_condition": "an arbiter can receive only disagreement packets",
       "key": "arbiter_receives_only_disagreement_packets",
       "verdict": "NOT_ASSESSABLE"
     },
     {
-      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "basis": "no semantic-review backend is evidenced in the execution inventory this assessor reads, so this property of a review design has nothing here to be assessed against; this is an absence of evidence within the assessed inventory, not a proof that no such backend exists anywhere",
       "frozen_condition": "all outputs remain private and only aggregates or content-free receipts leave",
       "key": "only_aggregates_or_content_free_receipts_leave",
       "verdict": "NOT_ASSESSABLE"
     },
     {
-      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "basis": "no semantic-review backend is evidenced in the execution inventory this assessor reads, so this property of a review design has nothing here to be assessed against; this is an absence of evidence within the assessed inventory, not a proof that no such backend exists anywhere",
       "frozen_condition": "a public synthetic review packet completes end to end and produces schema valid structured output",
       "key": "public_synthetic_review_packet_completes_end_to_end",
       "verdict": "NOT_ASSESSABLE"
     },
     {
-      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "basis": "no semantic-review backend is evidenced in the execution inventory this assessor reads, so this property of a review design has nothing here to be assessed against; this is an absence of evidence within the assessed inventory, not a proof that no such backend exists anywhere",
       "frozen_condition": "the boundary and the synthetic execution are independently audited",
       "key": "boundary_and_synthetic_execution_independently_audited",
       "verdict": "NOT_ASSESSABLE"

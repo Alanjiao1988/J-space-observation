@@ -641,20 +641,66 @@ def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
     path = Path(__file__).resolve() if source_path is None else Path(source_path)
     tree = ast.parse(path.read_text(encoding="utf-8"))
 
-    target = None
-    for node in ast.walk(tree):
-        if isinstance(node, ast.FunctionDef) and node.name == BYTE_HANDLING_FUNCTION:
-            target = node
-            break
+    # Audits E (E-19) and F both found, independently, that nothing bound the
+    # name `stream_object_digest` to the function this check analyses. Three
+    # shapes passed while shipping every chunk to a module global: a decorator;
+    # `stream_object_digest = _tap(stream_object_digest)` after the def, with no
+    # decorator syntax at all; and two definitions of the name, because the scan
+    # below takes the *first* and Python binds the *last*.
+    #
+    # So the name must be defined exactly once and never rebound. Any other
+    # shape is refused rather than analysed, because analysing the wrong
+    # function and reporting success is the worst outcome available here.
+    definitions = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == BYTE_HANDLING_FUNCTION
+    ]
+    rebindings = [
+        bound
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.Assign, ast.AugAssign, ast.AnnAssign, ast.NamedExpr))
+        for bound in (node.targets if isinstance(node, ast.Assign) else [node.target])
+        if isinstance(bound, ast.Name) and bound.id == BYTE_HANDLING_FUNCTION
+    ]
+    if len(definitions) > 1 or rebindings:
+        raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_HANDLER_NAME_NOT_UNIQUE")
+
+    target = definitions[0] if definitions else None
     if target is None:
         # The function this check exists to constrain has been renamed or
         # removed. Passing silently would be the worst outcome: the check would
         # report success while guarding nothing.
         raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_HANDLER_NOT_FOUND")
 
+    # Audit F: a decorator wraps the handler, so what executes is not the body
+    # this check reads. Audit F's counterexample passed every check below while
+    # the decorator retained every chunk in a module global. The body cannot be
+    # analysed in isolation unless it is what runs.
+    if target.decorator_list:
+        raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_HANDLER_IS_DECORATED")
+
     for node in ast.walk(target):
         if isinstance(node, (ast.Global, ast.Nonlocal)):
             raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_NAME_ESCAPES_HANDLER")
+        # A nested function or lambda has its own scope, which this analysis
+        # does not follow, and can close over the chunk.
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)) and (
+            node is not target
+        ):
+            raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_HANDLER_NESTS_A_SCOPE")
+
+    bindings = _handler_bindings(target)
+
+    # Audit F: `len = leak_and_count` inside the handler makes the whitelisted
+    # `len(chunk)` exfiltrate every chunk, because the whitelist matches the
+    # *name* and never establishes that it resolves to the builtin. Rebinding
+    # `hashlib` does the same for the digest constructor. None of these names
+    # may be bound in the handler at all.
+    for name in sorted(_DIGEST_ONLY_CALLS | {"hashlib"}):
+        if name in bindings:
+            raise ProbeRefusal("INTERNAL_REFUSAL", "WHITELISTED_NAME_SHADOWED")
 
     # Names bound to a fresh hashlib digest here. Only these may receive an
     # `update` call, so a same-named sink cannot impersonate the digest.
@@ -683,18 +729,13 @@ def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
 
     # A digest name that is later rebound is no longer the digest that was
     # constructed here. Audit F raised `digest = hashlib.sha256(); digest = sink`
-    # as a bypass, so any second assignment to a digest name is refused.
-    seen_digest_bindings: set[str] = set()
-    for node in ast.walk(target):
-        if not isinstance(node, (ast.Assign, ast.AugAssign, ast.AnnAssign)):
-            continue
-        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-        for bound in targets:
-            if not isinstance(bound, ast.Name) or bound.id not in digest_names:
-                continue
-            if bound.id in seen_digest_bindings:
-                raise ProbeRefusal("INTERNAL_REFUSAL", "DIGEST_NAME_REASSIGNED")
-            seen_digest_bindings.add(bound.id)
+    # as a bypass, and then, on closure review, showed that checking only
+    # Assign/AugAssign/AnnAssign left `(digest := sink)`, `for digest in (sink,)`
+    # and `digest, other = sink, 1` all passing. Every binding form is counted
+    # now, so a digest name bound more than once is refused whatever the shape.
+    for name in sorted(digest_names):
+        if len(bindings.get(name, ())) > 1:
+            raise ProbeRefusal("INTERNAL_REFUSAL", "DIGEST_NAME_REASSIGNED")
 
     inspected = 0
     whitelisted_argument_nodes: set[int] = set()
@@ -744,6 +785,68 @@ def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
 
     _assert_chunk_name_never_escapes(target, whitelisted_argument_nodes)
     return inspected
+
+
+def _handler_bindings(target: Any) -> dict[str, list[Any]]:
+    """Every name bound inside the handler, by every binding construct.
+
+    Audit F's closure review defeated a rebinding rule that inspected only
+    ``Assign``, ``AugAssign`` and ``AnnAssign``: ``(digest := sink)``,
+    ``for digest in (sink,)`` and ``digest, other = sink, 1`` each rebound the
+    digest and passed. Enumerating binding *forms* one at a time loses that
+    race, so this collects them all and the callers ask questions of the result.
+
+    A name absent from this mapping is not bound in the handler, which is what
+    lets the caller establish that ``len`` really is the builtin.
+    """
+
+    import ast
+
+    bindings: dict[str, list[Any]] = {}
+
+    def record(node: Any) -> None:
+        if isinstance(node, ast.Name):
+            bindings.setdefault(node.id, []).append(node)
+        elif isinstance(node, (ast.Tuple, ast.List)):
+            for element in node.elts:
+                record(element)
+        elif isinstance(node, ast.Starred):
+            record(node.value)
+
+    for argument in (
+        list(target.args.posonlyargs)
+        + list(target.args.args)
+        + list(target.args.kwonlyargs)
+        + [target.args.vararg, target.args.kwarg]
+    ):
+        if argument is not None:
+            bindings.setdefault(argument.arg, []).append(argument)
+
+    for node in ast.walk(target):
+        if isinstance(node, ast.Assign):
+            for element in node.targets:
+                record(element)
+        elif isinstance(node, (ast.AugAssign, ast.AnnAssign)):
+            record(node.target)
+        elif isinstance(node, ast.NamedExpr):
+            record(node.target)
+        elif isinstance(node, (ast.For, ast.AsyncFor)):
+            record(node.target)
+        elif isinstance(node, (ast.With, ast.AsyncWith)):
+            for item in node.items:
+                if item.optional_vars is not None:
+                    record(item.optional_vars)
+        elif isinstance(node, ast.ExceptHandler):
+            if node.name:
+                bindings.setdefault(node.name, []).append(node)
+        elif isinstance(node, (ast.Import, ast.ImportFrom)):
+            for alias in node.names:
+                bound = alias.asname or alias.name.split(".")[0]
+                bindings.setdefault(bound, []).append(alias)
+        elif isinstance(node, (ast.comprehension,)):
+            record(node.target)
+
+    return bindings
 
 
 def _assert_chunk_name_never_escapes(

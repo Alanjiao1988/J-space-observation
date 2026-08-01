@@ -457,7 +457,15 @@ def test_g01_lowering_an_event_backed_counter_fails_coherence_first(ledger):
     successor["live_counters"]["retired_v1_repair_access"][
         "byte_only_integrity_verifications"
     ] = 0
+    # Audits E (E-18) and F: this counter is now pinned to its exact value, so
+    # `validate_ledger` --- which `assert_monotonic_succession` runs first ---
+    # rejects the mutation before succession is reached. That is a strictly
+    # earlier refusal, not a weaker one, and the pin has its own test below.
+    # The event-coherence rule this test exists to protect is therefore called
+    # directly, so that removing it would still fail here.
     with pytest.raises(LedgerError, match="unsupported access claim"):
+        ledger_module._validate_event_counter_support(successor, successor["events"])
+    with pytest.raises(LedgerError):
         assert_monotonic_succession(ledger, successor)
 
 
@@ -505,7 +513,7 @@ def test_the_ledger_module_imports_only_the_standard_library():
     package, and an allowlist checks that directly and more strictly than one
     substring ever did.
     """
-    allowed = {"hashlib", "json", "re", "typing", "__future__"}
+    allowed = {"hashlib", "json", "pathlib", "re", "typing", "__future__"}
     tree = ast.parse(
         (
             ROOT / "src" / "jspace_observation" / "parser_v3_v2_access_ledger.py"
@@ -1291,3 +1299,130 @@ def test_a_parser_counter_reports_the_parser_rule_not_the_bookkeeping_rule(
     ] = 1
     with pytest.raises(LedgerError, match="no parser may"):
         _validate(ledger, policy)
+
+
+def test_the_two_positive_safety_counters_are_pinned_to_their_exact_values(ledger):
+    """Audits E (E-18) and F, independently: neither counter was constrained.
+
+    ``_PHASE_1_2H_ZERO_ACCESS_COUNTERS`` excludes these two because their
+    correct value is positive. A comment in the previous commit claimed the
+    receipt-citation rule constrained them instead. It did not. Audit E set
+    ``data_plane_content_reads`` to 500 with no other edit and the ledger
+    validated; it then raised ``byte_only_integrity_verifications`` from 14 to
+    99 by resumming the composite addends with citations to files that really
+    exist, and that validated too --- the citation rule checks addend *shape*,
+    never addend *amounts*, and never reached the first counter at all.
+
+    These are the counters recording how many private objects' bytes were read
+    and how many verifications stand behind the terminal state, so an operator
+    typo and a deliberate inflation must look the same to the validator.
+    """
+    for group, name, correct in (
+        ("azure", "data_plane_content_reads", 12),
+        ("retired_v1_repair_access", "byte_only_integrity_verifications", 14),
+    ):
+        assert ledger["live_counters"][group][name] == correct
+
+        for wrong in (correct + 1, correct - 1, 0, 500):
+            mutated = copy.deepcopy(ledger)
+            mutated["live_counters"][group][name] = wrong
+            with pytest.raises(LedgerError):
+                validate_ledger(mutated)
+
+        # Downward mutations were already owned by the pre-existing floor rule
+        # and by the event-coherence rule --- which is why both audits attacked
+        # *upward*, the one direction nothing checked. So the pin is asserted to
+        # own that direction specifically: deleting it makes these lines pass.
+        for wrong in (correct + 1, correct + 7, 500):
+            mutated = copy.deepcopy(ledger)
+            mutated["live_counters"][group][name] = wrong
+            with pytest.raises(LedgerError, match=f"must equal {correct}"):
+                ledger_module._validate_status_agreement(mutated, mutated["status"])
+
+    # Audit E's exact counterexample: the inflation is made self-consistent by
+    # resumming the composite addends against files that exist, which is what
+    # defeated every rule that was in place.
+    inflated = copy.deepcopy(ledger)
+    inflated["live_counters"]["retired_v1_repair_access"][
+        "byte_only_integrity_verifications"
+    ] = 99
+    parts = inflated["counter_provenance"]["composite_of_separately_evidenced_parts"][
+        "parts"
+    ]["retired_v1_repair_access.byte_only_integrity_verifications"]
+    parts[1] = {
+        "amount": 99 - parts[0]["amount"],
+        "evidence": "docs/phase1_2h_r1_job_execution_inventory.json",
+    }
+    with pytest.raises(LedgerError, match="must equal 14"):
+        validate_ledger(inflated)
+
+
+def test_a_citation_to_a_file_that_does_not_exist_is_refused(ledger):
+    """Audit F: the citation check was syntax-only.
+
+    ``_CITATION_PATTERN`` matches any token ending in ``.py``/``.json``/``.md``,
+    so ``docs/does-not-exist.json`` satisfied it. A citation that cannot be
+    followed is not evidence, so cited paths are now resolved against the
+    repository root and must be real files.
+    """
+    mutated = copy.deepcopy(ledger)
+    parts = mutated["counter_provenance"]["composite_of_separately_evidenced_parts"][
+        "parts"
+    ]["retired_v1_repair_access.byte_only_integrity_verifications"]
+    parts[1] = dict(parts[1], evidence="docs/phase1_2h_r1_access_receipt_fake.json")
+    with pytest.raises(LedgerError):
+        validate_ledger(mutated)
+
+    # The control: the same addend citing a file that does exist is accepted, so
+    # the refusal above is attributable to existence and not to the edit itself.
+    restored = copy.deepcopy(ledger)
+    validate_ledger(restored)
+
+
+def test_the_never_occurred_class_is_bound_to_the_state_it_appeals_to(ledger):
+    """Audit F: a record assertion was passing a "machine evidence" rule.
+
+    ``_MACHINE_EVIDENCE_REQUIRED`` was enforced as a denylist naming only
+    ``operator_maintained_approximate``, so five safety counters classified
+    ``zero_because_the_activity_has_never_occurred`` satisfied a rule whose
+    message said safety counters "require machine evidence, not recollection".
+    They do not carry machine evidence. The class text claimed "a committed
+    state block records" the fact, and nothing read that block.
+
+    Renaming the class would have left it resting on nothing, so it is bound to
+    the flags it appeals to instead. The class is still documented as a record
+    assertion rather than promoted to evidence.
+    """
+    assert (
+        "retired_v1_repair_access.labels_opened_for_scoring"
+        in ledger_module._NEVER_OCCURRED_STATE_BINDINGS
+    )
+
+    # The two halves of the record must now fail together rather than drift.
+    flipped = copy.deepcopy(ledger)
+    flipped["retired_v1_state"]["formal_evaluation_ever_run"] = True
+    with pytest.raises(LedgerError, match="the same history"):
+        ledger_module._assert_never_occurred_agrees_with_state(flipped)
+
+    raised = copy.deepcopy(ledger)
+    raised["retired_v1_state"]["labels_opened_for_scoring"] = 3
+    with pytest.raises(LedgerError, match="the same history"):
+        ledger_module._assert_never_occurred_agrees_with_state(raised)
+
+    # A counter cannot be swept into the class to avoid a stronger one unless a
+    # state flag is registered for it, which is a deliberate, reviewable edit.
+    moved = copy.deepcopy(ledger)
+    moved["counter_provenance"]["zero_because_the_activity_has_never_occurred"][
+        "counters"
+    ].append("azure.data_plane_writes")
+    moved["counter_provenance"]["receipt_derived_exact"]["counters"].remove(
+        "azure.data_plane_writes"
+    )
+    with pytest.raises(LedgerError, match="no state flag is registered"):
+        ledger_module._assert_never_occurred_agrees_with_state(moved)
+
+    # And the class is described as what it is, not as machine evidence.
+    note = ledger_module.COUNTER_PROVENANCE_CLASS_MEANING[
+        "zero_because_the_activity_has_never_occurred"
+    ]
+    assert "record assertion" in note

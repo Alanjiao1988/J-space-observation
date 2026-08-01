@@ -21,6 +21,7 @@ import hashlib
 import importlib.util
 import json
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -1376,6 +1377,12 @@ def test_a_handler_that_no_longer_iterates_its_input_is_refused():
 
 
 def test_nonlocal_in_the_handler_is_refused():
+    # Audit F round 3 added a blanket refusal of any nested scope inside the
+    # handler, because a nested function is one of the shapes that lets bytes
+    # leave the body the analysis reads. That refusal is strictly broader than
+    # the `nonlocal` rule and now fires first on this counterexample. Both are
+    # correct; the assertion records which one owns the case, so that deleting
+    # the nested-scope rule would fail here rather than pass silently.
     assert (
         _refuses(
             "    nonlocal_marker = 0\n"
@@ -1389,8 +1396,61 @@ def test_nonlocal_in_the_handler_is_refused():
             "        total = 0\n"
             "    return (digest.hexdigest(), total)\n"
         )
-        == "BYTE_NAME_ESCAPES_HANDLER"
+        == "BYTE_HANDLER_NESTS_A_SCOPE"
     )
+
+
+def test_the_byte_handler_name_must_be_defined_once_and_never_rebound():
+    """Audits E (E-19) and F: nothing bound the analysed body to what runs.
+
+    ``assert_byte_handling_is_digest_only`` reads the *first* definition found
+    by ``ast.walk``; Python binds the *last*. Both reviewers built handlers that
+    passed every check below while shipping every chunk to a module global: one
+    wrapped by a decorator, one rebound by a plain module-level assignment after
+    the def, and one simply defined twice. None of those is a byte-flow property
+    of the body, so none of the body checks could ever have caught them.
+    """
+    baseline = (
+        "import hashlib\n"
+        "def stream_object_digest(chunks):\n"
+        "    digest = hashlib.sha256()\n"
+        "    total = 0\n"
+        "    for chunk in chunks:\n"
+        "        digest.update(chunk)\n"
+        "        total += len(chunk)\n"
+        "    return (digest.hexdigest(), total)\n"
+    )
+
+    def _refuse_module(source: str) -> str:
+        path = Path(tempfile.mkdtemp()) / "candidate.py"
+        path.write_text(source, encoding="utf-8")
+        with pytest.raises(probe.ProbeRefusal) as caught:
+            probe.assert_byte_handling_is_digest_only(source_path=path)
+        return caught.value.invariant
+
+    # The control: the same module without the escape shape is accepted, so the
+    # refusals below are attributable to the shape and not to the fixture.
+    control = Path(tempfile.mkdtemp()) / "control.py"
+    control.write_text(baseline, encoding="utf-8")
+    assert probe.assert_byte_handling_is_digest_only(source_path=control) > 0
+
+    rebound = baseline + "stream_object_digest = _tap(stream_object_digest)\n"
+    assert _refuse_module(rebound) == "BYTE_HANDLER_NAME_NOT_UNIQUE"
+
+    duplicated = baseline + (
+        "\ndef stream_object_digest(chunks):\n"
+        "    _SINK.extend(list(chunks))\n"
+        "    return ('', 0)\n"
+    )
+    assert _refuse_module(duplicated) == "BYTE_HANDLER_NAME_NOT_UNIQUE"
+
+    decorated = baseline.replace(
+        "def stream_object_digest", "@_tap\ndef stream_object_digest", 1
+    )
+    assert _refuse_module(decorated) == "BYTE_HANDLER_IS_DECORATED"
+
+    annotated = baseline + "stream_object_digest: object = _tap\n"
+    assert _refuse_module(annotated) == "BYTE_HANDLER_NAME_NOT_UNIQUE"
 
 
 def test_the_strengthened_checks_pass_on_the_source_that_actually_ran():

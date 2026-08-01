@@ -224,7 +224,7 @@
     "formally_scorable": false,
     "formal_eligibility": "RETIRED_AS_INELIGIBLE",
     "current_state_label": "SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE",
-    "current_state_note": "The Phase 1.2H state transition to REPAIR_ACCESSED did NOT occur. Phase 1.2H-R1 authenticated to the authoritative source and streamed all 12 objects, but only to a digest: no byte was decoded, retained or interpreted, so nothing about any case is known that was not already public. UNSPENT therefore remains accurate without qualification, and the label is unchanged. What changed is the operator's ability to reach the source, not the state of the set."
+    "current_state_note": "The Phase 1.2H state transition to REPAIR_ACCESSED did NOT occur. Phase 1.2H-R1 authenticated to the authoritative source and streamed all 12 objects into a SHA-256 digest. Audit F (F-07b) narrowed the wording that stood here: the supportable claim is about the analysed in-job first-party sources, which contain no decode, no retention beyond a rolling chunk, and no interpretation of any byte, and about the job output, which carries digests and counts only. It is not a claim that no byte existed in memory --- streaming requires that --- nor a claim about the platform runtime beneath the job. On that basis nothing about any case is known that was not already public, UNSPENT remains accurate, and the label is unchanged. What changed is the operator ability to reach the source, not the state of the set."
   },
   "successor_set_state": {
     "set_id": "parser-v3-v2",

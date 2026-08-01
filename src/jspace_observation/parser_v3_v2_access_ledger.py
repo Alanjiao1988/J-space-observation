@@ -50,6 +50,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 __all__ = [
@@ -103,6 +104,16 @@ SEMANTIC_PROJECTION_COUNTER_EXCLUDES: tuple[str, ...] = (
 #: streams. It is a floor rather than an equality so that a later authorised
 #: byte-only round can add to it without this constant needing to move.
 BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE: int = 14
+
+#: The number of authoritative sealed objects the Phase 1.2H-R1 access gate
+#: streamed. ``azure.data_plane_content_reads`` counts one read per object, so
+#: this is what fixes that counter.
+#:
+#: Audit F's closure review found it fixed by nothing: it is excluded from
+#: :data:`_PHASE_1_2H_ZERO_ACCESS_COUNTERS` because its correct value is
+#: positive, and no other rule compared it with anything, so it could carry any
+#: number at all while every other data-plane claim stayed pinned.
+BYTE_ONLY_OBJECTS_STREAMED_BY_R1_GATE: int = 12
 
 #: Terminal states this ledger may record. They are exactly the Phase 1.2H
 #: terminal states; a ledger may not invent a state that the protocol does not
@@ -305,16 +316,61 @@ COUNTER_PROVENANCE_CLASS_MEANING: Mapping[str, str] = {
         "place in this project at all, which a committed state block records. "
         "This is a weaker and different fact from source analysis: it is not "
         "that the code cannot do the thing, but that no round has yet been "
-        "authorized to try. The ledger refuses any non-zero value carrying "
-        "this class"
+        "authorized to try. Audit F was right that this is a record assertion "
+        "rather than machine evidence, and it is now labelled as one: the "
+        "ledger refuses any non-zero value carrying this class, and requires "
+        "the state block whose flags the class appeals to actually to agree"
     ),
     "composite_of_separately_evidenced_parts": (
         "the value is a sum whose addends do not share a provenance, so no "
         "single class describes it honestly; the entry must decompose it and "
         "state the evidence for each part"
-    ),    "operator_maintained_approximate": (
+    ),
+    "operator_maintained_approximate": (
         "the value is a hand-maintained count and carries no machine evidence; "
         "it may only be used for counters whose value is not a safety claim"
+    ),
+}
+
+#: Provenance classes that are *assertions about the record*, not measurements
+#: or source analysis. Audit F found that ``_MACHINE_EVIDENCE_REQUIRED`` was
+#: enforced as a single denylist naming ``operator_maintained_approximate``, so
+#: a safety counter classified ``zero_because_the_activity_has_never_occurred``
+#: satisfied a rule whose message claimed it "requires machine evidence". It
+#: does not, and calling it machine evidence was the defect --- the class says
+#: no authorized round has ever tried, which is a fact about project history.
+#:
+#: Renaming alone would leave the class resting on nothing, so the class is
+#: instead bound to the committed state flags it appeals to, in
+#: :func:`_assert_never_occurred_agrees_with_state`. That is cheap, needs no
+#: new infrastructure, and makes the class's own premise checkable.
+_RECORD_ASSERTION_CLASSES: frozenset[str] = frozenset(
+    {"zero_because_the_activity_has_never_occurred"}
+)
+
+#: The state-block flags that must agree with a "never occurred" classification.
+#: Each entry maps a counter to the ``retired_v1_state`` flag that records the
+#: same fact, and the value that flag must carry.
+_NEVER_OCCURRED_STATE_BINDINGS: dict[str, tuple[str, Any]] = {
+    "retired_v1_repair_access.labels_opened_for_scoring": (
+        "labels_opened_for_scoring",
+        0,
+    ),
+    "formal_v2_evaluation_access.sealed_input_semantic_reads": (
+        "formal_evaluation_ever_run",
+        False,
+    ),
+    "formal_v2_evaluation_access.sealed_label_semantic_reads": (
+        "formal_evaluation_ever_run",
+        False,
+    ),
+    "formal_v2_evaluation_access.labels_opened_for_scoring": (
+        "formal_evaluation_ever_run",
+        False,
+    ),
+    "parser_execution.comparator_predictions_generated": (
+        "formal_evaluation_ever_run",
+        False,
     ),
 }
 
@@ -385,12 +441,17 @@ _MACHINE_EVIDENCE_REQUIRED: frozenset[str] = frozenset(
 #: already pinned independently of class, which is why the same mutation failed
 #: on them; the semantic-access counters were not.
 #:
-#: This set is the class-independent pin. Two safety counters are deliberately
-#: absent because their correct value is positive.
-#: ``byte_only_integrity_verifications`` is 14, and ``data_plane_content_reads``
-#: is 12 --- the gate really did read those objects' bytes, and pretending
-#: otherwise would be its own false claim. Both are constrained by the
-#: receipt-citation rule instead of by a zero pin.
+#: This set is the class-independent pin. Two safety counters are absent from it
+#: because their correct value is positive: ``byte_only_integrity_verifications``
+#: is 14 and ``data_plane_content_reads`` is 12 --- the gate really did read
+#: those bytes, and pretending otherwise would be its own false claim.
+#:
+#: An earlier version of this comment said both were "constrained by the
+#: receipt-citation rule instead". Audits E (E-18) and F both refuted that
+#: independently: the citation rule constrains addend *shape*, never addend
+#: *amounts*, and it never reached ``data_plane_content_reads`` at all, which
+#: accepted 500 with no other edit. Both are now pinned to their exact values
+#: in :func:`_validate_status_agreement`, so neither rests on a citation rule.
 _PHASE_1_2H_ZERO_ACCESS_COUNTERS: frozenset[str] = frozenset(
     {
         "retired_v1_repair_access.sealed_input_semantic_reads",
@@ -1076,6 +1137,7 @@ def validate_ledger(
     # block would report a state-agreement failure for what is really a
     # malformed-provenance failure, which sends a reader to the wrong place.
     _validate_counter_provenance(ledger["counter_provenance"])
+    _assert_never_occurred_agrees_with_state(ledger)
 
     _validate_status_agreement(ledger, status)
     _validate_event_counter_support(ledger, events)
@@ -1092,17 +1154,55 @@ def validate_ledger(
     )
 
 
+def _cited_paths_that_exist(evidence: str) -> list[str]:
+    """Return the cited repository paths that resolve to a real committed file.
+
+    Audit F's closure review pointed out that ``_CITATION_PATTERN`` checks
+    *shape*: ``docs/does-not-exist.json`` and
+    ``docs/phase1_2h_r1_access_receipt_fake.json`` both satisfied it, so
+    "cites a committed artifact" was false as written --- the rule established
+    only that the evidence contained a token ending in ``.py``, ``.json`` or
+    ``.md``.
+
+    Resolution is relative to the repository root, found by walking up from this
+    module. If the root cannot be located the check degrades to the shape test
+    rather than failing, because a ledger validated from an installed package
+    with no repository present must not be rejected for that reason --- and it
+    says so, rather than pretending the stronger check ran.
+    """
+
+    root = Path(__file__).resolve().parents[2]
+    if not (root / "docs").is_dir():
+        return [
+            match.group(0)
+            for match in _CITATION_PATTERN.finditer(evidence)
+        ]
+    existing: list[str] = []
+    for match in _CITATION_PATTERN.finditer(evidence):
+        candidate = match.group(0).strip().strip(",;:)(")
+        if "/" not in candidate:
+            continue
+        if (root / candidate).is_file():
+            existing.append(candidate)
+    return existing
+
+
 def _assert_evidence_is_citable(class_name: str, evidence: str) -> None:
     """Require a machine-evidence class to cite something a reader can open.
 
     Audit C (C-03) found ``evidence`` accepted as free text and never checked,
     so a class asserting machine derivation could cite nothing at all and the
-    ledger would still validate. This does not verify that the citation is
-    *correct* --- no string check can --- but it does require that one is
-    present in a form a reader can follow to a committed artifact.
+    ledger would still validate.
+
+    Since Audit F's closure review the cited path must also *resolve* to a file
+    that exists in the repository. That still does not verify the citation is
+    *correct* --- no check here can read a document and decide it supports a
+    number --- but "names a file that exists" is a materially stronger claim
+    than "contains a token ending in .json", and it is the claim the surrounding
+    prose makes.
     """
 
-    if _CITATION_PATTERN.search(evidence):
+    if _cited_paths_that_exist(evidence):
         return
     raise LedgerError(
         f"counter_provenance.{class_name}.evidence claims machine derivation "
@@ -1124,15 +1224,16 @@ def _assert_composite_addends_are_citable(
     the actual claims live, and they were unchecked.
 
     So each addend of a counter in :data:`_MACHINE_EVIDENCE_REQUIRED` must name
-    something a reader can open, on the same rule the class-level string obeys.
-    This still does not verify the citation is *correct*; it removes the route
-    where a counter asserting "no locked label was opened" is backed by
-    "batch one, recalled".
+    a file that exists in the repository, on the same rule the class-level
+    string obeys. This still does not verify the citation is *correct*; it
+    removes the route where a counter asserting "no locked label was opened" is
+    backed by "batch one, recalled", and --- since Audit F's closure review ---
+    the route where it is backed by a plausible-looking path to nothing.
     """
 
     for index, addend in enumerate(addends):
         evidence = addend.get("evidence", "") if isinstance(addend, Mapping) else ""
-        if _CITATION_PATTERN.search(str(evidence)):
+        if _cited_paths_that_exist(str(evidence)):
             continue
         raise LedgerError(
             f"counter_provenance composite parts for {path!r} addend {index} "
@@ -1384,6 +1485,75 @@ def _validate_counter_provenance(block: Any) -> None:
             )
 
 
+def _assert_never_occurred_agrees_with_state(ledger: Mapping[str, Any]) -> None:
+    """Bind the "never occurred" class to the state flags it appeals to.
+
+    Audit F: this class was accepted by a rule whose message said safety
+    counters "require machine evidence". It is not machine evidence --- it is
+    an assertion that no authorized round ever performed the activity. The
+    class text has always claimed "a committed state block records" that, and
+    nothing checked it, so the appeal was to a document the validator never
+    read.
+
+    It reads it now. A counter may only carry this class if the state flag
+    recording the same fact agrees, which makes the two halves of the record
+    fail together instead of drifting apart: a round that set
+    ``formal_evaluation_ever_run`` to true while leaving five counters
+    classified "never occurred" is refused, and so is the reverse.
+
+    This does not upgrade the class to machine evidence, and it is not
+    described as one. It makes the assertion internally accountable, which is
+    the honest available improvement without new infrastructure.
+    """
+
+    state = ledger.get("retired_v1_state")
+    if not isinstance(state, Mapping):
+        return
+
+    block = ledger.get("counter_provenance")
+    if not isinstance(block, Mapping):
+        return
+
+    seen: dict[str, str] = {}
+    for class_name, entry in block.items():
+        if not isinstance(entry, Mapping):
+            continue
+        listed = entry.get("counters")
+        if listed is None:
+            listed = list((entry.get("parts") or {}).keys())
+        if isinstance(listed, Sequence) and not isinstance(listed, (str, bytes)):
+            for path in listed:
+                if isinstance(path, str):
+                    seen[path] = class_name
+
+    for path, provenance in sorted(seen.items()):
+        if provenance not in _RECORD_ASSERTION_CLASSES:
+            continue
+        binding = _NEVER_OCCURRED_STATE_BINDINGS.get(path)
+        if binding is None:
+            raise LedgerError(
+                f"counter_provenance classifies {path!r} as "
+                f"{provenance!r}, but no state flag is registered for it; a "
+                "record assertion must name the committed state it rests on"
+            )
+        flag, expected = binding
+        if flag not in state:
+            raise LedgerError(
+                f"counter_provenance classifies {path!r} as {provenance!r}, "
+                f"which appeals to retired_v1_state.{flag}; that flag is absent"
+            )
+        actual = state[flag]
+        if actual != expected or isinstance(actual, bool) != isinstance(
+            expected, bool
+        ):
+            raise LedgerError(
+                f"counter_provenance classifies {path!r} as {provenance!r}, "
+                f"but retired_v1_state.{flag} is {actual!r} and not "
+                f"{expected!r}; the counter and the state block must record "
+                "the same history"
+            )
+
+
 def _assert_gate_receipt_is_cited(ledger: Mapping[str, Any]) -> None:
     """Require the boundary state to rest on a named execution receipt.
 
@@ -1560,11 +1730,12 @@ def _validate_status_agreement(ledger: Mapping[str, Any], status: str) -> None:
                 "run and no prediction may be generated"
             )
 
+    counters_block = ledger.get("live_counters")
+
     # Audit E (E-16). These pins are deliberately independent of the provenance
     # class. The class-keyed rules in _validate_counter_provenance_values can be
     # escaped by reclassifying a counter; these cannot, which is the difference
     # between a bookkeeping rule and a safety rule.
-    counters_block = ledger.get("live_counters")
     for path in sorted(_PHASE_1_2H_ZERO_ACCESS_COUNTERS):
         value = _counter_lookup(counters_block, path)
         if value:
@@ -1574,6 +1745,44 @@ def _validate_status_agreement(ledger: Mapping[str, Any], status: str) -> None:
                 "so no semantic read, no label opening and no data-plane write "
                 "may be recorded under any provenance class"
             )
+
+    # Audits E (E-18) and F both found the same hole, independently. The two
+    # safety counters excluded from the zero pin because their correct value is
+    # positive were constrained by nothing at all: `data_plane_content_reads`
+    # accepted 500 with no other edit, and `byte_only_integrity_verifications`
+    # accepted 99 when its addends were resummed with real file citations,
+    # because the citation rule constrains addend *shape* and never addend
+    # *amounts*. A comment added in the previous commit asserted both were
+    # "constrained by the receipt-citation rule instead"; that was false.
+    #
+    # Both are now pinned to their exact correct values, the way the parser
+    # counters are. These are the counters recording how many private objects'
+    # bytes were read and how many integrity verifications stand behind the
+    # terminal state, so an operator typo and a deliberate inflation should look
+    # the same to the validator: refused.
+    for path, expected, why in (
+        (
+            "azure.data_plane_content_reads",
+            BYTE_ONLY_OBJECTS_STREAMED_BY_R1_GATE,
+            "one read per authoritative sealed object streamed by the access "
+            "gate; no other data-plane content read is authorised in this phase",
+        ),
+        (
+            "retired_v1_repair_access.byte_only_integrity_verifications",
+            BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE,
+            "the 12 objects the gate streamed plus the 2 pre-R1 curator-file "
+            "verifications already on record; a later authorised byte-only "
+            "round must move this constant deliberately rather than raise the "
+            "counter quietly",
+        ),
+    ):
+        value = _counter_lookup(counters_block, path)
+        if isinstance(value, int) and not isinstance(value, bool):
+            if value != expected:
+                raise LedgerError(
+                    f"{path} must equal {expected} in Phase 1.2H, got {value!r}: "
+                    f"{why}"
+                )
 
 
 def assert_monotonic_succession(

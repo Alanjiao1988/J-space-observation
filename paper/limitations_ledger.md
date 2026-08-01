@@ -820,9 +820,37 @@ been found defective by the next review, and twice the defect was introduced *by
 the remediation itself*. The honest reading is not that the instruments are
 converging on correctness but that self-review does not find this class of
 defect — every one of the counterexamples above was produced by an independent
-reviewer executing the code, and none by the author's own test suite, which was
-green throughout. A green suite here means "the properties I thought to check
-hold", and the recurring failure has been in what was not thought of.
+reviewer, and none by the author's own test suite, which was green throughout. A
+green suite here means "the properties I thought to check hold", and the
+recurring failure has been in what was not thought of.
+
+A previous version of the sentence above said the counterexamples were produced
+by a reviewer *executing the code*. That was itself an overstatement of the kind
+this section documents. Several were: Audit E ran the validator to show that
+`data_plane_content_reads = 500` was accepted. But Audit F established F-03b by
+reading the source, with no execution, and the byte-handler rebinding defect
+(E-19) was found by reasoning about which definition `ast.walk` returns versus
+which one Python binds. Attributing all of them to execution overstated the
+method and understated the finding: static reading was sufficient to break these
+instruments, which is a worse result than needing to run them.
+
+The third review round (of `55d0e2b`) found eight further defects and is
+recorded in §7.6 of the round report. Its two most serious findings share a
+shape worth naming, because it is the shape that keeps recurring: **a check that
+constrains an artifact it was never bound to.** The byte-flow analysis
+constrained the body of a function selected by `ast.walk` order, while Python
+binds by definition order, so three different wrappers passed while exfiltrating
+every chunk. Two counters were excluded from a safety pin on the stated grounds
+that another rule constrained them; that rule constrained neither. In both cases
+the check was correct about what it examined and silent about whether what it
+examined was what ran.
+
+The sequence is eighteen findings, then twelve, then eight. The counts are
+falling, which is not the same as convergence and should not be read as it: each
+round's remediation has still been found defective by the next independent
+review, and no round has yet closed. Whether the fourth review closes is not a
+fact this document can assert in advance — the last two times a version of this
+paragraph tried, the attempt was itself cited as a finding.
 
 An earlier draft of this section claimed that "Audits C and D reviewed the final
 state, so the gap is narrowed rather than open". That sentence was written

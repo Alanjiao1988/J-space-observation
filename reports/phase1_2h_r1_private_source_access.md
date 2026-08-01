@@ -327,10 +327,13 @@ eighteen findings above, with a clean working tree. **Both returned BLOCKED.**
 
 This is the third consecutive round in which review of a remediation found new
 defects, and twice now the defect was introduced *by the remediation itself*.
-Every counterexample below was produced by a reviewer executing the code. The
-author's three suites were green throughout — which is the point: a green suite
-means the properties someone thought to check hold, and the recurring failure
-has been in what was not thought of.
+Every counterexample below was produced by an independent reviewer — some by
+executing the instrument, others, including F-03b and the byte-handler
+rebinding, purely by reading its source. An earlier draft of this sentence
+credited all of them to execution, which overstated the method and understated
+the finding. The author's three suites were green throughout — which is the
+point: a green suite means the properties someone thought to check hold, and the
+recurring failure has been in what was not thought of.
 
 | ID | Severity | Finding, as demonstrated | Disposition in this commit |
 | --- | --- | --- | --- |
@@ -361,19 +364,41 @@ build:
   the artifacts; it is an argument from the absence of any authorised occasion,
   not an observation, and it is now labelled that way.
 
-### 7.5 What no audit has reviewed
+  *Superseded in part by §7.6.* Audit F's further point — that the class was
+  nonetheless satisfying a rule whose message claimed safety counters "require
+  machine evidence" — was a fixable defect, and was fixed.
+
+### 7.6 Second closure review — both audits BLOCKED a third time
+
+Audits E and F reviewed `55d0e2b` and converged independently on the same two
+defects, neither of which the author's suites could have caught, because both
+concerned properties nobody had thought to assert.
+
+| ID | Finding, as demonstrated | Disposition in this commit |
+| --- | --- | --- |
+| E-18 | Two counters were excluded from the class-independent zero pin because their correct value is positive, and *nothing else constrained them*. Audit E set `azure.data_plane_content_reads = 500` with no other edit and the ledger validated. It then raised `byte_only_integrity_verifications` from 14 to 99 by resumming the composite addends with citations to files that really exist; that validated too. The sentence written in the previous commit asserting both were "constrained by the receipt-citation rule instead" was false: the rule checks addend *shape*, never addend *amounts*, and never reached the first counter at all. | Both pinned to their exact values in `_validate_status_agreement`, beside the parser pins. The false comment is replaced with the finding. Regression test asserts the pin owns the *upward* direction specifically — the one direction the pre-existing floor rule could not catch, and the one both audits attacked. |
+| E-19 | The byte-flow analysis constrained the body of the function *named* `stream_object_digest`, but nothing bound that name to what executes: the scan took the **first** definition `ast.walk` returned, while Python binds the **last**. Three handlers passed every check while shipping every chunk to a module global — one decorated, one rebound by a plain `stream_object_digest = _tap(stream_object_digest)` after the def, one simply defined twice. `assert_no_write_calls_in_source` passed all three as well, since `append`/`extend`/`list` are in no forbidden set. | The name must now be defined exactly once and never rebound, decorated, shadowed, or nest a scope; otherwise the source is refused rather than analysed. Five regression cases, each with a passing control. The generated current-state premise "the one function that holds object bytes" is no longer asserted — it is now established by the check that makes it true. |
+| F: citation existence | `_CITATION_PATTERN` matched any token ending `.py`/`.json`/`.md`, so `docs/does-not-exist.json` satisfied the evidence requirement. A citation that cannot be followed is not evidence. | Cited paths are resolved against the repository root and must be real files. |
+| F: name shadowing and rebinding | `len = leak_and_count` inside the handler, and digest rebinding via walrus, `for` target, `with` target and tuple unpacking, all passed. | A binding collector now covers every binding construct Python has, including recursive tuple/list/starred unpacking; any binding of a whitelisted name or a second binding of a digest name is refused. |
+| F: provenance category | `zero_because_the_activity_has_never_occurred` satisfied a rule whose message says safety counters "require machine evidence". It carries none. | The class is documented as a **record assertion**, not evidence. Rather than rename it and leave it resting on nothing, it is bound to the committed state flags its own text appeals to, so the counter and `retired_v1_state` must record the same history or the ledger is refused. |
+| F: L-40 overstatement | L-40 and §7.4 said every counterexample was produced by a reviewer *executing* the code. Audit F established F-03b statically, and E-19 was found by reasoning about `ast.walk` order. | Corrected in both places. Static reading was sufficient to break these instruments, which is a worse result than needing to run them, and the record now says so. |
+| F-02b | This paragraph claimed a receipt naming a *different container* would fail the anchor check. It would not: the anchor covers per-object digests, count and byte total, and no container, account or path name enters it. | Withdrawn. The check constrains the bytes, not their location, and the docstring now says which. |
+| F-04b | The `NOT_ASSESSABLE` reason read "no review backend exists" — an unscoped claim about the world, reproduced eight times in the decision record. | Scoped to what the assessor observed: no backend is *evidenced in the execution inventory it reads*, which is an absence of evidence within the assessed inventory and not a proof of non-existence anywhere. |
+
+### 7.7 What no audit has reviewed
 
 Audit D did not complete. Its process was lost before it reported, and no
 finding is attributed to it.
 
-More importantly, the remediation in §7.4 — this section included — is material
+More importantly, the remediation in §7.6 — this section included — is material
 that no independent review has seen. That is the structure `L-38` and `L-40`
 describe, and it is not closed. Each round of remediation creates a new
-unreviewed state, and the fact that two independent closure reviews found twelve
-further defects in a state that had already been remediated for eighteen is
-direct evidence that the pattern does not converge on its own. Self-authored tests are
-not independent validation, and an audit that reviewed the previous commit is
-not a review of this one.
+unreviewed state, and the fact that three consecutive independent reviews found
+further defects in states that had already been remediated — eighteen, then
+twelve, then eight — is direct evidence that the pattern does not converge on
+its own. Twice the defect was introduced *by the remediation itself*.
+Self-authored tests are not independent validation, and an audit that reviewed
+the previous commit is not a review of this one.
 
 ---
 
