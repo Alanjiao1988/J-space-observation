@@ -1301,6 +1301,66 @@ def test_update_on_something_that_is_not_a_digest_is_refused():
     )
 
 
+def test_returning_the_byte_bearing_parameter_is_refused():
+    # E-12. The flow analysis tracked the loop variable but not the parameter
+    # carrying the stream, so `return digest.hexdigest(), total, chunks` handed
+    # every chunk back to the caller and passed. Audit E demonstrated it.
+    assert (
+        _refuses(
+            "    digest = hashlib.sha256()\n"
+            "    total = 0\n"
+            "    for chunk in chunks:\n"
+            "        digest.update(chunk)\n"
+            "        total += len(chunk)\n"
+            "    return (digest.hexdigest(), total, chunks)\n"
+        )
+        == "BYTE_NAME_USED_OUTSIDE_DIGEST"
+    )
+
+
+def test_a_digest_from_a_module_other_than_hashlib_is_refused():
+    # E-12. `digest_names` matched on the attribute name alone, so
+    # `digest = exfil.sha256()` qualified as the digest and could then receive
+    # every chunk, while the docstring said the receiver had to come from
+    # hashlib.
+    assert (
+        _refuses(
+            "    import exfil\n"
+            "    digest = exfil.sha256()\n"
+            "    total = 0\n"
+            "    for chunk in chunks:\n"
+            "        digest.update(chunk)\n"
+            "        total += len(chunk)\n"
+            "    return (digest.hexdigest(), total)\n"
+        )
+        == "UPDATE_ON_NON_DIGEST"
+    )
+
+
+def test_rebinding_the_digest_name_is_refused():
+    # F-03. `digest = hashlib.sha256()` followed by `digest = sink` left the
+    # name in `digest_names` while the object receiving the bytes was no longer
+    # a digest at all.
+    assert (
+        _refuses(
+            "    digest = hashlib.sha256()\n"
+            "    total = 0\n"
+            "    digest = object()\n"
+            "    for chunk in chunks:\n"
+            "        digest.update(chunk)\n"
+            "        total += len(chunk)\n"
+            "    return (digest.hexdigest(), total)\n"
+        )
+        == "DIGEST_NAME_REASSIGNED"
+    )
+
+
+def test_the_live_byte_handler_still_passes_its_own_check():
+    # The negative controls above are only meaningful if the real handler is
+    # accepted. A check that refuses everything proves nothing.
+    assert probe.assert_byte_handling_is_digest_only() > 0
+
+
 def test_a_handler_that_no_longer_iterates_its_input_is_refused():
     # E-02. If the shape changes, the analysis no longer describes the code.
     # Reporting success over a function this check cannot read would be worse

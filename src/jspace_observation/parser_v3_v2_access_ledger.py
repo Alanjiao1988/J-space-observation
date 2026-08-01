@@ -339,6 +339,17 @@ _MUST_BE_ZERO_CLASSES: frozenset[str] = frozenset(
 #: both ``formal_v2_evaluation_access`` semantic-read counters --- so a ledger
 #: could have asserted that no locked label had been opened for scoring, on no
 #: evidence at all.
+#:
+#: A class label alone earns nothing. Audit E (E-16) demonstrated the gap with a
+#: working counterexample: a counter in this set could be moved into
+#: ``composite_of_separately_evidenced_parts`` and carry a positive value on two
+#: prose addends, because "machine evidence" was implemented as "any class
+#: except operator-maintained" and addends were only required to be non-empty
+#: distinct strings. Two rules now close it. Every addend of a counter in this
+#: set must itself cite a committed artifact
+#: (:func:`_assert_composite_addends_are_citable`), and the semantic-access
+#: counters are pinned to zero for this phase whatever class they carry
+#: (:data:`_PHASE_1_2H_ZERO_ACCESS_COUNTERS`).
 _MACHINE_EVIDENCE_REQUIRED: frozenset[str] = frozenset(
     {
         "retired_v1_repair_access.sealed_input_semantic_reads",
@@ -360,6 +371,36 @@ _MACHINE_EVIDENCE_REQUIRED: frozenset[str] = frozenset(
         "parser_execution.parser_invocations_on_private_or_locked_data",
         "parser_execution.candidate_predictions_generated",
         "parser_execution.comparator_predictions_generated",
+    }
+)
+
+#: The safety counters that must read exactly zero in Phase 1.2H, *whatever*
+#: provenance class they carry.
+#:
+#: Audit E (E-16) set ``formal_v2_evaluation_access.labels_opened_for_scoring``
+#: to 7 and ``sealed_input_semantic_reads`` to 3 by reclassifying them into the
+#: composite class, and ``validate_ledger`` accepted both. The value rules were
+#: attached to *classes* --- ``_MUST_BE_ZERO_CLASSES`` --- so moving a counter
+#: to a different class moved it out from under them. Parser counters were
+#: already pinned independently of class, which is why the same mutation failed
+#: on them; the semantic-access counters were not.
+#:
+#: This set is the class-independent pin. Two safety counters are deliberately
+#: absent because their correct value is positive.
+#: ``byte_only_integrity_verifications`` is 14, and ``data_plane_content_reads``
+#: is 12 --- the gate really did read those objects' bytes, and pretending
+#: otherwise would be its own false claim. Both are constrained by the
+#: receipt-citation rule instead of by a zero pin.
+_PHASE_1_2H_ZERO_ACCESS_COUNTERS: frozenset[str] = frozenset(
+    {
+        "retired_v1_repair_access.sealed_input_semantic_reads",
+        "retired_v1_repair_access.sealed_label_semantic_reads",
+        "retired_v1_repair_access.private_curator_files_read",
+        "retired_v1_repair_access.labels_opened_for_scoring",
+        "formal_v2_evaluation_access.sealed_input_semantic_reads",
+        "formal_v2_evaluation_access.sealed_label_semantic_reads",
+        "formal_v2_evaluation_access.labels_opened_for_scoring",
+        "azure.data_plane_writes",
     }
 )
 
@@ -1071,6 +1112,36 @@ def _assert_evidence_is_citable(class_name: str, evidence: str) -> None:
     )
 
 
+def _assert_composite_addends_are_citable(
+    path: str, addends: list[Any]
+) -> None:
+    """Require every addend of a safety counter to cite a committed artifact.
+
+    Audit E (E-16) showed that the composite class let a safety counter carry a
+    positive value on two lines of prose. ``_assert_evidence_is_citable`` was
+    applied to the *class-level* evidence string, and the class-level string for
+    a composite says only how the decomposition works --- the addends are where
+    the actual claims live, and they were unchecked.
+
+    So each addend of a counter in :data:`_MACHINE_EVIDENCE_REQUIRED` must name
+    something a reader can open, on the same rule the class-level string obeys.
+    This still does not verify the citation is *correct*; it removes the route
+    where a counter asserting "no locked label was opened" is backed by
+    "batch one, recalled".
+    """
+
+    for index, addend in enumerate(addends):
+        evidence = addend.get("evidence", "") if isinstance(addend, Mapping) else ""
+        if _CITATION_PATTERN.search(str(evidence)):
+            continue
+        raise LedgerError(
+            f"counter_provenance composite parts for {path!r} addend {index} "
+            "carries a safety claim but cites no committed artifact; this "
+            "counter is in _MACHINE_EVIDENCE_REQUIRED, so recollection is not "
+            f"evidence for any part of it (got: {evidence!r})"
+        )
+
+
 def _counter_lookup(counters_block: Any, path: str) -> Any:
     """Read a ``group.name`` counter path out of a live-counters block."""
 
@@ -1217,6 +1288,8 @@ def _validate_composite_parts(
                 f"counter_provenance composite parts for {path!r} sum to "
                 f"{total}, but the counter is {value!r}"
             )
+        if path in _MACHINE_EVIDENCE_REQUIRED:
+            _assert_composite_addends_are_citable(path, addends)
 
 
 def _validate_counter_provenance(block: Any) -> None:
@@ -1485,6 +1558,21 @@ def _validate_status_agreement(ledger: Mapping[str, Any], status: str) -> None:
             raise LedgerError(
                 f"parser_execution.{name} must be 0 in Phase 1.2H; no parser may "
                 "run and no prediction may be generated"
+            )
+
+    # Audit E (E-16). These pins are deliberately independent of the provenance
+    # class. The class-keyed rules in _validate_counter_provenance_values can be
+    # escaped by reclassifying a counter; these cannot, which is the difference
+    # between a bookkeeping rule and a safety rule.
+    counters_block = ledger.get("live_counters")
+    for path in sorted(_PHASE_1_2H_ZERO_ACCESS_COUNTERS):
+        value = _counter_lookup(counters_block, path)
+        if value:
+            raise LedgerError(
+                f"{path} must be 0 in Phase 1.2H, got {value!r}; this phase "
+                "authorises byte-only integrity verification and nothing else, "
+                "so no semantic read, no label opening and no data-plane write "
+                "may be recorded under any provenance class"
             )
 
 

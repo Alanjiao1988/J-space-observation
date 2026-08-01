@@ -25,7 +25,10 @@ What it deliberately does not do
 --------------------------------
 It does not provision anything, it does not decide to build anything, and a
 ``QUALIFIES`` verdict would not be authorisation to review. It answers exactly
-one question: does a backend meeting every frozen condition exist today.
+one question: does a backend meeting every frozen condition exist today *within
+the enumerated search scope* --- the resource group and region the evidence
+bundle names. A ``DOES_NOT_QUALIFY`` verdict is a statement about what was
+enumerated, not about the subscription or the tenant.
 
 Precedence
 ----------
@@ -47,10 +50,15 @@ raised as A-03 about ``public_network_access``, reappearing in the instrument
 that decides the round's outcome.
 
 The flag is gone. :func:`derive_gate_outcome` reads the execution receipt,
-validates it against the frozen receipt schema, and requires *nine* independent
-properties of it before returning ``True``. A round with no receipt passes no
-``--receipt`` and necessarily gets ``False``. The receipt's SHA-256 is recorded
-in the assessment, so the assessment names the exact evidence it relied on.
+validates it against the frozen receipt schema, and requires *twelve*
+properties of it before returning ``True`` --- see that function's own
+docstring for which of the twelve are independent observations and which are
+co-derived or schema-redundant, because they are not twelve independent facts.
+Audit F (E-08) found this sentence still saying "nine independent" after the
+count had been corrected in :data:`GATE_REQUIREMENTS`; the module docstring had
+been missed. A round with no receipt passes no ``--receipt`` and necessarily
+gets ``False``. The receipt's SHA-256 is recorded in the assessment, so the
+assessment names the exact evidence it relied on.
 """
 
 from __future__ import annotations
@@ -404,14 +412,27 @@ def derive_expected_anchors(
 
     The anchors are derived here rather than copied from a constant so that
     editing the public evidence file cannot silently move the target: the
-    decision record pins that file's SHA-256 and its members digest, both are
-    verified, and the aggregate is then recomputed from its contents.
+    decision record pins that file's SHA-256, it is verified before anything is
+    read out of the file, and the object count and byte total are then
+    cross-checked against the values the record registers. (Audit F found this
+    paragraph also claiming the *members digest* was verified. It is not read
+    here at all; the claim is withdrawn rather than the check added, because the
+    file digest already fixes the file's contents.)
 
-    What this establishes: the run streamed objects whose per-object digests are
-    exactly the committed public set. A receipt fabricated without access to the
-    private source cannot produce this value except by copying it, and copying
-    it means asserting a digest set that the seal already published --- which is
-    the point of having published it.
+    What this establishes, exactly: the receipt reports an aggregate over
+    per-object digests identical to the committed public set, and an object
+    count and byte total identical to the registered ones. That is consistency
+    with external values, and it is worth having --- a receipt naming a
+    different container, a truncated listing, or a partial stream fails it.
+
+    What it does **not** establish, and Audit F was right to press on this: the
+    anchor is itself public, so copying it is available to anyone with the
+    repository. This conjunct raises the cost of a fabricated receipt from
+    "invent twelve plausible numbers" to "reproduce a specific published
+    digest"; it is not proof that a stream occurred. Live-stream proof would
+    need an authenticated execution and output channel, which
+    :func:`assert_execution_is_platform_attested` approximates and does not
+    reach --- see its docstring for the same distinction.
     """
 
     record = json.loads(record_path.read_text(encoding="utf-8"))
@@ -565,7 +586,12 @@ def load_gate_evidence(receipt_path: Path | None) -> dict[str, Any]:
             "platform_attested_execution": None,
         }
 
-    raw = receipt_path.read_bytes()
+    # Audit E (E-17): this hashed the file raw while
+    # `_assert_cited_receipt_reproduces_the_gate` hashed it LF-normalised, so on
+    # a Windows clone with `core.autocrlf=true` the two disagreed and the
+    # assessor refused an untampered repository. Both now normalise, which is a
+    # no-op on the Linux runner where every committed digest was computed.
+    raw = receipt_path.read_bytes().replace(b"\r\n", b"\n")
     receipt = json.loads(raw.decode("utf-8"))
 
     sys.path.insert(0, str(Path(__file__).resolve().parent))

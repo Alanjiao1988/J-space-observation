@@ -658,15 +658,43 @@ def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
 
     # Names bound to a fresh hashlib digest here. Only these may receive an
     # `update` call, so a same-named sink cannot impersonate the digest.
+    #
+    # Audit E (E-12): matching on the attribute name alone accepted
+    # `sink = exfil.sha256()`, while the docstring said the receiver must come
+    # from `hashlib.sha256()`. The module is now checked, so an arbitrary object
+    # offering a `sha256` method no longer qualifies. `from hashlib import
+    # sha256` is deliberately still refused: it is a bare `ast.Name` call whose
+    # binding this function does not follow, and refusing it is the safe
+    # direction.
     digest_names: set[str] = set()
     for node in ast.walk(target):
         if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
             continue
         func = node.value.func
-        if isinstance(func, ast.Attribute) and func.attr == "sha256":
+        if (
+            isinstance(func, ast.Attribute)
+            and func.attr == "sha256"
+            and isinstance(func.value, ast.Name)
+            and func.value.id == "hashlib"
+        ):
             for bound in node.targets:
                 if isinstance(bound, ast.Name):
                     digest_names.add(bound.id)
+
+    # A digest name that is later rebound is no longer the digest that was
+    # constructed here. Audit F raised `digest = hashlib.sha256(); digest = sink`
+    # as a bypass, so any second assignment to a digest name is refused.
+    seen_digest_bindings: set[str] = set()
+    for node in ast.walk(target):
+        if not isinstance(node, (ast.Assign, ast.AugAssign, ast.AnnAssign)):
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        for bound in targets:
+            if not isinstance(bound, ast.Name) or bound.id not in digest_names:
+                continue
+            if bound.id in seen_digest_bindings:
+                raise ProbeRefusal("INTERNAL_REFUSAL", "DIGEST_NAME_REASSIGNED")
+            seen_digest_bindings.add(bound.id)
 
     inspected = 0
     whitelisted_argument_nodes: set[int] = set()
@@ -727,6 +755,13 @@ def _assert_chunk_name_never_escapes(
     handler's only parameter. Once that name is known, an assignment, a return,
     a further iteration or any other read of it is a path by which object bytes
     could leave the digest, and none of those is a call.
+
+    Audit E (E-12) then showed that tracking the loop variable alone was not
+    enough: ``return digest.hexdigest(), total, chunks`` passed, because
+    ``chunks`` --- the *parameter* carrying the byte stream --- was never in the
+    tracked set. The parameter is now tracked too, and may appear only as the
+    thing being iterated. That is the one use which does not move bytes
+    anywhere: it hands them to the loop that feeds the digest.
     """
 
     import ast
@@ -734,6 +769,7 @@ def _assert_chunk_name_never_escapes(
     parameters = [argument.arg for argument in target.args.args]
     chunk_names: set[str] = set()
     loop_target_nodes: set[int] = set()
+    permitted_parameter_nodes: set[int] = set()
     for node in ast.walk(target):
         if not isinstance(node, ast.For):
             continue
@@ -743,6 +779,7 @@ def _assert_chunk_name_never_escapes(
                 raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_LOOP_TARGET_NOT_A_NAME")
             chunk_names.add(node.target.id)
             loop_target_nodes.add(id(node.target))
+            permitted_parameter_nodes.add(id(iterated))
 
     if not chunk_names:
         # The handler no longer iterates its input. Either it accumulates, or
@@ -750,10 +787,11 @@ def _assert_chunk_name_never_escapes(
         # than report success over a function this check no longer understands.
         raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_CHUNK_BINDING_NOT_FOUND")
 
+    tracked = chunk_names | set(parameters)
     for node in ast.walk(target):
-        if not isinstance(node, ast.Name) or node.id not in chunk_names:
+        if not isinstance(node, ast.Name) or node.id not in tracked:
             continue
-        if id(node) in loop_target_nodes:
+        if id(node) in loop_target_nodes or id(node) in permitted_parameter_nodes:
             continue
         if id(node) not in whitelisted_argument_nodes:
             raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_NAME_USED_OUTSIDE_DIGEST")

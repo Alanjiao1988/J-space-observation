@@ -793,8 +793,36 @@ Audit C then reviewed `393ff3e`. It also returned BLOCKED, with one blocker and
 eight major findings, and its blocker was material: the instrument that decides
 this round's terminal state took the byte-only gate outcome as an operator-set
 command-line flag and never read the execution receipt, so it could not have
-detected a failed gate. That was remediated in this pass, which again produced
-material no audit has seen.
+detected a failed gate. That was remediated in `ccbaab0`.
+
+Audits E and F then reviewed `ccbaab0` — the remediated state. Both returned
+BLOCKED, with eighteen findings between them. That result is the most useful
+evidence this ledger entry has, and it points the other way from reassurance:
+one round of remediation, reviewed, produced eighteen further defects, several
+of them in the very sentences written to describe the previous fixes. Their
+findings were remediated in `13015d4`.
+
+Audits E and F then reviewed `13015d4` on closure. **Both returned BLOCKED
+again.** Between them they demonstrated, with working counterexamples rather
+than by reading: that the composite provenance class added to satisfy F-06 let
+`labels_opened_for_scoring` carry the value 7 on two lines of prose, reopening
+precisely the route that adding that counter to `_MACHINE_EVIDENCE_REQUIRED`
+for E-10 had closed in the same commit; that the byte-flow analysis still
+admitted `return digest.hexdigest(), total, chunks`, handing every chunk back to
+the caller, because it tracked the loop variable and not the parameter; that a
+digest receiver from any module offering `sha256` was accepted while the
+docstring said `hashlib`; and that two rows of the disposition table certifying
+these fixes were false as written. Those are remediated in the present commit,
+which is again material no audit has seen.
+
+The pattern is now three rounds long and has not converged. Each remediation has
+been found defective by the next review, and twice the defect was introduced *by
+the remediation itself*. The honest reading is not that the instruments are
+converging on correctness but that self-review does not find this class of
+defect — every one of the counterexamples above was produced by an independent
+reviewer executing the code, and none by the author's own test suite, which was
+green throughout. A green suite here means "the properties I thought to check
+hold", and the recurring failure has been in what was not thought of.
 
 An earlier draft of this section claimed that "Audits C and D reviewed the final
 state, so the gap is narrowed rather than open". That sentence was written

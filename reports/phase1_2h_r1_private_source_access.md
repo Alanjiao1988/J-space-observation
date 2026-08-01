@@ -168,11 +168,15 @@ more advanced-sounding terminal state cannot be claimed by a round that did less
 
 ## 6. Validation
 
+The counts below are for the present commit. Where a run identifier is given it
+is immutable and independently viewable; where it is not, the row is an operator
+assertion and is marked as such.
+
 | Check | Local | GitHub-hosted runner |
 |---|---|---|
-| `tests/test_phase1_2h_r1_access.py` | 162 passed | pass |
-| `tests/test_phase1_2h_r1_review_boundary.py` | 39 passed | pass |
-| `tests/test_parser_v3_v2_access_ledger.py` | 98 passed | pass |
+| `tests/test_phase1_2h_r1_access.py` | 178 passed | pass |
+| `tests/test_phase1_2h_r1_review_boundary.py` | 56 passed | pass |
+| `tests/test_parser_v3_v2_access_ledger.py` | 113 passed | pass |
 | Committed boundary assessment regenerates identically (`--check`) | pass | pass |
 | Committed receipt is schema-valid | pass | pass |
 | Current-state consistency instrument | pass | pass |
@@ -180,15 +184,32 @@ more advanced-sounding terminal state cannot be claimed by a round that did less
 | Offline probe dry run reproduces the anchors | pass | pass |
 | Probe imports no parser-bearing package | pass | pass |
 | `compileall`, `git diff --check`, secret scan, large-file check | pass | pass |
-| **Full repository suite** | not run locally this round | **2132 passed, 2 failed, 15 skipped** |
+| **Full repository suite** | not run locally this round | see below |
 
-The full suite was run on a GitHub-hosted runner rather than locally
-(run `30693832918`, commit `ccbaab0`). That is an operator constraint, not a
-methodological one: the local machine has overheated and rebooted repeatedly
-under sustained load, and a suite that crashes its host reports nothing. Every
-R1-specific step in the same workflow passed on the same runner, so the result
-is not weaker evidence than a local run — it is the same evidence, observed on
-hardware that stayed up.
+The full suite runs on a GitHub-hosted runner rather than locally. That is an
+operator constraint, not a methodological one: the local machine has overheated
+and rebooted repeatedly under sustained load, and a suite that crashes its host
+reports nothing.
+
+Two runs are on record, and Audit F was right to insist they be distinguished —
+an earlier version of this table presented a parent-commit run as validation of
+material that commit did not contain.
+
+| Run | Commit | Result |
+|---|---|---|
+| `30693832918` | `ccbaab0` | 2132 passed, 2 failed, 15 skipped |
+| `30695685244` | `13015d4` | 2174 passed, 2 failed, 15 skipped — every R1-specific step passed |
+
+The two failures are identical in both runs and are pre-existing and
+environmental: `tests/test_parser_v3_seal_job.py` needs the git-ignored
+`locked_inputs.jsonl`, which is absent from a fresh clone by design. They are
+unrelated to this work and predate it.
+
+**The present commit has no full-suite run recorded here**, because the commit
+does not exist until this document is written into it. Its run is dispatched
+after push, and the terminal state does not depend on it: every gate this round
+turns on is in the three R1 suites and the `--check` steps above, all of which
+run locally in seconds and are reproducible by any reader.
 
 The two runner failures are `tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last`
 and `::test_seal_refuses_a_non_empty_parent_prefix`. Both abort with
@@ -288,28 +309,69 @@ about the environment were stated as facts about the world.
 | F-06 | Major | `byte_only_integrity_verifications: 14` classified `receipt_derived_exact` when the receipt reports 12 | new `composite_of_separately_evidenced_parts` class with a mandatory, validator-enforced decomposition; the C-02 rule was re-stated on the evidence so the reclassification could not weaken it |
 | F-07 | Major | `generate_current_state.py` hard-coded the unsupported conclusions | both corrected at the generator, so every current-state document inherits the correction |
 | E-01 | Major | `assert_gate_evidence_consistent` could not fail; three documents called it a three-place enforcement point | now applied to the *committed* file, and it opens the receipt the evidence block names, hashes it, and re-derives the outcome; four negative-control tests show it rejecting tampering |
-| E-02 | Major | the byte-handler whitelist was called "complete"; it constrained calls, so `global SINK; SINK = chunk`, `return chunk`, `for b in chunk` and a same-named non-digest sink all passed | "complete" withdrawn; the check now tracks the chunk binding itself and refuses any use that is not an argument to a whitelisted digest call, with six negative-control tests |
+| E-02 | Major | the byte-handler whitelist was called "complete"; it constrained calls, so `global SINK; SINK = chunk`, `return chunk`, `for b in chunk` and a same-named non-digest sink all passed | "complete" withdrawn; the check now tracks the chunk binding and refuses any use that is not an argument to a whitelisted digest call, with six negative-control tests. **Closure review found this incomplete — see E-12 in §7.5.** |
 | E-03 | Major | the C-06 row described a denylist where the fix was a whitelist; §8 described the AST checks inaccurately | corrected |
-| E-04 | Major | "the probe's reachable source" survived in the protocol and this report | replaced everywhere with the first-party-source scope that is actually checked; the "scope claim is now accurate" certification in the C-14 row withdrawn |
-| E-05 | Major | `structurally_zero_by_source_analysis` claimed AST enforcement for four counters no AST check reaches, and carried no rule that the value was zero | those four moved to a new `zero_because_the_activity_has_never_occurred` class; both zero classes now refuse a non-zero value |
+| E-04 | Major | "the probe's reachable source" survived in the protocol and this report | replaced in `docs/phase1_2h_r1_cloud_access_protocol.md` and in this report with the first-party in-job scope actually checked; the "scope claim is now accurate" certification in the C-14 row withdrawn. The row previously said "replaced everywhere", which was false: `paper/methods_ledger.md` still carried it. **See E-13 in §7.5.** |
+| E-05 | Major | `structurally_zero_by_source_analysis` claimed AST enforcement for four counters no AST check reaches, and carried no rule that the value was zero | those four moved to a new `zero_because_the_activity_has_never_occurred` class; both zero classes now refuse a non-zero value. The one counter left behind still cited checks that do not reach it — **see E-14 in §7.5.** |
 | E-06 | Major | the C-12 residual test asserted a property of a synthetic fixture, never opening receipt 003 | it now opens the committed receipt, and a companion test shows a receipt built today carries the derived list |
-| E-07 | Major | every gate conjunct was the receipt agreeing with itself | anchor conjuncts added, recomputed offline from the committed expected-evidence file |
-| E-08 | Minor | the requirements docstring said "nine" where there are twelve, and did not disclose that some conjuncts are co-derived | corrected and disclosed |
-| E-09 | Minor | `invariants_checked: 12` restated as a measurement in four current-state documents | qualified at the generator and in this report |
-| E-10 | Minor | `formal_v2_evaluation_access.labels_opened_for_scoring` — the strongest safety claim the ledger makes — was absent from `_MACHINE_EVIDENCE_REQUIRED` | added |
-| E-11 | Minor | the committed execution inventory was bound to nothing | the ledger suite now asserts it agrees with `azure.job_executions` |
+| E-07 | Major | every gate conjunct was the receipt agreeing with itself | anchor conjuncts added, recomputed offline from the committed expected-evidence file. This is external-value consistency, not proof that a stream occurred; the docstring claiming the stronger reading was corrected on closure review |
+| E-08 | Minor | the requirements docstring said "nine" where there are twelve, and did not disclose that some conjuncts are co-derived | corrected in `GATE_REQUIREMENTS`. The *module* docstring was missed and still said "nine independent" — **see §7.5** |
+| E-09 | Minor | `invariants_checked: 12` restated as a measurement in four current-state documents | qualified at the generator and in this report. The hand-written `docs/thread_handoff.md` banner was missed — **see §7.5** |
+| E-10 | Minor | `formal_v2_evaluation_access.labels_opened_for_scoring` — the strongest safety claim the ledger makes — was absent from `_MACHINE_EVIDENCE_REQUIRED` | added. The composite class added for F-06 in the same commit reopened the route — **see E-16 in §7.5** |
+| E-11 | Minor | the committed execution inventory was bound to nothing | `tests/test_phase1_2h_r1_review_boundary.py` asserts it agrees with `azure.job_executions` |
 
-### 7.4 What no audit has reviewed
+### 7.4 Closure review of Audits E and F — both BLOCKED again
+
+Audits E and F were re-engaged against `13015d4`, the commit remediating the
+eighteen findings above, with a clean working tree. **Both returned BLOCKED.**
+
+This is the third consecutive round in which review of a remediation found new
+defects, and twice now the defect was introduced *by the remediation itself*.
+Every counterexample below was produced by a reviewer executing the code. The
+author's three suites were green throughout — which is the point: a green suite
+means the properties someone thought to check hold, and the recurring failure
+has been in what was not thought of.
+
+| ID | Severity | Finding, as demonstrated | Disposition in this commit |
+| --- | --- | --- | --- |
+| E-16 | Major | The `composite_of_separately_evidenced_parts` class added for F-06 reopened exactly the route that adding `labels_opened_for_scoring` to `_MACHINE_EVIDENCE_REQUIRED` for E-10 closed — in the same commit. Audit E set that counter to 7 with two prose addends and `validate_ledger` accepted it. "Machine evidence" was implemented as "any class except operator-maintained", and the value rules were keyed on the *class*, so reclassifying moved a counter out from under them. | Two rules. `_PHASE_1_2H_ZERO_ACCESS_COUNTERS` pins the semantic-access counters to zero independently of class, the way the parser counters already were — which is why the same mutation always failed on those. And every addend of a counter in `_MACHINE_EVIDENCE_REQUIRED` must itself cite a committed artifact. Audit E's exact mutation is now a test, run against all six classes. |
+| E-12 | Major | The byte-flow analysis tracked the loop variable but not the parameter carrying the stream, so `return digest.hexdigest(), total, chunks` returned every chunk to the caller and **passed**. Separately, `digest_names` matched on the attribute name alone, so `digest = exfil.sha256()` qualified as the digest while the docstring said `hashlib.sha256()`. | Parameters are tracked, permitted only as the iterated expression; the digest receiver must be assigned from `hashlib.sha256()` specifically. Both counterexamples are now negative-control tests, alongside a positive control that the live handler still passes. |
+| F-03b | Major | `digest = hashlib.sha256()` followed by `digest = sink` left the name in `digest_names` while the object receiving bytes was no longer a digest. | Any rebinding of a digest name is refused (`DIGEST_NAME_REASSIGNED`), with a test. |
+| E-13 | Major | The E-04 row above claimed the phrase was "replaced everywhere". `git grep` refuted it in one command: `paper/methods_ledger.md:840` still called it "positive structural proof" over "the probe's reachable source" — the strong form, in the most formal artifact in the repository. `L-40` also still said the Audit C remediation "produced material no audit has seen", which Audits E and F had by then seen. | `methods_ledger.md` corrected to the two-file first-party scope and to "check" rather than "proof"; `L-40` rewritten to record all three review rounds and the non-convergence; the E-04 row restated as the files actually changed. |
+| F-01b | Major | The schema said the attestation field "establishes that the described execution really happened". The inventory is an operator-transcribed, unsigned JSON file in this same repository; a hand-edited entry satisfies the check as easily as real control-plane output. | Schema description rewritten: it establishes agreement with a separately committed transcript, constrains a rogue probe and not a rogue operator, and "attested" names a provenance class, not cryptographic authentication. |
+| F-02b | Major | `derive_expected_anchors`'s docstring said the decision record pins the evidence file's SHA-256 *and its members digest*, "both are verified". The members digest is never read. It also said a fabricated receipt "cannot produce this value except by copying it" — but the anchor is public, so copying is freely available. | Both claims corrected in place. The docstring now states what the conjunct does establish (consistency with external values, defeating a wrong container or a truncated listing) and what it does not (proof that a stream occurred). |
+| E-14 | Minor | The single counter left in `structurally_zero_by_source_analysis` still cited two AST checks as its basis. Neither constrains which files are *read* — the probe itself calls `read_text` in four places. The real basis, the frozen prefix and member list, had been demoted to a `note`. | Evidence rewritten to lead with the frozen binding. |
+| E-15 / E-09b | Minor | `docs/thread_handoff.md:26` still read "Twelve invariants checked, none failed" in the hand-written banner while the generated block in the same file was corrected, and attributed the zeros to "the probe's own source … anywhere in it" — one file, where the check reads two. | Banner rewritten. |
+| E-08b | Minor | The *module* docstring still said `derive_gate_outcome` "requires *nine* independent properties" after the count was corrected in `GATE_REQUIREMENTS`. | Corrected, with the miss recorded in the text. |
+| F-04b | Minor | Two unscoped backend claims survived in the assessor module docstring and its `NOT_ASSESSABLE` reason text. | Scoped to the enumerated search scope. |
+| F-07b | Minor | The generator said each chunk is passed "only to a SHA-256 digest". It is also passed to `len`. | Corrected; both generated documents inherit it. |
+| E-17 | Minor | `load_gate_evidence` hashed the receipt raw while `_assert_cited_receipt_reproduces_the_gate` hashed it LF-normalised, so on a Windows clone with `core.autocrlf=true` the assessor refused an untampered repository. Cannot cause a false pass. | Both normalise; the R1 JSON artifacts pinned `text eol=lf`. |
+
+Two closure findings are **accepted as residual limitations rather than fixed**,
+because fixing them requires infrastructure this round is not authorised to
+build:
+
+- **The inventory is not cryptographically authenticated.** Audit F is right.
+  Real attestation needs a signed control-plane response or an authenticated
+  output channel. What exists constrains the probe, not the operator, and every
+  document that mentions it now says so.
+- **`zero_because_the_activity_has_never_occurred` rests on repository-internal
+  evidence.** A validator that refuses to record an activity cannot detect that
+  the activity occurred. The class name states the claim and the evidence names
+  the artifacts; it is an argument from the absence of any authorised occasion,
+  not an observation, and it is now labelled that way.
+
+### 7.5 What no audit has reviewed
 
 Audit D did not complete. Its process was lost before it reported, and no
 finding is attributed to it.
 
-More importantly, the remediation of Audits E and F — §7.3 included — is
-material that no independent review has seen. That is the structure `L-38` and
-`L-40` describe, and it is not closed. Each round of remediation creates a new
-unreviewed state, and the fact that Audits E and F found eighteen further
-defects in a state that Audit C had already been remediated for is direct
-evidence that the pattern does not converge on its own. Self-authored tests are
+More importantly, the remediation in §7.4 — this section included — is material
+that no independent review has seen. That is the structure `L-38` and `L-40`
+describe, and it is not closed. Each round of remediation creates a new
+unreviewed state, and the fact that two independent closure reviews found twelve
+further defects in a state that had already been remediated for eighteen is
+direct evidence that the pattern does not converge on its own. Self-authored tests are
 not independent validation, and an audit that reviewed the previous commit is
 not a review of this one.
 

@@ -835,8 +835,13 @@ trade the substance for the appearance.
 
 So the receipt records `"Unknown"` and `NOT_CONFIRMED_IN_JOB`, the schema
 *refuses* any other value for the first, and both properties are established
-instead from operator control-plane evidence plus positive structural proof —
-`data_plane_writes: 0` and an AST demonstration that no write, upload, delete
-or delegation call site exists in the probe's reachable source. A receipt that is
-honestly incomplete is worth more than one that is complete because the boundary
-was widened to complete it.
+instead from operator control-plane evidence plus a positive structural check —
+`data_plane_writes: 0`, and an AST check that no write, upload, delete or
+delegation call site appears in the first-party Python source that runs inside
+the job (`IN_JOB_FIRST_PARTY_SOURCES`: the probe and the receipt validator).
+That scope is narrower than it once read here. Until Audit E's closure review
+this sentence said "positive structural proof" over "the probe's reachable
+source", which would take in the Azure SDK and the standard library; neither is
+analysed, and a check over two first-party files is evidence rather than proof.
+A receipt that is honestly incomplete is worth more than one that is complete
+because the boundary was widened to complete it.

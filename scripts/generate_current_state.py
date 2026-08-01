@@ -102,12 +102,12 @@ INVARIANT_STATEMENTS: tuple[str, ...] = (
     "zeros are literals the probe emits. What makes them credible is AST "
     "analysis of the two first-party Python files that run inside the job: no "
     "mutating Blob call appears in either, and the one function that holds "
-    "object bytes passes each chunk only to a SHA-256 digest and uses that name "
-    "nowhere else. That is a property of first-party source — not of the Azure "
-    "SDK, the standard library or the base image, none of which is parsed — and "
-    "not an observation of the running process. The receipt schema's "
-    "`maximum: 0` pins stop a violation being *reported* as a valid receipt, "
-    "but do not themselves observe anything.",
+    "object bytes passes each chunk to a SHA-256 digest and to `len`, and uses "
+    "that name nowhere else. That is a property of first-party source — not of "
+    "the Azure SDK, the standard library or the base image, none of which is "
+    "parsed — and not an observation of the running process. The receipt "
+    "schema's `maximum: 0` pins stop a violation being *reported* as a valid "
+    "receipt, but do not themselves observe anything.",
     "No prediction was generated and no parser was run against any evaluation "
     "or calibration corpus.",
     "No formal parser-v3 evaluation has occurred. Parser v3 remains "

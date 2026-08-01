@@ -24,6 +24,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from jspace_observation import parser_v3_v2_access_ledger as ledger_module  # noqa: E402
 from jspace_observation.parser_v3_v2_access_ledger import (  # noqa: E402
     BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE,
     COUNTER_GROUPS,
@@ -1055,10 +1056,76 @@ def test_a_structurally_zero_counter_may_not_carry_a_non_zero_value(ledger, poli
     ``structurally_zero_by_source_analysis`` means "no code path can make this
     non-zero". A ledger could nonetheless report a positive value under it, so
     the class's whole meaning was decorative.
+
+    The class rule is exercised directly here rather than through
+    ``validate_ledger``. Since E-16 the same mutation is *also* caught by the
+    class-independent phase pin, which runs first because it is a safety rule
+    rather than a bookkeeping one --- so going through the front door would
+    assert the pin's message and leave this rule untested. Both are covered:
+    the pin has its own test below.
     """
 
     ledger["live_counters"]["retired_v1_repair_access"]["private_curator_files_read"] = 3
     with pytest.raises(LedgerError, match="falsifies the class"):
+        ledger_module._validate_counter_provenance_values(
+            ledger["counter_provenance"], ledger["live_counters"]
+        )
+
+
+def test_a_safety_counter_cannot_escape_its_zero_pin_by_changing_class(
+    ledger, policy
+):
+    """E-16: the value rules were keyed on the provenance class.
+
+    Audit E moved ``labels_opened_for_scoring`` into the composite class with
+    two prose addends summing to 7, and ``validate_ledger`` accepted it. The
+    class-keyed rules could be escaped by reclassifying. This asserts the pin
+    holds under every class the ledger admits, including the two that were
+    supposed to guarantee zero and the one that was used to escape them.
+    """
+
+    path = "formal_v2_evaluation_access.labels_opened_for_scoring"
+    for class_name in ledger_module.COUNTER_PROVENANCE_CLASSES:
+        mutated = copy.deepcopy(ledger)
+        for name, block in mutated["counter_provenance"].items():
+            if name == "role":
+                continue
+            if path in block.get("counters", []):
+                block["counters"].remove(path)
+            block.get("parts", {}).pop(path, None)
+        target = mutated["counter_provenance"].setdefault(
+            class_name, {"counters": [], "evidence": "docs/placeholder.json"}
+        )
+        target.setdefault("counters", []).append(path)
+        if class_name == "composite_of_separately_evidenced_parts":
+            target.setdefault("parts", {})[path] = [
+                {"amount": 4, "evidence": "docs/phase1_2h_r1_access_receipt_003.json"},
+                {"amount": 3, "evidence": "docs/phase1_2h_r1_job_execution_inventory.json"},
+            ]
+        mutated["live_counters"]["formal_v2_evaluation_access"][
+            "labels_opened_for_scoring"
+        ] = 7
+        with pytest.raises(LedgerError):
+            _validate(mutated, policy)
+
+
+def test_a_composite_addend_on_a_safety_counter_must_cite_an_artifact(
+    ledger, policy
+):
+    """E-16: composite addends were only required to be distinct non-empty text.
+
+    The class-level evidence string was citation-checked, but for a composite
+    that string only describes how the decomposition works --- the addends are
+    where the claims live. This pins the rule that closes it, on the one safety
+    counter whose correct value is positive and which therefore cannot be
+    protected by a zero pin.
+    """
+
+    parts = ledger["counter_provenance"]["composite_of_separately_evidenced_parts"][
+        "parts"
+    ]["retired_v1_repair_access.byte_only_integrity_verifications"]
+    parts[1] = dict(parts[1], evidence="batch two, recalled")
+    with pytest.raises(LedgerError, match="cites no committed artifact"):
         _validate(ledger, policy)
 
 
