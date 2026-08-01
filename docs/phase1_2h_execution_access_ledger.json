@@ -75,7 +75,7 @@
     "formal_v2_evaluation_access": "Access to a future sealed parser-v3-v2 set for formal evaluation. Distinct from repair access: a repair read must never be reported as, or aggregated with, an evaluation read.",
     "v2_construction": "Construction, sealing, listing-witness and final-contract activity for the successor set.",
     "parser_execution": "Parser invocations and prediction generation. Must remain zero for the whole of Phase 1.2H.",
-    "azure": "Control-plane reads are configuration and existence queries. Data-plane content reads and writes are object access. They are separate because a reachability probe is not a data access. See counter_provenance: the two data-plane counters and job_executions are derived from the signed execution receipt and from Azure's own execution list, so they are exact; control_plane_reads and resource_creations_or_changes are operator-maintained and are not load-bearing safety counters."
+    "azure": "Control-plane reads are configuration and existence queries. Data-plane content reads and writes are object access. They are separate because a reachability probe is not a data access. See counter_provenance: the two data-plane counters come from the execution receipt and job_executions from Azure's own execution list. Independent Audit F (F-01) found this sentence calling the receipt SIGNED. It is not signed. Nothing signs it and nothing verifies a signature; it is a JSON document the probe wrote about itself, and its authority is that of a self-report. What is independently observed is the platform execution list, which records that the execution the receipt names exists, succeeded, and ran the image digest the receipt claims -- scripts/phase1_2h_r1_review_boundary_assessment.py assert_execution_is_platform_attested enforces exactly that binding. So 'exact' here means 'transcribed from a named field without rounding', not 'independently attested'; control_plane_reads and resource_creations_or_changes are operator-maintained and are not load-bearing safety counters."
   },
   "counter_provenance": {
     "role": "Distinguishes counters derived from machine evidence from counters an operator maintains by hand, and distinguishes both from counters whose value is a property of the source rather than a measurement of a run. Audit-relevant because a hand-maintained number must never be presented with the authority of a receipt-derived one, and because a literal the emitting program writes is not the same kind of fact as a value read back from a machine artifact.",
@@ -83,14 +83,13 @@
       "counters": [
         "azure.data_plane_content_reads",
         "azure.data_plane_writes",
-        "retired_v1_repair_access.byte_only_integrity_verifications",
         "retired_v1_repair_access.sealed_input_semantic_reads",
         "retired_v1_repair_access.sealed_label_semantic_reads",
         "parser_execution.parser_invocations_on_private_or_locked_data",
         "parser_execution.candidate_predictions_generated"
       ],
       "evidence": "Each value appears as a named field of docs/phase1_2h_r1_access_receipt_003.json, which is committed and validated against docs/phase1_2h_r1_access_receipt.schema.json by scripts/phase1_2h_r1_receipt_validator.py. The mapping is: azure.data_plane_content_reads <- counters.azure_data_plane_content_reads; azure.data_plane_writes <- counters.azure_data_plane_writes; sealed_input_semantic_reads <- counters.semantic_input_reads; sealed_label_semantic_reads <- counters.semantic_label_reads; parser_invocations_on_private_or_locked_data <- counters.parser_invocations; candidate_predictions_generated <- counters.predictions_generated.",
-      "note": "byte_only_integrity_verifications is a composite and is the one value here that is not a single receipt field. Audit C (C-02) was right that presenting 14 as though the receipt reported it overstated the evidence. It decomposes as 12 + 2: the receipt's counters.byte_only_integrity_verifications is 12, one per authoritative object streamed by the gate, and the standing 2 are the pre-R1 local curator-file verifications recorded at event 2, which are a different kind of observation over different files. Only the 12 are receipt-derived; the 2 are carried forward from an earlier committed ledger state."
+      "note": "Audit C (C-02) found byte_only_integrity_verifications: 14 presented here as though the receipt reported it, when the receipt reports 12. Audit F (F-06) then found the added note insufficient: a composite left inside this class still borrows its authority, because a reader who checks the class contract rather than the note is told the value was copied from a receipt field. The counter has been moved to composite_of_separately_evidenced_parts, which requires it to decompose and which the validator enforces. Every counter remaining in this class is a single receipt field."
     },
     "azure_verified_exact": {
       "counters": [
@@ -101,14 +100,10 @@
     },
     "structurally_zero_by_source_analysis": {
       "counters": [
-        "retired_v1_repair_access.private_curator_files_read",
-        "retired_v1_repair_access.labels_opened_for_scoring",
-        "formal_v2_evaluation_access.sealed_input_semantic_reads",
-        "formal_v2_evaluation_access.sealed_label_semantic_reads",
-        "parser_execution.comparator_predictions_generated"
+        "retired_v1_repair_access.private_curator_files_read"
       ],
-      "evidence": "These are zero because no code path capable of incrementing them exists in anything this round ran. The probe scripts/phase1_2h_r1_private_source_probe.py is checked by its own assert_no_write_calls_in_source(), an AST walk that fails the build if a decode, persist, data-plane write or parser call appears; and tests/test_phase1_2h_r1_access.py asserts the check over the in-job source set. No comparator was run and no formal evaluation was opened, which the absence of any parser_invocation, prediction_generation or formal_evaluation event records, and which validate_ledger() independently forbids for this phase.",
-      "note": "Audit C (C-04) found these previously classified as receipt_derived_exact and described as in-process instrumentation. Both were wrong. comparator_predictions_generated in particular has no corresponding receipt field at all -- the receipt's counter keys are azure_data_plane_content_reads, azure_data_plane_writes, byte_only_integrity_verifications, list_operations, parser_invocations, predictions_generated, semantic_input_reads and semantic_label_reads, and no other. A zero established by reading code is a weaker and different fact than a zero read back from a receipt, and saying so is the point of this class."
+      "evidence": "These are zero because no first-party code path that could make them non-zero exists, checked by AST over the two files listed in IN_JOB_FIRST_PARTY_SOURCES in scripts/phase1_2h_r1_private_source_probe.py (the probe itself and scripts/phase1_2h_r1_receipt_validator.py): assert_no_write_calls_in_first_party_source refuses any mutating Blob call, and assert_byte_handling_is_digest_only refuses any use of an object-byte chunk other than as an argument to a SHA-256 digest, with global, nonlocal, assignment, return and re-iteration of that name all refused. Audit E (E-05) found the earlier wording claiming AST enforcement for counters that no AST check touches; those have been moved to zero_because_the_activity_has_never_occurred, and what remains here is only what the checks actually reach. The scope is first-party source: the Azure SDK, the standard library and the base image are not parsed, and nothing is claimed about them.",
+      "note": "private_curator_files_read is additionally zero because the probe's blob enumeration is bound to the frozen prefix and member list in docs/phase1_2h_r1_access_decision_record.json, which contains no curator file; command line and environment cannot redirect it. Where a zero rests only on source analysis that is the whole of its basis and it is stated as such."
     },
     "operator_maintained_approximate": {
       "counters": [
@@ -117,6 +112,38 @@
       ],
       "evidence": "None. These are hand-maintained counts kept across an interactive round and no machine artifact establishes them.",
       "note": "They are recorded because a round that provisioned Azure resources must say so, not because any safety property depends on their exact value. resource_creations_or_changes enumerates: the user-assigned identity, its two role assignments, three image pushes, the job creation and two job updates. control_plane_reads is an order-of-magnitude count of az configuration and existence queries and must not be cited as a precise measurement. No safety counter may be classified here; validate_ledger() enforces that."
+    },
+    "composite_of_separately_evidenced_parts": {
+      "counters": [
+        "retired_v1_repair_access.byte_only_integrity_verifications"
+      ],
+      "evidence": "The value 14 is a sum of two observations with different provenance and no single class describes it honestly. 12 come from docs/phase1_2h_r1_access_receipt_003.json field counters.byte_only_integrity_verifications, one per authoritative sealed object streamed by the Phase 1.2H-R1 gate; that receipt is committed and schema-validated. 2 are carried forward from event 2 of this ledger, where two local curator files were verified by digest before R1 existed; those predate any receipt and rest on the committed ledger event alone.",
+      "parts": {
+        "retired_v1_repair_access.byte_only_integrity_verifications": [
+          {
+            "amount": 12,
+            "evidence": "docs/phase1_2h_r1_access_receipt_003.json field counters.byte_only_integrity_verifications, validated against docs/phase1_2h_r1_access_receipt.schema.json",
+            "note": "One per authoritative sealed object streamed to SHA-256 by the in-VNet access-gate job."
+          },
+          {
+            "amount": 2,
+            "evidence": "Event 2 of this ledger, docs/phase1_2h_execution_access_ledger.json; no execution receipt exists for these.",
+            "note": "Pre-R1 local curator-file digest verifications over different files, retained because removing them would understate what has been verified."
+          }
+        ]
+      },
+      "note": "Introduced for Audit F (F-06). The class exists so that a counter summing differently evidenced addends cannot be labelled with the strongest of them."
+    },
+    "zero_because_the_activity_has_never_occurred": {
+      "counters": [
+        "retired_v1_repair_access.labels_opened_for_scoring",
+        "formal_v2_evaluation_access.sealed_input_semantic_reads",
+        "formal_v2_evaluation_access.sealed_label_semantic_reads",
+        "formal_v2_evaluation_access.labels_opened_for_scoring",
+        "parser_execution.comparator_predictions_generated"
+      ],
+      "evidence": "No formal parser-v3 evaluation has ever been run, no parser-v3-v2 set exists, and no comparator has been executed against locked inputs. Two committed artifacts establish this rather than one. (1) The state blocks of this file, docs/phase1_2h_execution_access_ledger.json: retired_v1_state has formal_evaluation_ever_run false and prediction_streams_generated_against_v1 false, and successor_set_state records that no successor set has been constructed or sealed. (2) Those blocks are not free text. src/jspace_observation/parser_v3_v2_access_ledger.py refuses to validate any ledger in which formal_evaluation_ever_run is true or prediction_streams_generated_against_v1 is true, in _validate_retired_v1_state, so the assertion cannot be flipped by editing this file: it would have to be flipped in the validator, in a reviewed commit, alongside the evaluation artifacts that do not exist.",
+      "note": "Introduced for Audit E (E-05). These zeros were previously classified as structurally zero by source analysis, which was not true of them: no AST check in this repository examines a scoring path or a comparator run, because no such code was written. The honest basis is that the activity never happened, which is a weaker fact and is now labelled as one. It is still machine evidence in the sense the ledger requires -- a committed state block, not a recollection -- but it would stop being true the moment such a round were authorized, whereas a source-analysis zero would not."
     }
   },
   "events": [

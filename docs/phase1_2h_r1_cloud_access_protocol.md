@@ -242,8 +242,20 @@ probe checked `hasattr(client, "upload_blob")` on the SDK object; that check was
 wrong and would have refused every run, because a `BlobClient` exposes
 `upload_blob` as a class method regardless of the caller's RBAC. Capability on
 the wire is decided by the role assignment. What the probe can honestly assert
-is the narrower structural claim — no mutating operation appears anywhere in its
-reachable source — and that is what it asserts, by AST.
+is a narrower structural claim, and independent Audit E (E-04) required that
+claim be stated with its true scope. The AST check parses the two first-party
+Python files listed in `IN_JOB_FIRST_PARTY_SOURCES` — the probe and its
+validator — and refuses if a mutating Blob operation is called anywhere in
+either. That is **not** the same as "the reachable source": the Azure SDK, the
+standard library and the base image are all reachable from the probe and none of
+them is parsed. The supportable sentence is:
+
+> No mutating Blob operation is called anywhere in the first-party source that
+> runs inside the job.
+
+Whether the SDK or the platform performed a write is established separately, and
+only negatively, by the storage account carrying no data-plane write role
+assignment for the job identity.
 
 ### 7.1 Two false claims this protocol refuses to make
 
@@ -287,10 +299,22 @@ be counted as satisfied. Observed: **0 passed, 5 failed, 8 not assessable ⇒
 | Backend within the project's authorization boundary | **Fails.** It belongs to an unrelated project. |
 | Egress-controlled worker | **Not configured.** See §7.1. |
 
-No qualifying backend exists. Under the round's terms this is decisive **even if
-byte-only access succeeds**, because a repair round would otherwise have to
-either export private material to a public endpoint or improvise a boundary
-mid-round. Both are refused.
+No qualifying backend was found **within the enumerated search scope**, which is
+resource group `rg-jspace-observation-sea` in region `southeastasia` plus the
+same-region AI accounts visible to the operator's control-plane listing.
+Independent Audit F (F-04) required this be stated as a scoped observation
+rather than as a fact about the world: whether some unlisted subscription,
+tenant or resource group holds a qualifying backend was not observed and is not
+asserted. What *is* asserted is that none is reachable under the required
+boundary from the worker subnet this round would have to use, and that the
+search scope is the one the round is authorized to provision into.
+
+Under the round's terms this is decisive **even if byte-only access succeeds**,
+because a repair round would otherwise have to either export private material to
+a public endpoint or improvise a boundary mid-round. Both are refused. Note also
+that the boundary fails on a second, independent ground: even had a qualifying
+backend been found, the worker subnet has no egress control, and two of the
+thirteen frozen conditions fail on that alone.
 
 The round therefore terminates:
 
@@ -311,11 +335,18 @@ Ledger counters are **derived from execution evidence**, never asserted:
 |---|---|
 | `azure_data_plane_content_reads` | one per object actually streamed |
 | `byte_only_integrity_verifications` | one per object whose size and digest were compared |
-| `azure_data_plane_writes` | structurally 0 — no write operation exists in the probe's reachable source |
-| `semantic_input_reads` | structurally 0 — nothing decodes |
-| `semantic_label_reads` | structurally 0 |
-| `parser_invocations` | structurally 0 — no parser in the image |
-| `predictions_generated` | structurally 0 |
+| `azure_data_plane_writes` | 0 by first-party source analysis (no mutating Blob call in `IN_JOB_FIRST_PARTY_SOURCES`) **and** by RBAC (the job identity holds no data-plane write role on the account) |
+| `semantic_input_reads` | 0 by first-party source analysis: the one function holding object bytes passes each chunk only to a SHA-256 digest, and no decode, parse, split or regex construct appears in it |
+| `semantic_label_reads` | 0 by construction of the frozen member list — the 12 objects the record binds are inputs; no label object is enumerated, requested or streamed |
+| `parser_invocations` | 0 by image content — the image installs no parser-bearing package — **and** by source analysis: no parser symbol is referenced in first-party in-job source |
+| `predictions_generated` | 0 by receipt schema — no field can carry a prediction — **and** because nothing in the job writes anywhere |
+
+Independent Audit E (E-05) and Audit F (F-06) both found an earlier version of
+this table describing all five zeros as "structurally 0" by AST, which was true
+of only two of them. The wording above states, per counter, what actually
+establishes the zero. Where a zero rests on more than one independent basis,
+both are named; where it rests on the absence of a capability rather than on
+source analysis, that is said plainly.
 
 A receipt whose counters contradict the ledger is a round failure, not a
 discrepancy to be reconciled after the fact. The ledger's `counter_provenance`
@@ -364,7 +395,7 @@ and must not name the more advanced-sounding boundary state.
 | State | Meaning | Precondition |
 |---|---|---|
 | `BLOCKED_ON_PRIVATE_SOURCE_ACCESS` | byte-only access itself could not be established | evaluated first; if it holds, the other two are unreachable |
-| `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY` | the byte-only gate passed, **and** no qualifying private semantic-review backend exists | requires a passing gate |
+| `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY` | the byte-only gate passed, **and** the frozen boundary assessment does not return `QUALIFIES` | requires a passing gate |
 | `READY_FOR_SEPARATELY_AUTHORISED_PRIVATE_REVIEW` | byte-only access succeeded **and** a qualifying private review boundary exists | requires a passing gate and all 13 frozen conditions PASS |
 
 An earlier version of this table named the third state
@@ -384,3 +415,15 @@ The precedence rule is enforced in three places, so that no single edit can
 defeat it: `classify_terminal_state` computes it,
 `assert_gate_evidence_consistent` re-derives it and refuses a mismatch, and the
 boundary suite asserts it against the committed artifact.
+
+Independent Audit E (E-01) found that this sentence had been true only in form.
+`assert_gate_evidence_consistent` was called solely on the object
+`build_assessment` had just returned, whose evidence block that same call had
+produced, so the second "place" could not fail and the third exercised the
+first. Two changes make the sentence true. The consistency check is now run
+against the **committed** file — which is the artefact a reader trusts, and the
+one a hand edit would target — and when the evidence block names a receipt, the
+check opens that file, hashes it against the recorded digest, re-derives the
+gate outcome from it, and re-confirms the platform attestation. The boundary
+suite carries negative controls for each of those, so the claim is now backed by
+demonstrated refusals rather than by construction.

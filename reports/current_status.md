@@ -9,23 +9,31 @@
 > Apps job — and **the byte-only access gate passed**: 12 members listed, all 12
 > objects streamed to a SHA-256 accumulator and discarded, 396,613 bytes, and an
 > aggregate digest reproducing the already-committed public anchor
-> `e1364afc…`. Twelve invariants checked, none failed.
+> `e1364afc…`. The receipt reports twelve invariants checked and none failed;
+> in the build that produced receipt 003 that count was a **literal**, and it
+> is derived from the invariants actually evaluated only in the current build
+> (Audit C, C-12).
 >
 > **This changed what the operator can reach. It changed nothing about the set.**
 > No byte was decoded, retained or interpreted: `decode_attempts`,
 > `persist_attempts`, `azure_data_plane_writes`, `semantic_input_reads`,
 > `semantic_label_reads`, `parser_invocations` and `predictions_generated` are
-> all **0**. What makes those zeros credible is an AST check over the probe's own
-> source that fails the build if any decode, persist or write call is present —
-> the receipt schema's `maximum: 0` pins prevent a violation from being
-> *reported* in a valid receipt, but they do not observe the running program.
+> all **0**. What makes those zeros credible is AST analysis of the two
+> first-party Python files that run inside the job: no mutating Blob call
+> appears in either, and the one function that holds object bytes passes each
+> chunk only to a SHA-256 digest and uses that name nowhere else. That is a
+> property of first-party source — the Azure SDK, the standard library and the
+> base image are not parsed — and it is not an observation of the running
+> program. The receipt schema's `maximum: 0` pins prevent a violation from being
+> *reported* in a valid receipt, but they do not observe anything.
 > **No private
 > content was read, no set was constructed, no set was sealed, no parser was
 > run, and no prediction was generated.**
 >
 > The blocker has therefore **moved, not cleared**. Set repair needs *semantic*
-> review of private material, and no qualifying private review backend exists:
-> the executable boundary assessment scores **0 of 13 conditions passed, 5
+> review of private material, and no qualifying private review backend was found
+> within the enumerated search scope: the executable boundary assessment scores
+> **0 of 13 conditions passed, 5
 > failed, 8 not assessable ⇒ `DOES_NOT_QUALIFY`**. The resource group contains
 > zero `Microsoft.CognitiveServices` accounts and zero ML workspaces; the only
 > same-region AI account belongs to an unrelated project and has
@@ -105,11 +113,11 @@ a future evaluation is settled, and records nothing whatever about any
 parser. Specifically:
 
 - Phase 1.0C was executed and finalized `INCONCLUSIVE`. It is target-model task/headroom screening, not parser calibration, and no Phase 1.0C result can supply, bound, or unblock any parser acceptance threshold.
-- No private holdout, sealed input, sealed label or private curator file was *semantically read*. Phase 1.2H-R1 streamed all 12 sealed objects into a SHA-256 accumulator and discarded them, so bytes were touched while nothing about any case was learned: `decode_attempts`, `persist_attempts`, `semantic_input_reads` and `semantic_label_reads` are all **0**. Those zeros are literals the probe emits, made credible by an AST check over its own source that fails the build if a decode, write or persist call appears; the receipt schema's `maximum: 0` pins stop a violation being *reported* as a valid receipt, but do not themselves observe the running program.
+- No private holdout, sealed input, sealed label or private curator file was *semantically read*. Phase 1.2H-R1 streamed all 12 sealed objects into a SHA-256 accumulator and discarded them, so bytes were touched while nothing about any case was learned: `decode_attempts`, `persist_attempts`, `semantic_input_reads` and `semantic_label_reads` are all **0**. Those zeros are literals the probe emits. What makes them credible is AST analysis of the two first-party Python files that run inside the job: no mutating Blob call appears in either, and the one function that holds object bytes passes each chunk only to a SHA-256 digest and uses that name nowhere else. That is a property of first-party source — not of the Azure SDK, the standard library or the base image, none of which is parsed — and not an observation of the running process. The receipt schema's `maximum: 0` pins stop a violation being *reported* as a valid receipt, but do not themselves observe anything.
 - No prediction was generated and no parser was run against any evaluation or calibration corpus.
 - No formal parser-v3 evaluation has occurred. Parser v3 remains **unvalidated**.
 - `parser-v3-v1` remains `SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE`, byte-unchanged.
-- Phase 1.2H terminated `BLOCKED_ON_PRIVATE_SOURCE_ACCESS`; Phase 1.2H-R1 established authenticated byte-only access from inside the VNet and terminated `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY`, because set repair needs a semantic review boundary that does not exist. No `parser-v3-v2` set was constructed or sealed, and none exists.
+- Phase 1.2H terminated `BLOCKED_ON_PRIVATE_SOURCE_ACCESS`; Phase 1.2H-R1 established authenticated byte-only access from inside the VNet and terminated `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY`, because set repair needs a semantic review boundary that the frozen 13-condition assessment scored `DOES_NOT_QUALIFY` — no qualifying backend was found within the enumerated search scope (resource group `rg-jspace-observation-sea` in `southeastasia`, plus same-region AI accounts visible to the operator's control-plane listing), and the worker subnet has no egress control. Whether an unlisted resource group elsewhere holds a qualifying backend was not observed and is not asserted. No `parser-v3-v2` set was constructed or sealed, and none exists.
 - No J-space, hidden-reasoning, invisible-CoT or internal-workspace conclusion follows from any of this.
 
 <!-- END GENERATED CURRENT STATE -->

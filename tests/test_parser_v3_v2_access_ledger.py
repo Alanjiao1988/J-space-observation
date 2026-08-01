@@ -878,9 +878,16 @@ def test_a_counter_may_not_hold_two_provenances(ledger, policy):
     ],
 )
 def test_every_safety_counter_must_declare_its_evidence(ledger, policy, path):
-    for entry in ledger["counter_provenance"].values():
-        if isinstance(entry, dict) and path in entry.get("counters", []):
-            entry["counters"].remove(path)
+    for name, entry in list(ledger["counter_provenance"].items()):
+        if not isinstance(entry, dict) or path not in entry.get("counters", []):
+            continue
+        entry["counters"].remove(path)
+        # A composite decomposes the counters it names, so the decomposition
+        # goes with it; leaving an orphaned `parts` entry would fail on the
+        # wrong rule and stop this test from reaching the one it is about.
+        entry.get("parts", {}).pop(path, None)
+        if not entry["counters"]:
+            del ledger["counter_provenance"][name]
     with pytest.raises(LedgerError, match="must state where its value came from"):
         _validate(ledger, policy)
 
@@ -918,6 +925,8 @@ def test_the_classes_are_exposed_for_reuse():
         "receipt_derived_exact",
         "azure_verified_exact",
         "structurally_zero_by_source_analysis",
+        "zero_because_the_activity_has_never_occurred",
+        "composite_of_separately_evidenced_parts",
         "operator_maintained_approximate",
     )
 
@@ -1035,3 +1044,183 @@ def test_the_receipt_carries_no_case_content(receipt):
 
     for value, path in walk(receipt):
         assert token.match(value), f"{path} = {value!r} is not a content-free token"
+
+
+# --- Audit E / Audit F regressions -----------------------------------------
+
+
+def test_a_structurally_zero_counter_may_not_carry_a_non_zero_value(ledger, policy):
+    """E-05: the class asserted a zero it never checked.
+
+    ``structurally_zero_by_source_analysis`` means "no code path can make this
+    non-zero". A ledger could nonetheless report a positive value under it, so
+    the class's whole meaning was decorative.
+    """
+
+    ledger["live_counters"]["retired_v1_repair_access"]["private_curator_files_read"] = 3
+    with pytest.raises(LedgerError, match="falsifies the class"):
+        _validate(ledger, policy)
+
+
+def test_a_never_occurred_counter_may_not_carry_a_non_zero_value(ledger, policy):
+    ledger["live_counters"]["formal_v2_evaluation_access"][
+        "sealed_input_semantic_reads"
+    ] = 1
+    with pytest.raises(LedgerError):
+        _validate(ledger, policy)
+
+
+def test_the_zero_classes_are_named_in_one_place(ledger):
+    # Both zero-asserting classes must be subject to the same rule. Naming them
+    # inline is how the second one would escape it.
+    from jspace_observation.parser_v3_v2_access_ledger import _MUST_BE_ZERO_CLASSES
+
+    assert _MUST_BE_ZERO_CLASSES <= set(COUNTER_PROVENANCE_CLASSES)
+    assert "structurally_zero_by_source_analysis" in _MUST_BE_ZERO_CLASSES
+    assert "zero_because_the_activity_has_never_occurred" in _MUST_BE_ZERO_CLASSES
+
+
+def test_the_structural_class_no_longer_claims_ast_enforcement_it_lacks(ledger):
+    """E-05: four counters were classed as AST-enforced when no check reaches them.
+
+    No AST check in this repository examines a scoring path or a comparator run,
+    because no such code was written. Those counters are zero because the
+    activity never happened, which is a weaker fact, and they now say so.
+    """
+
+    prov = ledger["counter_provenance"]
+    structural = set(prov["structurally_zero_by_source_analysis"]["counters"])
+    never = set(prov["zero_because_the_activity_has_never_occurred"]["counters"])
+
+    for path in (
+        "retired_v1_repair_access.labels_opened_for_scoring",
+        "formal_v2_evaluation_access.sealed_input_semantic_reads",
+        "formal_v2_evaluation_access.sealed_label_semantic_reads",
+        "parser_execution.comparator_predictions_generated",
+    ):
+        assert path in never, path
+        assert path not in structural, path
+
+
+def test_the_composite_counter_decomposes_into_its_addends(ledger):
+    """F-06: 14 was presented as receipt-derived when the receipt reports 12."""
+
+    prov = ledger["counter_provenance"]
+    counter = "retired_v1_repair_access.byte_only_integrity_verifications"
+    assert counter not in prov["receipt_derived_exact"]["counters"]
+
+    composite = prov["composite_of_separately_evidenced_parts"]
+    assert counter in composite["counters"]
+    addends = composite["parts"][counter]
+    assert sum(a["amount"] for a in addends) == (
+        ledger["live_counters"]["retired_v1_repair_access"][
+            "byte_only_integrity_verifications"
+        ]
+    )
+    assert len({a["evidence"] for a in addends}) == len(addends)
+    assert any("receipt_003" in a["evidence"] for a in addends)
+
+
+def test_a_composite_whose_parts_do_not_sum_is_refused(ledger, policy):
+    counter = "retired_v1_repair_access.byte_only_integrity_verifications"
+    ledger["counter_provenance"]["composite_of_separately_evidenced_parts"]["parts"][
+        counter
+    ][0]["amount"] = 99
+    with pytest.raises(LedgerError, match="sum to"):
+        _validate(ledger, policy)
+
+
+def test_a_composite_without_a_decomposition_is_refused(ledger, policy):
+    del ledger["counter_provenance"]["composite_of_separately_evidenced_parts"]["parts"]
+    # Two rules refuse this, and the stronger one speaks first: a composite with
+    # no decomposition has no receipt-backed addend either, so the terminal
+    # state is what fails. That ordering is correct -- it names the consequence
+    # rather than the schema defect -- so the test asserts the refusal and then
+    # exercises the decomposition rule directly below.
+    with pytest.raises(LedgerError):
+        _validate(ledger, policy)
+
+
+def test_the_decomposition_rule_names_the_missing_parts_mapping(ledger):
+    from jspace_observation.parser_v3_v2_access_ledger import (
+        _validate_counter_provenance_values,
+    )
+
+    block = copy.deepcopy(ledger["counter_provenance"])
+    del block["composite_of_separately_evidenced_parts"]["parts"]
+    with pytest.raises(LedgerError, match="requires a 'parts' mapping"):
+        _validate_counter_provenance_values(block, ledger["live_counters"])
+
+
+def test_a_composite_whose_addends_share_evidence_is_refused(ledger, policy):
+    counter = "retired_v1_repair_access.byte_only_integrity_verifications"
+    parts = ledger["counter_provenance"]["composite_of_separately_evidenced_parts"][
+        "parts"
+    ][counter]
+    parts[1]["evidence"] = parts[0]["evidence"]
+    with pytest.raises(LedgerError, match="not composite"):
+        _validate(ledger, policy)
+
+
+def test_the_boundary_state_still_requires_a_receipt_backed_addend(ledger, policy):
+    """F-06 must not have weakened the C-02 rule into a formality.
+
+    Moving the counter into the composite class could have let the terminal
+    state be earned by a composite made entirely of hand-carried parts.
+    """
+
+    counter = "retired_v1_repair_access.byte_only_integrity_verifications"
+    parts = ledger["counter_provenance"]["composite_of_separately_evidenced_parts"][
+        "parts"
+    ][counter]
+    for addend in parts:
+        addend["evidence"] = "an operator's notebook, page 4"
+    ledger["counter_provenance"]["composite_of_separately_evidenced_parts"][
+        "evidence"
+    ] = "docs/phase1_2h_execution_access_ledger.json events 2 and 8"
+    with pytest.raises(LedgerError, match="cite a committed access receipt"):
+        _validate(ledger, policy)
+
+
+def test_labels_opened_for_scoring_requires_machine_evidence():
+    """E-10: the strongest safety claim the ledger makes was carriable on memory."""
+
+    from jspace_observation.parser_v3_v2_access_ledger import (
+        _MACHINE_EVIDENCE_REQUIRED,
+    )
+
+    assert (
+        "formal_v2_evaluation_access.labels_opened_for_scoring"
+        in _MACHINE_EVIDENCE_REQUIRED
+    )
+
+
+def test_labels_opened_for_scoring_may_not_be_downgraded_to_recollection(
+    ledger, policy
+):
+    path = "formal_v2_evaluation_access.labels_opened_for_scoring"
+    ledger["counter_provenance"]["zero_because_the_activity_has_never_occurred"][
+        "counters"
+    ].remove(path)
+    ledger["counter_provenance"]["operator_maintained_approximate"]["counters"].append(
+        path
+    )
+    with pytest.raises(LedgerError, match="requires machine evidence"):
+        _validate(ledger, policy)
+
+
+def test_a_parser_counter_reports_the_parser_rule_not_the_bookkeeping_rule(
+    ledger, policy
+):
+    """The value rules run last, deliberately.
+
+    A ledger that records a parser invocation violates the prohibition on
+    running a parser. That it also falsifies the counter's provenance class is
+    bookkeeping, and a reader must be told the first.
+    """
+
+    ledger["live_counters"]["parser_execution"][
+        "comparator_predictions_generated"
+    ] = 1
+    with pytest.raises(LedgerError, match="no parser may"):
+        _validate(ledger, policy)

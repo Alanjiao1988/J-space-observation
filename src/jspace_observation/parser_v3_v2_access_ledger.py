@@ -270,6 +270,8 @@ COUNTER_PROVENANCE_CLASSES: tuple[str, ...] = (
     "receipt_derived_exact",
     "azure_verified_exact",
     "structurally_zero_by_source_analysis",
+    "zero_because_the_activity_has_never_occurred",
+    "composite_of_separately_evidenced_parts",
     "operator_maintained_approximate",
 )
 
@@ -291,15 +293,43 @@ COUNTER_PROVENANCE_CLASS_MEANING: Mapping[str, str] = {
         "committed to the repository"
     ),
     "structurally_zero_by_source_analysis": (
-        "the value is zero because no code path that could increment it exists, "
-        "which an AST check over the emitting source enforces; it is not a "
-        "measurement of a run"
+        "the value is zero because no code path that could make it non-zero "
+        "appears in the first-party source that runs in the job, which an AST "
+        "check over that source enforces. This is a property of first-party "
+        "source only: the Azure SDK, the standard library and the base image "
+        "are not parsed. It is not a measurement of a run, and the ledger "
+        "refuses any non-zero value carrying this class"
     ),
-    "operator_maintained_approximate": (
+    "zero_because_the_activity_has_never_occurred": (
+        "the value is zero because the activity it counts has never taken "
+        "place in this project at all, which a committed state block records. "
+        "This is a weaker and different fact from source analysis: it is not "
+        "that the code cannot do the thing, but that no round has yet been "
+        "authorized to try. The ledger refuses any non-zero value carrying "
+        "this class"
+    ),
+    "composite_of_separately_evidenced_parts": (
+        "the value is a sum whose addends do not share a provenance, so no "
+        "single class describes it honestly; the entry must decompose it and "
+        "state the evidence for each part"
+    ),    "operator_maintained_approximate": (
         "the value is a hand-maintained count and carries no machine evidence; "
         "it may only be used for counters whose value is not a safety claim"
     ),
 }
+
+#: Provenance classes whose whole meaning is that the counter is zero. Audit E
+#: (E-05) found that ``structurally_zero_by_source_analysis`` carried no rule
+#: requiring the value to actually be zero, so a ledger could report a positive
+#: semantic-read count under a class asserting none was possible. Both zero
+#: classes are listed here rather than named inline, so that adding a third
+#: cannot silently escape the rule.
+_MUST_BE_ZERO_CLASSES: frozenset[str] = frozenset(
+    {
+        "structurally_zero_by_source_analysis",
+        "zero_because_the_activity_has_never_occurred",
+    }
+)
 
 #: Counters whose value is a safety claim, and which therefore may never be
 #: classified as operator-maintained. A round may not assert "no semantic read
@@ -318,6 +348,13 @@ _MACHINE_EVIDENCE_REQUIRED: frozenset[str] = frozenset(
         "retired_v1_repair_access.labels_opened_for_scoring",
         "formal_v2_evaluation_access.sealed_input_semantic_reads",
         "formal_v2_evaluation_access.sealed_label_semantic_reads",
+        # Audit E (E-10). This counter asserts that no locked label has been
+        # opened to score a candidate, which is the single strongest safety
+        # claim the ledger makes. It was absent from this set, so it could have
+        # been carried on recollection alone. Its retired-v1 twin was already
+        # here; the omission of the formal-evaluation one was an oversight, and
+        # it is the more consequential of the two.
+        "formal_v2_evaluation_access.labels_opened_for_scoring",
         "azure.data_plane_content_reads",
         "azure.data_plane_writes",
         "parser_execution.parser_invocations_on_private_or_locked_data",
@@ -1004,6 +1041,15 @@ def validate_ledger(
     _validate_retired_v1_state(ledger)
     _validate_successor_set_state(ledger, status)
 
+    # Provenance rules that compare a class against the counter's *value* run
+    # last, deliberately. A ledger that sets a parser-invocation counter to 1
+    # violates the prohibition on running a parser; it also, incidentally,
+    # falsifies the provenance class that counter carries. The first is the
+    # finding, the second is bookkeeping, and a reader must be told the first.
+    _validate_counter_provenance_values(
+        ledger["counter_provenance"], ledger.get("live_counters")
+    )
+
 
 def _assert_evidence_is_citable(class_name: str, evidence: str) -> None:
     """Require a machine-evidence class to cite something a reader can open.
@@ -1025,16 +1071,166 @@ def _assert_evidence_is_citable(class_name: str, evidence: str) -> None:
     )
 
 
+def _counter_lookup(counters_block: Any, path: str) -> Any:
+    """Read a ``group.name`` counter path out of a live-counters block."""
+
+    if not isinstance(counters_block, Mapping):
+        return None
+    group, _, name = path.partition(".")
+    section = counters_block.get(group)
+    if not isinstance(section, Mapping):
+        return None
+    return section.get(name)
+
+
+def _validate_counter_provenance_values(block: Any, counters_block: Any) -> None:
+    """Check the provenance classes against the counter values they describe.
+
+    Split out of :func:`_validate_counter_provenance` so it can run after the
+    semantic rules. These two rules were added after independent Audits E and F
+    and are the only provenance rules that need the values.
+
+    * Audit E (E-05). ``structurally_zero_by_source_analysis`` asserts a value
+      is zero because the source cannot make it non-zero. The class carried no
+      rule that the value actually *was* zero, so a ledger could have reported
+      ``semantic_input_reads: 3`` under a class whose whole meaning is that it
+      must be 0. Both zero classes are now refused a non-zero value.
+    * Audit F (F-06). A counter that sums addends with different evidence was
+      being classified by the strongest of them, which laundered the weakest.
+      ``composite_of_separately_evidenced_parts`` exists for that case and must
+      decompose the value: its ``parts`` name each addend, its evidence and its
+      amount, and the amounts must sum to the counter.
+    """
+
+    if not isinstance(block, Mapping):  # pragma: no cover - defensive
+        return
+
+    def lookup(path: str) -> Any:
+        return _counter_lookup(counters_block, path)
+
+    for class_name in COUNTER_PROVENANCE_CLASSES:
+        entry = block.get(class_name)
+        if not isinstance(entry, Mapping):
+            continue
+        counters = entry.get("counters")
+        if not isinstance(counters, list):  # pragma: no cover - defensive
+            continue
+        if class_name in _MUST_BE_ZERO_CLASSES:
+            for path in counters:
+                value = lookup(path)
+                if value is not None and value != 0:
+                    raise LedgerError(
+                        f"counter_provenance classifies {path!r} as "
+                        f"{class_name}, but its value is {value!r}; that class "
+                        "asserts the value is zero, so a non-zero value "
+                        "falsifies the class"
+                    )
+        if class_name == "composite_of_separately_evidenced_parts":
+            _validate_composite_parts(entry, counters, lookup)
+
+
+def _validate_composite_parts(
+    entry: Mapping[str, Any],
+    counters: list[Any],
+    lookup: Any,
+) -> None:
+    """Require a composite counter to decompose into separately evidenced parts.
+
+    Audit F (F-06) found ``byte_only_integrity_verifications: 14`` classified as
+    ``receipt_derived_exact`` when only 12 of those 14 came from the committed
+    receipt; the remaining 2 came from an earlier execution with no receipt at
+    all. Summing them and labelling the total with the stronger class is
+    provenance laundering: a reader auditing the receipt finds 12 and has no way
+    to learn where the other 2 came from.
+
+    So a composite must say. Every counter in the class needs a ``parts`` entry
+    whose addends each carry an ``amount`` and an ``evidence`` string, and whose
+    amounts sum to the counter's value. A composite that does not add up, or
+    whose parts share no evidence distinction, is refused.
+    """
+
+    parts = entry.get("parts")
+    if not isinstance(parts, Mapping):
+        raise LedgerError(
+            "counter_provenance.composite_of_separately_evidenced_parts "
+            "requires a 'parts' mapping; a composite that does not decompose "
+            "is indistinguishable from the laundering this class exists to stop"
+        )
+    missing = [path for path in counters if path not in parts]
+    if missing:
+        raise LedgerError(
+            "counter_provenance.composite_of_separately_evidenced_parts.parts "
+            f"omits {sorted(missing)}"
+        )
+    extra = set(parts) - set(counters)
+    if extra:
+        raise LedgerError(
+            "counter_provenance.composite_of_separately_evidenced_parts.parts "
+            f"describes counters not in the class: {sorted(extra)}"
+        )
+
+    for path, addends in parts.items():
+        if not isinstance(addends, list) or len(addends) < 2:
+            raise LedgerError(
+                f"counter_provenance composite parts for {path!r} must list at "
+                "least two addends; a single addend is not a composite and "
+                "belongs in the class that describes its own evidence"
+            )
+        total = 0
+        evidences: set[str] = set()
+        for addend in addends:
+            if not isinstance(addend, Mapping):
+                raise LedgerError(
+                    f"counter_provenance composite parts for {path!r} must be "
+                    "mappings"
+                )
+            amount = addend.get("amount")
+            if not isinstance(amount, int) or isinstance(amount, bool) or amount < 0:
+                raise LedgerError(
+                    f"counter_provenance composite parts for {path!r} require a "
+                    "non-negative integer 'amount'"
+                )
+            evidence = addend.get("evidence")
+            if not isinstance(evidence, str) or not evidence.strip():
+                raise LedgerError(
+                    f"counter_provenance composite parts for {path!r} require a "
+                    "non-empty 'evidence' string per addend"
+                )
+            unknown_keys = set(addend) - {"amount", "evidence", "note"}
+            if unknown_keys:
+                raise LedgerError(
+                    f"counter_provenance composite parts for {path!r} have "
+                    f"unknown keys: {sorted(unknown_keys)}"
+                )
+            total += amount
+            evidences.add(evidence)
+
+        if len(evidences) < 2:
+            raise LedgerError(
+                f"counter_provenance composite parts for {path!r} all cite the "
+                "same evidence; then the counter is not composite and must be "
+                "classified by that evidence directly"
+            )
+        value = lookup(path)
+        if value is not None and total != value:
+            raise LedgerError(
+                f"counter_provenance composite parts for {path!r} sum to "
+                f"{total}, but the counter is {value!r}"
+            )
+
+
 def _validate_counter_provenance(block: Any) -> None:
     """Require the provenance block to partition the counters it names.
 
-    Three properties are enforced. Every counter named must exist, so the block
-    cannot describe a counter that was renamed away. No counter may appear in
-    two classes, because a value is either machine-derived or it is not. And
-    every counter in :data:`_MACHINE_EVIDENCE_REQUIRED` must be present and
-    classified as machine-derived --- those are the counters that carry the
-    round's safety claims, and an operator's recollection is not evidence for
-    them.
+    Every counter named must exist, so the block cannot describe a counter that
+    was renamed away. No counter may appear in two classes, because a value is
+    either machine-derived or it is not. And every counter in
+    :data:`_MACHINE_EVIDENCE_REQUIRED` must be present and classified as
+    machine-derived --- those are the counters that carry the round's safety
+    claims, and an operator's recollection is not evidence for them.
+
+    Rules that compare a class against a counter's *value* live in
+    :func:`_validate_counter_provenance_values`, which runs later.
     """
 
     if not isinstance(block, Mapping):
@@ -1085,7 +1281,10 @@ def _validate_counter_provenance(block: Any) -> None:
         if class_name != "operator_maintained_approximate":
             _assert_evidence_is_citable(class_name, evidence)
 
-        unknown_entry_keys = set(entry) - {"counters", "evidence", "note"}
+        allowed_entry_keys = {"counters", "evidence", "note"}
+        if class_name == "composite_of_separately_evidenced_parts":
+            allowed_entry_keys.add("parts")
+        unknown_entry_keys = set(entry) - allowed_entry_keys
         if unknown_entry_keys:
             raise LedgerError(
                 f"counter_provenance.{class_name} has unknown keys: "
@@ -1126,6 +1325,15 @@ def _assert_gate_receipt_is_cited(ledger: Mapping[str, Any]) -> None:
     receipt-to-ledger binding is asserted by the ledger test suite, which can.
     What it requires is that the ledger names one, in the provenance block that
     is the ledger's own account of where its numbers came from.
+
+    Audit F (F-06) moved this counter into
+    ``composite_of_separately_evidenced_parts``, because 14 is 12 receipt-backed
+    verifications plus 2 that predate any receipt. That reclassification must
+    not weaken this rule into a formality. The requirement is therefore stated
+    on the evidence rather than on the class: the counter must be
+    ``receipt_derived_exact``, or it must be a composite **at least one of whose
+    addends cites a committed access receipt**. A composite made entirely of
+    hand-carried parts earns nothing.
     """
 
     provenance = ledger.get("counter_provenance")
@@ -1134,17 +1342,45 @@ def _assert_gate_receipt_is_cited(ledger: Mapping[str, Any]) -> None:
             "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY requires a counter_provenance "
             "block naming the gate receipt"
         )
+    counter = "retired_v1_repair_access.byte_only_integrity_verifications"
     entry = provenance.get("receipt_derived_exact")
     evidence = entry.get("evidence", "") if isinstance(entry, Mapping) else ""
     counters = entry.get("counters", []) if isinstance(entry, Mapping) else []
 
-    if "retired_v1_repair_access.byte_only_integrity_verifications" not in counters:
-        raise LedgerError(
-            "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY requires "
-            "byte_only_integrity_verifications to be receipt-derived; the state "
-            "asserts that a gate ran, and a hand-maintained count is not "
-            "evidence that one did"
+    if counter not in counters:
+        composite = provenance.get("composite_of_separately_evidenced_parts")
+        composite_counters = (
+            composite.get("counters", []) if isinstance(composite, Mapping) else []
         )
+        if counter not in composite_counters:
+            raise LedgerError(
+                "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY requires "
+                "byte_only_integrity_verifications to rest on an execution "
+                "receipt; the state asserts that a gate ran, and a "
+                "hand-maintained count is not evidence that one did"
+            )
+        parts = composite.get("parts") if isinstance(composite, Mapping) else None
+        addends = parts.get(counter, []) if isinstance(parts, Mapping) else []
+        backed = [
+            addend
+            for addend in addends
+            if isinstance(addend, Mapping)
+            and isinstance(addend.get("evidence"), str)
+            and _RECEIPT_CITATION_PATTERN.search(addend["evidence"])
+            and isinstance(addend.get("amount"), int)
+            and not isinstance(addend.get("amount"), bool)
+            and addend["amount"] > 0
+        ]
+        if not backed:
+            raise LedgerError(
+                "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY requires at least one "
+                "byte_only_integrity_verifications addend to cite a committed "
+                "access receipt with a positive amount; a composite assembled "
+                "entirely from hand-carried parts is still an integer in this "
+                "file"
+            )
+        return
+
     if not _RECEIPT_CITATION_PATTERN.search(evidence):
         raise LedgerError(
             "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY requires "

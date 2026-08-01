@@ -430,3 +430,208 @@ def test_the_assessor_does_not_import_the_package():
     source = ASSESSOR_PATH.read_text(encoding="utf-8")
     assert "import jspace_observation" not in source
     assert "from jspace_observation" not in source
+
+
+# --- Audit E / Audit F regressions -----------------------------------------
+
+COMMITTED_ASSESSMENT = ROOT / "docs" / "phase1_2h_r1_review_boundary_assessment.json"
+INVENTORY = ROOT / "docs" / "phase1_2h_r1_job_execution_inventory.json"
+
+
+def test_the_consistency_check_runs_against_the_committed_assessment():
+    """Audit E (E-01): the check could not fail.
+
+    ``assert_gate_evidence_consistent`` was only ever called on the object
+    ``build_assessment`` had just returned, which was derived from the same gate
+    evidence the check re-derives. Three documents described it as an
+    enforcement point in three places. It is now applied to the committed file,
+    which is the artifact a reader trusts and the one an editor would tamper
+    with, and the tests below show it rejecting tampering.
+    """
+
+    committed = json.loads(COMMITTED_ASSESSMENT.read_text(encoding="utf-8"))
+    assessor.assert_gate_evidence_consistent(committed)
+
+
+def _tampered(mutate) -> dict:
+    committed = json.loads(COMMITTED_ASSESSMENT.read_text(encoding="utf-8"))
+    mutate(committed)
+    return committed
+
+
+def test_flipping_the_gate_flag_in_the_committed_file_is_rejected():
+    def mutate(doc):
+        doc["byte_only_gate_evidence"]["passed"] = False
+
+    with pytest.raises(assessor.BoundaryAssessmentError):
+        assessor.assert_gate_evidence_consistent(_tampered(mutate))
+
+
+def test_a_receipt_digest_that_does_not_match_the_named_file_is_rejected():
+    def mutate(doc):
+        doc["byte_only_gate_evidence"]["receipt_sha256"] = "0" * 64
+
+    with pytest.raises(assessor.BoundaryAssessmentError) as exc:
+        assessor.assert_gate_evidence_consistent(_tampered(mutate))
+    assert "does not hash to the digest recorded" in str(exc.value)
+
+
+def test_a_gate_evidence_block_naming_a_missing_receipt_is_rejected():
+    def mutate(doc):
+        doc["byte_only_gate_evidence"]["receipt_path"] = "docs/no_such_receipt.json"
+
+    with pytest.raises(assessor.BoundaryAssessmentError) as exc:
+        assessor.assert_gate_evidence_consistent(_tampered(mutate))
+    assert "does not exist" in str(exc.value)
+
+
+def test_a_gate_evidence_block_naming_the_wrong_execution_is_rejected():
+    def mutate(doc):
+        doc["byte_only_gate_evidence"]["platform_attested_execution"] = "other-run"
+
+    with pytest.raises(assessor.BoundaryAssessmentError) as exc:
+        assessor.assert_gate_evidence_consistent(_tampered(mutate))
+    assert "platform-attested execution" in str(exc.value)
+
+
+def test_a_terminal_state_that_does_not_follow_from_the_verdict_is_rejected():
+    def mutate(doc):
+        doc["terminal_state"] = "READY_FOR_SEPARATELY_AUTHORISED_PRIVATE_REVIEW"
+
+    with pytest.raises(assessor.BoundaryAssessmentError):
+        assessor.assert_gate_evidence_consistent(_tampered(mutate))
+
+
+# --- E-07: the gate outcome is anchored to evidence the probe did not write --
+
+
+def test_the_anchors_are_recomputed_from_committed_public_evidence():
+    """E-07: every gate conjunct was the receipt agreeing with itself.
+
+    The expected-evidence file is committed, its SHA-256 is pinned in the
+    decision record, and the aggregate digest the receipt reports is a pure
+    function of its contents. So it can be recomputed here, offline, without
+    trusting the receipt at all -- and it is recomputed rather than hard-coded,
+    so editing the evidence file cannot move the target to meet it.
+    """
+
+    anchors = assessor.derive_expected_anchors()
+    receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
+    assert anchors["object_count"] == 12
+    assert anchors["total_bytes"] == receipt["streaming"]["total_bytes_streamed"]
+    assert (
+        anchors["aggregate_digest"]
+        == receipt["streaming"]["observed_aggregate_digest"]
+    )
+
+
+def test_a_receipt_whose_aggregate_digest_disagrees_with_the_evidence_fails():
+    receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
+    receipt["streaming"]["observed_aggregate_digest"] = "0" * 64
+    passed, failures = assessor.derive_gate_outcome(receipt)
+    assert not passed
+    assert any("observed_aggregate_digest" in failure for failure in failures)
+
+
+def test_a_receipt_whose_byte_total_disagrees_with_the_evidence_fails():
+    receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
+    receipt["streaming"]["total_bytes_streamed"] += 1
+    passed, failures = assessor.derive_gate_outcome(receipt)
+    assert not passed
+    assert any("total_bytes_streamed" in failure for failure in failures)
+
+
+def test_the_committed_receipt_still_satisfies_every_conjunct():
+    receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
+    passed, failures = assessor.derive_gate_outcome(receipt)
+    assert passed, failures
+
+
+# --- F-01: the receipt is bound to control-plane output it cannot author -----
+
+
+def test_the_execution_is_bound_to_platform_recorded_output():
+    """F-01: the receipt was a self-authored, unsigned self-report.
+
+    Nothing signs it and nothing external corroborated it, yet the round's
+    terminal state rested on it. This does not make the receipt's counters true
+    -- no attestation can, since the platform does not observe what the program
+    did with the bytes -- but it does bind the execution to a record the probe
+    could not write: the control-plane execution list.
+    """
+
+    receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
+    assessor.assert_execution_is_platform_attested(receipt)
+
+
+def test_an_execution_name_absent_from_the_platform_inventory_is_rejected():
+    receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
+    receipt["execution"]["aca_execution_name"] = "job-that-never-ran"
+    with pytest.raises(assessor.PlatformAttestationError):
+        assessor.assert_execution_is_platform_attested(receipt)
+
+
+def test_an_image_digest_the_platform_did_not_record_is_rejected():
+    receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
+    receipt["provenance"]["image_digest"] = "sha256:" + "e" * 64
+    with pytest.raises(assessor.PlatformAttestationError):
+        assessor.assert_execution_is_platform_attested(receipt)
+
+
+def test_the_attestation_does_not_claim_to_verify_the_counters():
+    # The distinction this docstring carries is the whole point of F-01. If it
+    # were dropped, the attestation would read as corroboration of the safety
+    # claims, which it is not: the platform records that a container ran, not
+    # what it did with the bytes it read.
+    doc = assessor.assert_execution_is_platform_attested.__doc__ or ""
+    assert "does **not** establish" in doc
+    assert "counters" in doc
+
+
+def test_the_committed_inventory_agrees_with_the_job_executions_counter():
+    # E-11. The inventory was committed to answer C-13, then bound to nothing:
+    # the counter it justifies was never compared against it.
+    inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
+    ledger = json.loads(
+        (ROOT / "docs" / "phase1_2h_execution_access_ledger.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert len(inventory["executions"]) == ledger["live_counters"]["azure"][
+        "job_executions"
+    ]
+
+
+# --- F-05: QUALIFIES is unreachable, and that is a property worth pinning ----
+
+
+def test_qualifying_is_unreachable_from_the_current_evidence_schema():
+    """F-05: ``QUALIFIES`` cannot be produced, and this makes that explicit.
+
+    Eight of the thirteen frozen conditions have no evidence field that could
+    satisfy them, so they are ``NOT_ASSESSABLE`` for any input this schema
+    admits, and ``NOT_ASSESSABLE`` is not a pass. That is the correct behaviour
+    -- an unprovisioned boundary must not be assessable as qualifying -- but it
+    was an accident of the implementation rather than a stated property. A
+    future round that adds evidence fields must see this test fail and decide
+    deliberately, rather than discover that the verdict silently became
+    reachable.
+    """
+
+    evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
+    assessment = assessor.build_assessment(
+        evidence, gate_evidence=assessor.load_gate_evidence(RECEIPT)
+    )
+    statuses = [condition["verdict"] for condition in assessment["conditions"]]
+    assert "PASS" not in statuses
+    assert statuses.count("NOT_ASSESSABLE") == 8
+    assert assessment["qualification_verdict"] == "DOES_NOT_QUALIFY"
+
+
+def test_not_assessable_is_never_counted_as_a_pass():
+    evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
+    assessment = assessor.build_assessment(
+        evidence, gate_evidence=assessor.load_gate_evidence(RECEIPT)
+    )
+    assert assessment["summary"]["passed"] == 0
+    assert assessment["summary"]["not_assessable"] == 8

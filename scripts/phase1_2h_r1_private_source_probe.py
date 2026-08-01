@@ -8,14 +8,24 @@ streaming raw bytes into SHA-256 accumulators, that what is in the sealed prefix
 is byte-for-byte what the committed public record says was sealed there.
 
 It never decodes those bytes. A byte-only integrity verification is not a
-semantic read, and this probe is built so that the distinction is a structural
-property rather than a promise:
+semantic read, and this probe is built so that the distinction is enforced
+structurally in its own source rather than merely promised:
 
-* the bytes never leave a bounded buffer that is overwritten each chunk;
-* nothing in the reachable code path can turn a buffer into text;
+* the only function that holds object bytes binds each chunk to a loop
+  variable, passes it to a SHA-256 digest, and uses that name nowhere else ---
+  no assignment, no return, no further iteration, no non-digest call. This is a
+  statement about the reference graph in this source. It is NOT a statement
+  that the bytes are erased from process memory: CPython drops the reference
+  when the loop rebinds, and the allocator reuses the storage on its own
+  schedule, which this program neither controls nor observes;
+* no syntactic construct in that function can turn a chunk into text;
 * the receipt schema has no field that could carry one; and
 * the module refuses to run if a decode-capable or write-capable Blob symbol is
   reachable from its own module namespace.
+
+These are properties of first-party source, checked by AST analysis of that
+source. They say nothing about the Azure SDK that yields the chunks, the
+standard library, or the base image.
 
 Everything the probe trusts is frozen in
 ``docs/phase1_2h_r1_access_decision_record.json`` and bound by digest. Command
@@ -582,7 +592,7 @@ def assert_no_write_calls_in_source(source_path: Path | None = None) -> int:
 
 @_invariant("BYTE_HANDLING_DIGEST_ONLY")
 def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
-    """Whitelist every operation performed on authoritative bytes.
+    """Constrain every operation performed on authoritative bytes.
 
     :func:`stream_object_digest` is the only function in the round that holds a
     chunk of an authoritative object. The frozen ``byte_only_rule`` forbids nine
@@ -601,9 +611,27 @@ def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
 
     So this check inverts the polarity. Inside the byte-handling function, every
     call must appear in :data:`_DIGEST_ONLY_CALLS`; anything else is refused
-    whether or not anyone anticipated it. A whitelist over a three-line loop is
-    both enforceable and complete, which a denylist over a whole module can
-    never be.
+    whether or not anyone anticipated it.
+
+    Independent Audit E (E-02) then found the docstring calling that whitelist
+    "complete", which it was not: a call whitelist constrains calls, and
+    ``global SINK; SINK = chunk``, ``return chunk`` and ``for b in chunk`` are
+    not calls. It also matched attribute calls by name only, so
+    ``some_sink.update(chunk)`` read exactly like ``digest.update(chunk)``.
+    Those three gaps are now closed by tracking the chunk name itself:
+
+    * every appearance of the bound chunk name must be a direct argument to a
+      whitelisted call, and nothing else --- not a return value, not an
+      assignment source, not an iteration subject;
+    * ``global`` and ``nonlocal`` are refused outright, since either would let
+      the name escape;
+    * the receiver of an ``update`` call must be a local name assigned from
+      ``hashlib.sha256()`` in this same function.
+
+    This is a syntactic analysis of one small function, not a proof about the
+    running process. It establishes that no path in *this source* moves object
+    bytes anywhere but into a digest. It does not establish anything about the
+    Azure SDK that produces the chunks, the standard library, or the base image.
 
     Returns the number of calls inspected.
     """
@@ -624,7 +652,24 @@ def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
         # report success while guarding nothing.
         raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_HANDLER_NOT_FOUND")
 
+    for node in ast.walk(target):
+        if isinstance(node, (ast.Global, ast.Nonlocal)):
+            raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_NAME_ESCAPES_HANDLER")
+
+    # Names bound to a fresh hashlib digest here. Only these may receive an
+    # `update` call, so a same-named sink cannot impersonate the digest.
+    digest_names: set[str] = set()
+    for node in ast.walk(target):
+        if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
+            continue
+        func = node.value.func
+        if isinstance(func, ast.Attribute) and func.attr == "sha256":
+            for bound in node.targets:
+                if isinstance(bound, ast.Name):
+                    digest_names.add(bound.id)
+
     inspected = 0
+    whitelisted_argument_nodes: set[int] = set()
     for statement in target.body:
         for node in ast.walk(statement):
             if not isinstance(node, ast.Call):
@@ -635,10 +680,17 @@ def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
                 name = func.id
             elif isinstance(func, ast.Attribute):
                 name = func.attr
+                if name == "update" and not (
+                    isinstance(func.value, ast.Name)
+                    and func.value.id in digest_names
+                ):
+                    raise ProbeRefusal("INTERNAL_REFUSAL", "UPDATE_ON_NON_DIGEST")
             else:
                 raise ProbeRefusal("INTERNAL_REFUSAL", "COMPUTED_CALL_ON_BYTES")
             if name not in _DIGEST_ONLY_CALLS:
                 raise ProbeRefusal("INTERNAL_REFUSAL", "NON_DIGEST_CALL_ON_BYTES")
+            for argument in node.args:
+                whitelisted_argument_nodes.add(id(argument))
 
     # A comprehension, an f-string or a subscript over the chunk would move
     # bytes somewhere this function does not return them from. Only the body is
@@ -662,7 +714,49 @@ def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
             ):
                 raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_DERIVATIVE_IN_HANDLER")
 
+    _assert_chunk_name_never_escapes(target, whitelisted_argument_nodes)
     return inspected
+
+
+def _assert_chunk_name_never_escapes(
+    target: Any, whitelisted_argument_nodes: set[int]
+) -> None:
+    """Every use of the chunk name must be an argument to a whitelisted call.
+
+    Audit E (E-02). The chunk is the loop variable of the ``for`` over the
+    handler's only parameter. Once that name is known, an assignment, a return,
+    a further iteration or any other read of it is a path by which object bytes
+    could leave the digest, and none of those is a call.
+    """
+
+    import ast
+
+    parameters = [argument.arg for argument in target.args.args]
+    chunk_names: set[str] = set()
+    loop_target_nodes: set[int] = set()
+    for node in ast.walk(target):
+        if not isinstance(node, ast.For):
+            continue
+        iterated = node.iter
+        if isinstance(iterated, ast.Name) and iterated.id in parameters:
+            if not isinstance(node.target, ast.Name):
+                raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_LOOP_TARGET_NOT_A_NAME")
+            chunk_names.add(node.target.id)
+            loop_target_nodes.add(id(node.target))
+
+    if not chunk_names:
+        # The handler no longer iterates its input. Either it accumulates, or
+        # the shape changed; both invalidate this analysis, so refuse rather
+        # than report success over a function this check no longer understands.
+        raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_CHUNK_BINDING_NOT_FOUND")
+
+    for node in ast.walk(target):
+        if not isinstance(node, ast.Name) or node.id not in chunk_names:
+            continue
+        if id(node) in loop_target_nodes:
+            continue
+        if id(node) not in whitelisted_argument_nodes:
+            raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_NAME_USED_OUTSIDE_DIGEST")
 
 
 #: Every first-party Python source file that executes inside the access-gate

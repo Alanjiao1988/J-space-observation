@@ -99,10 +99,15 @@ INVARIANT_STATEMENTS: tuple[str, ...] = (
     "SHA-256 accumulator and discarded them, so bytes were touched while nothing "
     "about any case was learned: `decode_attempts`, `persist_attempts`, "
     "`semantic_input_reads` and `semantic_label_reads` are all **0**. Those "
-    "zeros are literals the probe emits, made credible by an AST check over its "
-    "own source that fails the build if a decode, write or persist call appears; "
-    "the receipt schema's `maximum: 0` pins stop a violation being *reported* as "
-    "a valid receipt, but do not themselves observe the running program.",
+    "zeros are literals the probe emits. What makes them credible is AST "
+    "analysis of the two first-party Python files that run inside the job: no "
+    "mutating Blob call appears in either, and the one function that holds "
+    "object bytes passes each chunk only to a SHA-256 digest and uses that name "
+    "nowhere else. That is a property of first-party source — not of the Azure "
+    "SDK, the standard library or the base image, none of which is parsed — and "
+    "not an observation of the running process. The receipt schema's "
+    "`maximum: 0` pins stop a violation being *reported* as a valid receipt, "
+    "but do not themselves observe anything.",
     "No prediction was generated and no parser was run against any evaluation "
     "or calibration corpus.",
     "No formal parser-v3 evaluation has occurred. Parser v3 remains "
@@ -112,7 +117,13 @@ INVARIANT_STATEMENTS: tuple[str, ...] = (
     "Phase 1.2H terminated `BLOCKED_ON_PRIVATE_SOURCE_ACCESS`; Phase 1.2H-R1 "
     "established authenticated byte-only access from inside the VNet and "
     "terminated `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY`, because set repair needs a "
-    "semantic review boundary that does not exist. No `parser-v3-v2` set was "
+    "semantic review boundary that the frozen 13-condition assessment scored "
+    "`DOES_NOT_QUALIFY` — no qualifying backend was found within the enumerated "
+    "search scope (resource group `rg-jspace-observation-sea` in "
+    "`southeastasia`, plus same-region AI accounts visible to the operator's "
+    "control-plane listing), and the worker subnet has no egress control. "
+    "Whether an unlisted resource group elsewhere holds a qualifying backend "
+    "was not observed and is not asserted. No `parser-v3-v2` set was "
     "constructed or sealed, and none exists.",
     "No J-space, hidden-reasoning, invisible-CoT or internal-workspace "
     "conclusion follows from any of this.",

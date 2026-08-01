@@ -62,7 +62,7 @@ Execution `p12h-r1-access-gate-003` (ACA execution `0fqre0m`) passed.
 | Bytes streamed | 396,613 |
 | Per-object digest mismatches | 0 |
 | Aggregate digest | `e1364afcac87516813d33a4e9fb3e370769487ab2f3ca47a08a3b4059db14e71` |
-| Invariants checked / failed | 12 / 0 |
+| Invariants checked / failed | 12 / 0 — a literal in the build that ran (C-12); derived from the evaluated set only in the current build |
 
 The aggregate digest is the load-bearing number. It was committed publicly
 **before** this round ran, in `docs/phase1_2h_r1_review_boundary_evidence.json`'s
@@ -70,6 +70,16 @@ sibling evidence file, and it was independently recomputed offline three times.
 The gate reproducing it from the live source is what makes this evidence rather
 than assertion: a run that had reached the wrong container, or a source that had
 drifted, could not have produced that value.
+
+Independent Audit E (E-07) then observed that the boundary assessor was not
+using it. Every conjunct of its gate decision was a field of the receipt
+compared against another field of the receipt, so the instrument checked that
+the probe agreed with itself. The assessor now recomputes the anchor offline
+from the committed expected-evidence file — whose SHA-256 the decision record
+pins — and requires the receipt to reproduce it. That is the one value in the
+receipt checkable against something the probe did not write, and it is
+recomputed rather than hard-coded, so editing the evidence file cannot move the
+target to meet a receipt.
 
 ### 3.1 What it did **not** prove
 
@@ -85,8 +95,12 @@ more privilege than the round needs:
 * **`effective_read_only_verdict`** is `NOT_CONFIRMED_IN_JOB`. Reading one's own
   role assignments requires a role the identity deliberately does not hold. The
   read-only property is established instead by operator control-plane evidence,
-  by `data_plane_writes: 0`, and by an AST proof that no write, upload, delete or
-  delegation call site exists anywhere in the probe's reachable source.
+  by `data_plane_writes: 0`, and by an AST check that no write, upload, delete
+  or delegation call site appears in the two first-party Python files that run
+  inside the job. Independent Audit E (E-04) required the scope of that last
+  clause be stated exactly: it is a property of first-party source, not of "the
+  reachable source", which would include the Azure SDK, the standard library and
+  the base image — none of which is parsed.
 
 An earlier draft returned `READ_ONLY_CONFIRMED` unconditionally. Independent
 Audit A found it (A-02) and Audit B found it separately (B-03). It was a
@@ -156,9 +170,9 @@ more advanced-sounding terminal state cannot be claimed by a round that did less
 
 | Check | Local | GitHub-hosted runner |
 |---|---|---|
-| `tests/test_phase1_2h_r1_access.py` | pass | pass |
-| `tests/test_phase1_2h_r1_review_boundary.py` | pass | pass |
-| `tests/test_parser_v3_v2_access_ledger.py` | 97 passed | pass |
+| `tests/test_phase1_2h_r1_access.py` | 162 passed | pass |
+| `tests/test_phase1_2h_r1_review_boundary.py` | 39 passed | pass |
+| `tests/test_parser_v3_v2_access_ledger.py` | 98 passed | pass |
 | Committed boundary assessment regenerates identically (`--check`) | pass | pass |
 | Committed receipt is schema-valid | pass | pass |
 | Current-state consistency instrument | pass | pass |
@@ -166,7 +180,15 @@ more advanced-sounding terminal state cannot be claimed by a round that did less
 | Offline probe dry run reproduces the anchors | pass | pass |
 | Probe imports no parser-bearing package | pass | pass |
 | `compileall`, `git diff --check`, secret scan, large-file check | pass | pass |
-| **Full repository suite** | **2103 passed, 0 failed** | **2086 passed, 2 failed, 15 skipped** |
+| **Full repository suite** | not run locally this round | **2132 passed, 2 failed, 15 skipped** |
+
+The full suite was run on a GitHub-hosted runner rather than locally
+(run `30693832918`, commit `ccbaab0`). That is an operator constraint, not a
+methodological one: the local machine has overheated and rebooted repeatedly
+under sustained load, and a suite that crashes its host reports nothing. Every
+R1-specific step in the same workflow passed on the same runner, so the result
+is not weaker evidence than a local run — it is the same evidence, observed on
+hardware that stayed up.
 
 The two runner failures are `tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last`
 and `::test_seal_refuses_a_non_empty_parent_prefix`. Both abort with
@@ -237,26 +259,59 @@ Its blocker was the more important result:
 | C-03 | Major | `counter_provenance` was optional, its `evidence` strings unvalidated, and 4 safety counters absent from the machine-evidence set | block made mandatory; evidence strings validated; the 4 counters added |
 | C-04 | Major | `comparator_predictions_generated` was declared `receipt_derived_exact`, but no such field exists in the receipt | reclassified; a `structurally_zero_by_source_analysis` class added for counters whose zero is a property of the code |
 | C-05 | Major | five documents claimed the `maximum: 0` schema pins *detect* violations | corrected everywhere: the pins constrain what may be *reported*; the AST source check is what supports the zeros |
-| C-06 | Major | the AST denylist missed 4 of the 9 frozen `forbidden_operations` | denylist widened to cover them |
+| C-06 | Major | the AST denylist missed 4 of the 9 frozen `forbidden_operations` | a *whitelist* on the one byte-handling function, not a wider denylist — see below |
 | C-07 | Major | protocol §10 said the boundary state applied "regardless of byte-only outcome", inverting the precedence rule; two state names existed outside `TERMINAL_STATES` | table rewritten with an explicit precedence column; one vocabulary, asserted by test |
 | C-08 | Minor | "protocol §12.3" does not exist; cited in a committed ledger event | erratum event 9 appended under a new `record_correction` kind; prose citations corrected to §10 with §8 |
 | C-09 | Major | documents asserted "Audits C and D reviewed the final state" — written before either audit returned | withdrawn; replaced with what actually happened, here and in `L-40` |
 | C-10 | Minor | a ledger event made a subscription-scoped negative claim from resource-group evidence and omitted a disqualified candidate | corrected by erratum event 9 |
 | C-11 | Minor | three documents said the schema refuses any `public_network_access` other than `"Unknown"`; the enum permitted three | schema pinned to `const: "Unknown"`, making the prose true |
 | C-12 | Minor | `invariants_checked: 12` was a literal restated as a measurement | counted from the invariants actually evaluated |
-| C-13 | Minor | execution 002 appeared in no record | accounted for; see §5 |
-| C-14 | Minor | "the entire first-party source executed by the gate" excluded the receipt validator, which also runs in-job | AST check extended to it; the scope claim is now accurate |
+| C-13 | Minor | execution 002 appeared in no record | accounted for; see §7 |
+| C-14 | Minor | "the entire first-party source executed by the gate" excluded the receipt validator, which also runs in-job | AST check extended to it; the scope is now stated as first-party in-job source rather than "reachable source" (see E-04) |
 
-### 7.3 What no audit has reviewed
+### 7.3 Audits E and F — the post-remediation state `ccbaab0`
+
+Two further independent read-only reviews were commissioned against the commit
+that closed Audit C. Both returned **BLOCKED**. They ran separately and did not
+see each other's output, and they converged on the same three mechanisms, which
+is the part worth recording: the receipt is a self-report; the source-analysis
+claims outran what the AST checks actually expressed; and negative findings
+about the environment were stated as facts about the world.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| F-01 | Blocker | the round's terminal state rested on an unsigned, self-authored receipt, described in a ledger event as "the **signed** execution receipt" — nothing signs it | "signed" removed; `assert_execution_is_platform_attested` added, binding the receipt to the committed control-plane execution inventory (name, status, image digest, and the `--execution-id`/`--freeze-commit` the platform recorded); its docstring states that this does not make the counters true |
+| F-04 | Blocker | "No qualifying backend exists" stated as a fact about the world from a resource-group listing | scoped to the enumerated search scope in the protocol, the report and `generate_current_state.py`; the second, independent egress-control ground for failure is now stated alongside it |
+| F-02 | Major | the strengthened AST checks were cited for execution 003, which ran a frozen probe predating them | reframed as post-hoc verification and made true: a test recovers the frozen source at the receipt's freeze commit, confirms it hashes to `probe_source_sha256`, and runs both checks over it |
+| F-03 | Major | "the bytes never leave a bounded buffer that is overwritten each chunk" — CPython drops a reference; it does not zero storage | claim withdrawn and replaced with the reference-graph property that is actually true and actually checked |
+| F-05 | Major | `QUALIFIES` was unreachable through `build_assessment` by accident rather than by design | made an explicit, tested property; a future round that adds evidence fields will see that test fail and must decide deliberately |
+| F-06 | Major | `byte_only_integrity_verifications: 14` classified `receipt_derived_exact` when the receipt reports 12 | new `composite_of_separately_evidenced_parts` class with a mandatory, validator-enforced decomposition; the C-02 rule was re-stated on the evidence so the reclassification could not weaken it |
+| F-07 | Major | `generate_current_state.py` hard-coded the unsupported conclusions | both corrected at the generator, so every current-state document inherits the correction |
+| E-01 | Major | `assert_gate_evidence_consistent` could not fail; three documents called it a three-place enforcement point | now applied to the *committed* file, and it opens the receipt the evidence block names, hashes it, and re-derives the outcome; four negative-control tests show it rejecting tampering |
+| E-02 | Major | the byte-handler whitelist was called "complete"; it constrained calls, so `global SINK; SINK = chunk`, `return chunk`, `for b in chunk` and a same-named non-digest sink all passed | "complete" withdrawn; the check now tracks the chunk binding itself and refuses any use that is not an argument to a whitelisted digest call, with six negative-control tests |
+| E-03 | Major | the C-06 row described a denylist where the fix was a whitelist; §8 described the AST checks inaccurately | corrected |
+| E-04 | Major | "the probe's reachable source" survived in the protocol and this report | replaced everywhere with the first-party-source scope that is actually checked; the "scope claim is now accurate" certification in the C-14 row withdrawn |
+| E-05 | Major | `structurally_zero_by_source_analysis` claimed AST enforcement for four counters no AST check reaches, and carried no rule that the value was zero | those four moved to a new `zero_because_the_activity_has_never_occurred` class; both zero classes now refuse a non-zero value |
+| E-06 | Major | the C-12 residual test asserted a property of a synthetic fixture, never opening receipt 003 | it now opens the committed receipt, and a companion test shows a receipt built today carries the derived list |
+| E-07 | Major | every gate conjunct was the receipt agreeing with itself | anchor conjuncts added, recomputed offline from the committed expected-evidence file |
+| E-08 | Minor | the requirements docstring said "nine" where there are twelve, and did not disclose that some conjuncts are co-derived | corrected and disclosed |
+| E-09 | Minor | `invariants_checked: 12` restated as a measurement in four current-state documents | qualified at the generator and in this report |
+| E-10 | Minor | `formal_v2_evaluation_access.labels_opened_for_scoring` — the strongest safety claim the ledger makes — was absent from `_MACHINE_EVIDENCE_REQUIRED` | added |
+| E-11 | Minor | the committed execution inventory was bound to nothing | the ledger suite now asserts it agrees with `azure.job_executions` |
+
+### 7.4 What no audit has reviewed
 
 Audit D did not complete. Its process was lost before it reported, and no
 finding is attributed to it.
 
-More importantly, the remediation of Audit C's findings — this section included
-— is material that no independent review has seen. That is the structure `L-38`
-and `L-40` describe, and it is not closed. Self-authored tests are not
-independent validation, and an audit that reviewed the previous commit is not a
-review of this one.
+More importantly, the remediation of Audits E and F — §7.3 included — is
+material that no independent review has seen. That is the structure `L-38` and
+`L-40` describe, and it is not closed. Each round of remediation creates a new
+unreviewed state, and the fact that Audits E and F found eighteen further
+defects in a state that Audit C had already been remediated for is direct
+evidence that the pattern does not converge on its own. Self-authored tests are
+not independent validation, and an audit that reviewed the previous commit is
+not a review of this one.
 
 ---
 
@@ -282,10 +337,29 @@ instrument from recording a non-zero count in a schema-valid artifact, which
 closes the specific failure mode of a violation being normalised into an
 acceptable receipt.
 
-The support for the zeros themselves is `assert_no_write_calls_in_source`: an
-AST walk over the probe's source that fails if a decode, persist, data-plane
-write or parser call is present. That is a property of the code, established by
-reading it.
+The support for the zeros themselves is source analysis, in two parts.
+`assert_no_write_calls_in_first_party_source` walks every first-party file that
+executes inside the job — the probe *and* the receipt validator, after Audit C
+(C-14) found the check reading only the first while claiming both — and fails if
+a decode, persist, data-plane write or parser call site is present anywhere in
+it. `assert_byte_handling_is_digest_only` then applies a *whitelist* to the one
+function that touches object bytes: inside `stream_object_digest`, the only
+calls permitted are `sha256`, `update`, `len` and `hexdigest`, and f-strings,
+comprehensions, subscripts and `await`/`yield` over the chunk are refused.
+
+The whitelist replaced the obvious fix, which was tried and rejected. Adding
+`str`, `split`, `loads` and `splitlines` to the module-wide denylist broke the
+probe, because `read_expected_members` legitimately calls `.splitlines()` and
+`json.loads()` — on the *public committed* member list, not on object bytes. The
+frozen rule is not "these names appear nowhere"; it is "object bytes reach a
+hash and nothing else", which is a property of one function and had to be
+checked there. A renamed or absent handler is a refusal
+(`BYTE_HANDLER_NOT_FOUND`), so the check cannot silently guard nothing.
+
+Both are properties of the code, established by reading it. Neither observes the
+running process, and neither establishes that the source analysed on disk is the
+source that executed; the image payload manifest and the digest-pinned image are
+what connect the two, and they are pinned rather than proven.
 
 `parser-v3-v1` remains **`SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE`**,
 byte-unchanged. The Phase 1.2H transition to `REPAIR_ACCESSED` did **not** occur:

@@ -32,6 +32,7 @@ RECEIPT_SCHEMA = ROOT / "docs" / "phase1_2h_r1_access_receipt.schema.json"
 REFUSAL_SCHEMA = ROOT / "docs" / "phase1_2h_r1_access_refusal_receipt.schema.json"
 PROBE_PATH = SCRIPTS / "phase1_2h_r1_private_source_probe.py"
 VALIDATOR_PATH = SCRIPTS / "phase1_2h_r1_receipt_validator.py"
+COMMITTED_RECEIPT = ROOT / "docs" / "phase1_2h_r1_access_receipt_003.json"
 
 #: The designated read-only identity, as frozen in the decision record. It is a
 #: public Azure resource identifier, not a credential. Tests read it from the
@@ -1098,12 +1099,53 @@ def test_a_receipt_may_not_name_the_same_invariant_twice():
         validator._assert_invariant_count_agrees(receipt)
 
 
-def test_receipt_003_is_identifiable_as_predating_the_derived_count(receipt):
+def test_receipt_003_is_identifiable_as_predating_the_derived_count():
     # C-12, residual. Receipt 003 was emitted by the old code with the literal.
     # Back-filling the list would fabricate evidence about a run that already
     # happened, so the field is absent and its absence is the marker.
-    assert "invariants_evaluated" not in receipt["verdict"]
-    validator._assert_invariant_count_agrees(receipt)
+    #
+    # Audit E (E-06) found this test taking the synthetic `receipt` fixture,
+    # which is built by the *current* code. It therefore asserted a property of
+    # a receipt this test constructs, not of the committed one it names, and
+    # would have kept passing had receipt 003 been back-filled. It now opens the
+    # committed file.
+    committed = json.loads(COMMITTED_RECEIPT.read_text(encoding="utf-8"))
+    assert committed["execution"]["execution_id"] == "p12h-r1-access-gate-003"
+    assert "invariants_evaluated" not in committed["verdict"]
+    assert committed["verdict"]["invariants_checked"] == 12
+    validator._assert_invariant_count_agrees(committed)
+
+
+def test_a_receipt_emitted_today_carries_the_derived_list(record, expected):
+    # The other half of E-06. The absence above is only meaningful evidence of
+    # age if a receipt built now would carry the field. The current code passes
+    # the evaluated set through, so this builds one with two invariants recorded
+    # and checks that both the list and the count follow from them.
+    names = _names(record, expected)
+    evaluated = ["DESIGNATED_IDENTITY", "EXPECTED_MEMBERS_DIGEST"]
+    fresh = probe.build_receipt(
+        record=record,
+        execution_id="ex-0002",
+        started_at="2026-01-01T00:00:00Z",
+        ended_at="2026-01-01T00:05:00Z",
+        freeze_commit="a" * 40,
+        image_digest="sha256:" + "b" * 64,
+        decision_record_sha256="c" * 64,
+        probe_source_sha256="d" * 64,
+        identity_block=probe.check_identity(
+            record, DESIGNATED_CLIENT_ID, "ManagedIdentityCredential"
+        ),
+        endpoint_block=probe.check_endpoint(record, "Unknown", "10.80.2.4"),
+        membership_block=probe.compare_membership(record, expected, names),
+        streaming_block=probe.verify_streamed(expected, list(expected)),
+        list_operations=1,
+        invariants_checked=len(evaluated),
+        invariants_evaluated=evaluated,
+    )
+
+    assert sorted(fresh["verdict"]["invariants_evaluated"]) == evaluated
+    assert fresh["verdict"]["invariants_checked"] == 2
+    validator._assert_invariant_count_agrees(fresh)
 
 
 def test_public_network_access_cannot_be_recorded_as_a_reassuring_value():
@@ -1115,3 +1157,234 @@ def test_public_network_access_cannot_be_recorded_as_a_reassuring_value():
     field = schema["properties"]["endpoint"]["properties"]["public_network_access"]
     assert field["const"] == "Unknown"
     assert "enum" not in field
+
+
+# --- Audit E / Audit F regressions -----------------------------------------
+#
+# Audits E and F were independent read-only reviews of the instruments this
+# suite covers. Each finding below is pinned by a test that fails if the fix is
+# reverted, because a finding closed only in prose is a finding that can reopen
+# silently.
+
+
+def _byte_handler_variant(body: str) -> Path:
+    """Write a probe-shaped module whose byte handler has the given body."""
+
+    import tempfile
+
+    source = (
+        "import hashlib\n"
+        "SINK = None\n"
+        "def other(x):\n"
+        "    return x\n"
+        "def stream_object_digest(chunks):\n" + body
+    )
+    handle = tempfile.NamedTemporaryFile(
+        "w", suffix=".py", delete=False, encoding="utf-8"
+    )
+    handle.write(source)
+    handle.close()
+    return Path(handle.name)
+
+
+def _refuses(body: str) -> str:
+    path = _byte_handler_variant(body)
+    try:
+        with pytest.raises(probe.ProbeRefusal) as exc:
+            probe.assert_byte_handling_is_digest_only(path)
+        return exc.value.invariant
+    finally:
+        path.unlink()
+
+
+BASELINE_HANDLER = (
+    "    digest = hashlib.sha256()\n"
+    "    total = 0\n"
+    "    for chunk in chunks:\n"
+    "        digest.update(chunk)\n"
+    "        total += len(chunk)\n"
+    "    return (digest.hexdigest(), total)\n"
+)
+
+
+def test_the_baseline_handler_shape_is_accepted():
+    # Negative control for the tests below: if this refused, they would prove
+    # nothing about the specific escapes they inject.
+    path = _byte_handler_variant(BASELINE_HANDLER)
+    try:
+        assert probe.assert_byte_handling_is_digest_only(path) == 4
+    finally:
+        path.unlink()
+
+
+def test_a_chunk_assigned_to_a_module_global_is_refused():
+    # E-02. `global SINK; SINK = chunk` is not a call, so a call whitelist
+    # could not see it. The bytes would outlive the loop.
+    assert (
+        _refuses(
+            "    global SINK\n"
+            "    digest = hashlib.sha256()\n"
+            "    total = 0\n"
+            "    for chunk in chunks:\n"
+            "        digest.update(chunk)\n"
+            "        SINK = chunk\n"
+            "        total += len(chunk)\n"
+            "    return (digest.hexdigest(), total)\n"
+        )
+        == "BYTE_NAME_ESCAPES_HANDLER"
+    )
+
+
+def test_a_chunk_bound_to_a_local_name_is_refused():
+    # E-02. A plain assignment is also not a call.
+    assert (
+        _refuses(
+            "    digest = hashlib.sha256()\n"
+            "    total = 0\n"
+            "    for chunk in chunks:\n"
+            "        digest.update(chunk)\n"
+            "        kept = chunk\n"
+            "        total += len(kept)\n"
+            "    return (digest.hexdigest(), total)\n"
+        )
+        == "BYTE_NAME_USED_OUTSIDE_DIGEST"
+    )
+
+
+def test_returning_the_chunk_is_refused():
+    # E-02. The declared return type would not stop it; nothing checked.
+    assert (
+        _refuses(
+            "    digest = hashlib.sha256()\n"
+            "    total = 0\n"
+            "    for chunk in chunks:\n"
+            "        digest.update(chunk)\n"
+            "        total += len(chunk)\n"
+            "        return chunk\n"
+            "    return (digest.hexdigest(), total)\n"
+        )
+        == "BYTE_NAME_USED_OUTSIDE_DIGEST"
+    )
+
+
+def test_iterating_over_the_chunk_is_refused():
+    # E-02. Iterating bytes yields integers, which is a content inspection.
+    assert (
+        _refuses(
+            "    digest = hashlib.sha256()\n"
+            "    total = 0\n"
+            "    for chunk in chunks:\n"
+            "        digest.update(chunk)\n"
+            "        for b in chunk:\n"
+            "            total += b\n"
+            "    return (digest.hexdigest(), total)\n"
+        )
+        == "BYTE_NAME_USED_OUTSIDE_DIGEST"
+    )
+
+
+def test_update_on_something_that_is_not_a_digest_is_refused():
+    # E-02. The old check matched the attribute name only, so any object with
+    # an `update` method -- a dict, a file-like accumulator -- read exactly
+    # like the SHA-256 digest.
+    assert (
+        _refuses(
+            "    digest = hashlib.sha256()\n"
+            "    sink = {}\n"
+            "    total = 0\n"
+            "    for chunk in chunks:\n"
+            "        sink.update(chunk)\n"
+            "        total += len(chunk)\n"
+            "    return (digest.hexdigest(), total)\n"
+        )
+        == "UPDATE_ON_NON_DIGEST"
+    )
+
+
+def test_a_handler_that_no_longer_iterates_its_input_is_refused():
+    # E-02. If the shape changes, the analysis no longer describes the code.
+    # Reporting success over a function this check cannot read would be worse
+    # than refusing.
+    assert (
+        _refuses(
+            "    digest = hashlib.sha256()\n"
+            "    digest.update(chunks)\n"
+            "    return (digest.hexdigest(), len(chunks))\n"
+        )
+        == "BYTE_CHUNK_BINDING_NOT_FOUND"
+    )
+
+
+def test_nonlocal_in_the_handler_is_refused():
+    assert (
+        _refuses(
+            "    nonlocal_marker = 0\n"
+            "    digest = hashlib.sha256()\n"
+            "    total = 0\n"
+            "    for chunk in chunks:\n"
+            "        digest.update(chunk)\n"
+            "        total += len(chunk)\n"
+            "    def inner():\n"
+            "        nonlocal total\n"
+            "        total = 0\n"
+            "    return (digest.hexdigest(), total)\n"
+        )
+        == "BYTE_NAME_ESCAPES_HANDLER"
+    )
+
+
+def test_the_strengthened_checks_pass_on_the_source_that_actually_ran():
+    """Audit F (F-02): a new check cited for an execution it did not run under.
+
+    Execution 003 ran a frozen probe whose SHA-256 the receipt records. The
+    checks added after Audit C and Audit E did not exist then, so citing them as
+    though they had governed that run would be a retroactive claim.
+
+    They can, however, be run against the frozen source now. That is a weaker
+    but true statement -- post-hoc verification rather than enforcement -- and
+    this test is what makes it true rather than asserted. It recovers the exact
+    bytes the receipt names, confirms the digest, and runs both strengthened
+    checks over them.
+    """
+
+    import subprocess
+    import tempfile
+
+    committed = json.loads(COMMITTED_RECEIPT.read_text(encoding="utf-8"))
+    claimed = committed["provenance"]["probe_source_sha256"]
+    freeze = committed["provenance"]["access_protocol_freeze_commit"]
+
+    completed = subprocess.run(
+        ["git", "show", f"{freeze}:scripts/phase1_2h_r1_private_source_probe.py"],
+        cwd=ROOT,
+        capture_output=True,
+    )
+    if completed.returncode != 0:  # pragma: no cover - shallow clone
+        pytest.skip("the freeze commit is not present in this clone")
+
+    frozen = completed.stdout.replace(b"\r\n", b"\n")
+    assert hashlib.sha256(frozen).hexdigest() == claimed
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "frozen_probe.py"
+        path.write_bytes(frozen)
+        assert probe.assert_no_write_calls_in_source(path) > 0
+        assert probe.assert_byte_handling_is_digest_only(path) == 4
+
+
+def test_the_docstring_does_not_claim_the_call_whitelist_is_complete():
+    # E-02. The word was load-bearing: it told a reader no further analysis was
+    # needed, which is what stopped the four gaps being found earlier.
+    doc = probe.assert_byte_handling_is_digest_only.__doc__ or ""
+    assert "both enforceable and complete" not in doc
+    assert "syntactic analysis of one small function" in doc
+    assert "not a proof about the" in doc
+
+
+def test_the_module_docstring_does_not_claim_memory_is_overwritten():
+    # F-03. CPython drops a reference when the loop rebinds; it does not zero
+    # the storage, and this program neither controls nor observes when the
+    # allocator reuses it.
+    doc = probe.__doc__ or ""
+    assert "overwritten each chunk" not in doc
+    assert "erased from process memory" in doc

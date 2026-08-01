@@ -140,7 +140,8 @@
         "receipt_path",
         "receipt_sha256",
         "passed",
-        "unmet_requirements"
+        "unmet_requirements",
+        "platform_attested_execution"
       ],
       "properties": {
         "receipt_path": {
@@ -168,6 +169,13 @@
           "items": {
             "type": "string"
           }
+        },
+        "platform_attested_execution": {
+          "description": "The Azure Container Apps execution name that the committed platform execution inventory independently records as Succeeded, running the image digest the receipt claims, invoked with the execution id and freeze commit the receipt claims. Null when no gate was run. Audit F (F-01): every other field here derives from a document the probe wrote about itself; this one derives from a control-plane query the probe cannot author. It establishes that the described execution really happened and ran the named image. It does NOT establish that the receipt's counters are true.",
+          "type": [
+            "string",
+            "null"
+          ]
         }
       }
     },
