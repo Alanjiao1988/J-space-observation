@@ -220,19 +220,30 @@ def assess(evidence: dict[str, Any]) -> dict[str, dict[str, str]]:
         "no egress allowlist is in force" if unrestricted else "egress allowlist in force",
     )
 
-    # The remaining conditions are properties of a review *design* that does
-    # not exist. Reporting them as NOT_ASSESSABLE is the honest result: they
-    # are neither satisfied nor violated, because there is nothing to assess.
-    # They are listed rather than dropped so that a future round cannot mistake
-    # silence for satisfaction.
+    # The remaining conditions are properties of a review *design* that has not
+    # been provisioned. Reporting them as NOT_ASSESSABLE is the honest result:
+    # they are neither satisfied nor violated, because there is nothing to
+    # assess. They are listed rather than dropped so that a future round cannot
+    # mistake silence for satisfaction.
     #
     # Audit F (F-04b): the reason string previously read "no review backend
     # exists", which is an unscoped claim about the world. What this assessor
-    # observed is narrower and is all it can support: no semantic-review
-    # backend appears in the execution inventory it reads, so no such backend
-    # has been provisioned *and evidenced* to this instrument. A backend that
-    # existed but was never evidenced here would produce the same reading, and
-    # the reason now says so.
+    # observed is narrower and is all it can support.
+    #
+    # Audit F (F-12) then found the narrowed reason citing the wrong input. It
+    # named "the execution inventory this assessor reads" --- but the execution
+    # inventory lists runs of the *access-gate job*, and would not contain a
+    # review backend under any circumstances, so a reason resting on its silence
+    # rested on nothing. Backend facts come from the review-boundary evidence
+    # bundle, which is a different file with different provenance: it does list
+    # a candidate endpoint, and that endpoint is reported as non-qualifying ---
+    # public network access enabled, no private endpoint, outside the project
+    # resource group --- rather than absent.
+    #
+    # The bundle's own provenance is disclosed in the same breath, because it
+    # matters to how much the NOT_ASSESSABLE reading is worth: it is an operator
+    # transcription of read-only `az` queries, committed as plain JSON and
+    # signed by nothing.
     for key in (
         "no_prompt_or_response_reaches_copilot_actions_or_public_telemetry",
         "raw_prompt_logging_disabled_or_confined_to_boundary",
@@ -246,11 +257,13 @@ def assess(evidence: dict[str, Any]) -> dict[str, dict[str, str]]:
         record(
             key,
             "NOT_ASSESSABLE",
-            "no semantic-review backend is evidenced in the execution "
-            "inventory this assessor reads, so this property of a review "
-            "design has nothing here to be assessed against; this is an "
-            "absence of evidence within the assessed inventory, not a proof "
-            "that no such backend exists anywhere",
+            "no qualifying review backend is evidenced in the review-boundary "
+            "evidence bundle: the project resource group holds no review "
+            "endpoint, and the one candidate listed sits outside it, with "
+            "public network access enabled and no private endpoint. The bundle "
+            "is an unsigned operator transcript of read-only az queries, so "
+            "this is absence of qualifying evidence in the assessed inputs, "
+            "not proof none exists",
         )
 
     missing = set(CONDITION_KEYS) - set(results)
@@ -308,42 +321,62 @@ def classify_terminal_state(
     return TERMINAL_STATE_BY_OUTCOME["gate_passed_boundary_qualifies"]
 
 
-#: The committed platform-side execution history of the access-gate job. Audit F
-#: (F-01) is why this exists as an input rather than as background reading: the
-#: receipt is written *by the probe, about the probe*, so every conjunct in
-#: :data:`GATE_REQUIREMENTS` is ultimately one program's self-report. This file
-#: is not. It is the output of an Azure control-plane query, which the probe has
-#: no way to write, and it independently records which executions of the job
-#: exist, which image each ran, what arguments each was given and how each
-#: ended. Binding the receipt to it does not make the receipt's *counters* true
-#: --- nothing offline can --- but it does establish that the execution the
-#: receipt describes is an execution that the platform agrees happened, ran the
-#: image the receipt names, and succeeded.
+#: A committed transcript of the platform-side execution history of the
+#: access-gate job. Audit F (F-01) is why this exists as an input rather than as
+#: background reading: the receipt is written *by the probe, about the probe*,
+#: so every conjunct in :data:`GATE_REQUIREMENTS` is ultimately one program's
+#: self-report. This file is a different program's output --- an
+#: ``az containerapp job execution list`` query, which the probe has no way to
+#: run --- recording which executions of the job exist, which image each ran,
+#: what arguments each was given and how each ended.
+#:
+#: Audit F (F-11) then bounded what that is worth. The transcript is committed
+#: JSON. Nothing signs it, nothing binds it to Azure, and an operator who can
+#: edit the receipt can edit this file in the same commit. What it supplies is
+#: *independence of authorship*, not attestation: the receipt is no longer
+#: checked against itself alone. It is second-hand testimony about a
+#: control-plane observation, transcribed offline by the same operator, and the
+#: strongest honest reading is that the receipt agrees with a separately
+#: authored, unsigned record of the same run.
 JOB_EXECUTION_INVENTORY = REPO_ROOT / "docs" / "phase1_2h_r1_job_execution_inventory.json"
 
 
 class PlatformAttestationError(BoundaryAssessmentError):
-    """The receipt describes an execution the platform record does not support."""
+    """The receipt disagrees with the committed transcript of the platform record."""
 
 
 def assert_execution_is_platform_attested(
     receipt: Mapping[str, Any],
     inventory_path: Path = JOB_EXECUTION_INVENTORY,
 ) -> dict[str, Any]:
-    """Bind the self-authored receipt to independently observed platform facts.
+    """Require the self-authored receipt to agree with a separately authored record.
 
     Returns the matched inventory entry so a caller can record what it matched
     against.
 
-    What this establishes: the named execution exists in Azure's own execution
-    list for this job, it succeeded, it ran the image digest the receipt claims,
-    and it was invoked with the execution id and freeze commit the receipt
-    claims. Those are control-plane observations; the probe cannot author them.
+    What this establishes: the named execution appears in a committed transcript
+    of Azure's execution list for this job, recorded there as succeeded, running
+    the image digest the receipt claims, invoked with the execution id and
+    freeze commit the receipt claims. Because the transcript is the output of a
+    control-plane query the probe cannot issue, a receipt that fabricated its
+    execution would have to be accompanied by a matching fabrication in a
+    different file.
 
-    What this does **not** establish: that the receipt's counters are true. A
-    program that genuinely ran the right image can still misreport what it did.
-    The counters are supported by source analysis of the frozen source, which is
-    a separate and weaker kind of evidence, and the report says so.
+    What this does **not** establish, and what the function name overstates.
+    Audit F (F-11) found this docstring claiming the platform "agrees" the
+    execution happened. It does not read the platform. It reads committed JSON
+    that an operator transcribed from a command, with no signature, no
+    timestamped authority and no binding to Azure --- so an operator editing the
+    receipt can edit the transcript in the same commit, and the check would
+    hold. The property is *agreement with an unsigned committed transcript*: it
+    raises the cost of a false receipt from one edit to two consistent ones, and
+    that is all. Genuine attestation would require a signed platform artifact,
+    which this round did not obtain and does not claim.
+
+    Nor does it establish that the receipt's counters are true. A program that
+    genuinely ran the right image can still misreport what it did. The counters
+    are supported by source analysis of the frozen source, which is a separate
+    and weaker kind of evidence, and the report says so.
     """
 
     inventory = json.loads(inventory_path.read_text(encoding="utf-8"))

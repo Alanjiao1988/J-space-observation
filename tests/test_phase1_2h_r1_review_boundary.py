@@ -635,3 +635,85 @@ def test_not_assessable_is_never_counted_as_a_pass():
     )
     assert assessment["summary"]["passed"] == 0
     assert assessment["summary"]["not_assessable"] == 8
+
+
+def test_f11_platform_attestation_is_described_as_an_unsigned_transcript():
+    """Audit F (F-11): the check claimed the platform agreed the run happened.
+
+    ``assert_execution_is_platform_attested`` reads
+    ``docs/phase1_2h_r1_job_execution_inventory.json``, which is committed JSON
+    an operator transcribed from an ``az`` command. Nothing signs it and nothing
+    binds it to Azure, so an operator who can edit the receipt can edit it in
+    the same commit and the check still holds. What it buys is independence of
+    *authorship* --- two consistent forgeries instead of one --- not attestation.
+
+    This test fixes the wording, because the wording is the claim.
+    """
+    doc = assessor.assert_execution_is_platform_attested.__doc__ or ""
+    assert "unsigned committed transcript" in doc
+    assert "Genuine attestation would require a signed platform artifact" in doc
+    assert "which this round did not obtain and does not claim" in doc
+    # The overbroad phrasing must not return.
+    assert "the platform agrees" not in doc
+    assert "Azure's own execution list" not in doc
+
+    source = Path(assessor.__file__).read_text(encoding="utf-8")
+    constant_comment = source[: source.index("JOB_EXECUTION_INVENTORY = ")]
+    assert "not attestation" in constant_comment
+    assert "Nothing signs it" in constant_comment
+
+
+def test_f12_the_not_assessable_reason_cites_the_input_it_rests_on():
+    """Audit F (F-12): the eight reasons appealed to the wrong file's silence.
+
+    The reason named "the execution inventory this assessor reads". That
+    inventory lists runs of the access-gate job; a review backend would never
+    appear in it under any circumstances, so its silence supported nothing.
+    Backend facts come from the review-boundary evidence bundle --- which does
+    not fall silent. It lists a candidate endpoint and reports it as
+    non-qualifying, which is a different and stronger reading than absence.
+    """
+    evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
+    results = assessor.assess(evidence)
+    not_assessable = [
+        entry for entry in results.values() if entry["verdict"] == "NOT_ASSESSABLE"
+    ]
+    assert len(not_assessable) == 8
+
+    for entry in not_assessable:
+        basis = entry["basis"]
+        assert "review-boundary evidence bundle" in basis
+        assert "execution inventory" not in basis
+        # The candidate is reported as non-qualifying, not as absent.
+        assert "the one candidate listed" in basis
+        assert "public network access enabled" in basis
+        # The bundle's provenance is disclosed where the reading is made.
+        assert "unsigned operator transcript" in basis
+        assert "not proof none exists" in basis
+
+    # The bundle really does list the candidate the reason describes, so the
+    # reason is not merely well-phrased.
+    candidates = evidence["candidate_reviewer_endpoints"]
+    assert candidates
+    assert all(c.get("public_network_access") == "Enabled" for c in candidates)
+    assert all(int(c.get("private_endpoint_count", 0)) == 0 for c in candidates)
+    assert all(c.get("in_project_resource_group") is False for c in candidates)
+
+
+def test_f12_the_schema_scopes_not_assessable_to_the_assessed_inputs():
+    """The schema said the review design "does not exist", unconditionally.
+
+    That is a claim about the world made by a document that reads two committed
+    JSON files. It is now scoped to what those files show.
+    """
+    schema = json.loads(
+        (ROOT / "docs" / "phase1_2h_r1_review_boundary.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    verdict = schema["properties"]["conditions"]["items"]["properties"]["verdict"]
+    description = verdict["description"]
+    assert "NOT_ASSESSABLE is not a pass" in description
+    assert "has not been provisioned and evidenced to this assessor" in description
+    assert "is not a claim that no such design exists anywhere" in description
+    assert "a review design that does not exist" not in description

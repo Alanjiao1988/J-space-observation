@@ -544,17 +544,29 @@ def _validate(ledger, policy):
 
 
 def test_g01_a_fabricated_sealed_successor_set_is_refused(ledger, policy):
-    """The exact mutation Audit G used, which validated and was then rendered."""
+    """The exact mutation Audit G used, which validated and was then rendered.
+
+    The assertion targets ``_validate_successor_set_state`` directly. Since the
+    F-10 correction the same mutation also falsifies the never-occurred
+    provenance binding --- a set that exists cannot have had its sealed inputs
+    never read --- and that rule runs earlier, so a whole-ledger ``match=``
+    would silently start testing the other rule. Both must refuse it, so both
+    are asserted.
+    """
     ledger["successor_set_state"].update(
         {"exists": True, "sealed": True, "sealed_object_count": 120}
     )
     with pytest.raises(LedgerError, match="sets_sealed"):
+        ledger_module._validate_successor_set_state(ledger, ledger["status"])
+    with pytest.raises(LedgerError):
         _validate(ledger, policy)
 
 
 def test_g01_exists_requires_a_constructed_or_sealed_set(ledger, policy):
     ledger["successor_set_state"]["exists"] = True
     with pytest.raises(LedgerError, match="cannot exist"):
+        ledger_module._validate_successor_set_state(ledger, ledger["status"])
+    with pytest.raises(LedgerError):
         _validate(ledger, policy)
 
 
@@ -1392,18 +1404,43 @@ def test_the_never_occurred_class_is_bound_to_the_state_it_appeals_to(ledger):
     Renaming the class would have left it resting on nothing, so it is bound to
     the flags it appeals to instead. The class is still documented as a record
     assertion rather than promoted to evidence.
+
+    Audit F's third closure review (F-10) then found the bindings themselves
+    semantically wrong: the four ``formal_v2_evaluation_access`` and
+    ``parser_execution`` counters were checked against
+    ``retired_v1_state.formal_evaluation_ever_run``, a flag recording the
+    history of ``parser-v3-v1``. The counters describe the *successor* set, so
+    the binding could hold while the fact it guaranteed had changed. Each
+    counter is now bound to the block describing the same object, and this test
+    exercises both blocks.
     """
     assert (
         "retired_v1_repair_access.labels_opened_for_scoring"
         in ledger_module._NEVER_OCCURRED_STATE_BINDINGS
     )
+    assert ledger_module._NEVER_OCCURRED_STATE_BINDINGS[
+        "formal_v2_evaluation_access.sealed_input_semantic_reads"
+    ] == ("successor_set_state", "exists", False)
+    assert ledger_module._NEVER_OCCURRED_STATE_BINDINGS[
+        "parser_execution.comparator_predictions_generated"
+    ] == ("successor_set_state", "formal_evaluation_ordinal", 0)
 
     # The two halves of the record must now fail together rather than drift.
+    # A successor set springing into existence falsifies the claim that its
+    # sealed inputs were never read.
     flipped = copy.deepcopy(ledger)
-    flipped["retired_v1_state"]["formal_evaluation_ever_run"] = True
+    flipped["successor_set_state"]["exists"] = True
     with pytest.raises(LedgerError, match="the same history"):
         ledger_module._assert_never_occurred_agrees_with_state(flipped)
 
+    # An ordered formal evaluation falsifies the claim that no label was opened
+    # to score one and no comparator ran alongside it.
+    ordered = copy.deepcopy(ledger)
+    ordered["successor_set_state"]["formal_evaluation_ordinal"] = 1
+    with pytest.raises(LedgerError, match="the same history"):
+        ledger_module._assert_never_occurred_agrees_with_state(ordered)
+
+    # The retired-v1 counter remains bound to the retired-v1 block.
     raised = copy.deepcopy(ledger)
     raised["retired_v1_state"]["labels_opened_for_scoring"] = 3
     with pytest.raises(LedgerError, match="the same history"):
@@ -1426,3 +1463,205 @@ def test_the_never_occurred_class_is_bound_to_the_state_it_appeals_to(ledger):
         "zero_because_the_activity_has_never_occurred"
     ]
     assert "record assertion" in note
+
+
+def test_a_citation_cannot_escape_the_repository_root(ledger):
+    """Audit E (E-22). The docstring claimed confinement the code did not do.
+
+    ``(root / candidate).is_file()`` follows ``..``, so ``../package.json`` and
+    ``docs/../../package.json`` resolved to real files outside the repository
+    and were accepted as evidence citations.
+    """
+    for escaping in (
+        "../package.json",
+        "docs/../../package.json",
+        "../../package.json",
+    ):
+        assert ledger_module._cited_paths_that_exist(escaping) == []
+
+    # The control: a real in-repository path is still accepted, so the refusals
+    # above are attributable to the escape and not to the check being inert.
+    assert ledger_module._cited_paths_that_exist(
+        "docs/phase1_2h_execution_access_ledger.json"
+    ) == ["docs/phase1_2h_execution_access_ledger.json"]
+
+    mutated = copy.deepcopy(ledger)
+    parts = mutated["counter_provenance"]["composite_of_separately_evidenced_parts"][
+        "parts"
+    ]["retired_v1_repair_access.byte_only_integrity_verifications"]
+    parts[1] = dict(parts[1], evidence="cited at ../package.json")
+    with pytest.raises(LedgerError):
+        validate_ledger(mutated)
+
+
+def test_f09_citability_fails_closed_when_the_repository_is_absent(
+    ledger, monkeypatch, tmp_path
+):
+    """Audit F (F-09): the missing-checkout branch reopened the shape-only hole.
+
+    ``_cited_paths_that_exist`` degraded to ``_CITATION_PATTERN`` whenever
+    ``root/"docs"`` was not a directory, so a ledger validated from an installed
+    package accepted ``docs/does-not-exist.json`` again --- the weaker check
+    replaced the stronger one exactly where nothing could notice. It now returns
+    nothing, and the callers refuse.
+
+    The branch is reached by pointing the module's ``__file__``-derived root at
+    an empty directory, which is what an installed package without a checkout
+    looks like.
+    """
+    real = ledger_module._cited_paths_that_exist(
+        "supported by docs/phase1_2h_execution_access_ledger.json"
+    )
+    assert real == ["docs/phase1_2h_execution_access_ledger.json"]
+
+    monkeypatch.setattr(
+        ledger_module, "__file__", str(tmp_path / "pkg" / "mod" / "x.py")
+    )
+    assert (
+        ledger_module._cited_paths_that_exist(
+            "supported by docs/phase1_2h_execution_access_ledger.json"
+        )
+        == []
+    )
+    with pytest.raises(LedgerError, match="cite"):
+        ledger_module._assert_evidence_is_citable(
+            "receipt_derived_exact",
+            "supported by docs/phase1_2h_execution_access_ledger.json",
+        )
+
+
+def test_f09_a_zero_counter_cannot_be_laundered_through_a_composite(ledger):
+    """Audit F (F-09): two zero addends citing real files satisfied the shape.
+
+    The composite class required at least two addends, each with a non-negative
+    amount and a distinct citable evidence string, summing to the counter. A
+    zero safety counter met all of that with ``0 + 0`` and two unrelated
+    committed documents --- so the strongest-looking provenance class was
+    reachable for a number nothing had measured.
+
+    Two rules close it independently: an addend must be positive, and a counter
+    whose value is zero may not be classified as a composite at all. A zero is
+    not a sum of evidenced activity, and it has classes of its own that say why
+    it is zero.
+    """
+    mutated = copy.deepcopy(ledger)
+    provenance = mutated["counter_provenance"]
+    path = "azure.data_plane_writes"
+    for class_name in ledger_module.COUNTER_PROVENANCE_CLASSES:
+        entry = provenance.get(class_name)
+        if isinstance(entry, dict) and path in entry.get("counters", []):
+            entry["counters"].remove(path)
+    composite = provenance["composite_of_separately_evidenced_parts"]
+    composite["counters"].append(path)
+    composite.setdefault("parts", {})[path] = [
+        {
+            "amount": 0,
+            "evidence": "no write in docs/thread_handoff.md",
+        },
+        {
+            "amount": 0,
+            "evidence": "no write in reports/current_status.md",
+        },
+    ]
+    with pytest.raises(LedgerError, match="positive integer"):
+        validate_ledger(mutated)
+
+    # And with the amount rule satisfied by construction, the zero-value rule
+    # still refuses it: 1 + -1 is not expressible, so the check is exercised
+    # through the direct validator with a counter forced to zero.
+    forced = copy.deepcopy(mutated)
+    forced["counter_provenance"]["composite_of_separately_evidenced_parts"]["parts"][
+        path
+    ] = [
+        {"amount": 1, "evidence": "cited in docs/thread_handoff.md"},
+        {"amount": 1, "evidence": "cited in reports/current_status.md"},
+    ]
+    with pytest.raises(LedgerError, match="sum to 2"):
+        validate_ledger(forced)
+
+
+def test_f13_the_byte_only_constant_is_an_equality_not_a_floor(ledger):
+    """Audit F (F-13): the constant's comment contradicted the rule reading it.
+
+    The comment called ``BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE`` a floor a later
+    round could exceed without moving the constant. ``_validate_status_agreement``
+    pins the counter to it exactly, because E-18 showed a floor leaves the
+    overstating direction free. This test fixes which of the two is the rule.
+    """
+    source = (
+        Path(ledger_module.__file__).read_text(encoding="utf-8")
+    )
+    marker = "BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE: int = 14"
+    comment = source[: source.index(marker)].rsplit("\n\n", 1)[-1]
+    assert "floor" not in comment.split("owns the downward")[0].replace(
+        "is a floor", ""
+    ) or "was wrong" in comment
+
+    raised = copy.deepcopy(ledger)
+    raised["live_counters"]["retired_v1_repair_access"][
+        "byte_only_integrity_verifications"
+    ] = 15
+    with pytest.raises(LedgerError, match="must equal 14"):
+        ledger_module._validate_status_agreement(raised, raised["status"])
+
+
+def test_f14_provenance_cannot_be_restated_across_succession(ledger):
+    """Audit F (F-14): succession compared counters and events and nothing else.
+
+    A successor could keep every value and every event while moving a counter
+    from ``operator_asserted_unverified`` to ``receipt_derived_exact``. The
+    number would not change; the reader's warrant for it would, upward, with
+    nothing recorded. Audit F judged this non-blocking while no successor
+    exists and said it must close before any round relies on succession.
+
+    Provenance is now immutable across succession unless an appended event
+    names the counter and both classes.
+    """
+    assert ledger_module.assert_monotonic_succession(ledger, copy.deepcopy(ledger)) is None
+
+    silent = copy.deepcopy(ledger)
+    provenance = silent["counter_provenance"]
+    path = "azure.control_plane_reads"
+    origin = "operator_maintained_approximate"
+    assert path in provenance[origin]["counters"]
+    provenance[origin]["counters"].remove(path)
+    provenance["receipt_derived_exact"]["counters"].append(path)
+    with pytest.raises(LedgerError, match="must be recorded, not applied"):
+        ledger_module.assert_monotonic_succession(ledger, silent)
+
+    # The same change is permitted when the successor appends an event that
+    # names the counter and both classes, which is what makes it reviewable.
+    recorded = copy.deepcopy(silent)
+    corrected = next(
+        event["sequence"]
+        for event in reversed(recorded["events"])
+        if event["kind"] != ledger_module.CORRECTION_EVENT_KIND
+    )
+    recorded["events"].append(
+        {
+            "sequence": len(recorded["events"]) + 1,
+            "kind": ledger_module.CORRECTION_EVENT_KIND,
+            "corrects": corrected,
+            "role": "public-repository maintainer, offline",
+            "private_content_read": False,
+            "summary": (
+                f"Reclassification of {path}. Its provenance moves from "
+                f"{origin} to receipt_derived_exact. No counter value changes; "
+                "this event exists so that the change in why the number should "
+                "be believed is itself on the record."
+            ),
+        }
+    )
+    ledger_module.assert_monotonic_succession(ledger, recorded)
+
+    # Dropping a classification is refused outright. The partition rule in
+    # _validate_counter_provenance also refuses it, so the succession rule is
+    # exercised directly to show it does not depend on that.
+    dropped = copy.deepcopy(ledger)
+    dropped["counter_provenance"][origin]["counters"].remove(path)
+    with pytest.raises(LedgerError, match="lose its provenance"):
+        ledger_module._assert_provenance_survives_succession(
+            ledger, dropped, ledger_module._validate_events(dropped["events"])
+        )
+    with pytest.raises(LedgerError):
+        ledger_module.assert_monotonic_succession(ledger, dropped)

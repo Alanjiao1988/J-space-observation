@@ -294,6 +294,20 @@ FORBIDDEN_PERSIST_METHODS = (
 # check, and this module does not claim it is.
 FORBIDDEN_DYNAMIC_ACCESS = ("eval", "exec", "compile", "__import__")
 
+#: Audit E (E-20). Forms that bind a module global without an assignment
+#: statement, so that no scan of assignment targets can see them. Audit E used
+#: ``globals()['stream_object_digest'] = _tap(...)`` and
+#: ``setattr(sys.modules[__name__], 'stream_object_digest', _tap)`` to replace
+#: the analysed handler with a wrapper that retained every chunk; both passed.
+#: A syntactic binding scan only means something if the source cannot bind
+#: names non-syntactically, so these are refused in first-party in-job source.
+FORBIDDEN_REFLECTIVE_MUTATION = ("setattr", "delattr")
+
+#: Namespace mappings that must not be used as assignment targets. Reading
+#: ``globals()`` stays permitted --- the reachability check in this module
+#: needs it --- but ``globals()[name] = value`` is a store.
+FORBIDDEN_NAMESPACE_STORES = ("globals", "vars", "locals")
+
 # Import roots that would give this file a persistence, exfiltration, or
 # parser capability it must not have.
 FORBIDDEN_IMPORT_ROOTS = (
@@ -629,9 +643,20 @@ def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
       ``hashlib.sha256()`` in this same function.
 
     This is a syntactic analysis of one small function, not a proof about the
-    running process. It establishes that no path in *this source* moves object
-    bytes anywhere but into a digest. It does not establish anything about the
-    Azure SDK that produces the chunks, the standard library, or the base image.
+    running process. Audit E (E-20) was right that the previous version of this
+    sentence --- "no path in *this source* moves object bytes anywhere but into
+    a digest" --- was false while eight module-scope shapes could redirect the
+    handler or the whitelisted names. What it establishes now, stated at its
+    actual strength: within this source file, the handler name is bound exactly
+    once by a plain ``def``, the whitelisted call names are not rebound by any
+    syntactic binding construct at either scope, no reflective rebinding form
+    appears, and in the resulting body every appearance of the chunk name is a
+    direct argument to a whitelisted call whose ``update`` receiver came from
+    ``hashlib.sha256()``.
+
+    It does not establish anything about the Azure SDK that produces the chunks,
+    the standard library, or the base image, none of which is parsed; and it
+    cannot see a rebinding performed by a module that imports this one.
 
     Returns the number of calls inspected.
     """
@@ -648,31 +673,66 @@ def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
     # decorator syntax at all; and two definitions of the name, because the scan
     # below takes the *first* and Python binds the *last*.
     #
-    # So the name must be defined exactly once and never rebound. Any other
-    # shape is refused rather than analysed, because analysing the wrong
-    # function and reporting success is the worst outcome available here.
+    # Audit E (E-20) then defeated the fix for that: the module scan was written
+    # by hand with four node types and no recursion, while `_bindings_in` --- a
+    # complete recursive enumerator --- sat one function away, used only on the
+    # handler. Tuple targets, `for` targets, `with` targets, `globals()[...]`
+    # and `setattr(sys.modules[__name__], ...)` all rebound the name and passed.
+    #
+    # There is now one enumerator and both scopes use it, and the reflective
+    # forms it cannot see are refused outright first.
+    _assert_no_reflective_rebinding(tree)
+
+    module_bindings = _bindings_in(tree, include_definitions=True)
+
     definitions = [
         node
         for node in ast.walk(tree)
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
         and node.name == BYTE_HANDLING_FUNCTION
     ]
-    rebindings = [
-        bound
-        for node in ast.walk(tree)
-        if isinstance(node, (ast.Assign, ast.AugAssign, ast.AnnAssign, ast.NamedExpr))
-        for bound in (node.targets if isinstance(node, ast.Assign) else [node.target])
-        if isinstance(bound, ast.Name) and bound.id == BYTE_HANDLING_FUNCTION
-    ]
-    if len(definitions) > 1 or rebindings:
-        raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_HANDLER_NAME_NOT_UNIQUE")
-
-    target = definitions[0] if definitions else None
-    if target is None:
+    if not definitions:
         # The function this check exists to constrain has been renamed or
         # removed. Passing silently would be the worst outcome: the check would
-        # report success while guarding nothing.
+        # report success while guarding nothing. This is deliberately reported
+        # before the binding rules below, so that "the handler is gone" is never
+        # misreported as "a name was shadowed".
         raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_HANDLER_NOT_FOUND")
+
+    if len(definitions) > 1 or len(module_bindings.get(BYTE_HANDLING_FUNCTION, ())) > 1:
+        raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_HANDLER_NAME_NOT_UNIQUE")
+
+    # Audit E (E-20), F10/F11/F12. The shadowing rule inspected only bindings
+    # *inside* the handler, so a module-level `len = _tap_len` or `hashlib = _H`
+    # left the body byte-identical to the live one while every whitelisted call
+    # resolved to an attacker's. The whitelist matches names, so every scope
+    # that can bind those names has to be checked, not just the innermost.
+    #
+    # `import hashlib` is the one permitted module-level binding: it is how the
+    # digest constructor is meant to arrive. Anything else --- `import hashlib
+    # as h`, `from x import hashlib`, an assignment, a def --- is refused.
+    for name in sorted(_DIGEST_ONLY_CALLS | {"hashlib"}):
+        bound = module_bindings.get(name, ())
+        if name == "hashlib":
+            # The digest receiver rule requires the constructor to be reached as
+            # `hashlib.sha256()`, so the module must actually bind `hashlib`,
+            # and by the one form that cannot be pointed elsewhere. `import
+            # hashlib as h` would leave the handler's `hashlib` unbound, and
+            # `import evil as hashlib` would bind it to anything at all; both
+            # mean the analysed body is not the code that runs.
+            if len(bound) == 1:
+                alias = bound[0]
+                if (
+                    isinstance(alias, ast.alias)
+                    and alias.asname is None
+                    and alias.name == "hashlib"
+                ):
+                    continue
+            raise ProbeRefusal("INTERNAL_REFUSAL", "WHITELISTED_NAME_SHADOWED")
+        if bound:
+            raise ProbeRefusal("INTERNAL_REFUSAL", "WHITELISTED_NAME_SHADOWED")
+
+    target = definitions[0]
 
     # Audit F: a decorator wraps the handler, so what executes is not the body
     # this check reads. Audit F's counterexample passed every check below while
@@ -787,8 +847,131 @@ def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
     return inspected
 
 
-def _handler_bindings(target: Any) -> dict[str, list[Any]]:
-    """Every name bound inside the handler, by every binding construct.
+#: The attribute call that produces the byte stream inside the job, and the
+#: attribute call that produces the object it is read from. Declared as module
+#: constants because :func:`assert_no_write_calls_in_source` refuses source
+#: files containing bare string literals that name analysed symbols unless they
+#: appear in a module-level declaration.
+BYTE_SOURCE_CHUNK_CALL = "chunks"
+BYTE_SOURCE_OPEN_CALL = "download_blob"
+
+
+@_invariant("BYTE_SOURCE_REACHES_ONLY_THE_HANDLER")
+def assert_byte_source_reaches_only_the_handler(
+    source_path: Path | None = None,
+) -> int:
+    """Require the streamed bytes to reach the analysed handler and nothing else.
+
+    Audit F (F-08) defeated :func:`assert_byte_handling_is_digest_only` without
+    touching it. A pristine ``stream_object_digest`` was left in place, passing
+    every rule; the live entrypoint was then changed to call
+    ``evil_stream_object_digest`` instead. The analysed function was clean, was
+    unique, was undecorated --- and was dead code. Byte handling was proved safe
+    for a function that never saw a byte.
+
+    The gap is that the earlier check reasons about a *definition* and never
+    about a *call site*. So this one reasons only about call sites, and asks two
+    questions of the whole module:
+
+    1. Every ``.chunks()`` call --- the expression that yields object bytes ---
+       must appear directly as an argument to a call of
+       :data:`BYTE_HANDLING_FUNCTION` by that exact name. A chunk iterator
+       handed to anything else, stored in a variable, or wrapped in a
+       comprehension is refused, because from that point the bytes are outside
+       the analysed body.
+
+    2. Every name bound to a ``.download_blob()`` call may be used only as the
+       receiver of ``.chunks()``. Otherwise ``evil(stream)`` reaches the same
+       bytes one step earlier.
+
+    And at least one such call site must exist: a module where the byte source
+    has been renamed away would otherwise pass by having nothing to check, which
+    is the failure mode this function was written to close.
+
+    Returns the number of call sites verified.
+    """
+
+    import ast
+
+    path = Path(__file__).resolve() if source_path is None else Path(source_path)
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+
+    handed_to_handler: set[int] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if not (isinstance(node.func, ast.Name) and node.func.id == BYTE_HANDLING_FUNCTION):
+            continue
+        for argument in node.args:
+            handed_to_handler.add(id(argument))
+
+    verified = 0
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if not (isinstance(func, ast.Attribute) and func.attr == BYTE_SOURCE_CHUNK_CALL):
+            continue
+        if id(node) not in handed_to_handler:
+            raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_BYPASSES_HANDLER")
+        verified += 1
+
+    if not verified:
+        raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_NOT_FOUND")
+
+    stream_names: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
+            continue
+        called = node.value.func
+        if not (
+            isinstance(called, ast.Attribute) and called.attr == BYTE_SOURCE_OPEN_CALL
+        ):
+            continue
+        for bound in node.targets:
+            if isinstance(bound, ast.Name):
+                stream_names.add(bound.id)
+            else:
+                raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_BINDING_UNREADABLE")
+
+    if not stream_names:
+        raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_NOT_FOUND")
+
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Name) or node.id not in stream_names:
+            continue
+        if isinstance(node.ctx, ast.Store):
+            continue
+        parent = _parent_of(tree, node)
+        if not (
+            isinstance(parent, ast.Attribute)
+            and parent.attr == BYTE_SOURCE_CHUNK_CALL
+        ):
+            raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_ESCAPES")
+
+    return verified
+
+
+def _parent_of(tree: Any, target: Any) -> Any:
+    """The node directly containing ``target``, or None.
+
+    ``ast`` does not record parents, and this check needs to know what a name is
+    being used *for*. Walking once per lookup is quadratic in principle and
+    irrelevant in practice: the module has a few thousand nodes and this runs
+    once per stream-name reference during preflight.
+    """
+
+    import ast
+
+    for node in ast.walk(tree):
+        for child in ast.iter_child_nodes(node):
+            if child is target:
+                return node
+    return None
+
+
+def _bindings_in(root: Any, *, include_definitions: bool = False) -> dict[str, list[Any]]:
+    """Every name bound anywhere under ``root``, by every binding construct.
 
     Audit F's closure review defeated a rebinding rule that inspected only
     ``Assign``, ``AugAssign`` and ``AnnAssign``: ``(digest := sink)``,
@@ -796,8 +979,25 @@ def _handler_bindings(target: Any) -> dict[str, list[Any]]:
     digest and passed. Enumerating binding *forms* one at a time loses that
     race, so this collects them all and the callers ask questions of the result.
 
-    A name absent from this mapping is not bound in the handler, which is what
-    lets the caller establish that ``len`` really is the builtin.
+    Audit E (E-20) then showed the lesson had been applied in only one place.
+    This enumerator was called on the handler, while the module-level scan that
+    decides *which* handler to analyse was written separately by hand with four
+    node types and no recursion --- so ``stream_object_digest, _spare = ...``,
+    ``for stream_object_digest in ...``, ``with ... as stream_object_digest``,
+    ``globals()[...] = ...`` and ``setattr(sys.modules[__name__], ...)`` all
+    rebound the name and passed. Audit E also found ``match _leak: case len:``,
+    a capture pattern this enumerator did not model, shadowing ``len`` inside
+    the analysed body.
+
+    So there is now one enumerator and both scopes use it. ``root`` may be a
+    function or a whole module; ``include_definitions`` additionally records
+    ``def``, ``async def`` and ``class`` statements, which bind their names.
+
+    What this establishes is bounded and worth stating exactly: a name absent
+    from this mapping is not bound by any *syntactic* binding construct under
+    ``root``. It is not a guarantee that the name resolves to the builtin at
+    runtime --- an importing module can still rebind it from outside, which no
+    analysis of this source can see.
     """
 
     import ast
@@ -813,16 +1013,20 @@ def _handler_bindings(target: Any) -> dict[str, list[Any]]:
         elif isinstance(node, ast.Starred):
             record(node.value)
 
-    for argument in (
-        list(target.args.posonlyargs)
-        + list(target.args.args)
-        + list(target.args.kwonlyargs)
-        + [target.args.vararg, target.args.kwarg]
-    ):
-        if argument is not None:
-            bindings.setdefault(argument.arg, []).append(argument)
+    def record_arguments(arguments: Any) -> None:
+        for argument in (
+            list(arguments.posonlyargs)
+            + list(arguments.args)
+            + list(arguments.kwonlyargs)
+            + [arguments.vararg, arguments.kwarg]
+        ):
+            if argument is not None:
+                bindings.setdefault(argument.arg, []).append(argument)
 
-    for node in ast.walk(target):
+    if isinstance(root, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        record_arguments(root.args)
+
+    for node in ast.walk(root):
         if isinstance(node, ast.Assign):
             for element in node.targets:
                 record(element)
@@ -843,10 +1047,79 @@ def _handler_bindings(target: Any) -> dict[str, list[Any]]:
             for alias in node.names:
                 bound = alias.asname or alias.name.split(".")[0]
                 bindings.setdefault(bound, []).append(alias)
-        elif isinstance(node, (ast.comprehension,)):
+        elif isinstance(node, ast.comprehension):
             record(node.target)
+        # Audit E (E-20), M1. `case len:` is a capture pattern: it binds `len`
+        # to the subject. `case [*rest]` and `case {**rest}` bind too. These are
+        # binding constructs like any other and were missing.
+        elif isinstance(node, (ast.MatchAs, ast.MatchStar)):
+            if node.name:
+                bindings.setdefault(node.name, []).append(node)
+        elif isinstance(node, ast.MatchMapping):
+            if node.rest:
+                bindings.setdefault(node.rest, []).append(node)
+        elif include_definitions and isinstance(
+            node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+        ):
+            bindings.setdefault(node.name, []).append(node)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                record_arguments(node.args)
+        elif include_definitions and isinstance(node, ast.Lambda):
+            record_arguments(node.args)
 
     return bindings
+
+
+def _handler_bindings(target: Any) -> dict[str, list[Any]]:
+    """Every name bound inside the handler. See :func:`_bindings_in`."""
+
+    return _bindings_in(target)
+
+
+def _assert_no_reflective_rebinding(tree: Any) -> None:
+    """Refuse source that can rebind a module global without an assignment.
+
+    Audit E (E-20) rebound the byte handler two ways that no assignment-target
+    scan can see, because neither is an assignment: ``globals()['name'] = ...``
+    is a subscript store on a dict, and ``setattr(sys.modules[__name__], ...)``
+    is an ordinary call. Both replaced the analysed function with a wrapper that
+    retained every chunk, and both passed.
+
+    A syntactic binding scan is only meaningful if the source cannot bind names
+    non-syntactically, so these forms are refused outright in first-party
+    in-job source. ``globals()`` remains readable --- the reachability check in
+    this module uses it --- but it may not be a store target.
+    """
+
+    import ast
+
+    reflective = set(FORBIDDEN_REFLECTIVE_MUTATION) | set(FORBIDDEN_DYNAMIC_ACCESS)
+    namespace_stores = set(FORBIDDEN_NAMESPACE_STORES)
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            if node.func.id in reflective:
+                raise ProbeRefusal("INTERNAL_REFUSAL", "REFLECTIVE_REBINDING")
+
+        targets: list[Any] = []
+        if isinstance(node, ast.Assign):
+            targets = list(node.targets)
+        elif isinstance(node, (ast.AugAssign, ast.AnnAssign)):
+            targets = [node.target]
+
+        for target in targets:
+            if isinstance(target, ast.Subscript):
+                base = target.value
+                if isinstance(base, ast.Call) and isinstance(base.func, ast.Name):
+                    if base.func.id in namespace_stores:
+                        raise ProbeRefusal(
+                            "INTERNAL_REFUSAL", "REFLECTIVE_REBINDING"
+                        )
+            # `hashlib.sha256 = _fake` makes the whitelisted constructor return
+            # an attacker object. Audit E (F11/F12).
+            if isinstance(target, ast.Attribute):
+                if target.attr in _DIGEST_ONLY_CALLS:
+                    raise ProbeRefusal("INTERNAL_REFUSAL", "WHITELISTED_NAME_SHADOWED")
 
 
 def _assert_chunk_name_never_escapes(
@@ -1311,6 +1584,7 @@ def main(argv: list[str] | None = None) -> int:
         assert_no_forbidden_symbols()
         assert_no_write_calls_in_first_party_source()
         assert_byte_handling_is_digest_only()
+        assert_byte_source_reaches_only_the_handler()
         assert_verbose_logging_disabled()
         record = load_decision_record()
         expected = expected_members(record)

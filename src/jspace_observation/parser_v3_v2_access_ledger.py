@@ -101,8 +101,23 @@ SEMANTIC_PROJECTION_COUNTER_EXCLUDES: tuple[str, ...] = (
 #: The cumulative ``byte_only_integrity_verifications`` a ledger must carry
 #: once the Phase 1.2H-R1 access gate has completed: the 2 verifications
 #: already on record before R1, plus the 12 authoritative objects the gate
-#: streams. It is a floor rather than an equality so that a later authorised
-#: byte-only round can add to it without this constant needing to move.
+#: streams.
+#:
+#: Audit F (F-13) found the comment here contradicting the rule that reads it.
+#: It described the constant as a floor a later round could exceed without the
+#: constant moving; ``_validate_status_agreement`` pins the counter to it
+#: *exactly*, because Audit E (E-18) showed a floor leaves the upward direction
+#: free and an inflated byte-access count is the direction that overstates what
+#: the round did. The two statements could not both be true.
+#:
+#: The equality is the intended rule and the comment was wrong. A later
+#: authorised byte-only round must raise this constant in the same commit that
+#: raises the counter, which is the point: the number of authoritative objects
+#: this project has ever streamed is a fact about the project, and moving it
+#: should be a deliberate, reviewable source change rather than a ledger edit
+#: that a floor would silently accept. The separate ``>= 14`` requirement in
+#: :func:`_validate_live_counters` still owns the downward direction, so a
+#: ledger that lowers the counter is refused there first.
 BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE: int = 14
 
 #: The number of authoritative sealed objects the Phase 1.2H-R1 access gate
@@ -349,28 +364,45 @@ _RECORD_ASSERTION_CLASSES: frozenset[str] = frozenset(
 )
 
 #: The state-block flags that must agree with a "never occurred" classification.
-#: Each entry maps a counter to the ``retired_v1_state`` flag that records the
-#: same fact, and the value that flag must carry.
-_NEVER_OCCURRED_STATE_BINDINGS: dict[str, tuple[str, Any]] = {
+#: Each entry maps a counter to the state block, field and value that record the
+#: same fact.
+#:
+#: Audit F (F-10) found the first version of this table semantically wrong: the
+#: four ``formal_v2_evaluation_access`` and ``parser_execution`` counters were
+#: bound to ``retired_v1_state.formal_evaluation_ever_run``, which records the
+#: history of ``parser-v3-v1``. A counter about the *successor* set was being
+#: checked against a flag about the *retired* set --- so the binding could hold
+#: while the fact it was supposed to guarantee had changed. Each counter is now
+#: bound to the block describing the same object.
+_NEVER_OCCURRED_STATE_BINDINGS: dict[str, tuple[str, str, Any]] = {
     "retired_v1_repair_access.labels_opened_for_scoring": (
+        "retired_v1_state",
         "labels_opened_for_scoring",
         0,
     ),
+    # No parser-v3-v2 set exists, so there is nothing whose sealed inputs or
+    # labels could have been read.
     "formal_v2_evaluation_access.sealed_input_semantic_reads": (
-        "formal_evaluation_ever_run",
+        "successor_set_state",
+        "exists",
         False,
     ),
     "formal_v2_evaluation_access.sealed_label_semantic_reads": (
-        "formal_evaluation_ever_run",
+        "successor_set_state",
+        "exists",
         False,
     ),
+    # No formal evaluation of the successor set has been ordered, so no label
+    # can have been opened to score one and no comparator run alongside it.
     "formal_v2_evaluation_access.labels_opened_for_scoring": (
-        "formal_evaluation_ever_run",
-        False,
+        "successor_set_state",
+        "formal_evaluation_ordinal",
+        0,
     ),
     "parser_execution.comparator_predictions_generated": (
-        "formal_evaluation_ever_run",
-        False,
+        "successor_set_state",
+        "formal_evaluation_ordinal",
+        0,
     ),
 }
 
@@ -1165,24 +1197,37 @@ def _cited_paths_that_exist(evidence: str) -> list[str]:
     ``.md``.
 
     Resolution is relative to the repository root, found by walking up from this
-    module. If the root cannot be located the check degrades to the shape test
-    rather than failing, because a ledger validated from an installed package
-    with no repository present must not be rejected for that reason --- and it
-    says so, rather than pretending the stronger check ran.
+    module.
+
+    Audit E (E-22) then showed the confinement this docstring claimed was not
+    implemented: ``(root / candidate).is_file()`` follows ``..``, so
+    ``../package.json`` and ``docs/../../package.json`` resolved to real files
+    outside the repository and were accepted as citations. Paths are now
+    resolved and required to stay under the root.
     """
 
     root = Path(__file__).resolve().parents[2]
     if not (root / "docs").is_dir():
-        return [
-            match.group(0)
-            for match in _CITATION_PATTERN.finditer(evidence)
-        ]
+        # Audit F (F-09): this branch was fail-open --- with the repository
+        # absent, `docs/does-not-exist.json` was accepted again, so the weaker
+        # check silently replaced the stronger one exactly when nothing could
+        # verify it. It now fails closed: no path can be shown to exist, so
+        # none is returned, and the callers refuse. A ledger validated from an
+        # installed package with no checkout gets an explicit refusal rather
+        # than a check that quietly stopped checking.
+        return []
     existing: list[str] = []
     for match in _CITATION_PATTERN.finditer(evidence):
         candidate = match.group(0).strip().strip(",;:)(")
         if "/" not in candidate:
             continue
-        if (root / candidate).is_file():
+        try:
+            resolved = (root / candidate).resolve()
+        except OSError:
+            continue
+        if not resolved.is_relative_to(root):
+            continue
+        if resolved.is_file():
             existing.append(candidate)
     return existing
 
@@ -1357,10 +1402,13 @@ def _validate_composite_parts(
                     "mappings"
                 )
             amount = addend.get("amount")
-            if not isinstance(amount, int) or isinstance(amount, bool) or amount < 0:
+            if not isinstance(amount, int) or isinstance(amount, bool) or amount < 1:
                 raise LedgerError(
                     f"counter_provenance composite parts for {path!r} require a "
-                    "non-negative integer 'amount'"
+                    "positive integer 'amount'; Audit F (F-09) reached a zero "
+                    "safety counter by declaring it a composite of two zero "
+                    "addends citing unrelated real files, which satisfied the "
+                    "two-addend and two-evidence shape while evidencing nothing"
                 )
             evidence = addend.get("evidence")
             if not isinstance(evidence, str) or not evidence.strip():
@@ -1388,6 +1436,14 @@ def _validate_composite_parts(
             raise LedgerError(
                 f"counter_provenance composite parts for {path!r} sum to "
                 f"{total}, but the counter is {value!r}"
+            )
+        if value == 0:
+            raise LedgerError(
+                f"counter_provenance classifies {path!r} as a composite of "
+                "separately evidenced parts, but the counter is zero; a zero "
+                "is not a sum of evidenced activity and must carry a class "
+                "that says why it is zero, not a decomposition that implies "
+                "activity was measured"
             )
         if path in _MACHINE_EVIDENCE_REQUIRED:
             _assert_composite_addends_are_citable(path, addends)
@@ -1513,7 +1569,6 @@ def _assert_never_occurred_agrees_with_state(ledger: Mapping[str, Any]) -> None:
     block = ledger.get("counter_provenance")
     if not isinstance(block, Mapping):
         return
-
     seen: dict[str, str] = {}
     for class_name, entry in block.items():
         if not isinstance(entry, Mapping):
@@ -1536,11 +1591,18 @@ def _assert_never_occurred_agrees_with_state(ledger: Mapping[str, Any]) -> None:
                 f"{provenance!r}, but no state flag is registered for it; a "
                 "record assertion must name the committed state it rests on"
             )
-        flag, expected = binding
+        block_name, flag, expected = binding
+        state = ledger.get(block_name)
+        if not isinstance(state, Mapping):
+            raise LedgerError(
+                f"counter_provenance classifies {path!r} as {provenance!r}, "
+                f"which appeals to {block_name}.{flag}; {block_name} is absent "
+                "or is not a mapping"
+            )
         if flag not in state:
             raise LedgerError(
                 f"counter_provenance classifies {path!r} as {provenance!r}, "
-                f"which appeals to retired_v1_state.{flag}; that flag is absent"
+                f"which appeals to {block_name}.{flag}; that flag is absent"
             )
         actual = state[flag]
         if actual != expected or isinstance(actual, bool) != isinstance(
@@ -1548,7 +1610,7 @@ def _assert_never_occurred_agrees_with_state(ledger: Mapping[str, Any]) -> None:
         ):
             raise LedgerError(
                 f"counter_provenance classifies {path!r} as {provenance!r}, "
-                f"but retired_v1_state.{flag} is {actual!r} and not "
+                f"but {block_name}.{flag} is {actual!r} and not "
                 f"{expected!r}; the counter and the state block must record "
                 "the same history"
             )
@@ -1824,4 +1886,86 @@ def assert_monotonic_succession(
         if next_events[index] != prior:
             raise LedgerError(
                 f"events[{index}] was rewritten; recorded events are immutable"
+            )
+
+    _assert_provenance_survives_succession(previous, current, next_events)
+
+
+def _provenance_class_of(ledger: Mapping[str, Any]) -> dict[str, str]:
+    """Map each classified counter path to the provenance class it carries."""
+
+    classes: dict[str, str] = {}
+    block = ledger.get("counter_provenance")
+    if not isinstance(block, Mapping):
+        return classes
+    for class_name in COUNTER_PROVENANCE_CLASSES:
+        entry = block.get(class_name)
+        if not isinstance(entry, Mapping):
+            continue
+        listed = entry.get("counters")
+        if not isinstance(listed, list):
+            continue
+        for path in listed:
+            if isinstance(path, str):
+                classes[path] = class_name
+    return classes
+
+
+def _assert_provenance_survives_succession(
+    previous: Mapping[str, Any],
+    current: Mapping[str, Any],
+    next_events: list[Any],
+) -> None:
+    """Refuse a successor that silently restates where a number came from.
+
+    Audit F (F-14): succession compared counters and events and nothing else,
+    so a successor could keep every value and every event while moving a
+    counter from ``operator_asserted_unverified`` to ``receipt_derived_exact``.
+    The number would not change; the reader's warrant for believing it would,
+    upward, with no record that anything happened. Audit F judged this
+    non-blocking for the present static ledger --- no successor exists --- and
+    said it must be closed before any round relies on succession. This is that
+    closure.
+
+    Provenance is therefore immutable across succession *by default*. A
+    reclassification is still permitted, because a wrong class must be
+    correctable, but only when the successor appends an event that names the
+    counter and both classes. That makes the strengthening itself a recorded
+    event rather than a diff nobody reads, which is the same discipline the
+    event log already applies to access.
+
+    Dropping a counter's classification entirely is refused outright: the
+    provenance block must partition the counters, so a disappearance is either
+    a rename --- which ``_validate_counter_provenance`` catches --- or an
+    attempt to leave a number unaccounted for.
+    """
+
+    before = _provenance_class_of(previous)
+    after = _provenance_class_of(current)
+
+    appended = next_events[len(_validate_events(previous["events"])):]
+    appended_text = " ".join(
+        str(event.get("summary", "")) for event in appended
+    )
+
+    for path, prior_class in sorted(before.items()):
+        current_class = after.get(path)
+        if current_class is None:
+            raise LedgerError(
+                f"counter_provenance no longer classifies {path!r}, which the "
+                f"predecessor classified as {prior_class!r}; a counter cannot "
+                "lose its provenance across succession"
+            )
+        if current_class == prior_class:
+            continue
+        if not (
+            path in appended_text
+            and prior_class in appended_text
+            and current_class in appended_text
+        ):
+            raise LedgerError(
+                f"counter_provenance moves {path!r} from {prior_class!r} to "
+                f"{current_class!r}, but no appended event names the counter "
+                "and both classes; a change in why a number should be believed "
+                "must be recorded, not applied"
             )

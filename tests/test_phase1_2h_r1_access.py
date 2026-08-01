@@ -1453,6 +1453,151 @@ def test_the_byte_handler_name_must_be_defined_once_and_never_rebound():
     assert _refuse_module(annotated) == "BYTE_HANDLER_NAME_NOT_UNIQUE"
 
 
+_BYTE_HANDLER_BASELINE = (
+    "import hashlib\n"
+    "def stream_object_digest(chunks):\n"
+    "    digest = hashlib.sha256()\n"
+    "    total = 0\n"
+    "    for chunk in chunks:\n"
+    "        digest.update(chunk)\n"
+    "        total += len(chunk)\n"
+    "    return (digest.hexdigest(), total)\n"
+)
+
+
+def _module_refusal(source: str) -> str:
+    path = Path(tempfile.mkdtemp()) / "candidate.py"
+    path.write_text(source, encoding="utf-8")
+    with pytest.raises(probe.ProbeRefusal) as caught:
+        probe.assert_byte_handling_is_digest_only(source_path=path)
+    return caught.value.invariant
+
+
+def test_the_control_for_the_module_scope_counterexamples_passes():
+    """Every refusal below must be attributable to its shape, not the fixture.
+
+    A check that refuses everything proves nothing, so the unmodified baseline
+    is asserted to pass with the same inspected-call count as the live handler.
+    """
+    path = Path(tempfile.mkdtemp()) / "control.py"
+    path.write_text(_BYTE_HANDLER_BASELINE, encoding="utf-8")
+    assert probe.assert_byte_handling_is_digest_only(source_path=path) == 4
+
+
+@pytest.mark.parametrize(
+    ("label", "suffix", "expected"),
+    (
+        # Audit E (E-20). Each of these reported `inspected == 4`, identical to
+        # the live handler, while delivering every chunk to a module sink. The
+        # first five rebind the handler by a construct the hand-written
+        # module-level scan did not model; the enumerator that models them all
+        # already existed one function away and was used only on the body.
+        (
+            "tuple target",
+            "stream_object_digest, _spare = _tap(stream_object_digest), None\n",
+            "BYTE_HANDLER_NAME_NOT_UNIQUE",
+        ),
+        (
+            "for target",
+            "for stream_object_digest in (_tap(stream_object_digest),):\n    pass\n",
+            "BYTE_HANDLER_NAME_NOT_UNIQUE",
+        ),
+        (
+            "with target",
+            "with open('x') as stream_object_digest:\n    pass\n",
+            "BYTE_HANDLER_NAME_NOT_UNIQUE",
+        ),
+        (
+            "globals store",
+            "globals()['stream_object_digest'] = _tap(stream_object_digest)\n",
+            "REFLECTIVE_REBINDING",
+        ),
+        (
+            "setattr on the module",
+            "import sys\nsetattr(sys.modules[__name__], 'stream_object_digest', _tap)\n",
+            "REFLECTIVE_REBINDING",
+        ),
+        # The next three leave the handler body byte-identical to the live one
+        # and rebind a whitelisted name at module scope, where the shadowing
+        # rule was not looking. `len(chunk)` and `hashlib.sha256()` then resolve
+        # to the attacker's.
+        (
+            "module-scope len shadow",
+            "def _tap_len(c):\n    _SINK.append(c)\n    return 0\nlen = _tap_len\n",
+            "WHITELISTED_NAME_SHADOWED",
+        ),
+        (
+            "module-scope hashlib shadow",
+            "hashlib = _H\n",
+            "WHITELISTED_NAME_SHADOWED",
+        ),
+        (
+            "hashlib.sha256 patched",
+            "hashlib.sha256 = _fake\n",
+            "WHITELISTED_NAME_SHADOWED",
+        ),
+    ),
+)
+def test_module_scope_rebinding_of_the_handler_or_whitelist_is_refused(
+    label: str, suffix: str, expected: str
+):
+    assert _module_refusal(_BYTE_HANDLER_BASELINE + suffix) == expected, label
+
+
+def test_a_match_capture_pattern_cannot_shadow_a_whitelisted_name():
+    """Audit E (E-20), M1. `case len:` is a binding construct.
+
+    A capture pattern binds its name to the subject, so `case len:` replaced the
+    builtin *inside* the analysed body while every other check passed. The
+    enumerator modelled eight binding forms and not this one.
+    """
+    shadowed = _BYTE_HANDLER_BASELINE.replace(
+        "    total = 0",
+        "    match _leak:\n        case len:\n            pass\n    total = 0",
+        1,
+    )
+    assert _module_refusal(shadowed) == "WHITELISTED_NAME_SHADOWED"
+
+
+def test_hashlib_must_arrive_by_a_plain_import():
+    """The digest constructor must be reachable and not pointable elsewhere.
+
+    `import evil as hashlib` binds the name to anything at all. `import hashlib
+    as h` leaves the handler's `hashlib` unbound, which means the analysed body
+    is not code that can run — reporting success over it would be the same
+    defect in a quieter form.
+    """
+    assert (
+        _module_refusal(
+            _BYTE_HANDLER_BASELINE.replace("import hashlib", "import evil as hashlib", 1)
+        )
+        == "WHITELISTED_NAME_SHADOWED"
+    )
+    assert (
+        _module_refusal(
+            _BYTE_HANDLER_BASELINE.replace("import hashlib", "import hashlib as h", 1)
+        )
+        == "WHITELISTED_NAME_SHADOWED"
+    )
+
+
+@pytest.mark.parametrize(
+    "call",
+    ("setattr(x, 'y', z)", "delattr(x, 'y')", "exec(src)", "eval(src)", "compile(a,b,c)"),
+)
+def test_reflective_builtins_are_refused_in_first_party_source(call: str):
+    """A syntactic binding scan means nothing if names can be bound elsewhere."""
+    assert (
+        _module_refusal(_BYTE_HANDLER_BASELINE + f"_ = {call}\n")
+        == "REFLECTIVE_REBINDING"
+    )
+
+
+def test_the_live_probe_source_still_passes_every_strengthened_check():
+    """The rules above must not have been tightened past the code that ran."""
+    assert probe.assert_byte_handling_is_digest_only() == 4
+
+
 def test_the_strengthened_checks_pass_on_the_source_that_actually_ran():
     """Audit F (F-02): a new check cited for an execution it did not run under.
 
@@ -1508,3 +1653,154 @@ def test_the_module_docstring_does_not_claim_memory_is_overwritten():
     doc = probe.__doc__ or ""
     assert "overwritten each chunk" not in doc
     assert "erased from process memory" in doc
+
+
+_BYTE_SOURCE_ENTRYPOINT = (
+    "def _run_live(blob):\n"
+    "    stream = blob.download_blob(max_concurrency=1)\n"
+    "    digest, size = stream_object_digest(stream.chunks())\n"
+    "    return (digest, size)\n"
+)
+
+_EVIL_HANDLER = (
+    "_SINK = []\n"
+    "def evil_stream_object_digest(chunks):\n"
+    "    digest = hashlib.sha256()\n"
+    "    total = 0\n"
+    "    for chunk in chunks:\n"
+    "        _SINK.append(chunk)\n"
+    "        digest.update(chunk)\n"
+    "        total += len(chunk)\n"
+    "    return (digest.hexdigest(), total)\n"
+)
+
+
+def _call_site_refusal(source: str) -> str:
+    path = Path(tempfile.mkdtemp()) / "candidate.py"
+    path.write_text(source, encoding="utf-8")
+    with pytest.raises(probe.ProbeRefusal) as caught:
+        probe.assert_byte_source_reaches_only_the_handler(source_path=path)
+    return caught.value.invariant
+
+
+def test_the_control_for_the_call_site_counterexamples_passes():
+    """The refusals below must be attributable to their shape, not the fixture."""
+    path = Path(tempfile.mkdtemp()) / "control.py"
+    path.write_text(
+        _BYTE_HANDLER_BASELINE + _BYTE_SOURCE_ENTRYPOINT, encoding="utf-8"
+    )
+    assert probe.assert_byte_source_reaches_only_the_handler(source_path=path) == 1
+
+
+def test_f08_a_clean_handler_does_not_certify_a_bypassing_entrypoint():
+    """Audit F (F-08): the analysed handler was proved safe while being dead code.
+
+    ``assert_byte_handling_is_digest_only`` reasons about a *definition*. Audit
+    F left ``stream_object_digest`` pristine --- unique, undecorated, passing
+    every rule --- and changed the entrypoint to call
+    ``evil_stream_object_digest`` instead. Both checks in force at the time
+    passed, and every chunk went to a module list.
+
+    The counterexample is asserted to still satisfy the definition-level check,
+    because that is the point: the two checks are not redundant, and the
+    definition-level one cannot be repaired into catching this.
+    """
+    source = _BYTE_HANDLER_BASELINE + _EVIL_HANDLER + (
+        "def _run_live(blob):\n"
+        "    stream = blob.download_blob(max_concurrency=1)\n"
+        "    digest, size = evil_stream_object_digest(stream.chunks())\n"
+        "    return (digest, size)\n"
+    )
+    path = Path(tempfile.mkdtemp()) / "bypass.py"
+    path.write_text(source, encoding="utf-8")
+
+    # Unchanged behaviour: the definition-level check still passes, identically
+    # to the live handler.
+    assert probe.assert_byte_handling_is_digest_only(source_path=path) == 4
+
+    # The call-site check refuses it.
+    assert _call_site_refusal(source) == "BYTE_SOURCE_BYPASSES_HANDLER"
+
+
+@pytest.mark.parametrize(
+    ("label", "source", "expected"),
+    (
+        (
+            "chunks stored in a variable first",
+            _BYTE_HANDLER_BASELINE
+            + "def _run_live(blob):\n"
+            "    stream = blob.download_blob(max_concurrency=1)\n"
+            "    it = stream.chunks()\n"
+            "    return stream_object_digest(it)\n",
+            "BYTE_SOURCE_BYPASSES_HANDLER",
+        ),
+        (
+            "chunks wrapped before the handler sees them",
+            _BYTE_HANDLER_BASELINE
+            + "def _tap(it):\n"
+            "    return list(it)\n"
+            "def _run_live(blob):\n"
+            "    stream = blob.download_blob(max_concurrency=1)\n"
+            "    return stream_object_digest(_tap(stream.chunks()))\n",
+            "BYTE_SOURCE_BYPASSES_HANDLER",
+        ),
+        (
+            "the stream object itself is handed elsewhere",
+            _BYTE_HANDLER_BASELINE
+            + "_SINK = []\n"
+            "def _run_live(blob):\n"
+            "    stream = blob.download_blob(max_concurrency=1)\n"
+            "    _SINK.append(stream)\n"
+            "    return stream_object_digest(stream.chunks())\n",
+            "BYTE_SOURCE_ESCAPES",
+        ),
+        (
+            "the handler is called through an alias",
+            _BYTE_HANDLER_BASELINE
+            + "_h = stream_object_digest\n"
+            "def _run_live(blob):\n"
+            "    stream = blob.download_blob(max_concurrency=1)\n"
+            "    return _h(stream.chunks())\n",
+            "BYTE_SOURCE_BYPASSES_HANDLER",
+        ),
+        (
+            "the byte source has been renamed away entirely",
+            _BYTE_HANDLER_BASELINE
+            + "def _run_live(blob):\n"
+            "    stream = blob.download_blob(max_concurrency=1)\n"
+            "    return stream_object_digest(stream.pieces())\n",
+            "BYTE_SOURCE_NOT_FOUND",
+        ),
+        (
+            "the object is opened by a call this check cannot read",
+            _BYTE_HANDLER_BASELINE
+            + "def _run_live(blob):\n"
+            "    stream = blob.open_it(max_concurrency=1)\n"
+            "    return stream_object_digest(stream.chunks())\n",
+            "BYTE_SOURCE_NOT_FOUND",
+        ),
+    ),
+)
+def test_f08_the_call_site_check_refuses_each_bypass(label, source, expected):
+    """Every route from the object to something other than the handler.
+
+    Each of these leaves ``stream_object_digest`` byte-identical to the live
+    definition, so none is caught by the definition-level check.
+    """
+    assert _call_site_refusal(source) == expected, label
+
+
+def test_f08_the_call_site_check_runs_in_the_preflight_chain():
+    """A check the gate never calls constrains nothing.
+
+    E-20's lesson generalised: the failure being closed here is a check bound to
+    the wrong artifact, and a check bound to *no* artifact is the same defect.
+    """
+    source = Path(probe.__file__).read_text(encoding="utf-8")
+    assert "assert_byte_source_reaches_only_the_handler()" in source
+    assert (
+        probe.assert_byte_source_reaches_only_the_handler.invariant_name
+        == "BYTE_SOURCE_REACHES_ONLY_THE_HANDLER"
+    )
+    probe.assert_byte_source_reaches_only_the_handler()
+    assert "BYTE_SOURCE_REACHES_ONLY_THE_HANDLER" in probe.INVARIANTS_EVALUATED

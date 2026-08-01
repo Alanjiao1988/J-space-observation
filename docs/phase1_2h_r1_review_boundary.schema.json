@@ -69,7 +69,7 @@
               "FAIL",
               "NOT_ASSESSABLE"
             ],
-            "description": "NOT_ASSESSABLE is not a pass. It records that the property belongs to a review design that does not exist, so there is nothing to assess against."
+            "description": "NOT_ASSESSABLE is not a pass. It records that the property belongs to a review design that has not been provisioned and evidenced to this assessor, so the assessed inputs contain nothing to assess it against. It is scoped to those inputs and is not a claim that no such design exists anywhere."
           },
           "basis": {
             "type": "string",

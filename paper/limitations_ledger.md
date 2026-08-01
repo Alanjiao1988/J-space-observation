@@ -803,8 +803,8 @@ of them in the very sentences written to describe the previous fixes. Their
 findings were remediated in `13015d4`.
 
 Audits E and F then reviewed `13015d4` on closure. **Both returned BLOCKED
-again.** Between them they demonstrated, with working counterexamples rather
-than by reading: that the composite provenance class added to satisfy F-06 let
+again.** Between them they demonstrated, by a mixture of execution and static
+reading: that the composite provenance class added to satisfy F-06 let
 `labels_opened_for_scoring` carry the value 7 on two lines of prose, reopening
 precisely the route that adding that counter to `_MACHINE_EVIDENCE_REQUIRED`
 for E-10 had closed in the same commit; that the byte-flow analysis still
@@ -812,8 +812,7 @@ admitted `return digest.hexdigest(), total, chunks`, handing every chunk back to
 the caller, because it tracked the loop variable and not the parameter; that a
 digest receiver from any module offering `sha256` was accepted while the
 docstring said `hashlib`; and that two rows of the disposition table certifying
-these fixes were false as written. Those are remediated in the present commit,
-which is again material no audit has seen.
+these fixes were false as written. Those were remediated in `55d0e2b`.
 
 The pattern is now three rounds long and has not converged. Each remediation has
 been found defective by the next review, and twice the defect was introduced *by
@@ -824,15 +823,17 @@ reviewer, and none by the author's own test suite, which was green throughout. A
 green suite here means "the properties I thought to check hold", and the
 recurring failure has been in what was not thought of.
 
-A previous version of the sentence above said the counterexamples were produced
-by a reviewer *executing the code*. That was itself an overstatement of the kind
-this section documents. Several were: Audit E ran the validator to show that
-`data_plane_content_reads = 500` was accepted. But Audit F established F-03b by
-reading the source, with no execution, and the byte-handler rebinding defect
-(E-19) was found by reasoning about which definition `ast.walk` returns versus
-which one Python binds. Attributing all of them to execution overstated the
-method and understated the finding: static reading was sufficient to break these
-instruments, which is a worse result than needing to run them.
+The phrase "with working counterexamples rather than by reading", which stood in
+the paragraph above, was itself an overstatement of the kind this section
+documents, and Audit F cited it: the same paragraph goes on to say that static
+reading was sufficient to break these instruments, so the two statements
+contradicted each other. Both methods were used. Audit E ran the validator to
+show that `data_plane_content_reads = 500` was accepted; Audit F established
+F-03b by reading the source with no execution, and the byte-handler rebinding
+defect (E-19) was found by reasoning about which definition `ast.walk` returns
+versus which one Python binds. An earlier draft attributed all of them to
+execution, which overstated the method and understated the finding: static
+reading alone was enough, which is a worse result than needing to run them.
 
 The third review round (of `55d0e2b`) found eight further defects and is
 recorded in §7.6 of the round report. Its two most serious findings share a
@@ -845,12 +846,27 @@ that another rule constrained them; that rule constrained neither. In both cases
 the check was correct about what it examined and silent about whether what it
 examined was what ran.
 
-The sequence is eighteen findings, then twelve, then eight. The counts are
-falling, which is not the same as convergence and should not be read as it: each
-round's remediation has still been found defective by the next independent
-review, and no round has yet closed. Whether the fourth review closes is not a
-fact this document can assert in advance — the last two times a version of this
+The sequence is eighteen findings, then twelve, then eight, then four from Audit
+E and eight from Audit F on the fourth review of `2acbac1`. The counts are not
+falling monotonically and should not be read as convergence: each round's
+remediation has still been found defective by the next independent review, and
+no round has yet closed. The fourth round's findings are recorded in §7.7 and
+§7.9 of the round report and are remediated in the present commit, which is
+again material no audit has seen. Whether the fifth review closes is not a fact
+this document can assert in advance — the last two times a version of this
 paragraph tried, the attempt was itself cited as a finding.
+
+Two of the fourth round's findings deserve naming here because they extend the
+recurring shape rather than repeat it. Audit E (E-20) found the module-level
+scan that selects *which* function the byte-flow analysis reads written by hand
+with four node types and no recursion, while a complete recursive enumerator sat
+one function away, used only on the body — eight working counterexamples passed
+with an `inspected` count identical to the live handler. Audit F (F-08) then
+left the analysed handler pristine and changed the entrypoint to call a
+different function: the check certified a clean definition that was dead code.
+Both are the same defect as §7.6's — a check bound to something other than what
+runs — reached by two further routes, which is the strongest available evidence
+that the shape is systemic rather than a sequence of individual oversights.
 
 An earlier draft of this section claimed that "Audits C and D reviewed the final
 state, so the gap is narrowed rather than open". That sentence was written

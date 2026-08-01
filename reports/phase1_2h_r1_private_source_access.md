@@ -68,8 +68,20 @@ The aggregate digest is the load-bearing number. It was committed publicly
 **before** this round ran, in `docs/phase1_2h_r1_review_boundary_evidence.json`'s
 sibling evidence file, and it was independently recomputed offline three times.
 The gate reproducing it from the live source is what makes this evidence rather
-than assertion: a run that had reached the wrong container, or a source that had
-drifted, could not have produced that value.
+than assertion: a source that had drifted from the committed expectation could
+not have produced that value.
+
+Audit F (F-15) struck the claim that stood in the last clause of that sentence:
+that a run "that had reached the wrong container" could not have produced the
+aggregate. It could. The aggregate is a function of the bytes, not of where they
+came from. A container holding byte-identical copies of the twelve objects
+yields the identical digest, and nothing in the receipt is signed by the storage
+account. What the reproduction establishes is that *the bytes the job read are
+the bytes the public anchor describes* — which is the property the round needs,
+and is strictly weaker than a statement about location. The container identity
+rests separately on the frozen decision record, which the receipt pins by
+SHA-256 and which names the account and prefix; that is an operator-authored
+binding, not an in-job observation.
 
 Independent Audit E (E-07) then observed that the boundary assessor was not
 using it. Every conjunct of its gate decision was a field of the receipt
@@ -374,31 +386,83 @@ Audits E and F reviewed `55d0e2b` and converged independently on the same two
 defects, neither of which the author's suites could have caught, because both
 concerned properties nobody had thought to assert.
 
-| ID | Finding, as demonstrated | Disposition in this commit |
-| --- | --- | --- |
-| E-18 | Two counters were excluded from the class-independent zero pin because their correct value is positive, and *nothing else constrained them*. Audit E set `azure.data_plane_content_reads = 500` with no other edit and the ledger validated. It then raised `byte_only_integrity_verifications` from 14 to 99 by resumming the composite addends with citations to files that really exist; that validated too. The sentence written in the previous commit asserting both were "constrained by the receipt-citation rule instead" was false: the rule checks addend *shape*, never addend *amounts*, and never reached the first counter at all. | Both pinned to their exact values in `_validate_status_agreement`, beside the parser pins. The false comment is replaced with the finding. Regression test asserts the pin owns the *upward* direction specifically — the one direction the pre-existing floor rule could not catch, and the one both audits attacked. |
-| E-19 | The byte-flow analysis constrained the body of the function *named* `stream_object_digest`, but nothing bound that name to what executes: the scan took the **first** definition `ast.walk` returned, while Python binds the **last**. Three handlers passed every check while shipping every chunk to a module global — one decorated, one rebound by a plain `stream_object_digest = _tap(stream_object_digest)` after the def, one simply defined twice. `assert_no_write_calls_in_source` passed all three as well, since `append`/`extend`/`list` are in no forbidden set. | The name must now be defined exactly once and never rebound, decorated, shadowed, or nest a scope; otherwise the source is refused rather than analysed. Five regression cases, each with a passing control. The generated current-state premise "the one function that holds object bytes" is no longer asserted — it is now established by the check that makes it true. |
-| F: citation existence | `_CITATION_PATTERN` matched any token ending `.py`/`.json`/`.md`, so `docs/does-not-exist.json` satisfied the evidence requirement. A citation that cannot be followed is not evidence. | Cited paths are resolved against the repository root and must be real files. |
-| F: name shadowing and rebinding | `len = leak_and_count` inside the handler, and digest rebinding via walrus, `for` target, `with` target and tuple unpacking, all passed. | A binding collector now covers every binding construct Python has, including recursive tuple/list/starred unpacking; any binding of a whitelisted name or a second binding of a digest name is refused. |
-| F: provenance category | `zero_because_the_activity_has_never_occurred` satisfied a rule whose message says safety counters "require machine evidence". It carries none. | The class is documented as a **record assertion**, not evidence. Rather than rename it and leave it resting on nothing, it is bound to the committed state flags its own text appeals to, so the counter and `retired_v1_state` must record the same history or the ledger is refused. |
-| F: L-40 overstatement | L-40 and §7.4 said every counterexample was produced by a reviewer *executing* the code. Audit F established F-03b statically, and E-19 was found by reasoning about `ast.walk` order. | Corrected in both places. Static reading was sufficient to break these instruments, which is a worse result than needing to run them, and the record now says so. |
-| F-02b | This paragraph claimed a receipt naming a *different container* would fail the anchor check. It would not: the anchor covers per-object digests, count and byte total, and no container, account or path name enters it. | Withdrawn. The check constrains the bytes, not their location, and the docstring now says which. |
-| F-04b | The `NOT_ASSESSABLE` reason read "no review backend exists" — an unscoped claim about the world, reproduced eight times in the decision record. | Scoped to what the assessor observed: no backend is *evidenced in the execution inventory it reads*, which is an absence of evidence within the assessed inventory and not a proof of non-existence anywhere. |
+**The dispositions recorded in this table were reviewed by Audit F in the fourth
+round and seven of the eight were judged overstated.** The table below is the
+corrected version; each row now states what the fix does and, where the fix was
+later found incomplete, says so and points at the section that closes it. The
+original wording is not reproduced, because reproducing an overstatement to
+annotate it is how overstatements survive; what it claimed is described in the
+correction itself.
 
-### 7.7 What no audit has reviewed
+| ID | Finding, as demonstrated | Disposition, as corrected in round four |
+| --- | --- | --- |
+| E-18 | Two counters were excluded from the class-independent zero pin because their correct value is positive, and *nothing else constrained them*. Audit E set `azure.data_plane_content_reads = 500` with no other edit and the ledger validated. It then raised `byte_only_integrity_verifications` from 14 to 99 by resumming the composite addends with citations to files that really exist; that validated too. The sentence written in the previous commit asserting both were "constrained by the receipt-citation rule instead" was false: the rule checks addend *shape*, never addend *amounts*, and never reached the first counter at all. | Both pinned to their exact values in `_validate_status_agreement`. Regression tests assert the pin owns the *upward* direction, which the pre-existing floor could not catch. **Audit F judged this row accurate — the only one of the eight it did.** F-13 then found the pinned constant's own comment describing it as a floor a later round could exceed, contradicting the equality; corrected in §7.9. |
+| E-19 | The byte-flow analysis constrained the body of the function *named* `stream_object_digest`, but nothing bound that name to what executes: the scan took the **first** definition `ast.walk` returned, while Python binds the **last**. Three handlers passed every check while shipping every chunk to a module global — one decorated, one rebound by a plain `stream_object_digest = _tap(stream_object_digest)` after the def, one simply defined twice. | Refused rather than analysed. **Incomplete twice over: E-20 (§7.7) defeated it at module scope by eight further routes, and F-08 (§7.9) bypassed it entirely by leaving the analysed handler pristine and calling a different function from the entrypoint.** A check on a definition cannot establish anything about what runs; §7.9 adds the call-site check that can. |
+| F: citation existence | `_CITATION_PATTERN` matched any token ending `.py`/`.json`/`.md`, so `docs/does-not-exist.json` satisfied the evidence requirement. A citation that cannot be followed is not evidence. | Cited paths are resolved against the repository root and must be real files. **Incomplete twice: E-22 (§7.7) escaped the root via `..`; F-09 (§7.9) found the missing-checkout branch fail-open, reopening the original hole exactly where nothing could observe it.** Both closed. Note the residual the fix never removed: "names a file that exists" is not "the file supports the number", and no offline check can make it so. |
+| F: name shadowing and rebinding | `len = leak_and_count` inside the handler, and digest rebinding via walrus, `for` target, `with` target and tuple unpacking, all passed. | A recursive binding collector was added — for the handler scope only, covering assignment, augmented and annotated assignment, walrus, `for`, `with`, `except`, imports and comprehensions. **It did not model `match` capture patterns and was not applied at module scope; E-20 (§7.7) exploited both.** One enumerator now serves both scopes. |
+| F: provenance category | `zero_because_the_activity_has_never_occurred` satisfied a rule whose message says safety counters "require machine evidence". It carries none. | The class is documented as a **record assertion**, not evidence, and bound to committed state flags. **The bindings themselves were wrong: F-10 (§7.9) found four successor-set counters checked against `retired_v1_state.formal_evaluation_ever_run`, a flag about `parser-v3-v1`.** Each counter is now bound to the block describing the same object. The class text's residual claim to be "still machine evidence in the sense the ledger requires" is struck; it is not machine evidence, and nothing measured these zeros. |
+| F: L-40 overstatement | L-40 and §7.4 said every counterexample was produced by a reviewer *executing* the code. Audit F established F-03b statically, and E-19 was found by reasoning about `ast.walk` order. | Corrected in both places — **and the correction introduced a contradiction of its own**, which F-15 (§7.9) cited: the replacement text said the counterexamples were produced "with working counterexamples rather than by reading" two paragraphs before saying static reading was sufficient. Both methods were used; L-40 now says so once. |
+| F-02b | This report claimed a receipt naming a *different container* would fail the anchor check. It would not: the anchor covers per-object digests, count and byte total, and no container, account or path name enters it. | Withdrawn from the docstring. **The same claim survived in §3 of this report and was re-cited as F-15 (§7.9); it is now withdrawn there too.** What the anchor establishes is that the bytes read match the public expectation — not where they came from. Container identity rests on the frozen decision record, an operator-authored binding. |
+| F-04b | The `NOT_ASSESSABLE` reason read "no review backend exists" — an unscoped claim about the world, reproduced eight times in the decision record. | Scoped to what the assessor observed. **The scoping named the wrong input: F-12 (§7.9) found it appealing to the silence of the job execution inventory, which lists access-gate runs and could never contain a review backend.** The reason now cites the review-boundary evidence bundle, which does not fall silent — it lists a candidate and reports it non-qualifying — and discloses that the bundle is an unsigned operator transcript. |
+
+### 7.7 Third closure review — Audit E BLOCKED a fourth time
+
+Audit E reviewed `2acbac1` and confirmed E-18, the citation-existence rule (except
+one gap), the provenance-class binding, and that no test had been weakened. It
+found the E-19 fix incomplete and the claims made about it false.
+
+| ID | Severity | Finding, as demonstrated | Disposition in this commit |
+| --- | --- | --- | --- |
+| E-20 | Major, blocking | Eight working counterexamples, each reporting `inspected == 4` exactly like the live handler while delivering every chunk to a module-level sink. The structural point is the one worth recording: **this repository added a complete recursive binding enumerator and then wrote the module-level scan beside it by hand, with four node types and no recursion.** So `stream_object_digest, _spare = _tap(...), None` (tuple target), `for stream_object_digest in (...)`, `with ... as stream_object_digest`, `globals()['stream_object_digest'] = ...` and `setattr(sys.modules[__name__], ...)` all rebound the handler and passed. Separately, `len = _tap_len`, `hashlib = _H` and `hashlib.sha256 = _fake` at **module** scope left the body byte-identical while every whitelisted call resolved to the attacker's — because the shadowing rule inspected only bindings *inside* the handler. And `match _leak: case len:` shadowed `len` *inside* the body, because the enumerator did not model `match` capture patterns. | There is now one enumerator, `_bindings_in`, used at both scopes; it models `MatchAs`, `MatchStar` and `MatchMapping`. The whitelist check runs at module scope too, where `hashlib` may arrive only by a plain `import hashlib` — `import hashlib as h` and `import evil as hashlib` are both refused. New `_assert_no_reflective_rebinding` refuses `setattr`/`delattr`/`exec`/`eval`/`compile`/`__import__` calls, `globals()`/`vars()`/`locals()` subscript stores, and attribute assignment to any whitelisted call name. All twelve counterexamples from this and the previous round are regression-tested, each against a passing control. |
+| E-21 | Major, blocking | The claim written *in the previous commit* — "the check now refuses any source in which that name is defined more than once, rebound, decorated, shadowed, or nests a scope, which is what makes the single-function premise true rather than assumed" — was false in both the "rebound" and "shadowed" terms, and had been generated into `reports/current_status.md`, `docs/thread_handoff.md` and this report. Two docstrings carried the same defect: `_handler_bindings` claimed it "lets the caller establish that `len` really is the builtin", and `assert_byte_handling_is_digest_only` claimed "no path in *this source* moves object bytes anywhere but into a digest". | All four rewritten to state the bounded fact: no *syntactic* binding construct in this source rebinds the handler or the whitelisted names, at either scope. Explicitly **not** claimed: anything about the running process, or about a rebinding performed by a module that imports this one. |
+| E-22 | Minor | `_cited_paths_that_exist` said cited paths must resolve "in the repository" and did `(root / candidate).is_file()` with no containment check, so `../package.json` and `docs/../../package.json` resolved to real files outside the repository and were accepted. | Paths are resolved and required to be relative to the root. |
+| E-23 | Minor | `WHITELISTED_NAME_SHADOWED` had no test at all; deleting the rule broke nothing. | Covered, at both scopes, along with every other new refusal. |
+
+Audit E confirmed as **closed**: E-18 (including the exact resummed-and-cited 99
+counterexample), citation existence for nonexistent paths, directories and
+wrong-case paths, the `_assert_never_occurred_agrees_with_state` binding
+(judged "real, not ceremonial", with both `return` paths shown unreachable), and
+that `test_g01…` is now strictly stronger and `BYTE_NAME_ESCAPES_HANDLER` remains
+reachable and asserted.
+
+### 7.9 Third closure review — Audit F BLOCKED a fourth time
+
+Audit F reviewed the same commit, `2acbac1`, and returned eight findings. Its
+most consequential result is structural: it defeated the byte-flow analysis
+**without touching it**, which no previous round had done.
+
+| ID | Severity | Finding, as demonstrated | Disposition in this commit |
+| --- | --- | --- | --- |
+| F-08 | Major, blocking | The definition-level check reasons about a function; the job runs a call site. Audit F left `stream_object_digest` pristine — unique, undecorated, passing every rule added for E-19 and E-20 — and changed the entrypoint to call `evil_stream_object_digest(stream.chunks())` instead. Both checks passed, `inspected` was 4 exactly as for the live handler, and every chunk went to a module list. The analysed function was proved safe and was dead code. | New invariant `BYTE_SOURCE_REACHES_ONLY_THE_HANDLER`, added to the preflight chain. Every `.chunks()` call must appear directly as an argument of a call to `stream_object_digest` *by that name*; every name bound to `.download_blob()` may be used only as the receiver of `.chunks()`; and at least one such call site must exist, so renaming the source cannot make the check vacuous. Six bypass routes are regression-tested — variable-held iterator, wrapped iterator, aliased handler, escaping stream object, renamed source, unreadable open call — each asserted to still pass the definition-level check, because the two are not redundant. |
+| F-09 | Major, blocking | Citability was fail-open by two routes. (a) When `root/"docs"` is not a directory — an installed package with no checkout — the check degraded to the shape test, so `docs/does-not-exist.json` was accepted again, precisely where nothing could observe it. (b) A zero safety counter could be reclassified as `composite_of_separately_evidenced_parts` with two **zero** addends citing two unrelated real files, satisfying the two-addend, two-evidence, sums-to-value shape while evidencing nothing. | (a) Fails closed: no path can be shown to exist, so none is returned and the callers refuse. The docstring's promise that it degrades gracefully is deleted along with the behaviour. (b) Two independent rules — an addend amount must be **positive**, and a counter whose value is zero may not carry the composite class at all, because a zero is not a sum of evidenced activity. |
+| F-10 | Major, blocking | The state bindings added for the previous round were semantically wrong. `formal_v2_evaluation_access.{sealed_input_semantic_reads, sealed_label_semantic_reads, labels_opened_for_scoring}` and `parser_execution.comparator_predictions_generated` were all bound to `retired_v1_state.formal_evaluation_ever_run` — a flag recording the history of **`parser-v3-v1`**. A counter about the successor set was checked against a fact about the retired set, so the binding could hold while the fact it guaranteed had changed. The class `evidence` text also still called itself "machine evidence in the sense the ledger requires". | Each counter is bound to the block describing the same object: the three access counters and the comparator counter to `successor_set_state` (`exists: false`, `formal_evaluation_ordinal: 0`); the retired-v1 counter stays on `retired_v1_state`. The binding table now carries a block name per entry rather than assuming one block. The "machine evidence" sentence is struck and replaced with what the class is: a record assertion whose warrant is the absence of the artifacts an authorised round would have produced. |
+| F-11 | Major | `assert_execution_is_platform_attested` claimed the execution was one "the platform agrees happened" and read from "Azure's own execution list". It reads committed JSON that an operator transcribed from an `az` command. Nothing signs it; an operator who can edit the receipt can edit it in the same commit. | Renamed in description rather than in name: the docstring and the constant comment now state the property as *agreement with an unsigned committed transcript*, whose value is independence of authorship — two consistent forgeries instead of one — and explicitly not attestation. "Genuine attestation would require a signed platform artifact, which this round did not obtain and does not claim." |
+| F-12 | Major | The eight `NOT_ASSESSABLE` reasons rested on the silence of "the execution inventory this assessor reads". That inventory lists runs of the access-gate job and would never contain a review backend, so its silence supported nothing. Meanwhile the file that *does* carry backend facts is not silent: it lists a candidate endpoint and reports it non-qualifying. The schema said, unconditionally, that the review design "does not exist". | The reason cites the review-boundary evidence bundle, describes the candidate as listed-and-non-qualifying rather than absent, and discloses that the bundle is an unsigned operator transcript of read-only control-plane queries. The schema description is scoped to the assessed inputs. |
+| F-13 | Minor | The comment on `BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE` described it as a floor a later round could exceed without moving the constant; the rule reading it pins the counter to it exactly. The two could not both be true. | The equality is the rule and the comment was wrong. The comment now says a later authorised round must raise the constant in the same reviewed commit that raises the counter, and notes that the separate `>= 14` requirement still owns the downward direction. |
+| F-14 | Minor, non-blocking for this ledger | `assert_monotonic_succession` compared counters and events and nothing else, so a successor could keep every value and every event while moving a counter from a weak provenance class to a strong one. The number would not change; the reader's warrant for it would, upward, unrecorded. Audit F noted no successor exists yet and required this closed before any round relies on succession. | Provenance is immutable across succession unless the successor **appends an event naming the counter and both classes** — the same append-only discipline the event log already applies to access. Losing a classification entirely is refused outright. |
+| F-15 | Minor | Seven of the eight §7.6 disposition rows overstated their fixes; §3 of this report still claimed a run reaching the wrong container could not have reproduced the aggregate digest; and L-40 contradicted itself, saying the counterexamples came "with working counterexamples rather than by reading" two paragraphs before saying static reading sufficed. | §7.6 is rewritten above with corrected dispositions and forward pointers. §3's wrong-container claim is withdrawn: the aggregate is a function of the bytes, and a byte-identical copy elsewhere yields the identical digest. L-40 states once that both methods were used. |
+
+### 7.10 What no audit has reviewed
 
 Audit D did not complete. Its process was lost before it reported, and no
 finding is attributed to it.
 
-More importantly, the remediation in §7.6 — this section included — is material
-that no independent review has seen. That is the structure `L-38` and `L-40`
-describe, and it is not closed. Each round of remediation creates a new
-unreviewed state, and the fact that three consecutive independent reviews found
+More importantly, the remediation in §7.7 and §7.9 — this section included — is
+material that no independent review has seen. That is the structure `L-38` and
+`L-40` describe, and it is not closed. Each round of remediation creates a new
+unreviewed state, and the fact that four consecutive independent reviews found
 further defects in states that had already been remediated — eighteen, then
-twelve, then eight — is direct evidence that the pattern does not converge on
-its own. Twice the defect was introduced *by the remediation itself*.
-Self-authored tests are not independent validation, and an audit that reviewed
-the previous commit is not a review of this one.
+twelve, then eight, then twelve again across both auditors — is direct evidence
+that the pattern does not converge on its own. Three times the defect was
+introduced *by the remediation itself*. E-20 and F-08 are the sharpest
+instances, and they are the same defect reached by different routes: E-20 found
+a complete recursive enumerator written in this repository and then not used by
+the check standing next to it; F-08 found a check that constrained a function
+definition while the entrypoint called a different function entirely. Both are
+"a check bound to something other than what runs", which is now the single most
+recurrent finding of this phase. Self-authored tests are not independent
+validation, and an audit that reviewed the previous commit is not a review of
+this one.
 
 ---
 
