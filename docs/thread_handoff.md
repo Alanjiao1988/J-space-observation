@@ -10,33 +10,60 @@ Current Phase 0.5 runtime launcher commit:
 Parser-v2 frozen implementation commit:
 `654f3bb463fedc33b0638b77fefdd9b2b9d1c9c2`
 
-## Where the project stands (Phase 1.2H)
+## Where the project stands (Phase 1.2H-R1)
 
-The authorized independent `parser-v3-v2` set-repair round terminated
-**`BLOCKED_ON_PRIVATE_SOURCE_ACCESS`**. The authoritative retired
-`parser-v3-v1` sealed source is unreachable from the current operating
-environment: the storage account reports `publicNetworkAccess = Disabled` and
-the registered read path is a user-assigned managed identity exercised from
-in-network compute. An unverified local copy may not be substituted for the
-sealed source, so the round blocked before any private access.
+The cloud-first private-source access restoration round terminated
+**`BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY`**.
 
-**The next gate is an infrastructure-access round, not a science round.** It
-must establish authenticated, read-only, in-network access to the retired sealed
-source under a boundary in which the required blind semantic review also occurs
-inside the network — a reviewer outside the network would defeat the isolation
-the network rules encode. That round is not preregistration, not evaluation, not
-set construction and not sealing.
+Phase 1.2H read `publicNetworkAccess = Disabled` as "the source is unreachable".
+The correct reading is "the source is unreachable *from outside the virtual
+network*". R1 acted on that: it provisioned a least-privilege in-VNet execution
+boundary — a user-assigned identity holding exactly two role assignments
+(`Storage Blob Data Reader` scoped to one container, `AcrPull` scoped to the
+registry), a pinned-digest image, and a VNet-injected Container Apps job — and
+**the byte-only access gate passed**. All 12 sealed objects were listed and
+streamed into a SHA-256 accumulator, 396,613 bytes, and the aggregate digest
+reproduced the already-committed public anchor `e1364afc…`. Twelve invariants
+checked, none failed.
+
+**Read that result precisely.** It establishes that the operator can *reach* the
+authoritative source under an auditable read-only boundary. It establishes
+nothing about the set's contents, because nothing was decoded: `decode_attempts`,
+`persist_attempts`, `azure_data_plane_writes`, `semantic_input_reads`,
+`semantic_label_reads`, `parser_invocations` and `predictions_generated` are all
+**0** — and they are pinned `maximum: 0` in the receipt schema, so a probe that
+had done any of them could not have produced a valid receipt at all.
+
+**The next gate is still an infrastructure gate, but a different one.** Set
+repair requires *semantic* review of private material, and that requires a review
+backend inside the network — a reviewer outside it would defeat the isolation the
+network rules encode. No such backend exists: the executable boundary assessment
+scores **0 of 13 conditions passed, 5 failed, 8 not assessable ⇒
+`DOES_NOT_QUALIFY`**. `rg-jspace-observation-sea` holds zero
+`Microsoft.CognitiveServices` accounts and zero ML workspaces; the only
+same-region AI account belongs to an unrelated project, has
+`publicNetworkAccess: Enabled` and no private endpoint; and the worker subnet has
+no egress control attached (the environment supports a UDR — it simply has none).
+
+Provisioning that boundary is an **operator decision** and is not something a
+round may improvise mid-flight. Until it exists, no repair round may start.
 
 Read next, in this order:
 
-1. `reports/phase1_2h_blocked_set_repair.md` — why the round blocked, and what
-   it did produce.
-2. `docs/phase1_2h_execution_access_ledger.json` — the machine-checked live
+1. `reports/phase1_2h_r1_private_source_access.md` — the R1 round: what was
+   provisioned, what the gate proved, and precisely what it did not prove.
+2. `docs/phase1_2h_r1_access_receipt_003.json` — the passing gate's
+   content-free receipt.
+3. `docs/phase1_2h_r1_review_boundary_assessment.json` — the computed
+   `DOES_NOT_QUALIFY` verdict, regenerable from committed evidence.
+4. `reports/phase1_2h_blocked_set_repair.md` — the prior round, whose
+   reachability conclusion R1 supersedes and whose record stands.
+5. `docs/phase1_2h_execution_access_ledger.json` — the machine-checked live
    access state.
-3. `docs/phase1_2h_independent_set_repair_protocol.md` — the registered,
+6. `docs/phase1_2h_independent_set_repair_protocol.md` — the registered,
    explicitly **unexecuted** design, including §0.1 on what was deliberately not
    frozen.
-4. `reports/phase1_2h_audit_findings.md` — Audit F, which found all six Phase
+7. `reports/phase1_2h_audit_findings.md` — Audit F, which found all six Phase
    1.2G Audit E remediations incomplete, and their fixes.
 5. `paper/limitations_ledger.md` — `L-37` (the successor set cannot currently be
    built at all) and `L-38` (the audit regress has never reached a fixed point).
@@ -60,21 +87,21 @@ The block above is the policy's own finalization snapshot. The live
 execution and access state is carried by the ledger, and is rendered
 from it:
 
-- Live access ledger: `phase1_2h_execution_access_ledger.json`, phase **1.2H**, status **BLOCKED_ON_PRIVATE_SOURCE_ACCESS**.
-- Retired `parser-v3-v1` repair access: sealed inputs read **0**, sealed labels read **0**, private curator files read **0**, byte-only integrity verifications **2** (a digest of a file is not a read of its content). State: **SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE**.
+- Live access ledger: `phase1_2h_execution_access_ledger.json`, phase **1.2H**, status **BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY**.
+- Retired `parser-v3-v1` repair access: sealed inputs read **0**, sealed labels read **0**, private curator files read **0**, byte-only integrity verifications **14** (a digest of a file is not a read of its content). State: **SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE**.
 - Successor `parser-v3-v2`: exists **false**, cases constructed **0**, sealed **false**, `sealed_object_count` **null** (undefined under `L-32` without an authenticated seal-time observation; not measured to be zero).
-- Parser execution: invocations on private or locked data **0**, candidate predictions **0**, comparator predictions **0**. Azure: data-plane content reads **0**, data-plane writes **0**, resource creations or changes **0**.
+- Parser execution: invocations on private or locked data **0**, candidate predictions **0**, comparator predictions **0**. Azure: data-plane content reads **12**, data-plane writes **0**, resource creations or changes **9**.
 
 A `FINAL` policy is not a result. It records that the rule for judging
 a future evaluation is settled, and records nothing whatever about any
 parser. Specifically:
 
 - Phase 1.0C was executed and finalized `INCONCLUSIVE`. It is target-model task/headroom screening, not parser calibration, and no Phase 1.0C result can supply, bound, or unblock any parser acceptance threshold.
-- No private holdout, sealed input, sealed label or private curator file was accessed.
+- No private holdout, sealed input, sealed label or private curator file was *semantically read*. Phase 1.2H-R1 streamed all 12 sealed objects into a SHA-256 accumulator and discarded them, so bytes were touched while nothing about any case was learned: `decode_attempts`, `persist_attempts`, `semantic_input_reads` and `semantic_label_reads` are all **0**, pinned `maximum: 0` in the receipt schema.
 - No prediction was generated and no parser was run against any evaluation or calibration corpus.
 - No formal parser-v3 evaluation has occurred. Parser v3 remains **unvalidated**.
 - `parser-v3-v1` remains `SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE`, byte-unchanged.
-- Phase 1.2H terminated `BLOCKED_ON_PRIVATE_SOURCE_ACCESS` before any private access. No `parser-v3-v2` set was constructed or sealed, and none exists.
+- Phase 1.2H terminated `BLOCKED_ON_PRIVATE_SOURCE_ACCESS`; Phase 1.2H-R1 established authenticated byte-only access from inside the VNet and terminated `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY`, because set repair needs a semantic review boundary that does not exist. No `parser-v3-v2` set was constructed or sealed, and none exists.
 - No J-space, hidden-reasoning, invisible-CoT or internal-workspace conclusion follows from any of this.
 
 <!-- END GENERATED CURRENT STATE -->

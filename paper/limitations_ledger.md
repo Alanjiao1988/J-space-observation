@@ -684,6 +684,41 @@ those reviewers satisfies the network rule in form and breaks it in substance. A
 sound resolution has to place the semantic review inside the boundary, or
 establish an equivalent isolation that the reviewers genuinely operate under.
 
+### Amendment (Phase 1.2H-R1): the first clause of this limitation was wrong
+
+The claim that the access "is unobtainable from the environment the project is
+currently operated from" was a false negative. It is corrected here rather than
+rewritten above.
+
+`publicNetworkAccess = Disabled` does not mean unreachable. It means unreachable
+from outside the virtual network. The account has a private endpoint at
+`10.80.2.4` and a linked private DNS zone, both recorded in committed evidence
+Phase 1.2H itself cited. Phase 1.2H-R1 provisioned a VNet-injected Container Apps
+job under a two-role identity and reached the source: 12 members listed, 12
+objects streamed to a SHA-256 accumulator, 396,613 bytes, aggregate digest
+reproducing the public anchor `e1364afc…`.
+
+That is worth stating plainly because the error ran in the project's favour in
+one sense — it produced a *more* conservative record — and against it in another:
+a round was terminated on a capability the project already had. A research record
+that overstates its own blockers is not thereby safe; it is inaccurate.
+
+What survives unchanged is the second half of this limitation, and it is the half
+that still blocks the project. The design constraint described in the paragraph
+above — that blind semantic review must occur inside the boundary — is now the
+**operative** blocker. R1's executable assessment scores 0 of 13 conditions
+passed, 5 failed and 8 not assessable: no in-VNet reviewer service exists, the
+only same-region AI account is public-facing and belongs to another project, and
+the worker subnet has no egress control attached. So this limitation's conclusion
+stands — no successor set can be constructed, no preregistration and no
+evaluation are possible — but its reason has moved from *source access* to
+*review boundary*.
+
+The paragraph about the local curator copies is unaffected. R1 does not make them
+a workaround; it makes them unnecessary, and it confirms what they could not: the
+repository's public record does agree with the sealed source, at the level of
+bytes and digests.
+
 ## L-38 - The audit regress has never reached a fixed point
 
 Seven independent read-only reviews have now been run against this repository's
@@ -714,3 +749,58 @@ automated agents operating on this repository under the same instructions as the
 authoring pass. They are independent **of the pass**; they are not independent
 **of the project**, and no external human reviewer has approved any value,
 threshold, disposition or claim recorded anywhere in it.
+## L-39 - Byte-only access proves provenance, not content, and cannot be stretched further
+
+Phase 1.2H-R1 streamed every object of the retired `parser-v3-v1` sealed set
+and matched every digest. It is important to state exactly how little that
+licenses.
+
+What it establishes: the 12 objects at the registered prefix are, byte for byte,
+the objects the committed public manifest describes, and the aggregate digest
+matches an anchor that was published before the read occurred. That is a
+provenance fact about the *container*, and it is a real one — it rules out drift,
+substitution and wrong-container error.
+
+What it does not establish, and what no amount of digesting could:
+
+* that the cases inside are well formed, or ontologically consistent, or free of
+  the defects the repair round exists to fix;
+* that the 15 quarantined cases are repairable;
+* that the 105 migratable cases are in fact migratable;
+* anything whatever about parser v3.
+
+The distinction is not pedantic. The temptation a passing gate creates is to
+treat "we verified the sealed set" as progress toward validation. It is progress
+toward *access*, and access was never the scientific question. Every defect the
+repair round was chartered to find is a semantic property, and semantic
+properties are precisely what a byte-only read is constructed to be blind to.
+
+A second caution concerns the direction of the evidence. The gate compares the
+live source against the repository's committed record. Agreement means the two
+agree. It does not independently corroborate either: had both been wrong in the
+same way from the start, the check would still pass. The seal-time observation
+that would settle that is the one limitation `L-32` describes, and it remains
+unavailable.
+
+## L-40 - The R1 audits reviewed a commit that is not the one being published
+
+Audits A and B for Phase 1.2H-R1 reviewed commit `47f207a`. Both returned
+BLOCKED, and their blockers were remediated in `56141c1` — after which the
+access gate ran, the ledger gained a terminal state and a provenance block, six
+documents were updated, and roughly a further 400 lines of test were added.
+
+Audits C and D reviewed the final state, so the gap is narrowed rather than
+open. But the structure of the problem is the one `L-38` describes and it has
+not gone away: every remediation pass produces material that the pass which
+motivated it never saw, and the only way to close that gap completely is a review
+that finds nothing, which has not yet happened.
+
+One specific residual should be named rather than left implicit. Audit A stated
+that "no path was found by which a private semantic read, a data-plane write, or
+an export of sealed content could occur", and that statement is the load-bearing
+safety finding of the round. It was made against `47f207a`. The probe changed
+substantially afterwards — the emission contract, the AST checks, the client
+chunk bindings and the identity handling were all rewritten. The property was
+re-checked by Audit C and by the `maximum: 0` schema pins, which are structural
+rather than inspectional, but the original finding does not automatically
+transfer to code it was not made about.

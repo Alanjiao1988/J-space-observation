@@ -1,0 +1,103 @@
+{
+  "access_ledger_effect": {
+    "azure_resource_changes": 0,
+    "parser_invocations": 0,
+    "predictions_generated": 0,
+    "private_curator_files_read": 0,
+    "sealed_input_semantic_reads": 0,
+    "sealed_label_semantic_reads": 0
+  },
+  "byte_only_gate_passed": true,
+  "conditions": [
+    {
+      "basis": "1 candidate endpoint(s) observed, none inside a private boundary",
+      "frozen_condition": "worker is in the project VNet or a formally approved Private Link connected service boundary",
+      "key": "worker_in_project_vnet_or_approved_private_link_boundary",
+      "verdict": "FAIL"
+    },
+    {
+      "basis": "1 candidate endpoint(s) have publicNetworkAccess Enabled",
+      "frozen_condition": "public network access to the reviewer endpoint is disabled",
+      "key": "reviewer_public_network_access_disabled",
+      "verdict": "FAIL"
+    },
+    {
+      "basis": "0 of 1 candidate endpoint(s) have at least one private endpoint",
+      "frozen_condition": "reviewer DNS resolves to a registered private endpoint",
+      "key": "reviewer_dns_resolves_to_registered_private_endpoint",
+      "verdict": "FAIL"
+    },
+    {
+      "basis": "worker subnet has no route table and no restrictive outbound NSG rule, so the platform default AllowInternetOutBound applies",
+      "frozen_condition": "the worker has no unrestricted Internet egress while it holds private material",
+      "key": "no_unrestricted_internet_egress_while_holding_private_material",
+      "verdict": "FAIL"
+    },
+    {
+      "basis": "no egress allowlist is in force",
+      "frozen_condition": "outbound paths are restricted to the minimum approved private endpoints and Azure platform dependencies",
+      "key": "outbound_restricted_to_approved_private_endpoints",
+      "verdict": "FAIL"
+    },
+    {
+      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "frozen_condition": "prompts and responses never reach Copilot, GitHub Actions, external subagents, public telemetry or public artifact storage",
+      "key": "no_prompt_or_response_reaches_copilot_actions_or_public_telemetry",
+      "verdict": "NOT_ASSESSABLE"
+    },
+    {
+      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "frozen_condition": "raw prompt and response logging is disabled or confined to the same private boundary with explicit retention and access controls",
+      "key": "raw_prompt_logging_disabled_or_confined_to_boundary",
+      "verdict": "NOT_ASSESSABLE"
+    },
+    {
+      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "frozen_condition": "identity, role and storage scopes are least privilege",
+      "key": "identity_role_and_storage_scopes_least_privilege",
+      "verdict": "NOT_ASSESSABLE"
+    },
+    {
+      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "frozen_condition": "separate R1 and R2 sessions can be isolated and their outputs hidden from each other",
+      "key": "r1_and_r2_sessions_isolable",
+      "verdict": "NOT_ASSESSABLE"
+    },
+    {
+      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "frozen_condition": "an arbiter can receive only disagreement packets",
+      "key": "arbiter_receives_only_disagreement_packets",
+      "verdict": "NOT_ASSESSABLE"
+    },
+    {
+      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "frozen_condition": "all outputs remain private and only aggregates or content-free receipts leave",
+      "key": "only_aggregates_or_content_free_receipts_leave",
+      "verdict": "NOT_ASSESSABLE"
+    },
+    {
+      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "frozen_condition": "a public synthetic review packet completes end to end and produces schema valid structured output",
+      "key": "public_synthetic_review_packet_completes_end_to_end",
+      "verdict": "NOT_ASSESSABLE"
+    },
+    {
+      "basis": "no review backend exists, so this property of a review design has nothing to be assessed against",
+      "frozen_condition": "the boundary and the synthetic execution are independently audited",
+      "key": "boundary_and_synthetic_execution_independently_audited",
+      "verdict": "NOT_ASSESSABLE"
+    }
+  ],
+  "evidence_source": "az control-plane reads, subscription 943bacdf-8b6e-4e3a-8126-a149f623d32e: 'az resource list -g rg-jspace-observation-sea --query [].type', 'az cognitiveservices account list', 'az cognitiveservices account show -n aj-gpt56-25-943b-southeastasia -g gpt56-sol-2025-rg', 'az network vnet subnet show --name snet-aca-jspace-sea-v2', 'az network nsg show'. Read-only; no resource was created, modified or deleted.",
+  "observed_at": "2026-08-01T06:10:00Z",
+  "phase": "1.2H-R1",
+  "qualification_verdict": "DOES_NOT_QUALIFY",
+  "schema_version": "phase1-2h-r1-review-boundary/v1",
+  "summary": {
+    "failed": 5,
+    "not_assessable": 8,
+    "passed": 0,
+    "total": 13
+  },
+  "terminal_state": "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY"
+}

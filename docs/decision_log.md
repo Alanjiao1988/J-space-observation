@@ -2128,3 +2128,64 @@ and `docs/thread_handoff.md`. A validator that runs only under pytest does not
 protect the artifact a reader actually reads. The file-path load is deliberate:
 `jspace_observation/__init__.py` eagerly imports the legacy parser, and the
 generator has no business pulling parser code into its process.
+## Phase 1.2H-R1 — go inside the network rather than declare the source unreachable
+
+**Decision.** Provision a least-privilege, VNet-injected execution boundary and
+run the byte-only access gate from inside it, instead of recording a second
+round of `BLOCKED_ON_PRIVATE_SOURCE_ACCESS`.
+
+**Why.** Phase 1.2H's determination rested on reading
+`publicNetworkAccess: Disabled` as "unreachable". That is a category error:
+the flag says the account refuses the *public* data plane, and the account has a
+private endpoint precisely so that in-network compute can reach it. Recording a
+blocker that a correct reading of committed evidence dissolves would have been a
+false negative, and false negatives about one's own capability are as damaging to
+a research record as false positives about a result.
+
+## Phase 1.2H-R1 — a terminal state must be earned, not selected
+
+**Decision.** `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY` is registered in the ledger
+validator with a precondition: at least
+`BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE` (14) cumulative byte-only
+verifications and zero semantic reads. A round that has not completed the gate
+must record `BLOCKED_ON_PRIVATE_SOURCE_ACCESS` instead.
+
+**Why.** Independent Audit B (B-11) found that the round's own intended terminal
+state was not a state the ledger would accept. The naive fix is to add the name
+to the enum. That fix is unsafe: of the two blocked states, "I reached the source
+and stopped at the reviewer" sounds strictly better than "I could not reach the
+source", so a round that did *less* would have an incentive to claim it. The
+precedence rule removes the incentive by making the better-sounding state require
+strictly more evidence.
+
+## Phase 1.2H-R1 — say which numbers are machine-derived and which are not
+
+**Decision.** The ledger carries a validated `counter_provenance` block
+partitioning every counter into `receipt_derived_exact`,
+`azure_verified_exact` or `operator_maintained_approximate`. Counters
+carrying a safety claim — the semantic-read counters, the data-plane counters,
+the parser and prediction counters — must be present and must not be classified
+as operator-maintained.
+
+**Why.** R1 produced both kinds of number at once. Eight counters come from a
+schema-validated execution receipt. Two — the count of `az` calls made and of
+resources touched over an interactive session — are an operator's tally and
+cannot be anything else. Publishing them side by side without distinction lets
+the second borrow the authority of the first. The specific laundering the
+validator blocks is moving "no semantic read occurred" from receipt evidence to
+recollection while leaving the value at `0`: the ledger would still read as
+safe, and would no longer be evidence.
+
+## Phase 1.2H-R1 — record a field as unobservable rather than grant privilege to fill it
+
+**Decision.** `public_network_access` is recorded as `"Unknown"` and
+`effective_read_only_verdict` as `NOT_CONFIRMED_IN_JOB`. The receipt schema
+refuses any other value for the first.
+
+**Why.** Both fields could have been made observable by granting the probe
+identity additional roles — a reader role on the storage account, and a
+role-assignment read. Doing so would have *increased* the privilege of the
+identity whose minimality is the round's central safety claim, in exchange for
+two fields that are already established by operator control-plane evidence. A
+receipt that is honestly incomplete is worth more than one that is complete
+because the boundary was widened to complete it.

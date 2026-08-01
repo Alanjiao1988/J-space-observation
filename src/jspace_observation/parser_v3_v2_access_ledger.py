@@ -59,6 +59,7 @@ __all__ = [
     "COUNTER_GROUPS",
     "TERMINAL_STATES",
     "BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE",
+    "COUNTER_PROVENANCE_CLASSES",
     "EVENT_KINDS",
     "policy_semantics_sha256",
     "validate_ledger",
@@ -198,7 +199,40 @@ _REQUIRED_TOP_LEVEL: tuple[str, ...] = (
 #: lets a round add a reassuring-sounding block that no validator reads, so an
 #: unknown key is an error rather than ignored decoration.
 LEDGER_KEYS: frozenset[str] = frozenset(
-    _REQUIRED_TOP_LEVEL + ("purpose", "counter_semantics")
+    _REQUIRED_TOP_LEVEL + ("purpose", "counter_semantics", "counter_provenance")
+)
+
+#: Closed key set for ``counter_provenance``, whose job is to say which
+#: counters are machine-derived and which an operator maintains by hand.
+#:
+#: Phase 1.2H-R1 added it because the round produced both kinds at once: the
+#: data-plane and semantic-read counters come from a schema-validated execution
+#: receipt, while the count of ``az`` calls an operator made over an interactive
+#: session does not and cannot. Recording both without distinguishing them
+#: would let a hand-maintained number be cited with the authority of a receipt.
+#: The block is validated rather than decorative --- see
+#: :func:`_validate_counter_provenance` --- so it cannot drift out of step with
+#: the counters it describes.
+COUNTER_PROVENANCE_CLASSES: tuple[str, ...] = (
+    "receipt_derived_exact",
+    "azure_verified_exact",
+    "operator_maintained_approximate",
+)
+
+#: Counters whose value is a safety claim, and which therefore may never be
+#: classified as operator-maintained. A round may not assert "no semantic read
+#: occurred" on the strength of someone's recollection.
+_MACHINE_EVIDENCE_REQUIRED: frozenset[str] = frozenset(
+    {
+        "retired_v1_repair_access.sealed_input_semantic_reads",
+        "retired_v1_repair_access.sealed_label_semantic_reads",
+        "retired_v1_repair_access.byte_only_integrity_verifications",
+        "azure.data_plane_content_reads",
+        "azure.data_plane_writes",
+        "parser_execution.parser_invocations_on_private_or_locked_data",
+        "parser_execution.candidate_predictions_generated",
+        "parser_execution.comparator_predictions_generated",
+    }
 )
 
 #: Closed key set for the retired-v1 state block, with the type each key takes.
@@ -818,6 +852,73 @@ def validate_ledger(
     _validate_event_counter_support(ledger, events)
     _validate_retired_v1_state(ledger)
     _validate_successor_set_state(ledger, status)
+    if "counter_provenance" in ledger:
+        _validate_counter_provenance(ledger["counter_provenance"])
+
+
+def _validate_counter_provenance(block: Any) -> None:
+    """Require the provenance block to partition the counters it names.
+
+    Three properties are enforced. Every counter named must exist, so the block
+    cannot describe a counter that was renamed away. No counter may appear in
+    two classes, because a value is either machine-derived or it is not. And
+    every counter in :data:`_MACHINE_EVIDENCE_REQUIRED` must be present and
+    classified as machine-derived --- those are the counters that carry the
+    round's safety claims, and an operator's recollection is not evidence for
+    them.
+    """
+
+    if not isinstance(block, Mapping):
+        raise LedgerError("counter_provenance must be a mapping")
+    unknown = set(block) - set(COUNTER_PROVENANCE_CLASSES) - {"role"}
+    if unknown:
+        raise LedgerError(
+            f"counter_provenance has unknown keys: {sorted(unknown)}; the "
+            "classes are fixed so a fourth, vaguer class cannot be introduced"
+        )
+
+    valid_paths = {
+        f"{group}.{name}"
+        for group, names in COUNTER_GROUPS.items()
+        for name in names
+    }
+    seen: dict[str, str] = {}
+    for class_name in COUNTER_PROVENANCE_CLASSES:
+        entry = block.get(class_name)
+        if entry is None:
+            continue
+        if not isinstance(entry, Mapping):
+            raise LedgerError(f"counter_provenance.{class_name} must be a mapping")
+        counters = entry.get("counters")
+        if not isinstance(counters, list) or not counters:
+            raise LedgerError(
+                f"counter_provenance.{class_name}.counters must be a non-empty list"
+            )
+        for path in counters:
+            if path not in valid_paths:
+                raise LedgerError(
+                    f"counter_provenance.{class_name} names {path!r}, which is "
+                    "not a counter this ledger carries"
+                )
+            if path in seen:
+                raise LedgerError(
+                    f"counter_provenance classifies {path!r} as both "
+                    f"{seen[path]} and {class_name}; a counter has one provenance"
+                )
+            seen[path] = class_name
+
+    for path in sorted(_MACHINE_EVIDENCE_REQUIRED):
+        provenance = seen.get(path)
+        if provenance is None:
+            raise LedgerError(
+                f"counter_provenance omits {path!r}, which carries a safety "
+                "claim and must state where its value came from"
+            )
+        if provenance == "operator_maintained_approximate":
+            raise LedgerError(
+                f"counter_provenance classifies {path!r} as operator-maintained; "
+                "a safety counter requires machine evidence, not recollection"
+            )
 
 
 def _validate_status_agreement(ledger: Mapping[str, Any], status: str) -> None:

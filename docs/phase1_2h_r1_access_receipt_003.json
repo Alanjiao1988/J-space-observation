@@ -1,0 +1,72 @@
+{
+  "counters": {
+    "azure_data_plane_content_reads": 12,
+    "azure_data_plane_writes": 0,
+    "byte_only_integrity_verifications": 12,
+    "list_operations": 1,
+    "parser_invocations": 0,
+    "predictions_generated": 0,
+    "semantic_input_reads": 0,
+    "semantic_label_reads": 0
+  },
+  "endpoint": {
+    "expected_private_ip": "10.80.2.4",
+    "privatelink_path_confirmed": true,
+    "public_network_access": "Unknown",
+    "public_network_access_observed_by": "operator_control_plane_read_before_run",
+    "resolved_ip_matches_only": true,
+    "resolved_is_private": true,
+    "resolved_matches_expected_private_ip": true
+  },
+  "execution": {
+    "aca_execution_name": "job-jspace-p12h-r1-access-gate-0fqre0m",
+    "ended_at": "2026-08-01T06:14:48Z",
+    "execution_id": "p12h-r1-access-gate-003",
+    "exit_status": "PASS",
+    "reason_code": "OK",
+    "started_at": "2026-08-01T06:14:47Z"
+  },
+  "identity": {
+    "client_id": "9e4baee7-6ffa-44f9-803b-c49fd774eba9",
+    "client_id_matches_designated": true,
+    "credential_type": "ManagedIdentityCredential",
+    "effective_read_only_verdict": "NOT_CONFIRMED_IN_JOB",
+    "forbidden_credential_types_absent": true
+  },
+  "membership": {
+    "counts_equal": true,
+    "expected_count": 12,
+    "member_sets_equal": true,
+    "missing_member_count": 0,
+    "observed_count": 12,
+    "prefix_scope": "exact_registered_prefix_only",
+    "unexpected_member_count": 0
+  },
+  "phase": "1.2H-R1",
+  "provenance": {
+    "access_protocol_freeze_commit": "56141c177a60c94b842ff5004656753b2945530d",
+    "decision_record_sha256": "99a3110e18539fe8c84d5199a8789237cf19d27e69002ed92171d738bff8a567",
+    "expected_evidence_sha256": "a111a821e22e83e779c1defbf2963afc1a665aeec48ddcdc67524975bc3701c6",
+    "expected_members_digest": "18378b52a7adc66a027d9f0bc1bc6638619c9af29b1dac4d00cc7fa2ba51f4d1",
+    "image_digest": "sha256:f2cf1701aab098236b5ce850f11b218f723dc7a9c2dd01cc8853e7572022ee15",
+    "probe_source_sha256": "13eaddb2f0bf5d787dd21711ae96d1c43b05a158e11d1631c1251e7a12688115"
+  },
+  "schema_version": "phase1-2h-r1-access-receipt/v1",
+  "streaming": {
+    "all_digests_match": true,
+    "all_sizes_match": true,
+    "decode_attempts": 0,
+    "digest_mismatch_count": 0,
+    "expected_total_bytes": 396613,
+    "objects_streamed": 12,
+    "observed_aggregate_digest": "e1364afcac87516813d33a4e9fb3e370769487ab2f3ca47a08a3b4059db14e71",
+    "persist_attempts": 0,
+    "size_mismatch_count": 0,
+    "total_bytes_streamed": 396613
+  },
+  "verdict": {
+    "access_gate_passed": true,
+    "invariants_checked": 12,
+    "invariants_failed": []
+  }
+}

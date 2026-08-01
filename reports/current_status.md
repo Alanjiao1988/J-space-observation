@@ -1,15 +1,43 @@
 # Project Status Report
 
-> **Phase 1.2H status (this round):** the authorized independent `parser-v3-v2`
-> set-repair round terminated **`BLOCKED_ON_PRIVATE_SOURCE_ACCESS`** at its
-> first precondition. The authoritative retired `parser-v3-v1` sealed source is
-> unreachable from this environment (`publicNetworkAccess = Disabled`;
-> managed-identity, in-network read path only), and an unverified local copy may
-> not be substituted for it. **No private content was read, no set was
-> constructed, no set was sealed, no parser was run, and no prediction was
-> generated.** The round did close the audit gap Phase 1.2G had disclosed —
-> Audit F found all six Audit E remediations incomplete and all six are now
-> fixed — and introduced a live execution/access ledger. See
+> **Phase 1.2H-R1 status (this round):** the cloud-first private-source access
+> restoration round terminated **`BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY`**. Phase
+> 1.2H had read `publicNetworkAccess = Disabled` as "unreachable"; the correct
+> reading was "unreachable from *outside* the virtual network". R1 provisioned a
+> least-privilege in-VNet execution boundary — a user-assigned identity holding
+> exactly two role assignments, a pinned-digest image, a VNet-injected Container
+> Apps job — and **the byte-only access gate passed**: 12 members listed, all 12
+> objects streamed to a SHA-256 accumulator and discarded, 396,613 bytes, and an
+> aggregate digest reproducing the already-committed public anchor
+> `e1364afc…`. Twelve invariants checked, none failed.
+>
+> **This changed what the operator can reach. It changed nothing about the set.**
+> No byte was decoded, retained or interpreted: `decode_attempts`,
+> `persist_attempts`, `azure_data_plane_writes`, `semantic_input_reads`,
+> `semantic_label_reads`, `parser_invocations` and `predictions_generated` are
+> all **0**, structurally pinned `maximum: 0` in the receipt schema so a probe
+> that had done any of them could not have emitted a valid receipt. **No private
+> content was read, no set was constructed, no set was sealed, no parser was
+> run, and no prediction was generated.**
+>
+> The blocker has therefore **moved, not cleared**. Set repair needs *semantic*
+> review of private material, and no qualifying private review backend exists:
+> the executable boundary assessment scores **0 of 13 conditions passed, 5
+> failed, 8 not assessable ⇒ `DOES_NOT_QUALIFY`**. The resource group contains
+> zero `Microsoft.CognitiveServices` accounts and zero ML workspaces; the only
+> same-region AI account belongs to an unrelated project and has
+> `publicNetworkAccess: Enabled` with no private endpoint; and the worker subnet
+> has no egress control configured. Provisioning that boundary is an **operator
+> decision**. See `reports/phase1_2h_r1_private_source_access.md`.
+>
+> **Phase 1.2H status (5e3c398, superseded in part):** the authorized
+> independent `parser-v3-v2` set-repair round terminated
+> **`BLOCKED_ON_PRIVATE_SOURCE_ACCESS`** at its first precondition. That
+> determination was accurate for the environment it was made in — a laptop
+> outside the VNet — and R1 supersedes its *conclusion about reachability* while
+> leaving its record intact. The round did close the audit gap Phase 1.2G had
+> disclosed — Audit F found all six Audit E remediations incomplete and all six
+> are now fixed — and introduced a live execution/access ledger. See
 > `reports/phase1_2h_blocked_set_repair.md`.
 >
 > **Phase 1.2G status (0480f4f):** the parser-v3 one-shot locked evaluation
@@ -64,21 +92,21 @@ The block above is the policy's own finalization snapshot. The live
 execution and access state is carried by the ledger, and is rendered
 from it:
 
-- Live access ledger: `phase1_2h_execution_access_ledger.json`, phase **1.2H**, status **BLOCKED_ON_PRIVATE_SOURCE_ACCESS**.
-- Retired `parser-v3-v1` repair access: sealed inputs read **0**, sealed labels read **0**, private curator files read **0**, byte-only integrity verifications **2** (a digest of a file is not a read of its content). State: **SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE**.
+- Live access ledger: `phase1_2h_execution_access_ledger.json`, phase **1.2H**, status **BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY**.
+- Retired `parser-v3-v1` repair access: sealed inputs read **0**, sealed labels read **0**, private curator files read **0**, byte-only integrity verifications **14** (a digest of a file is not a read of its content). State: **SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE**.
 - Successor `parser-v3-v2`: exists **false**, cases constructed **0**, sealed **false**, `sealed_object_count` **null** (undefined under `L-32` without an authenticated seal-time observation; not measured to be zero).
-- Parser execution: invocations on private or locked data **0**, candidate predictions **0**, comparator predictions **0**. Azure: data-plane content reads **0**, data-plane writes **0**, resource creations or changes **0**.
+- Parser execution: invocations on private or locked data **0**, candidate predictions **0**, comparator predictions **0**. Azure: data-plane content reads **12**, data-plane writes **0**, resource creations or changes **9**.
 
 A `FINAL` policy is not a result. It records that the rule for judging
 a future evaluation is settled, and records nothing whatever about any
 parser. Specifically:
 
 - Phase 1.0C was executed and finalized `INCONCLUSIVE`. It is target-model task/headroom screening, not parser calibration, and no Phase 1.0C result can supply, bound, or unblock any parser acceptance threshold.
-- No private holdout, sealed input, sealed label or private curator file was accessed.
+- No private holdout, sealed input, sealed label or private curator file was *semantically read*. Phase 1.2H-R1 streamed all 12 sealed objects into a SHA-256 accumulator and discarded them, so bytes were touched while nothing about any case was learned: `decode_attempts`, `persist_attempts`, `semantic_input_reads` and `semantic_label_reads` are all **0**, pinned `maximum: 0` in the receipt schema.
 - No prediction was generated and no parser was run against any evaluation or calibration corpus.
 - No formal parser-v3 evaluation has occurred. Parser v3 remains **unvalidated**.
 - `parser-v3-v1` remains `SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE`, byte-unchanged.
-- Phase 1.2H terminated `BLOCKED_ON_PRIVATE_SOURCE_ACCESS` before any private access. No `parser-v3-v2` set was constructed or sealed, and none exists.
+- Phase 1.2H terminated `BLOCKED_ON_PRIVATE_SOURCE_ACCESS`; Phase 1.2H-R1 established authenticated byte-only access from inside the VNet and terminated `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY`, because set repair needs a semantic review boundary that does not exist. No `parser-v3-v2` set was constructed or sealed, and none exists.
 - No J-space, hidden-reasoning, invisible-CoT or internal-workspace conclusion follows from any of this.
 
 <!-- END GENERATED CURRENT STATE -->

@@ -1,6 +1,8 @@
 """Tests for the Phase 1.2H live execution/access ledger.
 
-Phase 1.2H terminated ``BLOCKED_ON_PRIVATE_SOURCE_ACCESS``. The ledger is
+Phase 1.2H terminated ``BLOCKED_ON_PRIVATE_SOURCE_ACCESS``; Phase 1.2H-R1
+established authenticated byte-only access to the authoritative source and
+moved the ledger to ``BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY``. The ledger is
 therefore the round's principal machine-readable product, and every claim it
 makes about what did *not* happen has to be enforced rather than asserted.
 """
@@ -11,6 +13,7 @@ import ast
 import copy
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -22,11 +25,14 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from jspace_observation.parser_v3_v2_access_ledger import (  # noqa: E402
+    BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE,
     COUNTER_GROUPS,
+    COUNTER_PROVENANCE_CLASSES,
     EVENT_KINDS,
     LEDGER_SCHEMA_VERSION,
     SEMANTIC_PROJECTION_COUNTER_EXCLUDES,
     SEMANTIC_PROJECTION_EXCLUDES,
+    TERMINAL_STATES,
     LedgerError,
     assert_monotonic_succession,
     counter_value,
@@ -67,7 +73,10 @@ def test_the_committed_ledger_validates_against_the_committed_policy(
 
 
 def test_the_committed_ledger_records_the_blocked_terminal_state(ledger):
-    assert ledger["status"] == "BLOCKED_ON_PRIVATE_SOURCE_ACCESS"
+    # R1 moved the blocker: byte-only access to the authoritative source now
+    # succeeds, so BLOCKED_ON_PRIVATE_SOURCE_ACCESS is no longer true. What
+    # blocks the round is the absence of a private semantic-review boundary.
+    assert ledger["status"] == "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY"
     assert ledger["phase"] == "1.2H"
     assert ledger["schema_version"] == LEDGER_SCHEMA_VERSION
 
@@ -87,20 +96,31 @@ def test_every_prohibited_activity_is_recorded_as_zero(ledger):
         assert counter_value(ledger, "retired_v1_repair_access", name) == 0
     for name in COUNTER_GROUPS["v2_construction"]:
         assert counter_value(ledger, "v2_construction", name) == 0
-    for name in ("data_plane_content_reads", "data_plane_writes",
-                 "resource_creations_or_changes", "job_executions"):
-        assert counter_value(ledger, "azure", name) == 0
+    # data_plane_writes stays 0: R1 read bytes, it never wrote one. The other
+    # three azure counters are no longer 0 and must not be asserted to be --- R1
+    # provisioned resources and ran the gate, and a test that demanded zero here
+    # would be asserting that the round did not happen.
+    assert counter_value(ledger, "azure", "data_plane_writes") == 0
 
 
 def test_the_byte_only_verifications_are_counted_apart_from_semantic_reads(ledger):
-    """A digest of a file is not a read of its content, and the two never merge."""
+    """A digest of a file is not a read of its content, and the two never merge.
+
+    This is the whole basis on which R1 claims to have touched every byte of the
+    sealed set while learning nothing about it: 14 streams to a digest, 0 reads
+    of content.
+    """
     assert (
         counter_value(ledger, "retired_v1_repair_access",
                       "byte_only_integrity_verifications")
-        == 2
+        == BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE
     )
     assert (
         counter_value(ledger, "retired_v1_repair_access", "sealed_input_semantic_reads")
+        == 0
+    )
+    assert (
+        counter_value(ledger, "retired_v1_repair_access", "sealed_label_semantic_reads")
         == 0
     )
 
@@ -311,6 +331,7 @@ def test_a_missing_counter_group_is_refused(ledger):
 
 def test_a_blocked_source_round_cannot_record_a_semantic_read(ledger):
     broken = copy.deepcopy(ledger)
+    broken["status"] = "BLOCKED_ON_PRIVATE_SOURCE_ACCESS"
     broken["live_counters"]["retired_v1_repair_access"][
         "sealed_label_semantic_reads"
     ] = 1
@@ -427,6 +448,11 @@ def test_a_successor_may_not_lower_a_counter(ledger):
 def test_g01_lowering_an_event_backed_counter_fails_coherence_first(ledger):
     """The same mutation on an event-backed counter is rejected even earlier."""
     successor = copy.deepcopy(ledger)
+    # Also drop back to the pre-R1 status, so that the review-boundary rule is
+    # not the one that fires. What is under test is narrower: an event that
+    # records a byte-only verification must be backed by a counter that shows
+    # one, whatever the declared status.
+    successor["status"] = "BLOCKED_ON_PRIVATE_SOURCE_ACCESS"
     successor["live_counters"]["retired_v1_repair_access"][
         "byte_only_integrity_verifications"
     ] = 0
@@ -740,3 +766,257 @@ def test_prose_unrelated_to_the_projection_is_untouched(ledger, policy):
         "round may increment."
     )
     _validate(ledger, policy)
+
+# --- R1: the private-review-boundary terminal state -------------------------
+#
+# Independent Audit B (B-11) found that `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY`
+# --- the terminal state Phase 1.2H-R1 was heading for --- was not a state this
+# ledger would accept, while the *old* status was accepted alongside the new
+# R1 counters. The state now exists and, crucially, has to be earned.
+
+
+def test_the_review_boundary_state_is_registered():
+    assert "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY" in TERMINAL_STATES
+
+
+def test_the_review_boundary_state_requires_a_completed_byte_only_gate(ledger, policy):
+    # The precedence rule: a round that never reached the source must record
+    # BLOCKED_ON_PRIVATE_SOURCE_ACCESS, not the state that means "I reached it
+    # and stopped at the reviewer". Without this, the more advanced-sounding
+    # state could be claimed by a round that did strictly less.
+    ledger["status"] = "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY"
+    ledger["live_counters"]["retired_v1_repair_access"][
+        "byte_only_integrity_verifications"
+    ] = 2
+    with pytest.raises(LedgerError, match="byte-only access gate"):
+        _validate(ledger, policy)
+
+
+def test_the_review_boundary_state_is_accepted_after_the_gate(ledger, policy):
+    ledger["status"] = "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY"
+    ledger["live_counters"]["retired_v1_repair_access"][
+        "byte_only_integrity_verifications"
+    ] = BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE
+    _validate(ledger, policy)
+
+
+def test_a_partial_gate_does_not_earn_the_review_boundary_state(ledger, policy):
+    # 13 = the two pre-R1 verifications plus 11 of the 12 objects. A gate that
+    # did not complete every object has not established the byte-only claim.
+    ledger["status"] = "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY"
+    ledger["live_counters"]["retired_v1_repair_access"][
+        "byte_only_integrity_verifications"
+    ] = BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE - 1
+    with pytest.raises(LedgerError, match="byte-only access gate"):
+        _validate(ledger, policy)
+
+
+def test_the_committed_ledger_has_actually_earned_its_state(ledger):
+    """Not a mutation test: the real committed record must satisfy the rule."""
+    assert ledger["status"] == "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY"
+    assert (
+        counter_value(ledger, "retired_v1_repair_access",
+                      "byte_only_integrity_verifications")
+        >= BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE
+    )
+
+
+def test_the_review_boundary_state_still_forbids_a_semantic_read(ledger, policy):
+    # The boundary is precisely what prevents a semantic read, so a round that
+    # performed one did not block on it.
+    ledger["status"] = "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY"
+    ledger["live_counters"]["retired_v1_repair_access"][
+        "byte_only_integrity_verifications"
+    ] = BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE
+    ledger["live_counters"]["retired_v1_repair_access"]["sealed_input_semantic_reads"] = 1
+    with pytest.raises(LedgerError, match="semantic reads"):
+        _validate(ledger, policy)
+
+
+def test_a_novel_terminal_state_is_still_refused(ledger, policy):
+    # Adding one state must not open the door to inventing others.
+    ledger["status"] = "READY_FOR_PRIVATE_REVIEW"
+    with pytest.raises(LedgerError):
+        _validate(ledger, policy)
+
+
+# --- counter provenance -----------------------------------------------------
+#
+# R1 produced two kinds of number at once: counters read out of a
+# schema-validated execution receipt, and counters an operator kept by hand
+# across an interactive session. Recording both without saying which is which
+# would let the second borrow the authority of the first.
+
+
+def test_the_provenance_block_is_validated_not_decorative(ledger, policy):
+    ledger["counter_provenance"]["receipt_derived_exact"]["counters"].append(
+        "azure.reads_that_do_not_exist"
+    )
+    with pytest.raises(LedgerError, match="not a counter this ledger carries"):
+        _validate(ledger, policy)
+
+
+def test_a_counter_may_not_hold_two_provenances(ledger, policy):
+    ledger["counter_provenance"]["operator_maintained_approximate"][
+        "counters"
+    ].append("azure.data_plane_writes")
+    with pytest.raises(LedgerError, match="a counter has one provenance"):
+        _validate(ledger, policy)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "retired_v1_repair_access.sealed_input_semantic_reads",
+        "retired_v1_repair_access.sealed_label_semantic_reads",
+        "retired_v1_repair_access.byte_only_integrity_verifications",
+        "azure.data_plane_content_reads",
+        "azure.data_plane_writes",
+        "parser_execution.parser_invocations_on_private_or_locked_data",
+        "parser_execution.candidate_predictions_generated",
+        "parser_execution.comparator_predictions_generated",
+    ],
+)
+def test_every_safety_counter_must_declare_its_evidence(ledger, policy, path):
+    for entry in ledger["counter_provenance"].values():
+        if isinstance(entry, dict) and path in entry.get("counters", []):
+            entry["counters"].remove(path)
+    with pytest.raises(LedgerError, match="must state where its value came from"):
+        _validate(ledger, policy)
+
+
+def test_a_safety_counter_may_not_be_downgraded_to_recollection(ledger, policy):
+    # The exact laundering this check exists to stop: move
+    # "no semantic read occurred" from receipt evidence to an operator's memory
+    # while leaving the value at 0, and the ledger still reads as safe.
+    ledger["counter_provenance"]["receipt_derived_exact"]["counters"].remove(
+        "retired_v1_repair_access.sealed_input_semantic_reads"
+    )
+    ledger["counter_provenance"]["operator_maintained_approximate"][
+        "counters"
+    ].append("retired_v1_repair_access.sealed_input_semantic_reads")
+    with pytest.raises(LedgerError, match="requires machine evidence"):
+        _validate(ledger, policy)
+
+
+def test_a_fourth_vaguer_provenance_class_is_refused(ledger, policy):
+    ledger["counter_provenance"]["believed_accurate"] = {
+        "counters": ["azure.control_plane_reads"]
+    }
+    with pytest.raises(LedgerError, match="the classes are fixed"):
+        _validate(ledger, policy)
+
+
+def test_an_empty_class_is_refused(ledger, policy):
+    ledger["counter_provenance"]["azure_verified_exact"]["counters"] = []
+    with pytest.raises(LedgerError, match="non-empty list"):
+        _validate(ledger, policy)
+
+
+def test_the_classes_are_exposed_for_reuse():
+    assert COUNTER_PROVENANCE_CLASSES == (
+        "receipt_derived_exact",
+        "azure_verified_exact",
+        "operator_maintained_approximate",
+    )
+
+
+# --- the ledger must agree with the receipt it cites ------------------------
+#
+# counter_provenance claims eight counters come from
+# docs/phase1_2h_r1_access_receipt_003.json. That claim is worth nothing unless
+# something checks it, so this is that check: the ledger and its cited evidence
+# are compared value by value.
+
+RECEIPT_PATH = ROOT / "docs" / "phase1_2h_r1_access_receipt_003.json"
+PRE_R1_BYTE_ONLY_VERIFICATIONS = 2
+
+
+@pytest.fixture(scope="module")
+def receipt() -> dict:
+    return json.loads(RECEIPT_PATH.read_text(encoding="utf-8"))
+
+
+def test_the_cited_receipt_exists_and_records_a_pass(receipt):
+    assert receipt["schema_version"] == "phase1-2h-r1-access-receipt/v1"
+    assert receipt["execution"]["exit_status"] == "PASS"
+    assert receipt["verdict"]["access_gate_passed"] is True
+    assert receipt["verdict"]["invariants_failed"] == []
+
+
+def test_the_byte_only_count_is_the_receipt_plus_the_pre_r1_verifications(
+    ledger, receipt
+):
+    assert (
+        counter_value(ledger, "retired_v1_repair_access",
+                      "byte_only_integrity_verifications")
+        == receipt["counters"]["byte_only_integrity_verifications"]
+        + PRE_R1_BYTE_ONLY_VERIFICATIONS
+    )
+
+
+def test_the_data_plane_counters_come_from_the_receipt(ledger, receipt):
+    assert (
+        counter_value(ledger, "azure", "data_plane_content_reads")
+        == receipt["counters"]["azure_data_plane_content_reads"]
+    )
+    assert (
+        counter_value(ledger, "azure", "data_plane_writes")
+        == receipt["counters"]["azure_data_plane_writes"]
+    )
+
+
+@pytest.mark.parametrize(
+    ("group", "name", "receipt_key"),
+    [
+        ("retired_v1_repair_access", "sealed_input_semantic_reads",
+         "semantic_input_reads"),
+        ("retired_v1_repair_access", "sealed_label_semantic_reads",
+         "semantic_label_reads"),
+        ("parser_execution", "parser_invocations_on_private_or_locked_data",
+         "parser_invocations"),
+        ("parser_execution", "candidate_predictions_generated",
+         "predictions_generated"),
+    ],
+)
+def test_each_safety_counter_matches_its_evidence(
+    ledger, receipt, group, name, receipt_key
+):
+    assert counter_value(ledger, group, name) == receipt["counters"][receipt_key]
+
+
+def test_the_receipt_reproduces_the_committed_public_anchor(receipt):
+    """The gate is only evidence because its output was already public."""
+    assert (
+        receipt["streaming"]["observed_aggregate_digest"]
+        == "e1364afcac87516813d33a4e9fb3e370769487ab2f3ca47a08a3b4059db14e71"
+    )
+    assert receipt["streaming"]["objects_streamed"] == 12
+    assert receipt["streaming"]["total_bytes_streamed"] == 396613
+    assert receipt["streaming"]["decode_attempts"] == 0
+    assert receipt["streaming"]["persist_attempts"] == 0
+
+
+def test_the_receipt_carries_no_case_content(receipt):
+    """A receipt that could carry a span or an answer would defeat the round.
+
+    The bound is on shape, not length alone: every string in the receipt must be
+    a single token drawn from ``[A-Za-z0-9:._-]``. Case content --- a question, a
+    span, a canonical answer --- is prose, and prose cannot survive that filter.
+    A length cap alone would not do it, since a 60-character answer is possible.
+    """
+    token = re.compile(r"^[A-Za-z0-9:._/-]{1,80}$")
+
+    def walk(node, path="$"):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                yield key, f"{path}.{key} (key)"
+                yield from walk(value, f"{path}.{key}")
+        elif isinstance(node, list):
+            for index, value in enumerate(node):
+                yield from walk(value, f"{path}[{index}]")
+        elif isinstance(node, str):
+            yield node, path
+
+    for value, path in walk(receipt):
+        assert token.match(value), f"{path} = {value!r} is not a content-free token"

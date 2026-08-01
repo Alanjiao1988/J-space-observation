@@ -795,3 +795,48 @@ The same failure mode appeared in the policy's semantic hash. Excluding a
 *container* key from a hash excludes everything inside it, including free text
 that can be rewritten into a claim the hash was supposed to protect. Exclusion
 lists should name the mutable leaves, not the branch above them.
+## Provenance classes for ledger counters (Phase 1.2H-R1)
+
+Phase 1.2H-R1 produced two kinds of number in the same ledger. Eight counters
+were read out of a schema-validated execution receipt emitted inside the job.
+Two — how many `az` control-plane calls the operator made, and how many
+resources were created or changed — were kept by hand across an interactive
+session and cannot be anything else.
+
+Publishing both in one table, in one format, invites a reader to extend the
+authority of the first to the second. The method adopted is to make provenance
+explicit and checkable: the ledger carries a `counter_provenance` block that
+partitions counters into `receipt_derived_exact`, `azure_verified_exact` and
+`operator_maintained_approximate`, and the validator enforces three properties
+— every named counter exists, no counter appears in two classes, and every
+counter carrying a safety claim is present and is **not** classified as
+operator-maintained.
+
+The third property is the one with teeth. The failure it prevents is not a typo
+but a laundering: move "no semantic read occurred" from receipt evidence into an
+operator's recollection while leaving the value at `0`, and the ledger still
+reads as safe while having quietly stopped being evidence. Making the move
+invalid keeps the distinction between a measurement and an assertion where a
+reader can see it.
+
+## Recording a field as unobservable rather than widening the boundary to observe it (Phase 1.2H-R1)
+
+Two fields the R1 receipt would ideally carry — whether the storage account's
+public network access is disabled, and whether the executing identity's role set
+is genuinely read-only — cannot be observed from inside the job. The first needs
+a reader role on the account resource; the second needs permission to read role
+assignments. The probe identity holds neither, by design.
+
+Both could have been made observable by granting those roles. The method
+question is whether a more complete receipt is worth a wider boundary, and the
+answer adopted here is no: the minimality of that identity is the round's central
+safety claim, and expanding it to improve the appearance of the evidence would
+trade the substance for the appearance.
+
+So the receipt records `"Unknown"` and `NOT_CONFIRMED_IN_JOB`, the schema
+*refuses* any other value for the first, and both properties are established
+instead from operator control-plane evidence plus positive structural proof —
+`data_plane_writes: 0` and an AST demonstration that no write, upload, delete
+or delegation call site exists in the probe's reachable source. A receipt that is
+honestly incomplete is worth more than one that is complete because the boundary
+was widened to complete it.

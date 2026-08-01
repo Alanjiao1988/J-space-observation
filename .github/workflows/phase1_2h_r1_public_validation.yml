@@ -75,6 +75,27 @@ jobs:
         if: ${{ hashFiles('tests/test_phase1_2h_r1_access.py') != '' }}
         run: python -m pytest tests/test_phase1_2h_r1_access.py -q
 
+      - name: Phase 1.2H-R1 review-boundary suite
+        if: ${{ hashFiles('tests/test_phase1_2h_r1_review_boundary.py') != '' }}
+        run: python -m pytest tests/test_phase1_2h_r1_review_boundary.py -q
+
+      - name: Committed review-boundary assessment is reproducible
+        # The assessment decides the round's terminal state, so it must be a
+        # regenerable function of committed evidence rather than a document
+        # someone wrote. --check regenerates it and compares byte for byte.
+        if: ${{ hashFiles('docs/phase1_2h_r1_review_boundary_assessment.json') != '' }}
+        run: |
+          python scripts/phase1_2h_r1_review_boundary_assessment.py \
+            --evidence docs/phase1_2h_r1_review_boundary_evidence.json \
+            --byte-only-gate-passed true \
+            --check docs/phase1_2h_r1_review_boundary_assessment.json
+
+      - name: Committed access receipt is schema-valid
+        if: ${{ hashFiles('docs/phase1_2h_r1_access_receipt_003.json') != '' }}
+        run: |
+          python scripts/phase1_2h_r1_receipt_validator.py \
+            docs/phase1_2h_r1_access_receipt_003.json
+
       - name: Phase 1.2H ledger suite
         run: python -m pytest tests/test_parser_v3_v2_access_ledger.py -q
 

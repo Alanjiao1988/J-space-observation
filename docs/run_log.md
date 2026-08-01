@@ -3898,3 +3898,65 @@ prediction was generated, no set was constructed or sealed, and the terminal
 status remains `BLOCKED_ON_PRIVATE_SOURCE_ACCESS`. The policy's threshold, gate,
 ontology, population, comparator and status blocks are byte-identical to Phase
 1.2G.
+---
+
+## Phase 1.2H-R1 — cloud-first private-source access restoration
+
+**Terminal status:** `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY`.
+
+**What changed, in one sentence.** Phase 1.2H concluded the sealed source was
+unreachable; R1 established that it was unreachable *from outside the virtual
+network*, went inside, and streamed every byte of it to a digest without
+decoding one.
+
+**The provisioned boundary.** A user-assigned identity
+`id-jspace-p12h-r1-read-sea` holding exactly two role assignments
+(`Storage Blob Data Reader` scoped to the single container `jspace-results`;
+`AcrPull` scoped to the registry), a digest-pinned image built by ACR Tasks,
+and a VNet-injected Container Apps job with `replicaRetryLimit: 0`. No role
+granting write, delete, `Storage Blob Delegator` or role-assignment read was
+requested. Every heavy step ran in Azure; the operator's machine did editing,
+`git` and control-plane calls only.
+
+**The gate.** Execution `p12h-r1-access-gate-003` (ACA execution `0fqre0m`,
+image `sha256:f2cf1701…`) passed: one list over the exact registered prefix,
+12 members matching the committed public manifest as a set, 12 objects streamed,
+396,613 bytes, every per-object digest and size matching, and an aggregate
+digest of
+`e1364afcac87516813d33a4e9fb3e370769487ab2f3ca47a08a3b4059db14e71` —
+the value already committed publicly before the round ran. Twelve invariants
+checked, none failed.
+
+**The refusal that came first.** Execution `dlv8kmc` refused with
+`FORBIDDEN_ENV_VAR` before authenticating. The probe's own denylist named
+`MSI_ENDPOINT` and `MSI_SECRET`, which are exactly how Container Apps
+supplies the managed identity the protocol requires; the rule was
+self-contradictory and impossible to satisfy. It is recorded rather than quietly
+fixed because it is evidence the pre-flight guard fires on a real error, at the
+cost of a real run.
+
+**Why the round is still blocked.** Set repair needs *semantic* review of private
+material, and the executable boundary assessment scores 0 of 13 conditions
+passed, 5 failed and 8 not assessable ⇒ `DOES_NOT_QUALIFY`.
+`rg-jspace-observation-sea` contains zero `Microsoft.CognitiveServices`
+accounts and zero ML workspaces; the only same-region AI account belongs to an
+unrelated project, has `publicNetworkAccess: Enabled` and no private endpoint;
+and the worker subnet has no egress control attached. Under protocol §12.3 this
+is decisive even though the byte-only gate passed.
+
+**Two claims deliberately not made.** `public_network_access` is recorded as
+`"Unknown"` — the probe holds no reader role on the account resource, and the
+receipt schema now refuses any other value. `effective_read_only_verdict` is
+`NOT_CONFIRMED_IN_JOB` — reading one's own role assignments requires a role the
+identity deliberately does not hold, and granting it to fill in a field would
+have increased privilege for a cosmetic gain. An earlier draft returned
+`READ_ONLY_CONFIRMED` unconditionally; both independent audits caught it.
+
+**Unchanged by all of this.** No semantic read occurred, no parser ran, no
+prediction was generated, no set was constructed or sealed, and no formal
+evaluation took place. `parser-v3-v1` remains
+`SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE`, byte-unchanged; the
+transition to `REPAIR_ACCESSED` did **not** occur, because streaming bytes to a
+digest is not a repair read. The policy's threshold, gate, ontology, population,
+comparator and status blocks are byte-identical to Phase 1.2G, and
+`policy_semantics_sha256` remains `ae375481…`.

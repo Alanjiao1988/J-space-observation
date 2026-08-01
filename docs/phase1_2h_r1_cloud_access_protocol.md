@@ -116,9 +116,15 @@ The storage account is already configured the way this round needs:
 | `allowBlobPublicAccess` | `false` |
 | minimum TLS | 1.2 |
 
-`allowSharedKeyAccess: false` means shared-key and SAS authentication are
-impossible by construction, not merely forbidden by policy. The only way in is
-Entra ID plus the private endpoint.
+`allowSharedKeyAccess: false` means shared-key authentication, and any SAS
+signed with an account key, are impossible by construction rather than merely
+forbidden by policy. It does **not** by itself exclude a *user-delegation* SAS,
+which is signed with an Entra-issued key and is unaffected by that flag. What
+excludes that path is the identity's role set: minting a user-delegation key
+requires the `Storage Blob Delegator` role on the account, and the designated
+identity holds exactly two role assignments, neither of which is that one. The
+only way in is therefore Entra ID plus the private endpoint, and the reason is
+the role scoping, not the shared-key flag alone.
 
 The private path is verified end to end: private endpoint
 `pe-stjspacefiles-blob-sea` has NIC IP **10.80.2.4**; the linked private DNS
@@ -138,9 +144,30 @@ is not sufficient: a different private endpoint is a different endpoint.
 
 Refuse unless: no source-binding override was attempted; no ambient or secret
 credential environment variable is set; no forbidden credential symbol is
-reachable; verbose SDK body logging is off; `publicNetworkAccess` is `Disabled`;
-the blob FQDN resolves to the single registered private IP; the credential is
-`ManagedIdentityCredential` with an explicitly supplied user-assigned client ID.
+reachable; verbose SDK body logging is off; the blob FQDN resolves to the single
+registered private IP; the credential is `ManagedIdentityCredential` with an
+explicitly supplied user-assigned client ID.
+
+Two Stage A properties are deliberately **not** claimed as in-job observations.
+
+`publicNetworkAccess` is a control-plane property of the storage account. The
+probe holds no reader role on the account resource, so it cannot observe it, and
+granting one to make the receipt look more complete would *increase* the
+identity's privilege in exchange for a cosmetic field. The receipt therefore
+records `"Unknown"` and refuses any other value, and names the operator
+control-plane read taken before the run as the source of the `Disabled` finding
+quoted in section 5. The private-IP resolution check is what the job itself
+proves, and it is the stronger of the two: an account reachable from the public
+internet would still not be reached over a public address by this job.
+
+Likewise, the read-only nature of the identity's role assignments is not
+verifiable from inside the job, because reading role assignments requires a role
+the identity deliberately does not hold. The receipt records
+`effective_read_only_verdict: NOT_CONFIRMED_IN_JOB` rather than a verdict it
+cannot support. The role set is established by operator control-plane evidence
+recorded in the decision record, and the absence of write capability is
+demonstrated positively by `data_plane_writes: 0` and by the static proof that
+no write, upload, delete or delegation call site exists in the probe source.
 
 ### Stage B — membership
 
@@ -154,6 +181,12 @@ outside the prefix. Emit only aggregates — never a member name.
 For each expected member, stream the object in 256 KiB chunks directly into a
 SHA-256 accumulator. Compare size and digest against the seal record. Refuse on
 any mismatch.
+
+The chunk size is not merely the loop's step: it is also passed to the client as
+`max_single_get_size` and `max_chunk_get_size`. Without that, the SDK is free to
+buffer a whole object in memory on a single GET regardless of how the caller
+iterates, and the bounded-memory claim would be an assertion about the loop
+rather than a property of the download.
 
 `stream_object_digest` is the only function in the round that sees authoritative
 bytes. It holds one chunk at a time, folds it into the digest, and lets it go.
@@ -227,7 +260,15 @@ sufficient. Repair requires *semantic* review of private material, and semantic
 review requires a review backend that satisfies
 `private_review_boundary_requirements` in the decision record.
 
-Assessment of the current subscription:
+Assessment of the current subscription is **executable**, not narrative. The
+prose table below is a reading of
+`docs/phase1_2h_r1_review_boundary_evidence.json`; the verdict is computed from
+that same file by `scripts/phase1_2h_r1_review_boundary_assessment.py` and
+committed as `docs/phase1_2h_r1_review_boundary_assessment.json`, which CI
+regenerates and compares byte for byte. The instrument scores 13 conditions and
+treats `NOT_ASSESSABLE` as **not** a pass, so a condition nobody checked cannot
+be counted as satisfied. Observed: **0 passed, 5 failed, 8 not assessable ⇒
+`DOES_NOT_QUALIFY`.**
 
 | Requirement | Status |
 |---|---|
@@ -268,7 +309,30 @@ Ledger counters are **derived from execution evidence**, never asserted:
 | `predictions_generated` | structurally 0 |
 
 A receipt whose counters contradict the ledger is a round failure, not a
-discrepancy to be reconciled after the fact.
+discrepancy to be reconciled after the fact. The ledger's `counter_provenance`
+block names, per counter, whether its value came from the receipt, from an Azure
+control-plane query, or from an operator's hand-kept tally; the ledger validator
+refuses to let a counter carrying a safety claim be classified as the last of
+those. Two counters are honestly hand-kept — `control_plane_reads` and
+`resource_creations_or_changes` — and neither carries a safety property.
+
+### 9.1 The round's recorded outcome
+
+Execution `p12h-r1-access-gate-003` (ACA execution `0fqre0m`, image
+`sha256:f2cf1701…`) passed the gate: 12 members listed, 12 objects streamed,
+396,613 bytes, aggregate digest `e1364afc…` reproducing the committed public
+anchor, 12 invariants checked and none failed. `decode_attempts`,
+`persist_attempts`, `azure_data_plane_writes`, `semantic_input_reads`,
+`semantic_label_reads`, `parser_invocations` and `predictions_generated` were
+all 0. The receipt is committed at
+`docs/phase1_2h_r1_access_receipt_003.json`.
+
+The preceding execution (`dlv8kmc`) is recorded too, because it refused: the
+probe's own forbidden-environment denylist named `MSI_ENDPOINT` and `MSI_SECRET`,
+which are exactly how Container Apps supplies the managed identity this protocol
+requires. The rule was self-contradictory and the guard caught the operator's
+error rather than a hypothetical adversary's. That refusal is evidence the gate
+is real.
 
 ---
 

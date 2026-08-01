@@ -95,16 +95,22 @@ INVARIANT_STATEMENTS: tuple[str, ...] = (
     "task/headroom screening, not parser calibration, and no Phase 1.0C result "
     "can supply, bound, or unblock any parser acceptance threshold.",
     "No private holdout, sealed input, sealed label or private curator file was "
-    "accessed.",
+    "*semantically read*. Phase 1.2H-R1 streamed all 12 sealed objects into a "
+    "SHA-256 accumulator and discarded them, so bytes were touched while nothing "
+    "about any case was learned: `decode_attempts`, `persist_attempts`, "
+    "`semantic_input_reads` and `semantic_label_reads` are all **0**, pinned "
+    "`maximum: 0` in the receipt schema.",
     "No prediction was generated and no parser was run against any evaluation "
     "or calibration corpus.",
     "No formal parser-v3 evaluation has occurred. Parser v3 remains "
     "**unvalidated**.",
     "`parser-v3-v1` remains `SEALED / UNSPENT / UNSCORABLE / "
     "RETIRED_AS_INELIGIBLE`, byte-unchanged.",
-    "Phase 1.2H terminated `BLOCKED_ON_PRIVATE_SOURCE_ACCESS` before any "
-    "private access. No `parser-v3-v2` set was constructed or sealed, and none "
-    "exists.",
+    "Phase 1.2H terminated `BLOCKED_ON_PRIVATE_SOURCE_ACCESS`; Phase 1.2H-R1 "
+    "established authenticated byte-only access from inside the VNet and "
+    "terminated `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY`, because set repair needs a "
+    "semantic review boundary that does not exist. No `parser-v3-v2` set was "
+    "constructed or sealed, and none exists.",
     "No J-space, hidden-reasoning, invisible-CoT or internal-workspace "
     "conclusion follows from any of this.",
 )
