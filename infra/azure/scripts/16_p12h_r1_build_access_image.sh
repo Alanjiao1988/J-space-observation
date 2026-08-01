@@ -15,7 +15,7 @@ set -euo pipefail
 
 SUBSCRIPTION_ID="${SUBSCRIPTION_ID:-943bacdf-8b6e-4e3a-8126-a149f623d32e}"
 RESOURCE_GROUP="${RESOURCE_GROUP:-rg-jspace-observation-sea}"
-ACR_NAME="${ACR_NAME:-acrjspaceobservationsea}"
+ACR_NAME="${ACR_NAME:-acrjspaceobssea0708231738}"
 IMAGE_REPO="${IMAGE_REPO:-j-space-observation}"
 DOCKERFILE="${DOCKERFILE:-Dockerfile.phase1-2h-r1-access}"
 FREEZE_COMMIT="${FREEZE_COMMIT:-}"

@@ -55,16 +55,21 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install test dependencies
+      - name: Install repository dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest
+          # CPU-only torch. The package's __init__ eagerly imports model_loader,
+          # which imports torch, so importing any submodule requires it. The CPU
+          # wheel is a fraction of the size of the default CUDA build and this
+          # workflow never runs a model.
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu torch
+          python -m pip install -r requirements.txt
 
       - name: Byte-compile the repository
         run: python -m compileall -q src scripts tests
 
       - name: Whitespace and conflict-marker check
-        run: git diff --check "$(git rev-list --max-parents=0 HEAD | tail -1)" HEAD -- || true
+        run: git --no-pager diff --check "${{ github.event.inputs.target_sha }}^" "${{ github.event.inputs.target_sha }}"
 
       - name: Phase 1.2H-R1 focused suite
         if: ${{ hashFiles('tests/test_phase1_2h_r1_access.py') != '' }}

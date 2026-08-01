@@ -22,9 +22,9 @@ SUBSCRIPTION_ID="${SUBSCRIPTION_ID:-943bacdf-8b6e-4e3a-8126-a149f623d32e}"
 RESOURCE_GROUP="${RESOURCE_GROUP:-rg-jspace-observation-sea}"
 LOCATION="${LOCATION:-southeastasia}"
 IDENTITY_NAME="${IDENTITY_NAME:-id-jspace-p12h-r1-read-sea}"
-ACR_NAME="${ACR_NAME:-acrjspaceobservationsea}"
+ACR_NAME="${ACR_NAME:-acrjspaceobssea0708231738}"
 STORAGE_ACCOUNT="${STORAGE_ACCOUNT:-stjspacefiles0709085305}"
-BLOB_CONTAINER="${BLOB_CONTAINER:-jspace-files}"
+BLOB_CONTAINER="${BLOB_CONTAINER:-jspace-results}"
 
 # Built-in role definition IDs. Pinned by ID rather than by display name so a
 # renamed or shadowed custom role cannot be substituted silently.

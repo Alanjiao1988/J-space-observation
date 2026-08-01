@@ -25,6 +25,13 @@ secrets/
 results/runs/*
 !results/runs/.gitkeep
 artifacts/
+# Narrow, deliberate exception: the Phase 1.2H-R1 access image needs the
+# committed public seal record that lists the 12 sealed parser-v3-v1 objects by
+# name, byte count and SHA-256. It contains no answer value, no span, no offset
+# and no case content, and the image verifies it by digest at build time.
+# Scoped to this one file so the blanket artifacts/ exclusion keeps protecting
+# everything else.
+!artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/02_records.jsonl
 **/all45_*
 evaluator_sets/
 **/locked_inputs.jsonl
