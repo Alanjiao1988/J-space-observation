@@ -7,7 +7,7 @@
   "payload": [
     {
       "path": "scripts/phase1_2h_r1_private_source_probe.py",
-      "sha256": "c5c6de017b184248dc5bc5f10aeb89ba2baa8832023b92ec98ed11be0a8226d4"
+      "sha256": "d96c09ff602eba3a7bb6e4a5d497568f6ed3f0d91acdc7d5e9ab6fa1241978eb"
     },
     {
       "path": "scripts/phase1_2h_r1_receipt_validator.py",

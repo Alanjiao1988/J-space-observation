@@ -103,10 +103,20 @@ FORBIDDEN_CREDENTIAL_TYPES = (
     "WorkloadIdentityCredential",
 )
 
-# Environment variables that would let an ambient or secret credential in, or
-# would redirect the SDK's endpoint. Any of these being set is a refusal, not a
-# thing to be ignored: the point of the freeze is that the environment cannot
-# change where the probe goes or who it is.
+# Environment variables that would let a secret-bearing or ambient credential
+# in, or would redirect the SDK's endpoint. Any of these being set is a
+# refusal, not a thing to be ignored: the point of the freeze is that the
+# environment cannot change where the probe goes or who it is.
+#
+# Deliberately NOT listed: MSI_ENDPOINT, MSI_SECRET, IDENTITY_ENDPOINT and
+# IDENTITY_HEADER. Those are the platform-provided managed-identity token
+# endpoint, and they are exactly how ManagedIdentityCredential authenticates
+# inside a Container Apps job. An earlier revision of this list forbade
+# MSI_ENDPOINT and MSI_SECRET, which made the rule self-contradictory: the
+# freeze *requires* ManagedIdentityCredential, and the platform implements it
+# with those variables. The first live gate execution refused because of it.
+# That refusal was the machinery working, and the fix is to correct the rule,
+# not to relax the requirement. Secret-bearing variables below remain refused.
 FORBIDDEN_ENV_VARS = (
     "AZURE_CLIENT_SECRET",
     "AZURE_CLIENT_CERTIFICATE_PATH",
@@ -121,20 +131,28 @@ FORBIDDEN_ENV_VARS = (
     "AZURE_STORAGE_CONTAINER",
     "AZURE_POD_IDENTITY_AUTHORITY_HOST",
     "AZURE_AUTHORITY_HOST",
-    "MSI_ENDPOINT",
-    "MSI_SECRET",
 )
 
 CHUNK_BYTES = 262144
 
 
 class ProbeRefusal(Exception):
-    """A frozen invariant was violated. Carries a closed-vocabulary reason."""
+    """A frozen invariant was violated. Carries a closed-vocabulary reason.
 
-    def __init__(self, reason_code: str, invariant: str) -> None:
-        super().__init__(f"{reason_code}:{invariant}")
+    ``detail`` may carry a non-private identifier -- an environment variable
+    name, a symbol name -- but never a value, a member name, an address or any
+    object content. The first live gate execution refused with
+    ``FORBIDDEN_ENV_VAR`` and no indication of which variable, which cost a
+    whole cloud round trip to diagnose. A receipt that is content-free but also
+    useless is a false economy: the name of a platform environment variable is
+    a public constant, its value is not.
+    """
+
+    def __init__(self, reason_code: str, invariant: str, detail: str = "") -> None:
+        super().__init__(f"{reason_code}:{invariant}" + (f":{detail}" if detail else ""))
         self.reason_code = reason_code
         self.invariant = invariant
+        self.detail = detail
 
 
 # ---------------------------------------------------------------------------
@@ -251,7 +269,8 @@ def assert_environment_clean(environ: dict[str, str] | None = None) -> None:
     env = os.environ if environ is None else environ
     for name in FORBIDDEN_ENV_VARS:
         if env.get(name):
-            raise ProbeRefusal("CREDENTIAL_TYPE_FORBIDDEN", "FORBIDDEN_ENV_VAR")
+            # The variable's name, never its value.
+            raise ProbeRefusal("CREDENTIAL_TYPE_FORBIDDEN", "FORBIDDEN_ENV_VAR", name)
 
 
 def assert_no_forbidden_symbols(namespace: dict[str, Any] | None = None) -> None:
@@ -661,7 +680,7 @@ def main(argv: list[str] | None = None) -> int:
 def _refusal_receipt(
     refusal: ProbeRefusal, started: str, args: argparse.Namespace
 ) -> dict[str, Any]:
-    return {
+    receipt = {
         "schema_version": RECEIPT_SCHEMA_VERSION,
         "phase": "1.2H-R1",
         "refused": True,
@@ -671,6 +690,9 @@ def _refusal_receipt(
         "started_at": started,
         "ended_at": _now(),
     }
+    if refusal.detail:
+        receipt["detail"] = refusal.detail
+    return receipt
 
 
 def _run_live(

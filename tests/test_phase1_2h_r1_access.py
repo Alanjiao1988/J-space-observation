@@ -159,6 +159,66 @@ def test_a_clean_environment_passes():
     probe.assert_environment_clean({"PATH": "/usr/bin", "HOME": "/home/probe"})
 
 
+# --- 2b. Defects found by executing the gate, not by reasoning about it -----
+
+
+@pytest.mark.parametrize(
+    "name", ["MSI_ENDPOINT", "MSI_SECRET", "IDENTITY_ENDPOINT", "IDENTITY_HEADER"]
+)
+def test_the_platform_managed_identity_endpoint_is_not_forbidden(name):
+    # The first live gate execution refused with FORBIDDEN_ENV_VAR because the
+    # denylist included MSI_ENDPOINT and MSI_SECRET. Those are how Container
+    # Apps provides the managed identity the freeze *requires*, so the rule
+    # forbade the required credential. Correcting a self-contradictory rule is
+    # not the same as relaxing a requirement, and this test pins the
+    # distinction so the contradiction cannot come back.
+    assert name not in probe.FORBIDDEN_ENV_VARS
+    probe.assert_environment_clean({name: "http://localhost:42356/msi/token"})
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "AZURE_CLIENT_SECRET",
+        "AZURE_STORAGE_KEY",
+        "AZURE_STORAGE_SAS_TOKEN",
+        "AZURE_STORAGE_CONNECTION_STRING",
+    ],
+)
+def test_secret_bearing_variables_are_still_refused(name):
+    with pytest.raises(probe.ProbeRefusal):
+        probe.assert_environment_clean({name: "secret"})
+
+
+def test_an_environment_refusal_names_the_variable_but_never_its_value():
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.assert_environment_clean({"AZURE_CLIENT_SECRET": "hunter2-do-not-leak"})
+    assert exc.value.detail == "AZURE_CLIENT_SECRET"
+    assert "hunter2-do-not-leak" not in str(exc.value)
+
+
+def test_a_refusal_receipt_carries_the_detail_without_the_value():
+    args = probe._parse_args(
+        ["--client-id", "x", "--execution-id", "e", "--freeze-commit", "c", "--image-digest", "d"]
+    )
+    refusal = probe.ProbeRefusal(
+        "CREDENTIAL_TYPE_FORBIDDEN", "FORBIDDEN_ENV_VAR", "AZURE_CLIENT_SECRET"
+    )
+    receipt = probe._refusal_receipt(refusal, "2026-01-01T00:00:00Z", args)
+    assert receipt["detail"] == "AZURE_CLIENT_SECRET"
+    assert receipt["refused"] is True
+
+
+def test_a_refusal_without_detail_omits_the_field():
+    args = probe._parse_args(
+        ["--client-id", "x", "--execution-id", "e", "--freeze-commit", "c", "--image-digest", "d"]
+    )
+    receipt = probe._refusal_receipt(
+        probe.ProbeRefusal("MEMBER_SET_MISMATCH", "MEMBER_SET"), "2026-01-01T00:00:00Z", args
+    )
+    assert "detail" not in receipt
+
+
 @pytest.mark.parametrize(
     "env",
     [
