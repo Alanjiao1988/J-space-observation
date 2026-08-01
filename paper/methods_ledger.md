@@ -806,7 +806,7 @@ session and cannot be anything else.
 Publishing both in one table, in one format, invites a reader to extend the
 authority of the first to the second. The method adopted is to make provenance
 explicit and checkable: the ledger carries a `counter_provenance` block that
-partitions counters into `receipt_derived_exact`, `azure_verified_exact` and
+partitions counters into `receipt_derived_exact`, `azure_transcript_exact` and
 `operator_maintained_approximate`, and the validator enforces three properties
 — every named counter exists, no counter appears in two classes, and every
 counter carrying a safety claim is present and is **not** classified as

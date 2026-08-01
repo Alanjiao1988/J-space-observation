@@ -487,7 +487,7 @@ def test_a_gate_evidence_block_naming_a_missing_receipt_is_rejected():
 
 def test_a_gate_evidence_block_naming_the_wrong_execution_is_rejected():
     def mutate(doc):
-        doc["byte_only_gate_evidence"]["platform_attested_execution"] = "other-run"
+        doc["byte_only_gate_evidence"]["transcript_matched_execution"] = "other-run"
 
     with pytest.raises(assessor.BoundaryAssessmentError) as exc:
         assessor.assert_gate_evidence_consistent(_tampered(mutate))
@@ -561,21 +561,21 @@ def test_the_execution_is_bound_to_platform_recorded_output():
     """
 
     receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
-    assessor.assert_execution_is_platform_attested(receipt)
+    assessor.assert_execution_matches_committed_transcript(receipt)
 
 
 def test_an_execution_name_absent_from_the_platform_inventory_is_rejected():
     receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
     receipt["execution"]["aca_execution_name"] = "job-that-never-ran"
-    with pytest.raises(assessor.PlatformAttestationError):
-        assessor.assert_execution_is_platform_attested(receipt)
+    with pytest.raises(assessor.ExecutionTranscriptMismatchError):
+        assessor.assert_execution_matches_committed_transcript(receipt)
 
 
 def test_an_image_digest_the_platform_did_not_record_is_rejected():
     receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
     receipt["provenance"]["image_digest"] = "sha256:" + "e" * 64
-    with pytest.raises(assessor.PlatformAttestationError):
-        assessor.assert_execution_is_platform_attested(receipt)
+    with pytest.raises(assessor.ExecutionTranscriptMismatchError):
+        assessor.assert_execution_matches_committed_transcript(receipt)
 
 
 def test_the_attestation_does_not_claim_to_verify_the_counters():
@@ -583,7 +583,7 @@ def test_the_attestation_does_not_claim_to_verify_the_counters():
     # were dropped, the attestation would read as corroboration of the safety
     # claims, which it is not: the platform records that a container ran, not
     # what it did with the bytes it read.
-    doc = assessor.assert_execution_is_platform_attested.__doc__ or ""
+    doc = assessor.assert_execution_matches_committed_transcript.__doc__ or ""
     assert "does **not** establish" in doc
     assert "counters" in doc
 
@@ -640,7 +640,7 @@ def test_not_assessable_is_never_counted_as_a_pass():
 def test_f11_platform_attestation_is_described_as_an_unsigned_transcript():
     """Audit F (F-11): the check claimed the platform agreed the run happened.
 
-    ``assert_execution_is_platform_attested`` reads
+    ``assert_execution_matches_committed_transcript`` reads
     ``docs/phase1_2h_r1_job_execution_inventory.json``, which is committed JSON
     an operator transcribed from an ``az`` command. Nothing signs it and nothing
     binds it to Azure, so an operator who can edit the receipt can edit it in
@@ -649,7 +649,7 @@ def test_f11_platform_attestation_is_described_as_an_unsigned_transcript():
 
     This test fixes the wording, because the wording is the claim.
     """
-    doc = assessor.assert_execution_is_platform_attested.__doc__ or ""
+    doc = assessor.assert_execution_matches_committed_transcript.__doc__ or ""
     assert "unsigned committed transcript" in doc
     assert "Genuine attestation would require a signed platform artifact" in doc
     assert "which this round did not obtain and does not claim" in doc

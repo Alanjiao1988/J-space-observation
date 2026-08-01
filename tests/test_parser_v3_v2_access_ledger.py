@@ -936,7 +936,7 @@ def test_a_fourth_vaguer_provenance_class_is_refused(ledger, policy):
 
 
 def test_an_empty_class_is_refused(ledger, policy):
-    ledger["counter_provenance"]["azure_verified_exact"]["counters"] = []
+    ledger["counter_provenance"]["azure_transcript_exact"]["counters"] = []
     with pytest.raises(LedgerError, match="non-empty list"):
         _validate(ledger, policy)
 
@@ -944,7 +944,7 @@ def test_an_empty_class_is_refused(ledger, policy):
 def test_the_classes_are_exposed_for_reuse():
     assert COUNTER_PROVENANCE_CLASSES == (
         "receipt_derived_exact",
-        "azure_verified_exact",
+        "azure_transcript_exact",
         "structurally_zero_by_source_analysis",
         "zero_because_the_activity_has_never_occurred",
         "composite_of_separately_evidenced_parts",
@@ -1665,3 +1665,142 @@ def test_f14_provenance_cannot_be_restated_across_succession(ledger):
         )
     with pytest.raises(LedgerError):
         ledger_module.assert_monotonic_succession(ledger, dropped)
+
+
+def _correction(ledger: dict, sequence: int, summary: str) -> dict:
+    """A well-formed correction event carrying ``summary``."""
+    corrected = next(
+        event["sequence"]
+        for event in reversed(ledger["events"])
+        if event["kind"] != ledger_module.CORRECTION_EVENT_KIND
+    )
+    return {
+        "sequence": sequence,
+        "kind": ledger_module.CORRECTION_EVENT_KIND,
+        "corrects": corrected,
+        "role": "public-repository maintainer, offline",
+        "private_content_read": False,
+        "summary": summary,
+    }
+
+
+def test_r5_three_housekeeping_events_cannot_authorise_a_reclassification(ledger):
+    """Audit E (E-26) and Audit F (F-19): the F-14 rule was substring theatre.
+
+    The first version joined every appended summary into one string and asked
+    three independent questions of it. Three unrelated "housekeeping" events,
+    each carrying one token, satisfied the rule while none described the change
+    --- and the change they hid was an *upgrade*, from a record assertion to
+    ``structurally_zero_by_source_analysis``, whose warrant is that the source
+    cannot make the counter non-zero. Because that class is not a record
+    assertion, walking this gate also detached the F-10 state binding: two
+    independently remediated defects chained through one bypass.
+
+    The question is now asked of one event at a time.
+    """
+    path = "parser_execution.comparator_predictions_generated"
+    origin = "zero_because_the_activity_has_never_occurred"
+    target = "structurally_zero_by_source_analysis"
+
+    upgraded = copy.deepcopy(ledger)
+    provenance = upgraded["counter_provenance"]
+    assert path in provenance[origin]["counters"]
+    provenance[origin]["counters"].remove(path)
+    provenance[target]["counters"].append(path)
+
+    split = copy.deepcopy(upgraded)
+    base = len(split["events"])
+    split["events"].extend(
+        _correction(ledger, base + offset + 1, f"Housekeeping: glossary entry for {token}.")
+        for offset, token in enumerate((path, origin, target))
+    )
+    with pytest.raises(LedgerError, match="no single appended event"):
+        ledger_module._assert_provenance_survives_succession(
+            ledger, split, ledger_module._validate_events(split["events"])
+        )
+
+    # A single event that names all three is still accepted, so the rule
+    # narrowed rather than simply forbidding correction.
+    together = copy.deepcopy(upgraded)
+    together["events"].append(
+        _correction(
+            ledger,
+            len(together["events"]) + 1,
+            f"Reclassified {path} from {origin} to {target} after source analysis.",
+        )
+    )
+    assert (
+        ledger_module._assert_provenance_survives_succession(
+            ledger, together, ledger_module._validate_events(together["events"])
+        )
+        is None
+    )
+
+
+def test_r5_the_succession_rule_is_a_co_occurrence_test_and_says_so(ledger):
+    """The residual Audit F named is real, and is disclosed rather than closed.
+
+    An event whose prose *denies* that any reclassification is authorised still
+    satisfies the rule, because the rule tests for three strings in one summary
+    and cannot read. That is a genuine limitation. It is recorded here as a
+    characterisation test so no later reader mistakes the rule for a semantic
+    check, and it is stated in the function's own docstring.
+    """
+    path = "parser_execution.comparator_predictions_generated"
+    origin = "zero_because_the_activity_has_never_occurred"
+    target = "structurally_zero_by_source_analysis"
+
+    denying = copy.deepcopy(ledger)
+    denying["counter_provenance"][origin]["counters"].remove(path)
+    denying["counter_provenance"][target]["counters"].append(path)
+    denying["events"].append(
+        _correction(
+            ledger,
+            len(denying["events"]) + 1,
+            f"No reclassification is authorized. Glossary only: {path}; {origin}; {target}.",
+        )
+    )
+    assert (
+        ledger_module._assert_provenance_survives_succession(
+            ledger, denying, ledger_module._validate_events(denying["events"])
+        )
+        is None
+    )
+
+    doc = ledger_module._assert_provenance_survives_succession.__doc__ or ""
+    assert "not a semantic check" in doc
+    assert "co-occurrence" in doc
+
+
+def test_r5_the_never_occurred_rule_pins_the_value_when_called_directly(ledger):
+    """Audit F (F-17): the rule leaned on a rule elsewhere.
+
+    Called alone with ``sealed_input_semantic_reads = 3`` and an unchanged
+    ``successor_set_state``, this function did not object. Whole-ledger
+    validation refused the ledger, but through the class-independent zero pin in
+    ``_MUST_BE_ZERO_CLASSES`` --- so the guarantee a reader would attribute to
+    this function was supplied by a different one.
+    """
+    tampered = copy.deepcopy(ledger)
+    tampered["live_counters"]["formal_v2_evaluation_access"][
+        "sealed_input_semantic_reads"
+    ] = 3
+    with pytest.raises(LedgerError, match="never occurred"):
+        ledger_module._assert_never_occurred_agrees_with_state(tampered)
+
+
+def test_r5_whole_ledger_validation_still_reports_the_parser_rule_first(ledger):
+    """The F-17 pin must not displace the finding a reader needs first.
+
+    A ledger recording a parser invocation has violated the prohibition on
+    running a parser. That it also falsifies a provenance class is bookkeeping.
+    The value pin is therefore suppressed in whole-ledger validation, where a
+    late phase reports every class-versus-value failure, and active for a direct
+    caller, which has no ordering to preserve.
+    """
+    tampered = copy.deepcopy(ledger)
+    tampered["live_counters"]["parser_execution"][
+        "comparator_predictions_generated"
+    ] = 1
+    with pytest.raises(LedgerError, match="no parser may"):
+        validate_ledger(tampered)

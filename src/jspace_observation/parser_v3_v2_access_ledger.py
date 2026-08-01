@@ -294,7 +294,7 @@ LEDGER_KEYS: frozenset[str] = frozenset(
 #: in :data:`_REQUIRED_TOP_LEVEL`.
 COUNTER_PROVENANCE_CLASSES: tuple[str, ...] = (
     "receipt_derived_exact",
-    "azure_verified_exact",
+    "azure_transcript_exact",
     "structurally_zero_by_source_analysis",
     "zero_because_the_activity_has_never_occurred",
     "composite_of_separately_evidenced_parts",
@@ -314,7 +314,7 @@ COUNTER_PROVENANCE_CLASS_MEANING: Mapping[str, str] = {
         "the value appears as a field in a committed, schema-validated "
         "execution receipt and was copied from it"
     ),
-    "azure_verified_exact": (
+    "azure_transcript_exact": (
         "the value was observed from an Azure control-plane response that is "
         "committed to the repository"
     ),
@@ -1169,7 +1169,7 @@ def validate_ledger(
     # block would report a state-agreement failure for what is really a
     # malformed-provenance failure, which sends a reader to the wrong place.
     _validate_counter_provenance(ledger["counter_provenance"])
-    _assert_never_occurred_agrees_with_state(ledger)
+    _assert_never_occurred_agrees_with_state(ledger, check_counter_values=False)
 
     _validate_status_agreement(ledger, status)
     _validate_event_counter_support(ledger, events)
@@ -1541,7 +1541,9 @@ def _validate_counter_provenance(block: Any) -> None:
             )
 
 
-def _assert_never_occurred_agrees_with_state(ledger: Mapping[str, Any]) -> None:
+def _assert_never_occurred_agrees_with_state(
+    ledger: Mapping[str, Any], *, check_counter_values: bool = True
+) -> None:
     """Bind the "never occurred" class to the state flags it appeals to.
 
     Audit F: this class was accepted by a rule whose message said safety
@@ -1556,6 +1558,33 @@ def _assert_never_occurred_agrees_with_state(ledger: Mapping[str, Any]) -> None:
     fail together instead of drifting apart: a round that set
     ``formal_evaluation_ever_run`` to true while leaving five counters
     classified "never occurred" is refused, and so is the reverse.
+
+    Audit F (F-17) called this function alone with
+    ``sealed_input_semantic_reads = 3`` and an unchanged
+    ``successor_set_state``, and it did not object --- whole-ledger validation
+    refused the ledger, but through the separate class-independent zero pin in
+    :data:`_MUST_BE_ZERO_CLASSES`, not through here. The objection is fair: a
+    rule that leans on a rule elsewhere is one refactor away from leaning on
+    nothing. The value is now pinned here as well. The two checks are
+    deliberately redundant.
+
+    ``check_counter_values`` exists only for that redundancy, and
+    :func:`validate_ledger` passes it ``False``. Whole-ledger validation runs
+    every class-versus-value rule in one late phase, because a ledger reporting
+    a parser invocation has violated the prohibition on running a parser, and
+    that must be the finding a reader is shown --- not the bookkeeping
+    observation that the counter's provenance class is now also false. A direct
+    caller has no such ordering to preserve and gets the value check, which is
+    the case Audit F exercised.
+
+    What this establishes is narrower than the class text once implied, and the
+    ledger's own evidence string has been corrected to match. ``exists ==
+    False`` and ``formal_evaluation_ordinal == 0`` do not *prove* that no
+    sealed input was ever read; they are assertions in a committed file, and a
+    round that read one could in principle have written both. What the binding
+    establishes is that the two records cannot disagree --- falsifying the
+    counter now requires falsifying the state block in the same commit, under
+    review, rather than editing one number.
 
     This does not upgrade the class to machine evidence, and it is not
     described as one. It makes the assertion internally accountable, which is
@@ -1584,6 +1613,13 @@ def _assert_never_occurred_agrees_with_state(ledger: Mapping[str, Any]) -> None:
     for path, provenance in sorted(seen.items()):
         if provenance not in _RECORD_ASSERTION_CLASSES:
             continue
+        value = _counter_lookup(ledger.get("live_counters"), path)
+        if check_counter_values and value is not None and value != 0:
+            raise LedgerError(
+                f"counter_provenance classifies {path!r} as {provenance!r}, "
+                f"but its value is {value!r}; that class asserts the activity "
+                "never occurred, so a non-zero value falsifies it"
+            )
         binding = _NEVER_OCCURRED_STATE_BINDINGS.get(path)
         if binding is None:
             raise LedgerError(
@@ -1934,6 +1970,24 @@ def _assert_provenance_survives_succession(
     event rather than a diff nobody reads, which is the same discipline the
     event log already applies to access.
 
+    Audit E (E-26) and Audit F (F-19) both defeated the first version of this
+    rule, which joined every appended summary into one string and asked three
+    independent substring questions of it. Three unrelated "housekeeping"
+    events, each carrying one of the three tokens, satisfied it; so did a single
+    event whose prose *denied* that any reclassification was authorised. The
+    test is now asked of one event at a time, so at least one appended event
+    must carry all three tokens together.
+
+    That is a real narrowing and still not a semantic check, and this docstring
+    will not pretend otherwise. It tests for the co-occurrence of three strings
+    in one summary. It cannot tell an event that describes the change from an
+    event that mentions the same three tokens while describing something else,
+    and a determined author can satisfy it without explaining anything. What it
+    buys is that the record cannot be silent: some appended event must put the
+    counter and both class names in one sentence, where a reader auditing the
+    diff will meet them. Making this an actual semantic constraint needs a
+    reviewer, which is exactly the boundary this phase is blocked on.
+
     Dropping a counter's classification entirely is refused outright: the
     provenance block must partition the counters, so a disappearance is either
     a rename --- which ``_validate_counter_provenance`` catches --- or an
@@ -1944,9 +1998,7 @@ def _assert_provenance_survives_succession(
     after = _provenance_class_of(current)
 
     appended = next_events[len(_validate_events(previous["events"])):]
-    appended_text = " ".join(
-        str(event.get("summary", "")) for event in appended
-    )
+    appended_summaries = [str(event.get("summary", "")) for event in appended]
 
     for path, prior_class in sorted(before.items()):
         current_class = after.get(path)
@@ -1958,14 +2010,15 @@ def _assert_provenance_survives_succession(
             )
         if current_class == prior_class:
             continue
-        if not (
-            path in appended_text
-            and prior_class in appended_text
-            and current_class in appended_text
+        if not any(
+            path in summary
+            and prior_class in summary
+            and current_class in summary
+            for summary in appended_summaries
         ):
             raise LedgerError(
                 f"counter_provenance moves {path!r} from {prior_class!r} to "
-                f"{current_class!r}, but no appended event names the counter "
-                "and both classes; a change in why a number should be believed "
-                "must be recorded, not applied"
+                f"{current_class!r}, but no single appended event names the "
+                "counter and both classes together; a change in why a number "
+                "should be believed must be recorded, not applied"
             )

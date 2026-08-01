@@ -341,11 +341,11 @@ def classify_terminal_state(
 JOB_EXECUTION_INVENTORY = REPO_ROOT / "docs" / "phase1_2h_r1_job_execution_inventory.json"
 
 
-class PlatformAttestationError(BoundaryAssessmentError):
+class ExecutionTranscriptMismatchError(BoundaryAssessmentError):
     """The receipt disagrees with the committed transcript of the platform record."""
 
 
-def assert_execution_is_platform_attested(
+def assert_execution_matches_committed_transcript(
     receipt: Mapping[str, Any],
     inventory_path: Path = JOB_EXECUTION_INVENTORY,
 ) -> dict[str, Any]:
@@ -383,7 +383,7 @@ def assert_execution_is_platform_attested(
     execution = receipt.get("execution")
     provenance = receipt.get("provenance")
     if not isinstance(execution, Mapping) or not isinstance(provenance, Mapping):
-        raise PlatformAttestationError(
+        raise ExecutionTranscriptMismatchError(
             "receipt lacks the execution/provenance blocks needed to bind it to "
             "the platform record"
         )
@@ -395,7 +395,7 @@ def assert_execution_is_platform_attested(
         if entry.get("name") == name
     ]
     if not matches:
-        raise PlatformAttestationError(
+        raise ExecutionTranscriptMismatchError(
             f"execution {name!r} does not appear in the committed platform "
             f"execution inventory ({inventory_path.name}); a receipt describing "
             "an execution the platform has no record of is not evidence that a "
@@ -404,7 +404,7 @@ def assert_execution_is_platform_attested(
     entry = matches[0]
 
     if entry.get("status") != "Succeeded":
-        raise PlatformAttestationError(
+        raise ExecutionTranscriptMismatchError(
             f"execution {name!r} is recorded by the platform as "
             f"{entry.get('status')!r}, not 'Succeeded'"
         )
@@ -412,7 +412,7 @@ def assert_execution_is_platform_attested(
     claimed_image = provenance.get("image_digest")
     observed_image = entry.get("image", "")
     if not claimed_image or not observed_image.endswith(claimed_image):
-        raise PlatformAttestationError(
+        raise ExecutionTranscriptMismatchError(
             f"execution {name!r} ran an image the receipt does not claim; the "
             "receipt's image_digest must be the digest the platform recorded "
             "for that execution"
@@ -427,13 +427,13 @@ def assert_execution_is_platform_attested(
         ("--freeze-commit", provenance.get("access_protocol_freeze_commit")),
     ):
         if flag not in args:
-            raise PlatformAttestationError(
+            raise ExecutionTranscriptMismatchError(
                 f"platform record for {name!r} has no {flag} argument to check "
                 "the receipt against"
             )
         observed = args[args.index(flag) + 1]
         if observed != claimed:
-            raise PlatformAttestationError(
+            raise ExecutionTranscriptMismatchError(
                 f"{flag} disagrees: the platform recorded {observed!r}, the "
                 f"receipt claims {claimed!r}"
             )
@@ -483,7 +483,7 @@ def derive_expected_anchors(
     "invent twelve plausible numbers" to "reproduce a specific published
     digest"; it is not proof that a stream occurred. Live-stream proof would
     need an authenticated execution and output channel, which
-    :func:`assert_execution_is_platform_attested` approximates and does not
+    :func:`assert_execution_matches_committed_transcript` approximates and does not
     reach --- see its docstring for the same distinction.
     """
 
@@ -553,7 +553,7 @@ def derive_expected_anchors(
 #: ``all_sizes_match`` as ``size_mismatch_count == 0``. What they collectively
 #: establish is that the receipt is internally consistent, not that it is true.
 #: The checks that reach outside the receipt are
-#: :func:`assert_execution_is_platform_attested` and the anchor conjuncts in
+#: :func:`assert_execution_matches_committed_transcript` and the anchor conjuncts in
 #: :func:`derive_gate_outcome`.
 GATE_REQUIREMENTS: tuple[tuple[str, str, Any], ...] = (
     ("verdict", "access_gate_passed", True),
@@ -635,7 +635,7 @@ def load_gate_evidence(receipt_path: Path | None) -> dict[str, Any]:
             "receipt_sha256": None,
             "passed": False,
             "unmet_requirements": ["no receipt was supplied"],
-            "platform_attested_execution": None,
+            "transcript_matched_execution": None,
         }
 
     # Audit E (E-17): this hashed the file raw while
@@ -663,14 +663,14 @@ def load_gate_evidence(receipt_path: Path | None) -> dict[str, Any]:
 
     # Audit F (F-01). Every conjunct above is the probe's report about itself.
     # This is the one check whose evidence the probe did not author.
-    attestation = assert_execution_is_platform_attested(receipt)
+    attestation = assert_execution_matches_committed_transcript(receipt)
 
     return {
         "receipt_path": relative,
         "receipt_sha256": hashlib.sha256(raw).hexdigest(),
         "passed": passed,
         "unmet_requirements": failures,
-        "platform_attested_execution": attestation["name"],
+        "transcript_matched_execution": attestation["name"],
     }
 
 
@@ -707,8 +707,8 @@ def _assert_cited_receipt_reproduces_the_gate(evidence: Mapping[str, Any]) -> No
             f"names does not produce one: {failures}"
         )
 
-    attested = evidence.get("platform_attested_execution")
-    entry = assert_execution_is_platform_attested(receipt)
+    attested = evidence.get("transcript_matched_execution")
+    entry = assert_execution_matches_committed_transcript(receipt)
     if attested != entry["name"]:
         raise BoundaryAssessmentError(
             "the evidence block names a platform-attested execution that is "

@@ -2162,7 +2162,7 @@ strictly more evidence.
 
 **Decision.** The ledger carries a validated `counter_provenance` block
 partitioning every counter into `receipt_derived_exact`,
-`azure_verified_exact` or `operator_maintained_approximate`. Counters
+`azure_transcript_exact` or `operator_maintained_approximate`. Counters
 carrying a safety claim — the semantic-read counters, the data-plane counters,
 the parser and prediction counters — must be present and must not be classified
 as operator-maintained.

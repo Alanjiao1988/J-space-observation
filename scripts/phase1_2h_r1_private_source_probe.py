@@ -863,30 +863,52 @@ def assert_byte_source_reaches_only_the_handler(
     """Require the streamed bytes to reach the analysed handler and nothing else.
 
     Audit F (F-08) defeated :func:`assert_byte_handling_is_digest_only` without
-    touching it. A pristine ``stream_object_digest`` was left in place, passing
-    every rule; the live entrypoint was then changed to call
-    ``evil_stream_object_digest`` instead. The analysed function was clean, was
-    unique, was undecorated --- and was dead code. Byte handling was proved safe
-    for a function that never saw a byte.
+    touching it: a pristine ``stream_object_digest`` was left in place while the
+    entrypoint called a different function. That check reasons about a
+    *definition* and never about a *call site*, so this one reasons about call
+    sites.
 
-    The gap is that the earlier check reasons about a *definition* and never
-    about a *call site*. So this one reasons only about call sites, and asks two
-    questions of the whole module:
+    The first version of this function was itself an instance of the defect it
+    was written to close. It required that every name *bound by a plain
+    assignment statement* to ``.download_blob()`` be used only as the receiver
+    of ``.chunks()`` --- but nothing required the byte source to be bound that
+    way, so a downloader passed straight into a helper, or chained without ever
+    being assigned, fell outside every rule. Three working counterexamples
+    passed both byte checks while raw object bytes reached a module-level list.
+    The premise was assumed rather than established. It is now established:
 
-    1. Every ``.chunks()`` call --- the expression that yields object bytes ---
-       must appear directly as an argument to a call of
-       :data:`BYTE_HANDLING_FUNCTION` by that exact name. A chunk iterator
-       handed to anything else, stored in a variable, or wrapped in a
-       comprehension is refused, because from that point the bytes are outside
-       the analysed body.
-
-    2. Every name bound to a ``.download_blob()`` call may be used only as the
-       receiver of ``.chunks()``. Otherwise ``evil(stream)`` reaches the same
-       bytes one step earlier.
+    0. Every ``.download_blob()`` call must be the direct value of a plain
+       assignment to exactly one bare name --- no ``with`` target, walrus, tuple
+       unpack, attribute target, bare call or direct-argument chain. This makes
+       the set of stream names complete instead of assumed.
+    1. Every ``.chunks()`` call must appear directly as a positional or named
+       keyword argument to a call of :data:`BYTE_HANDLING_FUNCTION` by that
+       exact bare name. A starred unpack, a ``**`` expansion, a variable or a
+       comprehension is refused --- not because those are known to be unsafe,
+       but because this function cannot see through them.
+    2. Every ``.chunks()`` receiver must be one of those tracked names, so a
+       chunk iterator cannot be taken from an object this function never saw
+       opened.
+    3. Every tracked name may be used only as the receiver of ``.chunks()``, so
+       ``evil(stream)`` cannot reach the same bytes one step earlier.
+    4. :data:`BYTE_HANDLING_FUNCTION` must be defined exactly once here and
+       never rebound, so rule 1 constrains the function that was analysed rather
+       than a name now pointing elsewhere. A sibling check also enforces
+       uniqueness; it is repeated so this function stands on its own rather than
+       on the order of the preflight chain.
 
     And at least one such call site must exist: a module where the byte source
-    has been renamed away would otherwise pass by having nothing to check, which
-    is the failure mode this function was written to close.
+    has been renamed away would otherwise pass by having nothing to check.
+
+    The scope is one source file, and ``.chunks()`` is the only byte API
+    modelled. Audit E (E-24) is right that the Azure downloader also offers
+    ``.readall()``, ``.readinto()``, ``.content_as_bytes()``, ``.read()`` and
+    direct iteration. This function does not detect them and does not claim to.
+    What rules 0 and 3 establish instead is narrower and checkable: no object
+    this module opens is ever *named* anywhere that any other API could be
+    called on it, because the only binding form permitted is one whose every
+    later use must be ``.chunks()``. An unmodelled byte API is unreachable for
+    want of a receiver, not because it was looked for.
 
     Returns the number of call sites verified.
     """
@@ -896,6 +918,26 @@ def assert_byte_source_reaches_only_the_handler(
     path = Path(__file__).resolve() if source_path is None else Path(source_path)
     tree = ast.parse(path.read_text(encoding="utf-8"))
 
+    stream_names: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        called = node.func
+        if not (
+            isinstance(called, ast.Attribute) and called.attr == BYTE_SOURCE_OPEN_CALL
+        ):
+            continue
+        binding = _parent_of(tree, node)
+        if not isinstance(binding, ast.Assign) or len(binding.targets) != 1:
+            raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_BINDING_UNREADABLE")
+        bound = binding.targets[0]
+        if not isinstance(bound, ast.Name):
+            raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_BINDING_UNREADABLE")
+        stream_names.add(bound.id)
+
+    if not stream_names:
+        raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_NOT_FOUND")
+
     handed_to_handler: set[int] = set()
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
@@ -904,6 +946,9 @@ def assert_byte_source_reaches_only_the_handler(
             continue
         for argument in node.args:
             handed_to_handler.add(id(argument))
+        for keyword in node.keywords:
+            if keyword.arg is not None:
+                handed_to_handler.add(id(keyword.value))
 
     verified = 0
     for node in ast.walk(tree):
@@ -914,27 +959,12 @@ def assert_byte_source_reaches_only_the_handler(
             continue
         if id(node) not in handed_to_handler:
             raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_BYPASSES_HANDLER")
+        receiver = func.value
+        if not (isinstance(receiver, ast.Name) and receiver.id in stream_names):
+            raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_UNTRACKED_RECEIVER")
         verified += 1
 
     if not verified:
-        raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_NOT_FOUND")
-
-    stream_names: set[str] = set()
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
-            continue
-        called = node.value.func
-        if not (
-            isinstance(called, ast.Attribute) and called.attr == BYTE_SOURCE_OPEN_CALL
-        ):
-            continue
-        for bound in node.targets:
-            if isinstance(bound, ast.Name):
-                stream_names.add(bound.id)
-            else:
-                raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_BINDING_UNREADABLE")
-
-    if not stream_names:
         raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_NOT_FOUND")
 
     for node in ast.walk(tree):
@@ -942,12 +972,23 @@ def assert_byte_source_reaches_only_the_handler(
             continue
         if isinstance(node.ctx, ast.Store):
             continue
-        parent = _parent_of(tree, node)
+        holder = _parent_of(tree, node)
         if not (
-            isinstance(parent, ast.Attribute)
-            and parent.attr == BYTE_SOURCE_CHUNK_CALL
+            isinstance(holder, ast.Attribute)
+            and holder.attr == BYTE_SOURCE_CHUNK_CALL
         ):
             raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_ESCAPES")
+
+    definitions = 0
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if node.name == BYTE_HANDLING_FUNCTION:
+                definitions += 1
+        elif isinstance(node, ast.Name):
+            if node.id == BYTE_HANDLING_FUNCTION and isinstance(node.ctx, ast.Store):
+                raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_HANDLER_REBOUND")
+    if definitions != 1:
+        raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_SOURCE_HANDLER_REBOUND")
 
     return verified
 

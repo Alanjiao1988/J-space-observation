@@ -1785,9 +1785,210 @@ def test_f08_the_call_site_check_refuses_each_bypass(label, source, expected):
     """Every route from the object to something other than the handler.
 
     Each of these leaves ``stream_object_digest`` byte-identical to the live
-    definition, so none is caught by the definition-level check.
+    definition, so none is caught by the definition-level check --- which this
+    test now asserts rather than asserting in prose. Audit F (F-16) pointed out
+    that §7.9 claimed each route "was shown to still pass the definition-level
+    check" while no test checked it, so the claim rested on the author's word.
     """
+    path = Path(tempfile.mkdtemp()) / "candidate.py"
+    path.write_text(source, encoding="utf-8")
+    assert probe.assert_byte_handling_is_digest_only(source_path=path) == 4, label
     assert _call_site_refusal(source) == expected, label
+
+
+#: Round five. Audit E (E-24), Audit F (F-16) and a self-attack independently
+#: defeated the first version of the call-site check, which collected stream
+#: names from ``ast.Assign`` only. Every shape below leaves the handler
+#: byte-identical *and* satisfies the original three rules, while raw object
+#: bytes reach a module-level list.
+_R5_BYPASSES = (
+    (
+        "the downloader is opened as a with-target",
+        "_SINK = []\n"
+        "def _open(blob):\n"
+        "    s = blob.download_blob(max_concurrency=1)\n"
+        "    return stream_object_digest(s.chunks())\n"
+        "def _run_live(blob):\n"
+        "    with blob.download_blob(max_concurrency=1) as leaky:\n"
+        "        _SINK.append(leaky.readall())\n",
+        "BYTE_SOURCE_BINDING_UNREADABLE",
+    ),
+    (
+        "the downloader is bound by a walrus",
+        "_SINK = []\n"
+        "def _open(blob):\n"
+        "    s = blob.download_blob(max_concurrency=1)\n"
+        "    return stream_object_digest(s.chunks())\n"
+        "def _run_live(blob):\n"
+        "    if (leaky := blob.download_blob(max_concurrency=1)) is not None:\n"
+        "        _SINK.append(leaky.readall())\n",
+        "BYTE_SOURCE_BINDING_UNREADABLE",
+    ),
+    (
+        "the downloader is bound by a tuple unpack",
+        "_SINK = []\n"
+        "def _open(blob):\n"
+        "    s = blob.download_blob(max_concurrency=1)\n"
+        "    return stream_object_digest(s.chunks())\n"
+        "def _run_live(blob):\n"
+        "    leaky, _ = blob.download_blob(max_concurrency=1), 1\n"
+        "    _SINK.append(leaky.readall())\n",
+        "BYTE_SOURCE_BINDING_UNREADABLE",
+    ),
+    (
+        "the downloader is bound to an attribute",
+        "class H:\n"
+        "    def go(self, blob):\n"
+        "        self.stream = blob.download_blob(max_concurrency=1)\n"
+        "        return stream_object_digest(self.stream.chunks())\n",
+        "BYTE_SOURCE_BINDING_UNREADABLE",
+    ),
+    (
+        "the downloader is passed straight into a helper, never named",
+        "_SINK = []\n"
+        "def _open(blob):\n"
+        "    s = blob.download_blob(max_concurrency=1)\n"
+        "    return stream_object_digest(s.chunks())\n"
+        "def _tap(s2):\n"
+        "    _SINK.append(s2.readall())\n"
+        "    return stream_object_digest(s2.chunks())\n"
+        "def _run_live(blob):\n"
+        "    return _tap(blob.download_blob(max_concurrency=1))\n",
+        "BYTE_SOURCE_BINDING_UNREADABLE",
+    ),
+    (
+        "a second downloader is chained to a byte API without being named",
+        "_SINK = []\n"
+        "def _run_live(blob):\n"
+        "    _SINK.append(blob.download_blob(max_concurrency=1).readall())\n"
+        "    stream = blob.download_blob(max_concurrency=1)\n"
+        "    return stream_object_digest(stream.chunks())\n",
+        "BYTE_SOURCE_BINDING_UNREADABLE",
+    ),
+    (
+        "chunks are taken from an object this module never opened",
+        "def _open(blob):\n"
+        "    s = blob.download_blob(max_concurrency=1)\n"
+        "    return stream_object_digest(s.chunks())\n"
+        "def _run_live(other):\n"
+        "    return stream_object_digest(other.chunks())\n",
+        "BYTE_SOURCE_UNTRACKED_RECEIVER",
+    ),
+    (
+        "the downloader arrives as a parameter and escapes",
+        "_SINK = []\n"
+        "def _open(blob):\n"
+        "    s = blob.download_blob(max_concurrency=1)\n"
+        "    return stream_object_digest(s.chunks())\n"
+        "def _tap(stream):\n"
+        "    _SINK.append(stream)\n"
+        "    return stream_object_digest(stream.chunks())\n",
+        "BYTE_SOURCE_UNTRACKED_RECEIVER",
+    ),
+    (
+        "the tracked stream is iterated directly",
+        "_SINK = []\n"
+        "def _run_live(blob):\n"
+        "    stream = blob.download_blob(max_concurrency=1)\n"
+        "    for piece in stream:\n"
+        "        _SINK.append(piece)\n"
+        "    return stream_object_digest(stream.chunks())\n",
+        "BYTE_SOURCE_ESCAPES",
+    ),
+    (
+        "the handler name is rebound after its definition",
+        "_SINK = []\n"
+        "def _open(blob):\n"
+        "    s = blob.download_blob(max_concurrency=1)\n"
+        "    return stream_object_digest(s.chunks())\n"
+        "def _evil(chunks):\n"
+        "    for c in chunks:\n"
+        "        _SINK.append(c)\n"
+        "    return ('x', 0)\n"
+        "stream_object_digest = _evil\n",
+        "BYTE_SOURCE_HANDLER_REBOUND",
+    ),
+)
+
+
+@pytest.mark.parametrize(
+    ("label", "tail", "expected"),
+    _R5_BYPASSES,
+    ids=[case[0] for case in _R5_BYPASSES],
+)
+def test_r5_the_call_site_check_binds_the_byte_source_not_one_binding_form(
+    label, tail, expected
+):
+    """Audit E (E-24) and Audit F (F-16): the fix repeated the defect it closed.
+
+    The first call-site check required that every name *bound by a plain
+    assignment* to ``.download_blob()`` be used only as the receiver of
+    ``.chunks()``. Nothing required the byte source to be bound that way, so a
+    downloader opened in a ``with``, bound by walrus or tuple unpack, assigned
+    to an attribute, passed straight into a helper, or chained without ever
+    being named was outside every rule. The premise was assumed rather than
+    established --- the same shape as E-20 and F-08, introduced by the
+    remediation for F-08.
+
+    Rule 0 now *requires* the binding form instead of assuming it, so the set of
+    stream names is complete by construction rather than by hope.
+    """
+    source = _BYTE_HANDLER_BASELINE + tail
+    assert _call_site_refusal(source) == expected, label
+
+
+def test_r5_a_keyword_argument_to_the_handler_is_accepted():
+    """Audit E (E-25): refusing an idiomatic call is a defect in the other direction.
+
+    ``stream_object_digest(chunks=stream.chunks())`` hands the bytes to the
+    analysed handler and was refused only because the collector read
+    ``node.args`` and not ``node.keywords``. A check that refuses safe code
+    trains its readers to route around it.
+    """
+    path = Path(tempfile.mkdtemp()) / "kwarg.py"
+    path.write_text(
+        _BYTE_HANDLER_BASELINE
+        + "def _run_live(blob):\n"
+        "    stream = blob.download_blob(max_concurrency=1)\n"
+        "    return stream_object_digest(chunks=stream.chunks())\n",
+        encoding="utf-8",
+    )
+    assert probe.assert_byte_source_reaches_only_the_handler(source_path=path) == 1
+
+
+def test_r5_a_starred_unpack_is_still_refused():
+    """What cannot be seen through is refused, not assumed safe."""
+    source = (
+        _BYTE_HANDLER_BASELINE
+        + "def _run_live(blob):\n"
+        "    stream = blob.download_blob(max_concurrency=1)\n"
+        "    return stream_object_digest(*[stream.chunks()])\n"
+    )
+    assert _call_site_refusal(source) == "BYTE_SOURCE_BYPASSES_HANDLER"
+
+
+def test_r5_the_call_site_check_does_not_depend_on_preflight_ordering():
+    """A rule that leans on a sibling rule is one refactor from leaning on nothing.
+
+    Rebinding the handler was caught only by ``assert_byte_handling_is_digest_only``.
+    Composed in the preflight chain that was sound; as a claim about this
+    function it was not. Rule 4 makes it stand alone, and the two are now
+    deliberately redundant.
+    """
+    source = (
+        _BYTE_HANDLER_BASELINE
+        + "def _open(blob):\n"
+        "    s = blob.download_blob(max_concurrency=1)\n"
+        "    return stream_object_digest(s.chunks())\n"
+        "def _evil(chunks):\n"
+        "    return ('x', 0)\n"
+        "stream_object_digest = _evil\n"
+    )
+    assert _call_site_refusal(source) == "BYTE_SOURCE_HANDLER_REBOUND"
+    path = Path(tempfile.mkdtemp()) / "rebound.py"
+    path.write_text(source, encoding="utf-8")
+    with pytest.raises(probe.ProbeRefusal):
+        probe.assert_byte_handling_is_digest_only(source_path=path)
 
 
 def test_f08_the_call_site_check_runs_in_the_preflight_chain():

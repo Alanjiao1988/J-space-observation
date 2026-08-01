@@ -1,9 +1,9 @@
 {
   "byte_only_gate_evidence": {
     "passed": true,
-    "platform_attested_execution": "job-jspace-p12h-r1-access-gate-0fqre0m",
     "receipt_path": "docs/phase1_2h_r1_access_receipt_003.json",
     "receipt_sha256": "a2d9d0dd93a851bc5b55321a196c4bc9092f47241e38704cea5fee15e0c15f2f",
+    "transcript_matched_execution": "job-jspace-p12h-r1-access-gate-0fqre0m",
     "unmet_requirements": []
   },
   "byte_only_gate_passed": true,

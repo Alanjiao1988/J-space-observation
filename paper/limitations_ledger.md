@@ -847,14 +847,15 @@ the check was correct about what it examined and silent about whether what it
 examined was what ran.
 
 The sequence is eighteen findings, then twelve, then eight, then four from Audit
-E and eight from Audit F on the fourth review of `2acbac1`. The counts are not
+E and eight from Audit F on the fourth review of `2acbac1`, then five from Audit
+E and six from Audit F on the fifth review of `e0b1a93`. The counts are not
 falling monotonically and should not be read as convergence: each round's
 remediation has still been found defective by the next independent review, and
-no round has yet closed. The fourth round's findings are recorded in §7.7 and
-§7.9 of the round report and are remediated in the present commit, which is
-again material no audit has seen. Whether the fifth review closes is not a fact
-this document can assert in advance — the last two times a version of this
-paragraph tried, the attempt was itself cited as a finding.
+no round has yet closed. The fourth and fifth rounds' findings are recorded in
+§7.7, §7.9 and §7.10 of the round report and are remediated in the present
+commit, which is again material no audit has seen. Whether the sixth review
+closes is not a fact this document can assert in advance — the last two times a
+version of this paragraph tried, the attempt was itself cited as a finding.
 
 Two of the fourth round's findings deserve naming here because they extend the
 recurring shape rather than repeat it. Audit E (E-20) found the module-level
@@ -867,6 +868,36 @@ different function: the check certified a clean definition that was dead code.
 Both are the same defect as §7.6's — a check bound to something other than what
 runs — reached by two further routes, which is the strongest available evidence
 that the shape is systemic rather than a sequence of individual oversights.
+
+The fifth round is stronger evidence still, and in an uncomfortable direction.
+The remediation written to close F-08 **reproduced the defect F-08 identified**.
+The new call-site rule required every `.chunks()` call to be an argument to the
+handler and every downloader name to be used only as a `.chunks()` receiver, but
+it collected those names from assignment statements alone while nothing required
+a downloader to be bound by assignment. Both auditors (E-24, F-16) and an author
+self-attack independently produced modules that passed both byte checks, with an
+inspection count identical to the live handler, while every raw byte reached a
+module-level list — via a `with` target, a walrus, a tuple unpack, an attribute,
+a function parameter, or a call never bound to a name at all. The defect class
+was known by name, had been written about at length in this very section, and
+was reproduced anyway by the code written to close it. That is the fourth time a
+remediation introduced the defect it was meant to remove, and it establishes
+something the earlier three did not: naming the shape is not sufficient
+protection against it. The general remedy now applied is to *require* the
+premise a check depends on rather than assume it, and to make each rule
+self-standing rather than leaning on a sibling rule's ordering.
+
+Two further limitations of the review method itself belong here. First, the two
+fifth-round auditors did not agree with each other. On the eight disposition
+rows rewritten for the fourth round, Audit E judged none overstated and Audit F
+judged two; on the eight rows of the following section, Audit E judged two and
+Audit F judged five. Every row either auditor named has been corrected, which is
+the conservative reading, but the disagreement is recorded rather than resolved,
+because the author is the interested party. Second, three auditor processes have
+now been lost before reporting — Audit D in an earlier round, and both
+fifth-round processes, which had to be relaunched. A process that dies silently
+is indistinguishable, from the author's side, from one that found nothing, so
+the review method's own failure rate is a term in every count above.
 
 An earlier draft of this section claimed that "Audits C and D reviewed the final
 state, so the gap is narrowed rather than open". That sentence was written
