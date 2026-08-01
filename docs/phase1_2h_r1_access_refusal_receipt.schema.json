@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/docs/phase1_2h_r1_access_refusal_receipt.schema.json",
+  "title": "Phase 1.2H-R1 byte-only access gate refusal receipt",
+  "description": "The closed document a refused access-gate execution emits. It exists because the first draft of the probe printed an ad-hoc flat object on every refusal path, carried the success receipt's schema_version, and was never validated -- so the decision record's promise that 'the probe validates its own receipt against the closed schema before exit and fails closed if validation fails' held only on the success path. Independent Audit A raised this as A-09 and independent Audit B as B-08. Like the success receipt, this document is content-free: it carries no member name, no path below the registered prefix, no object bytes, no excerpt, and no free-text field of any kind. The reason and invariant vocabularies are closed for exactly that reason -- free text is where private material leaks. Progress counters are carried because a refusal raised after objects were already streamed still consumed data-plane content reads, and the append-only access ledger must record what actually happened rather than what was planned.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "phase", "refused", "execution", "progress_counters"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "phase1-2h-r1-access-refusal-receipt/v1"},
+    "phase": {"type": "string", "const": "1.2H-R1"},
+    "refused": {"type": "boolean", "const": true},
+
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "execution_id",
+        "aca_execution_name",
+        "started_at",
+        "ended_at",
+        "exit_status",
+        "reason_code",
+        "invariant"
+      ],
+      "properties": {
+        "execution_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^[A-Za-z0-9._-]+$",
+          "description": "The operator-assigned run label, or the literal 'unparsed' when the refusal occurred before argument parsing completed."
+        },
+        "aca_execution_name": {
+          "type": ["string", "null"],
+          "maxLength": 200,
+          "pattern": "^[A-Za-z0-9._-]+$",
+          "description": "The Azure Container Apps execution name as observed from the replica environment, or null when the platform did not expose it."
+        },
+        "started_at": {"type": "string", "format": "date-time"},
+        "ended_at": {"type": "string", "format": "date-time"},
+        "exit_status": {"type": "string", "const": "FAIL"},
+        "reason_code": {
+          "type": "string",
+          "description": "The same closed vocabulary as the success receipt, minus OK.",
+          "enum": [
+            "PUBLIC_NETWORK_ACCESS_NOT_DISABLED",
+            "ENDPOINT_NOT_PRIVATE",
+            "ENDPOINT_IP_MISMATCH",
+            "CREDENTIAL_TYPE_FORBIDDEN",
+            "IDENTITY_MISMATCH",
+            "ROLE_NOT_READ_ONLY",
+            "DECISION_RECORD_DIGEST_MISMATCH",
+            "EXPECTED_EVIDENCE_DIGEST_MISMATCH",
+            "MEMBERSHIP_MISMATCH",
+            "OBJECT_COUNT_MISMATCH",
+            "BYTE_TOTAL_MISMATCH",
+            "DIGEST_MISMATCH",
+            "STREAM_ERROR",
+            "RECEIPT_SCHEMA_INVALID",
+            "OVERRIDE_ATTEMPTED",
+            "FORBIDDEN_ENV_VAR",
+            "INTERNAL_REFUSAL"
+          ]
+        },
+        "invariant": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Z0-9_]+$",
+          "description": "An upper-snake token naming which frozen invariant failed. The pattern makes this field structurally incapable of carrying prose, a path, or an excerpt."
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "description": "A non-private identifier such as an environment variable NAME. Never a value. The pattern is deliberately narrow enough to exclude a secret, a URL, a path, or a sentence."
+        }
+      }
+    },
+
+    "progress_counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "What the execution had actually done at the moment it refused. The first four may legitimately be nonzero; the rest are pinned to zero, and the source-level AST checks in the probe are what make those pins honest rather than decorative.",
+      "required": [
+        "azure_data_plane_content_reads",
+        "byte_only_integrity_verifications",
+        "list_operations",
+        "azure_data_plane_writes",
+        "decode_attempts",
+        "persist_attempts",
+        "semantic_input_reads",
+        "semantic_label_reads",
+        "parser_invocations",
+        "predictions_generated"
+      ],
+      "properties": {
+        "azure_data_plane_content_reads": {"type": "integer", "minimum": 0, "maximum": 12},
+        "byte_only_integrity_verifications": {"type": "integer", "minimum": 0, "maximum": 12},
+        "list_operations": {"type": "integer", "minimum": 0, "maximum": 4},
+        "azure_data_plane_writes": {"type": "integer", "minimum": 0, "maximum": 0},
+        "decode_attempts": {"type": "integer", "minimum": 0, "maximum": 0},
+        "persist_attempts": {"type": "integer", "minimum": 0, "maximum": 0},
+        "semantic_input_reads": {"type": "integer", "minimum": 0, "maximum": 0},
+        "semantic_label_reads": {"type": "integer", "minimum": 0, "maximum": 0},
+        "parser_invocations": {"type": "integer", "minimum": 0, "maximum": 0},
+        "predictions_generated": {"type": "integer", "minimum": 0, "maximum": 0}
+      }
+    }
+  }
+}

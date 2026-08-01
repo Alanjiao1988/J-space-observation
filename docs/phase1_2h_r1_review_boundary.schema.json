@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/docs/phase1_2h_r1_review_boundary.schema.json",
+  "title": "Phase 1.2H-R1 private-review-boundary assessment",
+  "description": "The closed document produced by scripts/phase1_2h_r1_review_boundary_assessment.py. It exists because independent Audit B (B-09) found this round's terminal state rested on prose that could not be re-executed and did not name which frozen condition failed. The assessment reads only Azure control-plane facts from a committed evidence bundle: no sealed object, no private curator file, no prompt, no response, no case, no label. A QUALIFIES verdict would not be authorisation to review; it would only mean a qualifying backend exists.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "phase",
+    "observed_at",
+    "evidence_source",
+    "conditions",
+    "summary",
+    "qualification_verdict",
+    "byte_only_gate_passed",
+    "terminal_state",
+    "access_ledger_effect"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "phase1-2h-r1-review-boundary/v1"},
+    "phase": {"type": "string", "const": "1.2H-R1"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "evidence_source": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 800,
+      "description": "How the control-plane facts were captured, so the assessment can be reproduced."
+    },
+
+    "conditions": {
+      "type": "array",
+      "minItems": 13,
+      "maxItems": 13,
+      "description": "Every frozen condition, in the order it appears in the decision record. A condition is never dropped: an unassessed condition must not be able to disappear silently, because absence would read as satisfaction.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "frozen_condition", "verdict", "basis"],
+        "properties": {
+          "key": {"type": "string", "pattern": "^[a-z0-9_]+$", "maxLength": 80},
+          "frozen_condition": {"type": "string", "minLength": 1, "maxLength": 400},
+          "verdict": {
+            "type": "string",
+            "enum": ["PASS", "FAIL", "NOT_ASSESSABLE"],
+            "description": "NOT_ASSESSABLE is not a pass. It records that the property belongs to a review design that does not exist, so there is nothing to assess against."
+          },
+          "basis": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400,
+            "description": "What was observed. Never what was hoped."
+          }
+        }
+      }
+    },
+
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "passed", "failed", "not_assessable"],
+      "properties": {
+        "total": {"type": "integer", "minimum": 13, "maximum": 13},
+        "passed": {"type": "integer", "minimum": 0, "maximum": 13},
+        "failed": {"type": "integer", "minimum": 0, "maximum": 13},
+        "not_assessable": {"type": "integer", "minimum": 0, "maximum": 13}
+      }
+    },
+
+    "qualification_verdict": {
+      "type": "string",
+      "enum": ["QUALIFIES", "DOES_NOT_QUALIFY"],
+      "description": "QUALIFIES requires every condition to PASS. Any FAIL or NOT_ASSESSABLE yields DOES_NOT_QUALIFY."
+    },
+    "byte_only_gate_passed": {"type": "boolean"},
+    "terminal_state": {
+      "type": "string",
+      "enum": [
+        "BLOCKED_ON_PRIVATE_SOURCE_ACCESS",
+        "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY",
+        "READY_FOR_SEPARATELY_AUTHORISED_PRIVATE_REVIEW"
+      ],
+      "description": "Precedence, per independent Audit B (B-09): a failed byte-only gate blocks on source access, because the boundary question has not yet been reached. Only a passed gate can be followed by a boundary block."
+    },
+
+    "access_ledger_effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "What this assessment itself consumed. All pinned to zero: reading control-plane resource settings is not a semantic read, and this instrument makes no change to any resource.",
+      "required": [
+        "sealed_input_semantic_reads",
+        "sealed_label_semantic_reads",
+        "private_curator_files_read",
+        "predictions_generated",
+        "parser_invocations",
+        "azure_resource_changes"
+      ],
+      "properties": {
+        "sealed_input_semantic_reads": {"type": "integer", "minimum": 0, "maximum": 0},
+        "sealed_label_semantic_reads": {"type": "integer", "minimum": 0, "maximum": 0},
+        "private_curator_files_read": {"type": "integer", "minimum": 0, "maximum": 0},
+        "predictions_generated": {"type": "integer", "minimum": 0, "maximum": 0},
+        "parser_invocations": {"type": "integer", "minimum": 0, "maximum": 0},
+        "azure_resource_changes": {"type": "integer", "minimum": 0, "maximum": 0}
+      }
+    }
+  }
+}

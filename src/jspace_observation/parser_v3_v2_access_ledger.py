@@ -58,6 +58,7 @@ __all__ = [
     "SEMANTIC_PROJECTION_EXCLUDES",
     "COUNTER_GROUPS",
     "TERMINAL_STATES",
+    "BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE",
     "EVENT_KINDS",
     "policy_semantics_sha256",
     "validate_ledger",
@@ -95,6 +96,13 @@ SEMANTIC_PROJECTION_COUNTER_EXCLUDES: tuple[str, ...] = (
     "predictions_generated",
 )
 
+#: The cumulative ``byte_only_integrity_verifications`` a ledger must carry
+#: once the Phase 1.2H-R1 access gate has completed: the 2 verifications
+#: already on record before R1, plus the 12 authoritative objects the gate
+#: streams. It is a floor rather than an equality so that a later authorised
+#: byte-only round can add to it without this constant needing to move.
+BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE: int = 14
+
 #: Terminal states this ledger may record. They are exactly the Phase 1.2H
 #: terminal states; a ledger may not invent a state that the protocol does not
 #: define, because a novel state name is how a blocked round gets described as
@@ -104,6 +112,7 @@ TERMINAL_STATES: frozenset[str] = frozenset(
         "IN_PROGRESS",
         "SEALED_READY_FOR_PREREGISTRATION",
         "BLOCKED_ON_PRIVATE_SOURCE_ACCESS",
+        "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY",
         "BLOCKED_ON_INDEPENDENCE",
         "BLOCKED_ON_SET_REPAIR",
         "BLOCKED_ON_SEALING",
@@ -858,6 +867,38 @@ def _validate_status_agreement(ledger: Mapping[str, Any], status: str) -> None:
             f"retired-v1 semantic reads (inputs={v1_inputs}, labels={v1_labels}); "
             "a round that read the source did not block on reaching it"
         )
+
+    if status == "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY":
+        # This state was added in Phase 1.2H-R1, after independent Audit B
+        # observed that the round's own intended terminal state was not one the
+        # ledger would accept. It means something narrow and must be earned:
+        # the authoritative source WAS reached, byte-only, and the round then
+        # stopped because no qualifying private semantic-review backend exists.
+        #
+        # Precedence, per independent Audit B (B-09): if the byte-only gate
+        # fails, the correct state is BLOCKED_ON_PRIVATE_SOURCE_ACCESS. Only
+        # once the gate has passed can the boundary be the thing that blocks.
+        # Enforcing that here is what stops the more advanced-sounding state
+        # from being claimed by a round that never got that far.
+        if v1_inputs or v1_labels:
+            raise LedgerError(
+                "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY is inconsistent with "
+                f"retired-v1 semantic reads (inputs={v1_inputs}, labels={v1_labels}); "
+                "the boundary is precisely what prevents a semantic read, so a "
+                "round that performed one did not block on it"
+            )
+        verifications = counter_value(
+            ledger, "retired_v1_repair_access", "byte_only_integrity_verifications"
+        )
+        if verifications < BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE:
+            raise LedgerError(
+                "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY requires a completed "
+                "byte-only access gate over all 12 authoritative objects "
+                f"(byte_only_integrity_verifications >= "
+                f"{BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE}), got {verifications}; "
+                "a round that could not reach the source must record "
+                "BLOCKED_ON_PRIVATE_SOURCE_ACCESS instead"
+            )
 
     # Formal evaluation state is invariant for this whole phase.
     for name in ("formal_evaluations_run", "preregistrations_completed"):

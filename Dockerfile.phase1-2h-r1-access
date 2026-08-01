@@ -65,6 +65,7 @@ COPY scripts/phase1_2h_r1_private_source_probe.py \
      /workspace/scripts/
 COPY docs/phase1_2h_r1_access_decision_record.json \
      docs/phase1_2h_r1_access_receipt.schema.json \
+     docs/phase1_2h_r1_access_refusal_receipt.schema.json \
      /workspace/docs/
 COPY artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/02_records.jsonl \
      /workspace/artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/
@@ -79,9 +80,9 @@ import hashlib, json, pathlib, sys; \
 root = pathlib.Path('/workspace'); \
 manifest = json.loads((root / 'infra/azure/phase1_2h_r1_image_payload.json').read_text(encoding='utf-8')); \
 entries = manifest['payload']; \
-assert len(entries) == 5, 'unexpected payload size'; \
+assert len(entries) == 6, 'unexpected payload size'; \
 bad = [e['path'] for e in entries if hashlib.sha256((root / e['path']).read_bytes().replace(b'\r\n', b'\n').replace(b'\r', b'\n')).hexdigest() != e['sha256']]; \
-sys.exit('payload digest mismatch: ' + repr(bad)) if bad else print('payload digests verified: 5/5')" \
+sys.exit('payload digest mismatch: ' + repr(bad)) if bad else print('payload digests verified: 6/6')" \
     && /usr/local/bin/python3.11 -I -m py_compile \
        /workspace/scripts/phase1_2h_r1_private_source_probe.py \
        /workspace/scripts/phase1_2h_r1_receipt_validator.py

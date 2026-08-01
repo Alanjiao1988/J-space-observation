@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import ast
 import copy
+import hashlib
 import importlib.util
 import json
 import sys
@@ -28,8 +29,17 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
 DECISION_RECORD = ROOT / "docs" / "phase1_2h_r1_access_decision_record.json"
 RECEIPT_SCHEMA = ROOT / "docs" / "phase1_2h_r1_access_receipt.schema.json"
+REFUSAL_SCHEMA = ROOT / "docs" / "phase1_2h_r1_access_refusal_receipt.schema.json"
 PROBE_PATH = SCRIPTS / "phase1_2h_r1_private_source_probe.py"
 VALIDATOR_PATH = SCRIPTS / "phase1_2h_r1_receipt_validator.py"
+
+#: The designated read-only identity, as frozen in the decision record. It is a
+#: public Azure resource identifier, not a credential. Tests read it from the
+#: record rather than restating it, so a record edit cannot silently diverge
+#: from what the tests assert.
+DESIGNATED_CLIENT_ID = json.loads(DECISION_RECORD.read_text(encoding="utf-8"))[
+    "identity_rule"
+]["designated_identity"]["client_id"]
 
 
 def _load(path: Path, name: str):
@@ -199,24 +209,95 @@ def test_an_environment_refusal_names_the_variable_but_never_its_value():
 
 def test_a_refusal_receipt_carries_the_detail_without_the_value():
     args = probe._parse_args(
-        ["--client-id", "x", "--execution-id", "e", "--freeze-commit", "c", "--image-digest", "d"]
+        ["--client-id", DESIGNATED_CLIENT_ID, "--execution-id", "e", "--freeze-commit", "c", "--image-digest", "d"]
     )
     refusal = probe.ProbeRefusal(
         "CREDENTIAL_TYPE_FORBIDDEN", "FORBIDDEN_ENV_VAR", "AZURE_CLIENT_SECRET"
     )
     receipt = probe._refusal_receipt(refusal, "2026-01-01T00:00:00Z", args)
-    assert receipt["detail"] == "AZURE_CLIENT_SECRET"
+    assert receipt["execution"]["detail"] == "AZURE_CLIENT_SECRET"
     assert receipt["refused"] is True
+    # The refusal receipt is now a closed, schema-validated document. Its
+    # first draft was an ad-hoc flat object that carried the success receipt's
+    # schema_version and was never validated -- independent Audit A (A-09) and
+    # independent Audit B (B-08).
+    validator.validate_receipt(receipt, REFUSAL_SCHEMA)
+
+
+def test_the_refusal_receipt_schema_is_closed_everywhere():
+    validator.load_schema(REFUSAL_SCHEMA)
+
+
+def test_a_refusal_receipt_cannot_carry_prose():
+    # The invariant and detail patterns are what make this document
+    # structurally incapable of being a content channel.
+    receipt = probe._refusal_receipt(
+        probe.ProbeRefusal("INTERNAL_REFUSAL", "X"), "2026-01-01T00:00:00Z", None
+    )
+    receipt["execution"]["invariant"] = "case_0007 span=Yes offset=412"
+    with pytest.raises(validator.ReceiptValidationError):
+        validator.validate_receipt(receipt, REFUSAL_SCHEMA)
+
+
+def test_a_refusal_before_argument_parsing_still_emits_a_valid_receipt():
+    receipt = probe._refusal_receipt(
+        probe.ProbeRefusal("INTERNAL_REFUSAL", "ARGUMENT_PARSE_FAILED"),
+        "2026-01-01T00:00:00Z",
+        None,
+    )
+    assert receipt["execution"]["execution_id"] == "unparsed"
+    validator.validate_receipt(receipt, REFUSAL_SCHEMA)
+
+
+def test_a_bad_argument_produces_a_receipt_not_a_usage_message(capsys):
+    # argparse exits 2 with usage text on stderr, which is indistinguishable
+    # by exit code from a genuine refusal and carries no receipt at all.
+    code = probe.main(["--not-a-real-flag"])
+    captured = capsys.readouterr()
+    emitted = json.loads(captured.out.strip().splitlines()[-1])
+    assert code == 2
+    assert emitted["execution"]["invariant"] == "ARGUMENT_PARSE_FAILED"
+    validator.validate_receipt(emitted, REFUSAL_SCHEMA)
+
+
+def test_a_refusal_after_partial_streaming_reports_the_reads_it_performed():
+    # A refusal raised after objects were already streamed must still report
+    # how many data-plane content reads occurred, or the append-only access
+    # ledger cannot record what actually happened. Independent Audit B (B-08).
+    probe._reset_progress()
+    try:
+        probe.PROGRESS["azure_data_plane_content_reads"] = 7
+        probe.PROGRESS["list_operations"] = 1
+        receipt = probe._refusal_receipt(
+            probe.ProbeRefusal("DIGEST_MISMATCH", "OBJECT_DIGEST"),
+            "2026-01-01T00:00:00Z",
+            None,
+        )
+    finally:
+        probe._reset_progress()
+    assert receipt["progress_counters"]["azure_data_plane_content_reads"] == 7
+    assert receipt["progress_counters"]["list_operations"] == 1
+    assert receipt["progress_counters"]["semantic_input_reads"] == 0
+    validator.validate_receipt(receipt, REFUSAL_SCHEMA)
+
+
+def test_a_refusal_receipt_cannot_report_a_semantic_read():
+    receipt = probe._refusal_receipt(
+        probe.ProbeRefusal("INTERNAL_REFUSAL", "X"), "2026-01-01T00:00:00Z", None
+    )
+    receipt["progress_counters"]["semantic_input_reads"] = 1
+    with pytest.raises(validator.ReceiptValidationError):
+        validator.validate_receipt(receipt, REFUSAL_SCHEMA)
 
 
 def test_a_refusal_without_detail_omits_the_field():
     args = probe._parse_args(
-        ["--client-id", "x", "--execution-id", "e", "--freeze-commit", "c", "--image-digest", "d"]
+        ["--client-id", DESIGNATED_CLIENT_ID, "--execution-id", "e", "--freeze-commit", "c", "--image-digest", "d"]
     )
     receipt = probe._refusal_receipt(
         probe.ProbeRefusal("MEMBER_SET_MISMATCH", "MEMBER_SET"), "2026-01-01T00:00:00Z", args
     )
-    assert "detail" not in receipt
+    assert "detail" not in receipt["execution"]
 
 
 @pytest.mark.parametrize(
@@ -240,15 +321,49 @@ def test_ordinary_sdk_logging_is_allowed():
 
 
 def test_the_designated_managed_identity_is_accepted(record):
-    block = probe.check_identity(record, "a-client-id", "ManagedIdentityCredential")
-    assert block["effective_read_only_verdict"] == "READ_ONLY_CONFIRMED"
+    block = probe.check_identity(record, DESIGNATED_CLIENT_ID, "ManagedIdentityCredential")
+    # NOT "READ_ONLY_CONFIRMED". The probe holds no permission to read role
+    # assignments, so it cannot confirm read-only from inside the job.
+    # Independent Audit A (A-02) found the previous unconditional
+    # READ_ONLY_CONFIRMED was asserted on the basis of no check at all.
+    assert block["effective_read_only_verdict"] == "NOT_CONFIRMED_IN_JOB"
     assert block["forbidden_credential_types_absent"] is True
+
+
+def test_an_undesignated_client_id_is_refused(record):
+    # The concrete risk: id-jspace-aca-acrpull-sea is write-capable and exists
+    # in the same subscription. A receipt must be able to tell them apart.
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.check_identity(
+            record, "11111111-2222-3333-4444-555555555555", "ManagedIdentityCredential"
+        )
+    assert exc.value.reason_code == "IDENTITY_MISMATCH"
+    assert exc.value.invariant == "CLIENT_ID_NOT_DESIGNATED"
+
+
+def test_an_identity_refusal_carries_neither_the_supplied_nor_expected_id(record):
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.check_identity(
+            record, "11111111-2222-3333-4444-555555555555", "ManagedIdentityCredential"
+        )
+    rendered = str(exc.value)
+    assert "11111111" not in rendered
+    assert DESIGNATED_CLIENT_ID not in rendered
+
+
+def test_a_record_without_a_designated_client_id_is_refused(mutable_record):
+    del mutable_record["identity_rule"]["designated_identity"]["client_id"]
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.check_identity(
+            mutable_record, DESIGNATED_CLIENT_ID, "ManagedIdentityCredential"
+        )
+    assert exc.value.invariant == "DESIGNATED_CLIENT_ID_ABSENT"
 
 
 @pytest.mark.parametrize("bad", ["DefaultAzureCredential", "AzureCliCredential", "ClientSecretCredential"])
 def test_a_forbidden_credential_type_is_refused(record, bad):
     with pytest.raises(probe.ProbeRefusal) as exc:
-        probe.check_identity(record, "a-client-id", bad)
+        probe.check_identity(record, DESIGNATED_CLIENT_ID, bad)
     assert exc.value.reason_code == "CREDENTIAL_TYPE_FORBIDDEN"
 
 
@@ -284,27 +399,68 @@ def test_a_freeze_that_forbids_something_the_probe_ignores_is_refused(mutable_re
 
 
 def test_the_registered_private_endpoint_is_accepted(record):
-    block = probe.check_endpoint(record, "Disabled", "10.80.2.4")
+    block = probe.check_endpoint(record, "Unknown", "10.80.2.4")
     assert block["resolved_matches_expected_private_ip"] is True
     assert block["privatelink_path_confirmed"] is True
 
 
 def test_a_public_storage_endpoint_is_refused(record):
+    # "Enabled" is not an in-job observation either; the probe refuses any
+    # value other than "Unknown" because publicNetworkAccess is a control-plane
+    # property it holds no role to read. Independent Audit A (A-03) found the
+    # previous call site passed a literal "Disabled", making the check
+    # tautological while the receipt presented it as observed.
     with pytest.raises(probe.ProbeRefusal) as exc:
         probe.check_endpoint(record, "Enabled", "10.80.2.4")
-    assert exc.value.reason_code == "PUBLIC_NETWORK_ACCESS_NOT_DISABLED"
+    assert exc.value.invariant == "PNA_NOT_OBSERVABLE_IN_JOB"
+
+
+def test_a_literal_disabled_is_refused_rather_than_echoed(record):
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.check_endpoint(record, "Disabled", "10.80.2.4")
+    assert exc.value.invariant == "PNA_NOT_OBSERVABLE_IN_JOB"
+
+
+def test_the_receipt_records_who_observed_public_network_access(record):
+    block = probe.check_endpoint(record, "Unknown", "10.80.2.4")
+    assert block["public_network_access"] == "Unknown"
+    assert block["public_network_access_observed_by"] == (
+        "operator_control_plane_read_before_run"
+    )
+
+
+def test_a_second_resolved_address_defeats_the_only_claim(record):
+    # resolved_ip_matches_only asserts the expected address is the ONLY one.
+    # gethostbyname returns a single address and cannot establish that, which
+    # independent Audit A raised as A-12.
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.check_endpoint(record, "Unknown", ["10.80.2.4", "10.80.2.9"])
+    assert exc.value.reason_code == "ENDPOINT_IP_MISMATCH"
+
+
+def test_an_empty_resolution_is_refused(record):
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.check_endpoint(record, "Unknown", [])
+    assert exc.value.invariant == "NO_ADDRESS_RESOLVED"
+
+
+def test_resolve_endpoint_returns_the_full_address_set():
+    resolved = probe.resolve_endpoint(
+        "example.invalid", resolver=lambda _: ["10.0.0.2", "10.0.0.1", "10.0.0.1"]
+    )
+    assert resolved == ["10.0.0.1", "10.0.0.2"]
 
 
 def test_a_public_ip_is_refused(record):
     with pytest.raises(probe.ProbeRefusal) as exc:
-        probe.check_endpoint(record, "Disabled", "20.43.121.10")
+        probe.check_endpoint(record, "Unknown", "20.43.121.10")
     assert exc.value.reason_code == "ENDPOINT_NOT_PRIVATE"
     assert exc.value.invariant == "PUBLIC_ADDRESS"
 
 
 def test_a_private_ip_outside_the_project_vnet_is_refused(record):
     with pytest.raises(probe.ProbeRefusal) as exc:
-        probe.check_endpoint(record, "Disabled", "192.168.4.4")
+        probe.check_endpoint(record, "Unknown", "192.168.4.4")
     assert exc.value.invariant == "ADDRESS_OUTSIDE_PROJECT_VNET"
 
 
@@ -312,13 +468,13 @@ def test_an_unregistered_address_inside_the_vnet_is_still_refused(record):
     # Being inside 10.80.0.0/16 is not enough. A different private endpoint in
     # the same VNet is a different endpoint.
     with pytest.raises(probe.ProbeRefusal) as exc:
-        probe.check_endpoint(record, "Disabled", "10.80.2.5")
+        probe.check_endpoint(record, "Unknown", "10.80.2.5")
     assert exc.value.reason_code == "ENDPOINT_IP_MISMATCH"
 
 
 def test_an_endpoint_refusal_does_not_carry_the_observed_address(record):
     with pytest.raises(probe.ProbeRefusal) as exc:
-        probe.check_endpoint(record, "Disabled", "10.80.9.99")
+        probe.check_endpoint(record, "Unknown", "10.80.9.99")
     assert "10.80.9.99" not in str(exc.value)
 
 
@@ -482,9 +638,187 @@ def test_the_probe_never_decodes_streamed_bytes():
 def test_the_probe_does_not_import_the_package_that_eagerly_loads_the_parser():
     # jspace_observation/__init__ imports the legacy parser eagerly. The probe
     # must not pull parser code into the one process that touches sealed bytes.
-    source = PROBE_PATH.read_text(encoding="utf-8")
-    assert "jspace_observation" not in source
-    assert "import jspace_observation" not in source
+    #
+    # This was previously a substring search for "jspace_observation" in the
+    # source text, which independent Audit B (B-06) correctly called out: a
+    # string search proves nothing about imports, cannot see a deferred import
+    # inside a function, and breaks the moment the module legitimately *names*
+    # the package in a denylist. The check is now structural.
+    tree = ast.parse(PROBE_PATH.read_text(encoding="utf-8"))
+    forbidden_roots = {"jspace_observation", "torch", "transformers"}
+    imported: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                imported.add(alias.name.split(".")[0])
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                # A relative import would resolve through the package __init__,
+                # which is exactly the eager-parser path being excluded.
+                imported.add("<relative>")
+            imported.add((node.module or "").split(".")[0])
+    assert not (imported & forbidden_roots), sorted(imported & forbidden_roots)
+    assert "<relative>" not in imported
+
+
+def test_the_probe_refuses_a_source_that_imports_the_eager_parser_package(tmp_path):
+    # The structural check above describes the probe as it is. This one proves
+    # the probe would refuse to run if a future edit added such an import,
+    # which is the property that keeps the claim true over time.
+    bad = tmp_path / "bad.py"
+    bad.write_text("import jspace_observation\n", encoding="utf-8")
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.assert_no_write_calls_in_source(bad)
+    assert exc.value.invariant == "FORBIDDEN_IMPORT_IN_SOURCE"
+
+
+# --- Evasions closed after independent Audit A finding A-06 -----------------
+
+
+def test_a_write_method_reached_through_a_string_constant_is_refused(tmp_path):
+    # getattr(client, "upload_blob") has no Attribute node naming the method,
+    # so an AST check that looks only at attributes and imports passes it.
+    bad = tmp_path / "bad.py"
+    bad.write_text(
+        "def go(client):\n    return getattr(client, 'upload_blob')(b'x')\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.assert_no_write_calls_in_source(bad)
+    assert exc.value.invariant == "DYNAMIC_WRITE_NAME_IN_SOURCE"
+
+
+def test_an_aliased_module_import_of_a_forbidden_credential_is_refused(tmp_path):
+    # import azure.identity as ai; ai.DefaultAzureCredential() has no
+    # ImportFrom node, so checking only ImportFrom passes it.
+    bad = tmp_path / "bad.py"
+    bad.write_text(
+        "import azure.identity as ai\n\n\ndef go():\n    return ai.DefaultAzureCredential()\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.assert_no_write_calls_in_source(bad)
+    assert exc.value.invariant == "WRITE_CALL_IN_SOURCE"
+
+
+@pytest.mark.parametrize("call", ["eval", "exec", "compile", "__import__"])
+def test_a_dynamic_access_builtin_is_refused(tmp_path, call):
+    bad = tmp_path / "bad.py"
+    bad.write_text(f"def go(s):\n    return {call}(s)\n", encoding="utf-8")
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.assert_no_write_calls_in_source(bad)
+    assert exc.value.invariant == "WRITE_CALL_IN_SOURCE"
+
+
+@pytest.mark.parametrize("method", ["decode", "b64encode", "hexlify"])
+def test_a_decode_of_object_bytes_is_refused_at_source_level(tmp_path, method):
+    # This is what makes the pinned decode_attempts counter mean something.
+    # Independent Audit A (A-04) observed that the counter was a hardcoded
+    # literal and the schema constrained only what could be reported.
+    bad = tmp_path / "bad.py"
+    bad.write_text(f"def go(chunk):\n    return chunk.{method}()\n", encoding="utf-8")
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.assert_no_write_calls_in_source(bad)
+    assert exc.value.invariant == "WRITE_CALL_IN_SOURCE"
+
+
+@pytest.mark.parametrize("method", ["write_text", "write_bytes", "writelines"])
+def test_a_persistence_call_is_refused_at_source_level(tmp_path, method):
+    # Likewise for persist_attempts.
+    bad = tmp_path / "bad.py"
+    bad.write_text(f"def go(p, chunk):\n    return p.{method}(chunk)\n", encoding="utf-8")
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.assert_no_write_calls_in_source(bad)
+    assert exc.value.invariant == "WRITE_CALL_IN_SOURCE"
+
+
+@pytest.mark.parametrize("root", ["pickle", "subprocess", "shutil", "urllib", "requests"])
+def test_a_persistence_or_exfiltration_import_is_refused(tmp_path, root):
+    bad = tmp_path / "bad.py"
+    bad.write_text(f"import {root}\n", encoding="utf-8")
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.assert_no_write_calls_in_source(bad)
+    assert exc.value.invariant == "FORBIDDEN_IMPORT_IN_SOURCE"
+
+
+def test_the_probe_does_not_refuse_itself():
+    # The FORBIDDEN_* tuples necessarily contain the very names being
+    # forbidden. If the declaration carve-out were wrong, the probe would
+    # refuse every run -- a self-defeating check rather than a safe one.
+    assert probe.assert_no_write_calls_in_source() > 1000
+
+
+# --- Image payload completeness (independent Audit B, B-06) -----------------
+
+DOCKERFILE = ROOT / "Dockerfile.phase1-2h-r1-access"
+PAYLOAD_MANIFEST = ROOT / "infra" / "azure" / "phase1_2h_r1_image_payload.json"
+
+#: Files the Dockerfile copies that are deliberately not digest-pinned payload:
+#: the pip requirements closure (already hash-pinned by pip itself via
+#: --require-hashes) and the manifest, which cannot contain its own digest.
+NON_PAYLOAD_COPIES = {
+    "requirements-parser-v2-eval.txt",
+    "infra/azure/phase1_2h_r1_image_payload.json",
+}
+
+
+def _dockerfile_copy_sources() -> set[str]:
+    """Every source path the Dockerfile copies into the image."""
+
+    text = DOCKERFILE.read_text(encoding="utf-8")
+    # Join backslash continuations so a multi-line COPY is one logical line.
+    text = text.replace("\\\n", " ")
+    sources: set[str] = set()
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped.upper().startswith("COPY "):
+            continue
+        parts = stripped.split()[1:]
+        # The last token is the destination.
+        sources.update(parts[:-1])
+    return sources
+
+
+def test_the_dockerfile_copies_exactly_the_manifested_payload():
+    # A Dockerfile addition could otherwise bake in a parser module, an
+    # evaluator source, or private material without failing any check, because
+    # the manifest verifies the files it lists rather than the files present.
+    manifest = json.loads(PAYLOAD_MANIFEST.read_text(encoding="utf-8"))
+    manifested = {entry["path"] for entry in manifest["payload"]}
+    copied = _dockerfile_copy_sources()
+    assert copied == manifested | NON_PAYLOAD_COPIES, {
+        "copied_but_not_manifested": sorted(copied - manifested - NON_PAYLOAD_COPIES),
+        "manifested_but_not_copied": sorted(manifested - copied),
+    }
+
+
+def test_no_parser_bearing_path_is_copied_into_the_image():
+    parser_names = (
+        "eval_parsing.py",
+        "eval_parsing_v2.py",
+        "eval_parsing_v3.py",
+        "src/jspace_observation",
+    )
+    copied = " ".join(sorted(_dockerfile_copy_sources()))
+    for name in parser_names:
+        assert name not in copied
+
+
+def test_every_runtime_schema_the_probe_reads_is_in_the_payload():
+    # The probe reads both receipt schemas at runtime. A schema that is not
+    # baked into the image turns a refusal path into a crash.
+    manifest = json.loads(PAYLOAD_MANIFEST.read_text(encoding="utf-8"))
+    manifested = {entry["path"] for entry in manifest["payload"]}
+    for schema in (RECEIPT_SCHEMA, REFUSAL_SCHEMA, DECISION_RECORD):
+        assert schema.relative_to(ROOT).as_posix() in manifested
+
+
+def test_the_payload_manifest_is_current():
+    manifest = json.loads(PAYLOAD_MANIFEST.read_text(encoding="utf-8"))
+    for entry in manifest["payload"]:
+        raw = (ROOT / entry["path"]).read_bytes()
+        lf = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        assert hashlib.sha256(lf).hexdigest() == entry["sha256"], entry["path"]
 
 
 def test_the_receipt_validator_imports_only_the_standard_library():
@@ -515,9 +849,9 @@ def receipt(record, expected) -> dict:
         decision_record_sha256="c" * 64,
         probe_source_sha256="d" * 64,
         identity_block=probe.check_identity(
-            record, "11111111-2222-3333-4444-555555555555", "ManagedIdentityCredential"
+            record, DESIGNATED_CLIENT_ID, "ManagedIdentityCredential"
         ),
-        endpoint_block=probe.check_endpoint(record, "Disabled", "10.80.2.4"),
+        endpoint_block=probe.check_endpoint(record, "Unknown", "10.80.2.4"),
         membership_block=probe.compare_membership(record, expected, names),
         streaming_block=probe.verify_streamed(expected, list(expected)),
         list_operations=1,

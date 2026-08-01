@@ -1,0 +1,35 @@
+{
+  "observed_at": "2026-08-01T06:10:00Z",
+  "evidence_source": "az control-plane reads, subscription 943bacdf-8b6e-4e3a-8126-a149f623d32e: 'az resource list -g rg-jspace-observation-sea --query [].type', 'az cognitiveservices account list', 'az cognitiveservices account show -n aj-gpt56-25-943b-southeastasia -g gpt56-sol-2025-rg', 'az network vnet subnet show --name snet-aca-jspace-sea-v2', 'az network nsg show'. Read-only; no resource was created, modified or deleted.",
+  "note": "Control-plane facts only. This bundle contains no sealed object, no private curator file, no prompt, no response, no case and no label. Every value is an Azure resource setting.",
+
+  "project_resource_group": {
+    "name": "rg-jspace-observation-sea",
+    "cognitive_services_account_count": 0,
+    "machine_learning_workspace_count": 0,
+    "comment": "The decisive observation. The project resource group contains no semantic-review endpoint of any kind, so there is nothing in the project boundary that a reviewer could call."
+  },
+
+  "candidate_reviewer_endpoints": [
+    {
+      "name": "aj-gpt56-25-943b-southeastasia",
+      "resource_group": "gpt56-sol-2025-rg",
+      "kind": "Microsoft.CognitiveServices/accounts",
+      "location": "southeastasia",
+      "public_network_access": "Enabled",
+      "network_default_action": "Allow",
+      "private_endpoint_count": 0,
+      "in_project_resource_group": false,
+      "comment": "The only AI account in the region on this subscription. It belongs to an unrelated project, accepts traffic from the public Internet, applies no network ACL, and has no private endpoint. It is explicitly non-qualifying under the frozen requirements."
+    }
+  ],
+
+  "worker_egress": {
+    "subnet": "snet-aca-jspace-sea-v2",
+    "vnet": "vnet-jspace-observation-sea",
+    "route_table": null,
+    "nat_gateway": null,
+    "restrictive_nsg_outbound_rules": [],
+    "comment": "With no route table and no custom outbound NSG rule, the platform default AllowInternetOutBound applies, so a worker holding private material would have unrestricted Internet egress. The environment cae-jspace-observation-sea-vnet2 is a workload-profiles environment, so a user-defined route IS supported here -- it simply is not attached. The gap is configuration, not capability."
+  }
+}

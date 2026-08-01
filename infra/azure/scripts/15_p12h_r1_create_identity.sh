@@ -96,13 +96,26 @@ assign_role "${ROLE_BLOB_DATA_READER}" "${CONTAINER_SCOPE}" "Storage Blob Data R
 # --- 4. Prove the identity holds nothing else -------------------------------
 
 log "enumerating every role assignment held by this principal"
-ASSIGNMENTS="$(az role assignment list --assignee "${PRINCIPAL_ID}" --all \
-    --query "[].{role:roleDefinitionName, scope:scope}" --output json)"
+# Azure RBAC reads are eventually consistent. Listing immediately after
+# creating the assignments can legitimately return 0 or 1, so a bare check
+# would fail a correct run. Retry until the expected count appears, and only
+# then apply the strict equality test. Independent Audit A raised this as A-14.
+ASSIGNMENTS=""
+COUNT="0"
+for attempt in $(seq 1 24); do
+    ASSIGNMENTS="$(az role assignment list --assignee "${PRINCIPAL_ID}" --all \
+        --query "[].{role:roleDefinitionName, scope:scope}" --output json)"
+    COUNT="$(printf '%s' "${ASSIGNMENTS}" | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))')"
+    if [[ "${COUNT}" == "2" ]]; then
+        break
+    fi
+    log "role assignments not yet consistent (found ${COUNT}, attempt ${attempt}/24); waiting 5s"
+    sleep 5
+done
 printf '%s\n' "${ASSIGNMENTS}"
 
-COUNT="$(printf '%s' "${ASSIGNMENTS}" | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))')"
 if [[ "${COUNT}" != "2" ]]; then
-    fail "expected exactly 2 role assignments, found ${COUNT}. Refusing to proceed: an identity with more authority than the freeze describes cannot be used to make a least-privilege claim."
+    fail "expected exactly 2 role assignments, found ${COUNT} after ~120s of RBAC propagation. Refusing to proceed: an identity with more authority than the freeze describes cannot be used to make a least-privilege claim, and an identity with less cannot read the source."
 fi
 
 WRITE_CAPABLE="$(printf '%s' "${ASSIGNMENTS}" | python3 -c '

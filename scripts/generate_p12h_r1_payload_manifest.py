@@ -32,6 +32,11 @@ PAYLOAD = (
     "scripts/phase1_2h_r1_receipt_validator.py",
     "docs/phase1_2h_r1_access_decision_record.json",
     "docs/phase1_2h_r1_access_receipt.schema.json",
+    # Added after independent Audit A (A-09) and Audit B (B-08): the probe now
+    # validates its refusal receipts too, so the refusal schema is read at
+    # runtime. Without it in the image, every refusal path would crash instead
+    # of emitting the content-free document the refusal contract promises.
+    "docs/phase1_2h_r1_access_refusal_receipt.schema.json",
     "artifacts/phase1-evaluator-validation/track-d1/"
     "20260725T160340Z-track-d1-parser-v3-seal/02_records.jsonl",
 )

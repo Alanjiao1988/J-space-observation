@@ -48,8 +48,25 @@ from typing import Any, Iterable
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DECISION_RECORD = REPO_ROOT / "docs" / "phase1_2h_r1_access_decision_record.json"
 RECEIPT_SCHEMA = REPO_ROOT / "docs" / "phase1_2h_r1_access_receipt.schema.json"
+REFUSAL_SCHEMA = REPO_ROOT / "docs" / "phase1_2h_r1_access_refusal_receipt.schema.json"
 
 RECEIPT_SCHEMA_VERSION = "phase1-2h-r1-access-receipt/v1"
+REFUSAL_SCHEMA_VERSION = "phase1-2h-r1-access-refusal-receipt/v1"
+
+# Real progress, not a literal. A refusal raised after objects were already
+# streamed must still report how many data-plane content reads occurred, or the
+# append-only access ledger cannot be updated accurately. Independent Audit B
+# raised this as B-08.
+PROGRESS: dict[str, int] = {
+    "azure_data_plane_content_reads": 0,
+    "byte_only_integrity_verifications": 0,
+    "list_operations": 0,
+}
+
+
+def _reset_progress() -> None:
+    for key in PROGRESS:
+        PROGRESS[key] = 0
 DECISION_RECORD_SCHEMA_VERSION = "phase1-2h-r1-access-decision-record/v1"
 
 # Blob SDK symbols that mutate, lease or re-tier an object. None of these may be
@@ -135,6 +152,54 @@ FORBIDDEN_ENV_VARS = (
 
 CHUNK_BYTES = 262144
 
+# Names whose presence in this file would falsify the pinned decode_attempts
+# counter. A decode turns authoritative bytes into text, which is the first
+# step of a semantic read.
+FORBIDDEN_DECODE_METHODS = (
+    "decode",
+    "decodebytes",
+    "b64decode",
+    "b64encode",
+    "hexlify",
+    "unhexlify",
+)
+
+# Names whose presence in this file would falsify the pinned persist_attempts
+# counter, or would let object bytes reach a file or another process.
+FORBIDDEN_PERSIST_METHODS = (
+    "write_text",
+    "write_bytes",
+    "writelines",
+    "mkstemp",
+    "NamedTemporaryFile",
+)
+
+# Static analysis cannot follow a computed name. Rather than pretend otherwise,
+# the constructs that would defeat it are refused outright. Note the honest
+# residual: a name assembled by string concatenation is not defeated by this
+# check, and this module does not claim it is.
+FORBIDDEN_DYNAMIC_ACCESS = ("eval", "exec", "compile", "__import__")
+
+# Import roots that would give this file a persistence, exfiltration, or
+# parser capability it must not have.
+FORBIDDEN_IMPORT_ROOTS = (
+    "pickle",
+    "shelve",
+    "marshal",
+    "subprocess",
+    "shutil",
+    "smtplib",
+    "ftplib",
+    "urllib",
+    "requests",
+    "httpx",
+    "xmlrpc",
+    "tempfile",
+    "jspace_observation",
+    "torch",
+    "transformers",
+)
+
 
 class ProbeRefusal(Exception):
     """A frozen invariant was violated. Carries a closed-vocabulary reason.
@@ -216,7 +281,13 @@ def expected_members(record: dict[str, Any], repo_root: Path = REPO_ROOT) -> lis
             continue
         row = json.loads(line)
         evaluation = row.get("evaluation")
-        if not isinstance(evaluation, dict) or "order" not in evaluation:
+        if not isinstance(evaluation, dict):
+            continue
+        order = evaluation.get("order")
+        # The freeze selects rows whose evaluation.order is an integer. Accept
+        # exactly that. `isinstance(order, int)` would also admit bool, which is
+        # an int subclass in Python; `type(order) is int` is the frozen rule.
+        if type(order) is not int:
             continue
         members.append(
             (str(row["source_item_id"]), int(evaluation["bytes"]), str(row["input_hash"]))
@@ -286,7 +357,9 @@ def assert_no_forbidden_symbols(namespace: dict[str, Any] | None = None) -> None
 
 
 def assert_no_write_calls_in_source(source_path: Path | None = None) -> int:
-    """Refuse if this module's own source references a mutating Blob operation.
+    """Refuse if this module's own source references a mutating Blob operation,
+    a forbidden credential, a dynamic-access escape hatch, a decode of object
+    bytes, or a persistence call.
 
     An earlier draft of this probe checked ``hasattr(client, ...)`` on the SDK
     object. That check was wrong and would have refused every run: a
@@ -295,33 +368,94 @@ def assert_no_write_calls_in_source(source_path: Path | None = None) -> int:
     by the role assignment, not by the Python object.
 
     What this probe can honestly assert is the narrower, structural claim the
-    protocol actually asks for: no mutating operation appears anywhere in the
-    reachable source. That is checked here against the parsed AST, so a future
-    edit that adds one is a hard refusal rather than a review oversight.
+    protocol actually asks for: no mutating operation, no forbidden credential
+    construction, no decode and no persistence call appears anywhere in
+    **this file**, which is the entire first-party source executed by the gate.
+    It does not analyse the Azure SDK or the standard library, and it does not
+    claim to. Independent Audit A raised three evasions that the first draft
+    missed, all of which are now closed:
 
-    Returns the number of attribute and call names inspected.
+    * string constants, so ``getattr(client, "upload_blob")`` no longer passes;
+    * plain ``import`` with an alias, so ``import azure.identity as ai``
+      followed by ``ai.DefaultAzureCredential()`` no longer passes;
+    * dynamic-access builtins, which would defeat any static check and are
+      therefore refused outright rather than analysed.
+
+    The decode and persist checks are what make the pinned ``decode_attempts``
+    and ``persist_attempts`` counters mean something. Those counters are
+    reported as literal zero; this function is the evidence for that literal.
+
+    Returns the number of nodes inspected.
     """
 
     import ast
 
     path = Path(__file__).resolve() if source_path is None else Path(source_path)
-    tree = ast.parse(path.read_text(encoding="utf-8"))
+    source = path.read_text(encoding="utf-8")
+    tree = ast.parse(source)
 
-    forbidden = set(FORBIDDEN_BLOB_METHODS)
+    forbidden_attrs = (
+        set(FORBIDDEN_BLOB_METHODS)
+        | set(FORBIDDEN_DECODE_METHODS)
+        | set(FORBIDDEN_PERSIST_METHODS)
+        # A credential reached as an attribute -- `ai.DefaultAzureCredential()`
+        # after `import azure.identity as ai` -- produces no ImportFrom node
+        # and would otherwise pass (independent Audit A, A-06).
+        | set(FORBIDDEN_CREDENTIAL_TYPES)
+    )
+    forbidden_names = (
+        set(FORBIDDEN_BLOB_METHODS)
+        | set(FORBIDDEN_CREDENTIAL_TYPES)
+        | set(FORBIDDEN_DYNAMIC_ACCESS)
+        | set(FORBIDDEN_PERSIST_METHODS)
+    )
+    # Docstrings and the FORBIDDEN_* declarations themselves legitimately spell
+    # out the names being forbidden. Everything else is a potential dynamic
+    # payload. Without this carve-out the module would refuse itself, which
+    # would be a self-defeating check rather than a safe one.
+    declared: set[int] = set()
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        targets = [t.id for t in node.targets if isinstance(t, ast.Name)]
+        if not any(t.startswith("FORBIDDEN_") for t in targets):
+            continue
+        for sub in ast.walk(node.value):
+            if isinstance(sub, ast.Constant):
+                declared.add(id(sub))
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            body = node.body
+            if body and isinstance(body[0], ast.Expr) and isinstance(body[0].value, ast.Constant):
+                declared.add(id(body[0].value))
+
     inspected = 0
     for node in ast.walk(tree):
         if isinstance(node, ast.Attribute):
             inspected += 1
-            if node.attr in forbidden:
+            if node.attr in forbidden_attrs:
                 raise ProbeRefusal("INTERNAL_REFUSAL", "WRITE_CALL_IN_SOURCE")
         elif isinstance(node, ast.Name):
             inspected += 1
-            if node.id in forbidden:
+            if node.id in forbidden_names:
                 raise ProbeRefusal("INTERNAL_REFUSAL", "WRITE_CALL_IN_SOURCE")
-        elif isinstance(node, ast.ImportFrom):
+        elif isinstance(node, ast.Constant):
+            inspected += 1
+            if id(node) in declared or not isinstance(node.value, str):
+                continue
+            token = node.value.strip()
+            if token in forbidden_attrs or token in forbidden_names:
+                raise ProbeRefusal("INTERNAL_REFUSAL", "DYNAMIC_WRITE_NAME_IN_SOURCE")
+        elif isinstance(node, (ast.Import, ast.ImportFrom)):
+            module = node.module if isinstance(node, ast.ImportFrom) else None
+            if module and module.split(".")[0] in FORBIDDEN_IMPORT_ROOTS:
+                raise ProbeRefusal("INTERNAL_REFUSAL", "FORBIDDEN_IMPORT_IN_SOURCE")
             for alias in node.names:
                 inspected += 1
-                if alias.name in forbidden or alias.name in FORBIDDEN_CREDENTIAL_TYPES:
+                head = alias.name.split(".")[0]
+                if head in FORBIDDEN_IMPORT_ROOTS:
+                    raise ProbeRefusal("INTERNAL_REFUSAL", "FORBIDDEN_IMPORT_IN_SOURCE")
+                if alias.name in forbidden_attrs or alias.name in forbidden_names:
                     raise ProbeRefusal("INTERNAL_REFUSAL", "FORBIDDEN_IMPORT_IN_SOURCE")
     return inspected
 
@@ -341,36 +475,63 @@ def assert_verbose_logging_disabled(environ: dict[str, str] | None = None) -> No
 # ---------------------------------------------------------------------------
 
 
-def resolve_endpoint(fqdn: str, resolver: Any = None) -> str:
-    """Resolve the blob FQDN. Kept separate so tests can inject a resolver."""
+def resolve_endpoint(fqdn: str, resolver: Any = None) -> list[str]:
+    """Resolve the blob FQDN to the FULL set of addresses.
+
+    Returns every distinct address, not just the first. ``gethostbyname``
+    returns one address and therefore cannot support a claim that the expected
+    address is the *only* address, which is what the receipt asserts.
+    Independent Audit A raised this as A-12.
+    """
 
     if resolver is not None:
-        return resolver(fqdn)
-    return socket.gethostbyname(fqdn)
+        resolved = resolver(fqdn)
+        if isinstance(resolved, str):
+            return [resolved]
+        return sorted({str(a) for a in resolved})
+    infos = socket.getaddrinfo(fqdn, 443, proto=socket.IPPROTO_TCP)
+    return sorted({str(info[4][0]) for info in infos})
 
 
 def check_endpoint(
     record: dict[str, Any],
     public_network_access: str,
-    resolved_ip: str,
+    resolved_ips: list[str] | str,
 ) -> dict[str, Any]:
     rule = record["endpoint_rule"]
-    if public_network_access != rule["required_public_network_access"]:
-        raise ProbeRefusal("PUBLIC_NETWORK_ACCESS_NOT_DISABLED", "PUBLIC_NETWORK_ACCESS")
 
-    try:
-        address = ip_address(resolved_ip)
-    except ValueError as exc:  # pragma: no cover - defensive
-        raise ProbeRefusal("ENDPOINT_NOT_PRIVATE", "UNPARSEABLE_ADDRESS") from exc
+    # publicNetworkAccess is a control-plane property. The designated identity
+    # deliberately holds no management-plane role, so this process cannot read
+    # it. The only honest in-job value is "Unknown"; the real observation is
+    # made by the operator before the run and recorded in the decision record.
+    # Accepting "Disabled" here would let a literal argument masquerade as a
+    # measurement, which is what independent Audit A raised as A-03.
+    if public_network_access != "Unknown":
+        raise ProbeRefusal("INTERNAL_REFUSAL", "PNA_NOT_OBSERVABLE_IN_JOB")
+    if rule["required_public_network_access"] != "Disabled":
+        raise ProbeRefusal("DECISION_RECORD_DIGEST_MISMATCH", "ENDPOINT_RULE_DRIFT")
 
-    if address.is_global:
-        raise ProbeRefusal("ENDPOINT_NOT_PRIVATE", "PUBLIC_ADDRESS")
+    if isinstance(resolved_ips, str):
+        resolved_ips = [resolved_ips]
+    if not resolved_ips:
+        raise ProbeRefusal("ENDPOINT_NOT_PRIVATE", "NO_ADDRESS_RESOLVED")
 
-    allowed = [ip_network(c) for c in rule["allowed_private_cidrs"]]
-    if not any(address in net for net in allowed):
-        raise ProbeRefusal("ENDPOINT_NOT_PRIVATE", "ADDRESS_OUTSIDE_PROJECT_VNET")
+    for resolved_ip in resolved_ips:
+        try:
+            address = ip_address(resolved_ip)
+        except ValueError as exc:  # pragma: no cover - defensive
+            raise ProbeRefusal("ENDPOINT_NOT_PRIVATE", "UNPARSEABLE_ADDRESS") from exc
 
-    matches = resolved_ip == rule["expected_private_ip"]
+        if address.is_global:
+            raise ProbeRefusal("ENDPOINT_NOT_PRIVATE", "PUBLIC_ADDRESS")
+
+        allowed = [ip_network(c) for c in rule["allowed_private_cidrs"]]
+        if not any(address in net for net in allowed):
+            raise ProbeRefusal("ENDPOINT_NOT_PRIVATE", "ADDRESS_OUTSIDE_PROJECT_VNET")
+
+    # The claim is "the resolved set is exactly the registered address", so a
+    # second, also-private address must fail rather than pass.
+    matches = set(resolved_ips) == {rule["expected_private_ip"]}
     if not matches:
         # Deliberately does not carry the observed address: a misconfiguration
         # must not leak an unregistered endpoint address into a public receipt.
@@ -378,6 +539,7 @@ def check_endpoint(
 
     return {
         "public_network_access": public_network_access,
+        "public_network_access_observed_by": "operator_control_plane_read_before_run",
         "resolved_is_private": True,
         "resolved_matches_expected_private_ip": True,
         "privatelink_path_confirmed": True,
@@ -417,12 +579,33 @@ def check_identity(record: dict[str, Any], client_id: str, credential_type: str)
         # how "SystemAssignedManagedIdentity" in the frozen denylist is
         # structurally enforced.
         raise ProbeRefusal("IDENTITY_MISMATCH", "CLIENT_ID_ABSENT")
+
+    # The operator supplies --client-id. Without binding it to the freeze, the
+    # receipt would report "client_id_matches_designated" on the basis of
+    # nothing, and could not distinguish the designated reader from the
+    # write-capable id-jspace-aca-acrpull-sea. Independent Audit A raised this
+    # as A-02.
+    designated = rule["designated_identity"].get("client_id")
+    if not designated:
+        raise ProbeRefusal("DECISION_RECORD_DIGEST_MISMATCH", "DESIGNATED_CLIENT_ID_ABSENT")
+    if client_id != designated:
+        # Carries neither the supplied nor the expected value.
+        raise ProbeRefusal("IDENTITY_MISMATCH", "CLIENT_ID_NOT_DESIGNATED")
+
     return {
         "credential_type": "ManagedIdentityCredential",
         "client_id": client_id,
         "client_id_matches_designated": True,
         "forbidden_credential_types_absent": True,
-        "effective_read_only_verdict": "READ_ONLY_CONFIRMED",
+        # Deliberately NOT "READ_ONLY_CONFIRMED". The probe holds no permission
+        # to read role assignments, and granting it one would increase exactly
+        # the privilege this round is minimising. What is confirmed is that the
+        # credential is the frozen identity; that this identity holds only
+        # Storage Blob Data Reader at container scope is a control-plane
+        # observation recorded in the decision record, made by a different
+        # principal at a different time. Reporting it as confirmed here would
+        # be attesting to a check this process did not perform.
+        "effective_read_only_verdict": "NOT_CONFIRMED_IN_JOB",
     }
 
 
@@ -561,6 +744,7 @@ def build_receipt(
         "phase": "1.2H-R1",
         "execution": {
             "execution_id": execution_id,
+            "aca_execution_name": _aca_execution_name(),
             "started_at": started_at,
             "ended_at": ended_at,
             "exit_status": exit_status,
@@ -624,7 +808,17 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     started = _now()
-    args = _parse_args(argv)
+    _reset_progress()
+
+    # _parse_args previously ran outside every handler, so an argparse error
+    # exited 2 with usage text and no receipt -- indistinguishable by exit code
+    # from a genuine refusal (independent Audit A, A-09).
+    try:
+        args = _parse_args(argv)
+    except SystemExit:
+        return _emit_refusal(
+            ProbeRefusal("INTERNAL_REFUSAL", "ARGUMENT_PARSE_FAILED"), started, None
+        )
 
     try:
         assert_no_override(args)
@@ -635,8 +829,13 @@ def main(argv: list[str] | None = None) -> int:
         record = load_decision_record()
         expected = expected_members(record)
     except ProbeRefusal as refusal:
-        print(json.dumps(_refusal_receipt(refusal, started, args)), flush=True)
-        return 2
+        return _emit_refusal(refusal, started, args)
+    except Exception:  # noqa: BLE001 - deliberate blanket redaction
+        # These paths touch only publicly committed files, but an unredacted
+        # traceback is still an uncontrolled output channel.
+        return _emit_refusal(
+            ProbeRefusal("INTERNAL_REFUSAL", "PREFLIGHT_EXCEPTION"), started, args
+        )
 
     if args.dry_run:
         # Offline self-check: everything above this line ran, nothing touched
@@ -659,40 +858,101 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return _run_live(args, record, expected, started)
     except ProbeRefusal as refusal:
-        print(json.dumps(_refusal_receipt(refusal, started, args)), flush=True)
-        return 2
+        return _emit_refusal(refusal, started, args)
     except Exception:  # noqa: BLE001 - deliberate blanket redaction
         # An unredacted traceback could contain a URL, a header, a member name
         # or object bytes. Nothing but a closed token escapes.
-        print(
-            json.dumps(
-                _refusal_receipt(
-                    ProbeRefusal("INTERNAL_REFUSAL", "UNEXPECTED_EXCEPTION"),
-                    started,
-                    args,
-                )
-            ),
-            flush=True,
+        return _emit_refusal(
+            ProbeRefusal("INTERNAL_REFUSAL", "UNEXPECTED_EXCEPTION"), started, args
         )
-        return 3
+
+
+def _aca_execution_name() -> str | None:
+    """The ACA execution name as exposed to the replica, or None.
+
+    The operator-assigned --execution-id is chosen at job-definition time,
+    before any execution exists, so it cannot be the execution name the schema
+    once claimed it was (independent Audit A, A-15). Where the platform
+    publishes the real name, carry it; where it does not, carry null rather
+    than inventing a correlation.
+    """
+
+    for var in ("CONTAINER_APP_JOB_EXECUTION_NAME", "CONTAINER_APP_REPLICA_NAME"):
+        value = os.environ.get(var, "").strip()
+        if value:
+            return value
+    return None
 
 
 def _refusal_receipt(
-    refusal: ProbeRefusal, started: str, args: argparse.Namespace
+    refusal: ProbeRefusal, started: str, args: argparse.Namespace | None
 ) -> dict[str, Any]:
-    receipt = {
-        "schema_version": RECEIPT_SCHEMA_VERSION,
+    execution_id = ""
+    if args is not None:
+        execution_id = str(getattr(args, "execution_id", "") or "")
+    receipt: dict[str, Any] = {
+        "schema_version": REFUSAL_SCHEMA_VERSION,
         "phase": "1.2H-R1",
         "refused": True,
-        "reason_code": refusal.reason_code,
-        "invariant": refusal.invariant,
-        "execution_id": getattr(args, "execution_id", ""),
-        "started_at": started,
-        "ended_at": _now(),
+        "execution": {
+            "execution_id": execution_id or "unparsed",
+            "aca_execution_name": _aca_execution_name(),
+            "started_at": started,
+            "ended_at": _now(),
+            "exit_status": "FAIL",
+            "reason_code": refusal.reason_code,
+            "invariant": refusal.invariant,
+        },
+        # Progress at the moment of refusal. These are the only counters that
+        # can be nonzero; every semantic counter is pinned to zero by the
+        # schema, and the source-level checks are what make that pin honest.
+        "progress_counters": {
+            "azure_data_plane_content_reads": PROGRESS["azure_data_plane_content_reads"],
+            "byte_only_integrity_verifications": PROGRESS["byte_only_integrity_verifications"],
+            "list_operations": PROGRESS["list_operations"],
+            "azure_data_plane_writes": 0,
+            "decode_attempts": 0,
+            "persist_attempts": 0,
+            "semantic_input_reads": 0,
+            "semantic_label_reads": 0,
+            "parser_invocations": 0,
+            "predictions_generated": 0,
+        },
     }
     if refusal.detail:
-        receipt["detail"] = refusal.detail
+        receipt["execution"]["detail"] = refusal.detail
     return receipt
+
+
+def _emit(document: dict[str, Any], schema: Path) -> None:
+    """Validate before printing. Every emitted document, not just the success
+    one, is checked against a committed closed schema -- that is what the
+    receipt_rule in the decision record actually promises."""
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from phase1_2h_r1_receipt_validator import validate_receipt
+
+    validate_receipt(document, schema)
+    print(json.dumps(document, sort_keys=True), flush=True)
+
+
+def _emit_refusal(
+    refusal: ProbeRefusal, started: str, args: argparse.Namespace | None
+) -> int:
+    receipt = _refusal_receipt(refusal, started, args)
+    try:
+        _emit(receipt, REFUSAL_SCHEMA)
+    except Exception:  # noqa: BLE001 - the validator must never mask a refusal
+        # If the refusal receipt itself does not validate, say so in the closed
+        # vocabulary rather than printing an unvalidated document.
+        fallback = _refusal_receipt(
+            ProbeRefusal("RECEIPT_SCHEMA_INVALID", "REFUSAL_RECEIPT_INVALID"),
+            started,
+            args,
+        )
+        print(json.dumps(fallback, sort_keys=True), flush=True)
+        return 4
+    return 2
 
 
 def _run_live(
@@ -712,21 +972,34 @@ def _run_live(
     fqdn = endpoint_rule["required_blob_fqdn"]
 
     resolved = resolve_endpoint(fqdn)
-    endpoint_block = check_endpoint(record, "Disabled", resolved)
+    # "Unknown" is not a placeholder: it is the only value this process can
+    # honestly report for a control-plane property it holds no role to read.
+    # The earlier literal "Disabled" made the check tautological while the
+    # receipt presented it as an observation (independent Audit A, A-03).
+    endpoint_block = check_endpoint(record, "Unknown", resolved)
     identity_block = check_identity(record, args.client_id, "ManagedIdentityCredential")
 
     credential = ManagedIdentityCredential(client_id=args.client_id)
-    service = BlobServiceClient(f"https://{fqdn}", credential=credential)
+    chunk_bytes = int(record["byte_only_rule"]["chunk_bytes"])
+    if chunk_bytes != CHUNK_BYTES:
+        raise ProbeRefusal("DECISION_RECORD_DIGEST_MISMATCH", "CHUNK_SIZE_DRIFT")
+    # The frozen chunk size must actually govern I/O. Without these two
+    # arguments the SDK buffers up to max_single_get_size (32 MiB) before
+    # chunks() yields anything, so the "bounded buffer" property was a claim
+    # about a constant that governed nothing (independent Audit A, A-11).
+    service = BlobServiceClient(
+        f"https://{fqdn}",
+        credential=credential,
+        max_single_get_size=chunk_bytes,
+        max_chunk_get_size=chunk_bytes,
+    )
     container = service.get_container_client(source["blob_container"])
 
     prefix = source["exact_prefix"].rstrip("/") + "/"
     observed_names = [b.name for b in container.list_blobs(name_starts_with=prefix)]
     list_operations = 1
+    PROGRESS["list_operations"] = list_operations
     membership_block = compare_membership(record, expected, observed_names)
-
-    chunk_bytes = int(record["byte_only_rule"]["chunk_bytes"])
-    if chunk_bytes != CHUNK_BYTES:
-        raise ProbeRefusal("DECISION_RECORD_DIGEST_MISMATCH", "CHUNK_SIZE_DRIFT")
 
     observed: list[tuple[str, int, str]] = []
     for name, _, _ in expected:
@@ -734,8 +1007,10 @@ def _run_live(
         stream = blob.download_blob(max_concurrency=1)
         digest, size = stream_object_digest(stream.chunks())
         observed.append((name, size, digest))
+        PROGRESS["azure_data_plane_content_reads"] += 1
 
     streaming_block = verify_streamed(expected, observed)
+    PROGRESS["byte_only_integrity_verifications"] = streaming_block["objects_streamed"]
 
     receipt = build_receipt(
         record=record,
@@ -755,10 +1030,12 @@ def _run_live(
     )
 
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from phase1_2h_r1_receipt_validator import validate_receipt
+    from phase1_2h_r1_receipt_validator import ReceiptValidationError
 
-    validate_receipt(receipt, RECEIPT_SCHEMA)
-    print(json.dumps(receipt, sort_keys=True), flush=True)
+    try:
+        _emit(receipt, RECEIPT_SCHEMA)
+    except ReceiptValidationError as exc:
+        raise ProbeRefusal("RECEIPT_SCHEMA_INVALID", "SUCCESS_RECEIPT_INVALID") from exc
     return 0
 
 

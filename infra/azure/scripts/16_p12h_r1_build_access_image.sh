@@ -58,13 +58,17 @@ log "build provenance: ${BUILD_PROVENANCE_SHA256}"
 # the image.
 
 log "starting ACR task build (this runs on ACR compute, not locally)"
+# NOTE: --no-logs is a store_true switch. Passing it a value ("--no-logs false")
+# makes the CLI treat the positional source location as an unrecognised
+# argument and exit 2, so the build could never have run as first frozen.
+# Independent Audit A raised this as A-05 and independent Audit B as B-05.
+# Streaming logs is already the default; the switch is simply omitted.
 az acr build \
     --registry "${ACR_NAME}" \
     --image "${IMAGE_TAG}" \
     --file "${DOCKERFILE}" \
     --build-arg "BUILD_PROVENANCE_SHA256=${BUILD_PROVENANCE_SHA256}" \
     --platform linux/amd64 \
-    --no-logs false \
     "${GIT_REMOTE}#${FREEZE_COMMIT}"
 
 # --- 4. Resolve the immutable digest ---------------------------------------
