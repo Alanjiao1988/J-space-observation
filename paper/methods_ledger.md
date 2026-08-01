@@ -678,12 +678,20 @@ rather than a proof of provenance.
 The discipline's first act was to remove thresholds rather than justify them.
 The test applied is what a criterion constrains *after* the mandatory gates
 have applied, and the answer was usually "nothing that was not already
-constrained". With ninety of a hundred and twenty cases pinned to zero errors
+constrained". With eighty of a hundred and twenty cases pinned to zero errors
 by gates, a criterion stated over all one hundred and twenty governs only the
-thirty that are free; a second criterion stated over a critical-stratum set that
-is mostly zero-gated governs the same thirty again. Redundancy of that kind is
+forty that are free; a second criterion stated over a critical-stratum set that
+is mostly zero-gated governs the same forty again. Redundancy of that kind is
 not harmless. Two numbers over one population disagree at integer boundaries,
 and the policy then has no defined answer about which one decides.
+
+> **Erratum (Phase 1.2G).** As written during Phase 1.2F this paragraph said
+> ninety pinned and thirty free. That split counted `S06` as pinned. `S06`
+> carries a zero-error gate, but its registered error definition forbids
+> selecting one particular wrong span, which is narrower than requiring exact
+> typed-decision agreement, so it does not pin. The derived split is eighty
+> pinned and forty free, over `S04`, `S05`, `S06` and `S09`. The figure is now
+> computed by `derive_gate_coverage` rather than transcribed.
 
 The sharpest result concerns aggregate classification metrics on a
 quota-constructed set. Because the future evaluation is a fixed adversarial
@@ -701,15 +709,30 @@ prevent.
 
 The comparator question is answered structurally rather than numerically. A
 non-regression margin against a predecessor requires observing a parser on the
-locked set to choose, which is what candidate-independence forbids; and the
-predecessor here failed its own locked evaluation, so "not worse than it" is not
-evidence of fitness. Comparison is retained as reported context, where a
-regression remains informative, and removed from the pass condition, where it
-would give a failed instrument standing to admit its successor.
+locked set to choose, which is what candidate-independence forbids. Comparison
+is retained as reported context, where a regression remains informative, and
+removed from the pass condition, where it cannot carry acceptance weight.
 
-Where the discipline yields no number, it yields a null. The one criterion that
-survived the redundancy audit has a derivable structure and an underivable
-value, because no downstream parser-error budget is registered anywhere in the
-project. It is left open, the policy remains unusable, and the compiler
-continues to refuse. Recording the gap is the method; filling it with a
-plausible integer would have been the failure the method exists to prevent.
+> **Correction (Phase 1.2G).** This paragraph previously continued: "and the
+> predecessor here failed its own locked evaluation, so 'not worse than it' is
+> not evidence of fitness." That argument was **withdrawn** during Phase 1.2F's
+> own audit (finding A4) and should not have survived here. It is unsound: a
+> non-regression floor is an *additional* necessary condition applied on top of
+> the absolute gates, never a claim that the predecessor was adequate, so the
+> predecessor's failure does not bear on it. The live reason is the first one
+> only — the margin is underivable. The withdrawal is recorded in
+> `docs/phase1_parser_v3_v2_evaluation_policy.json` under the criterion's
+> `withdrawn_arguments`.
+
+Where the discipline yields no number, it yields a null — but a null is a
+finding about the *evidence*, not a licence to stop asking what the instrument
+is for. Phase 1.2F left the surviving criterion open because no downstream
+parser-error budget is registered anywhere in the project, and recorded that as
+the blocker. Phase 1.2G found that the missing budget was never the primary
+question. The prior question was what the future set *is*: a finite conformance
+suite, every member of which is admitted deliberately and carries an adjudicated
+reference decision. That fact was already registered in the public design, so
+the criterion was answerable from evidence the project already held, and its
+value is zero. Filling the gap with a plausible integer would have been the
+failure the method exists to prevent; so, less obviously, was continuing to
+report a blocker without checking whether the design already answered it.

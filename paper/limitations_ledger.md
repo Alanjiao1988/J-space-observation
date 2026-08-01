@@ -495,10 +495,20 @@ candidate: a logical invariant, a registered downstream error budget, an
 external calibration preregistered before candidate outputs are observed, or a
 stated operational requirement independent of both candidate and holdout.
 The one criterion that survived the redundancy audit,
-`residual_critical_exact_budget`, is left `REVIEW_REQUIRED` with a null
-value for exactly this reason: its structure is derivable today, its number is
-not, and inserting a plausible integer would be the failure this limitation
-describes.
+`residual_critical_exact_budget`, was left `REVIEW_REQUIRED` with a null
+value throughout Phase 1.2F for exactly this reason: its structure was
+derivable then, its number was not, and inserting a plausible integer would
+have been the failure this limitation describes.
+
+> **Phase 1.2G update.** That criterion is now `FINAL` with a value of `0`, on
+> a `LOGICAL_INVARIANT` basis. The number was not calibrated and no observation
+> supplied it; it is entailed by the strict finite-suite conformance premise
+> adopted in Phase 1.2G, under which every admitted case carries an individual
+> mandatory requirement. The limitation above is therefore not discharged, it
+> is relocated: what now needs scrutiny is the premise rather than the integer,
+> and that is recorded as `L-35`. The general warning stands unchanged — a
+> number that looks defensible is not the same as a number that is derived, and
+> this ledger entry remains the place to check which one a future threshold is.
 
 **What the validator actually does, stated precisely.** Audit finding B8
 rejected an earlier version of this paragraph, which claimed the validator
@@ -563,3 +573,75 @@ because it is load-bearing inside `NOT_RUN` and `sealed_object_count`. The
 general lesson stands as part of this limitation: a matcher over rendered-prose
 patterns is sensitive to markup that carries no meaning, and no amount of
 pattern tuning converts it into a semantic check.
+
+
+## L-35 - Zero residual tolerance rests on a premise, not on a proof
+
+`residual_critical_exact_budget` is `0` because Phase 1.2G adopted **strict
+finite-suite conformance**: the future `parser-v3-v2` set is a finite
+conformance suite, every case admitted to it is admitted because a correct
+instrument must handle it, and so a mismatch on any admitted case is
+unacceptable instrument behaviour. Given that premise, zero is a
+`LOGICAL_INVARIANT` - there is no coherent positive tolerance, because each
+admitted case carries its own requirement and an aggregate allowance of `B > 0`
+contradicts a per-case obligation rather than relaxing it. The argument does not
+turn on a budget being unable to name which cases it covers.
+
+The premise itself is a design decision. It was taken by the operator, recorded
+in `docs/decision_log.md`, and it is not a measurement. No observation licenses
+it and none refutes it directly; what refutes it is a change in how the set is
+built.
+
+That is the limitation. The value `0` is exactly as secure as the premise, and
+the premise has a stated falsifier: if a future authorized round admits a case
+that a correct instrument is *not* required to handle - an aspirational case, a
+case included to observe behaviour rather than to require it, or a case whose
+own reference label is uncertain - then the suite is no longer a pure
+conformance suite, the invariant loses its basis, and the value must be
+re-derived rather than inherited. Eligibility for admission and "must be handled
+correctly" have to remain the same predicate. The set-repair round inherits that
+constraint, and this ledger entry is the place it is recorded as a liability
+rather than as a settled fact.
+
+A second-order caution. Because the invariant is derived from the construction
+rule, it is possible to satisfy the *policy* by weakening the *set* - admitting
+fewer or easier cases keeps the budget at zero while reducing what zero means.
+Nothing in the acceptance policy can detect that, because the policy sees the
+set only through its declared strata and supports. The protection has to come
+from the set-repair round's own review, not from here.
+
+## L-36 - A conforming instrument is not a demonstrated-adequate one
+
+Every criterion in the prospective acceptance policy constrains the
+**instrument**. None of them constrains the **science**.
+
+A parser that satisfies the policy is one that reproduces the reference typed
+decision on all 120 cases of a stratified challenge set. That is a statement
+about extraction fidelity on a designed suite. It is not a statement that the
+downstream scientific conclusion is robust to parser error, and it must never be
+reported as one.
+
+The gap is concrete and is not closed anywhere in this repository. No downstream
+parser-error budget is registered: the scientific plan does not state how much
+parser-induced distortion any later metric or decision can absorb before its
+conclusion changes. Phase 1.2F searched for one and found none; Phase 1.2G did
+not create one, because under the conformance premise the residual budget did
+not need it, and manufacturing a budget to fill a documentation hole would have
+been worse than recording the hole.
+
+So the following inference is unavailable, and remains unavailable after any
+future `PASS`:
+
+> The parser passed, therefore parser error does not threaten the scientific
+> result.
+
+What a `PASS` would license is narrower and should be stated in exactly this
+form: on this fixed 120-case suite, under this ontology and span convention, the
+parser reproduced every reference typed decision. Whether that fidelity is
+*sufficient* for any particular downstream claim is a separate question that
+requires a downstream error budget, and that question is open.
+
+The reverse direction is also worth stating, because it is easy to overclaim in
+the other direction. A `FAIL` on this policy is not evidence that the scientific
+conclusion is wrong either. It is evidence that the instrument is not fit to be
+used to reach one.

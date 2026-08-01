@@ -5,6 +5,21 @@
 **Baseline:** `origin/main` @ `d843984a3b7e1a2bf9d306621b8557ce327cf987`
 **Protocol:** `docs/phase1_2f_parser_acceptance_policy_protocol.md`
 
+> **Superseded in part by Phase 1.2G.** This report remains the accurate record
+> of what Phase 1.2F decided and why, and its terminal status
+> `BLOCKED_ON_ACCEPTANCE_POLICY` is the correct historical outcome of that
+> round. Three things in it are no longer current, and each is marked inline:
+>
+> * **§15 "Exact next gate"** was wrong when written — it named the *secondary*
+>   dependency as the next gate, inverting the ordering §14 had just derived.
+> * **§10 verification counts** recorded intermediate figures (`79`, `201`)
+>   rather than the committed ones (`127`, `249`).
+> * **§2 protected-digest count** records the start-of-round registry size (11)
+>   without noting that the same round grew it to 12.
+>
+> The criterion this round left open, `residual_critical_exact_budget`, was
+> resolved in Phase 1.2G. See `reports/phase1_2g_conformance_policy.md`.
+
 ---
 
 ## 1. Outcome in one paragraph
@@ -39,9 +54,19 @@ was not the actual blocker.
 | Working tree at round start | clean |
 | Focused repair suite (`tests/test_parser_v3_repair.py`) | **122 passed** (38.32 s) |
 | Full suite | **1497 passed** (457.76 s) |
-| Protected digests (11 pinned, LF-normalised SHA-256) | 11 / 11 match |
+| Protected digests at round start (11 pinned, LF-normalised SHA-256) | 11 / 11 match |
 
 Both recorded expectations (`122 passed`, `1497 passed`) reproduced exactly.
+
+> **Erratum (Phase 1.2G).** This row states the registry size *at the start of*
+> Phase 1.2F, which was 11. Later in the same round, finding B15 was remediated
+> by adding `evaluator_sets/parser_v3_v1/strata_definitions.md` to
+> `PROTECTED_DIGESTS`, taking the registry to **12**. The committed state of
+> `3d519e1` pins **12** digests, and the round's closing verification was
+> 12 / 12. The row was never updated after the registry grew, so a reader
+> checking the shipped code against this report would find a discrepancy. The
+> start-of-round figure is left as written because it was true when measured;
+> the end-of-round figure is stated here.
 
 ---
 
@@ -490,12 +515,23 @@ make a claim true would have been the wrong repair.
 
 | Check | Result |
 | --- | --- |
-| Phase 1.2F suite (`tests/test_parser_v3_acceptance_policy.py`) | **79 passed** |
+| Phase 1.2F suite (`tests/test_parser_v3_acceptance_policy.py`) | **127 passed** |
 | Focused repair suite (`tests/test_parser_v3_repair.py`) | **122 passed** |
-| Combined focused run | **201 passed** (64.61 s) |
+| Combined focused run | **249 passed** |
 | Policy JSON validation against the strengthened validator | OK |
 | `scripts/check_current_state_consistency.py` | exit 0 |
 | Protected digests | unchanged |
+
+> **Erratum (Phase 1.2G).** This table originally recorded `79 passed` for the
+> Phase 1.2F suite and `201 passed` combined. Those were the counts at an
+> intermediate point of the round. Phase 1.2F went on to add the audit-driven
+> regressions — including the seven `_elide_markup` tests written after the
+> consistency checker was found to be defeatable by markdown emphasis — and the
+> committed state of `3d519e1` runs **249**, not 201. The figure was never
+> re-measured before the report was written. Corrected above; the superseded
+> figures are named here so a reader who saw them can recognise the change.
+> `reports/current_status.md` separately carried `242`, a third intermediate
+> value, also corrected.
 
 No existing test was weakened, removed, or skipped. One assertion in the **new**
 Phase 1.2F suite was corrected during development: it forbade the literal string
@@ -542,7 +578,7 @@ The consequential result is A2 with A3. The first draft reached
 gate-coverage baseline (90/30 rather than 80/40), a wrong enumeration domain
 (496 rather than 861 matrices), and a blocking dependency that was not the
 blocker, so that executing the registered calibration would have left the round
-still blocked. A green suite of 201 self-authored tests passed throughout. The
+still blocked. A green suite of self-authored tests passed throughout. The
 audits are the reason the shipped figures are right; the tests were not.
 
 Neither auditor re-verified the remediation, and both are language models
@@ -610,13 +646,34 @@ how many remain.
 
 ## 15. Exact next gate
 
-**Register a downstream parser-error budget**, then execute
-`docs/phase1_2f_parser_error_budget_calibration_protocol.md`.
+> **Superseded by Phase 1.2G.** This section was wrong when written, and the
+> error is recorded here rather than deleted.
+>
+> §14 of this report had already established that the dependencies are
+> *ordered*: the strictness decision is primary, and the downstream error
+> budget is required only if that decision permits a non-zero tolerance. This
+> section then named the secondary dependency as the next gate, inverting the
+> ordering the same report had just derived. Following it would have produced a
+> calibrated number for a question nobody had asked.
+>
+> **What actually happened.** Phase 1.2G settled the primary decision — the
+> future set is a finite conformance suite, so the permitted mismatch count is
+> zero — which made the secondary dependency moot.
+> `docs/phase1_2f_parser_error_budget_calibration_protocol.md` is now
+> `SUPERSEDED_UNEXECUTED` and was never run.
+>
+> The correct next gate is recorded in
+> `reports/phase1_2g_conformance_policy.md`.
 
-That protocol is **not** Phase 1.0C, is not a target-model headroom screen, and
-was not executed in this round.
+**As written (superseded):**
 
-Until a budget exists: `residual_critical_exact_budget` stays
-`REVIEW_REQUIRED`; the policy stays `REVIEW_REQUIRED`; `compile_contract` keeps
-refusing; and `parser-v3-v2` set repair, construction, sealing, preregistration,
-Stage P and Stage E all remain unauthorized.
+> **Register a downstream parser-error budget**, then execute
+> `docs/phase1_2f_parser_error_budget_calibration_protocol.md`.
+>
+> That protocol is **not** Phase 1.0C, is not a target-model headroom screen,
+> and was not executed in this round.
+>
+> Until a budget exists: `residual_critical_exact_budget` stays
+> `REVIEW_REQUIRED`; the policy stays `REVIEW_REQUIRED`; `compile_contract`
+> keeps refusing; and `parser-v3-v2` set repair, construction, sealing,
+> preregistration, Stage P and Stage E all remain unauthorized.

@@ -520,6 +520,27 @@ invalidated the specific numbers in B16 and could move B6. Both were
 re-verified against the recomputed policy before commit, and every figure in the
 shipped artifacts was regenerated from the enumeration rather than edited.
 
+> **Erratum (Phase 1.2G).** The last clause is false as written. The
+> *enumeration* figures were regenerated. The *coverage* figures were not
+> propagated: at commit `3d519e1` the 90/30 split survived in
+> `docs/phase1_parser_v3_v2_stratum_policy.md` §5 (which additionally listed
+> S06 as pinned), throughout
+> `docs/phase1_2f_parser_error_budget_calibration_protocol.md`, and inside the
+> residual criterion's own `metric_definition`, `numerator` and
+> `failure_risk_controlled`, which described three strata while the structured
+> population declared four.
+>
+> The claim was made because the policy JSON — the artifact under active edit —
+> was regenerated, and the check went no further. That is precisely the failure
+> mode this document elsewhere warns about: a verification scoped to the file
+> the author was looking at.
+>
+> Phase 1.2G corrected all of it, and made recurrence a validation error rather
+> than a review question: coverage is now derived once in
+> `derive_gate_coverage`, the policy's restatement must agree with the
+> derivation, and the residual criterion's prose is checked against its own
+> declared population.
+
 ### What the audits did not do
 
 * Neither re-verified the remediation. Findings were fixed by the author.
@@ -534,7 +555,7 @@ shipped artifacts was regenerated from the enumeration rather than edited.
 A2 and A3 together. The round's first draft reached
 `BLOCKED_ON_ACCEPTANCE_POLICY` — the correct answer — while naming the wrong
 blocker, publishing a wrong gate-coverage baseline, and pointing at a next step
-that would not have unblocked anything. A green test suite of 201 self-authored
+that would not have unblocked anything. A green test suite of self-authored
 tests passed throughout.
 
 That is the record's clearest evidence for a claim this project makes elsewhere:

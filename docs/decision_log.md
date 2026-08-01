@@ -1969,3 +1969,70 @@ specification.
 | Pick thresholds now from parser-v2 values | Reproduces the substitution error that caused `H9`, in a new file. |
 | Declare `READY_FOR_INDEPENDENT_SET_REPAIR` with thresholds open | The brief defines an unresolved scientific design choice as `BLOCKED`. Reporting otherwise would misstate readiness. |
 | Correct the two audit findings without recording them | Deletes the round's most useful result. An empty error log records unexamined work, not careful work. |
+
+---
+
+## Phase 1.2G - Strict finite-suite conformance as the acceptance premise
+
+**Decision.** The future `parser-v3-v2` evaluation set is treated as a **finite
+conformance suite**. Every case admitted to it is a mandatory conformance
+example. An exact typed-decision mismatch on any eligible case is unacceptable
+instrument behaviour. `residual_critical_exact_budget` is therefore `0`, both
+pooled and per stratum, on a `LOGICAL_INVARIANT` basis, and the prospective
+acceptance policy is `FINAL`.
+
+**Why this is a premise and not a measurement.** The question Phase 1.2F left
+open was never answerable by observation. No amount of data tells you whether a
+suite is a conformance suite or a sample; that is a statement about what the
+suite is *for*, and it has to be decided. Phase 1.2F correctly refused to invent
+a number, and correctly identified that a `LOGICAL_INVARIANT` basis for `B = 0`
+was available in the abstract while the decision that would license it had not
+been taken. Phase 1.2G takes it.
+
+Once taken, the invariant is not a choice about strictness. If each case is
+included because a correct instrument must handle it, then tolerating a failure
+on one of them is tolerating the instrument being incorrect on a case selected
+for the purpose of detecting exactly that. There is no coherent non-zero value:
+each admitted case carries its own requirement, and an aggregate tolerance of
+`B > 0` contradicts a per-case obligation rather than relaxing it. This does
+not depend on a budget being unable to name which cases it covers — "at most
+one mismatch anywhere" names nothing and is still incoherent here, because a
+universally quantified obligation admits no exception count.
+
+**What the derivation deliberately does not rest on.** Determinism of the
+parser. The set not being an IID sample. The absence of a registered downstream
+error budget. Conservatism. Tidiness or roundness of the number zero. Parser-v2
+precedent. Any expectation about parser-v3 performance. Each of these would be a
+different argument with different failure modes, and several would be
+disallowed bases outright. A regression test scans the recorded derivation for
+appeals to them.
+
+**The falsifier, recorded with the premise.** If a case is ever admitted to the
+set that a correct instrument is not required to handle - an aspirational case,
+a stress case included to observe behaviour rather than to require it, a case
+whose reference label is itself uncertain - the premise fails and the invariant
+loses its basis. This is a constraint the set-repair round inherits: eligibility
+for admission and "must be handled correctly" have to remain the same predicate.
+
+**Why both a pooled and a per-stratum limit.** A pooled limit of zero is
+arithmetically equivalent to per-stratum zeros today. They are both recorded
+because they are not equivalent under *amendment*: a later editor relaxing one
+stratum to `1` while holding the pool at `0` produces an inconsistent policy the
+validator can catch, whereas a policy stating only the pool would silently admit
+the per-stratum change. Redundancy between two statements of the same constraint
+is cheap; a single point of drift is not.
+
+**Rejected alternatives.**
+
+| Option | Why rejected |
+| --- | --- |
+| Leave the budget `REVIEW_REQUIRED` and remain blocked | The blocker was a decision, not missing evidence. Waiting produces no new information and the operator has taken the decision. |
+| Execute the registered calibration protocol first | It calibrates a downstream error budget, which is only needed if a non-zero tolerance is permitted. Under conformance the branch is moot. Executing it would have left the round blocked anyway - Phase 1.2F audit finding A3. |
+| Pick a small non-zero budget, such as 1 or 2 | No candidate-independent derivation exists for any positive value, and any number chosen today would be chosen by someone who already knows how parser v3 behaves in development. |
+| Justify `0` by the parser being deterministic | Determinism makes an error reproducible, not acceptable. It is an argument about variance, not about tolerance. |
+| Justify `0` by conservatism | "Be strict when unsure" is a disposition, not a basis. It would license any threshold and explain none. |
+| Keep `overall_exact_typed_decision_minimum` as a hard gate | With all 120 cases pinned it can never bind. A gate that cannot fire is a claim of protection that does not exist. |
+| Keep macro F1 as a hard gate | Exhaustive enumeration of the 861 feasible confusion matrices at the registered supports shows it awards a passing score to candidates with wrong canonical values that preserve the presence class. It measures something real but not this. |
+| Make the comparator binding | No prospectively choosable margin exists, and the one substantive argument for a binding comparator was withdrawn in Phase 1.2F as unsound. |
+| Number the ten defects into the `H` series | `H1`-`H9` are findings about the evaluation instrument and its artifacts' declared-versus-observed facts. `G-01`-`G-10` are internal consistency failures between this project's own documents. Merging them would corrupt the meaning of both series. |
+| Fix the stale figures and describe the round as clean | Six of ten defects were figures no prose pattern covered. Fixing them without adding the generator would have left the mechanism that produced them intact. |

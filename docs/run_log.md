@@ -3708,3 +3708,84 @@ before that gate passes.
 > thresholds and left one non-vacuous criterion,
 > `residual_critical_exact_budget` over `S04`/`S05`/`S09`, blocked on a
 > downstream parser-error budget the scientific plan does not register.
+
+---
+
+## 2026-07-26 - Phase 1.2G: post-audit consistency remediation and conformance-policy finalization
+
+**Round.** Phase 1.2G. Repository audit, methodological decision, policy and
+tooling correction, testing, documentation, and — on completion — commit and
+push. No experiment ran.
+
+**Baseline.** `origin/main` at `3d519e1`. Working tree clean at start. Full
+suite green at baseline: **1624 passed**.
+
+**What was decided.** The scientific question Phase 1.2F left open - whether the
+designed-failure strata `S04`, `S05`, `S06`, `S09` admit any exact
+typed-decision error tolerance - was settled by operator decision as **strict
+finite-suite conformance**. The future `parser-v3-v2` set is a finite
+conformance suite, not a sample. Every case admitted to it is admitted because a
+correct instrument must handle it, so every case is a mandatory conformance
+example and a mismatch on any one of them is unacceptable instrument behaviour.
+Zero residual tolerance follows as a `LOGICAL_INVARIANT`.
+
+The derivation is constrained. It does not appeal to determinism, non-IID
+sampling, the absence of calibration, conservatism, tidiness, parser-v2
+precedent, or any expectation about parser-v3 performance, and a regression test
+scans the derivation text to keep it that way. The premise is recorded with its
+falsifier: admitting a case a correct instrument is not required to handle would
+refute it.
+
+**What was remediated.** Ten seed defects, `G-01` to `G-10`, all consistency
+failures between artifacts rather than new scientific findings, and deliberately
+not numbered into the historical `H1`-`H9` series. In summary: stale 90/30
+coverage figures and a "pinned" `S06` in the stratum policy; stale population
+figures in the calibration protocol; a next-gate ordering inversion in the
+Phase 1.2F report; a stale synthetic fixture; a withdrawn comparator argument
+still asserted live in `paper/methods_ledger.md`; an audit report claiming fixes
+the artifacts contradicted; a focused-suite total recorded as 242/201 where the
+transcript shows 249; a per-stratum cap stated only in prose; and a
+protected-digest count of 11 where the registry holds 12.
+
+**Threshold dispositions.** `residual_critical_exact_budget` is `KEEP_HARD`,
+binding, pooled maximum errors `0` and per-stratum maximum errors `0` for each
+of `S04`, `S05`, `S06`, `S09`, on a `LOGICAL_INVARIANT` basis.
+`overall_exact_typed_decision_minimum` is `REPLACE_HARD` and
+`critical_stratum_floor` is `MERGE_WITH_EXISTING_GATE`.
+`answer_presence_macro_f1_minimum` and
+`non_regression_margin_vs_parser_v2` are `REPORT_ONLY`. The prospective
+acceptance policy is now `FINAL`.
+
+**Instruments changed.** The policy JSON is declared the canonical
+machine-readable source of truth and moves to schema `/v3`. Exact-typed-decision
+coverage is now computed by one production derivation,
+`parser_v3_repair_contract.derive_gate_coverage`, consumed by both validation
+and compilation; the policy's coverage block is a restatement the validator
+requires to agree with it. `GATE_ERROR_DEFINITIONS` is a closed, code-owned
+registry of what each gate's error definition means. A new deterministic
+generator, `scripts/generate_current_state.py`, renders the current-state block
+from the policy and compares bytes under `--check`.
+
+**Two defects in this round's own new code were found by this round's own new
+tests.** A comparator margin of `0` was silently admitted as "no margin",
+because `0 == False` in Python, when a zero margin is the substantive rule
+"must not be worse than parser v2". And the superseded-figure scanner's
+negation guard exempted the withdrawn comparator argument, whose own wording
+contains a negation. Both are fixed and pinned by tests.
+
+**Not claimed.** Parser v3 is not validated, not non-regressive, not improved,
+not accepted. A `FINAL` policy is a settled rule for judging a future
+evaluation; it is not a result and says nothing about any parser. The policy
+became stricter in this round, not more permissive. No J-space,
+hidden-reasoning, internal-workspace or invisible-CoT conclusion follows.
+
+**Private-access ledger.** Sealed inputs read `0`. Sealed labels read `0`.
+Private curator files read `0`. Predictions generated `0`. Parser runs `0`.
+Azure writes or resource changes `0`. Formal evaluation ordinal `0`.
+`parser-v3-v1` unchanged and still
+`SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE`.
+
+**Next gate:** a separately authorized independent set-repair round for
+`parser-v3-v2`. No construction, migration, replacement review, manifest
+generation, sealing, authorization lock, image build, preregistration, Stage P
+or Stage E is authorized by this round.

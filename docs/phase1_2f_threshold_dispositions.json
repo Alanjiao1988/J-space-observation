@@ -1,13 +1,14 @@
 {
   "schema_version": "phase1-parser-v3-threshold-disposition/v1",
   "artifact_id": "phase1-2f-threshold-dispositions",
-  "phase": "1.2F",
+  "phase": "1.2F; finalized in 1.2G",
   "status": "FINAL",
   "purpose": "Machine-readable disposition of every acceptance threshold proposed for a future parser-v3-v2 evaluation. This artifact records the audit outcome. It is not itself an acceptance criterion and the contract compiler does not read it.",
   "binds_to": {
     "policy": "docs/phase1_parser_v3_v2_evaluation_policy.json",
-    "policy_schema_version": "phase1-parser-v3-prospective-evaluation-policy/v2",
-    "agreement_rule": "For every threshold_id below, disposition and status must equal the corresponding fields in the policy's acceptance_thresholds.items. A test enforces this so the two artifacts cannot drift."
+    "policy_schema_version": "phase1-parser-v3-prospective-evaluation-policy/v3",
+    "agreement_rule": "For every threshold_id below, disposition and status must equal the corresponding fields in the policy's acceptance_thresholds.items. A test enforces this so the two artifacts cannot drift.",
+    "schema_version_history": "Bound to phase1-parser-v3-prospective-evaluation-policy/v2 while Phase 1.2F held the policy at REVIEW_REQUIRED. Rebound to /v3 in Phase 1.2G when the policy was finalized. The binding is checked by test against the loaded policy so the two cannot drift."
   },
   "recognised_basis_types": [
     "LOGICAL_INVARIANT",
@@ -37,14 +38,19 @@
       "S11",
       "S12"
     ],
-    "free_case_count": 40,
-    "free_strata": [
+    "residual_case_count": 40,
+    "residual_strata": [
       "S04",
       "S05",
       "S06",
       "S09"
     ],
-    "implication": "Any criterion whose binding value lies at or below 80 of 120 is vacuous under the mandatory gates."
+    "implication": "Any criterion whose binding value lies at or below 80 of 120 is vacuous under the mandatory gates.",
+    "accepted_policy_coverage": {
+      "gate_pinned_case_count": 80,
+      "residual_criterion_case_count": 40,
+      "total_case_count": 120
+    }
   },
   "dispositions": [
     {
@@ -88,19 +94,39 @@
       "basis_type": null,
       "controlled_risk": "claimed: silent regression against the deployed parser",
       "independence": "NOT_DERIVABLE_PROSPECTIVELY",
-      "one_line_finding": "No margin is choosable without observing a parser; the comparator itself failed its own locked evaluation so it is not a fitness reference; and the comparator run does not exist.",
-      "successor": null
+      "one_line_finding": "No margin is choosable without observing a parser, and no comparator run exists to choose one from.",
+      "successor": null,
+      "withdrawn_arguments": [
+        {
+          "argument": "The comparator itself failed its own locked evaluation, so it is not a fitness reference.",
+          "withdrawn_in": "1.2F",
+          "finding": "A4",
+          "why": "A predecessor's formal FAIL on its own holdout says nothing about whether per-case agreement with it is informative. The argument conflates the comparator's verdict with the comparator's usefulness as reported context."
+        },
+        {
+          "argument": "The comparator run does not exist.",
+          "withdrawn_in": "1.2F",
+          "finding": "A4",
+          "why": "True but not a reason the criterion is unsound. A future authorized run could supply it, so this is a statement about timing, not about the metric. The surviving reason is that no margin is derivable without observing a parser."
+        }
+      ]
     },
     {
       "threshold_id": "residual_critical_exact_budget",
-      "disposition": "REVIEW_REQUIRED",
-      "status": "REVIEW_REQUIRED",
-      "final_value": null,
-      "basis_type": null,
+      "disposition": "KEEP_HARD",
+      "status": "FINAL",
+      "final_value": 0,
+      "basis_type": "LOGICAL_INVARIANT",
       "controlled_risk": "extraction failure in the four adversarial strata no zero-error gate covers",
       "independence": "INDEPENDENT",
-      "one_line_finding": "Structure derived candidate-independently from gate coverage; numeric value blocked primarily because the scientific decision on how strict the instrument must be over designed-failure strata has not been taken, and secondarily because no registered downstream parser-error budget exists.",
-      "successor": null
+      "one_line_finding": "Structure derived candidate-independently from gate coverage; value fixed at zero by the finite-conformance-suite premise, under which every case admitted to the set carries a mandatory reference decision and no mismatch is a tolerable deviation.",
+      "successor": null,
+      "per_stratum_max_errors": {
+        "S04": 0,
+        "S05": 0,
+        "S06": 0,
+        "S09": 0
+      }
     }
   ],
   "confusion_matrix_analysis": {
@@ -156,6 +182,12 @@
       "finding": "A present case with a wrong canonical value keeps presence class present. It is a true positive for presence and a failure for exact typed decision. Worst case: exact agreement 80 of 120 while answer-presence macro F1 is exactly 1.0000."
     }
   },
-  "post_hoc_disclosure": "This audit was performed after some parser-v3 development results were already known to the project. No numeric value was derived from, checked against, or tuned toward any observed parser behaviour. The single surviving hard criterion was deliberately left unresolved rather than assigned a defensible-sounding number.",
-  "terminal_status": "BLOCKED_ON_ACCEPTANCE_POLICY"
+  "post_hoc_disclosure": "This audit was performed after some parser-v3 development results were already known to the project. No numeric value was derived from, checked against, or tuned toward any observed parser behaviour. Phase 1.2F left the single surviving hard criterion unresolved rather than assigning it a defensible-sounding number; Phase 1.2G resolved it at zero on a LOGICAL_INVARIANT basis entailed by the conformance premise, which is a decision about what the set is and not an observation of any parser.",
+  "terminal_status": "READY_FOR_INDEPENDENT_SET_REPAIR",
+  "phase_1_2g_update": {
+    "note": "Phase 1.2F left residual_critical_exact_budget REVIEW_REQUIRED because the prior scientific question - how strict the instrument must be on designed-failure strata that no gate pins - had never been decided. Phase 1.2G decided it.",
+    "decision": "STRICT_FINITE_SUITE_CONFORMANCE",
+    "consequence": "residual_critical_exact_budget is KEEP_HARD at 0 pooled and 0 per stratum, on the LOGICAL_INVARIANT basis. The accepted policy requires exact typed-decision agreement on all 120 registered cases.",
+    "unchanged": "The four originally proposed thresholds keep their Phase 1.2F dispositions. Nothing in this update reopens them."
+  }
 }

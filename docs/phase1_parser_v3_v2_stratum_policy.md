@@ -3,6 +3,7 @@
 **Artifact ID:** `phase1-parser-v3-v2-stratum-policy/v2`
 **Status:** `FINAL` (design artifact; not an authorization to construct a set)
 **Introduced:** Phase 1.2F
+**Corrected:** Phase 1.2G — §5 gate-coverage table and consequence (see §5)
 **Scope:** public, case-free, label-free
 
 ---
@@ -126,23 +127,54 @@ contract and were **not** derived from any prediction.
 
 ## 5. Gate coverage of the taxonomy
 
-Recorded here because every acceptance-threshold disposition in Phase 1.2F
-depends on it.
+Recorded here because every acceptance-threshold disposition depends on it.
 
-| Stratum | Dedicated zero-error mandatory gate | Pinned by |
-| --- | --- | --- |
-| S01 S02 S03 S12 | yes (collective) | `G_clean_strata_exact` |
-| S06 | yes | `G_S06_last_number_trap` |
-| S07 | yes | `G_S07_truncated_no_answer` |
-| S08 | yes | `G_S08_explicit_no_answer` |
-| S10 | yes | `G_S10_unrecoverable_no_answer` |
-| S11 | yes | `G_S11_ambiguity_detection` |
-| **S04 S05 S09** | **no** | — |
+**Correction (Phase 1.2G).** The table and consequence below previously
+recorded superseded coverage figures:
 
-**Consequence.** Satisfying every mandatory gate already implies at least
-**90 of 120** exact typed decisions. The **residual critical strata** are
-exactly **S04, S05, S09** (30 cases), and they are the only population over
-which a non-vacuous numeric acceptance criterion can be written.
+> S06 pinned; gate coverage 90 of 120 over a three-stratum residual.
+
+That was already false when Phase 1.2F wrote it: the same round had recomputed
+coverage from the registered per-gate error definitions and found S06
+*unpinned*, and had recorded the corrected figures in the policy JSON. The
+error was confined to this document. It is corrected below rather than
+silently rewritten, and the superseded figures are named so that a reader who
+saw them can recognise what changed.
+
+| Stratum | Dedicated zero-error mandatory gate | Pins exact typed decision | Pinned by |
+| --- | --- | --- | --- |
+| S01 S02 S03 S12 | yes (collective) | yes | `G_clean_strata_exact` |
+| S06 | yes | **no** | — |
+| S07 | yes | yes | `G_S07_truncated_no_answer` |
+| S08 | yes | yes | `G_S08_explicit_no_answer` |
+| S10 | yes | yes | `G_S10_unrecoverable_no_answer` |
+| S11 | yes | yes | `G_S11_ambiguity_detection` |
+| **S04 S05 S06 S09** | S06 only | **no** | — |
+
+**Why S06 has a zero-error gate but is not pinned.** `G_S06_last_number_trap`
+carries exactly one registered error definition,
+`registered_rightmost_distractor_span_selected`. It forbids selecting the
+trailing distractor span and forbids nothing else. A parser can avoid that span
+and still return a different wrong canonical value, or emit `no_answer`,
+without violating the gate. Zero errors under that definition therefore does
+not entail exact typed-decision agreement.
+
+**Consequence.** Satisfying every mandatory gate implies at least **80 of 120**
+exact typed decisions. The **residual strata** are exactly **S04, S05, S06,
+S09** (40 cases), and they are the only population over which a non-vacuous
+numeric acceptance criterion can be written.
+
+**Superseded figures.** `90 of 120`; residual `S04, S05, S09`; residual case
+count `30`. Do not cite them.
+
+**Derivation authority.** These figures are not maintained by hand. They are
+derived by
+`jspace_observation.parser_v3_repair_contract.derive_gate_coverage`, which
+`validate_policy` calls and which therefore runs before any contract can be
+compiled. The policy JSON restates them and the validator rejects the policy if
+the restatement disagrees. This document restates them a second time for a
+human reader and is checked by
+`scripts/check_current_state_consistency.py`.
 
 ---
 

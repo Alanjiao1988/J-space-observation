@@ -21,8 +21,15 @@ The compiler consumes both and emits a final contract only when every declared
 invariant agrees. It never edits the policy to fit the set; a disagreement is
 an error about the set, never a licence to move a threshold.
 
-Nothing here reads a private set, a sealed blob or a locked label, and nothing
-here imports or invokes a parser.
+Nothing here reads a private set, a sealed blob or a locked label.
+
+This module introduces no new parser dependency: it references no parser symbol
+and invokes no parser. That is a narrower claim than "no parser module is
+loaded", and the difference is deliberate. ``jspace_observation/__init__.py``
+eagerly imports the legacy parser, so importing this module *through the
+package* does place parser code in ``sys.modules``. The supportable and tested
+claim is differential — importing this module adds no parser module beyond the
+package baseline, and calls no parser function.
 """
 
 from __future__ import annotations
@@ -54,11 +61,16 @@ __all__ = [
     "FACTS_SCHEMA_VERSION",
     "CONTRACT_SCHEMA_VERSION",
     "GATE_POPULATIONS",
+    "GATE_ERROR_DEFINITIONS",
+    "GATE_COUNTING_UNITS",
+    "GateCoverage",
+    "derive_gate_coverage",
     "THRESHOLD_BASIS_TYPES",
     "THRESHOLD_DISPOSITIONS",
     "BINDING_DISPOSITIONS",
     "NON_BINDING_DISPOSITIONS",
     "REQUIRED_THRESHOLD_FIELDS",
+    "REQUIRED_BINDING_NARRATIVE_FIELDS",
     "INEQUALITY_DIRECTIONS",
     "validate_acceptance_thresholds",
     "validate_policy",
@@ -78,7 +90,7 @@ class ContractError(ValueError):
     """A contract artifact is malformed, disagrees, or would be overwritten."""
 
 
-POLICY_SCHEMA_VERSION = "phase1-parser-v3-prospective-evaluation-policy/v2"
+POLICY_SCHEMA_VERSION = "phase1-parser-v3-prospective-evaluation-policy/v3"
 FACTS_SCHEMA_VERSION = "phase1-parser-v3-set-derived-facts/v1"
 CONTRACT_SCHEMA_VERSION = "phase1-parser-v3-compiled-acceptance-contract/v1"
 
@@ -128,6 +140,20 @@ REQUIRED_THRESHOLD_FIELDS: tuple[str, ...] = (
     "set_independence",
     "boundary_semantics",
     "review_status",
+)
+
+#: Narrative provenance a FINAL *binding* criterion must carry, added in Phase
+#: 1.2G. A Boolean independence flag records a claim; these fields record what
+#: the claim rests on and what it does not cover. ``public_design_dependencies``
+#: exists because zero tolerance is candidate-independent and set-independent
+#: but is *not* context-free: it depends on the registered public ontology and
+#: on what the strata are for.
+REQUIRED_BINDING_NARRATIVE_FIELDS: tuple[str, ...] = (
+    "candidate_observation_independence",
+    "sealed_set_independence",
+    "public_design_dependencies",
+    "post_hoc_disclosure",
+    "residual_limitations",
 )
 
 #: Recognised inequality directions for a numeric threshold.
@@ -185,10 +211,99 @@ SCANNED_THRESHOLD_PROSE_FIELDS: tuple[str, ...] = (
 #: and pin no individual case.
 GATE_ERROR_SCOPES: tuple[str, ...] = ("per_case", "set_level")
 
+#: Recognised counting units. A gate that counts cases and a gate that reports
+#: a single whole-set property are not interchangeable, and reading the second
+#: as the first is what produced the Phase 1.2F coverage error.
+GATE_COUNTING_UNITS: tuple[str, ...] = ("case", "set")
+
+#: Closed registry of the error definitions a gate may declare, owned by this
+#: module rather than by the policy document.
+#:
+#: Phase 1.2G requirement. Coverage must be derived from code-owned closed
+#: semantics, never from explanatory prose and never from a free-standing
+#: Boolean in the policy. Each entry fixes three things that together decide
+#: whether zero errors under that definition entails exact typed-decision
+#: agreement for every case in the gate's population:
+#:
+#: ``scope``
+#:     ``per_case`` or ``set_level``. A set-level property can never pin an
+#:     individual case.
+#: ``counting_unit``
+#:     what one unit of ``maximum_errors`` counts.
+#: ``pins_exact_typed_decision``
+#:     whether a zero-error result under this definition *entails* exact typed
+#:     decision agreement. This is the field the coverage derivation reads.
+#:
+#: An unknown definition is a hard error. Adding a definition is a deliberate
+#: act that must state its pinning consequence here, in code, next to the
+#: reason.
+GATE_ERROR_DEFINITIONS: dict[str, dict[str, Any]] = {
+    "expected_value_or_registered_selected_span_not_recovered": {
+        "scope": "per_case",
+        "counting_unit": "case",
+        "pins_exact_typed_decision": True,
+        "reason": (
+            "recovering the registered expected value on a case is exact typed "
+            "decision agreement for that case, so zero errors pins the population"
+        ),
+    },
+    "typed_decision_is_not_no_answer": {
+        "scope": "per_case",
+        "counting_unit": "case",
+        "pins_exact_typed_decision": True,
+        "reason": (
+            "no_answer carries no canonical value, so the typed class is the whole "
+            "decision and requiring it exactly pins the population"
+        ),
+    },
+    "typed_decision_is_not_ambiguous": {
+        "scope": "per_case",
+        "counting_unit": "case",
+        "pins_exact_typed_decision": True,
+        "reason": (
+            "ambiguous carries no canonical value, so the typed class is the whole "
+            "decision and requiring it exactly pins the population"
+        ),
+    },
+    "registered_rightmost_distractor_span_selected": {
+        "scope": "per_case",
+        "counting_unit": "case",
+        "pins_exact_typed_decision": False,
+        "reason": (
+            "this forbids one registered wrong span and nothing else. A parser can "
+            "avoid the trailing distractor and still return a different wrong "
+            "canonical value, or the wrong typed class, so zero errors here does "
+            "not entail exact typed-decision agreement"
+        ),
+    },
+    "reference_support_denominator_is_zero": {
+        "scope": "set_level",
+        "counting_unit": "set",
+        "pins_exact_typed_decision": False,
+        "reason": (
+            "this constrains the reference supports of the set, not the parser's "
+            "output, and cannot pin any case"
+        ),
+    },
+    "parser_emitted_zero_instances_of_a_registered_typed_decision_class_across_the_whole_set": {
+        "scope": "set_level",
+        "counting_unit": "set",
+        "pins_exact_typed_decision": False,
+        "reason": (
+            "a whole-set collapse property. Reading its zero tolerance as a "
+            "per-case exact-agreement requirement would pin all 120 cases and make "
+            "every acceptance criterion vacuous"
+        ),
+    },
+}
+
 #: Provenance every gate must declare so that ``maximum_errors`` has a meaning.
+#: ``counting_unit`` was added in Phase 1.2G: without it, a set-level zero and a
+#: per-case zero are written identically.
 REQUIRED_GATE_SEMANTIC_FIELDS: tuple[str, ...] = (
     "error_definition",
     "error_scope",
+    "counting_unit",
     "pins_exact_typed_decision",
 )
 
@@ -311,6 +426,18 @@ def _validate_threshold_item(item: Mapping[str, Any], seen: set[str]) -> None:
             f"required provenance fields: {', '.join(sorted(missing))}"
         )
 
+    if disposition in BINDING_DISPOSITIONS:
+        for field in REQUIRED_BINDING_NARRATIVE_FIELDS:
+            text = item.get(field)
+            if isinstance(text, list):
+                text = " ".join(str(part) for part in text)
+            if not isinstance(text, str) or not text.strip():
+                raise ContractError(
+                    f"threshold {threshold_id} binds acceptance and must carry a "
+                    f"non-empty {field}"
+                )
+            _reject_prohibited_basis(text, f"threshold {threshold_id} {field}")
+
     basis = item.get("basis_type")
     if basis not in THRESHOLD_BASIS_TYPES:
         raise ContractError(
@@ -367,7 +494,21 @@ def _validate_threshold_item(item: Mapping[str, Any], seen: set[str]) -> None:
             f"threshold {threshold_id} must declare an inequality direction of "
             f"{' or '.join(INEQUALITY_DIRECTIONS)}"
         )
-    if not isinstance(boundary.get("at_threshold_passes"), bool):
+    # ``equality_passes`` is the Phase 1.2G name; ``at_threshold_passes`` is the
+    # Phase 1.2F spelling. Either may be used, but two spellings of one fact
+    # must not be able to disagree.
+    equality = boundary.get("equality_passes")
+    legacy_equality = boundary.get("at_threshold_passes")
+    if equality is not None and legacy_equality is not None:
+        if equality != legacy_equality:
+            raise ContractError(
+                f"threshold {threshold_id} declares equality_passes="
+                f"{equality!r} and at_threshold_passes={legacy_equality!r}; two "
+                "spellings of one boundary rule must agree"
+            )
+    if equality is None:
+        equality = legacy_equality
+    if not isinstance(equality, bool):
         raise ContractError(
             f"threshold {threshold_id} must state whether the exact threshold "
             "value passes"
@@ -425,11 +566,22 @@ def _collect_clause_text(value: Any) -> list[str]:
 
     A clause that is not a plain string must not silently bypass the
     non-binding re-entry check.
+
+    Mapping *keys* are collected as well as values. A clause written as
+    ``{"legacy_parser": "required"}`` places the reference in the key, and a
+    values-only walk would report the clause as clean while the policy reads a
+    comparator into its own pass condition. Post-remediation re-review finding
+    A-04: the earlier walk collected values only, and a synthetic policy using a
+    comparator name as a key validated successfully.
     """
     if isinstance(value, str):
         return [value]
     if isinstance(value, Mapping):
-        return [text for entry in value.values() for text in _collect_clause_text(entry)]
+        collected: list[str] = []
+        for key, entry in value.items():
+            collected.extend(_collect_clause_text(key))
+            collected.extend(_collect_clause_text(entry))
+        return collected
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
         return [text for entry in value for text in _collect_clause_text(entry)]
     if value is None:
@@ -437,12 +589,243 @@ def _collect_clause_text(value: Any) -> list[str]:
     return [str(value)]
 
 
-def _validate_gate_semantics(gate: Mapping[str, Any]) -> None:
-    """Require every gate to declare what one of its errors is.
+#: Fields of a threshold record that describe *its own* population, and are
+#: therefore required to agree with the structured population declaration.
+#: Phase 1.2G seed defect G-01: the residual criterion named three strata in
+#: its metric and numerator while declaring four in its population and a
+#: denominator of forty. Prose that contradicts the structure is not a
+#: cosmetic problem, because the prose is what a reader acts on.
+POPULATION_PROSE_FIELDS: tuple[str, ...] = (
+    "metric_definition",
+    "numerator",
+    "failure_risk_controlled",
+    "population_note",
+)
+
+_STRATUM_TOKEN_RE = re.compile(r"\bS(?:0[1-9]|1[0-2])\b")
+
+#: Cardinality words that must agree with the size of the declared population.
+_CARDINALITY_WORDS: dict[str, int] = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+}
+
+
+def _check_population_prose(
+    item: Mapping[str, Any], strata: Sequence[str], case_count: int
+) -> None:
+    """Reject prose describing a population other than the declared one."""
+    threshold_id = item["threshold_id"]
+    expected = set(strata)
+    for field in POPULATION_PROSE_FIELDS:
+        text = item.get(field)
+        if not isinstance(text, str) or not text.strip():
+            continue
+        mentioned = set(_STRATUM_TOKEN_RE.findall(text))
+        if mentioned and mentioned != expected:
+            raise ContractError(
+                f"threshold {threshold_id} field {field} describes strata "
+                f"{sorted(mentioned)} but the declared population is "
+                f"{sorted(expected)}; a three-stratum description of a "
+                "four-stratum population is the Phase 1.2F defect this check "
+                "exists to prevent"
+            )
+        lowered = text.lower()
+        for word, number in _CARDINALITY_WORDS.items():
+            if number == len(expected):
+                continue
+            if re.search(rf"\b{word}\b[^.]{{0,40}}\bstrata\b", lowered):
+                raise ContractError(
+                    f"threshold {threshold_id} field {field} calls the population "
+                    f"{word} strata while it is declared over {len(expected)}"
+                )
+        for match in re.finditer(r"\b(\d+)\s+cases\b", lowered):
+            if int(match.group(1)) != case_count:
+                raise ContractError(
+                    f"threshold {threshold_id} field {field} says "
+                    f"{match.group(1)} cases while the declared population holds "
+                    f"{case_count}"
+                )
+
+
+def _require_int(value: Any, subject: str, low: int, high: int | None = None) -> int:
+    """Require a plain integer in range, rejecting Booleans and floats.
+
+    ``isinstance(True, int)`` is true in Python, so a Boolean limit would
+    otherwise pass every range check and silently mean zero or one.
+
+    ``high`` is optional because some callers know a lower bound but have no
+    meaningful upper one; an absent upper bound must not become an excuse to
+    skip the type check.
+    """
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ContractError(
+            f"{subject} must be an integer, not {type(value).__name__}; a Boolean "
+            "or fractional limit has no meaning as an error count"
+        )
+    if value < low or (high is not None and value > high):
+        bound = f"{low}..{high}" if high is not None else f"at least {low}"
+        raise ContractError(f"{subject} must lie in {bound}, got {value}")
+    return value
+
+
+def _validate_residual_criterion(
+    item: Mapping[str, Any], coverage: GateCoverage, cases_per_stratum: int
+) -> None:
+    """Validate the residual exact-conformance criterion against the gates.
+
+    The population is not a free parameter. It is exactly the set of strata the
+    mandatory gates leave unpinned, so it is checked against the derived
+    coverage rather than read from the document.
+    """
+    threshold_id = item["threshold_id"]
+    population = item.get("population")
+    if not isinstance(population, Mapping):
+        raise ContractError(
+            f"threshold {threshold_id} must declare a structured population; a "
+            "prose population cannot be checked against the derived coverage"
+        )
+    derivation = population.get("derivation")
+    if derivation != "RESIDUAL_OF_EXACT_TYPED_DECISION_GATES":
+        raise ContractError(
+            f"threshold {threshold_id} must declare its population derivation as "
+            "RESIDUAL_OF_EXACT_TYPED_DECISION_GATES"
+        )
+    strata = population.get("strata")
+    if not isinstance(strata, list) or not strata:
+        raise ContractError(f"threshold {threshold_id} must list its residual strata")
+    if tuple(strata) != coverage.residual_strata:
+        raise ContractError(
+            f"threshold {threshold_id} declares residual strata {strata} but the "
+            f"gates leave {list(coverage.residual_strata)} unpinned"
+        )
+    declared_per_stratum = _require_int(
+        population.get("cases_per_stratum"),
+        f"threshold {threshold_id} population.cases_per_stratum",
+        1,
+        cases_per_stratum,
+    )
+    if declared_per_stratum != cases_per_stratum:
+        raise ContractError(
+            f"threshold {threshold_id} declares {declared_per_stratum} cases per "
+            f"stratum but the set registers {cases_per_stratum}"
+        )
+    case_count = _require_int(
+        population.get("case_count"),
+        f"threshold {threshold_id} population.case_count",
+        0,
+        coverage.total_case_count,
+    )
+    if case_count != coverage.residual_case_count:
+        raise ContractError(
+            f"threshold {threshold_id} declares a residual population of "
+            f"{case_count} cases but the gates leave "
+            f"{coverage.residual_case_count}; substituting the superseded "
+            "three-stratum count is the Phase 1.2F defect"
+        )
+    if case_count != len(strata) * declared_per_stratum:
+        raise ContractError(
+            f"threshold {threshold_id} population.case_count is not the product of "
+            "its own strata and cases_per_stratum"
+        )
+
+    _check_population_prose(item, strata, case_count)
+
+    limits = item.get("limits")
+    if not isinstance(limits, Mapping):
+        raise ContractError(
+            f"threshold {threshold_id} must declare structured limits; a "
+            "concentration cap stated only in prose cannot be enforced"
+        )
+    pooled = _require_int(
+        limits.get("pooled_max_errors"),
+        f"threshold {threshold_id} limits.pooled_max_errors",
+        0,
+        case_count,
+    )
+    per_stratum_limits = limits.get("per_stratum_max_errors")
+    if not isinstance(per_stratum_limits, Mapping) or not per_stratum_limits:
+        raise ContractError(
+            f"threshold {threshold_id} must declare a per-stratum concentration "
+            "cap for every residual stratum"
+        )
+    if sorted(per_stratum_limits) != sorted(strata):
+        raise ContractError(
+            f"threshold {threshold_id} declares per-stratum caps for "
+            f"{sorted(per_stratum_limits)} but its population is {sorted(strata)}"
+        )
+    for stratum in sorted(per_stratum_limits):
+        _require_int(
+            per_stratum_limits[stratum],
+            f"threshold {threshold_id} limits.per_stratum_max_errors.{stratum}",
+            0,
+            declared_per_stratum,
+        )
+
+    # A per-stratum cap above the pooled cap is unreachable, and a policy that
+    # states one is not merely redundant: it reads as permission. Phase 1.2G
+    # records both limits precisely so that relaxing one without the other is
+    # caught, which only works if the relation is enforced rather than
+    # described. Audit finding A3/B9.
+    for stratum in sorted(per_stratum_limits):
+        cap = per_stratum_limits[stratum]
+        if cap > pooled:
+            raise ContractError(
+                f"threshold {threshold_id} allows {cap} errors in {stratum} while "
+                f"its pooled limit is {pooled}; a per-stratum cap above the "
+                "pooled cap is unreachable and misstates the constraint"
+            )
+
+    # A legacy generic ``value`` is permitted only as an alias of the pooled
+    # limit. Two numbers that can disagree are two policies.
+    if "value" in item and item["value"] is not None:
+        alias = _require_int(
+            item["value"], f"threshold {threshold_id} value", 0, case_count
+        )
+        if alias != pooled:
+            raise ContractError(
+                f"threshold {threshold_id} carries value {alias} while its pooled "
+                f"limit is {pooled}; the generic value is defined as the pooled "
+                "limit and must equal it"
+            )
+
+    boundary = item.get("boundary_semantics")
+    if not isinstance(boundary, Mapping):
+        raise ContractError(f"threshold {threshold_id} must declare boundary_semantics")
+    if boundary.get("inequality") != "at_most":
+        raise ContractError(
+            f"threshold {threshold_id} counts errors and must use an at_most "
+            "inequality"
+        )
+    equality = boundary.get("equality_passes")
+    if equality is None:
+        equality = boundary.get("at_threshold_passes")
+    if equality is not True:
+        raise ContractError(
+            f"threshold {threshold_id} must declare that the exact limit passes; "
+            "at most zero errors means zero errors is a pass"
+        )
+
+
+def _validate_gate_semantics(gate: Mapping[str, Any]) -> dict[str, Any]:
+    """Require every gate to declare what one of its errors is, and check it.
 
     Audit finding A2. Without this, ``maximum_errors: 0`` has no meaning, and
     the coverage baseline that every threshold disposition rests on can be read
     three incompatible ways from the same field.
+
+    Phase 1.2G goes further. The declared semantics are checked against the
+    code-owned :data:`GATE_ERROR_DEFINITIONS` registry, and the policy's
+    ``pins_exact_typed_decision`` Boolean is treated as a readability
+    restatement that must agree with the registry rather than as an independent
+    source of truth. Returns the registry entry so the caller can derive
+    coverage from it.
     """
     gate_id = gate.get("gate_id", "<unnamed>")
     missing = [f for f in REQUIRED_GATE_SEMANTIC_FIELDS if f not in gate]
@@ -455,29 +838,270 @@ def _validate_gate_semantics(gate: Mapping[str, Any]) -> None:
     definition = gate["error_definition"]
     if not isinstance(definition, str) or not definition.strip():
         raise ContractError(f"gate {gate_id} must declare a non-empty error_definition")
+    registered = GATE_ERROR_DEFINITIONS.get(definition)
+    if registered is None:
+        raise ContractError(
+            f"gate {gate_id} declares error_definition {definition!r}, which is not "
+            "in the closed registry; coverage cannot be derived from an error "
+            "definition whose pinning consequence has never been decided"
+        )
     if gate["error_scope"] not in GATE_ERROR_SCOPES:
         raise ContractError(
             f"gate {gate_id} declares an unrecognised error_scope "
             f"{gate['error_scope']!r}"
         )
-    if not isinstance(gate["pins_exact_typed_decision"], bool):
+    if gate["error_scope"] != registered["scope"]:
+        raise ContractError(
+            f"gate {gate_id} declares error_scope {gate['error_scope']!r} but "
+            f"{definition!r} is registered as {registered['scope']!r}"
+        )
+    if gate["counting_unit"] not in GATE_COUNTING_UNITS:
+        raise ContractError(
+            f"gate {gate_id} declares an unrecognised counting_unit "
+            f"{gate['counting_unit']!r}"
+        )
+    if gate["counting_unit"] != registered["counting_unit"]:
+        raise ContractError(
+            f"gate {gate_id} declares counting_unit {gate['counting_unit']!r} but "
+            f"{definition!r} is registered as {registered['counting_unit']!r}"
+        )
+    declared_pins = gate["pins_exact_typed_decision"]
+    if not isinstance(declared_pins, bool):
         raise ContractError(
             f"gate {gate_id} must declare pins_exact_typed_decision as a boolean"
         )
-    if gate["error_scope"] == "set_level" and gate["pins_exact_typed_decision"]:
+    if declared_pins != registered["pins_exact_typed_decision"]:
+        raise ContractError(
+            f"gate {gate_id} declares pins_exact_typed_decision={declared_pins} but "
+            f"its registered error definition {definition!r} entails "
+            f"{registered['pins_exact_typed_decision']}: {registered['reason']}"
+        )
+    if gate["error_scope"] == "set_level" and declared_pins:
         raise ContractError(
             f"gate {gate_id} declares a set-level error scope and cannot pin any "
             "individual case to exact typed-decision agreement"
         )
+    return dict(registered)
 
 
-def validate_acceptance_thresholds(thresholds: Mapping[str, Any]) -> set[str]:
+@dataclass(frozen=True)
+class GateCoverage:
+    """Exact-typed-decision coverage derived from structured gate semantics.
+
+    This is the production derivation. Both :func:`validate_policy` and, through
+    it, :func:`compile_contract` read coverage from here, so a test can never
+    prove a coverage claim that the compiler does not also enforce.
+    """
+
+    pinned_strata: tuple[str, ...]
+    pinned_case_count: int
+    residual_strata: tuple[str, ...]
+    residual_case_count: int
+    total_case_count: int
+    pinning_gates: tuple[str, ...]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "pinned_strata": list(self.pinned_strata),
+            "pinned_case_count": self.pinned_case_count,
+            "residual_strata": list(self.residual_strata),
+            "residual_case_count": self.residual_case_count,
+            "total_case_count": self.total_case_count,
+            "pinning_gates": list(self.pinning_gates),
+        }
+
+
+def _resolve_gate_strata(
+    gate: Mapping[str, Any], population: Mapping[str, Any]
+) -> tuple[str, ...]:
+    """Resolve a gate's population to the strata it actually scores.
+
+    Fails closed. An unresolved selector, an unknown population kind, or a
+    selector naming a stratum the set does not contain is an error, never an
+    empty set that would silently shrink coverage.
+    """
+    gate_id = gate.get("gate_id", "<unnamed>")
+    kind = gate.get("population")
+    strata = tuple(population["strata"])
+
+    if kind == "all_cases":
+        return strata
+    if kind == "clean_cases":
+        clean = population.get("clean_strata")
+        if not isinstance(clean, list) or not clean:
+            raise ContractError(
+                f"gate {gate_id} scores the clean cases but "
+                "policy.population.clean_strata is not declared"
+            )
+        unknown = sorted(set(clean) - set(strata))
+        if unknown:
+            raise ContractError(
+                f"policy.population.clean_strata names unregistered strata: "
+                f"{', '.join(unknown)}"
+            )
+        return tuple(sorted(clean))
+    if kind == "stratum":
+        selector = gate.get("population_selector")
+        if selector not in strata:
+            raise ContractError(
+                f"gate {gate_id} selects stratum {selector!r}, which is not a "
+                "registered stratum"
+            )
+        return (selector,)
+    if kind in ("typed_decision_class", "answer_presence"):
+        selector = gate.get("population_selector")
+        presence = population.get("stratum_presence") or {}
+        resolved = tuple(
+            sorted(name for name, value in presence.items() if value == selector)
+        )
+        if not resolved:
+            raise ContractError(
+                f"gate {gate_id} selects class {selector!r}, which no registered "
+                "stratum carries; an unresolvable population is an error, not an "
+                "empty gate"
+            )
+        return resolved
+    raise ContractError(
+        f"gate {gate_id} declares population kind {kind!r}, which has no "
+        "registered resolution rule"
+    )
+
+
+def derive_gate_coverage(policy: Mapping[str, Any]) -> GateCoverage:
+    """Derive exact-typed-decision coverage from the gates alone.
+
+    The single production derivation required by Phase 1.2G. A stratum is
+    *pinned* when some mandatory gate scores it with a per-case error definition
+    that the code-owned registry says entails exact typed-decision agreement.
+    Every other stratum is *residual*.
+
+    Fails closed on an unknown error definition, an unknown population kind, an
+    unresolvable selector, a missing counting unit, an overlap between two
+    pinning gates, or any stratum that is neither pinned nor residual.
+    """
+    population = policy.get("population")
+    if not isinstance(population, Mapping):
+        raise ContractError("policy.population must be an object to derive coverage")
+    strata = tuple(population["strata"])
+    per_stratum = population["cases_per_stratum"]
+
+    pinned: dict[str, str] = {}
+    pinning_gates: list[str] = []
+    for gate in policy["gates"]:
+        registered = _validate_gate_semantics(gate)
+        resolved = _resolve_gate_strata(gate, population)
+        # ``maximum_errors`` decides whether a gate pins, so it is derivation
+        # input, not decoration. It must be a plain non-negative integer, or
+        # explicitly ``None`` for a gate that constrains support rather than
+        # errors: ``False`` and ``0.0`` both compare equal to zero in Python,
+        # so an untyped read would let a malformed gate pin a stratum. Audit
+        # finding A5/B7.
+        raw_limit = gate.get("maximum_errors")
+        if raw_limit is None:
+            if registered["pins_exact_typed_decision"]:
+                raise ContractError(
+                    f"gate {gate.get('gate_id')} pins exact typed-decision "
+                    "agreement but declares no maximum_errors; a pinning gate "
+                    "must state its error limit"
+                )
+            limit = None
+        else:
+            limit = _require_int(
+                raw_limit,
+                f"gate {gate.get('gate_id')} maximum_errors",
+                0,
+                len(resolved) * per_stratum if resolved else None,
+            )
+        if not gate.get("mandatory"):
+            continue
+        if not registered["pins_exact_typed_decision"]:
+            continue
+        if limit != 0:
+            # A pinning definition only pins at zero tolerance. A non-zero
+            # allowance leaves individual cases free and must not be counted.
+            continue
+        pinning_gates.append(gate["gate_id"])
+        for stratum in resolved:
+            if stratum in pinned:
+                raise ContractError(
+                    f"strata {stratum} is pinned by both {pinned[stratum]} and "
+                    f"{gate['gate_id']}; overlapping exact-agreement coverage is "
+                    "not permitted because it makes the residual population "
+                    "ambiguous"
+                )
+            pinned[stratum] = gate["gate_id"]
+
+    pinned_strata = tuple(sorted(pinned))
+    residual_strata = tuple(sorted(set(strata) - set(pinned_strata)))
+    if set(pinned_strata) | set(residual_strata) != set(strata):
+        raise ContractError(
+            "derived coverage does not partition the registered strata"
+        )
+    coverage = GateCoverage(
+        pinned_strata=pinned_strata,
+        pinned_case_count=len(pinned_strata) * per_stratum,
+        residual_strata=residual_strata,
+        residual_case_count=len(residual_strata) * per_stratum,
+        total_case_count=population["total_case_count"],
+        pinning_gates=tuple(sorted(pinning_gates)),
+    )
+    if (
+        coverage.pinned_case_count + coverage.residual_case_count
+        != coverage.total_case_count
+    ):
+        raise ContractError(
+            "derived coverage case counts do not sum to the registered total"
+        )
+    return coverage
+
+
+def _check_declared_coverage(
+    policy: Mapping[str, Any], coverage: GateCoverage
+) -> None:
+    """Reject a hand-maintained coverage block that disagrees with derivation.
+
+    The policy keeps a readable coverage section. Phase 1.2G makes it a
+    restatement: any disagreement with the derived values is an error, so the
+    document can never drift away from the code that enforces it.
+    """
+    declared = policy.get("gate_coverage_analysis")
+    if not isinstance(declared, Mapping):
+        raise ContractError("policy.gate_coverage_analysis must be an object")
+    expected = {
+        "zero_error_pinned_strata": list(coverage.pinned_strata),
+        "zero_error_pinned_case_count": coverage.pinned_case_count,
+        "residual_strata": list(coverage.residual_strata),
+        "residual_case_count": coverage.residual_case_count,
+    }
+    for field, value in expected.items():
+        if field not in declared:
+            raise ContractError(
+                f"policy.gate_coverage_analysis is missing {field}; the declared "
+                "coverage block must restate every derived value"
+            )
+        if declared[field] != value:
+            raise ContractError(
+                f"policy.gate_coverage_analysis.{field} is {declared[field]!r} but "
+                f"the gates derive {value!r}"
+            )
+
+
+def validate_acceptance_thresholds(
+    thresholds: Mapping[str, Any],
+    *,
+    coverage: GateCoverage | None = None,
+    cases_per_stratum: int | None = None,
+) -> set[str]:
     """Validate the acceptance-threshold block and its provenance.
 
     Phase 1.2F requirement. A numeric hard threshold is only prospective if it
     can be derived without observing the candidate parser and without observing
     the future holdout, so every FINAL hard threshold must name a recognised
     basis type and carry a complete derivation.
+
+    When ``coverage`` is supplied, any criterion declaring a residual population
+    is additionally checked against the derived gate coverage, so a criterion
+    can never claim a population the gates do not leave free.
 
     Returns the set of threshold identifiers that must never influence
     PASS/FAIL, so that the caller can police the policy's status logic.
@@ -497,6 +1121,17 @@ def validate_acceptance_thresholds(thresholds: Mapping[str, Any]) -> set[str]:
     seen: set[str] = set()
     for item in items:
         _validate_threshold_item(item, seen)
+
+    # A criterion whose population is the residual of the gates must be checked
+    # against the derived coverage, not against its own description of itself.
+    if coverage is not None and cases_per_stratum is not None:
+        for item in items:
+            population = item.get("population")
+            if not isinstance(population, Mapping):
+                continue
+            if population.get("derivation") is None:
+                continue
+            _validate_residual_criterion(item, coverage, cases_per_stratum)
 
     binding_ids = {
         item["threshold_id"]
@@ -819,8 +1454,16 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
             )
         _validate_gate_semantics(gate)
 
+    # The single production coverage derivation. Everything downstream - the
+    # residual criterion's population, the declared coverage block, and the
+    # compiled contract - reads from here.
+    coverage = derive_gate_coverage(policy)
+    _check_declared_coverage(policy, coverage)
+
     thresholds = policy.get("acceptance_thresholds")
-    non_binding = validate_acceptance_thresholds(thresholds)
+    non_binding = validate_acceptance_thresholds(
+        thresholds, coverage=coverage, cases_per_stratum=per_stratum
+    )
 
     # A metric that was removed, merged away, or demoted to report-only must
     # not be reachable from the PASS/FAIL logic under any spelling. Audit
@@ -830,6 +1473,7 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(status_logic, Mapping):
         raise ContractError("policy.status_logic must be an object")
     reserved_keys = {"non_binding_rule", "note", "notes"}
+    comparator_names = _registered_comparator_names(policy)
     for outcome, clause in sorted(status_logic.items()):
         if outcome in reserved_keys:
             continue
@@ -841,6 +1485,38 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
                         "is not a binding criterion; a report-only or removed metric "
                         "must never re-enter PASS/FAIL logic"
                     )
+            if outcome in ("PASS", "FAIL", "INVALID", "binding_criteria"):
+                for comparator in sorted(comparator_names):
+                    if re.search(rf"\b{re.escape(comparator)}\b", text):
+                        raise ContractError(
+                            f"status_logic.{outcome} references the registered "
+                            f"comparator {comparator!r}; comparator output is "
+                            "reported alongside the result and never inside it"
+                        )
+
+    # ``binding_criteria`` is a declaration, so it is checked against the set
+    # the validator actually computed rather than trusted. An empty list, a
+    # stale identifier, or a renamed criterion would otherwise leave the
+    # document claiming a binding set the policy does not have. Audit finding
+    # A4/B8.
+    declared_binding = status_logic.get("binding_criteria")
+    if not isinstance(declared_binding, list) or not declared_binding:
+        raise ContractError(
+            "policy.status_logic.binding_criteria must list the binding criteria; "
+            "a FINAL policy whose PASS reduces to the mandatory gates leaves the "
+            "residual population unconstrained"
+        )
+    computed_binding = {
+        item["threshold_id"]
+        for item in thresholds.get("items", [])
+        if item.get("binding") is True
+    }
+    if set(declared_binding) != computed_binding:
+        raise ContractError(
+            f"policy.status_logic.binding_criteria declares "
+            f"{sorted(declared_binding)} but the binding criteria are "
+            f"{sorted(computed_binding)}"
+        )
 
     status = policy.get("status")
     if status not in ("FINAL", "REVIEW_REQUIRED"):
@@ -849,7 +1525,230 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
         raise ContractError(
             "a policy with unresolved thresholds cannot declare itself FINAL"
         )
+
+    _validate_comparators(policy, non_binding)
+    _validate_execution_state(policy)
+    _reject_superseded_figures(policy, coverage)
     return dict(policy)
+
+
+#: Comparator fields that would turn reported context back into a criterion.
+#: ``binding`` is checked separately because ``False`` is its correct value,
+#: while for these fields any value at all - including ``0``, which is a real
+#: margin - reintroduces a criterion.
+_COMPARATOR_CRITERION_FIELDS: tuple[str, ...] = (
+    "margin",
+    "minimum_margin",
+    "required_margin",
+    "acceptance_margin",
+    "threshold",
+    "minimum",
+    "maximum",
+    "pass_condition",
+    "fail_condition",
+)
+
+
+def _registered_comparator_names(policy: Mapping[str, Any]) -> tuple[str, ...]:
+    """Return the registered comparator names, or ``()`` if none are declared.
+
+    Read defensively: this is used by the status-logic check, which must keep
+    working on a malformed comparator block long enough for the comparator
+    validator to produce the better error message.
+    """
+    comparators = policy.get("comparators")
+    if not isinstance(comparators, Mapping):
+        return ()
+    registered = comparators.get("registered_comparators")
+    if not isinstance(registered, list):
+        return ()
+    return tuple(name for name in registered if isinstance(name, str) and name)
+
+
+def _validate_comparators(
+    policy: Mapping[str, Any], non_binding: set[str]
+) -> None:
+    """Require the comparator block to be report-only, and structurally so.
+
+    Phase 1.2G. A comparator is informative for a reader and for error
+    analysis, but its value is not derivable before either parser is run on the
+    locked set, so it can carry no acceptance weight. The check is structural
+    rather than a promise in prose.
+    """
+    comparators = policy.get("comparators")
+    if not isinstance(comparators, Mapping):
+        raise ContractError("policy.comparators must be an object")
+    if comparators.get("role") != "REPORT_ONLY":
+        raise ContractError(
+            "policy.comparators.role must be REPORT_ONLY; a comparator result "
+            "cannot make a parser that violates an absolute gate acceptable"
+        )
+    if comparators.get("status") != "FINAL":
+        raise ContractError(
+            "policy.comparators.status must be FINAL; the comparator's role is "
+            "decided even though no comparator has been run"
+        )
+    if comparators.get("execution_status") != "NOT_RUN":
+        raise ContractError(
+            "policy.comparators.execution_status must be NOT_RUN; no comparator "
+            "has been run on any locked set"
+        )
+    if comparators.get("binding") is not False:
+        raise ContractError(
+            "policy.comparators must explicitly declare itself binding=false"
+        )
+    for field in _COMPARATOR_CRITERION_FIELDS:
+        # ``is not None`` rather than a truth test: a margin of 0 is a real
+        # margin, and ``0 == False`` in Python would have let it through.
+        if comparators.get(field) is not None:
+            raise ContractError(
+                f"policy.comparators.{field} is set; a report-only comparator "
+                "must carry no numeric margin and no pass condition"
+            )
+    registered = comparators.get("registered_comparators")
+    if not isinstance(registered, list):
+        raise ContractError(
+            "policy.comparators.registered_comparators must be a list"
+        )
+    purposes = comparators.get("comparator_purposes")
+    if not isinstance(purposes, Mapping) or sorted(purposes) != sorted(registered):
+        raise ContractError(
+            "every registered comparator must declare a distinct report-only "
+            "purpose; an unexplained comparator in the live registry invites "
+            "informal gating"
+        )
+    for name in sorted(registered):
+        text = purposes[name]
+        if not isinstance(text, str) or not text.strip():
+            raise ContractError(f"comparator {name} must declare a non-empty purpose")
+
+
+def _is_zero_count(value: Any) -> bool:
+    """True only for a genuine integer zero.
+
+    Third re-review finding R3-NEW-05: the earlier guard tested ``value != 0``,
+    which accepts ``0.0`` and ``Decimal(0)``. A count is an integer, and a
+    policy that records a float count is malformed whatever it evaluates to.
+    ``bool`` is excluded because ``False == 0``.
+    """
+    return isinstance(value, int) and not isinstance(value, bool) and value == 0
+
+
+def _validate_execution_state(policy: Mapping[str, Any]) -> None:
+    """Require the policy to state, machine-readably, that nothing has run.
+
+    A FINAL policy is a decision about how a future evaluation will be judged.
+    It is not a result. Recording the execution state next to the policy status
+    is what stops the first from being read as the second.
+    """
+    execution = policy.get("execution_state")
+    if not isinstance(execution, Mapping):
+        raise ContractError(
+            "policy.execution_state must be an object; a FINAL policy must state "
+            "that no evaluation has occurred"
+        )
+    if execution.get("formal_evaluation_execution_state") != "NOT_RUN":
+        raise ContractError(
+            "policy.execution_state.formal_evaluation_execution_state must be "
+            "NOT_RUN"
+        )
+    ordinal = execution.get("formal_evaluation_ordinal")
+    if not _is_zero_count(ordinal):
+        raise ContractError(
+            "policy.execution_state.formal_evaluation_ordinal must be 0"
+        )
+    for field in (
+        "predictions_generated",
+        "locked_label_reads",
+        "parser_v3_runs_against_any_locked_set",
+        "parser_v3_v2_sealed_sets_constructed",
+    ):
+        if field not in execution:
+            raise ContractError(
+                f"policy.execution_state.{field} is required; a FINAL policy "
+                f"must state it explicitly rather than leave it unstated"
+            )
+        if not _is_zero_count(execution[field]):
+            raise ContractError(f"policy.execution_state.{field} must be 0")
+    if "sealed_sets_constructed" in execution:
+        raise ContractError(
+            "policy.execution_state.sealed_sets_constructed is unscoped and "
+            "contradicts parser-v3-v1 having been sealed; use "
+            "parser_v3_v2_sealed_sets_constructed"
+        )
+    note = execution.get("final_policy_is_not_a_result")
+    if not isinstance(note, str) or not note.strip():
+        raise ContractError(
+            "policy.execution_state must state that a FINAL policy is not a "
+            "parser validation result"
+        )
+
+
+#: Subtrees whose whole purpose is to quote a superseded figure. Scanning them
+#: would make an erratum unwritable, which is how the Phase 1.2E record became
+#: false in the first place.
+_HISTORICAL_KEYS: frozenset[str] = frozenset(
+    {
+        "errata",
+        "superseded_figures",
+        "withdrawn_arguments",
+        "withdrawn_argument",
+        "as_written",
+        "historical_note",
+        "historical_notes",
+        "supersedes",
+        "corrections",
+        "previous",
+    }
+)
+
+
+def _reject_superseded_figures(
+    policy: Mapping[str, Any], coverage: GateCoverage
+) -> None:
+    """Reject live prose still asserting the superseded coverage figures.
+
+    Phase 1.2G seed defects G-01 and G-02. The corrected split is derived above;
+    this stops a document from quietly reasserting the old one outside an
+    explicitly historical subtree.
+    """
+    pinned = coverage.pinned_case_count
+    residual = coverage.residual_case_count
+    total = coverage.total_case_count
+    patterns = (
+        (
+            rf"\b(?!{pinned}\b)\d+\s+of\s+{total}\b\s+exact",
+            "a pinned-coverage figure other than the derived one",
+        ),
+        (
+            r"\bresidual\s+(?:critical\s+)?strata\s+are\s+S04,?\s*S05\s+and\s+S09\b",
+            "the superseded three-stratum residual population",
+        ),
+        (
+            rf"\bresidual\s+population\s+of\s+(?!{residual}\b)\d+\s+cases\b",
+            "a residual case count other than the derived one",
+        ),
+    )
+
+    def walk(node: Any, path: str) -> None:
+        if isinstance(node, Mapping):
+            for key, value in node.items():
+                if key in _HISTORICAL_KEYS:
+                    continue
+                walk(value, f"{path}.{key}")
+        elif isinstance(node, list):
+            for index, value in enumerate(node):
+                walk(value, f"{path}[{index}]")
+        elif isinstance(node, str):
+            collapsed = re.sub(r"\s+", " ", node)
+            for pattern, description in patterns:
+                if re.search(pattern, collapsed, flags=re.IGNORECASE):
+                    raise ContractError(
+                        f"policy{path} restates {description}; the gates derive "
+                        f"{pinned} pinned and {residual} residual cases"
+                    )
+
+    walk(policy, "")
 
 
 def _support_from_presence(
@@ -1256,6 +2155,7 @@ def compile_contract(
     ``set_source``, or when any declared invariant disagrees with the set.
     """
     validate_policy(policy)
+    coverage = derive_gate_coverage(policy)
     if policy["status"] != "FINAL":
         raise ContractError(
             f"policy status is {policy['status']!r}; a contract can only be "
@@ -1298,6 +2198,7 @@ def compile_contract(
             for gate in policy["gates"]
         ],
         "acceptance_thresholds": dict(policy["acceptance_thresholds"]),
+        "gate_coverage": coverage.as_dict(),
         "status_logic": dict(policy.get("status_logic") or {}),
         "comparators": dict(policy.get("comparators") or {}),
         "members": list(facts["members"]),

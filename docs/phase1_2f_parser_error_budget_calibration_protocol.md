@@ -1,16 +1,91 @@
 # Parser-error-budget calibration protocol (prospective)
 
 **Artifact ID:** `phase1-2f-parser-error-budget-calibration/v1`
-**Status:** `REGISTERED — NOT EXECUTED`
+**Status:** `SUPERSEDED_UNEXECUTED`
 **Introduced:** Phase 1.2F
+**Superseded:** Phase 1.2G
+**Times executed:** 0
 
-> This protocol is **registered, not run**. Phase 1.2F is not authorized to
-> execute it. It is **not** Phase 1.0C, is unrelated to Phase 1.0C, and must
-> never be described as a continuation of it.
+> **This protocol was never run, and is no longer the next gate.**
+>
+> It is retained as a design record, not as pending work. Phase 1.2G resolved
+> the criterion this protocol was written to unblock, and resolved it on a
+> basis that needs no calibration. Nothing below has been executed. No
+> generator was written, no fixture was produced, no *δ* was computed, no
+> parser was run, and no budget was registered.
+>
+> It is **not** Phase 1.0C, is unrelated to Phase 1.0C, and must never be
+> described as a continuation of it.
 
 ---
 
-## 1. Why this protocol exists
+## 0. Supersession record (Phase 1.2G)
+
+### 0.1 Why it is superseded
+
+Phase 1.2F left `residual_critical_exact_budget` unresolved and named two
+dependencies: an unmade scientific decision about how strict the instrument
+must be on designed-failure strata that no gate pins, and — *conditional on
+that decision permitting a non-zero tolerance* — the absence of any registered
+downstream parser-error budget. This protocol addressed the second.
+
+Phase 1.2G answered the first. The future set is a **finite conformance
+suite**: a fixed, quota-constructed, hand-curated collection whose members are
+admitted deliberately because the design requires the instrument to handle
+exactly those constructions, and whose reference decisions are adjudicated
+before sealing. No case is admitted whose correct handling is optional.
+A mismatch on an eligible case is therefore the instrument failing a
+requirement, not a deviation inside an error distribution. The permitted
+mismatch count is **zero**.
+
+A calibration that determines *how many* eligible cases the instrument may fail
+has no question to answer once the answer is *none*. The dependency is not
+satisfied — it is **moot**.
+
+### 0.2 Corrections to the text below
+
+The body was written against superseded coverage figures. It is corrected here
+rather than rewritten in place, because the body is a historical design record
+and silently editing it would destroy the evidence of what was believed when.
+
+| Location | As written | Correct value |
+| --- | --- | --- |
+| §1 | residual critical strata **S04, S05, S09** | **S04, S05, S06, S09** |
+| §1 | **30 cases** | **40 cases** |
+| §1 | gates pin **90 of 120** | gates pin **80 of 120** |
+| §9, §12 | feasible range **0–30** | would have been **0–40** |
+
+S06 is residual because `G_S06_last_number_trap` carries one registered error
+definition, `registered_rightmost_distractor_span_selected`, which forbids
+selecting the trailing distractor span and nothing else. A parser can satisfy
+it and still return a wrong canonical value.
+
+### 0.3 What would be required to reactivate it
+
+This protocol **cannot be silently reactivated**. Reactivation requires all of:
+
+1. a separately authorized round that first records a design decision admitting
+   cases to the suite whose correct handling is explicitly optional, or
+   demonstrates that some eligible case has no adjudicable reference decision —
+   either of which would falsify the conformance premise;
+2. a corrected body carrying the §0.2 figures rather than the superseded ones;
+3. a new artifact ID and version, because the superseded figures are baked into
+   the sample-size and stopping-rule reasoning below;
+4. explicit re-preregistration before any fixture is generated.
+
+Absent all four, this document is history. It is not a work item, it is not the
+next gate, and citing it as pending work is an error.
+
+### 0.4 What it is not
+
+It is not evidence that a calibration was performed. It is not evidence that a
+downstream error budget exists — none does. It says nothing about parser v3.
+
+---
+
+## 1. Why this protocol was written
+
+> **Historical section.** The figures below are the superseded ones. See §0.2.
 
 Phase 1.2F left one acceptance criterion unresolved:
 

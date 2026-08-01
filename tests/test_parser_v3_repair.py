@@ -315,11 +315,13 @@ def policy():
 def final_policy(policy):
     """A resolved copy of the shipped policy, used to exercise compilation.
 
-    The shipped policy is blocked on ``residual_critical_exact_budget``. To
-    exercise compilation at all, this fixture resolves that one criterion with
-    a complete, syntactically valid provenance record. The value is synthetic
-    and carries no scientific claim; it exists only so the compiler has
-    something to compile.
+    Phase 1.2F shipped a policy blocked on ``residual_critical_exact_budget``,
+    and this fixture existed to resolve that one criterion so the compiler had
+    something to compile. Phase 1.2G finalized the shipped policy, so the loop
+    below now finds nothing to resolve on the current artifact. It is retained
+    deliberately: it keeps the fixture correct if a future round reopens a
+    criterion, and it keeps ``resolve_threshold`` exercised. The value is
+    synthetic and carries no scientific claim.
     """
     resolved = copy.deepcopy(policy)
     resolved["policy_id"] = "parser-v3-v2-synthetic-test-policy"
@@ -334,7 +336,15 @@ def final_policy(policy):
 
 
 def resolve_threshold(*, value, **overrides):
-    """A syntactically complete FINAL hard-threshold provenance record."""
+    """A syntactically complete FINAL hard-threshold provenance record.
+
+    The boundary population must match the derived residual population. Audit
+    finding B3 found the Phase 1.2G seed defect ``G-05`` still living here --
+    "the 30 cases in S04, S05 and S09" -- dormant only because the shipped
+    policy no longer has a REVIEW_REQUIRED item for the fixture to resolve. A
+    dormant wrong fixture is still a wrong fixture: it would have reintroduced
+    the superseded three-stratum population the moment a criterion reopened.
+    """
     resolved = {
         "status": "FINAL",
         "disposition": "KEEP_HARD",
@@ -349,7 +359,7 @@ def resolve_threshold(*, value, **overrides):
         "boundary_semantics": {
             "inequality": "at_most",
             "at_threshold_passes": True,
-            "population": "the 30 cases in S04, S05 and S09",
+            "population": "the 40 residual cases in S04, S05, S06 and S09",
         },
         "review_status": "REVIEWED",
     }
@@ -907,11 +917,25 @@ def test_shipped_policy_validates(policy):
     validate_policy(policy)
 
 
-def test_shipped_policy_is_review_required(policy):
-    assert policy["status"] == "REVIEW_REQUIRED"
-    assert policy["acceptance_thresholds"]["status"] == "REVIEW_REQUIRED"
+def test_shipped_policy_is_final_and_binds_exactly_one_criterion(policy):
+    """Phase 1.2G. Supersedes test_shipped_policy_is_review_required.
+
+    The old assertion pinned the Phase 1.2F terminal state. That state was a
+    recorded open question, not an invariant, and this round answered it. The
+    replacement is stronger: it fixes the status, the number of binding
+    criteria, the binding value, and the requirement that every other record
+    still carries no number.
+    """
+    assert policy["status"] == "FINAL"
+    assert policy["acceptance_thresholds"]["status"] == "FINAL"
+    items = policy["acceptance_thresholds"]["items"]
+    binding = [item for item in items if item.get("binding") is True]
+    assert [item["threshold_id"] for item in binding] == [
+        "residual_critical_exact_budget"
+    ]
+    assert binding[0]["value"] == 0
     assert all(
-        item["value"] is None for item in policy["acceptance_thresholds"]["items"]
+        item["value"] is None for item in items if item.get("binding") is not True
     )
 
 
@@ -955,8 +979,14 @@ def test_policy_rejects_mandatory_gate_with_zero_minimum(policy):
 
 
 def test_policy_cannot_be_final_while_thresholds_are_open(policy):
+    """A FINAL policy with an unresolved threshold block is still refused.
+
+    Phase 1.2G finalized the shipped block, so the mutation now has to open the
+    thresholds rather than close the policy. The rule under test is unchanged.
+    """
     mutated = copy.deepcopy(policy)
     mutated["status"] = "FINAL"
+    mutated["acceptance_thresholds"]["status"] = "REVIEW_REQUIRED"
     with pytest.raises(ContractError):
         validate_policy(mutated)
 
@@ -1201,8 +1231,16 @@ def test_residual_semantic_cases_block_agreement(policy, facts):
 
 
 def test_compiler_refuses_a_review_required_policy(policy, facts, set_source):
+    """The shipped policy is FINAL, so this rule is exercised by re-opening it.
+
+    Phase 1.2G. The refusal being tested - a REVIEW_REQUIRED policy can never
+    compile - is unchanged; only the fixture had to be mutated back into the
+    state that triggers it.
+    """
+    reopened = copy.deepcopy(policy)
+    reopened["status"] = "REVIEW_REQUIRED"
     with pytest.raises(ContractError):
-        compile_contract(policy, facts, set_source=set_source)
+        compile_contract(reopened, facts, set_source=set_source)
 
 
 def test_compiler_refuses_open_thresholds(final_policy, facts, set_source):
@@ -1408,6 +1446,35 @@ def test_cli_check_reports_disagreement(tmp_path, synthetic_set, policy):
         "no_answer": 36,
         "ambiguous": 12,
     }
+    # Phase 1.2G: internal consistency now includes the coverage restatement,
+    # which the validator checks against the production derivation. Leaving the
+    # 120-case figures here would make the policy internally malformed and the
+    # test would stop exercising H9.
+    mutated_policy["gate_coverage_analysis"]["zero_error_pinned_case_count"] = 96
+    mutated_policy["gate_coverage_analysis"]["residual_case_count"] = 48
+    mutated_policy["gate_coverage_analysis"]["accepted_policy_coverage"] = {
+        "gate_pinned_case_count": 96,
+        "residual_criterion_case_count": 48,
+        "total_case_count": 144,
+        "note": "Synthetic mutation for the H9 disagreement test.",
+    }
+    for _item in mutated_policy["acceptance_thresholds"]["items"]:
+        if _item["threshold_id"] != "residual_critical_exact_budget":
+            continue
+        _item["population"]["cases_per_stratum"] = 12
+        _item["population"]["case_count"] = 48
+        _item["denominator"] = 48
+        _item["metric_definition"] = (
+            "Maximum number of exact typed-decision mismatches permitted within "
+            "the residual strata S04, S05, S06 and S09, pooled."
+        )
+        _item["numerator"] = (
+            "exact typed-decision mismatches within S04, S05, S06 and S09"
+        )
+        _item["failure_risk_controlled"] = "synthetic mutation for the H9 test"
+        _item["boundary_semantics"]["population"] = (
+            "the residual strata S04, S05, S06 and S09"
+        )
     policy_path = tmp_path / "policy.json"
     policy_path.write_text(json.dumps(mutated_policy, indent=2), encoding="utf-8")
 
