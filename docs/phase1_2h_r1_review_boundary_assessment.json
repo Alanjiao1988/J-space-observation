@@ -1,11 +1,9 @@
 {
-  "access_ledger_effect": {
-    "azure_resource_changes": 0,
-    "parser_invocations": 0,
-    "predictions_generated": 0,
-    "private_curator_files_read": 0,
-    "sealed_input_semantic_reads": 0,
-    "sealed_label_semantic_reads": 0
+  "byte_only_gate_evidence": {
+    "passed": true,
+    "receipt_path": "docs/phase1_2h_r1_access_receipt_003.json",
+    "receipt_sha256": "a2d9d0dd93a851bc5b55321a196c4bc9092f47241e38704cea5fee15e0c15f2f",
+    "unmet_requirements": []
   },
   "byte_only_gate_passed": true,
   "conditions": [
@@ -89,6 +87,14 @@
     }
   ],
   "evidence_source": "az control-plane reads, subscription 943bacdf-8b6e-4e3a-8126-a149f623d32e: 'az resource list -g rg-jspace-observation-sea --query [].type', 'az cognitiveservices account list', 'az cognitiveservices account show -n aj-gpt56-25-943b-southeastasia -g gpt56-sol-2025-rg', 'az network vnet subnet show --name snet-aca-jspace-sea-v2', 'az network nsg show'. Read-only; no resource was created, modified or deleted.",
+  "instrument_access_effect": {
+    "azure_resource_changes": 0,
+    "parser_invocations": 0,
+    "predictions_generated": 0,
+    "private_curator_files_read": 0,
+    "sealed_input_semantic_reads": 0,
+    "sealed_label_semantic_reads": 0
+  },
   "observed_at": "2026-08-01T06:10:00Z",
   "phase": "1.2H-R1",
   "qualification_verdict": "DOES_NOT_QUALIFY",

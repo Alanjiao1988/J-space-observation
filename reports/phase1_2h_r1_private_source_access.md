@@ -133,9 +133,18 @@ The assessment is executable, not narrative:
 | Backend inside the authorization boundary | **Fails** — it belongs to an unrelated project |
 | Egress-controlled worker | **Not configured** — `routeTable: null`, `natGateway: null`, no custom outbound NSG rule |
 
-Under §12.3 this is decisive **even though the byte-only gate passed**, because a
-repair round would otherwise have to either export private material to a public
-endpoint or improvise a boundary mid-round. Both are refused.
+Every row above is scoped to resource group `rg-jspace-observation-sea` in
+`southeastasia` — the group and region this work runs in, and the extent of the
+committed evidence. No claim is made about other resource groups in the
+subscription. Note also that the failure is not simply "nothing was found": a
+candidate backend class exists and *could* be provisioned, but the last row
+would still fail, so provisioning a reviewer without also constraining worker
+egress would not clear the boundary.
+
+Under §10 read with §8 this is decisive **because the byte-only gate passed**,
+not in spite of it: a repair round would otherwise have to either export private
+material to a public endpoint or improvise a boundary mid-round. Both are
+refused.
 
 The instrument encodes the precedence rule directly: had the byte-only gate
 failed, it would return `BLOCKED_ON_PRIVATE_SOURCE_ACCESS`, not this state. The
@@ -143,7 +152,41 @@ more advanced-sounding terminal state cannot be claimed by a round that did less
 
 ---
 
-## 6. Independent audits
+## 6. Validation
+
+| Check | Local | GitHub-hosted runner |
+|---|---|---|
+| `tests/test_phase1_2h_r1_access.py` | pass | pass |
+| `tests/test_phase1_2h_r1_review_boundary.py` | pass | pass |
+| `tests/test_parser_v3_v2_access_ledger.py` | 97 passed | pass |
+| Committed boundary assessment regenerates identically (`--check`) | pass | pass |
+| Committed receipt is schema-valid | pass | pass |
+| Current-state consistency instrument | pass | pass |
+| Generated current-state block (`--check`) | pass | pass |
+| Offline probe dry run reproduces the anchors | pass | pass |
+| Probe imports no parser-bearing package | pass | pass |
+| `compileall`, `git diff --check`, secret scan, large-file check | pass | pass |
+| **Full repository suite** | **2103 passed, 0 failed** | **2086 passed, 2 failed, 15 skipped** |
+
+The two runner failures are `tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last`
+and `::test_seal_refuses_a_non_empty_parent_prefix`. Both abort with
+`seal object is missing from the payload: locked_inputs.jsonl`. That file is
+git-ignored private curator material: it exists on the operator's machine and
+cannot exist on a public runner. The failures are environmental, are identical at
+the pre-change baseline, and are unrelated to this round.
+
+They are reported rather than suppressed. Making them skip when the file is
+absent would turn a known-red signal into a green one without changing anything
+real, and a suite that is green because a check quietly opted out is worse than
+one that is honestly red. The consequence — that this workflow's full-suite step
+can never pass on a public runner, and so trains a reader to ignore it — is a
+genuine instrument weakness and is recorded as such.
+
+---
+
+## 7. Independent audits
+
+### 7.1 Audits A and B — the frozen candidate `47f207a`
 
 Two read-only review agents reviewed the frozen candidate. Both returned
 **BLOCKED** and both independently recomputed the public anchors.
@@ -173,14 +216,51 @@ independently confirmed A's blockers.
 | B-06 | parser-isolation test was substring-based | AST-based; Dockerfile COPY set pinned to the payload manifest |
 | B-09 | boundary assessment was prose | executable instrument + schema + evidence bundle, checked in CI |
 
-The audits' own limitation applies: self-authored tests are not independent
-validation, and these audits reviewed a frozen commit rather than the final one.
-Audits C and D reviewed the final state; their findings are recorded below the
-line in the same file.
+### 7.2 Audit C — the post-gate state `393ff3e`
+
+Audit C reviewed the state after the gate had run, the ledger had been updated
+and the documents rewritten. It also returned **BLOCKED**, with 1 blocker, 8
+major and 5 minor findings.
+
+It re-examined the property Audit A had established against the earlier commit
+and reached the same conclusion — that it found no path by which a private
+semantic read, a data-plane write, or an export of sealed content could occur —
+and it separately confirmed that the six ledger tests modified in `393ff3e` were
+legitimate updates to a changed committed state rather than weakened assertions.
+
+Its blocker was the more important result:
+
+| ID | Sev | Finding | Fix |
+|---|---|---|---|
+| C-01 | **Blocker** | the boundary instrument took `--byte-only-gate-passed` as an operator-set flag and never read the receipt, so it could not have detected a failed gate; CI hard-coded `true` | flag removed; `--receipt` added; the outcome is derived from 12 independent conjuncts over the receipt; the receipt's SHA-256 is recorded in the assessment; `assert_gate_evidence_consistent` re-derives the precedence rule |
+| C-02 | Major | the terminal state was bound only to an integer in the ledger's own file, and `14` conflated 2 local with 12 authoritative verifications | terminal state now requires the committed receipt to agree; the composite is decomposed and named |
+| C-03 | Major | `counter_provenance` was optional, its `evidence` strings unvalidated, and 4 safety counters absent from the machine-evidence set | block made mandatory; evidence strings validated; the 4 counters added |
+| C-04 | Major | `comparator_predictions_generated` was declared `receipt_derived_exact`, but no such field exists in the receipt | reclassified; a `structurally_zero_by_source_analysis` class added for counters whose zero is a property of the code |
+| C-05 | Major | five documents claimed the `maximum: 0` schema pins *detect* violations | corrected everywhere: the pins constrain what may be *reported*; the AST source check is what supports the zeros |
+| C-06 | Major | the AST denylist missed 4 of the 9 frozen `forbidden_operations` | denylist widened to cover them |
+| C-07 | Major | protocol §10 said the boundary state applied "regardless of byte-only outcome", inverting the precedence rule; two state names existed outside `TERMINAL_STATES` | table rewritten with an explicit precedence column; one vocabulary, asserted by test |
+| C-08 | Minor | "protocol §12.3" does not exist; cited in a committed ledger event | erratum event 9 appended under a new `record_correction` kind; prose citations corrected to §10 with §8 |
+| C-09 | Major | documents asserted "Audits C and D reviewed the final state" — written before either audit returned | withdrawn; replaced with what actually happened, here and in `L-40` |
+| C-10 | Minor | a ledger event made a subscription-scoped negative claim from resource-group evidence and omitted a disqualified candidate | corrected by erratum event 9 |
+| C-11 | Minor | three documents said the schema refuses any `public_network_access` other than `"Unknown"`; the enum permitted three | schema pinned to `const: "Unknown"`, making the prose true |
+| C-12 | Minor | `invariants_checked: 12` was a literal restated as a measurement | counted from the invariants actually evaluated |
+| C-13 | Minor | execution 002 appeared in no record | accounted for; see §5 |
+| C-14 | Minor | "the entire first-party source executed by the gate" excluded the receipt validator, which also runs in-job | AST check extended to it; the scope claim is now accurate |
+
+### 7.3 What no audit has reviewed
+
+Audit D did not complete. Its process was lost before it reported, and no
+finding is attributed to it.
+
+More importantly, the remediation of Audit C's findings — this section included
+— is material that no independent review has seen. That is the structure `L-38`
+and `L-40` describe, and it is not closed. Self-authored tests are not
+independent validation, and an audit that reviewed the previous commit is not a
+review of this one.
 
 ---
 
-## 7. Private-access ledger
+## 8. Private-access ledger
 
 | Quantity | Value |
 |---|---|
@@ -193,10 +273,19 @@ line in the same file.
 | Azure data-plane content reads | 12 |
 | Azure data-plane **writes** | **0** |
 
-The first two rows and the last are pinned `maximum: 0` in the receipt schema. A
-probe that had violated them could not have emitted a schema-valid receipt at
-all — the constraint is enforced by the artifact format, not by the program's
-good intentions.
+The first two rows and the last are pinned `maximum: 0` in the receipt schema.
+State what that buys carefully — independent Audit C (C-05) found the earlier
+wording here overclaimed. The probe writes those counters as literals, so a
+probe that had violated them would emit `0` and its receipt would still
+validate; the pins do not detect a violation. What they do is prevent an honest
+instrument from recording a non-zero count in a schema-valid artifact, which
+closes the specific failure mode of a violation being normalised into an
+acceptable receipt.
+
+The support for the zeros themselves is `assert_no_write_calls_in_source`: an
+AST walk over the probe's source that fails if a decode, persist, data-plane
+write or parser call is present. That is a property of the code, established by
+reading it.
 
 `parser-v3-v1` remains **`SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE`**,
 byte-unchanged. The Phase 1.2H transition to `REPAIR_ACCESSED` did **not** occur:
@@ -205,7 +294,7 @@ without qualification.
 
 ---
 
-## 8. The exact next gate
+## 9. The exact next gate
 
 **Operator approval and provisioning of a private semantic-review backend and an
 egress-controlled worker boundary.**

@@ -98,8 +98,11 @@ INVARIANT_STATEMENTS: tuple[str, ...] = (
     "*semantically read*. Phase 1.2H-R1 streamed all 12 sealed objects into a "
     "SHA-256 accumulator and discarded them, so bytes were touched while nothing "
     "about any case was learned: `decode_attempts`, `persist_attempts`, "
-    "`semantic_input_reads` and `semantic_label_reads` are all **0**, pinned "
-    "`maximum: 0` in the receipt schema.",
+    "`semantic_input_reads` and `semantic_label_reads` are all **0**. Those "
+    "zeros are literals the probe emits, made credible by an AST check over its "
+    "own source that fails the build if a decode, write or persist call appears; "
+    "the receipt schema's `maximum: 0` pins stop a violation being *reported* as "
+    "a valid receipt, but do not themselves observe the running program.",
     "No prediction was generated and no parser was run against any evaluation "
     "or calibration corpus.",
     "No formal parser-v3 evaluation has occurred. Parser v3 remains "

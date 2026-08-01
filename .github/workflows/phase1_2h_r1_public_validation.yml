@@ -83,11 +83,15 @@ jobs:
         # The assessment decides the round's terminal state, so it must be a
         # regenerable function of committed evidence rather than a document
         # someone wrote. --check regenerates it and compares byte for byte.
+        # Audit C (C-01): the gate outcome is derived from the committed
+        # receipt, not asserted by this workflow. CI previously passed
+        # --byte-only-gate-passed true, which meant the step could not have
+        # detected a failed gate.
         if: ${{ hashFiles('docs/phase1_2h_r1_review_boundary_assessment.json') != '' }}
         run: |
           python scripts/phase1_2h_r1_review_boundary_assessment.py \
             --evidence docs/phase1_2h_r1_review_boundary_evidence.json \
-            --byte-only-gate-passed true \
+            --receipt docs/phase1_2h_r1_access_receipt_003.json \
             --check docs/phase1_2h_r1_review_boundary_assessment.json
 
       - name: Committed access receipt is schema-valid

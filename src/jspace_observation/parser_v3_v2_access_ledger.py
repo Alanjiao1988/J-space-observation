@@ -108,6 +108,19 @@ BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE: int = 14
 #: terminal states; a ledger may not invent a state that the protocol does not
 #: define, because a novel state name is how a blocked round gets described as
 #: something better than it was.
+#:
+#: Audit C (C-07) found three vocabularies in circulation: this one, a protocol
+#: table naming ``PRIVATE_SOURCE_ACCESS_RESTORED``, and
+#: ``classify_terminal_state`` returning
+#: ``READY_FOR_SEPARATELY_AUTHORISED_PRIVATE_REVIEW`` --- with the latter two
+#: absent here, so the boundary instrument could produce a state this validator
+#: would reject. This set is now the single vocabulary: the protocol table was
+#: rewritten to match it, and
+#: ``tests/test_phase1_2h_r1_review_boundary.py`` asserts that every state
+#: ``classify_terminal_state`` can return is a member. The assertion lives in a
+#: test rather than in a runtime import because the boundary instrument must not
+#: import this package: ``jspace_observation/__init__`` eagerly imports the
+#: legacy parser, and that would place parser code in the instrument's process.
 TERMINAL_STATES: frozenset[str] = frozenset(
     {
         "IN_PROGRESS",
@@ -117,6 +130,7 @@ TERMINAL_STATES: frozenset[str] = frozenset(
         "BLOCKED_ON_INDEPENDENCE",
         "BLOCKED_ON_SET_REPAIR",
         "BLOCKED_ON_SEALING",
+        "READY_FOR_SEPARATELY_AUTHORISED_PRIVATE_REVIEW",
     }
 )
 
@@ -179,7 +193,40 @@ EVENT_KINDS: frozenset[str] = frozenset(
         "prediction_generation",
         "formal_evaluation",
         "terminal_determination",
+        "record_correction",
     }
+)
+
+#: ``record_correction`` exists because prior events are immutable --- see
+#: :func:`assert_monotonic_succession` --- and an immutable record with no way
+#: to record that one of its entries was wrong is a record that has to choose
+#: between being tamper-evident and being accurate.
+#:
+#: Audit C found two defects in the text of committed event 8: it cited
+#: "protocol section 12.3", which does not exist, and it made a
+#: *subscription*-scoped negative claim from *resource-group and region*-scoped
+#: evidence. Rewriting the event would have destroyed the property that makes
+#: the ledger evidence. This kind appends the correction instead, so both the
+#: original claim and its correction remain readable.
+#:
+#: A correction event must name what it corrects. It never licenses a counter
+#: change: if the underlying facts changed rather than their description, that
+#: is a new observation and needs the event kind for that observation.
+CORRECTION_EVENT_KIND: str = "record_correction"
+
+#: A citation a reader can follow: a repository path with a recognised
+#: extension, or a function/identifier named with enough specificity to locate.
+#: Deliberately permissive about *what* is cited and strict about *whether*
+#: anything is.
+_CITATION_PATTERN = re.compile(
+    r"(?:[\w./-]+\.(?:json|py|md|ya?ml|txt))|(?:\b\w+\(\))"
+)
+
+#: A committed Phase 1.2H-R1 access receipt, by path. Narrower than
+#: :data:`_CITATION_PATTERN` on purpose: the boundary terminal state may only be
+#: earned by citing a receipt, not by citing any file at all.
+_RECEIPT_CITATION_PATTERN = re.compile(
+    r"docs/phase1_2h_r1_access_receipt[\w.-]*\.json"
 )
 
 _REQUIRED_TOP_LEVEL: tuple[str, ...] = (
@@ -190,6 +237,7 @@ _REQUIRED_TOP_LEVEL: tuple[str, ...] = (
     "policy_binding",
     "phase_1_2g_finalization_snapshot",
     "live_counters",
+    "counter_provenance",
     "events",
     "retired_v1_state",
     "successor_set_state",
@@ -199,7 +247,7 @@ _REQUIRED_TOP_LEVEL: tuple[str, ...] = (
 #: lets a round add a reassuring-sounding block that no validator reads, so an
 #: unknown key is an error rather than ignored decoration.
 LEDGER_KEYS: frozenset[str] = frozenset(
-    _REQUIRED_TOP_LEVEL + ("purpose", "counter_semantics", "counter_provenance")
+    _REQUIRED_TOP_LEVEL + ("purpose", "counter_semantics")
 )
 
 #: Closed key set for ``counter_provenance``, whose job is to say which
@@ -213,20 +261,63 @@ LEDGER_KEYS: frozenset[str] = frozenset(
 #: The block is validated rather than decorative --- see
 #: :func:`_validate_counter_provenance` --- so it cannot drift out of step with
 #: the counters it describes.
+#:
+#: Audit C (C-03) found the block *optional*: ``validate_ledger`` only checked
+#: it if present, so deleting the entire control left a valid ledger and the
+#: distinction it exists to draw simply disappeared. It is required now, listed
+#: in :data:`_REQUIRED_TOP_LEVEL`.
 COUNTER_PROVENANCE_CLASSES: tuple[str, ...] = (
     "receipt_derived_exact",
     "azure_verified_exact",
+    "structurally_zero_by_source_analysis",
     "operator_maintained_approximate",
 )
+
+#: What each provenance class asserts, and what would have to be true for the
+#: assertion to hold. Audit C (C-04) found two counters classified as
+#: ``receipt_derived_exact`` when the receipt has no corresponding field, and
+#: five described as "in-process instrumentation" when they are literals the
+#: emitting program writes. The distinction those findings turn on is between a
+#: number *read back* from a machine artifact and a number whose value is a
+#: property of the *code*, so the second now has a class of its own rather than
+#: borrowing the authority of the first.
+COUNTER_PROVENANCE_CLASS_MEANING: Mapping[str, str] = {
+    "receipt_derived_exact": (
+        "the value appears as a field in a committed, schema-validated "
+        "execution receipt and was copied from it"
+    ),
+    "azure_verified_exact": (
+        "the value was observed from an Azure control-plane response that is "
+        "committed to the repository"
+    ),
+    "structurally_zero_by_source_analysis": (
+        "the value is zero because no code path that could increment it exists, "
+        "which an AST check over the emitting source enforces; it is not a "
+        "measurement of a run"
+    ),
+    "operator_maintained_approximate": (
+        "the value is a hand-maintained count and carries no machine evidence; "
+        "it may only be used for counters whose value is not a safety claim"
+    ),
+}
 
 #: Counters whose value is a safety claim, and which therefore may never be
 #: classified as operator-maintained. A round may not assert "no semantic read
 #: occurred" on the strength of someone's recollection.
+#:
+#: Audit C (C-03) found four safety counters missing from this set, including
+#: both ``formal_v2_evaluation_access`` semantic-read counters --- so a ledger
+#: could have asserted that no locked label had been opened for scoring, on no
+#: evidence at all.
 _MACHINE_EVIDENCE_REQUIRED: frozenset[str] = frozenset(
     {
         "retired_v1_repair_access.sealed_input_semantic_reads",
         "retired_v1_repair_access.sealed_label_semantic_reads",
+        "retired_v1_repair_access.private_curator_files_read",
         "retired_v1_repair_access.byte_only_integrity_verifications",
+        "retired_v1_repair_access.labels_opened_for_scoring",
+        "formal_v2_evaluation_access.sealed_input_semantic_reads",
+        "formal_v2_evaluation_access.sealed_label_semantic_reads",
         "azure.data_plane_content_reads",
         "azure.data_plane_writes",
         "parser_execution.parser_invocations_on_private_or_locked_data",
@@ -267,9 +358,11 @@ SUCCESSOR_SET_STATE_KEYS: Mapping[str, type | tuple[type, ...]] = {
 #: cannot soften or re-word it while leaving every other check green.
 RETIRED_V1_STATE_LABEL = "SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE"
 
-#: Closed key set for a ledger event.
+#: Closed key set for a ledger event. ``corrects`` is present only on
+#: ``record_correction`` events, where it is mandatory: a correction that does
+#: not say what it corrects is just another claim.
 EVENT_KEYS: frozenset[str] = frozenset(
-    {"sequence", "kind", "role", "summary", "private_content_read"}
+    {"sequence", "kind", "role", "summary", "private_content_read", "corrects"}
 )
 
 #: Event kinds that read private content by definition. Declaring one of these
@@ -589,8 +682,60 @@ def _validate_events(events: Any) -> list[Mapping[str, Any]]:
             raise LedgerError(f"events[{index}].role must be a non-empty string")
         if not isinstance(event["summary"], str) or not event["summary"].strip():
             raise LedgerError(f"events[{index}].summary must be a non-empty string")
+        _validate_correction_event(event, index, events)
         ordered.append(event)
     return ordered
+
+
+def _validate_correction_event(
+    event: Mapping[str, Any], index: int, events: Sequence[Mapping[str, Any]]
+) -> None:
+    """Constrain ``record_correction`` events and forbid ``corrects`` elsewhere.
+
+    A correction must identify an *earlier* event that actually exists. Allowing
+    it to point forward, at itself, or at nothing would let a round attach the
+    word "corrected" to a claim without any prior claim being amended --- which
+    reads as diligence while asserting nothing.
+    """
+
+    kind = event["kind"]
+    if kind != CORRECTION_EVENT_KIND:
+        if "corrects" in event:
+            raise LedgerError(
+                f"events[{index}].corrects is only meaningful on "
+                f"{CORRECTION_EVENT_KIND!r} events, not {kind!r}"
+            )
+        return
+
+    if "corrects" not in event:
+        raise LedgerError(
+            f"events[{index}] is a {CORRECTION_EVENT_KIND!r} but names no "
+            "corrected event; a correction that does not say what it corrects "
+            "is only a further claim"
+        )
+    target = event["corrects"]
+    if not _is_count(target):
+        raise LedgerError(
+            f"events[{index}].corrects must be a non-negative int sequence number"
+        )
+    target = int(target)
+    if target >= int(event["sequence"]):
+        raise LedgerError(
+            f"events[{index}].corrects {target} does not precede this event; a "
+            "correction cannot amend the present or the future"
+        )
+    earlier_by_sequence = {
+        int(prior["sequence"]): prior for prior in events[:index]
+    }
+    if target not in earlier_by_sequence:
+        raise LedgerError(
+            f"events[{index}].corrects {target} matches no earlier event"
+        )
+    if earlier_by_sequence[target]["kind"] == CORRECTION_EVENT_KIND:
+        raise LedgerError(
+            f"events[{index}].corrects {target}, which is itself a correction; "
+            "amend the original record rather than chaining corrections"
+        )
 
 
 def _validate_event_counter_support(
@@ -848,12 +993,36 @@ def validate_ledger(
     _validate_counters(ledger["live_counters"])
     events = _validate_events(ledger["events"])
 
+    # Provenance is validated before the status-specific rules because those
+    # rules read it. A status check that consulted an unvalidated provenance
+    # block would report a state-agreement failure for what is really a
+    # malformed-provenance failure, which sends a reader to the wrong place.
+    _validate_counter_provenance(ledger["counter_provenance"])
+
     _validate_status_agreement(ledger, status)
     _validate_event_counter_support(ledger, events)
     _validate_retired_v1_state(ledger)
     _validate_successor_set_state(ledger, status)
-    if "counter_provenance" in ledger:
-        _validate_counter_provenance(ledger["counter_provenance"])
+
+
+def _assert_evidence_is_citable(class_name: str, evidence: str) -> None:
+    """Require a machine-evidence class to cite something a reader can open.
+
+    Audit C (C-03) found ``evidence`` accepted as free text and never checked,
+    so a class asserting machine derivation could cite nothing at all and the
+    ledger would still validate. This does not verify that the citation is
+    *correct* --- no string check can --- but it does require that one is
+    present in a form a reader can follow to a committed artifact.
+    """
+
+    if _CITATION_PATTERN.search(evidence):
+        return
+    raise LedgerError(
+        f"counter_provenance.{class_name}.evidence claims machine derivation "
+        "but cites no committed artifact; name the receipt, the committed "
+        "control-plane response, or the source file and check that establishes "
+        f"the value (got: {evidence!r})"
+    )
 
 
 def _validate_counter_provenance(block: Any) -> None:
@@ -907,6 +1076,28 @@ def _validate_counter_provenance(block: Any) -> None:
                 )
             seen[path] = class_name
 
+        evidence = entry.get("evidence")
+        if not isinstance(evidence, str) or not evidence.strip():
+            raise LedgerError(
+                f"counter_provenance.{class_name}.evidence must be a non-empty "
+                "string naming where these values came from"
+            )
+        if class_name != "operator_maintained_approximate":
+            _assert_evidence_is_citable(class_name, evidence)
+
+        unknown_entry_keys = set(entry) - {"counters", "evidence", "note"}
+        if unknown_entry_keys:
+            raise LedgerError(
+                f"counter_provenance.{class_name} has unknown keys: "
+                f"{sorted(unknown_entry_keys)}"
+            )
+        note = entry.get("note")
+        if note is not None and (not isinstance(note, str) or not note.strip()):
+            raise LedgerError(
+                f"counter_provenance.{class_name}.note must be a non-empty "
+                "string when present"
+            )
+
     for path in sorted(_MACHINE_EVIDENCE_REQUIRED):
         provenance = seen.get(path)
         if provenance is None:
@@ -919,6 +1110,48 @@ def _validate_counter_provenance(block: Any) -> None:
                 f"counter_provenance classifies {path!r} as operator-maintained; "
                 "a safety counter requires machine evidence, not recollection"
             )
+
+
+def _assert_gate_receipt_is_cited(ledger: Mapping[str, Any]) -> None:
+    """Require the boundary state to rest on a named execution receipt.
+
+    Audit C (C-02): the state was previously earned by an integer in the
+    ledger's own file. Raising that integer to 14 was sufficient to claim that
+    the authoritative source had been reached, which means the check verified
+    the ledger's self-consistency rather than anything about the world.
+
+    A receipt cannot be summoned by editing this file, so requiring one moves
+    the claim from arithmetic onto evidence. This function does not open the
+    receipt --- the ledger module reads nothing from disk, deliberately, and the
+    receipt-to-ledger binding is asserted by the ledger test suite, which can.
+    What it requires is that the ledger names one, in the provenance block that
+    is the ledger's own account of where its numbers came from.
+    """
+
+    provenance = ledger.get("counter_provenance")
+    if not isinstance(provenance, Mapping):  # pragma: no cover - defensive
+        raise LedgerError(
+            "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY requires a counter_provenance "
+            "block naming the gate receipt"
+        )
+    entry = provenance.get("receipt_derived_exact")
+    evidence = entry.get("evidence", "") if isinstance(entry, Mapping) else ""
+    counters = entry.get("counters", []) if isinstance(entry, Mapping) else []
+
+    if "retired_v1_repair_access.byte_only_integrity_verifications" not in counters:
+        raise LedgerError(
+            "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY requires "
+            "byte_only_integrity_verifications to be receipt-derived; the state "
+            "asserts that a gate ran, and a hand-maintained count is not "
+            "evidence that one did"
+        )
+    if not _RECEIPT_CITATION_PATTERN.search(evidence):
+        raise LedgerError(
+            "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY requires "
+            "counter_provenance.receipt_derived_exact.evidence to name a "
+            "committed access receipt; without one the state rests on an "
+            f"integer in this file (got: {evidence!r})"
+        )
 
 
 def _validate_status_agreement(ledger: Mapping[str, Any], status: str) -> None:
@@ -994,12 +1227,15 @@ def _validate_status_agreement(ledger: Mapping[str, Any], status: str) -> None:
         if verifications < BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE:
             raise LedgerError(
                 "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY requires a completed "
-                "byte-only access gate over all 12 authoritative objects "
-                f"(byte_only_integrity_verifications >= "
-                f"{BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE}), got {verifications}; "
+                "byte-only access gate: at least the 12 authoritative objects "
+                "the gate streams, plus the 2 pre-R1 local curator-file "
+                "verifications already on record, so "
+                f"byte_only_integrity_verifications >= "
+                f"{BYTE_ONLY_VERIFICATIONS_AFTER_R1_GATE}, got {verifications}; "
                 "a round that could not reach the source must record "
                 "BLOCKED_ON_PRIVATE_SOURCE_ACCESS instead"
             )
+        _assert_gate_receipt_is_cited(ledger)
 
     # Formal evaluation state is invariant for this whole phase.
     for name in ("formal_evaluations_run", "preregistrations_completed"):

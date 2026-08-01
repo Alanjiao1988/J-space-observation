@@ -782,25 +782,50 @@ same way from the start, the check would still pass. The seal-time observation
 that would settle that is the one limitation `L-32` describes, and it remains
 unavailable.
 
-## L-40 - The R1 audits reviewed a commit that is not the one being published
+## L-40 - Every R1 audit reviewed a commit that is not the one being published
 
 Audits A and B for Phase 1.2H-R1 reviewed commit `47f207a`. Both returned
 BLOCKED, and their blockers were remediated in `56141c1` — after which the
 access gate ran, the ledger gained a terminal state and a provenance block, six
 documents were updated, and roughly a further 400 lines of test were added.
 
-Audits C and D reviewed the final state, so the gap is narrowed rather than
-open. But the structure of the problem is the one `L-38` describes and it has
-not gone away: every remediation pass produces material that the pass which
-motivated it never saw, and the only way to close that gap completely is a review
-that finds nothing, which has not yet happened.
+Audit C then reviewed `393ff3e`. It also returned BLOCKED, with one blocker and
+eight major findings, and its blocker was material: the instrument that decides
+this round's terminal state took the byte-only gate outcome as an operator-set
+command-line flag and never read the execution receipt, so it could not have
+detected a failed gate. That was remediated in this pass, which again produced
+material no audit has seen.
+
+An earlier draft of this section claimed that "Audits C and D reviewed the final
+state, so the gap is narrowed rather than open". That sentence was written
+before either audit returned, and Audit C identified it as the sharpest instance
+in the round of the defect it was describing: a claim about evidence, asserted
+in advance of the evidence. It has been withdrawn. Audit D did not complete; its
+process was lost before it reported, and no finding of its should be attributed.
+
+The gap is therefore not closed. It is the structure `L-38` describes: every
+remediation pass produces material that the pass which motivated it never saw,
+and the only way to close it completely is a review that finds nothing, which
+has not yet happened in this phase.
 
 One specific residual should be named rather than left implicit. Audit A stated
 that "no path was found by which a private semantic read, a data-plane write, or
 an export of sealed content could occur", and that statement is the load-bearing
 safety finding of the round. It was made against `47f207a`. The probe changed
 substantially afterwards — the emission contract, the AST checks, the client
-chunk bindings and the identity handling were all rewritten. The property was
-re-checked by Audit C and by the `maximum: 0` schema pins, which are structural
-rather than inspectional, but the original finding does not automatically
-transfer to code it was not made about.
+chunk bindings and the identity handling were all rewritten. Audit C re-examined
+the property against `393ff3e` and reached the same conclusion, which is the
+strongest support the finding currently has.
+
+That support should not be overstated in one specific direction. The `maximum:
+0` schema pins have been described elsewhere in this repository as if they
+detected a violation. They do not, and the claim has been withdrawn wherever it
+appeared. The probe writes those counters as literals; a probe that decoded a
+sealed object would emit `0` just the same and the receipt would validate. What
+the pins actually do is narrower and still worth having: they make it impossible
+for a receipt to *report* a non-zero count and remain schema-valid, so an honest
+instrument cannot quietly normalise a violation into a valid artefact. The
+enforcement that makes the literal zeros credible is the AST check over the
+probe's own source, plus the fact that the module performs no decode and no
+data-plane write — properties that are established by reading the code, which is
+inspectional, not structural.

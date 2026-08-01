@@ -207,9 +207,18 @@ Emit exactly one receipt and self-validate it against
 `semantic_input_reads`, `semantic_label_reads`, `parser_invocations` and
 `predictions_generated` are structurally pinned `maximum: 0`.
 
-A probe that decoded, persisted or wrote **cannot emit a schema-valid receipt**.
-That is the point: the constraint is enforced by the artifact format, not by the
-program's good intentions.
+A probe that decoded, persisted or wrote could not emit a schema-valid receipt
+**reporting that it had done so**. That is a narrower claim than it may look,
+and independent Audit C (C-05) was right to insist on the distinction: the
+counters are literals the probe writes, so a dishonest or defective probe that
+decoded a sealed object would emit `0` and its receipt would validate. The pins
+close one specific hole — an honest instrument cannot normalise a violation it
+did observe into a valid artifact — and nothing more.
+
+The enforcement that makes the literal zeros credible is `assert_no_write_calls_in_source`,
+an AST walk over the probe's own source that fails the build if a decode,
+persist, data-plane write or parser call appears anywhere in it. That check is
+inspectional rather than structural, and its scope is stated exactly in §6.
 
 ---
 
@@ -321,7 +330,15 @@ those. Two counters are honestly hand-kept — `control_plane_reads` and
 Execution `p12h-r1-access-gate-003` (ACA execution `0fqre0m`, image
 `sha256:f2cf1701…`) passed the gate: 12 members listed, 12 objects streamed,
 396,613 bytes, aggregate digest `e1364afc…` reproducing the committed public
-anchor, 12 invariants checked and none failed. `decode_attempts`,
+anchor, and no invariant failed. On the count of invariants: receipt 003 carries
+`invariants_checked: 12`, which in the build that produced it was a **literal**
+typed beside the checks, not a measurement of them — independent Audit C (C-12)
+found that deleting a check would have left the number untouched. The probe now
+derives the count from the checks that actually ran and lists their names in
+`verdict.invariants_evaluated`, so the count and the list cannot disagree. That
+list is absent from receipt 003, and its absence is the marker of a pre-fix
+receipt; back-filling it would fabricate evidence about a run that has already
+happened. `decode_attempts`,
 `persist_attempts`, `azure_data_plane_writes`, `semantic_input_reads`,
 `semantic_label_reads`, `parser_invocations` and `predictions_generated` were
 all 0. The receipt is committed at
@@ -338,10 +355,32 @@ is real.
 
 ## 10. Terminal states
 
-| State | Meaning |
-|---|---|
-| `PRIVATE_SOURCE_ACCESS_RESTORED` | byte-only access succeeded **and** a qualifying private review boundary exists |
-| `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY` | no qualifying private semantic-review backend exists, regardless of byte-only outcome |
-| `BLOCKED_ON_PRIVATE_SOURCE_ACCESS` | byte-only access itself could not be established |
+The three states are **ordered by precedence**, not overlapping. Audit B (B-09)
+required that ordering and Audit C (C-07) found that this table originally
+contradicted it, so state it explicitly: the gate question comes first. A round
+that could not reach the source has not yet arrived at the boundary question,
+and must not name the more advanced-sounding boundary state.
 
-Manufacturing a passing boundary to reach the first state is prohibited.
+| State | Meaning | Precondition |
+|---|---|---|
+| `BLOCKED_ON_PRIVATE_SOURCE_ACCESS` | byte-only access itself could not be established | evaluated first; if it holds, the other two are unreachable |
+| `BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY` | the byte-only gate passed, **and** no qualifying private semantic-review backend exists | requires a passing gate |
+| `READY_FOR_SEPARATELY_AUTHORISED_PRIVATE_REVIEW` | byte-only access succeeded **and** a qualifying private review boundary exists | requires a passing gate and all 13 frozen conditions PASS |
+
+An earlier version of this table named the third state
+`PRIVATE_SOURCE_ACCESS_RESTORED` and said the second applied "regardless of
+byte-only outcome". Both were wrong. The name did not exist in the ledger's
+`TERMINAL_STATES` vocabulary, and "regardless" inverted the precedence rule that
+`classify_terminal_state` implements. The vocabulary above is the one the code
+uses; there is exactly one list, in
+`src/jspace_observation/parser_v3_v2_access_ledger.py`.
+
+Reaching the third state requires every one of the thirteen frozen conditions in
+§8 to be `PASS`. `NOT_ASSESSABLE` is not a pass: a condition that cannot be shown
+to hold has not been shown to hold. Manufacturing a passing boundary to reach it
+is prohibited.
+
+The precedence rule is enforced in three places, so that no single edit can
+defeat it: `classify_terminal_state` computes it,
+`assert_gate_evidence_consistent` re-derives it and refuses a mismatch, and the
+boundary suite asserts it against the committed artifact.

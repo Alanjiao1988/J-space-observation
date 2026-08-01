@@ -1,0 +1,53 @@
+{
+  "schema_version": "phase1-2h-r1-job-execution-inventory/v1",
+  "phase": "1.2H-R1",
+  "purpose": "The complete platform-side execution history of the access-gate job, committed so that the ledger's azure.job_executions counter cites an artifact a reader can open rather than a command someone ran. Independent Audit C (C-13) found that counter supported only by uncommitted `az` output, and separately found that the operator's execution numbering reached 003 while only two platform executions exist -- with 002 appearing in no record at all.",
+  "captured_by": "az containerapp job execution list -n job-jspace-p12h-r1-access-gate -g rg-jspace-observation-sea -o json",
+  "job": "job-jspace-p12h-r1-access-gate",
+  "resource_group": "rg-jspace-observation-sea",
+  "subscription_id": "943bacdf-8b6e-4e3a-8126-a149f623d32e",
+  "platform_execution_count": 2,
+  "executions": [
+    {
+      "name": "job-jspace-p12h-r1-access-gate-dlv8kmc",
+      "status": "Failed",
+      "start_time": "2026-08-01T05:33:13+00:00",
+      "end_time": null,
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation@sha256:b923abb15132e16ce3db0209c68d94ef883035f4b245060c9a924d19e4e661cc",
+      "args": [
+        "--client-id",
+        "9e4baee7-6ffa-44f9-803b-c49fd774eba9",
+        "--execution-id",
+        "p12h-r1-access-gate-001",
+        "--freeze-commit",
+        "174fda0ed329f287cbc15eb702262daefc58f33a",
+        "--image-digest",
+        "sha256:b923abb15132e16ce3db0209c68d94ef883035f4b245060c9a924d19e4e661cc"
+      ]
+    },
+    {
+      "name": "job-jspace-p12h-r1-access-gate-0fqre0m",
+      "status": "Succeeded",
+      "start_time": "2026-08-01T06:14:23+00:00",
+      "end_time": "2026-08-01T06:14:54+00:00",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation@sha256:f2cf1701aab098236b5ce850f11b218f723dc7a9c2dd01cc8853e7572022ee15",
+      "args": [
+        "--client-id",
+        "9e4baee7-6ffa-44f9-803b-c49fd774eba9",
+        "--execution-id",
+        "p12h-r1-access-gate-003",
+        "--freeze-commit",
+        "56141c177a60c94b842ff5004656753b2945530d",
+        "--image-digest",
+        "sha256:f2cf1701aab098236b5ce850f11b218f723dc7a9c2dd01cc8853e7572022ee15"
+      ]
+    }
+  ],
+  "operator_attempt_numbering": {
+    "note": "The --execution-id argument carries an operator-assigned attempt number, and it is not the same sequence as the platform execution list. Attempt 001 ran as dlv8kmc and was refused by the probe's own environment check. Attempt 002 was assigned to a re-run prepared against a rebuilt image, but that attempt was never started: the job update carrying it was superseded by the corrected job definition before any execution was created, so it produced no platform execution and appears in no receipt. Attempt 003 ran as 0fqre0m and is the passing gate. Two attempt numbers therefore map to two executions, and one -- 002 -- maps to none.",
+    "attempt_001": "job-jspace-p12h-r1-access-gate-dlv8kmc",
+    "attempt_002": null,
+    "attempt_003": "job-jspace-p12h-r1-access-gate-0fqre0m"
+  },
+  "what_this_does_not_show": "This is a control-plane inventory. It shows that exactly two executions of this job exist and what image and arguments each carried. It says nothing about what either execution read, which is what the receipts are for."
+}

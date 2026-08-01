@@ -993,3 +993,125 @@ def test_a_timestamp_without_an_offset_is_rejected():
     validator.validate_instance("2026-01-01T00:00:00Z", schema)
     with pytest.raises(validator.ReceiptValidationError):
         validator.validate_instance("2026-01-01 00:00:00", schema)
+
+
+# --- 10. Audit C remediations ------------------------------------------------
+#
+# Independent Audit C reviewed commit 393ff3e and returned BLOCKED. These tests
+# pin the fixes so a later edit cannot quietly restore the defect. Each names
+# the finding it belongs to.
+
+
+def test_the_byte_handler_admits_only_digest_calls():
+    # C-06. The frozen rule is "object bytes reach a hash and nothing else".
+    # The module-wide name ban cannot express it, because reading the *public*
+    # committed member list legitimately calls .splitlines() and json.loads().
+    # The rule is a property of one function, so it is checked there.
+    assert probe.assert_byte_handling_is_digest_only() > 0
+
+
+@pytest.mark.parametrize("name", probe.FORBIDDEN_INTERPRETATION_NAMES)
+def test_any_interpreting_call_inside_the_byte_handler_is_refused(name, tmp_path):
+    source = (
+        "import hashlib\n"
+        f"def {probe.BYTE_HANDLING_FUNCTION}(client, blob):\n"
+        "    digest = hashlib.sha256()\n"
+        "    for chunk in client.chunks():\n"
+        "        digest.update(chunk)\n"
+        f"        {name}(chunk)\n"
+        "    return digest.hexdigest(), 0\n"
+    )
+    path = tmp_path / "probe_like.py"
+    path.write_text(source, encoding="utf-8")
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.assert_byte_handling_is_digest_only(path)
+    assert exc.value.invariant in {
+        "NON_DIGEST_CALL_ON_BYTES",
+        "BYTE_DERIVATIVE_IN_HANDLER",
+    }
+
+
+def test_a_renamed_byte_handler_is_a_refusal_not_a_skip(tmp_path):
+    # A check that silently guards nothing is worse than no check: it reads as
+    # evidence. Renaming the function must fail loudly.
+    path = tmp_path / "probe_like.py"
+    path.write_text("def something_else():\n    return 1\n", encoding="utf-8")
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.assert_byte_handling_is_digest_only(path)
+    assert exc.value.invariant == "BYTE_HANDLER_NOT_FOUND"
+
+
+def test_the_write_call_check_covers_every_in_job_first_party_source():
+    # C-14. The docstring claimed to cover "the first-party source executed by
+    # the gate" while the check read only the probe. The receipt validator also
+    # runs in-job. It is clean, so this was a scope-claim defect rather than a
+    # hole -- but an overbroad claim is the defect this project ranks equal to a
+    # functional bug.
+    assert probe.IN_JOB_FIRST_PARTY_SOURCES == (
+        "phase1_2h_r1_private_source_probe.py",
+        "phase1_2h_r1_receipt_validator.py",
+    )
+    combined = probe.assert_no_write_calls_in_first_party_source()
+    single = probe.assert_no_write_calls_in_source()
+    assert combined > single
+
+
+def test_a_missing_first_party_source_is_a_refusal(monkeypatch):
+    monkeypatch.setattr(
+        probe, "IN_JOB_FIRST_PARTY_SOURCES", ("no_such_file_at_all.py",)
+    )
+    with pytest.raises(probe.ProbeRefusal) as exc:
+        probe.assert_no_write_calls_in_first_party_source()
+    assert exc.value.invariant == "FIRST_PARTY_SOURCE_MISSING"
+
+
+def test_the_invariant_count_is_derived_from_the_checks_that_ran():
+    # C-12. invariants_checked was a literal 12 typed next to the checks, so
+    # deleting a check would have left the count untouched and the receipt
+    # would still have claimed twelve. The count is now the size of the set the
+    # decorator populates on successful return.
+    probe.INVARIANTS_EVALUATED.clear()
+    probe.assert_byte_handling_is_digest_only()
+    assert probe.INVARIANTS_EVALUATED == {"BYTE_HANDLING_DIGEST_ONLY"}
+    # The wrapper and the per-file check each record, so the count grows with
+    # the checks that actually ran rather than with a number typed by hand.
+    probe.assert_no_write_calls_in_first_party_source()
+    assert probe.INVARIANTS_EVALUATED == {
+        "BYTE_HANDLING_DIGEST_ONLY",
+        "NO_WRITE_CALL_IN_SOURCE",
+        "NO_WRITE_CALL_IN_FIRST_PARTY_SOURCE",
+    }
+
+
+def test_a_receipt_may_not_claim_more_invariants_than_it_names():
+    receipt = {"verdict": {"invariants_checked": 12, "invariants_evaluated": ["A"]}}
+    with pytest.raises(validator.ReceiptValidationError) as exc:
+        validator._assert_invariant_count_agrees(receipt)
+    assert "not an independent assertion" in str(exc.value)
+
+
+def test_a_receipt_may_not_name_the_same_invariant_twice():
+    receipt = {
+        "verdict": {"invariants_checked": 2, "invariants_evaluated": ["A", "A"]}
+    }
+    with pytest.raises(validator.ReceiptValidationError):
+        validator._assert_invariant_count_agrees(receipt)
+
+
+def test_receipt_003_is_identifiable_as_predating_the_derived_count(receipt):
+    # C-12, residual. Receipt 003 was emitted by the old code with the literal.
+    # Back-filling the list would fabricate evidence about a run that already
+    # happened, so the field is absent and its absence is the marker.
+    assert "invariants_evaluated" not in receipt["verdict"]
+    validator._assert_invariant_count_agrees(receipt)
+
+
+def test_public_network_access_cannot_be_recorded_as_a_reassuring_value():
+    # C-11. The field was an enum including "Disabled", so an instrument that
+    # could not observe the setting could still have written a value implying
+    # it had. In-job observation is not available, so the only admissible value
+    # is the one that admits ignorance.
+    schema = json.loads(RECEIPT_SCHEMA.read_text(encoding="utf-8"))
+    field = schema["properties"]["endpoint"]["properties"]["public_network_access"]
+    assert field["const"] == "Unknown"
+    assert "enum" not in field

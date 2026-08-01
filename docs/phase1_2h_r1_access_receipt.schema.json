@@ -26,11 +26,17 @@
       "type": "string",
       "const": "1.2H-R1"
     },
-
     "execution": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["execution_id", "aca_execution_name", "started_at", "ended_at", "exit_status", "reason_code"],
+      "required": [
+        "execution_id",
+        "aca_execution_name",
+        "started_at",
+        "ended_at",
+        "exit_status",
+        "reason_code"
+      ],
       "properties": {
         "execution_id": {
           "type": "string",
@@ -40,14 +46,29 @@
           "description": "An operator-assigned run label, passed to the container at job-definition time. It is deliberately NOT the Azure Container Apps execution name, which does not exist until after the job is started and therefore cannot be baked into the job definition that produces this receipt. The ACA execution name is carried separately in aca_execution_name when the platform exposes it."
         },
         "aca_execution_name": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "maxLength": 200,
           "pattern": "^[A-Za-z0-9._-]+$",
           "description": "The Azure Container Apps job execution name as observed from the platform environment inside the replica, or null when the platform did not expose it. Public infrastructure identity."
         },
-        "started_at": {"type": "string", "format": "date-time"},
-        "ended_at": {"type": "string", "format": "date-time"},
-        "exit_status": {"type": "string", "enum": ["PASS", "FAIL"]},
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ended_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "exit_status": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
         "reason_code": {
           "type": "string",
           "description": "A closed vocabulary. A free-text reason is deliberately not permitted, because free text is where private material leaks.",
@@ -73,7 +94,6 @@
         }
       }
     },
-
     "provenance": {
       "type": "object",
       "additionalProperties": false,
@@ -86,11 +106,26 @@
         "probe_source_sha256"
       ],
       "properties": {
-        "access_protocol_freeze_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-        "image_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
-        "decision_record_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "expected_evidence_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "expected_members_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "access_protocol_freeze_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "image_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "decision_record_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expected_evidence_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expected_members_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
         "probe_source_sha256": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
@@ -98,7 +133,6 @@
         }
       }
     },
-
     "identity": {
       "type": "object",
       "additionalProperties": false,
@@ -110,36 +144,58 @@
         "effective_read_only_verdict"
       ],
       "properties": {
-        "credential_type": {"type": "string", "const": "ManagedIdentityCredential"},
+        "credential_type": {
+          "type": "string",
+          "const": "ManagedIdentityCredential"
+        },
         "client_id": {
           "type": "string",
           "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
           "description": "A user-assigned managed identity client ID. This is a public Azure resource identifier, not a credential."
         },
-        "client_id_matches_designated": {"type": "boolean"},
-        "forbidden_credential_types_absent": {"type": "boolean"},
+        "client_id_matches_designated": {
+          "type": "boolean"
+        },
+        "forbidden_credential_types_absent": {
+          "type": "boolean"
+        },
         "effective_read_only_verdict": {
           "type": "string",
-          "enum": ["READ_ONLY_CONFIRMED", "NOT_CONFIRMED", "NOT_CONFIRMED_IN_JOB"],
+          "enum": [
+            "READ_ONLY_CONFIRMED",
+            "NOT_CONFIRMED",
+            "NOT_CONFIRMED_IN_JOB"
+          ],
           "description": "READ_ONLY_CONFIRMED requires that this process actually read the role assignments of the credential it used. The probe deliberately holds no permission to do so, because granting it one would increase the very privilege this round minimises. NOT_CONFIRMED_IN_JOB is therefore the honest verdict for an in-job probe: the credential was proven to be the frozen designated identity, and that identity's role assignments are recorded as an operator control-plane observation in the decision record, not as an in-job attestation."
         },
         "role_definition_ids": {
           "type": "array",
-          "items": {"type": "string", "pattern": "^[0-9a-f-]{36}$"},
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
           "maxItems": 8
         },
         "assignment_scope_kind": {
           "type": "string",
-          "enum": ["container", "account", "resource_group", "subscription", "other"]
+          "enum": [
+            "container",
+            "account",
+            "resource_group",
+            "subscription",
+            "other"
+          ]
         },
         "role_condition_sha256": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^[0-9a-f]{64}$",
           "description": "Digest of the ABAC condition text if one is applied. The condition text itself is not emitted."
         }
       }
     },
-
     "endpoint": {
       "type": "object",
       "additionalProperties": false,
@@ -152,16 +208,26 @@
       "properties": {
         "public_network_access": {
           "type": "string",
-          "enum": ["Disabled", "Enabled", "Unknown"],
-          "description": "Unknown is the only value an in-job probe can honestly emit. publicNetworkAccess is a control-plane property of the storage account; reading it would require a management-plane role the designated identity deliberately does not hold. The control-plane observation is made separately by the operator before the job is started and is recorded in the decision record. Emitting Disabled here would be echoing an argument, not reporting a measurement."
+          "description": "Unknown is the ONLY value this schema permits, and independent Audit C (C-11) is why it is a const rather than an enum: three documents claimed the schema refused any other value while the enum still admitted Disabled and Enabled, so the refusal was program logic in check_endpoint that the prose attributed to the artifact format. publicNetworkAccess is a control-plane property of the storage account, and reading it would require a management-plane role the designated identity deliberately does not hold. The control-plane observation is made separately by the operator before the job is started and is recorded in the decision record. Emitting Disabled here would be echoing an argument, not reporting a measurement.",
+          "const": "Unknown"
         },
         "public_network_access_observed_by": {
           "type": "string",
-          "enum": ["in_job_control_plane_read", "operator_control_plane_read_before_run", "not_observed"]
+          "enum": [
+            "in_job_control_plane_read",
+            "operator_control_plane_read_before_run",
+            "not_observed"
+          ]
         },
-        "resolved_is_private": {"type": "boolean"},
-        "resolved_matches_expected_private_ip": {"type": "boolean"},
-        "privatelink_path_confirmed": {"type": "boolean"},
+        "resolved_is_private": {
+          "type": "boolean"
+        },
+        "resolved_matches_expected_private_ip": {
+          "type": "boolean"
+        },
+        "privatelink_path_confirmed": {
+          "type": "boolean"
+        },
         "expected_private_ip": {
           "type": "string",
           "pattern": "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$",
@@ -174,7 +240,6 @@
         }
       }
     },
-
     "membership": {
       "type": "object",
       "additionalProperties": false,
@@ -186,12 +251,32 @@
         "prefix_scope"
       ],
       "properties": {
-        "expected_count": {"type": "integer", "minimum": 0, "maximum": 1000},
-        "observed_count": {"type": "integer", "minimum": 0, "maximum": 1000},
-        "counts_equal": {"type": "boolean"},
-        "member_sets_equal": {"type": "boolean"},
-        "unexpected_member_count": {"type": "integer", "minimum": 0, "maximum": 1000},
-        "missing_member_count": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "expected_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "observed_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "counts_equal": {
+          "type": "boolean"
+        },
+        "member_sets_equal": {
+          "type": "boolean"
+        },
+        "unexpected_member_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "missing_member_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
         "prefix_scope": {
           "type": "string",
           "const": "exact_registered_prefix_only",
@@ -199,7 +284,6 @@
         }
       }
     },
-
     "streaming": {
       "type": "object",
       "additionalProperties": false,
@@ -213,20 +297,46 @@
         "persist_attempts"
       ],
       "properties": {
-        "objects_streamed": {"type": "integer", "minimum": 0, "maximum": 1000},
-        "total_bytes_streamed": {"type": "integer", "minimum": 0},
-        "expected_total_bytes": {"type": "integer", "minimum": 0},
-        "all_sizes_match": {"type": "boolean"},
-        "all_digests_match": {"type": "boolean"},
-        "size_mismatch_count": {"type": "integer", "minimum": 0, "maximum": 1000},
-        "digest_mismatch_count": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "objects_streamed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "total_bytes_streamed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expected_total_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "all_sizes_match": {
+          "type": "boolean"
+        },
+        "all_digests_match": {
+          "type": "boolean"
+        },
+        "size_mismatch_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "digest_mismatch_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
         "decode_attempts": {
           "type": "integer",
           "minimum": 0,
           "maximum": 0,
           "description": "Structurally pinned to zero. A receipt reporting any decode attempt is schema-invalid, so the probe cannot report one and pass."
         },
-        "persist_attempts": {"type": "integer", "minimum": 0, "maximum": 0},
+        "persist_attempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
         "observed_aggregate_digest": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
@@ -234,7 +344,6 @@
         }
       }
     },
-
     "counters": {
       "type": "object",
       "additionalProperties": false,
@@ -249,29 +358,76 @@
         "list_operations"
       ],
       "properties": {
-        "azure_data_plane_content_reads": {"type": "integer", "minimum": 0},
-        "azure_data_plane_writes": {"type": "integer", "minimum": 0, "maximum": 0},
-        "byte_only_integrity_verifications": {"type": "integer", "minimum": 0},
-        "semantic_input_reads": {"type": "integer", "minimum": 0, "maximum": 0},
-        "semantic_label_reads": {"type": "integer", "minimum": 0, "maximum": 0},
-        "parser_invocations": {"type": "integer", "minimum": 0, "maximum": 0},
-        "predictions_generated": {"type": "integer", "minimum": 0, "maximum": 0},
-        "list_operations": {"type": "integer", "minimum": 0}
+        "azure_data_plane_content_reads": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "azure_data_plane_writes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
+        "byte_only_integrity_verifications": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "semantic_input_reads": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
+        "semantic_label_reads": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
+        "parser_invocations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
+        "predictions_generated": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
+        "list_operations": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     },
-
     "verdict": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["access_gate_passed", "invariants_checked", "invariants_failed"],
+      "required": [
+        "access_gate_passed",
+        "invariants_checked",
+        "invariants_failed"
+      ],
       "properties": {
-        "access_gate_passed": {"type": "boolean"},
-        "invariants_checked": {"type": "integer", "minimum": 1},
+        "access_gate_passed": {
+          "type": "boolean"
+        },
+        "invariants_checked": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The number of frozen invariants this execution actually evaluated. Independent Audit C (C-12) found this emitted as a hard-coded literal and then restated in six documents as a measurement: adding or removing a check would not have changed it. It is now len(INVARIANTS_EVALUATED), populated by the @_invariant decorator on each checking function, so a deleted check reduces the count. Receipts emitted before that change --- phase1_2h_r1_access_receipt_003.json is the only one --- carry the literal and are identifiable by the absence of invariants_evaluated."
+        },
         "invariants_failed": {
           "type": "array",
           "items": {
             "type": "string",
             "description": "Closed-vocabulary invariant identifiers only, never a message.",
+            "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+          },
+          "maxItems": 64
+        },
+        "invariants_evaluated": {
+          "description": "The identifier of each frozen invariant that was evaluated and held, so the count can be checked rather than believed. Optional rather than required because receipt 003 was emitted before this field existed, and a committed receipt is a record of what ran; back-filling it would be fabricating evidence. When present its length must equal invariants_checked, which scripts/phase1_2h_r1_receipt_validator.py enforces.",
+          "type": "array",
+          "items": {
+            "type": "string",
             "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
           },
           "maxItems": 64

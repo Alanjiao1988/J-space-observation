@@ -3938,11 +3938,15 @@ cost of a real run.
 **Why the round is still blocked.** Set repair needs *semantic* review of private
 material, and the executable boundary assessment scores 0 of 13 conditions
 passed, 5 failed and 8 not assessable ⇒ `DOES_NOT_QUALIFY`.
-`rg-jspace-observation-sea` contains zero `Microsoft.CognitiveServices`
-accounts and zero ML workspaces; the only same-region AI account belongs to an
-unrelated project, has `publicNetworkAccess: Enabled` and no private endpoint;
-and the worker subnet has no egress control attached. Under protocol §12.3 this
-is decisive even though the byte-only gate passed.
+`rg-jspace-observation-sea` in `southeastasia` contains zero
+`Microsoft.CognitiveServices` accounts and zero ML workspaces; the only
+same-region AI account belongs to an unrelated project, has
+`publicNetworkAccess: Enabled` and no private endpoint; and the worker subnet
+has no egress control attached. Under protocol §10 read with §8 this is decisive
+**because** the byte-only gate passed: the states are ordered, and only a round
+that reached the source can be blocked at the boundary. The evidence covers that
+resource group and region, which is the scope of the claim; no statement is made
+about other resource groups in the subscription.
 
 **Two claims deliberately not made.** `public_network_access` is recorded as
 `"Unknown"` — the probe holds no reader role on the account resource, and the

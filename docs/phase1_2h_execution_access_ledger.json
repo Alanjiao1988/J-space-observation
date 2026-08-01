@@ -78,7 +78,7 @@
     "azure": "Control-plane reads are configuration and existence queries. Data-plane content reads and writes are object access. They are separate because a reachability probe is not a data access. See counter_provenance: the two data-plane counters and job_executions are derived from the signed execution receipt and from Azure's own execution list, so they are exact; control_plane_reads and resource_creations_or_changes are operator-maintained and are not load-bearing safety counters."
   },
   "counter_provenance": {
-    "role": "Distinguishes counters that are derived from machine evidence from counters an operator maintains by hand. Audit-relevant because a hand-maintained number must never be presented with the authority of a receipt-derived one.",
+    "role": "Distinguishes counters derived from machine evidence from counters an operator maintains by hand, and distinguishes both from counters whose value is a property of the source rather than a measurement of a run. Audit-relevant because a hand-maintained number must never be presented with the authority of a receipt-derived one, and because a literal the emitting program writes is not the same kind of fact as a value read back from a machine artifact.",
     "receipt_derived_exact": {
       "counters": [
         "azure.data_plane_content_reads",
@@ -87,18 +87,36 @@
         "retired_v1_repair_access.sealed_input_semantic_reads",
         "retired_v1_repair_access.sealed_label_semantic_reads",
         "parser_execution.parser_invocations_on_private_or_locked_data",
-        "parser_execution.candidate_predictions_generated",
-        "parser_execution.comparator_predictions_generated"
+        "parser_execution.candidate_predictions_generated"
       ],
-      "evidence": "docs/phase1_2h_r1_access_receipt_003.json, emitted inside the job from in-process instrumentation and validated against docs/phase1_2h_r1_access_receipt.schema.json. The 12 R1 byte-only verifications are the receipt's byte_only_integrity_verifications; the standing 2 are the pre-R1 local curator-file verifications recorded at event 2."
+      "evidence": "Each value appears as a named field of docs/phase1_2h_r1_access_receipt_003.json, which is committed and validated against docs/phase1_2h_r1_access_receipt.schema.json by scripts/phase1_2h_r1_receipt_validator.py. The mapping is: azure.data_plane_content_reads <- counters.azure_data_plane_content_reads; azure.data_plane_writes <- counters.azure_data_plane_writes; sealed_input_semantic_reads <- counters.semantic_input_reads; sealed_label_semantic_reads <- counters.semantic_label_reads; parser_invocations_on_private_or_locked_data <- counters.parser_invocations; candidate_predictions_generated <- counters.predictions_generated.",
+      "note": "byte_only_integrity_verifications is a composite and is the one value here that is not a single receipt field. Audit C (C-02) was right that presenting 14 as though the receipt reported it overstated the evidence. It decomposes as 12 + 2: the receipt's counters.byte_only_integrity_verifications is 12, one per authoritative object streamed by the gate, and the standing 2 are the pre-R1 local curator-file verifications recorded at event 2, which are a different kind of observation over different files. Only the 12 are receipt-derived; the 2 are carried forward from an earlier committed ledger state."
     },
     "azure_verified_exact": {
-      "counters": ["azure.job_executions"],
-      "evidence": "az containerapp job execution list returned exactly two executions for job-jspace-p12h-r1-access-gate: dlv8kmc (Failed, refused on FORBIDDEN_ENV_VAR) and 0fqre0m (Succeeded, the passing gate)."
+      "counters": [
+        "azure.job_executions"
+      ],
+      "evidence": "docs/phase1_2h_r1_job_execution_inventory.json is the committed output of the control-plane execution list for the access-gate job. It records exactly two platform executions: dlv8kmc, which the probe's own environment check refused, and 0fqre0m, the passing gate. Audit C (C-13) found this counter previously cited only an uncommitted command, so the inventory was captured and committed.",
+      "note": "The inventory also resolves the gap Audit C noticed between the operator's attempt numbering, which reaches 003, and the two executions that exist: attempt 002 was prepared but never started and produced no execution. See operator_attempt_numbering in that file."
+    },
+    "structurally_zero_by_source_analysis": {
+      "counters": [
+        "retired_v1_repair_access.private_curator_files_read",
+        "retired_v1_repair_access.labels_opened_for_scoring",
+        "formal_v2_evaluation_access.sealed_input_semantic_reads",
+        "formal_v2_evaluation_access.sealed_label_semantic_reads",
+        "parser_execution.comparator_predictions_generated"
+      ],
+      "evidence": "These are zero because no code path capable of incrementing them exists in anything this round ran. The probe scripts/phase1_2h_r1_private_source_probe.py is checked by its own assert_no_write_calls_in_source(), an AST walk that fails the build if a decode, persist, data-plane write or parser call appears; and tests/test_phase1_2h_r1_access.py asserts the check over the in-job source set. No comparator was run and no formal evaluation was opened, which the absence of any parser_invocation, prediction_generation or formal_evaluation event records, and which validate_ledger() independently forbids for this phase.",
+      "note": "Audit C (C-04) found these previously classified as receipt_derived_exact and described as in-process instrumentation. Both were wrong. comparator_predictions_generated in particular has no corresponding receipt field at all -- the receipt's counter keys are azure_data_plane_content_reads, azure_data_plane_writes, byte_only_integrity_verifications, list_operations, parser_invocations, predictions_generated, semantic_input_reads and semantic_label_reads, and no other. A zero established by reading code is a weaker and different fact than a zero read back from a receipt, and saying so is the point of this class."
     },
     "operator_maintained_approximate": {
-      "counters": ["azure.control_plane_reads", "azure.resource_creations_or_changes"],
-      "note": "These are maintained by hand across an interactive round and are approximate. They are recorded because a round that provisioned Azure resources must say so, not because any safety property depends on their exact value. resource_creations_or_changes enumerates: the user-assigned identity, its two role assignments, three image pushes, the job creation and two job updates. control_plane_reads is an order-of-magnitude count of az configuration and existence queries and should not be cited as a precise measurement."
+      "counters": [
+        "azure.control_plane_reads",
+        "azure.resource_creations_or_changes"
+      ],
+      "evidence": "None. These are hand-maintained counts kept across an interactive round and no machine artifact establishes them.",
+      "note": "They are recorded because a round that provisioned Azure resources must say so, not because any safety property depends on their exact value. resource_creations_or_changes enumerates: the user-assigned identity, its two role assignments, three image pushes, the job creation and two job updates. control_plane_reads is an order-of-magnitude count of az configuration and existence queries and must not be cited as a precise measurement. No safety counter may be classified here; validate_ledger() enforces that."
     }
   },
   "events": [
@@ -156,6 +174,14 @@
       "kind": "terminal_determination",
       "role": "primary_integrator",
       "summary": "Supersedes the event-4 determination for Phase 1.2H-R1 only; event 4 remains the accurate record of the earlier round. Authenticated byte-only access to the authoritative source is now established, so BLOCKED_ON_PRIVATE_SOURCE_ACCESS no longer describes the blocker. The blocker has moved: repair requires a semantic read, a semantic read requires a private review boundary, and the executable boundary assessment scored 0 of 13 conditions passed, 5 failed and 8 not assessable, verdict DOES_NOT_QUALIFY. No qualifying private semantic-review backend exists in the subscription: the resource group contains zero Microsoft.CognitiveServices accounts and zero ML workspaces, and the worker subnet has no egress control (routeTable=null, natGateway=null, no custom outbound NSG rule). Round terminated BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY. Under protocol section 12.3 this state applies even though the byte-only gate passed.",
+      "private_content_read": false
+    },
+    {
+      "sequence": 9,
+      "kind": "record_correction",
+      "corrects": 8,
+      "role": "public-repository maintainer, offline",
+      "summary": "Erratum to event 8, appended rather than substituted because recorded events are immutable. Independent Audit C found two defects in event 8's text; neither changes the round's terminal state, which remains BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY, and neither changes any counter. (1) Event 8 cites 'protocol section 12.3'. No such section exists: docs/phase1_2h_r1_cloud_access_protocol.md has ten sections. The intended reference is section 10, Terminal states, read together with section 8, The private review boundary. Event 8 also states that the terminal state applies 'even though the byte-only gate passed', which the protocol table then rendered as 'regardless of byte-only outcome'. That wording was wrong in the other direction and has been corrected: the states are ordered by precedence, and BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY REQUIRES a passing gate, because a round that never reached the source has not reached the boundary question. Event 8's own reasoning is consistent with that ordering; only its citation was wrong. (2) Event 8 asserts that no qualifying private semantic-review backend exists 'in the subscription'. The committed evidence does not reach that far. It covers resource group rg-jspace-observation-sea in region southeastasia: a full resource listing of that group, its network posture, and its private-endpoint inventory. The supportable claim is that no qualifying backend exists in the resource group and region in which this work runs, and none is reachable from the worker subnet under the required boundary. Whether some other resource group in the subscription holds a Cognitive Services account was not observed and is not asserted. Event 8 also omits that one candidate was found and disqualified rather than none being found at all: an Azure OpenAI-class backend could be provisioned, but the existing worker subnet snet-aca-jspace-sea-v2 has routeTable null, natGateway null and no custom outbound NSG rule, so AllowInternetOutBound at priority 65001 applies and unrestricted egress would accompany any private material the worker held. Two of the thirteen frozen conditions fail on that ground alone. The boundary therefore fails on egress control as well as on backend absence, and provisioning a reviewer without also constraining egress would not clear it.",
       "private_content_read": false
     }
   ],

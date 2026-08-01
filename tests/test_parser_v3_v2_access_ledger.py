@@ -917,7 +917,22 @@ def test_the_classes_are_exposed_for_reuse():
     assert COUNTER_PROVENANCE_CLASSES == (
         "receipt_derived_exact",
         "azure_verified_exact",
+        "structurally_zero_by_source_analysis",
         "operator_maintained_approximate",
+    )
+
+
+def test_every_class_carries_a_stated_meaning():
+    # Audit C (C-04): a class name is not self-explanatory. Adding a class
+    # without saying what it asserts is how a weak provenance claim gets to
+    # look like a strong one.
+    from jspace_observation.parser_v3_v2_access_ledger import (
+        COUNTER_PROVENANCE_CLASS_MEANING,
+    )
+
+    assert set(COUNTER_PROVENANCE_CLASS_MEANING) == set(COUNTER_PROVENANCE_CLASSES)
+    assert all(
+        len(meaning) > 40 for meaning in COUNTER_PROVENANCE_CLASS_MEANING.values()
     )
 
 

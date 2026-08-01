@@ -35,6 +35,7 @@ semantic read occurred, or that a private semantic-review boundary exists.
 from __future__ import annotations
 
 import argparse
+import functools
 import hashlib
 import json
 import os
@@ -154,7 +155,22 @@ CHUNK_BYTES = 262144
 
 # Names whose presence in this file would falsify the pinned decode_attempts
 # counter. A decode turns authoritative bytes into text, which is the first
-# step of a semantic read.
+# step of a semantic read. These six are refused *module-wide* because this
+# module has no legitimate use for any of them anywhere.
+#
+# Independent Audit C (C-06) found this list covered only 5 of the 9 frozen
+# forbidden_operations. The four it missed --- `str()` on object bytes, json
+# parsing, line splitting or text iteration, and regular expression matching
+# over object bytes --- are deliberately NOT added here, because they are not
+# module-wide defects: this probe legitimately reads and parses the *public*
+# committed evidence file, which is what `read_expected_members` does, and a
+# module-wide ban on `splitlines` and `json.loads` would refuse that.
+#
+# The frozen rule forbids those operations on *object bytes*, which is a
+# narrower claim and a different check. It is enforced positively by
+# `assert_byte_handling_is_digest_only`, which whitelists every call inside the
+# one function that ever holds a chunk. See that function for why a whitelist
+# is the right instrument and a wider denylist is not.
 FORBIDDEN_DECODE_METHODS = (
     "decode",
     "decodebytes",
@@ -163,6 +179,94 @@ FORBIDDEN_DECODE_METHODS = (
     "hexlify",
     "unhexlify",
 )
+
+# Builtins and module functions that would turn object bytes into text, a
+# structure, or a match. `str` and `repr` are the direct route; the `json` and
+# `re` entry points are the frozen rule's "json or jsonl parsing" and "regular
+# expression matching over object bytes".
+#
+# These are NOT applied as a module-wide denylist: this module legitimately
+# calls `str` and `split` on identifiers and configuration, and a rule that
+# refused those would either refuse the module or need carve-outs that
+# reintroduce the gap. The frozen rule forbids these operations *on object
+# bytes*, and that is enforced positively by
+# `assert_byte_handling_is_digest_only`. This tuple is retained as the frozen
+# rule's vocabulary, and the boundary tests assert that every entry is refused
+# inside the byte-handling function.
+FORBIDDEN_INTERPRETATION_NAMES = (
+    "str",
+    "repr",
+    "chr",
+    "format",
+    "hex",
+    "fromhex",
+    "from_bytes",
+    "splitlines",
+    "loads",
+    "load",
+    "JSONDecoder",
+    "search",
+    "match",
+    "fullmatch",
+    "findall",
+    "finditer",
+    "split",
+    "sub",
+    "subn",
+)
+
+#: The only function that ever holds a chunk of an authoritative object.
+BYTE_HANDLING_FUNCTION = "stream_object_digest"
+
+#: Every call permitted inside :data:`BYTE_HANDLING_FUNCTION`. A whitelist,
+#: because the set of ways to interpret bytes is open and the set of ways to
+#: digest them is not: construct the hash, feed it, measure the chunk, render
+#: the result. Nothing else is needed and nothing else is allowed.
+_DIGEST_ONLY_CALLS = frozenset({"sha256", "update", "len", "hexdigest"})
+
+#: Every frozen invariant this execution actually evaluated, recorded as it is
+#: evaluated rather than counted in advance.
+#:
+#: Independent Audit C (C-12) found ``invariants_checked`` emitted as the
+#: literal ``12`` and then restated in six documents as though the probe had
+#: measured it. It had not: the number was written by hand, so adding or
+#: removing a check would not have changed it, and a receipt reporting 12 could
+#: have come from a run that evaluated three. A field that cannot disagree with
+#: reality is not a measurement.
+#:
+#: A set rather than a list, because the public test suite calls several of
+#: these functions repeatedly and an invariant evaluated twice is still one
+#: invariant.
+INVARIANTS_EVALUATED: set[str] = set()
+
+
+def _record_invariant(name: str) -> None:
+    """Note that a named frozen invariant was actually evaluated."""
+
+    INVARIANTS_EVALUATED.add(name)
+
+
+def _invariant(name: str) -> Any:
+    """Mark a function as evaluating a named frozen invariant.
+
+    Records only on successful return, so a refusal is not counted as an
+    invariant that held. Binding the record to the function definition rather
+    than to a call site is deliberate: deleting the check deletes the count,
+    which is the property Audit C (C-12) found missing when the number was a
+    literal.
+    """
+
+    def decorate(func: Any) -> Any:
+        @functools.wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            result = func(*args, **kwargs)
+            _record_invariant(name)
+            return result
+
+        wrapper.invariant_name = name  # type: ignore[attr-defined]
+        return wrapper
+
+    return decorate
 
 # Names whose presence in this file would falsify the pinned persist_attempts
 # counter, or would let object bytes reach a file or another process.
@@ -195,6 +299,7 @@ FORBIDDEN_IMPORT_ROOTS = (
     "httpx",
     "xmlrpc",
     "tempfile",
+    "codecs",
     "jspace_observation",
     "torch",
     "transformers",
@@ -241,6 +346,7 @@ def _sha256_file(path: Path) -> str:
     return hashlib.sha256(lf).hexdigest()
 
 
+@_invariant("DECISION_RECORD_DIGEST")
 def load_decision_record(path: Path = DECISION_RECORD) -> dict[str, Any]:
     record = json.loads(path.read_text(encoding="utf-8"))
     if record.get("schema_version") != DECISION_RECORD_SCHEMA_VERSION:
@@ -259,6 +365,7 @@ def load_decision_record(path: Path = DECISION_RECORD) -> dict[str, Any]:
     return record
 
 
+@_invariant("EXPECTED_EVIDENCE_DIGEST")
 def expected_members(record: dict[str, Any], repo_root: Path = REPO_ROOT) -> list[tuple[str, int, str]]:
     """Load the frozen expected member set from committed public evidence.
 
@@ -325,6 +432,7 @@ def aggregate_digest(digests: Iterable[str]) -> str:
 # ---------------------------------------------------------------------------
 
 
+@_invariant("NO_ARGUMENT_OVERRIDE")
 def assert_no_override(argv_namespace: argparse.Namespace) -> None:
     """The frozen source binding may not be redirected from outside."""
 
@@ -336,6 +444,7 @@ def assert_no_override(argv_namespace: argparse.Namespace) -> None:
         raise ProbeRefusal("SOURCE_BINDING_OVERRIDE_ATTEMPTED", "PREFIX_OVERRIDE")
 
 
+@_invariant("ENVIRONMENT_CLEAN")
 def assert_environment_clean(environ: dict[str, str] | None = None) -> None:
     env = os.environ if environ is None else environ
     for name in FORBIDDEN_ENV_VARS:
@@ -344,6 +453,7 @@ def assert_environment_clean(environ: dict[str, str] | None = None) -> None:
             raise ProbeRefusal("CREDENTIAL_TYPE_FORBIDDEN", "FORBIDDEN_ENV_VAR", name)
 
 
+@_invariant("NO_FORBIDDEN_SDK_SYMBOL")
 def assert_no_forbidden_symbols(namespace: dict[str, Any] | None = None) -> None:
     """Refuse if a forbidden credential or write-capable symbol is reachable."""
 
@@ -356,6 +466,7 @@ def assert_no_forbidden_symbols(namespace: dict[str, Any] | None = None) -> None
             raise ProbeRefusal("INTERNAL_REFUSAL", "FORBIDDEN_BLOB_SYMBOL")
 
 
+@_invariant("NO_WRITE_CALL_IN_SOURCE")
 def assert_no_write_calls_in_source(source_path: Path | None = None) -> int:
     """Refuse if this module's own source references a mutating Blob operation,
     a forbidden credential, a dynamic-access escape hatch, a decode of object
@@ -369,17 +480,26 @@ def assert_no_write_calls_in_source(source_path: Path | None = None) -> int:
 
     What this probe can honestly assert is the narrower, structural claim the
     protocol actually asks for: no mutating operation, no forbidden credential
-    construction, no decode and no persistence call appears anywhere in
-    **this file**, which is the entire first-party source executed by the gate.
-    It does not analyse the Azure SDK or the standard library, and it does not
-    claim to. Independent Audit A raised three evasions that the first draft
-    missed, all of which are now closed:
+    construction, no decode and no persistence call appears anywhere in the
+    first-party source the gate executes. It does not analyse the Azure SDK or
+    the standard library, and it does not claim to. Independent Audit A raised
+    three evasions that the first draft missed, all of which are now closed:
 
     * string constants, so ``getattr(client, "upload_blob")`` no longer passes;
     * plain ``import`` with an alias, so ``import azure.identity as ai``
       followed by ``ai.DefaultAzureCredential()`` no longer passes;
     * dynamic-access builtins, which would defeat any static check and are
       therefore refused outright rather than analysed.
+
+    Independent Audit C (C-14) found the scope claim wrong rather than the check
+    wrong. The docstring said "this file, which is the entire first-party source
+    executed by the gate", but ``phase1_2h_r1_receipt_validator.py`` also runs
+    inside the job --- the probe imports it to validate the receipt before
+    emitting it --- and was never analysed. It is clean, so nothing unsafe
+    followed; the defect was that the sentence claimed a coverage the code did
+    not have. :func:`assert_no_write_calls_in_first_party_source` now covers
+    both files, and :data:`IN_JOB_FIRST_PARTY_SOURCES` is the list, so the claim
+    and the check move together.
 
     The decode and persist checks are what make the pinned ``decode_attempts``
     and ``persist_attempts`` counters mean something. Those counters are
@@ -460,9 +580,127 @@ def assert_no_write_calls_in_source(source_path: Path | None = None) -> int:
     return inspected
 
 
+@_invariant("BYTE_HANDLING_DIGEST_ONLY")
+def assert_byte_handling_is_digest_only(source_path: Path | None = None) -> int:
+    """Whitelist every operation performed on authoritative bytes.
+
+    :func:`stream_object_digest` is the only function in the round that holds a
+    chunk of an authoritative object. The frozen ``byte_only_rule`` forbids nine
+    operations on those bytes, and independent Audit C (C-06) found the
+    name-denylist check covered five of them. Four --- ``str()`` on object
+    bytes, json parsing, line splitting or text iteration, and regular
+    expression matching --- had no enforcement at all.
+
+    Extending the denylist would not have fixed that honestly. ``str``,
+    ``split`` and ``loads`` are ordinary operations that this module performs
+    legitimately on identifiers and configuration, so banning the *names*
+    everywhere would either refuse the module or require carve-outs that
+    reintroduce the gap. The frozen rule is not "never call ``str``"; it is
+    "never call ``str`` **on object bytes**", and that distinction is a property
+    of one function.
+
+    So this check inverts the polarity. Inside the byte-handling function, every
+    call must appear in :data:`_DIGEST_ONLY_CALLS`; anything else is refused
+    whether or not anyone anticipated it. A whitelist over a three-line loop is
+    both enforceable and complete, which a denylist over a whole module can
+    never be.
+
+    Returns the number of calls inspected.
+    """
+
+    import ast
+
+    path = Path(__file__).resolve() if source_path is None else Path(source_path)
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+
+    target = None
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name == BYTE_HANDLING_FUNCTION:
+            target = node
+            break
+    if target is None:
+        # The function this check exists to constrain has been renamed or
+        # removed. Passing silently would be the worst outcome: the check would
+        # report success while guarding nothing.
+        raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_HANDLER_NOT_FOUND")
+
+    inspected = 0
+    for statement in target.body:
+        for node in ast.walk(statement):
+            if not isinstance(node, ast.Call):
+                continue
+            inspected += 1
+            func = node.func
+            if isinstance(func, ast.Name):
+                name = func.id
+            elif isinstance(func, ast.Attribute):
+                name = func.attr
+            else:
+                raise ProbeRefusal("INTERNAL_REFUSAL", "COMPUTED_CALL_ON_BYTES")
+            if name not in _DIGEST_ONLY_CALLS:
+                raise ProbeRefusal("INTERNAL_REFUSAL", "NON_DIGEST_CALL_ON_BYTES")
+
+    # A comprehension, an f-string or a subscript over the chunk would move
+    # bytes somewhere this function does not return them from. Only the body is
+    # scanned: `tuple[str, int]` in the signature is a type annotation, not an
+    # operation on bytes.
+    for statement in target.body:
+        for node in ast.walk(statement):
+            if isinstance(
+                node,
+                (
+                    ast.JoinedStr,
+                    ast.ListComp,
+                    ast.SetComp,
+                    ast.DictComp,
+                    ast.GeneratorExp,
+                    ast.Subscript,
+                    ast.Await,
+                    ast.Yield,
+                    ast.YieldFrom,
+                ),
+            ):
+                raise ProbeRefusal("INTERNAL_REFUSAL", "BYTE_DERIVATIVE_IN_HANDLER")
+
+    return inspected
+
+
+#: Every first-party Python source file that executes inside the access-gate
+#: job. Audit C (C-14): the AST check analysed only the probe while its
+#: docstring claimed to cover "the entire first-party source executed by the
+#: gate". The receipt validator also runs in-job --- the probe imports it to
+#: validate the receipt before printing it --- and was outside the check. It is
+#: clean, so the omission was a scope-claim defect rather than a hole, but a
+#: claim that outruns its evidence is exactly what this project treats as equal
+#: in severity to a functional bug.
+IN_JOB_FIRST_PARTY_SOURCES: tuple[str, ...] = (
+    "phase1_2h_r1_private_source_probe.py",
+    "phase1_2h_r1_receipt_validator.py",
+)
+
+
+@_invariant("NO_WRITE_CALL_IN_FIRST_PARTY_SOURCE")
+def assert_no_write_calls_in_first_party_source() -> int:
+    """Run the write-call analysis over every in-job first-party source file.
+
+    Returns the total number of nodes inspected across all of them. A missing
+    file is a refusal rather than a skip: the check must not report success for
+    a file it could not read.
+    """
+
+    here = Path(__file__).resolve().parent
+    inspected = 0
+    for name in IN_JOB_FIRST_PARTY_SOURCES:
+        path = here / name
+        if not path.is_file():
+            raise ProbeRefusal("INTERNAL_REFUSAL", "FIRST_PARTY_SOURCE_MISSING")
+        inspected += assert_no_write_calls_in_source(path)
+    return inspected
+
+
+@_invariant("NO_VERBOSE_SDK_LOGGING")
 def assert_verbose_logging_disabled(environ: dict[str, str] | None = None) -> None:
     """SDK body logging would print URLs, headers and object bytes."""
-
     env = os.environ if environ is None else environ
     if env.get("AZURE_LOG_LEVEL", "").strip().lower() in {"debug", "trace"}:
         raise ProbeRefusal("INTERNAL_REFUSAL", "VERBOSE_SDK_LOGGING")
@@ -493,6 +731,7 @@ def resolve_endpoint(fqdn: str, resolver: Any = None) -> list[str]:
     return sorted({str(info[4][0]) for info in infos})
 
 
+@_invariant("ENDPOINT_PRIVATE_AND_RESOLVED")
 def check_endpoint(
     record: dict[str, Any],
     public_network_access: str,
@@ -551,6 +790,7 @@ def check_endpoint(
 REQUIRED_CREDENTIAL_TYPE = "ManagedIdentityCredential"
 
 
+@_invariant("IDENTITY_IS_DESIGNATED_MANAGED_IDENTITY")
 def check_identity(record: dict[str, Any], client_id: str, credential_type: str) -> dict[str, Any]:
     rule = record["identity_rule"]
 
@@ -614,6 +854,7 @@ def check_identity(record: dict[str, Any], client_id: str, credential_type: str)
 # ---------------------------------------------------------------------------
 
 
+@_invariant("MEMBERSHIP_MATCHES_PUBLIC_ANCHOR")
 def compare_membership(
     record: dict[str, Any],
     expected: list[tuple[str, int, str]],
@@ -672,6 +913,7 @@ def stream_object_digest(chunks: Iterable[bytes]) -> tuple[str, int]:
     return digest.hexdigest(), total
 
 
+@_invariant("BYTES_MATCH_COMMITTED_DIGESTS")
 def verify_streamed(
     expected: list[tuple[str, int, str]],
     observed: list[tuple[str, int, str]],
@@ -733,12 +975,24 @@ def build_receipt(
     streaming_block: dict[str, Any],
     list_operations: int,
     invariants_checked: int,
+    invariants_evaluated: list[str] | None = None,
     exit_status: str = "PASS",
     reason_code: str = "OK",
     invariants_failed: list[str] | None = None,
 ) -> dict[str, Any]:
     binding = record["expected_evidence_binding"]
     streamed = streaming_block["objects_streamed"]
+    verdict: dict[str, Any] = {
+        "access_gate_passed": exit_status == "PASS",
+        "invariants_checked": invariants_checked,
+        "invariants_failed": invariants_failed or [],
+    }
+    # Present only when the run actually recorded which invariants held. An
+    # empty list would assert that zero invariants were evaluated, which is a
+    # different and false claim from "this build did not track them", and it
+    # would contradict a positive ``invariants_checked``.
+    if invariants_evaluated:
+        verdict["invariants_evaluated"] = sorted(invariants_evaluated)
     return {
         "schema_version": RECEIPT_SCHEMA_VERSION,
         "phase": "1.2H-R1",
@@ -772,11 +1026,7 @@ def build_receipt(
             "predictions_generated": 0,
             "list_operations": list_operations,
         },
-        "verdict": {
-            "access_gate_passed": exit_status == "PASS",
-            "invariants_checked": invariants_checked,
-            "invariants_failed": invariants_failed or [],
-        },
+        "verdict": verdict,
     }
 
 
@@ -824,7 +1074,8 @@ def main(argv: list[str] | None = None) -> int:
         assert_no_override(args)
         assert_environment_clean()
         assert_no_forbidden_symbols()
-        assert_no_write_calls_in_source()
+        assert_no_write_calls_in_first_party_source()
+        assert_byte_handling_is_digest_only()
         assert_verbose_logging_disabled()
         record = load_decision_record()
         expected = expected_members(record)
@@ -1026,7 +1277,8 @@ def _run_live(
         membership_block=membership_block,
         streaming_block=streaming_block,
         list_operations=list_operations,
-        invariants_checked=12,
+        invariants_checked=len(INVARIANTS_EVALUATED),
+        invariants_evaluated=sorted(INVARIANTS_EVALUATED),
     )
 
     sys.path.insert(0, str(Path(__file__).resolve().parent))

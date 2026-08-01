@@ -278,6 +278,43 @@ def validate_receipt(receipt: Any, schema_path: str | Path) -> None:
     """Validate *receipt* against the committed schema at *schema_path*."""
 
     validate_instance(receipt, load_schema(schema_path))
+    _assert_invariant_count_agrees(receipt)
+
+
+def _assert_invariant_count_agrees(receipt: Any) -> None:
+    """Require ``invariants_checked`` to equal the invariants actually listed.
+
+    JSON Schema cannot compare two sibling fields, and this validator refuses
+    keywords it does not enforce rather than accepting ones it silently ignores,
+    so the cross-field rule lives here.
+
+    Audit C (C-12) found ``invariants_checked`` emitted as a literal. The fix
+    was to derive it from the checks that ran and to list them; this makes the
+    list and the count unable to disagree, so a receipt cannot claim twelve
+    invariants while naming three.
+    """
+
+    if not isinstance(receipt, Mapping):
+        return
+    verdict = receipt.get("verdict")
+    if not isinstance(verdict, Mapping) or "invariants_evaluated" not in verdict:
+        # Receipt 003 predates the field. Its count is a literal, which is
+        # recorded in the schema and in the limitations ledger rather than
+        # papered over here.
+        return
+    evaluated = verdict["invariants_evaluated"]
+    checked = verdict.get("invariants_checked")
+    if len(evaluated) != checked:
+        raise ReceiptValidationError(
+            f"$.verdict: invariants_checked is {checked} but "
+            f"{len(evaluated)} invariants are named; the count must be the "
+            "length of the list, not an independent assertion"
+        )
+    if len(set(evaluated)) != len(evaluated):
+        raise ReceiptValidationError(
+            "$.verdict.invariants_evaluated: contains a duplicate; an "
+            "invariant evaluated twice is still one invariant"
+        )
 
 
 def _main(argv: Sequence[str] | None = None) -> int:

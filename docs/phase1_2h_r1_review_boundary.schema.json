@@ -14,20 +14,29 @@
     "summary",
     "qualification_verdict",
     "byte_only_gate_passed",
+    "byte_only_gate_evidence",
     "terminal_state",
-    "access_ledger_effect"
+    "instrument_access_effect"
   ],
   "properties": {
-    "schema_version": {"type": "string", "const": "phase1-2h-r1-review-boundary/v1"},
-    "phase": {"type": "string", "const": "1.2H-R1"},
-    "observed_at": {"type": "string", "format": "date-time"},
+    "schema_version": {
+      "type": "string",
+      "const": "phase1-2h-r1-review-boundary/v1"
+    },
+    "phase": {
+      "type": "string",
+      "const": "1.2H-R1"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
     "evidence_source": {
       "type": "string",
       "minLength": 1,
       "maxLength": 800,
       "description": "How the control-plane facts were captured, so the assessment can be reproduced."
     },
-
     "conditions": {
       "type": "array",
       "minItems": 13,
@@ -36,13 +45,30 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["key", "frozen_condition", "verdict", "basis"],
+        "required": [
+          "key",
+          "frozen_condition",
+          "verdict",
+          "basis"
+        ],
         "properties": {
-          "key": {"type": "string", "pattern": "^[a-z0-9_]+$", "maxLength": 80},
-          "frozen_condition": {"type": "string", "minLength": 1, "maxLength": 400},
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$",
+            "maxLength": 80
+          },
+          "frozen_condition": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400
+          },
           "verdict": {
             "type": "string",
-            "enum": ["PASS", "FAIL", "NOT_ASSESSABLE"],
+            "enum": [
+              "PASS",
+              "FAIL",
+              "NOT_ASSESSABLE"
+            ],
             "description": "NOT_ASSESSABLE is not a pass. It records that the property belongs to a review design that does not exist, so there is nothing to assess against."
           },
           "basis": {
@@ -54,25 +80,49 @@
         }
       }
     },
-
     "summary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["total", "passed", "failed", "not_assessable"],
+      "required": [
+        "total",
+        "passed",
+        "failed",
+        "not_assessable"
+      ],
       "properties": {
-        "total": {"type": "integer", "minimum": 13, "maximum": 13},
-        "passed": {"type": "integer", "minimum": 0, "maximum": 13},
-        "failed": {"type": "integer", "minimum": 0, "maximum": 13},
-        "not_assessable": {"type": "integer", "minimum": 0, "maximum": 13}
+        "total": {
+          "type": "integer",
+          "minimum": 13,
+          "maximum": 13
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 13
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 13
+        },
+        "not_assessable": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 13
+        }
       }
     },
-
     "qualification_verdict": {
       "type": "string",
-      "enum": ["QUALIFIES", "DOES_NOT_QUALIFY"],
+      "enum": [
+        "QUALIFIES",
+        "DOES_NOT_QUALIFY"
+      ],
       "description": "QUALIFIES requires every condition to PASS. Any FAIL or NOT_ASSESSABLE yields DOES_NOT_QUALIFY."
     },
-    "byte_only_gate_passed": {"type": "boolean"},
+    "byte_only_gate_passed": {
+      "type": "boolean"
+    },
     "terminal_state": {
       "type": "string",
       "enum": [
@@ -82,11 +132,49 @@
       ],
       "description": "Precedence, per independent Audit B (B-09): a failed byte-only gate blocks on source access, because the boundary question has not yet been reached. Only a passed gate can be followed by a boundary block."
     },
-
-    "access_ledger_effect": {
+    "byte_only_gate_evidence": {
+      "description": "The receipt the gate outcome was derived from. Audit C (C-01): byte_only_gate_passed was formerly an operator-supplied CLI flag, so an assessment could name a terminal state its evidence did not support. It is now computed from this receipt, and the receipt is identified here by content digest so the derivation is auditable.",
       "type": "object",
       "additionalProperties": false,
-      "description": "What this assessment itself consumed. All pinned to zero: reading control-plane resource settings is not a semantic read, and this instrument makes no change to any resource.",
+      "required": [
+        "receipt_path",
+        "receipt_sha256",
+        "passed",
+        "unmet_requirements"
+      ],
+      "properties": {
+        "receipt_path": {
+          "description": "Repository-relative path to the receipt, or null when no gate was run.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "receipt_sha256": {
+          "description": "SHA-256 over the receipt's raw bytes, or null when no gate was run.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "passed": {
+          "description": "True only if every conjunct in GATE_REQUIREMENTS held. Must equal the top-level byte_only_gate_passed.",
+          "type": "boolean"
+        },
+        "unmet_requirements": {
+          "description": "Every requirement the receipt failed. Empty if and only if passed is true.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "instrument_access_effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "What this assessment instrument itself consumed. All pinned to zero: reading control-plane resource settings is not a semantic read, and this instrument makes no change to any resource. Audit C (C-01) note: these pins constrain what a receipt may *report*; they are not a runtime instrument. The credibility of the zeros rests on the module performing no data-plane or Azure call at all, which is checkable by reading it.",
       "required": [
         "sealed_input_semantic_reads",
         "sealed_label_semantic_reads",
@@ -96,12 +184,36 @@
         "azure_resource_changes"
       ],
       "properties": {
-        "sealed_input_semantic_reads": {"type": "integer", "minimum": 0, "maximum": 0},
-        "sealed_label_semantic_reads": {"type": "integer", "minimum": 0, "maximum": 0},
-        "private_curator_files_read": {"type": "integer", "minimum": 0, "maximum": 0},
-        "predictions_generated": {"type": "integer", "minimum": 0, "maximum": 0},
-        "parser_invocations": {"type": "integer", "minimum": 0, "maximum": 0},
-        "azure_resource_changes": {"type": "integer", "minimum": 0, "maximum": 0}
+        "sealed_input_semantic_reads": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
+        "sealed_label_semantic_reads": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
+        "private_curator_files_read": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
+        "predictions_generated": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
+        "parser_invocations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
+        "azure_resource_changes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        }
       }
     }
   }

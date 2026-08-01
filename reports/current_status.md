@@ -15,8 +15,11 @@
 > No byte was decoded, retained or interpreted: `decode_attempts`,
 > `persist_attempts`, `azure_data_plane_writes`, `semantic_input_reads`,
 > `semantic_label_reads`, `parser_invocations` and `predictions_generated` are
-> all **0**, structurally pinned `maximum: 0` in the receipt schema so a probe
-> that had done any of them could not have emitted a valid receipt. **No private
+> all **0**. What makes those zeros credible is an AST check over the probe's own
+> source that fails the build if any decode, persist or write call is present —
+> the receipt schema's `maximum: 0` pins prevent a violation from being
+> *reported* in a valid receipt, but they do not observe the running program.
+> **No private
 > content was read, no set was constructed, no set was sealed, no parser was
 > run, and no prediction was generated.**
 >
@@ -102,7 +105,7 @@ a future evaluation is settled, and records nothing whatever about any
 parser. Specifically:
 
 - Phase 1.0C was executed and finalized `INCONCLUSIVE`. It is target-model task/headroom screening, not parser calibration, and no Phase 1.0C result can supply, bound, or unblock any parser acceptance threshold.
-- No private holdout, sealed input, sealed label or private curator file was *semantically read*. Phase 1.2H-R1 streamed all 12 sealed objects into a SHA-256 accumulator and discarded them, so bytes were touched while nothing about any case was learned: `decode_attempts`, `persist_attempts`, `semantic_input_reads` and `semantic_label_reads` are all **0**, pinned `maximum: 0` in the receipt schema.
+- No private holdout, sealed input, sealed label or private curator file was *semantically read*. Phase 1.2H-R1 streamed all 12 sealed objects into a SHA-256 accumulator and discarded them, so bytes were touched while nothing about any case was learned: `decode_attempts`, `persist_attempts`, `semantic_input_reads` and `semantic_label_reads` are all **0**. Those zeros are literals the probe emits, made credible by an AST check over its own source that fails the build if a decode, write or persist call appears; the receipt schema's `maximum: 0` pins stop a violation being *reported* as a valid receipt, but do not themselves observe the running program.
 - No prediction was generated and no parser was run against any evaluation or calibration corpus.
 - No formal parser-v3 evaluation has occurred. Parser v3 remains **unvalidated**.
 - `parser-v3-v1` remains `SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE`, byte-unchanged.
