@@ -1,0 +1,35 @@
+{
+  "schema_version": "phase1-2h-r1-image-payload/v1",
+  "phase": "1.2H-R1",
+  "purpose": "LF-normalized SHA-256 of every file baked into the Phase 1.2H-R1 byte-only access image. The image build fails if any file differs.",
+  "digest_algorithm": "sha256",
+  "line_ending_normalization": "CRLF and CR are normalized to LF before digesting",
+  "payload": [
+    {
+      "path": "scripts/phase1_2h_r1_private_source_probe.py",
+      "sha256": "c5c6de017b184248dc5bc5f10aeb89ba2baa8832023b92ec98ed11be0a8226d4"
+    },
+    {
+      "path": "scripts/phase1_2h_r1_receipt_validator.py",
+      "sha256": "b4a77de993a5ef400a3b65911b78e635c8cf73732035414b7214cb09de24f960"
+    },
+    {
+      "path": "docs/phase1_2h_r1_access_decision_record.json",
+      "sha256": "54e2c7b04931c96e7710471e3f5dda57c800c64f912c6471d881db1835eb4520"
+    },
+    {
+      "path": "docs/phase1_2h_r1_access_receipt.schema.json",
+      "sha256": "384e8fd9236b93076a84e5c92b721eb26b981cab7b19acb55755e1dc7bb72455"
+    },
+    {
+      "path": "artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/02_records.jsonl",
+      "sha256": "a111a821e22e83e779c1defbf2963afc1a665aeec48ddcdc67524975bc3701c6"
+    }
+  ],
+  "excluded_by_construction": [
+    "any parser module (eval_parsing.py, eval_parsing_v2.py, eval_parsing_v3.py)",
+    "the jspace_observation package, whose __init__ eagerly imports the legacy parser",
+    "any sealed input, label, prediction or curator artifact",
+    "any credential, secret, connection string or SAS token"
+  ]
+}

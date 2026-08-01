@@ -1,0 +1,116 @@
+ARG PYTHON_BASE_IMAGE=python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d
+FROM ${PYTHON_BASE_IMAGE}
+ARG PYTHON_BASE_IMAGE
+ARG BUILD_PROVENANCE_SHA256
+
+# Phase 1.2H-R1 byte-only authoritative-source access image.
+#
+# This image exists to run one program: a probe that streams the sealed
+# parser-v3-v1 objects through SHA-256 and proves they are byte-for-byte what
+# the committed public seal record says they are.
+#
+# What is deliberately NOT in this image:
+#   * any parser module;
+#   * the jspace_observation package, whose __init__ eagerly imports the legacy
+#     parser -- importing any submodule through it would place parser code in
+#     sys.modules of the one process that touches sealed bytes;
+#   * any sealed input, label, prediction or curator artifact;
+#   * any credential, secret, connection string or SAS token. The probe
+#     authenticates with a user-assigned managed identity supplied at run time,
+#     and the storage account rejects shared-key auth by construction.
+#
+# CPU only. No GPU runtime, no model, no CUDA. The workload is I/O and SHA-256.
+
+LABEL org.opencontainers.image.build-provenance-sha256="${BUILD_PROVENANCE_SHA256}"
+LABEL org.opencontainers.image.title="j-space-observation phase1-2h-r1 access gate"
+LABEL org.opencontainers.image.description="Byte-only sealed-source integrity probe. Performs no semantic read."
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONHASHSEED=0 \
+    PYTHONUNBUFFERED=1 \
+    HOME=/nonexistent \
+    TMPDIR=/runtime/work \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PATH=/usr/local/bin:/usr/bin:/bin
+
+WORKDIR /workspace
+
+RUN test "${PYTHON_BASE_IMAGE}" = "python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d" \
+    && test "$(readlink -f /usr/local/bin/python3.11)" = "/usr/local/bin/python3.11" \
+    && test "${#BUILD_PROVENANCE_SHA256}" -eq 64 \
+    && test -z "$(printf '%s' "${BUILD_PROVENANCE_SHA256}" | tr -d '0-9a-f')" \
+    && test -x /usr/bin/grep \
+    && ! /usr/bin/grep -Eq '^[^:]+:[^:]*:10002:' /etc/group \
+    && ! /usr/bin/grep -Eq '^[^:]+:[^:]*:10002:' /etc/passwd \
+    && printf '%s\n' 'access-probe:x:10002:' >> /etc/group \
+    && printf '%s\n' \
+       'access-probe:x:10002:10002::/nonexistent:/bin/false' >> /etc/passwd \
+    && install -d -o access-probe -g access-probe -m 0700 /runtime /runtime/work
+
+# Reuses the already hash-pinned parser-v2 evaluation requirements verbatim.
+# That file is the repository's reviewed Azure SDK closure (azure-identity,
+# azure-storage-blob, azure-core and transitive dependencies), so reusing it
+# adds no new supply-chain surface. Its name refers to where it was first
+# introduced, not to anything parser-related being installed here: it contains
+# no project code.
+COPY requirements-parser-v2-eval.txt /workspace/
+RUN /usr/local/bin/python3.11 -I -m pip install --no-cache-dir \
+    --only-binary=:all: \
+    --require-hashes \
+    -r requirements-parser-v2-eval.txt
+
+COPY scripts/phase1_2h_r1_private_source_probe.py \
+     scripts/phase1_2h_r1_receipt_validator.py \
+     /workspace/scripts/
+COPY docs/phase1_2h_r1_access_decision_record.json \
+     docs/phase1_2h_r1_access_receipt.schema.json \
+     /workspace/docs/
+COPY artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/02_records.jsonl \
+     /workspace/artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/
+COPY infra/azure/phase1_2h_r1_image_payload.json /workspace/infra/azure/
+
+# Verify every payload file against the committed manifest, after the same LF
+# normalization the manifest generator uses. A build whose probe, schema or
+# frozen binding differs from the reviewed commit fails here rather than
+# producing a receipt nobody can trace.
+RUN /usr/local/bin/python3.11 -I -c "\
+import hashlib, json, pathlib, sys; \
+root = pathlib.Path('/workspace'); \
+manifest = json.loads((root / 'infra/azure/phase1_2h_r1_image_payload.json').read_text(encoding='utf-8')); \
+entries = manifest['payload']; \
+assert len(entries) == 5, 'unexpected payload size'; \
+bad = [e['path'] for e in entries if hashlib.sha256((root / e['path']).read_bytes().replace(b'\r\n', b'\n').replace(b'\r', b'\n')).hexdigest() != e['sha256']]; \
+sys.exit('payload digest mismatch: ' + repr(bad)) if bad else print('payload digests verified: 5/5')" \
+    && /usr/local/bin/python3.11 -I -m py_compile \
+       /workspace/scripts/phase1_2h_r1_private_source_probe.py \
+       /workspace/scripts/phase1_2h_r1_receipt_validator.py
+
+# Prove, at build time, that the image cannot reach parser code. The probe's
+# offline dry run exercises every frozen binding without touching the network,
+# and the import check fails the build if the parser package is present at all.
+RUN /usr/local/bin/python3.11 -I -c "\
+import importlib.util, sys; \
+found = [n for n in ('jspace_observation',) if importlib.util.find_spec(n) is not None]; \
+sys.exit('parser-bearing package present in image: ' + repr(found)) if found else print('no parser-bearing package in image')" \
+    && /usr/local/bin/python3.11 -I /workspace/scripts/phase1_2h_r1_private_source_probe.py \
+       --client-id 00000000-0000-0000-0000-000000000000 \
+       --execution-id build-time-dry-run \
+       --freeze-commit build \
+       --image-digest build \
+       --dry-run \
+    && /usr/local/bin/python3.11 -I -c "\
+import sys; \
+sys.path.insert(0, '/workspace/scripts'); \
+import phase1_2h_r1_private_source_probe as p; \
+assert 'jspace_observation' not in sys.modules; \
+assert not [m for m in sys.modules if 'parsing' in m]; \
+print('no parser module loaded by the probe')" \
+    && find /workspace -type d -name __pycache__ -prune -exec rm -rf {} + \
+    && chown -R 0:0 /workspace \
+    && chmod -R a-w /workspace
+
+USER access-probe
+
+ENTRYPOINT ["/usr/local/bin/python3.11", "-I", "/workspace/scripts/phase1_2h_r1_private_source_probe.py"]
+CMD ["--help"]

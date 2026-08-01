@@ -1,0 +1,204 @@
+{
+  "schema_version": "phase1-2h-r1-access-decision-record/v1",
+  "record_id": "phase1-2h-r1-cloud-access-and-boundary-decision",
+  "phase": "1.2H-R1",
+  "purpose": "Freeze, before any authoritative object is streamed, exactly which source the probe may reach, which identity it may use, which network path it must prove, and which public evidence it must agree with. Everything the probe trusts is named here and bound by digest, so a post-freeze edit to any of it is detectable.",
+  "authorizing_round": "Phase 1.2H-R1 - cloud-first private-source access restoration and private-review-boundary qualification",
+  "not_authorized_by_this_record": [
+    "semantic reading of any retired-v1 input or label",
+    "decoding, parsing or text interpretation of any sealed object",
+    "construction, repair, migration, review or replacement of any case",
+    "creation of any parser-v3-v2 case, manifest, contract, sealed prefix or listing witness",
+    "any parser invocation on private, locked, evaluation, calibration or candidate data",
+    "prediction, comparator output, scoring, preregistration, Stage P or Stage E",
+    "any data-plane write, delete, lease, tag, tier, snapshot or metadata change"
+  ],
+
+  "source_binding": {
+    "role": "The only source this probe may address. Every field is compared literally; the probe refuses any override.",
+    "subscription_display_name": "MCAPS-Hybrid-REQ-125620-2025-alanjiao",
+    "subscription_id": "943bacdf-8b6e-4e3a-8126-a149f623d32e",
+    "resource_group": "rg-jspace-observation-sea",
+    "region": "southeastasia",
+    "storage_account": "stjspacefiles0709085305",
+    "blob_container": "jspace-results",
+    "exact_prefix": "phase1-evaluator-validation/parser-v3-v1/20260725T160340Z",
+    "expected_object_count": 12,
+    "expected_total_bytes": 396613,
+    "prefix_semantics": "Exactly the registered prefix. The probe must not enumerate the container root, the sibling 20260725T160340Z-runlog prefix, or any neighbouring prefix.",
+    "sibling_prefix_excluded": "phase1-evaluator-validation/parser-v3-v1/20260725T160340Z-runlog"
+  },
+
+  "expected_evidence_binding": {
+    "role": "The committed public record of what was sealed. The probe loads expected member identities, sizes and SHA-256 digests from this file and from nowhere else, so the expected values cannot be edited independently of project history.",
+    "path": "artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/02_records.jsonl",
+    "sha256": "a111a821e22e83e779c1defbf2963afc1a665aeec48ddcdc67524975bc3701c6",
+    "line_ending_sensitivity": "none - this file is LF-only, so its raw and LF-normalized digests are identical",
+    "record_selector": "records whose evaluation object carries an integer order field",
+    "expected_selected_records": 12,
+    "member_field": "source_item_id",
+    "size_field": "evaluation.bytes",
+    "digest_field": "input_hash",
+    "digest_algorithm": "SHA-256 over the raw sealed bytes, with no line-ending normalization",
+    "digest_algorithm_verification": "Cross-checked in Phase 1.2H-R1 against five locally committed public counterparts, all of which matched the raw digest and not the LF-normalized digest.",
+    "members_digest": "18378b52a7adc66a027d9f0bc1bc6638619c9af29b1dac4d00cc7fa2ba51f4d1",
+    "members_digest_definition": "SHA-256 of the newline-joined, lexicographically sorted lines '<member>\\t<bytes>\\t<sha256>' over all 12 selected records.",
+    "members_digest_role": "Binds the whole expected set in one public value. It lets a reader confirm the probe used the registered expectation without the probe ever emitting a member name.",
+    "written_last_member_order": 12
+  },
+
+  "identity_rule": {
+    "role": "Which credential the probe may use. Selection is explicit; the probe never falls back to an ambient credential.",
+    "required_credential_type": "ManagedIdentityCredential with an explicitly supplied user-assigned client_id",
+    "forbidden_credential_types": [
+      "DefaultAzureCredential",
+      "ChainedTokenCredential",
+      "EnvironmentCredential",
+      "AzureCliCredential",
+      "AzureDeveloperCliCredential",
+      "AzurePowerShellCredential",
+      "InteractiveBrowserCredential",
+      "DeviceCodeCredential",
+      "ClientSecretCredential",
+      "CertificateCredential",
+      "SharedKeyCredential",
+      "AzureSasCredential",
+      "ConnectionString",
+      "SystemAssignedManagedIdentity"
+    ],
+    "forbidden_credential_rationale": "Each of these either resolves an identity the freeze did not name, or authenticates with a secret the storage account is configured to reject. A chained or default credential is forbidden even though it might resolve to the correct identity, because which identity it resolves to is an environment property rather than a frozen one.",
+    "required_data_role": "Storage Blob Data Reader",
+    "required_role_definition_id": "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1",
+    "maximum_assignment_scope": "the exact blob container: /subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Storage/storageAccounts/{storage_account}/blobServices/default/containers/{blob_container}",
+    "forbidden_data_roles": [
+      "Storage Blob Data Contributor",
+      "Storage Blob Data Owner",
+      "Storage Blob Delegator",
+      "Storage Account Contributor",
+      "Contributor",
+      "Owner",
+      "User Access Administrator"
+    ],
+    "historical_identity_disposition": {
+      "name": "id-jspace-aca-acrpull-sea",
+      "principal_id": "78d4348b-57eb-4fb9-aaa7-99148b303292",
+      "verdict": "REJECTED_FOR_DATA_ACCESS",
+      "reason": "It holds a standing Storage Blob Data Contributor assignment at the storage account scope, which is write and delete capable. Section 8.3 requires that the data identity's read-only status be demonstrable, and this identity's is demonstrably false.",
+      "evidence": "Live role assignment listing at the storage account scope, independently corroborated by docs/phase1_parser_v3_seal_execution_record.json, which records the same standing assignment as pre-existing, expected-by-spec 0, matches_expectation false, and not removed.",
+      "action_taken": "None. The assignment is left exactly as it is, because other Container Apps jobs depend on it and altering it to make this round look clean is forbidden.",
+      "still_used_for": "AcrPull only, if and only if a separate reading establishes it holds no write-capable data role at the source. It is not used as the data identity under any circumstance."
+    },
+    "second_historical_identity_disposition": {
+      "name": "id-jspace-parser-v2-control-sea",
+      "principal_id": "1ec93a23-1126-4058-a537-4f1016b8c325",
+      "verdict": "REJECTED_FOR_DATA_ACCESS",
+      "reason": "It holds Contributor at the resource group scope, which confers management-plane control over the storage account.",
+      "action_taken": "None."
+    },
+    "designated_identity": {
+      "name": "id-jspace-p12h-r1-read-sea",
+      "resource_group": "rg-jspace-observation-sea",
+      "creation_status": "to be created by this round if and only if it does not already exist",
+      "grants": [
+        "AcrPull at the exact ACR scope",
+        "Storage Blob Data Reader at the exact blob container scope"
+      ],
+      "must_not_grant": "any role in forbidden_data_roles, at any scope"
+    }
+  },
+
+  "endpoint_rule": {
+    "role": "Which network path the probe must prove before it reads a single byte.",
+    "required_public_network_access": "Disabled",
+    "required_blob_fqdn": "stjspacefiles0709085305.blob.core.windows.net",
+    "required_privatelink_zone": "privatelink.blob.core.windows.net",
+    "expected_private_ip": "10.80.2.4",
+    "expected_private_ip_evidence": "Private endpoint pe-stjspacefiles-blob-sea NIC ipConfiguration privateIPAddress, cross-checked against the A record stjspacefiles0709085305 in the linked private DNS zone.",
+    "private_endpoint_name": "pe-stjspacefiles-blob-sea",
+    "private_dns_zone_link": "link-vnet-jspace-observation-sea-blob",
+    "allowed_private_cidrs": ["10.80.0.0/16"],
+    "refusal_rule": "The probe must refuse to proceed if the resolved address is public, is outside allowed_private_cidrs, or does not equal expected_private_ip. A private address that is merely inside the VNet range but is not the registered endpoint address is still a refusal, because it would mean the name resolved through something other than the registered private endpoint.",
+    "ip_rebinding_note": "If the private endpoint is ever recreated its address may change. A changed address is a refusal under this frozen record, not something the probe may accept; it requires a new public freeze with an updated expected_private_ip derived from the private endpoint resource."
+  },
+
+  "byte_only_rule": {
+    "role": "What the probe may do with the bytes it reads.",
+    "permitted": "Stream bounded chunks directly into a SHA-256 accumulator and a byte counter, then discard each buffer.",
+    "chunk_bytes": 262144,
+    "forbidden_operations": [
+      "decode",
+      "str() on object bytes",
+      "json or jsonl parsing",
+      "line splitting or text iteration",
+      "regular expression matching over object bytes",
+      "writing bytes to disk, stdout, stderr, an exception message, a cache, a temp file or another blob",
+      "placing bytes or any derivative other than a whole-object digest into a receipt",
+      "passing bytes to a model prompt or any external agent",
+      "any parser, normalizer, ontology or semantic validation call on object bytes"
+    ],
+    "classification": "An operation performed under this rule is an Azure data-plane content read and a byte-only integrity verification. It is not a semantic read and it does not transition parser-v3-v1 out of SEALED / UNSPENT / UNSCORABLE / RETIRED_AS_INELIGIBLE."
+  },
+
+  "receipt_rule": {
+    "schema_path": "docs/phase1_2h_r1_access_receipt.schema.json",
+    "schema_version": "phase1-2h-r1-access-receipt/v1",
+    "emission": "exactly one canonical JSON document on stdout",
+    "validation": "The probe validates its own receipt against the closed schema before exit and fails closed if validation fails.",
+    "content_free_requirement": "The receipt carries counts, verdicts, public identifiers and digests of public expected values only. It carries no member name, no path below the registered prefix, no bytes, no excerpt, no token, no header and no unrestricted traceback."
+  },
+
+  "counter_semantics": {
+    "role": "How this round's execution is to be counted in the append-only ledger.",
+    "azure_data_plane_content_reads": "one per object successfully streamed",
+    "retired_v1_byte_only_integrity_verifications": "one per object successfully streamed, added to the existing count of 2 local curator files",
+    "retired_v1_semantic_input_reads": 0,
+    "retired_v1_semantic_label_reads": 0,
+    "azure_data_plane_writes": 0,
+    "parser_invocations_on_private_data": 0,
+    "predictions_generated": 0,
+    "sets_sealed": 0,
+    "formal_evaluations": 0,
+    "derivation_requirement": "Every counter must be derived from execution evidence. Expected values must never be copied into the ledger in place of measured ones."
+  },
+
+  "private_review_boundary_requirements": {
+    "role": "The conditions a backend must meet before any future semantic review may occur. This round only qualifies or classifies; it does not build.",
+    "conditions": [
+      "worker is in the project VNet or a formally approved Private Link connected service boundary",
+      "public network access to the reviewer endpoint is disabled",
+      "reviewer DNS resolves to a registered private endpoint",
+      "the worker has no unrestricted Internet egress while it holds private material",
+      "outbound paths are restricted to the minimum approved private endpoints and Azure platform dependencies",
+      "prompts and responses never reach Copilot, GitHub Actions, external subagents, public telemetry or public artifact storage",
+      "raw prompt and response logging is disabled or confined to the same private boundary with explicit retention and access controls",
+      "identity, role and storage scopes are least privilege",
+      "separate R1 and R2 sessions can be isolated and their outputs hidden from each other",
+      "an arbiter can receive only disagreement packets",
+      "all outputs remain private and only aggregates or content-free receipts leave",
+      "a public synthetic review packet completes end to end and produces schema valid structured output",
+      "the boundary and the synthetic execution are independently audited"
+    ],
+    "explicitly_non_qualifying": [
+      "Copilot CLI or a remote subagent invoked from an Azure shell, because the model endpoint is outside the VNet regardless of where the CLI process runs",
+      "a Container Apps environment that reaches Blob privately but retains unrestricted Internet egress",
+      "a public Azure OpenAI or Foundry endpoint protected only by an API key",
+      "an endpoint whose logs or prompts leave the approved boundary",
+      "a procedural promise not to exfiltrate while unrestricted egress remains"
+    ]
+  },
+
+  "freeze_semantics": {
+    "role": "What may and may not change after the first authoritative object is streamed.",
+    "frozen_after_first_stream": [
+      "this decision record",
+      "scripts/phase1_2h_r1_private_source_probe.py",
+      "docs/phase1_2h_r1_access_receipt.schema.json",
+      "the identity rule",
+      "the endpoint rule",
+      "the expected evidence binding",
+      "the byte-only rule",
+      "ledger counter semantics"
+    ],
+    "violation_consequence": "Any change to a frozen item after the first stream terminates the run blocked. The run may not be silently continued or rerun under changed semantics; it requires a new public freeze under a later authorization."
+  }
+}

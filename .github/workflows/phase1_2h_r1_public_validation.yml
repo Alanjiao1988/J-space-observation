@@ -1,0 +1,173 @@
+name: Phase 1.2H-R1 public validation
+
+# Runs the repository's public checks on GitHub-hosted compute.
+#
+# Why this exists: the operator's local machine cannot sustain the full suite,
+# so every heavy validation for Phase 1.2H-R1 runs here. Nothing in this
+# workflow touches Azure, the sealed source, or any private material. It has no
+# secrets, no cloud credential, no OIDC federation and read-only repository
+# permission, so it could not reach private data even if it tried.
+#
+# It is also the round's baseline instrument: dispatch it against the
+# pre-change commit first, then against the candidate, so the two results are
+# directly comparable rather than being asserted to be.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: "Commit SHA to validate (full 40-character SHA)"
+        required: true
+      run_full_suite:
+        description: "Run the full repository test suite"
+        required: false
+        default: "true"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p12h-r1-validation-${{ github.event.inputs.target_sha }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out the requested commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Confirm the checked-out commit is the requested one
+        run: |
+          actual="$(git rev-parse HEAD)"
+          echo "requested: ${{ github.event.inputs.target_sha }}"
+          echo "actual:    ${actual}"
+          test "${actual}" = "${{ github.event.inputs.target_sha }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+
+      - name: Byte-compile the repository
+        run: python -m compileall -q src scripts tests
+
+      - name: Whitespace and conflict-marker check
+        run: git diff --check "$(git rev-list --max-parents=0 HEAD | tail -1)" HEAD -- || true
+
+      - name: Phase 1.2H-R1 focused suite
+        if: ${{ hashFiles('tests/test_phase1_2h_r1_access.py') != '' }}
+        run: python -m pytest tests/test_phase1_2h_r1_access.py -q
+
+      - name: Phase 1.2H ledger suite
+        run: python -m pytest tests/test_parser_v3_v2_access_ledger.py -q
+
+      - name: Access-image payload manifest is current
+        if: ${{ hashFiles('scripts/generate_p12h_r1_payload_manifest.py') != '' }}
+        run: python scripts/generate_p12h_r1_payload_manifest.py --check
+
+      - name: Current-state consistency instrument
+        run: python scripts/check_current_state_consistency.py
+
+      - name: Offline probe dry run
+        if: ${{ hashFiles('scripts/phase1_2h_r1_private_source_probe.py') != '' }}
+        # Proves the frozen bindings load and reproduce the public anchors with
+        # no network, no credential and no Azure access whatsoever.
+        run: |
+          python scripts/phase1_2h_r1_private_source_probe.py \
+            --client-id 00000000-0000-0000-0000-000000000000 \
+            --execution-id ci-dry-run \
+            --freeze-commit "${{ github.event.inputs.target_sha }}" \
+            --image-digest none \
+            --dry-run
+
+      - name: Probe imports no parser-bearing package
+        if: ${{ hashFiles('scripts/phase1_2h_r1_private_source_probe.py') != '' }}
+        run: |
+          python - <<'PY'
+          import subprocess, sys, textwrap
+          probe = textwrap.dedent("""
+              import sys
+              sys.path.insert(0, "scripts")
+              import phase1_2h_r1_private_source_probe  # noqa: F401
+              leaked = [m for m in sys.modules if "jspace_observation" in m or "eval_parsing" in m]
+              assert not leaked, leaked
+              print("probe import graph is parser-free")
+          """)
+          sys.exit(subprocess.run([sys.executable, "-c", probe]).returncode)
+          PY
+
+      - name: Large-file check
+        run: |
+          large="$(find . -path ./.git -prune -o -type f -size +5M -print)"
+          if [ -n "${large}" ]; then
+            echo "files larger than 5MB:"; echo "${large}"; exit 1
+          fi
+          echo "no file exceeds 5MB"
+
+      - name: Credential and secret scan
+        run: |
+          python - <<'PY'
+          import re, pathlib, sys
+
+          # Deliberately narrow: high-signal secret shapes only. Azure resource
+          # IDs, principal IDs and role-definition GUIDs are public identifiers
+          # and are committed on purpose, so a bare-GUID rule would be noise.
+          patterns = {
+              "storage account key": re.compile(r"[A-Za-z0-9+/]{86}=="),
+              "connection string": re.compile(r"AccountKey=[A-Za-z0-9+/=]{20,}"),
+              "sas token": re.compile(r"[?&]sig=[A-Za-z0-9%+/=]{20,}"),
+              "aws key": re.compile(r"AKIA[0-9A-Z]{16}"),
+              "private key block": re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
+              "github token": re.compile(r"gh[pousr]_[A-Za-z0-9]{36,}"),
+              "bearer literal": re.compile(r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\."),
+          }
+
+          hits = []
+          root = pathlib.Path(".")
+          for path in root.rglob("*"):
+              if not path.is_file() or ".git/" in path.as_posix():
+                  continue
+              if path.stat().st_size > 2_000_000:
+                  continue
+              try:
+                  text = path.read_text(encoding="utf-8")
+              except (UnicodeDecodeError, OSError):
+                  continue
+              for label, pattern in patterns.items():
+                  if pattern.search(text):
+                      hits.append(f"{path.as_posix()}: {label}")
+
+          if hits:
+              print("potential secrets found:")
+              print("\n".join(sorted(hits)))
+              sys.exit(1)
+          print("secret scan clean")
+          PY
+
+      - name: Full repository suite
+        if: ${{ github.event.inputs.run_full_suite == 'true' }}
+        run: python -m pytest -q
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Phase 1.2H-R1 public validation"
+            echo ""
+            echo "- commit: \`${{ github.event.inputs.target_sha }}\`"
+            echo "- full suite requested: \`${{ github.event.inputs.run_full_suite }}\`"
+            echo "- Azure access: none"
+            echo "- sealed material accessed: none"
+          } >> "$GITHUB_STEP_SUMMARY"

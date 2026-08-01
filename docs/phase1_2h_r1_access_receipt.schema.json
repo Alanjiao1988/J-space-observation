@@ -1,0 +1,264 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/docs/phase1_2h_r1_access_receipt.schema.json",
+  "title": "Phase 1.2H-R1 content-free access receipt",
+  "description": "The only artifact the in-VNet access job is permitted to emit. It is closed at every level: additionalProperties is false everywhere, so a field that would carry private material cannot be added without changing this committed schema. It carries counts, verdicts, public identifiers and digests of public expected values. It carries no member name, no path below the registered prefix, no object bytes, no excerpt, no credential and no unrestricted traceback.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "phase",
+    "execution",
+    "provenance",
+    "identity",
+    "endpoint",
+    "membership",
+    "streaming",
+    "counters",
+    "verdict"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "phase1-2h-r1-access-receipt/v1"
+    },
+    "phase": {
+      "type": "string",
+      "const": "1.2H-R1"
+    },
+
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["execution_id", "started_at", "ended_at", "exit_status", "reason_code"],
+      "properties": {
+        "execution_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "The Azure Container Apps job execution name. Public infrastructure identity, discoverable after a laptop restart."
+        },
+        "started_at": {"type": "string", "format": "date-time"},
+        "ended_at": {"type": "string", "format": "date-time"},
+        "exit_status": {"type": "string", "enum": ["PASS", "FAIL"]},
+        "reason_code": {
+          "type": "string",
+          "description": "A closed vocabulary. A free-text reason is deliberately not permitted, because free text is where private material leaks.",
+          "enum": [
+            "OK",
+            "PUBLIC_NETWORK_ACCESS_NOT_DISABLED",
+            "ENDPOINT_NOT_PRIVATE",
+            "ENDPOINT_IP_MISMATCH",
+            "CREDENTIAL_TYPE_FORBIDDEN",
+            "IDENTITY_MISMATCH",
+            "ROLE_NOT_READ_ONLY",
+            "EXPECTED_EVIDENCE_DIGEST_MISMATCH",
+            "DECISION_RECORD_DIGEST_MISMATCH",
+            "SOURCE_BINDING_OVERRIDE_ATTEMPTED",
+            "MEMBER_COUNT_MISMATCH",
+            "MEMBER_SET_MISMATCH",
+            "OBJECT_SIZE_MISMATCH",
+            "OBJECT_DIGEST_MISMATCH",
+            "STREAM_ERROR",
+            "RECEIPT_SCHEMA_INVALID",
+            "INTERNAL_REFUSAL"
+          ]
+        }
+      }
+    },
+
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "access_protocol_freeze_commit",
+        "image_digest",
+        "decision_record_sha256",
+        "expected_evidence_sha256",
+        "expected_members_digest",
+        "probe_source_sha256"
+      ],
+      "properties": {
+        "access_protocol_freeze_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "image_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "decision_record_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "expected_evidence_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "expected_members_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "probe_source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Digest of the probe's own source as it ran, so the receipt binds to the exact code rather than only to the image."
+        }
+      }
+    },
+
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "credential_type",
+        "client_id",
+        "client_id_matches_designated",
+        "forbidden_credential_types_absent",
+        "effective_read_only_verdict"
+      ],
+      "properties": {
+        "credential_type": {"type": "string", "const": "ManagedIdentityCredential"},
+        "client_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "description": "A user-assigned managed identity client ID. This is a public Azure resource identifier, not a credential."
+        },
+        "client_id_matches_designated": {"type": "boolean"},
+        "forbidden_credential_types_absent": {"type": "boolean"},
+        "effective_read_only_verdict": {
+          "type": "string",
+          "enum": ["READ_ONLY_CONFIRMED", "NOT_CONFIRMED"]
+        },
+        "role_definition_ids": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[0-9a-f-]{36}$"},
+          "maxItems": 8
+        },
+        "assignment_scope_kind": {
+          "type": "string",
+          "enum": ["container", "account", "resource_group", "subscription", "other"]
+        },
+        "role_condition_sha256": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Digest of the ABAC condition text if one is applied. The condition text itself is not emitted."
+        }
+      }
+    },
+
+    "endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "public_network_access",
+        "resolved_is_private",
+        "resolved_matches_expected_private_ip",
+        "privatelink_path_confirmed"
+      ],
+      "properties": {
+        "public_network_access": {"type": "string", "enum": ["Disabled", "Enabled", "Unknown"]},
+        "resolved_is_private": {"type": "boolean"},
+        "resolved_matches_expected_private_ip": {"type": "boolean"},
+        "privatelink_path_confirmed": {"type": "boolean"},
+        "expected_private_ip": {
+          "type": "string",
+          "description": "Echoed from the frozen decision record. It is a private RFC1918 address inside the project VNet and is already committed publicly."
+        },
+        "resolved_ip_matches_only": {
+          "type": "boolean",
+          "description": "True when the resolved address equalled the expected address. The observed address is deliberately not emitted when it does not match, so a misconfiguration cannot leak an unregistered endpoint address."
+        }
+      }
+    },
+
+    "membership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expected_count",
+        "observed_count",
+        "counts_equal",
+        "member_sets_equal",
+        "prefix_scope"
+      ],
+      "properties": {
+        "expected_count": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "observed_count": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "counts_equal": {"type": "boolean"},
+        "member_sets_equal": {"type": "boolean"},
+        "unexpected_member_count": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "missing_member_count": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "prefix_scope": {
+          "type": "string",
+          "const": "exact_registered_prefix_only",
+          "description": "Asserts that enumeration was confined to the registered prefix. The prefix string itself is public and lives in the decision record; it is not repeated here."
+        }
+      }
+    },
+
+    "streaming": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objects_streamed",
+        "total_bytes_streamed",
+        "expected_total_bytes",
+        "all_sizes_match",
+        "all_digests_match",
+        "decode_attempts",
+        "persist_attempts"
+      ],
+      "properties": {
+        "objects_streamed": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "total_bytes_streamed": {"type": "integer", "minimum": 0},
+        "expected_total_bytes": {"type": "integer", "minimum": 0},
+        "all_sizes_match": {"type": "boolean"},
+        "all_digests_match": {"type": "boolean"},
+        "size_mismatch_count": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "digest_mismatch_count": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "decode_attempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0,
+          "description": "Structurally pinned to zero. A receipt reporting any decode attempt is schema-invalid, so the probe cannot report one and pass."
+        },
+        "persist_attempts": {"type": "integer", "minimum": 0, "maximum": 0},
+        "observed_aggregate_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 over the sorted observed per-object digests. When access succeeds this equals the public digest_set_digest, so it discloses nothing new; when it differs it discloses only that fact."
+        }
+      }
+    },
+
+    "counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "azure_data_plane_content_reads",
+        "azure_data_plane_writes",
+        "byte_only_integrity_verifications",
+        "semantic_input_reads",
+        "semantic_label_reads",
+        "parser_invocations",
+        "predictions_generated",
+        "list_operations"
+      ],
+      "properties": {
+        "azure_data_plane_content_reads": {"type": "integer", "minimum": 0},
+        "azure_data_plane_writes": {"type": "integer", "minimum": 0, "maximum": 0},
+        "byte_only_integrity_verifications": {"type": "integer", "minimum": 0},
+        "semantic_input_reads": {"type": "integer", "minimum": 0, "maximum": 0},
+        "semantic_label_reads": {"type": "integer", "minimum": 0, "maximum": 0},
+        "parser_invocations": {"type": "integer", "minimum": 0, "maximum": 0},
+        "predictions_generated": {"type": "integer", "minimum": 0, "maximum": 0},
+        "list_operations": {"type": "integer", "minimum": 0}
+      }
+    },
+
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["access_gate_passed", "invariants_checked", "invariants_failed"],
+      "properties": {
+        "access_gate_passed": {"type": "boolean"},
+        "invariants_checked": {"type": "integer", "minimum": 1},
+        "invariants_failed": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Closed-vocabulary invariant identifiers only, never a message.",
+            "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+          },
+          "maxItems": 64
+        }
+      }
+    }
+  }
+}
