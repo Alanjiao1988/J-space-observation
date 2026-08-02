@@ -128,3 +128,5 @@ tests/test_phase1_0c_defect_audit.py text eol=lf
 docs/phase1_0c_generation_profile_defects.json text eol=lf
 infra/azure/acr_tasks/targeted_tests.yaml text eol=lf
 infra/azure/acr_tasks/targeted_tests.sh text eol=lf
+src/jspace_observation/phase1_0d_confirmation.py text eol=lf
+tests/test_phase1_0d_confirmation.py text eol=lf
