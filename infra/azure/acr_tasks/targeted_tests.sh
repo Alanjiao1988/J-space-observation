@@ -25,3 +25,4 @@ python -V
 pip install -q -r requirements.lock.txt
 echo "=== TARGETED TESTS ==="
 python -m pytest $TESTS -q --no-header -p no:cacheprovider
+echo "TARGETED_TESTS_COMPLETE=1"
