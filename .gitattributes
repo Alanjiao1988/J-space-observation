@@ -110,3 +110,4 @@ infra/azure/parser_v3_v2_boundary/modules/storage_access.bicep text eol=lf
 infra/azure/parser_v3_v2_boundary/modules/observability.bicep text eol=lf
 infra/azure/parser_v3_v2_boundary/modules/assert_no_overlap.bicep text eol=lf
 tests/test_parser_v3_v2_boundary_iac.py text eol=lf
+tests/test_parser_v3_v2_rehearsal_entrypoints.py text eol=lf
