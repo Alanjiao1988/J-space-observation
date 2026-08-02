@@ -100,3 +100,6 @@ src/jspace_observation/parser_v3_v2_schemas.py text eol=lf
 tests/test_parser_v3_v2_schemas.py text eol=lf
 src/jspace_observation/parser_v3_v2_entrypoints.py text eol=lf
 tests/test_parser_v3_v2_entrypoints.py text eol=lf
+infra/azure/parser_v3_v2_boundary/address_plan.json text eol=lf
+infra/azure/parser_v3_v2_boundary/modules/network.bicep text eol=lf
+infra/azure/parser_v3_v2_boundary/modules/privatelink.bicep text eol=lf

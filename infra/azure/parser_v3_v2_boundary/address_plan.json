@@ -1,0 +1,74 @@
+{
+  "schema_version": "phase1-parser-v3-v2-address-plan/v1",
+  "purpose": "Frozen address allocation for the parser-v3-v2 private review boundary. Section 5.3 requires address prefixes to be queried from the live subscription and chosen mechanically rather than invented, so this record carries the evidence, the rule, and the result.",
+  "subscription_id": "943bacdf-8b6e-4e3a-8126-a149f623d32e",
+  "subscription_name": "MCAPS-Hybrid-REQ-125620-2025-alanjiao",
+  "observed_at_utc": "2026-08-02",
+  "observation_command": "az network vnet list --query \"[].{name:name,rg:resourceGroup,loc:location,prefixes:addressSpace.addressPrefixes}\" -o json",
+  "observed_vnets": [
+    {
+      "name": "vnet-fin-report-dev",
+      "resource_group": "rg-fin-report-dev",
+      "location": "eastus",
+      "address_prefixes": ["10.42.0.0/16"]
+    },
+    {
+      "name": "vnet-jspace-observation-sea",
+      "resource_group": "rg-jspace-observation-sea",
+      "location": "southeastasia",
+      "address_prefixes": ["10.80.0.0/16"]
+    }
+  ],
+  "derivation_rule": "Take every address prefix allocated to any virtual network in the subscription. The boundary VNet is the lowest /16 of the form 10.N.0.0/16 that is disjoint from all of them AND strictly above the highest allocated /16. Choosing above rather than below is not cosmetic: an existing network that later grows does so into the unused space beneath it, so growth cannot walk into the sealed boundary. The rule is stated before the answer so the answer is checkable.",
+  "derivation_steps": [
+    "highest allocated /16 = 10.80.0.0/16 (vnet-jspace-observation-sea)",
+    "first candidate strictly above = 10.81.0.0/16",
+    "10.81.0.0/16 is disjoint from 10.42.0.0/16 and from 10.80.0.0/16",
+    "therefore boundary_vnet = 10.81.0.0/16"
+  ],
+  "boundary_vnet_prefix": "10.81.0.0/16",
+  "subnet_rule": "Subnets are allocated in the fixed order below from the base of the VNet. Each size is the platform minimum for its purpose, not a preference: AzureFirewallSubnet and AzureFirewallManagementSubnet require /26, a private endpoint subnet needs no more than /26 for the two endpoints registered here, and a Container Apps workload-profiles subnet requires /23.",
+  "subnets": [
+    {
+      "name": "AzureFirewallSubnet",
+      "prefix": "10.81.0.0/26",
+      "purpose": "Azure Firewall Standard data plane. The name is fixed by the platform and cannot be chosen.",
+      "minimum_size_reason": "/26 is the platform minimum for AzureFirewallSubnet."
+    },
+    {
+      "name": "AzureFirewallManagementSubnet",
+      "prefix": "10.81.0.64/26",
+      "purpose": "Firewall management plane, kept separate so a management path cannot be confused with an egress path.",
+      "minimum_size_reason": "/26 is the platform minimum for AzureFirewallManagementSubnet."
+    },
+    {
+      "name": "snet-aca-boundary",
+      "prefix": "10.81.2.0/23",
+      "purpose": "Internal Container Apps workload-profiles environment. Carries every private role container.",
+      "minimum_size_reason": "/23 is required for a workload-profiles environment."
+    },
+    {
+      "name": "snet-pe-boundary",
+      "prefix": "10.81.4.0/26",
+      "purpose": "Private endpoints for the runtime registry and the private Blob account. No other resource may place an endpoint here.",
+      "minimum_size_reason": "/26 comfortably holds the two registered endpoints and leaves no room for an unregistered third to hide."
+    }
+  ],
+  "region": "southeastasia",
+  "region_rule": "The region is not chosen freely. It must (a) already host the private Blob account that holds the retired source, because moving that data would itself be a private read, and (b) offer the T4 workload profile. Both hold for southeastasia, so no cross-region data movement is introduced.",
+  "region_evidence": {
+    "existing_private_storage": "stjspacefiles0709085305 (rg-jspace-observation-sea, southeastasia, publicNetworkAccess=Disabled)",
+    "gpu_discovery_command": "az containerapp env workload-profile list-supported --location southeastasia -o json",
+    "gpu_profile_found": {
+      "name": "Consumption-GPU-NC8as-T4",
+      "category": "Consumption-GPU-T4",
+      "cores": 8,
+      "memory_gib": 56,
+      "gpus": 1
+    }
+  },
+  "gpu_rule": "The workload profile name is taken from the live regional inventory rather than written from memory. A profile name that is merely plausible deploys nothing and blocks at the wrong gate.",
+  "unresolved_at_freeze": [
+    "Serverless GPU quota for Consumption-GPU-NC8as-T4 in southeastasia is not asserted here. Quota is a deployment-time fact and is proven by the Phase B deployment itself; if it is absent the round stops at BLOCKED_ON_MODEL_AVAILABILITY_OR_QUOTA rather than silently falling back to another profile."
+  ]
+}

@@ -82,6 +82,7 @@ __all__ = [
     "REGISTERED_CONTAINERS",
     "REGISTERED_PREFIXES",
     "ROLE_SCHEMAS",
+    "READ_CONTAINERS",
     "FORBIDDEN_CREDENTIAL_MARKERS",
     "ENTRYPOINTS",
     "ENTRYPOINT_NAMES",
@@ -90,6 +91,7 @@ __all__ = [
     "entrypoint_call_graph",
     "assert_entrypoint_is_guarded",
     "assert_container_command_is_registered",
+    "export_role_matrix",
     "main",
 ]
 
@@ -236,6 +238,37 @@ ROLE_SCHEMAS: Mapping[str, tuple[str, ...]] = {
         "phase1-parser-v3-v2-public-receipt/v1",
         "phase1-parser-v3-v2-terminal-state-receipt/v1",
     ),
+}
+
+#: Read class -> the container that holds it.
+#:
+#: Closed and exhaustive: a control asserts that every read class appearing in
+#: any lane has an entry here. Without that, a class with no mapping would
+#: silently grant nothing, and a role that reads nothing looks identical to a
+#: role whose lane was never wired up.
+READ_CONTAINERS: Mapping[str, str] = {
+    "retired_v1_source": "v1-retired-source",
+    "v2_private_staging": "v2-private-staging",
+    "normalized_candidates": "v2-private-staging",
+    "blinded_case_packets": "v2-review",
+    "reviewer_a_decisions": "v2-review",
+    "reviewer_b_decisions": "v2-review",
+    "disagreement_packets": "v2-review",
+    "arbitration_records": "v2-arbitration",
+    "final_candidate": "v2-selection",
+    "provenance": "v2-selection",
+    "finalized_immutable_bytes": "v2-selection",
+    "set_facts": "v2-facts",
+    "seal_plan": "v2-facts",
+    "listing_witness": "v2-sealed",
+    "sealed_v2_inputs": "v2-sealed",
+    "frozen_parser_assets": "v2-parser-assets",
+    "prediction_members": "v2-predictions",
+    "sealed_predictions": "v2-predictions",
+    "scoring_labels": "v2-labels",
+    "policy": "v2-policy",
+    "final_contract": "v2-policy",
+    "content_free_receipts": "v2-receipts",
 }
 
 #: Environment fragments that indicate a credential other than the role's own
@@ -1084,6 +1117,42 @@ def assert_container_command_is_registered(role: str, command: Sequence[str]) ->
             f"container command runs the {spec.role!r} entrypoint but the container "
             f"is configured for role {role!r}"
         )
+
+
+def export_role_matrix() -> Mapping[str, Any]:
+    """Emit the deployment matrix the IaC consumes.
+
+    Generated from the registries above rather than transcribed beside them. A
+    hand-written copy of this table would be correct on the day it was written
+    and unfalsifiable afterwards; generating it means the infrastructure and the
+    code cannot disagree without a test noticing.
+    """
+    return {
+        "schema_version": "phase1-parser-v3-v2-role-matrix/v1",
+        "container_entrypoint_path": CONTAINER_ENTRYPOINT_PATH,
+        "roles": [
+            {
+                "role": spec.role,
+                "entrypoint": spec.name,
+                "command": list(spec.command),
+                "uami_name": ROLE_IDENTITY_NAMES[spec.role],
+                "container": REGISTERED_CONTAINERS[spec.role],
+                "prefix": REGISTERED_PREFIXES[spec.role],
+                "schema_ids": list(ROLE_SCHEMAS[spec.role]),
+                "reads": list(lifecycle.ROLE_LANES[spec.role]["reads"]),
+                "writes": list(lifecycle.ROLE_LANES[spec.role]["writes"]),
+                "read_containers": sorted(
+                    {
+                        READ_CONTAINERS[read_class]
+                        for read_class in lifecycle.ROLE_LANES[spec.role]["reads"]
+                    }
+                ),
+                "parser_free": spec.role in PARSER_FREE_ROLES,
+            }
+            for spec in sorted(ENTRYPOINTS.values(), key=lambda item: item.role)
+        ],
+        "registered_endpoints": sorted(REGISTERED_ENDPOINTS),
+    }
 
 
 def main(argv: Sequence[str] | None = None) -> int:
