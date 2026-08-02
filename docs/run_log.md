@@ -4321,3 +4321,64 @@ Not established: **no generation has been run.** This is a driver that has been
 exercised against a deterministic stub backend on CPU, which proves the pack is
 well-formed and the accounting is honest — not that the model produces anything.
 The Phase 1.0D headroom question remains open and no scientific counter moved.
+
+## 2026-08-02 — Phase 1.0D confirmation image built and locked
+
+The generation run needed a container image, and the Phase 1.0C image could not
+be reused: reusing it would put a frozen historical record and a live one behind
+the same repository, tag namespace and provenance generator. So Phase 1.0D got
+its own — `Dockerfile.phase1-0d`, image repository
+`j-space-observation-phase1-0d`, and its own build-provenance tool.
+
+The design decision worth recording is that **the build is the verification**.
+`Dockerfile.phase1-0d` runs three checks and cannot produce an image if any
+fails:
+
+1. `verify-runtime` — every pin in `requirements-calibration.txt` must match the
+   installed distribution, plus the interpreter, the base torch and transformers;
+2. `verify-image-context` — the baked source must hash to the committed bundle
+   digest, file by file, with line endings normalised so a Windows checkout and
+   a Linux one agree;
+3. `verify-protocol` — the image must reproduce the frozen Phase 1.0D
+   `protocol_sha256`, **including its 300-item selection**.
+
+A near-miss worth recording. The first `verify-protocol` failed, reporting
+`ef782fea…` against the frozen `25e96401…`. That looks exactly like a drifted
+preregistration. It was not: the frozen hash covers a snapshot built *with* the
+derived selection and the strict-budget check, and calling `protocol_snapshot()`
+bare produces a smaller document. Reproducing the full document returned
+`25e96401…` exactly. A test now pins both facts — that the full document
+reproduces the frozen hash, and that the bare one does not — so the next reader
+meets the trap as a documented fact rather than as a false alarm.
+
+`.dockerignore` gained one narrowly scoped exception. The disjoint confirmation
+split is defined against the item ids Phase 1.0C actually generated on, not
+against a split label, so `02_records.jsonl` from run 20260725T170041Z must
+travel in the image. Section 4.3 states every prompt and output in this work
+package is public scientific data; the file carries no reviewer identity and no
+private review material. The exception names that one file.
+
+| Run | Commit | Purpose | Result |
+| --- | --- | --- | --- |
+| `cm4r` | `1497f74e` | Build-provenance tests | 21 passed, 2 skipped, 1 failed: the bare-snapshot protocol mismatch above |
+| `cm4s` | `24e0d2e0` | Same tests after reproducing the full snapshot | 23 passed, 2 skipped |
+| `cm4t` | `24e0d2e0` | Emit the provenance record | Failed: CRLF in the uploaded task script |
+| `cm4u` | `24e0d2e0` | Emit the provenance record | Emitted 44 files, bundle `d1c0145f7aa22c509045073a5b31c8b470573c3338b5a3d540f11ca74b6f02b0` |
+| `cm4v` | `9cde1d95` | Verify the committed record against a clean clone | 25 passed, 0 skipped |
+| `cm4w` | `9cde1d95` | `az acr build` of `Dockerfile.phase1-0d` | Image built and pushed, digest `sha256:1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332c37481166aa4` |
+| `cm4x` | `dc6b5056` | Launcher-script tests | 34 passed |
+| `cm4y` | `dc6b5056` | Full suite | 3067 passed, 15 skipped, 2 failed, both disclosed pre-existing |
+
+The image tag and manifest are locked against write and delete, so the bytes
+behind that digest can no longer change. Cleanup action: **retained
+deliberately and permanently**; an image that could be deleted or overwritten
+cannot serve as the provenance of a result.
+
+Baseline for this increment was 3033 passed. It adds 34 tests and introduces no
+new failure.
+
+Not established: **the generation run still has not been performed.** A built
+image proves what bytes are in it and nothing about the model. What remains
+before a run is an ACA GPU job execution, and after it, the section 4.3 primary
+semantic labels without which no cell metric may exist. No scientific counter
+moved.

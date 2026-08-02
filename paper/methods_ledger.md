@@ -1033,3 +1033,41 @@ next to working functions is more dangerous than no claim at all, because the
 next implementer will follow it. A test now asserts that a generation pack
 carries no secondary-review selection, which pins the corrected order in
 executable form rather than in a comment.
+
+## A build that verifies itself beats an attestation nobody rechecks (2026-08-02)
+
+The Phase 1.0D image could have carried a signed manifest of what went into it.
+Instead the checks are build steps: the image does not exist unless every pinned
+package matches the lock, the baked source hashes file-by-file to a committed
+bundle digest, and the code inside reproduces the frozen `protocol_sha256`
+together with its 300-item selection.
+
+The difference is who has to act. An attestation is a claim a later reader must
+choose to verify, and the repository already contains a cautionary example — the
+Phase 1.0C generic image could not be built at all because its attestation
+generator demanded a 32-file list that no reachable commit satisfies, and the
+attestation itself was never committed. A build-time check has no such gap: the
+only way to obtain the image is to satisfy it.
+
+The general rule: prefer a property that must hold for the artifact to exist
+over a property recorded alongside the artifact.
+
+## A hash that only reproduces under undocumented arguments is a trap (2026-08-02)
+
+Verifying the image against the frozen Phase 1.0D protocol first reported
+`ef782fea…` where `25e96401…` was recorded. That is exactly what a drifted
+preregistration looks like, and it stopped the work.
+
+Nothing had drifted. `protocol_snapshot()` accepts an optional selection and an
+optional strict-budget check, and the frozen hash covers the document *with*
+both. The bare call produces a smaller document and a different hash. The
+recorded value was correct; the reproduction recipe was undocumented.
+
+The cost of that gap is asymmetric. A false alarm costs an investigation, but a
+reader who resolved it the other way — by assuming the smaller document was
+canonical and updating the record — would have destroyed the preregistration.
+Both facts are now pinned by tests: the full document reproduces the frozen
+hash, and the bare one does not.
+
+The general rule: a recorded hash must be published with the exact call that
+reproduces it, and the negative case is worth a test of its own.

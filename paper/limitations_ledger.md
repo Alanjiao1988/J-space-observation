@@ -1076,3 +1076,41 @@ public batch generated without reference to any model or lens output.
 Raised as T-01 in the section 7 preregistration review; this entry is the
 explicit selected-case-pilot record that finding asked for. L-43 records the
 bank-exhaustion fact; this entry records what it costs the pilot.
+
+## L-48 - Phase 1.0D is fully built and has produced no data
+
+Every part of Phase 1.0D except the measurement now exists: the protocol is
+frozen and reviewed, the execution pipeline applies it, the generation driver
+emits a complete artifact pack, and a locked container image reproduces the
+frozen protocol and its 300-item selection. Continuous integration reports
+3067 passing tests across the repository.
+
+None of that is a result. No generation has been run, no model output exists,
+no row has been semantically labelled, and no cell metric has been computed.
+The Phase 1.0C `COMPLETE_INCONCLUSIVE` finding is still the project's only
+headroom evidence, and it remains inconclusive.
+
+This entry exists because the failure mode is specific and easy: a repository
+this instrumented reads as though it has measured something. It has not. Any
+reader encountering Phase 1.0D artifacts should check for a decision file whose
+`result` is not `AWAITING_SEMANTIC_REVIEW` before treating any number in this
+phase as a finding.
+
+Two named dependencies stand between the current state and a headroom number:
+one ACA GPU job execution, and the section 4.3 primary semantic labels for 900
+rows. The second is the harder one and has no registered provider.
+
+## L-49 - The Phase 1.0D image can never be deleted
+
+The image tag and manifest are locked against both write and delete, so the
+bytes behind digest
+`sha256:1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332c37481166aa4`
+cannot change and the artifact cannot be removed from the registry. That is the
+intended trade: an image that could be rewritten cannot serve as the provenance
+of a result, and one that could be deleted cannot be re-examined by a later
+reader checking that result.
+
+The cost is that this registry entry is permanent and outside any cleanup
+policy, and that a defect discovered in the image cannot be patched in place —
+it requires a new commit and a new immutable tag, leaving the defective image
+visible in the registry forever. Both consequences are accepted knowingly.

@@ -2419,3 +2419,32 @@ against a deterministic stub backend, which establishes that the pack is
 well-formed and the accounting is honest, and establishes nothing whatsoever
 about the model. Reaching the run additionally requires a Phase 1.0D container
 image, a build-provenance record, and an ACA GPU job launcher.
+
+## 2026-08-02 — Phase 1.0D image: three decisions and one near-miss
+
+- **A separate image repository, not a reuse of Phase 1.0C's.** Reusing
+  `j-space-observation-calibration` would put a frozen historical record and a
+  live one behind the same tag namespace and the same provenance generator, and
+  the authority forbids overwriting or reinterpreting run 20260725T170041Z.
+  Phase 1.0D uses `j-space-observation-phase1-0d` with its own provenance tool.
+- **The build verifies itself instead of carrying an attestation.** The
+  Dockerfile fails if any pin drifts, if the baked source does not hash to the
+  committed bundle digest, or if the image cannot reproduce the frozen
+  `protocol_sha256` with its 300-item selection. A green build *is* the
+  evidence, so there is no separate document a reader has to trust.
+- **The tag and manifest are locked against write and delete.** The run launcher
+  refuses to start against an unlocked image. The consequence is accepted
+  deliberately: this image can never be cleaned up. An image whose bytes could
+  still change cannot be the provenance of a scientific result, and an image
+  that can be deleted cannot be re-examined by anyone checking the result later.
+- **Near-miss, recorded because it looked like an integrity failure.** The first
+  protocol check reported `ef782fea…` against the frozen `25e96401…`. The frozen
+  hash covers the snapshot *including* the derived selection and strict-budget
+  check; the bare `protocol_snapshot()` is a smaller document. Reproducing the
+  full document returned `25e96401…` exactly, so nothing had drifted. A recorded
+  hash that only reproduces under undocumented arguments is indistinguishable
+  from a drifted one, so both facts are now pinned by tests.
+
+**Still not performed: the generation run.** The image exists and is locked; no
+ACA GPU job has been executed from it, no model output exists, and no cell
+metric may exist before section 4.3 primary labels.
