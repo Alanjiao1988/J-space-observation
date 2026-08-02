@@ -1,0 +1,250 @@
+{
+  "base_image": "pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime",
+  "base_image_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
+  "base_image_platform": "linux/amd64",
+  "bundle_hash_domain": "jspace-phase1-0d/build-bundle/v1",
+  "bundle_sha256": "d1c0145f7aa22c509045073a5b31c8b470573c3338b5a3d540f11ca74b6f02b0",
+  "claim_boundary": "build provenance only; establishes what bytes are in the image and nothing about model behaviour, hidden reasoning, or a 'J-space'",
+  "code_commit": "24e0d2e0e6b3ed268221345242aab81bf26fd8d4",
+  "dockerfile": "Dockerfile.phase1-0d",
+  "expected_python_version": "3.11",
+  "expected_torch_version": "2.4.1",
+  "expected_transformers_version": "4.46.3",
+  "file_count": 44,
+  "files": [
+    {
+      "bytes": 5628,
+      "path": "Dockerfile.phase1-0d",
+      "sha256": "3bf60a9b8dc00e0601fe8358c18f48f8ae0695d338f42a99c82f5b410b378d3b"
+    },
+    {
+      "bytes": 957052,
+      "path": "artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/02_records.jsonl",
+      "sha256": "a37097a780c3a1b75c51a141fed91010013972616800cb550a5b885be32b5804"
+    },
+    {
+      "bytes": 3138564,
+      "path": "data/phase1_task_headroom_candidates.jsonl",
+      "sha256": "acf59ec44b7afb73c03392d2c9b7223eff7311e29e2261ff0d65b38a3a416407"
+    },
+    {
+      "bytes": 25313,
+      "path": "docs/prompts/phase_science_restart_after_parser_closure_prompt.md",
+      "sha256": "5bc137c42c68e1b85b4cad1d45e1b4bf54fb68e2899f27bc6338dae61e9ef162"
+    },
+    {
+      "bytes": 1121,
+      "path": "requirements-calibration.txt",
+      "sha256": "fa9312e89970ef86ef190862bd4cfc04ebb773ffb4bc0095ed4488ce5c8d761e"
+    },
+    {
+      "bytes": 14745,
+      "path": "scripts/phase1_0d_build_provenance.py",
+      "sha256": "511dae3ceace9060087ccbfa9c50cf234101d7982c6f8dd63469d865cd0598c3"
+    },
+    {
+      "bytes": 542,
+      "path": "scripts/run_phase1_0d_confirmation.py",
+      "sha256": "7322e2ea30f8ae9534dacb2aa0b065f832c5715613391f37bcebcbc083653719"
+    },
+    {
+      "bytes": 6255,
+      "path": "src/jspace_observation/__init__.py",
+      "sha256": "dbfbe6ae7ed2818b137549cf3821b693717badaf6812e8e3521606e5c241929f"
+    },
+    {
+      "bytes": 2207,
+      "path": "src/jspace_observation/blob_export.py",
+      "sha256": "6bdb43dc2d6d1731d5e0c783d75cce7e85166ecdf196029b3b20334a56988476"
+    },
+    {
+      "bytes": 1857,
+      "path": "src/jspace_observation/config.py",
+      "sha256": "400af951a5a3f99b86e548b57a9c437a4094ef743c81850c17d819b1a9d0ce00"
+    },
+    {
+      "bytes": 9627,
+      "path": "src/jspace_observation/eval_parsing.py",
+      "sha256": "4b07b91859aca33b51af9c15b08f07026f11b0141f1300fd3f942138b731177e"
+    },
+    {
+      "bytes": 37499,
+      "path": "src/jspace_observation/eval_parsing_v2.py",
+      "sha256": "fe02781545e26c2f97d1731e985d081a2f1468950bec4d88700647849243d182"
+    },
+    {
+      "bytes": 43338,
+      "path": "src/jspace_observation/eval_parsing_v3.py",
+      "sha256": "dd729c3c23771fb112811e382bf7e55f531ce534cbbd1cfec4f0527056c8908e"
+    },
+    {
+      "bytes": 405572,
+      "path": "src/jspace_observation/evaluator_validation.py",
+      "sha256": "63eb1c7d8b229dddafdd3d54a0d62bb415d76ae8dd5aab220bd91ff054f08344"
+    },
+    {
+      "bytes": 6250,
+      "path": "src/jspace_observation/headroom_blob_transport.py",
+      "sha256": "80320785763dd09d5d11faff752df6b88edc4738441e6e4255fc87cede680712"
+    },
+    {
+      "bytes": 112612,
+      "path": "src/jspace_observation/headroom_calibration.py",
+      "sha256": "3f962297d8783b2aa2fb196b1b932e3b29457d505b15fad2b468015bbc083eab"
+    },
+    {
+      "bytes": 68078,
+      "path": "src/jspace_observation/headroom_candidates.py",
+      "sha256": "52a2b11a9daecbda98389558df4fb06be15dfce901424dbd7592036b78714d05"
+    },
+    {
+      "bytes": 5564,
+      "path": "src/jspace_observation/jlens_utils.py",
+      "sha256": "c77c3ec3c566d5a67094c88108c098403be5f6175e6ea310973ebb0c66c5b799"
+    },
+    {
+      "bytes": 3862,
+      "path": "src/jspace_observation/model_loader.py",
+      "sha256": "867e1cd4b25abc0f871e93bdff85beacb9479a62eadf2c6356d41e9f8d2e6a1f"
+    },
+    {
+      "bytes": 21704,
+      "path": "src/jspace_observation/no_cot.py",
+      "sha256": "674e571ef1e9a2f607360be83f0c3a0f8892e6ad9e5f2c535090474800627f9f"
+    },
+    {
+      "bytes": 603702,
+      "path": "src/jspace_observation/parser_v2_locked_evaluation.py",
+      "sha256": "e82b6394484595290dbebba35605f1eeadbfb28f1a9c488a87ae60f030bffffe"
+    },
+    {
+      "bytes": 97819,
+      "path": "src/jspace_observation/parser_v3_repair_contract.py",
+      "sha256": "a41178a1389eac2c08a66bc6ecaa7cb7a487fe2f45e19f141a3818e990aafbd4"
+    },
+    {
+      "bytes": 24734,
+      "path": "src/jspace_observation/parser_v3_repair_normalization.py",
+      "sha256": "4ab83efdf405fd711cc1ebb3a00f53ab979602b1b111b6ad20a5c36c234b978d"
+    },
+    {
+      "bytes": 22324,
+      "path": "src/jspace_observation/parser_v3_repair_ontology.py",
+      "sha256": "81f9a592551847919c402fd4fcdd69dd1f583bec83227be11e7ca5ed9696efb9"
+    },
+    {
+      "bytes": 92642,
+      "path": "src/jspace_observation/parser_v3_v2_access_ledger.py",
+      "sha256": "162af49caf377a27d3d70bc65e8cfe4ffd53ef62c8970ac244c0da5848f7473b"
+    },
+    {
+      "bytes": 29395,
+      "path": "src/jspace_observation/parser_v3_v2_construction.py",
+      "sha256": "fb16b8f7aa728c613e386be4d5b6297794ce8ca054859a57ddb41459b8ab97fa"
+    },
+    {
+      "bytes": 60285,
+      "path": "src/jspace_observation/parser_v3_v2_entrypoints.py",
+      "sha256": "83c90493fbc4f755f84a475efb88ed8a4593738a9e45853ed90ee6482c2b6ae7"
+    },
+    {
+      "bytes": 32038,
+      "path": "src/jspace_observation/parser_v3_v2_evaluation.py",
+      "sha256": "7a06d725c4b6899d30d0c7a4a4715cb04e0b36930dcf1e94f1967d3b3342a81d"
+    },
+    {
+      "bytes": 33219,
+      "path": "src/jspace_observation/parser_v3_v2_lifecycle.py",
+      "sha256": "ab4bb10c388d8e1f6b468dee80532cce036b9b8eb5f94a9e1c17c048b2955047"
+    },
+    {
+      "bytes": 55095,
+      "path": "src/jspace_observation/parser_v3_v2_schemas.py",
+      "sha256": "8594a4256e873b262173e922a2b09d764cf2997a1c4832c78aec91294115c175"
+    },
+    {
+      "bytes": 33907,
+      "path": "src/jspace_observation/phase05_jlens.py",
+      "sha256": "cca30c89a5b0eb9e7facda9b29a5e707d5771f37c10cf82723cf3442ffede006"
+    },
+    {
+      "bytes": 71280,
+      "path": "src/jspace_observation/phase05_jlens_saturation.py",
+      "sha256": "c5b16b9a7d9f35aef27c2dab0b56a3b3c2977c95d000e0cd426a50ccffb3928d"
+    },
+    {
+      "bytes": 50761,
+      "path": "src/jspace_observation/phase05c_jlens_disjoint.py",
+      "sha256": "7dfbf877aec507a2626bfed335f64c34c46411f09a0389df53964d4bf77325a8"
+    },
+    {
+      "bytes": 14227,
+      "path": "src/jspace_observation/phase1_0c_defect_audit.py",
+      "sha256": "8d9699bf2c20992db79be2ac1ca3d12c45ce483d7b75fb06e447ccca472a963d"
+    },
+    {
+      "bytes": 38792,
+      "path": "src/jspace_observation/phase1_0d_confirmation.py",
+      "sha256": "0a310c0b6f6d4ea07af79bcbd266f5a78b5936aa93ea3b8258b2fe7f4f7e6998"
+    },
+    {
+      "bytes": 22850,
+      "path": "src/jspace_observation/phase1_0d_execution.py",
+      "sha256": "714e70a367a100163565da93d4c8e37135d8f22d8335ecd1047fc04cf83e3478"
+    },
+    {
+      "bytes": 23958,
+      "path": "src/jspace_observation/phase1_0d_generation.py",
+      "sha256": "ccef7e6d9de53abf1d416c282785eb6225e672af0127219732e7d64a908765c5"
+    },
+    {
+      "bytes": 32395,
+      "path": "src/jspace_observation/phase1_branches.py",
+      "sha256": "d3d5417e5fd066aab597e00c4b3ab775b0e05fd173f41bf377f026de92366ccb"
+    },
+    {
+      "bytes": 4682,
+      "path": "src/jspace_observation/postprocess.py",
+      "sha256": "4c26a99fdb5545e1b7b2f9a28fec5e0e392ed69d651d13223a43ec1b615f35a6"
+    },
+    {
+      "bytes": 9763,
+      "path": "src/jspace_observation/prompt_sets.py",
+      "sha256": "50c12e98b504ecd7b0792c1a611018b48cc19f26805046d75e029255e5e1ff2d"
+    },
+    {
+      "bytes": 74209,
+      "path": "src/jspace_observation/record_audit.py",
+      "sha256": "4b381a769ebe651ec1fecc73d2d0e4408e2d74a9988f6574d09980b2cdd85bf6"
+    },
+    {
+      "bytes": 5869,
+      "path": "src/jspace_observation/run_logging.py",
+      "sha256": "3ed17cfb489e22bb9a56a3d867796d9db0c1fb4857ad843607423086e03a3998"
+    },
+    {
+      "bytes": 201247,
+      "path": "src/jspace_observation/semantic_audit.py",
+      "sha256": "c43f101d5cb1103a96fd805c4a0e2d89c58b640308299105d1e397dc1968d443"
+    },
+    {
+      "bytes": 5728,
+      "path": "src/jspace_observation/stats.py",
+      "sha256": "c9bcbd2658d3f32aa098f2291b74cf8fbe86faf3beddbc544474aff6c679ebdd"
+    }
+  ],
+  "image_repository": "j-space-observation-phase1-0d",
+  "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+  "model_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+  "not_established": [
+    "no statement about model behaviour, accuracy, or hidden reasoning",
+    "no statement that a run using this image is scientifically valid",
+    "no statement about the base image beyond the digest it is pulled by"
+  ],
+  "phase": "1.0D",
+  "protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
+  "requirements": "requirements-calibration.txt",
+  "schema_version": "phase1-0d-confirmation-build-provenance/v1",
+  "tokenizer_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+  "track": "B"
+}
