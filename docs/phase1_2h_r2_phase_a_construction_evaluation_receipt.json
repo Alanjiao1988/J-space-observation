@@ -11,7 +11,9 @@
       {"commit": "59f7f280f033a9543b78bb391121c6a3ee226fd2", "subject": "Add preregistration, Stage P/E, and the public synthetic rehearsal"},
       {"commit": "ed51edf901db51c93f6e6ac0f0ff45b52b3f8be1", "subject": "Give every rehearsal case its own template family"},
       {"commit": "2be40da1fa7715d1e9b18e903d5c38e53c6948c9", "subject": "Make the new test modules import independently of collection order"},
-      {"commit": "abc6afedc6b00bb45552975dc739081bc224ce36", "subject": "Bind the rehearsal to the registered role-lane vocabulary"}
+      {"commit": "abc6afedc6b00bb45552975dc739081bc224ce36", "subject": "Bind the rehearsal to the registered role-lane vocabulary"},
+      {"commit": "80174f6b4d9e7355d5d21be082e588faa00505ef", "subject": "Record the Phase A construction and evaluation increment"},
+      {"commit": "0bee0c4401989f7a145695a66d9bc829b9b79cac", "subject": "Pin the resolved dependency closure"}
     ],
     "branch_is_pushed_to_origin": false,
     "branch_push_blocked_reason": "Unchanged from the previous receipt: a non-force push returns HTTP 403 because the session credential resolves to a principal without write access. Recorded as deviation D-03."
@@ -73,14 +75,43 @@
       "purpose": "Authoritative full-suite validation of this increment.",
       "outcome": "2493 passed, 15 skipped, 2 failed",
       "interpretation": "Bound to commit abc6afed with a clean working tree. Against the section 11.1 baseline of 2235 passed / 15 skipped / 2 failed this is 258 additional passing tests and zero new failures. The two failures are the same disclosed sealed-input environmental failures carried by the starting commit."
+    },
+    {
+      "run_id": "cm2g",
+      "duration": "4m32s",
+      "purpose": "Full-suite validation of the tree including this receipt.",
+      "outcome": "2493 passed, 15 skipped, 2 failed; bound to commit 80174f6b, tree 7e6bb257, clean.",
+      "interpretation": "The receipt-parse step in the same run raised NameError on its own print statement because of shell quote handling. The json.load calls preceding it had already succeeded, so the receipts did parse, but the check was reissued cleanly rather than relied on in that form."
+    },
+    {
+      "run_id": "cm2h",
+      "duration": "30s",
+      "purpose": "Clean re-verification that all three receipt documents parse.",
+      "outcome": "All three parsed at commit 80174f6b.",
+      "interpretation": "Authoritative for receipt well-formedness."
+    },
+    {
+      "run_id": "cm2j",
+      "duration": "2m00s",
+      "purpose": "Generate the resolved dependency closure.",
+      "outcome": "94 packages captured by pip freeze --all on linux/amd64, CPython 3.11.15.",
+      "interpretation": "Produced requirements.lock.txt. Generation ran in Azure, not locally; the laptop only wrote the captured lines to a file."
+    },
+    {
+      "run_id": "cm2k",
+      "duration": "4m48s",
+      "purpose": "Prove the suite reproduces when installed from the lock rather than the unpinned requirements.",
+      "outcome": "2493 passed, 15 skipped, 2 failed; bound to commit 0bee0c44, tree 36b136e8, clean.",
+      "interpretation": "Identical to the unpinned result, so the lock is a faithful record of the closure that was actually validated, not merely a plausible one."
     }
   ],
   "authoritative_binding": {
-    "run_id": "cm2f",
-    "bound_commit": "abc6afedc6b00bb45552975dc739081bc224ce36",
-    "bound_tree": "387f00ca375907663800a8ce8507dfedf74108bc",
+    "run_id": "cm2k",
+    "bound_commit": "0bee0c4401989f7a145695a66d9bc829b9b79cac",
+    "bound_tree": "36b136e808826e9bd10d42cd837718ba7211c1f9",
     "dirty_paths_in_azure": 0,
-    "self_reference_limitation": "This receipt cannot contain the digest of the tree that contains it. The binding above is for the commit validated immediately before this document was written; the run that validates the tree including this document is recorded outside the repository, in the session's phase_a_status.md."
+    "suite_result": "2493 passed, 15 skipped, 2 failed",
+    "self_reference_limitation": "This receipt cannot contain the digest of the tree that contains it. The binding above is for the commit validated immediately before this document was last edited; the run that validates the tree including this edit is recorded outside the repository, in the session's phase_a_status.md."
   },
   "defects_found_by_azure_validation_and_fixed": [
     {
@@ -162,13 +193,13 @@
       "One-shot evaluation lifecycle core, validated in Azure against the exact committed tree.",
       "Deterministic construction rules with mutation controls, validated in Azure.",
       "Post-seal preregistration lock, Stage P, create-only prediction sealing and Stage E, validated in Azure.",
-      "Public synthetic end-to-end rehearsal driving the real entrypoints, validated in Azure."
+      "Public synthetic end-to-end rehearsal driving the real entrypoints, validated in Azure.",
+      "A committed dependency lock, generated in Azure and proven to reproduce the identical suite result."
     ],
     "phase_a_outstanding_components": [
       "Closed JSON schemas with additionalProperties false for deployment evidence, runtime canaries, reviewer output, disagreement and arbitration, admission and quarantine, set facts, seal receipt, listing witness, preregistration, prediction receipt, formal result and terminal assessment.",
       "Container entrypoint scripts per role, so the identity separation is enforced by the platform and not only by the call site.",
       "Infrastructure as code for the private review boundary under infra/azure. None exists today.",
-      "A committed dependency lock replacing the unpinned requirements file, so the resolved closure stops being a property of the resolution date.",
       "The two independent pre-private public audits required before private semantics are read."
     ],
     "phase_b_private_review_boundary": "NOT_STARTED",
