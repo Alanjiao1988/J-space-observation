@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import platform
 import sys
 from pathlib import Path
@@ -40,7 +41,6 @@ from jspace_observation.phase1_0d_confirmation import (  # noqa: E402
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--run-id", default="unrecorded")
     parser.add_argument("--commit", default="unrecorded")
     arguments = parser.parse_args()
 
@@ -64,7 +64,7 @@ def main() -> int:
         "provenance": {
             "executed_in": "azure_container_registry_tasks",
             "registry": "acrjspaceobssea0708231738",
-            "run_id": arguments.run_id,
+            "run_id": os.environ.get("ACR_RUN_ID", "unrecorded"),
             "platform": "linux/amd64",
             "base_image": "python:3.11-bookworm",
             "python_version": platform.python_version(),

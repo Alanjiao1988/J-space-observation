@@ -2,3 +2,5 @@ version: v1.1.0
 steps:
   - cmd: python:3.11-bookworm bash /workspace/repo_script.sh {{.Values.COMMIT}} {{.Values.SCRIPT}} "{{.Values.ARGS}}"
     timeout: 2400
+    env:
+      - ACR_RUN_ID={{.Run.ID}}
