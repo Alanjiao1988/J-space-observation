@@ -31,6 +31,12 @@ param gpuWorkloadProfileName string
 @description('Immutable image digest per role. No default: a deployment without real digests must not be possible.')
 param roleImageDigests object
 
+@description('Pre-bound canonical configuration digest per role. No default.')
+param roleConfigDigests object
+
+@description('The private Blob endpoint every role reads and writes through.')
+param privateEndpointHost string
+
 @description('Roles that run on the GPU profile. Only the parser-bearing stage needs one.')
 param gpuRoles array = [ 'stage_p' ]
 
@@ -144,10 +150,14 @@ resource roleJobs 'Microsoft.App/jobs@2024-03-01' = [
             env: [
               { name: 'JSPACE_ROLE', value: role.role }
               { name: 'AZURE_CLIENT_ID', value: identities[index].properties.clientId }
+              { name: 'JSPACE_UAMI_NAME', value: role.uami_name }
+              { name: 'JSPACE_ENDPOINT', value: privateEndpointHost }
               { name: 'JSPACE_CONTAINER', value: role.container }
               { name: 'JSPACE_PREFIX', value: role.prefix }
               { name: 'JSPACE_SCHEMA_IDS', value: join(role.schema_ids, ',') }
+              { name: 'JSPACE_SCHEMA_REGISTRY_DIGEST', value: roleMatrix.schema_registry_digest }
               { name: 'JSPACE_IMAGE_DIGEST', value: roleImageDigests[role.role] }
+              { name: 'JSPACE_CONFIG_DIGEST', value: roleConfigDigests[role.role] }
             ]
           }
         ]

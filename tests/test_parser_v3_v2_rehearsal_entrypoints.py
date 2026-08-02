@@ -369,6 +369,13 @@ def _public_receipt() -> dict[str, Any]:
 
 
 def _config(role: str, **overrides: Any) -> entrypoints.RoleConfig:
+    """A configuration that is valid for ``role`` unless a field is overridden.
+
+    The digest is derived from the finished configuration, not typed as a
+    constant: after public audit finding B-02 a configuration whose digest does
+    not describe it is no longer valid, so a helper that produced one would be
+    rehearsing a deployment the platform would refuse to start.
+    """
     fields: dict[str, Any] = {
         "role": role,
         "uami_name": entrypoints.ROLE_IDENTITY_NAMES[role],
@@ -377,11 +384,16 @@ def _config(role: str, **overrides: Any) -> entrypoints.RoleConfig:
         "container": entrypoints.REGISTERED_CONTAINERS[role],
         "prefix": entrypoints.REGISTERED_PREFIXES[role],
         "schema_ids": entrypoints.ROLE_SCHEMAS[role],
+        "schema_registry_digest": entrypoints.schemas.REGISTRY_DIGEST,
         "image_digest": IMAGE_DIGEST,
         "config_digest": CONFIG_DIGEST,
     }
     fields.update(overrides)
-    return entrypoints.RoleConfig(**fields)
+    config = entrypoints.RoleConfig(**fields)
+    if "config_digest" not in overrides:
+        fields["config_digest"] = entrypoints.compute_config_digest(config)
+        config = entrypoints.RoleConfig(**fields)
+    return config
 
 
 def _env() -> dict[str, str]:
@@ -451,9 +463,11 @@ def rehearse(
     facts = launch("facts_compiler", admitted=admitted, facts=_set_facts())
 
     plan = _construction_plan()
-    seal = launch("seal_custodian", plan=plan)
+    seal = launch("seal_custodian", plan=plan, existing_objects=())
 
-    preregistration = launch("preregistration_compiler", bindings=_bindings())
+    preregistration = launch(
+        "preregistration_compiler", bindings=_bindings(), existing_lock_digest=None
+    )
     lock = preregistration["lock"]
     lock_digest = preregistration["lock_digest"]
 
@@ -475,6 +489,7 @@ def rehearse(
         sealed_case_ids=case_ids,
         write_order=order,
         terminal_manifest=manifest,
+        existing_objects=(),
     )
     receipt = sealer["receipt"]
 
@@ -486,6 +501,7 @@ def rehearse(
         sealed_members=stream["members"],
         labels=labels,
         strata=_strata(),
+        existing_result_digests=(),
     )
     exporter = launch("receipt_exporter", receipt=_public_receipt())
 
@@ -880,7 +896,7 @@ class TestCreateOnlySetSealAndListingWitness:
         plan = _construction_plan()
         plan["write_order"] = [plan["terminal_manifest"]] + plan["write_order"][:-1]
         with pytest.raises(LifecycleError):
-            launch("seal_custodian", plan=plan)
+            launch("seal_custodian", plan=plan, existing_objects=())
 
 
 class TestThePassPath:
@@ -991,6 +1007,7 @@ class TestTheInvalidPath:
                 sealed_members=run["stream"]["members"],
                 labels=_labels(),
                 strata=_strata(),
+                existing_result_digests=(),
             )
 
     def test_a_forged_receipt_produces_no_result(self, run) -> None:
@@ -1005,6 +1022,7 @@ class TestTheInvalidPath:
                 sealed_members=run["stream"]["members"],
                 labels=_labels(),
                 strata=_strata(),
+                existing_result_digests=(),
             )
 
     def test_predictions_that_are_not_the_sealed_stream_produce_no_result(self, run) -> None:
@@ -1019,6 +1037,7 @@ class TestTheInvalidPath:
                 sealed_members=swapped,
                 labels=_labels(),
                 strata=_strata(),
+                existing_result_digests=(),
             )
 
     def test_stage_e_before_the_seal_is_unrepresentable(self, run) -> None:
@@ -1033,6 +1052,7 @@ class TestTheInvalidPath:
                 sealed_members=run["stream"]["members"],
                 labels=_labels(),
                 strata=_strata(),
+                existing_result_digests=(),
             )
 
     def test_a_label_bearing_input_refuses_before_the_parser_runs(self, run) -> None:
@@ -1067,10 +1087,15 @@ class TestThePartialUploadPath:
         plan = _construction_plan()
         plan["planned_objects"] = plan["planned_objects"][:-1]
         with pytest.raises(LifecycleError):
-            launch("seal_custodian", plan=plan)
+            launch("seal_custodian", plan=plan, existing_objects=())
 
     def test_the_complete_plan_into_an_empty_namespace_is_accepted(self) -> None:
-        assert launch("seal_custodian", plan=_construction_plan())["created"] == TOTAL + 1
+        assert (
+            launch(
+                "seal_custodian", plan=_construction_plan(), existing_objects=()
+            )["created"]
+            == TOTAL + 1
+        )
 
 
 class TestThePartialPredictionPath:
@@ -1085,6 +1110,7 @@ class TestThePartialPredictionPath:
                 sealed_case_ids=run["case_ids"],
                 write_order=order,
                 terminal_manifest=manifest,
+                existing_objects=(),
             )
 
     def test_a_stream_with_an_extra_member_is_unrepresentable(self, run) -> None:
@@ -1098,6 +1124,7 @@ class TestThePartialPredictionPath:
                 sealed_case_ids=run["case_ids"],
                 write_order=order,
                 terminal_manifest=manifest,
+                existing_objects=(),
             )
 
     def test_the_complete_stream_seals(self, run) -> None:
@@ -1109,6 +1136,7 @@ class TestTheWrongRolePath:
     def test_stage_e_run_under_the_stage_p_identity_is_refused(self, run) -> None:
         with pytest.raises(EntrypointError):
             entrypoints.run_stage_e(
+                existing_result_digests=(),
                 config=_config("stage_p"),
                 environment=_env(),
                 loaded_module_names=CLEAN_MODULES,
@@ -1211,6 +1239,7 @@ class TestTheIneligibleSealedCasePath:
                 sealed_members=run["stream"]["members"],
                 labels=labels,
                 strata=_strata(),
+                existing_result_digests=(),
             )
 
     def test_an_ineligible_case_cannot_be_admitted_in_the_first_place(self) -> None:
@@ -1251,6 +1280,21 @@ class TestTheSecondLaunchPath:
                 write_order=order,
                 terminal_manifest=manifest,
                 existing_objects=[order[0]],
+            )
+
+    def test_a_second_formal_result_is_refused(self, run) -> None:
+        with pytest.raises(EvaluationError, match="ordinal has been consumed"):
+            launch(
+                "stage_e",
+                lock=run["lock"],
+                lock_digest=run["lock_digest"],
+                prediction_receipt=run["receipt"],
+                sealed_members=run["stream"]["members"],
+                labels=_labels(),
+                strata=_strata(),
+                existing_result_digests=[
+                    evaluation.canonical_digest(run["result"])
+                ],
             )
 
     def test_the_ordinal_advances_exactly_once(self, run) -> None:

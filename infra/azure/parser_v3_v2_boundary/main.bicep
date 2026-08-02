@@ -34,6 +34,27 @@ param namePrefix string = 'jspace-v2-boundary'
 @description('Immutable image digest per role, keyed by role name. No default: a deployment without real digests must not be possible.')
 param roleImageDigests object
 
+@description('''
+Canonical configuration SHA-256 digests keyed by every registered role.
+
+No default: these are pre-bound Phase A artifacts. Every runtime recomputes the
+digest from its deployed role configuration before accepting work. The UAMI
+client ID is bound separately to the identity resource in workload.bicep,
+because it is a deployment-time Azure value and Bicep has no SHA-256 function.
+''')
+param roleConfigDigests object
+
+@description('''
+Exact Container Apps platform FQDNs for the selected Azure cloud.
+
+No default: these names are an egress grant, and a template that silently
+chooses the public-cloud names while deploying to another cloud has granted the
+wrong destinations. The Phase B parameter file records the values discovered
+for the live environment.
+''')
+@minLength(1)
+param acaPlatformFqdns array
+
 @description('Resource group holding the existing private storage account.')
 param privateStorageResourceGroup string = 'rg-jspace-observation-sea'
 
@@ -173,6 +194,7 @@ module network 'modules/network.bicep' = {
     firewallManagementSubnetPrefix: subnetPrefixes.AzureFirewallManagementSubnet
     workloadSubnetPrefix: subnetPrefixes['snet-aca-boundary']
     privateEndpointSubnetPrefix: subnetPrefixes['snet-pe-boundary']
+    acaPlatformFqdns: acaPlatformFqdns
   }
   dependsOn: [
     addressPlanGate
@@ -204,6 +226,8 @@ module observability 'modules/observability.bicep' = {
     firewallName: '${namePrefix}-fw'
     firewallPolicyName: '${namePrefix}-fwpolicy'
     runtimeRegistryName: privateLink.outputs.runtimeRegistryName
+    privateEndpointSubnetId: network.outputs.privateEndpointSubnetId
+    privateDnsZoneIds: privateLink.outputs.monitorDnsZoneIds
   }
 }
 
@@ -222,6 +246,8 @@ module workload 'modules/workload.bicep' = {
     roleMatrix: roleMatrix
     gpuWorkloadProfileName: addressPlan.region_evidence.gpu_profile_found.name
     roleImageDigests: roleImageDigests
+    roleConfigDigests: roleConfigDigests
+    privateEndpointHost: blobEndpoint
   }
 }
 

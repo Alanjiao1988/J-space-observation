@@ -205,7 +205,7 @@ def _rehearse(
         set_contents={case["case_id"]: case["prompt"] for case in inputs}
     )
 
-    lock, lock_digest = evaluation.create_preregistration_lock(bindings=_bindings())
+    lock, lock_digest = evaluation.create_preregistration_lock(existing_lock_digest=None, bindings=_bindings())
 
     stream = evaluation.run_stage_p(
         lock=lock,
@@ -217,12 +217,14 @@ def _rehearse(
     )
     order, manifest = _write_order(case_ids)
     receipt = evaluation.seal_prediction_stream(
+        existing_objects=(),
         stream=stream,
         sealed_case_ids=case_ids,
         write_order=order,
         terminal_manifest=manifest,
     )
     result = evaluation.run_stage_e(
+        existing_result_digests=(),
         lock=lock,
         lock_digest=lock_digest,
         prediction_receipt=receipt,
@@ -285,7 +287,7 @@ class TestStagePCannotReachLabels:
             calls.append(case["case_id"])
             return _perfect_parser(case)
 
-        lock, digest = evaluation.create_preregistration_lock(bindings=_bindings())
+        lock, digest = evaluation.create_preregistration_lock(existing_lock_digest=None, bindings=_bindings())
         with pytest.raises(EvaluationError, match="label-bearing field"):
             evaluation.run_stage_p(
                 lock=lock,
@@ -301,7 +303,7 @@ class TestStagePCannotReachLabels:
         bindings = _bindings(
             stage_p_read_classes=["sealed_v2_inputs", "scoring_labels"]
         )
-        lock, digest = evaluation.create_preregistration_lock(bindings=bindings)
+        lock, digest = evaluation.create_preregistration_lock(existing_lock_digest=None, bindings=bindings)
         with pytest.raises(lifecycle.LifecycleError):
             evaluation.run_stage_p(
                 lock=lock,
@@ -313,7 +315,7 @@ class TestStagePCannotReachLabels:
             )
 
     def test_a_stage_p_process_holding_comparator_code_is_refused(self) -> None:
-        lock, digest = evaluation.create_preregistration_lock(bindings=_bindings())
+        lock, digest = evaluation.create_preregistration_lock(existing_lock_digest=None, bindings=_bindings())
         with pytest.raises(EvaluationError, match="scoring-bearing module"):
             evaluation.run_stage_p(
                 lock=lock,
@@ -337,10 +339,80 @@ class TestStagePCannotReachLabels:
                 evaluation.assert_stage_p_payload_carries_no_label({marker: "x"})
 
 
+class TestReviewerAndStageEPayloadClosure:
+    def test_a_reviewer_field_the_denylist_never_named_is_refused(self) -> None:
+        """A-04. The guard must be capable of failing after schema validation."""
+        packet = {
+            "schema_version": "phase1-parser-v3-v2-blinded-case-packet/v1",
+            "packet_id": "synthetic-packet",
+            "case_ref": "synthetic-000",
+            "case_content": "public synthetic content",
+            "public_ontology_packet": {},
+            "gold_label": "leaked",
+        }
+        assert "gold_label" not in construction.REVIEWER_FORBIDDEN_INPUTS
+        with pytest.raises(construction.ConstructionError, match="unregistered input"):
+            construction.assert_reviewer_packet_is_blind(packet)
+
+    def test_the_named_reviewer_denylist_keeps_its_precise_refusal(self) -> None:
+        packet = {
+            "schema_version": "phase1-parser-v3-v2-blinded-case-packet/v1",
+            "packet_id": "synthetic-packet",
+            "case_ref": "synthetic-000",
+            "case_content": "public synthetic content",
+            "public_ontology_packet": {},
+            "old_label": "leaked",
+        }
+        with pytest.raises(construction.ConstructionError, match="forbidden input"):
+            construction.assert_reviewer_packet_is_blind(packet)
+
+    def test_an_unregistered_stage_e_label_field_is_refused(self) -> None:
+        """A-05. Labels are closed at the Stage E boundary itself."""
+        labels = _labels()
+        labels[_case_id(0)]["gold_label"] = "leaked"
+        with pytest.raises(EvaluationError, match="unregistered field"):
+            _rehearse(labels=labels)
+
+    def test_a_stage_e_forbidden_read_class_gets_the_specific_refusal(self) -> None:
+        labels = _labels()
+        labels[_case_id(0)]["parser_source"] = "leaked"
+        with pytest.raises(EvaluationError, match="forbidden read class"):
+            evaluation.assert_stage_e_labels_are_closed(labels)
+
+    def test_a_permitted_label_name_cannot_carry_a_nested_payload(self) -> None:
+        labels = _labels()
+        labels[_case_id(0)]["canonical_value"] = {"hidden": "payload"}
+        with pytest.raises(EvaluationError, match="not a permitted scalar"):
+            evaluation.assert_stage_e_labels_are_closed(labels)
+
+    def test_every_label_record_has_exactly_the_registered_fields(self) -> None:
+        labels = _labels()
+        labels[_case_id(0)].pop("answer_presence")
+        with pytest.raises(EvaluationError, match="missing registered field"):
+            evaluation.assert_stage_e_labels_are_closed(labels)
+
+    def test_the_outer_and_inner_case_ids_must_agree(self) -> None:
+        labels = _labels()
+        labels[_case_id(0)]["case_id"] = _case_id(1)
+        with pytest.raises(EvaluationError, match="does not match record case_id"):
+            evaluation.assert_stage_e_labels_are_closed(labels)
+
+    def test_an_extra_well_formed_label_record_is_refused(self) -> None:
+        labels = _labels()
+        labels["extra-case"] = {
+            "case_id": "extra-case",
+            "eligible": True,
+            "answer_presence": "present",
+            "canonical_value": "extra",
+        }
+        with pytest.raises(EvaluationError, match="label set must exactly equal"):
+            _rehearse(labels=labels)
+
+
 class TestPredictionSeal:
     def test_a_partial_stream_cannot_seal(self) -> None:
         run_inputs = _locked_inputs()
-        lock, digest = evaluation.create_preregistration_lock(bindings=_bindings())
+        lock, digest = evaluation.create_preregistration_lock(existing_lock_digest=None, bindings=_bindings())
         stream = evaluation.run_stage_p(
             lock=lock,
             lock_digest=digest,
@@ -355,6 +427,7 @@ class TestPredictionSeal:
         order, manifest = _write_order(case_ids)
         with pytest.raises(lifecycle.LifecycleError):
             evaluation.seal_prediction_stream(
+                existing_objects=(),
                 stream=truncated,
                 sealed_case_ids=case_ids,
                 write_order=order,
@@ -368,6 +441,7 @@ class TestPredictionSeal:
         duplicated["members"][1] = duplicated["members"][0]
         with pytest.raises(lifecycle.LifecycleError):
             evaluation.seal_prediction_stream(
+                existing_objects=(),
                 stream=duplicated,
                 sealed_case_ids=run["case_ids"],
                 write_order=run["write_order"],
@@ -390,10 +464,38 @@ class TestPredictionSeal:
         reordered = [run["terminal_manifest"]] + run["write_order"][:-1]
         with pytest.raises(lifecycle.LifecycleError, match="written last"):
             evaluation.seal_prediction_stream(
+                existing_objects=(),
                 stream=run["stream"],
                 sealed_case_ids=run["case_ids"],
                 write_order=reordered,
                 terminal_manifest=run["terminal_manifest"],
+            )
+
+
+class TestExistenceEvidenceIsMandatory:
+    def test_the_lock_creator_cannot_omit_existence_evidence(self) -> None:
+        with pytest.raises(TypeError, match="existing_lock_digest"):
+            evaluation.create_preregistration_lock(bindings=_bindings())  # type: ignore[call-arg]
+
+    def test_the_prediction_sealer_cannot_omit_existence_evidence(self) -> None:
+        with pytest.raises(TypeError, match="existing_objects"):
+            evaluation.seal_prediction_stream(  # type: ignore[call-arg]
+                stream={},
+                sealed_case_ids=[],
+                write_order=[],
+                terminal_manifest="manifest.json",
+            )
+
+    def test_stage_e_cannot_omit_existing_result_evidence(self) -> None:
+        run = _rehearse()
+        with pytest.raises(TypeError, match="existing_result_digests"):
+            evaluation.run_stage_e(  # type: ignore[call-arg]
+                lock=run["lock"],
+                lock_digest=run["lock_digest"],
+                prediction_receipt=run["receipt"],
+                sealed_members=run["stream"]["members"],
+                labels=_labels(),
+                strata=_strata(),
             )
 
 
@@ -404,6 +506,7 @@ class TestStageEOrdering:
         unsealed["state"] = "PREDICTION_RUNNING"
         with pytest.raises(EvaluationError, match="before the prediction stream is sealed"):
             evaluation.run_stage_e(
+                existing_result_digests=(),
                 lock=run["lock"],
                 lock_digest=run["lock_digest"],
                 prediction_receipt=unsealed,
@@ -418,6 +521,7 @@ class TestStageEOrdering:
         swapped[0]["prediction"]["canonical_value"] = "substituted after sealing"
         with pytest.raises(EvaluationError, match="not the sealed prediction stream"):
             evaluation.run_stage_e(
+                existing_result_digests=(),
                 lock=run["lock"],
                 lock_digest=run["lock_digest"],
                 prediction_receipt=run["receipt"],
@@ -432,6 +536,7 @@ class TestStageEOrdering:
         forged["member_count"] = 1
         with pytest.raises(EvaluationError, match="does not verify"):
             evaluation.run_stage_e(
+                existing_result_digests=(),
                 lock=run["lock"],
                 lock_digest=run["lock_digest"],
                 prediction_receipt=forged,
@@ -444,6 +549,7 @@ class TestStageEOrdering:
         run = _rehearse()
         with pytest.raises(lifecycle.LifecycleError, match="parser-bearing module"):
             evaluation.run_stage_e(
+                existing_result_digests=(),
                 lock=run["lock"],
                 lock_digest=run["lock_digest"],
                 prediction_receipt=run["receipt"],
@@ -451,6 +557,59 @@ class TestStageEOrdering:
                 labels=_labels(),
                 strata=_strata(),
                 loaded_module_names=["jspace_observation.eval_parsing"],
+            )
+
+    def test_a_second_formal_result_is_refused_before_scoring(self) -> None:
+        """A-01. The single formal ordinal is backed by object existence."""
+        run = _rehearse()
+        with pytest.raises(EvaluationError, match="ordinal has been consumed"):
+            evaluation.run_stage_e(
+                existing_result_digests=[evaluation.canonical_digest(run["result"])],
+                lock=run["lock"],
+                lock_digest=run["lock_digest"],
+                prediction_receipt=run["receipt"],
+                sealed_members=run["stream"]["members"],
+                labels=_labels(),
+                strata=_strata(),
+            )
+
+    def test_a_self_consistent_short_stream_cannot_reach_scoring(self) -> None:
+        """A-02. A matching receipt digest does not prove the denominator."""
+        run = _rehearse()
+        short_members = list(run["stream"]["members"][:-1])
+        receipt = dict(run["receipt"])
+        receipt["member_count"] = len(short_members)
+        receipt["stream_digest"] = evaluation.canonical_digest(short_members)
+        receipt["receipt_digest"] = evaluation.canonical_digest(
+            {key: value for key, value in receipt.items() if key != "receipt_digest"}
+        )
+        with pytest.raises(EvaluationError, match="exactly 120 sealed cases"):
+            evaluation.run_stage_e(
+                existing_result_digests=(),
+                lock=run["lock"],
+                lock_digest=run["lock_digest"],
+                prediction_receipt=receipt,
+                sealed_members=short_members,
+                labels=_labels(),
+                strata=_strata(),
+            )
+
+    def test_a_self_consistent_wrong_member_count_is_refused(self) -> None:
+        run = _rehearse()
+        receipt = dict(run["receipt"])
+        receipt["member_count"] = construction.TOTAL_CASES - 1
+        receipt["receipt_digest"] = evaluation.canonical_digest(
+            {key: value for key, value in receipt.items() if key != "receipt_digest"}
+        )
+        with pytest.raises(EvaluationError, match="receipt declares"):
+            evaluation.run_stage_e(
+                existing_result_digests=(),
+                lock=run["lock"],
+                lock_digest=run["lock_digest"],
+                prediction_receipt=receipt,
+                sealed_members=run["stream"]["members"],
+                labels=_labels(),
+                strata=_strata(),
             )
 
     def test_the_ordinal_advances_exactly_once(self) -> None:
@@ -527,6 +686,7 @@ class TestDiagnosticsAreInert:
         )
         with pytest.raises(EvaluationError, match="not one of"):
             evaluation.run_stage_e(
+                existing_result_digests=(),
                 lock=run["lock"],
                 lock_digest=run["lock_digest"],
                 prediction_receipt=run["receipt"],
@@ -548,16 +708,16 @@ class TestPreregistrationLock:
         bindings = _bindings()
         del bindings["scorer_digest"]
         with pytest.raises(EvaluationError, match="missing bindings"):
-            evaluation.create_preregistration_lock(bindings=bindings)
+            evaluation.create_preregistration_lock(existing_lock_digest=None, bindings=bindings)
 
     def test_an_unregistered_binding_is_refused(self) -> None:
         bindings = _bindings()
         bindings["convenient_extra_knob"] = "yes"
         with pytest.raises(EvaluationError, match="unknown bindings"):
-            evaluation.create_preregistration_lock(bindings=bindings)
+            evaluation.create_preregistration_lock(existing_lock_digest=None, bindings=bindings)
 
     def test_a_bound_byte_moving_after_creation_is_detected(self) -> None:
-        lock, digest = evaluation.create_preregistration_lock(bindings=_bindings())
+        lock, digest = evaluation.create_preregistration_lock(existing_lock_digest=None, bindings=_bindings())
         mutated = dict(lock)
         mutated["parser_v3_digest"] = "f" * 64
         with pytest.raises(EvaluationError, match="changed after creation"):
@@ -566,17 +726,20 @@ class TestPreregistrationLock:
     def test_a_lock_that_does_not_preregister_ordinal_zero_is_refused(self) -> None:
         with pytest.raises(EvaluationError, match="ordinal 0"):
             evaluation.create_preregistration_lock(
+                existing_lock_digest=None,
                 bindings=_bindings(evaluation_ordinal=1)
             )
 
     def test_a_lock_that_weakens_the_seal_mode_is_refused(self) -> None:
         with pytest.raises(EvaluationError, match="create_only"):
             evaluation.create_preregistration_lock(
+                existing_lock_digest=None,
                 bindings=_bindings(prediction_seal_mode="overwrite_if_present")
             )
 
     def test_a_lock_that_drops_a_diagnostic_is_refused(self) -> None:
         with pytest.raises(EvaluationError, match="nonbinding diagnostics"):
             evaluation.create_preregistration_lock(
+                existing_lock_digest=None,
                 bindings=_bindings(nonbinding_diagnostics=["macro_f1"])
             )

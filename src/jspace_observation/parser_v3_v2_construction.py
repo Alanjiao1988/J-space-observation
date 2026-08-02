@@ -52,6 +52,7 @@ __all__ = [
     "DECISION_CLASS_QUOTA",
     "AGREEMENT_FIELDS",
     "REVIEWER_FORBIDDEN_INPUTS",
+    "REVIEWER_PACKET_FIELDS",
     "ARBITER_FORBIDDEN_INPUTS_BEFORE_ADJUDICATION",
     "PARSER_BEARING_FIELDS",
     "QUARANTINE_REASONS",
@@ -127,6 +128,28 @@ AGREEMENT_FIELDS: tuple[str, ...] = (
     "failure_reasons",
     "stratum",
     "subtype",
+)
+
+#: The only keys a blinded reviewer packet may carry.
+#:
+#: The blinded-case-packet schema closes the packet with
+#: ``additionalProperties: false``, which is what actually keeps an unblinding
+#: field out in production. Public audit finding A-04 pointed out the
+#: consequence: because the schema already refuses every name in
+#: :data:`REVIEWER_FORBIDDEN_INPUTS`, the denylist below it could never fire,
+#: and a guard named ``assert_reviewer_packet_is_blind`` that cannot fail is
+#: worse than no guard because it looks like the enforcement. Closing this
+#: function over the same field set makes it a real second line: it refuses
+#: ``gold_label`` -- a name no denylist anticipated -- on any path that reaches
+#: the guard without the schema, including a direct call.
+REVIEWER_PACKET_FIELDS: frozenset[str] = frozenset(
+    {
+        "schema_version",
+        "packet_id",
+        "case_ref",
+        "case_content",
+        "public_ontology_packet",
+    }
 )
 
 #: Inputs a reviewer packet must never contain.
@@ -230,12 +253,25 @@ def content_hash(payload: str) -> str:
 
 
 def assert_reviewer_packet_is_blind(packet: Mapping[str, Any]) -> None:
-    """Refuse a reviewer packet carrying anything that breaks independence."""
+    """Refuse a reviewer packet carrying anything that breaks independence.
+
+    The named denylist runs first, then closure. The order matters for the
+    message, not for the outcome: an unblinding field is refused either way, but
+    a packet carrying ``old_label`` should say so rather than report it as
+    merely unregistered.
+    """
     if not isinstance(packet, Mapping):
         raise ConstructionError("reviewer packet must be a mapping")
     present = sorted(set(packet).intersection(REVIEWER_FORBIDDEN_INPUTS))
     if present:
         raise ConstructionError(f"reviewer packet carries forbidden input(s): {present}")
+    unregistered = sorted(set(packet) - REVIEWER_PACKET_FIELDS)
+    if unregistered:
+        raise ConstructionError(
+            f"reviewer packet carries unregistered input(s): {unregistered}. "
+            "A reviewer packet is closed: independence is kept by admitting only "
+            "the registered fields, not by listing the ways it could be broken."
+        )
     required = {"case_content", "public_ontology_packet"}
     missing = sorted(required - set(packet))
     if missing:

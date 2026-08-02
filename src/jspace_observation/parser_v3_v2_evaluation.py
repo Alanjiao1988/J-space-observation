@@ -62,6 +62,8 @@ __all__ = [
     "PREREGISTRATION_SCHEMA_VERSION",
     "PREREGISTERED_BINDINGS",
     "LABEL_BEARING_FIELDS",
+    "REGISTERED_LABEL_FIELDS",
+    "STAGE_E_FORBIDDEN_KEY_MARKERS",
     "ZERO_ERROR_RESIDUAL_STRATA",
     "PINNED_ZERO_ERROR_GATES",
     "NONBINDING_DIAGNOSTICS",
@@ -71,6 +73,7 @@ __all__ = [
     "create_preregistration_lock",
     "assert_lock_unchanged",
     "assert_stage_p_payload_carries_no_label",
+    "assert_stage_e_labels_are_closed",
     "assert_stage_p_import_is_scorer_free",
     "run_stage_p",
     "seal_prediction_stream",
@@ -211,13 +214,20 @@ def canonical_digest(payload: Any) -> str:
 def create_preregistration_lock(
     *,
     bindings: Mapping[str, Any],
-    existing_lock_digest: str | None = None,
+    existing_lock_digest: str | None,
 ) -> tuple[Mapping[str, Any], str]:
     """Create the immutable preregistration lock exactly once.
 
     Returns the frozen bindings and their digest. Refuses if a lock already
     exists, because "create the lock again" and "change a bound byte" are the
     same operation wearing different clothes.
+
+    ``existing_lock_digest`` has no default. Public audit finding A-03 observed
+    that a defaulted evidence argument makes create-only mean "create-only if
+    the caller remembered to look": the one call that forgets is the one that
+    overwrites. Requiring the argument turns forgetting into a ``TypeError`` at
+    the call site instead of a silent second lock. ``None`` still means "I
+    looked and there is none", which is a claim the caller now has to make.
     """
     if existing_lock_digest is not None:
         raise EvaluationError(
@@ -287,6 +297,109 @@ def assert_stage_p_payload_carries_no_label(payload: Any, *, path: str = "payloa
     hits = _label_hits(payload, path)
     if hits:
         raise EvaluationError(f"label-bearing field(s) reached Stage P: {sorted(hits)}")
+
+
+#: The only keys a Stage E label record may carry, and the scalar type each one
+#: must be.
+#:
+#: Closed rather than denied, and typed rather than merely named. Stage P's
+#: payload is guarded by :func:`assert_stage_p_payload_carries_no_label`, but
+#: until public audit finding A-05 the label mapping that Stage E itself reads
+#: was guarded by nothing at all: labels are not schema-validated at the Stage E
+#: entrypoint, so whatever the label custodian attached travelled straight into
+#: the scoring role. Naming the four fields Stage E actually reads means a fifth
+#: cannot arrive whatever it is called, and pinning each to a scalar means the
+#: four that may arrive cannot carry a nested payload underneath a permitted
+#: name.
+REGISTERED_LABEL_FIELDS: Mapping[str, type | tuple[type, ...]] = {
+    "case_id": str,
+    "eligible": bool,
+    "answer_presence": str,
+    "canonical_value": (str, type(None)),
+}
+
+#: Key markers that name a read class Stage E is forbidden to hold.
+#:
+#: Derived from :data:`~parser_v3_v2_lifecycle.STAGE_E_FORBIDDEN_READ_CLASSES`
+#: rather than restated beside it, so the payload check and the declaration it
+#: enforces cannot drift apart. The leading token of each class is included so
+#: that ``parser_code`` is caught as well as ``parser_source``.
+STAGE_E_FORBIDDEN_KEY_MARKERS: tuple[str, ...] = tuple(
+    sorted(
+        {name for name in lifecycle.STAGE_E_FORBIDDEN_READ_CLASSES}
+        | {name.split("_", 1)[0] for name in lifecycle.STAGE_E_FORBIDDEN_READ_CLASSES}
+    )
+)
+
+
+def _forbidden_class_hits(payload: Any, path: str) -> list[str]:
+    hits: list[str] = []
+    if isinstance(payload, Mapping):
+        for key, value in payload.items():
+            folded = str(key).casefold()
+            here = f"{path}.{key}"
+            if any(marker in folded for marker in STAGE_E_FORBIDDEN_KEY_MARKERS):
+                hits.append(here)
+            hits.extend(_forbidden_class_hits(value, here))
+    elif isinstance(payload, (list, tuple)):
+        for index, item in enumerate(payload):
+            hits.extend(_forbidden_class_hits(item, f"{path}[{index}]"))
+    return hits
+
+
+def assert_stage_e_labels_are_closed(labels: Mapping[str, Mapping[str, Any]]) -> None:
+    """Refuse a label record carrying anything Stage E is not entitled to read.
+
+    Refusals are ordered from most specific to structural. A key naming a
+    forbidden read class is refused first at any depth, so the message says
+    *why*. Closure then rejects unknown or missing fields, scalar typing prevents
+    a permitted name from becoming a container, and the outer/inner case IDs
+    plus answer-presence vocabulary are checked before scoring. In particular,
+    :data:`~parser_v3_v2_lifecycle.STAGE_E_FORBIDDEN_READ_CLASSES` declares
+    parser source and parser invocation forbidden to Stage E, and a declaration
+    that nothing checks is a wish.
+    """
+    if not isinstance(labels, Mapping):
+        raise EvaluationError("Stage E labels must be a mapping keyed by case id")
+    required = set(REGISTERED_LABEL_FIELDS)
+    for case_id, record in labels.items():
+        if not isinstance(case_id, str):
+            raise EvaluationError("Stage E label-map keys must be case-id strings")
+        if not isinstance(record, Mapping):
+            raise EvaluationError(f"label for case {case_id!r} is not a record")
+        hits = _forbidden_class_hits(record, f"labels[{case_id!r}]")
+        if hits:
+            raise EvaluationError(
+                "field(s) naming a Stage E forbidden read class reached Stage E: "
+                f"{sorted(hits)}"
+            )
+        unknown = sorted(set(record) - set(REGISTERED_LABEL_FIELDS))
+        if unknown:
+            raise EvaluationError(
+                f"label for case {case_id!r} carries unregistered field(s) {unknown}; "
+                f"Stage E reads only {sorted(REGISTERED_LABEL_FIELDS)}"
+            )
+        missing = sorted(required - set(record))
+        if missing:
+            raise EvaluationError(
+                f"label for case {case_id!r} is missing registered field(s) {missing}"
+            )
+        for field, expected in REGISTERED_LABEL_FIELDS.items():
+            if not isinstance(record[field], expected):
+                raise EvaluationError(
+                    f"label for case {case_id!r} carries {field!r} as "
+                    f"{type(record[field]).__name__}, which is not a permitted scalar"
+                )
+        if record["case_id"] != case_id:
+            raise EvaluationError(
+                f"label-map key {case_id!r} does not match record case_id "
+                f"{record['case_id']!r}"
+            )
+        if record["answer_presence"] not in ANSWER_PRESENCE_CLASSES:
+            raise EvaluationError(
+                f"label for case {case_id!r} has unregistered answer_presence "
+                f"{record['answer_presence']!r}"
+            )
 
 
 def assert_stage_p_import_is_scorer_free(
@@ -390,13 +503,18 @@ def seal_prediction_stream(
     sealed_case_ids: Sequence[str],
     write_order: Sequence[str],
     terminal_manifest: str,
-    existing_objects: Iterable[str] = (),
+    existing_objects: Iterable[str],
 ) -> Mapping[str, Any]:
     """Seal the prediction stream create-only and completely.
 
     Delegates completeness, terminal-manifest ordering, and create-only
     enforcement to the lifecycle module so that the prediction seal and the set
     seal cannot drift apart into two different notions of "sealed".
+
+    ``existing_objects`` has no default, for the reason given in
+    :func:`create_preregistration_lock`: an empty tuple that arrives because
+    nobody listed the namespace is indistinguishable, to this function, from an
+    empty tuple that arrives because the namespace really is empty.
     """
     if stream.get("state") != "PREDICTION_RUNNING":
         raise EvaluationError(
@@ -482,6 +600,7 @@ def run_stage_e(
     sealed_members: Sequence[Mapping[str, Any]],
     labels: Mapping[str, Mapping[str, Any]],
     strata: Mapping[str, str],
+    existing_result_digests: Iterable[str],
     parser_v2_comparison: str = "NOT_RUN",
     loaded_module_names: Iterable[str] = (),
 ) -> Mapping[str, Any]:
@@ -492,7 +611,19 @@ def run_stage_e(
     matrix and macro-F1 are computed after status is fixed and are passed
     through the lifecycle reachability check, which proves they had no path to
     it: a diagnostic that can move a verdict is not a diagnostic.
+
+    ``existing_result_digests`` has no default. The lock and the prediction seal
+    were already create-only against caller-supplied evidence; public audit
+    finding A-01 observed that the terminal result -- the one object whose
+    duplication would mean the one-shot evaluation had been run twice -- was
+    not. It is now the same discipline as the other two.
     """
+    already = sorted({digest for digest in existing_result_digests})
+    if already:
+        raise EvaluationError(
+            "a formal result already exists, so the single formal evaluation "
+            f"ordinal has been consumed: {already}"
+        )
     assert_lock_unchanged(lock, lock_digest)
     if prediction_receipt.get("state") != "PREDICTION_SEALED":
         raise EvaluationError(
@@ -510,16 +641,38 @@ def run_stage_e(
         raise EvaluationError(
             "the supplied predictions are not the sealed prediction stream"
         )
+    expected = lifecycle.EXPECTED_SET_MEMBER_COUNT
+    if len(sealed_members) != expected:
+        raise EvaluationError(
+            f"Stage E scores exactly {expected} sealed cases, not "
+            f"{len(sealed_members)}. The stream digest only proves the members "
+            "are the ones the receipt sealed; it does not prove how many there "
+            "were, so a short stream sealed by a compromised or mistaken Stage P "
+            "would otherwise be scored on its own smaller denominator."
+        )
+    if prediction_receipt.get("member_count") != expected:
+        raise EvaluationError(
+            f"the prediction receipt declares {prediction_receipt.get('member_count')!r} "
+            f"members, not {expected}"
+        )
     lifecycle.assert_stage_e_scope(lock["stage_e_read_classes"])
     lifecycle.assert_stage_e_import_is_parser_free(loaded_module_names)
+    assert_stage_e_labels_are_closed(labels)
+
+    sealed_case_id_set = {member["case_id"] for member in sealed_members}
+    missing = sorted(sealed_case_id_set - set(labels))
+    extra = sorted(set(labels) - sealed_case_id_set)
+    if missing:
+        raise EvaluationError(f"no label for sealed prediction(s): {missing}")
+    if extra:
+        raise EvaluationError(
+            "the Stage E label set must exactly equal the sealed case set; "
+            f"extra={extra}"
+        )
 
     before = prediction_receipt["ordinal"]
     after = lifecycle.next_ordinal("PREDICTION_SEALED", "LABELS_OPENED", before)
     lifecycle.assert_ordinal_succession(before, after)
-
-    missing = sorted({m["case_id"] for m in sealed_members} - set(labels))
-    if missing:
-        raise EvaluationError(f"no label for sealed prediction(s): {missing}")
 
     residual_mismatches: dict[str, int] = {s: 0 for s in ZERO_ERROR_RESIDUAL_STRATA}
     pinned_mismatches: dict[str, int] = {g: 0 for g in PINNED_ZERO_ERROR_GATES}
@@ -564,6 +717,10 @@ def run_stage_e(
             residual_mismatches[stratum] += 1
 
     pooled_residual = sum(residual_mismatches.values())
+    if eligible != expected:
+        raise EvaluationError(
+            f"Stage E scored {eligible} eligible cases, not {expected}"
+        )
     binding_gates = {
         "residual_pooled_zero_error": pooled_residual == 0,
         **{

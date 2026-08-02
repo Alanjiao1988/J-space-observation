@@ -31,6 +31,21 @@ param privateEndpointSubnetPrefix string
 param namePrefix string
 param tags object
 
+@description('''
+Platform hosts the Container Apps control plane needs before a revision can
+start, which `environment()` does not expose.
+
+Parameters rather than literals. Public audit finding B-06 observed that
+`mcr.microsoft.com`, `login.microsoft.com`, `packages.microsoft.com` and
+`acs-mirror.azureedge.net` were typed directly into the allowlist beside hosts
+that *were* derived, so a reader could not tell which hosts had been chosen and
+which had merely been copied, and a sovereign-cloud deployment would have
+silently allowed the wrong names. There is deliberately no default: the Phase B
+parameter file records the exact values discovered for the selected cloud.
+''')
+@minLength(1)
+param acaPlatformFqdns array
+
 var vnetName = '${namePrefix}-vnet'
 var workloadSubnetName = 'snet-aca-boundary'
 var privateEndpointSubnetName = 'snet-pe-boundary'
@@ -41,6 +56,11 @@ var privateEndpointSubnetName = 'snet-pe-boundary'
 var resourceManagerHost = replace(replace(environment().resourceManager, 'https://', ''), '/', '')
 var loginHost = replace(replace(environment().authentication.loginEndpoint, 'https://', ''), '/', '')
 var storageSuffix = environment().suffixes.storage
+var acaControlPlaneFqdns = union(acaPlatformFqdns, [
+  resourceManagerHost
+  loginHost
+  '*.blob.${storageSuffix}'
+])
 
 resource workloadNsg 'Microsoft.Network/networkSecurityGroups@2023-11-01' = {
   name: '${namePrefix}-nsg-aca'
@@ -161,16 +181,7 @@ resource platformRules 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@
               { protocolType: 'Https', port: 443 }
             ]
             sourceAddresses: [ workloadSubnetPrefix ]
-            targetFqdns: [
-              'mcr.microsoft.com'
-              '*.data.mcr.microsoft.com'
-              resourceManagerHost
-              'login.microsoft.com'
-              loginHost
-              '*.blob.${storageSuffix}'
-              'packages.microsoft.com'
-              'acs-mirror.azureedge.net'
-            ]
+            targetFqdns: acaControlPlaneFqdns
           }
         ]
       }

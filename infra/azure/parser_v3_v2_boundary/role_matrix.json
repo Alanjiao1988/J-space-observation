@@ -1,6 +1,17 @@
 {
   "schema_version": "phase1-parser-v3-v2-role-matrix/v1",
   "container_entrypoint_path": "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+  "config_digest_schema_version": "phase1-parser-v3-v2-role-config/v1",
+  "config_digest_fields": [
+    "container",
+    "image_digest",
+    "prefix",
+    "private_endpoint",
+    "role",
+    "schema_ids",
+    "schema_registry_digest",
+    "uami_name"
+  ],
   "roles": [
     {
       "role": "arbiter",
@@ -423,5 +434,6 @@
   "registered_endpoints": [
     "acrjspaceruntime.privatelink.azurecr.io",
     "stjspacefiles0709085305.privatelink.blob.core.windows.net"
-  ]
+  ],
+  "schema_registry_digest": "211b1b28f6f26ab7f4bc891892357947a97597b3c61f4f064154da4501c4193b"
 }

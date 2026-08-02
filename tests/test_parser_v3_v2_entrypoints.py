@@ -23,6 +23,7 @@ could never pass on a real container.
 from __future__ import annotations
 
 import ast
+import json
 import sys
 from pathlib import Path
 
@@ -44,27 +45,73 @@ SchemaValidationError = entrypoints.schemas.SchemaValidationError
 CLIENT_ID = "11111111-2222-3333-4444-555555555555"
 IMAGE_DIGEST = "sha256:" + "ab" * 32
 CONFIG_DIGEST = "cd" * 32
+PRIVATE_ENDPOINT = "stjspacefiles0709085305.privatelink.blob.core.windows.net"
 
 
 def _config(role: str, **overrides: object) -> entrypoints.RoleConfig:
-    """A configuration that is valid for ``role`` unless a field is overridden."""
+    """A configuration that is valid for ``role`` unless a field is overridden.
+
+    The configuration digest is *derived* from the finished configuration
+    rather than typed as a constant. A constant would have been a digest that
+    described nothing, which is precisely what public audit finding B-02
+    refused. An explicit ``config_digest=`` override is honoured verbatim, so
+    the controls that supply a wrong digest still get a wrong digest.
+    """
     fields = {
         "role": role,
         "uami_name": entrypoints.ROLE_IDENTITY_NAMES[role],
         "uami_client_id": CLIENT_ID,
-        "private_endpoint": "stjspacefiles0709085305.privatelink.blob.core.windows.net",
+        "private_endpoint": PRIVATE_ENDPOINT,
         "container": entrypoints.REGISTERED_CONTAINERS[role],
         "prefix": entrypoints.REGISTERED_PREFIXES[role],
         "schema_ids": entrypoints.ROLE_SCHEMAS[role],
+        "schema_registry_digest": entrypoints.schemas.REGISTRY_DIGEST,
         "image_digest": IMAGE_DIGEST,
         "config_digest": CONFIG_DIGEST,
     }
     fields.update(overrides)
-    return entrypoints.RoleConfig(**fields)  # type: ignore[arg-type]
+    config = entrypoints.RoleConfig(**fields)  # type: ignore[arg-type]
+    if "config_digest" not in overrides:
+        fields["config_digest"] = entrypoints.compute_config_digest(config)
+        config = entrypoints.RoleConfig(**fields)  # type: ignore[arg-type]
+    return config
 
 
 def _env() -> dict[str, str]:
     return {"AZURE_CLIENT_ID": CLIENT_ID, "PYTHONHASHSEED": "0"}
+
+
+def _preflight_env(name: str) -> dict[str, str]:
+    """The environment the deployed container is given for ``name``.
+
+    Built from the same registries the Bicep is generated from, and with the
+    configuration digest derived rather than typed, so this helper cannot make
+    a container look configured when it is not.
+    """
+    role = entrypoints.ENTRYPOINTS[name].role
+    config = _config(role)
+    return {
+        "JSPACE_ROLE": role,
+        "AZURE_CLIENT_ID": config.uami_client_id,
+        "JSPACE_UAMI_NAME": config.uami_name,
+        "JSPACE_ENDPOINT": config.private_endpoint,
+        "JSPACE_CONTAINER": config.container,
+        "JSPACE_PREFIX": config.prefix,
+        "JSPACE_SCHEMA_IDS": ",".join(config.schema_ids),
+        "JSPACE_SCHEMA_REGISTRY_DIGEST": config.schema_registry_digest,
+        "JSPACE_IMAGE_DIGEST": config.image_digest,
+        "JSPACE_CONFIG_DIGEST": config.config_digest,
+    }
+
+
+def _run_preflight(
+    name: str, environment: dict[str, str] | None = None
+) -> entrypoints.AccessLog:
+    return entrypoints.preflight(
+        name,
+        _preflight_env(name) if environment is None else environment,
+        loaded_module_names=["json", "hashlib", "pathlib"],
+    )
 
 
 def _lanes(role: str) -> dict[str, list[str]]:
@@ -172,10 +219,102 @@ class TestDeployedPathIsTheTestedPath:
         with pytest.raises(EntrypointError, match="exactly one entrypoint name"):
             entrypoints.main([])
 
-    def test_main_refuses_to_invent_a_payload(self) -> None:
-        """A role that could synthesise its own input could run without the boundary."""
-        with pytest.raises(EntrypointError, match="private boundary"):
-            entrypoints.main(["stage-e"])
+    def test_main_refuses_to_invent_a_payload(self, monkeypatch, capsys) -> None:
+        """A role that could synthesise its own input could run without the boundary.
+
+        The property is unchanged; what changed is that it is now demonstrated
+        by a command that runs. Public audit finding B-01 established that
+        ``main`` previously refused *everything*, so the command bound by the
+        role matrix, the Bicep and the freeze could not have done its job even
+        if the boundary had been perfect. It now performs the whole preflight
+        and stops, and this control proves it stopped without a payload.
+        """
+        monkeypatch.setattr(entrypoints.os, "environ", _preflight_env("stage-e"))
+        monkeypatch.setattr(
+            entrypoints, "_runtime_module_names", lambda: ("json", "hashlib", "pathlib")
+        )
+        code = entrypoints.main(["stage-e"])
+        assert code == entrypoints.PREFLIGHT_WITHOUT_PAYLOAD
+        assert code != 0, "a container that did no work must not report success"
+        emitted = json.loads(capsys.readouterr().out)
+        assert emitted["outcome"] == "PREFLIGHT_PASSED_PAYLOAD_NOT_SUPPLIED"
+        assert emitted["role"] == "stage_e"
+        assert "result" not in emitted
+        assert "members" not in emitted
+
+    def test_the_preflight_actually_reaches_the_guarded_prologue(self) -> None:
+        """Otherwise it would be a command that runs and checks nothing, which
+        is the same untruthful binding the audit refused, wearing a new name."""
+        graph = tuple(sorted(set(entrypoints.preflight.__code__.co_names)))
+        assert "_PREFLIGHT_ACTIVE" in graph
+        assert "_preflight_payload" in graph
+        assert "function" in graph
+        assert "assert_container_command_is_registered" in graph
+        assert "RoleConfig" in graph
+
+    def test_preflight_calls_the_callable_in_the_registry(self, monkeypatch) -> None:
+        """B-01. The command binding is proved by execution, not resemblance."""
+
+        class Sentinel(Exception):
+            pass
+
+        called: list[str] = []
+        original = entrypoints.ENTRYPOINTS["stage-e"]
+
+        def replacement(*, config, environment, loaded_module_names):
+            called.append(config.role)
+            raise Sentinel
+
+        monkeypatch.setitem(
+            entrypoints.ENTRYPOINTS,
+            "stage-e",
+            entrypoints.EntrypointSpec(
+                name=original.name,
+                role=original.role,
+                function=replacement,
+                command=original.command,
+            ),
+        )
+        with pytest.raises(Sentinel):
+            _run_preflight("stage-e")
+        assert called == ["stage_e"]
+
+    def test_the_preflight_refuses_an_incomplete_environment(self) -> None:
+        for name in entrypoints.PREFLIGHT_ENVIRONMENT_NAMES:
+            environment = _preflight_env("stage-e")
+            del environment[name]
+            with pytest.raises(EntrypointError, match="missing"):
+                _run_preflight("stage-e", environment)
+
+    def test_the_preflight_refuses_a_role_that_is_not_its_entrypoint(self) -> None:
+        environment = _preflight_env("stage-e")
+        environment["JSPACE_ROLE"] = "stage_p"
+        with pytest.raises(EntrypointError, match="started with the"):
+            _run_preflight("stage-e", environment)
+
+    def test_the_preflight_refuses_an_unregistered_name(self) -> None:
+        with pytest.raises(EntrypointError, match="unregistered entrypoint"):
+            _run_preflight("not-a-role", _preflight_env("stage-e"))
+
+    def test_the_preflight_refuses_a_forged_configuration_digest(self) -> None:
+        environment = _preflight_env("stage-e")
+        environment["JSPACE_CONFIG_DIGEST"] = "ab" * 32
+        with pytest.raises(EntrypointError, match="does not match the configuration"):
+            _run_preflight("stage-e", environment)
+
+    def test_the_preflight_refuses_a_credential_the_deployment_added(self) -> None:
+        environment = _preflight_env("stage-e")
+        environment["JSPACE_STORAGE_TOKEN"] = "irrelevant"
+        with pytest.raises(EntrypointError, match="unregistered environment"):
+            _run_preflight("stage-e", environment)
+
+    def test_every_registered_entrypoint_has_a_runnable_preflight(self) -> None:
+        """The finding was about one command; the property is about all of them."""
+        for name in entrypoints.ENTRYPOINT_NAMES:
+            log = _run_preflight(name)
+            assert log.role == entrypoints.ENTRYPOINTS[name].role
+            assert "entrypoint_completed" in log.event_ids()
+            assert all(event["object_count"] == 0 for event in log.events)
 
 
 class TestCallGraphIsInspectable:
@@ -262,6 +401,26 @@ class TestTheEntrypointsAreParserFree:
 
 
 class TestConfigurationIsClosed:
+    def test_the_predeployment_digest_map_matches_every_runtime_recomputation(
+        self,
+    ) -> None:
+        image_digests = {role: IMAGE_DIGEST for role in ALL_ROLES}
+        generated = entrypoints.compute_role_config_digests(
+            role_image_digests=image_digests,
+            private_endpoint=PRIVATE_ENDPOINT,
+        )
+        assert set(generated) == set(ALL_ROLES)
+        for role in ALL_ROLES:
+            assert generated[role] == _config(role).config_digest
+
+    def test_an_incomplete_predeployment_digest_input_is_refused(self) -> None:
+        image_digests = {role: IMAGE_DIGEST for role in ALL_ROLES}
+        image_digests.pop("stage_e")
+        with pytest.raises(EntrypointError, match="missing=.*stage_e"):
+            entrypoints.compute_role_config_digests(
+                role_image_digests=image_digests,
+                private_endpoint=PRIVATE_ENDPOINT,
+            )
     def test_a_valid_configuration_is_accepted_for_every_role(self) -> None:
         for role in ALL_ROLES:
             entrypoints.assert_config_registered(_config(role))
@@ -277,6 +436,7 @@ class TestConfigurationIsClosed:
                     container="v2-review",
                     prefix="review/shadow/",
                     schema_ids=("phase1-parser-v3-v2-admission-record/v1",),
+                    schema_registry_digest=entrypoints.schemas.REGISTRY_DIGEST,
                     image_digest=IMAGE_DIGEST,
                     config_digest=CONFIG_DIGEST,
                 )
@@ -342,6 +502,100 @@ class TestConfigurationIsClosed:
         with pytest.raises(EntrypointError, match="SHA-256 hex digest"):
             entrypoints.assert_config_registered(_config("stage_e", config_digest=digest))
 
+    def test_a_well_formed_but_wrong_config_digest_is_refused(self) -> None:
+        """B-02. Syntax is not a binding.
+
+        Before this control, ``config_digest`` only had to look like a
+        SHA-256 hex string, so sixty-four arbitrary hex characters satisfied
+        every check the deployment made about its own configuration.
+        """
+        with pytest.raises(EntrypointError, match="does not match the configuration"):
+            entrypoints.assert_config_registered(_config("stage_e", config_digest="ab" * 32))
+
+    @pytest.mark.parametrize(
+        "field,value",
+        [
+            ("image_digest", "sha256:" + "cd" * 32),
+        ],
+    )
+    def test_changing_a_bound_field_invalidates_the_digest(
+        self, field: str, value: str
+    ) -> None:
+        """B-02. The digest must actually cover the fields it claims to cover.
+
+        Each of these substitutions leaves a configuration that passes every
+        other check, so if the digest did not cover it the substitution would
+        be invisible.
+        """
+        original = _config("stage_e")
+        forged = _config("stage_e", **{field: value, "config_digest": original.config_digest})
+        assert entrypoints.compute_config_digest(forged) != original.config_digest
+        with pytest.raises(EntrypointError, match="does not match the configuration"):
+            entrypoints.assert_config_registered(forged)
+
+    def test_the_registered_identity_name_is_in_the_configuration_digest(self) -> None:
+        registered = _config("stage_e")
+        borrowed = _config(
+            "stage_e",
+            uami_name="id-jspace-parser-v3-v2-stage-p",
+            config_digest=registered.config_digest,
+        )
+        assert (
+            entrypoints.compute_config_digest(borrowed) != registered.config_digest
+        )
+        with pytest.raises(EntrypointError, match="must run as"):
+            entrypoints.assert_config_registered(borrowed)
+
+    def test_the_digest_is_bound_to_the_schema_registry(self) -> None:
+        """A configuration validated against a different schema set is a
+        different configuration, even when every visible field agrees."""
+        config = _config("stage_e")
+        original = entrypoints.compute_config_digest(config)
+        assert len(original) == 64
+        assert original != entrypoints.compute_config_digest(_config("stage_p"))
+        changed = _config(
+            "stage_e",
+            schema_registry_digest="ff" * 32,
+            config_digest=config.config_digest,
+        )
+        assert entrypoints.compute_config_digest(changed) != original
+
+    def test_the_runtime_schema_digest_must_name_the_loaded_registry(self) -> None:
+        config = _config("stage_e")
+        with pytest.raises(EntrypointError, match="registry loaded by this role"):
+            entrypoints.assert_config_registered(
+                _config(
+                    "stage_e",
+                    schema_registry_digest="ff" * 32,
+                    config_digest=config.config_digest,
+                )
+            )
+
+    @pytest.mark.parametrize("digest", ["", "not-hex", "AB" * 32, "ab" * 31])
+    def test_a_malformed_schema_registry_digest_is_refused(self, digest: str) -> None:
+        with pytest.raises(EntrypointError, match="schema_registry_digest"):
+            entrypoints.assert_config_registered(
+                _config("stage_e", schema_registry_digest=digest)
+            )
+
+    def test_the_registration_check_verifies_the_schema_binding(self) -> None:
+        """B-02. ``assert_schema_binding`` was defined and never called.
+
+        A verification routine that no production path reaches is a comment.
+        The call graph is read from bytecode so that removing the call fails
+        here rather than being noticed by a reader.
+        """
+        graph = set(entrypoints.assert_config_registered.__code__.co_names)
+        assert "assert_schema_binding" in graph
+        assert "compute_config_digest" in graph
+
+    def test_a_drifted_schema_registry_stops_every_configuration(
+        self, monkeypatch
+    ) -> None:
+        monkeypatch.setattr(entrypoints.schemas, "REGISTRY_DIGEST", "ff" * 32)
+        with pytest.raises(entrypoints.lifecycle.LifecycleError):
+            entrypoints.assert_config_registered(_config("stage_e"))
+
     def test_a_non_config_object_is_refused(self) -> None:
         with pytest.raises(EntrypointError, match="must be a RoleConfig"):
             entrypoints.assert_config_registered({"role": "stage_e"})  # type: ignore[arg-type]
@@ -383,6 +637,85 @@ class TestIdentityAndCredentials:
             entrypoints.assert_no_ambient_credentials(
                 _env() | {"AZURE_USE_AMBIENT_CREDENTIAL": value}
             )
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "FOO_TOKEN",
+            "MY_STORAGE_AUTH",
+            "REVIEWER_SIGNATURE",
+            "APP_CREDENTIALS",
+            "svc_pwd",
+            "DATABRICKS_SECRET_SCOPE",
+            "SSH_AUTH_SOCK",
+            "TLS_CERT_PATH",
+            "HMAC_KEY_B64",
+            "SASL_PASSWD",
+        ],
+    )
+    def test_a_credential_shaped_name_nobody_anticipated_is_refused(
+        self, key: str
+    ) -> None:
+        """B-04. The denylist was a list of the mechanisms we thought of.
+
+        Every one of these passed every marker in
+        ``FORBIDDEN_CREDENTIAL_MARKERS`` and reached the payload. They are
+        refused now because the rule is closure, not enumeration.
+        """
+        assert not any(
+            marker in key.casefold() for marker in entrypoints.FORBIDDEN_CREDENTIAL_MARKERS
+        ), "this name is already caught by the denylist, so it proves nothing about closure"
+        with pytest.raises(EntrypointError, match="unregistered environment"):
+            entrypoints.assert_no_ambient_credentials(_env() | {key: "x"})
+
+    def test_the_registered_environment_names_are_the_only_exemptions(self) -> None:
+        """Every admitted name is explicit; a prefix or regex would be a denylist."""
+        assert set(entrypoints.PREFLIGHT_ENVIRONMENT_NAMES) <= set(
+            entrypoints.REGISTERED_ENVIRONMENT_NAMES
+        )
+        assert {"IDENTITY_ENDPOINT", "IDENTITY_HEADER"} <= set(
+            entrypoints.REGISTERED_ENVIRONMENT_NAMES
+        )
+        assert "FOO_TOKEN" not in entrypoints.REGISTERED_ENVIRONMENT_NAMES
+
+    def test_an_unknown_name_with_no_credential_marker_is_still_refused(self) -> None:
+        """This distinguishes closure from a broader marker denylist."""
+        key = "UNCLASSIFIED_CHANNEL"
+        assert not any(
+            marker in key.casefold()
+            for marker in entrypoints.FORBIDDEN_CREDENTIAL_MARKERS
+        )
+        with pytest.raises(EntrypointError, match="unregistered environment"):
+            entrypoints.assert_no_ambient_credentials(_env() | {key: "x"})
+
+    def test_the_ambient_flag_is_refused_by_closure_even_when_switched_off(
+        self,
+    ) -> None:
+        """``AZURE_USE_AMBIENT_CREDENTIAL=0`` used to be accepted silently.
+
+        A role has no reason to carry the variable at all, and a value-based
+        check is one typo away from being read the other way round.
+        """
+        with pytest.raises(EntrypointError, match="unregistered environment"):
+            entrypoints.assert_no_ambient_credentials(
+                _env() | {"AZURE_USE_AMBIENT_CREDENTIAL": "0"}
+            )
+
+    def test_the_broad_markers_do_not_swallow_the_named_ones(self) -> None:
+        """The precise message has to survive, or an operator loses the one
+        piece of information that says which mechanism arrived."""
+        with pytest.raises(EntrypointError, match="ambient credential material"):
+            entrypoints.assert_no_ambient_credentials(_env() | {"AZURE_CLIENT_SECRET": "x"})
+
+    def test_the_deployed_environment_passes_the_closure_rule(self) -> None:
+        """The rule must refuse credentials without refusing the deployment.
+
+        A closure rule that also rejected the variables every role legitimately
+        needs would be repaired by widening the exemption list, and the
+        exemption list is the denylist coming back.
+        """
+        for name in entrypoints.ENTRYPOINT_NAMES:
+            entrypoints.assert_no_ambient_credentials(_preflight_env(name))
 
     def test_a_clean_environment_is_accepted(self) -> None:
         entrypoints.assert_no_ambient_credentials(_env())
@@ -584,6 +917,7 @@ class TestEntrypointsInvokeTheRealImplementation:
         monkeypatch.setattr(entrypoints, "_validate_each", lambda *a, **k: None)
         with pytest.raises(self.Sentinel):
             entrypoints.run_stage_e(
+                existing_result_digests=(),
                 config=_config("stage_e"),
                 environment=_env(),
                 loaded_module_names=["json"],
@@ -601,6 +935,7 @@ class TestEntrypointsInvokeTheRealImplementation:
         monkeypatch.setattr(entrypoints.evaluation, "create_preregistration_lock", self._boom)
         with pytest.raises(self.Sentinel):
             entrypoints.run_preregistration_compiler(
+                existing_lock_digest=None,
                 config=_config("preregistration_compiler"),
                 environment=_env(),
                 loaded_module_names=["json"],
@@ -612,6 +947,7 @@ class TestEntrypointsInvokeTheRealImplementation:
         monkeypatch.setattr(entrypoints, "_validate_each", lambda *a, **k: None)
         with pytest.raises(self.Sentinel):
             entrypoints.run_prediction_sealer(
+                existing_objects=(),
                 config=_config("prediction_sealer"),
                 environment=_env(),
                 loaded_module_names=["json"],
@@ -626,6 +962,7 @@ class TestEntrypointsInvokeTheRealImplementation:
         monkeypatch.setattr(entrypoints, "_validate_each", lambda *a, **k: None)
         with pytest.raises(self.Sentinel):
             entrypoints.run_seal_custodian(
+                existing_objects=(),
                 config=_config("seal_custodian"),
                 environment=_env(),
                 loaded_module_names=["json"],
@@ -736,8 +1073,14 @@ class TestEveryEntrypointRefusesBeforeTouchingItsPayload:
             "selector": {"admitted": self.POISON},
             "private_set_auditor": {"admitted": self.POISON},
             "facts_compiler": {"admitted": self.POISON, "facts": self.POISON},
-            "seal_custodian": {"plan": self.POISON},
-            "preregistration_compiler": {"bindings": self.POISON},
+            "seal_custodian": {
+                "plan": self.POISON,
+                "existing_objects": self.POISON,
+            },
+            "preregistration_compiler": {
+                "bindings": self.POISON,
+                "existing_lock_digest": self.POISON,
+            },
             "stage_p": {
                 "lock": {"stage_p_read_classes": ["sealed_v2_inputs"]},
                 "lock_digest": "0" * 64,
@@ -751,6 +1094,7 @@ class TestEveryEntrypointRefusesBeforeTouchingItsPayload:
                 "sealed_case_ids": self.POISON,
                 "write_order": self.POISON,
                 "terminal_manifest": self.POISON,
+                "existing_objects": self.POISON,
             },
             "stage_e": {
                 "lock": {"stage_e_read_classes": ["sealed_predictions", "scoring_labels"]},
@@ -759,6 +1103,7 @@ class TestEveryEntrypointRefusesBeforeTouchingItsPayload:
                 "sealed_members": self.POISON,
                 "labels": self.POISON,
                 "strata": self.POISON,
+                "existing_result_digests": self.POISON,
             },
             "receipt_exporter": {"receipt": self.POISON},
         }

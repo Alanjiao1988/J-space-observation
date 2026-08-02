@@ -15,10 +15,10 @@ drift, and the role that drifts is the one nobody re-reads.
 Second, the container command is not a string that happens to resemble a
 function name. :data:`ENTRYPOINTS` maps each registered command to the actual
 callable, :func:`resolve_entrypoint` is the only way to get from one to the
-other, and :func:`main` dispatches through the same table. So the command the
-IaC configures, the function the tests exercise, and the function the container
-executes are the same object, and a test can prove it by substituting any of
-them and observing a refusal.
+other, and :func:`preflight` reaches the role's checks through the same table.
+So the command the IaC configures, the function the tests exercise, and the
+boundary the container enforces are bound to the same object, and a test can
+prove it by substituting any of them and observing a refusal.
 
 What an entrypoint deliberately does not do
 ===========================================
@@ -29,13 +29,26 @@ itself and fetched its bytes could not be tested for the authorisation step
 without also standing up the storage. Here the payload arrives as an argument,
 the entrypoint refuses it unless every lane, identity, schema and isolation
 check has already passed, and the boundary supplies the bytes.
+
+That is why the registered command dispatches the registered role callable in a
+preflight context. The callable executes its own guarded prologue and is stopped
+at the boundary immediately after the last guard, before it can inspect an inert
+payload. The command then exits :data:`PREFLIGHT_WITHOUT_PAYLOAD`. Thus the
+command the freeze binds demonstrably reaches the exact callable and guard path
+the private invocation uses without pretending that a payload-free canary did
+scientific work.
 """
 
 from __future__ import annotations
 
 import importlib.util
+import hashlib
+import inspect
+import json
+import os
 import re
 import sys
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
@@ -84,6 +97,11 @@ __all__ = [
     "ROLE_SCHEMAS",
     "READ_CONTAINERS",
     "FORBIDDEN_CREDENTIAL_MARKERS",
+    "REGISTERED_ENVIRONMENT_NAMES",
+    "CONFIG_DIGEST_SCHEMA_VERSION",
+    "CONFIG_DIGEST_FIELDS",
+    "PREFLIGHT_ENVIRONMENT_NAMES",
+    "PREFLIGHT_WITHOUT_PAYLOAD",
     "ENTRYPOINTS",
     "ENTRYPOINT_NAMES",
     "CONTAINER_ENTRYPOINT_PATH",
@@ -91,7 +109,10 @@ __all__ = [
     "entrypoint_call_graph",
     "assert_entrypoint_is_guarded",
     "assert_container_command_is_registered",
+    "compute_config_digest",
+    "compute_role_config_digests",
     "export_role_matrix",
+    "preflight",
     "main",
 ]
 
@@ -293,6 +314,46 @@ FORBIDDEN_CREDENTIAL_MARKERS: tuple[str, ...] = (
     "azure_tenant_id_override",
 )
 
+#: The complete set of environment-variable names a role may hold.
+#:
+#: This is closure, not a larger credential denylist. The role configuration,
+#: the Container Apps managed-identity endpoint, and a small set of non-secret
+#: process settings are admitted; every other name is refused. The explicit
+#: credential markers above remain only to produce a precise error for a known
+#: mechanism before the closure check reports the generic unknown name.
+REGISTERED_ENVIRONMENT_NAMES: frozenset[str] = frozenset(
+    {
+        # The complete role configuration.
+        "AZURE_CLIENT_ID",
+        "JSPACE_ROLE",
+        "JSPACE_UAMI_NAME",
+        "JSPACE_ENDPOINT",
+        "JSPACE_CONTAINER",
+        "JSPACE_PREFIX",
+        "JSPACE_SCHEMA_IDS",
+        "JSPACE_SCHEMA_REGISTRY_DIGEST",
+        "JSPACE_IMAGE_DIGEST",
+        "JSPACE_CONFIG_DIGEST",
+        # The managed-identity endpoint Container Apps injects. IDENTITY_HEADER
+        # is part of that one registered mechanism, not a second credential.
+        "IDENTITY_ENDPOINT",
+        "IDENTITY_HEADER",
+        # Closed, non-secret process settings used by the hardened role images.
+        "HOME",
+        "HOSTNAME",
+        "LANG",
+        "LC_ALL",
+        "PATH",
+        "PYTHONDONTWRITEBYTECODE",
+        "PYTHONHASHSEED",
+        "PYTHONPATH",
+        "PYTHONUNBUFFERED",
+        "SSL_CERT_DIR",
+        "SSL_CERT_FILE",
+        "TZ",
+    }
+)
+
 #: Roles that must never hold parser code. Everything that touches candidate
 #: material during construction, review or sealing, plus Stage E.
 PARSER_FREE_ROLES: frozenset[str] = frozenset(
@@ -331,8 +392,113 @@ class RoleConfig:
     container: str
     prefix: str
     schema_ids: tuple[str, ...]
+    schema_registry_digest: str
     image_digest: str
     config_digest: str
+
+
+CONFIG_DIGEST_SCHEMA_VERSION = "phase1-parser-v3-v2-role-config/v1"
+
+#: Fixed order for the JSON vector hashed before deployment and at runtime.
+#:
+#: A JSON object is unordered by definition, even if two implementations happen
+#: to preserve insertion order today. An ordered vector lets the public
+#: prebinding step and the runtime derive the same byte string without relying
+#: on an object-ordering accident.
+CONFIG_DIGEST_FIELDS: tuple[str, ...] = (
+    "container",
+    "image_digest",
+    "prefix",
+    "private_endpoint",
+    "role",
+    "schema_ids",
+    "schema_registry_digest",
+    "uami_name",
+)
+
+
+def _hash_config_values(values: Mapping[str, Any]) -> str:
+    if set(values) != set(CONFIG_DIGEST_FIELDS):
+        raise EntrypointError(
+            "configuration digest values do not exactly match the registered fields"
+        )
+    payload = [
+        CONFIG_DIGEST_SCHEMA_VERSION,
+        *[[field, values[field]] for field in CONFIG_DIGEST_FIELDS],
+    ]
+    serialized = json.dumps(payload, ensure_ascii=True, separators=(",", ":"))
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+
+
+def compute_config_digest(config: RoleConfig) -> str:
+    """Derive the digest that binds a configuration to its own content.
+
+    Every field that decides what the role *is* goes in, together with the
+    digest of the schema registry the role will validate against. Public audit
+    finding B-02 observed that ``config_digest`` was only checked for SHA-256
+    syntax; a digest nobody recomputes is decoration. Recomputing here means
+    swapping the image, endpoint, container, schema set, or registered identity
+    name changes the digest and stops the run.
+
+    The UAMI client ID is deliberately not in this pre-bound digest: Azure
+    creates that value during deployment, and Bicep cannot SHA-256 a
+    deployment-time resource property. Finding B-03 is closed at the IaC layer
+    instead: the job's assigned identity, ``uami_name`` and ``AZURE_CLIENT_ID``
+    are all derived from the same managed-identity resource, and
+    :func:`assert_identity` verifies that runtime value before payload access.
+    """
+    values: Mapping[str, Any] = {
+        "container": config.container,
+        "image_digest": config.image_digest,
+        "prefix": config.prefix,
+        "private_endpoint": config.private_endpoint,
+        "role": config.role,
+        "schema_ids": list(config.schema_ids),
+        "schema_registry_digest": config.schema_registry_digest,
+        "uami_name": config.uami_name,
+    }
+    return _hash_config_values(values)
+
+
+def compute_role_config_digests(
+    *,
+    role_image_digests: Mapping[str, str],
+    private_endpoint: str,
+) -> Mapping[str, str]:
+    """Produce the complete predeployment digest map required by Bicep."""
+    expected_roles = set(ROLE_IDENTITY_NAMES)
+    supplied_roles = set(role_image_digests)
+    if supplied_roles != expected_roles:
+        raise EntrypointError(
+            "role_image_digests must name exactly every registered role; "
+            f"missing={sorted(expected_roles - supplied_roles)}, "
+            f"extra={sorted(supplied_roles - expected_roles)}"
+        )
+    if private_endpoint not in REGISTERED_ENDPOINTS:
+        raise EntrypointError(
+            f"private endpoint {private_endpoint!r} is not registered"
+        )
+
+    digests: dict[str, str] = {}
+    for role in sorted(expected_roles):
+        image_digest = role_image_digests[role]
+        if not _IMAGE_DIGEST.match(image_digest or ""):
+            raise EntrypointError(
+                f"role {role!r} has no immutable sha256 image digest"
+            )
+        digests[role] = _hash_config_values(
+            {
+                "container": REGISTERED_CONTAINERS[role],
+                "image_digest": image_digest,
+                "prefix": REGISTERED_PREFIXES[role],
+                "private_endpoint": private_endpoint,
+                "role": role,
+                "schema_ids": list(ROLE_SCHEMAS[role]),
+                "schema_registry_digest": schemas.REGISTRY_DIGEST,
+                "uami_name": ROLE_IDENTITY_NAMES[role],
+            }
+        )
+    return digests
 
 
 def assert_config_registered(config: RoleConfig) -> None:
@@ -367,10 +533,26 @@ def assert_config_registered(config: RoleConfig) -> None:
             f"role {config.role} may only bind {list(ROLE_SCHEMAS[config.role])}"
         )
     schemas.assert_all_ids_reachable(config.schema_ids)
+    if not _SHA256.match(config.schema_registry_digest or ""):
+        raise EntrypointError("schema_registry_digest must be a SHA-256 hex digest")
+    if config.schema_registry_digest != schemas.REGISTRY_DIGEST:
+        raise EntrypointError(
+            "schema_registry_digest does not identify the registry loaded by this role"
+        )
     if not _IMAGE_DIGEST.match(config.image_digest or ""):
         raise EntrypointError("image_digest must be an explicit sha256: digest, not a tag")
     if not _SHA256.match(config.config_digest or ""):
         raise EntrypointError("config_digest must be a SHA-256 hex digest")
+    lifecycle.assert_schema_binding(
+        registry_digests=schemas.SCHEMA_DIGESTS,
+        registry_digest=schemas.REGISTRY_DIGEST,
+    )
+    expected_digest = compute_config_digest(config)
+    if config.config_digest != expected_digest:
+        raise EntrypointError(
+            "config_digest does not match the configuration it claims to bind: "
+            f"expected {expected_digest}, got {config.config_digest}"
+        )
 
 
 def assert_identity(config: RoleConfig, environment: Mapping[str, str]) -> None:
@@ -388,6 +570,14 @@ def assert_no_ambient_credentials(environment: Mapping[str, str]) -> None:
     A key, SAS, connection string or client secret in the environment means the
     role can reach storage without its lane being checked at all, so the lane
     matrix stops being the access control and becomes documentation.
+
+    The named markers run first so that a recognised mechanism is reported as
+    itself, then the explicit ambient-credential opt-in, and finally a complete
+    allowlist over environment-variable names. Public audit finding B-04 was
+    specifically a denylist failure: another denylist with broader fragments
+    would only move the hole. Under closure, ``FOO_TOKEN`` is refused because it
+    was never registered, but so is ``UNIMAGINED_CREDENTIAL_CARRIER`` even if its
+    name contains no marker at all.
     """
     hits = sorted(
         {
@@ -401,6 +591,13 @@ def assert_no_ambient_credentials(environment: Mapping[str, str]) -> None:
         raise EntrypointError(f"ambient credential material present in the environment: {hits}")
     if environment.get("AZURE_USE_AMBIENT_CREDENTIAL", "").strip().lower() in {"1", "true", "yes"}:
         raise EntrypointError("ambient credential fallback is explicitly refused")
+    unregistered = sorted(set(environment) - REGISTERED_ENVIRONMENT_NAMES)
+    if unregistered:
+        raise EntrypointError(
+            "unregistered environment variable(s) present: "
+            f"{unregistered}. Role environments are closed so an unanticipated "
+            "name cannot become an ambient credential channel."
+        )
 
 
 def assert_lanes(role: str, *, reads: Sequence[str], writes: Sequence[str]) -> None:
@@ -478,6 +675,19 @@ class AccessLog:
         return tuple(event["event_id"] for event in self.events)
 
 
+class _PreflightComplete(Exception):
+    """Internal signal that the registered callable reached every guard."""
+
+    def __init__(self, log: AccessLog):
+        super().__init__("registered entrypoint preflight completed")
+        self.log = log
+
+
+_PREFLIGHT_ACTIVE: ContextVar[bool] = ContextVar(
+    "parser_v3_v2_preflight_active", default=False
+)
+
+
 # ---------------------------------------------------------------------------
 # the single guarded prologue
 # ---------------------------------------------------------------------------
@@ -505,7 +715,7 @@ def _guarded(
         assert_config_registered(config)
         assert_identity(config, environment)
         assert_no_ambient_credentials(environment)
-    except EntrypointError:
+    except (EntrypointError, lifecycle.LifecycleError):
         log.record("identity_assertion_refused", status="refused")
         raise
     log.record("identity_assertion_passed")
@@ -521,6 +731,9 @@ def _guarded(
         log.record("import_isolation_refused", status="refused")
         raise
     log.record("import_isolation_passed")
+    if _PREFLIGHT_ACTIVE.get():
+        log.record("entrypoint_completed", object_count=0)
+        raise _PreflightComplete(log)
 
 
 def _validate_each(schema_id: str, instances: Sequence[Mapping[str, Any]], log: AccessLog) -> None:
@@ -825,7 +1038,7 @@ def run_seal_custodian(
     environment: Mapping[str, str],
     loaded_module_names: Iterable[str],
     plan: Mapping[str, Any],
-    existing_objects: Sequence[str] = (),
+    existing_objects: Sequence[str],
 ) -> Mapping[str, Any]:
     """Create the sealed namespace, terminal manifest last, never resuming."""
     log = AccessLog(role=config.role)
@@ -857,7 +1070,7 @@ def run_preregistration_compiler(
     environment: Mapping[str, str],
     loaded_module_names: Iterable[str],
     bindings: Mapping[str, Any],
-    existing_lock_digest: str | None = None,
+    existing_lock_digest: str | None,
 ) -> Mapping[str, Any]:
     """Create the preregistration lock exactly once."""
     log = AccessLog(role=config.role)
@@ -893,7 +1106,11 @@ def run_stage_p(
     log = AccessLog(role=config.role)
     _guarded(
         config,
-        reads=list(lock["stage_p_read_classes"]),
+        # Use the registered lane before touching the caller-supplied lock.
+        # Reading lock[...] in this argument used to happen before _guarded,
+        # so a malformed payload could execute before identity and isolation
+        # were established.
+        reads=list(lifecycle.ROLE_LANES[config.role]["reads"]),
         writes=["prediction_namespace"],
         environment=environment,
         loaded_module_names=loaded_module_names,
@@ -922,7 +1139,7 @@ def run_prediction_sealer(
     sealed_case_ids: Sequence[str],
     write_order: Sequence[str],
     terminal_manifest: str,
-    existing_objects: Sequence[str] = (),
+    existing_objects: Sequence[str],
 ) -> Mapping[str, Any]:
     """Seal the prediction stream create-only and completely."""
     log = AccessLog(role=config.role)
@@ -958,13 +1175,15 @@ def run_stage_e(
     sealed_members: Sequence[Mapping[str, Any]],
     labels: Mapping[str, Mapping[str, Any]],
     strata: Mapping[str, str],
+    existing_result_digests: Sequence[str],
     parser_v2_comparison: str = "NOT_RUN",
 ) -> Mapping[str, Any]:
     """Open labels once and produce the unique formal result."""
     log = AccessLog(role=config.role)
     _guarded(
         config,
-        reads=list(lock["stage_e_read_classes"]),
+        # As in Stage P, the guard is evaluated before any payload field.
+        reads=list(lifecycle.ROLE_LANES[config.role]["reads"]),
         writes=["formal_result"],
         environment=environment,
         loaded_module_names=loaded_module_names,
@@ -978,6 +1197,7 @@ def run_stage_e(
         sealed_members=sealed_members,
         labels=labels,
         strata=strata,
+        existing_result_digests=existing_result_digests,
         parser_v2_comparison=parser_v2_comparison,
         loaded_module_names=loaded_module_names,
     )
@@ -1130,6 +1350,8 @@ def export_role_matrix() -> Mapping[str, Any]:
     return {
         "schema_version": "phase1-parser-v3-v2-role-matrix/v1",
         "container_entrypoint_path": CONTAINER_ENTRYPOINT_PATH,
+        "config_digest_schema_version": CONFIG_DIGEST_SCHEMA_VERSION,
+        "config_digest_fields": list(CONFIG_DIGEST_FIELDS),
         "roles": [
             {
                 "role": spec.role,
@@ -1152,21 +1374,189 @@ def export_role_matrix() -> Mapping[str, Any]:
             for spec in sorted(ENTRYPOINTS.values(), key=lambda item: item.role)
         ],
         "registered_endpoints": sorted(REGISTERED_ENDPOINTS),
+        "schema_registry_digest": schemas.REGISTRY_DIGEST,
     }
 
 
+#: Exit code for a preflight that passed and then stopped.
+#:
+#: Distinct from 0 because a container that did no work must not report success
+#: to the orchestrator, and distinct from 1 because "the boundary is correct and
+#: the payload has not been supplied" is not the same event as "the boundary is
+#: wrong".
+PREFLIGHT_WITHOUT_PAYLOAD = 3
+
+#: The environment a preflight reads to reconstruct the role's configuration.
+PREFLIGHT_ENVIRONMENT_NAMES: tuple[str, ...] = (
+    "JSPACE_ROLE",
+    "JSPACE_UAMI_NAME",
+    "JSPACE_ENDPOINT",
+    "JSPACE_CONTAINER",
+    "JSPACE_PREFIX",
+    "JSPACE_SCHEMA_IDS",
+    "JSPACE_SCHEMA_REGISTRY_DIGEST",
+    "JSPACE_IMAGE_DIGEST",
+    "JSPACE_CONFIG_DIGEST",
+    "AZURE_CLIENT_ID",
+)
+
+
+def _preflight_callback(*args: Any, **kwargs: Any) -> Any:
+    raise EntrypointError("a preflight touched a callback before completing its guards")
+
+
+_PREFLIGHT_ARGUMENT_VALUES: Mapping[str, Any] = {
+    "admission_records": (),
+    "packets": (),
+    "decide": _preflight_callback,
+    "pairs": (),
+    "adjudicate": _preflight_callback,
+    "admitted": (),
+    "facts": {},
+    "plan": {},
+    "existing_objects": (),
+    "bindings": {},
+    "existing_lock_digest": None,
+    "lock": {},
+    "lock_digest": "",
+    "state": "",
+    "ordinal": 0,
+    "locked_inputs": (),
+    "parser": _preflight_callback,
+    "stream": {},
+    "sealed_case_ids": (),
+    "write_order": (),
+    "terminal_manifest": "",
+    "prediction_receipt": {},
+    "sealed_members": (),
+    "labels": {},
+    "strata": {},
+    "existing_result_digests": (),
+    "receipt": {},
+}
+
+
+def _preflight_payload(function: Callable[..., Any]) -> Mapping[str, Any]:
+    """Build inert arguments for one registered callable from its signature.
+
+    The values must never be read: :func:`_guarded` raises
+    :class:`_PreflightComplete` first. They exist so Python can enter the real
+    callable and prove that the command-to-callable binding reaches the exact
+    guard path the private invocation uses. Signature introspection keeps this
+    list fail-closed: a new required argument without an inert value prevents
+    the image from reporting a successful preflight.
+    """
+    supplied: dict[str, Any] = {}
+    common = {"config", "environment", "loaded_module_names"}
+    for parameter in inspect.signature(function).parameters.values():
+        if parameter.name in common or parameter.default is not inspect.Parameter.empty:
+            continue
+        if parameter.name not in _PREFLIGHT_ARGUMENT_VALUES:
+            raise EntrypointError(
+                f"no inert preflight value is registered for {parameter.name!r}"
+            )
+        supplied[parameter.name] = _PREFLIGHT_ARGUMENT_VALUES[parameter.name]
+    return supplied
+
+
+def _runtime_module_names() -> tuple[str, ...]:
+    """Snapshot the real process modules for the deployed command."""
+    return tuple(sorted(sys.modules))
+
+
+def preflight(
+    name: str,
+    environment: Mapping[str, str],
+    *,
+    loaded_module_names: Iterable[str] | None = None,
+) -> AccessLog:
+    """Run every boundary check the named entrypoint would run, and stop there.
+
+    This is what the registered container command actually does. Public audit
+    finding B-01 observed that the command bound by the role matrix, by the
+    Bicep, and by the preregistration lock resolved to a ``main`` that
+    validated the name and then refused unconditionally: the one command the
+    freeze binds provably could not do the work it was bound to. Refusing to
+    fetch a payload is right -- a role that could fetch its own payload could
+    reach private material on its own -- but refusing to do *anything* made the
+    binding untruthful.
+
+    So the command now dispatches ``spec.function`` itself with inert arguments.
+    Its real guarded prologue checks configuration, identity, environment
+    closure, lanes and import isolation, then raises the internal
+    :class:`_PreflightComplete` signal before any inert argument can be read. It
+    exits :data:`PREFLIGHT_WITHOUT_PAYLOAD` because the payload still has to
+    arrive from the private boundary and this process is still not allowed to go
+    and get one.
+    """
+    if name not in ENTRYPOINTS:
+        raise EntrypointError(f"unregistered entrypoint {name!r}")
+    spec = ENTRYPOINTS[name]
+    missing = sorted(set(PREFLIGHT_ENVIRONMENT_NAMES) - set(environment))
+    if missing:
+        raise EntrypointError(f"preflight environment is missing {missing}")
+    declared_role = environment["JSPACE_ROLE"]
+    if declared_role != spec.role:
+        raise EntrypointError(
+            f"the container is configured for role {declared_role!r} but was "
+            f"started with the {spec.role!r} entrypoint"
+        )
+    config = RoleConfig(
+        role=declared_role,
+        uami_name=environment["JSPACE_UAMI_NAME"],
+        uami_client_id=environment["AZURE_CLIENT_ID"],
+        private_endpoint=environment["JSPACE_ENDPOINT"],
+        container=environment["JSPACE_CONTAINER"],
+        prefix=environment["JSPACE_PREFIX"],
+        schema_ids=tuple(
+            part for part in environment["JSPACE_SCHEMA_IDS"].split(",") if part
+        ),
+        schema_registry_digest=environment["JSPACE_SCHEMA_REGISTRY_DIGEST"],
+        image_digest=environment["JSPACE_IMAGE_DIGEST"],
+        config_digest=environment["JSPACE_CONFIG_DIGEST"],
+    )
+    assert_container_command_is_registered(role=config.role, command=spec.command)
+    token = _PREFLIGHT_ACTIVE.set(True)
+    try:
+        spec.function(
+            config=config,
+            environment=environment,
+            loaded_module_names=(
+                _runtime_module_names()
+                if loaded_module_names is None
+                else tuple(loaded_module_names)
+            ),
+            **_preflight_payload(spec.function),
+        )
+    except _PreflightComplete as completed:
+        return completed.log
+    finally:
+        _PREFLIGHT_ACTIVE.reset(token)
+    raise EntrypointError(
+        f"entrypoint {name!r} returned without reaching the guarded preflight"
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
-    """Dispatch through the same table the IaC and the tests use."""
+    """Preflight through the same table the IaC and the tests use."""
     args = list(sys.argv[1:] if argv is None else argv)
     if len(args) != 1:
         raise EntrypointError("exactly one entrypoint name is required")
     name = args[0]
-    if name not in ENTRYPOINTS:
-        raise EntrypointError(f"unregistered entrypoint {name!r}")
-    raise EntrypointError(
-        f"entrypoint {name!r} requires its payload from the private boundary; "
-        "it must not fetch or synthesise one itself"
+    log = preflight(name, dict(os.environ))
+    print(
+        json.dumps(
+            {
+                "schema_version": "phase1-parser-v3-v2-preflight/v1",
+                "entrypoint": name,
+                "role": ENTRYPOINTS[name].role,
+                "events": list(log.event_ids()),
+                "outcome": "PREFLIGHT_PASSED_PAYLOAD_NOT_SUPPLIED",
+            },
+            sort_keys=True,
+        )
     )
+    return PREFLIGHT_WITHOUT_PAYLOAD
 
 
 if __name__ == "__main__":  # pragma: no cover

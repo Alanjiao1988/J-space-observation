@@ -57,7 +57,50 @@ def _read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _strip_comments(text: str) -> str:
+    """Return only the parts of a Bicep file the deployment engine reads.
+
+    Public audit finding B-07 observed that the substring controls in this
+    module read raw file text, so a template could satisfy a control by
+    mentioning the required string in a comment and could defeat a prohibition
+    control by moving the offending line into one. Both directions are removed
+    here by deleting comments before any control looks at the text.
+
+    Line comments are stripped with an explicit scan rather than a regular
+    expression because ``//`` also occurs inside ``https://`` and inside
+    single-quoted Bicep strings; a naive ``//.*`` substitution truncates real
+    resource ids and turns a control into a test of the stripper.
+    """
+    without_blocks = _BLOCK_COMMENT.sub(" ", text)
+    kept: list[str] = []
+    for line in without_blocks.splitlines():
+        in_string = False
+        cut = len(line)
+        index = 0
+        while index < len(line):
+            character = line[index]
+            if character == "'":
+                in_string = not in_string
+            elif not in_string and line.startswith("//", index):
+                cut = index
+                break
+            index += 1
+        kept.append(line[:cut])
+    return "\n".join(kept)
+
+
 def _read_text(path: Path) -> str:
+    """Read a template with its commentary removed.
+
+    Every control in this module goes through here, so a claim proved about a
+    template is a claim about what the template *does*, not about what it says
+    about itself.
+    """
+    return _strip_comments(path.read_text(encoding="utf-8"))
+
+
+def _read_raw_text(path: Path) -> str:
+    """Read a template exactly as it is on disk, commentary included."""
     return path.read_text(encoding="utf-8")
 
 
@@ -84,7 +127,7 @@ def _decorators(path: Path) -> list[str]:
     module that deliberately does not use it. Stripping comments before looking
     is the difference between checking a declaration and checking a sentence.
     """
-    text = _BLOCK_COMMENT.sub("", _read_text(path))
+    text = _read_text(path)
     return [
         line.strip() for line in text.splitlines() if line.strip().startswith("@")
     ]
@@ -125,6 +168,14 @@ class TestTheMatrixIsGeneratedNotTranscribed:
         assert role_matrix["container_entrypoint_path"] == entrypoints.CONTAINER_ENTRYPOINT_PATH
         for row in role_matrix["roles"]:
             assert entrypoints.CONTAINER_ENTRYPOINT_PATH in row["command"]
+
+    def test_the_matrix_binds_the_schema_and_config_digest_protocol(self, role_matrix):
+        assert role_matrix["schema_registry_digest"] == entrypoints.schemas.REGISTRY_DIGEST
+        assert (
+            role_matrix["config_digest_schema_version"]
+            == entrypoints.CONFIG_DIGEST_SCHEMA_VERSION
+        )
+        assert tuple(role_matrix["config_digest_fields"]) == entrypoints.CONFIG_DIGEST_FIELDS
 
     def test_the_matrix_names_no_module_invocation(self, role_matrix):
         # ``python -m jspace_observation.X`` executes the package __init__, which
@@ -167,6 +218,9 @@ class TestTheMatrixCarriesOnlyClosedVocabulary:
         assert set(role_matrix) == {
             "schema_version",
             "container_entrypoint_path",
+            "config_digest_schema_version",
+            "config_digest_fields",
+            "schema_registry_digest",
             "roles",
             "registered_endpoints",
         }
@@ -419,6 +473,99 @@ class TestTheBoundaryDeclaresItsSecurityProperties:
         text = _read_text(MODULES / "observability.bicep")
         assert "level: 'CanNotDelete'" in text
 
+    def test_the_evidence_workspace_is_not_reachable_from_the_internet(self):
+        """B-05. The store holding every access event must not be public.
+
+        Both directions matter. Public ingestion means anything on the Internet
+        can write into the evidence; public query means the evidence about a
+        private boundary can be read from outside it.
+        """
+        text = _read_text(MODULES / "observability.bicep")
+        assert "publicNetworkAccessForIngestion: 'Disabled'" in text
+        assert "publicNetworkAccessForQuery: 'Disabled'" in text
+        assert "publicNetworkAccessForIngestion: 'Enabled'" not in text
+        assert "publicNetworkAccessForQuery: 'Enabled'" not in text
+
+    def test_monitoring_traffic_has_a_private_path_to_reach(self):
+        """Disabling the public path is only honest if a private one exists.
+
+        Otherwise the boundary is not private, it is broken, and the first
+        deployment that needed telemetry would be repaired by turning the
+        public path back on.
+        """
+        text = _read_text(MODULES / "observability.bicep")
+        assert "Microsoft.Insights/privateLinkScopes@" in text
+        assert "ingestionAccessMode: 'PrivateOnly'" in text
+        assert "queryAccessMode: 'PrivateOnly'" in text
+        assert "'azuremonitor'" in text
+        assert "privateDnsZoneGroups" in text
+
+    def test_no_platform_hostname_is_hardwired_into_the_firewall_rules(self):
+        """B-06. Hosts are parameters or derived; none is typed into a rule.
+
+        The check is positional rather than lexical: the allowlist expression
+        must be a name, so a future edit that reintroduces a literal beside it
+        changes this line and fails here.
+        """
+        text = _read_text(MODULES / "network.bicep")
+        assert "targetFqdns: acaControlPlaneFqdns" in text
+        for literal in (
+            "'mcr.microsoft.com'",
+            "'*.data.mcr.microsoft.com'",
+            "'login.microsoft.com'",
+            "'packages.microsoft.com'",
+            "'acs-mirror.azureedge.net'",
+        ):
+            for path in _bicep_files():
+                assert literal not in _read_text(path), f"{path.name} hard-codes {literal}"
+        assert "environment().resourceManager" in text
+        assert "environment().authentication.loginEndpoint" in text
+        assert "param acaPlatformFqdns array\n" in _read_text(MAIN_TEMPLATE)
+        assert "acaPlatformFqdns: acaPlatformFqdns" in _read_text(MAIN_TEMPLATE)
+
+    def test_the_config_digest_is_required_and_runtime_checked(self):
+        """B-02. No deployment can silently invent or omit a role digest."""
+        text = _read_text(MODULES / "workload.bicep")
+        main = _read_text(MAIN_TEMPLATE)
+        assert "param roleConfigDigests object" in text
+        assert "param roleConfigDigests object" in main
+        assert "param roleConfigDigests object =" not in text
+        assert "param roleConfigDigests object =" not in main
+        assert "roleConfigDigests[role.role]" in text
+        assert "JSPACE_CONFIG_DIGEST" in text
+
+    def test_the_digest_protocol_names_every_static_runtime_binding(self, role_matrix):
+        assert tuple(role_matrix["config_digest_fields"]) == (
+            "container",
+            "image_digest",
+            "prefix",
+            "private_endpoint",
+            "role",
+            "schema_ids",
+            "schema_registry_digest",
+            "uami_name",
+        )
+
+    def test_each_identity_name_and_client_id_come_from_one_azure_resource(self):
+        """B-03. The name/GUID pair is derived, not supplied as two assertions."""
+        text = _read_text(MODULES / "workload.bicep")
+        assert "name: role.uami_name" in text
+        assert "'${identities[index].id}': {}" in text
+        assert "{ name: 'JSPACE_UAMI_NAME', value: role.uami_name }" in text
+        assert (
+            "{ name: 'AZURE_CLIENT_ID', value: identities[index].properties.clientId }"
+            in text
+        )
+        assert "param roleIdentityClientIds" not in text
+
+    def test_every_job_carries_the_environment_its_preflight_requires(self):
+        """The container's checks are only real if the container is given the
+        facts to check. A missing variable would make the preflight refuse, so
+        this control keeps the template and the code from drifting apart."""
+        text = _read_text(MODULES / "workload.bicep")
+        for name in entrypoints.PREFLIGHT_ENVIRONMENT_NAMES:
+            assert f"name: '{name}'" in text, f"workload.bicep never sets {name}"
+
     def test_egress_decisions_are_logged(self):
         text = _read_text(MODULES / "observability.bicep")
         assert "diagnosticSettings" in text
@@ -435,6 +582,67 @@ class TestTheBoundaryDeclaresItsSecurityProperties:
             lowered = line.lower()
             for forbidden in ("case", "label", "verdict", "content", "text", "blob"):
                 assert forbidden not in lowered
+
+
+class TestTheTemplateControlsReadDeclarationsNotCommentary:
+    """B-07. A control that reads raw text is satisfiable by a comment.
+
+    These are tests of the test harness, and they exist because the audit
+    finding was not that any particular template lied but that every control in
+    this module *could* have been satisfied by one. A guard that can be
+    satisfied by prose is not evidence about infrastructure.
+    """
+
+    def test_a_required_string_appearing_only_in_a_comment_is_not_counted(self):
+        for template in (
+            "// publicNetworkAccessForIngestion: 'Disabled'\n",
+            "/* publicNetworkAccessForIngestion: 'Disabled' */\n",
+        ):
+            assert "publicNetworkAccessForIngestion: 'Disabled'" not in _strip_comments(
+                template
+            )
+
+    def test_a_prohibited_string_cannot_be_hidden_inside_a_comment(self):
+        hidden = "param x string // publicNetworkAccess: 'Enabled'\n"
+        stripped = _strip_comments(hidden)
+        assert "publicNetworkAccess: 'Enabled'" not in stripped
+        assert "param x string" in stripped
+
+    def test_a_prohibited_string_outside_a_comment_still_survives(self):
+        """The stripper must not be able to pass a control by deleting the
+        thing the control is looking for."""
+        live = "/* explanatory */\nproperties: { publicNetworkAccess: 'Enabled' }\n"
+        assert "publicNetworkAccess: 'Enabled'" in _strip_comments(live)
+
+    def test_stripping_does_not_truncate_a_url_or_a_resource_id(self):
+        """``//`` inside a quoted string is not a comment. A naive ``//.*``
+        substitution silently shortens every https:// and every resource id,
+        which would make prohibition controls pass for the wrong reason."""
+        line = "var host = 'https://example.invalid/path'\n"
+        assert _strip_comments(line).strip() == line.strip()
+        resource = "linkedResourceId: '/subscriptions/x//resourceGroups/y'\n"
+        assert "resourceGroups/y" in _strip_comments(resource)
+
+    def test_every_template_still_has_content_after_stripping(self):
+        for path in _bicep_files():
+            stripped = _read_text(path)
+            assert any(token in stripped for token in ("resource ", "module ", "param "))
+            assert len(stripped.strip()) > 0
+
+    def test_the_controls_do_not_read_the_raw_file(self):
+        """The raw reader exists only for this class. If a control elsewhere
+        started using it, the substring guarantee would quietly disappear."""
+        source = Path(__file__).read_text(encoding="utf-8")
+        body = source.split("class TestTheTemplateControlsReadDeclarationsNotCommentary")[0]
+        assert body.count("_read_raw_text(") == 1, "only the helper definition is allowed"
+
+    def test_the_stripped_and_raw_reads_actually_differ(self):
+        """If they were identical the whole mechanism would be inert, and this
+        module would be back to the state the audit refused."""
+        differing = [
+            path for path in _bicep_files() if _read_text(path) != _read_raw_text(path)
+        ]
+        assert differing, "no template contains commentary; the stripper proves nothing"
 
 
 class TestTheGpuChoiceIsEvidenceBacked:
