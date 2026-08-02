@@ -100,6 +100,34 @@ generation has been run**, so CL-05 stays `preliminary` on the strength of
 Phase 1.0C alone; this note records a frozen design, not a result. The sample
 exhausts the bank — see `L-43`.
 
+**2026-08-02 — the frozen protocol was corrected once and refrozen; the hash
+above is superseded.** The single bounded preregistration methods review
+authorized by the controlling authority was spent on this protocol before any
+generation existed, and it found four material defects, the most consequential
+being that the arbitration rule escalated a reviewer disagreement to a third
+adjudication that no code path could supply. Left uncorrected, a routine
+disagreement would have failed a cell gate for a mechanical reason and that
+failure would have been reported as `HEADROOM_NOT_ESTABLISHED`. The consolidated
+correction moved the protocol SHA-256 from `fd52f2d5…` to
+`25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8` and the
+arbitration rule from `phase1_0d_arbitration_v1` to `phase1_0d_arbitration_v2`.
+The item selection was not touched: `task_ids_sha256` is unchanged at
+`0d3fe6ad…`, so the preregistered sample is the same sample. The record is
+`docs/audits/phase1_0d_preregistration_review.md`. Still no generation has been
+run and CL-05 remains `preliminary` on Phase 1.0C alone.
+
+**2026-08-02 — a Phase 1.0D pass cannot by itself mean retained competence.**
+The review's strongest uncorrected point is recorded as `L-45`: the design has no
+corrupted-prompt or prompt-echo control, so a correct strict-arm answer is
+equally consistent with surface recoverability from the prompt as with reasoning
+performed without a visible chain of thought. Adding an arm after the freeze is
+exactly the manoeuvre preregistration exists to prevent, so the control was not
+bolted on. The consequence is binding on this claim: a Phase 1.0D cell that
+passes its gate establishes measurable observable-answer headroom under the
+strict rendering and nothing more. `L-46` further records that the structural
+arm is rendered from a hand-specified template rather than pinned tokenizer chat
+metadata, and `L-47` that any resulting RQ2 pilot is a selected-case pilot.
+
 ---
 
 ## CL-06 — Parser-v3 correction of parser-v2 failure modes

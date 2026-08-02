@@ -938,3 +938,62 @@ The remedy is cheap and now standard here: the runner prints
 only if the output contains both the test summary and that sentinel. Any
 automation that reports success without reporting work should be assumed to have
 done none.
+## Spending one review allowance on two reviewers (2026-08-02)
+
+The controlling authority allows exactly one bounded preregistration methods
+review and exactly one consolidated correction before any scientific output
+exists. It says one review; it does not say one reviewer. Two independent
+reviewers were run in parallel on identical scope, with a calibration that
+forced each finding into FATAL, MATERIAL or NONFATAL and required a file and a
+line for every claim.
+
+The corroboration is what makes the outcome usable. Both reviewers independently
+identified the same primary defect — arbitration escalating to a third
+adjudication that no code path could supply — from different directions. A
+single reviewer reporting it would have been a suggestion to weigh; two
+independent reviewers converging on it is close to a proof that the defect is
+real and visible, and it was then confirmed directly in the code.
+
+The asymmetry justifies the cost. A review costs minutes. A missed
+preregistration defect costs an entire GPU round and yields a number that cannot
+be interpreted, because the failure mode it produces — a cell gate failing for a
+mechanical reason — is indistinguishable in the artifact from the scientific
+result HEADROOM_NOT_ESTABLISHED.
+
+Three practices kept the review from becoming a second design cycle. Findings
+were corrected once, together, as a single change. Findings that would have
+required changing the preregistered sample or design were recorded as
+limitations (L-45, L-46, L-47) rather than fixed, because bolting a
+control onto a frozen design after review is the manoeuvre preregistration
+exists to prevent. And one finding was neither fixed nor merely recorded but
+**checked**: the claim that a format exemplar could leak an answer was a
+checkable fact, so all 450 bank items were checked, zero matched, the exemplar
+was kept, and a test now fails if a registered answer ever equals it.
+
+The review allowance is per protocol, not per session. The allowance for the
+J-lens validity protocol is explicitly unspent, because that protocol does not
+exist yet and a review cannot be performed on something unwritten.
+
+## A ledger nobody validates is not a record (2026-08-02)
+
+Registering results in the paper ledgers exposed that no test in the repository
+had ever read those CSVs. A structural test was added — column count, identifier
+presence and uniqueness, mandatory limitations, declared privacy status — and it
+failed immediately on committed history rather than on the new rows: five rows
+across the figure and table registries carried unquoted commas in their trailing
+`limitations` field, so a 9-column header was followed by 10- and 11-column
+rows.
+
+The diagnosis matters more than the repair. The overflow was tail-only in every
+case, provable because the identifier still matched its pattern, `status`
+still read `available` and `generation_script` still named a `.py` file —
+none of which could survive a shift in a leading field. So no recorded value had
+moved onto a wrong header and the repair altered no text. What had actually been
+corrupted was the statement of what those five exhibits do **not** establish:
+any consumer reading the registry positionally would have read a truncated
+limitation. A disclosure silently losing its second half is the failure mode
+these ledgers exist to prevent.
+
+The general rule now applied here: a file that carries scientific meaning gets a
+test the day it starts carrying it, and the first run of that test should be
+expected to fail on history.
