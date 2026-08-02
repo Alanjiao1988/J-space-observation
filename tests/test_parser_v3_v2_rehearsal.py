@@ -131,15 +131,14 @@ def _bindings(**overrides: Any) -> dict[str, Any]:
             "stage_p_entrypoint": "jspace_observation.parser_v3_v2_evaluation:run_stage_p",
             "stage_p_command": ["python", "-m", "stage_p"],
             "stage_p_identity": "uami-stage-p",
-            "stage_p_read_classes": ["locked_inputs", "final_contract", "policy"],
+            "stage_p_read_classes": ["sealed_v2_inputs", "frozen_parser_assets"],
             "stage_e_entrypoint": "jspace_observation.parser_v3_v2_evaluation:run_stage_e",
             "stage_e_command": ["python", "-m", "stage_e"],
             "stage_e_identity": "uami-stage-e",
             "stage_e_read_classes": [
-                "scoring_labels",
                 "sealed_predictions",
+                "scoring_labels",
                 "policy",
-                "set_facts",
                 "final_contract",
             ],
             "prediction_member_layout": "one object per case plus a terminal manifest",
@@ -300,7 +299,7 @@ class TestStagePCannotReachLabels:
 
     def test_a_stage_p_scope_that_requests_labels_is_refused(self) -> None:
         bindings = _bindings(
-            stage_p_read_classes=["locked_inputs", "scoring_labels"]
+            stage_p_read_classes=["sealed_v2_inputs", "scoring_labels"]
         )
         lock, digest = evaluation.create_preregistration_lock(bindings=bindings)
         with pytest.raises(lifecycle.LifecycleError):
