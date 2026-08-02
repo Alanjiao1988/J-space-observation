@@ -86,3 +86,5 @@ docs/phase1_2h_r1_job_execution_inventory.json text eol=lf
 docs/phase1_2h_execution_access_ledger.json text eol=lf
 docs/prompts/phase1_2h_r2_to_1_2j_cloud_execution_prompt.md text eol=lf
 docs/phase1_2h_r2_acr_baseline_receipt.json text eol=lf
+src/jspace_observation/parser_v3_v2_lifecycle.py text eol=lf
+tests/test_parser_v3_v2_lifecycle.py text eol=lf
