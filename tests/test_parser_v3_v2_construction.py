@@ -11,9 +11,16 @@ this repository is a check bound to something other than the thing that runs.
 from __future__ import annotations
 
 import random
+import sys
+from pathlib import Path
 from typing import Any
 
 import pytest
+
+ROOT = Path(__file__).resolve().parent.parent
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 
 from jspace_observation import parser_v3_v2_construction as construction
 from jspace_observation.parser_v3_v2_construction import (

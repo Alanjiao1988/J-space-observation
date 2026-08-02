@@ -18,6 +18,11 @@ from pathlib import Path
 
 import pytest
 
+ROOT = Path(__file__).resolve().parent.parent
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
 from jspace_observation import parser_v3_v2_lifecycle as lifecycle
 from jspace_observation.parser_v3_v2_lifecycle import LifecycleError
 
