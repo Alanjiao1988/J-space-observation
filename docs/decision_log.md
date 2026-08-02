@@ -2334,3 +2334,54 @@ Rationale:
 Evidence: `docs/phase1_0d_protocol_snapshot.json`;
 `src/jspace_observation/phase1_0d_confirmation.py`;
 ACR runs `cm44`, `cm45`, `cm46`, `cm47`.
+## D-2026-08-02-04 - Spend the single preregistration review, correct once, then refreeze
+
+Authority section 7 allows exactly one bounded preregistration methods review
+and exactly one consolidated correction before any scientific output exists.
+This decision spends both.
+
+Two independent reviewers were used rather than one. Section 7 requires one
+review; it does not forbid corroboration, and the cost of a missed defect here
+is an entire GPU round producing an uninterpretable result. The corroboration
+paid for itself immediately: both reviewers independently identified the missing
+third-adjudication path, which is the difference between a cell that fails
+because the model failed and a cell that fails because the code could not record
+a human decision.
+
+Four MATERIAL findings were corrected together, as a single consolidated change:
+the third adjudication, true per-stratum sampling, strict-arm no-CoT compliance
+in the gate, and a closed reviewer form with a committed ingestion path.
+
+Three findings were deliberately NOT corrected, and this is the part that needs
+justification rather than assertion.
+
+- T-06 asks for a corrupted-prompt and prompt-echo control. It is right that
+  without one, a correct strict answer is consistent with surface recoverability
+  rather than retained competence. Adding an arm after the freeze would change
+  the preregistered sample and design, which is exactly the manoeuvre
+  preregistration exists to prevent. Recorded as L-45. Any claim that a Phase
+  1.0D cell shows retained competence must discharge it with a prospectively
+  registered control, not with an argument.
+- T-04 asks the structural arm to be rendered from pinned chat-template
+  metadata. That requires the tokenizer at plan time, coupling protocol
+  construction to a downloaded model artifact and making the frozen protocol
+  depend on something the laptop is forbidden to fetch. Recorded as L-46, with
+  the requirement that a generation run record the actual input token sequence.
+- T-01 asks that the RQ2 pilot be recorded as a selected-case pilot. That is a
+  disclosure, not a repair, and it is recorded as L-47.
+
+L-03 was neither corrected nor merely recorded. The claim was that the visible
+arm's format exemplar `42` would leak if a registered answer were `42`. That is
+a checkable fact, so it was checked: zero of 450 bank items have that answer. The
+exemplar was kept, because a concrete value is precisely the remedy for the
+Phase 1.0C defect where the model echoed the format instead of writing a value,
+and an impossible exemplar would teach the format less well. A test now fails if
+any registered answer ever equals the exemplar.
+
+The section 7 allowance for the J-lens validity protocol of sections 5 and 6 is
+NOT spent. That protocol does not exist yet, and a review cannot be performed on
+something unwritten. It must be exercised when that protocol is frozen.
+
+The protocol is refrozen at `protocol_sha256`
+`25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8`. No further
+preregistration review of the Phase 1.0D protocol is authorized.

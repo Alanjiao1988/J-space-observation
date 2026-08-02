@@ -1016,3 +1016,63 @@ The bound can only err toward being too generous with budget, never too tight,
 so it cannot silently truncate an answer. What it does not do is tell us how
 much of the 32-token budget the model actually needs, so a strict-arm truncation
 in Phase 1.0D must be investigated rather than assumed impossible.
+## L-45 - Phase 1.0D registers no prompt-corruption or prompt-echo control
+
+The Phase 1.0D design runs each item's clean question in three arms. It does not
+run the candidate bank's registered clean/corrupted pair, and it registers no
+prompt-echo control.
+
+The consequence is specific: a correct strict-no-CoT answer is consistent with
+retained task competence *and* with an answer that was recoverable from prompt
+surface form without solving the task. Phase 1.0D cannot separate those two.
+
+Two things bound the damage but do not remove it. The prompt carries the
+question only, never the registered answer, and every rendered prompt is
+asserted free of the literal answer placeholder before inference. The gate also
+caps strict-arm accuracy at 18 of 20 rather than rewarding a ceiling, so a pure
+surface-recovery artifact that solved every item would fail the gate rather than
+pass it.
+
+This limitation was raised in the section 7 preregistration review as T-06. It
+was recorded rather than repaired because adding a corrupted-prompt arm would
+change the preregistered sample and design after the freeze. Any RQ2 pilot built
+on a Phase 1.0D cell inherits it, and any claim that a cell demonstrates
+retained competence under suppression must first discharge it with a
+prospectively registered corruption control.
+
+## L-46 - The structural no-CoT arm is a string-level prefill
+
+`STRUCTURAL_NO_COT_ARM` is registered as an empty-think prefill, and the planner
+renders it with `construct_empty_think_prefill_prompt`, which builds the prefill
+as prompt text. The utility itself notes that a real generation path should use
+the chat-template metadata renderer so that the prefill is applied at the
+tokenizer level.
+
+So the arm is a prompt-text manipulation that imitates a structural
+intervention. It is a fair experimental arm and it is registered honestly, but a
+difference between the structural and spontaneous arms cannot be attributed to
+tokenizer-level structural suppression on this evidence.
+
+Raised as T-06's companion finding T-04 in the section 7 preregistration review.
+It was recorded rather than repaired because rendering from pinned chat-template
+metadata requires the tokenizer at plan time, which would couple protocol
+construction to a downloaded model artifact. A Phase 1.0D generation run must
+record the actual input token sequence so the gap can be measured afterwards
+rather than argued about.
+
+## L-47 - The RQ2 pilot is a selected-case pilot, not independent confirmation
+
+Phase 1.0D consumes all 300 non-calibration bank items, including the 150
+labelled `mechanistic`. The section 8 RQ2 pilot therefore draws its cases from
+the behaviourally successful strict-no-CoT rows of the selected Phase 1.0D
+cells.
+
+That is a defensible design for a first bounded pilot, but it means the pilot
+inherits both the cell selection and the correctness selection of Phase 1.0D.
+Any RQ2 result is conditioned on those choices and is not out-of-sample
+confirmation. Independent replication requires a new prospectively specified
+public batch generated without reference to any model or lens output.
+
+Raised as T-01 in the section 7 preregistration review; this entry is the
+explicit selected-case-pilot record that finding asked for. L-43 records the
+bank-exhaustion fact; this entry records what it costs the pilot.

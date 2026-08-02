@@ -4168,3 +4168,58 @@ Not established: nothing was generated, so no accuracy, no headroom, and no
 capability statement exists. The next scientific gate is the Phase 1.0D
 generation run itself, which needs GPU capacity that this work package did not
 provision.
+## 2026-08-02 - Phase 1.0D preregistration review and the single consolidated correction
+
+The one bounded preregistration review of authority section 7 was performed
+against the frozen protocol at commit `b07b90dba5b8b15a17516ba32a8c0be5f6cfa0af`
+by two independent reviewers, before any Phase 1.0D generation existed. Neither
+returned a FATAL finding. Four MATERIAL findings were corrected once; four
+NONFATAL findings were recorded as L-45, L-46, L-47 and an enforced test guard.
+The full record is `docs/audits/phase1_0d_preregistration_review.md`.
+
+Both reviewers independently found the same primary defect: the arbitration rule
+escalated a reviewer disagreement to a third adjudication that no code path
+could ever supply, so a single routine disagreement permanently failed a cell
+gate for a mechanical reason.
+
+Azure runs, all ACR Tasks, `linux/amd64`, `python:3.11-bookworm`, dependency
+closure `requirements.lock.txt`, source cloned from a git bundle so the build
+agent checks out the exact commit itself:
+
+| Run | Commit | Purpose | Result |
+| --- | --- | --- | --- |
+| `cm48` | `847d8a54` | Phase 1.0D execution pipeline, targeted | 25 passed |
+| `cm49` | `b07b90db` | Cell-coverage reporting made a computed fact | 26 passed |
+| `cm4a` | `b07b90db` | Full suite before the correction | 2971 passed, 15 skipped, 2 pre-existing failures |
+| `cm4b` | `fa863d07` | Registry test path, mistyped | failed, no such test file |
+| `cm4c` | `24464c3f` | Corrected protocol, targeted | 65 passed, 1 failed as designed |
+| `cm4d` | `24464c3f` | Snapshot emit, body only | successful |
+| `cm4e` | `95db5eb3` | Snapshot emit with disclosures | successful |
+| `cm4f` | `4caafa96` | Snapshot emit naming its own run | successful |
+| `cm4g` | `8c76b6ec` | Corrected protocol, targeted | 66 passed |
+| `cm4h` | `8c76b6ec` | Corrected execution pipeline, targeted | 33 passed |
+
+`cm4c` is the useful failure. The committed protocol snapshot carries a test
+asserting it equals the recomputed protocol, so changing the protocol broke it
+immediately and by name rather than leaving a stale preregistration in `docs/`.
+That is the behaviour the self-verifying artifact was added for.
+
+`cm4d` exposed a real defect in this operator's method rather than in the
+repository. The emit script printed only the protocol body, and writing that
+transcript over `docs/phase1_0d_protocol_snapshot.json` destroyed the
+hand-authored wrapper carrying the authority binding, the consequences, and the
+`not_established` disclosures. The fix was not to restore the wrapper by hand.
+`PROTOCOL_CONSEQUENCES` and `PROTOCOL_NOT_ESTABLISHED` now live in the protocol
+module and the emit script prints the whole artifact, so no part of a scientific
+artifact is hand-authored and the disclosures cannot drift from the code they
+describe. `cm4f` additionally reads `ACR_RUN_ID` from the task environment, so
+the transcript names the run that produced it instead of being annotated
+afterwards.
+
+The correction moved `protocol_sha256` from `fd52f2d5...` to `25e96401...` and
+the arbitration rule from `phase1_0d_arbitration_v1` to
+`phase1_0d_arbitration_v2`. The item selection was untouched:
+`task_ids_sha256` is still
+`0d3fe6add211a381a321ea974502d262faf65312dc504e2acceb7c6556b1f524`.
+
+All scientific counters remain zero. No Phase 1.0D generation has been run.
