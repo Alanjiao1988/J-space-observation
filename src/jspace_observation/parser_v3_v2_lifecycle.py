@@ -310,10 +310,41 @@ BOUND_SCHEMA_IDS: tuple[str, ...] = (
 )
 
 #: Azure-derived SHA-256 of each bound schema document.
-BOUND_SCHEMA_DIGESTS: Mapping[str, str] = {}
+#:
+#: Produced by ACR run cm2p from commit 71e13c9d, by importing the registry and
+#: printing ``SCHEMA_DIGESTS``. Editing any schema byte changes the value here
+#: and ``assert_schema_binding`` refuses until the change is bound on purpose.
+BOUND_SCHEMA_DIGESTS: Mapping[str, str] = {
+    "phase1-parser-v3-v2-access-event/v1": "a58c13c958275a395da214c87bf7df2f52ee0c2cfb55f914e95b403faaeb2bcd",
+    "phase1-parser-v3-v2-admission-record/v1": "9d5c02d5ff2e03f1508779222cad30862f94cbe47f6e674c1d7625fdace2e6b0",
+    "phase1-parser-v3-v2-arbitration-result/v1": "64bca5c9b3c0b331559c8ed6372e16c9daccb2a6097edc05d2641e8ac1bdc222",
+    "phase1-parser-v3-v2-authenticated-listing-projection/v1": "a0cd23e32984e541fa330a4d1cca1051e4aef7ea2760bb6171964bf4a4e1ae00",
+    "phase1-parser-v3-v2-blinded-case-packet/v1": "0e9d27e0b395357497ee4a450d3c7dd47cad08eb7a459ce81552a4ae921b8452",
+    "phase1-parser-v3-v2-construction-plan/v1": "8ef4c849f33e95d48e8be6c1233377bf740cb5c1389caa0d8624f4c08a79f9c2",
+    "phase1-parser-v3-v2-deployment-evidence/v1": "c130fdd660bd135f76dc0d0b44027a0057f38eedb5e0144804601cd991ba8262",
+    "phase1-parser-v3-v2-disagreement-packet/v1": "d70f1c1ef02c354d5819ceb9a01690c9d5be2e2c1639a0adbdb729bb46fbb8ba",
+    "phase1-parser-v3-v2-final-contract-receipt/v1": "c527c61ce96f1f63c0d3c9c1a6bc9de2e7b40e4b04f7b52e90c9fbc55cd1fdc0",
+    "phase1-parser-v3-v2-listing-witness-receipt/v1": "a23652dbca2c4491cafa021252ec7b15ea55a0d6ad9d4d2340baf63a5335e62b",
+    "phase1-parser-v3-v2-planned-seal-members/v1": "c8565701db6267e5d3af9aff1c6fd43f20ed99aed32e6154b80bb6e8861c2e9a",
+    "phase1-parser-v3-v2-prediction-manifest/v1": "f7147e815a645d8cfe097725b21e6d5cc8306beea199906e3f0cf90e7d04ee8a",
+    "phase1-parser-v3-v2-prediction-member/v1": "ec685d585f46bbe7e10219f8ee1821349a5a71088963fbabfa48a95937e0a158",
+    "phase1-parser-v3-v2-prediction-receipt/v1": "47da75d0ca9bc5c16b760e95c64724a8bdeb14c27ab9505c7064e0b9ef53ed5a",
+    "phase1-parser-v3-v2-preregistration-lock/v1": "9455edbb400221001a2ae6c211867992fed18daf97d0205ab94a2de264d573aa",
+    "phase1-parser-v3-v2-public-receipt/v1": "6d2b5b5c20d67d00eaa2f560b23c9223bf813ce276a02f12baf0c8ca9e2678bd",
+    "phase1-parser-v3-v2-quarantine-record/v1": "4ee5ed220605c6a7b8d9a456b52ec957bcd8f662aee7f2efe84df1f3eacb8159",
+    "phase1-parser-v3-v2-replacement-record/v1": "3b2a8593619e7ecc0442ee9c28fa1e006499189a693f84ae78da9bcb19649436",
+    "phase1-parser-v3-v2-reviewer-decision/v1": "c5013b5073e3df957c6ecd8790fecd17c38be543c09578ae778bd307f8b81c58",
+    "phase1-parser-v3-v2-runtime-canary-result/v1": "82c98628751a74268acfa658330d1f4b5d59075ffd5f38a569a489795788428f",
+    "phase1-parser-v3-v2-set-facts-projection/v1": "b38ac7395a81e4a49474b246b10521ccf450a40e3c3608cfeac35a2d6bb59a53",
+    "phase1-parser-v3-v2-stage-e-result/v1": "447675e2ae677cfe1cd37b53de987fef7a67d012e5ceaf7a4fc31a881b949728",
+    "phase1-parser-v3-v2-terminal-manifest/v1": "a05b1c0f82670d0a0fcd5e89e3c1ace2dca41ecfa5cd07fdb0c102a856c2c0ce",
+    "phase1-parser-v3-v2-terminal-state-receipt/v1": "1c6d68676d7822526c979d4cff686f13f52501fab4d3e6c689cfb330d594af2e",
+}
 
 #: Azure-derived SHA-256 over the whole digest table.
-BOUND_SCHEMA_REGISTRY_DIGEST: str = ""
+BOUND_SCHEMA_REGISTRY_DIGEST: str = (
+    "211b1b28f6f26ab7f4bc891892357947a97597b3c61f4f064154da4501c4193b"
+)
 
 
 def assert_schema_binding(
