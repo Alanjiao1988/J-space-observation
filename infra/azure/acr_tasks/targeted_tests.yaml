@@ -1,0 +1,6 @@
+# ACR Tasks definition for bounded, exact-commit test runs.
+# Uploaded as a standalone context with repo.bundle and targeted_tests.sh.
+version: v1.1.0
+steps:
+  - cmd: python:3.11-bookworm bash /workspace/targeted_tests.sh {{.Values.COMMIT}} {{.Values.TESTS}}
+    timeout: 2400

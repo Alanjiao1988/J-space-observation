@@ -2246,3 +2246,43 @@ validated protocol.
 evaluator, so every final label from Phase 1.0D onward is LLM operational
 consensus with no locked bound on its error rate. That ceiling is recorded as
 `L-41` rather than left implicit.
+
+## 2026-08-02 — Treat Phase 1.0C as defective in generation profile, not in conclusion
+
+Decision:
+
+- The Phase 1.0C `COMPLETE_INCONCLUSIVE` result stands. Phase 1.0D repairs the
+  generation profile and re-runs on a disjoint confirmation split; it does not
+  re-score, re-label, or reinterpret a single Phase 1.0C record.
+- Two defects are registered, both recomputed from the committed pack rather
+  than asserted:
+  - `P10C-D1` literal answer placeholder — all 300 prompts carried the literal
+    line `Final answer: <answer>`; 31 outputs echoed the placeholder and 5
+    echoed the whole line.
+  - `P10C-D2` generation token cap — all 300 records ran at
+    `max_new_tokens=512`; 79 of the 225 reviewed rows reached the cap.
+- Single-cause attribution is refused. Over the 44 unresolved rows the two
+  defects partition as 38 token-cap only, 4 both, 1 placeholder only, 1 neither.
+  Neither defect alone explains the outcome, so Phase 1.0C must not be recorded
+  as a GPU-budget failure and must not be recorded as a prompt-template failure.
+
+Rationale:
+
+- The authority's §4.1 numbers were stated, not derived. A repair protocol built
+  on unverified numbers would inherit their risk. Recomputing them costs one
+  bounded Azure run and converts the repair premise into evidence.
+- The 1 unresolved row explained by neither defect is retained deliberately. It
+  is the standing reminder that the defect list is a lower bound on what went
+  wrong, and Phase 1.0D must be able to fail for reasons not on this list.
+
+Consequences for Phase 1.0D:
+
+- No condition may contain the literal placeholder, and every rendered prompt is
+  asserted free of it before any inference is submitted.
+- Per-condition token budgets are registered before inference: at least 1024 new
+  tokens for the visible-reasoning control, and for the strict conditions a
+  budget large enough for the registered answer but too small to permit visible
+  reasoning.
+
+Evidence: `docs/phase1_0c_generation_profile_defects.json`;
+ACR run `cm3y` at commit `8333ccaefb0955d892aef18a6df4d4bc3bfe0aae`.

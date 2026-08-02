@@ -315,3 +315,11 @@ def test_the_receipt_carries_no_prompt_or_output_text(audit):
     serialized = json.dumps(build_defect_receipt(audit))
     assert "prompt_text" not in serialized
     assert "output_text" not in serialized
+
+
+def test_the_committed_artifact_matches_the_recomputed_receipt(audit):
+    artifact_path = REPO_ROOT / "docs" / "phase1_0c_generation_profile_defects.json"
+    artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+    assert artifact["receipt"] == build_defect_receipt(audit)
+    assert artifact["provenance"]["executed_in"] == "azure_container_registry_tasks"
+    assert artifact["what_this_does_not_establish"]

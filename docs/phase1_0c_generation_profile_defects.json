@@ -1,0 +1,93 @@
+{
+  "artifact": "phase1_0c_generation_profile_defects",
+  "schema_version": "phase1_0c_generation_profile_defects.v1",
+  "work_package": "S1",
+  "authority": {
+    "prompt": "docs/prompts/phase_science_restart_after_parser_closure_prompt.md",
+    "prompt_sha256": "5bc137c42c68e1b85b4cad1d45e1b4bf54fb68e2899f27bc6338dae61e9ef162",
+    "section": "4.1"
+  },
+  "provenance": {
+    "executed_in": "azure_container_registry_tasks",
+    "registry": "acrjspaceobssea0708231738",
+    "run_id": "cm3y",
+    "platform": "linux/amd64",
+    "base_image": "python:3.11-bookworm",
+    "python_version": "3.11.15",
+    "dependency_closure": "requirements.lock.txt",
+    "bound_commit": "8333ccaefb0955d892aef18a6df4d4bc3bfe0aae",
+    "bound_tree": "03835f211de4ac9666448e23d6b226071817c66b",
+    "dirty_files": 0,
+    "targeted_tests": "tests/test_phase1_0c_defect_audit.py",
+    "targeted_test_result": "24 passed",
+    "producer": "src/jspace_observation/phase1_0c_defect_audit.py",
+    "prior_failed_run": {
+      "run_id": "cm3x",
+      "bound_commit": "2925318327fdb4b68e3e28b9bfa9e0f156aa15c1",
+      "result": "23 passed, 1 failed",
+      "cause": "the mutation control mutated record 0, which already contained the literal placeholder, so the mutation changed no count",
+      "resolution": "the control now mutates the first record whose output lacks the placeholder; no audit logic and no authority fact was changed"
+    }
+  },
+  "receipt": {
+    "authority_expected": {
+      "outputs_containing_format_line_placeholder_form": 5,
+      "outputs_containing_literal_placeholder": 31,
+      "prompts_with_literal_format_line": 300,
+      "record_count": 300,
+      "reviewed_row_count": 225,
+      "reviewed_rows_at_token_cap": 79,
+      "unresolved_row_count": 44
+    },
+    "authority_facts_reproduced": true,
+    "authority_mismatches": {},
+    "defects": [
+      {
+        "id": "P10C-D1",
+        "name": "literal_answer_placeholder",
+        "phase_1_0d_remedy": "No Phase 1.0D condition may contain the literal placeholder, and every rendered prompt is asserted free of it before inference.",
+        "statement": "Every Phase 1.0C prompt carried the literal format line 'Final answer: <answer>', so a model copying the format emits the placeholder instead of a value."
+      },
+      {
+        "id": "P10C-D2",
+        "name": "generation_token_cap",
+        "phase_1_0d_remedy": "Per-condition budgets are registered before inference: the visible-reasoning control gets at least 1024 new tokens, and the strict conditions get a budget sufficient for the registered answer but too small to permit visible reasoning.",
+        "statement": "Every Phase 1.0C condition ran at max_new_tokens=512, so a row that reaches the cap has no final-answer surface to read."
+      }
+    ],
+    "historical_status_preserved": "COMPLETE_INCONCLUSIVE",
+    "interpretation": "Both defects are real and neither alone accounts for every unresolved row. The Phase 1.0C INCONCLUSIVE outcome is therefore not a GPU-budget failure and must not be attributed to one cause.",
+    "recomputed": {
+      "conditions": [
+        "r1_style_thinking",
+        "visible_cot"
+      ],
+      "outputs_containing_format_line_placeholder_form": 5,
+      "outputs_containing_literal_placeholder": 31,
+      "prompts_with_literal_format_line": 300,
+      "record_count": 300,
+      "registered_max_new_tokens": 512,
+      "reviewed_row_count": 225,
+      "reviewed_rows_at_token_cap": 79,
+      "run_id": "20260725T170041Z",
+      "token_cap_flag_disagreements": 0,
+      "unresolved_by_defect": {
+        "both": 4,
+        "neither": 1,
+        "placeholder_only": 1,
+        "token_cap_only": 38
+      },
+      "unresolved_row_count": 44
+    },
+    "schema_version": "phase1_0c_generation_profile_defects.v1",
+    "single_cause_attribution_refuted": true,
+    "source_pack": "artifacts/phase1-headroom-calibration/track-b/20260725T170041Z",
+    "source_records": "artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/02_records.jsonl"
+  },
+  "what_this_does_not_establish": [
+    "It does not establish that repairing the two defects will change the Phase 1.0C conclusion. Phase 1.0D is a fresh confirmation run whose outcome is unknown.",
+    "It does not establish behavioural headroom, and it does not license any claim about a no-CoT capability gap.",
+    "It does not re-open, re-score, or re-label a single Phase 1.0C record. The 20260725T170041Z pack and its COMPLETE_INCONCLUSIVE status are unchanged.",
+    "It does not identify the cause of the 38 token-cap-only unresolved rows beyond the cap itself; a longer budget may or may not produce a readable final answer."
+  ]
+}

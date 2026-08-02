@@ -4042,3 +4042,52 @@ closure record so that any later drift is detectable.
 **Next scientific gate.** Work package S1: reproduce the Phase 1.0C
 generation-profile defect facts from committed artifacts, then freeze the Phase
 1.0D protocol before any target-model inference.
+
+## 2026-08-02 — Phase 1.0C generation-profile defect audit (S1)
+
+Action:
+
+- Recomputed the controlling prompt's §4.1 factual claims about Phase 1.0C run
+  `20260725T170041Z` directly from the committed record pack, instead of
+  restating them.
+
+Azure execution (no analysis ran on the laptop):
+
+- ACR Tasks multi-step run `cm3y` on `acrjspaceobssea0708231738`,
+  platform `linux/amd64`, base image `python:3.11-bookworm` (Python 3.11.15),
+  dependency closure `requirements.lock.txt`.
+- Bound commit `8333ccaefb0955d892aef18a6df4d4bc3bfe0aae`,
+  tree `03835f211de4ac9666448e23d6b226071817c66b`, DIRTY=0.
+- `tests/test_phase1_0c_defect_audit.py`: 24 passed.
+- The immediately preceding run `cm3x` failed 1 of 24. The failure was in a
+  synthetic mutation control, not in the audit: it mutated record 0, which
+  already contained the literal placeholder, so the mutation changed no count.
+  Fixed by mutating the first record whose output lacks the placeholder. No
+  audit logic and no authority fact was altered.
+
+Result — every §4.1 fact reproduces exactly:
+
+| Fact | Authority | Recomputed |
+| --- | --- | --- |
+| Records | 300 | 300 |
+| Prompts carrying the literal `Final answer: <answer>` line | 300 | 300 |
+| Outputs containing the literal `<answer>` | 31 | 31 |
+| Outputs echoing the whole format line | 5 | 5 |
+| Rows flagged for review | 225 | 225 |
+| Reviewed rows at the 512-token cap | 79 | 79 |
+| Semantically unresolved rows | 44 | 44 |
+
+New fact not stated by the authority — the joint partition of the 44 unresolved
+rows over the two defects: 38 token-cap only, 4 both, 1 placeholder only,
+1 neither. Placeholder alone therefore accounts for 5 of 44 and the token cap
+alone for 42 of 44, so no single cause explains the Phase 1.0C outcome. The
+recorded `evaluation.truncated` flag agreed with the recomputed token count on
+all 300 rows (0 disagreements).
+
+Artifact: `docs/phase1_0c_generation_profile_defects.json`.
+
+Not established: this says nothing about whether repairing the defects changes
+the Phase 1.0C conclusion, and it licenses no headroom claim. Phase 1.0C keeps
+its `COMPLETE_INCONCLUSIVE` status and not one record was re-scored.
+
+Next expected run: the Phase 1.0D confirmation protocol (S1 continued).
