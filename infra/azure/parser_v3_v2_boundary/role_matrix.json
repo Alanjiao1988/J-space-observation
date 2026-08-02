@@ -1,0 +1,427 @@
+{
+  "schema_version": "phase1-parser-v3-v2-role-matrix/v1",
+  "container_entrypoint_path": "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+  "roles": [
+    {
+      "role": "arbiter",
+      "entrypoint": "arbiter",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "arbiter"
+      ],
+      "uami_name": "uami-jspace-arbiter",
+      "container": "v2-arbitration",
+      "prefix": "arbitration/records/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-disagreement-packet/v1",
+        "phase1-parser-v3-v2-arbitration-result/v1"
+      ],
+      "reads": [
+        "disagreement_packets"
+      ],
+      "writes": [
+        "arbitration_records"
+      ],
+      "read_containers": [
+        "v2-review"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "broker",
+      "entrypoint": "broker",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "broker"
+      ],
+      "uami_name": "uami-jspace-broker",
+      "container": "v2-review",
+      "prefix": "review/disagreements/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-reviewer-decision/v1",
+        "phase1-parser-v3-v2-disagreement-packet/v1"
+      ],
+      "reads": [
+        "reviewer_a_decisions",
+        "reviewer_b_decisions"
+      ],
+      "writes": [
+        "disagreements"
+      ],
+      "read_containers": [
+        "v2-review"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "facts_compiler",
+      "entrypoint": "facts-compiler",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "facts-compiler"
+      ],
+      "uami_name": "uami-jspace-facts-compiler",
+      "container": "v2-facts",
+      "prefix": "facts/set/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-admission-record/v1",
+        "phase1-parser-v3-v2-set-facts-projection/v1"
+      ],
+      "reads": [
+        "final_candidate"
+      ],
+      "writes": [
+        "set_facts"
+      ],
+      "read_containers": [
+        "v2-selection"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "normalizer",
+      "entrypoint": "normalizer",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "normalizer"
+      ],
+      "uami_name": "uami-jspace-normalizer",
+      "container": "v2-private-staging",
+      "prefix": "staging/normalized/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-admission-record/v1"
+      ],
+      "reads": [
+        "v2_private_staging"
+      ],
+      "writes": [
+        "normalized_candidates"
+      ],
+      "read_containers": [
+        "v2-private-staging"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "prediction_sealer",
+      "entrypoint": "prediction-sealer",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "prediction-sealer"
+      ],
+      "uami_name": "uami-jspace-prediction-sealer",
+      "container": "v2-predictions",
+      "prefix": "predictions/manifest/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-prediction-manifest/v1",
+        "phase1-parser-v3-v2-prediction-receipt/v1"
+      ],
+      "reads": [
+        "prediction_members"
+      ],
+      "writes": [
+        "prediction_manifest",
+        "prediction_witness"
+      ],
+      "read_containers": [
+        "v2-predictions"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "preregistration_compiler",
+      "entrypoint": "preregistration-compiler",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "preregistration-compiler"
+      ],
+      "uami_name": "uami-jspace-preregistration-compiler",
+      "container": "v2-preregistration",
+      "prefix": "preregistration/lock/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-preregistration-lock/v1"
+      ],
+      "reads": [
+        "set_facts",
+        "listing_witness",
+        "final_contract",
+        "policy"
+      ],
+      "writes": [
+
+        "preregistration_lock"
+      ],
+      "read_containers": [
+        "v2-facts",
+        "v2-policy",
+        "v2-sealed"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "private_set_auditor",
+      "entrypoint": "private-set-auditor",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "private-set-auditor"
+      ],
+      "uami_name": "uami-jspace-private-set-auditor",
+      "container": "v2-audit",
+      "prefix": "audit/findings/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-admission-record/v1"
+      ],
+      "reads": [
+        "final_candidate",
+        "provenance"
+      ],
+      "writes": [
+        "audit_findings"
+      ],
+      "read_containers": [
+        "v2-selection"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "receipt_exporter",
+      "entrypoint": "receipt-exporter",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "receipt-exporter"
+      ],
+      "uami_name": "uami-jspace-receipt-exporter",
+      "container": "v2-public-receipts",
+      "prefix": "public/receipts/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-public-receipt/v1",
+        "phase1-parser-v3-v2-terminal-state-receipt/v1"
+      ],
+      "reads": [
+        "content_free_receipts"
+      ],
+      "writes": [
+        "public_projection"
+      ],
+      "read_containers": [
+        "v2-receipts"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "reviewer_a",
+      "entrypoint": "reviewer-a",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "reviewer-a"
+      ],
+      "uami_name": "uami-jspace-reviewer-a",
+      "container": "v2-review",
+      "prefix": "review/a/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-blinded-case-packet/v1",
+        "phase1-parser-v3-v2-reviewer-decision/v1"
+      ],
+      "reads": [
+        "blinded_case_packets"
+      ],
+      "writes": [
+        "reviewer_a_decisions"
+      ],
+      "read_containers": [
+        "v2-review"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "reviewer_b",
+      "entrypoint": "reviewer-b",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "reviewer-b"
+      ],
+      "uami_name": "uami-jspace-reviewer-b",
+      "container": "v2-review",
+      "prefix": "review/b/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-blinded-case-packet/v1",
+        "phase1-parser-v3-v2-reviewer-decision/v1"
+      ],
+      "reads": [
+        "blinded_case_packets"
+      ],
+      "writes": [
+        "reviewer_b_decisions"
+      ],
+      "read_containers": [
+        "v2-review"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "seal_custodian",
+      "entrypoint": "seal-custodian",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "seal-custodian"
+      ],
+      "uami_name": "uami-jspace-seal-custodian",
+      "container": "v2-sealed",
+      "prefix": "sealed/v2/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-construction-plan/v1",
+        "phase1-parser-v3-v2-planned-seal-members/v1",
+        "phase1-parser-v3-v2-terminal-manifest/v1",
+        "phase1-parser-v3-v2-authenticated-listing-projection/v1",
+        "phase1-parser-v3-v2-listing-witness-receipt/v1",
+        "phase1-parser-v3-v2-final-contract-receipt/v1"
+      ],
+      "reads": [
+        "finalized_immutable_bytes",
+        "seal_plan"
+      ],
+      "writes": [
+        "v2_sealed_namespace",
+        "listing_witness"
+      ],
+      "read_containers": [
+        "v2-facts",
+        "v2-selection"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "selector",
+      "entrypoint": "selector",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "selector"
+      ],
+      "uami_name": "uami-jspace-selector",
+      "container": "v2-selection",
+      "prefix": "selection/final-candidate/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-admission-record/v1",
+        "phase1-parser-v3-v2-quarantine-record/v1",
+        "phase1-parser-v3-v2-replacement-record/v1"
+      ],
+      "reads": [
+        "normalized_candidates",
+        "reviewer_a_decisions",
+        "reviewer_b_decisions",
+        "arbitration_records"
+      ],
+      "writes": [
+        "final_candidate",
+        "quarantine_records",
+        "replacement_records"
+      ],
+      "read_containers": [
+        "v2-arbitration",
+        "v2-private-staging",
+        "v2-review"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "source_custodian",
+      "entrypoint": "source-custodian",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "source-custodian"
+      ],
+      "uami_name": "uami-jspace-source-custodian",
+      "container": "v2-private-staging",
+      "prefix": "staging/source/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-admission-record/v1"
+      ],
+      "reads": [
+        "retired_v1_source"
+      ],
+      "writes": [
+        "v2_private_staging"
+      ],
+      "read_containers": [
+        "v1-retired-source"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "stage_e",
+      "entrypoint": "stage-e",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "stage-e"
+      ],
+      "uami_name": "uami-jspace-stage-e",
+      "container": "v2-formal-result",
+      "prefix": "formal-result/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-prediction-receipt/v1",
+        "phase1-parser-v3-v2-stage-e-result/v1"
+      ],
+      "reads": [
+        "sealed_predictions",
+        "scoring_labels",
+        "policy",
+        "final_contract"
+      ],
+      "writes": [
+        "formal_result"
+      ],
+      "read_containers": [
+        "v2-labels",
+        "v2-policy",
+        "v2-predictions"
+      ],
+      "parser_free": true
+    },
+    {
+      "role": "stage_p",
+      "entrypoint": "stage-p",
+      "command": [
+        "python",
+        "/app/src/jspace_observation/parser_v3_v2_entrypoints.py",
+        "stage-p"
+      ],
+      "uami_name": "uami-jspace-stage-p",
+      "container": "v2-predictions",
+      "prefix": "predictions/members/",
+      "schema_ids": [
+        "phase1-parser-v3-v2-prediction-member/v1",
+        "phase1-parser-v3-v2-prediction-manifest/v1"
+      ],
+      "reads": [
+        "sealed_v2_inputs",
+        "frozen_parser_assets"
+      ],
+      "writes": [
+        "prediction_namespace"
+      ],
+      "read_containers": [
+        "v2-parser-assets",
+        "v2-sealed"
+      ],
+      "parser_free": false
+    }
+  ],
+  "registered_endpoints": [
+    "acrjspaceruntime.privatelink.azurecr.io",
+    "stjspacefiles0709085305.privatelink.blob.core.windows.net"
+  ]
+}

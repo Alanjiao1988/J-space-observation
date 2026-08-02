@@ -27,7 +27,8 @@ param vnetId string
 param privateStorageAccountName string
 param privateStorageResourceGroup string
 
-var runtimeRegistryName = replace('${namePrefix}runtimeacr', '-', '')
+@description('Runtime registry name, derived in main.bicep from the endpoint allowlist in code.')
+param runtimeRegistryName string
 
 resource runtimeRegistry 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' = {
   name: runtimeRegistryName
@@ -62,7 +63,7 @@ resource acrDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
 }
 
 resource blobDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'privatelink.blob.core.windows.net'
+  name: 'privatelink.blob.${environment().suffixes.storage}'
   location: 'global'
   tags: tags
 }

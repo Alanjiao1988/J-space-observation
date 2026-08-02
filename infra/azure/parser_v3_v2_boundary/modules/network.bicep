@@ -35,6 +35,13 @@ var vnetName = '${namePrefix}-vnet'
 var workloadSubnetName = 'snet-aca-boundary'
 var privateEndpointSubnetName = 'snet-pe-boundary'
 
+// Cloud-specific hosts are derived rather than typed, so the same template is
+// correct in a sovereign cloud and so a reader cannot mistake a hard-coded
+// string for a deliberate choice about which cloud this runs in.
+var resourceManagerHost = replace(replace(environment().resourceManager, 'https://', ''), '/', '')
+var loginHost = replace(replace(environment().authentication.loginEndpoint, 'https://', ''), '/', '')
+var storageSuffix = environment().suffixes.storage
+
 resource workloadNsg 'Microsoft.Network/networkSecurityGroups@2023-11-01' = {
   name: '${namePrefix}-nsg-aca'
   location: location
@@ -157,10 +164,10 @@ resource platformRules 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@
             targetFqdns: [
               'mcr.microsoft.com'
               '*.data.mcr.microsoft.com'
-              'management.azure.com'
+              resourceManagerHost
               'login.microsoft.com'
-              'login.microsoftonline.com'
-              '*.blob.core.windows.net'
+              loginHost
+              '*.blob.${storageSuffix}'
               'packages.microsoft.com'
               'acs-mirror.azureedge.net'
             ]
