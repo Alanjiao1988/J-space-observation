@@ -57,6 +57,15 @@ def test_every_evidence_row_states_what_it_does_not_establish():
         assert row[limitations].strip(), f"{row[identifier]} records no limitations"
 
 
+@pytest.mark.parametrize("name", ("figure_registry.csv", "table_registry.csv"))
+def test_every_registered_exhibit_states_what_it_does_not_establish(name):
+    header, rows = _rows(name)
+    limitations = header.index("limitations")
+    identifier = header.index("figure_or_table_id")
+    for row in rows:
+        assert row[limitations].strip(), f"{row[identifier]} records no limitations"
+
+
 def test_every_registered_artifact_declares_its_privacy_status():
     header, rows = _rows("artifact_index.csv")
     column = header.index("contains_private_data")
