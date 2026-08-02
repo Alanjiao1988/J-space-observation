@@ -4091,3 +4091,24 @@ the Phase 1.0C conclusion, and it licenses no headroom claim. Phase 1.0C keeps
 its `COMPLETE_INCONCLUSIVE` status and not one record was re-scored.
 
 Next expected run: the Phase 1.0D confirmation protocol (S1 continued).
+
+Confirmation of the committed artifact:
+
+- ACR run `cm43` at commit `f9e1c7f789804dd9fd501de935d0b5765e78f8f4`,
+  25 passed, including a test asserting that the committed
+  `docs/phase1_0c_generation_profile_defects.json` equals the receipt
+  recomputed from the pack. The artifact is therefore self-verifying and will
+  fail the suite if the pack or the audit ever drifts from it.
+
+Method defect found and fixed during this work (recorded because it would have
+silently manufactured evidence):
+
+- Runs `cm40`, `cm41`, and `cm42` used an ACR task context whose shell script had
+  been flattened to a single line by a PowerShell pipeline write. Everything
+  after the shebang became a comment, so the container executed nothing.
+  `cm42` reported **success in 21 seconds with no test output at all**.
+- A passing ACR run is therefore not evidence by itself. The runner now prints
+  `TARGETED_TESTS_COMPLETE=1` as its last line, and a run without both the
+  pytest summary and that sentinel is to be treated as no evidence.
+- The task YAML must also keep `version:` as its first line. With a leading
+  comment, ACR either runs zero steps (`cm40`) or fails to deserialize (`cm41`).
