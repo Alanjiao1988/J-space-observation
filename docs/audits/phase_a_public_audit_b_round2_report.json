@@ -1,0 +1,215 @@
+{
+  "api_shape": "responses",
+  "audit_id": "B",
+  "backend": "azure-openai",
+  "candidate_commit": "423d16a7b486b8c22fa58a733ffa6a03b389f0fe",
+  "candidate_tree": "3080241e68dc007e91f49967beebbd80ff1d4ec6",
+  "deployment": "audit-luna",
+  "frame_sha256": "37a9d36b792bec4707b15b16864f71dc41acf5ca715fdc8557d00efb9ee48f75",
+  "harness_warnings": [],
+  "material": [
+    {
+      "bytes": 60285,
+      "path": "src/jspace_observation/parser_v3_v2_entrypoints.py",
+      "sha256": "83c90493fbc4f755f84a475efb88ed8a4593738a9e45853ed90ee6482c2b6ae7"
+    },
+    {
+      "bytes": 55095,
+      "path": "src/jspace_observation/parser_v3_v2_schemas.py",
+      "sha256": "8594a4256e873b262173e922a2b09d764cf2997a1c4832c78aec91294115c175"
+    },
+    {
+      "bytes": 29379,
+      "path": "tests/test_parser_v3_v2_boundary_iac.py",
+      "sha256": "b4e4ed962f1db532bc7aa98c308ec2e44e691132374f7333b9550a00595c0015"
+    },
+    {
+      "bytes": 11208,
+      "path": "infra/azure/parser_v3_v2_boundary/main.bicep",
+      "sha256": "4bbd621f8b3aa509a9ce51003cbe277000d002be2fff9c48722553bd4b66aae5"
+    },
+    {
+      "bytes": 9903,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/network.bicep",
+      "sha256": "445c9b9ec544a43193d202690aeff145115e9cbb0a33ea43cab34f5a49c97fc3"
+    },
+    {
+      "bytes": 7342,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/privatelink.bicep",
+      "sha256": "96a4786c7960c785a60dbb48d7a2fdffa6269bc84b1550954d15e7aed8b16244"
+    },
+    {
+      "bytes": 3247,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/storage_access.bicep",
+      "sha256": "d7e3054e63434a66935500d26cf67bdd3fa7aad186515065693323f5e78dc12d"
+    },
+    {
+      "bytes": 6481,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/workload.bicep",
+      "sha256": "019762b069d8e42baa20a90f56a286b0fb35f59da542d17e1bf278b2b22589f3"
+    },
+    {
+      "bytes": 1956,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/assert_no_overlap.bicep",
+      "sha256": "18cf52ef09b3b0ceb927041b3e4c29fa8bc633362fae6946901279994b728350"
+    },
+    {
+      "bytes": 5304,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/observability.bicep",
+      "sha256": "e5492855e8cae158c766490078499699b37f29402f1b785ed8f1daafca554b97"
+    },
+    {
+      "bytes": 11379,
+      "path": "infra/azure/parser_v3_v2_boundary/role_matrix.json",
+      "sha256": "3717bf12e46b66241fd87dcfa1da27d2246ce1efd28082cf5c30f2bd8feb8b69"
+    },
+    {
+      "bytes": 4773,
+      "path": "infra/azure/parser_v3_v2_boundary/address_plan.json",
+      "sha256": "f66cd06536976ee343df3973cf135d264a8f1af5f6be7d0ba4f80a75e3844b27"
+    },
+    {
+      "bytes": 1310,
+      "path": ".dockerignore",
+      "sha256": "340ce490931ed8a243eac59ef6b4b671e53c51054b928aabfc20820988d75a83"
+    },
+    {
+      "bytes": 6572,
+      "path": ".gitattributes",
+      "sha256": "596715617a63d75775d8a7a11cabf21865eb594afe6546210419beecf51e0e75"
+    }
+  ],
+  "material_digest": "3e06aee6b4428f24be7874f95991efa23886f3d7db002ae279e46cb54d0ec34b",
+  "model": "gpt-5.6-luna",
+  "report": {
+    "audit_id": "B",
+    "candidate_commit": "423d16a7b486b8c22fa58a733ffa6a03b389f0fe",
+    "findings": [
+      {
+        "area": "schemas",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_schemas.py: PREDICTION_MANIFEST defines \"members\": {\"type\": \"array\", \"items\": {\"$ref\": PREDICTION_MEMBER}, \"minItems\": 0, \"maxItems\": 120} with no \"uniqueItems\" or identifier-uniqueness constraint. PREDICTION_MEMBER defines \"case_id\": _CASE_ID. The validator implements only whole-item uniqueness via `if schema.get(\"uniqueItems\"):` and has no keyed-ID uniqueness rule.",
+        "id": "B-01",
+        "reproduction": "Validate a prediction manifest containing two distinct member objects with the same `case_id` and different `position`, `source_digest`, `prediction`, or `member_digest`. Both members satisfy PREDICTION_MEMBER and the enclosing array has no uniqueness constraint keyed on `case_id`, so the duplicate identifier is accepted.",
+        "residual_limitation": "After adding and enforcing identifier-level uniqueness, the material still would not prove uniqueness constraints for identifier-bearing arrays not covered by the fix.",
+        "severity": "BLOCKER",
+        "title": "Identifier-bearing schema arrays accept duplicate IDs"
+      },
+      {
+        "area": "iac",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "infra/azure/parser_v3_v2_boundary/modules/privatelink.bicep: `resource existingStorage 'Microsoft.Storage/storageAccounts@2023-05-01' existing = { ... }` only references the account and declares no `publicNetworkAccess: 'Disabled'`, network rules, or equivalent assertion. The same file's comment says `The existing Basic registry ...` and `The private Blob account already exists and already has public network access disabled`, but that state is not enforced by this template. infra/azure/parser_v3_v2_boundary/main.bicep passes the existing account into the private endpoint module without any public-access check.",
+        "id": "B-02",
+        "reproduction": "Deploy this template against an existing storage account whose public network access is enabled. The Bicep declares the account as `existing`, creates a private endpoint, and does not refuse or update the public-access setting. The account can therefore remain reachable through its public endpoint while holding private material.",
+        "residual_limitation": "Even after adding the template control, public accessibility would still require Azure read-back evidence to establish the deployed state.",
+        "severity": "MAJOR",
+        "title": "Existing private storage is not mechanically configured or checked as private"
+      }
+    ],
+    "material_digest": "3e06aee6b4428f24be7874f95991efa23886f3d7db002ae279e46cb54d0ec34b",
+    "overall_verdict": "NOT_READY_FOR_FREEZE",
+    "properties_checked": [
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py provides the registry and resolver, but the supplied material does not include all protocol call sites or container build/runtime wiring proving that no alternate path reaches a protocol step.",
+        "property": "Every protocol step is reachable only through a registered container entrypoint.",
+        "verdict": "UNVERIFIABLE"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `assert_container_command_is_registered` resolves the exact command and raises when `spec.role != role`; `resolve_entrypoint` requires exact tuple equality. tests/test_parser_v3_v2_boundary_iac.py: `test_a_command_that_is_not_registered_is_refused`.",
+        "property": "A container command naming a different role than the role being run is refused.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `resolve_entrypoint` compares the complete command tuple and raises `EntrypointError`; `preflight` raises for names not in `ENTRYPOINTS`; `main` requires exactly one argument.",
+        "property": "An unregistered entrypoint name, a module-form command, or an extra argument is refused rather than ignored.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `_guarded` calls `assert_config_registered`, `assert_identity`, `assert_no_ambient_credentials`, `assert_lanes`, and `assert_import_isolation` before `_PreflightComplete` or payload validation.",
+        "property": "Each entrypoint asserts configuration, identity, absence of ambient credentials, storage lanes, and import isolation before doing work.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `assert_identity` raises when `AZURE_CLIENT_ID` is absent and when it differs from `config.uami_client_id`; infra/azure/parser_v3_v2_boundary/modules/workload.bicep assigns each job `identity: { type: 'UserAssigned', ... }`.",
+        "property": "A role holding no managed identity is refused.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_schemas.py: `_obj` sets `\"additionalProperties\": False`; `_assert_closed` raises when an object schema lacks `additionalProperties` and recursively checks object properties and array items.",
+        "property": "Every object boundary in the schema registry sets additionalProperties to false.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_schemas.py: `_sid` creates `/v1` identifiers, `_register` writes `$id`, `SCHEMA_DIGESTS` computes every schema digest, and `REGISTRY_DIGEST` binds the complete digest map. src/jspace_observation/parser_v3_v2_entrypoints.py: `assert_config_registered` requires `schema_registry_digest == schemas.REGISTRY_DIGEST`.",
+        "property": "Every registered schema carries an explicit version and a bound digest.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "Unknown fields and wrong versions are rejected by src/jspace_observation/parser_v3_v2_schemas.py, but duplicate identifier values are not. `PREDICTION_MANIFEST.members` has no `uniqueItems`, and `PREDICTION_MEMBER.case_id` is not checked for uniqueness. See finding B-01.",
+        "property": "Schema validation rejects unknown fields, wrong versions, duplicate IDs, and partial sets.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py calls `schemas.assert_valid` through `_validate_each`, but the supplied material does not include the contents of tests/test_parser_v3_v2_schemas.py or all production/test validator call paths.",
+        "property": "Production entrypoints call the same validators the tests exercise, not a simplified replica.",
+        "verdict": "UNVERIFIABLE"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `_IMAGE_DIGEST` requires `sha256:` image digests; `assert_config_registered` recomputes `compute_config_digest` and compares the schema registry digest. infra/azure/parser_v3_v2_boundary/modules/workload.bicep: image is formed as `${runtimeRegistryLoginServer}/...@${roleImageDigests[role.role]}`.",
+        "property": "The runtime is bound by image digest, config digest, and schema digest rather than by mutable name or tag.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "infra/azure/parser_v3_v2_boundary/main.bicep and modules/workload.bicep declare `param roleImageDigests object` without defaults and index it for every role, but no Bicep compilation or deployment result is supplied to prove the platform's behavior for missing or extra keys.",
+        "property": "roleImageDigests has no default and an incomplete map cannot deploy.",
+        "verdict": "UNVERIFIABLE"
+      },
+      {
+        "evidence": "infra/azure/parser_v3_v2_boundary/main.bicep passes `any(length(conflictingPrefixes))` to the gate and makes resources depend on `addressPlanGate`; modules/assert_no_overlap.bicep declares `@minValue(0)`, `@maxValue(0)`, and `param conflictingPrefixCount int`.",
+        "property": "The Bicep template refuses an overlapping address prefix rather than warning.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "infra/azure/parser_v3_v2_boundary/modules/privatelink.bicep references the private Blob account as `resource existingStorage ... existing` but does not declare or validate `publicNetworkAccess: 'Disabled'`. The only support is the comment `The private Blob account already exists and already has public network access disabled`, which is not enforcement. See finding B-02.",
+        "property": "Public network access is disabled on every resource that holds or transits private material.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "infra/azure/parser_v3_v2_boundary/main.bicep custom role dataActions include read, write, and `blobs/add/action`, while `notDataActions: []` and no delete action is present. tests/test_parser_v3_v2_boundary_iac.py asserts `blobs/delete` is absent.",
+        "property": "The role matrix grants no delete permission where create-only is claimed.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "infra/azure/parser_v3_v2_boundary/modules/network.bicep derives `resourceManagerHost` and `loginHost` from `environment()` and takes ACA hosts through required parameter `acaPlatformFqdns`; tests/test_parser_v3_v2_boundary_iac.py checks prohibited platform literals are absent.",
+        "property": "The Bicep template contains no hardcoded environment URLs.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "The material names `requirements.lock.txt` in comments and .gitattributes, but does not provide its contents or any Azure build/install script proving that the pinned closure is installed.",
+        "property": "The dependency closure is pinned and the pinned closure is what Azure installs.",
+        "verdict": "UNVERIFIABLE"
+      },
+      {
+        "evidence": "tests/test_parser_v3_v2_boundary_iac.py routes template checks through `_read_text`, which calls `_strip_comments`; the test class explicitly checks required and prohibited strings inside comments are removed before assertions.",
+        "property": "Text-substring controls over source files cannot be satisfied or defeated by a comment.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "Only tests/test_parser_v3_v2_boundary_iac.py is supplied. The complete prior test suite and repository diff are not available, so weakening, removal, skipping, or xfail changes elsewhere cannot be established.",
+        "property": "No existing test is weakened, removed, skipped, or xfailed by the material under audit.",
+        "verdict": "UNVERIFIABLE"
+      }
+    ],
+    "summary": "The entrypoint registry and command matrix are substantially bound and fail-closed, and the schema registry is closed at object boundaries. I found two material defects: schemas do not enforce uniqueness of identifier-bearing records, and the Bicep does not configure or verify public-network disablement for the existing private storage account. Several deployment and dependency claims cannot be settled from the supplied public material because the lock contents, installation command, and Azure read-back are absent.",
+    "unverifiable_without_private_material": [
+      "Azure read-back of public network access and private endpoint enforcement for the existing storage account.",
+      "The dependency lock contents and the exact dependency installation performed by Azure.",
+      "Complete test-suite history and whether any existing tests were removed, skipped, weakened, or xfailed.",
+      "Runtime behavior of Bicep deployments for incomplete or malformed roleImageDigests maps."
+    ]
+  },
+  "runner": "azure-container-registry-task",
+  "schema_version": "phase1-parser-v3-v2-public-audit/v1",
+  "scope_path": "docs/audits/phase_a_public_audit_scope_b.md",
+  "scope_sha256": "1808197d949d2a6cb96483fe6d26506052369a0695aef265e96a2d9d5e166bae"
+}

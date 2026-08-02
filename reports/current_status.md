@@ -1,5 +1,28 @@
 # Project Status Report
 
+> **Phase 1.2H-R2 manual status — 2026-08-02**
+>
+> **Terminal state:** `BLOCKED_ON_PUBLIC_PROTOCOL_FREEZE`.
+>
+> The exact remediated public candidate was commit
+> `423d16a7b486b8c22fa58a733ffa6a03b389f0fe`, tree
+> `3080241e68dc007e91f49967beebbd80ff1d4ec6`. ACR runs `cm3q` and `cm3u`
+> passed the new targeted controls, compiled all boundary Bicep, and reproduced
+> the full-suite baseline with 2873 passed, 15 skipped, and only the two
+> disclosed pre-existing failures.
+>
+> The second and final permitted independent audit cycle (`cm3v`/`cm3w`)
+> nevertheless returned four verified BLOCKER findings and one verified MAJOR
+> finding. The controlling prompt therefore forbids another remediation/audit
+> cycle in this round. Phase A is not frozen; Phase B and every private-semantic
+> operation are unauthorized. No private semantic or label read, prediction,
+> construction, seal, preregistration, Stage P, Stage E, formal evaluation, or
+> private-boundary deployment occurred. The exact evidence is bound in
+> `docs/phase1_2h_r2_phase_a_public_audit_terminal_receipt.json`.
+>
+> The status below is retained as historical context and predates this terminal
+> record.
+
 > **Phase 1.2H-R1 status (this round):** the cloud-first private-source access
 > restoration round terminated **`BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY`**. Phase
 > 1.2H had read `publicNetworkAccess = Disabled` as "unreachable"; the correct

@@ -1,0 +1,163 @@
+{
+  "schema_version": "phase1_2h_r2_phase_a_public_audit_terminal_receipt.v1",
+  "recorded_at_utc": "2026-08-02T14:05:41Z",
+  "authority": {
+    "path": "docs/prompts/phase_a3_b_to_d_cloud_execution_prompt.md",
+    "section": "5.4",
+    "maximum_audit_remediation_cycles": 2
+  },
+  "candidate": {
+    "commit": "423d16a7b486b8c22fa58a733ffa6a03b389f0fe",
+    "tree": "3080241e68dc007e91f49967beebbd80ff1d4ec6",
+    "subject": "Close Phase A public audit findings"
+  },
+  "exact_candidate_validation": {
+    "targeted_run": {
+      "acr_run_id": "cm3q",
+      "tests_passed": 463,
+      "boundary_bicep_compilation": "PASS"
+    },
+    "full_run": {
+      "acr_run_id": "cm3u",
+      "tests_passed": 2873,
+      "tests_skipped": 15,
+      "pre_existing_failures": 2,
+      "new_failures": 0,
+      "boundary_bicep_compilation": "PASS",
+      "checkout_root": "/tmp/src"
+    }
+  },
+  "audit_cycles": [
+    {
+      "cycle": 1,
+      "candidate_commit": "1b9916a9cd6f0559d36b026a5b3bb7ca45441896",
+      "candidate_tree": "401e03837715f74b9bf78477e712777ce449168c",
+      "reports": [
+        {
+          "audit_id": "A",
+          "path": "docs/audits/phase_a_public_audit_a_report.json",
+          "sha256": "bc9ec0e3db9640fd200cc786adb787e8c5c3657c763b7299c139c4f109a5871d",
+          "findings": {
+            "BLOCKER": [
+              "A-01",
+              "A-02",
+              "A-03",
+              "A-04",
+              "A-05"
+            ],
+            "MAJOR": []
+          },
+          "overall_verdict": "NOT_READY_FOR_FREEZE"
+        },
+        {
+          "audit_id": "B",
+          "path": "docs/audits/phase_a_public_audit_b_report.json",
+          "sha256": "2b55670c7c59ee74ab1351246f0450b64fa68becd5c0ad59c7e1c638bba4f3ef",
+          "findings": {
+            "BLOCKER": [
+              "B-01",
+              "B-04"
+            ],
+            "MAJOR": [
+              "B-02",
+              "B-03",
+              "B-05",
+              "B-06",
+              "B-07"
+            ]
+          },
+          "overall_verdict": "NOT_READY_FOR_FREEZE"
+        }
+      ],
+      "disposition": "REMEDIATED_AND_REVALIDATED"
+    },
+    {
+      "cycle": 2,
+      "candidate_commit": "423d16a7b486b8c22fa58a733ffa6a03b389f0fe",
+      "candidate_tree": "3080241e68dc007e91f49967beebbd80ff1d4ec6",
+      "reports": [
+        {
+          "audit_id": "A",
+          "acr_run_id": "cm3v",
+          "model": "gpt-5.6-terra",
+          "path": "docs/audits/phase_a_public_audit_a_round2_report.json",
+          "sha256": "f5a40d3a88f1977de6afb098b9c7109832e2b32679ef3d513018cedddec2d0f5",
+          "findings": {
+            "BLOCKER": [
+              "A-01",
+              "A-02",
+              "A-03"
+            ],
+            "MAJOR": []
+          },
+          "overall_verdict": "NOT_READY_FOR_FREEZE"
+        },
+        {
+          "audit_id": "B",
+          "acr_run_id": "cm3w",
+          "model": "gpt-5.6-luna",
+          "path": "docs/audits/phase_a_public_audit_b_round2_report.json",
+          "sha256": "4be4cf1ee04976ff69b9fc666287fd5304cd13520ae742e1acb3a9dca8b6d364",
+          "findings": {
+            "BLOCKER": [
+              "B-01"
+            ],
+            "MAJOR": [
+              "B-02"
+            ]
+          },
+          "overall_verdict": "NOT_READY_FOR_FREEZE"
+        }
+      ],
+      "disposition": "AUDIT_CYCLE_LIMIT_EXHAUSTED_WITH_MATERIAL_FINDINGS"
+    }
+  ],
+  "verified_round_2_findings": [
+    {
+      "id": "A-01",
+      "severity": "BLOCKER",
+      "title": "Stage E accepts a 120-member stream with duplicate case IDs and an omitted case"
+    },
+    {
+      "id": "A-02",
+      "severity": "BLOCKER",
+      "title": "One-shot and create-only controls trust caller-supplied nonexistence evidence"
+    },
+    {
+      "id": "A-03",
+      "severity": "BLOCKER",
+      "title": "The historical 105/15 target guard can be bypassed with unregistered target keys"
+    },
+    {
+      "id": "B-01",
+      "severity": "BLOCKER",
+      "title": "Identifier-bearing schema arrays accept duplicate IDs"
+    },
+    {
+      "id": "B-02",
+      "severity": "MAJOR",
+      "title": "Existing private storage is not mechanically configured or checked as private"
+    }
+  ],
+  "decision": {
+    "terminal_state": "BLOCKED_ON_PUBLIC_PROTOCOL_FREEZE",
+    "phase_a_frozen": false,
+    "phase_b_authorized": false,
+    "post_cycle_2_remediation_authorized": false,
+    "reason": "The second and final permitted independent audit cycle returned four BLOCKER findings and one MAJOR finding.",
+    "required_next_authority": "A separately authorized public-protocol redesign round with a new bounded audit plan."
+  },
+  "activity_after_cycle_2_audit": {
+    "protocol_code_changes": 0,
+    "private_semantic_reads": 0,
+    "private_label_reads": 0,
+    "predictions_generated": 0,
+    "sets_constructed": 0,
+    "sets_sealed": 0,
+    "preregistration_locks_created": 0,
+    "stage_p_runs": 0,
+    "stage_e_runs": 0,
+    "formal_evaluations": 0,
+    "private_boundary_deployments": 0
+  }
+}

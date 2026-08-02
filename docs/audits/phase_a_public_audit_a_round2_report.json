@@ -1,0 +1,179 @@
+{
+  "api_shape": "responses",
+  "audit_id": "A",
+  "backend": "azure-openai",
+  "candidate_commit": "423d16a7b486b8c22fa58a733ffa6a03b389f0fe",
+  "candidate_tree": "3080241e68dc007e91f49967beebbd80ff1d4ec6",
+  "deployment": "audit-terra",
+  "frame_sha256": "37a9d36b792bec4707b15b16864f71dc41acf5ca715fdc8557d00efb9ee48f75",
+  "harness_warnings": [],
+  "material": [
+    {
+      "bytes": 33219,
+      "path": "src/jspace_observation/parser_v3_v2_lifecycle.py",
+      "sha256": "ab4bb10c388d8e1f6b468dee80532cce036b9b8eb5f94a9e1c17c048b2955047"
+    },
+    {
+      "bytes": 29395,
+      "path": "src/jspace_observation/parser_v3_v2_construction.py",
+      "sha256": "fb16b8f7aa728c613e386be4d5b6297794ce8ca054859a57ddb41459b8ab97fa"
+    },
+    {
+      "bytes": 32038,
+      "path": "src/jspace_observation/parser_v3_v2_evaluation.py",
+      "sha256": "7a06d725c4b6899d30d0c7a4a4715cb04e0b36930dcf1e94f1967d3b3342a81d"
+    },
+    {
+      "bytes": 52777,
+      "path": "tests/test_parser_v3_v2_rehearsal_entrypoints.py",
+      "sha256": "e68bb274c8950eaaa847bc7047612933677cf64e7ef4c402ab55c56279d90941"
+    },
+    {
+      "bytes": 31033,
+      "path": "tests/test_parser_v3_v2_rehearsal.py",
+      "sha256": "7e1dc52c52a8b880dc05e5c196a8798eed9640ca63f5852c154a73af9e5d20a6"
+    },
+    {
+      "bytes": 9034,
+      "path": "docs/phase1_parser_v3_v2_stratum_policy.md",
+      "sha256": "26e2cbf5d0b3f53a54649224dd78ac4ea2c3b9c1dce2b644e38aff37af6a798d"
+    },
+    {
+      "bytes": 9723,
+      "path": "docs/phase1_2h_independent_set_repair_protocol.md",
+      "sha256": "58938558e5f1cf017afaffa7c09d2a978f8aa131a6ab892b27a15d5fd9c30bc3"
+    }
+  ],
+  "material_digest": "728fa12cf774d83a23f667aeea387b547ba3d21a876b6c1557a77b92be947cb2",
+  "model": "gpt-5.6-terra",
+  "report": {
+    "audit_id": "A",
+    "candidate_commit": "423d16a7b486b8c22fa58a733ffa6a03b389f0fe",
+    "findings": [
+      {
+        "area": "stage-e",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py, run_stage_e: `if len(sealed_members) != expected:` checks only list length; `sealed_case_id_set = {member[\"case_id\"] for member in sealed_members}` converts the members to a set; and `missing = sorted(sealed_case_id_set - set(labels))` / `extra = sorted(set(labels) - sealed_case_id_set)` compare labels only to that deduplicated set. The loop then increments `eligible += 1` once per list member. No uniqueness check of `member[\"case_id\"]` or validation of the receipt's `listing_witness_digest` occurs in run_stage_e. By contrast, src/jspace_observation/parser_v3_v2_lifecycle.py, assert_prediction_stream_complete contains the required duplicate check: `if duplicates: raise LifecycleError(...)`.",
+        "id": "A-01",
+        "reproduction": "Start with a valid rehearsal stream. Replace its last member with a deep copy of member 0, leaving `len(members) == 120`; remove the omitted last case's label; set `receipt[\"member_count\"] = 120`, set `receipt[\"stream_digest\"] = canonical_digest(members)`, and recompute `receipt[\"receipt_digest\"]` exactly as run_stage_e does. Invoke run_stage_e with `existing_result_digests=()`. The deduplicated case-ID set has 119 IDs and exactly matches the 119 labels; the loop nevertheless scores the duplicated case twice, increments `eligible` to 120, and can return PASS.",
+        "residual_limitation": "Even after Stage E verifies unique IDs, exact membership, and the listing witness, assurance that the receipt and member bytes came from immutable storage still depends on the external sealing and storage boundary.",
+        "severity": "BLOCKER",
+        "title": "Stage E accepts a 120-member stream with duplicate case IDs and an omitted case"
+      },
+      {
+        "area": "lifecycle",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py, create_preregistration_lock enforces prior existence only through `if existing_lock_digest is not None:`. seal_prediction_stream forwards the caller value through `lifecycle.assert_create_only_plan(existing_objects=existing_objects, ...)`. run_stage_e likewise begins `already = sorted({digest for digest in existing_result_digests})` and refuses only under `if already:`. None of these functions records an object, reads an authoritative object listing, or changes persistent ordinal state. src/jspace_observation/parser_v3_v2_lifecycle.py, next_ordinal similarly derives its result solely from supplied state: `if current_ordinal != 0: raise LifecycleError(...)` followed by `return 1`. The supplied test only exercises truthful evidence: tests/test_parser_v3_v2_rehearsal.py states `existing_result_digests=[evaluation.canonical_digest(run[\"result\"])]` in `test_a_second_formal_result_is_refused`.",
+        "id": "A-02",
+        "reproduction": "Using otherwise valid lock, receipt, members, labels, and strata, call run_stage_e once with `existing_result_digests=()`. Call it again with the identical arguments and again pass `existing_result_digests=()`. The function performs no mutation on the first call and therefore returns a second formal result on the second call. Similarly, two calls to create_preregistration_lock with identical bindings and `existing_lock_digest=None`, or two calls to seal_prediction_stream with `existing_objects=()`, are both accepted.",
+        "residual_limitation": "A corrected implementation still requires an authenticated, atomic storage operation or durable ledger outside these pure functions to make existence evidence truthful under concurrent callers.",
+        "severity": "BLOCKER",
+        "title": "One-shot and create-only controls trust caller-supplied nonexistence evidence"
+      },
+      {
+        "area": "construction",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py defines `TARGET_KEY_FRAGMENTS` as only `\"target\", \"expected\", \"quota\", \"must_equal\", \"required_count\", \"repairable\", \"residual_count\"`. Its enforcement is restricted to `return any(fragment in lowered for fragment in TARGET_KEY_FRAGMENTS)` and `if under_target_key and node in historical:`. Thus a target key not containing one of those fragments never sets `under_target_key`, even where its values are precisely 105 and 15.",
+        "id": "A-03",
+        "reproduction": "Call `assert_split_is_not_a_target({\"desired_repair_count\": 105, \"desired_remaining\": 15})`. Neither key contains any registered fragment: in particular, `desired_repair_count` does not contain `repairable`, and neither key contains `target`, `expected`, `quota`, `must_equal`, `required_count`, or `residual_count`. The function returns normally despite the mapping explicitly encoding the prohibited desired 105/15 outcome.",
+        "residual_limitation": "No key-name heuristic alone can establish that arbitrary future rule structures lack a semantic target; the registered construction representation must make the relevant counts structurally closed and validate them there.",
+        "severity": "BLOCKER",
+        "title": "The historical 105/15 target guard can be bypassed with unregistered target keys"
+      }
+    ],
+    "material_digest": "728fa12cf774d83a23f667aeea387b547ba3d21a876b6c1557a77b92be947cb2",
+    "overall_verdict": "NOT_READY_FOR_FREEZE",
+    "properties_checked": [
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py refuses only nonempty caller-supplied `existing_result_digests` via `if already:`. A repeated call with `existing_result_digests=()` is accepted; no persistent ordinal or result existence is consulted.",
+        "property": "Exactly one formal evaluation ordinal exists and a second formal evaluation is refused rather than overwritten.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py does raise on `if label.get(\"eligible\") is not True`, but its `len(sealed_members)` check and deduplicating `sealed_case_id_set` permit duplicate members and omission of a unique sealed case, as documented in A-01.",
+        "property": "Stage E refuses any sealed case marked ineligible; it never skips it or shrinks the 120-case denominator.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py computes `status = \"PASS\" if all(binding_gates.values()) else \"FAIL\"` and calls `lifecycle.assert_status_is_exclusive(binding_gate_results=binding_gates, declared_status=status)`; no reported verdict is accepted as an input.",
+        "property": "Stage E recomputes PASS/FAIL from preregistered gates rather than trusting a reported verdict.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py closes supplied bindings with `missing = sorted(registered - supplied)` and `unknown = sorted(supplied - registered)`, but create-only is only `if existing_lock_digest is not None:`. Reissuing the call with `existing_lock_digest=None` is accepted because no existing lock is independently checked.",
+        "property": "The preregistration lock is create-only over a closed binding set and cannot be amended after creation.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_lifecycle.py, assert_prediction_stream_complete refuses missing predictions through `if missing: raise LifecycleError(...)`. But src/jspace_observation/parser_v3_v2_evaluation.py delegates create-only only against caller-provided `existing_objects`; repeated sealing with a falsely empty iterable is accepted.",
+        "property": "Prediction sealing is create-only and refuses an incomplete prediction stream.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py defines closed `QUARANTINE_REASONS` and assert_quarantine_reason_is_registered raises under `if reason not in QUARANTINE_REASONS:`.",
+        "property": "Quarantine reasons are drawn from a closed registered set and an unregistered reason is refused.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py, assert_replacement_batch_within_limit raises `BlockedOnSetRepair` when `batches_used >= preregistered_batch_limit`, with the message that the round is `BLOCKED_ON_SET_REPAIR` and `must not generate another batch`.",
+        "property": "Replacement is bounded and exhausting the budget raises BLOCKED_ON_SET_REPAIR rather than relaxing the set.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py deterministically iterates `AGREEMENT_FIELDS` in disagreeing_fields, but the production broker/arbiter entrypoint implementation that performs routing is not included in this audit material. Tests call an unavailable entrypoints module and cannot prove its implementation from the supplied bytes.",
+        "property": "Blinded A/B review compares only the registered agreement fields and routes to the arbiter deterministically.",
+        "verdict": "UNVERIFIABLE"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py registers `exact`, `normalized`, `numeric_normalized`, and `template_family` in COLLISION_RULES; assert_no_prohibited_collision iterates every rule and raises `within-set collision under rule {rule_name!r}`. tests/test_parser_v3_v2_rehearsal_entrypoints.py supplies pairs immune to earlier rules and asserts the corresponding named refusal.",
+        "property": "All four collision rules can independently reject a set and the reported rule name is the rule that fired.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py defines `_SLOT_TOKEN = re.compile(r\"\\S*\\d\\S*\")`; _rule_template_family masks quoted spans, placeholders, and digit-carrying tokens only. Its docstring explicitly preserves surrounding words and identifies masking every alphanumeric run as the prohibited behavior.",
+        "property": "template_family does not mask every alphanumeric segment and does not recreate the PA-03 false-positive defect.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "tests/test_parser_v3_v2_rehearsal_entrypoints.py, _prompt constructs `the {qualifier} {obj} recorded at the {subject}` from five subjects, four objects, and six qualifiers, and states that every case has its own literal frame. The analogous _prompt in tests/test_parser_v3_v2_rehearsal.py has the same construction.",
+        "property": "Rehearsal fixtures do not use \"one template plus case ID\" to defeat the registered collision rule.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py, select_deterministically calculates a content digest, rejects duplicate digests, and applies `prepared.sort(key=lambda item: (item[0], item[1]))` before selecting the first count members.",
+        "property": "Content-hash selection is order-independent.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py restricts target recognition to TARGET_KEY_FRAGMENTS and raises only when `under_target_key` is true. `{\"desired_repair_count\": 105, \"desired_remaining\": 15}` bypasses that restricted vocabulary, as shown in A-03.",
+        "property": "The construction refuses to target the historical 105/15 split.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "The material includes lane declarations and payload guards, but not the production entrypoint implementations, schemas, or storage read paths needed to establish that every role receives only checked payloads. The reviewer packet guard closes only top-level packet keys and permits arbitrary `public_ontology_packet` content.",
+        "property": "No label-bearing field reaches a role forbidden to read labels.",
+        "verdict": "UNVERIFIABLE"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_lifecycle.py declares forbidden classes and checks supplied module-name lists, but the production role/container implementations and actual process module state are not supplied. Therefore the end-to-end non-reachability claim cannot be established from these bytes.",
+        "property": "No parser-bearing field reaches a role forbidden to invoke the parser.",
+        "verdict": "UNVERIFIABLE"
+      },
+      {
+        "evidence": "The supplied material contains the candidate tests but no parent commit, diff, or historical test inventory against which removal, weakening, skip, or xfail changes can be determined.",
+        "property": "No existing test is weakened, removed, skipped, or xfailed by the material under audit.",
+        "verdict": "UNVERIFIABLE"
+      }
+    ],
+    "summary": "I checked the lifecycle, construction, evaluation, and supplied rehearsal controls. Stage E recomputes its status and rejects ordinary short streams, ineligible labels, mismatched labels, and altered receipts. However, a self-consistent receipt with duplicate members is accepted because Stage E checks only list length and set equality, permitting an effective denominator below 120. The one-shot and create-only guarantees are also caller-asserted rather than persisted: callers can supply empty existence evidence repeatedly. Finally, the historical 105/15-target guard omits ordinary target-like key names and can be bypassed. These paths permit formal results or construction rules contrary to the stated scientific protocol.",
+    "unverifiable_without_private_material": [
+      "Whether real sealed-set, prediction, lock, and result namespaces provide authenticated and atomic existence listings to the caller-supplied create-only arguments.",
+      "Whether private case content or labels contain semantic material embedded under permitted field names.",
+      "Whether deployed role processes actually contain parser or scorer modules beyond their supplied module-name lists."
+    ]
+  },
+  "runner": "azure-container-registry-task",
+  "schema_version": "phase1-parser-v3-v2-public-audit/v1",
+  "scope_path": "docs/audits/phase_a_public_audit_scope_a.md",
+  "scope_sha256": "0a32e0a4527613af450843bef3cdef5df7eb8a280b9f2ee7312016d9e81fbc6e"
+}

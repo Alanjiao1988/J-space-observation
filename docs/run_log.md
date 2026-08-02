@@ -3964,3 +3964,45 @@ transition to `REPAIR_ACCESSED` did **not** occur, because streaming bytes to a
 digest is not a repair read. The policy's threshold, gate, ontology, population,
 comparator and status blocks are byte-identical to Phase 1.2G, and
 `policy_semantics_sha256` remains `ae375481…`.
+
+---
+
+## Phase 1.2H-R2 — Phase A public protocol freeze gate
+
+**Terminal status:** `BLOCKED_ON_PUBLIC_PROTOCOL_FREEZE`.
+
+**Exact candidate.** The remediated public candidate was commit
+`423d16a7b486b8c22fa58a733ffa6a03b389f0fe`, tree
+`3080241e68dc007e91f49967beebbd80ff1d4ec6`. ACR run `cm3q` passed 463
+targeted controls and compiled the boundary Bicep. A clean exact-commit checkout
+under `/tmp/src` in run `cm3u` produced 2873 passed, 15 skipped, and only the
+two disclosed pre-existing failures; `main.bicep` and every module compiled.
+
+**Final permitted audits.** Independent Audit A (`gpt-5.6-terra`, run `cm3v`)
+returned three BLOCKER findings: duplicate Stage E case IDs can replace an
+omitted case (`A-01`), one-shot/create-only controls still trust caller-supplied
+nonexistence (`A-02`), and the historical 105/15 target guard remains a
+key-name heuristic (`A-03`). Independent Audit B (`gpt-5.6-luna`, run `cm3w`)
+returned one BLOCKER and one MAJOR: identifier-bearing schema arrays do not
+enforce keyed-ID uniqueness (`B-01`), and the existing Blob account's
+public-network-disabled state is neither configured nor mechanically checked
+by the Bicep (`B-02`).
+
+The exact reports are
+`docs/audits/phase_a_public_audit_a_round2_report.json`
+(`f5a40d3a88f1977de6afb098b9c7109832e2b32679ef3d513018cedddec2d0f5`)
+and `docs/audits/phase_a_public_audit_b_round2_report.json`
+(`4be4cf1ee04976ff69b9fc666287fd5304cd13520ae742e1acb3a9dca8b6d364`).
+The content-free terminal receipt is
+`docs/phase1_2h_r2_phase_a_public_audit_terminal_receipt.json`.
+
+**Mandatory stop.** This was audit/remediation cycle two of the maximum two
+allowed by the controlling prompt section 5.4. Because material findings remain,
+no third remediation/audit cycle is attempted, Phase A is not frozen, and Phase
+B is not authorized. A new public-protocol redesign requires separate authority
+and a new bounded audit plan.
+
+**Unchanged scientific record.** No private semantic or label read occurred, no
+prediction was generated, no set was constructed or sealed, no preregistration
+lock was created, no Stage P or Stage E run occurred, and no formal evaluation
+or private-boundary deployment took place.

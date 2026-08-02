@@ -2189,3 +2189,23 @@ identity whose minimality is the round's central safety claim, in exchange for
 two fields that are already established by operator control-plane evidence. A
 receipt that is honestly incomplete is worth more than one that is complete
 because the boundary was widened to complete it.
+
+## Phase 1.2H-R2 — stop after the second public audit cycle
+
+**Decision.** Record `BLOCKED_ON_PUBLIC_PROTOCOL_FREEZE`; do not remediate the
+second-cycle findings under the current round, do not declare a Phase A freeze,
+and do not begin Phase B or any private-semantic operation.
+
+**Why.** Section 5.4 of
+`docs/prompts/phase_a3_b_to_d_cloud_execution_prompt.md` permits at most two
+independent audit/remediation cycles. Cycle two, against exact commit
+`423d16a7b486b8c22fa58a733ffa6a03b389f0fe` and tree
+`3080241e68dc007e91f49967beebbd80ff1d4ec6`, returned four verified BLOCKER
+findings and one verified MAJOR finding. Treating a third code-remediation pass
+as ordinary continuation would bypass the registered bound precisely when the
+bound requires a stop.
+
+**Consequence.** The only changes after the final audits are record-only:
+persisting their exact reports, binding their hashes and findings in a terminal
+receipt, and updating the public logs. Any later technical fix must start as a
+separately authorized public-protocol redesign with a new bounded audit plan.
