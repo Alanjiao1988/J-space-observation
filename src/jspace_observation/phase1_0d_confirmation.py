@@ -686,6 +686,43 @@ GATE_INTERPRETATION = (
 
 NO_HEADROOM_RESULT = "HEADROOM_NOT_ESTABLISHED"
 
+AUTHORITY_PROMPT_PATH = "docs/prompts/phase_science_restart_after_parser_closure_prompt.md"
+AUTHORITY_PROMPT_SHA256 = "5bc137c42c68e1b85b4cad1d45e1b4bf54fb68e2899f27bc6338dae61e9ef162"
+AUTHORITY_SECTIONS = "4.2, 4.3, 4.4"
+
+PROTOCOL_CONSEQUENCES: tuple[str, ...] = (
+    "The eligible pool is exactly 300 items and the registered design needs "
+    "exactly 300, so Phase 1.0D consumes the entire non-calibration remainder of "
+    "the public bank, including the split labelled mechanistic. There is no "
+    "slack: a single ineligible item would have stopped the run before inference.",
+    "After Phase 1.0D no item in data/phase1_task_headroom_candidates.jsonl is "
+    "unused. Any later work that needs items disjoint from both 1.0C and 1.0D "
+    "requires a new prospectively specified public batch, generated without "
+    "reference to any model or lens output.",
+    "The S4 RQ2 pilot draws its cases from the behaviourally successful "
+    "strict-no-CoT rows of the selected 1.0D cells rather than from a separate "
+    "held-out split, so it is a selected-case pilot and inherits the cell and "
+    "correctness conditioning of Phase 1.0D. It is not independent confirmation.",
+    "No inference has been run. This file registers what will be done; it "
+    "reports no result and licenses no claim.",
+)
+
+PROTOCOL_NOT_ESTABLISHED: tuple[str, ...] = (
+    "It does not establish that any cell has headroom. Every accuracy number is "
+    "unmeasured.",
+    "It does not establish that the two repairs are sufficient. One of the 44 "
+    "unresolved Phase 1.0C rows was explained by neither known defect, so Phase "
+    "1.0D can still fail for a reason not on the list.",
+    "It does not establish that a correct strict-arm answer reflects retained "
+    "task competence rather than an answer recoverable from prompt surface form: "
+    "no corrupted-prompt or prompt-echo control is registered in this round.",
+    "It does not establish that the structural arm suppresses reasoning at the "
+    "tokenizer level. The arm is rendered as text, so its empty-think prefill is "
+    "a string-level construction.",
+    "It does not establish anything about hidden reasoning, internal "
+    "representations, or J-space.",
+)
+
 #: A strict arm claims the model answered *without emitting reasoning*.  These
 #: markers are compliance evidence about the arm, never a correctness label.
 NO_COT_COMPLIANCE_ID = "phase1_0d_no_cot_compliance_v1"
