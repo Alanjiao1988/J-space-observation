@@ -252,10 +252,20 @@ def test_a_mixed_pack_refutes_single_cause_attribution():
 
 def test_a_mutated_count_is_detected_against_the_authority(records):
     mutated = [copy.deepcopy(record) for record in records]
-    mutated[0]["output_text"] = mutated[0]["output_text"] + LITERAL_PLACEHOLDER
+    target = next(
+        index
+        for index, record in enumerate(mutated)
+        if LITERAL_PLACEHOLDER not in record["output_text"]
+    )
+    mutated[target]["output_text"] += LITERAL_PLACEHOLDER
     result = audit_phase_1_0c_defects(mutated)
     mismatches = compare_to_authority(result)
     assert "outputs_containing_literal_placeholder" in mismatches
+    assert mismatches["outputs_containing_literal_placeholder"] == {
+        "authority": AUTHORITY_EXPECTED_FACTS["outputs_containing_literal_placeholder"],
+        "observed": AUTHORITY_EXPECTED_FACTS["outputs_containing_literal_placeholder"]
+        + 1,
+    }
 
 
 def test_a_record_generated_at_another_cap_is_refused():
