@@ -1,0 +1,187 @@
+{
+  "schema_version": "phase1-2h-r2-phase-a-lifecycle-receipt/v1",
+  "document_purpose": "Content-free evidence record for the first Phase A increment of the cloud-native parser-v3-v2 round: the one-shot evaluation lifecycle core, its Azure validation, and the formal adjudication of the carried-over local-subagent deviation D-01. This document is not a parser result and must not be cited as one.",
+  "not_a_result_statement": "Nothing in this receipt evaluates parser v3. No formal evaluation has been run, no set has been constructed or sealed, no preregistration exists and no label has been read. All scientific counters remain zero.",
+
+  "source_binding": {
+    "starting_commit": "a99d1e8341af85b8db32cb97a46ed5095c3f7978",
+    "starting_commit_equals_origin_main_at_takeover": true,
+    "working_branch": "alanjiao-microsoft-phase1-2h-r2-parser-v3-v2-round",
+    "commits_added_on_branch": [
+      {
+        "commit": "f041a9d462623031a527ea67d99eb64edb4bf712",
+        "subject": "Record exact-starting-commit ACR baseline for the parser-v3-v2 round"
+      },
+      {
+        "commit": "c4346e73dff47947c5f65b0acb268cdb4252c3da",
+        "subject": "Add the one-shot parser-v3-v2 evaluation lifecycle core"
+      }
+    ],
+    "branch_is_pushed_to_origin": false,
+    "branch_push_blocked_reason": "The Git credential in use for this session resolves to a principal without write access to the repository. A non-force push of the working branch returned HTTP 403. Section 2.4 permits push as the only GitHub interaction, so this is an access gap and not a policy conflict."
+  },
+
+  "cloud_execution_binding": {
+    "why_this_section_exists": "The recurrent finding in this repository is a check bound to something other than the thing that runs. Because the working branch could not be pushed, the validated tree had to be transported into Azure by another route, so the binding between what was committed locally and what executed in the cloud is proven explicitly rather than assumed.",
+    "transport_method": "A Git bundle covering the two branch commits was generated locally, base64-encoded, materialised inside the ACR task on the shared volume, fetched into a full clone of the public repository and checked out by explicit commit SHA. No Docker build context was used at any point, so .dockerignore never filtered the source.",
+    "binding_evidence_run": "cm22",
+    "observed_in_azure": {
+      "commit": "c4346e73dff47947c5f65b0acb268cdb4252c3da",
+      "tree": "5eb58947afec218faad621bf28d3bd4c8594d0d9",
+      "working_tree_dirty_paths": 0,
+      "git_directory": "present",
+      "blob_src_jspace_observation_parser_v3_v2_lifecycle_py": "17427c3a12b8de788220c765687eae04a2927fde",
+      "blob_tests_test_parser_v3_v2_lifecycle_py": "36bc554582a09a0a9b94ba9e54c30157c718986a"
+    },
+    "observed_locally": {
+      "commit": "c4346e73dff47947c5f65b0acb268cdb4252c3da",
+      "tree": "5eb58947afec218faad621bf28d3bd4c8594d0d9",
+      "blob_src_jspace_observation_parser_v3_v2_lifecycle_py": "17427c3a12b8de788220c765687eae04a2927fde",
+      "blob_tests_test_parser_v3_v2_lifecycle_py": "36bc554582a09a0a9b94ba9e54c30157c718986a"
+    },
+    "binding_conclusion": "Equal on every field. The tree validated in Azure is byte-identical to the tree committed on the working branch."
+  },
+
+  "azure_runs": [
+    {
+      "run_id": "cm1x",
+      "duration": "4m39s",
+      "purpose": "First full-suite validation of the lifecycle core.",
+      "outcome": "2343 passed, 15 skipped, 4 failed",
+      "interpretation": "Two failures were the disclosed pre-existing sealed-input environmental failures. Two were genuine defects in the newly added material and were treated as defects, not as environment noise."
+    },
+    {
+      "run_id": "cm1y",
+      "duration": "1s",
+      "purpose": "Resubmission after the first defect fix.",
+      "outcome": "Rejected before execution: malformed task YAML.",
+      "interpretation": "A local PowerShell array-literal quoting error split three long lines into separate YAML nodes. Corrected by reverting to the incremental append form already proven in the baseline round. No cloud-side cause."
+    },
+    {
+      "run_id": "cm20",
+      "duration": "4m32s",
+      "purpose": "Full-suite validation after both defects were fixed.",
+      "outcome": "2347 passed, 15 skipped, 2 failed",
+      "interpretation": "The only remaining failures are the same two disclosed sealed-input environmental failures carried by the starting commit. Compared with the section 11.1 baseline of 2235 passed / 15 skipped / 2 failed, this is 112 additional passing tests and zero new failures."
+    },
+    {
+      "run_id": "cm21",
+      "duration": "34s",
+      "purpose": "Binding verification, first attempt.",
+      "outcome": "Executed, but two digest fields were empty.",
+      "interpretation": "Shell quote handling stripped the delimiter argument. Superseded by cm22; recorded rather than discarded because a run that produced a blank field should not disappear from the record."
+    },
+    {
+      "run_id": "cm22",
+      "duration": "34s",
+      "purpose": "Binding verification, corrected.",
+      "outcome": "All six binding fields returned and equal to the local values.",
+      "interpretation": "Authoritative for the cloud_execution_binding section above."
+    }
+  ],
+
+  "defects_found_by_azure_validation_and_fixed": [
+    {
+      "id": "PA-01",
+      "found_in": "tests/test_parser_v3_v2_lifecycle.py",
+      "symptom": "A parser-isolation test asserted that the strings eval_parsing, parser_v3_repair and model_loader do not appear in the module body, and failed.",
+      "root_cause": "The assertion was false by construction. The module must carry those names as the denylist that the Stage E import check matches against. A denylist entry is data, not a dependency.",
+      "resolution": "Replaced the substring scan with an AST walk over the module's import graph. The test now asserts that no import statement reaches the package or any parser-bearing module, and a companion mutation control shows the same walk does flag a module that imports one.",
+      "note": "The original test was wrong about a true property. Weakening or deleting it would have removed the control entirely; it was replaced with an instrument that can actually measure the claim."
+    },
+    {
+      "id": "PA-02",
+      "found_in": "src/jspace_observation/parser_v3_v2_lifecycle.py",
+      "symptom": "Loading a module from a non-existent path raised FileNotFoundError from the import machinery instead of the module's own refusal type.",
+      "root_cause": "importlib.util.spec_from_file_location returns a spec for a path that does not exist, so the existing None guard never fired and the failure surfaced later inside exec_module.",
+      "resolution": "The path is now checked before the spec is built, and any loader exception is re-raised as a lifecycle refusal with the partially registered module removed from sys.modules."
+    }
+  ],
+
+  "what_the_lifecycle_core_establishes": {
+    "ordered_state_machine": "Eight states and a closed transition relation. Every transition outside the relation is refused, terminal states have no successor, unregistered state names are refused before the relation is consulted, and a reachability test proves every non-terminal state can still reach a terminal state so no round can be stranded without an honest status.",
+    "one_shot_ordinal": "The formal evaluation ordinal advances on exactly one transition, the opening of scoring labels, and not on the launch of prediction generation. Generating a prediction spends nothing that cannot be spent again; seeing the answer is what consumes the one-shot property. A second label opening is refused.",
+    "create_only_sealing": "Overwrite, resume and rename are refused by one rule rather than three, because from the outside they are the same failure. The terminal manifest must be part of the plan and must be the final write, so a manifest can never describe a set that does not yet exist.",
+    "prediction_stream_completeness": "Completeness is checked against the sealed set's own case identifiers rather than against a count, because a stream of the right size drawn from the wrong set is the more dangerous error and a count check passes it.",
+    "role_and_lane_separation": "Read and write lanes are declared per role. Absence is denial: an unlisted read class is refused even when it is not on the forbidden list. Tests prove no two roles share a write lane and neither reviewer can read the other's decisions.",
+    "status_exclusivity": "The status is recomputed from the binding gates and compared, never accepted as an input. A zero-gate set is refused because an empty conjunction would silently derive PASS. Report-only diagnostics are refused if they appear among the binding gates.",
+    "final_contract": "Compiled once, refused on recompilation, and binding the set manifest together with the authenticated listing witness so that a self-consistent set never observed at the storage layer cannot satisfy it."
+  },
+
+  "mutation_controls_present": [
+    "Emptying the transition relation must break the permitted path.",
+    "Changing the expected member count must change which stream sizes are accepted.",
+    "Emptying the parser marker list must stop the Stage E import check from refusing.",
+    "Every bound digest and the prospective protocol commit must each change the final contract hash.",
+    "The AST import walk must flag a module that does import parser code."
+  ],
+
+  "deviation_adjudication": {
+    "deviation_id": "D-01",
+    "description": "A preceding session delegated a read-only survey of the public repository to a locally executed subagent. Section 2.1 of the controlling prompt forbids local subagent and auditor workloads.",
+    "assessment_question": "Does this force the terminal state BLOCKED_ON_PROTOCOL_INTEGRITY?",
+    "determination": "No. It is a disclosed operational deviation, remediable by disclosure and prospective compliance.",
+    "reasoning": [
+      "The terminal state BLOCKED_ON_PROTOCOL_INTEGRITY is reserved for policy or protected-byte drift, private leakage, a runtime versus assessor object mismatch, an irreconcilable ledger contradiction, an unresolved audit blocker, or another scientific-integrity failure. D-01 matches none of these.",
+      "Protected-byte drift: independently re-derived from the code that enforces it. All twelve protected artifacts match under the repository's LF-normalised digest convention, and the acceptance policy's LF digest equals the binding recorded in the execution and access ledger.",
+      "Private leakage: the survey returned public repository structure. The only private-path identifiers it named are category filenames that the committed, public .gitignore and .dockerignore already publish, so naming them disclosed nothing the public repository does not already disclose. No private object content, no sealed blob and no label was read.",
+      "Ledger state: no ledger event was written and no live counter moved as a result of the survey. All scientific counters remain zero.",
+      "Timing: it occurred before any Phase A freeze and before the first private semantic read, so no frozen artifact and no private observation is contaminated by it.",
+      "Character of the rule: the prohibition sits under the requirement that Azure executes and the laptop orchestrates, whose stated motivation is that the operator's laptop has repeatedly overheated and restarted. It is an operational and resource-protection rule, not a scientific invariant."
+    ],
+    "residual_limitation": "The subagent's actual returned text is no longer retrievable from the local session store, and the execution location of its runtime was never established. This adjudication therefore rests on the preceding session's own account together with the independently verifiable facts listed above, not on inspection of the returned output. It is also a self-assessment by an interested party, which this repository's own discipline holds is not independent validation. An external reviewer may reach a different conclusion, and the evidence needed to overturn it is recorded here rather than omitted.",
+    "prospective_compliance": "No subagent, auditor or delegated agent workload has been run locally in this round. Local activity has been confined to file reading, digest computation, Git operations, Azure control-plane submission and bounded content-free result reading.",
+    "status": "ADJUDICATED_NOT_BLOCKING"
+  },
+
+  "other_deviations": [
+    {
+      "deviation_id": "D-02",
+      "description": "Work is committed to a worktree branch rather than to main in the operator's primary checkout, because the host application confines this session to a worktree.",
+      "authorisation": "Explicit operator direction. The operator retains the decision on merging to main.",
+      "status": "DISCLOSED_OPERATOR_APPROVED"
+    },
+    {
+      "deviation_id": "D-03",
+      "description": "The working branch cannot be pushed to origin; the session's Git credential lacks write access.",
+      "consequence": "The commit sequence required at the end of the round cannot be completed by this session. The commits exist locally on the worktree branch and are reproducible from the recorded SHAs.",
+      "status": "OPEN_REQUIRES_OPERATOR"
+    }
+  ],
+
+  "counters_unchanged_this_increment": {
+    "formal_evaluation_ordinal": 0,
+    "locked_label_reads": 0,
+    "parser_v3_runs_against_any_locked_set": 0,
+    "parser_v3_v2_sealed_sets_constructed": 0,
+    "predictions_generated": 0,
+    "private_data_plane_content_reads": 0,
+    "private_blob_writes": 0
+  },
+
+  "phase_status": {
+    "phase_a_public_protocol_and_tooling_freeze": "PARTIAL",
+    "phase_a_completed_components": [
+      "One-shot evaluation lifecycle core with mutation and negative controls, validated in Azure against the exact committed tree."
+    ],
+    "phase_a_outstanding_components": [
+      "Closed JSON schemas for deployment evidence, runtime canaries, reviewer output, disagreement and arbitration, admission and quarantine, set facts, seal receipt, listing witness, preregistration, prediction receipt, formal result and terminal assessment.",
+      "Deterministic construction module: admission, N1 to N6 one-way migration, eligibility and selection with content-hash tie-break, finite replacement batches.",
+      "Executable entrypoints for reviewer, broker, arbiter, auditor, migration, selection, seal, Stage P, prediction seal, Stage E and receipt export.",
+      "Infrastructure as code for the private review boundary under infra/azure. None exists today.",
+      "A committed dependency lock replacing the unpinned requirements file, so the resolved closure stops being a property of the resolution date.",
+      "A public synthetic end-to-end rehearsal through fake set seal, preregistration, Stage P, prediction seal and Stage E."
+    ],
+    "phase_b_private_review_boundary": "NOT_STARTED",
+    "phase_c_construction": "NOT_STARTED",
+    "phase_d_audit_and_seal": "NOT_STARTED",
+    "phase_e_preregistration": "NOT_STARTED",
+    "phase_f_formal_evaluation": "NOT_STARTED",
+    "phase_g_closure": "NOT_STARTED"
+  },
+
+  "terminal_state": "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY",
+  "terminal_state_justification": "The private review boundary required before any private construction work does not exist. The container registry in the resource group is Basic tier, which cannot carry a private link, so it must be upgraded or replaced. No firewall, no egress control and no private compute environment for the review roles has been deployed. This is the same terminal state the execution and access ledger already carries; this increment advanced public Phase A work underneath it without changing it.",
+
+  "cost_note": "Five container registry task runs were submitted in this increment, totalling approximately ten minutes of Basic-tier agent time. No GPU capacity was provisioned and no model was downloaded or run."
+}
