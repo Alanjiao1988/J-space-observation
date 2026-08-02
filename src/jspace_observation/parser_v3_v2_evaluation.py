@@ -32,7 +32,30 @@ import unicodedata
 from collections.abc import Iterable, Mapping, Sequence
 from typing import Any, Callable
 
-from jspace_observation import parser_v3_v2_lifecycle as lifecycle
+if __package__:
+    from jspace_observation import parser_v3_v2_lifecycle as lifecycle
+else:  # loaded from a path, so the package ``__init__`` must not run
+    # ``jspace_observation/__init__.py`` eagerly imports ``model_loader`` and
+    # ``eval_parsing``. A Stage E container that reached this module through
+    # the package would therefore always hold parser code, and
+    # ``assert_stage_e_import_is_parser_free`` could never pass in production
+    # -- a guard bound to something other than what runs. When this module is
+    # loaded by path the dependency is resolved by path too.
+    import importlib.util as _importlib_util
+    import sys as _sys
+    from pathlib import Path as _Path
+
+    _LIFECYCLE_NAME = "parser_v3_v2_lifecycle"
+    lifecycle = _sys.modules.get(_LIFECYCLE_NAME)
+    if lifecycle is None:
+        _spec = _importlib_util.spec_from_file_location(
+            _LIFECYCLE_NAME, _Path(__file__).with_name("parser_v3_v2_lifecycle.py")
+        )
+        if _spec is None or _spec.loader is None:  # pragma: no cover - defensive
+            raise ImportError("cannot load parser_v3_v2_lifecycle without the package")
+        lifecycle = _importlib_util.module_from_spec(_spec)
+        _sys.modules[_LIFECYCLE_NAME] = lifecycle
+        _spec.loader.exec_module(lifecycle)
 
 __all__ = [
     "EvaluationError",
