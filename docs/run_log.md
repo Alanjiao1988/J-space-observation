@@ -4112,3 +4112,59 @@ silently manufactured evidence):
   pytest summary and that sentinel is to be treated as no evidence.
 - The task YAML must also keep `version:` as its first line. With a leading
   comment, ACR either runs zero steps (`cm40`) or fails to deserialize (`cm41`).
+
+## 2026-08-02 — Phase 1.0D protocol freeze (S1)
+
+Action:
+
+- Froze the Phase 1.0D confirmation protocol — selection, prompt rendering,
+  decoding, adjudication, and the cell gate — before any target-model
+  generation. Nothing was generated. Phase 1.0C is untouched.
+
+Azure runs (no analysis on the laptop):
+
+| Run | Commit | What it did | Result |
+| --- | --- | --- | --- |
+| `cm44` | `73566c7d` | `tests/test_phase1_0d_confirmation.py` | 46 passed |
+| `cm45` | `7e9e3f86` | `infra/azure/scripts/emit_phase1_0d_protocol.py` | snapshot emitted |
+| `cm46` | `d5d898ea` | protocol tests incl. committed-snapshot check | 47 passed |
+| `cm47` | `d5d898ea` | full suite | 2945 passed / 15 skipped / 2 failed |
+
+The 2 failures in `cm47` are the disclosed pre-existing
+`tests/test_parser_v3_seal_job.py` failures carried since the `a99d1e83`
+baseline. Test count went 2873 -> 2945 (+72) with zero new failures.
+
+Split feasibility — the bank supports the registered design exactly, with no
+slack:
+
+- bank = 450 items; Phase 1.0C consumed the 150 `calibration` items, verified
+  against the `source_item_id` values in the 1.0C records rather than against
+  the split label alone;
+- eligible pool = 300 items, and every one of the 15 family x band cells holds
+  exactly 20;
+- the selection is therefore all 300 remaining items: 150 `confirmation` and
+  150 `mechanistic`, disjoint from Phase 1.0C, `task_ids_sha256`
+  `0d3fe6add211a381a321ea974502d262faf65312dc504e2acceb7c6556b1f524`;
+- protocol snapshot hash
+  `fd52f2d58b59198512aff43eb826250dbadf9675306d8231af5809d3b763c84c`.
+
+Registered budgets: 1024 new tokens for the visible-reasoning control, 32 for
+both strict arms. The strict budget was verified, not assumed: the longest
+registered answer in the selection is 15 UTF-8 bytes
+(`p1hd-fact2-easy-confirmation-01`), and byte-level BPE guarantees
+`token_count <= utf8_byte_length`, so 32 tokens is provably sufficient with 17
+tokens to spare — and still far too few to emit a chain of thought. No
+tokenizer download was needed for that proof.
+
+Prompt rendering was checked on real material, not samples: all 300 items x 3
+arms were rendered and asserted free of the literal `<answer>`, of any
+`{slot}`-shaped leftover, and of any other angle-bracket placeholder. The
+spontaneous strict arm was additionally asserted free of think tags, of the
+empty-think prefill, and of any model-name-dependent text.
+
+Artifact: `docs/phase1_0d_protocol_snapshot.json`.
+
+Not established: nothing was generated, so no accuracy, no headroom, and no
+capability statement exists. The next scientific gate is the Phase 1.0D
+generation run itself, which needs GPU capacity that this work package did not
+provision.

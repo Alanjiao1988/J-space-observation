@@ -887,3 +887,54 @@ oracle.** Reviewer agreement is inter-model consistency, not accuracy. Automatic
 parser output may still be reported as triage diagnostics — routing rates,
 disagreement counts — and parser-versus-reviewer agreement must never be
 presented as inter-reviewer agreement.
+
+## Recomputing an authority's premises before acting on them (2026-08-02)
+
+The controlling authority for the scientific restart stated seven numeric facts
+about Phase 1.0C and asked that a repair protocol be built on them. Those numbers
+were *stated*, not derived, and a repair built on unverified premises inherits
+their risk without inheriting their evidence.
+
+So they were recomputed from the committed record pack before any repair was
+designed: 300 records, 300 prompts carrying the literal placeholder, 31 outputs
+echoing it, 5 echoing the whole line, 225 reviewed, 79 at the token cap, 44
+unresolved. All seven reproduced exactly. The recomputation also produced a fact
+the authority did not state — the joint partition of the 44 unresolved rows over
+the two defects (38 token-cap only, 4 both, 1 placeholder only, 1 neither) —
+which is what actually refutes single-cause attribution and forced both defects
+into the 1.0D design instead of one.
+
+The method generalizes: when an instruction hands over numbers, recompute them
+before building on them. One bounded run converts a premise into evidence, and
+the residual it exposes (here, the single row explained by neither defect) is
+usually the most informative part.
+
+## Preregistering the repair, not just the experiment (2026-08-02)
+
+Phase 1.0D freezes selection, prompt rendering, decoding, adjudication, and the
+cell gate in code, with executable assertions, before any generation. Three
+properties make this more than a declaration:
+
+- the prompt prohibitions are checked against **all** real rendered prompts
+  (300 items x 3 arms), not against a sample or a synthetic example;
+- the anti-defect checker is itself tested with positive cases, so a checker that
+  silently stopped detecting anything would fail;
+- the committed protocol snapshot is compared in the test suite against the
+  snapshot recomputed from the module, so the artifact cannot drift from the code
+  it claims to describe.
+
+The same pattern is applied to the Phase 1.0C defect receipt. An artifact that
+merely records a number is a claim; an artifact the suite re-derives is evidence.
+
+## A passing cloud run is not evidence (2026-08-02)
+
+An ACR task whose shell script had been flattened to a single line by a
+PowerShell pipeline write executed nothing and reported success in 21 seconds.
+Two sibling runs failed silently for a related reason: a comment above the task
+YAML's `version:` line makes ACR run zero steps or refuse to deserialize.
+
+The remedy is cheap and now standard here: the runner prints
+`TARGETED_TESTS_COMPLETE=1` as its final line, and a run is treated as evidence
+only if the output contains both the test summary and that sentinel. Any
+automation that reports success without reporting work should be assumed to have
+done none.

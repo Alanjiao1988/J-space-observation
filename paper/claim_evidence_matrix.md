@@ -87,6 +87,19 @@ have caused all 44 unresolved rows. If no Phase 1.0D cell passes the frozen
 count gate, `HEADROOM_NOT_ESTABLISHED` is the scientific result and the gate is
 not lowered.
 
+**2026-08-02 — the Phase 1.0D protocol is frozen and preregistered.** The
+selection, prompt rendering, decoding, adjudication, and gate rules are fixed in
+`src/jspace_observation/phase1_0d_confirmation.py` and recorded in
+`docs/phase1_0d_protocol_snapshot.json` (protocol SHA-256
+`fd52f2d5…`), verified by ACR runs `cm44`/`cm46` and a full-suite run `cm47`.
+The design is 300 items — 20 per family × band cell, `task_ids_sha256`
+`0d3fe6ad…` — proven disjoint from the Phase 1.0C item ids, with 1024 new tokens
+for the visible control and a provably sufficient 32 for the strict arms. All
+300 items × 3 arms were rendered and asserted free of the 1.0C placeholder. **No
+generation has been run**, so CL-05 stays `preliminary` on the strength of
+Phase 1.0C alone; this note records a frozen design, not a result. The sample
+exhausts the bank — see `L-43`.
+
 ---
 
 ## CL-06 — Parser-v3 correction of parser-v2 failure modes

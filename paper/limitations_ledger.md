@@ -981,3 +981,38 @@ entrypoints, or its boundary IaC inherits those defects. The retained material
 is a historical artifact of an unfinished instrument, and it must never be
 described as a validated, audited, or publication-ready protocol on the strength
 of its size or its test count.
+
+## L-43 - Phase 1.0D exhausts the public candidate bank
+
+The Phase 1.0D confirmation sample is 300 items, and exactly 300 bank items were
+eligible. After this run, `data/phase1_task_headroom_candidates.jsonl` contains
+no item that has never been used: 150 went to Phase 1.0C and 150 + 150 go to
+Phase 1.0D.
+
+This is a real constraint on everything downstream. The S4 RQ2 pilot is
+unaffected, because it draws its cases from the behaviourally successful
+strict-no-CoT rows of the selected 1.0D cells rather than from a held-out split.
+But any future analysis that requires items unseen by both rounds - a second
+confirmation, an independent replication, an ability-matched RQ3 comparison on
+fresh material - cannot get them from this bank. It needs a new prospectively
+specified public batch, and that batch must be generated without consulting any
+model output or lens readout, or the selection becomes outcome-dependent.
+
+The alternative was to keep 10 items per cell and preserve a reserve. That was
+rejected: n=10 is exactly the screen size that left Phase 1.0C unable to support
+an estimate (`CL-05`), and repeating it would have spent a GPU run to learn
+nothing again.
+
+## L-44 - The strict token budget is bounded, not tokenized
+
+The Phase 1.0D strict budget of 32 new tokens is justified by the byte-level BPE
+inequality `token_count <= utf8_byte_length` against the longest registered
+answer (15 bytes). That bound is sound and conservative, but it is not the same
+thing as tokenizing every registered answer with the pinned
+`deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B` tokenizer and reading the true
+lengths.
+
+The bound can only err toward being too generous with budget, never too tight,
+so it cannot silently truncate an answer. What it does not do is tell us how
+much of the 32-token budget the model actually needs, so a strict-arm truncation
+in Phase 1.0D must be investigated rather than assumed impossible.

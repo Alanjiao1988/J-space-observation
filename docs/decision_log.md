@@ -2286,3 +2286,51 @@ Consequences for Phase 1.0D:
 
 Evidence: `docs/phase1_0c_generation_profile_defects.json`;
 ACR run `cm3y` at commit `8333ccaefb0955d892aef18a6df4d4bc3bfe0aae`.
+
+## 2026-08-02 — Freeze Phase 1.0D before inference, and accept that it exhausts the bank
+
+Decision:
+
+- The Phase 1.0D confirmation sample is every remaining public bank item that
+  Phase 1.0C did not touch: all 300 of them, 20 per family x band cell, drawn
+  from both the `confirmation` and the `mechanistic` splits. Selection is a total
+  order (split rank, then `task_id`) with no random number generator, and
+  disjointness is proven against the item ids Phase 1.0C actually generated on.
+- Consequence, accepted deliberately: after Phase 1.0D no item in the bank is
+  unused. There is no slack — a single ineligible item would have triggered
+  `Phase1_0DBankShortage` and stopped the run before inference. Any later work
+  needing items disjoint from both 1.0C and 1.0D requires a new prospectively
+  specified public batch generated without reference to model or lens output.
+  This is recorded as `L-43` rather than avoided by shrinking cells to 10, which
+  would have reproduced the n=10 screen that made Phase 1.0C uninformative.
+- All three arms decode greedily. The project's registered per-condition
+  configuration is greedy for both strict conditions and for `r1_style_thinking`,
+  so adopting it makes the arms differ only in renderer and token budget. Phase
+  1.0C's sampled `official_style` profile was not carried over: a paired
+  visible-minus-strict difference across different sampling regimes would have
+  confounded the comparison it exists to make.
+- The strict budget is 32 new tokens, not the registered 8/12. The registered
+  caps were chosen for other rounds and are re-registered here under a distinct
+  profile name (`phase1_0d_*`) so a 1.0D configuration can never be mistaken for
+  them. 32 is justified by a proof rather than by taste: byte-level BPE gives
+  `token_count <= utf8_byte_length`, and the longest registered answer is 15
+  bytes.
+- Arbitration never resolves toward `correct` and never resolves toward the
+  parser. A primary/secondary disagreement becomes `unresolved` and demands an
+  explicit third adjudication. A rule that broke ties toward the parser would
+  reintroduce the automatic evaluator that `DR-01` forbids.
+- The secondary-review sample is a hash of the record id, fixed before any label
+  exists, so the 20% stratified sample cannot be steered by an outcome.
+
+Rationale:
+
+- Phase 1.0C failed as evidence for two recomputed reasons and one unexplained
+  one. Freezing every biasing rule before inference is what converts 1.0D from a
+  second attempt into a confirmation.
+- The gate is a substrate selector, not a performance claim, and the module says
+  so in the returned payload rather than only in prose. Every cell is reported
+  whether it passes or not.
+
+Evidence: `docs/phase1_0d_protocol_snapshot.json`;
+`src/jspace_observation/phase1_0d_confirmation.py`;
+ACR runs `cm44`, `cm45`, `cm46`, `cm47`.
