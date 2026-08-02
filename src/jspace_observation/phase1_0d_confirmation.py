@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from math import ceil
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -490,63 +491,178 @@ SECONDARY_REVIEW_SAMPLE_FRACTION = 0.20
 SECONDARY_REVIEW_DOMAIN = "jspace-phase1-0d/secondary-review/v1"
 
 
-def requires_secondary_review(
-    record_id: str,
+def forces_secondary_review(
     *,
     primary_label: str,
     parser_agrees_with_primary: bool,
-    sample_fraction: float = SECONDARY_REVIEW_SAMPLE_FRACTION,
 ) -> bool:
-    """Return whether a row must receive an isolated secondary review.
+    """Return whether the authority *requires* an isolated secondary review.
 
-    Frozen rule: every primary ``unresolved``/``invalid`` row, every
-    parser/reviewer disagreement, and a deterministic stratified sample of the
-    remainder.  The sample is a hash of the record id, so it is fixed before any
-    label exists and cannot be steered by an outcome.
+    Frozen rule: every primary ``unresolved``/``invalid`` row and every
+    parser/reviewer disagreement.  This is the forced component only; the
+    stratified sample of the remainder is chosen by
+    :func:`stratified_secondary_sample`, which cannot see a label.
     """
 
     if primary_label in {"unresolved", "invalid"}:
         return True
-    if not parser_agrees_with_primary:
-        return True
-    digest = sha256_text(f"{SECONDARY_REVIEW_DOMAIN}|{record_id}")
-    bucket = int(digest[:8], 16) / 0xFFFFFFFF
-    return bucket < sample_fraction
+    return not parser_agrees_with_primary
 
 
-ARBITRATION_RULE_ID = "phase1_0d_arbitration_v1"
+def _secondary_sample_rank(record_id: str) -> str:
+    return sha256_text(f"{SECONDARY_REVIEW_DOMAIN}|{record_id}")
 
 
-def arbitrate(primary_label: str, secondary_label: str | None) -> dict[str, Any]:
-    """Apply the frozen arbitration rule to one row.
+def stratified_secondary_sample(
+    strata: Mapping[tuple[str, ...], Sequence[str]],
+    *,
+    sample_fraction: float = SECONDARY_REVIEW_SAMPLE_FRACTION,
+) -> set[str]:
+    """Return the deterministic stratified secondary-review sample.
 
-    Agreement stands.  Disagreement is never averaged, never resolved toward the
-    parser, and never resolved toward ``correct``: it escalates to an explicit
-    third adjudication and stays ``unresolved`` until that adjudication exists.
+    Within every stratum the record ids are ranked by a fixed hash and the top
+    ``ceil(fraction * n)`` are taken.  An unstratified per-row hash threshold
+    would satisfy the rate globally while leaving individual cells with no
+    sampled review at all, which is exactly the coverage the gate depends on.
+    The rank is a hash of the record id, so it is fixed before any label exists.
     """
 
-    for label in (primary_label, secondary_label):
+    if not 0.0 < sample_fraction <= 1.0:
+        raise Phase1_0DError("the secondary-review fraction must be in (0, 1]")
+    selected: set[str] = set()
+    for _, record_ids in sorted(strata.items()):
+        ordered = sorted(set(record_ids), key=lambda rid: (_secondary_sample_rank(rid), rid))
+        if not ordered:
+            continue
+        take = ceil(sample_fraction * len(ordered))
+        selected.update(ordered[:take])
+    return selected
+
+
+ARBITRATION_RULE_ID = "phase1_0d_arbitration_v2"
+
+# --------------------------------------------------------------------------
+# Closed reviewer form and judgment ingestion (section 4.3)
+# --------------------------------------------------------------------------
+
+REVIEW_FORM_ID = "phase1_0d_reviewer_form_v1"
+REVIEW_ROLES: tuple[str, ...] = ("primary", "secondary", "third")
+
+#: Exactly the fields a reviewer may return.  A closed form is what makes the
+#: decision reproducible by a party who holds only the generations and the form.
+REVIEW_FORM_FIELDS: tuple[str, ...] = (
+    "record_id",
+    "role",
+    "label",
+    "reviewer_id",
+)
+
+#: Exactly what a reviewer is shown.  No parser route, no triage flag, and no
+#: other reviewer's label, so a judgment cannot be anchored on an automatic
+#: verdict or on a colleague.
+REVIEW_FORM_PRESENTED_FIELDS: tuple[str, ...] = (
+    "record_id",
+    "question",
+    "registered_answer",
+    "output_text",
+)
+
+
+def validate_judgment(judgment: Mapping[str, Any]) -> dict[str, Any]:
+    """Validate one reviewer judgment against the closed form."""
+
+    extra = set(judgment) - set(REVIEW_FORM_FIELDS)
+    if extra:
+        raise Phase1_0DError(f"judgment carries unregistered fields: {sorted(extra)}")
+    missing = set(REVIEW_FORM_FIELDS) - set(judgment)
+    if missing:
+        raise Phase1_0DError(f"judgment is missing required fields: {sorted(missing)}")
+    role = str(judgment["role"])
+    if role not in REVIEW_ROLES:
+        raise Phase1_0DError(f"role {role!r} is not a registered review role")
+    label = str(judgment["label"])
+    if label not in SEMANTIC_LABELS:
+        raise Phase1_0DError(f"label {label!r} is not a registered semantic label")
+    reviewer_id = str(judgment["reviewer_id"]).strip()
+    if not reviewer_id:
+        raise Phase1_0DError("every judgment must name its reviewer")
+    return {
+        "record_id": str(judgment["record_id"]),
+        "role": role,
+        "label": label,
+        "reviewer_id": reviewer_id,
+    }
+
+
+def validate_judgment_set(judgments: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Validate a whole judgment set and refuse structurally unusable ones.
+
+    Two judgments for the same row and role, or one reviewer holding two roles on
+    the same row, would destroy the independence the secondary review exists to
+    provide, so both are refused here rather than silently averaged later.
+    """
+
+    validated = [validate_judgment(judgment) for judgment in judgments]
+    seen: set[tuple[str, str]] = set()
+    reviewers: dict[str, set[str]] = {}
+    for judgment in validated:
+        key = (judgment["record_id"], judgment["role"])
+        if key in seen:
+            raise Phase1_0DError(f"duplicate {judgment['role']} judgment for {judgment['record_id']}")
+        seen.add(key)
+        holders = reviewers.setdefault(judgment["record_id"], set())
+        if judgment["reviewer_id"] in holders:
+            raise Phase1_0DError(
+                f"reviewer {judgment['reviewer_id']} holds two roles on {judgment['record_id']}"
+            )
+        holders.add(judgment["reviewer_id"])
+    return validated
+
+
+def arbitrate(
+    primary_label: str,
+    secondary_label: str | None,
+    third_label: str | None = None,
+) -> dict[str, Any]:
+    """Apply the frozen arbitration rule to one row.
+
+    Agreement stands.  Disagreement is never averaged and never resolved toward
+    the parser: it escalates to an explicit third adjudication.  Until that
+    adjudication exists the row is ``unresolved`` and openly ``pending``; when it
+    exists it decides, including deciding ``unresolved``.  A third label offered
+    where the reviewers already agreed is refused, so adjudication cannot be used
+    to revisit a settled row.
+    """
+
+    for label in (primary_label, secondary_label, third_label):
         if label is not None and label not in SEMANTIC_LABELS:
             raise Phase1_0DError(f"label {label!r} is not a registered semantic label")
     if secondary_label is None:
+        if third_label is not None:
+            raise Phase1_0DError("a third adjudication requires two reviewer labels")
         return {
             "rule": ARBITRATION_RULE_ID,
             "final_label": primary_label,
             "agreement": None,
             "arbitration_required": False,
+            "arbitration_pending": False,
         }
     if primary_label == secondary_label:
+        if third_label is not None:
+            raise Phase1_0DError("a third adjudication requires a reviewer disagreement")
         return {
             "rule": ARBITRATION_RULE_ID,
             "final_label": primary_label,
             "agreement": True,
             "arbitration_required": False,
+            "arbitration_pending": False,
         }
     return {
         "rule": ARBITRATION_RULE_ID,
-        "final_label": "unresolved",
+        "final_label": third_label if third_label is not None else "unresolved",
         "agreement": False,
         "arbitration_required": True,
+        "arbitration_pending": third_label is None,
     }
 
 
@@ -570,6 +686,55 @@ GATE_INTERPRETATION = (
 
 NO_HEADROOM_RESULT = "HEADROOM_NOT_ESTABLISHED"
 
+#: A strict arm claims the model answered *without emitting reasoning*.  These
+#: markers are compliance evidence about the arm, never a correctness label.
+NO_COT_COMPLIANCE_ID = "phase1_0d_no_cot_compliance_v1"
+NO_COT_MAX_SURFACE_LINES = 1
+NO_COT_REASONING_MARKERS: tuple[str, ...] = (
+    "<think>",
+    "</think>",
+    "let me",
+    "let's",
+    "first,",
+    "step 1",
+    "step one",
+    "we need to",
+    "i need to",
+    "because ",
+    "therefore",
+    "so the answer",
+    "thus ",
+    "reasoning:",
+    "explanation:",
+)
+
+
+def strict_output_compliance(output_text: str) -> dict[str, Any]:
+    """Report whether a strict-arm output actually withheld visible reasoning.
+
+    A strict arm that emits a short rationale and still lands on the right value
+    has not demonstrated suppressed reasoning, so a cell built from such rows
+    cannot support the RQ2 precondition.  This is deterministic compliance
+    evidence about the arm; it never decides whether the answer is correct.
+    """
+
+    lowered = output_text.lower()
+    markers = sorted({marker for marker in NO_COT_REASONING_MARKERS if marker in lowered})
+    lines = [line for line in output_text.strip().splitlines() if line.strip()]
+    violations: list[str] = []
+    if markers:
+        violations.append("reasoning_marker")
+    if len(lines) > NO_COT_MAX_SURFACE_LINES:
+        violations.append("multi_line_output")
+    return {
+        "check": NO_COT_COMPLIANCE_ID,
+        "compliant": not violations,
+        "violations": violations,
+        "markers_found": markers,
+        "line_count": len(lines),
+        "decides_correctness": False,
+    }
+
 
 @dataclass(frozen=True)
 class CellOutcome:
@@ -586,6 +751,8 @@ class CellOutcome:
     placeholder: int
     unresolved: int
     loop_repetition: int
+    no_cot_violations: int = 0
+    arbitration_pending: int = 0
 
     @property
     def cell_id(self) -> str:
@@ -596,6 +763,7 @@ class CellOutcome:
         low, high = wilson_ci(self.correct, self.resolved) if self.resolved else (0.0, 0.0)
         return {
             "arm_id": self.arm_id,
+            "arbitration_pending": self.arbitration_pending,
             "cell_id": self.cell_id,
             "correct": self.correct,
             "difficulty_band": self.difficulty_band,
@@ -605,6 +773,7 @@ class CellOutcome:
             "invalid_rate": round(self.invalid / total, 6) if total else 0.0,
             "loop_repetition_rate": round(self.loop_repetition / total, 6) if total else 0.0,
             "no_answer_rate": round(self.no_answer / total, 6) if total else 0.0,
+            "no_cot_violations": self.no_cot_violations,
             "placeholder_rate": round(self.placeholder / total, 6) if total else 0.0,
             "resolved": self.resolved,
             "row_count": total,
@@ -653,6 +822,9 @@ def evaluate_cell_gate(
         and visible.invalid / visible_rows <= GATE_MAX_INVALID_RATE,
         "strict_invalid_within_10_percent": strict_rows > 0
         and strict.invalid / strict_rows <= GATE_MAX_INVALID_RATE,
+        "strict_arm_emitted_no_visible_reasoning": strict.no_cot_violations == 0,
+        "no_arbitration_left_pending": visible.arbitration_pending == 0
+        and strict.arbitration_pending == 0,
     }
     return {
         "gate": GATE_ID,
@@ -738,7 +910,20 @@ def protocol_snapshot(
         "parser_role": PARSER_ROLE,
         "semantic_labels": list(SEMANTIC_LABELS),
         "secondary_review_sample_fraction": SECONDARY_REVIEW_SAMPLE_FRACTION,
+        "secondary_review_strata": ["task_family", "difficulty_band", "arm_id"],
         "arbitration_rule": ARBITRATION_RULE_ID,
+        "review_form": {
+            "id": REVIEW_FORM_ID,
+            "roles": list(REVIEW_ROLES),
+            "fields": list(REVIEW_FORM_FIELDS),
+            "presented_fields": list(REVIEW_FORM_PRESENTED_FIELDS),
+        },
+        "no_cot_compliance": {
+            "id": NO_COT_COMPLIANCE_ID,
+            "max_surface_lines": NO_COT_MAX_SURFACE_LINES,
+            "reasoning_markers": list(NO_COT_REASONING_MARKERS),
+            "decides_correctness": False,
+        },
         "gate": {
             "id": GATE_ID,
             "required_resolved": GATE_REQUIRED_RESOLVED,
@@ -747,6 +932,8 @@ def protocol_snapshot(
             "strict_correct_high": GATE_STRICT_CORRECT_HIGH,
             "max_truncation_rate": GATE_MAX_TRUNCATION_RATE,
             "max_invalid_rate": GATE_MAX_INVALID_RATE,
+            "requires_strict_arm_no_cot_compliance": True,
+            "requires_no_pending_arbitration": True,
             "interpretation": GATE_INTERPRETATION,
             "no_headroom_result": NO_HEADROOM_RESULT,
         },

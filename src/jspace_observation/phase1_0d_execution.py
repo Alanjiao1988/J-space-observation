@@ -28,8 +28,12 @@ from .phase1_0d_confirmation import (
     ARMS_BY_ID,
     FINAL_ANSWER_PREFIX,
     LITERAL_ANSWER_PLACEHOLDER,
+    NO_COT_COMPLIANCE_ID,
     NO_HEADROOM_RESULT,
     REPLICATE_INDEX,
+    REVIEW_FORM_ID,
+    REVIEW_FORM_PRESENTED_FIELDS,
+    REVIEW_ROLES,
     SPONTANEOUS_NO_COT_ARM,
     STRUCTURAL_NO_COT_ARM,
     VISIBLE_CONTROL_ARM,
@@ -38,11 +42,14 @@ from .phase1_0d_confirmation import (
     Phase1_0DError,
     arbitrate,
     evaluate_cell_gate,
+    forces_secondary_review,
     generation_config,
     paired_difference,
     prompt_defects,
     render_prompt,
-    requires_secondary_review,
+    stratified_secondary_sample,
+    strict_output_compliance,
+    validate_judgment_set,
 )
 
 #: Repetition diagnostic: a shingle of this many words repeated this many times.
@@ -264,6 +271,20 @@ def build_records(
                     "cell_id": f"{unit.task_family}|{unit.difficulty_band}|{unit.arm_id}",
                 },
                 "triage": triage(unit, output),
+                "compliance": (
+                    strict_output_compliance(output.output_text)
+                    if unit.arm_id != VISIBLE_CONTROL_ARM.arm_id
+                    else {
+                        "check": NO_COT_COMPLIANCE_ID,
+                        "compliant": None,
+                        "violations": [],
+                        "markers_found": [],
+                        "line_count": len(
+                            [line for line in output.output_text.strip().splitlines() if line.strip()]
+                        ),
+                        "decides_correctness": False,
+                    }
+                ),
                 "evaluation": {
                     "primary_label": None,
                     "secondary_label": None,
@@ -279,29 +300,41 @@ def build_records(
 def annotate_review_selection(records: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     """Mark which rows need an isolated secondary review.
 
-    Called after primary review.  The sample component is a hash of the record
-    id, so it is fixed before any label exists.
+    Called after primary review.  The forced component depends on the primary
+    label; the sampled component is a hash-ranked 20% *within every stratum*, so
+    no cell can end up with zero sampled reviews while the global rate still
+    looks right.
     """
 
-    annotated: list[dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for record in records:
         row = {key: dict(value) if isinstance(value, dict) else value
                for key, value in record.items()}
-        evaluation = row["evaluation"]
-        primary = evaluation.get("primary_label")
-        if primary is None:
+        if row["evaluation"].get("primary_label") is None:
             raise Phase1_0DError(
                 f"{row['record_id']} has no primary label; every row is reviewed first"
             )
+        rows.append(row)
+
+    strata: dict[tuple[str, ...], list[str]] = {}
+    for row in rows:
+        key = (str(row["task_family"]), str(row["difficulty_band"]), str(row["arm_id"]))
+        strata.setdefault(key, []).append(str(row["record_id"]))
+    sampled = stratified_secondary_sample(strata)
+
+    for row in rows:
+        evaluation = row["evaluation"]
         parser_agrees = _parser_agrees(row)
-        evaluation["parser_agrees_with_primary"] = parser_agrees
-        evaluation["secondary_review_required"] = requires_secondary_review(
-            str(row["record_id"]),
-            primary_label=str(primary),
+        forced = forces_secondary_review(
+            primary_label=str(evaluation["primary_label"]),
             parser_agrees_with_primary=parser_agrees,
         )
-        annotated.append(row)
-    return annotated
+        in_sample = str(row["record_id"]) in sampled
+        evaluation["parser_agrees_with_primary"] = parser_agrees
+        evaluation["secondary_review_forced"] = forced
+        evaluation["secondary_review_sampled"] = in_sample
+        evaluation["secondary_review_required"] = forced or in_sample
+    return rows
 
 
 def _parser_agrees(record: Mapping[str, Any]) -> bool:
@@ -338,13 +371,76 @@ def apply_judgments(records: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]
         outcome = arbitrate(
             str(evaluation["primary_label"]),
             evaluation.get("secondary_label"),
+            evaluation.get("third_label"),
         )
         evaluation["final_label"] = outcome["final_label"]
         evaluation["agreement"] = outcome["agreement"]
         evaluation["arbitration_required"] = outcome["arbitration_required"]
+        evaluation["arbitration_pending"] = outcome["arbitration_pending"]
         evaluation["arbitration_rule"] = outcome["rule"]
         resolved.append(row)
     return resolved
+
+
+def ingest_judgments(
+    records: Sequence[Mapping[str, Any]],
+    judgments: Iterable[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Attach a validated judgment set to the records it belongs to.
+
+    This is the registered path from a closed reviewer form to a decision, so an
+    independent party holding the generations and the judgments can reproduce the
+    result without inventing a review process.
+    """
+
+    validated = validate_judgment_set(judgments)
+    known = {str(record["record_id"]) for record in records}
+    unknown = sorted({j["record_id"] for j in validated} - known)
+    if unknown:
+        raise Phase1_0DError(f"judgments reference unknown records: {unknown}")
+
+    by_record: dict[str, dict[str, dict[str, Any]]] = {}
+    for judgment in validated:
+        by_record.setdefault(judgment["record_id"], {})[judgment["role"]] = judgment
+
+    rows: list[dict[str, Any]] = []
+    for record in records:
+        row = {key: dict(value) if isinstance(value, dict) else value
+               for key, value in record.items()}
+        evaluation = row["evaluation"]
+        roles = by_record.get(str(row["record_id"]), {})
+        for role in REVIEW_ROLES:
+            judgment = roles.get(role)
+            evaluation[f"{role}_label"] = judgment["label"] if judgment else None
+            evaluation[f"{role}_reviewer_id"] = judgment["reviewer_id"] if judgment else None
+        evaluation["review_form"] = REVIEW_FORM_ID
+        rows.append(row)
+    return rows
+
+
+def build_review_form_rows(
+    records: Sequence[Mapping[str, Any]],
+    questions: Mapping[str, str],
+) -> list[dict[str, Any]]:
+    """Build exactly what a reviewer is shown, and nothing else."""
+
+    rows: list[dict[str, Any]] = []
+    for record in records:
+        record_id = str(record["record_id"])
+        if record_id not in questions:
+            raise Phase1_0DError(f"no question text for {record_id}")
+        rows.append(
+            {
+                "record_id": record_id,
+                "question": questions[record_id],
+                "registered_answer": str(record["registered_answer"]),
+                "output_text": str(record["output_text"]),
+            }
+        )
+    for row in rows:
+        if set(row) != set(REVIEW_FORM_PRESENTED_FIELDS):
+            raise Phase1_0DError("a review row must present exactly the registered fields")
+    return rows
 
 
 def review_agreement(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
@@ -401,6 +497,14 @@ def compute_cell_outcomes(records: Sequence[Mapping[str, Any]]) -> list[CellOutc
                 placeholder=sum(1 for row in rows if row["triage"]["placeholder_echo"]),
                 unresolved=unresolved,
                 loop_repetition=sum(1 for row in rows if row["triage"]["possible_loop"]),
+                no_cot_violations=sum(
+                    1 for row in rows if row["compliance"]["compliant"] is False
+                ),
+                arbitration_pending=sum(
+                    1
+                    for row in rows
+                    if row["evaluation"].get("arbitration_pending") is True
+                ),
             )
         )
     return outcomes

@@ -136,3 +136,4 @@ infra/azure/scripts/emit_phase1_0d_protocol.py text eol=lf
 docs/phase1_0d_protocol_snapshot.json text eol=lf
 src/jspace_observation/phase1_0d_execution.py text eol=lf
 tests/test_phase1_0d_execution.py text eol=lf
+tests/test_paper_registries.py text eol=lf

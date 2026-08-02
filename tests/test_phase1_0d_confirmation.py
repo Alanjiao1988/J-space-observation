@@ -29,6 +29,7 @@ from jspace_observation.phase1_0d_confirmation import (
     LITERAL_ANSWER_PLACEHOLDER,
     PHASE_1_0C_SPLIT,
     PRESERVED_PHASE_1_0C_PACK,
+    REVIEW_FORM_PRESENTED_FIELDS,
     SPONTANEOUS_NO_COT_ARM,
     STRICT_MAX_NEW_TOKENS,
     STRUCTURAL_NO_COT_ARM,
@@ -42,15 +43,19 @@ from jspace_observation.phase1_0d_confirmation import (
     cell_availability,
     eligible_items,
     evaluate_cell_gate,
+    forces_secondary_review,
     generation_config,
     paired_difference,
     phase_1_0c_item_ids,
     prompt_defects,
     protocol_snapshot,
     render_prompt,
-    requires_secondary_review,
     select_confirmation_items,
     selection_summary,
+    stratified_secondary_sample,
+    strict_output_compliance,
+    validate_judgment,
+    validate_judgment_set,
 )
 from jspace_observation.headroom_calibration import (
     MODEL_ID,
@@ -282,35 +287,42 @@ def test_an_answer_longer_than_the_budget_is_refused():
 
 def test_unresolved_and_invalid_rows_always_get_a_second_review():
     for label in ("unresolved", "invalid"):
-        assert requires_secondary_review(
-            "row-1", primary_label=label, parser_agrees_with_primary=True
+        assert forces_secondary_review(
+            primary_label=label, parser_agrees_with_primary=True
         )
 
 
 def test_every_parser_disagreement_gets_a_second_review():
-    assert requires_secondary_review(
-        "row-1", primary_label="correct", parser_agrees_with_primary=False
+    assert forces_secondary_review(
+        primary_label="correct", parser_agrees_with_primary=False
     )
 
 
 def test_the_remaining_sample_is_deterministic_and_near_twenty_percent():
-    ids = [f"p1hd-row-{index:04d}" for index in range(2000)]
-    sampled = [
-        record_id
-        for record_id in ids
-        if requires_secondary_review(
-            record_id, primary_label="correct", parser_agrees_with_primary=True
-        )
-    ]
-    again = [
-        record_id
-        for record_id in ids
-        if requires_secondary_review(
-            record_id, primary_label="correct", parser_agrees_with_primary=True
-        )
-    ]
-    assert sampled == again
-    assert 0.15 < len(sampled) / len(ids) < 0.25
+    strata = {
+        (family, band): [f"p1hd-{family}-{band}-{index:04d}" for index in range(20)]
+        for family in ("alpha", "beta", "gamma")
+        for band in ("easy", "medium", "hard")
+    }
+    sampled = stratified_secondary_sample(strata)
+    assert sampled == stratified_secondary_sample(strata)
+    assert len(sampled) / sum(len(v) for v in strata.values()) == pytest.approx(0.20)
+
+
+def test_every_stratum_receives_its_own_sampled_reviews():
+    strata = {
+        (family, band): [f"p1hd-{family}-{band}-{index:04d}" for index in range(20)]
+        for family in ("alpha", "beta", "gamma")
+        for band in ("easy", "medium", "hard")
+    }
+    sampled = stratified_secondary_sample(strata)
+    for key, record_ids in strata.items():
+        covered = len(sampled.intersection(record_ids))
+        assert covered == 4, f"stratum {key} received {covered} sampled reviews"
+
+
+def test_a_small_stratum_is_never_left_unsampled():
+    assert len(stratified_secondary_sample({("only",): ["a", "b", "c"]})) == 1
 
 
 def test_agreement_stands_and_disagreement_never_resolves_to_correct():
@@ -319,6 +331,25 @@ def test_agreement_stands_and_disagreement_never_resolves_to_correct():
     assert disagreement["final_label"] == "unresolved"
     assert disagreement["arbitration_required"] is True
     assert disagreement["agreement"] is False
+    assert disagreement["arbitration_pending"] is True
+
+
+def test_a_third_adjudication_resolves_a_disagreement():
+    outcome = arbitrate("correct", "incorrect", "incorrect")
+    assert outcome["final_label"] == "incorrect"
+    assert outcome["arbitration_required"] is True
+    assert outcome["arbitration_pending"] is False
+
+
+def test_a_third_adjudication_may_itself_leave_a_row_unresolved():
+    assert arbitrate("correct", "incorrect", "unresolved")["final_label"] == "unresolved"
+
+
+def test_a_third_adjudication_cannot_reopen_a_settled_row():
+    with pytest.raises(Phase1_0DError):
+        arbitrate("correct", "correct", "incorrect")
+    with pytest.raises(Phase1_0DError):
+        arbitrate("correct", None, "incorrect")
 
 
 def test_a_row_without_a_second_review_keeps_the_primary_label():
@@ -330,6 +361,107 @@ def test_a_row_without_a_second_review_keeps_the_primary_label():
 def test_an_unregistered_label_is_refused():
     with pytest.raises(Phase1_0DError):
         arbitrate("probably_right", None)
+
+
+# ---------------------------------------------------------------------------
+# Strict-arm no-CoT compliance
+# ---------------------------------------------------------------------------
+
+
+def test_a_bare_value_is_no_cot_compliant():
+    report = strict_output_compliance("224")
+    assert report["compliant"] is True
+    assert report["violations"] == []
+
+
+def test_an_emitted_rationale_is_a_compliance_violation():
+    report = strict_output_compliance("Let me add them. Therefore 224")
+    assert report["compliant"] is False
+    assert "reasoning_marker" in report["violations"]
+
+
+def test_a_multi_line_strict_output_is_a_compliance_violation():
+    assert "multi_line_output" in strict_output_compliance("224\n225")["violations"]
+
+
+def test_no_cot_compliance_never_decides_correctness():
+    assert strict_output_compliance("224")["decides_correctness"] is False
+
+
+def test_the_gate_refuses_a_strict_cell_that_emitted_reasoning():
+    visible = _outcome(VISIBLE_CONTROL_ARM.arm_id, correct=18)
+    strict = _outcome(SPONTANEOUS_NO_COT_ARM.arm_id, correct=12, no_cot_violations=1)
+    gate = evaluate_cell_gate(visible, strict)
+    assert gate["criteria"]["strict_arm_emitted_no_visible_reasoning"] is False
+    assert gate["rq2_pilot_candidate"] is False
+
+
+def test_the_gate_refuses_a_cell_with_pending_arbitration():
+    visible = _outcome(VISIBLE_CONTROL_ARM.arm_id, correct=18)
+    strict = _outcome(SPONTANEOUS_NO_COT_ARM.arm_id, correct=12, arbitration_pending=1)
+    gate = evaluate_cell_gate(visible, strict)
+    assert gate["criteria"]["no_arbitration_left_pending"] is False
+
+
+# ---------------------------------------------------------------------------
+# Closed reviewer form
+# ---------------------------------------------------------------------------
+
+
+def _judgment(**overrides):
+    base = {
+        "record_id": "row-1",
+        "role": "primary",
+        "label": "correct",
+        "reviewer_id": "reviewer-a",
+    }
+    base.update(overrides)
+    return base
+
+
+def test_a_valid_judgment_is_accepted():
+    assert validate_judgment(_judgment())["label"] == "correct"
+
+
+def test_a_judgment_with_an_extra_field_is_refused():
+    with pytest.raises(Phase1_0DError):
+        validate_judgment({**_judgment(), "confidence": 0.9})
+
+
+def test_a_judgment_missing_its_reviewer_is_refused():
+    with pytest.raises(Phase1_0DError):
+        validate_judgment(_judgment(reviewer_id="  "))
+
+
+def test_two_judgments_for_the_same_row_and_role_are_refused():
+    with pytest.raises(Phase1_0DError):
+        validate_judgment_set([_judgment(), _judgment(reviewer_id="reviewer-b")])
+
+
+def test_one_reviewer_may_not_hold_two_roles_on_one_row():
+    with pytest.raises(Phase1_0DError):
+        validate_judgment_set([_judgment(), _judgment(role="secondary")])
+
+
+def test_independent_reviewers_on_one_row_are_accepted():
+    accepted = validate_judgment_set(
+        [_judgment(), _judgment(role="secondary", reviewer_id="reviewer-b")]
+    )
+    assert len(accepted) == 2
+
+
+def test_the_reviewer_is_never_shown_the_parser_verdict():
+    assert "triage" not in REVIEW_FORM_PRESENTED_FIELDS
+    assert "route" not in REVIEW_FORM_PRESENTED_FIELDS
+
+
+def test_the_visible_exemplar_is_never_a_registered_answer():
+    bank = load_task_bank(REPO_ROOT / DEFAULT_BANK_PATH)
+    exemplars = {"42"}
+    assert not exemplars.intersection(
+        str(item["registered_answer"]) for item in bank
+    ), "the visible-arm format exemplar collides with a registered answer"
+
 
 
 def test_the_parser_may_only_route():

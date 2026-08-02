@@ -37,8 +37,10 @@ from jspace_observation.phase1_0d_execution import (
     apply_judgments,
     build_decision,
     build_records,
+    build_review_form_rows,
     compute_cell_outcomes,
     final_answer_surface,
+    ingest_judgments,
     looks_like_a_loop,
     plan_work_units,
     record_id_for,
@@ -195,14 +197,22 @@ def test_every_invalid_row_is_double_reviewed(pipeline):
 
 def test_the_secondary_review_covers_more_than_the_forced_rows(pipeline):
     forced = sum(
-        1
-        for record in pipeline
-        if record["evaluation"]["primary_label"] in {"invalid", "unresolved"}
+        1 for record in pipeline if record["evaluation"]["secondary_review_forced"]
     )
     selected = sum(
         1 for record in pipeline if record["evaluation"]["secondary_review_required"]
     )
     assert selected > forced
+
+
+def test_every_cell_and_arm_receives_sampled_secondary_reviews(pipeline):
+    strata: dict[tuple, int] = {}
+    for record in pipeline:
+        if record["evaluation"]["secondary_review_sampled"]:
+            key = (record["task_family"], record["difficulty_band"], record["arm_id"])
+            strata[key] = strata.get(key, 0) + 1
+    assert len(strata) == 15 * len(ARMS)
+    assert set(strata.values()) == {4}
 
 
 def test_a_missing_secondary_review_is_refused(units):
@@ -227,6 +237,89 @@ def test_a_reviewer_disagreement_becomes_unresolved(units):
     resolved = apply_judgments(annotated)
     assert resolved[0]["evaluation"]["final_label"] == "unresolved"
     assert resolved[0]["evaluation"]["arbitration_required"] is True
+    assert resolved[0]["evaluation"]["arbitration_pending"] is True
+
+
+def test_a_third_adjudication_closes_a_disagreement(units):
+    backend = SelfTestBackend()
+    outputs = {unit.record_id: backend.generate(unit) for unit in units[:1]}
+    records = build_records(units[:1], outputs)
+    records[0]["evaluation"]["primary_label"] = "correct"
+    annotated = annotate_review_selection(records)
+    annotated[0]["evaluation"]["secondary_review_required"] = True
+    annotated[0]["evaluation"]["secondary_label"] = "incorrect"
+    annotated[0]["evaluation"]["third_label"] = "correct"
+    resolved = apply_judgments(annotated)
+    assert resolved[0]["evaluation"]["final_label"] == "correct"
+    assert resolved[0]["evaluation"]["arbitration_pending"] is False
+
+
+# ---------------------------------------------------------------------------
+# Closed review form and judgment ingestion
+# ---------------------------------------------------------------------------
+
+
+def test_the_review_form_shows_only_the_registered_fields(units):
+    backend = SelfTestBackend()
+    outputs = {unit.record_id: backend.generate(unit) for unit in units[:5]}
+    records = build_records(units[:5], outputs)
+    questions = {unit.record_id: unit.prompt for unit in units[:5]}
+    rows = build_review_form_rows(records, questions)
+    assert all(set(row) == {"record_id", "question", "registered_answer", "output_text"} for row in rows)
+
+
+def test_ingested_judgments_reach_the_decision_pipeline(units):
+    backend = SelfTestBackend()
+    outputs = {unit.record_id: backend.generate(unit) for unit in units[:1]}
+    records = build_records(units[:1], outputs)
+    record_id = records[0]["record_id"]
+    ingested = ingest_judgments(
+        records,
+        [
+            {"record_id": record_id, "role": "primary", "label": "correct", "reviewer_id": "a"},
+            {"record_id": record_id, "role": "secondary", "label": "correct", "reviewer_id": "b"},
+        ],
+    )
+    resolved = apply_judgments(annotate_review_selection(ingested))
+    assert resolved[0]["evaluation"]["final_label"] == "correct"
+    assert resolved[0]["evaluation"]["primary_reviewer_id"] == "a"
+
+
+def test_a_judgment_for_an_unknown_record_is_refused(units):
+    backend = SelfTestBackend()
+    outputs = {unit.record_id: backend.generate(unit) for unit in units[:1]}
+    records = build_records(units[:1], outputs)
+    with pytest.raises(Phase1_0DError):
+        ingest_judgments(
+            records,
+            [{"record_id": "no-such-row", "role": "primary", "label": "correct", "reviewer_id": "a"}],
+        )
+
+
+# ---------------------------------------------------------------------------
+# Strict-arm no-CoT compliance
+# ---------------------------------------------------------------------------
+
+
+def test_strict_rows_carry_a_compliance_report_and_visible_rows_do_not(pipeline):
+    for record in pipeline:
+        report = record["compliance"]
+        if record["arm_id"] == VISIBLE_CONTROL_ARM.arm_id:
+            assert report["compliant"] is None
+        else:
+            assert report["compliant"] in {True, False}
+
+
+def test_an_emitted_rationale_in_a_strict_arm_is_counted(units):
+    unit = next(u for u in units if u.arm_id == SPONTANEOUS_NO_COT_ARM.arm_id)
+    records = build_records([unit], {unit.record_id: GenerationOutput("Let me add. 224", 6)})
+    assert records[0]["compliance"]["compliant"] is False
+    records[0]["evaluation"]["primary_label"] = "correct"
+    records[0]["evaluation"]["secondary_label"] = "correct"
+    resolved = apply_judgments(annotate_review_selection(records))
+    outcome = compute_cell_outcomes(resolved)[0]
+    assert outcome.no_cot_violations == 1
+
 
 
 def test_agreement_reporting_separates_reviewers_from_the_parser(pipeline):
