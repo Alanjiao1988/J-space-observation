@@ -69,6 +69,13 @@ ENDPOINT = "stjspacefiles0709085305.privatelink.blob.core.windows.net"
 #: holding instead of inheriting whatever pytest happens to have imported.
 CLEAN_MODULES = ("json", "hashlib", "unicodedata", "typing")
 
+#: role -> entrypoint spec, derived from the registry rather than restated.
+#:
+#: The registry is keyed by the entrypoint's kebab-case name and the roles are
+#: snake_case, so a second hand-written table here would be one more place for
+#: the rehearsal and the deployment to drift apart.
+BY_ROLE = {spec.role: spec for spec in entrypoints.ENTRYPOINTS.values()}
+
 TOTAL = construction.TOTAL_CASES
 
 
@@ -263,12 +270,12 @@ def _bindings(**overrides: Any) -> dict[str, Any]:
             "base_image_digest": IMAGE_DIGEST,
             "evaluation_image_digest": IMAGE_DIGEST,
             "cuda_runtime": "cuda-12.4",
-            "stage_p_entrypoint": entrypoints.ENTRYPOINTS["stage_p"].name,
-            "stage_p_command": list(entrypoints.ENTRYPOINTS["stage_p"].command),
+            "stage_p_entrypoint": BY_ROLE["stage_p"].name,
+            "stage_p_command": list(BY_ROLE["stage_p"].command),
             "stage_p_identity": entrypoints.ROLE_IDENTITY_NAMES["stage_p"],
             "stage_p_read_classes": ["sealed_v2_inputs", "frozen_parser_assets"],
-            "stage_e_entrypoint": entrypoints.ENTRYPOINTS["stage_e"].name,
-            "stage_e_command": list(entrypoints.ENTRYPOINTS["stage_e"].command),
+            "stage_e_entrypoint": BY_ROLE["stage_e"].name,
+            "stage_e_command": list(BY_ROLE["stage_e"].command),
             "stage_e_identity": entrypoints.ROLE_IDENTITY_NAMES["stage_e"],
             "stage_e_read_classes": [
                 "sealed_predictions",
@@ -382,14 +389,14 @@ def _env() -> dict[str, str]:
 
 
 def launch(name: str, *, config: entrypoints.RoleConfig | None = None, **payload: Any) -> Any:
-    """Reach an entrypoint through its registered command, as a container does.
+    """Reach a role's entrypoint through its registered command, as a container does.
 
     The command tuple is resolved rather than the function being imported by
     name, and the resolution is cross-checked against the role. If the registry
     and the deployment ever disagree, this raises instead of quietly rehearsing
     something the platform would never run.
     """
-    spec = entrypoints.ENTRYPOINTS[name]
+    spec = BY_ROLE[name]
     resolved = entrypoints.resolve_entrypoint(spec.command)
     entrypoints.assert_container_command_is_registered(role=spec.role, command=spec.command)
     assert resolved is spec, "the registered command resolved to a different entrypoint"
@@ -535,6 +542,10 @@ class TestTheRehearsalUsesTheRegisteredCommands:
             assert entrypoints.resolve_entrypoint(spec.command) is spec
             assert spec.command[1] == entrypoints.CONTAINER_ENTRYPOINT_PATH
             assert spec.command[2] == name
+
+    def test_the_role_index_is_a_bijection_over_the_registry(self) -> None:
+        assert len(BY_ROLE) == len(entrypoints.ENTRYPOINTS)
+        assert set(BY_ROLE) == set(entrypoints.ROLE_IDENTITY_NAMES)
 
     def test_every_role_logged_its_guard_before_its_work(self, run) -> None:
         for returned in run["returns"].values():
@@ -895,12 +906,8 @@ class TestThePassPath:
         assert run["result"]["prediction_receipt_digest"] == run["receipt"]["receipt_digest"]
 
     def test_the_lock_preregisters_the_registered_commands(self, run) -> None:
-        assert run["lock"]["stage_p_command"] == list(
-            entrypoints.ENTRYPOINTS["stage_p"].command
-        )
-        assert run["lock"]["stage_e_command"] == list(
-            entrypoints.ENTRYPOINTS["stage_e"].command
-        )
+        assert run["lock"]["stage_p_command"] == list(BY_ROLE["stage_p"].command)
+        assert run["lock"]["stage_e_command"] == list(BY_ROLE["stage_e"].command)
         assert run["lock"]["stage_p_identity"] == entrypoints.ROLE_IDENTITY_NAMES["stage_p"]
         assert run["lock"]["stage_e_identity"] == entrypoints.ROLE_IDENTITY_NAMES["stage_e"]
 
@@ -1124,9 +1131,8 @@ class TestTheWrongRolePath:
             launch("normalizer", config=config, admission_records=_admitted())
 
     def test_a_role_holding_no_managed_identity_is_refused(self) -> None:
-        spec = entrypoints.ENTRYPOINTS["normalizer"]
         with pytest.raises(EntrypointError):
-            spec.function(
+            BY_ROLE["normalizer"].function(
                 config=_config("normalizer"),
                 environment={},
                 loaded_module_names=CLEAN_MODULES,
@@ -1143,7 +1149,7 @@ class TestTheWrongRolePath:
 
 class TestTheWrongEntrypointPath:
     def test_a_command_naming_another_role_is_refused_for_this_role(self) -> None:
-        stage_e = entrypoints.ENTRYPOINTS["stage_e"]
+        stage_e = BY_ROLE["stage_e"]
         assert entrypoints.resolve_entrypoint(stage_e.command).role == "stage_e"
         with pytest.raises(EntrypointError):
             entrypoints.assert_container_command_is_registered(
@@ -1153,20 +1159,34 @@ class TestTheWrongEntrypointPath:
     def test_the_module_form_command_is_refused(self) -> None:
         with pytest.raises(EntrypointError):
             entrypoints.resolve_entrypoint(
-                ("python", "-m", "jspace_observation.parser_v3_v2_entrypoints", "stage_p")
+                ("python", "-m", "jspace_observation.parser_v3_v2_entrypoints", "stage-p")
             )
 
     def test_an_unregistered_entrypoint_name_is_refused(self) -> None:
         with pytest.raises(EntrypointError):
             entrypoints.resolve_entrypoint(
-                ("python", entrypoints.CONTAINER_ENTRYPOINT_PATH, "stage_x")
+                ("python", entrypoints.CONTAINER_ENTRYPOINT_PATH, "stage-x")
             )
 
     def test_an_extra_argument_is_refused_rather_than_ignored(self) -> None:
         with pytest.raises(EntrypointError):
             entrypoints.resolve_entrypoint(
-                tuple(entrypoints.ENTRYPOINTS["stage_p"].command) + ("--extra",)
+                tuple(BY_ROLE["stage_p"].command) + ("--extra",)
             )
+
+    def test_a_command_naming_the_role_instead_of_the_entrypoint_is_refused(self) -> None:
+        """The registry is keyed by kebab-case name; the roles are snake_case.
+
+        A container configured with the role name rather than the entrypoint
+        name must fail to resolve rather than land on a neighbouring role.
+        """
+        for role, spec in BY_ROLE.items():
+            if role == spec.name:
+                continue
+            with pytest.raises(EntrypointError):
+                entrypoints.resolve_entrypoint(
+                    ("python", entrypoints.CONTAINER_ENTRYPOINT_PATH, role)
+                )
 
 
 class TestTheIneligibleSealedCasePath:
