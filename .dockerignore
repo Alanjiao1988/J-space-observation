@@ -32,6 +32,14 @@ artifacts/
 # Scoped to this one file so the blanket artifacts/ exclusion keeps protecting
 # everything else.
 !artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/02_records.jsonl
+# Second narrow exception: the Phase 1.0D confirmation image needs Phase 1.0C's
+# own generated records, because the disjoint confirmation split is defined
+# against the item ids 1.0C actually generated on rather than against a split
+# label. Section 4.3 states that every prompt and output in this work package is
+# public scientific data; this file carries no private review material and no
+# reviewer identity. Scoped to this one file so the blanket artifacts/ exclusion
+# keeps protecting everything else.
+!artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/02_records.jsonl
 **/all45_*
 evaluator_sets/
 **/locked_inputs.jsonl

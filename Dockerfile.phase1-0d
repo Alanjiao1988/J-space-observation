@@ -1,0 +1,110 @@
+FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime@sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126
+
+# Dedicated Phase 1.0D headroom-confirmation image.
+#
+# Separate from Dockerfile.calibration on purpose.  Phase 1.0C run
+# 20260725T170041Z remains a valid historical record and its image, provenance
+# generator and artifact namespace must not be overwritten or reinterpreted.
+# This image has its own repository, its own provenance record and its own
+# entrypoint, and it changes no frozen Phase 1.0C protocol.
+#
+# The build refuses to complete unless the baked source hashes to the recorded
+# bundle digest, every installed package matches the lock, and the Phase 1.0D
+# protocol inside the image reports its frozen protocol_sha256.
+
+LABEL org.opencontainers.image.title="J-space Phase 1.0D headroom confirmation"
+LABEL org.opencontainers.image.base.name="pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime"
+LABEL org.opencontainers.image.base.digest="sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126"
+LABEL io.jspace.confirmation.phase="1.0D"
+LABEL io.jspace.confirmation.model-id="deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+LABEL io.jspace.confirmation.model-revision="ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+LABEL io.jspace.confirmation.tokenizer-revision="ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+LABEL io.jspace.confirmation.protocol-sha256="25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8"
+LABEL io.jspace.confirmation.provenance="/opt/jspace/phase1-0d-build-provenance.json"
+LABEL io.jspace.confirmation.emits="unlabelled generations only; a headroom number requires semantic review under section 4.3"
+LABEL io.jspace.confirmation.claim-boundary="task calibration only; licenses no claim about hidden reasoning or internal representations"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN groupadd --system --gid 10001 jspace \
+    && useradd --system --uid 10001 --gid jspace --create-home \
+        --home-dir /workspace/runtime/home --shell /usr/sbin/nologin jspace
+
+WORKDIR /workspace
+
+COPY requirements-calibration.txt Dockerfile.phase1-0d /workspace/
+COPY scripts/phase1_0d_build_provenance.py /workspace/scripts/
+COPY phase1_0d_build_provenance.json /opt/jspace/phase1-0d-build-provenance.json
+
+# --no-deps keeps every installed version exactly at its pin; verify-runtime
+# then fails the build if any pin, the interpreter, or the base torch drifts.
+RUN python -m pip install --no-cache-dir --no-deps \
+        -r /workspace/requirements-calibration.txt \
+    && python -I /workspace/scripts/phase1_0d_build_provenance.py \
+        verify-runtime --requirements /workspace/requirements-calibration.txt \
+    && python -c "import torch, transformers, scipy, numpy, azure.identity, azure.storage.blob"
+
+COPY scripts/run_phase1_0d_confirmation.py /workspace/scripts/
+COPY src/jspace_observation/ /workspace/src/jspace_observation/
+COPY data/phase1_task_headroom_candidates.jsonl /workspace/data/
+COPY docs/prompts/phase_science_restart_after_parser_closure_prompt.md /workspace/docs/prompts/
+# Phase 1.0C's own generated records.  The disjoint confirmation split is
+# defined against the item ids 1.0C actually generated on, not against a split
+# label, so the evidence has to travel with the image.  These are public
+# scientific data under section 4.3 and carry no private review material.
+COPY artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/02_records.jsonl \
+     /workspace/artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/
+
+RUN python -I /workspace/scripts/phase1_0d_build_provenance.py \
+        --project-root /workspace verify-image-context \
+        --provenance /opt/jspace/phase1-0d-build-provenance.json \
+    && python -I /workspace/scripts/phase1_0d_build_provenance.py \
+        --project-root /workspace verify-protocol \
+    && install -d -o jspace -g jspace -m 0700 \
+        /workspace/runtime/home \
+        /workspace/runtime/hf-cache \
+        /workspace/runtime/results \
+        /workspace/runtime/cache \
+        /workspace/runtime/cache/tmp \
+        /workspace/runtime/pycache \
+    && chown -R 0:0 \
+        /workspace/scripts \
+        /workspace/src \
+        /workspace/data \
+        /workspace/docs \
+        /workspace/artifacts \
+        /workspace/requirements-calibration.txt \
+        /workspace/Dockerfile.phase1-0d \
+        /opt/jspace \
+    && chmod -R a-w \
+        /workspace/scripts \
+        /workspace/src \
+        /workspace/data \
+        /workspace/docs \
+        /workspace/artifacts \
+        /workspace/requirements-calibration.txt \
+        /workspace/Dockerfile.phase1-0d \
+    && chmod 0444 /opt/jspace/phase1-0d-build-provenance.json
+
+ENV HOME=/workspace/runtime/home \
+    HF_HOME=/workspace/runtime/hf-cache \
+    HUGGINGFACE_HUB_CACHE=/workspace/runtime/hf-cache/hub \
+    TRANSFORMERS_CACHE=/workspace/runtime/hf-cache \
+    XDG_CACHE_HOME=/workspace/runtime/cache \
+    TMPDIR=/workspace/runtime/cache/tmp \
+    PYTHONPYCACHEPREFIX=/workspace/runtime/pycache \
+    RESULTS_DIR=/workspace/runtime/results \
+    JSPACE_PHASE1_0D_PROVENANCE=/opt/jspace/phase1-0d-build-provenance.json
+
+USER 10001:10001
+
+# The default is the mode that cannot touch the model.  Running this image with
+# no arguments registers the selection and every rendered prompt and stops; a
+# generation must be asked for explicitly.
+CMD ["python", "/workspace/scripts/run_phase1_0d_confirmation.py", \
+     "--mode", "plan", \
+     "--repo-root", "/workspace", \
+     "--output-root", "/workspace/runtime/results"]
