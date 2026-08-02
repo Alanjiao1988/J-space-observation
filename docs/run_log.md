@@ -4223,3 +4223,49 @@ the arbitration rule from `phase1_0d_arbitration_v1` to
 `0d3fe6add211a381a321ea974502d262faf65312dc504e2acceb7c6556b1f524`.
 
 All scientific counters remain zero. No Phase 1.0D generation has been run.
+
+## 2026-08-02 - A registry integrity test found five malformed rows in the paper registries
+
+Authority section 10 requires every scientific result to be registered in the
+paper ledgers. Registering the section 4 results exposed that nothing in the
+repository had ever validated those CSVs, so `tests/test_paper_registries.py`
+was added: it refuses a row whose column count differs from the header, a
+missing or duplicate identifier, an evidence row with no limitations, and an
+artifact row that does not declare its privacy status.
+
+It immediately failed on committed history rather than on the new rows.
+
+| Registry | Row | Columns found | Columns declared |
+| --- | --- | --- | --- |
+| `table_registry.csv` | TAB-001 | 10 | 9 |
+| `table_registry.csv` | TAB-003 | 10 | 9 |
+| `table_registry.csv` | TAB-004 | 11 | 9 |
+| `table_registry.csv` | TAB-005 | 10 | 9 |
+| `figure_registry.csv` | FIG-003 | 11 | 9 |
+
+Cause: the trailing `limitations` field of those rows contains commas and was
+not quoted, so `csv.reader` split one field into several.
+
+Scope of the damage, stated precisely rather than reassuringly. The overflow is
+tail-only in all five rows: the identifier still matches its pattern, `status`
+still reads `available`, and `generation_script` still names a `.py` file,
+which could not be true if a leading field had shifted. So no recorded value had
+moved onto a wrong header, and the repair quotes the field without altering a
+character of the recorded text. What was actually at risk is a consumer that
+reads these registries positionally: it would have read a truncated limitations
+string for five exhibits, that is, an understated statement of what those
+exhibits do not establish.
+
+The test was also extended: every registered figure and table must now state
+what it does not establish, not only every evidence row.
+
+| Run | Commit | Purpose | Result |
+| --- | --- | --- | --- |
+| `cm4j` | `8c76b6ec` | Full suite after the preregistration correction | 3005 passed, 15 skipped, 4 failed: the 2 disclosed pre-existing failures plus the 2 registry defects above |
+| `cm4k` | `109766da` | Full suite after the registry repair | 3009 passed, 15 skipped, 2 failed, both disclosed pre-existing |
+
+Baseline for this work package was 2945 passed. The package adds 64 tests and
+introduces no new failure.
+
+Not established: this is a records-integrity repair. No measurement was taken,
+no artifact was regenerated, and no scientific counter moved.
