@@ -1,0 +1,173 @@
+{
+  "schema_version": "phase_science_restart_authority.v1",
+  "recorded_at_utc": "2026-08-02T14:55:00Z",
+  "authority": {
+    "kind": "operator_prompt",
+    "path": "docs/prompts/phase_science_restart_after_parser_closure_prompt.md",
+    "sha256": "5bc137c42c68e1b85b4cad1d45e1b4bf54fb68e2899f27bc6338dae61e9ef162",
+    "bytes": 25313,
+    "line_endings": "lf",
+    "verbatim": true,
+    "supersedes": [
+      {
+        "name": "docs/prompts/phase_a3_b_to_d_cloud_execution_prompt.md",
+        "effect": "no_longer_the_active_execution_authority",
+        "retained": true
+      },
+      {
+        "name": "phase1_2h_rd1_public_protocol_refoundation_prompt.md",
+        "effect": "superseded_and_must_not_be_executed",
+        "present_in_repository": false
+      }
+    ]
+  },
+  "required_starting_commit": "ea2bce81defe9063bde2be58ada0e747d2a34c03",
+  "observed_starting_commit": "ea2bce81defe9063bde2be58ada0e747d2a34c03",
+  "starting_commit_matches": true,
+  "target_model": {
+    "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+  },
+  "project_state": {
+    "previous_global_state_source": "parser-v3-v2 locked-evaluation subproject",
+    "previous_global_state": "BLOCKED_ON_PUBLIC_PROTOCOL_FREEZE",
+    "new_project_state": "SCIENTIFIC_MAINLINE_RESTART_AUTHORIZED",
+    "parser_subproject_state": "CLOSED_NONAUTHORITATIVE_TRIAGE_ONLY"
+  },
+  "binding_design_decisions": [
+    {
+      "id": "DR-01",
+      "statement": "Semantic adjudication is the only authoritative final-label path. An automatic parser may triage, route or diagnose, but may never be the final correctness label for a scientific result.",
+      "source": "paper/limitations_ledger.md L-01, elevated from a temporary limitation to a project design rule"
+    },
+    {
+      "id": "DR-02",
+      "statement": "The parser-v3-v1 and parser-v3-v2 locked-evaluation programs are closed. No new private holdout, set repair, private review boundary, Stage P/E run, parser freeze or parser audit is authorized.",
+      "source": "new prompt section 1"
+    },
+    {
+      "id": "DR-03",
+      "statement": "All old reports, receipts, commits, failed candidates, sealed objects, counters and audit findings are preserved unchanged. BLOCKED_ON_PUBLIC_PROTOCOL_FREEZE remains the correct terminal state of the parser subproject under its old authority.",
+      "source": "new prompt section 1"
+    },
+    {
+      "id": "DR-04",
+      "statement": "The old parser terminal state is not a global scientific-project blocker.",
+      "source": "new prompt section 1"
+    },
+    {
+      "id": "DR-05",
+      "statement": "Existing parser-v3 code, tests, schemas, entrypoints, IaC and audit tooling remain historical/methodological artifacts. They are not deleted, not improved and not re-audited under this authority, and elaborateness alone does not make them publishable.",
+      "source": "new prompt section 1"
+    },
+    {
+      "id": "DR-06",
+      "statement": "A negative headroom result, a non-converged lens or a failed validity gate is a scientific result, not a reason to create another evaluator or audit-infrastructure project.",
+      "source": "new prompt section 1"
+    }
+  ],
+  "authorized_work_packages": [
+    {
+      "id": "S0",
+      "title": "Close the parser subproject without erasing history",
+      "prompt_section": "3"
+    },
+    {
+      "id": "S1",
+      "title": "Phase 1.0D headroom repair and strict-no-CoT calibration",
+      "prompt_section": "4"
+    },
+    {
+      "id": "S2",
+      "title": "Full-layer J-lens scaling run",
+      "prompt_section": "5"
+    },
+    {
+      "id": "S3",
+      "title": "Preregistered J-lens validity benchmark",
+      "prompt_section": "6"
+    },
+    {
+      "id": "S4",
+      "title": "First bounded RQ2 mechanistic pilot",
+      "prompt_section": "8",
+      "conditional_on": [
+        "a Phase 1.0D RQ2 pilot candidate cell exists",
+        "section 6 returned JLENS_VALIDATED_FOR_RQ2_PILOT"
+      ]
+    }
+  ],
+  "operating_rules": {
+    "execution_location": "Azure (ACR Tasks, Azure Container Apps Jobs, Azure ML or an equivalent Azure runner)",
+    "laptop_permitted": [
+      "edit public tracked files",
+      "lightweight Git commands",
+      "submit Azure work",
+      "read bounded content-free or public-scientific results"
+    ],
+    "laptop_forbidden": [
+      "pytest",
+      "imports-as-tests",
+      "builds",
+      "model downloads",
+      "inference",
+      "J-lens fits",
+      "activation extraction",
+      "patching",
+      "ablation",
+      "large scans",
+      "sustained analysis"
+    ],
+    "gpu_authorized": [
+      "T4",
+      "A100 or larger when it materially reduces wall time or is required for the registered sequence length or full-layer fit"
+    ],
+    "cost_is_an_acceptance_gate": false,
+    "github_usage": "git transport only: clone, fetch, commit, non-force push",
+    "github_forbidden": [
+      "Actions",
+      "workflows",
+      "pull requests",
+      "issues",
+      "releases",
+      "artifacts",
+      "GHCR",
+      "Packages",
+      "Codespaces"
+    ],
+    "infrastructure_expansion_required": false,
+    "preregistration_review_cycles": 1,
+    "recursive_auditing_authorized": false
+  },
+  "not_opened_by_this_decision": {
+    "private_holdouts": 0,
+    "private_labels_read": 0,
+    "predictions_created": 0,
+    "stage_p_runs": 0,
+    "stage_e_runs": 0,
+    "formal_ordinals_consumed": 0,
+    "sealed_objects_modified": 0,
+    "old_receipt_bytes_modified": 0
+  },
+  "valid_final_states": [
+    "RQ2_MECHANISTIC_PILOT_COMPLETE",
+    "JLENS_VALIDATED_FOR_RQ2_PILOT",
+    "JLENS_PARTIALLY_VALIDATED",
+    "JLENS_NOT_VALIDATED",
+    "HEADROOM_NOT_ESTABLISHED",
+    "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+    "INSUFFICIENT_RQ2_PILOT_CASES",
+    "BLOCKED_ON_PREREGISTRATION_INTEGRITY",
+    "BLOCKED_ON_AZURE_EXECUTION_<EXACT_CAUSE>",
+    "NONTERMINAL_CHECKPOINT_<EXACT_NEXT_SCIENTIFIC_GATE>"
+  ],
+  "forbidden_final_states_under_this_authority": [
+    "any parser-v3 state",
+    "any public-protocol-freeze state"
+  ],
+  "methodology_references": [
+    "https://transformer-circuits.pub/2026/workspace/index.html",
+    "https://github.com/anthropics/jacobian-lens",
+    "https://github.com/anthropics/jacobian-lens/tree/main/data/evaluations"
+  ]
+}
