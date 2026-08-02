@@ -23,21 +23,31 @@
 
   "cloud_execution_binding": {
     "why_this_section_exists": "The recurrent finding in this repository is a check bound to something other than the thing that runs. Because the working branch could not be pushed, the validated tree had to be transported into Azure by another route, so the binding between what was committed locally and what executed in the cloud is proven explicitly rather than assumed.",
-    "transport_method": "A Git bundle covering the two branch commits was generated locally, base64-encoded, materialised inside the ACR task on the shared volume, fetched into a full clone of the public repository and checked out by explicit commit SHA. No Docker build context was used at any point, so .dockerignore never filtered the source.",
-    "binding_evidence_run": "cm22",
+    "transport_method": "A Git bundle covering the branch commits was generated locally and uploaded to the task as the source context, then fetched into a full clone of the public repository and checked out by explicit commit SHA. No Docker build context was used at any point, so .dockerignore never filtered the source.",
+    "superseded_transport_method": "The first four runs embedded the same bundle as base64 inside the task YAML. That works but is bounded: once the bundle grew past roughly 48 kilobytes the encoded task exceeded the service's request size limit and was rejected with a message about a step missing its cmd property, which describes the truncation rather than the cause. Uploading the bundle as the source context removes the limit and shrinks the task file from about 68 kilobytes to 1211 bytes.",
+    "binding_evidence_run": "cm26",
     "observed_in_azure": {
-      "commit": "c4346e73dff47947c5f65b0acb268cdb4252c3da",
-      "tree": "5eb58947afec218faad621bf28d3bd4c8594d0d9",
+      "commit": "97682114d8eecec051fb24938b15a2033db82431",
+      "tree": "83136a3c7a627414f6dfc633662bc9b94b4fe784",
       "working_tree_dirty_paths": 0,
       "git_directory": "present",
-      "blob_src_jspace_observation_parser_v3_v2_lifecycle_py": "17427c3a12b8de788220c765687eae04a2927fde",
-      "blob_tests_test_parser_v3_v2_lifecycle_py": "36bc554582a09a0a9b94ba9e54c30157c718986a"
+      "receipt_json_documents_parse": true,
+      "earlier_binding_run_cm22": {
+        "commit": "c4346e73dff47947c5f65b0acb268cdb4252c3da",
+        "tree": "5eb58947afec218faad621bf28d3bd4c8594d0d9",
+        "blob_src_jspace_observation_parser_v3_v2_lifecycle_py": "17427c3a12b8de788220c765687eae04a2927fde",
+        "blob_tests_test_parser_v3_v2_lifecycle_py": "36bc554582a09a0a9b94ba9e54c30157c718986a"
+      }
     },
     "observed_locally": {
-      "commit": "c4346e73dff47947c5f65b0acb268cdb4252c3da",
-      "tree": "5eb58947afec218faad621bf28d3bd4c8594d0d9",
-      "blob_src_jspace_observation_parser_v3_v2_lifecycle_py": "17427c3a12b8de788220c765687eae04a2927fde",
-      "blob_tests_test_parser_v3_v2_lifecycle_py": "36bc554582a09a0a9b94ba9e54c30157c718986a"
+      "commit": "97682114d8eecec051fb24938b15a2033db82431",
+      "tree": "83136a3c7a627414f6dfc633662bc9b94b4fe784",
+      "earlier_binding_run_cm22": {
+        "commit": "c4346e73dff47947c5f65b0acb268cdb4252c3da",
+        "tree": "5eb58947afec218faad621bf28d3bd4c8594d0d9",
+        "blob_src_jspace_observation_parser_v3_v2_lifecycle_py": "17427c3a12b8de788220c765687eae04a2927fde",
+        "blob_tests_test_parser_v3_v2_lifecycle_py": "36bc554582a09a0a9b94ba9e54c30157c718986a"
+      }
     },
     "binding_conclusion": "Equal on every field. The tree validated in Azure is byte-identical to the tree committed on the working branch."
   },
@@ -76,7 +86,35 @@
       "duration": "34s",
       "purpose": "Binding verification, corrected.",
       "outcome": "All six binding fields returned and equal to the local values.",
-      "interpretation": "Authoritative for the cloud_execution_binding section above."
+      "interpretation": "Authoritative for the code increment at commit c4346e73."
+    },
+    {
+      "run_id": "cm23",
+      "duration": "1s",
+      "purpose": "First attempt at the final full-tree validation.",
+      "outcome": "Rejected before execution: step is missing a cmd property.",
+      "interpretation": "Diagnosed, not guessed. The encoded task had grown past the service request size limit once the bundle included the receipt document, so the task body was truncated and the final step lost its cmd. The message describes the symptom, not the cause."
+    },
+    {
+      "run_id": "cm24",
+      "duration": "1s",
+      "purpose": "Retry after separating the JSON parse into its own step.",
+      "outcome": "Rejected identically.",
+      "interpretation": "Confirmed the rejection was not caused by the step structure, which was inspected line by line and found well formed."
+    },
+    {
+      "run_id": "cm25",
+      "duration": "1s",
+      "purpose": "Retry after removing a working directory key that followed a block scalar.",
+      "outcome": "Rejected identically.",
+      "interpretation": "Third identical rejection against three different step structures isolated the cause to task size rather than syntax."
+    },
+    {
+      "run_id": "cm26",
+      "duration": "4m33s",
+      "purpose": "Final full-tree validation with the bundle uploaded as the source context instead of embedded.",
+      "outcome": "JSON receipts parse; commit, tree and clean working tree all bound; 2347 passed, 15 skipped, 2 failed.",
+      "interpretation": "Authoritative for the final state of this increment. The two failures are the same disclosed sealed-input environmental failures carried by the starting commit."
     }
   ],
 
@@ -183,5 +221,5 @@
   "terminal_state": "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY",
   "terminal_state_justification": "The private review boundary required before any private construction work does not exist. The container registry in the resource group is Basic tier, which cannot carry a private link, so it must be upgraded or replaced. No firewall, no egress control and no private compute environment for the review roles has been deployed. This is the same terminal state the execution and access ledger already carries; this increment advanced public Phase A work underneath it without changing it.",
 
-  "cost_note": "Five container registry task runs were submitted in this increment, totalling approximately ten minutes of Basic-tier agent time. No GPU capacity was provisioned and no model was downloaded or run."
+  "cost_note": "Nine container registry task runs were submitted across the baseline and this increment, totalling roughly twenty-five minutes of Basic-tier agent time. Four of the nine were rejected in about one second each and cost effectively nothing. No GPU capacity was provisioned and no model was downloaded or run."
 }
