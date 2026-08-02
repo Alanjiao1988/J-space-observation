@@ -138,3 +138,6 @@ src/jspace_observation/phase1_0d_execution.py text eol=lf
 tests/test_phase1_0d_execution.py text eol=lf
 tests/test_paper_registries.py text eol=lf
 docs/audits/phase1_0d_preregistration_review.md text eol=lf
+src/jspace_observation/phase1_0d_generation.py text eol=lf
+scripts/run_phase1_0d_confirmation.py text eol=lf
+tests/test_phase1_0d_generation.py text eol=lf

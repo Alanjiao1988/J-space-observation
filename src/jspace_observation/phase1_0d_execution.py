@@ -6,9 +6,14 @@ or a threshold that the frozen protocol does not already contain.
 
 The pipeline seam is deliberate:
 
-``plan_work_units`` -> ``build_records`` -> ``annotate_review_selection``
--> (semantic review happens outside this module) -> ``apply_judgments``
+``plan_work_units`` -> ``build_records`` -> (primary semantic review happens
+outside this module) -> ``ingest_judgments`` -> ``annotate_review_selection``
+-> (secondary review, also outside) -> ``apply_judgments``
 -> ``compute_cell_outcomes`` -> ``build_decision``
+
+``annotate_review_selection`` sits *after* primary review because the forced
+component of the secondary sample is defined by the primary label.  A row cannot
+be marked for isolated re-review before anyone has reviewed it once.
 
 Automatic triage appears only in ``build_records`` and only as routing metadata.
 It never becomes a final label: ``DR-01`` forbids an automatic evaluator from
@@ -467,7 +472,26 @@ def review_agreement(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
 
 
 def compute_cell_outcomes(records: Sequence[Mapping[str, Any]]) -> list[CellOutcome]:
-    """Aggregate resolved rows into the frozen per-cell summary."""
+    """Aggregate resolved rows into the frozen per-cell summary.
+
+    Every row must already carry a semantic ``final_label``.  Without this guard
+    an unlabelled row would be counted as resolved-and-incorrect, so a run that
+    had merely not been reviewed yet would report ``HEADROOM_NOT_ESTABLISHED``
+    as though the model had failed.  A missing label is a missing measurement,
+    not a negative result.
+    """
+
+    unlabelled = [
+        str(record["record_id"])
+        for record in records
+        if record["evaluation"].get("final_label") is None
+    ]
+    if unlabelled:
+        raise Phase1_0DError(
+            f"{len(unlabelled)} row(s) carry no semantic final label, "
+            f"starting with {unlabelled[0]}; a cell metric may not be computed "
+            "from unreviewed rows"
+        )
 
     buckets: dict[tuple[str, str, str], list[Mapping[str, Any]]] = {}
     for record in records:
