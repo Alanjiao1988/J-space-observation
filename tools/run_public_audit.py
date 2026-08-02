@@ -27,7 +27,9 @@ Usage inside the runner::
     python tools/run_public_audit.py --audit a --commit <sha> \
         --endpoint https://<account>.openai.azure.com/ --deployment <name>
 
-The API key is read from ``AZURE_OPENAI_API_KEY`` and is never logged.
+Credentials come from ``AZURE_OPENAI_TOKEN`` (an Entra access token, which is
+what the target account requires because local authentication is disabled) or
+from ``AZURE_OPENAI_API_KEY``. Neither is logged.
 """
 
 from __future__ import annotations
@@ -167,15 +169,25 @@ def parse_properties(scope_text: str):
 
 
 def _post(url: str, key: str, payload: dict, attempts: int = 6) -> dict:
-    """POST with backoff on throttling; raise on anything else."""
+    """POST with backoff on throttling; raise on anything else.
+
+    ``key`` is either an Entra access token (when it looks like a JWT) or an
+    account key. The account this runs against has local authentication
+    disabled, so the token path is the normal one; the key path is kept so the
+    harness still works against an account that allows keys.
+    """
     body = json.dumps(payload).encode("utf-8")
+    if key.count(".") == 2 and key.startswith("ey"):
+        auth = {"Authorization": f"Bearer {key}"}
+    else:
+        auth = {"api-key": key}
     delay = 20.0
     last = None
     for attempt in range(attempts):
         request = urllib.request.Request(
             url,
             data=body,
-            headers={"Content-Type": "application/json", "api-key": key},
+            headers={"Content-Type": "application/json", **auth},
             method="POST",
         )
         try:
@@ -406,9 +418,11 @@ def main() -> int:
     args = parser.parse_args()
 
     audit_id = args.audit.upper()
-    key = os.environ.get("AZURE_OPENAI_API_KEY", "")
+    key = os.environ.get("AZURE_OPENAI_TOKEN", "") or os.environ.get(
+        "AZURE_OPENAI_API_KEY", ""
+    )
     if not key:
-        raise AuditError("AZURE_OPENAI_API_KEY is not set")
+        raise AuditError("neither AZURE_OPENAI_TOKEN nor AZURE_OPENAI_API_KEY is set")
 
     tree = verify_checkout(args.commit)
     scope_path, paths = MATERIAL[audit_id]
