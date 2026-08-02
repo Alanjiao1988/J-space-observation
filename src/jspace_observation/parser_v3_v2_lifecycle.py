@@ -211,7 +211,150 @@ ROLE_LANES: Mapping[str, Mapping[str, tuple[str, ...]]] = {
         "reads": ("content_free_receipts",),
         "writes": ("public_projection",),
     },
+    # --- additive lanes required by section 5.2 --------------------------
+    #
+    # Section 7.4 registers the minimum matrix above. Section 5.2 requires a
+    # production entrypoint for four further roles, and ``_assert_scope``
+    # refuses any role absent from this table --- so without these entries the
+    # normalizer, selector, facts compiler and preregistration compiler could
+    # not verify their lanes at all, which is the opposite of fail-closed.
+    #
+    # The eleven entries above are unchanged. A control asserts that, because
+    # "we only added rows" is a claim about a diff and must be testable from
+    # the running table instead.
+    "normalizer": {
+        "reads": ("v2_private_staging",),
+        "writes": ("normalized_candidates",),
+    },
+    "selector": {
+        "reads": (
+            "normalized_candidates",
+            "reviewer_a_decisions",
+            "reviewer_b_decisions",
+            "arbitration_records",
+        ),
+        "writes": ("final_candidate", "quarantine_records", "replacement_records"),
+    },
+    "facts_compiler": {
+        "reads": ("final_candidate",),
+        "writes": ("set_facts",),
+    },
+    # Deliberately does not read ``v2_sealed_namespace``. The compiler needs the
+    # sealed set's manifest digest, not its cases, and the listing witness is
+    # the content-free artifact that already carries exactly that. Granting the
+    # namespace would hand a role that never needs case content the ability to
+    # read all 120 of them.
+    "preregistration_compiler": {
+        "reads": ("set_facts", "listing_witness", "final_contract", "policy"),
+        "writes": ("preregistration_lock",),
+    },
 }
+
+#: The eleven role names registered by section 7.4, recorded separately so a
+#: control can prove the additive extension above did not edit them.
+SECTION_7_4_ROLES: tuple[str, ...] = (
+    "source_custodian",
+    "reviewer_a",
+    "reviewer_b",
+    "broker",
+    "arbiter",
+    "private_set_auditor",
+    "seal_custodian",
+    "stage_p",
+    "prediction_sealer",
+    "stage_e",
+    "receipt_exporter",
+)
+
+#: The only role permitted to read scoring labels. Named here so the property
+#: is checkable against the whole lane table rather than against Stage E alone.
+LABEL_READING_ROLE = "stage_e"
+
+
+# ---------------------------------------------------------------------------
+# schema binding
+# ---------------------------------------------------------------------------
+
+#: Every schema id the lifecycle recognises, closed.
+#:
+#: Section 5.1 requires schema ids and hashes to be bound in the lifecycle. The
+#: ids are written here by hand: that is the binding. The digests below are
+#: derived mechanically in Azure from the schema documents themselves and pasted
+#: back, in the same way ``requirements.lock.txt`` was produced --- a digest a
+#: human typed from memory certifies nothing.
+BOUND_SCHEMA_IDS: tuple[str, ...] = (
+    "phase1-parser-v3-v2-access-event/v1",
+    "phase1-parser-v3-v2-admission-record/v1",
+    "phase1-parser-v3-v2-arbitration-result/v1",
+    "phase1-parser-v3-v2-authenticated-listing-projection/v1",
+    "phase1-parser-v3-v2-blinded-case-packet/v1",
+    "phase1-parser-v3-v2-construction-plan/v1",
+    "phase1-parser-v3-v2-deployment-evidence/v1",
+    "phase1-parser-v3-v2-disagreement-packet/v1",
+    "phase1-parser-v3-v2-final-contract-receipt/v1",
+    "phase1-parser-v3-v2-listing-witness-receipt/v1",
+    "phase1-parser-v3-v2-planned-seal-members/v1",
+    "phase1-parser-v3-v2-prediction-manifest/v1",
+    "phase1-parser-v3-v2-prediction-member/v1",
+    "phase1-parser-v3-v2-prediction-receipt/v1",
+    "phase1-parser-v3-v2-preregistration-lock/v1",
+    "phase1-parser-v3-v2-public-receipt/v1",
+    "phase1-parser-v3-v2-quarantine-record/v1",
+    "phase1-parser-v3-v2-replacement-record/v1",
+    "phase1-parser-v3-v2-reviewer-decision/v1",
+    "phase1-parser-v3-v2-runtime-canary-result/v1",
+    "phase1-parser-v3-v2-set-facts-projection/v1",
+    "phase1-parser-v3-v2-stage-e-result/v1",
+    "phase1-parser-v3-v2-terminal-manifest/v1",
+    "phase1-parser-v3-v2-terminal-state-receipt/v1",
+)
+
+#: Azure-derived SHA-256 of each bound schema document.
+BOUND_SCHEMA_DIGESTS: Mapping[str, str] = {}
+
+#: Azure-derived SHA-256 over the whole digest table.
+BOUND_SCHEMA_REGISTRY_DIGEST: str = ""
+
+
+def assert_schema_binding(
+    *, registry_digests: Mapping[str, str], registry_digest: str
+) -> None:
+    """Refuse any drift between the schema registry and this binding.
+
+    Refuses an unfilled binding first. An empty expected table would otherwise
+    make every comparison below vacuously true, which is the precise shape of
+    the check-that-checks-nothing this repository has already had to remove
+    five times.
+    """
+    if not BOUND_SCHEMA_DIGESTS or not BOUND_SCHEMA_REGISTRY_DIGEST:
+        raise LifecycleError(
+            "the lifecycle schema binding is empty; derive the digests in Azure "
+            "and bind them before any artifact is validated against them"
+        )
+    bound_ids = set(BOUND_SCHEMA_IDS)
+    if set(BOUND_SCHEMA_DIGESTS) != bound_ids:
+        raise LifecycleError(
+            "the bound digest table and the bound id list describe different "
+            "schema sets"
+        )
+    supplied = set(registry_digests)
+    missing = sorted(bound_ids - supplied)
+    if missing:
+        raise LifecycleError(f"schema registry is missing bound schema(s): {missing}")
+    added = sorted(supplied - bound_ids)
+    if added:
+        raise LifecycleError(f"schema registry carries unbound schema(s): {added}")
+    changed = sorted(
+        sid for sid in bound_ids if registry_digests[sid] != BOUND_SCHEMA_DIGESTS[sid]
+    )
+    if changed:
+        raise LifecycleError(f"bound schema document(s) changed: {changed}")
+    for sid in sorted(bound_ids):
+        _require_sha256(registry_digests[sid], f"schema digest for {sid}")
+    if registry_digest != BOUND_SCHEMA_REGISTRY_DIGEST:
+        raise LifecycleError(
+            "the schema registry digest does not match the bound registry digest"
+        )
 
 _SHA256_RE = re.compile(r"\A[0-9a-f]{64}\Z")
 
