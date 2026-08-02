@@ -845,3 +845,45 @@ source", which would take in the Azure SDK and the standard library; neither is
 analysed, and a check over two first-party files is evidence rather than proof.
 A receipt that is honestly incomplete is worth more than one that is complete
 because the boundary was widened to complete it.
+
+---
+
+## Retiring an instrument-validation program instead of completing it (2026-08-02)
+
+A methods section that reports adjudicated labels must say why the project has
+no validated automatic scorer, given that it spent several phases building one.
+The answer is a design decision, not a failure to finish, and the distinction is
+methodologically load-bearing.
+
+The locked-evaluation program (parser v2, then parser-v3-v1, then parser-v3-v2)
+had exactly one purpose: to establish, by a one-shot preregistered evaluation
+against a sealed holdout, that an automatic parser could be trusted as the final
+correctness label. Parser v2 ran that evaluation and failed it (32 of 34 gates).
+Parser v3 was built, sealed a fresh 120-case holdout, and never ran an
+evaluation. The parser-v3-v2 public protocol round exhausted its registered
+two-cycle audit budget with four BLOCKER-class properties unresolved.
+
+The program was then closed rather than extended, on the following reasoning.
+The four unresolved properties — Stage E member-identifier uniqueness, atomic
+create-only state, a structurally closed construction target, and keyed
+schema-array uniqueness — share a form: each asks a pure function to certify a
+fact about the world (what objects exist, what has already been consumed) from
+evidence its own caller supplies. That is not a bug budget; it is a boundary
+between what in-process validation can and cannot establish. Closing the gap
+would have required an authenticated atomic store and a durable ledger outside
+the protocol functions, which is a new system, not a remediation.
+
+At the same time, `L-01` had already forced every label that matters through
+semantic adjudication. Elevating `L-01` to a design rule (`DR-01`) makes the
+program's product — a parser trusted as a final label — something the project
+will never use. Completing it would have been building an instrument in order to
+leave it in its case.
+
+The method consequence is stated in `L-41` and must appear in any Methods
+section: all final correctness labels in this project are LLM semantic
+adjudication under a frozen reviewer form with arbitration, and **no locked
+evaluation anywhere in the project bounds their error against an independent
+oracle.** Reviewer agreement is inter-model consistency, not accuracy. Automatic
+parser output may still be reported as triage diagnostics — routing rates,
+disagreement counts — and parser-versus-reviewer agreement must never be
+presented as inter-reviewer agreement.

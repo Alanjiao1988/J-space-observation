@@ -4006,3 +4006,39 @@ and a new bounded audit plan.
 prediction was generated, no set was constructed or sealed, no preregistration
 lock was created, no Stage P or Stage E run occurred, and no formal evaluation
 or private-boundary deployment took place.
+
+---
+
+## Scientific mainline restart — S0 parser closure (2026-08-02)
+
+**Project state:** `SCIENTIFIC_MAINLINE_RESTART_AUTHORIZED`.
+**Parser subproject state:** `CLOSED_NONAUTHORITATIVE_TRIAGE_ONLY`.
+
+**Authority.** A new operator prompt, saved verbatim at
+`docs/prompts/phase_science_restart_after_parser_closure_prompt.md`
+(SHA-256 `5bc137c42c68e1b85b4cad1d45e1b4bf54fb68e2899f27bc6338dae61e9ef162`,
+25,313 bytes), executed at the required starting commit
+`ea2bce81defe9063bde2be58ada0e747d2a34c03`. `origin/main` was verified equal to
+that commit before any file was written. The prompt and the decision record were
+committed and pushed as `ac9e0327d82bbc2d0451e7fca09b504660ce579d` **before**
+implementation began, because executing the prompt is the operator authorization
+for the scope.
+
+**What S0 changed.** Three new records — the verbatim prompt, the machine-readable
+authority object `docs/phase_science_restart_authority.json`, and the closure
+decision `docs/decisions/parser_v3_locked_evaluation_closure.md` — plus
+consistent entries in this log, `docs/decision_log.md`, `README.md`,
+`paper/limitations_ledger.md` (`L-01` elevated; `L-41` and `L-42` added),
+`paper/claim_evidence_matrix.md` (`CL-06` withdrawn as pursuable, `CL-07` opened
+for J-lens functional validity) and `paper/methods_ledger.md`.
+
+**What S0 deliberately did not change.** No parser implementation, parser test,
+parser schema, or parser IaC file was touched. No receipt or report byte was
+edited. No row of `paper/evidence_ledger.csv` was rewritten: the closure is a
+scope decision, not new evidence, and the historical records of what was built
+stand exactly as they were. Eight preserved artifact digests are pinned in the
+closure record so that any later drift is detectable.
+
+**Next scientific gate.** Work package S1: reproduce the Phase 1.0C
+generation-profile defect facts from committed artifacts, then freeze the Phase
+1.0D protocol before any target-model inference.

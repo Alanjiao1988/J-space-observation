@@ -75,6 +75,18 @@ Status vocabulary: `unsupported`, `preliminary`, `supported`, `contradicted`.
 | Key artifacts | `data/phase1_task_headroom_candidates.jsonl`; `artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/`; blob `phase1-headroom-calibration/20260725T170041Z`. |
 | Limitations | **n = 10 per cell is a screen, never a stable performance estimate**, and no cell accuracy from this pack may be quoted as target-model performance. A 7/10 cell's 95% interval spans `[0.397, 0.892]`. Selection is descriptive screening: "this cell showed measurable observable-answer headroom in this run", not "the model can or cannot do this task". 79 of 225 reviewed rows hit the 512-token cap, so truncation reflects the generation budget rather than competence. Single sample per item/condition, so no pass@k or sampling-capability claim. Parser v2 was automated triage only and never produced a final label. This claim licenses nothing about hidden reasoning, an internal workspace, invisible chain-of-thought, or a "J-space". |
 
+**2026-08-02 — Phase 1.0D is authorized to repair, not to replace.** Phase 1.0C
+run `20260725T170041Z` (`EV-0004`) remains a valid historical
+`COMPLETE_INCONCLUSIVE` record and is not relabelled, deleted, or silently
+superseded. Phase 1.0D runs under a new protocol version and a new artifact
+namespace on a deterministic confirmation split disjoint from the Phase 1.0C
+items. Two separate preregistered generation-profile defects are carried into
+its design: the literal `Final answer: <answer>` placeholder that appeared in
+every 1.0C prompt, and the 512-token cap. Neither defect alone may be claimed to
+have caused all 44 unresolved rows. If no Phase 1.0D cell passes the frozen
+count gate, `HEADROOM_NOT_ESTABLISHED` is the scientific result and the gate is
+not lowered.
+
 ---
 
 ## CL-06 — Parser-v3 correction of parser-v2 failure modes
@@ -88,3 +100,28 @@ Status vocabulary: `unsupported`, `preliminary`, `supported`, `contradicted`.
 | Status | **unsupported** |
 | Key artifacts | `artifacts/phase1-parser-v3/track-c/phase1-parser-v3-track-c-20260725T114448Z/`; `artifacts/phase1-evaluator-validation/track-d/20260725T121557Z-track-d-parser-v3-locked-set/`; `artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/`. |
 | Limitations | Parser v3 was developed with knowledge of which retired cases parser v2 failed, so overfitting risk is structural. The 65 adversarial fixtures share authorship with parser v3 and are therefore not an independent oracle. All five rule changes are recall-increasing, so precision is unprobed. The holdout is now sealed, which fixes the instrument in time but validates nothing: sealing licenses no accuracy, precision or recall claim. Any parser-v3 result on the retired parser-v2 holdout is development diagnosis and is never validation. Isolation of the retired label and score material during the seal rested on the payload code path and its tests, not on RBAC — see `L-17`. |
+
+**2026-08-02 — CL-06 is withdrawn as a pursuable claim.** The parser-v3
+locked-evaluation program is closed (`docs/decisions/parser_v3_locked_evaluation_closure.md`).
+The missing evidence — the one-shot locked evaluation — will not be produced,
+because `L-01` is now the binding design rule `DR-01` and no automatic parser
+may ever be a final label in this project. CL-06 therefore stays permanently
+`unsupported`: not refuted, not abandoned as unimportant, but deliberately never
+tested. `EV-0006` and `EV-0007` remain valid records of what was built. The
+final parser-v2-v2 public audit cycle found four BLOCKER-class properties that
+remain defective in the retained code; see `L-42`. No paper may present the
+parser-v3 material as a validated or audited protocol.
+
+---
+
+## CL-07 — J-lens functional validity against known intermediates
+
+| Field | Value |
+| --- | --- |
+| Proposed paper claim | The fitted Jacobian lens reads out known intermediate computations better than an ordinary logit lens and better than norm-matched random directions, and those readouts are causally load-bearing rather than surface leakage from the final answer. |
+| Required evidence | A preregistered validity benchmark on the official public evaluation distributions, with eligibility fixed before any lens readout; pass@k readout curves and normalized AUC against log(k) for the merged lens, both independent replicates, the logit lens, and label-permuted / position-shuffled negative controls; causal ablation, coordinate swaps, answer-vector swaps, and lens-independent activation patching with the full control set; item-level paired bootstrap intervals against a frozen classification rule. |
+| Available evidence | None yet. `EV-0005` and `EV-0009` are matrix-convergence and transport diagnostics only, and under the controlling authority matrix convergence is explicitly **not** a substitute for functional validity. |
+| Missing evidence | All of it. The benchmark is work package S3 and has not been designed, frozen, or run. |
+| Status | **unsupported** |
+| Key artifacts | None. |
+| Limitations | This claim is the primary scientific instrument gate for RQ2. `JLENS_PARTIALLY_VALIDATED` and `JLENS_NOT_VALIDATED` are terminal scientific results under the controlling authority and must not be repaired away by refitting on the confirmatory set, altering thresholds, or restarting evaluator work. Secondary generalization distributions (association, typo, multilingual, poetry) may be reported but can never rescue a failed primary result. |

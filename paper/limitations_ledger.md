@@ -10,7 +10,19 @@ Prospective parser v2 failed its one-shot locked evaluation on 2026-07-25
 of 1). Consequently, **no automatic parser output may be treated as a final
 label anywhere in this project.** Parser v2 remains usable only as a triage
 tool, and every downstream label that matters must be semantically adjudicated.
-Parser v3 is under development but is not validated and has no locked result.
+Parser v3 was under development, was never validated, has no locked result, and
+its program is now closed.
+
+**2026-08-02 — elevated to a binding project design rule (`DR-01`).** This entry
+is no longer a temporary limitation awaiting a validated parser. Semantic
+adjudication is now the *only* authoritative final-label path in this project by
+design. An automatic parser may triage, route, or diagnose, and its statistics
+may be reported as diagnostics, but it may never be the final correctness label
+for a scientific result — including in any future phase, and including if some
+later parser passes a locked gate. The parser-v3 locked-evaluation program was
+closed on this basis; see `docs/decisions/parser_v3_locked_evaluation_closure.md`.
+Elevation strengthens this limitation and removes the escape hatch by which it
+could have expired.
 
 ## L-02 — The parser-v2 holdout is spent
 
@@ -932,3 +944,40 @@ enforcement that makes the literal zeros credible is the AST check over the
 probe's own source, plus the fact that the module performs no decode and no
 data-plane write — properties that are established by reading the code, which is
 inspectional, not structural.
+
+## L-41 - This project will never have a validated automatic evaluator
+
+`L-01` is now a design rule (`DR-01`), and the parser-v3 locked-evaluation
+program is closed. The consequence must be stated plainly rather than left as an
+implication: **no result in this project will ever rest on a mechanically
+validated scoring function.** Every final correctness label, in every phase from
+Phase 1.0D onward, is LLM semantic adjudication under a frozen reviewer form
+with arbitration.
+
+That is a real ceiling, and it compounds `L-03`: adjudicated labels are
+inter-model operational consensus, not human ground truth, and no locked
+evaluation exists anywhere in the project to bound their error rate against an
+independent oracle. Reviewer agreement statistics measure consistency between
+reviewers, not accuracy. Where a paper reports an accuracy, it reports accuracy
+*with respect to an adjudicated reference of unbounded error*, and it must say
+so.
+
+The alternative — continuing the locked-evaluation program until a parser could
+be trusted as a final label — was available and was rejected. Recording the
+ceiling is the cost of that choice.
+
+## L-42 - The parser program closed with its blocking properties unresolved
+
+The closure in `docs/decisions/parser_v3_locked_evaluation_closure.md` is a
+scope decision. It is not a demonstration that the four BLOCKER-class properties
+found by the final audit cycle were unimportant, wrong, or fixed.
+
+They were none of those things. Stage E member-ID uniqueness, genuinely atomic
+create-only state, a structurally closed construction target, and keyed
+schema-array uniqueness were all found genuinely defective at commit
+`423d16a7`, and all four remain defective in the retained code today. Anyone who
+later reuses `src/jspace_observation/parser_v3_v2_*.py`, its schemas, its
+entrypoints, or its boundary IaC inherits those defects. The retained material
+is a historical artifact of an unfinished instrument, and it must never be
+described as a validated, audited, or publication-ready protocol on the strength
+of its size or its test count.

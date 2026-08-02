@@ -2209,3 +2209,40 @@ bound requires a stop.
 persisting their exact reports, binding their hashes and findings in a terminal
 receipt, and updating the public logs. Any later technical fix must start as a
 separately authorized public-protocol redesign with a new bounded audit plan.
+
+## Scientific restart — close the parser program instead of refounding it
+
+**Decision.** The parser-v3-v1 and parser-v3-v2 locked-evaluation programs are
+closed as `CLOSED_NONAUTHORITATIVE_TRIAGE_ONLY`. The project state becomes
+`SCIENTIFIC_MAINLINE_RESTART_AUTHORIZED`. `L-01` is elevated from a temporary
+limitation to the binding design rule `DR-01`: semantic adjudication is the only
+authoritative final-label path, and an automatic parser may triage, route or
+diagnose but may never be a final correctness label. The drafted
+public-protocol-v2 refoundation is superseded and must not be executed. Full
+record: `docs/decisions/parser_v3_locked_evaluation_closure.md`; authority
+object: `docs/phase_science_restart_authority.json`.
+
+**Why.** The locked-evaluation program existed for one purpose: to license an
+automatic parser as an authoritative final label. Once semantic adjudication is
+authoritative *by design*, that license is never spent, and every further round
+of holdouts, private boundaries and audits buys an authority the project has
+decided not to use. The second and final audit cycle also gave a substantive
+reason not to continue: its four BLOCKER-class properties — Stage E member-ID
+uniqueness, atomic create-only state, a structurally closed construction target,
+keyed schema-array uniqueness — are not reachable by pure functions over
+caller-supplied evidence, so a third cycle would have been a redesign, not a fix.
+
+**What this decision refuses to do.** It does not revise
+`BLOCKED_ON_PUBLIC_PROTOCOL_FREEZE`, which remains correct under its own
+authority. It does not edit, delete or rescore any receipt, report, sealed
+object or counter; the closure record pins eight artifact digests so that later
+drift is detectable as a defect. It opens no private holdout, label, prediction,
+Stage P/E result or formal ordinal. And it does not claim the parser material is
+publishable: the code, schemas, entrypoints, IaC and audit tooling are retained
+as historical artifacts carrying four known unfixed defects (`L-42`), never as a
+validated protocol.
+
+**Cost accepted.** The project will never have a mechanically validated
+evaluator, so every final label from Phase 1.0D onward is LLM operational
+consensus with no locked bound on its error rate. That ceiling is recorded as
+`L-41` rather than left implicit.

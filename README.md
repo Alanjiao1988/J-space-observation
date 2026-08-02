@@ -10,6 +10,23 @@
 
 ## 当前阶段
 
+**2026-08-02 项目状态：`SCIENTIFIC_MAINLINE_RESTART_AUTHORIZED`。**
+
+parser-v3 locked-evaluation 子项目已关闭为 `CLOSED_NONAUTHORITATIVE_TRIAGE_ONLY`。关闭的理由不是它失败得不够明确，而是它的前提被取消了：`L-01` 已从临时限制升级为项目设计规则 `DR-01` —— **语义裁决是本项目唯一权威的最终标签路径**，自动 parser 只能用于分流、路由与诊断，永远不能作为科学结果的最终正确性标签。既然如此，一个"通过验证的 parser"不再是任何科学标签或下游实验的前置条件，继续建私有 holdout、私有评审边界与审计循环，买到的是一个项目已决定不使用的授权。
+
+parser 子项目的旧终态 `BLOCKED_ON_PUBLIC_PROTOCOL_FREEZE` 在其原授权下依然正确，不被改写、不被软化；全部报告、receipt、commit、失败候选、sealed 对象、计数器与审计发现原样保留，关闭记录中钉死了 8 个工件摘要以便检测漂移。parser-v3 从未被验证，也不存在任何 parser-v3 科学结果。详见[parser-v3 关闭决策](docs/decisions/parser_v3_locked_evaluation_closure.md)与[授权对象](docs/phase_science_restart_authority.json)。
+
+科学主线据此重启，授权四个工作包：
+
+1. **S1 / Phase 1.0D** — 修复 Phase 1.0C headroom run。1.0C 的 `20260725T170041Z` 作为 `COMPLETE_INCONCLUSIVE` 历史记录保留，不重贴标签、不删除。字面占位符 `Final answer: <answer>` 与 512-token cap 被当作两个独立的、预注册的 generation-profile 缺陷，不得声称其中任一独自导致了全部 44 条 unresolved。
+2. **S2** — 在确定性公开 pretraining-like 语料上完成更大规模的全层 J-lens 拟合。
+3. **S3** — 执行预注册的 J-lens validity benchmark（已知中间量的 pass@k readout、ablation、coordinate swap、activation patching 与随机方向对照）。**矩阵收敛只是诊断，永远不能替代功能性有效性。**
+4. **S4** — 在 S1 与 S3 的门槛都通过时，执行第一个有界的 RQ2 strict-no-CoT 机制学试点。
+
+阴性的 headroom 结果、不收敛的 lens、未通过的 validity gate 都是科学结果，不构成再造一个 evaluator 或审计基础设施项目的理由。
+
+## 历史阶段（parser 关闭前）
+
 当前已完成四条关键路径的首个可执行阶段：
 
 1. Phase 0.5A 在单张 Tesla T4 上完成真实 Jacobian Lens 技术可行性验证，结论为 **GREEN（仅限技术可行性）**。
@@ -37,6 +54,9 @@
 - [实现注记](docs/implementation_notes.md)
 - [决策日志](docs/decision_log.md)
 - [运行日志](docs/run_log.md)
+- [parser-v3 关闭决策](docs/decisions/parser_v3_locked_evaluation_closure.md)
+- [科学主线重启授权](docs/phase_science_restart_authority.json)
+- [当前执行 Prompt](docs/prompts/phase_science_restart_after_parser_closure_prompt.md)
 - [文献笔记](docs/literature_notes.md)
 - [Phase 0.5A real J-lens feasibility report](reports/phase05_jlens_feasibility.md)
 - [Parser-v2 locked evaluation formal result](reports/phase1_parser_v2_locked_evaluation.md)
