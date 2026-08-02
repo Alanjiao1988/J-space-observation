@@ -241,3 +241,75 @@ def test_the_image_is_not_the_calibration_image():
     assert provenance.IMAGE_REPOSITORY != "j-space-observation-calibration"
     text = (REPO_ROOT / provenance.DOCKERFILE).read_text(encoding="utf-8")
     assert "must not be overwritten" in text
+
+
+BUILD_SCRIPT = REPO_ROOT / "infra/azure/scripts/18_build_phase1_0d_confirmation.sh"
+RUN_SCRIPT = REPO_ROOT / "infra/azure/scripts/19_run_phase1_0d_confirmation.sh"
+
+
+def _script(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+
+def test_neither_launcher_touches_the_phase_1_0c_namespace():
+    for path in (BUILD_SCRIPT, RUN_SCRIPT):
+        text = _script(path)
+        assert "j-space-observation-calibration" not in text
+        assert "phase1-headroom-calibration" not in text
+        assert "job-jspace-p10c-headroom" not in text
+
+
+def test_the_run_launcher_starts_the_phase_1_0d_entrypoint_in_generate_mode():
+    text = _script(RUN_SCRIPT)
+    assert "run_phase1_0d_confirmation.py --mode generate" in text
+    assert "--repo-root /workspace" in text
+    assert provenance.IMAGE_REPOSITORY in text
+
+
+def test_the_run_launcher_refuses_a_platform_retry_or_a_second_replica():
+    text = _script(RUN_SCRIPT)
+    assert '"replicaRetryLimit": 0' in text
+    assert '"parallelism": 1' in text
+    assert '"replicaCompletionCount": 1' in text
+
+
+def test_the_run_launcher_refuses_an_unlocked_image():
+    text = _script(RUN_SCRIPT)
+    assert "Phase 1.0D image is not locked" in text
+    for attribute in ("TAG_WRITE_ENABLED", "TAG_DELETE_ENABLED",
+                      "MANIFEST_WRITE_ENABLED", "MANIFEST_DELETE_ENABLED"):
+        assert attribute in text
+
+
+def test_the_run_launcher_carries_no_storage_credential():
+    """Blob access is managed identity only; a key would make the run deniable."""
+
+    text = _script(RUN_SCRIPT)
+    assert "AZURE_CLIENT_ID" in text
+    assert "credential-bearing variables present" in text
+    environment_block = text.split("environment = [", 1)[1].split("]", 1)[0]
+    for forbidden in ("ACCOUNT_KEY", "SAS", "CONNECTION_STRING"):
+        assert forbidden not in environment_block.upper()
+
+
+def test_the_build_script_locks_the_image_and_verifies_the_lock():
+    text = _script(BUILD_SCRIPT)
+    assert "--write-enabled false --delete-enabled false" in text
+    assert "is still enabled after locking" in text
+
+
+def test_the_build_script_refuses_a_dirty_tree_and_a_reused_tag():
+    text = _script(BUILD_SCRIPT)
+    assert "Refusing to build a dirty worktree" in text
+    assert "already exists; use a new commit" in text
+
+
+def test_the_build_script_requires_the_committed_provenance_record():
+    text = _script(BUILD_SCRIPT)
+    assert provenance.PROVENANCE_FILENAME in text
+    assert "build-provenance record is missing" in text
+
+
+def test_both_launchers_state_what_the_artifact_does_not_establish():
+    assert "establishes nothing about the model" in _script(BUILD_SCRIPT)
+    assert "AWAITING_SEMANTIC_REVIEW" in _script(RUN_SCRIPT)
