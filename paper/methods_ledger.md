@@ -997,3 +997,39 @@ these ledgers exist to prevent.
 The general rule now applied here: a file that carries scientific meaning gets a
 test the day it starts carrying it, and the first run of that test should be
 expected to fail on history.
+
+## An absent measurement must not be representable as a bad one (2026-08-02)
+
+Writing the Phase 1.0D generation driver exposed a defect in the already-tested
+pipeline it drives. `compute_cell_outcomes` counted a row as correct only when
+`final_label == "correct"`, which is right, and reached that judgement without
+first asking whether the row had been labelled at all, which is not. A pack of
+900 generations that no reviewer had yet touched would have scored 0% in every
+cell and been adjudicated `HEADROOM_NOT_ESTABLISHED` — the exact verdict a
+genuinely incapable model would earn.
+
+The failure mode is worth naming because it is not a coding slip. Absent data
+had been given the same representation as bad data, so the pipeline could not
+tell the two apart, and its output was most misleading precisely when the least
+work had been done. Both functions now refuse an unlabelled row.
+
+The general rule: for any measurement, "not measured" needs its own value that
+propagates to an error, never a default that happens to look like a result. The
+generation pack applies the same rule outward — its decision file and its
+summary both read `AWAITING_SEMANTIC_REVIEW` rather than carrying a provisional
+number that a reader could quote.
+
+## A documented pipeline order that cannot run is a defect, not a comment (2026-08-02)
+
+`phase1_0d_execution.py` documented its own stages as `build_records` ->
+`annotate_review_selection` -> semantic review -> `apply_judgments`. Following
+that order raised immediately: `annotate_review_selection` forces a second
+review based on the primary label, so it cannot precede the primary review that
+produces one. The docstring had never been executed in the order it stated.
+
+This was found only because the generation driver trusted the docstring. Prose
+describing an order is a claim about the code, and an unrunnable claim sitting
+next to working functions is more dangerous than no claim at all, because the
+next implementer will follow it. A test now asserts that a generation pack
+carries no secondary-review selection, which pins the corrected order in
+executable form rather than in a comment.

@@ -4269,3 +4269,55 @@ introduces no new failure.
 
 Not established: this is a records-integrity repair. No measurement was taken,
 no artifact was regenerated, and no scientific counter moved.
+
+## 2026-08-02 — Phase 1.0D generation driver (code only, no generation run)
+
+The frozen Phase 1.0D protocol and the pipeline that applies it both existed,
+but nothing connected them to a model. This adds that connector:
+`src/jspace_observation/phase1_0d_generation.py` plus the registered entrypoint
+`scripts/run_phase1_0d_confirmation.py`, in four modes — `plan`, `self-test`,
+`generate`, `finalize`.
+
+What it emits is a pack, not a number. `00_protocol_snapshot.json`,
+`01_selection.json`, `02_records.jsonl`, `03_review_form.jsonl`,
+`04_generation_summary.json`, `05_decision.json`, `09_summary.md`, and
+`artifact_manifest.json` written last and hashing every other file including
+itself. In `generate` mode `05_decision.json` and the summary both carry
+`AWAITING_SEMANTIC_REVIEW`: no headroom figure exists until the section 4.3
+primary labels arrive, and the artifacts say so in those words rather than
+reporting a provisional value.
+
+Two real defects were found by writing this, and both were in code that already
+existed and already passed its tests:
+
+1. `compute_cell_outcomes` and `build_decision` treated a row with no
+   `final_label` as resolved-and-incorrect. An unreviewed run would therefore
+   have reported `HEADROOM_NOT_ESTABLISHED` with a clean-looking 0% — a review
+   that never happened would have been indistinguishable from a model that
+   failed every item. Both now raise on an unlabelled row.
+2. The pipeline's own documented order was unexecutable.
+   `annotate_review_selection` was documented as running before semantic review,
+   but its forced component is defined by the primary label and it raises
+   without one. The order is now recorded as it must actually run:
+   `build_records` -> primary review -> `ingest_judgments` ->
+   `annotate_review_selection` -> secondary review -> `apply_judgments`.
+
+No generation-time stop sequence is registered. Section 4.2 permits a stop only
+after a complete registered final-answer surface; declining to stop early always
+satisfies that rule and cannot truncate a surface mid-write. The arm's
+registered token budget is the only bound, and nothing is clipped afterwards.
+
+| Run | Commit | Purpose | Result |
+| --- | --- | --- | --- |
+| `cm4m` | `5afba955` | Targeted generation-driver tests | Collection `ModuleNotFoundError`: the new test module lacked the `src` path insert every other module carries |
+| `cm4n` | `0a160269` | Targeted, after the import fix | 16 passed, 7 failed, one cause: review selection called before any review existed |
+| `cm4p` | `6c20078f` | Targeted, after the ordering fix | 24 passed |
+| `cm4q` | `6c20078f` | Full suite | 3033 passed, 15 skipped, 2 failed, both disclosed pre-existing |
+
+Baseline for this increment was 3009 passed. It adds 24 tests and introduces no
+new failure.
+
+Not established: **no generation has been run.** This is a driver that has been
+exercised against a deterministic stub backend on CPU, which proves the pack is
+well-formed and the accounting is honest — not that the model produces anything.
+The Phase 1.0D headroom question remains open and no scientific counter moved.

@@ -2385,3 +2385,37 @@ something unwritten. It must be exercised when that protocol is frozen.
 The protocol is refrozen at `protocol_sha256`
 `25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8`. No further
 preregistration review of the Phase 1.0D protocol is authorized.
+
+## 2026-08-02 — Phase 1.0D generation driver: what it refuses to produce
+
+The driver stops at a reviewed-shaped hole rather than filling it.
+
+- **A generation pack reports no headroom number.** `05_decision.json` and
+  `09_summary.md` both read `AWAITING_SEMANTIC_REVIEW`. Section 4.3 makes a
+  semantic label the only thing that may decide correctness, so a pack emitted
+  before review has nothing to report and says exactly that. The alternative —
+  a parser-derived provisional accuracy, clearly labelled provisional — was
+  rejected: a number in an artifact gets quoted, and the label does not travel
+  with it.
+- **No generation-time stop sequence is registered.** Section 4.2 permits a stop
+  only after a complete registered final-answer surface. Declining to stop early
+  always satisfies that rule; a stop string chosen wrongly could truncate a
+  surface mid-write and the truncated text would then be reported as the model's
+  output. The registered per-condition budget is the only bound, and no text is
+  clipped after the fact.
+- **Failed generations are counted, not dropped.** A backend error yields a
+  record with an empty output and an error class in the telemetry, so the pack's
+  item count always equals the planned count. A run that silently emitted fewer
+  rows would shrink its own denominator.
+
+Two defects in existing code were found and fixed rather than worked around:
+`compute_cell_outcomes`/`build_decision` scored unlabelled rows as incorrect,
+and the execution module's documented stage order could not run because
+`annotate_review_selection` requires the primary label it was documented as
+preceding. Both are recorded in the methods ledger.
+
+**The generation run has not been performed.** The driver is exercised on CPU
+against a deterministic stub backend, which establishes that the pack is
+well-formed and the accounting is honest, and establishes nothing whatsoever
+about the model. Reaching the run additionally requires a Phase 1.0D container
+image, a build-provenance record, and an ACA GPU job launcher.
