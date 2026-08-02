@@ -133,3 +133,4 @@ tests/test_phase1_0d_confirmation.py text eol=lf
 infra/azure/acr_tasks/repo_script.yaml text eol=lf
 infra/azure/acr_tasks/repo_script.sh text eol=lf
 infra/azure/scripts/emit_phase1_0d_protocol.py text eol=lf
+docs/phase1_0d_protocol_snapshot.json text eol=lf

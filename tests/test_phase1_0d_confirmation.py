@@ -484,3 +484,19 @@ def test_the_snapshot_disclaims_hidden_reasoning():
     disclaimed = protocol_snapshot()["licenses_no_claim_about"]
     assert "J-space" in disclaimed
     assert "invisible chain-of-thought" in disclaimed
+
+
+def test_the_committed_snapshot_matches_the_recomputed_protocol(
+    selection, used_item_ids, bank
+):
+    artifact_path = REPO_ROOT / "docs" / "phase1_0d_protocol_snapshot.json"
+    artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+    expected = protocol_snapshot(
+        selection=selection_summary(selection, used_item_ids),
+        strict_budget_check=assert_strict_budget_fits_every_answer(selection),
+    )
+    assert artifact["snapshot"] == expected
+    assert artifact["status"] == "FROZEN_BEFORE_INFERENCE"
+    assert artifact["context"]["eligible_pool"]["item_count"] == EXPECTED_ITEM_COUNT
+    assert artifact["context"]["bank_item_count"] == len(bank)
+    assert artifact["not_established"]
