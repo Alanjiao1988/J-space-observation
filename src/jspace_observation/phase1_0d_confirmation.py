@@ -466,6 +466,7 @@ def selection_summary(
         "overlap_with_phase_1_0c": sorted(set(task_ids) & used),
         "disjoint_from_phase_1_0c": not (set(task_ids) & used),
         "selection_seed": SELECTION_SEED,
+        "task_ids": task_ids,
         "task_ids_sha256": sha256_text("\n".join(task_ids) + "\n"),
     }
 
