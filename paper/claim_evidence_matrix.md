@@ -128,6 +128,16 @@ strict rendering and nothing more. `L-46` further records that the structural
 arm is rendered from a hand-specified template rather than pinned tokenizer chat
 metadata, and `L-47` that any resulting RQ2 pilot is a selected-case pilot.
 
+**2026-08-02 — Phase 1.0D is fully instrumented and has produced no data.**
+A locked container image now reproduces the frozen protocol and its 300-item
+selection, the generation driver emits a complete artifact pack, and the
+repository passes 3067 tests. None of that is evidence for this claim. No
+generation has been run, no row has been semantically labelled, and no cell
+metric exists; the driver emits `AWAITING_SEMANTIC_REVIEW` rather than a number
+precisely so that an unreviewed pack cannot be mistaken for a result. CL-05
+remains `preliminary` on Phase 1.0C alone. `L-48` records this in full, and
+`L-49` records that the image is permanently undeletable by design.
+
 ---
 
 ## CL-06 — Parser-v3 correction of parser-v2 failure modes
