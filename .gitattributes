@@ -93,3 +93,4 @@ src/jspace_observation/parser_v3_v2_construction.py text eol=lf
 tests/test_parser_v3_v2_construction.py text eol=lf
 src/jspace_observation/parser_v3_v2_evaluation.py text eol=lf
 tests/test_parser_v3_v2_rehearsal.py text eol=lf
+docs/phase1_2h_r2_phase_a_construction_evaluation_receipt.json text eol=lf

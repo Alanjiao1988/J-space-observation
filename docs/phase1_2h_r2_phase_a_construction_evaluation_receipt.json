@@ -1,0 +1,183 @@
+{
+  "schema_version": "phase1-2h-r2-phase-a-increment-receipt/v1",
+  "document_purpose": "Append-only, content-free record of the second Phase A increment: deterministic set construction, post-seal preregistration, Stage P, prediction sealing, Stage E, and the public synthetic end-to-end rehearsal. Companion to phase1_2h_r2_phase_a_lifecycle_receipt.json, which it does not modify.",
+  "not_a_result_statement": "Nothing here is a scientific result. No private set was read, no candidate case was seen, no label was opened, and no parser was run on anything but synthetic public fixtures. Every scientific counter remains zero.",
+  "source_binding": {
+    "starting_commit": "a99d1e8341af85b8db32cb97a46ed5095c3f7978",
+    "working_branch": "alanjiao-microsoft-phase1-2h-r2-parser-v3-v2-round",
+    "commits_added_in_this_increment": [
+      {"commit": "8cc19c7534cbe07db01d01f47c9c086180597271", "subject": "Add the deterministic parser-v3-v2 construction rules"},
+      {"commit": "8e6dca8e0833e4ce8572c0d34f456ad2df5289be", "subject": "Fix the template-family collision rule to stop rejecting sound sets"},
+      {"commit": "59f7f280f033a9543b78bb391121c6a3ee226fd2", "subject": "Add preregistration, Stage P/E, and the public synthetic rehearsal"},
+      {"commit": "ed51edf901db51c93f6e6ac0f0ff45b52b3f8be1", "subject": "Give every rehearsal case its own template family"},
+      {"commit": "2be40da1fa7715d1e9b18e903d5c38e53c6948c9", "subject": "Make the new test modules import independently of collection order"},
+      {"commit": "abc6afedc6b00bb45552975dc739081bc224ce36", "subject": "Bind the rehearsal to the registered role-lane vocabulary"}
+    ],
+    "branch_is_pushed_to_origin": false,
+    "branch_push_blocked_reason": "Unchanged from the previous receipt: a non-force push returns HTTP 403 because the session credential resolves to a principal without write access. Recorded as deviation D-03."
+  },
+  "cloud_execution_binding": {
+    "all_test_execution_ran_in_azure": true,
+    "registry": "acrjspaceobssea0708231738",
+    "platform": "linux/amd64",
+    "method": "ACR multi-step task. The branch cannot be pushed, so a Git bundle limited to this branch is uploaded as the task source context, fetched onto the build agent, and checked out by exact commit. No Docker build context is used, so .dockerignore never filters the tree.",
+    "why_not_az_acr_build": "az acr build applies .dockerignore, which excludes .git, .gitignore and evaluator_sets. That is the exact mechanism behind round 5's four false regressions, and section 11.1 forbids reusing it.",
+    "local_execution_this_increment": "None. No pytest, no compileall, no lint, no import of the modules under test. The laptop acted only as editor, Git client and Azure control-plane submitter."
+  },
+  "azure_runs": [
+    {
+      "run_id": "cm29",
+      "duration": "4m28s",
+      "purpose": "First full-suite validation of the construction rules.",
+      "outcome": "2460 passed, 15 skipped, 3 failed",
+      "interpretation": "Two failures were the disclosed pre-existing sealed-input environmental failures. The third was a genuine defect in the new material and was treated as one."
+    },
+    {
+      "run_id": "cm2a",
+      "duration": "4m27s",
+      "purpose": "Full-suite validation after the template-family rule was corrected.",
+      "outcome": "2463 passed, 15 skipped, 2 failed",
+      "interpretation": "Only the two disclosed environmental failures remain."
+    },
+    {
+      "run_id": "cm2b",
+      "duration": "4m29s",
+      "purpose": "First full-suite validation of the preregistration, Stage P/E and rehearsal material.",
+      "outcome": "2473 passed, 15 skipped, 22 failed",
+      "interpretation": "Twenty of the twenty-two were the rehearsal's own tests failing on a single shared root cause in the fixture. Treated as a defect in the new material."
+    },
+    {
+      "run_id": "cm2c",
+      "duration": "2m03s",
+      "purpose": "Targeted run of the rehearsal module alone, to separate the remaining causes.",
+      "outcome": "Collection error: ModuleNotFoundError for jspace_observation.",
+      "interpretation": "Exposed a real defect. The repository has no conftest.py and no pythonpath setting; each test file puts src on sys.path itself. The three new test modules omitted this and passed only because an earlier-collected file had already fixed the path."
+    },
+    {
+      "run_id": "cm2d",
+      "duration": "2m04s",
+      "purpose": "Targeted rerun after the import fix.",
+      "outcome": "10 passed, 20 failed, one shared cause.",
+      "interpretation": "The role-lane check is an allowlist against ROLE_LANES, so the invented read-class names in the fixture were refused. The lane table matches section 7.4 of the controlling prompt; the fixture did not."
+    },
+    {
+      "run_id": "cm2e",
+      "duration": "2m07s",
+      "purpose": "Targeted rerun after binding the fixture to the registered lane vocabulary.",
+      "outcome": "30 passed, 0 failed.",
+      "interpretation": "The complete rehearsal passes in isolation, which also proves the module no longer depends on collection order."
+    },
+    {
+      "run_id": "cm2f",
+      "duration": "4m31s",
+      "purpose": "Authoritative full-suite validation of this increment.",
+      "outcome": "2493 passed, 15 skipped, 2 failed",
+      "interpretation": "Bound to commit abc6afed with a clean working tree. Against the section 11.1 baseline of 2235 passed / 15 skipped / 2 failed this is 258 additional passing tests and zero new failures. The two failures are the same disclosed sealed-input environmental failures carried by the starting commit."
+    }
+  ],
+  "authoritative_binding": {
+    "run_id": "cm2f",
+    "bound_commit": "abc6afedc6b00bb45552975dc739081bc224ce36",
+    "bound_tree": "387f00ca375907663800a8ce8507dfedf74108bc",
+    "dirty_paths_in_azure": 0,
+    "self_reference_limitation": "This receipt cannot contain the digest of the tree that contains it. The binding above is for the commit validated immediately before this document was written; the run that validates the tree including this document is recorded outside the repository, in the session's phase_a_status.md."
+  },
+  "defects_found_by_azure_validation_and_fixed": [
+    {
+      "id": "PA-03",
+      "found_by": "cm29",
+      "symptom": "A set of three obviously distinct texts was reported as a within-set collision under the template_family rule.",
+      "true_cause": "The rule masked every alphanumeric run, so any two sentences of the same shape reduced to one skeleton. It was not detecting template families; it was erasing the text.",
+      "why_it_mattered": "The failure direction was the dangerous one. A collision rule that fires on innocent input sends a sound 120-case set to repair, and a guard that blocks correct work is a guard that gets switched off.",
+      "remedy": "Mask only what plausibly varies between siblings of a template: quoted spans, bracketed placeholders, and tokens carrying a digit. Pinned by a test asserting that unrelated prose stays distinct.",
+      "test_not_weakened": true
+    },
+    {
+      "id": "PA-04",
+      "found_by": "cm2b",
+      "symptom": "Twenty rehearsal tests failed on a within-set collision between two synthetic cases.",
+      "true_cause": "The fixture built prompts from four templates plus the case identifier. Since the identifier is a digit-bearing token, the corrected rule masked it and correctly identified the two prompts as the same template with a different filler.",
+      "why_it_mattered": "The rule was right and the fixture was wrong. Rewriting the rule to accommodate the fixture would have removed a real protection to make a synthetic case convenient.",
+      "remedy": "Five subjects, four objects and six qualifiers give 120 digit-free literal frames, so each case is its own template family.",
+      "test_not_weakened": true
+    },
+    {
+      "id": "PA-05",
+      "found_by": "cm2c",
+      "symptom": "The rehearsal module could not be collected on its own.",
+      "true_cause": "The repository has no conftest.py and no pythonpath configuration; every test file that needs the package puts src on sys.path itself. All three new test modules omitted this and imported successfully only because another file had already run.",
+      "why_it_mattered": "An order-dependent test suite proves less than it appears to, and the dependency is invisible while the full suite happens to pass.",
+      "remedy": "Applied the repository's established idiom to all three new modules.",
+      "test_not_weakened": true
+    },
+    {
+      "id": "PA-06",
+      "found_by": "cm2d",
+      "symptom": "Every rehearsal path through Stage P was refused for requesting read classes outside its lane.",
+      "true_cause": "The lane check is an allowlist against ROLE_LANES, and the preregistration fixture used invented read-class names.",
+      "why_it_mattered": "This is the section 400 defect in miniature: a fixture that names something the live check does not recognise. Had the check been a denylist, the invented names would have passed silently and the rehearsal would have proved nothing about the lanes.",
+      "remedy": "Bound the fixture to the registered vocabulary. Section 7.4 gives Stage P sealed v2 inputs plus frozen parser assets, and Stage E sealed predictions plus exact labels, policy and contract; the normative matrix was followed in preference to the looser Phase F prose, which also mentions set facts.",
+      "test_not_weakened": true
+    }
+  ],
+  "design_tightening_made_during_this_increment": [
+    {
+      "id": "PT-01",
+      "change": "Stage E now refuses a sealed case whose label is marked ineligible, instead of skipping it.",
+      "reason": "Construction admits only mandatory, eligible cases, so an ineligible label at scoring time is a contradiction rather than a filter. The skip path was the one route by which the 120-case denominator could shrink after predictions were sealed, which is how a failing run becomes a passing one."
+    },
+    {
+      "id": "PT-02",
+      "change": "The template-family guard was narrowed while the Stage P label guard was left deliberately broad.",
+      "reason": "The asymmetry is intentional and is recorded in the source. A false positive in the label guard refuses a run that can be re-issued; a false positive in the collision rule destroys a sound set. Each guard is tuned in the direction where being wrong is cheap."
+    }
+  ],
+  "what_this_increment_establishes": [
+    "Deterministic construction: stratum and decision-class quotas, reviewer and arbiter blinding across the full agreement surface, arbiter scoping that withholds the prior label until adjudication is recorded, closed quarantine reasons, bounded replacement that raises BLOCKED_ON_SET_REPAIR rather than retrying, order-independent selection with a content-hash tie-break, collision freedom under every registered rule, and refusal of the historical 105/15 split as a target.",
+    "Post-seal preregistration as a create-only lock over a closed binding set, refusing both a missing binding and an unregistered one.",
+    "Stage P that is structurally unable to receive a label: the payload check runs before the parser is invoked, and a Stage P process holding comparator or scoring modules is refused.",
+    "Create-only prediction sealing that refuses a partial, duplicated or manifest-first stream.",
+    "Stage E that cannot start before the seal, cannot accept predictions that are not the sealed stream, cannot accept a forged receipt, and cannot hold parser code.",
+    "An evaluation ordinal that advances exactly once, and PASS, FAIL and INVALID recomputed from the binding gates rather than accepted as input.",
+    "Report-only diagnostics proven inert: a perfect macro-F1 is produced while the status is FAIL, because presence can be classified correctly while the canonical value is wrong."
+  ],
+  "rehearsal_evidence": {
+    "requirement": "Controlling prompt section 402: public synthetic end-to-end rehearsal through construction, fake seal, preregistration, Stage P, prediction sealing and Stage E, using synthetic public cases and a synthetic parser only.",
+    "status": "COMPLETE for the public synthetic scope",
+    "drives_real_entrypoints": true,
+    "note": "The rehearsal calls the same functions the private run will call. Nothing is stubbed, relaxed or re-implemented for the rehearsal's convenience, because a rehearsal of a simplified copy would prove only that the copy works. The remaining gap is that the production identities, image digest and container boundaries do not yet exist; that is Phase B and Phase E work and is not claimed here."
+  },
+  "counters_unchanged_this_increment": {
+    "private_semantic_reads": 0,
+    "candidate_cases_seen": 0,
+    "labels_opened": 0,
+    "formal_evaluations_started": 0,
+    "formal_evaluation_ordinal": 0,
+    "sets_sealed": 0,
+    "preregistration_locks_created": 0
+  },
+  "phase_status": {
+    "phase_a_public_protocol_and_tooling_freeze": "PARTIAL",
+    "phase_a_completed_components": [
+      "One-shot evaluation lifecycle core, validated in Azure against the exact committed tree.",
+      "Deterministic construction rules with mutation controls, validated in Azure.",
+      "Post-seal preregistration lock, Stage P, create-only prediction sealing and Stage E, validated in Azure.",
+      "Public synthetic end-to-end rehearsal driving the real entrypoints, validated in Azure."
+    ],
+    "phase_a_outstanding_components": [
+      "Closed JSON schemas with additionalProperties false for deployment evidence, runtime canaries, reviewer output, disagreement and arbitration, admission and quarantine, set facts, seal receipt, listing witness, preregistration, prediction receipt, formal result and terminal assessment.",
+      "Container entrypoint scripts per role, so the identity separation is enforced by the platform and not only by the call site.",
+      "Infrastructure as code for the private review boundary under infra/azure. None exists today.",
+      "A committed dependency lock replacing the unpinned requirements file, so the resolved closure stops being a property of the resolution date.",
+      "The two independent pre-private public audits required before private semantics are read."
+    ],
+    "phase_b_private_review_boundary": "NOT_STARTED",
+    "phase_c_construction": "NOT_STARTED",
+    "phase_d_audit_and_seal": "NOT_STARTED",
+    "phase_e_preregistration": "NOT_STARTED",
+    "phase_f_formal_evaluation": "NOT_STARTED",
+    "phase_g_closure": "NOT_STARTED"
+  },
+  "terminal_state": "BLOCKED_ON_PRIVATE_REVIEW_BOUNDARY",
+  "terminal_state_justification": "Unchanged and correct. Phase A is public work and has advanced, but no private review boundary exists: the registry is Basic tier and cannot carry a Private Link, and no private endpoints, firewall, delegated subnet or GPU environment have been provisioned. Phase B cannot begin without operator budget approval, so the first private semantic read remains unreachable. No terminal state that implies evaluation progress may be claimed, because none has occurred."
+}
