@@ -29,12 +29,23 @@ from jspace_observation.parser_v3_v2_evaluation import EvaluationError
 # synthetic public material
 # ---------------------------------------------------------------------------
 
-_TEMPLATES = (
-    "the shorter path from the depot to the yard",
-    "the quoted rate for the second consignment",
-    "the registered owner of the disputed parcel",
-    "the earliest sailing that still clears customs",
-)
+_SUBJECTS = ("depot", "harbour", "registry", "warehouse", "terminal")
+_OBJECTS = ("consignment", "parcel", "charter", "sailing")
+_QUALIFIERS = ("earliest", "shortest", "cheapest", "safest", "latest", "nearest")
+
+
+def _prompt(index: int) -> str:
+    """A digit-free phrasing unique to this case.
+
+    The obvious fixture -- one template plus the case identifier -- is exactly
+    what the template-family collision rule exists to reject, and it rejected
+    it. Five subjects times four objects times six qualifiers gives 120 distinct
+    literal frames, so each case is its own template family.
+    """
+    qualifier = _QUALIFIERS[index % len(_QUALIFIERS)]
+    obj = _OBJECTS[(index // len(_QUALIFIERS)) % len(_OBJECTS)]
+    subject = _SUBJECTS[index // (len(_QUALIFIERS) * len(_OBJECTS))]
+    return f"the {qualifier} {obj} recorded at the {subject}"
 
 
 def _case_id(index: int) -> str:
@@ -62,10 +73,8 @@ def _locked_input(index: int) -> dict[str, Any]:
     return {
         "case_id": _case_id(index),
         "stratum": _stratum(index),
-        "prompt": (
-            f"{_TEMPLATES[index % len(_TEMPLATES)]}, case {_case_id(index)}"
-        ),
-        "context": f"synthetic public context for position {index}",
+        "prompt": _prompt(index),
+        "context": "synthetic public context, held free of any scoring signal",
     }
 
 
