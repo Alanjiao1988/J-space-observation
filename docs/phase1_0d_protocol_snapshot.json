@@ -1,30 +1,62 @@
 {
   "artifact": "phase1_0d_protocol_snapshot",
-  "work_package": "S1",
-  "status": "FROZEN_BEFORE_INFERENCE",
   "authority": {
     "prompt": "docs/prompts/phase_science_restart_after_parser_closure_prompt.md",
     "prompt_sha256": "5bc137c42c68e1b85b4cad1d45e1b4bf54fb68e2899f27bc6338dae61e9ef162",
     "section": "4.2, 4.3, 4.4"
   },
+  "consequences": [
+    "The eligible pool is exactly 300 items and the registered design needs exactly 300, so Phase 1.0D consumes the entire non-calibration remainder of the public bank, including the split labelled mechanistic. There is no slack: a single ineligible item would have stopped the run before inference.",
+    "After Phase 1.0D no item in data/phase1_task_headroom_candidates.jsonl is unused. Any later work that needs items disjoint from both 1.0C and 1.0D requires a new prospectively specified public batch, generated without reference to any model or lens output.",
+    "The S4 RQ2 pilot draws its cases from the behaviourally successful strict-no-CoT rows of the selected 1.0D cells rather than from a separate held-out split, so it is a selected-case pilot and inherits the cell and correctness conditioning of Phase 1.0D. It is not independent confirmation.",
+    "No inference has been run. This file registers what will be done; it reports no result and licenses no claim."
+  ],
+  "context": {
+    "bank_item_count": 450,
+    "eligible_pool": {
+      "item_count": 300,
+      "per_family_band": {
+        "arithmetic|easy": 20,
+        "arithmetic|hard": 20,
+        "arithmetic|medium": 20,
+        "counterfactual_entity_replacement|easy": 20,
+        "counterfactual_entity_replacement|hard": 20,
+        "counterfactual_entity_replacement|medium": 20,
+        "prompt_grounded_two_hop_factual|easy": 20,
+        "prompt_grounded_two_hop_factual|hard": 20,
+        "prompt_grounded_two_hop_factual|medium": 20,
+        "synthetic_relation|easy": 20,
+        "synthetic_relation|hard": 20,
+        "synthetic_relation|medium": 20,
+        "wrong_cot_error_detection|easy": 20,
+        "wrong_cot_error_detection|hard": 20,
+        "wrong_cot_error_detection|medium": 20
+      }
+    },
+    "phase_1_0c_item_count": 150
+  },
+  "not_established": [
+    "It does not establish that any cell has headroom. Every accuracy number is unmeasured.",
+    "It does not establish that the two repairs are sufficient. One of the 44 unresolved Phase 1.0C rows was explained by neither known defect, so Phase 1.0D can still fail for a reason not on the list.",
+    "It does not establish that a correct strict-arm answer reflects retained task competence rather than an answer recoverable from prompt surface form: no corrupted-prompt or prompt-echo control is registered in this round.",
+    "It does not establish that the structural arm suppresses reasoning at the tokenizer level. The arm is rendered as text, so its empty-think prefill is a string-level construction.",
+    "It does not establish anything about hidden reasoning, internal representations, or J-space."
+  ],
   "provenance": {
-    "executed_in": "azure_container_registry_tasks",
-    "registry": "acrjspaceobssea0708231738",
-    "run_id": "cm45",
-    "platform": "linux/amd64",
     "base_image": "python:3.11-bookworm",
-    "python_version": "3.11.15",
+    "bound_commit": "4caafa9673b3723029f74ba5f2813209f0559ccc",
     "dependency_closure": "requirements.lock.txt",
-    "bound_commit": "7e9e3f8614281bbbb15442f92664972dbda30953",
+    "executed_in": "azure_container_registry_tasks",
+    "platform": "linux/amd64",
     "producer": "infra/azure/scripts/emit_phase1_0d_protocol.py",
     "protocol_module": "src/jspace_observation/phase1_0d_confirmation.py",
     "protocol_tests": "tests/test_phase1_0d_confirmation.py",
-    "protocol_tests_run_id": "cm44",
-    "protocol_tests_bound_commit": "73566c7dff44faa7155aacc6d7b31fcf65a05100",
-    "protocol_tests_result": "46 passed"
+    "python_version": "3.11.15",
+    "registry": "acrjspaceobssea0708231738",
+    "run_id": "cm4f"
   },
   "snapshot": {
-    "arbitration_rule": "phase1_0d_arbitration_v1",
+    "arbitration_rule": "phase1_0d_arbitration_v2",
     "arms": [
       {
         "arm_id": "visible_reasoning_control",
@@ -38,6 +70,7 @@
       {
         "arm_id": "structural_no_cot",
         "branch": "prefill_intervention",
+
         "condition": "strict_answer_only_empty_think_prefill",
         "max_new_tokens": 32,
         "permits_visible_reasoning": false,
@@ -70,6 +103,8 @@
       "min_visible_correct": 14,
       "no_headroom_result": "HEADROOM_NOT_ESTABLISHED",
       "required_resolved": 20,
+      "requires_no_pending_arbitration": true,
+      "requires_strict_arm_no_cot_compliance": true,
       "strict_correct_high": 18,
       "strict_correct_low": 8
     },
@@ -82,20 +117,67 @@
     ],
     "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
     "model_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+    "no_cot_compliance": {
+      "decides_correctness": false,
+      "id": "phase1_0d_no_cot_compliance_v1",
+      "max_surface_lines": 1,
+      "reasoning_markers": [
+        "<think>",
+        "</think>",
+        "let me",
+        "let's",
+        "first,",
+        "step 1",
+        "step one",
+        "we need to",
+        "i need to",
+        "because ",
+        "therefore",
+        "so the answer",
+        "thus ",
+        "reasoning:",
+        "explanation:"
+      ]
+    },
     "parser_role": "routing_only",
     "phase": "1.0D",
     "phase_1_0c_split": "calibration",
     "preserved_phase_1_0c_pack": "artifacts/phase1-headroom-calibration/track-b/20260725T170041Z",
-    "protocol_sha256": "fd52f2d58b59198512aff43eb826250dbadf9675306d8231af5809d3b763c84c",
+    "protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
     "protocol_version": "phase1-headroom-confirmation-protocol-v1",
     "repairs": {
       "P10C-D1": "no condition contains the literal answer placeholder, and every rendered prompt is asserted free of it before inference",
       "P10C-D2": "budgets are registered per arm: 1024 new tokens for the visible control, 32 for the strict arms"
     },
+    "review_form": {
+      "fields": [
+        "record_id",
+        "role",
+        "label",
+        "reviewer_id"
+      ],
+      "id": "phase1_0d_reviewer_form_v1",
+      "presented_fields": [
+        "record_id",
+        "question",
+        "registered_answer",
+        "output_text"
+      ],
+      "roles": [
+        "primary",
+        "secondary",
+        "third"
+      ]
+    },
     "run_base_seed": 20260802,
     "samples_per_item": 1,
     "schema_version": "phase1-headroom-confirmation-v1",
     "secondary_review_sample_fraction": 0.2,
+    "secondary_review_strata": [
+      "task_family",
+      "difficulty_band",
+      "arm_id"
+    ],
     "selection": {
       "disjoint_from_phase_1_0c": true,
       "item_count": 300,
@@ -448,39 +530,7 @@
     "visible_override_id": "phase1_0d_visible_override_v1",
     "visible_override_sha256": "161571421a40ab19c1a6bb61ad4379d9fb6ad9bba8ebbc2974adf9f4d40b7bc0"
   },
-  "context": {
-    "bank_item_count": 450,
-    "eligible_pool": {
-      "item_count": 300,
-      "per_family_band": {
-        "arithmetic|easy": 20,
-        "arithmetic|hard": 20,
-        "arithmetic|medium": 20,
-        "counterfactual_entity_replacement|easy": 20,
-        "counterfactual_entity_replacement|hard": 20,
-        "counterfactual_entity_replacement|medium": 20,
-        "prompt_grounded_two_hop_factual|easy": 20,
-        "prompt_grounded_two_hop_factual|hard": 20,
-        "prompt_grounded_two_hop_factual|medium": 20,
-        "synthetic_relation|easy": 20,
-        "synthetic_relation|hard": 20,
-        "synthetic_relation|medium": 20,
-        "wrong_cot_error_detection|easy": 20,
-        "wrong_cot_error_detection|hard": 20,
-        "wrong_cot_error_detection|medium": 20
-      }
-    },
-    "phase_1_0c_item_count": 150
-  },
-  "consequences": [
-    "The eligible pool is exactly 300 items and the registered design needs exactly 300, so Phase 1.0D consumes the entire non-calibration remainder of the public bank, including the split labelled mechanistic. There is no slack: a single ineligible item would have stopped the run before inference.",
-    "After Phase 1.0D no item in data/phase1_task_headroom_candidates.jsonl is unused. Any later work that needs items disjoint from both 1.0C and 1.0D requires a new prospectively specified public batch, generated without reference to any model or lens output.",
-    "The S4 RQ2 pilot is unaffected: section 8 draws its cases from the behaviourally successful strict-no-CoT rows of the selected 1.0D cells, not from a separate held-out split.",
-    "No inference has been run. This file registers what will be done; it reports no result and licenses no claim."
-  ],
-  "not_established": [
-    "It does not establish that any cell has headroom. Every accuracy number is unmeasured.",
-    "It does not establish that the two repairs are sufficient. One of the 44 unresolved Phase 1.0C rows was explained by neither known defect, so Phase 1.0D can still fail for a reason not on the list.",
-    "It does not establish anything about hidden reasoning, internal representations, or J-space."
-  ]
+  "status": "FROZEN_BEFORE_INFERENCE",
+  "work_package": "S1"
 }
+
