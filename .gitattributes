@@ -115,3 +115,5 @@ tools/run_public_audit.py text eol=lf
 docs/audits/phase_a_public_audit_frame.md text eol=lf
 docs/audits/phase_a_public_audit_scope_a.md text eol=lf
 docs/audits/phase_a_public_audit_scope_b.md text eol=lf
+docs/audits/phase_a_public_audit_a_report.json text eol=lf
+docs/audits/phase_a_public_audit_b_report.json text eol=lf

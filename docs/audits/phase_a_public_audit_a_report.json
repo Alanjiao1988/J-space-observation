@@ -1,0 +1,199 @@
+{
+  "api_shape": "responses",
+  "audit_id": "A",
+  "backend": "azure-openai",
+  "candidate_commit": "1b9916a9cd6f0559d36b026a5b3bb7ca45441896",
+  "candidate_tree": "401e03837715f74b9bf78477e712777ce449168c",
+  "deployment": "audit-terra",
+  "frame_sha256": "37a9d36b792bec4707b15b16864f71dc41acf5ca715fdc8557d00efb9ee48f75",
+  "harness_warnings": [],
+  "material": [
+    {
+      "bytes": 33219,
+      "path": "src/jspace_observation/parser_v3_v2_lifecycle.py",
+      "sha256": "ab4bb10c388d8e1f6b468dee80532cce036b9b8eb5f94a9e1c17c048b2955047"
+    },
+    {
+      "bytes": 27768,
+      "path": "src/jspace_observation/parser_v3_v2_construction.py",
+      "sha256": "fdfe1447355a7b680dd5121f068a4476a026a2536dbab8ae74e98d0b52afc2a1"
+    },
+    {
+      "bytes": 24424,
+      "path": "src/jspace_observation/parser_v3_v2_evaluation.py",
+      "sha256": "4dfc0f058554c1cf96fbbd531fd28e511e073a86cbcd5ed654b07a73efc930c6"
+    },
+    {
+      "bytes": 50948,
+      "path": "tests/test_parser_v3_v2_rehearsal_entrypoints.py",
+      "sha256": "2244f5e3cdad7f950c61b97c3e321c43dc93100553af3d98008125a73349545d"
+    },
+    {
+      "bytes": 23399,
+      "path": "tests/test_parser_v3_v2_rehearsal.py",
+      "sha256": "5d83324b0efbffd32f970ceea50ba435a05ea43660d41921ea7d2e1c0c8f69f4"
+    },
+    {
+      "bytes": 9034,
+      "path": "docs/phase1_parser_v3_v2_stratum_policy.md",
+      "sha256": "26e2cbf5d0b3f53a54649224dd78ac4ea2c3b9c1dce2b644e38aff37af6a798d"
+    },
+    {
+      "bytes": 9723,
+      "path": "docs/phase1_2h_independent_set_repair_protocol.md",
+      "sha256": "58938558e5f1cf017afaffa7c09d2a978f8aa131a6ab892b27a15d5fd9c30bc3"
+    }
+  ],
+  "material_digest": "64d79eebfb40f46dffe3f1b7273ca2de328ffc81d20b74b4ba30d2de72f72e1c",
+  "model": "gpt-5.6-terra",
+  "report": {
+    "audit_id": "A",
+    "candidate_commit": "1b9916a9cd6f0559d36b026a5b3bb7ca45441896",
+    "findings": [
+      {
+        "area": "lifecycle",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py, run_stage_e: \"before = prediction_receipt[\\\"ordinal\\\"]\" and \"after = lifecycle.next_ordinal(\\\"PREDICTION_SEALED\\\", \\\"LABELS_OPENED\\\", before)\" derive the ordinal entirely from the supplied receipt; the function returns a result but records no consumed state. src/jspace_observation/parser_v3_v2_lifecycle.py, next_ordinal: \"if current_ordinal != 0: raise LifecycleError(...)\" only refuses a caller that supplies a nonzero value. src/jspace_observation/parser_v3_v2_evaluation.py, result construction: \"\\\"ordinal\\\": after\" returns rather than persists the advanced ordinal.",
+        "id": "A-01",
+        "reproduction": "Obtain any valid lock, prediction receipt, members, labels, and strata accepted by run_stage_e. Invoke run_stage_e once, then invoke it again with byte-identical arguments, including the original receipt whose ordinal remains 0. Each invocation computes after=1 and returns a terminal EVALUATED_ACCEPTED or EVALUATED_NOT_ACCEPTED result; neither invocation is refused as a second formal evaluation.",
+        "residual_limitation": "Persisting a consumed ordinal must also be paired with an authenticated, create-only terminal-result namespace; it alone does not prove that all runtime inputs were the registered sealed objects.",
+        "severity": "BLOCKER",
+        "title": "Stage E does not consume the formal evaluation ordinal and can be run repeatedly"
+      },
+      {
+        "area": "stage-e",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py, run_stage_e verifies only \"if canonical_digest(list(sealed_members)) != prediction_receipt[\\\"stream_digest\\\"]\" and then iterates \"for member in sealed_members:\". It has no assertion that len(sealed_members), prediction_receipt[\"member_count\"], or the scored denominator equals lifecycle.EXPECTED_SET_MEMBER_COUNT. The only missing-label check is \"missing = sorted({m[\\\"case_id\\\"] for m in sealed_members} - set(labels))\", which likewise covers only supplied members. src/jspace_observation/parser_v3_v2_lifecycle.py defines \"EXPECTED_SET_MEMBER_COUNT = 120\", but run_stage_e does not use it.",
+        "id": "A-02",
+        "reproduction": "Create a valid lock and lock digest. Supply sealed_members=[{\"case_id\":\"c1\",\"prediction\":{\"answer_presence\":\"present\",\"canonical_value\":\"x\"}}]. Construct a self-consistent receipt with state \"PREDICTION_SEALED\", ordinal 0, the lock digest, member_count 1, stream_digest=canonical_digest(sealed_members), and receipt_digest=canonical_digest(receipt without receipt_digest). Supply labels={\"c1\":{\"eligible\":True,\"answer_presence\":\"present\",\"canonical_value\":\"x\"}} and strata={\"c1\":\"S01\"}. run_stage_e accepts the receipt and returns PASS with eligible_case_count 1 because all mismatch counters are zero.",
+        "residual_limitation": "Checking the count prevents denominator shrinkage but does not by itself authenticate that the members are the cases represented by the preregistered set manifest.",
+        "severity": "BLOCKER",
+        "title": "Stage E can return PASS for a stream shorter than 120 cases"
+      },
+      {
+        "area": "sealing",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py, create_preregistration_lock: \"if existing_lock_digest is not None: raise EvaluationError(...)\" accepts creation whenever its optional caller-supplied existing_lock_digest is omitted, and returns only \"frozen, canonical_digest(frozen)\" without retaining a lock object or existence record. src/jspace_observation/parser_v3_v2_evaluation.py, seal_prediction_stream declares \"existing_objects: Iterable[str] = ()\" and passes it to lifecycle.assert_create_only_plan. src/jspace_observation/parser_v3_v2_lifecycle.py, assert_create_only_plan only evaluates \"existing = set(existing_objects)\" and refuses collisions in that supplied iterable; it neither reads nor retains object existence.",
+        "id": "A-03",
+        "reproduction": "Call create_preregistration_lock(bindings=valid_bindings) twice, omitting existing_lock_digest both times; both calls succeed, including if the second bindings differ. Separately, call seal_prediction_stream twice with the same valid stream, sealed_case_ids, write_order, and terminal_manifest while omitting existing_objects; both calls accept because each sees the default empty iterable. These calls can yield fresh receipts/results instead of refusing a second write.",
+        "residual_limitation": "A persistent create-only store or authenticated append-only ledger is also required to establish that a claimed existing-object listing was complete and was observed before the attempted write.",
+        "severity": "BLOCKER",
+        "title": "Preregistration and prediction seals are not create-only without caller-provided existence state"
+      },
+      {
+        "area": "blinding",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py defines REVIEWER_FORBIDDEN_INPUTS as exact names including \"old_label\" and \"migrated_label\". Its asserted enforcement is only \"present = sorted(set(packet).intersection(REVIEWER_FORBIDDEN_INPUTS))\" in assert_reviewer_packet_is_blind, followed by a check only for \"case_content\" and \"public_ontology_packet\". Unlike the Stage P guard, it does not recursively inspect keys or reject unknown fields.",
+        "id": "A-04",
+        "reproduction": "Call assert_reviewer_packet_is_blind({\"case_content\":\"case\", \"public_ontology_packet\":{}, \"gold_label\":\"secret\"}). The required fields are present and gold_label is not an exact member of REVIEWER_FORBIDDEN_INPUTS, so the packet is accepted and can be handed to a reviewer despite carrying a label-bearing field.",
+        "residual_limitation": "A field-level guard cannot establish reviewer independence from shared execution context, filesystem, or transcript; those isolation properties require the separately configured runtime boundary.",
+        "severity": "BLOCKER",
+        "title": "Reviewer blinding admits unregistered label-bearing field names"
+      },
+      {
+        "area": "stage-e",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_lifecycle.py defines STAGE_E_FORBIDDEN_READ_CLASSES including \"parser_source\" and \"parser_invocation\". src/jspace_observation/parser_v3_v2_evaluation.py, run_stage_e receives \"labels: Mapping[str, Mapping[str, Any]]\", assigns \"label = labels[case_id]\", and reads selected label keys, but has no payload-field rejection for parser-bearing data. Its only parser check is \"lifecycle.assert_stage_e_import_is_parser_free(loaded_module_names)\", which inspects a caller-supplied sequence of module names rather than the received label payload.",
+        "id": "A-05",
+        "reproduction": "Use the one-member otherwise-perfect receipt and inputs described for A-02, but set labels[\"c1\"][\"parser_source\"]=\"parser bytes\" and pass loaded_module_names=(). run_stage_e reads the label mapping, performs no parser-field check, and returns PASS. Thus parser-bearing material reaches the Stage E role despite its forbidden class.",
+        "residual_limitation": "Rejecting parser-bearing payload fields does not prove process-level parser absence; the runtime image and module-loading boundary must independently remain parser-free.",
+        "severity": "BLOCKER",
+        "title": "Stage E accepts parser-bearing fields embedded in its label payload"
+      }
+    ],
+    "material_digest": "64d79eebfb40f46dffe3f1b7273ca2de328ffc81d20b74b4ba30d2de72f72e1c",
+    "overall_verdict": "NOT_READY_FOR_FREEZE",
+    "properties_checked": [
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py, run_stage_e derives its ordinal from the immutable caller-supplied prediction_receipt[\"ordinal\"] and does not persist consumption; identical repeated calls are accepted (A-01).",
+        "property": "Exactly one formal evaluation ordinal exists and a second formal evaluation is refused rather than overwritten.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py refuses an ineligible supplied member via \"if label.get(\\\"eligible\\\") is not True: raise EvaluationError(...)\" but contains no assertion that supplied sealed_members has 120 members or that receipt member_count is 120 (A-02).",
+        "property": "Stage E refuses any sealed case marked ineligible; it never skips it or shrinks the 120-case denominator.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py computes \"status = \\\"PASS\\\" if all(binding_gates.values()) else \\\"FAIL\\\"\" and invokes lifecycle.assert_status_is_exclusive(binding_gate_results=binding_gates, declared_status=status); run_stage_e accepts no reported verdict parameter.",
+        "property": "Stage E recomputes PASS/FAIL from preregistered gates rather than trusting a reported verdict.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py closes supplied binding names against PREREGISTERED_BINDINGS, but its only existence control is the optional caller argument \"existing_lock_digest: str | None = None\"; a second changed lock can be created by omitting it (A-03).",
+        "property": "The preregistration lock is create-only over a closed binding set and cannot be amended after creation.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_lifecycle.py, assert_prediction_stream_complete refuses missing and duplicate predictions, but src/jspace_observation/parser_v3_v2_evaluation.py, seal_prediction_stream defaults existing_objects to () and retains no write state, allowing repeated sealing when the caller omits existing objects (A-03).",
+        "property": "Prediction sealing is create-only and refuses an incomplete prediction stream.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py defines the frozenset QUARANTINE_REASONS and assert_quarantine_reason_is_registered raises when \"reason not in QUARANTINE_REASONS\".",
+        "property": "Quarantine reasons are drawn from a closed registered set and an unregistered reason is refused.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py, assert_replacement_batch_within_limit raises BlockedOnSetRepair when \"batches_used >= preregistered_batch_limit\"; its message explicitly states \"the round is BLOCKED_ON_SET_REPAIR and must not generate another batch\".",
+        "property": "Replacement is bounded and exhausting the budget raises BLOCKED_ON_SET_REPAIR rather than relaxing the set.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py, disagreeing_fields iterates the fixed AGREEMENT_FIELDS tuple, but the live broker/arbiter entrypoint implementation that orders and emits routed packets is not included in this audit material. The supplied tests invoke entrypoints, but their implementation is absent.",
+        "property": "Blinded A/B review compares only the registered agreement fields and routes to the arbiter deterministically.",
+        "verdict": "UNVERIFIABLE"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py defines COLLISION_RULES with exact, normalized, numeric_normalized, and template_family; assert_no_prohibited_collision iterates each rule and raises \"within-set collision under rule {rule_name!r}\". tests/test_parser_v3_v2_rehearsal_entrypoints.py TestEveryCollisionRule supplies a pair for each rule and asserts the corresponding refusal.",
+        "property": "All four collision rules can independently reject a set and the reported rule name is the rule that fired.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py defines _SLOT_TOKEN as \"re.compile(r\\\"\\\\S*\\\\d\\\\S*\\\")\" and _rule_template_family masks quoted spans, placeholders, and digit-carrying tokens only. Its docstring explicitly preserves surrounding words and identifies masking every alphanumeric run as the rejected behavior.",
+        "property": "template_family does not mask every alphanumeric segment and does not recreate the PA-03 false-positive defect.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "tests/test_parser_v3_v2_rehearsal_entrypoints.py, _prompt constructs unique digit-free frames from five subjects, four objects, and six qualifiers, and TestEveryCollisionRule.test_the_rehearsal_set_is_collision_free_under_every_rule invokes assert_no_prohibited_collision on all 120 prompts.",
+        "property": "Rehearsal fixtures do not use \"one template plus case ID\" to defeat the registered collision rule.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py, select_deterministically derives tuples (rank, digest, candidate), rejects repeated digests, and executes \"prepared.sort(key=lambda item: (item[0], item[1]))\" before taking the requested count.",
+        "property": "Content-hash selection is order-independent.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py, assert_split_is_not_a_target walks rule_set and raises if an integer historical value occurs under a target-marked key: \"pins the historical split value {node} as a target\".",
+        "property": "The construction refuses to target the historical 105/15 split.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_construction.py reviewer blinding tests only exact forbidden names through \"set(packet).intersection(REVIEWER_FORBIDDEN_INPUTS)\" and accepts arbitrary label-bearing variants such as gold_label (A-04).",
+        "property": "No label-bearing field reaches a role forbidden to read labels.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_evaluation.py run_stage_e accepts arbitrary label mappings and performs no parser-bearing payload-field validation, while lifecycle declares parser_source and parser_invocation forbidden to Stage E (A-05).",
+        "property": "No parser-bearing field reaches a role forbidden to invoke the parser.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "The material contains current test-file bytes but no parent commit, diff, test collection output, or repository history from which removal, weakening, skip, or xfail changes can be established.",
+        "property": "No existing test is weakened, removed, skipped, or xfailed by the material under audit.",
+        "verdict": "UNVERIFIABLE"
+      }
+    ],
+    "summary": "Audited the supplied lifecycle, construction, evaluation, rehearsal tests, and methodology documents for one-shot execution, admission, blinding, bounded repair, sealing, collision rules, and Stage E gates. The construction-side closed vocabularies, deterministic content-hash ordering, collision rules, and scoring-gate recomputation are substantively implemented. However, the formal lifecycle is represented only by caller-supplied values: Stage E can be called repeatedly with the same sealed receipt, and can issue PASS for a one-member stream if supplied a self-consistent forged receipt. Preregistration and prediction create-only checks likewise rely on caller-supplied existence listings rather than retained state. Reviewer blinding has an exact-name blacklist that admits label-bearing variants, and Stage E accepts parser-bearing fields inside labels. These are paths to invalid scientific results or prohibited disclosures.",
+    "unverifiable_without_private_material": [
+      "Whether production storage and entrypoint implementations, not supplied here, persist object existence, consumed ordinals, and create-only writes.",
+      "Whether deployed reviewer and arbiter execution environments are actually isolated despite the documented role lanes.",
+      "Whether any private set, label, prediction, or deployed result conforms to the public protocol."
+    ]
+  },
+  "runner": "azure-container-registry-task",
+  "schema_version": "phase1-parser-v3-v2-public-audit/v1",
+  "scope_path": "docs/audits/phase_a_public_audit_scope_a.md",
+  "scope_sha256": "0a32e0a4527613af450843bef3cdef5df7eb8a280b9f2ee7312016d9e81fbc6e"
+}

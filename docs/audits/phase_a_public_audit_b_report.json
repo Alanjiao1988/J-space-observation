@@ -1,0 +1,266 @@
+{
+  "api_shape": "responses",
+  "audit_id": "B",
+  "backend": "azure-openai",
+  "candidate_commit": "1b9916a9cd6f0559d36b026a5b3bb7ca45441896",
+  "candidate_tree": "401e03837715f74b9bf78477e712777ce449168c",
+  "deployment": "audit-luna",
+  "frame_sha256": "37a9d36b792bec4707b15b16864f71dc41acf5ca715fdc8557d00efb9ee48f75",
+  "harness_warnings": [],
+  "material": [
+    {
+      "bytes": 44820,
+      "path": "src/jspace_observation/parser_v3_v2_entrypoints.py",
+      "sha256": "2b232ce3cb43dcff2c738aa8a039d313c2aaa1dd38ad05a59874b655ef28c9d3"
+    },
+    {
+      "bytes": 55095,
+      "path": "src/jspace_observation/parser_v3_v2_schemas.py",
+      "sha256": "8594a4256e873b262173e922a2b09d764cf2997a1c4832c78aec91294115c175"
+    },
+    {
+      "bytes": 19414,
+      "path": "tests/test_parser_v3_v2_boundary_iac.py",
+      "sha256": "e93e38677eab40204db1a7ec42cc8287eecdb241c9567f9bfb4a16473f891f63"
+    },
+    {
+      "bytes": 10134,
+      "path": "infra/azure/parser_v3_v2_boundary/main.bicep",
+      "sha256": "27534c2405cf347a14f8fd1c6f0c686a3921b81aa415c1e6ffbde53bfa45e176"
+    },
+    {
+      "bytes": 9346,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/network.bicep",
+      "sha256": "93d12371bb4c560998b1eeef9f75aefe629d13931f0cbf9e8cb97770896874f8"
+    },
+    {
+      "bytes": 4797,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/privatelink.bicep",
+      "sha256": "8cd6e0bb0551d22b6a26aaea710c0b983eff2ac88d7767eda70ea00fa76d4195"
+    },
+    {
+      "bytes": 3247,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/storage_access.bicep",
+      "sha256": "d7e3054e63434a66935500d26cf67bdd3fa7aad186515065693323f5e78dc12d"
+    },
+    {
+      "bytes": 5939,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/workload.bicep",
+      "sha256": "527956206c09e347fefa8df02307e3253e3af4cf501bbaac1bdb0ffe2d9b15e7"
+    },
+    {
+      "bytes": 1956,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/assert_no_overlap.bicep",
+      "sha256": "18cf52ef09b3b0ceb927041b3e4c29fa8bc633362fae6946901279994b728350"
+    },
+    {
+      "bytes": 2739,
+      "path": "infra/azure/parser_v3_v2_boundary/modules/observability.bicep",
+      "sha256": "b71cedd09ad59c5aabd237c3c8f3ffca210e12d366193057bebe3c763aeaff6d"
+    },
+    {
+      "bytes": 11027,
+      "path": "infra/azure/parser_v3_v2_boundary/role_matrix.json",
+      "sha256": "aa4e3d0caa6754103ae444b903cf22094ade77864a01f9a767777c8a6576dd1e"
+    },
+    {
+      "bytes": 4773,
+      "path": "infra/azure/parser_v3_v2_boundary/address_plan.json",
+      "sha256": "f66cd06536976ee343df3973cf135d264a8f1af5f6be7d0ba4f80a75e3844b27"
+    },
+    {
+      "bytes": 1310,
+      "path": ".dockerignore",
+      "sha256": "340ce490931ed8a243eac59ef6b4b671e53c51054b928aabfc20820988d75a83"
+    },
+    {
+      "bytes": 6455,
+      "path": ".gitattributes",
+      "sha256": "dc39cb7a06f46cd12b194fd69f6e6d416e78fa68466b3f51fd8479436336996e"
+    }
+  ],
+  "material_digest": "831e0701853c74d3246e39d61f5716b49ebf92987fcaa0dab186c69a8c019c8e",
+  "model": "gpt-5.6-luna",
+  "report": {
+    "audit_id": "B",
+    "candidate_commit": "1b9916a9cd6f0559d36b026a5b3bb7ca45441896",
+    "findings": [
+      {
+        "area": "entrypoints",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `def main(argv: Sequence[str] | None = None) -> int:`; `if name not in ENTRYPOINTS: raise EntrypointError(...)`; `raise EntrypointError(f\"entrypoint {name!r} requires its payload from the private boundary; \" \"it must not fetch or synthesise one itself\")`. The registered command is `(\"python\", CONTAINER_ENTRYPOINT_PATH, name)` in `_spec`, but `main` contains no call to `ENTRYPOINTS[name].function`.",
+        "id": "B-01",
+        "reproduction": "Invoke the committed container command for any role, for example `python /app/src/jspace_observation/parser_v3_v2_entrypoints.py stage-p`. `main()` accepts the registered name and then raises EntrypointError without invoking `run_stage_p` or any other registered callable.",
+        "residual_limitation": "A dispatch fix would bind the command to a callable, but would not by itself prove that Azure launched the intended image or supplied the intended payload.",
+        "severity": "BLOCKER",
+        "title": "The deployed container command never dispatches a registered entrypoint"
+      },
+      {
+        "area": "runtime-binding",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `class RoleConfig` contains `image_digest: str` and `config_digest: str` but no schema digest; `assert_config_registered` validates `config.config_digest` only with `if not _SHA256.match(config.config_digest or \"\")`; `ROLE_SCHEMAS` stores only schema ID strings. infra/azure/parser_v3_v2_boundary/modules/workload.bicep: the container environment includes `JSPACE_SCHEMA_IDS` and `JSPACE_IMAGE_DIGEST`, but no schema-registry digest or configuration digest. src/jspace_observation/parser_v3_v2_schemas.py: `SCHEMA_DIGESTS` and `REGISTRY_DIGEST` are computed, but `assert_registry_matches` is only defined and is not invoked in the supplied production path.",
+        "id": "B-02",
+        "reproduction": "Replace the schema document or role/configuration JSON while retaining the same schema ID and role names. The entrypoint configuration checks the ID and only checks that `config_digest` has SHA-256 syntax; the workload template passes schema IDs, not a bound schema digest, and no production call compares the registry to a pre-bound digest.",
+        "residual_limitation": "Digest binding would establish content identity for the supplied artifacts, but would not prove that Azure actually deployed the recorded digest without deployment read-back evidence.",
+        "severity": "MAJOR",
+        "title": "Schema and configuration content are not runtime-bound by digest"
+      },
+      {
+        "area": "security",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `expected_identity = ROLE_IDENTITY_NAMES.get(config.role)` and `if config.uami_name != expected_identity`; `if not _GUID.match(config.uami_client_id or \"\")`; `supplied = environment.get(\"AZURE_CLIENT_ID\")`; `if supplied != config.uami_client_id`. The code never verifies a mapping from the registered `uami_name` to the supplied client ID or to an Azure identity object.",
+        "id": "B-03",
+        "reproduction": "Construct a `RoleConfig` for a registered role with its expected `uami_name` and any syntactically valid GUID as `uami_client_id`, then provide the same GUID as `AZURE_CLIENT_ID`. The identity assertions pass even though the GUID is not bound in the supplied material to that role's managed identity.",
+        "residual_limitation": "A name-to-client-ID binding would still not prove that the Azure workload token at runtime corresponds to that identity without a runtime canary or control-plane read-back.",
+        "severity": "MAJOR",
+        "title": "Managed identity is not bound to the registered identity name"
+      },
+      {
+        "area": "security",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `FORBIDDEN_CREDENTIAL_MARKERS` is a fixed tuple of marker strings; `hits = sorted({key for key in environment for marker in FORBIDDEN_CREDENTIAL_MARKERS if marker in key.casefold()})`; the only separate fallback check is `environment.get(\"AZURE_USE_AMBIENT_CREDENTIAL\", \"\").strip().lower() in {\"1\", \"true\", \"yes\"}`.",
+        "id": "B-04",
+        "reproduction": "Call `assert_no_ambient_credentials` with an environment containing `AZURE_CLIENT_ID` plus a differently named credential such as `FOO_TOKEN=secret` or `MY_STORAGE_AUTH=secret`. Neither key contains any listed marker and the function returns without refusal.",
+        "residual_limitation": "Rejecting all unapproved environment variables or using an explicit allowlist would still not detect credentials injected through files, process metadata, or platform token endpoints.",
+        "severity": "BLOCKER",
+        "title": "Ambient-credential refusal is an incomplete denylist"
+      },
+      {
+        "area": "iac",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "infra/azure/parser_v3_v2_boundary/modules/observability.bicep: `resource workspace 'Microsoft.OperationalInsights/workspaces@2023-09-01'`; `publicNetworkAccessForIngestion: 'Enabled'`; `publicNetworkAccessForQuery: 'Enabled'`. The same module sends firewall and registry evidence to `workspace.id` through diagnostic settings.",
+        "id": "B-05",
+        "reproduction": "Deploy the committed observability module and inspect the workspace properties: both ingestion and query public-network settings are explicitly Enabled, while the module configures private-boundary firewall and registry events to that workspace.",
+        "residual_limitation": "Disabling public access would not by itself prove that logs contain no private material or that every control-plane access path is private.",
+        "severity": "MAJOR",
+        "title": "The observability workspace has public network access enabled"
+      },
+      {
+        "area": "iac",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "infra/azure/parser_v3_v2_boundary/modules/network.bicep: `targetFqdns: [ 'mcr.microsoft.com' '*.data.mcr.microsoft.com' resourceManagerHost 'login.microsoft.com' loginHost '*.blob.${storageSuffix}' 'packages.microsoft.com' 'acs-mirror.azureedge.net' ]`. These are literal environment/service hostnames in the firewall allowlist.",
+        "id": "B-06",
+        "reproduction": "Search the committed Bicep files for literal hostnames. The listed URLs remain in the deployed firewall policy independently of `environment()` and therefore are not portable or content-bound to the selected Azure environment.",
+        "residual_limitation": "Deriving endpoints from the environment would not establish that the resulting allowlist is sufficient or least-privilege for the platform.",
+        "severity": "MAJOR",
+        "title": "IaC contains hardcoded cloud environment URLs"
+      },
+      {
+        "area": "repository",
+        "disposition": "REMEDIATE_BEFORE_FREEZE",
+        "evidence": "tests/test_parser_v3_v2_boundary_iac.py: `_read_text(path)` returns the complete file text; `test_the_runtime_registry_is_private` asserts `\"publicNetworkAccess: 'Disabled'\" in text` and `\"networkRuleBypassOptions: 'None'\" in text`; `test_the_environment_has_no_public_ingress` asserts `\"internal: true\" in text`; `test_the_custom_write_role_cannot_delete` asserts `\"blobs/delete\" not in text`. These checks use raw text rather than a parsed Bicep declaration or compiled template. The file itself documents that several controls are text-level checks.",
+        "id": "B-07",
+        "reproduction": "Move a required positive declaration into a comment while removing the actual declaration, or place a forbidden token in a comment. The positive substring assertions still pass in the first case, and negative substring assertions fail or can be defeated by changing the tested text representation rather than the resource semantics.",
+        "residual_limitation": "Parsing or compiling the template would still not prove Azure's deployed resource properties without control-plane read-back.",
+        "severity": "MAJOR",
+        "title": "Source-text security tests can be satisfied by comments"
+      }
+    ],
+    "material_digest": "831e0701853c74d3246e39d61f5716b49ebf92987fcaa0dab186c69a8c019c8e",
+    "overall_verdict": "NOT_READY_FOR_FREEZE",
+    "properties_checked": [
+      {
+        "evidence": "The container command invokes `main`, but `main` raises after validating the name and never dispatches `ENTRYPOINTS[name].function` in src/jspace_observation/parser_v3_v2_entrypoints.py.",
+        "property": "Every protocol step is reachable only through a registered container entrypoint.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `spec = resolve_entrypoint(command)` followed by `if spec.role != role: raise EntrypointError(...)`.",
+        "property": "A container command naming a different role than the role being run is refused.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `resolve_entrypoint` compares the complete command tuple; `main` requires `len(args) != 1` to raise and rejects names not in `ENTRYPOINTS`.",
+        "property": "An unregistered entrypoint name, a module-form command, or an extra argument is refused rather than ignored.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "run_stage_p and run_stage_e evaluate `list(lock[\"stage_p_read_classes\"])` or `list(lock[\"stage_e_read_classes\"])` in the arguments to `_guarded`, before `_guarded` runs. The deployed `main` also performs no work because it raises instead of dispatching.",
+        "property": "Each entrypoint asserts configuration, identity, absence of ambient credentials, storage lanes, and import isolation before doing work.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `if supplied is None: raise EntrypointError(\"AZURE_CLIENT_ID is not set; ambient identity is refused\")`.",
+        "property": "A role holding no managed identity is refused.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_schemas.py: `_obj` sets `\"additionalProperties\": False`; `_assert_closed` rejects object schemas lacking `additionalProperties` and recursively checks declared properties.",
+        "property": "Every object boundary in the schema registry sets additionalProperties to false.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "Schema IDs contain `/v1` and `SCHEMA_DIGESTS` are computed in src/jspace_observation/parser_v3_v2_schemas.py, but the registry documents do not carry their digest and the production role binding carries only `schema_ids`; no bound registry digest is passed by infra/azure/parser_v3_v2_boundary/modules/workload.bicep.",
+        "property": "Every registered schema carries an explicit version and a bound digest.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_schemas.py: `_assert_closed` rejects duplicate registration and undeclared required names; `_validate` rejects unknown properties, missing required fields, and failed `const` schema versions. Array uniqueness is implemented through `uniqueItems`.",
+        "property": "Schema validation rejects unknown fields, wrong versions, duplicate IDs, and partial sets.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "src/jspace_observation/parser_v3_v2_entrypoints.py: `_validate_each` calls `schemas.assert_valid`; the module imports the registry module directly rather than defining a second schema validator.",
+        "property": "Production entrypoints call the same validators the tests exercise, not a simplified replica.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "workload.bicep interpolates `@${roleImageDigests[role.role]}` and passes `JSPACE_IMAGE_DIGEST`, but passes only `JSPACE_SCHEMA_IDS` and no schema/config digest. `RoleConfig.config_digest` is only syntax-checked.",
+        "property": "The runtime is bound by image digest, config digest, and schema digest rather than by mutable name or tag.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "The parameter has no default in main.bicep and workload.bicep, but the supplied material contains no Bicep compilation/deployment result or explicit key/cardinality validation proving that every role key is required.",
+        "property": "roleImageDigests has no default and an incomplete map cannot deploy.",
+        "verdict": "UNVERIFIABLE"
+      },
+      {
+        "evidence": "main.bicep passes `any(length(conflictingPrefixes))` to `assert_no_overlap.bicep`; that module declares `@minValue(0)`, `@maxValue(0)`, and `param conflictingPrefixCount int`.",
+        "property": "The Bicep template refuses an overlapping address prefix rather than warning.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "observability.bicep explicitly sets `publicNetworkAccessForIngestion: 'Enabled'` and `publicNetworkAccessForQuery: 'Enabled'` on a workspace receiving boundary diagnostic events.",
+        "property": "Public network access is disabled on every resource that holds or transits private material.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "main.bicep custom role dataActions contain read, write, and `Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action` but no delete action; storage_access.bicep references that role for write grants.",
+        "property": "The role matrix grants no delete permission where create-only is claimed.",
+        "verdict": "HOLDS"
+      },
+      {
+        "evidence": "network.bicep contains literal `mcr.microsoft.com`, `login.microsoft.com`, `packages.microsoft.com`, and `acs-mirror.azureedge.net` in `targetFqdns`.",
+        "property": "The Bicep template contains no hardcoded environment URLs.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "The material exposes only a reference to requirements.lock.txt in .gitattributes; it does not include the lock contents, image build scripts, or Azure installation steps.",
+        "property": "The dependency closure is pinned and the pinned closure is what Azure installs.",
+        "verdict": "UNVERIFIABLE"
+      },
+      {
+        "evidence": "tests/test_parser_v3_v2_boundary_iac.py uses raw `_read_text` and substring assertions such as `\"publicNetworkAccess: 'Disabled'\" in text` and `\"internal: true\" in text`; comments are not removed for these checks.",
+        "property": "Text-substring controls over source files cannot be satisfied or defeated by a comment.",
+        "verdict": "VIOLATED"
+      },
+      {
+        "evidence": "The supplied material shows no diff or complete test inventory sufficient to establish that no other existing test was weakened, removed, skipped, or xfailed.",
+        "property": "No existing test is weakened, removed, skipped, or xfailed by the material under audit.",
+        "verdict": "UNVERIFIABLE"
+      }
+    ],
+    "summary": "The registry and entrypoint tables are substantially closed, but the deployed binding is not. The container command reaches main(), which validates a name and then unconditionally raises instead of dispatching the registered callable. Runtime configuration does not bind schema or config content by digest, identity client IDs are only checked for GUID shape and equality to caller-supplied configuration, ambient-credential detection is an incomplete name-marker denylist, and the observability workspace has public ingestion and query enabled. The IaC also hardcodes cloud environment URLs and relies on comment-vulnerable text-substring tests.",
+    "unverifiable_without_private_material": [
+      "Whether Azure actually deployed the image, configuration, schema registry, and role matrix contents represented by the committed files.",
+      "Whether the dependency lock is the closure Azure installs.",
+      "Whether the deployed managed identity tokens correspond to the role identities.",
+      "Whether runtime canaries observed the claimed network, lane, and import-isolation refusals.",
+      "Whether any tests outside the supplied material were weakened, removed, skipped, or xfailed."
+    ]
+  },
+  "runner": "azure-container-registry-task",
+  "schema_version": "phase1-parser-v3-v2-public-audit/v1",
+  "scope_path": "docs/audits/phase_a_public_audit_scope_b.md",
+  "scope_sha256": "1808197d949d2a6cb96483fe6d26506052369a0695aef265e96a2d9d5e166bae"
+}
