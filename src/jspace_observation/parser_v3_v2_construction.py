@@ -201,7 +201,14 @@ TARGET_KEY_FRAGMENTS: tuple[str, ...] = (
 
 _WHITESPACE = re.compile(r"\s+")
 _NUMBER = re.compile(r"-?\d+(?:\.\d+)?")
-_LITERAL_RUN = re.compile(r"[0-9A-Za-z]+")
+
+#: A template's slot fillers: quoted spans, bracketed placeholders, and any
+#: token carrying a digit (identifiers, codes, quantities). Deliberately *not*
+#: every alphanumeric run — see :func:`_rule_template_family`.
+_QUOTED = re.compile("[\"'\u00ab\u00bb\u201c\u201d\u2018\u2019][^\"'\u00ab\u00bb\u201c\u201d\u2018\u2019]*[\"'\u00ab\u00bb\u201c\u201d\u2018\u2019]")
+_PLACEHOLDER = re.compile(r"[{<\[][^{}<>\[\]]*[}>\]]")
+_SLOT_TOKEN = re.compile(r"\S*\d\S*")
+_SLOT = "\x00slot\x00"
 
 
 def content_hash(payload: str) -> str:
@@ -428,7 +435,22 @@ def _rule_numeric_normalized(text: str) -> str:
 
 
 def _rule_template_family(text: str) -> str:
-    return _LITERAL_RUN.sub("*", _rule_normalized(text))
+    """Collapse slot fillers so two cases cut from one template collide.
+
+    Only what plausibly varies between siblings of a template is masked:
+    quoted spans, bracketed placeholders, and tokens carrying a digit. The
+    surrounding words are kept.
+
+    The obvious shortcut -- mask every alphanumeric run -- is wrong, and wrong
+    in the direction that does damage. It reduces "alpha one" and "beta two" to
+    the same skeleton, so it reports a collision between two unrelated cases and
+    sends a perfectly good set to repair. A rule that fires on innocent input is
+    a rule someone eventually switches off, and then it protects nothing.
+    """
+    masked = _rule_normalized(text)
+    masked = _QUOTED.sub(_SLOT, masked)
+    masked = _PLACEHOLDER.sub(_SLOT, masked)
+    return _SLOT_TOKEN.sub(_SLOT, masked)
 
 
 #: Every registered collision rule. The checker runs all of them.

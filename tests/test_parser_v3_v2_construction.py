@@ -381,6 +381,23 @@ class TestCollisionFreedom:
                 set_contents={"a": "order abc123 shipped", "b": "order zzz999 shipped"}
             )
 
+    def test_the_template_rule_does_not_fire_on_unrelated_prose(self) -> None:
+        """Regression guard for a rule that once flagged every same-shaped pair.
+
+        Masking every alphanumeric run reduced "alpha one" and "beta two" to one
+        skeleton, so the checker reported a collision between unrelated cases and
+        would have sent a sound set to repair.
+        """
+        family = construction.COLLISION_RULES["template_family"]
+        assert family("alpha one") != family("beta two")
+        assert family("the shorter path") != family("the longer route")
+
+    def test_the_template_rule_masks_quoted_and_bracketed_slots(self) -> None:
+        family = construction.COLLISION_RULES["template_family"]
+        assert family('pick "red" now') == family('pick "blue" now')
+        assert family("pick {red} now") == family("pick {blue} now")
+        assert family('pick "red" now') != family('choose "red" now')
+
     def test_every_registered_rule_can_actually_reject_something(self) -> None:
         """Mutation control: a rule that never fires is not a rule."""
         provoking = {
