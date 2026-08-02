@@ -22,6 +22,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping, Sequence
 
+from .headroom_calibration import sha256_text
 from .phase1_0d_confirmation import (
     ARMS,
     ARMS_BY_ID,
@@ -152,7 +153,7 @@ class SelfTestBackend:
     is_real_model = False
 
     def generate(self, unit: WorkUnit) -> GenerationOutput:
-        index = int(unit.task_id.rsplit("-", 1)[-1])
+        index = int(sha256_text(unit.task_id)[:8], 16)
         if unit.arm_id == VISIBLE_CONTROL_ARM.arm_id:
             if index % 7 == 0:
                 text = "Let me think about it " * 40
@@ -454,12 +455,25 @@ def build_decision(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         if gate["rq2_pilot_candidate"]:
             candidates.append(f"{family}|{band}|{arm_id}")
 
+    observed_pairs = {
+        (str(record["task_family"]), str(record["difficulty_band"]))
+        for record in records
+    }
+    reported_pairs = {(cell["task_family"], cell["difficulty_band"]) for cell in cells}
+    expected_cells = len(observed_pairs) * len(
+        (STRUCTURAL_NO_COT_ARM.arm_id, SPONTANEOUS_NO_COT_ARM.arm_id)
+    )
+    all_reported = reported_pairs == observed_pairs and len(cells) == expected_cells
+
     return {
         "cells": cells,
         "cell_count": len(cells),
         "rq2_pilot_candidates": sorted(candidates),
         "result": "RQ2_PILOT_CANDIDATE_CELLS_FOUND" if candidates else NO_HEADROOM_RESULT,
-        "all_cells_reported": True,
+        "all_cells_reported": all_reported,
+        "unreported_cells": sorted(
+            f"{family}|{band}" for family, band in observed_pairs - reported_pairs
+        ),
         "strict_arms": [
             STRUCTURAL_NO_COT_ARM.arm_id,
             SPONTANEOUS_NO_COT_ARM.arm_id,

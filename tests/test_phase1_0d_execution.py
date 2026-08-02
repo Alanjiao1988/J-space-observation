@@ -290,6 +290,21 @@ def test_a_cell_without_a_visible_control_is_refused(pipeline):
         build_decision(without_control)
 
 
+def test_a_missing_strict_arm_is_reported_not_hidden(pipeline):
+    dropped = [
+        record
+        for record in pipeline
+        if not (
+            record["arm_id"] == STRUCTURAL_NO_COT_ARM.arm_id
+            and record["task_family"] == "arithmetic"
+            and record["difficulty_band"] == "easy"
+        )
+    ]
+    decision = build_decision(dropped)
+    assert decision["all_cells_reported"] is False
+    assert decision["cell_count"] == 15 * 2 - 1
+
+
 def test_the_decision_disclaims_hidden_reasoning(pipeline):
     assert "J-space" in build_decision(pipeline)["licenses_no_claim_about"]
 
