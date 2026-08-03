@@ -154,3 +154,7 @@ scripts/phase1_0d_protected_bytes.py text eol=lf
 docs/phase1_0d_protected_bytes.json text eol=lf
 tests/test_phase1_0d_protected_bytes.py text eol=lf
 src/jspace_observation/semantic_review/*.py text eol=lf
+docs/phase1_0d_semantic_review_addendum.json text eol=lf
+docs/phase1_0d_semantic_review_rubric.md text eol=lf
+scripts/run_phase1_0d_semantic_review.py text eol=lf
+tests/test_phase1_0d_semantic_review.py text eol=lf

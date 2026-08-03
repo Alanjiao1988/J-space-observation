@@ -1,0 +1,306 @@
+{
+  "schema_version": "phase1-0d-semantic-review-addendum/v1",
+  "title": "Phase 1.0D semantic-review execution addendum",
+  "why_this_exists": "The frozen Phase 1.0D protocol registered what a semantic review decides and how its judgments arbitrate, but it named no executable reviewer, no machine-followable label rubric and no request body. Without those a cell metric cannot exist. This addendum adds only the execution surface; it changes no prompt, seed, decoding parameter, output budget, stopping rule, eligibility rule, sample, threshold or gate in the base protocol.",
+  "frozen_before_inference": true,
+  "authority_prompt": "docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md",
+  "authority_prompt_sha256": "61f04923e4afaa3e6fd9f66d7b91a1316852de11b41dc6d3380ee827f5065d87",
+  "base_protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
+  "task_ids_sha256": "0d3fe6add211a381a321ea974502d262faf65312dc504e2acceb7c6556b1f524",
+  "generation_image_digest": "sha256:1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332c37481166aa4",
+  "generation_image_build_commit": "9cde1d95ffda36698a0ddf558a9358f3337dd711",
+  "rubric_path": "docs/phase1_0d_semantic_review_rubric.md",
+  "rubric_sha256": "a0d5b22bd6d4ef1012db676ff3431c3d2e6825f1ec4ade1a7c7801817ba8765d",
+  "rubric_delivery": "The rubric bytes are sent verbatim as the system message to all three roles. Only the provider wrapper differs.",
+  "presented_fields": [
+    "record_id",
+    "question",
+    "registered_answer",
+    "output_text"
+  ],
+  "prohibited_reviewer_fields": [
+    "role",
+    "arm_id",
+    "condition",
+    "task_family",
+    "difficulty_band",
+    "parser_route",
+    "triage",
+    "no_cot_violation",
+    "primary_label",
+    "secondary_label",
+    "third_label",
+    "selection_reason",
+    "any metric"
+  ],
+  "labels": [
+    "correct",
+    "incorrect",
+    "no_answer",
+    "invalid",
+    "unresolved"
+  ],
+  "roles": {
+    "primary": {
+      "provider": "azure_openai",
+      "api_kind": "azure_openai_v1_chat_completions",
+      "endpoint": "https://aj-gpt56-25-943b-eastus2.openai.azure.com",
+      "path_candidates": [
+        "/openai/v1/chat/completions"
+      ],
+      "api_version_candidates": [
+        ""
+      ],
+      "deployment": "gpt-5-6-sol-global",
+      "model": "gpt-5.6-sol",
+      "model_version": "2026-07-09",
+      "sku": "GlobalStandard",
+      "region": "eastus2",
+      "token_scope": "https://cognitiveservices.azure.com/.default",
+      "max_visible_output_tokens": 64,
+      "reasoning_content_fields": [],
+      "request": {
+        "model": "gpt-5-6-sol-global",
+        "reasoning_effort": "medium",
+        "max_completion_tokens": 4096,
+        "store": false,
+        "response_format": {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "phase1_0d_semantic_label",
+            "strict": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "enum": [
+                    "correct",
+                    "incorrect",
+                    "no_answer",
+                    "invalid",
+                    "unresolved"
+                  ]
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    },
+    "secondary": {
+      "provider": "microsoft_foundry",
+      "api_kind": "foundry_model_inference",
+      "endpoint": "https://aif-jspace-p10d-review-eastus2.services.ai.azure.com",
+      "path_candidates": [
+        "/models/chat/completions",
+        "/openai/v1/chat/completions"
+      ],
+      "api_version_candidates": [
+        "2024-05-01-preview",
+        "2025-01-01-preview",
+        "2025-04-01-preview",
+        "2026-01-01-preview",
+        ""
+      ],
+      "deployment": "mistral-large-3-global",
+      "model": "Mistral-Large-3",
+      "model_version": "1",
+      "sku": "GlobalStandard",
+      "region": "eastus2",
+      "token_scope": "https://cognitiveservices.azure.com/.default",
+      "max_visible_output_tokens": 64,
+      "reasoning_content_fields": [],
+      "request": {
+        "model": "mistral-large-3-global",
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 64,
+        "response_format": {
+          "type": "json_object"
+        }
+      }
+    },
+    "third": {
+      "provider": "microsoft_foundry",
+      "api_kind": "foundry_model_inference",
+      "endpoint": "https://aif-jspace-p10d-review-eastus2.services.ai.azure.com",
+      "path_candidates": [
+        "/models/chat/completions",
+        "/openai/v1/chat/completions"
+      ],
+      "api_version_candidates": [
+        "2024-05-01-preview",
+        "2025-01-01-preview",
+        "2025-04-01-preview",
+        "2026-01-01-preview",
+        ""
+      ],
+      "deployment": "deepseek-v4-pro-global",
+      "model": "DeepSeek-V4-Pro",
+      "model_version": "2026-04-23",
+      "sku": "GlobalStandard",
+      "region": "eastus2",
+      "token_scope": "https://cognitiveservices.azure.com/.default",
+      "max_visible_output_tokens": 64,
+      "reasoning_content_fields": [
+        "reasoning_content"
+      ],
+      "request": {
+        "model": "deepseek-v4-pro-global",
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 4096,
+        "response_format": {
+          "type": "json_object"
+        }
+      }
+    }
+  },
+  "parameter_notes": {
+    "max_visible_output_tokens": "The authority caps visible output at 64 tokens. Azure exposes no separate visible cap for a reasoning deployment: max_completion_tokens covers reasoning plus visible output, so setting it to 64 would consume the budget on hidden reasoning and return nothing to parse. The cap is therefore enforced as a checked invariant on the visible completion tokens of every response, while the transport budget is set high enough that a well-formed answer is never truncated. A response whose visible output exceeds 64 tokens is malformed, not relabelled.",
+    "primary_max_completion_tokens": "4096, covering reasoning_effort=medium plus the one-key object. Truncation would surface as finish_reason='length' and is treated as malformed rather than as a label.",
+    "third_max_tokens": "4096 for the same reason: DeepSeek-V4-Pro may emit provider-separated reasoning, which is never read and never enters a judgment.",
+    "secondary_max_tokens": "64, the literal visible cap, because Mistral-Large-3 v1 emits no separate reasoning stream.",
+    "determinism": "temperature=0 and top_p=1 are the documented lowest-variance request for the Foundry deployments. gpt-5.6-sol omits sampling parameters entirely rather than relying silently on a service default; its output shape is instead constrained by a strict closed JSON schema.",
+    "api_version_discovery": "The Foundry route and api-version are proven against the live deployment by the provider-qualification stage before any target output exists. The candidate list is frozen here; the qualification receipt records which candidate answered. This is what the authority means by 'the exact API version proven by the provider qualification receipt'.",
+    "store": "store=false is set on the Azure OpenAI request so no conversation state is retained. No tools, browsing, file search or code execution is enabled for any role."
+  },
+  "isolation": {
+    "rows_per_request": 1,
+    "session_reuse": false,
+    "conversation_state": false,
+    "secondary_sees_primary_label": false,
+    "third_sees_prior_labels": false,
+    "third_sees_disagreement_fact": false,
+    "note": "Every role receives one row in a stateless request built only from the four presented fields. The secondary reviewer is a separate deployment on a separate model, not a second call carrying the primary result."
+  },
+  "concurrency": {
+    "max_in_flight_per_deployment": 8
+  },
+  "retry": {
+    "max_attempts": 8,
+    "retry_status_codes": [
+      408,
+      429,
+      500,
+      502,
+      503,
+      504
+    ],
+    "retry_on_connection_error": true,
+    "backoff_initial_seconds": 1.0,
+    "backoff_multiplier": 2.0,
+    "backoff_max_seconds": 60.0,
+    "jitter": "full",
+    "identical_request_required": true,
+    "semantic_retry_forbidden": true,
+    "note": "Only transport and service failures are retried, and every retry sends byte-identical semantic content to the same pinned deployment. After any successful provider response the label stands: it is never resampled because it is undesirable, uncertain or unresolved."
+  },
+  "coverage": {
+    "primary_rows": 900,
+    "strata": 45,
+    "rows_per_stratum": 20,
+    "sample_fraction": 0.2,
+    "sampled_secondary_rows": 180,
+    "note": "45 task-family x difficulty x arm strata of 20 rows each give a fixed sampled component of exactly 180 rows. The required secondary set is the union of that sample with every forced row, so it may be larger than 180 and can never be smaller."
+  },
+  "smoke_fixtures": [
+    {
+      "fixture_id": "smoke_exact_correct",
+      "purpose": "an obvious exact correct answer",
+      "expected_label": "correct",
+      "row": {
+        "record_id": "smoke_exact_correct",
+        "question": "What is 2 + 2?",
+        "registered_answer": "4",
+        "output_text": "Final answer: 4"
+      }
+    },
+    {
+      "fixture_id": "smoke_equivalent_correct",
+      "purpose": "an obvious semantically equivalent correct answer",
+      "expected_label": "correct",
+      "row": {
+        "record_id": "smoke_equivalent_correct",
+        "question": "What is the capital city of France?",
+        "registered_answer": "Paris",
+        "output_text": "The capital of France is the city of paris.\nFinal answer: paris"
+      }
+    },
+    {
+      "fixture_id": "smoke_incorrect",
+      "purpose": "an obvious incorrect answer",
+      "expected_label": "incorrect",
+      "row": {
+        "record_id": "smoke_incorrect",
+        "question": "What is 2 + 2?",
+        "registered_answer": "4",
+        "output_text": "Final answer: 7"
+      }
+    },
+    {
+      "fixture_id": "smoke_no_answer",
+      "purpose": "an empty output producing no_answer",
+      "expected_label": "no_answer",
+      "row": {
+        "record_id": "smoke_no_answer",
+        "question": "What is 2 + 2?",
+        "registered_answer": "4",
+        "output_text": ""
+      }
+    },
+    {
+      "fixture_id": "smoke_unresolved",
+      "purpose": "conflicting commitments producing unresolved",
+      "expected_label": "unresolved",
+      "row": {
+        "record_id": "smoke_unresolved",
+        "question": "What is 2 + 2?",
+        "registered_answer": "4",
+        "output_text": "Final answer: 4\n\nOn reflection I disagree with myself.\nFinal answer: 5\n\nBoth of those answers are equally my final commitment and I do not prefer either one."
+      }
+    },
+    {
+      "fixture_id": "smoke_invalid",
+      "purpose": "a record with a missing question producing invalid",
+      "expected_label": "invalid",
+      "row": {
+        "record_id": "smoke_invalid",
+        "question": "",
+        "registered_answer": "",
+        "output_text": "Final answer: 4"
+      }
+    }
+  ],
+  "smoke_rules": {
+    "expected_labels_committed_before_calls": true,
+    "roles_exercised": [
+      "primary",
+      "secondary",
+      "third"
+    ],
+    "one_isolated_request_per_fixture_per_role": true,
+    "on_label_mismatch": "Stop before target generation as BLOCKED_ON_SEMANTIC_REVIEW_PROVIDER_BEFORE_GENERATION. Do not tune the rubric, change a fixture, change a model or add a fallback after seeing a smoke output.",
+    "on_transport_or_configuration_defect": "A 4xx route/api-version/authentication defect is an ordinary implementation defect: fix it, add a regression test, rerun the gate. It may never be used as a reason to change the rubric, the fixtures, the expected labels or the models.",
+    "counts_towards_scientific_totals": false
+  },
+  "terminal_states": {
+    "malformed_response": "BLOCKED_ON_MALFORMED_SEMANTIC_REVIEW_RESPONSE",
+    "transport_exhausted": "BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT",
+    "provider_unavailable": "BLOCKED_ON_SEMANTIC_REVIEW_PROVIDER_BEFORE_GENERATION",
+    "protected_byte_drift": "BLOCKED_ON_FROZEN_PHASE_1_0D_DRIFT",
+    "result_pack_mismatch": "BLOCKED_ON_RESULT_PACK_INTEGRITY"
+  },
+  "authentication": {
+    "method": "microsoft_entra_managed_identity",
+    "user_assigned_identity": "id-jspace-p10d-review-sea",
+    "keys_forbidden": true,
+    "note": "No API key, SAS token, account key, client secret, connection string or authorization header is used, printed, stored or committed. Local authentication is disabled on both Cognitive Services accounts."
+  },
+  "claim_boundary": "This addendum makes semantic review executable and auditable. It establishes nothing about reviewer accuracy: the reviewers are authoritative by registration under DR-01, no independent oracle bounds them, inter-model agreement is consistency rather than correctness, and no Phase 1.0D result establishes hidden reasoning, internal representations, invisible chain-of-thought or a 'J-space'."
+}
