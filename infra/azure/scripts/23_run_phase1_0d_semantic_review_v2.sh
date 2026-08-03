@@ -49,6 +49,8 @@ SMOKE_RUN_ID="${SMOKE_RUN_ID:-}"
 GENERATION_RUN_ID="${GENERATION_RUN_ID:-}"
 SOURCE_MANIFEST_SHA256=""
 EXPECTED_REVIEW_IMAGE_DIGEST=""
+QUALIFICATION_RECEIPT_SHA256=""
+QUALIFICATION_MANIFEST_SHA256=""
 SMOKE_RECEIPT_SHA256=""
 SMOKE_MANIFEST_SHA256=""
 FORMAL_REVIEW_REQUIRED_SECONDS=611517
@@ -59,10 +61,10 @@ else
     REPLICA_TIMEOUT="${REPLICA_TIMEOUT:-10800}"
     REVIEW_TIMEOUT_SECONDS="${REVIEW_TIMEOUT_SECONDS:-10500}"
 fi
-JOB_NAME="job-jspace-p10d-review-v2-${REVIEW_MODE}"
-
 case "$REVIEW_MODE" in
-    qualify|smoke|review) ;;
+    qualify) JOB_MODE="q" ;;
+    smoke) JOB_MODE="s" ;;
+    review) JOB_MODE="r" ;;
     *)
         echo "[FAIL] REVIEW_MODE must be qualify, smoke or review"
         exit 1
@@ -85,6 +87,11 @@ if [[ "$REVIEW_MODE" == "review" \
 fi
 if [[ ! "$RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]; then
     echo "[FAIL] Run ID must be a UTC stamp of the form YYYYMMDDTHHMMSSZ"
+    exit 1
+fi
+JOB_NAME="job-p10d-rv2-${JOB_MODE}-${RUN_ID,,}"
+if (( ${#JOB_NAME} > 32 )); then
+    echo "[FAIL] ACA job name exceeds the 32-character service limit"
     exit 1
 fi
 if [[ ! "$REPLICA_TIMEOUT" =~ ^[0-9]+$ \
@@ -379,13 +386,67 @@ else
 fi
 EXECUTION_COUNT="$(python -c 'import json,sys; print(len(json.load(open(sys.argv[1], encoding="utf-8"))))' \
     "$(native_path "$EXECUTION_LIST_FILE")")"
-if [[ "$REVIEW_MODE" == "smoke" && "$JOB_EXISTS" != "0" ]]; then
-    echo "[FAIL] The v2 smoke one-round ceiling is already spent; no RV3 is authorised"
+if [[ "$JOB_EXISTS" != "0" ]]; then
+    echo "[FAIL] This v2 run id already has an ACA job; duplicate execution is forbidden"
     exit 1
 fi
-if [[ "$REVIEW_MODE" == "review" && "$JOB_EXISTS" != "0" ]]; then
-    echo "[FAIL] The sole formal v2 review execution is already spent; rerun is forbidden"
-    exit 1
+if [[ "$REVIEW_MODE" == "smoke" ]]; then
+    QUALIFICATION_RECEIPT="$RECORD_DIR/qualification_00_gate_receipt.json"
+    QUALIFICATION_MANIFEST="$RECORD_DIR/qualification_artifact_manifest.json"
+    QUALIFICATION_OBJECTS="$RECORD_DIR/qualification_objects.json"
+    QUALIFICATION_BLOB_PREFIX="${QUALIFICATION_PREFIX}/${QUALIFICATION_RUN_ID}"
+    az storage blob download \
+        --auth-mode login \
+        --account-name "$BLOB_ACCOUNT" \
+        --container-name "$BLOB_CONTAINER" \
+        --name "${QUALIFICATION_BLOB_PREFIX}/00_gate_receipt.json" \
+        --file "$QUALIFICATION_RECEIPT" \
+        --overwrite false --only-show-errors --output none
+    az storage blob download \
+        --auth-mode login \
+        --account-name "$BLOB_ACCOUNT" \
+        --container-name "$BLOB_CONTAINER" \
+        --name "${QUALIFICATION_BLOB_PREFIX}/artifact_manifest.json" \
+        --file "$QUALIFICATION_MANIFEST" \
+        --overwrite false --only-show-errors --output none
+    az storage blob list \
+        --auth-mode login \
+        --account-name "$BLOB_ACCOUNT" \
+        --container-name "$BLOB_CONTAINER" \
+        --prefix "${QUALIFICATION_BLOB_PREFIX}/" \
+        --only-show-errors --output json >"$QUALIFICATION_OBJECTS"
+    python - "$QUALIFICATION_OBJECTS" "$QUALIFICATION_BLOB_PREFIX" <<'PY'
+import json
+import sys
+
+objects_path, prefix = sys.argv[1:3]
+expected = {
+    f"{prefix}/00_gate_receipt.json",
+    f"{prefix}/artifact_manifest.json",
+}
+observed = {
+    item.get("name")
+    for item in json.load(open(objects_path, encoding="utf-8"))
+}
+if observed != expected:
+    raise SystemExit("[FAIL] Qualification Blob prefix is not the exact evidence pack")
+print("[OK] Qualification Blob prefix has the exact persisted file set")
+PY
+    QUALIFICATION_RECEIPT_SHA256="$(python -c \
+        'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' \
+        "$(native_path "$QUALIFICATION_RECEIPT")")"
+    QUALIFICATION_MANIFEST_SHA256="$(python -c \
+        'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' \
+        "$(native_path "$QUALIFICATION_MANIFEST")")"
+    python "$(native_path "$PROJECT_ROOT/scripts/verify_phase1_0d_rv2_gate.py")" \
+        --project-root "$(native_path "$PROJECT_ROOT")" \
+        --manifest "$(native_path "$QUALIFICATION_MANIFEST")" \
+        --receipt "$(native_path "$QUALIFICATION_RECEIPT")" \
+        --qualification-run-id "$QUALIFICATION_RUN_ID" \
+        --manifest-sha256 "$QUALIFICATION_MANIFEST_SHA256" \
+        --receipt-sha256 "$QUALIFICATION_RECEIPT_SHA256" \
+        --review-code-commit "$PROJECT_SHA" \
+        --review-image-digest "$IMAGE_DIGEST"
 fi
 if [[ "$REVIEW_MODE" == "review" ]]; then
     COMMITTED_SOURCE_MANIFEST_REL="${COMMITTED_GENERATION_ROOT}/${GENERATION_RUN_ID}/artifact_manifest.json"
@@ -547,41 +608,6 @@ for name, digest in expected.items():
 print("[OK] Committed generation license binds every source-pack byte")
 PY
 fi
-if [[ "$REVIEW_MODE" == "smoke" ]]; then
-    # Atomic service-side one-round lock.  Two concurrent launchers may both
-    # observe no ACA job, but only one create-only Blob upload can succeed.  The
-    # lock is retained permanently and is claimed before any job is provisioned.
-    SMOKE_LOCK_FILE="$RECORD_DIR/smoke_round_lock.json"
-    printf '{"artifact":"phase1_0d_rv2_smoke_round_lock","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","smoke_run_id":"%s"}\n' \
-        "$PROJECT_SHA" "$IMAGE_DIGEST" "$QUALIFICATION_RUN_ID" "$RUN_ID" \
-        >"$SMOKE_LOCK_FILE"
-    az storage blob upload \
-        --auth-mode login \
-        --account-name "$BLOB_ACCOUNT" \
-        --container-name "$BLOB_CONTAINER" \
-        --name "$SMOKE_LOCK_BLOB" \
-        --file "$SMOKE_LOCK_FILE" \
-        --overwrite false \
-        --only-show-errors \
-        --output none
-fi
-if [[ "$REVIEW_MODE" == "review" ]]; then
-    # Target review has no rerun path after any failure.  Claim this lock before
-    # provisioning so concurrent launchers cannot both pass the ACA job check.
-    REVIEW_LOCK_FILE="$RECORD_DIR/formal_review_lock.json"
-    printf '{"artifact":"phase1_0d_rv2_formal_review_lock","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","smoke_run_id":"%s","generation_run_id":"%s","source_manifest_sha256":"%s","review_run_id":"%s"}\n' \
-        "$PROJECT_SHA" "$IMAGE_DIGEST" "$QUALIFICATION_RUN_ID" "$SMOKE_RUN_ID" \
-        "$GENERATION_RUN_ID" "$SOURCE_MANIFEST_SHA256" "$RUN_ID" >"$REVIEW_LOCK_FILE"
-    az storage blob upload \
-        --auth-mode login \
-        --account-name "$BLOB_ACCOUNT" \
-        --container-name "$BLOB_CONTAINER" \
-        --name "$REVIEW_LOCK_BLOB" \
-        --file "$REVIEW_LOCK_FILE" \
-        --overwrite false \
-        --only-show-errors \
-        --output none
-fi
 
 ARGS="--project-root /workspace --out-dir /workspace/runtime/results"
 ARGS="$ARGS --run-id $RUN_ID --client-id $IDENTITY_CLIENT_ID"
@@ -594,6 +620,8 @@ case "$REVIEW_MODE" in
         ;;
     smoke)
         ARGS="$ARGS --qualification-receipt-prefix ${QUALIFICATION_PREFIX}/${QUALIFICATION_RUN_ID}"
+        ARGS="$ARGS --qualification-manifest-sha256 ${QUALIFICATION_MANIFEST_SHA256}"
+        ARGS="$ARGS --qualification-receipt-sha256 ${QUALIFICATION_RECEIPT_SHA256}"
         ARGS="$ARGS --gate-blob-prefix ${SMOKE_PREFIX}/${RUN_ID}"
         ;;
     review)
@@ -626,6 +654,8 @@ environment = [
     {"name": "JSPACE_IMAGE_DIGEST", "value": "$IMAGE_DIGEST"},
     {"name": "JSPACE_GENERATION_RUN_ID", "value": "$GENERATION_RUN_ID"},
     {"name": "JSPACE_SOURCE_MANIFEST_SHA256", "value": "$SOURCE_MANIFEST_SHA256"},
+    {"name": "JSPACE_QUALIFICATION_RECEIPT_SHA256", "value": "$QUALIFICATION_RECEIPT_SHA256"},
+    {"name": "JSPACE_QUALIFICATION_MANIFEST_SHA256", "value": "$QUALIFICATION_MANIFEST_SHA256"},
     {"name": "JSPACE_SMOKE_RECEIPT_SHA256", "value": "$SMOKE_RECEIPT_SHA256"},
     {"name": "JSPACE_SMOKE_MANIFEST_SHA256", "value": "$SMOKE_MANIFEST_SHA256"},
 ]
@@ -647,6 +677,8 @@ body = {
         "image-digest": "$IMAGE_DIGEST",
         "generation-run-id": "$GENERATION_RUN_ID",
         "source-manifest-sha256": "$SOURCE_MANIFEST_SHA256",
+        "qualification-receipt-sha256": "$QUALIFICATION_RECEIPT_SHA256",
+        "qualification-manifest-sha256": "$QUALIFICATION_MANIFEST_SHA256",
         "smoke-receipt-sha256": "$SMOKE_RECEIPT_SHA256",
         "smoke-manifest-sha256": "$SMOKE_MANIFEST_SHA256",
     },
@@ -716,7 +748,9 @@ python - "$(native_path "$JOB_FILE")" "$RUN_ID" "$PROJECT_SHA" "$IMAGE_DIGEST" \
     "$IMAGE_DIGEST_REF" "$WORKLOAD_PROFILE_NAME" "$REVIEW_MODE" \
     "$REPLICA_TIMEOUT" "$COMMAND" "$IDENTITY_CLIENT_ID" "$BLOB_ACCOUNT" \
     "$BLOB_CONTAINER" "$GENERATION_RUN_ID" "$SOURCE_MANIFEST_SHA256" \
-    "$LAUNCHER_SHA" "$SMOKE_RECEIPT_SHA256" "$SMOKE_MANIFEST_SHA256" <<'PY'
+    "$LAUNCHER_SHA" "$QUALIFICATION_RECEIPT_SHA256" \
+    "$QUALIFICATION_MANIFEST_SHA256" "$SMOKE_RECEIPT_SHA256" \
+    "$SMOKE_MANIFEST_SHA256" <<'PY'
 import json
 import sys
 
@@ -736,9 +770,11 @@ import sys
     generation_run_id,
     source_manifest_sha256,
     launcher_sha,
+    qualification_receipt_sha256,
+    qualification_manifest_sha256,
     smoke_receipt_sha256,
     smoke_manifest_sha256,
-) = sys.argv[1:18]
+) = sys.argv[1:20]
 job = json.loads(open(path, encoding="utf-8").read())
 tags = job.get("tags") or {}
 properties = job.get("properties") or {}
@@ -761,6 +797,10 @@ if tags.get("generation-run-id") != generation_run_id:
     failures.append("generation-run-id tag mismatch")
 if tags.get("source-manifest-sha256") != source_manifest_sha256:
     failures.append("source-manifest-sha256 tag mismatch")
+if tags.get("qualification-receipt-sha256") != qualification_receipt_sha256:
+    failures.append("qualification-receipt-sha256 tag mismatch")
+if tags.get("qualification-manifest-sha256") != qualification_manifest_sha256:
+    failures.append("qualification-manifest-sha256 tag mismatch")
 if tags.get("smoke-receipt-sha256") != smoke_receipt_sha256:
     failures.append("smoke-receipt-sha256 tag mismatch")
 if tags.get("smoke-manifest-sha256") != smoke_manifest_sha256:
@@ -809,6 +849,8 @@ else:
         "JSPACE_IMAGE_DIGEST": image_digest,
         "JSPACE_GENERATION_RUN_ID": generation_run_id,
         "JSPACE_SOURCE_MANIFEST_SHA256": source_manifest_sha256,
+        "JSPACE_QUALIFICATION_RECEIPT_SHA256": qualification_receipt_sha256,
+        "JSPACE_QUALIFICATION_MANIFEST_SHA256": qualification_manifest_sha256,
         "JSPACE_SMOKE_RECEIPT_SHA256": smoke_receipt_sha256,
         "JSPACE_SMOKE_MANIFEST_SHA256": smoke_manifest_sha256,
     }
@@ -833,6 +875,42 @@ if failures:
     sys.exit(1)
 print("[OK] Provisioned v2 job matches the recorded launch parameters")
 PY
+
+if [[ "$REVIEW_MODE" == "smoke" ]]; then
+    # Jobs are unique per run id, so concurrent launchers cannot mutate each
+    # other's command.  Claim the global one-round lock only after qualification
+    # bytes and the provisioned job are fully verified, immediately before calls.
+    SMOKE_LOCK_FILE="$RECORD_DIR/smoke_round_lock.json"
+    printf '{"artifact":"phase1_0d_rv2_smoke_round_lock","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","qualification_receipt_sha256":"%s","qualification_manifest_sha256":"%s","smoke_run_id":"%s"}\n' \
+        "$PROJECT_SHA" "$IMAGE_DIGEST" "$QUALIFICATION_RUN_ID" \
+        "$QUALIFICATION_RECEIPT_SHA256" "$QUALIFICATION_MANIFEST_SHA256" \
+        "$RUN_ID" >"$SMOKE_LOCK_FILE"
+    az storage blob upload \
+        --auth-mode login \
+        --account-name "$BLOB_ACCOUNT" \
+        --container-name "$BLOB_CONTAINER" \
+        --name "$SMOKE_LOCK_BLOB" \
+        --file "$SMOKE_LOCK_FILE" \
+        --overwrite false \
+        --only-show-errors \
+        --output none
+fi
+if [[ "$REVIEW_MODE" == "review" ]]; then
+    # The unique job is inert until this create-only global lock succeeds.
+    REVIEW_LOCK_FILE="$RECORD_DIR/formal_review_lock.json"
+    printf '{"artifact":"phase1_0d_rv2_formal_review_lock","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","smoke_run_id":"%s","generation_run_id":"%s","source_manifest_sha256":"%s","review_run_id":"%s"}\n' \
+        "$PROJECT_SHA" "$IMAGE_DIGEST" "$QUALIFICATION_RUN_ID" "$SMOKE_RUN_ID" \
+        "$GENERATION_RUN_ID" "$SOURCE_MANIFEST_SHA256" "$RUN_ID" >"$REVIEW_LOCK_FILE"
+    az storage blob upload \
+        --auth-mode login \
+        --account-name "$BLOB_ACCOUNT" \
+        --container-name "$BLOB_CONTAINER" \
+        --name "$REVIEW_LOCK_BLOB" \
+        --file "$REVIEW_LOCK_FILE" \
+        --overwrite false \
+        --only-show-errors \
+        --output none
+fi
 
 EXECUTION_NAME="$(az containerapp job start \
     --name "$JOB_NAME" \

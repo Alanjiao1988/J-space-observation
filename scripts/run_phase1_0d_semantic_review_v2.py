@@ -61,6 +61,7 @@ from jspace_observation.phase1_0d_confirmation import (  # noqa: E402
 from jspace_observation.semantic_review import addendum as contract  # noqa: E402
 from jspace_observation.semantic_review import transport  # noqa: E402
 from jspace_observation.semantic_review_v2 import addendum_v2  # noqa: E402
+from jspace_observation.semantic_review_v2 import transport as blob_transport  # noqa: E402
 
 # One trivial synthetic exchange, outside the registered bank on purpose.
 QUALIFICATION_PROBE: dict[str, str] = {
@@ -127,7 +128,7 @@ class GatePublisher:
         expected_root: str,
         tokens: Any,
     ) -> None:
-        self._client = transport.BlobClient(account, container, tokens)
+        self._client = blob_transport.BlobClient(account, container, tokens)
         self._prefix = _validate_gate_prefix(prefix, expected_root)
         self.account = account
         self.container = container
@@ -174,7 +175,7 @@ class GateReader:
         expected_root: str,
         tokens: Any,
     ) -> None:
-        self._client = transport.BlobClient(account, container, tokens)
+        self._client = blob_transport.BlobClient(account, container, tokens)
         self._prefix = _validate_gate_prefix(prefix, expected_root)
 
     @property
@@ -902,13 +903,20 @@ def _validate_call(
 
 
 def _load_qualification_receipt(
-    client: Any, prefix: str, book: contract.Addendum
+    client: Any,
+    prefix: str,
+    book: contract.Addendum,
+    *,
+    expected_manifest_sha256: str = "",
+    expected_receipt_sha256: str = "",
 ) -> dict[str, Any]:
     receipt = _load_persisted_receipt(
         client,
         prefix,
         book,
         "phase1_0d_rv2_provider_qualification_receipt",
+        expected_manifest_sha256,
+        expected_receipt_sha256,
     )
     counts = receipt.get("counts", {})
     expected_counts = {
@@ -1047,6 +1055,7 @@ def _load_gate_receipt(
     if (
         not isinstance(parent, Mapping)
         or not re.fullmatch(r"[0-9a-f]{64}", str(parent.get("receipt_sha256", "")))
+        or not re.fullmatch(r"[0-9a-f]{64}", str(parent.get("manifest_sha256", "")))
         or not UTC_RUN_ID.fullmatch(str(parent.get("run_id", "")))
     ):
         raise addendum_v2.AddendumError(
@@ -1066,6 +1075,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--blob-container", default="")
     parser.add_argument("--gate-blob-prefix", default="")
     parser.add_argument("--qualification-receipt-prefix", default="")
+    parser.add_argument("--qualification-manifest-sha256", default="")
+    parser.add_argument("--qualification-receipt-sha256", default="")
     parser.add_argument("--gate-receipt-prefix", default="")
     parser.add_argument("--gate-manifest-sha256", default="")
     parser.add_argument("--gate-receipt-sha256", default="")
@@ -1114,6 +1125,21 @@ def main(argv: list[str] | None = None) -> int:
     ):
         raise SystemExit(
             "the v2 qualification and smoke stages take no target or gate license"
+        )
+    qualification_licenses = (
+        args.qualification_manifest_sha256,
+        args.qualification_receipt_sha256,
+    )
+    if args.mode != "smoke" and any(qualification_licenses):
+        raise SystemExit(
+            "only smoke mode accepts exact qualification SHA-256 licenses"
+        )
+    if args.mode == "smoke" and any(
+        not re.fullmatch(r"[0-9a-f]{64}", digest)
+        for digest in qualification_licenses
+    ):
+        raise SystemExit(
+            "smoke mode requires exact qualification manifest and receipt licenses"
         )
     if args.mode == "review" and any(
         not re.fullmatch(r"[0-9a-f]{64}", digest)
@@ -1234,6 +1260,8 @@ def main(argv: list[str] | None = None) -> int:
             qualification_reader,
             qualification_reader.prefix,
             book,
+            expected_manifest_sha256=args.qualification_manifest_sha256,
+            expected_receipt_sha256=args.qualification_receipt_sha256,
         )
         if qualification.get("review_code_commit") != args.code_commit:
             raise addendum_v2.AddendumError(
@@ -1272,6 +1300,7 @@ def main(argv: list[str] | None = None) -> int:
                 "prefix": qualification_reader.prefix,
                 "run_id": qualification["run_id"],
                 "receipt_sha256": qualification["_receipt_sha256"],
+                "manifest_sha256": args.qualification_manifest_sha256,
             },
             "review_code_commit": args.code_commit or "not_recorded",
             "review_image_digest": args.image_digest or "not_recorded",
@@ -1311,7 +1340,7 @@ def main(argv: list[str] | None = None) -> int:
         )
     import run_phase1_0d_semantic_review as v1runner  # noqa: PLC0415, E402
 
-    blob = transport.BlobClient(args.blob_account, args.blob_container, tokens)
+    blob = blob_transport.BlobClient(args.blob_account, args.blob_container, tokens)
 
     if not args.gate_receipt_prefix:
         raise SystemExit("review mode needs --gate-receipt-prefix")

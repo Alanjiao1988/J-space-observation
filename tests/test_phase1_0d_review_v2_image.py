@@ -57,6 +57,7 @@ gate_verifier = _load(
 
 from jspace_observation.semantic_review import addendum as contract  # noqa: E402
 from jspace_observation.semantic_review_v2 import addendum_v2  # noqa: E402
+from jspace_observation.semantic_review_v2 import transport as blob_transport  # noqa: E402
 
 DOCKERFILE = REPO_ROOT / "Dockerfile.phase1-0d-review-v2"
 RECORD = REPO_ROOT / prov2.RECORD_PATH
@@ -485,6 +486,53 @@ def test_review_requires_the_committed_source_manifest_binding():
     assert "source and gate SHA-256" in str(error.value)
 
 
+def test_smoke_requires_exact_qualification_byte_licenses():
+    with pytest.raises(SystemExit) as error:
+        runner.main(
+            [
+                "smoke",
+                "--code-commit",
+                "a" * 40,
+                "--image-digest",
+                "sha256:" + "b" * 64,
+            ]
+        )
+    assert "qualification manifest and receipt licenses" in str(error.value)
+
+
+def test_v2_blob_download_uses_the_supplied_bearer_token(monkeypatch):
+    captured = {}
+
+    class _Response:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return b"evidence"
+
+    class _Tokens:
+        def token(self, _resource):
+            return "sentinel-token"
+
+    def urlopen(request, *, timeout):
+        captured["authorization"] = request.get_header("Authorization")
+        captured["timeout"] = timeout
+        return _Response()
+
+    monkeypatch.setattr(blob_transport.urllib.request, "urlopen", urlopen)
+    client = blob_transport.BlobClient("account", "container", _Tokens())
+    assert client.get("prefix/evidence.json") == b"evidence"
+    assert captured == {
+        "authorization": "Bearer sentinel-token",
+        "timeout": 120.0,
+    }
+
+
 def test_the_download_helper_is_not_imported_at_module_scope():
     assert not hasattr(runner, "download_pack")
     source = (
@@ -537,6 +585,7 @@ def _gate_objects(book, *, passed=True, matches=60, addendum_sha=None):
             ),
             "run_id": "20260803T000001Z",
             "receipt_sha256": "3" * 64,
+            "manifest_sha256": "4" * 64,
         },
         **result,
     }
@@ -666,7 +715,7 @@ def test_generation_license_reuses_the_full_review_gate_validation(book, tmp_pat
     assert result["licensed"] is True
 
 
-def test_smoke_accepts_only_a_persisted_three_of_three_qualification(book):
+def test_smoke_accepts_only_a_persisted_three_of_three_qualification(book, tmp_path):
     roles = {
         role: {
             "reviewer_id": book.roles[role].reviewer_id,
@@ -708,9 +757,26 @@ def test_smoke_accepts_only_a_persisted_three_of_three_qualification(book):
             }
         ).encode("utf-8"),
     }
+    manifest = objects["q/artifact_manifest.json"]
     observed = runner._load_qualification_receipt(_FakeBlob(objects), "q", book)
     assert observed["passed"] is True
     assert observed["counts"]["valid_expected_label_matches"] == 3
+    manifest_path = tmp_path / "artifact_manifest.json"
+    receipt_path = tmp_path / "00_gate_receipt.json"
+    manifest_path.write_bytes(manifest)
+    receipt_path.write_bytes(raw)
+    verified = gate_verifier.verify_qualification_files(
+        project_root=REPO_ROOT,
+        manifest_path=manifest_path,
+        receipt_path=receipt_path,
+        qualification_run_id=receipt["run_id"],
+        expected_manifest_sha256=hashlib.sha256(manifest).hexdigest(),
+        expected_receipt_sha256=hashlib.sha256(raw).hexdigest(),
+        expected_review_code_commit="1" * 40,
+        expected_review_image_digest="sha256:" + "2" * 64,
+    )
+    assert verified["valid_expected_label_matches"] == 3
+    assert verified["licensed"] is True
 
 
 # --------------------------------------------------------------------------
@@ -889,16 +955,25 @@ def test_the_runner_uses_the_registered_gate_prefixes():
 
 def test_the_runner_enforces_the_one_round_smoke_ceiling():
     text = RUN_SCRIPT.read_text(encoding="utf-8")
-    assert '[[ "$REVIEW_MODE" == "smoke" && "$JOB_EXISTS" != "0" ]]' in text
-    assert "one-round ceiling is already spent; no RV3 is authorised" in text
+    assert 'JOB_NAME="job-p10d-rv2-${JOB_MODE}-${RUN_ID,,}"' in text
+    assert '[[ "$JOB_EXISTS" != "0" ]]' in text
+    assert "duplicate execution is forbidden" in text
     assert 'SMOKE_LOCK_BLOB="phase1-0d-semantic-review-v2/smoke-round-lock.json"' in text
     assert "--overwrite false" in text
-    assert "Atomic service-side one-round lock" in text
+    assert "global one-round lock" in text
+    for code in ("q", "s", "r"):
+        assert len(f"job-p10d-rv2-{code}-20260803t000000z") <= 32
+    qualification = text.index("--qualification-run-id")
+    job_verified = text.index("[OK] Provisioned v2 job matches")
+    smoke_lock = text.index('SMOKE_LOCK_FILE="$RECORD_DIR/smoke_round_lock.json"')
+    execution = text.index('EXECUTION_NAME="$(az containerapp job start')
+    assert qualification < job_verified < smoke_lock < execution
+    assert "--qualification-manifest-sha256" in text
+    assert "--qualification-receipt-sha256" in text
 
 
 def test_the_runner_enforces_one_formal_review_execution():
     text = RUN_SCRIPT.read_text(encoding="utf-8")
-    assert '[[ "$REVIEW_MODE" == "review" && "$JOB_EXISTS" != "0" ]]' in text
     assert (
         'REVIEW_LOCK_BLOB="phase1-0d-semantic-review-v2/formal-review-lock.json"'
         in text
@@ -908,7 +983,9 @@ def test_the_runner_enforces_one_formal_review_execution():
         '"generation_run_id":"%s","source_manifest_sha256":"%s",'
         '"review_run_id":"%s"'
     ) in text
-    assert "Target review has no rerun path after any failure" in text
+    review_lock = text.index('REVIEW_LOCK_FILE="$RECORD_DIR/formal_review_lock.json"')
+    execution = text.index('EXECUTION_NAME="$(az containerapp job start')
+    assert text.index("[OK] Provisioned v2 job matches") < review_lock < execution
     assert "Committed generation license binds every source-pack byte" in text
     assert 'cat-file", "blob"' in text
     assert "cat-file blob" in text
