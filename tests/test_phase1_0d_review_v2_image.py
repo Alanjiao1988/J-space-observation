@@ -50,6 +50,10 @@ prov1 = _load(
     "phase1_0d_review_build_provenance", "scripts/phase1_0d_review_build_provenance.py"
 )
 prov0 = _load("phase1_0d_build_provenance", "scripts/phase1_0d_build_provenance.py")
+gate_verifier = _load(
+    "verify_phase1_0d_rv2_gate",
+    "scripts/verify_phase1_0d_rv2_gate.py",
+)
 
 from jspace_observation.semantic_review import addendum as contract  # noqa: E402
 from jspace_observation.semantic_review_v2 import addendum_v2  # noqa: E402
@@ -77,6 +81,8 @@ def _ok_call(
     observed: str,
     tokens: int = 12,
     profile=None,
+    book=None,
+    row=None,
 ):
     provider = profile.provider if profile else "azure_ai_foundry"
     deployment = profile.deployment if profile else f"{role}-deployment"
@@ -90,7 +96,11 @@ def _ok_call(
         "deployment": deployment,
         "model": model,
         "model_version": model_version,
-        "request_body_sha256": "a" * 64,
+        "request_body_sha256": (
+            runner._request_body_sha256(profile, book, row)
+            if profile is not None and book is not None and row is not None
+            else "a" * 64
+        ),
         "response_body_sha256": "b" * 64,
         "observed_label": observed,
         "match": observed == expected,
@@ -123,6 +133,8 @@ def _full_batch(book, observed_override=None):
                     expected,
                     observed,
                     profile=book.roles[role],
+                    book=book,
+                    row=fixture["row"],
                 )
             )
     return calls
@@ -518,8 +530,11 @@ def _gate_objects(book, *, passed=True, matches=60, addendum_sha=None):
     import hashlib
 
     manifest = {
+        "artifact": "phase1_0d_semantic_review_bundle",
+        "run_id": receipt["run_id"],
         "file_count": 1,
         "manifest_written_last": True,
+        "upload_semantics": "create-only; an existing prefix is never overwritten",
         "files": [
             {"name": "00_gate_receipt.json", "sha256": hashlib.sha256(raw).hexdigest()}
         ]
@@ -578,6 +593,47 @@ def test_review_refuses_an_incomplete_receipt_even_if_it_claims_sixty(book):
         runner._load_gate_receipt(_FakeBlob(objects), "p", book)
 
 
+def test_review_recomputes_every_registered_request_hash(book):
+    objects = _gate_objects(book)
+    _rewrite_receipt(
+        objects,
+        "p",
+        lambda receipt: receipt["calls"][0].__setitem__(
+            "request_body_sha256",
+            "a" * 64,
+        ),
+    )
+    with pytest.raises(
+        addendum_v2.AddendumError,
+        match="request bytes do not match",
+    ):
+        runner._load_gate_receipt(_FakeBlob(objects), "p", book)
+
+
+def test_generation_license_reuses_the_full_review_gate_validation(book, tmp_path):
+    import hashlib
+
+    objects = _gate_objects(book)
+    manifest = objects["p/artifact_manifest.json"]
+    receipt = objects["p/00_gate_receipt.json"]
+    manifest_path = tmp_path / "artifact_manifest.json"
+    receipt_path = tmp_path / "00_gate_receipt.json"
+    manifest_path.write_bytes(manifest)
+    receipt_path.write_bytes(receipt)
+    result = gate_verifier.verify_gate_files(
+        project_root=REPO_ROOT,
+        manifest_path=manifest_path,
+        receipt_path=receipt_path,
+        smoke_run_id="20260803T000000Z",
+        expected_manifest_sha256=hashlib.sha256(manifest).hexdigest(),
+        expected_receipt_sha256=hashlib.sha256(receipt).hexdigest(),
+        expected_review_code_commit="1" * 40,
+        expected_review_image_digest="sha256:" + "2" * 64,
+    )
+    assert result["exact_expected_label_matches"] == 60
+    assert result["licensed"] is True
+
+
 def test_smoke_accepts_only_a_persisted_three_of_three_qualification(book):
     roles = {
         role: {
@@ -604,8 +660,13 @@ def test_smoke_accepts_only_a_persisted_three_of_three_qualification(book):
         "q/00_gate_receipt.json": raw,
         "q/artifact_manifest.json": contract.canonical_json(
             {
+                "artifact": "phase1_0d_semantic_review_bundle",
+                "run_id": receipt["run_id"],
                 "file_count": 1,
                 "manifest_written_last": True,
+                "upload_semantics": (
+                    "create-only; an existing prefix is never overwritten"
+                ),
                 "files": [
                     {
                         "name": "00_gate_receipt.json",
@@ -725,6 +786,7 @@ def test_review_uses_the_v2_independent_recomputation():
     review = source.split(
         "# ---- review: target storage is reachable only from here", 1
     )[1]
+    assert "verifier.verify_source_pack(" in review
     assert "verifier.verify_final_result(" in review
     assert "stages.independent_check(" not in review
 
@@ -740,6 +802,7 @@ def test_the_build_verifies_but_never_rewrites_the_v1_review_surface(dockerfile)
 def test_the_image_runs_unprivileged_and_defaults_to_qualify(dockerfile):
     assert "USER 10001:10001" in dockerfile
     assert "run_phase1_0d_semantic_review_v2.py" in dockerfile
+    assert "verify_phase1_0d_rv2_gate.py" in dockerfile
     assert '"qualify"' in dockerfile
     assert '"smoke"' not in dockerfile
     assert '"review"' not in dockerfile

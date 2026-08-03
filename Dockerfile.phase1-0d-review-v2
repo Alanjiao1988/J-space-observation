@@ -89,6 +89,7 @@ COPY artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/ \
 
 # The v2 surface, recorded by its own sibling provenance tool.
 COPY scripts/run_phase1_0d_semantic_review_v2.py \
+     scripts/verify_phase1_0d_rv2_gate.py \
      scripts/phase1_0d_review_v2_build_provenance.py \
      scripts/phase1_0d_rv2_protected_bytes.py \
      /workspace/scripts/

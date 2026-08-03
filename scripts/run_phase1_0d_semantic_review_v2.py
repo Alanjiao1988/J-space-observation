@@ -263,8 +263,10 @@ def _qualify(book: contract.Addendum, caller: LiveCaller) -> dict[str, Any]:
             "expected_label": "correct",
         }
         record = _blank_call(fixture, profile)
-        record["request_body_sha256"] = contract.sha256_text(
-            contract.request_bytes(body).decode("utf-8")
+        record["request_body_sha256"] = _request_body_sha256(
+            profile,
+            book,
+            QUALIFICATION_PROBE,
         )
         started = time.monotonic()
         try:
@@ -413,6 +415,15 @@ def _record_response(record: dict[str, Any], response: Any) -> None:
     )
 
 
+def _request_body_sha256(
+    profile: contract.RoleProfile,
+    book: contract.Addendum,
+    row: Mapping[str, Any],
+) -> str:
+    body = contract.build_request(profile, book, row)
+    return hashlib.sha256(contract.request_bytes(body)).hexdigest()
+
+
 def _blank_call(fixture: Mapping[str, Any], profile: contract.RoleProfile) -> dict[str, Any]:
     """Every registered field, present even when the exchange failed.
 
@@ -455,8 +466,10 @@ def _smoke_pair(
     record = _blank_call(fixture, profile)
     expected = str(fixture["expected_label"])
     body = contract.build_request(profile, book, fixture["row"])
-    record["request_body_sha256"] = contract.sha256_text(
-        contract.request_bytes(body).decode("utf-8")
+    record["request_body_sha256"] = _request_body_sha256(
+        profile,
+        book,
+        fixture["row"],
     )
     started = time.monotonic()
     try:
@@ -717,8 +730,12 @@ def _load_persisted_receipt(
         not isinstance(files, list)
         or len(files) != 1
         or manifest.get("file_count") != 1
+        or manifest.get("artifact") != "phase1_0d_semantic_review_bundle"
         or manifest.get("manifest_written_last") is not True
+        or manifest.get("upload_semantics")
+        != "create-only; an existing prefix is never overwritten"
         or not isinstance(files[0], Mapping)
+        or set(files[0]) != {"name", "sha256"}
         or files[0].get("name") != "00_gate_receipt.json"
     ):
         raise addendum_v2.AddendumError(
@@ -733,6 +750,10 @@ def _load_persisted_receipt(
             "the persisted gate receipt does not match its manifest hash"
         )
     receipt = json.loads(raw)
+    if manifest.get("run_id") != receipt.get("run_id"):
+        raise addendum_v2.AddendumError(
+            "the gate manifest and receipt bind different run ids"
+        )
     if receipt.get("addendum_sha256") != book.sha256:
         raise addendum_v2.AddendumError(
             "the persisted gate receipt was produced by a different addendum"
@@ -792,7 +813,9 @@ def _validate_call(
     call: Mapping[str, Any],
     fixture_id: str,
     expected_label: str,
+    row: Mapping[str, Any],
     profile: contract.RoleProfile,
+    book: contract.Addendum,
     required_fields: set[str],
 ) -> None:
     missing = sorted(required_fields - set(call))
@@ -815,12 +838,18 @@ def _validate_call(
                 f"{fixture_id}/{profile.role} moved {key}: "
                 f"{call.get(key)!r} != {expected!r}"
             )
-    for key in ("request_body_sha256", "response_body_sha256"):
-        value = str(call.get(key, ""))
-        if not re.fullmatch(r"[0-9a-f]{64}", value):
-            raise addendum_v2.AddendumError(
-                f"{fixture_id}/{profile.role} has no complete {key}"
-            )
+    request_sha = str(call.get("request_body_sha256", ""))
+    expected_request_sha = _request_body_sha256(profile, book, row)
+    if request_sha != expected_request_sha:
+        raise addendum_v2.AddendumError(
+            f"{fixture_id}/{profile.role} request bytes do not match the "
+            "registered fixture, rubric and request profile"
+        )
+    response_sha = str(call.get("response_body_sha256", ""))
+    if not re.fullmatch(r"[0-9a-f]{64}", response_sha):
+        raise addendum_v2.AddendumError(
+            f"{fixture_id}/{profile.role} has no complete response_body_sha256"
+        )
     if call.get("terminal_transport_status") != "ok":
         raise addendum_v2.AddendumError(
             f"{fixture_id}/{profile.role} is not a valid completed response"
@@ -909,7 +938,9 @@ def _load_qualification_receipt(
             by_role[role],
             QUALIFICATION_PROBE["record_id"],
             "correct",
+            QUALIFICATION_PROBE,
             book.roles[role],
+            book,
             required_fields,
         )
     return receipt
@@ -982,7 +1013,9 @@ def _load_gate_receipt(client: Any, prefix: str, book: contract.Addendum) -> dic
                 by_pair[pair],
                 fixture_id,
                 expected_label,
+                fixture["row"],
                 book.roles[role],
+                book,
                 required_fields,
             )
     parent = receipt.get("qualification_parent")
@@ -1271,8 +1304,20 @@ def main(argv: list[str] | None = None) -> int:
     elif not args.pack_dir:
         raise SystemExit("review mode requires --pack-dir or --pack-blob-prefix")
 
+    from jspace_observation.semantic_review_v2 import verifier  # noqa: PLC0415
+
+    source_verification = verifier.verify_source_pack(
+        pack_dir=pack_dir,
+        project_root=root,
+    )
+    print(
+        "SOURCE_PACK_REBUILT_RECORDS="
+        f"{source_verification['records_rebuilt']}"
+    )
+
     summary = v1runner._review(book, caller, pack_dir, out_dir, run_id)
     summary["round"] = "v2"
+    summary["source_pack_independent_verification"] = source_verification
     summary["provider_qualification"] = gate["qualification_parent"]
     summary["gate_receipt"] = {
         "prefix": args.gate_receipt_prefix.rstrip("/"),
@@ -1296,8 +1341,6 @@ def main(argv: list[str] | None = None) -> int:
     print(f"FINAL_RESULT={finalization['result']}")
 
     from jspace_observation.semantic_review import stages  # noqa: PLC0415
-    from jspace_observation.semantic_review_v2 import verifier  # noqa: PLC0415
-
     source_records = stages.load_records(pack_dir / "02_records.jsonl")
     finalized_records = stages.load_records(final_pack / "02_records.jsonl")
     decision = json.loads((final_pack / "05_decision.json").read_text(encoding="utf-8"))
@@ -1309,6 +1352,8 @@ def main(argv: list[str] | None = None) -> int:
         combined=combined,
         required_secondary=summary["secondary_selection"]["required_ids"],
         required_third=summary["third_selection"]["required_ids"],
+        expected_code_commit=args.code_commit,
+        expected_image_digest=args.image_digest,
     )
     summary["independent_check"] = check
     print(f"INDEPENDENT_CHECK_DECISION_SHA256={check['decision_sha256']}")

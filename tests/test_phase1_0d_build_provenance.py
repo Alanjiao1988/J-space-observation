@@ -264,6 +264,14 @@ def test_the_run_launcher_starts_the_phase_1_0d_entrypoint_in_generate_mode():
     assert "run_phase1_0d_confirmation.py --mode generate" in text
     assert "--repo-root /workspace" in text
     assert provenance.IMAGE_REPOSITORY in text
+    assert 'REPLICA_TIMEOUT="${REPLICA_TIMEOUT:-21600}"' in text
+    assert (
+        'GENERATION_TIMEOUT_SECONDS="${GENERATION_TIMEOUT_SECONDS:-21300}"'
+        in text
+    )
+    assert "exact 21600/21300 second timeout envelope" in text
+    assert "container command differs from the registered generation command" in text
+    assert "container environment differs from the exact registered values" in text
 
 
 def test_the_run_launcher_uses_the_existing_locked_generation_image():
@@ -300,6 +308,23 @@ def test_the_run_launcher_enforces_one_generation_execution():
     assert "only one create-only upload can authorize an execution" in text
     assert "sole Phase 1.0D generation execution is already claimed" in text
     assert "use a new run ID" not in text
+
+
+def test_the_run_launcher_requires_the_exact_committed_v2_smoke_license():
+    text = _script(RUN_SCRIPT)
+    for binding in (
+        "SMOKE_RUN_ID",
+        "SMOKE_RECEIPT_SHA256",
+        "SMOKE_MANIFEST_SHA256",
+        "REVIEW_V2_CODE_COMMIT",
+        "REVIEW_V2_IMAGE_DIGEST",
+    ):
+        assert binding in text
+    assert "verify_phase1_0d_rv2_gate.py" in text
+    assert "RV2 review or gate-verification bytes changed after the smoke image" in text
+    assert "The committed gate checkpoint must be pushed to origin/main" in text
+    assert "Committed v2 smoke gate differs from the create-only Blob evidence" in text
+    assert '"rv2_smoke_receipt_sha256":"%s"' in text
 
 
 def test_the_run_launcher_requires_an_empty_target_prefix():

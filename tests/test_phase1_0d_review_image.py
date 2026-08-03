@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
 import sys
 from pathlib import Path
 from typing import Any
@@ -28,6 +29,7 @@ from jspace_observation.phase1_0d_generation import (  # noqa: E402
     RunConfig,
     run_phase1_0d,
 )
+from jspace_observation.phase1_0d_execution import SelfTestBackend  # noqa: E402
 from jspace_observation.semantic_review import addendum as contract  # noqa: E402
 from jspace_observation.semantic_review import stages  # noqa: E402
 from jspace_observation.semantic_review import transport  # noqa: E402
@@ -416,6 +418,109 @@ def pack(tmp_path_factory) -> Path:
     return Path(summary["output_dir"])
 
 
+class _RegisteredFakeBackend(SelfTestBackend):
+    is_real_model = True
+    name = "phase1_0d_transformers_causal_lm_v1"
+
+    def generate(self, unit):
+        self._last_prompt_token_count = 100
+        return super().generate(unit)
+
+    def describe(self) -> dict[str, Any]:
+        return {
+            "backend": self.name,
+            "is_real_model": True,
+            "model_id": stages.MODEL_ID,
+            "model_revision": stages.MODEL_REVISION,
+            "device": "cuda",
+        }
+
+
+@pytest.fixture(scope="module")
+def generation_pack(tmp_path_factory) -> Path:
+    summary = run_phase1_0d(
+        RunConfig(
+            mode="generate",
+            output_root=tmp_path_factory.mktemp("generation-packs"),
+            repo_root=REPO_ROOT,
+            run_id="20260101T000000Z",
+            code_commit=v2_verifier.GENERATION_CODE_COMMIT,
+            image_digest=stages.GENERATION_IMAGE_DIGEST,
+            hardware=v2_verifier.GENERATION_HARDWARE,
+            backend=_RegisteredFakeBackend(),
+            runtime_environment={
+                "cuda_available": True,
+                "cuda_device_name": "NVIDIA Tesla T4",
+            },
+        )
+    )
+    return Path(summary["output_dir"])
+
+
+def _rehash_pack_file(pack_dir: Path, name: str) -> None:
+    import hashlib
+
+    manifest_path = pack_dir / "artifact_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    digest = hashlib.sha256(
+        (pack_dir / name).read_bytes().replace(b"\r\n", b"\n")
+    ).hexdigest()
+    for entry in manifest["files"]:
+        if entry["name"] == name:
+            entry["sha256"] = digest
+            break
+    else:
+        raise AssertionError(f"manifest has no {name}")
+    manifest_path.write_bytes(contract.canonical_json(manifest).encode("utf-8"))
+
+
+def test_v2_rebuilds_the_exact_source_pack_before_any_review(generation_pack):
+    result = v2_verifier.verify_source_pack(
+        pack_dir=generation_pack,
+        project_root=REPO_ROOT,
+    )
+    assert result["records_rebuilt"] == 900
+    assert result["selection_recomputed"] is True
+    assert result["exact_manifest_file_set"] is True
+
+
+def test_v2_refuses_a_rehashed_but_substituted_selection(
+    generation_pack, tmp_path
+):
+    copied = tmp_path / "substituted-selection"
+    shutil.copytree(generation_pack, copied)
+    path = copied / "01_selection.json"
+    selection = json.loads(path.read_text(encoding="utf-8"))
+    selection["items"][0]["question"] = "substituted after generation"
+    path.write_bytes(contract.canonical_json(selection).encode("utf-8"))
+    _rehash_pack_file(copied, "01_selection.json")
+    with pytest.raises(
+        v2_verifier.IndependentVerificationError,
+        match="selected items differ",
+    ):
+        v2_verifier.verify_source_pack(pack_dir=copied, project_root=REPO_ROOT)
+
+
+def test_v2_refuses_a_rehashed_record_with_moved_metadata(
+    generation_pack, tmp_path
+):
+    copied = tmp_path / "substituted-record"
+    shutil.copytree(generation_pack, copied)
+    path = copied / "02_records.jsonl"
+    records = stages.load_records(path)
+    records[0]["condition"] = "substituted condition"
+    path.write_text(
+        "\n".join(contract.canonical_json(row) for row in records) + "\n",
+        encoding="utf-8",
+    )
+    _rehash_pack_file(copied, "02_records.jsonl")
+    with pytest.raises(
+        v2_verifier.IndependentVerificationError,
+        match="record metadata",
+    ):
+        v2_verifier.verify_source_pack(pack_dir=copied, project_root=REPO_ROOT)
+
+
 def _parser_agreeing_labels(pack: Path) -> dict[str, str]:
     """Labels that follow the frozen parser route on every row.
 
@@ -538,6 +643,8 @@ def test_v2_independently_recomputes_records_metrics_gates_and_decision(
         combined=finalized["combined"],
         required_secondary=finalized["secondary_selection"]["required_ids"],
         required_third=finalized["third_selection"]["required_ids"],
+        expected_code_commit=COMMIT,
+        expected_image_digest="sha256:" + "3" * 64,
     )
     assert check["records"] == 900
     assert check["cell_count"] == 30
@@ -565,6 +672,30 @@ def test_v2_independent_recomputation_rejects_an_arbitrary_decision(
             combined=finalized["combined"],
             required_secondary=finalized["secondary_selection"]["required_ids"],
             required_third=finalized["third_selection"]["required_ids"],
+            expected_code_commit=COMMIT,
+            expected_image_digest="sha256:" + "3" * 64,
+        )
+
+
+def test_v2_independent_recomputation_rejects_moved_provenance(
+    finalized, pack
+):
+    final_dir = Path(finalized["result"]["output_dir"])
+    decision = json.loads((final_dir / "05_decision.json").read_text("utf-8"))
+    decision["provenance"]["code_commit"] = "0" * 40
+    with pytest.raises(
+        v2_verifier.IndependentVerificationError,
+        match="provenance differs",
+    ):
+        v2_verifier.verify_final_result(
+            source_records=stages.load_records(pack / "02_records.jsonl"),
+            finalized_records=stages.load_records(final_dir / "02_records.jsonl"),
+            decision=decision,
+            combined=finalized["combined"],
+            required_secondary=finalized["secondary_selection"]["required_ids"],
+            required_third=finalized["third_selection"]["required_ids"],
+            expected_code_commit=COMMIT,
+            expected_image_digest="sha256:" + "3" * 64,
         )
 
 

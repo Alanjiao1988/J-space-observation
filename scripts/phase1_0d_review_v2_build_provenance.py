@@ -84,6 +84,7 @@ BUNDLE_GLOBS: tuple[str, ...] = (
     ".dockerignore",
     DOCKERFILE,
     "scripts/run_phase1_0d_semantic_review_v2.py",
+    "scripts/verify_phase1_0d_rv2_gate.py",
     "scripts/phase1_0d_review_v2_build_provenance.py",
     "scripts/phase1_0d_rv2_protected_bytes.py",
     "docs/phase1_0d_rv2_protected_bytes.json",
