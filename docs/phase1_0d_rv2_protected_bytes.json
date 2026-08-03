@@ -1,8 +1,8 @@
 {
   "authority_prompt": "docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md",
   "claim_boundary": "byte-identity of the declared protected paths only; establishes nothing about their scientific correctness, nothing about paths outside the declared patterns, nothing about reviewer accuracy, and nothing about model behaviour or a 'J-space'",
-  "code_commit": "5c4f51292e3d1782d277ad74ca946bee0940613a",
-  "file_count": 35,
+  "code_commit": "ff1de804b96b9bdaa894121f4997bc25a3b6b2d8",
+  "file_count": 36,
   "files": [
     {
       "bytes": 5628,
@@ -95,9 +95,9 @@
       "sha256": "f7712f19cfb0e4ac911b1ed3b32f7bbff7cf358f65459187b538602e1cda1111"
     },
     {
-      "bytes": 28319,
+      "bytes": 32053,
       "path": "infra/azure/scripts/19_run_phase1_0d_confirmation.sh",
-      "sha256": "d3be2289f8710875564710d3187069a8b9c29d9d238f33f0e0c705ed0fe71b62"
+      "sha256": "ce448d818b3f8d24d131bf7fcece0d1be383f9c1dd033642271ec049b0174adc"
     },
     {
       "bytes": 4585,
@@ -108,6 +108,11 @@
       "bytes": 16021,
       "path": "infra/azure/scripts/21_run_phase1_0d_semantic_review.sh",
       "sha256": "8bea27ac127807907864037fd00a0ad64a460b428b71f4658617628a4e005a97"
+    },
+    {
+      "bytes": 35587,
+      "path": "infra/azure/scripts/23_run_phase1_0d_semantic_review_v2.sh",
+      "sha256": "1fdc0ec2bb4fd443233f44b81e2e8f20dc20992a2fb838b3a267e56e3b018a79"
     },
     {
       "bytes": 9390,
@@ -192,6 +197,7 @@
     "data/phase1_task_headroom_candidates.jsonl",
     "infra/azure/scripts/18_build_phase1_0d_confirmation.sh",
     "infra/azure/scripts/19_run_phase1_0d_confirmation.sh",
+    "infra/azure/scripts/23_run_phase1_0d_semantic_review_v2.sh",
     "docs/prompts/phase_science_restart_after_parser_closure_prompt.md",
     "docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md",
     "docs/phase1_0d_semantic_review_addendum.json",
@@ -211,7 +217,7 @@
     "docs/phase1_0d_semantic_review_rubric_v2.md",
     "docs/phase1_0d_semantic_review_addendum_v2.json"
   ],
-  "rollup_sha256": "1433288a20df5c525f38ba5ea9542e090ca8b8ea2bc7cbf2cb744265a30cfdf8",
+  "rollup_sha256": "dcf60f5914935cf346e914604065bd753e8134d7ac90206e0d606d8e91d2038c",
   "schema_version": "phase1-0d-rv2-protected-bytes/v1",
   "supersedes_nothing": "docs/phase1_0d_protected_bytes.json remains in force unchanged; this record is additive and covers a strictly larger set",
   "terminal_state_on_mismatch": "BLOCKED_ON_FROZEN_PHASE_1_0D_DRIFT"
