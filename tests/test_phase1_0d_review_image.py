@@ -285,6 +285,20 @@ def test_neither_review_launcher_touches_the_phase_1_0c_namespace():
         assert "phase1-headroom-calibration" not in text
 
 
+def test_both_run_launchers_resolve_an_interpreter_that_actually_answers():
+    """A name on PATH can be an alias that exits without running Python.
+
+    The interpreter only builds a control-plane request body, but a launcher
+    that dies on a Windows App Execution Alias cannot submit the run at all.
+    """
+
+    for relative in ("infra/azure/scripts/19_run_phase1_0d_confirmation.sh", RUN_SCRIPT):
+        text = _text(relative)
+        assert "type -aP python3 python" in text
+        assert "sys.version_info[0] == 3" in text
+        assert "/usr/bin/python3" in text
+
+
 # ---------------------------------------------------------------------------
 # Moving bytes: download, publish, and the outer bundle
 # ---------------------------------------------------------------------------

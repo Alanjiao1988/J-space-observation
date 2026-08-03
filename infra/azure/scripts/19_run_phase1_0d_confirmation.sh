@@ -65,15 +65,23 @@ if [[ -x /usr/bin/python3 ]]; then
         exit 1
     fi
 else
+    # A name on PATH is not always an interpreter: on Windows the first
+    # "python3" is usually an App Execution Alias that exits non-zero without
+    # running anything. Try every candidate and keep the first that actually
+    # answers as Python 3, rather than trusting the first name that resolves.
     PYTHON_TRUST="path-resolved-absolute (no /usr/bin/python3 on this host)"
-    PYTHON_BIN="$(command -v python3 || command -v python || true)"
+    PYTHON_BIN=""
+    while IFS= read -r candidate; do
+        [[ -n "$candidate" ]] || continue
+        absolute="$(cd "$(dirname "$candidate")" && pwd)/$(basename "$candidate")"
+        if [[ -x "$absolute" ]] \
+            && "$absolute" -I -c 'import sys; raise SystemExit(0 if sys.version_info[0] == 3 else 1)' \
+                >/dev/null 2>&1; then
+            PYTHON_BIN="$absolute"
+            break
+        fi
+    done < <(type -aP python3 python 2>/dev/null)
     if [[ -z "$PYTHON_BIN" ]]; then
-        echo "[FAIL] Authenticated absolute Python interpreter is unavailable"
-        exit 1
-    fi
-    PYTHON_BIN="$(cd "$(dirname "$PYTHON_BIN")" && pwd)/$(basename "$PYTHON_BIN")"
-    if [[ ! -x "$PYTHON_BIN" ]] \
-        || ! "$PYTHON_BIN" -I -c 'import sys; raise SystemExit(0 if sys.version_info[0] == 3 else 1)'; then
         echo "[FAIL] Authenticated absolute Python interpreter is unavailable"
         exit 1
     fi
