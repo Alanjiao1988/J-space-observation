@@ -7,9 +7,9 @@
   "base_image_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
   "base_protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
   "bundle_hash_domain": "jspace-phase1-0d-review-v2/build-bundle/v1",
-  "bundle_sha256": "f8573e7f71522796e07ed3b05c8dc32d15ea07e7620c04f5a0e3fbbaa526677c",
+  "bundle_sha256": "86b05cfceeeff04312617009ab24a1cfeca25cb83d6c09669cd2d63e91e429d9",
   "claim_boundary": "build provenance only; establishes which bytes are in the v2 review image and nothing about reviewer accuracy, instrument validity, model behaviour, hidden reasoning, or a 'J-space'",
-  "code_commit": "0a2b30043aba796e4480790666e57836f36e447c",
+  "code_commit": "0c2f95fdcafa39e37384e7fbb3ebe920e9958666",
   "disjoint_from": [
     "phase1_0d_build_provenance.json",
     "phase1_0d_review_build_provenance.json"
@@ -40,7 +40,7 @@
     {
       "bytes": 8863,
       "path": "docs/phase1_0d_rv2_protected_bytes.json",
-      "sha256": "bcbf649223a6f3c7ef1d81961c69620f5a14c58cb0c0dc58925aead9e0553a72"
+      "sha256": "9941deb94940902a63857bc1a740178df878e873f666c5096a0869f4ec2f0f6a"
     },
     {
       "bytes": 24921,
