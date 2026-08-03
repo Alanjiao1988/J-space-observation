@@ -321,7 +321,7 @@ def test_the_run_launcher_requires_the_exact_committed_v2_smoke_license():
     ):
         assert binding in text
     assert "verify_phase1_0d_rv2_gate.py" in text
-    assert "RV2 review or gate-verification bytes changed after the smoke image" in text
+    assert "V2 review or gate-verification bytes changed after the smoke image" in text
     assert "The committed gate checkpoint must be pushed to origin/main" in text
     assert "Committed v2 smoke gate differs from the create-only Blob evidence" in text
     assert '"rv2_smoke_receipt_sha256":"%s"' in text

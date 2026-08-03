@@ -30,6 +30,7 @@ from jspace_observation.phase1_0d_generation import (  # noqa: E402
     run_phase1_0d,
 )
 from jspace_observation.phase1_0d_execution import SelfTestBackend  # noqa: E402
+from jspace_observation.headroom_calibration import canonical_jsonl  # noqa: E402
 from jspace_observation.semantic_review import addendum as contract  # noqa: E402
 from jspace_observation.semantic_review import stages  # noqa: E402
 from jspace_observation.semantic_review import transport  # noqa: E402
@@ -509,10 +510,7 @@ def test_v2_refuses_a_rehashed_record_with_moved_metadata(
     path = copied / "02_records.jsonl"
     records = stages.load_records(path)
     records[0]["condition"] = "substituted condition"
-    path.write_text(
-        "\n".join(contract.canonical_json(row) for row in records) + "\n",
-        encoding="utf-8",
-    )
+    path.write_text(canonical_jsonl(records), encoding="utf-8")
     _rehash_pack_file(copied, "02_records.jsonl")
     with pytest.raises(
         v2_verifier.IndependentVerificationError,
