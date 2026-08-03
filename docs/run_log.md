@@ -4441,3 +4441,21 @@ Not established: nothing about reviewer accuracy in general, nothing about the
 other two reviewers, nothing about model capability, and nothing about the
 Phase 1.0D task bank, which was never generated on. No scientific counter
 moved. `AWAITING_SEMANTIC_REVIEW` remains the honest status of Phase 1.0D.
+
+### Closing verification for the gate round
+
+| Azure run | Commit | What ran | Result |
+| --- | --- | --- | --- |
+| `cm5c` | `2e343e2` | `scripts/phase1_0d_protected_bytes.py verify` | 152 files, rollup `436ed331c7dd53fa6387d6b52447bc72edf166bbb3640b7f7723a8766bdf51dd`, `PROTECTED_BYTES_OK=1` — unchanged from the baseline |
+| `cm5d` | `2e343e2` | Full suite | 3185 passed, 15 skipped, 2 failed, both the disclosed pre-existing `tests/test_parser_v3_seal_job.py` cases |
+
+The suite is one test larger than `cm57` (3184) because the launcher interpreter
+resolver gained a regression test: on this Windows host `command -v python3`
+returns the Microsoft Store App Execution Alias, which exits 49 without running
+Python, so both launchers now walk `type -aP python3 python` and keep the first
+candidate that actually answers as Python 3. Against the older 3067-passed
+figure recorded for `cm4y`, this round is +118 tests and no new failure.
+
+Nothing in the gate round touched a protected byte: the new artifact prefix
+`artifacts/phase1-0d-semantic-review-gate/**` matches no protected glob, and the
+rollup confirms it.
