@@ -150,7 +150,6 @@ def verify_source_pack(
         raise IndependentVerificationError(
             "source manifest SHA-256 differs from the committed generation license"
         )
-    base = stages.verify_generation_pack(pack_dir)
     manifest = _read_json(pack_dir / stages.MANIFEST_NAME)
     entries = manifest.get("files")
     names = [
@@ -164,6 +163,12 @@ def verify_source_pack(
         or manifest.get("artifact") != "phase1_0d_confirmation_pack"
         or manifest.get("artifact_root") != ARTIFACT_ROOT
         or manifest.get("manifest_written_last") is not True
+        or any(
+            not isinstance(entry, Mapping)
+            or set(entry) != {"name", "sha256"}
+            or not re.fullmatch(r"[0-9a-f]{64}", str(entry.get("sha256", "")))
+            for entry in entries
+        )
     ):
         raise IndependentVerificationError(
             "generation manifest is not the exact frozen seven-file pack"
@@ -177,6 +182,14 @@ def verify_source_pack(
         raise IndependentVerificationError(
             "generation pack contains missing, extra or nested files"
         )
+    for entry in entries:
+        name = str(entry["name"])
+        observed = hashlib.sha256((pack_dir / name).read_bytes()).hexdigest()
+        if observed != entry["sha256"]:
+            raise IndependentVerificationError(
+                f"raw source bytes differ from the committed manifest for {name}"
+            )
+    base = stages.verify_generation_pack(pack_dir)
 
     selected, expected_snapshot = _expected_selection(project_root)
     observed_snapshot = _read_json(pack_dir / "00_protocol_snapshot.json")
@@ -361,6 +374,7 @@ def verify_source_pack(
     return {
         **base,
         "committed_manifest_sha256": expected_manifest_sha256,
+        "raw_member_hashes_verified": True,
         "exact_manifest_file_set": True,
         "selection_recomputed": True,
         "work_units_recomputed": len(units),

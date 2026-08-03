@@ -489,7 +489,29 @@ def test_v2_rebuilds_the_exact_source_pack_before_any_review(generation_pack):
     )
     assert result["records_rebuilt"] == 900
     assert result["selection_recomputed"] is True
+    assert result["raw_member_hashes_verified"] is True
     assert result["exact_manifest_file_set"] is True
+
+
+def test_v2_refuses_line_ending_substitution_under_the_committed_manifest(
+    generation_pack, tmp_path
+):
+    expected_manifest_sha256 = _source_manifest_sha256(generation_pack)
+    copied = tmp_path / "crlf-substitution"
+    shutil.copytree(generation_pack, copied)
+    path = copied / "01_selection.json"
+    raw = path.read_bytes()
+    assert b"\r\n" not in raw
+    path.write_bytes(raw.replace(b"\n", b"\r\n"))
+    with pytest.raises(
+        v2_verifier.IndependentVerificationError,
+        match="raw source bytes differ from the committed manifest",
+    ):
+        v2_verifier.verify_source_pack(
+            pack_dir=copied,
+            project_root=REPO_ROOT,
+            expected_manifest_sha256=expected_manifest_sha256,
+        )
 
 
 def test_v2_refuses_a_rehashed_but_substituted_selection(

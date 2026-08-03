@@ -53,6 +53,7 @@ QUALIFICATION_RECEIPT_SHA256=""
 QUALIFICATION_MANIFEST_SHA256=""
 SMOKE_RECEIPT_SHA256=""
 SMOKE_MANIFEST_SHA256=""
+SMOKE_REQUIRED_SECONDS=5709
 FORMAL_REVIEW_REQUIRED_SECONDS=611517
 if [[ "$REVIEW_MODE" == "review" ]]; then
     REPLICA_TIMEOUT="${REPLICA_TIMEOUT:-612300}"
@@ -89,11 +90,6 @@ if [[ ! "$RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]; then
     echo "[FAIL] Run ID must be a UTC stamp of the form YYYYMMDDTHHMMSSZ"
     exit 1
 fi
-JOB_NAME="job-p10d-rv2-${JOB_MODE}-${RUN_ID,,}"
-if (( ${#JOB_NAME} > 32 )); then
-    echo "[FAIL] ACA job name exceeds the 32-character service limit"
-    exit 1
-fi
 if [[ ! "$REPLICA_TIMEOUT" =~ ^[0-9]+$ \
     || ! "$REVIEW_TIMEOUT_SECONDS" =~ ^[0-9]+$ ]]; then
     echo "[FAIL] Timeouts must be nonnegative integers"
@@ -101,6 +97,11 @@ if [[ ! "$REPLICA_TIMEOUT" =~ ^[0-9]+$ \
 fi
 if (( REVIEW_TIMEOUT_SECONDS >= REPLICA_TIMEOUT )); then
     echo "[FAIL] In-container timeout must fire before the replica timeout"
+    exit 1
+fi
+if [[ "$REVIEW_MODE" == "smoke" ]] \
+    && (( REVIEW_TIMEOUT_SECONDS < SMOKE_REQUIRED_SECONDS )); then
+    echo "[FAIL] Smoke timeout cannot cover frozen calls, retries and persistence"
     exit 1
 fi
 if [[ "$REVIEW_MODE" == "review" ]] \
@@ -166,6 +167,18 @@ native_path() {
         printf '%s' "$1"
     fi
 }
+
+JOB_NONCE="$(python -c 'import secrets; print(secrets.token_hex(8))')"
+if [[ ! "$JOB_NONCE" =~ ^[0-9a-f]{16}$ ]]; then
+    echo "[FAIL] Could not create a collision-resistant ACA job identity"
+    exit 1
+fi
+JOB_NAME="job-p10d-rv2-${JOB_MODE}-${JOB_NONCE}"
+if (( ${#JOB_NAME} > 32 )); then
+    echo "[FAIL] ACA job name exceeds the 32-character service limit"
+    exit 1
+fi
+readonly JOB_NONCE JOB_NAME
 
 ORIGIN_MAIN_SHA="$(git -C "$PROJECT_ROOT" ls-remote --exit-code \
     origin refs/heads/main | awk '{print $1}')"
@@ -881,8 +894,8 @@ if [[ "$REVIEW_MODE" == "smoke" ]]; then
     # other's command.  Claim the global one-round lock only after qualification
     # bytes and the provisioned job are fully verified, immediately before calls.
     SMOKE_LOCK_FILE="$RECORD_DIR/smoke_round_lock.json"
-    printf '{"artifact":"phase1_0d_rv2_smoke_round_lock","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","qualification_receipt_sha256":"%s","qualification_manifest_sha256":"%s","smoke_run_id":"%s"}\n' \
-        "$PROJECT_SHA" "$IMAGE_DIGEST" "$QUALIFICATION_RUN_ID" \
+    printf '{"artifact":"phase1_0d_rv2_smoke_round_lock","job_name":"%s","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","qualification_receipt_sha256":"%s","qualification_manifest_sha256":"%s","smoke_run_id":"%s"}\n' \
+        "$JOB_NAME" "$PROJECT_SHA" "$IMAGE_DIGEST" "$QUALIFICATION_RUN_ID" \
         "$QUALIFICATION_RECEIPT_SHA256" "$QUALIFICATION_MANIFEST_SHA256" \
         "$RUN_ID" >"$SMOKE_LOCK_FILE"
     az storage blob upload \
@@ -898,8 +911,8 @@ fi
 if [[ "$REVIEW_MODE" == "review" ]]; then
     # The unique job is inert until this create-only global lock succeeds.
     REVIEW_LOCK_FILE="$RECORD_DIR/formal_review_lock.json"
-    printf '{"artifact":"phase1_0d_rv2_formal_review_lock","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","smoke_run_id":"%s","generation_run_id":"%s","source_manifest_sha256":"%s","review_run_id":"%s"}\n' \
-        "$PROJECT_SHA" "$IMAGE_DIGEST" "$QUALIFICATION_RUN_ID" "$SMOKE_RUN_ID" \
+    printf '{"artifact":"phase1_0d_rv2_formal_review_lock","job_name":"%s","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","smoke_run_id":"%s","generation_run_id":"%s","source_manifest_sha256":"%s","review_run_id":"%s"}\n' \
+        "$JOB_NAME" "$PROJECT_SHA" "$IMAGE_DIGEST" "$QUALIFICATION_RUN_ID" "$SMOKE_RUN_ID" \
         "$GENERATION_RUN_ID" "$SOURCE_MANIFEST_SHA256" "$RUN_ID" >"$REVIEW_LOCK_FILE"
     az storage blob upload \
         --auth-mode login \

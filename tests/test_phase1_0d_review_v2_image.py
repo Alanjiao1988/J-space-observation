@@ -373,6 +373,8 @@ def test_smoke_worst_case_fits_the_launcher_deadline(book):
     )
     text = RUN_SCRIPT.read_text(encoding="utf-8")
     assert "--execution-timeout-seconds $REVIEW_TIMEOUT_SECONDS" in text
+    assert "SMOKE_REQUIRED_SECONDS=5709" in text
+    assert "Smoke timeout cannot cover frozen calls" in text
 
 
 def test_formal_review_worst_case_fits_its_mode_specific_deadline(book):
@@ -955,14 +957,17 @@ def test_the_runner_uses_the_registered_gate_prefixes():
 
 def test_the_runner_enforces_the_one_round_smoke_ceiling():
     text = RUN_SCRIPT.read_text(encoding="utf-8")
-    assert 'JOB_NAME="job-p10d-rv2-${JOB_MODE}-${RUN_ID,,}"' in text
+    assert 'JOB_NONCE="$(python -c' in text
+    assert 'secrets.token_hex(8)' in text
+    assert 'JOB_NAME="job-p10d-rv2-${JOB_MODE}-${JOB_NONCE}"' in text
     assert '[[ "$JOB_EXISTS" != "0" ]]' in text
     assert "duplicate execution is forbidden" in text
     assert 'SMOKE_LOCK_BLOB="phase1-0d-semantic-review-v2/smoke-round-lock.json"' in text
     assert "--overwrite false" in text
     assert "global one-round lock" in text
     for code in ("q", "s", "r"):
-        assert len(f"job-p10d-rv2-{code}-20260803t000000z") <= 32
+        assert len(f"job-p10d-rv2-{code}-0123456789abcdef") <= 32
+    assert '"job_name":"%s"' in text
     qualification = text.index("--qualification-run-id")
     job_verified = text.index("[OK] Provisioned v2 job matches")
     smoke_lock = text.index('SMOKE_LOCK_FILE="$RECORD_DIR/smoke_round_lock.json"')
