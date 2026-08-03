@@ -266,6 +266,22 @@ def test_the_run_launcher_starts_the_phase_1_0d_entrypoint_in_generate_mode():
     assert provenance.IMAGE_REPOSITORY in text
 
 
+def test_the_run_launcher_uses_the_existing_locked_generation_image():
+    text = _script(RUN_SCRIPT)
+    assert (
+        'LOCKED_IMAGE_TAG="9cde1d95ffda36698a0ddf558a9358f3337dd711"'
+        in text
+    )
+    assert (
+        'LOCKED_IMAGE_DIGEST="sha256:'
+        '1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332c37481166aa4"'
+        in text
+    )
+    assert 'PROJECT_SHA="${PROJECT_SHA:-$LOCKED_IMAGE_TAG}"' in text
+    assert '[[ "$PROJECT_SHA" != "$LOCKED_IMAGE_TAG" ]]' in text
+    assert '[[ "$IMAGE_DIGEST" != "$LOCKED_IMAGE_DIGEST" ]]' in text
+
+
 def test_the_run_launcher_refuses_a_platform_retry_or_a_second_replica():
     text = _script(RUN_SCRIPT)
     assert '"replicaRetryLimit": 0' in text

@@ -32,8 +32,10 @@ BLOB_CONTAINER="jspace-results"
 BLOB_PREFIX="phase1-headroom-confirmation"
 GENERATION_LOCK_BLOB="${BLOB_PREFIX}/generation-execution-lock.json"
 IMAGE_REPOSITORY="j-space-observation-phase1-0d"
+LOCKED_IMAGE_TAG="9cde1d95ffda36698a0ddf558a9358f3337dd711"
+LOCKED_IMAGE_DIGEST="sha256:1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332c37481166aa4"
 ACR_NAME="${ACR_NAME:?Set ACR_NAME to the existing private registry name}"
-PROJECT_SHA="${PROJECT_SHA:-$(git -C "$PROJECT_ROOT" rev-parse HEAD)}"
+PROJECT_SHA="${PROJECT_SHA:-$LOCKED_IMAGE_TAG}"
 RUN_ID="${JSPACE_CONFIRMATION_RUN_ID:-$(date -u +'%Y%m%dT%H%M%SZ')}"
 REPLICA_TIMEOUT="${REPLICA_TIMEOUT:-10800}"
 GENERATION_TIMEOUT_SECONDS="${GENERATION_TIMEOUT_SECONDS:-10500}"
@@ -110,6 +112,10 @@ if [[ ! "$PROJECT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
     echo "[FAIL] PROJECT_SHA must be a full 40-character commit"
     exit 1
 fi
+if [[ "$PROJECT_SHA" != "$LOCKED_IMAGE_TAG" ]]; then
+    echo "[FAIL] PROJECT_SHA must identify the sole locked generation image"
+    exit 1
+fi
 if [[ ! "$RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]; then
     echo "[FAIL] Run ID must be a UTC stamp of the form YYYYMMDDTHHMMSSZ"
     exit 1
@@ -149,6 +155,10 @@ IMAGE_DIGEST="$(az acr repository show-manifests \
     -o tsv)"
 if [[ ! "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
     echo "[FAIL] No immutable Phase 1.0D image is tagged $PROJECT_SHA"
+    exit 1
+fi
+if [[ "$IMAGE_DIGEST" != "$LOCKED_IMAGE_DIGEST" ]]; then
+    echo "[FAIL] The locked generation tag does not resolve to its frozen digest"
     exit 1
 fi
 IMAGE_DIGEST_REF="${LOGIN_SERVER}/${IMAGE_REPOSITORY}@${IMAGE_DIGEST}"
