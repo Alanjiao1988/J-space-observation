@@ -148,3 +148,5 @@ phase1_0d_build_provenance.json text eol=lf
 
 infra/azure/scripts/18_build_phase1_0d_confirmation.sh text eol=lf
 infra/azure/scripts/19_run_phase1_0d_confirmation.sh text eol=lf
+
+docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md text eol=lf
