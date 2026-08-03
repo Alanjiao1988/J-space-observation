@@ -19,6 +19,8 @@ import json
 import shutil
 import subprocess
 import sys
+import threading
+import time
 from pathlib import Path
 
 import pytest
@@ -213,11 +215,13 @@ class _FailingCaller:
         self._book = book
         self._index = failing_index
         self._error = error
+        self._call_lock = threading.Lock()
         self.calls = 0
 
     def __call__(self, profile, body):
-        index = self.calls
-        self.calls += 1
+        with self._call_lock:
+            index = self.calls
+            self.calls += 1
         if index == self._index:
             raise self._error
         label = self._expected_for(body)
@@ -317,6 +321,47 @@ def test_a_clean_run_reaches_sixty_of_sixty(book):
             assert field in call
 
 
+class _ConcurrencyCaller(_FailingCaller):
+    def __init__(self, book) -> None:
+        super().__init__(book, -1, RuntimeError("unused"))
+        self._activity_lock = threading.Lock()
+        self._active = {role: 0 for role in contract.ROLES}
+        self.max_active = {role: 0 for role in contract.ROLES}
+
+    def __call__(self, profile, body):
+        with self._activity_lock:
+            self._active[profile.role] += 1
+            self.max_active[profile.role] = max(
+                self.max_active[profile.role], self._active[profile.role]
+            )
+        try:
+            time.sleep(0.02)
+            return super().__call__(profile, body)
+        finally:
+            with self._activity_lock:
+                self._active[profile.role] -= 1
+
+
+def test_smoke_uses_at_most_eight_workers_per_deployment(book):
+    caller = _ConcurrencyCaller(book)
+    result = runner._smoke(book, caller)
+    assert result["passed"] is True
+    assert caller.calls == 60
+    for role in contract.ROLES:
+        assert 1 < caller.max_active[role] <= 8
+
+
+def test_smoke_worst_case_fits_the_launcher_deadline(book):
+    assert runner.smoke_worst_case_seconds(book) == 4689
+    assert (
+        runner.smoke_worst_case_seconds(book)
+        + runner.GATE_PERSISTENCE_MARGIN_SECONDS
+        < 10500
+    )
+    text = RUN_SCRIPT.read_text(encoding="utf-8")
+    assert "--execution-timeout-seconds $REVIEW_TIMEOUT_SECONDS" in text
+
+
 def test_a_non_object_envelope_is_recorded_and_the_batch_continues(book):
     caller = _FailingCaller(book, -1, RuntimeError("unused"))
     original = caller.__call__
@@ -324,11 +369,14 @@ def test_a_non_object_envelope_is_recorded_and_the_batch_continues(book):
     class _MalformedThenClean:
         def __init__(self):
             self.calls = 0
+            self.lock = threading.Lock()
 
         def __call__(self, profile, body):
-            self.calls += 1
+            with self.lock:
+                self.calls += 1
+                call_number = self.calls
             response = original(profile, body)
-            if self.calls == 1:
+            if call_number == 1:
                 response.payload = []
             return response
 

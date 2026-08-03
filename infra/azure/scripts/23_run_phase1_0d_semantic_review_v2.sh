@@ -258,6 +258,7 @@ ARGS="--project-root /workspace --out-dir /workspace/runtime/results"
 ARGS="$ARGS --run-id $RUN_ID --client-id $IDENTITY_CLIENT_ID"
 ARGS="$ARGS --blob-account $BLOB_ACCOUNT --blob-container $BLOB_CONTAINER"
 ARGS="$ARGS --code-commit $PROJECT_SHA --image-digest $IMAGE_DIGEST"
+ARGS="$ARGS --execution-timeout-seconds $REVIEW_TIMEOUT_SECONDS"
 case "$REVIEW_MODE" in
     qualify)
         ARGS="$ARGS --gate-blob-prefix ${QUALIFICATION_PREFIX}/${RUN_ID}"

@@ -40,10 +40,14 @@ nothing else, and the pack-download helper is imported only inside ``review``.
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
+import contextlib
 import hashlib
 import json
+import math
 import re
 import sys
+import threading
 import time
 from pathlib import Path
 from typing import Any, Mapping
@@ -76,10 +80,24 @@ UTC_RUN_ID = re.compile(r"[0-9]{8}T[0-9]{6}Z\Z")
 SHA1 = re.compile(r"[0-9a-f]{40}\Z")
 SHA256_DIGEST = re.compile(r"sha256:[0-9a-f]{64}\Z")
 MAX_REGISTERED_RETRIES = 7
+PROVIDER_ATTEMPT_TIMEOUT_SECONDS = 180
+GATE_PERSISTENCE_MARGIN_SECONDS = 300
 
 
 class GateEvidenceError(RuntimeError):
     """Raised when gate evidence exists but cannot be persisted."""
+
+
+class SerializedTokenProvider:
+    """Make the v1 token cache safe for the registered concurrent smoke."""
+
+    def __init__(self, provider: transport.TokenProvider) -> None:
+        self._provider = provider
+        self._lock = threading.Lock()
+
+    def token(self, resource: str) -> str:
+        with self._lock:
+            return self._provider.token(resource)
 
 
 def _validate_gate_prefix(prefix: str, expected_root: str) -> str:
@@ -185,7 +203,7 @@ class GateReader:
 class LiveCaller:
     """Calls one pinned deployment, remembering the route that answered."""
 
-    def __init__(self, book: contract.Addendum, tokens: transport.TokenProvider) -> None:
+    def __init__(self, book: contract.Addendum, tokens: Any) -> None:
         self._addendum = book
         self._tokens = tokens
         self.resolved: dict[str, tuple[str, str]] = {}
@@ -204,6 +222,7 @@ class LiveCaller:
             path=path,
             api_version=api_version,
             tokens=self._tokens,
+            timeout=PROVIDER_ATTEMPT_TIMEOUT_SECONDS,
         )
 
     def __call__(self, profile: contract.RoleProfile, body: Mapping[str, Any]):
@@ -434,67 +453,118 @@ def _blank_call(fixture: Mapping[str, Any], profile: contract.RoleProfile) -> di
     }
 
 
+def _smoke_pair(
+    book: contract.Addendum,
+    caller: LiveCaller,
+    fixture: Mapping[str, Any],
+    role: str,
+) -> dict[str, Any]:
+    """Execute one registered pair and convert every registered failure to data."""
+
+    profile = book.roles[role]
+    record = _blank_call(fixture, profile)
+    expected = str(fixture["expected_label"])
+    body = contract.build_request(profile, book, fixture["row"])
+    record["request_body_sha256"] = contract.sha256_text(
+        contract.request_bytes(body).decode("utf-8")
+    )
+    started = time.monotonic()
+    try:
+        response = caller(profile, body)
+    except contract.TransportError as error:
+        record["latency_seconds"] = round(time.monotonic() - started, 3)
+        record["retry_count"] = (
+            int(book.retry["max_attempts"]) - 1 if "exhausted" in str(error) else 0
+        )
+        record["terminal_transport_status"] = f"transport_exhausted: {error}"
+        return record
+    except contract.MalformedResponseError as error:
+        record["latency_seconds"] = round(time.monotonic() - started, 3)
+        record["retry_count"] = 0
+        record["terminal_transport_status"] = f"malformed_envelope: {error}"
+        return record
+
+    payload = response.payload
+    try:
+        _record_response(record, response)
+    except contract.MalformedResponseError as error:
+        record["terminal_transport_status"] = f"malformed_envelope: {error}"
+        return record
+    try:
+        label = contract.parse_label(payload, profile)
+    except contract.MalformedResponseError as error:
+        record["terminal_transport_status"] = f"malformed_label: {error}"
+        return record
+    record["observed_label"] = label
+    record["match"] = label == expected
+    visible = record["visible_completion_tokens"]
+    if (
+        type(visible) is not int
+        or visible < 0
+        or visible > profile.max_visible_output_tokens
+    ):
+        record["terminal_transport_status"] = (
+            "malformed_visible_token_count: "
+            f"{visible!r} is outside 0..{profile.max_visible_output_tokens}"
+        )
+    return record
+
+
 def _smoke(book: contract.Addendum, caller: LiveCaller) -> dict[str, Any]:
-    """Run all 60 registered pairs, recording every outcome before judging."""
+    """Run all 60 pairs with at most eight in flight per deployment.
 
-    calls: list[dict[str, Any]] = []
-    for fixture in book.smoke_fixtures:
-        for role in contract.ROLES:
-            profile = book.roles[role]
-            record = _blank_call(fixture, profile)
-            expected = str(fixture["expected_label"])
-            body = contract.build_request(profile, book, fixture["row"])
-            record["request_body_sha256"] = contract.sha256_text(
-                contract.request_bytes(body).decode("utf-8")
+    The frozen retry permits eight 180-second attempts plus at most 123 seconds
+    of backoff per exhausted pair.  Twenty sequential pairs could therefore
+    exceed the ACA deadline.  Eight workers per distinct deployment reduce the
+    registered 20 calls to three worst-case waves, while staying at the exact
+    concurrency ceiling and preserving the receipt in preregistered order.
+    """
+
+    max_workers = int(book.document["concurrency"]["max_in_flight_per_deployment"])
+    if max_workers != 8:
+        raise addendum_v2.AddendumError(
+            f"the v2 smoke concurrency moved from eight to {max_workers}"
+        )
+    pairs = [
+        (fixture, role)
+        for fixture in book.smoke_fixtures
+        for role in contract.ROLES
+    ]
+    with contextlib.ExitStack() as stack:
+        executors = {
+            role: stack.enter_context(
+                concurrent.futures.ThreadPoolExecutor(
+                    max_workers=max_workers,
+                    thread_name_prefix=f"smoke-{role}",
+                )
             )
-            started = time.monotonic()
-            try:
-                response = caller(profile, body)
-            except contract.TransportError as error:
-                record["latency_seconds"] = round(time.monotonic() - started, 3)
-                record["retry_count"] = (
-                    int(book.retry["max_attempts"]) - 1
-                    if "exhausted" in str(error)
-                    else 0
-                )
-                record["terminal_transport_status"] = f"transport_exhausted: {error}"
-                calls.append(record)
-                continue
-            except contract.MalformedResponseError as error:
-                record["latency_seconds"] = round(time.monotonic() - started, 3)
-                record["retry_count"] = 0
-                record["terminal_transport_status"] = f"malformed_envelope: {error}"
-                calls.append(record)
-                continue
-
-            payload = response.payload
-            try:
-                _record_response(record, response)
-            except contract.MalformedResponseError as error:
-                record["terminal_transport_status"] = f"malformed_envelope: {error}"
-                calls.append(record)
-                continue
-            try:
-                label = contract.parse_label(payload, profile)
-            except contract.MalformedResponseError as error:
-                record["terminal_transport_status"] = f"malformed_label: {error}"
-                calls.append(record)
-                continue
-            record["observed_label"] = label
-            record["match"] = label == expected
-            visible = record["visible_completion_tokens"]
-            if (
-                type(visible) is not int
-                or visible < 0
-                or visible > profile.max_visible_output_tokens
-            ):
-                record["terminal_transport_status"] = (
-                    "malformed_visible_token_count: "
-                    f"{visible!r} is outside 0..{profile.max_visible_output_tokens}"
-                )
-            calls.append(record)
-
+            for role in contract.ROLES
+        }
+        futures = [
+            executors[role].submit(_smoke_pair, book, caller, fixture, role)
+            for fixture, role in pairs
+        ]
+        calls = [future.result() for future in futures]
     return summarise_smoke(book, calls)
+
+
+def smoke_worst_case_seconds(book: contract.Addendum) -> int:
+    """Upper bound one deployment's 20-pair smoke route under frozen retry."""
+
+    retry = book.retry
+    attempts = int(retry["max_attempts"])
+    initial = float(retry["backoff_initial_seconds"])
+    multiplier = float(retry["backoff_multiplier"])
+    maximum = float(retry["backoff_max_seconds"])
+    backoff = sum(
+        min(initial * (multiplier**index), maximum)
+        for index in range(attempts - 1)
+    )
+    workers = int(book.document["concurrency"]["max_in_flight_per_deployment"])
+    waves = math.ceil(addendum_v2.FIXTURE_COUNT / workers)
+    return math.ceil(
+        waves * (attempts * PROVIDER_ATTEMPT_TIMEOUT_SECONDS + backoff)
+    )
 
 
 def summarise_smoke(book: contract.Addendum, calls: list[dict[str, Any]]) -> dict[str, Any]:
@@ -923,6 +993,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--client-id", default="")
     parser.add_argument("--code-commit", default="")
     parser.add_argument("--image-digest", default="")
+    parser.add_argument("--execution-timeout-seconds", type=int, default=0)
     args = parser.parse_args(argv)
 
     root = Path(args.project_root).resolve()
@@ -979,7 +1050,9 @@ def main(argv: list[str] | None = None) -> int:
             "any provider call"
         )
 
-    tokens = transport.TokenProvider(args.client_id or None)
+    tokens = SerializedTokenProvider(
+        transport.TokenProvider(args.client_id or None)
+    )
 
     publisher: GatePublisher | None = None
     if args.gate_blob_prefix:
@@ -1041,6 +1114,15 @@ def main(argv: list[str] | None = None) -> int:
             raise SystemExit("smoke mode needs --blob-account and --blob-container")
         if not args.qualification_receipt_prefix:
             raise SystemExit("smoke mode needs --qualification-receipt-prefix")
+        required_seconds = (
+            smoke_worst_case_seconds(book) + GATE_PERSISTENCE_MARGIN_SECONDS
+        )
+        if args.execution_timeout_seconds < required_seconds:
+            raise SystemExit(
+                "smoke execution timeout cannot complete the registered retry "
+                f"batch and persistence: {args.execution_timeout_seconds} < "
+                f"{required_seconds}"
+            )
         qualification_reader = GateReader(
             args.blob_account,
             args.blob_container,
