@@ -4459,3 +4459,32 @@ figure recorded for `cm4y`, this round is +118 tests and no new failure.
 Nothing in the gate round touched a protected byte: the new artifact prefix
 `artifacts/phase1-0d-semantic-review-gate/**` matches no protected glob, and the
 rollup confirms it.
+
+## 2026-08-03 — Phase 1.0D semantic-review v2 round
+
+Authority: `docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md`,
+SHA-256 `7b93c90a299ff4e77b83d4633624053f8ce53afcd04279ca3050c5ab14428e19`.
+It authorizes a forensic correction of the v1 interpretation, exactly one
+re-frozen v2 reviewer instrument, exactly one v2 qualification and smoke, and —
+only on a 60/60 smoke pass — the single already-preregistered Phase 1.0D
+generation, review and finalization. There is no RV3.
+
+Starting state verified before any edit: `origin/main`
+`4668ef371b89162a45cbccb57939f9f68571c9f7`, tree
+`811ec140c82bcd190d49de9686d426cec3991f89`, worktree clean,
+`5ae85cb838ff2c8d296ee90b10f1ca2e9f885b0a` still an ancestor, and Azure run
+`cm5e` reproducing the protected rollup `436ed331…` over 152 files.
+
+| Azure run | Commit | What ran | Result |
+| --- | --- | --- | --- |
+| `cm5e` | `4668ef3` | `scripts/phase1_0d_protected_bytes.py verify` | 152 files, `436ed331…`, `PROTECTED_BYTES_OK=1` |
+
+**Forensic correction first, because it changes what the v2 instrument has to
+fix.** The v1 stop stands as procedurally correct and terminal, but its recorded
+cause was wrong: the frozen rubric's rule 3 selects the last complete literal
+`Final answer:` surface, rule 4 fires only "with no rule selecting one", and the
+fixture `smoke_unresolved` registers `unresolved` on the strength of prose that
+appears after that surface. `incorrect` is what strict in-order execution
+returns. Recorded as `EV-0013`, `D26`, `L-52`, `M-16` and
+`docs/decisions/phase1_0d_semantic_review_v1_specification_correction.md`, with
+dated pointers appended to `D25` and `L-50` and no original byte rewritten.

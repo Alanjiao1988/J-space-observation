@@ -1120,3 +1120,49 @@ any measurement is taken. That is the cost being paid here, and it is the
 correct one — the alternative outcome, 900 labels from a panel known to
 mislabel the one distinction the phase turns on, would have been worse and
 would have looked like progress.
+
+## M-16 - Executing an ordered rubric against its own fixture bank before freezing
+
+M-15 recorded the order that makes a reviewer panel an instrument: freeze, bake,
+lock, qualify, smoke, and bind the response in advance. The v1 round executed
+that order faithfully and still froze a broken instrument, because one step was
+missing from it.
+
+The v1 rubric has six numbered rules applied in order. Rule 3 selects a
+commitment ("the last complete `Final answer:` surface"); rule 4 classifies a
+conflict only "with no rule selecting one". The v1 fixture `smoke_unresolved`
+has two literal surfaces plus trailing prose declaring both co-equal, and its
+registered expectation follows the prose. Executing the rubric's own ordering
+against that fixture yields `incorrect`, not the registered `unresolved`. The
+contradiction was present in the committed bytes, hashed, verified inside the
+image, and never once executed by a human or a test.
+
+Every v1 check passed because each checked a different thing: the addendum
+hashed correctly, the rubric hashed correctly, the fixtures were well-formed and
+covered every label, and the image verified all of it. None of them asked
+whether a reader applying the rules in order would produce the expected label.
+
+The method added for v2:
+
+1. **Write the ordering consequences down as prose in the rubric**, including
+   the negative cases — a later rule may classify the answer an earlier rule
+   selected, but may not replace that selection; prose before or after the last
+   complete surface cannot retract it.
+2. **Make the rubric's ordering executable as a test.** Pin the rubric SHA-256,
+   then assert the consequences case by case: last complete surface wins; later
+   prose cannot override it; incompatible alternatives *inside* the selected
+   surface are `unresolved`; co-equal commitments with no literal surface are
+   `unresolved`; explored-but-uncommitted alternatives are `no_answer`; empty
+   question or reference fields are `invalid`.
+3. **Include the adversarial pair in the bank.** The v2 bank carries
+   `v2_correct_last_surface_wins` and `v2_incorrect_last_surface_wins`: the same
+   structural trap as the v1 fixture, but with expectations that follow the
+   rubric's ordering rather than the trailing prose, and with the two possible
+   outcomes pointing in opposite directions so a reviewer cannot satisfy both by
+   guessing one label.
+4. **Run these tests before any provider call**, in Azure, and commit them with
+   the frozen bytes.
+
+The general rule: a specification with ordered rules is a program, and freezing a
+program you have never executed is freezing whatever bug it contains. Hashing
+proves the bytes did not change; only execution proves they say what you meant.

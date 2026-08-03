@@ -1169,3 +1169,52 @@ receipt bodies, because those bodies no longer exist.
 Re-running either stage to export the file was refused: the smoke stage's
 output has already been seen, and a second execution at the same gate is
 exactly the retry the stop rule forbids.
+
+**2026-08-03 — correction pointer appended to L-50, original text preserved
+above.** L-50's second and third paragraphs assert that the primary reviewer
+"collapses 'never committed' into 'wrong'" and "reproduces the defect the phase
+exists to repair". That inference is withdrawn. The fixture contains two
+explicit `Final answer:` surfaces and the frozen rubric's rule 3 selects the
+last one, so `incorrect` follows from strict execution of the rubric as
+written; the expected label `unresolved` follows prose placed after that
+surface. L-50's operative consequences are unchanged and still live: no Phase
+1.0D semantic labels exist, the v1 gate cannot be repaired within its own round,
+and one synthetic fixture establishes nothing general about any reviewer. See
+`L-52` and
+`docs/decisions/phase1_0d_semantic_review_v1_specification_correction.md`.
+
+## L-52 - The v2 reviewer instrument was written after seeing the v1 responses
+
+The v1 gate failed because a frozen rubric and a frozen fixture contradicted
+each other, not because a reviewer was shown to be wrong (see D26 and the
+specification-correction record). The v2 rubric and its 20-fixture bank are the
+repair, and they were authored with the v1 responses already known.
+
+That is a real loss of independence and it is bounded as follows.
+
+- **Lost:** instrument-calibration independence. The v2 rubric's selection rule
+  is explicit about the last complete literal surface, and about prose after it
+  being unable to retract the selection, precisely because the v1 round showed
+  the primary reviewer reading it that way and the other two reviewers reading
+  it the other way. A conformance pass on fixtures authored in that state of
+  knowledge is weaker evidence than a pass on fixtures authored blind, and the
+  20 v2 fixtures include two `*_last_surface_wins` cases whose expectations were
+  chosen after observing exactly that disagreement.
+- **Retained:** target-data independence. Zero Phase 1.0D generations, zero
+  target rows, zero labels, zero metrics existed when the v2 instrument was
+  frozen, and the frozen target protocol, its 300 task IDs, its three arms and
+  its locked generation image were not touched. The v2 instrument is therefore
+  still prospective with respect to the experiment it will judge.
+- **Not repaired by v2:** the v1 six-fixture bank remains retired historical
+  development evidence. It is not re-run, not re-scored, and not counted in any
+  v2 denominator.
+- **Ceiling:** this is the last authorised reviewer-instrument round for Phase
+  1.0D. There is no RV3. If any one of the 60 v2 judgments mismatches, the Phase
+  1.0D execution route closes permanently before generation as
+  `CLOSED_PHASE_1_0D_WITHOUT_GENERATION_REVIEW_INSTRUMENT_UNQUALIFIED`, which is
+  an instrument result and is evidence neither for nor against headroom.
+
+Wherever a v2 conformance result is summarised, both facts must be stated: it is
+disclosed conformance testing on synthetic examples authored after a
+specification failure, and reviewer agreement is operational consistency, not
+accuracy.

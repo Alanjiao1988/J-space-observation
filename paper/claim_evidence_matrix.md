@@ -155,6 +155,24 @@ state, and `L-50` and `L-51` record the consequences. CL-05 is unchanged and
 remains `preliminary` on Phase 1.0C alone; a failed instrument check is not
 evidence for or against headroom.
 
+**2026-08-03 — the v1 mismatch was an instrument defect, and a v2 instrument is
+authorized.** A forensic audit of the frozen v1 bytes (`EV-0013`, `D26`) shows
+the rubric and the fixture contradicted each other: the rubric's rule 3 selects
+the last complete literal `Final answer:` surface, rule 4 applies only "with no
+rule selecting one", and the fixture registers `unresolved` on the strength of
+prose placed *after* that surface. The observed `incorrect` is what strict
+in-order execution of the rubric produces. The correction to this claim's
+reading is narrow but real: the v1 round does **not** show that the registered
+primary reviewer confuses an absent answer with a wrong one, so the earlier
+statement that it "reproduces the defect the phase exists to repair" is
+withdrawn. What remains true is that Phase 1.0D still has zero labels, zero cell
+metrics and zero candidate cells, and that CL-05 therefore still rests on Phase
+1.0C alone. A single re-frozen v2 instrument is authorized under
+`docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md`; its
+conformance bank was authored after seeing the v1 responses, which `L-52`
+records as a disclosed loss of instrument-calibration independence. Target-data
+independence is intact — no target output exists.
+
 ---
 
 ## CL-06 — Parser-v3 correction of parser-v2 failure modes

@@ -2496,3 +2496,51 @@ neither has produced a row of target output. The blocker has moved from "no
 registered provider exists" to "a registered provider exists and does not
 reproduce a registered label", which is a more informative place to be stopped
 and is not progress towards a result.
+
+**2026-08-03 — correction pointer appended to D25, original text preserved
+above.** D25's procedural conclusion stands: the frozen mismatch rule fired and
+was obeyed, and the round ended without a generation run. Its *causal* reading
+does not. D25 says the primary reviewer "collapses the second into the first",
+i.e. treats a non-commitment as a wrong answer. The frozen fixture contains two
+explicit `Final answer:` surfaces, and the frozen rubric's rule 3 selects the
+last one, so `incorrect` is what strict rule-3 execution yields. The fixture and
+the ordered rubric conflicted with each other before any provider was called.
+See `docs/decisions/phase1_0d_semantic_review_v1_specification_correction.md`
+and `L-52`. D25 is not edited, rerun or reinterpreted as a pass.
+
+## D26 — Auditing the instrument instead of the reviewer
+
+2026-08-03. Phase 1.0D semantic-review v1 forensic specification audit.
+
+When a prospective gate fires, there are two candidate defendants: the provider
+and the specification. D25 charged the provider. Re-reading the frozen bytes
+shows the specification was self-contradictory, so the provider's answer was
+compatible with executing it correctly.
+
+- **The rubric's own ordering decides the case.** Rule 3 selects the last
+  complete `Final answer:` surface as *the* final commitment. Rule 4 only
+  applies "with no rule selecting one". On `smoke_unresolved`, rule 3 selects
+  `5`; against the registered `4`, rule 6 yields `incorrect`. The registered
+  expectation `unresolved` instead follows prose that appears *after* the last
+  surface — a reading rule 3 never authorises.
+- **This changes the diagnosis, not the verdict.** The v1 stop was procedurally
+  correct and stays terminal. What changes is what we are allowed to say caused
+  it: not "the reviewer cannot tell an absent answer from a wrong one", but "the
+  instrument told the reviewer two different things and we noticed only after
+  it answered".
+- **The two-versus-one split is not a vote we get to count.** Secondary and
+  third read the trailing prose as controlling. That is a defensible reading of
+  a contradictory spec, not evidence they are more accurate. Treating 2:1 as
+  ground truth would have converted a specification bug into a fabricated
+  reliability finding about the primary.
+- **The audit is recorded as an audit, not a result.** It is an
+  internal-consistency finding about six synthetic strings. It licenses nothing
+  scientific, and it explicitly does not license rerunning the v1 gate.
+- **The correction is appended, never substituted.** D25, L-50, EV-0012, the
+  gate artifact and the commit history keep their original bytes. A ledger that
+  silently rewrites its own past cannot be used to check anything.
+
+The operational lesson is narrow and expensive: a frozen rubric with ordered
+rules and a frozen fixture bank are one artifact, and freezing them without a
+test that *executes the ordering against every fixture* freezes a bug. The v2
+instrument carries exactly that test, written before any v2 provider call.
