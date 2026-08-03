@@ -619,7 +619,7 @@ def test_the_runner_carries_no_storage_secret_or_volume():
 
 def test_only_review_receives_a_generation_prefix():
     text = RUN_SCRIPT.read_text(encoding="utf-8")
-    case = text.split('case "$REVIEW_MODE" in', 1)[1].split("esac", 1)[0]
+    case = text.rsplit('case "$REVIEW_MODE" in', 1)[1].split("esac", 1)[0]
     qualify = case.split("qualify)", 1)[1].split(";;", 1)[0]
     smoke = case.split("smoke)", 1)[1].split(";;", 1)[0]
     review = case.split("review)", 1)[1].split(";;", 1)[0]
