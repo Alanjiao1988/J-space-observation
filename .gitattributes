@@ -150,3 +150,7 @@ infra/azure/scripts/18_build_phase1_0d_confirmation.sh text eol=lf
 infra/azure/scripts/19_run_phase1_0d_confirmation.sh text eol=lf
 
 docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md text eol=lf
+scripts/phase1_0d_protected_bytes.py text eol=lf
+docs/phase1_0d_protected_bytes.json text eol=lf
+tests/test_phase1_0d_protected_bytes.py text eol=lf
+src/jspace_observation/semantic_review/*.py text eol=lf
