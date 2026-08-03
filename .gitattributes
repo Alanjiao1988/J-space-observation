@@ -176,3 +176,6 @@ docs/phase1_0d_semantic_review_rubric_v2.md text eol=lf
 docs/phase1_0d_semantic_review_addendum_v2.json text eol=lf
 src/jspace_observation/semantic_review_v2/*.py text eol=lf
 tests/test_phase1_0d_semantic_review_v2_instrument.py text eol=lf
+scripts/phase1_0d_rv2_protected_bytes.py text eol=lf
+docs/phase1_0d_rv2_protected_bytes.json text eol=lf
+tests/test_phase1_0d_rv2_protected_bytes.py text eol=lf

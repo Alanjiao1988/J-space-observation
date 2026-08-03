@@ -1,0 +1,218 @@
+{
+  "authority_prompt": "docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md",
+  "claim_boundary": "byte-identity of the declared protected paths only; establishes nothing about their scientific correctness, nothing about paths outside the declared patterns, nothing about reviewer accuracy, and nothing about model behaviour or a 'J-space'",
+  "code_commit": "dd758bf6e30946db0446f1829ca6c511c98ad3e6",
+  "file_count": 35,
+  "files": [
+    {
+      "bytes": 5628,
+      "path": "Dockerfile.phase1-0d",
+      "sha256": "3bf60a9b8dc00e0601fe8358c18f48f8ae0695d338f42a99c82f5b410b378d3b"
+    },
+    {
+      "bytes": 6690,
+      "path": "Dockerfile.phase1-0d-review",
+      "sha256": "ed7bbd7f2c1fc3ab481ced61464a198e660758317f7180ff9f1bd3bc1952b3a0"
+    },
+    {
+      "bytes": 5925,
+      "path": "artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/00_gate_receipt.json",
+      "sha256": "74d738bf00477f391097ee6622379259ffb808283ebe081d33934a79fd252352"
+    },
+    {
+      "bytes": 1004,
+      "path": "artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/01_qualification_console_transcript.txt",
+      "sha256": "63712794c842de29e1ac23e7d98f6b771da1f83eadac4e2e3bbc1c80346ce003"
+    },
+    {
+      "bytes": 3053,
+      "path": "artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/02_smoke_console_transcript.txt",
+      "sha256": "7e18386b8eb98b2a210f8d3567df5ff75dae570ba5acba43d167fe8982193cd5"
+    },
+    {
+      "bytes": 665,
+      "path": "artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/artifact_manifest.json",
+      "sha256": "d70c0c9925fdd9d764f17068d1c712e2c1ff1fdde4f75ed266b4b08018b0083f"
+    },
+    {
+      "bytes": 3138564,
+      "path": "data/phase1_task_headroom_candidates.jsonl",
+      "sha256": "acf59ec44b7afb73c03392d2c9b7223eff7311e29e2261ff0d65b38a3a416407"
+    },
+    {
+      "bytes": 5849,
+      "path": "docs/decisions/phase1_0d_semantic_review_v1_specification_correction.md",
+      "sha256": "c8a10562dc58871e2229c68f3f0942dc471a7c2bc31ea193d3df97ecf2372820"
+    },
+    {
+      "bytes": 33243,
+      "path": "docs/phase1_0d_protected_bytes.json",
+      "sha256": "dcd41ea706c66743fb3923cc3f993c9135f0b2ab9dd32977869d16473cf3dfbf"
+    },
+    {
+      "bytes": 22227,
+      "path": "docs/phase1_0d_protocol_snapshot.json",
+      "sha256": "1ebf03a7731ad9a523f50284ba68c711727304633963f89b613f4a8f37710c69"
+    },
+    {
+      "bytes": 13161,
+      "path": "docs/phase1_0d_semantic_review_addendum.json",
+      "sha256": "582640de645030daf957fbc3e5c7947008b78d1596b674687a73f20ba749bdc3"
+    },
+    {
+      "bytes": 24921,
+      "path": "docs/phase1_0d_semantic_review_addendum_v2.json",
+      "sha256": "20e5f30455f90a95c07e05e080e51443511c957e09d4ce97a42bd118bd9268e4"
+    },
+    {
+      "bytes": 2431,
+      "path": "docs/phase1_0d_semantic_review_rubric.md",
+      "sha256": "a0d5b22bd6d4ef1012db676ff3431c3d2e6825f1ec4ade1a7c7801817ba8765d"
+    },
+    {
+      "bytes": 3698,
+      "path": "docs/phase1_0d_semantic_review_rubric_v2.md",
+      "sha256": "91f687087fbd56cb07369da7a4c28beddb49d822f2d6fa1832cb3849a26f60e3"
+    },
+    {
+      "bytes": 34360,
+      "path": "docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md",
+      "sha256": "61f04923e4afaa3e6fd9f66d7b91a1316852de11b41dc6d3380ee827f5065d87"
+    },
+    {
+      "bytes": 36742,
+      "path": "docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md",
+      "sha256": "7b93c90a299ff4e77b83d4633624053f8ce53afcd04279ca3050c5ab14428e19"
+    },
+    {
+      "bytes": 25313,
+      "path": "docs/prompts/phase_science_restart_after_parser_closure_prompt.md",
+      "sha256": "5bc137c42c68e1b85b4cad1d45e1b4bf54fb68e2899f27bc6338dae61e9ef162"
+    },
+    {
+      "bytes": 4365,
+      "path": "infra/azure/scripts/18_build_phase1_0d_confirmation.sh",
+      "sha256": "f7712f19cfb0e4ac911b1ed3b32f7bbff7cf358f65459187b538602e1cda1111"
+    },
+    {
+      "bytes": 17135,
+      "path": "infra/azure/scripts/19_run_phase1_0d_confirmation.sh",
+      "sha256": "5b96d9918f108f2b260390310f47be6a8855bc28b0543ae5aea84bd2e66ac635"
+    },
+    {
+      "bytes": 4585,
+      "path": "infra/azure/scripts/20_build_phase1_0d_review.sh",
+      "sha256": "96436e36e97c85ad25af5caafaa3bce0d11194cefba74cb6c272af9bf51efe85"
+    },
+    {
+      "bytes": 16021,
+      "path": "infra/azure/scripts/21_run_phase1_0d_semantic_review.sh",
+      "sha256": "8bea27ac127807907864037fd00a0ad64a460b428b71f4658617628a4e005a97"
+    },
+    {
+      "bytes": 9390,
+      "path": "phase1_0d_build_provenance.json",
+      "sha256": "f388c514860612928fae7875a493d3bc6af977d15cd3cce180243d0d3cf29fb1"
+    },
+    {
+      "bytes": 4406,
+      "path": "phase1_0d_review_build_provenance.json",
+      "sha256": "2ba4ca9a67ed7a7ef9d11cc3269d256a26bb510a0f15400be1e2147e4ef5062a"
+    },
+    {
+      "bytes": 14745,
+      "path": "scripts/phase1_0d_build_provenance.py",
+      "sha256": "511dae3ceace9060087ccbfa9c50cf234101d7982c6f8dd63469d865cd0598c3"
+    },
+    {
+      "bytes": 9174,
+      "path": "scripts/phase1_0d_protected_bytes.py",
+      "sha256": "b9cb5e579256bf28c9ab48dd39fee875bd4b81ad815768fec15c02606b953e3b"
+    },
+    {
+      "bytes": 10418,
+      "path": "scripts/phase1_0d_review_build_provenance.py",
+      "sha256": "c00c177e3cc4f8a00289dfbc90152da39c90c003f94a0f8f2e52f1ec8930f982"
+    },
+    {
+      "bytes": 542,
+      "path": "scripts/run_phase1_0d_confirmation.py",
+      "sha256": "7322e2ea30f8ae9534dacb2aa0b065f832c5715613391f37bcebcbc083653719"
+    },
+    {
+      "bytes": 21241,
+      "path": "scripts/run_phase1_0d_semantic_review.py",
+      "sha256": "ba241a3a10dafdd25a614d85843efb1f7ecb6d49c9d5a6ff83bed64eba3a40a7"
+    },
+    {
+      "bytes": 38792,
+      "path": "src/jspace_observation/phase1_0d_confirmation.py",
+      "sha256": "0a310c0b6f6d4ea07af79bcbd266f5a78b5936aa93ea3b8258b2fe7f4f7e6998"
+    },
+    {
+      "bytes": 22850,
+      "path": "src/jspace_observation/phase1_0d_execution.py",
+      "sha256": "714e70a367a100163565da93d4c8e37135d8f22d8335ecd1047fc04cf83e3478"
+    },
+    {
+      "bytes": 23958,
+      "path": "src/jspace_observation/phase1_0d_generation.py",
+      "sha256": "ccef7e6d9de53abf1d416c282785eb6225e672af0127219732e7d64a908765c5"
+    },
+    {
+      "bytes": 946,
+      "path": "src/jspace_observation/semantic_review/__init__.py",
+      "sha256": "6ada91b448c0da1f9a07dc8fd5c859f2464bae7f187a619a9845fc781bde1b24"
+    },
+    {
+      "bytes": 14035,
+      "path": "src/jspace_observation/semantic_review/addendum.py",
+      "sha256": "0777f72eca5dd9260a65610f1302c6ca4a9f9150ff5a88cb599023dc99e5a8f5"
+    },
+    {
+      "bytes": 24430,
+      "path": "src/jspace_observation/semantic_review/stages.py",
+      "sha256": "15f8660de22de5799d1437678148176bcb977b6ed10937044949f89fdd079ba6"
+    },
+    {
+      "bytes": 12440,
+      "path": "src/jspace_observation/semantic_review/transport.py",
+      "sha256": "cd7f900b3f4209e9762bfc98e28763348fba90994874dc6d49ca0fd10452e8e5"
+    }
+  ],
+  "patterns": [
+    "docs/phase1_0d_protocol_snapshot.json",
+    "phase1_0d_build_provenance.json",
+    "scripts/phase1_0d_build_provenance.py",
+    "scripts/run_phase1_0d_confirmation.py",
+    "src/jspace_observation/phase1_0d_confirmation.py",
+    "src/jspace_observation/phase1_0d_execution.py",
+    "src/jspace_observation/phase1_0d_generation.py",
+    "Dockerfile.phase1-0d",
+    "data/phase1_task_headroom_candidates.jsonl",
+    "infra/azure/scripts/18_build_phase1_0d_confirmation.sh",
+    "infra/azure/scripts/19_run_phase1_0d_confirmation.sh",
+    "docs/prompts/phase_science_restart_after_parser_closure_prompt.md",
+    "docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md",
+    "docs/phase1_0d_semantic_review_addendum.json",
+    "docs/phase1_0d_semantic_review_rubric.md",
+    "docs/phase1_0d_protected_bytes.json",
+    "scripts/phase1_0d_protected_bytes.py",
+    "scripts/run_phase1_0d_semantic_review.py",
+    "scripts/phase1_0d_review_build_provenance.py",
+    "phase1_0d_review_build_provenance.json",
+    "Dockerfile.phase1-0d-review",
+    "src/jspace_observation/semantic_review/*.py",
+    "infra/azure/scripts/20_build_phase1_0d_review.sh",
+    "infra/azure/scripts/21_run_phase1_0d_semantic_review.sh",
+    "artifacts/phase1-0d-semantic-review-gate/**/*",
+    "docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md",
+    "docs/decisions/phase1_0d_semantic_review_v1_specification_correction.md",
+    "docs/phase1_0d_semantic_review_rubric_v2.md",
+    "docs/phase1_0d_semantic_review_addendum_v2.json"
+  ],
+  "rollup_sha256": "4209dcb5a21d75db7d862ff7c3f3f7273934c5f2586196a87bd72ddee6cbfa3b",
+  "schema_version": "phase1-0d-rv2-protected-bytes/v1",
+  "supersedes_nothing": "docs/phase1_0d_protected_bytes.json remains in force unchanged; this record is additive and covers a strictly larger set",
+  "terminal_state_on_mismatch": "BLOCKED_ON_FROZEN_PHASE_1_0D_DRIFT"
+}
