@@ -1,0 +1,94 @@
+{
+  "addendum_sha256": "582640de645030daf957fbc3e5c7947008b78d1596b674687a73f20ba749bdc3",
+  "artifact": "phase1_0d_review_build_provenance",
+  "authority_prompt": "docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md",
+  "authority_prompt_sha256": "61f04923e4afaa3e6fd9f66d7b91a1316852de11b41dc6d3380ee827f5065d87",
+  "base_image": "pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime",
+  "base_image_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
+  "base_protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
+  "bundle_hash_domain": "jspace-phase1-0d-review/build-bundle/v1",
+  "bundle_sha256": "d1fbd985f959648ec178480ce26caf696152520f26f96bc8b4458cb6881f3b49",
+  "claim_boundary": "build provenance only; establishes which bytes are in the review image and nothing about reviewer accuracy, model behaviour, hidden reasoning, or a 'J-space'",
+  "code_commit": "1baa68346d2bd12aa5e367fa29003ad75b518e36",
+  "dockerfile": "Dockerfile.phase1-0d-review",
+  "file_count": 12,
+  "files": [
+    {
+      "bytes": 6690,
+      "path": "Dockerfile.phase1-0d-review",
+      "sha256": "ed7bbd7f2c1fc3ab481ced61464a198e660758317f7180ff9f1bd3bc1952b3a0"
+    },
+    {
+      "bytes": 33243,
+      "path": "docs/phase1_0d_protected_bytes.json",
+      "sha256": "dcd41ea706c66743fb3923cc3f993c9135f0b2ab9dd32977869d16473cf3dfbf"
+    },
+    {
+      "bytes": 13161,
+      "path": "docs/phase1_0d_semantic_review_addendum.json",
+      "sha256": "582640de645030daf957fbc3e5c7947008b78d1596b674687a73f20ba749bdc3"
+    },
+    {
+      "bytes": 2431,
+      "path": "docs/phase1_0d_semantic_review_rubric.md",
+      "sha256": "a0d5b22bd6d4ef1012db676ff3431c3d2e6825f1ec4ade1a7c7801817ba8765d"
+    },
+    {
+      "bytes": 34360,
+      "path": "docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md",
+      "sha256": "61f04923e4afaa3e6fd9f66d7b91a1316852de11b41dc6d3380ee827f5065d87"
+    },
+    {
+      "bytes": 9174,
+      "path": "scripts/phase1_0d_protected_bytes.py",
+      "sha256": "b9cb5e579256bf28c9ab48dd39fee875bd4b81ad815768fec15c02606b953e3b"
+    },
+    {
+      "bytes": 10418,
+      "path": "scripts/phase1_0d_review_build_provenance.py",
+      "sha256": "c00c177e3cc4f8a00289dfbc90152da39c90c003f94a0f8f2e52f1ec8930f982"
+    },
+    {
+      "bytes": 21241,
+      "path": "scripts/run_phase1_0d_semantic_review.py",
+      "sha256": "ba241a3a10dafdd25a614d85843efb1f7ecb6d49c9d5a6ff83bed64eba3a40a7"
+    },
+    {
+      "bytes": 946,
+      "path": "src/jspace_observation/semantic_review/__init__.py",
+      "sha256": "6ada91b448c0da1f9a07dc8fd5c859f2464bae7f187a619a9845fc781bde1b24"
+    },
+    {
+      "bytes": 14035,
+      "path": "src/jspace_observation/semantic_review/addendum.py",
+      "sha256": "0777f72eca5dd9260a65610f1302c6ca4a9f9150ff5a88cb599023dc99e5a8f5"
+    },
+    {
+      "bytes": 24430,
+      "path": "src/jspace_observation/semantic_review/stages.py",
+      "sha256": "15f8660de22de5799d1437678148176bcb977b6ed10937044949f89fdd079ba6"
+    },
+    {
+      "bytes": 12440,
+      "path": "src/jspace_observation/semantic_review/transport.py",
+      "sha256": "cd7f900b3f4209e9762bfc98e28763348fba90994874dc6d49ca0fd10452e8e5"
+    }
+  ],
+  "generation_image_digest": "sha256:1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332c37481166aa4",
+  "phase": "1.0D",
+  "request_profile_sha256": {
+    "primary": "5b2352bf8428e0c278397b24efa2469cbb94692be64f8e0b50e878c3c85c97af",
+    "secondary": "e2ed8e7dfddd1a0121a4a3ca6897f883500f9ab348afdc3b92130d30f7a5f98a",
+    "third": "d95a1b74db00c55aa81f9381264d653c413fe707ae2aa25f35b839b10578256c"
+  },
+  "requirements": "requirements-calibration.txt",
+  "requirements_note": "the review job is standard-library only; the pinned calibration requirements are installed and verified by the frozen generation provenance tool so the review image's environment is the same already-pinned environment rather than a second unpinned one",
+  "reviewer_ids": {
+    "primary": "primary:azure_openai:gpt-5-6-sol-global:gpt-5.6-sol:2026-07-09",
+    "secondary": "secondary:microsoft_foundry:mistral-large-3-global:Mistral-Large-3:1",
+    "third": "third:microsoft_foundry:deepseek-v4-pro-global:DeepSeek-V4-Pro:2026-04-23"
+  },
+  "rubric_sha256": "a0d5b22bd6d4ef1012db676ff3431c3d2e6825f1ec4ade1a7c7801817ba8765d",
+  "schema": "phase1-0d-review-build-provenance/v1",
+  "track": "b"
+}
