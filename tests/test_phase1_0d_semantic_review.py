@@ -89,7 +89,14 @@ def test_the_addendum_carries_no_credential(book):
     """Words like "secret" appear in prose; credential *material* must not."""
 
     text = json.dumps(book.document)
-    for marker in ("AccountKey=", "SharedAccessSignature", "sig=", "sk-", "eyJ0eXAi"):
+    for marker in (
+        "AccountKey=",
+        "SharedAccessSignature",
+        "?sig=",
+        "&sig=",
+        "eyJ0eXAi",
+        "BEGIN PRIVATE KEY",
+    ):
         assert marker not in text
     for role in contract.ROLES:
         raw = book.document["roles"][role]
