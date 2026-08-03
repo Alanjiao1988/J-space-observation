@@ -352,7 +352,7 @@ def test_smoke_uses_at_most_eight_workers_per_deployment(book):
 
 
 def test_smoke_worst_case_fits_the_launcher_deadline(book):
-    assert runner.smoke_worst_case_seconds(book) == 4689
+    assert runner.smoke_worst_case_seconds(book) == 5409
     assert (
         runner.smoke_worst_case_seconds(book)
         + runner.GATE_PERSISTENCE_MARGIN_SECONDS
@@ -360,6 +360,13 @@ def test_smoke_worst_case_fits_the_launcher_deadline(book):
     )
     text = RUN_SCRIPT.read_text(encoding="utf-8")
     assert "--execution-timeout-seconds $REVIEW_TIMEOUT_SECONDS" in text
+
+
+def test_smoke_token_acquisition_has_no_global_serial_lock():
+    source = Path(runner.__file__).read_text(encoding="utf-8")
+    assert "SerializedTokenProvider" not in source
+    assert "threading.Lock" not in source
+    assert "tokens = transport.TokenProvider(args.client_id or None)" in source
 
 
 def test_a_non_object_envelope_is_recorded_and_the_batch_continues(book):
@@ -700,6 +707,8 @@ def test_the_build_chains_every_required_verification(dockerfile):
         "verify-no-target-output",
     ):
         assert command in dockerfile
+    assert "COPY .dockerignore" in dockerfile
+    assert dockerfile.count("/workspace/.dockerignore") == 2
 
 
 def test_the_build_verifies_but_never_rewrites_the_v1_review_surface(dockerfile):

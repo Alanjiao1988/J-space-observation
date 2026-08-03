@@ -47,7 +47,6 @@ import json
 import math
 import re
 import sys
-import threading
 import time
 from pathlib import Path
 from typing import Any, Mapping
@@ -81,23 +80,12 @@ SHA1 = re.compile(r"[0-9a-f]{40}\Z")
 SHA256_DIGEST = re.compile(r"sha256:[0-9a-f]{64}\Z")
 MAX_REGISTERED_RETRIES = 7
 PROVIDER_ATTEMPT_TIMEOUT_SECONDS = 180
+TOKEN_ACQUISITION_TIMEOUT_SECONDS = 30
 GATE_PERSISTENCE_MARGIN_SECONDS = 300
 
 
 class GateEvidenceError(RuntimeError):
     """Raised when gate evidence exists but cannot be persisted."""
-
-
-class SerializedTokenProvider:
-    """Make the v1 token cache safe for the registered concurrent smoke."""
-
-    def __init__(self, provider: transport.TokenProvider) -> None:
-        self._provider = provider
-        self._lock = threading.Lock()
-
-    def token(self, resource: str) -> str:
-        with self._lock:
-            return self._provider.token(resource)
 
 
 def _validate_gate_prefix(prefix: str, expected_root: str) -> str:
@@ -286,7 +274,7 @@ def _qualify(book: contract.Addendum, caller: LiveCaller) -> dict[str, Any]:
                 if "exhausted" in str(error)
                 else 0
             )
-            record["terminal_transport_status"] = f"transport_exhausted: {error}"
+            record["terminal_transport_status"] = "transport_exhausted"
         except contract.MalformedResponseError as error:
             record["latency_seconds"] = round(time.monotonic() - started, 3)
             record["retry_count"] = 0
@@ -476,7 +464,7 @@ def _smoke_pair(
         record["retry_count"] = (
             int(book.retry["max_attempts"]) - 1 if "exhausted" in str(error) else 0
         )
-        record["terminal_transport_status"] = f"transport_exhausted: {error}"
+        record["terminal_transport_status"] = "transport_exhausted"
         return record
     except contract.MalformedResponseError as error:
         record["latency_seconds"] = round(time.monotonic() - started, 3)
@@ -562,8 +550,16 @@ def smoke_worst_case_seconds(book: contract.Addendum) -> int:
     )
     workers = int(book.document["concurrency"]["max_in_flight_per_deployment"])
     waves = math.ceil(addendum_v2.FIXTURE_COUNT / workers)
+    # Token acquisition is deliberately not serialized across the concurrent
+    # calls.  Conservatively charge its 30-second endpoint timeout to every
+    # registered provider attempt.
     return math.ceil(
-        waves * (attempts * PROVIDER_ATTEMPT_TIMEOUT_SECONDS + backoff)
+        waves
+        * (
+            attempts
+            * (PROVIDER_ATTEMPT_TIMEOUT_SECONDS + TOKEN_ACQUISITION_TIMEOUT_SECONDS)
+            + backoff
+        )
     )
 
 
@@ -1050,9 +1046,7 @@ def main(argv: list[str] | None = None) -> int:
             "any provider call"
         )
 
-    tokens = SerializedTokenProvider(
-        transport.TokenProvider(args.client_id or None)
-    )
+    tokens = transport.TokenProvider(args.client_id or None)
 
     publisher: GatePublisher | None = None
     if args.gate_blob_prefix:

@@ -48,7 +48,8 @@ RUN groupadd --system --gid 10001 jspace \
 
 WORKDIR /workspace
 
-COPY requirements-calibration.txt \
+COPY .dockerignore \
+     requirements-calibration.txt \
      Dockerfile.phase1-0d \
      Dockerfile.phase1-0d-review \
      Dockerfile.phase1-0d-review-v2 \
@@ -130,6 +131,7 @@ RUN python -I /workspace/scripts/phase1_0d_build_provenance.py \
         /workspace/data \
         /workspace/docs \
         /workspace/artifacts \
+        /workspace/.dockerignore \
         /workspace/requirements-calibration.txt \
         /workspace/Dockerfile.phase1-0d \
         /workspace/Dockerfile.phase1-0d-review \
@@ -142,6 +144,7 @@ RUN python -I /workspace/scripts/phase1_0d_build_provenance.py \
         /workspace/data \
         /workspace/docs \
         /workspace/artifacts \
+        /workspace/.dockerignore \
         /workspace/requirements-calibration.txt \
         /workspace/Dockerfile.phase1-0d \
         /workspace/Dockerfile.phase1-0d-review \
