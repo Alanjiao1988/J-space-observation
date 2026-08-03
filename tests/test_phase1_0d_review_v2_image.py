@@ -782,6 +782,18 @@ def test_the_runner_enforces_the_one_round_smoke_ceiling():
     assert "Atomic service-side one-round lock" in text
 
 
+def test_the_runner_enforces_one_formal_review_execution():
+    text = RUN_SCRIPT.read_text(encoding="utf-8")
+    assert '[[ "$REVIEW_MODE" == "review" && "$JOB_EXISTS" != "0" ]]' in text
+    assert (
+        'REVIEW_LOCK_BLOB="phase1-0d-semantic-review-v2/formal-review-lock.json"'
+        in text
+    )
+    assert '"artifact":"phase1_0d_rv2_formal_review_lock"' in text
+    assert '"generation_run_id":"%s","review_run_id":"%s"' in text
+    assert "Target review has no rerun path after any failure" in text
+
+
 def test_the_runner_uses_a_locked_digest_and_no_platform_retry():
     text = RUN_SCRIPT.read_text(encoding="utf-8")
     assert (

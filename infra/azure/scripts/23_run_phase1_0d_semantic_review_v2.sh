@@ -11,7 +11,8 @@
 # qualify writes a create-only 3-call receipt.  smoke reads only that receipt,
 # makes exactly the 60 registered calls, writes its complete receipt even on a
 # mismatch, and may be executed at most once.  review reads the persisted 60/60
-# receipt before it receives a generation-pack prefix.
+# receipt before it receives a generation-pack prefix and is likewise guarded
+# by a permanent create-only one-execution lock.
 #
 # Execution posture:
 #   * image referenced by digest only, never by tag
@@ -34,6 +35,7 @@ REVIEW_PREFIX="phase1-headroom-confirmation-review-v2"
 QUALIFICATION_PREFIX="phase1-0d-semantic-review-v2/qualification"
 SMOKE_PREFIX="phase1-0d-semantic-review-v2/smoke"
 SMOKE_LOCK_BLOB="phase1-0d-semantic-review-v2/smoke-round-lock.json"
+REVIEW_LOCK_BLOB="phase1-0d-semantic-review-v2/formal-review-lock.json"
 IMAGE_REPOSITORY="j-space-observation-phase1-0d-review-v2"
 ACR_NAME="${ACR_NAME:?Set ACR_NAME to the existing private registry name}"
 REVIEW_MODE="${REVIEW_MODE:?Set REVIEW_MODE to qualify, smoke or review}"
@@ -235,6 +237,10 @@ if [[ "$REVIEW_MODE" == "smoke" && "$JOB_EXISTS" != "0" ]]; then
     echo "[FAIL] The v2 smoke one-round ceiling is already spent; no RV3 is authorised"
     exit 1
 fi
+if [[ "$REVIEW_MODE" == "review" && "$JOB_EXISTS" != "0" ]]; then
+    echo "[FAIL] The sole formal v2 review execution is already spent; rerun is forbidden"
+    exit 1
+fi
 if [[ "$REVIEW_MODE" == "smoke" ]]; then
     # Atomic service-side one-round lock.  Two concurrent launchers may both
     # observe no ACA job, but only one create-only Blob upload can succeed.  The
@@ -249,6 +255,23 @@ if [[ "$REVIEW_MODE" == "smoke" ]]; then
         --container-name "$BLOB_CONTAINER" \
         --name "$SMOKE_LOCK_BLOB" \
         --file "$SMOKE_LOCK_FILE" \
+        --overwrite false \
+        --only-show-errors \
+        --output none
+fi
+if [[ "$REVIEW_MODE" == "review" ]]; then
+    # Target review has no rerun path after any failure.  Claim this lock before
+    # provisioning so concurrent launchers cannot both pass the ACA job check.
+    REVIEW_LOCK_FILE="$RECORD_DIR/formal_review_lock.json"
+    printf '{"artifact":"phase1_0d_rv2_formal_review_lock","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","smoke_run_id":"%s","generation_run_id":"%s","review_run_id":"%s"}\n' \
+        "$PROJECT_SHA" "$IMAGE_DIGEST" "$QUALIFICATION_RUN_ID" "$SMOKE_RUN_ID" \
+        "$GENERATION_RUN_ID" "$RUN_ID" >"$REVIEW_LOCK_FILE"
+    az storage blob upload \
+        --auth-mode login \
+        --account-name "$BLOB_ACCOUNT" \
+        --container-name "$BLOB_CONTAINER" \
+        --name "$REVIEW_LOCK_BLOB" \
+        --file "$REVIEW_LOCK_FILE" \
         --overwrite false \
         --only-show-errors \
         --output none
