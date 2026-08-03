@@ -960,6 +960,10 @@ def test_the_runner_enforces_the_one_round_smoke_ceiling():
     assert 'JOB_NONCE="$(python -c' in text
     assert 'secrets.token_hex(8)' in text
     assert 'JOB_NAME="job-p10d-rv2-${JOB_MODE}-${JOB_NONCE}"' in text
+    assert (
+        'RECORD_DIR="${RECORD_ROOT%/}/phase1-0d-review-v2-'
+        '${REVIEW_MODE}-${RUN_ID}-${JOB_NONCE}"'
+    ) in text
     assert '[[ "$JOB_EXISTS" != "0" ]]' in text
     assert "duplicate execution is forbidden" in text
     assert 'SMOKE_LOCK_BLOB="phase1-0d-semantic-review-v2/smoke-round-lock.json"' in text
