@@ -20,6 +20,7 @@ start before both have passed.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import time
@@ -41,9 +42,69 @@ def _write(path: Path, payload: str) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
     data = payload.encode("utf-8")
     path.write_bytes(data)
-    import hashlib
-
     return hashlib.sha256(data).hexdigest()
+
+
+def download_pack(client: Any, prefix: str, destination: Path) -> dict[str, Any]:
+    """Copy one generation pack out of Blob, refusing to merge two runs.
+
+    The pack is read, never written back. Downloading into a directory that
+    already holds files would let a second source contribute bytes to something
+    that is about to be verified as a single run, so a non-empty destination is
+    refused outright.
+    """
+
+    if destination.exists() and any(destination.iterdir()):
+        raise stages.StageError(f"{destination} is not empty; refusing to merge packs")
+    names = [name for name in client.list_prefix(prefix) if not name.endswith("/")]
+    if not names:
+        raise stages.StageError(f"no generation pack under {prefix}")
+    destination.mkdir(parents=True, exist_ok=True)
+    written: list[dict[str, Any]] = []
+    for name in sorted(names):
+        relative = name[len(prefix) :].lstrip("/")
+        target = destination / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        payload = client.get(name)
+        target.write_bytes(payload)
+        written.append(
+            {
+                "name": relative,
+                "sha256": hashlib.sha256(payload.replace(b"\r\n", b"\n")).hexdigest(),
+                "bytes": len(payload),
+            }
+        )
+    return {
+        "source_prefix": prefix,
+        "file_count": len(written),
+        "files": written,
+        "destination": str(destination),
+    }
+
+
+def publish_bundle(client: Any, prefix: str, files: Mapping[str, bytes], run_id: str) -> dict[str, Any]:
+    """Upload every file, then the manifest that hashes them, create-only.
+
+    Manifest last is the whole point: a reader that finds the manifest knows the
+    bytes it names were already written, so a partial upload can never be
+    mistaken for a complete result.
+    """
+
+    manifest = stages.bundle_manifest(files, run_id)
+    uploaded: list[str] = []
+    for name in sorted(files):
+        client.put_create_only(f"{prefix}/{name}", files[name])
+        uploaded.append(name)
+    manifest_bytes = contract.canonical_json(manifest).encode("utf-8")
+    client.put_create_only(f"{prefix}/artifact_manifest.json", manifest_bytes)
+    return {
+        "prefix": prefix,
+        "uploaded": uploaded,
+        "uploaded_count": len(uploaded),
+        "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+        "manifest_written_last": True,
+        "manifest": manifest,
+    }
 
 
 class LiveCaller:
@@ -265,14 +326,61 @@ def _review(
     }
 
 
+def finalize_pack(
+    project_root: Path,
+    pack_dir: Path,
+    judgments_path: Path,
+    out_root: Path,
+    run_id: str,
+    code_commit: str,
+    image_digest: str,
+) -> dict[str, Any]:
+    """Stage 8: the frozen finalizer, called rather than reimplemented."""
+
+    from jspace_observation.phase1_0d_generation import (  # noqa: PLC0415
+        RunConfig,
+        run_phase1_0d,
+    )
+
+    summary = run_phase1_0d(
+        RunConfig(
+            mode="finalize",
+            output_root=out_root,
+            repo_root=project_root,
+            run_id=run_id,
+            code_commit=code_commit,
+            image_digest=image_digest,
+            hardware="Azure Container Apps Consumption workload profile, CPU only",
+            records_path=pack_dir / "02_records.jsonl",
+            judgments_path=judgments_path,
+        )
+    )
+    return summary
+
+
+def _read_tree(root: Path) -> dict[str, bytes]:
+    return {
+        path.relative_to(root).as_posix(): path.read_bytes()
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    }
+
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=("qualify", "smoke", "review"))
     parser.add_argument("--project-root", default=str(REPO_ROOT))
     parser.add_argument("--pack-dir", default="")
+    parser.add_argument("--pack-blob-prefix", default="")
+    parser.add_argument("--blob-account", default="")
+    parser.add_argument("--blob-container", default="")
+    parser.add_argument("--out-blob-prefix", default="")
     parser.add_argument("--out-dir", default="")
     parser.add_argument("--run-id", default="")
     parser.add_argument("--client-id", default="")
+    parser.add_argument("--code-commit", default="")
+    parser.add_argument("--image-digest", default="")
     args = parser.parse_args(argv)
 
     root = Path(args.project_root).resolve()
@@ -342,12 +450,92 @@ def main(argv: list[str] | None = None) -> int:
         print("SMOKE_COMPLETE=1")
         return 0
 
-    if not args.pack_dir:
-        raise SystemExit("review mode requires --pack-dir")
-    summary = _review(book, caller, Path(args.pack_dir).resolve(), out_dir, run_id)
+    blob = None
+    if args.blob_account and args.blob_container:
+        blob = transport.BlobClient(args.blob_account, args.blob_container, tokens)
+
+    pack_dir = Path(args.pack_dir).resolve() if args.pack_dir else out_dir / "generation"
+    download: dict[str, Any] | None = None
+    if args.pack_blob_prefix:
+        if blob is None:
+            raise SystemExit("a blob pack prefix needs --blob-account and --blob-container")
+        download = download_pack(blob, args.pack_blob_prefix.rstrip("/"), pack_dir)
+        print(f"PACK_FILES={download['file_count']}")
+    elif not args.pack_dir:
+        raise SystemExit("review mode requires --pack-dir or --pack-blob-prefix")
+
+    summary = _review(book, caller, pack_dir, out_dir, run_id)
     summary["provider_qualification"] = qualification
+    summary["pack_download"] = download
+
+    # Stage 8: the frozen finalizer decides; this wrapper only supplies bytes.
+    final_dir = out_dir / "final"
+    finalization = finalize_pack(
+        project_root=root,
+        pack_dir=pack_dir,
+        judgments_path=Path(summary["judgments_path"]),
+        out_root=final_dir,
+        run_id=run_id,
+        code_commit=args.code_commit or "not_recorded",
+        image_digest=args.image_digest or "not_recorded",
+    )
+    final_pack = Path(finalization["output_dir"])
+    summary["finalization"] = finalization
+    print(f"FINAL_RESULT={finalization['result']}")
+
+    # Stage 9: recompute; never choose.
+    finalized_records = stages.load_records(final_pack / "02_records.jsonl")
+    decision = json.loads((final_pack / "05_decision.json").read_text(encoding="utf-8"))
+    combined = json.loads(Path(summary["judgments_path"]).read_text(encoding="utf-8"))
+    check = stages.independent_check(
+        records=finalized_records,
+        decision=decision,
+        combined=combined,
+        required_secondary=summary["secondary_selection"]["required_ids"],
+        required_third=summary["third_selection"]["required_ids"],
+    )
+    summary["independent_check"] = check
+    print(f"INDEPENDENT_CHECK_DECISION_SHA256={check['decision_sha256']}")
+
+    summary["execution_receipt"] = stages.outer_receipt(
+        artifact="phase1_0d_semantic_review_execution_receipt",
+        run_id=run_id,
+        addendum_sha256=book.sha256,
+        rubric_sha256=book.rubric_sha256,
+        base_protocol_sha256=book.document["base_protocol_sha256"],
+        generation_pack_manifest_sha256=summary["verification"]["manifest_sha256"],
+        generation_records_sha256=summary["verification"]["records_sha256"],
+        all_judgments_sha256=summary["all_judgments_sha256"],
+        review_image_digest=args.image_digest or "not_recorded",
+        review_code_commit=args.code_commit or "not_recorded",
+        reviewer_authority="registered under DR-01; LLM operational consensus, not human ground truth",
+    )
     path = out_dir / "review_stage_summary.json"
     print(f"SUMMARY_SHA256={_write(path, contract.canonical_json(summary))}")
+    _write(
+        out_dir / "00_execution_receipt.json",
+        contract.canonical_json(summary["execution_receipt"]),
+    )
+
+    # Stage 10: outer bundle, manifest last, create-only.
+    if args.out_blob_prefix:
+        if blob is None:
+            raise SystemExit("an output prefix needs --blob-account and --blob-container")
+        files: dict[str, bytes] = {}
+        files.update(
+            {f"generation/{name}": payload for name, payload in _read_tree(pack_dir).items()}
+        )
+        files.update(
+            {f"final/{name}": payload for name, payload in _read_tree(final_pack).items()}
+        )
+        for name, payload in _read_tree(out_dir).items():
+            if name.startswith("generation/") or name.startswith("final/"):
+                continue
+            files[name] = payload
+        published = publish_bundle(blob, args.out_blob_prefix.rstrip("/"), files, run_id)
+        print(f"BUNDLE_FILES={published['uploaded_count']}")
+        print(f"BUNDLE_MANIFEST_SHA256={published['manifest_sha256']}")
+
     print(f"ALL_JUDGMENTS={summary['judgments_path']}")
     print(f"ALL_JUDGMENTS_SHA256={summary['all_judgments_sha256']}")
     print(f"SECONDARY_REQUIRED={summary['secondary_selection']['required_count']}")

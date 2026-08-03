@@ -18,6 +18,7 @@ import os
 import random
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping
@@ -251,6 +252,34 @@ def blob_request(
         )
 
 
+def blob_bytes(
+    method: str,
+    url: str,
+    token: str,
+    *,
+    timeout: float = 120.0,
+) -> tuple[int, bytes]:
+    """Read a blob as bytes.
+
+    ``blob_request`` decodes to text with ``errors="replace"``, which is right
+    for XML listings and fatal for a payload that is about to be hashed: a
+    replacement character would silently change the bytes.  Downloads therefore
+    go through this function instead.
+    """
+
+    headers = {
+        "Authorization": f"******",
+        "x-ms-version": STORAGE_API_VERSION,
+        "User-Agent": USER_AGENT,
+    }
+    request = urllib.request.Request(url, method=method, headers=headers)
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310
+            return response.status, response.read()
+    except urllib.error.HTTPError as error:
+        return error.code, error.read()
+
+
 class BlobClient:
     """The narrowest Blob surface this job needs, over Entra tokens only."""
 
@@ -265,23 +294,39 @@ class BlobClient:
         return f"https://{self.account}.blob.core.windows.net/{self.container}/{name}"
 
     def list_prefix(self, prefix: str) -> list[str]:
-        url = (
-            f"https://{self.account}.blob.core.windows.net/{self.container}"
-            f"?restype=container&comp=list&prefix={prefix}"
-        )
-        result = blob_request("GET", url, self._tokens.token(self.RESOURCE))
-        if result.status != 200:
-            raise TransportError(f"listing {prefix} failed: {result.status}")
+        """List every blob under a prefix, following continuation markers.
+
+        A truncated listing would produce a pack that is short some files and
+        still internally consistent, so the marker loop is not optional.
+        """
+
         names: list[str] = []
-        for chunk in result.body.split("<Name>")[1:]:
-            names.append(chunk.split("</Name>")[0])
-        return names
+        marker = ""
+        for _ in range(1000):
+            url = (
+                f"https://{self.account}.blob.core.windows.net/{self.container}"
+                f"?restype=container&comp=list"
+                f"&prefix={urllib.parse.quote(prefix, safe='/')}"
+            )
+            if marker:
+                url = f"{url}&marker={urllib.parse.quote(marker, safe='')}"
+            result = blob_request("GET", url, self._tokens.token(self.RESOURCE))
+            if result.status != 200:
+                raise TransportError(f"listing {prefix} failed: {result.status}")
+            for chunk in result.body.split("<Name>")[1:]:
+                names.append(chunk.split("</Name>")[0])
+            marker = ""
+            if "<NextMarker>" in result.body:
+                marker = result.body.split("<NextMarker>")[1].split("</NextMarker>")[0]
+            if not marker:
+                return names
+        raise TransportError(f"listing {prefix} did not terminate")
 
     def get(self, name: str) -> bytes:
-        result = blob_request("GET", self._url(name), self._tokens.token(self.RESOURCE))
-        if result.status != 200:
-            raise TransportError(f"reading {name} failed: {result.status}")
-        return result.body.encode("utf-8")
+        status, payload = blob_bytes("GET", self._url(name), self._tokens.token(self.RESOURCE))
+        if status != 200:
+            raise TransportError(f"reading {name} failed: {status}")
+        return payload
 
     def put_create_only(self, name: str, payload: bytes) -> None:
         """Upload, refusing to overwrite anything that already exists."""

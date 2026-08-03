@@ -158,3 +158,10 @@ docs/phase1_0d_semantic_review_addendum.json text eol=lf
 docs/phase1_0d_semantic_review_rubric.md text eol=lf
 scripts/run_phase1_0d_semantic_review.py text eol=lf
 tests/test_phase1_0d_semantic_review.py text eol=lf
+
+Dockerfile.phase1-0d-review text eol=lf
+scripts/phase1_0d_review_build_provenance.py text eol=lf
+phase1_0d_review_build_provenance.json text eol=lf
+infra/azure/scripts/20_build_phase1_0d_review.sh text eol=lf
+infra/azure/scripts/21_run_phase1_0d_semantic_review.sh text eol=lf
+tests/test_phase1_0d_review_image.py text eol=lf

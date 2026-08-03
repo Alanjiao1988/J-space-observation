@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
-# Launch the Phase 1.0D Track B headroom-confirmation generation run
-# as a one-shot GPU Container Apps job.
+# Launch one stage of the Phase 1.0D semantic review as a CPU Container Apps job.
 #
-# What this run produces: unlabelled generations. Section 4.3 makes a semantic
-# label the only thing that may decide correctness, so the emitted pack reports
-# AWAITING_SEMANTIC_REVIEW and carries no headroom number. Finalizing the
-# decision is a separate step that needs the reviewer judgments.
+#   ACR_NAME=<registry> REVIEW_MODE=qualify ./21_run_phase1_0d_semantic_review.sh
+#   ACR_NAME=<registry> REVIEW_MODE=smoke   ./21_run_phase1_0d_semantic_review.sh
+#   ACR_NAME=<registry> REVIEW_MODE=review \
+#       GENERATION_RUN_ID=<utc> ./21_run_phase1_0d_semantic_review.sh
 #
-# Phase 1.0C run 20260725T170041Z is untouched by this: different job, different
-# image repository, different blob prefix, different artifact namespace.
+# qualify and smoke are synthetic: they touch no target output, count towards no
+# scientific total, and must both pass before review may start. review runs the
+# nine deterministic stages in the registered order, calls the frozen finalizer,
+# recomputes the result independently and uploads the outer bundle.
 #
-# Execution posture (mirrors 08_run_phase05_jlens.sh):
-#   * image referenced by digest only, never by tag, never a floating tag
-#   * user-assigned managed identity for both ACR pull and Blob write
-#   * no storage account key, no SAS, no connection string, no Azure Files
-#   * replicaRetryLimit 0 so the platform never silently re-runs generation
-#   * parallelism 1 / replicaCompletionCount 1
+# Execution posture (mirrors 19_run_phase1_0d_confirmation.sh):
+#   * image referenced by digest only, never by tag
+#   * user-assigned managed identity for ACR pull, Blob and every model call
+#   * no key, SAS, connection string or Azure Files mount
+#   * replicaRetryLimit 0, parallelism 1, replicaCompletionCount 1
 
 set -euo pipefail
 
@@ -23,29 +23,58 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../" && pwd)"
 RESOURCE_GROUP="${RESOURCE_GROUP:-rg-jspace-observation-sea}"
 CONTAINER_APP_ENV="cae-jspace-observation-sea-vnet2"
-WORKLOAD_PROFILE_NAME="gpu-t4"
-JOB_NAME="job-jspace-p10d-confirmation"
-IDENTITY_NAME="id-jspace-aca-acrpull-sea"
+WORKLOAD_PROFILE_NAME="Consumption"
+IDENTITY_NAME="id-jspace-p10d-review-sea"
 BLOB_ACCOUNT="stjspacefiles0709085305"
 BLOB_CONTAINER="jspace-results"
-BLOB_PREFIX="phase1-headroom-confirmation"
-IMAGE_REPOSITORY="j-space-observation-phase1-0d"
+GENERATION_PREFIX="phase1-headroom-confirmation"
+REVIEW_PREFIX="phase1-headroom-confirmation-review"
+IMAGE_REPOSITORY="j-space-observation-phase1-0d-review"
 ACR_NAME="${ACR_NAME:?Set ACR_NAME to the existing private registry name}"
+REVIEW_MODE="${REVIEW_MODE:?Set REVIEW_MODE to qualify, smoke or review}"
 PROJECT_SHA="${PROJECT_SHA:-$(git -C "$PROJECT_ROOT" rev-parse HEAD)}"
-RUN_ID="${JSPACE_CONFIRMATION_RUN_ID:-$(date -u +'%Y%m%dT%H%M%SZ')}"
+RUN_ID="${JSPACE_REVIEW_RUN_ID:-$(date -u +'%Y%m%dT%H%M%SZ')}"
+GENERATION_RUN_ID="${GENERATION_RUN_ID:-}"
 REPLICA_TIMEOUT="${REPLICA_TIMEOUT:-10800}"
-GENERATION_TIMEOUT_SECONDS="${GENERATION_TIMEOUT_SECONDS:-10500}"
+REVIEW_TIMEOUT_SECONDS="${REVIEW_TIMEOUT_SECONDS:-10500}"
+JOB_NAME="job-jspace-p10d-review-${REVIEW_MODE}"
 
-# Bind `python` to an authenticated absolute interpreter. On the Linux
-# orchestrator that is /usr/bin/python3, and the ownership/permission checks
-# are what make "authenticated" mean something there: a world-writable
-# interpreter on a shared host could be swapped between the check and the call.
-#
-# A control-plane workstation without the FHS path cannot offer that guarantee,
-# so it says so rather than pretending. The interpreter is still resolved to an
-# absolute path and is still only ever used to build a control-plane request
-# body and to count job executions; no scientific computation runs here, and
-# none may -- every generation, test and analysis runs in Azure.
+case "$REVIEW_MODE" in
+    qualify|smoke|review) ;;
+    *)
+        echo "[FAIL] REVIEW_MODE must be qualify, smoke or review"
+        exit 1
+        ;;
+esac
+if [[ "$REVIEW_MODE" == "review" && ! "$GENERATION_RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]; then
+    echo "[FAIL] review mode requires GENERATION_RUN_ID as a UTC stamp"
+    exit 1
+fi
+if [[ ! "$PROJECT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+    echo "[FAIL] PROJECT_SHA must be a full 40-character commit"
+    exit 1
+fi
+if [[ ! "$RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]; then
+    echo "[FAIL] Run ID must be a UTC stamp of the form YYYYMMDDTHHMMSSZ"
+    exit 1
+fi
+if [[ ! "$REPLICA_TIMEOUT" =~ ^[0-9]+$ || ! "$REVIEW_TIMEOUT_SECONDS" =~ ^[0-9]+$ ]]; then
+    echo "[FAIL] Timeouts must be nonnegative integers"
+    exit 1
+fi
+if (( REVIEW_TIMEOUT_SECONDS >= REPLICA_TIMEOUT )); then
+    echo "[FAIL] In-container timeout must fire before the replica timeout"
+    exit 1
+fi
+LAUNCHER_SHA="$(git -C "$PROJECT_ROOT" rev-parse HEAD)"
+if ! git -C "$PROJECT_ROOT" diff --quiet \
+    || ! git -C "$PROJECT_ROOT" diff --cached --quiet; then
+    echo "[FAIL] Launcher worktree must be clean"
+    exit 1
+fi
+
+# See 19_run_phase1_0d_confirmation.sh: the interpreter is used only to build a
+# control-plane request body. Every scientific computation runs in Azure.
 PYTHON_BIN=""
 PYTHON_TRUST="fhs-root-owned"
 if [[ -x /usr/bin/python3 ]]; then
@@ -85,9 +114,6 @@ python() {
 }
 readonly -f python
 
-# A path this shell can open is not always a path the Azure CLI can open: on a
-# Windows control-plane workstation the CLI is a native binary and does not
-# understand a POSIX-style path. Convert only where a converter exists.
 native_path() {
     if command -v cygpath >/dev/null 2>&1; then
         cygpath -w "$1"
@@ -95,34 +121,6 @@ native_path() {
         printf '%s' "$1"
     fi
 }
-
-if [[ ! "$PROJECT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
-    echo "[FAIL] PROJECT_SHA must be a full 40-character commit"
-    exit 1
-fi
-if [[ ! "$RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]; then
-    echo "[FAIL] Run ID must be a UTC stamp of the form YYYYMMDDTHHMMSSZ"
-    exit 1
-fi
-if [[ ! "$REPLICA_TIMEOUT" =~ ^[0-9]+$ \
-    || ! "$GENERATION_TIMEOUT_SECONDS" =~ ^[0-9]+$ ]]; then
-    echo "[FAIL] Timeouts must be nonnegative integers"
-    exit 1
-fi
-if (( GENERATION_TIMEOUT_SECONDS >= REPLICA_TIMEOUT )); then
-    echo "[FAIL] In-container timeout must fire before the replica timeout"
-    exit 1
-fi
-LAUNCHER_SHA="$(git -C "$PROJECT_ROOT" rev-parse HEAD)"
-if ! git -C "$PROJECT_ROOT" diff --quiet \
-    || ! git -C "$PROJECT_ROOT" diff --cached --quiet; then
-    echo "[FAIL] Launcher worktree must be clean"
-    exit 1
-fi
-if ! git -C "$PROJECT_ROOT" cat-file -e "${PROJECT_SHA}^{commit}"; then
-    echo "[FAIL] Image PROJECT_SHA must exist in local git history"
-    exit 1
-fi
 
 LOGIN_SERVER="$(az acr show \
     --name "$ACR_NAME" \
@@ -138,7 +136,7 @@ IMAGE_DIGEST="$(az acr repository show-manifests \
     --query "[?tags[?@=='${PROJECT_SHA}']].digest | [0]" \
     -o tsv)"
 if [[ ! "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
-    echo "[FAIL] No immutable Phase 1.0D image is tagged $PROJECT_SHA"
+    echo "[FAIL] No immutable review image is tagged $PROJECT_SHA"
     exit 1
 fi
 IMAGE_DIGEST_REF="${LOGIN_SERVER}/${IMAGE_REPOSITORY}@${IMAGE_DIGEST}"
@@ -163,7 +161,7 @@ if [[ "${TAG_WRITE_ENABLED,,}" != "false" \
     || "${TAG_DELETE_ENABLED,,}" != "false" \
     || "${MANIFEST_WRITE_ENABLED,,}" != "false" \
     || "${MANIFEST_DELETE_ENABLED,,}" != "false" ]]; then
-    echo "[FAIL] Phase 1.0D image is not locked; refusing to launch"
+    echo "[FAIL] Review image is not locked; refusing to launch"
     exit 1
 fi
 
@@ -191,37 +189,34 @@ SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 API_VERSION="2024-03-01"
 JOB_URL="https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.App/jobs/${JOB_NAME}?api-version=${API_VERSION}"
 
-RECORD_DIR="${CONFIRMATION_RUN_RECORD_DIR:-$PROJECT_ROOT/results/runs/phase1-0d-confirmation-${RUN_ID}}"
+RECORD_DIR="${REVIEW_RUN_RECORD_DIR:-$PROJECT_ROOT/results/runs/phase1-0d-review-${REVIEW_MODE}-${RUN_ID}}"
 mkdir -p "$RECORD_DIR"
 BODY_FILE="$RECORD_DIR/job_body.json"
 JOB_FILE="$RECORD_DIR/job_state.json"
 
-# One generation run per run ID. If the job already carries executions, the
-# operator must supply a fresh run ID rather than silently overwrite evidence.
 EXECUTION_LIST_FILE="$RECORD_DIR/existing_executions.json"
 if az containerapp job show \
     --name "$JOB_NAME" \
     --resource-group "$RESOURCE_GROUP" \
-    --output none; then
+    --output none 2>/dev/null; then
     az containerapp job execution list \
         --name "$JOB_NAME" \
         --resource-group "$RESOURCE_GROUP" \
         --output json >"$EXECUTION_LIST_FILE"
-    EXISTING_RUN_IDS="$(az containerapp job show \
-        --name "$JOB_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
-        --query 'tags."run-id"' -o tsv)"
-    if [[ "$EXISTING_RUN_IDS" == "$RUN_ID" ]]; then
-        echo "[FAIL] Job already provisioned for run ID $RUN_ID; use a new run ID"
-        exit 1
-    fi
 else
     printf '[]\n' >"$EXECUTION_LIST_FILE"
 fi
 EXECUTION_COUNT="$(python -c 'import json,sys; print(len(json.load(open(sys.argv[1], encoding="utf-8"))))' \
     "$(native_path "$EXECUTION_LIST_FILE")")"
 
-COMMAND="timeout --signal=TERM --kill-after=60s ${GENERATION_TIMEOUT_SECONDS}s python /workspace/scripts/run_phase1_0d_confirmation.py --mode generate --repo-root /workspace --output-root /workspace/runtime/results --upload-blob"
+ARGS="--project-root /workspace --out-dir /workspace/runtime/results --run-id $RUN_ID --client-id $IDENTITY_CLIENT_ID"
+if [[ "$REVIEW_MODE" == "review" ]]; then
+    ARGS="$ARGS --pack-blob-prefix ${GENERATION_PREFIX}/${GENERATION_RUN_ID}"
+    ARGS="$ARGS --blob-account $BLOB_ACCOUNT --blob-container $BLOB_CONTAINER"
+    ARGS="$ARGS --out-blob-prefix ${REVIEW_PREFIX}/${RUN_ID}"
+    ARGS="$ARGS --code-commit $PROJECT_SHA --image-digest $IMAGE_DIGEST"
+fi
+COMMAND="timeout --signal=TERM --kill-after=60s ${REVIEW_TIMEOUT_SECONDS}s python /workspace/scripts/run_phase1_0d_semantic_review.py ${REVIEW_MODE} ${ARGS}"
 
 python - "$(native_path "$BODY_FILE")" <<PY
 import json
@@ -229,22 +224,16 @@ import sys
 from pathlib import Path
 
 environment = [
-    {"name": "HF_HOME", "value": "/workspace/runtime/hf-cache"},
-    {"name": "HUGGINGFACE_HUB_CACHE", "value": "/workspace/runtime/hf-cache/hub"},
-    {"name": "TRANSFORMERS_CACHE", "value": "/workspace/runtime/hf-cache"},
     {"name": "RESULTS_DIR", "value": "/workspace/runtime/results"},
     {"name": "TMPDIR", "value": "/workspace/runtime/cache/tmp"},
-    {"name": "HF_HUB_DISABLE_TELEMETRY", "value": "1"},
-    {"name": "TOKENIZERS_PARALLELISM", "value": "false"},
     {"name": "PYTHONUNBUFFERED", "value": "1"},
     {"name": "AZURE_CLIENT_ID", "value": "$IDENTITY_CLIENT_ID"},
     {"name": "JSPACE_BLOB_ACCOUNT", "value": "$BLOB_ACCOUNT"},
     {"name": "JSPACE_BLOB_CONTAINER", "value": "$BLOB_CONTAINER"},
-    {"name": "JSPACE_BLOB_PREFIX", "value": "$BLOB_PREFIX"},
-    {"name": "JSPACE_CONFIRMATION_RUN_ID", "value": "$RUN_ID"},
+    {"name": "JSPACE_REVIEW_RUN_ID", "value": "$RUN_ID"},
+    {"name": "JSPACE_REVIEW_MODE", "value": "$REVIEW_MODE"},
     {"name": "JSPACE_CODE_COMMIT", "value": "$PROJECT_SHA"},
     {"name": "JSPACE_IMAGE_DIGEST", "value": "$IMAGE_DIGEST"},
-    {"name": "JSPACE_HARDWARE", "value": "Azure Container Apps gpu-t4 workload profile, NVIDIA Tesla T4"},
 ]
 body = {
     "location": "southeastasia",
@@ -256,10 +245,9 @@ body = {
         "project": "jspace-observation",
         "phase": "1.0D",
         "track": "B",
-        "stage": "headroom-confirmation-generation",
+        "stage": "semantic-review-$REVIEW_MODE",
         "run-id": "$RUN_ID",
         "project-sha": "$PROJECT_SHA",
-        "image-project-sha": "$PROJECT_SHA",
         "launcher-sha": "$LAUNCHER_SHA",
         "image-digest": "$IMAGE_DIGEST",
     },
@@ -281,12 +269,12 @@ body = {
         "template": {
             "containers": [
                 {
-                    "name": "confirmation",
+                    "name": "review",
                     "image": "$IMAGE_DIGEST_REF",
                     "command": ["/bin/sh"],
                     "args": ["-lc", "$COMMAND"],
                     "env": environment,
-                    "resources": {"cpu": 8.0, "memory": "56Gi"},
+                    "resources": {"cpu": 2.0, "memory": "4Gi"},
                 }
             ]
         },
@@ -366,27 +354,14 @@ else:
     if container.get("image") != image_ref:
         failures.append("container image is not the pinned digest reference")
     env_names = {item.get("name") for item in container.get("env") or []}
-    required = {
-        "AZURE_CLIENT_ID",
-        "JSPACE_BLOB_ACCOUNT",
-        "JSPACE_BLOB_CONTAINER",
-        "JSPACE_BLOB_PREFIX",
-        "JSPACE_CONFIRMATION_RUN_ID",
-        "JSPACE_CODE_COMMIT",
-        "JSPACE_IMAGE_DIGEST",
-    }
-    missing = sorted(required - env_names)
+    missing = sorted({"AZURE_CLIENT_ID", "JSPACE_REVIEW_RUN_ID"} - env_names)
     if missing:
         failures.append("missing environment variables: " + ", ".join(missing))
     forbidden = sorted(
         name
         for name in env_names
         if name
-        and (
-            "ACCOUNT_KEY" in name
-            or "SAS" in name
-            or "CONNECTION_STRING" in name
-        )
+        and ("ACCOUNT_KEY" in name or "SAS" in name or "CONNECTION_STRING" in name)
     )
     if forbidden:
         failures.append("credential-bearing variables present: " + ", ".join(forbidden))
@@ -423,7 +398,9 @@ fi
 printf '%s\n' "$EXECUTION_NAME" >"$RECORD_DIR/execution_name.txt"
 echo "[OK] job_name=$JOB_NAME"
 echo "[OK] execution_name=$EXECUTION_NAME"
+echo "[OK] mode=$REVIEW_MODE"
 echo "[OK] run_id=$RUN_ID"
 echo "[OK] image=$IMAGE_DIGEST_REF"
-echo "[OK] blob_prefix=${BLOB_PREFIX}/${RUN_ID}"
+echo "[OK] interpreter_trust=$PYTHON_TRUST"
 echo "[OK] No platform retry; no Azure Files; managed identity only"
+echo "[OK] qualify and smoke are synthetic and count towards no scientific total"

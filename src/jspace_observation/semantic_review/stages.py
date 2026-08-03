@@ -74,6 +74,12 @@ def _load_jsonl(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def load_records(path: Path) -> list[dict[str, Any]]:
+    """Read a records file. The orchestrator needs this after finalization."""
+
+    return _load_jsonl(path)
+
+
 def _sha256_bytes(payload: bytes) -> str:
     import hashlib
 

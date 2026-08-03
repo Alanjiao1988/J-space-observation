@@ -1,0 +1,129 @@
+FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime@sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126
+
+# Dedicated Phase 1.0D semantic-review and finalization image.
+#
+# Separate from Dockerfile.phase1-0d on purpose.  That image is locked: its
+# tag and manifest are immutable and its provenance record is a protected byte.
+# Nothing here rebuilds, retags or reinterprets it.
+#
+# The base image is the same digest-pinned base as the locked generation image.
+# The review job needs no GPU and no third-party package -- its transport is the
+# standard library -- but reusing the proven base makes "the reviewer harness
+# runs the same interpreter and the same frozen science code as the generation
+# run" a checkable statement rather than a hope.  The pinned calibration
+# requirements are installed and verified with the frozen provenance tool, so
+# the environment is an already-pinned environment rather than a second
+# unpinned one.
+#
+# The build refuses to complete unless: the pins match, the frozen science
+# bytes are byte-identical to the locked generation image's recorded bundle,
+# the Phase 1.0D protocol inside the image reports its frozen sha256, the
+# review bundle matches its own record, and the baked addendum and rubric hash
+# to the committed values.
+
+LABEL org.opencontainers.image.title="J-space Phase 1.0D semantic review"
+LABEL org.opencontainers.image.base.name="pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime"
+LABEL org.opencontainers.image.base.digest="sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126"
+LABEL io.jspace.review.phase="1.0D"
+LABEL io.jspace.review.protocol-sha256="25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8"
+LABEL io.jspace.review.generation-image-digest="sha256:1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332c37481166aa4"
+LABEL io.jspace.review.provenance="/opt/jspace/phase1-0d-review-build-provenance.json"
+LABEL io.jspace.review.authentication="microsoft entra managed identity only; no key, SAS or secret is baked, read or printed"
+LABEL io.jspace.review.emits="reviewer judgments and a finalized pack; establishes nothing about reviewer accuracy"
+LABEL io.jspace.review.claim-boundary="LLM operational consensus, not human ground truth; licenses no claim about hidden reasoning or internal representations"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN groupadd --system --gid 10001 jspace \
+    && useradd --system --uid 10001 --gid jspace --create-home \
+        --home-dir /workspace/runtime/home --shell /usr/sbin/nologin jspace
+
+WORKDIR /workspace
+
+COPY requirements-calibration.txt Dockerfile.phase1-0d Dockerfile.phase1-0d-review /workspace/
+COPY scripts/phase1_0d_build_provenance.py /workspace/scripts/
+COPY phase1_0d_build_provenance.json /opt/jspace/phase1-0d-build-provenance.json
+COPY phase1_0d_review_build_provenance.json /opt/jspace/phase1-0d-review-build-provenance.json
+
+RUN python -m pip install --no-cache-dir --no-deps \
+        -r /workspace/requirements-calibration.txt \
+    && python -I /workspace/scripts/phase1_0d_build_provenance.py \
+        verify-runtime --requirements /workspace/requirements-calibration.txt
+
+# The frozen science: byte-identical to the locked generation image's bundle.
+COPY scripts/run_phase1_0d_confirmation.py /workspace/scripts/
+COPY src/jspace_observation/ /workspace/src/jspace_observation/
+COPY data/phase1_task_headroom_candidates.jsonl /workspace/data/
+COPY docs/prompts/phase_science_restart_after_parser_closure_prompt.md /workspace/docs/prompts/
+COPY artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/02_records.jsonl \
+     /workspace/artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/
+
+# The review surface, recorded by its own sibling provenance tool.
+COPY scripts/run_phase1_0d_semantic_review.py \
+     scripts/phase1_0d_review_build_provenance.py \
+     scripts/phase1_0d_protected_bytes.py \
+     /workspace/scripts/
+COPY docs/phase1_0d_semantic_review_addendum.json \
+     docs/phase1_0d_semantic_review_rubric.md \
+     docs/phase1_0d_protected_bytes.json \
+     /workspace/docs/
+COPY docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md /workspace/docs/prompts/
+
+RUN python -I /workspace/scripts/phase1_0d_build_provenance.py \
+        --project-root /workspace verify-image-context \
+        --provenance /opt/jspace/phase1-0d-build-provenance.json \
+    && python -I /workspace/scripts/phase1_0d_build_provenance.py \
+        --project-root /workspace verify-protocol \
+    && python -I /workspace/scripts/phase1_0d_review_build_provenance.py \
+        --project-root /workspace verify-image-context \
+        --provenance /opt/jspace/phase1-0d-review-build-provenance.json \
+    && python -I /workspace/scripts/phase1_0d_review_build_provenance.py \
+        --project-root /workspace verify-addendum \
+        --provenance /opt/jspace/phase1-0d-review-build-provenance.json \
+    && install -d -o jspace -g jspace -m 0700 \
+        /workspace/runtime/home \
+        /workspace/runtime/results \
+        /workspace/runtime/cache \
+        /workspace/runtime/cache/tmp \
+        /workspace/runtime/pycache \
+    && chown -R 0:0 \
+        /workspace/scripts \
+        /workspace/src \
+        /workspace/data \
+        /workspace/docs \
+        /workspace/artifacts \
+        /workspace/requirements-calibration.txt \
+        /workspace/Dockerfile.phase1-0d \
+        /workspace/Dockerfile.phase1-0d-review \
+        /opt/jspace \
+    && chmod -R a-w \
+        /workspace/scripts \
+        /workspace/src \
+        /workspace/data \
+        /workspace/docs \
+        /workspace/artifacts \
+        /workspace/requirements-calibration.txt \
+        /workspace/Dockerfile.phase1-0d \
+        /workspace/Dockerfile.phase1-0d-review \
+    && chmod 0444 /opt/jspace/phase1-0d-build-provenance.json \
+        /opt/jspace/phase1-0d-review-build-provenance.json
+
+ENV HOME=/workspace/runtime/home \
+    XDG_CACHE_HOME=/workspace/runtime/cache \
+    TMPDIR=/workspace/runtime/cache/tmp \
+    PYTHONPYCACHEPREFIX=/workspace/runtime/pycache \
+    RESULTS_DIR=/workspace/runtime/results \
+    JSPACE_PHASE1_0D_PROVENANCE=/opt/jspace/phase1-0d-build-provenance.json \
+    JSPACE_PHASE1_0D_REVIEW_PROVENANCE=/opt/jspace/phase1-0d-review-build-provenance.json
+
+USER 10001:10001
+
+# The default is the mode that cannot see a target output: it proves the pinned
+# deployments answer, over synthetic bytes only, and stops.
+CMD ["python", "/workspace/scripts/run_phase1_0d_semantic_review.py", \
+     "qualify", \
+     "--project-root", "/workspace", \
+     "--out-dir", "/workspace/runtime/results"]
