@@ -16,6 +16,7 @@
 #   * no storage account key, no SAS, no connection string, no Azure Files
 #   * replicaRetryLimit 0 so the platform never silently re-runs generation
 #   * parallelism 1 / replicaCompletionCount 1
+#   * one fixed create-only Blob lock so a new run ID cannot start a rerun
 
 set -euo pipefail
 
@@ -29,6 +30,7 @@ IDENTITY_NAME="id-jspace-aca-acrpull-sea"
 BLOB_ACCOUNT="stjspacefiles0709085305"
 BLOB_CONTAINER="jspace-results"
 BLOB_PREFIX="phase1-headroom-confirmation"
+GENERATION_LOCK_BLOB="${BLOB_PREFIX}/generation-execution-lock.json"
 IMAGE_REPOSITORY="j-space-observation-phase1-0d"
 ACR_NAME="${ACR_NAME:?Set ACR_NAME to the existing private registry name}"
 PROJECT_SHA="${PROJECT_SHA:-$(git -C "$PROJECT_ROOT" rev-parse HEAD)}"
@@ -204,30 +206,55 @@ mkdir -p "$RECORD_DIR"
 BODY_FILE="$RECORD_DIR/job_body.json"
 JOB_FILE="$RECORD_DIR/job_state.json"
 
-# One generation run per run ID. If the job already carries executions, the
-# operator must supply a fresh run ID rather than silently overwrite evidence.
+# The authority licenses one generation execution in total, not one per run ID.
 EXECUTION_LIST_FILE="$RECORD_DIR/existing_executions.json"
 if az containerapp job show \
     --name "$JOB_NAME" \
     --resource-group "$RESOURCE_GROUP" \
-    --output none; then
+    --output none 2>/dev/null; then
     az containerapp job execution list \
         --name "$JOB_NAME" \
         --resource-group "$RESOURCE_GROUP" \
         --output json >"$EXECUTION_LIST_FILE"
-    EXISTING_RUN_IDS="$(az containerapp job show \
-        --name "$JOB_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
-        --query 'tags."run-id"' -o tsv)"
-    if [[ "$EXISTING_RUN_IDS" == "$RUN_ID" ]]; then
-        echo "[FAIL] Job already provisioned for run ID $RUN_ID; use a new run ID"
-        exit 1
-    fi
+    echo "[FAIL] The sole Phase 1.0D generation execution is already claimed"
+    exit 1
 else
     printf '[]\n' >"$EXECUTION_LIST_FILE"
 fi
 EXECUTION_COUNT="$(python -c 'import json,sys; print(len(json.load(open(sys.argv[1], encoding="utf-8"))))' \
     "$(native_path "$EXECUTION_LIST_FILE")")"
+
+# Prove the exact run-specific target prefix is empty before claiming the
+# global execution lock.  The lock is a sibling under BLOB_PREFIX, not target
+# output, so it cannot make this check pass or fail.
+TARGET_PREFIX="${BLOB_PREFIX}/${RUN_ID}/"
+TARGET_OBJECT_COUNT="$(az storage blob list \
+    --auth-mode login \
+    --account-name "$BLOB_ACCOUNT" \
+    --container-name "$BLOB_CONTAINER" \
+    --prefix "$TARGET_PREFIX" \
+    --query 'length(@)' -o tsv \
+    --only-show-errors)"
+if [[ ! "$TARGET_OBJECT_COUNT" =~ ^[0-9]+$ || "$TARGET_OBJECT_COUNT" != "0" ]]; then
+    echo "[FAIL] Target prefix is not empty: ${TARGET_PREFIX}"
+    exit 1
+fi
+
+# Claim before provisioning. Two concurrent launchers can both observe an
+# absent ACA job, but only one create-only upload can authorize an execution.
+GENERATION_LOCK_FILE="$RECORD_DIR/generation_execution_lock.json"
+printf '{"artifact":"phase1_0d_generation_execution_lock","project_sha":"%s","image_digest":"%s","generation_run_id":"%s","target_prefix":"%s"}\n' \
+    "$PROJECT_SHA" "$IMAGE_DIGEST" "$RUN_ID" "$TARGET_PREFIX" \
+    >"$GENERATION_LOCK_FILE"
+az storage blob upload \
+    --auth-mode login \
+    --account-name "$BLOB_ACCOUNT" \
+    --container-name "$BLOB_CONTAINER" \
+    --name "$GENERATION_LOCK_BLOB" \
+    --file "$GENERATION_LOCK_FILE" \
+    --overwrite false \
+    --only-show-errors \
+    --output none
 
 COMMAND="timeout --signal=TERM --kill-after=60s ${GENERATION_TIMEOUT_SECONDS}s python /workspace/scripts/run_phase1_0d_confirmation.py --mode generate --repo-root /workspace --output-root /workspace/runtime/results --upload-blob"
 

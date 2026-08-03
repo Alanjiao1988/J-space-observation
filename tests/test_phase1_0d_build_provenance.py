@@ -273,6 +273,27 @@ def test_the_run_launcher_refuses_a_platform_retry_or_a_second_replica():
     assert '"replicaCompletionCount": 1' in text
 
 
+def test_the_run_launcher_enforces_one_generation_execution():
+    text = _script(RUN_SCRIPT)
+    assert (
+        'GENERATION_LOCK_BLOB="${BLOB_PREFIX}/generation-execution-lock.json"'
+        in text
+    )
+    assert '"artifact":"phase1_0d_generation_execution_lock"' in text
+    assert "--overwrite false" in text
+    assert "only one create-only upload can authorize an execution" in text
+    assert "sole Phase 1.0D generation execution is already claimed" in text
+    assert "use a new run ID" not in text
+
+
+def test_the_run_launcher_requires_an_empty_target_prefix():
+    text = _script(RUN_SCRIPT)
+    assert 'TARGET_PREFIX="${BLOB_PREFIX}/${RUN_ID}/"' in text
+    assert "--prefix \"$TARGET_PREFIX\"" in text
+    assert "--query 'length(@)'" in text
+    assert "Target prefix is not empty" in text
+
+
 def test_the_run_launcher_refuses_an_unlocked_image():
     text = _script(RUN_SCRIPT)
     assert "Phase 1.0D image is not locked" in text
