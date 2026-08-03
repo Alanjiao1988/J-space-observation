@@ -2448,3 +2448,51 @@ image, a build-provenance record, and an ACA GPU job launcher.
 **Still not performed: the generation run.** The image exists and is locked; no
 ACA GPU job has been executed from it, no model output exists, and no cell
 metric may exist before section 4.3 primary labels.
+
+## D25 — Stopping at a prospective gate that we could have quietly passed
+
+2026-08-03. Phase 1.0D semantic-review provider qualification.
+
+The section 4.3 primary semantic labels have blocked Phase 1.0D since the
+protocol was frozen. The authorised way to unblock them was to register a
+reviewer panel *before* seeing any target output, prove it can run, and prove it
+reproduces committed labels on synthetic fixtures. We did all three. The third
+one failed by one call out of eighteen.
+
+- **The gate was made hard to pass before it was run, not after.** The six
+  fixtures and their expected labels were committed, hashed, baked into the
+  image, and verified inside the image before a single reviewer call was made.
+  The addendum's `on_label_mismatch` rule was written in the same frozen bytes.
+  The value of a prospective gate is entirely in what it forbids once it fires;
+  a gate that can be renegotiated after seeing its output is not evidence of
+  anything.
+- **The mismatch is a disagreement, not a bug.** Every call authenticated,
+  routed, returned well-formed JSON inside the token cap with `finish_reason
+  stop`, and 17 of 18 labels matched. The addendum separates transport and
+  configuration defects, which we may fix and rerun, from label mismatches,
+  which we may not. Had the reviewer 4xx'd, this would be a one-line fix. It
+  answered correctly-formed and disagreed, which is the case the rule is for.
+- **The specific disagreement is the one worth stopping on.** `smoke_unresolved`
+  presents an output that states two different final answers and refuses to
+  prefer either. The registered expectation is `unresolved`. The primary
+  reviewer called it `incorrect`. That is exactly the judgement the Phase 1.0D
+  measurement depends on: a bank whose whole point is separating "the model got
+  it wrong" from "the model never committed" cannot be labelled by a reviewer
+  that collapses the second into the first. The two other reviewers returned
+  `unresolved`, which makes the primary the outlier, and makes a majority vote
+  the most tempting and least defensible repair available.
+- **Every repair was refused and the refusals are recorded.** We could have
+  promoted the secondary to primary, adopted a two-of-three vote, softened the
+  rubric's `unresolved` clause, or dropped the fixture. Each is a
+  post-hoc change to a frozen instrument made after seeing its output on that
+  instrument, and each would have produced 900 labels nobody could trust.
+- **The gate cost is disclosed and small.** Two ACA executions, eighteen
+  reviewer calls plus three qualification calls, all on synthetic bytes. They
+  count towards no scientific total.
+
+**Still not performed: the generation run.** The generation image is built and
+locked, the review image is built and locked, both were verified in Azure, and
+neither has produced a row of target output. The blocker has moved from "no
+registered provider exists" to "a registered provider exists and does not
+reproduce a registered label", which is a more informative place to be stopped
+and is not progress towards a result.

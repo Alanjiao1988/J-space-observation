@@ -4382,3 +4382,62 @@ image proves what bytes are in it and nothing about the model. What remains
 before a run is an ACA GPU job execution, and after it, the section 4.3 primary
 semantic labels without which no cell metric may exist. No scientific counter
 moved.
+## 2026-08-03 — Phase 1.0D semantic-review provider gate
+
+Final state: **`BLOCKED_ON_SEMANTIC_REVIEW_PROVIDER_BEFORE_GENERATION`**.
+No target generation run was performed, before or after this gate.
+
+The section 3.1 rule is prospective: the registered reviewers must be deployed
+and smoke-tested *before* any target inference. They were. One of eighteen
+calls disagreed with its committed expected label, and the addendum's
+`on_label_mismatch` rule makes that terminal.
+
+| Azure run | Commit | What ran | Result |
+| --- | --- | --- | --- |
+| `cm52` | `5f56535d` | Protected-byte baseline tests | 11 passed |
+| `cm53` | `91e12c8` | Semantic-review module | 71 passed, 1 failed: a credential guard matched "task-family" |
+| `cm54` | `e7a1c7a` | Same module after narrowing the guard | 72 passed |
+| `cm55` | `e7a1c7a` | Full suite | 3150 passed, 15 skipped, 2 failed, both disclosed pre-existing |
+| `cm56` | `1baa683` | Review-image, provenance and launcher tests | 34 passed |
+| `cm57` | `1baa683` | Full suite | 3184 passed, 15 skipped, 2 failed, both disclosed pre-existing |
+| `cm58` | `1baa683` | Emit the review build-provenance record | 12 files, bundle `d1fbd985f959648ec178480ce26caf696152520f26f96bc8b4458cb6881f3b49` |
+| `cm59` | `bda9b3b` | Verify the committed record against a clean clone | `REVIEW_IMAGE_CONTEXT_OK=1` |
+| `cm5a` | `bda9b3b` | Verify the baked addendum and rubric | `REVIEW_ADDENDUM_OK=1` |
+| `cm5b` | `bda9b3b` | `az acr build` of `Dockerfile.phase1-0d-review` | Digest `sha256:d9e887e68cccf7472e956785cda3ad7cf5f3902daea9287fc7b72c357f473e10`, tag and manifest locked |
+
+| ACA execution | Mode | Result |
+| --- | --- | --- |
+| `job-jspace-p10d-review-qualify-d9e24fa` | qualify | Succeeded. All three roles answered on `/openai/v1/chat/completions`; no api-version parameter was needed. Receipt `efb94aed3e33b518f5e3703c3f7bd0c27534444a871e324e5d2a32fbca3d5048`. |
+| `job-jspace-p10d-review-smoke-ifz4l7z` | smoke | Failed by design. 17 of 18 label matches. Receipt `eba6e2e48d3b7c30c61779629facc523975740b4a1f2d2be9e833b75fc7dda8e`. |
+
+The one mismatch: fixture `smoke_unresolved`, role `primary`, deployment
+`gpt-5-6-sol-global`, expected `unresolved`, observed `incorrect`. The fixture
+shows an output that commits to two different final answers and explicitly
+refuses to prefer either. The secondary and third reviewers both returned
+`unresolved`.
+
+Zero transport failures, zero malformed responses, zero schema failures, zero
+4xx faults. That matters, because the addendum treats a route, api-version or
+authentication fault as an ordinary defect to fix and rerun, and a semantic
+label mismatch as terminal. This was the second kind.
+
+Refused, in order, and recorded because each was available and each would have
+been wrong: changing the fixture, changing its expected label, retuning the
+rubric, substituting a reviewer model, adding a fallback or majority vote over
+the mismatch, rerunning the gate after seeing its output, and starting the
+target generation run anyway.
+
+Evidence export: the in-container receipt JSON was hashed by the job and left
+on the job's ephemeral filesystem. The job mounts no writable share and never
+reached its upload stage, so the exported record is the Container Apps console
+transcript from the environment's Log Analytics workspace, which carries the
+hashes the job computed. Re-running either stage purely to export a file would
+be a second inference attempt at a gate whose output has been seen.
+
+Baseline for this increment was 3150 passed. It adds 34 tests and introduces no
+new failure.
+
+Not established: nothing about reviewer accuracy in general, nothing about the
+other two reviewers, nothing about model capability, and nothing about the
+Phase 1.0D task bank, which was never generated on. No scientific counter
+moved. `AWAITING_SEMANTIC_REVIEW` remains the honest status of Phase 1.0D.

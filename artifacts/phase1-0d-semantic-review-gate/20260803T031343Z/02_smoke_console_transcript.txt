@@ -1,0 +1,27 @@
+08/03/2026 03:16:56 ADDENDUM_SHA256=582640de645030daf957fbc3e5c7947008b78d1596b674687a73f20ba749bdc3
+08/03/2026 03:16:56 RUBRIC_SHA256=a0d5b22bd6d4ef1012db676ff3431c3d2e6825f1ec4ade1a7c7801817ba8765d
+08/03/2026 03:16:56 BASE_PROTOCOL_SHA256=25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8
+08/03/2026 03:17:22 QUALIFIED role=primary deployment=gpt-5-6-sol-global model=gpt-5.6-sol:2026-07-09 path=/openai/v1/chat/completions api_version=-
+08/03/2026 03:17:22 QUALIFIED role=secondary deployment=mistral-large-3-global model=Mistral-Large-3:1 path=/openai/v1/chat/completions api_version=-
+08/03/2026 03:17:22 QUALIFIED role=third deployment=deepseek-v4-pro-global model=DeepSeek-V4-Pro:2026-04-23 path=/openai/v1/chat/completions api_version=-
+08/03/2026 03:18:05 RECEIPT_SHA256=eba6e2e48d3b7c30c61779629facc523975740b4a1f2d2be9e833b75fc7dda8e
+08/03/2026 03:18:05 RECEIPT_PATH=/workspace/runtime/results/provider_smoke_20260803T031343Z.json
+08/03/2026 03:18:05 SMOKE fixture=smoke_incorrect role=secondary expected=incorrect observed=incorrect match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_equivalent_correct role=third expected=correct observed=correct match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_equivalent_correct role=secondary expected=correct observed=correct match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_no_answer role=third expected=no_answer observed=no_answer match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_incorrect role=primary expected=incorrect observed=incorrect match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_no_answer role=primary expected=no_answer observed=no_answer match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_no_answer role=secondary expected=no_answer observed=no_answer match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_invalid role=primary expected=invalid observed=invalid match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_equivalent_correct role=primary expected=correct observed=correct match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_invalid role=third expected=invalid observed=invalid match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_unresolved role=primary expected=unresolved observed=incorrect match=False
+08/03/2026 03:18:05 SMOKE fixture=smoke_unresolved role=secondary expected=unresolved observed=unresolved match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_exact_correct role=primary expected=correct observed=correct match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_unresolved role=third expected=unresolved observed=unresolved match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_exact_correct role=secondary expected=correct observed=correct match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_invalid role=secondary expected=invalid observed=invalid match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_exact_correct role=third expected=correct observed=correct match=True
+08/03/2026 03:18:05 SMOKE fixture=smoke_incorrect role=third expected=incorrect observed=incorrect match=True
+08/03/2026 03:18:05 BLOCKED_ON_SEMANTIC_REVIEW_PROVIDER_BEFORE_GENERATION

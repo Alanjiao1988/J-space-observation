@@ -25,6 +25,24 @@ parser 子项目的旧终态 `BLOCKED_ON_PUBLIC_PROTOCOL_FREEZE` 在其原授权
 
 阴性的 headroom 结果、不收敛的 lens、未通过的 validity gate 都是科学结果，不构成再造一个 evaluator 或审计基础设施项目的理由。
 
+### 2026-08-03 · S1 / Phase 1.0D 最新状态：`BLOCKED_ON_SEMANTIC_REVIEW_PROVIDER_BEFORE_GENERATION`
+
+**Phase 1.0D 的 generation run 至今没有执行，本轮也不会执行。**
+
+依 `DR-01`，语义裁决是唯一权威的最终标签路径，因此 Phase 1.0D 的 900 行必须先有一个已注册的 semantic-review 提供方，否则任何 cell metric 都不允许存在。本轮的授权工作就是去取得这个提供方：把三个 reviewer 角色、prompt、rubric、输出 schema、六条合成 fixture 及其预期标签、以及各类失败的停止规则一次性冻结成
+`docs/phase1_0d_semantic_review_addendum.json`（SHA-256 `582640de…`），烘进一个只读锁定的镜像
+（`sha256:d9e887e68cccf7472e956785cda3ad7cf5f3902daea9287fc7b72c357f473e10`），**在任何目标输出存在之前**先跑 qualification，再跑 smoke。
+
+- qualification **通过**：三个角色都能从 southeastasia 的 Container Apps VNet、以 managed identity（endpoint 已禁用 local auth）访问 eastus2 端点，统一走 `/openai/v1/chat/completions`，不需要 api-version 参数。
+- smoke **按设计失败**：18 次角色×fixture 调用中 17 次与冻结的预期标签一致。唯一不一致的是 fixture `smoke_unresolved`——一段同时给出两个不同 final answer 并明确拒绝二选一的输出——注册的 primary reviewer 判成 `incorrect`，冻结的预期是 `unresolved`；secondary 与 third 都判 `unresolved`。
+
+零传输失败、零格式错误、零 schema 失败、零 4xx。所以这不是 addendum 里"可修复并重跑"的传输/配置缺陷，而是它明确定为终态的 label mismatch。**未做任何修补**：没有换 fixture、没有改预期标签、没有调 rubric、没有换模型、没有加 fallback 或多数表决、没有重跑该 gate、没有硬启 generation run。
+
+被这个 gate 卡住恰恰是它存在的意义：Phase 1.0C 之所以有 44 行不可用，就是因为分不清"答错"和"根本没给答案"；一个把后者塌缩成前者的 reviewer 会在 headroom 估计最敏感的方向上系统性放大错误率。
+
+记录见 `EV-0012`、`D25`、`L-50`、`L-51`，工件见
+`artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/`。这一结果**不**说明该 reviewer 总体不可靠、**不**说明另外两个可靠、**不**涉及目标模型的任何能力，也**不**构成关于 hidden reasoning 或 J-space 的任何证据。Phase 1.0D 的诚实状态仍然是 `AWAITING_SEMANTIC_REVIEW`。
+
 ## 历史阶段（parser 关闭前）
 
 当前已完成四条关键路径的首个可执行阶段：

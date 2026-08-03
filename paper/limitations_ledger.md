@@ -1114,3 +1114,58 @@ The cost is that this registry entry is permanent and outside any cleanup
 policy, and that a defect discovered in the image cannot be patched in place —
 it requires a new commit and a new immutable tag, leaving the defective image
 visible in the registry forever. Both consequences are accepted knowingly.
+
+## L-50 - The registered primary reviewer does not reproduce a registered label
+
+The Phase 1.0D semantic-review panel was smoke-tested on six committed
+synthetic fixtures before any target output existed. Seventeen of eighteen
+role-fixture calls matched their committed expected label. The exception:
+fixture `smoke_unresolved`, presenting an output that states two different
+final answers and explicitly refuses to prefer either, was labelled `incorrect`
+by the registered primary reviewer
+(`gpt-5-6-sol-global` / `gpt-5.6-sol:2026-07-09`) where the frozen expectation
+is `unresolved`. The secondary and third reviewers both returned `unresolved`.
+
+This is the single distinction the Phase 1.0D measurement is built on. The
+whole reason 44 of 300 Phase 1.0C rows were unusable is that the pipeline could
+not separate a wrong answer from an absent one, and a reviewer that collapses
+"never committed" into "wrong" reproduces the defect the phase exists to
+repair — while inflating the apparent error rate in exactly the direction the
+headroom argument is sensitive to.
+
+Consequences, all live:
+
+- **No Phase 1.0D semantic labels exist**, so no cell metric, no headroom
+  estimate and no strict-versus-visible comparison exists.
+- The gate is prospective and frozen, so it cannot be repaired within this
+  round. Promoting the secondary, adopting a two-of-three vote, softening the
+  rubric or dropping the fixture are all post-hoc edits to an instrument after
+  seeing its output on that instrument.
+- The disagreement is one call on one synthetic fixture. It does **not**
+  establish that this reviewer is generally unreliable, that the other two are
+  reliable, or anything at all about the target model. It establishes only that
+  the panel as registered cannot be trusted to produce the labels this phase
+  requires.
+- A future authorised round must re-freeze the fixtures, expectations and
+  rubric **before** any inference, and must disclose that it does so with prior
+  knowledge of this failure — which weakens the new gate, because an
+  expectation written by someone who has seen a reviewer's answer is no longer
+  fully independent of it.
+
+## L-51 - The gate evidence is a console transcript, not the receipt file
+
+The qualification and smoke stages each wrote a receipt JSON to the job's
+ephemeral filesystem and hashed it in-process. The job mounts no writable
+share, and the smoke stage stopped at the gate before any upload could occur,
+so those files were destroyed with the replica.
+
+What is committed is the Container Apps console transcript retrieved from the
+environment's Log Analytics workspace, carrying the receipt hashes the job
+computed (`efb94aed…` for qualification, `eba6e2e4…` for smoke). A reader can
+verify that the transcript is internally consistent and that its hashes were
+produced by the locked image, but cannot independently recompute them from the
+receipt bodies, because those bodies no longer exist.
+
+Re-running either stage to export the file was refused: the smoke stage's
+output has already been seen, and a second execution at the same gate is
+exactly the retry the stop rule forbids.

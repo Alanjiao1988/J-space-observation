@@ -138,6 +138,23 @@ precisely so that an unreviewed pack cannot be mistaken for a result. CL-05
 remains `preliminary` on Phase 1.0C alone. `L-48` records this in full, and
 `L-49` records that the image is permanently undeletable by design.
 
+**2026-08-03 — the semantic-review panel failed its prospective gate, so Phase
+1.0D still has no labels.** The missing piece for this claim has always been
+`EV-0011`'s open item: 900 rows cannot become a cell metric without section 4.3
+semantic labels, and no provider was registered to supply them. A three-model
+reviewer panel was therefore frozen, hashed, baked into a locked image and
+smoke-tested on six committed synthetic fixtures **before** any target output
+existed. It failed: 17 of 18 role-fixture calls matched, and the registered
+primary reviewer labelled the `unresolved` fixture `incorrect` — collapsing
+"the model never committed to an answer" into "the model was wrong", which is
+the exact distinction this claim's headroom estimate turns on. The frozen
+`on_label_mismatch` rule made that terminal, the generation run was not
+started, and no repair was applied. `EV-0012` records the gate,
+`BLOCKED_ON_SEMANTIC_REVIEW_PROVIDER_BEFORE_GENERATION` is the round's final
+state, and `L-50` and `L-51` record the consequences. CL-05 is unchanged and
+remains `preliminary` on Phase 1.0C alone; a failed instrument check is not
+evidence for or against headroom.
+
 ---
 
 ## CL-06 — Parser-v3 correction of parser-v2 failure modes

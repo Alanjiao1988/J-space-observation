@@ -1,0 +1,107 @@
+{
+  "artifact": "phase1_0d_semantic_review_provider_gate",
+  "phase": "1.0D",
+  "track": "b",
+  "schema": "phase1-0d-semantic-review-gate/v1",
+  "final_state": "BLOCKED_ON_SEMANTIC_REVIEW_PROVIDER_BEFORE_GENERATION",
+  "gate": "section 3.1 prospective provider smoke test",
+  "authority_prompt": "docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md",
+  "authority_prompt_sha256": "61f04923e4afaa3e6fd9f66d7b91a1316852de11b41dc6d3380ee827f5065d87",
+  "addendum_sha256": "582640de645030daf957fbc3e5c7947008b78d1596b674687a73f20ba749bdc3",
+  "rubric_sha256": "a0d5b22bd6d4ef1012db676ff3431c3d2e6825f1ec4ade1a7c7801817ba8765d",
+  "base_protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
+  "review_image": {
+    "repository": "j-space-observation-phase1-0d-review",
+    "tag": "bda9b3bee073b969f8fb97411a5eb9ee80beb147",
+    "digest": "sha256:d9e887e68cccf7472e956785cda3ad7cf5f3902daea9287fc7b72c357f473e10",
+    "build_provenance": "phase1_0d_review_build_provenance.json",
+    "bundle_sha256": "d1fbd985f959648ec178480ce26caf696152520f26f96bc8b4458cb6881f3b49",
+    "tag_write_enabled": false,
+    "tag_delete_enabled": false,
+    "manifest_write_enabled": false,
+    "manifest_delete_enabled": false
+  },
+  "qualification": {
+    "run_id": "20260803T030929Z",
+    "job_name": "job-jspace-p10d-review-qualify",
+    "execution_name": "job-jspace-p10d-review-qualify-d9e24fa",
+    "status": "Succeeded",
+    "in_container_receipt_sha256": "efb94aed3e33b518f5e3703c3f7bd0c27534444a871e324e5d2a32fbca3d5048",
+    "in_container_receipt_path": "/workspace/runtime/results/provider_qualification_20260803T030929Z.json",
+    "proven_route": "/openai/v1/chat/completions",
+    "proven_api_version": "none required on the v1 route",
+    "result": "all three registered roles answered from the southeastasia Container Apps environment against the eastus2 endpoints"
+  },
+  "smoke": {
+    "run_id": "20260803T031343Z",
+    "job_name": "job-jspace-p10d-review-smoke",
+    "execution_name": "job-jspace-p10d-review-smoke-ifz4l7z",
+    "status": "Failed",
+    "in_container_receipt_sha256": "eba6e2e48d3b7c30c61779629facc523975740b4a1f2d2be9e833b75fc7dda8e",
+    "in_container_receipt_path": "/workspace/runtime/results/provider_smoke_20260803T031343Z.json",
+    "fixtures": 6,
+    "roles": 3,
+    "calls": 18,
+    "matched": 17,
+    "mismatched": 1,
+    "mismatches": [
+      {
+        "fixture_id": "smoke_unresolved",
+        "role": "primary",
+        "deployment": "gpt-5-6-sol-global",
+        "model": "gpt-5.6-sol:2026-07-09",
+        "expected_label": "unresolved",
+        "observed_label": "incorrect"
+      }
+    ],
+    "transport_failures": 0,
+    "malformed_responses": 0,
+    "schema_failures": 0
+  },
+  "reviewers": [
+    {
+      "role": "primary",
+      "provider": "azure_openai",
+      "deployment": "gpt-5-6-sol-global",
+      "model": "gpt-5.6-sol",
+      "model_version": "2026-07-09",
+      "reviewer_id": "primary:azure_openai:gpt-5-6-sol-global:gpt-5.6-sol:2026-07-09"
+    },
+    {
+      "role": "secondary",
+      "provider": "microsoft_foundry",
+      "deployment": "mistral-large-3-global",
+      "model": "Mistral-Large-3",
+      "model_version": "1",
+      "reviewer_id": "secondary:microsoft_foundry:mistral-large-3-global:Mistral-Large-3:1"
+    },
+    {
+      "role": "third",
+      "provider": "microsoft_foundry",
+      "deployment": "deepseek-v4-pro-global",
+      "model": "DeepSeek-V4-Pro",
+      "model_version": "2026-04-23",
+      "reviewer_id": "third:microsoft_foundry:deepseek-v4-pro-global:DeepSeek-V4-Pro:2026-04-23"
+    }
+  ],
+  "no_target_output_existed": {
+    "target_generation_runs_executed": 0,
+    "phase1_0d_generation_rows_produced": 0,
+    "blob_prefix_phase1_headroom_confirmation": "empty at gate time; no generation job was ever created",
+    "aca_gpu_job_executions": 0,
+    "note": "both stages ran on the six committed synthetic fixtures only, in separate processes, before any target inference; neither stage can read a generation pack because neither is given a pack prefix"
+  },
+  "action_taken": "stop",
+  "actions_refused": [
+    "changing the mismatched fixture",
+    "changing its expected label",
+    "changing or retuning the rubric",
+    "substituting or adding a reviewer model",
+    "adding a fallback, a majority vote or a retry over a semantic mismatch",
+    "rerunning the smoke gate after seeing its output",
+    "starting the target generation run"
+  ],
+  "why_this_is_not_an_ordinary_defect": "the registered on_transport_or_configuration_defect rule covers 4xx route, api-version and authentication faults. There were none: every call was authenticated, routed, well formed, within the visible-token cap and returned finish_reason stop, and 17 of 18 labels matched. The single mismatch is a semantic disagreement between a pinned reviewer and a committed expected label, which the addendum's on_label_mismatch rule makes terminal.",
+  "transcript_provenance": "the in-container receipt JSON was written to the job's ephemeral filesystem and hashed by the job itself; the job mounts no writable share and the review bundle was never uploaded, so the exported evidence here is the Container Apps console transcript retrieved from the environment's Log Analytics workspace, which carries the receipt hash the job computed. Re-running either stage to export the receipt file would be a second inference attempt at a gate whose output has already been seen, and is refused.",
+  "claim_boundary": "this records that one pinned reviewer disagreed with one committed expected label on one synthetic fixture. It establishes nothing about that reviewer's accuracy in general, nothing about the other reviewers, nothing about model capability, nothing about hidden reasoning or internal representations, and nothing about a 'J-space'. It is not evidence about the Phase 1.0D task bank, which was never generated on."
+}

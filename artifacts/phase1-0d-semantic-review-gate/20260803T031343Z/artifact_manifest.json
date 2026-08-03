@@ -1,0 +1,23 @@
+{
+  "artifact": "phase1_0d_semantic_review_provider_gate_manifest",
+  "run_id": "20260803T031343Z",
+  "file_count": 3,
+  "files": [
+    {
+      "name": "00_gate_receipt.json",
+      "sha256": "74d738bf00477f391097ee6622379259ffb808283ebe081d33934a79fd252352",
+      "bytes": 5925
+    },
+    {
+      "name": "01_qualification_console_transcript.txt",
+      "sha256": "63712794c842de29e1ac23e7d98f6b771da1f83eadac4e2e3bbc1c80346ce003",
+      "bytes": 1004
+    },
+    {
+      "name": "02_smoke_console_transcript.txt",
+      "sha256": "7e18386b8eb98b2a210f8d3567df5ff75dae570ba5acba43d167fe8982193cd5",
+      "bytes": 3053
+    }
+  ],
+  "manifest_written_last": true
+}

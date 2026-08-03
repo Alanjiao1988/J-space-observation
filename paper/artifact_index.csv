@@ -53,3 +53,10 @@ AR-0051,1.0C,20260725T170041Z,conflict_report_vs_deterministic_triage.json,seman
 AR-0052,1.0C-audit,cm43,phase1_0c_generation_profile_defects.json,defect_audit,repo:docs,4cab827caae2ea871fe34cd18dd545a866af7aafd6345b575dbee62c9a649637,4663,no,no,primary
 AR-0053,1.0D,cm45,phase1_0d_protocol_snapshot.json,preregistered_protocol,repo:docs,fe1016aac00be4fe5dfd2414fd30c561474252a361332479ab9c8561ceb73817,20786,no,no,primary
 AR-0054,1.0D,cm4u,phase1_0d_build_provenance.json,build_provenance,repo:root,f388c514860612928fae7875a493d3bc6af977d15cd3cce180243d0d3cf29fb1,9390,no,no,supporting
+AR-0055,1.0D,cm5a,phase1_0d_semantic_review_addendum.json,frozen_review_protocol,repo:docs,582640de645030daf957fbc3e5c7947008b78d1596b674687a73f20ba749bdc3,13161,no,no,primary
+AR-0056,1.0D,cm5a,phase1_0d_semantic_review_rubric.md,frozen_review_rubric,repo:docs,a0d5b22bd6d4ef1012db676ff3431c3d2e6825f1ec4ade1a7c7801817ba8765d,2431,no,no,primary
+AR-0057,1.0D,cm58,phase1_0d_review_build_provenance.json,build_provenance,repo:root,2ba4ca9a67ed7a7ef9d11cc3269d256a26bb510a0f15400be1e2147e4ef5062a,4406,no,no,supporting
+AR-0058,1.0D,20260803T031343Z,00_gate_receipt.json,gate_receipt,repo:artifacts/phase1-0d-semantic-review-gate/20260803T031343Z,74d738bf00477f391097ee6622379259ffb808283ebe081d33934a79fd252352,5925,no,no,primary
+AR-0059,1.0D,20260803T030929Z,01_qualification_console_transcript.txt,console_transcript,repo:artifacts/phase1-0d-semantic-review-gate/20260803T031343Z,63712794c842de29e1ac23e7d98f6b771da1f83eadac4e2e3bbc1c80346ce003,1004,no,no,supporting
+AR-0060,1.0D,20260803T031343Z,02_smoke_console_transcript.txt,console_transcript,repo:artifacts/phase1-0d-semantic-review-gate/20260803T031343Z,7e18386b8eb98b2a210f8d3567df5ff75dae570ba5acba43d167fe8982193cd5,3053,no,no,primary
+AR-0061,1.0D,20260803T031343Z,artifact_manifest.json,artifact_manifest,repo:artifacts/phase1-0d-semantic-review-gate/20260803T031343Z,d70c0c9925fdd9d764f17068d1c712e2c1ff1fdde4f75ed266b4b08018b0083f,665,no,no,provenance

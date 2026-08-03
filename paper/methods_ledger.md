@@ -1071,3 +1071,52 @@ hash, and the bare one does not.
 
 The general rule: a recorded hash must be published with the exact call that
 reproduces it, and the negative case is worth a test of its own.
+## M-15 - Qualifying a semantic-review panel before it can see a result
+
+Phase 1.0D needs 900 semantic labels, and the repository has no registered
+provider for them. The method used to try to acquire one is worth recording
+independently of the fact that it failed.
+
+The order is the method:
+
+1. **Freeze the instrument first.** The reviewer roles, deployments, model
+   versions, prompt, rubric, output schema, six synthetic fixtures with their
+   expected labels, and the stop rules for every failure mode were written into
+   one addendum, hashed
+   (`582640de645030daf957fbc3e5c7947008b78d1596b674687a73f20ba749bdc3`), and
+   committed before any endpoint existed.
+2. **Bake the frozen bytes into the executing artifact.** The review image
+   verifies at build time that the addendum and rubric inside it hash to the
+   committed values, that its own source bundle matches its committed
+   provenance record, and that it can reproduce the base protocol hash. A green
+   build is the attestation; there is no separate document to trust.
+3. **Lock the artifact.** Tag and manifest are locked against write and delete,
+   and the launcher refuses to start against an unlocked image.
+4. **Prove the route on bytes that carry no information.** The qualification
+   stage sends one trivial prompt per role. It answers "can this environment
+   reach these models at all", and nothing else. Here it retired a real
+   unknown: all three deployments answer `/openai/v1/chat/completions` with no
+   api-version parameter, and a southeastasia Container Apps VNet can reach
+   eastus2 AI endpoints under managed identity with local auth disabled.
+5. **Prove the judgement on synthetic bytes, still before any target output.**
+   The smoke stage runs all six fixtures against all three roles and compares
+   to the committed expectations. It is deliberately run in a separate process
+   from any generation, is given no pack prefix, and therefore *cannot* read a
+   target output even if one existed.
+6. **Bind the response to the fixtures in advance.** Transport and
+   configuration faults are declared fixable and rerunnable. Label mismatches
+   are declared terminal, with tuning, substitution, fallback and fixture
+   edits named and forbidden by the frozen text.
+
+Step 6 is the part that has to be written before step 5 runs, and it is the
+only part that gives steps 1 to 5 any value. This round it fired: one of
+eighteen labels disagreed, and the round ended without a generation run. See
+D25 and L-50.
+
+The general rule: a reviewer panel is an instrument, and an instrument that is
+calibrated after it has read the sample is not an instrument. The cost of
+qualifying prospectively is that a single disagreement can end a round before
+any measurement is taken. That is the cost being paid here, and it is the
+correct one — the alternative outcome, 900 labels from a panel known to
+mislabel the one distinction the phase turns on, would have been worse and
+would have looked like progress.

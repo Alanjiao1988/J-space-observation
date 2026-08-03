@@ -1,0 +1,9 @@
+08/03/2026 03:12:27 ADDENDUM_SHA256=582640de645030daf957fbc3e5c7947008b78d1596b674687a73f20ba749bdc3
+08/03/2026 03:12:27 RUBRIC_SHA256=a0d5b22bd6d4ef1012db676ff3431c3d2e6825f1ec4ade1a7c7801817ba8765d
+08/03/2026 03:12:27 BASE_PROTOCOL_SHA256=25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8
+08/03/2026 03:12:53 QUALIFIED role=primary deployment=gpt-5-6-sol-global model=gpt-5.6-sol:2026-07-09 path=/openai/v1/chat/completions api_version=-
+08/03/2026 03:12:53 QUALIFIED role=secondary deployment=mistral-large-3-global model=Mistral-Large-3:1 path=/openai/v1/chat/completions api_version=-
+08/03/2026 03:12:53 QUALIFIED role=third deployment=deepseek-v4-pro-global model=DeepSeek-V4-Pro:2026-04-23 path=/openai/v1/chat/completions api_version=-
+08/03/2026 03:12:53 RECEIPT_SHA256=efb94aed3e33b518f5e3703c3f7bd0c27534444a871e324e5d2a32fbca3d5048
+08/03/2026 03:12:53 RECEIPT_PATH=/workspace/runtime/results/provider_qualification_20260803T030929Z.json
+08/03/2026 03:12:53 QUALIFY_COMPLETE=1
