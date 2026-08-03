@@ -7,15 +7,15 @@
   "base_image_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
   "base_protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
   "bundle_hash_domain": "jspace-phase1-0d-review-v2/build-bundle/v1",
-  "bundle_sha256": "47fda61eaedce711d790ca5838225611893f8f792958c8d12a6f7f19237c1e36",
+  "bundle_sha256": "70c3ff1a8be36a77becafc3ae1a57a54d0d8dcac939b87246857a01b61cf9d2d",
   "claim_boundary": "build provenance only; establishes which bytes are in the v2 review image and nothing about reviewer accuracy, instrument validity, model behaviour, hidden reasoning, or a 'J-space'",
-  "code_commit": "8e836d788cac0275ceccc7fa8e8adc33e0f02b5f",
+  "code_commit": "fe1bc9b31f0de43c16d0d70ad21cb48ffe2288a1",
   "disjoint_from": [
     "phase1_0d_build_provenance.json",
     "phase1_0d_review_build_provenance.json"
   ],
   "dockerfile": "Dockerfile.phase1-0d-review-v2",
-  "file_count": 14,
+  "file_count": 15,
   "files": [
     {
       "bytes": 3303,
@@ -23,9 +23,9 @@
       "sha256": "c965ea6e67cb9d473aa76d57913f8976b4d7b38b59fa2bedb64dcab06df163c2"
     },
     {
-      "bytes": 9462,
+      "bytes": 9506,
       "path": "Dockerfile.phase1-0d-review-v2",
-      "sha256": "73ccf513557a6eb72cdc537ab6a86fe9d636894ac0142bc92e5594a94c525631"
+      "sha256": "a70a4de927a91b164b5c7b131f0ae919c28ba54298fee7668aa39cb05ed5be4b"
     },
     {
       "bytes": 5849,
@@ -40,7 +40,7 @@
     {
       "bytes": 8863,
       "path": "docs/phase1_0d_rv2_protected_bytes.json",
-      "sha256": "9b312cffa9c034b7f182a2c6cc0fa3314b8481972dd65c0af6f603d7c9c423e9"
+      "sha256": "25b4589e044d3d6c2d759039e94f67b9c9451cb887ff21ac1b4f3924169adca8"
     },
     {
       "bytes": 24921,
@@ -58,9 +58,9 @@
       "sha256": "7b93c90a299ff4e77b83d4633624053f8ce53afcd04279ca3050c5ab14428e19"
     },
     {
-      "bytes": 21620,
+      "bytes": 21664,
       "path": "scripts/phase1_0d_review_v2_build_provenance.py",
-      "sha256": "b5e892559260fcba7f64a566dbc84c63c528cc820f9d48c31ea3dfca96e533d7"
+      "sha256": "00c29a7547b7c37ffb4f22ce10698b0c78b97a7de58bc79532ace4c157d8132f"
     },
     {
       "bytes": 10376,
@@ -68,9 +68,14 @@
       "sha256": "73db75fd13922849194381959bda47595f76c6286bb3a0693395e4bc3fe82095"
     },
     {
-      "bytes": 54635,
+      "bytes": 56187,
       "path": "scripts/run_phase1_0d_semantic_review_v2.py",
-      "sha256": "0e9bd0be7a3b839fb918c93420f64b3a4d2fc2056b1a4cd6e669a5c57f38ef3f"
+      "sha256": "46d61b9d1fc69c3f81faee1622aaf08e70439abb719d0a953152c0c36dffcecb"
+    },
+    {
+      "bytes": 5305,
+      "path": "scripts/verify_phase1_0d_rv2_gate.py",
+      "sha256": "7ee36295f619ce590ea289331316af8e8a992e3daae604eea5a070a538565dfa"
     },
     {
       "bytes": 862,
@@ -83,9 +88,9 @@
       "sha256": "d61729992f4220e95b612187d1e2ccb17ca33f577880395ca18ced85b9fb6ffd"
     },
     {
-      "bytes": 5314,
+      "bytes": 19245,
       "path": "src/jspace_observation/semantic_review_v2/verifier.py",
-      "sha256": "7a1c4b2b27e3a728c09515fd10ff9968bff806df3a552871eb356ee38cfc9d09"
+      "sha256": "040921080fbd8224bb6589cea78c37e3de14623168447711dd66d684000f3f90"
     }
   ],
   "fixture_bank_sha256": "41adb246ec36d5ac7b16f5144c466351b93abe8b3f56dc811e58a789b197e75f",
