@@ -844,7 +844,10 @@ else:
         expected_command,
     ]:
         failures.append("container command differs from the registered review command")
-    if container.get("resources") != {"cpu": 2.0, "memory": "4Gi"}:
+    resources = dict(container.get("resources") or {})
+    if resources.pop("ephemeralStorage", "") != "":
+        failures.append("container has unexpected ephemeral storage")
+    if resources != {"cpu": 2.0, "memory": "4Gi"}:
         failures.append("container resources differ from the registered review job")
     env_list = container.get("env") or []
     env = {item.get("name"): item.get("value") for item in env_list}

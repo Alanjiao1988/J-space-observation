@@ -1017,6 +1017,14 @@ def test_the_runner_uses_a_locked_digest_and_no_platform_retry():
     assert "container environment differs from the exact registered values" in text
 
 
+def test_the_runner_accepts_only_empty_platform_ephemeral_storage_readback():
+    text = RUN_SCRIPT.read_text(encoding="utf-8")
+    assert 'resources = dict(container.get("resources") or {})' in text
+    assert 'resources.pop("ephemeralStorage", "") != ""' in text
+    assert 'resources != {"cpu": 2.0, "memory": "4Gi"}' in text
+    assert "container has unexpected ephemeral storage" in text
+
+
 def test_the_runner_carries_no_storage_secret_or_volume():
     text = RUN_SCRIPT.read_text(encoding="utf-8")
     assert "ACCOUNT_KEY" not in "\n".join(

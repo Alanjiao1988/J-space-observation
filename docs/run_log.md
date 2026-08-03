@@ -4488,3 +4488,27 @@ appears after that surface. `incorrect` is what strict in-order execution
 returns. Recorded as `EV-0013`, `D26`, `L-52`, `M-16` and
 `docs/decisions/phase1_0d_semantic_review_v1_specification_correction.md`, with
 dated pointers appended to `D25` and `L-50` and no original byte rewritten.
+
+### Pre-execution qualification attempt 1 — inert Azure readback mismatch
+
+ACR QuickRun `cm82` built commit
+`c7d5848b71bc546a2bd5c55fd224c4ed7b7caed1` as
+`j-space-observation-phase1-0d-review-v2@sha256:5e1d6c63df5cd5866b7b8b2d81c073167cb62b3801460d917b2d3189eba352ae`.
+Both its tag and manifest were locked against write and delete.
+
+Qualification run ID `20260803T223953Z` provisioned the unique inert ACA Job
+`job-p10d-rv2-q-30e62394facd117d`, then stopped before `job start`. The Azure
+resource provider added `"ephemeralStorage": ""` to the returned container
+resource object; the launcher compared that service readback to an object
+containing only CPU and memory and failed closed. The Job has zero executions,
+so this attempt made zero provider calls, obtained zero semantic responses,
+wrote no qualification receipt, and consumed neither the smoke lock nor a
+scientific counter.
+
+Section 10.1 permits repair of a transport/configuration defect that produces
+no valid semantic response before smoke. The repair accepts only the platform's
+absent-or-empty ephemeral-storage field while retaining exact CPU and memory
+checks; a non-empty value or any other extra resource field remains terminal.
+The locked `cm82` image is retained unchanged. No model, version, route
+candidate, request profile, rubric, fixture, expected label, or retry rule
+changed.
