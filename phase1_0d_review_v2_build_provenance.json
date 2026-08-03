@@ -9,7 +9,7 @@
   "bundle_hash_domain": "jspace-phase1-0d-review-v2/build-bundle/v1",
   "bundle_sha256": "f8573e7f71522796e07ed3b05c8dc32d15ea07e7620c04f5a0e3fbbaa526677c",
   "claim_boundary": "build provenance only; establishes which bytes are in the v2 review image and nothing about reviewer accuracy, instrument validity, model behaviour, hidden reasoning, or a 'J-space'",
-  "code_commit": "9b63a45f6ab8b9c58645875be38b46918e93ed01",
+  "code_commit": "0a2b30043aba796e4480790666e57836f36e447c",
   "disjoint_from": [
     "phase1_0d_build_provenance.json",
     "phase1_0d_review_build_provenance.json"
