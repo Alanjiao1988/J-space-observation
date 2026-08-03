@@ -186,3 +186,4 @@ phase1_0d_review_v2_build_provenance.json text eol=lf
 infra/azure/scripts/22_build_phase1_0d_review_v2.sh text eol=lf
 infra/azure/scripts/23_run_phase1_0d_semantic_review_v2.sh text eol=lf
 tests/test_phase1_0d_review_v2_image.py text eol=lf
+.dockerignore text eol=lf

@@ -42,6 +42,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -69,10 +70,29 @@ QUALIFICATION_PROBE: dict[str, str] = {
 TERMINAL_PERSISTENCE = "BLOCKED_ON_PHASE_1_0D_RV2_GATE_EVIDENCE_PERSISTENCE"
 TERMINAL_UNQUALIFIED = "CLOSED_PHASE_1_0D_WITHOUT_GENERATION_REVIEW_INSTRUMENT_UNQUALIFIED"
 TERMINAL_PROVIDER = "CLOSED_PHASE_1_0D_WITHOUT_GENERATION_REVIEW_PROVIDER_UNAVAILABLE"
+QUALIFICATION_PREFIX_ROOT = "phase1-0d-semantic-review-v2/qualification"
+SMOKE_PREFIX_ROOT = "phase1-0d-semantic-review-v2/smoke"
+UTC_RUN_ID = re.compile(r"[0-9]{8}T[0-9]{6}Z\Z")
+SHA1 = re.compile(r"[0-9a-f]{40}\Z")
+SHA256_DIGEST = re.compile(r"sha256:[0-9a-f]{64}\Z")
+MAX_REGISTERED_RETRIES = 7
 
 
 class GateEvidenceError(RuntimeError):
     """Raised when gate evidence exists but cannot be persisted."""
+
+
+def _validate_gate_prefix(prefix: str, expected_root: str) -> str:
+    normalised = prefix.rstrip("/")
+    if not normalised or normalised != prefix.strip().rstrip("/"):
+        raise GateEvidenceError(f"refusing an unnormalised gate prefix: {prefix!r}")
+    root, separator, run_id = normalised.rpartition("/")
+    if root != expected_root or separator != "/" or not UTC_RUN_ID.fullmatch(run_id):
+        raise GateEvidenceError(
+            f"gate prefix {prefix!r} is outside registered root "
+            f"{expected_root!r} or lacks one UTC run id"
+        )
+    return normalised
 
 
 def _write(path: Path, payload: str) -> str:
@@ -91,11 +111,16 @@ class GatePublisher:
     storage") is a property of the process rather than a promise about it.
     """
 
-    def __init__(self, account: str, container: str, prefix: str, tokens: Any) -> None:
-        if not prefix or prefix.strip("/") != prefix.strip():
-            raise GateEvidenceError(f"refusing an unnormalised gate prefix: {prefix!r}")
+    def __init__(
+        self,
+        account: str,
+        container: str,
+        prefix: str,
+        expected_root: str,
+        tokens: Any,
+    ) -> None:
         self._client = transport.BlobClient(account, container, tokens)
-        self._prefix = prefix.rstrip("/")
+        self._prefix = _validate_gate_prefix(prefix, expected_root)
         self.account = account
         self.container = container
 
@@ -133,12 +158,16 @@ class GatePublisher:
 class GateReader:
     """Read exactly one registered gate prefix and nothing beside it."""
 
-    def __init__(self, account: str, container: str, prefix: str, tokens: Any) -> None:
-        normalised = prefix.rstrip("/")
-        if not normalised or normalised != prefix.strip().rstrip("/"):
-            raise GateEvidenceError(f"refusing an unnormalised gate prefix: {prefix!r}")
+    def __init__(
+        self,
+        account: str,
+        container: str,
+        prefix: str,
+        expected_root: str,
+        tokens: Any,
+    ) -> None:
         self._client = transport.BlobClient(account, container, tokens)
-        self._prefix = normalised
+        self._prefix = _validate_gate_prefix(prefix, expected_root)
 
     @property
     def prefix(self) -> str:
@@ -244,24 +273,31 @@ def _qualify(book: contract.Addendum, caller: LiveCaller) -> dict[str, Any]:
             record["retry_count"] = 0
             record["terminal_transport_status"] = f"malformed_envelope: {error}"
         else:
-            _record_response(record, response)
             try:
-                label = contract.parse_label(response.payload, profile)
+                _record_response(record, response)
             except contract.MalformedResponseError as error:
-                record["terminal_transport_status"] = f"malformed_label: {error}"
+                record["terminal_transport_status"] = f"malformed_envelope: {error}"
             else:
-                record["observed_label"] = label
-                record["match"] = label == "correct"
-                visible = record["visible_completion_tokens"]
-                if not isinstance(visible, int) or visible > profile.max_visible_output_tokens:
-                    record["terminal_transport_status"] = (
-                        "malformed_visible_token_count: "
-                        f"{visible!r} exceeds or cannot prove cap "
-                        f"{profile.max_visible_output_tokens}"
-                    )
-                    record["match"] = False
+                try:
+                    label = contract.parse_label(response.payload, profile)
+                except contract.MalformedResponseError as error:
+                    record["terminal_transport_status"] = f"malformed_label: {error}"
                 else:
-                    caller.resolved[role] = (path, api_version)
+                    record["observed_label"] = label
+                    record["match"] = label == "correct"
+                    visible = record["visible_completion_tokens"]
+                    if (
+                        type(visible) is not int
+                        or visible < 0
+                        or visible > profile.max_visible_output_tokens
+                    ):
+                        record["terminal_transport_status"] = (
+                            "malformed_visible_token_count: "
+                            f"{visible!r} is outside 0.."
+                            f"{profile.max_visible_output_tokens}"
+                        )
+                    else:
+                        caller.resolved[role] = (path, api_version)
 
         roles[role] = {
             "provider": profile.provider,
@@ -288,7 +324,12 @@ def _qualify(book: contract.Addendum, caller: LiveCaller) -> dict[str, Any]:
         for call in calls
     )
     matches = sum(bool(call["match"]) for call in calls)
-    passed = len(calls) == len(contract.ROLES) and matches == len(contract.ROLES)
+    passed = (
+        len(calls) == len(contract.ROLES)
+        and matches == len(contract.ROLES)
+        and transport_failures == 0
+        and malformed == 0
+    )
     if passed:
         verdict = "QUALIFIED"
     elif transport_failures:
@@ -341,12 +382,18 @@ def _record_response(record: dict[str, Any], response: Any) -> None:
             "frozen body recorded before the call"
         )
     payload = response.payload
+    if not isinstance(payload, Mapping):
+        raise contract.MalformedResponseError(
+            "a reviewer response envelope must be a JSON object"
+        )
     record.update(
         {
             "response_body_sha256": response.response_sha256,
             "request_id": _envelope_field(payload, "id"),
-            "provider_model_fingerprint": _envelope_field(payload, "model")
-            or _envelope_field(payload, "system_fingerprint"),
+            "provider_model_fingerprint": _envelope_field(
+                payload, "system_fingerprint"
+            )
+            or _envelope_field(payload, "model"),
             "finish_reason": _finish_reason(payload),
             "visible_completion_tokens": contract.visible_token_count(payload),
             "total_tokens": _total_tokens(payload),
@@ -421,7 +468,12 @@ def _smoke(book: contract.Addendum, caller: LiveCaller) -> dict[str, Any]:
                 continue
 
             payload = response.payload
-            _record_response(record, response)
+            try:
+                _record_response(record, response)
+            except contract.MalformedResponseError as error:
+                record["terminal_transport_status"] = f"malformed_envelope: {error}"
+                calls.append(record)
+                continue
             try:
                 label = contract.parse_label(payload, profile)
             except contract.MalformedResponseError as error:
@@ -430,6 +482,16 @@ def _smoke(book: contract.Addendum, caller: LiveCaller) -> dict[str, Any]:
                 continue
             record["observed_label"] = label
             record["match"] = label == expected
+            visible = record["visible_completion_tokens"]
+            if (
+                type(visible) is not int
+                or visible < 0
+                or visible > profile.max_visible_output_tokens
+            ):
+                record["terminal_transport_status"] = (
+                    "malformed_visible_token_count: "
+                    f"{visible!r} is outside 0..{profile.max_visible_output_tokens}"
+                )
             calls.append(record)
 
     return summarise_smoke(book, calls)
@@ -460,8 +522,8 @@ def summarise_smoke(book: contract.Addendum, calls: list[dict[str, Any]]) -> dic
     within_cap = [
         call
         for call in valid
-        if isinstance(call["visible_completion_tokens"], int)
-        and call["visible_completion_tokens"] <= caps[call["role"]]
+        if type(call["visible_completion_tokens"]) is int
+        and 0 <= call["visible_completion_tokens"] <= caps[call["role"]]
     ]
     matches = [call for call in calls if call["match"]]
     mismatches = [
@@ -558,11 +620,21 @@ def _load_persisted_receipt(
 
     prefix = prefix.rstrip("/")
     manifest = json.loads(client.get(f"{prefix}/artifact_manifest.json"))
+    files = manifest.get("files")
+    if (
+        not isinstance(files, list)
+        or len(files) != 1
+        or manifest.get("file_count") != 1
+        or manifest.get("manifest_written_last") is not True
+        or not isinstance(files[0], Mapping)
+        or files[0].get("name") != "00_gate_receipt.json"
+    ):
+        raise addendum_v2.AddendumError(
+            "the persisted gate manifest is not the exact one-receipt, "
+            "manifest-last bundle"
+        )
     raw = client.get(f"{prefix}/00_gate_receipt.json")
-    recorded = {
-        str(entry["name"]): str(entry["sha256"])
-        for entry in manifest.get("files", [])
-    }
+    recorded = {str(entry["name"]): str(entry["sha256"]) for entry in files}
     digest = hashlib.sha256(raw).hexdigest()
     if recorded.get("00_gate_receipt.json") != digest:
         raise addendum_v2.AddendumError(
@@ -578,6 +650,12 @@ def _load_persisted_receipt(
             f"gate receipt artifact is {receipt.get('artifact')!r}, expected "
             f"{expected_artifact!r}"
         )
+    for key, expected in _instrument_header(book).items():
+        if receipt.get(key) != expected:
+            raise addendum_v2.AddendumError(
+                f"gate receipt moved frozen instrument field {key}: "
+                f"{receipt.get(key)!r} != {expected!r}"
+            )
     receipt["_receipt_sha256"] = digest
     return receipt
 
@@ -607,6 +685,88 @@ def _validate_receipt_routes(
             )
 
 
+def _validate_execution_binding(receipt: Mapping[str, Any]) -> None:
+    if not SHA1.fullmatch(str(receipt.get("review_code_commit", ""))):
+        raise addendum_v2.AddendumError(
+            "gate receipt has no full review_code_commit binding"
+        )
+    if not SHA256_DIGEST.fullmatch(str(receipt.get("review_image_digest", ""))):
+        raise addendum_v2.AddendumError(
+            "gate receipt has no digest-pinned review_image_digest binding"
+        )
+
+
+def _validate_call(
+    call: Mapping[str, Any],
+    fixture_id: str,
+    expected_label: str,
+    profile: contract.RoleProfile,
+    required_fields: set[str],
+) -> None:
+    missing = sorted(required_fields - set(call))
+    if missing:
+        raise addendum_v2.AddendumError(
+            f"{fixture_id}/{profile.role} receipt misses fields: {missing}"
+        )
+    expected_static = {
+        "fixture_id": fixture_id,
+        "expected_label": expected_label,
+        "role": profile.role,
+        "provider": profile.provider,
+        "deployment": profile.deployment,
+        "model": profile.model,
+        "model_version": profile.model_version,
+    }
+    for key, expected in expected_static.items():
+        if call.get(key) != expected:
+            raise addendum_v2.AddendumError(
+                f"{fixture_id}/{profile.role} moved {key}: "
+                f"{call.get(key)!r} != {expected!r}"
+            )
+    for key in ("request_body_sha256", "response_body_sha256"):
+        value = str(call.get(key, ""))
+        if not re.fullmatch(r"[0-9a-f]{64}", value):
+            raise addendum_v2.AddendumError(
+                f"{fixture_id}/{profile.role} has no complete {key}"
+            )
+    if call.get("terminal_transport_status") != "ok":
+        raise addendum_v2.AddendumError(
+            f"{fixture_id}/{profile.role} is not a valid completed response"
+        )
+    if call.get("observed_label") != expected_label or call.get("match") is not True:
+        raise addendum_v2.AddendumError(
+            f"{fixture_id}/{profile.role} is not an exact expected-label match"
+        )
+    visible = call.get("visible_completion_tokens")
+    if (
+        type(visible) is not int
+        or visible < 0
+        or visible > profile.max_visible_output_tokens
+    ):
+        raise addendum_v2.AddendumError(
+            f"{fixture_id}/{profile.role} has invalid visible token count {visible!r}"
+        )
+    total = call.get("total_tokens")
+    if total is not None and (type(total) is not int or total < visible):
+        raise addendum_v2.AddendumError(
+            f"{fixture_id}/{profile.role} has invalid total token usage {total!r}"
+        )
+    latency = call.get("latency_seconds")
+    if (
+        isinstance(latency, bool)
+        or not isinstance(latency, (int, float))
+        or latency < 0
+    ):
+        raise addendum_v2.AddendumError(
+            f"{fixture_id}/{profile.role} has invalid latency {latency!r}"
+        )
+    retries = call.get("retry_count")
+    if type(retries) is not int or not 0 <= retries <= MAX_REGISTERED_RETRIES:
+        raise addendum_v2.AddendumError(
+            f"{fixture_id}/{profile.role} has invalid retry count {retries!r}"
+        )
+
+
 def _load_qualification_receipt(
     client: Any, prefix: str, book: contract.Addendum
 ) -> dict[str, Any]:
@@ -617,15 +777,49 @@ def _load_qualification_receipt(
         "phase1_0d_rv2_provider_qualification_receipt",
     )
     counts = receipt.get("counts", {})
-    if (
-        not receipt.get("passed")
-        or int(counts.get("completed_calls", -1)) != len(contract.ROLES)
-        or int(counts.get("valid_expected_label_matches", -1)) != len(contract.ROLES)
+    expected_counts = {
+        "registered_calls": len(contract.ROLES),
+        "completed_calls": len(contract.ROLES),
+        "valid_expected_label_matches": len(contract.ROLES),
+        "transport_failures_after_registered_retry": 0,
+        "malformed_responses": 0,
+        "semantic_retries": 0,
+    }
+    if not receipt.get("passed") or any(
+        counts.get(key) != expected for key, expected in expected_counts.items()
     ):
         raise addendum_v2.AddendumError(
             "smoke is licensed only by a persisted 3/3 qualification pass"
         )
     _validate_receipt_routes(receipt, book)
+    _validate_execution_binding(receipt)
+    calls = receipt.get("calls")
+    if not isinstance(calls, list) or len(calls) != len(contract.ROLES):
+        raise addendum_v2.AddendumError(
+            "qualification receipt must contain exactly three per-call receipts"
+        )
+    by_role: dict[str, Mapping[str, Any]] = {}
+    for call in calls:
+        if not isinstance(call, Mapping) or str(call.get("role")) in by_role:
+            raise addendum_v2.AddendumError(
+                "qualification receipt has a malformed or duplicate role call"
+            )
+        by_role[str(call["role"])] = call
+    required_fields = set(
+        book.document["evidence_persistence"]["per_call_receipt_fields"]
+    )
+    for role in contract.ROLES:
+        if role not in by_role:
+            raise addendum_v2.AddendumError(
+                f"qualification receipt has no {role} call"
+            )
+        _validate_call(
+            by_role[role],
+            QUALIFICATION_PROBE["record_id"],
+            "correct",
+            book.roles[role],
+            required_fields,
+        )
     return receipt
 
 
@@ -644,6 +838,71 @@ def _load_gate_receipt(client: Any, prefix: str, book: contract.Addendum) -> dic
             f"{addendum_v2.REQUIRED_CALLS}/{addendum_v2.REQUIRED_CALLS} smoke pass"
         )
     _validate_receipt_routes(receipt, book)
+    _validate_execution_binding(receipt)
+    criterion = book.document["smoke_rules"]["pass_criterion"]
+    expected_counts = {
+        "registered_calls": addendum_v2.REQUIRED_CALLS,
+        "completed_calls": addendum_v2.REQUIRED_CALLS,
+        **{key: int(value) for key, value in criterion.items()},
+    }
+    for key, expected in expected_counts.items():
+        if counts.get(key) != expected:
+            raise addendum_v2.AddendumError(
+                f"smoke receipt count {key} is {counts.get(key)!r}, expected "
+                f"{expected}"
+            )
+    if (
+        receipt.get("mismatches") != []
+        or receipt.get("verdict") != "QUALIFIED"
+        or receipt.get("no_majority_rule") is not True
+    ):
+        raise addendum_v2.AddendumError(
+            "smoke receipt does not carry the exact no-tolerance pass verdict"
+        )
+    calls = receipt.get("calls")
+    if not isinstance(calls, list) or len(calls) != addendum_v2.REQUIRED_CALLS:
+        raise addendum_v2.AddendumError(
+            "smoke receipt must contain exactly 60 per-call receipts"
+        )
+    by_pair: dict[tuple[str, str], Mapping[str, Any]] = {}
+    for call in calls:
+        if not isinstance(call, Mapping):
+            raise addendum_v2.AddendumError("smoke receipt contains a non-object call")
+        pair = (str(call.get("fixture_id")), str(call.get("role")))
+        if pair in by_pair:
+            raise addendum_v2.AddendumError(
+                f"smoke receipt duplicates registered pair {pair}"
+            )
+        by_pair[pair] = call
+    required_fields = set(
+        book.document["evidence_persistence"]["per_call_receipt_fields"]
+    )
+    for fixture in book.smoke_fixtures:
+        fixture_id = str(fixture["fixture_id"])
+        expected_label = str(fixture["expected_label"])
+        for role in contract.ROLES:
+            pair = (fixture_id, role)
+            if pair not in by_pair:
+                raise addendum_v2.AddendumError(
+                    f"smoke receipt omits registered pair {pair}"
+                )
+            _validate_call(
+                by_pair[pair],
+                fixture_id,
+                expected_label,
+                book.roles[role],
+                required_fields,
+            )
+    parent = receipt.get("qualification_parent")
+    if (
+        not isinstance(parent, Mapping)
+        or not re.fullmatch(r"[0-9a-f]{64}", str(parent.get("receipt_sha256", "")))
+        or not UTC_RUN_ID.fullmatch(str(parent.get("run_id", "")))
+    ):
+        raise addendum_v2.AddendumError(
+            "smoke receipt does not bind one persisted qualification parent"
+        )
+    _validate_gate_prefix(str(parent.get("prefix", "")), QUALIFICATION_PREFIX_ROOT)
     return receipt
 
 
@@ -694,14 +953,51 @@ def main(argv: list[str] | None = None) -> int:
             "the v2 qualification and smoke stages take no generation pack; "
             "target isolation is not optional"
         )
+    if not SHA1.fullmatch(args.code_commit):
+        raise SystemExit(
+            f"{args.mode} mode requires --code-commit as a full 40-character sha"
+        )
+    if not SHA256_DIGEST.fullmatch(args.image_digest):
+        raise SystemExit(
+            f"{args.mode} mode requires --image-digest as a sha256 digest"
+        )
+
+    persistence = book.document["evidence_persistence"]
+    expected_account = str(persistence["blob_account"])
+    expected_container = str(persistence["blob_container"])
+    if (
+        args.blob_account != expected_account
+        or args.blob_container != expected_container
+    ):
+        raise SystemExit(
+            "the v2 route must use the frozen gate evidence store "
+            f"{expected_account}/{expected_container}"
+        )
+    if args.mode in ("qualify", "smoke") and not args.gate_blob_prefix:
+        raise SystemExit(
+            f"{args.mode} mode requires a create-only --gate-blob-prefix before "
+            "any provider call"
+        )
 
     tokens = transport.TokenProvider(args.client_id or None)
 
     publisher: GatePublisher | None = None
-    if args.blob_account and args.blob_container and args.gate_blob_prefix:
+    if args.gate_blob_prefix:
+        if args.mode == "qualify":
+            expected_root = QUALIFICATION_PREFIX_ROOT
+        elif args.mode == "smoke":
+            expected_root = SMOKE_PREFIX_ROOT
+        else:
+            raise SystemExit("review mode does not accept --gate-blob-prefix")
         publisher = GatePublisher(
-            args.blob_account, args.blob_container, args.gate_blob_prefix, tokens
+            args.blob_account,
+            args.blob_container,
+            args.gate_blob_prefix,
+            expected_root,
+            tokens,
         )
+        if publisher.prefix != f"{expected_root}/{run_id}":
+            raise SystemExit("the gate evidence prefix must end in this exact run id")
 
     if args.mode == "qualify":
         caller = LiveCaller(book, tokens)
@@ -749,6 +1045,7 @@ def main(argv: list[str] | None = None) -> int:
             args.blob_account,
             args.blob_container,
             args.qualification_receipt_prefix,
+            QUALIFICATION_PREFIX_ROOT,
             tokens,
         )
         qualification = _load_qualification_receipt(
@@ -756,11 +1053,11 @@ def main(argv: list[str] | None = None) -> int:
             qualification_reader.prefix,
             book,
         )
-        if args.code_commit and qualification.get("review_code_commit") != args.code_commit:
+        if qualification.get("review_code_commit") != args.code_commit:
             raise addendum_v2.AddendumError(
                 "the qualification receipt came from a different review commit"
             )
-        if args.image_digest and qualification.get("review_image_digest") != args.image_digest:
+        if qualification.get("review_image_digest") != args.image_digest:
             raise addendum_v2.AddendumError(
                 "the qualification receipt came from a different review image"
             )
@@ -823,18 +1120,23 @@ def main(argv: list[str] | None = None) -> int:
     # ---- review: target storage is reachable only from here -----------------
     import run_phase1_0d_semantic_review as v1runner  # noqa: PLC0415, E402
 
-    if not (args.blob_account and args.blob_container):
-        raise SystemExit("review mode needs --blob-account and --blob-container")
     blob = transport.BlobClient(args.blob_account, args.blob_container, tokens)
 
     if not args.gate_receipt_prefix:
         raise SystemExit("review mode needs --gate-receipt-prefix")
-    gate = _load_gate_receipt(blob, args.gate_receipt_prefix, book)
-    if args.code_commit and gate.get("review_code_commit") != args.code_commit:
+    gate_reader = GateReader(
+        args.blob_account,
+        args.blob_container,
+        args.gate_receipt_prefix,
+        SMOKE_PREFIX_ROOT,
+        tokens,
+    )
+    gate = _load_gate_receipt(gate_reader, gate_reader.prefix, book)
+    if gate.get("review_code_commit") != args.code_commit:
         raise addendum_v2.AddendumError(
             "the smoke receipt came from a different review commit"
         )
-    if args.image_digest and gate.get("review_image_digest") != args.image_digest:
+    if gate.get("review_image_digest") != args.image_digest:
         raise addendum_v2.AddendumError(
             "the smoke receipt came from a different review image"
         )

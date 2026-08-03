@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -67,15 +68,26 @@ def book():
 # --------------------------------------------------------------------------
 
 
-def _ok_call(fixture_id: str, role: str, expected: str, observed: str, tokens: int = 12):
+def _ok_call(
+    fixture_id: str,
+    role: str,
+    expected: str,
+    observed: str,
+    tokens: int = 12,
+    profile=None,
+):
+    provider = profile.provider if profile else "azure_ai_foundry"
+    deployment = profile.deployment if profile else f"{role}-deployment"
+    model = profile.model if profile else "m"
+    model_version = profile.model_version if profile else "v"
     return {
         "fixture_id": fixture_id,
         "expected_label": expected,
         "role": role,
-        "provider": "azure_ai_foundry",
-        "deployment": f"{role}-deployment",
-        "model": "m",
-        "model_version": "v",
+        "provider": provider,
+        "deployment": deployment,
+        "model": model,
+        "model_version": model_version,
         "request_body_sha256": "a" * 64,
         "response_body_sha256": "b" * 64,
         "observed_label": observed,
@@ -103,7 +115,13 @@ def _full_batch(book, observed_override=None):
             ):
                 observed = observed_override[1]
             calls.append(
-                _ok_call(str(fixture["fixture_id"]), role, expected, observed)
+                _ok_call(
+                    str(fixture["fixture_id"]),
+                    role,
+                    expected,
+                    observed,
+                    profile=book.roles[role],
+                )
             )
     return calls
 
@@ -163,6 +181,14 @@ def test_exceeding_the_visible_cap_is_a_failure_not_a_label(book):
     assert result["passed"] is False
     assert result["counts"]["visible_completions_within_cap"] == 59
     assert result["counts"]["exact_expected_label_matches"] == 60
+
+
+def test_a_negative_visible_count_is_malformed_not_within_cap(book):
+    calls = _full_batch(book)
+    calls[4]["visible_completion_tokens"] = -3
+    result = runner.summarise_smoke(book, calls)
+    assert result["passed"] is False
+    assert result["counts"]["visible_completions_within_cap"] == 59
 
 
 def test_the_registered_caps_are_the_frozen_sixty_four(book):
@@ -291,6 +317,29 @@ def test_a_clean_run_reaches_sixty_of_sixty(book):
             assert field in call
 
 
+def test_a_non_object_envelope_is_recorded_and_the_batch_continues(book):
+    caller = _FailingCaller(book, -1, RuntimeError("unused"))
+    original = caller.__call__
+
+    class _MalformedThenClean:
+        def __init__(self):
+            self.calls = 0
+
+        def __call__(self, profile, body):
+            self.calls += 1
+            response = original(profile, body)
+            if self.calls == 1:
+                response.payload = []
+            return response
+
+    wrapped = _MalformedThenClean()
+    result = runner._smoke(book, wrapped)
+    assert wrapped.calls == 60
+    assert result["counts"]["completed_calls"] == 60
+    assert result["counts"]["malformed_responses"] == 1
+    assert result["passed"] is False
+
+
 # --------------------------------------------------------------------------
 # isolation
 # --------------------------------------------------------------------------
@@ -318,11 +367,32 @@ def test_the_gate_reader_refuses_paths_outside_its_registered_prefix():
         reader.get("target-generation/02_records.jsonl")
 
 
+def test_gate_prefixes_are_confined_to_the_frozen_roots():
+    assert (
+        runner._validate_gate_prefix(
+            "phase1-0d-semantic-review-v2/qualification/20260803T000000Z",
+            runner.QUALIFICATION_PREFIX_ROOT,
+        )
+        == "phase1-0d-semantic-review-v2/qualification/20260803T000000Z"
+    )
+    with pytest.raises(runner.GateEvidenceError):
+        runner._validate_gate_prefix(
+            "phase1-headroom-confirmation/20260803T000000Z",
+            runner.QUALIFICATION_PREFIX_ROOT,
+        )
+
+
 def test_qualify_and_smoke_refuse_a_generation_pack():
     for mode in ("qualify", "smoke"):
         with pytest.raises(SystemExit) as error:
             runner.main([mode, "--pack-blob-prefix", "phase1-0d/whatever"])
         assert "take no generation pack" in str(error.value)
+
+
+def test_every_mode_requires_an_explicit_commit_and_image_binding():
+    with pytest.raises(SystemExit) as error:
+        runner.main(["qualify"])
+    assert "requires --code-commit" in str(error.value)
 
 
 def test_the_download_helper_is_not_imported_at_module_scope():
@@ -359,18 +429,33 @@ def _gate_objects(book, *, passed=True, matches=60, addendum_sha=None):
         }
         for role in contract.ROLES
     }
+    result = runner.summarise_smoke(book, _full_batch(book))
+    result["passed"] = passed
+    result["counts"]["exact_expected_label_matches"] = matches
     receipt = {
         "artifact": "phase1_0d_rv2_provider_smoke_receipt",
         "run_id": "20260803T000000Z",
+        **runner._instrument_header(book),
         "addendum_sha256": addendum_sha or book.sha256,
-        "passed": passed,
-        "counts": {"exact_expected_label_matches": matches},
+        "review_code_commit": "1" * 40,
+        "review_image_digest": "sha256:" + "2" * 64,
         "roles": roles,
+        "qualification_parent": {
+            "prefix": (
+                "phase1-0d-semantic-review-v2/qualification/"
+                "20260803T000001Z"
+            ),
+            "run_id": "20260803T000001Z",
+            "receipt_sha256": "3" * 64,
+        },
+        **result,
     }
     raw = contract.canonical_json(receipt).encode("utf-8")
     import hashlib
 
     manifest = {
+        "file_count": 1,
+        "manifest_written_last": True,
         "files": [
             {"name": "00_gate_receipt.json", "sha256": hashlib.sha256(raw).hexdigest()}
         ]
@@ -379,6 +464,20 @@ def _gate_objects(book, *, passed=True, matches=60, addendum_sha=None):
         "p/00_gate_receipt.json": raw,
         "p/artifact_manifest.json": contract.canonical_json(manifest).encode("utf-8"),
     }
+
+
+def _rewrite_receipt(objects, prefix, mutate):
+    import hashlib
+
+    key = f"{prefix}/00_gate_receipt.json"
+    document = json.loads(objects[key])
+    mutate(document)
+    raw = contract.canonical_json(document).encode("utf-8")
+    objects[key] = raw
+    manifest_key = f"{prefix}/artifact_manifest.json"
+    manifest = json.loads(objects[manifest_key])
+    manifest["files"][0]["sha256"] = hashlib.sha256(raw).hexdigest()
+    objects[manifest_key] = contract.canonical_json(manifest).encode("utf-8")
 
 
 def test_review_accepts_a_persisted_sixty_of_sixty(book):
@@ -408,6 +507,13 @@ def test_review_refuses_a_receipt_that_does_not_match_its_manifest(book):
         runner._load_gate_receipt(_FakeBlob(objects), "p", book)
 
 
+def test_review_refuses_an_incomplete_receipt_even_if_it_claims_sixty(book):
+    objects = _gate_objects(book)
+    _rewrite_receipt(objects, "p", lambda receipt: receipt["calls"].pop())
+    with pytest.raises(addendum_v2.AddendumError):
+        runner._load_gate_receipt(_FakeBlob(objects), "p", book)
+
+
 def test_smoke_accepts_only_a_persisted_three_of_three_qualification(book):
     roles = {
         role: {
@@ -418,16 +524,14 @@ def test_smoke_accepts_only_a_persisted_three_of_three_qualification(book):
         }
         for role in contract.ROLES
     }
+    qualification = runner._qualify(book, _QualificationCaller())
     receipt = {
         "artifact": "phase1_0d_rv2_provider_qualification_receipt",
         "run_id": "20260803T000000Z",
-        "addendum_sha256": book.sha256,
-        "passed": True,
-        "counts": {
-            "completed_calls": 3,
-            "valid_expected_label_matches": 3,
-        },
-        "roles": roles,
+        **runner._instrument_header(book),
+        "review_code_commit": "1" * 40,
+        "review_image_digest": "sha256:" + "2" * 64,
+        **qualification,
     }
     raw = contract.canonical_json(receipt).encode("utf-8")
     import hashlib
@@ -436,6 +540,8 @@ def test_smoke_accepts_only_a_persisted_three_of_three_qualification(book):
         "q/00_gate_receipt.json": raw,
         "q/artifact_manifest.json": contract.canonical_json(
             {
+                "file_count": 1,
+                "manifest_written_last": True,
                 "files": [
                     {
                         "name": "00_gate_receipt.json",
@@ -489,6 +595,22 @@ def test_the_instrument_check_refuses_a_moved_hash(monkeypatch):
     monkeypatch.setattr(prov2, "RUBRIC_SHA256", "0" * 64)
     with pytest.raises(prov2.ReviewV2ProvenanceError):
         prov2.verify_instrument(REPO_ROOT, RECORD)
+
+
+def test_every_v1_gate_manifest_entry_is_verified(tmp_path):
+    source = (
+        REPO_ROOT
+        / "artifacts/phase1-0d-semantic-review-gate/20260803T031343Z"
+    )
+    copied = tmp_path / "gate"
+    shutil.copytree(source, copied)
+    result = prov2.verify_manifest_tree(copied, copied / "artifact_manifest.json")
+    assert result["file_count"] == 3
+
+    transcript = copied / "01_qualification_console_transcript.txt"
+    transcript.write_bytes(transcript.read_bytes() + b"tampered\n")
+    with pytest.raises(prov2.ReviewV2ProvenanceError):
+        prov2.verify_manifest_tree(copied, copied / "artifact_manifest.json")
 
 
 def test_no_target_output_is_present_in_the_build_context():
@@ -568,6 +690,11 @@ def test_the_build_uses_a_separate_repository_and_locks_both_objects():
     assert "is still enabled after locking" in text
     assert "already exists; use a new commit" in text
     assert "az acr build" in text
+    assert "--overwrite false" in text
+    assert 'BUILD_LOCK_PREFIX="phase1-0d-semantic-review-v2/build-locks"' in text
+    assert 'git -C "$PROJECT_ROOT" archive --format=tar "$PROJECT_SHA"' in text
+    assert '"$BUILD_CONTEXT"' in text
+    assert 'LOCKED_TAG_DIGEST' in text
 
 
 def test_the_build_requires_a_clean_committed_provenance_record():
@@ -591,8 +718,11 @@ def test_the_runner_uses_the_registered_gate_prefixes():
 
 def test_the_runner_enforces_the_one_round_smoke_ceiling():
     text = RUN_SCRIPT.read_text(encoding="utf-8")
-    assert '[[ "$REVIEW_MODE" == "smoke" && "$EXECUTION_COUNT" != "0" ]]' in text
+    assert '[[ "$REVIEW_MODE" == "smoke" && "$JOB_EXISTS" != "0" ]]' in text
     assert "one-round ceiling is already spent; no RV3 is authorised" in text
+    assert 'SMOKE_LOCK_BLOB="phase1-0d-semantic-review-v2/smoke-round-lock.json"' in text
+    assert "--overwrite false" in text
+    assert "Atomic service-side one-round lock" in text
 
 
 def test_the_runner_uses_a_locked_digest_and_no_platform_retry():
@@ -642,3 +772,16 @@ def test_the_new_shell_scripts_parse_as_bash():
             text=True,
         )
         assert result.returncode == 0, result.stderr
+
+
+def test_docker_context_reincludes_only_the_required_historical_evidence():
+    text = (REPO_ROOT / ".dockerignore").read_text(encoding="utf-8")
+    assert "artifacts/*" in text
+    root = "artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/"
+    for name in (
+        "00_gate_receipt.json",
+        "01_qualification_console_transcript.txt",
+        "02_smoke_console_transcript.txt",
+        "artifact_manifest.json",
+    ):
+        assert f"!{root}{name}" in text

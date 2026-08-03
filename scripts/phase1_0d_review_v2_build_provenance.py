@@ -81,6 +81,7 @@ FIXTURE_BANK_SHA256 = (
 #: covered by their own records, which this image also verifies during the
 #: build, so the three bundles stay disjoint.
 BUNDLE_GLOBS: tuple[str, ...] = (
+    ".dockerignore",
     DOCKERFILE,
     "scripts/run_phase1_0d_semantic_review_v2.py",
     "scripts/phase1_0d_review_v2_build_provenance.py",
@@ -207,6 +208,55 @@ def _frozen_expectations() -> dict[str, str]:
     }
 
 
+def verify_manifest_tree(root: Path, manifest_path: Path) -> dict[str, Any]:
+    """Verify every payload named by one immutable artifact manifest."""
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    entries = manifest.get("files")
+    if (
+        not isinstance(entries, list)
+        or manifest.get("file_count") != len(entries)
+        or manifest.get("manifest_written_last") is not True
+    ):
+        raise ReviewV2ProvenanceError(
+            f"{manifest_path} is not a complete manifest-last artifact"
+        )
+    names: list[str] = []
+    for entry in entries:
+        if not isinstance(entry, dict) or not isinstance(entry.get("name"), str):
+            raise ReviewV2ProvenanceError(
+                f"{manifest_path} contains a malformed file entry"
+            )
+        name = str(entry["name"])
+        if name in names or "/" in name or "\\" in name:
+            raise ReviewV2ProvenanceError(
+                f"{manifest_path} contains duplicate or non-local name {name!r}"
+            )
+        names.append(name)
+        candidate = root / name
+        if not candidate.is_file():
+            raise ReviewV2ProvenanceError(
+                f"{manifest_path} names missing historical evidence {candidate}"
+            )
+        normalised = candidate.read_bytes().replace(b"\r\n", b"\n")
+        actual_hash = sha256_bytes(normalised)
+        if actual_hash != entry.get("sha256") or len(normalised) != entry.get("bytes"):
+            raise ReviewV2ProvenanceError(
+                f"historical evidence {candidate} does not match its manifest"
+            )
+    actual_names = {
+        path.name
+        for path in root.iterdir()
+        if path.is_file() and path.name != manifest_path.name
+    }
+    if actual_names != set(names):
+        raise ReviewV2ProvenanceError(
+            f"historical evidence tree has unexpected or missing files: "
+            f"manifest={sorted(names)} actual={sorted(actual_names)}"
+        )
+    return {"file_count": len(names), "files": sorted(names)}
+
+
 def verify_instrument(project_root: Path, provenance: Path | None) -> dict[str, Any]:
     """Section 8's semantic obligations, checked against frozen constants.
 
@@ -284,6 +334,11 @@ def verify_instrument(project_root: Path, provenance: Path | None) -> dict[str, 
         raise ReviewV2ProvenanceError(
             f"the v1 gate manifest hashes to {gate_manifest_sha}, historical parent "
             f"is {parents['v1_gate_manifest_sha256']}"
+        )
+    gate_tree = verify_manifest_tree(gate_root, gate_manifest_path)
+    if gate_tree["file_count"] != 3:
+        raise ReviewV2ProvenanceError(
+            "the frozen v1 gate must contain its receipt and two transcripts"
         )
     gate_receipt = json.loads(gate_receipt_path.read_text(encoding="utf-8"))
     if (

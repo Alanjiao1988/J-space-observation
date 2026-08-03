@@ -33,6 +33,7 @@ GENERATION_PREFIX="phase1-headroom-confirmation"
 REVIEW_PREFIX="phase1-headroom-confirmation-review-v2"
 QUALIFICATION_PREFIX="phase1-0d-semantic-review-v2/qualification"
 SMOKE_PREFIX="phase1-0d-semantic-review-v2/smoke"
+SMOKE_LOCK_BLOB="phase1-0d-semantic-review-v2/smoke-round-lock.json"
 IMAGE_REPOSITORY="j-space-observation-phase1-0d-review-v2"
 ACR_NAME="${ACR_NAME:?Set ACR_NAME to the existing private registry name}"
 REVIEW_MODE="${REVIEW_MODE:?Set REVIEW_MODE to qualify, smoke or review}"
@@ -215,10 +216,12 @@ mkdir -p "$RECORD_DIR"
 BODY_FILE="$RECORD_DIR/job_body.json"
 JOB_FILE="$RECORD_DIR/job_state.json"
 EXECUTION_LIST_FILE="$RECORD_DIR/existing_executions.json"
+JOB_EXISTS=0
 if az containerapp job show \
     --name "$JOB_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --output none 2>/dev/null; then
+    JOB_EXISTS=1
     az containerapp job execution list \
         --name "$JOB_NAME" \
         --resource-group "$RESOURCE_GROUP" \
@@ -228,9 +231,27 @@ else
 fi
 EXECUTION_COUNT="$(python -c 'import json,sys; print(len(json.load(open(sys.argv[1], encoding="utf-8"))))' \
     "$(native_path "$EXECUTION_LIST_FILE")")"
-if [[ "$REVIEW_MODE" == "smoke" && "$EXECUTION_COUNT" != "0" ]]; then
+if [[ "$REVIEW_MODE" == "smoke" && "$JOB_EXISTS" != "0" ]]; then
     echo "[FAIL] The v2 smoke one-round ceiling is already spent; no RV3 is authorised"
     exit 1
+fi
+if [[ "$REVIEW_MODE" == "smoke" ]]; then
+    # Atomic service-side one-round lock.  Two concurrent launchers may both
+    # observe no ACA job, but only one create-only Blob upload can succeed.  The
+    # lock is retained permanently and is claimed before any job is provisioned.
+    SMOKE_LOCK_FILE="$RECORD_DIR/smoke_round_lock.json"
+    printf '{"artifact":"phase1_0d_rv2_smoke_round_lock","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","smoke_run_id":"%s"}\n' \
+        "$PROJECT_SHA" "$IMAGE_DIGEST" "$QUALIFICATION_RUN_ID" "$RUN_ID" \
+        >"$SMOKE_LOCK_FILE"
+    az storage blob upload \
+        --auth-mode login \
+        --account-name "$BLOB_ACCOUNT" \
+        --container-name "$BLOB_CONTAINER" \
+        --name "$SMOKE_LOCK_BLOB" \
+        --file "$SMOKE_LOCK_FILE" \
+        --overwrite false \
+        --only-show-errors \
+        --output none
 fi
 
 ARGS="--project-root /workspace --out-dir /workspace/runtime/results"

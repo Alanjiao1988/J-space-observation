@@ -24,13 +24,19 @@ secrets/
 # Results and model artifacts (must not be baked into image)
 results/runs/*
 !results/runs/.gitkeep
-artifacts/
+artifacts/*
 # Narrow, deliberate exception: the Phase 1.2H-R1 access image needs the
 # committed public seal record that lists the 12 sealed parser-v3-v1 objects by
 # name, byte count and SHA-256. It contains no answer value, no span, no offset
 # and no case content, and the image verifies it by digest at build time.
 # Scoped to this one file so the blanket artifacts/ exclusion keeps protecting
 # everything else.
+!artifacts/phase1-evaluator-validation/
+artifacts/phase1-evaluator-validation/*
+!artifacts/phase1-evaluator-validation/track-d1/
+artifacts/phase1-evaluator-validation/track-d1/*
+!artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/
+artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/*
 !artifacts/phase1-evaluator-validation/track-d1/20260725T160340Z-track-d1-parser-v3-seal/02_records.jsonl
 # Second narrow exception: the Phase 1.0D confirmation image needs Phase 1.0C's
 # own generated records, because the disjoint confirmation split is defined
@@ -39,7 +45,23 @@ artifacts/
 # public scientific data; this file carries no private review material and no
 # reviewer identity. Scoped to this one file so the blanket artifacts/ exclusion
 # keeps protecting everything else.
+!artifacts/phase1-headroom-calibration/
+artifacts/phase1-headroom-calibration/*
+!artifacts/phase1-headroom-calibration/track-b/
+artifacts/phase1-headroom-calibration/track-b/*
+!artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/
+artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/*
 !artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/02_records.jsonl
+# Third narrow exception: the v2 reviewer image verifies the complete immutable
+# v1 gate evidence as a historical parent.  These four public files contain no
+# credentials and the v2 build verifies every manifest entry before succeeding.
+!artifacts/phase1-0d-semantic-review-gate/
+artifacts/phase1-0d-semantic-review-gate/*
+!artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/
+!artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/00_gate_receipt.json
+!artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/01_qualification_console_transcript.txt
+!artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/02_smoke_console_transcript.txt
+!artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/artifact_manifest.json
 **/all45_*
 evaluator_sets/
 **/locked_inputs.jsonl
