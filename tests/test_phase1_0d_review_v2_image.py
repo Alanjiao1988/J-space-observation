@@ -471,6 +471,20 @@ def test_every_mode_requires_an_explicit_commit_and_image_binding():
     assert "requires --code-commit" in str(error.value)
 
 
+def test_review_requires_the_committed_source_manifest_binding():
+    with pytest.raises(SystemExit) as error:
+        runner.main(
+            [
+                "review",
+                "--code-commit",
+                "a" * 40,
+                "--image-digest",
+                "sha256:" + "b" * 64,
+            ]
+        )
+    assert "source and gate SHA-256" in str(error.value)
+
+
 def test_the_download_helper_is_not_imported_at_module_scope():
     assert not hasattr(runner, "download_pack")
     source = (
@@ -584,6 +598,24 @@ def test_review_refuses_a_receipt_that_does_not_match_its_manifest(book):
     objects["p/00_gate_receipt.json"] = objects["p/00_gate_receipt.json"] + b" "
     with pytest.raises(addendum_v2.AddendumError):
         runner._load_gate_receipt(_FakeBlob(objects), "p", book)
+
+
+def test_review_refuses_a_later_internally_rehashed_gate_substitution(book):
+    import hashlib
+
+    objects = _gate_objects(book)
+    expected_manifest = hashlib.sha256(objects["p/artifact_manifest.json"]).hexdigest()
+    expected_receipt = hashlib.sha256(objects["p/00_gate_receipt.json"]).hexdigest()
+    _rewrite_receipt(objects, "p", lambda receipt: receipt.update(note="substituted"))
+
+    with pytest.raises(addendum_v2.AddendumError, match="committed manifest bytes"):
+        runner._load_gate_receipt(
+            _FakeBlob(objects),
+            "p",
+            book,
+            expected_manifest_sha256=expected_manifest,
+            expected_receipt_sha256=expected_receipt,
+        )
 
 
 def test_review_refuses_an_incomplete_receipt_even_if_it_claims_sixty(book):
@@ -787,6 +819,7 @@ def test_review_uses_the_v2_independent_recomputation():
         "# ---- review: target storage is reachable only from here", 1
     )[1]
     assert "verifier.verify_source_pack(" in review
+    assert "expected_manifest_sha256=args.source_manifest_sha256" in review
     assert "verifier.verify_final_result(" in review
     assert "stages.independent_check(" not in review
 
@@ -871,8 +904,17 @@ def test_the_runner_enforces_one_formal_review_execution():
         in text
     )
     assert '"artifact":"phase1_0d_rv2_formal_review_lock"' in text
-    assert '"generation_run_id":"%s","review_run_id":"%s"' in text
+    assert (
+        '"generation_run_id":"%s","source_manifest_sha256":"%s",'
+        '"review_run_id":"%s"'
+    ) in text
     assert "Target review has no rerun path after any failure" in text
+    assert "Committed generation license binds every source-pack byte" in text
+    assert 'cat-file", "blob"' in text
+    assert "cat-file blob" in text
+    assert "--source-manifest-sha256" in text
+    assert "--gate-manifest-sha256" in text
+    assert "--gate-receipt-sha256" in text
 
 
 def test_the_runner_uses_a_locked_digest_and_no_platform_retry():
@@ -885,6 +927,8 @@ def test_the_runner_uses_a_locked_digest_and_no_platform_retry():
     assert '"parallelism": 1' in text
     assert '"replicaCompletionCount": 1' in text
     assert "V2 review image is not locked; refusing to launch" in text
+    assert "container command differs from the registered review command" in text
+    assert "container environment differs from the exact registered values" in text
 
 
 def test_the_runner_carries_no_storage_secret_or_volume():

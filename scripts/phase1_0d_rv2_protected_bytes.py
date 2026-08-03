@@ -19,12 +19,12 @@ v2 provider call.
 
 Deliberately *not* covered:
 
-``scripts/run_phase1_0d_semantic_review_v2.py``, ``Dockerfile.phase1-0d-review-v2``
-    and the rest of the v2 executable surface.  Those bytes are held by
+``scripts/run_phase1_0d_semantic_review_v2.py`` and
+``Dockerfile.phase1-0d-review-v2``
+    The image-baked v2 surface is held by
     ``phase1_0d_review_v2_build_provenance.json``, which additionally proves
-    what went into the image.  Pinning them here as well would mean recutting
-    this baseline every time the runner changed, which is how a drift gate
-    quietly becomes a formality.
+    what went into the image.  The external ACA launcher is different: it is
+    not baked into the image, so it is pinned below by this record.
 
 Azure-side objects
     the locked image tag and manifest are held immutable by the registry.
@@ -63,6 +63,8 @@ PROTECTED_GLOBS: tuple[str, ...] = (
     "data/phase1_task_headroom_candidates.jsonl",
     "infra/azure/scripts/18_build_phase1_0d_confirmation.sh",
     "infra/azure/scripts/19_run_phase1_0d_confirmation.sh",
+    # This control-plane launcher is not baked into the review image.
+    "infra/azure/scripts/23_run_phase1_0d_semantic_review_v2.sh",
     "docs/prompts/phase_science_restart_after_parser_closure_prompt.md",
     # -- the complete v1 reviewer instrument --------------------------------
     "docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md",

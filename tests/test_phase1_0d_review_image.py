@@ -475,10 +475,17 @@ def _rehash_pack_file(pack_dir: Path, name: str) -> None:
     manifest_path.write_bytes(contract.canonical_json(manifest).encode("utf-8"))
 
 
+def _source_manifest_sha256(pack_dir: Path) -> str:
+    import hashlib
+
+    return hashlib.sha256((pack_dir / "artifact_manifest.json").read_bytes()).hexdigest()
+
+
 def test_v2_rebuilds_the_exact_source_pack_before_any_review(generation_pack):
     result = v2_verifier.verify_source_pack(
         pack_dir=generation_pack,
         project_root=REPO_ROOT,
+        expected_manifest_sha256=_source_manifest_sha256(generation_pack),
     )
     assert result["records_rebuilt"] == 900
     assert result["selection_recomputed"] is True
@@ -499,7 +506,11 @@ def test_v2_refuses_a_rehashed_but_substituted_selection(
         v2_verifier.IndependentVerificationError,
         match="selected items differ",
     ):
-        v2_verifier.verify_source_pack(pack_dir=copied, project_root=REPO_ROOT)
+        v2_verifier.verify_source_pack(
+            pack_dir=copied,
+            project_root=REPO_ROOT,
+            expected_manifest_sha256=_source_manifest_sha256(copied),
+        )
 
 
 def test_v2_refuses_a_rehashed_record_with_moved_metadata(
@@ -516,7 +527,34 @@ def test_v2_refuses_a_rehashed_record_with_moved_metadata(
         v2_verifier.IndependentVerificationError,
         match="record metadata",
     ):
-        v2_verifier.verify_source_pack(pack_dir=copied, project_root=REPO_ROOT)
+        v2_verifier.verify_source_pack(
+            pack_dir=copied,
+            project_root=REPO_ROOT,
+            expected_manifest_sha256=_source_manifest_sha256(copied),
+        )
+
+
+def test_v2_refuses_rehashed_output_substitution_without_committed_license(
+    generation_pack, tmp_path
+):
+    expected_manifest_sha256 = _source_manifest_sha256(generation_pack)
+    copied = tmp_path / "substituted-output"
+    shutil.copytree(generation_pack, copied)
+    path = copied / "02_records.jsonl"
+    records = stages.load_records(path)
+    records[0]["output_text"] = "attacker-controlled replacement"
+    path.write_text(canonical_jsonl(records), encoding="utf-8")
+    _rehash_pack_file(copied, "02_records.jsonl")
+
+    with pytest.raises(
+        v2_verifier.IndependentVerificationError,
+        match="committed generation license",
+    ):
+        v2_verifier.verify_source_pack(
+            pack_dir=copied,
+            project_root=REPO_ROOT,
+            expected_manifest_sha256=expected_manifest_sha256,
+        )
 
 
 def _parser_agreeing_labels(pack: Path) -> dict[str, str]:

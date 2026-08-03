@@ -40,10 +40,15 @@ LOCKED_IMAGE_DIGEST="sha256:1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332
 ACR_NAME="${ACR_NAME:?Set ACR_NAME to the existing private registry name}"
 PROJECT_SHA="${PROJECT_SHA:-$LOCKED_IMAGE_TAG}"
 RUN_ID="${JSPACE_CONFIRMATION_RUN_ID:-$(date -u +'%Y%m%dT%H%M%SZ')}"
-SMOKE_RUN_ID="${SMOKE_RUN_ID:-}"
-SMOKE_RECEIPT_SHA256="${SMOKE_RECEIPT_SHA256:-}"
-SMOKE_MANIFEST_SHA256="${SMOKE_MANIFEST_SHA256:-}"
-REVIEW_V2_CODE_COMMIT="${REVIEW_V2_CODE_COMMIT:-}"
+REQUESTED_SMOKE_RUN_ID="${SMOKE_RUN_ID:-}"
+REQUESTED_SMOKE_RECEIPT_SHA256="${SMOKE_RECEIPT_SHA256:-}"
+REQUESTED_SMOKE_MANIFEST_SHA256="${SMOKE_MANIFEST_SHA256:-}"
+REQUESTED_REVIEW_V2_CODE_COMMIT="${REVIEW_V2_CODE_COMMIT:-}"
+SMOKE_RUN_ID=""
+SMOKE_RECEIPT_SHA256=""
+SMOKE_MANIFEST_SHA256=""
+REVIEW_V2_CODE_COMMIT=""
+REVIEW_V2_IMAGE_DIGEST=""
 REPLICA_TIMEOUT="${REPLICA_TIMEOUT:-21600}"
 GENERATION_TIMEOUT_SECONDS="${GENERATION_TIMEOUT_SECONDS:-21300}"
 
@@ -127,19 +132,6 @@ if [[ ! "$RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]; then
     echo "[FAIL] Run ID must be a UTC stamp of the form YYYYMMDDTHHMMSSZ"
     exit 1
 fi
-if [[ ! "$SMOKE_RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]; then
-    echo "[FAIL] SMOKE_RUN_ID must name the sole persisted v2 smoke"
-    exit 1
-fi
-if [[ ! "$SMOKE_RECEIPT_SHA256" =~ ^[0-9a-f]{64}$ \
-    || ! "$SMOKE_MANIFEST_SHA256" =~ ^[0-9a-f]{64}$ ]]; then
-    echo "[FAIL] Exact smoke receipt and manifest SHA-256 values are required"
-    exit 1
-fi
-if [[ ! "$REVIEW_V2_CODE_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
-    echo "[FAIL] REVIEW_V2_CODE_COMMIT must be the full commit baked into the smoke image"
-    exit 1
-fi
 if [[ ! "$REPLICA_TIMEOUT" =~ ^[0-9]+$ \
     || ! "$GENERATION_TIMEOUT_SECONDS" =~ ^[0-9]+$ ]]; then
     echo "[FAIL] Timeouts must be nonnegative integers"
@@ -160,6 +152,88 @@ if ! git -C "$PROJECT_ROOT" diff --quiet \
     echo "[FAIL] Launcher worktree must be clean"
     exit 1
 fi
+ORIGIN_MAIN_SHA="$(git -C "$PROJECT_ROOT" ls-remote --exit-code \
+    origin refs/heads/main | awk '{print $1}')"
+if [[ "$ORIGIN_MAIN_SHA" != "$LAUNCHER_SHA" ]]; then
+    echo "[FAIL] The committed gate checkpoint must be pushed to origin/main"
+    exit 1
+fi
+
+mapfile -t COMMITTED_GATE_RECEIPTS < <(
+    git -C "$PROJECT_ROOT" ls-tree -r --name-only \
+        "$LAUNCHER_SHA" -- "$COMMITTED_GATE_ROOT" \
+        | grep -E "^${COMMITTED_GATE_ROOT}/[0-9]{8}T[0-9]{6}Z/00_gate_receipt\\.json$" \
+        || true
+)
+if (( ${#COMMITTED_GATE_RECEIPTS[@]} != 1 )); then
+    echo "[FAIL] Exactly one committed v2 gate receipt must license generation"
+    exit 1
+fi
+COMMITTED_SMOKE_RECEIPT_REL="${COMMITTED_GATE_RECEIPTS[0]}"
+COMMITTED_GATE_DIR="${COMMITTED_SMOKE_RECEIPT_REL%/00_gate_receipt.json}"
+COMMITTED_SMOKE_MANIFEST_REL="${COMMITTED_GATE_DIR}/artifact_manifest.json"
+if ! git -C "$PROJECT_ROOT" cat-file -e \
+    "${LAUNCHER_SHA}:${COMMITTED_SMOKE_MANIFEST_REL}"; then
+    echo "[FAIL] The sole committed v2 gate has no committed manifest"
+    exit 1
+fi
+mapfile -t GATE_BINDINGS < <(
+    python - \
+        "$(native_path "$PROJECT_ROOT")" \
+        "$LAUNCHER_SHA" \
+        "$COMMITTED_SMOKE_RECEIPT_REL" \
+        "$COMMITTED_SMOKE_MANIFEST_REL" <<'PY'
+import hashlib
+import json
+import subprocess
+import sys
+
+project_root, commit, receipt_path, manifest_path = sys.argv[1:5]
+def git_blob(path):
+    return subprocess.check_output(
+        ["git", "-C", project_root, "cat-file", "blob", f"{commit}:{path}"]
+    )
+
+receipt_bytes = git_blob(receipt_path)
+manifest_bytes = git_blob(manifest_path)
+receipt = json.loads(receipt_bytes)
+print(receipt.get("run_id", ""))
+print(hashlib.sha256(receipt_bytes).hexdigest())
+print(hashlib.sha256(manifest_bytes).hexdigest())
+print(receipt.get("review_code_commit", ""))
+print(receipt.get("review_image_digest", ""))
+PY
+)
+if (( ${#GATE_BINDINGS[@]} != 5 )); then
+    echo "[FAIL] Could not derive the committed v2 gate bindings"
+    exit 1
+fi
+SMOKE_RUN_ID="${GATE_BINDINGS[0]}"
+SMOKE_RECEIPT_SHA256="${GATE_BINDINGS[1]}"
+SMOKE_MANIFEST_SHA256="${GATE_BINDINGS[2]}"
+REVIEW_V2_CODE_COMMIT="${GATE_BINDINGS[3]}"
+REVIEW_V2_IMAGE_DIGEST="${GATE_BINDINGS[4]}"
+if [[ ! "$SMOKE_RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ \
+    || "$COMMITTED_GATE_DIR" != "${COMMITTED_GATE_ROOT}/${SMOKE_RUN_ID}" \
+    || ! "$SMOKE_RECEIPT_SHA256" =~ ^[0-9a-f]{64}$ \
+    || ! "$SMOKE_MANIFEST_SHA256" =~ ^[0-9a-f]{64}$ \
+    || ! "$REVIEW_V2_CODE_COMMIT" =~ ^[0-9a-f]{40}$ \
+    || ! "$REVIEW_V2_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+    echo "[FAIL] The committed v2 gate has malformed execution bindings"
+    exit 1
+fi
+if [[ -n "$REQUESTED_SMOKE_RUN_ID" \
+    && "$REQUESTED_SMOKE_RUN_ID" != "$SMOKE_RUN_ID" ]] \
+    || [[ -n "$REQUESTED_SMOKE_RECEIPT_SHA256" \
+    && "$REQUESTED_SMOKE_RECEIPT_SHA256" != "$SMOKE_RECEIPT_SHA256" ]] \
+    || [[ -n "$REQUESTED_SMOKE_MANIFEST_SHA256" \
+    && "$REQUESTED_SMOKE_MANIFEST_SHA256" != "$SMOKE_MANIFEST_SHA256" ]] \
+    || [[ -n "$REQUESTED_REVIEW_V2_CODE_COMMIT" \
+    && "$REQUESTED_REVIEW_V2_CODE_COMMIT" != "$REVIEW_V2_CODE_COMMIT" ]]; then
+    echo "[FAIL] Operator-supplied gate bindings differ from committed evidence"
+    exit 1
+fi
+
 if ! git -C "$PROJECT_ROOT" cat-file -e "${REVIEW_V2_CODE_COMMIT}^{commit}" \
     || ! git -C "$PROJECT_ROOT" merge-base --is-ancestor \
         "$REVIEW_V2_CODE_COMMIT" "$LAUNCHER_SHA"; then
@@ -170,19 +244,27 @@ if ! git -C "$PROJECT_ROOT" diff --quiet \
     "$REVIEW_V2_CODE_COMMIT" "$LAUNCHER_SHA" -- \
     Dockerfile.phase1-0d-review-v2 \
     docs/phase1_0d_semantic_review_addendum_v2.json \
+    docs/phase1_0d_rv2_protected_bytes.json \
     docs/phase1_0d_semantic_review_rubric_v2.md \
     docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md \
     phase1_0d_review_v2_build_provenance.json \
+    scripts/phase1_0d_rv2_protected_bytes.py \
     scripts/run_phase1_0d_semantic_review_v2.py \
     scripts/verify_phase1_0d_rv2_gate.py \
+    src/jspace_observation/__init__.py \
+    src/jspace_observation/phase1_0d_confirmation.py \
+    src/jspace_observation/semantic_review \
     src/jspace_observation/semantic_review_v2; then
     echo "[FAIL] V2 review or gate-verification bytes changed after the smoke image"
     exit 1
 fi
-ORIGIN_MAIN_SHA="$(git -C "$PROJECT_ROOT" ls-remote --exit-code \
-    origin refs/heads/main | awk '{print $1}')"
-if [[ "$ORIGIN_MAIN_SHA" != "$LAUNCHER_SHA" ]]; then
-    echo "[FAIL] The committed gate checkpoint must be pushed to origin/main"
+python "$(native_path "$PROJECT_ROOT/scripts/phase1_0d_protected_bytes.py")" \
+    verify --project-root "$(native_path "$PROJECT_ROOT")"
+python "$(native_path "$PROJECT_ROOT/scripts/phase1_0d_rv2_protected_bytes.py")" \
+    verify --project-root "$(native_path "$PROJECT_ROOT")"
+if ! git -C "$PROJECT_ROOT" diff --quiet \
+    || ! git -C "$PROJECT_ROOT" diff --cached --quiet; then
+    echo "[FAIL] Protected-byte verification changed the launcher worktree"
     exit 1
 fi
 if ! git -C "$PROJECT_ROOT" cat-file -e "${PROJECT_SHA}^{commit}"; then
@@ -237,13 +319,17 @@ if [[ "${TAG_WRITE_ENABLED,,}" != "false" \
     exit 1
 fi
 
-REVIEW_V2_IMAGE_DIGEST="$(az acr repository show-manifests \
+RESOLVED_REVIEW_V2_IMAGE_DIGEST="$(az acr repository show-manifests \
     --name "$ACR_NAME" \
     --repository "$REVIEW_V2_IMAGE_REPOSITORY" \
     --query "[?tags[?@=='${REVIEW_V2_CODE_COMMIT}']].digest | [0]" \
     -o tsv)"
-if [[ ! "$REVIEW_V2_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+if [[ ! "$RESOLVED_REVIEW_V2_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
     echo "[FAIL] No digest-pinned v2 smoke image exists for REVIEW_V2_CODE_COMMIT"
+    exit 1
+fi
+if [[ "$RESOLVED_REVIEW_V2_IMAGE_DIGEST" != "$REVIEW_V2_IMAGE_DIGEST" ]]; then
+    echo "[FAIL] Committed smoke digest differs from the locked ACR review image"
     exit 1
 fi
 REVIEW_V2_TAG_WRITE_ENABLED="$(az acr repository show \
@@ -304,8 +390,14 @@ JOB_FILE="$RECORD_DIR/job_state.json"
 # the Blob originals and run the same exhaustive validation used by formal
 # review before checking or claiming any target-generation resource.
 COMMITTED_GATE_DIR="${COMMITTED_GATE_ROOT}/${SMOKE_RUN_ID}"
-COMMITTED_SMOKE_RECEIPT="${PROJECT_ROOT}/${COMMITTED_GATE_DIR}/00_gate_receipt.json"
-COMMITTED_SMOKE_MANIFEST="${PROJECT_ROOT}/${COMMITTED_GATE_DIR}/artifact_manifest.json"
+COMMITTED_SMOKE_RECEIPT="$RECORD_DIR/committed_00_gate_receipt.json"
+COMMITTED_SMOKE_MANIFEST="$RECORD_DIR/committed_artifact_manifest.json"
+git -C "$PROJECT_ROOT" cat-file blob \
+    "${LAUNCHER_SHA}:${COMMITTED_GATE_DIR}/00_gate_receipt.json" \
+    >"$COMMITTED_SMOKE_RECEIPT"
+git -C "$PROJECT_ROOT" cat-file blob \
+    "${LAUNCHER_SHA}:${COMMITTED_GATE_DIR}/artifact_manifest.json" \
+    >"$COMMITTED_SMOKE_MANIFEST"
 for relative in \
     "${COMMITTED_GATE_DIR}/00_gate_receipt.json" \
     "${COMMITTED_GATE_DIR}/artifact_manifest.json"; do

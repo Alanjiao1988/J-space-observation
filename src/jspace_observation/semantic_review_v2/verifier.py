@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -135,9 +137,19 @@ def verify_source_pack(
     *,
     pack_dir: Path,
     project_root: Path,
+    expected_manifest_sha256: str,
 ) -> dict[str, Any]:
     """Rebuild the frozen selection, work units and immutable record metadata."""
 
+    manifest_path = pack_dir / stages.MANIFEST_NAME
+    observed_manifest_sha256 = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+    if (
+        not re.fullmatch(r"[0-9a-f]{64}", expected_manifest_sha256)
+        or observed_manifest_sha256 != expected_manifest_sha256
+    ):
+        raise IndependentVerificationError(
+            "source manifest SHA-256 differs from the committed generation license"
+        )
     base = stages.verify_generation_pack(pack_dir)
     manifest = _read_json(pack_dir / stages.MANIFEST_NAME)
     entries = manifest.get("files")
@@ -348,6 +360,7 @@ def verify_source_pack(
 
     return {
         **base,
+        "committed_manifest_sha256": expected_manifest_sha256,
         "exact_manifest_file_set": True,
         "selection_recomputed": True,
         "work_units_recomputed": len(units),

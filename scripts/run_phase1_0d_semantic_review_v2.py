@@ -720,11 +720,20 @@ def _load_persisted_receipt(
     prefix: str,
     book: contract.Addendum,
     expected_artifact: str,
+    expected_manifest_sha256: str = "",
+    expected_receipt_sha256: str = "",
 ) -> dict[str, Any]:
     """Load one manifest-complete receipt and verify its instrument binding."""
 
     prefix = prefix.rstrip("/")
-    manifest = json.loads(client.get(f"{prefix}/artifact_manifest.json"))
+    manifest_raw = client.get(f"{prefix}/artifact_manifest.json")
+    if expected_manifest_sha256 and (
+        hashlib.sha256(manifest_raw).hexdigest() != expected_manifest_sha256
+    ):
+        raise addendum_v2.AddendumError(
+            "persisted gate manifest differs from the committed manifest bytes"
+        )
+    manifest = json.loads(manifest_raw)
     files = manifest.get("files")
     if (
         not isinstance(files, list)
@@ -745,6 +754,10 @@ def _load_persisted_receipt(
     raw = client.get(f"{prefix}/00_gate_receipt.json")
     recorded = {str(entry["name"]): str(entry["sha256"]) for entry in files}
     digest = hashlib.sha256(raw).hexdigest()
+    if expected_receipt_sha256 and digest != expected_receipt_sha256:
+        raise addendum_v2.AddendumError(
+            "persisted gate receipt differs from the committed receipt bytes"
+        )
     if recorded.get("00_gate_receipt.json") != digest:
         raise addendum_v2.AddendumError(
             "the persisted gate receipt does not match its manifest hash"
@@ -946,11 +959,23 @@ def _load_qualification_receipt(
     return receipt
 
 
-def _load_gate_receipt(client: Any, prefix: str, book: contract.Addendum) -> dict[str, Any]:
+def _load_gate_receipt(
+    client: Any,
+    prefix: str,
+    book: contract.Addendum,
+    *,
+    expected_manifest_sha256: str = "",
+    expected_receipt_sha256: str = "",
+) -> dict[str, Any]:
     """Refuse to review unless a persisted 60/60 v2 gate receipt says so."""
 
     receipt = _load_persisted_receipt(
-        client, prefix, book, "phase1_0d_rv2_provider_smoke_receipt"
+        client,
+        prefix,
+        book,
+        "phase1_0d_rv2_provider_smoke_receipt",
+        expected_manifest_sha256,
+        expected_receipt_sha256,
     )
     counts = receipt.get("counts", {})
     if not receipt.get("passed") or int(
@@ -1042,6 +1067,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--gate-blob-prefix", default="")
     parser.add_argument("--qualification-receipt-prefix", default="")
     parser.add_argument("--gate-receipt-prefix", default="")
+    parser.add_argument("--gate-manifest-sha256", default="")
+    parser.add_argument("--gate-receipt-sha256", default="")
+    parser.add_argument("--source-manifest-sha256", default="")
     parser.add_argument("--out-blob-prefix", default="")
     parser.add_argument("--out-dir", default="")
     parser.add_argument("--run-id", default="")
@@ -1078,6 +1106,25 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit(
             "the v2 qualification and smoke stages take no generation pack; "
             "target isolation is not optional"
+        )
+    if args.mode in ("qualify", "smoke") and (
+        args.source_manifest_sha256
+        or args.gate_manifest_sha256
+        or args.gate_receipt_sha256
+    ):
+        raise SystemExit(
+            "the v2 qualification and smoke stages take no target or gate license"
+        )
+    if args.mode == "review" and any(
+        not re.fullmatch(r"[0-9a-f]{64}", digest)
+        for digest in (
+            args.source_manifest_sha256,
+            args.gate_manifest_sha256,
+            args.gate_receipt_sha256,
+        )
+    ):
+        raise SystemExit(
+            "review mode requires exact committed source and gate SHA-256 licenses"
         )
     if not SHA1.fullmatch(args.code_commit):
         raise SystemExit(
@@ -1275,7 +1322,13 @@ def main(argv: list[str] | None = None) -> int:
         SMOKE_PREFIX_ROOT,
         tokens,
     )
-    gate = _load_gate_receipt(gate_reader, gate_reader.prefix, book)
+    gate = _load_gate_receipt(
+        gate_reader,
+        gate_reader.prefix,
+        book,
+        expected_manifest_sha256=args.gate_manifest_sha256,
+        expected_receipt_sha256=args.gate_receipt_sha256,
+    )
     if gate.get("review_code_commit") != args.code_commit:
         raise addendum_v2.AddendumError(
             "the smoke receipt came from a different review commit"
@@ -1309,6 +1362,7 @@ def main(argv: list[str] | None = None) -> int:
     source_verification = verifier.verify_source_pack(
         pack_dir=pack_dir,
         project_root=root,
+        expected_manifest_sha256=args.source_manifest_sha256,
     )
     print(
         "SOURCE_PACK_REBUILT_RECORDS="
@@ -1323,6 +1377,8 @@ def main(argv: list[str] | None = None) -> int:
         "prefix": args.gate_receipt_prefix.rstrip("/"),
         "run_id": gate["run_id"],
         "counts": gate["counts"],
+        "committed_manifest_sha256": args.gate_manifest_sha256,
+        "committed_receipt_sha256": args.gate_receipt_sha256,
     }
     summary["pack_download"] = download
 

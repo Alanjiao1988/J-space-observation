@@ -34,16 +34,23 @@ GENERATION_PREFIX="phase1-headroom-confirmation"
 REVIEW_PREFIX="phase1-headroom-confirmation-review-v2"
 QUALIFICATION_PREFIX="phase1-0d-semantic-review-v2/qualification"
 SMOKE_PREFIX="phase1-0d-semantic-review-v2/smoke"
+COMMITTED_GATE_ROOT="artifacts/phase1-0d-semantic-review-v2-gate"
+COMMITTED_GENERATION_ROOT="artifacts/phase1-0d-confirmation"
 SMOKE_LOCK_BLOB="phase1-0d-semantic-review-v2/smoke-round-lock.json"
 REVIEW_LOCK_BLOB="phase1-0d-semantic-review-v2/formal-review-lock.json"
 IMAGE_REPOSITORY="j-space-observation-phase1-0d-review-v2"
 ACR_NAME="${ACR_NAME:?Set ACR_NAME to the existing private registry name}"
 REVIEW_MODE="${REVIEW_MODE:?Set REVIEW_MODE to qualify, smoke or review}"
-PROJECT_SHA="${PROJECT_SHA:-$(git -C "$PROJECT_ROOT" rev-parse HEAD)}"
+REQUESTED_PROJECT_SHA="${PROJECT_SHA:-}"
+PROJECT_SHA=""
 RUN_ID="${JSPACE_REVIEW_RUN_ID:-$(date -u +'%Y%m%dT%H%M%SZ')}"
 QUALIFICATION_RUN_ID="${QUALIFICATION_RUN_ID:-}"
 SMOKE_RUN_ID="${SMOKE_RUN_ID:-}"
 GENERATION_RUN_ID="${GENERATION_RUN_ID:-}"
+SOURCE_MANIFEST_SHA256=""
+EXPECTED_REVIEW_IMAGE_DIGEST=""
+SMOKE_RECEIPT_SHA256=""
+SMOKE_MANIFEST_SHA256=""
 FORMAL_REVIEW_REQUIRED_SECONDS=611517
 if [[ "$REVIEW_MODE" == "review" ]]; then
     REPLICA_TIMEOUT="${REPLICA_TIMEOUT:-612300}"
@@ -74,10 +81,6 @@ fi
 if [[ "$REVIEW_MODE" == "review" \
     && ! "$GENERATION_RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]; then
     echo "[FAIL] review mode requires GENERATION_RUN_ID as a UTC stamp"
-    exit 1
-fi
-if [[ ! "$PROJECT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
-    echo "[FAIL] PROJECT_SHA must be a full 40-character commit"
     exit 1
 fi
 if [[ ! "$RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]; then
@@ -157,6 +160,133 @@ native_path() {
     fi
 }
 
+ORIGIN_MAIN_SHA="$(git -C "$PROJECT_ROOT" ls-remote --exit-code \
+    origin refs/heads/main | awk '{print $1}')"
+if [[ "$ORIGIN_MAIN_SHA" != "$LAUNCHER_SHA" ]]; then
+    echo "[FAIL] The v2 execution checkpoint must be pushed to origin/main"
+    exit 1
+fi
+
+if [[ "$REVIEW_MODE" == "review" ]]; then
+    mapfile -t COMMITTED_GATE_RECEIPTS < <(
+        git -C "$PROJECT_ROOT" ls-tree -r --name-only \
+            "$LAUNCHER_SHA" -- "$COMMITTED_GATE_ROOT" \
+            | grep -E "^${COMMITTED_GATE_ROOT}/[0-9]{8}T[0-9]{6}Z/00_gate_receipt\\.json$" \
+            || true
+    )
+    EXPECTED_GATE_RECEIPT="${COMMITTED_GATE_ROOT}/${SMOKE_RUN_ID}/00_gate_receipt.json"
+    if (( ${#COMMITTED_GATE_RECEIPTS[@]} != 1 )) \
+        || [[ "${COMMITTED_GATE_RECEIPTS[0]}" != "$EXPECTED_GATE_RECEIPT" ]]; then
+        echo "[FAIL] Formal review requires the sole committed v2 smoke receipt"
+        exit 1
+    fi
+    COMMITTED_GATE_DIR="${COMMITTED_GATE_ROOT}/${SMOKE_RUN_ID}"
+    COMMITTED_SMOKE_MANIFEST_REL="${COMMITTED_GATE_DIR}/artifact_manifest.json"
+    if ! git -C "$PROJECT_ROOT" cat-file -e \
+        "${LAUNCHER_SHA}:${COMMITTED_SMOKE_MANIFEST_REL}"; then
+        echo "[FAIL] The committed v2 smoke receipt has no committed manifest"
+        exit 1
+    fi
+    mapfile -t GATE_BINDINGS < <(
+        python - \
+            "$(native_path "$PROJECT_ROOT")" \
+            "$LAUNCHER_SHA" \
+            "$EXPECTED_GATE_RECEIPT" \
+            "$COMMITTED_SMOKE_MANIFEST_REL" <<'PY'
+import hashlib
+import json
+import subprocess
+import sys
+
+project_root, commit, receipt_path, manifest_path = sys.argv[1:5]
+def git_blob(path):
+    return subprocess.check_output(
+        ["git", "-C", project_root, "cat-file", "blob", f"{commit}:{path}"]
+    )
+
+receipt_bytes = git_blob(receipt_path)
+manifest_bytes = git_blob(manifest_path)
+receipt = json.loads(receipt_bytes)
+print(hashlib.sha256(receipt_bytes).hexdigest())
+print(hashlib.sha256(manifest_bytes).hexdigest())
+print(receipt.get("review_code_commit", ""))
+print(receipt.get("review_image_digest", ""))
+parent = receipt.get("qualification_parent") or {}
+print(parent.get("run_id", ""))
+PY
+    )
+    if (( ${#GATE_BINDINGS[@]} != 5 )); then
+        echo "[FAIL] Could not derive the committed v2 smoke bindings"
+        exit 1
+    fi
+    SMOKE_RECEIPT_SHA256="${GATE_BINDINGS[0]}"
+    SMOKE_MANIFEST_SHA256="${GATE_BINDINGS[1]}"
+    PROJECT_SHA="${GATE_BINDINGS[2]}"
+    EXPECTED_REVIEW_IMAGE_DIGEST="${GATE_BINDINGS[3]}"
+    COMMITTED_QUALIFICATION_RUN_ID="${GATE_BINDINGS[4]}"
+    if [[ ! "$SMOKE_RECEIPT_SHA256" =~ ^[0-9a-f]{64}$ \
+        || ! "$SMOKE_MANIFEST_SHA256" =~ ^[0-9a-f]{64}$ \
+        || ! "$PROJECT_SHA" =~ ^[0-9a-f]{40}$ \
+        || ! "$EXPECTED_REVIEW_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ \
+        || ! "$COMMITTED_QUALIFICATION_RUN_ID" =~ ^[0-9]{8}T[0-9]{6}Z$ \
+        || "$QUALIFICATION_RUN_ID" != "$COMMITTED_QUALIFICATION_RUN_ID" ]]; then
+        echo "[FAIL] The committed v2 smoke bindings are malformed"
+        exit 1
+    fi
+    if [[ -n "$REQUESTED_PROJECT_SHA" \
+        && "$REQUESTED_PROJECT_SHA" != "$PROJECT_SHA" ]]; then
+        echo "[FAIL] PROJECT_SHA differs from the committed smoke image"
+        exit 1
+    fi
+    if ! git -C "$PROJECT_ROOT" merge-base --is-ancestor \
+        "$PROJECT_SHA" "$LAUNCHER_SHA"; then
+        echo "[FAIL] The smoke image commit is not an ancestor of formal review"
+        exit 1
+    fi
+    if ! git -C "$PROJECT_ROOT" diff --quiet \
+        "$PROJECT_SHA" "$LAUNCHER_SHA" -- \
+        Dockerfile.phase1-0d-review-v2 \
+        docs/phase1_0d_protocol_snapshot.json \
+        docs/phase1_0d_rv2_protected_bytes.json \
+        docs/phase1_0d_semantic_review_addendum_v2.json \
+        docs/phase1_0d_semantic_review_rubric_v2.md \
+        docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md \
+        infra/azure/scripts/23_run_phase1_0d_semantic_review_v2.sh \
+        phase1_0d_review_v2_build_provenance.json \
+        scripts/phase1_0d_review_v2_build_provenance.py \
+        scripts/phase1_0d_rv2_protected_bytes.py \
+        scripts/run_phase1_0d_semantic_review.py \
+        scripts/run_phase1_0d_semantic_review_v2.py \
+        scripts/verify_phase1_0d_rv2_gate.py \
+        src/jspace_observation/__init__.py \
+        src/jspace_observation/phase1_0d_confirmation.py \
+        src/jspace_observation/phase1_0d_generation.py \
+        src/jspace_observation/semantic_review \
+        src/jspace_observation/semantic_review_v2; then
+        echo "[FAIL] Review or verification bytes changed after the smoke image"
+        exit 1
+    fi
+else
+    PROJECT_SHA="${REQUESTED_PROJECT_SHA:-$LAUNCHER_SHA}"
+    if [[ "$PROJECT_SHA" != "$LAUNCHER_SHA" ]]; then
+        echo "[FAIL] Qualification and smoke must use this exact pushed image commit"
+        exit 1
+    fi
+fi
+if [[ ! "$PROJECT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+    echo "[FAIL] PROJECT_SHA must be a full 40-character commit"
+    exit 1
+fi
+python "$(native_path "$PROJECT_ROOT/scripts/phase1_0d_protected_bytes.py")" \
+    verify --project-root "$(native_path "$PROJECT_ROOT")"
+python "$(native_path "$PROJECT_ROOT/scripts/phase1_0d_rv2_protected_bytes.py")" \
+    verify --project-root "$(native_path "$PROJECT_ROOT")"
+if ! git -C "$PROJECT_ROOT" diff --quiet \
+    || ! git -C "$PROJECT_ROOT" diff --cached --quiet; then
+    echo "[FAIL] Protected-byte verification changed the launcher worktree"
+    exit 1
+fi
+
 LOGIN_SERVER="$(az acr show \
     --name "$ACR_NAME" \
     --resource-group "$RESOURCE_GROUP" \
@@ -172,6 +302,11 @@ IMAGE_DIGEST="$(az acr repository show-manifests \
     -o tsv)"
 if [[ ! "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
     echo "[FAIL] No immutable v2 review image is tagged $PROJECT_SHA"
+    exit 1
+fi
+if [[ "$REVIEW_MODE" == "review" \
+    && "$IMAGE_DIGEST" != "$EXPECTED_REVIEW_IMAGE_DIGEST" ]]; then
+    echo "[FAIL] Committed smoke digest differs from the locked review image"
     exit 1
 fi
 IMAGE_DIGEST_REF="${LOGIN_SERVER}/${IMAGE_REPOSITORY}@${IMAGE_DIGEST}"
@@ -252,6 +387,166 @@ if [[ "$REVIEW_MODE" == "review" && "$JOB_EXISTS" != "0" ]]; then
     echo "[FAIL] The sole formal v2 review execution is already spent; rerun is forbidden"
     exit 1
 fi
+if [[ "$REVIEW_MODE" == "review" ]]; then
+    COMMITTED_SOURCE_MANIFEST_REL="${COMMITTED_GENERATION_ROOT}/${GENERATION_RUN_ID}/artifact_manifest.json"
+    if ! git -C "$PROJECT_ROOT" ls-files --error-unmatch \
+        "$COMMITTED_SOURCE_MANIFEST_REL" >/dev/null \
+        || ! git -C "$PROJECT_ROOT" cat-file -e \
+            "${LAUNCHER_SHA}:${COMMITTED_SOURCE_MANIFEST_REL}"; then
+        echo "[FAIL] Formal review requires the committed generation manifest"
+        exit 1
+    fi
+    COMMITTED_SMOKE_RECEIPT="$RECORD_DIR/committed_00_gate_receipt.json"
+    COMMITTED_SMOKE_MANIFEST="$RECORD_DIR/committed_smoke_artifact_manifest.json"
+    COMMITTED_SOURCE_MANIFEST="$RECORD_DIR/committed_generation_artifact_manifest.json"
+    git -C "$PROJECT_ROOT" cat-file blob \
+        "${LAUNCHER_SHA}:${EXPECTED_GATE_RECEIPT}" \
+        >"$COMMITTED_SMOKE_RECEIPT"
+    git -C "$PROJECT_ROOT" cat-file blob \
+        "${LAUNCHER_SHA}:${COMMITTED_SMOKE_MANIFEST_REL}" \
+        >"$COMMITTED_SMOKE_MANIFEST"
+    git -C "$PROJECT_ROOT" cat-file blob \
+        "${LAUNCHER_SHA}:${COMMITTED_SOURCE_MANIFEST_REL}" \
+        >"$COMMITTED_SOURCE_MANIFEST"
+    SOURCE_MANIFEST_SHA256="$(python -c \
+        'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' \
+        "$(native_path "$COMMITTED_SOURCE_MANIFEST")")"
+    if [[ ! "$SOURCE_MANIFEST_SHA256" =~ ^[0-9a-f]{64}$ ]]; then
+        echo "[FAIL] Could not hash the committed generation manifest"
+        exit 1
+    fi
+
+    DOWNLOADED_SMOKE_RECEIPT="$RECORD_DIR/00_gate_receipt.json"
+    DOWNLOADED_SMOKE_MANIFEST="$RECORD_DIR/smoke_artifact_manifest.json"
+    DOWNLOADED_SOURCE_MANIFEST="$RECORD_DIR/generation_artifact_manifest.json"
+    az storage blob download \
+        --auth-mode login \
+        --account-name "$BLOB_ACCOUNT" \
+        --container-name "$BLOB_CONTAINER" \
+        --name "${SMOKE_PREFIX}/${SMOKE_RUN_ID}/00_gate_receipt.json" \
+        --file "$DOWNLOADED_SMOKE_RECEIPT" \
+        --overwrite false --only-show-errors --output none
+    az storage blob download \
+        --auth-mode login \
+        --account-name "$BLOB_ACCOUNT" \
+        --container-name "$BLOB_CONTAINER" \
+        --name "${SMOKE_PREFIX}/${SMOKE_RUN_ID}/artifact_manifest.json" \
+        --file "$DOWNLOADED_SMOKE_MANIFEST" \
+        --overwrite false --only-show-errors --output none
+    az storage blob download \
+        --auth-mode login \
+        --account-name "$BLOB_ACCOUNT" \
+        --container-name "$BLOB_CONTAINER" \
+        --name "${GENERATION_PREFIX}/${GENERATION_RUN_ID}/artifact_manifest.json" \
+        --file "$DOWNLOADED_SOURCE_MANIFEST" \
+        --overwrite false --only-show-errors --output none
+    if ! cmp -s "$DOWNLOADED_SMOKE_RECEIPT" "$COMMITTED_SMOKE_RECEIPT" \
+        || ! cmp -s "$DOWNLOADED_SMOKE_MANIFEST" "$COMMITTED_SMOKE_MANIFEST" \
+        || ! cmp -s "$DOWNLOADED_SOURCE_MANIFEST" "$COMMITTED_SOURCE_MANIFEST"; then
+        echo "[FAIL] Committed licenses differ from their Blob evidence"
+        exit 1
+    fi
+    python "$(native_path "$PROJECT_ROOT/scripts/verify_phase1_0d_rv2_gate.py")" \
+        --project-root "$(native_path "$PROJECT_ROOT")" \
+        --manifest "$(native_path "$DOWNLOADED_SMOKE_MANIFEST")" \
+        --receipt "$(native_path "$DOWNLOADED_SMOKE_RECEIPT")" \
+        --smoke-run-id "$SMOKE_RUN_ID" \
+        --manifest-sha256 "$SMOKE_MANIFEST_SHA256" \
+        --receipt-sha256 "$SMOKE_RECEIPT_SHA256" \
+        --review-code-commit "$PROJECT_SHA" \
+        --review-image-digest "$IMAGE_DIGEST"
+
+    SOURCE_OBJECTS_FILE="$RECORD_DIR/generation_objects.json"
+    az storage blob list \
+        --auth-mode login \
+        --account-name "$BLOB_ACCOUNT" \
+        --container-name "$BLOB_CONTAINER" \
+        --prefix "${GENERATION_PREFIX}/${GENERATION_RUN_ID}/" \
+        --only-show-errors --output json >"$SOURCE_OBJECTS_FILE"
+    SOURCE_FILES=(
+        00_protocol_snapshot.json
+        01_selection.json
+        02_records.jsonl
+        03_review_form.jsonl
+        04_generation_summary.json
+        05_decision.json
+        09_summary.md
+    )
+    python - \
+        "$(native_path "$COMMITTED_SOURCE_MANIFEST")" \
+        "$(native_path "$SOURCE_OBJECTS_FILE")" \
+        "${GENERATION_PREFIX}/${GENERATION_RUN_ID}" \
+        "$GENERATION_RUN_ID" <<'PY'
+import json
+import re
+import sys
+
+manifest_path, objects_path, prefix, run_id = sys.argv[1:5]
+expected_files = [
+    "00_protocol_snapshot.json",
+    "01_selection.json",
+    "02_records.jsonl",
+    "03_review_form.jsonl",
+    "04_generation_summary.json",
+    "05_decision.json",
+    "09_summary.md",
+]
+manifest = json.load(open(manifest_path, encoding="utf-8"))
+if (
+    manifest.get("run_id") != run_id
+    or manifest.get("artifact") != "phase1_0d_confirmation_pack"
+    or manifest.get("manifest_written_last") is not True
+):
+    raise SystemExit("[FAIL] Committed generation manifest has invalid identity")
+entries = manifest.get("files")
+if (
+    not isinstance(entries, list)
+    or manifest.get("file_count") != len(expected_files)
+    or [entry.get("name") for entry in entries] != expected_files
+    or any(
+        set(entry) != {"name", "sha256"}
+        or not re.fullmatch(r"[0-9a-f]{64}", str(entry.get("sha256", "")))
+        for entry in entries
+    )
+):
+    raise SystemExit("[FAIL] Committed generation manifest has invalid entries")
+expected = {f"{prefix}/{name}" for name in expected_files}
+expected.add(f"{prefix}/artifact_manifest.json")
+objects = json.load(open(objects_path, encoding="utf-8"))
+observed = {item.get("name") for item in objects}
+if observed != expected:
+    raise SystemExit("[FAIL] Generation Blob prefix is not the exact complete pack")
+print("[OK] Generation Blob prefix has the exact committed file set")
+PY
+    SOURCE_PACK_DIR="$RECORD_DIR/source-pack"
+    mkdir -p "$SOURCE_PACK_DIR"
+    for name in "${SOURCE_FILES[@]}"; do
+        az storage blob download \
+            --auth-mode login \
+            --account-name "$BLOB_ACCOUNT" \
+            --container-name "$BLOB_CONTAINER" \
+            --name "${GENERATION_PREFIX}/${GENERATION_RUN_ID}/${name}" \
+            --file "$SOURCE_PACK_DIR/$name" \
+            --overwrite false --only-show-errors --output none
+    done
+    python - \
+        "$(native_path "$COMMITTED_SOURCE_MANIFEST")" \
+        "$(native_path "$SOURCE_PACK_DIR")" <<'PY'
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+manifest_path, pack_dir = sys.argv[1:3]
+manifest = json.load(open(manifest_path, encoding="utf-8"))
+expected = {entry["name"]: entry["sha256"] for entry in manifest["files"]}
+for name, digest in expected.items():
+    observed = hashlib.sha256((Path(pack_dir) / name).read_bytes()).hexdigest()
+    if observed != digest:
+        raise SystemExit(f"[FAIL] Generation Blob bytes differ for {name}")
+print("[OK] Committed generation license binds every source-pack byte")
+PY
+fi
 if [[ "$REVIEW_MODE" == "smoke" ]]; then
     # Atomic service-side one-round lock.  Two concurrent launchers may both
     # observe no ACA job, but only one create-only Blob upload can succeed.  The
@@ -274,9 +569,9 @@ if [[ "$REVIEW_MODE" == "review" ]]; then
     # Target review has no rerun path after any failure.  Claim this lock before
     # provisioning so concurrent launchers cannot both pass the ACA job check.
     REVIEW_LOCK_FILE="$RECORD_DIR/formal_review_lock.json"
-    printf '{"artifact":"phase1_0d_rv2_formal_review_lock","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","smoke_run_id":"%s","generation_run_id":"%s","review_run_id":"%s"}\n' \
+    printf '{"artifact":"phase1_0d_rv2_formal_review_lock","project_sha":"%s","image_digest":"%s","qualification_run_id":"%s","smoke_run_id":"%s","generation_run_id":"%s","source_manifest_sha256":"%s","review_run_id":"%s"}\n' \
         "$PROJECT_SHA" "$IMAGE_DIGEST" "$QUALIFICATION_RUN_ID" "$SMOKE_RUN_ID" \
-        "$GENERATION_RUN_ID" "$RUN_ID" >"$REVIEW_LOCK_FILE"
+        "$GENERATION_RUN_ID" "$SOURCE_MANIFEST_SHA256" "$RUN_ID" >"$REVIEW_LOCK_FILE"
     az storage blob upload \
         --auth-mode login \
         --account-name "$BLOB_ACCOUNT" \
@@ -304,7 +599,10 @@ case "$REVIEW_MODE" in
     review)
         ARGS="$ARGS --qualification-receipt-prefix ${QUALIFICATION_PREFIX}/${QUALIFICATION_RUN_ID}"
         ARGS="$ARGS --gate-receipt-prefix ${SMOKE_PREFIX}/${SMOKE_RUN_ID}"
+        ARGS="$ARGS --gate-manifest-sha256 ${SMOKE_MANIFEST_SHA256}"
+        ARGS="$ARGS --gate-receipt-sha256 ${SMOKE_RECEIPT_SHA256}"
         ARGS="$ARGS --pack-blob-prefix ${GENERATION_PREFIX}/${GENERATION_RUN_ID}"
+        ARGS="$ARGS --source-manifest-sha256 ${SOURCE_MANIFEST_SHA256}"
         ARGS="$ARGS --out-blob-prefix ${REVIEW_PREFIX}/${RUN_ID}"
         ;;
 esac
@@ -326,6 +624,10 @@ environment = [
     {"name": "JSPACE_REVIEW_MODE", "value": "$REVIEW_MODE"},
     {"name": "JSPACE_CODE_COMMIT", "value": "$PROJECT_SHA"},
     {"name": "JSPACE_IMAGE_DIGEST", "value": "$IMAGE_DIGEST"},
+    {"name": "JSPACE_GENERATION_RUN_ID", "value": "$GENERATION_RUN_ID"},
+    {"name": "JSPACE_SOURCE_MANIFEST_SHA256", "value": "$SOURCE_MANIFEST_SHA256"},
+    {"name": "JSPACE_SMOKE_RECEIPT_SHA256", "value": "$SMOKE_RECEIPT_SHA256"},
+    {"name": "JSPACE_SMOKE_MANIFEST_SHA256", "value": "$SMOKE_MANIFEST_SHA256"},
 ]
 body = {
     "location": "southeastasia",
@@ -343,6 +645,10 @@ body = {
         "project-sha": "$PROJECT_SHA",
         "launcher-sha": "$LAUNCHER_SHA",
         "image-digest": "$IMAGE_DIGEST",
+        "generation-run-id": "$GENERATION_RUN_ID",
+        "source-manifest-sha256": "$SOURCE_MANIFEST_SHA256",
+        "smoke-receipt-sha256": "$SMOKE_RECEIPT_SHA256",
+        "smoke-manifest-sha256": "$SMOKE_MANIFEST_SHA256",
     },
     "properties": {
         "environmentId": "$ENVIRONMENT_ID",
@@ -407,11 +713,32 @@ fi
 
 az rest --method get --url "$JOB_URL" --output json >"$JOB_FILE"
 python - "$(native_path "$JOB_FILE")" "$RUN_ID" "$PROJECT_SHA" "$IMAGE_DIGEST" \
-    "$IMAGE_DIGEST_REF" "$WORKLOAD_PROFILE_NAME" "$REVIEW_MODE" <<'PY'
+    "$IMAGE_DIGEST_REF" "$WORKLOAD_PROFILE_NAME" "$REVIEW_MODE" \
+    "$REPLICA_TIMEOUT" "$COMMAND" "$IDENTITY_CLIENT_ID" "$BLOB_ACCOUNT" \
+    "$BLOB_CONTAINER" "$GENERATION_RUN_ID" "$SOURCE_MANIFEST_SHA256" \
+    "$LAUNCHER_SHA" "$SMOKE_RECEIPT_SHA256" "$SMOKE_MANIFEST_SHA256" <<'PY'
 import json
 import sys
 
-path, run_id, project_sha, image_digest, image_ref, profile, mode = sys.argv[1:8]
+(
+    path,
+    run_id,
+    project_sha,
+    image_digest,
+    image_ref,
+    profile,
+    mode,
+    replica_timeout,
+    expected_command,
+    identity_client_id,
+    blob_account,
+    blob_container,
+    generation_run_id,
+    source_manifest_sha256,
+    launcher_sha,
+    smoke_receipt_sha256,
+    smoke_manifest_sha256,
+) = sys.argv[1:18]
 job = json.loads(open(path, encoding="utf-8").read())
 tags = job.get("tags") or {}
 properties = job.get("properties") or {}
@@ -428,12 +755,24 @@ if tags.get("project-sha") != project_sha:
     failures.append("project-sha tag mismatch")
 if tags.get("image-digest") != image_digest:
     failures.append("image-digest tag mismatch")
+if tags.get("launcher-sha") != launcher_sha:
+    failures.append("launcher-sha tag mismatch")
+if tags.get("generation-run-id") != generation_run_id:
+    failures.append("generation-run-id tag mismatch")
+if tags.get("source-manifest-sha256") != source_manifest_sha256:
+    failures.append("source-manifest-sha256 tag mismatch")
+if tags.get("smoke-receipt-sha256") != smoke_receipt_sha256:
+    failures.append("smoke-receipt-sha256 tag mismatch")
+if tags.get("smoke-manifest-sha256") != smoke_manifest_sha256:
+    failures.append("smoke-manifest-sha256 tag mismatch")
 if tags.get("round") != "v2":
     failures.append("round tag mismatch")
 if properties.get("workloadProfileName") != profile:
     failures.append("workload profile mismatch")
 if configuration.get("replicaRetryLimit") != 0:
     failures.append("platform retry is enabled")
+if configuration.get("replicaTimeout") != int(replica_timeout):
+    failures.append("replica timeout mismatch")
 if configuration.get("triggerType") != "Manual":
     failures.append("trigger type is not Manual")
 if manual.get("parallelism") != 1 or manual.get("replicaCompletionCount") != 1:
@@ -446,20 +785,44 @@ else:
     container = containers[0]
     if container.get("image") != image_ref:
         failures.append("container image is not the pinned digest reference")
-    env_names = {item.get("name") for item in container.get("env") or []}
-    missing = sorted({"AZURE_CLIENT_ID", "JSPACE_REVIEW_RUN_ID"} - env_names)
-    if missing:
-        failures.append("missing environment variables: " + ", ".join(missing))
+    if container.get("command") != ["/bin/sh"] or container.get("args") != [
+        "-lc",
+        expected_command,
+    ]:
+        failures.append("container command differs from the registered review command")
+    if container.get("resources") != {"cpu": 2.0, "memory": "4Gi"}:
+        failures.append("container resources differ from the registered review job")
+    env_list = container.get("env") or []
+    env = {item.get("name"): item.get("value") for item in env_list}
+    if len(env) != len(env_list):
+        failures.append("container environment has duplicate names")
+    expected_env = {
+        "RESULTS_DIR": "/workspace/runtime/results",
+        "TMPDIR": "/workspace/runtime/cache/tmp",
+        "PYTHONUNBUFFERED": "1",
+        "AZURE_CLIENT_ID": identity_client_id,
+        "JSPACE_BLOB_ACCOUNT": blob_account,
+        "JSPACE_BLOB_CONTAINER": blob_container,
+        "JSPACE_REVIEW_RUN_ID": run_id,
+        "JSPACE_REVIEW_MODE": mode,
+        "JSPACE_CODE_COMMIT": project_sha,
+        "JSPACE_IMAGE_DIGEST": image_digest,
+        "JSPACE_GENERATION_RUN_ID": generation_run_id,
+        "JSPACE_SOURCE_MANIFEST_SHA256": source_manifest_sha256,
+        "JSPACE_SMOKE_RECEIPT_SHA256": smoke_receipt_sha256,
+        "JSPACE_SMOKE_MANIFEST_SHA256": smoke_manifest_sha256,
+    }
+    if env != expected_env:
+        failures.append("container environment differs from the exact registered values")
     forbidden = sorted(
         name
-        for name in env_names
+        for name in env
         if name
         and ("ACCOUNT_KEY" in name or "SAS" in name or "CONNECTION_STRING" in name)
     )
     if forbidden:
         failures.append("credential-bearing variables present: " + ", ".join(forbidden))
-    command = " ".join(container.get("args") or [])
-    if mode in {"qualify", "smoke"} and "--pack-blob-prefix" in command:
+    if mode in {"qualify", "smoke"} and "--pack-blob-prefix" in expected_command:
         failures.append("a synthetic gate stage received a target pack prefix")
 if template.get("volumes"):
     failures.append("job mounts volumes; managed identity to Blob only is required")

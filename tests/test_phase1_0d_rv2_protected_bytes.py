@@ -89,6 +89,7 @@ def test_the_v2_record_covers_every_path_the_v1_record_covers_for_phase_1_0d():
         "src/jspace_observation/phase1_0d_generation.py",
         "Dockerfile.phase1-0d",
         "infra/azure/scripts/19_run_phase1_0d_confirmation.sh",
+        "infra/azure/scripts/23_run_phase1_0d_semantic_review_v2.sh",
         # the complete v1 reviewer instrument
         "docs/phase1_0d_semantic_review_addendum.json",
         "docs/phase1_0d_semantic_review_rubric.md",
