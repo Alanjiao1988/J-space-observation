@@ -7,16 +7,21 @@
   "base_image_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
   "base_protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
   "bundle_hash_domain": "jspace-phase1-0d-review-v2/build-bundle/v1",
-  "bundle_sha256": "fbd9999356cbf5f22043a4820d77680dd4dc80b34b213995bb59f6858eae69b6",
+  "bundle_sha256": "1c06a103ebbe13b0fe793c6fe3d911e19c6c6894af583dab9f5b9d8fda3f3e70",
   "claim_boundary": "build provenance only; establishes which bytes are in the v2 review image and nothing about reviewer accuracy, instrument validity, model behaviour, hidden reasoning, or a 'J-space'",
-  "code_commit": "4b4894f2ad1efa2ddf0625798c2c04938da6b238",
+  "code_commit": "971ce4297d6cb1320bd0e173979e7fc6023ed3f5",
   "disjoint_from": [
     "phase1_0d_build_provenance.json",
     "phase1_0d_review_build_provenance.json"
   ],
   "dockerfile": "Dockerfile.phase1-0d-review-v2",
-  "file_count": 12,
+  "file_count": 13,
   "files": [
+    {
+      "bytes": 3303,
+      "path": ".dockerignore",
+      "sha256": "c965ea6e67cb9d473aa76d57913f8976b4d7b38b59fa2bedb64dcab06df163c2"
+    },
     {
       "bytes": 9371,
       "path": "Dockerfile.phase1-0d-review-v2",
@@ -53,9 +58,9 @@
       "sha256": "7b93c90a299ff4e77b83d4633624053f8ce53afcd04279ca3050c5ab14428e19"
     },
     {
-      "bytes": 19328,
+      "bytes": 21620,
       "path": "scripts/phase1_0d_review_v2_build_provenance.py",
-      "sha256": "da6e52f32003b0d723131ac5015a61156492b67157fd9a4fb8362af3fc721558"
+      "sha256": "b5e892559260fcba7f64a566dbc84c63c528cc820f9d48c31ea3dfca96e533d7"
     },
     {
       "bytes": 10376,
@@ -63,9 +68,9 @@
       "sha256": "73db75fd13922849194381959bda47595f76c6286bb3a0693395e4bc3fe82095"
     },
     {
-      "bytes": 39236,
+      "bytes": 50571,
       "path": "scripts/run_phase1_0d_semantic_review_v2.py",
-      "sha256": "7efa25d49b51e4ef98fb2a5cde2e90062807aec9e870aa0147803abe35fae10b"
+      "sha256": "061b3b4dbec553133335db67a803bff8d6cc652edbd1578ce072254c9f82f961"
     },
     {
       "bytes": 862,
