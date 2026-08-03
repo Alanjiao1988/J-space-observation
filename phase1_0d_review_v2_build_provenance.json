@@ -1,0 +1,126 @@
+{
+  "addendum_sha256": "20e5f30455f90a95c07e05e080e51443511c957e09d4ce97a42bd118bd9268e4",
+  "artifact": "phase1_0d_review_v2_build_provenance",
+  "authority_prompt": "docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md",
+  "authority_prompt_sha256": "7b93c90a299ff4e77b83d4633624053f8ce53afcd04279ca3050c5ab14428e19",
+  "base_image": "pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime",
+  "base_image_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
+  "base_protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
+  "bundle_hash_domain": "jspace-phase1-0d-review-v2/build-bundle/v1",
+  "bundle_sha256": "fbd9999356cbf5f22043a4820d77680dd4dc80b34b213995bb59f6858eae69b6",
+  "claim_boundary": "build provenance only; establishes which bytes are in the v2 review image and nothing about reviewer accuracy, instrument validity, model behaviour, hidden reasoning, or a 'J-space'",
+  "code_commit": "4b4894f2ad1efa2ddf0625798c2c04938da6b238",
+  "disjoint_from": [
+    "phase1_0d_build_provenance.json",
+    "phase1_0d_review_build_provenance.json"
+  ],
+  "dockerfile": "Dockerfile.phase1-0d-review-v2",
+  "file_count": 12,
+  "files": [
+    {
+      "bytes": 9371,
+      "path": "Dockerfile.phase1-0d-review-v2",
+      "sha256": "c8c076d2f95b260bf775a2182916fa226543f122f702f2d78bbbc7b34fc27df3"
+    },
+    {
+      "bytes": 5849,
+      "path": "docs/decisions/phase1_0d_semantic_review_v1_specification_correction.md",
+      "sha256": "c8a10562dc58871e2229c68f3f0942dc471a7c2bc31ea193d3df97ecf2372820"
+    },
+    {
+      "bytes": 22227,
+      "path": "docs/phase1_0d_protocol_snapshot.json",
+      "sha256": "1ebf03a7731ad9a523f50284ba68c711727304633963f89b613f4a8f37710c69"
+    },
+    {
+      "bytes": 8863,
+      "path": "docs/phase1_0d_rv2_protected_bytes.json",
+      "sha256": "bcbf649223a6f3c7ef1d81961c69620f5a14c58cb0c0dc58925aead9e0553a72"
+    },
+    {
+      "bytes": 24921,
+      "path": "docs/phase1_0d_semantic_review_addendum_v2.json",
+      "sha256": "20e5f30455f90a95c07e05e080e51443511c957e09d4ce97a42bd118bd9268e4"
+    },
+    {
+      "bytes": 3698,
+      "path": "docs/phase1_0d_semantic_review_rubric_v2.md",
+      "sha256": "91f687087fbd56cb07369da7a4c28beddb49d822f2d6fa1832cb3849a26f60e3"
+    },
+    {
+      "bytes": 36742,
+      "path": "docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md",
+      "sha256": "7b93c90a299ff4e77b83d4633624053f8ce53afcd04279ca3050c5ab14428e19"
+    },
+    {
+      "bytes": 19328,
+      "path": "scripts/phase1_0d_review_v2_build_provenance.py",
+      "sha256": "da6e52f32003b0d723131ac5015a61156492b67157fd9a4fb8362af3fc721558"
+    },
+    {
+      "bytes": 10376,
+      "path": "scripts/phase1_0d_rv2_protected_bytes.py",
+      "sha256": "73db75fd13922849194381959bda47595f76c6286bb3a0693395e4bc3fe82095"
+    },
+    {
+      "bytes": 39236,
+      "path": "scripts/run_phase1_0d_semantic_review_v2.py",
+      "sha256": "7efa25d49b51e4ef98fb2a5cde2e90062807aec9e870aa0147803abe35fae10b"
+    },
+    {
+      "bytes": 862,
+      "path": "src/jspace_observation/semantic_review_v2/__init__.py",
+      "sha256": "ea638368e70ef8d74c5b2534aac9b2ea996a3dcef81352ba23724056ff9e7891"
+    },
+    {
+      "bytes": 8830,
+      "path": "src/jspace_observation/semantic_review_v2/addendum_v2.py",
+      "sha256": "d61729992f4220e95b612187d1e2ccb17ca33f577880395ca18ced85b9fb6ffd"
+    }
+  ],
+  "fixture_bank_sha256": "41adb246ec36d5ac7b16f5144c466351b93abe8b3f56dc811e58a789b197e75f",
+  "fixture_count": 20,
+  "generation_image_build_commit": "9cde1d95ffda36698a0ddf558a9358f3337dd711",
+  "generation_image_digest": "sha256:1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332c37481166aa4",
+  "historical_parents": {
+    "note": "The v1 instrument and its terminal gate are immutable history. They are bound here so a reader can prove the v2 round did not quietly rewrite them, and so the v2 image can verify their bytes.",
+    "v1_addendum": "docs/phase1_0d_semantic_review_addendum.json",
+    "v1_addendum_sha256": "582640de645030daf957fbc3e5c7947008b78d1596b674687a73f20ba749bdc3",
+    "v1_authority_prompt": "docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md",
+    "v1_authority_prompt_sha256": "61f04923e4afaa3e6fd9f66d7b91a1316852de11b41dc6d3380ee827f5065d87",
+    "v1_bank_is_retired": "The retired v1 six-fixture bank is historical development evidence. It is never called again and never counted in a v2 denominator.",
+    "v1_final_state": "BLOCKED_ON_SEMANTIC_REVIEW_PROVIDER_BEFORE_GENERATION",
+    "v1_gate_artifact_root": "artifacts/phase1-0d-semantic-review-gate/20260803T031343Z",
+    "v1_gate_manifest_sha256": "d70c0c9925fdd9d764f17068d1c712e2c1ff1fdde4f75ed266b4b08018b0083f",
+    "v1_gate_receipt_sha256": "74d738bf00477f391097ee6622379259ffb808283ebe081d33934a79fd252352",
+    "v1_qualification_receipt_sha256": "efb94aed3e33b518f5e3703c3f7bd0c27534444a871e324e5d2a32fbca3d5048",
+    "v1_review_build_provenance": "phase1_0d_review_build_provenance.json",
+    "v1_review_bundle_sha256": "d1fbd985f959648ec178480ce26caf696152520f26f96bc8b4458cb6881f3b49",
+    "v1_review_image_digest": "sha256:d9e887e68cccf7472e956785cda3ad7cf5f3902daea9287fc7b72c357f473e10",
+    "v1_rubric": "docs/phase1_0d_semantic_review_rubric.md",
+    "v1_rubric_sha256": "a0d5b22bd6d4ef1012db676ff3431c3d2e6825f1ec4ade1a7c7801817ba8765d",
+    "v1_smoke_receipt_sha256": "eba6e2e48d3b7c30c61779629facc523975740b4a1f2d2be9e833b75fc7dda8e",
+    "v1_smoke_result": "17/18 matched; smoke_unresolved/primary expected unresolved, observed incorrect",
+    "v1_specification_correction": "docs/decisions/phase1_0d_semantic_review_v1_specification_correction.md"
+  },
+  "no_target_output_baked": true,
+  "phase": "1.0D",
+  "registered_calls": 60,
+  "request_profile_sha256": {
+    "primary": "5b2352bf8428e0c278397b24efa2469cbb94692be64f8e0b50e878c3c85c97af",
+    "secondary": "35ebb8afc283a17baa12cf422cb952a5d088bd5690e1a731b9f76fd1b3af2b8e",
+    "third": "5361270acc780b00d73de0dff9b51baefcd103d0f9cd0678a923b8dc3749bf4f"
+  },
+  "requirements": "requirements-calibration.txt",
+  "requirements_note": "the v2 review job is standard-library only; the pinned calibration requirements are installed and verified by the frozen generation provenance tool so this image's environment is the same already-pinned environment rather than a third unpinned one",
+  "reviewer_ids": {
+    "primary": "primary:azure_openai:gpt-5-6-sol-global:gpt-5.6-sol:2026-07-09",
+    "secondary": "secondary:microsoft_foundry:mistral-large-3-global:Mistral-Large-3:1",
+    "third": "third:microsoft_foundry:deepseek-v4-pro-global:DeepSeek-V4-Pro:2026-04-23"
+  },
+  "round": "v2",
+  "rubric_sha256": "91f687087fbd56cb07369da7a4c28beddb49d822f2d6fa1832cb3849a26f60e3",
+  "schema": "phase1-0d-review-v2-build-provenance/v1",
+  "task_ids_sha256": "0d3fe6add211a381a321ea974502d262faf65312dc504e2acceb7c6556b1f524",
+  "track": "b"
+}
