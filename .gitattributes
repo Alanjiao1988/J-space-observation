@@ -171,3 +171,8 @@ artifacts/phase1-0d-semantic-review-gate/**/*.txt text eol=lf
 
 docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md text eol=lf
 docs/decisions/phase1_0d_semantic_review_v1_specification_correction.md text eol=lf
+
+docs/phase1_0d_semantic_review_rubric_v2.md text eol=lf
+docs/phase1_0d_semantic_review_addendum_v2.json text eol=lf
+src/jspace_observation/semantic_review_v2/*.py text eol=lf
+tests/test_phase1_0d_semantic_review_v2_instrument.py text eol=lf

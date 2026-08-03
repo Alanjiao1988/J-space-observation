@@ -1,0 +1,559 @@
+{
+  "schema_version": "phase1-0d-semantic-review-addendum/v2",
+  "title": "Phase 1.0D semantic-review execution addendum, version 2",
+  "why_this_exists": "The v1 reviewer instrument failed its own prospective gate because its frozen rubric and one of its frozen fixtures contradicted each other: rule 3 selected the last complete literal 'Final answer:' surface, rule 4 applied only 'with no rule selecting one', and the fixture registered 'unresolved' on the strength of prose placed after that surface. This addendum re-freezes the instrument with an explicit selection rule, an executable ordering test, and a fresh 20-fixture conformance bank. It is the last authorized reviewer-instrument round for Phase 1.0D.",
+  "frozen_before_inference": true,
+  "authority_prompt": "docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md",
+  "authority_prompt_sha256": "7b93c90a299ff4e77b83d4633624053f8ce53afcd04279ca3050c5ab14428e19",
+  "base_protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
+  "task_ids_sha256": "0d3fe6add211a381a321ea974502d262faf65312dc504e2acceb7c6556b1f524",
+  "generation_image_digest": "sha256:1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332c37481166aa4",
+  "generation_image_build_commit": "9cde1d95ffda36698a0ddf558a9358f3337dd711",
+  "historical_parents": {
+    "note": "The v1 instrument and its terminal gate are immutable history. They are bound here so a reader can prove the v2 round did not quietly rewrite them, and so the v2 image can verify their bytes.",
+    "v1_authority_prompt": "docs/prompts/phase1_0d_generation_semantic_review_execution_prompt.md",
+    "v1_authority_prompt_sha256": "61f04923e4afaa3e6fd9f66d7b91a1316852de11b41dc6d3380ee827f5065d87",
+    "v1_addendum": "docs/phase1_0d_semantic_review_addendum.json",
+    "v1_addendum_sha256": "582640de645030daf957fbc3e5c7947008b78d1596b674687a73f20ba749bdc3",
+    "v1_rubric": "docs/phase1_0d_semantic_review_rubric.md",
+    "v1_rubric_sha256": "a0d5b22bd6d4ef1012db676ff3431c3d2e6825f1ec4ade1a7c7801817ba8765d",
+    "v1_review_image_digest": "sha256:d9e887e68cccf7472e956785cda3ad7cf5f3902daea9287fc7b72c357f473e10",
+    "v1_review_build_provenance": "phase1_0d_review_build_provenance.json",
+    "v1_review_bundle_sha256": "d1fbd985f959648ec178480ce26caf696152520f26f96bc8b4458cb6881f3b49",
+    "v1_gate_artifact_root": "artifacts/phase1-0d-semantic-review-gate/20260803T031343Z",
+    "v1_gate_receipt_sha256": "74d738bf00477f391097ee6622379259ffb808283ebe081d33934a79fd252352",
+    "v1_gate_manifest_sha256": "d70c0c9925fdd9d764f17068d1c712e2c1ff1fdde4f75ed266b4b08018b0083f",
+    "v1_qualification_receipt_sha256": "efb94aed3e33b518f5e3703c3f7bd0c27534444a871e324e5d2a32fbca3d5048",
+    "v1_smoke_receipt_sha256": "eba6e2e48d3b7c30c61779629facc523975740b4a1f2d2be9e833b75fc7dda8e",
+    "v1_smoke_result": "17/18 matched; smoke_unresolved/primary expected unresolved, observed incorrect",
+    "v1_final_state": "BLOCKED_ON_SEMANTIC_REVIEW_PROVIDER_BEFORE_GENERATION",
+    "v1_specification_correction": "docs/decisions/phase1_0d_semantic_review_v1_specification_correction.md",
+    "v1_bank_is_retired": "The retired v1 six-fixture bank is historical development evidence. It is never called again and never counted in a v2 denominator."
+  },
+  "rubric_path": "docs/phase1_0d_semantic_review_rubric_v2.md",
+  "rubric_sha256": "91f687087fbd56cb07369da7a4c28beddb49d822f2d6fa1832cb3849a26f60e3",
+  "rubric_delivery": "The rubric bytes are sent verbatim as the system message to all three roles. Only the provider wrapper differs.",
+  "rubric_ordering_consequences": [
+    "the last complete literal surface wins",
+    "prose after that surface cannot override it",
+    "incompatible alternatives inside the selected surface are unresolved",
+    "co-equal final commitments without a literal surface are unresolved",
+    "explored alternatives without commitment are no_answer",
+    "an empty or whitespace-only question or registered_answer is invalid"
+  ],
+  "presented_fields": [
+    "record_id",
+    "question",
+    "registered_answer",
+    "output_text"
+  ],
+  "prohibited_reviewer_fields": [
+    "role",
+    "arm_id",
+    "condition",
+    "task_family",
+    "difficulty_band",
+    "parser_route",
+    "triage",
+    "no_cot_violation",
+    "primary_label",
+    "secondary_label",
+    "third_label",
+    "selection_reason",
+    "any metric"
+  ],
+  "labels": [
+    "correct",
+    "incorrect",
+    "no_answer",
+    "invalid",
+    "unresolved"
+  ],
+  "roles": {
+    "primary": {
+      "provider": "azure_openai",
+      "api_kind": "azure_openai_v1_chat_completions",
+      "endpoint": "https://aj-gpt56-25-943b-eastus2.openai.azure.com",
+      "path_candidates": [
+        "/openai/v1/chat/completions"
+      ],
+      "api_version_candidates": [
+        ""
+      ],
+      "deployment": "gpt-5-6-sol-global",
+      "model": "gpt-5.6-sol",
+      "model_version": "2026-07-09",
+      "sku": "GlobalStandard",
+      "region": "eastus2",
+      "token_scope": "https://cognitiveservices.azure.com/.default",
+      "max_visible_output_tokens": 64,
+      "reasoning_content_fields": [],
+      "request": {
+        "model": "gpt-5-6-sol-global",
+        "reasoning_effort": "medium",
+        "max_completion_tokens": 4096,
+        "store": false,
+        "response_format": {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "phase1_0d_semantic_label",
+            "strict": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "enum": [
+                    "correct",
+                    "incorrect",
+                    "no_answer",
+                    "invalid",
+                    "unresolved"
+                  ]
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      },
+      "proven_by": {
+        "stage": "v1_provider_qualification",
+        "run_id": "20260803T030929Z",
+        "execution": "job-jspace-p10d-review-qualify-d9e24fa",
+        "receipt_sha256": "efb94aed3e33b518f5e3703c3f7bd0c27534444a871e324e5d2a32fbca3d5048"
+      }
+    },
+    "secondary": {
+      "provider": "microsoft_foundry",
+      "api_kind": "foundry_model_inference",
+      "endpoint": "https://aif-jspace-p10d-review-eastus2.services.ai.azure.com",
+      "path_candidates": [
+        "/openai/v1/chat/completions"
+      ],
+      "api_version_candidates": [
+        ""
+      ],
+      "deployment": "mistral-large-3-global",
+      "model": "Mistral-Large-3",
+      "model_version": "1",
+      "sku": "GlobalStandard",
+      "region": "eastus2",
+      "token_scope": "https://cognitiveservices.azure.com/.default",
+      "max_visible_output_tokens": 64,
+      "reasoning_content_fields": [],
+      "request": {
+        "model": "mistral-large-3-global",
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 64,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "proven_by": {
+        "stage": "v1_provider_qualification",
+        "run_id": "20260803T030929Z",
+        "execution": "job-jspace-p10d-review-qualify-d9e24fa",
+        "receipt_sha256": "efb94aed3e33b518f5e3703c3f7bd0c27534444a871e324e5d2a32fbca3d5048"
+      }
+    },
+    "third": {
+      "provider": "microsoft_foundry",
+      "api_kind": "foundry_model_inference",
+      "endpoint": "https://aif-jspace-p10d-review-eastus2.services.ai.azure.com",
+      "path_candidates": [
+        "/openai/v1/chat/completions"
+      ],
+      "api_version_candidates": [
+        ""
+      ],
+      "deployment": "deepseek-v4-pro-global",
+      "model": "DeepSeek-V4-Pro",
+      "model_version": "2026-04-23",
+      "sku": "GlobalStandard",
+      "region": "eastus2",
+      "token_scope": "https://cognitiveservices.azure.com/.default",
+      "max_visible_output_tokens": 64,
+      "reasoning_content_fields": [
+        "reasoning_content"
+      ],
+      "request": {
+        "model": "deepseek-v4-pro-global",
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 4096,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "proven_by": {
+        "stage": "v1_provider_qualification",
+        "run_id": "20260803T030929Z",
+        "execution": "job-jspace-p10d-review-qualify-d9e24fa",
+        "receipt_sha256": "efb94aed3e33b518f5e3703c3f7bd0c27534444a871e324e5d2a32fbca3d5048"
+      }
+    }
+  },
+  "parameter_notes": {
+    "max_visible_output_tokens": "The authority caps visible output at 64 tokens. Azure exposes no separate visible cap for a reasoning deployment: max_completion_tokens covers reasoning plus visible output, so setting it to 64 would consume the budget on hidden reasoning and return nothing to parse. The cap is therefore enforced as a checked invariant on the visible completion tokens of every response, while the transport budget is set high enough that a well-formed answer is never truncated. A response whose visible output exceeds 64 tokens is malformed, not relabelled.",
+    "primary_max_completion_tokens": "4096, covering reasoning_effort=medium plus the one-key object. Truncation would surface as finish_reason='length' and is treated as malformed rather than as a label.",
+    "third_max_tokens": "4096 for the same reason: DeepSeek-V4-Pro may emit provider-separated reasoning, which is never read and never enters a judgment.",
+    "secondary_max_tokens": "64, the literal visible cap, because Mistral-Large-3 v1 emits no separate reasoning stream.",
+    "determinism": "temperature=0 and top_p=1 are the documented lowest-variance request for the Foundry deployments. gpt-5.6-sol omits sampling parameters entirely rather than relying silently on a service default; its output shape is instead constrained by a strict closed JSON schema.",
+    "api_version_discovery": "The Foundry route and api-version are proven against the live deployment by the provider-qualification stage before any target output exists. The candidate list is frozen here; the qualification receipt records which candidate answered. This is what the authority means by 'the exact API version proven by the provider qualification receipt'.",
+    "store": "store=false is set on the Azure OpenAI request so no conversation state is retained. No tools, browsing, file search or code execution is enabled for any role."
+  },
+  "isolation": {
+    "rows_per_request": 1,
+    "session_reuse": false,
+    "conversation_state": false,
+    "secondary_sees_primary_label": false,
+    "third_sees_prior_labels": false,
+    "third_sees_disagreement_fact": false,
+    "note": "Every role receives one row in a stateless request built only from the four presented fields. The secondary reviewer is a separate deployment on a separate model, not a second call carrying the primary result."
+  },
+  "concurrency": {
+    "max_in_flight_per_deployment": 8
+  },
+  "retry": {
+    "max_attempts": 8,
+    "retry_status_codes": [
+      408,
+      429,
+      500,
+      502,
+      503,
+      504
+    ],
+    "retry_on_connection_error": true,
+    "backoff_initial_seconds": 1.0,
+    "backoff_multiplier": 2.0,
+    "backoff_max_seconds": 60.0,
+    "jitter": "full",
+    "identical_request_required": true,
+    "semantic_retry_forbidden": true,
+    "note": "Only transport and service failures are retried, and every retry sends byte-identical semantic content to the same pinned deployment. After any successful provider response the label stands: it is never resampled because it is undesirable, uncertain or unresolved."
+  },
+  "coverage": {
+    "primary_rows": 900,
+    "strata": 45,
+    "rows_per_stratum": 20,
+    "sample_fraction": 0.2,
+    "sampled_secondary_rows": 180,
+    "note": "45 task-family x difficulty x arm strata of 20 rows each give a fixed sampled component of exactly 180 rows. The required secondary set is the union of that sample with every forced row, so it may be larger than 180 and can never be smaller."
+  },
+  "conformance_bank": {
+    "fixture_count": 20,
+    "roles": 3,
+    "calls": 60,
+    "labels_per_class": 4,
+    "authored": "2026-08-03, after the v1 responses were observed",
+    "independence_disclosure": "These 20 fixtures and their expected labels were authored with knowledge of how each v1 reviewer answered the v1 bank. That is a real loss of instrument-calibration independence and is recorded as L-52. Target-data independence is intact: zero Phase 1.0D generations, rows, labels and metrics exist.",
+    "canonicalisation": "fixture_bank_sha256 is sha256 of json.dumps(fixtures, sort_keys=True, separators=(',', ':'), ensure_ascii=False) encoded as UTF-8, over the fixtures list exactly as ordered below.",
+    "fixture_bank_sha256": "41adb246ec36d5ac7b16f5144c466351b93abe8b3f56dc811e58a789b197e75f"
+  },
+  "smoke_fixtures": [
+    {
+      "fixture_id": "v2_correct_exact",
+      "expected_label": "correct",
+      "row": {
+        "record_id": "v2_correct_exact",
+        "question": "What is 3 + 5?",
+        "registered_answer": "8",
+        "output_text": "Final answer: 8"
+      }
+    },
+    {
+      "fixture_id": "v2_correct_case_equivalent",
+      "expected_label": "correct",
+      "row": {
+        "record_id": "v2_correct_case_equivalent",
+        "question": "What is the capital city of Germany?",
+        "registered_answer": "Berlin",
+        "output_text": "Final answer: berlin"
+      }
+    },
+    {
+      "fixture_id": "v2_correct_numeric_equivalent",
+      "expected_label": "correct",
+      "row": {
+        "record_id": "v2_correct_numeric_equivalent",
+        "question": "What is half of 10?",
+        "registered_answer": "5",
+        "output_text": "Final answer: 5.0"
+      }
+    },
+    {
+      "fixture_id": "v2_correct_last_surface_wins",
+      "expected_label": "correct",
+      "row": {
+        "record_id": "v2_correct_last_surface_wins",
+        "question": "What is 3 + 3?",
+        "registered_answer": "6",
+        "output_text": "Final answer: 7\nI correct that.\nFinal answer: 6\nI remain uncertain, but the registered surface above remains my final answer."
+      }
+    },
+    {
+      "fixture_id": "v2_incorrect_exact",
+      "expected_label": "incorrect",
+      "row": {
+        "record_id": "v2_incorrect_exact",
+        "question": "What is 3 + 5?",
+        "registered_answer": "8",
+        "output_text": "Final answer: 9"
+      }
+    },
+    {
+      "fixture_id": "v2_incorrect_entity",
+      "expected_label": "incorrect",
+      "row": {
+        "record_id": "v2_incorrect_entity",
+        "question": "What is the capital city of Germany?",
+        "registered_answer": "Berlin",
+        "output_text": "Final answer: Munich"
+      }
+    },
+    {
+      "fixture_id": "v2_incorrect_value",
+      "expected_label": "incorrect",
+      "row": {
+        "record_id": "v2_incorrect_value",
+        "question": "How many centimeters are in one meter?",
+        "registered_answer": "100",
+        "output_text": "Final answer: 1"
+      }
+    },
+    {
+      "fixture_id": "v2_incorrect_last_surface_wins",
+      "expected_label": "incorrect",
+      "row": {
+        "record_id": "v2_incorrect_last_surface_wins",
+        "question": "What is 3 + 3?",
+        "registered_answer": "6",
+        "output_text": "Final answer: 6\nI reconsidered.\nFinal answer: 7\nBoth candidate lines seem equally plausible to me."
+      }
+    },
+    {
+      "fixture_id": "v2_no_answer_empty",
+      "expected_label": "no_answer",
+      "row": {
+        "record_id": "v2_no_answer_empty",
+        "question": "What is 4 + 4?",
+        "registered_answer": "8",
+        "output_text": ""
+      }
+    },
+    {
+      "fixture_id": "v2_no_answer_refusal",
+      "expected_label": "no_answer",
+      "row": {
+        "record_id": "v2_no_answer_refusal",
+        "question": "What is 4 + 4?",
+        "registered_answer": "8",
+        "output_text": "I refuse to answer this question."
+      }
+    },
+    {
+      "fixture_id": "v2_no_answer_reasoning_only",
+      "expected_label": "no_answer",
+      "row": {
+        "record_id": "v2_no_answer_reasoning_only",
+        "question": "What is 4 + 4?",
+        "registered_answer": "8",
+        "output_text": "I would need to add the two values, but I will not provide a final answer."
+      }
+    },
+    {
+      "fixture_id": "v2_no_answer_empty_surface",
+      "expected_label": "no_answer",
+      "row": {
+        "record_id": "v2_no_answer_empty_surface",
+        "question": "What is 4 + 4?",
+        "registered_answer": "8",
+        "output_text": "I considered the problem.\nFinal answer:"
+      }
+    },
+    {
+      "fixture_id": "v2_invalid_empty_question",
+      "expected_label": "invalid",
+      "row": {
+        "record_id": "v2_invalid_empty_question",
+        "question": "",
+        "registered_answer": "4",
+        "output_text": "Final answer: 4"
+      }
+    },
+    {
+      "fixture_id": "v2_invalid_empty_reference",
+      "expected_label": "invalid",
+      "row": {
+        "record_id": "v2_invalid_empty_reference",
+        "question": "What is 2 + 2?",
+        "registered_answer": "",
+        "output_text": "Final answer: 4"
+      }
+    },
+    {
+      "fixture_id": "v2_invalid_whitespace_question",
+      "expected_label": "invalid",
+      "row": {
+        "record_id": "v2_invalid_whitespace_question",
+        "question": "   ",
+        "registered_answer": "4",
+        "output_text": "Final answer: 4"
+      }
+    },
+    {
+      "fixture_id": "v2_invalid_whitespace_reference",
+      "expected_label": "invalid",
+      "row": {
+        "record_id": "v2_invalid_whitespace_reference",
+        "question": "What is 2 + 2?",
+        "registered_answer": "   ",
+        "output_text": "Final answer: 4"
+      }
+    },
+    {
+      "fixture_id": "v2_unresolved_coequal_commitments",
+      "expected_label": "unresolved",
+      "row": {
+        "record_id": "v2_unresolved_coequal_commitments",
+        "question": "What is 2 + 2?",
+        "registered_answer": "4",
+        "output_text": "Answer candidate one is 4. Answer candidate two is 5. I explicitly commit to both as co-equal final answers and select neither."
+      }
+    },
+    {
+      "fixture_id": "v2_unresolved_surface_alternatives",
+      "expected_label": "unresolved",
+      "row": {
+        "record_id": "v2_unresolved_surface_alternatives",
+        "question": "What is 2 + 2?",
+        "registered_answer": "4",
+        "output_text": "Final answer: 4 or 5"
+      }
+    },
+    {
+      "fixture_id": "v2_unresolved_surface_disjunction",
+      "expected_label": "unresolved",
+      "row": {
+        "record_id": "v2_unresolved_surface_disjunction",
+        "question": "What is 10 divided by 2?",
+        "registered_answer": "5",
+        "output_text": "Final answer: either 5 or 6; I cannot choose one."
+      }
+    },
+    {
+      "fixture_id": "v2_unresolved_no_surface_conflict",
+      "expected_label": "unresolved",
+      "row": {
+        "record_id": "v2_unresolved_no_surface_conflict",
+        "question": "What is the capital city of Italy?",
+        "registered_answer": "Rome",
+        "output_text": "My first final committed answer is Rome. My second final committed answer is Milan. Neither commitment overrides the other."
+      }
+    }
+  ],
+  "smoke_rules": {
+    "expected_labels_committed_before_calls": true,
+    "roles_exercised": [
+      "primary",
+      "secondary",
+      "third"
+    ],
+    "one_isolated_request_per_fixture_per_role": true,
+    "batch_is_registered_in_advance": "The 60 role/fixture pairs are one prospectively registered batch. Each pair is submitted at most once, apart from registered byte-identical transport retries. All 60 outcomes are completed and recorded even if an early response mismatches; remaining calls are never cancelled and no call is added beyond this bank. The pass rule is evaluated only after the complete batch has reached a valid response or a registered terminal transport state.",
+    "pass_criterion": {
+      "valid_responses": 60,
+      "schema_valid_one_key_labels": 60,
+      "visible_completions_within_cap": 60,
+      "exact_expected_label_matches": 60,
+      "transport_failures_after_registered_retry": 0,
+      "malformed_responses": 0,
+      "semantic_retries": 0
+    },
+    "no_majority_rule": true,
+    "no_tolerance": "There is no 59/60 tolerance and no majority vote.",
+    "on_any_mismatch": "Finish persisting the complete 60-call receipt, do not rerun or add a fixture call, do not generate target output, record the permanent close, and end as CLOSED_PHASE_1_0D_WITHOUT_GENERATION_REVIEW_INSTRUMENT_UNQUALIFIED.",
+    "on_pass": "Commit and push the immutable gate receipt and continue directly to the single preregistered Phase 1.0D generation under the same authority, without pausing for a new operator choice.",
+    "after_first_response_frozen": [
+      "do not change the rubric",
+      "do not change a fixture or expected label",
+      "do not change a model, role, deployment, parameter or prompt",
+      "do not add majority voting or fallback",
+      "do not semantically retry or resample a valid response",
+      "do not rerun the smoke",
+      "do not start generation unless all 60 judgments match"
+    ],
+    "one_round_ceiling": "This is the last authorized semantic-review qualification round for Phase 1.0D. There is no RV3.",
+    "counts_towards_scientific_totals": false
+  },
+  "evidence_persistence": {
+    "why": "L-51 records that the v1 receipts died with the ephemeral replica because the job mounted no writable share and stopped before its upload stage. v2 uploads its complete receipt before exit, including on semantic mismatch.",
+    "blob_account": "stjspacefiles0709085305",
+    "blob_container": "jspace-results",
+    "qualification_prefix": "phase1-0d-semantic-review-v2/qualification",
+    "smoke_prefix": "phase1-0d-semantic-review-v2/smoke",
+    "create_only": true,
+    "overwrite_forbidden": true,
+    "manifest_written_last": true,
+    "upload_on_mismatch": true,
+    "per_call_receipt_fields": [
+      "fixture_id",
+      "expected_label",
+      "role",
+      "provider",
+      "deployment",
+      "model",
+      "model_version",
+      "request_body_sha256",
+      "response_body_sha256",
+      "observed_label",
+      "match",
+      "request_id",
+      "provider_model_fingerprint",
+      "finish_reason",
+      "visible_completion_tokens",
+      "total_tokens",
+      "latency_seconds",
+      "retry_count",
+      "terminal_transport_status"
+    ],
+    "never_published": [
+      "credentials",
+      "bearer tokens",
+      "subscription ids",
+      "tenant ids",
+      "authorization headers"
+    ],
+    "on_persistence_failure": "If a valid semantic response exists but its gate receipt cannot be persisted, do not rerun the semantic call to reconstruct evidence. Preserve console evidence and stop as BLOCKED_ON_PHASE_1_0D_RV2_GATE_EVIDENCE_PERSISTENCE."
+  },
+  "target_isolation": {
+    "smoke_receives_generation_pack_prefix": false,
+    "smoke_may_list_or_read_target_storage": false,
+    "note": "The qualification and smoke stages take no pack prefix and hold no code path that lists or reads target-generation storage. All v2 qualification and smoke bytes are synthetic and public."
+  },
+  "terminal_states": {
+    "starting_state_mismatch": "BLOCKED_ON_PHASE_1_0D_RV2_STARTING_STATE_MISMATCH",
+    "gate_evidence_persistence": "BLOCKED_ON_PHASE_1_0D_RV2_GATE_EVIDENCE_PERSISTENCE",
+    "instrument_unqualified": "CLOSED_PHASE_1_0D_WITHOUT_GENERATION_REVIEW_INSTRUMENT_UNQUALIFIED",
+    "provider_unavailable": "CLOSED_PHASE_1_0D_WITHOUT_GENERATION_REVIEW_PROVIDER_UNAVAILABLE",
+    "malformed_response": "BLOCKED_ON_MALFORMED_SEMANTIC_REVIEW_RESPONSE",
+    "transport_exhausted": "BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT",
+    "protected_byte_drift": "BLOCKED_ON_FROZEN_PHASE_1_0D_DRIFT",
+    "result_pack_mismatch": "BLOCKED_ON_RESULT_PACK_INTEGRITY",
+    "headroom_not_established": "HEADROOM_NOT_ESTABLISHED",
+    "candidate_cells_found": "RQ2_PILOT_CANDIDATE_CELLS_FOUND"
+  },
+  "authentication": {
+    "method": "microsoft_entra_managed_identity",
+    "user_assigned_identity": "id-jspace-p10d-review-sea",
+    "keys_forbidden": true,
+    "note": "No API key, SAS token, account key, client secret, connection string or authorization header is used, printed, stored or committed. Local authentication is disabled on both Cognitive Services accounts."
+  },
+  "claim_boundary": "A v2 smoke pass establishes only conformance on 20 disclosed synthetic fixtures authored after a specification failure. It does not establish general reviewer accuracy, human-ground-truth accuracy, target-model capability, headroom, hidden reasoning, J-lens validity, or a 'J-space'. Reviewer agreement is operational consistency, not accuracy. Infrastructure completion, image immutability, test count and a passed provider smoke are never scientific claims."
+}
