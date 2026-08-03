@@ -82,6 +82,8 @@ MAX_REGISTERED_RETRIES = 7
 PROVIDER_ATTEMPT_TIMEOUT_SECONDS = 180
 TOKEN_ACQUISITION_TIMEOUT_SECONDS = 30
 GATE_PERSISTENCE_MARGIN_SECONDS = 300
+FORMAL_REVIEW_RECORDS = 900
+FORMAL_REVIEW_ROLE_PASSES = 3
 
 
 class GateEvidenceError(RuntimeError):
@@ -553,6 +555,30 @@ def smoke_worst_case_seconds(book: contract.Addendum) -> int:
     # Token acquisition is deliberately not serialized across the concurrent
     # calls.  Conservatively charge its 30-second endpoint timeout to every
     # registered provider attempt.
+    return math.ceil(
+        waves
+        * (
+            attempts
+            * (PROVIDER_ATTEMPT_TIMEOUT_SECONDS + TOKEN_ACQUISITION_TIMEOUT_SECONDS)
+            + backoff
+        )
+    )
+
+
+def formal_review_worst_case_seconds(book: contract.Addendum) -> int:
+    """Upper bound three sequential target-review passes at frozen coverage."""
+
+    retry = book.retry
+    attempts = int(retry["max_attempts"])
+    initial = float(retry["backoff_initial_seconds"])
+    multiplier = float(retry["backoff_multiplier"])
+    maximum = float(retry["backoff_max_seconds"])
+    backoff = sum(
+        min(initial * (multiplier**index), maximum)
+        for index in range(attempts - 1)
+    )
+    workers = int(book.document["concurrency"]["max_in_flight_per_deployment"])
+    waves = FORMAL_REVIEW_ROLE_PASSES * math.ceil(FORMAL_REVIEW_RECORDS / workers)
     return math.ceil(
         waves
         * (
@@ -1194,6 +1220,15 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     # ---- review: target storage is reachable only from here -----------------
+    required_seconds = (
+        formal_review_worst_case_seconds(book) + GATE_PERSISTENCE_MARGIN_SECONDS
+    )
+    if args.execution_timeout_seconds < required_seconds:
+        raise SystemExit(
+            "formal review execution timeout cannot complete the maximum frozen "
+            f"coverage, registered retries and persistence: "
+            f"{args.execution_timeout_seconds} < {required_seconds}"
+        )
     import run_phase1_0d_semantic_review as v1runner  # noqa: PLC0415, E402
 
     blob = transport.BlobClient(args.blob_account, args.blob_container, tokens)
@@ -1261,12 +1296,15 @@ def main(argv: list[str] | None = None) -> int:
     print(f"FINAL_RESULT={finalization['result']}")
 
     from jspace_observation.semantic_review import stages  # noqa: PLC0415
+    from jspace_observation.semantic_review_v2 import verifier  # noqa: PLC0415
 
+    source_records = stages.load_records(pack_dir / "02_records.jsonl")
     finalized_records = stages.load_records(final_pack / "02_records.jsonl")
     decision = json.loads((final_pack / "05_decision.json").read_text(encoding="utf-8"))
     combined = json.loads(Path(summary["judgments_path"]).read_text(encoding="utf-8"))
-    check = stages.independent_check(
-        records=finalized_records,
+    check = verifier.verify_final_result(
+        source_records=source_records,
+        finalized_records=finalized_records,
         decision=decision,
         combined=combined,
         required_secondary=summary["secondary_selection"]["required_ids"],

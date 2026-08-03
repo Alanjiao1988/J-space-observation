@@ -31,6 +31,7 @@ from jspace_observation.phase1_0d_generation import (  # noqa: E402
 from jspace_observation.semantic_review import addendum as contract  # noqa: E402
 from jspace_observation.semantic_review import stages  # noqa: E402
 from jspace_observation.semantic_review import transport  # noqa: E402
+from jspace_observation.semantic_review_v2 import verifier as v2_verifier  # noqa: E402
 
 
 def _load(name: str, relative: str):
@@ -524,6 +525,47 @@ def test_the_independent_check_refuses_a_pack_whose_judgments_moved(finalized):
             required_third=finalized["third_selection"]["required_ids"],
         )
     assert "secondary judgments are not exactly the required set" in str(error.value)
+
+
+def test_v2_independently_recomputes_records_metrics_gates_and_decision(
+    finalized, pack
+):
+    final_dir = Path(finalized["result"]["output_dir"])
+    check = v2_verifier.verify_final_result(
+        source_records=stages.load_records(pack / "02_records.jsonl"),
+        finalized_records=stages.load_records(final_dir / "02_records.jsonl"),
+        decision=json.loads((final_dir / "05_decision.json").read_text("utf-8")),
+        combined=finalized["combined"],
+        required_secondary=finalized["secondary_selection"]["required_ids"],
+        required_third=finalized["third_selection"]["required_ids"],
+    )
+    assert check["records"] == 900
+    assert check["cell_count"] == 30
+    assert check["decision_result"] == finalized["result"]["result"]
+    assert sum(check["final_label_counts"].values()) == 900
+    assert check["decision_sha256"]
+    assert check["recomputed_decision_sha256"]
+
+
+def test_v2_independent_recomputation_rejects_an_arbitrary_decision(
+    finalized, pack
+):
+    final_dir = Path(finalized["result"]["output_dir"])
+    decision = json.loads((final_dir / "05_decision.json").read_text("utf-8"))
+    decision["result"] = "ARBITRARY_WRONG_RESULT"
+    decision["rq2_pilot_candidates"] = ["fabricated|candidate"]
+    with pytest.raises(
+        v2_verifier.IndependentVerificationError,
+        match="decision differs from independent metric and gate recomputation",
+    ):
+        v2_verifier.verify_final_result(
+            source_records=stages.load_records(pack / "02_records.jsonl"),
+            finalized_records=stages.load_records(final_dir / "02_records.jsonl"),
+            decision=decision,
+            combined=finalized["combined"],
+            required_secondary=finalized["secondary_selection"]["required_ids"],
+            required_third=finalized["third_selection"]["required_ids"],
+        )
 
 
 def test_the_execution_receipt_binds_generation_review_and_image():

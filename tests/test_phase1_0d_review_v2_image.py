@@ -362,6 +362,15 @@ def test_smoke_worst_case_fits_the_launcher_deadline(book):
     assert "--execution-timeout-seconds $REVIEW_TIMEOUT_SECONDS" in text
 
 
+def test_formal_review_worst_case_fits_its_mode_specific_deadline(book):
+    assert runner.formal_review_worst_case_seconds(book) == 611217
+    text = RUN_SCRIPT.read_text(encoding="utf-8")
+    assert "FORMAL_REVIEW_REQUIRED_SECONDS=611517" in text
+    assert 'REPLICA_TIMEOUT="${REPLICA_TIMEOUT:-612300}"' in text
+    assert 'REVIEW_TIMEOUT_SECONDS="${REVIEW_TIMEOUT_SECONDS:-612000}"' in text
+    assert "Formal review timeout cannot cover frozen calls" in text
+
+
 def test_smoke_token_acquisition_has_no_global_serial_lock():
     source = Path(runner.__file__).read_text(encoding="utf-8")
     assert "SerializedTokenProvider" not in source
@@ -709,6 +718,15 @@ def test_the_build_chains_every_required_verification(dockerfile):
         assert command in dockerfile
     assert "COPY .dockerignore" in dockerfile
     assert dockerfile.count("/workspace/.dockerignore") == 2
+
+
+def test_review_uses_the_v2_independent_recomputation():
+    source = Path(runner.__file__).read_text(encoding="utf-8")
+    review = source.split(
+        "# ---- review: target storage is reachable only from here", 1
+    )[1]
+    assert "verifier.verify_final_result(" in review
+    assert "stages.independent_check(" not in review
 
 
 def test_the_build_verifies_but_never_rewrites_the_v1_review_surface(dockerfile):

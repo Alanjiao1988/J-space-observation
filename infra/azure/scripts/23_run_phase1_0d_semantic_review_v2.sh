@@ -44,8 +44,14 @@ RUN_ID="${JSPACE_REVIEW_RUN_ID:-$(date -u +'%Y%m%dT%H%M%SZ')}"
 QUALIFICATION_RUN_ID="${QUALIFICATION_RUN_ID:-}"
 SMOKE_RUN_ID="${SMOKE_RUN_ID:-}"
 GENERATION_RUN_ID="${GENERATION_RUN_ID:-}"
-REPLICA_TIMEOUT="${REPLICA_TIMEOUT:-10800}"
-REVIEW_TIMEOUT_SECONDS="${REVIEW_TIMEOUT_SECONDS:-10500}"
+FORMAL_REVIEW_REQUIRED_SECONDS=611517
+if [[ "$REVIEW_MODE" == "review" ]]; then
+    REPLICA_TIMEOUT="${REPLICA_TIMEOUT:-612300}"
+    REVIEW_TIMEOUT_SECONDS="${REVIEW_TIMEOUT_SECONDS:-612000}"
+else
+    REPLICA_TIMEOUT="${REPLICA_TIMEOUT:-10800}"
+    REVIEW_TIMEOUT_SECONDS="${REVIEW_TIMEOUT_SECONDS:-10500}"
+fi
 JOB_NAME="job-jspace-p10d-review-v2-${REVIEW_MODE}"
 
 case "$REVIEW_MODE" in
@@ -85,6 +91,11 @@ if [[ ! "$REPLICA_TIMEOUT" =~ ^[0-9]+$ \
 fi
 if (( REVIEW_TIMEOUT_SECONDS >= REPLICA_TIMEOUT )); then
     echo "[FAIL] In-container timeout must fire before the replica timeout"
+    exit 1
+fi
+if [[ "$REVIEW_MODE" == "review" ]] \
+    && (( REVIEW_TIMEOUT_SECONDS < FORMAL_REVIEW_REQUIRED_SECONDS )); then
+    echo "[FAIL] Formal review timeout cannot cover frozen calls, retries and persistence"
     exit 1
 fi
 LAUNCHER_SHA="$(git -C "$PROJECT_ROOT" rev-parse HEAD)"
