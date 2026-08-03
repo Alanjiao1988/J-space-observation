@@ -1,7 +1,7 @@
 {
   "authority_prompt": "docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md",
   "claim_boundary": "byte-identity of the declared protected paths only; establishes nothing about their scientific correctness, nothing about paths outside the declared patterns, nothing about reviewer accuracy, and nothing about model behaviour or a 'J-space'",
-  "code_commit": "82f40a976cffc5d183d19931fa44c626cb311410",
+  "code_commit": "2af1fd982e9b21e4b6d2a7456cbeb0bff873d3bf",
   "file_count": 36,
   "files": [
     {
@@ -110,9 +110,9 @@
       "sha256": "8bea27ac127807907864037fd00a0ad64a460b428b71f4658617628a4e005a97"
     },
     {
-      "bytes": 40038,
+      "bytes": 40198,
       "path": "infra/azure/scripts/23_run_phase1_0d_semantic_review_v2.sh",
-      "sha256": "1768ba76d290d2a64432982b34faec11554e799858829220e04a4bfad6bead84"
+      "sha256": "65b46ccc407a18a110e9f62a3a492ed405c77de902cdeb74927fa6c4783e1cb5"
     },
     {
       "bytes": 9390,
@@ -217,7 +217,7 @@
     "docs/phase1_0d_semantic_review_rubric_v2.md",
     "docs/phase1_0d_semantic_review_addendum_v2.json"
   ],
-  "rollup_sha256": "c9a3707ebb20dfd2c5e56fd2150a01462b03d82088d2d2223e3f8b3d57741a14",
+  "rollup_sha256": "ef5a417c572f7da94a562411b752d74b48da2e28aa3aa1491db9bc34dfbde82a",
   "schema_version": "phase1-0d-rv2-protected-bytes/v1",
   "supersedes_nothing": "docs/phase1_0d_protected_bytes.json remains in force unchanged; this record is additive and covers a strictly larger set",
   "terminal_state_on_mismatch": "BLOCKED_ON_FROZEN_PHASE_1_0D_DRIFT"
