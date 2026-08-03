@@ -7,15 +7,15 @@
   "base_image_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
   "base_protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
   "bundle_hash_domain": "jspace-phase1-0d-review-v2/build-bundle/v1",
-  "bundle_sha256": "b8091783207972374a70b3d6c41d21a84d2918649288c88f4a2224dce78800bc",
+  "bundle_sha256": "df8282f1efe27b79c0c3a220da8ac28de1533337aac1d129ff875e249f93b739",
   "claim_boundary": "build provenance only; establishes which bytes are in the v2 review image and nothing about reviewer accuracy, instrument validity, model behaviour, hidden reasoning, or a 'J-space'",
-  "code_commit": "d827304d67540555c66044db5df26b988076fbbc",
+  "code_commit": "5be6b997524da06c3bf26fd633730705979b7892",
   "disjoint_from": [
     "phase1_0d_build_provenance.json",
     "phase1_0d_review_build_provenance.json"
   ],
   "dockerfile": "Dockerfile.phase1-0d-review-v2",
-  "file_count": 15,
+  "file_count": 16,
   "files": [
     {
       "bytes": 3303,
@@ -40,7 +40,7 @@
     {
       "bytes": 9123,
       "path": "docs/phase1_0d_rv2_protected_bytes.json",
-      "sha256": "f0fcf7280d3798b39565dd8e4ac4c10b96b9cbd168ffef5d26e759a3a8feb17a"
+      "sha256": "9b12656fe0a9c36b195acc4f4ef1c80b25c02940896e8c465e6dc59a347caa1f"
     },
     {
       "bytes": 24921,
@@ -68,14 +68,14 @@
       "sha256": "94f8e15b0b20be640bc2d7e1254a8c33e8b46c333866c70698ff3f2e6337ac08"
     },
     {
-      "bytes": 58116,
+      "bytes": 59381,
       "path": "scripts/run_phase1_0d_semantic_review_v2.py",
-      "sha256": "605058f424a4d4ff7436110e3995d25523c9cbb8b80c43692f51b15649674a47"
+      "sha256": "f983b81baf92c3a65fad45ae6d175e6d0444c0bb2f283f59295d1358a6f152f5"
     },
     {
-      "bytes": 5305,
+      "bytes": 9207,
       "path": "scripts/verify_phase1_0d_rv2_gate.py",
-      "sha256": "7ee36295f619ce590ea289331316af8e8a992e3daae604eea5a070a538565dfa"
+      "sha256": "11ab251c1b16d15de8fe83c91401fe98a7cdc65b81dbf9ecfba3ce3ee290b4ef"
     },
     {
       "bytes": 862,
@@ -86,6 +86,11 @@
       "bytes": 8830,
       "path": "src/jspace_observation/semantic_review_v2/addendum_v2.py",
       "sha256": "d61729992f4220e95b612187d1e2ccb17ca33f577880395ca18ced85b9fb6ffd"
+    },
+    {
+      "bytes": 1360,
+      "path": "src/jspace_observation/semantic_review_v2/transport.py",
+      "sha256": "b9a172a739a404197504e8990b5420aa9b70d0a06d7118d0f2b158d2ca3f3c8a"
     },
     {
       "bytes": 19792,
