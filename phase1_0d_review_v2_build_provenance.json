@@ -7,9 +7,9 @@
   "base_image_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
   "base_protocol_sha256": "25e96401f8e53b913872eaf77e5585a1b34142c5a73765eba4711a3659c113d8",
   "bundle_hash_domain": "jspace-phase1-0d-review-v2/build-bundle/v1",
-  "bundle_sha256": "a6370e76310342c7a5956f22aba7854f5f9b2e6d6453813562fee7ddd00d2610",
+  "bundle_sha256": "f8573e7f71522796e07ed3b05c8dc32d15ea07e7620c04f5a0e3fbbaa526677c",
   "claim_boundary": "build provenance only; establishes which bytes are in the v2 review image and nothing about reviewer accuracy, instrument validity, model behaviour, hidden reasoning, or a 'J-space'",
-  "code_commit": "53794b2c0c686e24f180e7526cc728f41b133781",
+  "code_commit": "9b63a45f6ab8b9c58645875be38b46918e93ed01",
   "disjoint_from": [
     "phase1_0d_build_provenance.json",
     "phase1_0d_review_build_provenance.json"
@@ -23,9 +23,9 @@
       "sha256": "c965ea6e67cb9d473aa76d57913f8976b4d7b38b59fa2bedb64dcab06df163c2"
     },
     {
-      "bytes": 9371,
+      "bytes": 9462,
       "path": "Dockerfile.phase1-0d-review-v2",
-      "sha256": "c8c076d2f95b260bf775a2182916fa226543f122f702f2d78bbbc7b34fc27df3"
+      "sha256": "73ccf513557a6eb72cdc537ab6a86fe9d636894ac0142bc92e5594a94c525631"
     },
     {
       "bytes": 5849,
@@ -68,9 +68,9 @@
       "sha256": "73db75fd13922849194381959bda47595f76c6286bb3a0693395e4bc3fe82095"
     },
     {
-      "bytes": 53231,
+      "bytes": 53106,
       "path": "scripts/run_phase1_0d_semantic_review_v2.py",
-      "sha256": "b7faeb3d7c06abadf1df4e7109a7f29675ae2b18522a1f573cabbb330a56f574"
+      "sha256": "55dd9d7337c6b8affdc034ca6b042d3922608ee90278f8d2c6bf7a12df3db364"
     },
     {
       "bytes": 862,
