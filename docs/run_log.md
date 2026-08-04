@@ -4512,3 +4512,26 @@ checks; a non-empty value or any other extra resource field remains terminal.
 The locked `cm82` image is retained unchanged. No model, version, route
 candidate, request profile, rubric, fixture, expected label, or retry rule
 changed.
+
+### Pre-generation control-plane readback preflight
+
+After the v2 qualification and sole 60-call smoke passed, but before any
+generation lock or generation Job existed, an inert control-plane-only probe
+provisioned `job-p10d-gen-rb-09a2a2507a2e` with the exact registered
+`gpu-t4`, 8 CPU and 56Gi resource request. It was never started and has zero
+executions. The current `2024-03-01` ARM readback returned:
+
+`{"cpu":8.0,"ephemeralStorage":"","memory":"56Gi"}`
+
+This proves the frozen generation launcher's literal two-key resource
+comparison would fail after its create-only permanent generation lock, before
+`job start`. No target prefix, target output, model call, scientific counter,
+generation Job, or generation lock was created by the probe.
+
+The authority forbids changing the target experiment and the v2 protected-byte
+record pins launcher `19`; both remain unchanged. An additive operational shim
+therefore executes the exact frozen launcher and intercepts only its one final,
+unqueried GET of `job-jspace-p10d-confirmation`. It requires the exact Job name,
+`gpu-t4`, one container, 8 CPU and 56Gi, accepts only absent or empty
+platform-owned `ephemeralStorage`, rejects every other resource shape, removes
+only that empty field, and delegates every other Azure CLI call unchanged.
