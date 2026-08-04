@@ -4675,3 +4675,39 @@ the locked build bundle's path set from its verified provenance record and
 tests the no-target-output guard there; a separate assertion pins the live
 repository to the one authorized generation manifest. No protected byte,
 image, target output, reviewer instrument, or scientific datum changes.
+
+At correction commit `b6e1b3e`, the Azure closing gates were:
+
+| ACR run | Scope | Result |
+| --- | --- | --- |
+| `cm8y` | v1/v2 protected bytes plus terminal archive | 152-file `436ed331…` and 36-file `ef5a417c…` rollups unchanged; archive manifest `41694a6b…`; passed |
+| `cm90` | v2 review-image focused module | 64 passed |
+| `cm8x` | full suite | 3336 passed, 15 skipped, 2 failed; both are the disclosed pre-existing `tests/test_parser_v3_seal_job.py` cases |
+
+Against the required 3185 passed / 15 skipped / 2 disclosed-failure baseline,
+the final suite is +151 passed / +0 skipped / +0 failures. There is no new
+failure.
+
+### Exact retention state
+
+Read-only Azure inspection after the terminal archive confirmed that the
+generation image, v1 review image, v2 review image, and replacement operator
+helper manifest all have `writeEnabled=false` and `deleteEnabled=false`.
+Every Phase 1.0D gate, probe, orchestrator, generation, verification, formal
+review, and partial-state-capture Job remains retained. The target generation
+Job has exactly one execution, succeeded; the formal-review Job has exactly
+one execution, failed.
+
+The retained `AIServices` account
+`aif-jspace-p10d-review-eastus2`, review UAMI
+`id-jspace-p10d-review-sea`, and registered deployments remain live. The three
+temporary formal-review launcher assignment IDs each have count zero. No Job,
+Blob, image, deployment, identity, lock, or scientific artifact was deleted.
+ACR QuickRuns are the only ephemeral resources.
+
+Final scientific state:
+**`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT`**. The smallest next gate is an
+operator recovery decision about the registered transport capacity. It is not
+authorization to rerun, change concurrency, substitute a deployment, edit the
+instrument or target pack, start an RQ2 pilot, run J-lens, or restart parser
+work.
