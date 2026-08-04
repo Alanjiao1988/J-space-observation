@@ -1,0 +1,38 @@
+Azure Container Apps execution:
+  job: job-p10d-rv2-r-d4a84a59bc28a91f
+  execution: job-p10d-rv2-r-d4a84a59bc28a91f-tjzwlse
+  status: Failed
+  start: 2026-08-05T02:17:39+08:00
+
+Bounded Log Analytics console excerpt:
+  2026-08-04T18:19:04.7961474+00:00 PACK_FILES=8
+  2026-08-04T18:19:05.3308399+00:00 SOURCE_PACK_REBUILT_RECORDS=900
+  2026-08-04T18:21:27.3067314+00:00 Traceback (most recent call last):
+  File "/workspace/scripts/run_phase1_0d_semantic_review_v2.py", line 1401, in main
+    summary = v1runner._review(book, caller, pack_dir, out_dir, run_id)
+  File "/workspace/scripts/run_phase1_0d_semantic_review.py", line 236, in _review
+    primary = stages.review_rows(
+  File "/workspace/src/jspace_observation/semantic_review/stages.py", line 262, in review_rows
+  File "/workspace/src/jspace_observation/semantic_review/stages.py", line 256, in _one
+  File "/workspace/scripts/run_phase1_0d_semantic_review_v2.py", line 226, in __call__
+  File "/workspace/scripts/run_phase1_0d_semantic_review_v2.py", line 209, in call_route
+  File "/workspace/src/jspace_observation/semantic_review/transport.py", line 213, in call_row
+    raise TransportError(
+  jspace_observation.semantic_review.addendum.TransportError: primary exhausted 8 identical attempts; last status 429 error None
+
+Independent private Blob inventory:
+  job: job-p10d-review-state-183db2bc
+  execution: job-p10d-review-state-183db2bc-9bc4h8l
+  status: Succeeded
+  FORMAL_REVIEW_LOCK_EXISTS=true
+  REVIEW_OUTPUT_OBJECT_COUNT=0
+  SOURCE_OBJECT_COUNT=8
+  REVIEW_OBJECT_NAMES=[]
+  formal-review-lock.json sha256=d7b184b486e757ba0a7702c41300157627e03616b873555d87ea27ada7d7e93f
+
+Interpretation boundary:
+  Concurrent primary requests were active. This excerpt does not establish the
+  exact aggregate provider-call count or whether another in-flight row received
+  a valid response. No partial judgment artifact survived, so no such response
+  is counted or reconstructed. No result bundle, semantic label, cell metric,
+  candidate cell, or scientific decision exists.

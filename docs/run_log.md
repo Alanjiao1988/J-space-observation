@@ -4604,3 +4604,48 @@ review-form rows, exact raw member hashes, recomputed selection and telemetry
 aggregates, and status `AWAITING_SEMANTIC_REVIEW`. No semantic label or cell
 metric exists at this stage. The exact create-only manifest is committed under
 `artifacts/phase1-0d-confirmation/20260804T154518Z/`.
+
+### Sole formal v2 semantic review — terminal transport failure
+
+The committed source manifest licensed exactly one formal-review launch.
+Private orchestrator `job-p10d-rvo-9f4cc351a79a-bvysm2t` passed the frozen
+source-license checks, created the permanent formal-review lock, started the
+child, and revoked all three temporary launcher grants:
+
+| Field | Exact value |
+| --- | --- |
+| review run | `20260804T181247Z` |
+| ACA job | `job-p10d-rv2-r-d4a84a59bc28a91f` |
+| ACA execution | `job-p10d-rv2-r-d4a84a59bc28a91f-tjzwlse` |
+| start | `2026-08-05T02:17:39+08:00` |
+| image | `j-space-observation-phase1-0d-review-v2@sha256:b3cf2c5933fe296c6a4d59eba9d73c3f10fc42bdddc494b25b679ca679b449dd` |
+| source verification | 8 files; 900 records rebuilt |
+| terminal status | `Failed` |
+| exact registered terminal state | `BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT` |
+
+The primary-review stage raised the registered terminal exception:
+
+`TransportError: primary exhausted 8 identical attempts; last status 429 error None`
+
+No rerun, deployment substitution, quota workaround, concurrency change,
+rubric edit, fixture edit, role change, target-pack change, or parser restart
+was made. Concurrent primary requests were already in flight, so the console
+trace does not establish an exact aggregate provider-call count or whether
+another row received a valid response. No partial judgments were sealed, and
+none are reconstructed or counted.
+
+Independent private inventory
+`job-p10d-review-state-183db2bc-9bc4h8l` subsequently established:
+
+- the permanent formal-review lock exists and hashes to
+  `d7b184b486e757ba0a7702c41300157627e03616b873555d87ea27ada7d7e93f`;
+- the source generation prefix still contains exactly eight objects;
+- `phase1-headroom-confirmation-review-v2/20260804T181247Z/` contains zero
+  objects.
+
+Therefore no result manifest, final semantic label, cell metric, candidate
+cell, cost/latency aggregate, or scientific decision exists. The generation
+pack remains immutable with status `AWAITING_SEMANTIC_REVIEW`; its 900 rows are
+licensed for review but did not complete primary review. The sanitized
+terminal archive is
+`artifacts/phase1-0d-semantic-review-v2-formal/20260804T181247Z/`.

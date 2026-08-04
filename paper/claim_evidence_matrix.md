@@ -173,6 +173,19 @@ conformance bank was authored after seeing the v1 responses, which `L-52`
 records as a disclosed loss of instrument-calibration independence. Target-data
 independence is intact — no target output exists.
 
+**2026-08-04 — Phase 1.0D generated its frozen bank, but semantic review
+failed operationally before a result bundle existed.** The sole generation
+execution completed 300 items × 3 arms with zero generation failures, and the
+eight-object source pack was independently rebuilt as 900 records and 900
+review rows. This advances the available artifact from a preregistration to an
+unreviewed target-output pack; it does not advance this claim. The sole formal
+v2 review ended as `BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT` after one primary
+call exhausted eight byte-identical attempts with last HTTP status 429. The
+review-result prefix is empty, so there are zero final semantic labels, zero
+cell metrics, zero candidate cells, and no scientific decision. CL-05 remains
+`preliminary` on Phase 1.0C alone. `EV-0014`, `D27`, `L-53`, and `M-17` bind
+the terminal record and its no-reconstruction rule.
+
 ---
 
 ## CL-06 — Parser-v3 correction of parser-v2 failure modes

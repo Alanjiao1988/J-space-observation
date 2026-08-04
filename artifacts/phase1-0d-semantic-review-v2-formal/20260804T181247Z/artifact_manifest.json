@@ -1,0 +1,23 @@
+{
+  "artifact": "phase1_0d_semantic_review_v2_formal_terminal_manifest",
+  "schema_version": "phase1-0d-semantic-review-v2-formal-terminal-manifest/v1",
+  "review_run_id": "20260804T181247Z",
+  "terminal_state": "BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT",
+  "manifest_written_last": true,
+  "expected_member_count_excluding_manifest": 3,
+  "members": [
+    {
+      "path": "00_terminal_receipt.json",
+      "sha256": "430adc4870130edb58f5c6b6f1e8094db575affc9354a0dffb12b7c9cd58c3cf"
+    },
+    {
+      "path": "01_terminal_console_excerpt.txt",
+      "sha256": "6cc10479b0ca9ed8b88972bf966196bff5db73f3a2621ddb634235410ce003d0"
+    },
+    {
+      "path": "02_formal_review_lock.json",
+      "sha256": "d7b184b486e757ba0a7702c41300157627e03616b873555d87ea27ada7d7e93f"
+    }
+  ],
+  "claim_boundary": "The manifest binds the sanitized terminal receipt, bounded console excerpt, and exact create-only formal-review lock. It is not a successful semantic-review result manifest and contains no reconstructed judgment or scientific decision."
+}

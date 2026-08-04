@@ -1166,3 +1166,28 @@ The method added for v2:
 The general rule: a specification with ordered rules is a program, and freezing a
 program you have never executed is freezing whatever bug it contains. Hashing
 proves the bytes did not change; only execution proves they say what you meant.
+
+## M-17 - Recording an irreversible review failure without reconstructing work
+
+The formal-review launcher used a create-only lock before `job start`, so a
+failed child cannot be replaced by another child under the same scientific
+license. That irreversibility is preserved rather than worked around.
+
+The failure record was assembled from three independently bounded surfaces:
+
+1. the child execution terminal status and Log Analytics traceback;
+2. the exact create-only formal-review lock downloaded inside the private
+   Container Apps environment;
+3. a later read-only Blob inventory of the source and result prefixes.
+
+The traceback proves the source pack reached review, because it first reports
+eight files and a 900-row independent rebuild. It then proves the registered
+transport terminal condition for the failing primary call: eight identical
+attempts, last status 429. It does not prove the aggregate call or response
+counts under concurrency, so those fields are explicitly left unestablished.
+
+The Blob inventory proves what persisted: one lock, eight unchanged source
+objects, and zero review-result objects. The method therefore records no
+partial judgment and computes no metric. This is stricter than replaying
+ephemeral responses from logs and safer than treating process-local work as a
+sealed result.

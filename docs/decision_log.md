@@ -2544,3 +2544,39 @@ The operational lesson is narrow and expensive: a frozen rubric with ordered
 rules and a frozen fixture bank are one artifact, and freezing them without a
 test that *executes the ordering against every fixture* freezes a bug. The v2
 instrument carries exactly that test, written before any v2 provider call.
+
+## D27 — Preserve the generated bank and stop at the registered transport state
+
+2026-08-04. Sole Phase 1.0D semantic-review v2 formal execution.
+
+The v2 instrument qualified and its sole 60-call smoke passed, so the
+already-preregistered target generation was licensed and completed. The
+resulting 300-item, 900-row source pack passed an independent rebuild and
+entered the sole formal-review execution. The primary stage then exhausted its
+registered eight byte-identical transport attempts for one call, ending on
+HTTP 429.
+
+The decision is to obey the frozen failure mapping exactly:
+`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT`.
+
+- **Do not turn an operational failure into a scientific result.** The source
+  pack still says `AWAITING_SEMANTIC_REVIEW`; no semantic label, cell metric,
+  candidate cell, `HEADROOM_NOT_ESTABLISHED`, or
+  `RQ2_PILOT_CANDIDATE_CELLS_FOUND` decision exists.
+- **Do not improvise a second measurement.** A rerun, quota workaround,
+  concurrency change, model/deployment substitution, role change, rubric
+  change, fixture change, target-pack change, or parser restart would be a new
+  execution after target output and review failure were known. None is
+  authorized.
+- **Do not infer missing rows from concurrent logs.** Several primary calls
+  could be in flight when one future raised. The exact provider-call and valid
+  response counts are not recoverable from the surviving console trace, and no
+  partial judgment artifact was sealed. Unknown counts remain unknown.
+- **Retain the irreversible evidence.** The generation pack, formal-review
+  lock, generation and review Jobs, immutable generation/review images, and
+  terminal evidence remain available. The empty result prefix is recorded,
+  not filled post hoc.
+
+This decision closes the current execution at an operational blocker while
+leaving CL-05 scientifically unchanged: Phase 1.0C remains the only
+preliminary headroom evidence.

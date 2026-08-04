@@ -1218,3 +1218,30 @@ Wherever a v2 conformance result is summarised, both facts must be stated: it is
 disclosed conformance testing on synthetic examples authored after a
 specification failure, and reviewer agreement is operational consistency, not
 accuracy.
+
+## L-53 - The formal review failed before any recoverable judgment bundle existed
+
+The sole Phase 1.0D v2 formal-review execution verified all eight source-pack
+objects and independently rebuilt all 900 review rows. During concurrent
+primary review, one call exhausted the registered eight byte-identical
+transport attempts and ended on HTTP 429. The process terminated before any
+judgment file, result manifest, token/latency aggregate, or finalization bundle
+was uploaded.
+
+This creates two distinct limits.
+
+- The exact aggregate provider-call count and the exact number of valid
+  responses, if any, cannot be recovered from the terminal traceback. Other
+  requests were concurrently in flight. Reporting the failing call's eight
+  attempts as the whole run count, or reporting zero valid responses, would be
+  fabricated precision.
+- A provider response that was not sealed into a create-only judgment artifact
+  is not a scientific label. No partial label is reconstructed from logs or
+  process timing, and no row enters a denominator.
+
+An independent private Blob inventory found the formal-review lock present,
+the source prefix unchanged at eight objects, and the review-result prefix
+empty. Consequently the only defensible terminal statement is
+`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT`. The 900 generated rows remain
+`AWAITING_SEMANTIC_REVIEW`; no cell accuracy, gate outcome, candidate cell, or
+headroom conclusion exists.

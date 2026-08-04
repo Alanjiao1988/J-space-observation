@@ -1,0 +1,69 @@
+{
+  "artifact": "phase1_0d_semantic_review_v2_formal_terminal_receipt",
+  "schema_version": "phase1-0d-semantic-review-v2-formal-terminal-receipt/v1",
+  "review_run_id": "20260804T181247Z",
+  "terminal_state": "BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT",
+  "project_commit": "1b56f775b5457e2e11124559052ad4caf028fdad",
+  "review_image": {
+    "repository": "j-space-observation-phase1-0d-review-v2",
+    "digest": "sha256:b3cf2c5933fe296c6a4d59eba9d73c3f10fc42bdddc494b25b679ca679b449dd"
+  },
+  "source_pack": {
+    "generation_run_id": "20260804T154518Z",
+    "blob_prefix": "phase1-headroom-confirmation/20260804T154518Z/",
+    "manifest_sha256": "76accb0f675130989f3db698ecfeaa8736f288980026cdaca0e8413c05234536",
+    "object_count": 8,
+    "selected_item_count": 300,
+    "record_count": 900,
+    "work_unit_count": 900,
+    "review_form_row_count": 900,
+    "status": "AWAITING_SEMANTIC_REVIEW"
+  },
+  "formal_review": {
+    "job": "job-p10d-rv2-r-d4a84a59bc28a91f",
+    "execution": "job-p10d-rv2-r-d4a84a59bc28a91f-tjzwlse",
+    "start_time": "2026-08-05T02:17:39+08:00",
+    "terminal_status": "Failed",
+    "source_pack_verification": {
+      "pack_files": 8,
+      "rebuilt_records": 900
+    },
+    "terminal_exception": {
+      "class": "jspace_observation.semantic_review.addendum.TransportError",
+      "message": "primary exhausted 8 identical attempts; last status 429 error None",
+      "role": "primary",
+      "registered_attempts_for_failing_call": 8,
+      "last_http_status": 429,
+      "last_error": null
+    },
+    "result_blob_prefix": "phase1-headroom-confirmation-review-v2/20260804T181247Z/",
+    "result_object_count": 0,
+    "result_manifest_exists": false,
+    "formal_review_lock_exists": true,
+    "formal_review_lock_sha256": "d7b184b486e757ba0a7702c41300157627e03616b873555d87ea27ada7d7e93f"
+  },
+  "scientific_state": {
+    "exact_total_provider_call_count": "not_established_due_to_concurrent_in_flight_requests",
+    "exact_valid_response_count": "not_established_due_to_concurrent_in_flight_requests",
+    "primary_judgment_count": "not_persisted",
+    "secondary_selection_count": 0,
+    "secondary_judgment_count": 0,
+    "third_judgment_count": 0,
+    "final_semantic_label_count": 0,
+    "cell_metric_count": 0,
+    "candidate_cell_count": 0,
+    "scientific_decision": null,
+    "decision_hash": null
+  },
+  "independent_partial_state_capture": {
+    "job": "job-p10d-review-state-183db2bc",
+    "execution": "job-p10d-review-state-183db2bc-9bc4h8l",
+    "status": "Succeeded",
+    "observations": {
+      "formal_review_lock_exists": true,
+      "review_output_object_count": 0,
+      "source_object_count": 8
+    }
+  },
+  "claim_boundary": "This receipt records the terminal transport failure and persisted Azure object state. It does not reconstruct concurrent provider-call counts, provider responses, judgments, labels, metrics, cost, or latency that were not sealed before process termination. It establishes no Phase 1.0D headroom result."
+}
