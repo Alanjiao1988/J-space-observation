@@ -4649,3 +4649,29 @@ pack remains immutable with status `AWAITING_SEMANTIC_REVIEW`; its 900 rows are
 licensed for review but did not complete primary review. The sanitized
 terminal archive is
 `artifacts/phase1-0d-semantic-review-v2-formal/20260804T181247Z/`.
+
+### Closing-verification transition correction
+
+ACR runs `cm8t` and `cm8u` were inert task-context failures: both uploaded
+temporary shell scripts with CRLF and stopped at `set -o pipefail` before
+cloning the repository or running any check. The scripts were normalized to LF
+without changing the committed tree.
+
+At commit `73ac00c`, ACR run `cm8w` then passed both protected-byte verifiers
+and the terminal-archive verifier:
+
+- v1: 152 files, rollup `436ed331…`, unchanged;
+- v2: 36 files, rollup `ef5a417c…`, unchanged;
+- terminal archive: four members, manifest SHA-256
+  `41694a6b9593756d3cbed3014367887567f5e785840dce86bceb2da41a39c204`.
+
+Full-suite run `cm8v` produced the two disclosed parser-seal failures plus one
+new failure in `test_no_target_output_is_present_in_the_build_context`. The
+underlying provenance guard was correct when the v2 review image was built:
+its locked build bundle contained no target output. The test incorrectly
+applied that pre-generation invariant to the live repository after the
+authorized generation manifest had been committed. The correction reconstructs
+the locked build bundle's path set from its verified provenance record and
+tests the no-target-output guard there; a separate assertion pins the live
+repository to the one authorized generation manifest. No protected byte,
+image, target output, reviewer instrument, or scientific datum changes.

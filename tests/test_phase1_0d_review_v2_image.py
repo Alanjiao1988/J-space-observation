@@ -838,8 +838,20 @@ def test_every_v1_gate_manifest_entry_is_verified(tmp_path):
         prov2.verify_manifest_tree(copied, copied / "artifact_manifest.json")
 
 
-def test_no_target_output_is_present_in_the_build_context():
-    assert prov2.verify_no_target_output(REPO_ROOT)["found"] == 0
+def test_no_target_output_was_present_in_the_locked_build_bundle(tmp_path):
+    record = json.loads(RECORD.read_text(encoding="utf-8"))
+    for item in record["files"]:
+        path = tmp_path / item["path"]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch()
+    assert prov2.verify_no_target_output(tmp_path)["found"] == 0
+
+
+def test_only_the_authorized_generation_manifest_is_now_present():
+    assert prov2.find_target_output(REPO_ROOT) == [
+        "artifacts/phase1-0d-confirmation/"
+        "20260804T154518Z/artifact_manifest.json"
+    ]
 
 
 def test_a_planted_target_pack_is_refused(tmp_path):
