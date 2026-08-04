@@ -4568,3 +4568,39 @@ helper and verified `cmp`, trusted Python, Azure CLI, and pinned containerapp
 extension paths during the build. The replacement helper is
 `j-space-observation-operator@sha256:9bfa04ea63086aaabccd3bd1d31eb0dcf1f883a68e31e34d838914bbae534a4c`;
 its tag and manifest are both locked against write and delete.
+
+### Sole Phase 1.0D generation
+
+Replacement-helper private preflight
+`job-p10d-gen-pre-f5998a9a235b-26w5jfn` verified `cmp`, exact pushed commit
+`45bb96a`, lock absent and target-root object count zero. Private orchestrator
+`job-p10d-gen-orch-2a8a43cd1ac9-fend5zv` then passed its separate zero-execution
+control-plane authorization probe, reverified the v1 and v2 protected rollups,
+verified the exact committed 60/60 gate against create-only Blob bytes,
+normalized only Azure's empty `ephemeralStorage` readback, and started the sole
+GPU execution:
+
+| Field | Exact value |
+| --- | --- |
+| generation run | `20260804T154518Z` |
+| ACA execution | `job-jspace-p10d-confirmation-pdlhmah` |
+| profile / GPU | `gpu-t4` / one Tesla T4 |
+| image | `j-space-observation-phase1-0d@sha256:1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332c37481166aa4` |
+| timeout envelope | replica 21600s / in-container 21300s |
+| start / end | `2026-08-04T23:50:12+08:00` / `2026-08-05T01:52:42+08:00` |
+| terminal state | `Succeeded` |
+| Blob prefix | `phase1-headroom-confirmation/20260804T154518Z/` |
+| manifest SHA-256 | `76accb0f675130989f3db698ecfeaa8736f288980026cdaca0e8413c05234536` |
+
+Exactly one target execution exists. The temporary Reader, Container Apps Jobs
+Contributor and generation-identity Managed Identity Operator assignments were
+removed immediately after child start; remaining temporary role count is zero.
+
+Private verification execution
+`job-p10d-gen-verify-db2fc9df0da4-g8jqbue` observed the exact eight-object
+manifest-last prefix and independently ran the frozen v2 source-pack verifier:
+300 selected items, 900 ordered records, 900 rebuilt work units, 900 rebuilt
+review-form rows, exact raw member hashes, recomputed selection and telemetry
+aggregates, and status `AWAITING_SEMANTIC_REVIEW`. No semantic label or cell
+metric exists at this stage. The exact create-only manifest is committed under
+`artifacts/phase1-0d-confirmation/20260804T154518Z/`.

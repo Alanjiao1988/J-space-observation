@@ -1,0 +1,37 @@
+{
+  "artifact": "phase1_0d_confirmation_pack",
+  "artifact_root": "artifacts/phase1-headroom-confirmation/track-b",
+  "file_count": 7,
+  "files": [
+    {
+      "name": "00_protocol_snapshot.json",
+      "sha256": "a2552dd9d8b793440d68c466be3f2319d4a87eb7a44c5a92fd8f2a70d2418d53"
+    },
+    {
+      "name": "01_selection.json",
+      "sha256": "7d477eeb01af38884e1a0f32febf77ad29f504dfc0cc8f50a2ac34673e2a6ab1"
+    },
+    {
+      "name": "02_records.jsonl",
+      "sha256": "2e33d7b31ef64bd4ac5e0e471e19408973b1e3188cb1e3c3461050c6b34ed53a"
+    },
+    {
+      "name": "03_review_form.jsonl",
+      "sha256": "f808ce2148ee7c5a898c367783fd23584a368601daa5de944dbd9a4e21a801bc"
+    },
+    {
+      "name": "04_generation_summary.json",
+      "sha256": "685cd5b0e459189119192430a8ea9e0b5f9e1d4bc4a13f86356dae781b5b593b"
+    },
+    {
+      "name": "05_decision.json",
+      "sha256": "c1cafd012da284cee93a6427e5bd80818e6c1a6a66c2bf6e5a1a426128759367"
+    },
+    {
+      "name": "09_summary.md",
+      "sha256": "824621b7887a7019bb9df27182d1bf0502664686123fb851073ae83cf8797be9"
+    }
+  ],
+  "manifest_written_last": true,
+  "run_id": "20260804T154518Z"
+}
