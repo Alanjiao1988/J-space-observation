@@ -186,6 +186,18 @@ cell metrics, zero candidate cells, and no scientific decision. CL-05 remains
 `preliminary` on Phase 1.0C alone. `EV-0014`, `D27`, `L-53`, and `M-17` bind
 the terminal record and its no-reconstruction rule.
 
+**2026-08-05 — one capacity-gated review-only transport recovery is authorized,
+but no new scientific evidence exists yet.** The frozen authority
+`docs/prompts/phase1_0d_review_only_transport_recovery_prompt.md` (SHA-256
+`dc350039f118cb5931dab08fd65e24ed169757c472898b7dbe8d27eb3ce2f92b`)
+preserves the generation and all v1/v2 semantic bytes, permits no inference
+before a mechanical capacity certificate passes, and permits at most one new
+provider-bearing execution. Authorization is not evidence: CL-05 remains
+`preliminary` on Phase 1.0C alone until a complete recovery bundle is sealed.
+Any completed result will carry L-54's permanent disclosure that an unknown
+subset of requests may have received unpersisted valid responses in the old
+failed process before being uniformly resubmitted.
+
 ---
 
 ## CL-06 — Parser-v3 correction of parser-v2 failure modes

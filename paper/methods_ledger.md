@@ -1191,3 +1191,32 @@ objects, and zero review-result objects. The method therefore records no
 partial judgment and computes no metric. This is stricter than replaying
 ephemeral responses from logs and safer than treating process-local work as a
 sealed result.
+
+## M-18 - Separating transport-capacity repair from semantic review
+
+The one authorized recovery treats deployment capacity as a control-plane
+precondition, not as a reason to revise the frozen reviewer.
+
+1. Freeze the recovery authority and reauthenticate the one generation, the
+   failed formal execution, both protected-byte rollups, all image identities,
+   the old lock, and the empty old result prefix.
+2. Use only ARM, Azure Monitor, Blob metadata, and repository bytes before
+   inference. Normalize each deployment's returned rate-limit rules without
+   substituting subscription maxima for missing deployment allocations, and
+   compute ordered hashes of all 900 frozen request bodies per role offline.
+3. If a deployment is below its mechanical floor, permit only the minimum
+   `sku.capacity` increase on that same deployment, guarded by its current ETag.
+   Any absent or ambiguous rate limit, insufficient unallocated quota, or
+   non-allowlisted readback change fails closed before inference.
+4. Seal and push a create-only sanitized capacity certificate that records
+   `provider_calls=0`, the quiet window, before/after allocations, every gate,
+   and the three request-body rollups.
+5. Only a passing certificate can license an inert fixed-identity Job, one
+   create-only recovery lock, and one non-retrying start. The locked v2 image
+   then performs the existing 900-row review and finalization unchanged.
+
+The old execution contributes no row to the recovery. A successful result is
+computed only from the new complete sealed bundle and carries L-54's
+resampling-exposure disclosure. Capacity failure consumes no provider-bearing
+execution; any failure after recovery inference consumes the sole allowance
+and closes Phase 1.0D without a result.

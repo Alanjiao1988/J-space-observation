@@ -2580,3 +2580,37 @@ The decision is to obey the frozen failure mapping exactly:
 This decision closes the current execution at an operational blocker while
 leaving CL-05 scientifically unchanged: Phase 1.0C remains the only
 preliminary headroom evidence.
+
+## D28 — Permit one capacity-gated review-only transport recovery
+
+2026-08-05. Phase 1.0D semantic-review v2 transport recovery.
+
+The controlling authority is
+`docs/prompts/phase1_0d_review_only_transport_recovery_prompt.md`, SHA-256
+`dc350039f118cb5931dab08fd65e24ed169757c472898b7dbe8d27eb3ce2f92b`.
+It preserves the old terminal receipt
+`artifacts/phase1-0d-semantic-review-v2-formal/20260804T181247Z/00_terminal_receipt.json`
+(SHA-256 `430adc4870130edb58f5c6b6f1e8094db575affc9354a0dffb12b7c9cd58c3cf`)
+and its terminal archive (SHA-256
+`41694a6b9593756d3cbed3014367887567f5e785840dce86bceb2da41a39c204`).
+
+The decision is narrow:
+
+- Preserve the one completed generation and every v1/v2 protected byte. No
+  generation, qualification, smoke, reviewer, request, concurrency, retry,
+  parser, or J-lens change is permitted.
+- Before inference, require a mechanical capacity-only gate over the three
+  registered deployments. The gate uses ARM, Monitor, Blob metadata, and
+  offline request reconstruction only; any permitted mutation changes only
+  `sku.capacity`, under the current ETag, to the minimum passing allocation.
+- A create-only passing capacity certificate may license at most one new
+  provider-bearing review-only recovery execution. There is no second recovery
+  execution.
+- The recovery resubmits every required row uniformly. Because concurrent
+  responses from the old failed process were not persisted, an unknown subset
+  may be submitted again after an unobserved valid response. This
+  unquantifiable prior-response resampling exposure is permanent and is not
+  evidence that the old process produced zero valid responses.
+- If capacity cannot be proved, stop before inference. If the recovery starts
+  but does not seal a complete result, permanently close the Phase 1.0D review
+  route without a result; do not reconstruct, retry, or substitute.

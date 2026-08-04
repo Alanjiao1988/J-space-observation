@@ -4711,3 +4711,37 @@ operator recovery decision about the registered transport capacity. It is not
 authorization to rerun, change concurrency, substitute a deployment, edit the
 instrument or target pack, start an RQ2 pilot, run J-lens, or restart parser
 work.
+
+## 2026-08-05 - Phase 1.0D review-only transport recovery authorized
+
+The independent recovery authority was frozen unchanged at
+`docs/prompts/phase1_0d_review_only_transport_recovery_prompt.md`, SHA-256
+`dc350039f118cb5931dab08fd65e24ed169757c472898b7dbe8d27eb3ce2f92b`.
+D28, L-54, and M-18 define the one-execution boundary, the permanent
+unquantifiable prior-response resampling exposure, and the capacity-only
+method. No scientific evidence item was created for this authorization.
+
+The starting-state gate reauthenticated:
+
+- `origin/main` `d145b1c79db8b6866fadaa8875c2374a813a7e31`, tree
+  `b4329a4062415cf7cb3b058d3defe6da7c14f25c`, clean, with `5ae85cb...`
+  retained as an ancestor;
+- v1 152-file rollup
+  `436ed331c7dd53fa6387d6b52447bc72edf166bbb3640b7f7723a8766bdf51dd`
+  and v2 36-file rollup
+  `ef5a417c572f7da94a562411b752d74b48da2e28aa3aa1491db9bc34dfbde82a`;
+- all three immutable review/generation image digests and write/delete locks;
+- the 60/60 v2 gate, exact eight-object 900-row source license, sole generation
+  execution, sole failed formal execution, old terminal receipt/archive, and
+  old formal lock.
+
+Retained private verifier
+`job-p10d-review-state-183db2bc-c4jlgqz` succeeded and freshly observed source
+object count 8, old result object count 0, and old lock SHA-256
+`d7b184b486e757ba0a7702c41300157627e03616b873555d87ea27ada7d7e93f`.
+A second retained read-only verifier execution,
+`job-p10d-gen-verify-db2fc9df0da4-3c0826z`, failed closed at its obsolete
+hard-coded Git-HEAD assertion before reaching Blob verification. Neither
+execution contains an inference command or changed a Blob. No provider call,
+capacity mutation, recovery Job, recovery lock, or recovery result exists at
+this checkpoint.

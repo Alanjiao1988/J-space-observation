@@ -1245,3 +1245,27 @@ empty. Consequently the only defensible terminal statement is
 `BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT`. The 900 generated rows remain
 `AWAITING_SEMANTIC_REVIEW`; no cell accuracy, gate outcome, candidate cell, or
 headroom conclusion exists.
+
+## L-54 - A recovery cannot remove unknown prior-response resampling exposure
+
+The failed formal-review process issued concurrent primary requests. At least
+one row exhausted eight byte-identical transport attempts and ended on HTTP
+429, but the process sealed no response or judgment bundle. The surviving
+trace therefore cannot establish which other requests completed, whether any
+returned a valid response, or the aggregate provider-call count.
+
+The separately authorized transport recovery must submit every required row
+from the beginning under one uniform rule. An unknown subset of rows might
+therefore be submitted again after receiving an unpersisted valid response in
+the failed process. This is **unquantifiable prior-response resampling
+exposure**. It is not a continuation of the old row's eight retries, is not
+evidence that zero old responses were valid, and cannot be converted into an
+exact combined request count.
+
+The exposure is bounded but not eliminated: no old response body, label,
+judgment, token count, latency, or metric was observed or used to select rows;
+the old execution is excluded in full from every scientific denominator; and
+any completed result must derive only from the recovery's new create-only
+sealed bundle. Every future use of a Phase 1.0D result must disclose this
+history. If the recovery fails to seal a complete bundle, no partial response
+or label may be reconstructed and Phase 1.0D closes without a result.
