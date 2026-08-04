@@ -4535,3 +4535,36 @@ unqueried GET of `job-jspace-p10d-confirmation`. It requires the exact Job name,
 `gpu-t4`, one container, 8 CPU and 56Gi, accepts only absent or empty
 platform-owned `ephemeralStorage`, rejects every other resource shape, removes
 only that empty field, and delegates every other Azure CLI call unchanged.
+
+Azure targeted run `cm8r` verified commit `b966f14` with 90/90 tests, including
+the compatibility-shim tests, generation-launcher provenance tests, and both
+v1/v2 protected-byte suites. Private preflight execution
+`job-p10d-gen-pre-caa913346f28-jpqlx2w` independently observed
+`generation-execution-lock.json` absent and zero objects under
+`phase1-headroom-confirmation/`; it also confirmed `/usr/bin/az`,
+`/usr/bin/python3.11`, the unchanged launcher SHA-256, and the exact
+absent-or-empty normalization behavior.
+
+### Pre-generation operator attempt 1 — inert missing `cmp`
+
+Run ID `20260804T152940Z` was presented to private orchestrator execution
+`job-p10d-gen-orch-48f38b1280d8-0h7z3av`. Its separate control-plane
+authorization probe provisioned successfully with zero executions. The frozen
+launcher then reverified both protected rollups and downloaded the exact
+committed and create-only Blob smoke evidence, but the operator helper image
+lacked the `cmp` utility required for the byte comparison at launcher line 432.
+It stopped before the global generation lock, target Job provisioning, or
+`job start`.
+
+Post-failure private execution
+`job-p10d-gen-pre-caa913346f28-8899hc0` reconfirmed lock absent, target-root
+object count zero, and target Job absent. The orchestrator identity's temporary
+Reader, Container Apps Jobs Contributor, and Managed Identity Operator
+assignments were all revoked; remaining temporary role count was zero.
+
+This is an operator-image dependency defect, not a target or review-instrument
+change. ACR build `cm8s` added only Azure Linux `diffutils` to the prior locked
+helper and verified `cmp`, trusted Python, Azure CLI, and pinned containerapp
+extension paths during the build. The replacement helper is
+`j-space-observation-operator@sha256:9bfa04ea63086aaabccd3bd1d31eb0dcf1f883a68e31e34d838914bbae534a4c`;
+its tag and manifest are both locked against write and delete.
