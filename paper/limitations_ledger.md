@@ -1269,3 +1269,27 @@ any completed result must derive only from the recovery's new create-only
 sealed bundle. Every future use of a Phase 1.0D result must disclose this
 history. If the recovery fails to seal a complete bundle, no partial response
 or label may be reconstructed and Phase 1.0D closes without a result.
+
+## L-55 - The review-only recovery is capacity-blocked before inference
+
+The capacity snapshot on 2026-08-05 found all three registered deployments
+below their frozen floors. Primary was allocated 36,000 TPM / 36 RPM against a
+1,000,000 / 1,000 floor, with subscription usage 1,000 / 1,000 and exact model
+capacity available 0. Secondary and third each returned 50,000 TPM / 50 RPM,
+also below their respective floors. No allocation change can make the complete
+gate pass while primary has no unallocated quota, so no deployment was mutated.
+
+This observation is operational and time-bound. It is not evidence about the
+target model, reviewer accuracy, or headroom, and it does not prove that quota
+can never become available. Empty Azure Monitor timeseries are recorded as
+empty successful queries, not as reconstructed request logs. They establish no
+fact about the unknown concurrent responses in the old failed formal process;
+L-53 and L-54 remain unchanged.
+
+The recovery stopped before inference with zero provider calls and no recovery
+Job, lock, execution, result prefix object, response, label, metric, candidate
+or decision. Phase 1.0D therefore remains `AWAITING_SEMANTIC_REVIEW` at the
+scientific layer and CL-05 remains preliminary on Phase 1.0C alone. The frozen
+authority may be resumed only after an independent operator makes sufficient
+quota available on the same deployments; it supplies no automatic polling,
+quota-request, substitution or retry authority.

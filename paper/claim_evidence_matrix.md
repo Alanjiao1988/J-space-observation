@@ -198,6 +198,18 @@ Any completed result will carry L-54's permanent disclosure that an unknown
 subset of requests may have received unpersisted valid responses in the old
 failed process before being uniformly resubmitted.
 
+**2026-08-05 — the recovery stopped at its pre-inference capacity gate.** The
+create-only certificate for `20260805T180417Z` passed 35 of 38 mechanical
+checks and failed only the three registered capacity floors. Primary returned
+36,000 TPM / 36 RPM against 1,000,000 / 1,000 and had no unallocated
+subscription or model capacity; secondary and third each returned 50,000 TPM /
+50 RPM, also below their floors. No capacity mutation was made because the
+primary blocker makes an overall pass impossible. Provider calls, recovery
+Jobs, locks, executions and result objects are all zero. This operational
+`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY` state creates no EV row and
+does not advance CL-05: there are still zero final Phase 1.0D labels, cell
+metrics, candidate cells or scientific decisions.
+
 ---
 
 ## CL-06 — Parser-v3 correction of parser-v2 failure modes

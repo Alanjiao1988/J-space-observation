@@ -43,6 +43,35 @@ parser 子项目的旧终态 `BLOCKED_ON_PUBLIC_PROTOCOL_FREEZE` 在其原授权
 记录见 `EV-0012`、`D25`、`L-50`、`L-51`，工件见
 `artifacts/phase1-0d-semantic-review-gate/20260803T031343Z/`。这一结果**不**说明该 reviewer 总体不可靠、**不**说明另外两个可靠、**不**涉及目标模型的任何能力，也**不**构成关于 hidden reasoning 或 J-space 的任何证据。Phase 1.0D 的诚实状态仍然是 `AWAITING_SEMANTIC_REVIEW`。
 
+### 2026-08-05 · S1 / Phase 1.0D 最新状态：`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`
+
+Phase 1.0D 后来完成了唯一 generation，并在唯一 formal v2 review 中因
+primary 的 HTTP 429 transport exhaustion 停止。独立授权的 review-only
+transport recovery 现已在任何新 inference 之前完成 capacity gate，并按设计
+阻断：
+
+| role | allocation | normalized TPM / RPM | subscription usage | model capacity available |
+| --- | ---: | ---: | ---: | ---: |
+| primary | 36 | 36,000 / 36 | 1,000 / 1,000 | 0 |
+| secondary | 50 | 50,000 / 50 | 50 / 1,000 | 950 |
+| third | 50 | 50,000 / 50 | 50 / 1,000 | 950 |
+
+三个 deployment 都低于各自冻结 floor；primary 又没有任何未分配 quota，
+所以本授权内不存在合法的整体通过路径。没有 deployment mutation，没有
+recovery Job、lock、execution 或 result object，也没有 provider call。60 分钟
+Azure Monitor 查询和最后 15 分钟 quiet window 都返回 0；证书同时明确记录了
+这些查询的 timeseries 为空，而不是把空日志伪装成额外证据。
+
+完整 capacity certificate 位于
+`artifacts/phase1-0d-semantic-review-v2-transport-capacity/20260805T180417Z/`
+（certificate SHA-256
+`20e486e05a5f076b720ca12db3459b5a1c2c42e95684977dfdcff19d6da055d3`）。
+这是一条 operational block，不是 scientific result：900 行仍然没有 final
+semantic label、cell metric、candidate cell 或 headroom decision，CL-05 仍只
+由 Phase 1.0C 的 preliminary screen 支撑。同一冻结 authority 只能在 operator
+独立为同一组 deployment 提供足够 quota 后恢复；它不授权自动轮询、quota
+request、alternate deployment 或 model change。
+
 ## 历史阶段（parser 关闭前）
 
 当前已完成四条关键路径的首个可执行阶段：

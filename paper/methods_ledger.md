@@ -1220,3 +1220,48 @@ computed only from the new complete sealed bundle and carries L-54's
 resampling-exposure disclosure. Capacity failure consumes no provider-bearing
 execution; any failure after recovery inference consumes the sole allowance
 and closes Phase 1.0D without a result.
+
+## M-19 - Sealing a blocked capacity gate without inference
+
+The authorized capacity gate was executed as a bounded control-plane
+measurement, not as semantic review. Azure Resource Manager supplied exact
+account, deployment, ETag, SKU, allocation, returned rate-limit, subscription
+usage and model-capacity records. Azure Monitor queried
+`AzureOpenAIRequests`, `ProcessedPromptTokens`, and `GeneratedTokens` at
+`PT1M`, with exact `ModelDeploymentName` filters for all three registered
+deployments. The 60-minute role queries and final 15-minute account-wide quiet
+window returned zero counts and empty timeseries; both the zero sums and the
+empty-series counts are retained in the certificate.
+
+A non-provider Container Apps identity with zero Cognitive Services roles read
+the private eight-object source pack, old formal lock, empty old/recovery result
+prefixes and absent recovery lock. Inside the private environment it
+independently rebuilt all 900 possible request bodies per role. The ordered
+rollups were:
+
+- primary `7347d1346c41bd3a0255f0e8e0f4f348e642d5fe4418067c1fdf077014356aed`;
+- secondary `f3348c56d656e61c1cca3f9809eca36f03bc19002855189f1114ada6ba27e133`;
+- third `ddd2ed53b1dfb71277ba6379ee666c13b516ac9e888d308376adda9945343b8d`.
+
+All material readbacks fell within 237 seconds, from the Monitor window end at
+`18:01:00Z` through certificate observation at `18:04:57Z`. The final sealer
+image
+`j-space-observation-phase1-0d-capacity-sealer@sha256:1c04065228bf57f042069e32b8f05e613c2e7e536a8c98ba755a804bfc2d1d32`
+was ACR-build-verified against the frozen profiles and exact Git-blob source
+and old-archive hashes, then locked against write and delete.
+
+Three earlier non-provider sealer executions failed closed before writing any
+capacity object: `ripscxe` at the Python package path, `z9uam21` at an eager
+`torch` import, and `sfbyzvb` when CRLF worktree bytes differed from the exact
+Git source-manifest blob. The first two did not reach Blob; the third performed
+only private reads. None had a provider route. The corrected execution
+`job-p10d-tr-seal-34404a89-jyi7tki` sealed canonical certificate and manifest
+bytes with create-only writes, enumerated the exact two-object prefix, and read
+both objects back byte-for-byte.
+
+The resulting 38-gate certificate passes 35 gates and fails only the three
+capacity floors. No capacity mutation or inference occurred. Certificate
+SHA-256 is
+`20e486e05a5f076b720ca12db3459b5a1c2c42e95684977dfdcff19d6da055d3`;
+manifest SHA-256 is
+`23016ad15430b1720e4b37033a3638bf45e817ac00513292d138d26e0ed0a834`.

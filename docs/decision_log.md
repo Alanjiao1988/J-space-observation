@@ -2614,3 +2614,35 @@ The decision is narrow:
 - If capacity cannot be proved, stop before inference. If the recovery starts
   but does not seal a complete result, permanently close the Phase 1.0D review
   route without a result; do not reconstruct, retry, or substitute.
+
+## D29 — Stop the review-only recovery at the capacity gate
+
+2026-08-05. Phase 1.0D semantic-review v2 transport recovery.
+
+The canonical capacity certificate for run `20260805T180417Z` evaluated 38
+mechanical gates. Thirty-five passed; the three registered deployment floors
+failed:
+
+- primary returned 36,000 TPM / 36 RPM against 1,000,000 / 1,000;
+- secondary returned 50,000 TPM / 50 RPM against 500,000 / 500;
+- third returned 50,000 TPM / 50 RPM against 1,000,000 / 500.
+
+Primary subscription usage was 1,000 / 1,000 and its exact model-capacity
+readback was 0, so no permitted capacity allocation can make the full gate
+pass. Increasing the other two deployments would not clear that blocker and
+would be unnecessary mutation. The decision is therefore to perform no
+capacity mutation and end exactly as
+`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`.
+
+The certificate and manifest were uploaded create-only and read back
+byte-for-byte. Before the stop there were zero provider calls. No recovery Job,
+lock, execution, result object, response, judgment, label, metric, candidate,
+or scientific decision exists. The provider-bearing recovery allowance is
+unspent, and no evidence-ledger row is created.
+
+This is a resumable capacity block, not an automatic retry loop. The same
+frozen authority can resume only after an operator independently makes the
+required quota available on the same registered deployments. It does not
+permit a quota request, alternate deployment, provider or model substitution,
+or any change to the target pack, reviewer bytes, concurrency, retry policy,
+or request bodies.

@@ -4745,3 +4745,98 @@ hard-coded Git-HEAD assertion before reaching Blob verification. Neither
 execution contains an inference command or changed a Blob. No provider call,
 capacity mutation, recovery Job, recovery lock, or recovery result exists at
 this checkpoint.
+
+## 2026-08-05 - Phase 1.0D transport recovery stopped at capacity
+
+### Recovery tooling and Azure verification
+
+The fail-closed recovery tooling, public certificate schema, fixed launcher and
+36 focused controls were pushed in three fast-forward checkpoints:
+
+- `db873b465ed841798a091b5c4b4a423bdf22ec44`;
+- `83d7a8ad3d761e205fb5217e9a6899a4351f4022`;
+- `34404a89a3e63c4eea808485c353e6c7f49f8c49`.
+
+At `34404a89`, authoritative Azure run `cm9c` passed all 36 focused controls.
+Full-suite run `cm9b` returned 3372 passed / 15 skipped / 2 failed; both
+failures are the disclosed pre-existing
+`tests/test_parser_v3_seal_job.py` cases. This is +36 passed / +0 skipped /
++0 failures against the 3336 / 15 / 2 baseline. Protected-byte runs `cm9d`
+and `cm9e` reproduced the v1
+`436ed331c7dd53fa6387d6b52447bc72edf166bbb3640b7f7723a8766bdf51dd`
+and v2
+`ef5a417c572f7da94a562411b752d74b48da2e28aa3aa1491db9bc34dfbde82a`
+rollups. Earlier `cm93`-`cm99` attempts were non-authoritative context,
+line-ending or unpinned-test-dependency failures and made no Azure AI call.
+
+### Private state and capacity evidence
+
+Retained non-provider collector Job `job-p10d-tr-cap-34404a89` ran under
+`id-jspace-aca-acrpull-sea`, which has zero Cognitive Services roles.
+Executions `3o0clkb` and `fucpyxy` independently observed:
+
+- exact source object count 8 and manifest
+  `76accb0f675130989f3db698ecfeaa8736f288980026cdaca0e8413c05234536`;
+- old result object count 0 and old formal-lock hash
+  `d7b184b486e757ba0a7702c41300157627e03616b873555d87ea27ada7d7e93f`;
+- recovery lock absent, recovery result object count 0 and recovery Job count 0;
+- exact 900-row request-body rollups `7347d134...`, `f3348c56...` and
+  `ddd2ed53...`, with ordered record-ID hash `4cc29857...`.
+
+The final evidence window ended with these exact deployment readbacks:
+
+| role | capacity before/after | TPM / RPM | floor TPM / RPM | usage | exact available model capacity | mutation |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| primary | 36 / 36 | 36,000 / 36 | 1,000,000 / 1,000 | 1,000 / 1,000 | 0 | none |
+| secondary | 50 / 50 | 50,000 / 50 | 500,000 / 500 | 50 / 1,000 | 950 | none |
+| third | 50 / 50 | 50,000 / 50 | 1,000,000 / 500 | 50 / 1,000 | 950 | none |
+
+The primary allocation cannot reach its floor under existing quota. Mutating
+secondary or third cannot make the overall gate pass, so no deployment was
+changed. Exact 60-minute deployment-filtered Monitor queries returned 0
+requests, 0 HTTP 429s, 0 prompt tokens and 0 generated tokens for every role.
+All four role metric timeseries were empty and are recorded as such. The final
+15-minute account-wide quiet window returned 0 registered and 0 non-project
+requests.
+
+### Create-only blocked certificate
+
+The final non-provider sealer image was ACR-built in `cm9k`, verified during
+build against the frozen reviewer profiles and exact Git-blob source/archive
+hashes, and locked at
+`sha256:1c04065228bf57f042069e32b8f05e613c2e7e536a8c98ba755a804bfc2d1d32`.
+Earlier build runs `cm9f`, `cm9g`, `cm9h` and `cm9j` are retained. Their image
+tags and manifests are also write- and delete-disabled.
+
+The retained Job `job-p10d-tr-seal-34404a89` has four executions:
+
+| execution suffix | result | boundary |
+| --- | --- | --- |
+| `ripscxe` | Failed | Python package path; before Blob |
+| `z9uam21` | Failed | eager `torch` import; before Blob |
+| `sfbyzvb` | Failed | worktree CRLF differed from exact Git manifest bytes; read-only Blob access, before any write |
+| `jyi7tki` | Succeeded | canonical create-only seal and exact readback |
+
+Every execution used the non-provider identity and issued zero Azure AI
+inference calls. The successful execution sealed exactly two objects under
+`phase1-0d-semantic-review-v2/transport-recovery/capacity/20260805T180417Z/`:
+
+- `00_capacity_certificate.json`, SHA-256
+  `20e486e05a5f076b720ca12db3459b5a1c2c42e95684977dfdcff19d6da055d3`;
+- `artifact_manifest.json`, SHA-256
+  `23016ad15430b1720e4b37033a3638bf45e817ac00513292d138d26e0ed0a834`.
+
+The 38 mechanical gates passed 35 and failed only
+`primary.capacity_floor`, `secondary.capacity_floor` and
+`third.capacity_floor`. `provider_calls=0`; capacity mutation, recovery Job,
+recovery lock, recovery execution and recovery result object counts are all
+zero. No temporary role assignment was created, so the teardown-ID list is
+empty.
+
+Exact state:
+**`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`**. This is operational
+evidence only. No evidence-ledger row, semantic label, cell metric, candidate
+cell or scientific decision was created. The smallest next scientific gate is
+unchanged: J-lens S3 validity-protocol design can proceed independently. The
+same transport-recovery authority can resume only after an operator
+independently makes sufficient quota available on the same deployments.
