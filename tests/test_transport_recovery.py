@@ -1034,6 +1034,16 @@ def test_launcher_has_no_override_surface_and_only_one_start_call_site():
     assert recovery.OLD_FORMAL_EXECUTION in text
     assert recovery.OLD_TERMINAL_ARCHIVE_SHA256 in text
     assert recovery.SOURCE_MANIFEST_SHA256 in text
+    assert (
+        ']] \\\n'
+        '    || ! cmp -s "$COMMITTED_SOURCE_MANIFEST" '
+        '"$BLOB_SOURCE_MANIFEST"; then'
+    ) in text
+    assert (
+        '|| ! cmp -s "$COMMITTED_SOURCE_MANIFEST" '
+        '"$BLOB_SOURCE_MANIFEST" ]]'
+        not in text
+    )
     assert "parser_v3" not in text
     assert "jlens" not in text.lower()
 
