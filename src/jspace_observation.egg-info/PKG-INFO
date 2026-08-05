@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: jspace-observation
+Version: 0.1.0
+Summary: J-lens based hidden workspace observation for R1 distilled small models
+Requires-Python: >=3.11
