@@ -10,6 +10,7 @@ import importlib.util
 import json
 import math
 import shlex
+import subprocess
 from pathlib import Path
 
 import jsonschema
@@ -1027,3 +1028,13 @@ def test_launcher_has_no_override_surface_and_only_one_start_call_site():
     assert recovery.SOURCE_MANIFEST_SHA256 in text
     assert "parser_v3" not in text
     assert "jlens" not in text.lower()
+
+
+def test_launcher_is_valid_bash_syntax_on_the_azure_test_host():
+    completed = subprocess.run(
+        ["bash", "-n", str(LAUNCHER)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
