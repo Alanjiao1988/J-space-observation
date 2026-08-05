@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "upstream": {
+    "repository": "https://github.com/anthropics/jacobian-lens.git",
+    "commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+    "license": "Apache-2.0"
+  },
+  "authorship": {
+    "json_data": "Anthropic-authored synthetic public data",
+    "modifications": "none"
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "role": "Apache-2.0 license text"
+    },
+    {
+      "path": "data/evaluations/README.md",
+      "bytes": 3815,
+      "sha256": "e061d9cce02a1cc651d58a81927833b760d3cef65bf4995126ecbe372a0ebe07",
+      "role": "upstream evaluation definitions"
+    },
+    {
+      "path": "data/experiments/README.md",
+      "bytes": 8570,
+      "sha256": "1d78c702fa22ba610990d545b4c9c96839cc75cd4e451f2badb1cab23e04ad0f",
+      "role": "upstream intervention definitions"
+    },
+    {
+      "path": "data/evaluations/lens-eval-multihop.json",
+      "bytes": 21869,
+      "sha256": "50b7e4c9255291c0ca2a8e94615be9f44531fa57bb1a844e4f9616056d987416",
+      "item_count": 93,
+      "role": "primary multihop readout benchmark"
+    },
+    {
+      "path": "data/evaluations/lens-eval-order-ops.json",
+      "bytes": 9589,
+      "sha256": "b203206d16ff628152cc86f3838604e06cb54776f3e14fa1c34f150db8bc7560",
+      "item_count": 55,
+      "role": "primary order-of-operations readout benchmark"
+    },
+    {
+      "path": "data/experiments/probe-swap.json",
+      "bytes": 26567,
+      "sha256": "a0edd27ca23f7b4d0fbe90448c2ddcc7457a3d812121bf024ed12a032ff86796",
+      "item_count": 90,
+      "role": "separate causal-swap benchmark"
+    }
+  ],
+  "registered_model_free_facts": {
+    "probe_swap_oriented_counterpart_matches": 29,
+    "probe_swap_unique_unordered_counterpart_pairs": 24,
+    "counterpart_rule": "Exact case-folded (category, intermediate, answer) matched against (category, swap_to, swap_answer); unordered pair IDs deduplicate reverse orientations."
+  },
+  "scope": {
+    "included": [
+      "lens-eval-multihop",
+      "lens-eval-order-ops",
+      "probe-swap"
+    ],
+    "excluded": [
+      "association",
+      "typo",
+      "multilingual",
+      "poetry"
+    ]
+  }
+}
