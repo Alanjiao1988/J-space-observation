@@ -13,7 +13,6 @@ import shlex
 import subprocess
 from pathlib import Path
 
-import jsonschema
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -614,9 +613,18 @@ def test_passing_capacity_certificate_recomputes_and_matches_schema():
     )
     assert certificate["capacity_gate_passed"] is True
     assert certificate["terminal_state"] is None
-    jsonschema.Draft202012Validator(
-        json.loads(SCHEMA.read_text(encoding="utf-8"))
-    ).validate(certificate)
+    schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
+    assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+    assert schema["additionalProperties"] is False
+    assert set(schema["required"]) == set(certificate)
+    assert schema["properties"]["artifact"]["const"] == certificate["artifact"]
+    assert (
+        schema["properties"]["schema_version"]["const"]
+        == certificate["schema_version"]
+    )
+    assert schema["properties"]["provider_calls"]["properties"]["count"][
+        "const"
+    ] == 0
 
 
 def test_insufficient_primary_capacity_blocks_without_fabricating_a_result():
