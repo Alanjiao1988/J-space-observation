@@ -4840,3 +4840,50 @@ cell or scientific decision was created. The smallest next scientific gate is
 unchanged: J-lens S3 validity-protocol design can proceed independently. The
 same transport-recovery authority can resume only after an operator
 independently makes sufficient quota available on the same deployments.
+
+### Final launcher repair and closing verification
+
+The final integrity pass found one launcher defect after the blocked
+certificate was already sealed: the source-manifest `cmp` command was placed
+inside a Bash `[[ ... ]]` expression. Bash printed `conditional binary
+operator expected`, but `bash -n` returned zero for this construct, so the
+original syntax test had produced a false pass. ACR run `cm9r` exposed the
+diagnostic. Commit `9287b86c1eb5a051c7a7223f4e72631cb649351e` moved `cmp`
+outside the conditional expression and added a structural regression
+assertion. The repair changes no recovery identity, image, source, reviewer,
+request, capacity, lock, result, or execution contract.
+
+Runs `cm9m`, `cm9n` and `cm9p` uploaded an incorrect context root and therefore
+did not execute repository checks; they are non-authoritative context
+failures. `cm9q` and `cm9s` reconfirmed the focused and full-suite baselines
+while the launcher diagnostic was investigated. The final authoritative runs
+at `9287b86` were:
+
+- `cm9t`: capacity-pack and protected-byte integrity succeeded;
+- `cm9u`: all 36 focused transport-recovery controls passed;
+- `cm9v`: 3372 passed / 15 skipped / 2 failed, with only the two disclosed
+  pre-existing `tests/test_parser_v3_seal_job.py` failures.
+
+The final read-only collector attempt
+`job-p10d-tr-cap-34404a89-bq7yh0q` failed before Blob access because its
+retained command still required cloned `main` to equal `34404a89` after the
+later fast-forward pushes. The Job command was changed only to check out that
+exact frozen ancestor before running the same verifier. Execution
+`job-p10d-tr-cap-34404a89-zpno3bl` then succeeded under the same identity with
+zero Cognitive Services roles. Its bounded readback observed source object
+count 8, capacity object count 2, old result object count 0, the unchanged old
+lock hash, no recovery lock, no recovery result object, and the same three
+900-row request-body rollups. It issued no provider call, made no capacity
+mutation and wrote no Blob.
+
+Final ACR inventory reconfirmed write- and delete-disabled tags and manifests
+for the generation image
+`sha256:1f504579e8bd3a7a4abb3643d3c153c53cf31e43a4b1a44d1332c37481166aa4`,
+v1 review image
+`sha256:d9e887e68cccf7472e956785cda3ad7cf5f3902daea9287fc7b72c357f473e10`,
+v2 review image
+`sha256:b3cf2c5933fe296c6a4d59eba9d73c3f10fc42bdddc494b25b679ca679b449dd`,
+and final capacity-sealer image
+`sha256:1c04065228bf57f042069e32b8f05e613c2e7e536a8c98ba755a804bfc2d1d32`.
+The exact terminal state remains
+**`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`**.
