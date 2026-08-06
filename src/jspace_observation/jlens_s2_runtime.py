@@ -562,9 +562,8 @@ def independent_weighted_mean(
                 lens.jacobians[layer].float() * int(lens.n_prompts)
                 for lens in lenses
             ),
-            torch_module.zeros(
-                s2.MODEL_WIDTH,
-                s2.MODEL_WIDTH,
+            torch_module.zeros_like(
+                lenses[0].jacobians[layer],
                 dtype=torch_module.float32,
             ),
         )
