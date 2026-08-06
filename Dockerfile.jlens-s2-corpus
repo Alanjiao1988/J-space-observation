@@ -1,0 +1,87 @@
+FROM python:3.11.15-bookworm@sha256:a8f8fbe1a0edc9e4dddafa64ba73f7e04be7be5ebc23f332362e779e0a2e4e52
+
+ARG PROJECT_COMMIT
+ARG S2_PROTOCOL_SHA256=e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2
+ARG S2_CORPUS_CONTRACT_SHA256=bde80360e5f0dda1701ebc41341bdc777416efcae43a4764493180e185008e6d
+
+LABEL org.opencontainers.image.title="J-space full-layer S2 corpus acquisition"
+LABEL org.opencontainers.image.revision="${PROJECT_COMMIT}"
+LABEL io.jspace.s2.protocol-sha256="${S2_PROTOCOL_SHA256}"
+LABEL io.jspace.s2.corpus-contract-sha256="${S2_CORPUS_CONTRACT_SHA256}"
+LABEL io.jspace.s2.operation-boundary="dataset-and-tokenizer-only-no-model-no-lens"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates tini \
+    && groupadd --system --gid 10001 jspace \
+    && useradd --system --uid 10001 --gid jspace --create-home \
+        --home-dir /workspace/runtime/home --shell /usr/sbin/nologin jspace \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace/repo
+COPY requirements-jlens-s2-corpus.txt /workspace/repo/
+
+RUN python -m pip install --no-cache-dir \
+        pip==24.0 setuptools==79.0.1 wheel==0.46.3 \
+    && grep -Ev '^(#|[[:space:]]*$|pip==|setuptools==|wheel==)' \
+        requirements-jlens-s2-corpus.txt > /tmp/runtime-requirements.txt \
+    && python -m pip install --no-cache-dir --no-deps \
+        -r /tmp/runtime-requirements.txt \
+    && grep -Ev '^(#|[[:space:]]*$)' requirements-jlens-s2-corpus.txt \
+        | sort > /tmp/expected-freeze.txt \
+    && python -m pip freeze --all | sort > /tmp/observed-freeze.txt \
+    && diff -u /tmp/expected-freeze.txt /tmp/observed-freeze.txt \
+    && rm -f /tmp/runtime-requirements.txt \
+        /tmp/expected-freeze.txt /tmp/observed-freeze.txt
+
+COPY docs/jlens_s2_artifacts.schema.json /workspace/repo/docs/
+COPY docs/jlens_s2_corpus_source_contract.json /workspace/repo/docs/
+COPY docs/jlens_s2_protocol.json /workspace/repo/docs/
+COPY scripts/jlens_s2_corpus_acquisition.py /workspace/repo/scripts/
+COPY src/jspace_observation/jlens_s2_corpus.py /workspace/repo/src/jspace_observation/
+COPY src/jspace_observation/jlens_s2_protocol.py /workspace/repo/src/jspace_observation/
+
+COPY data/jlens_feasibility_prompts.jsonl /workspace/repo/data/
+COPY data/jlens_saturation_prompts.jsonl /workspace/repo/data/
+COPY data/phase1_task_headroom_candidates.jsonl /workspace/repo/data/
+COPY artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/02_records.jsonl \
+    /workspace/repo/artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/
+COPY evaluator_sets/parser_v2_v1/development_cases.jsonl \
+    /workspace/repo/evaluator_sets/parser_v2_v1/
+COPY evaluator_sets/parser_v3_v1/adversarial_development_cases.jsonl \
+    /workspace/repo/evaluator_sets/parser_v3_v1/
+COPY src/jspace_observation/prompt_sets.py /workspace/repo/src/jspace_observation/
+COPY third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/lens-eval-multihop.json \
+    /workspace/repo/third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/
+COPY third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/lens-eval-order-ops.json \
+    /workspace/repo/third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/
+COPY third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/experiments/probe-swap.json \
+    /workspace/repo/third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/experiments/
+
+RUN test -n "${PROJECT_COMMIT}" \
+    && test "$(sha256sum docs/jlens_s2_protocol.json | cut -d' ' -f1)" \
+        = "${S2_PROTOCOL_SHA256}" \
+    && test "$(sha256sum docs/jlens_s2_corpus_source_contract.json | cut -d' ' -f1)" \
+        = "${S2_CORPUS_CONTRACT_SHA256}" \
+    && install -d -o jspace -g jspace -m 0700 \
+        /workspace/runtime/home \
+        /workspace/runtime/hf-cache \
+        /workspace/runtime/results \
+        /workspace/runtime/tmp \
+    && chown -R 0:0 /workspace/repo \
+    && chmod -R a-w /workspace/repo
+
+ENV HOME=/workspace/runtime/home \
+    HF_HOME=/workspace/runtime/hf-cache \
+    HUGGINGFACE_HUB_CACHE=/workspace/runtime/hf-cache/hub \
+    TRANSFORMERS_CACHE=/workspace/runtime/hf-cache \
+    TMPDIR=/workspace/runtime/tmp \
+    RESULTS_DIR=/workspace/runtime/results
+
+USER 10001:10001
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["python", "/workspace/repo/scripts/jlens_s2_corpus_acquisition.py"]
