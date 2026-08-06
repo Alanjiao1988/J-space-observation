@@ -31,12 +31,8 @@ RUN python -m pip install --no-cache-dir \
         requirements-jlens-s2-corpus.txt > /tmp/runtime-requirements.txt \
     && python -m pip install --no-cache-dir --no-deps \
         -r /tmp/runtime-requirements.txt \
-    && grep -Ev '^(#|[[:space:]]*$)' requirements-jlens-s2-corpus.txt \
-        | sort > /tmp/expected-freeze.txt \
-    && python -m pip freeze --all | sort > /tmp/observed-freeze.txt \
-    && diff -u /tmp/expected-freeze.txt /tmp/observed-freeze.txt \
-    && rm -f /tmp/runtime-requirements.txt \
-        /tmp/expected-freeze.txt /tmp/observed-freeze.txt
+    && python -c "import importlib.metadata as m, pathlib, re; canon=lambda s: re.sub(r'[-_.]+','-',s).lower(); expected={canon(line.split('==',1)[0]):line.split('==',1)[1] for line in pathlib.Path('requirements-jlens-s2-corpus.txt').read_text().splitlines() if line and not line.startswith('#')}; observed={canon(d.metadata['Name']):d.version for d in m.distributions()}; assert expected == observed, {'missing_or_changed': {k:v for k,v in expected.items() if observed.get(k)!=v}, 'unexpected': {k:v for k,v in observed.items() if expected.get(k)!=v}}" \
+    && rm -f /tmp/runtime-requirements.txt
 
 COPY docs/jlens_s2_artifacts.schema.json /workspace/repo/docs/
 COPY docs/jlens_s2_corpus_source_contract.json /workspace/repo/docs/
