@@ -302,6 +302,19 @@ def test_license_notice_is_revision_and_hash_bound() -> None:
     assert "2" * 64 in notice
 
 
+def test_cache_snapshot_revision_is_immutable_and_exact() -> None:
+    revision = "1" * 40
+    assert corpus.snapshot_revision_from_cache_path(
+        Path("/cache/models--owner--model/snapshots") / revision / "tokenizer.json"
+    ) == revision
+    with pytest.raises(corpus.CorpusAcquisitionError, match="snapshot identity"):
+        corpus.snapshot_revision_from_cache_path("/cache/tokenizer.json")
+    with pytest.raises(corpus.CorpusAcquisitionError, match="immutable commit"):
+        corpus.snapshot_revision_from_cache_path(
+            "/cache/models--owner--model/snapshots/main/tokenizer.json"
+        )
+
+
 def test_acquisition_script_has_no_top_level_tokenizer_or_dataset_import() -> None:
     source = (
         ROOT / "scripts" / "jlens_s2_corpus_acquisition.py"

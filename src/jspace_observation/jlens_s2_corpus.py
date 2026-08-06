@@ -318,6 +318,21 @@ def library_versions(names: Sequence[str]) -> list[dict[str, str]]:
     return rows
 
 
+def snapshot_revision_from_cache_path(path: str | Path) -> str:
+    parts = Path(path).parts
+    indices = [index for index, part in enumerate(parts) if part == "snapshots"]
+    if len(indices) != 1 or indices[0] + 1 >= len(parts):
+        raise CorpusAcquisitionError(
+            f"Hugging Face cache path has no single snapshot identity: {path}"
+        )
+    revision = parts[indices[0] + 1]
+    if not s2._IMMUTABLE_REF.fullmatch(revision):
+        raise CorpusAcquisitionError(
+            f"Hugging Face cache snapshot is not an immutable commit: {revision}"
+        )
+    return revision
+
+
 def _audit_row(
     *,
     row_id: str,
@@ -804,6 +819,7 @@ __all__ = [
     "prompt_bank_rows",
     "repository_prompt_entries",
     "scan_and_assign",
+    "snapshot_revision_from_cache_path",
     "write_canonical_json",
     "write_canonical_jsonl",
 ]

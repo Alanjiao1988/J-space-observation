@@ -274,7 +274,18 @@ def build_and_seal_protected_bank(
 def load_tokenizer(dataset_revision: str) -> tuple[Any, dict[str, Any]]:
     del dataset_revision
     from transformers import AutoTokenizer
+    from transformers.utils.hub import cached_file
 
+    tokenizer_config_path = cached_file(
+        s2.MODEL_ID,
+        "tokenizer_config.json",
+        revision=s2.MODEL_REVISION,
+    )
+    resolved = corpus.snapshot_revision_from_cache_path(tokenizer_config_path)
+    if resolved != s2.MODEL_REVISION:
+        raise corpus.CorpusAcquisitionError(
+            f"tokenizer cache revision {resolved!r} differs from pinned revision"
+        )
     tokenizer = AutoTokenizer.from_pretrained(
         s2.MODEL_ID,
         revision=s2.MODEL_REVISION,
@@ -291,18 +302,11 @@ def load_tokenizer(dataset_revision: str) -> tuple[Any, dict[str, Any]]:
         raise corpus.CorpusAcquisitionError(
             "pinned adapter force_bos=true could not be applied"
         )
-    resolved = (
-        getattr(tokenizer, "_commit_hash", None)
-        or getattr(tokenizer, "init_kwargs", {}).get("_commit_hash")
-    )
-    if resolved != s2.MODEL_REVISION:
-        raise corpus.CorpusAcquisitionError(
-            f"tokenizer revision {resolved!r} differs from pinned revision"
-        )
     return tokenizer, {
         "add_bos_token": True,
         "bos_token_id": int(tokenizer.bos_token_id),
         "id": s2.MODEL_ID,
+        "tokenizer_config_cache_path": str(tokenizer_config_path),
         "revision": resolved,
         "trust_remote_code": False,
     }
