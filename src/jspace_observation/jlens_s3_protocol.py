@@ -436,6 +436,7 @@ _OUTPUT_ARRAY_INTEGER_FIELDS = {
     "source_token_ids",
     "swap_answer_token_ids",
     "target_token_ids",
+    "token_ids",
 }
 _OUTPUT_ARRAY_STRING_FIELDS = {
     "causal_draw_ids",
