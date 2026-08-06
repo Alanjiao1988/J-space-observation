@@ -4957,3 +4957,44 @@ therefore still ends at `EV-0014`. The design result is
 **`NONTERMINAL_CHECKPOINT_JLENS_S3_VALIDITY_PROTOCOL_FROZEN_AWAITING_S2_LENSES_AND_EXECUTION`**.
 Phase 1.0D simultaneously remains
 **`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`**.
+
+### Final ACR verification and historical-image integration
+
+Final focused run `cma5` bound ledger commit `4aa7b34` / tree
+`adf61339a397047038c936e27764ed026ce574d9`, reproduced every frozen hash and
+29/24 counterpart count, passed all 55 S3 tests, confirmed `EV-0014` remained
+the final evidence row, and verified D30, M-20, L-56--L-61, AR-0067--AR-0082,
+claim states, review closure, source-bundle bytes, and both simultaneous project
+states.
+
+The first full run, `cma4`, correctly exposed one new integration failure:
+the historical Phase 1.0D build-provenance test treated the newly authorized
+top-level S3 module as if it had existed in the old frozen image. An attempted
+`.dockerignore` isolation at `0e068ee` was rejected: although focused `cma6`
+passed, full run `cma7` proved `.dockerignore` itself is frozen in the v2 review
+image context. That input was restored byte-for-byte.
+
+Commit `32f14af` instead changed only the non-protected historical provenance
+test. It now:
+
+- rebuilds the old image-context projection from the record's exact 44 files
+  and verifies every recorded byte;
+- requires the unchanged old build verifier to reject the current repository
+  only for the authorized later
+  `src/jspace_observation/jlens_s3_protocol.py` addition and consequent bundle
+  digest drift.
+
+Thus no old Dockerfile, provenance record, manifest, protocol, generation/
+review/capacity source, or other protected byte changed, and any attempted old
+image rebuild from the expanded current context still fails closed.
+
+Full-suite run `cma8` bound commit
+`32f14afb41140666dd54a79dd2c03b970eaabf75` / tree
+`2f04862f59ca5516e1179f8bc6def35285fe2a54` and completed with:
+
+- 3427 passed;
+- 15 skipped;
+- exactly the two disclosed historical
+  `tests/test_parser_v3_seal_job.py` failures;
+- delta from the 3372 / 15 / 2 authority baseline:
+  **+55 passed / +0 skipped / +0 failed**.
