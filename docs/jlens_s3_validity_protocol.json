@@ -1,0 +1,1179 @@
+{
+  "artifact_semantics": {
+    "confirmation_pack": {
+      "all_or_nothing": true,
+      "create_only": true,
+      "incomplete_bytes_location": "separate partial prefix excluded from classification",
+      "manifest_written_last": true,
+      "open_only_after": [
+        "final executing image and code are sealed",
+        "Stage E0 manifest bytes are sealed",
+        "complete output schema bytes are sealed"
+      ]
+    },
+    "e0_manifest": {
+      "all_or_nothing": true,
+      "create_only": true,
+      "manifest_written_last": true,
+      "seal_before": [
+        "J-lens output",
+        "logit-lens output",
+        "intervention output",
+        "patching output"
+      ]
+    },
+    "protocol_round_operations": {
+      "activation_operations": 0,
+      "inference_calls": 0,
+      "lens_load_fit_apply": 0,
+      "provider_calls": 0,
+      "target_model_loads": 0,
+      "tokenizer_loads": 0
+    }
+  },
+  "authority": {
+    "design_prompt": "docs/prompts/phase_s3_jlens_validity_protocol_design_prompt.md",
+    "design_prompt_role": "controlling authority",
+    "design_round_terminal_state": "NONTERMINAL_CHECKPOINT_JLENS_S3_VALIDITY_PROTOCOL_CANDIDATE_AWAITING_BOUNDED_REVIEW",
+    "phase1_0d_anchors": [
+      {
+        "path": "docs/prompts/phase1_0d_review_only_transport_recovery_prompt.md",
+        "sha256": "dc350039f118cb5931dab08fd65e24ed169757c472898b7dbe8d27eb3ce2f92b"
+      },
+      {
+        "path": "artifacts/phase1-0d-semantic-review-v2-transport-capacity/20260805T180417Z/00_capacity_certificate.json",
+        "sha256": "20e486e05a5f076b720ca12db3459b5a1c2c42e95684977dfdcff19d6da055d3"
+      },
+      {
+        "path": "artifacts/phase1-0d-semantic-review-v2-transport-capacity/20260805T180417Z/artifact_manifest.json",
+        "sha256": "23016ad15430b1720e4b37033a3638bf45e817ac00513292d138d26e0ed0a834"
+      }
+    ],
+    "phase1_0d_state": "BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY",
+    "question": "Can the project state a complete, computable, prospectively falsifiable protocol for deciding whether its real Jacobian Lens is scientifically usable for a later RQ2 pilot?"
+  },
+  "causal": {
+    "ablation": {
+      "formula": "h_ablate = h - v * dot(v,h) / dot(v,v)",
+      "nonfinite_or_zero_norm": "execution failure, never an exclusion",
+      "registered_methods": [
+        "M1200 intermediate-direction ablation",
+        "logit-lens intermediate-direction ablation",
+        "five Gram-matched random-direction ablations"
+      ]
+    },
+    "answer_probability": {
+      "multiple_token_surfaces": "log-sum-exp over the registered answer token set before differences",
+      "primary_binary_outcome": "1 iff intervened top-1 token is in the registered swap_answer token set"
+    },
+    "comparators": [
+      "M1200 intermediate-to-alternative coordinate swap",
+      "logit-lens intermediate-to-alternative coordinate swap",
+      "five deterministic Gram-matched random-direction pair swaps",
+      "M1200 answer-to-swap-answer vector swap",
+      "M1200 intermediate-direction ablation",
+      "logit-lens intermediate-direction ablation",
+      "five deterministic Gram-matched random-direction ablations",
+      "no-op hook",
+      "wrong-position diagnostic",
+      "early-band diagnostic",
+      "motor-band diagnostic"
+    ],
+    "coordinate_swap": {
+      "alphas": {
+        "integrity": 0.0,
+        "primary": 1.0,
+        "secondary": 0.5
+      },
+      "cast_patched_residual_to": "torch.float16",
+      "coordinate_formula": "c = pinv(V) @ h",
+      "direction_columns": "V = [v_source, v_target]",
+      "intervention_dtype": "torch.float32",
+      "patched_formula": "h_swap = h + alpha * V @ (swap(c) - c)",
+      "pseudoinverse": {
+        "atol": 0.0,
+        "implementation": "torch.linalg.pinv",
+        "rtol": 1e-06
+      },
+      "source_direction_formula": "D_l = W_U @ J_l",
+      "source_direction_rows": "M1200 J-lens vocabulary directions",
+      "unembedding": "pinned model actual W_U",
+      "unmodified_clean_distribution_preserved": true
+    },
+    "effects": {
+      "C_leakage": "G(M1200 intermediate swap) - G(M1200 answer-vector swap)",
+      "C_logit": "swap_success(M1200 intermediate swap) - swap_success(logit-lens intermediate swap)",
+      "C_random": "swap_success(M1200 intermediate swap) - mean swap_success(five Gram-matched random swaps)",
+      "G": "[log p_intervened(swap_answer) - log p_intervened(clean_answer)] - [log p_clean(swap_answer) - log p_clean(clean_answer)]",
+      "answer_smuggling_rule": "A favorable top-1 switch is not intermediate-direction evidence unless lower95(C_leakage) is above zero."
+    },
+    "intervention_application": {
+      "diagnostic_bands": {
+        "early": [
+          0,
+          8
+        ],
+        "motor": [
+          23,
+          26
+        ]
+      },
+      "primary_layers": [
+        9,
+        22
+      ],
+      "primary_positions": "all prompt token positions",
+      "primary_semantics": "Apply the intervention simultaneously after every block in the primary middle band in one forward pass.",
+      "wrong_position": "Apply only at each item's five preregistered non-final surface-free control positions while retaining all middle-band layers."
+    },
+    "metrics": [
+      "KL(p_clean || p_intervened)",
+      "correct-answer logit change",
+      "swap-answer log-prob change",
+      "alternative-vs-clean-answer log-odds gain G",
+      "intervened top-1 swap success",
+      "direction-pair condition number"
+    ],
+    "random_controls": {
+      "draws": 5,
+      "gram_definition": "The full 2x2 matrix V^T V, including both norms and the cross inner product.",
+      "gram_tolerance_absolute": 1e-09,
+      "matching_algorithm": "Let context be canonical_item_sha256 + NUL + decimal layer. For draw 0..4 seed Python random.Random with the big-endian uint256 of SHA-256(UTF-8(seed) || NUL || UTF-8(context) || NUL || ASCII(draw)); draw Gaussian vectors, deterministically Gram-Schmidt an orthonormal 2-frame, and multiply it by the unique nonnegative-diagonal 2x2 Cholesky factor of the source Gram matrix.",
+      "seed": "jlens-s3-v1-random-direction-2026-08-06",
+      "selection": "Use all five draws and average within item; never select a favorable draw."
+    }
+  },
+  "classification": {
+    "core_gates": {
+      "CAUSAL_PASS": "lower95(C_logit) > 0 and lower95(C_random) > 0",
+      "READOUT_PASS": "lower95(R) > 0"
+    },
+    "hard_scientific_gates": [
+      "lower95(M1200 true-label minus label-permuted readout effect) > 0",
+      "lower95(M1200 true-position minus position-shuffled readout effect) > 0",
+      "lower95(C_leakage) > 0",
+      "no forbidden surface or final-answer synonym enters the primary readout"
+    ],
+    "integrity_preconditions": [
+      "all required source hashes, model and lens identities, source layers, and confirmation rows are complete",
+      "all primary computations are finite",
+      "alpha-zero and no-op logits retain the clean-hook top-1 and have maximum absolute logit difference <= 1e-5"
+    ],
+    "operational_blocker_rule": "Any failed integrity precondition, incomplete pack, transport failure, non-finite primary computation, source identity mismatch, or inability to execute a frozen metric produces no scientific classification.",
+    "terminal_values": [
+      "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+      "JLENS_NOT_VALIDATED",
+      "JLENS_PARTIALLY_VALIDATED",
+      "JLENS_VALIDATED_FOR_RQ2_PILOT"
+    ],
+    "truth_table": [
+      {
+        "causal_pass": false,
+        "hard_gates_pass": true,
+        "readout_pass": false,
+        "result": "JLENS_NOT_VALIDATED"
+      },
+      {
+        "causal_pass": false,
+        "hard_gates_pass": true,
+        "readout_pass": true,
+        "result": "JLENS_PARTIALLY_VALIDATED"
+      },
+      {
+        "causal_pass": true,
+        "hard_gates_pass": true,
+        "readout_pass": false,
+        "result": "JLENS_PARTIALLY_VALIDATED"
+      },
+      {
+        "causal_pass": true,
+        "hard_gates_pass": true,
+        "readout_pass": true,
+        "result": "JLENS_VALIDATED_FOR_RQ2_PILOT"
+      },
+      {
+        "causal_pass": false,
+        "hard_gates_pass": false,
+        "readout_pass": false,
+        "result": "JLENS_NOT_VALIDATED"
+      },
+      {
+        "causal_pass": false,
+        "hard_gates_pass": false,
+        "readout_pass": true,
+        "result": "JLENS_NOT_VALIDATED"
+      },
+      {
+        "causal_pass": true,
+        "hard_gates_pass": false,
+        "readout_pass": false,
+        "result": "JLENS_NOT_VALIDATED"
+      },
+      {
+        "causal_pass": true,
+        "hard_gates_pass": false,
+        "readout_pass": true,
+        "result": "JLENS_NOT_VALIDATED"
+      }
+    ]
+  },
+  "eligibility": {
+    "causal_swap": {
+      "behavioral_rule": "The unchanged prompt answer passes clean top-1; swap_answer need not be the clean answer.",
+      "mechanical_rule": "intermediate, swap_to, answer, and swap_answer each have a complete registered single-token surface.",
+      "surfaces": "Only exact official intermediate, swap_to, answer, and swap_answer strings with casing and tokenizer-boundary equivalents."
+    },
+    "clean_behavior": {
+      "answer_rule": "Greedy top-1 token is in the mechanically registered target token ID set.",
+      "decoding": "raw-completion greedy next token only",
+      "lens_use": "forbidden",
+      "prompt": "exact raw official prompt bytes, no chat template and no generated chain of thought",
+      "sealed_fields": [
+        "clean top-1 token",
+        "target token set",
+        "input token IDs",
+        "resolved model revision",
+        "resolved tokenizer revision",
+        "parameter dtype",
+        "prompt SHA-256"
+      ]
+    },
+    "mechanical": {
+      "control_position_rule": "At least one non-final input position exists whose decoded token span contains no complete registered surface after registered normalization; the five controls are selected only from such positions.",
+      "direction_token_rule": "At least one vocabulary token decodes to the complete normalized surface with zero or one leading ASCII boundary space.",
+      "forbidden": [
+        "human eligibility judgment",
+        "LLM eligibility judgment",
+        "multi-token surface",
+        "input truncation",
+        "lens-dependent eligibility",
+        "rank-dependent eligibility"
+      ],
+      "maximum_input_tokens": 512,
+      "over_length": "mechanically ineligible",
+      "required_reason_counts": [
+        "prompt_surface",
+        "target_overlap",
+        "multi_token",
+        "over_length",
+        "no_control_position"
+      ]
+    },
+    "multihop": {
+      "semantic_synonyms": "forbidden",
+      "source": "official intermediate string only",
+      "variants": "casing-equivalent and tokenizer boundary variants decoding to the same normalized string"
+    },
+    "order_ops": {
+      "numeric_forms": {
+        "10": [
+          "10",
+          "ten"
+        ],
+        "11": [
+          "11",
+          "eleven"
+        ],
+        "12": [
+          "12",
+          "twelve"
+        ],
+        "13": [
+          "13",
+          "thirteen"
+        ],
+        "15": [
+          "15",
+          "fifteen"
+        ],
+        "16": [
+          "16",
+          "sixteen"
+        ],
+        "20": [
+          "20",
+          "twenty"
+        ],
+        "24": [
+          "24",
+          "twenty-four"
+        ],
+        "3": [
+          "3",
+          "three"
+        ],
+        "4": [
+          "4",
+          "four"
+        ],
+        "5": [
+          "5",
+          "five"
+        ],
+        "6": [
+          "6",
+          "six"
+        ],
+        "7": [
+          "7",
+          "seven"
+        ],
+        "8": [
+          "8",
+          "eight"
+        ],
+        "9": [
+          "9",
+          "nine"
+        ]
+      },
+      "numeric_keys": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "15",
+        "16",
+        "20",
+        "24"
+      ],
+      "official_inclusive_diagnostic": true,
+      "operation_forms": {
+        "addition": [
+          "+",
+          "add",
+          "addition",
+          "plus"
+        ],
+        "division": [
+          "/",
+          "divide",
+          "divided",
+          "division",
+          "\u00f7"
+        ],
+        "mod": [
+          "%",
+          "mod",
+          "modulo",
+          "remainder"
+        ],
+        "multiplication": [
+          "*",
+          "multiplication",
+          "multiply",
+          "times",
+          "\u00d7"
+        ],
+        "squared": [
+          "^2",
+          "square",
+          "squared",
+          "\u00b2"
+        ],
+        "subtraction": [
+          "-",
+          "minus",
+          "subtract",
+          "subtraction"
+        ]
+      },
+      "operation_keys": [
+        "addition",
+        "division",
+        "mod",
+        "multiplication",
+        "squared",
+        "subtraction"
+      ],
+      "runtime_growth": "forbidden"
+    },
+    "primary_leakage_filter": {
+      "answer_overlap": "Remove a surface when its normalized case-folded complete form equals the registered target-answer surface.",
+      "empty_result": "mechanically ineligible",
+      "prompt_match": "Remove a surface when its normalized case-folded complete form occurs as a token-bounded literal in the normalized case-folded prompt.",
+      "reporting": "Report item and intermediate removal counts separately for prompt surface, target overlap, and multi-token ineligibility."
+    },
+    "targets": {
+      "causal": "Use only the exact official answer and swap_answer strings with casing-equivalent and tokenizer-boundary variants.",
+      "primary_readout": "Use only the exact official target string with casing-equivalent and tokenizer-boundary variants; target semantic synonyms and generated numeric word variants are forbidden.",
+      "single_token_rule": "Each required target surface must resolve to at least one complete vocabulary token under the registered direction-token rule."
+    }
+  },
+  "identities": {
+    "j_lens_code": {
+      "commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+      "hf_adapter_force_bos": true,
+      "repository": "https://github.com/anthropics/jacobian-lens.git"
+    },
+    "lens_artifacts": {
+      "A600": {
+        "role": "replication diagnostic",
+        "source": "independent 600-sequence full-layer S2 fit"
+      },
+      "B600": {
+        "role": "replication diagnostic",
+        "source": "independent 600-sequence full-layer S2 fit"
+      },
+      "M1200": {
+        "role": "only primary lens",
+        "source": "official n_prompts-weighted merge of A600 and B600"
+      },
+      "availability_rule": "All three full-layer identities must be byte-sealed before validity readout or S3 execution is blocked.",
+      "selection_rule": "A600 and B600 are both reported; choosing the better replicate is forbidden."
+    },
+    "target_model": {
+      "evaluation_mode": true,
+      "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+      "maximum_input_tokens": 512,
+      "number_of_transformer_blocks": 28,
+      "parameter_dtype": "torch.float16",
+      "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+      "trust_remote_code": false,
+      "use_cache": false
+    },
+    "tokenizer": {
+      "chat_template": false,
+      "input_truncation": false,
+      "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+    }
+  },
+  "layers": {
+    "bands": {
+      "early_control": {
+        "end": 8,
+        "start": 0
+      },
+      "motor_output_adjacent_control": {
+        "end": 26,
+        "start": 23
+      },
+      "primary_middle": {
+        "end": 22,
+        "start": 9
+      },
+      "target_final_block": {
+        "end": 27,
+        "start": 27
+      }
+    },
+    "j_lens_source_layers": {
+      "end": 26,
+      "start": 0
+    },
+    "j_lens_target_layer": 27,
+    "per_layer_output": "required for every source layer",
+    "selection": "No best-layer selection and no post-output movement between bands.",
+    "target_final_block_role": "model-output control, not a fitted source layer",
+    "zero_based": true
+  },
+  "normalization": {
+    "casefold": {
+      "counterpart_rule": "Python str.casefold on each exact raw triple component only; no NFKC or whitespace rewriting.",
+      "surface_rule": "Python str.casefold only for casing-equivalent vocabulary equality, prompt leakage, and target overlap.",
+      "unstated_uses": "forbidden"
+    },
+    "token_boundary": {
+      "definition": "A literal occurrence is token-bounded when the character immediately before and after, if present, is not Unicode alphanumeric and not underscore.",
+      "leading_space": "A vocabulary token decode may have zero or one leading ASCII U+0020 before the complete surface; two or more leading spaces are ineligible."
+    },
+    "unicode": "NFKC",
+    "whitespace": "After NFKC, replace each maximal nonempty run of characters for which Python str.isspace is true with one ASCII U+0020, then strip ASCII U+0020 from both ends. No other characters are removed or rewritten."
+  },
+  "outputs": {
+    "artifact_manifest": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "artifact_id:string",
+        "stage:enum[P,E0,E1,E2]",
+        "relative_path:string",
+        "bytes:integer",
+        "sha256:sha256",
+        "schema_sha256:sha256",
+        "protocol_sha256:sha256",
+        "source_commit:immutable_ref",
+        "image_digest:string",
+        "create_only:boolean",
+        "complete:boolean",
+        "written_order:integer",
+        "opened_at_utc:null_or_string"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "artifact_id"
+      ]
+    },
+    "bootstrap_replicate": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "endpoint:enum[R,label_control,position_control,C_logit,C_random,C_leakage,patching_alignment]",
+        "replicate:integer",
+        "sampling_unit:enum[item,unordered_pair_id]",
+        "multihop_draw_ids:array_string",
+        "order_ops_draw_ids:array_string",
+        "causal_draw_ids:array_string",
+        "pair_draw_ids:array_string",
+        "effect:number"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "endpoint",
+        "replicate"
+      ]
+    },
+    "bootstrap_summary": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "endpoint:string",
+        "point_estimate:number",
+        "lower95:number",
+        "upper95:number",
+        "replicates:integer",
+        "seed:string",
+        "percentile_method:string",
+        "finite:boolean"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "endpoint"
+      ]
+    },
+    "causal_direction": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "item_id:string",
+        "lens_id:enum[M1200,logit_lens,random]",
+        "method:string",
+        "random_draw:null_or_integer",
+        "layer:integer",
+        "source_token_ids:array_integer",
+        "target_token_ids:array_integer",
+        "source_direction_sha256:sha256",
+        "target_direction_sha256:sha256",
+        "gram_00:number",
+        "gram_01:number",
+        "gram_11:number",
+        "condition_number:number",
+        "finite:boolean"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "item_id",
+        "lens_id",
+        "method",
+        "random_draw",
+        "layer"
+      ]
+    },
+    "causal_item": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "item_id:string",
+        "canonical_item_sha256:sha256",
+        "lens_id:enum[M1200,A600,B600,logit_lens,none]",
+        "method:string",
+        "random_draw:null_or_integer",
+        "alpha:number",
+        "band:enum[early_control,primary_middle,motor_output_adjacent_control]",
+        "positions:array_integer",
+        "source_layers:array_integer",
+        "source_token_ids:array_integer",
+        "target_token_ids:array_integer",
+        "clean_answer_token_ids:array_integer",
+        "swap_answer_token_ids:array_integer",
+        "clean_top1_token_id:integer",
+        "intervened_top1_token_id:integer",
+        "swap_success:integer",
+        "clean_logits_sha256:sha256",
+        "intervened_logits_sha256:sha256",
+        "max_abs_logit_difference:number",
+        "kl_clean_intervened:number",
+        "correct_answer_logit_change:number",
+        "swap_answer_logprob_change:number",
+        "log_odds_gain_G:number",
+        "condition_number:number",
+        "finite:boolean"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "item_id",
+        "lens_id",
+        "method",
+        "random_draw",
+        "alpha",
+        "band"
+      ]
+    },
+    "classification": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "protocol_sha256:sha256",
+        "e0_manifest_sha256:sha256",
+        "confirmation_manifest_sha256:sha256",
+        "floor_multihop:boolean",
+        "floor_order_ops:boolean",
+        "floor_pooled:boolean",
+        "floor_causal:boolean",
+        "integrity_complete:boolean",
+        "integrity_finite:boolean",
+        "integrity_noop:boolean",
+        "hard_label:boolean",
+        "hard_position:boolean",
+        "hard_leakage:boolean",
+        "hard_surface:boolean",
+        "readout_pass:boolean",
+        "causal_pass:boolean",
+        "patching_status:enum[PATCHING_ALIGNMENT_SUPPORTED,PATCHING_ALIGNMENT_NOT_SUPPORTED,PATCHING_ALIGNMENT_NOT_ESTIMABLE]",
+        "operational_status:enum[COMPLETE,OPERATIONAL_BLOCKER]",
+        "classification:null_or_enum[INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY,JLENS_NOT_VALIDATED,JLENS_PARTIALLY_VALIDATED,JLENS_VALIDATED_FOR_RQ2_PILOT]"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "protocol_sha256",
+        "e0_manifest_sha256",
+        "confirmation_manifest_sha256"
+      ]
+    },
+    "e0_item": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "distribution:enum[multihop,order_ops,causal_swap]",
+        "item_id:string",
+        "canonical_item_sha256:sha256",
+        "prompt_sha256:sha256",
+        "raw_prompt_utf8_sha256:sha256",
+        "input_token_ids:array_integer",
+        "input_length:integer",
+        "model_id:string",
+        "model_revision:immutable_ref",
+        "tokenizer_revision:immutable_ref",
+        "parameter_dtype:string",
+        "clean_top1_token_id:null_or_integer",
+        "target_token_ids:array_integer",
+        "control_position_candidates:array_integer",
+        "control_positions:array_integer",
+        "mechanical_eligible:boolean",
+        "behavioral_eligible:boolean",
+        "prompt_surface_removed_count:integer",
+        "target_overlap_removed_count:integer",
+        "multi_token_removed_count:integer",
+        "exclusion_reasons:array_string",
+        "split_hash:null_or_sha256",
+        "split_role:enum[ineligible,development,confirmation]"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "distribution",
+        "item_id"
+      ]
+    },
+    "e0_surface": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "distribution:string",
+        "item_id:string",
+        "surface_role:enum[intermediate,swap_to,target,swap_answer]",
+        "intermediate_index:null_or_integer",
+        "raw_key:string",
+        "candidate_surface:string",
+        "normalized_surface:string",
+        "token_ids:array_integer",
+        "prompt_leakage:boolean",
+        "target_overlap:boolean",
+        "single_token:boolean",
+        "primary_retained:boolean",
+        "official_inclusive_retained:boolean"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "distribution",
+        "item_id",
+        "surface_role",
+        "intermediate_index",
+        "candidate_surface"
+      ]
+    },
+    "patching_alignment": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "unordered_pair_id:string",
+        "rho_true:number",
+        "rho_position_shuffled:number",
+        "rho_difference:number",
+        "pair_cell_count:integer",
+        "finite:boolean"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "unordered_pair_id"
+      ]
+    },
+    "patching_cell": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "unordered_pair_id:string",
+        "donor_item_id:string",
+        "recipient_item_id:string",
+        "layer:integer",
+        "position:integer",
+        "donor_input_length:integer",
+        "recipient_input_length:integer",
+        "donor_clean_answer_token_ids:array_integer",
+        "recipient_clean_answer_token_ids:array_integer",
+        "recipient_clean_logits_sha256:sha256",
+        "patched_logits_sha256:sha256",
+        "causal_recovery_log_odds:number",
+        "donor_intermediate_rank_donor:integer",
+        "donor_intermediate_rank_recipient:integer",
+        "true_rank_contrast:number",
+        "position_shuffled_rank_contrast:number",
+        "finite:boolean"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "unordered_pair_id",
+        "donor_item_id",
+        "recipient_item_id",
+        "layer",
+        "position"
+      ]
+    },
+    "readout_item": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "distribution:enum[multihop,order_ops]",
+        "item_id:string",
+        "lens_id:enum[M1200,A600,B600,logit_lens]",
+        "control_kind:enum[true,label_permutation,position_shuffle]",
+        "control_replicate:null_or_integer",
+        "band:enum[early_control,primary_middle,motor_output_adjacent_control]",
+        "k:integer",
+        "intermediate_pass_fraction:number",
+        "normalized_auc:number"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "distribution",
+        "item_id",
+        "lens_id",
+        "control_kind",
+        "control_replicate",
+        "band",
+        "k"
+      ]
+    },
+    "readout_rank": {
+      "additional_fields": false,
+      "all_or_nothing": true,
+      "columns": [
+        "distribution:enum[multihop,order_ops]",
+        "item_id:string",
+        "canonical_item_sha256:sha256",
+        "lens_id:enum[M1200,A600,B600,logit_lens]",
+        "control_kind:enum[true,label_permutation,position_shuffle]",
+        "control_replicate:null_or_integer",
+        "position:integer",
+        "layer:integer",
+        "intermediate_index:integer",
+        "registered_token_ids:array_integer",
+        "minimum_vocabulary_rank:integer",
+        "finite:boolean"
+      ],
+      "create_only": true,
+      "primary_key": [
+        "distribution",
+        "item_id",
+        "lens_id",
+        "control_kind",
+        "control_replicate",
+        "position",
+        "layer",
+        "intermediate_index"
+      ]
+    },
+    "required_tables": [
+      "e0_item",
+      "e0_surface",
+      "readout_rank",
+      "readout_item",
+      "causal_item",
+      "causal_direction",
+      "patching_cell",
+      "patching_alignment",
+      "bootstrap_replicate",
+      "bootstrap_summary",
+      "classification",
+      "artifact_manifest"
+    ]
+  },
+  "patching": {
+    "alignment": {
+      "cells": "All source layers 0..26 by all token positions shared by the equal-length pair.",
+      "comparison": "For each unordered pair, Spearman correlation of the causal-recovery heatmap with the true M1200 rank-contrast trajectory, minus the correlation with its deterministic position-shuffled trajectory.",
+      "heatmap_recovery": "[log p_patched(donor_answer) - log p_patched(recipient_answer)] - [log p_recipient_clean(donor_answer) - log p_recipient_clean(recipient_answer)]",
+      "lens_independence": "Activation replacement and causal-recovery computation use no J-lens direction; M1200 is used only in the prospective alignment comparison.",
+      "rank_contrast": "log(min-rank of donor intermediate in recipient clean cell) - log(min-rank of donor intermediate in donor clean cell)",
+      "support_classification": "PATCHING_ALIGNMENT_SUPPORTED iff the cluster-bootstrap lower95 of mean(rho_true-rho_position_shuffled) is above zero; otherwise PATCHING_ALIGNMENT_NOT_SUPPORTED.",
+      "trajectory_shuffle": "Within each layer, permute position labels by ascending SHA-256(UTF-8(position-shuffle seed) || NUL || UTF-8(pair ID) || NUL || ASCII(layer) || NUL || ASCII(position))."
+    },
+    "bootstrap_unit": "unordered_pair_id",
+    "minimum_confirmation_pairs": 12,
+    "not_estimable": "PATCHING_ALIGNMENT_NOT_ESTIMABLE",
+    "pair_eligibility": [
+      "model-free exact counterpart and unordered-pair deduplication rule",
+      "both prompts pass clean behavior",
+      "both prompts have equal tokenized length",
+      "registered clean answers are distinct",
+      "both members are in causal confirmation"
+    ],
+    "pair_selection_forbidden": [
+      "J-lens rank",
+      "readout result",
+      "intervention result",
+      "patching result"
+    ],
+    "patch_operation": "For both orientations, replace one recipient block-output activation at one token position with the donor clean-run activation and emit the full layer-by-position heatmap.",
+    "role_rule": "A pair touching development is development-only and excluded from confirmatory alignment.",
+    "secondary_only": "Patching support is reported but never changes or overrides the scientific classification."
+  },
+  "readout": {
+    "auc": {
+      "band_item_rule": "For each intermediate take its minimum vocabulary rank over layers in the band; at each k the item value is the fraction of intermediates with band-minimum rank <= k.",
+      "denominator": "log(100)",
+      "integration": "trapezoidal area under pass@k against natural log(k)",
+      "k_grid": [
+        1,
+        2,
+        5,
+        10,
+        20,
+        50,
+        100
+      ],
+      "rank_rule": "minimum vocabulary rank over registered leakage-resistant single-token surfaces",
+      "unit_rule": "intermediates are equal-weighted within item and every item contributes once to bootstrap sampling"
+    },
+    "controls": {
+      "label_derangements": {
+        "algorithm": "Let prefix = UTF-8(seed) || NUL || UTF-8(distribution) || NUL || ASCII(replicate). Within each distribution and replicate 0..4, order by SHA-256(prefix || NUL || canonical_item_bytes), breaking only digest collisions by item name; rotate complete item labels by 1 + big-endian-uint256(SHA-256(prefix)) mod (n-1), yielding no fixed point.",
+        "draws": 5,
+        "seed": "jlens-s3-v1-label-permutation-2026-08-06"
+      },
+      "position_shuffle": {
+        "algorithm": "For replicate 0..4, order eligible non-final surface-free positions by SHA-256(UTF-8(seed) || NUL || ASCII(replicate) || NUL || canonical_item_bytes || NUL || ASCII(decimal position)) and select the first; selection never uses ranks.",
+        "draws": 5,
+        "seed": "jlens-s3-v1-position-shuffle-2026-08-06"
+      }
+    },
+    "effects": {
+      "R": "pooled_middle_AUC(M1200) - pooled_middle_AUC(logit_lens)",
+      "label_control": "M1200 true-label true-position AUC minus mean AUC over five label derangements",
+      "position_control": "M1200 true-label true-position AUC minus mean AUC over five position controls"
+    },
+    "methods": [
+      "M1200 J-lens",
+      "A600 J-lens",
+      "B600 J-lens",
+      "ordinary logit lens using the same final norm and unembedding path with no Jacobian transport",
+      "five deterministic within-distribution label derangements",
+      "five deterministic within-item position-shuffled controls"
+    ],
+    "pooling": "0.5 * mean(multihop confirmation item AUC) + 0.5 * mean(order-ops confirmation item AUC)",
+    "position": "final prompt-token position for true readout; same captured activations for all methods",
+    "required_reports": [
+      "per-layer curves for all source layers",
+      "early, middle, and motor band curves",
+      "each distribution",
+      "equal-distribution pooled primary statistic",
+      "A600 and B600 replication diagnostics"
+    ]
+  },
+  "review": {
+    "candidate_hash_required": true,
+    "correction_allowance": "At most one consolidated correction covering every FATAL and MATERIAL finding.",
+    "finding_levels": [
+      "FATAL",
+      "MATERIAL",
+      "MINOR"
+    ],
+    "questions": [
+      "Are fit, development, confirmation, Phase 1 bank, and official benchmark roles non-overlapping where the protocol claims they are?",
+      "Can any item, synonym, layer, position, comparator, or exclusion depend on a lens, intervention, or confirmation outcome?",
+      "Are token eligibility, pass@k AUC, bootstrap, coordinate swap, ablation, random control, answer-leakage control, patching, and classification computable exactly from the registered fields?",
+      "Do the controls distinguish a known intermediate from prompt echo, final-answer leakage, motor preparation, and arbitrary perturbation?",
+      "Are development and confirmation operationally separated?",
+      "Can every stated result be reconstructed from the planned row-level pack?"
+    ],
+    "record_fields": [
+      "severity",
+      "exact file reference",
+      "exact JSON field reference",
+      "finding",
+      "disposition"
+    ],
+    "result_in_candidate": "none; this candidate registers review policy only",
+    "rounds": 1,
+    "verification_rule": "Rerun only the same checklist to verify cited consolidated corrections; do not introduce findings unless a correction created a direct contradiction."
+  },
+  "role_separation": {
+    "allowed_selection_signals": [
+      "vendored public item bytes",
+      "registered mechanical token eligibility",
+      "registered clean greedy next-token correctness",
+      "registered deterministic split hash"
+    ],
+    "claims": {
+      "allowed": "A later complete execution may classify only J-lens validity for the selected-case v1 instrument under the frozen truth table.",
+      "design_only": "This candidate establishes a prospective protocol only and no empirical or scientific result."
+    },
+    "limitations": [
+      "Official public items were authored for the source paper, not for the target model.",
+      "Clean-correct and single-token eligibility make this a selected-case instrument validation, not a population capability estimate.",
+      "Multi-token concepts are outside v1.",
+      "Public confirmation labels are not private or blind to the researcher.",
+      "The official repository publishes data and a lens implementation but not a complete reusable intervention runtime, so actual-path compatibility remains to be proven before confirmation.",
+      "Later S3 validity would not establish Phase 1.0D headroom, human ground truth, hidden reasoning, an internal workspace, or a J-space."
+    ],
+    "required_disjoint_pairs": [
+      [
+        "S2 fit A600",
+        "S2 fit B600"
+      ],
+      [
+        "S2 fit sequences",
+        "official benchmark items"
+      ],
+      [
+        "development items",
+        "confirmation items"
+      ],
+      [
+        "Phase 1 bank",
+        "official benchmark items"
+      ],
+      [
+        "primary readout benchmark",
+        "causal swap benchmark"
+      ]
+    ],
+    "roles": {
+      "Phase 1 bank": "independent blocked headroom bank; never S3 fit, development, confirmation, or rescue data",
+      "S2 fit A600": "independent 600-sequence lens fit only",
+      "S2 fit B600": "independent 600-sequence lens fit only",
+      "S2 fit sequences": "the union of the two independent S2 fit corpora, disjoint from every official benchmark item",
+      "causal swap benchmark": "probe-swap 90-item causal source only",
+      "confirmation items": "unopened confirmatory rows after E0 split sealing",
+      "development items": "execution and implementation-defect diagnostics only",
+      "official benchmark items": "the immutable public readout and causal benchmark items, never lens-fit sequences or Phase 1 bank rows",
+      "primary readout benchmark": "93 multihop plus 55 order-ops public items"
+    },
+    "selection_signals_forbidden": [
+      "J-lens output",
+      "logit-lens output",
+      "activation value",
+      "rank",
+      "intervention result",
+      "patching result",
+      "confirmation outcome",
+      "best replicate",
+      "best layer",
+      "favorable random control"
+    ]
+  },
+  "schema_version": "jlens-s3-validity-protocol/v1",
+  "split": {
+    "assignment": {
+      "causal_swap_development": 15,
+      "multihop_development": 15,
+      "order_ops_development": 15,
+      "remainder": "confirmation"
+    },
+    "canonical_item_bytes": "UTF-8 of json.dumps(raw upstream item, sort_keys=True, separators=(',', ':'), ensure_ascii=False, allow_nan=False)",
+    "floor_failure": "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+    "floors": {
+      "causal_swap_confirmation": 30,
+      "multihop_confirmation": 20,
+      "order_ops_confirmation": 20,
+      "pooled_readout_confirmation": 50
+    },
+    "hash": "SHA-256(canonical_item_bytes || UTF-8(seed)); ascending hexadecimal digest with item name as collision-only tie-break",
+    "no_backfill": true,
+    "no_replacement_batch": true,
+    "order_input": "Only mechanically and behaviorally eligible items within each distribution.",
+    "replacement_authority_spent": false,
+    "seed": "jlens-s3-v1-split-2026-08-06",
+    "stratification": "forbidden"
+  },
+  "stages": {
+    "E0": {
+      "allowed": [
+        "pinned tokenizer mechanical eligibility",
+        "one clean next-token forward pass per item",
+        "clean-behavior eligibility",
+        "frozen hash split",
+        "create-only eligibility and split manifest"
+      ],
+      "boundary": "Seal E0 bytes and selection/exclusion counts before any lens, logit-lens, intervention, or patching output is computed or opened.",
+      "lens_operations": 0
+    },
+    "E1": {
+      "allowed_use": "Prove frozen computations execute and diagnose implementation defects.",
+      "forbidden_changes": [
+        "prompt",
+        "synonym",
+        "band",
+        "position",
+        "k",
+        "strength",
+        "metric",
+        "threshold",
+        "gate",
+        "confirmation member"
+      ],
+      "role": "development"
+    },
+    "E2": {
+      "all_or_nothing": true,
+      "open_after": [
+        "executing image and code seal",
+        "Stage E0 manifest seal",
+        "complete output schema seal"
+      ],
+      "role": "confirmation"
+    },
+    "P": {
+      "frozen": [
+        "algorithms",
+        "data identities",
+        "allowed eligibility signals",
+        "layer bands",
+        "token rules",
+        "split rules",
+        "metrics",
+        "controls",
+        "intervention formulas",
+        "bootstrap",
+        "sample floors",
+        "classification gates"
+      ],
+      "target_or_lens_operations": 0
+    }
+  },
+  "statistics": {
+    "bootstrap": {
+      "causal_sampling": "Resample causal item IDs and retain all paired method rows for each draw.",
+      "patching_sampling": "Cluster-resample unordered pair IDs and retain every orientation and cell in each selected cluster.",
+      "readout_sampling": "Separately resample confirmation item IDs within multihop and order-ops, compute each distribution mean, then preserve 0.5/0.5 weighting.",
+      "replicates": 10000,
+      "rng": "Seed Python random.Random with the big-endian uint256 of SHA-256(UTF-8(seed)); for each replicate, visit distribution names in ascending Unicode order and make n draws with randrange(n). Patching analogously visits the one sorted unordered-pair cluster list.",
+      "seed": "jlens-s3-v1-bootstrap-2026-08-06",
+      "unit": "item-level paired",
+      "wrong_units": [
+        "row",
+        "token",
+        "intermediate",
+        "layer"
+      ]
+    },
+    "interval": {
+      "bounds": [
+        2.5,
+        97.5
+      ],
+      "method": "percentile with sorted replicates and linear interpolation at zero-based index (n-1)*p"
+    },
+    "point_estimate": "Apply each registered effect formula once to all eligible confirmation items without resampling."
+  },
+  "upstream": {
+    "authorship": "Anthropic-authored synthetic public data",
+    "commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+    "counterparts": {
+      "matching_rule": "Exact Python str.casefold triples (category, intermediate, answer) matched against (category, swap_to, swap_answer), with no other normalization.",
+      "oriented_matches": 29,
+      "unique_unordered_pairs": 24,
+      "unordered_pair_id": "SHA-256 of the two item names sorted by UTF-8 bytes and joined by one LF byte."
+    },
+    "excluded_distributions": [
+      "association",
+      "typo",
+      "multilingual",
+      "poetry"
+    ],
+    "files": [
+      {
+        "bytes": 11358,
+        "item_count": null,
+        "path": "LICENSE",
+        "role": "Apache-2.0 license text",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "bytes": 3815,
+        "item_count": null,
+        "path": "data/evaluations/README.md",
+        "role": "upstream evaluation definitions",
+        "sha256": "e061d9cce02a1cc651d58a81927833b760d3cef65bf4995126ecbe372a0ebe07"
+      },
+      {
+        "bytes": 8570,
+        "item_count": null,
+        "path": "data/experiments/README.md",
+        "role": "upstream intervention definitions",
+        "sha256": "1d78c702fa22ba610990d545b4c9c96839cc75cd4e451f2badb1cab23e04ad0f"
+      },
+      {
+        "bytes": 21869,
+        "item_count": 93,
+        "path": "data/evaluations/lens-eval-multihop.json",
+        "role": "primary multihop readout benchmark",
+        "sha256": "50b7e4c9255291c0ca2a8e94615be9f44531fa57bb1a844e4f9616056d987416"
+      },
+      {
+        "bytes": 9589,
+        "item_count": 55,
+        "path": "data/evaluations/lens-eval-order-ops.json",
+        "role": "primary order-of-operations readout benchmark",
+        "sha256": "b203206d16ff628152cc86f3838604e06cb54776f3e14fa1c34f150db8bc7560"
+      },
+      {
+        "bytes": 26567,
+        "item_count": 90,
+        "path": "data/experiments/probe-swap.json",
+        "role": "separate causal-swap benchmark",
+        "sha256": "a0edd27ca23f7b4d0fbe90448c2ddcc7457a3d812121bf024ed12a032ff86796"
+      }
+    ],
+    "license": "Apache-2.0",
+    "modifications": "none",
+    "repository": "https://github.com/anthropics/jacobian-lens.git",
+    "vendored_root": "third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e"
+  },
+  "verification": {
+    "accepted_historical_full_suite_baseline": {
+      "failed": 2,
+      "failure_file": "tests/test_parser_v3_seal_job.py",
+      "passed": 3372,
+      "skipped": 15
+    },
+    "design_validation_surface": "ACR QuickRuns only; no local execution and no GPU Job",
+    "later_execution_nonfinite_policy": "Operational blocker; never exclusion or scientific failure."
+  }
+}
