@@ -154,26 +154,30 @@ def test_a_record_carrying_a_stale_protocol_hash_is_refused(tmp_path):
 
 
 def test_the_committed_record_is_the_hash_of_the_committed_source(tmp_path):
-    """The record must describe the bytes in the actual Phase 1.0D context."""
+    """Recorded bytes stay exact while authorized later files fail closed."""
 
     record = REPO_ROOT / provenance.PROVENANCE_FILENAME
     if not record.exists():
         pytest.skip("the provenance record has not been emitted from Azure yet")
 
-    excluded = "src/jspace_observation/jlens_s3_protocol.py"
-    dockerignore = (REPO_ROOT / ".dockerignore").read_text(encoding="utf-8").splitlines()
-    assert excluded in dockerignore
-
-    context = tmp_path / "phase1-0d-context"
-    for source in provenance.resolve_bundle_files(REPO_ROOT):
-        relative = source.relative_to(REPO_ROOT)
-        if relative.as_posix() == excluded:
-            continue
+    context = tmp_path / "recorded-phase1-0d-context"
+    document = json.loads(record.read_text(encoding="utf-8"))
+    for entry in document["files"]:
+        relative = Path(entry["path"])
+        source = REPO_ROOT / relative
         target = context / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
 
     assert provenance.verify_image_context(context, record) == []
+
+    current_failures = provenance.verify_image_context(REPO_ROOT, record)
+    assert len(current_failures) == 2
+    assert (
+        "image carries an unrecorded file: "
+        "src/jspace_observation/jlens_s3_protocol.py"
+    ) in current_failures
+    assert any(failure.startswith("bundle digest is ") for failure in current_failures)
 
 
 def test_the_committed_record_matches_the_frozen_protocol():
