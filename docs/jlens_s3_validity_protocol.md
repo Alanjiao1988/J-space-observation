@@ -38,9 +38,12 @@ poetry data are excluded.
 
 The model-free rule at `$.upstream.counterparts` case-folds only the exact raw
 triples `(category, intermediate, answer)` and
-`(category, swap_to, swap_answer)`. It produces 29 oriented matches and 24
-unique unordered pairs. The two primary readout distributions and the causal
-benchmark retain separate roles.
+`(category, swap_to, swap_answer)`. If a base triple occurs more than once, its
+sole target representative is the first matching item in the official upstream
+array; this result-independent tie-break is necessary to make duplicate raw
+triples computable. The rule produces 29 oriented matches and 24 unique
+unordered pairs. The two primary readout distributions and the causal benchmark
+retain separate roles.
 
 ## Prospective stage boundary
 

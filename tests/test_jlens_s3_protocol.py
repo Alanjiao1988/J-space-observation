@@ -108,6 +108,43 @@ def test_model_free_counterpart_builder_reproduces_29_and_24() -> None:
     assert len({row["unordered_pair_id"] for row in built["unordered_pairs"]}) == 24
 
 
+def test_counterpart_duplicate_base_triple_uses_first_official_item() -> None:
+    items = [
+        {
+            "name": "first",
+            "category": "c",
+            "intermediate": "base",
+            "answer": "answer",
+            "swap_to": "none",
+            "swap_answer": "none",
+        },
+        {
+            "name": "duplicate",
+            "category": "c",
+            "intermediate": "BASE",
+            "answer": "ANSWER",
+            "swap_to": "none",
+            "swap_answer": "none",
+        },
+        {
+            "name": "source",
+            "category": "c",
+            "intermediate": "other",
+            "answer": "other-answer",
+            "swap_to": "base",
+            "swap_answer": "answer",
+        },
+    ]
+    built = s3.build_counterparts(items)
+    assert built["oriented_matches"] == (
+        {
+            "source_item_id": "source",
+            "counterpart_item_id": "first",
+            "unordered_pair_id": hashlib.sha256(b"first\nsource").hexdigest(),
+        },
+    )
+
+
 def test_schema_is_closed_and_markdown_crosswalk_is_complete(
     protocol: dict, schema: dict
 ) -> None:

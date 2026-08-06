@@ -1106,7 +1106,7 @@
     "authorship": "Anthropic-authored synthetic public data",
     "commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
     "counterparts": {
-      "matching_rule": "Exact Python str.casefold triples (category, intermediate, answer) matched against (category, swap_to, swap_answer), with no other normalization.",
+      "matching_rule": "Exact Python str.casefold triples (category, intermediate, answer) matched against (category, swap_to, swap_answer), with no other normalization; when a base triple occurs more than once, the first item in the official upstream array is its sole representative.",
       "oriented_matches": 29,
       "unique_unordered_pairs": 24,
       "unordered_pair_id": "SHA-256 of the two item names sorted by UTF-8 bytes and joined by one LF byte."

@@ -142,6 +142,15 @@ EXPECTED_REVIEW_QUESTIONS = (
     "Are development and confirmation operationally separated?",
     "Can every stated result be reconstructed from the planned row-level pack?",
 )
+COUNTERPART_MATCHING_RULE = (
+    "Exact Python str.casefold triples (category, intermediate, answer) matched "
+    "against (category, swap_to, swap_answer), with no other normalization; "
+    "when a base triple occurs more than once, the first item in the official "
+    "upstream array is its sole representative."
+)
+COUNTERPART_PAIR_ID_RULE = (
+    "SHA-256 of the two item names sorted by UTF-8 bytes and joined by one LF byte."
+)
 
 OUTPUT_COLUMNS = {
     "e0_item": (
@@ -1120,7 +1129,7 @@ def deterministic_gram_matched_pairs(
 def build_counterparts(items: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """Build exact model-free oriented and unique probe-swap counterparts."""
 
-    source_index: dict[tuple[str, str, str], list[str]] = {}
+    source_index: dict[tuple[str, str, str], str] = {}
     by_name: dict[str, Mapping[str, Any]] = {}
     fields = ("name", "category", "intermediate", "answer", "swap_to", "swap_answer")
     for item in items:
@@ -1131,30 +1140,30 @@ def build_counterparts(items: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
             raise ProtocolError(f"duplicate probe-swap name: {name}")
         by_name[name] = item
         key = tuple(str(item[field]).casefold() for field in ("category", "intermediate", "answer"))
-        source_index.setdefault(key, []).append(name)
+        source_index.setdefault(key, name)
 
     oriented: list[dict[str, str]] = []
     unique: dict[str, dict[str, str]] = {}
     for source_name in sorted(by_name):
         item = by_name[source_name]
         key = tuple(str(item[field]).casefold() for field in ("category", "swap_to", "swap_answer"))
-        for counterpart_name in sorted(source_index.get(key, ())):
-            if counterpart_name == source_name:
-                continue
-            names = sorted((source_name, counterpart_name), key=lambda value: value.encode("utf-8"))
-            pair_id = hashlib.sha256((names[0] + "\n" + names[1]).encode("utf-8")).hexdigest()
-            oriented.append(
-                {
-                    "source_item_id": source_name,
-                    "counterpart_item_id": counterpart_name,
-                    "unordered_pair_id": pair_id,
-                }
-            )
-            unique[pair_id] = {
-                "first_item_id": names[0],
-                "second_item_id": names[1],
+        counterpart_name = source_index.get(key)
+        if counterpart_name is None or counterpart_name == source_name:
+            continue
+        names = sorted((source_name, counterpart_name), key=lambda value: value.encode("utf-8"))
+        pair_id = hashlib.sha256((names[0] + "\n" + names[1]).encode("utf-8")).hexdigest()
+        oriented.append(
+            {
+                "source_item_id": source_name,
+                "counterpart_item_id": counterpart_name,
                 "unordered_pair_id": pair_id,
             }
+        )
+        unique[pair_id] = {
+            "first_item_id": names[0],
+            "second_item_id": names[1],
+            "unordered_pair_id": pair_id,
+        }
     oriented.sort(
         key=lambda row: (
             row["source_item_id"],
@@ -1463,6 +1472,10 @@ def validate_protocol_semantics(protocol: Mapping[str, Any]) -> None:
         raise ProtocolError("oriented counterpart count drift")
     if upstream["counterparts"]["unique_unordered_pairs"] != 24:
         raise ProtocolError("unordered counterpart count drift")
+    if upstream["counterparts"]["matching_rule"] != COUNTERPART_MATCHING_RULE:
+        raise ProtocolError("counterpart matching rule drift")
+    if upstream["counterparts"]["unordered_pair_id"] != COUNTERPART_PAIR_ID_RULE:
+        raise ProtocolError("counterpart pair-ID rule drift")
 
     identities = protocol["identities"]
     model = identities["target_model"]
@@ -1861,6 +1874,8 @@ __all__ = [
     "BOOTSTRAP_REPLICATES",
     "BOOTSTRAP_SEED",
     "BANDS",
+    "COUNTERPART_MATCHING_RULE",
+    "COUNTERPART_PAIR_ID_RULE",
     "FLOORS",
     "GRAM_TOLERANCE",
     "HARD_GATES",

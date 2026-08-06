@@ -53,7 +53,7 @@
   "registered_model_free_facts": {
     "probe_swap_oriented_counterpart_matches": 29,
     "probe_swap_unique_unordered_counterpart_pairs": 24,
-    "counterpart_rule": "Exact case-folded (category, intermediate, answer) matched against (category, swap_to, swap_answer); unordered pair IDs deduplicate reverse orientations."
+    "counterpart_rule": "Exact case-folded (category, intermediate, answer) matched against (category, swap_to, swap_answer); if a base triple occurs more than once, the first item in the official upstream array is its sole representative; unordered pair IDs deduplicate reverse orientations."
   },
   "scope": {
     "included": [
