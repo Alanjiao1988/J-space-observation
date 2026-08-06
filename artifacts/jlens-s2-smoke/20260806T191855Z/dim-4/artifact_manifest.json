@@ -1,0 +1,30 @@
+{
+  "complete": true,
+  "create_only": true,
+  "files": [
+    {
+      "bytes": 254812607,
+      "relative_path": "smoke-1.pt",
+      "sha256": "692b791265eceea78811528101307fcd335db37ab82c197f8b82414063c58c31",
+      "written_order": 1
+    },
+    {
+      "bytes": 254812607,
+      "relative_path": "smoke-2.pt",
+      "sha256": "053315b1ce18a2e4bdaade949a72234ad7ff1583771ef4541b4fde54d741fa69",
+      "written_order": 2
+    },
+    {
+      "bytes": 13685,
+      "relative_path": "smoke_attempt.json",
+      "sha256": "aed532aa162c36c5deef00a31eeb3ddcc521fd3a9b11a27b9ca6f6657f86ce8f",
+      "written_order": 3
+    }
+  ],
+  "image_digest": "sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+  "manifest_written_last": true,
+  "protocol_sha256": "e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2",
+  "schema_version": "jlens-s2-runtime-pack/v1",
+  "source_commit": "06e1604cd8633ecdc3267eac19ff529b2e5d3f83",
+  "stage": "S2-T0-smoke"
+}

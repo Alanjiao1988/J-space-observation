@@ -1,0 +1,92 @@
+{
+  "attempts": {
+    "1": {
+      "artifact_manifest_sha256": "2abfbc577481636cc0d8b01823dc16349e0d50ebc08f2f21a94ebe7ffae48e94",
+      "execution": "job-js-s2-smoke-d1-06e1604c-xz757ng",
+      "job": "job-js-s2-smoke-d1-06e1604c",
+      "max_abs_vs_dim1": 0.0,
+      "max_relative_frobenius_vs_dim1": 0.0,
+      "min_cosine_vs_dim1": 1.0000893358078833,
+      "peak_reserved_ratio": 0.24908097250175568,
+      "seconds_per_prompt": 74.06789781899897,
+      "smoke_attempt_sha256": "7d0bea40f48ed1fc9954a10ed86300d0e5517519fecebf21b10123099757c3ac",
+      "status": "success"
+    },
+    "2": {
+      "artifact_manifest_sha256": "ededd9d30232b771f7cb34a56c51389418eb97e78e4a860d31779208a9ee310b",
+      "execution": "job-js-s2-smoke-d2-06e1604c-oi4uia2",
+      "job": "job-js-s2-smoke-d2-06e1604c",
+      "max_abs_vs_dim1": 0.007557392120361328,
+      "max_relative_frobenius_vs_dim1": 0.005106734264999694,
+      "min_cosine_vs_dim1": 1.0000840396167352,
+      "peak_reserved_ratio": 0.26125882246781934,
+      "seconds_per_prompt": 39.30507570100008,
+      "smoke_attempt_sha256": "bc8076c3f62a804073ad3323a00ef2fa42187962294ce3f0ff5e06ca75bf621c",
+      "status": "success"
+    },
+    "4": {
+      "artifact_manifest_sha256": "01a640e02f391108f983c951c0b09c3f16e6be90e3b2f195facbe8ad6edeb9c6",
+      "execution": "job-js-s2-smoke-d4-06e1604c-n4js2qm",
+      "job": "job-js-s2-smoke-d4-06e1604c",
+      "max_abs_vs_dim1": 0.006994366645812988,
+      "max_relative_frobenius_vs_dim1": 0.005207016017318436,
+      "min_cosine_vs_dim1": 1.0000837571336112,
+      "peak_reserved_ratio": 0.3127322089223152,
+      "seconds_per_prompt": 35.40195593000135,
+      "smoke_attempt_sha256": "aed532aa162c36c5deef00a31eeb3ddcc521fd3a9b11a27b9ca6f6657f86ce8f",
+      "status": "success"
+    },
+    "8": {
+      "artifact_manifest_sha256": "10adf25476081f03c3d9b283cecae79791b079572927ad63fd967566cc7b6029",
+      "execution": "job-js-s2-smoke-d8-06e1604c-7dr6ov4",
+      "job": "job-js-s2-smoke-d8-06e1604c",
+      "max_abs_vs_dim1": 0.008046209812164307,
+      "max_relative_frobenius_vs_dim1": 0.005140707802876319,
+      "min_cosine_vs_dim1": 1.0000816118501932,
+      "peak_reserved_ratio": 0.3977260689947389,
+      "seconds_per_prompt": 32.92807295500006,
+      "smoke_attempt_sha256": "d37db04a1d2c5a668fdc305e1d3814627369fa96455f43984a4054e5a9e375e7",
+      "status": "success"
+    }
+  },
+  "blob_prefix": "jlens-s2/smoke/20260806T191855Z",
+  "image_digest": "sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+  "operations": {
+    "benchmark_model_operations": 0,
+    "benchmark_tokenizer_operations": 0,
+    "j_lens_jacobian_for_prompt_calls": 8,
+    "target_model_loads": 4,
+    "target_tokenizer_loads": 4
+  },
+  "planner": {
+    "export_reserve_seconds": 900,
+    "fit_budget_seconds": 4410.0,
+    "maximum_subshard_size": 59,
+    "observed_seconds_per_prompt": 74.06789781899897,
+    "safety_factor": 0.7,
+    "subshard_sizes": [
+      59,
+      59,
+      59,
+      59,
+      59,
+      49
+    ],
+    "timeout_seconds": 7200,
+    "total_prompts": 344
+  },
+  "schema_version": "jlens-s2-smoke-verification-receipt/v1",
+  "selected_configuration": {
+    "artifact_manifest_sha256": "fdc46b33324d5a3488b8d75d5bad8501e4694e97df5227bee277926de1a84dd9",
+    "blob": "jlens-s2/smoke/20260806T191855Z/selection/selected_configuration.json",
+    "bytes": 121097,
+    "selected_dim_batch": 1,
+    "sha256": "44720471570b63bff6eda6f8c4df56c5703adf5c22803d4968eb1a401df02440"
+  },
+  "verification": {
+    "all_artifact_manifest_objects_verified": true,
+    "read_only_export_execution": "job-js-s2-smoke-exp-06e1604c-ntzyhil",
+    "read_only_export_job": "job-js-s2-smoke-exp-06e1604c",
+    "verified_object_count": 13
+  }
+}
