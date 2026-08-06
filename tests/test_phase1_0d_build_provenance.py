@@ -7,6 +7,7 @@ whether any image was ever built, and nothing about the model.
 from __future__ import annotations
 
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -152,13 +153,27 @@ def test_a_record_carrying_a_stale_protocol_hash_is_refused(tmp_path):
         provenance.verify_image_context(root, record)
 
 
-def test_the_committed_record_is_the_hash_of_the_committed_source():
-    """The point of the whole tool: the record must describe this repository."""
+def test_the_committed_record_is_the_hash_of_the_committed_source(tmp_path):
+    """The record must describe the bytes in the actual Phase 1.0D context."""
 
     record = REPO_ROOT / provenance.PROVENANCE_FILENAME
     if not record.exists():
         pytest.skip("the provenance record has not been emitted from Azure yet")
-    assert provenance.verify_image_context(REPO_ROOT, record) == []
+
+    excluded = "src/jspace_observation/jlens_s3_protocol.py"
+    dockerignore = (REPO_ROOT / ".dockerignore").read_text(encoding="utf-8").splitlines()
+    assert excluded in dockerignore
+
+    context = tmp_path / "phase1-0d-context"
+    for source in provenance.resolve_bundle_files(REPO_ROOT):
+        relative = source.relative_to(REPO_ROOT)
+        if relative.as_posix() == excluded:
+            continue
+        target = context / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+
+    assert provenance.verify_image_context(context, record) == []
 
 
 def test_the_committed_record_matches_the_frozen_protocol():

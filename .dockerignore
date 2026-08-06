@@ -92,3 +92,6 @@ huggingface/
 
 # Docs and CI (not needed at runtime)
 .github/
+
+# Design-only S3 validator; never add it to the frozen Phase 1.0D image context.
+src/jspace_observation/jlens_s3_protocol.py
