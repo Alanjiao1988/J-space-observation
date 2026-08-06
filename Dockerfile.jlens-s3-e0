@@ -1,0 +1,49 @@
+ARG S2_BASE_IMAGE
+FROM ${S2_BASE_IMAGE}
+
+ARG PROJECT_COMMIT
+ARG S3_PROTOCOL_SHA256=bb07dc3be90539e88ff8ada8adee879da747ec5b0b0409499b9809f259df4625
+ARG E0_SCHEMA_SHA256=9fdb9a45b78bae98ab72e1ffb9eb5b757de889e27b05f799e175f67a82dfbb7c
+
+LABEL org.opencontainers.image.title="J-space frozen lens-free S3 Stage E0"
+LABEL org.opencontainers.image.revision="${PROJECT_COMMIT}"
+LABEL io.jspace.s3.protocol-sha256="${S3_PROTOCOL_SHA256}"
+LABEL io.jspace.s3.e0-schema-sha256="${E0_SCHEMA_SHA256}"
+LABEL io.jspace.s3.lens-operations="0"
+
+USER root
+WORKDIR /workspace/repo
+
+COPY docs/jlens_s3_e0_pack.schema.json /workspace/repo/docs/
+COPY docs/jlens_s3_validity_protocol.json /workspace/repo/docs/
+COPY docs/jlens_s3_validity_protocol.schema.json /workspace/repo/docs/
+COPY docs/jlens_s3_validity_protocol.md /workspace/repo/docs/
+COPY scripts/jlens_s3_e0.py /workspace/repo/scripts/
+COPY scripts/jlens_s3_e0_lock.py /workspace/repo/scripts/
+COPY src/jspace_observation/jlens_s3_e0_runtime.py /workspace/repo/src/jspace_observation/
+COPY src/jspace_observation/jlens_s3_protocol.py /workspace/repo/src/jspace_observation/
+COPY third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/PROVENANCE.json \
+    /workspace/repo/third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/
+COPY third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/LICENSE \
+    /workspace/repo/third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/
+COPY third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/README.md \
+    /workspace/repo/third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/
+COPY third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/lens-eval-multihop.json \
+    /workspace/repo/third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/
+COPY third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/lens-eval-order-ops.json \
+    /workspace/repo/third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/
+COPY third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/experiments/README.md \
+    /workspace/repo/third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/experiments/
+COPY third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/experiments/probe-swap.json \
+    /workspace/repo/third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/experiments/
+
+RUN test -n "${PROJECT_COMMIT}" \
+    && test "$(sha256sum docs/jlens_s3_validity_protocol.json | cut -d' ' -f1)" \
+        = "${S3_PROTOCOL_SHA256}" \
+    && test "$(sha256sum docs/jlens_s3_e0_pack.schema.json | cut -d' ' -f1)" \
+        = "${E0_SCHEMA_SHA256}" \
+    && chown -R 0:0 /workspace/repo \
+    && chmod -R a-w /workspace/repo
+
+USER 10001:10001
+CMD ["python", "/workspace/repo/scripts/jlens_s3_e0.py"]

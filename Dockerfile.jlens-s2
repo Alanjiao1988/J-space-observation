@@ -1,0 +1,40 @@
+FROM acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens@sha256:a15016dfd025cb4e5dc166638129cc4abf7895cdddbbc1b7638672aab7a3524f
+
+ARG PROJECT_COMMIT
+ARG S2_PROTOCOL_SHA256=e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2
+ARG S2_CORPUS_MANIFEST_SHA256=a7e1e721670c2e03619b914bc8d492f1d2e680f5e11afe5d74ddfb3edef14180
+
+LABEL org.opencontainers.image.title="J-space full-layer S2 production"
+LABEL org.opencontainers.image.revision="${PROJECT_COMMIT}"
+LABEL io.jspace.s2.protocol-sha256="${S2_PROTOCOL_SHA256}"
+LABEL io.jspace.s2.corpus-manifest-sha256="${S2_CORPUS_MANIFEST_SHA256}"
+LABEL io.jspace.s2.source-layers="0-26"
+LABEL io.jspace.s2.target-layer="27"
+
+USER root
+WORKDIR /workspace/repo
+
+COPY docs/jlens_s2_artifacts.schema.json /workspace/repo/docs/
+COPY docs/jlens_s2_protocol.json /workspace/repo/docs/
+COPY docs/jlens_s2_protocol.schema.json /workspace/repo/docs/
+COPY data/jlens_s2_wikitext /workspace/repo/data/jlens_s2_wikitext
+COPY scripts/jlens_s2_analysis.py /workspace/repo/scripts/
+COPY scripts/jlens_s2_model_snapshot.py /workspace/repo/scripts/
+COPY scripts/jlens_s2_runtime.py /workspace/repo/scripts/
+COPY src/jspace_observation/jlens_s2_corpus.py /workspace/repo/src/jspace_observation/
+COPY src/jspace_observation/jlens_s2_protocol.py /workspace/repo/src/jspace_observation/
+COPY src/jspace_observation/jlens_s2_runtime.py /workspace/repo/src/jspace_observation/
+
+RUN test -n "${PROJECT_COMMIT}" \
+    && test "$(sha256sum docs/jlens_s2_protocol.json | cut -d' ' -f1)" \
+        = "${S2_PROTOCOL_SHA256}" \
+    && test "$(sha256sum data/jlens_s2_wikitext/corpus_manifest.json | cut -d' ' -f1)" \
+        = "${S2_CORPUS_MANIFEST_SHA256}" \
+    && python scripts/jlens_s2_model_snapshot.py --output /workspace/model \
+    && chown -R 0:0 /workspace/repo /workspace/model \
+    && chmod -R a-w /workspace/repo /workspace/model
+
+ENV RESULTS_DIR=/workspace/runtime/results
+
+USER 10001:10001
+CMD ["python", "/workspace/repo/scripts/jlens_s2_runtime.py", "--help"]
