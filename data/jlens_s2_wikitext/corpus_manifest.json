@@ -1,0 +1,85 @@
+{
+  "dataset": {
+    "configuration": "wikitext-103-raw-v1",
+    "files": [
+      {
+        "bytes": 156987808,
+        "path": "wikitext-103-raw-v1/train-00000-of-00002.parquet",
+        "sha256": "74da360f23826045b3e6ac6375411fdb15f003030aa74f2596ed08b857cb9212"
+      },
+      {
+        "bytes": 157088770,
+        "path": "wikitext-103-raw-v1/train-00001-of-00002.parquet",
+        "sha256": "ba090ac30dbf5461e8dcbdd1a1b8e6f3cf9c2c756d64f0c1220450acd514f720"
+      }
+    ],
+    "id": "Salesforce/wikitext",
+    "license": {
+      "attribution": "WikiText by Salesforce Research, derived from Wikipedia contributors",
+      "bytes": 10464,
+      "license_id": "cc-by-sa-3.0,gfdl",
+      "path": "upstream_README.md",
+      "sha256": "d5aabf145d341366745ac703b5844c442c143943b6c77929481395c822b1c28c",
+      "share_alike": true
+    },
+    "revision": "b08601e04326c79dfdd32d625aee71d232d685c3",
+    "split": "train"
+  },
+  "exclusion_audit": {
+    "bytes": 289526517,
+    "path": "exclusion_audit.jsonl",
+    "sha256": "a4d50d946e50f4e911db012bdac9e0fb13a7e65aa3a6e035249118ac16d4f8dc"
+  },
+  "library_versions": [
+    {
+      "name": "datasets",
+      "version": "5.0.1"
+    },
+    {
+      "name": "huggingface_hub",
+      "version": "1.16.1"
+    },
+    {
+      "name": "pyarrow",
+      "version": "25.0.0"
+    },
+    {
+      "name": "tokenizers",
+      "version": "0.22.2"
+    },
+    {
+      "name": "transformers",
+      "version": "5.9.0"
+    }
+  ],
+  "protected_prompt_bank": {
+    "bytes": 1674877,
+    "path": "protected_prompt_bank.jsonl",
+    "sha256": "1056a1458a4d2a911159a03229c957d4c46947b2ae0b91fd197f2bb5b4a7a9fc"
+  },
+  "role_counts": {
+    "A": 600,
+    "B": 600,
+    "heldout": 200,
+    "smoke": 2
+  },
+  "rows": {
+    "bytes": 2774340,
+    "path": "corpus_rows.jsonl",
+    "sha256": "63ed70ef0a7457f47a77a0d96855a2aeb605026c99a6708b6cf8d2f630b1445d"
+  },
+  "schema_version": "jlens-s2-corpus-manifest/v1",
+  "selection": {
+    "assignment_seed": "jlens-s2-wikitext-roles-2026-08-06",
+    "eligible_unique_rows": 378511,
+    "model_signals_inspected": false,
+    "role_key_rule": "SHA-256(UTF8(seed)||NUL||UTF8(row_id)||NUL||ASCII(raw_text_sha256)||NUL||ASCII(token_ids_sha256))",
+    "scanned_rows": 1801350
+  },
+  "tokenizer": {
+    "force_bos": true,
+    "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+    "trust_remote_code": false
+  }
+}

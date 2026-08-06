@@ -1,0 +1,66 @@
+{
+  "complete": true,
+  "create_only": true,
+  "files": [
+    {
+      "bytes": 1143,
+      "relative_path": "LICENSE.md",
+      "sha256": "ee2d05361377a1dd8e8a72abb07f278f42c76d6880a7ece4cff8dc2b437364ff",
+      "written_order": 1
+    },
+    {
+      "bytes": 2426,
+      "relative_path": "corpus_manifest.json",
+      "sha256": "a7e1e721670c2e03619b914bc8d492f1d2e680f5e11afe5d74ddfb3edef14180",
+      "written_order": 2
+    },
+    {
+      "bytes": 2774340,
+      "relative_path": "corpus_rows.jsonl",
+      "sha256": "63ed70ef0a7457f47a77a0d96855a2aeb605026c99a6708b6cf8d2f630b1445d",
+      "written_order": 3
+    },
+    {
+      "bytes": 289526517,
+      "relative_path": "exclusion_audit.jsonl",
+      "sha256": "a4d50d946e50f4e911db012bdac9e0fb13a7e65aa3a6e035249118ac16d4f8dc",
+      "written_order": 4
+    },
+    {
+      "bytes": 985,
+      "relative_path": "exclusion_audit_summary.json",
+      "sha256": "f5f0eb133ebb8120d1364215561bf116f27b5dcbd603e19910d5dd0e6bed17e4",
+      "written_order": 5
+    },
+    {
+      "bytes": 886,
+      "relative_path": "execution_receipt.json",
+      "sha256": "e2e88ae696de95b2cf42313c3f95b2c239ae4b32943e1b5510c341ca02463d90",
+      "written_order": 6
+    },
+    {
+      "bytes": 1674877,
+      "relative_path": "protected_prompt_bank.jsonl",
+      "sha256": "1056a1458a4d2a911159a03229c957d4c46947b2ae0b91fd197f2bb5b4a7a9fc",
+      "written_order": 7
+    },
+    {
+      "bytes": 1111,
+      "relative_path": "source_resolution.json",
+      "sha256": "da2af1104ac3cc1b6386393465c04e8b22025665fe1f37845f378bfbeafc2290",
+      "written_order": 8
+    },
+    {
+      "bytes": 10464,
+      "relative_path": "upstream_README.md",
+      "sha256": "d5aabf145d341366745ac703b5844c442c143943b6c77929481395c822b1c28c",
+      "written_order": 9
+    }
+  ],
+  "image_digest": "sha256:e13e97f723e8d84d98994cd24cb5953c34f35d26a5c7dea61df7b66d1d479937",
+  "manifest_written_last": true,
+  "protocol_sha256": "e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2",
+  "schema_version": "jlens-s2-corpus-package-manifest/v1",
+  "source_commit": "4b0ea1c95d5c7185b8da8f745de14f5d4d149367",
+  "stage": "S2-P1-corpus-freeze"
+}

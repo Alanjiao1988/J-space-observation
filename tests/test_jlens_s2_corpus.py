@@ -337,3 +337,51 @@ def test_source_contract_correction_and_protocol_bytes_are_frozen() -> None:
     assert s2.sha256_file(
         ROOT / "docs" / "jlens_s2_protocol.json"
     ) == "e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2"
+
+
+def test_committed_corpus_reconstructs_roles_hashes_and_exclusions() -> None:
+    corpus_root = ROOT / "data" / "jlens_s2_wikitext"
+    rows_path = corpus_root / "corpus_rows.jsonl"
+    rows = [
+        json.loads(line)
+        for line in rows_path.read_text(encoding="utf-8").splitlines()
+        if line
+    ]
+    manifest = s2.load_json(corpus_root / "corpus_manifest.json")
+    report = s2.validate_corpus_manifest(manifest, rows)
+    assert report == {
+        "dataset_revision": "b08601e04326c79dfdd32d625aee71d232d685c3",
+        "role_counts": {"A": 600, "B": 600, "heldout": 200, "smoke": 2},
+        "row_count": 1402,
+        "rows_sha256": "63ed70ef0a7457f47a77a0d96855a2aeb605026c99a6708b6cf8d2f630b1445d",
+        "unique_token_sequences": 1402,
+    }
+
+    bank_rows = [
+        json.loads(line)
+        for line in (corpus_root / "protected_prompt_bank.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line
+    ]
+    assert len(bank_rows) == 1835
+    overlap_bank = corpus.bank_for_overlap(bank_rows)
+    assert all(
+        not s2.overlap_matches(row["raw_text"].encode("utf-8"), overlap_bank)
+        for row in rows
+    )
+
+    exclusions = s2.load_json(corpus_root / "exclusion_audit_summary.json")
+    assert (
+        sum(
+            row["count"]
+            for row in exclusions["category_summary"].values()
+        )
+        + len(rows)
+        == 1_801_350
+    )
+    receipt = s2.load_json(corpus_root / "execution_receipt.json")
+    assert receipt["benchmark_model_operations"] == 0
+    assert receipt["benchmark_tokenizer_operations"] == 0
+    assert receipt["corpus_model_operations"] == 0
+    assert receipt["lens_operations"] == 0

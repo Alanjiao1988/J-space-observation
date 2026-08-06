@@ -1,0 +1,26 @@
+{
+  "benchmark_model_operations": 0,
+  "benchmark_tokenizer_operations": 0,
+  "corpus_model_operations": 0,
+  "dataset_revision": "b08601e04326c79dfdd32d625aee71d232d685c3",
+  "eligible_unique_rows": 378511,
+  "lens_operations": 0,
+  "model_signals_inspected": false,
+  "role_counts": {
+    "A": 600,
+    "B": 600,
+    "heldout": 200,
+    "smoke": 2
+  },
+  "scanned_rows": 1801350,
+  "source_and_license_sealed_before_tokenizer": true,
+  "tokenizer": {
+    "add_bos_token": true,
+    "bos_token_id": 151646,
+    "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+    "tokenizer_config_cache_path": "/workspace/runtime/hf-cache/hub/models--deepseek-ai--DeepSeek-R1-Distill-Qwen-1.5B/snapshots/ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562/tokenizer_config.json",
+    "trust_remote_code": false
+  },
+  "tokenizer_constructions": 1
+}

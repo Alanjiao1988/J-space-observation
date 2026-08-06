@@ -1,0 +1,110 @@
+{
+  "acquisition": {
+    "blob_prefix": "jlens-s2/corpus/20260806T175724Z/final",
+    "end_time_utc": "2026-08-06T18:14:11Z",
+    "execution": "job-jspace-s2-corpus-4b0ea1c9-hcyl2wo",
+    "image_digest": "sha256:e13e97f723e8d84d98994cd24cb5953c34f35d26a5c7dea61df7b66d1d479937",
+    "image_source_commit": "4b0ea1c95d5c7185b8da8f745de14f5d4d149367",
+    "job": "job-jspace-s2-corpus-4b0ea1c9",
+    "start_time_utc": "2026-08-06T17:58:17Z",
+    "status": "Succeeded"
+  },
+  "dataset": {
+    "configuration": "wikitext-103-raw-v1",
+    "id": "Salesforce/wikitext",
+    "license_values": [
+      "cc-by-sa-3.0",
+      "gfdl"
+    ],
+    "revision": "b08601e04326c79dfdd32d625aee71d232d685c3",
+    "scanned_rows": 1801350,
+    "split": "train"
+  },
+  "files": {
+    "artifact_manifest.json": {
+      "bytes": 2159,
+      "sha256": "a181a861c15f24d61192c750b79d79567d94d43acb69f802c2abab912a9bb460"
+    },
+    "corpus_manifest.json": {
+      "bytes": 2426,
+      "sha256": "a7e1e721670c2e03619b914bc8d492f1d2e680f5e11afe5d74ddfb3edef14180"
+    },
+    "corpus_rows.jsonl": {
+      "bytes": 2774340,
+      "sha256": "63ed70ef0a7457f47a77a0d96855a2aeb605026c99a6708b6cf8d2f630b1445d"
+    },
+    "exclusion_audit.jsonl": {
+      "bytes": 289526517,
+      "sha256": "a4d50d946e50f4e911db012bdac9e0fb13a7e65aa3a6e035249118ac16d4f8dc"
+    },
+    "exclusion_audit_summary.json": {
+      "bytes": 985,
+      "sha256": "f5f0eb133ebb8120d1364215561bf116f27b5dcbd603e19910d5dd0e6bed17e4"
+    },
+    "execution_receipt.json": {
+      "bytes": 886,
+      "sha256": "e2e88ae696de95b2cf42313c3f95b2c239ae4b32943e1b5510c341ca02463d90"
+    },
+    "protected_prompt_bank.jsonl": {
+      "bytes": 1674877,
+      "sha256": "1056a1458a4d2a911159a03229c957d4c46947b2ae0b91fd197f2bb5b4a7a9fc"
+    },
+    "source_resolution.json": {
+      "bytes": 1111,
+      "sha256": "da2af1104ac3cc1b6386393465c04e8b22025665fe1f37845f378bfbeafc2290"
+    },
+    "upstream_README.md": {
+      "bytes": 10464,
+      "sha256": "d5aabf145d341366745ac703b5844c442c143943b6c77929481395c822b1c28c"
+    }
+  },
+  "operations": {
+    "benchmark_model_operations": 0,
+    "benchmark_tokenizer_operations": 0,
+    "corpus_model_operations": 0,
+    "corpus_tokenizer_constructions": 1,
+    "lens_operations": 0,
+    "model_signals_inspected": false
+  },
+  "prior_attempts": [
+    {
+      "blob_prefix": "jlens-s2/corpus/20260806T172525Z",
+      "execution": "job-jspace-s2-corpus-18274d4e-2kbgf2l",
+      "status": "Failed before tokenizer construction"
+    },
+    {
+      "blob_prefix": "jlens-s2/corpus/20260806T174244Z",
+      "execution": "job-jspace-s2-corpus-b77f7df6-i1qcwwm",
+      "status": "Failed after one tokenizer construction and before dataset scan"
+    }
+  ],
+  "schema_version": "jlens-s2-corpus-verification-receipt/v1",
+  "selection": {
+    "assignment_seed": "jlens-s2-wikitext-roles-2026-08-06",
+    "eligible_unique_rows": 378511,
+    "exclusion_counts": {
+      "duplicate_128_token_ids": 5287,
+      "eligible_unassigned_after_first_1402": 377109,
+      "protected_prompt_overlap": 18561,
+      "short_raw_text": 1390878,
+      "under_128_tokens": 8113
+    },
+    "protected_prompt_count": 1835,
+    "role_counts": {
+      "A": 600,
+      "B": 600,
+      "heldout": 200,
+      "smoke": 2
+    }
+  },
+  "verification": {
+    "all_ten_objects_verified": true,
+    "emitted_chunk_rows": 1494,
+    "end_time_utc": "2026-08-06T18:20:22Z",
+    "execution": "job-js-s2c-export-4b0ea1c9-lgdejpc",
+    "job": "job-js-s2c-export-4b0ea1c9",
+    "read_only_script_sha256": "10190ee5592d47c8c4995ddfe0d3162071de077f61fc7a095ccd7490b65c245c",
+    "start_time_utc": "2026-08-06T18:19:44Z",
+    "status": "Succeeded"
+  }
+}

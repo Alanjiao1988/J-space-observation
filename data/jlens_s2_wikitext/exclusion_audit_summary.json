@@ -1,0 +1,28 @@
+{
+  "bytes": 289526517,
+  "category_summary": {
+    "duplicate_128_token_ids": {
+      "count": 5287,
+      "ordered_rows_sha256": "46451e9f29a1addcb416bbddf31f7e782a86bc91f9edb77d174e8cfb18d193d1"
+    },
+    "eligible_unassigned_after_first_1402": {
+      "count": 377109,
+      "ordered_rows_sha256": "68fbb904a801d7197a0ce967a6ea0f487216e0a1cdeebd9eb6668671a81ec352"
+    },
+    "protected_prompt_overlap": {
+      "count": 18561,
+      "ordered_rows_sha256": "f6a890c084cdca1735928530b0f7243b985a67088c7ddb79fd52589d5a11c6bf"
+    },
+    "short_raw_text": {
+      "count": 1390878,
+      "ordered_rows_sha256": "b2803aa7f687f6ecee8b46cf40716bc1541075ed7905c44a6b51e2aea98f7da9"
+    },
+    "under_128_tokens": {
+      "count": 8113,
+      "ordered_rows_sha256": "13a9b83995d0017a90b282e70fae22a9950071214d236c06adde4f4f5b1a535e"
+    }
+  },
+  "excluded_rows": 1799948,
+  "path": "exclusion_audit.jsonl",
+  "sha256": "a4d50d946e50f4e911db012bdac9e0fb13a7e65aa3a6e035249118ac16d4f8dc"
+}

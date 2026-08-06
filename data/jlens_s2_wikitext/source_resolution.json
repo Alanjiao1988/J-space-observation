@@ -1,0 +1,36 @@
+{
+  "card_license_values": [
+    "cc-by-sa-3.0",
+    "gfdl"
+  ],
+  "configuration": "wikitext-103-raw-v1",
+  "dataset_id": "Salesforce/wikitext",
+  "dataset_revision": "b08601e04326c79dfdd32d625aee71d232d685c3",
+  "expected_train_rows": 1801350,
+  "files": [
+    {
+      "bytes": 156987808,
+      "path": "wikitext-103-raw-v1/train-00000-of-00002.parquet",
+      "sha256": "74da360f23826045b3e6ac6375411fdb15f003030aa74f2596ed08b857cb9212"
+    },
+    {
+      "bytes": 157088770,
+      "path": "wikitext-103-raw-v1/train-00001-of-00002.parquet",
+      "sha256": "ba090ac30dbf5461e8dcbdd1a1b8e6f3cf9c2c756d64f0c1220450acd514f720"
+    }
+  ],
+  "huggingface_hub_version": "1.16.1",
+  "license_notice": {
+    "bytes": 1143,
+    "path": "LICENSE.md",
+    "sha256": "ee2d05361377a1dd8e8a72abb07f278f42c76d6880a7ece4cff8dc2b437364ff"
+  },
+  "resolved_at_utc": "2026-08-06T17:58:46Z",
+  "split": "train",
+  "tokenizer_modules_loaded_before_resolution": 0,
+  "upstream_readme": {
+    "bytes": 10464,
+    "path": "upstream_README.md",
+    "sha256": "d5aabf145d341366745ac703b5844c442c143943b6c77929481395c822b1c28c"
+  }
+}
