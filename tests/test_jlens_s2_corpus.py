@@ -187,7 +187,7 @@ def test_scan_rejects_short_overlap_underlength_and_duplicate_rows(
 
 
 def test_build_corpus_manifest_validates_exact_rows(tmp_path: Path) -> None:
-    dataset = [_source_row(index) for index in range(1402)]
+    dataset = [_source_row(index) for index in range(1403)]
     scan = corpus.scan_and_assign(
         dataset,
         tokenizer=FakeTokenizer(),
@@ -221,8 +221,8 @@ def test_build_corpus_manifest_validates_exact_rows(tmp_path: Path) -> None:
         rows_path=rows_path,
         exclusion_path=tmp_path / "exclusion_audit.jsonl",
         protected_bank_path=bank_path,
-        eligible_unique_rows=1402,
-        scanned_rows=1402,
+        eligible_unique_rows=1403,
+        scanned_rows=1403,
         versions=[{"name": "synthetic", "version": "1"}],
     )
     assert manifest["rows"]["sha256"] == s2.sha256_file(rows_path)
