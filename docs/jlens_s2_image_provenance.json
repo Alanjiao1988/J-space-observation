@@ -1,0 +1,81 @@
+{
+  "base_image": {
+    "digest": "sha256:a15016dfd025cb4e5dc166638129cc4abf7895cdddbbc1b7638672aab7a3524f",
+    "repository": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens"
+  },
+  "build": {
+    "run_id": "cmb3",
+    "source_commit": "06e1604cd8633ecdc3267eac19ff529b2e5d3f83",
+    "source_tree": "28f6a3fdcdedc6c38c05e69ff2284fb2a77cb40f"
+  },
+  "image": {
+    "delete_enabled": false,
+    "digest": "sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+    "manifest_delete_enabled": false,
+    "manifest_write_enabled": false,
+    "repository": "j-space-observation-jlens-s2",
+    "tag": "06e1604cd8633ecdc3267eac19ff529b2e5d3f83",
+    "write_enabled": false
+  },
+  "model_snapshot": {
+    "file_count": 9,
+    "manifest_sha256": "1cdefe845504be7b6051b7b5dde4c56ae54cc7b8dbbb4ebe4c44e7bc89cdcb51",
+    "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+    "total_bytes": 3562046103
+  },
+  "operation_boundary": {
+    "benchmark_model_operations": 0,
+    "benchmark_tokenizer_operations": 0,
+    "corpus_tokenizer_constructions": 0,
+    "j_lens_operations": 0,
+    "target_model_loads": 0,
+    "target_tokenizer_loads": 0
+  },
+  "schema_version": "jlens-s2-image-provenance/v1",
+  "sealed_at_utc": "2026-08-06T19:16:27Z",
+  "source_bundle": {
+    "bytes": 4676769,
+    "file_count": 20,
+    "format": "ASCII jlens-s2-production-source-bundle-v1 plus LF, then for each UTF-8-lexicographically sorted path: UTF-8 path, NUL, ASCII decimal blob length, NUL, exact Git blob bytes",
+    "sha256": "87c8b38013485c84f03f573c5deeb7e1ccd61b2ce7eaab4108085c38262da2f4"
+  },
+  "source_files": {
+    "Dockerfile.jlens-s2": {
+      "bytes": 2009,
+      "sha256": "3aaec20e484b253789a44d1c56459f7ac71ffee39994c020e9e4e22467c60734"
+    },
+    "scripts/jlens_s2_analysis.py": {
+      "bytes": 19791,
+      "sha256": "56488da253280e257bb0fd2a1d637937f3102827b0033a1c5aebf1aa4d723377"
+    },
+    "scripts/jlens_s2_model_snapshot.py": {
+      "bytes": 2996,
+      "sha256": "745129a45d534e37a832f834dfc161f8f7a59ee018845156b74aa888f83680eb"
+    },
+    "scripts/jlens_s2_runtime.py": {
+      "bytes": 29095,
+      "sha256": "ecf3cf77e8e82fc625a353cd066fc601db76ec241718a6fcaebc37c25a0e1937"
+    },
+    "src/jspace_observation/jlens_s2_runtime.py": {
+      "bytes": 25949,
+      "sha256": "137036269b009c8078c4f723604e2e19ba99cb1f5af267ea0334baa4fcfd59cb"
+    }
+  },
+  "validation": {
+    "focused": {
+      "result": "144 passed",
+      "run_id": "cmb1"
+    },
+    "full": {
+      "failed": 2,
+      "passed": 3478,
+      "run_id": "cmb2",
+      "skipped": 15
+    },
+    "historical_failures": [
+      "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+      "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix"
+    ]
+  }
+}
