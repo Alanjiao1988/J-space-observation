@@ -27,7 +27,7 @@ EXPECTED_PROTOCOL_SHA256 = (
     "e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2"
 )
 EXPECTED_CORPUS_CONTRACT_SHA256 = (
-    "bde80360e5f0dda1701ebc41341bdc777416efcae43a4764493180e185008e6d"
+    "d1eccb2eb35da65f5c3cbb98ee4b6fbbe58de434fc5e6d420981367071706775"
 )
 EXPECTED_ARTIFACT_SCHEMA_SHA256 = (
     "36a5a5df70d859bfabc808ffb926bf61bc1738106650a58b9e62951966b3a2da"
@@ -227,7 +227,15 @@ def build_and_seal_protected_bank(
     )
     review_form = store.download_absolute(review_object)
     entries = list(corpus.repository_prompt_entries(PROJECT_ROOT, contract))
-    entries.extend(corpus.phase1_blob_prompt_entries(phase1_manifest, review_form))
+    entries.extend(
+        corpus.phase1_blob_prompt_entries(
+            phase1_manifest,
+            review_form,
+            selector_keys=contract["protected_prompt_bank"]["phase1_0d_blob"][
+                "selectors"
+            ],
+        )
+    )
     rows = corpus.prompt_bank_rows(entries)
     bank_dir.mkdir(parents=True, exist_ok=True)
     bank_path = bank_dir / "protected_prompt_bank.jsonl"

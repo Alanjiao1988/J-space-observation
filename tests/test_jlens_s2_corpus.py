@@ -116,10 +116,46 @@ def test_phase1_blob_source_fails_closed_on_manifest_or_object_drift() -> None:
             corpus.phase1_blob_prompt_entries(
                 manifest,
                 b'{"prompt_text":"synthetic"}\n',
+                selector_keys=["question"],
             )
         )
     with pytest.raises(corpus.CorpusAcquisitionError, match="manifest SHA"):
-        list(corpus.phase1_blob_prompt_entries(manifest + b"x", b""))
+        list(
+            corpus.phase1_blob_prompt_entries(
+                manifest + b"x",
+                b"",
+                selector_keys=["question"],
+            )
+        )
+
+
+def test_phase1_blob_extracts_the_frozen_question_field() -> None:
+    review = b'{"record_id":"r1","question":"exact question"}\n'
+    review_hash = s2.sha256_bytes(review)
+    manifest = s2.canonical_json_bytes(
+        {
+            "files": [
+                {"name": "03_review_form.jsonl", "sha256": review_hash}
+            ]
+        }
+    )
+    entries = list(
+        corpus.phase1_blob_prompt_entries(
+            manifest,
+            review,
+            selector_keys=["question"],
+            expected_manifest_sha256=s2.sha256_bytes(manifest),
+            expected_review_form_sha256=review_hash,
+        )
+    )
+    assert entries == [
+        (
+            "sealed Phase 1.0D prompt bank",
+            f"{corpus.PHASE1_SOURCE_MANIFEST_OBJECT}:03_review_form.jsonl:"
+            "1:question",
+            "exact question",
+        )
+    ]
 
 
 def test_scan_assigns_exact_roles_and_reconstructs_exclusion_rollups(
@@ -281,10 +317,10 @@ def test_acquisition_script_has_no_top_level_tokenizer_or_dataset_import() -> No
     assert top_level.isdisjoint(forbidden)
 
 
-def test_source_contract_remains_unchanged_after_protocol_freeze() -> None:
+def test_source_contract_correction_and_protocol_bytes_are_frozen() -> None:
     assert s2.sha256_file(
         ROOT / "docs" / "jlens_s2_corpus_source_contract.json"
-    ) == "bde80360e5f0dda1701ebc41341bdc777416efcae43a4764493180e185008e6d"
+    ) == "d1eccb2eb35da65f5c3cbb98ee4b6fbbe58de434fc5e6d420981367071706775"
     assert s2.sha256_file(
         ROOT / "docs" / "jlens_s2_protocol.json"
     ) == "e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2"

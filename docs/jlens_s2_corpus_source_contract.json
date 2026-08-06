@@ -42,8 +42,7 @@
       "manifest_sha256": "76accb0f675130989f3db698ecfeaa8736f288980026cdaca0e8413c05234536",
       "object": "phase1-headroom-confirmation/20260804T154518Z/03_review_form.jsonl",
       "selectors": [
-        "prompt_text",
-        "prompt"
+        "question"
       ]
     },
     "repository_sources": [

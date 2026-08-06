@@ -2,7 +2,7 @@ FROM python:3.11.15-bookworm@sha256:a8f8fbe1a0edc9e4dddafa64ba73f7e04be7be5ebc23
 
 ARG PROJECT_COMMIT
 ARG S2_PROTOCOL_SHA256=e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2
-ARG S2_CORPUS_CONTRACT_SHA256=bde80360e5f0dda1701ebc41341bdc777416efcae43a4764493180e185008e6d
+ARG S2_CORPUS_CONTRACT_SHA256=d1eccb2eb35da65f5c3cbb98ee4b6fbbe58de434fc5e6d420981367071706775
 
 LABEL org.opencontainers.image.title="J-space full-layer S2 corpus acquisition"
 LABEL org.opencontainers.image.revision="${PROJECT_COMMIT}"

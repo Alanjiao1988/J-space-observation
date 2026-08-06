@@ -219,8 +219,17 @@ def repository_prompt_entries(
 def phase1_blob_prompt_entries(
     manifest_bytes: bytes,
     review_form_bytes: bytes,
+    *,
+    selector_keys: Sequence[str],
+    expected_manifest_sha256: str = PHASE1_SOURCE_MANIFEST_SHA256,
+    expected_review_form_sha256: str = PHASE1_REVIEW_FORM_SHA256,
 ) -> Iterator[tuple[str, str, str]]:
-    if s2.sha256_bytes(manifest_bytes) != PHASE1_SOURCE_MANIFEST_SHA256:
+    if (
+        not selector_keys
+        or any(not isinstance(key, str) or not key for key in selector_keys)
+    ):
+        raise CorpusAcquisitionError("Phase 1.0D selectors must be nonempty strings")
+    if s2.sha256_bytes(manifest_bytes) != expected_manifest_sha256:
         raise CorpusAcquisitionError("Phase 1.0D source manifest SHA-256 mismatch")
     manifest = _strict_json_line(
         manifest_bytes.decode("utf-8"),
@@ -232,9 +241,9 @@ def phase1_blob_prompt_entries(
         for row in files or []
         if isinstance(row, Mapping)
     }
-    if expected.get("03_review_form.jsonl") != PHASE1_REVIEW_FORM_SHA256:
+    if expected.get("03_review_form.jsonl") != expected_review_form_sha256:
         raise CorpusAcquisitionError("Phase 1.0D review-form manifest binding drifted")
-    if s2.sha256_bytes(review_form_bytes) != PHASE1_REVIEW_FORM_SHA256:
+    if s2.sha256_bytes(review_form_bytes) != expected_review_form_sha256:
         raise CorpusAcquisitionError("Phase 1.0D review-form SHA-256 mismatch")
     found = 0
     for line_number, raw in enumerate(
@@ -243,7 +252,7 @@ def phase1_blob_prompt_entries(
         if not raw.strip():
             continue
         document = _strict_json_line(raw, f"Phase1.0D:{line_number}")
-        for key, value in _recursive_key_values(document, {"prompt", "prompt_text"}):
+        for key, value in _recursive_key_values(document, set(selector_keys)):
             found += 1
             yield (
                 "sealed Phase 1.0D prompt bank",
