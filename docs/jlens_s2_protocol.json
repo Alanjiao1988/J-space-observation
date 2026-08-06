@@ -1,0 +1,314 @@
+{
+  "authority": {
+    "authority_prompt": "docs/prompts/jlens_s2_full_layer_and_s3_e0_execution_prompt.md",
+    "authority_sha256": "4c982831bf5461f1b237ed0b6198f9cc1a6f36d330ca1960e7f8830a69b7f5ef",
+    "decision_log_prefix": {
+      "bytes": 144356,
+      "sha256": "e37299087788738009ad0264597c161fac536982869367916dc228cd744b3108"
+    },
+    "evidence_ledger_prefix": {
+      "bytes": 21347,
+      "last_pre_round_row": "EV-0014",
+      "sha256": "16121192cf4ca0ee507a310356b0d9bb6cc7770323fa650867d8a4c65bb1bb85"
+    },
+    "frozen_s3": {
+      "protocol_sha256": "bb07dc3be90539e88ff8ada8adee879da747ec5b0b0409499b9809f259df4625",
+      "schema_sha256": "5d6e2fc33771b427130bd1dbe94c79cdf6d5827288b96929352c0caa793acbf1",
+      "source_bundle_sha256": "7e837b0cfdb0c9a12eb1b6c9067751c7cd4262cc18c5a6f17f4a6505f25b7410"
+    },
+    "phase1_protected_rollups": {
+      "v1": "436ed331c7dd53fa6387d6b52447bc72edf166bbb3640b7f7723a8766bdf51dd",
+      "v2": "ef5a417c572f7da94a562411b752d74b48da2e28aa3aa1491db9bc34dfbde82a"
+    },
+    "starting_commit": "72336f822a8ffdbd2e0caf40f4a62c68cce68156",
+    "starting_tree": "d0592ae0b0edb62b4f082c0a12a9bcafe5693ee5"
+  },
+  "claim_boundary": {
+    "establishes": [
+      "engineering transport, numerical, convergence, runtime, memory, and cost facts for the registered full-layer S2 lenses",
+      "selected-public-item behavioral eligibility and frozen development/confirmation assignment when E0 completes"
+    ],
+    "limitations": [
+      "WikiText is a public Wikipedia-derived proxy, not the target model's known training distribution",
+      "two arm fits provide one independent difference trajectory, not a sampling distribution",
+      "matrix convergence and heldout apply stability are engineering evidence only",
+      "E0 estimates eligibility only on selected official public items",
+      "public benchmark labels are not private or researcher-blind",
+      "the independent Phase 1.0D capacity block remains unchanged"
+    ],
+    "prohibits": [
+      "hidden reasoning claim",
+      "internal workspace claim",
+      "J-space claim",
+      "J-lens validity classification before complete E1 and E2",
+      "RQ2 authorization"
+    ]
+  },
+  "corpus": {
+    "assignment_seed": "jlens-s2-wikitext-roles-2026-08-06",
+    "dataset": {
+      "configuration": "wikitext-103-raw-v1",
+      "id": "Salesforce/wikitext",
+      "immutable_revision_required": true,
+      "license_bytes_required_before_tokenizer": true,
+      "split": "train"
+    },
+    "eligibility": {
+      "actual_sequence": "first 128 token IDs supplied by the pinned force_bos=true adapter",
+      "duplicate_token_sequences": "reject",
+      "minimum_raw_strip_characters": 600,
+      "minimum_untruncated_tokens": 128,
+      "model_signals_forbidden": true,
+      "source_text_mutation": "forbidden"
+    },
+    "exact_storage": {
+      "attribution_and_share_alike_notice_required": true,
+      "directory": "data/jlens_s2_wikitext",
+      "exact_text_or_lossless_reference_required": true,
+      "repository_license_compatibility_required": true
+    },
+    "overlap": {
+      "bank_contract": "docs/jlens_s2_corpus_source_contract.json",
+      "operands": "exact UTF-8 prompt bytes without normalization",
+      "rule": "reject iff candidate equals protected, candidate is a contiguous substring of protected, or protected is a contiguous substring of candidate",
+      "symmetric": true
+    },
+    "role_counts": {
+      "A": 600,
+      "B": 600,
+      "heldout": 200,
+      "smoke": 2
+    },
+    "role_key_bytes": "UTF8(seed) || NUL || UTF8(immutable row ID) || NUL || ASCII(raw-text SHA-256) || NUL || ASCII(token-ID SHA-256)",
+    "role_order": [
+      "A",
+      "B",
+      "heldout",
+      "smoke"
+    ],
+    "sort": "ascending hexadecimal role key with immutable row ID as collision-only tie-break",
+    "token_ids_hash_bytes": "ASCII compact JSON integer array with separators comma and colon and no trailing newline"
+  },
+  "e0": {
+    "expected_item_counts": {
+      "causal_swap": 90,
+      "multihop": 93,
+      "order_ops": 55
+    },
+    "floor_counts": {
+      "causal_swap_confirmation": 30,
+      "multihop_confirmation": 20,
+      "order_ops_confirmation": 20,
+      "pooled_readout_confirmation": 50
+    },
+    "lens_operations": 0,
+    "lock_required_fields": [
+      "frozen S3 protocol and schema hashes",
+      "all vendored benchmark hashes",
+      "target model and tokenizer revision and parameter dtype",
+      "A600, B600, M1200 byte hashes and S2 manifest hash",
+      "E0 image digest and source bundle hash",
+      "official row order and expected item counts",
+      "E0 output schema and manifest destination",
+      "zero pre-lock benchmark tokenizer and model operations"
+    ],
+    "model_calls": "exactly one clean greedy next-token forward pass per official item after lock readback",
+    "output_files": [
+      "e0_item.jsonl",
+      "e0_surface.jsonl",
+      "eligibility_split_manifest.json",
+      "artifact_manifest.json"
+    ],
+    "output_schema": "docs/jlens_s3_e0_pack.schema.json",
+    "prompt_mode": "exact raw official bytes, no chat template, no generated chain of thought",
+    "split": "frozen distribution-local hash split from the frozen S3 protocol",
+    "terminal_floor_fail": "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+    "terminal_floor_pass": "NONTERMINAL_CHECKPOINT_JLENS_S3_E0_SEALED_AWAITING_E1_E2_EXECUTION",
+    "terminal_operational_failure": "BLOCKED_ON_JLENS_S3_E0_EXECUTION_INTEGRITY"
+  },
+  "fit": {
+    "aggregation": "official per-prompt mean and cross-prompt arithmetic mean",
+    "heldout_is_never_fit": true,
+    "lossless_serialization_dtype": "torch.float32",
+    "max_seq_len": 128,
+    "merge_max_abs_tolerance": 1e-05,
+    "merge_relative_frobenius_tolerance": 1e-06,
+    "primary_merge": "official n_prompts-weighted merge A600 plus B600 equals M1200",
+    "save_load_max_abs_tolerance": 0.0,
+    "skip_first": 16,
+    "source_layers": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26
+    ],
+    "target_layer": 27,
+    "target_position_semantics": "current-and-future positions exactly as implemented at the pinned J-lens commit"
+  },
+  "identities": {
+    "j_lens": {
+      "commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+      "compile": false,
+      "force_bos": true,
+      "repository": "https://github.com/anthropics/jacobian-lens.git"
+    },
+    "model": {
+      "d_model": 1536,
+      "eval_mode": true,
+      "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+      "n_layers": 28,
+      "parameter_dtype": "torch.float16",
+      "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+      "trust_remote_code": false,
+      "use_cache": false
+    }
+  },
+  "measurements": {
+    "across_layer_summary": [
+      "maximum and median relative Frobenius distance",
+      "minimum and mean flattened cosine",
+      "finite matrix rate"
+    ],
+    "checkpoint_per_layer": [
+      "A versus B relative Frobenius distance",
+      "A versus B flattened cosine",
+      "finite rate",
+      "official merge versus independent n_prompts-weighted float32 recomputation",
+      "lossless save/load identity",
+      "fitted prompt and sequence identities",
+      "wall time and seconds per prompt",
+      "GPU type and peak allocated and reserved memory",
+      "estimated and actual Azure cost"
+    ],
+    "heldout_apply": {
+      "diagnostic_only": true,
+      "lenses": [
+        "A600",
+        "B600",
+        "M1200"
+      ],
+      "metrics": [
+        "pairwise full-vocabulary logit cosine",
+        "pairwise top-10 overlap",
+        "pairwise top-50 overlap",
+        "pairwise full-vocabulary Spearman rank correlation",
+        "finite rate",
+        "lossless save/load apply consistency"
+      ],
+      "positions": [
+        -1
+      ],
+      "prompts": 200,
+      "source_layers": "all 0 through 26"
+    },
+    "scaling": {
+      "fit": "ordinary least squares of log D(n) on log n for n=64,128,256,600 with free exponent alpha",
+      "model": "D(n,n) = K * n^(-alpha)",
+      "prior_c": 1.7,
+      "prior_diagnostic": "D_prior(n,n) = 1.7 * sqrt(2/n), never an acceptance criterion",
+      "report": [
+        "alpha",
+        "K",
+        "C-equivalent at alpha one-half",
+        "predictions",
+        "raw-scale residuals"
+      ]
+    }
+  },
+  "operational_artifacts": {
+    "artifact_schema": "docs/jlens_s2_artifacts.schema.json",
+    "blob_policy": "create-only with independent byte, size, and SHA-256 readback",
+    "image_policy": "distinct S2 image addressed by digest with tag and manifest write and delete disabled",
+    "manifest_written_last": true,
+    "prefix_roles": [
+      "corpus acquisition and role manifest",
+      "smoke attempts and selected engineering configuration",
+      "every A and B subshard and resumable checkpoint",
+      "cumulative A64 A128 A256 A600 and B64 B128 B256 B600",
+      "canonical M1200",
+      "heldout apply diagnostics",
+      "independent verification and final S2 manifest",
+      "distinct S3 E0 lock output and manifest"
+    ],
+    "repository_policy": "small public manifests, hashes, schemas, summaries, bounded logs, provenance, and retrieval coordinates only; no large lens binaries"
+  },
+  "schema_version": "jlens-s2-full-layer/v1",
+  "shards": {
+    "cumulative_checkpoints": [
+      64,
+      128,
+      256,
+      600
+    ],
+    "exactly_once": true,
+    "failed_attempt_policy": "preserve every attempt; resume only its own exact checkpoint under identical image, corpus, configuration, and shard identity",
+    "final_increment_planner": {
+      "container_timeout_seconds": 7200,
+      "export_reserve_seconds": 900,
+      "fit_budget_formula": "(timeout - export reserve) * safety factor",
+      "maximum_size_formula": "floor(fit budget / observed selected-smoke seconds per prompt)",
+      "safety_factor": 0.7
+    },
+    "fixed_increments": [
+      64,
+      64,
+      128,
+      344
+    ],
+    "parallelism": "independent registered subshards only when GPU quota permits",
+    "role_order_immutable": true
+  },
+  "smoke": {
+    "comparison_thresholds": {
+      "cosine_minimum": 0.999999,
+      "max_abs_maximum": 1e-05,
+      "relative_frobenius_maximum": 1e-05
+    },
+    "dim_batch_candidates": [
+      8,
+      4,
+      2,
+      1
+    ],
+    "fresh_process_per_candidate": true,
+    "peak_reserved_ratio_maximum": 0.92,
+    "reference_dim_batch": 1,
+    "rows": 2,
+    "selection": "largest descending candidate passing every layer and identity check against dim_batch=1",
+    "t4_failure_policy": "if dim_batch=1 cannot complete, repeat unchanged procedure on an available larger Azure GPU; never reduce sequence length or layers"
+  },
+  "terminal_states": [
+    "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+    "NONTERMINAL_CHECKPOINT_JLENS_S3_E0_SEALED_AWAITING_E1_E2_EXECUTION",
+    "BLOCKED_ON_S2_STARTING_STATE_INTEGRITY",
+    "BLOCKED_ON_S2_CORPUS_FREEZE",
+    "BLOCKED_ON_S2_RUNTIME_COMPATIBILITY",
+    "BLOCKED_ON_S2_GPU_CAPACITY",
+    "BLOCKED_ON_S2_EXECUTION_INTEGRITY",
+    "BLOCKED_ON_S2_ARTIFACT_INTEGRITY",
+    "BLOCKED_ON_JLENS_S3_E0_EXECUTION_INTEGRITY"
+  ]
+}

@@ -1,0 +1,512 @@
+{
+  "$defs": {
+    "artifact_file": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "create_only": {
+          "const": true,
+          "type": "boolean"
+        },
+        "relative_path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "written_order": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "bytes",
+        "create_only",
+        "relative_path",
+        "sha256",
+        "written_order"
+      ],
+      "type": "object"
+    },
+    "distribution_count": {
+      "additionalProperties": false,
+      "properties": {
+        "behavioral_eligible": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "confirmation": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "development": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "mechanical_eligible": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "official": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "behavioral_eligible",
+        "confirmation",
+        "development",
+        "mechanical_eligible",
+        "official"
+      ],
+      "type": "object"
+    },
+    "e0_item": {
+      "additionalProperties": false,
+      "properties": {
+        "behavioral_eligible": {
+          "type": "boolean"
+        },
+        "canonical_item_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "clean_top1_token_id": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "control_position_candidates": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "control_positions": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "distribution": {
+          "enum": [
+            "multihop",
+            "order_ops",
+            "causal_swap"
+          ],
+          "type": "string"
+        },
+        "exclusion_reasons": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "input_length": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "input_token_ids": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "item_id": {
+          "type": "string"
+        },
+        "mechanical_eligible": {
+          "type": "boolean"
+        },
+        "model_id": {
+          "type": "string"
+        },
+        "model_revision": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "multi_token_removed_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "parameter_dtype": {
+          "type": "string"
+        },
+        "prompt_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "prompt_surface_removed_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "raw_prompt_utf8_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "split_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "split_role": {
+          "enum": [
+            "ineligible",
+            "development",
+            "confirmation"
+          ],
+          "type": "string"
+        },
+        "target_overlap_removed_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "target_token_ids": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "tokenizer_revision": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "behavioral_eligible",
+        "canonical_item_sha256",
+        "clean_top1_token_id",
+        "control_position_candidates",
+        "control_positions",
+        "distribution",
+        "exclusion_reasons",
+        "input_length",
+        "input_token_ids",
+        "item_id",
+        "mechanical_eligible",
+        "model_id",
+        "model_revision",
+        "multi_token_removed_count",
+        "parameter_dtype",
+        "prompt_sha256",
+        "prompt_surface_removed_count",
+        "raw_prompt_utf8_sha256",
+        "split_hash",
+        "split_role",
+        "target_overlap_removed_count",
+        "target_token_ids",
+        "tokenizer_revision"
+      ],
+      "type": "object"
+    },
+    "e0_surface": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_surface": {
+          "type": "string"
+        },
+        "distribution": {
+          "type": "string"
+        },
+        "intermediate_index": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "item_id": {
+          "type": "string"
+        },
+        "normalized_surface": {
+          "type": "string"
+        },
+        "official_inclusive_retained": {
+          "type": "boolean"
+        },
+        "primary_retained": {
+          "type": "boolean"
+        },
+        "prompt_leakage": {
+          "type": "boolean"
+        },
+        "raw_key": {
+          "type": "string"
+        },
+        "single_token": {
+          "type": "boolean"
+        },
+        "surface_role": {
+          "enum": [
+            "intermediate",
+            "swap_to",
+            "target",
+            "swap_answer"
+          ],
+          "type": "string"
+        },
+        "target_overlap": {
+          "type": "boolean"
+        },
+        "token_ids": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "candidate_surface",
+        "distribution",
+        "intermediate_index",
+        "item_id",
+        "normalized_surface",
+        "official_inclusive_retained",
+        "primary_retained",
+        "prompt_leakage",
+        "raw_key",
+        "single_token",
+        "surface_role",
+        "target_overlap",
+        "token_ids"
+      ],
+      "type": "object"
+    },
+    "eligibility_manifest": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_manifest_destination": {
+          "type": "string"
+        },
+        "benchmark_item_tokenizer_calls": {
+          "const": 238,
+          "type": "integer"
+        },
+        "benchmark_model_forward_calls": {
+          "const": 238,
+          "type": "integer"
+        },
+        "distribution_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "causal_swap": {
+              "$ref": "#/$defs/distribution_count"
+            },
+            "multihop": {
+              "$ref": "#/$defs/distribution_count"
+            },
+            "order_ops": {
+              "$ref": "#/$defs/distribution_count"
+            }
+          },
+          "required": [
+            "causal_swap",
+            "multihop",
+            "order_ops"
+          ],
+          "type": "object"
+        },
+        "e0_item_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "e0_surface_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "e1_outputs": {
+          "const": 0,
+          "type": "integer"
+        },
+        "e2_outputs": {
+          "const": 0,
+          "type": "integer"
+        },
+        "exclusion_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "multi_token": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "no_control_position": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "over_length": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "prompt_surface": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "target_overlap": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "multi_token",
+            "no_control_position",
+            "over_length",
+            "prompt_surface",
+            "target_overlap"
+          ],
+          "type": "object"
+        },
+        "floor_booleans": {
+          "additionalProperties": false,
+          "properties": {
+            "causal_swap_confirmation": {
+              "type": "boolean"
+            },
+            "multihop_confirmation": {
+              "type": "boolean"
+            },
+            "order_ops_confirmation": {
+              "type": "boolean"
+            },
+            "pooled_readout_confirmation": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "causal_swap_confirmation",
+            "multihop_confirmation",
+            "order_ops_confirmation",
+            "pooled_readout_confirmation"
+          ],
+          "type": "object"
+        },
+        "lens_imports": {
+          "const": 0,
+          "type": "integer"
+        },
+        "lens_operations": {
+          "const": 0,
+          "type": "integer"
+        },
+        "lock_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "manifest_written_last": {
+          "const": true,
+          "type": "boolean"
+        },
+        "pre_lock_benchmark_model_operations": {
+          "const": 0,
+          "type": "integer"
+        },
+        "pre_lock_benchmark_tokenizer_operations": {
+          "const": 0,
+          "type": "integer"
+        },
+        "terminal_state": {
+          "enum": [
+            "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+            "NONTERMINAL_CHECKPOINT_JLENS_S3_E0_SEALED_AWAITING_E1_E2_EXECUTION"
+          ],
+          "type": "string"
+        },
+        "vocabulary_token_decodes": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_manifest_destination",
+        "benchmark_item_tokenizer_calls",
+        "benchmark_model_forward_calls",
+        "distribution_counts",
+        "e0_item_sha256",
+        "e0_surface_sha256",
+        "e1_outputs",
+        "e2_outputs",
+        "exclusion_counts",
+        "floor_booleans",
+        "lens_imports",
+        "lens_operations",
+        "lock_sha256",
+        "manifest_written_last",
+        "pre_lock_benchmark_model_operations",
+        "pre_lock_benchmark_tokenizer_operations",
+        "terminal_state",
+        "vocabulary_token_decodes"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/docs/jlens_s3_e0_pack.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_files": {
+      "items": {
+        "$ref": "#/$defs/artifact_file"
+      },
+      "type": "array"
+    },
+    "complete": {
+      "const": true,
+      "type": "boolean"
+    },
+    "e0_items": {
+      "items": {
+        "$ref": "#/$defs/e0_item"
+      },
+      "maxItems": 238,
+      "minItems": 238,
+      "type": "array"
+    },
+    "e0_surfaces": {
+      "items": {
+        "$ref": "#/$defs/e0_surface"
+      },
+      "type": "array"
+    },
+    "eligibility_split_manifest": {
+      "$ref": "#/$defs/eligibility_manifest"
+    },
+    "s2_manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "s3_protocol_sha256": {
+      "const": "bb07dc3be90539e88ff8ada8adee879da747ec5b0b0409499b9809f259df4625",
+      "type": "string"
+    },
+    "s3_schema_sha256": {
+      "const": "5d6e2fc33771b427130bd1dbe94c79cdf6d5827288b96929352c0caa793acbf1",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "jlens-s3-e0-pack/v1",
+      "type": "string"
+    }
+  },
+  "required": [
+    "artifact_files",
+    "complete",
+    "e0_items",
+    "e0_surfaces",
+    "eligibility_split_manifest",
+    "s2_manifest_sha256",
+    "s3_protocol_sha256",
+    "s3_schema_sha256",
+    "schema_version"
+  ],
+  "title": "Frozen S3 Stage E0 pack",
+  "type": "object"
+}

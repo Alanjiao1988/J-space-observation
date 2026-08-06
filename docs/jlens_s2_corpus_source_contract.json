@@ -1,0 +1,164 @@
+{
+  "dataset": {
+    "configuration": "wikitext-103-raw-v1",
+    "id": "Salesforce/wikitext",
+    "immutable_revision": "resolved and sealed by S2-P1 before tokenizer construction",
+    "license": "resolve exact repository license bytes and retain attribution and share-alike notice before tokenizer construction",
+    "row_identity": "train:<zero-based source row index>",
+    "source_field": "text",
+    "split": "train"
+  },
+  "eligibility_order": [
+    "raw source text is an exact string and len(text.strip()) is at least 600",
+    "exact raw UTF-8 bytes have no symmetric overlap with any protected prompt-bank entry",
+    "pinned force_bos=true untruncated tokenization contains at least 128 IDs",
+    "fit sequence is exactly the first 128 adapter-supplied token IDs",
+    "reject a duplicate exact 128-token-ID sequence",
+    "compute immutable hashes and role key without model or S3 behavior"
+  ],
+  "exclusion_audit": {
+    "categories": [
+      "short_raw_text",
+      "protected_prompt_overlap",
+      "under_128_tokens",
+      "duplicate_128_token_ids",
+      "eligible_unassigned_after_first_1402"
+    ],
+    "record_fields": [
+      "row_id",
+      "raw_text_sha256",
+      "category",
+      "detail_ids"
+    ],
+    "reconstructible": true
+  },
+  "protected_prompt_bank": {
+    "deduplication": "deduplicate only byte-identical prompts after recording every source coordinate",
+    "extraction": "read exact committed or sealed source bytes; extract only the declared selector strings; encode each selected string as UTF-8 without normalization",
+    "phase1_0d_blob": {
+      "account": "stjspacefiles0709085305",
+      "auth": "managed identity read-only",
+      "container": "jspace-results",
+      "manifest_sha256": "76accb0f675130989f3db698ecfeaa8736f288980026cdaca0e8413c05234536",
+      "object": "phase1-headroom-confirmation/20260804T154518Z/03_review_form.jsonl",
+      "selectors": [
+        "prompt_text",
+        "prompt"
+      ]
+    },
+    "repository_sources": [
+      {
+        "format": "jsonl",
+        "path": "data/phase1_task_headroom_candidates.jsonl",
+        "role": "Phase 1 bank and RQ2 candidate material",
+        "selectors": [
+          "question",
+          "prompt_template",
+          "clean_corrupted_pair.clean.question",
+          "clean_corrupted_pair.corrupted.question"
+        ]
+      },
+      {
+        "format": "jsonl",
+        "path": "artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/02_records.jsonl",
+        "role": "executed Phase 1 prompts",
+        "selectors": [
+          "provenance.prompt_text"
+        ]
+      },
+      {
+        "format": "jsonl",
+        "path": "evaluator_sets/parser_v2_v1/development_cases.jsonl",
+        "role": "public parser fixtures",
+        "selectors": [
+          "output_text"
+        ]
+      },
+      {
+        "format": "jsonl",
+        "path": "evaluator_sets/parser_v3_v1/adversarial_development_cases.jsonl",
+        "role": "public parser fixtures",
+        "selectors": [
+          "output_text"
+        ]
+      },
+      {
+        "format": "jsonl",
+        "path": "data/jlens_feasibility_prompts.jsonl",
+        "role": "prior J-lens fit material",
+        "selectors": [
+          "text"
+        ]
+      },
+      {
+        "format": "jsonl",
+        "path": "data/jlens_saturation_prompts.jsonl",
+        "role": "prior J-lens fit and heldout material",
+        "selectors": [
+          "text"
+        ]
+      },
+      {
+        "format": "python_ast",
+        "path": "src/jspace_observation/prompt_sets.py",
+        "role": "registered pilot and RQ2 predecessor material",
+        "selectors": [
+          "PromptItem.prompt_base keyword string literals"
+        ]
+      },
+      {
+        "format": "json",
+        "path": "third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/lens-eval-multihop.json",
+        "role": "official S3 benchmark",
+        "selectors": [
+          "items[*].prompt"
+        ]
+      },
+      {
+        "format": "json",
+        "path": "third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/evaluations/lens-eval-order-ops.json",
+        "role": "official S3 benchmark",
+        "selectors": [
+          "items[*].prompt"
+        ]
+      },
+      {
+        "format": "json",
+        "path": "third_party/jacobian-lens/581d398613e5602a5af361e1c34d3a92ea82ba8e/data/experiments/probe-swap.json",
+        "role": "official S3 benchmark",
+        "selectors": [
+          "items[*].prompt"
+        ]
+      }
+    ],
+    "rule": "reject iff exact candidate UTF-8 bytes equal protected bytes, candidate bytes occur as a contiguous substring of protected bytes, or protected bytes occur as a contiguous substring of candidate bytes",
+    "signals_forbidden": [
+      "model logits",
+      "loss",
+      "activation",
+      "Jacobian",
+      "S3 behavior"
+    ]
+  },
+  "role_assignment": {
+    "counts": {
+      "A": 600,
+      "B": 600,
+      "heldout": 200,
+      "smoke": 2
+    },
+    "key": "SHA-256(UTF8(seed) || NUL || UTF8(row_id) || NUL || ASCII(raw_text_sha256) || NUL || ASCII(token_ids_sha256))",
+    "seed": "jlens-s2-wikitext-roles-2026-08-06",
+    "sort": "ascending key, then row_id only on key collision"
+  },
+  "schema_version": "jlens-s2-corpus-source-contract/v1",
+  "tokenization": {
+    "actual_sequence_length": 128,
+    "adapter_force_bos": true,
+    "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+    "token_ids_hash": "SHA-256 of ASCII compact JSON integer array with separators comma and colon and no trailing newline",
+    "trust_remote_code": false,
+    "untruncated": true
+  }
+}

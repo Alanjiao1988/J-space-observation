@@ -1,0 +1,634 @@
+{
+  "$defs": {
+    "artifact_file": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "create_only": {
+          "const": true,
+          "type": "boolean"
+        },
+        "media_type": {
+          "type": "string"
+        },
+        "readback_verified": {
+          "type": "boolean"
+        },
+        "relative_path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "written_order": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "bytes",
+        "create_only",
+        "media_type",
+        "readback_verified",
+        "relative_path",
+        "sha256",
+        "written_order"
+      ],
+      "type": "object"
+    },
+    "corpus_row": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_revision": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "raw_text": {
+          "type": "string"
+        },
+        "raw_text_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "A",
+            "B",
+            "heldout",
+            "smoke"
+          ],
+          "type": "string"
+        },
+        "role_index": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "role_key": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "row_id": {
+          "type": "string"
+        },
+        "token_count_untruncated": {
+          "minimum": 128,
+          "type": "integer"
+        },
+        "token_ids": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 128,
+          "minItems": 128,
+          "type": "array"
+        },
+        "token_ids_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataset_revision",
+        "raw_text",
+        "raw_text_sha256",
+        "role",
+        "role_index",
+        "role_key",
+        "row_id",
+        "token_count_untruncated",
+        "token_ids",
+        "token_ids_sha256"
+      ],
+      "type": "object"
+    },
+    "exclusion_row": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "enum": [
+            "short_raw_text",
+            "protected_prompt_overlap",
+            "under_128_tokens",
+            "duplicate_128_token_ids",
+            "eligible_unassigned_after_first_1402"
+          ],
+          "type": "string"
+        },
+        "detail_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "raw_text_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "row_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "category",
+        "detail_ids",
+        "raw_text_sha256",
+        "row_id"
+      ],
+      "type": "object"
+    },
+    "heldout_diagnostic": {
+      "additionalProperties": false,
+      "properties": {
+        "finite": {
+          "type": "boolean"
+        },
+        "layer": {
+          "maximum": 26,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "logit_cosine": {
+          "type": "number"
+        },
+        "pair": {
+          "enum": [
+            "A600_vs_B600",
+            "A600_vs_M1200",
+            "B600_vs_M1200"
+          ],
+          "type": "string"
+        },
+        "rank_correlation": {
+          "type": "number"
+        },
+        "sequence_id": {
+          "type": "string"
+        },
+        "top10_overlap": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "top50_overlap": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "finite",
+        "layer",
+        "logit_cosine",
+        "pair",
+        "rank_correlation",
+        "sequence_id",
+        "top10_overlap",
+        "top50_overlap"
+      ],
+      "type": "object"
+    },
+    "lens_manifest": {
+      "additionalProperties": false,
+      "properties": {
+        "blob": {
+          "type": "string"
+        },
+        "bytes": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "d_model": {
+          "const": 1536,
+          "type": "integer"
+        },
+        "finite": {
+          "const": true,
+          "type": "boolean"
+        },
+        "lens_id": {
+          "enum": [
+            "A64",
+            "A128",
+            "A256",
+            "A600",
+            "B64",
+            "B128",
+            "B256",
+            "B600",
+            "M1200"
+          ],
+          "type": "string"
+        },
+        "merge_max_abs": {
+          "type": "number"
+        },
+        "merge_relative_frobenius": {
+          "type": "number"
+        },
+        "n_prompts": {
+          "enum": [
+            64,
+            128,
+            256,
+            600,
+            1200
+          ],
+          "type": "integer"
+        },
+        "save_load_max_abs": {
+          "const": 0.0,
+          "type": "number"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source_layers": {
+          "items": {
+            "maximum": 26,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "maxItems": 27,
+          "minItems": 27,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "target_layer": {
+          "const": 27,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "blob",
+        "bytes",
+        "d_model",
+        "finite",
+        "lens_id",
+        "merge_max_abs",
+        "merge_relative_frobenius",
+        "n_prompts",
+        "save_load_max_abs",
+        "sha256",
+        "source_layers",
+        "target_layer"
+      ],
+      "type": "object"
+    },
+    "shard_receipt": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_id": {
+          "type": "string"
+        },
+        "checkpoint_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "completed_sequence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "dim_batch": {
+          "enum": [
+            8,
+            4,
+            2,
+            1
+          ],
+          "type": "integer"
+        },
+        "gpu_name": {
+          "type": "string"
+        },
+        "image_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "peak_allocated_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "peak_reserved_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "resumed": {
+          "type": "boolean"
+        },
+        "seconds": {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "shard_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "infrastructure_failed",
+            "scientific_failed"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "attempt_id",
+        "checkpoint_sha256",
+        "completed_sequence_ids",
+        "dim_batch",
+        "gpu_name",
+        "image_digest",
+        "peak_allocated_bytes",
+        "peak_reserved_bytes",
+        "resumed",
+        "seconds",
+        "shard_id",
+        "status"
+      ],
+      "type": "object"
+    },
+    "smoke_attempt": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_id": {
+          "type": "string"
+        },
+        "comparison_to_dim1": {
+          "items": {
+            "$ref": "#/$defs/smoke_layer_comparison"
+          },
+          "type": "array"
+        },
+        "dim_batch": {
+          "enum": [
+            8,
+            4,
+            2,
+            1
+          ],
+          "type": "integer"
+        },
+        "finite_float32": {
+          "type": "boolean"
+        },
+        "gpu_name": {
+          "type": "string"
+        },
+        "matrix_shapes_valid": {
+          "type": "boolean"
+        },
+        "peak_allocated_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "peak_reserved_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "peak_reserved_ratio": {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "seconds": {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "source_layers": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 27,
+          "minItems": 27,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "status": {
+          "enum": [
+            "success",
+            "oom",
+            "failed"
+          ],
+          "type": "string"
+        },
+        "target_layer": {
+          "const": 27,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "attempt_id",
+        "comparison_to_dim1",
+        "dim_batch",
+        "finite_float32",
+        "gpu_name",
+        "matrix_shapes_valid",
+        "peak_allocated_bytes",
+        "peak_reserved_bytes",
+        "peak_reserved_ratio",
+        "seconds",
+        "source_layers",
+        "status",
+        "target_layer"
+      ],
+      "type": "object"
+    },
+    "smoke_layer_comparison": {
+      "additionalProperties": false,
+      "properties": {
+        "cosine": {
+          "type": "number"
+        },
+        "layer": {
+          "maximum": 26,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max_abs": {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "relative_frobenius": {
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "cosine",
+        "layer",
+        "max_abs",
+        "relative_frobenius"
+      ],
+      "type": "object"
+    },
+    "verification_receipt": {
+      "additionalProperties": false,
+      "properties": {
+        "A600_sealed": {
+          "const": true,
+          "type": "boolean"
+        },
+        "B600_sealed": {
+          "const": true,
+          "type": "boolean"
+        },
+        "M1200_sealed": {
+          "const": true,
+          "type": "boolean"
+        },
+        "all_operational_gates_pass": {
+          "const": true,
+          "type": "boolean"
+        },
+        "benchmark_model_operations_before_seal": {
+          "const": 0,
+          "type": "integer"
+        },
+        "benchmark_tokenizer_operations_before_seal": {
+          "const": 0,
+          "type": "integer"
+        },
+        "receipt_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "A600_sealed",
+        "B600_sealed",
+        "M1200_sealed",
+        "all_operational_gates_pass",
+        "benchmark_model_operations_before_seal",
+        "benchmark_tokenizer_operations_before_seal",
+        "receipt_sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/docs/jlens_s2_artifacts.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "complete": {
+      "type": "boolean"
+    },
+    "corpus_rows": {
+      "items": {
+        "$ref": "#/$defs/corpus_row"
+      },
+      "type": "array"
+    },
+    "create_only": {
+      "const": true,
+      "type": "boolean"
+    },
+    "exclusions": {
+      "items": {
+        "$ref": "#/$defs/exclusion_row"
+      },
+      "type": "array"
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/artifact_file"
+      },
+      "type": "array"
+    },
+    "heldout_diagnostics": {
+      "items": {
+        "$ref": "#/$defs/heldout_diagnostic"
+      },
+      "type": "array"
+    },
+    "image_digest": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "lens_manifests": {
+      "items": {
+        "$ref": "#/$defs/lens_manifest"
+      },
+      "type": "array"
+    },
+    "manifest_written_last": {
+      "const": true,
+      "type": "boolean"
+    },
+    "protocol_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "jlens-s2-artifact-pack/v1",
+      "type": "string"
+    },
+    "shard_receipts": {
+      "items": {
+        "$ref": "#/$defs/shard_receipt"
+      },
+      "type": "array"
+    },
+    "smoke_attempts": {
+      "items": {
+        "$ref": "#/$defs/smoke_attempt"
+      },
+      "type": "array"
+    },
+    "source_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "stage": {
+      "enum": [
+        "S2-P1",
+        "S2-T0",
+        "S2-F0",
+        "S2-M0",
+        "S2-V0"
+      ],
+      "type": "string"
+    },
+    "verification": {
+      "items": {
+        "$ref": "#/$defs/verification_receipt"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "complete",
+    "corpus_rows",
+    "create_only",
+    "exclusions",
+    "files",
+    "heldout_diagnostics",
+    "image_digest",
+    "lens_manifests",
+    "manifest_written_last",
+    "protocol_sha256",
+    "run_id",
+    "schema_version",
+    "shard_receipts",
+    "smoke_attempts",
+    "source_commit",
+    "stage",
+    "verification"
+  ],
+  "title": "S2 create-only artifact pack",
+  "type": "object"
+}

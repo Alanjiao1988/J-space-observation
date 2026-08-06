@@ -1,0 +1,988 @@
+{
+  "$defs": {
+    "authority": {
+      "additionalProperties": false,
+      "properties": {
+        "authority_prompt": {
+          "type": "string"
+        },
+        "authority_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "decision_log_prefix": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "evidence_ledger_prefix": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "last_pre_round_row": {
+              "const": "EV-0014",
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "last_pre_round_row",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "frozen_s3": {
+          "additionalProperties": false,
+          "properties": {
+            "protocol_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "schema_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "source_bundle_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "protocol_sha256",
+            "schema_sha256",
+            "source_bundle_sha256"
+          ],
+          "type": "object"
+        },
+        "phase1_protected_rollups": {
+          "additionalProperties": false,
+          "properties": {
+            "v1": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "v2": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "v1",
+            "v2"
+          ],
+          "type": "object"
+        },
+        "starting_commit": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "starting_tree": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "authority_prompt",
+        "authority_sha256",
+        "decision_log_prefix",
+        "evidence_ledger_prefix",
+        "frozen_s3",
+        "phase1_protected_rollups",
+        "starting_commit",
+        "starting_tree"
+      ],
+      "type": "object"
+    },
+    "claim_boundary": {
+      "additionalProperties": false,
+      "properties": {
+        "establishes": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "prohibits": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "establishes",
+        "limitations",
+        "prohibits"
+      ],
+      "type": "object"
+    },
+    "corpus": {
+      "additionalProperties": false,
+      "properties": {
+        "assignment_seed": {
+          "type": "string"
+        },
+        "dataset": {
+          "additionalProperties": false,
+          "properties": {
+            "configuration": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "immutable_revision_required": {
+              "const": true,
+              "type": "boolean"
+            },
+            "license_bytes_required_before_tokenizer": {
+              "const": true,
+              "type": "boolean"
+            },
+            "split": {
+              "const": "train",
+              "type": "string"
+            }
+          },
+          "required": [
+            "configuration",
+            "id",
+            "immutable_revision_required",
+            "license_bytes_required_before_tokenizer",
+            "split"
+          ],
+          "type": "object"
+        },
+        "eligibility": {
+          "additionalProperties": false,
+          "properties": {
+            "actual_sequence": {
+              "type": "string"
+            },
+            "duplicate_token_sequences": {
+              "const": "reject",
+              "type": "string"
+            },
+            "minimum_raw_strip_characters": {
+              "const": 600,
+              "type": "integer"
+            },
+            "minimum_untruncated_tokens": {
+              "const": 128,
+              "type": "integer"
+            },
+            "model_signals_forbidden": {
+              "const": true,
+              "type": "boolean"
+            },
+            "source_text_mutation": {
+              "const": "forbidden",
+              "type": "string"
+            }
+          },
+          "required": [
+            "actual_sequence",
+            "duplicate_token_sequences",
+            "minimum_raw_strip_characters",
+            "minimum_untruncated_tokens",
+            "model_signals_forbidden",
+            "source_text_mutation"
+          ],
+          "type": "object"
+        },
+        "exact_storage": {
+          "additionalProperties": false,
+          "properties": {
+            "attribution_and_share_alike_notice_required": {
+              "const": true,
+              "type": "boolean"
+            },
+            "directory": {
+              "type": "string"
+            },
+            "exact_text_or_lossless_reference_required": {
+              "const": true,
+              "type": "boolean"
+            },
+            "repository_license_compatibility_required": {
+              "const": true,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "attribution_and_share_alike_notice_required",
+            "directory",
+            "exact_text_or_lossless_reference_required",
+            "repository_license_compatibility_required"
+          ],
+          "type": "object"
+        },
+        "overlap": {
+          "additionalProperties": false,
+          "properties": {
+            "bank_contract": {
+              "type": "string"
+            },
+            "operands": {
+              "type": "string"
+            },
+            "rule": {
+              "type": "string"
+            },
+            "symmetric": {
+              "const": true,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "bank_contract",
+            "operands",
+            "rule",
+            "symmetric"
+          ],
+          "type": "object"
+        },
+        "role_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "A": {
+              "const": 600,
+              "type": "integer"
+            },
+            "B": {
+              "const": 600,
+              "type": "integer"
+            },
+            "heldout": {
+              "const": 200,
+              "type": "integer"
+            },
+            "smoke": {
+              "const": 2,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "A",
+            "B",
+            "heldout",
+            "smoke"
+          ],
+          "type": "object"
+        },
+        "role_key_bytes": {
+          "type": "string"
+        },
+        "role_order": {
+          "items": {
+            "enum": [
+              "A",
+              "B",
+              "heldout",
+              "smoke"
+            ],
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "sort": {
+          "type": "string"
+        },
+        "token_ids_hash_bytes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "assignment_seed",
+        "dataset",
+        "eligibility",
+        "exact_storage",
+        "overlap",
+        "role_counts",
+        "role_key_bytes",
+        "role_order",
+        "sort",
+        "token_ids_hash_bytes"
+      ],
+      "type": "object"
+    },
+    "e0": {
+      "additionalProperties": false,
+      "properties": {
+        "expected_item_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "causal_swap": {
+              "const": 90,
+              "type": "integer"
+            },
+            "multihop": {
+              "const": 93,
+              "type": "integer"
+            },
+            "order_ops": {
+              "const": 55,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "causal_swap",
+            "multihop",
+            "order_ops"
+          ],
+          "type": "object"
+        },
+        "floor_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "causal_swap_confirmation": {
+              "const": 30,
+              "type": "integer"
+            },
+            "multihop_confirmation": {
+              "const": 20,
+              "type": "integer"
+            },
+            "order_ops_confirmation": {
+              "const": 20,
+              "type": "integer"
+            },
+            "pooled_readout_confirmation": {
+              "const": 50,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "causal_swap_confirmation",
+            "multihop_confirmation",
+            "order_ops_confirmation",
+            "pooled_readout_confirmation"
+          ],
+          "type": "object"
+        },
+        "lens_operations": {
+          "const": 0,
+          "type": "integer"
+        },
+        "lock_required_fields": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "model_calls": {
+          "type": "string"
+        },
+        "output_files": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "output_schema": {
+          "type": "string"
+        },
+        "prompt_mode": {
+          "type": "string"
+        },
+        "split": {
+          "type": "string"
+        },
+        "terminal_floor_fail": {
+          "type": "string"
+        },
+        "terminal_floor_pass": {
+          "type": "string"
+        },
+        "terminal_operational_failure": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "expected_item_counts",
+        "floor_counts",
+        "lens_operations",
+        "lock_required_fields",
+        "model_calls",
+        "output_files",
+        "output_schema",
+        "prompt_mode",
+        "split",
+        "terminal_floor_fail",
+        "terminal_floor_pass",
+        "terminal_operational_failure"
+      ],
+      "type": "object"
+    },
+    "fit": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregation": {
+          "type": "string"
+        },
+        "heldout_is_never_fit": {
+          "const": true,
+          "type": "boolean"
+        },
+        "lossless_serialization_dtype": {
+          "const": "torch.float32",
+          "type": "string"
+        },
+        "max_seq_len": {
+          "const": 128,
+          "type": "integer"
+        },
+        "merge_max_abs_tolerance": {
+          "const": 1e-05,
+          "type": "number"
+        },
+        "merge_relative_frobenius_tolerance": {
+          "const": 1e-06,
+          "type": "number"
+        },
+        "primary_merge": {
+          "type": "string"
+        },
+        "save_load_max_abs_tolerance": {
+          "const": 0.0,
+          "type": "number"
+        },
+        "skip_first": {
+          "const": 16,
+          "type": "integer"
+        },
+        "source_layers": {
+          "items": {
+            "maximum": 26,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "maxItems": 27,
+          "minItems": 27,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "target_layer": {
+          "const": 27,
+          "type": "integer"
+        },
+        "target_position_semantics": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "aggregation",
+        "heldout_is_never_fit",
+        "lossless_serialization_dtype",
+        "max_seq_len",
+        "merge_max_abs_tolerance",
+        "merge_relative_frobenius_tolerance",
+        "primary_merge",
+        "save_load_max_abs_tolerance",
+        "skip_first",
+        "source_layers",
+        "target_layer",
+        "target_position_semantics"
+      ],
+      "type": "object"
+    },
+    "identities": {
+      "additionalProperties": false,
+      "properties": {
+        "j_lens": {
+          "additionalProperties": false,
+          "properties": {
+            "commit": {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": "string"
+            },
+            "compile": {
+              "const": false,
+              "type": "boolean"
+            },
+            "force_bos": {
+              "const": true,
+              "type": "boolean"
+            },
+            "repository": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "commit",
+            "compile",
+            "force_bos",
+            "repository"
+          ],
+          "type": "object"
+        },
+        "model": {
+          "additionalProperties": false,
+          "properties": {
+            "d_model": {
+              "const": 1536,
+              "type": "integer"
+            },
+            "eval_mode": {
+              "const": true,
+              "type": "boolean"
+            },
+            "id": {
+              "type": "string"
+            },
+            "n_layers": {
+              "const": 28,
+              "type": "integer"
+            },
+            "parameter_dtype": {
+              "const": "torch.float16",
+              "type": "string"
+            },
+            "revision": {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": "string"
+            },
+            "trust_remote_code": {
+              "const": false,
+              "type": "boolean"
+            },
+            "use_cache": {
+              "const": false,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "d_model",
+            "eval_mode",
+            "id",
+            "n_layers",
+            "parameter_dtype",
+            "revision",
+            "trust_remote_code",
+            "use_cache"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "j_lens",
+        "model"
+      ],
+      "type": "object"
+    },
+    "measurements": {
+      "additionalProperties": false,
+      "properties": {
+        "across_layer_summary": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "checkpoint_per_layer": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "heldout_apply": {
+          "additionalProperties": false,
+          "properties": {
+            "diagnostic_only": {
+              "const": true,
+              "type": "boolean"
+            },
+            "lenses": {
+              "items": {
+                "enum": [
+                  "A600",
+                  "B600",
+                  "M1200"
+                ],
+                "type": "string"
+              },
+              "maxItems": 3,
+              "minItems": 3,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "metrics": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "positions": {
+              "items": {
+                "const": -1,
+                "type": "integer"
+              },
+              "maxItems": 1,
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "prompts": {
+              "const": 200,
+              "type": "integer"
+            },
+            "source_layers": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "diagnostic_only",
+            "lenses",
+            "metrics",
+            "positions",
+            "prompts",
+            "source_layers"
+          ],
+          "type": "object"
+        },
+        "scaling": {
+          "additionalProperties": false,
+          "properties": {
+            "fit": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "prior_c": {
+              "const": 1.7,
+              "type": "number"
+            },
+            "prior_diagnostic": {
+              "type": "string"
+            },
+            "report": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "fit",
+            "model",
+            "prior_c",
+            "prior_diagnostic",
+            "report"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "across_layer_summary",
+        "checkpoint_per_layer",
+        "heldout_apply",
+        "scaling"
+      ],
+      "type": "object"
+    },
+    "operational_artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_schema": {
+          "type": "string"
+        },
+        "blob_policy": {
+          "type": "string"
+        },
+        "image_policy": {
+          "type": "string"
+        },
+        "manifest_written_last": {
+          "const": true,
+          "type": "boolean"
+        },
+        "prefix_roles": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "repository_policy": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_schema",
+        "blob_policy",
+        "image_policy",
+        "manifest_written_last",
+        "prefix_roles",
+        "repository_policy"
+      ],
+      "type": "object"
+    },
+    "shards": {
+      "additionalProperties": false,
+      "properties": {
+        "cumulative_checkpoints": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "exactly_once": {
+          "const": true,
+          "type": "boolean"
+        },
+        "failed_attempt_policy": {
+          "type": "string"
+        },
+        "final_increment_planner": {
+          "additionalProperties": false,
+          "properties": {
+            "container_timeout_seconds": {
+              "const": 7200,
+              "type": "integer"
+            },
+            "export_reserve_seconds": {
+              "const": 900,
+              "type": "integer"
+            },
+            "fit_budget_formula": {
+              "type": "string"
+            },
+            "maximum_size_formula": {
+              "type": "string"
+            },
+            "safety_factor": {
+              "const": 0.7,
+              "type": "number"
+            }
+          },
+          "required": [
+            "container_timeout_seconds",
+            "export_reserve_seconds",
+            "fit_budget_formula",
+            "maximum_size_formula",
+            "safety_factor"
+          ],
+          "type": "object"
+        },
+        "fixed_increments": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array"
+        },
+        "parallelism": {
+          "type": "string"
+        },
+        "role_order_immutable": {
+          "const": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "cumulative_checkpoints",
+        "exactly_once",
+        "failed_attempt_policy",
+        "final_increment_planner",
+        "fixed_increments",
+        "parallelism",
+        "role_order_immutable"
+      ],
+      "type": "object"
+    },
+    "smoke": {
+      "additionalProperties": false,
+      "properties": {
+        "comparison_thresholds": {
+          "additionalProperties": false,
+          "properties": {
+            "cosine_minimum": {
+              "const": 0.999999,
+              "type": "number"
+            },
+            "max_abs_maximum": {
+              "const": 1e-05,
+              "type": "number"
+            },
+            "relative_frobenius_maximum": {
+              "const": 1e-05,
+              "type": "number"
+            }
+          },
+          "required": [
+            "cosine_minimum",
+            "max_abs_maximum",
+            "relative_frobenius_maximum"
+          ],
+          "type": "object"
+        },
+        "dim_batch_candidates": {
+          "items": {
+            "enum": [
+              8,
+              4,
+              2,
+              1
+            ],
+            "type": "integer"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "fresh_process_per_candidate": {
+          "const": true,
+          "type": "boolean"
+        },
+        "peak_reserved_ratio_maximum": {
+          "const": 0.92,
+          "type": "number"
+        },
+        "reference_dim_batch": {
+          "const": 1,
+          "type": "integer"
+        },
+        "rows": {
+          "const": 2,
+          "type": "integer"
+        },
+        "selection": {
+          "type": "string"
+        },
+        "t4_failure_policy": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "comparison_thresholds",
+        "dim_batch_candidates",
+        "fresh_process_per_candidate",
+        "peak_reserved_ratio_maximum",
+        "reference_dim_batch",
+        "rows",
+        "selection",
+        "t4_failure_policy"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/docs/jlens_s2_protocol.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authority": {
+      "$ref": "#/$defs/authority"
+    },
+    "claim_boundary": {
+      "$ref": "#/$defs/claim_boundary"
+    },
+    "corpus": {
+      "$ref": "#/$defs/corpus"
+    },
+    "e0": {
+      "$ref": "#/$defs/e0"
+    },
+    "fit": {
+      "$ref": "#/$defs/fit"
+    },
+    "identities": {
+      "$ref": "#/$defs/identities"
+    },
+    "measurements": {
+      "$ref": "#/$defs/measurements"
+    },
+    "operational_artifacts": {
+      "$ref": "#/$defs/operational_artifacts"
+    },
+    "schema_version": {
+      "const": "jlens-s2-full-layer/v1",
+      "type": "string"
+    },
+    "shards": {
+      "$ref": "#/$defs/shards"
+    },
+    "smoke": {
+      "$ref": "#/$defs/smoke"
+    },
+    "terminal_states": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 9,
+      "minItems": 9,
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "authority",
+    "claim_boundary",
+    "corpus",
+    "e0",
+    "fit",
+    "identities",
+    "measurements",
+    "operational_artifacts",
+    "schema_version",
+    "shards",
+    "smoke",
+    "terminal_states"
+  ],
+  "title": "Full-layer S2 and frozen S3-E0 protocol",
+  "type": "object"
+}
