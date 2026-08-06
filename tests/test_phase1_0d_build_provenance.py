@@ -172,12 +172,27 @@ def test_the_committed_record_is_the_hash_of_the_committed_source(tmp_path):
     assert provenance.verify_image_context(context, record) == []
 
     current_failures = provenance.verify_image_context(REPO_ROOT, record)
-    assert len(current_failures) == 2
-    assert (
-        "image carries an unrecorded file: "
-        "src/jspace_observation/jlens_s3_protocol.py"
-    ) in current_failures
-    assert any(failure.startswith("bundle digest is ") for failure in current_failures)
+    authorized_later_modules = {
+        "src/jspace_observation/jlens_s2_corpus.py",
+        "src/jspace_observation/jlens_s2_protocol.py",
+        "src/jspace_observation/jlens_s2_runtime.py",
+        "src/jspace_observation/jlens_s3_e0_runtime.py",
+        "src/jspace_observation/jlens_s3_protocol.py",
+    }
+    expected_file_failures = {
+        f"image carries an unrecorded file: {path}"
+        for path in authorized_later_modules
+    }
+    observed_file_failures = {
+        failure
+        for failure in current_failures
+        if failure.startswith("image carries an unrecorded file: ")
+    }
+    assert observed_file_failures == expected_file_failures
+    assert len(current_failures) == len(expected_file_failures) + 1
+    assert sum(
+        failure.startswith("bundle digest is ") for failure in current_failures
+    ) == 1
 
 
 def test_the_committed_record_matches_the_frozen_protocol():
