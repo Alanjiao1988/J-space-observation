@@ -1,0 +1,87 @@
+{
+  "acr": {
+    "build_attempts": [
+      {
+        "detail": "dependency versions resolved correctly; bytewise freeze presentation check rejected equivalent packaging names",
+        "run_id": "cmap",
+        "status": "Failed"
+      },
+      {
+        "detail": "dependency seal passed; frozen protocol hashes rejected a CRLF-converted Windows scratch context",
+        "run_id": "cmaq",
+        "status": "Failed"
+      },
+      {
+        "detail": "exact Git blob context; dependency, protocol, and corpus-contract gates passed",
+        "run_id": "cmar",
+        "status": "Succeeded"
+      }
+    ],
+    "registry": "acrjspaceobssea0708231738",
+    "repository": "j-space-observation-jlens-s2-corpus",
+    "resource_group": "rg-jspace-observation-sea"
+  },
+  "base_image": {
+    "digest": "sha256:a8f8fbe1a0edc9e4dddafa64ba73f7e04be7be5ebc23f332362e779e0a2e4e52",
+    "reference": "python:3.11.15-bookworm"
+  },
+  "candidate_tests": {
+    "failed_runs": [
+      {
+        "result": "25 passed, 2 failed",
+        "run_id": "cmak"
+      },
+      {
+        "result": "26 passed, 1 failed",
+        "run_id": "cmam"
+      }
+    ],
+    "passing_run": {
+      "commit": "91462672778fba63700428841f1ca21b226f2abd",
+      "result": "27 passed",
+      "run_id": "cman",
+      "tree": "a199a9af4a8d321cd8f90a58e2a8350959cd23ad"
+    }
+  },
+  "dependency_resolution": {
+    "failed_probe": "cmag",
+    "latest_version_probe": "cmah",
+    "lock_resolution_run": "cmaj",
+    "requirements_bytes": 1184,
+    "requirements_path": "requirements-jlens-s2-corpus.txt",
+    "requirements_sha256": "93baa0651b00bd62c5739b360c65121dd138966fb8f5867e1395c55143e0ef0e"
+  },
+  "image": {
+    "delete_enabled": false,
+    "digest": "sha256:50ee00228313e1661276aed6e290adcea034e7c28d2ab34090d53f6fe624eee1",
+    "manifest_delete_enabled": false,
+    "manifest_write_enabled": false,
+    "tag": "18274d4e26bda3194bce574fb0f72452d1cb464d",
+    "write_enabled": false
+  },
+  "operation_boundary": {
+    "benchmark_model_operations": 0,
+    "benchmark_tokenizer_operations": 0,
+    "corpus_tokenizer_constructions": 0,
+    "j_lens_operations": 0,
+    "model_operations": 0,
+    "statement": "Build and tests only; no dataset scan, tokenizer construction, model load, inference, Jacobian, lens fit, lens apply, or benchmark tokenization occurred."
+  },
+  "schema_version": "jlens-s2-corpus-image-provenance/v1",
+  "sealed_at_utc": "2026-08-06T17:20:49Z",
+  "source": {
+    "bundle_bytes": 4454078,
+    "bundle_file_count": 18,
+    "bundle_format": "ASCII jlens-s2-corpus-image-source-bundle-v1 plus LF, then for each UTF-8-lexicographically sorted path: UTF-8 path, NUL, ASCII decimal blob length, NUL, exact Git blob bytes",
+    "bundle_sha256": "20031a611991d7c7387b3edeaee66dfa04c283ba9686177057dcb26e59d51985",
+    "commit": "18274d4e26bda3194bce574fb0f72452d1cb464d",
+    "context_method": "18 declared paths reconstructed and individually verified against exact Git blob object IDs before upload",
+    "dockerfile_bytes": 4815,
+    "dockerfile_sha256": "2c2a0076a679fdfb7dd2374b87a7967e9eabe44ef3920d9544c9bbe52e7ea331",
+    "script_bytes": 18950,
+    "script_sha256": "5d564da80d82f37936d335e42742a9571e21cc8e51595e2c3084891ed6d4559b",
+    "selector_module_bytes": 28161,
+    "selector_module_sha256": "c6fe84f7a90b3db86521b2644a3b128a39a5e5303f192cb2c0f6ec9bebfa1761",
+    "tree": "b040d0c092f642787b7629fd832ef9600d509c98"
+  }
+}
