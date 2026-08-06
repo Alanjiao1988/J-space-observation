@@ -74,6 +74,13 @@ every manifest-bound byte count and SHA-256, then emitted nine repository
 files in 1,494 hash-checked chunks. The final artifact manifest SHA-256 is
 `a181a861c15f24d61192c750b79d79567d94d43acb69f802c2abab912a9bb460`.
 
+ACR run `cmaw` then bound repository commit
+`3ea74aa9210c0289b92ba9a361c38363fd7ff093`, tree
+`8b3bdfb6b4a59d081c4c5866bbcb82b6bd5bc974`, reconstructed every selected
+row/hash/role, checked all selected rows against all 1,835 protected prompts,
+reconciled exclusion counts to 1,801,350 source rows, and passed all 30
+focused S2 corpus and protocol tests.
+
 ## Retained failures
 
 Two P1 attempts are preserved and excluded:
