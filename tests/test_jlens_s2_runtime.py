@@ -239,3 +239,28 @@ def test_runtime_source_does_not_change_frozen_s3_bytes() -> None:
     assert {
         path: s2.sha256_file(ROOT / path) for path in expected
     } == expected
+
+
+def test_production_plan_partitions_each_arm_once_and_preserves_checkpoints() -> None:
+    plan = s2.load_json(ROOT / "docs" / "jlens_s2_production_plan.json")
+    assert plan["dim_batch"] == 1
+    assert plan["image"]["digest"] == (
+        "sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1"
+    )
+    for role in ("A", "B"):
+        shards = [row for row in plan["shards"] if row["role"] == role]
+        covered = [
+            index
+            for row in shards
+            for index in range(row["start_index"], row["end_index"] + 1)
+        ]
+        assert covered == list(range(1, 601))
+        assert all(
+            row["size"] == row["end_index"] - row["start_index"] + 1
+            for row in shards
+        )
+        assert [row["size"] for row in shards[3:]] == [59, 59, 59, 59, 59, 49]
+        assert plan["cumulative_lenses"][f"{role}64"] == [f"{role}-001-064"]
+        assert plan["cumulative_lenses"][f"{role}128"][-1] == f"{role}-065-128"
+        assert plan["cumulative_lenses"][f"{role}256"][-1] == f"{role}-129-256"
+        assert len(plan["cumulative_lenses"][f"{role}600"]) == 9
