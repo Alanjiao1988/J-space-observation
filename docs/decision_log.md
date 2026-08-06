@@ -2646,3 +2646,47 @@ required quota available on the same registered deployments. It does not
 permit a quota request, alternate deployment, provider or model substitution,
 or any change to the target pack, reviewer bytes, concurrency, retry policy,
 or request bodies.
+
+## D30 — Freeze the reviewed J-lens S3 validity protocol without execution
+
+2026-08-06. J-lens S3 design-only Stage P.
+
+The controlling authority is
+`docs/prompts/phase_s3_jlens_validity_protocol_design_prompt.md`, committed
+before implementation at `a98928817ce738d4e2af3365c099ed8fa6ab09e8` with
+SHA-256
+`5d39859bc3d75143f3fdcb469de1d199ad7f831d474509b605569cdc9c1814b8`.
+The decision is to freeze the prospective protocol at canonical JSON SHA-256
+`bb07dc3be90539e88ff8ada8adee879da747ec5b0b0409499b9809f259df4625`
+and validator source-bundle SHA-256
+`7e837b0cfdb0c9a12eb1b6c9067751c7cd4262cc18c5a6f17f4a6505f25b7410`.
+
+The single bounded methods review targeted candidate commit
+`36b54824a6c916e8d7738c6a9f65c54c314a4e20`. It returned 0 FATAL,
+2 MATERIAL, and 0 MINOR findings: public readout/causal rows needed an explicit
+distribution-qualified identity, and the named final-answer-synonym gate was
+not mechanically reconstructible. The one permitted consolidated correction
+at `3954e6e0089271e835de152e4c7e3e9591bb8491` fixed both. Same-checklist
+verification returned 0 FATAL / 0 MATERIAL / 0 MINOR and no direct
+contradiction. The S3 review allowance is spent; no second review or correction
+cycle is authorized.
+
+The freeze registers exact official benchmark bytes, 93 multihop, 55
+order-operations, 90 causal-swap items, and the model-free 29 oriented / 24
+unique unordered counterpart facts. It also fixes model/lens identities,
+eligibility, leakage filtering, deterministic splits, layer bands, readout and
+causal metrics, controls, bootstrap, patching support, all-or-nothing output
+schemas, and the classification truth table.
+
+No target model, tokenizer, or real lens was loaded, fitted, applied, inspected,
+or compared. No inference, activation operation, coordinate swap, ablation,
+patching, GPU Job, scientific result row, or RQ2 run occurred. Therefore no
+J-lens validity classification exists, no row is added to
+`paper/evidence_ledger.csv`, CL-02 and CL-07 remain unsupported, and CL-05 is
+unchanged. Phase 1.0D independently remains
+`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`.
+
+The exact freeze record is
+`docs/decisions/jlens_s3_validity_protocol_freeze.md`. The resulting state is
+`NONTERMINAL_CHECKPOINT_JLENS_S3_VALIDITY_PROTOCOL_FROZEN_AWAITING_S2_LENSES_AND_EXECUTION`.
+It licenses no S3 or RQ2 execution.

@@ -1265,3 +1265,61 @@ SHA-256 is
 `20e486e05a5f076b720ca12db3459b5a1c2c42e95684977dfdcff19d6da055d3`;
 manifest SHA-256 is
 `23016ad15430b1720e4b37033a3638bf45e817ac00513292d138d26e0ed0a834`.
+
+## M-20 - Freezing a prospectively falsifiable J-lens S3 validity protocol
+
+The design-only S3 Stage P froze the official public benchmark inputs from
+`anthropics/jacobian-lens` commit
+`581d398613e5602a5af361e1c34d3a92ea82ba8e`: 93 multihop readout items, 55
+order-operations readout items, and a separate 90-item causal-swap benchmark.
+An exact case-folded triple rule, with first-official-array occurrence as the
+duplicate base-triple representative, deterministically yields 29 oriented
+counterparts and 24 unique unordered pairs. Public rows are identified by
+`SHA-256(UTF-8(distribution) || NUL || canonical_item_bytes)`, so identical
+content in different source distributions is never merged or moved between
+readout and causal roles.
+
+The canonical JSON fixes the target model and tokenizer revision, A600/B600
+independent S2 fits, their official M1200 merge, source layers 0--26, target
+layer 27, and early 0--8, primary-middle 9--22, and motor/output-adjacent 23--26
+bands. Stage E0 may later use only the pinned tokenizer and one clean
+next-token pass per item to resolve finite single-token eligibility, clean
+greedy correctness, and a distribution-local SHA-256 split. It must seal the
+create-only E0 manifest before any lens or intervention output is computed or
+opened. The first 15 eligible items per distribution are development; the
+remainder are confirmation, subject to frozen confirmation floors and with no
+backfill or replacement batch.
+
+Primary readout is normalized trapezoidal AUC of pass@k against `log(k)` for
+`k = [1,2,5,10,20,50,100]`, pooled as equal 0.5/0.5 distribution means.
+Comparators include the M1200 lens, both independent replicates, an ordinary
+logit lens, five deterministic label derangements, and five deterministic
+surface-free position controls. The causal path freezes Moore-Penrose
+coordinate swaps at alpha 1.0, 0.5, and integrity alpha 0.0; direct answer
+vector swaps; direction ablations; five deterministic 2x2 Gram-matched random
+controls; no-op, wrong-position, early, and motor-band controls; and exact
+alternative-vs-clean answer log-odds gain. Lens-independent single-cell
+activation patching is secondary support only and is clustered by unordered
+pair ID.
+
+All primary intervals use 10,000 deterministic item-paired bootstrap
+replicates, with equal readout-distribution weighting and pair-clustered
+patching. The exact target-overlap surface gate is reconstructible from sealed
+`e0_item`, `e0_surface`, and true-label `readout_rank` rows. Twelve closed,
+create-only, all-or-nothing output tables carry raw identities, token sets,
+row-level ranks and interventions, bootstrap draws, gate booleans, nullable
+classification, and artifact hashes. Incomplete or non-finite packs are
+operational blockers, not negative scientific classifications.
+
+The single bounded methods review found two MATERIAL and zero FATAL findings.
+One consolidated correction made role identity distribution-qualified and made
+the surface gate exactly reconstructible. Same-checklist verification closed
+at zero findings. The frozen protocol SHA-256 is
+`bb07dc3be90539e88ff8ada8adee879da747ec5b0b0409499b9809f259df4625`;
+validator source-bundle SHA-256 is
+`7e837b0cfdb0c9a12eb1b6c9067751c7cd4262cc18c5a6f17f4a6505f25b7410`.
+The review allowance is spent.
+
+This method entry is preregistration, not empirical evidence. No target model,
+tokenizer, lens, inference, activation, patching, ablation, scientific row, or
+RQ2 run occurred.

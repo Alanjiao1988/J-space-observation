@@ -4887,3 +4887,73 @@ and final capacity-sealer image
 `sha256:1c04065228bf57f042069e32b8f05e613c2e7e536a8c98ba755a804bfc2d1d32`.
 The exact terminal state remains
 **`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`**.
+
+## 2026-08-06 — J-lens S3 validity protocol design and freeze
+
+This was a design-only Stage P run under
+`docs/prompts/phase_s3_jlens_validity_protocol_design_prompt.md`
+(SHA-256
+`5d39859bc3d75143f3fdcb469de1d199ad7f831d474509b605569cdc9c1814b8`).
+The required starting commit
+`31e8fc87cb560d141bada0aeb7d3b60c45f30081` and tree
+`6132b43523c97c98722c094216c914f96b9dcd50` remained ancestors and protected
+Phase 1.0D bytes were not edited.
+
+### Public inputs and candidate
+
+The six allowed upstream files were vendored byte-for-byte from
+`anthropics/jacobian-lens` commit
+`581d398613e5602a5af361e1c34d3a92ea82ba8e`. Model-free validation reproduced
+93 multihop, 55 order-operations, 90 causal-swap items, 29 oriented
+counterparts, and 24 unique unordered pairs.
+
+The complete candidate package was added in `f84cbef`, followed by the
+`token_ids` output-type fix in `cd061d7` and deterministic duplicate-base-triple
+counterpart tie-break in `36b5482`. ACR run `cma2` bound commit `36b5482` /
+tree `632b99f91daa4b071a1f1ebaee19b03c17796fc3`, returned protocol SHA-256
+`eed211b11020851651bdcc4142e0e0c0d402e9814e9c7ede510667d425f897d4`,
+reproduced 29/24 counterparts, and passed all 52 focused tests.
+
+Non-authoritative setup failures are retained: `cm9w` failed on a CRLF shell
+context before repository validation, and `cma1` failed because a Windows
+absolute task-file path was interpreted inside the ACR workspace. `cm9x` and
+`cm9y` were useful fail-closed candidate diagnostics; `cma0` was a bounded,
+model-free counterpart diagnostic. None loaded or executed a model or lens.
+
+### Single methods review and correction
+
+The one bounded review targeted exact candidate commit `36b5482`, tree
+`632b99f9`, and protocol hash `eed211b1...`. It asked only the six registered
+questions and returned 0 FATAL / 2 MATERIAL / 0 MINOR. The one consolidated
+correction commit `3954e6e`:
+
+- qualified official role-row identity by immutable source distribution and
+  explicitly allowed, but never merged, cross-distribution content overlap;
+- replaced the noncomputable synonym wording with an exact row-level
+  `hard_surface_rule` over `e0_item`, `e0_surface`, and true-label
+  `readout_rank`.
+
+ACR run `cma3` bound `3954e6e` / tree
+`dbb275b3ae7e0cd41af365dbac14b103c18ee0a7`, reproduced protocol SHA-256
+`bb07dc3be90539e88ff8ada8adee879da747ec5b0b0409499b9809f259df4625`
+and schema SHA-256
+`5d6e2fc33771b427130bd1dbe94c79cdf6d5827288b96929352c0caa793acbf1`,
+and passed all 55 focused tests. Same-checklist verification resolved both
+findings, introduced no contradiction, and closed at 0 FATAL / 0 MATERIAL /
+0 MINOR. The S3 methods-review allowance is spent.
+
+### Frozen result and zero-operation boundary
+
+The freeze record is
+`docs/decisions/jlens_s3_validity_protocol_freeze.md`. It binds the canonical
+protocol, schema, Markdown crosswalk, completed review, provenance manifest,
+authority, and validator source bundle to exact committed-byte SHA-256 values.
+
+No target-model or tokenizer load, real lens load/fit/apply/inspection,
+target-model inference, clean-behavior screening, activation extraction,
+coordinate swap, ablation, patching, GPU Job, semantic-review provider call,
+scientific evidence row, or RQ2 run occurred. `paper/evidence_ledger.csv`
+therefore still ends at `EV-0014`. The design result is
+**`NONTERMINAL_CHECKPOINT_JLENS_S3_VALIDITY_PROTOCOL_FROZEN_AWAITING_S2_LENSES_AND_EXECUTION`**.
+Phase 1.0D simultaneously remains
+**`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`**.

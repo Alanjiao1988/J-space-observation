@@ -72,6 +72,32 @@ semantic label、cell metric、candidate cell 或 headroom decision，CL-05 仍�
 独立为同一组 deployment 提供足够 quota 后恢复；它不授权自动轮询、quota
 request、alternate deployment 或 model change。
 
+### 2026-08-06 · S3 protocol 状态：`NONTERMINAL_CHECKPOINT_JLENS_S3_VALIDITY_PROTOCOL_FROZEN_AWAITING_S2_LENSES_AND_EXECUTION`
+
+S3 的 design-only Stage P 已完成。canonical protocol
+`docs/jlens_s3_validity_protocol.json`（SHA-256
+`bb07dc3be90539e88ff8ada8adee879da747ec5b0b0409499b9809f259df4625`）
+冻结了官方 public benchmark bytes、target/tokenizer/lens identities、E0/E1/E2
+边界、mechanical eligibility、hash split、pass@k log-AUC、paired bootstrap、
+coordinate swap、ablation、Gram-matched random controls、answer-leakage
+control、lens-independent activation patching、closed row-level output pack 与
+classification truth table。
+
+唯一的 bounded methods review 在精确 candidate hash 上发现 2 个 MATERIAL、
+0 个 FATAL；唯一允许的 consolidated correction 明确了
+distribution-qualified source-row identity 与完全可重建的 exact
+target-overlap surface gate。同清单 verification 关闭为 0 FATAL / 0 MATERIAL /
+0 MINOR；review allowance 已用尽。冻结记录见
+[S3 protocol freeze](docs/decisions/jlens_s3_validity_protocol_freeze.md)，
+review 记录见
+[S3 methods review](docs/jlens_s3_validity_protocol_review.md)。
+
+这仍然不是 S3 execution 或科学结果：本轮 target-model、tokenizer、lens、
+inference、activation、patching、ablation、GPU Job、scientific row 与 RQ2 run
+均为 0。CL-02/CL-07 仍 unsupported，CL-05 不变；Phase 1.0D 同时继续保持
+`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`。未来执行需要独立授权、冻结
+的 S2 lens artifacts，并严格使用上述 bytes 和 E0/E1/E2 边界。
+
 ## 历史阶段（parser 关闭前）
 
 当前已完成四条关键路径的首个可执行阶段：
@@ -104,6 +130,8 @@ request、alternate deployment 或 model change。
 - [parser-v3 关闭决策](docs/decisions/parser_v3_locked_evaluation_closure.md)
 - [科学主线重启授权](docs/phase_science_restart_authority.json)
 - [当前执行 Prompt](docs/prompts/phase_science_restart_after_parser_closure_prompt.md)
+- [J-lens S3 validity protocol](docs/jlens_s3_validity_protocol.md)
+- [J-lens S3 protocol freeze](docs/decisions/jlens_s3_validity_protocol_freeze.md)
 - [文献笔记](docs/literature_notes.md)
 - [Phase 0.5A real J-lens feasibility report](reports/phase05_jlens_feasibility.md)
 - [Parser-v2 locked evaluation formal result](reports/phase1_parser_v2_locked_evaluation.md)

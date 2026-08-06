@@ -1293,3 +1293,58 @@ scientific layer and CL-05 remains preliminary on Phase 1.0C alone. The frozen
 authority may be resumed only after an independent operator makes sufficient
 quota available on the same deployments; it supplies no automatic polling,
 quota-request, substitution or retry authority.
+
+## L-56 - Official benchmark items were authored for the source paper
+
+The frozen S3 inputs are exact public items from the official J-lens repository.
+They were authored for the source paper and not for
+`deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`. They may be useful instrument
+checks, but they are not a representative sample of this target model's tasks,
+training distribution, or deployment conditions. Content overlap across
+official readout and causal source files is retained and handled by
+distribution-qualified row identity, not hidden by deduplication.
+
+## L-57 - Eligibility makes S3 a selected-case instrument validation
+
+Only items that meet the frozen single-token mechanical rules and pass clean
+greedy next-token behavior can enter confirmation. This selection is
+prospective and outcome-independent with respect to the lens, but it changes
+the estimand: a later S3 result applies to clean-correct, token-eligible public
+cases. It is not a population capability estimate and cannot establish how the
+model behaves on excluded or incorrect cases.
+
+## L-58 - Multi-token concepts are outside protocol v1
+
+Protocol v1 requires complete single-token surfaces for readout directions and
+causal answer/intermediate coordinates. Multi-token concepts are mechanically
+ineligible rather than approximated, generated, pooled, or repaired. A later
+classification therefore cannot be generalized to multi-token concepts
+without a new prospectively reviewed protocol.
+
+## L-59 - Public confirmation labels are neither private nor researcher-blind
+
+The official benchmark rows, intermediates, answers, and alternatives are
+public. The deterministic development/confirmation split is frozen before lens
+output, but the confirmation labels are not private and are not blind to the
+researcher. This limits the strength of claims about independence and makes
+strict adherence to the frozen bytes and no-post-output-selection rules
+essential.
+
+## L-60 - Actual-path intervention compatibility remains unproven
+
+The official repository publishes data and a lens implementation but not a
+complete reusable intervention runtime for this target model and the frozen
+coordinate-swap, ablation, and patching path. The protocol and synthetic
+algebra tests establish computability, not compatibility with a future real
+M1200 artifact or hook implementation. That actual-path compatibility must be
+proved before confirmation is opened; failure is an operational blocker, not a
+license to change the metric.
+
+## L-61 - S3 validity would not establish the project's larger claims
+
+Even a future `JLENS_VALIDATED_FOR_RQ2_PILOT` result would validate only the
+selected-case v1 instrument under its frozen truth table. It would not establish
+Phase 1.0D capability headroom, semantic reviewer accuracy, human ground truth,
+hidden reasoning, an internal workspace, or a J-space. It also would not
+override the independent Phase 1.0D transport-capacity block or by itself
+license S4/RQ2.
