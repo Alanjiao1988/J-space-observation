@@ -42,8 +42,15 @@ triples `(category, intermediate, answer)` and
 sole target representative is the first matching item in the official upstream
 array; this result-independent tie-break is necessary to make duplicate raw
 triples computable. The rule produces 29 oriented matches and 24 unique
-unordered pairs. The two primary readout distributions and the causal benchmark
-retain separate roles.
+unordered pairs.
+
+Some official rows have identical names or content across source files. They
+are not claimed to be content-disjoint. `$.role_separation.role_identity`
+defines a row as
+`SHA-256(UTF-8(distribution) || NUL || canonical_item_bytes)`. Thus multihop,
+order-ops, and causal-swap copies remain distinct source-role rows and cannot be
+merged, deduplicated across distributions, or transferred between readout and
+causal roles.
 
 ## Prospective stage boundary
 
@@ -142,10 +149,11 @@ diagnostic is reported but never enters a primary gate.
 
 Under `$.eligibility.primary_leakage_filter`, a candidate is removed when its
 complete normalized/case-folded form occurs as a token-bounded prompt literal
-or equals the registered target-answer surface. An intermediate with no
-remaining single-token surface is mechanically ineligible. Counts are emitted
-by item and intermediate for prompt surface, target overlap, and multi-token
-failure.
+or exactly equals the normalized/case-folded registered target-answer surface.
+No semantic-synonym lookup or generated answer variant is used. An intermediate
+with no remaining single-token surface is mechanically ineligible. Counts are
+emitted by item and intermediate for prompt surface, target overlap, and
+multi-token failure.
 
 At `$.eligibility.targets`, each primary readout target is only the exact
 official target string with casing/boundary equivalents; semantic synonyms and
@@ -313,7 +321,14 @@ top-1 equality with clean plus maximum absolute logit difference at most
 classification.
 
 Hard gates require lower95 of label control, position control, and
-`C_leakage` each above zero, plus no forbidden primary surface. Core gates are
+`C_leakage` each above zero. The fourth gate at
+`$.classification.hard_surface_rule` joins confirmation-eligible `e0_item`,
+intermediate `e0_surface`, and true-label `readout_rank` rows. It requires
+`primary_retained` to equal
+`not prompt_leakage and not target_overlap and single_token`, and requires each
+true-label rank token set to equal the sorted union of retained E0 token IDs.
+This is an exact registered-target overlap check, not a semantic-synonym
+judgment. Core gates are
 `READOUT_PASS = lower95(R) > 0` and
 `CAUSAL_PASS = lower95(C_logit) > 0 and lower95(C_random) > 0`.
 
@@ -377,8 +392,10 @@ created a direct contradiction.
 ## Roles, limitations, and claims
 
 `$.role_separation` fixes the non-overlap claims among A600/B600 fit sequences,
-official benchmarks, Phase 1 bank, development, confirmation, primary readout,
-and causal swap. Only vendored bytes, mechanical eligibility, clean greedy
+official benchmarks, Phase 1 bank, development, and confirmation. Readout and
+causal roles are disjoint by distribution-qualified source-row identity, while
+identical public content across their source files is explicitly allowed and
+never merged. Only vendored bytes, mechanical eligibility, clean greedy
 correctness, and the deterministic split hash may select items. Lens/readout/
 activation/intervention/patching outcomes, best replicate/layer, and favorable
 random controls are forbidden selectors.

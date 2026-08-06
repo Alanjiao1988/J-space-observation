@@ -218,6 +218,9 @@ def test_strict_json_loader_rejects_nonfinite_literals(tmp_path: Path) -> None:
         ),
         lambda p: p["identities"]["target_model"].__setitem__("revision", "main"),
         lambda p: p["role_separation"]["allowed_selection_signals"].append("rank"),
+        lambda p: p["role_separation"]["role_identity"].__setitem__(
+            "row_id", "SHA-256(canonical_item_bytes)"
+        ),
         lambda p: p["eligibility"]["order_ops"]["numeric_forms"]["3"].append("third"),
         lambda p: p["eligibility"]["targets"].__setitem__(
             "primary_readout", "accept any numeric synonym"
@@ -258,6 +261,20 @@ def test_role_overlap_is_rejected_mechanically() -> None:
         {"development items": {"a"}, "confirmation items": {"b"}},
         [("development items", "confirmation items")],
     )
+
+
+def test_role_row_identity_qualifies_cross_distribution_duplicates() -> None:
+    item = {"name": "same", "prompt": "p", "target": "t", "intermediates": ["i"]}
+    multihop = s3.canonical_role_row_bytes("multihop", item)
+    causal = s3.canonical_role_row_bytes("causal_swap", item)
+    assert multihop == b"multihop\0" + s3.canonical_item_bytes(item)
+    assert causal == b"causal_swap\0" + s3.canonical_item_bytes(item)
+    assert multihop != causal
+    assert s3.canonical_role_row_hash(
+        "multihop", item
+    ) != s3.canonical_role_row_hash("causal_swap", item)
+    with pytest.raises(s3.ProtocolError, match="unknown official distribution"):
+        s3.canonical_role_row_bytes("merged", item)
 
 
 def test_output_rows_are_closed_typed_and_output_pack_is_all_or_nothing(
@@ -373,8 +390,56 @@ def test_surface_and_answer_leakage_filtering_is_mechanical() -> None:
         "prompt_surface": ("Brazil",),
         "target_overlap": ("Portuguese",),
     }
+    exact_only = s3.filter_leaking_surfaces(["3", "three"], "", "3")
+    assert exact_only == {
+        "kept": ("three",),
+        "prompt_surface": (),
+        "target_overlap": ("3",),
+    }
     assert s3.token_bounded_literal("a rain-forest", "rain")
     assert not s3.token_bounded_literal("a train", "rain")
+
+
+def test_hard_surface_gate_is_reconstructible_from_registered_rows() -> None:
+    items = [
+        {
+            "distribution": "multihop",
+            "item_id": "item",
+            "mechanical_eligible": True,
+            "behavioral_eligible": True,
+            "split_role": "confirmation",
+        }
+    ]
+    surfaces = [
+        {
+            "distribution": "multihop",
+            "item_id": "item",
+            "surface_role": "intermediate",
+            "intermediate_index": 0,
+            "token_ids": [7, 3],
+            "prompt_leakage": False,
+            "target_overlap": False,
+            "single_token": True,
+            "primary_retained": True,
+        }
+    ]
+    ranks = [
+        {
+            "distribution": "multihop",
+            "item_id": "item",
+            "intermediate_index": 0,
+            "control_kind": "true",
+            "registered_token_ids": [3, 7],
+        }
+    ]
+    assert s3.hard_surface_gate(items, surfaces, ranks)
+
+    target_leak = copy.deepcopy(surfaces)
+    target_leak[0]["target_overlap"] = True
+    assert not s3.hard_surface_gate(items, target_leak, ranks)
+    wrong_tokens = copy.deepcopy(ranks)
+    wrong_tokens[0]["registered_token_ids"] = [3]
+    assert not s3.hard_surface_gate(items, surfaces, wrong_tokens)
 
 
 def test_control_position_and_clean_behavior_eligibility_are_mechanical() -> None:

@@ -152,8 +152,14 @@
       "lower95(M1200 true-label minus label-permuted readout effect) > 0",
       "lower95(M1200 true-position minus position-shuffled readout effect) > 0",
       "lower95(C_leakage) > 0",
-      "no forbidden surface or final-answer synonym enters the primary readout"
+      "hard_surface_rule passes for every primary-readout confirmation row"
     ],
+    "hard_surface_rule": {
+      "candidate_scope": "e0_item distribution in [multihop, order_ops] with mechanical_eligible=true, behavioral_eligible=true, and split_role=confirmation; join e0_surface where surface_role=intermediate.",
+      "readout_token_equality": "For each scoped (distribution, item_id, intermediate_index), every readout_rank row with control_kind=true has registered_token_ids equal to the sorted unique union of token_ids from primary_retained e0_surface rows.",
+      "retention_equivalence": "For each scoped e0_surface row, primary_retained equals (not prompt_leakage and not target_overlap and single_token).",
+      "semantic_synonym_scope": "No semantic-synonym lookup is performed: target_overlap is only exact normalized case-folded equality to the registered official target surface; unregistered generated variants cannot enter the candidate set."
+    },
     "integrity_preconditions": [
       "all required source hashes, model and lens identities, source layers, and confirmation rows are complete",
       "all primary computations are finite",
@@ -396,7 +402,7 @@
       "runtime_growth": "forbidden"
     },
     "primary_leakage_filter": {
-      "answer_overlap": "Remove a surface when its normalized case-folded complete form equals the registered target-answer surface.",
+      "answer_overlap": "Set target_overlap=true and remove a surface when its normalized case-folded complete form equals the normalized case-folded exact registered target-answer surface; no semantic-synonym relation or generated variant is consulted.",
       "empty_result": "mechanically ineligible",
       "prompt_match": "Remove a surface when its normalized case-folded complete form occurs as a token-bounded literal in the normalized case-folded prompt.",
       "reporting": "Report item and intermediate removal counts separately for prompt surface, target overlap, and multi-token ineligibility."
@@ -970,20 +976,31 @@
         "official benchmark items"
       ],
       [
-        "primary readout benchmark",
-        "causal swap benchmark"
+        "primary readout source-role rows",
+        "causal swap source-role rows"
       ]
     ],
+    "role_identity": {
+      "canonical_role_row_bytes": "UTF-8(distribution) || one NUL byte || canonical_item_bytes",
+      "content_overlap_policy": "Identical names, prompts, answers, intermediates, or canonical_item_bytes across different distributions are allowed public-source overlap; they remain different role rows and must not be merged, deduplicated, or transferred across roles.",
+      "distribution_sources": {
+        "causal_swap": "data/experiments/probe-swap.json",
+        "multihop": "data/evaluations/lens-eval-multihop.json",
+        "order_ops": "data/evaluations/lens-eval-order-ops.json"
+      },
+      "output_reconstruction": "e0_item emits distribution, item_id, and canonical_item_sha256; readout rows emit distribution and item_id; causal tables are causal_swap-only and join to e0_item by item_id and canonical_item_sha256.",
+      "row_id": "SHA-256(canonical_role_row_bytes)"
+    },
     "roles": {
       "Phase 1 bank": "independent blocked headroom bank; never S3 fit, development, confirmation, or rescue data",
       "S2 fit A600": "independent 600-sequence lens fit only",
       "S2 fit B600": "independent 600-sequence lens fit only",
       "S2 fit sequences": "the union of the two independent S2 fit corpora, disjoint from every official benchmark item",
-      "causal swap benchmark": "probe-swap 90-item causal source only",
+      "causal swap source-role rows": "distribution-qualified probe-swap rows assigned only to the 90-item causal source role",
       "confirmation items": "unopened confirmatory rows after E0 split sealing",
       "development items": "execution and implementation-defect diagnostics only",
       "official benchmark items": "the immutable public readout and causal benchmark items, never lens-fit sequences or Phase 1 bank rows",
-      "primary readout benchmark": "93 multihop plus 55 order-ops public items"
+      "primary readout source-role rows": "distribution-qualified multihop and order-ops rows assigned only to the 93 plus 55 primary readout role"
     },
     "selection_signals_forbidden": [
       "J-lens output",

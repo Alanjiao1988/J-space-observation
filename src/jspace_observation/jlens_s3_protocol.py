@@ -99,6 +99,11 @@ EXPECTED_UPSTREAM_FILES = {
         "separate causal-swap benchmark",
     ),
 }
+DISTRIBUTION_SOURCE_PATHS = MappingProxyType({
+    "causal_swap": "data/experiments/probe-swap.json",
+    "multihop": "data/evaluations/lens-eval-multihop.json",
+    "order_ops": "data/evaluations/lens-eval-order-ops.json",
+})
 
 TERMINAL_VALUES = (
     "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
@@ -122,8 +127,30 @@ HARD_GATES = (
     "lower95(M1200 true-label minus label-permuted readout effect) > 0",
     "lower95(M1200 true-position minus position-shuffled readout effect) > 0",
     "lower95(C_leakage) > 0",
-    "no forbidden surface or final-answer synonym enters the primary readout",
+    "hard_surface_rule passes for every primary-readout confirmation row",
 )
+HARD_SURFACE_RULE = {
+    "candidate_scope": (
+        "e0_item distribution in [multihop, order_ops] with "
+        "mechanical_eligible=true, behavioral_eligible=true, and "
+        "split_role=confirmation; join e0_surface where surface_role=intermediate."
+    ),
+    "readout_token_equality": (
+        "For each scoped (distribution, item_id, intermediate_index), every "
+        "readout_rank row with control_kind=true has registered_token_ids equal "
+        "to the sorted unique union of token_ids from primary_retained "
+        "e0_surface rows."
+    ),
+    "retention_equivalence": (
+        "For each scoped e0_surface row, primary_retained equals "
+        "(not prompt_leakage and not target_overlap and single_token)."
+    ),
+    "semantic_synonym_scope": (
+        "No semantic-synonym lookup is performed: target_overlap is only exact "
+        "normalized case-folded equality to the registered official target "
+        "surface; unregistered generated variants cannot enter the candidate set."
+    ),
+}
 INTEGRITY_PRECONDITIONS = (
     "all required source hashes, model and lens identities, source layers, and confirmation rows are complete",
     "all primary computations are finite",
@@ -151,6 +178,25 @@ COUNTERPART_MATCHING_RULE = (
 COUNTERPART_PAIR_ID_RULE = (
     "SHA-256 of the two item names sorted by UTF-8 bytes and joined by one LF byte."
 )
+ROLE_IDENTITY = {
+    "canonical_role_row_bytes": (
+        "UTF-8(distribution) || one NUL byte || canonical_item_bytes"
+    ),
+    "content_overlap_policy": (
+        "Identical names, prompts, answers, intermediates, or "
+        "canonical_item_bytes across different distributions are allowed "
+        "public-source overlap; they remain different role rows and must not be "
+        "merged, deduplicated, or transferred across roles."
+    ),
+    "distribution_sources": dict(DISTRIBUTION_SOURCE_PATHS),
+    "output_reconstruction": (
+        "e0_item emits distribution, item_id, and canonical_item_sha256; "
+        "readout rows emit distribution and item_id; causal tables are "
+        "causal_swap-only and join to e0_item by item_id and "
+        "canonical_item_sha256."
+    ),
+    "row_id": "SHA-256(canonical_role_row_bytes)",
+}
 
 OUTPUT_COLUMNS = {
     "e0_item": (
@@ -648,6 +694,20 @@ def canonical_item_hash(item: Mapping[str, Any], seed: str = SPLIT_SEED) -> str:
     return hashlib.sha256(canonical_item_bytes(item) + seed.encode("utf-8")).hexdigest()
 
 
+def canonical_role_row_bytes(distribution: str, item: Mapping[str, Any]) -> bytes:
+    """Qualify identical public rows by their immutable source distribution."""
+
+    if distribution not in DISTRIBUTION_SOURCE_PATHS:
+        raise ProtocolError(f"unknown official distribution: {distribution}")
+    return distribution.encode("utf-8") + b"\0" + canonical_item_bytes(item)
+
+
+def canonical_role_row_hash(distribution: str, item: Mapping[str, Any]) -> str:
+    """Return the distribution-qualified role-row identity."""
+
+    return hashlib.sha256(canonical_role_row_bytes(distribution, item)).hexdigest()
+
+
 def assign_hash_split(
     items: Sequence[Mapping[str, Any]],
     development_count: int = 15,
@@ -767,6 +827,75 @@ def filter_leaking_surfaces(
         "prompt_surface": tuple(prompt_removed),
         "target_overlap": tuple(target_removed),
     }
+
+
+def hard_surface_gate(
+    e0_items: Sequence[Mapping[str, Any]],
+    e0_surfaces: Sequence[Mapping[str, Any]],
+    readout_ranks: Sequence[Mapping[str, Any]],
+) -> bool:
+    """Reconstruct the exact primary-surface hard gate from registered rows."""
+
+    scoped_items = {
+        (str(row.get("distribution")), str(row.get("item_id")))
+        for row in e0_items
+        if row.get("distribution") in {"multihop", "order_ops"}
+        and row.get("mechanical_eligible") is True
+        and row.get("behavioral_eligible") is True
+        and row.get("split_role") == "confirmation"
+    }
+    if not scoped_items:
+        return False
+
+    surface_keys: set[tuple[str, str, int]] = set()
+    retained_tokens: dict[tuple[str, str, int], set[int]] = {}
+    for row in e0_surfaces:
+        item_key = (str(row.get("distribution")), str(row.get("item_id")))
+        if item_key not in scoped_items or row.get("surface_role") != "intermediate":
+            continue
+        intermediate_index = row.get("intermediate_index")
+        if not isinstance(intermediate_index, int):
+            return False
+        surface_key = (item_key[0], item_key[1], intermediate_index)
+        surface_keys.add(surface_key)
+        should_retain = (
+            row.get("prompt_leakage") is False
+            and row.get("target_overlap") is False
+            and row.get("single_token") is True
+        )
+        if row.get("primary_retained") is not should_retain:
+            return False
+        if not should_retain:
+            continue
+        token_ids = row.get("token_ids")
+        if not isinstance(token_ids, list):
+            return False
+        if not token_ids or any(not isinstance(token_id, int) for token_id in token_ids):
+            return False
+        retained_tokens.setdefault(surface_key, set()).update(token_ids)
+
+    if surface_keys != set(retained_tokens):
+        return False
+
+    seen: set[tuple[str, str, int]] = set()
+    for row in readout_ranks:
+        if row.get("control_kind") != "true":
+            continue
+        key = (
+            str(row.get("distribution")),
+            str(row.get("item_id")),
+            row.get("intermediate_index"),
+        )
+        if key[:2] not in scoped_items or not isinstance(key[2], int):
+            return False
+        expected = retained_tokens.get(key)
+        registered = row.get("registered_token_ids")
+        if expected is None or not isinstance(registered, list):
+            return False
+        if tuple(registered) != tuple(sorted(expected)):
+            return False
+        seen.add(key)
+    return bool(retained_tokens) and seen == surface_keys
 
 
 def resolve_single_token_ids(
@@ -1602,6 +1731,8 @@ def validate_protocol_semantics(protocol: Mapping[str, Any]) -> None:
         raise ProtocolError("core gate drift")
     if tuple(classification["hard_scientific_gates"]) != HARD_GATES:
         raise ProtocolError("hard gate drift")
+    if classification["hard_surface_rule"] != HARD_SURFACE_RULE:
+        raise ProtocolError("hard surface rule drift")
     if tuple(classification["integrity_preconditions"]) != INTEGRITY_PRECONDITIONS:
         raise ProtocolError("integrity gate drift")
 
@@ -1631,10 +1762,17 @@ def validate_protocol_semantics(protocol: Mapping[str, Any]) -> None:
         frozenset(("S2 fit sequences", "official benchmark items")),
         frozenset(("development items", "confirmation items")),
         frozenset(("Phase 1 bank", "official benchmark items")),
-        frozenset(("primary readout benchmark", "causal swap benchmark")),
+        frozenset(
+            (
+                "primary readout source-role rows",
+                "causal swap source-role rows",
+            )
+        ),
     }
     if pairs != required_pairs:
         raise ProtocolError("role non-overlap drift")
+    if role["role_identity"] != ROLE_IDENTITY:
+        raise ProtocolError("distribution-qualified role identity drift")
 
     review = protocol["review"]
     if review["rounds"] != 1 or tuple(review["questions"]) != EXPECTED_REVIEW_QUESTIONS:
@@ -1876,9 +2014,11 @@ __all__ = [
     "BANDS",
     "COUNTERPART_MATCHING_RULE",
     "COUNTERPART_PAIR_ID_RULE",
+    "DISTRIBUTION_SOURCE_PATHS",
     "FLOORS",
     "GRAM_TOLERANCE",
     "HARD_GATES",
+    "HARD_SURFACE_RULE",
     "INTEGRITY_PRECONDITIONS",
     "K_GRID",
     "LABEL_SEED",
@@ -1888,6 +2028,7 @@ __all__ = [
     "ProtocolError",
     "RANDOM_DIRECTION_SEED",
     "REQUIRED_CROSSWALK_PATHS",
+    "ROLE_IDENTITY",
     "SCHEMA_VERSION",
     "SPLIT_SEED",
     "TERMINAL_VALUES",
@@ -1897,6 +2038,8 @@ __all__ = [
     "canonical_item_bytes",
     "canonical_item_hash",
     "canonical_json_bytes",
+    "canonical_role_row_bytes",
+    "canonical_role_row_hash",
     "classify",
     "clean_behavior_eligible",
     "coordinate_swap",
@@ -1907,6 +2050,7 @@ __all__ = [
     "equal_distribution_pool",
     "filter_leaking_surfaces",
     "gram_matrix",
+    "hard_surface_gate",
     "load_and_validate_protocol",
     "load_json",
     "normalize_decoded_token",

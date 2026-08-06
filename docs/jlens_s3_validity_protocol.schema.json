@@ -58,6 +58,30 @@
       ],
       "type": "object"
     },
+    "hardSurfaceRule": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_scope": {
+          "$ref": "#/$defs/string"
+        },
+        "readout_token_equality": {
+          "$ref": "#/$defs/string"
+        },
+        "retention_equivalence": {
+          "$ref": "#/$defs/string"
+        },
+        "semantic_synonym_scope": {
+          "$ref": "#/$defs/string"
+        }
+      },
+      "required": [
+        "candidate_scope",
+        "readout_token_equality",
+        "retention_equivalence",
+        "semantic_synonym_scope"
+      ],
+      "type": "object"
+    },
     "lensArtifact": {
       "additionalProperties": false,
       "properties": {
@@ -128,6 +152,51 @@
       ],
       "type": "object"
     },
+    "roleIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_role_row_bytes": {
+          "$ref": "#/$defs/string"
+        },
+        "content_overlap_policy": {
+          "$ref": "#/$defs/string"
+        },
+        "distribution_sources": {
+          "additionalProperties": false,
+          "properties": {
+            "causal_swap": {
+              "$ref": "#/$defs/string"
+            },
+            "multihop": {
+              "$ref": "#/$defs/string"
+            },
+            "order_ops": {
+              "$ref": "#/$defs/string"
+            }
+          },
+          "required": [
+            "causal_swap",
+            "multihop",
+            "order_ops"
+          ],
+          "type": "object"
+        },
+        "output_reconstruction": {
+          "$ref": "#/$defs/string"
+        },
+        "row_id": {
+          "$ref": "#/$defs/string"
+        }
+      },
+      "required": [
+        "canonical_role_row_bytes",
+        "content_overlap_policy",
+        "distribution_sources",
+        "output_reconstruction",
+        "row_id"
+      ],
+      "type": "object"
+    },
     "roleMap": {
       "additionalProperties": false,
       "properties": {
@@ -143,7 +212,7 @@
         "S2 fit sequences": {
           "$ref": "#/$defs/string"
         },
-        "causal swap benchmark": {
+        "causal swap source-role rows": {
           "$ref": "#/$defs/string"
         },
         "confirmation items": {
@@ -155,7 +224,7 @@
         "official benchmark items": {
           "$ref": "#/$defs/string"
         },
-        "primary readout benchmark": {
+        "primary readout source-role rows": {
           "$ref": "#/$defs/string"
         }
       },
@@ -164,11 +233,11 @@
         "S2 fit A600",
         "S2 fit B600",
         "S2 fit sequences",
-        "causal swap benchmark",
+        "causal swap source-role rows",
         "confirmation items",
         "development items",
         "official benchmark items",
-        "primary readout benchmark"
+        "primary readout source-role rows"
       ],
       "type": "object"
     },
@@ -649,6 +718,9 @@
         "hard_scientific_gates": {
           "$ref": "#/$defs/stringArray"
         },
+        "hard_surface_rule": {
+          "$ref": "#/$defs/hardSurfaceRule"
+        },
         "integrity_preconditions": {
           "$ref": "#/$defs/stringArray"
         },
@@ -669,6 +741,7 @@
       "required": [
         "core_gates",
         "hard_scientific_gates",
+        "hard_surface_rule",
         "integrity_preconditions",
         "operational_blocker_rule",
         "terminal_values",
@@ -1537,6 +1610,9 @@
           "minItems": 1,
           "type": "array"
         },
+        "role_identity": {
+          "$ref": "#/$defs/roleIdentity"
+        },
         "roles": {
           "$ref": "#/$defs/roleMap"
         },
@@ -1549,6 +1625,7 @@
         "claims",
         "limitations",
         "required_disjoint_pairs",
+        "role_identity",
         "roles",
         "selection_signals_forbidden"
       ],
