@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import copy
 import hashlib
 import json
@@ -405,14 +406,11 @@ def test_manifest_order_is_create_only_manifest_last() -> None:
 
 def test_s2_module_cannot_import_model_dataset_or_lens_packages() -> None:
     source = (HELPER_ROOT / "jlens_s2_protocol.py").read_text(encoding="utf-8")
-    forbidden = (
-        "import torch",
-        "import transformers",
-        "import datasets",
-        "import jlens",
-        "from torch",
-        "from transformers",
-        "from datasets",
-        "from jlens",
-    )
-    assert not any(fragment in source for fragment in forbidden)
+    forbidden = {"datasets", "jlens", "torch", "transformers"}
+    imported = set()
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            imported.update(alias.name.split(".", 1)[0] for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported.add(node.module.split(".", 1)[0])
+    assert imported.isdisjoint(forbidden)

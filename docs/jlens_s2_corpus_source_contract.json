@@ -24,13 +24,13 @@
       "duplicate_128_token_ids",
       "eligible_unassigned_after_first_1402"
     ],
+    "reconstructible": true,
     "record_fields": [
       "row_id",
       "raw_text_sha256",
       "category",
       "detail_ids"
-    ],
-    "reconstructible": true
+    ]
   },
   "protected_prompt_bank": {
     "deduplication": "deduplicate only byte-identical prompts after recording every source coordinate",
