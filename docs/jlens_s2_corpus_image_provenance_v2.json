@@ -1,0 +1,58 @@
+{
+  "correction": {
+    "decision": "docs/decisions/jlens_s2_pre_corpus_selector_correction.md",
+    "old_contract_sha256": "bde80360e5f0dda1701ebc41341bdc777416efcae43a4764493180e185008e6d",
+    "reason": "sealed Phase 1.0D review form has the closed question field, not prompt_text or prompt",
+    "replacement_contract_sha256": "d1eccb2eb35da65f5c3cbb98ee4b6fbbe58de434fc5e6d420981367071706775",
+    "unchanged_protocol_sha256": "e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2"
+  },
+  "image": {
+    "build_run_id": "cmat",
+    "delete_enabled": false,
+    "digest": "sha256:48efeaa40d88ac60d35f186fbb6c57b6731b28bbb5f47ba7277fbee04cc40045",
+    "manifest_delete_enabled": false,
+    "manifest_write_enabled": false,
+    "registry": "acrjspaceobssea0708231738",
+    "repository": "j-space-observation-jlens-s2-corpus",
+    "tag": "b77f7df6974d3d17549370a6b5f3ee6d0f201ce0",
+    "write_enabled": false
+  },
+  "operation_boundary": {
+    "benchmark_model_operations": 0,
+    "benchmark_tokenizer_operations": 0,
+    "corpus_tokenizer_constructions": 0,
+    "j_lens_operations": 0,
+    "model_operations": 0,
+    "statement": "Corrected image build and tests only; no tokenizer construction, dataset row scan, model operation, or lens operation occurred."
+  },
+  "prior_attempt_retained": {
+    "blob_prefix": "jlens-s2/corpus/20260806T172525Z",
+    "execution": "job-jspace-s2-corpus-18274d4e-2kbgf2l",
+    "image_digest": "sha256:50ee00228313e1661276aed6e290adcea034e7c28d2ab34090d53f6fe624eee1",
+    "job": "job-jspace-s2-corpus-18274d4e",
+    "status": "Failed before tokenizer construction"
+  },
+  "schema_version": "jlens-s2-corpus-image-provenance/v2",
+  "sealed_at_utc": "2026-08-06T17:41:15Z",
+  "source": {
+    "bundle_bytes": 4454599,
+    "bundle_file_count": 18,
+    "bundle_format": "ASCII jlens-s2-corpus-image-source-bundle-v1 plus LF, then for each UTF-8-lexicographically sorted path: UTF-8 path, NUL, ASCII decimal blob length, NUL, exact Git blob bytes",
+    "bundle_sha256": "9affc49f5032e23ade27b3e17e6e5afdfdfedb8f9c48038b62785f121822bf11",
+    "commit": "b77f7df6974d3d17549370a6b5f3ee6d0f201ce0",
+    "context_method": "18 declared paths normalized to LF in scratch and individually verified against exact Git blob object IDs before upload",
+    "dockerfile_bytes": 4815,
+    "dockerfile_sha256": "5130d5b08bde58d81f804e4965d0c114ada396c33602112dcbcb968e0df5b21b",
+    "script_bytes": 19121,
+    "script_sha256": "9dae72877fdb06b7d475131bf690f855a5ebdb8abfc56662264fa8aee9a633a8",
+    "selector_module_bytes": 28532,
+    "selector_module_sha256": "ef60728894a7e1acec1132054a86eaff229607ecea53085e7b3e09378ebbffdd",
+    "tree": "ce12480ee20bec7d85069fed0e1a252d42753979"
+  },
+  "validation": {
+    "focused_acr_run": "cmas",
+    "result": "28 passed",
+    "validated_commit": "3c4199844143fe5755927886a693f9a2ad029d0a",
+    "validated_tree": "bc9d6914bad155a528da276f9cb0d3a751d0debf"
+  }
+}
