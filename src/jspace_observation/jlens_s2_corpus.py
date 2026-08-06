@@ -283,10 +283,10 @@ retained as `upstream_README.md` with SHA-256
 `{upstream_readme_sha256}`.
 
 Attribution: WikiText by Salesforce Research, derived from Wikipedia
-contributors. The source text and derived corpus rows remain subject to the
-upstream Creative Commons Attribution-ShareAlike 3.0 and GNU Free
-Documentation License terms; they are not relicensed under the repository's
-code license. Preserve this notice and the upstream dataset card when
+contributors. The source text and derived corpus rows remain subject to the upstream
+Creative Commons Attribution-ShareAlike 3.0 and GNU Free Documentation License
+terms; they are not relicensed under the repository's code license.
+Preserve this notice and the upstream dataset card when
 redistributing these corpus files.
 
 References:
@@ -525,6 +525,7 @@ def build_corpus_manifest(
     protected_bank_path: Path,
     eligible_unique_rows: int,
     scanned_rows: int,
+    versions: Sequence[Mapping[str, str]] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     rows = []
     for line_number, raw in enumerate(
@@ -549,13 +550,17 @@ def build_corpus_manifest(
             "path": exclusion_path.name,
             "sha256": s2.sha256_file(exclusion_path),
         },
-        "library_versions": library_versions(
-            (
-                "datasets",
-                "huggingface_hub",
-                "pyarrow",
-                "tokenizers",
-                "transformers",
+        "library_versions": (
+            [dict(row) for row in versions]
+            if versions is not None
+            else library_versions(
+                (
+                    "datasets",
+                    "huggingface_hub",
+                    "pyarrow",
+                    "tokenizers",
+                    "transformers",
+                )
             )
         ),
         "protected_prompt_bank": {

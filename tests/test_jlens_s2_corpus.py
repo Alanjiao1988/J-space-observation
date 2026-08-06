@@ -223,6 +223,7 @@ def test_build_corpus_manifest_validates_exact_rows(tmp_path: Path) -> None:
         protected_bank_path=bank_path,
         eligible_unique_rows=1402,
         scanned_rows=1402,
+        versions=[{"name": "synthetic", "version": "1"}],
     )
     assert manifest["rows"]["sha256"] == s2.sha256_file(rows_path)
     assert len(rows) == 1402
