@@ -53,5 +53,32 @@ The one correction:
 
 ## Same-checklist verification
 
-Pending verification of only `S3R-01` and `S3R-02` against the corrected
-candidate. No second review cycle is authorized.
+The correction verification targeted only the two cited findings:
+
+| Field | Value |
+|---|---|
+| Corrected commit | `3954e6e0089271e835de152e4c7e3e9591bb8491` |
+| Corrected tree | `dbb275b3ae7e0cd41af365dbac14b103c18ee0a7` |
+| Corrected protocol SHA-256 | `bb07dc3be90539e88ff8ada8adee879da747ec5b0b0409499b9809f259df4625` |
+| Corrected schema SHA-256 | `5d6e2fc33771b427130bd1dbe94c79cdf6d5827288b96929352c0caa793acbf1` |
+| Focused correction ACR run | `cma3`: 55 passed |
+
+`S3R-01` is **VERIFIED**. `$.role_separation.role_identity` now qualifies
+each official row by its immutable source distribution, explicitly acknowledges
+cross-distribution content overlap, forbids merge/transfer across roles, and
+keeps readout and causal source-role rows operationally distinct. The schema,
+Markdown, validator helpers, and tests carry the same rule.
+
+`S3R-02` is **VERIFIED**. `$.classification.hard_surface_rule` is finite and
+reconstructible from scoped `e0_item`, `e0_surface`, and true-label
+`readout_rank` rows. Target overlap is exact normalized case-folded equality;
+semantic synonym generation is not used. The separate direct-answer,
+prompt-echo, motor-band, and random-perturbation controls remain registered.
+
+The correction created no direct contradiction. Final disposition:
+**0 FATAL / 0 MATERIAL / 0 MINOR**. The protocol is freeze-ready and
+`BLOCKED_ON_PREREGISTRATION_INTEGRITY` is not required.
+
+This verification completes the already-spent single review; it is not a
+second review cycle. No further correction or S3 methods review is authorized
+after this record is frozen.
