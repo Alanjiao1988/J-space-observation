@@ -63,6 +63,11 @@ def test_registered_corpus_role_slices_are_exact() -> None:
         "heldout": 200,
         "smoke": 2,
     }
+    rows = runtime.role_slice(pack, "A", 65, 128)
+    assert len(rows) == 64
+    assert [row["role_index"] for row in rows] == list(range(65, 129))
+    with pytest.raises(runtime.S2RuntimeError, match="exceeds"):
+        runtime.role_slice(pack, "smoke", 1, 3)
 
 
 def test_heldout_metric_keys_require_exact_cartesian_coverage() -> None:
@@ -85,11 +90,6 @@ def test_heldout_metric_keys_require_exact_cartesian_coverage() -> None:
     duplicate = [*rows[:-1], rows[0]]
     with pytest.raises(runtime.S2RuntimeError, match="exactly cover"):
         runtime.validate_heldout_metric_rows(duplicate, expected_ids)
-    rows = runtime.role_slice(pack, "A", 65, 128)
-    assert len(rows) == 64
-    assert [row["role_index"] for row in rows] == list(range(65, 129))
-    with pytest.raises(runtime.S2RuntimeError, match="exceeds"):
-        runtime.role_slice(pack, "smoke", 1, 3)
 
 
 def test_blob_store_is_create_only_and_exact() -> None:
@@ -211,7 +211,7 @@ def test_pack_manifest_binds_source_image_and_protocol(
             else original(value)
         )
         manifest = runtime.pack_manifest(
-            stage="S2-test",
+            stage="S2-T0-selection",
             files=[file_path],
             root=tmp_path,
             complete=True,
