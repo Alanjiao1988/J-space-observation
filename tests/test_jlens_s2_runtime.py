@@ -500,3 +500,19 @@ def test_production_plan_partitions_each_arm_once_and_preserves_checkpoints() ->
         assert plan["cumulative_lenses"][f"{role}128"][-1] == f"{role}-065-128"
         assert plan["cumulative_lenses"][f"{role}256"][-1] == f"{role}-129-256"
         assert len(plan["cumulative_lenses"][f"{role}600"]) == 9
+
+
+def test_heldout_plan_partitions_all_rows_and_freezes_metric_keys() -> None:
+    plan = s2.load_json(ROOT / "docs" / "jlens_s2_heldout_plan.json")
+    covered = [
+        index
+        for shard in plan["shards"]
+        for index in range(shard["start_index"], shard["end_index"] + 1)
+    ]
+    assert covered == list(range(1, 201))
+    assert [row["size"] for row in plan["shards"]] == [40] * 5
+    assert set(plan["lenses"]) == {"A600", "B600", "M1200"}
+    assert set(plan["metric_contract"]["pairs"]) == runtime.HELDOUT_PAIRS
+    assert plan["metric_contract"]["layers"] == list(s2.SOURCE_LAYERS)
+    assert plan["metric_contract"]["top_k_overlap"] == [10, 50]
+    assert plan["metric_contract"]["position"] == -1

@@ -1,0 +1,100 @@
+{
+  "analysis_image": {
+    "digest": "sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+    "source_commit": "3249c90d0a54a64010aed111998c3907021d55ce"
+  },
+  "blob_prefix": "jlens-s2/production/20260806T194226Z/heldout",
+  "diagnostic_only": true,
+  "lenses": {
+    "A600": {
+      "manifest_blob": "jlens-s2/production/20260806T194226Z/lenses/A600/lens_manifest.json",
+      "manifest_sha256": "302112cb3cea6c10f4531b897e5d75484e9489cd044bc8e555e5bcf6acb0fa77"
+    },
+    "B600": {
+      "manifest_blob": "jlens-s2/production/20260806T194226Z/lenses/B600/lens_manifest.json",
+      "manifest_sha256": "0881047112f8f8d6d105cd3e7a09c49d83cf2c2617730537e77e1604582c1aaa"
+    },
+    "M1200": {
+      "manifest_blob": "jlens-s2/production/20260806T194226Z/lenses/M1200/lens_manifest.json",
+      "manifest_sha256": "cc96d4c07aa2a5eaf35ef0aeb57391265dcfa79d3745dded1e84ece5827b943a"
+    }
+  },
+  "metric_contract": {
+    "finite_rate": true,
+    "full_vocabulary_logit_cosine": true,
+    "full_vocabulary_spearman_rank_correlation": true,
+    "layers": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26
+    ],
+    "pairs": [
+      "A600_vs_B600",
+      "A600_vs_M1200",
+      "B600_vs_M1200"
+    ],
+    "position": -1,
+    "top_k_overlap": [
+      10,
+      50
+    ]
+  },
+  "role": "heldout",
+  "schema_version": "jlens-s2-heldout-plan/v1",
+  "shards": [
+    {
+      "end_index": 40,
+      "id": "heldout-001-040",
+      "size": 40,
+      "start_index": 1
+    },
+    {
+      "end_index": 80,
+      "id": "heldout-041-080",
+      "size": 40,
+      "start_index": 41
+    },
+    {
+      "end_index": 120,
+      "id": "heldout-081-120",
+      "size": 40,
+      "start_index": 81
+    },
+    {
+      "end_index": 160,
+      "id": "heldout-121-160",
+      "size": 40,
+      "start_index": 121
+    },
+    {
+      "end_index": 200,
+      "id": "heldout-161-200",
+      "size": 40,
+      "start_index": 161
+    }
+  ]
+}
