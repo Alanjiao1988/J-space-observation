@@ -1,0 +1,44 @@
+{
+  "authority_baseline": {
+    "failed": 2,
+    "passed": 3427,
+    "skipped": 15
+  },
+  "focused": {
+    "failed": 0,
+    "passed": 311,
+    "run_id": "cmbr",
+    "runner_sha256": "c2acb8a80c5c6931cd607f0e789edf57317a33ae2df69cf80baa3659fd6a4340",
+    "skipped": 0,
+    "status": "Succeeded"
+  },
+  "full": {
+    "delta": {
+      "failed": 0,
+      "passed": 58,
+      "skipped": 0
+    },
+    "failed": 2,
+    "historical_failures": [
+      "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+      "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix"
+    ],
+    "new_failures": 0,
+    "passed": 3485,
+    "run_id": "cmbq",
+    "skipped": 15,
+    "status": "Failed only because the two authority-disclosed historical parser-seal tests remain red"
+  },
+  "integrity": {
+    "run_id": "cmbs",
+    "script_sha256": "13f06ad1f5d2bd11b266a6b5ca6f64e53c772544555553125d6a5bfe51b7107b",
+    "status": "Succeeded"
+  },
+  "non_authoritative_harness_run": {
+    "reason": "The original external runner accepted multiple selectors as separate positional arguments but retained only the first. It therefore passed 17 tests and was replaced by the corrected multi-selector runner.",
+    "run_id": "cmbp"
+  },
+  "schema_version": "jlens-s2-s3-final-acr-validation/v1",
+  "target_commit": "30c0dee7194446040da2a542ea763b1fdbad3d55",
+  "target_tree": "af63a170f6b6f659b41ab1e503122d10d5343763"
+}

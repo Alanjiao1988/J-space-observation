@@ -5119,3 +5119,28 @@ development-first split, leaving confirmation counts 0/0/0 and pooled readout
 confirmation 0. Every floor failed. The exact terminal state is:
 
 **`INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY`**.
+
+### Final ACR and protected-byte verification
+
+The terminal evidence commit
+`30c0dee7194446040da2a542ea763b1fdbad3d55`, tree
+`af63a170f6b6f659b41ab1e503122d10d5343763`, was tested from an exact Git
+bundle in ACR.
+
+- Initial focused run `cmbp` passed 17 tests but was non-authoritative because
+  the external runner retained only the first of multiple positional
+  selectors.
+- Corrected focused run `cmbr` passed all 311 selected S2, S3, E0, registry,
+  protected-byte, and historical-image controls.
+- Full run `cmbq` completed at 3,485 passed / 15 skipped / exactly the two
+  authority-disclosed historical `tests/test_parser_v3_seal_job.py` failures.
+  Relative to the 3,427 / 15 / 2 baseline, the delta is
+  **+58 passed / +0 skipped / +0 failed**.
+- Independent integrity run `cmbs` rehashed every frozen S3 and Phase 1.0D
+  anchor, both protected-byte manifests, D25-D30 and EV-0014 prefixes, the S2
+  seals, E0 lock, complete E0 pack, and terminal receipt. It returned
+  `FINAL-INTEGRITY-PASS`, confirmed EV-0016 as the evidence tail, confirmed
+  D25-D32, and proved the starting commit remains an ancestor.
+
+The exhaustive operator handoff is
+`docs/jlens_s2_s3_e0_final_handoff.md`.
