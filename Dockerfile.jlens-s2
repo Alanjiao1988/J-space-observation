@@ -17,6 +17,7 @@ WORKDIR /workspace/repo
 COPY docs/jlens_s2_artifacts.schema.json /workspace/repo/docs/
 COPY docs/jlens_s2_protocol.json /workspace/repo/docs/
 COPY docs/jlens_s2_protocol.schema.json /workspace/repo/docs/
+COPY docs/jlens_s2_production_plan.json /workspace/repo/docs/
 COPY docs/jlens_s2_runtime_pack.schema.json /workspace/repo/docs/
 COPY data/jlens_s2_wikitext /workspace/repo/data/jlens_s2_wikitext
 COPY scripts/jlens_s2_analysis.py /workspace/repo/scripts/
