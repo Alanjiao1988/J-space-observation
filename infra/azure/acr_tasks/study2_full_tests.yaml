@@ -1,0 +1,4 @@
+version: v1.1.0
+steps:
+  - cmd: python:3.11-bookworm bash /workspace/study2_full_tests.sh {{.Values.COMMIT}}
+    timeout: 2400
