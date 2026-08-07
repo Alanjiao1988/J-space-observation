@@ -308,7 +308,13 @@ def _counterfactual(primitive: Mapping[str, Any], *domain: object) -> tuple[dict
     }, implied
 
 
-def _behavioral_row(role: str, family: str, depth: int, index: int) -> dict[str, Any]:
+def _behavioral_row(
+    role: str,
+    family: str,
+    depth: int,
+    index: int,
+    collision_attempt: int,
+) -> dict[str, Any]:
     seed = protocol.SEEDS[role]
     size = 8 if family == "permutation_chain" else 10
     label = protocol.LABELS[index % 4]
@@ -325,12 +331,29 @@ def _behavioral_row(role: str, family: str, depth: int, index: int) -> dict[str,
         sequence=sequence,
         desired_pre_answer=desired_pre,
         desired_final=desired_final,
-        domain=(role, family, depth, index, "primary"),
+        domain=(role, family, depth, index, collision_attempt, "primary"),
         require_distinct_trace_states=depth == 3,
     )
-    counterfactual, implied = _counterfactual(primitive, seed, role, family, depth, index)
+    counterfactual, implied = _counterfactual(
+        primitive,
+        seed,
+        role,
+        family,
+        depth,
+        index,
+        collision_attempt,
+    )
     other_states = [value for value in primitive["state_space"] if value not in {desired_final, implied}]
-    extras = _hash_order(other_states, seed, role, family, depth, index, "distractors")[:2]
+    extras = _hash_order(
+        other_states,
+        seed,
+        role,
+        family,
+        depth,
+        index,
+        collision_attempt,
+        "distractors",
+    )[:2]
     option_values = sorted([desired_final, implied, *extras])
     mapping = _option_mapping(
         option_values,
@@ -342,6 +365,7 @@ def _behavioral_row(role: str, family: str, depth: int, index: int) -> dict[str,
         family,
         depth,
         index,
+        collision_attempt,
     )
     counterfactual["implied_label"] = next(key for key, value in mapping.items() if value == implied)
     task: dict[str, Any] = {
@@ -448,7 +472,14 @@ def _pair_payload(row: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def _candidate_pair(role: str, family: str, depth: int, local_index: int, partition: str) -> dict[str, Any]:
+def _candidate_pair(
+    role: str,
+    family: str,
+    depth: int,
+    local_index: int,
+    partition: str,
+    forbidden_semantic_ids: set[str],
+) -> dict[str, Any]:
     seed = protocol.SEEDS[role]
     size = 8 if family == "permutation_chain" else 10
     balance_index = local_index + (0 if partition == "front" else 128)
@@ -540,7 +571,14 @@ def _candidate_pair(role: str, family: str, depth: int, local_index: int, partit
         same_intermediate = _pair_task(same_intermediate_primitive, task_id=f"{base_id}:same-intermediate", template_id=template_id, option_values=option_values, mapping=mapping)
         same_answer = _pair_task(same_answer_primitive, task_id=f"{base_id}:same-answer", template_id=template_id, option_values=option_values, mapping=mapping)
         random_donor = _pair_task(random_primitive, task_id=f"{base_id}:random", template_id=template_id, option_values=option_values, mapping=mapping)
-        if len({donor["semantic_id"], recipient["semantic_id"], same_intermediate["semantic_id"], same_answer["semantic_id"], random_donor["semantic_id"]}) != 5:
+        semantic_ids = {
+            donor["semantic_id"],
+            recipient["semantic_id"],
+            same_intermediate["semantic_id"],
+            same_answer["semantic_id"],
+            random_donor["semantic_id"],
+        }
+        if len(semantic_ids) != 5 or semantic_ids & forbidden_semantic_ids:
             continue
         recombinant_label = next(option_label for option_label, value in mapping.items() if value == a_x)
         row: dict[str, Any] = {
@@ -603,20 +641,56 @@ def _candidate_pair(role: str, family: str, depth: int, local_index: int, partit
     raise RuntimeError("deterministic candidate-pair search exhausted")
 
 
-def build_role_rows(role: str) -> list[dict[str, Any]]:
+def build_role_rows(
+    role: str,
+    forbidden_semantic_ids: set[str] | None = None,
+) -> list[dict[str, Any]]:
+    reserved = forbidden_semantic_ids if forbidden_semantic_ids is not None else set()
     if role in {"development", "behavioral_confirmation"}:
         rows: list[dict[str, Any]] = []
         per_cell = protocol.EXPECTED_CELL_COUNTS[role]
         for family in protocol.FAMILIES:
             for depth in protocol.DEPTHS:
-                rows.extend(_behavioral_row(role, family, depth, index) for index in range(per_cell))
+                for index in range(per_cell):
+                    for collision_attempt in range(1_000_000):
+                        row = _behavioral_row(
+                            role,
+                            family,
+                            depth,
+                            index,
+                            collision_attempt,
+                        )
+                        if row["semantic_id"] not in reserved:
+                            rows.append(row)
+                            reserved.add(row["semantic_id"])
+                            break
+                    else:  # pragma: no cover - finite space is far above bank size
+                        raise RuntimeError("deterministic behavioral collision search exhausted")
         return rows
     if role in {"mechanistic_development", "mechanistic_candidate_confirmation"}:
         rows = []
         for family in protocol.FAMILIES:
             for depth in protocol.COMPOSITIONAL_DEPTHS:
                 for partition in ("front", "back"):
-                    rows.extend(_candidate_pair(role, family, depth, index, partition) for index in range(128))
+                    for index in range(128):
+                        row = _candidate_pair(
+                            role,
+                            family,
+                            depth,
+                            index,
+                            partition,
+                            reserved,
+                        )
+                        rows.append(row)
+                        reserved.update(
+                            {
+                                row["primary"]["donor"]["semantic_id"],
+                                row["primary"]["recipient"]["semantic_id"],
+                                row["controls"]["same_intermediate_donor"]["semantic_id"],
+                                row["controls"]["same_answer_donor"]["semantic_id"],
+                                row["controls"]["random_donor"]["semantic_id"],
+                            }
+                        )
         return rows
     raise ValueError(f"unregistered role {role}")
 
@@ -630,8 +704,12 @@ def generate_all(root: Path, output_root: Path | None = None) -> dict[str, Any]:
     output = output_root or root / "studies/study2/data"
     protocol_document = protocol.load_and_validate_protocol(root)
     output.mkdir(parents=True, exist_ok=True)
+    reserved_semantic_ids: set[str] = set()
     for role, filename in protocol.BANK_FILES.items():
-        _write_jsonl(output / filename, build_role_rows(role))
+        _write_jsonl(
+            output / filename,
+            build_role_rows(role, reserved_semantic_ids),
+        )
 
     # The manifest can only be emitted after the separately coded verifier has
     # reconstructed every just-written row.  Verification expects the canonical
