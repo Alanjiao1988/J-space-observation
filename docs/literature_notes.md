@@ -38,3 +38,25 @@ Key relevance:
 
 - Activation patching can provide lens-independent causal evidence.
 - For RQ3, patching effect size is a primary instrument because model-specific J-lens readouts are not directly comparable across models.
+
+## Study 2 Stage P design sources and boundaries
+
+- The official DeepSeek-R1 model card identifies the 1.5B checkpoint's
+  Qwen2.5-Math lineage and R1-generated fine-tuning context. It motivates both
+  the lineage-base and same-family instruction controls, but does not identify
+  a training-causal mechanism.
+- *From Reasoning to Answer* and *Analysing Chain of Thought Dynamics* motivate
+  separating visible supplied/generated traces from a no-generated-trace logit
+  observable. They do not establish hidden computation in the fixed target.
+- The J-lens workspace paper motivates matched readout and causal controls.
+  *Observable Patterns Are Not Explanations* reinforces that decodability or
+  geometry without intervention is not mechanism evidence.
+- Study 2 therefore uses four-option restricted logits, exact programmatic
+  ground truth, donor-recipient recombinant patching, cross-template probes,
+  and target-only secondary M1200 diagnostics.
+
+The protected four-scale Study 1 J-lens convergence trajectory is recorded only
+as `EXPLORATORY_METHODS_OBSERVATION_AWAITING_CONTROLLED_VALIDATION`. No novelty,
+publication-readiness, or causal `max_seq_len=128` claim is made. Any Claude
+Study 1 failure analysis remains `ADVISORY_POST_HOC_METHODS_INPUT`, not
+scientific evidence.

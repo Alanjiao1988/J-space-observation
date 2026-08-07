@@ -1418,3 +1418,106 @@ a separately authorized behavioral-interface characterization. That efficiency
 failure does not license a post-hoc Study 1 rerun. Study 2 addresses it only by
 starting a prospectively separate forced-choice and causal design with new
 tasks, controls, splits, authority, and terminal states.
+
+## L-68 - Forced-choice logits are controlled preference, not spontaneous behavior
+
+Study 2 reads four registered continuation logits at one answer position and
+generates zero tokens. This avoids Study 1's open-answer format gate, but it
+does not establish spontaneous natural-language answering, conversational
+performance, or faithful self-generated chain of thought.
+
+## L-69 - Synthetic finite-state tasks do not establish broad reasoning
+
+`permutation_chain` and `affine_mod10` provide exact compositional ground truth
+and causal recombination, but they do not establish broad mathematical,
+factual, agentic, or real-world reasoning. Any result is bounded to these two
+registered families and interfaces.
+
+## L-70 - Three checkpoints do not isolate a training cause
+
+The target, lineage base, and instruction control permit a prospective
+checkpoint-level comparison. They cannot identify the causal contribution of a
+particular distillation sample, teacher trace, objective, loss term, or training
+phase.
+
+## L-71 - Control checkpoints may differ in tokenizer and configuration details
+
+Stage T must record each pinned tokenizer, BOS behavior, config, input length,
+and answer position. Common mechanical support makes the compared rows
+executable, but it does not make every checkpoint implementation detail
+identical.
+
+## L-72 - PT, WT, and ST are supplied traces
+
+The registered trace arms are controlled external inputs. They can measure
+whether supplied intermediate tokens affect the answer distribution, but they
+are not natural model-generated reasoning and cannot establish faithful CoT.
+
+## L-73 - Activation patching does not recover a complete algorithm
+
+Successful recombinant patching can show that transferred residual state has a
+causal effect on the registered answer contrast. It does not by itself yield a
+complete human-readable algorithm or prove that the intervention changes only
+one latent variable.
+
+## L-74 - Full-residual transfer carries multiple features
+
+The primary patch transfers a full block-output residual. Intermediate-state
+transfer, surface information, position information, and other features may
+co-move, which is why recombinant, donor-answer, structural, position, random,
+early-band, and motor-band controls are all conjunctively required.
+
+## L-75 - Probe decodability is not mechanism
+
+A cross-template probe can identify information present at the frozen layer,
+but decodability alone is not causal use. Probe success is required only in
+conjunction with the independent patching result, and probe failure remains
+visible when patching is favorable.
+
+## L-76 - M1200 remains a WikiText-proxy engineering artifact
+
+M1200 was fitted on a public WikiText proxy and has not been functionally
+validated on Study 2. Its four-scale convergence and heldout stability are
+engineering observations, not evidence that it reads or controls the registered
+intermediate state.
+
+## L-77 - The J-lens subaxis admits only token-supported digits
+
+The target-only J-lens axis can run only if Stage T proves exact support for the
+registered single-token state digits. Concepts without that support remain
+outside protocol v1; absence of support is operationally not estimable, not a
+negative J-lens result.
+
+## L-78 - Public deterministic banks are not private or researcher-blind
+
+The banks are prospective, byte-frozen, and generated without model output, but
+they are public and inspectable. They do not provide the protection of a
+private holdout or researcher-blind confirmation set.
+
+## L-79 - One-family support cannot generalize across domains
+
+A complete result in exactly one family receives an explicitly
+non-generalized one-family state. It cannot be promoted to the two-family
+internal-computation or strong distillation-associated claim.
+
+## L-80 - Study 2 cannot repair Study 1 or Phase 1.0D
+
+No Study 2 result changes Study 1's
+`INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY` state or Phase 1.0D's independent
+`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY` state. It cannot retrospectively
+validate Study 1 lenses or reopen old evidence rows.
+
+## L-81 - Gate A conditions confirmation on target development success
+
+Gate A prevents opening confirmation when either task family lacks a detectable
+target compositional development signal. This is prospectively registered and
+uses no confirmation data, but it still creates protocol-selection and
+winner's-curse risk by conditioning later execution on favorable target
+development.
+
+## L-82 - Joint power across conjunctive gates is not identified
+
+Exact binomial, paired-discordance, and standardized-effect calculations bound
+individual components. They do not identify joint power across behavior,
+margin, six patch contrasts, probes, hard controls, two families, and two
+checkpoint comparisons without a registered joint data-generating model.

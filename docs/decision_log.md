@@ -2796,6 +2796,44 @@ GPU, and scientific operations remain unauthorized. No Study 2 evidence row is
 created by this organizational transition. The resulting state is
 `NONTERMINAL_CHECKPOINT_STUDY2_OPENED_AWAITING_STAGE_P`.
 
+## D35 - Adopt a disposable two-family development feasibility gate
+
+2026-08-07. Study 2 Stage P operator amendment.
+
+The operator selected Gate A after a pre-review gap analysis showed that the
+original B-D stage could verify implementation but could not discard an
+empirically unsuitable interface before confirmation. The original 53,018-byte
+Stage P authority remains unchanged. The additive authority at
+`studies/study2/prompts/stage_p_gate_a_operator_amendment.md` fixes one narrow
+change: after Stage T and B-D implementation validation, before any B-C object
+is opened, target NT development accuracy must pass an exact binomial gate in
+both task families.
+
+Each family pools its fixed 64 depth-2 and 64 depth-3 rows. Forty-three or more
+of 128 restricted-option-correct rows pass the exact one-sided alpha .025
+boundary; 42 does not. All three models still run the same development rows,
+but control outcomes cannot decide the gate. A failure closes protocol v1 and
+requires a new version, authority, and seeds. It cannot trigger same-version
+backfill, replacement tasks, pooling rescue, or threshold change. Gate A is
+operational protocol qualification, not scientific evidence.
+
+## D36 - Freeze the reviewed Study 2 Stage P protocol and banks
+
+2026-08-07. Study 2 Stage P freeze.
+
+The single 15-item methods review found no FATAL or MATERIAL issue and recorded
+two accepted MINOR limitations: Gate A protocol-selection bias and unidentified
+joint power across conjunctive gates. No consolidated correction or second
+review was used.
+
+The canonical protocol is frozen as `FROZEN_AWAITING_STAGE_T`, the task-bank
+manifest as `FROZEN_MODEL_FREE_BANKS`, and the review allowance as
+`SPENT_VERIFIED`. Final ACR runs `cmcc`, `cmcd`, and `cmce` respectively passed
+41 focused tests, the 3,537 / 15 / 2 full-suite envelope, and the complete
+frozen validator. EV-0016 remains the evidence tail, all Study 2 claims remain
+unsupported/preregistered, and Stage T is not authorized. The exact state is
+`NONTERMINAL_CHECKPOINT_STUDY2_PROTOCOL_FROZEN_AWAITING_TOKENIZER_GATE_AND_EXECUTION`.
+
 ## D34 - Seal the Study 2 bootstrap authority and new-thread handoff
 
 2026-08-07. Study 2 bootstrap handoff.

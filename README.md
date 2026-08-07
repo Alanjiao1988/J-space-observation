@@ -1,13 +1,13 @@
 # J-space observation
 
-本仓库研究 DeepSeek-R1 蒸馏小模型是否形成可观察、可干预、具有因果作用的内部推理状态。项目现已明确划分为两个相互隔离的研究：已经关闭的 **Study 1**，以及刚刚开启、等待前瞻性协议设计的 **Study 2**。
+本仓库研究 DeepSeek-R1 蒸馏小模型是否形成可观察、可干预、具有因果作用的内部推理状态。项目现已明确划分为两个相互隔离的研究：已经关闭的 **Study 1**，以及已完成 Stage P 前瞻性冻结、等待独立 tokenizer gate 授权的 **Study 2**。
 
 ## 当前状态
 
 | Study | 状态 | 结论边界 | 入口 |
 |---|---|---|---|
 | Study 1 | `CLOSED / INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY` | 工程链和证据封存完成，但原始科学问题未被检验 | [Study 1 总结](studies/study1/README.md) |
-| Study 2 | `OPEN / AWAITING_STAGE_P` | 新研究已建立；尚无 tokenizer、模型、lens、activation 或科学结果 | [Study 2 入口](studies/study2/README.md) |
+| Study 2 | `PROTOCOL_FROZEN / AWAITING_STAGE_T_AUTHORITY` | 协议、Gate A 与公开确定性 banks 已冻结；尚无 tokenizer、模型、lens、activation 或科学结果 | [Study 2 入口](studies/study2/README.md) |
 
 Study 1 的终态基线是 commit `6409d2c6d665187e4459d94d490a20d7b085e8af`、tree `bc8b80cb0e66f9426dcdedd52b624c892caa3fc9`。旧文件保持原路径和原字节；新的 `studies/study1/` 只是索引层，不重写历史证据。
 
@@ -44,12 +44,12 @@ Study 2 的 claim ceiling 是：
 
 | 阶段 | 内容 | 当前状态 |
 |---|---|---|
-| P | 协议、合成任务库、方法审查与冻结 | `AUTHORIZED_NOT_RUN` |
+| P | 协议、合成任务库、方法审查与冻结 | `COMPLETE / FROZEN_AWAITING_STAGE_T` |
 | T | tokenizer、模型身份及 token-alignment gate | 未授权 |
 | B-D / B-C | 行为 development / confirmation | 未授权 |
 | M-D / M-C | 机制定位 / confirmation | 未授权 |
 
-当前只允许执行 Stage P。它必须保持 model-free，并在一次有界方法学审查后冻结。Stage P 的设计文件不是经验性证据，也不能新增科学 evidence row。
+Stage P 已严格保持 model-free，并在唯一一次有界方法学审查后冻结。新增的 Gate A 要求未来在 Stage T 之后、打开 B-C 之前，以固定 development rows 对两个任务族分别执行一次 target-only 组合能力 gate；失败只能关闭当前协议版本，不能在同一版本换题、回填或改阈值。Stage P 的设计文件不是经验性证据，`paper/evidence_ledger.csv` 仍止于 `EV-0016`。Stage T 尚未授权。
 
 ## 固定模型身份
 
@@ -68,6 +68,9 @@ Study 2 的 claim ceiling 是：
 - [Study 2 研究章程](studies/study2/RESEARCH_CHARTER.md)
 - [Study 2 机器可读章程](studies/study2/study2_charter.json)
 - [Study 2 下一线程 handoff](studies/study2/NEXT_THREAD_HANDOFF.md)
+- [Study 2 冻结协议](studies/study2/protocol/reasoning_internalization_protocol.md)
+- [Study 2 Stage P freeze decision](studies/study2/decisions/reasoning_internalization_protocol_freeze.md)
+- [Study 2 Stage P final handoff](studies/study2/STAGE_P_FINAL_HANDOFF.md)
 - [全局决策日志](docs/decision_log.md)
 - [全局运行日志](docs/run_log.md)
 - [Claim–evidence matrix](paper/claim_evidence_matrix.md)

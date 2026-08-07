@@ -248,3 +248,50 @@ parser-v3 material as a validated or audited protocol.
 | Status | **unsupported / not estimable in Study 1** |
 | Key artifacts | `docs/jlens_s3_validity_protocol.json`; `artifacts/jlens-s2-production/20260806T194226Z/s2-sealed/`; `artifacts/jlens-s3-e0/20260807T081017Z/`; `docs/jlens_s2_s3_e0_final_handoff.md`. |
 | Limitations | `INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY` is a prospective eligibility-floor result, not `JLENS_NOT_VALIDATED`. Study 1 is closed and cannot be repaired with replacement items or a second E0. Study 2 may use the fixed target M1200 only as a secondary axis after its new behavior, selection, and causal design are sealed; a future Study 2 result cannot retrospectively validate Study 1. |
+
+**2026-08-07 - Study 2 Stage P update.** A new target-only J-lens secondary
+axis is preregistered, but it has not run. The frozen protocol, public banks,
+Gate A, and engineering identities are not functional validity evidence.
+CL-07 remains unsupported.
+
+---
+
+## CL-08 - Study 2 causal internal computation
+
+| Field | Value |
+| --- | --- |
+| Proposed paper claim | The target checkpoint uses a causally load-bearing task-defined intermediate variable to solve fresh compositional tasks under a controlled no-generated-trace interface. |
+| Required evidence | Frozen Gate A pass; target NT_PASS in both selected family cells; complete fixed-window recombinant patching with all six lower-bound gates; cross-template PROBE_PASS; complete integrity controls and closed row-level packs. |
+| Available evidence | A reviewed and frozen protocol, deterministic public banks, exact task/pair ground truth, ACR validation, and zero-operation Stage P provenance. |
+| Missing evidence | Every tokenizer gate, Gate A result, behavioral logit row, activation, patch, probe, bootstrap interval, and confirmation classification. |
+| Status | **unsupported / preregistered** |
+| Key artifacts | `studies/study2/protocol/reasoning_internalization_protocol.json`; `studies/study2/data/task_bank_manifest.json`; `studies/study2/decisions/reasoning_internalization_protocol_freeze.md`. |
+| Limitations | Forced-choice logits are not spontaneous behavior; synthetic tasks are narrow; Gate A creates disclosed protocol-selection bias; one-family support cannot generalize; operational incompleteness is not a scientific negative. |
+
+---
+
+## CL-09 - Study 2 distillation-associated checkpoint difference
+
+| Field | Value |
+| --- | --- |
+| Proposed paper claim | The target's registered behavioral and causal internal-computation effects are stronger than both the fixed lineage base and the fixed same-family instruction control. |
+| Required evidence | CL-08 support plus paired lower95 target-minus-each-control aggregate NT accuracy above zero and, in each family, target-minus-each-control PATCH_RECOMBINATION above zero, with every hard control intact on identical target-defined cells, pairs, and window. |
+| Available evidence | Exact immutable checkpoint identities and a frozen common-support design requiring all three models to run the same rows and target-defined selections. |
+| Missing evidence | All three-model tokenizer, behavior, causal, and comparative output packs. |
+| Status | **unsupported / preregistered** |
+| Key artifacts | `studies/study2/RESEARCH_CHARTER.md`; `studies/study2/protocol/reasoning_internalization_protocol.json`. |
+| Limitations | A checkpoint difference is associated with the total post-training/distillation-related change and cannot identify a teacher trace, training example, objective, or loss component. |
+
+---
+
+## CL-10 - Study 2 target-only J-space validation
+
+| Field | Value |
+| --- | --- |
+| Proposed paper claim | The fixed target M1200 axis reads out and causally manipulates the registered intermediate state beyond logit-lens, label/position, random-direction, and direct-answer controls. |
+| Required evidence | Complete target-only M-C pack with JREADOUT_PASS and JCAUSAL_PASS under the frozen tasks, pairs, and window, after the lens-independent axis is sealed. |
+| Available evidence | Fixed M1200/A600/B600 engineering identities and a preregistered non-rescuing secondary axis. |
+| Missing evidence | Every Study 2 J-lens readout, coordinate swap, control replicate, interval, and classification. |
+| Status | **unsupported / preregistered** |
+| Key artifacts | `studies/study2/protocol/reasoning_internalization_protocol.json`; `artifacts/jlens-s2-production/20260806T194226Z/s2-sealed/`. |
+| Limitations | M1200 was fitted on a WikiText proxy; four-scale convergence is exploratory engineering observation only; digit-token support is not yet known; this axis cannot promote the lens-independent result or validate Study 1 retrospectively. |

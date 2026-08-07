@@ -2,14 +2,19 @@
 
 ## Status
 
-Coordination state: `FROZEN_PENDING_FINAL_ACR_VALIDATION`
+Coordination state:
+`NONTERMINAL_CHECKPOINT_STUDY2_PROTOCOL_FROZEN_AWAITING_TOKENIZER_GATE_AND_EXECUTION`
 
 Canonical protocol lifecycle: `FROZEN_AWAITING_STAGE_T`
 
 Formal methods-review allowance: `SPENT_VERIFIED`
 
 The model-free protocol and public deterministic banks are frozen after the
-single formal methods review. An operator-directed pre-review check identified
+single formal methods review and final ACR validation. Focused run `cmcc`
+passed 41 tests, full run `cmcd` returned 3,537 passed / 15 skipped / only the
+two disclosed historical parser-seal failures, and validator `cmce` passed the
+complete frozen package and protected-byte checks. An operator-directed
+pre-review check identified
 a material feasibility-gate question. The operator selected Gate A and authorized
 the additive amendment at
 [`prompts/stage_p_gate_a_operator_amendment.md`](prompts/stage_p_gate_a_operator_amendment.md).
@@ -20,7 +25,7 @@ The freeze decision is
 
 No tokenizer, model, lens, activation, probe, patching, ablation,
 semantic-review provider, GPU Job, or scientific row has been produced under
-Study 2. A candidate protocol and model-free task-bank generation are not
+Study 2. A frozen protocol and model-free task-bank generation are not
 empirical evidence.
 
 ## Research question
@@ -69,10 +74,10 @@ tasks, new splits, new controls, new authority, and new terminal states.
 
 ## Stage boundary
 
-Only Stage P is authorized for the next thread. Stage P may create and review
-the prospective protocol and deterministic public task banks. It must perform
-zero tokenizer/model/lens/activation operation. Later Stage T, behavioral, and
-mechanistic execution each require separate authority.
+Stage P is complete. No Stage T authority exists in this round. A later
+operator authority must separately open tokenizer/model identity and alignment
+work; behavioral and mechanistic execution remain further downstream and
+separately gated.
 
 ## Read next
 
@@ -81,3 +86,4 @@ mechanistic execution each require separate authority.
 3. [`NEXT_THREAD_HANDOFF.md`](NEXT_THREAD_HANDOFF.md)
 4. [`prompts/stage_p_protocol_design_prompt.md`](prompts/stage_p_protocol_design_prompt.md)
 5. [`protocol/stage_p_operator_amendment_required.md`](protocol/stage_p_operator_amendment_required.md)
+6. [`STAGE_P_FINAL_HANDOFF.md`](STAGE_P_FINAL_HANDOFF.md)

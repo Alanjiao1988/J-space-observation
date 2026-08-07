@@ -5188,3 +5188,81 @@ No Stage P implementation, task generation, methods review, ACR validation, or
 scientific operation occurred while sealing the handoff. The new thread must
 begin by verifying the exact final head supplied by the operator and the
 authority ancestry, then execute Stage P only.
+
+## 2026-08-07 - Study 2 Stage P protocol, Gate A, banks, review, and freeze
+
+Stage P began from the registered execution start
+`191d4a3596ab64b26f54effb6ccaf6005f229139`, tree
+`9d1c68d895435928a10ac2b0f44d277b370000c1`, with the operator handoff head
+`1b7edc1d2108a98ca12db63bb6a76274cc6f726a` as the verified current remote
+checkpoint. The original start remains an ancestor throughout.
+
+The starting integrity gate rehashed the 53,018-byte authority, Study 1
+terminal commit/tree, bootstrap authority, every listed S2/S3/E0 and Phase 1.0D
+anchor, the 152-file and 36-file protected rollups, D32/D33, and EV-0016. Every
+identity matched.
+
+Static candidate review corrected model-free construction and validation before
+formal review: option-order seeding, full-cell mechanistic balance, depth-3
+trace distinctness, cross-role semantic rejection sampling, fail-closed
+manifest validation, exact deterministic bootstrap support, closed blocker
+reasons, and truth-table tests. The operator then adopted the additive Gate A
+authority after model-free ACR sensitivity run `cmc2` proved its exact 43/128
+boundary.
+
+### Model-free bank generation
+
+Final candidate generation was bound to commit
+`09d922774e19ce4a58cbea09bdedcd3792b4f4a5`, tree
+`4623cbbe29278aef2a559483249872f9bf3e4f25`.
+
+| Run | Type | Status | Result |
+|---|---|---|---|
+| `cmc3` | ACR QuickRun | Succeeded | Generated, independently verified, compared PYTHONHASHSEED 1/777, exported exact banks |
+| `cmc4` | ACR QuickRun | Succeeded | Repeated generation with the same four bank hashes |
+
+The exact ACR bytes were retrieved from `cmc3`'s OCI layers without local
+regeneration and committed. Counts are 384 development rows, 1,536 behavioral
+confirmation rows, 1,024 mechanistic-development pair units, and 1,024
+mechanistic-confirmation pair units. All role overlaps and protected-prompt
+overlaps are zero; 3,968 task/pair units were independently reconstructed.
+
+### Candidate validation and bounded review
+
+Candidate commit `97ea5b291aec1bcfc6e5ab9a0de42a6c901afae4`, tree
+`966a31aec9bb4f1aa057e90ef95a6a4134b155ea`, passed:
+
+- focused `cmc9`: 41 passed;
+- full `cmca`: 3,537 passed / 15 skipped / two disclosed historical failures;
+- validator `cmcb`: complete package, protected anchors, and both Phase 1.0D
+  rollups passed.
+
+The single formal methods review was committed as `86b04db4da1ad701af7a9da8f7fddb711d838dad`.
+It recorded no FATAL/MATERIAL finding, two MINOR limitations, no consolidated
+correction, and no second review.
+
+### Frozen validation
+
+Freeze commit `d5e8e19c025410fda7c9eb430f507a201a18c9cd`, tree
+`b044133055c697cad8828664254143f3b83f68d5`, passed:
+
+| Run | Type | Status | Result |
+|---|---|---|---|
+| `cmcc` | ACR QuickRun | Succeeded | 41 focused tests passed |
+| `cmcd` | ACR QuickRun | Succeeded | 3,537 passed / 15 skipped / exactly 2 historical failures |
+| `cmce` | ACR QuickRun | Succeeded | Frozen lifecycle, banks, hashes, ancestry, protected bytes, EV-0016, and zero-operation contract passed |
+
+Relative to 3,485 / 15 / 2, the exact full-suite delta is
+**+52 passed / +0 skipped / +0 failed**.
+
+Failed pre-final harness attempts were retained honestly: `cmbu` stopped on a
+CRLF task wrapper before generation; `cmbv` exposed a semantic collision;
+`cmbw` exposed JSON balance-key canonicalization; `cmbx` validated generation
+but used a non-pushing task form; `cmc7` exposed four full-suite integration
+regressions in addition to the two historical failures. Each defect was fixed
+before the formal review; none performed a model, tokenizer, lens, activation,
+probe, patch, or GPU operation.
+
+The final Stage P state is
+`NONTERMINAL_CHECKPOINT_STUDY2_PROTOCOL_FROZEN_AWAITING_TOKENIZER_GATE_AND_EXECUTION`.
+No Stage T work was started.
