@@ -1,0 +1,18 @@
+version: v1.1.0
+steps:
+  - id: generate
+    cmd: python:3.11-bookworm bash /workspace/study2_generate_banks.sh {{.Values.COMMIT}} {{.Values.TREE}}
+    timeout: 3600
+    env:
+      - ACR_RUN_ID={{.Run.ID}}
+  - id: package
+    build: >-
+      -t {{.Run.Registry}}/j-space-observation-study2-stage-p:{{.Values.OUTPUT_TAG}}
+      -f /workspace/study2-src/infra/azure/acr_tasks/study2_bank_output.Dockerfile
+      --build-arg SOURCE_COMMIT={{.Values.COMMIT}}
+      --build-arg SOURCE_TREE={{.Values.TREE}}
+      /workspace/study2-src
+    when:
+      - generate
+push:
+  - {{.Run.Registry}}/j-space-observation-study2-stage-p:{{.Values.OUTPUT_TAG}}
