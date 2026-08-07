@@ -89,6 +89,7 @@ def test_exact_models_revisions_jlens_and_zero_operations(document: dict) -> Non
         "src/jspace_observation/study2_task_bank.py",
         "scripts/build_study2_task_bank.py",
         "scripts/validate_study2_protocol.py",
+        "scripts/analyze_study2_stage_p_sensitivity.py",
     ],
 )
 def test_stage_p_source_has_no_forbidden_import_or_provider_path(relative: str) -> None:
@@ -146,6 +147,39 @@ def test_wilson_and_registered_127_versus_128_cell_gate() -> None:
     assert s2.nt_pass(n=256, correct=128, margin_lower95=0.01, integrity_complete=True, balance_ok=True)
     assert not s2.nt_pass(n=255, correct=200, margin_lower95=0.01, integrity_complete=True, balance_ok=True)
     assert not s2.nt_pass(n=256, correct=200, margin_lower95=0.0, integrity_complete=True, balance_ok=True)
+
+
+def test_gate_a_exact_binomial_boundary_and_conjunction(document: dict) -> None:
+    gate = document["feasibility_gate"]
+    assert gate["critical_successes"] == 43
+    assert math.isclose(s2.binomial_upper_tail(128, 0.25, 43), 0.018218515933, abs_tol=5e-13)
+    assert math.isclose(s2.binomial_upper_tail(128, 0.25, 42), 0.028760674518, abs_tol=5e-13)
+    assert s2.feasibility_gate_pass(
+        permutation_correct=43,
+        affine_correct=43,
+        n_per_family=128,
+        execution_complete=True,
+        balance_ok=True,
+        confirmation_unopened=True,
+    )
+    assert not s2.feasibility_gate_pass(
+        permutation_correct=43,
+        affine_correct=42,
+        n_per_family=128,
+        execution_complete=True,
+        balance_ok=True,
+        confirmation_unopened=True,
+    )
+    assert not s2.feasibility_gate_pass(
+        permutation_correct=80,
+        affine_correct=80,
+        n_per_family=128,
+        execution_complete=True,
+        balance_ok=True,
+        confirmation_unopened=False,
+    )
+    assert document["feasibility_gate"]["on_fail"] == s2.FEASIBILITY_CLOSURE_STATES[0]
+    assert s2.FEASIBILITY_CLOSURE_STATES[0] not in s2.SCIENTIFIC_STATES
 
 
 def test_quantile_is_registered_linear_finite_rule() -> None:
@@ -341,6 +375,7 @@ def test_operational_blocker_cannot_be_synthesized_as_scientific_negative() -> N
 def test_protocol_contains_all_future_closed_output_rows(document: dict) -> None:
     tables = {row["name"]: row for row in document["output_contract"]["future_tables"]}
     assert set(tables) == {
+        "feasibility_gate_row",
         "behavioral_row",
         "patch_row",
         "probe_row",

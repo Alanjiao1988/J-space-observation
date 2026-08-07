@@ -2,9 +2,12 @@
 
 ## Coordination state
 
-`OPERATOR_AMENDMENT_REQUIRED`
+`RESOLVED_BY_GATE_A_OPERATOR_AMENDMENT`
 
-This is an operator-directed pre-review gap record. It is **not** the one
+This is the retained operator-directed pre-review gap record. The operator
+delegated the choice, Gate A was selected, and the additive authority is
+[`../prompts/stage_p_gate_a_operator_amendment.md`](../prompts/stage_p_gate_a_operator_amendment.md).
+This record is **not** the one
 bounded methods review in Stage P authority Section 17. The canonical protocol
 remains `CANDIDATE_AWAITING_REVIEW`, its review allowance remains `UNSPENT`,
 and no freeze decision exists.
@@ -202,8 +205,8 @@ Consequences:
 - still conditions confirmation on favorable target development and therefore
   retains selection bias.
 
-Neither gate is adopted. The operator must choose a new authority or explicitly
-retain the current no-feasibility-gate state machine.
+Gate A was subsequently adopted by the additive operator amendment. Gate B was
+not adopted.
 
 ## 5. Non-scientific execution reliability contract
 
@@ -259,9 +262,6 @@ exact ways:
 4. Section 17 allows one review/correction cycle, not an unregistered empirical
    redesign loop.
 
-Therefore the 53,018-byte authority remains unchanged, neither candidate gate
-is incorporated, the formal review does not start, and freeze is prohibited
-until the operator either:
-
-- explicitly retains the existing exact state machine; or
-- issues a new authority that selects and fully registers one amendment.
+Therefore the 53,018-byte authority remains unchanged. The additive Gate A
+authority resolves the conflict narrowly; the formal review may start only
+after the amended candidate package and banks are complete.

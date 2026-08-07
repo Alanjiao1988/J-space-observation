@@ -28,6 +28,11 @@ START_COMMIT = "191d4a3596ab64b26f54effb6ccaf6005f229139"
 START_TREE = "9d1c68d895435928a10ac2b0f44d277b370000c1"
 AUTHORITY_SHA256 = "1408c5ae4d09a097c70b0e984150c4947e527ca12b5614905a98b65685ed0b37"
 AUTHORITY_BYTES = 53_018
+AMENDMENT_PATH = "studies/study2/prompts/stage_p_gate_a_operator_amendment.md"
+AMENDMENT_SHA256 = "e7f015a71e0491aa26f66780e94ad7fd8201b3d1b9411298d92848781310c3c1"
+AMENDMENT_BYTES = 5_836
+SENSITIVITY_PATH = "studies/study2/protocol/stage_p_power_sensitivity.json"
+SENSITIVITY_SHA256 = "f2514ffe9bc5cff80ef164f5b05a3cd90bbdfb9550af49b755accd3cbc3589ff"
 
 MODEL_IDENTITIES = (
     (
@@ -126,6 +131,9 @@ OPERATIONAL_BLOCKERS = (
     "BLOCKED_ON_STUDY2_COMMON_OPTION_TOKENIZATION",
     "BLOCKED_ON_STUDY2_MECHANISTIC_TOKEN_SUPPORT",
     "BLOCKED_ON_STUDY2_EXECUTION",
+)
+FEASIBILITY_CLOSURE_STATES = (
+    "STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY",
 )
 EXECUTION_BLOCKER_REASONS = (
     "NONFINITE_OUTPUT",
@@ -476,6 +484,16 @@ def validate_protocol_semantics(document: Mapping[str, Any]) -> None:
     _require_equal(authority["prompt_sha256"], AUTHORITY_SHA256, "/authority/prompt_sha256")
     _require_equal(authority["prompt_bytes"], AUTHORITY_BYTES, "/authority/prompt_bytes")
     _require_equal(authority["protected_anchors"], PROTECTED_ANCHORS, "/authority/protected_anchors")
+    amendment = authority["operator_amendment"]
+    _require_equal(amendment["path"], AMENDMENT_PATH, "/authority/operator_amendment/path")
+    _require_equal(amendment["sha256"], AMENDMENT_SHA256, "/authority/operator_amendment/sha256")
+    _require_equal(amendment["bytes"], AMENDMENT_BYTES, "/authority/operator_amendment/bytes")
+    _require_equal(
+        amendment["decision"],
+        "ADOPT_GATE_A_FAMILY_COMPOSITION_QUALIFICATION",
+        "/authority/operator_amendment/decision",
+    )
+    _require_equal(amendment["original_authority_unchanged"], True, "/authority/operator_amendment/original_authority_unchanged")
 
     models = tuple((m["role"], m["model_id"], m["revision"]) for m in document["identities"]["models"])
     _require_equal(models, MODEL_IDENTITIES, "/identities/models")
@@ -504,6 +522,11 @@ def validate_protocol_semantics(document: Mapping[str, Any]) -> None:
     _require_equal(tuple(document["classification"]["jlens_states"]), JLENS_STATES, "/classification/jlens_states")
     _require_equal(tuple(document["classification"]["operational_blockers"]), OPERATIONAL_BLOCKERS, "/classification/operational_blockers")
     _require_equal(
+        tuple(document["classification"]["feasibility_closure_states"]),
+        FEASIBILITY_CLOSURE_STATES,
+        "/classification/feasibility_closure_states",
+    )
+    _require_equal(
         tuple(document["classification"]["execution_blocker_reason_codes"]),
         EXECUTION_BLOCKER_REASONS,
         "/classification/execution_blocker_reason_codes",
@@ -517,6 +540,46 @@ def validate_protocol_semantics(document: Mapping[str, Any]) -> None:
     _require_equal(document["selection"]["window"]["width"], 3, "/selection/window/width")
     _require_equal(document["selection"]["window"]["early_band"], [0, 8], "/selection/window/early_band")
     _require_equal(document["selection"]["window"]["motor_band"], [23, 27], "/selection/window/motor_band")
+
+    sensitivity = document["design_sensitivity"]
+    _require_equal(sensitivity["path"], SENSITIVITY_PATH, "/design_sensitivity/path")
+    _require_equal(sensitivity["sha256"], SENSITIVITY_SHA256, "/design_sensitivity/sha256")
+    _require_equal(sensitivity["acr_run_id"], "cmc2", "/design_sensitivity/acr_run_id")
+    _require_equal(sensitivity["sample_sizes_or_thresholds_changed"], False, "/design_sensitivity/sample_sizes_or_thresholds_changed")
+    gate = document["feasibility_gate"]
+    _require_equal(gate["id"], "GATE_A_FAMILY_COMPOSITION_QUALIFICATION", "/feasibility_gate/id")
+    _require_equal(gate["n_per_family"], 128, "/feasibility_gate/n_per_family")
+    _require_equal(gate["null_accuracy"], 0.25, "/feasibility_gate/null_accuracy")
+    _require_equal(gate["alpha"], 0.025, "/feasibility_gate/alpha")
+    _require_equal(gate["critical_successes"], 43, "/feasibility_gate/critical_successes")
+    _require_equal(gate["previous_successes_do_not_pass"], 42, "/feasibility_gate/previous_successes_do_not_pass")
+    _require_equal(gate["controls_affect_decision"], False, "/feasibility_gate/controls_affect_decision")
+    _require_equal(gate["confirmation_opened_before_decision"], False, "/feasibility_gate/confirmation_opened_before_decision")
+    _require_equal(gate["on_fail"], FEASIBILITY_CLOSURE_STATES[0], "/feasibility_gate/on_fail")
+    _require_equal(gate["same_version_repair_allowed"], False, "/feasibility_gate/same_version_repair_allowed")
+    if not (
+        binomial_upper_tail(128, 0.25, 43) <= 0.025
+        and binomial_upper_tail(128, 0.25, 42) > 0.025
+    ):
+        raise ProtocolError("Gate A critical-success boundary is not exact")
+    reliability = document["execution_reliability"]
+    if not reliability["manifest_last_complete_merge"]:
+        raise ProtocolError("later execution contract does not require manifest-last merge")
+    if reliability["infrastructure_failure_is_scientific_negative"]:
+        raise ProtocolError("infrastructure failure cannot be a scientific negative")
+    if reliability["cost_may_reduce_samples_repetitions_or_controls"]:
+        raise ProtocolError("GPU cost cannot reduce registered scientific work")
+    advisory = document["advisory_boundaries"]
+    _require_equal(
+        advisory["study1_failure_analysis"]["classification"],
+        "ADVISORY_POST_HOC_METHODS_INPUT",
+        "/advisory_boundaries/study1_failure_analysis/classification",
+    )
+    _require_equal(
+        advisory["jlens_four_scale"]["classification"],
+        "EXPLORATORY_METHODS_OBSERVATION_AWAITING_CONTROLLED_VALIDATION",
+        "/advisory_boundaries/jlens_four_scale/classification",
+    )
 
     review = document["review"]
     _require_equal(len(review["checklist"]), 15, "/review/checklist")
@@ -557,6 +620,10 @@ def validate_markdown_crosswalk(path: Path, document: Mapping[str, Any]) -> None
         "/selection",
         "/classification",
         "/output_contract",
+        "/design_sensitivity",
+        "/feasibility_gate",
+        "/execution_reliability",
+        "/advisory_boundaries",
         "/review",
         "/operation_limits",
         "/limitations",
@@ -587,6 +654,7 @@ def validate_markdown_crosswalk(path: Path, document: Mapping[str, Any]) -> None
         + DISTILLATION_AXIS_STATES
         + JLENS_STATES
         + OPERATIONAL_BLOCKERS
+        + FEASIBILITY_CLOSURE_STATES
     ):
         if state not in text:
             raise ProtocolError(f"Markdown omits registered state {state}")
@@ -608,6 +676,13 @@ def load_and_validate_protocol(root: Path) -> dict[str, Any]:
     if protocol_path.read_bytes() != canonical_json_bytes(document):
         raise ProtocolError("protocol JSON is not canonical")
     validate_markdown_crosswalk(markdown_path, document)
+    for relative, expected_bytes, expected_sha256 in (
+        (AMENDMENT_PATH, AMENDMENT_BYTES, AMENDMENT_SHA256),
+        (SENSITIVITY_PATH, 9_291, SENSITIVITY_SHA256),
+    ):
+        path = root / relative
+        if path.stat().st_size != expected_bytes or sha256_file(path) != expected_sha256:
+            raise ProtocolError(f"registered Stage P support bytes differ: {relative}")
     return document
 
 
@@ -1268,6 +1343,33 @@ def wilson_interval(successes: int, n: int, z: float = 1.959963984540054) -> tup
     center = (p + z * z / (2 * n)) / denominator
     half = z * math.sqrt((p * (1 - p) + z * z / (4 * n)) / n) / denominator
     return center - half, center + half
+
+
+def binomial_upper_tail(n: int, probability: float, threshold: int) -> float:
+    if n <= 0 or not 0 <= probability <= 1 or not 0 <= threshold <= n + 1:
+        raise ProtocolError("invalid binomial-tail inputs")
+    return math.fsum(
+        math.comb(n, successes)
+        * probability**successes
+        * (1 - probability) ** (n - successes)
+        for successes in range(threshold, n + 1)
+    )
+
+
+def feasibility_gate_pass(
+    *,
+    permutation_correct: int,
+    affine_correct: int,
+    n_per_family: int,
+    execution_complete: bool,
+    balance_ok: bool,
+    confirmation_unopened: bool,
+) -> bool:
+    if n_per_family != 128 or not execution_complete or not balance_ok or not confirmation_unopened:
+        return False
+    if any(not _is_plain_int(value) or not 0 <= value <= n_per_family for value in (permutation_correct, affine_correct)):
+        raise ProtocolError("invalid Gate A correct count")
+    return permutation_correct >= 43 and affine_correct >= 43
 
 
 def finite_quantile(values: Sequence[float], probability: float) -> float:

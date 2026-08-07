@@ -3,11 +3,40 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
+    "advisory_boundaries": {
+      "const": {
+        "jlens_four_scale": {
+          "classification": "EXPLORATORY_METHODS_OBSERVATION_AWAITING_CONTROLLED_VALIDATION",
+          "max_seq_len_128_causal_attribution": false,
+          "novelty_claim": false,
+          "primary_design_selection_role": false,
+          "publication_claim": false
+        },
+        "study1_failure_analysis": {
+          "classification": "ADVISORY_POST_HOC_METHODS_INPUT",
+          "evidence_id_allowed": false,
+          "scientific_evidence": false,
+          "study1_state_change_allowed": false,
+          "unsealed_numerical_claim_allowed": false
+        }
+      }
+    },
     "authority": {
       "const": {
         "claim_boundary": "Stage P is a reviewed prospective design and public deterministic bank freeze; it is not empirical evidence.",
         "decision_boundary": "D33",
         "evidence_tail": "EV-0016",
+        "operator_amendment": {
+          "bytes": 5836,
+          "decision": "ADOPT_GATE_A_FAMILY_COMPOSITION_QUALIFICATION",
+          "id": "STAGE_P_GATE_A_2026-08-07",
+          "lines": 144,
+          "original_authority_unchanged": true,
+          "path": "studies/study2/prompts/stage_p_gate_a_operator_amendment.md",
+          "sha256": "e7f015a71e0491aa26f66780e94ad7fd8201b3d1b9411298d92848781310c3c1",
+          "starting_commit": "def1e743ba68744adff208eb8bcede18e7fa0b32",
+          "starting_tree": "a699c84077068348e9023030cefdb0247f04f2f0"
+        },
         "path": "studies/study2/prompts/stage_p_protocol_design_prompt.md",
         "phase1_0d_state": "BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY",
         "prompt_bytes": 53018,
@@ -52,6 +81,7 @@
     "classification": {
       "const": {
         "composite_precedence": [
+          "Gate A failure closes protocol v1 before B-C and produces no scientific composite state.",
           "Operationally incomplete or integrity-failed required opened pack -> STUDY2_RESULT_NOT_ESTIMABLE.",
           "Two-family internal support plus stronger-than-both comparison -> STUDY2_DISTILLATION_ASSOCIATED_CAUSAL_INTERNAL_REASONING_SUPPORTED.",
           "Two-family internal support without stronger-than-both comparison -> STUDY2_CAUSAL_INTERNAL_REASONING_SUPPORTED_WITHOUT_DISTILLATION_ATTRIBUTION.",
@@ -83,6 +113,9 @@
           "ARTIFACT_WRITE_FAILURE",
           "RUNTIME_EXCEPTION",
           "CAPACITY_UNAVAILABLE"
+        ],
+        "feasibility_closure_states": [
+          "STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY"
         ],
         "internal_axis": {
           "behavior_only": "At least one compositional target NT_PASS exists but neither family passes the complete internal gate after opened finite mechanistic packs finish.",
@@ -129,6 +162,84 @@
     },
     "created_on": {
       "const": "2026-08-07"
+    },
+    "design_sensitivity": {
+      "const": {
+        "acr_run_id": "cmc2",
+        "bytes": 9291,
+        "joint_conjunctive_power_identified": false,
+        "path": "studies/study2/protocol/stage_p_power_sensitivity.json",
+        "sample_sizes_or_thresholds_changed": false,
+        "sha256": "f2514ffe9bc5cff80ef164f5b05a3cd90bbdfb9550af49b755accd3cbc3589ff",
+        "source_commit": "e12457cf90f0105ac0ae04ab9142bbdc3a35d18f",
+        "source_tree": "1373020a263677150130a587e9038ae25dd52ef2",
+        "status": "ADVISORY_DESIGN_SENSITIVITY_NOT_SCIENTIFIC_EVIDENCE"
+      }
+    },
+    "execution_reliability": {
+      "const": {
+        "capacity_preflight": true,
+        "cost_may_reduce_samples_repetitions_or_controls": false,
+        "create_only_checkpoints": true,
+        "duplicate_missing_out_of_shard_rejection": true,
+        "failed_shard_isolation_without_denominator_shrinkage": true,
+        "finite_reason_code_bound_retries": true,
+        "gpu_cost_primary_design_constraint": false,
+        "idempotent_attempt_ids": true,
+        "immutable_shard_manifest": true,
+        "infrastructure_failure_is_scientific_negative": false,
+        "manifest_last_complete_merge": true,
+        "scope": "non-scientific contract for later authorized T/B/M execution",
+        "verified_resume_without_duplicate_contribution": true
+      }
+    },
+    "feasibility_gate": {
+      "const": {
+        "alpha": 0.025,
+        "confirmation_opened_before_decision": false,
+        "controls_affect_decision": false,
+        "critical_successes": 43,
+        "critical_upper_tail": 0.018218515933,
+        "decision_arm": "NT",
+        "decision_model": "target",
+        "depths_pooled_within_family": [
+          2,
+          3
+        ],
+        "failure_requires": [
+          "new protocol version",
+          "new operator authority",
+          "new task-bank seeds"
+        ],
+        "families": [
+          "permutation_chain",
+          "affine_mod10"
+        ],
+        "family_pass_requires": [
+          "exactly 128 registered rows",
+          "complete finite execution integrity",
+          "all registered balance invariants pass",
+          "target restricted-option correct count is at least 43"
+        ],
+        "id": "GATE_A_FAMILY_COMPOSITION_QUALIFICATION",
+        "models_run": [
+          "target",
+          "lineage_base",
+          "instruction_control"
+        ],
+        "n_per_family": 128,
+        "null_accuracy": 0.25,
+        "on_fail": "STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY",
+        "on_pass": "seal development and Gate A manifest-last; B-C still requires separate authority",
+        "overall_pass": "both families pass; no pooling, depth fallback, or control-model rescue",
+        "placement": "after Stage T and B-D implementation validation; before any B-C object is opened",
+        "previous_successes_do_not_pass": 42,
+        "previous_upper_tail": 0.028760674518,
+        "rows_per_depth": 64,
+        "same_version_repair_allowed": false,
+        "scientific_evidence_row": false,
+        "test": "exact one-sided binomial upper tail"
+      }
     },
     "identities": {
       "const": {
@@ -215,7 +326,9 @@
         "Only single-token digit concepts enter the J-lens subaxis.",
         "Public deterministic banks are prospective but not private or researcher-blind.",
         "Any one-family result cannot be generalized across reasoning domains.",
-        "No Study 2 outcome modifies Phase 1.0D or retrospectively validates Study 1."
+        "No Study 2 outcome modifies Phase 1.0D or retrospectively validates Study 1.",
+        "Gate A conditions confirmation opening on target development success and therefore creates disclosed protocol-selection and winner's-curse risk.",
+        "The recorded power calculations are marginal component sensitivity; joint power across conjunctive gates is not identified."
       ]
     },
     "metrics": {
@@ -378,6 +491,32 @@
           {
             "fields": [
               "run_id:string",
+              "protocol_version:string",
+              "model_role:enum[target,lineage_base,instruction_control]",
+              "family:enum[permutation_chain,affine_mod10]",
+              "n_nt_compositional:integer",
+              "nt_correct:integer",
+              "exact_binomial_upper_tail:number",
+              "alpha:number",
+              "critical_successes:integer",
+              "finite_complete:boolean",
+              "balance_ok:boolean",
+              "family_gate_pass:boolean",
+              "overall_gate_pass:boolean",
+              "confirmation_opened_before_decision:boolean",
+              "gate_inputs_sha256:sha256"
+            ],
+            "name": "feasibility_gate_row",
+            "primary_key": [
+              "run_id",
+              "model_role",
+              "family"
+            ],
+            "stage": "B-D"
+          },
+          {
+            "fields": [
+              "run_id:string",
               "item_id:string",
               "semantic_id:sha256",
               "model_role:enum[target,lineage_base,instruction_control]",
@@ -525,7 +664,7 @@
             "fields": [
               "run_id:string",
               "axis:enum[internal,distillation,jlens,composite,operational]",
-              "registered_state:enum[INTERNAL_COMPUTATION_SUPPORTED,INTERNAL_COMPUTATION_SUPPORTED_ONE_FAMILY,BEHAVIOR_ONLY_WITHOUT_CAUSAL_SUPPORT,NO_COMPOSITIONAL_BEHAVIORAL_SUPPORT,NOT_ESTIMABLE,DISTILLATION_ASSOCIATION_STRONGER_THAN_BOTH_CONTROLS,DISTILLATION_ASSOCIATION_NOT_DISTINGUISHED,DISTILLATION_ASSOCIATION_CONTRADICTED,DISTILLATION_ASSOCIATION_NOT_ESTIMABLE,STUDY2_JLENS_VALIDATED,STUDY2_JLENS_PARTIAL,STUDY2_JLENS_NOT_VALIDATED,STUDY2_JLENS_NOT_ESTIMABLE,STUDY2_DISTILLATION_ASSOCIATED_CAUSAL_INTERNAL_REASONING_SUPPORTED,STUDY2_CAUSAL_INTERNAL_REASONING_SUPPORTED_WITHOUT_DISTILLATION_ATTRIBUTION,STUDY2_CAUSAL_INTERNAL_REASONING_SUPPORTED_ONE_FAMILY_ONLY,STUDY2_BEHAVIOR_ONLY_WITHOUT_CAUSAL_SUPPORT,STUDY2_EXTERNAL_TRACE_DEPENDENCE_ONLY,STUDY2_EXTERNAL_TRACE_SUPPORT_ONE_FAMILY_ONLY,STUDY2_NO_COMPOSITIONAL_BEHAVIORAL_SUPPORT,STUDY2_TASK_INTERFACE_UNQUALIFIED,STUDY2_RESULT_NOT_ESTIMABLE,BLOCKED_ON_STUDY2_STARTING_STATE_INTEGRITY,BLOCKED_ON_STUDY2_PREREGISTRATION_INTEGRITY,BLOCKED_ON_STUDY2_MODEL_IDENTITY,BLOCKED_ON_STUDY2_COMMON_OPTION_TOKENIZATION,BLOCKED_ON_STUDY2_MECHANISTIC_TOKEN_SUPPORT,BLOCKED_ON_STUDY2_EXECUTION]",
+              "registered_state:enum[INTERNAL_COMPUTATION_SUPPORTED,INTERNAL_COMPUTATION_SUPPORTED_ONE_FAMILY,BEHAVIOR_ONLY_WITHOUT_CAUSAL_SUPPORT,NO_COMPOSITIONAL_BEHAVIORAL_SUPPORT,NOT_ESTIMABLE,DISTILLATION_ASSOCIATION_STRONGER_THAN_BOTH_CONTROLS,DISTILLATION_ASSOCIATION_NOT_DISTINGUISHED,DISTILLATION_ASSOCIATION_CONTRADICTED,DISTILLATION_ASSOCIATION_NOT_ESTIMABLE,STUDY2_JLENS_VALIDATED,STUDY2_JLENS_PARTIAL,STUDY2_JLENS_NOT_VALIDATED,STUDY2_JLENS_NOT_ESTIMABLE,STUDY2_DISTILLATION_ASSOCIATED_CAUSAL_INTERNAL_REASONING_SUPPORTED,STUDY2_CAUSAL_INTERNAL_REASONING_SUPPORTED_WITHOUT_DISTILLATION_ATTRIBUTION,STUDY2_CAUSAL_INTERNAL_REASONING_SUPPORTED_ONE_FAMILY_ONLY,STUDY2_BEHAVIOR_ONLY_WITHOUT_CAUSAL_SUPPORT,STUDY2_EXTERNAL_TRACE_DEPENDENCE_ONLY,STUDY2_EXTERNAL_TRACE_SUPPORT_ONE_FAMILY_ONLY,STUDY2_NO_COMPOSITIONAL_BEHAVIORAL_SUPPORT,STUDY2_TASK_INTERFACE_UNQUALIFIED,STUDY2_RESULT_NOT_ESTIMABLE,BLOCKED_ON_STUDY2_STARTING_STATE_INTEGRITY,BLOCKED_ON_STUDY2_PREREGISTRATION_INTEGRITY,BLOCKED_ON_STUDY2_MODEL_IDENTITY,BLOCKED_ON_STUDY2_COMMON_OPTION_TOKENIZATION,BLOCKED_ON_STUDY2_MECHANISTIC_TOKEN_SUPPORT,BLOCKED_ON_STUDY2_EXECUTION,STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY]",
               "gate_inputs_sha256:sha256",
               "complete:boolean",
               "blocker_reason:null_or_enum[NONFINITE_OUTPUT,MISSING_ROW,HASH_MISMATCH,HOOK_NOOP_MISMATCH,SOURCE_IMAGE_MISMATCH,ARTIFACT_WRITE_FAILURE,RUNTIME_EXCEPTION,CAPACITY_UNAVAILABLE]"
@@ -767,7 +906,7 @@
           "Are four-option tokens prospectively verifiable in all three tokenizers without outcome-dependent substitution?",
           "Are task answers, intermediates, distractors, trace arms, and pair counterfactuals mechanically unique and independently reconstructible?",
           "Are development, behavioral confirmation, mechanistic development, and mechanistic candidate confirmation semantically disjoint?",
-          "Can any task, model, cell, template, item, pair, layer, position, comparator, or exclusion depend on confirmation, lens, probe, or intervention output?",
+          "Can any task, model, cell, template, item, pair, layer, position, comparator, or exclusion depend on confirmation, lens, probe, or intervention output, or feasibility output?",
           "Do balance and direct-lookup controls distinguish composition from option priors and single-surface shortcuts?",
           "Does a_x=g_r(m_d), with distinct answer values and shared value-to-label mappings, distinguish intermediate transfer from donor-answer or donor-option-label copying?",
           "Do same-intermediate, same-answer, random-donor, no-op, wrong-position, early-band, and motor-band controls cover the stated alternatives?",
@@ -776,7 +915,7 @@
           "Is the target M1200 axis secondary and incapable of selecting or rescuing the lens-independent result?",
           "Do the two controls support only the registered checkpoint-level distillation association, not a stronger training-causal claim?",
           "Are DR-01, Study 1 protected bytes, Phase 1.0D, and all old terminal states preserved?",
-          "Are every metric, bootstrap unit, threshold, null, truth-table branch, and output row exactly computable from planned fields?",
+          "Are every metric, bootstrap unit, threshold, null, truth-table branch, and output row exactly computable from planned fields, power/sensitivity quantity, feasibility branch, and reliability state?",
           "Can every positive and negative result be reconstructed from a closed row-level pack without semantic interpretation?"
         ],
         "consolidated_corrections": 1,
@@ -855,7 +994,11 @@
         },
         {
           "authority": "separate_required",
-          "purpose": "three-model behavioral development implementation check",
+          "confirmation_opened_before_gate": false,
+          "gate": "GATE_A_FAMILY_COMPOSITION_QUALIFICATION",
+          "gate_can_change_scientific_choices": false,
+          "gate_can_only_open_or_close_protocol_version": true,
+          "purpose": "three-model behavioral development implementation check and fixed Gate A feasibility decision",
           "scientific_choice_changes": false,
           "stage": "B-D"
         },
@@ -1071,10 +1214,14 @@
     }
   },
   "required": [
+    "advisory_boundaries",
     "authority",
     "claims",
     "classification",
     "created_on",
+    "design_sensitivity",
+    "execution_reliability",
+    "feasibility_gate",
     "identities",
     "limitations",
     "metrics",

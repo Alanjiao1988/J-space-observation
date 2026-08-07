@@ -142,6 +142,8 @@ def main(argv: list[str] | None = None) -> int:
         "protocol_sha256": protocol.sha256_file(root / "studies/study2/protocol/reasoning_internalization_protocol.json"),
         "schema_sha256": protocol.sha256_file(root / "studies/study2/protocol/reasoning_internalization_protocol.schema.json"),
         "markdown_sha256": protocol.sha256_file(root / "studies/study2/protocol/reasoning_internalization_protocol.md"),
+        "operator_amendment_sha256": protocol.sha256_file(root / protocol.AMENDMENT_PATH),
+        "design_sensitivity_sha256": protocol.sha256_file(root / protocol.SENSITIVITY_PATH),
         "manifest_sha256": protocol.sha256_file(root / "studies/study2/data/task_bank_manifest.json"),
         "models": document["identities"]["models"],
         "start": start,
@@ -158,6 +160,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"PROTOCOL_SHA256={result['protocol_sha256']}")
         print(f"SCHEMA_SHA256={result['schema_sha256']}")
         print(f"MARKDOWN_SHA256={result['markdown_sha256']}")
+        print(f"OPERATOR_AMENDMENT_SHA256={result['operator_amendment_sha256']}")
+        print(f"DESIGN_SENSITIVITY_SHA256={result['design_sensitivity_sha256']}")
         print(f"MANIFEST_SHA256={result['manifest_sha256']}")
         print(f"ROLE_COUNTS={json.dumps(banks['role_counts'], sort_keys=True)}")
         print("PROTECTED_BYTES=152/v1 36/v2")

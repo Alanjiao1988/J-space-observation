@@ -2,7 +2,7 @@
 
 ## Status
 
-Coordination state: `OPERATOR_AMENDMENT_REQUIRED`
+Coordination state: `GATE_A_ADOPTED_CANDIDATE_REBUILD`
 
 Canonical protocol lifecycle: `CANDIDATE_AWAITING_REVIEW`
 
@@ -11,8 +11,10 @@ Formal methods-review allowance: `UNSPENT`
 The model-free Stage P candidate protocol and deterministic bank generator have
 been implemented, but the formal methods review has not started and the
 protocol is not frozen. An operator-directed pre-review check identified a
-material feasibility-gate question that conflicts with the authority's exact
-stage machine. See
+material feasibility-gate question. The operator selected Gate A and authorized
+the additive amendment at
+[`prompts/stage_p_gate_a_operator_amendment.md`](prompts/stage_p_gate_a_operator_amendment.md).
+The retained gap analysis is
 [`protocol/stage_p_operator_amendment_required.md`](protocol/stage_p_operator_amendment_required.md).
 
 No tokenizer, model, lens, activation, probe, patching, ablation,
