@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 from statistics import NormalDist
 from typing import Any
 
@@ -205,7 +206,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--source-tree", required=True)
-    parser.add_argument("--acr-run-id", default="")
+    parser.add_argument("--acr-run-id", default=os.environ.get("ACR_RUN_ID", ""))
     args = parser.parse_args()
     if len(args.source_commit) != 40 or len(args.source_tree) != 40:
         raise SystemExit("source commit and tree must be full 40-character identities")
