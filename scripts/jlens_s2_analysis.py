@@ -472,6 +472,8 @@ def run_verify(args: argparse.Namespace) -> int:
         raise runtime.S2RuntimeError("independent M1200 recomputation failed")
 
     shard_receipts = []
+    shard_documents = {}
+    shard_references = {}
     for reference in args.shard:
         receipt, shard_payload = load_receipt(store, reference)
         receipt_transport(
@@ -483,6 +485,14 @@ def run_verify(args: argparse.Namespace) -> int:
             expected_image_digest=args.fit_image_digest,
         )
         shard_receipts.append(receipt)
+        shard_id = receipt["shard_id"]
+        if shard_id in shard_documents:
+            raise runtime.S2RuntimeError("duplicate successful shard receipt")
+        shard_documents[shard_id] = receipt
+        shard_references[shard_id] = {
+            "blob": reference["blob"],
+            "sha256": reference["sha256"],
+        }
     expected_a = [row["row_id"] for row in corpus_pack["by_role"]["A"]]
     expected_b = [row["row_id"] for row in corpus_pack["by_role"]["B"]]
     accounting = {}
@@ -496,6 +506,23 @@ def run_verify(args: argparse.Namespace) -> int:
             if receipt["role"] == role
         ]
         accounting[role] = s2.account_successful_sequences(expected, attempts)
+
+    attempt_manifest_bytes = store.download_absolute(args.attempt_manifest_blob)
+    if s2.sha256_bytes(attempt_manifest_bytes) != args.attempt_manifest_sha256:
+        raise runtime.S2RuntimeError("production attempt manifest SHA-256 mismatch")
+    attempt_manifest = json.loads(attempt_manifest_bytes)
+    production_plan_path = PROJECT_ROOT / "docs" / "jlens_s2_production_plan.json"
+    production_plan = s2.load_json(production_plan_path)
+    attempt_validation = runtime.validate_production_attempt_manifest(
+        store,
+        attempt_manifest,
+        production_plan=production_plan,
+        success_receipts=shard_references,
+        success_documents=shard_documents,
+        expected_fit_source_commit=args.fit_source_commit,
+        expected_fit_image_digest=args.fit_image_digest,
+        production_plan_sha256=s2.sha256_file(production_plan_path),
+    )
 
     convergence, convergence_payload = load_receipt(store, args.convergence)
     heldout, heldout_payload = load_receipt(store, args.heldout)
@@ -556,6 +583,11 @@ def run_verify(args: argparse.Namespace) -> int:
         "heldout_transport": heldout_transport,
         "m1200_independent_recomputation": m_check,
         "sequence_accounting": accounting,
+        "production_attempt_manifest": {
+            "blob": args.attempt_manifest_blob,
+            "sha256": args.attempt_manifest_sha256,
+            "validation": attempt_validation,
+        },
         "shard_attempt_count": len(shard_receipts),
         "smoke_selection_receipt": args.smoke,
         "smoke_transport": smoke_transport,
@@ -758,6 +790,8 @@ def build_parser() -> argparse.ArgumentParser:
     verify.add_argument("--fit-image-digest", required=True)
     verify.add_argument("--analysis-source-commit", required=True)
     verify.add_argument("--analysis-image-digest", required=True)
+    verify.add_argument("--attempt-manifest-blob", required=True)
+    verify.add_argument("--attempt-manifest-sha256", required=True)
     verify.add_argument("--subprefix", required=True)
     verify.set_defaults(handler=run_verify)
     return parser

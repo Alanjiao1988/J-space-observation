@@ -92,6 +92,132 @@ def test_heldout_metric_keys_require_exact_cartesian_coverage() -> None:
         runtime.validate_heldout_metric_rows(duplicate, expected_ids)
 
 
+def test_production_attempt_manifest_binds_failed_progress_to_exact_resume() -> None:
+    client = FakeContainer()
+    store = runtime.BlobStore(
+        account="account",
+        container="container",
+        prefix="production",
+        client_id=None,
+        container_client=client,
+    )
+    checkpoint_blob = (
+        "production/shards/A-001-064/attempts/primary/checkpoints/n0032.pt"
+    )
+    checkpoint_sha = "a" * 64
+    checkpoint_manifest_blob = (
+        "production/shards/A-001-064/attempts/primary/checkpoints/n0032.json"
+    )
+    checkpoint_manifest = {
+        "checkpoint": {
+            "blob": checkpoint_blob,
+            "bytes": 1,
+            "sha256": checkpoint_sha,
+        },
+        "n_done": 32,
+        "next_idx": 32,
+        "source_layers": list(s2.SOURCE_LAYERS),
+        "target_layer": s2.TARGET_LAYER,
+    }
+    checkpoint_manifest_bytes = s2.canonical_json_bytes(checkpoint_manifest)
+    client.objects[checkpoint_manifest_blob] = checkpoint_manifest_bytes
+    reference = {"blob": "production/success.json", "sha256": "b" * 64}
+    resume = {
+        "checkpoint_blob": checkpoint_blob,
+        "checkpoint_manifest_blob": checkpoint_manifest_blob,
+        "checkpoint_manifest_sha256": s2.sha256_bytes(
+            checkpoint_manifest_bytes
+        ),
+        "checkpoint_sha256": checkpoint_sha,
+        "n_done": 32,
+    }
+    attempts = [
+        {
+            "artifact_prefix": "production/shards/A-001-064/attempts/primary",
+            "attempt_id": "primary",
+            "end_time_utc": "2026-01-01T01:00:00Z",
+            "execution": "execution-primary",
+            "failure_reason": "platform_timeout",
+            "job": "job-primary",
+            "last_checkpoint": {
+                "checkpoint_blob": checkpoint_blob,
+                "checkpoint_sha256": checkpoint_sha,
+            },
+            "processed_count": 32,
+            "resume_source": None,
+            "shard_id": "A-001-064",
+            "start_time_utc": "2026-01-01T00:00:00Z",
+            "status": "infrastructure_failed",
+            "success_receipt": None,
+        },
+        {
+            "artifact_prefix": "production/shards/A-001-064/attempts/resume-1",
+            "attempt_id": "resume-1",
+            "end_time_utc": "2026-01-01T02:00:00Z",
+            "execution": "execution-resume",
+            "failure_reason": None,
+            "job": "job-resume",
+            "last_checkpoint": None,
+            "processed_count": 64,
+            "resume_source": resume,
+            "shard_id": "A-001-064",
+            "start_time_utc": "2026-01-01T01:00:00Z",
+            "status": "success",
+            "success_receipt": reference,
+        },
+    ]
+    plan = {
+        "blob_prefix": "production",
+        "run_id": "run",
+        "shards": [{"id": "A-001-064", "size": 64}],
+    }
+    manifest = {
+        "attempts": attempts,
+        "fit_image_digest": "sha256:" + "2" * 64,
+        "fit_source_commit": "1" * 40,
+        "production_plan_sha256": "3" * 64,
+        "run_id": "run",
+        "schema_version": "jlens-s2-production-attempts/v1",
+        "sequence_recomputed": False,
+        "successful_shards": {"A-001-064": reference},
+    }
+    report = runtime.validate_production_attempt_manifest(
+        store,
+        manifest,
+        production_plan=plan,
+        success_receipts={"A-001-064": reference},
+        success_documents={
+            "A-001-064": {
+                "initial_next_idx": 32,
+                "resumed": True,
+            }
+        },
+        expected_fit_source_commit="1" * 40,
+        expected_fit_image_digest="sha256:" + "2" * 64,
+        production_plan_sha256="3" * 64,
+    )
+    assert report["partial_attempt_count"] == 1
+    assert report["sequence_recomputed"] is False
+    changed = json.loads(json.dumps(manifest))
+    changed["attempts"][1]["resume_source"]["checkpoint_sha256"] = "c" * 64
+    with pytest.raises(runtime.S2RuntimeError, match="resume manifest"):
+        runtime.validate_production_attempt_manifest(
+            store,
+            changed,
+            production_plan=plan,
+            success_receipts={"A-001-064": reference},
+            success_documents={
+                "A-001-064": {
+                    "initial_next_idx": 32,
+                    "resumed": True,
+                }
+            },
+            expected_fit_source_commit="1" * 40,
+            expected_fit_image_digest="sha256:" + "2" * 64,
+            production_plan_sha256="3" * 64,
+        )
+
+
 def test_blob_store_is_create_only_and_exact() -> None:
     client = FakeContainer()
     store = runtime.BlobStore(

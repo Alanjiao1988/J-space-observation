@@ -921,6 +921,204 @@ def validate_heldout_metric_rows(
     }
 
 
+def validate_production_attempt_manifest(
+    store: BlobStore,
+    manifest: Mapping[str, Any],
+    *,
+    production_plan: Mapping[str, Any],
+    success_receipts: Mapping[str, Mapping[str, str]],
+    success_documents: Mapping[str, Mapping[str, Any]],
+    expected_fit_source_commit: str,
+    expected_fit_image_digest: str,
+    production_plan_sha256: str,
+) -> dict[str, Any]:
+    required = {
+        "attempts",
+        "fit_image_digest",
+        "fit_source_commit",
+        "production_plan_sha256",
+        "run_id",
+        "schema_version",
+        "sequence_recomputed",
+        "successful_shards",
+    }
+    if set(manifest) != required:
+        raise S2RuntimeError("production attempt manifest fields are not exact")
+    if (
+        manifest["schema_version"] != "jlens-s2-production-attempts/v1"
+        or manifest["fit_source_commit"] != expected_fit_source_commit
+        or manifest["fit_image_digest"] != expected_fit_image_digest
+        or manifest["production_plan_sha256"] != production_plan_sha256
+        or manifest["run_id"] != production_plan["run_id"]
+        or manifest["sequence_recomputed"] is not False
+    ):
+        raise S2RuntimeError("production attempt manifest identity mismatch")
+    expected_shards = {
+        row["id"]: row for row in production_plan["shards"]
+    }
+    successful = manifest["successful_shards"]
+    if (
+        not isinstance(successful, Mapping)
+        or set(successful) != set(expected_shards)
+        or set(success_receipts) != set(expected_shards)
+        or set(success_documents) != set(expected_shards)
+    ):
+        raise S2RuntimeError("successful production shard set is incomplete")
+    for shard_id, reference in successful.items():
+        if reference != success_receipts[shard_id]:
+            raise S2RuntimeError("successful shard receipt reference mismatch")
+    attempts = manifest["attempts"]
+    if not isinstance(attempts, list) or not attempts:
+        raise S2RuntimeError("production attempts are missing")
+    attempt_keys: set[tuple[str, str]] = set()
+    successes: dict[str, list[Mapping[str, Any]]] = {
+        shard_id: [] for shard_id in expected_shards
+    }
+    failed_with_progress: list[Mapping[str, Any]] = []
+    for attempt in attempts:
+        fields = {
+            "artifact_prefix",
+            "attempt_id",
+            "end_time_utc",
+            "execution",
+            "failure_reason",
+            "job",
+            "last_checkpoint",
+            "processed_count",
+            "resume_source",
+            "shard_id",
+            "start_time_utc",
+            "status",
+            "success_receipt",
+        }
+        if not isinstance(attempt, Mapping) or set(attempt) != fields:
+            raise S2RuntimeError("production attempt row fields are not exact")
+        shard_id = str(attempt["shard_id"])
+        attempt_id = str(attempt["attempt_id"])
+        key = (shard_id, attempt_id)
+        shard = expected_shards.get(shard_id)
+        if (
+            shard is None
+            or not attempt_id
+            or key in attempt_keys
+            or attempt["status"] not in {"success", "infrastructure_failed"}
+            or not isinstance(attempt["processed_count"], int)
+            or not 0 <= attempt["processed_count"] <= shard["size"]
+            or not str(attempt["job"])
+            or not str(attempt["execution"])
+            or not str(attempt["artifact_prefix"]).startswith(
+                f"{production_plan['blob_prefix']}/shards/{shard_id}/attempts/"
+            )
+        ):
+            raise S2RuntimeError("production attempt identity is invalid")
+        attempt_keys.add(key)
+        if attempt["status"] == "success":
+            if (
+                attempt["processed_count"] != shard["size"]
+                or attempt["success_receipt"] != successful[shard_id]
+                or attempt["failure_reason"] is not None
+            ):
+                raise S2RuntimeError("successful attempt accounting is invalid")
+            successes[shard_id].append(attempt)
+        else:
+            if (
+                attempt["success_receipt"] is not None
+                or not str(attempt["failure_reason"])
+            ):
+                raise S2RuntimeError("failed attempt accounting is invalid")
+            if attempt["processed_count"] > 0:
+                failed_with_progress.append(attempt)
+        resume = attempt["resume_source"]
+        document = success_documents.get(shard_id) if attempt["status"] == "success" else None
+        if resume is None:
+            if document is not None and document.get("resumed") is True:
+                raise S2RuntimeError("resumed success has no checkpoint binding")
+        else:
+            resume_fields = {
+                "checkpoint_blob",
+                "checkpoint_manifest_blob",
+                "checkpoint_manifest_sha256",
+                "checkpoint_sha256",
+                "n_done",
+            }
+            if (
+                not isinstance(resume, Mapping)
+                or set(resume) != resume_fields
+                or not isinstance(resume["n_done"], int)
+                or not 0 < resume["n_done"] < shard["size"]
+            ):
+                raise S2RuntimeError("resume source fields are invalid")
+            shard_prefix = (
+                f"{production_plan['blob_prefix']}/shards/{shard_id}/attempts/"
+            )
+            if (
+                not str(resume["checkpoint_blob"]).startswith(shard_prefix)
+                or not str(resume["checkpoint_manifest_blob"]).startswith(
+                    shard_prefix
+                )
+                or not _SHA256.fullmatch(str(resume["checkpoint_sha256"]))
+                or not _SHA256.fullmatch(
+                    str(resume["checkpoint_manifest_sha256"])
+                )
+            ):
+                raise S2RuntimeError("resume source is not shard-bound")
+            payload = store.download_absolute(
+                resume["checkpoint_manifest_blob"]
+            )
+            if s2.sha256_bytes(payload) != resume["checkpoint_manifest_sha256"]:
+                raise S2RuntimeError("resume manifest SHA-256 mismatch")
+            checkpoint_manifest = json.loads(payload)
+            if (
+                checkpoint_manifest.get("checkpoint", {}).get("blob")
+                != resume["checkpoint_blob"]
+                or checkpoint_manifest.get("checkpoint", {}).get("sha256")
+                != resume["checkpoint_sha256"]
+                or checkpoint_manifest.get("n_done") != resume["n_done"]
+                or checkpoint_manifest.get("next_idx") != resume["n_done"]
+            ):
+                raise S2RuntimeError("resume manifest content mismatch")
+            if document is not None and (
+                document.get("resumed") is not True
+                or document.get("initial_next_idx") != resume["n_done"]
+            ):
+                raise S2RuntimeError("success receipt resume progress mismatch")
+    if any(len(rows) != 1 for rows in successes.values()):
+        raise S2RuntimeError("each production shard requires one successful attempt")
+    resume_sources = {
+        (
+            row["shard_id"],
+            row["resume_source"]["checkpoint_blob"],
+            row["resume_source"]["checkpoint_sha256"],
+        )
+        for rows in successes.values()
+        for row in rows
+        if row["resume_source"] is not None
+    }
+    for failed in failed_with_progress:
+        checkpoint = failed["last_checkpoint"]
+        if (
+            not isinstance(checkpoint, Mapping)
+            or (
+                failed["shard_id"],
+                checkpoint.get("checkpoint_blob"),
+                checkpoint.get("checkpoint_sha256"),
+            )
+            not in resume_sources
+        ):
+            raise S2RuntimeError(
+                "failed progress is not consumed by an exact later resume"
+            )
+    return {
+        "attempt_count": len(attempts),
+        "failed_attempt_count": sum(
+            attempt["status"] == "infrastructure_failed" for attempt in attempts
+        ),
+        "partial_attempt_count": len(failed_with_progress),
+        "sequence_recomputed": False,
+        "successful_shard_count": len(successes),
+    }
+
+
 __all__ = [
     "BlobStore",
     "CHECKPOINT_EVERY",
@@ -945,6 +1143,7 @@ __all__ = [
     "validate_runtime_pack_manifest",
     "validate_jacobians",
     "validate_heldout_metric_rows",
+    "validate_production_attempt_manifest",
     "write_json",
     "write_jsonl",
 ]
