@@ -1,0 +1,689 @@
+{
+  "attempts": [
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-001-064/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-a001064-06e1604c-aee6srt",
+      "failure_reason": null,
+      "job": "job-js-s2-a001064-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 64,
+      "resume_source": null,
+      "shard_id": "A-001-064",
+      "start_time_utc": "08/06/2026 19:49:11",
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/A-001-064/attempts/primary/shard_receipt.json",
+        "sha256": "086ce29ccb949eb31e3f8e3077d46c5a8abc0901f4d10f8cb74fed7406e0618b"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-065-128/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-a065128-06e1604c-fcl07ix",
+      "failure_reason": null,
+      "job": "job-js-s2-a065128-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 64,
+      "resume_source": null,
+      "shard_id": "A-065-128",
+      "start_time_utc": "08/06/2026 19:49:40",
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/A-065-128/attempts/primary/shard_receipt.json",
+        "sha256": "952af7188ee6146fe8a3c23bfbad481c676ad74416f982900890b87bad404c3b"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-129-256/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-a129256-06e1604c-a9kkt7j",
+      "failure_reason": "platform_timeout_after_partial_checkpoint",
+      "job": "job-js-s2-a129256-06e1604c",
+      "last_checkpoint": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/A-129-256/attempts/primary/checkpoints/n0088.pt",
+        "checkpoint_sha256": "1291d55f61e574d908a0c9a111f7a8e127f8fc1d872057a458f648f1f9514203"
+      },
+      "processed_count": 88,
+      "resume_source": null,
+      "shard_id": "A-129-256",
+      "start_time_utc": "08/06/2026 19:50:10",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-257-315/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-a257315-06e1604c-8ckwhba",
+      "failure_reason": null,
+      "job": "job-js-s2-a257315-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 59,
+      "resume_source": null,
+      "shard_id": "A-257-315",
+      "start_time_utc": "08/06/2026 19:50:40",
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/A-257-315/attempts/primary/shard_receipt.json",
+        "sha256": "82a33db4e84d3795e284e76dd6774493fcff09a549ed59a601d614e26fdd5b04"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-316-374/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-a316374-06e1604c-0h7zb2n",
+      "failure_reason": null,
+      "job": "job-js-s2-a316374-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 59,
+      "resume_source": null,
+      "shard_id": "A-316-374",
+      "start_time_utc": "08/06/2026 19:51:11",
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/A-316-374/attempts/primary/shard_receipt.json",
+        "sha256": "c841706861a000aa1cd4644e4e719a39d44f9b3d6cb7fff6146130eb1c260a6f"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-375-433/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-a375433-06e1604c-45in11i",
+      "failure_reason": "gpu_quota_exhausted_until_absolute_execution_timeout",
+      "job": "job-js-s2-a375433-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 0,
+      "resume_source": null,
+      "shard_id": "A-375-433",
+      "start_time_utc": "08/06/2026 19:51:41",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-434-492/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-a434492-06e1604c-h5ezxz5",
+      "failure_reason": "platform_timeout_after_partial_checkpoint",
+      "job": "job-js-s2-a434492-06e1604c",
+      "last_checkpoint": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/A-434-492/attempts/primary/checkpoints/n0024.pt",
+        "checkpoint_sha256": "c1cdc3f4088338cc79be3b750ce6981bfd1cc811660449f8704ad4b8aa49af7d"
+      },
+      "processed_count": 24,
+      "resume_source": null,
+      "shard_id": "A-434-492",
+      "start_time_utc": "08/06/2026 19:52:11",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-493-551/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-a493551-06e1604c-wpe0ept",
+      "failure_reason": "gpu_quota_exhausted_until_absolute_execution_timeout",
+      "job": "job-js-s2-a493551-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 0,
+      "resume_source": null,
+      "shard_id": "A-493-551",
+      "start_time_utc": "08/06/2026 19:52:42",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-552-600/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-a552600-06e1604c-acjrgs4",
+      "failure_reason": "gpu_quota_exhausted_until_absolute_execution_timeout",
+      "job": "job-js-s2-a552600-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 0,
+      "resume_source": null,
+      "shard_id": "A-552-600",
+      "start_time_utc": "08/06/2026 19:53:13",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-001-064/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-b001064-06e1604c-u6vazm0",
+      "failure_reason": "gpu_quota_exhausted_until_absolute_execution_timeout",
+      "job": "job-js-s2-b001064-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 0,
+      "resume_source": null,
+      "shard_id": "B-001-064",
+      "start_time_utc": "08/06/2026 19:53:44",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-065-128/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-b065128-06e1604c-pz4lzju",
+      "failure_reason": "platform_timeout_after_partial_checkpoint",
+      "job": "job-js-s2-b065128-06e1604c",
+      "last_checkpoint": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/B-065-128/attempts/primary/checkpoints/n0032.pt",
+        "checkpoint_sha256": "7bfe6a7f7e66f5a0bc8391a3c6f15ed54648a6a2e27e431ca626406b7e89b81e"
+      },
+      "processed_count": 32,
+      "resume_source": null,
+      "shard_id": "B-065-128",
+      "start_time_utc": "08/06/2026 19:54:18",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-129-256/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-b129256-06e1604c-n2hx0ot",
+      "failure_reason": "gpu_quota_exhausted_until_absolute_execution_timeout",
+      "job": "job-js-s2-b129256-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 0,
+      "resume_source": null,
+      "shard_id": "B-129-256",
+      "start_time_utc": "08/06/2026 19:54:52",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-257-315/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-b257315-06e1604c-1m0mv40",
+      "failure_reason": "gpu_quota_exhausted_until_absolute_execution_timeout",
+      "job": "job-js-s2-b257315-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 0,
+      "resume_source": null,
+      "shard_id": "B-257-315",
+      "start_time_utc": "08/06/2026 19:55:22",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-316-374/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-b316374-06e1604c-rbpqxmr",
+      "failure_reason": "gpu_quota_exhausted_until_absolute_execution_timeout",
+      "job": "job-js-s2-b316374-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 0,
+      "resume_source": null,
+      "shard_id": "B-316-374",
+      "start_time_utc": "08/06/2026 19:55:59",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-375-433/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-b375433-06e1604c-tktem8x",
+      "failure_reason": "gpu_quota_exhausted_until_absolute_execution_timeout",
+      "job": "job-js-s2-b375433-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 0,
+      "resume_source": null,
+      "shard_id": "B-375-433",
+      "start_time_utc": "08/06/2026 19:56:29",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-434-492/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-b434492-06e1604c-1nzrldg",
+      "failure_reason": "platform_timeout_after_partial_checkpoint",
+      "job": "job-js-s2-b434492-06e1604c",
+      "last_checkpoint": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/B-434-492/attempts/primary/checkpoints/n0032.pt",
+        "checkpoint_sha256": "8ddbccd1e1521c2e6e90ea63fac4ad99b5dff46ea65083dd3aef7eaa05e55c54"
+      },
+      "processed_count": 32,
+      "resume_source": null,
+      "shard_id": "B-434-492",
+      "start_time_utc": "08/06/2026 19:57:08",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-493-551/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-b493551-06e1604c-pwo0m42",
+      "failure_reason": "platform_timeout_after_partial_checkpoint",
+      "job": "job-js-s2-b493551-06e1604c",
+      "last_checkpoint": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/B-493-551/attempts/primary/checkpoints/n0032.pt",
+        "checkpoint_sha256": "9d615f25bc4622e3c3384d8d0a3c1f9db1f102b463dc1fd0a0d3d2e42b2604bf"
+      },
+      "processed_count": 32,
+      "resume_source": null,
+      "shard_id": "B-493-551",
+      "start_time_utc": "08/06/2026 19:57:38",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-552-600/attempts/primary",
+      "attempt_id": "primary",
+      "end_time_utc": null,
+      "execution": "job-js-s2-b552600-06e1604c-57ppdh1",
+      "failure_reason": "gpu_quota_exhausted_until_absolute_execution_timeout",
+      "job": "job-js-s2-b552600-06e1604c",
+      "last_checkpoint": null,
+      "processed_count": 0,
+      "resume_source": null,
+      "shard_id": "B-552-600",
+      "start_time_utc": "08/06/2026 19:58:09",
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-129-256/attempts/resume-1",
+      "attempt_id": "resume-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-r1-a129256-06e160-fi9lch4",
+      "failure_reason": null,
+      "job": "job-js-s2-r1-a129256-06e160",
+      "last_checkpoint": null,
+      "processed_count": 128,
+      "resume_source": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/A-129-256/attempts/primary/checkpoints/n0088.pt",
+        "checkpoint_manifest_blob": "jlens-s2/production/20260806T194226Z/shards/A-129-256/attempts/primary/checkpoints/n0088.json",
+        "checkpoint_manifest_sha256": "afc0d56c9c40ded8c8bc6961d0cb6d42b0f2184ea7098698967a318b129d721f",
+        "checkpoint_sha256": "1291d55f61e574d908a0c9a111f7a8e127f8fc1d872057a458f648f1f9514203",
+        "n_done": 88
+      },
+      "shard_id": "A-129-256",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/A-129-256/attempts/resume-1/shard_receipt.json",
+        "sha256": "766948e0a3c82f8af449f7d72195a85bdb4b5b9197fd5c48a2a085485189ab8c"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-434-492/attempts/resume-1",
+      "attempt_id": "resume-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-r1-a434492-06e160-bvlxu7j",
+      "failure_reason": null,
+      "job": "job-js-s2-r1-a434492-06e160",
+      "last_checkpoint": null,
+      "processed_count": 59,
+      "resume_source": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/A-434-492/attempts/primary/checkpoints/n0024.pt",
+        "checkpoint_manifest_blob": "jlens-s2/production/20260806T194226Z/shards/A-434-492/attempts/primary/checkpoints/n0024.json",
+        "checkpoint_manifest_sha256": "7b99ff6f3171f499472d8377f9370579c8648a38305d11055d150b7cd72cef40",
+        "checkpoint_sha256": "c1cdc3f4088338cc79be3b750ce6981bfd1cc811660449f8704ad4b8aa49af7d",
+        "n_done": 24
+      },
+      "shard_id": "A-434-492",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/A-434-492/attempts/resume-1/shard_receipt.json",
+        "sha256": "17ca9908f83aa64302120cca62c2fbb2aacc85fe38e9875eb7ee3a5d07b11609"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-065-128/attempts/resume-1",
+      "attempt_id": "resume-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-r1-b065128-06e160-ufrgzmh",
+      "failure_reason": null,
+      "job": "job-js-s2-r1-b065128-06e160",
+      "last_checkpoint": null,
+      "processed_count": 64,
+      "resume_source": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/B-065-128/attempts/primary/checkpoints/n0032.pt",
+        "checkpoint_manifest_blob": "jlens-s2/production/20260806T194226Z/shards/B-065-128/attempts/primary/checkpoints/n0032.json",
+        "checkpoint_manifest_sha256": "1844f885bf3b5e66534d54d5e6fe06aa1ebdbea80a5b63691ce0f4891bd7b07f",
+        "checkpoint_sha256": "7bfe6a7f7e66f5a0bc8391a3c6f15ed54648a6a2e27e431ca626406b7e89b81e",
+        "n_done": 32
+      },
+      "shard_id": "B-065-128",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/B-065-128/attempts/resume-1/shard_receipt.json",
+        "sha256": "25b6e0918619e360f59b9fb3c96ccc066168b98dbbc725ac1cca90e80e83b4fe"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-434-492/attempts/resume-1",
+      "attempt_id": "resume-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-r1-b434492-06e160-3wqe394",
+      "failure_reason": null,
+      "job": "job-js-s2-r1-b434492-06e160",
+      "last_checkpoint": null,
+      "processed_count": 59,
+      "resume_source": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/B-434-492/attempts/primary/checkpoints/n0032.pt",
+        "checkpoint_manifest_blob": "jlens-s2/production/20260806T194226Z/shards/B-434-492/attempts/primary/checkpoints/n0032.json",
+        "checkpoint_manifest_sha256": "bb40cf5e8eb438b50e7a3fa4a3c3bde0b94312b0b37cda523dcaffa8d034023d",
+        "checkpoint_sha256": "8ddbccd1e1521c2e6e90ea63fac4ad99b5dff46ea65083dd3aef7eaa05e55c54",
+        "n_done": 32
+      },
+      "shard_id": "B-434-492",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/B-434-492/attempts/resume-1/shard_receipt.json",
+        "sha256": "332980d28982833ac42d9d119feb7acbf60e776562c6fc97fa1a80f9a1797f5a"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-493-551/attempts/resume-1",
+      "attempt_id": "resume-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-r1-b493551-06e160-zspmnzq",
+      "failure_reason": null,
+      "job": "job-js-s2-r1-b493551-06e160",
+      "last_checkpoint": null,
+      "processed_count": 59,
+      "resume_source": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/B-493-551/attempts/primary/checkpoints/n0032.pt",
+        "checkpoint_manifest_blob": "jlens-s2/production/20260806T194226Z/shards/B-493-551/attempts/primary/checkpoints/n0032.json",
+        "checkpoint_manifest_sha256": "a1224e8c4e94e5ec8b837173164a855ba33ab73b909b31afe1b6566e4e9cb3d6",
+        "checkpoint_sha256": "9d615f25bc4622e3c3384d8d0a3c1f9db1f102b463dc1fd0a0d3d2e42b2604bf",
+        "n_done": 32
+      },
+      "shard_id": "B-493-551",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/B-493-551/attempts/resume-1/shard_receipt.json",
+        "sha256": "ed69114f0a9228f6ff9106dfa9eb791fb62b6d9090695c0d837769d98db4a1d9"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-375-433/attempts/retry-1",
+      "attempt_id": "retry-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-t1-a375433-06e160-ib8wlhz",
+      "failure_reason": null,
+      "job": "job-js-s2-t1-a375433-06e160",
+      "last_checkpoint": null,
+      "processed_count": 59,
+      "resume_source": null,
+      "shard_id": "A-375-433",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/A-375-433/attempts/retry-1/shard_receipt.json",
+        "sha256": "1822700fb729d4a74e8128184a3572287c0987debebff34c8fbbb7add58fa47d"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-493-551/attempts/retry-1",
+      "attempt_id": "retry-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-t1-a493551-06e160-lmqcbgk",
+      "failure_reason": null,
+      "job": "job-js-s2-t1-a493551-06e160",
+      "last_checkpoint": null,
+      "processed_count": 59,
+      "resume_source": null,
+      "shard_id": "A-493-551",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/A-493-551/attempts/retry-1/shard_receipt.json",
+        "sha256": "0a794d0b8202e80b028b19c3eeadd71e46e6307cb1eece833d526c97d4cb50be"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/A-552-600/attempts/retry-1",
+      "attempt_id": "retry-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-t1-a552600-06e160-aa77b84",
+      "failure_reason": null,
+      "job": "job-js-s2-t1-a552600-06e160",
+      "last_checkpoint": null,
+      "processed_count": 49,
+      "resume_source": null,
+      "shard_id": "A-552-600",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/A-552-600/attempts/retry-1/shard_receipt.json",
+        "sha256": "404e107902a08e46a8168aab618185071d813dd26e5911dcb292f750bda411f2"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-001-064/attempts/retry-1",
+      "attempt_id": "retry-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-t1-b001064-06e160-mxhn3do",
+      "failure_reason": null,
+      "job": "job-js-s2-t1-b001064-06e160",
+      "last_checkpoint": null,
+      "processed_count": 64,
+      "resume_source": null,
+      "shard_id": "B-001-064",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/B-001-064/attempts/retry-1/shard_receipt.json",
+        "sha256": "b91caffa0d29c1161c882f357891973ab03e29ae5dbe442bd59298eac4a93b6a"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-129-256/attempts/retry-1",
+      "attempt_id": "retry-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-t1-b129256-06e160-7hgtldg",
+      "failure_reason": "platform_timeout_after_partial_checkpoint",
+      "job": "job-js-s2-t1-b129256-06e160",
+      "last_checkpoint": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/B-129-256/attempts/retry-1/checkpoints/n0088.pt",
+        "checkpoint_sha256": "f51a46c19208b0e4efc1f8bb55d656c3cf0ca788a3e47585a447440e3ba8d86e"
+      },
+      "processed_count": 88,
+      "resume_source": null,
+      "shard_id": "B-129-256",
+      "start_time_utc": null,
+      "status": "infrastructure_failed",
+      "success_receipt": null
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-257-315/attempts/retry-1",
+      "attempt_id": "retry-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-t1-b257315-06e160-3d1kd01",
+      "failure_reason": null,
+      "job": "job-js-s2-t1-b257315-06e160",
+      "last_checkpoint": null,
+      "processed_count": 59,
+      "resume_source": null,
+      "shard_id": "B-257-315",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/B-257-315/attempts/retry-1/shard_receipt.json",
+        "sha256": "988c46030f946f9652b7e36790a739420b519177d0b8f489865a5e093ff4198e"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-316-374/attempts/retry-1",
+      "attempt_id": "retry-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-t1-b316374-06e160-3st4bhb",
+      "failure_reason": null,
+      "job": "job-js-s2-t1-b316374-06e160",
+      "last_checkpoint": null,
+      "processed_count": 59,
+      "resume_source": null,
+      "shard_id": "B-316-374",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/B-316-374/attempts/retry-1/shard_receipt.json",
+        "sha256": "3349ae5f54d2512fb0526c4869d08379b90984d56caf4bfbc8f778600676db36"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-375-433/attempts/retry-1",
+      "attempt_id": "retry-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-t1-b375433-06e160-vp2b45h",
+      "failure_reason": null,
+      "job": "job-js-s2-t1-b375433-06e160",
+      "last_checkpoint": null,
+      "processed_count": 59,
+      "resume_source": null,
+      "shard_id": "B-375-433",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/B-375-433/attempts/retry-1/shard_receipt.json",
+        "sha256": "36df6cde5adeb34e4135c215776b588f00cfaa8495b64f55409857e90d477407"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-552-600/attempts/retry-1",
+      "attempt_id": "retry-1",
+      "end_time_utc": null,
+      "execution": "job-js-s2-t1-b552600-06e160-kibuk8e",
+      "failure_reason": null,
+      "job": "job-js-s2-t1-b552600-06e160",
+      "last_checkpoint": null,
+      "processed_count": 49,
+      "resume_source": null,
+      "shard_id": "B-552-600",
+      "start_time_utc": null,
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/B-552-600/attempts/retry-1/shard_receipt.json",
+        "sha256": "8687195ad8ce162fd277b2da74baeb0978c27cfa1a463097acb9d79547c9764e"
+      }
+    },
+    {
+      "artifact_prefix": "jlens-s2/production/20260806T194226Z/shards/B-129-256/attempts/resume-2",
+      "attempt_id": "resume-2",
+      "end_time_utc": null,
+      "execution": "job-js-s2-r2-b129256-06e160-tqrip09",
+      "failure_reason": null,
+      "job": "job-js-s2-r2-b129256-06e160",
+      "last_checkpoint": null,
+      "processed_count": 128,
+      "resume_source": {
+        "checkpoint_blob": "jlens-s2/production/20260806T194226Z/shards/B-129-256/attempts/retry-1/checkpoints/n0088.pt",
+        "checkpoint_manifest_blob": "jlens-s2/production/20260806T194226Z/shards/B-129-256/attempts/retry-1/checkpoints/n0088.json",
+        "checkpoint_manifest_sha256": "e85d21fe50447f6d8f1a69cac1ee2787b804690d78eda021cc3dbbe433e63152",
+        "checkpoint_sha256": "f51a46c19208b0e4efc1f8bb55d656c3cf0ca788a3e47585a447440e3ba8d86e",
+        "n_done": 88
+      },
+      "shard_id": "B-129-256",
+      "start_time_utc": "08/07/2026 04:13:27",
+      "status": "success",
+      "success_receipt": {
+        "blob": "jlens-s2/production/20260806T194226Z/shards/B-129-256/attempts/resume-2/shard_receipt.json",
+        "sha256": "8be97116a3eb4837c5f82be89cb15272b09b8552c20c72cd2df248f51eedefe6"
+      }
+    }
+  ],
+  "checkpoint_every": 8,
+  "fit_image_digest": "sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+  "fit_source_commit": "06e1604cd8633ecdc3267eac19ff529b2e5d3f83",
+  "maximum_possible_recomputed_sequences": 42,
+  "production_plan_sha256": "61726fbc502c3ca9fb0f6fbd0df61c0134efd590667dffb722285878fba30a6b",
+  "recomputation_status": "unknown_due_to_uncheckpointed_suffix",
+  "run_id": "20260806T194226Z",
+  "schema_version": "jlens-s2-production-attempts/v1",
+  "successful_shards": {
+    "A-001-064": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/A-001-064/attempts/primary/shard_receipt.json",
+      "sha256": "086ce29ccb949eb31e3f8e3077d46c5a8abc0901f4d10f8cb74fed7406e0618b"
+    },
+    "A-129-256": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/A-129-256/attempts/resume-1/shard_receipt.json",
+      "sha256": "766948e0a3c82f8af449f7d72195a85bdb4b5b9197fd5c48a2a085485189ab8c"
+    },
+    "A-375-433": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/A-375-433/attempts/retry-1/shard_receipt.json",
+      "sha256": "1822700fb729d4a74e8128184a3572287c0987debebff34c8fbbb7add58fa47d"
+    },
+    "A-316-374": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/A-316-374/attempts/primary/shard_receipt.json",
+      "sha256": "c841706861a000aa1cd4644e4e719a39d44f9b3d6cb7fff6146130eb1c260a6f"
+    },
+    "A-493-551": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/A-493-551/attempts/retry-1/shard_receipt.json",
+      "sha256": "0a794d0b8202e80b028b19c3eeadd71e46e6307cb1eece833d526c97d4cb50be"
+    },
+    "A-065-128": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/A-065-128/attempts/primary/shard_receipt.json",
+      "sha256": "952af7188ee6146fe8a3c23bfbad481c676ad74416f982900890b87bad404c3b"
+    },
+    "B-129-256": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/B-129-256/attempts/resume-2/shard_receipt.json",
+      "sha256": "8be97116a3eb4837c5f82be89cb15272b09b8552c20c72cd2df248f51eedefe6"
+    },
+    "B-552-600": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/B-552-600/attempts/retry-1/shard_receipt.json",
+      "sha256": "8687195ad8ce162fd277b2da74baeb0978c27cfa1a463097acb9d79547c9764e"
+    },
+    "B-493-551": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/B-493-551/attempts/resume-1/shard_receipt.json",
+      "sha256": "ed69114f0a9228f6ff9106dfa9eb791fb62b6d9090695c0d837769d98db4a1d9"
+    },
+    "B-316-374": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/B-316-374/attempts/retry-1/shard_receipt.json",
+      "sha256": "3349ae5f54d2512fb0526c4869d08379b90984d56caf4bfbc8f778600676db36"
+    },
+    "A-552-600": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/A-552-600/attempts/retry-1/shard_receipt.json",
+      "sha256": "404e107902a08e46a8168aab618185071d813dd26e5911dcb292f750bda411f2"
+    },
+    "B-434-492": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/B-434-492/attempts/resume-1/shard_receipt.json",
+      "sha256": "332980d28982833ac42d9d119feb7acbf60e776562c6fc97fa1a80f9a1797f5a"
+    },
+    "A-434-492": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/A-434-492/attempts/resume-1/shard_receipt.json",
+      "sha256": "17ca9908f83aa64302120cca62c2fbb2aacc85fe38e9875eb7ee3a5d07b11609"
+    },
+    "B-065-128": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/B-065-128/attempts/resume-1/shard_receipt.json",
+      "sha256": "25b6e0918619e360f59b9fb3c96ccc066168b98dbbc725ac1cca90e80e83b4fe"
+    },
+    "B-001-064": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/B-001-064/attempts/retry-1/shard_receipt.json",
+      "sha256": "b91caffa0d29c1161c882f357891973ab03e29ae5dbe442bd59298eac4a93b6a"
+    },
+    "B-257-315": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/B-257-315/attempts/retry-1/shard_receipt.json",
+      "sha256": "988c46030f946f9652b7e36790a739420b519177d0b8f489865a5e093ff4198e"
+    },
+    "B-375-433": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/B-375-433/attempts/retry-1/shard_receipt.json",
+      "sha256": "36df6cde5adeb34e4135c215776b588f00cfaa8495b64f55409857e90d477407"
+    },
+    "A-257-315": {
+      "blob": "jlens-s2/production/20260806T194226Z/shards/A-257-315/attempts/primary/shard_receipt.json",
+      "sha256": "82a33db4e84d3795e284e76dd6774493fcff09a549ed59a601d614e26fdd5b04"
+    }
+  }
+}
