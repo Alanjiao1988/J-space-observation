@@ -1,0 +1,69 @@
+{
+  "canonical_lenses": {
+    "A600": {
+      "bytes": 254812508,
+      "seal_sha256": "4032c8f30ec6aec2f12cbf0a303466a0fe66745617266dcc0fa3d2289e731dd7",
+      "sealed": true,
+      "sha256": "28e066960f03f51eaefb0e29aeb9cfe266e353746660f3283caaed85d0bc7689"
+    },
+    "B600": {
+      "bytes": 254812508,
+      "seal_sha256": "b62cd7f69aaa4a662144d8a8b75e3165330c9369990a52dbee85bb1b06b33ad4",
+      "sealed": true,
+      "sha256": "f39a656a018f99b0b0bacff97fe0eb7fe18285aa0049f1ca0f477232400272d3"
+    },
+    "M1200": {
+      "bytes": 254812541,
+      "seal_sha256": "9716c3802625176060b3c2a479f7860cf4045807a45c6de346833a3b66e00138",
+      "sealed": true,
+      "sha256": "9938aa66e07ca8bc2f63463dc2dfe60cb512271fa7b19955b402cb581bb0e682"
+    }
+  },
+  "e0_image_digest": "sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc",
+  "e0_manifest_destination": "jlens-s3/e0/20260807T081017Z/output",
+  "e0_output_schema_sha256": "9fdb9a45b78bae98ab72e1ffb9eb5b757de889e27b05f799e175f67a82dfbb7c",
+  "e0_source_bundle_sha256": "95b8cede932e1ed298e5f675075530a8b1560c0aa9049abfa0c6feebf38f9085",
+  "expected_item_counts": {
+    "causal_swap": 90,
+    "multihop": 93,
+    "order_ops": 55
+  },
+  "lens_operations_authorized": 0,
+  "model": {
+    "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    "parameter_dtype": "torch.float16",
+    "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+    "tokenizer_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+  },
+  "pre_lock_benchmark_model_operations": 0,
+  "pre_lock_benchmark_tokenizer_operations": 0,
+  "row_order": [
+    "multihop",
+    "order_ops",
+    "causal_swap"
+  ],
+  "s2_manifest": {
+    "blob": "jlens-s2/production/20260806T194226Z/verification-3/s2_manifest.json",
+    "sha256": "9d10a4b07a8133b7241ce9067649ebf1de48429cf7c04e0495b4c3fe90e58e47"
+  },
+  "s3_protocol_sha256": "bb07dc3be90539e88ff8ada8adee879da747ec5b0b0409499b9809f259df4625",
+  "s3_schema_sha256": "5d6e2fc33771b427130bd1dbe94c79cdf6d5827288b96929352c0caa793acbf1",
+  "schema_version": "jlens-s3-e0-lock/v1",
+  "vendored_benchmarks": {
+    "causal_swap": {
+      "bytes": 26567,
+      "item_count": 90,
+      "sha256": "a0edd27ca23f7b4d0fbe90448c2ddcc7457a3d812121bf024ed12a032ff86796"
+    },
+    "multihop": {
+      "bytes": 21869,
+      "item_count": 93,
+      "sha256": "50b7e4c9255291c0ca2a8e94615be9f44531fa57bb1a844e4f9616056d987416"
+    },
+    "order_ops": {
+      "bytes": 9589,
+      "item_count": 55,
+      "sha256": "b203206d16ff628152cc86f3838604e06cb54776f3e14fa1c34f150db8bc7560"
+    }
+  }
+}

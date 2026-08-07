@@ -1,0 +1,37 @@
+{
+  "canonical_s2_seals_verified": [
+    "A600",
+    "B600",
+    "M1200"
+  ],
+  "complete_output_objects_before_execution": 0,
+  "e0_image_digest": "sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc",
+  "e0_source_bundle_sha256": "95b8cede932e1ed298e5f675075530a8b1560c0aa9049abfa0c6feebf38f9085",
+  "lens_operations_authorized": 0,
+  "lock": {
+    "blob": "jlens-s3/e0/20260807T081017Z/lock/e0_lock.json",
+    "bytes": 2561,
+    "sha256": "8417ec21a512f51dac094facd3e7769f0d00b8b8ee896a7e11aeb4a7acb44c1b"
+  },
+  "lock_creation": {
+    "execution": "job-js-e0-lock-081017-1kglmch",
+    "job": "job-js-e0-lock-081017",
+    "status": "S3-E0-LOCK-SEALED"
+  },
+  "lock_prefix_objects": [
+    "jlens-s3/e0/20260807T081017Z/lock/e0_lock.json"
+  ],
+  "partial_output_objects_before_execution": 0,
+  "pre_lock_benchmark_model_operations": 0,
+  "pre_lock_benchmark_tokenizer_operations": 0,
+  "readback": {
+    "execution": "job-js-e0-lock-read-081017-27xh0q6",
+    "job": "job-js-e0-lock-read-081017",
+    "local_source_and_benchmark_hashes_verified": true,
+    "s2_manifest_verified": true,
+    "status": "Succeeded"
+  },
+  "run_id": "20260807T081017Z",
+  "schema_version": "jlens-s3-e0-lock-readback/v1",
+  "status": "S3-E0-LOCK-INDEPENDENTLY-VERIFIED"
+}
