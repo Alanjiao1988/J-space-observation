@@ -1,0 +1,11 @@
+{
+  "lens": {
+    "blob": "jlens-s2/production/20260806T194226Z/lenses/A600/A600.pt",
+    "bytes": 254812508,
+    "sha256": "28e066960f03f51eaefb0e29aeb9cfe266e353746660f3283caaed85d0bc7689"
+  },
+  "lens_id": "A600",
+  "manifest_blob": "jlens-s2/production/20260806T194226Z/lenses/A600/lens_manifest.json",
+  "manifest_sha256": "302112cb3cea6c10f4531b897e5d75484e9489cd044bc8e555e5bcf6acb0fa77",
+  "sealed": true
+}

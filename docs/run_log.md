@@ -4998,3 +4998,59 @@ Full-suite run `cma8` bound commit
   `tests/test_parser_v3_seal_job.py` failures;
 - delta from the 3372 / 15 / 2 authority baseline:
   **+55 passed / +0 skipped / +0 failed**.
+
+## 2026-08-06 to 2026-08-07 - Full-layer J-lens S2 execution and seal
+
+The run followed S2-G0 through S2-V0 in order under
+`docs/prompts/jlens_s2_full_layer_and_s3_e0_execution_prompt.md`. Starting
+commit `72336f822a8ffdbd2e0caf40f4a62c68cce68156` and tree
+`d0592ae0b0edb62b4f082c0a12a9bcafe5693ee5` remained ancestors. Frozen S3,
+Phase 1.0D, D25--D30, and `.dockerignore` bytes were not changed.
+
+The canonical S2 protocol fixed model revision
+`ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562`, upstream J-lens commit
+`581d398613e5602a5af361e1c34d3a92ea82ba8e`, layers 0--26 to target 27,
+128 tokens, `skip_first=16`, and exact 600/600/200/2 roles. Azure resolved
+WikiText revision `b08601e7c05d0c1b2f9d4a6039cf782e095e8629`, scanned 1,801,350 rows,
+found 378,511 eligible unique sequences, and sealed the first 1,402 by the
+frozen role key.
+
+Four full-layer T4 smoke Jobs measured `dim_batch` 1, 2, 4, and 8. Every job
+returned all 27 finite matrices and stayed below the memory ceiling. Only
+`dim_batch=1` met the 1e-5 max-absolute and relative-Frobenius equivalence
+limits, so production used 1. The deterministic wall-time planner split the
+final 344-sequence increment into 59/59/59/59/59/49.
+
+Eighteen primary shard starts against quota five produced four successes and
+14 infrastructure failures. Exact checkpoint resumes and from-scratch retries
+eventually produced all 18 successful registered shard states. In total there
+were 33 attempts, 18 successes, 15 failures, and six checkpoint-bearing
+partials. Every registered A/B contribution appears once in the successful
+lens states. The exact number of computations repeated after an unpersisted
+timeout suffix is unknowable; the registered bound is zero through 42.
+
+Official cumulative merges produced A64/A128/A256/A600 and
+B64/B128/B256/B600. M1200 was produced only as the official equal-weight
+600:600 merge of A600 and B600. All merge-vs-independent and lossless
+save/load maximum absolute differences were zero. A/B maximum across-layer
+relative Frobenius distances were 0.217365, 0.157403, 0.112630, and 0.073860;
+the non-gating fitted exponent was 0.482675. Five heldout Jobs covered all 200
+registered sequences and the aggregate verified all 16,200 expected finite
+pair-layer metric rows.
+
+Two verification attempts were retained as operational failures: the first
+rejected a CRLF-derived production-plan hash, and the second stopped on a
+missing verifier `os` import before writing seals. The corrected immutable
+verifier image
+`sha256:e0fec8e76a98be692d0f1f8631ca14c3978897fe765edc07db96ee97a5eae757`
+then independently verified the complete input graph and wrote the canonical
+seals and manifest create-only. A read-only export independently reconstructed
+and SHA-checked every small seal object.
+
+The S2 manifest is
+`9d10a4b07a8133b7241ce9067649ebf1de48429cf7c04e0495b4c3fe90e58e47`;
+the closed pack is
+`2dfc9bee037673f7bf33dddd863a3ce77cbe64482c72f06fd689c519a4041ddc`.
+No official S3 benchmark tokenization or model pass preceded the seal. The
+state is
+**`NONTERMINAL_CHECKPOINT_JLENS_S2_SEALED_AWAITING_S3_E0`**.

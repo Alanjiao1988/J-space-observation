@@ -1323,3 +1323,51 @@ The review allowance is spent.
 This method entry is preregistration, not empirical evidence. No target model,
 tokenizer, lens, inference, activation, patching, ablation, scientific row, or
 RQ2 run occurred.
+
+## M-21 - Fitting and independently sealing full-layer S2 identities
+
+The full-layer S2 run used the pinned
+`deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B` revision
+`ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562`, float16 model parameters,
+evaluation mode, `use_cache=false`, and the official retained-graph
+Jacobian-lens implementation at commit
+`581d398613e5602a5af361e1c34d3a92ea82ba8e`. Each 128-token fit returned
+float32 1536 by 1536 matrices for source layers 0 through 26 against target
+layer 27.
+
+Before production, an Azure scan of all 1,801,350 rows in the immutable
+WikiText train split selected 1,402 disjoint sequences by a frozen SHA-256 role
+key: 600 A, 600 B, 200 heldout, and two smoke-only. Selection used exact raw
+bytes and token IDs, minimum source length and token count, duplicate rejection,
+and symmetric exact prompt-overlap exclusion. It did not inspect model output.
+
+Four independent T4 smoke Jobs compared `dim_batch` 8, 4, 2, and 1 on the same
+two smoke-only rows. All returned complete finite matrices, but 8, 4, and 2
+failed the prospectively fixed 1e-5 numerical limits against 1. The run
+therefore fixed `dim_batch=1` and deterministically split the final
+344-sequence increment as 59/59/59/59/59/49.
+
+Production used 18 registered contiguous shards. Thirty-three executions
+produced 18 successes and 15 infrastructure failures. Six failed attempts
+persisted exact eight-prompt checkpoints and were resumed once under the same
+image, source, corpus, shard, and configuration; nine quota-timeout attempts
+had no usable checkpoint. The successful states cover every A1--A600 and
+B1--B600 contribution once. Because a process can finish work after its last
+surviving checkpoint, the exact number of recomputed evaluations is unknown
+and bounded at zero through 42.
+
+At 64, 128, 256, and 600 prompts, the official merge was independently
+recomputed as the `n_prompts`-weighted float32 matrix mean. A600 and B600 have
+equal prompt counts, so M1200 is their 600:600, or 50:50, official merge.
+Every merge comparison and lossless save/load comparison had maximum absolute
+difference zero. Heldout engineering apply diagnostics covered the exact
+Cartesian product of 200 sequences, three lens pairs, and 27 layers.
+
+A distinct read-only verifier re-downloaded and hashed every registered input,
+validated the production-attempt state machine, exact sequence accounting,
+transport manifests, lens shape/finiteness/provenance, merges, heldout keys,
+and closed artifact schema, and then wrote A600, B600, M1200 seals followed by
+the S2 manifest. The manifest SHA-256 is
+`9d10a4b07a8133b7241ce9067649ebf1de48429cf7c04e0495b4c3fe90e58e47`.
+No official S3 benchmark item was tokenized or sent through the model before
+this seal.

@@ -1,0 +1,11 @@
+{
+  "lens": {
+    "blob": "jlens-s2/production/20260806T194226Z/lenses/M1200/M1200.pt",
+    "bytes": 254812541,
+    "sha256": "9938aa66e07ca8bc2f63463dc2dfe60cb512271fa7b19955b402cb581bb0e682"
+  },
+  "lens_id": "M1200",
+  "manifest_blob": "jlens-s2/production/20260806T194226Z/lenses/M1200/lens_manifest.json",
+  "manifest_sha256": "cc96d4c07aa2a5eaf35ef0aeb57391265dcfa79d3745dded1e84ece5827b943a",
+  "sealed": true
+}

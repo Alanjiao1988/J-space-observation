@@ -1348,3 +1348,30 @@ Phase 1.0D capability headroom, semantic reviewer accuracy, human ground truth,
 hidden reasoning, an internal workspace, or a J-space. It also would not
 override the independent Phase 1.0D transport-capacity block or by itself
 license S4/RQ2.
+
+## L-62 - WikiText is only a public pretraining-like proxy
+
+The S2 fit corpus is deterministically sampled from the public
+Wikipedia-derived WikiText dataset. Its immutable revision, license, source
+rows, token IDs, exclusions, and role assignment are reproducible, but there is
+no evidence that these rows are representative of the target model's actual
+training distribution. Convergence under this proxy cannot be generalized to
+all training-like text or to a known model-training distribution.
+
+## L-63 - Two S2 arms provide one difference trajectory
+
+A600 and B600 are independent, disjoint fits, but they yield only one A/B
+difference at each cumulative checkpoint. The four checkpoint distances form a
+useful scaling trajectory, not a sampling distribution. The fitted exponent
+and residuals have no replicate-level uncertainty estimate and cannot support a
+population convergence claim.
+
+## L-64 - S2 convergence and heldout stability are engineering evidence
+
+Matrix distance, cosine, exact merge reproduction, serialization identity, and
+heldout top-k/rank/logit stability establish transport and numerical behavior
+of the fitted artifacts. They do not validate semantic readout, causal
+intervention, hidden reasoning, an internal workspace, or a J-space. They also
+do not alter the independent Phase 1.0D capacity block. The frozen S3 protocol
+requires separate E0 eligibility and later E1/E2 execution before any J-lens
+validity classification can exist.

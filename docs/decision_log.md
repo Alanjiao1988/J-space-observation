@@ -2690,3 +2690,35 @@ The exact freeze record is
 `docs/decisions/jlens_s3_validity_protocol_freeze.md`. The resulting state is
 `NONTERMINAL_CHECKPOINT_JLENS_S3_VALIDITY_PROTOCOL_FROZEN_AWAITING_S2_LENSES_AND_EXECUTION`.
 It licenses no S3 or RQ2 execution.
+
+## D31 - Accept the independently verified full-layer S2 identities
+
+2026-08-07. Full-layer J-lens S2 execution.
+
+The deterministic S2 run produced exact lossless A600, B600, and official
+600:600 weighted M1200 identities. Independent verification confirmed all
+source layers 0--26 against target 27, float32 1536 by 1536 finite matrices,
+prompt counts 600/600/1200, exact save/load identity, exact official-merge
+recomputation, create-only Blob readback, complete transport provenance, and
+the closed artifact schema.
+
+The canonical lens hashes are:
+
+- A600 `28e066960f03f51eaefb0e29aeb9cfe266e353746660f3283caaed85d0bc7689`;
+- B600 `f39a656a018f99b0b0bacff97fe0eb7fe18285aa0049f1ca0f477232400272d3`;
+- M1200 `9938aa66e07ca8bc2f63463dc2dfe60cb512271fa7b19955b402cb581bb0e682`.
+
+The S2 manifest SHA-256 is
+`9d10a4b07a8133b7241ce9067649ebf1de48429cf7c04e0495b4c3fe90e58e47`;
+the verification receipt SHA-256 is
+`b1a909cd04c991fd69932af5bfbf6427343851f87a1a00c537ac42c7d9d02a5f`.
+Before the seal there were zero official benchmark tokenizer operations and
+zero official benchmark model operations.
+
+The A/B maximum relative Frobenius distance decreased across the registered
+checkpoints and the heldout key space was complete, but those results are
+non-gating engineering diagnostics. They do not validate a lens or establish
+hidden reasoning, an internal workspace, or a J-space. The decision is solely
+to accept the three byte identities as the frozen S3 E0 prerequisites. The
+state becomes
+`NONTERMINAL_CHECKPOINT_JLENS_S2_SEALED_AWAITING_S3_E0`.

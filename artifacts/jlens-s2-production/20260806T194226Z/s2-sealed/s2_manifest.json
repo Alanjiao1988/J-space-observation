@@ -1,0 +1,44 @@
+{
+  "artifact_pack_sha256": "2dfc9bee037673f7bf33dddd863a3ce77cbe64482c72f06fd689c519a4041ddc",
+  "canonical_seals": [
+    {
+      "lens": {
+        "blob": "jlens-s2/production/20260806T194226Z/lenses/A600/A600.pt",
+        "bytes": 254812508,
+        "sha256": "28e066960f03f51eaefb0e29aeb9cfe266e353746660f3283caaed85d0bc7689"
+      },
+      "lens_id": "A600",
+      "manifest_blob": "jlens-s2/production/20260806T194226Z/lenses/A600/lens_manifest.json",
+      "manifest_sha256": "302112cb3cea6c10f4531b897e5d75484e9489cd044bc8e555e5bcf6acb0fa77",
+      "sealed": true
+    },
+    {
+      "lens": {
+        "blob": "jlens-s2/production/20260806T194226Z/lenses/B600/B600.pt",
+        "bytes": 254812508,
+        "sha256": "f39a656a018f99b0b0bacff97fe0eb7fe18285aa0049f1ca0f477232400272d3"
+      },
+      "lens_id": "B600",
+      "manifest_blob": "jlens-s2/production/20260806T194226Z/lenses/B600/lens_manifest.json",
+      "manifest_sha256": "0881047112f8f8d6d105cd3e7a09c49d83cf2c2617730537e77e1604582c1aaa",
+      "sealed": true
+    },
+    {
+      "lens": {
+        "blob": "jlens-s2/production/20260806T194226Z/lenses/M1200/M1200.pt",
+        "bytes": 254812541,
+        "sha256": "9938aa66e07ca8bc2f63463dc2dfe60cb512271fa7b19955b402cb581bb0e682"
+      },
+      "lens_id": "M1200",
+      "manifest_blob": "jlens-s2/production/20260806T194226Z/lenses/M1200/lens_manifest.json",
+      "manifest_sha256": "cc96d4c07aa2a5eaf35ef0aeb57391265dcfa79d3745dded1e84ece5827b943a",
+      "sealed": true
+    }
+  ],
+  "corpus_manifest_sha256": "a7e1e721670c2e03619b914bc8d492f1d2e680f5e11afe5d74ddfb3edef14180",
+  "image_digest": "sha256:e0fec8e76a98be692d0f1f8631ca14c3978897fe765edc07db96ee97a5eae757",
+  "protocol_sha256": "e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2",
+  "source_commit": "6c7acea471594c8bbb1e4dba8eb34cc50e8ae4ff",
+  "status": "S2-V0-SEALED",
+  "verification_receipt_sha256": "b1a909cd04c991fd69932af5bfbf6427343851f87a1a00c537ac42c7d9d02a5f"
+}

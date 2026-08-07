@@ -1,0 +1,48 @@
+{
+  "complete": true,
+  "create_only": true,
+  "files": [
+    {
+      "bytes": 415,
+      "relative_path": "A600_seal.json",
+      "sha256": "4032c8f30ec6aec2f12cbf0a303466a0fe66745617266dcc0fa3d2289e731dd7",
+      "written_order": 1
+    },
+    {
+      "bytes": 415,
+      "relative_path": "B600_seal.json",
+      "sha256": "b62cd7f69aaa4a662144d8a8b75e3165330c9369990a52dbee85bb1b06b33ad4",
+      "written_order": 2
+    },
+    {
+      "bytes": 419,
+      "relative_path": "M1200_seal.json",
+      "sha256": "9716c3802625176060b3c2a479f7860cf4045807a45c6de346833a3b66e00138",
+      "written_order": 3
+    },
+    {
+      "bytes": 1978,
+      "relative_path": "s2_manifest.json",
+      "sha256": "9d10a4b07a8133b7241ce9067649ebf1de48429cf7c04e0495b4c3fe90e58e47",
+      "written_order": 4
+    },
+    {
+      "bytes": 23711,
+      "relative_path": "s2_verification_receipt.json",
+      "sha256": "b1a909cd04c991fd69932af5bfbf6427343851f87a1a00c537ac42c7d9d02a5f",
+      "written_order": 5
+    },
+    {
+      "bytes": 4599734,
+      "relative_path": "zz_s2_artifact_pack.json",
+      "sha256": "2dfc9bee037673f7bf33dddd863a3ce77cbe64482c72f06fd689c519a4041ddc",
+      "written_order": 6
+    }
+  ],
+  "image_digest": "sha256:e0fec8e76a98be692d0f1f8631ca14c3978897fe765edc07db96ee97a5eae757",
+  "manifest_written_last": true,
+  "protocol_sha256": "e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2",
+  "schema_version": "jlens-s2-runtime-pack/v1",
+  "source_commit": "6c7acea471594c8bbb1e4dba8eb34cc50e8ae4ff",
+  "stage": "S2-V0-independent-verification"
+}
