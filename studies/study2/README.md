@@ -2,20 +2,21 @@
 
 ## Status
 
-Coordination state: `GATE_A_ADOPTED_CANDIDATE_REBUILD`
+Coordination state: `FROZEN_PENDING_FINAL_ACR_VALIDATION`
 
-Canonical protocol lifecycle: `CANDIDATE_AWAITING_REVIEW`
+Canonical protocol lifecycle: `FROZEN_AWAITING_STAGE_T`
 
-Formal methods-review allowance: `UNSPENT`
+Formal methods-review allowance: `SPENT_VERIFIED`
 
-The model-free Stage P candidate protocol and deterministic bank generator have
-been implemented, but the formal methods review has not started and the
-protocol is not frozen. An operator-directed pre-review check identified a
-material feasibility-gate question. The operator selected Gate A and authorized
+The model-free protocol and public deterministic banks are frozen after the
+single formal methods review. An operator-directed pre-review check identified
+a material feasibility-gate question. The operator selected Gate A and authorized
 the additive amendment at
 [`prompts/stage_p_gate_a_operator_amendment.md`](prompts/stage_p_gate_a_operator_amendment.md).
 The retained gap analysis is
 [`protocol/stage_p_operator_amendment_required.md`](protocol/stage_p_operator_amendment_required.md).
+The freeze decision is
+[`decisions/reasoning_internalization_protocol_freeze.md`](decisions/reasoning_internalization_protocol_freeze.md).
 
 No tokenizer, model, lens, activation, probe, patching, ablation,
 semantic-review provider, GPU Job, or scientific row has been produced under

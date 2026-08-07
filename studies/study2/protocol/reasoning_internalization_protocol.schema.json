@@ -927,7 +927,7 @@
         ],
         "references_required": "exact file path and JSON pointer",
         "same_checklist_verifications": 1,
-        "status": "UNSPENT",
+        "status": "SPENT_VERIFIED",
         "unresolved_integrity_action": "BLOCKED_ON_STUDY2_PREREGISTRATION_INTEGRITY",
         "verification_scope": "same checklist; only a direct contradiction introduced by the correction may be newly identified"
       }
@@ -1023,7 +1023,7 @@
       ]
     },
     "status": {
-      "const": "CANDIDATE_AWAITING_REVIEW"
+      "const": "FROZEN_AWAITING_STAGE_T"
     },
     "study_id": {
       "const": "study2"
