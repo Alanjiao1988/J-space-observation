@@ -1055,7 +1055,10 @@ def _validate_cell_balance(rows: Sequence[Mapping[str, Any]], *, pair_rows: bool
             table[str(value)] = dict(complete)
         conditional[field] = table
     return {
-        "counts": {name: dict(counter) for name, counter in counters.items()},
+        "counts": {
+            name: {str(value): count for value, count in counter.items()}
+            for name, counter in counters.items()
+        },
         "conditional_label_tables": conditional,
     }
 
