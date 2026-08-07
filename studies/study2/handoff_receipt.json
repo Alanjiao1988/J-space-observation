@@ -1,0 +1,102 @@
+{
+  "schema_version": "jspace-study2-bootstrap-handoff/v1",
+  "created_on": "2026-08-07",
+  "repository": "Alanjiao1988/J-space-observation",
+  "branch": "main",
+  "study1_terminal": {
+    "commit": "6409d2c6d665187e4459d94d490a20d7b085e8af",
+    "tree": "bc8b80cb0e66f9426dcdedd52b624c892caa3fc9",
+    "state": "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+    "scientific_disposition": "ORIGINAL_RESEARCH_QUESTION_NOT_ANSWERED"
+  },
+  "study2_bootstrap_authority": {
+    "commit": "db8c100db0c16306a702d348a49a90480f440629",
+    "tree": "032109e20e32f43126ade0d45c0abffa5c2de85f",
+    "parent_commit": "6409d2c6d665187e4459d94d490a20d7b085e8af",
+    "commit_subject": "Organize Study 1 and open Study 2"
+  },
+  "authority_prompt": {
+    "path": "studies/study2/prompts/stage_p_protocol_design_prompt.md",
+    "sha256": "1408c5ae4d09a097c70b0e984150c4947e527ca12b5614905a98b65685ed0b37",
+    "bytes": 53018,
+    "lines": 1124,
+    "authorized_stage": "P",
+    "status": "COMMITTED_UNEXECUTED"
+  },
+  "bootstrap_documents": [
+    {
+      "path": "studies/study1/terminal_manifest.json",
+      "sha256": "5bc61e3622114cd7d5c14c031fc0379fada91802d4d45f559280eb1e1dd325e2",
+      "bytes": 3795
+    },
+    {
+      "path": "studies/study2/RESEARCH_CHARTER.md",
+      "sha256": "8b38a1d2d85845b4cee466f0428ff8389069f3cd1d08b78dd895e1db851680b7",
+      "bytes": 4462
+    },
+    {
+      "path": "studies/study2/study2_charter.json",
+      "sha256": "e359bf866b3f8781b7d045fd47df6330d34dad81141669178afc1fe2eabc91b4",
+      "bytes": 4063
+    }
+  ],
+  "protected_study1_anchors": [
+    {
+      "path": "docs/jlens_s2_s3_e0_final_handoff.md",
+      "sha256": "5870c82b15575086f5c29c34661d89d96d265848846e3de74162da8919951f77"
+    },
+    {
+      "path": "docs/jlens_s3_validity_protocol.json",
+      "sha256": "bb07dc3be90539e88ff8ada8adee879da747ec5b0b0409499b9809f259df4625"
+    },
+    {
+      "path": "artifacts/jlens-s2-production/20260806T194226Z/s2-sealed/s2_manifest.json",
+      "sha256": "9d10a4b07a8133b7241ce9067649ebf1de48429cf7c04e0495b4c3fe90e58e47"
+    },
+    {
+      "path": "artifacts/jlens-s3-e0/20260807T081017Z/05_terminal_receipt.json",
+      "sha256": "e7daad69a81377aba05be2617c07522d8d04552e594bc2cdc8318b057a83f218"
+    },
+    {
+      "path": "artifacts/phase1-0d-semantic-review-v2-transport-capacity/20260805T180417Z/00_capacity_certificate.json",
+      "sha256": "20e486e05a5f076b720ca12db3459b5a1c2c42e95684977dfdcff19d6da055d3"
+    }
+  ],
+  "ledger_state": {
+    "decision_tail_at_authority": "D33",
+    "method_tail_at_authority": "M-23",
+    "limitation_tail_at_authority": "L-67",
+    "evidence_tail": "EV-0016",
+    "study2_scientific_evidence_rows": 0
+  },
+  "stage_p_review_allowance": {
+    "candidate_reviews": 1,
+    "consolidated_corrections": 1,
+    "same_checklist_verification": 1,
+    "status": "UNSPENT"
+  },
+  "operations_at_handoff": {
+    "tokenizer_constructions": 0,
+    "model_downloads": 0,
+    "weight_loads": 0,
+    "forward_passes": 0,
+    "generations": 0,
+    "lens_operations": 0,
+    "activation_operations": 0,
+    "probe_operations": 0,
+    "patching_operations": 0,
+    "ablation_operations": 0,
+    "semantic_review_calls": 0,
+    "gpu_jobs": 0,
+    "phase1_0d_operations": 0,
+    "scientific_evidence_rows": 0
+  },
+  "next_thread_binding": {
+    "minimum_required_ancestor": "db8c100db0c16306a702d348a49a90480f440629",
+    "authority_tree": "032109e20e32f43126ade0d45c0abffa5c2de85f",
+    "exact_origin_main_source": "operator_handoff_message",
+    "self_referential_head_omitted": true,
+    "rule": "The new thread must require origin/main to equal the exact commit and tree supplied by the operator, then verify this receipt and the bootstrap authority ancestry before Stage P implementation."
+  },
+  "current_state": "NONTERMINAL_CHECKPOINT_STUDY2_OPENED_AWAITING_STAGE_P"
+}

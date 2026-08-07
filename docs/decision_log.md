@@ -2795,3 +2795,27 @@ Stage T and all model, lens, activation, probe, patching, ablation, reviewer,
 GPU, and scientific operations remain unauthorized. No Study 2 evidence row is
 created by this organizational transition. The resulting state is
 `NONTERMINAL_CHECKPOINT_STUDY2_OPENED_AWAITING_STAGE_P`.
+
+## D34 - Seal the Study 2 bootstrap authority and new-thread handoff
+
+2026-08-07. Study 2 bootstrap handoff.
+
+The organizational and authority transition was fast-forward committed as
+`db8c100db0c16306a702d348a49a90480f440629`, tree
+`032109e20e32f43126ade0d45c0abffa5c2de85f`, with the Study 1 terminal commit
+as its parent. The Stage P authority prompt at
+`studies/study2/prompts/stage_p_protocol_design_prompt.md` is 53,018 bytes,
+1,124 lines, and SHA-256
+`1408c5ae4d09a097c70b0e984150c4947e527ca12b5614905a98b65685ed0b37`.
+
+A machine-readable handoff receipt binds that authority commit/tree, prompt,
+charters, Study 1 terminal identity, protected anchors, ledger tails, unspent
+review allowance, and zero-operation counters. Because a receipt cannot embed
+the SHA of the commit that contains itself, the operator's final handoff message
+supplies the exact current `origin/main` commit/tree; the new thread must require
+that exact head and verify the authority commit as its ancestor.
+
+This handoff authorizes no new operation beyond D33. Stage P remains unexecuted,
+its review allowance remains unspent, `paper/evidence_ledger.csv` remains at
+EV-0016, and the state remains
+`NONTERMINAL_CHECKPOINT_STUDY2_OPENED_AWAITING_STAGE_P`.

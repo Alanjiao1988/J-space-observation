@@ -5172,3 +5172,19 @@ loads, forward passes, generations, lens operations, activation operations,
 probes, patching, ablations, semantic-review calls, GPU Jobs, Phase 1.0D
 operations, or scientific evidence rows. It is a research-boundary and
 authority transition, not an empirical run.
+
+### Bootstrap handoff seal
+
+The Study 2 organizational/authority commit is
+`db8c100db0c16306a702d348a49a90480f440629`, tree
+`032109e20e32f43126ade0d45c0abffa5c2de85f`. A separate fast-forward handoff
+commit adds the machine-readable receipt, detailed next-thread handoff, and
+copy-ready start prompt. The receipt binds the exact Stage P authority prompt
+at SHA-256
+`1408c5ae4d09a097c70b0e984150c4947e527ca12b5614905a98b65685ed0b37`
+and 53,018 bytes.
+
+No Stage P implementation, task generation, methods review, ACR validation, or
+scientific operation occurred while sealing the handoff. The new thread must
+begin by verifying the exact final head supplied by the operator and the
+authority ancestry, then execute Stage P only.
