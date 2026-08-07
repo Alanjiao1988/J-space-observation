@@ -2,12 +2,23 @@
 
 ## Status
 
-`OPEN_AWAITING_STAGE_P`
+Coordination state: `OPERATOR_AMENDMENT_REQUIRED`
 
-Study 2 has been established as a new study. No Stage P protocol has yet been
-implemented or reviewed, and no tokenizer, model, lens, activation, probe,
-patching, ablation, semantic-review provider, GPU Job, or scientific row has
-been produced under Study 2.
+Canonical protocol lifecycle: `CANDIDATE_AWAITING_REVIEW`
+
+Formal methods-review allowance: `UNSPENT`
+
+The model-free Stage P candidate protocol and deterministic bank generator have
+been implemented, but the formal methods review has not started and the
+protocol is not frozen. An operator-directed pre-review check identified a
+material feasibility-gate question that conflicts with the authority's exact
+stage machine. See
+[`protocol/stage_p_operator_amendment_required.md`](protocol/stage_p_operator_amendment_required.md).
+
+No tokenizer, model, lens, activation, probe, patching, ablation,
+semantic-review provider, GPU Job, or scientific row has been produced under
+Study 2. A candidate protocol and model-free task-bank generation are not
+empirical evidence.
 
 ## Research question
 
@@ -66,3 +77,4 @@ mechanistic execution each require separate authority.
 2. [`study2_charter.json`](study2_charter.json)
 3. [`NEXT_THREAD_HANDOFF.md`](NEXT_THREAD_HANDOFF.md)
 4. [`prompts/stage_p_protocol_design_prompt.md`](prompts/stage_p_protocol_design_prompt.md)
+5. [`protocol/stage_p_operator_amendment_required.md`](protocol/stage_p_operator_amendment_required.md)
