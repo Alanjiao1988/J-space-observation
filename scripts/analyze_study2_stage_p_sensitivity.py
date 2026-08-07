@@ -61,7 +61,7 @@ def rounded(value: float) -> float:
 
 def exact_binomial_section() -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    for n in (64, 256):
+    for n in (64, 128, 256):
         for alpha in ALPHAS:
             threshold = critical_successes(n, CHANCE, alpha)
             rows.append(
@@ -80,6 +80,25 @@ def exact_binomial_section() -> list[dict[str, Any]]:
                 }
             )
     return rows
+
+
+def gate_a_section() -> dict[str, Any]:
+    n = 128
+    alpha = 0.025
+    threshold = critical_successes(n, CHANCE, alpha)
+    return {
+        "n_per_family": n,
+        "one_sided_alpha": alpha,
+        "critical_successes": threshold,
+        "critical_accuracy": rounded(threshold / n),
+        "critical_upper_tail": rounded(
+            binomial_upper_tail(n, CHANCE, threshold)
+        ),
+        "previous_upper_tail": rounded(
+            binomial_upper_tail(n, CHANCE, threshold - 1)
+        ),
+        "overall_rule": "both fixed families pass; no pooled or depth rescue",
+    }
 
 
 def substantive_floor_section() -> dict[str, Any]:
@@ -190,6 +209,7 @@ def build_report(source_commit: str, source_tree: str, acr_run_id: str) -> dict[
             "power_targets": list(POWER_TARGETS),
         },
         "exact_binomial_against_chance": exact_binomial_section(),
+        "gate_a_family_composition_qualification": gate_a_section(),
         "confirmation_accuracy_floor": substantive_floor_section(),
         "paired_target_control_sensitivity": paired_difference_section(),
         "mechanistic_pair_sensitivity": mechanistic_section(),
