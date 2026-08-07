@@ -14,5 +14,8 @@ steps:
       /workspace/study2-src
     when:
       - generate
-push:
-  - {{.Run.Registry}}/j-space-observation-study2-stage-p:{{.Values.OUTPUT_TAG}}
+  - id: push
+    push:
+      - {{.Run.Registry}}/j-space-observation-study2-stage-p:{{.Values.OUTPUT_TAG}}
+    when:
+      - package
