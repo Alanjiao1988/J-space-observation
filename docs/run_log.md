@@ -5054,3 +5054,68 @@ the closed pack is
 No official S3 benchmark tokenization or model pass preceded the seal. The
 state is
 **`NONTERMINAL_CHECKPOINT_JLENS_S2_SEALED_AWAITING_S3_E0`**.
+
+## 2026-08-07 - Frozen S3 E0 execution and terminal verification
+
+The exact E0 source bundle was frozen at SHA-256
+`95b8cede932e1ed298e5f675075530a8b1560c0aa9049abfa0c6feebf38f9085`.
+The distinct image build `cmbk` produced immutable digest
+`sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc`.
+The empty-prefix preflight and read-only image verifier passed with zero
+benchmark operations.
+
+Three non-scientific harness failures are retained. ACR run `cmbh` interpreted
+a Windows absolute task-file path inside its workspace and ran no test. Image
+verifier runs `cmbm` and `cmbn` failed respectively on CRLF in the external
+shell wrapper and because the ACR source mount hid the image workspace. The
+corrected read-only Container Apps verifier
+`job-js-e0-imgverify-67b72c2-5lg12he` recomputed all source, protocol, schema,
+and benchmark hashes. None of these attempts tokenized a benchmark item or
+called the model.
+
+Lock creation `job-js-e0-lock-081017-1kglmch` wrote one create-only 2,561-byte
+object with SHA-256
+`8417ec21a512f51dac094facd3e7769f0d00b8b8ee896a7e11aeb4a7acb44c1b`.
+Independent readback `job-js-e0-lock-read-081017-27xh0q6` verified the lock,
+image-local bytes, S2 manifest, three lens seals, one-object namespace, zero
+pre-lock benchmark operations, and zero authorized lens operations.
+
+The sole execution was started once as
+`job-js-e0-run-081017-yi5acvy`. The client-side wait was interrupted after the
+start, but the Azure execution continued unchanged and succeeded; no second
+start was issued. It ran from 08:22:10Z through 08:28:52Z, with 254 observed
+GPU-container seconds and 234.9299 core E0 seconds.
+
+The execution sealed:
+
+- `e0_item.jsonl`: 250,605 bytes,
+  SHA-256 `698bfaa830c5f19c41a79ed4059d848464d09d47c73dede72eba678c2e45cfd4`;
+- `e0_surface.jsonl`: 339,433 bytes,
+  SHA-256 `0b0c6d8393c8eb5ed4495b3d555790666ccd5381cb32313a911ed1f74f5f9a86`;
+- `eligibility_split_manifest.json`: 1,585 bytes,
+  SHA-256 `aaa8ac7526824da3ea5bfe1e07508ccfbb490d939d32ca9105d7a39847ec89c1`;
+- manifest-last `artifact_manifest.jsonl`: 1,726 bytes,
+  SHA-256 `6d11b09b39bbeead9b38fdb23be47a4247245fb55e6b6b665b817241519df60f`.
+
+Independent S3-V0 Job `job-js-e0-verify-081017-5bsodon` downloaded the exact
+five-object lock/output set, found zero partial objects, validated 238 item
+rows and 962 surface rows, reconstructed the frozen rules and splits, and
+reproduced every count and floor. The first optional S2 final-diagnostic export
+Job `job-js-s2-final-export-081017-wb2188g` failed read-only on an incorrect
+assumption that checkpoint manifests carried `fit_seconds`; it wrote nothing.
+Corrected read-only export
+`job-js-s2-final-export2-081017-r02w5ku` succeeded and preserved the exact
+per-layer and heldout diagnostic rows plus all six partial checkpoint
+manifests.
+
+E0 performed 151,665 vocabulary-token decodes, exactly 238 item tokenizations,
+and exactly 238 model forwards. It performed zero lens imports or operations,
+zero E1/E2 outputs, and zero intervention, ablation, patching, or RQ2
+operations.
+
+Behavioral eligibility was 2 multihop, 2 order-operations and 5 causal-swap
+items. All nine were assigned to development by the prospectively frozen
+development-first split, leaving confirmation counts 0/0/0 and pooled readout
+confirmation 0. Every floor failed. The exact terminal state is:
+
+**`INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY`**.

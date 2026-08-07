@@ -1375,3 +1375,23 @@ intervention, hidden reasoning, an internal workspace, or a J-space. They also
 do not alter the independent Phase 1.0D capacity block. The frozen S3 protocol
 requires separate E0 eligibility and later E1/E2 execution before any J-lens
 validity classification can exist.
+
+## L-65 - E0 has no confirmation sample after the frozen development allocation
+
+Only 2 multihop, 2 order-operations and 5 causal-swap items passed both the
+mechanical and clean-behavior gates. The frozen distribution-local rule assigns
+up to 15 eligible items per distribution to development first, so all nine
+eligible rows are development and the three confirmation sets are empty. This
+is a valid prospective floor failure, not a missing-data repair opportunity.
+No backfill, replacement item, prompt change, chat template, chain of thought,
+surface expansion, threshold revision, or second E0 is authorized.
+
+## L-66 - The E0 floor failure is not a J-lens validity result
+
+E0 loaded and applied no J-lens and emitted no readout, causal, intervention,
+ablation, patching, E1, or E2 row. Its terminal state means only that the
+selected official public items do not supply enough confirmation support for
+the frozen validity protocol. It does not show that A600, B600, or M1200 is
+valid or invalid, and it establishes nothing about hidden reasoning, an
+internal workspace, or a J-space. It also leaves the independent Phase 1.0D
+transport-capacity block unchanged.

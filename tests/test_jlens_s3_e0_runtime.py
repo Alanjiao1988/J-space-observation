@@ -310,3 +310,145 @@ def test_e0_script_has_no_readout_intervention_or_e1_e2_call_path() -> None:
     assert not any(call in source for call in forbidden_calls)
     assert '"e1_outputs": 0' in source
     assert '"e2_outputs": 0' in source
+
+
+def test_sealed_e0_pack_matches_the_frozen_floor_result() -> None:
+    run_root = ROOT / "artifacts" / "jlens-s3-e0" / "20260807T081017Z"
+    output_root = run_root / "output"
+    expected = {
+        "artifact_manifest.jsonl": (
+            1726,
+            "6d11b09b39bbeead9b38fdb23be47a4247245fb55e6b6b665b817241519df60f",
+        ),
+        "e0_item.jsonl": (
+            250605,
+            "698bfaa830c5f19c41a79ed4059d848464d09d47c73dede72eba678c2e45cfd4",
+        ),
+        "e0_surface.jsonl": (
+            339433,
+            "0b0c6d8393c8eb5ed4495b3d555790666ccd5381cb32313a911ed1f74f5f9a86",
+        ),
+        "eligibility_split_manifest.json": (
+            1585,
+            "aaa8ac7526824da3ea5bfe1e07508ccfbb490d939d32ca9105d7a39847ec89c1",
+        ),
+    }
+    payloads = {}
+    for relative, (expected_bytes, expected_sha) in expected.items():
+        payload = (output_root / relative).read_bytes()
+        assert len(payload) == expected_bytes
+        assert hashlib.sha256(payload).hexdigest() == expected_sha
+        payloads[relative] = payload
+
+    def parse_jsonl(relative: str) -> list[dict]:
+        rows = [json.loads(line) for line in payloads[relative].splitlines()]
+        assert s2.canonical_jsonl_bytes(rows) == payloads[relative]
+        return rows
+
+    item_rows = parse_jsonl("e0_item.jsonl")
+    surface_rows = parse_jsonl("e0_surface.jsonl")
+    manifest_rows = parse_jsonl("artifact_manifest.jsonl")
+    eligibility = json.loads(payloads["eligibility_split_manifest.json"])
+    assert s2.canonical_json_bytes(eligibility) == payloads[
+        "eligibility_split_manifest.json"
+    ]
+    assert len(item_rows) == 238
+    assert len(surface_rows) == 962
+    assert len(manifest_rows) == 3
+
+    protocol = s3.load_and_validate_protocol(ROOT)
+    for row in item_rows:
+        s3.validate_output_row(protocol, "e0_item", row)
+    for row in surface_rows:
+        s3.validate_output_row(protocol, "e0_surface", row)
+    for row in manifest_rows:
+        s3.validate_output_row(protocol, "artifact_manifest", row)
+
+    counts = e0.e0_counts(item_rows)
+    assert counts["distribution_counts"] == {
+        "causal_swap": {
+            "behavioral_eligible": 5,
+            "confirmation": 0,
+            "development": 5,
+            "mechanical_eligible": 83,
+            "official": 90,
+        },
+        "multihop": {
+            "behavioral_eligible": 2,
+            "confirmation": 0,
+            "development": 2,
+            "mechanical_eligible": 79,
+            "official": 93,
+        },
+        "order_ops": {
+            "behavioral_eligible": 2,
+            "confirmation": 0,
+            "development": 2,
+            "mechanical_eligible": 36,
+            "official": 55,
+        },
+    }
+    assert counts["floor_booleans"] == {
+        "causal_swap_confirmation": False,
+        "multihop_confirmation": False,
+        "order_ops_confirmation": False,
+        "pooled_readout_confirmation": False,
+    }
+    assert (
+        counts["terminal_state"]
+        == "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY"
+    )
+    assert eligibility["distribution_counts"] == counts["distribution_counts"]
+    assert eligibility["floor_booleans"] == counts["floor_booleans"]
+    assert eligibility["terminal_state"] == counts["terminal_state"]
+    assert eligibility["benchmark_item_tokenizer_calls"] == 238
+    assert eligibility["benchmark_model_forward_calls"] == 238
+    assert eligibility["lens_imports"] == 0
+    assert eligibility["lens_operations"] == 0
+    assert eligibility["e1_outputs"] == 0
+    assert eligibility["e2_outputs"] == 0
+    assert eligibility["manifest_written_last"] is True
+    assert eligibility["lock_sha256"] == (
+        "8417ec21a512f51dac094facd3e7769f0d00b8b8ee896a7e11aeb4a7acb44c1b"
+    )
+
+    lock_payload = (run_root / "01_e0_lock.json").read_bytes()
+    assert len(lock_payload) == 2561
+    assert hashlib.sha256(lock_payload).hexdigest() == (
+        "8417ec21a512f51dac094facd3e7769f0d00b8b8ee896a7e11aeb4a7acb44c1b"
+    )
+    lock = json.loads(lock_payload)
+    e0.validate_e0_lock(lock)
+
+    schema = s3.load_json(ROOT / "docs" / "jlens_s3_e0_pack.schema.json")
+    artifact_files = [
+        {
+            "bytes": len(payloads[relative]),
+            "create_only": True,
+            "relative_path": relative,
+            "sha256": hashlib.sha256(payloads[relative]).hexdigest(),
+            "written_order": index,
+        }
+        for index, relative in enumerate(
+            (
+                "e0_item.jsonl",
+                "e0_surface.jsonl",
+                "eligibility_split_manifest.json",
+            ),
+            start=1,
+        )
+    ]
+    s3.validate_json_schema(
+        {
+            "artifact_files": artifact_files,
+            "complete": True,
+            "e0_items": item_rows,
+            "e0_surfaces": surface_rows,
+            "eligibility_split_manifest": eligibility,
+            "s2_manifest_sha256": lock["s2_manifest"]["sha256"],
+            "s3_protocol_sha256": s2.S3_PROTOCOL_SHA256,
+            "s3_schema_sha256": s2.S3_SCHEMA_SHA256,
+            "schema_version": "jlens-s3-e0-pack/v1",
+        },
+        schema,
+    )

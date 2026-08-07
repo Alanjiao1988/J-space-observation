@@ -1371,3 +1371,51 @@ the S2 manifest. The manifest SHA-256 is
 `9d10a4b07a8133b7241ce9067649ebf1de48429cf7c04e0495b4c3fe90e58e47`.
 No official S3 benchmark item was tokenized or sent through the model before
 this seal.
+
+## M-22 - Executing the frozen lens-free S3 E0 exactly once
+
+After the S2 byte seals were pushed, a distinct E0 image was built from commit
+`67b72c29bd3dc6e8707198b16cfac27177664943` over the immutable model
+snapshot. Its digest is
+`sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc`;
+both tag and manifest are write- and delete-disabled. The four-component E0
+source bundle is 117,995 bytes with SHA-256
+`95b8cede932e1ed298e5f675075530a8b1560c0aa9049abfa0c6feebf38f9085`.
+A read-only image verifier recomputed that identity and all frozen protocol,
+schema, and benchmark hashes before the lock.
+
+The create-only lock
+`jlens-s3/e0/20260807T081017Z/lock/e0_lock.json` binds the exact image,
+source bundle, model and tokenizer revision, three S2 seals, S2 manifest,
+93/55/90 benchmark bytes, row order, output schema, and destination. It is
+2,561 bytes with SHA-256
+`8417ec21a512f51dac094facd3e7769f0d00b8b8ee896a7e11aeb4a7acb44c1b`.
+A separate read-only Job rehashed and validated the lock, its local image
+bytes, S2 prerequisites, and the one-object prefix before execution. The lock
+records zero pre-lock benchmark tokenizer/model operations and authorizes zero
+lens operations.
+
+The sole E0 execution used every raw official prompt byte without a chat
+template or generated chain of thought. It constructed the pinned tokenizer
+once, decoded its 151,665-token vocabulary for frozen surface resolution, and
+performed exactly one tokenizer call and one greedy clean next-token forward
+pass for each of 238 items. It performed no lens import, load, application,
+ranking, activation extraction, intervention, ablation, patching, E1, or E2
+operation.
+
+The runtime applied the frozen normalization, complete-surface,
+token-boundary, prompt-leakage, target-overlap, single-token, length,
+control-position, clean-top-1, and distribution-local split rules. It wrote
+`e0_item.jsonl`, `e0_surface.jsonl`, and
+`eligibility_split_manifest.json` create-only, then wrote the artifact
+manifest last. A separate model-free verifier downloaded the exact five-object
+lock/output set, found no partial object, reconstructed every official item,
+surface rule, eligibility decision, split, count, and floor, validated every
+closed row and the complete E0 pack schema, and exported the exact bytes.
+
+Mechanical eligibility was 79 multihop, 36 order-operations, and 83
+causal-swap items. Clean-behavior eligibility was 2, 2, and 5. Because the
+frozen split assigns up to the first 15 eligible rows in each distribution to
+development, all nine behaviorally eligible rows are development and no
+confirmation row remains. The four confirmation counts are therefore all zero
+and all four floors fail.

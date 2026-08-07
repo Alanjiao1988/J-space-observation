@@ -169,6 +169,9 @@ tests/test_phase1_0d_review_image.py text eol=lf
 artifacts/phase1-0d-semantic-review-gate/**/*.json text eol=lf
 artifacts/phase1-0d-semantic-review-gate/**/*.txt text eol=lf
 artifacts/jlens-s2-production/20260806T194226Z/production_attempts_corrected.json -text
+artifacts/jlens-s2-production/20260806T194226Z/analysis/** -text
+artifacts/jlens-s3-e0/20260807T081017Z/** -text
+artifacts/jlens-s3-e0/20260807T081017Z/06_independent_verifier.py binary
 
 docs/prompts/phase1_0d_semantic_review_v2_execution_prompt.md text eol=lf
 docs/decisions/phase1_0d_semantic_review_v1_specification_correction.md text eol=lf

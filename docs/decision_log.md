@@ -2722,3 +2722,36 @@ hidden reasoning, an internal workspace, or a J-space. The decision is solely
 to accept the three byte identities as the frozen S3 E0 prerequisites. The
 state becomes
 `NONTERMINAL_CHECKPOINT_JLENS_S2_SEALED_AWAITING_S3_E0`.
+
+## D32 - Close the frozen S3 E0 on insufficient behavioral support
+
+2026-08-07. Frozen J-lens S3 Stage E0.
+
+After independent lock readback, the sole formal E0 execution
+`job-js-e0-run-081017-yi5acvy` processed all 238 official items exactly once.
+It issued 238 item tokenizer calls and 238 clean next-token model forwards,
+loaded or applied no lens, and produced no E1/E2 output.
+
+Mechanical eligibility was 79 of 93 multihop, 36 of 55 order-operations, and
+83 of 90 causal-swap items. Clean-behavior eligibility was 2, 2, and 5. The
+frozen distribution-local split assigns the first 15 eligible items to
+development; therefore all nine eligible items became development and
+confirmation counts were zero for all three distributions. The pooled readout
+confirmation count was also zero. All four registered floor booleans are
+false.
+
+The complete create-only pack was sealed manifest-last and independently
+reconstructed. Its artifact-manifest SHA-256 is
+`6d11b09b39bbeead9b38fdb23be47a4247245fb55e6b6b665b817241519df60f`.
+There is no partial object, no missing row, and no operational blocker.
+
+The exact primary terminal state is therefore:
+
+`INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY`
+
+This floor failure is terminal under the current authority. No backfill,
+replacement batch, prompt change, surface growth, threshold change, or second
+E0 is authorized. It is not a J-lens validity classification: E0 contains no
+lens output and establishes neither hidden reasoning nor an internal workspace
+or J-space. E1/E2 and RQ2 remain unauthorized, and Phase 1.0D independently
+remains `BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`.

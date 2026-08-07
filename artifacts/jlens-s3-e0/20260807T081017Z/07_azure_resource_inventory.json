@@ -1,0 +1,928 @@
+{
+  "schema_version": "jlens-s2-s3-azure-resource-inventory/v1",
+  "observed_at_utc": "2026-08-07T09:11:11Z",
+  "resource_group": "rg-jspace-observation-sea",
+  "region": "Southeast Asia",
+  "new_container_app_jobs": [
+    {
+      "name": "job-js-e0-imgverify-67b72c2",
+      "created_at": "2026-08-07T08:08:21.3691094",
+      "phase": "S3-E0-image-verification",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s3-e0@sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-e0-lock-081017",
+      "created_at": "2026-08-07T08:16:35.8060687",
+      "phase": "S3-E0-lock",
+      "run_id": "20260807T081017Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s3-e0@sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-e0-lock-read-081017",
+      "created_at": "2026-08-07T08:18:51.7905636",
+      "phase": "S3-E0-lock-readback",
+      "run_id": "20260807T081017Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s3-e0@sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-e0-prefix-081017",
+      "created_at": "2026-08-07T08:10:46.1920909",
+      "phase": "S3-E0-prefix-preflight",
+      "run_id": "20260807T081017Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s3-e0@sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-e0-run-081017",
+      "created_at": "2026-08-07T08:22:04.6695092",
+      "phase": "S3-E0",
+      "run_id": "20260807T081017Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s3-e0@sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-e0-verify-081017",
+      "created_at": "2026-08-07T08:35:35.8001817",
+      "phase": "S3-V0",
+      "run_id": "20260807T081017Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s3-e0@sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-a001064-06e1604c",
+      "created_at": "2026-08-06T19:48:56.2211813",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-a065128-06e1604c",
+      "created_at": "2026-08-06T19:49:24.3022655",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-a129256-06e1604c",
+      "created_at": "2026-08-06T19:49:56.1364748",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-a257315-06e1604c",
+      "created_at": "2026-08-06T19:50:23.2058256",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-a316374-06e1604c",
+      "created_at": "2026-08-06T19:50:55.1228069",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-a375433-06e1604c",
+      "created_at": "2026-08-06T19:51:25.3589315",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-a434492-06e1604c",
+      "created_at": "2026-08-06T19:51:56.9568399",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-a493551-06e1604c",
+      "created_at": "2026-08-06T19:52:25.3652597",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-a552600-06e1604c",
+      "created_at": "2026-08-06T19:52:58.3781217",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-analysis-inv-3249c",
+      "created_at": "2026-08-07T06:53:31.5403519",
+      "phase": "S2-analysis-inventory",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-attempt-fix-3249c",
+      "created_at": "2026-08-07T07:05:03.2770053",
+      "phase": "S2-F0-seal-correction",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-attempt-inv-1980b",
+      "created_at": "2026-08-07T05:36:57.0248388",
+      "phase": "S2-F0-inventory",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:dc81da8747c1ca6c6e2bfd0452bda8692871498ab85ae6cd9eab4b4d82ca6a1a",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-attempt-inv2-1980b",
+      "created_at": "2026-08-07T05:40:22.6326669",
+      "phase": "S2-F0-inventory",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:dc81da8747c1ca6c6e2bfd0452bda8692871498ab85ae6cd9eab4b4d82ca6a1a",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-attempt-seal-3249c",
+      "created_at": "2026-08-07T06:04:33.2093107",
+      "phase": "S2-F0-seal",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-b001064-06e1604c",
+      "created_at": "2026-08-06T19:53:27.6438149",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-b065128-06e1604c",
+      "created_at": "2026-08-06T19:54:03.4791642",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-b129-inv-06e160",
+      "created_at": "2026-08-07T04:09:37.1181475",
+      "phase": "S2-F0-inventory",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-b129256-06e1604c",
+      "created_at": "2026-08-06T19:54:34.2747827",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-b257315-06e1604c",
+      "created_at": "2026-08-06T19:55:07.853004",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-b316374-06e1604c",
+      "created_at": "2026-08-06T19:55:39.7183332",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-b375433-06e1604c",
+      "created_at": "2026-08-06T19:56:13.9261389",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-b434492-06e1604c",
+      "created_at": "2026-08-06T19:56:46.8542939",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-b493551-06e1604c",
+      "created_at": "2026-08-06T19:57:22.1932551",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-b552600-06e1604c",
+      "created_at": "2026-08-06T19:57:55.7087039",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-convergence-3249c",
+      "created_at": "2026-08-07T06:30:01.3101734",
+      "phase": "S2-M0-analysis",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-final-export-081017",
+      "created_at": "2026-08-07T08:41:02.9988344",
+      "phase": "S3-V0-S2-final-export",
+      "run_id": "20260807T081017Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s3-e0@sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-final-export2-081017",
+      "created_at": "2026-08-07T08:46:19.0236912",
+      "phase": "S3-V0-S2-final-export",
+      "run_id": "20260807T081017Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s3-e0@sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-h001040-3249c",
+      "created_at": "2026-08-07T06:40:58.1162141",
+      "phase": "S2-heldout",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-h041080-3249c",
+      "created_at": "2026-08-07T06:41:14.9505041",
+      "phase": "S2-heldout",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-h081120-3249c",
+      "created_at": "2026-08-07T06:41:29.9023486",
+      "phase": "S2-heldout",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-h121160-3249c",
+      "created_at": "2026-08-07T06:41:47.3425471",
+      "phase": "S2-heldout",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-h161200-3249c",
+      "created_at": "2026-08-07T06:42:03.1966193",
+      "phase": "S2-heldout",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-held-agg-3249c",
+      "created_at": "2026-08-07T06:50:47.8437342",
+      "phase": "S2-heldout-aggregate",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-held-inv-3249c",
+      "created_at": "2026-08-07T06:48:35.310299",
+      "phase": "S2-heldout-inventory",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-lens-inv-3249c",
+      "created_at": "2026-08-07T06:16:56.0776919",
+      "phase": "S2-M0-inventory",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-m1200-inv-3249c",
+      "created_at": "2026-08-07T06:27:19.7249291",
+      "phase": "S2-M0-inventory",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-merge-a128-3249c",
+      "created_at": "2026-08-07T06:12:01.6382648",
+      "phase": "S2-M0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-merge-a256-3249c",
+      "created_at": "2026-08-07T06:12:14.1158199",
+      "phase": "S2-M0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-merge-a600-3249c",
+      "created_at": "2026-08-07T06:12:26.6134006",
+      "phase": "S2-M0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-merge-a64-3249c",
+      "created_at": "2026-08-07T06:11:47.6853894",
+      "phase": "S2-M0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-merge-b128-3249c",
+      "created_at": "2026-08-07T06:12:56.9917716",
+      "phase": "S2-M0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-merge-b256-3249c",
+      "created_at": "2026-08-07T06:13:11.4593027",
+      "phase": "S2-M0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-merge-b600-3249c",
+      "created_at": "2026-08-07T06:13:25.4082128",
+      "phase": "S2-M0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-merge-b64-3249c",
+      "created_at": "2026-08-07T06:12:41.4817464",
+      "phase": "S2-M0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-merge-m1200-3249c",
+      "created_at": "2026-08-07T06:19:42.8893277",
+      "phase": "S2-M0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-prod-inv-06e1604c",
+      "created_at": "2026-08-06T22:05:11.7159911",
+      "phase": "S2-F0-inventory",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-prod-inv2-06e1604c",
+      "created_at": "2026-08-06T22:07:41.0976473",
+      "phase": "S2-F0-inventory",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-r1-a129256-06e160",
+      "created_at": "2026-08-06T22:10:17.8993001",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-r1-a434492-06e160",
+      "created_at": "2026-08-06T22:10:34.4019014",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-r1-b065128-06e160",
+      "created_at": "2026-08-06T22:10:50.7586179",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-r1-b434492-06e160",
+      "created_at": "2026-08-06T22:11:05.4923689",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-r1-b493551-06e160",
+      "created_at": "2026-08-06T22:11:21.1277749",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-r2-b129256-06e160",
+      "created_at": "2026-08-07T04:13:15.3398328",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-seal-export-6c7a",
+      "created_at": "2026-08-07T07:27:58.4863375",
+      "phase": "S2-V0-export",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:e0fec8e76a98be692d0f1f8631ca14c3978897fe765edc07db96ee97a5eae757",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-smoke-d1-06e1604c",
+      "created_at": "2026-08-06T19:19:23.1319162",
+      "phase": "S2-T0",
+      "run_id": "20260806T191855Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-smoke-d2-06e1604c",
+      "created_at": "2026-08-06T19:19:57.5018124",
+      "phase": "S2-T0",
+      "run_id": "20260806T191855Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-smoke-d4-06e1604c",
+      "created_at": "2026-08-06T19:20:25.0781579",
+      "phase": "S2-T0",
+      "run_id": "20260806T191855Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-smoke-d8-06e1604c",
+      "created_at": "2026-08-06T19:20:59.2711974",
+      "phase": "S2-T0",
+      "run_id": "20260806T191855Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-smoke-exp-06e1604c",
+      "created_at": "2026-08-06T19:35:27.0923146",
+      "phase": "S2-T0-export",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-smoke-read-06e1604c",
+      "created_at": "2026-08-06T19:32:35.4253343",
+      "phase": "S2-T0-readback",
+      "run_id": null,
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-smoke-sel-06e1604c",
+      "created_at": "2026-08-06T19:27:14.8692741",
+      "phase": "S2-T0-selection",
+      "run_id": "20260806T191855Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-t1-a375433-06e160",
+      "created_at": "2026-08-06T23:06:35.863059",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-t1-a493551-06e160",
+      "created_at": "2026-08-06T23:06:58.1595516",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-t1-a552600-06e160",
+      "created_at": "2026-08-06T23:07:13.6159576",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-t1-b001064-06e160",
+      "created_at": "2026-08-06T23:07:28.3729285",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-t1-b129256-06e160",
+      "created_at": "2026-08-06T23:07:45.3207075",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-t1-b257315-06e160",
+      "created_at": "2026-08-07T00:34:19.465683",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-t1-b316374-06e160",
+      "created_at": "2026-08-07T00:34:44.2789148",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-t1-b375433-06e160",
+      "created_at": "2026-08-07T00:35:12.7851012",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-t1-b552600-06e160",
+      "created_at": "2026-08-07T00:35:49.5544012",
+      "phase": "S2-F0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "gpu-t4",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2@sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-verify-3249c",
+      "created_at": "2026-08-07T06:58:17.1462434",
+      "phase": "S2-V0",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-verify2-3249c",
+      "created_at": "2026-08-07T07:07:49.487609",
+      "phase": "S2-V0-retry",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-js-s2-verify3-6c7acea",
+      "created_at": "2026-08-07T07:24:42.0175294",
+      "phase": "S2-V0-retry-3",
+      "run_id": "20260806T194226Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-analysis@sha256:e0fec8e76a98be692d0f1f8631ca14c3978897fe765edc07db96ee97a5eae757",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-jspace-s2-corpus-18274d4e",
+      "created_at": "2026-08-06T17:26:01.5601379",
+      "phase": "S2-P1",
+      "run_id": "20260806T172525Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-corpus@sha256:50ee00228313e1661276aed6e290adcea034e7c28d2ab34090d53f6fe624eee1",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-jspace-s2-corpus-4b0ea1c9",
+      "created_at": "2026-08-06T17:58:00.412939",
+      "phase": "S2-P1",
+      "run_id": "20260806T175724Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-corpus@sha256:e13e97f723e8d84d98994cd24cb5953c34f35d26a5c7dea61df7b66d1d479937",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    },
+    {
+      "name": "job-jspace-s2-corpus-b77f7df6",
+      "created_at": "2026-08-06T17:43:17.7031214",
+      "phase": "S2-P1",
+      "run_id": "20260806T174244Z",
+      "workload_profile": "Consumption",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-jlens-s2-corpus@sha256:48efeaa40d88ac60d35f186fbb6c57b6731b28bbb5f47ba7277fbee04cc40045",
+      "provisioning_state": "Succeeded",
+      "running_status": "Ready"
+    }
+  ],
+  "new_container_app_job_count": 82,
+  "retained_acr_manifests": [
+    {
+      "repository": "j-space-observation-jlens-s2-corpus",
+      "digest": "sha256:48efeaa40d88ac60d35f186fbb6c57b6731b28bbb5f47ba7277fbee04cc40045",
+      "tags": [
+        "b77f7df6974d3d17549370a6b5f3ee6d0f201ce0"
+      ],
+      "created_time": "2026-08-06T17:38:19.108567Z",
+      "image_size": 536972130,
+      "write_enabled": false,
+      "delete_enabled": false
+    },
+    {
+      "repository": "j-space-observation-jlens-s2-corpus",
+      "digest": "sha256:50ee00228313e1661276aed6e290adcea034e7c28d2ab34090d53f6fe624eee1",
+      "tags": [
+        "18274d4e26bda3194bce574fb0f72452d1cb464d"
+      ],
+      "created_time": "2026-08-06T17:18:00.3179226Z",
+      "image_size": 536972575,
+      "write_enabled": false,
+      "delete_enabled": false
+    },
+    {
+      "repository": "j-space-observation-jlens-s2-corpus",
+      "digest": "sha256:e13e97f723e8d84d98994cd24cb5953c34f35d26a5c7dea61df7b66d1d479937",
+      "tags": [
+        "4b0ea1c95d5c7185b8da8f745de14f5d4d149367"
+      ],
+      "created_time": "2026-08-06T17:52:39.465535Z",
+      "image_size": 536971290,
+      "write_enabled": false,
+      "delete_enabled": false
+    },
+    {
+      "repository": "j-space-observation-jlens-s2",
+      "digest": "sha256:403522b9a7a59b6db5d96fc211bdb3bdb80c6a9fcfa9d630541014c55587edc1",
+      "tags": [
+        "06e1604cd8633ecdc3267eac19ff529b2e5d3f83"
+      ],
+      "created_time": "2026-08-06T19:13:56.3340942Z",
+      "image_size": 5735437600,
+      "write_enabled": false,
+      "delete_enabled": false
+    },
+    {
+      "repository": "j-space-observation-jlens-s2-analysis",
+      "digest": "sha256:25fdd44b6d9ce103ca3e0c9aa4941a023caf95ab69b5c38ec89fab3e0934c27f",
+      "tags": [
+        "3249c90d0a54a64010aed111998c3907021d55ce"
+      ],
+      "created_time": "2026-08-07T05:59:38.4985884Z",
+      "image_size": 5735492687,
+      "write_enabled": false,
+      "delete_enabled": false
+    },
+    {
+      "repository": "j-space-observation-jlens-s2-analysis",
+      "digest": "sha256:dc81da8747c1ca6c6e2bfd0452bda8692871498ab85ae6cd9eab4b4d82ca6a1a",
+      "tags": [
+        "1980b37904d6d07536eeea8c1b403bd40d3fba11"
+      ],
+      "created_time": "2026-08-07T05:33:52.4196618Z",
+      "image_size": 5735492311,
+      "write_enabled": false,
+      "delete_enabled": false
+    },
+    {
+      "repository": "j-space-observation-jlens-s2-analysis",
+      "digest": "sha256:e0fec8e76a98be692d0f1f8631ca14c3978897fe765edc07db96ee97a5eae757",
+      "tags": [
+        "6c7acea471594c8bbb1e4dba8eb34cc50e8ae4ff"
+      ],
+      "created_time": "2026-08-07T07:22:41.5677867Z",
+      "image_size": 5735492837,
+      "write_enabled": false,
+      "delete_enabled": false
+    },
+    {
+      "repository": "j-space-observation-jlens-s3-e0",
+      "digest": "sha256:17d664e13d67d79d99e7bf521bce9b7aefa946d33e25ec5ebe4cc7bc0aeff6cc",
+      "tags": [
+        "67b72c29bd3dc6e8707198b16cfac27177664943"
+      ],
+      "created_time": "2026-08-07T07:58:31.0318174Z",
+      "image_size": 5735595405,
+      "write_enabled": false,
+      "delete_enabled": false
+    }
+  ],
+  "retained_acr_manifest_count": 8,
+  "retained_blob_prefixes": [
+    "jlens-s2/corpus/20260806T175724Z",
+    "jlens-s2/smoke/20260806T191855Z",
+    "jlens-s2/production/20260806T194226Z",
+    "jlens-s3/e0/20260807T081017Z"
+  ],
+  "old_resources_mutated": 0,
+  "resources_deleted": 0
+}
