@@ -223,7 +223,7 @@ def _valid_lock() -> dict:
         },
         "e0_image_digest": "sha256:" + "d" * 64,
         "e0_manifest_destination": "jlens-s3/e0/run/output",
-        "e0_output_schema_sha256": "e" * 64,
+        "e0_output_schema_sha256": e0.E0_PACK_SCHEMA_SHA256,
         "e0_source_bundle_sha256": "f" * 64,
         "expected_item_counts": dict(e0.EXPECTED_ITEM_COUNTS),
         "lens_operations_authorized": 0,
@@ -242,11 +242,11 @@ def _valid_lock() -> dict:
         "schema_version": "jlens-s3-e0-lock/v1",
         "vendored_benchmarks": {
             distribution: {
-                "bytes": 1,
-                "item_count": count,
-                "sha256": "2" * 64,
+                key: value
+                for key, value in identity.items()
+                if key != "path"
             }
-            for distribution, count in e0.EXPECTED_ITEM_COUNTS.items()
+            for distribution, identity in e0.BENCHMARK_IDENTITIES.items()
         },
     }
 
@@ -262,6 +262,19 @@ def test_e0_lock_rejects_prelock_operations_and_missing_seals() -> None:
     changed["canonical_lenses"]["M1200"]["sealed"] = False
     with pytest.raises(s2.S2ProtocolError, match="not byte-sealed"):
         e0.validate_e0_lock(changed)
+
+
+def test_e0_lock_recomputes_every_local_hash_before_execution() -> None:
+    lock = _valid_lock()
+    lock["e0_source_bundle_sha256"] = s2.sha256_bytes(
+        e0.e0_source_bundle_bytes(ROOT)
+    )
+    observed = e0.verify_locked_local_bytes(ROOT, lock)
+    assert observed["vendored_benchmarks"] == lock["vendored_benchmarks"]
+    changed = copy.deepcopy(lock)
+    changed["vendored_benchmarks"]["multihop"]["sha256"] = "0" * 64
+    with pytest.raises(e0.E0RuntimeError, match="benchmark byte mismatch"):
+        e0.verify_locked_local_bytes(ROOT, changed)
 
 
 @pytest.mark.parametrize(

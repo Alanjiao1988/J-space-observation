@@ -1,0 +1,97 @@
+{
+  "$defs": {
+    "file": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "relative_path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "written_order": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "bytes",
+        "relative_path",
+        "sha256",
+        "written_order"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/docs/jlens_s2_runtime_pack.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "complete": {
+      "type": "boolean"
+    },
+    "create_only": {
+      "const": true,
+      "type": "boolean"
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/file"
+      },
+      "type": "array"
+    },
+    "image_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "manifest_written_last": {
+      "const": true,
+      "type": "boolean"
+    },
+    "protocol_sha256": {
+      "const": "e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "jlens-s2-runtime-pack/v1",
+      "type": "string"
+    },
+    "source_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "stage": {
+      "enum": [
+        "S2-T0-smoke",
+        "S2-T0-selection",
+        "S2-F0-fit-shard",
+        "S2-F0-fit-shard-failure",
+        "S2-M0-merge",
+        "S2-heldout-apply",
+        "S2-convergence-analysis",
+        "S2-heldout-aggregate",
+        "S2-V0-independent-verification"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "complete",
+    "create_only",
+    "files",
+    "image_digest",
+    "manifest_written_last",
+    "protocol_sha256",
+    "schema_version",
+    "source_commit",
+    "stage"
+  ],
+  "title": "S2 create-only runtime pack manifest",
+  "type": "object"
+}

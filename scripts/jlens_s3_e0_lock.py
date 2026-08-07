@@ -20,25 +20,6 @@ import jlens_s2_protocol as s2  # noqa: E402
 import jlens_s3_e0_runtime as e0  # noqa: E402
 
 
-BENCHMARKS = {
-    "causal_swap": {
-        "bytes": 26567,
-        "item_count": 90,
-        "sha256": "a0edd27ca23f7b4d0fbe90448c2ddcc7457a3d812121bf024ed12a032ff86796",
-    },
-    "multihop": {
-        "bytes": 21869,
-        "item_count": 93,
-        "sha256": "50b7e4c9255291c0ca2a8e94615be9f44531fa57bb1a844e4f9616056d987416",
-    },
-    "order_ops": {
-        "bytes": 9589,
-        "item_count": 55,
-        "sha256": "b203206d16ff628152cc86f3838604e06cb54776f3e14fa1c34f150db8bc7560",
-    },
-}
-
-
 def blob_client() -> Any:
     from azure.identity import DefaultAzureCredential
     from azure.storage.blob import BlobServiceClient
@@ -66,6 +47,36 @@ def download_checked(client: Any, blob: str, sha256: str) -> tuple[dict, bytes]:
 
 def main() -> int:
     client = blob_client()
+    protocol_sha256 = s2.sha256_file(
+        PROJECT_ROOT / "docs" / "jlens_s3_validity_protocol.json"
+    )
+    schema_sha256 = s2.sha256_file(
+        PROJECT_ROOT / "docs" / "jlens_s3_validity_protocol.schema.json"
+    )
+    e0_schema_sha256 = s2.sha256_file(
+        PROJECT_ROOT / "docs" / "jlens_s3_e0_pack.schema.json"
+    )
+    source_bundle_sha256 = s2.sha256_bytes(
+        e0.e0_source_bundle_bytes(PROJECT_ROOT)
+    )
+    benchmarks = e0.actual_benchmark_identities(PROJECT_ROOT)
+    if (
+        protocol_sha256 != s2.S3_PROTOCOL_SHA256
+        or schema_sha256 != s2.S3_SCHEMA_SHA256
+        or e0_schema_sha256 != e0.E0_PACK_SCHEMA_SHA256
+        or source_bundle_sha256
+        != os.environ["JSPACE_E0_SOURCE_BUNDLE_SHA256"]
+        or benchmarks
+        != {
+            distribution: {
+                key: value
+                for key, value in identity.items()
+                if key != "path"
+            }
+            for distribution, identity in e0.BENCHMARK_IDENTITIES.items()
+        }
+    ):
+        raise e0.E0RuntimeError("E0 executing source or benchmark bytes drifted")
     s2_manifest, _ = download_checked(
         client,
         os.environ["JSPACE_S2_MANIFEST_BLOB"],
@@ -95,10 +106,8 @@ def main() -> int:
         "canonical_lenses": canonical,
         "e0_image_digest": os.environ["JSPACE_E0_IMAGE_DIGEST"],
         "e0_manifest_destination": os.environ["JSPACE_E0_OUTPUT_PREFIX"],
-        "e0_output_schema_sha256": s2.sha256_file(
-            PROJECT_ROOT / "docs" / "jlens_s3_e0_pack.schema.json"
-        ),
-        "e0_source_bundle_sha256": os.environ["JSPACE_E0_SOURCE_BUNDLE_SHA256"],
+        "e0_output_schema_sha256": e0_schema_sha256,
+        "e0_source_bundle_sha256": source_bundle_sha256,
         "expected_item_counts": dict(e0.EXPECTED_ITEM_COUNTS),
         "lens_operations_authorized": 0,
         "model": {
@@ -114,12 +123,13 @@ def main() -> int:
             "blob": os.environ["JSPACE_S2_MANIFEST_BLOB"],
             "sha256": os.environ["JSPACE_S2_MANIFEST_SHA256"],
         },
-        "s3_protocol_sha256": s2.S3_PROTOCOL_SHA256,
-        "s3_schema_sha256": s2.S3_SCHEMA_SHA256,
+        "s3_protocol_sha256": protocol_sha256,
+        "s3_schema_sha256": schema_sha256,
         "schema_version": "jlens-s3-e0-lock/v1",
-        "vendored_benchmarks": BENCHMARKS,
+        "vendored_benchmarks": benchmarks,
     }
     e0.validate_e0_lock(lock)
+    e0.verify_locked_local_bytes(PROJECT_ROOT, lock)
     payload = s2.canonical_json_bytes(lock)
     prefix = os.environ["JSPACE_E0_LOCK_PREFIX"].strip("/")
     blob = f"{prefix}/e0_lock.json"

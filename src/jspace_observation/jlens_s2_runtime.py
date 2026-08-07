@@ -7,6 +7,7 @@ import io
 import json
 import math
 import os
+import re
 import threading
 import time
 from collections.abc import Mapping, Sequence
@@ -22,6 +23,26 @@ MODEL_SNAPSHOT = Path("/workspace/model")
 MODEL_SNAPSHOT_MANIFEST = MODEL_SNAPSHOT / "MODEL_SNAPSHOT_MANIFEST.json"
 CHECKPOINT_EVERY = 8
 TOP_K = (10, 50)
+HELDOUT_PAIRS = {
+    "A600_vs_B600",
+    "A600_vs_M1200",
+    "B600_vs_M1200",
+}
+RUNTIME_PACK_SCHEMA_VERSION = "jlens-s2-runtime-pack/v1"
+RUNTIME_PACK_STAGES = {
+    "S2-T0-smoke",
+    "S2-T0-selection",
+    "S2-F0-fit-shard",
+    "S2-F0-fit-shard-failure",
+    "S2-M0-merge",
+    "S2-heldout-apply",
+    "S2-convergence-analysis",
+    "S2-heldout-aggregate",
+    "S2-V0-independent-verification",
+}
+_SHA256 = re.compile(r"[0-9a-f]{64}\Z")
+_COMMIT = re.compile(r"[0-9a-f]{40}\Z")
+_IMAGE_DIGEST = re.compile(r"sha256:[0-9a-f]{64}\Z")
 
 
 class S2RuntimeError(RuntimeError):
@@ -227,7 +248,7 @@ def pack_manifest(
 ) -> dict[str, Any]:
     source_commit = os.environ["JSPACE_CODE_COMMIT"]
     image_digest = os.environ["JSPACE_IMAGE_DIGEST"]
-    return {
+    manifest = {
         "complete": complete,
         "create_only": True,
         "files": [
@@ -247,9 +268,142 @@ def pack_manifest(
         "protocol_sha256": s2.sha256_file(
             Path("/workspace/repo/docs/jlens_s2_protocol.json")
         ),
-        "schema_version": "jlens-s2-runtime-pack/v1",
+        "schema_version": RUNTIME_PACK_SCHEMA_VERSION,
         "source_commit": source_commit,
         "stage": stage,
+    }
+    validate_runtime_pack_manifest(manifest)
+    return manifest
+
+
+def validate_runtime_pack_manifest(
+    manifest: Mapping[str, Any],
+    *,
+    expected_source_commit: str | None = None,
+    expected_image_digest: str | None = None,
+) -> dict[str, Any]:
+    required = {
+        "complete",
+        "create_only",
+        "files",
+        "image_digest",
+        "manifest_written_last",
+        "protocol_sha256",
+        "schema_version",
+        "source_commit",
+        "stage",
+    }
+    if set(manifest) != required:
+        raise S2RuntimeError("runtime pack manifest fields are not exact")
+    if (
+        not isinstance(manifest["complete"], bool)
+        or manifest["create_only"] is not True
+        or manifest["manifest_written_last"] is not True
+        or manifest["schema_version"] != RUNTIME_PACK_SCHEMA_VERSION
+        or manifest["stage"] not in RUNTIME_PACK_STAGES
+        or not _COMMIT.fullmatch(str(manifest["source_commit"]))
+        or not _IMAGE_DIGEST.fullmatch(str(manifest["image_digest"]))
+        or manifest["protocol_sha256"]
+        != "e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2"
+    ):
+        raise S2RuntimeError("runtime pack manifest identity mismatch")
+    if (
+        expected_source_commit is not None
+        and manifest["source_commit"] != expected_source_commit
+    ):
+        raise S2RuntimeError("runtime pack source commit mismatch")
+    if (
+        expected_image_digest is not None
+        and manifest["image_digest"] != expected_image_digest
+    ):
+        raise S2RuntimeError("runtime pack image digest mismatch")
+    files = manifest["files"]
+    if not isinstance(files, list):
+        raise S2RuntimeError("runtime pack files must be an array")
+    names: list[str] = []
+    for index, row in enumerate(files, start=1):
+        if (
+            not isinstance(row, Mapping)
+            or set(row) != {"bytes", "relative_path", "sha256", "written_order"}
+            or not isinstance(row["bytes"], int)
+            or row["bytes"] < 0
+            or not isinstance(row["relative_path"], str)
+            or not row["relative_path"]
+            or ".." in row["relative_path"].split("/")
+            or not _SHA256.fullmatch(str(row["sha256"]))
+            or row["written_order"] != index
+        ):
+            raise S2RuntimeError("runtime pack file identity is malformed")
+        names.append(row["relative_path"])
+    if len(names) != len(set(names)) or names != sorted(names):
+        raise S2RuntimeError("runtime pack files are not unique sorted identities")
+    return {
+        "complete": manifest["complete"],
+        "file_count": len(files),
+        "image_digest": manifest["image_digest"],
+        "source_commit": manifest["source_commit"],
+        "stage": manifest["stage"],
+    }
+
+
+def receipt_artifact_manifest_blob(receipt_blob: str) -> str:
+    clean = receipt_blob.strip("/")
+    if "/" not in clean:
+        raise S2RuntimeError("receipt Blob has no parent prefix")
+    return clean.rsplit("/", 1)[0] + "/artifact_manifest.json"
+
+
+def validate_receipt_transport(
+    store: BlobStore,
+    *,
+    receipt_blob: str,
+    receipt_sha256: str,
+    receipt_bytes: bytes,
+    related_files: Sequence[Mapping[str, Any]] = (),
+    expected_source_commit: str | None = None,
+    expected_image_digest: str | None = None,
+) -> dict[str, Any]:
+    if s2.sha256_bytes(receipt_bytes) != receipt_sha256:
+        raise S2RuntimeError("receipt bytes differ from registered SHA-256")
+    manifest_blob = receipt_artifact_manifest_blob(receipt_blob)
+    manifest_bytes = store.download_absolute(manifest_blob)
+    manifest = json.loads(manifest_bytes)
+    provenance = validate_runtime_pack_manifest(
+        manifest,
+        expected_source_commit=expected_source_commit,
+        expected_image_digest=expected_image_digest,
+    )
+    receipt_name = receipt_blob.rsplit("/", 1)[-1]
+    matches = [
+        row for row in manifest["files"] if row["relative_path"] == receipt_name
+    ]
+    if (
+        len(matches) != 1
+        or matches[0]["bytes"] != len(receipt_bytes)
+        or matches[0]["sha256"] != receipt_sha256
+    ):
+        raise S2RuntimeError("receipt is not bound by its runtime pack manifest")
+    by_name = {row["relative_path"]: row for row in manifest["files"]}
+    for related in related_files:
+        blob = str(related.get("blob", ""))
+        name = blob.rsplit("/", 1)[-1]
+        row = by_name.get(name)
+        if (
+            not blob
+            or row is None
+            or row["bytes"] != related.get("bytes")
+            or row["sha256"] != related.get("sha256")
+        ):
+            raise S2RuntimeError(
+                f"related artifact {name!r} is not bound by the runtime manifest"
+            )
+    return {
+        **provenance,
+        "manifest_blob": manifest_blob,
+        "manifest_bytes": len(manifest_bytes),
+        "manifest_sha256": s2.sha256_bytes(manifest_bytes),
+        "receipt_blob": receipt_blob,
+        "receipt_sha256": receipt_sha256,
     }
 
 
@@ -731,6 +885,42 @@ def logit_pair_metrics(
     return result
 
 
+def validate_heldout_metric_rows(
+    rows: Sequence[Mapping[str, Any]],
+    expected_sequence_ids: Sequence[str],
+) -> dict[str, Any]:
+    if (
+        len(expected_sequence_ids) != len(set(expected_sequence_ids))
+        or not expected_sequence_ids
+    ):
+        raise S2RuntimeError("heldout expected sequence IDs are not unique")
+    expected_keys = {
+        (sequence_id, pair, layer)
+        for sequence_id in expected_sequence_ids
+        for pair in HELDOUT_PAIRS
+        for layer in s2.SOURCE_LAYERS
+    }
+    observed_keys = [
+        (row.get("sequence_id"), row.get("pair"), row.get("layer"))
+        for row in rows
+    ]
+    if (
+        len(observed_keys) != len(set(observed_keys))
+        or set(observed_keys) != expected_keys
+        or any(row.get("finite") is not True for row in rows)
+    ):
+        raise S2RuntimeError(
+            "heldout metric keys do not exactly cover sequence x pair x layer"
+        )
+    return {
+        "finite_rate": 1.0,
+        "metric_row_count": len(rows),
+        "pair_count": len(HELDOUT_PAIRS),
+        "sequence_count": len(expected_sequence_ids),
+        "source_layer_count": len(s2.SOURCE_LAYERS),
+    }
+
+
 __all__ = [
     "BlobStore",
     "CHECKPOINT_EVERY",
@@ -751,7 +941,10 @@ __all__ = [
     "role_slice",
     "runtime_store_from_environment",
     "upload_pack",
+    "validate_receipt_transport",
+    "validate_runtime_pack_manifest",
     "validate_jacobians",
+    "validate_heldout_metric_rows",
     "write_json",
     "write_jsonl",
 ]

@@ -20,6 +20,7 @@ if str(HELPER_ROOT) not in sys.path:
 
 import jlens_s2_protocol as s2  # noqa: E402
 import jlens_s2_runtime as runtime  # noqa: E402
+import jlens_s3_protocol as s3  # noqa: E402
 
 
 class FakeDownloader:
@@ -62,6 +63,28 @@ def test_registered_corpus_role_slices_are_exact() -> None:
         "heldout": 200,
         "smoke": 2,
     }
+
+
+def test_heldout_metric_keys_require_exact_cartesian_coverage() -> None:
+    expected_ids = ["heldout-a", "heldout-b"]
+    rows = [
+        {
+            "finite": True,
+            "layer": layer,
+            "pair": pair,
+            "sequence_id": sequence_id,
+        }
+        for sequence_id in expected_ids
+        for pair in runtime.HELDOUT_PAIRS
+        for layer in s2.SOURCE_LAYERS
+    ]
+    report = runtime.validate_heldout_metric_rows(rows, expected_ids)
+    assert report["metric_row_count"] == 2 * 3 * 27
+    with pytest.raises(runtime.S2RuntimeError, match="exactly cover"):
+        runtime.validate_heldout_metric_rows(rows[:-1], expected_ids)
+    duplicate = [*rows[:-1], rows[0]]
+    with pytest.raises(runtime.S2RuntimeError, match="exactly cover"):
+        runtime.validate_heldout_metric_rows(duplicate, expected_ids)
     rows = runtime.role_slice(pack, "A", 65, 128)
     assert len(rows) == 64
     assert [row["role_index"] for row in rows] == list(range(65, 129))
@@ -88,6 +111,85 @@ def test_blob_store_is_create_only_and_exact() -> None:
     assert store.list_absolute("round/") == ["round/pack/a.json"]
     with pytest.raises(RuntimeError, match="exists"):
         store.upload_bytes("pack/a.json", b"replacement")
+
+
+def test_receipt_transport_binds_receipt_related_file_and_provenance() -> None:
+    client = FakeContainer()
+    store = runtime.BlobStore(
+        account="account",
+        container="container",
+        prefix="run",
+        client_id=None,
+        container_client=client,
+    )
+    receipt = b'{"status":"success"}\n'
+    lens = b"lens"
+    manifest = {
+        "complete": True,
+        "create_only": True,
+        "files": [
+            {
+                "bytes": len(lens),
+                "relative_path": "lens.pt",
+                "sha256": s2.sha256_bytes(lens),
+                "written_order": 1,
+            },
+            {
+                "bytes": len(receipt),
+                "relative_path": "shard_receipt.json",
+                "sha256": s2.sha256_bytes(receipt),
+                "written_order": 2,
+            },
+        ],
+        "image_digest": "sha256:" + "2" * 64,
+        "manifest_written_last": True,
+        "protocol_sha256": (
+            "e542841890322f2407553714c65ad153e4dfbdba3cb51dad61542e122a5a29a2"
+        ),
+        "schema_version": "jlens-s2-runtime-pack/v1",
+        "source_commit": "1" * 40,
+        "stage": "S2-F0-fit-shard",
+    }
+    client.objects = {
+        "run/shard/artifact_manifest.json": s2.canonical_json_bytes(manifest),
+        "run/shard/lens.pt": lens,
+        "run/shard/shard_receipt.json": receipt,
+    }
+    result = runtime.validate_receipt_transport(
+        store,
+        receipt_blob="run/shard/shard_receipt.json",
+        receipt_sha256=s2.sha256_bytes(receipt),
+        receipt_bytes=receipt,
+        related_files=[
+            {
+                "blob": "run/shard/lens.pt",
+                "bytes": len(lens),
+                "sha256": s2.sha256_bytes(lens),
+            }
+        ],
+        expected_source_commit="1" * 40,
+        expected_image_digest="sha256:" + "2" * 64,
+    )
+    assert result["stage"] == "S2-F0-fit-shard"
+    changed = json.loads(json.dumps(manifest))
+    changed["files"][0]["sha256"] = "3" * 64
+    client.objects["run/shard/artifact_manifest.json"] = s2.canonical_json_bytes(
+        changed
+    )
+    with pytest.raises(runtime.S2RuntimeError, match="related artifact"):
+        runtime.validate_receipt_transport(
+            store,
+            receipt_blob="run/shard/shard_receipt.json",
+            receipt_sha256=s2.sha256_bytes(receipt),
+            receipt_bytes=receipt,
+            related_files=[
+                {
+                    "blob": "run/shard/lens.pt",
+                    "bytes": len(lens),
+                    "sha256": s2.sha256_bytes(lens),
+                }
+            ],
+        )
 
 
 def test_pack_manifest_binds_source_image_and_protocol(
@@ -119,6 +221,11 @@ def test_pack_manifest_binds_source_image_and_protocol(
     assert manifest["source_commit"] == "1" * 40
     assert manifest["image_digest"] == "sha256:" + "2" * 64
     assert manifest["files"][0]["sha256"] == s2.sha256_file(file_path)
+    s3.validate_json_schema(
+        manifest,
+        s2.load_json(ROOT / "docs" / "jlens_s2_runtime_pack.schema.json"),
+    )
+    assert runtime.validate_runtime_pack_manifest(manifest)["file_count"] == 1
 
 
 def test_tiny_tensor_merge_comparison_and_logit_metrics() -> None:

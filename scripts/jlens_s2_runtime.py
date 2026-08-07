@@ -221,6 +221,7 @@ def run_fit_shard(args: argparse.Namespace) -> int:
         "end_index": args.end_index,
         "image_digest": env["image_digest"],
         "resumed": bool(args.resume_checkpoint_blob),
+        "resume_source": None,
         "role": args.role,
         "shard_id": args.shard_id,
         "start_index": args.start_index,
@@ -241,21 +242,84 @@ def run_fit_shard(args: argparse.Namespace) -> int:
         result["package_versions"] = runtime.package_versions()
         backend.verify_tokenization(rows)
         if args.resume_checkpoint_blob:
+            if (
+                not args.resume_checkpoint_sha256
+                or not args.resume_checkpoint_manifest_blob
+                or not args.resume_checkpoint_manifest_sha256
+            ):
+                raise runtime.S2RuntimeError(
+                    "resume requires checkpoint and manifest Blob SHA-256 bindings"
+                )
+            shard_prefix = (
+                f"{store.prefix}/shards/{args.shard_id}/attempts/"
+            )
+            if (
+                not args.resume_checkpoint_blob.startswith(shard_prefix)
+                or not args.resume_checkpoint_manifest_blob.startswith(shard_prefix)
+            ):
+                raise runtime.S2RuntimeError(
+                    "resume checkpoint is not bound to the requested shard"
+                )
+            manifest_bytes = store.download_absolute(
+                args.resume_checkpoint_manifest_blob
+            )
+            if (
+                s2.sha256_bytes(manifest_bytes)
+                != args.resume_checkpoint_manifest_sha256
+            ):
+                raise runtime.S2RuntimeError(
+                    "resume checkpoint manifest SHA-256 mismatch"
+                )
+            checkpoint_manifest = json.loads(manifest_bytes)
+            if (
+                checkpoint_manifest.get("checkpoint", {}).get("blob")
+                != args.resume_checkpoint_blob
+                or checkpoint_manifest.get("checkpoint", {}).get("sha256")
+                != args.resume_checkpoint_sha256
+                or checkpoint_manifest.get("source_layers")
+                != list(s2.SOURCE_LAYERS)
+                or checkpoint_manifest.get("target_layer") != s2.TARGET_LAYER
+                or checkpoint_manifest.get("n_done")
+                != checkpoint_manifest.get("next_idx")
+            ):
+                raise runtime.S2RuntimeError(
+                    "resume checkpoint manifest identity mismatch"
+                )
             receipt = store.download_absolute_to(
                 args.resume_checkpoint_blob,
                 checkpoint_path,
             )
-            if (
-                args.resume_checkpoint_sha256
-                and receipt["sha256"] != args.resume_checkpoint_sha256
-            ):
+            if receipt["sha256"] != args.resume_checkpoint_sha256:
                 raise runtime.S2RuntimeError("resume checkpoint SHA-256 mismatch")
             state = runtime.load_checkpoint_state(backend.torch, checkpoint_path)
             initial_next_idx = int(state["next_idx"])
+            if (
+                checkpoint_manifest["n_done"] != initial_next_idx
+                or checkpoint_manifest["checkpoint"]["bytes"] != receipt["bytes"]
+            ):
+                raise runtime.S2RuntimeError(
+                    "resume checkpoint bytes or progress mismatch"
+                )
             if initial_next_idx >= len(rows):
                 raise runtime.S2RuntimeError(
                     "resume checkpoint already completes the shard"
                 )
+            result["resume_source"] = {
+                "checkpoint_blob": args.resume_checkpoint_blob,
+                "checkpoint_bytes": receipt["bytes"],
+                "checkpoint_manifest_blob": args.resume_checkpoint_manifest_blob,
+                "checkpoint_manifest_sha256": (
+                    args.resume_checkpoint_manifest_sha256
+                ),
+                "checkpoint_sha256": args.resume_checkpoint_sha256,
+                "n_done": initial_next_idx,
+                "sequence_prefix_sha256": s2.sha256_bytes(
+                    s2.canonical_jsonl_bytes(
+                        {"sequence_id": row["row_id"]}
+                        for row in rows[:initial_next_idx]
+                    )
+                ),
+            }
         result["initial_next_idx"] = initial_next_idx
         mirror = runtime.CheckpointMirror(
             torch_module=backend.torch,
@@ -509,6 +573,13 @@ def run_merge(args: argparse.Namespace) -> int:
             raise runtime.S2RuntimeError("component receipt SHA-256 mismatch")
         receipt = json.loads(receipt_bytes)
         lens_row = receipt["lens"]
+        provenance = runtime.validate_receipt_transport(
+            store,
+            receipt_blob=component["receipt_blob"],
+            receipt_sha256=component["receipt_sha256"],
+            receipt_bytes=receipt_bytes,
+            related_files=[lens_row],
+        )
         component_ids = list(
             receipt.get("sequence_ids")
             or receipt.get("completed_sequence_ids")
@@ -537,6 +608,7 @@ def run_merge(args: argparse.Namespace) -> int:
                 "receipt_blob": component["receipt_blob"],
                 "receipt_sha256": component["receipt_sha256"],
                 "sequence_count": len(component_ids),
+                "transport_provenance": provenance,
             }
         )
     if len(sequence_ids) != args.expected_n_prompts:
@@ -749,6 +821,8 @@ def build_parser() -> argparse.ArgumentParser:
     fit.add_argument("--subprefix", required=True)
     fit.add_argument("--resume-checkpoint-blob", default="")
     fit.add_argument("--resume-checkpoint-sha256", default="")
+    fit.add_argument("--resume-checkpoint-manifest-blob", default="")
+    fit.add_argument("--resume-checkpoint-manifest-sha256", default="")
     fit.set_defaults(handler=run_fit_shard)
 
     merge = subparsers.add_parser("merge")

@@ -17,6 +17,7 @@ WORKDIR /workspace/repo
 COPY docs/jlens_s2_artifacts.schema.json /workspace/repo/docs/
 COPY docs/jlens_s2_protocol.json /workspace/repo/docs/
 COPY docs/jlens_s2_protocol.schema.json /workspace/repo/docs/
+COPY docs/jlens_s2_runtime_pack.schema.json /workspace/repo/docs/
 COPY data/jlens_s2_wikitext /workspace/repo/data/jlens_s2_wikitext
 COPY scripts/jlens_s2_analysis.py /workspace/repo/scripts/
 COPY scripts/jlens_s2_model_snapshot.py /workspace/repo/scripts/
@@ -24,6 +25,7 @@ COPY scripts/jlens_s2_runtime.py /workspace/repo/scripts/
 COPY src/jspace_observation/jlens_s2_corpus.py /workspace/repo/src/jspace_observation/
 COPY src/jspace_observation/jlens_s2_protocol.py /workspace/repo/src/jspace_observation/
 COPY src/jspace_observation/jlens_s2_runtime.py /workspace/repo/src/jspace_observation/
+COPY src/jspace_observation/jlens_s3_protocol.py /workspace/repo/src/jspace_observation/
 
 RUN test -n "${PROJECT_COMMIT}" \
     && test "$(sha256sum docs/jlens_s2_protocol.json | cut -d' ' -f1)" \

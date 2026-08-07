@@ -82,6 +82,27 @@ def load_receipt(
     return document, payload
 
 
+def receipt_transport(
+    store: runtime.BlobStore,
+    reference: dict[str, str],
+    payload: bytes,
+    document: dict[str, Any],
+    *,
+    expected_source_commit: str | None = None,
+    expected_image_digest: str | None = None,
+) -> dict[str, Any]:
+    related = [document["lens"]] if isinstance(document.get("lens"), dict) else []
+    return runtime.validate_receipt_transport(
+        store,
+        receipt_blob=reference["blob"],
+        receipt_sha256=reference["sha256"],
+        receipt_bytes=payload,
+        related_files=related,
+        expected_source_commit=expected_source_commit,
+        expected_image_digest=expected_image_digest,
+    )
+
+
 def load_lens(
     store: runtime.BlobStore,
     receipt: dict[str, Any],
@@ -134,8 +155,14 @@ def run_convergence(args: argparse.Namespace) -> int:
     summaries = []
     for row in sorted(args.checkpoint, key=lambda item: item["n"]):
         n = row["n"]
-        a_receipt, _ = load_receipt(store, row["a"])
-        b_receipt, _ = load_receipt(store, row["b"])
+        a_receipt, a_payload = load_receipt(store, row["a"])
+        b_receipt, b_payload = load_receipt(store, row["b"])
+        a_provenance = receipt_transport(
+            store, row["a"], a_payload, a_receipt
+        )
+        b_provenance = receipt_transport(
+            store, row["b"], b_payload, b_receipt
+        )
         a = load_lens(
             store, a_receipt, directory / f"A{n}.pt", jlens_module
         )
@@ -171,6 +198,10 @@ def run_convergence(args: argparse.Namespace) -> int:
                 "mean_cosine": statistics.fmean(cosines),
                 "median_relative_frobenius": statistics.median(distances),
                 "minimum_cosine": min(cosines),
+                "transport_provenance": {
+                    "A": a_provenance,
+                    "B": b_provenance,
+                },
             }
         )
     scaling = s2.fit_scaling_law(
@@ -221,9 +252,12 @@ def run_heldout_aggregate(args: argparse.Namespace) -> int:
     metric_rows = []
     components = []
     for index, reference in enumerate(args.component, start=1):
-        receipt, _ = load_receipt(store, reference)
+        receipt, receipt_payload = load_receipt(store, reference)
         if receipt.get("status") != "success":
             raise runtime.S2RuntimeError("heldout shard did not succeed")
+        provenance = receipt_transport(
+            store, reference, receipt_payload, receipt
+        )
         ids = list(receipt["sequence_ids"])
         if set(sequence_ids) & set(ids):
             raise runtime.S2RuntimeError("heldout shard sequence overlap")
@@ -242,6 +276,17 @@ def run_heldout_aggregate(args: argparse.Namespace) -> int:
         ]
         if len(rows) != receipt["metric_row_count"]:
             raise runtime.S2RuntimeError("heldout metric row count mismatch")
+        receipt_ids = set(ids)
+        if (
+            any(row.get("sequence_id") not in receipt_ids for row in rows)
+            or {
+                row["sequence_id"] for row in rows
+            }
+            != receipt_ids
+        ):
+            raise runtime.S2RuntimeError(
+                "heldout metric rows are not bound to their shard sequences"
+            )
         metric_rows.extend(rows)
         components.append(
             {
@@ -249,14 +294,17 @@ def run_heldout_aggregate(args: argparse.Namespace) -> int:
                 "receipt_blob": reference["blob"],
                 "receipt_sha256": reference["sha256"],
                 "sequence_count": len(ids),
+                "transport_provenance": provenance,
             }
         )
     corpus_pack = runtime.load_registered_corpus()
     expected = [row["row_id"] for row in corpus_pack["by_role"]["heldout"]]
     if sorted(sequence_ids) != sorted(expected) or len(sequence_ids) != 200:
         raise runtime.S2RuntimeError("heldout shards do not cover exact 200 rows")
-    if len(metric_rows) != 200 * 3 * len(s2.SOURCE_LAYERS):
-        raise runtime.S2RuntimeError("heldout aggregate metric cardinality mismatch")
+    metric_validation = runtime.validate_heldout_metric_rows(
+        metric_rows,
+        expected,
+    )
     grouped: dict[tuple[str, int], list[dict[str, Any]]] = defaultdict(list)
     for row in metric_rows:
         if row.get("finite") is not True:
@@ -292,6 +340,7 @@ def run_heldout_aggregate(args: argparse.Namespace) -> int:
         "components": components,
         "diagnostic_only": True,
         "metric_row_count": len(metric_rows),
+        "metric_key_validation": metric_validation,
         "sequence_count": 200,
         "sequence_ids_sha256": s2.sha256_bytes(
             s2.canonical_jsonl_bytes(
@@ -359,6 +408,14 @@ def run_verify(args: argparse.Namespace) -> int:
             store,
             {"blob": reference["blob"], "sha256": reference["sha256"]},
         )
+        transport = receipt_transport(
+            store,
+            {"blob": reference["blob"], "sha256": reference["sha256"]},
+            payload,
+            receipt,
+            expected_source_commit=args.analysis_source_commit,
+            expected_image_digest=args.analysis_image_digest,
+        )
         expected_ids = expected_lens_sequences(corpus_pack, lens_id)
         if receipt["sequence_ids"] != expected_ids:
             raise runtime.S2RuntimeError(f"{lens_id} sequence identities mismatch")
@@ -396,6 +453,7 @@ def run_verify(args: argparse.Namespace) -> int:
             "manifest_sha256": reference["sha256"],
             "metadata": metadata,
             "sequence_ids_sha256": receipt["sequence_ids_sha256"],
+            "transport_provenance": transport,
         }
     recomputed_m = runtime.independent_weighted_mean(
         torch_module,
@@ -415,7 +473,15 @@ def run_verify(args: argparse.Namespace) -> int:
 
     shard_receipts = []
     for reference in args.shard:
-        receipt, _payload = load_receipt(store, reference)
+        receipt, shard_payload = load_receipt(store, reference)
+        receipt_transport(
+            store,
+            reference,
+            shard_payload,
+            receipt,
+            expected_source_commit=args.fit_source_commit,
+            expected_image_digest=args.fit_image_digest,
+        )
         shard_receipts.append(receipt)
     expected_a = [row["row_id"] for row in corpus_pack["by_role"]["A"]]
     expected_b = [row["row_id"] for row in corpus_pack["by_role"]["B"]]
@@ -431,9 +497,33 @@ def run_verify(args: argparse.Namespace) -> int:
         ]
         accounting[role] = s2.account_successful_sequences(expected, attempts)
 
-    convergence, _ = load_receipt(store, args.convergence)
-    heldout, _ = load_receipt(store, args.heldout)
-    smoke, _ = load_receipt(store, args.smoke)
+    convergence, convergence_payload = load_receipt(store, args.convergence)
+    heldout, heldout_payload = load_receipt(store, args.heldout)
+    smoke, smoke_payload = load_receipt(store, args.smoke)
+    convergence_transport = receipt_transport(
+        store,
+        args.convergence,
+        convergence_payload,
+        convergence,
+        expected_source_commit=args.analysis_source_commit,
+        expected_image_digest=args.analysis_image_digest,
+    )
+    heldout_transport = receipt_transport(
+        store,
+        args.heldout,
+        heldout_payload,
+        heldout,
+        expected_source_commit=args.analysis_source_commit,
+        expected_image_digest=args.analysis_image_digest,
+    )
+    smoke_transport = receipt_transport(
+        store,
+        args.smoke,
+        smoke_payload,
+        smoke,
+        expected_source_commit=args.fit_source_commit,
+        expected_image_digest=args.fit_image_digest,
+    )
     if smoke.get("status") != "selected" or not smoke.get("selected_dim_batch"):
         raise runtime.S2RuntimeError("smoke selection is not sealed")
     if heldout.get("sequence_count") != 200:
@@ -463,14 +553,148 @@ def run_verify(args: argparse.Namespace) -> int:
         "convergence_receipt": args.convergence,
         "corpus_manifest_sha256": args.corpus_manifest_sha256,
         "heldout_receipt": args.heldout,
+        "heldout_transport": heldout_transport,
         "m1200_independent_recomputation": m_check,
         "sequence_accounting": accounting,
         "shard_attempt_count": len(shard_receipts),
         "smoke_selection_receipt": args.smoke,
+        "smoke_transport": smoke_transport,
+        "convergence_transport": convergence_transport,
         "status": "S2-V0-SEALED",
     }
     receipt_path = directory / "s2_verification_receipt.json"
     runtime.write_json(receipt_path, receipt)
+    artifact_files = [
+        {
+            "bytes": path.stat().st_size,
+            "create_only": True,
+            "media_type": "application/json",
+            "readback_verified": True,
+            "relative_path": path.name,
+            "sha256": s2.sha256_file(path),
+            "written_order": index,
+        }
+        for index, path in enumerate(
+            sorted([*seal_paths, receipt_path], key=lambda item: item.name),
+            start=1,
+        )
+    ]
+    lens_manifest_rows = []
+    for lens_id in CANONICAL_LENS_IDS:
+        row = receipts[lens_id]
+        metadata = row["metadata"]
+        merge = row["merge"]["independent_weighted_recomputation"]
+        lens_manifest_rows.append(
+            {
+                "blob": row["lens"]["blob"],
+                "bytes": row["lens"]["bytes"],
+                "d_model": metadata["d_model"],
+                "finite": metadata["finite"],
+                "lens_id": lens_id,
+                "merge_max_abs": merge["max_abs"],
+                "merge_relative_frobenius": merge[
+                    "max_relative_frobenius"
+                ],
+                "n_prompts": metadata["n_prompts"],
+                "save_load_max_abs": metadata["save_load_max_abs"],
+                "sha256": row["lens"]["sha256"],
+                "source_layers": metadata["source_layers"],
+                "target_layer": metadata["target_layer"],
+            }
+        )
+    shard_pack_rows = []
+    for row in shard_receipts:
+        snapshots = row.get("checkpoint_snapshots") or []
+        checkpoint_sha = (
+            snapshots[-1]["checkpoint"]["sha256"] if snapshots else None
+        )
+        shard_pack_rows.append(
+            {
+                "attempt_id": row["attempt_id"],
+                "checkpoint_sha256": checkpoint_sha,
+                "completed_sequence_ids": row["completed_sequence_ids"],
+                "dim_batch": row["dim_batch"],
+                "gpu_name": row["environment"]["gpu_name"],
+                "image_digest": row["image_digest"],
+                "peak_allocated_bytes": row["memory"][
+                    "gpu_peak_allocated_bytes"
+                ],
+                "peak_reserved_bytes": row["memory"][
+                    "gpu_peak_reserved_bytes"
+                ],
+                "resumed": row["resumed"],
+                "seconds": row["fit_seconds"],
+                "shard_id": row["shard_id"],
+                "status": row["status"],
+            }
+        )
+    smoke_pack_rows = []
+    for dim_batch in s2.DIM_BATCH_CANDIDATES:
+        row = smoke["attempts"][str(dim_batch)]
+        smoke_pack_rows.append(
+            {
+                "attempt_id": row["attempt_id"],
+                "comparison_to_dim1": row["comparison_to_dim1"],
+                "dim_batch": dim_batch,
+                "finite_float32": row["finite_float32"],
+                "gpu_name": row["environment"]["gpu_name"],
+                "matrix_shapes_valid": row["matrix_shapes_valid"],
+                "peak_allocated_bytes": max(
+                    item["memory"]["gpu_peak_allocated_bytes"]
+                    for item in row["rows"]
+                ),
+                "peak_reserved_bytes": max(
+                    item["memory"]["gpu_peak_reserved_bytes"]
+                    for item in row["rows"]
+                ),
+                "peak_reserved_ratio": row["peak_reserved_ratio"],
+                "seconds": max(item["seconds"] for item in row["rows"]),
+                "source_layers": row["source_layers"],
+                "status": row["status"],
+                "target_layer": row["target_layer"],
+            }
+        )
+    final_pack = {
+        "complete": True,
+        "corpus_rows": corpus_pack["rows"],
+        "create_only": True,
+        "exclusions": [],
+        "files": artifact_files,
+        "heldout_diagnostics": [],
+        "image_digest": os.environ["JSPACE_IMAGE_DIGEST"],
+        "lens_manifests": lens_manifest_rows,
+        "manifest_written_last": True,
+        "protocol_sha256": s2.sha256_file(
+            PROJECT_ROOT / "docs" / "jlens_s2_protocol.json"
+        ),
+        "run_id": os.environ["JSPACE_S2_RUN_ID"],
+        "schema_version": "jlens-s2-artifact-pack/v1",
+        "shard_receipts": shard_pack_rows,
+        "smoke_attempts": smoke_pack_rows,
+        "source_commit": os.environ["JSPACE_CODE_COMMIT"],
+        "stage": "S2-V0",
+        "verification": [
+            {
+                "A600_sealed": True,
+                "B600_sealed": True,
+                "M1200_sealed": True,
+                "all_operational_gates_pass": True,
+                "benchmark_model_operations_before_seal": 0,
+                "benchmark_tokenizer_operations_before_seal": 0,
+                "receipt_sha256": s2.sha256_file(receipt_path),
+            }
+        ],
+    }
+    from jlens_s3_protocol import validate_json_schema
+
+    validate_json_schema(
+        final_pack,
+        s2.load_json(
+            PROJECT_ROOT / "docs" / "jlens_s2_artifacts.schema.json"
+        ),
+    )
+    final_pack_path = directory / "zz_s2_artifact_pack.json"
+    runtime.write_json(final_pack_path, final_pack)
     s2_manifest = {
         "canonical_seals": seals,
         "corpus_manifest_sha256": args.corpus_manifest_sha256,
@@ -480,6 +704,7 @@ def run_verify(args: argparse.Namespace) -> int:
         ),
         "source_commit": os.environ["JSPACE_CODE_COMMIT"],
         "status": "S2-V0-SEALED",
+        "artifact_pack_sha256": s2.sha256_file(final_pack_path),
         "verification_receipt_sha256": s2.sha256_file(receipt_path),
     }
     s2_manifest_path = directory / "s2_manifest.json"
@@ -488,7 +713,12 @@ def run_verify(args: argparse.Namespace) -> int:
         store,
         stage="S2-V0-independent-verification",
         directory=directory,
-        files=[*seal_paths, receipt_path, s2_manifest_path],
+        files=[
+            *seal_paths,
+            receipt_path,
+            s2_manifest_path,
+            final_pack_path,
+        ],
         subprefix=args.subprefix,
     )
     result = {
@@ -524,6 +754,10 @@ def build_parser() -> argparse.ArgumentParser:
     verify.add_argument("--heldout", type=component, required=True)
     verify.add_argument("--smoke", type=component, required=True)
     verify.add_argument("--corpus-manifest-sha256", required=True)
+    verify.add_argument("--fit-source-commit", required=True)
+    verify.add_argument("--fit-image-digest", required=True)
+    verify.add_argument("--analysis-source-commit", required=True)
+    verify.add_argument("--analysis-image-digest", required=True)
     verify.add_argument("--subprefix", required=True)
     verify.set_defaults(handler=run_verify)
     return parser

@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 from typing import Any
 
 import jlens_s2_protocol as s2
@@ -14,10 +16,104 @@ import jlens_s3_protocol as s3
 DISTRIBUTION_ORDER = ("multihop", "order_ops", "causal_swap")
 EXPECTED_ITEM_COUNTS = {"multihop": 93, "order_ops": 55, "causal_swap": 90}
 MAXIMUM_INPUT_TOKENS = 512
+E0_PACK_SCHEMA_SHA256 = (
+    "9fdb9a45b78bae98ab72e1ffb9eb5b757de889e27b05f799e175f67a82dfbb7c"
+)
+BENCHMARK_IDENTITIES = {
+    "causal_swap": {
+        "bytes": 26567,
+        "item_count": 90,
+        "path": "data/experiments/probe-swap.json",
+        "sha256": "a0edd27ca23f7b4d0fbe90448c2ddcc7457a3d812121bf024ed12a032ff86796",
+    },
+    "multihop": {
+        "bytes": 21869,
+        "item_count": 93,
+        "path": "data/evaluations/lens-eval-multihop.json",
+        "sha256": "50b7e4c9255291c0ca2a8e94615be9f44531fa57bb1a844e4f9616056d987416",
+    },
+    "order_ops": {
+        "bytes": 9589,
+        "item_count": 55,
+        "path": "data/evaluations/lens-eval-order-ops.json",
+        "sha256": "b203206d16ff628152cc86f3838604e06cb54776f3e14fa1c34f150db8bc7560",
+    },
+}
+E0_SOURCE_BUNDLE_COMPONENTS = (
+    "scripts/jlens_s3_e0.py",
+    "scripts/jlens_s3_e0_lock.py",
+    "src/jspace_observation/jlens_s3_e0_runtime.py",
+    "src/jspace_observation/jlens_s3_protocol.py",
+)
+_SHA256 = re.compile(r"[0-9a-f]{64}\Z")
+_IMAGE_DIGEST = re.compile(r"sha256:[0-9a-f]{64}\Z")
 
 
 class E0RuntimeError(RuntimeError):
     """Raised when frozen E0 mechanics or operation boundaries fail."""
+
+
+def e0_source_bundle_bytes(project_root: Path) -> bytes:
+    output = bytearray(b"jlens-s3-e0-source-bundle-v1\n")
+    for relative in sorted(E0_SOURCE_BUNDLE_COMPONENTS):
+        raw = (project_root / relative).read_bytes()
+        output.extend(relative.encode("utf-8"))
+        output.extend(b"\0")
+        output.extend(str(len(raw)).encode("ascii"))
+        output.extend(b"\0")
+        output.extend(raw)
+    return bytes(output)
+
+
+def actual_benchmark_identities(project_root: Path) -> dict[str, dict[str, Any]]:
+    vendored = (
+        project_root / "third_party" / "jacobian-lens" / s2.JLENS_COMMIT
+    )
+    observed = {}
+    for distribution, expected in BENCHMARK_IDENTITIES.items():
+        path = vendored / expected["path"]
+        raw = path.read_bytes()
+        document = json.loads(raw)
+        observed[distribution] = {
+            "bytes": len(raw),
+            "item_count": len(document["items"]),
+            "sha256": hashlib.sha256(raw).hexdigest(),
+        }
+    return observed
+
+
+def verify_locked_local_bytes(
+    project_root: Path,
+    lock: Mapping[str, Any],
+) -> dict[str, Any]:
+    observed = {
+        "e0_output_schema_sha256": hashlib.sha256(
+            (project_root / "docs" / "jlens_s3_e0_pack.schema.json").read_bytes()
+        ).hexdigest(),
+        "e0_source_bundle_sha256": hashlib.sha256(
+            e0_source_bundle_bytes(project_root)
+        ).hexdigest(),
+        "s3_protocol_sha256": hashlib.sha256(
+            (project_root / "docs" / "jlens_s3_validity_protocol.json").read_bytes()
+        ).hexdigest(),
+        "s3_schema_sha256": hashlib.sha256(
+            (
+                project_root / "docs" / "jlens_s3_validity_protocol.schema.json"
+            ).read_bytes()
+        ).hexdigest(),
+        "vendored_benchmarks": actual_benchmark_identities(project_root),
+    }
+    for key in (
+        "e0_output_schema_sha256",
+        "e0_source_bundle_sha256",
+        "s3_protocol_sha256",
+        "s3_schema_sha256",
+    ):
+        if observed[key] != lock[key]:
+            raise E0RuntimeError(f"E0 lock local byte mismatch: {key}")
+    if observed["vendored_benchmarks"] != lock["vendored_benchmarks"]:
+        raise E0RuntimeError("E0 lock vendored benchmark byte mismatch")
+    return observed
 
 
 def surface_specs(distribution: str, item: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -385,27 +481,54 @@ def validate_e0_lock(lock: Mapping[str, Any]) -> None:
         raise E0RuntimeError("E0 lock model/tokenizer identity drifted")
     if not str(lock.get("e0_image_digest", "")).startswith("sha256:"):
         raise E0RuntimeError("E0 image digest is invalid")
+    if (
+        not _IMAGE_DIGEST.fullmatch(str(lock["e0_image_digest"]))
+        or not _SHA256.fullmatch(str(lock["e0_output_schema_sha256"]))
+        or lock["e0_output_schema_sha256"] != E0_PACK_SCHEMA_SHA256
+        or not _SHA256.fullmatch(str(lock["e0_source_bundle_sha256"]))
+        or not _SHA256.fullmatch(str(lock["s2_manifest"].get("sha256", "")))
+    ):
+        raise E0RuntimeError("E0 lock hash identity is invalid")
+    if set(lock["canonical_lenses"]) != {"A600", "B600", "M1200"}:
+        raise E0RuntimeError("E0 canonical lens lock set drifted")
+    for row in lock["canonical_lenses"].values():
+        if (
+            not isinstance(row, Mapping)
+            or set(row) != {"bytes", "seal_sha256", "sealed", "sha256"}
+            or not isinstance(row["bytes"], int)
+            or row["bytes"] <= 0
+            or row["sealed"] is not True
+            or not _SHA256.fullmatch(str(row["seal_sha256"]))
+            or not _SHA256.fullmatch(str(row["sha256"]))
+        ):
+            raise E0RuntimeError("E0 canonical lens byte seal is invalid")
     if set(lock["vendored_benchmarks"]) != set(EXPECTED_ITEM_COUNTS):
         raise E0RuntimeError("E0 benchmark distributions drifted")
     for name, row in lock["vendored_benchmarks"].items():
-        if (
-            not isinstance(row, dict)
-            or set(row) != {"bytes", "item_count", "sha256"}
-            or row["item_count"] != EXPECTED_ITEM_COUNTS[name]
-        ):
+        expected = {
+            key: value
+            for key, value in BENCHMARK_IDENTITIES[name].items()
+            if key != "path"
+        }
+        if row != expected:
             raise E0RuntimeError("E0 benchmark lock is incomplete")
 
 
 __all__ = [
     "DISTRIBUTION_ORDER",
+    "BENCHMARK_IDENTITIES",
+    "E0_PACK_SCHEMA_SHA256",
     "E0RuntimeError",
     "EXPECTED_ITEM_COUNTS",
     "MAXIMUM_INPUT_TOKENS",
     "assign_sealed_splits",
+    "actual_benchmark_identities",
     "build_item_row",
     "build_surface_rows",
     "e0_counts",
+    "e0_source_bundle_bytes",
     "mechanical_eligibility",
     "surface_specs",
     "validate_e0_lock",
+    "verify_locked_local_bytes",
 ]

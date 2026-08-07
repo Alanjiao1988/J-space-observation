@@ -95,6 +95,7 @@ def load_lock() -> tuple[dict[str, Any], bytes]:
         raise e0.E0RuntimeError("E0 lock SHA-256 mismatch")
     lock = json.loads(payload)
     e0.validate_e0_lock(lock)
+    e0.verify_locked_local_bytes(PROJECT_ROOT, lock)
     if lock["e0_image_digest"] != os.environ["JSPACE_IMAGE_DIGEST"]:
         raise e0.E0RuntimeError("executing E0 image differs from lock")
     if lock["e0_manifest_destination"] != os.environ["JSPACE_BLOB_PREFIX"]:
