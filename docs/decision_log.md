@@ -2755,3 +2755,43 @@ E0 is authorized. It is not a J-lens validity classification: E0 contains no
 lens output and establishes neither hidden reasoning nor an internal workspace
 or J-space. E1/E2 and RQ2 remain unauthorized, and Phase 1.0D independently
 remains `BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`.
+
+## D33 - Close the original program as Study 1 and open independent Study 2
+
+2026-08-07. Cross-study boundary decision.
+
+The repository state at
+`6409d2c6d665187e4459d94d490a20d7b085e8af`, tree
+`bc8b80cb0e66f9426dcdedd52b624c892caa3fc9`, is designated the terminal
+scientific baseline of **Study 1**. Its exact terminal state remains
+`INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY`; Phase 1.0D separately remains
+`BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`. Neither state is relabelled,
+merged, or repaired by this decision.
+
+Study 1 did not answer the original research question. Its terminal E0 tested
+whether frozen official public items supplied enough clean-correct greedy
+next-token cases under raw completion bytes, no chat template, and no generated
+chain-of-thought. It stopped before any lens output or causal intervention.
+That valid prospective floor failure is evidence about the selected behavioral
+interface, not evidence for or against hidden reasoning, an internal workspace,
+a J-space, or distillation-transferred reasoning.
+
+Historical files remain at their existing paths. New files under
+`studies/study1/` form an index and machine-readable closure layer only. They
+do not move or replace receipts, artifacts, ledgers, decisions, protected-byte
+manifests, or the final Study 1 handoff.
+
+**Study 2** is opened as an independent prospective study with new namespaces,
+task banks, authority, controls, and terminal states. It asks whether the
+R1-distilled checkpoint computes and causally uses a task-defined intermediate
+variable in one forward pass with zero generated reasoning tokens, and whether
+that behavior or mechanism is stronger than both its lineage base and a
+same-family instruction-tuned control.
+
+Only Study 2 Stage P is authorized next: model-free protocol design,
+deterministic public task-bank construction, one bounded methods review, at
+most one consolidated correction, freeze, validation, ledgers, and handoff.
+Stage T and all model, lens, activation, probe, patching, ablation, reviewer,
+GPU, and scientific operations remain unauthorized. No Study 2 evidence row is
+created by this organizational transition. The resulting state is
+`NONTERMINAL_CHECKPOINT_STUDY2_OPENED_AWAITING_STAGE_P`.

@@ -1,0 +1,127 @@
+{
+  "schema_version": "jspace-study2-charter/v1",
+  "study_id": "study2",
+  "opened_on": "2026-08-07",
+  "status": "OPEN_AWAITING_STAGE_P",
+  "predecessor": {
+    "study_id": "study1",
+    "terminal_state": "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+    "terminal_commit": "6409d2c6d665187e4459d94d490a20d7b085e8af",
+    "terminal_tree": "bc8b80cb0e66f9426dcdedd52b624c892caa3fc9",
+    "scientific_disposition": "ORIGINAL_RESEARCH_QUESTION_NOT_ANSWERED"
+  },
+  "research_question": "Does the R1-distilled checkpoint compute and causally use a task-defined intermediate variable during a single forward pass with zero generated reasoning tokens, and is that behavior or mechanism stronger than in both its lineage base checkpoint and a same-family instruction-tuned control?",
+  "claim_ceiling": "The target checkpoint uses a causally load-bearing intermediate variable to solve fresh compositional tasks under a controlled no-generated-trace interface.",
+  "models": [
+    {
+      "role": "target",
+      "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+      "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+    },
+    {
+      "role": "lineage_base",
+      "model_id": "Qwen/Qwen2.5-Math-1.5B",
+      "revision": "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2"
+    },
+    {
+      "role": "instruction_control",
+      "model_id": "Qwen/Qwen2.5-Math-1.5B-Instruct",
+      "revision": "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35"
+    }
+  ],
+  "jlens_source": {
+    "repository": "anthropics/jacobian-lens",
+    "commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+    "study2_role": "target_only_secondary_axis"
+  },
+  "primary_measurement": {
+    "interface": "single_forward_four_option_logits",
+    "generated_tokens": 0,
+    "semantic_parser": false,
+    "semantic_reviewer": false,
+    "task_families": [
+      "permutation_chain",
+      "affine_mod10"
+    ],
+    "depths": [
+      1,
+      2,
+      3
+    ]
+  },
+  "primary_causal_test": {
+    "instrument": "donor_to_recipient_residual_patching",
+    "target_answer": "g_recipient(m_donor)",
+    "anti_copy_requirement": "donor_answer, recipient_answer, and recombinant_answer are pairwise distinct",
+    "matched_controls": [
+      "no_op",
+      "same_intermediate",
+      "same_answer_different_intermediate",
+      "random_donor",
+      "wrong_position",
+      "early_band",
+      "motor_band"
+    ]
+  },
+  "stages": [
+    {
+      "stage": "P",
+      "purpose": "protocol, deterministic public task banks, one bounded methods review, freeze",
+      "status": "AUTHORIZED_NOT_RUN",
+      "model_operations_allowed": 0
+    },
+    {
+      "stage": "T",
+      "purpose": "model identity, tokenizer and token-alignment gate",
+      "status": "NOT_AUTHORIZED"
+    },
+    {
+      "stage": "B-D",
+      "purpose": "behavioral development",
+      "status": "NOT_AUTHORIZED"
+    },
+    {
+      "stage": "B-C",
+      "purpose": "behavioral confirmation",
+      "status": "NOT_AUTHORIZED"
+    },
+    {
+      "stage": "M-D",
+      "purpose": "mechanistic development and localization",
+      "status": "NOT_AUTHORIZED"
+    },
+    {
+      "stage": "M-C",
+      "purpose": "mechanistic confirmation",
+      "status": "NOT_AUTHORIZED"
+    }
+  ],
+  "stage_p_review_allowance": {
+    "candidate_reviews": 1,
+    "consolidated_corrections": 1,
+    "same_checklist_verification": 1,
+    "status": "UNSPENT"
+  },
+  "study1_protection": {
+    "modify_old_terminal_states": false,
+    "reuse_item_level_outcomes_for_selection": false,
+    "resume_phase1_0d": false,
+    "open_s2_lens_bytes_in_stage_p": false
+  },
+  "operations_at_open": {
+    "tokenizer_constructions": 0,
+    "model_downloads": 0,
+    "weight_loads": 0,
+    "forward_passes": 0,
+    "generations": 0,
+    "lens_operations": 0,
+    "activation_operations": 0,
+    "probe_operations": 0,
+    "patching_operations": 0,
+    "semantic_review_calls": 0,
+    "gpu_jobs": 0,
+    "scientific_evidence_rows": 0
+  },
+  "authority_path": "studies/study2/prompts/stage_p_protocol_design_prompt.md",
+  "handoff_path": "studies/study2/NEXT_THREAD_HANDOFF.md"
+}

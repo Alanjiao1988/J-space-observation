@@ -1419,3 +1419,23 @@ frozen split assigns up to the first 15 eligible rows in each distribution to
 development, all nine behaviorally eligible rows are development and no
 confirmation row remains. The four confirmation counts are therefore all zero
 and all four floors fail.
+
+## M-23 - Opening a new study without repairing the terminal study
+
+Study 1 is closed at its exact terminal commit and tree. Its files are not
+moved into a new physical hierarchy because many receipts, manifests, hashes,
+and reports bind their historical paths. Instead, `studies/study1/` adds a
+read-only organizational index, terminal manifest, and asset map while the
+original bytes remain in place.
+
+Study 2 begins under a separate namespace and authority. Its bootstrap records
+the research question, claim ceiling, three fixed checkpoint identities,
+stage order, permitted Stage P operations, and explicit cross-study exclusions
+before Stage P implementation exists. The full Stage P prompt is committed and
+then bound by a later receipt to the exact bootstrap commit/tree and prompt
+hash. This two-commit pattern avoids a document attempting to embed the hash of
+the commit that contains itself.
+
+The transition is deliberately model-free. It changes project organization and
+future authority only; it creates no empirical observation and appends no row
+to the scientific evidence ledger.

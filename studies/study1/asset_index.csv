@@ -1,0 +1,19 @@
+component,status,canonical_path,terminal_or_checkpoint,evidence_ids,interpretation
+study1_final_handoff,closed,docs/jlens_s2_s3_e0_final_handoff.md,INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY,EV-0015;EV-0016,primary handoff
+study1_terminal_manifest,closed,studies/study1/terminal_manifest.json,ORIGINAL_RESEARCH_QUESTION_NOT_ANSWERED,EV-0016,organizational index only
+decision_history,append_only,docs/decision_log.md,D1-D33,,global decision history
+run_history,append_only,docs/run_log.md,through Study 1 closure,,global run history
+evidence_ledger,append_only,paper/evidence_ledger.csv,EV-0001-EV-0016,EV-0001-EV-0016,no Study 2 empirical row exists
+claim_matrix,current,paper/claim_evidence_matrix.md,Study 1 claims remain bounded,EV-0001-EV-0016,scientific claim boundary
+methods_ledger,append_only,paper/methods_ledger.md,M-01-M-23,,methods and provenance
+limitations_ledger,append_only,paper/limitations_ledger.md,L-01-L-67,,limitations including question-method mismatch
+phase05_feasibility,complete,reports/phase05_jlens_feasibility.md,GREEN,EV-0001,engineering only
+phase1_0c,complete_inconclusive,artifacts/phase1-headroom-calibration/track-b/20260725T170041Z/,COMPLETE_INCONCLUSIVE,EV-0004,preliminary behavior screen
+phase1_0d,blocked,artifacts/phase1-0d-semantic-review-v2-transport-capacity/20260805T180417Z/,BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY,EV-0014,no final labels or scientific result
+parser_v2,closed_fail,reports/phase1_parser_v2_locked_evaluation.md,FAIL,EV-0002,evaluator validation only
+parser_v3,closed,docs/decisions/parser_v3_locked_evaluation_closure.md,CLOSED_NONAUTHORITATIVE_TRIAGE_ONLY,EV-0006;EV-0007,never scientifically validated
+s2_protocol,sealed,docs/jlens_s2_protocol.json,S2-V0-SEALED,EV-0015,engineering protocol
+s2_seals,sealed,artifacts/jlens-s2-production/20260806T194226Z/s2-sealed/,S2-V0-SEALED,EV-0015,A600/B600/M1200 identities
+s3_protocol,frozen,docs/jlens_s3_validity_protocol.json,protocol frozen,,preregistration only
+s3_e0,closed,artifacts/jlens-s3-e0/20260807T081017Z/,INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY,EV-0016,behavioral floor failure only
+legacy_thread_handoff,historical,docs/thread_handoff.md@6409d2c6d665187e4459d94d490a20d7b085e8af,SUPERSEDED,,SHA-256 a788bd5efafed0c07ea643df6a14a7c5ca8848fa8d4effd8720f8c131a829a4e

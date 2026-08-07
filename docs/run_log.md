@@ -5144,3 +5144,31 @@ bundle in ACR.
 
 The exhaustive operator handoff is
 `docs/jlens_s2_s3_e0_final_handoff.md`.
+
+## 2026-08-07 - Study 1 closure index and Study 2 bootstrap
+
+The completed repository through commit
+`6409d2c6d665187e4459d94d490a20d7b085e8af`, tree
+`bc8b80cb0e66f9426dcdedd52b624c892caa3fc9`, was reorganized logically rather
+than physically. No historical evidence path was moved or renamed. A new
+`studies/study1/` index records the terminal state, exact protected anchors,
+authoritative reading order, asset map, measured question, and the explicit
+fact that Study 1 did not answer the original hidden-reasoning question.
+
+The root README and stable `docs/thread_handoff.md` entrypoint now route readers
+through the Study 1 closure and the new Study 2 namespace instead of presenting
+the superseded July handoff as current. The old handoff bytes remain available
+in Git history at the Study 1 terminal commit and are identified by SHA-256.
+
+Study 2 was opened at `OPEN_AWAITING_STAGE_P`. Its charter fixes the research
+question, target and two control identities, no-generated-trace four-option
+observable, recombinant-answer causal test, stage order, claim ceiling, and
+cross-study protection rules. The Stage P prompt is precommitted as the sole
+next authority and will be bound to an exact transition commit/tree and prompt
+hash in a separate handoff receipt.
+
+This bootstrap performed zero tokenizer constructions, model downloads, weight
+loads, forward passes, generations, lens operations, activation operations,
+probes, patching, ablations, semantic-review calls, GPU Jobs, Phase 1.0D
+operations, or scientific evidence rows. It is a research-boundary and
+authority transition, not an empirical run.

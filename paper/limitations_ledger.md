@@ -1395,3 +1395,26 @@ the frozen validity protocol. It does not show that A600, B600, or M1200 is
 valid or invalid, and it establishes nothing about hidden reasoning, an
 internal workspace, or a J-space. It also leaves the independent Phase 1.0D
 transport-capacity block unchanged.
+
+## L-67 - Study 1 did not operationalize the original research question
+
+Study 1's original target was hidden, causally meaningful reasoning in an
+R1-distilled checkpoint. Its frozen S3 E0 eligibility gate instead required the
+model's first greedy next token under raw completion bytes, no chat template,
+and no generated chain-of-thought to match a registered single-token answer
+surface. The target supplied only 2 multihop, 2 order-operations, and 5
+causal-swap eligible rows, all of which entered development and left
+confirmation empty.
+
+This fail-closed design prevented unsupported claims, but it also prevented the
+registered lens and causal instruments from being applied. The terminal result
+therefore answers an interface-specific feasibility question and not whether
+the model internally computes or causally uses intermediate reasoning states.
+It cannot be described as a null result on hidden reasoning, J-lens validity,
+J-space, or distillation-transferred reasoning.
+
+The mismatch should have been exposed before the expensive S2 fitting stage by
+a separately authorized behavioral-interface characterization. That efficiency
+failure does not license a post-hoc Study 1 rerun. Study 2 addresses it only by
+starting a prospectively separate forced-choice and causal design with new
+tasks, controls, splits, authority, and terminal states.

@@ -1,0 +1,87 @@
+{
+  "schema_version": "jspace-study1-terminal/v1",
+  "study_id": "study1",
+  "display_name": "Original J-space observation program",
+  "closed_at_utc": "2026-08-07T09:42:07Z",
+  "terminal_repository": {
+    "branch": "main",
+    "commit": "6409d2c6d665187e4459d94d490a20d7b085e8af",
+    "tree": "bc8b80cb0e66f9426dcdedd52b624c892caa3fc9"
+  },
+  "primary_terminal_state": "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+  "scientific_disposition": "ORIGINAL_RESEARCH_QUESTION_NOT_ANSWERED",
+  "original_research_question": "Whether the R1-distilled checkpoint acquired an observable and causally meaningful internal reasoning process rather than merely reproducing visible chain-of-thought.",
+  "terminal_measured_question": "Whether the frozen official items supplied enough registered single-token clean-correct next-token cases under raw completion bytes, no chat template, no generated chain-of-thought, and greedy top-1 to populate confirmation.",
+  "independent_substates": {
+    "phase1_0c": "COMPLETE_INCONCLUSIVE",
+    "phase1_0d": "BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY",
+    "s2": "S2-V0-SEALED",
+    "s3_e0": "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY"
+  },
+  "s2_identities": {
+    "A600_lens_sha256": "28e066960f03f51eaefb0e29aeb9cfe266e353746660f3283caaed85d0bc7689",
+    "B600_lens_sha256": "f39a656a018f99b0b0bacff97fe0eb7fe18285aa0049f1ca0f477232400272d3",
+    "M1200_lens_sha256": "9938aa66e07ca8bc2f63463dc2dfe60cb512271fa7b19955b402cb581bb0e682",
+    "A600_seal_sha256": "4032c8f30ec6aec2f12cbf0a303466a0fe66745617266dcc0fa3d2289e731dd7",
+    "B600_seal_sha256": "b62cd7f69aaa4a662144d8a8b75e3165330c9369990a52dbee85bb1b06b33ad4",
+    "M1200_seal_sha256": "9716c3802625176060b3c2a479f7860cf4045807a45c6de346833a3b66e00138",
+    "manifest_sha256": "9d10a4b07a8133b7241ce9067649ebf1de48429cf7c04e0495b4c3fe90e58e47",
+    "interpretation": "engineering_only"
+  },
+  "s3_e0": {
+    "tokenizer_calls": 238,
+    "model_forwards": 238,
+    "lens_operations": 0,
+    "development_counts": {
+      "multihop": 2,
+      "order_ops": 2,
+      "causal_swap": 5
+    },
+    "confirmation_counts": {
+      "multihop": 0,
+      "order_ops": 0,
+      "causal_swap": 0,
+      "pooled_readout": 0
+    },
+    "artifact_manifest_sha256": "6d11b09b39bbeead9b38fdb23be47a4247245fb55e6b6b665b817241519df60f",
+    "terminal_receipt_sha256": "e7daad69a81377aba05be2617c07522d8d04552e594bc2cdc8318b057a83f218"
+  },
+  "protected_anchors": [
+    {
+      "path": "docs/jlens_s2_s3_e0_final_handoff.md",
+      "sha256": "5870c82b15575086f5c29c34661d89d96d265848846e3de74162da8919951f77"
+    },
+    {
+      "path": "docs/jlens_s3_validity_protocol.json",
+      "sha256": "bb07dc3be90539e88ff8ada8adee879da747ec5b0b0409499b9809f259df4625"
+    },
+    {
+      "path": "docs/decisions/jlens_s3_validity_protocol_freeze.md",
+      "sha256": "d7d9623e3668b5469b426ba45671f267b631599e44f598f710f6c16564a96b48"
+    },
+    {
+      "path": "artifacts/phase1-0d-semantic-review-v2-transport-capacity/20260805T180417Z/00_capacity_certificate.json",
+      "sha256": "20e486e05a5f076b720ca12db3459b5a1c2c42e95684977dfdcff19d6da055d3"
+    },
+    {
+      "path": "artifacts/phase1-0d-semantic-review-v2-transport-capacity/20260805T180417Z/artifact_manifest.json",
+      "sha256": "23016ad15430b1720e4b37033a3638bf45e817ac00513292d138d26e0ed0a834"
+    }
+  ],
+  "claim_boundary": {
+    "jlens_validity": "not_measured",
+    "hidden_reasoning": "not_measured",
+    "internal_workspace": "not_measured",
+    "jspace": "not_measured",
+    "distillation_reasoning_transfer": "not_measured"
+  },
+  "closure_policy": {
+    "rerun": false,
+    "repair": false,
+    "relabel": false,
+    "backfill": false,
+    "threshold_change": false,
+    "second_e0": false,
+    "reuse_item_outcomes_for_study2_selection": false
+  }
+}
