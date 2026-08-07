@@ -7,6 +7,7 @@ import copy
 import json
 import math
 import sys
+from itertools import product
 from pathlib import Path
 
 import pytest
@@ -75,6 +76,9 @@ def test_exact_models_revisions_jlens_and_zero_operations(document: dict) -> Non
     assert observed == s2.MODEL_IDENTITIES
     assert document["identities"]["jlens"]["commit"] == s2.JLENS_COMMIT
     assert document["identities"]["jlens"]["m1200_seal_sha256"] == s2.M1200_SEAL
+    assert tuple(document["classification"]["internal_axis_states"]) == s2.INTERNAL_AXIS_STATES
+    assert tuple(document["classification"]["distillation_axis_states"]) == s2.DISTILLATION_AXIS_STATES
+    assert tuple(document["classification"]["execution_blocker_reason_codes"]) == s2.EXECUTION_BLOCKER_REASONS
     assert all(value == 0 for value in document["operation_limits"].values())
 
 
@@ -151,6 +155,52 @@ def test_quantile_is_registered_linear_finite_rule() -> None:
         s2.finite_quantile([1.0, float("nan")], 0.5)
 
 
+def test_trace_effects_and_pt_support_are_hand_calculable() -> None:
+    effects = s2.trace_effects(
+        nt_correct_probability=0.25,
+        pt_correct_probability=0.75,
+        nt_counterfactual_probability=0.10,
+        wt_counterfactual_probability=0.60,
+        st_correct_probability=0.40,
+    )
+    assert effects == {
+        "TRACE_GAIN": 0.5,
+        "WRONG_TRACE_PULL": 0.5,
+        "SHUFFLE_DAMAGE": 0.35,
+    }
+    assert s2.pt_support(
+        depth=3,
+        n=256,
+        correct=128,
+        trace_gain_lower95=0.01,
+        wrong_trace_pull_lower95=0.01,
+        shuffle_damage_lower95=0.01,
+        integrity_complete=True,
+    )
+    assert not s2.pt_support(
+        depth=3,
+        n=256,
+        correct=128,
+        trace_gain_lower95=0.01,
+        wrong_trace_pull_lower95=0.01,
+        shuffle_damage_lower95=0.0,
+        integrity_complete=True,
+    )
+
+
+def test_paired_bootstrap_constant_difference_has_exact_interval() -> None:
+    replicates = s2.paired_bootstrap_mean_differences(
+        [2.0, 3.0, 4.0],
+        [1.0, 2.0, 3.0],
+        seed=s2.SEEDS["bootstrap"],
+        domain="hand-calculated-constant-difference",
+        replicates=17,
+    )
+    assert replicates == [1.0] * 17
+    assert s2.finite_quantile(replicates, 0.025) == 1.0
+    assert s2.finite_quantile(replicates, 0.975) == 1.0
+
+
 @pytest.mark.parametrize(
     ("d2", "d3", "expected"),
     [(False, False, None), (True, False, 2), (False, True, 3), (True, True, 3)],
@@ -178,6 +228,9 @@ def test_hand_calculated_gx_gd_distinguishes_recombination_and_copy() -> None:
     assert copy_gd > copy_gx
     noop_gx, noop_gd = s2.gx_gd(clean=clean, patched=clean, a_x="C", a_d="A", a_r="B")
     assert noop_gx == noop_gd == 0.0
+    random_control = {"A": 0.5, "B": 2.0, "C": 1.5, "D": -1.0}
+    random_gx, _ = s2.gx_gd(clean=clean, patched=random_control, a_x="C", a_d="A", a_r="B")
+    assert gx > random_gx
 
 
 @pytest.mark.parametrize(
@@ -214,11 +267,73 @@ def test_jlens_axis_is_closed(complete: bool, integrity: bool, readout: bool, ca
     assert s2.classify_jlens(complete=complete, integrity_ok=integrity, readout_pass=readout, causal_pass=causal) == expected
 
 
+def test_distillation_axis_is_closed() -> None:
+    assert s2.classify_distillation(
+        operationally_complete=True,
+        target_internal_supported=True,
+        stronger_than_both=True,
+        contradicted=False,
+    ) == "DISTILLATION_ASSOCIATION_STRONGER_THAN_BOTH_CONTROLS"
+    assert s2.classify_distillation(
+        operationally_complete=True,
+        target_internal_supported=True,
+        stronger_than_both=False,
+        contradicted=True,
+    ) == "DISTILLATION_ASSOCIATION_CONTRADICTED"
+    assert s2.classify_distillation(
+        operationally_complete=True,
+        target_internal_supported=True,
+        stronger_than_both=False,
+        contradicted=False,
+    ) == "DISTILLATION_ASSOCIATION_NOT_DISTINGUISHED"
+    assert s2.classify_distillation(
+        operationally_complete=False,
+        target_internal_supported=True,
+        stronger_than_both=False,
+        contradicted=False,
+    ) == "DISTILLATION_ASSOCIATION_NOT_ESTIMABLE"
+
+
+def test_composite_is_independent_of_every_jlens_axis_state() -> None:
+    for internal_families, stronger, jlens_state in product(
+        (0, 1, 2),
+        (False, True),
+        s2.JLENS_STATES,
+    ):
+        if stronger and internal_families != 2:
+            with pytest.raises(s2.ProtocolError):
+                s2.classify_composite(
+                    operationally_complete=True,
+                    integrity_ok=True,
+                    internal_families=internal_families,
+                    distillation_stronger_than_both=stronger,
+                    nt_compositional_families=max(1, internal_families),
+                    pt_support_families=0,
+                    nt_depth1_any=True,
+                )
+            continue
+        state = s2.classify_composite(
+            operationally_complete=True,
+            integrity_ok=True,
+            internal_families=internal_families,
+            distillation_stronger_than_both=stronger,
+            nt_compositional_families=max(1, internal_families),
+            pt_support_families=0,
+            nt_depth1_any=True,
+        )
+        assert jlens_state in s2.JLENS_STATES
+        assert state in s2.SCIENTIFIC_STATES
+
+
 def test_operational_blocker_cannot_be_synthesized_as_scientific_negative() -> None:
     s2.validate_blocker("BLOCKED_ON_STUDY2_MODEL_IDENTITY")
     s2.validate_blocker("BLOCKED_ON_STUDY2_EXECUTION", "NONFINITE_OUTPUT")
     with pytest.raises(s2.ProtocolError):
         s2.validate_blocker("BLOCKED_ON_STUDY2_EXECUTION", "")
+    with pytest.raises(s2.ProtocolError):
+        s2.validate_blocker("BLOCKED_ON_STUDY2_EXECUTION", "UNREGISTERED")
+    with pytest.raises(s2.ProtocolError):
+        s2.validate_blocker("BLOCKED_ON_STUDY2_MODEL_IDENTITY", "HASH_MISMATCH")
     with pytest.raises(s2.ProtocolError):
         s2.validate_blocker("STUDY2_TASK_INTERFACE_UNQUALIFIED")
 

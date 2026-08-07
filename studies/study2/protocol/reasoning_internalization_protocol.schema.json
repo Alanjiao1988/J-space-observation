@@ -68,6 +68,12 @@
           "not_estimable": "Target internal computation is unsupported or the comparative pack is operationally incomplete.",
           "stronger_than_both": "Target internal computation is supported; paired lower95 target-minus-each-control aggregate NT accuracy >0; in each family paired lower95 target-minus-each-control PATCH_RECOMBINATION >0; every hard control passes."
         },
+        "distillation_axis_states": [
+          "DISTILLATION_ASSOCIATION_STRONGER_THAN_BOTH_CONTROLS",
+          "DISTILLATION_ASSOCIATION_NOT_DISTINGUISHED",
+          "DISTILLATION_ASSOCIATION_CONTRADICTED",
+          "DISTILLATION_ASSOCIATION_NOT_ESTIMABLE"
+        ],
         "execution_blocker_reason_codes": [
           "NONFINITE_OUTPUT",
           "MISSING_ROW",
@@ -85,6 +91,13 @@
           "supported": "Both families have a selected depth, target NT_PASS, target PATCH_PASS, and target PROBE_PASS.",
           "supported_one_family": "Exactly one family passes the complete internal gate and is explicitly non-generalized."
         },
+        "internal_axis_states": [
+          "INTERNAL_COMPUTATION_SUPPORTED",
+          "INTERNAL_COMPUTATION_SUPPORTED_ONE_FAMILY",
+          "BEHAVIOR_ONLY_WITHOUT_CAUSAL_SUPPORT",
+          "NO_COMPOSITIONAL_BEHAVIORAL_SUPPORT",
+          "NOT_ESTIMABLE"
+        ],
         "jlens_states": [
           "STUDY2_JLENS_VALIDATED",
           "STUDY2_JLENS_PARTIAL",
@@ -234,9 +247,11 @@
           "maxima": "compute each registered maximum inside every bootstrap replicate before quantiles",
           "quantile": "sort finite replicate statistics; use linear interpolation at (n-1)*p for p=0.025 and 0.975",
           "replicates": 10000,
+          "sampling_algorithm": "Order units by semantic item ID or pair ID. For replicate r and draw d, hash UTF-8 seed, domain, r, d, and attempt separated by U+001F; interpret SHA-256 as an unsigned big-endian integer; reject values at or above 2^256-(2^256 mod n); select value mod n.",
           "seed": "jspace-study2-bootstrap-2026-08-07",
           "unit_behavior": "semantic item ID within family x depth with model/template/arm rows kept paired",
-          "unit_mechanism": "pair ID after equal averaging over the three frozen-window layers"
+          "unit_mechanism": "pair ID after equal averaging over the three frozen-window layers",
+          "unit_order": "ascending semantic item ID for behavior and ascending pair ID for mechanism"
         },
         "jlens": {
           "auc": "normalized trapezoidal AUC against log(k), equal family weighting, equal item averaging over the three frozen-window layers",
@@ -282,7 +297,7 @@
           "PATCH_RECOMBINATION": "mean G_x",
           "PATCH_STRUCTURAL_SPECIFICITY": "mean G_x - max(mean G_x(no-op), mean G_x(same-intermediate), mean G_x(same-answer))",
           "alpha_zero_argmax_same": true,
-          "alpha_zero_max_abs": 0.00001,
+          "alpha_zero_max_abs": 1e-05,
           "noop_failure": "BLOCKED_ON_STUDY2_EXECUTION",
           "patch_pass": "All six paired-bootstrap lower 95% bounds are strictly above zero.",
           "position": "final input token at registered Answer: position",
@@ -509,11 +524,11 @@
           {
             "fields": [
               "run_id:string",
-              "axis:enum[internal,distillation,jlens,composite]",
-              "registered_state:string",
+              "axis:enum[internal,distillation,jlens,composite,operational]",
+              "registered_state:enum[INTERNAL_COMPUTATION_SUPPORTED,INTERNAL_COMPUTATION_SUPPORTED_ONE_FAMILY,BEHAVIOR_ONLY_WITHOUT_CAUSAL_SUPPORT,NO_COMPOSITIONAL_BEHAVIORAL_SUPPORT,NOT_ESTIMABLE,DISTILLATION_ASSOCIATION_STRONGER_THAN_BOTH_CONTROLS,DISTILLATION_ASSOCIATION_NOT_DISTINGUISHED,DISTILLATION_ASSOCIATION_CONTRADICTED,DISTILLATION_ASSOCIATION_NOT_ESTIMABLE,STUDY2_JLENS_VALIDATED,STUDY2_JLENS_PARTIAL,STUDY2_JLENS_NOT_VALIDATED,STUDY2_JLENS_NOT_ESTIMABLE,STUDY2_DISTILLATION_ASSOCIATED_CAUSAL_INTERNAL_REASONING_SUPPORTED,STUDY2_CAUSAL_INTERNAL_REASONING_SUPPORTED_WITHOUT_DISTILLATION_ATTRIBUTION,STUDY2_CAUSAL_INTERNAL_REASONING_SUPPORTED_ONE_FAMILY_ONLY,STUDY2_BEHAVIOR_ONLY_WITHOUT_CAUSAL_SUPPORT,STUDY2_EXTERNAL_TRACE_DEPENDENCE_ONLY,STUDY2_EXTERNAL_TRACE_SUPPORT_ONE_FAMILY_ONLY,STUDY2_NO_COMPOSITIONAL_BEHAVIORAL_SUPPORT,STUDY2_TASK_INTERFACE_UNQUALIFIED,STUDY2_RESULT_NOT_ESTIMABLE,BLOCKED_ON_STUDY2_STARTING_STATE_INTEGRITY,BLOCKED_ON_STUDY2_PREREGISTRATION_INTEGRITY,BLOCKED_ON_STUDY2_MODEL_IDENTITY,BLOCKED_ON_STUDY2_COMMON_OPTION_TOKENIZATION,BLOCKED_ON_STUDY2_MECHANISTIC_TOKEN_SUPPORT,BLOCKED_ON_STUDY2_EXECUTION]",
               "gate_inputs_sha256:sha256",
               "complete:boolean",
-              "blocker_reason:null_or_string"
+              "blocker_reason:null_or_enum[NONFINITE_OUTPUT,MISSING_ROW,HASH_MISMATCH,HOOK_NOOP_MISMATCH,SOURCE_IMAGE_MISMATCH,ARTIFACT_WRITE_FAILURE,RUNTIME_EXCEPTION,CAPACITY_UNAVAILABLE]"
             ],
             "name": "classification_row",
             "primary_key": [

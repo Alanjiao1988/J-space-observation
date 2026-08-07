@@ -100,6 +100,19 @@ SCIENTIFIC_STATES = (
     "STUDY2_TASK_INTERFACE_UNQUALIFIED",
     "STUDY2_RESULT_NOT_ESTIMABLE",
 )
+INTERNAL_AXIS_STATES = (
+    "INTERNAL_COMPUTATION_SUPPORTED",
+    "INTERNAL_COMPUTATION_SUPPORTED_ONE_FAMILY",
+    "BEHAVIOR_ONLY_WITHOUT_CAUSAL_SUPPORT",
+    "NO_COMPOSITIONAL_BEHAVIORAL_SUPPORT",
+    "NOT_ESTIMABLE",
+)
+DISTILLATION_AXIS_STATES = (
+    "DISTILLATION_ASSOCIATION_STRONGER_THAN_BOTH_CONTROLS",
+    "DISTILLATION_ASSOCIATION_NOT_DISTINGUISHED",
+    "DISTILLATION_ASSOCIATION_CONTRADICTED",
+    "DISTILLATION_ASSOCIATION_NOT_ESTIMABLE",
+)
 JLENS_STATES = (
     "STUDY2_JLENS_VALIDATED",
     "STUDY2_JLENS_PARTIAL",
@@ -113,6 +126,16 @@ OPERATIONAL_BLOCKERS = (
     "BLOCKED_ON_STUDY2_COMMON_OPTION_TOKENIZATION",
     "BLOCKED_ON_STUDY2_MECHANISTIC_TOKEN_SUPPORT",
     "BLOCKED_ON_STUDY2_EXECUTION",
+)
+EXECUTION_BLOCKER_REASONS = (
+    "NONFINITE_OUTPUT",
+    "MISSING_ROW",
+    "HASH_MISMATCH",
+    "HOOK_NOOP_MISMATCH",
+    "SOURCE_IMAGE_MISMATCH",
+    "ARTIFACT_WRITE_FAILURE",
+    "RUNTIME_EXCEPTION",
+    "CAPACITY_UNAVAILABLE",
 )
 
 PROTECTED_ANCHORS = {
@@ -195,6 +218,23 @@ PAIR_TASK_KEYS = frozenset(
         "nt_prompt",
         "prompt_sha256",
         "start_anchor",
+    }
+)
+MANIFEST_KEYS = frozenset(
+    {
+        "schema_version",
+        "status",
+        "generated_by",
+        "protocol_sha256",
+        "files",
+        "role_counts",
+        "semantic_overlap_counts",
+        "protected_prompt_count",
+        "protected_prompt_overlap",
+        "ground_truth_rows_verified",
+        "balance",
+        "seeds",
+        "determinism",
     }
 )
 
@@ -420,6 +460,10 @@ def _require_equal(actual: Any, expected: Any, path: str) -> None:
         raise ProtocolError(f"registered value mismatch at {path}: {actual!r} != {expected!r}")
 
 
+def _is_plain_int(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
 def validate_protocol_semantics(document: Mapping[str, Any]) -> None:
     _require_equal(document["schema_version"], SCHEMA_VERSION, "/schema_version")
     _require_equal(document["study_id"], "study2", "/study_id")
@@ -447,8 +491,23 @@ def validate_protocol_semantics(document: Mapping[str, Any]) -> None:
     _require_equal(split_counts, EXPECTED_ROLE_COUNTS, "/task_design/splits")
 
     _require_equal(tuple(document["classification"]["scientific_states"]), SCIENTIFIC_STATES, "/classification/scientific_states")
+    _require_equal(
+        tuple(document["classification"]["internal_axis_states"]),
+        INTERNAL_AXIS_STATES,
+        "/classification/internal_axis_states",
+    )
+    _require_equal(
+        tuple(document["classification"]["distillation_axis_states"]),
+        DISTILLATION_AXIS_STATES,
+        "/classification/distillation_axis_states",
+    )
     _require_equal(tuple(document["classification"]["jlens_states"]), JLENS_STATES, "/classification/jlens_states")
     _require_equal(tuple(document["classification"]["operational_blockers"]), OPERATIONAL_BLOCKERS, "/classification/operational_blockers")
+    _require_equal(
+        tuple(document["classification"]["execution_blocker_reason_codes"]),
+        EXECUTION_BLOCKER_REASONS,
+        "/classification/execution_blocker_reason_codes",
+    )
     _require_equal(document["metrics"]["bootstrap"]["replicates"], 10_000, "/metrics/bootstrap/replicates")
     _require_equal(document["metrics"]["bootstrap"]["seed"], SEEDS["bootstrap"], "/metrics/bootstrap/seed")
     _require_equal(document["metrics"]["behavior"]["chance"], 0.25, "/metrics/behavior/chance")
@@ -522,7 +581,13 @@ def validate_markdown_crosswalk(path: Path, document: Mapping[str, Any]) -> None
     ):
         if formula not in text:
             raise ProtocolError(f"Markdown omits formula {formula}")
-    for state in SCIENTIFIC_STATES + JLENS_STATES + OPERATIONAL_BLOCKERS:
+    for state in (
+        SCIENTIFIC_STATES
+        + INTERNAL_AXIS_STATES
+        + DISTILLATION_AXIS_STATES
+        + JLENS_STATES
+        + OPERATIONAL_BLOCKERS
+    ):
         if state not in text:
             raise ProtocolError(f"Markdown omits registered state {state}")
     if document["research_question"] not in text:
@@ -600,7 +665,7 @@ def _recompute_states(task: Mapping[str, Any]) -> tuple[list[int], int, int]:
     if len(sequence) != task["depth"] or any(name not in by_name for name in sequence):
         raise ProtocolError("operation sequence/depth mismatch")
     value = task["start_state"]
-    if not isinstance(value, int) or not 0 <= value < size:
+    if not _is_plain_int(value) or not 0 <= value < size:
         raise ProtocolError("invalid start state")
     states: list[int] = []
     for name in sequence:
@@ -718,6 +783,13 @@ def _validate_task_common(task: Mapping[str, Any], *, pair_task: bool) -> None:
         _require_equal(task["schema_version"], TASK_ROW_VERSION, "/schema_version")
         if task["role"] not in {"development", "behavioral_confirmation"}:
             raise ProtocolError("invalid task role")
+        if task["seed"] != SEEDS[task["role"]]:
+            raise ProtocolError("task row seed mismatch")
+        if not _is_plain_int(task["counter"]) or not 0 <= task["counter"] < EXPECTED_CELL_COUNTS[task["role"]]:
+            raise ProtocolError("task row counter mismatch")
+        expected_item_id = f"s2-{task['role']}-{task['family']}-d{task['depth']}-{task['counter'] + 1:04d}"
+        if task["item_id"] != expected_item_id:
+            raise ProtocolError("task row item id mismatch")
     if task["family"] not in FAMILIES or task["depth"] not in DEPTHS or task["template_id"] not in TEMPLATES:
         raise ProtocolError("invalid task cell")
     states, pre_answer, final = _recompute_states(task)
@@ -727,7 +799,11 @@ def _validate_task_common(task: Mapping[str, Any], *, pair_task: bool) -> None:
         "final_state": final,
     }
     _require_equal(task["ground_truth"], expected_truth, "/ground_truth")
-    if len(task["option_values"]) != 4 or len(set(task["option_values"])) != 4:
+    if (
+        len(task["option_values"]) != 4
+        or len(set(task["option_values"])) != 4
+        or any(not _is_plain_int(value) or value not in task["state_space"] for value in task["option_values"])
+    ):
         raise ProtocolError("option values are not four distinct values")
     if set(task["option_mapping"]) != set(LABELS) or list(task["option_mapping"]) != list(LABELS):
         raise ProtocolError("option mapping is not canonical A/B/C/D")
@@ -737,6 +813,8 @@ def _validate_task_common(task: Mapping[str, Any], *, pair_task: bool) -> None:
         raise ProtocolError("correct label mismatch")
     if task["semantic_id"] != _semantic_id(task):
         raise ProtocolError("semantic id mismatch")
+    if not re.fullmatch(r"[0-9a-f]{64}", task["semantic_id"]):
+        raise ProtocolError("semantic id is not a SHA-256 value")
 
     counterfactual = task.get("counterfactual")
     if counterfactual is not None:
@@ -754,6 +832,8 @@ def _validate_task_common(task: Mapping[str, Any], *, pair_task: bool) -> None:
             raise ProtocolError("counterfactual answer is not registered in options")
 
     if pair_task:
+        if not isinstance(task["task_id"], str) or not task["task_id"]:
+            raise ProtocolError("pair task id is empty")
         expected_prompt = independent_render_task(task, "NT")
         if task["nt_prompt"] != expected_prompt or task["prompt_sha256"] != sha256_bytes(expected_prompt.encode("utf-8")):
             raise ProtocolError("pair task prompt/hash mismatch")
@@ -820,6 +900,10 @@ def verify_pair_row(row: Mapping[str, Any]) -> None:
     _require_equal(row["schema_version"], PAIR_ROW_VERSION, "/schema_version")
     if row["role"] not in {"mechanistic_development", "mechanistic_candidate_confirmation"}:
         raise ProtocolError("invalid pair role")
+    if row["seed"] != SEEDS[row["role"]]:
+        raise ProtocolError("pair row seed mismatch")
+    if not _is_plain_int(row["counter"]) or not 0 <= row["counter"] < EXPECTED_CELL_COUNTS[row["role"]]:
+        raise ProtocolError("pair row counter mismatch")
     if row["family"] not in FAMILIES or row["depth"] not in COMPOSITIONAL_DEPTHS or row["template_id"] not in TEMPLATES:
         raise ProtocolError("invalid pair cell")
     if row["state_space"] != list(range(_state_count(row["family"]))):
@@ -1062,7 +1146,14 @@ def verify_task_banks(root: Path, *, require_manifest: bool = True) -> dict[str,
                 if len(cell) != EXPECTED_CELL_COUNTS[role]:
                     raise ProtocolError(f"cell count mismatch for {role}/{family}/d{depth}")
                 balance_report[f"{role}/{family}/d{depth}"] = _validate_cell_balance(cell, pair_rows=pair_rows)
+                counters = [row["counter"] for row in cell]
+                if sorted(counters) != list(range(EXPECTED_CELL_COUNTS[role])):
+                    raise ProtocolError(f"counter closure mismatch for {role}/{family}/d{depth}")
                 if pair_rows:
+                    pair_ids = [row["pair_id"] for row in cell]
+                    pair_semantic_ids = [row["pair_semantic_id"] for row in cell]
+                    if len(pair_ids) != len(set(pair_ids)) or len(pair_semantic_ids) != len(set(pair_semantic_ids)):
+                        raise ProtocolError("mechanistic pair identities are not unique")
                     front = [row for row in cell if row["hash_partition"] == "front"]
                     back = [row for row in cell if row["hash_partition"] == "back"]
                     if len(front) != 128 or len(back) != 128:
@@ -1088,11 +1179,22 @@ def verify_task_banks(root: Path, *, require_manifest: bool = True) -> dict[str,
 
     manifest_report: dict[str, Any] | None = None
     if require_manifest:
-        manifest = load_json(data_root / "task_bank_manifest.json")
+        manifest_path = data_root / "task_bank_manifest.json"
+        manifest = load_json(manifest_path)
+        if not isinstance(manifest, dict) or set(manifest) != MANIFEST_KEYS:
+            raise ProtocolError("task-bank manifest is not a closed object")
         if manifest.get("schema_version") != MANIFEST_VERSION:
             raise ProtocolError("task-bank manifest schema mismatch")
-        if manifest.get("status") not in {"CANDIDATE_MODEL_FREE_BANKS", "FROZEN_MODEL_FREE_BANKS"}:
-            raise ProtocolError("task-bank manifest has an unregistered lifecycle status")
+        protocol_path = root / "studies/study2/protocol/reasoning_internalization_protocol.json"
+        protocol_document = load_json(protocol_path)
+        expected_status = (
+            "CANDIDATE_MODEL_FREE_BANKS"
+            if protocol_document["status"] == "CANDIDATE_AWAITING_REVIEW"
+            else "FROZEN_MODEL_FREE_BANKS"
+        )
+        _require_equal(manifest["status"], expected_status, "/status")
+        _require_equal(manifest["generated_by"], "src/jspace_observation/study2_task_bank.py", "/generated_by")
+        _require_equal(manifest["protocol_sha256"], sha256_file(protocol_path), "/protocol_sha256")
         expected_files: dict[str, Any] = {}
         for role, filename in BANK_FILES.items():
             path = data_root / filename
@@ -1103,10 +1205,25 @@ def verify_task_banks(root: Path, *, require_manifest: bool = True) -> dict[str,
                 "sha256": sha256_file(path),
             }
         _require_equal(manifest["files"], expected_files, "/files")
+        _require_equal(manifest["role_counts"], {role: len(rows) for role, rows in role_rows.items()}, "/role_counts")
         _require_equal(manifest["semantic_overlap_counts"], overlaps, "/semantic_overlap_counts")
+        _require_equal(manifest["protected_prompt_count"], len(protected), "/protected_prompt_count")
         _require_equal(manifest["protected_prompt_overlap"], {"exact": 0, "normalized": 0}, "/protected_prompt_overlap")
         _require_equal(manifest["ground_truth_rows_verified"], sum(EXPECTED_ROLE_COUNTS.values()), "/ground_truth_rows_verified")
         _require_equal(manifest["balance"], balance_report, "/balance")
+        _require_equal(manifest["seeds"], SEEDS, "/seeds")
+        _require_equal(
+            manifest["determinism"],
+            {
+                "algorithm": "sha256_counter_mode_with_rejection_randbelow",
+                "python_hash_used": False,
+                "rng_state_used": False,
+                "manifest_written_last": True,
+            },
+            "/determinism",
+        )
+        if manifest_path.read_bytes() != canonical_json_bytes(manifest):
+            raise ProtocolError("task-bank manifest is not canonical JSON")
         manifest_report = manifest
 
     return {
@@ -1163,11 +1280,107 @@ def finite_quantile(values: Sequence[float], probability: float) -> float:
     return ordered[lower] * (1 - fraction) + ordered[upper] * fraction
 
 
+def trace_effects(
+    *,
+    nt_correct_probability: float,
+    pt_correct_probability: float,
+    nt_counterfactual_probability: float,
+    wt_counterfactual_probability: float,
+    st_correct_probability: float | None = None,
+) -> dict[str, float | None]:
+    values = [
+        nt_correct_probability,
+        pt_correct_probability,
+        nt_counterfactual_probability,
+        wt_counterfactual_probability,
+    ]
+    if st_correct_probability is not None:
+        values.append(st_correct_probability)
+    if any(not math.isfinite(value) or not 0 <= value <= 1 for value in values):
+        raise ProtocolError("trace effects require finite probabilities in [0,1]")
+    return {
+        "TRACE_GAIN": pt_correct_probability - nt_correct_probability,
+        "WRONG_TRACE_PULL": wt_counterfactual_probability - nt_counterfactual_probability,
+        "SHUFFLE_DAMAGE": (
+            None
+            if st_correct_probability is None
+            else pt_correct_probability - st_correct_probability
+        ),
+    }
+
+
+def _bootstrap_index(*, seed: str, domain: str, replicate: int, draw: int, upper: int) -> int:
+    if upper <= 0 or replicate < 0 or draw < 0 or not seed or not domain:
+        raise ProtocolError("invalid deterministic bootstrap index inputs")
+    ceiling = 1 << 256
+    limit = ceiling - ceiling % upper
+    attempt = 0
+    while True:
+        payload = "\x1f".join((seed, domain, str(replicate), str(draw), str(attempt))).encode("utf-8")
+        value = int.from_bytes(hashlib.sha256(payload).digest(), "big")
+        if value < limit:
+            return value % upper
+        attempt += 1
+
+
+def paired_bootstrap_mean_differences(
+    left: Sequence[float],
+    right: Sequence[float],
+    *,
+    seed: str,
+    domain: str,
+    replicates: int = 10_000,
+) -> list[float]:
+    if len(left) != len(right) or not left or replicates <= 0:
+        raise ProtocolError("paired bootstrap requires equal nonempty pairs and positive replicates")
+    differences = [left_value - right_value for left_value, right_value in zip(left, right)]
+    if any(not math.isfinite(value) for value in differences):
+        raise ProtocolError("paired bootstrap differences must be finite")
+    return [
+        sum(
+            differences[
+                _bootstrap_index(
+                    seed=seed,
+                    domain=domain,
+                    replicate=replicate,
+                    draw=draw,
+                    upper=len(differences),
+                )
+            ]
+            for draw in range(len(differences))
+        )
+        / len(differences)
+        for replicate in range(replicates)
+    ]
+
+
 def nt_pass(*, n: int, correct: int, margin_lower95: float, integrity_complete: bool, balance_ok: bool) -> bool:
     if n != 256 or not integrity_complete or not balance_ok:
         return False
     lower, _ = wilson_interval(correct, n)
     return correct / n >= 0.50 and lower > 0.25 and margin_lower95 > 0
+
+
+def pt_support(
+    *,
+    depth: int,
+    n: int,
+    correct: int,
+    trace_gain_lower95: float,
+    wrong_trace_pull_lower95: float,
+    shuffle_damage_lower95: float | None,
+    integrity_complete: bool,
+) -> bool:
+    if depth not in COMPOSITIONAL_DEPTHS or n != 256 or not integrity_complete:
+        return False
+    lower, _ = wilson_interval(correct, n)
+    common = (
+        correct / n >= 0.50
+        and lower > 0.25
+        and trace_gain_lower95 > 0
+        and wrong_trace_pull_lower95 > 0
+    )
+    return common and (depth == 2 or (shuffle_damage_lower95 is not None and shuffle_damage_lower95 > 0))
 
 
 def select_mechanistic_depth(depth2_pass: bool, depth3_pass: bool) -> int | None:
@@ -1223,6 +1436,10 @@ def classify_composite(
 ) -> str:
     if internal_families not in {0, 1, 2} or nt_compositional_families not in {0, 1, 2} or pt_support_families not in {0, 1, 2}:
         raise ProtocolError("classification family counts must be 0, 1, or 2")
+    if internal_families > nt_compositional_families:
+        raise ProtocolError("internal support cannot exceed compositional NT support")
+    if distillation_stronger_than_both and internal_families != 2:
+        raise ProtocolError("distillation association requires two-family internal support")
     if not operationally_complete or not integrity_ok:
         return "STUDY2_RESULT_NOT_ESTIMABLE"
     if internal_families == 2:
@@ -1242,10 +1459,31 @@ def classify_composite(
     return "STUDY2_TASK_INTERFACE_UNQUALIFIED"
 
 
+def classify_distillation(
+    *,
+    operationally_complete: bool,
+    target_internal_supported: bool,
+    stronger_than_both: bool,
+    contradicted: bool,
+) -> str:
+    if stronger_than_both and contradicted:
+        raise ProtocolError("distillation comparison cannot be both stronger and contradicted")
+    if not operationally_complete or not target_internal_supported:
+        return "DISTILLATION_ASSOCIATION_NOT_ESTIMABLE"
+    if stronger_than_both:
+        return DISTILLATION_AXIS_STATES[0]
+    if contradicted:
+        return DISTILLATION_AXIS_STATES[2]
+    return DISTILLATION_AXIS_STATES[1]
+
+
 def validate_blocker(state: str, blocker_reason: str | None = None) -> None:
     if state not in OPERATIONAL_BLOCKERS:
         raise ProtocolError("unregistered operational blocker")
-    if state == "BLOCKED_ON_STUDY2_EXECUTION" and (blocker_reason is None or not blocker_reason.strip()):
-        raise ProtocolError("execution blocker requires a nonempty registered reason")
+    if state == "BLOCKED_ON_STUDY2_EXECUTION":
+        if blocker_reason not in EXECUTION_BLOCKER_REASONS:
+            raise ProtocolError("execution blocker requires a registered reason")
+    elif blocker_reason is not None:
+        raise ProtocolError("only the execution blocker accepts a reason code")
     if state in SCIENTIFIC_STATES:
         raise ProtocolError("operational blocker cannot be a scientific state")

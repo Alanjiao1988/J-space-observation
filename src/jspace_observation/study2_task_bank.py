@@ -140,10 +140,13 @@ def _primitive(
     desired_pre_answer: int,
     desired_final: int,
     domain: Sequence[object],
+    require_distinct_trace_states: bool = False,
 ) -> dict[str, Any]:
     for attempt in range(1_000_000):
         operators = _sample_operators(seed, family, *domain, attempt)
         states, pre_answer, final = _evaluate(operators, start, sequence, family)
+        if require_distinct_trace_states and len(set(states[:-1])) != len(states[:-1]):
+            continue
         if pre_answer == desired_pre_answer and final == desired_final:
             return {
                 "family": family,
@@ -323,12 +326,23 @@ def _behavioral_row(role: str, family: str, depth: int, index: int) -> dict[str,
         desired_pre_answer=desired_pre,
         desired_final=desired_final,
         domain=(role, family, depth, index, "primary"),
+        require_distinct_trace_states=depth == 3,
     )
     counterfactual, implied = _counterfactual(primitive, seed, role, family, depth, index)
     other_states = [value for value in primitive["state_space"] if value not in {desired_final, implied}]
     extras = _hash_order(other_states, seed, role, family, depth, index, "distractors")[:2]
     option_values = sorted([desired_final, implied, *extras])
-    mapping = _option_mapping(option_values, desired_final, label, seed, role, family, depth, index)
+    mapping = _option_mapping(
+        option_values,
+        desired_final,
+        label,
+        protocol.SEEDS["option_permutation"],
+        seed,
+        role,
+        family,
+        depth,
+        index,
+    )
     counterfactual["implied_label"] = next(key for key, value in mapping.items() if value == implied)
     task: dict[str, Any] = {
         **{key: value for key, value in primitive.items() if key != "attempt"},
@@ -437,18 +451,19 @@ def _pair_payload(row: Mapping[str, Any]) -> dict[str, Any]:
 def _candidate_pair(role: str, family: str, depth: int, local_index: int, partition: str) -> dict[str, Any]:
     seed = protocol.SEEDS[role]
     size = 8 if family == "permutation_chain" else 10
-    label = protocol.LABELS[local_index % 4]
-    template_id = _template(local_index)
-    m_r = _balanced_value(local_index, size, 2)
-    a_r = _balanced_value(local_index, size, 4)
-    start_r = _balanced_value(local_index, size, 0)
-    seq_r = _sequence(local_index, depth, 0)
-    m_d = (m_r + 1 + ((local_index // size) % (size - 1))) % size
+    balance_index = local_index + (0 if partition == "front" else 128)
+    label = protocol.LABELS[balance_index % 4]
+    template_id = _template(balance_index)
+    m_r = _balanced_value(balance_index, size, 2)
+    a_r = _balanced_value(balance_index, size, 4)
+    start_r = _balanced_value(balance_index, size, 0)
+    seq_r = _sequence(balance_index, depth, 0)
+    m_d = (m_r + 1 + ((balance_index // size) % (size - 1))) % size
     if m_d == m_r:  # pragma: no cover - construction makes this impossible
         raise AssertionError("donor and recipient intermediate collided")
 
     for pair_attempt in range(1_000_000):
-        prefix = (role, family, depth, partition, local_index, pair_attempt)
+        prefix = (role, family, depth, partition, balance_index, pair_attempt)
         recipient_primitive = _primitive(
             seed=seed,
             family=family,
@@ -471,8 +486,8 @@ def _candidate_pair(role: str, family: str, depth: int, local_index: int, partit
             seed=seed,
             family=family,
             depth=depth,
-            start=_balanced_value(local_index, size, 1),
-            sequence=_sequence(local_index, depth, 1),
+            start=_balanced_value(balance_index, size, 1),
+            sequence=_sequence(balance_index, depth, 1),
             desired_pre_answer=m_d,
             desired_final=a_d,
             domain=(*prefix, "donor"),
@@ -481,21 +496,21 @@ def _candidate_pair(role: str, family: str, depth: int, local_index: int, partit
             seed=seed,
             family=family,
             depth=depth,
-            start=_balanced_value(local_index, size, 3),
-            sequence=_sequence(local_index, depth, 2),
+            start=_balanced_value(balance_index, size, 3),
+            sequence=_sequence(balance_index, depth, 2),
             desired_pre_answer=m_r,
             desired_final=distractor,
             domain=(*prefix, "same-intermediate"),
         )
-        same_answer_m = (m_r + 2 + ((local_index // 3) % (size - 1))) % size
+        same_answer_m = (m_r + 2 + ((balance_index // 3) % (size - 1))) % size
         if same_answer_m == m_r:
             same_answer_m = (same_answer_m + 1) % size
         same_answer_primitive = _primitive(
             seed=seed,
             family=family,
             depth=depth,
-            start=_balanced_value(local_index, size, 5),
-            sequence=_sequence(local_index, depth, 3),
+            start=_balanced_value(balance_index, size, 5),
+            sequence=_sequence(balance_index, depth, 3),
             desired_pre_answer=same_answer_m,
             desired_final=a_r,
             domain=(*prefix, "same-answer"),
@@ -510,8 +525,16 @@ def _candidate_pair(role: str, family: str, depth: int, local_index: int, partit
             forbidden_answer=a_r,
             domain=(*prefix, "random"),
         )
-        mapping = _option_mapping(option_values, a_r, label, seed, *prefix, "pair-options")
-        base_id = f"s2-{role}-{family}-d{depth}-{partition}-{local_index + 1:04d}"
+        mapping = _option_mapping(
+            option_values,
+            a_r,
+            label,
+            protocol.SEEDS["option_permutation"],
+            seed,
+            *prefix,
+            "pair-options",
+        )
+        base_id = f"s2-{role}-{family}-d{depth}-{partition}-{balance_index + 1:04d}"
         recipient = _pair_task(recipient_primitive, task_id=f"{base_id}:recipient", template_id=template_id, option_values=option_values, mapping=mapping)
         donor = _pair_task(donor_primitive, task_id=f"{base_id}:donor", template_id=template_id, option_values=option_values, mapping=mapping)
         same_intermediate = _pair_task(same_intermediate_primitive, task_id=f"{base_id}:same-intermediate", template_id=template_id, option_values=option_values, mapping=mapping)
@@ -529,7 +552,7 @@ def _candidate_pair(role: str, family: str, depth: int, local_index: int, partit
             "depth": depth,
             "template_id": template_id,
             "seed": seed,
-            "counter": local_index + (0 if partition == "front" else 128),
+            "counter": balance_index,
             "hash_partition": partition,
             "state_space": list(range(size)),
             "option_values": option_values,

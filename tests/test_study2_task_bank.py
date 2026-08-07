@@ -38,6 +38,8 @@ def test_exact_role_and_cell_counts(report: dict) -> None:
 
 def test_manifest_hashes_bytes_counts_and_manifest_last_claim(report: dict) -> None:
     manifest = report["manifest"]
+    assert set(manifest) == s2.MANIFEST_KEYS
+    assert (DATA / "task_bank_manifest.json").read_bytes() == s2.canonical_json_bytes(manifest)
     assert manifest["schema_version"] == s2.MANIFEST_VERSION
     assert manifest["status"] in {"CANDIDATE_MODEL_FREE_BANKS", "FROZEN_MODEL_FREE_BANKS"}
     assert manifest["determinism"] == {
@@ -62,6 +64,9 @@ def test_every_task_ground_truth_trace_and_prompt_is_independently_recomputed() 
             if row["depth"] >= 2:
                 assert row["counterfactual"]["implied_final_state"] in row["option_values"]
                 assert row["counterfactual"]["implied_final_state"] != row["ground_truth"]["final_state"]
+            if row["depth"] == 3:
+                assert row["ground_truth"]["intermediate_states"][0] != row["ground_truth"]["intermediate_states"][1]
+                assert row["prompts"]["PT"] != row["prompts"]["ST"]
 
 
 def test_every_pair_recombination_and_control_is_independently_recomputed() -> None:
@@ -89,6 +94,14 @@ def test_balance_tables_are_exact_and_all_registered_spreads_are_at_most_one(rep
         for field_table in row["conditional_label_tables"].values():
             for label_counts in field_table.values():
                 assert max(label_counts.values()) - min(label_counts.values()) <= 1
+    for role, filename in s2.BANK_FILES.items():
+        pair_rows = role.startswith("mechanistic")
+        depths = s2.COMPOSITIONAL_DEPTHS if pair_rows else s2.DEPTHS
+        rows = s2.load_jsonl(DATA / filename)
+        for family in s2.FAMILIES:
+            for depth in depths:
+                counters = sorted(row["counter"] for row in rows if row["family"] == family and row["depth"] == depth)
+                assert counters == list(range(s2.EXPECTED_CELL_COUNTS[role]))
 
 
 def test_mechanistic_hash_order_has_balanced_front_128_and_back_128() -> None:
@@ -140,6 +153,7 @@ def test_generator_uses_sha256_counter_mode_not_python_random_or_hash() -> None:
     assert "random" not in imported
     assert "hash" not in calls
     assert "hashlib.sha256" in source
+    assert 'protocol.SEEDS["option_permutation"]' in source
     assert s2.SEEDS == s2.load_json(ROOT / "studies/study2/protocol/reasoning_internalization_protocol.json")["task_design"]["seeds"]
 
 

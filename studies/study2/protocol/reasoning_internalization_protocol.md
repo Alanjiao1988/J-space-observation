@@ -184,7 +184,10 @@ Behavior resamples semantic items inside family × depth while retaining model,
 template, and arm pairing. Mechanism resamples pairs after equal averaging over
 the three window layers. The 2.5th and 97.5th percentiles use linear
 interpolation at `(n-1)*p`. A maximum comparator is recomputed inside each
-replicate before its quantile.
+replicate before its quantile. Units are ordered by semantic item or pair ID.
+For replicate `r` and draw `d`, rejection sampling maps
+`SHA-256(seed || US || domain || US || r || US || d || US || attempt)` to the
+ordered unit index, where `US` is byte `0x1f`.
 
 ## Cell and layer selection
 
@@ -288,7 +291,16 @@ Operational states are `BLOCKED_ON_STUDY2_STARTING_STATE_INTEGRITY`,
 `BLOCKED_ON_STUDY2_COMMON_OPTION_TOKENIZATION`,
 `BLOCKED_ON_STUDY2_MECHANISTIC_TOKEN_SUPPORT`, and
 `BLOCKED_ON_STUDY2_EXECUTION`. The last requires one nonempty reason from the
-closed JSON enum. No operational blocker is a scientific negative, and no
+closed JSON enum. The registered distillation-axis states are
+`DISTILLATION_ASSOCIATION_STRONGER_THAN_BOTH_CONTROLS`,
+`DISTILLATION_ASSOCIATION_NOT_DISTINGUISHED`,
+`DISTILLATION_ASSOCIATION_CONTRADICTED`, and
+`DISTILLATION_ASSOCIATION_NOT_ESTIMABLE`. The registered internal-axis names are
+`INTERNAL_COMPUTATION_SUPPORTED`,
+`INTERNAL_COMPUTATION_SUPPORTED_ONE_FAMILY`,
+`BEHAVIOR_ONLY_WITHOUT_CAUSAL_SUPPORT`,
+`NO_COMPOSITIONAL_BEHAVIORAL_SUPPORT`, and `NOT_ESTIMABLE`. No operational
+blocker is a scientific negative, and no
 complete negative may be repaired by another task, template, threshold,
 alphabet, layer search, or replacement bank.
 
