@@ -178,6 +178,8 @@ def test_the_committed_record_is_the_hash_of_the_committed_source(tmp_path):
         "src/jspace_observation/jlens_s2_runtime.py",
         "src/jspace_observation/jlens_s3_e0_runtime.py",
         "src/jspace_observation/jlens_s3_protocol.py",
+        "src/jspace_observation/study2_protocol.py",
+        "src/jspace_observation/study2_task_bank.py",
     }
     expected_file_failures = {
         f"image carries an unrecorded file: {path}"
