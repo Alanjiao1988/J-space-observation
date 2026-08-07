@@ -173,12 +173,14 @@ def test_production_attempt_manifest_binds_failed_progress_to_exact_resume() -> 
     }
     manifest = {
         "attempts": attempts,
+        "checkpoint_every": 8,
         "fit_image_digest": "sha256:" + "2" * 64,
         "fit_source_commit": "1" * 40,
+        "maximum_possible_recomputed_sequences": 7,
         "production_plan_sha256": "3" * 64,
+        "recomputation_status": "unknown_due_to_uncheckpointed_suffix",
         "run_id": "run",
         "schema_version": "jlens-s2-production-attempts/v1",
-        "sequence_recomputed": False,
         "successful_shards": {"A-001-064": reference},
     }
     report = runtime.validate_production_attempt_manifest(
@@ -197,7 +199,8 @@ def test_production_attempt_manifest_binds_failed_progress_to_exact_resume() -> 
         production_plan_sha256="3" * 64,
     )
     assert report["partial_attempt_count"] == 1
-    assert report["sequence_recomputed"] is False
+    assert report["maximum_possible_recomputed_sequences"] == 7
+    assert report["recomputation_status"] == "unknown_due_to_uncheckpointed_suffix"
     changed = json.loads(json.dumps(manifest))
     changed["attempts"][1]["resume_source"]["checkpoint_sha256"] = "c" * 64
     with pytest.raises(runtime.S2RuntimeError, match="resume manifest"):

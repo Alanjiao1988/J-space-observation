@@ -934,12 +934,14 @@ def validate_production_attempt_manifest(
 ) -> dict[str, Any]:
     required = {
         "attempts",
+        "checkpoint_every",
         "fit_image_digest",
         "fit_source_commit",
+        "maximum_possible_recomputed_sequences",
         "production_plan_sha256",
+        "recomputation_status",
         "run_id",
         "schema_version",
-        "sequence_recomputed",
         "successful_shards",
     }
     if set(manifest) != required:
@@ -950,7 +952,9 @@ def validate_production_attempt_manifest(
         or manifest["fit_image_digest"] != expected_fit_image_digest
         or manifest["production_plan_sha256"] != production_plan_sha256
         or manifest["run_id"] != production_plan["run_id"]
-        or manifest["sequence_recomputed"] is not False
+        or manifest["checkpoint_every"] != CHECKPOINT_EVERY
+        or manifest["recomputation_status"]
+        not in {"none", "unknown_due_to_uncheckpointed_suffix"}
     ):
         raise S2RuntimeError("production attempt manifest identity mismatch")
     expected_shards = {
@@ -1108,13 +1112,25 @@ def validate_production_attempt_manifest(
             raise S2RuntimeError(
                 "failed progress is not consumed by an exact later resume"
             )
+    maximum_possible = len(failed_with_progress) * (CHECKPOINT_EVERY - 1)
+    expected_status = (
+        "unknown_due_to_uncheckpointed_suffix"
+        if maximum_possible
+        else "none"
+    )
+    if (
+        manifest["maximum_possible_recomputed_sequences"] != maximum_possible
+        or manifest["recomputation_status"] != expected_status
+    ):
+        raise S2RuntimeError("production recomputation disclosure is invalid")
     return {
         "attempt_count": len(attempts),
         "failed_attempt_count": sum(
             attempt["status"] == "infrastructure_failed" for attempt in attempts
         ),
         "partial_attempt_count": len(failed_with_progress),
-        "sequence_recomputed": False,
+        "maximum_possible_recomputed_sequences": maximum_possible,
+        "recomputation_status": expected_status,
         "successful_shard_count": len(successes),
     }
 
