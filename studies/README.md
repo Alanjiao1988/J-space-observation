@@ -10,7 +10,16 @@ model operations.
 |---|---|---|---|
 | [Study 1](study1/README.md) | Original J-space observation program, including Phase 0.5, Phase 1, S2 and frozen S3 E0 | `CLOSED` | `INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY`; original question not tested |
 | [Study 2](study2/README.md) | Single-forward behavioral and causal test of task-defined intermediate computation with base and instruction controls | `CLOSED` | `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`; the pre-registered development feasibility gate failed, the original question was not answered, and no mechanistic stage was ever opened |
-| [Study 3](study3/README.md) | Interface adequacy and label-binding calibration: whether a pre-specified response and scoring interface can recover deliberately trivial and primitive competence robustly across label permutations, option positions and renderings | `DESIGN DRAFT` | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW`; nothing frozen, nothing authorized, zero model operations, no bank, no seed, no interface selected |
+| [Study 3](study3/README.md) | Interface adequacy and label-binding calibration: whether a pre-specified response and scoring interface can recover deliberately trivial and primitive competence robustly across label permutations, option positions and renderings | `DESIGN DRAFT v0.2` | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW`; nothing frozen, nothing authorized, all 22 operation counters zero, no bank, no seed, no interface selected, no positive reference selected |
+
+Study 3's draft-v0.1 was reviewed by the operator, found to contain ten design
+defects, and refused freeze under
+`STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`.
+draft-v0.2 is the amendment; the defects and their resolutions are recorded in
+[`study3/reviews/v0_1_operator_review.md`](study3/reviews/v0_1_operator_review.md).
+In draft-v0.2 the JSON protocol document is authoritative and the Markdown is a
+companion rendering of it, and the design-critical checks are committed
+artifacts rather than ephemeral scripts.
 
 ## Cross-study rule
 

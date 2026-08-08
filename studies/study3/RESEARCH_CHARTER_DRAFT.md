@@ -7,7 +7,8 @@
 | study id | `jspace-study3-interface-calibration` |
 | name | Study 3 - Interface Adequacy and Label-Binding Calibration |
 | namespace | `studies/study3` |
-| state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW` |
+| state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW` |
+| draft version | `draft-v0.2` |
 | frozen | no |
 | execution authorized | no |
 | operations performed | zero |
@@ -15,6 +16,12 @@
 This charter is a draft. It is deliberately **not** named `RESEARCH_CHARTER.md`, because that name
 is reserved in this repository for frozen, protected documents. Nothing in this file may be cited
 as a commitment until an operator reviews it, amends it, and freezes it under a separate authority.
+
+**Amendment history.** draft-v0.1 was reviewed by the operator, who recorded ten design defects and
+refused freeze under `STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`.
+draft-v0.2 is the resulting amendment. The defects and their resolutions are in
+`reviews/v0_1_operator_review.md`. The amendment changed the design; it did not perform any
+measurement, and it did not close any blocking decision.
 
 ---
 
@@ -64,12 +71,19 @@ is out of protocol regardless of what the numbers say.
 3. **Robustness as equivalence.** A reading that moves when only an irrelevant transformation
    changes is not measuring the intended quantity. Demonstrating robustness requires an interval
    inside a pre-specified margin, never a failure to detect a difference.
-4. **Multiple surfaces, never pooled.** Four candidate families are compared per cell. Their
-   disagreement is diagnostic information, not noise to be averaged away.
-5. **One-way selection, then a hard stop.** The surface is chosen on development data only, the
-   choice is published, and confirmation needs a separate operator authority.
+4. **Multiple surfaces, never pooled.** Four interface profiles are compared per atomic cell. Their
+   disagreement is diagnostic information, not noise to be averaged away. Pooling may never be used
+   to rescue a failing cell.
+5. **Admissibility is ordered in advance, not selected from data.** The order is published before
+   any observation and may not be reordered afterwards. One profile is `never_selectable` by
+   construction. Confirmation needs a separate operator authority.
 6. **Ground truth is computed, never parsed.** The Study 1 failure mode is structurally excluded.
 7. **A claim ceiling fixed in advance, in both directions.**
+8. **Not applicable is a third value.** A transformation with no referent for a profile is recorded
+   `not_applicable`, which is neither a pass nor a zero effect and may never be averaged into a rate.
+9. **Every design-critical check is committed.** The statistical derivation is a committed script and
+   the design invariants are a committed test with a negative-mutation battery. An ephemeral checker
+   that is not committed cannot be relied on, and in draft-v0.1 one such checker missed a defect.
 
 ## 5. Claim ceiling
 
@@ -97,8 +111,10 @@ parser. It inherits no data, no bank, no seed, no item identity, and no result.
 
 ## 7. What has and has not happened
 
-**Has happened.** A design draft was written, statistical tables were derived by model-free
-arithmetic, and six primary sources were consulted and cited.
+**Has happened.** A design draft was written and then amended after operator review; statistical
+tables were derived by model-free arithmetic in a committed script; design invariants were expressed
+as a committed test; and primary sources were consulted and cited, including the paired-equivalence
+methods literature and the model cards behind the positive-reference dossier.
 
 **Has not happened.** No model was downloaded, loaded or tokenized. No forward pass, no generation,
 no activation extraction, no probe, no patch, no ablation, no lens operation, and no GPU job was
@@ -108,21 +124,37 @@ selected.
 ## 8. Open decisions before any freeze
 
 Eight decisions remain open and are listed with recommendations and trade-offs in
-`NEXT_THREAD_HANDOFF.md`. Three block progress: the positive-reference model (`OD2`, which blocks
-Gate `I4`), the thresholds (`OD5`), and the sample sizes (`OD6`).
+`NEXT_THREAD_HANDOFF.md`. Three block progress: the positive reference (`OD2`, which blocks Gate
+`I4`), the thresholds (`OD5`), and the sample sizes (`OD6`).
+
+The v0.2 amendment strengthened the basis for answering them without answering any of them. In
+particular the committed derivation shows that the sample size draft-v0.1 proposed does not support
+the aggregate equivalence margin it asserted, at any discordance rate tested, which is why `OD6`
+remains blocking rather than being quietly resolved in the drafting party's favour.
+
+The legal next action is a **bounded independent methods review**; the packet for it is
+`analysis/independent_methods_review_packet.md`.
 
 ## 9. Governing documents
 
 | document | purpose |
 | --- | --- |
-| `protocol/interface_calibration_protocol_draft.md` | the full design draft |
-| `protocol/interface_calibration_protocol_draft.json` | machine-readable twin |
+| `protocol/interface_calibration_protocol_draft.json` | **authoritative** machine-readable design |
+| `protocol/interface_calibration_protocol_draft.md` | companion rendering of the authoritative JSON |
 | `protocol/interface_calibration_protocol.schema.json` | fail-closed structural schema |
+| `reviews/v0_1_operator_review.md` | the ten draft-v0.1 defects and their resolutions |
+| `analysis/design_statistics.py` | committed model-free derivation of every proposed number |
+| `analysis/design_statistics_tables.json` | the derived tables the draft quotes |
+| `analysis/independent_methods_review_packet.md` | bounded packet for the independent reviewer |
 | `analysis/study2_to_study3_design_traceability.md` | what came from Study 2 and with what authority |
 | `references/methods_sources.md` | primary sources |
+| `references/positive_reference_dossier.md` | candidate evaluation for `OD2`; selects nothing |
+| `tests/test_study3_design.py` | committed design invariants and negative mutations |
 | `NEXT_THREAD_HANDOFF.md` | operator decisions and the legal next action |
-| `design_receipt.json` | cryptographic binding of this design round |
-| `prompts/study3_interface_calibration_design_authority.md` | the operator authority, verbatim |
+| `design_receipt.json` | cryptographic binding of the draft-v0.1 round |
+| `design_receipt_v0_2.json` | cryptographic binding of the draft-v0.2 amendment round |
+| `prompts/study3_interface_calibration_design_authority.md` | the v0.1 operator authority, verbatim |
+| `prompts/study3_v0_2_design_amendment_authority.md` | the v0.2 amendment authority, verbatim |
 
 ---
 

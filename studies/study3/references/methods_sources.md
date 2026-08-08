@@ -197,3 +197,121 @@ perform well here. In this repository MCSB is an open question, not a background
 - It does not license any claim about reasoning, chain-of-thought internalization, distillation, or
   mechanistic interpretability. Every source above is about measurement instruments, which is
   exactly and only what Study 3 is about.
+
+---
+
+## Statistical-methods sources added in draft-v0.2
+
+The draft-v0.1 review found that the paired equivalence criterion was named
+without an executable definition or any verified type-I/power behaviour. The two
+sources below are the primary methods literature for that criterion. They were
+retrieved from their publisher records; the bibliographic fields were read from
+those records rather than from a secondary summary.
+
+### S-07 - Score-based equivalence for paired proportions
+
+- **Title.** Equivalence Test and Confidence Interval for the Difference in
+  Proportions for the Paired-Sample Design
+- **Author.** Toshiro Tango
+- **Venue.** Statistics in Medicine 17(8):891-908, 1998
+- **PMID.** 9595618
+
+**Methodological point taken.** Tango gives a score-based one-sided equivalence
+test and a matching score-based confidence interval for the difference in
+proportions from paired binary data. The procedure is defined through the
+restricted maximum-likelihood estimate of the discordant cell probability under
+the null difference, which makes it executable rather than merely named. McNemar's
+test is the special case at a zero-difference null, and the procedure remains
+defined when an off-diagonal cell is zero. The reported Monte Carlo work finds
+empirical type-I error closer to nominal, and better interval coverage, than four
+previously published alternatives.
+
+**How Study 3 uses it.** This is the named executable method behind the I3
+secondary aggregate-equivalence criterion. It is implemented in
+`studies/study3/analysis/design_statistics.py`, and its reduction to McNemar at a
+zero-difference null is used there as a closed-form correctness proof rather than
+a numerical opinion. The committed script fails closed if that reduction, the
+restricted MLE, or the normal-quantile routine does not reproduce.
+
+**Limitation of application.** The procedure is asymptotic. Exact enumeration of
+the trinomial sampling distribution shows one configuration in the committed
+sensitivity grid whose realised one-sided level is 0.025501 against a nominal
+0.025. That exceedance is disclosed in the methods-review packet and is an
+unresolved item for the independent reviewer; it is not absorbed.
+
+### S-08 - Equivalence and non-inferiority tests for paired binary data
+
+- **Title.** Tests for equivalence or non-inferiority for paired binary data
+- **Authors.** Jen-Pei Liu, Huey-Miin Hsueh, Eric Hsieh, James J. Chen
+- **Venue.** Statistics in Medicine 21(2):231-245, 2002
+- **PMID.** 11782062
+
+**Methodological point taken.** The authors compare Wald-type statistics based on
+the sample estimate with statistics based on the restricted maximum-likelihood
+estimate, and derive the corresponding sample-size and power functions. The
+restricted-MLE form controls the type-I error rate better, and performs well at
+the boundary of a zero difference without a continuity correction. The paper
+reports that a symmetric equivalence limit of 0.15 needs a minimum sample size of
+about 120 pairs.
+
+**How Study 3 uses it.** It corroborates the choice of a restricted-MLE score
+form over a Wald form, and it independently frames the sample-size question that
+Study 3's own exact enumeration answers for this design's margins. The published
+minimum sample size is *not* imported as a Study 3 threshold; every number in the
+Study 3 tables is recomputed from first principles by the committed script.
+
+**Limitation of application.** The published sample sizes assume the equivalence
+limits and discordance rates of that paper's examples. They are not transferable
+to this design, which is precisely why the committed script enumerates the
+sensitivity grid rather than citing a number.
+
+---
+
+## Positive-reference candidate sources added in draft-v0.2
+
+These entries record the primary material behind the positive-reference dossier
+at `studies/study3/references/positive_reference_dossier.md`. **No model is
+selected, pinned, downloaded, tokenized or loaded by recording them.** OD2 remains
+blocking.
+
+### S-09 - Qwen3-4B-Instruct-2507 model card
+
+- **URL.** https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507
+- **License read from the repository metadata.** apache-2.0
+- **Stated architecture.** 4.0B total parameters, 3.6B non-embedding, 36 layers,
+  grouped-query attention with 32 query heads and 8 key/value heads, 262144
+  native context length.
+- **Stated behaviour.** Non-thinking mode only; the card states that the model
+  does not generate thinking blocks and that a thinking switch is no longer
+  required in the chat template.
+- **Stated runtime requirement.** transformers >= 4.51.0.
+
+### S-10 - Qwen3 technical report
+
+- **URL.** https://arxiv.org/abs/2505.09388
+- **Point taken.** The report describes the Qwen3 family across dense and
+  mixture-of-expert variants and documents the unified thinking / non-thinking
+  design and multilingual coverage. It is the primary description of the family
+  the recommended candidate belongs to.
+
+### S-11 - Qwen2.5-Math-7B-Instruct model card
+
+- **URL.** https://huggingface.co/Qwen/Qwen2.5-Math-7B-Instruct
+- **License read from the repository metadata.** apache-2.0
+- **Stated runtime requirement.** transformers >= 4.37.0.
+- **Stated scope warning.** The card states the model mainly supports solving
+  English and Chinese mathematics problems through chain-of-thought and
+  tool-integrated reasoning, and does not recommend it for other tasks.
+
+### S-12 - Qwen2.5-Math release note
+
+- **URL.** https://qwenlm.github.io/blog/qwen2.5-math/
+- **Point taken.** The release note is the primary source for the family's
+  reported mathematics results and for the tool-integrated-reasoning setting in
+  which the strongest numbers are obtained.
+
+**Scope note for S-09 through S-12.** These are vendor-published materials. Every
+performance number in them is a vendor claim measured on the vendor's harness, and
+none of it has been reproduced here. Nothing in these four entries is evidence
+about this repository, and none of it may be cited as a measured property of any
+Study 3 artifact.

@@ -1637,3 +1637,105 @@ their power consequences made explicit, not commitments. Validation of the round
 used CPU-only Azure ACR runs against committed bytes, including a static structural
 instrument that was deliberately not committed; local pytest was not used and would
 carry no evidential weight.
+
+## M-27 - Committed model-free design statistics and a negative-mutation design test for Study 3 draft-v0.2
+
+**Date.** 2026-08-08
+
+**Scope.** Study 3 design only. No model, no bank, no seed, no measurement. Every
+number below is a proposed design parameter, not a result.
+
+### Why the method changed
+
+Study 3 draft-v0.1 derived its design numbers with an ephemeral script that was
+never committed, and named a paired-equivalence criterion without an executable
+definition or any verified type-I/power behaviour. The operator review found ten
+defects, one of which the ephemeral checker should have caught and did not.
+draft-v0.2 therefore commits both the derivation and the checks.
+
+### The committed derivation
+
+`studies/study3/analysis/design_statistics.py` derives every proposed threshold
+using only the Python standard library. It has two modes: `--emit` writes
+`design_statistics_tables.json`, and `--check` recomputes every table and
+compares it value-for-value against the committed file, exiting non-zero on any
+mismatch. It performs only declared arithmetic and writes no bank, item, seed,
+model output or result artifact.
+
+**Exact binomial gate thresholds.** Retained gates use one-sided exact binomial
+tests at the study level. Reproduced values include `n = 192`, `p0 = 0.90`,
+`alpha = 0.005` giving an acceptance count of 184, and `n = 192`, `p0 = 0.50`
+giving 115.
+
+**The rejected chance null.** draft-v0.1 proposed a chance-level null for the
+positive-reference gate `I4`. That is rejected in draft-v0.2: a reference that
+merely beats chance cannot demonstrate that a working interface would register
+competence. The replacement is an exact binomial competence floor at `p0 = 0.80`.
+
+**Paired equivalence.** The named executable method is the score procedure of
+Tango (1998) for the difference in paired proportions, evaluated as two one-sided
+tests and combined by intersection-union. The constrained maximum-likelihood
+estimate of the discordant cell probability under a null difference `d0` solves
+
+`2n q^2 - [(n12 + n21) - d0 (2n - n12 + n21)] q - n21 d0 (1 - d0) = 0`
+
+and the statistic is
+
+`Z(d0) = (n12 - n21 - n d0) / sqrt(n (2 q~ + d0 (1 - d0)))`.
+
+**Three-way verification, fail-closed.** The implementation is verified before any
+table is emitted, and the script exits non-zero and writes nothing if any check
+fails:
+
+1. at `d0 = 0` the statistic collapses algebraically to
+   `(n12 - n21) / sqrt(n12 + n21)`, McNemar's statistic, which is Tango's
+   published special case; the observed maximum absolute deviation is exactly 0;
+2. the closed-form constrained MLE agrees with direct numerical maximisation to
+   3.4e-09;
+3. the normal-quantile routine reproduces 1.959963984540054.
+
+**Exact power and type-I.** Power and type-I are computed by exhaustively
+enumerating the trinomial distribution of the discordant pair counts. There is no
+simulation and no normal approximation to the sampling distribution. The word
+*exact* describes this enumeration and **not** the test: the decision rule is
+asymptotic, and the enumeration itself discloses one configuration whose realised
+one-sided level is 0.025501 against a nominal 0.025. Because the decision depends
+only on `(n12, n21, n)`, the rejection region is enumerated once per `(n, margin)`
+and cached.
+
+**Multiplicity.** Two structurally different problems are kept apart. Within one
+interface profile the gates form an intersection-union conjunction whose size is
+bounded by the level of its components, so no correction is applied. Across
+selectable profiles the study would proceed if any one qualified, which is a union
+event, so the per-profile level is Bonferroni-divided by the number of selectable
+profiles. The never-selectable profile is excluded from that count because it can
+never produce a reported success.
+
+### The committed test
+
+`tests/test_study3_design.py` is the single dedicated Study 3 test. It contains a
+dependency-free JSON-Schema validator, because `jsonschema` is not in the pinned
+lock file and the validation must run in the same clean container as the rest of
+the suite. It checks positive structural validity, semantic laws a structural
+schema cannot express (applicability against declared non-applicable
+transformations, counterbalancing completeness, label-alphabet disjointness from
+the answer domain), JSON/Markdown parity on every decision-bearing marker, and
+reproduction of the committed statistics.
+
+It also runs a **negative-mutation battery**: each mutation injects a specific
+prohibited state - a frozen flag, an authorised flag, a non-zero or injected
+operation counter, a selected winner, a selectable never-selectable profile, an
+omitted `I4`, an `I4` failure that leaves the interface eligible, an `I5` that
+omits a construct, enabled pooling, a resolved blocking decision, a removed claim
+ceiling, an accessible confirmation split, a results or bank row - and asserts
+that the checks reject it. A companion test asserts that the **unmutated**
+document is accepted, so a checker that rejected everything would fail rather than
+appear maximally strict.
+
+### What this method does not do
+
+It does not select an interface, does not select or pin a positive reference, does
+not fix any blocking threshold or sample size, and produces no evidence row. Its
+output is a set of proposals and one negative feasibility finding: at `n = 192`
+and a target power of 0.90, the aggregate equivalence margin asserted in
+draft-v0.1 is not supported at any tested discordance rate.

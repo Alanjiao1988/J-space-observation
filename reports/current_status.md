@@ -1,5 +1,66 @@
 # Project Status Report
 
+> **Study 3 draft-v0.2 design amendment — 2026-08-08**
+>
+> **Study 3 state:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW`
+>
+> **Operator-review disposition recorded:**
+> `STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`
+>
+> The operator reviewed Study 3 draft-v0.1, found **ten design defects**, and refused
+> freeze. This round is the resulting single design-amendment round. It produced
+> **draft-v0.2** of the interface-calibration protocol. The defects and their
+> resolutions are recorded additively in
+> [`studies/study3/reviews/v0_1_operator_review.md`](../studies/study3/reviews/v0_1_operator_review.md);
+> the draft-v0.1 receipt was left untouched as the historical record.
+>
+> **The JSON protocol document is now authoritative** and the Markdown is a companion
+> rendering of it. draft-v0.1's unsupported claim that both were generated from a
+> single source of record has been removed, because no such generator is committed;
+> what is committed, and therefore what is checked, is their agreement.
+>
+> **Design-critical checks are now committed rather than ephemeral.** draft-v0.2 adds
+> a committed model-free statistics script with a `--check` mode
+> ([`studies/study3/analysis/design_statistics.py`](../studies/study3/analysis/design_statistics.py))
+> and a committed test with a negative-mutation battery
+> ([`tests/test_study3_design.py`](../tests/test_study3_design.py)). In the v0.1 round
+> the equivalent checker was ephemeral and missed a defect; that process failure is
+> itself recorded.
+>
+> **A substantive statistical finding was produced against the drafting party's own
+> earlier assertion.** Exact enumeration shows that at `n = 192` and a target power of
+> 0.90, the aggregate paired-equivalence margin of 0.05 asserted in draft-v0.1 is
+> supported at **no** tested discordance rate, and a 0.10 margin is supported only at
+> discordance 0.05 and 0.10. The aggregate criterion was therefore demoted to
+> secondary, an exact per-base-item consistency criterion was made primary, and `OD6`
+> was left blocking rather than resolved by widening the margin to fit the sample size.
+> A second issue is disclosed rather than absorbed: one configuration of the named
+> asymptotic paired method has a realised one-sided level of 0.025501 against a
+> nominal 0.025.
+>
+> **This remains a design state only.** Nothing is frozen. Nothing is authorized to
+> execute. All 22 operation counters are zero: no download, no weight load, no
+> tokenizer construction, no forward pass, no generation, no activation extraction, no
+> probe, no patch, no ablation, no lens operation, no GPU job, no provider call. No
+> seed was drawn, no task-bank row exists, no interface was selected, no positive
+> reference was selected or pinned, and no evidence row was created.
+> `paper/evidence_ledger.csv` still ends at `EV-0016`.
+>
+> **Four of the eight open decisions were resolved, and part of a fifth. None of the
+> three blocking ones was.** `OD2` (positive reference), `OD5` (thresholds) and `OD6`
+> (sample sizes) remain unresolved and blocking.
+>
+> **Both prior terminal states are unchanged.** Study 1 remains closed at
+> `INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY`. Study 2 remains closed at
+> `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY` with documentation state
+> `STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE`. No Study 1 or Study 2 file was
+> modified in this round and both protected Phase 1.0D rollups are unchanged.
+>
+> The only legal next action for Study 3 is a **bounded independent methods review**.
+> The packet is
+> [`studies/study3/analysis/independent_methods_review_packet.md`](../studies/study3/analysis/independent_methods_review_packet.md).
+> There is no freeze prompt and no execution prompt.
+>
 > **Study 3 interface-calibration design draft — 2026-08-08**
 >
 > **Study 3 state:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW`
@@ -27,6 +88,11 @@
 >
 > The only legal next action for Study 3 is operator review. See
 > [`studies/study3/NEXT_THREAD_HANDOFF.md`](../studies/study3/NEXT_THREAD_HANDOFF.md).
+>
+> **Superseded.** That operator review has since taken place. It found ten design
+> defects and refused freeze, and draft-v0.1 was amended to draft-v0.2. See the
+> current notice at the top of this file. This block is retained unchanged as the
+> historical record of the v0.1 round.
 >
 > **Everything below this notice is prior status and remains historical.**
 

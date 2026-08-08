@@ -3089,3 +3089,84 @@ Study 2 terminal state are untouched.
 
 The only legal next action for Study 3 is operator review of the draft and of the
 eight open decisions. Approval of this design would not itself authorize execution.
+
+## D39 - Amend the Study 3 design to draft-v0.2 after an operator review found ten defects and refused freeze
+
+**Date.** 2026-08-08
+
+**Context.** Study 3 draft-v0.1 was published under D38 as a reviewable design
+draft. The operator reviewed it and returned
+`STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`, listing
+ten design defects and explicitly declining freeze. A single design-amendment
+round was authorised to produce draft-v0.2.
+
+**Decision.** Amend the design rather than defend it, and record the review
+additively rather than by rewriting history.
+
+1. **The JSON protocol document is authoritative; the Markdown is a companion
+   rendering of it.** draft-v0.1 claimed both were generated from one source of
+   record. No such generator was committed, so the claim was unsupported. It is
+   removed and replaced by a statement that the agreement itself is what is
+   committed and checked.
+2. **Design-critical checks are committed, not ephemeral.** The statistical
+   derivation is now `studies/study3/analysis/design_statistics.py` with a
+   `--check` mode, and the design invariants are now `tests/test_study3_design.py`
+   with a negative-mutation battery. In the v0.1 round the equivalent checker was
+   an ephemeral script that was never committed, and it missed a defect that a
+   human reader found immediately. That process failure is recorded as a defect in
+   its own right.
+3. **`candidate_interfaces` becomes `interface_profiles`** with an explicit
+   pre-registered `selectable_status`, an applicability map, and a declared list
+   of transformations that have no referent for that profile.
+4. **The data-dependent selection rule is replaced by a published
+   `admissibility_order`** fixed in advance, and the draft states plainly that no
+   interface is selected in this round. draft-v0.1 contained a direct
+   label/value contradiction on exactly this point.
+5. **`not_applicable` becomes a real third value** that is neither a pass nor a
+   zero effect and may never be averaged into a rate.
+6. **The fused `I1` is split into `I1a` and `I1b`**, so a symbol-binding failure
+   can no longer be mistaken for a content-recovery failure.
+7. **`I4` becomes part of eligibility and fails per interface profile**, not as a
+   global study stop, and `I5` is extended to cover every gate-bearing construct
+   including `I4`.
+8. **The chance-level `I4` null is rejected** and replaced by a competence floor.
+   A reference that merely beats chance is not a positive control.
+
+**The finding that made this more than editorial.** The committed derivation
+contradicts draft-v0.1's own assertion. At `n = 192` and a target power of 0.90,
+the aggregate paired-equivalence margin of 0.05 that draft-v0.1 asserted is
+supported at no tested discordance rate, and a 0.10 margin is supported only at
+discordance 0.05 and 0.10. The aggregate criterion was therefore demoted to
+secondary and an exact per-base-item consistency criterion was made primary.
+`OD6` was left blocking rather than resolved by widening the margin until it fit
+the sample size, which would have been the drafting party marking its own work.
+
+Separately, exact enumeration shows that the named asymptotic paired method has
+one configuration with a realised one-sided level of 0.025501 against a nominal
+0.025. This is disclosed in the review packet and put to the reviewer rather than
+absorbed.
+
+**Alternatives considered and rejected.**
+
+- *Defend draft-v0.1 and freeze it.* Rejected: two of the ten defects were
+  outright contradictions in the document, and one was an unsupported provenance
+  claim. There was nothing to defend.
+- *Rewrite the draft-v0.1 artifacts in place so the defects disappear.* Rejected:
+  the v0.1 receipt and the v0.1 authority are historical records. The review is
+  recorded additively in `studies/study3/reviews/v0_1_operator_review.md` and
+  `studies/study3/design_receipt.json` was left untouched.
+- *Record the ten defects as limitations in `paper/limitations_ledger.md`.*
+  Rejected: this repository reserves `L-` rows for limitations of executed
+  measurement. These are defects in an unfrozen design document, and filing them
+  as limitations would misrepresent a drafting error as a finding about the world.
+- *Resolve `OD5` and `OD6` using the newly derived numbers.* Rejected: the
+  numbers make the decisions answerable, but the drafting party is not the party
+  entitled to answer them.
+
+**Consequences.** Study 3 moves to
+`STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW`.
+Four of the eight open decisions are resolved and part of a fifth; `OD2`, `OD5`
+and `OD6` remain blocking. All 22 operation counters remain zero. No Study 1 or
+Study 2 file was modified, no evidence row was added, and both protected Phase
+1.0D rollups are unchanged. The only legal next action is a bounded independent
+methods review; no freeze prompt and no execution prompt exist.

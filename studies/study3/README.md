@@ -1,13 +1,21 @@
 # Study 3 - Interface Adequacy and Label-Binding Calibration
 
-> **DESIGN DRAFT - AWAITING OPERATOR REVIEW**
+> **DESIGN DRAFT v0.2 - AWAITING INDEPENDENT METHODS REVIEW**
 >
-> State: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW`
+> State: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW`
 >
 > Nothing here is frozen. Nothing here authorizes execution. Zero model operations have been
 > performed for this study: no download, no weight load, no tokenizer construction, no forward
 > pass, no generation, no activation extraction, no probe, no patch, no ablation, no lens
 > operation, no GPU job. No seed has been drawn and no task-bank row exists.
+>
+> draft-v0.1 was reviewed by the operator, who found ten design defects and refused freeze
+> (`STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`). draft-v0.2 is the
+> amendment. The defects and their resolutions are recorded in `reviews/v0_1_operator_review.md`.
+>
+> **The JSON protocol document is authoritative.** The Markdown is a companion rendering of it.
+> Where they disagree the JSON governs and the disagreement is a defect; agreement is enforced by
+> the committed test `tests/test_study3_design.py`.
 
 ## What this study is
 
@@ -38,39 +46,64 @@ or J-lens is valid. Whether Study 2's Gate A should have passed.
 | path | what it is |
 | --- | --- |
 | `RESEARCH_CHARTER_DRAFT.md` | draft charter - scope, commitments, claim ceiling |
-| `protocol/interface_calibration_protocol_draft.md` | the full design draft |
-| `protocol/interface_calibration_protocol_draft.json` | machine-readable twin of the draft |
-| `protocol/interface_calibration_protocol.schema.json` | fail-closed structural schema for the twin |
+| `protocol/interface_calibration_protocol_draft.json` | **authoritative** machine-readable design |
+| `protocol/interface_calibration_protocol_draft.md` | companion rendering of the authoritative JSON |
+| `protocol/interface_calibration_protocol.schema.json` | fail-closed structural schema for the JSON |
+| `reviews/v0_1_operator_review.md` | the ten draft-v0.1 defects and their v0.2 resolutions |
+| `analysis/design_statistics.py` | committed model-free derivation of every proposed number |
+| `analysis/design_statistics_tables.json` | the derived tables the draft quotes |
+| `analysis/independent_methods_review_packet.md` | bounded packet for the independent reviewer |
 | `analysis/study2_to_study3_design_traceability.md` | what came from Study 2, and with what authority |
-| `references/methods_sources.md` | six primary sources with limitations of application |
+| `references/methods_sources.md` | primary sources with limitations of application |
+| `references/positive_reference_dossier.md` | candidate evaluation for OD2; selects nothing |
 | `NEXT_THREAD_HANDOFF.md` | the eight open operator decisions |
-| `design_receipt.json` | cryptographic binding of this design round |
-| `prompts/study3_interface_calibration_design_authority.md` | the operator authority, verbatim |
+| `design_receipt.json` | cryptographic binding of the draft-v0.1 round |
+| `design_receipt_v0_2.json` | cryptographic binding of the draft-v0.2 amendment round |
+| `prompts/study3_interface_calibration_design_authority.md` | the v0.1 operator authority, verbatim |
+| `prompts/study3_v0_2_design_amendment_authority.md` | the v0.2 amendment authority, verbatim |
+
+The one dedicated test lives outside this directory, at `tests/test_study3_design.py`, so it runs
+with the repository suite.
 
 ## Design at a glance
 
-**Four candidate surfaces**, none selected:
+**Four interface profiles**, none selected. `selectable_status` is a pre-registered property of
+the profile, not an outcome:
 
-| id | surface | reads |
+| id | profile | reads | selectable status |
+| --- | --- | --- | --- |
+| `S1` | restricted label-token logits | one position, label tokens (Study 2 legacy comparator) | `selectable` |
+| `S2` | restricted content-token logits | one position, content tokens | `selectable_preferred` |
+| `S3` | length-normalised sequence log-likelihood | full continuation, teacher-forced | `conditionally_selectable` |
+| `S4` | constrained generation plus deterministic parser | generated span, calibration reference only | `never_selectable` |
+
+**No interface is selected in this round.** The admissibility order is fixed in advance
+(`S2`, then `S3` under its condition, then `S1`; `S4` never) and may not be reordered after seeing
+data.
+
+**Seven fail-closed gates**, none evaluated:
+
+| gate | asks | part of eligibility |
 | --- | --- | --- |
-| `S1` | restricted A/B/C/D label-token logits | one position, label tokens (Study 2 legacy comparator) |
-| `S2` | direct answer-content logits | one position, content tokens |
-| `S3` | conditional log-likelihood of option contents | full continuation, teacher-forced |
-| `S4` | bounded minimal-answer generation | generated span, calibration reference only |
+| `I0` | is the renderer, mapping, scorer and ground truth correct, with no model involved? | yes |
+| `I1a` | can each role recover an answer stated verbatim in the prompt, with a valid output? | yes |
+| `I1b` | does each role bind the correct content to the correct displayed symbol? | yes, where labels exist |
+| `I2` | does each role clear a depth-1 primitive by a usable margin, per operation family? | yes |
+| `I3` | does the reading stay inside a pre-specified margin when only irrelevant things change? | yes |
+| `I4` | can an independently prequalified reference clear the compositional strata here? | yes |
+| `I5` | do the constructs reproduce on a sealed, never-inspected confirmation bank? | no; it is the confirmation |
 
-**Six fail-closed gates**, none evaluated:
-
-| gate | asks |
-| --- | --- |
-| `I0` | is the renderer, mapping, scorer and ground truth correct, with no model involved? |
-| `I1` | can each role emit the label for an answer that is stated in the prompt? |
-| `I2` | does each role clear a depth-1 primitive by a usable margin? |
-| `I3` | does the reading stay inside a pre-specified margin when only irrelevant things change? |
-| `I4` | can an independently capable reference clear the compositional strata under this interface? |
-| `I5` | does the one selected interface reproduce on a sealed, never-inspected bank? |
+draft-v0.1 fused trivial recovery with symbol binding into a single `I1`, which made a binding
+failure indistinguishable from a recovery failure; v0.2 splits them into `I1a` and `I1b`.
 
 Gate `I4` is the direct structural response to Study 2's central limitation: without a positive
-control on a different checkpoint, a null cannot be interpreted.
+control on a different checkpoint, a null cannot be interpreted. Its failure eliminates **that
+interface profile only** - it is not a global study stop, and it never leaves a failing profile
+eligible. `I5` covers every gate-bearing construct, `I4` included.
+
+**Not applicable is a third value.** A transformation that has no referent for a profile - there
+are no label symbols to permute on `S2` - is recorded `not_applicable`. That is not a pass and not
+a zero effect, and it may never be averaged into a rate or counted as a satisfied gate.
 
 ## Claim ceiling
 
@@ -88,5 +121,15 @@ bank row, template outcome, confirmation content, seed, or result.
 
 ## Next action
 
-**Operator review.** See `NEXT_THREAD_HANDOFF.md`. Three of the eight open decisions block progress:
-the positive-reference model (`OD2`), the thresholds (`OD5`), and the sample sizes (`OD6`).
+**Bounded independent methods review.** See `analysis/independent_methods_review_packet.md` for the
+estimands, hypotheses, truth table, multiplicity logic, margins, power tables, the eight unresolved
+statistical choices and the reviewer checklist; see `NEXT_THREAD_HANDOFF.md` for the operator
+decisions. Three of the eight open decisions still block progress: the positive reference (`OD2`),
+the thresholds (`OD5`) and the sample sizes (`OD6`).
+
+The amendment did not close them. It made them answerable: every proposed number is now derived by
+a committed model-free script, and the derivation shows - for instance - that `n = 192` does **not**
+support the aggregate equivalence margin draft-v0.1 asserted, at any discordance rate tested.
+
+No freeze prompt and no execution prompt exist. The only authority that may follow this document is
+an independent methods review.

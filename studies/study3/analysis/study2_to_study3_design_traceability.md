@@ -168,8 +168,10 @@ future, separately authorized execution, and none of it has been executed.
 
 ## Tier 5 - Choices that remain unresolved
 
-These are open. They are listed in full with recommendations and trade-offs in section 12 of
-`protocol/interface_calibration_protocol_draft.md` and in `NEXT_THREAD_HANDOFF.md`.
+These are open. They are listed in full with recommendations and trade-offs in
+`protocol/interface_calibration_protocol_draft.json` (authoritative), its Markdown companion, and
+`NEXT_THREAD_HANDOFF.md`. The dispositions below are the draft-v0.2 dispositions; draft-v0.1 left
+all eight open without dispositions.
 
 | id | unresolved choice | blocking? |
 | --- | --- | --- |
@@ -182,10 +184,25 @@ These are open. They are listed in full with recommendations and trade-offs in s
 | `OD7` | whether a bounded independent methods review is required before freeze | no |
 | `OD8` | whether and where a chat template is applied | no |
 
+**draft-v0.2 dispositions.** `OD1`, `OD3`, `OD4` and `OD7` are resolved; `OD8` is resolved in part;
+`OD2`, `OD5` and `OD6` remain unresolved and blocking. Resolving `OD7` in the affirmative is what
+makes the bounded independent methods review the legal next action rather than a freeze.
+
 **`OD2` is the one that can stop the study before it starts.** If no positive-capability reference
 can be justified within the Tesla T4 envelope without empirical screening, then Gate `I4` cannot be
 evaluated, and a Study 3 null would be as uninterpretable as Study 2's was. The draft's proposed
 answer is a separate prequalification stage that never inspects the Study 3 confirmation bank.
+draft-v0.2 adds `references/positive_reference_dossier.md`, which evaluates named candidates against
+the registered compute envelope from primary sources. The dossier selects nothing and pins nothing;
+`OD2` stays blocking.
+
+**`OD5` and `OD6` are now answerable, and that is why they stayed open.** draft-v0.2 derives every
+proposed number in a committed model-free script,
+`analysis/design_statistics.py`. The derivation contradicts a draft-v0.1 assertion: at `n = 192` and
+a target power of 0.90, the aggregate paired-equivalence margin of 0.05 that draft-v0.1 asserted is
+**not** supported at any discordance rate tested, and a 0.10 margin is supported only at discordance
+0.05 and 0.10. The drafting party is not permitted to resolve this by widening the margin to fit the
+sample size, so `OD6` remains blocking and the choice is put to the independent reviewer.
 
 ---
 
@@ -205,11 +222,33 @@ Tier 2  post-hoc observations ........ ZERO authority
 
 Tier 3  published literature .......... external; motivates risks
                                        |
-                                       +--> strata K5/K6, gates I1/I3, surface panel
+                                       +--> strata K5/K6, gates I1a/I1b/I3, profile panel
+                                       +--> paired-equivalence method (Tango 1998, Liu 2002)
+                                            => the executable I3 secondary criterion
 
 Tier 4  prospective requirements ...... constrain a FUTURE authorized execution
 
-Tier 5  unresolved choices ............ operator review; OD2 is blocking
+Tier 5  unresolved choices ............ independent methods review;
+                                       OD2, OD5, OD6 blocking
 ```
 
 Nothing in Tier 2 is permitted to move upward into Tier 1, and nothing in Tier 4 has been executed.
+
+---
+
+## Tier 6 - the draft-v0.1 operator review
+
+The operator review of draft-v0.1 is a **sixth** kind of input, and it is important not to file it
+under any of the five above.
+
+- It is **not** a Tier 1 sealed fact: it is about a document, not about a measurement.
+- It is **not** a Tier 2 post-hoc observation: it carries full authority over the draft.
+- It is **not** a Tier 3 external risk: it is internal to this repository.
+- It is **not** an empirical finding at all. The ten defects are defects in an unfrozen design
+  document. They are recorded in `reviews/v0_1_operator_review.md`, and deliberately **not** in
+  `paper/limitations_ledger.md`, which this repository reserves for limitations of executed
+  measurement. Filing a review defect as a limitation would misrepresent a drafting error as a
+  finding about the world.
+
+What the review licenses is exactly one thing: amending the draft. It does not license any claim,
+any measurement, any freeze, or any relaxation of a blocking decision.
