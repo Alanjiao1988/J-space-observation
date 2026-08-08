@@ -68,6 +68,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import hashlib
 import json
 import math
 import os
@@ -162,6 +163,9 @@ PROBABILITY_DECIMALS = 9
 NUISANCE_DECIMALS = 6
 CHECK_ABSOLUTE_TOLERANCE = 1e-9
 
+EMIT_BEGIN_MARKER = "=== BEGIN INDEPENDENT RECALCULATION TABLE ==="
+EMIT_END_MARKER = "=== END INDEPENDENT RECALCULATION TABLE ==="
+
 FORBIDDEN_MODULE_SUBSTRINGS = (
     "design_statistics",
     "torch",
@@ -182,6 +186,7 @@ PERMITTED_IMPORT_ROOTS = (
     "ast",
     "bisect",
     "fractions",
+    "hashlib",
     "json",
     "math",
     "os",
@@ -1567,6 +1572,10 @@ def _canonical(document) -> str:
                       ensure_ascii=True) + "\n"
 
 
+def _sha256_of_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def _deviations(left, right, path="$", out=None, stats=None):
     if out is None:
         out = []
@@ -1622,11 +1631,23 @@ def main(argv=None) -> int:
     rendered = _canonical(tables)
 
     if args.emit:
-        with open(review_path, "w", encoding="utf-8", newline="\n") as handle:
-            handle.write(rendered)
-        print("INDEPENDENT_RECALCULATION_EMITTED=%s" % review_path)
+        if args.out == "-":
+            # The review calculation is executed only in the container, so the
+            # emitted document has to leave through the run log rather than
+            # through a file the operator cannot reach.
+            print(EMIT_BEGIN_MARKER)
+            sys.stdout.write(rendered)
+            print(EMIT_END_MARKER)
+            print("INDEPENDENT_RECALCULATION_EMITTED=stdout")
+        else:
+            with open(review_path, "w", encoding="utf-8",
+                      newline="\n") as handle:
+                handle.write(rendered)
+            print("INDEPENDENT_RECALCULATION_EMITTED=%s" % review_path)
         print("INDEPENDENT_RECALCULATION_BYTES=%d"
               % len(rendered.encode("utf-8")))
+        print("INDEPENDENT_RECALCULATION_SHA256=%s"
+              % _sha256_of_text(rendered))
         print("STATUS=%s" % STATUS_LINE)
         return 0
 
