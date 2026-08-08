@@ -5858,3 +5858,128 @@ authority in the new design.
 The only legal next action is operator review of the draft and of the eight
 unresolved decisions. Approval of the design would not itself authorize
 execution.
+
+## 2026-08-08 - Study 3 interface-calibration design amendment to draft-v0.2
+
+### Purpose and endpoint
+
+A single design-amendment round in response to an operator review of Study 3
+draft-v0.1. The review returned
+`STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`, listed
+ten design defects and declined freeze. The endpoint of this round is
+`STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW`,
+which is again a design state and not a result. No freeze prompt and no execution
+prompt were produced.
+
+### Starting state
+
+The round began at commit `360086db495c4c5a098e49a6e8adf73dd143eaef`, tree
+`23ba838d5f1bc639a9b21b49ba96ac957865dd90`, with `HEAD == origin/main` and a
+clean index and worktree. The complete starting-state preflight passed: the
+required ancestor relationships to the Study 1 terminal commit, the Study 2
+measurement and documentation terminal commits, the Stage T seal and the Stage P
+commit all held; all four Study 2 terminal-documentation blobs matched their
+registered hashes; both protected Phase 1.0D rollups matched with zero
+differences; `paper/evidence_ledger.csv` ended at `EV-0016`; and every
+prohibited-operation counter stood at zero. Disposition recorded:
+`STUDY3_DESIGN_STARTING_STATE_ACCEPTED_CONTENT_IDENTITY_BRANCH_METADATA_NONAUTHORITATIVE`.
+
+Branch and worktree names remain observational metadata rather than admission
+gates. The observed local branch was `alanjiao1988-microsoft-miniature-eureka`
+in a platform-managed worktree.
+
+### What the review found, and what was done about it
+
+All ten defects were accepted. None was argued away. The substantive repairs:
+
+- The claim that the JSON and Markdown protocol documents were generated from a
+  single source of record was **withdrawn**, because no such generator was ever
+  committed. The JSON is now declared authoritative, the Markdown a companion,
+  and the *agreement between them* is what is committed and checked.
+- `candidate_interfaces` became `interface_profiles` with a pre-registered
+  `selectable_status`, an applicability map, and an explicit list of
+  transformations that have no referent for each profile.
+- The data-dependent selection rule, which directly contradicted the draft's own
+  "no winner" flag, was replaced by a published `admissibility_order` fixed in
+  advance. The draft now states plainly that no interface is selected.
+- `not_applicable` became a real third outcome that is neither a pass nor a zero
+  effect and may never be averaged into a rate.
+- The fused `I1` was split into `I1a` (symbol binding) and `I1b` (content
+  recovery), so one failure can no longer masquerade as the other.
+- `I4` became part of eligibility and now fails **per interface profile** rather
+  than stopping the whole study, and `I5` was extended to cover every
+  gate-bearing construct including `I4`.
+- The chance-level `I4` null was rejected and replaced by an exact binomial
+  competence floor at `p0 = 0.80`. A reference that merely beats chance is not a
+  positive control.
+
+### The process defect, and the fix
+
+One of the ten defects should have been caught mechanically and was not: in the
+v0.1 round the design checker was an ephemeral script that was never committed.
+draft-v0.2 therefore commits both design-critical checks.
+`studies/study3/analysis/design_statistics.py` derives every proposed threshold
+from the standard library alone and has a `--check` mode that recomputes and
+compares every table.  `tests/test_study3_design.py` carries 61 tests including a
+31-case negative-mutation battery, plus a companion test asserting that the
+*unmutated* document is accepted, so a checker that rejected everything would
+fail rather than look maximally strict.
+
+### The finding that made this more than editorial
+
+The committed derivation contradicts draft-v0.1's own assertion. At `n = 192` and
+target power 0.90, the aggregate paired-equivalence margin of 0.05 asserted in
+v0.1 is supported at **no** tested discordance rate, and a 0.10 margin only at
+discordance 0.05 and 0.10. The aggregate criterion was therefore demoted to
+secondary and an exact per-base-item consistency criterion made primary. `OD6`
+was left **blocking** rather than resolved by widening the margin until it fit
+the sample size, which would have been the drafting party marking its own work.
+
+Separately, exhaustive enumeration of the trinomial distribution shows that of 28
+reachable boundary configurations exactly one has a realised one-sided level of
+0.025501 against a nominal 0.025, a relative excess of 2.00 percent. This is
+disclosed in the review packet as unresolved item `U8`, together with the
+statement that *exact* describes the enumeration and not the decision rule, which
+remains asymptotic. It was put to the reviewer rather than absorbed.
+
+### Commits
+
+Four commits, all on the platform-managed session branch, none forced:
+
+1. `5dd1dea` - the operator-review record, the committed statistics script and
+   its emitted tables.
+2. `e40c733` - the amended protocol JSON, its companion Markdown, the schema, and
+   the committed design test.
+3. `7ab36ba` - the independent-methods-review packet, the positive-reference
+   dossier, the verbatim v0.2 authority, `D39`, `M-27` and the routers.
+4. `b96a479` - the draft-v0.2 design receipt.
+
+### Deliberate non-changes
+
+`paper/limitations_ledger.md` was **not** touched. This repository reserves `L-`
+rows for limitations of executed measurement; the ten reviewed items are defects
+in an unfrozen design document, and filing them as limitations would misrepresent
+a drafting error as a finding about the world.
+
+`studies/study3/design_receipt.json` and
+`studies/study3/prompts/study3_interface_calibration_design_authority.md` were
+also left untouched. They are the historical record of what draft-v0.1 actually
+claimed and under what authority; editing them would destroy the evidence that
+the ten defects were present. The amendment is recorded additively in
+`studies/study3/reviews/v0_1_operator_review.md` and
+`studies/study3/design_receipt_v0_2.json`.
+
+`studies/study3/prompts/study3_v0_2_design_amendment_authority.md` is byte-exact
+verbatim: 27819 bytes, no added header, no added trailing newline, no
+reformatting.
+
+### Boundary
+
+Zero model downloads, weight loads, tokenizer constructions, forward passes,
+generations, activation operations, probe fits, patching operations, ablation
+operations, lens loads, lens fits, lens applies, GPU jobs, provider calls, bank
+rows, seeds, gate evaluations, evidence rows, Phase 1.0D operations, RQ2/S4
+operations, Study 1 modifications and Study 2 modifications. Nothing is frozen,
+nothing is authorised, no interface is selected and no positive reference is
+selected. `OD2`, `OD5` and `OD6` remain blocking. The only legal next action is a
+bounded independent methods review.
