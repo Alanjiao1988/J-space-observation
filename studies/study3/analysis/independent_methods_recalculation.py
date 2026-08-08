@@ -92,6 +92,10 @@ REVIEW_VERSION = "study3-independent-methods-review-v0.2"
 
 STUDY_ALPHA = Fraction("0.005")
 SELECTABLE_PROFILE_COUNT = 3
+# RT, RL and RI are the model roles that carry gate authority on the target
+# constructs. R0 and RC are registered as deterministic non-model controls and
+# consume no forward pass; RP is scoped to gate I4 only.
+TARGET_BEARING_MODEL_ROLES = 3
 BONFERRONI_PER_PROFILE_ALPHA = Fraction("0.001666666667")
 TARGET_POWER = Fraction("0.9")
 
@@ -133,6 +137,75 @@ REVIEWED_BINOMIAL_GATES = (
     ("I4_competence_floor", Fraction("0.80"),
      (Fraction("0.90"), Fraction("0.95"), Fraction("0.97"))),
 )
+
+# The alternative of interest recommended for each gate. Each p1 is the
+# drafting party's own lowest declared alternative, taken from its committed
+# tables, so this review tests the design against the standard the design set
+# for itself rather than against a friendlier one chosen by the reviewer.
+RECOMMENDED_GATE_SPECS = {
+    "I1a_trivial_recovery": {
+        "p1": Fraction("0.97"),
+        "p1_justification": ("the drafting party's own lowest declared "
+                             "alternative for this gate; retained unchanged so "
+                             "the power verdict cannot be attributed to the "
+                             "reviewer moving the alternative"),
+        "estimand": ("per-base-item probability that the interface recovers the "
+                     "answer that is explicitly bound in the prompt"),
+        "splits": ("development", "confirmation"),
+        "applicability": "every interface profile; label-bearing and content-only",
+    },
+    "I1b_symbol_binding": {
+        "p1": Fraction("0.97"),
+        "p1_justification": ("the drafting party's own lowest declared "
+                             "alternative for this gate; retained unchanged"),
+        "estimand": ("per-base-item probability that the interface binds the "
+                     "answer to the correct label symbol"),
+        "splits": ("development", "confirmation"),
+        "applicability": ("label-bearing profiles only; not applicable to S2 or "
+                          "S3, which display no label alphabet"),
+    },
+    "I2_primitive_headroom": {
+        "p1": Fraction("0.70"),
+        "p1_justification": ("the drafting party's own lowest declared "
+                             "alternative for this gate; retained unchanged"),
+        "estimand": ("per-base-item probability of a correct answer on the "
+                     "primitive stratum, against a four-option chance floor "
+                     "restated as 0.50 by the draft"),
+        "splits": ("development", "confirmation"),
+        "applicability": "every interface profile",
+    },
+    "I3_primary_consistency_p0_090": {
+        "p1": Fraction("0.97"),
+        "p1_justification": ("the drafting party's own lowest declared "
+                             "alternative for this gate; retained unchanged"),
+        "estimand": ("per-base-item probability that the item satisfies the I3 "
+                     "primary indicator, under the 0.90 floor variant of the "
+                     "null that the authoritative JSON registers"),
+        "splits": ("development", "confirmation"),
+        "applicability": ("every interface profile, but the number of applicable "
+                          "variants per base item differs by profile"),
+    },
+    "I3_primary_consistency_p0_095": {
+        "p1": Fraction("0.97"),
+        "p1_justification": ("the drafting party's own lowest declared "
+                             "alternative for this gate; retained unchanged"),
+        "estimand": ("the same indicator under the 0.95 floor variant of the "
+                     "null that the same committed table also registers"),
+        "splits": ("development", "confirmation"),
+        "applicability": ("every interface profile; retained here only to show "
+                          "the consequence of the unresolved floor"),
+    },
+    "I4_competence_floor": {
+        "p1": Fraction("0.90"),
+        "p1_justification": ("the drafting party's own lowest declared "
+                             "alternative for this gate; retained unchanged"),
+        "estimand": ("per-base-item probability that the positive reference "
+                     "answers correctly on the registered K4 construct"),
+        "splits": ("development",),
+        "applicability": ("the positive-reference role only; the checkpoint "
+                          "identity remains an operator decision"),
+    },
+}
 
 # Paired-equivalence review grid. The (margin, n) pairs mirror the drafting
 # sensitivity table so the comparison is like-for-like; the nuisance treatment
@@ -1375,7 +1448,67 @@ def build_multiplicity_decision() -> dict:
     }
 
 
-def build_projected_cells_and_operations() -> dict:
+def build_reviewed_parameter_recommendations(evidence: dict) -> list:
+    """One recommended rule per gate, at the alpha the multiplicity claim needs.
+
+    The per-profile level is what Family B says it delivers, so every component
+    rule is recomputed there. Family A is intersection-union, so the components
+    inside a profile are each tested at the full per-profile level and are not
+    split again.
+    """
+    alpha = BONFERRONI_PER_PROFILE_ALPHA
+    key = "alpha_bonferroni_per_profile"
+    rows = []
+    for gate, null_p, alternatives in REVIEWED_BINOMIAL_GATES:
+        spec = RECOMMENDED_GATE_SPECS[gate]
+        p1 = spec["p1"]
+        if p1 not in alternatives:
+            raise AssertionError("recommended p1 is outside the reviewed grid")
+        chosen = None
+        for size in admissible_sample_sizes():
+            record = evidence[(gate, key, size)]
+            if not record["feasible"]:
+                continue
+            if record["power"][_decimal_key(p1)] >= float(TARGET_POWER):
+                chosen = size
+                break
+        record = evidence[(gate, key, chosen)] if chosen else None
+        rows.append({
+            "gate": gate,
+            "estimand": spec["estimand"],
+            "unit_of_n": "base items per atomic cell",
+            "null_p0": float(null_p),
+            "null_hypothesis": "p <= " + format(float(null_p), ".10g"),
+            "smallest_alternative_of_interest_p1": float(p1),
+            "p1_justification": spec["p1_justification"],
+            "one_sided_alpha": float(alpha),
+            "alpha_basis": ("study alpha " + format(float(STUDY_ALPHA), ".10g")
+                            + " divided by " + str(SELECTABLE_PROFILE_COUNT)
+                            + " selectable profiles, applied to every component "
+                            "because Family A is intersection-union"),
+            "recommended_n": chosen,
+            "recommended_n_reachable_within_reviewed_grid": chosen is not None,
+            "rejection_rule": (
+                "reject the null and pass the gate when the observed success "
+                "count is at least " + str(record["rejection_count"])
+                + " out of " + str(chosen)) if record else (
+                "no admissible n at or below " + str(ADMISSIBLE_N_MAX)
+                + " reaches the target power at this p0 and p1"),
+            "rejection_count": record["rejection_count"] if record else None,
+            "exact_power_at_p1": _round(record["power"][_decimal_key(p1)])
+                                 if record else None,
+            "exact_null_tail_at_p0": _round(record["exact_null_tail"], 12)
+                                     if record else None,
+            "target_power": float(TARGET_POWER),
+            "applies_to_splits": list(spec["splits"]),
+            "applicability": spec["applicability"],
+            "authority_status": ("reviewer recommendation only; not adopted "
+                                 "protocol and not an execution authority"),
+        })
+    return rows
+
+
+def build_projected_cells_and_operations(recommendations: list) -> dict:
     """Model-free planning arithmetic. Every executed count stays at zero."""
     divisors = counterbalancing_divisors()
     variants = {
@@ -1414,6 +1547,95 @@ def build_projected_cells_and_operations() -> dict:
                 * COUNTERBALANCE_RENDERING_COUNT,
         },
     }
+
+    # Gates that apply to a target-role checkpoint on a candidate profile, and
+    # the gate that applies only to the positive reference.
+    target_gates = [row for row in recommendations
+                    if row["gate"] != "I4_competence_floor"
+                    and row["gate"] != "I3_primary_consistency_p0_095"]
+    reference_gates = [row for row in recommendations
+                       if row["gate"] == "I4_competence_floor"]
+
+    def profile_rows(profile: str, gates: list, roles: int) -> int:
+        """Scored rows for one profile: base items x applicable variants x roles."""
+        per_item = variants[profile]["applicable_variants_per_base_item"]
+        total = 0
+        for row in gates:
+            if row["recommended_n"] is None:
+                continue
+            if (row["gate"] == "I1b_symbol_binding"
+                    and variants[profile]["label_alphabet_variants_per_base_item"]
+                    == 0):
+                # I1b is not applicable where no label alphabet is displayed;
+                # a not-applicable cell is never converted into a pass or a
+                # denominator entry.
+                continue
+            total += row["recommended_n"] * per_item * roles
+        return total
+
+    development_rows = 0
+    per_profile = {}
+    for profile in ("S1_label_bearing", "S2_content_only", "S3_content_only"):
+        rows_here = profile_rows(profile, target_gates,
+                                 TARGET_BEARING_MODEL_ROLES)
+        per_profile[profile] = rows_here
+        development_rows += rows_here
+
+    confirmation_profile = "S1_label_bearing"
+    confirmation_rows = profile_rows(confirmation_profile, target_gates,
+                                     TARGET_BEARING_MODEL_ROLES)
+    reference_rows = profile_rows("S1_label_bearing", reference_gates, 1)
+    diagnostic_rows = profile_rows("S4_diagnostic_never_selectable",
+                                   target_gates, TARGET_BEARING_MODEL_ROLES)
+
+    streams = {
+        "positive_reference_prequalification_P3Q": {
+            "scope": ("external canonical qualification interface, outside the "
+                      "Study 3 candidate panel"),
+            "scored_rows": None,
+            "reviewer_note": ("cannot be projected in this round because the "
+                              "qualification bank, floor, n and interface are "
+                              "all still open under OD2; the review specifies "
+                              "the statistical fields that must be frozen, not "
+                              "the checkpoint"),
+            "authority": "operator decision OD2; not selected here",
+        },
+        "positive_reference_I4": {
+            "scope": ("the already-qualified reference scored on the registered "
+                      "K4 construct through each candidate Study 3 interface"),
+            "n_base_items_per_atomic_cell": reference_gates[0]["recommended_n"]
+                                            if reference_gates else None,
+            "roles": 1,
+            "scored_rows_on_the_label_bearing_profile": reference_rows,
+            "reviewer_note": ("the drafting projection budgets zero K4 items, so "
+                              "this entire stream is missing from it"),
+        },
+        "target_development": {
+            "scope": ("every gate-bearing construct for each selectable profile "
+                      "on the development split"),
+            "model_roles_scored": TARGET_BEARING_MODEL_ROLES,
+            "roles_note": ("RT, RL and RI carry gate authority on the target "
+                           "constructs; R0 and RC are deterministic non-model "
+                           "controls and consume no forward pass; RP is scoped "
+                           "to gate I4 only"),
+            "scored_rows_by_profile": per_profile,
+            "scored_rows": development_rows,
+        },
+        "selected_profile_confirmation": {
+            "scope": ("the single development-selected profile on the disjoint "
+                      "confirmation split"),
+            "profile_used_for_this_projection": confirmation_profile,
+            "profile_note": ("the label-bearing profile is used here only "
+                             "because it is the most expensive case; no profile "
+                             "is selected by this review"),
+            "scored_rows": confirmation_rows,
+        },
+        "S4_diagnostic": {
+            "scope": "never-selectable diagnostic profile",
+            "scored_rows": diagnostic_rows,
+            "selection_authority": "none; excluded from every success union",
+        },
+    }
     return {
         "unit_definitions": {
             "base_item": ("one registered question stem; the sampling unit and "
@@ -1428,6 +1650,62 @@ def build_projected_cells_and_operations() -> dict:
         },
         "variants_per_base_item_by_profile": variants,
         "counterbalancing_divisors": divisors,
+        "work_streams": streams,
+        "totals": {
+            "development_scored_rows_over_selectable_profiles":
+                development_rows,
+            "confirmation_scored_rows_single_selected_profile":
+                confirmation_rows,
+            "positive_reference_scored_rows": reference_rows,
+            "diagnostic_scored_rows_zero_selection_authority": diagnostic_rows,
+            "all_streams_scored_rows": (development_rows + confirmation_rows
+                                        + reference_rows + diagnostic_rows),
+            "forward_passes_executed_this_round": 0,
+            "generations_executed_this_round": 0,
+        },
+        "drafting_projection_discrepancies": [
+            {
+                "id": "S3_budgeted_as_four_scorings",
+                "drafting_field": ("operation_boundaries."
+                                   "projected_future_operations."
+                                   "per_role_per_surface.S3_sequence_scorings"),
+                "drafting_value": 9728,
+                "conflicting_field": ("interface_profiles[S3]."
+                                      "projected_operation_counts_if_later_"
+                                      "authorized.note"),
+                "conflicting_text": ("it does not add four separate scorings "
+                                     "and must not be budgeted as if it did"),
+                "reviewer_note": ("9728 is exactly 4 x 2432, which is the "
+                                  "budgeting the same document forbids; the "
+                                  "registered per-item forward-pass count for "
+                                  "S3 is 1, and under the current single-token "
+                                  "domain S3 reuses the S2 pass entirely"),
+            },
+            {
+                "id": "K4_absent_from_the_projection",
+                "drafting_field": ("operation_boundaries."
+                                   "projected_future_operations.assumptions"),
+                "drafting_value": ("192 base items each for K1 and K3, 128 for "
+                                   "K2, four permutation conditions from K5 and "
+                                   "three renderings from K6"),
+                "reviewer_note": ("K4 carries gate I4 and is the only construct "
+                                  "the positive reference is scored on, yet it "
+                                  "receives no budgeted items, so the projected "
+                                  "I4 work is zero while I4 is a required gate"),
+            },
+            {
+                "id": "positive_reference_multiplied_through_every_construct",
+                "drafting_field": ("operation_boundaries."
+                                   "projected_future_operations."
+                                   "development_total_across_4_roles_and_4_"
+                                   "surfaces"),
+                "drafting_value": 68096,
+                "reviewer_note": ("the total multiplies four model roles "
+                                  "uniformly across every construct, but RP has "
+                                  "gate_role 'Gate I4 only', so RP should not be "
+                                  "budgeted on K1, K2, K3, K5 or K6 at all"),
+            },
+        ],
         "note": ("this is planning arithmetic only; it authorises nothing and "
                  "every executed operation count below remains zero"),
         "executed_operation_counts": {name: 0
@@ -1564,6 +1842,7 @@ def compare_with_drafting_tables(independent: dict, drafting_path: str) -> dict:
 def build_review_tables(drafting_path: str) -> dict:
     validate_registered_parameters()
     evidence = _binomial_evidence()
+    recommendations = build_reviewed_parameter_recommendations(evidence)
     tables = {
         "admissible_n_rule": {
             "statement": ("a base-item count is admissible for a label-bearing "
@@ -1606,7 +1885,9 @@ def build_review_tables(drafting_path: str) -> dict:
         "multiplicity_decision": build_multiplicity_decision(),
         "operation_counts": {name: 0 for name in ZERO_OPERATION_COUNTERS},
         "paired_equivalence": build_paired_tables(),
-        "projected_cells_and_operations": build_projected_cells_and_operations(),
+        "reviewed_parameter_recommendations": recommendations,
+        "projected_cells_and_operations":
+            build_projected_cells_and_operations(recommendations),
         "review_version": REVIEW_VERSION,
         "smallest_admissible_n_reaching_target_power":
             build_smallest_admissible_n(evidence),
