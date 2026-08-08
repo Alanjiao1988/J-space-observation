@@ -879,7 +879,10 @@
           "minimum": 0
         },
         "rows": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "null"
+          ],
           "minimum": 0
         },
         "sha256": {

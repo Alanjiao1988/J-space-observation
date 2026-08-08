@@ -864,7 +864,12 @@ def test_core_manifest_validates_against_the_closed_schema() -> None:
         "weight_files_present": [],
     }
     files = {
-        name: {"bytes": 1, "rows": 1, "sha256": "0" * 64} for name in st.PACK_FILES
+        name: {
+            "bytes": 1,
+            "rows": 1 if name.endswith(".jsonl") else None,
+            "sha256": "0" * 64,
+        }
+        for name in st.PACK_FILES
     }
     environment = {
         "base_image_reference": "python:3.11-bookworm",
@@ -885,6 +890,37 @@ def test_core_manifest_validates_against_the_closed_schema() -> None:
         s2.validate_json_schema(
             dict(manifest, accuracy=1.0), {**defs["core_manifest"], "$defs": defs}
         )
+
+
+def test_manifest_row_counts_follow_the_writer_convention(tmp_path: Path) -> None:
+    """``write_json`` reports ``rows: null``; the schema must accept it.
+
+    Attempt ``t1a`` (ACR run ``cmcq``) produced a valid pack and was then
+    rejected by the validator because ``file_entry.rows`` had been declared
+    integer-only while the real JSON writer reports ``null``.  This test binds
+    the schema to the writers so the two can never drift again.
+    """
+
+    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+    defs = schema["$defs"]
+    entry_schema = {**defs["file_entry"], "$defs": defs}
+
+    json_entry = st.write_json(tmp_path / "doc.json", {"a": 1})
+    jsonl_entry = st.write_jsonl(tmp_path / "rows.jsonl", [{"a": 1}, {"a": 2}])
+
+    assert json_entry["rows"] is None
+    assert jsonl_entry["rows"] == 2
+    s2.validate_json_schema(json_entry, entry_schema)
+    s2.validate_json_schema(jsonl_entry, entry_schema)
+
+    # A row count is still a count: negatives and non-integers stay rejected.
+    for bad in (-1, "2", 1.5):
+        with pytest.raises(s2.ProtocolError):
+            s2.validate_json_schema(dict(jsonl_entry, rows=bad), entry_schema)
+
+    # Every pack file name implies its own row-count shape.
+    for name in st.PACK_FILES:
+        assert name.endswith((".json", ".jsonl"))
 
 
 def test_attempt_receipt_shape_is_closed() -> None:

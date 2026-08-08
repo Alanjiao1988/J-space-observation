@@ -94,23 +94,25 @@ Stage T result they produced is void and must be re-derived.
 
 ### 3.1 Sealed source and contract
 
-Seal revision 2 (see §3.7). The rows marked ▲ were revised after seal revision 1
-and before any Stage T measurement existed.
+Seal revision 3 (see §3.7 and §3.8). The rows marked ▲ were revised after seal
+revision 1 and before any Stage T measurement existed. The rows marked ◆ were
+revised after attempt `t1a` produced a complete pack, and §3.8 records both the
+justification and the pre-registered prediction that binds the revision.
 
 | Path | Bytes | SHA-256 |
 | --- | ---: | --- |
 | `src/jspace_observation/study2_stage_t.py` | 45,932 | `e81dedd99e1aed9347faa359eb1b2a5283b0ba74959c1ca83e83a14044ac9c7c` |
 | ▲ `scripts/run_study2_stage_t.py` | 11,011 | `03953680aecc7a1362153dd0cff179812588711b743d771fa85407c63ebc12d4` |
 | ▲ `scripts/validate_study2_stage_t.py` | 15,265 | `d040089339e718f7a922c2af8c537e36a399b09bca4322abf328bac227d5d757` |
-| ▲ `tests/test_study2_stage_t.py` | 38,699 | `e473bb8b9a08c5daf83abd48c98574c95f96e676faba6b808ae82cf3e4371975` |
-| ▲ `studies/study2/protocol/stage_t_pack.schema.json` | 38,872 | `394ef2e827c493e71d4e4780b7738e15ecdb9ef49128b105c4f5528568eb6290` |
+| ▲◆ `tests/test_study2_stage_t.py` | 40,107 | `e9cc83a7b01a7d9897824b1443f424df48e107a26bc38596ee8901e9ded57a84` |
+| ▲◆ `studies/study2/protocol/stage_t_pack.schema.json` | 38,918 | `23d0b8518e7ee01bf401d3824bada515c913520919c29c54e060bc0a5c204259` |
 | `infra/azure/acr_tasks/study2_stage_t.sh` | 4,549 | `ce78fca20251cf2280b7913c02a8cc0e11c169d2d92bdee3be325ef9dc9efcc5` |
 | `infra/azure/acr_tasks/study2_stage_t.yaml` | 795 | `1916065a219dc0640bc108cf1f29ba99f2630e6b9e1a0605423e956f0434dbe7` |
 | `infra/azure/acr_tasks/study2_stage_t_output.Dockerfile` | 568 | `74f7d6a4d03a128bffae5a6bd235047f5493fa770d6593f29ebc6fe74c54f1ff` |
 | `studies/study2/prompts/stage_t_tokenizer_gate_prompt.md` | 22,229 | `dce8c7167682b57e9a6cd8c7dbe651cbdcbfda13255ad9d434d06b7e7949b974` |
 | `studies/study2/prompts/stage_t_starting_state_operator_amendments.md` | 9,764 | `3aa642d472abc0b1b7f73980a7cf85c52086d9bbc632acd8d1735a4bed4a06fe` |
 
-Seal revision 1 recorded these values for the four revised paths, and they are
+Seal revision 1 recorded these values for the four ▲ paths, and they are
 kept here so the revision is auditable rather than silent:
 `scripts/run_study2_stage_t.py` 9,409 /
 `9733cbac8fdad9c19c6b925844eb0e358660e2ca3e8f27c3b1fcd8fbbec3931c`;
@@ -120,6 +122,16 @@ kept here so the revision is auditable rather than silent:
 `44cfae98104977c8f449d93b3dd4696798a0461ff37e4f32031996f3a42c0da4`;
 `studies/study2/protocol/stage_t_pack.schema.json` 38,358 /
 `231144614a83dc4a658af81ebe44b02d24fdb6af72265a8ad8c5a5535a43154d`.
+
+Seal revision 2 recorded these values for the two ◆ paths:
+`tests/test_study2_stage_t.py` 38,699 /
+`e473bb8b9a08c5daf83abd48c98574c95f96e676faba6b808ae82cf3e4371975`;
+`studies/study2/protocol/stage_t_pack.schema.json` 38,872 /
+`394ef2e827c493e71d4e4780b7738e15ecdb9ef49128b105c4f5528568eb6290`.
+
+The generator that produces every Stage T artifact,
+`src/jspace_observation/study2_stage_t.py`, is byte-identical across all three
+seal revisions.
 
 All ten blobs are stored LF-only; `.gitattributes` registers each of them with
 `text eol=lf` so that the bytes the ACR agent executes are the bytes committed
@@ -243,6 +255,84 @@ Crucially, no Stage T measurement existed when this revision was made. Run
 table, and no selection; it never reached `run_gate`. The revision was therefore
 made blind to every Stage T outcome, which is exactly the condition a
 pre-execution seal is meant to guarantee.
+
+### 3.8 Seal revision 3, issued after attempt `t1a` and bound by a prediction
+
+Unlike revision 2, this revision was made **after** a complete Stage T pack
+existed, so it is recorded with the stricter treatment that situation demands.
+
+Attempt `t1a` (ACR run `cmcq`, source commit `f97b98a`) ran the gate to
+completion: `STAGE_T_GATE_COMPLETE=1`, 17,408 prompt rows per model, 2,048
+jointly eligible pairs, 1,024 selected pairs, no cell shortfall, and zero weight
+files in the cache. The run then failed in the *post-gate validator* with:
+
+```
+type mismatch at $/files/stage_t_identity_receipt.json/rows: expected ['integer']
+```
+
+The defect was in the contract, not the data. `write_jsonl` reports an integer
+row count, while `write_json` reports `rows: null`, because a single JSON
+document has no row count. The generated `file_entry` definition declared `rows`
+as integer-only, so the schema rejected the two legitimately `null` entries
+(`stage_t_identity_receipt.json` and `stage_t_jlens_digit_support.json`). The
+seal-revision-2 test suite missed it because its synthetic manifest stubbed
+`rows: 1` for every file, a shape the real writers never produce.
+
+The correction declares `rows` as `["integer", "null"]` — matching six fields
+that already carried that type — and replaces the uniform stub with one that
+mirrors the writer convention. A new test, `test_manifest_row_counts_follow_the
+_writer_convention`, calls the real writers and validates their output against
+the schema, so the contract and the writers can no longer drift. Negative,
+string, and float row counts remain rejected; only `null` was admitted.
+
+**Why this revision cannot have influenced any result.** The generator never
+reads the schema. `studies/study2/protocol/stage_t_pack.schema.json` is loaded
+only by `scripts/validate_study2_stage_t.py` and by the test suite; no import,
+open, or path reference to it exists anywhere in
+`src/jspace_observation/study2_stage_t.py` or `scripts/run_study2_stage_t.py`.
+The generator is byte-identical across seal revisions 1, 2, and 3. It is
+therefore not merely unlikely but structurally impossible for this change to
+alter which pairs are selected.
+
+**The prediction that binds it.** Rather than rely on that argument alone, the
+attempt `t1a` artifact hashes are pre-registered here, before the re-run, as a
+falsifiable claim: the re-run must reproduce every one of them exactly. Any
+difference is a determinism failure to be reported, not repaired.
+
+| Artifact | Bytes | Rows | SHA-256 |
+| --- | ---: | ---: | --- |
+| `stage_t_identity_receipt.json` | 3,684 | null | `abe5113d4eeef2a47ffa047e34d7a7ce3e9274ef3f86e02b494bdd6d05a4dc40` |
+| `stage_t_jlens_digit_support.json` | 2,420 | null | `2bec6fb6464f8ec6284e3fbcf440efecf3035ca3ee60b19d4c07aab30e9f95e4` |
+| `stage_t_mechanistic_eligibility_instruction_control.jsonl` | 1,666,560 | 2,048 | `a6e217357880522592048ed26345671c43564a57724a6332f9f25bedc341c9e6` |
+| `stage_t_mechanistic_eligibility_lineage_base.jsonl` | 1,666,560 | 2,048 | `a6e217357880522592048ed26345671c43564a57724a6332f9f25bedc341c9e6` |
+| `stage_t_mechanistic_eligibility_target.jsonl` | 1,666,560 | 2,048 | `a6e217357880522592048ed26345671c43564a57724a6332f9f25bedc341c9e6` |
+| `stage_t_pair_joint_eligibility.jsonl` | 941,200 | 2,048 | `d0a7607e629e8414bbadda020985948c4d97488e5047693852bc51a75822ac35` |
+| `stage_t_prompt_tokenization_instruction_control.jsonl` | 9,217,376 | 17,408 | `79b0c313bc27bbc1a7c5261a13fb6602cf62b975dc7764af77e5485a986d2c79` |
+| `stage_t_prompt_tokenization_lineage_base.jsonl` | 9,095,520 | 17,408 | `995f89aed40bbc7031ba2bfc099d1886adc32f6de2c0b97701b6cf322753f1c7` |
+| `stage_t_prompt_tokenization_target.jsonl` | 8,991,072 | 17,408 | `e865e3c41db585a48637f92f287edbeba93fc33d53c4fa7b2aa45c869c721eb0` |
+| `stage_t_selected_annotations.jsonl` | 519,092 | 1,024 | `44ebdaa1d0c06a3d385efe3f600829d301903215f8f7a4a1f1a4aaa5452f9f18` |
+| `stage_t_selected_mechanistic_confirmation.jsonl` | 4,053,320 | 512 | `82c02c46de1934e22e595721f66ec29457f68ee89f71326a93d7b527c2eac6b3` |
+| `stage_t_selected_mechanistic_development.jsonl` | 4,006,216 | 512 | `439bea73b39cb5c1b4a7ded3496cbe471cd0188576b68569d93d695306d39722` |
+| `stage_t_core_manifest.json` | 149,948 | null | `6dec7650a05533efc5d88ba9ac1e3a498ca977a091a25b52155bbdb452622815` |
+
+One feature of this table deserves comment, since it looks at first like a bug.
+The three `stage_t_mechanistic_eligibility_*.jsonl` files share one hash, while
+the three `stage_t_prompt_tokenization_*.jsonl` files do not. That combination
+is the evidence the gate exists to produce. The prompt files differ, which
+proves three genuinely distinct tokenizers were acquired and applied. The
+eligibility files agree, which means all three tokenizers assigned every pair
+the same input length, the same answer position, and the same per-object
+lengths. Exact cross-model alignment is the property Stage T is meant to
+establish, and the eligibility row carries no model-role field, so agreement
+renders the files byte-identical. Had a single tokenizer been reused by mistake,
+the prompt files would have been identical too. The Stage T final handoff records
+the direct numerical confirmation of this reading, computed from the published
+artifacts.
+
+As with revision 2, this revision touches no frozen Stage P byte, protocol,
+schema of any scientific row, bank, threshold, seed, model or tokenizer
+registration, prompt rule, option gate rule, eligibility rule, or selection
+rule.
 
 ---
 
