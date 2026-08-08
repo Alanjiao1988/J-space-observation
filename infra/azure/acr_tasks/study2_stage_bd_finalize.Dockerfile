@@ -36,27 +36,6 @@ WORKDIR /opt/study2-src
 
 # The finalizer and validator use the standard library only.  Installing nothing
 # is what makes the model-free claim checkable rather than merely asserted.
-RUN python - <<'PY'
-import importlib.util
-import sys
-from pathlib import Path
-
-for name in ("torch", "transformers"):
-    if importlib.util.find_spec(name) is not None:
-        raise SystemExit(f"{name} must not be present in the finalization image")
-
-sys.path.insert(0, "src/jspace_observation")
-import study2_stage_bd as bd
-
-root = Path(".")
-frozen = bd.verify_frozen_inputs(root)
-items = bd.load_development_bank(root)
-manifest = bd.build_shard_manifest(items)
-assert len(items) == bd.ITEM_COUNT, len(items)
-assert len(manifest["shards"]) == bd.SHARD_COUNT, len(manifest["shards"])
-print("MODEL_FREE_IMAGE=1")
-print("FROZEN_INPUTS_VERIFIED=%d" % len(frozen))
-print("SHARD_MANIFEST_SHA256=%s" % manifest["shard_manifest_sha256"])
-PY
+RUN python infra/azure/acr_tasks/study2_stage_bd_image_verify.py --require-model-free
 
 ENTRYPOINT ["bash", "/opt/study2-src/infra/azure/acr_tasks/study2_stage_bd_finalize_job.sh"]

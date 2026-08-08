@@ -63,26 +63,7 @@ RUN pip install --no-cache-dir \
 
 # The frozen inputs and the closed core must import and verify inside the image,
 # so a drifted artifact fails at build time rather than after a GPU allocation.
-RUN python - <<'PY'
-import sys
-from pathlib import Path
-
-sys.path.insert(0, "src/jspace_observation")
-import study2_stage_bd as bd
-
-root = Path(".")
-frozen = bd.verify_frozen_inputs(root)
-receipt = bd.assert_confirmation_unaddressable(root)
-items = bd.load_development_bank(root)
-manifest = bd.build_shard_manifest(items)
-assert len(items) == bd.ITEM_COUNT, len(items)
-assert len(manifest["shards"]) == bd.SHARD_COUNT, len(manifest["shards"])
-print("FROZEN_INPUTS_VERIFIED=%d" % len(frozen))
-print("CONFIRMATION_PATHS_PRESENT=%d" % sum(
-    1 for p in bd.CONFIRMATION_PATHS if (root / p).exists()
-))
-print("SHARD_MANIFEST_SHA256=%s" % manifest["shard_manifest_sha256"])
-print("DEVELOPMENT_ONLY_RECEIPT=%s" % receipt["schema_version"])
-PY
+RUN python infra/azure/acr_tasks/study2_stage_bd_image_verify.py \
+        --require-confirmation-absent
 
 ENTRYPOINT ["bash", "/opt/study2-src/infra/azure/acr_tasks/study2_stage_bd_job.sh"]

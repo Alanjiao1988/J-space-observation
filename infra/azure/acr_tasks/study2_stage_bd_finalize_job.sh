@@ -29,13 +29,7 @@ export PYTHONHASHSEED=0
 echo "SOURCE_COMMIT=${STAGE_BD_SOURCE_COMMIT}"
 python -V
 
-python - <<'PY'
-import importlib.util
-for name in ("torch", "transformers"):
-    if importlib.util.find_spec(name) is not None:
-        raise SystemExit(f"[FAIL] {name} is installed in a model-free image")
-print("MODEL_FREE_IMAGE=1")
-PY
+python infra/azure/acr_tasks/study2_stage_bd_image_verify.py --require-model-free
 
 python scripts/oci_artifact.py \
     --registry "$STAGE_BD_REGISTRY" \
