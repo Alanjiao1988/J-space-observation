@@ -41,8 +41,15 @@ def main() -> int:
     dest.mkdir(parents=True, exist_ok=True)
 
     if args.bundle:
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True
+        ).stdout.strip()
+        if head != args.commit:
+            raise SystemExit(f"HEAD is {head}, not the requested {args.commit}")
+        # A bundle needs a ref, not a bare object name, so it is always cut from
+        # HEAD after HEAD has been confirmed to be the requested commit.
         subprocess.run(
-            ["git", "bundle", "create", str(dest / args.bundle), args.commit],
+            ["git", "bundle", "create", str(dest / args.bundle), "HEAD"],
             check=True,
             capture_output=True,
         )
