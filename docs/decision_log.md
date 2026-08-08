@@ -2980,3 +2980,46 @@ evidence about internal reasoning, distillation, or J-space. Stage B-C,
 mechanistic-cell selection, M-D and M-C were never opened and may not be opened
 under this protocol version. Any further attempt requires a new protocol version,
 a new operator authority, and new task-bank seeds.
+
+## D37 - Terminalize Study 2 protocol v1 as documentation without touching the measurement
+
+Study 2 protocol v1 was already scientifically closed at commit
+`43411e09de425dfae0ee74ba46c68a389311e9a7`, but the repository's routers still
+told a reader that Study 2 was awaiting Stage P or Stage B-D authority, and the
+frozen Gate A documents asserted without qualification that the outcome "is not a
+measurement artifact". Both defects were about how the closed result is presented,
+not about the result. The decision was to fix them as documentation, under a
+separate endpoint `STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE`, and to
+leave the scientific terminal state
+`STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY` exactly as sealed.
+
+The alternative would have been to reopen or restate the science: to rerun the
+gate, to repair the interface and try again, or to promote the one control cell
+that cleared a family threshold. Each is prohibited by the frozen rule, and each
+would convert a pre-registered feasibility failure into a post-hoc rescue. The
+separation of a documentation state from the scientific state exists precisely so
+that improving the explanation cannot quietly improve the claim.
+
+Three boundaries were held. First, no frozen artifact was edited: the Gate A
+decision document, the Stage B-D handoff, the protocol, banks, schema, thresholds,
+seeds and model registrations keep their registered bytes and hashes, and the
+erratum narrows their interpretation without altering a byte. Second, no scientific
+operation was performed: this round added zero model downloads, weight loads,
+tokenizer constructions, forward passes, generations, activations, probes, patches,
+ablations, lens operations, provider calls and evidence rows, and
+`paper/evidence_ledger.csv` still ends at `EV-0016`. Third, the one computation
+performed - a read-only re-aggregation of already-committed development rows - was
+labeled `POST_HOC_DESCRIPTIVE_ZERO_AUTHORITY_NOT_SCIENTIFIC_EVIDENCE` and recorded
+as a limitation (L-89), never as a finding.
+
+The substantive interpretive change is narrow and deliberately unsatisfying: the
+Gate A failure is not an artifact of execution or bookkeeping integrity, but the
+study cannot distinguish an incapable checkpoint from an inadequate interface,
+because protocol v1 never measured interface adequacy or label binding. Naming that
+gap is not the same as filling it. Interface calibration, a label-binding study,
+protocol v2 design, Stage B-C and every mechanistic stage remain unauthorized, and
+this terminalization grants no execution authority of any kind.
+
+The charter, the machine-readable charter and the bootstrap handoff receipt were
+deliberately left unedited and are labeled historical records rather than current
+state, so that the opening record of the study stays legible next to its closure.

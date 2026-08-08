@@ -1597,3 +1597,37 @@ B-D handoff. Because the seal was published before all of them and the sealed
 artifacts reproduced byte-identically across the intervening image changes, none
 of those corrections could have moved the measurement, but a reader should know
 that the successful run was not the first attempt.
+
+## L-89 - The failed gate cannot separate an incapable model from an inadequate interface
+
+This limitation is post-hoc. It was written at terminalization, after Gate A
+failed, and it is not a result. Its supporting counts come from
+`studies/study2/analysis/stage_bd_posthoc_interface_diagnostic.md`, which is
+labeled `POST_HOC_DESCRIPTIVE_ZERO_AUTHORITY_NOT_SCIENTIFIC_EVIDENCE` and carries
+no authority over any decision.
+
+A read-only re-aggregation of the already-committed target development rows
+records that the restricted prediction is option C in **zero of all 384** target
+NT rows, at every depth and in both families, even though C is the correct label
+in a quarter of the balanced items. It further records that the modal option
+shifts from A in the no-trace arm to B in all three trace-conditioned arms, while
+accuracy stays near the 0.25 restricted-choice chance level in every arm
+(NT 0.2396, PT 0.2617, ST 0.2656, WT 0.2734). Trace conditioning therefore
+reorganized which letter was emitted without producing an accuracy gain.
+
+That pattern is consistent with weak or failed binding between the option letters
+and the task content, which would be an interface-level rather than a purely
+capability-level concern. It is equally consistent with position or token-level
+preference, template interaction, prompt-format effects, and genuine inability at
+this model scale. **The cause is not identified and cannot be identified from
+these data**: protocol v1 contains no manipulation isolating label binding, no
+interface-adequacy condition, and no calibration arm.
+
+The consequence for interpretation is the operative point. The Gate A failure is
+not an artifact of execution or bookkeeping integrity, as the frozen decision
+document establishes, but the study cannot distinguish an incapable checkpoint
+from an inadequate instrument. Both the failed gate and this limitation must be
+reported together, and neither may be presented as evidence about internal
+computation. See `studies/study2/decisions/study2_stage_bd_interpretation_erratum.md`
+and L-85. This limitation authorizes no rerun, repair, or reinterpretation under
+protocol v1, and no interface-calibration work.

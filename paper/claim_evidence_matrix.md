@@ -41,11 +41,11 @@ Status vocabulary: `unsupported`, `preliminary`, `supported`, `contradicted`.
 | --- | --- |
 | Proposed paper claim | The target model maintains a hidden internal reasoning workspace when visible chain-of-thought is suppressed. |
 | Required evidence | A validated lens (CL-02), calibrated task cells with genuine headroom (CL-05), a preregistered causal intervention design, and a result that discriminates the hidden-workspace hypothesis from simpler explanations. |
-| Available evidence | No direct evidence. Study 1 produced engineering lens identities and an interface-specific behavioral floor failure, but no lens readout or causal intervention. Study 2 is only an opened design namespace and has no empirical row. |
+| Available evidence | No direct evidence. Study 1 produced engineering lens identities and an interface-specific behavioral floor failure, but no lens readout or causal intervention. Study 2 protocol v1 executed a complete 3,072-row behavioral development stage and then closed on a failed pre-registered feasibility gate (`STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`); it never opened confirmation or any mechanistic stage and produced no evidence row. |
 | Missing evidence | A complete behaviorally qualified, prospectively controlled, causal result that distinguishes intermediate computation from answer copying, prompt echo, option priors, generic residual transfer, motor preparation, and post-training alternatives. |
 | Status | **unsupported** |
-| Key artifacts | Study 1 closure: `studies/study1/terminal_manifest.json`. Study 2 design entry: `studies/study2/RESEARCH_CHARTER.md`. Neither is empirical support. |
-| Limitations | Study 1 did not operationalize this claim (`L-67`). Study 2 may eventually support only its narrower registered operational claim; no bootstrap or protocol artifact may be presented as evidence. |
+| Key artifacts | Study 1 closure: `studies/study1/terminal_manifest.json`. Study 2 closure: `studies/study2/terminal_manifest.json` and `studies/study2/STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md`. Neither is empirical support for this claim. |
+| Limitations | Study 1 did not operationalize this claim (`L-67`). Study 2 protocol v1 stopped before any mechanistic measurement, and its development behavior cannot distinguish an incapable checkpoint from an inadequate interface (`L-85`, `L-89`). No bootstrap, protocol, or terminalization artifact is evidence. |
 
 ---
 
@@ -264,9 +264,9 @@ CL-07 remains unsupported.
 | Required evidence | Frozen Gate A pass; target NT_PASS in both selected family cells; complete fixed-window recombinant patching with all six lower-bound gates; cross-template PROBE_PASS; complete integrity controls and closed row-level packs. |
 | Available evidence | A reviewed and frozen protocol, deterministic public banks, exact task/pair ground truth, ACR validation, zero-operation Stage P provenance, sealed Stage T token identity, and a complete integrity-valid Stage B-D development pack of 3,072 rows across all three checkpoints. |
 | Missing evidence | Every activation, patch, probe, bootstrap interval, and confirmation classification. Under protocol v1 these can no longer be produced: the frozen Gate A feasibility rule returned `overall_gate_pass = false` (target NT, depths 2+3: `permutation_chain` 25/128, `affine_mod10` 33/128, threshold 43, chance 32/128), which closes v1 before Stage B-C and every mechanistic stage. |
-| Status | **unsupported / preregistered** |
-| Key artifacts | `studies/study2/protocol/reasoning_internalization_protocol.json`; `studies/study2/data/task_bank_manifest.json`; `studies/study2/decisions/reasoning_internalization_protocol_freeze.md`; `studies/study2/decisions/study2_stage_bd_gate_a_decision.md`; `studies/study2/stage_bd/stage_bd_core_manifest.json`. |
-| Limitations | Forced-choice logits are not spontaneous behavior; synthetic tasks are narrow; Gate A creates disclosed protocol-selection bias; one-family support cannot generalize; operational incompleteness is not a scientific negative. |
+| Status | **unsupported / not estimable under protocol v1** |
+| Key artifacts | `studies/study2/terminal_manifest.json`; `studies/study2/STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md`; `studies/study2/decisions/study2_stage_bd_gate_a_decision.md`; `studies/study2/decisions/study2_stage_bd_interpretation_erratum.md`; `studies/study2/protocol/reasoning_internalization_protocol.json`; `studies/study2/data/task_bank_manifest.json`; `studies/study2/decisions/reasoning_internalization_protocol_freeze.md`; `studies/study2/stage_bd/stage_bd_core_manifest.json`. |
+| Limitations | Forced-choice logits are not spontaneous behavior; synthetic tasks are narrow; Gate A creates disclosed protocol-selection bias; one-family support cannot generalize; operational incompleteness is not a scientific negative. The development behavior additionally cannot distinguish an incapable checkpoint from an inadequate interface (`L-85`, `L-89`); the descriptive post-hoc diagnostic at `studies/study2/analysis/stage_bd_posthoc_interface_diagnostic.md` carries zero authority and is not evidence for or against this claim. |
 
 ---
 
@@ -278,9 +278,9 @@ CL-07 remains unsupported.
 | Required evidence | CL-08 support plus paired lower95 target-minus-each-control aggregate NT accuracy above zero and, in each family, target-minus-each-control PATCH_RECOMBINATION above zero, with every hard control intact on identical target-defined cells, pairs, and window. |
 | Available evidence | Exact immutable checkpoint identities, a frozen common-support design requiring all three models to run the same rows and target-defined selections, and complete three-model development behavior. |
 | Missing evidence | All three-model causal and comparative output packs. The development comparison is available but non-decisional and does not support the claim: all three checkpoints scored at chance on the restricted surface, and the one control cell that cleared a family threshold (`lineage_base`, `affine_mod10`, 44/128) has no authority under the frozen rule. Protocol v1 is closed on Gate A failure, so the remaining packs cannot be produced under this version. |
-| Status | **unsupported / preregistered** |
-| Key artifacts | `studies/study2/RESEARCH_CHARTER.md`; `studies/study2/protocol/reasoning_internalization_protocol.json`; `studies/study2/stage_bd/stage_bd_feasibility_gate.jsonl`. |
-| Limitations | A checkpoint difference is associated with the total post-training/distillation-related change and cannot identify a teacher trace, training example, objective, or loss component. |
+| Status | **unsupported / not estimable under protocol v1** |
+| Key artifacts | `studies/study2/terminal_manifest.json`; `studies/study2/STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md`; `studies/study2/RESEARCH_CHARTER.md`; `studies/study2/protocol/reasoning_internalization_protocol.json`; `studies/study2/stage_bd/stage_bd_feasibility_gate.jsonl`. |
+| Limitations | A checkpoint difference is associated with the total post-training/distillation-related change and cannot identify a teacher trace, training example, objective, or loss component. Under protocol v1 no comparative quantity was estimable at all: all three checkpoints sat at the restricted-choice chance level, and no control cell may be promoted to a finding (`L-89`). |
 
 ---
 
@@ -292,6 +292,6 @@ CL-07 remains unsupported.
 | Required evidence | Complete target-only M-C pack with JREADOUT_PASS and JCAUSAL_PASS under the frozen tasks, pairs, and window, after the lens-independent axis is sealed. |
 | Available evidence | Fixed M1200/A600/B600 engineering identities and a preregistered non-rescuing secondary axis. |
 | Missing evidence | Every Study 2 J-lens readout, coordinate swap, control replicate, interval, and classification. Protocol v1 is closed on Gate A failure, so none can be produced under this version. |
-| Status | **unsupported / preregistered** |
-| Key artifacts | `studies/study2/protocol/reasoning_internalization_protocol.json`; `artifacts/jlens-s2-production/20260806T194226Z/s2-sealed/`. |
-| Limitations | M1200 was fitted on a WikiText proxy; four-scale convergence is exploratory engineering observation only; digit-token support is not yet known; this axis cannot promote the lens-independent result or validate Study 1 retrospectively. |
+| Status | **unsupported / not estimable under protocol v1** |
+| Key artifacts | `studies/study2/terminal_manifest.json`; `studies/study2/STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md`; `studies/study2/protocol/reasoning_internalization_protocol.json`; `artifacts/jlens-s2-production/20260806T194226Z/s2-sealed/`. |
+| Limitations | M1200 was fitted on a WikiText proxy; four-scale convergence is exploratory engineering observation only; digit-token support is not yet known; this axis cannot promote the lens-independent result or validate Study 1 retrospectively. Under protocol v1 the axis was never loaded or applied, so nothing about it was estimated. |

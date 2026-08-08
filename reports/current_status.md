@@ -1,6 +1,46 @@
 # Project Status Report
 
-> **Phase 1.2H-R2 manual status — 2026-08-02**
+> **Study 2 protocol v1 terminalization — 2026-08-08**
+>
+> **Study 2 terminal state:** `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`
+>
+> **Documentation state:** `STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE`
+>
+> Study 2 protocol v1 is closed. The pre-registered, target-only Gate A feasibility
+> gate failed at the end of Stage B-D: `permutation_chain` 25/128 (exact one-sided
+> upper tail `0.9403523926144965`) and `affine_mod10` 33/128 (`0.4526854444021635`)
+> against the frozen threshold X >= 43 at alpha = 0.025, so `overall_gate_pass` is
+> `false`. Stage B-C, mechanistic-cell selection, M-D and M-C were never opened and
+> may not be opened under this protocol version.
+>
+> **The original Study 2 research question was not answered.** Study 2 produced no
+> evidence about internal computation, causal mechanism, distillation, J-space or
+> J-lens, and added zero rows to `paper/evidence_ledger.csv`, which still ends at
+> `EV-0016`. Cumulatively Study 2 performed 3,072 forward passes, 3 weight loads, 3
+> tokenizer constructions and 3 model downloads; every other operation counter is
+> zero.
+>
+> The Gate A outcome is not an artifact of execution or bookkeeping integrity, but
+> may still be an artifact of interface or construct validity: protocol v1 never
+> measured interface adequacy or label binding, so the data cannot distinguish an
+> incapable checkpoint from an inadequate interface. See
+> `studies/study2/decisions/study2_stage_bd_interpretation_erratum.md`.
+>
+> Current Study 2 entry points: `studies/study2/terminal_manifest.json` and
+> `studies/study2/STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md`.
+>
+> Study 1 remains independently `CLOSED /
+> INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY`, and Phase 1.0D remains
+> independently `BLOCKED_ON_SEMANTIC_REVIEW_TRANSPORT_CAPACITY`. Study 2's closure
+> changes neither.
+>
+> **Everything below this notice is historical.** The Phase 1.x material that
+> follows records earlier states in this repository and is retained unedited. It is
+> not current status. Nothing below has been deleted, rewritten, or restated.
+
+---
+
+> **Phase 1.2H-R2 manual status — 2026-08-02** *(historical)*
 >
 > **Terminal state:** `BLOCKED_ON_PUBLIC_PROTOCOL_FREEZE`.
 >

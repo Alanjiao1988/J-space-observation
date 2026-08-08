@@ -2,42 +2,51 @@
 
 ## Status
 
-Coordination state:
-`NONTERMINAL_CHECKPOINT_STUDY2_STAGE_T_TOKENIZER_GATE_SEALED_AWAITING_BD_AUTHORITY`
+**Terminal state: `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`**
 
-Canonical protocol lifecycle: `STAGE_T_SEALED_AWAITING_BD_AUTHORITY`
+**Documentation state: `STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE`**
+
+Study 2 protocol v1 is closed. The pre-registered, target-only Gate A feasibility
+gate failed at the end of Stage B-D, before Stage B-C and before any mechanistic
+stage. The original research question was **not answered**, and no evidence about
+internal computation, causal mechanism, distillation, J-space or J-lens exists.
 
 Formal methods-review allowance: `SPENT_VERIFIED`
 
-The model-free protocol and public deterministic banks are frozen after the
-single formal methods review and final ACR validation. Focused run `cmcc`
-passed 41 tests, full run `cmcd` returned 3,537 passed / 15 skipped / only the
-two disclosed historical parser-seal failures, and validator `cmce` passed the
-complete frozen package and protected-byte checks. An operator-directed
-pre-review check identified
-a material feasibility-gate question. The operator selected Gate A and authorized
-the additive amendment at
-[`prompts/stage_p_gate_a_operator_amendment.md`](prompts/stage_p_gate_a_operator_amendment.md).
-The retained gap analysis is
-[`protocol/stage_p_operator_amendment_required.md`](protocol/stage_p_operator_amendment_required.md).
-The freeze decision is
-[`decisions/reasoning_internalization_protocol_freeze.md`](decisions/reasoning_internalization_protocol_freeze.md).
+Stage P froze the model-free protocol and public deterministic banks after the single
+formal methods review. Stage T sealed the tokenizer and option-alignment gate: all
+17,408 frozen prompt rows tokenize under all three registered checkpoints, all four
+option continuations are single tokens, all 2,048 mechanistic pairs are jointly
+eligible, and all eight selection cells filled to 128 for 1,024 selected pairs. The
+three checkpoints produce *identical token IDs* on every prompt row.
 
-Stage T is complete. The tokenizer gate passed cleanly: all 17,408 frozen
-prompt rows tokenize under all three registered checkpoints, all four option
-continuations are single tokens, all 2,048 mechanistic pairs are jointly
-eligible, and all eight selection cells filled to 128 for 1,024 selected pairs
-with no shortfall. The three checkpoints produce *identical token IDs* on every
-prompt row, so downstream mechanistic comparisons run on the same token
-sequences. The gate decision is
-[`../../docs/decisions/study2_stage_t_tokenizer_gate.md`](../../docs/decisions/study2_stage_t_tokenizer_gate.md).
+Stage B-D then executed the complete 384-item development bank across all three
+registered checkpoints, producing 3,072 behavioral rows in 18 shards with zero
+retries, and applied Gate A:
 
-No model weight, lens, activation, probe, patching, ablation, semantic-review
-provider, GPU Job, or scientific row has been produced under Study 2. A frozen
-protocol, model-free task-bank generation, and a tokenizer gate are not
-empirical evidence.
+| target family | NT correct | n | exact one-sided upper tail | family pass |
+| --- | --- | --- | --- | --- |
+| `permutation_chain` | 25 | 128 | 0.9403523926144965 | no |
+| `affine_mod10` | 33 | 128 | 0.4526854444021635 | no |
 
-## Research question
+Against the frozen threshold X >= 43 at alpha = 0.025, `overall_gate_pass = false`.
+The frozen rule permits no rerun, repair, relabel, backfill, threshold change,
+cross-family pooling, or control substitution within protocol v1. Stage B-C and every
+mechanistic stage were therefore never opened; the confirmation bank was never read.
+
+Study 2 contributed **zero** rows to `paper/evidence_ledger.csv`, which still ends at
+`EV-0016`. Cumulatively Study 2 performed 3,072 forward passes, 3 weight loads, 3
+tokenizer constructions and 3 model downloads; every other operation counter -
+generations, activation operations, probes, patching, ablation, lens operations,
+confirmation operations, provider calls, Phase 1.0D and RQ2/S4 operations - is zero.
+
+The Gate A outcome is not an artifact of execution or bookkeeping integrity. It may
+still be an artifact of interface or construct validity: protocol v1 never measured
+interface adequacy or label binding, so **the data cannot distinguish an incapable
+checkpoint from an inadequate interface**. See
+[`decisions/study2_stage_bd_interpretation_erratum.md`](decisions/study2_stage_bd_interpretation_erratum.md).
+
+## Research question (not answered)
 
 Does the R1-distilled checkpoint compute and causally use a task-defined
 intermediate variable during a single forward pass with zero generated
@@ -45,11 +54,15 @@ reasoning tokens, and is that behavior or mechanism stronger than in both its
 lineage base checkpoint and a same-family instruction-tuned control?
 
 The phrase “genuine reasoning” is not treated as a primitive label. The
-strongest permitted operational claim, if every future gate passes, is:
+strongest operational claim the design would ever have permitted, had every gate
+passed, was:
 
 > The target checkpoint uses a causally load-bearing intermediate variable to
 > solve fresh compositional tasks under a controlled no-generated-trace
 > interface.
+
+That ceiling was never approached. Gate A failed at the development stage, so no
+claim of any strength is supported in either direction.
 
 ## Why this is a new study
 
@@ -63,7 +76,7 @@ text and no semantic parser.
 Study 2 is not S3 v1, a replacement batch, or a rerun. It uses new synthetic
 tasks, new splits, new controls, new authority, and new terminal states.
 
-## Design skeleton
+## Design skeleton (as frozen; mechanistic parts never executed)
 
 - Task families: `permutation_chain` and `affine_mod10`.
 - Depths: 1 as direct control; 2 and 3 as compositional tasks.
@@ -71,15 +84,17 @@ tasks, new splits, new controls, new authority, and new terminal states.
 - Observable: restricted probabilities over four fixed option tokens from one
   forward pass; zero generated tokens.
 - Primary mechanism: donor-to-recipient residual patching at the answer
-  position.
+  position. **Never executed.**
 - Anti-copy test: patch success must favor the recombinant answer
   `g_recipient(m_donor)`, which is distinct from donor and recipient answers.
+  **Never executed.**
 - Controls: no-op, same-intermediate, same-answer/different-intermediate,
   random donor, wrong position, early band, motor band, option balance and
-  cross-template probe.
-- Comparators: lineage base and same-family instruction checkpoint.
-- J-lens: fixed M1200 is target-only and secondary; it cannot select or rescue
-  the lens-independent result.
+  cross-template probe. **Never executed.**
+- Comparators: lineage base and same-family instruction checkpoint. Executed at
+  the behavioral development stage only, as descriptive rows with zero authority
+  over Gate A.
+- J-lens: fixed M1200 was target-only and secondary. **Never loaded or applied.**
 
 ## Stage boundary
 
@@ -112,14 +127,26 @@ a new protocol version, a new operator authority, and new task-bank seeds.
 
 ## Read next
 
-1. [`RESEARCH_CHARTER.md`](RESEARCH_CHARTER.md)
-2. [`study2_charter.json`](study2_charter.json)
-3. [`NEXT_THREAD_HANDOFF.md`](NEXT_THREAD_HANDOFF.md)
-4. [`prompts/stage_p_protocol_design_prompt.md`](prompts/stage_p_protocol_design_prompt.md)
-5. [`protocol/stage_p_operator_amendment_required.md`](protocol/stage_p_operator_amendment_required.md)
-6. [`STAGE_P_FINAL_HANDOFF.md`](STAGE_P_FINAL_HANDOFF.md)
-7. [`STAGE_T_FINAL_HANDOFF.md`](STAGE_T_FINAL_HANDOFF.md)
-8. [`STAGE_T_AUTHORITY_RECEIPT.md`](STAGE_T_AUTHORITY_RECEIPT.md)
-9. [`STAGE_BD_FINAL_HANDOFF.md`](STAGE_BD_FINAL_HANDOFF.md)
-10. [`decisions/study2_stage_bd_gate_a_decision.md`](decisions/study2_stage_bd_gate_a_decision.md)
-11. [`STAGE_BD_AUTHORITY_RECEIPT.md`](STAGE_BD_AUTHORITY_RECEIPT.md)
+1. [`terminal_manifest.json`](terminal_manifest.json) — machine-readable terminal record
+2. [`STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md`](STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md) — terminal router
+3. [`decisions/study2_stage_bd_gate_a_decision.md`](decisions/study2_stage_bd_gate_a_decision.md) — the frozen decision
+4. [`decisions/study2_stage_bd_interpretation_erratum.md`](decisions/study2_stage_bd_interpretation_erratum.md) — interpretation control
+5. [`analysis/stage_bd_posthoc_interface_diagnostic.md`](analysis/stage_bd_posthoc_interface_diagnostic.md) — descriptive, zero authority, not evidence
+6. [`STAGE_BD_FINAL_HANDOFF.md`](STAGE_BD_FINAL_HANDOFF.md)
+7. [`STAGE_BD_AUTHORITY_RECEIPT.md`](STAGE_BD_AUTHORITY_RECEIPT.md)
+8. [`STAGE_T_FINAL_HANDOFF.md`](STAGE_T_FINAL_HANDOFF.md)
+9. [`STAGE_T_AUTHORITY_RECEIPT.md`](STAGE_T_AUTHORITY_RECEIPT.md)
+10. [`STAGE_P_FINAL_HANDOFF.md`](STAGE_P_FINAL_HANDOFF.md)
+11. [`protocol/stage_p_operator_amendment_required.md`](protocol/stage_p_operator_amendment_required.md)
+12. [`prompts/stage_p_protocol_design_prompt.md`](prompts/stage_p_protocol_design_prompt.md)
+
+### Historical records, not current state
+
+These describe the study at opening and deliberately retain their original
+lifecycle wording. They are not current authority and were not edited at
+terminalization.
+
+- [`RESEARCH_CHARTER.md`](RESEARCH_CHARTER.md)
+- [`study2_charter.json`](study2_charter.json)
+- [`handoff_receipt.json`](handoff_receipt.json)
+- [`NEXT_THREAD_HANDOFF.md`](NEXT_THREAD_HANDOFF.md) — superseded by the terminal handoff

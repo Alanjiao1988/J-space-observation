@@ -1,6 +1,55 @@
-# Study 2 next-thread handoff
+# Study 2 next-thread handoff (superseded)
 
-## Current state
+## This document is superseded
+
+**This handoff is a historical record. It is no longer executable authority.**
+
+It was written when Study 2 had just been opened and Stage P had not yet run. It
+authorized a next thread to execute Stage P. That work is long finished, and the
+entire study has since closed.
+
+**Current terminal state: `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`**
+
+Go to these instead:
+
+1. [`terminal_manifest.json`](terminal_manifest.json) — machine-readable terminal record
+2. [`STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md`](STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md) — the current terminal router
+3. [`decisions/study2_stage_bd_gate_a_decision.md`](decisions/study2_stage_bd_gate_a_decision.md) — the decision that closed the study
+4. [`decisions/study2_stage_bd_interpretation_erratum.md`](decisions/study2_stage_bd_interpretation_erratum.md) — interpretation control
+5. [`README.md`](README.md) — study entry point
+
+Nothing below this section grants authority. The state, the reading order, the
+“first actions”, and the expected Stage P endpoint recorded below are all historical
+and were all overtaken by events. Do **not** execute them.
+
+## What actually happened after this handoff was written
+
+| stage | outcome |
+| --- | --- |
+| Stage P | completed and frozen |
+| Stage T | completed and sealed; three tokenizers constructed, zero weight loads |
+| Stage B-D | completed; 3,072 development rows; **Gate A failed** |
+| Stage B-C | never opened; unavailable under protocol v1 |
+| Mechanistic selection, M-D, M-C | never opened; unavailable under protocol v1 |
+
+Gate A, the pre-registered target-only feasibility gate, returned
+`overall_gate_pass = false`: `permutation_chain` 25/128 (exact one-sided upper tail
+`0.9403523926144965`) and `affine_mod10` 33/128 (`0.4526854444021635`) against the
+frozen threshold X >= 43 at alpha = 0.025. Protocol v1 closed at that point.
+
+The research question stated below was **not answered**. Study 2 produced no evidence
+about internal computation, causal mechanism, distillation, J-space or J-lens, and
+added zero rows to `paper/evidence_ledger.csv`, which still ends at `EV-0016`.
+
+Any further attempt at this research question requires a separately authorized new
+protocol version with its own operator authority and task-bank seeds. This document
+grants none.
+
+---
+
+# Historical content (as originally written; not current state)
+
+## Original state at the time of writing
 
 `NONTERMINAL_CHECKPOINT_STUDY2_OPENED_AWAITING_STAGE_P`
 

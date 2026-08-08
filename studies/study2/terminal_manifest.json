@@ -1,0 +1,418 @@
+{
+  "schema_version": "jspace-study2-terminal/v1",
+  "study_id": "study2",
+  "display_name": "Causal internal computation under a no-generated-trace interface",
+  "protocol": {
+    "id": "jspace-study2-reasoning-internalization",
+    "version": "v1",
+    "schema_version": "jspace-study2-reasoning-internalization/v1"
+  },
+  "closed_at_utc": "2026-08-08T08:01:45Z",
+  "closed_at_derivation": "Author and committer timestamp of the registered measurement-terminal commit 43411e09de425dfae0ee74ba46c68a389311e9a7, not the workstation clock.",
+  "measurement_terminal_repository": {
+    "branch": "main",
+    "commit": "43411e09de425dfae0ee74ba46c68a389311e9a7",
+    "tree": "c393f395fd499716f5caae6515045483745975bb",
+    "explanation": "These are the terminal scientific-measurement bytes of Study 2 protocol v1. Every behavioral row, summary, feasibility row, Gate A decision object, receipt and stage document that carries scientific weight is fixed at this commit and tree. Later commits in this repository may only add documentation, routing and interpretation control; they cannot change, extend, repair or reinterpret the measurement."
+  },
+  "documentation_publication": {
+    "commit": null,
+    "tree": null,
+    "explanation": "The documentation commit that contains this manifest is intentionally omitted. A file cannot embed the SHA of the commit that contains itself, and inventing or guessing one would create a false identity. The publishing operator supplies the final documentation commit and tree in the terminal handoff response.",
+    "self_reference_avoided": true
+  },
+  "primary_terminal_state": "STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY",
+  "documentation_state": "STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE",
+  "documentation_state_note": "The documentation state records only that the repository's mutable routers, ledgers and interpretation controls were made consistent with the scientific terminal state. It does not replace, promote, weaken or alter the primary terminal state, and it is not scientific evidence.",
+  "scientific_disposition": "ORIGINAL_RESEARCH_QUESTION_NOT_ANSWERED",
+  "original_research_question": "Does the R1-distilled checkpoint compute and causally use a task-defined intermediate variable during a single forward pass with zero generated reasoning tokens, and is that behavior or mechanism stronger than in both its lineage base checkpoint and a same-family instruction-tuned control?",
+  "terminal_measured_question": "Whether the complete, integrity-valid, frozen four-option/no-generated-trace interface cleared its pre-registered target-only development feasibility gate on the frozen 384-item development bank under the three registered 1.5B checkpoints.",
+  "measured_question_boundary": "The measured question is strictly narrower than the original research question. Answering it in the negative closes protocol v1 without producing any evidence about internal computation, causal mechanism, distillation, or the validity of J-space.",
+  "lifecycle": {
+    "stage_p": {
+      "state": "COMPLETE_FROZEN",
+      "opened": true,
+      "description": "Prospective protocol design, deterministic model-free task banks, one bounded methods review, Gate A amendment and freeze. Created no empirical evidence."
+    },
+    "stage_t": {
+      "state": "COMPLETE_SEALED",
+      "opened": true,
+      "description": "Tokenizer identity, prompt tokenization and option-token alignment gate; sealed mechanistic pair selection. Constructed three tokenizers, loaded no model weight, produced no scientific evidence."
+    },
+    "stage_bd": {
+      "state": "COMPLETE_GATE_A_FAILED",
+      "opened": true,
+      "description": "Complete development execution of the frozen behavioral computation across all three registered checkpoints, followed by the pre-registered, non-scientific Gate A feasibility decision, which failed."
+    },
+    "stage_bc": {
+      "state": "NEVER_OPENED",
+      "opened": false,
+      "available_under_protocol_v1": false,
+      "description": "Behavioral confirmation. Never opened; the confirmation bank was never read, tokenized or forwarded. Unavailable under protocol v1 because Gate A failed."
+    },
+    "mechanistic_cell_selection": {
+      "state": "NEVER_OPENED",
+      "opened": false,
+      "available_under_protocol_v1": false
+    },
+    "stage_md": {
+      "state": "NEVER_OPENED",
+      "opened": false,
+      "available_under_protocol_v1": false,
+      "description": "Mechanistic development: activation extraction, patching, probes, ablation and lens work. Never opened."
+    },
+    "stage_mc": {
+      "state": "NEVER_OPENED",
+      "opened": false,
+      "available_under_protocol_v1": false,
+      "description": "Mechanistic confirmation. Never opened."
+    }
+  },
+  "gate_a": {
+    "character": "non_scientific_feasibility_gate",
+    "frozen_before_measurement": true,
+    "modified_after_measurement": false,
+    "design": {
+      "decision_model_role": "target",
+      "decision_arm": "NT",
+      "depths": [
+        2,
+        3
+      ],
+      "rows_per_depth": 64,
+      "n_per_family": 128,
+      "null_accuracy": 0.25,
+      "alpha": 0.025,
+      "test": "exact one-sided binomial upper tail",
+      "threshold_rule": "X >= 43",
+      "boundary_x_43_upper_tail": 0.018218515933,
+      "boundary_x_42_upper_tail": 0.028760674518,
+      "combination_rule": "Gate A passes only when both target families pass.",
+      "chance_count": 32,
+      "prohibited_rescues": [
+        "cross-family pooling",
+        "depth fallback",
+        "favorable subgroup selection",
+        "template selection",
+        "multiplicity rescue",
+        "control-model substitution",
+        "prior-result rescue"
+      ]
+    },
+    "decisive_rows": {
+      "permutation_chain": {
+        "model_role": "target",
+        "arm": "NT",
+        "nt_correct": 25,
+        "n_nt_compositional": 128,
+        "exact_binomial_upper_tail": 0.9403523926144965,
+        "family_gate_pass": false,
+        "balance_ok": true,
+        "finite_complete": true,
+        "confirmation_opened_before_decision": false,
+        "gate_inputs_sha256": "439d00c4ba82d56c4418b43d5ce32cf192f2064cf5d3cbf46aac26240236125c"
+      },
+      "affine_mod10": {
+        "model_role": "target",
+        "arm": "NT",
+        "nt_correct": 33,
+        "n_nt_compositional": 128,
+        "exact_binomial_upper_tail": 0.4526854444021635,
+        "family_gate_pass": false,
+        "balance_ok": true,
+        "finite_complete": true,
+        "confirmation_opened_before_decision": false,
+        "gate_inputs_sha256": "34ce185d4439e78bd712ac239b69212c143a8dba00c4fe8a5355c8a3c41720bc"
+      }
+    },
+    "overall_gate_pass": false,
+    "combined_gate_inputs_sha256": "1433f8119b2d8e377be7ede2735430ab55006c3737ebd2bf9e0c85c486b93cf7",
+    "distance_from_threshold": "Reaching X = 43 would have required 18 additional correct rows in permutation_chain and 10 in affine_mod10. The decision involves no marginal judgment call."
+  },
+  "controls": {
+    "authority": "none",
+    "status": "descriptive_only",
+    "controls_affect_decision": false,
+    "explanation": "The complete six-row family table was retained because the protocol requires it, not because a control can move the decision. No control result is a finding, and substituting a control for the target is not a permitted operation.",
+    "rows": [
+      {
+        "model_role": "target",
+        "family": "permutation_chain",
+        "nt_correct": 25,
+        "n": 128,
+        "exact_binomial_upper_tail": 0.9403523926144965,
+        "family_gate_pass": false,
+        "decisional": true
+      },
+      {
+        "model_role": "target",
+        "family": "affine_mod10",
+        "nt_correct": 33,
+        "n": 128,
+        "exact_binomial_upper_tail": 0.4526854444021635,
+        "family_gate_pass": false,
+        "decisional": true
+      },
+      {
+        "model_role": "lineage_base",
+        "family": "permutation_chain",
+        "nt_correct": 33,
+        "n": 128,
+        "exact_binomial_upper_tail": 0.4526854444021635,
+        "family_gate_pass": false,
+        "decisional": false
+      },
+      {
+        "model_role": "lineage_base",
+        "family": "affine_mod10",
+        "nt_correct": 44,
+        "n": 128,
+        "exact_binomial_upper_tail": 0.011190410208704914,
+        "family_gate_pass": true,
+        "decisional": false,
+        "note": "This control cell cleared the family threshold and still carries zero authority. The frozen rule derives overall_gate_pass exclusively from the two target families. Six family cells were computed; one control cell at p = 0.011 is unremarkable under that many comparisons, and reading it as a rescue would be exactly the multiplicity failure the pre-registration exists to prevent. It is not a finding and must not be reported as one."
+      },
+      {
+        "model_role": "instruction_control",
+        "family": "permutation_chain",
+        "nt_correct": 36,
+        "n": 128,
+        "exact_binomial_upper_tail": 0.23494577258837968,
+        "family_gate_pass": false,
+        "decisional": false
+      },
+      {
+        "model_role": "instruction_control",
+        "family": "affine_mod10",
+        "nt_correct": 32,
+        "n": 128,
+        "exact_binomial_upper_tail": 0.5338897878610797,
+        "family_gate_pass": false,
+        "decisional": false
+      }
+    ]
+  },
+  "execution_identity": {
+    "run_id": "s2-bd-development-v1",
+    "models": 3,
+    "development_items": 384,
+    "rows_per_model": 1024,
+    "total_rows": 3072,
+    "observed_row_count": 3072,
+    "shards": 18,
+    "retries": 0,
+    "shard_manifest_sha256": "7a0f529a9868b054fed21510959c305c01861e6dbe0692f66c1294b6885317b5",
+    "expected_primary_keys_sha256_note": "The core manifest and the pre-inference seal both carry a field named expected_primary_keys_sha256 whose values differ because one digests generation order and the other sorted order over the identical 3,072-key set. This naming defect is disclosed in L-87 and was not repaired, because the computation module's bytes are bound by a seal published before any weight load.",
+    "environment": {
+      "cuda_device_name": "Tesla T4",
+      "image_digest": "sha256:60fd31b4b396dd09565103d85b9ccf9a8d0703f4d6333e870167b95ee02ebe86",
+      "source_commit": "2bb70de3c2bd32a67f21b674bcecb44126032ac0",
+      "source_tree": "d585ae563b8c852aad8bfe18d288e69e9db09090",
+      "torch_version": "2.4.1+cu121",
+      "transformers_version": "4.46.3",
+      "python_version": "3.11.9",
+      "pythonhashseed": "0",
+      "platform_machine": "x86_64"
+    },
+    "model_identities": [
+      {
+        "role": "target",
+        "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        "resolved_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+      },
+      {
+        "role": "lineage_base",
+        "model_id": "Qwen/Qwen2.5-Math-1.5B",
+        "resolved_revision": "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2"
+      },
+      {
+        "role": "instruction_control",
+        "model_id": "Qwen/Qwen2.5-Math-1.5B-Instruct",
+        "resolved_revision": "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35"
+      }
+    ],
+    "generated_tokens": 0
+  },
+  "cumulative_operation_counts": {
+    "source": "Field names and values copied verbatim from the operation_counts object of studies/study2/stage_bd/stage_bd_core_manifest.json.",
+    "ablation_operations": 0,
+    "activation_operations": 0,
+    "behavioral_confirmation_forwards": 0,
+    "behavioral_confirmation_tokenizations": 0,
+    "forward_passes": 3072,
+    "generations": 0,
+    "lens_applies": 0,
+    "lens_fits": 0,
+    "lens_loads": 0,
+    "mechanistic_confirmation_operations": 0,
+    "mechanistic_development_operations": 0,
+    "model_downloads": 3,
+    "patching_operations": 0,
+    "phase1_0d_operations": 0,
+    "probe_fits": 0,
+    "rq2_s4_runs": 0,
+    "scientific_evidence_rows": 0,
+    "semantic_review_provider_calls": 0,
+    "tokenizer_constructions": 3,
+    "weight_loads": 3,
+    "nonzero_counters": [
+      "forward_passes",
+      "weight_loads",
+      "tokenizer_constructions",
+      "model_downloads"
+    ],
+    "documentation_round_contribution": "This documentation terminalization added zero to every counter above."
+  },
+  "confirmation_unopened": {
+    "status": "UNOPENED",
+    "receipt_path": "studies/study2/stage_bd/stage_bd_confirmation_unopened_receipt.json",
+    "receipt_bytes": 804,
+    "receipt_sha256": "572ed679157228f39bfba45cfd8a714aa9100365d3959810e7f170660077810c",
+    "registered_path_count": 6,
+    "behavioral_confirmation_tokenizations": 0,
+    "behavioral_confirmation_forwards": 0,
+    "behavioral_confirmation_output_objects": 0,
+    "confirmation_prompt_identities_loaded": 0,
+    "mechanistic_confirmation_operations": 0,
+    "model_free_integrity_reads": 0,
+    "physical_absence_from_execution_image": true,
+    "gpu_job_reported": "CONFIRMATION_PATHS_PRESENT=0"
+  },
+  "protected_state": {
+    "phase1_0d_rollup_sha256": "436ed331c7dd53fa6387d6b52447bc72edf166bbb3640b7f7723a8766bdf51dd",
+    "phase1_0d_rollup_file_count": 152,
+    "phase1_0d_review_v2_rollup_sha256": "ef5a417c572f7da94a562411b752d74b48da2e28aa3aa1491db9bc34dfbde82a",
+    "phase1_0d_review_v2_rollup_file_count": 36,
+    "evidence_ledger_path": "paper/evidence_ledger.csv",
+    "evidence_ledger_bytes": 25241,
+    "evidence_ledger_sha256": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1",
+    "evidence_ledger_tail_id": "EV-0016",
+    "study2_scientific_evidence_rows": 0
+  },
+  "registered_terminal_artifacts": {
+    "stage_bd_authority": {
+      "path": "studies/study2/prompts/study2_stage_bd_operator_authority.md",
+      "bytes": 25173,
+      "sha256": "f6932e50cf5692ef01df9b5b8a930a3941de9620a7404653c92ffd4e9ea7e8ed"
+    },
+    "stage_bd_computation_module": {
+      "path": "src/jspace_observation/study2_stage_bd.py",
+      "bytes": 66851,
+      "sha256": "27dc5f67c4fa9bf6d01ac3761958dd702915aae260c385ba41f020e619920a88"
+    },
+    "stage_bd_pack_schema": {
+      "path": "studies/study2/protocol/stage_bd_pack.schema.json",
+      "bytes": 36009,
+      "sha256": "f24ed3168f743d1141da9c2e9549b63020aa5c1652f1ea6829de4bfbbfd811f7"
+    },
+    "stage_bd_preinference_seal": {
+      "path": "studies/study2/stage_bd/stage_bd_preinference_seal.json",
+      "bytes": 5844,
+      "sha256": "0c4efb0d25012673834381df1ae566802af0f3785f1ee6df72f8d67a352c4a9a"
+    },
+    "stage_bd_core_manifest": {
+      "path": "studies/study2/stage_bd/stage_bd_core_manifest.json",
+      "bytes": 41322,
+      "sha256": "4a64cbf9de6d2fae476589b3a8213dd5bf2dedad19c40b9d4003dd768fa56716"
+    },
+    "stage_bd_gate_a_decision_object": {
+      "path": "studies/study2/stage_bd/stage_bd_gate_a_decision.json",
+      "bytes": 38845,
+      "sha256": "1aebc183e157f8097cdc88ab3a9dbdb53bd1ae3bf4ff6a428e3e9dfef49a3544"
+    },
+    "stage_bd_gate_a_decision_document": {
+      "path": "studies/study2/decisions/study2_stage_bd_gate_a_decision.md",
+      "bytes": 8590,
+      "sha256": "e535504725b2e5d918af19ecce5eda82ebdf573feb0ca3a1f1efd358f065eab4"
+    },
+    "stage_bd_final_handoff": {
+      "path": "studies/study2/STAGE_BD_FINAL_HANDOFF.md",
+      "bytes": 14218,
+      "sha256": "8acc361f40ea9d3ee6aad7af0d905c808acaf19dec69e88ca0d8c23a637f008f"
+    },
+    "stage_bd_authority_receipt": {
+      "path": "studies/study2/STAGE_BD_AUTHORITY_RECEIPT.md",
+      "bytes": 13984,
+      "sha256": "ffdcde348f63be6245913528776fe49dc509febe03a345e4436e0ab9560f96fd"
+    },
+    "target_development_rows": {
+      "path": "studies/study2/stage_bd/stage_bd_behavioral_development_target.jsonl",
+      "bytes": 1002446,
+      "sha256": "9ada004f1c9c25f940e00de7753dd6563e3898153c66099f7b84360aaa8ea34e"
+    }
+  },
+  "claim_boundaries": {
+    "causal_internal_computation": "unsupported_and_unmeasured",
+    "distillation_associated_difference": "unsupported_and_unmeasured",
+    "jlens_validity": "unsupported_and_unmeasured",
+    "jspace_validity": "unsupported_and_unmeasured",
+    "hidden_reasoning": "unsupported_and_unmeasured",
+    "internalized_chain_of_thought": "unsupported_and_unmeasured",
+    "explanation": "Gate A failed before Stage B-C and before every mechanistic stage, so none of these constructs was ever measured. The development behavior that does exist is integrity-valid but at the restricted-choice chance level, and it supports no claim in either direction."
+  },
+  "interpretation_boundary": {
+    "integrity_validation_excludes": [
+      "a wrong or incomplete row space",
+      "prompt or token identity mismatch against the Stage T seal",
+      "wrong option-token IDs",
+      "non-finite or incomplete summary cells",
+      "shard-manifest mismatch",
+      "unregistered decision inputs",
+      "post-measurement movement of the frozen Gate A rule"
+    ],
+    "integrity_validation_does_not_establish": [
+      "that the four-option letter surface is a valid measurement of the underlying capability",
+      "that label binding succeeded",
+      "that the no-tool, no-generated-trace interface can express the relevant computation",
+      "construct validity of the estimand",
+      "adequacy of the interface at this model scale"
+    ],
+    "cannot_distinguish": "an incapable checkpoint from an inadequate interface",
+    "erratum": "studies/study2/decisions/study2_stage_bd_interpretation_erratum.md",
+    "related_limitations": [
+      "L-85",
+      "L-89"
+    ]
+  },
+  "closure_policy": {
+    "rerun_same_version": false,
+    "repair": false,
+    "relabel": false,
+    "backfill": false,
+    "replacement": false,
+    "threshold_change": false,
+    "pooling_rescue": false,
+    "reinterpretation_as_positive_or_negative_science": false,
+    "open_stage_bc": false,
+    "open_mechanistic_selection_or_execution": false,
+    "promote_control_cell_to_finding": false,
+    "post_hoc_diagnostic_as_evidence": false
+  },
+  "future_authority": {
+    "granted_by_this_terminalization": "none",
+    "rule": "Any later attempt at this research question requires a separately authorized new protocol version with a new operator authority and new task-bank seeds. Protocol v2 design, interface calibration, task or threshold selection, Stage B-C, and every mechanistic stage remain unauthorized. This terminalization is documentation and interpretation control only; it grants no execution authority and creates no scientific evidence.",
+    "branch_metadata_rule": "Local branch names, session names and worktree paths are observational metadata. Commit, tree and blob identity remain authoritative for any future separately authorized work."
+  },
+  "historical_records_not_current_state": [
+    {
+      "path": "studies/study2/RESEARCH_CHARTER.md",
+      "note": "Opening charter. Describes the state at study opening and retains its original lifecycle wording. It is a historical authority record, not current execution authority."
+    },
+    {
+      "path": "studies/study2/study2_charter.json",
+      "note": "Machine-readable opening charter. Historical record; its opening lifecycle fields were deliberately left unedited."
+    },
+    {
+      "path": "studies/study2/handoff_receipt.json",
+      "note": "Bootstrap handoff receipt. Historical record of study opening, not current state."
+    }
+  ],
+  "required_reading_order": [
+    "studies/study2/terminal_manifest.json",
+    "studies/study2/STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md",
+    "studies/study2/decisions/study2_stage_bd_gate_a_decision.md",
+    "studies/study2/decisions/study2_stage_bd_interpretation_erratum.md",
+    "studies/study2/STAGE_BD_FINAL_HANDOFF.md"
+  ],
+  "manifest_status": "This manifest is a routing and identity record. It is not scientific evidence, it creates no evidence row, and it does not alter any frozen artifact."
+}

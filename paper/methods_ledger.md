@@ -1550,3 +1550,41 @@ byte-identically three times across two image digests, and two finalization runs
 on two different image digests reproduced all eleven artifact digests
 identically. Every committed byte was pulled from the registry by manifest
 digest.
+
+## M-25 - Study 2 protocol v1 terminalization and post-hoc re-aggregation
+
+Study 2 protocol v1 was terminalized as a documentation operation after the
+scientific measurement had already been sealed. The terminalization ran no model,
+constructed no tokenizer, executed no forward pass, and added no evidence row; it
+edited only mutable routers, ledgers and interpretation controls, and created a
+machine-readable terminal manifest, a terminal handoff, an interpretation erratum,
+and one post-hoc diagnostic document. Frozen protocol, schema, banks, thresholds,
+seeds, model registrations and stage artifacts were not touched, and their
+registered hashes are unchanged.
+
+Two method-relevant corrections were recorded. First, the frozen claim that the
+Gate A outcome "is not a measurement artifact" was narrowed: the frozen analysis
+excluded execution and bookkeeping artifacts, not interface or construct-validity
+artifacts, so the corrected statement is that the data cannot distinguish an
+incapable checkpoint from an inadequate interface. The two frozen documents keep
+their exact bytes; only the interpretation is controlled, at
+`studies/study2/decisions/study2_stage_bd_interpretation_erratum.md`.
+
+Second, one descriptive re-aggregation was computed over already-committed rows.
+It reads `studies/study2/stage_bd/stage_bd_behavioral_development_target.jsonl`
+(1,002,446 bytes, SHA-256
+`9ada004f1c9c25f940e00de7753dd6563e3898153c66099f7b84360aaa8ea34e`) from the
+committed blob, verifies that digest, parses each line as JSON, selects rows on
+the `arm` and `depth` fields, counts `correct`, and tallies `restricted_prediction`
+with the Python standard library. Counts were recomputed from row bytes rather
+than copied from any summary or manifest, and every recomputed value matched its
+registered expected value with zero discrepancies. The procedure is model-free,
+read-only, and reproducible from the same commit.
+
+The resulting document is labeled
+`POST_HOC_DESCRIPTIVE_ZERO_AUTHORITY_NOT_SCIENTIFIC_EVIDENCE`. It was not
+pre-registered, it is not a hypothesis test, no p-value or interval is computed
+or implied, and it changes no decision. It is admissible only as a limitation
+(L-89) and as exploratory context for a future, separately authorized protocol
+version. Validation of the terminalization used CPU-only ACR runs on committed
+bytes; local pytest was not used and would carry no evidential weight.
