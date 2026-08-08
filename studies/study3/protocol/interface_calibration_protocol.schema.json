@@ -1,31 +1,39 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Alanjiao1988/J-space-observation/studies/study3/protocol/interface_calibration_protocol.schema.json",
-  "title": "Study 3 interface-calibration protocol draft",
-  "description": "Fail-closed structural schema for a Study 3 interface-calibration protocol DRAFT. It is deliberately impossible to satisfy this schema with a document that (a) omits any gate in the required hierarchy, (b) omits the claim boundaries, (c) declares itself frozen, (d) declares itself execution-authorized, (e) carries actual result rows, (f) carries actual task-bank rows, (g) reports any nonzero performed-operation count, or (h) omits the confirmation-isolation rule. The schema validates structure and boundaries only; it cannot and does not validate scientific adequacy.",
+  "title": "Study 3 interface-calibration protocol draft-v0.2",
+  "description": "Fail-closed structural schema for a Study 3 interface-calibration protocol DRAFT at version v0.2. It is deliberately impossible to satisfy this schema with a document that declares itself frozen, declares itself execution-authorized, reports any nonzero performed-operation count, introduces an unregistered operation counter, carries a result row or a task-bank row, selects a winning interface, marks S4 selectable, omits gate I4 from the eligibility set, omits any gate from the hierarchy, lets a gate authorize mechanistic execution, makes the confirmation split accessible before authority, omits the positive-reference construct from confirmation coverage, selects a positive reference, marks OD2, OD5 or OD6 resolved, enables pooling as a rescue, or removes the claim ceiling. The schema validates structure and boundaries only; it cannot and does not validate scientific adequacy, which is why the independent methods review is still required.",
   "type": "object",
   "required": [
     "schema_version",
     "state",
     "status",
     "study_identity",
+    "operator_review_v0_1",
     "research_question",
     "non_questions",
     "validation_targets",
-    "candidate_interfaces",
-    "interface_selection_rule",
+    "not_applicable_semantics",
+    "interface_profiles",
+    "admissibility_order",
+    "atomic_evaluation_cells",
+    "counterbalancing_design",
     "task_strata",
     "bank_construction_policy",
     "checkpoint_roles",
     "positive_reference_candidates",
     "split_lifecycle",
     "gate_hierarchy",
+    "gate_truth_table",
     "target_must_pass_i1_i2_analysis",
     "proposed_statistics",
     "operation_boundaries",
     "compute_and_reproducibility_plan",
     "claim_ceiling",
+    "prior_study_statements",
     "unresolved_operator_decisions",
+    "blocking_decisions",
+    "required_next_action",
     "results",
     "bank_rows"
   ],
@@ -33,11 +41,12 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "pattern": "draft-v0[.]2$"
     },
     "state": {
-      "description": "The only state a conforming draft may declare.",
-      "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW"
+      "description": "The only state a conforming v0.2 draft may declare.",
+      "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW"
     },
     "status": {
       "type": "object",
@@ -46,24 +55,28 @@
         "frozen",
         "execution_authorized",
         "review_state",
+        "authoritative_artifact",
         "note"
       ],
       "additionalProperties": false,
       "properties": {
         "document_class": {
-          "const": "design_draft",
-          "description": "A frozen protocol or an execution authority is rejected here."
+          "const": "design_draft"
         },
         "frozen": {
           "const": false,
-          "description": "Rejects a frozen status."
+          "description": "Rejects frozen=true."
         },
         "execution_authorized": {
           "const": false,
-          "description": "Rejects an execution-authorized status."
+          "description": "Rejects execution_authorized=true."
         },
         "review_state": {
-          "const": "awaiting_operator_review"
+          "const": "awaiting_independent_methods_review"
+        },
+        "authoritative_artifact": {
+          "type": "string",
+          "minLength": 1
         },
         "note": {
           "type": "string",
@@ -79,101 +92,95 @@
         "namespace",
         "draft_version",
         "predecessors",
-        "successor_authority"
+        "successor_authority",
+        "amendment_history"
       ],
+      "additionalProperties": false,
       "properties": {
         "study_id": {
-          "const": "jspace-study3-interface-calibration"
+          "type": "string",
+          "minLength": 1
         },
         "name": {
           "type": "string",
           "minLength": 1
         },
         "namespace": {
-          "const": "studies/study3"
-        },
-        "draft_version": {
           "type": "string",
           "minLength": 1
         },
+        "draft_version": {
+          "const": "draft-v0.2"
+        },
         "predecessors": {
           "type": "array",
-          "minItems": 2,
-          "items": {
-            "type": "object",
-            "required": [
-              "study_id",
-              "terminal_state",
-              "relevance"
-            ]
-          }
+          "minItems": 1
         },
         "successor_authority": {
           "const": "none",
-          "description": "A draft may not confer authority on any successor."
+          "description": "A draft may not name a successor authority."
+        },
+        "amendment_history": {
+          "type": "array",
+          "minItems": 2
+        }
+      }
+    },
+    "operator_review_v0_1": {
+      "type": "object",
+      "required": [
+        "disposition",
+        "record",
+        "additive",
+        "v0_1_preserved_unedited",
+        "v0_1_receipt_retained",
+        "classification",
+        "defects"
+      ],
+      "properties": {
+        "disposition": {
+          "const": "STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE"
+        },
+        "record": {
+          "type": "string",
+          "minLength": 1
+        },
+        "additive": {
+          "const": true
+        },
+        "v0_1_preserved_unedited": {
+          "const": true
+        },
+        "v0_1_receipt_retained": {
+          "type": "string",
+          "minLength": 1
+        },
+        "classification": {
+          "type": "string",
+          "minLength": 1
+        },
+        "defects": {
+          "type": "array",
+          "minItems": 10
         }
       }
     },
     "research_question": {
-      "type": "object",
-      "required": [
-        "draft_question",
-        "question_class",
-        "unit_of_analysis",
-        "what_a_pass_would_mean",
-        "what_a_fail_would_mean"
-      ],
-      "properties": {
-        "draft_question": {
-          "type": "string",
-          "minLength": 40
-        }
-      }
+      "type": "object"
     },
     "non_questions": {
       "type": "array",
-      "minItems": 6,
-      "items": {
-        "type": "object",
-        "required": [
-          "id",
-          "statement",
-          "reason"
-        ],
-        "properties": {
-          "statement": {
-            "type": "string",
-            "minLength": 1
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 1
-          }
-        }
-      },
-      "description": "The draft must explicitly disclaim the questions Study 3 does not ask."
+      "minItems": 1
     },
     "validation_targets": {
       "type": "array",
-      "minItems": 8,
-      "items": {
-        "type": "object",
-        "required": [
-          "id",
-          "construct",
-          "why_needed",
-          "cannot_prove"
-        ],
-        "properties": {
-          "cannot_prove": {
-            "type": "string",
-            "minLength": 1
-          }
-        }
-      },
-      "description": "Every validation target must state what it cannot prove."
+      "minItems": 1
     },
-    "candidate_interfaces": {
+    "not_applicable_semantics": {
+      "type": "string",
+      "minLength": 80
+    },
+    "interface_profiles": {
       "type": "array",
       "minItems": 4,
       "items": {
@@ -183,19 +190,91 @@
           "name",
           "family",
           "role_in_panel",
-          "prompt_contract",
-          "answer_position",
-          "permitted_output",
-          "scoring_equation",
-          "tokenization_assumptions",
-          "abstention_handling",
-          "chat_template",
-          "fair_treatment_across_checkpoints",
-          "future_operation_counts",
+          "prompt_and_rendering_contract",
+          "options_visible",
+          "labels_visible",
+          "scoring_formula",
+          "tokenizer_eligibility_rule",
+          "output_validity_rule",
+          "chat_template_policy_by_role",
+          "applicable_gates",
+          "transformation_applicability",
+          "non_applicable_transformations",
+          "selectable_status",
+          "selectable_status_reason",
+          "projected_operation_counts_if_later_authorized",
           "known_confounds",
-          "disqualifying_failures"
+          "disqualifying_failures",
+          "notes"
         ],
+        "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^S[1-4]$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "family": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role_in_panel": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prompt_and_rendering_contract": {
+            "type": "string",
+            "minLength": 1
+          },
+          "options_visible": {
+            "type": "boolean"
+          },
+          "labels_visible": {
+            "type": "boolean"
+          },
+          "scoring_formula": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tokenizer_eligibility_rule": {
+            "type": "string",
+            "minLength": 1
+          },
+          "output_validity_rule": {
+            "type": "string",
+            "minLength": 1
+          },
+          "chat_template_policy_by_role": {
+            "type": "object"
+          },
+          "applicable_gates": {
+            "type": "array",
+            "minItems": 1
+          },
+          "transformation_applicability": {
+            "type": "object"
+          },
+          "non_applicable_transformations": {
+            "type": "array"
+          },
+          "selectable_status": {
+            "enum": [
+              "selectable",
+              "selectable_preferred",
+              "conditionally_selectable",
+              "never_selectable"
+            ]
+          },
+          "selectable_status_reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "projected_operation_counts_if_later_authorized": {
+            "type": "object"
+          },
           "known_confounds": {
             "type": "array",
             "minItems": 1
@@ -203,58 +282,290 @@
           "disqualifying_failures": {
             "type": "array",
             "minItems": 1
+          },
+          "notes": {
+            "type": "array"
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id",
+              "selectable_status"
+            ],
+            "properties": {
+              "id": {
+                "const": "S1"
+              },
+              "selectable_status": {
+                "const": "selectable"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id",
+              "selectable_status"
+            ],
+            "properties": {
+              "id": {
+                "const": "S2"
+              },
+              "selectable_status": {
+                "const": "selectable_preferred"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id",
+              "selectable_status"
+            ],
+            "properties": {
+              "id": {
+                "const": "S3"
+              },
+              "selectable_status": {
+                "const": "conditionally_selectable"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id",
+              "selectable_status"
+            ],
+            "properties": {
+              "id": {
+                "const": "S4"
+              },
+              "selectable_status": {
+                "const": "never_selectable"
+              }
+            }
+          },
+          "description": "S4 must be never_selectable; marking it selectable is rejected here."
+        }
+      ]
     },
-    "interface_selection_rule": {
+    "admissibility_order": {
       "type": "object",
       "required": [
         "principle",
-        "eligibility",
-        "ranking_among_eligible",
-        "deterministic_tie_breaker",
+        "eligibility_rule",
+        "gates_required_for_eligibility",
+        "i1b_applicability",
+        "order",
+        "never_selectable",
+        "no_data_dependent_ranking",
+        "no_winner_this_round",
+        "no_winner_this_round_statement",
+        "proposed_disposition_only",
+        "study_stops_only_when",
         "confirmation_bank_prohibition",
-        "no_winner_this_round"
+        "what_happens_if_the_highest_ranked_eligible_surface_is_not_s2"
       ],
+      "additionalProperties": false,
       "properties": {
-        "ranking_among_eligible": {
+        "principle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eligibility_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gates_required_for_eligibility": {
           "type": "array",
-          "minItems": 2
+          "minItems": 6,
+          "contains": {
+            "const": "I4"
+          },
+          "description": "I4 must be part of eligibility; omitting it is rejected here."
+        },
+        "i1b_applicability": {
+          "type": "string",
+          "minLength": 1
+        },
+        "order": {
+          "type": "array",
+          "minItems": 3
+        },
+        "never_selectable": {
+          "type": "array",
+          "minItems": 1,
+          "contains": {
+            "const": "S4"
+          }
+        },
+        "no_data_dependent_ranking": {
+          "const": true
         },
         "no_winner_this_round": {
           "const": true,
-          "description": "Rejects a draft that has already selected a winning surface."
+          "description": "Rejects a selected winner."
+        },
+        "no_winner_this_round_statement": {
+          "const": "No interface is selected in this round."
+        },
+        "proposed_disposition_only": {
+          "const": true
+        },
+        "study_stops_only_when": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmation_bank_prohibition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "what_happens_if_the_highest_ranked_eligible_surface_is_not_s2": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "atomic_evaluation_cells": {
+      "type": "object",
+      "required": [
+        "sampling_unit",
+        "cluster_rule",
+        "cell_factors",
+        "definition",
+        "pooling_prohibitions",
+        "descriptive_pooling",
+        "no_pooling_rescue"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "sampling_unit": {
+          "const": "the base item"
+        },
+        "cluster_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cell_factors": {
+          "type": "array",
+          "minItems": 8
+        },
+        "definition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pooling_prohibitions": {
+          "type": "array",
+          "minItems": 6
+        },
+        "descriptive_pooling": {
+          "type": "string",
+          "minLength": 1
+        },
+        "no_pooling_rescue": {
+          "const": true,
+          "description": "Rejects enabling pooling as a rescue."
+        }
+      }
+    },
+    "counterbalancing_design": {
+      "type": "object",
+      "required": [
+        "problem_in_v0_1",
+        "requirement",
+        "separated_factors",
+        "construction_algorithm",
+        "label_alphabets",
+        "k6_renderings"
+      ],
+      "properties": {
+        "separated_factors": {
+          "type": "array",
+          "minItems": 3
+        },
+        "construction_algorithm": {
+          "type": "object",
+          "required": [
+            "status",
+            "inputs",
+            "steps",
+            "randomness",
+            "verification"
+          ],
+          "properties": {
+            "steps": {
+              "type": "array",
+              "minItems": 5
+            },
+            "randomness": {
+              "const": "none; the construction is a deterministic function of the registered base-item index and draws no seed"
+            }
+          }
+        },
+        "label_alphabets": {
+          "type": "object",
+          "required": [
+            "requirement",
+            "answer_domain",
+            "forbidden_alphabets",
+            "permitted_alphabet_examples",
+            "label_set_replacement_rule"
+          ],
+          "properties": {
+            "forbidden_alphabets": {
+              "type": "array",
+              "minItems": 1
+            }
+          }
+        },
+        "k6_renderings": {
+          "type": "object",
+          "required": [
+            "count",
+            "one_factor_at_a_time",
+            "answer_cue",
+            "renderings",
+            "v0_1_defect"
+          ],
+          "properties": {
+            "count": {
+              "const": 3
+            },
+            "one_factor_at_a_time": {
+              "const": true
+            },
+            "answer_cue": {
+              "const": "held constant across all three renderings"
+            },
+            "renderings": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3
+            }
+          }
         }
       }
     },
     "task_strata": {
       "type": "array",
-      "minItems": 7,
-      "items": {
-        "type": "object",
-        "required": [
-          "id",
-          "name",
-          "uses_model",
-          "data_generating_process",
-          "ground_truth_function",
-          "duplicate_and_leakage_prevention",
-          "balance_invariants",
-          "expected_failure_mode",
-          "gate_role"
-        ]
-      }
+      "minItems": 7
     },
     "bank_construction_policy": {
       "type": "object",
       "required": [
         "rows_generated_this_round",
-        "seeds_drawn_this_round",
-        "future_seed_draw_procedure",
-        "future_bank_sealing_procedure",
-        "study2_reuse_rule",
-        "parser_dependence_rule"
+        "seeds_drawn_this_round"
       ],
       "properties": {
         "rows_generated_this_round": {
@@ -267,32 +578,37 @@
     },
     "checkpoint_roles": {
       "type": "array",
-      "minItems": 5,
-      "items": {
-        "type": "object",
-        "required": [
-          "id",
-          "name",
-          "is_model",
-          "identity",
-          "purpose",
-          "gate_role"
-        ]
-      }
+      "minItems": 6
     },
     "positive_reference_candidates": {
       "type": "object",
       "required": [
         "selection_status",
-        "hard_requirements",
-        "t4_feasibility_analysis",
-        "candidate_families_for_operator_consideration",
+        "blocking_decision",
+        "dossier",
+        "circularity_rule",
         "prequalification_stage_proposal"
       ],
       "properties": {
-        "hard_requirements": {
-          "type": "array",
-          "minItems": 1
+        "selection_status": {
+          "const": "NOT SELECTED; candidate dossier only",
+          "description": "Rejects a selected positive reference."
+        },
+        "blocking_decision": {
+          "const": "OD2"
+        },
+        "dossier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "circularity_rule": {
+          "type": "object",
+          "required": [
+            "problem",
+            "requirement",
+            "canonical_interface_status",
+            "item_disjointness"
+          ]
         }
       }
     },
@@ -304,62 +620,31 @@
         "surface_selection",
         "hard_stop_before_confirmation",
         "confirmation_isolation",
-        "prevented_failure_modes"
+        "prevented_failure_modes",
+        "cluster_rule"
       ],
       "properties": {
-        "splits": {
-          "type": "array",
-          "minItems": 3
-        },
-        "prevented_failure_modes": {
-          "type": "array",
-          "minItems": 7
-        },
-        "hard_stop_before_confirmation": {
-          "type": "object",
-          "required": [
-            "required",
-            "authority_needed",
-            "rationale"
-          ],
-          "properties": {
-            "required": {
-              "const": true
-            }
-          }
-        },
         "confirmation_isolation": {
-          "description": "Omitting this object, or any of its rules, invalidates the document.",
           "type": "object",
           "required": [
-            "required",
-            "one_shot",
-            "single_interface_only",
-            "physical_exclusion_before_authorization",
-            "no_reuse_after_observation",
-            "fail_closed"
+            "covers_every_gate_bearing_construct",
+            "explicitly_includes",
+            "accessible_before_authority"
           ],
           "properties": {
-            "required": {
+            "covers_every_gate_bearing_construct": {
               "const": true
             },
-            "one_shot": {
-              "const": true
+            "explicitly_includes": {
+              "type": "array",
+              "minItems": 3,
+              "contains": {
+                "const": "gate I4"
+              }
             },
-            "single_interface_only": {
-              "const": true
-            },
-            "fail_closed": {
-              "type": "string",
-              "minLength": 1
-            },
-            "physical_exclusion_before_authorization": {
-              "type": "string",
-              "minLength": 1
-            },
-            "no_reuse_after_observation": {
-              "type": "string",
-              "minLength": 1
+            "accessible_before_authority": {
+              "const": false,
+              "description": "Rejects a confirmation split that is accessible before authority."
             }
           }
         }
@@ -367,7 +652,7 @@
     },
     "gate_hierarchy": {
       "type": "array",
-      "minItems": 6,
+      "minItems": 7,
       "items": {
         "type": "object",
         "required": [
@@ -376,20 +661,26 @@
           "question",
           "inputs",
           "model_roles",
+          "applicable_profiles",
+          "part_of_eligibility",
+          "evaluated_per",
           "threshold_logic",
           "what_passes",
           "what_fails",
+          "not_applicable_semantics",
           "merely_descriptive",
           "legal_next_state_on_pass",
           "legal_next_state_on_fail",
           "authorizes_mechanistic_execution",
-          "fail_closed"
+          "fail_closed",
+          "no_pooling"
         ],
         "properties": {
           "gate_id": {
             "enum": [
               "I0",
-              "I1",
+              "I1a",
+              "I1b",
               "I2",
               "I3",
               "I4",
@@ -398,9 +689,12 @@
           },
           "authorizes_mechanistic_execution": {
             "const": false,
-            "description": "No gate may authorize mechanistic execution."
+            "description": "No gate in a draft may authorize mechanistic execution."
           },
           "fail_closed": {
+            "const": true
+          },
+          "no_pooling": {
             "const": true
           }
         }
@@ -409,125 +703,270 @@
         {
           "contains": {
             "type": "object",
+            "required": [
+              "authorizes_mechanistic_execution",
+              "fail_closed",
+              "gate_id"
+            ],
             "properties": {
               "gate_id": {
                 "const": "I0"
+              },
+              "fail_closed": {
+                "const": true
+              },
+              "authorizes_mechanistic_execution": {
+                "const": false
               }
-            },
-            "required": [
-              "gate_id"
-            ]
-          },
-          "description": "Gate I0 must be present."
+            }
+          }
         },
         {
           "contains": {
             "type": "object",
+            "required": [
+              "authorizes_mechanistic_execution",
+              "fail_closed",
+              "gate_id"
+            ],
             "properties": {
               "gate_id": {
-                "const": "I1"
+                "const": "I1a"
+              },
+              "fail_closed": {
+                "const": true
+              },
+              "authorizes_mechanistic_execution": {
+                "const": false
               }
-            },
-            "required": [
-              "gate_id"
-            ]
-          },
-          "description": "Gate I1 must be present."
+            }
+          }
         },
         {
           "contains": {
             "type": "object",
+            "required": [
+              "authorizes_mechanistic_execution",
+              "fail_closed",
+              "gate_id"
+            ],
+            "properties": {
+              "gate_id": {
+                "const": "I1b"
+              },
+              "fail_closed": {
+                "const": true
+              },
+              "authorizes_mechanistic_execution": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "authorizes_mechanistic_execution",
+              "fail_closed",
+              "gate_id"
+            ],
             "properties": {
               "gate_id": {
                 "const": "I2"
+              },
+              "fail_closed": {
+                "const": true
+              },
+              "authorizes_mechanistic_execution": {
+                "const": false
               }
-            },
-            "required": [
-              "gate_id"
-            ]
-          },
-          "description": "Gate I2 must be present."
+            }
+          }
         },
         {
           "contains": {
             "type": "object",
+            "required": [
+              "authorizes_mechanistic_execution",
+              "fail_closed",
+              "gate_id"
+            ],
             "properties": {
               "gate_id": {
                 "const": "I3"
+              },
+              "fail_closed": {
+                "const": true
+              },
+              "authorizes_mechanistic_execution": {
+                "const": false
               }
-            },
-            "required": [
-              "gate_id"
-            ]
-          },
-          "description": "Gate I3 must be present."
+            }
+          }
         },
         {
           "contains": {
             "type": "object",
+            "required": [
+              "authorizes_mechanistic_execution",
+              "fail_closed",
+              "gate_id"
+            ],
             "properties": {
               "gate_id": {
                 "const": "I4"
+              },
+              "fail_closed": {
+                "const": true
+              },
+              "authorizes_mechanistic_execution": {
+                "const": false
               }
-            },
-            "required": [
-              "gate_id"
-            ]
-          },
-          "description": "Gate I4 must be present."
+            }
+          }
         },
         {
           "contains": {
             "type": "object",
+            "required": [
+              "accessible_before_authority",
+              "authorizes_mechanistic_execution",
+              "covered_constructs",
+              "fail_closed",
+              "gate_id"
+            ],
             "properties": {
               "gate_id": {
                 "const": "I5"
+              },
+              "fail_closed": {
+                "const": true
+              },
+              "authorizes_mechanistic_execution": {
+                "const": false
+              },
+              "accessible_before_authority": {
+                "const": false
+              },
+              "covered_constructs": {
+                "type": "array",
+                "minItems": 6,
+                "contains": {
+                  "const": "I4"
+                }
               }
-            },
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
             "required": [
-              "gate_id"
-            ]
-          },
-          "description": "Gate I5 must be present."
+              "authorizes_mechanistic_execution",
+              "fail_closed",
+              "gate_id",
+              "part_of_eligibility",
+              "per_interface_not_global"
+            ],
+            "properties": {
+              "gate_id": {
+                "const": "I4"
+              },
+              "fail_closed": {
+                "const": true
+              },
+              "authorizes_mechanistic_execution": {
+                "const": false
+              },
+              "part_of_eligibility": {
+                "const": true
+              },
+              "per_interface_not_global": {
+                "const": true
+              }
+            }
+          }
         }
       ]
     },
-    "target_must_pass_i1_i2_analysis": {
+    "gate_truth_table": {
       "type": "object",
       "required": [
-        "position",
-        "argument",
-        "distinctness_from_i4",
-        "consequence_if_target_fails_i1_or_i2_under_every_interface"
-      ]
+        "note",
+        "rows",
+        "legal_stop_states"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "minItems": 7
+        },
+        "legal_stop_states": {
+          "type": "array",
+          "minItems": 4
+        }
+      }
+    },
+    "target_must_pass_i1_i2_analysis": {
+      "type": "object"
     },
     "proposed_statistics": {
       "type": "object",
       "required": [
         "framework",
         "all_numbers_status",
+        "derivation_script",
+        "derivation_tables",
+        "reproducibility",
+        "model_free",
+        "hypothesis_families",
+        "retained_exact_binomial_gates",
+        "i3_primary_item_level_consistency",
+        "i3_secondary_paired_equivalence_sensitivity",
+        "i3_feasibility_verdict",
+        "i4_competence_floor_thresholds",
+        "rejected_v0_1_i4_chance_null",
+        "label_selection_uniformity_bands",
+        "descriptive_clopper_pearson_lower_bounds",
+        "paired_method_verification",
         "sample_sizes",
-        "confidence_intervals",
-        "multiplicity",
-        "equivalence_testing",
-        "power_and_assurance",
-        "deterministic_tie_breaking",
-        "reproducible_formulas"
+        "target_power",
+        "study_alpha",
+        "unresolved"
       ],
       "properties": {
         "all_numbers_status": {
-          "type": "string",
-          "pattern": "proposed"
+          "const": "proposed design parameters, not measurements"
         },
-        "equivalence_testing": {
+        "model_free": {
+          "const": true
+        },
+        "rejected_v0_1_i4_chance_null": {
           "type": "object",
           "required": [
-            "method",
-            "margin_delta",
-            "principle",
-            "minimum_practically_important_accuracy_margin",
-            "minimum_practically_important_robustness_margin"
-          ]
+            "status"
+          ],
+          "properties": {
+            "status": {
+              "const": "REJECTED_BY_OPERATOR_REVIEW"
+            }
+          }
+        },
+        "sample_sizes": {
+          "type": "object",
+          "required": [
+            "n_192_is_not_an_i3_justification",
+            "blocking_decision"
+          ],
+          "properties": {
+            "n_192_is_not_an_i3_justification": {
+              "const": true
+            },
+            "blocking_decision": {
+              "const": "OD6"
+            }
+          }
         }
       }
     },
@@ -535,44 +974,55 @@
       "type": "object",
       "required": [
         "performed_this_round",
+        "all_counters_zero",
+        "counter_semantics",
         "prohibited_without_new_authority",
         "projected_future_operations"
       ],
       "additionalProperties": false,
       "properties": {
         "performed_this_round": {
-          "description": "Any nonzero performed-operation count invalidates the document.",
           "type": "object",
+          "description": "Every registered counter must be exactly zero, and no unregistered counter may be introduced.",
           "required": [
-            "model_downloads",
-            "weight_loads",
-            "tokenizer_constructions",
+            "ablation_operations",
+            "activation_extractions",
+            "bank_rows_generated",
+            "confirmation_split_accesses",
+            "evidence_rows_created",
             "forward_passes",
             "generations",
-            "activation_operations",
-            "probe_fits",
-            "patching_operations",
-            "ablation_operations",
-            "lens_loads",
-            "lens_fits",
-            "lens_applies",
             "gpu_jobs",
+            "interfaces_selected",
+            "lens_operations",
+            "model_downloads",
+            "model_weight_loads",
+            "patching_operations",
+            "phase_1_0d_operations",
+            "positive_references_selected",
+            "probe_operations",
             "provider_calls",
-            "bank_rows_generated",
+            "rq2_s4_operations",
             "seeds_drawn",
-            "scientific_evidence_rows"
+            "study1_files_modified",
+            "study2_files_modified",
+            "tokenizer_constructions"
           ],
-          "additionalProperties": {
-            "const": 0
-          },
+          "additionalProperties": false,
           "properties": {
-            "model_downloads": {
+            "ablation_operations": {
               "const": 0
             },
-            "weight_loads": {
+            "activation_extractions": {
               "const": 0
             },
-            "tokenizer_constructions": {
+            "bank_rows_generated": {
+              "const": 0
+            },
+            "confirmation_split_accesses": {
+              "const": 0
+            },
+            "evidence_rows_created": {
               "const": 0
             },
             "forward_passes": {
@@ -581,85 +1031,73 @@
             "generations": {
               "const": 0
             },
-            "activation_operations": {
+            "gpu_jobs": {
               "const": 0
             },
-            "probe_fits": {
+            "interfaces_selected": {
+              "const": 0
+            },
+            "lens_operations": {
+              "const": 0
+            },
+            "model_downloads": {
+              "const": 0
+            },
+            "model_weight_loads": {
               "const": 0
             },
             "patching_operations": {
               "const": 0
             },
-            "ablation_operations": {
+            "phase_1_0d_operations": {
               "const": 0
             },
-            "lens_loads": {
+            "positive_references_selected": {
               "const": 0
             },
-            "lens_fits": {
-              "const": 0
-            },
-            "lens_applies": {
-              "const": 0
-            },
-            "gpu_jobs": {
+            "probe_operations": {
               "const": 0
             },
             "provider_calls": {
               "const": 0
             },
-            "bank_rows_generated": {
+            "rq2_s4_operations": {
               "const": 0
             },
             "seeds_drawn": {
               "const": 0
             },
-            "scientific_evidence_rows": {
+            "study1_files_modified": {
+              "const": 0
+            },
+            "study2_files_modified": {
+              "const": 0
+            },
+            "tokenizer_constructions": {
               "const": 0
             }
           }
         },
+        "all_counters_zero": {
+          "const": true
+        },
+        "counter_semantics": {
+          "type": "string",
+          "minLength": 1
+        },
         "prohibited_without_new_authority": {
           "type": "array",
-          "minItems": 5
+          "minItems": 1
         },
         "projected_future_operations": {
-          "type": "object",
-          "required": [
-            "status",
-            "assumptions",
-            "caveat"
-          ],
-          "properties": {
-            "status": {
-              "type": "string",
-              "pattern": "PROJECTION ONLY"
-            }
-          }
+          "type": "object"
         }
       }
     },
     "compute_and_reproducibility_plan": {
-      "type": "object",
-      "required": [
-        "route",
-        "workstation_role",
-        "github_actions",
-        "model_and_tokenizer_pinning",
-        "image_and_dependency_locking",
-        "pre_inference_sealing",
-        "operation_counters",
-        "independent_finalization_and_validation",
-        "confirmation_bank_physical_exclusion",
-        "publication",
-        "post_push_verification",
-        "branch_name_handling",
-        "newline_corruption_prevention",
-        "status"
-      ]
+      "type": "object"
     },
     "claim_ceiling": {
-      "description": "Omitting any claim boundary invalidates the document.",
       "type": "object",
       "required": [
         "maximum_pass_claim",
@@ -667,57 +1105,177 @@
         "prohibited_claims",
         "what_a_pass_permits",
         "what_a_pass_does_not_permit",
-        "study2_relationship"
+        "study2_relationship",
+        "not_applicable_semantics"
       ],
       "properties": {
-        "maximum_pass_claim": {
-          "type": "string",
-          "minLength": 1
-        },
-        "maximum_fail_claim": {
-          "type": "string",
-          "minLength": 1
-        },
         "prohibited_claims": {
           "type": "array",
-          "minItems": 6
+          "minItems": 8
         },
         "what_a_pass_does_not_permit": {
           "type": "array",
-          "minItems": 5
+          "minItems": 8
+        }
+      }
+    },
+    "prior_study_statements": {
+      "type": "object",
+      "required": [
+        "study1",
+        "study1_classification",
+        "study2",
+        "study2_classification"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "study1": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "do not establish that parsing caused"
+        },
+        "study1_classification": {
+          "type": "string",
+          "minLength": 1
+        },
+        "study2": {
+          "type": "string",
+          "minLength": 1
+        },
+        "study2_classification": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
     "unresolved_operator_decisions": {
       "type": "array",
-      "minItems": 7,
+      "minItems": 8,
       "items": {
         "type": "object",
         "required": [
           "id",
           "question",
-          "recommendation",
-          "tradeoff",
-          "status"
+          "status",
+          "disposition",
+          "blocking"
         ],
         "properties": {
+          "id": {
+            "pattern": "^OD[1-8]$"
+          },
           "status": {
-            "type": "string",
-            "pattern": "unresolved"
+            "enum": [
+              "resolved",
+              "resolved_in_part",
+              "unresolved"
+            ]
+          },
+          "blocking": {
+            "type": "boolean"
           }
         }
       },
-      "description": "Operator choices must remain visible and unresolved, never buried as defaults."
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id",
+              "status",
+              "blocking"
+            ],
+            "properties": {
+              "id": {
+                "const": "OD2"
+              },
+              "status": {
+                "const": "unresolved"
+              },
+              "blocking": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id",
+              "status",
+              "blocking"
+            ],
+            "properties": {
+              "id": {
+                "const": "OD5"
+              },
+              "status": {
+                "const": "unresolved"
+              },
+              "blocking": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id",
+              "status",
+              "blocking"
+            ],
+            "properties": {
+              "id": {
+                "const": "OD6"
+              },
+              "status": {
+                "const": "unresolved"
+              },
+              "blocking": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "blocking_decisions": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "allOf": [
+        {
+          "contains": {
+            "const": "OD2"
+          }
+        },
+        {
+          "contains": {
+            "const": "OD5"
+          }
+        },
+        {
+          "contains": {
+            "const": "OD6"
+          }
+        }
+      ]
+    },
+    "required_next_action": {
+      "const": "bounded independent methods review of the statistical and gate packet"
     },
     "results": {
-      "description": "A draft may not carry actual result rows.",
       "type": "array",
-      "maxItems": 0
+      "maxItems": 0,
+      "description": "A draft carries no results."
     },
     "bank_rows": {
-      "description": "A draft may not carry actual task-bank rows.",
       "type": "array",
-      "maxItems": 0
+      "maxItems": 0,
+      "description": "A draft carries no task-bank rows."
     }
   }
 }

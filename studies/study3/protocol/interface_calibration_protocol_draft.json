@@ -1,18 +1,19 @@
 {
-  "schema_version": "study3-interface-calibration-draft/1",
-  "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW",
+  "schema_version": "study3-interface-calibration-protocol-draft-v0.2",
+  "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW",
   "status": {
     "document_class": "design_draft",
     "frozen": false,
     "execution_authorized": false,
-    "review_state": "awaiting_operator_review",
-    "note": "This document is a reviewable design draft. It is not a frozen protocol, not a pre-registration of record, and not authority to execute any model operation. Every numeric value in it is proposed, derived, or unresolved."
+    "review_state": "awaiting_independent_methods_review",
+    "authoritative_artifact": "The JSON document interface_calibration_protocol_draft.json is the authoritative record of this design. The Markdown document interface_calibration_protocol_draft.md is a companion rendering of it. Where the two disagree, the JSON governs and the disagreement is a defect. Agreement on every decision-bearing marker is enforced by the committed test at tests/test_study3_design.py. No claim is made that the two documents are generated from a single source of record, because no such generator is committed; what is committed, and therefore what is checked, is the agreement itself.",
+    "note": "draft-v0.2 is an amendment produced in response to an operator review that found ten design defects in draft-v0.1 and refused freeze. Nothing here is frozen, nothing here is authorised for execution, and no scientific measurement of any kind was performed to produce it."
   },
   "study_identity": {
     "study_id": "jspace-study3-interface-calibration",
     "name": "Study 3 - Interface Adequacy and Label-Binding Calibration",
     "namespace": "studies/study3",
-    "draft_version": "draft-v0.1",
+    "draft_version": "draft-v0.2",
     "predecessors": [
       {
         "study_id": "jspace-study1",
@@ -26,7 +27,85 @@
         "relevance": "Study 2 executed its Gate A honestly and did not pass it. Its integrity is not in question. What remains unresolved is whether the A/B/C/D label-token interface it used was adequate to express competence at all."
       }
     ],
-    "successor_authority": "none"
+    "successor_authority": "none",
+    "amendment_history": [
+      {
+        "version": "draft-v0.1",
+        "commit": "360086db495c4c5a098e49a6e8adf73dd143eaef",
+        "disposition": "STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE",
+        "record": "studies/study3/reviews/v0_1_operator_review.md"
+      },
+      {
+        "version": "draft-v0.2",
+        "disposition": "awaiting independent methods review",
+        "record": "studies/study3/analysis/independent_methods_review_packet.md"
+      }
+    ]
+  },
+  "operator_review_v0_1": {
+    "disposition": "STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE",
+    "record": "studies/study3/reviews/v0_1_operator_review.md",
+    "additive": true,
+    "v0_1_preserved_unedited": true,
+    "v0_1_receipt_retained": "studies/study3/design_receipt.json",
+    "classification": "design defects in an unfrozen draft; not empirical findings, not measurements, not results",
+    "defects": [
+      {
+        "id": "D-01",
+        "summary": "the Markdown companion contradicted its JSON twin about whether a winner was selected",
+        "resolution": "resolved; JSON declared authoritative, label corrected, parity test committed"
+      },
+      {
+        "id": "D-02",
+        "summary": "the Markdown made an unsupported single-source provenance claim",
+        "resolution": "resolved; the claim is removed and replaced by an enforced statement"
+      },
+      {
+        "id": "D-03",
+        "summary": "gate lifecycle contradictions around I4 and I5",
+        "resolution": "resolved; I4 is part of eligibility, its failure is per interface, I5 covers every construct"
+      },
+      {
+        "id": "D-04",
+        "summary": "positive-reference circularity and a chance-level floor that is not a capability floor",
+        "resolution": "structurally resolved; floor value blocking as OD5"
+      },
+      {
+        "id": "D-05",
+        "summary": "robustness construct mismatch and not_applicable treated as a pass",
+        "resolution": "resolved; item-level consistency is primary and not_applicable is a third value"
+      },
+      {
+        "id": "D-06",
+        "summary": "the statistics were incomplete",
+        "resolution": "derivations committed and verified; margin and sample size blocking as OD6"
+      },
+      {
+        "id": "D-07",
+        "summary": "pooling could mask a failed cell",
+        "resolution": "resolved; atomic cells defined and pooling rescue prohibited"
+      },
+      {
+        "id": "D-08",
+        "summary": "panel and selection contradiction over S4 and S3",
+        "resolution": "resolved; S4 never selectable, S3 conditional, ranking replaced by admissibility order"
+      },
+      {
+        "id": "D-09",
+        "summary": "counterbalancing was ambiguous and the label alphabet collided with the answer domain",
+        "resolution": "resolved; orthogonal construction published, 1/2/3/4 forbidden"
+      },
+      {
+        "id": "D-10",
+        "summary": "Study 1 overstatement",
+        "resolution": "resolved; the accurate statement is used"
+      },
+      {
+        "id": "D-11",
+        "summary": "reproducibility gap: the v0.1 checker was ephemeral and missed D-01",
+        "resolution": "resolved; design-critical checks are committed"
+      }
+    ]
   },
   "research_question": {
     "draft_question": "Can a pre-specified response and scoring interface recover deliberately trivial, primitive, and independently demonstrated task competence robustly across answer-label permutations, option positions, and prompt renderings for the checkpoint roles relevant to a later J-space study?",
@@ -117,120 +196,437 @@
       "cannot_prove": "The surface that agrees with the others most is not thereby the most valid; agreement is descriptive and must not be promoted into a selection rule on its own."
     }
   ],
-  "candidate_interfaces": [
+  "not_applicable_semantics": "not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied gate, averaged into any rate, or used as an input to admissibility. A gate whose transformation is not applicable to a profile is simply not evaluated for that profile, and the profile's eligibility rests on the gates that are applicable to it.",
+  "interface_profiles": [
     {
       "id": "S1",
       "name": "label_token_logits",
-      "family": "restricted label-token logits over A/B/C/D",
-      "role_in_panel": "Study 2 legacy comparator, retained for continuity, not privileged",
-      "prompt_contract": "Question stem, then four options each on its own line prefixed by its label and a fixed separator, then a fixed instruction to answer with a single label, then a fixed answer cue ending immediately before the label position.",
-      "answer_position": "the single token immediately following the fixed answer cue",
-      "permitted_output": "no generated text; logits are read at one position only",
-      "scoring_equation": "argmax over the four registered label token ids of the next-token logit at the answer position; ties broken by the registered deterministic tie-break order; no renormalization is applied before argmax, and the softmax over the four ids is recorded separately as a descriptive confidence only",
-      "tokenization_assumptions": "each of the four label strings, in the exact surface form produced by the renderer, must map to exactly one token id; Study 2 established ids A=362, B=425, C=356, D=422 for the Qwen2.5 tokenizer, and a future tokenizer gate must re-derive them rather than assume them",
-      "abstention_handling": "not expressible: the surface is forced-choice by construction, so it cannot distinguish 'no answer' from 'wrong answer'. This is a recorded limitation, not a defect to be patched.",
-      "chat_template": "no chat template on base and distilled checkpoints; a registered chat template is an option only if applied to every role identically, which is an unresolved operator decision",
-      "fair_treatment_across_checkpoints": "identical rendered bytes for all roles; no role-specific prompt tuning; any template applied to one role is applied to all",
-      "future_operation_counts": "one forward pass per rendering; no generation",
+      "family": "restricted label-token logits over a four-symbol label alphabet",
+      "role_in_panel": "Study 2 legacy comparator, retained for continuity and not privileged",
+      "prompt_and_rendering_contract": "Question stem, then four option lines each prefixed by its displayed label symbol and a fixed separator, then a fixed instruction to answer with a single label symbol, then a fixed answer cue ending immediately before the label position.",
+      "options_visible": true,
+      "labels_visible": true,
+      "scoring_formula": "argmax over the four registered label token ids of the next-token logit at the answer position, with ties broken by the registered deterministic order; no renormalisation is applied before argmax and the softmax over the four ids is recorded separately as a descriptive confidence only",
+      "tokenizer_eligibility_rule": "every label surface string, in the exact form emitted by the renderer, must map to exactly one token id under the pinned tokenizer of every required role; the four ids must be pairwise distinct; failure is an eligibility failure of the profile, never a silent fallback",
+      "output_validity_rule": "no text is generated; exactly one logit vector is read at exactly one position, so an invalid output is impossible by construction and the output-validity rate is defined as identically 1 and is not a gate input",
+      "chat_template_policy_by_role": {
+        "R0": "not applicable; R0 is a deterministic software control and never receives a prompt",
+        "RC": "not applicable; RC is a deterministic software control and never receives a prompt",
+        "RT": "no chat template; raw completion surface",
+        "RL": "no chat template; raw completion surface",
+        "RI": "no chat template; raw completion surface",
+        "RP": "deferred to OD2; the RP canonical qualification wrapper is not settled and must be frozen before P3-Q and I4"
+      },
+      "applicable_gates": [
+        "I0",
+        "I1a",
+        "I1b",
+        "I2",
+        "I3",
+        "I4",
+        "I5"
+      ],
+      "transformation_applicability": {
+        "position_permutation": "applicable",
+        "label_symbol_permutation": "applicable",
+        "label_set_replacement": "applicable",
+        "separator_rendering": "applicable",
+        "instruction_wording": "applicable"
+      },
+      "non_applicable_transformations": [],
+      "selectable_status": "selectable",
+      "selectable_status_reason": "S1 displays options and labels, so every calibration transformation has a referent and every gate is applicable; it is admissible but ranked last, because it is the surface whose adequacy is under suspicion",
+      "projected_operation_counts_if_later_authorized": {
+        "forward_passes_per_item": 1,
+        "generated_tokens_per_item": 0,
+        "scored_positions_per_item": 1,
+        "logit_reads_per_item": 1
+      },
       "known_confounds": [
-        "option-ID token prior bias (Zheng et al.)",
-        "position bias concentrated when the model is uncertain between the top two or three options (Pezeshkpour and Hruschka)",
-        "first-token probability need not match what the model would write (Wang et al.)"
+        "a label-token frequency prior can substitute for content binding",
+        "position of the correct content is confounded with the displayed symbol unless the counterbalancing design separates them",
+        "label symbols that also occur in the answer domain are ambiguous"
       ],
       "disqualifying_failures": [
-        "fails Gate I1 on explicit-answer items",
-        "selected-label distribution outside the registered uniformity band on balanced banks",
-        "any label string that is not single-token under the pinned tokenizer revision"
-      ]
+        "any label surface string that is not single-token under a required role",
+        "duplicate label token ids",
+        "failure of I1b, which is the gate that distinguishes binding from prior"
+      ],
+      "notes": []
     },
     {
       "id": "S2",
-      "name": "answer_content_logits",
-      "family": "direct answer-content logits over exact single-token answer contents",
-      "role_in_panel": "removes the label indirection while keeping a single-position read",
-      "prompt_contract": "Question stem and a fixed instruction to answer with the value only, then a fixed answer cue. Options are not shown, so no label mapping exists to be biased.",
-      "answer_position": "the single token immediately following the fixed answer cue",
-      "permitted_output": "no generated text; logits are read at one position only",
-      "scoring_equation": "argmax over the registered candidate-content token ids for that item (the correct content plus the registered distractor contents); correct if the argmax id equals the ground-truth content id",
-      "tokenization_assumptions": "every candidate content for an item must be single-token eligible under the pinned tokenizer revision, verified by a future tokenizer gate; items whose contents are not single-token eligible are excluded from this surface before any measurement, and the exclusion set is recorded",
-      "abstention_handling": "not expressible over the restricted set; an unrestricted-vocabulary variant that records whether the global argmax lies outside the candidate set is proposed as an additional descriptive diagnostic",
-      "chat_template": "same policy as S1",
-      "fair_treatment_across_checkpoints": "identical rendered bytes and identical candidate id sets for all roles",
-      "future_operation_counts": "one forward pass per rendering; no generation",
+      "name": "content_token_logits",
+      "family": "restricted content-token logits over the frozen answer domain",
+      "role_in_panel": "primary candidate; the surface that asks the model for the answer itself rather than for a symbol standing for the answer",
+      "prompt_and_rendering_contract": "Question stem, then a fixed instruction to state the answer value directly, then a fixed answer cue ending immediately before the answer position. No option list is rendered and no label symbol is displayed.",
+      "options_visible": false,
+      "labels_visible": false,
+      "scoring_formula": "argmax over the registered content token ids of the frozen answer domain of the next-token logit at the answer position, with ties broken by the registered deterministic order; the softmax over the domain is recorded as a descriptive confidence only",
+      "tokenizer_eligibility_rule": "every content surface string of the frozen answer domain, in the exact form emitted by the renderer, must map to exactly one token id under the pinned tokenizer of every required role, and the ids must be pairwise distinct; the current frozen domain is the ten mod-10 residues",
+      "output_validity_rule": "no text is generated; exactly one logit vector is read at exactly one position, so the output-validity rate is identically 1 and is not a gate input",
+      "chat_template_policy_by_role": {
+        "R0": "not applicable; R0 is a deterministic software control and never receives a prompt",
+        "RC": "not applicable; RC is a deterministic software control and never receives a prompt",
+        "RT": "no chat template; raw completion surface",
+        "RL": "no chat template; raw completion surface",
+        "RI": "no chat template; raw completion surface",
+        "RP": "deferred to OD2; the RP canonical qualification wrapper is not settled and must be frozen before P3-Q and I4"
+      },
+      "applicable_gates": [
+        "I0",
+        "I1a",
+        "I2",
+        "I3",
+        "I4",
+        "I5"
+      ],
+      "transformation_applicability": {
+        "position_permutation": "S2 renders no option list, so there is no physical position for the correct content to occupy and the transformation has no referent",
+        "label_symbol_permutation": "S2 displays no label symbols, so there is nothing to permute and the transformation has no referent",
+        "label_set_replacement": "S2 displays no label alphabet, so there is no alphabet to replace",
+        "separator_rendering": "applicable",
+        "instruction_wording": "applicable"
+      },
+      "non_applicable_transformations": [
+        {
+          "transformation": "position_permutation",
+          "reason": "S2 renders no option list, so there is no physical position for the correct content to occupy and the transformation has no referent"
+        },
+        {
+          "transformation": "label_symbol_permutation",
+          "reason": "S2 displays no label symbols, so there is nothing to permute and the transformation has no referent"
+        },
+        {
+          "transformation": "label_set_replacement",
+          "reason": "S2 displays no label alphabet, so there is no alphabet to replace"
+        }
+      ],
+      "selectable_status": "selectable_preferred",
+      "selectable_status_reason": "S2 removes the symbol-binding step entirely, so a failure cannot be attributed to label handling; it is preferred whenever the frozen answer domain is jointly single-token eligible for every required role",
+      "projected_operation_counts_if_later_authorized": {
+        "forward_passes_per_item": 1,
+        "generated_tokens_per_item": 0,
+        "scored_positions_per_item": 1,
+        "logit_reads_per_item": 1
+      },
       "known_confounds": [
-        "single-token eligibility silently restricts the answer space and can make the stratum easier than intended",
-        "frequency priors over content tokens are not removed by restriction",
-        "without options shown, the task is open-response scored closed, which is a different task from S1 and must not be pooled with it"
+        "a content-token frequency prior over the answer domain",
+        "the answer cue wording can bias the first emitted token"
       ],
       "disqualifying_failures": [
-        "insufficient single-token eligible items to reach the registered per-cell sample size",
-        "fails Gate I2 on depth-1 primitives for the roles a later study needs"
+        "any content surface string of the frozen answer domain that is not single-token under a required role",
+        "duplicate content token ids"
+      ],
+      "notes": [
+        "Because S2 shows no options and no labels, three of the five calibration transformations are not applicable to it. Under v0.1 those three were scored as passes; under v0.2 they are recorded as not_applicable and contribute nothing."
       ]
     },
     {
       "id": "S3",
-      "name": "content_conditional_loglikelihood",
-      "family": "conditional log-likelihood of exact option contents",
-      "role_in_panel": "the standard cloze-style comparator; the only surface that handles multi-token answers",
-      "prompt_contract": "Question stem and a fixed continuation cue, scored once per candidate content. Options are not enumerated in the prompt, so the score is independent of option order by construction.",
-      "answer_position": "the full candidate-content continuation after the cue",
-      "permitted_output": "no generated text; teacher-forced scoring only",
-      "scoring_equation": "for each candidate c, sum of log P(token_i | prefix, tokens_<i) over the tokens of c; the registered primary variant divides by the token count of c (mean log-likelihood) and the unnormalized sum is recorded as a registered secondary; both are computed from the same forward passes so no extra operations are needed; argmax over candidates",
-      "length_handling": "length normalization is a known confound that changes which candidate wins. The draft registers mean-per-token as primary and the raw sum as secondary, requires both to be reported, and requires that any stratum where the two disagree on more than a registered fraction of items be flagged as length-confounded rather than scored",
-      "tokenization_assumptions": "no single-token requirement; candidate contents must be tokenized in isolation from the prefix boundary in a registered, documented way, because leading-space handling changes token counts and therefore the normalized score",
-      "abstention_handling": "not expressible; forced choice over the candidate set",
-      "chat_template": "same policy as S1",
-      "fair_treatment_across_checkpoints": "identical prefixes, identical candidate strings, identical normalization for all roles",
-      "future_operation_counts": "one teacher-forced sequence scoring per (rendering, candidate) pair, so four times the S1 cost at four candidates; no generation",
+      "name": "content_sequence_likelihood",
+      "family": "length-normalised sequence log-likelihood over candidate answer strings",
+      "role_in_panel": "conditional candidate; currently an integrity check on S2 rather than an independent surface",
+      "prompt_and_rendering_contract": "Identical stem, instruction and answer cue to S2. The difference is entirely in scoring: each candidate answer string is scored as a sequence rather than as a single token.",
+      "options_visible": false,
+      "labels_visible": false,
+      "scoring_formula": "argmax over candidate answer strings of the length-normalised sum of token log-probabilities of the candidate continuation, with the normalisation constant, the boundary-token rule and the tie-break order all registered in advance",
+      "tokenizer_eligibility_rule": "candidate answer strings need not be single-token, which is precisely the case S3 exists to cover; but the boundary-token rule must be registered before any scoring, because where the candidate is deemed to start and stop determines the score",
+      "output_validity_rule": "no free text is generated; the candidate set is closed, so an invalid output is impossible and the validity rate is identically 1",
+      "chat_template_policy_by_role": {
+        "R0": "not applicable; R0 is a deterministic software control and never receives a prompt",
+        "RC": "not applicable; RC is a deterministic software control and never receives a prompt",
+        "RT": "no chat template; raw completion surface",
+        "RL": "no chat template; raw completion surface",
+        "RI": "no chat template; raw completion surface",
+        "RP": "deferred to OD2; the RP canonical qualification wrapper is not settled and must be frozen before P3-Q and I4"
+      },
+      "applicable_gates": [
+        "I0",
+        "I1a",
+        "I2",
+        "I3",
+        "I4",
+        "I5"
+      ],
+      "transformation_applicability": {
+        "position_permutation": "S3 renders no option list",
+        "label_symbol_permutation": "S3 displays no label symbols",
+        "label_set_replacement": "S3 displays no label alphabet",
+        "separator_rendering": "applicable",
+        "instruction_wording": "applicable"
+      },
+      "non_applicable_transformations": [
+        {
+          "transformation": "position_permutation",
+          "reason": "S3 renders no option list"
+        },
+        {
+          "transformation": "label_symbol_permutation",
+          "reason": "S3 displays no label symbols"
+        },
+        {
+          "transformation": "label_set_replacement",
+          "reason": "S3 displays no label alphabet"
+        }
+      ],
+      "selectable_status": "conditionally_selectable",
+      "selectable_status_reason": "For a single-token answer domain the length-normalised sequence score of a one-token candidate is a monotone function of that token's log probability, so S3's argmax is identical to S2's by construction. S3 is therefore not an independent surface under the current frozen domain. It becomes selectable only when a later authority introduces a multi-token answer domain, a dedicated multi-token stratum, a registered boundary-token rule and a length-confound gate.",
+      "projected_operation_counts_if_later_authorized": {
+        "forward_passes_per_item": 1,
+        "generated_tokens_per_item": 0,
+        "scored_positions_per_item": 1,
+        "note": "under the current single-token domain S3 reuses the S2 forward pass and its agreement with S2 is recorded as an integrity check; it does not add four separate scorings and must not be budgeted as if it did"
+      },
       "known_confounds": [
-        "length and token-count asymmetry among candidates",
-        "surface-form frequency priors",
-        "leading-whitespace and tokenizer boundary effects",
-        "the option set is never shown, so this surface cannot detect a comparison failure that only appears when options are visible"
+        "length confound: longer candidate strings are penalised or rewarded depending on the normalisation constant",
+        "boundary-token ambiguity: leading-space and end-of-string handling can change the ranking"
       ],
       "disqualifying_failures": [
-        "primary and secondary normalizations disagree beyond the registered fraction on a gate-bearing stratum",
-        "candidate token counts cannot be balanced or covaried within a stratum"
+        "disagreement with S2 on a single-token domain, which would indicate a scoring implementation defect rather than a model property",
+        "any use of S3 as an independent surface before a multi-token domain, a dedicated stratum, a boundary-token rule and a length-confound gate all exist"
+      ],
+      "notes": [
+        "S3's current job is to catch scorer defects, not to compete."
       ]
     },
     {
       "id": "S4",
-      "name": "bounded_minimal_generation",
-      "family": "bounded minimal-answer generation, final answer only, no rationale",
-      "role_in_panel": "calibration reference only. It is explicitly not assumed to be the surface a later causal study would use, because free generation reintroduces the parsing dependence that ended Study 1.",
-      "prompt_contract": "Question stem, options if the stratum shows them, a fixed instruction that the reply must contain only the final answer, and a fixed answer cue.",
-      "answer_position": "the generated span, truncated at the registered maximum new-token budget",
-      "permitted_output": "at most a registered small number of new tokens, greedy decoding, temperature fixed at 0, no sampling, hard stop at a registered stop string; any generated rationale is a protocol violation for this surface and is scored as invalid rather than parsed",
-      "scoring_equation": "exact match of the normalized generated span against the ground-truth content or label after a registered, deterministic normalization (strip whitespace, case-fold, strip a registered set of trailing punctuation); no fuzzy matching, no regex rescue, no second-chance parse",
-      "tokenization_assumptions": "none beyond the pinned tokenizer; multi-token answers are permitted",
-      "abstention_handling": "expressible and recorded as a distinct outcome. Invalid, empty, over-budget and off-format outputs are counted separately and are never silently mapped to a wrong answer; output validity is itself an input to Gate I1",
-      "chat_template": "the instruction-tuned role plausibly requires its registered chat template for this surface to be meaningful, while the base role has none. This asymmetry is unresolved and is an operator-review item.",
-      "fair_treatment_across_checkpoints": "cannot be made perfectly fair across base and instruction-tuned checkpoints; the draft records this as a structural limitation of S4 rather than claiming parity",
-      "future_operation_counts": "one generation per rendering, each up to the registered new-token budget; the most expensive surface in the panel",
+      "name": "free_generation_with_parser",
+      "family": "constrained free generation followed by a deterministic parser",
+      "role_in_panel": "diagnostic only; never selectable",
+      "prompt_and_rendering_contract": "Question stem, option list, and an instruction permitting a short free response. Each role's native chat template is applied where one exists, and its absence is recorded explicitly where one does not.",
+      "options_visible": true,
+      "labels_visible": true,
+      "scoring_formula": "the model generates at most a registered maximum number of tokens under greedy decoding; a deterministic, version-pinned parser maps the completion to a member of the answer domain or to the explicit value unparseable",
+      "tokenizer_eligibility_rule": "no single-token constraint applies, because S4 generates text; the tokenizer is still pinned and recorded",
+      "output_validity_rule": "an output is valid only if the pinned parser maps it to a member of the answer domain; unparseable is a first-class recorded outcome and is never silently dropped, never imputed and never treated as incorrect without being reported separately",
+      "chat_template_policy_by_role": {
+        "R0": "not applicable; deterministic software control",
+        "RC": "not applicable; deterministic software control",
+        "RT": "each role's native chat template is applied, or its absence is recorded explicitly; no cross-role byte parity is claimed",
+        "RL": "each role's native chat template is applied, or its absence is recorded explicitly; no cross-role byte parity is claimed",
+        "RI": "each role's native chat template is applied, or its absence is recorded explicitly; no cross-role byte parity is claimed",
+        "RP": "deferred to OD2"
+      },
+      "applicable_gates": [
+        "I0",
+        "I1a",
+        "I1b",
+        "I2",
+        "I3",
+        "I4",
+        "I5"
+      ],
+      "transformation_applicability": {
+        "position_permutation": "applicable",
+        "label_symbol_permutation": "applicable",
+        "label_set_replacement": "applicable",
+        "separator_rendering": "applicable",
+        "instruction_wording": "applicable"
+      },
+      "non_applicable_transformations": [],
+      "selectable_status": "never_selectable",
+      "selectable_status_reason": "S4 reintroduces exactly the parser dependence that motivated this study, so allowing it to be selected would make the study's own instrument the thing under suspicion. It is retained because its unparseable rate is the most direct diagnostic of whether a surface is legible to the model at all. It is never selectable under any outcome, it never enters any admissibility comparison, and its results carry no selection authority.",
+      "projected_operation_counts_if_later_authorized": {
+        "forward_passes_per_item": "registered maximum generated tokens",
+        "generated_tokens_per_item": "greater than zero and bounded by the registered maximum",
+        "scored_positions_per_item": 0
+      },
       "known_confounds": [
-        "format compliance is confounded with task competence",
-        "instruction tuning advantages S4 independently of task ability",
-        "normalization choices silently decide borderline cases",
-        "Li et al. show multiple-choice and long-form answers correlate weakly, so S4 and S1 disagreeing is expected and is not by itself evidence that either is broken"
+        "parser version dependence, which is the confound the study exists to avoid taking on faith",
+        "chat-template differences across roles, which are not byte-comparable"
       ],
       "disqualifying_failures": [
-        "output-validity rate below the registered floor on explicit-answer items",
-        "any need for a parser more permissive than the registered normalization, which would repeat the Study 1 failure"
+        "none that would change its status, because its status is already never_selectable; a high unparseable rate is a finding, not a disqualification"
+      ],
+      "notes": [
+        "S4 is the only profile that generates text. Its per-item cost is therefore not comparable to S1, S2 or S3."
       ]
     }
   ],
-  "interface_selection_rule": {
-    "principle": "one-way, development-only, pre-registered before any confirmation access",
-    "eligibility": "an interface is eligible only if it passes Gates I0, I1, I2 and I3 on the development bank for every checkpoint role the later study requires",
-    "ranking_among_eligible": [
-      "1. highest registered lower confidence bound on explicit-answer binding accuracy (Gate I1)",
-      "2. smallest registered maximum position-or-permutation effect (Gate I3)",
-      "3. fewest excluded items caused by the surface's own eligibility restrictions",
-      "4. lowest projected future operation count"
+  "admissibility_order": {
+    "principle": "A pre-registered, fail-closed admissibility order replaces the data-dependent ranking used in draft-v0.1. The order is fixed here, before any data exists, so that no outcome can influence which surface is preferred. Data can only remove candidates from the order; it can never reorder them.",
+    "eligibility_rule": "An interface profile is eligible if and only if every gate that is applicable to it passes in every atomic cell. The applicable gate set is a property of the profile and is listed in the profile. I4 is part of eligibility.",
+    "gates_required_for_eligibility": [
+      "I0",
+      "I1a",
+      "I1b",
+      "I2",
+      "I3",
+      "I4"
     ],
-    "deterministic_tie_breaker": "if two interfaces remain tied after all four ranking criteria, select the lower interface id in the fixed registered order S1 < S2 < S3 < S4. The order is fixed in this draft, before any data exists, precisely so that it cannot be chosen later to favour an observed outcome.",
-    "confirmation_bank_prohibition": "the held-out confirmation bank must never be used to choose, rank, tune or eliminate a surface, and must be physically excluded from the execution image until selection is sealed",
-    "no_winner_this_round": true
+    "i1b_applicability": "I1b is required for label-bearing profiles only. For content-only profiles it is not_applicable, which is neither a pass nor a waiver: the profile simply has no symbol-binding step to validate.",
+    "order": [
+      {
+        "rank": 1,
+        "interface": "S2",
+        "condition": "the frozen answer domain is jointly single-token eligible for every required role",
+        "why": "S2 has no symbol-binding step, so a pass cannot be an artefact of label handling and a failure cannot be blamed on it"
+      },
+      {
+        "rank": 2,
+        "interface": "S3",
+        "condition": "a later authority has introduced a multi-token answer domain, a dedicated multi-token stratum, a registered boundary-token rule and a length-confound gate",
+        "why": "S3 is the natural surface for a multi-token domain, but it is not independent of S2 for single-token contents"
+      },
+      {
+        "rank": 3,
+        "interface": "S1",
+        "condition": "S1 is eligible",
+        "why": "S1 preserves continuity with Study 2 but is the surface whose adequacy is in question, so it is admitted only when no higher-ranked surface is available"
+      }
+    ],
+    "never_selectable": [
+      "S4"
+    ],
+    "no_data_dependent_ranking": true,
+    "what_happens_if_the_highest_ranked_eligible_surface_is_not_s2": "nothing automatic; the admissibility order simply proposes the highest-ranked eligible surface. A proposal is not a selection, and this round makes no selection.",
+    "no_winner_this_round": true,
+    "no_winner_this_round_statement": "No interface is selected in this round.",
+    "proposed_disposition_only": true,
+    "study_stops_only_when": "no selectable interface remains eligible. The failure of one interface eliminates that interface and nothing else.",
+    "confirmation_bank_prohibition": "The admissibility order is evaluated on the development split only. The confirmation split is physically inaccessible until an interface has been proposed, the proposal has been sealed, and a separate authority has released it."
+  },
+  "atomic_evaluation_cells": {
+    "sampling_unit": "the base item",
+    "cluster_rule": "Every permutation, label-set replacement and rendering variant derived from one base item belongs to the same correlated cluster as that base item, is assigned to the same split as that base item, and is never treated as an independent observation. Splitting a cluster across splits would leak the confirmation set.",
+    "cell_factors": [
+      "interface profile",
+      "checkpoint role",
+      "task stratum",
+      "operation family",
+      "depth",
+      "rendering",
+      "label or position condition",
+      "split"
+    ],
+    "definition": "An atomic evaluation cell is one combination of interface profile, checkpoint role, task stratum, operation family, depth, rendering, label or position condition, and split. A gate passes only if it passes in every atomic cell to which it is applicable.",
+    "pooling_prohibitions": [
+      {
+        "prohibited": "pooling K1 with K2",
+        "why": "K1 asks whether the model binds content to a displayed symbol; K2 asks whether it can echo trivially recoverable content at all. A high K2 rate can carry a failed K1 across a threshold, which would let the study report binding it never demonstrated."
+      },
+      {
+        "prohibited": "pooling across primitive operation families",
+        "why": "a family the model handles well can mask a family it cannot handle, so the headroom gate would stop testing headroom"
+      },
+      {
+        "prohibited": "pooling K4 depth 2 with depth 3",
+        "why": "depth is the compositional variable of interest; averaging over it destroys the construct"
+      },
+      {
+        "prohibited": "pooling across checkpoint roles",
+        "why": "the roles are the contrast the later study depends on"
+      },
+      {
+        "prohibited": "pooling across interface profiles",
+        "why": "the interfaces are the object of comparison"
+      },
+      {
+        "prohibited": "pooling across renderings",
+        "why": "rendering sensitivity is precisely what K6 measures"
+      }
+    ],
+    "descriptive_pooling": "Pooled summaries may be reported for readability. They carry no gate authority, may never be substituted for a failed cell, and must be labelled descriptive wherever they appear.",
+    "no_pooling_rescue": true
+  },
+  "counterbalancing_design": {
+    "problem_in_v0_1": "draft-v0.1 used four cyclic option orders. Under cyclic rotation the physical position of the correct content and the identity of the displayed symbol move together, so the design cannot attribute an effect to one rather than the other. draft-v0.1 also used the label alphabet 1/2/3/4 while the frozen answer domain is the mod-10 residues, so a displayed label could be indistinguishable from a valid answer.",
+    "requirement": "Counterbalancing must use a deterministic orthogonal design, or an explicitly justified balanced design, that separates three factors: the physical position of the correct content, the identity of the displayed symbol at that position, and the label alphabet in use.",
+    "separated_factors": [
+      "physical position of the correct content",
+      "identity of the displayed symbol carrying the correct content",
+      "label alphabet in use"
+    ],
+    "construction_algorithm": {
+      "status": "published with the design, not merely described",
+      "inputs": [
+        "the base item",
+        "the ordered option contents",
+        "the label alphabet",
+        "the base-item index"
+      ],
+      "steps": [
+        "1. Enumerate the four physical positions 0, 1, 2, 3.",
+        "2. Enumerate the four displayed symbols of the label alphabet in their registered order.",
+        "3. Form the 4 x 4 Latin square L[i][j] = (i + j) mod 4, whose rows index the position of the correct content and whose columns index the cyclic offset applied to the symbol assignment.",
+        "4. Cross the position factor with the symbol-assignment factor by taking, for each base item, the pair (p, s) where p is the physical position of the correct content and s is the index of the symbol displayed at that position. Because p and s are enumerated independently, every one of the sixteen (p, s) pairs occurs, so position and symbol identity are orthogonal rather than tied.",
+        "5. Assign the sixteen pairs to base items by the deterministic rule (p, s) = (k mod 4, (k div 4) mod 4) where k is the registered base-item index; this is a fixed function of the index and uses no random draw.",
+        "6. Cross the resulting (p, s) design with the label-alphabet factor so that each alphabet is balanced across positions and symbols.",
+        "7. Emit, for every produced variant, the tuple (base item id, position of correct content, displayed symbol at that position, label alphabet id, rendering id) as the recorded condition."
+      ],
+      "randomness": "none; the construction is a deterministic function of the registered base-item index and draws no seed",
+      "verification": "the construction is checked by the committed design test, which asserts that position and symbol identity are orthogonal over a complete block and that no label symbol collides with the answer domain"
+    },
+    "label_alphabets": {
+      "requirement": "every label alphabet must be disjoint from the answer domain surface forms",
+      "answer_domain": "the mod-10 residues 0 through 9 in their registered surface form",
+      "forbidden_alphabets": [
+        {
+          "alphabet": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "why": "collides with the mod-10 answer domain, so a displayed label cannot be distinguished from a valid answer"
+        },
+        {
+          "alphabet": [
+            "0",
+            "1",
+            "2",
+            "3"
+          ],
+          "why": "same collision"
+        }
+      ],
+      "permitted_alphabet_examples": [
+        {
+          "alphabet": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "why": "disjoint from the mod-10 answer domain"
+        },
+        {
+          "alphabet": [
+            "W",
+            "X",
+            "Y",
+            "Z"
+          ],
+          "why": "disjoint from the mod-10 answer domain, and disjoint from the first alphabet, so label-set replacement is a real manipulation"
+        }
+      ],
+      "label_set_replacement_rule": "label-set replacement is crossed and balanced with position, so an effect of changing the alphabet cannot be confounded with an effect of moving the content"
+    },
+    "k6_renderings": {
+      "count": 3,
+      "one_factor_at_a_time": true,
+      "answer_cue": "held constant across all three renderings",
+      "renderings": [
+        {
+          "id": "R-base",
+          "varies": "nothing",
+          "description": "the registered baseline rendering"
+        },
+        {
+          "id": "R-sep",
+          "varies": "the option separator only",
+          "description": "identical to R-base except for the separator string between a label and its option content"
+        },
+        {
+          "id": "R-instr",
+          "varies": "the instruction wording only",
+          "description": "identical to R-base except for the wording of the instruction sentence; the answer cue is byte-identical to R-base"
+        }
+      ],
+      "v0_1_defect": "draft-v0.1 claimed three renderings while varying three things at once, including the answer cue, so a rendering effect could not be attributed to any single factor"
+    }
   },
   "task_strata": [
     {
@@ -243,7 +639,8 @@
       "duplicate_and_leakage_prevention": "fixtures are non-evidential and are excluded from every bank by construction; fixture content may never appear in the development or confirmation banks",
       "balance_invariants": "every label appears as the correct answer an equal number of times",
       "expected_failure_mode": "an off-by-one in permutation application or a mislabelled ground truth",
-      "gate_role": "sole input to Gate I0"
+      "gate_role": "sole input to gate I0; coverage must include every scorer, every profile, every not_applicable branch, every tie path and every invalid-output path",
+      "pooling_rule": "evaluated in its own atomic cells; may not be pooled with any other stratum, family or depth for gate purposes"
     },
     {
       "id": "K1",
@@ -255,7 +652,14 @@
       "duplicate_and_leakage_prevention": "item identity is the tuple of stem content and distractor set; duplicates are rejected at draw time and development and confirmation draws are disjoint by identity",
       "balance_invariants": "correct answer appears in each of the four positions equally often; each label is correct equally often",
       "expected_failure_mode": "a model that knows the content but cannot emit the symbol, which is precisely the multiple choice symbol binding failure",
-      "gate_role": "primary input to Gate I1"
+      "gate_role": "sole input to gate I1b, which is applicable to label-bearing profiles only",
+      "pooling_rule": "evaluated in its own atomic cells; may not be pooled with any other stratum, family or depth for gate purposes",
+      "separated_from": "K2",
+      "why_separated": "K1 asks whether content is bound to a displayed symbol. K2 asks whether trivially recoverable content can be echoed at all. Pooling them lets a high K2 rate carry a failed K1.",
+      "applicable_profiles": [
+        "S1",
+        "S4"
+      ]
     },
     {
       "id": "K2",
@@ -267,7 +671,15 @@
       "duplicate_and_leakage_prevention": "same identity-tuple rule as K1; disjoint from K1 content",
       "balance_invariants": "balanced correct-answer position and label",
       "expected_failure_mode": "surface or formatting failure rather than task failure",
-      "gate_role": "supporting input to Gate I1 and a floor for Gate I2"
+      "gate_role": "sole input to gate I1a",
+      "pooling_rule": "evaluated in its own atomic cells; may not be pooled with any other stratum, family or depth for gate purposes",
+      "separated_from": "K1",
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ]
     },
     {
       "id": "K3",
@@ -279,7 +691,11 @@
       "duplicate_and_leakage_prevention": "no Study 2 item identity, frozen bank row, selected template outcome or confirmation content may be reused; new seeds are mandatory",
       "balance_invariants": "balanced positions, labels, and operand distributions within the family",
       "expected_failure_mode": "genuine primitive-competence shortfall, or a surface that cannot express it",
-      "gate_role": "primary input to Gate I2"
+      "gate_role": "sole input to gate I2, evaluated per primitive operation family with no pooling across families",
+      "pooling_rule": "evaluated in its own atomic cells; may not be pooled with any other stratum, family or depth for gate purposes",
+      "evaluated_per": [
+        "operation family"
+      ]
     },
     {
       "id": "K4",
@@ -294,7 +710,18 @@
       "duplicate_and_leakage_prevention": "same as K3, plus exclusion of any composition whose intermediate collides with a K3 item identity",
       "balance_invariants": "balanced positions and labels; intermediate values balanced across the registered range",
       "expected_failure_mode": "for the positive control, none expected; for the 1.5B roles, failure here is uninformative about the interface and must not be read as one",
-      "gate_role": "sole input to Gate I4; explicitly not an input to Gate I2"
+      "gate_role": "sole input to gate I4, evaluated per operation family and per depth",
+      "pooling_rule": "evaluated in its own atomic cells; may not be pooled with any other stratum, family or depth for gate purposes",
+      "evaluated_per": [
+        "operation family",
+        "depth"
+      ],
+      "depths": [
+        2,
+        3
+      ],
+      "depth_pooling": "prohibited; depth 2 and depth 3 are never combined",
+      "confirmation_coverage": "K4 is carried into the I5 confirmation split, together with the positive-reference construct"
     },
     {
       "id": "K5",
@@ -306,7 +733,120 @@
       "duplicate_and_leakage_prevention": "variants of one base item always travel together into the same split; a base item may never straddle development and confirmation",
       "balance_invariants": "exact counterbalance by construction, verified in Gate I0 fixtures",
       "expected_failure_mode": "position bias and option-ID token prior bias",
-      "gate_role": "primary input to Gate I3"
+      "gate_role": "input to gate I3, applicable to label-bearing profiles only for the position, label-symbol and label-set transformations",
+      "pooling_rule": "evaluated in its own atomic cells; may not be pooled with any other stratum, family or depth for gate purposes",
+      "counterbalancing_design": {
+        "problem_in_v0_1": "draft-v0.1 used four cyclic option orders. Under cyclic rotation the physical position of the correct content and the identity of the displayed symbol move together, so the design cannot attribute an effect to one rather than the other. draft-v0.1 also used the label alphabet 1/2/3/4 while the frozen answer domain is the mod-10 residues, so a displayed label could be indistinguishable from a valid answer.",
+        "requirement": "Counterbalancing must use a deterministic orthogonal design, or an explicitly justified balanced design, that separates three factors: the physical position of the correct content, the identity of the displayed symbol at that position, and the label alphabet in use.",
+        "separated_factors": [
+          "physical position of the correct content",
+          "identity of the displayed symbol carrying the correct content",
+          "label alphabet in use"
+        ],
+        "construction_algorithm": {
+          "status": "published with the design, not merely described",
+          "inputs": [
+            "the base item",
+            "the ordered option contents",
+            "the label alphabet",
+            "the base-item index"
+          ],
+          "steps": [
+            "1. Enumerate the four physical positions 0, 1, 2, 3.",
+            "2. Enumerate the four displayed symbols of the label alphabet in their registered order.",
+            "3. Form the 4 x 4 Latin square L[i][j] = (i + j) mod 4, whose rows index the position of the correct content and whose columns index the cyclic offset applied to the symbol assignment.",
+            "4. Cross the position factor with the symbol-assignment factor by taking, for each base item, the pair (p, s) where p is the physical position of the correct content and s is the index of the symbol displayed at that position. Because p and s are enumerated independently, every one of the sixteen (p, s) pairs occurs, so position and symbol identity are orthogonal rather than tied.",
+            "5. Assign the sixteen pairs to base items by the deterministic rule (p, s) = (k mod 4, (k div 4) mod 4) where k is the registered base-item index; this is a fixed function of the index and uses no random draw.",
+            "6. Cross the resulting (p, s) design with the label-alphabet factor so that each alphabet is balanced across positions and symbols.",
+            "7. Emit, for every produced variant, the tuple (base item id, position of correct content, displayed symbol at that position, label alphabet id, rendering id) as the recorded condition."
+          ],
+          "randomness": "none; the construction is a deterministic function of the registered base-item index and draws no seed",
+          "verification": "the construction is checked by the committed design test, which asserts that position and symbol identity are orthogonal over a complete block and that no label symbol collides with the answer domain"
+        },
+        "label_alphabets": {
+          "requirement": "every label alphabet must be disjoint from the answer domain surface forms",
+          "answer_domain": "the mod-10 residues 0 through 9 in their registered surface form",
+          "forbidden_alphabets": [
+            {
+              "alphabet": [
+                "1",
+                "2",
+                "3",
+                "4"
+              ],
+              "why": "collides with the mod-10 answer domain, so a displayed label cannot be distinguished from a valid answer"
+            },
+            {
+              "alphabet": [
+                "0",
+                "1",
+                "2",
+                "3"
+              ],
+              "why": "same collision"
+            }
+          ],
+          "permitted_alphabet_examples": [
+            {
+              "alphabet": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ],
+              "why": "disjoint from the mod-10 answer domain"
+            },
+            {
+              "alphabet": [
+                "W",
+                "X",
+                "Y",
+                "Z"
+              ],
+              "why": "disjoint from the mod-10 answer domain, and disjoint from the first alphabet, so label-set replacement is a real manipulation"
+            }
+          ],
+          "label_set_replacement_rule": "label-set replacement is crossed and balanced with position, so an effect of changing the alphabet cannot be confounded with an effect of moving the content"
+        },
+        "k6_renderings": {
+          "count": 3,
+          "one_factor_at_a_time": true,
+          "answer_cue": "held constant across all three renderings",
+          "renderings": [
+            {
+              "id": "R-base",
+              "varies": "nothing",
+              "description": "the registered baseline rendering"
+            },
+            {
+              "id": "R-sep",
+              "varies": "the option separator only",
+              "description": "identical to R-base except for the separator string between a label and its option content"
+            },
+            {
+              "id": "R-instr",
+              "varies": "the instruction wording only",
+              "description": "identical to R-base except for the wording of the instruction sentence; the answer cue is byte-identical to R-base"
+            }
+          ],
+          "v0_1_defect": "draft-v0.1 claimed three renderings while varying three things at once, including the answer cue, so a rendering effect could not be attributed to any single factor"
+        }
+      },
+      "v0_1_defect": "four cyclic orders could not separate the physical position of the correct content from the identity of the displayed symbol, and the 1/2/3/4 label alphabet collided with the mod-10 answer domain",
+      "applicable_profiles": [
+        "S1",
+        "S4"
+      ],
+      "not_applicable_profiles": [
+        {
+          "profile": "S2",
+          "reason": "renders no options and no labels"
+        },
+        {
+          "profile": "S3",
+          "reason": "renders no options and no labels"
+        }
+      ]
     },
     {
       "id": "K6",
@@ -318,7 +858,37 @@
       "duplicate_and_leakage_prevention": "renderings of one base item travel together into the same split",
       "balance_invariants": "every rendering is applied to every included base item",
       "expected_failure_mode": "rendering-sensitive accuracy of the kind Zhou et al. report for smaller models",
-      "gate_role": "secondary input to Gate I3"
+      "gate_role": "input to gate I3 for the separator and instruction-wording transformations, which are applicable to every profile",
+      "pooling_rule": "evaluated in its own atomic cells; may not be pooled with any other stratum, family or depth for gate purposes",
+      "renderings": {
+        "count": 3,
+        "one_factor_at_a_time": true,
+        "answer_cue": "held constant across all three renderings",
+        "renderings": [
+          {
+            "id": "R-base",
+            "varies": "nothing",
+            "description": "the registered baseline rendering"
+          },
+          {
+            "id": "R-sep",
+            "varies": "the option separator only",
+            "description": "identical to R-base except for the separator string between a label and its option content"
+          },
+          {
+            "id": "R-instr",
+            "varies": "the instruction wording only",
+            "description": "identical to R-base except for the wording of the instruction sentence; the answer cue is byte-identical to R-base"
+          }
+        ],
+        "v0_1_defect": "draft-v0.1 claimed three renderings while varying three things at once, including the answer cue, so a rendering effect could not be attributed to any single factor"
+      },
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ]
     }
   ],
   "bank_construction_policy": {
@@ -394,7 +964,7 @@
     }
   ],
   "positive_reference_candidates": {
-    "selection_status": "unselected; operator-review item",
+    "selection_status": "NOT SELECTED; candidate dossier only",
     "hard_requirements": [
       "pinned repository identity and immutable revision hash",
       "license permitting research use and redistribution of derived measurements",
@@ -435,7 +1005,20 @@
       "authority": "separate operator authority, not granted by this draft",
       "isolation_rule": "runs only on K4-shaped items drawn from a prequalification seed that is disjoint from both the development and the confirmation seeds; the confirmation bank is physically absent from the image",
       "output": "a pass or fail per candidate on a pre-registered capability floor, and nothing else",
-      "prohibition": "may not be reported as a Study 3 result and may not influence interface selection"
+      "prohibition": "may not be reported as a Study 3 result and may not influence interface selection",
+      "stage_id": "P3-Q",
+      "status": "not authorised, not executed",
+      "interface": "a separate canonical interface outside the candidate panel",
+      "items": "disjoint from the K4 items used by gate I4",
+      "floor": "the competence floor is blocking decision OD5; the draft-v0.1 chance floor is rejected"
+    },
+    "blocking_decision": "OD2",
+    "dossier": "studies/study3/references/positive_reference_dossier.md",
+    "circularity_rule": {
+      "problem": "draft-v0.1 permitted the positive reference to be prequalified through a candidate interface. If a candidate interface is what demonstrates that the reference is capable, the interface's adequacy rests on an argument that presupposes it.",
+      "requirement": "the positive reference must be prequalified through a separate canonical interface that is not S1, S2, S3 or S4, on items disjoint from those used for gate I4",
+      "canonical_interface_status": "not defined in this round; it must be registered before P3-Q, and it is not a member of the candidate panel",
+      "item_disjointness": "the P3-Q prequalification items and the K4 I4 items must be disjoint by construction"
     }
   },
   "split_lifecycle": {
@@ -489,7 +1072,15 @@
       "single_interface_only": true,
       "physical_exclusion_before_authorization": "the confirmation bank files are absent from the execution image until the selection record is published and the separate authority is issued",
       "no_reuse_after_observation": "once the confirmation bank has been observed under any interface it is spent; a second confirmation requires a newly generated, newly sealed bank",
-      "fail_closed": "any error, any ambiguity, any deviation from the sealed plan, or any missing counter causes the confirmation to be recorded as failed rather than retried"
+      "fail_closed": "any error, any ambiguity, any deviation from the sealed plan, or any missing counter causes the confirmation to be recorded as failed rather than retried",
+      "covers_every_gate_bearing_construct": true,
+      "explicitly_includes": [
+        "gate I4",
+        "the positive-reference construct",
+        "the K4 stratum"
+      ],
+      "v0_1_defect": "draft-v0.1's confirmation description omitted the positive-reference construct and the K4 stratum",
+      "accessible_before_authority": false
     },
     "prevented_failure_modes": [
       {
@@ -520,248 +1111,399 @@
         "mode": "reusing Study 2 outcomes as Study 3 selection data",
         "prevention": "Study 2 outcomes are frozen history and are excluded from every Study 3 decision rule by construction"
       }
-    ]
+    ],
+    "cluster_rule": "Every permutation, label-set replacement and rendering variant derived from one base item belongs to the same correlated cluster as that base item, is assigned to the same split as that base item, and is never treated as an independent observation. Splitting a cluster across splits would leak the confirmation set."
   },
   "gate_hierarchy": [
     {
       "gate_id": "I0",
-      "name": "deterministic integrity",
-      "question": "Do the renderer, the option-to-label mapping, the ground-truth function and the scorer behave exactly as specified, with no model involved?",
+      "name": "instrument integrity",
+      "question": "Does the rendering and scoring software do exactly what it claims to do, on inputs whose correct answer is fixed by construction and requires no model?",
       "inputs": [
-        "K0 fixtures"
+        "stratum K0 deterministic software fixtures"
       ],
       "model_roles": [
-        "R0"
+        "R0",
+        "RC"
       ],
-      "threshold_logic": "every fixture must match its declared expectation exactly. There is no tolerance, no sampling and no statistic: the required pass rate is 100 percent of a finite enumerated set.",
-      "what_passes": "all fixtures match; the instrument is internally consistent",
-      "what_fails": "any single mismatch",
-      "merely_descriptive": "fixture timing and coverage counts",
-      "legal_next_state_on_pass": "proceed to I1",
-      "legal_next_state_on_fail": "stop; repair the harness; regenerate fixtures; rerun from I0",
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "part_of_eligibility": true,
+      "evaluated_per": [
+        "interface profile",
+        "renderer branch",
+        "scorer branch"
+      ],
+      "threshold_logic": "100 percent of fixtures must pass. There is no statistical threshold, because a fixture failure is a software defect, not a sampling outcome.",
+      "coverage_requirement": "The fixture set must cover every scorer, every interface profile, every not_applicable branch, every tie-break path and every invalid output path. Coverage is asserted by the committed design test; a scorer or branch with no fixture is itself an I0 failure.",
+      "what_passes": "every fixture renders and scores exactly as declared",
+      "what_fails": "any fixture mismatch, or any uncovered scorer, profile, not_applicable branch, tie path or invalid-output path",
+      "not_applicable_semantics": "none; I0 applies to every profile",
+      "merely_descriptive": [],
+      "legal_next_state_on_pass": "evaluate I1a",
+      "legal_next_state_on_fail": "STOP; fix the instrument and restart the gate sequence from I0",
       "authorizes_mechanistic_execution": false,
-      "fail_closed": true
+      "fail_closed": true,
+      "no_pooling": true
     },
     {
-      "gate_id": "I1",
-      "name": "explicit answer-to-label binding and output validity",
-      "question": "When the correct content is stated in the prompt, can each required checkpoint role emit the label that denotes it, and does it emit a valid output at all?",
+      "gate_id": "I1a",
+      "name": "trivial content recovery and output validity",
+      "question": "Can the checkpoint recover an answer that is trivially present in the prompt, and does it emit a structurally valid output while doing so?",
       "inputs": [
-        "K1",
-        "K2"
+        "stratum K2 trivial content recovery items"
       ],
       "model_roles": [
         "RT",
         "RL",
         "RI"
       ],
-      "threshold_logic": "two conjunctive conditions per (interface, role) cell. First, an output-validity floor: the proportion of renderings producing a well-formed, in-set response must meet the registered floor; for S1, S2 and S3 this is 1.0 by construction and is therefore a check on the harness, while for S4 it is a substantive measurement. Second, a binding-accuracy floor tested as an exact one-sided binomial against H0: p <= 0.90 at the registered per-cell alpha.",
-      "proposed_numbers": {
-        "null_hypothesis": "p <= 0.90",
-        "recommended_n_per_cell": 192,
-        "recommended_alpha_per_cell": 0.005,
-        "derived_rejection_threshold_X": 184,
-        "derived_threshold_accuracy": 0.9583333333333334,
-        "derived_exact_p_at_threshold": 0.002362,
-        "derived_power_at_true_0_98": 0.9841,
-        "derived_power_at_true_0_99": 0.9998,
-        "s4_output_validity_floor": 0.95,
-        "status": "proposed, not frozen"
-      },
-      "what_passes": "both conditions hold for that (interface, role) cell",
-      "what_fails": "either condition fails; the interface is ineligible for that role",
-      "merely_descriptive": "which distractor absorbs the errors, and the selected-label distribution",
-      "legal_next_state_on_pass": "the cell proceeds to I2",
-      "legal_next_state_on_fail": "the cell is eliminated from the panel for that role. If every interface fails for a role the later study requires, the study stops and reports interface inadequacy.",
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "part_of_eligibility": true,
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "split"
+      ],
+      "threshold_logic": "exact one-sided binomial test of H0: p <= 0.90 at alpha = 0.005; at n = 192 the acceptance count is 184, that is a rate of 0.9583, with exact null tail 2.362e-03",
+      "what_passes": "the checkpoint recovers trivially present content at a rate exceeding the floor, and its outputs are valid",
+      "what_fails": "the checkpoint cannot echo content that is already in the prompt, in which case nothing downstream is interpretable",
+      "not_applicable_semantics": "none; I1a applies to every profile",
+      "merely_descriptive": [
+        "the softmax confidence at the answer position"
+      ],
+      "legal_next_state_on_pass": "evaluate I1b where applicable, otherwise I2",
+      "legal_next_state_on_fail": "eliminate this interface profile for this role; if no selectable profile remains, STOP",
       "authorizes_mechanistic_execution": false,
-      "fail_closed": true
+      "fail_closed": true,
+      "no_pooling": true,
+      "separated_from": "I1b, which draft-v0.1 conflated with this gate"
+    },
+    {
+      "gate_id": "I1b",
+      "name": "explicit content-to-symbol binding",
+      "question": "When a symbol stands for an answer, does the checkpoint bind the correct content to the correct displayed symbol, rather than following a symbol prior?",
+      "inputs": [
+        "stratum K1 explicit binding items"
+      ],
+      "model_roles": [
+        "RT",
+        "RL",
+        "RI"
+      ],
+      "applicable_profiles": [
+        "S1",
+        "S4"
+      ],
+      "part_of_eligibility": true,
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "label or position condition",
+        "split"
+      ],
+      "threshold_logic": "exact one-sided binomial test of H0: p <= 0.90 at alpha = 0.005; at n = 192 the acceptance count is 184, that is a rate of 0.9583",
+      "what_passes": "the correct content is selected through its displayed symbol across the counterbalanced conditions",
+      "what_fails": "the checkpoint tracks the symbol rather than the content, or tracks position rather than either",
+      "not_applicable_semantics": "For content-only profiles S2 and S3 this gate is not_applicable. not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied gate, averaged into any rate, or used as an input to admissibility. A gate whose transformation is not applicable to a profile is simply not evaluated for that profile, and the profile's eligibility rests on the gates that are applicable to it.",
+      "merely_descriptive": [
+        "the marginal frequency of each displayed symbol"
+      ],
+      "legal_next_state_on_pass": "evaluate I2",
+      "legal_next_state_on_fail": "eliminate this interface profile for this role; if no selectable profile remains, STOP",
+      "authorizes_mechanistic_execution": false,
+      "fail_closed": true,
+      "no_pooling": true,
+      "new_in_v0_2": true
     },
     {
       "gate_id": "I2",
-      "name": "primitive-task headroom on content-based surfaces",
-      "question": "Does each required role clear a depth-1 primitive by a margin large enough that a later compositional design has room to detect an effect?",
+      "name": "primitive headroom",
+      "question": "Does the checkpoint have measurable headroom on each single primitive operation family, so that a later compositional failure cannot be explained by inability to do the parts?",
       "inputs": [
-        "K3"
+        "stratum K3 single primitive items"
       ],
       "model_roles": [
         "RT",
         "RL",
         "RI"
       ],
-      "threshold_logic": "exact one-sided binomial against H0: p <= 0.50 at the registered per-cell alpha. The null is deliberately far above the 0.25 forced-choice chance level, because clearing chance is not headroom; the requirement is a usable margin.",
-      "proposed_numbers": {
-        "null_hypothesis": "p <= 0.50",
-        "recommended_n_per_cell": 192,
-        "recommended_alpha_per_cell": 0.005,
-        "derived_rejection_threshold_X": 115,
-        "derived_threshold_accuracy": 0.5989583333333334,
-        "derived_exact_p_at_threshold": 0.003709,
-        "derived_power_at_true_0_75": 1.0,
-        "derived_power_at_true_0_80": 1.0,
-        "status": "proposed, not frozen"
-      },
-      "what_passes": "the role clears the primitive margin under that interface",
-      "what_fails": "it does not",
-      "merely_descriptive": "per-operation-family breakdown within K3",
-      "legal_next_state_on_pass": "the cell proceeds to I3",
-      "legal_next_state_on_fail": "the interface is ineligible for that role. A failure here is jointly attributable to interface and role and must not be reported as a capability claim about the role.",
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "part_of_eligibility": true,
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "operation family",
+        "split"
+      ],
+      "threshold_logic": "exact one-sided binomial test of H0: p <= 0.50 at alpha = 0.005, evaluated separately in every operation family; at n = 192 the acceptance count is 115, that is a rate of 0.5990",
+      "what_passes": "every primitive family independently clears the floor",
+      "what_fails": "any single family falls below the floor, regardless of the pooled rate across families",
+      "not_applicable_semantics": "none; I2 applies to every profile",
+      "merely_descriptive": [
+        "the pooled rate across families"
+      ],
+      "legal_next_state_on_pass": "evaluate I3",
+      "legal_next_state_on_fail": "eliminate this interface profile for this role; if no selectable profile remains, STOP",
       "authorizes_mechanistic_execution": false,
-      "fail_closed": true
+      "fail_closed": true,
+      "no_pooling": true
     },
     {
       "gate_id": "I3",
-      "name": "position, permutation and rendering robustness",
-      "question": "Does the reading stay within a pre-specified margin when only irrelevant transformations change?",
+      "name": "calibration robustness",
+      "question": "Does the checkpoint give the same answer to the same question when the presentation changes in ways that do not change the question?",
       "inputs": [
-        "K5",
-        "K6"
+        "stratum K5 counterbalanced presentations",
+        "stratum K6 one-factor renderings"
       ],
       "model_roles": [
         "RT",
         "RL",
         "RI"
       ],
-      "threshold_logic": "robustness is tested as equivalence, never as a failure to reject a difference. Three conjunctive conditions. (a) Paired equivalence across permutation conditions: for each pair of conditions over the same base items, an exact paired two-one-sided-test on the discordant pairs must place the accuracy difference inside the registered margin delta. (b) Maximum spread: the largest minus smallest per-condition accuracy must not exceed the registered maximum position-or-permutation effect. (c) Selected-label uniformity: on banks balanced by construction, the count of each selected label must fall inside a simultaneous exact acceptance band.",
-      "proposed_numbers": {
-        "equivalence_margin_delta": 0.05,
-        "maximum_position_or_permutation_effect": 0.05,
-        "secondary_margin_for_rendering_variants": 0.075,
-        "recommended_n_per_condition": 192,
-        "family_alpha": 0.005,
-        "multiplicity_method": "Bonferroni over the number of (interface, role, condition) cells",
-        "worked_simultaneous_bounds": [
-          {
-            "cells": 4,
-            "per_cell_alpha": 0.00125,
-            "n": 192,
-            "X": 184,
-            "clopper_pearson_lower": 0.8952
-          },
-          {
-            "cells": 8,
-            "per_cell_alpha": 0.000625,
-            "n": 192,
-            "X": 184,
-            "clopper_pearson_lower": 0.8901
-          },
-          {
-            "cells": 12,
-            "per_cell_alpha": 0.0004166666666666667,
-            "n": 192,
-            "X": 184,
-            "clopper_pearson_lower": 0.8872
-          },
-          {
-            "cells": 24,
-            "per_cell_alpha": 0.0002083333333333333,
-            "n": 192,
-            "X": 184,
-            "clopper_pearson_lower": 0.8824
-          }
-        ],
-        "label_uniformity_bands": [
-          {
-            "n": 192,
-            "per_label_alpha": 0.00125,
-            "accept_count_low": 31,
-            "accept_count_high": 68,
-            "accept_share_low": 0.16145833333333334,
-            "accept_share_high": 0.3541666666666667
-          },
-          {
-            "n": 384,
-            "per_label_alpha": 0.00125,
-            "accept_count_low": 71,
-            "accept_count_high": 123,
-            "accept_share_low": 0.18489583333333334,
-            "accept_share_high": 0.3203125
-          },
-          {
-            "n": 768,
-            "per_label_alpha": 0.00125,
-            "accept_count_low": 156,
-            "accept_count_high": 230,
-            "accept_share_low": 0.203125,
-            "accept_share_high": 0.2994791666666667
-          }
-        ],
-        "status": "proposed, not frozen"
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "part_of_eligibility": true,
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "rendering",
+        "label or position condition",
+        "split"
+      ],
+      "primary_criterion": {
+        "name": "item-level content consistency",
+        "construct": "for each base item, the indicator that the answer is identical across every applicable transformed variant of that base item",
+        "test": "exact one-sided binomial test on the per-base-item consistency indicator",
+        "why_primary": "aggregate equivalence can be satisfied while a large number of items flip in compensating directions, which is the failure mode this gate exists to exclude; an item-level indicator cannot be satisfied that way",
+        "candidate_floors": "see the committed statistics tables under i3_primary_item_level_consistency",
+        "floor_status": "provisional; the floor value is part of blocking decision OD6"
       },
-      "what_passes": "all three conditions hold",
-      "what_fails": "any one fails",
-      "merely_descriptive": "the direction of any position preference and the identity of the favoured label",
-      "legal_next_state_on_pass": "the interface is eligible for selection",
-      "legal_next_state_on_fail": "the interface is ineligible; a non-significant difference is never accepted as invariance",
+      "secondary_criterion": {
+        "name": "aggregate equivalence",
+        "method": "Tango (1998) score-based procedure for the difference of paired proportions, applied as two one-sided tests",
+        "citation": "Tango T. Equivalence test and confidence interval for the difference in proportions for the paired-sample design. Statistics in Medicine 1998;17(8):891-908. PMID 9595618.",
+        "executable": true,
+        "implementation": "studies/study3/analysis/design_statistics.py",
+        "verified_before_use": [
+          "reduces exactly to McNemar's statistic at a null difference of zero, which is the published special case",
+          "its closed-form constrained maximum-likelihood estimate agrees with direct numerical maximisation of the constrained likelihood",
+          "its exact type-I error, computed by enumerating the full joint distribution of the discordant counts, does not exceed its nominal one-sided level"
+        ],
+        "decision_form": "intersection-union; equivalence is declared only when both one-sided nulls are rejected. A non-significant difference is never treated as equivalence.",
+        "margin_status": "unresolved; the committed derivation shows that n = 192 does not support a 0.05 margin at 0.90 power at any tested discordance rate, so the margin, the sample size, or both must change. This is blocking decision OD6.",
+        "why_secondary": "it is a useful summary but it is not the construct the gate is about"
+      },
+      "selected_label_uniformity": {
+        "status": "gate",
+        "applies_to": "label-bearing profiles only",
+        "not_applicable_to": [
+          "S2",
+          "S3"
+        ],
+        "why": "a profile that displays no labels has no selected-label distribution, so the construct has no referent",
+        "test": "exact central acceptance band around the uniform rate of 0.25 per label, Bonferroni-corrected over the four labels",
+        "single_classification": "this criterion is a gate for label-bearing profiles and is not_applicable elsewhere; it is never reclassified as diagnostic to avoid a failure"
+      },
+      "threshold_logic": "the primary item-level criterion and, where applicable, the selected-label uniformity criterion must both pass in every atomic cell; the secondary aggregate criterion is reported alongside and cannot rescue a failed primary",
+      "what_passes": "the same question yields the same answer under presentation changes that do not change the question",
+      "what_fails": "answers move with presentation",
+      "not_applicable_semantics": "Position, label-symbol and label-set transformations are not_applicable to S2 and S3, which display neither options nor labels. not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied gate, averaged into any rate, or used as an input to admissibility. A gate whose transformation is not applicable to a profile is simply not evaluated for that profile, and the profile's eligibility rests on the gates that are applicable to it.",
+      "merely_descriptive": [
+        "aggregate rate differences without the paired procedure",
+        "pooled consistency across cells"
+      ],
+      "legal_next_state_on_pass": "evaluate I4",
+      "legal_next_state_on_fail": "eliminate this interface profile for this role; if no selectable profile remains, STOP",
       "authorizes_mechanistic_execution": false,
-      "fail_closed": true
+      "fail_closed": true,
+      "no_pooling": true
     },
     {
       "gate_id": "I4",
-      "name": "positive-control compositional headroom",
-      "question": "On the compositional strata a later study would need, does an independently capable reference checkpoint clear the task under the interface?",
+      "name": "positive reference adequacy",
+      "question": "Does an independently prequalified capable reference succeed through this interface, so that a target failure through the same interface can be attributed to the target rather than to the interface?",
       "inputs": [
-        "K4"
+        "stratum K4 compositional items at depth 2 and depth 3"
       ],
       "model_roles": [
         "RP"
       ],
-      "threshold_logic": "exact one-sided binomial against H0: p <= 0.25, the forced-choice chance level, at a stricter registered alpha because this gate carries the whole interpretability of a later null.",
-      "proposed_numbers": {
-        "null_hypothesis": "p <= 0.25",
-        "recommended_n_per_cell": 128,
-        "recommended_alpha_per_cell": 0.001,
-        "derived_rejection_threshold_X": 49,
-        "derived_threshold_accuracy": 0.3828125,
-        "derived_exact_p_at_threshold": 0.0006161,
-        "derived_power_at_true_0_50": 0.997,
-        "derived_power_at_true_0_60": 1.0,
-        "alternative_n_256_alpha_0_001": {
-          "X": 87,
-          "accuracy": 0.33984375,
-          "exact_p": 0.0008124
-        },
-        "status": "proposed, not frozen; conditional on a positive reference being selected"
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "part_of_eligibility": true,
+      "evaluated_per": [
+        "interface profile",
+        "operation family",
+        "depth"
+      ],
+      "per_interface_not_global": true,
+      "prequalification": {
+        "requirement": "the positive reference must be prequalified through a separate canonical interface that is not S1, S2, S3 or S4, on items disjoint from those used for I4",
+        "why": "if a candidate interface were used to establish that the reference is capable, the interface's adequacy would be established by an argument that presupposes it",
+        "stage_id": "P3-Q",
+        "status": "not executed; RP is not selected and P3-Q is not authorised"
       },
-      "logical_separation_from_target": "I4 is deliberately evaluated on a different checkpoint from the target. It asks whether the interface can register compositional competence in something, not whether the target has it. Passing I4 says nothing about the target. Failing I4 means a later null on the target would be uninterpretable, so the study stops rather than proceeding.",
-      "what_passes": "the reference clears chance by the registered margin on K4 under the interface",
-      "what_fails": "it does not, or no positive reference was selected",
-      "merely_descriptive": "the reference's accuracy on K1 to K3",
-      "legal_next_state_on_pass": "the interface remains eligible for selection",
-      "legal_next_state_on_fail": "the study stops and reports that no interface could be shown adequate for compositional strata. Replacing a failed positive control with a different checkpoint after seeing the result is forbidden.",
+      "threshold_logic": {
+        "form": "exact one-sided binomial test of H0: p <= p_floor, evaluated separately in every operation family and at every depth",
+        "p_floor_proposal": 0.8,
+        "p_floor_status": "proposal; the final value is blocking decision OD5",
+        "rejected_v0_1_proposal": {
+          "null": "p <= 0.25",
+          "n": 128,
+          "acceptance_count": 49,
+          "acceptance_rate": 0.3828125,
+          "status": "REJECTED_BY_OPERATOR_REVIEW",
+          "why": "a chance-level null establishes only that the reference beats guessing; it is not a competence floor, and only a competence claim can license the inference that a capable model would have succeeded"
+        },
+        "candidate_thresholds": "see the committed statistics tables under i4_competence_floor_thresholds"
+      },
+      "what_passes": "the prequalified reference clears the competence floor through this interface in every family and at every depth",
+      "what_fails": "the reference does not clear the floor through this interface",
+      "consequence_of_failure": "this interface profile is eliminated, and only this interface profile. The study stops only if no selectable interface profile remains eligible. draft-v0.1 wrote this failure as a global study stop, and separately said a failing interface remained eligible; both statements are withdrawn.",
+      "not_applicable_semantics": "none; I4 applies to every profile",
+      "merely_descriptive": [
+        "the reference's pooled rate across families and depths"
+      ],
+      "legal_next_state_on_pass": "the interface profile is eligible; evaluate the admissibility order",
+      "legal_next_state_on_fail": "eliminate this interface profile; if no selectable profile remains, STOP",
       "authorizes_mechanistic_execution": false,
-      "fail_closed": true
+      "fail_closed": true,
+      "no_pooling": true
     },
     {
       "gate_id": "I5",
-      "name": "one-shot held-out confirmation",
-      "question": "Does the single development-selected interface reproduce its I1, I2 and I3 outcomes on a sealed, never-inspected confirmation bank?",
+      "name": "one-shot confirmation",
+      "question": "Do the constructs that passed on the development split hold on a confirmation split that was never inspected?",
       "inputs": [
-        "confirmation bank draws of K1, K2, K3, K5, K6"
+        "the confirmation split of every gate-bearing stratum, including K4"
       ],
       "model_roles": [
         "RT",
         "RL",
-        "RI"
+        "RI",
+        "RP"
       ],
-      "threshold_logic": "the same registered thresholds as I1, I2 and I3, applied once, to one interface, on a bank observed for the first and only time. No re-selection, no second interface, no retry.",
-      "proposed_numbers": {
-        "reuses": [
-          "I1",
-          "I2",
-          "I3"
-        ],
-        "n_per_cell": "operator decision; the development sizes are the proposed default",
-        "status": "proposed, not frozen"
-      },
-      "what_passes": "every reused threshold holds on the confirmation bank",
-      "what_fails": "any threshold fails, any counter is missing, or any deviation from the sealed plan occurs",
-      "merely_descriptive": "the numerical gap between development and confirmation accuracy",
-      "legal_next_state_on_pass": "STUDY3_INTERFACE_CALIBRATION_CONFIRMED for the named interface, tasks and roles, which is a new operator decision point and nothing more",
-      "legal_next_state_on_fail": "STUDY3_INTERFACE_CALIBRATION_NOT_CONFIRMED; the bank is spent; no retry",
+      "applicable_profiles": [
+        "the single proposed interface profile only"
+      ],
+      "part_of_eligibility": false,
+      "evaluated_per": [
+        "every gate-bearing construct"
+      ],
+      "coverage_requirement": "I5 must cover every gate-bearing construct without exception. That explicitly includes I4 evaluated on the positive reference over the K4 stratum. draft-v0.1 omitted the positive-reference construct and the K4 stratum from confirmation; that omission is withdrawn.",
+      "covered_constructs": [
+        "I0",
+        "I1a",
+        "I1b",
+        "I2",
+        "I3",
+        "I4"
+      ],
+      "threshold_logic": "the same pre-registered thresholds as the development split, with no re-tuning of any kind",
+      "one_shot": true,
+      "what_passes": "every construct holds on data that was never inspected",
+      "what_fails": "any construct fails to replicate",
+      "not_applicable_semantics": "constructs that are not_applicable to the proposed profile are not evaluated and are recorded as not_applicable. not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied gate, averaged into any rate, or used as an input to admissibility. A gate whose transformation is not applicable to a profile is simply not evaluated for that profile, and the profile's eligibility rests on the gates that are applicable to it.",
+      "merely_descriptive": [],
+      "legal_next_state_on_pass": "the interface is calibrated; a separate authority is still required before any mechanistic work",
+      "legal_next_state_on_fail": "STOP; the confirmation split is spent and may not be reused",
       "authorizes_mechanistic_execution": false,
-      "fail_closed": true
+      "fail_closed": true,
+      "accessible_before_authority": false,
+      "no_pooling": true
     }
   ],
+  "gate_truth_table": {
+    "note": "Every gate is fail-closed. No gate authorises mechanistic execution.",
+    "rows": [
+      {
+        "gate": "I0",
+        "part_of_eligibility": true,
+        "on_pass": "evaluate I1a",
+        "on_fail": "STOP; fix the instrument and restart the gate sequence from I0",
+        "authorizes_mechanistic_execution": false,
+        "fail_closed": true
+      },
+      {
+        "gate": "I1a",
+        "part_of_eligibility": true,
+        "on_pass": "evaluate I1b where applicable, otherwise I2",
+        "on_fail": "eliminate this interface profile for this role; if no selectable profile remains, STOP",
+        "authorizes_mechanistic_execution": false,
+        "fail_closed": true
+      },
+      {
+        "gate": "I1b",
+        "part_of_eligibility": true,
+        "on_pass": "evaluate I2",
+        "on_fail": "eliminate this interface profile for this role; if no selectable profile remains, STOP",
+        "authorizes_mechanistic_execution": false,
+        "fail_closed": true
+      },
+      {
+        "gate": "I2",
+        "part_of_eligibility": true,
+        "on_pass": "evaluate I3",
+        "on_fail": "eliminate this interface profile for this role; if no selectable profile remains, STOP",
+        "authorizes_mechanistic_execution": false,
+        "fail_closed": true
+      },
+      {
+        "gate": "I3",
+        "part_of_eligibility": true,
+        "on_pass": "evaluate I4",
+        "on_fail": "eliminate this interface profile for this role; if no selectable profile remains, STOP",
+        "authorizes_mechanistic_execution": false,
+        "fail_closed": true
+      },
+      {
+        "gate": "I4",
+        "part_of_eligibility": true,
+        "on_pass": "the interface profile is eligible; evaluate the admissibility order",
+        "on_fail": "eliminate this interface profile; if no selectable profile remains, STOP",
+        "authorizes_mechanistic_execution": false,
+        "fail_closed": true
+      },
+      {
+        "gate": "I5",
+        "part_of_eligibility": false,
+        "on_pass": "the interface is calibrated; a separate authority is still required before any mechanistic work",
+        "on_fail": "STOP; the confirmation split is spent and may not be reused",
+        "authorizes_mechanistic_execution": false,
+        "fail_closed": true
+      }
+    ],
+    "legal_stop_states": [
+      "STOP_INSTRUMENT_DEFECT after an I0 failure",
+      "STOP_NO_SELECTABLE_INTERFACE_REMAINS after every selectable profile has been eliminated by I1a, I1b, I2, I3 or I4",
+      "STOP_CONFIRMATION_FAILED after an I5 failure, with the confirmation split spent",
+      "STOP_AWAITING_AUTHORITY, which is the current state"
+    ]
+  },
   "target_must_pass_i1_i2_analysis": {
     "position": "yes, for a later target-centered causal study",
     "argument": "A later study built on this interface would make claims about the target checkpoint. If the interface cannot register the target's competence on items where the answer is stated outright (I1) or on a single primitive (I2), then any later null on the target is uninterpretable in exactly the way Study 2's Gate A was. Requiring the target to clear I1 and I2 is therefore a precondition of interpretability, not a capability claim.",
@@ -769,75 +1511,1009 @@
     "consequence_if_target_fails_i1_or_i2_under_every_interface": "The study reports that no candidate interface was shown adequate for the target, which is a statement about the measurement panel and the target jointly, and is not evidence of model incapability."
   },
   "proposed_statistics": {
-    "framework": "exact binomial methods throughout; no normal approximation is used for a gate decision",
-    "all_numbers_status": "proposed or derived; none is frozen",
-    "sample_sizes": {
-      "development_per_cell_default": 192,
-      "confirmation_per_cell_default": 192,
-      "i4_per_cell_default": 128,
-      "rationale": "192 is divisible by 4, so a four-way counterbalance over label and position is exact with 48 items per position, and it is divisible by 3 so the three-rendering set is also exact at 64 items per rendering. 128 for I4 reflects the higher per-item cost of compositional items.",
-      "status": "proposed"
+    "framework": "frequentist, pre-registered, exact where an exact test exists",
+    "all_numbers_status": "proposed design parameters, not measurements",
+    "derivation_script": "studies/study3/analysis/design_statistics.py",
+    "derivation_tables": "studies/study3/analysis/design_statistics_tables.json",
+    "reproducibility": "the script's --check mode recomputes every table and compares it value-for-value against the committed tables; the committed design test runs that check",
+    "model_free": true,
+    "hypothesis_families": {
+      "family_A_within_profile": {
+        "correction": "none required; IU size is bounded by the component level",
+        "members": [
+          "I1a",
+          "I1b",
+          "I2",
+          "I3_primary",
+          "I3_uniformity",
+          "I4"
+        ],
+        "note": "each atomic cell inside a gate is itself a conjunctive member; a failed cell fails the gate and no pooled summary may rescue it",
+        "per_component_alpha": 0.005,
+        "type": "intersection_union_conjunctive"
+      },
+      "family_B_across_profiles": {
+        "correction": "Bonferroni over 3 selectable profiles",
+        "excluded": [
+          "S4 is never selectable and never enters selection"
+        ],
+        "members": [
+          "S1",
+          "S2",
+          "S3"
+        ],
+        "per_profile_alpha": 0.001666666667,
+        "study_alpha": 0.005,
+        "type": "union_selection"
+      },
+      "family_C_descriptive": {
+        "correction": "simultaneous Clopper-Pearson bounds are reported for readability; they carry no gate authority",
+        "members": [
+          "pooled summaries",
+          "softmax confidences",
+          "per-cell Clopper-Pearson intervals"
+        ],
+        "type": "descriptive_only"
+      },
+      "principle": "Two structurally different multiplicity problems are kept apart. Within one interface profile, every gate and every atomic cell must pass; that conjunction is an intersection-union test, whose size is bounded by the level of its individual components, so no inflation correction is applied to the conjunction itself. Across interface profiles, by contrast, the study may proceed if ANY selectable profile qualifies; that is a union event and it does inflate the false-qualification rate, so it is Bonferroni-corrected by the number of selectable profiles.",
+      "unresolved": [
+        "the final alpha allocation is a v0.2 proposal and is part of the blocking OD5 decision"
+      ]
     },
-    "confidence_intervals": {
-      "method": "Clopper-Pearson exact intervals",
-      "reported_for": "every gate-bearing cell",
-      "simultaneous_coverage": "Bonferroni-adjusted per-cell alpha as tabulated in Gate I3"
-    },
-    "multiplicity": {
-      "families": [
-        "interfaces",
-        "checkpoint roles",
-        "conditions within I3"
+    "retained_exact_binomial_gates": [
+      {
+        "acceptance_count": 184,
+        "acceptance_rate": 0.9583333333,
+        "alpha": 0.005,
+        "construct": "trivial content recovery and output validity",
+        "exact_null_tail": 0.002362050279,
+        "gate": "I1a",
+        "meets_target_power_0_90_at_lowest_alternative": false,
+        "n": 192,
+        "null_hypothesis": "p <= 0.9",
+        "power": {
+          "0.97": 0.87425,
+          "0.98": 0.984073,
+          "0.99": 0.999843
+        }
+      },
+      {
+        "acceptance_count": 124,
+        "acceptance_rate": 0.96875,
+        "alpha": 0.005,
+        "construct": "trivial content recovery and output validity",
+        "exact_null_tail": 0.003071835731,
+        "gate": "I1a",
+        "meets_target_power_0_90_at_lowest_alternative": false,
+        "n": 128,
+        "null_hypothesis": "p <= 0.9",
+        "power": {
+          "0.97": 0.660555,
+          "0.98": 0.885042,
+          "0.99": 0.990394
+        }
+      },
+      {
+        "acceptance_count": 184,
+        "acceptance_rate": 0.9583333333,
+        "alpha": 0.005,
+        "construct": "explicit content-to-symbol binding",
+        "exact_null_tail": 0.002362050279,
+        "gate": "I1b",
+        "meets_target_power_0_90_at_lowest_alternative": false,
+        "n": 192,
+        "null_hypothesis": "p <= 0.9",
+        "power": {
+          "0.97": 0.87425,
+          "0.98": 0.984073,
+          "0.99": 0.999843
+        }
+      },
+      {
+        "acceptance_count": 124,
+        "acceptance_rate": 0.96875,
+        "alpha": 0.005,
+        "construct": "explicit content-to-symbol binding",
+        "exact_null_tail": 0.003071835731,
+        "gate": "I1b",
+        "meets_target_power_0_90_at_lowest_alternative": false,
+        "n": 128,
+        "null_hypothesis": "p <= 0.9",
+        "power": {
+          "0.97": 0.660555,
+          "0.98": 0.885042,
+          "0.99": 0.990394
+        }
+      },
+      {
+        "acceptance_count": 115,
+        "acceptance_rate": 0.5989583333,
+        "alpha": 0.005,
+        "construct": "primitive headroom, per family",
+        "exact_null_tail": 0.003709328063,
+        "gate": "I2",
+        "meets_target_power_0_90_at_lowest_alternative": true,
+        "n": 192,
+        "null_hypothesis": "p <= 0.5",
+        "power": {
+          "0.7": 0.998888,
+          "0.75": 0.999999,
+          "0.8": 1.0
+        }
+      },
+      {
+        "acceptance_count": 80,
+        "acceptance_rate": 0.625,
+        "alpha": 0.005,
+        "construct": "primitive headroom, per family",
+        "exact_null_tail": 0.002962603303,
+        "gate": "I2",
+        "meets_target_power_0_90_at_lowest_alternative": true,
+        "n": 128,
+        "null_hypothesis": "p <= 0.5",
+        "power": {
+          "0.7": 0.972426,
+          "0.75": 0.999384,
+          "0.8": 0.999999
+        }
+      }
+    ],
+    "i3_primary_item_level_consistency": [
+      {
+        "acceptance_count": 124,
+        "acceptance_rate": 0.96875,
+        "alpha": 0.005,
+        "exact_null_tail": 0.003071835731,
+        "feasible": true,
+        "n": 128,
+        "null_hypothesis": "p <= 0.9",
+        "power": {
+          "0.97": 0.660555,
+          "0.98": 0.885042,
+          "0.99": 0.990394
+        }
+      },
+      {
+        "acceptance_count": 184,
+        "acceptance_rate": 0.9583333333,
+        "alpha": 0.005,
+        "exact_null_tail": 0.002362050279,
+        "feasible": true,
+        "n": 192,
+        "null_hypothesis": "p <= 0.9",
+        "power": {
+          "0.97": 0.87425,
+          "0.98": 0.984073,
+          "0.99": 0.999843
+        }
+      },
+      {
+        "acceptance_count": 243,
+        "acceptance_rate": 0.94921875,
+        "alpha": 0.005,
+        "exact_null_tail": 0.003307722347,
+        "feasible": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.9",
+        "power": {
+          "0.97": 0.97629,
+          "0.98": 0.999248,
+          "0.99": 1.0
+        }
+      },
+      {
+        "acceptance_count": 361,
+        "acceptance_rate": 0.9401041667,
+        "alpha": 0.005,
+        "exact_null_tail": 0.003608096462,
+        "feasible": true,
+        "n": 384,
+        "null_hypothesis": "p <= 0.9",
+        "power": {
+          "0.97": 0.999296,
+          "0.98": 0.999999,
+          "0.99": 1.0
+        }
+      },
+      {
+        "acceptance_count": 128,
+        "acceptance_rate": 1.0,
+        "alpha": 0.005,
+        "exact_null_tail": 0.001408061024,
+        "feasible": true,
+        "n": 128,
+        "null_hypothesis": "p <= 0.95",
+        "power": {
+          "0.97": 0.020267,
+          "0.98": 0.075325,
+          "0.99": 0.276252
+        }
+      },
+      {
+        "acceptance_count": 190,
+        "acceptance_rate": 0.9895833333,
+        "alpha": 0.005,
+        "exact_null_tail": 0.003270433875,
+        "feasible": true,
+        "n": 192,
+        "null_hypothesis": "p <= 0.95",
+        "power": {
+          "0.97": 0.070621,
+          "0.98": 0.259555,
+          "0.99": 0.69843
+        }
+      },
+      {
+        "acceptance_count": 252,
+        "acceptance_rate": 0.984375,
+        "alpha": 0.005,
+        "exact_null_tail": 0.003665973641,
+        "feasible": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.95",
+        "power": {
+          "0.97": 0.115754,
+          "0.98": 0.417758,
+          "0.99": 0.884023
+        }
+      },
+      {
+        "acceptance_count": 376,
+        "acceptance_rate": 0.9791666667,
+        "alpha": 0.005,
+        "exact_null_tail": 0.002867099998,
+        "feasible": true,
+        "n": 384,
+        "null_hypothesis": "p <= 0.95",
+        "power": {
+          "0.97": 0.184973,
+          "0.98": 0.637573,
+          "0.99": 0.983552
+        }
+      }
+    ],
+    "i3_secondary_paired_equivalence_sensitivity": [
+      {
+        "discordance_rate": 0.05,
+        "exact_power": 0.173256,
+        "exact_type_i_at_margin": 0.010894,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 128,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.1,
+        "exact_power": 0.00586,
+        "exact_type_i_at_margin": 0.002787,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 128,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.2,
+        "exact_power": 0.0,
+        "exact_type_i_at_margin": 0.0,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 128,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.3,
+        "exact_power": 0.0,
+        "exact_type_i_at_margin": 0.0,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 128,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.05,
+        "exact_power": 0.541197,
+        "exact_type_i_at_margin": 0.012216,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 192,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.1,
+        "exact_power": 0.114881,
+        "exact_type_i_at_margin": 0.015768,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 192,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.2,
+        "exact_power": 3.5e-05,
+        "exact_type_i_at_margin": 1.9e-05,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 192,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.3,
+        "exact_power": 0.0,
+        "exact_type_i_at_margin": 0.0,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 192,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.05,
+        "exact_power": 0.776425,
+        "exact_type_i_at_margin": 0.01072,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 256,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.1,
+        "exact_power": 0.358216,
+        "exact_type_i_at_margin": 0.022272,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 256,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.2,
+        "exact_power": 0.003664,
+        "exact_type_i_at_margin": 0.001093,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 256,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.3,
+        "exact_power": 0.0,
+        "exact_type_i_at_margin": 0.0,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 256,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.05,
+        "exact_power": 0.9605,
+        "exact_type_i_at_margin": 0.014578,
+        "margin": 0.05,
+        "meets_target_power": true,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 384,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.1,
+        "exact_power": 0.692423,
+        "exact_type_i_at_margin": 0.022519,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 384,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.2,
+        "exact_power": 0.167119,
+        "exact_type_i_at_margin": 0.017435,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 384,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.3,
+        "exact_power": 0.000476,
+        "exact_type_i_at_margin": 0.000131,
+        "margin": 0.05,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 384,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.05,
+        "exact_power": 0.97327,
+        "exact_type_i_at_margin": null,
+        "margin": 0.1,
+        "meets_target_power": true,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 128,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.1,
+        "exact_power": 0.811431,
+        "exact_type_i_at_margin": 0.023487,
+        "margin": 0.1,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 128,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.2,
+        "exact_power": 0.37971,
+        "exact_type_i_at_margin": 0.022592,
+        "margin": 0.1,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 128,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.3,
+        "exact_power": 0.078535,
+        "exact_type_i_at_margin": 0.011778,
+        "margin": 0.1,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 128,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.05,
+        "exact_power": 0.99904,
+        "exact_type_i_at_margin": null,
+        "margin": 0.1,
+        "meets_target_power": true,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 192,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.1,
+        "exact_power": 0.963405,
+        "exact_type_i_at_margin": 0.025501,
+        "margin": 0.1,
+        "meets_target_power": true,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 192,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.2,
+        "exact_power": 0.713243,
+        "exact_type_i_at_margin": 0.023542,
+        "margin": 0.1,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 192,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.3,
+        "exact_power": 0.417343,
+        "exact_type_i_at_margin": 0.023677,
+        "margin": 0.1,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 192,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.05,
+        "exact_power": 0.999972,
+        "exact_type_i_at_margin": null,
+        "margin": 0.1,
+        "meets_target_power": true,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 256,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.1,
+        "exact_power": 0.994856,
+        "exact_type_i_at_margin": 0.023601,
+        "margin": 0.1,
+        "meets_target_power": true,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 256,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.2,
+        "exact_power": 0.876815,
+        "exact_type_i_at_margin": 0.023881,
+        "margin": 0.1,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 256,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.3,
+        "exact_power": 0.653297,
+        "exact_type_i_at_margin": 0.024552,
+        "margin": 0.1,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 256,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.05,
+        "exact_power": 1.0,
+        "exact_type_i_at_margin": null,
+        "margin": 0.1,
+        "meets_target_power": true,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 384,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.1,
+        "exact_power": 0.999909,
+        "exact_type_i_at_margin": 0.017524,
+        "margin": 0.1,
+        "meets_target_power": true,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 384,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.2,
+        "exact_power": 0.981367,
+        "exact_type_i_at_margin": 0.024284,
+        "margin": 0.1,
+        "meets_target_power": true,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 384,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      },
+      {
+        "discordance_rate": 0.3,
+        "exact_power": 0.8907,
+        "exact_type_i_at_margin": 0.024727,
+        "margin": 0.1,
+        "meets_target_power": false,
+        "method": "Tango 1998 score interval, two one-sided tests",
+        "n": 384,
+        "one_sided_alpha": 0.025,
+        "true_difference": 0.0
+      }
+    ],
+    "i3_feasibility_verdict": {
+      "claim_under_review": "v0.1 asserted an aggregate equivalence margin of 0.05 without any paired power analysis",
+      "conclusion": "n = 192 does NOT support the v0.1 aggregate equivalence margin of 0.05 at 0.90 power under any tested discordance rate. The margin, the sample size, or both must be revised by the independent methods review. This is why OD5 and OD6 remain blocking.",
+      "margin_0_05_discordance_rates_supported": [],
+      "margin_0_05_supported_at_any_tested_discordance": false,
+      "margin_0_10_discordance_rates_supported": [
+        0.05,
+        0.1
       ],
-      "method": "Bonferroni within each gate family; gates themselves are conjunctive, so no correction is applied across gates",
-      "note": "conjunctive gates make the overall false-pass rate smaller than any single gate's alpha, and make the false-fail rate larger. The draft accepts that asymmetry deliberately: a false fail costs a redesign, a false pass costs an invalid later study."
+      "n": 192,
+      "target_power": 0.9
     },
-    "equivalence_testing": {
-      "method": "two one-sided tests, exact, on paired discordant counts",
-      "margin_delta": 0.05,
-      "principle": "a non-significant difference is never reported as invariance. Robustness must be demonstrated by an interval falling inside the margin, not by a failure to detect.",
-      "minimum_practically_important_accuracy_margin": 0.1,
-      "minimum_practically_important_robustness_margin": 0.05,
-      "mpia_rationale": "an interface whose reading moves by more than five accuracy points under a pure relabelling is not measuring the intended quantity; ten points of accuracy headroom is the smallest gap that leaves room for a later design to detect an effect without ceiling or floor artifacts."
+    "i4_competence_floor_thresholds": [
+      {
+        "acceptance_count": 114,
+        "acceptance_rate": 0.890625,
+        "alpha": 0.005,
+        "exact_null_tail": 0.004706876109,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 128,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.701983,
+          "0.95": 0.998087,
+          "0.97": 0.999992
+        }
+      },
+      {
+        "acceptance_count": 116,
+        "acceptance_rate": 0.90625,
+        "alpha": 0.001666666667,
+        "exact_null_tail": 0.000911222895,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 128,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.480533,
+          "0.95": 0.987934,
+          "0.97": 0.999865
+        }
+      },
+      {
+        "acceptance_count": 116,
+        "acceptance_rate": 0.90625,
+        "alpha": 0.001,
+        "exact_null_tail": 0.000911222895,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 128,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.480533,
+          "0.95": 0.987934,
+          "0.97": 0.999865
+        }
+      },
+      {
+        "acceptance_count": 168,
+        "acceptance_rate": 0.875,
+        "alpha": 0.005,
+        "exact_null_tail": 0.00432381909,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 192,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.89595,
+          "0.95": 0.999987,
+          "0.97": 1.0
+        }
+      },
+      {
+        "acceptance_count": 170,
+        "acceptance_rate": 0.8854166667,
+        "alpha": 0.001666666667,
+        "exact_null_tail": 0.001202995135,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 192,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.78993,
+          "0.95": 0.999897,
+          "0.97": 1.0
+        }
+      },
+      {
+        "acceptance_count": 171,
+        "acceptance_rate": 0.890625,
+        "alpha": 0.001,
+        "exact_null_tail": 0.000591161236,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 192,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.717503,
+          "0.95": 0.999727,
+          "0.97": 1.0
+        }
+      },
+      {
+        "acceptance_count": 222,
+        "acceptance_rate": 0.8671875,
+        "alpha": 0.005,
+        "exact_null_tail": 0.003276850097,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.96382,
+          "0.95": 1.0,
+          "0.97": 1.0
+        }
+      },
+      {
+        "acceptance_count": 224,
+        "acceptance_rate": 0.875,
+        "alpha": 0.001666666667,
+        "exact_null_tail": 0.001081002486,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.921084,
+          "0.95": 0.999999,
+          "0.97": 1.0
+        }
+      },
+      {
+        "acceptance_count": 225,
+        "acceptance_rate": 0.87890625,
+        "alpha": 0.001,
+        "exact_null_tail": 0.000590803318,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.888306,
+          "0.95": 0.999998,
+          "0.97": 1.0
+        }
+      },
+      {
+        "acceptance_count": 328,
+        "acceptance_rate": 0.8541666667,
+        "alpha": 0.005,
+        "exact_null_tail": 0.003745269173,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 384,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.998248,
+          "0.95": 1.0,
+          "0.97": 1.0
+        }
+      },
+      {
+        "acceptance_count": 330,
+        "acceptance_rate": 0.859375,
+        "alpha": 0.001666666667,
+        "exact_null_tail": 0.001581818398,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 384,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.995536,
+          "0.95": 1.0,
+          "0.97": 1.0
+        }
+      },
+      {
+        "acceptance_count": 331,
+        "acceptance_rate": 0.8619791667,
+        "alpha": 0.001,
+        "exact_null_tail": 0.000997595404,
+        "feasible": true,
+        "meets_target_power_0_90_at_0_95": true,
+        "n": 384,
+        "null_hypothesis": "p <= 0.8",
+        "power": {
+          "0.9": 0.993074,
+          "0.95": 1.0,
+          "0.97": 1.0
+        }
+      }
+    ],
+    "rejected_v0_1_i4_chance_null": {
+      "acceptance_count": 49,
+      "acceptance_rate": 0.3828125,
+      "alpha": 0.001,
+      "exact_null_tail": 0.000616080915,
+      "n": 128,
+      "null_hypothesis": "p <= 0.25",
+      "status": "REJECTED_BY_OPERATOR_REVIEW",
+      "why": "a chance-level null does not establish a positive-capability floor; clearing 0.25 shows only that the reference is above guessing, which cannot license the inference that the interface is adequate for a capable model"
     },
-    "power_and_assurance": {
-      "reported_at": "the registered alternatives shown in each gate's proposed_numbers",
-      "worst_case_in_panel": "Gate I1 at n=192, alpha=0.005 has power 0.9841 against a true rate of 0.98; the same gate at n=128 falls to 0.8850, which is why 192 is the recommended default rather than 128",
-      "assurance_note": "no prior distribution over true rates is assumed; only point-alternative power is reported"
+    "label_selection_uniformity_bands": [
+      {
+        "acceptance_band": [
+          30,
+          68
+        ],
+        "applies_to": "label-bearing profiles only; NA for content-only profiles",
+        "bonferroni_alpha": 0.00125,
+        "expected_per_label": 48.0,
+        "labels": 4,
+        "n": 192
+      },
+      {
+        "acceptance_band": [
+          69,
+          124
+        ],
+        "applies_to": "label-bearing profiles only; NA for content-only profiles",
+        "bonferroni_alpha": 0.00125,
+        "expected_per_label": 96.0,
+        "labels": 4,
+        "n": 384
+      },
+      {
+        "acceptance_band": [
+          154,
+          231
+        ],
+        "applies_to": "label-bearing profiles only; NA for content-only profiles",
+        "bonferroni_alpha": 0.00125,
+        "expected_per_label": 192.0,
+        "labels": 4,
+        "n": 768
+      }
+    ],
+    "descriptive_clopper_pearson_lower_bounds": [
+      {
+        "cells": 4,
+        "clopper_pearson_lower": 0.890112,
+        "n": 192,
+        "simultaneous_alpha": 0.00125,
+        "successes": 184
+      },
+      {
+        "cells": 4,
+        "clopper_pearson_lower": 0.833418,
+        "n": 192,
+        "simultaneous_alpha": 0.00125,
+        "successes": 176
+      },
+      {
+        "cells": 4,
+        "clopper_pearson_lower": 0.83815,
+        "n": 128,
+        "simultaneous_alpha": 0.00125,
+        "successes": 120
+      },
+      {
+        "cells": 8,
+        "clopper_pearson_lower": 0.885178,
+        "n": 192,
+        "simultaneous_alpha": 0.000625,
+        "successes": 184
+      },
+      {
+        "cells": 8,
+        "clopper_pearson_lower": 0.82775,
+        "n": 192,
+        "simultaneous_alpha": 0.000625,
+        "successes": 176
+      },
+      {
+        "cells": 8,
+        "clopper_pearson_lower": 0.831111,
+        "n": 128,
+        "simultaneous_alpha": 0.000625,
+        "successes": 120
+      },
+      {
+        "cells": 12,
+        "clopper_pearson_lower": 0.882352,
+        "n": 192,
+        "simultaneous_alpha": 0.000416666667,
+        "successes": 184
+      },
+      {
+        "cells": 12,
+        "clopper_pearson_lower": 0.824521,
+        "n": 192,
+        "simultaneous_alpha": 0.000416666667,
+        "successes": 176
+      },
+      {
+        "cells": 12,
+        "clopper_pearson_lower": 0.827088,
+        "n": 128,
+        "simultaneous_alpha": 0.000416666667,
+        "successes": 120
+      },
+      {
+        "cells": 24,
+        "clopper_pearson_lower": 0.877611,
+        "n": 192,
+        "simultaneous_alpha": 0.000208333333,
+        "successes": 184
+      },
+      {
+        "cells": 24,
+        "clopper_pearson_lower": 0.819131,
+        "n": 192,
+        "simultaneous_alpha": 0.000208333333,
+        "successes": 176
+      },
+      {
+        "cells": 24,
+        "clopper_pearson_lower": 0.820356,
+        "n": 128,
+        "simultaneous_alpha": 0.000208333333,
+        "successes": 120
+      }
+    ],
+    "paired_method_verification": {
+      "constrained_mle_max_abs_deviation": 3.3922399750307974e-09,
+      "exact_type_i_at_boundary": [
+        {
+          "discordance": 0.2,
+          "exact_type_i": 0.015065,
+          "margin": 0.1,
+          "n": 96
+        },
+        {
+          "discordance": 0.2,
+          "exact_type_i": 0.022592,
+          "margin": 0.1,
+          "n": 128
+        },
+        {
+          "discordance": 0.3,
+          "exact_type_i": 0.023677,
+          "margin": 0.1,
+          "n": 192
+        }
+      ],
+      "mcnemar_reduction_max_abs_deviation": 0.0,
+      "normal_quantile_check": 0.0
     },
-    "deterministic_tie_breaking": {
-      "among_interfaces": "the four ranking criteria then the fixed order S1 < S2 < S3 < S4",
-      "within_scoring": "argmax ties broken by the registered label or candidate order, fixed before any measurement",
-      "principle": "no tie is ever broken by a value observed during the round"
+    "sample_sizes": {
+      "n_192_status": "provisional for I1a, I1b and I2 only",
+      "n_192_is_not_an_i3_justification": true,
+      "why": "the committed derivation shows n = 192 cannot support a 0.05 aggregate equivalence margin at 0.90 power at any of the discordance rates 0.05, 0.10, 0.20 or 0.30",
+      "confirmation_size": "awaits the reviewed power analysis",
+      "i3_size": "awaits the reviewed power analysis",
+      "blocking_decision": "OD6"
     },
-    "reproducible_formulas": {
-      "language": "Python standard library only; no third-party dependency",
-      "survival_function": "sf(x, n, p) = sum(comb(n, k) * p**k * (1-p)**(n-k) for k in range(x, n+1))",
-      "exact_threshold": "smallest x in 0..n such that sf(x, n, p0) <= alpha",
-      "power_at_alternative": "sf(x_threshold, n, p1)",
-      "clopper_pearson_lower": "the p solving sf(x, n, p) = alpha, obtained by bisection on (0, 1)",
-      "note": "every derived number in this draft was produced by these formulas and can be recomputed without any model, any GPU and any network access"
-    }
+    "target_power": 0.9,
+    "study_alpha": 0.005,
+    "unresolved": [
+      "the I3 method margins, the I4 competence floor and every sample size other than the provisional I1/I2 value are reserved for the independent methods review"
+    ]
   },
   "operation_boundaries": {
     "performed_this_round": {
       "model_downloads": 0,
-      "weight_loads": 0,
+      "model_weight_loads": 0,
       "tokenizer_constructions": 0,
       "forward_passes": 0,
       "generations": 0,
-      "activation_operations": 0,
-      "probe_fits": 0,
+      "activation_extractions": 0,
+      "lens_operations": 0,
+      "probe_operations": 0,
       "patching_operations": 0,
       "ablation_operations": 0,
-      "lens_loads": 0,
-      "lens_fits": 0,
-      "lens_applies": 0,
       "gpu_jobs": 0,
       "provider_calls": 0,
       "bank_rows_generated": 0,
       "seeds_drawn": 0,
-      "scientific_evidence_rows": 0
+      "evidence_rows_created": 0,
+      "phase_1_0d_operations": 0,
+      "rq2_s4_operations": 0,
+      "interfaces_selected": 0,
+      "positive_references_selected": 0,
+      "confirmation_split_accesses": 0,
+      "study1_files_modified": 0,
+      "study2_files_modified": 0
     },
     "prohibited_without_new_authority": [
       "any model download, weight load or tokenizer construction",
@@ -863,7 +2539,9 @@
       "development_total_across_4_roles_and_4_surfaces": 68096,
       "confirmation_projection_single_interface": "roughly 1024 renderings per role for the selected surface only",
       "caveat": "these are arithmetic projections from the proposed sample sizes. They will change with every operator decision and must be recomputed at freeze time."
-    }
+    },
+    "all_counters_zero": true,
+    "counter_semantics": "every key in performed_this_round must be exactly zero; any nonzero value, and any key added without a new authority, is a fail-closed violation"
   },
   "compute_and_reproducibility_plan": {
     "route": "Azure Container Registry build and Azure containerized GPU execution, as already registered",
@@ -892,7 +2570,10 @@
       "any claim for or against J-space or J-lens validity",
       "any claim that Study 2 Gate A should or should not have passed",
       "any claim of model incapability derived from an interface failure",
-      "any claim that a passing interface validates a later experimental design"
+      "any claim that a passing interface validates a later experimental design",
+      "that a not_applicable transformation demonstrates robustness",
+      "that a pooled summary satisfies a gate that failed in an atomic cell",
+      "that parsing caused the Study 1 E0 eligibility collapse"
     ],
     "what_a_pass_permits": "only a new operator decision about whether to design a later substantive protocol",
     "what_a_pass_does_not_permit": [
@@ -905,66 +2586,95 @@
       "ablations",
       "lens work"
     ],
-    "study2_relationship": "Study 3 neither reopens nor revises Study 2; Study 2 remains closed at its terminal state"
+    "study2_relationship": "Study 3 neither reopens nor revises Study 2; Study 2 remains closed at its terminal state",
+    "not_applicable_semantics": "not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied gate, averaged into any rate, or used as an input to admissibility. A gate whose transformation is not applicable to a profile is simply not evaluated for that profile, and the profile's eligibility rests on the gates that are applicable to it."
+  },
+  "prior_study_statements": {
+    "study1": "Study 1's frozen raw-completion, no-chat-template, single-token E0 surface yielded too few behaviorally eligible items to populate confirmation. Parser-v2 separately failed its locked gate, while parser-v3 remained nonauthoritative. These facts motivate prospective interface validation but do not establish that parsing caused E0's eligibility collapse.",
+    "study1_classification": "motivation only; this does not establish that parsing caused the collapse",
+    "study2": "Study 2 remains closed and unchanged. Its post-hoc response-pattern diagnostic remains zero-authority motivation only.",
+    "study2_classification": "closed and unchanged; zero-authority motivation only"
   },
   "unresolved_operator_decisions": [
     {
       "id": "OD1",
-      "question": "Should Study 3 retain all three Study 2 checkpoint roles?",
-      "recommendation": "retain all three",
-      "tradeoff": "retaining all three roughly triples measurement cost and widens the multiplicity correction, but dropping the lineage base or the instruction control removes the only available contrast for distinguishing an interface effect from an instruction-tuning effect. Dropping the target is not an option if a later study is target-centered.",
-      "status": "unresolved"
+      "question": "Should all three target checkpoint roles RT, RL and RI be retained, or should the panel be narrowed?",
+      "status": "resolved",
+      "disposition": "retain RT, RL and RI. All three are required for the later distillation, lineage and instruction contrast, and each gate is evaluated per role.",
+      "blocking": false
     },
     {
       "id": "OD2",
-      "question": "Which positive-capability reference model is defensible and T4-feasible?",
-      "recommendation": "do not select one on paper; authorize the separate Stage P3-Q prequalification with a 3B-class candidate first and a 7B-class fallback",
-      "tradeoff": "a 3B-class model fits a T4 comfortably but may itself fail the compositional strata, which would stop the study; a 7B-class model is far more likely to clear them but is tight in fp16 on 16 GiB and may require quantization that alters the logits the interfaces read. Selecting without prequalification risks discovering the failure only after the gate matters.",
-      "status": "unresolved, blocking Gate I4"
+      "question": "Which model serves as the positive reference, and what canonical qualification wrapper does it use?",
+      "status": "unresolved",
+      "disposition": "candidate dossier only. No positive reference is selected. The RP canonical qualification wrapper and the RP-specific I4 wrapper must be frozen before P3-Q and I4.",
+      "blocking": true,
+      "blocks": [
+        "Gate I4",
+        "stage P3-Q",
+        "freeze"
+      ]
     },
     {
       "id": "OD3",
-      "question": "Does bounded final-answer generation (S4) belong in the calibration panel?",
-      "recommendation": "keep it, but strictly as a calibration reference and never as the default later surface",
-      "tradeoff": "S4 is the only surface that can express abstention and the only one that measures what the model would actually write, and Wang et al. give a direct reason to care about that divergence. Against it: it cannot be made fair across base and instruction-tuned checkpoints, it is the most expensive surface, and any relaxation of its normalization would reproduce the parser dependence that ended Study 1.",
-      "status": "unresolved"
+      "question": "Should the free-generation surface S4 be retained in the panel?",
+      "status": "resolved",
+      "disposition": "retain S4 only as a non-selectable diagnostic. It never enters admissibility and can never be selected.",
+      "blocking": false
     },
     {
       "id": "OD4",
-      "question": "Which prompt-rendering variants are methodologically necessary?",
-      "recommendation": "exactly three: the registered baseline plus one separator change and one instruction-wording change",
-      "tradeoff": "more renderings give a better robustness estimate and a stronger claim, but each one multiplies both cost and the multiplicity correction, and an over-large set invites the appearance of prompt shopping. Fewer than three cannot distinguish a rendering effect from noise.",
-      "status": "unresolved"
+      "question": "How many rendering variants should the K6 stratum carry, and what may each vary?",
+      "status": "resolved",
+      "disposition": "exactly three one-factor renderings: baseline, separator-only and instruction-wording-only. The answer cue is held constant across all three.",
+      "blocking": false
     },
     {
       "id": "OD5",
-      "question": "What accuracy, robustness, equivalence and multiplicity thresholds are acceptable?",
-      "recommendation": "I1 null p<=0.90, I2 null p<=0.50, I4 null p<=0.25, equivalence margin 0.05, per-cell alpha 0.005 with Bonferroni within each gate family",
-      "tradeoff": "stricter thresholds reduce the chance of certifying an inadequate interface but raise the chance of discarding a usable one and increase required sample sizes. The proposed values are deliberately conservative because the cost of a false pass is an uninterpretable later study.",
-      "status": "unresolved"
+      "question": "What are the statistical thresholds for I3 and I4?",
+      "status": "unresolved",
+      "disposition": "the I1 and I2 proposals may remain provisional. The I3 method and margins and the I4 competence floor require independent review. The chance-floor I4 proposal from draft-v0.1 is rejected.",
+      "blocking": true,
+      "blocks": [
+        "Gate I3 thresholds",
+        "Gate I4 floor",
+        "freeze"
+      ]
     },
     {
       "id": "OD6",
-      "question": "What development and confirmation sample sizes should be used?",
-      "recommendation": "192 per cell for development and confirmation, 128 for Gate I4",
-      "tradeoff": "192 gives power 0.98 at Gate I1 against a true rate of 0.98 and permits exact four-way and three-way counterbalancing; 128 drops I1 power to 0.885, which risks discarding an adequate interface; 256 buys little additional power at substantially higher cost.",
-      "status": "unresolved"
+      "question": "What sample sizes does the design require?",
+      "status": "unresolved",
+      "disposition": "n = 192 may remain a provisional I1 and I2 value. It is not an I3 justification. Confirmation and I3 sizes await the reviewed power analysis.",
+      "blocking": true,
+      "blocks": [
+        "I3 sizing",
+        "confirmation sizing",
+        "freeze"
+      ]
     },
     {
       "id": "OD7",
-      "question": "Is a bounded independent methods review required before freeze?",
-      "recommendation": "yes, bounded to the statistical design and the gate logic, before any bank is generated",
-      "tradeoff": "a review costs calendar time and must be scoped tightly to avoid becoming an open-ended redesign. Against that, both prior studies terminated on instrument-level problems that a design-stage reviewer could plausibly have flagged, which is a strong argument for paying that cost once.",
-      "status": "unresolved"
+      "question": "Is independent review required before freeze?",
+      "status": "resolved",
+      "disposition": "yes. A bounded independent review of the statistics and the gate logic is mandatory before freeze and before any bank construction or seed draw.",
+      "blocking": false
     },
     {
       "id": "OD8",
-      "question": "Should a chat template be applied, and to which roles?",
-      "recommendation": "no chat template for S1, S2 and S3 on any role; for S4, apply each role's native template or record its absence",
-      "tradeoff": "uniform treatment is cleaner for comparability but disadvantages the instruction-tuned role on generation; native templates are fairer per role but make cross-role comparison partly a comparison of templates. This asymmetry cannot be fully resolved and must be declared either way.",
-      "status": "unresolved"
+      "question": "What chat-template policy applies to each role on each surface?",
+      "status": "resolved_in_part",
+      "disposition": "no chat template for RT, RL or RI on S1, S2 or S3. S4 uses each role's native template or explicitly records its absence. The RP canonical qualification wrapper and the RP-specific I4 wrapper remain part of OD2 and must be frozen before P3-Q and I4. No cross-role byte parity is claimed where native wrappers differ.",
+      "blocking": false,
+      "residual": "the RP wrappers are carried by OD2"
     }
   ],
+  "blocking_decisions": [
+    "OD2",
+    "OD5",
+    "OD6"
+  ],
+  "required_next_action": "bounded independent methods review of the statistical and gate packet",
   "results": [],
   "bank_rows": []
 }

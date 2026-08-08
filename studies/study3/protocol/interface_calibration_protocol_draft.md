@@ -1,778 +1,755 @@
-# Study 3 - Interface Adequacy and Label-Binding Calibration
+# Study 3 - interface adequacy and label-binding calibration
 
-## Interface-calibration protocol - DESIGN DRAFT
+**State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW`
 
-| field | value |
-| --- | --- |
-| study id | `jspace-study3-interface-calibration` |
-| namespace | `studies/study3` |
-| draft version | `draft-v0.1` |
-| state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW` |
-| document class | `design_draft` |
-| frozen | `false` |
-| execution authorized | `false` |
-| review state | `awaiting_operator_review` |
-| successor authority | `none` |
-| machine-readable twin | `protocol/interface_calibration_protocol_draft.json` |
-| structural schema | `protocol/interface_calibration_protocol.schema.json` |
+**Draft version:** draft-v0.2
 
-> This document is a reviewable design draft. It is not a frozen protocol, not a pre-registration of record, and not authority to execute any model operation. Every numeric value in it is proposed, derived, or unresolved.
+**Frozen:** `false`  **Execution authorized:** `false`  **Review state:** `awaiting_independent_methods_review`
 
-This Markdown document and its JSON twin are generated from one source of record and agree exactly on study identity, research question, non-questions, candidate interfaces, task strata, model and control roles, split lifecycle, gate hierarchy, proposed statistics, operation boundaries, claim ceiling, unresolved operator decisions, and state name. Where the two ever disagree, that is a defect and the disagreement itself is the finding.
+**Successor authority:** `none`
 
-### Predecessors
+## How to read this pair of documents
 
-- **`jspace-study1`** - terminal state `INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY`.
-  Study 1 stopped because behavioral eligibility collapsed to 2/93, 2/55 and 5/90 and produced zero confirmation runs. That collapse is the single strongest motivation for treating the response interface as an object of study in its own right.
-- **`jspace-study2`** - terminal state `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`.
-  Study 2 executed its Gate A honestly and did not pass it. Its integrity is not in question. What remains unresolved is whether the A/B/C/D label-token interface it used was adequate to express competence at all.
+The JSON document interface_calibration_protocol_draft.json is the authoritative record of this design. The Markdown document interface_calibration_protocol_draft.md is a companion rendering of it. Where the two disagree, the JSON governs and the disagreement is a defect. Agreement on every decision-bearing marker is enforced by the committed test at tests/test_study3_design.py. No claim is made that the two documents are generated from a single source of record, because no such generator is committed; what is committed, and therefore what is checked, is the agreement itself.
 
----
+draft-v0.2 is an amendment produced in response to an operator review that found ten design defects in draft-v0.1 and refused freeze. Nothing here is frozen, nothing here is authorised for execution, and no scientific measurement of any kind was performed to produce it.
 
-## 1. Research question
+## What draft-v0.2 is
 
-> Can a pre-specified response and scoring interface recover deliberately trivial, primitive, and independently demonstrated task competence robustly across answer-label permutations, option positions, and prompt renderings for the checkpoint roles relevant to a later J-space study?
+draft-v0.2 is an amendment. An operator review of draft-v0.1 found ten design
+defects and refused freeze, with disposition
+`STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`.
+draft-v0.1 is preserved unedited, and its receipt at
+`studies/study3/design_receipt.json` is retained verbatim.
+The full review record is at `studies/study3/reviews/v0_1_operator_review.md`.
 
-- **Question class.** measurement_instrument_validation
-- **Unit of analysis.** a (interface, checkpoint role, task stratum, rendering condition) cell
-- **A pass would mean.** A future, separately authorized execution that passed every gate would establish only that the named interface met its pre-registered adequacy and robustness criteria for the named tasks and checkpoint roles.
-- **A fail would mean.** A future execution that failed would establish only that the candidate interface panel did not meet its calibration gates under the registered conditions. It would not establish model incapability.
+Every item in that review is classified as **design defects in an unfrozen draft; not empirical findings, not measurements, not results**.
 
-### 1.1 What Study 3 does not ask
+| Defect | Summary | Resolution |
+| --- | --- | --- |
+| D-01 | the Markdown companion contradicted its JSON twin about whether a winner was selected | resolved; JSON declared authoritative, label corrected, parity test committed |
+| D-02 | the Markdown made an unsupported single-source provenance claim | resolved; the claim is removed and replaced by an enforced statement |
+| D-03 | gate lifecycle contradictions around I4 and I5 | resolved; I4 is part of eligibility, its failure is per interface, I5 covers every construct |
+| D-04 | positive-reference circularity and a chance-level floor that is not a capability floor | structurally resolved; floor value blocking as OD5 |
+| D-05 | robustness construct mismatch and not_applicable treated as a pass | resolved; item-level consistency is primary and not_applicable is a third value |
+| D-06 | the statistics were incomplete | derivations committed and verified; margin and sample size blocking as OD6 |
+| D-07 | pooling could mask a failed cell | resolved; atomic cells defined and pooling rescue prohibited |
+| D-08 | panel and selection contradiction over S4 and S3 | resolved; S4 never selectable, S3 conditional, ranking replaced by admissibility order |
+| D-09 | counterbalancing was ambiguous and the label alphabet collided with the answer domain | resolved; orthogonal construction published, 1/2/3/4 forbidden |
+| D-10 | Study 1 overstatement | resolved; the accurate statement is used |
+| D-11 | reproducibility gap: the v0.1 checker was ephemeral and missed D-01 | resolved; design-critical checks are committed |
 
-These are not hedges. They are boundaries, and a future result that is written as though it answered any of them is out of protocol.
+## Research question
 
-**NQ1.** Study 3 does not ask whether the R1-distilled model reasons.
+Can a pre-specified response and scoring interface recover deliberately trivial, primitive, and independently demonstrated task competence robustly across answer-label permutations, option positions, and prompt renderings for the checkpoint roles relevant to a later J-space study?
 
-> Reasoning is a theoretical construct that no accuracy-on-a-response-surface measurement can adjudicate. Study 3 measures whether an instrument can register competence that is already independently demonstrated.
+- **Question class:** measurement_instrument_validation
+- **Unit of analysis:** a (interface, checkpoint role, task stratum, rendering condition) cell
+- **What a pass would mean:** A future, separately authorized execution that passed every gate would establish only that the named interface met its pre-registered adequacy and robustness criteria for the named tasks and checkpoint roles.
+- **What a fail would mean:** A future execution that failed would establish only that the candidate interface panel did not meet its calibration gates under the registered conditions. It would not establish model incapability.
 
-**NQ2.** Study 3 does not ask whether the model internalized a chain of thought.
+### What this study is not asking
 
-> Internalization is a claim about hidden process. Study 3 deliberately forbids generated rationale on three of its four candidate surfaces and never inspects internal state.
+- **NQ1.** Study 3 does not ask whether the R1-distilled model reasons. _(Reasoning is a theoretical construct that no accuracy-on-a-response-surface measurement can adjudicate. Study 3 measures whether an instrument can register competence that is already independently demonstrated.)_
+- **NQ2.** Study 3 does not ask whether the model internalized a chain of thought. _(Internalization is a claim about hidden process. Study 3 deliberately forbids generated rationale on three of its four candidate surfaces and never inspects internal state.)_
+- **NQ3.** Study 3 does not ask whether distillation transferred a causal mechanism. _(Causal transfer requires intervention. Study 3 authorizes no patching, no ablation, and no activation access, now or by implication.)_
+- **NQ4.** Study 3 does not ask whether a task-defined intermediate variable exists. _(Existence of an intermediate variable is the substantive question a later study might pose. Study 3 only asks whether the measuring instrument is fit to pose it.)_
+- **NQ5.** Study 3 does not ask whether J-space or J-lens is valid. _(No lens is loaded, fitted, or applied. J-lens validity is untouched by this study in either direction.)_
+- **NQ6.** Study 3 does not ask whether Study 2 Gate A should have passed. _(Study 2 is closed. Its Gate A inputs, thresholds and outcome are frozen and are not re-litigated. Study 3 is prospective and uses new banks and new seeds.)_
 
-**NQ3.** Study 3 does not ask whether distillation transferred a causal mechanism.
+## Applicability is a third value
 
-> Causal transfer requires intervention. Study 3 authorizes no patching, no ablation, and no activation access, now or by implication.
+not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied gate, averaged into any rate, or used as an input to admissibility. A gate whose transformation is not applicable to a profile is simply not evaluated for that profile, and the profile's eligibility rests on the gates that are applicable to it.
 
-**NQ4.** Study 3 does not ask whether a task-defined intermediate variable exists.
+## Interface profiles
 
-> Existence of an intermediate variable is the substantive question a later study might pose. Study 3 only asks whether the measuring instrument is fit to pose it.
+draft-v0.1 described each candidate as a scoring formula. A scoring formula is
+not enough to decide which calibration transformations even have a referent, so
+draft-v0.2 replaces it with a complete profile.
 
-**NQ5.** Study 3 does not ask whether J-space or J-lens is valid.
+| Profile | Name | Options visible | Labels visible | Selectable status |
+| --- | --- | --- | --- | --- |
+| S1 | `label_token_logits` | `true` | `true` | `selectable` |
+| S2 | `content_token_logits` | `false` | `false` | `selectable_preferred` |
+| S3 | `content_sequence_likelihood` | `false` | `false` | `conditionally_selectable` |
+| S4 | `free_generation_with_parser` | `true` | `true` | `never_selectable` |
 
-> No lens is loaded, fitted, or applied. J-lens validity is untouched by this study in either direction.
+### S1 - label_token_logits
 
-**NQ6.** Study 3 does not ask whether Study 2 Gate A should have passed.
+- **Family:** restricted label-token logits over a four-symbol label alphabet
+- **Role in panel:** Study 2 legacy comparator, retained for continuity and not privileged
+- **Prompt and rendering contract:** Question stem, then four option lines each prefixed by its displayed label symbol and a fixed separator, then a fixed instruction to answer with a single label symbol, then a fixed answer cue ending immediately before the label position.
+- **Options visible:** `true`
+- **Labels visible:** `true`
+- **Scoring formula:** argmax over the four registered label token ids of the next-token logit at the answer position, with ties broken by the registered deterministic order; no renormalisation is applied before argmax and the softmax over the four ids is recorded separately as a descriptive confidence only
+- **Tokenizer eligibility rule:** every label surface string, in the exact form emitted by the renderer, must map to exactly one token id under the pinned tokenizer of every required role; the four ids must be pairwise distinct; failure is an eligibility failure of the profile, never a silent fallback
+- **Output validity rule:** no text is generated; exactly one logit vector is read at exactly one position, so an invalid output is impossible by construction and the output-validity rate is defined as identically 1 and is not a gate input
+- **Applicable gates:** `I0`, `I1a`, `I1b`, `I2`, `I3`, `I4`, `I5`
+- **Selectable status:** `selectable`
+- **Why:** S1 displays options and labels, so every calibration transformation has a referent and every gate is applicable; it is admissible but ranked last, because it is the surface whose adequacy is under suspicion
 
-> Study 2 is closed. Its Gate A inputs, thresholds and outcome are frozen and are not re-litigated. Study 3 is prospective and uses new banks and new seeds.
+**Chat template policy by role**
 
----
+- `R0`: not applicable; R0 is a deterministic software control and never receives a prompt
+- `RC`: not applicable; RC is a deterministic software control and never receives a prompt
+- `RT`: no chat template; raw completion surface
+- `RL`: no chat template; raw completion surface
+- `RI`: no chat template; raw completion surface
+- `RP`: deferred to OD2; the RP canonical qualification wrapper is not settled and must be frozen before P3-Q and I4
 
-## 2. Validation targets
+**Transformations that are `not_applicable` to S1:** none; every
+calibration transformation has a referent for this profile.
 
-Interface adequacy is not one construct. The draft separates the following, because a single pooled accuracy number cannot distinguish among them, and Study 1 and Study 2 each terminated in a place where that distinction mattered.
+**Projected operation counts if a later authority permits execution**
 
-### VT1 - scoring-pipeline correctness
+- `forward_passes_per_item`: 1
+- `generated_tokens_per_item`: 0
+- `scored_positions_per_item`: 1
+- `logit_reads_per_item`: 1
 
-- **Why it is needed.** If the renderer, the option-to-label mapping, or the scorer is wrong, every downstream number is uninterpretable. Study 1 and Study 2 both show that instrument faults are cheap to introduce and expensive to detect late.
-- **What it cannot prove.** Correct plumbing says nothing about whether any model can use the interface.
+**Known confounds**
 
-### VT2 - answer-content to label binding
+- a label-token frequency prior can substitute for content binding
+- position of the correct content is confounded with the displayed symbol unless the counterbalancing design separates them
+- label symbols that also occur in the answer domain are ambiguous
 
-- **Why it is needed.** A model may know the answer content and still fail to emit the symbol that denotes it. Robinson, Rytting and Wingate call this multiple choice symbol binding and show it varies greatly by model.
-- **What it cannot prove.** Successful binding on explicit-answer items does not show binding survives when the answer must also be computed.
+**Disqualifying failures**
 
-### VT3 - output-surface adequacy
+- any label surface string that is not single-token under a required role
+- duplicate label token ids
+- failure of I1b, which is the gate that distinguishes binding from prior
 
-- **Why it is needed.** Restricted label logits, content logits, sequence log-likelihood and bounded generation are different measurement devices. Wang et al. show first-token probabilities and text answers can disagree, and that the disagreement is systematic rather than noise.
-- **What it cannot prove.** Agreement among surfaces does not make any of them correct.
+### S2 - content_token_logits
 
-### VT4 - primitive task headroom
+- **Family:** restricted content-token logits over the frozen answer domain
+- **Role in panel:** primary candidate; the surface that asks the model for the answer itself rather than for a symbol standing for the answer
+- **Prompt and rendering contract:** Question stem, then a fixed instruction to state the answer value directly, then a fixed answer cue ending immediately before the answer position. No option list is rendered and no label symbol is displayed.
+- **Options visible:** `false`
+- **Labels visible:** `false`
+- **Scoring formula:** argmax over the registered content token ids of the frozen answer domain of the next-token logit at the answer position, with ties broken by the registered deterministic order; the softmax over the domain is recorded as a descriptive confidence only
+- **Tokenizer eligibility rule:** every content surface string of the frozen answer domain, in the exact form emitted by the renderer, must map to exactly one token id under the pinned tokenizer of every required role, and the ids must be pairwise distinct; the current frozen domain is the ten mod-10 residues
+- **Output validity rule:** no text is generated; exactly one logit vector is read at exactly one position, so the output-validity rate is identically 1 and is not a gate input
+- **Applicable gates:** `I0`, `I1a`, `I2`, `I3`, `I4`, `I5`
+- **Selectable status:** `selectable_preferred`
+- **Why:** S2 removes the symbol-binding step entirely, so a failure cannot be attributed to label handling; it is preferred whenever the frozen answer domain is jointly single-token eligible for every required role
 
-- **Why it is needed.** If a checkpoint cannot clear a depth-1 primitive under a surface, that surface cannot support a later compositional study using the same checkpoint.
-- **What it cannot prove.** Headroom on primitives does not predict headroom on compositions, which is exactly why a separate positive-control gate exists.
+**Chat template policy by role**
 
-### VT5 - compositional task headroom in an independently capable positive control
+- `R0`: not applicable; R0 is a deterministic software control and never receives a prompt
+- `RC`: not applicable; RC is a deterministic software control and never receives a prompt
+- `RT`: no chat template; raw completion surface
+- `RL`: no chat template; raw completion surface
+- `RI`: no chat template; raw completion surface
+- `RP`: deferred to OD2; the RP canonical qualification wrapper is not settled and must be frozen before P3-Q and I4
 
-- **Why it is needed.** Without a checkpoint that is known on independent grounds to be able to do the compositional tasks, a null result is uninterpretable: instrument failure and model incapability are perfectly confounded. This confound is the specific reason Study 2 could not interpret its own Gate A outcome.
-- **What it cannot prove.** A capable reference clearing the tasks does not show the Study 2 target can, and must not be read as a statement about the target.
+**Transformations that are `not_applicable` to S2**
 
-### VT6 - robustness to answer-position and label permutation
+- `position_permutation`: S2 renders no option list, so there is no physical position for the correct content to occupy and the transformation has no referent
+- `label_symbol_permutation`: S2 displays no label symbols, so there is nothing to permute and the transformation has no referent
+- `label_set_replacement`: S2 displays no label alphabet, so there is no alphabet to replace
 
-- **Why it is needed.** Pezeshkpour and Hruschka report accuracy gaps of roughly 13 to 85 percent under option reordering; Zheng et al. attribute much of this to a prior token bias over option-ID tokens. An instrument whose reading moves that much with an irrelevant transformation is not measuring the intended quantity.
-- **What it cannot prove.** Position robustness does not imply content sensitivity.
+These are `not_applicable`. They are not passes, not zero effects and
+not inputs to admissibility.
 
-### VT7 - robustness to a small, pre-specified rendering set
+**Projected operation counts if a later authority permits execution**
 
-- **Why it is needed.** Zhou et al. find individual-question accuracy is unstable under knowledge-equivalent rewrites, particularly for models below roughly 30B and for pretrained checkpoints. The Study 2 target is a 1.5B checkpoint.
-- **What it cannot prove.** Stability over a small registered rendering set does not generalize to arbitrary prompts, and the set must stay small to keep multiplicity honest.
+- `forward_passes_per_item`: 1
+- `generated_tokens_per_item`: 0
+- `scored_positions_per_item`: 1
+- `logit_reads_per_item`: 1
 
-### VT8 - agreement or disagreement among scoring surfaces
+**Known confounds**
 
-- **Why it is needed.** Disagreement is diagnostic: it localizes whether a failure is in binding, in content access, or in generation control. Li et al. report low correlation between multiple-choice answers and long-form answers for identical questions.
-- **What it cannot prove.** The surface that agrees with the others most is not thereby the most valid; agreement is descriptive and must not be promoted into a selection rule on its own.
+- a content-token frequency prior over the answer domain
+- the answer cue wording can bias the first emitted token
 
----
+**Disqualifying failures**
 
-## 3. Candidate response and scoring surfaces
+- any content surface string of the frozen answer domain that is not single-token under a required role
+- duplicate content token ids
 
-Four families are compared. **No winner is selected in this round.** The panel exists so that a later, separately authorized execution can choose between them by a rule that was fixed before any data existed.
+> Because S2 shows no options and no labels, three of the five calibration transformations are not applicable to it. Under v0.1 those three were scored as passes; under v0.2 they are recorded as not_applicable and contribute nothing.
 
-### S1 - `label_token_logits`
+### S3 - content_sequence_likelihood
 
-*restricted label-token logits over A/B/C/D*
+- **Family:** length-normalised sequence log-likelihood over candidate answer strings
+- **Role in panel:** conditional candidate; currently an integrity check on S2 rather than an independent surface
+- **Prompt and rendering contract:** Identical stem, instruction and answer cue to S2. The difference is entirely in scoring: each candidate answer string is scored as a sequence rather than as a single token.
+- **Options visible:** `false`
+- **Labels visible:** `false`
+- **Scoring formula:** argmax over candidate answer strings of the length-normalised sum of token log-probabilities of the candidate continuation, with the normalisation constant, the boundary-token rule and the tie-break order all registered in advance
+- **Tokenizer eligibility rule:** candidate answer strings need not be single-token, which is precisely the case S3 exists to cover; but the boundary-token rule must be registered before any scoring, because where the candidate is deemed to start and stop determines the score
+- **Output validity rule:** no free text is generated; the candidate set is closed, so an invalid output is impossible and the validity rate is identically 1
+- **Applicable gates:** `I0`, `I1a`, `I2`, `I3`, `I4`, `I5`
+- **Selectable status:** `conditionally_selectable`
+- **Why:** For a single-token answer domain the length-normalised sequence score of a one-token candidate is a monotone function of that token's log probability, so S3's argmax is identical to S2's by construction. S3 is therefore not an independent surface under the current frozen domain. It becomes selectable only when a later authority introduces a multi-token answer domain, a dedicated multi-token stratum, a registered boundary-token rule and a length-confound gate.
 
-**Role in the panel.** Study 2 legacy comparator, retained for continuity, not privileged
+**Chat template policy by role**
 
-| aspect | specification |
-| --- | --- |
-| prompt contract | Question stem, then four options each on its own line prefixed by its label and a fixed separator, then a fixed instruction to answer with a single label, then a fixed answer cue ending immediately before the label position. |
-| answer position | the single token immediately following the fixed answer cue |
-| permitted output | no generated text; logits are read at one position only |
-| scoring equation | argmax over the four registered label token ids of the next-token logit at the answer position; ties broken by the registered deterministic tie-break order; no renormalization is applied before argmax, and the softmax over the four ids is recorded separately as a descriptive confidence only |
-| tokenization assumptions | each of the four label strings, in the exact surface form produced by the renderer, must map to exactly one token id; Study 2 established ids A=362, B=425, C=356, D=422 for the Qwen2.5 tokenizer, and a future tokenizer gate must re-derive them rather than assume them |
-| abstention / invalid output | not expressible: the surface is forced-choice by construction, so it cannot distinguish 'no answer' from 'wrong answer'. This is a recorded limitation, not a defect to be patched. |
-| chat template | no chat template on base and distilled checkpoints; a registered chat template is an option only if applied to every role identically, which is an unresolved operator decision |
-| fairness across checkpoints | identical rendered bytes for all roles; no role-specific prompt tuning; any template applied to one role is applied to all |
-| future operation counts | one forward pass per rendering; no generation |
+- `R0`: not applicable; R0 is a deterministic software control and never receives a prompt
+- `RC`: not applicable; RC is a deterministic software control and never receives a prompt
+- `RT`: no chat template; raw completion surface
+- `RL`: no chat template; raw completion surface
+- `RI`: no chat template; raw completion surface
+- `RP`: deferred to OD2; the RP canonical qualification wrapper is not settled and must be frozen before P3-Q and I4
 
-**Known confounds.**
+**Transformations that are `not_applicable` to S3**
 
-- option-ID token prior bias (Zheng et al.)
-- position bias concentrated when the model is uncertain between the top two or three options (Pezeshkpour and Hruschka)
-- first-token probability need not match what the model would write (Wang et al.)
+- `position_permutation`: S3 renders no option list
+- `label_symbol_permutation`: S3 displays no label symbols
+- `label_set_replacement`: S3 displays no label alphabet
 
-**Disqualifying failures.**
+These are `not_applicable`. They are not passes, not zero effects and
+not inputs to admissibility.
 
-- fails Gate I1 on explicit-answer items
-- selected-label distribution outside the registered uniformity band on balanced banks
-- any label string that is not single-token under the pinned tokenizer revision
+**Projected operation counts if a later authority permits execution**
 
-### S2 - `answer_content_logits`
+- `forward_passes_per_item`: 1
+- `generated_tokens_per_item`: 0
+- `scored_positions_per_item`: 1
+- `note`: under the current single-token domain S3 reuses the S2 forward pass and its agreement with S2 is recorded as an integrity check; it does not add four separate scorings and must not be budgeted as if it did
 
-*direct answer-content logits over exact single-token answer contents*
+**Known confounds**
 
-**Role in the panel.** removes the label indirection while keeping a single-position read
+- length confound: longer candidate strings are penalised or rewarded depending on the normalisation constant
+- boundary-token ambiguity: leading-space and end-of-string handling can change the ranking
 
-| aspect | specification |
-| --- | --- |
-| prompt contract | Question stem and a fixed instruction to answer with the value only, then a fixed answer cue. Options are not shown, so no label mapping exists to be biased. |
-| answer position | the single token immediately following the fixed answer cue |
-| permitted output | no generated text; logits are read at one position only |
-| scoring equation | argmax over the registered candidate-content token ids for that item (the correct content plus the registered distractor contents); correct if the argmax id equals the ground-truth content id |
-| tokenization assumptions | every candidate content for an item must be single-token eligible under the pinned tokenizer revision, verified by a future tokenizer gate; items whose contents are not single-token eligible are excluded from this surface before any measurement, and the exclusion set is recorded |
-| abstention / invalid output | not expressible over the restricted set; an unrestricted-vocabulary variant that records whether the global argmax lies outside the candidate set is proposed as an additional descriptive diagnostic |
-| chat template | same policy as S1 |
-| fairness across checkpoints | identical rendered bytes and identical candidate id sets for all roles |
-| future operation counts | one forward pass per rendering; no generation |
+**Disqualifying failures**
 
-**Known confounds.**
+- disagreement with S2 on a single-token domain, which would indicate a scoring implementation defect rather than a model property
+- any use of S3 as an independent surface before a multi-token domain, a dedicated stratum, a boundary-token rule and a length-confound gate all exist
 
-- single-token eligibility silently restricts the answer space and can make the stratum easier than intended
-- frequency priors over content tokens are not removed by restriction
-- without options shown, the task is open-response scored closed, which is a different task from S1 and must not be pooled with it
+> S3's current job is to catch scorer defects, not to compete.
 
-**Disqualifying failures.**
+### S4 - free_generation_with_parser
 
-- insufficient single-token eligible items to reach the registered per-cell sample size
-- fails Gate I2 on depth-1 primitives for the roles a later study needs
+- **Family:** constrained free generation followed by a deterministic parser
+- **Role in panel:** diagnostic only; never selectable
+- **Prompt and rendering contract:** Question stem, option list, and an instruction permitting a short free response. Each role's native chat template is applied where one exists, and its absence is recorded explicitly where one does not.
+- **Options visible:** `true`
+- **Labels visible:** `true`
+- **Scoring formula:** the model generates at most a registered maximum number of tokens under greedy decoding; a deterministic, version-pinned parser maps the completion to a member of the answer domain or to the explicit value unparseable
+- **Tokenizer eligibility rule:** no single-token constraint applies, because S4 generates text; the tokenizer is still pinned and recorded
+- **Output validity rule:** an output is valid only if the pinned parser maps it to a member of the answer domain; unparseable is a first-class recorded outcome and is never silently dropped, never imputed and never treated as incorrect without being reported separately
+- **Applicable gates:** `I0`, `I1a`, `I1b`, `I2`, `I3`, `I4`, `I5`
+- **Selectable status:** `never_selectable`
+- **Why:** S4 reintroduces exactly the parser dependence that motivated this study, so allowing it to be selected would make the study's own instrument the thing under suspicion. It is retained because its unparseable rate is the most direct diagnostic of whether a surface is legible to the model at all. It is never selectable under any outcome, it never enters any admissibility comparison, and its results carry no selection authority.
 
-### S3 - `content_conditional_loglikelihood`
+**Chat template policy by role**
 
-*conditional log-likelihood of exact option contents*
+- `R0`: not applicable; deterministic software control
+- `RC`: not applicable; deterministic software control
+- `RT`: each role's native chat template is applied, or its absence is recorded explicitly; no cross-role byte parity is claimed
+- `RL`: each role's native chat template is applied, or its absence is recorded explicitly; no cross-role byte parity is claimed
+- `RI`: each role's native chat template is applied, or its absence is recorded explicitly; no cross-role byte parity is claimed
+- `RP`: deferred to OD2
 
-**Role in the panel.** the standard cloze-style comparator; the only surface that handles multi-token answers
+**Transformations that are `not_applicable` to S4:** none; every
+calibration transformation has a referent for this profile.
 
-| aspect | specification |
-| --- | --- |
-| prompt contract | Question stem and a fixed continuation cue, scored once per candidate content. Options are not enumerated in the prompt, so the score is independent of option order by construction. |
-| answer position | the full candidate-content continuation after the cue |
-| permitted output | no generated text; teacher-forced scoring only |
-| scoring equation | for each candidate c, sum of log P(token_i | prefix, tokens_<i) over the tokens of c; the registered primary variant divides by the token count of c (mean log-likelihood) and the unnormalized sum is recorded as a registered secondary; both are computed from the same forward passes so no extra operations are needed; argmax over candidates |
-| length handling | length normalization is a known confound that changes which candidate wins. The draft registers mean-per-token as primary and the raw sum as secondary, requires both to be reported, and requires that any stratum where the two disagree on more than a registered fraction of items be flagged as length-confounded rather than scored |
-| tokenization assumptions | no single-token requirement; candidate contents must be tokenized in isolation from the prefix boundary in a registered, documented way, because leading-space handling changes token counts and therefore the normalized score |
-| abstention / invalid output | not expressible; forced choice over the candidate set |
-| chat template | same policy as S1 |
-| fairness across checkpoints | identical prefixes, identical candidate strings, identical normalization for all roles |
-| future operation counts | one teacher-forced sequence scoring per (rendering, candidate) pair, so four times the S1 cost at four candidates; no generation |
+**Projected operation counts if a later authority permits execution**
 
-**Known confounds.**
+- `forward_passes_per_item`: registered maximum generated tokens
+- `generated_tokens_per_item`: greater than zero and bounded by the registered maximum
+- `scored_positions_per_item`: 0
 
-- length and token-count asymmetry among candidates
-- surface-form frequency priors
-- leading-whitespace and tokenizer boundary effects
-- the option set is never shown, so this surface cannot detect a comparison failure that only appears when options are visible
+**Known confounds**
 
-**Disqualifying failures.**
+- parser version dependence, which is the confound the study exists to avoid taking on faith
+- chat-template differences across roles, which are not byte-comparable
 
-- primary and secondary normalizations disagree beyond the registered fraction on a gate-bearing stratum
-- candidate token counts cannot be balanced or covaried within a stratum
+**Disqualifying failures**
 
-### S4 - `bounded_minimal_generation`
+- none that would change its status, because its status is already never_selectable; a high unparseable rate is a finding, not a disqualification
 
-*bounded minimal-answer generation, final answer only, no rationale*
+> S4 is the only profile that generates text. Its per-item cost is therefore not comparable to S1, S2 or S3.
 
-**Role in the panel.** calibration reference only. It is explicitly not assumed to be the surface a later causal study would use, because free generation reintroduces the parsing dependence that ended Study 1.
+## Admissibility order
 
-| aspect | specification |
-| --- | --- |
-| prompt contract | Question stem, options if the stratum shows them, a fixed instruction that the reply must contain only the final answer, and a fixed answer cue. |
-| answer position | the generated span, truncated at the registered maximum new-token budget |
-| permitted output | at most a registered small number of new tokens, greedy decoding, temperature fixed at 0, no sampling, hard stop at a registered stop string; any generated rationale is a protocol violation for this surface and is scored as invalid rather than parsed |
-| scoring equation | exact match of the normalized generated span against the ground-truth content or label after a registered, deterministic normalization (strip whitespace, case-fold, strip a registered set of trailing punctuation); no fuzzy matching, no regex rescue, no second-chance parse |
-| tokenization assumptions | none beyond the pinned tokenizer; multi-token answers are permitted |
-| abstention / invalid output | expressible and recorded as a distinct outcome. Invalid, empty, over-budget and off-format outputs are counted separately and are never silently mapped to a wrong answer; output validity is itself an input to Gate I1 |
-| chat template | the instruction-tuned role plausibly requires its registered chat template for this surface to be meaningful, while the base role has none. This asymmetry is unresolved and is an operator-review item. |
-| fairness across checkpoints | cannot be made perfectly fair across base and instruction-tuned checkpoints; the draft records this as a structural limitation of S4 rather than claiming parity |
-| future operation counts | one generation per rendering, each up to the registered new-token budget; the most expensive surface in the panel |
+A pre-registered, fail-closed admissibility order replaces the data-dependent ranking used in draft-v0.1. The order is fixed here, before any data exists, so that no outcome can influence which surface is preferred. Data can only remove candidates from the order; it can never reorder them.
 
-**Known confounds.**
+- **Eligibility rule:** An interface profile is eligible if and only if every gate that is applicable to it passes in every atomic cell. The applicable gate set is a property of the profile and is listed in the profile. I4 is part of eligibility.
+- **Gates required for eligibility:** `I0`, `I1a`, `I1b`, `I2`, `I3`, `I4`
+- **I1b applicability:** I1b is required for label-bearing profiles only. For content-only profiles it is not_applicable, which is neither a pass nor a waiver: the profile simply has no symbol-binding step to validate.
+- **Never selectable:** `S4`
+- **Data-dependent ranking:** `false`
+- **The study stops only when** no selectable interface remains eligible. The failure of one interface eliminates that interface and nothing else.
 
-- format compliance is confounded with task competence
-- instruction tuning advantages S4 independently of task ability
-- normalization choices silently decide borderline cases
-- Li et al. show multiple-choice and long-form answers correlate weakly, so S4 and S1 disagreeing is expected and is not by itself evidence that either is broken
-
-**Disqualifying failures.**
-
-- output-validity rate below the registered floor on explicit-answer items
-- any need for a parser more permissive than the registered normalization, which would repeat the Study 1 failure
-
-### 3.5 Selection rule (development only, one-way)
-
-- **Principle.** one-way, development-only, pre-registered before any confirmation access
-- **Eligibility.** an interface is eligible only if it passes Gates I0, I1, I2 and I3 on the development bank for every checkpoint role the later study requires
-- **Confirmation-bank prohibition.** the held-out confirmation bank must never be used to choose, rank, tune or eliminate a surface, and must be physically excluded from the execution image until selection is sealed
-- **A winner is selected in this round:** `true` (that is, no winner is selected)
-
-Ranking among eligible interfaces, applied in order:
-
-- 1. highest registered lower confidence bound on explicit-answer binding accuracy (Gate I1)
-- 2. smallest registered maximum position-or-permutation effect (Gate I3)
-- 3. fewest excluded items caused by the surface's own eligibility restrictions
-- 4. lowest projected future operation count
-
-**Deterministic tie-breaker.** if two interfaces remain tied after all four ranking criteria, select the lower interface id in the fixed registered order S1 < S2 < S3 < S4. The order is fixed in this draft, before any data exists, precisely so that it cannot be chosen later to favour an observed outcome.
-
----
-
-## 4. Task strata
-
-Strata are disjoint. Gates are evaluated per stratum; pooling across strata to rescue a failing gate is forbidden.
-
-### K0 - `deterministic_software_fixtures`
-
-| aspect | specification |
-| --- | --- |
-| depth | not applicable |
-| uses a model | no |
-| data-generating process | hand-written and programmatically enumerated fixtures covering every renderer branch, every label permutation, every option position, and every scorer outcome including invalid output |
-| ground-truth function | the fixture declares its own expected rendering and expected score |
-| duplicate and leakage prevention | fixtures are non-evidential and are excluded from every bank by construction; fixture content may never appear in the development or confirmation banks |
-| balance invariants | every label appears as the correct answer an equal number of times |
-| expected failure mode | an off-by-one in permutation application or a mislabelled ground truth |
-| role in a gate | sole input to Gate I0 |
-
-### K1 - `explicit_answer_binding`
-
-| aspect | specification |
-| --- | --- |
-| depth | 0 |
-| uses a model | yes |
-| data-generating process | the correct content is stated verbatim in the stem, for example 'The value is 7.' followed by options containing 7 and three registered distractors; the only remaining task is to map a stated content to its label |
-| ground-truth function | the stated content, by construction |
-| duplicate and leakage prevention | item identity is the tuple of stem content and distractor set; duplicates are rejected at draw time and development and confirmation draws are disjoint by identity |
-| balance invariants | correct answer appears in each of the four positions equally often; each label is correct equally often |
-| expected failure mode | a model that knows the content but cannot emit the symbol, which is precisely the multiple choice symbol binding failure |
-| role in a gate | primary input to Gate I1 |
-
-### K2 - `identity_and_copy_depth0`
-
-| aspect | specification |
-| --- | --- |
-| depth | 0 |
-| uses a model | yes |
-| data-generating process | identity, copy, and single-element selection items over the same value domain as the primitive strata, with no arithmetic required |
-| ground-truth function | deterministic identity or projection function |
-| duplicate and leakage prevention | same identity-tuple rule as K1; disjoint from K1 content |
-| balance invariants | balanced correct-answer position and label |
-| expected failure mode | surface or formatting failure rather than task failure |
-| role in a gate | supporting input to Gate I1 and a floor for Gate I2 |
-
-### K3 - `depth1_primitives`
-
-| aspect | specification |
-| --- | --- |
-| depth | 1 |
-| uses a model | yes |
-| data-generating process | a single application of one registered primitive operation family to registered inputs; operation families may be reused from Study 2 at the abstract level only, never as item identities |
-| ground-truth function | the deterministic primitive itself, computed in the harness, never parsed from text |
-| duplicate and leakage prevention | no Study 2 item identity, frozen bank row, selected template outcome or confirmation content may be reused; new seeds are mandatory |
-| balance invariants | balanced positions, labels, and operand distributions within the family |
-| expected failure mode | genuine primitive-competence shortfall, or a surface that cannot express it |
-| role in a gate | primary input to Gate I2 |
-
-### K4 - `depth2_depth3_compositions`
-
-| aspect | specification |
-| --- | --- |
-| depth | 2 and 3 |
-| uses a model | yes |
-| data-generating process | composition of two or three registered primitives with a deterministic intermediate value that is computed but never shown; included only where the positive-control rationale and the power analysis justify the cost |
-| ground-truth function | deterministic composition computed in the harness |
-| duplicate and leakage prevention | same as K3, plus exclusion of any composition whose intermediate collides with a K3 item identity |
-| balance invariants | balanced positions and labels; intermediate values balanced across the registered range |
-| expected failure mode | for the positive control, none expected; for the 1.5B roles, failure here is uninformative about the interface and must not be read as one |
-| role in a gate | sole input to Gate I4; explicitly not an input to Gate I2 |
-
-### K5 - `position_and_permutation_variants`
-
-| aspect | specification |
-| --- | --- |
-| depth | inherited |
-| uses a model | yes |
-| data-generating process | each base item from K1, K2 and K3 is rendered under a counterbalanced set of label permutations and correct-answer positions; the registered default is the four cyclic permutations of the option order, which places the correct content in each of the four positions exactly once, plus one registered label-set replacement (A/B/C/D to 1/2/3/4) |
-| ground-truth function | inherited from the base item and transformed by the applied permutation |
-| duplicate and leakage prevention | variants of one base item always travel together into the same split; a base item may never straddle development and confirmation |
-| balance invariants | exact counterbalance by construction, verified in Gate I0 fixtures |
-| expected failure mode | position bias and option-ID token prior bias |
-| role in a gate | primary input to Gate I3 |
-
-### K6 - `rendering_variants`
-
-| aspect | specification |
-| --- | --- |
-| depth | inherited |
-| uses a model | yes |
-| data-generating process | a deliberately small registered set of knowledge-equivalent renderings of the same item: the registered default is three renderings differing only in the separator, the instruction sentence, and the answer cue. The set is kept small because every additional rendering multiplies the multiplicity correction. |
-| ground-truth function | unchanged by rendering, by construction |
-| duplicate and leakage prevention | renderings of one base item travel together into the same split |
-| balance invariants | every rendering is applied to every included base item |
-| expected failure mode | rendering-sensitive accuracy of the kind Zhou et al. report for smaller models |
-| role in a gate | secondary input to Gate I3 |
-
-### 4.8 Bank construction, seeds and reuse
-
-- **Bank rows generated in this round:** 0
-- **Seeds drawn in this round:** 0
-- **Future seed draw.** Seeds are drawn only under a separate future operator authority, from a registered entropy source, recorded in the run log before any item is generated, and bound into a sealed manifest together with the generator source digest. A seed that has been observed producing a bank may never be redrawn or re-rolled.
-- **Future bank sealing.** Generate, then hash every bank file, then record the hashes and row counts in an immutable manifest, then commit and publish the manifest, and only then is the bank usable. The confirmation bank is sealed and physically excluded from the execution image until selection is complete and a separate authority releases it.
-- **Study 2 reuse rule.** Study 3 may reuse abstract operation families only where justified in the traceability document. It may not reuse any Study 2 item identity, frozen bank row, selected template outcome, or confirmation content. New future seeds and disjoint development and confirmation banks are mandatory.
-- **Parser dependence.** Ground truth is always computed by the harness from the generating parameters. Natural language is never parsed to establish ground truth. Only S4 parses model output at all, and only with the registered deterministic normalization.
-
----
-
-## 5. Checkpoint roles and controls
-
-| id | role | model? | identity | revision | gate role |
-| --- | --- | --- | --- | --- | --- |
-| `R0` | deterministic_non_model_oracle | no | `the harness itself, executed on K0 fixtures` | n/a | Gate I0 |
-| `RC` | explicit_answer_binding_condition | no | `a condition, not a checkpoint: the K1 stratum applied to whichever model role is under test` | n/a | Gate I1 |
-| `RT` | target | yes | `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B` | `ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562` | Gates I1, I2, I3, I5 |
-| `RL` | lineage_base | yes | `Qwen/Qwen2.5-Math-1.5B` | `4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2` | Gates I1, I2, I3 |
-| `RI` | instruction_control | yes | `Qwen/Qwen2.5-Math-1.5B-Instruct` | `aafeb0fc6f22cbf0eaeed126eff8be45b0360a35` | Gates I1, I2, I3 |
-| `RP` | positive_capability_reference | yes | `UNSELECTED - operator review item` | `UNSELECTED` | Gate I4 only |
-
-**`R0` - deterministic_non_model_oracle.** establishes renderer, mapping, scorer and ground-truth integrity with no model involved
-
-> if R0 fails, no model measurement may proceed and the round stops
-
-**`RC` - explicit_answer_binding_condition.** isolates symbol binding from task competence
-
-> listed separately because it is a control by design, not by choice of checkpoint
-
-**`RT` - target.** the checkpoint any later target-centered causal study would use
-
-> The draft takes the position that the target itself must clear I1 and I2 for an interface to be useful in a later target-centered causal study. An interface that cannot register the target's competence on trivial and primitive items cannot support a causal claim about the target. This is kept logically distinct from I4.
-
-**`RL` - lineage_base.** lineage comparison; a base checkpoint with no instruction tuning
-
-> Its Study 2 cell that reached 44/128 must not be treated as a positive control. That cell has zero authority, arose among multiple observed control comparisons, and is a multiplicity artifact, not a demonstration of capability.
-
-**`RI` - instruction_control.** instruction-tuning comparison; the only 1.5B role with a native chat template
-
-> the only role for which S4 is straightforwardly meaningful, which is itself a finding about S4
-
-**`RP` - positive_capability_reference.** a checkpoint independently expected to be able to perform the K4 compositional strata, so that a null there can be attributed to the interface rather than confounded with model incapability
-
-> No candidate is downloaded, loaded, tokenized or benchmarked in this round. Selection requires either a defensible published-capability argument or a separate prequalification stage that never inspects the Study 3 confirmation bank.
-
-### 5.7 Positive-capability reference: unselected
-
-**Selection status: unselected; operator-review item.**
-
-Hard requirements:
-
-- pinned repository identity and immutable revision hash
-- license permitting research use and redistribution of derived measurements
-- must not be qualified, tuned or selected on the Study 3 confirmation bank
-- must be runnable on the registered Azure GPU route
-
-#### Tesla T4 feasibility
-
-| aspect | assessment |
-| --- | --- |
-| device | Tesla T4, 16 GiB, no bfloat16 tensor-core path, fp16 supported |
-| reference point | a 1.5B checkpoint in fp16 needs roughly 3.1 GiB of weights and runs comfortably |
-| class 3b | roughly 6.2 GiB in fp16; fits with ample activation headroom; lowest risk |
-| class 7b | roughly 15.2 GiB in fp16, which does not leave dependable headroom for activations and KV cache on a 16 GiB T4; would require either short sequences and small batches with measured margin, or quantization |
-| class 8b and above | does not fit in fp16 on a T4 |
-| quantization note | int8 or 4-bit quantization changes the numerics of the very logits the interfaces read. If quantization is used it must be registered as part of the checkpoint identity and the positive control must be described as 'quantized checkpoint X', not as X. |
-| alternative | a larger GPU SKU on the registered Azure route removes the constraint at higher cost |
-
-#### Candidate families for operator consideration
-
-| family | T4 fit | argument | risk |
+| Rank | Interface | Condition | Why |
 | --- | --- | --- | --- |
-| 3B-class instruction-tuned general model | comfortable in fp16 | cheapest defensible option; capability on depth-2 arithmetic compositions is plausible but not established here | may itself fail K4, which would leave Gate I4 unsatisfied and stop the study |
-| 7B-class instruction-tuned general or math model | tight in fp16; needs measured headroom or quantization | substantially more likely to clear depth-2 and depth-3 compositions | T4 memory margin and, if quantized, altered logit numerics |
-| hosted or larger-SKU reference | not applicable | removes capability doubt | cost, and a provider call is currently outside the registered route |
+| 1 | S2 | the frozen answer domain is jointly single-token eligible for every required role | S2 has no symbol-binding step, so a pass cannot be an artefact of label handling and a failure cannot be blamed on it |
+| 2 | S3 | a later authority has introduced a multi-token answer domain, a dedicated multi-token stratum, a registered boundary-token rule and a length-confound gate | S3 is the natural surface for a multi-token domain, but it is not independent of S2 for single-token contents |
+| 3 | S1 | S1 is eligible | S1 preserves continuity with Study 2 but is the surface whose adequacy is in question, so it is admitted only when no higher-ranked surface is available |
 
-No candidate was downloaded, loaded, tokenized or benchmarked in this round.
+- **No interface is selected in this round.**
+- **Proposed disposition only:** `true`
+- **Confirmation bank prohibition:** The admissibility order is evaluated on the development split only. The confirmation split is physically inaccessible until an interface has been proposed, the proposal has been sealed, and a separate authority has released it.
 
-#### Proposed prequalification stage
+## Atomic evaluation cells and the pooling prohibition
 
-- **Name.** Stage P3-Q, positive-reference prequalification
-- **Authority.** separate operator authority, not granted by this draft
-- **Isolation rule.** runs only on K4-shaped items drawn from a prequalification seed that is disjoint from both the development and the confirmation seeds; the confirmation bank is physically absent from the image
-- **Output.** a pass or fail per candidate on a pre-registered capability floor, and nothing else
-- **Prohibition.** may not be reported as a Study 3 result and may not influence interface selection
+- **Sampling unit:** the base item
+- **Cluster rule:** Every permutation, label-set replacement and rendering variant derived from one base item belongs to the same correlated cluster as that base item, is assigned to the same split as that base item, and is never treated as an independent observation. Splitting a cluster across splits would leak the confirmation set.
 
----
+An atomic evaluation cell is one combination of interface profile, checkpoint role, task stratum, operation family, depth, rendering, label or position condition, and split. A gate passes only if it passes in every atomic cell to which it is applicable.
 
-## 6. Splits, selection and confirmation
+**Cell factors**
 
-| split | name | evidential | content | freely inspectable | purpose |
+- interface profile
+- checkpoint role
+- task stratum
+- operation family
+- depth
+- rendering
+- label or position condition
+- split
+
+**Pooling as a rescue is prohibited**
+
+- **pooling K1 with K2** - K1 asks whether the model binds content to a displayed symbol; K2 asks whether it can echo trivially recoverable content at all. A high K2 rate can carry a failed K1 across a threshold, which would let the study report binding it never demonstrated.
+- **pooling across primitive operation families** - a family the model handles well can mask a family it cannot handle, so the headroom gate would stop testing headroom
+- **pooling K4 depth 2 with depth 3** - depth is the compositional variable of interest; averaging over it destroys the construct
+- **pooling across checkpoint roles** - the roles are the contrast the later study depends on
+- **pooling across interface profiles** - the interfaces are the object of comparison
+- **pooling across renderings** - rendering sensitivity is precisely what K6 measures
+
+Pooled summaries may be reported for readability. They carry no gate authority, may never be substituted for a failed cell, and must be labelled descriptive wherever they appear.
+
+## Counterbalancing
+
+**The defect being corrected.** draft-v0.1 used four cyclic option orders. Under cyclic rotation the physical position of the correct content and the identity of the displayed symbol move together, so the design cannot attribute an effect to one rather than the other. draft-v0.1 also used the label alphabet 1/2/3/4 while the frozen answer domain is the mod-10 residues, so a displayed label could be indistinguishable from a valid answer.
+
+**The requirement.** Counterbalancing must use a deterministic orthogonal design, or an explicitly justified balanced design, that separates three factors: the physical position of the correct content, the identity of the displayed symbol at that position, and the label alphabet in use.
+
+**Factors that must be separated**
+
+- physical position of the correct content
+- identity of the displayed symbol carrying the correct content
+- label alphabet in use
+
+**Construction algorithm** (published, not merely described; randomness: none; the construction is a deterministic function of the registered base-item index and draws no seed)
+
+1. Enumerate the four physical positions 0, 1, 2, 3.
+
+2. Enumerate the four displayed symbols of the label alphabet in their registered order.
+
+3. Form the 4 x 4 Latin square L[i][j] = (i + j) mod 4, whose rows index the position of the correct content and whose columns index the cyclic offset applied to the symbol assignment.
+
+4. Cross the position factor with the symbol-assignment factor by taking, for each base item, the pair (p, s) where p is the physical position of the correct content and s is the index of the symbol displayed at that position. Because p and s are enumerated independently, every one of the sixteen (p, s) pairs occurs, so position and symbol identity are orthogonal rather than tied.
+
+5. Assign the sixteen pairs to base items by the deterministic rule (p, s) = (k mod 4, (k div 4) mod 4) where k is the registered base-item index; this is a fixed function of the index and uses no random draw.
+
+6. Cross the resulting (p, s) design with the label-alphabet factor so that each alphabet is balanced across positions and symbols.
+
+7. Emit, for every produced variant, the tuple (base item id, position of correct content, displayed symbol at that position, label alphabet id, rendering id) as the recorded condition.
+
+Verification: the construction is checked by the committed design test, which asserts that position and symbol identity are orthogonal over a complete block and that no label symbol collides with the answer domain
+
+**Label alphabets**
+
+- **Requirement:** every label alphabet must be disjoint from the answer domain surface forms
+- **Answer domain:** the mod-10 residues 0 through 9 in their registered surface form
+- **Forbidden:** `1/2/3/4` - collides with the mod-10 answer domain, so a displayed label cannot be distinguished from a valid answer
+- **Forbidden:** `0/1/2/3` - same collision
+- **Permitted example:** `A/B/C/D` - disjoint from the mod-10 answer domain
+- **Permitted example:** `W/X/Y/Z` - disjoint from the mod-10 answer domain, and disjoint from the first alphabet, so label-set replacement is a real manipulation
+- **Label-set replacement:** label-set replacement is crossed and balanced with position, so an effect of changing the alphabet cannot be confounded with an effect of moving the content
+
+**K6 renderings** - exactly 3, one factor at a time, answer cue held constant across all three renderings
+
+- `R-base` varies nothing: the registered baseline rendering
+- `R-sep` varies the option separator only: identical to R-base except for the separator string between a label and its option content
+- `R-instr` varies the instruction wording only: identical to R-base except for the wording of the instruction sentence; the answer cue is byte-identical to R-base
+
+## Task strata
+
+| Stratum | Name | Uses a model | Gate role |
+| --- | --- | --- | --- |
+| K0 | deterministic_software_fixtures | `false` | sole input to gate I0; coverage must include every scorer, every profile, every not_applicable branch, every tie path and every invalid-output path |
+| K1 | explicit_answer_binding | `true` | sole input to gate I1b, which is applicable to label-bearing profiles only |
+| K2 | identity_and_copy_depth0 | `true` | sole input to gate I1a |
+| K3 | depth1_primitives | `true` | sole input to gate I2, evaluated per primitive operation family with no pooling across families |
+| K4 | depth2_depth3_compositions | `true` | sole input to gate I4, evaluated per operation family and per depth |
+| K5 | position_and_permutation_variants | `true` | input to gate I3, applicable to label-bearing profiles only for the position, label-symbol and label-set transformations |
+| K6 | rendering_variants | `true` | input to gate I3 for the separator and instruction-wording transformations, which are applicable to every profile |
+
+## Checkpoint and control roles
+
+| Role | Name | Is a model | Identity |
+| --- | --- | --- | --- |
+| R0 | deterministic_non_model_oracle | `false` | the harness itself, executed on K0 fixtures |
+| RC | explicit_answer_binding_condition | `false` | a condition, not a checkpoint: the K1 stratum applied to whichever model role is under test |
+| RT | target | `true` | deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B |
+| RL | lineage_base | `true` | Qwen/Qwen2.5-Math-1.5B |
+| RI | instruction_control | `true` | Qwen/Qwen2.5-Math-1.5B-Instruct |
+| RP | positive_capability_reference | `true` | UNSELECTED - operator review item |
+
+## Positive reference
+
+- **Selection status:** NOT SELECTED; candidate dossier only
+- **Blocking decision:** `OD2`
+- **Dossier:** `studies/study3/references/positive_reference_dossier.md`
+
+**The circularity being corrected.** draft-v0.1 permitted the positive reference to be prequalified through a candidate interface. If a candidate interface is what demonstrates that the reference is capable, the interface's adequacy rests on an argument that presupposes it.
+
+**The requirement.** the positive reference must be prequalified through a separate canonical interface that is not S1, S2, S3 or S4, on items disjoint from those used for gate I4
+
+- **Canonical interface status:** not defined in this round; it must be registered before P3-Q, and it is not a member of the candidate panel
+- **Item disjointness:** the P3-Q prequalification items and the K4 I4 items must be disjoint by construction
+
+## Gate hierarchy
+
+| Gate | Name | Part of eligibility | Authorizes mechanistic execution | Fail closed |
+| --- | --- | --- | --- | --- |
+| I0 | instrument integrity | `true` | `false` | `true` |
+| I1a | trivial content recovery and output validity | `true` | `false` | `true` |
+| I1b | explicit content-to-symbol binding | `true` | `false` | `true` |
+| I2 | primitive headroom | `true` | `false` | `true` |
+| I3 | calibration robustness | `true` | `false` | `true` |
+| I4 | positive reference adequacy | `true` | `false` | `true` |
+| I5 | one-shot confirmation | `false` | `false` | `true` |
+
+### Gate I0 - instrument integrity
+
+**Question.** Does the rendering and scoring software do exactly what it claims to do, on inputs whose correct answer is fixed by construction and requires no model?
+
+- **Inputs:** stratum K0 deterministic software fixtures
+- **Model roles:** `R0`, `RC`
+- **Applicable profiles:** S1, S2, S3, S4
+- **Part of eligibility:** `true`
+- **Evaluated per:** interface profile, renderer branch, scorer branch
+- **Pooling across cells:** `prohibited`
+- **Threshold logic:** 100 percent of fixtures must pass. There is no statistical threshold, because a fixture failure is a software defect, not a sampling outcome.
+- **Coverage requirement:** The fixture set must cover every scorer, every interface profile, every not_applicable branch, every tie-break path and every invalid output path. Coverage is asserted by the committed design test; a scorer or branch with no fixture is itself an I0 failure.
+- **What passes:** every fixture renders and scores exactly as declared
+- **What fails:** any fixture mismatch, or any uncovered scorer, profile, not_applicable branch, tie path or invalid-output path
+- **`not_applicable` semantics:** none; I0 applies to every profile
+- **Merely descriptive:** none
+- **Legal next state on pass:** evaluate I1a
+- **Legal next state on fail:** STOP; fix the instrument and restart the gate sequence from I0
+- **Authorizes mechanistic execution:** `false`
+- **Fail closed:** `true`
+
+### Gate I1a - trivial content recovery and output validity
+
+**Question.** Can the checkpoint recover an answer that is trivially present in the prompt, and does it emit a structurally valid output while doing so?
+
+- **Inputs:** stratum K2 trivial content recovery items
+- **Model roles:** `RT`, `RL`, `RI`
+- **Applicable profiles:** S1, S2, S3, S4
+- **Part of eligibility:** `true`
+- **Evaluated per:** interface profile, checkpoint role, split
+- **Pooling across cells:** `prohibited`
+- **Threshold logic:** exact one-sided binomial test of H0: p <= 0.90 at alpha = 0.005; at n = 192 the acceptance count is 184, that is a rate of 0.9583, with exact null tail 2.362e-03
+- **What passes:** the checkpoint recovers trivially present content at a rate exceeding the floor, and its outputs are valid
+- **What fails:** the checkpoint cannot echo content that is already in the prompt, in which case nothing downstream is interpretable
+- **`not_applicable` semantics:** none; I1a applies to every profile
+- **Merely descriptive:** the softmax confidence at the answer position
+- **Legal next state on pass:** evaluate I1b where applicable, otherwise I2
+- **Legal next state on fail:** eliminate this interface profile for this role; if no selectable profile remains, STOP
+- **Authorizes mechanistic execution:** `false`
+- **Fail closed:** `true`
+
+### Gate I1b - explicit content-to-symbol binding
+
+**Question.** When a symbol stands for an answer, does the checkpoint bind the correct content to the correct displayed symbol, rather than following a symbol prior?
+
+- **Inputs:** stratum K1 explicit binding items
+- **Model roles:** `RT`, `RL`, `RI`
+- **Applicable profiles:** S1, S4
+- **Part of eligibility:** `true`
+- **Evaluated per:** interface profile, checkpoint role, label or position condition, split
+- **Pooling across cells:** `prohibited`
+- **Threshold logic:** exact one-sided binomial test of H0: p <= 0.90 at alpha = 0.005; at n = 192 the acceptance count is 184, that is a rate of 0.9583
+- **What passes:** the correct content is selected through its displayed symbol across the counterbalanced conditions
+- **What fails:** the checkpoint tracks the symbol rather than the content, or tracks position rather than either
+- **`not_applicable` semantics:** For content-only profiles S2 and S3 this gate is not_applicable. not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied gate, averaged into any rate, or used as an input to admissibility. A gate whose transformation is not applicable to a profile is simply not evaluated for that profile, and the profile's eligibility rests on the gates that are applicable to it.
+- **Merely descriptive:** the marginal frequency of each displayed symbol
+- **Legal next state on pass:** evaluate I2
+- **Legal next state on fail:** eliminate this interface profile for this role; if no selectable profile remains, STOP
+- **Authorizes mechanistic execution:** `false`
+- **Fail closed:** `true`
+
+### Gate I2 - primitive headroom
+
+**Question.** Does the checkpoint have measurable headroom on each single primitive operation family, so that a later compositional failure cannot be explained by inability to do the parts?
+
+- **Inputs:** stratum K3 single primitive items
+- **Model roles:** `RT`, `RL`, `RI`
+- **Applicable profiles:** S1, S2, S3, S4
+- **Part of eligibility:** `true`
+- **Evaluated per:** interface profile, checkpoint role, operation family, split
+- **Pooling across cells:** `prohibited`
+- **Threshold logic:** exact one-sided binomial test of H0: p <= 0.50 at alpha = 0.005, evaluated separately in every operation family; at n = 192 the acceptance count is 115, that is a rate of 0.5990
+- **What passes:** every primitive family independently clears the floor
+- **What fails:** any single family falls below the floor, regardless of the pooled rate across families
+- **`not_applicable` semantics:** none; I2 applies to every profile
+- **Merely descriptive:** the pooled rate across families
+- **Legal next state on pass:** evaluate I3
+- **Legal next state on fail:** eliminate this interface profile for this role; if no selectable profile remains, STOP
+- **Authorizes mechanistic execution:** `false`
+- **Fail closed:** `true`
+
+### Gate I3 - calibration robustness
+
+**Question.** Does the checkpoint give the same answer to the same question when the presentation changes in ways that do not change the question?
+
+- **Inputs:** stratum K5 counterbalanced presentations, stratum K6 one-factor renderings
+- **Model roles:** `RT`, `RL`, `RI`
+- **Applicable profiles:** S1, S2, S3, S4
+- **Part of eligibility:** `true`
+- **Evaluated per:** interface profile, checkpoint role, rendering, label or position condition, split
+- **Pooling across cells:** `prohibited`
+- **Threshold logic:** the primary item-level criterion and, where applicable, the selected-label uniformity criterion must both pass in every atomic cell; the secondary aggregate criterion is reported alongside and cannot rescue a failed primary
+- **Primary criterion:** item-level content consistency - for each base item, the indicator that the answer is identical across every applicable transformed variant of that base item
+  - test: exact one-sided binomial test on the per-base-item consistency indicator
+  - why primary: aggregate equivalence can be satisfied while a large number of items flip in compensating directions, which is the failure mode this gate exists to exclude; an item-level indicator cannot be satisfied that way
+  - floor status: provisional; the floor value is part of blocking decision OD6
+- **Secondary criterion:** aggregate equivalence
+  - method: Tango (1998) score-based procedure for the difference of paired proportions, applied as two one-sided tests
+  - citation: Tango T. Equivalence test and confidence interval for the difference in proportions for the paired-sample design. Statistics in Medicine 1998;17(8):891-908. PMID 9595618.
+  - implementation: `studies/study3/analysis/design_statistics.py`
+  - decision form: intersection-union; equivalence is declared only when both one-sided nulls are rejected. A non-significant difference is never treated as equivalence.
+  - margin status: unresolved; the committed derivation shows that n = 192 does not support a 0.05 margin at 0.90 power at any tested discordance rate, so the margin, the sample size, or both must change. This is blocking decision OD6.
+  - verified before use:
+    - reduces exactly to McNemar's statistic at a null difference of zero, which is the published special case
+    - its closed-form constrained maximum-likelihood estimate agrees with direct numerical maximisation of the constrained likelihood
+    - its exact type-I error, computed by enumerating the full joint distribution of the discordant counts, does not exceed its nominal one-sided level
+- **Selected-label uniformity:** classified as `gate`, applies to label-bearing profiles only, `not_applicable` to S2, S3. this criterion is a gate for label-bearing profiles and is not_applicable elsewhere; it is never reclassified as diagnostic to avoid a failure
+- **What passes:** the same question yields the same answer under presentation changes that do not change the question
+- **What fails:** answers move with presentation
+- **`not_applicable` semantics:** Position, label-symbol and label-set transformations are not_applicable to S2 and S3, which display neither options nor labels. not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied gate, averaged into any rate, or used as an input to admissibility. A gate whose transformation is not applicable to a profile is simply not evaluated for that profile, and the profile's eligibility rests on the gates that are applicable to it.
+- **Merely descriptive:** aggregate rate differences without the paired procedure, pooled consistency across cells
+- **Legal next state on pass:** evaluate I4
+- **Legal next state on fail:** eliminate this interface profile for this role; if no selectable profile remains, STOP
+- **Authorizes mechanistic execution:** `false`
+- **Fail closed:** `true`
+
+### Gate I4 - positive reference adequacy
+
+**Question.** Does an independently prequalified capable reference succeed through this interface, so that a target failure through the same interface can be attributed to the target rather than to the interface?
+
+- **Inputs:** stratum K4 compositional items at depth 2 and depth 3
+- **Model roles:** `RP`
+- **Applicable profiles:** S1, S2, S3, S4
+- **Part of eligibility:** `true`
+- **Evaluated per:** interface profile, operation family, depth
+- **Pooling across cells:** `prohibited`
+- **Threshold logic:** exact one-sided binomial test of H0: p <= p_floor, evaluated separately in every operation family and at every depth
+  - proposed competence floor `p_floor = 0.8` (proposal; the final value is blocking decision OD5)
+  - the draft-v0.1 proposal of `p <= 0.25` at n = 128, acceptance count 49, rate 0.3828, is `REJECTED_BY_OPERATOR_REVIEW`: a chance-level null establishes only that the reference beats guessing; it is not a competence floor, and only a competence claim can license the inference that a capable model would have succeeded
+- **Prequalification:** the positive reference must be prequalified through a separate canonical interface that is not S1, S2, S3 or S4, on items disjoint from those used for I4
+  - why: if a candidate interface were used to establish that the reference is capable, the interface's adequacy would be established by an argument that presupposes it
+  - stage: `P3-Q`, status: not executed; RP is not selected and P3-Q is not authorised
+- **Consequence of failure:** this interface profile is eliminated, and only this interface profile. The study stops only if no selectable interface profile remains eligible. draft-v0.1 wrote this failure as a global study stop, and separately said a failing interface remained eligible; both statements are withdrawn.
+- **What passes:** the prequalified reference clears the competence floor through this interface in every family and at every depth
+- **What fails:** the reference does not clear the floor through this interface
+- **`not_applicable` semantics:** none; I4 applies to every profile
+- **Merely descriptive:** the reference's pooled rate across families and depths
+- **Legal next state on pass:** the interface profile is eligible; evaluate the admissibility order
+- **Legal next state on fail:** eliminate this interface profile; if no selectable profile remains, STOP
+- **Authorizes mechanistic execution:** `false`
+- **Fail closed:** `true`
+
+### Gate I5 - one-shot confirmation
+
+**Question.** Do the constructs that passed on the development split hold on a confirmation split that was never inspected?
+
+- **Inputs:** the confirmation split of every gate-bearing stratum, including K4
+- **Model roles:** `RT`, `RL`, `RI`, `RP`
+- **Applicable profiles:** the single proposed interface profile only
+- **Part of eligibility:** `false`
+- **Evaluated per:** every gate-bearing construct
+- **Pooling across cells:** `prohibited`
+- **Threshold logic:** the same pre-registered thresholds as the development split, with no re-tuning of any kind
+- **Coverage requirement:** I5 must cover every gate-bearing construct without exception. That explicitly includes I4 evaluated on the positive reference over the K4 stratum. draft-v0.1 omitted the positive-reference construct and the K4 stratum from confirmation; that omission is withdrawn.
+- **Covered constructs:** `I0`, `I1a`, `I1b`, `I2`, `I3`, `I4`
+- **Accessible before authority:** `false`
+- **What passes:** every construct holds on data that was never inspected
+- **What fails:** any construct fails to replicate
+- **`not_applicable` semantics:** constructs that are not_applicable to the proposed profile are not evaluated and are recorded as not_applicable. not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied gate, averaged into any rate, or used as an input to admissibility. A gate whose transformation is not applicable to a profile is simply not evaluated for that profile, and the profile's eligibility rests on the gates that are applicable to it.
+- **Merely descriptive:** none
+- **Legal next state on pass:** the interface is calibrated; a separate authority is still required before any mechanistic work
+- **Legal next state on fail:** STOP; the confirmation split is spent and may not be reused
+- **Authorizes mechanistic execution:** `false`
+- **Fail closed:** `true`
+
+## Gate truth table and legal stop states
+
+Every gate is fail-closed. No gate authorises mechanistic execution.
+
+| Gate | Eligibility | On pass | On fail | Authorizes mechanism |
+| --- | --- | --- | --- | --- |
+| I0 | `true` | evaluate I1a | STOP; fix the instrument and restart the gate sequence from I0 | `false` |
+| I1a | `true` | evaluate I1b where applicable, otherwise I2 | eliminate this interface profile for this role; if no selectable profile remains, STOP | `false` |
+| I1b | `true` | evaluate I2 | eliminate this interface profile for this role; if no selectable profile remains, STOP | `false` |
+| I2 | `true` | evaluate I3 | eliminate this interface profile for this role; if no selectable profile remains, STOP | `false` |
+| I3 | `true` | evaluate I4 | eliminate this interface profile for this role; if no selectable profile remains, STOP | `false` |
+| I4 | `true` | the interface profile is eligible; evaluate the admissibility order | eliminate this interface profile; if no selectable profile remains, STOP | `false` |
+| I5 | `false` | the interface is calibrated; a separate authority is still required before any mechanistic work | STOP; the confirmation split is spent and may not be reused | `false` |
+
+**Legal stop states**
+
+- STOP_INSTRUMENT_DEFECT after an I0 failure
+- STOP_NO_SELECTABLE_INTERFACE_REMAINS after every selectable profile has been eliminated by I1a, I1b, I2, I3 or I4
+- STOP_CONFIRMATION_FAILED after an I5 failure, with the confirmation split spent
+- STOP_AWAITING_AUTHORITY, which is the current state
+
+## Proposed statistics
+
+- **Framework:** frequentist, pre-registered, exact where an exact test exists
+- **Status of every number below:** proposed design parameters, not measurements
+- **Derivation script:** `studies/study3/analysis/design_statistics.py`
+- **Derivation tables:** `studies/study3/analysis/design_statistics_tables.json`
+- **Reproducibility:** the script's --check mode recomputes every table and compares it value-for-value against the committed tables; the committed design test runs that check
+- **Model free:** `true`
+- **Study alpha:** `0.005`  **Target power:** `0.9`
+
+### Multiplicity
+
+Two structurally different multiplicity problems are kept apart. Within one interface profile, every gate and every atomic cell must pass; that conjunction is an intersection-union test, whose size is bounded by the level of its individual components, so no inflation correction is applied to the conjunction itself. Across interface profiles, by contrast, the study may proceed if ANY selectable profile qualifies; that is a union event and it does inflate the false-qualification rate, so it is Bonferroni-corrected by the number of selectable profiles.
+
+- **Family A, within a profile** (`intersection_union_conjunctive`): members I1a, I1b, I2, I3_primary, I3_uniformity, I4, per-component alpha `0.005`, correction: none required; IU size is bounded by the component level
+- **Family B, across profiles** (`union_selection`): members S1, S2, S3, study alpha `0.005`, per-profile alpha `0.001666666667`, correction: Bonferroni over 3 selectable profiles
+- **Excluded from selection:** S4 is never selectable and never enters selection
+
+### Retained exact binomial gates
+
+| Gate | Null | n | alpha | Acceptance count | Rate | Exact null tail |
+| --- | --- | --- | --- | --- | --- | --- |
+| I1a | p <= 0.9 | 192 | 0.005 | 184 | 0.9583 | 2.362e-03 |
+| I1a | p <= 0.9 | 128 | 0.005 | 124 | 0.9688 | 3.072e-03 |
+| I1b | p <= 0.9 | 192 | 0.005 | 184 | 0.9583 | 2.362e-03 |
+| I1b | p <= 0.9 | 128 | 0.005 | 124 | 0.9688 | 3.072e-03 |
+| I2 | p <= 0.5 | 192 | 0.005 | 115 | 0.5990 | 3.709e-03 |
+| I2 | p <= 0.5 | 128 | 0.005 | 80 | 0.6250 | 2.963e-03 |
+
+### Gate I4 competence floor
+
+The draft-v0.1 proposal is `REJECTED_BY_OPERATOR_REVIEW`. a chance-level null does not establish a positive-capability floor; clearing 0.25 shows only that the reference is above guessing, which cannot license the inference that the interface is adequate for a capable model It tested `p <= 0.25` at n = 128, giving an acceptance count of 49, a rate of 0.3828.
+
+| n | alpha | Acceptance count | Rate | Power at 0.95 |
+| --- | --- | --- | --- | --- |
+| 128 | 0.005000 | 114 | 0.8906 | 0.9981 |
+| 128 | 0.001667 | 116 | 0.9062 | 0.9879 |
+| 128 | 0.001000 | 116 | 0.9062 | 0.9879 |
+| 192 | 0.005000 | 168 | 0.8750 | 1.0000 |
+| 192 | 0.001667 | 170 | 0.8854 | 0.9999 |
+| 192 | 0.001000 | 171 | 0.8906 | 0.9997 |
+| 256 | 0.005000 | 222 | 0.8672 | 1.0000 |
+| 256 | 0.001667 | 224 | 0.8750 | 1.0000 |
+| 256 | 0.001000 | 225 | 0.8789 | 1.0000 |
+| 384 | 0.005000 | 328 | 0.8542 | 1.0000 |
+| 384 | 0.001667 | 330 | 0.8594 | 1.0000 |
+| 384 | 0.001000 | 331 | 0.8620 | 1.0000 |
+
+### Gate I3 primary criterion: item-level content consistency
+
+| Null | n | alpha | Acceptance count | Rate | Power at 0.98 |
 | --- | --- | --- | --- | --- | --- |
-| `F` | implementation_fixtures | no | K0 only | yes | renderer, mapping and scorer verification |
-| `D` | development_bank | yes | K1, K2, K3, K5, K6 and, if authorized, K4 | yes | all interface comparison, all surface selection, all diagnostics |
-| `C` | confirmation_bank | yes | disjoint draws from the same strata as D | no | one-shot confirmation of the single development-selected interface |
+| p <= 0.9 | 128 | 0.005 | 124 | 0.9688 | 0.8850 |
+| p <= 0.9 | 192 | 0.005 | 184 | 0.9583 | 0.9841 |
+| p <= 0.9 | 256 | 0.005 | 243 | 0.9492 | 0.9992 |
+| p <= 0.9 | 384 | 0.005 | 361 | 0.9401 | 1.0000 |
+| p <= 0.95 | 128 | 0.005 | 128 | 1.0000 | 0.0753 |
+| p <= 0.95 | 192 | 0.005 | 190 | 0.9896 | 0.2596 |
+| p <= 0.95 | 256 | 0.005 | 252 | 0.9844 | 0.4178 |
+| p <= 0.95 | 384 | 0.005 | 376 | 0.9792 | 0.6376 |
 
-**Ordering.** `F` -> `D` -> `surface_selection` -> `hard_stop` -> `C`
+### Gate I3 secondary criterion: paired equivalence sensitivity
 
-**Surface selection.** Uses development bank only. One-way: true. Sealed before confirmation: true. Recorded artifact: a published selection record naming the interface and the ranking values that produced it.
+Method: Tango (1998) score-based procedure for the difference of paired proportions, applied as two one-sided tests. Verified before use:
 
-**Hard stop before confirmation.** Required: true. Authority needed: a separate operator authority issued after the selection record is published. Rationale: prevents the selection and the confirmation from being decided in one uninterruptible run
+- reduces exactly to McNemar's statistic at a null difference of zero, which is the published special case
+- its closed-form constrained maximum-likelihood estimate agrees with direct numerical maximisation of the constrained likelihood
+- its exact type-I error, computed by enumerating the full joint distribution of the discordant counts, does not exceed its nominal one-sided level
 
-### 6.4 Confirmation isolation rule
+Verification results: McNemar reduction maximum absolute deviation `0`; constrained MLE maximum absolute deviation `3.39e-09`; exact type-I error at the null boundary `0.0151` (n = 96), `0.0226` (n = 128), `0.0237` (n = 192), all at or below the nominal one-sided level 0.025.
 
-| rule | value |
+| Margin | n | Discordance | Exact power | Exact type-I at margin | Meets 0.90 power |
+| --- | --- | --- | --- | --- | --- |
+| 0.05 | 128 | 0.05 | 0.1733 | 0.0109 | `false` |
+| 0.05 | 128 | 0.10 | 0.0059 | 0.0028 | `false` |
+| 0.05 | 128 | 0.20 | 0.0000 | 0.0000 | `false` |
+| 0.05 | 128 | 0.30 | 0.0000 | 0.0000 | `false` |
+| 0.05 | 192 | 0.05 | 0.5412 | 0.0122 | `false` |
+| 0.05 | 192 | 0.10 | 0.1149 | 0.0158 | `false` |
+| 0.05 | 192 | 0.20 | 0.0000 | 0.0000 | `false` |
+| 0.05 | 192 | 0.30 | 0.0000 | 0.0000 | `false` |
+| 0.05 | 256 | 0.05 | 0.7764 | 0.0107 | `false` |
+| 0.05 | 256 | 0.10 | 0.3582 | 0.0223 | `false` |
+| 0.05 | 256 | 0.20 | 0.0037 | 0.0011 | `false` |
+| 0.05 | 256 | 0.30 | 0.0000 | 0.0000 | `false` |
+| 0.05 | 384 | 0.05 | 0.9605 | 0.0146 | `true` |
+| 0.05 | 384 | 0.10 | 0.6924 | 0.0225 | `false` |
+| 0.05 | 384 | 0.20 | 0.1671 | 0.0174 | `false` |
+| 0.05 | 384 | 0.30 | 0.0005 | 0.0001 | `false` |
+| 0.10 | 128 | 0.05 | 0.9733 | n/a | `true` |
+| 0.10 | 128 | 0.10 | 0.8114 | 0.0235 | `false` |
+| 0.10 | 128 | 0.20 | 0.3797 | 0.0226 | `false` |
+| 0.10 | 128 | 0.30 | 0.0785 | 0.0118 | `false` |
+| 0.10 | 192 | 0.05 | 0.9990 | n/a | `true` |
+| 0.10 | 192 | 0.10 | 0.9634 | 0.0255 | `true` |
+| 0.10 | 192 | 0.20 | 0.7132 | 0.0235 | `false` |
+| 0.10 | 192 | 0.30 | 0.4173 | 0.0237 | `false` |
+| 0.10 | 256 | 0.05 | 1.0000 | n/a | `true` |
+| 0.10 | 256 | 0.10 | 0.9949 | 0.0236 | `true` |
+| 0.10 | 256 | 0.20 | 0.8768 | 0.0239 | `false` |
+| 0.10 | 256 | 0.30 | 0.6533 | 0.0246 | `false` |
+| 0.10 | 384 | 0.05 | 1.0000 | n/a | `true` |
+| 0.10 | 384 | 0.10 | 0.9999 | 0.0175 | `true` |
+| 0.10 | 384 | 0.20 | 0.9814 | 0.0243 | `true` |
+| 0.10 | 384 | 0.30 | 0.8907 | 0.0247 | `false` |
+
+**Feasibility verdict.** n = 192 does NOT support the v0.1 aggregate equivalence margin of 0.05 at 0.90 power under any tested discordance rate. The margin, the sample size, or both must be revised by the independent methods review. This is why OD5 and OD6 remain blocking.
+
+- Claim under review: v0.1 asserted an aggregate equivalence margin of 0.05 without any paired power analysis
+- Margin 0.05 supported at any tested discordance: `false`
+- Discordance rates at which margin 0.10 reaches 0.90 power: 0.05, 0.1
+
+**Sample sizes.** n = 192 is provisional for I1a, I1b and I2 only. It is not an I3 justification: the committed derivation shows n = 192 cannot support a 0.05 aggregate equivalence margin at 0.90 power at any of the discordance rates 0.05, 0.10, 0.20 or 0.30 Confirmation size: awaits the reviewed power analysis. I3 size: awaits the reviewed power analysis. Blocking decision: `OD6`.
+
+### Label-selection uniformity bands
+
+| n | Labels | Expected per label | Bonferroni alpha | Acceptance band |
+| --- | --- | --- | --- | --- |
+| 192 | 4 | 48.0 | 0.001250 | 30 to 68 |
+| 384 | 4 | 96.0 | 0.001250 | 69 to 124 |
+| 768 | 4 | 192.0 | 0.001250 | 154 to 231 |
+
+These bands apply to label-bearing profiles only. For `S2` and `S3` the construct is `not_applicable`.
+
+## Operations performed in this round
+
+every key in performed_this_round must be exactly zero; any nonzero value, and any key added without a new authority, is a fail-closed violation
+
+| Counter | Value |
 | --- | --- |
-| required | true |
-| one shot | true |
-| single interface only | true |
-| physical exclusion before authorization | the confirmation bank files are absent from the execution image until the selection record is published and the separate authority is issued |
-| no reuse after observation | once the confirmation bank has been observed under any interface it is spent; a second confirmation requires a newly generated, newly sealed bank |
-| fail closed | any error, any ambiguity, any deviation from the sealed plan, or any missing counter causes the confirmation to be recorded as failed rather than retried |
-
-### 6.5 Failure modes this lifecycle is designed to prevent
-
-| failure mode | prevention |
-| --- | --- |
-| trying several surfaces on confirmation and reporting the best | exactly one interface is admitted to confirmation, named in a published record beforehand |
-| changing answer mappings after observing accuracy | the option-to-label mapping is fixed in the sealed bank manifest and is hashed |
-| replacing failed positive controls | the positive reference is pinned by revision before Gate I4 runs; a failed I4 stops the study and is reported as a failed gate |
-| threshold shopping | thresholds are frozen at protocol freeze, before any bank is generated, and are hashed into the sealed manifest |
-| cross-stratum pooling rescue | gates are evaluated per stratum and per role; pooling across strata is forbidden and pooled numbers are descriptive only |
-| prompt-template rescue | the rendering set is registered and small; adding a rendering after seeing results invalidates the round |
-| reusing Study 2 outcomes as Study 3 selection data | Study 2 outcomes are frozen history and are excluded from every Study 3 decision rule by construction |
-
----
-
-## 7. Proposed gate hierarchy
-
-The hierarchy is fail-closed and conjunctive. No gate authorizes mechanistic execution.
-
-### Gate I0 - deterministic integrity
-
-**Do the renderer, the option-to-label mapping, the ground-truth function and the scorer behave exactly as specified, with no model involved?**
-
-| aspect | specification |
-| --- | --- |
-| inputs | `K0 fixtures` |
-| model roles | `R0` |
-| threshold logic | every fixture must match its declared expectation exactly. There is no tolerance, no sampling and no statistic: the required pass rate is 100 percent of a finite enumerated set. |
-| what passes | all fixtures match; the instrument is internally consistent |
-| what fails | any single mismatch |
-| merely descriptive | fixture timing and coverage counts |
-| legal next state on pass | proceed to I1 |
-| legal next state on fail | stop; repair the harness; regenerate fixtures; rerun from I0 |
-| authorizes mechanistic execution | false |
-| fail closed | true |
-
-### Gate I1 - explicit answer-to-label binding and output validity
-
-**When the correct content is stated in the prompt, can each required checkpoint role emit the label that denotes it, and does it emit a valid output at all?**
-
-| aspect | specification |
-| --- | --- |
-| inputs | `K1`, `K2` |
-| model roles | `RT`, `RL`, `RI` |
-| threshold logic | two conjunctive conditions per (interface, role) cell. First, an output-validity floor: the proportion of renderings producing a well-formed, in-set response must meet the registered floor; for S1, S2 and S3 this is 1.0 by construction and is therefore a check on the harness, while for S4 it is a substantive measurement. Second, a binding-accuracy floor tested as an exact one-sided binomial against H0: p <= 0.90 at the registered per-cell alpha. |
-| what passes | both conditions hold for that (interface, role) cell |
-| what fails | either condition fails; the interface is ineligible for that role |
-| merely descriptive | which distractor absorbs the errors, and the selected-label distribution |
-| legal next state on pass | the cell proceeds to I2 |
-| legal next state on fail | the cell is eliminated from the panel for that role. If every interface fails for a role the later study requires, the study stops and reports interface inadequacy. |
-| authorizes mechanistic execution | false |
-| fail closed | true |
-
-Proposed numbers (all **proposed, not frozen**):
-
-| quantity | value |
-| --- | --- |
-| null hypothesis | `p <= 0.90` |
-| recommended n per cell | `192` |
-| recommended alpha per cell | `0.005` |
-| derived rejection threshold X | `184` |
-| derived threshold accuracy | `0.9583333333333334` |
-| derived exact p at threshold | `0.002362` |
-| derived power at true 0 98 | `0.9841` |
-| derived power at true 0 99 | `0.9998` |
-| s4 output validity floor | `0.95` |
-| status | `proposed, not frozen` |
-
-### Gate I2 - primitive-task headroom on content-based surfaces
-
-**Does each required role clear a depth-1 primitive by a margin large enough that a later compositional design has room to detect an effect?**
-
-| aspect | specification |
-| --- | --- |
-| inputs | `K3` |
-| model roles | `RT`, `RL`, `RI` |
-| threshold logic | exact one-sided binomial against H0: p <= 0.50 at the registered per-cell alpha. The null is deliberately far above the 0.25 forced-choice chance level, because clearing chance is not headroom; the requirement is a usable margin. |
-| what passes | the role clears the primitive margin under that interface |
-| what fails | it does not |
-| merely descriptive | per-operation-family breakdown within K3 |
-| legal next state on pass | the cell proceeds to I3 |
-| legal next state on fail | the interface is ineligible for that role. A failure here is jointly attributable to interface and role and must not be reported as a capability claim about the role. |
-| authorizes mechanistic execution | false |
-| fail closed | true |
-
-Proposed numbers (all **proposed, not frozen**):
-
-| quantity | value |
-| --- | --- |
-| null hypothesis | `p <= 0.50` |
-| recommended n per cell | `192` |
-| recommended alpha per cell | `0.005` |
-| derived rejection threshold X | `115` |
-| derived threshold accuracy | `0.5989583333333334` |
-| derived exact p at threshold | `0.003709` |
-| derived power at true 0 75 | `1.0` |
-| derived power at true 0 80 | `1.0` |
-| status | `proposed, not frozen` |
-
-### Gate I3 - position, permutation and rendering robustness
-
-**Does the reading stay within a pre-specified margin when only irrelevant transformations change?**
-
-| aspect | specification |
-| --- | --- |
-| inputs | `K5`, `K6` |
-| model roles | `RT`, `RL`, `RI` |
-| threshold logic | robustness is tested as equivalence, never as a failure to reject a difference. Three conjunctive conditions. (a) Paired equivalence across permutation conditions: for each pair of conditions over the same base items, an exact paired two-one-sided-test on the discordant pairs must place the accuracy difference inside the registered margin delta. (b) Maximum spread: the largest minus smallest per-condition accuracy must not exceed the registered maximum position-or-permutation effect. (c) Selected-label uniformity: on banks balanced by construction, the count of each selected label must fall inside a simultaneous exact acceptance band. |
-| what passes | all three conditions hold |
-| what fails | any one fails |
-| merely descriptive | the direction of any position preference and the identity of the favoured label |
-| legal next state on pass | the interface is eligible for selection |
-| legal next state on fail | the interface is ineligible; a non-significant difference is never accepted as invariance |
-| authorizes mechanistic execution | false |
-| fail closed | true |
-
-Proposed numbers (all **proposed, not frozen**):
-
-| quantity | value |
-| --- | --- |
-| equivalence margin delta | `0.05` |
-| maximum position or permutation effect | `0.05` |
-| secondary margin for rendering variants | `0.075` |
-| recommended n per condition | `192` |
-| family alpha | `0.005` |
-| multiplicity method | `Bonferroni over the number of (interface, role, condition) cells` |
-| worked simultaneous bounds | `{'cells': 4, 'per_cell_alpha': 0.00125, 'n': 192, 'X': 184, 'clopper_pearson_lower': 0.8952}, {'cells': 8, 'per_cell_alpha': 0.000625, 'n': 192, 'X': 184, 'clopper_pearson_lower': 0.8901}, {'cells': 12, 'per_cell_alpha': 0.0004166666666666667, 'n': 192, 'X': 184, 'clopper_pearson_lower': 0.8872}, {'cells': 24, 'per_cell_alpha': 0.0002083333333333333, 'n': 192, 'X': 184, 'clopper_pearson_lower': 0.8824}` |
-| label uniformity bands | `{'n': 192, 'per_label_alpha': 0.00125, 'accept_count_low': 31, 'accept_count_high': 68, 'accept_share_low': 0.16145833333333334, 'accept_share_high': 0.3541666666666667}, {'n': 384, 'per_label_alpha': 0.00125, 'accept_count_low': 71, 'accept_count_high': 123, 'accept_share_low': 0.18489583333333334, 'accept_share_high': 0.3203125}, {'n': 768, 'per_label_alpha': 0.00125, 'accept_count_low': 156, 'accept_count_high': 230, 'accept_share_low': 0.203125, 'accept_share_high': 0.2994791666666667}` |
-| status | `proposed, not frozen` |
-
-### Gate I4 - positive-control compositional headroom
-
-**On the compositional strata a later study would need, does an independently capable reference checkpoint clear the task under the interface?**
-
-| aspect | specification |
-| --- | --- |
-| inputs | `K4` |
-| model roles | `RP` |
-| threshold logic | exact one-sided binomial against H0: p <= 0.25, the forced-choice chance level, at a stricter registered alpha because this gate carries the whole interpretability of a later null. |
-| what passes | the reference clears chance by the registered margin on K4 under the interface |
-| what fails | it does not, or no positive reference was selected |
-| merely descriptive | the reference's accuracy on K1 to K3 |
-| legal next state on pass | the interface remains eligible for selection |
-| legal next state on fail | the study stops and reports that no interface could be shown adequate for compositional strata. Replacing a failed positive control with a different checkpoint after seeing the result is forbidden. |
-| authorizes mechanistic execution | false |
-| fail closed | true |
-
-Proposed numbers (all **proposed, not frozen**):
-
-| quantity | value |
-| --- | --- |
-| null hypothesis | `p <= 0.25` |
-| recommended n per cell | `128` |
-| recommended alpha per cell | `0.001` |
-| derived rejection threshold X | `49` |
-| derived threshold accuracy | `0.3828125` |
-| derived exact p at threshold | `0.0006161` |
-| derived power at true 0 50 | `0.997` |
-| derived power at true 0 60 | `1.0` |
-| alternative n 256 alpha 0 001 | `X=87, accuracy=0.33984375, exact_p=0.0008124` |
-| status | `proposed, not frozen; conditional on a positive reference being selected` |
-
-> **Separation from target capability.** I4 is deliberately evaluated on a different checkpoint from the target. It asks whether the interface can register compositional competence in something, not whether the target has it. Passing I4 says nothing about the target. Failing I4 means a later null on the target would be uninterpretable, so the study stops rather than proceeding.
-
-### Gate I5 - one-shot held-out confirmation
-
-**Does the single development-selected interface reproduce its I1, I2 and I3 outcomes on a sealed, never-inspected confirmation bank?**
-
-| aspect | specification |
-| --- | --- |
-| inputs | `confirmation bank draws of K1, K2, K3, K5, K6` |
-| model roles | `RT`, `RL`, `RI` |
-| threshold logic | the same registered thresholds as I1, I2 and I3, applied once, to one interface, on a bank observed for the first and only time. No re-selection, no second interface, no retry. |
-| what passes | every reused threshold holds on the confirmation bank |
-| what fails | any threshold fails, any counter is missing, or any deviation from the sealed plan occurs |
-| merely descriptive | the numerical gap between development and confirmation accuracy |
-| legal next state on pass | STUDY3_INTERFACE_CALIBRATION_CONFIRMED for the named interface, tasks and roles, which is a new operator decision point and nothing more |
-| legal next state on fail | STUDY3_INTERFACE_CALIBRATION_NOT_CONFIRMED; the bank is spent; no retry |
-| authorizes mechanistic execution | false |
-| fail closed | true |
-
-Proposed numbers (all **proposed, not frozen**):
-
-| quantity | value |
-| --- | --- |
-| reuses | `I1, I2, I3` |
-| n per cell | `operator decision; the development sizes are the proposed default` |
-| status | `proposed, not frozen` |
-
-### 7.7 Must the target itself pass I1 and I2?
-
-**Position: yes, for a later target-centered causal study.**
-
-A later study built on this interface would make claims about the target checkpoint. If the interface cannot register the target's competence on items where the answer is stated outright (I1) or on a single primitive (I2), then any later null on the target is uninterpretable in exactly the way Study 2's Gate A was. Requiring the target to clear I1 and I2 is therefore a precondition of interpretability, not a capability claim.
-
-**Distinctness from Gate I4.** I4 is evaluated on a different checkpoint and asks a different question: can the interface register compositional competence at all. The target may legitimately fail K4 while the interface remains adequate. Conflating the two would smuggle a capability claim about the target into an instrument validation.
-
-**If the target fails I1 or I2 under every interface.** The study reports that no candidate interface was shown adequate for the target, which is a statement about the measurement panel and the target jointly, and is not evidence of model incapability.
-
----
-
-## 8. Statistical design
-
-**Framework.** exact binomial methods throughout; no normal approximation is used for a gate decision
-
-**Status of every number in this section: proposed or derived; none is frozen.**
-
-### 8.1 Sample sizes
-
-| quantity | value |
-| --- | --- |
-| development per cell (default) | 192 |
-| confirmation per cell (default) | 192 |
-| Gate I4 per cell (default) | 128 |
-
-**Rationale.** 192 is divisible by 4, so a four-way counterbalance over label and position is exact with 48 items per position, and it is divisible by 3 so the three-rendering set is also exact at 64 items per rendering. 128 for I4 reflects the higher per-item cost of compositional items.
-
-### 8.2 Confidence intervals and multiplicity
-
-- **Interval method.** Clopper-Pearson exact intervals
-- **Reported for.** every gate-bearing cell
-- **Simultaneous coverage.** Bonferroni-adjusted per-cell alpha as tabulated in Gate I3
-- **Multiplicity families.** interfaces, checkpoint roles, conditions within I3
-- **Multiplicity method.** Bonferroni within each gate family; gates themselves are conjunctive, so no correction is applied across gates
-
-> conjunctive gates make the overall false-pass rate smaller than any single gate's alpha, and make the false-fail rate larger. The draft accepts that asymmetry deliberately: a false fail costs a redesign, a false pass costs an invalid later study.
-
-### 8.3 Equivalence, not absence of evidence
-
-- **Method.** two one-sided tests, exact, on paired discordant counts
-- **Margin delta.** `0.05`
-- **Minimum practically important accuracy margin.** `0.1`
-- **Minimum practically important robustness margin.** `0.05`
-
-**Principle.** a non-significant difference is never reported as invariance. Robustness must be demonstrated by an interval falling inside the margin, not by a failure to detect.
-
-**Rationale for the margins.** an interface whose reading moves by more than five accuracy points under a pure relabelling is not measuring the intended quantity; ten points of accuracy headroom is the smallest gap that leaves room for a later design to detect an effect without ceiling or floor artifacts.
-
-### 8.4 Power
-
-- **Reported at.** the registered alternatives shown in each gate's proposed_numbers
-- **Worst case in the panel.** Gate I1 at n=192, alpha=0.005 has power 0.9841 against a true rate of 0.98; the same gate at n=128 falls to 0.8850, which is why 192 is the recommended default rather than 128
-- **Assurance.** no prior distribution over true rates is assumed; only point-alternative power is reported
-
-### 8.5 Deterministic tie-breaking
-
-- **Among interfaces.** the four ranking criteria then the fixed order S1 < S2 < S3 < S4
-- **Within scoring.** argmax ties broken by the registered label or candidate order, fixed before any measurement
-- **Principle.** no tie is ever broken by a value observed during the round
-
-### 8.6 Reproducible formulas
-
-Standard library only (`Python standard library only; no third-party dependency`). Every derived number above can be recomputed with these:
-
-```python
-from math import comb
-
-# sf(x, n, p)
-def sf(x, n, p):
-    return sum(comb(n, k) * p**k * (1-p)**(n-k) for k in range(x, n+1))
-
-# smallest x in 0..n such that sf(x, n, p0) <= alpha
-def exact_threshold(n, p0, alpha):
-    return min(x for x in range(n+1) if sf(x, n, p0) <= alpha)
-
-# sf(x_threshold, n, p1)
-def power(x_threshold, n, p1):
-    return sf(x_threshold, n, p1)
-
-# the p solving sf(x, n, p) = alpha, obtained by bisection on (0, 1)
-def clopper_pearson_lower(x, n, alpha):
-    lo, hi = 0.0, 1.0
-    for _ in range(200):
-        mid = (lo + hi) / 2
-        lo, hi = (lo, mid) if sf(x, n, mid) > alpha else (mid, hi)
-    return lo
-```
-
-> every derived number in this draft was produced by these formulas and can be recomputed without any model, any GPU and any network access
-
----
-
-## 9. Operation boundaries
-
-### 9.1 Operations performed in this design round
-
-| counter | value |
-| --- | --- |
-| `model_downloads` | 0 |
-| `weight_loads` | 0 |
-| `tokenizer_constructions` | 0 |
-| `forward_passes` | 0 |
-| `generations` | 0 |
-| `activation_operations` | 0 |
-| `probe_fits` | 0 |
-| `patching_operations` | 0 |
-| `ablation_operations` | 0 |
-| `lens_loads` | 0 |
-| `lens_fits` | 0 |
-| `lens_applies` | 0 |
-| `gpu_jobs` | 0 |
-| `provider_calls` | 0 |
-| `bank_rows_generated` | 0 |
-| `seeds_drawn` | 0 |
-| `scientific_evidence_rows` | 0 |
-
-Every counter is zero. This round produced a document and nothing else.
-
-### 9.2 Prohibited without new operator authority
+| `model_downloads` | `0` |
+| `model_weight_loads` | `0` |
+| `tokenizer_constructions` | `0` |
+| `forward_passes` | `0` |
+| `generations` | `0` |
+| `activation_extractions` | `0` |
+| `lens_operations` | `0` |
+| `probe_operations` | `0` |
+| `patching_operations` | `0` |
+| `ablation_operations` | `0` |
+| `gpu_jobs` | `0` |
+| `provider_calls` | `0` |
+| `bank_rows_generated` | `0` |
+| `seeds_drawn` | `0` |
+| `evidence_rows_created` | `0` |
+| `phase_1_0d_operations` | `0` |
+| `rq2_s4_operations` | `0` |
+| `interfaces_selected` | `0` |
+| `positive_references_selected` | `0` |
+| `confirmation_split_accesses` | `0` |
+| `study1_files_modified` | `0` |
+| `study2_files_modified` | `0` |
+
+**All counters zero:** `true`
+
+**Prohibited without a new authority**
 
 - any model download, weight load or tokenizer construction
 - any forward pass or generation
@@ -784,59 +761,12 @@ Every counter is zero. This round produced a document and nothing else.
 - any Phase 1.0D or RQ2/S4 operation
 - any Study 2 state change
 
-### 9.3 Projected future operations
+## Claim ceiling
 
-**PROJECTION ONLY - not an authorization, not a budget approval**
+- **Maximum pass claim:** The named interface met the registered adequacy and robustness gates for the named tasks and the named checkpoint roles, under the registered conditions, on a sealed held-out bank.
+- **Maximum fail claim:** No candidate interface met the registered gates under the registered conditions. This is a statement about the candidate panel and the registered conditions, not about model capability.
 
-*Assumptions.* 192 base items each for K1 and K3, 128 for K2, four permutation conditions from K5 and three renderings from K6 applied to a 128-item subset; four candidate interfaces; four checkpoint roles
-
-| projection | value |
-| --- | --- |
-| renderings | 2432 |
-| S1 forward passes | 2432 |
-| S2 forward passes | 2432 |
-| S3 sequence scorings | 9728 |
-| S4 generations | 2432 |
-| development total across 4 roles and 4 surfaces | 68096 |
-| confirmation projection | roughly 1024 renderings per role for the selected surface only |
-
-> these are arithmetic projections from the proposed sample sizes. They will change with every operator decision and must be recomputed at freeze time.
-
----
-
-## 10. Compute and reproducibility plan
-
-**These are design proposals only in this round: design proposals only in this round.**
-
-| aspect | proposal |
-| --- | --- |
-| route | Azure Container Registry build and Azure containerized GPU execution, as already registered |
-| workstation role | inspection, editing, Git, hashing and Azure submission only |
-| github actions | not used |
-| model and tokenizer pinning | immutable revision hashes recorded in the sealed manifest before any load |
-| image and dependency locking | image digest pinned; dependency lock file hashed into the manifest |
-| pre inference sealing | protocol, thresholds, banks and mapping are hashed and published before the first forward pass |
-| operation counters | every prohibited and permitted operation family has an explicit counter emitted by the job and validated independently; a missing counter is a failure |
-| independent finalization and validation | a finalize step recomputes every gate from raw records and must agree exactly with the job's own report |
-| confirmation bank physical exclusion | confirmation files are absent from the build context until the separate release authority is issued |
-| publication | fast-forward-only push with an explicit refspec; never a force push |
-| post push verification | re-fetch and verify HEAD equals origin main, tree identity, clean worktree, and unchanged protected rollups |
-| branch name handling | local branch and worktree names are observational metadata only. Commit, tree and protected-byte identity are the authoritative gates. A branch-name-only change triggers revalidation and logging, never a block. |
-| newline corruption prevention | all authored files are written as LF bytes; recorded digests are always computed from the committed Git blob rather than the working-tree file; commits are made with core.autocrlf disabled for the operation. This is a real hazard in this repository: several protected files appear to differ locally under core.autocrlf=true while their committed blobs are byte-identical, and any check that reads the working tree instead of the blob will produce a false mismatch. |
-
----
-
-## 11. Interpretation and claim ceiling
-
-### 11.1 Maximum future conclusion, both directions
-
-**On a pass:** The named interface met the registered adequacy and robustness gates for the named tasks and the named checkpoint roles, under the registered conditions, on a sealed held-out bank.
-
-**On a fail:** No candidate interface met the registered gates under the registered conditions. This is a statement about the candidate panel and the registered conditions, not about model capability.
-
-Neither direction may be written as evidence for or against hidden reasoning, distillation, causal internal computation, J-space, or J-lens.
-
-### 11.2 Prohibited claims
+**Prohibited claims**
 
 - any claim that the model does or does not reason
 - any claim about internalized chain of thought
@@ -846,12 +776,11 @@ Neither direction may be written as evidence for or against hidden reasoning, di
 - any claim that Study 2 Gate A should or should not have passed
 - any claim of model incapability derived from an interface failure
 - any claim that a passing interface validates a later experimental design
+- that a not_applicable transformation demonstrates robustness
+- that a pooled summary satisfies a gate that failed in an atomic cell
+- that parsing caused the Study 1 E0 eligibility collapse
 
-### 11.3 What a pass would and would not permit
-
-**Would permit:** only a new operator decision about whether to design a later substantive protocol.
-
-**Would not permit:**
+**What a pass does not permit**
 
 - reopening Study 2
 - authorizing Study 4 or Study 2 v2
@@ -862,68 +791,33 @@ Neither direction may be written as evidence for or against hidden reasoning, di
 - ablations
 - lens work
 
-**Relationship to Study 2.** Study 3 neither reopens nor revises Study 2; Study 2 remains closed at its terminal state
+## Study 1 and Study 2
 
----
+Study 1's frozen raw-completion, no-chat-template, single-token E0 surface yielded too few behaviorally eligible items to populate confirmation. Parser-v2 separately failed its locked gate, while parser-v3 remained nonauthoritative. These facts motivate prospective interface validation but do not establish that parsing caused E0's eligibility collapse.
 
-## 12. Unresolved operator decisions
+_motivation only; this does not establish that parsing caused the collapse_
 
-These are genuine decisions. Each has a recommendation and a trade-off, and each remains open. None of them is buried as a silent default in the JSON twin.
+Study 2 remains closed and unchanged. Its post-hoc response-pattern diagnostic remains zero-authority motivation only.
 
-### OD1 - Should Study 3 retain all three Study 2 checkpoint roles?
+_closed and unchanged; zero-authority motivation only_
 
-- **Recommendation.** retain all three
-- **Trade-off.** retaining all three roughly triples measurement cost and widens the multiplicity correction, but dropping the lineage base or the instruction control removes the only available contrast for distinguishing an interface effect from an instruction-tuning effect. Dropping the target is not an option if a later study is target-centered.
-- **Status.** `unresolved`
+## Unresolved operator decisions
 
-### OD2 - Which positive-capability reference model is defensible and T4-feasible?
+| Decision | Status | Blocking | Disposition |
+| --- | --- | --- | --- |
+| OD1 | `resolved` | `false` | retain RT, RL and RI. All three are required for the later distillation, lineage and instruction contrast, and each gate is evaluated per role. |
+| OD2 | `unresolved` | `true` | candidate dossier only. No positive reference is selected. The RP canonical qualification wrapper and the RP-specific I4 wrapper must be frozen before P3-Q and I4. |
+| OD3 | `resolved` | `false` | retain S4 only as a non-selectable diagnostic. It never enters admissibility and can never be selected. |
+| OD4 | `resolved` | `false` | exactly three one-factor renderings: baseline, separator-only and instruction-wording-only. The answer cue is held constant across all three. |
+| OD5 | `unresolved` | `true` | the I1 and I2 proposals may remain provisional. The I3 method and margins and the I4 competence floor require independent review. The chance-floor I4 proposal from draft-v0.1 is rejected. |
+| OD6 | `unresolved` | `true` | n = 192 may remain a provisional I1 and I2 value. It is not an I3 justification. Confirmation and I3 sizes await the reviewed power analysis. |
+| OD7 | `resolved` | `false` | yes. A bounded independent review of the statistics and the gate logic is mandatory before freeze and before any bank construction or seed draw. |
+| OD8 | `resolved_in_part` | `false` | no chat template for RT, RL or RI on S1, S2 or S3. S4 uses each role's native template or explicitly records its absence. The RP canonical qualification wrapper and the RP-specific I4 wrapper remain part of OD2 and must be frozen before P3-Q and I4. No cross-role byte parity is claimed where native wrappers differ. |
 
-- **Recommendation.** do not select one on paper; authorize the separate Stage P3-Q prequalification with a 3B-class candidate first and a 7B-class fallback
-- **Trade-off.** a 3B-class model fits a T4 comfortably but may itself fail the compositional strata, which would stop the study; a 7B-class model is far more likely to clear them but is tight in fp16 on 16 GiB and may require quantization that alters the logits the interfaces read. Selecting without prequalification risks discovering the failure only after the gate matters.
-- **Status.** `unresolved, blocking Gate I4`
+**Blocking decisions:** `OD2`, `OD5`, `OD6`
 
-### OD3 - Does bounded final-answer generation (S4) belong in the calibration panel?
+## Required next action
 
-- **Recommendation.** keep it, but strictly as a calibration reference and never as the default later surface
-- **Trade-off.** S4 is the only surface that can express abstention and the only one that measures what the model would actually write, and Wang et al. give a direct reason to care about that divergence. Against it: it cannot be made fair across base and instruction-tuned checkpoints, it is the most expensive surface, and any relaxation of its normalization would reproduce the parser dependence that ended Study 1.
-- **Status.** `unresolved`
+bounded independent methods review of the statistical and gate packet
 
-### OD4 - Which prompt-rendering variants are methodologically necessary?
-
-- **Recommendation.** exactly three: the registered baseline plus one separator change and one instruction-wording change
-- **Trade-off.** more renderings give a better robustness estimate and a stronger claim, but each one multiplies both cost and the multiplicity correction, and an over-large set invites the appearance of prompt shopping. Fewer than three cannot distinguish a rendering effect from noise.
-- **Status.** `unresolved`
-
-### OD5 - What accuracy, robustness, equivalence and multiplicity thresholds are acceptable?
-
-- **Recommendation.** I1 null p<=0.90, I2 null p<=0.50, I4 null p<=0.25, equivalence margin 0.05, per-cell alpha 0.005 with Bonferroni within each gate family
-- **Trade-off.** stricter thresholds reduce the chance of certifying an inadequate interface but raise the chance of discarding a usable one and increase required sample sizes. The proposed values are deliberately conservative because the cost of a false pass is an uninterpretable later study.
-- **Status.** `unresolved`
-
-### OD6 - What development and confirmation sample sizes should be used?
-
-- **Recommendation.** 192 per cell for development and confirmation, 128 for Gate I4
-- **Trade-off.** 192 gives power 0.98 at Gate I1 against a true rate of 0.98 and permits exact four-way and three-way counterbalancing; 128 drops I1 power to 0.885, which risks discarding an adequate interface; 256 buys little additional power at substantially higher cost.
-- **Status.** `unresolved`
-
-### OD7 - Is a bounded independent methods review required before freeze?
-
-- **Recommendation.** yes, bounded to the statistical design and the gate logic, before any bank is generated
-- **Trade-off.** a review costs calendar time and must be scoped tightly to avoid becoming an open-ended redesign. Against that, both prior studies terminated on instrument-level problems that a design-stage reviewer could plausibly have flagged, which is a strong argument for paying that cost once.
-- **Status.** `unresolved`
-
-### OD8 - Should a chat template be applied, and to which roles?
-
-- **Recommendation.** no chat template for S1, S2 and S3 on any role; for S4, apply each role's native template or record its absence
-- **Trade-off.** uniform treatment is cleaner for comparability but disadvantages the instruction-tuned role on generation; native templates are fairer per role but make cross-role comparison partly a comparison of templates. This asymmetry cannot be fully resolved and must be declared either way.
-- **Status.** `unresolved`
-
----
-
-## 13. State
-
-```
-STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW
-```
-
-This draft is complete as a draft. It is not frozen, it authorizes nothing, and the only legal next action is operator review.
+This draft is **not** frozen, **not** authorized for execution, and carries **no** authority for bank construction, seed drawing, tokenizer construction, model download, model loading, forward passes, generation, activation extraction, probing, patching, ablation, lens work or any Gate A or Stage B-D operation.
