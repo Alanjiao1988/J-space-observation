@@ -205,6 +205,78 @@ def forward_row(model, input_ids, tokens):
     )
 
 
+def verify_published_seal(
+    *,
+    manifest: dict,
+    expected_keys: list,
+    tokens: dict,
+    frozen: dict,
+) -> dict:
+    """Bind this run to the pre-inference seal that was published before it.
+
+    The seal is a commit that exists in the image because it was pushed to
+    ``main`` before this job was ever started.  Re-deriving the row space and
+    then requiring it to equal the sealed values is what makes the
+    pre-registration checkable: a run that silently measured a different row
+    space, a different shard partition or different option tokens cannot reach a
+    forward pass.
+    """
+
+    path = REPO_ROOT / bd.OUTPUT_DIR / bd.SEAL_NAME
+    if not path.exists():
+        raise bd.StageBDError(
+            f"the pre-inference seal is absent from this image: {path}. Stage B-D "
+            "refuses to run against an unpublished row space."
+        )
+    seal = json.loads(path.read_text(encoding="utf-8"))
+
+    payload = "\n".join("|".join(key) for key in expected_keys)
+    recomputed = bd.sha256_text(
+        f"jspace-study2-stage-bd/expected-keys/v1\n{payload}\n"
+    )
+    checks = {
+        "expected_primary_keys_sha256": (seal["expected_primary_keys_sha256"], recomputed),
+        "expected_row_count": (seal["expected_row_count"], len(expected_keys)),
+        "shard_manifest_sha256": (
+            seal["shard_manifest_sha256"],
+            manifest["shard_manifest_sha256"],
+        ),
+        "schema_version": (seal["schema_version"], bd.SEAL_VERSION),
+        "run_id": (seal["run_id"], bd.RUN_ID),
+        "starting_commit": (seal["starting_commit"], bd.STAGE_BD_START_COMMIT),
+        "starting_tree": (seal["starting_tree"], bd.STAGE_BD_START_TREE),
+    }
+    for field, (sealed, observed) in sorted(checks.items()):
+        if sealed != observed:
+            raise bd.StageBDError(
+                f"the sealed {field} is {sealed!r} but this run derived {observed!r}"
+            )
+
+    sealed_tokens = {entry["label"]: int(entry["token_id"]) for entry in seal["option_token_ids"]}
+    if sealed_tokens != {label: int(value) for label, value in tokens.items()}:
+        raise bd.StageBDError("the sealed option token IDs are not the ones this run derived")
+
+    sealed_frozen = {entry["path"]: entry["sha256"] for entry in seal["frozen_inputs"]}
+    observed_frozen = {path: entry["sha256"] for path, entry in frozen.items()}
+    if sealed_frozen != observed_frozen:
+        drifted = sorted(
+            name
+            for name in set(sealed_frozen) | set(observed_frozen)
+            if sealed_frozen.get(name) != observed_frozen.get(name)
+        )
+        raise bd.StageBDError(f"frozen inputs drifted from the seal: {drifted}")
+
+    source = seal["source"]
+    payload_bytes = (REPO_ROOT / source["path"]).read_bytes()
+    if bd.sha256_bytes(payload_bytes) != source["sha256"]:
+        raise bd.StageBDError(
+            f"{source['path']} is not the sealed source this run was registered against"
+        )
+
+    print(f"SEAL_VERIFIED={bd.sha256_bytes(path.read_bytes())}")
+    return seal
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, help="directory for shard artifacts")
@@ -227,6 +299,15 @@ def main() -> int:
     tokens = bd.option_token_ids(index)
     manifest = bd.build_shard_manifest(items)
     prompts = bd.load_development_prompts(REPO_ROOT)
+
+    # Bind to the published pre-registration before any model library is
+    # imported, so a row-space discrepancy stops the run before a weight is read.
+    verify_published_seal(
+        manifest=manifest,
+        expected_keys=bd.expected_row_keys(items),
+        tokens=tokens,
+        frozen=frozen,
+    )
 
     patched = install_interlocks()
     assert_clean_import_surface()
