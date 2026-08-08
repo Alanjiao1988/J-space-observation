@@ -1,0 +1,25 @@
+version: v1.1.0
+steps:
+  - id: gate
+    cmd: >-
+      python:3.11-bookworm bash /workspace/study2_stage_t.sh
+      {{.Values.COMMIT}} {{.Values.TREE}}
+      {{.Values.ATTEMPT_ID}} {{.Values.HASH_SEED}}
+    timeout: 3600
+    env:
+      - ACR_RUN_ID={{.Run.ID}}
+  - id: package
+    build: >-
+      -t {{.Run.Registry}}/j-space-observation-study2-stage-t:{{.Values.OUTPUT_TAG}}
+      -f /workspace/study2-src/infra/azure/acr_tasks/study2_stage_t_output.Dockerfile
+      --build-arg SOURCE_COMMIT={{.Values.COMMIT}}
+      --build-arg SOURCE_TREE={{.Values.TREE}}
+      --build-arg ATTEMPT_ID={{.Values.ATTEMPT_ID}}
+      /workspace/study2-src
+    when:
+      - gate
+  - id: push
+    push:
+      - {{.Run.Registry}}/j-space-observation-study2-stage-t:{{.Values.OUTPUT_TAG}}
+    when:
+      - package

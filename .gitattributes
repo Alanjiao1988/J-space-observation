@@ -191,3 +191,21 @@ infra/azure/scripts/22_build_phase1_0d_review_v2.sh text eol=lf
 infra/azure/scripts/23_run_phase1_0d_semantic_review_v2.sh text eol=lf
 tests/test_phase1_0d_review_v2_image.py text eol=lf
 .dockerignore text eol=lf
+
+# Study 2 Stage T tokenizer gate. Registered here because an ACR task script
+# that reaches the Linux build agent with CRLF endings cannot be executed by
+# bash and cannot compare equal to its own in-repo checkout.
+src/jspace_observation/study2_stage_t.py text eol=lf
+scripts/run_study2_stage_t.py text eol=lf
+scripts/validate_study2_stage_t.py text eol=lf
+tests/test_study2_stage_t.py text eol=lf
+studies/study2/protocol/stage_t_pack.schema.json text eol=lf
+infra/azure/acr_tasks/study2_stage_t.sh text eol=lf
+infra/azure/acr_tasks/study2_stage_t.yaml text eol=lf
+infra/azure/acr_tasks/study2_stage_t_output.Dockerfile text eol=lf
+studies/study2/prompts/stage_t_tokenizer_gate_prompt.md text eol=lf
+studies/study2/prompts/stage_t_starting_state_operator_amendments.md text eol=lf
+studies/study2/stage_t/** text eol=lf
+docs/decisions/study2_stage_t_tokenizer_gate.md text eol=lf
+studies/study2/STAGE_T_FINAL_HANDOFF.md text eol=lf
+studies/study2/STAGE_T_AUTHORITY_RECEIPT.md text eol=lf

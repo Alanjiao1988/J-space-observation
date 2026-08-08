@@ -1,0 +1,1423 @@
+{
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/studies/study2/protocol/stage_t_pack.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Study 2 Stage T closed artifact contract",
+  "description": "Every Stage T row type is closed: unknown fields, missing fields, and unregistered enum members are rejected. No field in this contract carries a model logit, probability, accuracy, activation, probe, lens, or patching value.",
+  "$defs": {
+    "annotation_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cell",
+        "depth",
+        "family",
+        "pair_id",
+        "pair_semantic_id",
+        "role",
+        "schema_version",
+        "selection_rank",
+        "source_line_index",
+        "source_row_sha256",
+        "template_id"
+      ],
+      "properties": {
+        "cell": {
+          "type": "string",
+          "minLength": 1
+        },
+        "depth": {
+          "$ref": "#/$defs/compositional_depth"
+        },
+        "family": {
+          "$ref": "#/$defs/family"
+        },
+        "pair_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pair_semantic_id": {
+          "$ref": "#/$defs/sha256"
+        },
+        "role": {
+          "$ref": "#/$defs/mechanistic_role"
+        },
+        "schema_version": {
+          "const": "jspace-study2-stage-t-annotation-row/v1"
+        },
+        "selection_rank": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 127
+        },
+        "source_line_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_row_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "template_id": {
+          "$ref": "#/$defs/template_id"
+        }
+      }
+    },
+    "attempt_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt_id",
+        "core_manifest_sha256",
+        "elapsed_seconds_bucket",
+        "image_digest",
+        "platform_machine",
+        "python_version",
+        "pythonhashseed",
+        "run_id",
+        "schema_version",
+        "source_commit",
+        "source_tree",
+        "torch_imported",
+        "weight_path_modules_imported"
+      ],
+      "properties": {
+        "attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "core_manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "elapsed_seconds_bucket": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "image_digest": {
+          "type": "string"
+        },
+        "platform_machine": {
+          "type": "string",
+          "minLength": 1
+        },
+        "python_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pythonhashseed": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "jspace-study2-stage-t-attempt/v1"
+        },
+        "source_commit": {
+          "type": "string"
+        },
+        "source_tree": {
+          "type": "string"
+        },
+        "torch_imported": {
+          "type": "boolean"
+        },
+        "weight_path_modules_imported": {
+          "type": "array",
+          "maxItems": 0,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cell_summary": {
+      "type": "object",
+      "properties": {
+        "eligible": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selected": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "selected_pair_ids": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "selected_pair_semantic_ids": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "#/$defs/sha256"
+          }
+        }
+      },
+      "required": [
+        "eligible",
+        "selected",
+        "selected_pair_ids",
+        "selected_pair_semantic_ids"
+      ],
+      "additionalProperties": false
+    },
+    "compositional_depth": {
+      "type": "integer",
+      "enum": [
+        2,
+        3
+      ]
+    },
+    "core_manifest": {
+      "type": "object",
+      "properties": {
+        "authority": {
+          "type": "object",
+          "properties": {
+            "amendment_path": {
+              "const": "studies/study2/prompts/stage_t_starting_state_operator_amendments.md"
+            },
+            "bytes": {
+              "const": 22229
+            },
+            "path": {
+              "const": "studies/study2/prompts/stage_t_tokenizer_gate_prompt.md"
+            },
+            "sha256": {
+              "const": "dce8c7167682b57e9a6cd8c7dbe651cbdcbfda13255ad9d434d06b7e7949b974"
+            },
+            "starting_state_disposition": {
+              "const": "STARTING_STATE_ACCEPTED_UNDER_CONTENT_IDENTITY_BRANCH_METADATA_NONAUTHORITATIVE"
+            }
+          },
+          "required": [
+            "amendment_path",
+            "bytes",
+            "path",
+            "sha256",
+            "starting_state_disposition"
+          ],
+          "additionalProperties": false
+        },
+        "environment": {
+          "type": "object",
+          "properties": {
+            "base_image_reference": {
+              "const": "python:3.11-bookworm"
+            },
+            "dependency_lock_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "huggingface_hub_pin": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tokenizers_pin": {
+              "type": "string",
+              "minLength": 1
+            },
+            "transformers_pin": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "base_image_reference",
+            "dependency_lock_sha256",
+            "huggingface_hub_pin",
+            "tokenizers_pin",
+            "transformers_pin"
+          ],
+          "additionalProperties": false
+        },
+        "files": {
+          "type": "object",
+          "properties": {
+            "stage_t_identity_receipt.json": {
+              "$ref": "#/$defs/file_entry"
+            },
+            "stage_t_jlens_digit_support.json": {
+              "$ref": "#/$defs/file_entry"
+            },
+            "stage_t_mechanistic_eligibility_instruction_control.jsonl": {
+              "$ref": "#/$defs/file_entry"
+            },
+            "stage_t_mechanistic_eligibility_lineage_base.jsonl": {
+              "$ref": "#/$defs/file_entry"
+            },
+            "stage_t_mechanistic_eligibility_target.jsonl": {
+              "$ref": "#/$defs/file_entry"
+            },
+            "stage_t_pair_joint_eligibility.jsonl": {
+              "$ref": "#/$defs/file_entry"
+            },
+            "stage_t_prompt_tokenization_instruction_control.jsonl": {
+              "$ref": "#/$defs/file_entry"
+            },
+            "stage_t_prompt_tokenization_lineage_base.jsonl": {
+              "$ref": "#/$defs/file_entry"
+            },
+            "stage_t_prompt_tokenization_target.jsonl": {
+              "$ref": "#/$defs/file_entry"
+            },
+            "stage_t_selected_annotations.jsonl": {
+              "$ref": "#/$defs/file_entry"
+            },
+            "stage_t_selected_mechanistic_confirmation.jsonl": {
+              "$ref": "#/$defs/file_entry"
+            },
+            "stage_t_selected_mechanistic_development.jsonl": {
+              "$ref": "#/$defs/file_entry"
+            }
+          },
+          "required": [
+            "stage_t_identity_receipt.json",
+            "stage_t_jlens_digit_support.json",
+            "stage_t_mechanistic_eligibility_instruction_control.jsonl",
+            "stage_t_mechanistic_eligibility_lineage_base.jsonl",
+            "stage_t_mechanistic_eligibility_target.jsonl",
+            "stage_t_pair_joint_eligibility.jsonl",
+            "stage_t_prompt_tokenization_instruction_control.jsonl",
+            "stage_t_prompt_tokenization_lineage_base.jsonl",
+            "stage_t_prompt_tokenization_target.jsonl",
+            "stage_t_selected_annotations.jsonl",
+            "stage_t_selected_mechanistic_confirmation.jsonl",
+            "stage_t_selected_mechanistic_development.jsonl"
+          ],
+          "additionalProperties": false
+        },
+        "frozen_inputs": {
+          "type": "object",
+          "properties": {
+            "studies/study2/STAGE_P_FINAL_HANDOFF.md": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/prompts/stage_p_protocol_design_prompt.md": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/prompts/stage_p_gate_a_operator_amendment.md": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/protocol/reasoning_internalization_protocol.json": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/protocol/reasoning_internalization_protocol.schema.json": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/protocol/reasoning_internalization_protocol.md": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/protocol/reasoning_internalization_protocol_review.md": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/protocol/stage_p_power_sensitivity.json": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/decisions/reasoning_internalization_protocol_freeze.md": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/data/task_bank_manifest.json": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/data/development.jsonl": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/data/behavioral_confirmation.jsonl": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/data/mechanistic_development_candidate_pairs.jsonl": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "studies/study2/data/mechanistic_candidate_pairs.jsonl": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "src/jspace_observation/study2_protocol.py": {
+              "$ref": "#/$defs/frozen_input_entry"
+            },
+            "src/jspace_observation/study2_task_bank.py": {
+              "$ref": "#/$defs/frozen_input_entry"
+            }
+          },
+          "required": [
+            "src/jspace_observation/study2_protocol.py",
+            "src/jspace_observation/study2_task_bank.py",
+            "studies/study2/STAGE_P_FINAL_HANDOFF.md",
+            "studies/study2/data/behavioral_confirmation.jsonl",
+            "studies/study2/data/development.jsonl",
+            "studies/study2/data/mechanistic_candidate_pairs.jsonl",
+            "studies/study2/data/mechanistic_development_candidate_pairs.jsonl",
+            "studies/study2/data/task_bank_manifest.json",
+            "studies/study2/decisions/reasoning_internalization_protocol_freeze.md",
+            "studies/study2/prompts/stage_p_gate_a_operator_amendment.md",
+            "studies/study2/prompts/stage_p_protocol_design_prompt.md",
+            "studies/study2/protocol/reasoning_internalization_protocol.json",
+            "studies/study2/protocol/reasoning_internalization_protocol.md",
+            "studies/study2/protocol/reasoning_internalization_protocol.schema.json",
+            "studies/study2/protocol/reasoning_internalization_protocol_review.md",
+            "studies/study2/protocol/stage_p_power_sensitivity.json"
+          ],
+          "additionalProperties": false
+        },
+        "identities": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/identity_entry"
+          }
+        },
+        "joint_eligible_pairs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "models": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "$ref": "#/$defs/model_summary"
+            },
+            "lineage_base": {
+              "$ref": "#/$defs/model_summary"
+            },
+            "instruction_control": {
+              "$ref": "#/$defs/model_summary"
+            }
+          },
+          "required": [
+            "instruction_control",
+            "lineage_base",
+            "target"
+          ],
+          "additionalProperties": false
+        },
+        "operation_counts": {
+          "type": "object",
+          "properties": {
+            "activation_operations": {
+              "const": 0
+            },
+            "forward_passes": {
+              "const": 0
+            },
+            "generations": {
+              "const": 0
+            },
+            "gpu_jobs": {
+              "const": 0
+            },
+            "lens_operations": {
+              "const": 0
+            },
+            "model_downloads": {
+              "const": 0
+            },
+            "patching_operations": {
+              "const": 0
+            },
+            "probe_fits": {
+              "const": 0
+            },
+            "scientific_evidence_rows": {
+              "const": 0
+            },
+            "semantic_review_provider_calls": {
+              "const": 0
+            },
+            "tokenizer_constructions": {
+              "const": 3
+            },
+            "weight_loads": {
+              "const": 0
+            }
+          },
+          "required": [
+            "activation_operations",
+            "forward_passes",
+            "generations",
+            "gpu_jobs",
+            "lens_operations",
+            "model_downloads",
+            "patching_operations",
+            "probe_fits",
+            "scientific_evidence_rows",
+            "semantic_review_provider_calls",
+            "tokenizer_constructions",
+            "weight_loads"
+          ],
+          "additionalProperties": false
+        },
+        "prompt_row_count_per_model": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "schema_version": {
+          "const": "jspace-study2-stage-t-core-manifest/v1"
+        },
+        "selection": {
+          "type": "object",
+          "properties": {
+            "cells": {
+              "type": "object",
+              "properties": {
+                "mechanistic_development|permutation_chain|d2": {
+                  "$ref": "#/$defs/cell_summary"
+                },
+                "mechanistic_development|permutation_chain|d3": {
+                  "$ref": "#/$defs/cell_summary"
+                },
+                "mechanistic_development|affine_mod10|d2": {
+                  "$ref": "#/$defs/cell_summary"
+                },
+                "mechanistic_development|affine_mod10|d3": {
+                  "$ref": "#/$defs/cell_summary"
+                },
+                "mechanistic_candidate_confirmation|permutation_chain|d2": {
+                  "$ref": "#/$defs/cell_summary"
+                },
+                "mechanistic_candidate_confirmation|permutation_chain|d3": {
+                  "$ref": "#/$defs/cell_summary"
+                },
+                "mechanistic_candidate_confirmation|affine_mod10|d2": {
+                  "$ref": "#/$defs/cell_summary"
+                },
+                "mechanistic_candidate_confirmation|affine_mod10|d3": {
+                  "$ref": "#/$defs/cell_summary"
+                }
+              },
+              "required": [
+                "mechanistic_candidate_confirmation|affine_mod10|d2",
+                "mechanistic_candidate_confirmation|affine_mod10|d3",
+                "mechanistic_candidate_confirmation|permutation_chain|d2",
+                "mechanistic_candidate_confirmation|permutation_chain|d3",
+                "mechanistic_development|affine_mod10|d2",
+                "mechanistic_development|affine_mod10|d3",
+                "mechanistic_development|permutation_chain|d2",
+                "mechanistic_development|permutation_chain|d3"
+              ],
+              "additionalProperties": false
+            },
+            "selected_per_cell": {
+              "const": 128
+            },
+            "selected_per_role": {
+              "const": 512
+            },
+            "selected_total": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "shortfalls": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "sort": {
+              "const": "ascending pair_semantic_id"
+            },
+            "sufficient": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "cells",
+            "selected_per_cell",
+            "selected_per_role",
+            "selected_total",
+            "shortfalls",
+            "sort",
+            "sufficient"
+          ],
+          "additionalProperties": false
+        },
+        "stage_p": {
+          "type": "object",
+          "properties": {
+            "freeze_commit": {
+              "const": "d5e8e19c025410fda7c9eb430f507a201a18c9cd"
+            },
+            "freeze_tree": {
+              "const": "b044133055c697cad8828664254143f3b83f68d5"
+            },
+            "start_commit": {
+              "const": "c2e2383e96ba3d94f3dcf9b9b57db36e1f08dcd1"
+            },
+            "start_tree": {
+              "const": "533fb62db4db096f4f6d09eeb858a391936a28c9"
+            }
+          },
+          "required": [
+            "freeze_commit",
+            "freeze_tree",
+            "start_commit",
+            "start_tree"
+          ],
+          "additionalProperties": false
+        },
+        "target_digit_support": {
+          "type": "object",
+          "properties": {
+            "bare_all_single_token": {
+              "type": "boolean"
+            },
+            "rescue_prohibited": {
+              "const": true
+            },
+            "role": {
+              "const": "target_only_secondary_axis"
+            },
+            "selection_prohibited": {
+              "const": true
+            },
+            "space_prefixed_all_single_token": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "bare_all_single_token",
+            "rescue_prohibited",
+            "role",
+            "selection_prohibited",
+            "space_prefixed_all_single_token"
+          ],
+          "additionalProperties": false
+        },
+        "terminal_state": {
+          "enum": [
+            "NONTERMINAL_CHECKPOINT_STUDY2_STAGE_T_TOKENIZER_GATE_SEALED_AWAITING_BD_AUTHORITY",
+            null
+          ]
+        }
+      },
+      "required": [
+        "authority",
+        "environment",
+        "files",
+        "frozen_inputs",
+        "identities",
+        "joint_eligible_pairs",
+        "models",
+        "operation_counts",
+        "prompt_row_count_per_model",
+        "schema_version",
+        "selection",
+        "stage_p",
+        "target_digit_support",
+        "terminal_state"
+      ],
+      "additionalProperties": false
+    },
+    "digit_support": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bare_all_single_token",
+        "bare_ids_pairwise_distinct",
+        "rescue_prohibited",
+        "role",
+        "schema_version",
+        "selection_prohibited",
+        "single_token_surface_count",
+        "space_prefixed_all_single_token",
+        "space_prefixed_ids_pairwise_distinct",
+        "surface_count",
+        "surfaces"
+      ],
+      "properties": {
+        "bare_all_single_token": {
+          "type": "boolean"
+        },
+        "bare_ids_pairwise_distinct": {
+          "type": "boolean"
+        },
+        "rescue_prohibited": {
+          "const": true
+        },
+        "role": {
+          "const": "target_only_secondary_axis"
+        },
+        "schema_version": {
+          "const": "jspace-study2-stage-t-digit-support/v1"
+        },
+        "selection_prohibited": {
+          "const": true
+        },
+        "single_token_surface_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20
+        },
+        "space_prefixed_all_single_token": {
+          "type": "boolean"
+        },
+        "space_prefixed_ids_pairwise_distinct": {
+          "type": "boolean"
+        },
+        "surface_count": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 20
+        },
+        "surfaces": {
+          "type": "array",
+          "minItems": 20,
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/digit_surface"
+          }
+        }
+      }
+    },
+    "digit_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "form",
+        "single_token",
+        "surface",
+        "token_count",
+        "token_ids",
+        "value"
+      ],
+      "properties": {
+        "form": {
+          "type": "string",
+          "enum": [
+            "bare",
+            "space_prefixed"
+          ]
+        },
+        "single_token": {
+          "type": "boolean"
+        },
+        "surface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "token_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "token_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "value": {
+          "type": "string",
+          "pattern": "[0-9]"
+        }
+      }
+    },
+    "eligibility_reason": {
+      "type": "string",
+      "enum": [
+        "ANSWER_POSITION_MISALIGNED",
+        "OPTION_GATE_FAILED",
+        "PROMPT_HASH_MISMATCH",
+        "UNEQUAL_INPUT_LENGTH",
+        "WRONG_POSITION_ANCHOR_SURFACE_MISMATCH",
+        "WRONG_POSITION_ANCHOR_UNRESOLVED"
+      ]
+    },
+    "eligibility_reason_counts": {
+      "type": "object",
+      "properties": {
+        "ANSWER_POSITION_MISALIGNED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "OPTION_GATE_FAILED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "PROMPT_HASH_MISMATCH": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "UNEQUAL_INPUT_LENGTH": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "WRONG_POSITION_ANCHOR_SURFACE_MISMATCH": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "WRONG_POSITION_ANCHOR_UNRESOLVED": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "ANSWER_POSITION_MISALIGNED",
+        "OPTION_GATE_FAILED",
+        "PROMPT_HASH_MISMATCH",
+        "UNEQUAL_INPUT_LENGTH",
+        "WRONG_POSITION_ANCHOR_SURFACE_MISMATCH",
+        "WRONG_POSITION_ANCHOR_UNRESOLVED"
+      ],
+      "additionalProperties": false
+    },
+    "eligibility_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "answer_position_index",
+        "depth",
+        "eligible",
+        "family",
+        "input_length",
+        "object_answer_positions",
+        "object_input_lengths",
+        "pair_id",
+        "pair_semantic_id",
+        "reason_codes",
+        "role",
+        "schema_version",
+        "template_id",
+        "wrong_position_index"
+      ],
+      "properties": {
+        "answer_position_index": {
+          "$ref": "#/$defs/nullable_index"
+        },
+        "depth": {
+          "$ref": "#/$defs/compositional_depth"
+        },
+        "eligible": {
+          "type": "boolean"
+        },
+        "family": {
+          "$ref": "#/$defs/family"
+        },
+        "input_length": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "object_answer_positions": {
+          "$ref": "#/$defs/pair_object_map"
+        },
+        "object_input_lengths": {
+          "$ref": "#/$defs/pair_object_map"
+        },
+        "pair_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pair_semantic_id": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eligibility_reason"
+          }
+        },
+        "role": {
+          "$ref": "#/$defs/mechanistic_role"
+        },
+        "schema_version": {
+          "const": "jspace-study2-stage-t-eligibility-row/v1"
+        },
+        "template_id": {
+          "$ref": "#/$defs/template_id"
+        },
+        "wrong_position_index": {
+          "$ref": "#/$defs/nullable_index"
+        }
+      }
+    },
+    "failure_reason": {
+      "type": "string",
+      "enum": [
+        "EMPTY_ENCODING",
+        "INPUT_TRUNCATED",
+        "OPTION_IDS_NOT_DISTINCT",
+        "OPTION_NOT_SINGLE_TOKEN",
+        "OPTION_ROUND_TRIP_DRIFT",
+        "PROMPT_HASH_MISMATCH",
+        "PROMPT_PREFIX_NOT_PRESERVED",
+        "PROMPT_ROUND_TRIP_DRIFT",
+        "PROMPT_TERMINATOR_MISSING",
+        "SPECIAL_SUFFIX_PRESENT",
+        "UNREGISTERED_SPECIAL_TOKEN"
+      ]
+    },
+    "family": {
+      "type": "string",
+      "enum": [
+        "permutation_chain",
+        "affine_mod10"
+      ]
+    },
+    "file_entry": {
+      "type": "object",
+      "properties": {
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": [
+        "bytes",
+        "rows",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "frozen_input_entry": {
+      "type": "object",
+      "properties": {
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": [
+        "bytes",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "identity_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adds_bos",
+        "bos_prefix_decoded",
+        "bos_prefix_token_ids",
+        "config_model_type",
+        "files",
+        "model_id",
+        "option_token_ids",
+        "requested_revision",
+        "resolved_revision",
+        "role",
+        "special_suffix_token_ids",
+        "special_token_ids",
+        "tokenizer_class",
+        "trust_remote_code",
+        "weight_files_present"
+      ],
+      "properties": {
+        "adds_bos": {
+          "type": "boolean"
+        },
+        "bos_prefix_decoded": {
+          "type": "string"
+        },
+        "bos_prefix_token_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "config_model_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/snapshot_file"
+          }
+        },
+        "model_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "option_token_ids": {
+          "$ref": "#/$defs/option_token_ids"
+        },
+        "requested_revision": {
+          "$ref": "#/$defs/revision"
+        },
+        "resolved_revision": {
+          "$ref": "#/$defs/revision"
+        },
+        "role": {
+          "$ref": "#/$defs/model_role"
+        },
+        "special_suffix_token_ids": {
+          "type": "array",
+          "maxItems": 0,
+          "items": {
+            "type": "integer"
+          }
+        },
+        "special_token_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "tokenizer_class": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trust_remote_code": {
+          "const": false
+        },
+        "weight_files_present": {
+          "type": "array",
+          "maxItems": 0,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "identity_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "models",
+        "schema_version",
+        "trust_remote_code",
+        "weight_files_present"
+      ],
+      "properties": {
+        "models": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/identity_entry"
+          }
+        },
+        "schema_version": {
+          "const": "jspace-study2-stage-t-identity/v1"
+        },
+        "trust_remote_code": {
+          "const": false
+        },
+        "weight_files_present": {
+          "type": "array",
+          "maxItems": 0,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "joint_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "depth",
+        "eligible_all_models",
+        "family",
+        "model_eligibility",
+        "pair_id",
+        "pair_semantic_id",
+        "reason_codes",
+        "role",
+        "schema_version",
+        "selected",
+        "selection_rank"
+      ],
+      "properties": {
+        "depth": {
+          "$ref": "#/$defs/compositional_depth"
+        },
+        "eligible_all_models": {
+          "type": "boolean"
+        },
+        "family": {
+          "$ref": "#/$defs/family"
+        },
+        "model_eligibility": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "instruction_control",
+            "lineage_base",
+            "target"
+          ],
+          "properties": {
+            "instruction_control": {
+              "type": "boolean"
+            },
+            "lineage_base": {
+              "type": "boolean"
+            },
+            "target": {
+              "type": "boolean"
+            }
+          }
+        },
+        "pair_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pair_semantic_id": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eligibility_reason"
+          }
+        },
+        "role": {
+          "$ref": "#/$defs/mechanistic_role"
+        },
+        "schema_version": {
+          "const": "jspace-study2-stage-t-joint-row/v1"
+        },
+        "selected": {
+          "type": "boolean"
+        },
+        "selection_rank": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 127
+        }
+      }
+    },
+    "mechanistic_role": {
+      "type": "string",
+      "enum": [
+        "mechanistic_development",
+        "mechanistic_candidate_confirmation"
+      ]
+    },
+    "model_role": {
+      "type": "string",
+      "enum": [
+        "target",
+        "lineage_base",
+        "instruction_control"
+      ]
+    },
+    "model_summary": {
+      "type": "object",
+      "properties": {
+        "eligible_pairs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "eligibility_reason_counts": {
+          "$ref": "#/$defs/eligibility_reason_counts"
+        },
+        "option_token_ids": {
+          "$ref": "#/$defs/option_token_ids"
+        },
+        "prompt_failure_counts": {
+          "$ref": "#/$defs/prompt_failure_counts"
+        },
+        "prompt_pass_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "prompt_row_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "unique_prompt_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "eligibility_reason_counts",
+        "eligible_pairs",
+        "option_token_ids",
+        "prompt_failure_counts",
+        "prompt_pass_count",
+        "prompt_row_count",
+        "unique_prompt_count"
+      ],
+      "additionalProperties": false
+    },
+    "nullable_index": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "nullable_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "[0-9a-f]{64}"
+    },
+    "option_token_ids": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "properties": {
+        "A": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "B": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "C": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "D": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "pair_object_map": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "control_no_op_donor",
+        "control_random_donor",
+        "control_same_answer_donor",
+        "control_same_intermediate_donor",
+        "primary_donor",
+        "primary_recipient"
+      ],
+      "properties": {
+        "control_no_op_donor": {
+          "$ref": "#/$defs/nullable_index"
+        },
+        "control_random_donor": {
+          "$ref": "#/$defs/nullable_index"
+        },
+        "control_same_answer_donor": {
+          "$ref": "#/$defs/nullable_index"
+        },
+        "control_same_intermediate_donor": {
+          "$ref": "#/$defs/nullable_index"
+        },
+        "primary_donor": {
+          "$ref": "#/$defs/nullable_index"
+        },
+        "primary_recipient": {
+          "$ref": "#/$defs/nullable_index"
+        }
+      }
+    },
+    "prompt_failure_counts": {
+      "type": "object",
+      "properties": {
+        "EMPTY_ENCODING": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "INPUT_TRUNCATED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "OPTION_IDS_NOT_DISTINCT": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "OPTION_NOT_SINGLE_TOKEN": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "OPTION_ROUND_TRIP_DRIFT": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "PROMPT_HASH_MISMATCH": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "PROMPT_PREFIX_NOT_PRESERVED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "PROMPT_ROUND_TRIP_DRIFT": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "PROMPT_TERMINATOR_MISSING": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "SPECIAL_SUFFIX_PRESENT": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "UNREGISTERED_SPECIAL_TOKEN": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "EMPTY_ENCODING",
+        "INPUT_TRUNCATED",
+        "OPTION_IDS_NOT_DISTINCT",
+        "OPTION_NOT_SINGLE_TOKEN",
+        "OPTION_ROUND_TRIP_DRIFT",
+        "PROMPT_HASH_MISMATCH",
+        "PROMPT_PREFIX_NOT_PRESERVED",
+        "PROMPT_ROUND_TRIP_DRIFT",
+        "PROMPT_TERMINATOR_MISSING",
+        "SPECIAL_SUFFIX_PRESENT",
+        "UNREGISTERED_SPECIAL_TOKEN"
+      ],
+      "additionalProperties": false
+    },
+    "prompt_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "answer_position_index",
+        "arm",
+        "bank",
+        "failure_reasons",
+        "input_ids_sha256",
+        "input_length",
+        "model_role",
+        "option_token_ids",
+        "prompt_sha256",
+        "row_id",
+        "schema_version",
+        "status"
+      ],
+      "properties": {
+        "answer_position_index": {
+          "$ref": "#/$defs/nullable_index"
+        },
+        "arm": {
+          "type": "string",
+          "enum": [
+            "NT",
+            "PT",
+            "WT",
+            "ST",
+            "control_no_op_donor",
+            "control_random_donor",
+            "control_same_answer_donor",
+            "control_same_intermediate_donor",
+            "primary_donor",
+            "primary_recipient"
+          ]
+        },
+        "bank": {
+          "type": "string",
+          "enum": [
+            "development",
+            "behavioral_confirmation",
+            "mechanistic_development",
+            "mechanistic_candidate_confirmation"
+          ]
+        },
+        "failure_reasons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/failure_reason"
+          }
+        },
+        "input_ids_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        },
+        "input_length": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "model_role": {
+          "$ref": "#/$defs/model_role"
+        },
+        "option_token_ids": {
+          "$ref": "#/$defs/option_token_ids"
+        },
+        "prompt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "row_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schema_version": {
+          "const": "jspace-study2-stage-t-prompt-row/v1"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        }
+      }
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "[0-9a-f]{40}"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "[0-9a-f]{64}"
+    },
+    "snapshot_file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bytes",
+        "name",
+        "sha256"
+      ],
+      "properties": {
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "template_id": {
+      "type": "string",
+      "enum": [
+        "T-A",
+        "T-B"
+      ]
+    }
+  }
+}
