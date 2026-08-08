@@ -2857,3 +2857,42 @@ This handoff authorizes no new operation beyond D33. Stage P remains unexecuted,
 its review allowance remains unspent, `paper/evidence_ledger.csv` remains at
 EV-0016, and the state remains
 `NONTERMINAL_CHECKPOINT_STUDY2_OPENED_AWAITING_STAGE_P`.
+
+
+2026-08-08. Study 2 Stage T tokenizer gate sealed.
+
+Stage T is closed and published. The gate passes cleanly: every one of the
+17,408 frozen prompt rows tokenizes successfully under all three registered
+checkpoints, all four option continuations are single tokens, all 2,048
+mechanistic pairs are jointly eligible, and all eight selection cells filled to
+128 for 1,024 selected pairs with no shortfall. See
+`docs/decisions/study2_stage_t_tokenizer_gate.md`.
+
+The substantive finding exceeds the requirement. Stage T needed exact pair
+length and answer-position alignment across models; what it found is identical
+token IDs on all 17,408 rows for all three checkpoints, so later mechanistic
+comparisons operate on the same token sequences rather than merely
+commensurable ones. The three tokenizers remain distinct artifacts by
+`model_id`, resolved revision, config bytes, and special-token inventory, which
+was verified directly because identical output is also what a reused-tokenizer
+bug would produce.
+
+Two corrections were made during execution and both are recorded as seal
+revisions in `studies/study2/STAGE_T_AUTHORITY_RECEIPT.md`. The first replaced a
+passive weight-path import assertion, which transformers 5.x makes unsound by
+resolving its auto-class registry eagerly, with an active interlock that makes a
+weight load raise; it was issued before any measurement existed. The second
+admitted `rows: null` for single-document artifacts after the validator rejected
+an otherwise complete pack. Because that second revision followed an observed
+outcome, the thirteen artifact hashes from the pre-fix run were pre-registered
+as a falsifiable prediction before re-running, and all thirteen reproduced
+exactly. An incorrect argument in an earlier draft of the receipt, which
+inferred tokenizer distinctness from differing file sizes that in fact differ
+only by a role label, was measured, refuted, and corrected in place rather than
+dropped.
+
+Stage T authorizes nothing further. No model weight was downloaded or loaded, no
+forward pass, generation, activation, probe, patch, ablation, or lens operation
+occurred, `paper/evidence_ledger.csv` remains at EV-0016, both protected Phase
+1.0D rollups are unchanged, and the state is
+`NONTERMINAL_CHECKPOINT_STUDY2_STAGE_T_TOKENIZER_GATE_SEALED_AWAITING_BD_AUTHORITY`.

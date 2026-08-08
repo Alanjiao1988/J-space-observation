@@ -317,17 +317,42 @@ difference is a determinism failure to be reported, not repaired.
 
 One feature of this table deserves comment, since it looks at first like a bug.
 The three `stage_t_mechanistic_eligibility_*.jsonl` files share one hash, while
-the three `stage_t_prompt_tokenization_*.jsonl` files do not. That combination
-is the evidence the gate exists to produce. The prompt files differ, which
-proves three genuinely distinct tokenizers were acquired and applied. The
-eligibility files agree, which means all three tokenizers assigned every pair
-the same input length, the same answer position, and the same per-object
-lengths. Exact cross-model alignment is the property Stage T is meant to
-establish, and the eligibility row carries no model-role field, so agreement
-renders the files byte-identical. Had a single tokenizer been reused by mistake,
-the prompt files would have been identical too. The Stage T final handoff records
-the direct numerical confirmation of this reading, computed from the published
-artifacts.
+the three `stage_t_prompt_tokenization_*.jsonl` files do not.
+
+An earlier draft of this section argued that the differing prompt files proved
+three distinct tokenizers had been applied. Direct measurement of the published
+artifacts refuted that argument, and it is corrected here rather than quietly
+dropped. The three prompt files differ **only** in the `model_role` label each
+row carries. With 17,408 rows per file, the label lengths alone predict the
+sizes exactly: 8,991,072 for `target`, plus 17,408 × 6 = 9,095,520 for
+`lineage_base`, plus 17,408 × 13 = 9,217,376 for `instruction_control`. All
+three predictions match the observed sizes to the byte.
+
+The substantive finding is stronger than the one first claimed: **all three
+tokenizers produce identical token IDs on all 17,408 prompt rows.** Pairwise
+comparison of `input_ids_sha256` agrees on 17,408 of 17,408 rows for every pair
+of models, with zero `input_length` and zero `answer_position_index` mismatches,
+and all four option continuations resolve to the same single tokens
+(A=362, B=425, C=356, D=422) under every model. The eligibility files are
+therefore identical because the underlying tokenizations are identical, and the
+eligibility row carries no model-role field.
+
+That the three tokenizers are nevertheless genuinely distinct artifacts is
+established by the identity receipt, not by file sizes: three different
+`model_id` values, three different `resolved_revision` values each equal to its
+pinned revision, three different `config.json` byte counts and hashes, and
+different special-token inventories — the target checkpoint exposes two special
+token IDs (`151643`, `151646`) while both Qwen checkpoints expose fourteen. All
+three load `Qwen2Tokenizer` over the same `qwen2` vocabulary and merges, which
+is precisely why ordinary mathematical prompt text tokenizes identically while
+the checkpoints remain distinct. Had one tokenizer been silently reused, the
+special-token inventories and config hashes would have coincided; they do not.
+
+Exact cross-model token alignment is the property Stage T exists to establish,
+and it holds here in the strongest available form: not merely equal lengths and
+equal answer positions, but equal token IDs throughout. Every downstream
+mechanistic comparison across these three checkpoints is therefore performed on
+literally the same input token sequences.
 
 As with revision 2, this revision touches no frozen Stage P byte, protocol,
 schema of any scientific row, bank, threshold, seed, model or tokenizer

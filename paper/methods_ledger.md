@@ -1469,3 +1469,40 @@ validated both protected-byte rollups. The single 15-item methods review found
 no FATAL/MATERIAL issue and used no consolidated correction. Stage P performs
 zero tokenizer, model, lens, activation, probe, patching, provider, or GPU
 operation and creates no scientific evidence row.
+
+
+## Study 2 Stage T tokenizer gate
+
+Stage T resolves the pinned config and tokenizer identity of the three
+registered checkpoints and establishes the token-level preconditions the
+mechanistic design assumes. It downloads no model weight and creates no
+scientific evidence row.
+
+Each checkpoint is acquired at its pinned revision with `trust_remote_code`
+disabled, and every resolved revision equalled its pin. All three load
+`Qwen2Tokenizer` over the `qwen2` vocabulary, and all three are distinct
+artifacts by model id, resolved revision, config bytes, and special-token
+inventory (2 for the target, 14 for both Qwen checkpoints).
+
+All 17,408 frozen prompt rows tokenize successfully under all three models, with
+no prompt failure code firing. The four option continuations are single tokens
+under every model (A=362, B=425, C=356, D=422). All 2,048 mechanistic pairs are
+eligible under each model and jointly eligible across all three, with no
+eligibility rejection code firing, and the eight selection cells each filled to
+128 for 1,024 selected pairs, sorted by ascending `pair_semantic_id`.
+
+The three checkpoints produce identical token IDs on all 17,408 rows, with zero
+input-length and zero answer-position mismatches pairwise. Cross-model
+mechanistic comparisons therefore operate on the same input token sequences,
+which subsumes the exact-alignment precondition the design required. It also
+means the tokenizer contributes no differentiating signal between checkpoints,
+so any downstream difference must originate in weights rather than in input
+representation.
+
+Two ACR QuickRuns with different hash seeds and independent caches produced 13
+of 13 byte-identical core artifacts, and the committed bytes are those extracted
+from the ACR-produced images rather than locally regenerated. Weight loading was
+prevented by an active interlock that replaces every model-loading entry point
+with a raising stub before acquisition; the post-run cache contained zero weight
+files. Stage T performs zero forward pass, generation, activation, probe,
+patching, ablation, lens, provider, or GPU operation.

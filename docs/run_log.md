@@ -5266,3 +5266,73 @@ probe, patch, or GPU operation.
 The final Stage P state is
 `NONTERMINAL_CHECKPOINT_STUDY2_PROTOCOL_FROZEN_AWAITING_TOKENIZER_GATE_AND_EXECUTION`.
 No Stage T work was started.
+
+
+## Study 2 Stage T — tokenizer gate
+
+Stage T resolved the pinned tokenizer identity of the three registered Study 2
+checkpoints, proved the frozen Stage P prompts tokenize with single-token option
+continuations, verified pair alignment, and selected the mechanistic pairs for a
+future Gate B-D. No model weight was downloaded or loaded and no evidence row
+was created.
+
+### Starting state
+
+The session ran on a platform-managed worktree branch rather than `main`. Under
+the final operator amendment, branch and worktree names are observational and
+content identity is the hard gate. The complete preflight passed against
+`c2e2383e96ba3d94f3dcf9b9b57db36e1f08dcd1`, tree
+`533fb62db4db096f4f6d09eeb858a391936a28c9`, clean worktree, all registered blob
+identities, both protected rollups, and EV-0016, and was recorded as
+`STARTING_STATE_ACCEPTED_UNDER_CONTENT_IDENTITY_BRANCH_METADATA_NONAUTHORITATIVE`.
+
+### Runs
+
+| Run | Type | Status | Result |
+|---|---|---|---|
+| `cmcg` | ACR QuickRun | Succeeded | 71 Stage T tests passed |
+| `cmch` | ACR QuickRun | Failed | Full suite exposed a Phase 1.0D build-provenance regression |
+| `cmcj` | ACR QuickRun | Succeeded | 3,608 passed / 15 skipped / exactly 2 historical failures |
+| `cmck` | ACR QuickRun | Failed | Gate aborted on an over-strict weight-path import assertion |
+| `cmcm` | ACR QuickRun | Succeeded | 72 Stage T tests passed |
+| `cmcn` | ACR QuickRun | Failed | Task template missing from the upload context |
+| `cmcp` | ACR QuickRun | Succeeded | 3,609 passed / 15 skipped / exactly 2 historical failures |
+| `cmcq` | ACR QuickRun | Failed | Gate completed; post-gate validator rejected `rows: null` |
+| `cmcr` | ACR QuickRun | Succeeded | 73 Stage T tests passed |
+| `cmcs` | ACR QuickRun | Succeeded | Gate attempt `t1a` complete, validated, packaged, pushed |
+| `cmct` | ACR QuickRun | Succeeded | Gate attempt `t1b` complete, validated, packaged, pushed |
+
+Relative to the Stage P baseline of 3,537 / 15 / 2, the full-suite delta is
+**+72 passed / +0 skipped / +0 failed**.
+
+Three failures were retained honestly rather than rewritten. `cmch` exposed a
+real regression: `tests/test_phase1_0d_build_provenance.py` pins the exact set
+of `src/jspace_observation/` modules added after the Phase 1.0D image was
+sealed, so the new Stage T module had to be registered there, as Stage P had
+done before it. `cmck` and `cmcq` are described in the decision document; both
+were defects in Stage T's own self-checks, not in the gate, and neither
+performed a weight, forward, generation, activation, probe, patch, lens, or GPU
+operation. `cmcn` was an upload-context mistake that ran nothing.
+
+### Result
+
+The gate passes. 17,408 prompt rows per model all pass, 2,048 of 2,048 pairs
+are eligible under each model and jointly eligible across all three, and all
+eight selection cells filled to 128 for a total of 1,024 selected pairs with no
+shortfall. No prompt failure code or eligibility rejection code fired.
+
+The principal finding is stronger than the required one: the three checkpoints
+produce identical token IDs on all 17,408 rows, not merely equal lengths, so
+downstream mechanistic comparisons run on literally the same token sequences.
+The three tokenizers are nevertheless distinct artifacts, distinguished by
+`model_id`, resolved revision, config bytes, and special-token inventory.
+
+Attempts `t1a` and `t1b` ran with different `PYTHONHASHSEED` values and
+independent caches and produced 13 of 13 byte-identical core artifacts. The
+artifacts committed here are the exact bytes extracted from the ACR-produced OCI
+images; nothing was regenerated locally.
+
+The final Stage T state is
+`NONTERMINAL_CHECKPOINT_STUDY2_STAGE_T_TOKENIZER_GATE_SEALED_AWAITING_BD_AUTHORITY`.
+No Gate A or Gate B-D work was started, `paper/evidence_ledger.csv` remains at
+EV-0016, and both protected rollups are unchanged.

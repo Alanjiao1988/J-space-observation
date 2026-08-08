@@ -1521,3 +1521,25 @@ Exact binomial, paired-discordance, and standardized-effect calculations bound
 individual components. They do not identify joint power across behavior,
 margin, six patch contrasts, probes, hard controls, two families, and two
 checkpoint comparisons without a registered joint data-generating model.
+
+
+## L-83 - Stage T selection is deterministic, not random, over a fully eligible pool
+
+Every one of the 2,048 mechanistic pairs passed the Stage T tokenizer gate under
+all three checkpoints, so no pair was filtered on token-level grounds. The 1,024
+selected pairs were then taken by ascending `pair_semantic_id` within each of
+the eight cells. That rule is prospectively registered, reproducible, and blind
+to any model behavior, but it is a deterministic enumeration rather than a
+random sample. Any systematic structure correlated with `pair_semantic_id`
+ordering would be inherited by the development and confirmation splits, and the
+two splits are not exchangeable in the sense a randomized partition would give.
+
+## L-84 - Token identity removes a confound and an explanation at the same time
+
+The three checkpoints tokenize every frozen prompt identically, which makes
+cross-checkpoint comparison exact and eliminates input-representation
+differences as a confound. The same fact removes a candidate explanation: no
+observed difference between checkpoints can be attributed to tokenization, so
+the design has no tokenizer-level account available for any effect it finds.
+This strengthens attribution to weights but narrows the space of benign
+explanations for anomalous results.
