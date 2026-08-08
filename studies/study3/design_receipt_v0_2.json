@@ -1,0 +1,307 @@
+{
+  "receipt_type": "study3_design_round_receipt",
+  "schema_version": "study3-design-receipt/1",
+  "round": "draft-v0.2 design amendment",
+  "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW",
+  "supersedes": {
+    "receipt": "studies/study3/design_receipt.json",
+    "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW",
+    "superseded_receipt_left_unmodified": true,
+    "why_left_unmodified": "the v0.1 receipt is the historical record of what was actually claimed at that time; editing it would destroy the evidence that the ten reviewed defects were present, so the amendment is recorded additively"
+  },
+  "self_reference_note": "This receipt deliberately omits its own byte count and digest, and omits the final publication commit and tree, because a file cannot contain a hash of itself or of the commit that contains it. Those values are supplied in the final response and in the run log entry for this round.",
+  "operator_review_disposition": {
+    "disposition": "STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE",
+    "defects_found": 10,
+    "approved_for_freeze": false,
+    "record": "studies/study3/reviews/v0_1_operator_review.md"
+  },
+  "draft_only_state": {
+    "document_class": "design draft, amended, not frozen",
+    "frozen": false,
+    "execution_authorized": false,
+    "review_state": "awaiting bounded independent methods review",
+    "protocol_frozen": false,
+    "bank_sealed": false,
+    "interface_selected": false,
+    "positive_reference_selected": false,
+    "thresholds_frozen": false,
+    "seed_drawn": false
+  },
+  "absence_of_execution_authority": {
+    "authorizes_model_execution": false,
+    "authorizes_gate_evaluation": false,
+    "authorizes_bank_generation": false,
+    "authorizes_seed_draw": false,
+    "authorizes_gpu_job": false,
+    "authorizes_behavioral_confirmation": false,
+    "authorizes_activation_extraction": false,
+    "authorizes_probe_patching_or_ablation": false,
+    "authorizes_lens_work": false,
+    "authorizes_interface_selection": false,
+    "authorizes_positive_reference_selection": false,
+    "authorizes_freeze": false,
+    "authorizes_study4_or_study2_v2": false,
+    "reopens_study1": false,
+    "reopens_study2": false
+  },
+  "starting_state": {
+    "repository": "Alanjiao1988/J-space-observation",
+    "origin_remote": "https://github.com/Alanjiao1988/J-space-observation",
+    "starting_commit": "360086db495c4c5a098e49a6e8adf73dd143eaef",
+    "starting_tree": "23ba838d5f1bc639a9b21b49ba96ac957865dd90",
+    "worktree_clean_at_start": true,
+    "index_clean_at_start": true,
+    "preflight_disposition": "STUDY3_DESIGN_STARTING_STATE_ACCEPTED_CONTENT_IDENTITY_BRANCH_METADATA_NONAUTHORITATIVE",
+    "v0_1_receipt_present_at_start": true
+  },
+  "branch_and_worktree_metadata": {
+    "authoritative": false,
+    "note": "recorded for audit only; commit, tree, index/worktree cleanliness and protected-byte identity are the admission gates, and the local branch label is observational",
+    "observed_local_branch": "alanjiao1988-microsoft-miniature-eureka",
+    "observed_worktree_path": "C:\\Users\\alanjiao\\.copilot\\repos\\copilot-worktrees\\J-space-observation\\alanjiao-microsoft-miniature-eureka",
+    "publication_target": "refs/heads/main",
+    "publication_mode": "fast-forward only, explicit refspec, never forced"
+  },
+  "parent_terminal_identities": {
+    "study1": {
+      "terminal_commit": "6409d2c6d665187e4459d94d490a20d7b085e8af",
+      "terminal_tree": "bc8b80cb0e66f9426dcdedd52b624c892caa3fc9",
+      "terminal_state": "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+      "ancestor_of_starting_commit": true,
+      "modified_this_round": false
+    },
+    "study2": {
+      "measurement_terminal_commit": "43411e09de425dfae0ee74ba46c68a389311e9a7",
+      "documentation_terminal_commit": "783ad360030e9105e87301ac5e3af6346076596e",
+      "primary_terminal_state": "STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY",
+      "documentation_state": "STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE",
+      "stage_t_seal_commit": "a958adf4aec5736ef04f468fc3532ca7c92f7e5e",
+      "stage_p_commit": "c2e2383e96ba3d94f3dcf9b9b57db36e1f08dcd1",
+      "scientific_artifacts_modified_this_round": false,
+      "gate_a_overall_pass": false,
+      "gate_a_inputs_sha256": "1433f8119b2d8e377be7ede2735430ab55006c3737ebd2bf9e0c85c486b93cf7"
+    }
+  },
+  "commits_this_round": {
+    "commit_1_operator_review_and_statistics": "5dd1dea6a0e67643e9afeed3ae0500083e7dda0b",
+    "commit_2_protocol_and_committed_test": "e40c733a1dad59eead432d54b7ce7631a1a96a64",
+    "commit_3_packet_dossier_registries_routers": "7ab36ba51121491675aa22450e92327a15db6023"
+  },
+  "authority_prompt": {
+    "path": "studies/study3/prompts/study3_v0_2_design_amendment_authority.md",
+    "bytes": 27819,
+    "sha256": "23ca0cb38f9fa164236a62cfd506a52dc36d7a22969f50c42538e22552786f19",
+    "preserved_verbatim": true,
+    "verbatim_definition": "byte-identical to the operator source: no header, no footer, no trailing newline added, no reformatting, no renumbering, no annotation",
+    "normalization_applied": "none; the source contained no CR bytes and was written unchanged",
+    "prior_authority_left_unmodified": "studies/study3/prompts/study3_interface_calibration_design_authority.md"
+  },
+  "design_artifacts": [
+    {
+      "path": "studies/study3/NEXT_THREAD_HANDOFF.md",
+      "bytes": 12552,
+      "sha256": "cc47532be1e815fd649f4510e4e4d5298fbcdf55ac1952420ce927aa5fada873"
+    },
+    {
+      "path": "studies/study3/README.md",
+      "bytes": 8201,
+      "sha256": "9b06d979fe0296cd451fa407ecdec00e06347ad9eab68f5ac1596189ba637514"
+    },
+    {
+      "path": "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+      "bytes": 9545,
+      "sha256": "34119564c11c27aced1e251018954d630aca2bb0ccc41e7e8d5a98acf4b8cf64"
+    },
+    {
+      "path": "studies/study3/analysis/design_statistics.py",
+      "bytes": 28026,
+      "sha256": "462a86d62e4c53d12a23c5615de2423da1ea9c49b40819bcb26f25f5e9149f94"
+    },
+    {
+      "path": "studies/study3/analysis/design_statistics_tables.json",
+      "bytes": 26713,
+      "sha256": "48524f066b3f96cdb96b60008318294e2ee883a407ed12e1d8b7a3d0fc60b85f"
+    },
+    {
+      "path": "studies/study3/analysis/independent_methods_review_packet.md",
+      "bytes": 28113,
+      "sha256": "d438b5c4b0008d6afc63cf77cb5ed0858ef958fe8f18acbf97f50c32f698c5e3"
+    },
+    {
+      "path": "studies/study3/analysis/study2_to_study3_design_traceability.md",
+      "bytes": 14548,
+      "sha256": "dda6be22936c1db8c1b4da2f14e877c095a00d8d83526ae29a96f3e69d2a85ac"
+    },
+    {
+      "path": "studies/study3/prompts/study3_v0_2_design_amendment_authority.md",
+      "bytes": 27819,
+      "sha256": "23ca0cb38f9fa164236a62cfd506a52dc36d7a22969f50c42538e22552786f19"
+    },
+    {
+      "path": "studies/study3/protocol/interface_calibration_protocol.schema.json",
+      "bytes": 33167,
+      "sha256": "ff60f1f2f3a8a09797c3dcfe7bb2ee6314aaece152f8cd8069fcd870865a1785"
+    },
+    {
+      "path": "studies/study3/protocol/interface_calibration_protocol_draft.json",
+      "bytes": 129382,
+      "sha256": "4648e0386457f17b4d013ebe44b5f47d6ccd9c77bf87d6014eb1cd1e7b8344e8"
+    },
+    {
+      "path": "studies/study3/protocol/interface_calibration_protocol_draft.md",
+      "bytes": 59684,
+      "sha256": "deb9238d565feea3a748e20313be8d45f8384f3bc50bb89c77caf13b23a37e5c"
+    },
+    {
+      "path": "studies/study3/references/methods_sources.md",
+      "bytes": 18534,
+      "sha256": "0bb1962326c4d65e9fe077eefb7b960ee1b9ac0eb4661893e59c6aa0a64ad4af"
+    },
+    {
+      "path": "studies/study3/references/positive_reference_dossier.md",
+      "bytes": 9923,
+      "sha256": "bdde6514d7431e24f6b3ad4df5e510357850c4fb9289a8b11ad62e0bea35ef39"
+    },
+    {
+      "path": "studies/study3/reviews/v0_1_operator_review.md",
+      "bytes": 15303,
+      "sha256": "24e659d41588fe2b6239b7340a67516d13faf352147096313c04ef357cca8b54"
+    },
+    {
+      "path": "tests/test_study3_design.py",
+      "bytes": 33894,
+      "sha256": "98bb923d0c835e1a816d3805930bc6319db07905d13276fb99a2f2d7c7369ebf"
+    }
+  ],
+  "design_artifact_count_excluding_receipt": 15,
+  "mutation_whitelist": {
+    "new_files": [
+      "studies/study3/analysis/design_statistics.py",
+      "studies/study3/analysis/design_statistics_tables.json",
+      "studies/study3/analysis/independent_methods_review_packet.md",
+      "studies/study3/design_receipt_v0_2.json",
+      "studies/study3/prompts/study3_v0_2_design_amendment_authority.md",
+      "studies/study3/references/positive_reference_dossier.md",
+      "studies/study3/reviews/v0_1_operator_review.md",
+      "tests/test_study3_design.py"
+    ],
+    "modified_files": [
+      "README.md",
+      "docs/decision_log.md",
+      "paper/methods_ledger.md",
+      "reports/current_status.md",
+      "studies/README.md",
+      "studies/study3/NEXT_THREAD_HANDOFF.md",
+      "studies/study3/README.md",
+      "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+      "studies/study3/analysis/study2_to_study3_design_traceability.md",
+      "studies/study3/protocol/interface_calibration_protocol.schema.json",
+      "studies/study3/protocol/interface_calibration_protocol_draft.json",
+      "studies/study3/protocol/interface_calibration_protocol_draft.md",
+      "studies/study3/references/methods_sources.md"
+    ],
+    "total_paths": 21,
+    "deliberately_not_modified": {
+      "paper/limitations_ledger.md": "the ten reviewed items are defects in an unfrozen design document, not limitations of executed measurement; filing them as L- rows would misrepresent a drafting error as a finding about the world",
+      "studies/study3/design_receipt.json": "historical v0.1 receipt, superseded additively",
+      "studies/study3/prompts/study3_interface_calibration_design_authority.md": "verbatim authority copies are never edited",
+      "paper/evidence_ledger.csv": "no scientific evidence was produced this round"
+    },
+    "must_not_modify": [
+      "any studies/study1 path",
+      "any studies/study2 path",
+      "paper/evidence_ledger.csv",
+      "any frozen Stage P/T/B-D artifact, seal, bank, manifest, row file or decision",
+      "protected rollup inputs",
+      "model or runtime source used by past studies",
+      "dependencies, lock files or container images",
+      "GitHub workflows"
+    ]
+  },
+  "operation_counts_this_round": {
+    "model_downloads": 0,
+    "weight_loads": 0,
+    "tokenizer_constructions": 0,
+    "forward_passes": 0,
+    "generations": 0,
+    "activation_operations": 0,
+    "probe_fits": 0,
+    "patching_operations": 0,
+    "ablation_operations": 0,
+    "lens_loads": 0,
+    "lens_fits": 0,
+    "lens_applies": 0,
+    "gpu_jobs": 0,
+    "provider_calls": 0,
+    "bank_rows_written": 0,
+    "seeds_drawn": 0,
+    "gate_evaluations": 0,
+    "evidence_rows_written": 0,
+    "phase_1_0d_operations": 0,
+    "rq2_or_s4_operations": 0,
+    "study1_modifications": 0,
+    "study2_modifications": 0
+  },
+  "committed_checks": {
+    "test": {
+      "path": "tests/test_study3_design.py",
+      "bytes": 33894,
+      "sha256": "98bb923d0c835e1a816d3805930bc6319db07905d13276fb99a2f2d7c7369ebf"
+    },
+    "statistics_script": {
+      "path": "studies/study3/analysis/design_statistics.py",
+      "bytes": 28026,
+      "sha256": "462a86d62e4c53d12a23c5615de2423da1ea9c49b40819bcb26f25f5e9149f94"
+    },
+    "statistics_tables": {
+      "path": "studies/study3/analysis/design_statistics_tables.json",
+      "bytes": 26713,
+      "sha256": "48524f066b3f96cdb96b60008318294e2ee883a407ed12e1d8b7a3d0fc60b85f"
+    },
+    "why_committed": "in the v0.1 round the equivalent checker was ephemeral and was never committed, and it missed a defect a human reader found immediately; design-critical checks are therefore now committed artifacts that run in the same clean container as the rest of the suite"
+  },
+  "evidence_ledger_identity": {
+    "path": "paper/evidence_ledger.csv",
+    "bytes": 25241,
+    "sha256": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1",
+    "record_count": 16,
+    "last_evidence_id": "EV-0016",
+    "modified_this_round": false
+  },
+  "protected_rollups": {
+    "phase1_0d_rollup_sha256": "436ed331c7dd53fa6387d6b52447bc72edf166bbb3640b7f7723a8766bdf51dd",
+    "phase1_0d_rollup_file_count": 152,
+    "phase1_0d_review_v2_rollup_sha256": "ef5a417c572f7da94a562411b752d74b48da2e28aa3aa1491db9bc34dfbde82a",
+    "phase1_0d_review_v2_rollup_file_count": 36,
+    "modified_this_round": false
+  },
+  "study2_terminal_blobs_unchanged": [
+    {
+      "path": "studies/study2/terminal_manifest.json",
+      "bytes": 19739,
+      "sha256": "75fc5a88faed24852ee858804a8c166042c8edbfff148f60235c2942650e1292"
+    },
+    {
+      "path": "studies/study2/STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md",
+      "bytes": 9516,
+      "sha256": "efe21ffa73351e027c5b38d8a828cc8ea8fce1fdd37bc1b799bb416a3e9f9ff9"
+    },
+    {
+      "path": "studies/study2/decisions/study2_stage_bd_interpretation_erratum.md",
+      "bytes": 5551,
+      "sha256": "7a992ae27ec30cedd95818d84efe759e11263700b7740d0fe7b7728c944d59f8"
+    },
+    {
+      "path": "studies/study2/analysis/stage_bd_posthoc_interface_diagnostic.md",
+      "bytes": 7487,
+      "sha256": "806fc94f4c26b55246e6b8a454d29d4788da27937f8f954a58742a14ef6acb8d"
+    }
+  ],
+  "unresolved_blocking_decisions": [
+    "OD2",
+    "OD5",
+    "OD6"
+  ],
+  "only_legal_next_action": "bounded independent methods review of studies/study3/analysis/independent_methods_review_packet.md; no freeze prompt and no execution prompt exist"
+}
