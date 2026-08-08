@@ -125,12 +125,15 @@ def load_role(role: str, model_id: str, revision: str, cache_root: Path):
     tokenizer = AutoTokenizer.from_pretrained(
         local_dir, revision=revision, trust_remote_code=False, use_fast=True
     )
+    # Deliberately no low_cpu_mem_usage / device_map: those route loading through
+    # accelerate, which would add a dependency to the sealed execution image for
+    # a transient memory saving. The loaded parameter values are identical either
+    # way, and the dtype inventory in the weight-identity receipt proves it.
     model = AutoModelForCausalLM.from_pretrained(
         local_dir,
         revision=revision,
         trust_remote_code=False,
         torch_dtype=torch.float16,
-        low_cpu_mem_usage=True,
     )
     model.eval()
     model.config.use_cache = False
