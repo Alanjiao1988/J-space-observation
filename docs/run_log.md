@@ -5496,8 +5496,8 @@ was renamed, switched, merged, rebased, reset, or recreated to satisfy a name.
 
 ### Changed paths
 
-Exactly fourteen paths differ from `43411e09`, every one of them inside the
-authorized whitelist. Four are new files; ten were already mutable routing or
+Exactly fifteen paths differ from `43411e09`, every one of them inside the
+authorized whitelist. Four are new files; eleven were already mutable routing or
 ledger documents. No frozen Stage P, Stage T, or Stage B-D artifact, no
 protected Phase 1.0D file, no script, no test, and no scientific data file was
 touched.
@@ -5514,8 +5514,28 @@ Created:
 Modified: `README.md`, `studies/README.md`, `studies/study2/README.md`,
 `studies/study2/NEXT_THREAD_HANDOFF.md`, `reports/current_status.md`,
 `paper/claim_evidence_matrix.md`, `paper/limitations_ledger.md`,
-`paper/methods_ledger.md`, `paper/artifact_index.csv`, and this file,
-`docs/run_log.md`.
+`paper/methods_ledger.md`, `paper/artifact_index.csv`, `docs/decision_log.md`,
+and this file, `docs/run_log.md`.
+
+**Bookkeeping correction, added 2026-08-08.** The three counts and the
+modified-path list above were corrected after publication. As originally
+written this entry said fourteen total and ten modified, and it omitted
+`docs/decision_log.md` from the modified list even though that file was
+modified in the same round to append `D37`, was named in the terminalization
+whitelist, and is described two paragraphs below. The undercount was a clerical
+error in the prose of this log, not a deviation from the authorized changed-path
+set. Git history is the authority: `git diff --name-status 43411e09 783ad360`
+returns exactly fifteen paths, four added and eleven modified, with
+`docs/decision_log.md` among the modified. That comparison was rerun and
+independently confirmed before this correction was applied.
+
+The correction changes no frozen artifact, no Gate A value, no operation count,
+no evidence row, no interpretation, and neither terminal state. It touches only
+this file. `paper/evidence_ledger.csv` still ends at `EV-0016`, both protected
+rollups are unchanged, the scientific terminal state remains
+`STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`, and the documentation
+state remains `STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE`. No new
+artifact record and no evidence row was created for this correction.
 
 The two superseded routers were corrected additively. Nothing was deleted from
 `studies/study2/NEXT_THREAD_HANDOFF.md` or `reports/current_status.md`; each now
