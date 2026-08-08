@@ -38,18 +38,27 @@ if az acr repository show \
 fi
 
 git -C "$PROJECT_ROOT" bundle create "$CONTEXT_DIR/repo.bundle" HEAD
-cp "$PROJECT_ROOT/$DOCKERFILE" "$CONTEXT_DIR/Dockerfile"
+# Read the committed blob rather than copying the checkout, so a CRLF worktree
+# cannot change the bytes that are built.
+git -C "$PROJECT_ROOT" cat-file blob "${PROJECT_SHA}:${DOCKERFILE}" \
+    >"$CONTEXT_DIR/Dockerfile"
 
 mkdir -p "$BUILD_RECORD_DIR"
-az acr build \
-    --registry "$ACR_NAME" \
-    --image "${IMAGE_REPOSITORY}:${PROJECT_SHA}" \
-    --file Dockerfile \
-    --platform linux/amd64 \
-    --build-arg "SOURCE_COMMIT=${PROJECT_SHA}" \
-    --build-arg "SOURCE_TREE=${PROJECT_TREE}" \
-    "$CONTEXT_DIR" \
-    | tee "$BUILD_RECORD_DIR/acr_build.log"
+# ``az acr build`` resolves ``--file`` against the working directory before the
+# context, so running it from the repository root packs the repository's own
+# top-level Dockerfile over this one and silently builds the wrong image.  Run
+# it from inside the context directory, where ``Dockerfile`` is unambiguous.
+(
+    cd "$CONTEXT_DIR"
+    az acr build \
+        --registry "$ACR_NAME" \
+        --image "${IMAGE_REPOSITORY}:${PROJECT_SHA}" \
+        --file Dockerfile \
+        --platform linux/amd64 \
+        --build-arg "SOURCE_COMMIT=${PROJECT_SHA}" \
+        --build-arg "SOURCE_TREE=${PROJECT_TREE}" \
+        .
+) | tee "$BUILD_RECORD_DIR/acr_build.log"
 
 IMAGE_DIGEST="$(az acr repository show-manifests \
     --name "$ACR_NAME" \
