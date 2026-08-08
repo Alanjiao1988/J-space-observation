@@ -6950,6 +6950,28 @@
       "minimum_balance_divisor": 16,
       "position_symbol_cells": 16
     },
+    "drafting_projection_discrepancies": [
+      {
+        "conflicting_field": "interface_profiles[S3].projected_operation_counts_if_later_authorized.note",
+        "conflicting_text": "it does not add four separate scorings and must not be budgeted as if it did",
+        "drafting_field": "operation_boundaries.projected_future_operations.per_role_per_surface.S3_sequence_scorings",
+        "drafting_value": 9728,
+        "id": "S3_budgeted_as_four_scorings",
+        "reviewer_note": "9728 is exactly 4 x 2432, which is the budgeting the same document forbids; the registered per-item forward-pass count for S3 is 1, and under the current single-token domain S3 reuses the S2 pass entirely"
+      },
+      {
+        "drafting_field": "operation_boundaries.projected_future_operations.assumptions",
+        "drafting_value": "192 base items each for K1 and K3, 128 for K2, four permutation conditions from K5 and three renderings from K6",
+        "id": "K4_absent_from_the_projection",
+        "reviewer_note": "K4 carries gate I4 and is the only construct the positive reference is scored on, yet it receives no budgeted items, so the projected I4 work is zero while I4 is a required gate"
+      },
+      {
+        "drafting_field": "operation_boundaries.projected_future_operations.development_total_across_4_roles_and_4_surfaces",
+        "drafting_value": 68096,
+        "id": "positive_reference_multiplied_through_every_construct",
+        "reviewer_note": "the total multiplies four model roles uniformly across every construct, but RP has gate_role 'Gate I4 only', so RP should not be budgeted on K1, K2, K3, K5 or K6 at all"
+      }
+    ],
     "executed_operation_counts": {
       "activation_extractions": 0,
       "bank_rows_read": 0,
@@ -6966,6 +6988,15 @@
       "weight_loads": 0
     },
     "note": "this is planning arithmetic only; it authorises nothing and every executed operation count below remains zero",
+    "totals": {
+      "all_streams_scored_rows": 810240,
+      "confirmation_scored_rows_single_selected_profile": 258048,
+      "development_scored_rows_over_selectable_profiles": 269568,
+      "diagnostic_scored_rows_zero_selection_authority": 258048,
+      "forward_passes_executed_this_round": 0,
+      "generations_executed_this_round": 0,
+      "positive_reference_scored_rows": 24576
+    },
     "unit_definitions": {
       "base_item": "one registered question stem; the sampling unit and the independent unit for every derived variant",
       "derived_variant": "one rendered presentation of a base item under one (position, symbol, alphabet, rendering) condition",
@@ -6997,9 +7028,191 @@
         "position_and_symbol_variants_per_base_item": 16,
         "rendering_variants_per_base_item": 3
       }
+    },
+    "work_streams": {
+      "S4_diagnostic": {
+        "scope": "never-selectable diagnostic profile",
+        "scored_rows": 258048,
+        "selection_authority": "none; excluded from every success union"
+      },
+      "positive_reference_I4": {
+        "n_base_items_per_atomic_cell": 256,
+        "reviewer_note": "the drafting projection budgets zero K4 items, so this entire stream is missing from it",
+        "roles": 1,
+        "scope": "the already-qualified reference scored on the registered K4 construct through each candidate Study 3 interface",
+        "scored_rows_on_the_label_bearing_profile": 24576
+      },
+      "positive_reference_prequalification_P3Q": {
+        "authority": "operator decision OD2; not selected here",
+        "reviewer_note": "cannot be projected in this round because the qualification bank, floor, n and interface are all still open under OD2; the review specifies the statistical fields that must be frozen, not the checkpoint",
+        "scope": "external canonical qualification interface, outside the Study 3 candidate panel",
+        "scored_rows": null
+      },
+      "selected_profile_confirmation": {
+        "profile_note": "the label-bearing profile is used here only because it is the most expensive case; no profile is selected by this review",
+        "profile_used_for_this_projection": "S1_label_bearing",
+        "scope": "the single development-selected profile on the disjoint confirmation split",
+        "scored_rows": 258048
+      },
+      "target_development": {
+        "model_roles_scored": 3,
+        "roles_note": "RT, RL and RI carry gate authority on the target constructs; R0 and RC are deterministic non-model controls and consume no forward pass; RP is scoped to gate I4 only",
+        "scope": "every gate-bearing construct for each selectable profile on the development split",
+        "scored_rows": 269568,
+        "scored_rows_by_profile": {
+          "S1_label_bearing": 258048,
+          "S2_content_only": 5760,
+          "S3_content_only": 5760
+        }
+      }
     }
   },
   "review_version": "study3-independent-methods-review-v0.2",
+  "reviewed_parameter_recommendations": [
+    {
+      "alpha_basis": "study alpha 0.005 divided by 3 selectable profiles, applied to every component because Family A is intersection-union",
+      "applicability": "every interface profile; label-bearing and content-only",
+      "applies_to_splits": [
+        "development",
+        "confirmation"
+      ],
+      "authority_status": "reviewer recommendation only; not adopted protocol and not an execution authority",
+      "estimand": "per-base-item probability that the interface recovers the answer that is explicitly bound in the prompt",
+      "exact_null_tail_at_p0": 0.001491215117,
+      "exact_power_at_p1": 0.953040775,
+      "gate": "I1a_trivial_recovery",
+      "null_hypothesis": "p <= 0.9",
+      "null_p0": 0.9,
+      "one_sided_alpha": 0.001666666667,
+      "p1_justification": "the drafting party's own lowest declared alternative for this gate; retained unchanged so the power verdict cannot be attributed to the reviewer moving the alternative",
+      "recommended_n": 256,
+      "recommended_n_reachable_within_reviewed_grid": true,
+      "rejection_count": 244,
+      "rejection_rule": "reject the null and pass the gate when the observed success count is at least 244 out of 256",
+      "smallest_alternative_of_interest_p1": 0.97,
+      "target_power": 0.9,
+      "unit_of_n": "base items per atomic cell"
+    },
+    {
+      "alpha_basis": "study alpha 0.005 divided by 3 selectable profiles, applied to every component because Family A is intersection-union",
+      "applicability": "label-bearing profiles only; not applicable to S2 or S3, which display no label alphabet",
+      "applies_to_splits": [
+        "development",
+        "confirmation"
+      ],
+      "authority_status": "reviewer recommendation only; not adopted protocol and not an execution authority",
+      "estimand": "per-base-item probability that the interface binds the answer to the correct label symbol",
+      "exact_null_tail_at_p0": 0.001491215117,
+      "exact_power_at_p1": 0.953040775,
+      "gate": "I1b_symbol_binding",
+      "null_hypothesis": "p <= 0.9",
+      "null_p0": 0.9,
+      "one_sided_alpha": 0.001666666667,
+      "p1_justification": "the drafting party's own lowest declared alternative for this gate; retained unchanged",
+      "recommended_n": 256,
+      "recommended_n_reachable_within_reviewed_grid": true,
+      "rejection_count": 244,
+      "rejection_rule": "reject the null and pass the gate when the observed success count is at least 244 out of 256",
+      "smallest_alternative_of_interest_p1": 0.97,
+      "target_power": 0.9,
+      "unit_of_n": "base items per atomic cell"
+    },
+    {
+      "alpha_basis": "study alpha 0.005 divided by 3 selectable profiles, applied to every component because Family A is intersection-union",
+      "applicability": "every interface profile",
+      "applies_to_splits": [
+        "development",
+        "confirmation"
+      ],
+      "authority_status": "reviewer recommendation only; not adopted protocol and not an execution authority",
+      "estimand": "per-base-item probability of a correct answer on the primitive stratum, against a four-option chance floor restated as 0.50 by the draft",
+      "exact_null_tail_at_p0": 0.000931234262,
+      "exact_power_at_p1": 0.938986365,
+      "gate": "I2_primitive_headroom",
+      "null_hypothesis": "p <= 0.5",
+      "null_p0": 0.5,
+      "one_sided_alpha": 0.001666666667,
+      "p1_justification": "the drafting party's own lowest declared alternative for this gate; retained unchanged",
+      "recommended_n": 128,
+      "recommended_n_reachable_within_reviewed_grid": true,
+      "rejection_count": 82,
+      "rejection_rule": "reject the null and pass the gate when the observed success count is at least 82 out of 128",
+      "smallest_alternative_of_interest_p1": 0.7,
+      "target_power": 0.9,
+      "unit_of_n": "base items per atomic cell"
+    },
+    {
+      "alpha_basis": "study alpha 0.005 divided by 3 selectable profiles, applied to every component because Family A is intersection-union",
+      "applicability": "every interface profile, but the number of applicable variants per base item differs by profile",
+      "applies_to_splits": [
+        "development",
+        "confirmation"
+      ],
+      "authority_status": "reviewer recommendation only; not adopted protocol and not an execution authority",
+      "estimand": "per-base-item probability that the item satisfies the I3 primary indicator, under the 0.90 floor variant of the null that the authoritative JSON registers",
+      "exact_null_tail_at_p0": 0.001491215117,
+      "exact_power_at_p1": 0.953040775,
+      "gate": "I3_primary_consistency_p0_090",
+      "null_hypothesis": "p <= 0.9",
+      "null_p0": 0.9,
+      "one_sided_alpha": 0.001666666667,
+      "p1_justification": "the drafting party's own lowest declared alternative for this gate; retained unchanged",
+      "recommended_n": 256,
+      "recommended_n_reachable_within_reviewed_grid": true,
+      "rejection_count": 244,
+      "rejection_rule": "reject the null and pass the gate when the observed success count is at least 244 out of 256",
+      "smallest_alternative_of_interest_p1": 0.97,
+      "target_power": 0.9,
+      "unit_of_n": "base items per atomic cell"
+    },
+    {
+      "alpha_basis": "study alpha 0.005 divided by 3 selectable profiles, applied to every component because Family A is intersection-union",
+      "applicability": "every interface profile; retained here only to show the consequence of the unresolved floor",
+      "applies_to_splits": [
+        "development",
+        "confirmation"
+      ],
+      "authority_status": "reviewer recommendation only; not adopted protocol and not an execution authority",
+      "estimand": "the same indicator under the 0.95 floor variant of the null that the same committed table also registers",
+      "exact_null_tail_at_p0": null,
+      "exact_power_at_p1": null,
+      "gate": "I3_primary_consistency_p0_095",
+      "null_hypothesis": "p <= 0.95",
+      "null_p0": 0.95,
+      "one_sided_alpha": 0.001666666667,
+      "p1_justification": "the drafting party's own lowest declared alternative for this gate; retained unchanged",
+      "recommended_n": null,
+      "recommended_n_reachable_within_reviewed_grid": false,
+      "rejection_count": null,
+      "rejection_rule": "no admissible n at or below 768 reaches the target power at this p0 and p1",
+      "smallest_alternative_of_interest_p1": 0.97,
+      "target_power": 0.9,
+      "unit_of_n": "base items per atomic cell"
+    },
+    {
+      "alpha_basis": "study alpha 0.005 divided by 3 selectable profiles, applied to every component because Family A is intersection-union",
+      "applicability": "the positive-reference role only; the checkpoint identity remains an operator decision",
+      "applies_to_splits": [
+        "development"
+      ],
+      "authority_status": "reviewer recommendation only; not adopted protocol and not an execution authority",
+      "estimand": "per-base-item probability that the positive reference answers correctly on the registered K4 construct",
+      "exact_null_tail_at_p0": 0.001081002486,
+      "exact_power_at_p1": 0.921083515,
+      "gate": "I4_competence_floor",
+      "null_hypothesis": "p <= 0.8",
+      "null_p0": 0.8,
+      "one_sided_alpha": 0.001666666667,
+      "p1_justification": "the drafting party's own lowest declared alternative for this gate; retained unchanged",
+      "recommended_n": 256,
+      "recommended_n_reachable_within_reviewed_grid": true,
+      "rejection_count": 224,
+      "rejection_rule": "reject the null and pass the gate when the observed success count is at least 224 out of 256",
+      "smallest_alternative_of_interest_p1": 0.9,
+      "target_power": 0.9,
+      "unit_of_n": "base items per atomic cell"
+    }
+  ],
   "smallest_admissible_n_reaching_target_power": [
     {
       "alpha": 0.005,
