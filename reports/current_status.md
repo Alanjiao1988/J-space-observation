@@ -1,5 +1,48 @@
 # Project Status Report
 
+> **Study 3 draft-v0.2 independent methods review - 2026-08-08**
+>
+> **Study 3 state:** `STUDY3_DRAFT_V0_2_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`
+>
+> **Review disposition:** `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`
+>
+> The bounded independent methods review authorised after the draft-v0.2 amendment is
+> complete. It was performed by a party that did not write the design, against the
+> reviewed commit `8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`, and it re-derived every
+> design statistic from Tango (1998), Hsueh, Liu and Chen (2001) and Berger and Hsu
+> (1996) in an implementation that never reaches
+> [`studies/study3/analysis/design_statistics.py`](../studies/study3/analysis/design_statistics.py).
+>
+> **draft-v0.2 is rejected.** Six findings block: the `I3` primary estimand is not
+> identifiable from the published counterbalancing construction; the `I3` primary
+> indicator has two incompatible definitions across the authoritative JSON and the
+> review packet; the Family B per-profile `alpha = 0.001666666667` is asserted while
+> every component rule is computed at `alpha = 0.005`; the authoritative JSON asserts
+> that exact enumeration never exceeds the nominal one-sided level while the packet
+> discloses a realised `0.025501`; the four-value discordance grid cannot establish
+> size control, and maximising over the full feasible null boundary finds `0.025073`
+> at `n = 384` where the grid peaks at `0.024727`; and the `I3` floor at `p0 = 0.95`
+> is unreachable at any admissible sample size.
+>
+> The independent enumeration **reproduces** the drafting party's `0.025501`, so the
+> drafting enumeration is correct and the defect is in the claim made about it. That
+> distinction is why the round required a separate implementation rather than a rerun.
+>
+> Eleven further findings are MAJOR, three are MINOR, and seventeen candidate
+> cross-artifact inconsistencies were adjudicated individually.
+>
+> **Nothing was selected, adopted or authorized.** No interface, no positive reference
+> - `OD2` remains an operator decision and no checkpoint was named, pinned, downloaded,
+> tokenized, loaded, run, prequalified or substituted. `OD5` and `OD6` received
+> explicit methods recommendations that this round does **not** adopt. All 22 operation
+> counters remain zero, no bank row and no seed exists, `paper/evidence_ledger.csv` is
+> unchanged at `EV-0016`, and both protected Phase 1.0D rollups are unchanged.
+>
+> The only legal next action is an operator amendment round producing draft-v0.3. See
+> [`studies/study3/reviews/v0_2_independent_methods_review.md`](../studies/study3/reviews/v0_2_independent_methods_review.md)
+> and [`studies/study3/NEXT_THREAD_HANDOFF.md`](../studies/study3/NEXT_THREAD_HANDOFF.md).
+> No freeze prompt and no execution prompt exist.
+
 > **Study 3 draft-v0.2 design amendment — 2026-08-08**
 >
 > **Study 3 state:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW`

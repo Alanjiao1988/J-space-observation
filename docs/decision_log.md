@@ -3170,3 +3170,99 @@ and `OD6` remain blocking. All 22 operation counters remain zero. No Study 1 or
 Study 2 file was modified, no evidence row was added, and both protected Phase
 1.0D rollups are unchanged. The only legal next action is a bounded independent
 methods review; no freeze prompt and no execution prompt exist.
+
+## D40 - Return `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED` on Study 3 draft-v0.2 after an independent re-derivation of its statistics
+
+**Date.** 2026-08-08
+
+**Context.** D39 published Study 3 draft-v0.2 and left the only legal next action
+as a bounded independent methods review. That review was carried out in a fresh
+session and a fresh worktree by a party that did not write the design. Its
+mandate was to audit, not to repair, and to earn one of exactly three permitted
+dispositions rather than to be handed one.
+
+The review was required to be independent in a specific, checkable sense: it had
+to re-derive every design statistic from the cited primary sources - Tango (1998)
+*Statistics in Medicine* 17:891-908, Hsueh, Liu and Chen (2001) *Biometrics*
+57:478-483, and Berger and Hsu (1996) *Statistical Science* - in a separately
+structured implementation that never imports, executes, copies from, or
+dynamically loads `studies/study3/analysis/design_statistics.py`. Agreement with
+the drafting implementation was explicitly disallowed as evidence of
+correctness, so each statistical family also had to pass at least one closed-form
+or published-example check that does not involve the drafting code at all.
+
+**Decision.** Reject draft-v0.2 and require an amendment round. Six blocking
+findings were confirmed; none of them can be closed by supplying a value the
+draft omitted, and at least one of them changes the core design.
+
+1. **The `I3` primary estimand is not identifiable from the published
+   construction.** `I3` is defined over the set of variants of a base item, but
+   `counterbalancing_design.construction_algorithm` assigns exactly one
+   `(position, symbol)` pair to each base item by the deterministic rule
+   `(p, s) = (k mod 4, (k div 4) mod 4)`. No committed field states how many
+   variants a base item actually has for any profile, so the denominator of the
+   primary indicator does not exist in the document. Every `I3` threshold, its
+   sample size, and its share of the projected work inherit that hole.
+2. **The `I3` primary indicator has two incompatible published definitions.**
+   The authoritative JSON scores identical-answer-across-variants; the review
+   packet scores all-variants-correct. These are different estimands, and a
+   stably wrong answer passes one and fails the other. The packet is the outlier,
+   but the round cannot decide which definition is intended.
+3. **The Family B per-profile level is asserted but not implemented.** The
+   design states a per-profile alpha of `0.001666666667` while every retained
+   component rule is computed at `alpha = 0.005`. The independent recalculation
+   shows the union bound over three selectable profiles at the implemented level
+   is `0.015`, three times the stated guarantee. Either the components must be
+   recomputed at the stated level - which moves thresholds and sample sizes - or
+   the stated level must be withdrawn.
+4. **The conservativeness claim in the authoritative JSON is false as written.**
+   The gate-hierarchy text says exact enumeration does not exceed the nominal
+   one-sided level. The packet and the methods ledger disclose a realised
+   `0.025501` against a nominal `0.025`. The independent enumeration reproduces
+   `0.025501092` at `n = 192`, `margin = 0.10`. **The drafting enumeration is
+   correct; the defect is entirely in the claim made about it.**
+5. **The four-value discordance grid is a sensitivity grid, not proof of size
+   control.** A finite grid bounds a supremum only from below. Maximising over
+   the full feasible null boundary finds a configuration the drafting grid never
+   evaluates: at `n = 384`, `margin = 0.10`, the four grid rows peak at `0.024727`
+   and look compliant, while the true supremum is `0.025073` at a discordance of
+   about `0.478`. Size control was asserted from evidence that cannot establish
+   it.
+6. **The `I3` floor is unresolved and, at the stated floor, unreachable.** At
+   `p0 = 0.95`, `p1 = 0.97`, `alpha = 0.005/3` and target power `0.90`, no
+   admissible sample size up to the design maximum of 768 attains the target.
+
+**Alternatives considered and rejected.**
+
+- *`STUDY3_METHODS_REVIEW_ACCEPTED_AS_SPECIFIED`.* Rejected. The controlling
+  authority forbids acceptance while anything is unresolved and forbids
+  acceptance obtained by having the reviewer supply values the draft omitted.
+  The review supplies a full reviewed-parameter set precisely because the draft
+  does not contain one, which is a reason to reject rather than to accept.
+- *`STUDY3_METHODS_REVIEW_ACCEPTED_WITH_REQUIRED_CHANGES`.* Rejected. That
+  disposition is available only when the required changes are local. Repairing
+  `I3` forces re-specification of the atomic evaluation cell, the unit in which
+  `n` is counted, the projected operation total, and every `I3` threshold. That
+  is inventing structure the document does not contain, which the reviewer is
+  not entitled to do.
+- *Repairing the design in place.* Rejected on the same ground that D39 refused
+  to defend draft-v0.1: the reviewing party is not the drafting party, and a
+  reviewer who fixes the object no longer has an object to review. Where the
+  committed design test itself encodes a defect - it verifies the drafting
+  tables against the drafting script, which is circular - the defect was
+  recorded as finding S3MR-009 and `tests/test_study3_design.py` was left
+  untouched.
+- *Resolving `OD2`, `OD5` or `OD6`.* Rejected. `OD2` is reserved to the
+  operator and no checkpoint was named, pinned, downloaded, tokenized, loaded,
+  run, prequalified or substituted. `OD5` and `OD6` received explicit methods
+  recommendations, which this round does not adopt.
+
+**Consequences.** Study 3 moves to
+`STUDY3_DRAFT_V0_2_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`.
+The next legal action is `OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_3`. Nothing is
+frozen, nothing is authorized for execution, no interface is selected, no
+positive reference is selected, no bank row or seed exists, and all 22 operation
+counters remain zero. No Study 1 or Study 2 path was touched, `paper/evidence_ledger.csv`
+is unchanged at `EV-0016`, and both protected Phase 1.0D rollups are unchanged.
+The review is recorded additively: no protocol, packet, drafting statistic,
+dossier, prior review, receipt, or prior authority was modified.

@@ -1,8 +1,12 @@
 # Study 3 - Interface Adequacy and Label-Binding Calibration
 
-> **DESIGN DRAFT v0.2 - AWAITING INDEPENDENT METHODS REVIEW**
+> **DESIGN DRAFT v0.2 - INDEPENDENT METHODS REVIEW COMPLETE, REJECTED**
 >
-> State: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW`
+> State: `STUDY3_DRAFT_V0_2_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`
+>
+> Review disposition: `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`, returned by an
+> independent reviewer against the reviewed commit `8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`.
+> Six blocking findings. Read `reviews/v0_2_independent_methods_review.md`.
 >
 > Nothing here is frozen. Nothing here authorizes execution. Zero model operations have been
 > performed for this study: no download, no weight load, no tokenizer construction, no forward
@@ -61,9 +65,16 @@ or J-lens is valid. Whether Study 2's Gate A should have passed.
 | `design_receipt_v0_2.json` | cryptographic binding of the draft-v0.2 amendment round |
 | `prompts/study3_interface_calibration_design_authority.md` | the v0.1 operator authority, verbatim |
 | `prompts/study3_v0_2_design_amendment_authority.md` | the v0.2 amendment authority, verbatim |
+| `reviews/v0_2_independent_methods_review.md` | **the independent methods review of draft-v0.2** |
+| `reviews/v0_2_independent_methods_review.json` | authoritative machine-readable form of that review |
+| `reviews/v0_2_independent_methods_review.schema.json` | fail-closed schema for the review JSON |
+| `analysis/independent_methods_recalculation.py` | the reviewer's own derivation, independent of `design_statistics.py` |
+| `analysis/independent_methods_recalculation_tables.json` | the reviewer's own tables |
+| `methods_review_receipt_v0_2.json` | cryptographic binding of the independent review round |
+| `prompts/study3_v0_2_independent_methods_review_authority.md` | the review authority, verbatim |
 
-The one dedicated test lives outside this directory, at `tests/test_study3_design.py`, so it runs
-with the repository suite.
+The two dedicated tests live outside this directory, at `tests/test_study3_design.py` and
+`tests/test_study3_methods_review.py`, so they run with the repository suite.
 
 ## Design at a glance
 
@@ -121,15 +132,23 @@ bank row, template outcome, confirmation content, seed, or result.
 
 ## Next action
 
-**Bounded independent methods review.** See `analysis/independent_methods_review_packet.md` for the
-estimands, hypotheses, truth table, multiplicity logic, margins, power tables, the eight unresolved
-statistical choices and the reviewer checklist; see `NEXT_THREAD_HANDOFF.md` for the operator
-decisions. Three of the eight open decisions still block progress: the positive reference (`OD2`),
-the thresholds (`OD5`) and the sample sizes (`OD6`).
+**Operator amendment round for draft-v0.3.** The bounded independent methods review is complete
+and returned `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`. draft-v0.2 is **not** approved
+for freeze and **not** approved for execution.
 
-The amendment did not close them. It made them answerable: every proposed number is now derived by
-a committed model-free script, and the derivation shows - for instance - that `n = 192` does **not**
-support the aggregate equivalence margin draft-v0.1 asserted, at any discordance rate tested.
+Six findings block. In summary: the `I3` primary estimand is not identifiable from the published
+counterbalancing construction, so its denominator does not exist in any committed field; the `I3`
+primary indicator has two incompatible definitions across the authoritative JSON and the review
+packet; the Family B per-profile `alpha = 0.001666666667` is asserted while every component rule is
+computed at `alpha = 0.005`; the authoritative JSON asserts that exact enumeration never exceeds the
+nominal one-sided level while the packet discloses a realised `0.025501`; the four-value discordance
+grid is a sensitivity grid and cannot establish size control, and maximising over the full feasible
+null boundary finds a violation the grid never evaluates; and the `I3` floor at `p0 = 0.95` is
+unreachable at any admissible sample size. The full list, with evidence and file paths, is in
+`reviews/v0_2_independent_methods_review.md`.
+
+`OD2`, `OD5` and `OD6` remain open. The review recommends parameters for `OD5` and `OD6` but does
+**not** adopt them, and it selects no positive reference: `OD2` remains an operator decision.
 
 No freeze prompt and no execution prompt exist. The only authority that may follow this document is
-an independent methods review.
+an operator amendment round producing draft-v0.3.

@@ -1739,3 +1739,135 @@ not fix any blocking threshold or sample size, and produces no evidence row. Its
 output is a set of proposals and one negative feasibility finding: at `n = 192`
 and a target power of 0.90, the aggregate equivalence margin asserted in
 draft-v0.1 is not supported at any tested discordance rate.
+
+## M-28 - Independent re-derivation of the Study 3 design statistics, and a committed review validator with a negative-mutation battery
+
+**Date.** 2026-08-08
+
+**Scope.** Study 3 design review only. No model, no tokenizer, no weights, no
+forward pass, no bank, no seed, no measurement. Every number below is either a
+property of a published statistical procedure or a proposed design parameter.
+Nothing here is a scientific result.
+
+### The independence requirement, and how it was made checkable
+
+M-27 committed the drafting party's own derivation. A review that re-ran that
+derivation would establish only that the code is deterministic. So the review
+implementation, `studies/study3/analysis/independent_methods_recalculation.py`,
+was written from the primary sources with differently structured functions and
+different internal names, and it is forbidden to reach the drafting code at all.
+
+That prohibition is enforced twice. The script itself calls
+`assert_independence_of_drafting_implementation()` before it computes anything,
+parsing its own source and refusing to run if it finds an import of, or a dynamic
+load route to, the drafting module. Independently, `tests/test_study3_methods_review.py`
+re-parses the script and asserts that it never imports the drafting module, never
+uses `exec`, `eval`, `compile`, `import_module`, `__import__`, `load_module`,
+`spec_from_file_location` or `module_from_spec`, and never opens a Python file at
+all. Opening `design_statistics_tables.json` is permitted and necessary: comparing
+against the drafting *output* is the review, whereas reaching the drafting *code*
+would be borrowing its reasoning.
+
+### Re-derivation from the primary sources
+
+**Paired score procedure.** Under `H0: delta = d0`, writing `p21 = q` and
+`p12 = q + d0`, the constrained maximum-likelihood estimate of `q` is the larger
+root of
+
+`2n q^2 - [(n12 + n21) - d0 (2n - n12 + n21)] q - n21 d0 (1 - d0) = 0`,
+
+the null variance of the discordant difference is `n [2q + d0 (1 - d0)]`, and
+
+`Z(d0) = (n12 - n21 - n d0) / sqrt(n (2 q~ + d0 (1 - d0)))`.
+
+The feasible null boundary is `q` in `[0, (1 - Delta)/2]`, equivalently a
+discordance rate `2q + Delta` in `[Delta, 1]`. That domain matters: it is what a
+four-point grid fails to cover.
+
+**Exact binomial gates.** Rejection regions, exact power, and exact realised
+level are obtained by enumeration, never by simulation and never by a normal
+approximation to the sampling distribution.
+
+**Multiplicity.** Within a profile the gates are an intersection-union
+conjunction, so the size is bounded by the component level (Berger and Hsu 1996).
+Across selectable profiles the study proceeds if any one qualifies, which is a
+union, so the per-profile level must be divided by the number of selectable
+profiles. The review found that the design states the divided level but computes
+its components at the undivided one.
+
+### Validation that does not depend on the drafting implementation
+
+Each family carries at least one check with a known answer:
+
+1. binomial all-successes and at-least-one identities, deviation exactly 0;
+2. binomial symmetry at `p = 1/2`, deviation exactly 0;
+3. the binomial-tail/incomplete-beta identity, 3.34e-14;
+4. Clopper-Pearson bounds recovered by inverting the tail, 2.46e-16, and
+   monotone in the observed count, deviation exactly 0;
+5. windowed enumeration against exhaustive enumeration, deviation exactly 0, with
+   total lattice mass 8.37e-14 from one;
+6. Tango's statistic collapsing to McNemar's at `d0 = 0`, deviation exactly 0;
+7. the constrained-MLE quadratic residual 6.01e-17 and the score residual
+   1.53e-14 over 2778 interior and 122 boundary configurations with 0 infeasible;
+8. the normal-quantile routine, 6.66e-16.
+
+Agreement with the drafting tables was examined only after these passed, and
+every difference was classified as a drafting defect, a defensible alternative
+choice, a rounding difference, or an error in the review's own implementation.
+Three differences were errors in the review's own implementation and are
+disclosed in `docs/run_log.md`.
+
+### What the re-derivation established
+
+The drafting enumeration is correct. The realised one-sided level of `0.025501`
+at `n = 192`, `margin = 0.10` was reproduced as `0.025501092`, so the defect lies
+in the authoritative JSON's claim that enumeration never exceeds nominal, not in
+the enumeration.
+
+Maximising over the full feasible null boundary, rather than over four discordance
+values, finds a violation the grid cannot see. At `n = 384`, `margin = 0.10` the
+grid rows peak at `0.024727` and appear compliant while the supremum is `0.025073`
+at a discordance near `0.478`. Calibrated critical values that restore one-sided
+`0.025` over the whole boundary are `z = 1.97269` at `n = 192` and `z = 1.961978`
+at `n = 384`.
+
+A complete reviewed-parameter set was computed at the design's own stated
+per-profile level `alpha = 0.005/3` and target power `0.90`. Five of six gates are
+attainable at an admissible sample size; `I3` at a floor of `p0 = 0.95` is not
+attainable at any admissible `n` up to 768.
+
+### The committed review validator
+
+`tests/test_study3_methods_review.py` ships its own JSON-Schema validator because
+`jsonschema` is not in `requirements.lock.txt`, and it fails closed: it raises
+rather than silently skipping if the schema uses a keyword it cannot enforce, so
+a schema cannot be weakened by writing a rule the checker ignores.
+
+Beyond schema conformance it asserts that all 22 registered checklist questions
+are answered, that every finding carries a stable identifier, a severity and
+evidence, that every candidate inconsistency carries exactly one of the four
+permitted statuses, that every operation counter is zero, that no authority flag
+is set, that no bank row, seed, result row or model output exists, that no
+interface and no model is selected, that `OD2` remains operator-controlled, that
+a disposition requiring changes cannot route to freeze or execution, that every
+recommended sample size declares its unit, and that the Markdown and the JSON
+agree on every decision-bearing field. Artifact identities are read from
+committed Git blobs rather than the working tree, so the binding does not depend
+on a checkout's line-ending policy.
+
+A 41-case negative-mutation battery corrupts the review one prohibited state at a
+time - a non-zero counter, a set authority flag, a selected model, an adopted
+`OD2`, an unanswered checklist item, a finding without evidence, a candidate
+inconsistency with two statuses, a disposition outside the permitted three, an
+acceptance while unresolved items remain, a missing null/alternative set, an
+unregistered nuisance optimisation, a dropped work stream - and asserts each is
+rejected. A companion assertion requires the unmutated document to be accepted,
+so a validator that rejected everything would fail rather than look strict.
+
+### What this method does not do
+
+It does not select an interface, does not select, name, pin, download, tokenize,
+load, run, prequalify or substitute a positive reference, does not freeze any
+threshold or sample size, does not adopt any operator decision, and produces no
+evidence row. Its outputs are an audit, a set of recommendations that are
+explicitly not adopted, and one disposition.

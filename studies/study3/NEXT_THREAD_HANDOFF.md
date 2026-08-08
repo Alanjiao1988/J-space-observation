@@ -1,11 +1,21 @@
 # Study 3 - next thread handoff
 
-**State: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW`**
+**State: `STUDY3_DRAFT_V0_2_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`**
 
-**Draft version: `draft-v0.2`.**
+**Draft version: `draft-v0.2`, reviewed and rejected.**
 
-**The only legal next action is a bounded independent methods review of the
-statistics and gate logic. Not a freeze. Not model execution.**
+**Independent methods review disposition:
+`STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`**, returned against the
+reviewed commit `8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`, tree
+`7e9077a32903adfdaa3bede95beba8752fcb5133`.
+
+**The only legal next action is an operator amendment round producing
+draft-v0.3 (`OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_3`). Not a freeze. Not model
+execution.**
+
+Sections 1 through 8 below are the historical record of the draft-v0.2 round and
+are unchanged. Section 9 records the review outcome. Where section 5 asks what
+the independent methods review should check, section 9 records what it found.
 
 ---
 
@@ -224,3 +234,57 @@ Each step is a distinct authority. None of them is implied by the previous one.
 
 *Classification: closed and unchanged; zero-authority motivation only.*
 
+## 9. Independent methods review of draft-v0.2 - outcome
+
+The bounded independent methods review authorised after the draft-v0.2 round is
+complete. It was carried out in a fresh session by a party that did not write the
+design, and it re-derived every design statistic from the cited primary sources in
+an implementation that never reaches `analysis/design_statistics.py`.
+
+**Disposition: `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`.** draft-v0.2
+is not approved for freeze and not approved for execution.
+
+Six blocking findings:
+
+- **S3MR-001** the `I3` primary estimand is not identifiable. `I3` is defined over
+  the variants of a base item, but the committed counterbalancing construction
+  assigns exactly one `(position, symbol)` pair per base item and no field states
+  how many variants a base item has for any profile. The denominator does not
+  exist in the document.
+- **S3MR-002** the `I3` primary indicator has two incompatible definitions: the
+  authoritative JSON scores identical-answer-across-variants, the review packet
+  scores all-variants-correct. A stably wrong answer passes one and fails the
+  other.
+- **S3MR-003** the Family B per-profile `alpha = 0.001666666667` is asserted while
+  every retained component rule is computed at `alpha = 0.005`. The union bound
+  over three selectable profiles at the implemented level is `0.015`.
+- **S3MR-004** the authoritative JSON asserts that exact enumeration does not
+  exceed the nominal one-sided level, while the packet and the methods ledger
+  disclose a realised `0.025501`. The independent enumeration reproduces
+  `0.025501092`, so the enumeration is right and the claim about it is wrong.
+- **S3MR-005** the four discordance values are a sensitivity grid, not proof of
+  size control. Maximising over the full feasible null boundary finds
+  `0.025073` at `n = 384`, `margin = 0.10`, discordance about `0.478`, which the
+  grid never evaluates.
+- **S3MR-006** the `I3` floor at `p0 = 0.95` is unreachable: no admissible sample
+  size up to 768 attains target power `0.90` at the stated per-profile level.
+
+Eleven further findings are MAJOR and three are MINOR. Seventeen candidate
+cross-artifact inconsistencies were adjudicated: six `CONFIRMED_BLOCKING`, eight
+`CONFIRMED_NONBLOCKING`, one `NOT_CONFIRMED`, two `QUALIFIED`.
+
+**What the review did not do.** It selected no interface and no positive
+reference; `OD2` remains entirely an operator decision and no checkpoint was
+named, pinned, downloaded, tokenized, loaded, run, prequalified or substituted.
+It supplied explicit methods recommendations for `OD5` and `OD6` but **did not
+adopt them**; they are reviewer recommendations, not protocol. It did not repair
+the review object: where the committed design test itself encodes a circular
+verification, that was recorded as finding S3MR-009 and
+`tests/test_study3_design.py` was left untouched. All 22 operation counters
+remain zero.
+
+Read `reviews/v0_2_independent_methods_review.md` for the full audit, the 22
+answered checklist questions, the reviewed parameter table, the executable
+multiplicity decision graph and the projected operation table;
+`reviews/v0_2_independent_methods_review.json` is its authoritative machine-readable
+form; `methods_review_receipt_v0_2.json` binds the round.
