@@ -5336,3 +5336,79 @@ The final Stage T state is
 `NONTERMINAL_CHECKPOINT_STUDY2_STAGE_T_TOKENIZER_GATE_SEALED_AWAITING_BD_AUTHORITY`.
 No Gate A or Gate B-D work was started, `paper/evidence_ledger.csv` remains at
 EV-0016, and both protected rollups are unchanged.
+
+
+## Study 2 Stage B-D — development execution and Gate A
+
+Stage B-D executed the complete 384-item development bank under every applicable
+arm across the three registered 1.5B checkpoints and evaluated the frozen Gate A
+rule. All executable work ran in Azure; the workstation only inspected text,
+computed hashes, ran Git, submitted jobs, and retrieved artifacts by digest.
+
+### Starting state
+
+The session ran on the platform-managed worktree branch
+`alanjiao1988-microsoft-miniature-eureka`. Branch and worktree names are
+observational metadata; content identity was the hard gate. The preflight passed
+against the Stage T publication commit, both protected Phase 1.0D rollups, all
+registered blob identities, and EV-0016.
+
+### ACR runs
+
+| Run | Type | Status | Result |
+|---|---|---|---|
+| `cmcy` | ACR QuickRun | Succeeded | Full suite on an LF context: 3,664 passed / 15 skipped / exactly 2 historical failures |
+| `cmd0` | ACR QuickRun | Failed | GPU image build aborted on a bug in the new build-time verifier (`ITEM_COUNT` does not exist) |
+| `cmd1` | ACR QuickRun | Succeeded | GPU execution image built |
+| `cmd2` | ACR QuickRun | Succeeded | Model-free finalize image built |
+| `cmd3` – `cmda` | ACR QuickRun | Succeeded | Image rebuilds across the seal-binding, guard and work-root corrections |
+| `cmdb`, `cmdc` | ACR QuickRun | Succeeded | Images rebuilt after the work-root probe fix |
+| `cmdd` | ACR QuickRun | Succeeded | Execution image at the run commit `2bb70de3` |
+| `cmde`, `cmdf`, `cmdg` | ACR QuickRun | Failed | `az acr build` resolved `--file` against the working directory and packed the repository's own top-level Dockerfile over the intended one |
+| `cmdh` | ACR QuickRun | Succeeded | Finalize image at `2bb70de3`, built from inside the context directory |
+| `cmdj` | ACR QuickRun | Succeeded | Finalize image at `efd2b507` after the reporting fix |
+
+### Azure Container Apps executions
+
+| Job | Execution | Profile | Status | Result |
+|---|---|---|---|---|
+| `job-js-s2-bd-seal-63a5def1` | seal | Consumption | Succeeded | Pre-inference seal, reproduced byte-identically three times |
+| `job-js-s2-bd-2bb70de3` | `…-dyu2efq` | GPU T4 | Succeeded | 18 shards, 3,072 rows, 0 retries, `SEAL_VERIFIED`, `CONFIRMATION_PATHS_PRESENT=0` |
+| `job-js-s2-bdf-2bb70de3` | `…-4z5uy2y` | Consumption | Failed | Finalizer and validator both succeeded; the job then raised `KeyError` in its reporting step, before the pack was published |
+| `job-js-s2-bdf-efd2b507` | `…-z1oy5b8` | Consumption | Succeeded | Same eleven digests as the aborted run, validator `certified: true`, pack published |
+
+The GPU run took roughly 53 minutes: about 15 minutes of shards per model plus
+weight download. Runtime was `Tesla T4`, torch `2.4.1+cu121`, transformers
+`4.46.3`, Python `3.11.9`, `PYTHONHASHSEED=0`, batch size 1.
+
+### Failures worth remembering
+
+Each of these cost a run and none of them changed a scientific byte:
+
+- ACR's Dockerfile dependency scanner cannot parse heredocs.
+- A Windows checkout with `core.autocrlf=true` delivers CRLF shell scripts to
+  Linux containers, which fail at `set -euo pipefail`.
+- `git bundle create` needs a ref, not a bare object name.
+- `az acr repository update --image repo:tag` locks the tag, not the manifest;
+  the launcher correctly refused to start an unlocked manifest.
+- `az acr build` resolves `--file` locally before the uploaded context.
+- ACA GPU workload-profile containers cannot write the container root, though
+  Consumption containers can.
+- An mtime guard compared against a checked-out file whose write order git does
+  not guarantee.
+- `low_cpu_mem_usage=True` requires `accelerate`, deliberately absent from the
+  sealed image; the flag was removed rather than the dependency added.
+
+### Result
+
+Gate A returned `overall_gate_pass = false` on target counts of 25/128
+(`permutation_chain`) and 33/128 (`affine_mod10`) against a threshold of 43 and a
+chance rate of 32/128. Every committed artifact is the exact byte sequence pulled
+from the registry by manifest digest; nothing was regenerated on the workstation.
+Local `pytest` runs during implementation were development-only and carry no
+evidential weight.
+
+The final Stage B-D state is
+`STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`.
+`paper/evidence_ledger.csv` remains at EV-0016 and both protected rollups are
+unchanged.

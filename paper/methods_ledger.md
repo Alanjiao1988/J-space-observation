@@ -1506,3 +1506,47 @@ prevented by an active interlock that replaces every model-loading entry point
 with a raising stub before acquisition; the post-run cache contained zero weight
 files. Stage T performs zero forward pass, generation, activation, probe,
 patching, ablation, lens, provider, or GPU operation.
+
+
+## Study 2 Stage B-D development execution and Gate A
+
+The complete 384-item development bank was executed under every applicable arm
+across the three registered 1.5B checkpoints, producing 3,072 behavioral rows in
+18 shards with zero retries. Scoring is a restricted four-way choice among the
+fixed option tokens A=362, B=425, C=356, D=422 at the registered final input
+position, with `use_cache=False`, `trust_remote_code=False`, `float16`, batch
+size 1, and zero generated tokens. No natural-language generation occurred.
+
+Three properties make the numbers auditable rather than merely reported.
+
+First, the row space was pre-registered. A pre-inference seal binding the
+3,072-row space, its primary-key digest, the shard-manifest digest, the option
+token IDs, twenty frozen input hashes and the byte identity of the computation
+module was generated in Azure and published to `main` before any weight was
+loaded. The GPU job verified it against the published copy before importing
+`torch`, and the shard-manifest digest it later reported equals the sealed value.
+
+Second, tokenization was re-verified at inference time. Every prompt was
+re-tokenized inside the execution image and checked against the Stage T sealed
+token identity, so a transformers 4.46.3 runtime provably reproduced the token
+sequences Stage T sealed under a different transformers major version. A mismatch
+would have stopped the shard rather than been silently accepted.
+
+Third, writing and certifying were separated. Aggregation and the Gate A decision
+were computed by a model-free finalizer on an image with neither `torch` nor
+`transformers` installed, then certified by an independent validator that shares
+no writing code path and that recomputes the summaries, bootstrap diagnostics,
+feasibility rows and decision from the raw rows. Model-freeness is therefore a
+property of the image rather than a promise in the code.
+
+The Gate A rule was frozen before any Stage B-D measurement existed: target model
+only, no-tool arm only, depths 2+3 pooled within family for n = 128, an exact
+one-sided binomial upper tail under p0 = 0.25 at alpha = 0.025, a family passing
+only at X >= 43, and overall passage requiring both families. Controls were run
+in full and recorded but have no authority over the decision.
+
+Determinism was demonstrated rather than assumed: the seal reproduced
+byte-identically three times across two image digests, and two finalization runs
+on two different image digests reproduced all eleven artifact digests
+identically. Every committed byte was pulled from the registry by manifest
+digest.

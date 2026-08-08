@@ -2896,3 +2896,87 @@ forward pass, generation, activation, probe, patch, ablation, or lens operation
 occurred, `paper/evidence_ledger.csv` remains at EV-0016, both protected Phase
 1.0D rollups are unchanged, and the state is
 `NONTERMINAL_CHECKPOINT_STUDY2_STAGE_T_TOKENIZER_GATE_SEALED_AWAITING_BD_AUTHORITY`.
+
+
+## Study 2 Stage B-D — development execution and Gate A
+
+Stage B-D implemented the frozen behavioral computation, loaded the three
+registered 1.5B checkpoints exactly, ran the complete 384-item development bank
+under every applicable arm on an Azure T4, and evaluated the pre-registered
+Gate A feasibility rule. The terminal state is
+`STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`.
+
+### The decision and why it was not a judgment call
+
+Gate A was frozen before any Stage B-D measurement existed: target model only,
+no-tool arm only, depths 2+3 pooled within family for n = 128, pass a family only
+when X ≥ 43 restricted-option-correct rows, and pass overall only when both
+families pass. The target scored 25/128 on `permutation_chain` (exact upper tail
+0.9403523926144965) and 33/128 on `affine_mod10` (0.4526854444021635) against a
+chance rate of 32/128. Reaching the threshold would have required 18 and 10 more
+correct rows. `overall_gate_pass = false`.
+
+`lineage_base` cleared the `affine_mod10` threshold at 44/128. The frozen rule
+gives controls no authority precisely for this case, and one passing cell out of
+six computed comparisons is unremarkable. `controls_affect_decision` is recorded
+as `false`, and no control substitution was performed.
+
+The failure is uniform rather than localized: all 24 model × family × arm
+aggregates lie between 0.188 and 0.318 against a chance rate of 0.25, every one
+of the 96 summary cells is finite and complete, and the target's 95% Wilson
+intervals all contain 0.25. The restricted surface is a four-way choice among
+fixed option tokens, so an interface producing no signal lands at 0.25, which is
+what all three models did.
+
+### Why the numbers are trustworthy
+
+A pre-inference seal was generated in Azure, published to `main`, and only then
+used. It pre-registers the 3,072-row space, its primary-key digest, the
+shard-manifest digest, the option token IDs A=362 B=425 C=356 D=422, twenty
+frozen input hashes, and the byte identity of the core module. The GPU job
+verified it against the published copy before importing `torch`. The shard
+manifest digest the GPU job reported equals the sealed value, and every prompt
+was re-tokenized at inference time and checked against the Stage T sealed token
+identity, so the transformers 4.46.3 runtime provably saw the same token
+sequences Stage T sealed under a different transformers major version.
+
+The seal reproduced byte-identically three times across two image digests, and
+two finalization runs on two different image digests reproduced all eleven
+artifact digests identically.
+
+### Order of operations
+
+The seal was created and published before the run, and the aggregation and Gate A
+decision were computed by a model-free finalizer and then certified by an
+independent validator that shares no writing code path. Gate A was therefore
+never in a position to be chosen after seeing a preferred outcome.
+
+### A defect that was disclosed rather than repaired
+
+The core manifest's `expected_primary_keys_sha256`
+(`d15cc1bd…`) is computed over lexicographically sorted keys, while the seal's
+identically named field (`7b3e6c53…`) is computed over `expected_row_keys()`
+generation order, which is not sorted. Both digest the same 3,072-key set;
+nothing verifies the manifest field. The substantive property is proven
+independently by the validator, which asserts set equality and primary-key
+uniqueness and fails closed before any recomputation.
+
+It was left uncorrected deliberately. The core module's bytes are bound by a seal
+published before any weight load; rewriting them after seeing the result would
+destroy the property that makes the seal worth having. The correct place to fix
+the field name is a future protocol version.
+
+### Boundary
+
+No confirmation object was opened; all six registered confirmation paths were
+physically absent from the execution image. Generations, activation operations,
+probes, patching, ablations, lens operations, provider calls, Phase 1.0D
+operations, RQ2/S4 operations, mechanistic operations and scientific evidence
+rows are all zero. `paper/evidence_ledger.csv` remains byte-identical at EV-0016
+and both protected Phase 1.0D rollups are unchanged.
+
+Gate A failure is the registered non-scientific closure of protocol v1, not
+evidence about internal reasoning, distillation, or J-space. Stage B-C,
+mechanistic-cell selection, M-D and M-C were never opened and may not be opened
+under this protocol version. Any further attempt requires a new protocol version,
+a new operator authority, and new task-bank seeds.

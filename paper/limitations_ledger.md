@@ -1543,3 +1543,57 @@ observed difference between checkpoints can be attributed to tokenization, so
 the design has no tokenizer-level account available for any effect it finds.
 This strengthens attribution to weights but narrows the space of benign
 explanations for anomalous results.
+
+
+## L-85 - A chance-level development result cannot distinguish inability from interface
+
+Gate A failed because the target model scored at or below chance on both
+families under the restricted four-option surface. A model with no usable signal
+and a model whose signal the interface cannot express both land at 0.25, so this
+round cannot separate them. The integrity evidence rules out several specific
+defects: the prompts were re-tokenized and matched the Stage T seal, the option
+token IDs were verified against the seal, the row space and shard manifest were
+pre-registered and matched, and all 96 summary cells are finite and complete.
+What remains unexcluded is the broader possibility that a 1.5B interface asked
+for a single restricted-option answer, with no tool and no chain of thought, is
+simply not the surface on which this capability would appear at these depths.
+The protocol accepted that risk in advance by pre-registering the gate, and the
+correct reading of the failure is that the interface was not shown to be
+adequate, not that the capability was shown to be absent.
+
+## L-86 - One control cleared the threshold, and the rule correctly ignored it
+
+`lineage_base` scored 44/128 on `affine_mod10`, an exact upper tail of 0.011,
+which would have passed the family threshold had it carried authority. It does
+not: the frozen rule derives `overall_gate_pass` exclusively from the two target
+families. Reporting that cell as a positive finding would be a multiplicity
+failure, since six family cells were computed and one at p = 0.011 is
+unremarkable among them. It is recorded because the protocol requires the
+complete six-row table, and it is a useful reminder that a pre-registered rule
+earns its value precisely when an unauthorized cell looks attractive.
+
+## L-87 - The pack contains a manifest field that is misleadingly named
+
+The core manifest's `expected_primary_keys_sha256` is computed over
+lexicographically sorted primary keys, while the pre-inference seal's identically
+named field is computed over the generation order of `expected_row_keys()`, which
+is not sorted. The two digests therefore differ although they cover the same
+3,072-key set, and nothing verifies the manifest field. The property that matters
+is proven elsewhere: the independent validator asserts primary-key uniqueness and
+set equality against the expected space and fails closed before any recomputation
+if either fails. The field was not corrected because the computation module's
+bytes are bound by a seal published before any weight load, and rewriting them
+after seeing the result would have destroyed the guarantee that makes the seal
+meaningful. A reader auditing the pack should expect the mismatch.
+
+## L-88 - Local development iterations preceded the sealed execution
+
+The implementation was iterated locally before execution, and local `pytest`
+runs carry no evidential weight; only the ACR runs recorded in the run log are
+admissible test evidence. No local run touched a model weight and no confirmation
+object was opened locally. Several Azure plumbing defects were found and fixed
+between the seal and the successful execution; each is enumerated in the Stage
+B-D handoff. Because the seal was published before all of them and the sealed
+artifacts reproduced byte-identically across the intervening image changes, none
+of those corrections could have moved the measurement, but a reader should know
+that the successful run was not the first attempt.

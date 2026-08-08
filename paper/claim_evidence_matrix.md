@@ -262,10 +262,10 @@ CL-07 remains unsupported.
 | --- | --- |
 | Proposed paper claim | The target checkpoint uses a causally load-bearing task-defined intermediate variable to solve fresh compositional tasks under a controlled no-generated-trace interface. |
 | Required evidence | Frozen Gate A pass; target NT_PASS in both selected family cells; complete fixed-window recombinant patching with all six lower-bound gates; cross-template PROBE_PASS; complete integrity controls and closed row-level packs. |
-| Available evidence | A reviewed and frozen protocol, deterministic public banks, exact task/pair ground truth, ACR validation, and zero-operation Stage P provenance. |
-| Missing evidence | Every tokenizer gate, Gate A result, behavioral logit row, activation, patch, probe, bootstrap interval, and confirmation classification. |
+| Available evidence | A reviewed and frozen protocol, deterministic public banks, exact task/pair ground truth, ACR validation, zero-operation Stage P provenance, sealed Stage T token identity, and a complete integrity-valid Stage B-D development pack of 3,072 rows across all three checkpoints. |
+| Missing evidence | Every activation, patch, probe, bootstrap interval, and confirmation classification. Under protocol v1 these can no longer be produced: the frozen Gate A feasibility rule returned `overall_gate_pass = false` (target NT, depths 2+3: `permutation_chain` 25/128, `affine_mod10` 33/128, threshold 43, chance 32/128), which closes v1 before Stage B-C and every mechanistic stage. |
 | Status | **unsupported / preregistered** |
-| Key artifacts | `studies/study2/protocol/reasoning_internalization_protocol.json`; `studies/study2/data/task_bank_manifest.json`; `studies/study2/decisions/reasoning_internalization_protocol_freeze.md`. |
+| Key artifacts | `studies/study2/protocol/reasoning_internalization_protocol.json`; `studies/study2/data/task_bank_manifest.json`; `studies/study2/decisions/reasoning_internalization_protocol_freeze.md`; `studies/study2/decisions/study2_stage_bd_gate_a_decision.md`; `studies/study2/stage_bd/stage_bd_core_manifest.json`. |
 | Limitations | Forced-choice logits are not spontaneous behavior; synthetic tasks are narrow; Gate A creates disclosed protocol-selection bias; one-family support cannot generalize; operational incompleteness is not a scientific negative. |
 
 ---
@@ -276,10 +276,10 @@ CL-07 remains unsupported.
 | --- | --- |
 | Proposed paper claim | The target's registered behavioral and causal internal-computation effects are stronger than both the fixed lineage base and the fixed same-family instruction control. |
 | Required evidence | CL-08 support plus paired lower95 target-minus-each-control aggregate NT accuracy above zero and, in each family, target-minus-each-control PATCH_RECOMBINATION above zero, with every hard control intact on identical target-defined cells, pairs, and window. |
-| Available evidence | Exact immutable checkpoint identities and a frozen common-support design requiring all three models to run the same rows and target-defined selections. |
-| Missing evidence | All three-model tokenizer, behavior, causal, and comparative output packs. |
+| Available evidence | Exact immutable checkpoint identities, a frozen common-support design requiring all three models to run the same rows and target-defined selections, and complete three-model development behavior. |
+| Missing evidence | All three-model causal and comparative output packs. The development comparison is available but non-decisional and does not support the claim: all three checkpoints scored at chance on the restricted surface, and the one control cell that cleared a family threshold (`lineage_base`, `affine_mod10`, 44/128) has no authority under the frozen rule. Protocol v1 is closed on Gate A failure, so the remaining packs cannot be produced under this version. |
 | Status | **unsupported / preregistered** |
-| Key artifacts | `studies/study2/RESEARCH_CHARTER.md`; `studies/study2/protocol/reasoning_internalization_protocol.json`. |
+| Key artifacts | `studies/study2/RESEARCH_CHARTER.md`; `studies/study2/protocol/reasoning_internalization_protocol.json`; `studies/study2/stage_bd/stage_bd_feasibility_gate.jsonl`. |
 | Limitations | A checkpoint difference is associated with the total post-training/distillation-related change and cannot identify a teacher trace, training example, objective, or loss component. |
 
 ---
@@ -291,7 +291,7 @@ CL-07 remains unsupported.
 | Proposed paper claim | The fixed target M1200 axis reads out and causally manipulates the registered intermediate state beyond logit-lens, label/position, random-direction, and direct-answer controls. |
 | Required evidence | Complete target-only M-C pack with JREADOUT_PASS and JCAUSAL_PASS under the frozen tasks, pairs, and window, after the lens-independent axis is sealed. |
 | Available evidence | Fixed M1200/A600/B600 engineering identities and a preregistered non-rescuing secondary axis. |
-| Missing evidence | Every Study 2 J-lens readout, coordinate swap, control replicate, interval, and classification. |
+| Missing evidence | Every Study 2 J-lens readout, coordinate swap, control replicate, interval, and classification. Protocol v1 is closed on Gate A failure, so none can be produced under this version. |
 | Status | **unsupported / preregistered** |
 | Key artifacts | `studies/study2/protocol/reasoning_internalization_protocol.json`; `artifacts/jlens-s2-production/20260806T194226Z/s2-sealed/`. |
 | Limitations | M1200 was fitted on a WikiText proxy; four-scale convergence is exploratory engineering observation only; digit-token support is not yet known; this axis cannot promote the lens-independent result or validate Study 1 retrospectively. |

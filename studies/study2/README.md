@@ -83,12 +83,32 @@ tasks, new splits, new controls, new authority, and new terminal states.
 
 ## Stage boundary
 
-Stage P and Stage T are complete. Stage T resolved tokenizer identity and
-alignment and sealed the mechanistic pair selection; it created no scientific
-evidence and loaded no model weight. Gate A and Gate B-D remain unopened. A
-separate operator authority is required before any model weight download,
-forward pass, generation, activation extraction, probe, patching, ablation, or
-J-lens operation.
+Stage P, Stage T and Stage B-D are complete, and **protocol v1 is closed**.
+
+Stage T resolved tokenizer identity and alignment and sealed the mechanistic pair
+selection; it created no scientific evidence and loaded no model weight.
+
+Stage B-D then implemented the frozen behavioral computation, loaded the three
+registered 1.5B checkpoints exactly, ran the complete 384-item development bank
+under every applicable arm on an Azure T4 (3,072 rows, 18 shards, 0 retries), and
+evaluated the pre-registered Gate A feasibility rule. Gate A returned
+`overall_gate_pass = false`: on the target model's no-tool arm at depths 2+3, the
+`permutation_chain` family scored 25/128 and `affine_mod10` scored 33/128 against
+a threshold of 43, with chance at 32/128. The terminal state is
+`STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`.
+
+Gate A is a non-scientific feasibility gate. Its failure says nothing about
+whether the target reasons internally, internalized a chain of thought, acquired
+a causal mechanism through distillation, or about the validity of J-space. It
+records only that the frozen interface did not clear the accuracy floor the
+protocol required before spending confirmation and mechanistic budget. No
+scientific evidence row was created and `paper/evidence_ledger.csv` still ends at
+EV-0016.
+
+Stage B-C, mechanistic-cell selection, M-D and M-C were never opened and may not
+be opened under this protocol version. Re-running, backfilling, pooling away or
+reinterpreting this protocol version is prohibited; any further attempt requires
+a new protocol version, a new operator authority, and new task-bank seeds.
 
 ## Read next
 
@@ -100,3 +120,6 @@ J-lens operation.
 6. [`STAGE_P_FINAL_HANDOFF.md`](STAGE_P_FINAL_HANDOFF.md)
 7. [`STAGE_T_FINAL_HANDOFF.md`](STAGE_T_FINAL_HANDOFF.md)
 8. [`STAGE_T_AUTHORITY_RECEIPT.md`](STAGE_T_AUTHORITY_RECEIPT.md)
+9. [`STAGE_BD_FINAL_HANDOFF.md`](STAGE_BD_FINAL_HANDOFF.md)
+10. [`decisions/study2_stage_bd_gate_a_decision.md`](decisions/study2_stage_bd_gate_a_decision.md)
+11. [`STAGE_BD_AUTHORITY_RECEIPT.md`](STAGE_BD_AUTHORITY_RECEIPT.md)
