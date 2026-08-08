@@ -22,6 +22,36 @@
       "paper/methods_ledger.md",
       "paper/artifact_index.csv"
     ],
+    "changed_path_accounting": {
+      "declared_modified_after_this_receipt": [
+        "paper/artifact_index.csv",
+        "docs/run_log.md"
+      ],
+      "declared_reason": {
+        "docs/run_log.md": "must record the ACR validation of the publication commit, which does not exist until this receipt is committed",
+        "paper/artifact_index.csv": "must register AR-0219 for this receipt, so it can only be written after this file's bytes are final"
+      },
+      "note": "A receipt cannot observe commits made after it. The paths below are split into what the diff against the starting commit already shows at the commit that contains this receipt, and what this round declares it will additionally change before publication. Both sets are inside the authority whitelist, and their union is the complete changed-path set for the round.",
+      "observed_added_at_this_receipt": [
+        "studies/study3/reviews/v0_2_independent_methods_review.md",
+        "studies/study3/reviews/v0_2_independent_methods_review.json",
+        "studies/study3/reviews/v0_2_independent_methods_review.schema.json",
+        "studies/study3/analysis/independent_methods_recalculation.py",
+        "studies/study3/analysis/independent_methods_recalculation_tables.json",
+        "tests/test_study3_methods_review.py",
+        "studies/study3/prompts/study3_v0_2_independent_methods_review_authority.md",
+        "studies/study3/methods_review_receipt_v0_2.json"
+      ],
+      "observed_modified_at_this_receipt": [
+        "README.md",
+        "studies/README.md",
+        "studies/study3/README.md",
+        "studies/study3/NEXT_THREAD_HANDOFF.md",
+        "reports/current_status.md",
+        "docs/decision_log.md",
+        "paper/methods_ledger.md"
+      ]
+    },
     "observed_added": [
       "studies/study3/reviews/v0_2_independent_methods_review.md",
       "studies/study3/reviews/v0_2_independent_methods_review.json",
@@ -102,9 +132,9 @@
       },
       {
         "artifact_id": "AR-0217",
-        "bytes": 41221,
+        "bytes": 53517,
         "path": "tests/test_study3_methods_review.py",
-        "sha256": "b1974e9cc9aa8dc47b8ca072d81669c03544aaa148c2af07d6349e85bd021d79"
+        "sha256": "85ae6072c5bc7ee2d06804e070f9c932b2b5427e6a15adea425a0e6dcedb3790"
       },
       {
         "artifact_id": "AR-0218",
