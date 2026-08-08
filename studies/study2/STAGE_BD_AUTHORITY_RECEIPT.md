@@ -120,18 +120,33 @@ result they produced is void and must be re-derived.
 | Path | Bytes | SHA-256 |
 | --- | ---: | --- |
 | `src/jspace_observation/study2_stage_bd.py` | see `stage_bd_preinference_seal.json` | sealed at execution time |
-| `scripts/run_study2_stage_bd_gpu.py` | see seal | sealed at execution time |
-| `scripts/finalize_study2_stage_bd.py` | see seal | sealed at execution time |
-| `scripts/validate_study2_stage_bd.py` | see seal | sealed at execution time |
-| `tests/test_study2_stage_bd.py` | see seal | sealed at execution time |
+| `scripts/seal_study2_stage_bd.py` | see seal job log | sealed at execution time |
+| `scripts/run_study2_stage_bd_gpu.py` | see seal job log | sealed at execution time |
+| `scripts/finalize_study2_stage_bd.py` | see seal job log | sealed at execution time |
+| `scripts/validate_study2_stage_bd.py` | see seal job log | sealed at execution time |
+| `tests/test_study2_stage_bd.py` | see seal job log | sealed at execution time |
 | `studies/study2/protocol/stage_bd_pack.schema.json` | 36,009 | `f24ed3168f743d1141da9c2e9549b63020aa5c1652f1ea6829de4bfbbfd811f7` |
 | `studies/study2/prompts/study2_stage_bd_operator_authority.md` | 25,173 | `f6932e50cf5692ef01df9b5b8a930a3941de9620a7404653c92ffd4e9ea7e8ed` |
 
-The five paths marked "sealed at execution time" are hashed into
-`studies/study2/stage_bd/stage_bd_preinference_seal.json`, which is committed and
-published **before** the first weight load. Their values are not written here
-because this receipt is authored first; the seal is the binding record, and the
-commit order is the proof that no measurement could have influenced them.
+The paths marked "sealed at execution time" are fixed before the first weight
+load, in this order.
+
+The registered `preinference_seal` schema carries exactly two blob identities,
+`source` and `schema`, so the seal binds the closed core module and this
+contract cryptographically. The remaining scripts and the test suite are not
+fields of that schema and are therefore emitted as `SEALED_SOURCE=` lines by
+`scripts/seal_study2_stage_bd.py`, recorded in the run log, and bound by the
+commit that publishes the seal. Their values are not written here because this
+receipt is authored first; the seal and the publication commit are the binding
+records, and the commit order is the proof that no measurement could have
+influenced them.
+
+The seal is produced by running the **execution image** — the same image, by the
+same immutable digest, that later runs the forwards — on a CPU-only Consumption
+profile with no accelerator attached. That is deliberate. The execution image is
+the only context in which the six confirmation objects are genuinely absent from
+the filesystem, so `confirmation_unopened` in the seal is a statement about the
+filesystem rather than a promise about behaviour.
 
 ### 3.2 Frozen inputs (20 files, hash-checked at every entry point)
 
