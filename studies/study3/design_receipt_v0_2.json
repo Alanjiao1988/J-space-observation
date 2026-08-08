@@ -86,7 +86,18 @@
   "commits_this_round": {
     "commit_1_operator_review_and_statistics": "5dd1dea6a0e67643e9afeed3ae0500083e7dda0b",
     "commit_2_protocol_and_committed_test": "e40c733a1dad59eead432d54b7ce7631a1a96a64",
-    "commit_3_packet_dossier_registries_routers": "7ab36ba51121491675aa22450e92327a15db6023"
+    "commit_3_packet_dossier_registries_routers": "7ab36ba51121491675aa22450e92327a15db6023",
+    "commit_4_design_receipt": "b96a4795586394bcbda12021e696df7fc4dccbd7",
+    "commit_5_run_log_and_artifact_registrations": "7607bdba2a4c073de69e648d6956c86da93a2dab",
+    "commit_6_receipt_changed_path_accounting_correction": "written by this commit; a receipt cannot contain the hash of the commit that carries it"
+  },
+  "changed_path_accounting": {
+    "note": "the receipt is written before the run-log and artifact-index commits of the same round, so those two paths are declared prospectively rather than observed; the final response reports the observed set for comparison",
+    "declared_after_this_receipt": [
+      "docs/run_log.md",
+      "paper/artifact_index.csv"
+    ],
+    "declared_total_paths": 23
   },
   "authority_prompt": {
     "path": "studies/study3/prompts/study3_v0_2_design_amendment_authority.md",
@@ -189,6 +200,8 @@
     "modified_files": [
       "README.md",
       "docs/decision_log.md",
+      "docs/run_log.md",
+      "paper/artifact_index.csv",
       "paper/methods_ledger.md",
       "reports/current_status.md",
       "studies/README.md",
@@ -201,7 +214,7 @@
       "studies/study3/protocol/interface_calibration_protocol_draft.md",
       "studies/study3/references/methods_sources.md"
     ],
-    "total_paths": 21,
+    "total_paths": 23,
     "deliberately_not_modified": {
       "paper/limitations_ledger.md": "the ten reviewed items are defects in an unfrozen design document, not limitations of executed measurement; filing them as L- rows would misrepresent a drafting error as a finding about the world",
       "studies/study3/design_receipt.json": "historical v0.1 receipt, superseded additively",

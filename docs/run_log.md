@@ -5983,3 +5983,19 @@ operations, Study 1 modifications and Study 2 modifications. Nothing is frozen,
 nothing is authorised, no interface is selected and no positive reference is
 selected. `OD2`, `OD5` and `OD6` remain blocking. The only legal next action is a
 bounded independent methods review.
+
+### Changed-path accounting correction
+
+The draft-v0.2 design receipt was first written at commit `b96a479`, before the
+run-log and artifact-index commit existed, and so recorded 21 changed paths
+rather than the 23 this round actually produces. A receipt cannot observe commits
+made after it. The receipt was corrected in a sixth commit to declare
+`docs/run_log.md` and `paper/artifact_index.csv` prospectively, under an explicit
+`changed_path_accounting` block that says which paths are declared rather than
+observed, and `AR-0211` was updated to the corrected receipt bytes and digest.
+
+The corrected declared set is 8 added and 15 modified, 23 paths, which equals the
+observed `git diff --name-status` set against
+`360086db495c4c5a098e49a6e8adf73dd143eaef`. This is a bookkeeping correction to a
+draft-round receipt; no protocol content, threshold, statistic, gate, hash of a
+scientific artifact, or boundary claim changed.
