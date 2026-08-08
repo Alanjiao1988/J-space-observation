@@ -1,0 +1,718 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/studies/study3/reviews/v0_2_independent_methods_review.schema.json",
+  "title": "Study 3 draft-v0.2 independent methods review",
+  "description": "Fail-closed schema for the independent methods review of Study 3 draft-v0.2. Every constraint below is a rejection rule: a review document that violates any of them is invalid and must not be treated as a review. The schema deliberately encodes the eleven conditions the operator authority requires it to reject, and it is validated by a dependency-free validator in tests/test_study3_methods_review.py because jsonschema is not in requirements.lock.txt.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "document_class",
+    "review_round",
+    "state",
+    "disposition",
+    "disposition_basis",
+    "required_changes_exist",
+    "reviewed_commit",
+    "reviewed_tree",
+    "review_object_is_unmodified",
+    "selection_state",
+    "authority_flags",
+    "result_rows",
+    "bank_rows",
+    "seeds",
+    "model_outputs",
+    "evidence_rows",
+    "reviewed_artifact_identities",
+    "reviewer_independence",
+    "checklist_answers",
+    "mandatory_audit_answers",
+    "findings",
+    "cross_artifact_consistency",
+    "estimand_decisions",
+    "multiplicity_decision",
+    "gate_parameter_recommendations",
+    "paired_method_decision",
+    "positive_reference_statistical_requirements",
+    "confirmation_decision",
+    "projected_operation_accounting",
+    "operator_decisions",
+    "unresolved_items",
+    "claim_ceiling",
+    "absence_of_execution_authority",
+    "operation_counts",
+    "next_legal_action"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "study3-independent-methods-review-1.0.0"
+    },
+    "document_class": {
+      "type": "string",
+      "const": "independent_methods_review"
+    },
+    "review_round": {
+      "type": "string",
+      "const": "study3-draft-v0.2-independent-methods-review"
+    },
+
+    "state": {
+      "description": "REJECTION CONDITION 7a: any frozen or execution-authorized state. Exactly one state string is legal for this document class.",
+      "type": "string",
+      "const": "STUDY3_DRAFT_V0_2_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION"
+    },
+
+    "disposition": {
+      "description": "REJECTION CONDITION 1: an unknown disposition. Only the three strings the review packet permits are legal.",
+      "type": "string",
+      "enum": [
+        "STUDY3_METHODS_REVIEW_ACCEPTED_AS_SPECIFIED",
+        "STUDY3_METHODS_REVIEW_ACCEPTED_WITH_REQUIRED_CHANGES",
+        "STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED"
+      ]
+    },
+    "disposition_basis": {
+      "type": "object",
+      "required": ["statement", "triggering_conditions", "why_not_accepted_as_specified", "why_not_accepted_with_required_changes"],
+      "properties": {
+        "statement": { "type": "string", "minLength": 20 },
+        "triggering_conditions": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 10 } },
+        "why_not_accepted_as_specified": { "type": "string", "minLength": 20 },
+        "why_not_accepted_with_required_changes": { "type": "string", "minLength": 20 }
+      },
+      "additionalProperties": true
+    },
+    "required_changes_exist": { "type": "boolean" },
+
+    "reviewed_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "reviewed_tree": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "review_object_is_unmodified": { "type": "boolean", "const": true },
+
+    "selection_state": {
+      "description": "REJECTION CONDITION 6: a selected interface or a selected positive reference. All three fields must be null. This review selects nothing.",
+      "type": "object",
+      "required": ["selected_interface_profile", "selected_positive_reference_checkpoint", "selected_model"],
+      "properties": {
+        "selected_interface_profile": { "type": "null" },
+        "selected_positive_reference_checkpoint": { "type": "null" },
+        "selected_model": { "type": "null" },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "authority_flags": {
+      "description": "REJECTION CONDITION 7b: any frozen or execution-authorized state. Every flag must be false.",
+      "type": "object",
+      "required": [
+        "frozen",
+        "freeze_authorized",
+        "execution_authorized",
+        "gpu_authorized",
+        "bank_construction_authorized",
+        "model_selection_authorized",
+        "mechanistic_authority_created"
+      ],
+      "properties": {
+        "frozen": { "type": "boolean", "const": false },
+        "freeze_authorized": { "type": "boolean", "const": false },
+        "execution_authorized": { "type": "boolean", "const": false },
+        "gpu_authorized": { "type": "boolean", "const": false },
+        "bank_construction_authorized": { "type": "boolean", "const": false },
+        "model_selection_authorized": { "type": "boolean", "const": false },
+        "mechanistic_authority_created": { "type": "boolean", "const": false }
+      },
+      "additionalProperties": false
+    },
+
+    "result_rows": {
+      "description": "REJECTION CONDITION 9a: any result row.",
+      "type": "array", "maxItems": 0
+    },
+    "bank_rows": {
+      "description": "REJECTION CONDITION 9b: any bank row.",
+      "type": "array", "maxItems": 0
+    },
+    "seeds": {
+      "description": "REJECTION CONDITION 9c: any seed.",
+      "type": "array", "maxItems": 0
+    },
+    "model_outputs": {
+      "description": "REJECTION CONDITION 9d: any model output.",
+      "type": "array", "maxItems": 0
+    },
+    "evidence_rows": {
+      "description": "REJECTION CONDITION 9e: any evidence row.",
+      "type": "array", "maxItems": 0
+    },
+
+    "reviewed_artifact_identities": {
+      "description": "Content identity of every artifact reviewed, taken from committed blobs. Binds the review to exact bytes rather than to file names.",
+      "type": "array",
+      "minItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["path", "bytes", "sha256", "role"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "bytes": { "type": "integer", "minimum": 1 },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "role": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "reviewer_independence": {
+      "type": "object",
+      "required": [
+        "reviewer_wrote_the_reviewed_design",
+        "does_not_import_design_statistics",
+        "does_not_exec_or_dynamically_load_design_statistics",
+        "does_not_copy_functions_from_design_statistics",
+        "derivation_sources",
+        "independent_closed_form_checks_per_family",
+        "agreement_is_not_validation",
+        "implementation_path",
+        "tables_path",
+        "execution_venue",
+        "enforcement_mechanism",
+        "structural_differences_from_the_drafting_implementation"
+      ],
+      "properties": {
+        "reviewer_wrote_the_reviewed_design": { "type": "boolean", "const": false },
+        "does_not_import_design_statistics": { "type": "boolean", "const": true },
+        "does_not_exec_or_dynamically_load_design_statistics": { "type": "boolean", "const": true },
+        "does_not_copy_functions_from_design_statistics": { "type": "boolean", "const": true },
+        "derivation_sources": { "type": "array", "minItems": 3, "items": { "type": "string", "minLength": 5 } },
+        "independent_closed_form_checks_per_family": { "type": "object" },
+        "agreement_is_not_validation": { "type": "string", "minLength": 20 },
+        "implementation_path": { "type": "string", "const": "studies/study3/analysis/independent_methods_recalculation.py" },
+        "tables_path": { "type": "string", "const": "studies/study3/analysis/independent_methods_recalculation_tables.json" },
+        "execution_venue": { "type": "string", "minLength": 5 },
+        "enforcement_mechanism": { "type": "string", "minLength": 10 },
+        "structural_differences_from_the_drafting_implementation": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 5 } }
+      },
+      "additionalProperties": true
+    },
+
+    "checklist_answers": {
+      "description": "REJECTION CONDITIONS 2 and 3: fewer or more than 22 registered checklist answers, and any unanswered checklist item. Exactly 22 items, exactly IDs 1 through 22 each present once, every status ANSWERED and every answer substantive.",
+      "type": "array",
+      "minItems": 22,
+      "maxItems": 22,
+      "items": {
+        "type": "object",
+        "required": ["id", "question", "verdict", "answer", "status", "evidence", "finding_ids"],
+        "properties": {
+          "id": { "type": "integer", "minimum": 1, "maximum": 22 },
+          "question": { "type": "string", "minLength": 10 },
+          "verdict": { "type": "string", "enum": ["YES", "NO", "QUALIFIED"] },
+          "answer": { "type": "string", "minLength": 20 },
+          "status": { "type": "string", "const": "ANSWERED" },
+          "evidence": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+          "finding_ids": { "type": "array", "items": { "type": "string", "pattern": "^S3MR-[0-9]{3}$" } }
+        },
+        "additionalProperties": false
+      },
+      "allOf": [
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 1 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 2 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 3 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 4 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 5 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 6 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 7 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 8 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 9 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 10 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 11 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 12 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 13 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 14 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 15 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 16 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 17 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 18 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 19 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 20 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 21 } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": 22 } } } }
+      ]
+    },
+
+    "mandatory_audit_answers": {
+      "type": "object",
+      "required": [
+        "5.1_cross_artifact_semantic_consistency",
+        "5.2_estimands_atomic_cells_and_pooling",
+        "5.3_multiplicity_and_selection",
+        "5.4_exact_binomial_gates_and_power",
+        "5.5_i3_robustness_and_paired_equivalence",
+        "5.6_i4_and_the_positive_reference",
+        "5.7_confirmation_and_one_shot_lifecycle",
+        "5.8_feasibility_and_operation_accounting"
+      ],
+      "additionalProperties": true
+    },
+
+    "findings": {
+      "description": "REJECTION CONDITION 4: a finding without evidence paths or severity. Every finding needs a stable ID, a severity from the registered vocabulary, at least one evidence path, and a required change.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "severity", "title", "statement", "evidence_paths", "quoted_fields", "rationale", "required_change"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^S3MR-[0-9]{3}$" },
+          "severity": { "type": "string", "enum": ["BLOCKING", "MAJOR", "MINOR"] },
+          "title": { "type": "string", "minLength": 10 },
+          "statement": { "type": "string", "minLength": 20 },
+          "evidence_paths": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+          "quoted_fields": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+          "rationale": { "type": "string", "minLength": 20 },
+          "required_change": { "type": "string", "minLength": 10 }
+        },
+        "additionalProperties": true
+      }
+    },
+
+    "cross_artifact_consistency": {
+      "type": "object",
+      "required": ["method", "status_vocabulary", "candidate_inconsistencies"],
+      "properties": {
+        "method": { "type": "string", "minLength": 20 },
+        "status_vocabulary": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": { "type": "string", "enum": ["CONFIRMED_BLOCKING", "CONFIRMED_NONBLOCKING", "NOT_CONFIRMED", "QUALIFIED"] }
+        },
+        "candidate_inconsistencies": {
+          "description": "Every candidate inconsistency receives exactly one status, with file paths, exact quoted field names, and a rationale.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "candidate", "status", "files", "quoted_fields", "rationale", "finding_ids"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^CI-[0-9]{2}$" },
+              "candidate": { "type": "string", "minLength": 20 },
+              "status": { "type": "string", "enum": ["CONFIRMED_BLOCKING", "CONFIRMED_NONBLOCKING", "NOT_CONFIRMED", "QUALIFIED"] },
+              "files": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+              "quoted_fields": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+              "rationale": { "type": "string", "minLength": 20 },
+              "finding_ids": { "type": "array", "items": { "type": "string", "pattern": "^S3MR-[0-9]{3}$" } }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "estimand_decisions": { "type": "object", "required": ["i3_primary", "atomic_cell", "pooling", "units"], "additionalProperties": true },
+
+    "multiplicity_decision": {
+      "type": "object",
+      "required": ["formal_null_alternative_sets", "adjudications", "multiplicity_decision_graph"],
+      "properties": {
+        "formal_null_alternative_sets": {
+          "type": "object",
+          "required": [
+            "conjunction_of_cells_within_one_profile",
+            "union_over_selectable_profiles",
+            "development_selection",
+            "single_selected_confirmation_profile",
+            "label_uniformity_nuisance_check",
+            "positive_reference_cells",
+            "all_retained_roles_families_depths_renderings"
+          ],
+          "additionalProperties": true
+        },
+        "adjudications": { "type": "object" },
+        "multiplicity_decision_graph": {
+          "type": "object",
+          "required": ["note", "steps"],
+          "properties": {
+            "note": { "type": "string", "minLength": 10 },
+            "steps": {
+              "type": "array",
+              "minItems": 5,
+              "items": {
+                "type": "object",
+                "required": ["step", "action"],
+                "properties": {
+                  "step": { "type": "integer", "minimum": 1 },
+                  "action": { "type": "string", "minLength": 20 }
+                },
+                "additionalProperties": true
+              }
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "gate_parameter_recommendations": {
+      "description": "REJECTION CONDITION 5: a binding parameter with no unit. Every recommended parameter row must carry a non-empty unit_of_n, an alpha basis, an explicit authority status, and a substantive justification for its alternative.",
+      "type": "object",
+      "required": [
+        "provenance",
+        "alpha_policy",
+        "p0_and_p1_policy",
+        "discreteness_policy",
+        "binding_status",
+        "exact_binomial_gates",
+        "admissible_n_rule",
+        "paired_secondary_criterion"
+      ],
+      "properties": {
+        "provenance": { "type": "string", "minLength": 20 },
+        "alpha_policy": { "type": "string", "minLength": 20 },
+        "p0_and_p1_policy": { "type": "string", "minLength": 20 },
+        "discreteness_policy": { "type": "string", "minLength": 20 },
+        "binding_status": { "type": "string", "pattern": "NOT_ADOPTED_NOT_FROZEN" },
+        "exact_binomial_gates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "gate",
+              "estimand",
+              "null_hypothesis",
+              "null_p0",
+              "smallest_alternative_of_interest_p1",
+              "p1_justification",
+              "one_sided_alpha",
+              "alpha_basis",
+              "target_power",
+              "recommended_n",
+              "unit_of_n",
+              "rejection_count",
+              "rejection_rule",
+              "applies_to_splits",
+              "authority_status"
+            ],
+            "properties": {
+              "gate": { "type": "string", "minLength": 2 },
+              "estimand": { "type": "string", "minLength": 10 },
+              "null_hypothesis": { "type": "string", "minLength": 5 },
+              "null_p0": { "type": "number", "minimum": 0, "maximum": 1 },
+              "smallest_alternative_of_interest_p1": { "type": "number", "minimum": 0, "maximum": 1 },
+              "p1_justification": { "type": "string", "minLength": 10 },
+              "one_sided_alpha": { "type": "number", "minimum": 0, "maximum": 1 },
+              "alpha_basis": { "type": "string", "minLength": 5 },
+              "target_power": { "type": "number", "minimum": 0, "maximum": 1 },
+              "unit_of_n": { "type": "string", "minLength": 1 },
+              "rejection_rule": { "type": "string", "minLength": 5 },
+              "applies_to_splits": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+              "authority_status": { "type": "string", "pattern": "not adopted" }
+            },
+            "additionalProperties": true
+          }
+        },
+        "admissible_n_rule": { "type": "object" },
+        "paired_secondary_criterion": {
+          "type": "object",
+          "required": ["note", "unit_of_n", "rejection_rule", "size_over_feasible_null_boundary", "conservative_critical_value_calibration"],
+          "properties": {
+            "note": { "type": "string", "minLength": 20 },
+            "unit_of_n": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "paired_method_decision": {
+      "type": "object",
+      "required": ["status_determination", "independent_rederivation", "closed_form_validations", "supremum_over_the_full_feasible_boundary", "optimisation_registration", "corrected_rule_returned", "admissible_remedies"],
+      "properties": {
+        "optimisation_registration": {
+          "description": "The authority requires the domain, tolerance, bracketing rule, convergence-failure behaviour and an independent validation to be registered whenever numerical optimisation is used for a continuous nuisance parameter.",
+          "type": "object",
+          "required": ["domain", "resolution", "refinement", "tolerance", "convergence_failure_behaviour", "independent_validation"],
+          "additionalProperties": true
+        },
+        "admissible_remedies": { "type": "array", "minItems": 4, "items": { "type": "string", "minLength": 10 } }
+      },
+      "additionalProperties": true
+    },
+
+    "positive_reference_statistical_requirements": {
+      "type": "object",
+      "required": ["competence_floor", "predeclared_alternative", "separation_required", "fields_a_later_od2_authority_must_freeze", "od2_state"],
+      "properties": {
+        "separation_required": {
+          "type": "object",
+          "required": ["P3_Q_prequalification", "I4", "prohibition"],
+          "additionalProperties": true
+        },
+        "fields_a_later_od2_authority_must_freeze": { "type": "array", "minItems": 6, "items": { "type": "string", "minLength": 3 } },
+        "od2_state": { "type": "string", "pattern": "^untouched" }
+      },
+      "additionalProperties": true
+    },
+
+    "confirmation_decision": {
+      "type": "object",
+      "required": ["what_i5_confirms", "published_state", "required_publication", "one_profile_confirmation_conditions", "error_spends_the_split", "no_reselection_after_confirmation", "claim_ceiling_preserved"],
+      "properties": {
+        "one_profile_confirmation_conditions": { "type": "array", "minItems": 3, "items": { "type": "string", "minLength": 10 } }
+      },
+      "additionalProperties": true
+    },
+
+    "projected_operation_accounting": {
+      "type": "object",
+      "required": ["provenance", "character", "unit_definitions", "variants_per_base_item_by_profile", "work_streams", "totals", "executed_operation_counts"],
+      "properties": {
+        "character": { "type": "string", "pattern": "not an execution authorization" },
+        "work_streams": {
+          "description": "The authority requires the projection to distinguish prequalification work, I4 work, target development work, selected-profile confirmation work, and S4 diagnostic work.",
+          "type": "object",
+          "required": [
+            "positive_reference_prequalification_P3Q",
+            "positive_reference_I4",
+            "target_development",
+            "selected_profile_confirmation",
+            "S4_diagnostic"
+          ],
+          "additionalProperties": true
+        },
+        "totals": {
+          "type": "object",
+          "required": ["forward_passes_executed_this_round", "generations_executed_this_round"],
+          "properties": {
+            "forward_passes_executed_this_round": { "type": "integer", "const": 0 },
+            "generations_executed_this_round": { "type": "integer", "const": 0 }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "operator_decisions": {
+      "description": "OD2, OD5 and OD6 must all be present, and none may be adopted by this round.",
+      "type": "object",
+      "required": ["note", "decisions"],
+      "properties": {
+        "note": { "type": "string", "minLength": 20 },
+        "decisions": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "object",
+            "required": ["id", "subject", "review_action", "adopted_by_this_round"],
+            "properties": {
+              "id": { "type": "string", "enum": ["OD2", "OD5", "OD6"] },
+              "subject": { "type": "string", "minLength": 10 },
+              "review_action": { "type": "string", "enum": ["NONE - operator-controlled", "RECOMMENDATION_ONLY"] },
+              "adopted_by_this_round": { "type": "boolean", "const": false }
+            },
+            "additionalProperties": true
+          },
+          "allOf": [
+            {
+              "contains": {
+                "type": "object",
+                "required": ["id", "review_action"],
+                "properties": {
+                  "id": { "const": "OD2" },
+                  "review_action": { "const": "NONE - operator-controlled" }
+                }
+              }
+            },
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "OD5" } } } },
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "OD6" } } } }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "unresolved_items": {
+      "type": "object",
+      "required": ["note", "items"],
+      "properties": {
+        "note": { "type": "string", "minLength": 10 },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "subject", "state", "owner", "resolution_requires"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^UR-[0-9]{2}$" },
+              "subject": { "type": "string", "minLength": 5 },
+              "state": {
+                "type": "string",
+                "enum": ["UNRESOLVED_BLOCKING", "UNRESOLVED_REQUIRED_CHANGE", "UNRESOLVED_MINOR", "RESOLVED"]
+              },
+              "owner": { "type": "string", "minLength": 3 },
+              "resolution_requires": { "type": "string", "minLength": 10 }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "claim_ceiling": {
+      "type": "object",
+      "required": ["statement", "this_review_creates", "this_review_does_not_create", "every_number_in_this_review_is"],
+      "properties": {
+        "statement": { "type": "string", "minLength": 20 },
+        "this_review_does_not_create": { "type": "array", "minItems": 3, "items": { "type": "string", "minLength": 3 } }
+      },
+      "additionalProperties": true
+    },
+
+    "absence_of_execution_authority": {
+      "type": "object",
+      "required": ["statement", "downstream_authority_required_before_any_execution"],
+      "properties": { "statement": { "type": "string", "minLength": 20 } },
+      "additionalProperties": true
+    },
+
+    "operation_counts": {
+      "description": "REJECTION CONDITION 8: any non-zero operation counter. This round performed zero experimental operations of every registered kind.",
+      "type": "object",
+      "required": [
+        "model_downloads", "tokenizer_constructions", "weight_loads", "forward_passes", "generations",
+        "activation_extractions", "probe_fits", "patching_operations", "ablation_operations", "lens_operations",
+        "provider_calls", "gpu_jobs", "bank_rows_created", "bank_rows_read", "seeds_drawn",
+        "gate_evaluations_against_a_model", "confirmation_split_accesses", "evidence_rows_created", "prior_result_reads"
+      ],
+      "properties": {
+        "model_downloads": { "type": "integer", "const": 0 },
+        "tokenizer_constructions": { "type": "integer", "const": 0 },
+        "weight_loads": { "type": "integer", "const": 0 },
+        "forward_passes": { "type": "integer", "const": 0 },
+        "generations": { "type": "integer", "const": 0 },
+        "activation_extractions": { "type": "integer", "const": 0 },
+        "probe_fits": { "type": "integer", "const": 0 },
+        "patching_operations": { "type": "integer", "const": 0 },
+        "ablation_operations": { "type": "integer", "const": 0 },
+        "lens_operations": { "type": "integer", "const": 0 },
+        "provider_calls": { "type": "integer", "const": 0 },
+        "gpu_jobs": { "type": "integer", "const": 0 },
+        "bank_rows_created": { "type": "integer", "const": 0 },
+        "bank_rows_read": { "type": "integer", "const": 0 },
+        "seeds_drawn": { "type": "integer", "const": 0 },
+        "gate_evaluations_against_a_model": { "type": "integer", "const": 0 },
+        "confirmation_split_accesses": { "type": "integer", "const": 0 },
+        "evidence_rows_created": { "type": "integer", "const": 0 },
+        "prior_result_reads": { "type": "integer", "const": 0 }
+      },
+      "additionalProperties": false
+    },
+
+    "next_legal_action": {
+      "type": "object",
+      "required": ["action_id", "statement", "routes_directly_to_freeze", "routes_directly_to_execution", "prohibited_next_actions", "minimum_content_of_the_amendment_round"],
+      "properties": {
+        "action_id": { "type": "string", "minLength": 5 },
+        "statement": { "type": "string", "minLength": 20 },
+        "routes_directly_to_freeze": { "type": "boolean" },
+        "routes_directly_to_execution": { "type": "boolean" },
+        "prohibited_next_actions": { "type": "array", "minItems": 3, "items": { "type": "string", "minLength": 3 } },
+        "minimum_content_of_the_amendment_round": { "type": "array", "items": { "type": "string", "minLength": 10 } }
+      },
+      "additionalProperties": true
+    }
+  },
+
+  "allOf": [
+    {
+      "description": "REJECTION CONDITION 10: an accepted-as-specified disposition with an unresolved blocking methods item. If the disposition is ACCEPTED_AS_SPECIFIED then no finding may be BLOCKING, no unresolved item may remain in any unresolved state, and required_changes_exist must be false.",
+      "if": {
+        "type": "object",
+        "required": ["disposition"],
+        "properties": { "disposition": { "const": "STUDY3_METHODS_REVIEW_ACCEPTED_AS_SPECIFIED" } }
+      },
+      "then": {
+        "type": "object",
+        "required": ["findings", "unresolved_items", "required_changes_exist"],
+        "properties": {
+          "required_changes_exist": { "const": false },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": { "severity": { "enum": ["MAJOR", "MINOR"] } }
+            }
+          },
+          "unresolved_items": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": { "state": { "enum": ["RESOLVED"] } }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "REJECTION CONDITION 10b: a non-accepting disposition must be accompanied by required_changes_exist true. A rejection that claims no changes are required is incoherent.",
+      "if": {
+        "type": "object",
+        "required": ["disposition"],
+        "properties": { "disposition": { "const": "STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED" } }
+      },
+      "then": {
+        "type": "object",
+        "required": ["required_changes_exist"],
+        "properties": { "required_changes_exist": { "const": true } }
+      }
+    },
+    {
+      "description": "REJECTION CONDITION 11: a next action that jumps directly to freeze or execution when required changes exist.",
+      "if": {
+        "type": "object",
+        "required": ["required_changes_exist"],
+        "properties": { "required_changes_exist": { "const": true } }
+      },
+      "then": {
+        "type": "object",
+        "required": ["next_legal_action"],
+        "properties": {
+          "next_legal_action": {
+            "type": "object",
+            "required": ["routes_directly_to_freeze", "routes_directly_to_execution", "action_id"],
+            "properties": {
+              "routes_directly_to_freeze": { "const": false },
+              "routes_directly_to_execution": { "const": false },
+              "action_id": {
+                "not": {
+                  "enum": [
+                    "FREEZE",
+                    "FREEZE_STUDY3_PROTOCOL",
+                    "STUDY3_FREEZE",
+                    "EXECUTE",
+                    "EXECUTE_STUDY3",
+                    "STUDY3_EXECUTION",
+                    "BANK_CONSTRUCTION",
+                    "GPU_EXECUTION"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
