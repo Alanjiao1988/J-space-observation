@@ -5699,3 +5699,162 @@ Protocol v2, interface calibration, any Stage B-C or mechanistic follow-up, and
 any new measurement all remain unauthorized. The documentation endpoint is
 `STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE`; the scientific terminal
 state remains `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`.
+
+
+## 2026-08-08 - Study 3 interface-calibration design draft
+
+### Purpose and endpoint
+
+Two strictly ordered, entirely non-empirical tasks. First, correct a clerical
+changed-path count in the Study 2 terminalization run-log entry. Second, create a
+reviewable design draft for a new, isolated Study 3 on interface adequacy and
+label binding. The endpoint of the round is
+`STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW`,
+which is a design state and not a result.
+
+### Starting state
+
+The round began at commit `783ad360030e9105e87301ac5e3af6346076596e`, tree
+`1b97103e1cdca281cac015b79184e9c83002654f`, with `HEAD == origin/main`, a clean
+index and worktree, and no `studies/study3` path in the tree. The complete
+starting-state preflight passed: the four required ancestor relationships held,
+all four Study 2 terminal-documentation blobs matched their registered hashes,
+both protected Phase 1.0D rollups matched, `paper/evidence_ledger.csv` ended at
+`EV-0016`, and every prohibited-operation counter stood at its expected value.
+Disposition recorded:
+`STUDY3_DESIGN_STARTING_STATE_ACCEPTED_CONTENT_IDENTITY_BRANCH_METADATA_NONAUTHORITATIVE`.
+
+Branch and worktree names remain observational metadata rather than admission
+gates. The observed local branch was `alanjiao1988-microsoft-miniature-eureka`
+in a platform-managed worktree; commit, tree, index, worktree cleanliness and
+protected-byte identity were the authoritative predicates, and all of them held.
+
+### Phase A - Study 2 bookkeeping correction
+
+The Study 2 terminalization entry in this log described its own change set as
+fourteen paths with ten modified. An independent Git comparison of
+`43411e09de425dfae0ee74ba46c68a389311e9a7` against
+`783ad360030e9105e87301ac5e3af6346076596e` returned fifteen changed paths: four
+added and eleven modified. The omitted path was `docs/decision_log.md`, which the
+entry had in fact modified but left out of its own list.
+
+The correction was committed on its own as
+`1f2a50585b258dc97dbecb7deeff7d426ca5ca53`, whose parent is exactly the starting
+commit and whose diff contains exactly one path, `docs/run_log.md`. Substate:
+`STUDY2_TERMINAL_CHANGED_PATH_BOOKKEEPING_CORRECTED`. No Study 2 scientific
+content, threshold, count, seal, hash, digest or conclusion changed; the Gate A
+outcome and the Study 2 terminal state are untouched. The error was a
+self-description error in mutable routing prose, not an integrity failure of the
+underlying commit.
+
+### Phase B - Study 3 design draft
+
+Ten new files were created under `studies/study3` and seven existing routing and
+registry files were updated. The design registers a research question about
+whether a pre-specified response and scoring interface can recover deliberately
+trivial and primitive task competence robustly across answer-label permutations,
+option positions and prompt renderings; six explicit non-questions; four
+candidate interface surfaces with no winner selected and a deterministic
+tie-break order registered in advance; seven task strata; six checkpoint roles
+including a mandatory non-model oracle and an unselected positive-capability
+reference; six fail-closed gates `I0` through `I5`, none of which authorizes
+mechanistic execution; a claim ceiling; and eight unresolved operator decisions
+`OD1` through `OD8`, three of them blocking.
+
+Every statistical quantity in the draft was derived by exact, model-free
+arithmetic with the Python standard library before any bank, seed, interface or
+checkpoint exists. These are design parameters, not measurements; the derivation
+is recorded as `M-26` and the decision as `D38`.
+
+### Validation
+
+All validation was CPU-only on Azure ACR against clean clones of the exact
+committed bytes. Local pytest was not used and would carry no evidential weight.
+Every run reported its bound commit, bound tree, `DIRTY=0`, CPU-only execution,
+and zero tokenizer constructions, model downloads, model loads, forwards,
+generations and GPU jobs.
+
+Runs against the design commit `3aa27e3818486cf3a416f68a84d68a1a3fb900bf`, tree
+`258e2f94ff2e24e47bc4f75e2b441486ac1f7bcb`:
+
+| Run | Scope | Result |
+| --- | --- | --- |
+| `ca2u` | `targeted_tests.yaml` over `tests/test_study2_stage_bd.py tests/test_paper_registries.py tests/test_study2_stage_t.py` | 54 passed |
+| `ca2t` | `study2_full_tests.yaml`, full repository suite | 3664 passed, 15 skipped, exactly the 2 accepted historical `test_parser_v3_seal_job` failures, `FULL_SUITE_ACCEPTED_HISTORICAL_FAILURES_ONLY=1` |
+| `ca2s` | `repo_script.yaml` with `SCRIPT=/workspace/study3_design_static_check.py` | 333 checks, 0 failures, `STUDY3_DESIGN_STATIC_VALIDATION_PASS` |
+
+The validation envelope is unchanged from the Study 2 terminalization round: the
+same 54 focused tests, the same full-suite counts, and the same two accepted
+historical failures.
+
+The static instrument used by run `ca2s` is an ephemeral, operator-side
+validation script written for exactly this round and **deliberately not
+committed**, because this round's mutable-path whitelist creates no new script
+and adding one would itself be an unauthorized change. It was supplied through
+the ACR build context at `/workspace/study3_design_static_check.py` and executed
+against the committed clone at `/tmp/src`, so it read committed bytes only and
+could not alter the tree it validated. This status is disclosed here as required.
+
+The instrument verified the exact seventeen-path final diff and mutation
+whitelist, that the Phase A commit contains exactly `docs/run_log.md` and has the
+starting commit as its parent, that no source, test, script, workflow or
+dependency file changed, that all three new JSON documents parse, that the
+protocol validates against the new schema, that state names agree across Markdown
+and JSON, that no new file claims Study 3 is frozen, passed, failed, executed or
+evidential, that no gate authorizes mechanistic execution, that no seed, bank row
+or result row exists, that every recorded link resolves to a committed path, that
+`D38`, `M-26` and `AR-0186` through `AR-0195` are unique and contiguous, that each
+new artifact's recorded size and SHA-256 match its committed blob, that every
+Study 1 and Study 2 path is byte-identical to the starting commit, that both
+protected rollups and the Study 2 terminal states are unchanged, that
+`paper/evidence_ledger.csv` still ends at `EV-0016`, and that every round
+operation counter is zero.
+
+Because `jsonschema` is not part of `requirements.lock.txt` and this round may not
+add a dependency, the instrument implements a strict, dependency-free validator
+for the closed keyword set the schema uses. The validator is fail-closed by
+construction: an unrecognized schema keyword is reported as an error rather than
+ignored. It was cross-checked against the reference `jsonschema` implementation
+outside ACR, where both agreed, and it was additionally exercised against eleven
+deliberate mutations - a frozen or execution-authorized state name, a nonzero
+operation count, a nonzero count introduced through a new counter key, `frozen`
+or `execution_authorized` flipped true, an injected result row, an injected bank
+row, a removed claim ceiling, removed non-questions, a truncated gate hierarchy
+and a selected winner - every one of which was rejected.
+
+### Operation counts
+
+This round performed zero operations of every prohibited kind: zero model
+downloads, zero weight loads, zero tokenizer constructions, zero forward passes,
+zero generations, zero activation extractions, zero probe fits, zero patching or
+ablation operations, zero lens loads, fits or applies, zero GPU jobs, zero
+provider calls, zero bank rows, zero seeds drawn, zero Phase 1.0D operations,
+zero RQ2/S4 operations and zero scientific evidence rows. No new repository was
+created. The cumulative Study 2 counters are unchanged.
+
+### Publication
+
+Remote `main` stood at `783ad360030e9105e87301ac5e3af6346076596e` throughout
+implementation, and no publication was attempted before the final file-changing
+commit. Publication is a single non-force, fast-forward-only push of an explicit
+refspec after re-fetching and confirming the remote has not moved.
+
+The confirming reruns at the actual publication commit, which differs from
+`3aa27e3818486cf3a416f68a84d68a1a3fb900bf` only by this run-log section, together
+with the post-push verification, are reported in the final operator response
+rather than committed here, so that this log need not contain a self-referential
+account of its own validation.
+
+### Result
+
+Study 3 now exists as a reviewable design draft and nothing more. It is not
+frozen, it is not a pre-registration of record, no interface is selected, no
+bank or seed exists, and no execution of any kind is authorized. Study 1 remains
+closed at `INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY` and Study 2 remains
+closed at `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`; neither was
+reopened, revised or reinterpreted, and Study 2 post-hoc observations carry zero
+authority in the new design.
+
+The only legal next action is operator review of the draft and of the eight
+unresolved decisions. Approval of the design would not itself authorize
+execution.
