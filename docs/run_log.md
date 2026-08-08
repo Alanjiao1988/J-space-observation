@@ -5999,3 +5999,47 @@ observed `git diff --name-status` set against
 `360086db495c4c5a098e49a6e8adf73dd143eaef`. This is a bookkeeping correction to a
 draft-round receipt; no protocol content, threshold, statistic, gate, hash of a
 scientific artifact, or boundary claim changed.
+
+### Validation
+
+Validation ran in a clean CPU-only `python:3.11-bookworm` container on ACR
+registry `acrfinreportdt2tgbdb`, run id `ca31`, from a fresh clone of a Git
+bundle rather than from any working tree. The container reported
+`BOUND_COMMIT=b64fe13740f96badfffea2f0465cdcc02bfb91d1`,
+`BOUND_TREE=0b0f9843a8c83b977b673a331b2c0024627dd526` and `DIRTY=0`, so every
+result below is bound to the exact published bytes.
+
+Forty-eight checks ran and forty-eight passed; `INTEGRITY_FAILED_CHECKS=0` and
+`STUDY3_V0_2_VALIDATION_COMPLETE=1`.
+
+| Check group | Result |
+|---|---|
+| `tests/test_study3_design.py` | 61 passed, including the 31-case negative-mutation battery |
+| Study 2 focused regression at the round base `360086db` | 139 passed |
+| Study 2 focused regression at `b64fe13` | 139 passed, identical to base |
+| `design_statistics.py --check` | `DESIGN_STATISTICS_CHECK_OK sections=15` |
+| Full suite | 3725 passed, 15 skipped, 2 failed, `FULL_SUITE_ACCEPTED_HISTORICAL_FAILURES_ONLY=1` |
+| Changed-path whitelist | 8 added, 15 modified, 23 total, none outside the whitelist, no rename or delete, no forbidden path |
+| Receipt versus observed diff | added set, modified set and total all match |
+| Committed sizes and digests | all 15 design artifacts and all 16 `AR-` rows match the committed blobs |
+| Verbatim authority copy | digest matches, no CR bytes |
+| Artifact index | ids unique and contiguous through `AR-0211` |
+| `paper/evidence_ledger.csv` | byte-identical to the round base, 16 rows, tail `EV-0016` |
+| Protected Phase 1.0D rollups | both declared values match; 152 and 36 files re-hashed with 0 differences |
+| Ancestry | Study 1 terminal, Study 2 measurement and documentation terminals, Stage T seal, Stage P and the round base are all ancestors |
+| Protocol boundary | not frozen, not authorised, no winner, empty results, empty bank rows, 22 counters all zero, all seven gates present |
+
+The full-suite failure count is the two pre-existing
+`tests/test_parser_v3_seal_job` failures already registered as accepted
+historical failures. The passed count moves from the registered 3664 to 3725,
+which is exactly the 61 new Study 3 design tests and nothing else. Study 2's
+focused selection returns the same 139 passed at the round base and at the
+published commit, so this round introduces no Study 2 regression.
+
+Three container runs were needed. Runs `ca2y` and `ca30` failed on defects in the
+operator-side validation script itself, not in the repository: run `ca2y` used a
+non-existent protocol key `document_status` and invoked the full-suite script
+without its commit argument, and run `ca30` still let the full-suite script clone
+into an already-populated directory. Both are disclosed here rather than omitted.
+No repository content changed between the three runs; all three were bound to
+`b64fe13740f96badfffea2f0465cdcc02bfb91d1`.
