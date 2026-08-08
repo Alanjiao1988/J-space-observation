@@ -94,18 +94,32 @@ Stage T result they produced is void and must be re-derived.
 
 ### 3.1 Sealed source and contract
 
+Seal revision 2 (see §3.7). The rows marked ▲ were revised after seal revision 1
+and before any Stage T measurement existed.
+
 | Path | Bytes | SHA-256 |
 | --- | ---: | --- |
 | `src/jspace_observation/study2_stage_t.py` | 45,932 | `e81dedd99e1aed9347faa359eb1b2a5283b0ba74959c1ca83e83a14044ac9c7c` |
-| `scripts/run_study2_stage_t.py` | 9,409 | `9733cbac8fdad9c19c6b925844eb0e358660e2ca3e8f27c3b1fcd8fbbec3931c` |
-| `scripts/validate_study2_stage_t.py` | 15,266 | `010f8492cb95d2e1884b93795f621a1deca341ed1c666896c72515a9267b11c7` |
-| `tests/test_study2_stage_t.py` | 36,660 | `44cfae98104977c8f449d93b3dd4696798a0461ff37e4f32031996f3a42c0da4` |
-| `studies/study2/protocol/stage_t_pack.schema.json` | 38,358 | `231144614a83dc4a658af81ebe44b02d24fdb6af72265a8ad8c5a5535a43154d` |
+| ▲ `scripts/run_study2_stage_t.py` | 11,011 | `03953680aecc7a1362153dd0cff179812588711b743d771fa85407c63ebc12d4` |
+| ▲ `scripts/validate_study2_stage_t.py` | 15,265 | `d040089339e718f7a922c2af8c537e36a399b09bca4322abf328bac227d5d757` |
+| ▲ `tests/test_study2_stage_t.py` | 38,699 | `e473bb8b9a08c5daf83abd48c98574c95f96e676faba6b808ae82cf3e4371975` |
+| ▲ `studies/study2/protocol/stage_t_pack.schema.json` | 38,872 | `394ef2e827c493e71d4e4780b7738e15ecdb9ef49128b105c4f5528568eb6290` |
 | `infra/azure/acr_tasks/study2_stage_t.sh` | 4,549 | `ce78fca20251cf2280b7913c02a8cc0e11c169d2d92bdee3be325ef9dc9efcc5` |
 | `infra/azure/acr_tasks/study2_stage_t.yaml` | 795 | `1916065a219dc0640bc108cf1f29ba99f2630e6b9e1a0605423e956f0434dbe7` |
 | `infra/azure/acr_tasks/study2_stage_t_output.Dockerfile` | 568 | `74f7d6a4d03a128bffae5a6bd235047f5493fa770d6593f29ebc6fe74c54f1ff` |
 | `studies/study2/prompts/stage_t_tokenizer_gate_prompt.md` | 22,229 | `dce8c7167682b57e9a6cd8c7dbe651cbdcbfda13255ad9d434d06b7e7949b974` |
 | `studies/study2/prompts/stage_t_starting_state_operator_amendments.md` | 9,764 | `3aa642d472abc0b1b7f73980a7cf85c52086d9bbc632acd8d1735a4bed4a06fe` |
+
+Seal revision 1 recorded these values for the four revised paths, and they are
+kept here so the revision is auditable rather than silent:
+`scripts/run_study2_stage_t.py` 9,409 /
+`9733cbac8fdad9c19c6b925844eb0e358660e2ca3e8f27c3b1fcd8fbbec3931c`;
+`scripts/validate_study2_stage_t.py` 15,266 /
+`010f8492cb95d2e1884b93795f621a1deca341ed1c666896c72515a9267b11c7`;
+`tests/test_study2_stage_t.py` 36,660 /
+`44cfae98104977c8f449d93b3dd4696798a0461ff37e4f32031996f3a42c0da4`;
+`studies/study2/protocol/stage_t_pack.schema.json` 38,358 /
+`231144614a83dc4a658af81ebe44b02d24fdb6af72265a8ad8c5a5535a43154d`.
 
 All ten blobs are stored LF-only; `.gitattributes` registers each of them with
 `text eol=lf` so that the bytes the ACR agent executes are the bytes committed
@@ -187,14 +201,48 @@ executed locally, and no local byte is uploaded except the task files, which the
 agent compares against its own checkout with `cmp` before running them.
 
 The cache root is asserted empty before acquisition and scanned for weight file
-extensions afterwards; both assertions must pass. The run additionally records
-whether `torch` entered `sys.modules` transitively and asserts that no
-weight-loading module (`transformers.modeling_utils`,
-`transformers.models.auto.modeling_auto`) was ever imported.
+extensions afterwards; both assertions must pass. Before any acquisition the run
+installs a **weight-load interlock**: it replaces
+`transformers.modeling_utils.PreTrainedModel.from_pretrained`, the same class's
+`from_config`, and the `from_pretrained` of every `AutoModel*` class with a stub
+that raises. A weight load therefore aborts the run rather than succeeding
+quietly. The interlock targets are listed in the attempt receipt, and the
+validator refuses a receipt whose interlock list is empty.
 
 Deterministic core artifacts contain no run ID, image digest, timestamp,
 hostname, or filesystem path. Those live only in the per-attempt receipt, which
 binds itself to the core manifest by hash.
+
+### 3.7 Seal revision 2, issued before any Stage T measurement existed
+
+Attempt `t1a` (ACR run `cmck`, source commit `2b1bd84`) **aborted before the
+gate ran**. All three pinned tokenizers were acquired and constructed, and every
+resolved revision equalled its pinned revision, but the run then stopped in a
+self-check: seal revision 1 treated the mere *import* of
+`transformers.models.auto.modeling_auto` as proof that a weight path had been
+entered, and `transformers` 5.14.1 resolves its auto-class registry eagerly, so
+that module appears without a single tensor being read. Reading the registry is
+not a weight load, so the original check was simply wrong about its own
+evidence.
+
+The correction replaces a passive observation with an active interlock, as
+described in §3.6. This is strictly stronger: seal revision 1 could only report,
+after the fact, that a weight-loading module had not been imported, whereas
+revision 2 makes a weight load raise. The module-import list is retained in the
+receipt as an observation, and a new test asserts statically that the interlock
+is installed in `main` before the first acquisition call and that it replaces
+loaders via `setattr` rather than merely inspecting them.
+
+What this revision does **not** touch: no frozen Stage P byte, no protocol, no
+schema of any scientific row, no bank, no threshold, no seed, no model or
+tokenizer registration, no prompt or option gate rule, no eligibility rule, and
+no selection rule. It cannot change which pairs are selected.
+
+Crucially, no Stage T measurement existed when this revision was made. Run
+`cmck` produced no core manifest, no prompt pack, no eligibility table, no joint
+table, and no selection; it never reached `run_gate`. The revision was therefore
+made blind to every Stage T outcome, which is exactly the condition a
+pre-execution seal is meant to guarantee.
 
 ---
 

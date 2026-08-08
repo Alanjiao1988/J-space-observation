@@ -300,8 +300,8 @@ def validate(root: Path, pack_dir: Path) -> dict[str, Any]:
         s2.validate_json_schema(receipt, {**defs["attempt_receipt"], "$defs": defs})
         if receipt["core_manifest_sha256"] != manifest_sha:
             failures.append(f"{path.name}: attempt receipt does not bind this core manifest")
-        if receipt["weight_path_modules_imported"]:
-            failures.append(f"{path.name}: a weight-loading module was imported")
+        if not receipt["weight_load_interlock"]:
+            failures.append(f"{path.name}: no weight-load interlock was installed")
 
     ledger = _read(root / EVIDENCE_LEDGER).decode("utf-8").rstrip("\n").splitlines()
     if not ledger[-1].startswith(EVIDENCE_TAIL + ","):

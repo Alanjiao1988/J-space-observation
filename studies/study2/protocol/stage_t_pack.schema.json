@@ -77,6 +77,7 @@
         "source_commit",
         "source_tree",
         "torch_imported",
+        "weight_load_interlock",
         "weight_path_modules_imported"
       ],
       "properties": {
@@ -120,12 +121,22 @@
         "torch_imported": {
           "type": "boolean"
         },
+        "weight_load_interlock": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Weight entry points replaced by a raising stub before acquisition, so a weight load aborts the run."
+        },
         "weight_path_modules_imported": {
           "type": "array",
-          "maxItems": 0,
           "items": {
-            "type": "string"
-          }
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Observational: transformers resolves its auto-class registry eagerly, so these module names can appear without any tensor being read."
         }
       }
     },

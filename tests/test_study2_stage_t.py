@@ -903,12 +903,27 @@ def test_attempt_receipt_shape_is_closed() -> None:
         "source_commit": "0" * 40,
         "source_tree": "0" * 40,
         "torch_imported": False,
+        "weight_load_interlock": [
+            "transformers.modeling_utils.PreTrainedModel.from_pretrained"
+        ],
         "weight_path_modules_imported": [],
     }
     s2.validate_json_schema(receipt, {**defs["attempt_receipt"], "$defs": defs})
+    # The interlock is the guarantee; an empty interlock must be rejected.
     with pytest.raises(s2.ProtocolError):
         s2.validate_json_schema(
-            dict(receipt, weight_path_modules_imported=["transformers.modeling_utils"]),
+            dict(receipt, weight_load_interlock=[]),
+            {**defs["attempt_receipt"], "$defs": defs},
+        )
+    # Recording a transitively imported registry module is allowed, because
+    # transformers resolves its auto-class registry without reading a tensor.
+    s2.validate_json_schema(
+        dict(receipt, weight_path_modules_imported=["transformers.modeling_utils"]),
+        {**defs["attempt_receipt"], "$defs": defs},
+    )
+    with pytest.raises(s2.ProtocolError):
+        s2.validate_json_schema(
+            dict(receipt, unexpected_field=1),
             {**defs["attempt_receipt"], "$defs": defs},
         )
 
@@ -961,6 +976,43 @@ def test_stage_t_sources_import_no_model_or_provider_surface(relative: str) -> N
         assert root_module not in FORBIDDEN_IMPORTS, f"{relative} imports {name}"
     for symbol in FORBIDDEN_SYMBOLS:
         assert f"{symbol}." not in source and f"{symbol}(" not in source
+
+
+def test_the_weight_load_interlock_is_installed_before_any_acquisition() -> None:
+    """The interlock must precede the first network call, not follow it."""
+
+    source = (ROOT / "scripts/run_study2_stage_t.py").read_text(encoding="utf-8")
+    tree = ast.parse(source, "run_study2_stage_t.py")
+    main = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "main"
+    )
+    calls = [
+        (node.lineno, node.func.id)
+        for node in ast.walk(main)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in {"_install_weight_load_interlock", "stage_snapshot", "build_tokenizer"}
+    ]
+    ordered = [name for _, name in sorted(calls)]
+    assert ordered[0] == "_install_weight_load_interlock", ordered
+    assert "stage_snapshot" in ordered and "build_tokenizer" in ordered
+
+    # The interlock must replace loaders rather than merely observe them.
+    interlock = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "_install_weight_load_interlock"
+    )
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "setattr"
+        for node in ast.walk(interlock)
+    )
+    assert "raise st.StageTError" in source
 
 
 def test_stage_t_module_uses_the_top_level_import_convention() -> None:

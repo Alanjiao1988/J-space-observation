@@ -35,13 +35,56 @@ import study2_stage_t as st  # noqa: E402
 
 FORBIDDEN_MODULES = ("torch", "accelerate", "jlens", "jacobian_lens")
 
-# Importing either of these is the operation that could load a weight tensor.
-# Their absence after tokenizer construction is the machine-checkable statement
-# that Stage T never entered a modelling path.
+# Importing either of these is *not* a weight load: transformers resolves its
+# auto-class registry eagerly, so these modules can appear without a single
+# tensor being read.  Their names are recorded in the attempt receipt as an
+# observation.  The real guarantee is the interlock installed below, which makes
+# a weight load raise instead of merely being unlikely.
 WEIGHT_PATH_MODULES = (
     "transformers.modeling_utils",
     "transformers.models.auto.modeling_auto",
 )
+
+
+def _refuse_weight_load(*_args: object, **_kwargs: object) -> None:
+    raise st.StageTError(
+        "Stage T attempted to load model weights; Stage T is a tokenizer gate"
+    )
+
+
+def _install_weight_load_interlock() -> list[str]:
+    """Make a model-weight load impossible before any acquisition happens.
+
+    Passive checks can only observe that a weight path was not taken.  This
+    replaces every weight entry point with a raising stub, so a weight load
+    aborts the run instead of succeeding quietly.
+    """
+
+    import transformers
+    from transformers import modeling_utils
+
+    patched: list[str] = []
+    base = modeling_utils.PreTrainedModel
+    for attribute in ("from_pretrained", "from_config"):
+        if hasattr(base, attribute):
+            setattr(base, attribute, classmethod(_refuse_weight_load))
+            patched.append(f"transformers.modeling_utils.PreTrainedModel.{attribute}")
+
+    for name in sorted(dir(transformers)):
+        if not name.startswith("AutoModel"):
+            continue
+        candidate = getattr(transformers, name, None)
+        if isinstance(candidate, type) and hasattr(candidate, "from_pretrained"):
+            setattr(candidate, "from_pretrained", classmethod(_refuse_weight_load))
+            patched.append(f"transformers.{name}.from_pretrained")
+
+    if not patched:
+        raise st.StageTError("the weight-load interlock patched nothing")
+    return sorted(set(patched))
+
+
+def _weight_path_modules_imported() -> list[str]:
+    return sorted(name for name in WEIGHT_PATH_MODULES if name in sys.modules)
 
 
 def _refuse_model_classes() -> None:
@@ -56,12 +99,6 @@ def _refuse_model_classes() -> None:
     )
     if leaked:
         raise st.StageTError(f"model classes leaked into this module: {leaked}")
-
-
-def _assert_no_weight_path() -> None:
-    reached = sorted(name for name in WEIGHT_PATH_MODULES if name in sys.modules)
-    if reached:
-        raise st.StageTError(f"a weight-loading module was imported: {reached}")
 
 
 def stage_snapshot(
@@ -170,6 +207,9 @@ def main(argv: list[str] | None = None) -> int:
     started = time.monotonic()
     st.verify_frozen_inputs(root)
     s2.verify_protected_anchors(root)
+    interlock = _install_weight_load_interlock()
+    for target in interlock:
+        print(f"STAGE_T_WEIGHT_LOAD_INTERLOCK|{target}")
     _refuse_model_classes()
 
     snapshots: dict[str, dict[str, object]] = {}
@@ -187,7 +227,6 @@ def main(argv: list[str] | None = None) -> int:
 
     if "torch" in sys.modules:
         print("STAGE_T_NOTE|torch entered sys.modules transitively; no weight path used")
-    _assert_no_weight_path()
     _refuse_model_classes()
 
     result = st.run_gate(root, tokenizers)
@@ -208,9 +247,8 @@ def main(argv: list[str] | None = None) -> int:
         "source_commit": os.environ.get("STAGE_T_SOURCE_COMMIT", ""),
         "source_tree": os.environ.get("STAGE_T_SOURCE_TREE", ""),
         "torch_imported": "torch" in sys.modules,
-        "weight_path_modules_imported": sorted(
-            name for name in WEIGHT_PATH_MODULES if name in sys.modules
-        ),
+        "weight_load_interlock": interlock,
+        "weight_path_modules_imported": _weight_path_modules_imported(),
     }
     receipt_path = output_dir / f"{st.ATTEMPT_RECEIPT_PREFIX}{args.attempt_id}.json"
     st.write_json(receipt_path, receipt)
