@@ -1,0 +1,970 @@
+{
+  "schema_version": "study3-interface-calibration-draft/1",
+  "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW",
+  "status": {
+    "document_class": "design_draft",
+    "frozen": false,
+    "execution_authorized": false,
+    "review_state": "awaiting_operator_review",
+    "note": "This document is a reviewable design draft. It is not a frozen protocol, not a pre-registration of record, and not authority to execute any model operation. Every numeric value in it is proposed, derived, or unresolved."
+  },
+  "study_identity": {
+    "study_id": "jspace-study3-interface-calibration",
+    "name": "Study 3 - Interface Adequacy and Label-Binding Calibration",
+    "namespace": "studies/study3",
+    "draft_version": "draft-v0.1",
+    "predecessors": [
+      {
+        "study_id": "jspace-study1",
+        "terminal_state": "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+        "relevance": "Study 1 stopped because behavioral eligibility collapsed to 2/93, 2/55 and 5/90 and produced zero confirmation runs. That collapse is the single strongest motivation for treating the response interface as an object of study in its own right."
+      },
+      {
+        "study_id": "jspace-study2",
+        "terminal_state": "STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY",
+        "documentation_state": "STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE",
+        "relevance": "Study 2 executed its Gate A honestly and did not pass it. Its integrity is not in question. What remains unresolved is whether the A/B/C/D label-token interface it used was adequate to express competence at all."
+      }
+    ],
+    "successor_authority": "none"
+  },
+  "research_question": {
+    "draft_question": "Can a pre-specified response and scoring interface recover deliberately trivial, primitive, and independently demonstrated task competence robustly across answer-label permutations, option positions, and prompt renderings for the checkpoint roles relevant to a later J-space study?",
+    "question_class": "measurement_instrument_validation",
+    "unit_of_analysis": "a (interface, checkpoint role, task stratum, rendering condition) cell",
+    "what_a_pass_would_mean": "A future, separately authorized execution that passed every gate would establish only that the named interface met its pre-registered adequacy and robustness criteria for the named tasks and checkpoint roles.",
+    "what_a_fail_would_mean": "A future execution that failed would establish only that the candidate interface panel did not meet its calibration gates under the registered conditions. It would not establish model incapability."
+  },
+  "non_questions": [
+    {
+      "id": "NQ1",
+      "statement": "Study 3 does not ask whether the R1-distilled model reasons.",
+      "reason": "Reasoning is a theoretical construct that no accuracy-on-a-response-surface measurement can adjudicate. Study 3 measures whether an instrument can register competence that is already independently demonstrated."
+    },
+    {
+      "id": "NQ2",
+      "statement": "Study 3 does not ask whether the model internalized a chain of thought.",
+      "reason": "Internalization is a claim about hidden process. Study 3 deliberately forbids generated rationale on three of its four candidate surfaces and never inspects internal state."
+    },
+    {
+      "id": "NQ3",
+      "statement": "Study 3 does not ask whether distillation transferred a causal mechanism.",
+      "reason": "Causal transfer requires intervention. Study 3 authorizes no patching, no ablation, and no activation access, now or by implication."
+    },
+    {
+      "id": "NQ4",
+      "statement": "Study 3 does not ask whether a task-defined intermediate variable exists.",
+      "reason": "Existence of an intermediate variable is the substantive question a later study might pose. Study 3 only asks whether the measuring instrument is fit to pose it."
+    },
+    {
+      "id": "NQ5",
+      "statement": "Study 3 does not ask whether J-space or J-lens is valid.",
+      "reason": "No lens is loaded, fitted, or applied. J-lens validity is untouched by this study in either direction."
+    },
+    {
+      "id": "NQ6",
+      "statement": "Study 3 does not ask whether Study 2 Gate A should have passed.",
+      "reason": "Study 2 is closed. Its Gate A inputs, thresholds and outcome are frozen and are not re-litigated. Study 3 is prospective and uses new banks and new seeds."
+    }
+  ],
+  "validation_targets": [
+    {
+      "id": "VT1",
+      "construct": "scoring-pipeline correctness",
+      "why_needed": "If the renderer, the option-to-label mapping, or the scorer is wrong, every downstream number is uninterpretable. Study 1 and Study 2 both show that instrument faults are cheap to introduce and expensive to detect late.",
+      "cannot_prove": "Correct plumbing says nothing about whether any model can use the interface."
+    },
+    {
+      "id": "VT2",
+      "construct": "answer-content to label binding",
+      "why_needed": "A model may know the answer content and still fail to emit the symbol that denotes it. Robinson, Rytting and Wingate call this multiple choice symbol binding and show it varies greatly by model.",
+      "cannot_prove": "Successful binding on explicit-answer items does not show binding survives when the answer must also be computed."
+    },
+    {
+      "id": "VT3",
+      "construct": "output-surface adequacy",
+      "why_needed": "Restricted label logits, content logits, sequence log-likelihood and bounded generation are different measurement devices. Wang et al. show first-token probabilities and text answers can disagree, and that the disagreement is systematic rather than noise.",
+      "cannot_prove": "Agreement among surfaces does not make any of them correct."
+    },
+    {
+      "id": "VT4",
+      "construct": "primitive task headroom",
+      "why_needed": "If a checkpoint cannot clear a depth-1 primitive under a surface, that surface cannot support a later compositional study using the same checkpoint.",
+      "cannot_prove": "Headroom on primitives does not predict headroom on compositions, which is exactly why a separate positive-control gate exists."
+    },
+    {
+      "id": "VT5",
+      "construct": "compositional task headroom in an independently capable positive control",
+      "why_needed": "Without a checkpoint that is known on independent grounds to be able to do the compositional tasks, a null result is uninterpretable: instrument failure and model incapability are perfectly confounded. This confound is the specific reason Study 2 could not interpret its own Gate A outcome.",
+      "cannot_prove": "A capable reference clearing the tasks does not show the Study 2 target can, and must not be read as a statement about the target."
+    },
+    {
+      "id": "VT6",
+      "construct": "robustness to answer-position and label permutation",
+      "why_needed": "Pezeshkpour and Hruschka report accuracy gaps of roughly 13 to 85 percent under option reordering; Zheng et al. attribute much of this to a prior token bias over option-ID tokens. An instrument whose reading moves that much with an irrelevant transformation is not measuring the intended quantity.",
+      "cannot_prove": "Position robustness does not imply content sensitivity."
+    },
+    {
+      "id": "VT7",
+      "construct": "robustness to a small, pre-specified rendering set",
+      "why_needed": "Zhou et al. find individual-question accuracy is unstable under knowledge-equivalent rewrites, particularly for models below roughly 30B and for pretrained checkpoints. The Study 2 target is a 1.5B checkpoint.",
+      "cannot_prove": "Stability over a small registered rendering set does not generalize to arbitrary prompts, and the set must stay small to keep multiplicity honest."
+    },
+    {
+      "id": "VT8",
+      "construct": "agreement or disagreement among scoring surfaces",
+      "why_needed": "Disagreement is diagnostic: it localizes whether a failure is in binding, in content access, or in generation control. Li et al. report low correlation between multiple-choice answers and long-form answers for identical questions.",
+      "cannot_prove": "The surface that agrees with the others most is not thereby the most valid; agreement is descriptive and must not be promoted into a selection rule on its own."
+    }
+  ],
+  "candidate_interfaces": [
+    {
+      "id": "S1",
+      "name": "label_token_logits",
+      "family": "restricted label-token logits over A/B/C/D",
+      "role_in_panel": "Study 2 legacy comparator, retained for continuity, not privileged",
+      "prompt_contract": "Question stem, then four options each on its own line prefixed by its label and a fixed separator, then a fixed instruction to answer with a single label, then a fixed answer cue ending immediately before the label position.",
+      "answer_position": "the single token immediately following the fixed answer cue",
+      "permitted_output": "no generated text; logits are read at one position only",
+      "scoring_equation": "argmax over the four registered label token ids of the next-token logit at the answer position; ties broken by the registered deterministic tie-break order; no renormalization is applied before argmax, and the softmax over the four ids is recorded separately as a descriptive confidence only",
+      "tokenization_assumptions": "each of the four label strings, in the exact surface form produced by the renderer, must map to exactly one token id; Study 2 established ids A=362, B=425, C=356, D=422 for the Qwen2.5 tokenizer, and a future tokenizer gate must re-derive them rather than assume them",
+      "abstention_handling": "not expressible: the surface is forced-choice by construction, so it cannot distinguish 'no answer' from 'wrong answer'. This is a recorded limitation, not a defect to be patched.",
+      "chat_template": "no chat template on base and distilled checkpoints; a registered chat template is an option only if applied to every role identically, which is an unresolved operator decision",
+      "fair_treatment_across_checkpoints": "identical rendered bytes for all roles; no role-specific prompt tuning; any template applied to one role is applied to all",
+      "future_operation_counts": "one forward pass per rendering; no generation",
+      "known_confounds": [
+        "option-ID token prior bias (Zheng et al.)",
+        "position bias concentrated when the model is uncertain between the top two or three options (Pezeshkpour and Hruschka)",
+        "first-token probability need not match what the model would write (Wang et al.)"
+      ],
+      "disqualifying_failures": [
+        "fails Gate I1 on explicit-answer items",
+        "selected-label distribution outside the registered uniformity band on balanced banks",
+        "any label string that is not single-token under the pinned tokenizer revision"
+      ]
+    },
+    {
+      "id": "S2",
+      "name": "answer_content_logits",
+      "family": "direct answer-content logits over exact single-token answer contents",
+      "role_in_panel": "removes the label indirection while keeping a single-position read",
+      "prompt_contract": "Question stem and a fixed instruction to answer with the value only, then a fixed answer cue. Options are not shown, so no label mapping exists to be biased.",
+      "answer_position": "the single token immediately following the fixed answer cue",
+      "permitted_output": "no generated text; logits are read at one position only",
+      "scoring_equation": "argmax over the registered candidate-content token ids for that item (the correct content plus the registered distractor contents); correct if the argmax id equals the ground-truth content id",
+      "tokenization_assumptions": "every candidate content for an item must be single-token eligible under the pinned tokenizer revision, verified by a future tokenizer gate; items whose contents are not single-token eligible are excluded from this surface before any measurement, and the exclusion set is recorded",
+      "abstention_handling": "not expressible over the restricted set; an unrestricted-vocabulary variant that records whether the global argmax lies outside the candidate set is proposed as an additional descriptive diagnostic",
+      "chat_template": "same policy as S1",
+      "fair_treatment_across_checkpoints": "identical rendered bytes and identical candidate id sets for all roles",
+      "future_operation_counts": "one forward pass per rendering; no generation",
+      "known_confounds": [
+        "single-token eligibility silently restricts the answer space and can make the stratum easier than intended",
+        "frequency priors over content tokens are not removed by restriction",
+        "without options shown, the task is open-response scored closed, which is a different task from S1 and must not be pooled with it"
+      ],
+      "disqualifying_failures": [
+        "insufficient single-token eligible items to reach the registered per-cell sample size",
+        "fails Gate I2 on depth-1 primitives for the roles a later study needs"
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "content_conditional_loglikelihood",
+      "family": "conditional log-likelihood of exact option contents",
+      "role_in_panel": "the standard cloze-style comparator; the only surface that handles multi-token answers",
+      "prompt_contract": "Question stem and a fixed continuation cue, scored once per candidate content. Options are not enumerated in the prompt, so the score is independent of option order by construction.",
+      "answer_position": "the full candidate-content continuation after the cue",
+      "permitted_output": "no generated text; teacher-forced scoring only",
+      "scoring_equation": "for each candidate c, sum of log P(token_i | prefix, tokens_<i) over the tokens of c; the registered primary variant divides by the token count of c (mean log-likelihood) and the unnormalized sum is recorded as a registered secondary; both are computed from the same forward passes so no extra operations are needed; argmax over candidates",
+      "length_handling": "length normalization is a known confound that changes which candidate wins. The draft registers mean-per-token as primary and the raw sum as secondary, requires both to be reported, and requires that any stratum where the two disagree on more than a registered fraction of items be flagged as length-confounded rather than scored",
+      "tokenization_assumptions": "no single-token requirement; candidate contents must be tokenized in isolation from the prefix boundary in a registered, documented way, because leading-space handling changes token counts and therefore the normalized score",
+      "abstention_handling": "not expressible; forced choice over the candidate set",
+      "chat_template": "same policy as S1",
+      "fair_treatment_across_checkpoints": "identical prefixes, identical candidate strings, identical normalization for all roles",
+      "future_operation_counts": "one teacher-forced sequence scoring per (rendering, candidate) pair, so four times the S1 cost at four candidates; no generation",
+      "known_confounds": [
+        "length and token-count asymmetry among candidates",
+        "surface-form frequency priors",
+        "leading-whitespace and tokenizer boundary effects",
+        "the option set is never shown, so this surface cannot detect a comparison failure that only appears when options are visible"
+      ],
+      "disqualifying_failures": [
+        "primary and secondary normalizations disagree beyond the registered fraction on a gate-bearing stratum",
+        "candidate token counts cannot be balanced or covaried within a stratum"
+      ]
+    },
+    {
+      "id": "S4",
+      "name": "bounded_minimal_generation",
+      "family": "bounded minimal-answer generation, final answer only, no rationale",
+      "role_in_panel": "calibration reference only. It is explicitly not assumed to be the surface a later causal study would use, because free generation reintroduces the parsing dependence that ended Study 1.",
+      "prompt_contract": "Question stem, options if the stratum shows them, a fixed instruction that the reply must contain only the final answer, and a fixed answer cue.",
+      "answer_position": "the generated span, truncated at the registered maximum new-token budget",
+      "permitted_output": "at most a registered small number of new tokens, greedy decoding, temperature fixed at 0, no sampling, hard stop at a registered stop string; any generated rationale is a protocol violation for this surface and is scored as invalid rather than parsed",
+      "scoring_equation": "exact match of the normalized generated span against the ground-truth content or label after a registered, deterministic normalization (strip whitespace, case-fold, strip a registered set of trailing punctuation); no fuzzy matching, no regex rescue, no second-chance parse",
+      "tokenization_assumptions": "none beyond the pinned tokenizer; multi-token answers are permitted",
+      "abstention_handling": "expressible and recorded as a distinct outcome. Invalid, empty, over-budget and off-format outputs are counted separately and are never silently mapped to a wrong answer; output validity is itself an input to Gate I1",
+      "chat_template": "the instruction-tuned role plausibly requires its registered chat template for this surface to be meaningful, while the base role has none. This asymmetry is unresolved and is an operator-review item.",
+      "fair_treatment_across_checkpoints": "cannot be made perfectly fair across base and instruction-tuned checkpoints; the draft records this as a structural limitation of S4 rather than claiming parity",
+      "future_operation_counts": "one generation per rendering, each up to the registered new-token budget; the most expensive surface in the panel",
+      "known_confounds": [
+        "format compliance is confounded with task competence",
+        "instruction tuning advantages S4 independently of task ability",
+        "normalization choices silently decide borderline cases",
+        "Li et al. show multiple-choice and long-form answers correlate weakly, so S4 and S1 disagreeing is expected and is not by itself evidence that either is broken"
+      ],
+      "disqualifying_failures": [
+        "output-validity rate below the registered floor on explicit-answer items",
+        "any need for a parser more permissive than the registered normalization, which would repeat the Study 1 failure"
+      ]
+    }
+  ],
+  "interface_selection_rule": {
+    "principle": "one-way, development-only, pre-registered before any confirmation access",
+    "eligibility": "an interface is eligible only if it passes Gates I0, I1, I2 and I3 on the development bank for every checkpoint role the later study requires",
+    "ranking_among_eligible": [
+      "1. highest registered lower confidence bound on explicit-answer binding accuracy (Gate I1)",
+      "2. smallest registered maximum position-or-permutation effect (Gate I3)",
+      "3. fewest excluded items caused by the surface's own eligibility restrictions",
+      "4. lowest projected future operation count"
+    ],
+    "deterministic_tie_breaker": "if two interfaces remain tied after all four ranking criteria, select the lower interface id in the fixed registered order S1 < S2 < S3 < S4. The order is fixed in this draft, before any data exists, precisely so that it cannot be chosen later to favour an observed outcome.",
+    "confirmation_bank_prohibition": "the held-out confirmation bank must never be used to choose, rank, tune or eliminate a surface, and must be physically excluded from the execution image until selection is sealed",
+    "no_winner_this_round": true
+  },
+  "task_strata": [
+    {
+      "id": "K0",
+      "name": "deterministic_software_fixtures",
+      "depth": null,
+      "uses_model": false,
+      "data_generating_process": "hand-written and programmatically enumerated fixtures covering every renderer branch, every label permutation, every option position, and every scorer outcome including invalid output",
+      "ground_truth_function": "the fixture declares its own expected rendering and expected score",
+      "duplicate_and_leakage_prevention": "fixtures are non-evidential and are excluded from every bank by construction; fixture content may never appear in the development or confirmation banks",
+      "balance_invariants": "every label appears as the correct answer an equal number of times",
+      "expected_failure_mode": "an off-by-one in permutation application or a mislabelled ground truth",
+      "gate_role": "sole input to Gate I0"
+    },
+    {
+      "id": "K1",
+      "name": "explicit_answer_binding",
+      "depth": 0,
+      "uses_model": true,
+      "data_generating_process": "the correct content is stated verbatim in the stem, for example 'The value is 7.' followed by options containing 7 and three registered distractors; the only remaining task is to map a stated content to its label",
+      "ground_truth_function": "the stated content, by construction",
+      "duplicate_and_leakage_prevention": "item identity is the tuple of stem content and distractor set; duplicates are rejected at draw time and development and confirmation draws are disjoint by identity",
+      "balance_invariants": "correct answer appears in each of the four positions equally often; each label is correct equally often",
+      "expected_failure_mode": "a model that knows the content but cannot emit the symbol, which is precisely the multiple choice symbol binding failure",
+      "gate_role": "primary input to Gate I1"
+    },
+    {
+      "id": "K2",
+      "name": "identity_and_copy_depth0",
+      "depth": 0,
+      "uses_model": true,
+      "data_generating_process": "identity, copy, and single-element selection items over the same value domain as the primitive strata, with no arithmetic required",
+      "ground_truth_function": "deterministic identity or projection function",
+      "duplicate_and_leakage_prevention": "same identity-tuple rule as K1; disjoint from K1 content",
+      "balance_invariants": "balanced correct-answer position and label",
+      "expected_failure_mode": "surface or formatting failure rather than task failure",
+      "gate_role": "supporting input to Gate I1 and a floor for Gate I2"
+    },
+    {
+      "id": "K3",
+      "name": "depth1_primitives",
+      "depth": 1,
+      "uses_model": true,
+      "data_generating_process": "a single application of one registered primitive operation family to registered inputs; operation families may be reused from Study 2 at the abstract level only, never as item identities",
+      "ground_truth_function": "the deterministic primitive itself, computed in the harness, never parsed from text",
+      "duplicate_and_leakage_prevention": "no Study 2 item identity, frozen bank row, selected template outcome or confirmation content may be reused; new seeds are mandatory",
+      "balance_invariants": "balanced positions, labels, and operand distributions within the family",
+      "expected_failure_mode": "genuine primitive-competence shortfall, or a surface that cannot express it",
+      "gate_role": "primary input to Gate I2"
+    },
+    {
+      "id": "K4",
+      "name": "depth2_depth3_compositions",
+      "depth": [
+        2,
+        3
+      ],
+      "uses_model": true,
+      "data_generating_process": "composition of two or three registered primitives with a deterministic intermediate value that is computed but never shown; included only where the positive-control rationale and the power analysis justify the cost",
+      "ground_truth_function": "deterministic composition computed in the harness",
+      "duplicate_and_leakage_prevention": "same as K3, plus exclusion of any composition whose intermediate collides with a K3 item identity",
+      "balance_invariants": "balanced positions and labels; intermediate values balanced across the registered range",
+      "expected_failure_mode": "for the positive control, none expected; for the 1.5B roles, failure here is uninformative about the interface and must not be read as one",
+      "gate_role": "sole input to Gate I4; explicitly not an input to Gate I2"
+    },
+    {
+      "id": "K5",
+      "name": "position_and_permutation_variants",
+      "depth": "inherited",
+      "uses_model": true,
+      "data_generating_process": "each base item from K1, K2 and K3 is rendered under a counterbalanced set of label permutations and correct-answer positions; the registered default is the four cyclic permutations of the option order, which places the correct content in each of the four positions exactly once, plus one registered label-set replacement (A/B/C/D to 1/2/3/4)",
+      "ground_truth_function": "inherited from the base item and transformed by the applied permutation",
+      "duplicate_and_leakage_prevention": "variants of one base item always travel together into the same split; a base item may never straddle development and confirmation",
+      "balance_invariants": "exact counterbalance by construction, verified in Gate I0 fixtures",
+      "expected_failure_mode": "position bias and option-ID token prior bias",
+      "gate_role": "primary input to Gate I3"
+    },
+    {
+      "id": "K6",
+      "name": "rendering_variants",
+      "depth": "inherited",
+      "uses_model": true,
+      "data_generating_process": "a deliberately small registered set of knowledge-equivalent renderings of the same item: the registered default is three renderings differing only in the separator, the instruction sentence, and the answer cue. The set is kept small because every additional rendering multiplies the multiplicity correction.",
+      "ground_truth_function": "unchanged by rendering, by construction",
+      "duplicate_and_leakage_prevention": "renderings of one base item travel together into the same split",
+      "balance_invariants": "every rendering is applied to every included base item",
+      "expected_failure_mode": "rendering-sensitive accuracy of the kind Zhou et al. report for smaller models",
+      "gate_role": "secondary input to Gate I3"
+    }
+  ],
+  "bank_construction_policy": {
+    "rows_generated_this_round": 0,
+    "seeds_drawn_this_round": 0,
+    "future_seed_draw_procedure": "Seeds are drawn only under a separate future operator authority, from a registered entropy source, recorded in the run log before any item is generated, and bound into a sealed manifest together with the generator source digest. A seed that has been observed producing a bank may never be redrawn or re-rolled.",
+    "future_bank_sealing_procedure": "Generate, then hash every bank file, then record the hashes and row counts in an immutable manifest, then commit and publish the manifest, and only then is the bank usable. The confirmation bank is sealed and physically excluded from the execution image until selection is complete and a separate authority releases it.",
+    "study2_reuse_rule": "Study 3 may reuse abstract operation families only where justified in the traceability document. It may not reuse any Study 2 item identity, frozen bank row, selected template outcome, or confirmation content. New future seeds and disjoint development and confirmation banks are mandatory.",
+    "parser_dependence_rule": "Ground truth is always computed by the harness from the generating parameters. Natural language is never parsed to establish ground truth. Only S4 parses model output at all, and only with the registered deterministic normalization."
+  },
+  "checkpoint_roles": [
+    {
+      "id": "R0",
+      "name": "deterministic_non_model_oracle",
+      "is_model": false,
+      "identity": "the harness itself, executed on K0 fixtures",
+      "purpose": "establishes renderer, mapping, scorer and ground-truth integrity with no model involved",
+      "gate_role": "Gate I0",
+      "notes": "if R0 fails, no model measurement may proceed and the round stops"
+    },
+    {
+      "id": "RC",
+      "name": "explicit_answer_binding_condition",
+      "is_model": false,
+      "identity": "a condition, not a checkpoint: the K1 stratum applied to whichever model role is under test",
+      "purpose": "isolates symbol binding from task competence",
+      "gate_role": "Gate I1",
+      "notes": "listed separately because it is a control by design, not by choice of checkpoint"
+    },
+    {
+      "id": "RT",
+      "name": "target",
+      "is_model": true,
+      "identity": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+      "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+      "retention_status": "proposed for retention, subject to operator review",
+      "purpose": "the checkpoint any later target-centered causal study would use",
+      "gate_role": "Gates I1, I2, I3, I5",
+      "notes": "The draft takes the position that the target itself must clear I1 and I2 for an interface to be useful in a later target-centered causal study. An interface that cannot register the target's competence on trivial and primitive items cannot support a causal claim about the target. This is kept logically distinct from I4."
+    },
+    {
+      "id": "RL",
+      "name": "lineage_base",
+      "is_model": true,
+      "identity": "Qwen/Qwen2.5-Math-1.5B",
+      "revision": "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2",
+      "retention_status": "proposed for retention, subject to operator review",
+      "purpose": "lineage comparison; a base checkpoint with no instruction tuning",
+      "gate_role": "Gates I1, I2, I3",
+      "notes": "Its Study 2 cell that reached 44/128 must not be treated as a positive control. That cell has zero authority, arose among multiple observed control comparisons, and is a multiplicity artifact, not a demonstration of capability."
+    },
+    {
+      "id": "RI",
+      "name": "instruction_control",
+      "is_model": true,
+      "identity": "Qwen/Qwen2.5-Math-1.5B-Instruct",
+      "revision": "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35",
+      "retention_status": "proposed for retention, subject to operator review",
+      "purpose": "instruction-tuning comparison; the only 1.5B role with a native chat template",
+      "gate_role": "Gates I1, I2, I3",
+      "notes": "the only role for which S4 is straightforwardly meaningful, which is itself a finding about S4"
+    },
+    {
+      "id": "RP",
+      "name": "positive_capability_reference",
+      "is_model": true,
+      "identity": "UNSELECTED - operator review item",
+      "revision": "UNSELECTED",
+      "retention_status": "required in principle, unselected in fact",
+      "purpose": "a checkpoint independently expected to be able to perform the K4 compositional strata, so that a null there can be attributed to the interface rather than confounded with model incapability",
+      "gate_role": "Gate I4 only",
+      "notes": "No candidate is downloaded, loaded, tokenized or benchmarked in this round. Selection requires either a defensible published-capability argument or a separate prequalification stage that never inspects the Study 3 confirmation bank."
+    }
+  ],
+  "positive_reference_candidates": {
+    "selection_status": "unselected; operator-review item",
+    "hard_requirements": [
+      "pinned repository identity and immutable revision hash",
+      "license permitting research use and redistribution of derived measurements",
+      "must not be qualified, tuned or selected on the Study 3 confirmation bank",
+      "must be runnable on the registered Azure GPU route"
+    ],
+    "t4_feasibility_analysis": {
+      "device": "Tesla T4, 16 GiB, no bfloat16 tensor-core path, fp16 supported",
+      "reference_point": "a 1.5B checkpoint in fp16 needs roughly 3.1 GiB of weights and runs comfortably",
+      "class_3b": "roughly 6.2 GiB in fp16; fits with ample activation headroom; lowest risk",
+      "class_7b": "roughly 15.2 GiB in fp16, which does not leave dependable headroom for activations and KV cache on a 16 GiB T4; would require either short sequences and small batches with measured margin, or quantization",
+      "class_8b_and_above": "does not fit in fp16 on a T4",
+      "quantization_note": "int8 or 4-bit quantization changes the numerics of the very logits the interfaces read. If quantization is used it must be registered as part of the checkpoint identity and the positive control must be described as 'quantized checkpoint X', not as X.",
+      "alternative": "a larger GPU SKU on the registered Azure route removes the constraint at higher cost"
+    },
+    "candidate_families_for_operator_consideration": [
+      {
+        "family": "3B-class instruction-tuned general model",
+        "t4_fit": "comfortable in fp16",
+        "argument": "cheapest defensible option; capability on depth-2 arithmetic compositions is plausible but not established here",
+        "risk": "may itself fail K4, which would leave Gate I4 unsatisfied and stop the study"
+      },
+      {
+        "family": "7B-class instruction-tuned general or math model",
+        "t4_fit": "tight in fp16; needs measured headroom or quantization",
+        "argument": "substantially more likely to clear depth-2 and depth-3 compositions",
+        "risk": "T4 memory margin and, if quantized, altered logit numerics"
+      },
+      {
+        "family": "hosted or larger-SKU reference",
+        "t4_fit": "not applicable",
+        "argument": "removes capability doubt",
+        "risk": "cost, and a provider call is currently outside the registered route"
+      }
+    ],
+    "prequalification_stage_proposal": {
+      "name": "Stage P3-Q, positive-reference prequalification",
+      "authority": "separate operator authority, not granted by this draft",
+      "isolation_rule": "runs only on K4-shaped items drawn from a prequalification seed that is disjoint from both the development and the confirmation seeds; the confirmation bank is physically absent from the image",
+      "output": "a pass or fail per candidate on a pre-registered capability floor, and nothing else",
+      "prohibition": "may not be reported as a Study 3 result and may not influence interface selection"
+    }
+  },
+  "split_lifecycle": {
+    "splits": [
+      {
+        "id": "F",
+        "name": "implementation_fixtures",
+        "evidential": false,
+        "content": "K0 only",
+        "may_be_inspected_freely": true,
+        "purpose": "renderer, mapping and scorer verification"
+      },
+      {
+        "id": "D",
+        "name": "development_bank",
+        "evidential": true,
+        "content": "K1, K2, K3, K5, K6 and, if authorized, K4",
+        "may_be_inspected_freely": true,
+        "purpose": "all interface comparison, all surface selection, all diagnostics"
+      },
+      {
+        "id": "C",
+        "name": "confirmation_bank",
+        "evidential": true,
+        "content": "disjoint draws from the same strata as D",
+        "may_be_inspected_freely": false,
+        "purpose": "one-shot confirmation of the single development-selected interface"
+      }
+    ],
+    "ordering": [
+      "F",
+      "D",
+      "surface_selection",
+      "hard_stop",
+      "C"
+    ],
+    "surface_selection": {
+      "uses": "development bank only",
+      "one_way": true,
+      "sealed_before_confirmation": true,
+      "recorded_artifact": "a published selection record naming the interface and the ranking values that produced it"
+    },
+    "hard_stop_before_confirmation": {
+      "required": true,
+      "authority_needed": "a separate operator authority issued after the selection record is published",
+      "rationale": "prevents the selection and the confirmation from being decided in one uninterruptible run"
+    },
+    "confirmation_isolation": {
+      "required": true,
+      "one_shot": true,
+      "single_interface_only": true,
+      "physical_exclusion_before_authorization": "the confirmation bank files are absent from the execution image until the selection record is published and the separate authority is issued",
+      "no_reuse_after_observation": "once the confirmation bank has been observed under any interface it is spent; a second confirmation requires a newly generated, newly sealed bank",
+      "fail_closed": "any error, any ambiguity, any deviation from the sealed plan, or any missing counter causes the confirmation to be recorded as failed rather than retried"
+    },
+    "prevented_failure_modes": [
+      {
+        "mode": "trying several surfaces on confirmation and reporting the best",
+        "prevention": "exactly one interface is admitted to confirmation, named in a published record beforehand"
+      },
+      {
+        "mode": "changing answer mappings after observing accuracy",
+        "prevention": "the option-to-label mapping is fixed in the sealed bank manifest and is hashed"
+      },
+      {
+        "mode": "replacing failed positive controls",
+        "prevention": "the positive reference is pinned by revision before Gate I4 runs; a failed I4 stops the study and is reported as a failed gate"
+      },
+      {
+        "mode": "threshold shopping",
+        "prevention": "thresholds are frozen at protocol freeze, before any bank is generated, and are hashed into the sealed manifest"
+      },
+      {
+        "mode": "cross-stratum pooling rescue",
+        "prevention": "gates are evaluated per stratum and per role; pooling across strata is forbidden and pooled numbers are descriptive only"
+      },
+      {
+        "mode": "prompt-template rescue",
+        "prevention": "the rendering set is registered and small; adding a rendering after seeing results invalidates the round"
+      },
+      {
+        "mode": "reusing Study 2 outcomes as Study 3 selection data",
+        "prevention": "Study 2 outcomes are frozen history and are excluded from every Study 3 decision rule by construction"
+      }
+    ]
+  },
+  "gate_hierarchy": [
+    {
+      "gate_id": "I0",
+      "name": "deterministic integrity",
+      "question": "Do the renderer, the option-to-label mapping, the ground-truth function and the scorer behave exactly as specified, with no model involved?",
+      "inputs": [
+        "K0 fixtures"
+      ],
+      "model_roles": [
+        "R0"
+      ],
+      "threshold_logic": "every fixture must match its declared expectation exactly. There is no tolerance, no sampling and no statistic: the required pass rate is 100 percent of a finite enumerated set.",
+      "what_passes": "all fixtures match; the instrument is internally consistent",
+      "what_fails": "any single mismatch",
+      "merely_descriptive": "fixture timing and coverage counts",
+      "legal_next_state_on_pass": "proceed to I1",
+      "legal_next_state_on_fail": "stop; repair the harness; regenerate fixtures; rerun from I0",
+      "authorizes_mechanistic_execution": false,
+      "fail_closed": true
+    },
+    {
+      "gate_id": "I1",
+      "name": "explicit answer-to-label binding and output validity",
+      "question": "When the correct content is stated in the prompt, can each required checkpoint role emit the label that denotes it, and does it emit a valid output at all?",
+      "inputs": [
+        "K1",
+        "K2"
+      ],
+      "model_roles": [
+        "RT",
+        "RL",
+        "RI"
+      ],
+      "threshold_logic": "two conjunctive conditions per (interface, role) cell. First, an output-validity floor: the proportion of renderings producing a well-formed, in-set response must meet the registered floor; for S1, S2 and S3 this is 1.0 by construction and is therefore a check on the harness, while for S4 it is a substantive measurement. Second, a binding-accuracy floor tested as an exact one-sided binomial against H0: p <= 0.90 at the registered per-cell alpha.",
+      "proposed_numbers": {
+        "null_hypothesis": "p <= 0.90",
+        "recommended_n_per_cell": 192,
+        "recommended_alpha_per_cell": 0.005,
+        "derived_rejection_threshold_X": 184,
+        "derived_threshold_accuracy": 0.9583333333333334,
+        "derived_exact_p_at_threshold": 0.002362,
+        "derived_power_at_true_0_98": 0.9841,
+        "derived_power_at_true_0_99": 0.9998,
+        "s4_output_validity_floor": 0.95,
+        "status": "proposed, not frozen"
+      },
+      "what_passes": "both conditions hold for that (interface, role) cell",
+      "what_fails": "either condition fails; the interface is ineligible for that role",
+      "merely_descriptive": "which distractor absorbs the errors, and the selected-label distribution",
+      "legal_next_state_on_pass": "the cell proceeds to I2",
+      "legal_next_state_on_fail": "the cell is eliminated from the panel for that role. If every interface fails for a role the later study requires, the study stops and reports interface inadequacy.",
+      "authorizes_mechanistic_execution": false,
+      "fail_closed": true
+    },
+    {
+      "gate_id": "I2",
+      "name": "primitive-task headroom on content-based surfaces",
+      "question": "Does each required role clear a depth-1 primitive by a margin large enough that a later compositional design has room to detect an effect?",
+      "inputs": [
+        "K3"
+      ],
+      "model_roles": [
+        "RT",
+        "RL",
+        "RI"
+      ],
+      "threshold_logic": "exact one-sided binomial against H0: p <= 0.50 at the registered per-cell alpha. The null is deliberately far above the 0.25 forced-choice chance level, because clearing chance is not headroom; the requirement is a usable margin.",
+      "proposed_numbers": {
+        "null_hypothesis": "p <= 0.50",
+        "recommended_n_per_cell": 192,
+        "recommended_alpha_per_cell": 0.005,
+        "derived_rejection_threshold_X": 115,
+        "derived_threshold_accuracy": 0.5989583333333334,
+        "derived_exact_p_at_threshold": 0.003709,
+        "derived_power_at_true_0_75": 1.0,
+        "derived_power_at_true_0_80": 1.0,
+        "status": "proposed, not frozen"
+      },
+      "what_passes": "the role clears the primitive margin under that interface",
+      "what_fails": "it does not",
+      "merely_descriptive": "per-operation-family breakdown within K3",
+      "legal_next_state_on_pass": "the cell proceeds to I3",
+      "legal_next_state_on_fail": "the interface is ineligible for that role. A failure here is jointly attributable to interface and role and must not be reported as a capability claim about the role.",
+      "authorizes_mechanistic_execution": false,
+      "fail_closed": true
+    },
+    {
+      "gate_id": "I3",
+      "name": "position, permutation and rendering robustness",
+      "question": "Does the reading stay within a pre-specified margin when only irrelevant transformations change?",
+      "inputs": [
+        "K5",
+        "K6"
+      ],
+      "model_roles": [
+        "RT",
+        "RL",
+        "RI"
+      ],
+      "threshold_logic": "robustness is tested as equivalence, never as a failure to reject a difference. Three conjunctive conditions. (a) Paired equivalence across permutation conditions: for each pair of conditions over the same base items, an exact paired two-one-sided-test on the discordant pairs must place the accuracy difference inside the registered margin delta. (b) Maximum spread: the largest minus smallest per-condition accuracy must not exceed the registered maximum position-or-permutation effect. (c) Selected-label uniformity: on banks balanced by construction, the count of each selected label must fall inside a simultaneous exact acceptance band.",
+      "proposed_numbers": {
+        "equivalence_margin_delta": 0.05,
+        "maximum_position_or_permutation_effect": 0.05,
+        "secondary_margin_for_rendering_variants": 0.075,
+        "recommended_n_per_condition": 192,
+        "family_alpha": 0.005,
+        "multiplicity_method": "Bonferroni over the number of (interface, role, condition) cells",
+        "worked_simultaneous_bounds": [
+          {
+            "cells": 4,
+            "per_cell_alpha": 0.00125,
+            "n": 192,
+            "X": 184,
+            "clopper_pearson_lower": 0.8952
+          },
+          {
+            "cells": 8,
+            "per_cell_alpha": 0.000625,
+            "n": 192,
+            "X": 184,
+            "clopper_pearson_lower": 0.8901
+          },
+          {
+            "cells": 12,
+            "per_cell_alpha": 0.0004166666666666667,
+            "n": 192,
+            "X": 184,
+            "clopper_pearson_lower": 0.8872
+          },
+          {
+            "cells": 24,
+            "per_cell_alpha": 0.0002083333333333333,
+            "n": 192,
+            "X": 184,
+            "clopper_pearson_lower": 0.8824
+          }
+        ],
+        "label_uniformity_bands": [
+          {
+            "n": 192,
+            "per_label_alpha": 0.00125,
+            "accept_count_low": 31,
+            "accept_count_high": 68,
+            "accept_share_low": 0.16145833333333334,
+            "accept_share_high": 0.3541666666666667
+          },
+          {
+            "n": 384,
+            "per_label_alpha": 0.00125,
+            "accept_count_low": 71,
+            "accept_count_high": 123,
+            "accept_share_low": 0.18489583333333334,
+            "accept_share_high": 0.3203125
+          },
+          {
+            "n": 768,
+            "per_label_alpha": 0.00125,
+            "accept_count_low": 156,
+            "accept_count_high": 230,
+            "accept_share_low": 0.203125,
+            "accept_share_high": 0.2994791666666667
+          }
+        ],
+        "status": "proposed, not frozen"
+      },
+      "what_passes": "all three conditions hold",
+      "what_fails": "any one fails",
+      "merely_descriptive": "the direction of any position preference and the identity of the favoured label",
+      "legal_next_state_on_pass": "the interface is eligible for selection",
+      "legal_next_state_on_fail": "the interface is ineligible; a non-significant difference is never accepted as invariance",
+      "authorizes_mechanistic_execution": false,
+      "fail_closed": true
+    },
+    {
+      "gate_id": "I4",
+      "name": "positive-control compositional headroom",
+      "question": "On the compositional strata a later study would need, does an independently capable reference checkpoint clear the task under the interface?",
+      "inputs": [
+        "K4"
+      ],
+      "model_roles": [
+        "RP"
+      ],
+      "threshold_logic": "exact one-sided binomial against H0: p <= 0.25, the forced-choice chance level, at a stricter registered alpha because this gate carries the whole interpretability of a later null.",
+      "proposed_numbers": {
+        "null_hypothesis": "p <= 0.25",
+        "recommended_n_per_cell": 128,
+        "recommended_alpha_per_cell": 0.001,
+        "derived_rejection_threshold_X": 49,
+        "derived_threshold_accuracy": 0.3828125,
+        "derived_exact_p_at_threshold": 0.0006161,
+        "derived_power_at_true_0_50": 0.997,
+        "derived_power_at_true_0_60": 1.0,
+        "alternative_n_256_alpha_0_001": {
+          "X": 87,
+          "accuracy": 0.33984375,
+          "exact_p": 0.0008124
+        },
+        "status": "proposed, not frozen; conditional on a positive reference being selected"
+      },
+      "logical_separation_from_target": "I4 is deliberately evaluated on a different checkpoint from the target. It asks whether the interface can register compositional competence in something, not whether the target has it. Passing I4 says nothing about the target. Failing I4 means a later null on the target would be uninterpretable, so the study stops rather than proceeding.",
+      "what_passes": "the reference clears chance by the registered margin on K4 under the interface",
+      "what_fails": "it does not, or no positive reference was selected",
+      "merely_descriptive": "the reference's accuracy on K1 to K3",
+      "legal_next_state_on_pass": "the interface remains eligible for selection",
+      "legal_next_state_on_fail": "the study stops and reports that no interface could be shown adequate for compositional strata. Replacing a failed positive control with a different checkpoint after seeing the result is forbidden.",
+      "authorizes_mechanistic_execution": false,
+      "fail_closed": true
+    },
+    {
+      "gate_id": "I5",
+      "name": "one-shot held-out confirmation",
+      "question": "Does the single development-selected interface reproduce its I1, I2 and I3 outcomes on a sealed, never-inspected confirmation bank?",
+      "inputs": [
+        "confirmation bank draws of K1, K2, K3, K5, K6"
+      ],
+      "model_roles": [
+        "RT",
+        "RL",
+        "RI"
+      ],
+      "threshold_logic": "the same registered thresholds as I1, I2 and I3, applied once, to one interface, on a bank observed for the first and only time. No re-selection, no second interface, no retry.",
+      "proposed_numbers": {
+        "reuses": [
+          "I1",
+          "I2",
+          "I3"
+        ],
+        "n_per_cell": "operator decision; the development sizes are the proposed default",
+        "status": "proposed, not frozen"
+      },
+      "what_passes": "every reused threshold holds on the confirmation bank",
+      "what_fails": "any threshold fails, any counter is missing, or any deviation from the sealed plan occurs",
+      "merely_descriptive": "the numerical gap between development and confirmation accuracy",
+      "legal_next_state_on_pass": "STUDY3_INTERFACE_CALIBRATION_CONFIRMED for the named interface, tasks and roles, which is a new operator decision point and nothing more",
+      "legal_next_state_on_fail": "STUDY3_INTERFACE_CALIBRATION_NOT_CONFIRMED; the bank is spent; no retry",
+      "authorizes_mechanistic_execution": false,
+      "fail_closed": true
+    }
+  ],
+  "target_must_pass_i1_i2_analysis": {
+    "position": "yes, for a later target-centered causal study",
+    "argument": "A later study built on this interface would make claims about the target checkpoint. If the interface cannot register the target's competence on items where the answer is stated outright (I1) or on a single primitive (I2), then any later null on the target is uninterpretable in exactly the way Study 2's Gate A was. Requiring the target to clear I1 and I2 is therefore a precondition of interpretability, not a capability claim.",
+    "distinctness_from_i4": "I4 is evaluated on a different checkpoint and asks a different question: can the interface register compositional competence at all. The target may legitimately fail K4 while the interface remains adequate. Conflating the two would smuggle a capability claim about the target into an instrument validation.",
+    "consequence_if_target_fails_i1_or_i2_under_every_interface": "The study reports that no candidate interface was shown adequate for the target, which is a statement about the measurement panel and the target jointly, and is not evidence of model incapability."
+  },
+  "proposed_statistics": {
+    "framework": "exact binomial methods throughout; no normal approximation is used for a gate decision",
+    "all_numbers_status": "proposed or derived; none is frozen",
+    "sample_sizes": {
+      "development_per_cell_default": 192,
+      "confirmation_per_cell_default": 192,
+      "i4_per_cell_default": 128,
+      "rationale": "192 is divisible by 4, so a four-way counterbalance over label and position is exact with 48 items per position, and it is divisible by 3 so the three-rendering set is also exact at 64 items per rendering. 128 for I4 reflects the higher per-item cost of compositional items.",
+      "status": "proposed"
+    },
+    "confidence_intervals": {
+      "method": "Clopper-Pearson exact intervals",
+      "reported_for": "every gate-bearing cell",
+      "simultaneous_coverage": "Bonferroni-adjusted per-cell alpha as tabulated in Gate I3"
+    },
+    "multiplicity": {
+      "families": [
+        "interfaces",
+        "checkpoint roles",
+        "conditions within I3"
+      ],
+      "method": "Bonferroni within each gate family; gates themselves are conjunctive, so no correction is applied across gates",
+      "note": "conjunctive gates make the overall false-pass rate smaller than any single gate's alpha, and make the false-fail rate larger. The draft accepts that asymmetry deliberately: a false fail costs a redesign, a false pass costs an invalid later study."
+    },
+    "equivalence_testing": {
+      "method": "two one-sided tests, exact, on paired discordant counts",
+      "margin_delta": 0.05,
+      "principle": "a non-significant difference is never reported as invariance. Robustness must be demonstrated by an interval falling inside the margin, not by a failure to detect.",
+      "minimum_practically_important_accuracy_margin": 0.1,
+      "minimum_practically_important_robustness_margin": 0.05,
+      "mpia_rationale": "an interface whose reading moves by more than five accuracy points under a pure relabelling is not measuring the intended quantity; ten points of accuracy headroom is the smallest gap that leaves room for a later design to detect an effect without ceiling or floor artifacts."
+    },
+    "power_and_assurance": {
+      "reported_at": "the registered alternatives shown in each gate's proposed_numbers",
+      "worst_case_in_panel": "Gate I1 at n=192, alpha=0.005 has power 0.9841 against a true rate of 0.98; the same gate at n=128 falls to 0.8850, which is why 192 is the recommended default rather than 128",
+      "assurance_note": "no prior distribution over true rates is assumed; only point-alternative power is reported"
+    },
+    "deterministic_tie_breaking": {
+      "among_interfaces": "the four ranking criteria then the fixed order S1 < S2 < S3 < S4",
+      "within_scoring": "argmax ties broken by the registered label or candidate order, fixed before any measurement",
+      "principle": "no tie is ever broken by a value observed during the round"
+    },
+    "reproducible_formulas": {
+      "language": "Python standard library only; no third-party dependency",
+      "survival_function": "sf(x, n, p) = sum(comb(n, k) * p**k * (1-p)**(n-k) for k in range(x, n+1))",
+      "exact_threshold": "smallest x in 0..n such that sf(x, n, p0) <= alpha",
+      "power_at_alternative": "sf(x_threshold, n, p1)",
+      "clopper_pearson_lower": "the p solving sf(x, n, p) = alpha, obtained by bisection on (0, 1)",
+      "note": "every derived number in this draft was produced by these formulas and can be recomputed without any model, any GPU and any network access"
+    }
+  },
+  "operation_boundaries": {
+    "performed_this_round": {
+      "model_downloads": 0,
+      "weight_loads": 0,
+      "tokenizer_constructions": 0,
+      "forward_passes": 0,
+      "generations": 0,
+      "activation_operations": 0,
+      "probe_fits": 0,
+      "patching_operations": 0,
+      "ablation_operations": 0,
+      "lens_loads": 0,
+      "lens_fits": 0,
+      "lens_applies": 0,
+      "gpu_jobs": 0,
+      "provider_calls": 0,
+      "bank_rows_generated": 0,
+      "seeds_drawn": 0,
+      "scientific_evidence_rows": 0
+    },
+    "prohibited_without_new_authority": [
+      "any model download, weight load or tokenizer construction",
+      "any forward pass or generation",
+      "any activation extraction or probe",
+      "any patching, ablation or lens operation",
+      "any GPU job",
+      "any bank generation or seed draw",
+      "any evidence-ledger row",
+      "any Phase 1.0D or RQ2/S4 operation",
+      "any Study 2 state change"
+    ],
+    "projected_future_operations": {
+      "status": "PROJECTION ONLY - not an authorization, not a budget approval",
+      "assumptions": "192 base items each for K1 and K3, 128 for K2, four permutation conditions from K5 and three renderings from K6 applied to a 128-item subset; four candidate interfaces; four checkpoint roles",
+      "per_role_per_surface": {
+        "renderings": 2432,
+        "S1_forward_passes": 2432,
+        "S2_forward_passes": 2432,
+        "S3_sequence_scorings": 9728,
+        "S4_generations": 2432
+      },
+      "development_total_across_4_roles_and_4_surfaces": 68096,
+      "confirmation_projection_single_interface": "roughly 1024 renderings per role for the selected surface only",
+      "caveat": "these are arithmetic projections from the proposed sample sizes. They will change with every operator decision and must be recomputed at freeze time."
+    }
+  },
+  "compute_and_reproducibility_plan": {
+    "route": "Azure Container Registry build and Azure containerized GPU execution, as already registered",
+    "workstation_role": "inspection, editing, Git, hashing and Azure submission only",
+    "github_actions": "not used",
+    "model_and_tokenizer_pinning": "immutable revision hashes recorded in the sealed manifest before any load",
+    "image_and_dependency_locking": "image digest pinned; dependency lock file hashed into the manifest",
+    "pre_inference_sealing": "protocol, thresholds, banks and mapping are hashed and published before the first forward pass",
+    "operation_counters": "every prohibited and permitted operation family has an explicit counter emitted by the job and validated independently; a missing counter is a failure",
+    "independent_finalization_and_validation": "a finalize step recomputes every gate from raw records and must agree exactly with the job's own report",
+    "confirmation_bank_physical_exclusion": "confirmation files are absent from the build context until the separate release authority is issued",
+    "publication": "fast-forward-only push with an explicit refspec; never a force push",
+    "post_push_verification": "re-fetch and verify HEAD equals origin main, tree identity, clean worktree, and unchanged protected rollups",
+    "branch_name_handling": "local branch and worktree names are observational metadata only. Commit, tree and protected-byte identity are the authoritative gates. A branch-name-only change triggers revalidation and logging, never a block.",
+    "newline_corruption_prevention": "all authored files are written as LF bytes; recorded digests are always computed from the committed Git blob rather than the working-tree file; commits are made with core.autocrlf disabled for the operation. This is a real hazard in this repository: several protected files appear to differ locally under core.autocrlf=true while their committed blobs are byte-identical, and any check that reads the working tree instead of the blob will produce a false mismatch.",
+    "status": "design proposals only in this round"
+  },
+  "claim_ceiling": {
+    "maximum_pass_claim": "The named interface met the registered adequacy and robustness gates for the named tasks and the named checkpoint roles, under the registered conditions, on a sealed held-out bank.",
+    "maximum_fail_claim": "No candidate interface met the registered gates under the registered conditions. This is a statement about the candidate panel and the registered conditions, not about model capability.",
+    "prohibited_claims": [
+      "any claim that the model does or does not reason",
+      "any claim about internalized chain of thought",
+      "any claim that distillation did or did not transfer a causal mechanism",
+      "any claim about the existence of a task-defined intermediate variable",
+      "any claim for or against J-space or J-lens validity",
+      "any claim that Study 2 Gate A should or should not have passed",
+      "any claim of model incapability derived from an interface failure",
+      "any claim that a passing interface validates a later experimental design"
+    ],
+    "what_a_pass_permits": "only a new operator decision about whether to design a later substantive protocol",
+    "what_a_pass_does_not_permit": [
+      "reopening Study 2",
+      "authorizing Study 4 or Study 2 v2",
+      "behavioral confirmation",
+      "activation extraction",
+      "patching",
+      "probes",
+      "ablations",
+      "lens work"
+    ],
+    "study2_relationship": "Study 3 neither reopens nor revises Study 2; Study 2 remains closed at its terminal state"
+  },
+  "unresolved_operator_decisions": [
+    {
+      "id": "OD1",
+      "question": "Should Study 3 retain all three Study 2 checkpoint roles?",
+      "recommendation": "retain all three",
+      "tradeoff": "retaining all three roughly triples measurement cost and widens the multiplicity correction, but dropping the lineage base or the instruction control removes the only available contrast for distinguishing an interface effect from an instruction-tuning effect. Dropping the target is not an option if a later study is target-centered.",
+      "status": "unresolved"
+    },
+    {
+      "id": "OD2",
+      "question": "Which positive-capability reference model is defensible and T4-feasible?",
+      "recommendation": "do not select one on paper; authorize the separate Stage P3-Q prequalification with a 3B-class candidate first and a 7B-class fallback",
+      "tradeoff": "a 3B-class model fits a T4 comfortably but may itself fail the compositional strata, which would stop the study; a 7B-class model is far more likely to clear them but is tight in fp16 on 16 GiB and may require quantization that alters the logits the interfaces read. Selecting without prequalification risks discovering the failure only after the gate matters.",
+      "status": "unresolved, blocking Gate I4"
+    },
+    {
+      "id": "OD3",
+      "question": "Does bounded final-answer generation (S4) belong in the calibration panel?",
+      "recommendation": "keep it, but strictly as a calibration reference and never as the default later surface",
+      "tradeoff": "S4 is the only surface that can express abstention and the only one that measures what the model would actually write, and Wang et al. give a direct reason to care about that divergence. Against it: it cannot be made fair across base and instruction-tuned checkpoints, it is the most expensive surface, and any relaxation of its normalization would reproduce the parser dependence that ended Study 1.",
+      "status": "unresolved"
+    },
+    {
+      "id": "OD4",
+      "question": "Which prompt-rendering variants are methodologically necessary?",
+      "recommendation": "exactly three: the registered baseline plus one separator change and one instruction-wording change",
+      "tradeoff": "more renderings give a better robustness estimate and a stronger claim, but each one multiplies both cost and the multiplicity correction, and an over-large set invites the appearance of prompt shopping. Fewer than three cannot distinguish a rendering effect from noise.",
+      "status": "unresolved"
+    },
+    {
+      "id": "OD5",
+      "question": "What accuracy, robustness, equivalence and multiplicity thresholds are acceptable?",
+      "recommendation": "I1 null p<=0.90, I2 null p<=0.50, I4 null p<=0.25, equivalence margin 0.05, per-cell alpha 0.005 with Bonferroni within each gate family",
+      "tradeoff": "stricter thresholds reduce the chance of certifying an inadequate interface but raise the chance of discarding a usable one and increase required sample sizes. The proposed values are deliberately conservative because the cost of a false pass is an uninterpretable later study.",
+      "status": "unresolved"
+    },
+    {
+      "id": "OD6",
+      "question": "What development and confirmation sample sizes should be used?",
+      "recommendation": "192 per cell for development and confirmation, 128 for Gate I4",
+      "tradeoff": "192 gives power 0.98 at Gate I1 against a true rate of 0.98 and permits exact four-way and three-way counterbalancing; 128 drops I1 power to 0.885, which risks discarding an adequate interface; 256 buys little additional power at substantially higher cost.",
+      "status": "unresolved"
+    },
+    {
+      "id": "OD7",
+      "question": "Is a bounded independent methods review required before freeze?",
+      "recommendation": "yes, bounded to the statistical design and the gate logic, before any bank is generated",
+      "tradeoff": "a review costs calendar time and must be scoped tightly to avoid becoming an open-ended redesign. Against that, both prior studies terminated on instrument-level problems that a design-stage reviewer could plausibly have flagged, which is a strong argument for paying that cost once.",
+      "status": "unresolved"
+    },
+    {
+      "id": "OD8",
+      "question": "Should a chat template be applied, and to which roles?",
+      "recommendation": "no chat template for S1, S2 and S3 on any role; for S4, apply each role's native template or record its absence",
+      "tradeoff": "uniform treatment is cleaner for comparability but disadvantages the instruction-tuned role on generation; native templates are fairer per role but make cross-role comparison partly a comparison of templates. This asymmetry cannot be fully resolved and must be declared either way.",
+      "status": "unresolved"
+    }
+  ],
+  "results": [],
+  "bank_rows": []
+}

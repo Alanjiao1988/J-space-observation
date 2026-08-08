@@ -3023,3 +3023,69 @@ this terminalization grants no execution authority of any kind.
 The charter, the machine-readable charter and the bootstrap handoff receipt were
 deliberately left unedited and are labeled historical records rather than current
 state, so that the opening record of the study stays legible next to its closure.
+
+
+## D38 - Open Study 3 as an interface-adequacy and label-binding calibration design draft, and correct a Study 2 terminal changed-path count
+
+**Date:** 2026-08-08
+**Status:** Design draft awaiting operator review. Not frozen. Not authorized to execute.
+
+Study 1 closed at `INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY` and Study 2 closed
+at `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`. Both terminated on
+tooling-adjacent grounds rather than on an answered scientific question, and in both
+cases the record could not separate an incapable checkpoint from an inadequate
+measurement interface, because neither protocol ever measured whether its own
+response and scoring interface could recover competence that was independently known
+to be present. D38 opens a third, isolated study whose object of measurement is that
+interface itself.
+
+The registered Study 3 question is whether a pre-specified response and scoring
+interface can recover deliberately trivial and primitive task competence robustly
+across answer-label permutations, option positions and prompt renderings, at a
+pre-registered adequacy level, on the same three checkpoints Study 2 registered.
+Study 3 explicitly does not ask whether any checkpoint reasons, whether an internal
+state is causal, whether Study 2's Gate A outcome was correct, or whether any
+interface is "the right one" in general. A negative Study 3 outcome would license no
+claim about model capability, and a positive outcome would license no claim about
+reasoning; the design carries an explicit claim ceiling to that effect.
+
+Four candidate interface surfaces are carried forward without a winner: `S1`
+label-token logits, retained solely as the Study 2 legacy comparator; `S2`
+answer-content logits; `S3` content-conditional log-likelihood; and `S4` bounded
+minimal generation, admissible only as a calibration reference. Selection among them
+is deferred to a later, separately authorized round, and a deterministic tie-break
+order (`S1 < S2 < S3 < S4`) is registered now so that the choice cannot be made after
+seeing outcomes. Six fail-closed gates `I0`-`I5` are registered, none of which
+authorizes mechanistic execution; the highest gate that can be reached still leaves
+Gate A, Stage B-C, weight loading, forward passes, generation, activation
+extraction, probing, patching, ablation and every lens operation unauthorized.
+
+The central methodological commitment is a mandatory non-model oracle role (`R0`)
+plus an explicit-binding condition (`RC`), so that an interface failure can be
+distinguished from a task-construction failure before any checkpoint is consulted.
+The design also registers a positive-capability reference role (`RP`) but leaves it
+`UNSELECTED`, because choosing it is a scientific decision reserved to the operator;
+gate `I4` is blocked until that decision is made. Eight operator decisions `OD1`-`OD8`
+are recorded as open, three of them blocking.
+
+This round performed zero scientific operations. No model was downloaded or loaded,
+no tokenizer was constructed, no forward pass, generation, activation extraction,
+probe, patch, ablation, lens operation, GPU job or provider call occurred, no seed
+was drawn, no task-bank row was written, no interface was selected, and no evidence
+row was created; `paper/evidence_ledger.csv` still ends at `EV-0016`. All statistical
+quantities in the draft - exact binomial acceptance thresholds, power values,
+Clopper-Pearson bounds and label-uniformity bands - were derived by model-free
+arithmetic and are design parameters, not measurements. Both protected Phase 1.0D
+rollups and every Study 2 terminal artifact retain their registered bytes.
+
+Separately and first, in its own single-path commit, this round corrected a clerical
+error in the Study 2 terminalization run-log entry, which described its own change
+set as fourteen paths with ten modified when the commit in fact touched fifteen paths
+with eleven modified, having omitted `docs/decision_log.md` from its own list. The
+correction is bookkeeping only under substate
+`STUDY2_TERMINAL_CHANGED_PATH_BOOKKEEPING_CORRECTED`: no Study 2 scientific content,
+threshold, count, seal, hash or conclusion changed, and the Gate A outcome and the
+Study 2 terminal state are untouched.
+
+The only legal next action for Study 3 is operator review of the draft and of the
+eight open decisions. Approval of this design would not itself authorize execution.

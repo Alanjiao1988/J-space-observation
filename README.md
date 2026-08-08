@@ -1,6 +1,6 @@
 # J-space observation
 
-本仓库研究 DeepSeek-R1 蒸馏小模型是否形成可观察、可干预、具有因果作用的内部推理状态。项目现已明确划分为两个相互隔离的研究：已经关闭的 **Study 1**，以及同样已经关闭的 **Study 2**（protocol v1 在前瞻注册的 development feasibility gate 上失败）。两项研究都没有回答各自的原始科学问题。
+本仓库研究 DeepSeek-R1 蒸馏小模型是否形成可观察、可干预、具有因果作用的内部推理状态。项目现已明确划分为三个相互隔离的研究：已经关闭的 **Study 1**，同样已经关闭的 **Study 2**（protocol v1 在前瞻注册的 development feasibility gate 上失败），以及新建的 **Study 3**（仅为设计草案，等待 operator review）。Study 1 与 Study 2 都没有回答各自的原始科学问题；Study 3 尚未执行任何测量。
 
 ## 当前状态
 
@@ -8,6 +8,9 @@
 |---|---|---|---|
 | Study 1 | `CLOSED / INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY` | 工程链和证据封存完成，但原始科学问题未被检验 | [Study 1 总结](studies/study1/README.md) |
 | Study 2 | `CLOSED / STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY` | 前瞻注册的 Gate A 在 development 阶段失败；原始研究问题未被回答；B-C 与全部机制阶段从未打开 | [Study 2 终态清单](studies/study2/terminal_manifest.json) · [Study 2 终态 handoff](studies/study2/STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md) |
+| Study 3 | `DESIGN DRAFT / STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW` | 仅为设计草案：未冻结、未授权执行、零模型操作、无 bank、无 seed、未选定 interface | [Study 3 索引](studies/study3/README.md) · [协议草案](studies/study3/protocol/interface_calibration_protocol_draft.md) · [operator 决策](studies/study3/NEXT_THREAD_HANDOFF.md) |
+
+Study 3 是一个**设计状态**，不是结果。它把「响应与打分接口」本身当作被测对象，因为 Study 1 与 Study 2 都在不同程度上终止于工具层面的问题。Study 3 未修改、未重开、未重新解释 Study 1 或 Study 2 的任何冻结产物，也没有复用它们的任何 item identity、bank row、template outcome、confirmation content、seed 或结果。
 
 Study 1 的终态基线是 commit `6409d2c6d665187e4459d94d490a20d7b085e8af`、tree `bc8b80cb0e66f9426dcdedd52b624c892caa3fc9`。旧文件保持原路径和原字节；新的 `studies/study1/` 只是索引层，不重写历史证据。
 

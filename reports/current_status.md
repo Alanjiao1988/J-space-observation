@@ -1,5 +1,35 @@
 # Project Status Report
 
+> **Study 3 interface-calibration design draft — 2026-08-08**
+>
+> **Study 3 state:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_COMPLETE_AWAITING_OPERATOR_REVIEW`
+>
+> A new study namespace, `studies/study3`, now holds a reviewable design draft for
+> **Study 3 — Interface Adequacy and Label-Binding Calibration**. It asks whether a
+> pre-specified response and scoring interface can recover deliberately trivial,
+> primitive, and independently demonstrated task competence robustly across
+> answer-label permutations, option positions and prompt renderings.
+>
+> **This is a design state only.** Nothing is frozen. Nothing is authorized to
+> execute. Zero model operations were performed: no download, no weight load, no
+> tokenizer construction, no forward pass, no generation, no activation
+> extraction, no probe, no patch, no ablation, no lens operation, no GPU job. No
+> seed was drawn, no task-bank row exists, no interface was selected, and no
+> evidence row was created. `paper/evidence_ledger.csv` still ends at `EV-0016`.
+>
+> **Both prior terminal states are unchanged.** Study 1 remains closed at
+> `INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY`. Study 2 remains closed at
+> `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY` with documentation state
+> `STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE`. No Study 2 scientific
+> artifact was modified; only a clerical changed-path count in the Study 2
+> terminal run-log prose was corrected, in its own separate commit, under substate
+> `STUDY2_TERMINAL_CHANGED_PATH_BOOKKEEPING_CORRECTED`.
+>
+> The only legal next action for Study 3 is operator review. See
+> [`studies/study3/NEXT_THREAD_HANDOFF.md`](../studies/study3/NEXT_THREAD_HANDOFF.md).
+>
+> **Everything below this notice is prior status and remains historical.**
+
 > **Study 2 protocol v1 terminalization — 2026-08-08**
 >
 > **Study 2 terminal state:** `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`

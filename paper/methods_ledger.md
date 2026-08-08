@@ -1588,3 +1588,52 @@ or implied, and it changes no decision. It is admissible only as a limitation
 (L-89) and as exploratory context for a future, separately authorized protocol
 version. Validation of the terminalization used CPU-only ACR runs on committed
 bytes; local pytest was not used and would carry no evidential weight.
+
+
+## M-26 - Model-free derivation of Study 3 interface-calibration design parameters
+
+**Date:** 2026-08-08
+**Applies to:** `studies/study3/protocol/interface_calibration_protocol_draft.md`,
+`studies/study3/protocol/interface_calibration_protocol_draft.json`
+**Status:** Design parameters, not measurements. Draft, not frozen.
+
+Every numeric quantity in the Study 3 design draft was derived by exact,
+model-free arithmetic on the Python standard library, before any interface,
+checkpoint, task bank or seed exists, and none of it is a measurement. No model was
+downloaded or loaded, no tokenizer was constructed, no forward pass or generation
+was run, no GPU job or provider call was issued, and no observation of any kind
+entered the derivation.
+
+Acceptance thresholds for the pre-registered one-sided exact binomial tests were
+computed with `math.comb` as the smallest count whose exact upper-tail probability
+under the registered null falls at or below the registered alpha. Gate `I1` uses
+H0 p <= 0.90 at n = 192 and alpha = 0.005, giving an acceptance count of 184 and an
+exact tail probability of 2.362e-3; the same construction at n = 128 was rejected
+during design because its power at a true rate of 0.98 is only 0.885 against 0.984
+at n = 192. Gate `I2` uses H0 p <= 0.50 at n = 192 and alpha = 0.005, giving 115.
+Gate `I4` uses H0 p <= 0.25 at n = 128 and alpha = 0.001, giving 49 with an exact
+tail of 6.161e-4 and power 0.997 at a true rate of 0.50. Power figures are exact
+binomial sums, not normal or simulation approximations.
+
+Robustness reporting uses two-sided Clopper-Pearson bounds inverted from the same
+exact binomial family; the registered per-cell lower bounds at n = 192 with 184
+successes are 0.8952, 0.8901, 0.8872 and 0.8824 for 4, 8, 12 and 24 cells. Label
+selection-uniformity acceptance bands are exact central binomial intervals at a
+Bonferroni-corrected alpha of 0.005 divided by 4, giving [31, 68] at n = 192,
+[71, 123] at n = 384 and [156, 230] at n = 768. The equivalence margin, the
+accuracy margin and the robustness margin are registered design choices, not
+estimates.
+
+The projected rendering counts in the draft - 2,432 renderings per role per surface
+and 68,096 across four roles and four surfaces at development scale - are
+combinatorial projections of a design that has not been authorized to run. They
+describe work that would be required if execution were later approved, and they
+must not be read as work performed.
+
+Because these are design parameters rather than results, they carry no evidence row
+and no p-value is reported for any observation. Sample sizes and thresholds remain
+open operator decisions (`OD5`, `OD6`); the values above are recommendations with
+their power consequences made explicit, not commitments. Validation of the round
+used CPU-only Azure ACR runs against committed bytes, including a static structural
+instrument that was deliberately not committed; local pytest was not used and would
+carry no evidential weight.
