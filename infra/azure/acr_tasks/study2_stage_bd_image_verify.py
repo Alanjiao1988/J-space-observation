@@ -48,7 +48,7 @@ def main() -> int:
     frozen = bd.verify_frozen_inputs(root)
     items = bd.load_development_bank(root)
     manifest = bd.build_shard_manifest(items)
-    if len(items) != bd.ITEM_COUNT:
+    if len(items) != bd.DEVELOPMENT_ITEMS:
         raise SystemExit(f"development bank holds {len(items)} items")
     if len(manifest["shards"]) != bd.SHARD_COUNT:
         raise SystemExit(f"shard manifest holds {len(manifest['shards'])} shards")
