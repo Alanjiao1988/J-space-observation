@@ -45,6 +45,8 @@ RECALC_SCRIPT = os.path.join(
 RECALC_TABLES = os.path.join(
     REPO_ROOT, "studies", "study3", "analysis",
     "independent_methods_recalculation_tables.json")
+RECEIPT = os.path.join(
+    REPO_ROOT, "studies", "study3", "methods_review_receipt_v0_2.json")
 DRAFTING_SCRIPT_BASENAME = "design_statistics"
 
 PERMITTED_DISPOSITIONS = (
@@ -972,3 +974,261 @@ def test_the_review_did_not_edit_the_review_object(review):
     assert hashlib.sha256(payload).hexdigest() == design_test["sha256"], (
         "tests/test_study3_design.py was modified; the review object must not "
         "be repaired by its reviewer")
+
+
+# --------------------------------------------------------------------------
+# Publication-state checks
+#
+# These carry decision authority: publication is conditional on them, so they
+# live in a committed test rather than in an operator-side helper script.
+# --------------------------------------------------------------------------
+
+STARTING_COMMIT = "8a2c4a0b2a73c5d802988333f11ea6c22828f6f5"
+
+CHANGED_PATH_WHITELIST = frozenset([
+    # the eight new files
+    "studies/study3/reviews/v0_2_independent_methods_review.md",
+    "studies/study3/reviews/v0_2_independent_methods_review.json",
+    "studies/study3/reviews/v0_2_independent_methods_review.schema.json",
+    "studies/study3/analysis/independent_methods_recalculation.py",
+    "studies/study3/analysis/independent_methods_recalculation_tables.json",
+    "tests/test_study3_methods_review.py",
+    "studies/study3/prompts/study3_v0_2_independent_methods_review_authority.md",
+    "studies/study3/methods_review_receipt_v0_2.json",
+    # the nine modifiable routing and registry surfaces
+    "README.md",
+    "studies/README.md",
+    "studies/study3/README.md",
+    "studies/study3/NEXT_THREAD_HANDOFF.md",
+    "reports/current_status.md",
+    "docs/decision_log.md",
+    "docs/run_log.md",
+    "paper/methods_ledger.md",
+    "paper/artifact_index.csv",
+])
+
+PROTECTED_FROM_THIS_ROUND = (
+    "paper/evidence_ledger.csv",
+    "paper/limitations_ledger.md",
+    "paper/claim_evidence_matrix.md",
+    "docs/phase1_0d_protected_bytes.json",
+    "docs/phase1_0d_rv2_protected_bytes.json",
+    "tests/test_study3_design.py",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json",
+    "studies/study3/protocol/interface_calibration_protocol_draft.md",
+    "studies/study3/protocol/interface_calibration_protocol.schema.json",
+    "studies/study3/analysis/design_statistics.py",
+    "studies/study3/analysis/design_statistics_tables.json",
+    "studies/study3/analysis/independent_methods_review_packet.md",
+    "studies/study3/analysis/study2_to_study3_design_traceability.md",
+    "studies/study3/references/methods_sources.md",
+    "studies/study3/references/positive_reference_dossier.md",
+    "studies/study3/reviews/v0_1_operator_review.md",
+    "studies/study3/design_receipt.json",
+    "studies/study3/design_receipt_v0_2.json",
+    "requirements.lock.txt",
+)
+
+
+@pytest.fixture(scope="module")
+def receipt():
+    with open(RECEIPT, "r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def _starting_commit_is_reachable() -> bool:
+    completed = subprocess.run(
+        ["git", "-C", REPO_ROOT, "cat-file", "-e", STARTING_COMMIT + "^{commit}"],
+        capture_output=True)
+    return completed.returncode == 0
+
+
+def test_the_changed_path_set_is_inside_the_authority_whitelist():
+    """The authority caps this round at 17 paths: 8 added, 9 modifiable."""
+    if not _starting_commit_is_reachable():
+        pytest.skip("starting commit not present in this clone")
+    completed = subprocess.run(
+        ["git", "-C", REPO_ROOT, "diff", "--name-only", STARTING_COMMIT, "HEAD"],
+        capture_output=True)
+    assert completed.returncode == 0, completed.stderr.decode()
+    changed = [line for line in completed.stdout.decode("utf-8").splitlines()
+               if line.strip()]
+    outside = sorted(set(changed) - CHANGED_PATH_WHITELIST)
+    assert not outside, "changed paths outside the whitelist: %s" % outside
+    assert len(changed) <= 17, (
+        "%d paths changed; the authority caps the round at 17" % len(changed))
+
+
+def test_no_protected_path_was_touched_by_this_round():
+    """Recording a defect is permitted; repairing the object is not."""
+    if not _starting_commit_is_reachable():
+        pytest.skip("starting commit not present in this clone")
+    completed = subprocess.run(
+        ["git", "-C", REPO_ROOT, "diff", "--name-only", STARTING_COMMIT, "HEAD"],
+        capture_output=True)
+    changed = set(completed.stdout.decode("utf-8").splitlines())
+    for path in PROTECTED_FROM_THIS_ROUND:
+        assert path not in changed, "%s must not be modified by this round" % path
+    for path in changed:
+        assert not path.startswith("studies/study1/"), path
+        assert not path.startswith("studies/study2/"), path
+        assert not path.startswith(".github/"), path
+        assert not path.startswith("infra/"), path
+
+
+def test_the_artifact_index_is_unique_contiguous_and_binds_real_blobs():
+    """AR ids must be unique and gapless, and each digest must be a real blob."""
+    payload = _committed_bytes("paper/artifact_index.csv").decode("utf-8")
+    lines = [line for line in payload.splitlines() if line.strip()]
+    header = lines[0].split(",")
+    assert header[0] == "artifact_id"
+    columns = {name: index for index, name in enumerate(header)}
+
+    ids = []
+    rows_by_id = {}
+    for line in lines[1:]:
+        fields = line.split(",")
+        assert len(fields) == len(header), line
+        ids.append(fields[columns["artifact_id"]])
+        rows_by_id[fields[columns["artifact_id"]]] = fields
+
+    assert len(ids) == len(set(ids)), "duplicate artifact ids"
+    numbers = [int(value.split("-")[1]) for value in ids]
+    assert numbers == sorted(numbers), "artifact ids are not in order"
+    assert numbers == list(range(numbers[0], numbers[0] + len(numbers))), (
+        "artifact ids are not contiguous")
+    assert ids[-1] == "AR-0221", "this round must end the index at AR-0221"
+
+    for number in range(212, 222):
+        artifact_id = "AR-%04d" % number
+        assert artifact_id in rows_by_id, "%s is not registered" % artifact_id
+        fields = rows_by_id[artifact_id]
+        location = fields[columns["storage_location"]]
+        assert location.startswith("repo:"), location
+        path = location[len("repo:"):]
+        blob = _committed_bytes(path)
+        assert hashlib.sha256(blob).hexdigest() == fields[columns["sha256"]], (
+            "%s digest does not match the committed blob for %s"
+            % (artifact_id, path))
+        assert len(blob) == int(fields[columns["bytes"]]), (
+            "%s byte count does not match the committed blob for %s"
+            % (artifact_id, path))
+        usage = fields[columns["paper_usage"]]
+        assert usage.endswith("_not_result"), (
+            "%s must not be classified as a scientific result" % artifact_id)
+
+
+def test_the_earlier_registrations_were_not_altered(review):
+    """D39, M-27 and AR-0196..AR-0211 belong to the round under review."""
+    payload = _committed_bytes("paper/artifact_index.csv").decode("utf-8")
+    lines = [line for line in payload.splitlines() if line.strip()]
+    for number in range(196, 212):
+        artifact_id = "AR-%04d" % number
+        matches = [line for line in lines
+                   if line.split(",")[0] == artifact_id]
+        assert len(matches) == 1, artifact_id
+        assert "STUDY3-DESIGN" in matches[0], (
+            "%s changed phase; prior registrations are immutable here"
+            % artifact_id)
+
+    decisions = _committed_bytes("docs/decision_log.md").decode("utf-8")
+    assert decisions.count("\n## D39 - ") == 1
+    assert decisions.count("\n## D40 - ") == 1
+    methods = _committed_bytes("paper/methods_ledger.md").decode("utf-8")
+    assert methods.count("\n## M-27 - ") == 1
+    assert methods.count("\n## M-28 - ") == 1
+
+
+def test_the_evidence_ledger_is_untouched_at_ev_0016(receipt):
+    """A methods review produces no evidence row, by construction."""
+    payload = _committed_bytes("paper/evidence_ledger.csv")
+    recorded = receipt["protected_state"]["evidence_ledger"]
+    assert len(payload) == recorded["bytes"]
+    assert hashlib.sha256(payload).hexdigest() == recorded["sha256"]
+    rows = [line for line in payload.decode("utf-8").splitlines() if line.strip()]
+    assert len(rows) - 1 == recorded["data_rows"]
+    assert rows[-1].split(",")[0] == "EV-0016"
+
+
+def test_both_protected_rollups_are_unchanged(receipt):
+    """The two Phase 1.0D rollup records are frozen state from earlier rounds."""
+    for recorded in receipt["protected_state"]["protected_rollups"]:
+        payload = _committed_bytes(recorded["path"])
+        assert len(payload) == recorded["bytes"], recorded["path"]
+        assert hashlib.sha256(payload).hexdigest() == recorded["sha256"], (
+            recorded["path"])
+        document = json.loads(payload.decode("utf-8"))
+        assert document["rollup_sha256"] == recorded["rollup_sha256"]
+        assert document["file_count"] == recorded["file_count"]
+        assert document["file_count"] == len(document["files"])
+
+
+def test_the_receipt_binds_every_new_artifact_and_omits_its_own_hash(receipt):
+    """A receipt that hashed itself would be either stale or circular."""
+    assert receipt["new_artifact_identities"]["self_hash_in_body"] is False
+    body = json.dumps(receipt, sort_keys=True)
+    own = hashlib.sha256(_committed_bytes(
+        "studies/study3/methods_review_receipt_v0_2.json")).hexdigest()
+    assert own not in body, "the receipt contains its own digest"
+
+    artifacts = receipt["new_artifact_identities"]["artifacts"]
+    assert [row["artifact_id"] for row in artifacts] == [
+        "AR-%04d" % number for number in range(212, 219)]
+    for row in artifacts:
+        payload = _committed_bytes(row["path"])
+        assert len(payload) == row["bytes"], row["path"]
+        assert hashlib.sha256(payload).hexdigest() == row["sha256"], row["path"]
+
+    for row in receipt["reviewed_artifact_identities"]:
+        payload = _committed_bytes(row["path"])
+        assert len(payload) == row["bytes"], row["path"]
+        assert hashlib.sha256(payload).hexdigest() == row["sha256"], row["path"]
+
+
+def test_the_receipt_and_the_review_agree_on_the_disposition(review, receipt):
+    assert receipt["disposition"] == review["disposition"]
+    assert receipt["state"] == review["state"]
+    assert receipt["required_changes_exist"] == review["required_changes_exist"]
+    assert (receipt["remaining_authority"]["next_legal_action"]
+            == review["next_legal_action"]["action_id"])
+
+
+def test_the_receipt_grants_no_authority(receipt):
+    """Every authority flag in the receipt must be negative."""
+    remaining = receipt["remaining_authority"]
+    assert remaining["this_round_grants"] == "none"
+    for key, value in remaining.items():
+        if key.endswith("_authorized"):
+            assert value is False, "%s is set" % key
+    for key, value in receipt["zero_operation_attestation"].items():
+        if isinstance(value, int) and not isinstance(value, bool):
+            assert value == 0, "%s is %r" % (key, value)
+    assert receipt["publication"]["force_push_used"] is False
+    assert receipt["publication"]["github_actions_used"] is False
+    assert receipt["publication"]["merge_or_rebase_used"] is False
+
+
+def test_no_new_file_declares_an_operation_or_an_authority():
+    """A static scan of the round's own new bytes for prohibited state."""
+    prohibited = (
+        re.compile(r'"(frozen|freeze_authorized|execution_authorized|'
+                   r'bank_construction_authorized|seed_draw_authorized|'
+                   r'interface_selection_authorized|'
+                   r'positive_reference_selection_authorized|'
+                   r'azure_gpu_authorized|approved_for_freeze|'
+                   r'approved_for_execution)"\s*:\s*true'),
+        re.compile(r'"(forward_passes|generations|weight_loads|'
+                   r'tokenizer_constructions|model_downloads|gpu_jobs|'
+                   r'bank_rows_created|seeds_drawn|activation_extractions|'
+                   r'probe_fits|patching_operations|ablation_operations|'
+                   r'lens_operations|confirmation_accesses|'
+                   r'gate_evaluations_on_models)"\s*:\s*(?!0\b)\d+'),
+    )
+    for path in ("studies/study3/reviews/v0_2_independent_methods_review.json",
+                 "studies/study3/methods_review_receipt_v0_2.json",
+                 "studies/study3/analysis/"
+                 "independent_methods_recalculation_tables.json"):
+        text = _committed_bytes(path).decode("utf-8")
+        for pattern in prohibited:
+            match = pattern.search(text)
+            assert match is None, "%s declares %r" % (path, match.group(0))
