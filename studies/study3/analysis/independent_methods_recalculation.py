@@ -155,7 +155,6 @@ TRINOMIAL_WINDOW_SIGMA = 10.0
 TRINOMIAL_WINDOW_PAD = 8
 
 CALIBRATION_TARGETS = ((Fraction("0.10"), 192), (Fraction("0.10"), 384))
-CALIBRATION_COARSE_GRID_POINTS = 32
 CALIBRATION_Z_TOLERANCE = 1e-4
 CALIBRATION_Z_MAX_ITERATIONS = 24
 
@@ -729,7 +728,11 @@ def paired_size_supremum(pairs: int, margin: float, critical_value: float,
     if lattice is None:
         lattice = paired_rejection_lattice(pairs, margin, critical_value)
     if coarse_points is None:
-        coarse_points = NUISANCE_COARSE_GRID_POINTS
+        # The boundary rejection probability is not smooth in the nuisance
+        # parameter: it steps as lattice points enter and leave the region, with
+        # a characteristic scale of about 1/n. A grid coarser than that can walk
+        # straight past the maximum, so the resolution is tied to n.
+        coarse_points = max(NUISANCE_COARSE_GRID_POINTS, 2 * pairs)
     upper_bound = (1.0 - margin) / 2.0
     grid = [upper_bound * index / coarse_points
             for index in range(coarse_points + 1)]
@@ -769,6 +772,7 @@ def paired_size_supremum(pairs: int, margin: float, critical_value: float,
     return {
         "converged": converged,
         "golden_iterations": iterations,
+        "coarse_grid_points": coarse_points,
         "nuisance_at_supremum": best_point,
         "discordance_at_supremum": 2.0 * best_point + margin,
         "coarse_grid_maximum": coarse_best,
@@ -792,8 +796,7 @@ def calibrate_paired_critical_value(pairs: int, margin: float,
         if not lattice:
             return 0.0
         return paired_size_supremum(
-            pairs, margin, value, lattice=lattice,
-            coarse_points=CALIBRATION_COARSE_GRID_POINTS)["size_supremum"]
+            pairs, margin, value, lattice=lattice)["size_supremum"]
 
     baseline = supremum(low)
     if baseline <= nominal_alpha:
@@ -910,12 +913,14 @@ def validate_clopper_pearson_family() -> dict:
                                   abs(limit ** trials - alpha))
     for alpha in (0.05, 0.01, 0.005, 0.00125, 0.000625):
         limit = clopper_pearson_lower_limit(184, 192, alpha)
-        if previous is not None and limit < previous - 1e-15:
-            worst_monotone = max(worst_monotone, previous - limit)
+        # A smaller one-sided alpha buys a wider interval, so the lower limit
+        # must be non-increasing as alpha decreases. An increase is the error.
+        if previous is not None and limit > previous + 1e-15:
+            worst_monotone = max(worst_monotone, limit - previous)
         previous = limit
     return {
         "inversion_max_abs_deviation": worst_inversion,
-        "monotone_in_alpha_max_violation": worst_monotone,
+        "monotone_decreasing_in_decreasing_alpha_max_violation": worst_monotone,
         "note": ("the lower limit is defined by P(X >= x | limit) = alpha; "
                  "the check re-evaluates that tail at the returned limit"),
     }
@@ -1235,6 +1240,13 @@ def build_paired_tables() -> dict:
                 "discordance_at_supremum": _round(
                     supremum["discordance_at_supremum"], NUISANCE_DECIMALS),
                 "coarse_grid_maximum": _round(supremum["coarse_grid_maximum"]),
+                "nuisance_grid_points": supremum["coarse_grid_points"],
+                "supremum_is_a_lower_bound": True,
+                "inference_direction": ("a finite grid can only bound the "
+                                        "supremum from below, so an exceedance "
+                                        "found here is real while the absence "
+                                        "of one is never proof of size "
+                                        "control"),
                 "golden_section_converged": supremum["converged"],
                 "golden_section_iterations": supremum["golden_iterations"],
                 "exceeds_nominal_one_sided_alpha":
@@ -1304,6 +1316,9 @@ def build_paired_tables() -> dict:
             "nuisance_optimisation": {
                 "domain": NUISANCE_DOMAIN_NOTE,
                 "coarse_grid_points": NUISANCE_COARSE_GRID_POINTS,
+                "coarse_grid_points_rule": ("max(64, 2n), so that the grid is "
+                                            "finer than the 1/n scale on which "
+                                            "the lattice region changes"),
                 "bracketing": "coarse argmax with its two neighbours",
                 "refinement": "golden-section search",
                 "tolerance": NUISANCE_GOLDEN_TOLERANCE,
