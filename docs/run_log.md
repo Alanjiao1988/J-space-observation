@@ -5399,6 +5399,44 @@ Each of these cost a run and none of them changed a scientific byte:
 - `low_cpu_mem_usage=True` requires `accelerate`, deliberately absent from the
   sealed image; the flag was removed rather than the dependency added.
 
+### Final validation before publication
+
+Run at commit `4fa63c93fbdfe396c01eeba2722c1fa00428bff0`, tree
+`b2dba5aae116ce011ab6561c70222c2df9639404`, each ACR task cloning the commit
+from a bundle and reporting `DIRTY=0`:
+
+| ACR run | scope | result |
+| --- | --- | --- |
+| `ca26` | focused `test_study2_stage_bd.py`, `test_paper_registries.py`, `test_study2_stage_t.py` | 54 passed |
+| `ca27` | full repository suite | 3664 passed, 15 skipped, 2 accepted historical `test_parser_v3_seal_job` failures |
+| `ca28` | `validate_study2_stage_t.py` over the committed Stage T pack | `STAGE_T_VALIDATION_OK=1`, core manifest `6dec7650a05533efc5d88ba9ac1e3a498ca977a091a25b52155bbdb452622815` |
+| `ca29` | `validate_study2_stage_bd.py` over the committed Stage B-D pack | `certified: true`, 3072 rows, `overall_gate_pass: false` |
+
+`ca28` reproduced the Stage T pack without constructing a tokenizer: that
+validator loads no model and no tokenizer and only re-reads sealed bytes.
+`ca29` recertified the committed pack rather than the registry copy, which
+proves the commit carries the exact Azure bytes.
+
+Both Phase 1.0D rollups were rechecked and are unchanged:
+`PROTECTED_ROLLUP_SHA256=436ed331c7dd53fa6387d6b52447bc72edf166bbb3640b7f7723a8766bdf51dd`
+over 152 files and
+`RV2_PROTECTED_ROLLUP_SHA256=ef5a417c572f7da94a562411b752d74b48da2e28aa3aa1491db9bc34dfbde82a`
+over 36 files. `paper/evidence_ledger.csv` is byte-identical at 25,241 bytes,
+`3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1`, still
+ending at `EV-0016`.
+
+One observation worth recording for future Windows rounds: the workstation
+checkout reports nine protected anchors as differing, because `core.autocrlf`
+is `true` and those files carry no `.gitattributes` entry, so the working copy
+holds CRLF while the committed blob holds LF. All nine match their committed
+blobs exactly, and the Linux ACR checkout verifies them without complaint.
+Protected-byte identity is a property of the committed blobs, not of a
+platform-specific working copy, and no anchor was edited to resolve this.
+
+The run IDs for the confirming reruns at the actual publication commit, which
+differs from `4fa63c93` only by this section, are reported in the Stage B-D
+closure response.
+
 ### Result
 
 Gate A returned `overall_gate_pass = false` on target counts of 25/128
