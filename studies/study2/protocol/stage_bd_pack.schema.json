@@ -1,0 +1,1858 @@
+{
+ "$defs": {
+  "arm": {
+   "enum": [
+    "NT",
+    "PT",
+    "ST",
+    "WT"
+   ],
+   "type": "string"
+  },
+  "attempt_entry": {
+   "additionalProperties": false,
+   "properties": {
+    "attempt": {
+     "maximum": 3,
+     "minimum": 1,
+     "type": "integer"
+    },
+    "attempt_id": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "elapsed_seconds_bucket": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "outcome": {
+     "enum": [
+      "complete",
+      "retried"
+     ],
+     "type": "string"
+    },
+    "retry_reason": {
+     "type": "string"
+    },
+    "row_count": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "row_keys_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "shard_id": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "attempt",
+    "attempt_id",
+    "elapsed_seconds_bucket",
+    "outcome",
+    "retry_reason",
+    "row_count",
+    "row_keys_sha256",
+    "shard_id"
+   ],
+   "type": "object"
+  },
+  "balance_conditional_entry": {
+   "additionalProperties": false,
+   "properties": {
+    "count": {
+     "$ref": "#/$defs/count"
+    },
+    "field": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "label": {
+     "$ref": "#/$defs/label"
+    },
+    "value": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "count",
+    "field",
+    "label",
+    "value"
+   ],
+   "type": "object"
+  },
+  "balance_count_entry": {
+   "additionalProperties": false,
+   "properties": {
+    "count": {
+     "$ref": "#/$defs/count"
+    },
+    "field": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "value": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "count",
+    "field",
+    "value"
+   ],
+   "type": "object"
+  },
+  "balance_counts": {
+   "additionalProperties": false,
+   "properties": {
+    "conditional": {
+     "items": {
+      "$ref": "#/$defs/balance_conditional_entry"
+     },
+     "minItems": 1,
+     "type": "array"
+    },
+    "counts": {
+     "items": {
+      "$ref": "#/$defs/balance_count_entry"
+     },
+     "minItems": 1,
+     "type": "array"
+    }
+   },
+   "required": [
+    "conditional",
+    "counts"
+   ],
+   "type": "object"
+  },
+  "behavioral_row": {
+   "additionalProperties": false,
+   "properties": {
+    "answer_position": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "arm": {
+     "$ref": "#/$defs/arm"
+    },
+    "correct": {
+     "type": "boolean"
+    },
+    "correct_label": {
+     "$ref": "#/$defs/label"
+    },
+    "correct_margin": {
+     "$ref": "#/$defs/finite_number"
+    },
+    "depth": {
+     "$ref": "#/$defs/depth"
+    },
+    "execution_status": {
+     "$ref": "#/$defs/execution_status"
+    },
+    "family": {
+     "$ref": "#/$defs/family"
+    },
+    "finite": {
+     "type": "boolean"
+    },
+    "full_vocab_option_ranks": {
+     "items": {
+      "minimum": 1,
+      "type": "integer"
+     },
+     "maxItems": 4,
+     "minItems": 4,
+     "type": "array"
+    },
+    "full_vocab_top1_token_id": {
+     "$ref": "#/$defs/token_id"
+    },
+    "input_ids_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "input_length": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "item_id": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "model_id": {
+     "enum": [
+      "Qwen/Qwen2.5-Math-1.5B",
+      "Qwen/Qwen2.5-Math-1.5B-Instruct",
+      "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+     ],
+     "type": "string"
+    },
+    "model_revision": {
+     "enum": [
+      "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2",
+      "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35",
+      "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+     ],
+     "type": "string"
+    },
+    "model_role": {
+     "$ref": "#/$defs/model_role"
+    },
+    "option_logits": {
+     "items": {
+      "$ref": "#/$defs/finite_number"
+     },
+     "maxItems": 4,
+     "minItems": 4,
+     "type": "array"
+    },
+    "option_token_ids": {
+     "items": {
+      "$ref": "#/$defs/token_id"
+     },
+     "maxItems": 4,
+     "minItems": 4,
+     "type": "array"
+    },
+    "prompt_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "restricted_prediction": {
+     "$ref": "#/$defs/label"
+    },
+    "restricted_probabilities": {
+     "items": {
+      "$ref": "#/$defs/probability"
+     },
+     "maxItems": 4,
+     "minItems": 4,
+     "type": "array"
+    },
+    "run_id": {
+     "$ref": "#/$defs/run_id"
+    },
+    "semantic_id": {
+     "$ref": "#/$defs/sha256"
+    },
+    "template_id": {
+     "$ref": "#/$defs/template_id"
+    }
+   },
+   "required": [
+    "answer_position",
+    "arm",
+    "correct",
+    "correct_label",
+    "correct_margin",
+    "depth",
+    "execution_status",
+    "family",
+    "finite",
+    "full_vocab_option_ranks",
+    "full_vocab_top1_token_id",
+    "input_ids_sha256",
+    "input_length",
+    "item_id",
+    "model_id",
+    "model_revision",
+    "model_role",
+    "option_logits",
+    "option_token_ids",
+    "prompt_sha256",
+    "restricted_prediction",
+    "restricted_probabilities",
+    "run_id",
+    "semantic_id",
+    "template_id"
+   ],
+   "type": "object"
+  },
+  "blob_identity": {
+   "additionalProperties": false,
+   "properties": {
+    "bytes": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "path": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "sha256": {
+     "$ref": "#/$defs/sha256"
+    }
+   },
+   "required": [
+    "bytes",
+    "path",
+    "sha256"
+   ],
+   "type": "object"
+  },
+  "bootstrap_identity": {
+   "additionalProperties": false,
+   "properties": {
+    "quantiles": {
+     "items": {
+      "type": "number"
+     },
+     "maxItems": 2,
+     "minItems": 2,
+     "type": "array"
+    },
+    "replicates": {
+     "const": 10000
+    },
+    "rows": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "seed": {
+     "const": "jspace-study2-bootstrap-2026-08-07"
+    }
+   },
+   "required": [
+    "quantiles",
+    "replicates",
+    "rows",
+    "seed"
+   ],
+   "type": "object"
+  },
+  "bootstrap_row": {
+   "additionalProperties": false,
+   "properties": {
+    "bootstrap_lower_95": {
+     "$ref": "#/$defs/finite_number"
+    },
+    "bootstrap_upper_95": {
+     "$ref": "#/$defs/finite_number"
+    },
+    "depth": {
+     "$ref": "#/$defs/depth"
+    },
+    "domain": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "family": {
+     "$ref": "#/$defs/family"
+    },
+    "model_role": {
+     "$ref": "#/$defs/model_role"
+    },
+    "n_units": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "observed": {
+     "$ref": "#/$defs/finite_number"
+    },
+    "replicates": {
+     "const": 10000
+    },
+    "schema_version": {
+     "const": "jspace-study2-stage-bd-bootstrap-row/v1"
+    },
+    "statistic": {
+     "enum": [
+      "NT_MEAN_CORRECT_MARGIN",
+      "SHUFFLE_DAMAGE",
+      "TRACE_GAIN",
+      "WRONG_TRACE_PULL"
+     ],
+     "type": "string"
+    }
+   },
+   "required": [
+    "bootstrap_lower_95",
+    "bootstrap_upper_95",
+    "depth",
+    "domain",
+    "family",
+    "model_role",
+    "n_units",
+    "observed",
+    "replicates",
+    "schema_version",
+    "statistic"
+   ],
+   "type": "object"
+  },
+  "confirmation_unopened_receipt": {
+   "additionalProperties": false,
+   "properties": {
+    "behavioral_confirmation_forwards": {
+     "const": 0
+    },
+    "behavioral_confirmation_output_objects": {
+     "const": 0
+    },
+    "behavioral_confirmation_tokenizations": {
+     "const": 0
+    },
+    "confirmation_paths": {
+     "items": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "minItems": 1,
+     "type": "array"
+    },
+    "confirmation_prompt_identities_loaded": {
+     "const": 0
+    },
+    "development_only_prompt_rows": {
+     "const": 3072
+    },
+    "mechanistic_confirmation_operations": {
+     "const": 0
+    },
+    "model_free_integrity_reads": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "run_id": {
+     "$ref": "#/$defs/run_id"
+    },
+    "schema_version": {
+     "const": "jspace-study2-stage-bd-confirmation-receipt/v1"
+    }
+   },
+   "required": [
+    "behavioral_confirmation_forwards",
+    "behavioral_confirmation_output_objects",
+    "behavioral_confirmation_tokenizations",
+    "confirmation_paths",
+    "confirmation_prompt_identities_loaded",
+    "development_only_prompt_rows",
+    "mechanistic_confirmation_operations",
+    "model_free_integrity_reads",
+    "run_id",
+    "schema_version"
+   ],
+   "type": "object"
+  },
+  "core_manifest": {
+   "additionalProperties": false,
+   "properties": {
+    "authority": {
+     "$ref": "#/$defs/blob_identity"
+    },
+    "bootstrap": {
+     "$ref": "#/$defs/bootstrap_identity"
+    },
+    "confirmation_unopened": {
+     "$ref": "#/$defs/confirmation_unopened_receipt"
+    },
+    "development_items": {
+     "const": 384
+    },
+    "environment": {
+     "$ref": "#/$defs/runtime_environment"
+    },
+    "execution": {
+     "$ref": "#/$defs/execution_ledger"
+    },
+    "expected_primary_keys_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "files": {
+     "items": {
+      "$ref": "#/$defs/file_entry"
+     },
+     "maxItems": 10,
+     "minItems": 10,
+     "type": "array"
+    },
+    "frozen_inputs": {
+     "items": {
+      "$ref": "#/$defs/file_entry"
+     },
+     "minItems": 1,
+     "type": "array"
+    },
+    "gate_a": {
+     "$ref": "#/$defs/gate_a_manifest"
+    },
+    "observed_row_count": {
+     "const": 3072
+    },
+    "operation_counts": {
+     "$ref": "#/$defs/operation_counts"
+    },
+    "protocol_version": {
+     "$ref": "#/$defs/protocol_version"
+    },
+    "row_cells": {
+     "items": {
+      "$ref": "#/$defs/row_cell_entry"
+     },
+     "minItems": 1,
+     "type": "array"
+    },
+    "row_counts": {
+     "items": {
+      "$ref": "#/$defs/row_count_entry"
+     },
+     "minItems": 1,
+     "type": "array"
+    },
+    "rows_per_model": {
+     "const": 1024
+    },
+    "run_id": {
+     "$ref": "#/$defs/run_id"
+    },
+    "schema_version": {
+     "const": "jspace-study2-stage-bd-core-manifest/v1"
+    },
+    "shard_manifest_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "stage_p_freeze_commit": {
+     "const": "d5e8e19c025410fda7c9eb430f507a201a18c9cd"
+    },
+    "stage_p_handoff_commit": {
+     "const": "c2e2383e96ba3d94f3dcf9b9b57db36e1f08dcd1"
+    },
+    "starting_commit": {
+     "const": "a958adf4aec5736ef04f468fc3532ca7c92f7e5e"
+    },
+    "starting_tree": {
+     "const": "f96729c41dcbd8b20e156177e2533516cb44a1ef"
+    },
+    "summary_rows": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "terminal_state": {
+     "enum": [
+      "NONTERMINAL_CHECKPOINT_STUDY2_STAGE_BD_GATE_A_PASSED_AWAITING_BC_AUTHORITY",
+      "STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY"
+     ],
+     "type": "string"
+    },
+    "total_rows": {
+     "const": 3072
+    },
+    "weight_identity": {
+     "$ref": "#/$defs/weight_identity_receipt"
+    }
+   },
+   "required": [
+    "authority",
+    "bootstrap",
+    "confirmation_unopened",
+    "development_items",
+    "environment",
+    "execution",
+    "expected_primary_keys_sha256",
+    "files",
+    "frozen_inputs",
+    "gate_a",
+    "observed_row_count",
+    "operation_counts",
+    "protocol_version",
+    "row_cells",
+    "row_counts",
+    "rows_per_model",
+    "run_id",
+    "schema_version",
+    "shard_manifest_sha256",
+    "stage_p_freeze_commit",
+    "stage_p_handoff_commit",
+    "starting_commit",
+    "starting_tree",
+    "summary_rows",
+    "terminal_state",
+    "total_rows",
+    "weight_identity"
+   ],
+   "type": "object"
+  },
+  "count": {
+   "minimum": 0,
+   "type": "integer"
+  },
+  "depth": {
+   "enum": [
+    1,
+    2,
+    3
+   ],
+   "type": "integer"
+  },
+  "dtype_entry": {
+   "additionalProperties": false,
+   "properties": {
+    "count": {
+     "$ref": "#/$defs/count"
+    },
+    "dtype": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "count",
+    "dtype"
+   ],
+   "type": "object"
+  },
+  "execution_ledger": {
+   "additionalProperties": false,
+   "properties": {
+    "attempts": {
+     "items": {
+      "$ref": "#/$defs/attempt_entry"
+     },
+     "minItems": 18,
+     "type": "array"
+    },
+    "batch_size": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "retries": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "schema_version": {
+     "const": "jspace-study2-stage-bd-execution-receipt/v1"
+    },
+    "shards_complete": {
+     "const": 18
+    }
+   },
+   "required": [
+    "attempts",
+    "batch_size",
+    "retries",
+    "schema_version",
+    "shards_complete"
+   ],
+   "type": "object"
+  },
+  "execution_status": {
+   "enum": [
+    "complete",
+    "failed"
+   ],
+   "type": "string"
+  },
+  "family": {
+   "enum": [
+    "affine_mod10",
+    "permutation_chain"
+   ],
+   "type": "string"
+  },
+  "family_balance": {
+   "additionalProperties": false,
+   "properties": {
+    "d2": {
+     "$ref": "#/$defs/balance_counts"
+    },
+    "d3": {
+     "$ref": "#/$defs/balance_counts"
+    },
+    "pooled_structure": {
+     "$ref": "#/$defs/pooled_structure"
+    }
+   },
+   "required": [
+    "d2",
+    "d3",
+    "pooled_structure"
+   ],
+   "type": "object"
+  },
+  "family_decision": {
+   "additionalProperties": false,
+   "properties": {
+    "exact_binomial_upper_tail": {
+     "$ref": "#/$defs/probability"
+    },
+    "family_gate_pass": {
+     "type": "boolean"
+    },
+    "n_nt_compositional": {
+     "const": 128
+    },
+    "nt_correct": {
+     "maximum": 128,
+     "minimum": 0,
+     "type": "integer"
+    }
+   },
+   "required": [
+    "exact_binomial_upper_tail",
+    "family_gate_pass",
+    "n_nt_compositional",
+    "nt_correct"
+   ],
+   "type": "object"
+  },
+  "feasibility_gate_row": {
+   "additionalProperties": false,
+   "properties": {
+    "alpha": {
+     "const": 0.025
+    },
+    "balance_ok": {
+     "type": "boolean"
+    },
+    "confirmation_opened_before_decision": {
+     "const": false
+    },
+    "critical_successes": {
+     "const": 43
+    },
+    "exact_binomial_upper_tail": {
+     "$ref": "#/$defs/probability"
+    },
+    "family": {
+     "$ref": "#/$defs/family"
+    },
+    "family_gate_pass": {
+     "type": "boolean"
+    },
+    "finite_complete": {
+     "type": "boolean"
+    },
+    "gate_inputs_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "model_role": {
+     "$ref": "#/$defs/model_role"
+    },
+    "n_nt_compositional": {
+     "const": 128
+    },
+    "nt_correct": {
+     "maximum": 128,
+     "minimum": 0,
+     "type": "integer"
+    },
+    "overall_gate_pass": {
+     "type": "boolean"
+    },
+    "protocol_version": {
+     "$ref": "#/$defs/protocol_version"
+    },
+    "run_id": {
+     "$ref": "#/$defs/run_id"
+    }
+   },
+   "required": [
+    "alpha",
+    "balance_ok",
+    "confirmation_opened_before_decision",
+    "critical_successes",
+    "exact_binomial_upper_tail",
+    "family",
+    "family_gate_pass",
+    "finite_complete",
+    "gate_inputs_sha256",
+    "model_role",
+    "n_nt_compositional",
+    "nt_correct",
+    "overall_gate_pass",
+    "protocol_version",
+    "run_id"
+   ],
+   "type": "object"
+  },
+  "file_entry": {
+   "additionalProperties": false,
+   "properties": {
+    "bytes": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "path": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "rows": {
+     "minimum": 0,
+     "type": [
+      "integer",
+      "null"
+     ]
+    },
+    "sha256": {
+     "$ref": "#/$defs/sha256"
+    }
+   },
+   "required": [
+    "bytes",
+    "path",
+    "rows",
+    "sha256"
+   ],
+   "type": "object"
+  },
+  "finite_number": {
+   "type": "number"
+  },
+  "gate_a_decision": {
+   "additionalProperties": false,
+   "properties": {
+    "balance_tables": {
+     "additionalProperties": false,
+     "properties": {
+      "affine_mod10": {
+       "$ref": "#/$defs/family_balance"
+      },
+      "permutation_chain": {
+       "$ref": "#/$defs/family_balance"
+      }
+     },
+     "required": [
+      "affine_mod10",
+      "permutation_chain"
+     ],
+     "type": "object"
+    },
+    "confirmation_opened_before_decision": {
+     "const": false
+    },
+    "controls_are_descriptive_only": {
+     "const": true
+    },
+    "gate_inputs_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "overall_gate_pass": {
+     "type": "boolean"
+    },
+    "run_id": {
+     "$ref": "#/$defs/run_id"
+    },
+    "schema_version": {
+     "const": "jspace-study2-stage-bd/v1"
+    },
+    "target_family_decisions": {
+     "additionalProperties": false,
+     "properties": {
+      "affine_mod10": {
+       "$ref": "#/$defs/family_decision"
+      },
+      "permutation_chain": {
+       "$ref": "#/$defs/family_decision"
+      }
+     },
+     "required": [
+      "affine_mod10",
+      "permutation_chain"
+     ],
+     "type": "object"
+    },
+    "terminal_state": {
+     "enum": [
+      "NONTERMINAL_CHECKPOINT_STUDY2_STAGE_BD_GATE_A_PASSED_AWAITING_BC_AUTHORITY",
+      "STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY"
+     ],
+     "type": "string"
+    }
+   },
+   "required": [
+    "balance_tables",
+    "confirmation_opened_before_decision",
+    "controls_are_descriptive_only",
+    "gate_inputs_sha256",
+    "overall_gate_pass",
+    "run_id",
+    "schema_version",
+    "target_family_decisions",
+    "terminal_state"
+   ],
+   "type": "object"
+  },
+  "gate_a_manifest": {
+   "additionalProperties": false,
+   "properties": {
+    "alpha": {
+     "const": 0.025
+    },
+    "controls_affect_decision": {
+     "const": false
+    },
+    "critical_successes": {
+     "const": 43
+    },
+    "decision_arm": {
+     "const": "NT"
+    },
+    "decision_model": {
+     "const": "target"
+    },
+    "depths": {
+     "items": {
+      "$ref": "#/$defs/gate_depth"
+     },
+     "maxItems": 2,
+     "minItems": 2,
+     "type": "array"
+    },
+    "feasibility_rows": {
+     "items": {
+      "$ref": "#/$defs/feasibility_gate_row"
+     },
+     "maxItems": 6,
+     "minItems": 6,
+     "type": "array"
+    },
+    "gate_inputs_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "n_per_family": {
+     "const": 128
+    },
+    "null_accuracy": {
+     "const": 0.25
+    },
+    "overall_gate_pass": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "alpha",
+    "controls_affect_decision",
+    "critical_successes",
+    "decision_arm",
+    "decision_model",
+    "depths",
+    "feasibility_rows",
+    "gate_inputs_sha256",
+    "n_per_family",
+    "null_accuracy",
+    "overall_gate_pass"
+   ],
+   "type": "object"
+  },
+  "gate_a_parameters": {
+   "additionalProperties": false,
+   "properties": {
+    "alpha": {
+     "const": 0.025
+    },
+    "critical_successes": {
+     "const": 43
+    },
+    "decision_arm": {
+     "const": "NT"
+    },
+    "decision_model": {
+     "const": "target"
+    },
+    "depths": {
+     "items": {
+      "$ref": "#/$defs/gate_depth"
+     },
+     "maxItems": 2,
+     "minItems": 2,
+     "type": "array"
+    },
+    "n_per_family": {
+     "const": 128
+    },
+    "null_accuracy": {
+     "const": 0.25
+    }
+   },
+   "required": [
+    "alpha",
+    "critical_successes",
+    "decision_arm",
+    "decision_model",
+    "depths",
+    "n_per_family",
+    "null_accuracy"
+   ],
+   "type": "object"
+  },
+  "gate_depth": {
+   "enum": [
+    2,
+    3
+   ],
+   "type": "integer"
+  },
+  "label": {
+   "enum": [
+    "A",
+    "B",
+    "C",
+    "D"
+   ],
+   "type": "string"
+  },
+  "model_identity": {
+   "additionalProperties": false,
+   "properties": {
+    "model_id": {
+     "enum": [
+      "Qwen/Qwen2.5-Math-1.5B",
+      "Qwen/Qwen2.5-Math-1.5B-Instruct",
+      "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+     ],
+     "type": "string"
+    },
+    "revision": {
+     "enum": [
+      "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2",
+      "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35",
+      "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+     ],
+     "type": "string"
+    },
+    "role": {
+     "$ref": "#/$defs/model_role"
+    }
+   },
+   "required": [
+    "model_id",
+    "revision",
+    "role"
+   ],
+   "type": "object"
+  },
+  "model_role": {
+   "enum": [
+    "instruction_control",
+    "lineage_base",
+    "target"
+   ],
+   "type": "string"
+  },
+  "operation_counts": {
+   "additionalProperties": false,
+   "properties": {
+    "ablation_operations": {
+     "const": 0
+    },
+    "activation_operations": {
+     "const": 0
+    },
+    "behavioral_confirmation_forwards": {
+     "const": 0
+    },
+    "behavioral_confirmation_tokenizations": {
+     "const": 0
+    },
+    "forward_passes": {
+     "const": 3072
+    },
+    "generations": {
+     "const": 0
+    },
+    "lens_applies": {
+     "const": 0
+    },
+    "lens_fits": {
+     "const": 0
+    },
+    "lens_loads": {
+     "const": 0
+    },
+    "mechanistic_confirmation_operations": {
+     "const": 0
+    },
+    "mechanistic_development_operations": {
+     "const": 0
+    },
+    "model_downloads": {
+     "const": 3
+    },
+    "patching_operations": {
+     "const": 0
+    },
+    "phase1_0d_operations": {
+     "const": 0
+    },
+    "probe_fits": {
+     "const": 0
+    },
+    "rq2_s4_runs": {
+     "const": 0
+    },
+    "scientific_evidence_rows": {
+     "const": 0
+    },
+    "semantic_review_provider_calls": {
+     "const": 0
+    },
+    "tokenizer_constructions": {
+     "const": 3
+    },
+    "weight_loads": {
+     "const": 3
+    }
+   },
+   "required": [
+    "ablation_operations",
+    "activation_operations",
+    "behavioral_confirmation_forwards",
+    "behavioral_confirmation_tokenizations",
+    "forward_passes",
+    "generations",
+    "lens_applies",
+    "lens_fits",
+    "lens_loads",
+    "mechanistic_confirmation_operations",
+    "mechanistic_development_operations",
+    "model_downloads",
+    "patching_operations",
+    "phase1_0d_operations",
+    "probe_fits",
+    "rq2_s4_runs",
+    "scientific_evidence_rows",
+    "semantic_review_provider_calls",
+    "tokenizer_constructions",
+    "weight_loads"
+   ],
+   "type": "object"
+  },
+  "pooled_structure": {
+   "additionalProperties": false,
+   "properties": {
+    "distinct_item_ids": {
+     "const": 128
+    },
+    "distinct_semantic_ids": {
+     "const": 128
+    },
+    "n": {
+     "const": 128
+    },
+    "rows_per_depth": {
+     "additionalProperties": false,
+     "properties": {
+      "d2": {
+       "const": 64
+      },
+      "d3": {
+       "const": 64
+      }
+     },
+     "required": [
+      "d2",
+      "d3"
+     ],
+     "type": "object"
+    }
+   },
+   "required": [
+    "distinct_item_ids",
+    "distinct_semantic_ids",
+    "n",
+    "rows_per_depth"
+   ],
+   "type": "object"
+  },
+  "preinference_seal": {
+   "additionalProperties": false,
+   "properties": {
+    "authority": {
+     "$ref": "#/$defs/blob_identity"
+    },
+    "confirmation_unopened": {
+     "$ref": "#/$defs/confirmation_unopened_receipt"
+    },
+    "expected_primary_keys_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "expected_row_count": {
+     "const": 3072
+    },
+    "frozen_inputs": {
+     "items": {
+      "$ref": "#/$defs/file_entry"
+     },
+     "minItems": 1,
+     "type": "array"
+    },
+    "gate_a": {
+     "$ref": "#/$defs/gate_a_parameters"
+    },
+    "model_identities": {
+     "items": {
+      "$ref": "#/$defs/model_identity"
+     },
+     "maxItems": 3,
+     "minItems": 3,
+     "type": "array"
+    },
+    "option_token_ids": {
+     "items": {
+      "$ref": "#/$defs/token_entry"
+     },
+     "maxItems": 4,
+     "minItems": 4,
+     "type": "array"
+    },
+    "protocol_version": {
+     "$ref": "#/$defs/protocol_version"
+    },
+    "run_id": {
+     "$ref": "#/$defs/run_id"
+    },
+    "schema": {
+     "$ref": "#/$defs/blob_identity"
+    },
+    "schema_version": {
+     "const": "jspace-study2-stage-bd-preinference-seal/v1"
+    },
+    "shard_manifest_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "source": {
+     "$ref": "#/$defs/blob_identity"
+    },
+    "starting_commit": {
+     "const": "a958adf4aec5736ef04f468fc3532ca7c92f7e5e"
+    },
+    "starting_tree": {
+     "const": "f96729c41dcbd8b20e156177e2533516cb44a1ef"
+    }
+   },
+   "required": [
+    "authority",
+    "confirmation_unopened",
+    "expected_primary_keys_sha256",
+    "expected_row_count",
+    "frozen_inputs",
+    "gate_a",
+    "model_identities",
+    "option_token_ids",
+    "protocol_version",
+    "run_id",
+    "schema",
+    "schema_version",
+    "shard_manifest_sha256",
+    "source",
+    "starting_commit",
+    "starting_tree"
+   ],
+   "type": "object"
+  },
+  "probability": {
+   "maximum": 1.0,
+   "minimum": 0.0,
+   "type": "number"
+  },
+  "protocol_version": {
+   "const": "jspace-study2-reasoning-internalization/v1"
+  },
+  "row_cell_entry": {
+   "additionalProperties": false,
+   "properties": {
+    "arm": {
+     "$ref": "#/$defs/arm"
+    },
+    "count": {
+     "$ref": "#/$defs/count"
+    },
+    "depth": {
+     "$ref": "#/$defs/depth"
+    },
+    "family": {
+     "$ref": "#/$defs/family"
+    },
+    "model_role": {
+     "$ref": "#/$defs/model_role"
+    },
+    "template_id": {
+     "$ref": "#/$defs/template_id"
+    }
+   },
+   "required": [
+    "arm",
+    "count",
+    "depth",
+    "family",
+    "model_role",
+    "template_id"
+   ],
+   "type": "object"
+  },
+  "row_count_entry": {
+   "additionalProperties": false,
+   "properties": {
+    "count": {
+     "$ref": "#/$defs/count"
+    },
+    "field": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "value": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "count",
+    "field",
+    "value"
+   ],
+   "type": "object"
+  },
+  "run_id": {
+   "const": "s2-bd-development-v1"
+  },
+  "runtime_environment": {
+   "additionalProperties": false,
+   "properties": {
+    "cuda_device_name": {
+     "type": "string"
+    },
+    "image_digest": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "platform_machine": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "python_version": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "pythonhashseed": {
+     "type": "string"
+    },
+    "source_commit": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "source_tree": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "torch_version": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "transformers_version": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "cuda_device_name",
+    "image_digest",
+    "platform_machine",
+    "python_version",
+    "pythonhashseed",
+    "source_commit",
+    "source_tree",
+    "torch_version",
+    "transformers_version"
+   ],
+   "type": "object"
+  },
+  "sha256": {
+   "pattern": "^[0-9a-f]{64}$",
+   "type": "string"
+  },
+  "shard": {
+   "additionalProperties": false,
+   "properties": {
+    "depth": {
+     "$ref": "#/$defs/depth"
+    },
+    "family": {
+     "$ref": "#/$defs/family"
+    },
+    "model_role": {
+     "$ref": "#/$defs/model_role"
+    },
+    "row_count": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "row_keys_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "shard_id": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "shard_index": {
+     "maximum": 17,
+     "minimum": 0,
+     "type": "integer"
+    }
+   },
+   "required": [
+    "depth",
+    "family",
+    "model_role",
+    "row_count",
+    "row_keys_sha256",
+    "shard_id",
+    "shard_index"
+   ],
+   "type": "object"
+  },
+  "shard_manifest": {
+   "additionalProperties": false,
+   "properties": {
+    "expected_rows_per_model": {
+     "const": 1024
+    },
+    "max_shard_attempts": {
+     "const": 3
+    },
+    "retry_reason_codes": {
+     "items": {
+      "enum": [
+       "ARTIFACT_WRITE_FAILURE",
+       "CAPACITY_UNAVAILABLE",
+       "HASH_MISMATCH",
+       "HOOK_NOOP_MISMATCH",
+       "MISSING_ROW",
+       "NONFINITE_OUTPUT",
+       "RUNTIME_EXCEPTION",
+       "SOURCE_IMAGE_MISMATCH"
+      ],
+      "type": "string"
+     },
+     "minItems": 0,
+     "type": "array"
+    },
+    "run_id": {
+     "$ref": "#/$defs/run_id"
+    },
+    "schema_version": {
+     "const": "jspace-study2-stage-bd-shard-manifest/v1"
+    },
+    "shard_count": {
+     "const": 18
+    },
+    "shard_manifest_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "shards": {
+     "items": {
+      "$ref": "#/$defs/shard"
+     },
+     "maxItems": 18,
+     "minItems": 18,
+     "type": "array"
+    },
+    "total_rows": {
+     "const": 3072
+    }
+   },
+   "required": [
+    "expected_rows_per_model",
+    "max_shard_attempts",
+    "retry_reason_codes",
+    "run_id",
+    "schema_version",
+    "shard_count",
+    "shard_manifest_sha256",
+    "shards",
+    "total_rows"
+   ],
+   "type": "object"
+  },
+  "summary_row": {
+   "additionalProperties": false,
+   "properties": {
+    "arm": {
+     "$ref": "#/$defs/arm"
+    },
+    "correct": {
+     "$ref": "#/$defs/count"
+    },
+    "correct_label_confusion": {
+     "additionalProperties": false,
+     "properties": {
+      "A": {
+       "additionalProperties": false,
+       "properties": {
+        "A": {
+         "$ref": "#/$defs/count"
+        },
+        "B": {
+         "$ref": "#/$defs/count"
+        },
+        "C": {
+         "$ref": "#/$defs/count"
+        },
+        "D": {
+         "$ref": "#/$defs/count"
+        }
+       },
+       "required": [
+        "A",
+        "B",
+        "C",
+        "D"
+       ],
+       "type": "object"
+      },
+      "B": {
+       "additionalProperties": false,
+       "properties": {
+        "A": {
+         "$ref": "#/$defs/count"
+        },
+        "B": {
+         "$ref": "#/$defs/count"
+        },
+        "C": {
+         "$ref": "#/$defs/count"
+        },
+        "D": {
+         "$ref": "#/$defs/count"
+        }
+       },
+       "required": [
+        "A",
+        "B",
+        "C",
+        "D"
+       ],
+       "type": "object"
+      },
+      "C": {
+       "additionalProperties": false,
+       "properties": {
+        "A": {
+         "$ref": "#/$defs/count"
+        },
+        "B": {
+         "$ref": "#/$defs/count"
+        },
+        "C": {
+         "$ref": "#/$defs/count"
+        },
+        "D": {
+         "$ref": "#/$defs/count"
+        }
+       },
+       "required": [
+        "A",
+        "B",
+        "C",
+        "D"
+       ],
+       "type": "object"
+      },
+      "D": {
+       "additionalProperties": false,
+       "properties": {
+        "A": {
+         "$ref": "#/$defs/count"
+        },
+        "B": {
+         "$ref": "#/$defs/count"
+        },
+        "C": {
+         "$ref": "#/$defs/count"
+        },
+        "D": {
+         "$ref": "#/$defs/count"
+        }
+       },
+       "required": [
+        "A",
+        "B",
+        "C",
+        "D"
+       ],
+       "type": "object"
+      }
+     },
+     "required": [
+      "A",
+      "B",
+      "C",
+      "D"
+     ],
+     "type": "object"
+    },
+    "depth": {
+     "$ref": "#/$defs/depth"
+    },
+    "execution_complete": {
+     "$ref": "#/$defs/count"
+    },
+    "family": {
+     "$ref": "#/$defs/family"
+    },
+    "finite_rows": {
+     "$ref": "#/$defs/count"
+    },
+    "full_vocab_correct_rank_max": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "full_vocab_correct_rank_mean": {
+     "minimum": 1.0,
+     "type": "number"
+    },
+    "full_vocab_correct_rank_min": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "input_length_max": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "input_length_min": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "mean_correct_margin": {
+     "$ref": "#/$defs/finite_number"
+    },
+    "mean_correct_restricted_probability": {
+     "$ref": "#/$defs/probability"
+    },
+    "model_role": {
+     "$ref": "#/$defs/model_role"
+    },
+    "n": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "restricted_accuracy": {
+     "$ref": "#/$defs/probability"
+    },
+    "schema_version": {
+     "const": "jspace-study2-stage-bd-summary-row/v1"
+    },
+    "template_id": {
+     "$ref": "#/$defs/template_id"
+    },
+    "wilson_lower_95": {
+     "$ref": "#/$defs/probability"
+    },
+    "wilson_upper_95": {
+     "$ref": "#/$defs/probability"
+    }
+   },
+   "required": [
+    "arm",
+    "correct",
+    "correct_label_confusion",
+    "depth",
+    "execution_complete",
+    "family",
+    "finite_rows",
+    "full_vocab_correct_rank_max",
+    "full_vocab_correct_rank_mean",
+    "full_vocab_correct_rank_min",
+    "input_length_max",
+    "input_length_min",
+    "mean_correct_margin",
+    "mean_correct_restricted_probability",
+    "model_role",
+    "n",
+    "restricted_accuracy",
+    "schema_version",
+    "template_id",
+    "wilson_lower_95",
+    "wilson_upper_95"
+   ],
+   "type": "object"
+  },
+  "template_id": {
+   "enum": [
+    "T-A",
+    "T-B"
+   ],
+   "type": "string"
+  },
+  "token_entry": {
+   "additionalProperties": false,
+   "properties": {
+    "label": {
+     "$ref": "#/$defs/label"
+    },
+    "token_id": {
+     "$ref": "#/$defs/token_id"
+    }
+   },
+   "required": [
+    "label",
+    "token_id"
+   ],
+   "type": "object"
+  },
+  "token_id": {
+   "minimum": 0,
+   "type": "integer"
+  },
+  "weight_file": {
+   "additionalProperties": false,
+   "properties": {
+    "bytes": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "name": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "sha256": {
+     "$ref": "#/$defs/sha256"
+    }
+   },
+   "required": [
+    "bytes",
+    "name",
+    "sha256"
+   ],
+   "type": "object"
+  },
+  "weight_identity_receipt": {
+   "additionalProperties": false,
+   "properties": {
+    "generated_tokens": {
+     "const": 0
+    },
+    "models": {
+     "items": {
+      "$ref": "#/$defs/weight_model"
+     },
+     "maxItems": 3,
+     "minItems": 3,
+     "type": "array"
+    },
+    "run_id": {
+     "$ref": "#/$defs/run_id"
+    },
+    "schema_version": {
+     "const": "jspace-study2-stage-bd-weight-identity/v1"
+    }
+   },
+   "required": [
+    "generated_tokens",
+    "models",
+    "run_id",
+    "schema_version"
+   ],
+   "type": "object"
+  },
+  "weight_model": {
+   "additionalProperties": false,
+   "properties": {
+    "config_files": {
+     "items": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "minItems": 0,
+     "type": "array"
+    },
+    "dtype_inventory": {
+     "items": {
+      "$ref": "#/$defs/dtype_entry"
+     },
+     "minItems": 1,
+     "type": "array"
+    },
+    "files": {
+     "items": {
+      "$ref": "#/$defs/weight_file"
+     },
+     "minItems": 1,
+     "type": "array"
+    },
+    "model_class": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "model_id": {
+     "enum": [
+      "Qwen/Qwen2.5-Math-1.5B",
+      "Qwen/Qwen2.5-Math-1.5B-Instruct",
+      "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+     ],
+     "type": "string"
+    },
+    "parameter_count": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "parameter_dtype": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "requested_revision": {
+     "enum": [
+      "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2",
+      "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35",
+      "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+     ],
+     "type": "string"
+    },
+    "resolved_revision": {
+     "enum": [
+      "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2",
+      "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35",
+      "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+     ],
+     "type": "string"
+    },
+    "role": {
+     "$ref": "#/$defs/model_role"
+    },
+    "tokenizer_class": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "trust_remote_code": {
+     "const": false
+    },
+    "use_cache": {
+     "const": false
+    },
+    "weight_files": {
+     "items": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "minItems": 1,
+     "type": "array"
+    }
+   },
+   "required": [
+    "config_files",
+    "dtype_inventory",
+    "files",
+    "model_class",
+    "model_id",
+    "parameter_count",
+    "parameter_dtype",
+    "requested_revision",
+    "resolved_revision",
+    "role",
+    "tokenizer_class",
+    "trust_remote_code",
+    "use_cache",
+    "weight_files"
+   ],
+   "type": "object"
+  }
+ },
+ "$id": "https://github.com/Alanjiao1988/J-space-observation/studies/study2/protocol/stage_bd_pack.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "description": "Every Stage B-D row type is closed: unknown fields, missing fields and unregistered enum members are rejected.  behavioral_row and feasibility_gate_row reproduce the frozen protocol future-table field sets exactly.  No field in this contract carries an activation, hidden state, probe, lens, patching, ablation or generated-token value, and no field admits a behavioral-confirmation, mechanistic, RQ2/S4 or scientific-evidence object.",
+ "title": "Study 2 Stage B-D closed behavioral and Gate A contract"
+}
