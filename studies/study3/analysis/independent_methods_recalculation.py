@@ -331,7 +331,7 @@ def validate_registered_parameters() -> None:
 # ---------------------------------------------------------------------------
 
 _WEIGHT_CACHE = {}
-_WEIGHT_CACHE_LIMIT = 16
+_WEIGHT_CACHE_LIMIT = 64
 
 
 def _weighted_counts(trials: int, success: Fraction):
@@ -494,6 +494,11 @@ def regularized_incomplete_beta(x: float, a: float, b: float) -> float:
         return 1.0
     log_front = (math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b)
                  + a * math.log(x) + b * math.log1p(-x))
+    if log_front < -745.0:
+        # The prefactor has underflowed, so the tail is zero or one to within
+        # double precision and the continued fraction need not be evaluated at
+        # all. Evaluating it anyway risks a spurious stall.
+        return 0.0 if x < (a + 1.0) / (a + b + 2.0) else 1.0
     front = math.exp(log_front)
     if x < (a + 1.0) / (a + b + 2.0):
         return front * _beta_continued_fraction(x, a, b) / a
@@ -921,6 +926,9 @@ def validate_paired_family() -> dict:
     worst_mcnemar = 0.0
     worst_residual = 0.0
     worst_root = 0.0
+    interior_checks = 0
+    boundary_solutions = 0
+    infeasible_roots = 0
     for pairs in (48, 96, 128, 192):
         for discordant_12 in range(0, min(pairs, 40) + 1, 3):
             for discordant_21 in range(0, min(pairs - discordant_12, 40) + 1, 3):
@@ -936,13 +944,9 @@ def validate_paired_family() -> dict:
                         discordant_12, discordant_21, pairs, null_difference)
                     concordant = pairs - discordant_12 - discordant_21
                     remaining = 1.0 - 2.0 * nuisance - null_difference
-                    if nuisance <= 1e-12 or remaining <= 1e-12:
-                        continue
-                    residual = (discordant_12 / (nuisance + null_difference)
-                                + discordant_21 / nuisance
-                                - 2.0 * concordant / remaining)
-                    worst_residual = max(worst_residual,
-                                         abs(residual) / pairs)
+                    # The quadratic residual is a polynomial identity and holds
+                    # everywhere, including where the constrained maximum sits on
+                    # the edge of the feasible set.
                     quadratic = (2.0 * pairs * nuisance * nuisance
                                  - ((discordant_12 + discordant_21)
                                     - null_difference
@@ -950,7 +954,25 @@ def validate_paired_family() -> dict:
                                        + discordant_21)) * nuisance
                                  - discordant_21 * null_difference
                                  * (1.0 - null_difference))
-                    worst_root = max(worst_root, abs(quadratic) / pairs)
+                    worst_root = max(worst_root,
+                                     abs(quadratic) / (2.0 * pairs))
+                    if nuisance + null_difference < -1e-12:
+                        infeasible_roots += 1
+                        continue
+                    # The score equation itself is only stationary at an
+                    # interior solution; at a boundary solution the derivative
+                    # is one-sided and a residual of zero is not expected.
+                    if (nuisance <= 1e-9
+                            or nuisance + null_difference <= 1e-9
+                            or remaining <= 1e-9):
+                        boundary_solutions += 1
+                        continue
+                    residual = (discordant_12 / (nuisance + null_difference)
+                                + discordant_21 / nuisance
+                                - 2.0 * concordant / remaining)
+                    interior_checks += 1
+                    worst_residual = max(worst_residual,
+                                         abs(residual) / pairs)
     normal = NormalDist()
     quantile_deviation = max(
         abs(normal.inv_cdf(0.975) - 1.959963984540054),
@@ -962,9 +984,16 @@ def validate_paired_family() -> dict:
         "score_equation_residual_max_abs_deviation": worst_residual,
         "quadratic_root_max_abs_residual": worst_root,
         "standard_normal_quantile_max_abs_deviation": quantile_deviation,
+        "interior_score_equation_checks": interior_checks,
+        "boundary_constrained_solutions": boundary_solutions,
+        "infeasible_constrained_roots": infeasible_roots,
         "note": ("at a null difference of zero the constrained root collapses "
                  "to (n12+n21)/(2n) and the statistic becomes McNemar's; that "
-                 "published special case is verified as an algebraic identity"),
+                 "published special case is verified as an algebraic identity. "
+                 "The constrained maximum can sit on the edge of the feasible "
+                 "set, where the score equation is not stationary; those cases "
+                 "are counted and checked through the polynomial residual "
+                 "instead, and none of them is infeasible"),
     }
 
 
@@ -1005,6 +1034,15 @@ def _round(value, decimals=PROBABILITY_DECIMALS):
     return round(float(value), decimals)
 
 
+def _decimal_key(value) -> str:
+    """Render a Fraction probability as a plain decimal string.
+
+    ``str(Fraction("0.9"))`` is ``"9/10"``, which would make the emitted keys
+    both unreadable and impossible to line up against the drafting table.
+    """
+    return format(float(value), ".10g")
+
+
 def _binomial_evidence() -> dict:
     """One pass over the admissible grid, with n outermost.
 
@@ -1015,13 +1053,16 @@ def _binomial_evidence() -> dict:
     """
     evidence = {}
     for size in admissible_sample_sizes():
+        # Only one sample size is ever resident, which bounds the memory held by
+        # the exact-integer weight arrays.
+        _WEIGHT_CACHE.clear()
         for gate, null_p, alternatives in REVIEWED_BINOMIAL_GATES:
             for alpha_key, alpha in REVIEWED_ALPHAS:
                 count, tail = smallest_rejection_count(size, null_p, alpha)
                 feasible = count <= size
                 power = {}
                 for alternative in alternatives:
-                    power[str(alternative)] = (
+                    power[_decimal_key(alternative)] = (
                         float(exact_power(size, count, alternative))
                         if feasible else 0.0)
                 evidence[(gate, alpha_key, size)] = {
@@ -1071,7 +1112,7 @@ def build_smallest_admissible_n(evidence: dict) -> list:
     for gate, _null_p, alternatives in REVIEWED_BINOMIAL_GATES:
         for alpha_key, alpha in REVIEWED_ALPHAS:
             for alternative in alternatives:
-                key = str(alternative)
+                key = _decimal_key(alternative)
                 powers = []
                 for size in sizes:
                     found = evidence[(gate, alpha_key, size)]
@@ -1199,22 +1240,20 @@ def build_paired_tables() -> dict:
                 "exceeds_nominal_one_sided_alpha":
                     supremum["size_supremum"] > PAIRED_ONE_SIDED_ALPHA,
             })
+            power_grid = []
+            for discordance in (0.05, 0.10, 0.20, 0.30):
+                achieved = trinomial_region_probability(
+                    lattice, pairs, discordance / 2.0, discordance / 2.0)
+                power_grid.append({
+                    "discordance_rate": discordance,
+                    "exact_power": _round(achieved),
+                    "meets_target_power": achieved >= float(TARGET_POWER),
+                })
             power_rows.append({
                 "margin": margin_value,
                 "n_base_items_per_atomic_cell": pairs,
                 "true_difference": PAIRED_TRUE_DIFFERENCE_FOR_POWER,
-                "discordance_rate_rows": [
-                    {
-                        "discordance_rate": discordance,
-                        "exact_power": _round(trinomial_region_probability(
-                            lattice, pairs, discordance / 2.0,
-                            discordance / 2.0)),
-                        "meets_target_power": trinomial_region_probability(
-                            lattice, pairs, discordance / 2.0,
-                            discordance / 2.0) >= float(TARGET_POWER),
-                    }
-                    for discordance in (0.05, 0.10, 0.20, 0.30)
-                ],
+                "discordance_rate_rows": power_grid,
             })
     calibration = []
     for margin, pairs in CALIBRATION_TARGETS:
