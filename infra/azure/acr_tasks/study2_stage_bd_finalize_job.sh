@@ -60,7 +60,12 @@ print(f"OUTPUT|stage_bd_core_manifest.json|bytes={len(core)}"
       f"|sha256={hashlib.sha256(core).hexdigest()}")
 print(f"CORE_MANIFEST_SHA256={hashlib.sha256(core).hexdigest()}")
 print(f"TERMINAL_STATE={manifest['terminal_state']}")
-print(f"OVERALL_GATE_PASS={manifest['overall_gate_pass']}")
+# The core manifest carries the terminal state; the gate decision carries the
+# boolean the terminal state was derived from.
+decision = json.loads(
+    (pack / "stage_bd_gate_a_decision.json").read_text(encoding="utf-8")
+)
+print(f"OVERALL_GATE_PASS={decision['overall_gate_pass']}")
 PY
 
 python scripts/oci_artifact.py \
