@@ -6043,3 +6043,209 @@ without its commit argument, and run `ca30` still let the full-suite script clon
 into an already-populated directory. Both are disclosed here rather than omitted.
 No repository content changed between the three runs; all three were bound to
 `b64fe13740f96badfffea2f0465cdcc02bfb91d1`.
+
+## 2026-08-08 - Study 3 draft-v0.2 independent methods review
+
+### Purpose and endpoint
+
+A bounded independent methods review of the Study 3 interface-calibration design
+draft-v0.2. The reviewing party did not write the design, did not repair it, and
+was permitted exactly one of three dispositions. The endpoint is a documentation
+state, not a scientific result: the review produces a disposition, a finding
+list, an independent recalculation and a receipt, and then stops.
+
+The returned disposition is `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`
+and the documentation state is
+`STUDY3_DRAFT_V0_2_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`.
+
+### Starting state
+
+The round started from `origin/main` at
+`8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`, tree
+`7e9077a32903adfdaa3bede95beba8752fcb5133`, worktree clean. The full starting
+preflight was re-run from committed blobs rather than from the handoff note: the
+seven-commit and twenty-three-path comparison against
+`360086db495c4c5a098e49a6e8adf73dd143eaef`, every draft-v0.2 core artifact size
+and digest, the `AR-0196` through `AR-0211` blob digests, the evidence-ledger
+identity, and both protected Phase 1.0D rollups. Every check passed and the
+starting state was accepted as
+`STUDY3_METHODS_REVIEW_STARTING_STATE_ACCEPTED_CONTENT_IDENTITY_BRANCH_METADATA_NONAUTHORITATIVE`.
+
+### Independence
+
+The review implementation
+`studies/study3/analysis/independent_methods_recalculation.py` does not import,
+exec, copy from, or dynamically load
+`studies/study3/analysis/design_statistics.py`. The paired-binary score test was
+re-derived from Tango 1998 *Statistics in Medicine* 17:891-908 (PMID 9595618),
+the paired non-inferiority sample-size and enumeration machinery from Hsueh, Liu
+and Chen 2001 *Biometrics* 57:478-483 (PMID 11414572) with Liu, Hsueh, Hsieh and
+Chen 2002 (PMID 11782062), and the intersection-union framing from Berger and Hsu
+1996 *Statistical Science* 11:283-319. All four citations were verified against
+NCBI and Crossref metadata. The script structures the work as four independent
+families with differently named internal routines and carries its own AST
+self-check that fails if any reachable literal opens a `.py` file.
+
+Independent validation does not rely on agreement with the drafting
+implementation. Each statistical family carries closed-form or published-example
+checks that are true regardless of what the draft says: the all-successes and
+at-least-one binomial identities, exact symmetry of the binomial tail at
+p = 1/2, the beta-function identity for the binomial tail, Clopper-Pearson
+inversion and monotonicity, the reduction of the Tango statistic to McNemar at
+margin zero, the quadratic-root residual and the score residual of the
+constrained maximum-likelihood nuisance estimate, windowed against exhaustive
+enumeration, and total lattice mass. All closed-form residuals came back at or
+below 8.4e-14. Only after the independent values existed were they compared
+against `design_statistics_tables.json`, and every difference was classified.
+
+### Result
+
+Twenty findings: six blocking, eleven major, three minor. Seventeen candidate
+cross-artifact inconsistencies were adjudicated to exactly one status each, with
+six `CONFIRMED_BLOCKING`, eight `CONFIRMED_NONBLOCKING`, one `NOT_CONFIRMED` and
+two `QUALIFIED`.
+
+The independent enumeration reproduces the drafting enumeration exactly at
+n = 192 and margin 0.10, returning 0.025501092 against the disclosed 0.025501.
+The drafting enumeration is therefore correct; the defect is in the claim made
+about it. Searching the full feasible null-boundary domain rather than the
+four-point discordance grid, the realised one-sided size exceeds the nominal
+0.025 at n = 192 with margin 0.10 (0.025501 at discordance 0.1000) and again at
+n = 384 with margin 0.10 (0.025073 at discordance 0.4782). The second case is the
+decisive one: every row of the drafting grid at that configuration is compliant,
+with a maximum of 0.024727, yet the supremum over the feasible domain is not. A
+finite discordance grid bounds a supremum only from below, so the grid cannot
+establish size control. Calibrated critical values are supplied for both cases.
+
+The blocking findings are that the `I3` estimand is not identifiable as written,
+that the `I3` primary indicator is defined inconsistently across the
+authoritative JSON, the packet and the methods ledger, that the Family B
+per-profile level 0.001666666667 is not implemented by component rules computed
+at 0.005, that the conservativeness assertion in the JSON gate-hierarchy text is
+contradicted by the round's own disclosed 0.025501, that the discordance grid is
+a sensitivity grid rather than proof of global size control, and that the `I3`
+floor is unresolved and unreachable at 0.95 for any admissible n at or below 768
+under the stated per-profile level and power.
+
+The disposition is a rejection rather than an acceptance with required changes
+because repairing `I3` would require re-specifying the atomic unit, the unit of
+n, the projection and every `I3` threshold, which is the invention of structure
+the draft does not contain. Supplying values the draft omits is expressly not a
+basis for acceptance.
+
+### Changes
+
+Seventeen paths: eight added and nine modified. Added are the review Markdown,
+the review JSON, its schema, the independent recalculation script, its tables,
+the committed review test module, the verbatim authority copy, and the methods
+review receipt. Modified are the two Study 3 routers, the repository README, the
+studies README, the current-status report, the decision log, the methods ledger,
+the artifact index and this run log. Decision `D40`, method `M-28`, and artifact
+identifiers `AR-0212` through `AR-0221` are registered. `D39`, `M-27` and
+`AR-0196` through `AR-0211` are unchanged.
+
+No file of the review object was edited: not the protocol JSON, Markdown or
+schema, not the review packet, not the drafting statistics or tables, not the
+positive-reference dossier, not the v0.1 review, not the design receipts, not the
+prior authority prompts, and not `tests/test_study3_design.py`. One finding
+concerns the committed design test itself and is recorded rather than fixed.
+
+The verbatim authority copy at
+`studies/study3/prompts/study3_v0_2_independent_methods_review_authority.md` was
+compared as a committed Git blob against the preserved operator source: 34624
+bytes, 931 lines, zero CR bytes, no trailing newline, digest
+`ec207bb595490417078ec904c71f6bb1fda2035006dded8488a2f9071dad4968` on both sides.
+
+### Changed-path accounting
+
+The receipt was written before the artifact-index and run-log commits existed. A
+receipt cannot observe commits made after it, and the draft-v0.2 round hit the
+same problem and had to issue a correction. Rather than repeat that correction,
+the receipt carries an explicit `changed_path_accounting` block that separates
+paths observed at receipt time from `paper/artifact_index.csv` and
+`docs/run_log.md`, which are declared prospectively. The declared total is
+seventeen and matches the observed `git diff --name-status` set against
+`8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`.
+
+### Validation
+
+No test and no review calculation ran on the operator machine. Every calculation
+and test result below comes from a clean CPU-only `python:3.11-bookworm`
+container on ACR registry `acrfinreportdt2tgbdb`, cloned from a Git bundle at an
+exact commit rather than from any working tree. Every run reported `DIRTY=0`.
+
+The calculation runs that produced the committed tables are `ca34` and `ca35`,
+both bound to the commit whose tables they emitted, with
+`INDEPENDENT_RECALCULATION_CHECK_OK=1` and a maximum absolute deviation of 0
+across the self-consistency battery.
+
+The validation battery ran on `85f885a17559c7f697681d1773edf87f219c2363`, tree
+`9a6b3fcdc986d213eceeb81bf2e55e9af8263b19`.
+
+| ACR run | Command | Result |
+|---|---|---|
+| `ca36` | `tests/test_study3_methods_review.py` | 78 passed |
+| `ca37` | `tests/test_study3_methods_review.py` repeated | 78 passed |
+| `ca38` | `tests/test_study3_design.py` | 61 passed |
+| `ca39` | `independent_methods_recalculation.py --check` | `INDEPENDENT_RECALCULATION_CHECK_OK=1`, deviation 0 |
+| `ca3a` | `design_statistics.py --check` | `DESIGN_STATISTICS_CHECK_OK sections=15` |
+| `ca3b` | `tests/test_study2_stage_t.py` | 73 passed |
+| `ca3c` | `tests/test_study2_stage_bd.py` | 54 passed |
+| `ca3d` | `tests/test_phase1_0d_protected_bytes.py` | 11 passed |
+| `ca3e` | `tests/test_phase1_0d_rv2_protected_bytes.py` | 30 passed |
+| `ca3g` | Full repository suite | 3803 passed, 15 skipped, 2 failed, `FULL_SUITE_ACCEPTED_HISTORICAL_FAILURES_ONLY=1` |
+
+The two full-suite failures are the pre-existing
+`tests/test_parser_v3_seal_job` failures already registered as accepted
+historical failures. The passed count moves from the registered 3725 to 3803,
+which is exactly the 78 new review tests and nothing else. The Study 2 focused
+selections and both Phase 1.0D protected-byte modules are unchanged.
+
+Because this run-log entry is itself the final commit, the focused review tests,
+the design tests, both `--check` runs, both protected-byte modules and the full
+suite are run a second time on the actual publication commit, so that no commit
+is claimed to be validated by a run bound only to its parent. Those second-round
+results are reported in the round handoff; a committed file cannot record runs
+that postdate it.
+
+Two container runs failed and are disclosed rather than omitted. Run `ca32`
+failed with a `ZeroDivisionError` inside the reviewing party's own paired-family
+validator at the null boundary where the nuisance probability is zero; the
+estimator was correct and the validator was wrong. Run `ca3f` failed immediately
+because the operator-side ACR context copy of `study2_full_tests.sh` had been
+copied out of a Windows working tree with CRLF line endings, so `set -o pipefail`
+was unparseable in the container; the script was normalised to LF in the context
+directory and re-run as `ca3g`. Neither failure involved repository content.
+
+Three further defects in the reviewing party's own work were found and corrected
+before publication and are recorded here for the same reason: a
+Clopper-Pearson monotonicity check oriented in the wrong direction, which
+produced a spurious violation in run `ca33`; an internal inconsistency in `ca33`
+between a 32-point and a resolution-scaled calibration grid, resolved by fixing
+the grid at `max(64, 2n)` everywhere; and an artifact-identity assertion in the
+committed test module that hashed working-tree bytes, which on Windows are CRLF,
+and now reads committed blobs instead.
+
+Non-authoritative operator-side activity is disclosed in the receipt: byte
+compilation of authored files, direct invocation of individual assertion
+functions from the committed test module as a plain import while debugging its
+hand-written validator, and document assembly through throwaway generator
+scripts kept outside the repository. `pytest` was never invoked on the operator
+machine and the review calculation was never executed there. None of that
+activity carries decision authority.
+
+### Boundary
+
+Zero model downloads, tokenizer constructions, weight loads, forward passes,
+generations, activation extractions, probe fits, patching operations, ablation
+operations, lens operations, experimental provider calls, GPU jobs, bank rows,
+seeds, gate evaluations on models, confirmation accesses and evidence rows.
+Nothing is frozen, nothing is authorised, no interface is selected and no
+positive reference is selected. `OD2` remains an operator decision and no
+checkpoint was selected, pinned, downloaded, tokenized, loaded, run,
+prequalified or substituted. `OD5` and `OD6` received explicit methods
+recommendations but are not adopted by this round. No Study 1 or Study 2 path,
+no evidence ledger, no limitations ledger, no claim-evidence matrix, no
+dependency, no lockfile, no container definition, no runtime source and no
+GitHub workflow was modified, and GitHub Actions was not used. The only legal
+next action is an operator amendment round producing draft-v0.3.
