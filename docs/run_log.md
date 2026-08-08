@@ -5450,3 +5450,232 @@ The final Stage B-D state is
 `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`.
 `paper/evidence_ledger.csv` remains at EV-0016 and both protected rollups are
 unchanged.
+
+## 2026-08-08 - Study 2 protocol v1 terminal documentation
+
+A documentation-only terminalization round. It closes the mutable repository
+routing that still pointed at an unexecuted Study 2, narrows one overbroad
+interpretive sentence with an additive erratum, and records a read-only
+descriptive diagnostic over already-committed development rows. It creates no
+scientific evidence, changes no frozen artifact, and does not supersede the
+scientific terminal state `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`,
+which remains sealed at commit `43411e09de425dfae0ee74ba46c68a389311e9a7`, tree
+`c393f395fd499716f5caae6515045483745975bb`. The endpoint reached here,
+`STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE`, is a documentation state
+only and does not promote, replace, or reopen that scientific state.
+
+### Starting-state preflight
+
+The complete content-identity preflight was rerun before any file was touched:
+repository identity and the `origin` remote, `HEAD == origin/main ==
+43411e09de425dfae0ee74ba46c68a389311e9a7`, `HEAD^{tree} ==
+c393f395fd499716f5caae6515045483745975bb`, a completely clean index and
+worktree, the required ancestry of the registered Stage P, Stage T, and Stage
+B-D commits, every registered frozen Git-blob hash, both protected Phase 1.0D
+rollups, the evidence-ledger tail, and the prohibited-operation counters. Every
+check passed with zero differences.
+
+Disposition recorded:
+
+`STUDY2_TERMINALIZATION_STARTING_STATE_ACCEPTED_CONTENT_IDENTITY_BRANCH_METADATA_NONAUTHORITATIVE`
+
+Platform metadata observed and recorded for audit, and deliberately not used as
+an admission gate:
+
+| item | observed value |
+| --- | --- |
+| local branch | `alanjiao1988-microsoft-miniature-eureka` |
+| worktree path | `C:\Users\alanjiao\.copilot\repos\copilot-worktrees\J-space-observation\alanjiao-microsoft-miniature-eureka` |
+| checkout kind | platform-managed worktree of `Alanjiao1988/J-space-observation` |
+
+The platform relabelled the session branch without changing the commit, the
+tree, the index, the worktree, or any protected byte. Under the standing
+starting-state amendment, branch and worktree names are observational metadata;
+commit, tree, and protected-byte identity are the authoritative gate. No branch
+was renamed, switched, merged, rebased, reset, or recreated to satisfy a name.
+
+### Changed paths
+
+Exactly fourteen paths differ from `43411e09`, every one of them inside the
+authorized whitelist. Four are new files; ten were already mutable routing or
+ledger documents. No frozen Stage P, Stage T, or Stage B-D artifact, no
+protected Phase 1.0D file, no script, no test, and no scientific data file was
+touched.
+
+Created:
+
+| path | bytes | sha256 |
+| --- | --- | --- |
+| `studies/study2/terminal_manifest.json` | 19739 | `75fc5a88faed24852ee858804a8c166042c8edbfff148f60235c2942650e1292` |
+| `studies/study2/STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md` | 9516 | `efe21ffa73351e027c5b38d8a828cc8ea8fce1fdd37bc1b799bb416a3e9f9ff9` |
+| `studies/study2/decisions/study2_stage_bd_interpretation_erratum.md` | 5551 | `7a992ae27ec30cedd95818d84efe759e11263700b7740d0fe7b7728c944d59f8` |
+| `studies/study2/analysis/stage_bd_posthoc_interface_diagnostic.md` | 7487 | `806fc94f4c26b55246e6b8a454d29d4788da27937f8f954a58742a14ef6acb8d` |
+
+Modified: `README.md`, `studies/README.md`, `studies/study2/README.md`,
+`studies/study2/NEXT_THREAD_HANDOFF.md`, `reports/current_status.md`,
+`paper/claim_evidence_matrix.md`, `paper/limitations_ledger.md`,
+`paper/methods_ledger.md`, `paper/artifact_index.csv`, and this file,
+`docs/run_log.md`.
+
+The two superseded routers were corrected additively. Nothing was deleted from
+`studies/study2/NEXT_THREAD_HANDOFF.md` or `reports/current_status.md`; each now
+opens with a dated notice and retains its original text below an explicit
+historical cut, so the earlier planning language survives as a labelled record
+rather than as a live instruction.
+
+New ledger rows are `L-89`, `M-25`, `D37`, and artifact records `AR-0182`
+through `AR-0185`. The historical ordering of `D34`, `D35`, and `D36` was left
+exactly as it was; `D37` was appended after confirming no collision.
+
+### Read-only diagnostic recomputation
+
+`studies/study2/stage_bd/rows_target.jsonl` was re-read as committed bytes
+(1002446 bytes,
+`9ada004f1c9c25f940e00de7753dd6563e3898153c66099f7b84360aaa8ea34e`, 1024 rows,
+every row `model_role = target`) and the option-selection counts were recomputed
+from the `restricted_prediction` field. Every slice matched its expected value
+exactly; there were zero mismatches.
+
+| slice | n | correct | A | B | C | D |
+| --- | --- | --- | --- | --- | --- | --- |
+| Gate A target NT, depths 2+3 | 256 | 58 | 106 | 66 | 0 | 84 |
+| all target NT, depths 1+2+3 | 384 | 92 | 162 | 99 | 0 | 123 |
+| target PT | 256 | 67 | 12 | 162 | 5 | 77 |
+| target ST | 128 | 34 | 2 | 77 | 4 | 45 |
+| target WT | 256 | 70 | 16 | 158 | 6 | 76 |
+
+Depth-1 NT correctness was 34/128. Gate A pooled correctness was 0.2265625, and
+the per-condition rates were NT 0.23958333333333334, PT 0.26171875, ST 0.265625,
+and WT 0.2734375, all near the 0.25 chance rate. Option C was selected in 0 of
+the 384 target NT rows.
+
+This recomputation reads sealed rows and computes descriptive counts. It ran no
+model, constructed no tokenizer, and produced no evidence row. It carries zero
+evidential authority: it is post-hoc, it was not preregistered, it has no
+control comparison and no error model, and it cannot distinguish a prompt or
+option-rendering interface defect from a genuine capability result. It does not
+alter Gate A, it does not rehabilitate the failed comparison, and it must not be
+cited as a finding. `L-89` records it as a limitation and `AR-0185` registers it
+with a `limitation_exploratory_not_result` usage.
+
+### Validation
+
+All evidential validation ran remotely in CPU-only ACR against clean committed
+Git bytes. No GPU was used, no GitHub workflow was used, and no local `pytest`
+run was performed in this round. Each task clones the target commit from a
+bundle into `/tmp/src` and reports the bound commit, the bound tree, and its
+dirty state before doing anything else.
+
+Every run below reported `BOUND_COMMIT=9abbf325a11070b7fe83259d83a5dd4be3756b2c`,
+`BOUND_TREE=e19c05797ccb89f1e0dc62d4570c5f219d4c2876`, and `DIRTY=0`.
+
+| ACR run | command | result |
+| --- | --- | --- |
+| `ca2c` | `targeted_tests.yaml` over `tests/test_study2_stage_bd.py tests/test_paper_registries.py tests/test_study2_stage_t.py` | 54 passed |
+| `ca2e` | `study2_full_tests.yaml`, full repository suite | 3664 passed, 15 skipped, exactly the 2 accepted historical `test_parser_v3_seal_job` failures, `FULL_SUITE_ACCEPTED_HISTORICAL_FAILURES_ONLY=1` |
+| `ca2f` | `repo_script.yaml` with `SCRIPT=scripts/validate_study2_stage_t.py` | `STAGE_T_VALIDATION_OK=1`, core manifest `6dec7650a05533efc5d88ba9ac1e3a498ca977a091a25b52155bbdb452622815`, 1024 selected, no failures |
+| `ca2h` | `repo_script.yaml` with `SCRIPT=scripts/validate_study2_stage_bd.py` and `ARGS=--pack studies/study2/stage_bd` | `certified: true`, 3072 rows, `overall_gate_pass: false`, `gate_inputs_sha256 = 1433f8119b2d8e377be7ede2735430ab55006c3737ebd2bf9e0c85c486b93cf7` |
+| `ca2d` | `repo_script.yaml` with `SCRIPT=/workspace/terminal_static_check.py` | `TERMINAL_STATIC_CHECKS=205`, `TERMINAL_STATIC_FAILURES=0`, `TERMINAL_STATIC_CHECK_OK=1` |
+
+One earlier invocation, `ca2g`, failed in 1m49s because
+`validate_study2_stage_bd.py` was launched without its required `--pack`
+argument. That was an operator command error, not a validation failure; the
+script aborted on argument parsing before reading any artifact. It is recorded
+here because run identities must never be omitted or invented. The corrected
+invocation is `ca2h`.
+
+The validation envelope is unchanged from the Stage B-D closure round in every
+respect: the same 54 focused tests, the same full-suite counts, the same two
+accepted historical failures, the same Stage T validator disposition, and the
+same Stage B-D certification with the identical `gate_inputs_sha256`. No source
+file and no test was modified in this round, so no count could have been forced.
+
+The terminal static check deserves an explicit disclosure. This round's
+whitelist authorizes exactly four new repository files, none of which is a
+script, so the model-free terminal static check could not be added to the
+repository without exceeding the authorized changed-path set. It was therefore
+written as an operator-side instrument outside the working tree and uploaded
+into the ACR build context, where the existing `repo_script` vehicle executed it
+with `cwd` set to the clean `/tmp/src` clone. The instrument reads the committed
+checkout and writes nothing. Its 205 checks parse `terminal_manifest.json`,
+re-derive every diagnostic count from the committed target rows, verify the
+`AR-0182` through `AR-0185` byte lengths and hashes against committed blobs,
+confirm the evidence ledger is byte-identical and still ends at `EV-0016`,
+confirm every registered Stage P, Stage T, and Stage B-D blob is unchanged,
+confirm the six Stage B-D confirmation operation counters are still zero,
+resolve every relative link introduced this round, assert the `L-89`, `M-25`,
+and `D37` ledger tails with `D34` through `D36` retained, and scan the five
+current routers for stale present-tense lifecycle claims while ignoring text
+below a declared historical cut. Because it is not committed, it is not a
+repository artifact and is not registered in the artifact index.
+
+A Windows-specific observation from the previous round recurred and is again
+recorded rather than "fixed". The workstation checkout reports a handful of
+protected anchors as differing because `core.autocrlf` is `true` and those paths
+carry no `.gitattributes` entry, so the working copy holds CRLF while the
+committed blob holds LF. Locally the terminal static check reported four such
+failures, covering `paper/evidence_ledger.csv`,
+`studies/study2/RESEARCH_CHARTER.md`, and
+`studies/study2/STAGE_BD_AUTHORITY_RECEIPT.md`. Each was verified to match its
+committed blob exactly, byte length and SHA-256 alike, with an empty `git diff`,
+and all four disappeared on the Linux ACR checkout, which is why `ca2d` reports
+zero failures. Protected-byte identity is a property of the committed blobs, not
+of a platform-specific working copy, and no anchor was edited. All new files
+written this round were written as raw bytes with LF endings and committed with
+`core.autocrlf` disabled, and every hash recorded anywhere in this round was
+computed from `git cat-file blob`, never from a working-copy read.
+
+### Protected boundaries
+
+Both Phase 1.0D rollups were verified before the first edit and again after the
+final content commit, with identical results each time:
+
+`PROTECTED_ROLLUP_SHA256=436ed331c7dd53fa6387d6b52447bc72edf166bbb3640b7f7723a8766bdf51dd`
+over 152 files, and
+`RV2_PROTECTED_ROLLUP_SHA256=ef5a417c572f7da94a562411b752d74b48da2e28aa3aa1491db9bc34dfbde82a`
+over 36 files.
+
+`paper/evidence_ledger.csv` is byte-identical at 25241 bytes,
+`3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1`, and still
+ends at `EV-0016`. No evidence row was added, because documentation is not
+evidence.
+
+This round performed zero operations of every prohibited kind: zero tokenizer
+constructions, zero model downloads, zero weight loads, zero model forwards,
+zero generations, zero activation extractions, zero lens fits or applies, zero
+probe fits, zero patching or ablation operations, zero GPU jobs, zero provider
+calls, zero Phase 1.0D operations, zero RQ2/S4 operations, and zero scientific
+evidence rows. The cumulative Study 2 counters in `terminal_manifest.json` are
+copied verbatim from the sealed `stage_bd_core_manifest.json` and are therefore
+unchanged: 3072 forward passes, 3 weight loads, 3 tokenizer constructions, and 3
+model downloads, all from the sealed Stage B-D GPU job, with every other counter
+at zero.
+
+### Publication
+
+No publication was attempted before the final file-changing commit; remote
+`main` stood at `43411e09de425dfae0ee74ba46c68a389311e9a7` throughout the
+implementation. Publication is a single non-force, fast-forward-only push of an
+explicit refspec after re-fetching and confirming the remote has not moved.
+
+The confirming reruns at the actual publication commit, which differs from
+`9abbf325a11070b7fe83259d83a5dd4be3756b2c` only by this run-log section, together
+with the post-push verification, are reported in the final operator response
+rather than committed here, so that this log need not contain a self-referential
+account of its own validation.
+
+### Result
+
+The mutable routing now describes what actually happened: Study 2 protocol v1
+ran, Gate A failed at 25/128 and 33/128 against a threshold of 43 with a chance
+rate of 32/128, and the study closed on development feasibility without an
+answer to its research question. The erratum narrows the single overbroad
+sentence in the sealed decision record without editing it, stating that the
+failed comparison does not license a claim about the model's internal
+capability, because a prompt or option-rendering interface defect remains an
+unexcluded explanation.
+
+Protocol v2, interface calibration, any Stage B-C or mechanistic follow-up, and
+any new measurement all remain unauthorized. The documentation endpoint is
+`STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE`; the scientific terminal
+state remains `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`.
