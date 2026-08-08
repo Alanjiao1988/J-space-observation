@@ -9,7 +9,18 @@
 
 set -euo pipefail
 
-OUTPUT_DIR="/work/seal"
+WORK_ROOT="${STAGE_BD_WORK_DIR:-}"
+if [[ -z "$WORK_ROOT" ]]; then
+    if mkdir -p /work/stage-bd 2>/dev/null; then
+        WORK_ROOT="/work/stage-bd"
+    else
+        WORK_ROOT="${TMPDIR:-/tmp}/stage-bd"
+    fi
+fi
+mkdir -p "$WORK_ROOT"
+echo "WORK_ROOT=${WORK_ROOT}"
+
+OUTPUT_DIR="${WORK_ROOT}/seal"
 
 : "${STAGE_BD_SOURCE_COMMIT:?}"
 : "${STAGE_BD_SOURCE_TREE:?}"
@@ -26,7 +37,7 @@ echo "OUTPUT_EMPTY_BEFORE_RUN=1"
 # created now is the only correct comparison: every file in the image predates
 # the job, whereas comparing against a checked-out file depends on the order git
 # happened to write the tree.
-MARKER="/work/.started"
+MARKER="${WORK_ROOT}/.started"
 : > "$MARKER"
 
 cd /opt/study2-src

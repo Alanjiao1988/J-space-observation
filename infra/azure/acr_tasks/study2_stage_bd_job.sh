@@ -7,13 +7,27 @@
 # the payload is opaque to it and every byte is re-verified against the sealed
 # manifest before anything downstream admits it.
 #
-# The job writes only to /work.  It never writes into the image's source tree,
+# The job writes only to its work root.  It never writes into the image's tree,
 # so the commit it was built from remains exactly what it was.
 
 set -euo pipefail
 
-OUTPUT_DIR="/work/shards"
-CACHE_DIR="/work/cache"
+# The GPU workload profile does not grant write access to the container root, so
+# the work root is chosen at start rather than assumed.  Nothing scientific
+# depends on the location: every output is hashed and re-verified downstream.
+WORK_ROOT="${STAGE_BD_WORK_DIR:-}"
+if [[ -z "$WORK_ROOT" ]]; then
+    if mkdir -p /work/stage-bd 2>/dev/null; then
+        WORK_ROOT="/work/stage-bd"
+    else
+        WORK_ROOT="${TMPDIR:-/tmp}/stage-bd"
+    fi
+fi
+mkdir -p "$WORK_ROOT"
+echo "WORK_ROOT=${WORK_ROOT}"
+
+OUTPUT_DIR="${WORK_ROOT}/shards"
+CACHE_DIR="${WORK_ROOT}/cache"
 
 : "${STAGE_BD_SOURCE_COMMIT:?}"
 : "${STAGE_BD_SOURCE_TREE:?}"
@@ -32,7 +46,7 @@ echo "CACHE_EMPTY_BEFORE_RUN=1"
 # created now is the only correct comparison: every file in the image predates
 # the job, whereas comparing against a checked-out file depends on the order git
 # happened to write the tree.
-MARKER="/work/.started"
+MARKER="${WORK_ROOT}/.started"
 : > "$MARKER"
 
 cd /opt/study2-src
@@ -60,8 +74,9 @@ test -z "$(find /opt/study2-src -newer "$MARKER" -type f \
     || { echo "[FAIL] the source tree was modified during execution"; exit 1; }
 echo "SOURCE_TREE_UNMODIFIED=1"
 
-python - <<'PY'
+OUTPUT_DIR="$OUTPUT_DIR" python - <<'PY'
 import json
+import os
 import pathlib
 import sys
 
@@ -73,7 +88,7 @@ present = [p for p in bd.CONFIRMATION_PATHS if (root / p).exists()]
 if present:
     raise SystemExit(f"[FAIL] confirmation objects reachable: {present}")
 receipt = json.loads(
-    pathlib.Path("/work/shards/stage_bd_execution_receipt.json").read_text("utf-8")
+    pathlib.Path(os.environ["OUTPUT_DIR"], "stage_bd_execution_receipt.json").read_text("utf-8")
 )
 print("SHARDS_COMPLETE=%d" % receipt["execution"]["shards_complete"])
 print("RETRIES=%d" % receipt["execution"]["retries"])
