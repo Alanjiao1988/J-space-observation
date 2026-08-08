@@ -28,6 +28,13 @@ test -z "$(ls -A "$CACHE_DIR")"
 echo "OUTPUT_EMPTY_BEFORE_RUN=1"
 echo "CACHE_EMPTY_BEFORE_RUN=1"
 
+# Reference point for the source-tree check below.  Comparing against a marker
+# created now is the only correct comparison: every file in the image predates
+# the job, whereas comparing against a checked-out file depends on the order git
+# happened to write the tree.
+MARKER="/work/.started"
+: > "$MARKER"
+
 cd /opt/study2-src
 echo "SOURCE_COMMIT=${STAGE_BD_SOURCE_COMMIT}"
 echo "IMAGE_DIGEST=${STAGE_BD_IMAGE_DIGEST}"
@@ -48,7 +55,7 @@ python scripts/run_study2_stage_bd_gpu.py \
 # The source tree must be exactly what the image was built from.  A job that
 # modified its own checkout could not be trusted to have measured the pinned
 # commit, so this is checked rather than assumed.
-test -z "$(find /opt/study2-src -newer /opt/study2-src/pyproject.toml -type f \
+test -z "$(find /opt/study2-src -newer "$MARKER" -type f \
     -not -path '*/__pycache__/*' -print -quit)" \
     || { echo "[FAIL] the source tree was modified during execution"; exit 1; }
 echo "SOURCE_TREE_UNMODIFIED=1"
