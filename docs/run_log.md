@@ -6249,3 +6249,177 @@ no evidence ledger, no limitations ledger, no claim-evidence matrix, no
 dependency, no lockfile, no container definition, no runtime source and no
 GitHub workflow was modified, and GitHub Actions was not used. The only legal
 next action is an operator amendment round producing draft-v0.3.
+## 2026-08-08 - Study 3 interface-calibration design amendment to draft-v0.3
+
+### Purpose and endpoint
+
+An operator amendment round in response to
+`STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`. The round repairs the
+design, records the repairs, and publishes the result as an unfrozen draft-v0.3
+for a **second** independent methods review. It is explicitly not an approval
+round. The party that wrote draft-v0.2 also wrote this amendment, so the
+amendment record states that each repair is proposed resolved subject to
+independent review and never that the protocol is correct.
+
+The endpoint is the documentation state
+`STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW`.
+
+### Starting state
+
+The round started from `origin/main` at
+`e4bcda3a487ea9c9a085e3943103a07501014431`, tree
+`fa1246fb72232212e29fced7e37dbef971601cfc`, worktree and index clean. The full
+preflight was re-run from committed blobs rather than taken from the handoff
+note: the reviewed design commit `8a2c4a0b2a73c5d802988333f11ea6c22828f6f5` was
+confirmed a strict ancestor, the comparison between it and the starting commit
+was confirmed to be exactly seventeen paths with eight additions and nine
+modifications, the committed v0.2 review-authority blob was confirmed at 34624
+bytes and `ec207bb595490417078ec904c71f6bb1fda2035006dded8488a2f9071dad4968`,
+`paper/evidence_ledger.csv` was confirmed byte-identical at 25241 bytes with
+sixteen rows ending `EV-0016`, both protected Phase 1.0D rollups were recomputed
+from committed blobs and matched, and the registry tails were read as `D40`,
+`M-28` and `AR-0221`.
+
+The tails were read as the **maximum numeric identifier**, not as the last
+regular-expression match in the file. A naive last-match scan reports `D39` and
+`M-27`, because entry bodies back-reference earlier identifiers. The starting
+state was accepted as
+`STUDY3_V0_3_AMENDMENT_STARTING_STATE_ACCEPTED_CONTENT_IDENTITY_BRANCH_METADATA_NONAUTHORITATIVE`.
+
+### What was repaired
+
+All twenty findings `S3MR-001` through `S3MR-020` and all twenty-two packet
+checklist items `UR-01` through `UR-22` are closed exactly once each with a real
+disposition in `studies/study3/reviews/v0_3_operator_amendment.json`. The
+substantive repairs are recorded in `D41` and `M-29`. In summary:
+
+`I3` is redefined over pre-registered pairwise `base_item_contrast_clusters`
+with exactly two variants each, which supplies the denominator the estimand
+previously lacked. There is no cross product; `K5` and `K6` are not crossed and
+use disjoint base-item identities. `K5` is exactly seven one-factor contrasts
+and `K6` is exactly two. `K5` is `not_applicable` to `S2` and `S3` rather than
+trivially passing. Three `I3` indicators are defined and the conjunction
+`J_both` is the primary gate, so a stable but wrong answer and a stable but
+invalid answer both score zero. `OD5` is resolved as an exact-rational
+exact-binomial design with a study-level screening level of `1/200`, a
+per-profile development component level of `1/600`, intersection-union
+conjunction within a profile, and a selectable-profile denominator fixed at
+three before any data exists. `OD6` is resolved as one `I3` floor only, at
+`p0 = 0.90` against `p1 = 0.97` with power at least `0.90` and `n = 256`
+clusters per applicable contrast cell; the second floor is deleted from every
+active field. Every `n` carries a unit at its definition and at every use. The
+paired aggregate-equivalence procedure is retired from every decision role and
+the four-point discordance grid is removed from active verification. The Study 3
+operation projection is decomposed into six named work streams with per-stream
+units, and under the current single-token answer domain Study 3 adds exactly
+zero forward passes and zero sequence-scoring rows beyond Study 2.
+
+`OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`. No positive-reference
+checkpoint was selected, preferred, pinned, ranked, downloaded, tokenized,
+loaded or prequalified, and the dossier says `UNSELECTED` explicitly. Its two
+back-references to `D-07` are corrected to `D-04`.
+
+### Independent derivation rather than transcription
+
+The amendment authority supplied the development and confirmation targets as
+planning values. `studies/study3/analysis/design_statistics.py` derives all of
+them from the exact rational levels and registered floors using exact integer
+and `Fraction` arithmetic. `tests/test_study3_design.py` parses the script's
+abstract syntax tree and fails if any of those planning targets appears as a
+literal in it, so copying a constant instead of deriving it is a test failure
+rather than a silent pass.
+
+### Repair of the historical-review test
+
+`tests/test_study3_methods_review.py` asserted the identity of the historical
+review against working-tree files. draft-v0.3 legitimately changes several of
+those files, and in particular it rewrites
+`studies/study3/analysis/design_statistics_tables.json`, which the reviewer's
+recalculation compares itself against. Left alone, the module would have started
+asking whether the v0.2 reviewer reproduces the v0.3 drafting party, which is
+not the historical question and is not true.
+
+The module now reads the historical artifacts from committed blobs by explicit
+commit: the reviewed design bytes at `8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`
+and the review outputs at `e4bcda3a487ea9c9a085e3943103a07501014431`. The
+recalculation check materialises the immutable script, its committed review
+table and the drafting table it reviewed into a scratch directory from those
+commits and runs the same script bytes there. This is a commit-addressing repair
+only. The review disposition, the finding text, the finding counts, the
+checklist answers and the recalculated values are unchanged, and no assertion
+was weakened to make the historical review pass.
+
+### Changed paths and registrations
+
+Exactly twenty-six paths changed against `e4bcda3a`: six added and twenty
+modified, with no rename and no deletion. `D41` and `M-29` are the only new
+registry entries, `AR-0222` through `AR-0240` are the only new artifact rows,
+and `D39`, `D40`, `M-27`, `M-28` and `AR-0196` through `AR-0221` are unaltered.
+No evidence row and no limitations row was added: a defect in an unfrozen design
+document is not a limitation of executed measurement, and no scientific evidence
+was produced. `paper/evidence_ledger.csv`, `paper/limitations_ledger.md`,
+`paper/claim_evidence_matrix.md`, every Study 1 and Study 2 path, every
+dependency, lock file, container definition, runtime source and GitHub workflow
+are untouched, and `infra/` is not in the whitelist, so the container task
+scripts were kept operator-side and uncommitted.
+
+The draft-v0.2 review outputs, its receipt, its recalculation, its authority copy
+and the exact packet the first reviewer reviewed are immutable and unchanged.
+
+### Validation
+
+All decision-bearing validation ran in clean CPU-only Azure Container Registry
+tasks on registry `acrfinreportdt2tgbdb` with image `python:3.11-bookworm`, each
+bound to an exact commit, with one test path per invocation so that no run can
+be claimed to have covered two modules. GitHub Actions was not used. `pytest`
+was never invoked on the operator machine and no decision-bearing statistical
+calculation was performed there.
+
+Because this run-log entry is itself part of the final commit, the design tests,
+the historical-review tests, the statistics `--check`, the Study 2 Stage T and
+Stage B-D focused regressions, both protected Phase 1.0D byte modules, the full
+repository suite and the static changed-path and digest audit are run again on
+the actual publication commit, so that no commit is claimed to have been
+validated by a run bound only to its parent. Those results are reported in the
+round handoff, because a committed file cannot record runs that postdate it.
+
+The full suite may accept only the two already-registered historical
+`tests/test_parser_v3_seal_job` failures with identical identities. Any new
+failure, any unexplained change in the skip count and any run not bound to the
+candidate commit is a stop rather than a note.
+
+### Non-authoritative operator-side activity, disclosed
+
+Read-only git inspection of committed blobs, trees and diffs; document assembly
+through throwaway generator scripts kept outside the repository; byte
+compilation and abstract-syntax parsing of authored Python files; a non-pytest
+shape probe that executes the committed test modules against a stubbed `pytest`
+module and calls each assertion function directly, used only to find shape and
+typo defects before the container run; a read-only
+`design_statistics.py --check` to confirm the script and its table agreed before
+they were committed; and line-ending normalisation of authored files to LF.
+None of that activity carries decision authority and none of it is cited as
+evidence.
+
+One environment artifact is recorded so it is not mistaken for drift:
+`scripts/validate_study2_protocol.py` fails on the operator machine with
+`protocol JSON is not canonical` purely because the Windows working tree carries
+CRLF. The protected rollups were therefore verified from committed blobs, and no
+protected file was touched.
+
+### Boundary
+
+Zero model downloads, revision resolutions by download, tokenizer constructions,
+tokenizations, weight loads, forward passes, sequence scorings, generations,
+activation extractions, hook installations, lens loads, lens fits, lens applies,
+probe fits, patching operations, ablation operations, provider calls, GPU jobs,
+task, qualification, development or confirmation bank rows or accesses, seeds,
+interface selections, positive-reference selections, gate evaluations on models,
+result rows, scientific evidence rows, Phase 1.0D operations and RQ2 or Study 4
+operations. Nothing is frozen, nothing is authorised, no interface is selected
+and no positive reference is selected.
+
+The only legal next action is a second independent methods review of
+`studies/study3/analysis/independent_methods_review_packet_v0_3.md` by a party
+that did not write draft-v0.3, conducted under a separate authority. Its
+disposition is not predeclared here.
