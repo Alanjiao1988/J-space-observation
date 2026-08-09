@@ -950,6 +950,52 @@ def test_the_prose_scan_covers_every_registered_prohibited_term(protocol):
             "the prose scan does not cover the registered term %r" % term
 
 
+# S3MR3-003 and S3MR3-008. The routing documents that state the round and the
+# legal next action. A stale round reference here is exactly the residue the
+# third review recorded, and it is not caught by the prohibited-term scan.
+ROUND_REFERENCE_PATHS = (
+    "reports/current_status.md",
+    "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+    "studies/study3/README.md",
+    "studies/study3/NEXT_THREAD_HANDOFF.md",
+    "studies/study3/analysis/independent_methods_review_packet_v0_5.md",
+    "studies/study3/protocol/interface_calibration_protocol_draft.md",
+)
+
+
+@pytest.mark.parametrize("relative", ROUND_REFERENCE_PATHS)
+def test_routing_documents_name_the_fourth_review_as_the_legal_next_action(relative):
+    """S3MR3-008. Active round references must name the FOURTH review."""
+    text = _load_text(os.path.join(REPO_ROOT, relative.replace("/", os.sep)))
+    lowered = text.lower()
+    assert "fourth" in lowered, relative
+    assert EXPECTED_STATE in text or "draft-v0.5" in lowered, relative
+    # An active sentence may not still call an earlier round the legal next action.
+    for number, paragraph in _prose_paragraphs(
+            os.path.join(REPO_ROOT, relative.replace("/", os.sep))):
+        blob = " ".join(paragraph.split()).lower()
+        if "legal next action" not in blob and "only legal next" not in blob:
+            continue
+        if any(marker in blob for marker in _historical_exemption_markers()):
+            continue
+        for stale in ("second bounded independent methods review",
+                      "third bounded independent methods review",
+                      "second independent methods review",
+                      "third independent methods review"):
+            assert stale not in blob, \
+                "%s:%d still names %r as the legal next action" \
+                % (relative, number, stale)
+
+
+def test_the_charter_declares_the_current_draft_version(protocol):
+    """S3MR3-003. The charter's version row carried draft-v0.3 through two rounds."""
+    text = _load_text(os.path.join(
+        REPO_ROOT, "studies", "study3", "RESEARCH_CHARTER_DRAFT.md"))
+    assert "| draft version | `%s` |" % DRAFT_VERSION in text
+    assert "| state | `%s` |" % EXPECTED_STATE in text
+    assert protocol["study_identity"]["draft_version"] == DRAFT_VERSION
+
+
 def test_the_prohibition_enforcement_scope_matches_the_registered_scope(protocol):
     """S3MR3-004. The declared scope and the enforced scope must be the same set."""
     prohibition = protocol["proposed_statistics"]["active_claim_term_prohibition"]

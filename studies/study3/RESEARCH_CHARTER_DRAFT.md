@@ -7,8 +7,8 @@
 | study id | `jspace-study3-interface-calibration` |
 | name | Study 3 - Interface Adequacy and Label-Binding Calibration |
 | namespace | `studies/study3` |
-| state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW` |
-| draft version | `draft-v0.3` |
+| state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW` |
+| draft version | `draft-v0.5` |
 | frozen | no |
 | execution authorized | no |
 | bank authorized | no |
@@ -35,11 +35,12 @@ finding-by-finding dispositions are in `reviews/v0_3_operator_amendment.md`.
 
 **No amendment in this history performed any measurement or closed any blocking decision.**
 
-**The drafting party does not claim draft-v0.3 is correct.** Every repair is recorded as
-`PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`. draft-v0.2 was found defensible by
-the party that wrote it and was then independently rejected with six blocking findings; a design
-checked only by its author is not evidence that the design is sound. That determination belongs to
-the third independent methods review.
+**The drafting party does not claim draft-v0.5 is correct.** Every repair is recorded as
+`PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW`. draft-v0.2 was found defensible by
+the party that wrote it and was then independently rejected with six blocking findings; draft-v0.3
+and draft-v0.4 were each rejected by a further independent review. A design checked only by its
+author is not evidence that the design is sound. That determination belongs to the fourth
+independent methods review.
 
 ---
 
@@ -170,6 +171,11 @@ exactly zero.
 
 The open decisions are listed with recommendations and trade-offs in `NEXT_THREAD_HANDOFF.md`.
 
+*Historical record only: the paragraph below states the draft-v0.3 disposition of `OD5` and `OD6`.
+draft-v0.3 was rejected by the second independent methods review and superseded by draft-v0.4, which
+was rejected by the third and superseded by draft-v0.5. Its sizes are withdrawn and are not current;
+the active development sizes are `413`, `214` and `448`.*
+
 The draft-v0.3 operator amendment authority **resolves `OD5` and `OD6`**, subject to the second
 independent methods review. `OD5` fixes the exact-rational multiplicity policy above. `OD6` fixes a
 single `I3` floor, `p0 = 0.90` against `p1 = 0.97` at power at least `0.90`, giving `n = 256`
@@ -181,7 +187,11 @@ narrative, because the review established it was unreachable at any admissible s
 revision-resolved, downloaded, tokenized, loaded or prequalified, and unresolved item `UR-22` stays
 `UNRESOLVED_BLOCKING_OPERATOR_DECISION`. `OD2` still blocks Gate `I4`.
 
-The legal next action is a **second bounded independent methods review**; the packet for it is
+*Historical record only: the following sentence recorded the draft-v0.3 legal next action, which
+has since been carried out. The current legal next action is a fourth bounded independent methods
+review of draft-v0.5.*
+
+The legal next action recorded by draft-v0.3 was a **second bounded independent methods review**; the packet for it is
 `analysis/independent_methods_review_packet_v0_3.md`.
 
 ## 9. Governing documents
@@ -212,7 +222,9 @@ The legal next action is a **second bounded independent methods review**; the pa
 
 ---
 
-**The only legal next action is a second bounded independent methods review.** No freeze prompt, no
+**The only legal next action is a fourth bounded independent methods review of draft-v0.5.** The
+sentence that follows is the draft-v0.3 historical record and is superseded: at that time the only
+legal next action was a second bounded independent methods review. No freeze prompt, no
 `P3-Q` prompt, no bank prompt, no seed prompt, no model prompt, no GPU prompt, no development prompt,
 no confirmation prompt and no mechanistic-execution prompt exists.
 

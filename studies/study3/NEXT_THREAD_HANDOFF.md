@@ -1,5 +1,22 @@
 # Study 3 - next thread handoff
 
+> **Study 3 draft-v0.5 bounded operator amendment - published, awaiting a FOURTH independent methods review**
+>
+> **State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`
+>
+> draft-v0.5 answers the ten `S3MR3-*` findings of the third independent methods review. Its
+> blocking repair records `K6-SEP` as `not_applicable` for the option-less profiles `S2` and `S3`,
+> which render neither an option label nor an option content, so each of them now carries exactly
+> **one** genuine `I3` contrast, `K6-INSTR`. A byte-exact deterministic rendering registry is
+> registered as a binding input. Re-derived: `S2` and `S3` fall from 19 gate-bearing cells to 16
+> while `S1` stays at 43, so `m_max` remains 43 by derivation and the sizes `413`/`214`/`448` and
+> their pass counts reproduce.
+>
+> **The only legal next action is a fresh-session fourth bounded independent methods review of
+> published draft-v0.5, by a party that did not draft it.** Nothing is frozen, nothing is
+> authorized, every operation counter is zero, no bank or seed exists, no interface and no positive
+> reference is selected, and `OD2`, `UR-22` and the `RP` wrappers remain unresolved.
+
 > **THIRD INDEPENDENT METHODS REVIEW COMPLETE - BOUNDED AMENDMENT REQUIRED**
 >
 > State: `STUDY3_DRAFT_V0_4_THIRD_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`
