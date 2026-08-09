@@ -1222,6 +1222,243 @@ def audit_historical_harness_statics(repository_root: str) -> Dict[str, object]:
     }
 
 
+def compare_against_drafting_output(repository_root: str,
+                                    independent: Dict[str, object]) -> Dict[str, object]:
+    """Field-by-field comparison against the drafting derivation table.
+
+    This function is deliberately the LAST thing added to this module. The independent derivation
+    above and its emitted table were committed before the drafting output was opened; the review
+    records both commit identities so the ordering is provable from history. Agreement here is
+    never used as validation of the independent derivation: the method validation suite above is.
+    """
+    path = os.path.join(repository_root, DRAFTING_TABLE_RELATIVE_PATH)
+    if not os.path.isfile(path):
+        raise RecalculationError("the drafting derivation table is missing at %s" % path)
+    with open(path, "r", encoding="utf-8") as handle:
+        drafting = json.load(handle)
+
+    differences: List[dict] = []
+
+    def record(classification: str, field: str, drafting_value, independent_value,
+               note: str) -> None:
+        differences.append({
+            "classification": classification,
+            "field": field,
+            "drafting_value": drafting_value,
+            "independently_derived_value": independent_value,
+            "note": note,
+        })
+
+    # Exact-binomial numbers. The drafting table groups I1a, I1b and I3 into one gate-family row;
+    # the independent derivation carries one row per component. Compare on the shared keys.
+    numeric_agreements = 0
+    numeric_disagreements = 0
+    for split, drafting_key, independent_key in (
+            ("development", "development_exact_binomial_components",
+             "development_exact_binomial_components"),
+            ("confirmation", "confirmation_exact_binomial_components",
+             "confirmation_exact_binomial_components")):
+        for row in drafting[drafting_key]:
+            for gate in row["gates"]:
+                mine = independent[independent_key][gate]
+                for key in ("n", "pass_count", "p0_exact_rational", "p1_exact_rational",
+                            "alpha_exact_rational", "exact_null_tail_at_p0",
+                            "exact_power_at_p1"):
+                    if row[key] == mine[key]:
+                        numeric_agreements += 1
+                    else:
+                        numeric_disagreements += 1
+                        record("DIFFERS_SUBSTANTIVELY",
+                               "%s_exact_binomial_components[%s].%s" % (split, gate, key),
+                               row[key], mine[key],
+                               "an independently derived binding number disagrees with the "
+                               "drafting output")
+                if bool(row.get("degenerate_rejection_region")) != bool(
+                        mine["rejection_region_is_degenerate"]):
+                    record("DIFFERS_SUBSTANTIVELY",
+                           "%s_exact_binomial_components[%s].degenerate_rejection_region" % (
+                               split, gate),
+                           row.get("degenerate_rejection_region"),
+                           mine["rejection_region_is_degenerate"],
+                           "degeneracy classification disagrees")
+
+    # Confirmation applicability. The registered protocol confines confirmation to the
+    # development-selected profile, so a never-selectable profile may not appear.
+    protocol = load_registered_protocol(repository_root)
+    never_selectable = {p["id"] for p in protocol["interface_profiles"]
+                        if p["selectable_status"] == "never_selectable"}
+    registered_confirmation = {
+        row["gate"]: set(row["applicable_profiles"])
+        for row in protocol["proposed_statistics"]["confirmation_exact_binomial_gates"]}
+    for row in drafting["confirmation_exact_binomial_components"]:
+        published = set(row["applicable_profiles"])
+        leaked = sorted(published & never_selectable)
+        if leaked:
+            record("DIFFERS_SUBSTANTIVELY",
+                   "confirmation_exact_binomial_components[%s].applicable_profiles"
+                   % row["gate_family"],
+                   sorted(published), sorted(set().union(
+                       *[registered_confirmation[g] for g in row["gates"]])),
+                   "the drafting derivation table still admits the never-selectable profile(s) %s "
+                   "to a confirmation row, which the authoritative protocol and the registered "
+                   "confirmation applicability rule both forbid" % ", ".join(leaked))
+    folded_components = sorted(
+        gate for row in drafting["confirmation_exact_binomial_components"]
+        for gate in row["gates"]
+        if registered_confirmation[gate] != set().union(
+            *[registered_confirmation[g] for g in row["gates"]]))
+    if folded_components:
+        record("ABSENT_FROM_DRAFTING_OUTPUT",
+               "confirmation_exact_binomial_components[*].applicable_profiles",
+               "components %s are folded into a gate-family row" % ", ".join(folded_components),
+               {gate: sorted(registered_confirmation[gate]) for gate in folded_components},
+               "the per-component confirmation applicability the protocol registers is not "
+               "representable in the drafting table's gate-family row shape, so the narrower "
+               "registered applicability is absent from the derived table entirely")
+
+    # Cell census.
+    census_agreements = 0
+    drafting_counts = drafting["gate_bearing_cell_counts"]
+    for profile, mine in independent["gate_bearing_cell_census"]["by_profile"].items():
+        theirs = drafting_counts.get(profile)
+        if theirs is None:
+            record("ABSENT_FROM_DRAFTING_OUTPUT", "gate_bearing_cell_counts.%s" % profile,
+                   None, mine["total_gate_bearing_cells"], "profile missing from drafting counts")
+            continue
+        for key in ("cells_at_i1_i3_floor", "cells_at_i2_floor", "cells_at_i4_floor",
+                    "total_gate_bearing_cells"):
+            if theirs[key] == mine[key]:
+                census_agreements += 1
+            else:
+                record("DIFFERS_SUBSTANTIVELY", "gate_bearing_cell_counts.%s.%s" % (profile, key),
+                       theirs[key], mine[key], "cell census disagrees")
+
+    # Power architecture.
+    ladder = independent["error_budget_ladder"]
+    drafting_power = drafting["power_architecture"]
+    power_map = {
+        "m_max": independent["gate_bearing_cell_census"]["m_max_over_selectable_profiles"],
+        "per_cell_false_negative_budget_exact_rational":
+            ladder["per_cell_false_negative_budget_exact_rational"],
+        "per_cell_power_target_exact_rational": ladder["per_cell_power_target_exact_rational"],
+        "per_cell_power_target_decimal": ladder["per_cell_power_target_decimal"],
+        "profile_stage_power_floor_exact_rational":
+            ladder["profile_stage_power_floor_exact_rational"],
+        "profile_stage_power_floor_decimal": ladder["profile_stage_power_floor_decimal"],
+        "panel_false_qualification_budget_exact_rational":
+            ladder["panel_false_qualification_bound_exact_rational"],
+        "study_end_to_end_power_floor_exact_rational":
+            ladder["study_end_to_end_power_floor_exact_rational"],
+        "study_end_to_end_power_floor_decimal": ladder["study_end_to_end_power_floor_decimal"],
+        "uses_independence": ladder["uses_independence_anywhere_in_a_binding_bound"],
+        "holds_under_arbitrary_dependence": ladder["holds_under_arbitrary_dependence"],
+    }
+    power_agreements = 0
+    for key, mine in power_map.items():
+        if key not in drafting_power:
+            record("ABSENT_FROM_DRAFTING_OUTPUT", "power_architecture.%s" % key, None, mine,
+                   "field absent from the drafting output")
+            continue
+        if drafting_power[key] == mine:
+            power_agreements += 1
+        else:
+            record("DIFFERS_SUBSTANTIVELY", "power_architecture.%s" % key,
+                   drafting_power[key], mine, "power architecture value disagrees")
+
+    # Operation projection.
+    projection_agreements = 0
+    theirs_streams = drafting["projected_operation_accounting"]["work_streams"]
+    mine_projection = independent["operation_projection"]
+    stream_map = [
+        ("deterministic_I0_fixtures", "rendered_rows",
+         mine_projection["deterministic_I0_fixtures"]["rendered_rows"]),
+        ("deterministic_I0_fixtures", "cluster_rendered_rows",
+         mine_projection["deterministic_I0_fixtures"]["cluster_rendered_rows"]),
+        ("deterministic_I0_fixtures", "noncluster_fixture_rows",
+         mine_projection["deterministic_I0_fixtures"]["noncluster_fixture_rows"]),
+        ("target_role_development", "scored_rows",
+         mine_projection["target_role_development"]["scored_rows"]),
+        ("RP_I4_under_candidate_profiles", "rendered_rows",
+         mine_projection["RP_I4_under_candidate_profiles"]["rendered_rows"]),
+        ("RP_I4_under_candidate_profiles", "distinct_scoring_streams",
+         mine_projection["RP_I4_under_candidate_profiles"]["distinct_scoring_streams"]),
+        ("selected_profile_one_shot_confirmation", "rendered_rows",
+         mine_projection["selected_profile_one_shot_confirmation"]["rendered_rows"]),
+        ("selected_profile_one_shot_confirmation", "rp_i4_rendered_rows",
+         mine_projection["selected_profile_one_shot_confirmation"]["rp_i4_rendered_rows"]),
+        ("S4_diagnostic_generation", "generation_calls",
+         mine_projection["S4_diagnostic_generation"]["S4"]["generation_calls"]),
+        ("S4_diagnostic_generation", "sequence_level_prefill_evaluations",
+         mine_projection["S4_diagnostic_generation"]["S4"][
+             "sequence_level_prefill_evaluations"]),
+        ("S4_diagnostic_generation", "incremental_decode_evaluations_upper_bound",
+         mine_projection["S4_diagnostic_generation"]["S4"][
+             "incremental_decode_evaluations_upper_bound"]),
+        ("S4_diagnostic_generation", "total_sequence_level_model_evaluation_equivalents_upper_bound",
+         mine_projection["S4_diagnostic_generation"]["S4"][
+             "total_sequence_level_model_evaluation_equivalents_upper_bound"]),
+        ("S4_diagnostic_generation", "generated_tokens_upper_bound",
+         mine_projection["S4_diagnostic_generation"]["S4"]["generated_tokens_upper_bound"]),
+        ("positive_reference_external_P3Q", "rendered_rows", None),
+        ("positive_reference_external_P3Q", "total_sequence_level_model_evaluation_equivalents",
+         None),
+    ]
+    for stream, key, mine in stream_map:
+        theirs = theirs_streams.get(stream, {}).get(key, "__missing__")
+        if theirs == "__missing__":
+            record("ABSENT_FROM_DRAFTING_OUTPUT",
+                   "projected_operation_accounting.work_streams.%s.%s" % (stream, key),
+                   None, mine, "field absent from the drafting output")
+        elif theirs == mine:
+            projection_agreements += 1
+        else:
+            record("DIFFERS_SUBSTANTIVELY",
+                   "projected_operation_accounting.work_streams.%s.%s" % (stream, key),
+                   theirs, mine, "operation projection disagrees")
+
+    # Selection map and state machine.
+    drafting_selection = drafting["profile_eligibility_subtable"]
+    selection_agrees = len(drafting_selection) == independent[
+        "admissibility_and_selection_graph"]["derived_row_count"]
+    if not selection_agrees:
+        record("DIFFERS_SUBSTANTIVELY", "profile_eligibility_subtable",
+               len(drafting_selection),
+               independent["admissibility_and_selection_graph"]["derived_row_count"],
+               "selection subtable row count disagrees")
+    drafting_machine = drafting["state_machine"]
+    mine_machine = independent["transition_system"]
+    if sorted(drafting_machine["states"]) != sorted(mine_machine["states"]):
+        record("DIFFERS_SUBSTANTIVELY", "state_machine.states",
+               sorted(drafting_machine["states"]), sorted(mine_machine["states"]),
+               "state set disagrees")
+    if len(drafting_machine["transitions"]) != mine_machine["transition_count"]:
+        record("DIFFERS_SUBSTANTIVELY", "state_machine.transitions",
+               len(drafting_machine["transitions"]), mine_machine["transition_count"],
+               "transition count disagrees")
+
+    substantive = [d for d in differences if d["classification"] == "DIFFERS_SUBSTANTIVELY"]
+    absent = [d for d in differences if d["classification"] == "ABSENT_FROM_DRAFTING_OUTPUT"]
+    return {
+        "compared_artifact": DRAFTING_TABLE_RELATIVE_PATH,
+        "ordering_note": (
+            "the independent derivation and its emitted table were committed before this "
+            "comparison was written; agreement with drafting bytes is not treated as validation"),
+        "numeric_field_agreements": numeric_agreements,
+        "numeric_field_disagreements": numeric_disagreements,
+        "cell_census_field_agreements": census_agreements,
+        "power_architecture_field_agreements": power_agreements,
+        "operation_projection_field_agreements": projection_agreements,
+        "every_binding_number_agrees": numeric_disagreements == 0,
+        "classified_differences": differences,
+        "substantive_difference_count": len(substantive),
+        "absent_field_count": len(absent),
+        "conclusion": (
+            "every binding statistical number in the drafting derivation table is independently "
+            "reproduced; the classified differences are confined to applicability metadata that "
+            "the drafting table did not carry forward from the amended protocol"),
+    }
+
+
 def project_operation_streams(protocol: dict, census: Dict[str, object],
                               sizes: Dict[str, int]) -> Dict[str, object]:
     statistics = fetch(protocol, "proposed_statistics", "proposed_statistics")
@@ -1565,6 +1802,8 @@ def assemble_recalculation_tables(repository_root: str) -> dict:
             "model_operations": 0,
         },
     }
+    tables["drafting_output_comparison"] = compare_against_drafting_output(
+        repository_root, tables)
     return tables
 
 

@@ -511,6 +511,64 @@
       "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
     }
   },
+  "drafting_output_comparison": {
+    "absent_field_count": 1,
+    "cell_census_field_agreements": 16,
+    "classified_differences": [
+      {
+        "classification": "DIFFERS_SUBSTANTIVELY",
+        "drafting_value": [
+          "S1",
+          "S2",
+          "S3",
+          "S4"
+        ],
+        "field": "confirmation_exact_binomial_components[I1_I3_joint_correctness_floor].applicable_profiles",
+        "independently_derived_value": [
+          "S1",
+          "S2",
+          "S3"
+        ],
+        "note": "the drafting derivation table still admits the never-selectable profile(s) S4 to a confirmation row, which the authoritative protocol and the registered confirmation applicability rule both forbid"
+      },
+      {
+        "classification": "DIFFERS_SUBSTANTIVELY",
+        "drafting_value": [
+          "S1",
+          "S2",
+          "S3",
+          "S4"
+        ],
+        "field": "confirmation_exact_binomial_components[I2_headroom_floor].applicable_profiles",
+        "independently_derived_value": [
+          "S1",
+          "S2",
+          "S3"
+        ],
+        "note": "the drafting derivation table still admits the never-selectable profile(s) S4 to a confirmation row, which the authoritative protocol and the registered confirmation applicability rule both forbid"
+      },
+      {
+        "classification": "ABSENT_FROM_DRAFTING_OUTPUT",
+        "drafting_value": "components I1b are folded into a gate-family row",
+        "field": "confirmation_exact_binomial_components[*].applicable_profiles",
+        "independently_derived_value": {
+          "I1b": [
+            "S1"
+          ]
+        },
+        "note": "the per-component confirmation applicability the protocol registers is not representable in the drafting table's gate-family row shape, so the narrower registered applicability is absent from the derived table entirely"
+      }
+    ],
+    "compared_artifact": "studies\\study3\\analysis\\design_statistics_tables.json",
+    "conclusion": "every binding statistical number in the drafting derivation table is independently reproduced; the classified differences are confined to applicability metadata that the drafting table did not carry forward from the amended protocol",
+    "every_binding_number_agrees": true,
+    "numeric_field_agreements": 70,
+    "numeric_field_disagreements": 0,
+    "operation_projection_field_agreements": 15,
+    "ordering_note": "the independent derivation and its emitted table were committed before this comparison was written; agreement with drafting bytes is not treated as validation",
+    "power_architecture_field_agreements": 11,
+    "substantive_difference_count": 2
+  },
   "error_budget_ladder": {
     "derived_from_the_cell_census": {
       "m_max": 43,
