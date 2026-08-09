@@ -9,15 +9,247 @@
   "seed_authorized": false,
   "winner_selected": false
  },
+ "confirmation_component_applicability": {
+  "component_count": 13,
+  "components": [
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "component": "I1a",
+    "gate_family": "I1_I3_joint_correctness_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1"
+    ],
+    "component": "I1b",
+    "gate_family": "I1_I3_joint_correctness_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [
+     "S2",
+     "S3"
+    ],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "component": "I2",
+    "gate_family": "I2_headroom_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1"
+    ],
+    "component": "I3/K5-P1",
+    "gate_family": "I1_I3_joint_correctness_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [
+     "S2",
+     "S3"
+    ],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1"
+    ],
+    "component": "I3/K5-P2",
+    "gate_family": "I1_I3_joint_correctness_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [
+     "S2",
+     "S3"
+    ],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1"
+    ],
+    "component": "I3/K5-P3",
+    "gate_family": "I1_I3_joint_correctness_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [
+     "S2",
+     "S3"
+    ],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1"
+    ],
+    "component": "I3/K5-S1",
+    "gate_family": "I1_I3_joint_correctness_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [
+     "S2",
+     "S3"
+    ],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1"
+    ],
+    "component": "I3/K5-S2",
+    "gate_family": "I1_I3_joint_correctness_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [
+     "S2",
+     "S3"
+    ],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1"
+    ],
+    "component": "I3/K5-S3",
+    "gate_family": "I1_I3_joint_correctness_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [
+     "S2",
+     "S3"
+    ],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1"
+    ],
+    "component": "I3/K5-A1",
+    "gate_family": "I1_I3_joint_correctness_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [
+     "S2",
+     "S3"
+    ],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1"
+    ],
+    "component": "I3/K6-SEP",
+    "gate_family": "I1_I3_joint_correctness_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [
+     "S2",
+     "S3"
+    ],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "component": "I3/K6-INSTR",
+    "gate_family": "I1_I3_joint_correctness_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [],
+    "s4_present": false
+   },
+   {
+    "applicability_rule": "the component's registered applicable profiles INTERSECT the selectable profiles; exactly one selected profile enters confirmation and S4 can never be that profile",
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "component": "I4",
+    "gate_family": "I4_positive_reference_floor",
+    "never_selectable_profile_present": false,
+    "not_applicable_selectable_profiles": [],
+    "s4_present": false
+   }
+  ],
+  "row_shape": "per component, not per gate family",
+  "rule": "confirmation applicability = the component's registered SELECTABLE profiles INTERSECT {the single profile selected on the development split}",
+  "s4_can_never_appear": true,
+  "selectable_profiles": [
+   "S1",
+   "S2",
+   "S3"
+  ],
+  "v0_4_defect_repaired": "draft-v0.4's committed table listed S1, S2, S3 and S4 in the confirmation I1_I3 family row and the confirmation I2 family row, and had no place to record the per-component repair confining I1b and K5 confirmation to S1 (S3MR3-002)"
+ },
  "confirmation_exact_binomial_components": [
   {
    "alpha_exact_rational": "1/200",
+   "applicability_is_component_level": true,
+   "applicability_rule": "the component's registered selectable profiles INTERSECT the single development-selected profile; S4 is never selectable and can never appear",
    "applicable_profiles": [
     "S1",
     "S2",
-    "S3",
-    "S4"
+    "S3"
    ],
+   "component_applicability": {
+    "I1a": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "I1b": [
+     "S1"
+    ],
+    "I3/K5-A1": [
+     "S1"
+    ],
+    "I3/K5-P1": [
+     "S1"
+    ],
+    "I3/K5-P2": [
+     "S1"
+    ],
+    "I3/K5-P3": [
+     "S1"
+    ],
+    "I3/K5-S1": [
+     "S1"
+    ],
+    "I3/K5-S2": [
+     "S1"
+    ],
+    "I3/K5-S3": [
+     "S1"
+    ],
+    "I3/K6-INSTR": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "I3/K6-SEP": [
+     "S1"
+    ]
+   },
    "construct": "trivial content recovery, explicit content-to-symbol binding, and joint robust correctness across a registered presentation pair",
    "degenerate_rejection_region": false,
    "derivation": "exact binomial search over exact rational inputs with integer tail arithmetic; no threshold, tail, power or sample size in this row is a transcribed constant",
@@ -37,6 +269,29 @@
     "I3"
    ],
    "independent_unit": "base_item for I1a and I1b; base_item_contrast_cluster for I3",
+   "local_power_nonmonotonicity": {
+    "at_least_n_interpretation_prohibited": true,
+    "disclosure_window": [
+     414,
+     541
+    ],
+    "disclosure_window_size": 128,
+    "execution_must_use_the_exact_registered_cell_size": true,
+    "failing_size_count_within_the_disclosure_window": 5,
+    "failing_sizes_within_the_disclosure_window": [
+     421,
+     422,
+     423,
+     424,
+     425
+    ],
+    "first_contiguous_failing_run_above_the_registered_minimum": [],
+    "largest_failing_size_within_the_disclosure_window": 425,
+    "no_eventual_monotonicity_threshold_is_registered": true,
+    "statement_is_scoped_to_the_disclosure_window": true,
+    "target_is_monotone_within_the_disclosure_window": false,
+    "why": "the exact test's rejection region is discrete, so realized power is locally non-monotone in n at a fixed level. The registered size is the smallest unrestricted positive integer meeting the target; it is NOT a threshold above which the target always holds. A realized cell size that drifted upward by a few units could fall below the registered target, so execution must use the exact registered cell size and must never read it as 'at least n'."
+   },
    "meets_per_cell_power_target": true,
    "n": 413,
    "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
@@ -46,18 +301,27 @@
    "pass_count": 388,
    "pass_count_is_minimal_at_alpha": true,
    "rejection_rule": "pass the cell when the observed success count is at least 388 out of 413 base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3",
+   "s4_present": false,
    "size_status": "CONSERVATIVE_REUSE_OF_THE_DEVELOPMENT_SIZE_NOT_A_MINIMAL_CONFIRMATION_SIZE",
    "split": "confirmation",
    "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3"
   },
   {
    "alpha_exact_rational": "1/200",
+   "applicability_is_component_level": true,
+   "applicability_rule": "the component's registered selectable profiles INTERSECT the single development-selected profile; S4 is never selectable and can never appear",
    "applicable_profiles": [
     "S1",
     "S2",
-    "S3",
-    "S4"
+    "S3"
    ],
+   "component_applicability": {
+    "I2": [
+     "S1",
+     "S2",
+     "S3"
+    ]
+   },
    "construct": "primitive headroom, evaluated separately per registered operation family",
    "degenerate_rejection_region": false,
    "derivation": "exact binomial search over exact rational inputs with integer tail arithmetic; no threshold, tail, power or sample size in this row is a transcribed constant",
@@ -74,6 +338,30 @@
     "I2"
    ],
    "independent_unit": "base_item",
+   "local_power_nonmonotonicity": {
+    "at_least_n_interpretation_prohibited": true,
+    "disclosure_window": [
+     215,
+     342
+    ],
+    "disclosure_window_size": 128,
+    "execution_must_use_the_exact_registered_cell_size": true,
+    "failing_size_count_within_the_disclosure_window": 3,
+    "failing_sizes_within_the_disclosure_window": [
+     215,
+     216,
+     218
+    ],
+    "first_contiguous_failing_run_above_the_registered_minimum": [
+     215,
+     216
+    ],
+    "largest_failing_size_within_the_disclosure_window": 218,
+    "no_eventual_monotonicity_threshold_is_registered": true,
+    "statement_is_scoped_to_the_disclosure_window": true,
+    "target_is_monotone_within_the_disclosure_window": false,
+    "why": "the exact test's rejection region is discrete, so realized power is locally non-monotone in n at a fixed level. The registered size is the smallest unrestricted positive integer meeting the target; it is NOT a threshold above which the target always holds. A realized cell size that drifted upward by a few units could fall below the registered target, so execution must use the exact registered cell size and must never read it as 'at least n'."
+   },
    "meets_per_cell_power_target": true,
    "n": 214,
    "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
@@ -83,17 +371,27 @@
    "pass_count": 127,
    "pass_count_is_minimal_at_alpha": true,
    "rejection_rule": "pass the cell when the observed success count is at least 127 out of 214 base items per primitive-family cell",
+   "s4_present": false,
    "size_status": "CONSERVATIVE_REUSE_OF_THE_DEVELOPMENT_SIZE_NOT_A_MINIMAL_CONFIRMATION_SIZE",
    "split": "confirmation",
    "unit_of_n": "base items per primitive-family cell"
   },
   {
    "alpha_exact_rational": "1/200",
+   "applicability_is_component_level": true,
+   "applicability_rule": "the component's registered selectable profiles INTERSECT the single development-selected profile; S4 is never selectable and can never appear",
    "applicable_profiles": [
     "S1",
     "S2",
     "S3"
    ],
+   "component_applicability": {
+    "I4": [
+     "S1",
+     "S2",
+     "S3"
+    ]
+   },
    "construct": "positive-reference competence recovery through the candidate interface",
    "degenerate_rejection_region": false,
    "derivation": "exact binomial search over exact rational inputs with integer tail arithmetic; no threshold, tail, power or sample size in this row is a transcribed constant",
@@ -110,6 +408,29 @@
     "I4"
    ],
    "independent_unit": "base_item",
+   "local_power_nonmonotonicity": {
+    "at_least_n_interpretation_prohibited": true,
+    "disclosure_window": [
+     449,
+     576
+    ],
+    "disclosure_window_size": 128,
+    "execution_must_use_the_exact_registered_cell_size": true,
+    "failing_size_count_within_the_disclosure_window": 5,
+    "failing_sizes_within_the_disclosure_window": [
+     450,
+     451,
+     452,
+     453,
+     459
+    ],
+    "first_contiguous_failing_run_above_the_registered_minimum": [],
+    "largest_failing_size_within_the_disclosure_window": 459,
+    "no_eventual_monotonicity_threshold_is_registered": true,
+    "statement_is_scoped_to_the_disclosure_window": true,
+    "target_is_monotone_within_the_disclosure_window": false,
+    "why": "the exact test's rejection region is discrete, so realized power is locally non-monotone in n at a fixed level. The registered size is the smallest unrestricted positive integer meeting the target; it is NOT a threshold above which the target always holds. A realized cell size that drifted upward by a few units could fall below the registered target, so execution must use the exact registered cell size and must never read it as 'at least n'."
+   },
    "meets_per_cell_power_target": true,
    "n": 448,
    "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
@@ -119,6 +440,7 @@
    "pass_count": 381,
    "pass_count_is_minimal_at_alpha": true,
    "rejection_rule": "pass the cell when the observed success count is at least 381 out of 448 RP base items per operation-family x depth cell per candidate profile",
+   "s4_present": false,
    "size_status": "CONSERVATIVE_REUSE_OF_THE_DEVELOPMENT_SIZE_NOT_A_MINIMAL_CONFIRMATION_SIZE",
    "split": "confirmation",
    "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
@@ -163,6 +485,29 @@
     "I3"
    ],
    "independent_unit": "base_item for I1a and I1b; base_item_contrast_cluster for I3",
+   "local_power_nonmonotonicity": {
+    "at_least_n_interpretation_prohibited": true,
+    "disclosure_window": [
+     414,
+     541
+    ],
+    "disclosure_window_size": 128,
+    "execution_must_use_the_exact_registered_cell_size": true,
+    "failing_size_count_within_the_disclosure_window": 5,
+    "failing_sizes_within_the_disclosure_window": [
+     421,
+     422,
+     423,
+     424,
+     425
+    ],
+    "first_contiguous_failing_run_above_the_registered_minimum": [],
+    "largest_failing_size_within_the_disclosure_window": 425,
+    "no_eventual_monotonicity_threshold_is_registered": true,
+    "statement_is_scoped_to_the_disclosure_window": true,
+    "target_is_monotone_within_the_disclosure_window": false,
+    "why": "the exact test's rejection region is discrete, so realized power is locally non-monotone in n at a fixed level. The registered size is the smallest unrestricted positive integer meeting the target; it is NOT a threshold above which the target always holds. A realized cell size that drifted upward by a few units could fall below the registered target, so execution must use the exact registered cell size and must never read it as 'at least n'."
+   },
    "meets_per_cell_power_target": true,
    "n": 413,
    "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
@@ -199,6 +544,30 @@
     "I2"
    ],
    "independent_unit": "base_item",
+   "local_power_nonmonotonicity": {
+    "at_least_n_interpretation_prohibited": true,
+    "disclosure_window": [
+     215,
+     342
+    ],
+    "disclosure_window_size": 128,
+    "execution_must_use_the_exact_registered_cell_size": true,
+    "failing_size_count_within_the_disclosure_window": 3,
+    "failing_sizes_within_the_disclosure_window": [
+     215,
+     216,
+     218
+    ],
+    "first_contiguous_failing_run_above_the_registered_minimum": [
+     215,
+     216
+    ],
+    "largest_failing_size_within_the_disclosure_window": 218,
+    "no_eventual_monotonicity_threshold_is_registered": true,
+    "statement_is_scoped_to_the_disclosure_window": true,
+    "target_is_monotone_within_the_disclosure_window": false,
+    "why": "the exact test's rejection region is discrete, so realized power is locally non-monotone in n at a fixed level. The registered size is the smallest unrestricted positive integer meeting the target; it is NOT a threshold above which the target always holds. A realized cell size that drifted upward by a few units could fall below the registered target, so execution must use the exact registered cell size and must never read it as 'at least n'."
+   },
    "meets_per_cell_power_target": true,
    "n": 214,
    "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
@@ -234,6 +603,29 @@
     "I4"
    ],
    "independent_unit": "base_item",
+   "local_power_nonmonotonicity": {
+    "at_least_n_interpretation_prohibited": true,
+    "disclosure_window": [
+     449,
+     576
+    ],
+    "disclosure_window_size": 128,
+    "execution_must_use_the_exact_registered_cell_size": true,
+    "failing_size_count_within_the_disclosure_window": 5,
+    "failing_sizes_within_the_disclosure_window": [
+     450,
+     451,
+     452,
+     453,
+     459
+    ],
+    "first_contiguous_failing_run_above_the_registered_minimum": [],
+    "largest_failing_size_within_the_disclosure_window": 459,
+    "no_eventual_monotonicity_threshold_is_registered": true,
+    "statement_is_scoped_to_the_disclosure_window": true,
+    "target_is_monotone_within_the_disclosure_window": false,
+    "why": "the exact test's rejection region is discrete, so realized power is locally non-monotone in n at a fixed level. The registered size is the smallest unrestricted positive integer meeting the target; it is NOT a threshold above which the target always holds. A realized cell size that drifted upward by a few units could fall below the registered target, so execution must use the exact registered cell size and must never read it as 'at least n'."
+   },
    "meets_per_cell_power_target": true,
    "n": 448,
    "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
@@ -247,9 +639,9 @@
    "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
   }
  ],
- "disposition_status": "PROPOSED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW",
+ "disposition_status": "PROPOSED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
  "document_class": "design_statistics_derivation",
- "draft_version": "draft-v0.4",
+ "draft_version": "draft-v0.5",
  "gate_bearing_cell_counts": {
   "S1": {
    "I1a_cells": 3,
@@ -259,10 +651,36 @@
    "I3_K6_cells": 6,
    "I3_cells": 27,
    "I4_cells": 4,
+   "applicable_i3_contrast_count": 9,
+   "applicable_i3_contrast_ids": [
+    "K5-P1",
+    "K5-P2",
+    "K5-P3",
+    "K5-S1",
+    "K5-S2",
+    "K5-S3",
+    "K5-A1",
+    "K6-SEP",
+    "K6-INSTR"
+   ],
+   "applicable_k5_contrast_ids": [
+    "K5-P1",
+    "K5-P2",
+    "K5-P3",
+    "K5-S1",
+    "K5-S2",
+    "K5-S3",
+    "K5-A1"
+   ],
+   "applicable_k6_contrast_ids": [
+    "K6-SEP",
+    "K6-INSTR"
+   ],
    "cells_at_i1_i3_floor": 33,
    "cells_at_i2_floor": 6,
    "cells_at_i4_floor": 4,
    "label_bearing": true,
+   "not_applicable_i3_contrast_ids": [],
    "selectable": true,
    "total_gate_bearing_cells": 43
   },
@@ -271,30 +689,66 @@
    "I1b_cells": 0,
    "I2_cells": 6,
    "I3_K5_cells": 0,
-   "I3_K6_cells": 6,
-   "I3_cells": 6,
+   "I3_K6_cells": 3,
+   "I3_cells": 3,
    "I4_cells": 4,
-   "cells_at_i1_i3_floor": 9,
+   "applicable_i3_contrast_count": 1,
+   "applicable_i3_contrast_ids": [
+    "K6-INSTR"
+   ],
+   "applicable_k5_contrast_ids": [],
+   "applicable_k6_contrast_ids": [
+    "K6-INSTR"
+   ],
+   "cells_at_i1_i3_floor": 6,
    "cells_at_i2_floor": 6,
    "cells_at_i4_floor": 4,
    "label_bearing": false,
+   "not_applicable_i3_contrast_ids": [
+    "K5-P1",
+    "K5-P2",
+    "K5-P3",
+    "K5-S1",
+    "K5-S2",
+    "K5-S3",
+    "K5-A1",
+    "K6-SEP"
+   ],
    "selectable": true,
-   "total_gate_bearing_cells": 19
+   "total_gate_bearing_cells": 16
   },
   "S3": {
    "I1a_cells": 3,
    "I1b_cells": 0,
    "I2_cells": 6,
    "I3_K5_cells": 0,
-   "I3_K6_cells": 6,
-   "I3_cells": 6,
+   "I3_K6_cells": 3,
+   "I3_cells": 3,
    "I4_cells": 4,
-   "cells_at_i1_i3_floor": 9,
+   "applicable_i3_contrast_count": 1,
+   "applicable_i3_contrast_ids": [
+    "K6-INSTR"
+   ],
+   "applicable_k5_contrast_ids": [],
+   "applicable_k6_contrast_ids": [
+    "K6-INSTR"
+   ],
+   "cells_at_i1_i3_floor": 6,
    "cells_at_i2_floor": 6,
    "cells_at_i4_floor": 4,
    "label_bearing": false,
+   "not_applicable_i3_contrast_ids": [
+    "K5-P1",
+    "K5-P2",
+    "K5-P3",
+    "K5-S1",
+    "K5-S2",
+    "K5-S3",
+    "K5-A1",
+    "K6-SEP"
+   ],
    "selectable": true,
-   "total_gate_bearing_cells": 19
+   "total_gate_bearing_cells": 16
   },
   "S4": {
    "I1a_cells": 3,
@@ -304,10 +758,36 @@
    "I3_K6_cells": 6,
    "I3_cells": 27,
    "I4_cells": 0,
+   "applicable_i3_contrast_count": 9,
+   "applicable_i3_contrast_ids": [
+    "K5-P1",
+    "K5-P2",
+    "K5-P3",
+    "K5-S1",
+    "K5-S2",
+    "K5-S3",
+    "K5-A1",
+    "K6-SEP",
+    "K6-INSTR"
+   ],
+   "applicable_k5_contrast_ids": [
+    "K5-P1",
+    "K5-P2",
+    "K5-P3",
+    "K5-S1",
+    "K5-S2",
+    "K5-S3",
+    "K5-A1"
+   ],
+   "applicable_k6_contrast_ids": [
+    "K6-SEP",
+    "K6-INSTR"
+   ],
    "cells_at_i1_i3_floor": 33,
    "cells_at_i2_floor": 6,
    "cells_at_i4_floor": 0,
    "label_bearing": true,
+   "not_applicable_i3_contrast_ids": [],
    "selectable": false,
    "total_gate_bearing_cells": 39
   }
@@ -994,38 +1474,38 @@
       "total_sequence_level_model_evaluation_equivalents": 26064
      },
      "S2": {
-      "base_item_contrast_clusters": 826,
+      "base_item_contrast_clusters": 413,
       "base_items": 841,
-      "cluster_rendered_rows": 1652,
+      "cluster_rendered_rows": 826,
       "dimensional_identity_cluster_rows_equals_clusters_times_variants": true,
       "generated_tokens_upper_bound": 0,
       "generation_calls": 0,
       "incremental_decode_evaluations": 0,
-      "rendered_rows": 7479,
-      "rendered_rows_per_target_role": 2493,
-      "restricted_vocabulary_logit_reads": 7479,
-      "scored_rows": 7479,
-      "scored_rows_per_target_role": 2493,
-      "sequence_level_prefill_evaluations": 7479,
+      "rendered_rows": 5001,
+      "rendered_rows_per_target_role": 1667,
+      "restricted_vocabulary_logit_reads": 5001,
+      "scored_rows": 5001,
+      "scored_rows_per_target_role": 1667,
+      "sequence_level_prefill_evaluations": 5001,
       "target_roles": 3,
-      "total_sequence_level_model_evaluation_equivalents": 7479
+      "total_sequence_level_model_evaluation_equivalents": 5001
      },
      "S3_if_independently_rendered": {
-      "base_item_contrast_clusters": 826,
+      "base_item_contrast_clusters": 413,
       "base_items": 841,
-      "cluster_rendered_rows": 1652,
+      "cluster_rendered_rows": 826,
       "dimensional_identity_cluster_rows_equals_clusters_times_variants": true,
       "generated_tokens_upper_bound": 0,
       "generation_calls": 0,
       "incremental_decode_evaluations": 0,
-      "rendered_rows": 7479,
-      "rendered_rows_per_target_role": 2493,
-      "restricted_vocabulary_logit_reads": 7479,
-      "scored_rows": 7479,
-      "scored_rows_per_target_role": 2493,
-      "sequence_level_prefill_evaluations": 7479,
+      "rendered_rows": 5001,
+      "rendered_rows_per_target_role": 1667,
+      "restricted_vocabulary_logit_reads": 5001,
+      "scored_rows": 5001,
+      "scored_rows_per_target_role": 1667,
+      "sequence_level_prefill_evaluations": 5001,
       "target_roles": 3,
-      "total_sequence_level_model_evaluation_equivalents": 7479
+      "total_sequence_level_model_evaluation_equivalents": 5001
      }
     },
     "model_roles": [
@@ -1033,8 +1513,8 @@
      "RL",
      "RI"
     ],
-    "scored_rows": 33543,
-    "total_sequence_level_model_evaluation_equivalents": 33543,
+    "scored_rows": 31065,
+    "total_sequence_level_model_evaluation_equivalents": 31065,
     "uses_model": true
    }
   }
@@ -1054,7 +1534,7 @@
   "seeds_drawn": 0,
   "split_partition_outcome_blind": true
  },
- "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW",
+ "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW",
  "state_machine": {
   "every_event_has_exactly_one_next_state": true,
   "every_terminal_state_is_reachable": true,

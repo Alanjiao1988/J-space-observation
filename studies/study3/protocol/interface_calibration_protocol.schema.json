@@ -327,6 +327,38 @@
      "type": "string"
     },
     "i3_claim_ceiling_by_profile": {},
+    "i3_single_genuine_contrast_profiles": {
+     "additionalProperties": false,
+     "properties": {
+      "profiles": {
+       "items": {
+        "enum": [
+         "S2",
+         "S3"
+        ],
+        "type": "string"
+       },
+       "maxItems": 2,
+       "minItems": 2,
+       "type": "array",
+       "uniqueItems": true
+      },
+      "s3_conditional_status_still_applies": {
+       "const": true,
+       "type": "boolean"
+      },
+      "statement": {
+       "minLength": 1,
+       "type": "string"
+      }
+     },
+     "required": [
+      "profiles",
+      "statement",
+      "s3_conditional_status_still_applies"
+     ],
+     "type": "object"
+    },
     "maximum_fail_claim": {
      "minLength": 1,
      "type": "string"
@@ -637,13 +669,58 @@
        },
        "type": "array"
       },
+      "prose_description_is_not_the_registration": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "registered_surface": {
+       "minLength": 1,
+       "type": "string"
+      },
       "renderings": {
        "items": {
         "properties": {
+         "applicable_profiles": {
+          "items": {
+           "enum": [
+            "S1",
+            "S2",
+            "S3",
+            "S4"
+           ],
+           "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+         },
          "description": {
           "type": "string"
          },
          "id": {
+          "type": "string"
+         },
+         "not_applicable_profiles": {
+          "items": {
+           "enum": [
+            "S1",
+            "S2",
+            "S3",
+            "S4"
+           ],
+           "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+         },
+         "not_applicable_reason": {
+          "type": [
+           "string",
+           "null"
+          ]
+         },
+         "separator_literal": {
+          "minLength": 1,
           "type": "string"
          },
          "varies": {
@@ -1256,12 +1333,29 @@
   "gate_truth_table": {
    "additionalProperties": false,
    "properties": {
+    "contrast_level_applicability": {
+     "minLength": 1,
+     "type": "string"
+    },
     "i4_applicability_note": {},
+    "k6_applicability_note": {
+     "minLength": 1,
+     "type": "string"
+    },
     "legal_stop_states": {
      "items": {
+      "not": {
+       "pattern": "^STOP_AWAITING_AUTHORITY"
+      },
       "type": "string"
      },
-     "type": "array"
+     "minItems": 1,
+     "type": "array",
+     "uniqueItems": true
+    },
+    "legal_stop_states_note": {
+     "minLength": 1,
+     "type": "string"
     },
     "no_pass_value_appears_in_this_table": {
      "minLength": 1,
@@ -1295,8 +1389,124 @@
           }
          }
         }
+       },
+       {
+        "if": {
+         "properties": {
+          "label_bearing": {
+           "const": false
+          }
+         },
+         "required": [
+          "label_bearing"
+         ]
+        },
+        "then": {
+         "properties": {
+          "I3_K6": {
+           "properties": {
+            "K6-SEP": {
+             "const": "not_applicable"
+            }
+           },
+           "required": [
+            "K6-SEP"
+           ]
+          }
+         }
+        }
        }
       ],
+      "properties": {
+       "I3_K5": {
+        "additionalProperties": false,
+        "properties": {
+         "K5-A1": {
+          "enum": [
+           "applicable",
+           "not_applicable"
+          ],
+          "type": "string"
+         },
+         "K5-P1": {
+          "enum": [
+           "applicable",
+           "not_applicable"
+          ],
+          "type": "string"
+         },
+         "K5-P2": {
+          "enum": [
+           "applicable",
+           "not_applicable"
+          ],
+          "type": "string"
+         },
+         "K5-P3": {
+          "enum": [
+           "applicable",
+           "not_applicable"
+          ],
+          "type": "string"
+         },
+         "K5-S1": {
+          "enum": [
+           "applicable",
+           "not_applicable"
+          ],
+          "type": "string"
+         },
+         "K5-S2": {
+          "enum": [
+           "applicable",
+           "not_applicable"
+          ],
+          "type": "string"
+         },
+         "K5-S3": {
+          "enum": [
+           "applicable",
+           "not_applicable"
+          ],
+          "type": "string"
+         }
+        },
+        "required": [
+         "K5-P1",
+         "K5-P2",
+         "K5-P3",
+         "K5-S1",
+         "K5-S2",
+         "K5-S3",
+         "K5-A1"
+        ],
+        "type": "object"
+       },
+       "I3_K6": {
+        "additionalProperties": false,
+        "properties": {
+         "K6-INSTR": {
+          "enum": [
+           "applicable",
+           "not_applicable"
+          ],
+          "type": "string"
+         },
+         "K6-SEP": {
+          "enum": [
+           "applicable",
+           "not_applicable"
+          ],
+          "type": "string"
+         }
+        },
+        "required": [
+         "K6-SEP",
+         "K6-INSTR"
+        ],
+        "type": "object"
+       }
+      },
       "required": [
        "profile",
        "label_bearing",
@@ -1465,20 +1675,133 @@
     "k6_applicability": {
      "additionalProperties": false,
      "properties": {
-      "applicable_profiles": {
-       "items": {
-        "type": "string"
+      "by_contrast": {
+       "additionalProperties": false,
+       "properties": {
+        "K6-INSTR": {
+         "additionalProperties": false,
+         "properties": {
+          "applicable_profiles": {
+           "items": {
+            "enum": [
+             "S1",
+             "S2",
+             "S3",
+             "S4"
+            ],
+            "type": "string"
+           },
+           "maxItems": 4,
+           "minItems": 4,
+           "type": "array",
+           "uniqueItems": true
+          },
+          "not_applicable_profiles": {
+           "items": {
+            "enum": [
+             "S1",
+             "S2",
+             "S3",
+             "S4"
+            ],
+            "type": "string"
+           },
+           "type": "array",
+           "uniqueItems": true
+          },
+          "semantics": {
+           "minLength": 1,
+           "type": "string"
+          },
+          "varied_factor": {
+           "minLength": 1,
+           "type": "string"
+          }
+         },
+         "required": [
+          "applicable_profiles",
+          "not_applicable_profiles",
+          "varied_factor",
+          "semantics"
+         ],
+         "type": "object"
+        },
+        "K6-SEP": {
+         "additionalProperties": false,
+         "properties": {
+          "applicable_profiles": {
+           "items": {
+            "enum": [
+             "S1",
+             "S4"
+            ],
+            "type": "string"
+           },
+           "maxItems": 2,
+           "minItems": 2,
+           "type": "array",
+           "uniqueItems": true
+          },
+          "not_applicable_profiles": {
+           "items": {
+            "enum": [
+             "S2",
+             "S3"
+            ],
+            "type": "string"
+           },
+           "maxItems": 2,
+           "minItems": 2,
+           "type": "array",
+           "uniqueItems": true
+          },
+          "semantics": {
+           "minLength": 1,
+           "type": "string"
+          },
+          "varied_factor": {
+           "minLength": 1,
+           "type": "string"
+          }
+         },
+         "required": [
+          "applicable_profiles",
+          "not_applicable_profiles",
+          "varied_factor",
+          "semantics"
+         ],
+         "type": "object"
+        }
        },
-       "type": "array"
+       "required": [
+        "K6-SEP",
+        "K6-INSTR"
+       ],
+       "type": "object"
+      },
+      "per_contrast_registration_required": {
+       "const": true,
+       "type": "boolean"
+      },
+      "registered_surface": {
+       "minLength": 1,
+       "type": "string"
       },
       "semantics": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "v0_4_defect": {
        "minLength": 1,
        "type": "string"
       }
      },
      "required": [
-      "applicable_profiles",
-      "semantics"
+      "by_contrast",
+      "per_contrast_registration_required",
+      "registered_surface",
+      "semantics",
+      "v0_4_defect"
      ],
      "type": "object"
     },
@@ -3150,28 +3473,265 @@
      "type": "string"
     },
     "confirmation_applicability_rule": {
+     "additionalProperties": false,
      "properties": {
+      "bound_by_test": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "closes_finding": {
+       "const": "S3MR3-002",
+       "type": "string"
+      },
+      "derived_table": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "i1a_confirmation_profiles": {
+       "items": {
+        "enum": [
+         "S1",
+         "S2",
+         "S3",
+         "S4"
+        ],
+        "type": "string"
+       },
+       "minItems": 1,
+       "type": "array",
+       "uniqueItems": true
+      },
       "i1b_confirmation_profiles": {
-       "const": [
-        "S1"
-       ],
+       "items": {
+        "const": "S1",
+        "type": "string"
+       },
+       "maxItems": 1,
+       "minItems": 1,
        "type": "array"
+      },
+      "i2_confirmation_profiles": {
+       "items": {
+        "enum": [
+         "S1",
+         "S2",
+         "S3",
+         "S4"
+        ],
+        "type": "string"
+       },
+       "minItems": 1,
+       "type": "array",
+       "uniqueItems": true
+      },
+      "i4_confirmation_profiles": {
+       "items": {
+        "enum": [
+         "S1",
+         "S2",
+         "S3",
+         "S4"
+        ],
+        "type": "string"
+       },
+       "minItems": 1,
+       "type": "array",
+       "uniqueItems": true
       },
       "k5_confirmation_profiles": {
-       "const": [
-        "S1"
-       ],
+       "items": {
+        "const": "S1",
+        "type": "string"
+       },
+       "maxItems": 1,
+       "minItems": 1,
        "type": "array"
       },
+      "k6_instr_confirmation_profiles": {
+       "items": {
+        "enum": [
+         "S1",
+         "S2",
+         "S3"
+        ],
+        "type": "string"
+       },
+       "maxItems": 3,
+       "minItems": 3,
+       "type": "array",
+       "uniqueItems": true
+      },
+      "k6_sep_confirmation_profiles": {
+       "items": {
+        "const": "S1",
+        "type": "string"
+       },
+       "maxItems": 1,
+       "minItems": 1,
+       "type": "array"
+      },
+      "no_row_may_imply_a_never_selectable_or_not_applicable_profile_reaches_confirmation": {
+       "const": true,
+       "type": "boolean"
+      },
+      "per_contrast_confirmation_profiles": {
+       "additionalProperties": false,
+       "properties": {
+        "K5-A1": {
+         "items": {
+          "const": "S1",
+          "type": "string"
+         },
+         "maxItems": 1,
+         "minItems": 1,
+         "type": "array"
+        },
+        "K5-P1": {
+         "items": {
+          "const": "S1",
+          "type": "string"
+         },
+         "maxItems": 1,
+         "minItems": 1,
+         "type": "array"
+        },
+        "K5-P2": {
+         "items": {
+          "const": "S1",
+          "type": "string"
+         },
+         "maxItems": 1,
+         "minItems": 1,
+         "type": "array"
+        },
+        "K5-P3": {
+         "items": {
+          "const": "S1",
+          "type": "string"
+         },
+         "maxItems": 1,
+         "minItems": 1,
+         "type": "array"
+        },
+        "K5-S1": {
+         "items": {
+          "const": "S1",
+          "type": "string"
+         },
+         "maxItems": 1,
+         "minItems": 1,
+         "type": "array"
+        },
+        "K5-S2": {
+         "items": {
+          "const": "S1",
+          "type": "string"
+         },
+         "maxItems": 1,
+         "minItems": 1,
+         "type": "array"
+        },
+        "K5-S3": {
+         "items": {
+          "const": "S1",
+          "type": "string"
+         },
+         "maxItems": 1,
+         "minItems": 1,
+         "type": "array"
+        },
+        "K6-INSTR": {
+         "items": {
+          "enum": [
+           "S1",
+           "S2",
+           "S3"
+          ],
+          "type": "string"
+         },
+         "maxItems": 3,
+         "minItems": 3,
+         "type": "array",
+         "uniqueItems": true
+        },
+        "K6-SEP": {
+         "items": {
+          "const": "S1",
+          "type": "string"
+         },
+         "maxItems": 1,
+         "minItems": 1,
+         "type": "array"
+        }
+       },
+       "required": [
+        "K5-P1",
+        "K5-P2",
+        "K5-P3",
+        "K5-S1",
+        "K5-S2",
+        "K5-S3",
+        "K5-A1",
+        "K6-SEP",
+        "K6-INSTR"
+       ],
+       "type": "object"
+      },
+      "row_shape": {
+       "pattern": "PER COMPONENT",
+       "type": "string"
+      },
+      "rule": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "s2_s3_i1b_and_k5": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "s2_s3_k6_sep": {
+       "minLength": 1,
+       "type": "string"
+      },
       "s4_can_never_appear": {
-       "const": true
+       "const": true,
+       "type": "boolean"
+      },
+      "selectable_profiles": {
+       "items": {
+        "enum": [
+         "S1",
+         "S2",
+         "S3"
+        ],
+        "type": "string"
+       },
+       "maxItems": 3,
+       "minItems": 3,
+       "type": "array",
+       "uniqueItems": true
+      },
+      "v0_3_defect_repaired": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "v0_4_defect_repaired": {
+       "minLength": 1,
+       "type": "string"
       }
      },
      "required": [
+      "closes_finding",
       "rule",
-      "s4_can_never_appear",
+      "row_shape",
+      "selectable_profiles",
       "i1b_confirmation_profiles",
-      "k5_confirmation_profiles"
+      "k5_confirmation_profiles",
+      "k6_sep_confirmation_profiles",
+      "k6_instr_confirmation_profiles",
+      "per_contrast_confirmation_profiles",
+      "s4_can_never_appear",
+      "no_row_may_imply_a_never_selectable_or_not_applicable_profile_reaches_confirmation"
      ],
      "type": "object"
     },
@@ -3372,6 +3932,10 @@
           "type": "string"
          },
          "type": "array"
+        },
+        "reviewer_question_status": {
+         "minLength": 1,
+         "type": "string"
         },
         "second_reviewer_question": {
          "minLength": 1,
@@ -3871,6 +4435,63 @@
      ],
      "type": "object"
     },
+    "local_power_nonmonotonicity": {
+     "additionalProperties": false,
+     "properties": {
+      "at_least_n_interpretation_prohibited": {
+       "const": true,
+       "type": "boolean"
+      },
+      "closes_finding": {
+       "const": "S3MR3-007",
+       "type": "string"
+      },
+      "derived_by": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "disclosure_window": {
+       "minimum": 1,
+       "type": "integer"
+      },
+      "disclosure_window_semantics": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "eventual_monotonicity_threshold_registered": {
+       "const": false,
+       "type": "boolean"
+      },
+      "execution_rule": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "registered_minimum_is_retained": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "statement": {
+       "minLength": 1,
+       "type": "string"
+      }
+     },
+     "required": [
+      "closes_finding",
+      "statement",
+      "execution_rule",
+      "at_least_n_interpretation_prohibited",
+      "registered_minimum_is_retained",
+      "eventual_monotonicity_threshold_registered",
+      "disclosure_window",
+      "disclosure_window_semantics",
+      "derived_by"
+     ],
+     "type": "object"
+    },
+    "local_power_nonmonotonicity_disclosure_window": {
+     "minimum": 1,
+     "type": "integer"
+    },
     "model_free": {
      "const": true
     },
@@ -4139,6 +4760,10 @@
        "minLength": 1,
        "type": "string"
       },
+      "exact_n_required": {
+       "minLength": 1,
+       "type": "string"
+      },
       "n_192_status": {
        "minLength": 1,
        "type": "string"
@@ -4300,6 +4925,112 @@
     "study_development_screening_alpha_exact_rational",
     "target_power",
     "unresolved"
+   ],
+   "type": "object"
+  },
+  "rendering_surface_v0_5": {
+   "additionalProperties": false,
+   "properties": {
+    "binding_input": {
+     "const": true,
+     "type": "boolean"
+    },
+    "closes_finding": {
+     "const": "S3MR3-010",
+     "type": "string"
+    },
+    "future_pre_bank_token_distinctness_rule": {
+     "pattern": "INELIGIBLE",
+     "type": "string"
+    },
+    "future_rule_resolves_od2": {
+     "const": false,
+     "type": "boolean"
+    },
+    "illustrative_example": {
+     "const": false,
+     "type": "boolean"
+    },
+    "k6_instr_rule": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "k6_sep_separators": {
+     "additionalProperties": false,
+     "properties": {
+      "R-base": {
+       "const": ": ",
+       "type": "string"
+      },
+      "R-sep": {
+       "const": " = ",
+       "type": "string"
+      },
+      "every_other_prompt_byte_identical_within_the_pair": {
+       "const": true,
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "R-base",
+      "R-sep",
+      "every_other_prompt_byte_identical_within_the_pair"
+     ],
+     "type": "object"
+    },
+    "registry_path": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "registry_schema_path": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "registry_sha256": {
+     "pattern": "^[0-9a-f]{64}$",
+     "type": "string"
+    },
+    "rp_wrapper": {
+     "type": "null"
+    },
+    "rp_wrapper_status": {
+     "pattern": "^UNRESOLVED",
+     "type": "string"
+    },
+    "s4_wrapper_boundary": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "status": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "sufficiency_claim": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "tokenizer_distinctness_status": {
+     "const": "NOT_TESTED_THIS_ROUND_NO_CHECKPOINT_OR_TOKENIZER_MAY_BE_ACCESSED",
+     "type": "string"
+    }
+   },
+   "required": [
+    "binding_input",
+    "closes_finding",
+    "illustrative_example",
+    "registry_path",
+    "registry_schema_path",
+    "registry_sha256",
+    "status",
+    "sufficiency_claim",
+    "k6_sep_separators",
+    "k6_instr_rule",
+    "tokenizer_distinctness_status",
+    "future_pre_bank_token_distinctness_rule",
+    "future_rule_resolves_od2",
+    "s4_wrapper_boundary",
+    "rp_wrapper",
+    "rp_wrapper_status"
    ],
    "type": "object"
   },
@@ -4788,7 +5519,7 @@
    "type": "object"
   },
   "schema_version": {
-   "const": "study3-interface-calibration-protocol-draft-v0.4"
+   "const": "study3-interface-calibration-protocol-draft-v0.5"
   },
   "split_lifecycle": {
    "additionalProperties": false,
@@ -4971,7 +5702,7 @@
    "type": "object"
   },
   "state": {
-   "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW"
+   "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW"
   },
   "state_machine_v0_4": {
    "properties": {
@@ -5370,6 +6101,7 @@
   "power_architecture_v0_4",
   "prior_study_statements",
   "proposed_statistics",
+  "rendering_surface_v0_5",
   "required_next_action",
   "research_question",
   "results",

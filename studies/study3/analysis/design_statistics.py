@@ -1,4 +1,4 @@
-"""Study 3 draft-v0.4 design-statistics derivation instrument (model-free).
+"""Study 3 draft-v0.5 design-statistics derivation instrument (model-free).
 
 This script belongs to the Study 3 *design* packet. It performs no model operation of any
 kind: no download, no revision resolution by download, no weight load, no tokenizer
@@ -9,14 +9,33 @@ confirmation content and produces no scientific evidence row.
 
 Everything it emits is a *design parameter* computed by exact, model-free arithmetic from
 the registered parameters of the authoritative protocol document. Nothing here is a
-measurement and nothing here is frozen. draft-v0.4 is an amended, still-unfrozen draft
-awaiting a THIRD independent methods review.
+measurement and nothing here is frozen. draft-v0.5 is an amended, still-unfrozen draft
+awaiting a FOURTH independent methods review.
+
+What changed from draft-v0.4, and why
+-------------------------------------
+The third independent methods review returned
+``STUDY3_V0_4_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`` with one BLOCKING, three MAJOR and
+six MINOR structured findings. The bounded operator amendment adopted here:
+
+* derives the I3 cell census from **per-contrast** applicability rather than per-family
+  applicability. ``K6-SEP`` varies the separator between a displayed option label and its
+  displayed option content, which has no referent for the option-less profiles S2 and S3, so
+  it is ``not_applicable`` there and their genuine I3 contrast count falls to one. Every
+  affected census, allocation, projection and claim ceiling is re-derived rather than edited
+  (S3MR3-001);
+* emits **component-level confirmation applicability** so that a per-component repair has a
+  place to live, and so that no row can imply that a never-selectable or not-applicable
+  profile reaches confirmation (S3MR3-002);
+* records, beside each registered minimal sample size, the **local non-monotonicity run** of
+  the exact-binomial power target immediately above that size, so no reader can infer that
+  any n at or above the registered size meets the target (S3MR3-007).
 
 What changed from draft-v0.3, and why
 -------------------------------------
 The second independent methods review returned
 ``STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`` with two BLOCKING, six MAJOR and
-two MINOR structured findings. The operator amendment adopted here:
+two MINOR structured findings. The operator amendment adopted then:
 
 * narrows I3 to **joint robust correctness**. The sole gate-bearing indicator is
   ``J_joint_correct``, which is 1 exactly when both registered variants of the cluster are
@@ -197,6 +216,52 @@ def smallest_size_meeting_power(p0, p1, alpha, target, ceiling):
     raise DesignDefect("no admissible sample size at or below the search ceiling")
 
 
+def power_target_holds(n, p0, p1, alpha, target):
+    """True when the exact test at size n meets the per-cell power target at p1."""
+    count = smallest_controlling_count(n, p0, alpha)
+    if count >= n:
+        return False
+    return upper_tail(n, count, p1) >= target
+
+
+def local_nonmonotonic_run(minimum, p0, p1, alpha, target, window):
+    """Enumerate the sizes in a registered LOCAL window above ``minimum`` where the target FAILS.
+
+    Discreteness of the exact binomial rejection region makes realized power non-monotone in
+    n at a fixed level, so the registered minimum is not a threshold above which the target
+    always holds (S3MR3-007). The disclosure window is registered explicitly: the statement
+    made here is a statement about that window and is not extrapolated beyond it.
+    """
+    failures = [n for n in range(minimum + 1, minimum + window + 1)
+                if not power_target_holds(n, p0, p1, alpha, target)]
+    contiguous = []
+    probe = minimum + 1
+    failing = set(failures)
+    while probe in failing:
+        contiguous.append(probe)
+        probe += 1
+    return {
+        "disclosure_window_size": window,
+        "disclosure_window": [minimum + 1, minimum + window],
+        "target_is_monotone_within_the_disclosure_window": not failures,
+        "failing_sizes_within_the_disclosure_window": failures,
+        "failing_size_count_within_the_disclosure_window": len(failures),
+        "first_contiguous_failing_run_above_the_registered_minimum": contiguous,
+        "largest_failing_size_within_the_disclosure_window": (
+            max(failures) if failures else None),
+        "statement_is_scoped_to_the_disclosure_window": True,
+        "no_eventual_monotonicity_threshold_is_registered": True,
+        "execution_must_use_the_exact_registered_cell_size": True,
+        "at_least_n_interpretation_prohibited": True,
+        "why": ("the exact test's rejection region is discrete, so realized power is locally "
+                "non-monotone in n at a fixed level. The registered size is the smallest "
+                "unrestricted positive integer meeting the target; it is NOT a threshold above "
+                "which the target always holds. A realized cell size that drifted upward by a "
+                "few units could fall below the registered target, so execution must use the "
+                "exact registered cell size and must never read it as 'at least n'."),
+    }
+
+
 def render(value, digits):
     """Exact half-up decimal rendering of a rational; no floating point is used."""
     if value < 0:
@@ -218,7 +283,12 @@ def as_rational_text(value):
 # ----------------------------------------------------------------------------------
 
 def derive_cell_counts(protocol):
-    """Derive gate-bearing evaluation-cell counts per profile from registered structure."""
+    """Derive gate-bearing evaluation-cell counts per profile from registered structure.
+
+    I3 applicability is registered PER CONTRAST ID, not per family. draft-v0.4 carried one
+    family-level ``I3_K6`` value, which cannot express that ``K6-SEP`` has no referent for the
+    option-less profiles (S3MR3-001). The census counts applicable contrast IDs.
+    """
     truth = {row["profile"]: row for row in protocol["gate_truth_table"]["rows"]}
     roles = tuple(protocol["proposed_statistics"]["registered_target_roles"])
     families = tuple(protocol["proposed_statistics"]["registered_operation_families"])
@@ -226,14 +296,29 @@ def derive_cell_counts(protocol):
     k5 = tuple(protocol["i3_contrast_registry"]["k5_contrast_ids"])
     k6 = tuple(protocol["i3_contrast_registry"]["k6_contrast_ids"])
 
+    def applicable_contrasts(row, key, registered):
+        """The registered contrast IDs marked applicable for this profile."""
+        value = row[key]
+        if not isinstance(value, dict):
+            raise DesignDefect("%s must be registered per contrast ID, not per family" % key)
+        if tuple(sorted(value)) != tuple(sorted(registered)):
+            raise DesignDefect("%s does not cover exactly the registered contrast IDs" % key)
+        for contrast, state in value.items():
+            if state not in ("applicable", "not_applicable"):
+                raise DesignDefect("%s[%s] carries an unregistered applicability value"
+                                   % (key, contrast))
+        return tuple(c for c in registered if value[c] == "applicable")
+
     counts = {}
     for profile, row in truth.items():
         applicable = lambda key: row[key] == "applicable"  # noqa: E731
+        k5_applicable = applicable_contrasts(row, "I3_K5", k5)
+        k6_applicable = applicable_contrasts(row, "I3_K6", k6)
         i1a = len(roles) if applicable("I1a") else 0
         i1b = len(roles) if applicable("I1b") else 0
         i2 = len(roles) * len(families) if applicable("I2") else 0
-        i3_k5 = len(roles) * len(k5) if applicable("I3_K5") else 0
-        i3_k6 = len(roles) * len(k6) if applicable("I3_K6") else 0
+        i3_k5 = len(roles) * len(k5_applicable)
+        i3_k6 = len(roles) * len(k6_applicable)
         i4 = len(families) * len(depths) if applicable("I4") else 0
         counts[profile] = {
             "label_bearing": bool(row["label_bearing"]),
@@ -245,6 +330,13 @@ def derive_cell_counts(protocol):
             "I3_K6_cells": i3_k6,
             "I3_cells": i3_k5 + i3_k6,
             "I4_cells": i4,
+            "applicable_k5_contrast_ids": list(k5_applicable),
+            "applicable_k6_contrast_ids": list(k6_applicable),
+            "applicable_i3_contrast_ids": list(k5_applicable) + list(k6_applicable),
+            "applicable_i3_contrast_count": len(k5_applicable) + len(k6_applicable),
+            "not_applicable_i3_contrast_ids": [
+                c for c in tuple(k5) + tuple(k6)
+                if c not in set(k5_applicable) | set(k6_applicable)],
             "cells_at_i1_i3_floor": i1a + i1b + i3_k5 + i3_k6,
             "cells_at_i2_floor": i2,
             "cells_at_i4_floor": i4,
@@ -333,9 +425,78 @@ def gate_families(protocol):
     return out
 
 
-def derive_binomial_rows(families, power, search_ceiling):
+def confirmation_component_applicability(protocol, counts):
+    """Component-level confirmation applicability, derived not transcribed.
+
+    Confirmation applicability is the component's registered applicable profiles INTERSECT the
+    selectable profiles, because exactly one profile is selected on the development split and
+    the selection map can never return a never-selectable profile. draft-v0.4 published one
+    family-level list per row, which cannot express a per-component repair and still admitted
+    S4 to two confirmation rows (S3MR3-002).
+    """
+    truth = {row["profile"]: row for row in protocol["gate_truth_table"]["rows"]}
+    selectable = sorted(p for p, c in counts.items() if c["selectable"])
+    k5 = tuple(protocol["i3_contrast_registry"]["k5_contrast_ids"])
+    k6 = tuple(protocol["i3_contrast_registry"]["k6_contrast_ids"])
+
+    components = []
+    for gate in ("I1a", "I1b", "I2"):
+        components.append((gate, "I1_I3_joint_correctness_floor" if gate != "I2"
+                           else "I2_headroom_floor",
+                           tuple(p for p in selectable if truth[p][gate] == "applicable")))
+    for contrast in k5:
+        components.append(("I3/" + contrast, "I1_I3_joint_correctness_floor",
+                           tuple(p for p in selectable
+                                 if truth[p]["I3_K5"][contrast] == "applicable")))
+    for contrast in k6:
+        components.append(("I3/" + contrast, "I1_I3_joint_correctness_floor",
+                           tuple(p for p in selectable
+                                 if truth[p]["I3_K6"][contrast] == "applicable")))
+    components.append(("I4", "I4_positive_reference_floor",
+                       tuple(p for p in selectable if truth["S1"]["I4"] == "applicable"
+                             and truth[p]["I4"] == "applicable")))
+
+    rows = []
+    for component, family, profiles in components:
+        if "S4" in profiles:
+            raise DesignDefect("S4 reached a confirmation applicability field")
+        rows.append({
+            "component": component,
+            "gate_family": family,
+            "applicable_profiles": list(profiles),
+            "s4_present": False,
+            "never_selectable_profile_present": False,
+            "applicability_rule": "the component's registered applicable profiles INTERSECT the "
+                                  "selectable profiles; exactly one selected profile enters "
+                                  "confirmation and S4 can never be that profile",
+            "not_applicable_selectable_profiles": [
+                p for p in selectable if p not in profiles],
+        })
+    return {
+        "rule": "confirmation applicability = the component's registered SELECTABLE profiles "
+                "INTERSECT {the single profile selected on the development split}",
+        "selectable_profiles": selectable,
+        "s4_can_never_appear": True,
+        "component_count": len(rows),
+        "components": rows,
+        "v0_4_defect_repaired": "draft-v0.4's committed table listed S1, S2, S3 and S4 in the "
+                                "confirmation I1_I3 family row and the confirmation I2 family "
+                                "row, and had no place to record the per-component repair "
+                                "confining I1b and K5 confirmation to S1 (S3MR3-002)",
+        "row_shape": "per component, not per gate family",
+    }
+
+
+def derive_binomial_rows(families, power, search_ceiling, component_applicability=None,
+                         window=None):
     development = {}
     confirmation = {}
+    by_component = {}
+    if window is None:
+        raise DesignDefect("the local non-monotonicity disclosure window is not registered")
+    if component_applicability is not None:
+        for row in component_applicability["components"]:
+            by_component[row["component"]] = list(row["applicable_profiles"])
     for name, spec in sorted(families.items()):
         n, dev_count = smallest_size_meeting_power(
             spec["p0"], spec["p1"], power["dev_alpha"], power["per_cell_target"], search_ceiling)
@@ -380,6 +541,9 @@ def derive_binomial_rows(families, power, search_ceiling):
             "p1_exact_rational": as_rational_text(spec["p1"]),
             "n": n,
             "n_is_smallest_unrestricted_positive_integer_meeting_the_target": True,
+            "local_power_nonmonotonicity": local_nonmonotonic_run(
+                n, spec["p0"], spec["p1"], power["dev_alpha"], power["per_cell_target"],
+                window),
             "applicable_profiles": list(spec["applicable_profiles"]),
             "evaluated_per": list(spec["evaluated_per"]),
             "derivation": "exact binomial search over exact rational inputs with integer tail arithmetic; "
@@ -397,9 +561,24 @@ def derive_binomial_rows(families, power, search_ceiling):
             "rejection_rule": "pass the cell when the observed success count is at least %d out of %d %s"
                               % (dev_count, n, spec["unit_of_n"]),
         })
+        confirmation_components = {
+            component: profiles for component, profiles in by_component.items()
+            if component.split("/")[0] in spec["gates"]}
+        confirmation_profiles = sorted(
+            {p for profiles in confirmation_components.values() for p in profiles})
+        if "S4" in confirmation_profiles:
+            raise DesignDefect("%s confirmation: the never-selectable profile S4 appears" % name)
+
         confirmation[name] = dict(common, **{
             "split": "confirmation",
             "alpha_exact_rational": as_rational_text(power["conf_alpha"]),
+            "applicable_profiles": confirmation_profiles,
+            "component_applicability": {k: list(v)
+                                        for k, v in sorted(confirmation_components.items())},
+            "applicability_is_component_level": True,
+            "applicability_rule": "the component's registered selectable profiles INTERSECT the "
+                                  "single development-selected profile; S4 is never selectable "
+                                  "and can never appear",
             "pass_count": conf_count,
             "pass_count_is_minimal_at_alpha": True,
             "exact_null_tail_at_p0": render(conf_tail, TAIL_DIGITS),
@@ -407,6 +586,7 @@ def derive_binomial_rows(families, power, search_ceiling):
             "meets_per_cell_power_target": bool(conf_power >= power["per_cell_target"]),
             "degenerate_rejection_region": False,
             "size_status": "CONSERVATIVE_REUSE_OF_THE_DEVELOPMENT_SIZE_NOT_A_MINIMAL_CONFIRMATION_SIZE",
+            "s4_present": False,
             "rejection_rule": "pass the cell when the observed success count is at least %d out of %d %s"
                               % (conf_count, n, spec["unit_of_n"]),
         })
@@ -1007,7 +1187,12 @@ def build_tables():
     power = derive_power_architecture(protocol, counts)
     gates = gate_families(protocol)
     ceiling = positive_int(protocol["proposed_statistics"]["sample_size_search_ceiling"], "search ceiling")
-    development, confirmation = derive_binomial_rows(gates, power, ceiling)
+    applicability = confirmation_component_applicability(protocol, counts)
+    window = positive_int(
+        protocol["proposed_statistics"]["local_power_nonmonotonicity_disclosure_window"],
+        "local non-monotonicity disclosure window")
+    development, confirmation = derive_binomial_rows(
+        gates, power, ceiling, applicability, window)
 
     subtable, order = build_eligibility_subtable(protocol, power["denominator"])
     machine = build_state_machine(protocol)
@@ -1022,7 +1207,7 @@ def build_tables():
         "document_class": "design_statistics_derivation",
         "draft_version": protocol["study_identity"]["draft_version"],
         "state": protocol["state"],
-        "disposition_status": "PROPOSED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW",
+        "disposition_status": "PROPOSED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
         "declared_assumptions": {
             "study_development_false_qualification_bound_exact_rational": as_rational_text(power["study_alpha"]),
             "fixed_selectable_profile_denominator": power["denominator"],
@@ -1064,6 +1249,7 @@ def build_tables():
             ],
         },
         "gate_bearing_cell_counts": counts,
+        "confirmation_component_applicability": applicability,
         "development_exact_binomial_components": [development[k] for k in sorted(development)],
         "confirmation_exact_binomial_components": [confirmation[k] for k in sorted(confirmation)],
         "i3_outcome_lattice": lattice,
@@ -1093,7 +1279,7 @@ def _serialise(tables):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Study 3 draft-v0.4 design-statistics derivation")
+    parser = argparse.ArgumentParser(description="Study 3 draft-v0.5 design-statistics derivation")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--emit", action="store_true", help="regenerate the committed tables")
     group.add_argument("--check", action="store_true", help="verify the committed tables reproduce exactly")
