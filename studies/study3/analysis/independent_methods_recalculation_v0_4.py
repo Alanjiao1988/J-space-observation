@@ -51,13 +51,19 @@ RECALCULATION_ID = "STUDY3_V0_4_THIRD_INDEPENDENT_METHODS_RECALCULATION"
 ARTIFACT_STATUS = "PROPOSED_DESIGN_PARAMETERS_NOT_MEASUREMENTS"
 SCHEMA_VERSION = "study3-independent-methods-recalculation-v0.4"
 
-PROTOCOL_RELATIVE_PATH = os.path.join(
-    "studies", "study3", "protocol", "interface_calibration_protocol_draft.json")
-TABLE_RELATIVE_PATH = os.path.join(
-    "studies", "study3", "analysis",
-    "independent_methods_recalculation_tables_v0_4.json")
-DRAFTING_TABLE_RELATIVE_PATH = os.path.join(
-    "studies", "study3", "analysis", "design_statistics_tables.json")
+PROTOCOL_RELATIVE_PATH = "studies/study3/protocol/interface_calibration_protocol_draft.json"
+TABLE_RELATIVE_PATH = (
+    "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json")
+DRAFTING_TABLE_RELATIVE_PATH = "studies/study3/analysis/design_statistics_tables.json"
+
+
+def repository_path(repository_root: str, posix_relative: str) -> str:
+    """Resolve a POSIX-style repository-relative path on any platform.
+
+    Emitted identities are always the POSIX form, so a table emitted on one platform is
+    byte-identical to the same table emitted on another.
+    """
+    return os.path.join(repository_root, *posix_relative.split("/"))
 
 PROHIBITED_SOURCE_PATHS = (
     "studies/study3/analysis/design_statistics.py",
@@ -167,7 +173,7 @@ def fetch(container, key, label):
 
 
 def load_registered_protocol(repository_root: str) -> dict:
-    path = os.path.join(repository_root, PROTOCOL_RELATIVE_PATH)
+    path = repository_path(repository_root, PROTOCOL_RELATIVE_PATH)
     if not os.path.isfile(path):
         raise RecalculationError("authoritative protocol JSON not found at %s" % path)
     with open(path, "r", encoding="utf-8") as handle:
@@ -1150,7 +1156,7 @@ def audit_historical_harness_statics(repository_root: str) -> Dict[str, object]:
     absence of weakened assertions, and proof that the anchored historical input actually differs
     from the live draft-v0.4 input, without which anchoring could not be detected at all.
     """
-    harness_path = os.path.join(repository_root, "tests", "test_study3_methods_review_v0_3.py")
+    harness_path = repository_path(repository_root, "tests/test_study3_methods_review_v0_3.py")
     require(os.path.isfile(harness_path), "the historical-review harness is missing")
     with open(harness_path, "r", encoding="utf-8") as handle:
         harness_source = handle.read()
@@ -1175,10 +1181,10 @@ def audit_historical_harness_statics(repository_root: str) -> Dict[str, object]:
         "except_pass": harness_source.count("except Exception:  # noqa"),
     }
 
-    def digest_of(*relative: str) -> Dict[str, object]:
-        path = os.path.join(repository_root, *relative)
+    def digest_of(posix_relative: str) -> Dict[str, object]:
+        path = repository_path(repository_root, posix_relative)
         if not os.path.isfile(path):
-            return {"path": "/".join(relative), "present": False}
+            return {"path": posix_relative, "present": False}
         with open(path, "rb") as handle:
             payload = handle.read()
         # Normalise to LF before hashing. The repository stores these text blobs with LF, and a
@@ -1186,19 +1192,18 @@ def audit_historical_harness_statics(repository_root: str) -> Dict[str, object]:
         normalised = payload.replace(b"\r\n", b"\n")
         import hashlib
         return {
-            "path": "/".join(relative),
+            "path": posix_relative,
             "present": True,
             "bytes_lf_normalised": len(normalised),
             "sha256_of_lf_normalised_bytes": hashlib.sha256(normalised).hexdigest(),
         }
 
-    v0_3_recalculation = digest_of("studies", "study3", "analysis",
-                                   "independent_methods_recalculation_v0_3.py")
-    v0_3_tables = digest_of("studies", "study3", "analysis",
-                            "independent_methods_recalculation_tables_v0_3.json")
-    live_protocol = digest_of(*PROTOCOL_RELATIVE_PATH.split(os.sep))
-    live_drafting_tables = digest_of("studies", "study3", "analysis",
-                                     "design_statistics_tables.json")
+    v0_3_recalculation = digest_of(
+        "studies/study3/analysis/independent_methods_recalculation_v0_3.py")
+    v0_3_tables = digest_of(
+        "studies/study3/analysis/independent_methods_recalculation_tables_v0_3.json")
+    live_protocol = digest_of(PROTOCOL_RELATIVE_PATH)
+    live_drafting_tables = digest_of(DRAFTING_TABLE_RELATIVE_PATH)
 
     return {
         "harness_path": "tests/test_study3_methods_review_v0_3.py",
@@ -1231,7 +1236,7 @@ def compare_against_drafting_output(repository_root: str,
     records both commit identities so the ordering is provable from history. Agreement here is
     never used as validation of the independent derivation: the method validation suite above is.
     """
-    path = os.path.join(repository_root, DRAFTING_TABLE_RELATIVE_PATH)
+    path = repository_path(repository_root, DRAFTING_TABLE_RELATIVE_PATH)
     if not os.path.isfile(path):
         raise RecalculationError("the drafting derivation table is missing at %s" % path)
     with open(path, "r", encoding="utf-8") as handle:
@@ -1831,7 +1836,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     root = locate_repository_root(arguments.repository_root)
     tables = assemble_recalculation_tables(root)
     rendered = canonical_json(tables)
-    destination = os.path.join(root, TABLE_RELATIVE_PATH)
+    destination = repository_path(root, TABLE_RELATIVE_PATH)
 
     if arguments.emit:
         with open(destination, "w", encoding="utf-8", newline="\n") as handle:

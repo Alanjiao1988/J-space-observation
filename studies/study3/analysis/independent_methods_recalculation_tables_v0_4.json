@@ -559,7 +559,7 @@
         "note": "the per-component confirmation applicability the protocol registers is not representable in the drafting table's gate-family row shape, so the narrower registered applicability is absent from the derived table entirely"
       }
     ],
-    "compared_artifact": "studies\\study3\\analysis\\design_statistics_tables.json",
+    "compared_artifact": "studies/study3/analysis/design_statistics_tables.json",
     "conclusion": "every binding statistical number in the drafting derivation table is independently reproduced; the classified differences are confined to applicability metadata that the drafting table did not carry forward from the amended protocol",
     "every_binding_number_agrees": true,
     "numeric_field_agreements": 70,
@@ -1227,7 +1227,7 @@
   },
   "independence": {
     "derivation_precedes_any_drafting_output_inspection": true,
-    "only_repository_artifact_read": "studies\\study3\\protocol\\interface_calibration_protocol_draft.json",
+    "only_repository_artifact_read": "studies/study3/protocol/interface_calibration_protocol_draft.json",
     "prohibited_sources": [
       "studies/study3/analysis/design_statistics.py",
       "studies/study3/analysis/design_statistics_tables.json",
