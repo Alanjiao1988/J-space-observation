@@ -1,0 +1,533 @@
+{
+ "$id": "study3-v0-5-operator-amendment-record.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "allOf": [
+  {
+   "$comment": "UR-22 may never be recorded as resolved.",
+   "properties": {
+    "unresolved_item_dispositions": {
+     "items": {
+      "if": {
+       "properties": {
+        "id": {
+         "const": "UR-22"
+        }
+       },
+       "required": [
+        "id"
+       ]
+      },
+      "then": {
+       "properties": {
+        "disposition": {
+         "const": "UNRESOLVED_BLOCKING_OPERATOR_DECISION"
+        },
+        "status": {
+         "const": "UNRESOLVED"
+        }
+       }
+      }
+     },
+     "type": "array"
+    }
+   }
+  },
+  {
+   "$comment": "Every closure row must cite normative bytes, a committed test and a negative mutation. Prose alone may not close a finding.",
+   "properties": {
+    "closure_matrix_v0_5": {
+     "items": {
+      "properties": {
+       "affected_normative_fields": {
+        "minItems": 1,
+        "type": "array"
+       },
+       "committed_tests": {
+        "minItems": 1,
+        "type": "array"
+       },
+       "negative_mutations": {
+        "minItems": 1,
+        "type": "array"
+       }
+      },
+      "required": [
+       "affected_normative_fields",
+       "committed_tests",
+       "negative_mutations"
+      ]
+     },
+     "type": "array"
+    }
+   }
+  }
+ ],
+ "description": "Fail-closed schema for the draft-v0.5 bounded operator amendment record. It refuses a missing, duplicate or extra S3MR3 identifier; a closure status outside the ten required statuses; a closure row that cites no normative field, no committed test or no negative mutation, so that no finding can be closed by prose alone; fewer than the twenty inherited first-review findings, the ten carried-forward second-review findings or the twenty-two unresolved items; a reopened earlier finding; a repair that self-approves instead of deferring to the fourth independent review; a resolved OD2 or UR-22; a non-zero operation counter; a true authority flag; any result, evidence row, bank row or seed; a scope boundary that admits a prohibited act; and a successor action that is not a fourth independent methods review.",
+ "properties": {
+  "all_independent_reviews_remain_valid_rejections": {
+   "const": true
+  },
+  "authority": {
+   "additionalProperties": false,
+   "properties": {
+    "bytes": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "committed_byte_identically": {
+     "const": true
+    },
+    "cr_count": {
+     "const": 0
+    },
+    "ends_with_newline": {
+     "const": true
+    },
+    "lf_count": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "path": {
+     "const": "studies/study3/prompts/study3_v0_5_design_amendment_authority.md"
+    },
+    "sha256": {
+     "pattern": "^[0-9a-f]{64}$",
+     "type": "string"
+    }
+   },
+   "required": [
+    "path",
+    "sha256",
+    "bytes",
+    "lf_count",
+    "cr_count",
+    "ends_with_newline",
+    "committed_byte_identically"
+   ],
+   "type": "object"
+  },
+  "authority_flags": {
+   "additionalProperties": {
+    "const": false
+   },
+   "minProperties": 8,
+   "type": "object"
+  },
+  "bank_rows": {
+   "maxItems": 0,
+   "type": "array"
+  },
+  "carried_forward_closure_matrix_v0_4": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "finding_id": {
+      "pattern": "^S3MR2-\\d{3}$",
+      "type": "string"
+     },
+     "original_severity": {
+      "enum": [
+       "BLOCKING",
+       "MAJOR",
+       "MINOR"
+      ]
+     },
+     "reopened": {
+      "const": false
+     },
+     "status": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "v0_5_note": {
+      "minLength": 1,
+      "type": "string"
+     }
+    },
+    "required": [
+     "finding_id",
+     "original_severity",
+     "reopened",
+     "status",
+     "v0_5_note"
+    ],
+    "type": "object"
+   },
+   "maxItems": 10,
+   "minItems": 10,
+   "type": "array",
+   "uniqueItems": true
+  },
+  "closure_matrix_v0_5": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "affected_derived_fields": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "affected_normative_fields": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "closure_status": {
+      "enum": [
+       "RESOLVED_BY_NOT_APPLICABLE_REREGISTRATION_AND_FULL_REDERIVATION",
+       "RESOLVED_BY_COMPONENT_LEVEL_CONFIRMATION_APPLICABILITY",
+       "RESOLVED_ACTIVE_TEXT_ALIGNED_HISTORY_PRESERVED",
+       "RESOLVED_ENFORCEMENT_SCOPE_MATCHES_REGISTERED_SCOPE",
+       "RESOLVED_S4_I4_REMOVED",
+       "RESOLVED_NON_MACHINE_STATUS_REMOVED_FROM_STOP_STATES",
+       "RESOLVED_NONMONOTONICITY_DISCLOSED_EXACT_N_REQUIRED",
+       "RESOLVED_ROUND_REFERENCES_UPDATED",
+       "RESOLVED_UNION_BOUND_CLAIM_ALIGNED",
+       "RESOLVED_DETERMINISTIC_RENDERING_SURFACE_REGISTERED"
+      ]
+     },
+     "committed_tests": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "disposition": {
+      "const": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW"
+     },
+     "finding_id": {
+      "pattern": "^S3MR3-\\d{3}$",
+      "type": "string"
+     },
+     "negative_mutations": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "original_severity": {
+      "enum": [
+       "BLOCKING",
+       "MAJOR",
+       "MINOR"
+      ]
+     },
+     "original_title": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "repair": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "repair_kind": {
+      "enum": [
+       "method",
+       "operator_decision_input"
+      ]
+     },
+     "residual_limitation": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "self_approved": {
+      "const": false
+     },
+     "starting_evidence": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "verification": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "where": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "affected_derived_fields",
+     "affected_normative_fields",
+     "closure_status",
+     "committed_tests",
+     "disposition",
+     "finding_id",
+     "negative_mutations",
+     "original_severity",
+     "original_title",
+     "repair",
+     "repair_kind",
+     "residual_limitation",
+     "self_approved",
+     "starting_evidence",
+     "verification",
+     "where"
+    ],
+    "type": "object"
+   },
+   "maxItems": 10,
+   "minItems": 10,
+   "type": "array",
+   "uniqueItems": true
+  },
+  "document_class": {
+   "const": "operator_amendment_record"
+  },
+  "evidence_rows": {
+   "maxItems": 0,
+   "type": "array"
+  },
+  "external_validity_bridge": {
+   "additionalProperties": false,
+   "properties": {
+    "claim_ceiling": {
+     "items": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "minItems": 4,
+     "type": "array"
+    },
+    "classified_as_a_rejection_driver_by_the_third_review": {
+     "const": false
+    },
+    "inherited_item": {
+     "const": "UM3-05"
+    },
+    "new_gate_or_task_bank_added_in_v0_5": {
+     "const": false
+    },
+    "status": {
+     "const": "UNRESOLVED_FUTURE_METHODS_PREREQUISITE"
+    }
+   },
+   "required": [
+    "status",
+    "inherited_item",
+    "claim_ceiling",
+    "new_gate_or_task_bank_added_in_v0_5"
+   ],
+   "type": "object"
+  },
+  "historical_count_mismatch": {
+   "type": "object"
+  },
+  "historical_review_test_harness_scope_erratum": {
+   "type": "object"
+  },
+  "immutable_objects_not_edited": {
+   "items": {
+    "minLength": 1,
+    "type": "string"
+   },
+   "minItems": 20,
+   "type": "array",
+   "uniqueItems": true
+  },
+  "inherited_first_review_findings": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "finding_id": {
+      "pattern": "^S3MR-\\d{3}$",
+      "type": "string"
+     },
+     "note": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "original_severity": {
+      "enum": [
+       "BLOCKING",
+       "MAJOR",
+       "MINOR"
+      ]
+     },
+     "status_after_second_review": {
+      "enum": [
+       "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+       "PARTIALLY_RESOLVED_BY_DRAFT_V0_3"
+      ]
+     },
+     "v0_5_residual": {
+      "minLength": 1,
+      "type": "string"
+     }
+    },
+    "required": [
+     "finding_id",
+     "original_severity",
+     "status_after_second_review",
+     "note",
+     "v0_5_residual"
+    ],
+    "type": "object"
+   },
+   "maxItems": 20,
+   "minItems": 20,
+   "type": "array",
+   "uniqueItems": true
+  },
+  "next_legal_action": {
+   "pattern": "fourth bounded independent methods review of draft-v0\\.5",
+   "type": "string"
+  },
+  "no_review_artifact_was_edited": {
+   "const": true
+  },
+  "operation_counters": {
+   "additionalProperties": {
+    "const": 0
+   },
+   "minProperties": 10,
+   "type": "object"
+  },
+  "operator_decisions_in_this_round": {
+   "items": {
+    "minLength": 1,
+    "type": "string"
+   },
+   "minItems": 1,
+   "type": "array"
+  },
+  "party": {
+   "minLength": 1,
+   "type": "string"
+  },
+  "responds_to": {
+   "const": "studies/study3/reviews/v0_4_independent_methods_review.md"
+  },
+  "results": {
+   "maxItems": 0,
+   "type": "array"
+  },
+  "round": {
+   "minLength": 1,
+   "type": "string"
+  },
+  "schema_version": {
+   "const": "study3_operator_amendment_v0_5"
+  },
+  "scope_boundary": {
+   "additionalProperties": {
+    "const": false
+   },
+   "minProperties": 13,
+   "type": "object"
+  },
+  "seeds": {
+   "maxItems": 0,
+   "type": "array"
+  },
+  "self_approval_prohibition": {
+   "additionalProperties": false,
+   "properties": {
+    "determination_belongs_to": {
+     "const": "the fourth independent methods reviewer"
+    },
+    "every_repair_label": {
+     "const": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW"
+    },
+    "the_drafting_party_does_not_claim_draft_v0_5_is_correct": {
+     "const": true
+    }
+   },
+   "required": [
+    "determination_belongs_to",
+    "every_repair_label",
+    "the_drafting_party_does_not_claim_draft_v0_5_is_correct"
+   ],
+   "type": "object"
+  },
+  "separation_of_kinds": {
+   "type": "object"
+  },
+  "starting_state": {
+   "additionalProperties": false,
+   "properties": {
+    "commit": {
+     "const": "79bcc20244ab55045ba1c5d778d829d4caac3dd3"
+    },
+    "evidence_ledger_last_row": {
+     "const": "EV-0016"
+    },
+    "strict_ancestor_present": {
+     "const": "e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43"
+    },
+    "third_review_publication_paths": {
+     "const": 17
+    },
+    "tree": {
+     "const": "3855a579d0174d2c45587cba248e96d42c319664"
+    }
+   },
+   "required": [
+    "commit",
+    "tree",
+    "strict_ancestor_present",
+    "third_review_publication_paths",
+    "evidence_ledger_last_row"
+   ],
+   "type": "object"
+  },
+  "state": {
+   "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW"
+  },
+  "unresolved_item_dispositions": {
+   "items": {
+    "type": "object"
+   },
+   "maxItems": 22,
+   "minItems": 22,
+   "type": "array",
+   "uniqueItems": true
+  }
+ },
+ "required": [
+  "all_independent_reviews_remain_valid_rejections",
+  "authority",
+  "authority_flags",
+  "bank_rows",
+  "carried_forward_closure_matrix_v0_4",
+  "closure_matrix_v0_5",
+  "document_class",
+  "evidence_rows",
+  "external_validity_bridge",
+  "historical_count_mismatch",
+  "historical_review_test_harness_scope_erratum",
+  "immutable_objects_not_edited",
+  "inherited_first_review_findings",
+  "next_legal_action",
+  "no_review_artifact_was_edited",
+  "operation_counters",
+  "operator_decisions_in_this_round",
+  "party",
+  "responds_to",
+  "results",
+  "round",
+  "schema_version",
+  "scope_boundary",
+  "seeds",
+  "self_approval_prohibition",
+  "separation_of_kinds",
+  "starting_state",
+  "state",
+  "unresolved_item_dispositions"
+ ],
+ "type": "object"
+}

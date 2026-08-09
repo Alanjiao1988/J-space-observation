@@ -1,138 +1,6 @@
 {
- "authority_flags_all_false": true,
- "closure_matrix": [
-  {
-   "affected_derived_fields": [],
-   "affected_normative_fields": [],
-   "committed_tests": [],
-   "finding_id": "S3MR3-001",
-   "negative_mutations": [],
-   "operator_decision": null,
-   "required_closure": "RESOLVED_BY_NOT_APPLICABLE_REREGISTRATION_AND_FULL_REDERIVATION",
-   "residual_limitation": null,
-   "severity": "BLOCKING",
-   "starting_evidence": "third independent methods review, new_findings[S3MR3-001]",
-   "status": "OPEN_NOT_YET_DRAFTED"
-  },
-  {
-   "affected_derived_fields": [],
-   "affected_normative_fields": [],
-   "committed_tests": [],
-   "finding_id": "S3MR3-002",
-   "negative_mutations": [],
-   "operator_decision": null,
-   "required_closure": "RESOLVED_BY_COMPONENT_LEVEL_CONFIRMATION_APPLICABILITY",
-   "residual_limitation": null,
-   "severity": "MAJOR",
-   "starting_evidence": "third independent methods review, new_findings[S3MR3-002]",
-   "status": "OPEN_NOT_YET_DRAFTED"
-  },
-  {
-   "affected_derived_fields": [],
-   "affected_normative_fields": [],
-   "committed_tests": [],
-   "finding_id": "S3MR3-003",
-   "negative_mutations": [],
-   "operator_decision": null,
-   "required_closure": "RESOLVED_ACTIVE_TEXT_ALIGNED_HISTORY_PRESERVED",
-   "residual_limitation": null,
-   "severity": "MAJOR",
-   "starting_evidence": "third independent methods review, new_findings[S3MR3-003]",
-   "status": "OPEN_NOT_YET_DRAFTED"
-  },
-  {
-   "affected_derived_fields": [],
-   "affected_normative_fields": [],
-   "committed_tests": [],
-   "finding_id": "S3MR3-004",
-   "negative_mutations": [],
-   "operator_decision": null,
-   "required_closure": "RESOLVED_ENFORCEMENT_SCOPE_MATCHES_REGISTERED_SCOPE",
-   "residual_limitation": null,
-   "severity": "MINOR",
-   "starting_evidence": "third independent methods review, new_findings[S3MR3-004]",
-   "status": "OPEN_NOT_YET_DRAFTED"
-  },
-  {
-   "affected_derived_fields": [],
-   "affected_normative_fields": [],
-   "committed_tests": [],
-   "finding_id": "S3MR3-005",
-   "negative_mutations": [],
-   "operator_decision": null,
-   "required_closure": "RESOLVED_S4_I4_REMOVED",
-   "residual_limitation": null,
-   "severity": "MINOR",
-   "starting_evidence": "third independent methods review, new_findings[S3MR3-005]",
-   "status": "OPEN_NOT_YET_DRAFTED"
-  },
-  {
-   "affected_derived_fields": [],
-   "affected_normative_fields": [],
-   "committed_tests": [],
-   "finding_id": "S3MR3-006",
-   "negative_mutations": [],
-   "operator_decision": null,
-   "required_closure": "RESOLVED_NON_MACHINE_STATUS_REMOVED_FROM_STOP_STATES",
-   "residual_limitation": null,
-   "severity": "MINOR",
-   "starting_evidence": "third independent methods review, new_findings[S3MR3-006]",
-   "status": "OPEN_NOT_YET_DRAFTED"
-  },
-  {
-   "affected_derived_fields": [],
-   "affected_normative_fields": [],
-   "committed_tests": [],
-   "finding_id": "S3MR3-007",
-   "negative_mutations": [],
-   "operator_decision": null,
-   "required_closure": "RESOLVED_NONMONOTONICITY_DISCLOSED_EXACT_N_REQUIRED",
-   "residual_limitation": null,
-   "severity": "MINOR",
-   "starting_evidence": "third independent methods review, new_findings[S3MR3-007]",
-   "status": "OPEN_NOT_YET_DRAFTED"
-  },
-  {
-   "affected_derived_fields": [],
-   "affected_normative_fields": [],
-   "committed_tests": [],
-   "finding_id": "S3MR3-008",
-   "negative_mutations": [],
-   "operator_decision": null,
-   "required_closure": "RESOLVED_ROUND_REFERENCES_UPDATED",
-   "residual_limitation": null,
-   "severity": "MINOR",
-   "starting_evidence": "third independent methods review, new_findings[S3MR3-008]",
-   "status": "OPEN_NOT_YET_DRAFTED"
-  },
-  {
-   "affected_derived_fields": [],
-   "affected_normative_fields": [],
-   "committed_tests": [],
-   "finding_id": "S3MR3-009",
-   "negative_mutations": [],
-   "operator_decision": null,
-   "required_closure": "RESOLVED_UNION_BOUND_CLAIM_ALIGNED",
-   "residual_limitation": null,
-   "severity": "MINOR",
-   "starting_evidence": "third independent methods review, new_findings[S3MR3-009]",
-   "status": "OPEN_NOT_YET_DRAFTED"
-  },
-  {
-   "affected_derived_fields": [],
-   "affected_normative_fields": [],
-   "committed_tests": [],
-   "finding_id": "S3MR3-010",
-   "negative_mutations": [],
-   "operator_decision": null,
-   "required_closure": "RESOLVED_DETERMINISTIC_RENDERING_SURFACE_REGISTERED",
-   "residual_limitation": null,
-   "severity": "MAJOR",
-   "starting_evidence": "third independent methods review, new_findings[S3MR3-010]",
-   "status": "OPEN_NOT_YET_DRAFTED"
-  }
- ],
- "committed_authority": {
+ "all_independent_reviews_remain_valid_rejections": true,
+ "authority": {
   "bytes": 27458,
   "committed_byte_identically": true,
   "cr_count": 0,
@@ -141,23 +9,972 @@
   "path": "studies/study3/prompts/study3_v0_5_design_amendment_authority.md",
   "sha256": "b9f0023052c9056de1707ba64a8686a8df05d260cbf7aae0673c31d2dc3aadc6"
  },
- "document_class": "operator_amendment",
- "operation_counters_all_zero": true,
- "round": "draft-v0.5 bounded operator amendment",
+ "authority_flags": {
+  "bank_authorized": false,
+  "confirmation_access_authorized": false,
+  "execution_authorized": false,
+  "frozen": false,
+  "model_operations_authorized": false,
+  "positive_reference_selected": false,
+  "seed_authorized": false,
+  "winner_selected": false
+ },
+ "bank_rows": [],
+ "carried_forward_closure_matrix_v0_4": [
+  {
+   "finding_id": "S3MR2-001",
+   "original_severity": "BLOCKING",
+   "reopened": false,
+   "status": "CLOSED_BY_DRAFT_V0_4_AND_NOT_REOPENED_BY_DRAFT_V0_5",
+   "v0_5_note": "the J_joint_correct narrowing stands. draft-v0.5 closes the residual ACTIVE-TEXT residue under S3MR3-003 and the residual enforcement-scope gap under S3MR3-004, without reopening S3MR2-001."
+  },
+  {
+   "finding_id": "S3MR2-002",
+   "original_severity": "BLOCKING",
+   "reopened": false,
+   "status": "CLOSED_BY_DRAFT_V0_4_AND_NOT_REOPENED_BY_DRAFT_V0_5",
+   "v0_5_note": "the binding end-to-end power architecture stands. draft-v0.5 re-derives every quantity from the amended per-contrast census and adds the local non-monotonicity disclosure under S3MR3-007."
+  },
+  {
+   "finding_id": "S3MR2-003",
+   "original_severity": "MAJOR",
+   "reopened": false,
+   "status": "CLOSED_BY_DRAFT_V0_4_AND_NOT_REOPENED_BY_DRAFT_V0_5",
+   "v0_5_note": "the I4 applicability resolution stands. draft-v0.5 removes the single stale location under S3MR3-005 without reopening S3MR2-003."
+  },
+  {
+   "finding_id": "S3MR2-004",
+   "original_severity": "MAJOR",
+   "reopened": false,
+   "status": "CLOSED_BY_DRAFT_V0_4_AND_NOT_REOPENED_BY_DRAFT_V0_5",
+   "v0_5_note": "draft-v0.4's repair of the confirmation applicability defect was present in the protocol but absent from its named derived table. draft-v0.5 closes that residual defect under S3MR3-002 without reopening S3MR2-004."
+  },
+  {
+   "finding_id": "S3MR2-005",
+   "original_severity": "MAJOR",
+   "reopened": false,
+   "status": "CLOSED_BY_DRAFT_V0_4_AND_NOT_REOPENED_BY_DRAFT_V0_5",
+   "v0_5_note": "closed by draft-v0.4 and not reopened; draft-v0.5 introduces no change to it."
+  },
+  {
+   "finding_id": "S3MR2-006",
+   "original_severity": "MAJOR",
+   "reopened": false,
+   "status": "CLOSED_BY_DRAFT_V0_4_AND_NOT_REOPENED_BY_DRAFT_V0_5",
+   "v0_5_note": "closed by draft-v0.4 and not reopened; draft-v0.5 introduces no change to it."
+  },
+  {
+   "finding_id": "S3MR2-007",
+   "original_severity": "MAJOR",
+   "reopened": false,
+   "status": "CLOSED_BY_DRAFT_V0_4_AND_NOT_REOPENED_BY_DRAFT_V0_5",
+   "v0_5_note": "closed by draft-v0.4 and not reopened; draft-v0.5 introduces no change to it."
+  },
+  {
+   "finding_id": "S3MR2-008",
+   "original_severity": "MINOR",
+   "reopened": false,
+   "status": "CLOSED_BY_DRAFT_V0_4_AND_NOT_REOPENED_BY_DRAFT_V0_5",
+   "v0_5_note": "closed by draft-v0.4 and not reopened; draft-v0.5 introduces no change to it."
+  },
+  {
+   "finding_id": "S3MR2-009",
+   "original_severity": "MINOR",
+   "reopened": false,
+   "status": "CLOSED_BY_DRAFT_V0_4_AND_NOT_REOPENED_BY_DRAFT_V0_5",
+   "v0_5_note": "closed by draft-v0.4 and not reopened; draft-v0.5 introduces no change to it."
+  },
+  {
+   "finding_id": "S3MR2-010",
+   "original_severity": "MAJOR",
+   "reopened": false,
+   "status": "CLOSED_BY_DRAFT_V0_4_AND_NOT_REOPENED_BY_DRAFT_V0_5",
+   "v0_5_note": "the stochastic sampling model stands. draft-v0.5 adds the DETERMINISTIC half of the generator under S3MR3-010 without reopening S3MR2-010."
+  }
+ ],
+ "closure_matrix_v0_5": [
+  {
+   "affected_derived_fields": [
+    "studies/study3/analysis/design_statistics_tables.json :: gate_bearing_cell_counts",
+    "studies/study3/analysis/design_statistics_tables.json :: power_architecture.m_max",
+    "studies/study3/analysis/design_statistics_tables.json :: projected_operation_accounting"
+   ],
+   "affected_normative_fields": [
+    "i3_contrast_registry.k6_applicability.by_contrast",
+    "gate_truth_table.rows[*].I3_K6",
+    "interface_profiles[*].transformation_applicability.separator_rendering",
+    "i3_contrast_registry.claim_ceiling_by_profile",
+    "claim_ceiling.i3_single_genuine_contrast_profiles"
+   ],
+   "closure_status": "RESOLVED_BY_NOT_APPLICABLE_REREGISTRATION_AND_FULL_REDERIVATION",
+   "committed_tests": [
+    "tests/test_study3_design.py :: test_per_profile_i3_applicability_and_claim_ceiling_are_exact",
+    "tests/test_study3_design.py :: test_no_duplicate_r_sep_branch_exists_for_the_option_less_profiles",
+    "tests/test_study3_design.py :: test_m_max_and_cell_counts_derive_from_the_truth_table",
+    "tests/test_study3_rendering_registry_v0_5.py :: test_k6_sep_is_structurally_absent_for_the_option_less_profiles"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
+   "finding_id": "S3MR3-001",
+   "negative_mutations": [
+    "K6-SEP is re-applied to an option-less profile",
+    "K6 applicability returns to family level",
+    "K6-SEP applicability widens beyond the label-bearing profiles",
+    "an option-less claim ceiling regains K6-SEP",
+    "R-sep is duplicated for an option-less profile",
+    "separator rendering becomes applicable to an option-less profile"
+   ],
+   "original_severity": "BLOCKING",
+   "original_title": "The K6-SEP contrast cell has no referent for the option-less selectable profiles S2 and S3, yet is registered applicable, counted and gate-bearing for both",
+   "repair": "K6-SEP continues to mean the separator between a DISPLAYED OPTION LABEL and its DISPLAYED OPTION CONTENT. It remains applicable to the label-bearing profiles S1 and S4 and is recorded not_applicable for S2 and S3, which render neither. No profile-specific replacement separator is invented and no R-sep duplicate of R-base is rendered. not_applicable is never a pass, a zero effect, robustness evidence, a gate-bearing cell or a denominator member. S2 and S3 each carry exactly ONE genuine I3 contrast, K6-INSTR, and their per-profile I3 claim ceiling states joint robust correctness for that one registered pair only, subject to S3's existing conditional status. Applicability is now registered PER CONTRAST ID throughout, because family level cannot express the distinction. Every affected applicability list, cell census, gate truth-table row, claim ceiling, sampling and evaluation mapping, operation projection and test was re-derived rather than text-edited.",
+   "repair_kind": "method",
+   "residual_limitation": "S2 and S3 now rest on a single genuine I3 contrast each. That is a narrower evidential base than S1's nine, and it is disclosed rather than compensated: no pooling, rescue or substitute contrast is introduced, and S3 remains conditional under the single-token domain.",
+   "self_approved": false,
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-001], at commit 79bcc20244ab55045ba1c5d778d829d4caac3dd3",
+   "verification": "the derivation recomputes the census from applicable CONTRAST IDS; S2 and S3 fall from 19 to 16 gate-bearing cells and from 2 to 1 applicable I3 contrast, while S1 -- the selectable profile that attains m_max -- is unchanged at 43, so m_max, the per-cell budget 19/17200, the per-cell target 17181/17200, the profile stage floor 381/400, the end-to-end floor 9/10 and every minimal size and pass count reproduce BY DERIVATION and not by preservation",
+   "where": [
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: i3_contrast_registry.k6_applicability.by_contrast",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: gate_truth_table.rows[*].I3_K5 and .I3_K6",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: interface_profiles[S2|S3].transformation_applicability.separator_rendering",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: claim_ceiling.i3_claim_ceiling_by_profile",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: power_architecture_v0_4.cell_counts"
+   ]
+  },
+  {
+   "affected_derived_fields": [
+    "studies/study3/analysis/design_statistics_tables.json :: confirmation_component_applicability",
+    "studies/study3/analysis/design_statistics_tables.json :: confirmation_exact_binomial_components[*].component_applicability"
+   ],
+   "affected_normative_fields": [
+    "proposed_statistics.confirmation_applicability_rule",
+    "proposed_statistics.confirmation_exact_binomial_gates[*].applicable_profiles",
+    "proposed_statistics.confirmation_exact_binomial_gates[*].contrast_cell_applicability"
+   ],
+   "closure_status": "RESOLVED_BY_COMPONENT_LEVEL_CONFIRMATION_APPLICABILITY",
+   "committed_tests": [
+    "tests/test_study3_design.py :: test_i1b_and_k5_confirmation_applicability_is_limited_to_s1",
+    "tests/test_study3_design.py :: test_s4_is_not_i4_applicable_never_selectable_and_absent_from_confirmation",
+    "tests/test_study3_design.py :: _semantic_laws (component-level confirmation block)"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
+   "finding_id": "S3MR3-002",
+   "negative_mutations": [
+    "K6-SEP enters confirmation for an option-less profile",
+    "confirmation applicability returns to family level",
+    "S4 re-enters a confirmation component",
+    "I1b confirmation widened beyond S1"
+   ],
+   "original_severity": "MAJOR",
+   "original_title": "The drafting derivation table still admits the never-selectable profile S4 to two confirmation rows, so the S3MR2-004 repair is absent from the artifact the protocol names as its derived source",
+   "repair": "design_statistics_tables.json is regenerated only from the amended normative inputs, and confirmation applicability is emitted at COMPONENT level rather than as one family-level list. S4 appears in no confirmation applicability field; I1b and K5 confirmation applicability is restricted to S1; K6-SEP confirmation applicability excludes S2 and S3; K6-INSTR reflects the amended protocol exactly; I2 and I4 match the gate hierarchy and the profile contracts. A committed test binds every component-level field to the normative protocol and the rendering registry, and no row can imply that a never-selectable or not-applicable profile reaches confirmation.",
+   "repair_kind": "method",
+   "residual_limitation": "confirmation applicability is still a design registration, not an observation. No confirmation material was accessed and the confirmation split remains physically unread.",
+   "self_approved": false,
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-002], at commit 79bcc20244ab55045ba1c5d778d829d4caac3dd3",
+   "verification": "the derivation raises DesignDefect if S4 reaches any confirmation applicability field, and the committed test compares every published component list against the truth table intersected with the selectable profiles",
+   "where": [
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: proposed_statistics.confirmation_applicability_rule",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: proposed_statistics.confirmation_exact_binomial_gates[*]"
+   ]
+  },
+  {
+   "affected_derived_fields": [
+    "reports/current_status.md",
+    "studies/study3/README.md"
+   ],
+   "affected_normative_fields": [
+    "proposed_statistics.active_claim_term_prohibition.scope",
+    "proposed_statistics.active_claim_term_prohibition.historical_exemptions"
+   ],
+   "closure_status": "RESOLVED_ACTIVE_TEXT_ALIGNED_HISTORY_PRESERVED",
+   "committed_tests": [
+    "tests/test_study3_design.py :: test_reviewed_prose_carries_no_active_retired_or_prohibited_language",
+    "tests/test_study3_design.py :: test_the_withdrawn_sample_sizes_appear_in_no_active_field"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
+   "finding_id": "S3MR3-003",
+   "negative_mutations": [
+    "a mutation moving retired language into active scope is rejected",
+    "a round reference reverts to the second review"
+   ],
+   "original_severity": "MAJOR",
+   "original_title": "The retired J_both invariance construct and the withdrawn sample size 256 survive in active charter, README and handoff text, contradicting two explicit protocol claims",
+   "repair": "The charter, the repository README, the studies README, the Study 3 README, the handoff, the protocol Markdown companion, the review packet, the status report and the traceability note are brought into one consistent draft-v0.5 vocabulary. Active text no longer describes J_both as current, claims invariance, equivalence or an absent presentation effect, publishes n = 256 or n = 128 as active sizes, or names the second or third review as pending. Superseded passages are retained only inside unambiguous historical records that state the version, its rejection and its non-current status; the review history is preserved and nothing is erased.",
+   "repair_kind": "method",
+   "residual_limitation": "append-only ledgers (docs/decision_log.md, docs/run_log.md, paper/methods_ledger.md) retain their original draft-v0.3 and draft-v0.4 entries verbatim. They are marked as superseded by later appended entries rather than rewritten, because rewriting them would destroy provenance.",
+   "self_approved": false,
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-003], at commit 79bcc20244ab55045ba1c5d778d829d4caac3dd3",
+   "verification": "a committed parametrised test scans every reviewed prose path line by line, exempts only explicitly marked historical, retired, limitation-of-claim and prohibited-claim passages, and fails on any active occurrence of the retired construct, the withdrawn sizes or the prohibited presentation vocabulary",
+   "where": [
+    "README.md",
+    "reports/current_status.md",
+    "studies/README.md",
+    "studies/study3/README.md",
+    "studies/study3/NEXT_THREAD_HANDOFF.md",
+    "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+    "studies/study3/analysis/study2_to_study3_design_traceability.md",
+    "studies/study3/protocol/interface_calibration_protocol_draft.md"
+   ]
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [
+    "proposed_statistics.active_claim_term_prohibition.scope",
+    "proposed_statistics.active_claim_term_prohibition.enforced_paths",
+    "proposed_statistics.active_claim_term_prohibition.historical_exemptions"
+   ],
+   "closure_status": "RESOLVED_ENFORCEMENT_SCOPE_MATCHES_REGISTERED_SCOPE",
+   "committed_tests": [
+    "tests/test_study3_design.py :: test_the_prohibition_enforcement_scope_matches_the_registered_scope",
+    "tests/test_study3_design.py :: test_a_mutation_moving_retired_language_into_active_scope_is_rejected",
+    "tests/test_study3_design.py :: test_active_claim_text_contains_no_presentation_effect_claim"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
+   "finding_id": "S3MR3-004",
+   "negative_mutations": [
+    "the prohibition scope narrows to the protocol only",
+    "the prohibition's historical exemptions are removed"
+   ],
+   "original_severity": "MINOR",
+   "original_title": "The claimed enforcement of the active-claim term prohibition is narrower than the registered scope",
+   "repair": "The registered scope is widened to name the research question, success statements, validation-target interpretations, gate questions, what_fails, what_passes, claim ceilings, routing documents, the handoff, the charter, the READMEs, the Markdown companion, the packet and the status report, and the enforcing scan is widened to match it exactly. Exemptions are explicit and auditable rather than a hand-picked subset, and a committed test asserts that the declared enforced path set and the enforced set are the same set.",
+   "repair_kind": "method",
+   "residual_limitation": "the scan is lexical. It enforces the registered vocabulary and the registered retired tokens; it cannot detect a prohibited claim expressed in unregistered words, and it is not a substitute for the independent reviewer's reading.",
+   "self_approved": false,
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-004], at commit 79bcc20244ab55045ba1c5d778d829d4caac3dd3",
+   "verification": "the committed test asserts set equality between the declared enforced paths and the paths the parametrised scan actually visits, and a non-vacuity test proves the scan sees prohibited active language and exempts an explicitly historical passage",
+   "where": [
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: proposed_statistics.active_claim_term_prohibition.scope",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: proposed_statistics.active_claim_term_prohibition.enforced_paths",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: proposed_statistics.active_claim_term_prohibition.enforced_protocol_fields"
+   ]
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [
+    "interface_profiles[S4].applicable_gates"
+   ],
+   "closure_status": "RESOLVED_S4_I4_REMOVED",
+   "committed_tests": [
+    "tests/test_study3_design.py :: test_s4_is_not_i4_applicable_never_selectable_and_absent_from_confirmation",
+    "tests/test_study3_design.py :: _semantic_laws (S4 gate list)"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
+   "finding_id": "S3MR3-005",
+   "negative_mutations": [
+    "S4 gains I4 applicability"
+   ],
+   "original_severity": "MINOR",
+   "original_title": "S4 still lists I4 among its applicable gates although every decision-bearing field records I4 as not_applicable to S4",
+   "repair": "I4 is removed from interface_profiles[S4].applicable_gates. The contradiction is removed rather than qualified away.",
+   "repair_kind": "method",
+   "residual_limitation": "none. S4 remains a never-selectable diagnostic and is excluded from every success union.",
+   "self_approved": false,
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-005], at commit 79bcc20244ab55045ba1c5d778d829d4caac3dd3",
+   "verification": "a committed assertion and a negative mutation; the independently derived census already gives S4 zero I4 cells, so no number depended on the stale entry",
+   "where": [
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: interface_profiles[S4].applicable_gates"
+   ]
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [
+    "gate_truth_table.legal_stop_states"
+   ],
+   "closure_status": "RESOLVED_NON_MACHINE_STATUS_REMOVED_FROM_STOP_STATES",
+   "committed_tests": [
+    "tests/test_study3_design.py :: test_the_state_machine_is_total_deterministic_and_fully_reachable",
+    "tests/test_study3_design.py :: _semantic_laws (stop-state equality)"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
+   "finding_id": "S3MR3-006",
+   "negative_mutations": [
+    "a non-machine stop state returns"
+   ],
+   "original_severity": "MINOR",
+   "original_title": "A stop state is registered in the gate truth table that the total state machine does not contain",
+   "repair": "STOP_AWAITING_AUTHORITY is removed from gate_truth_table.legal_stop_states and is NOT added to the registered experimental state machine. The repository's pre-execution governance status is not an experimental stop state.",
+   "repair_kind": "method",
+   "residual_limitation": "none. The machine itself was already total, deterministic and fully reachable; only the second artifact disagreed.",
+   "self_approved": false,
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-006], at commit 79bcc20244ab55045ba1c5d778d829d4caac3dd3",
+   "verification": "a committed assertion that the listed stop-state set equals the set of STOP terminals of the registered total state machine",
+   "where": [
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: gate_truth_table.legal_stop_states"
+   ]
+  },
+  {
+   "affected_derived_fields": [
+    "studies/study3/analysis/design_statistics_tables.json :: development_exact_binomial_components[*].local_power_nonmonotonicity"
+   ],
+   "affected_normative_fields": [
+    "proposed_statistics.local_power_nonmonotonicity",
+    "proposed_statistics.local_power_nonmonotonicity_disclosure_window",
+    "proposed_statistics.sample_sizes.search_rule"
+   ],
+   "closure_status": "RESOLVED_NONMONOTONICITY_DISCLOSED_EXACT_N_REQUIRED",
+   "committed_tests": [
+    "tests/test_study3_design.py :: test_development_sample_sizes_are_the_smallest_meeting_the_target",
+    "tests/test_study3_design.py :: _semantic_laws (non-monotonicity block)"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
+   "finding_id": "S3MR3-007",
+   "negative_mutations": [
+    "an 'at least n' reading becomes permitted",
+    "an eventual-monotonicity threshold replaces the registered minimum"
+   ],
+   "original_severity": "MINOR",
+   "original_title": "The per-cell power target is not monotone in n immediately above each registered sample size, and this is disclosed nowhere",
+   "repair": "The registered smallest unrestricted positive integers and the exact-binomial test definitions are retained after fresh recalculation confirmed them under the amended applicability. Beside the search rule the design now discloses that exact-test power is locally non-monotone in n, and registers that execution must use the EXACT registered cell size and must never read it as 'at least n'. The registered minimum is not replaced by an eventual-monotonicity threshold, because fresh arithmetic shows the design is executable at exact n.",
+   "repair_kind": "method",
+   "residual_limitation": "the enumeration is scoped to a registered window above each minimum and is not extrapolated beyond it. No claim is made about arbitrarily large n.",
+   "self_approved": false,
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-007], at commit 79bcc20244ab55045ba1c5d778d829d4caac3dd3",
+   "verification": "the derivation enumerates, within a registered disclosure window above each minimum, every size at which the target fails again: 421-425 above n = 413, 215, 216 and 218 above n = 214, and 450-453 and 459 above n = 448. The disclosure is therefore non-vacuous and is asserted to be non-empty.",
+   "where": [
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: proposed_statistics.local_power_nonmonotonicity",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: proposed_statistics.sample_sizes.search_rule"
+   ]
+  },
+  {
+   "affected_derived_fields": [
+    "studies/study3/analysis/design_statistics_tables.json :: disposition_status"
+   ],
+   "affected_normative_fields": [
+    "proposed_statistics.unresolved",
+    "claim_ceiling.no_self_approval",
+    "unresolved_operator_decisions[OD7].disposition",
+    "status.review_state",
+    "required_next_action"
+   ],
+   "closure_status": "RESOLVED_ROUND_REFERENCES_UPDATED",
+   "committed_tests": [
+    "tests/test_study3_design.py :: test_protocol_declares_the_expected_draft_state",
+    "tests/test_study3_design.py :: test_the_amendment_does_not_self_approve"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
+   "finding_id": "S3MR3-008",
+   "negative_mutations": [
+    "a round reference reverts to the second review"
+   ],
+   "original_severity": "MINOR",
+   "original_title": "Active protocol fields still name a second independent methods review as the governing or pending review",
+   "repair": "Active round references are updated so that draft-v0.5 awaits a FOURTH independent methods review. The historical question the retired-procedure record posed is marked answered by the completed second review rather than deleted.",
+   "repair_kind": "method",
+   "residual_limitation": "this amendment does not perform or prejudge the fourth review.",
+   "self_approved": false,
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-008], at commit 79bcc20244ab55045ba1c5d778d829d4caac3dd3",
+   "verification": "a committed assertion on each field, plus a negative mutation reverting a round reference to the second review",
+   "where": [
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: proposed_statistics.unresolved[1]",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: claim_ceiling.no_self_approval",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: proposed_statistics.descriptive_paired_summary.retired_procedure",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: unresolved_operator_decisions[OD7].disposition"
+   ]
+  },
+  {
+   "affected_derived_fields": [
+    "studies/study3/analysis/design_statistics_tables.json :: power_architecture.union_bound_terms"
+   ],
+   "affected_normative_fields": [
+    "power_architecture_v0_4.union_bound_proof",
+    "power_architecture_v0_4.least_favourable_configuration.conditions"
+   ],
+   "closure_status": "RESOLVED_UNION_BOUND_CLAIM_ALIGNED",
+   "committed_tests": [
+    "tests/test_study3_design.py :: test_the_union_bound_proof_contains_no_independence_assumption",
+    "tests/test_study3_design.py :: _semantic_laws (union-bound block)"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
+   "finding_id": "S3MR3-009",
+   "negative_mutations": [
+    "the union bound claims a predesignated profile"
+   ],
+   "original_severity": "MINOR",
+   "original_title": "The end-to-end conclusion string is narrower than the union-bound argument that supports it",
+   "repair": "The end-to-end union-bound conclusion is restated as returning and confirming AN ADEQUATE profile. Where several selectable profiles are adequate, the frozen priority order returns the highest-priority adequate profile. No claim of recovering an externally predesignated profile is made.",
+   "repair_kind": "method",
+   "residual_limitation": "the bound remains a lower bound under the registered least-favourable configuration only, and still covers neither the indifference region nor distribution shift.",
+   "self_approved": false,
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-009], at commit 79bcc20244ab55045ba1c5d778d829d4caac3dd3",
+   "verification": "a committed assertion on the conclusion string and on the multi-adequate branch, plus the independent recalculation of the three unioned terms under arbitrary dependence",
+   "where": [
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: power_architecture_v0_4.union_bound_proof.conclusion",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: power_architecture_v0_4.least_favourable_configuration.conditions"
+   ]
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [
+    "rendering_surface_v0_5",
+    "counterbalancing_design.k6_renderings.registered_surface",
+    "task_strata[K6].registered_surface"
+   ],
+   "closure_status": "RESOLVED_DETERMINISTIC_RENDERING_SURFACE_REGISTERED",
+   "committed_tests": [
+    "tests/test_study3_rendering_registry_v0_5.py",
+    "tests/test_study3_design.py :: test_no_duplicate_r_sep_branch_exists_for_the_option_less_profiles"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
+   "finding_id": "S3MR3-010",
+   "negative_mutations": [
+    "the rendering registry is demoted to an illustrative example",
+    "the rendering registry stops being a binding input",
+    "the RP wrapper is filled in by v0.5",
+    "token distinctness is treated as already tested",
+    "a token-distinctness failure becomes a pass"
+   ],
+   "original_severity": "MAJOR",
+   "original_title": "The registered generator fixes the sampled parameters but not the deterministic rendering surface, so the two K6 cells are not instantiable without a later substantive design choice",
+   "repair": "A normative, machine-readable rendering registry and schema are created and registered as BINDING INPUTS, not illustrative examples. They fix UTF-8 encoding, LF and terminal newline policy and NFC normalization; one exact question-stem template for every registered operation family, depth and task stratum that can enter a gate-bearing cell; placeholder names, types, allowed surface forms, ordering, interpolation, escaping and rejection rules; exact option ordering and option-line grammar for S1 and S4; exact label alphabets and label-to-content separators; exact instruction sentences for every applicable (profile, rendering) pair; the exact answer cue and the whitespace convention of every candidate surface; the exact raw-completion prompt template for S1, S2 and S3; the exact pre-wrapper message content for S4 and the boundary to any role-native wrapper; the deterministic tie-break order and the exact scored candidate surfaces; a full (profile, rendering, contrast) applicability table; and a cryptographic identity for the registry and every normative template asset. K6-SEP uses the exact ASCII literals ': ' for R-base and ' = ' for R-sep with every other prompt byte identical; K6-INSTR registers two exact, semantically co-referential instruction strings per applicable profile with the answer cue and every other byte identical.",
+   "repair_kind": "method",
+   "residual_limitation": "tokenizer distinctness is NOT tested in this round because no checkpoint or tokenizer may be accessed. A fail-closed pre-bank rule is registered instead: once checkpoints and tokenizers are separately authorised and pinned, every gate-bearing pair must produce distinct token-ID sequences for every role to which the cell applies, and failure makes that role/profile/contrast INELIGIBLE rather than a pass. That future rule does not resolve OD2. The RP canonical qualification wrapper remains explicitly null under OD2.",
+   "self_approved": false,
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-010], at commit 79bcc20244ab55045ba1c5d778d829d4caac3dd3",
+   "verification": "deterministic model-free fixtures instantiate every applicable profile/rendering/contrast branch, prove byte difference within every applicable pair, prove structural absence rather than duplication of K6-SEP for S2 and S3, prove single-factor isolation, and reject byte-identical pairs, unregistered substitutions and missing template branches",
+   "where": [
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.json",
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.schema.json",
+    "studies/study3/protocol/interface_calibration_protocol_draft.json :: rendering_surface_v0_5"
+   ]
+  }
+ ],
+ "document_class": "operator_amendment_record",
+ "evidence_rows": [],
+ "external_validity_bridge": {
+  "claim_ceiling": [
+   "a pass applies only to the registered synthetic generator distributions and the named interface and checkpoint roles",
+   "a pass does not establish adequacy on an unregistered substantive task distribution",
+   "before the selected instrument is relied upon outside the generator, a new authority must register a bridge or validation design to the target substantive distribution using physically isolated new data",
+   "descriptive results observed in a future Study 3 run may not be retrospectively upgraded into bridge evidence"
+  ],
+  "classified_as_a_rejection_driver_by_the_third_review": false,
+  "inherited_item": "UM3-05",
+  "new_gate_or_task_bank_added_in_v0_5": false,
+  "status": "UNRESOLVED_FUTURE_METHODS_PREREQUISITE"
+ },
+ "historical_count_mismatch": {
+  "eight_major_is_not_propagated": true,
+  "immutable_disposition_basis_phrase": "Two BLOCKING and eight MAJOR methods defects remain",
+  "mismatch": "the structured new_findings array and the finding headings of the second review support 2 BLOCKING + 6 MAJOR + 2 MINOR, while the immutable disposition_basis sentence says 2 BLOCKING and 8 MAJOR",
+  "review_was_not_edited": true,
+  "status": "NON_DISPOSITIVE_HISTORICAL_NARRATIVE_COUNT_MISMATCH",
+  "structured_count_is_authoritative_for_this_amendment": true,
+  "structured_new_findings": {
+   "BLOCKING": 2,
+   "MAJOR": 6,
+   "MINOR": 2,
+   "total": 10
+  },
+  "why_it_does_not_reverse_the_rejection": "both BLOCKING findings and the substantive sampling-model defect independently require amendment, so the disposition stands on either reading"
+ },
+ "historical_review_test_harness_scope_erratum": {
+  "classification": "a scope erratum in the committed historical-regression harness, not an amendment to the second independent methods review",
+  "defect": {
+   "affected_node_ids": [
+    "tests/test_study3_methods_review_v0_3.py::test_the_reviewer_did_not_edit_either_existing_study3_test_module",
+    "tests/test_study3_methods_review_v0_3.py::test_independent_recalculation_check_mode_reproduces_the_committed_tables"
+   ],
+   "summary": "two committed checks in the draft-v0.3 historical-regression module read live index or working-tree bytes instead of the reviewed history, so they silently measured whichever draft happened to be checked out",
+   "why_it_surfaced_now": "the authorized draft-v0.4 amendment legitimately enlarged tests/test_study3_design.py and legitimately amended the protocol, which a correctly scoped historical check must ignore"
+  },
+  "disclosed_earlier_runs": {
+   "candidate_bound_v0_3_module_run": {
+    "candidate_commit": "3c229017d85259af2e2e3a6654b66b4383c064a0",
+    "result": "33 passed, 2 failed",
+    "scope_error": "both failures were produced by reading live current-draft bytes inside a check whose stated purpose is historical"
+   },
+   "direct_live_input_recalculation_failure": {
+    "cause": "the live draft-v0.4 protocol was consumed in place of the reviewed draft-v0.3 protocol",
+    "invocation": "independent_methods_recalculation_v0_3.py --check executed with the live repository as its root",
+    "observed": "FAIL: recomputed tables differ from the committed tables"
+   },
+   "how_the_corrected_execution_resolves_them": "pinning the mutable inputs to REVIEWED_COMMIT restores the intended historical scope, after which the unchanged script reproduces the unchanged committed table exactly and the module returns 35 passed",
+   "note": "these runs are disclosed, not erased and not relabelled"
+  },
+  "immutable_objects_not_modified": [
+   "studies/study3/analysis/independent_methods_recalculation_v0_3.py",
+   "studies/study3/analysis/independent_methods_recalculation_tables_v0_3.json",
+   "studies/study3/reviews/v0_3_independent_methods_review.json",
+   "studies/study3/reviews/v0_3_independent_methods_review.md",
+   "studies/study3/reviews/v0_3_independent_methods_review.schema.json",
+   "studies/study3/methods_review_receipt_v0_3.json",
+   "paper/evidence_ledger.csv"
+  ],
+  "no_v0_4_scientific_content_changed": true,
+  "original_committed_authority_unchanged": {
+   "byte_identical": true,
+   "bytes": 46543,
+   "path": "studies/study3/prompts/study3_v0_4_design_amendment_authority.md",
+   "sha256": "230c57f4bfb874ad724c9448e8cfc1e58b0ff5970159e6741ce61de8104cd173"
+  },
+  "path_set_after_the_erratum": {
+   "added": 6,
+   "deletions_renames_copies_type_changes": 0,
+   "modified": 20,
+   "total": 26
+  },
+  "pre_erratum_test_module_identity_retained_at": "AR-0246",
+  "prohibited_repairs_not_used": {
+   "assertion_deleted_or_weakened": false,
+   "exception_swallowed": false,
+   "expected_hash_or_value_changed_to_accept_live_v0_4_bytes": false,
+   "registered_parser_v3_seal_job_failures_changed": false,
+   "skip_or_xfail_added": false,
+   "treated_as_allowed_failure": false,
+   "warning_only_behaviour_added": false
+  },
+  "repair": {
+   "expected_sizes_digests_and_results_unchanged": true,
+   "isolation_proof": "the generator resolves every path it reads from its own __file__, so the snapshot root is its repository; the check asserts that no current-draft byte is reachable from that root",
+   "node_ids_unchanged": true,
+   "recalculation_execution": "the unchanged v0.3 recalculation script and the unchanged committed v0.3 table are executed inside an isolated snapshot whose mutable protocol and design inputs are materialised from REVIEWED_COMMIT",
+   "reviewed_commit_anchor": "2b36f5321d830ea6f70fff2b7bbca3cb93394046",
+   "test_count_unchanged": 35,
+   "test_module_comparison": "compares tests/test_study3_design.py and tests/test_study3_methods_review.py with their committed blobs at REVIEWED_COMMIT, never with live index or working-tree bytes"
+  },
+  "review_disposition_unchanged": "STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED",
+  "scientific_design_statistics_sampling_estimands_thresholds_claims_unchanged": true,
+  "sole_newly_authorized_path": "tests/test_study3_methods_review_v0_3.py",
+  "status": "HISTORICAL_REVIEW_TEST_HARNESS_SCOPE_ERRATUM",
+  "supplemental_authority": {
+   "bytes": 5938,
+   "no_additional_authority_file_was_added": true,
+   "recorded_verbatim_in": "studies/study3/reviews/v0_4_operator_amendment.md",
+   "selected_option": "operator option 1, narrowly construed",
+   "sha256": "165acb770db3f25c0403a7d376a81b569fff11d623610a802e135633ec9c503b",
+   "verbatim_text": "# Supplemental operator authority \u2014 Study 3 draft-v0.4 historical-regression harness erratum\n\nI select operator option 1, narrowly construed.\n\nThis authority resolves only the proven historical-regression harness contradiction. It does not amend the Study 3 scientific design, statistics, sampling frame, estimands, thresholds, claims, state machine, operation projection, or review disposition.\n\n## 1. Starting point\n\nContinue from the exact local candidate:\n\n- commit: `3c229017d85259af2e2e3a6654b66b4383c064a0`\n- tree: `ac4acd703ca1169dbbf5016c2b0796f625ef2196`\n- published base: `bc98e5c98a2d4e273142c91497b7600ce751bade`\n\nRequire a clean worktree and verify that the candidate remains a strict descendant of the published base before making any change.\n\n## 2. Sole path exception\n\nThe only newly authorized path is:\n\n`tests/test_study3_methods_review_v0_3.py`\n\nThe final changed-path set relative to `bc98e5c\u2026` must therefore be exactly:\n\n- 26 paths;\n- 6 added;\n- 20 modified;\n- no deletion, rename, copy, or type change.\n\nNo 27th path is authorized.\n\nThe existing 25 paths may be updated only where necessary to record this disclosed erratum, update path counts, hashes, receipts, registry metadata, and validation results. They must not receive any substantive scientific or statistical redesign.\n\nThe original committed authority:\n\n`studies/study3/prompts/study3_v0_4_design_amendment_authority.md`\n\nmust remain byte-identical at 46,543 bytes with SHA-256 `230c57f4\u2026d173`. Record this supplemental authority verbatim, or with its complete text and byte identity, inside an already-authorized v0.4 amendment record. Do not add another authority file.\n\n## 3. Required semantic repair\n\nRepair the historical regression harness so that its implementation matches its existing stated purpose: validating draft-v0.3 against its reviewed historical inputs.\n\nSpecifically:\n\n1. `test_the_reviewer_did_not_edit_either_existing_study3_test_module` must compare the relevant files with their committed blobs at:\n`REVIEWED_COMMIT = 2b36f5321d830ea6f70fff2b7bbca3cb93394046`\nIt must not compare them with the candidate\u2019s live index or working-tree bytes.\n2. The v0.3 independent recalculation check must execute the unchanged v0.3 recalculation script and unchanged committed v0.3 table against an isolated historical snapshot whose mutable protocol/design inputs come from `REVIEWED_COMMIT`.\n3. The isolated check must not consume the live draft-v0.4 protocol, design statistics, test file, or other mutable current-draft bytes.\n4. Do not modify either immutable v0.3 recalculation file, any review finding, review disposition, reviewed-artifact identity, expected scientific result, or historical commit.\n\nThis authority forbids:\n\n- deleting or weakening either failing assertion;\n- adding `skip`, `xfail`, warning-only behavior, or exception swallowing;\n- changing expected hashes or values to accept live v0.4 bytes;\n- treating the two failures as allowed failures;\n- changing the two existing registered `test_parser_v3_seal_job` failures;\n- changing any v0.4 scientific content.\n\nThe repair must be recorded as a historical-review test-harness scope erratum, not as an amendment to the v0.3 review itself.\n\n## 4. Required validation\n\nRun the complete clean CPU-only ACR validation envelope on the new final candidate commit, with `GPU_COUNT=0`, `CUDA_AVAILABLE=False`, and a clean worktree.\n\nAt minimum require:\n\n- `tests/test_study3_design.py`: 197 passed;\n- `tests/test_study3_methods_review.py`: 78 passed;\n- `tests/test_study3_methods_review_v0_3.py`: 35 passed;\n- the unchanged v0.3 recalculation script reproduces its committed table exactly when run against the isolated reviewed snapshot;\n- `DESIGN_STATISTICS_CHECK_OK sections=19`;\n- all previously required Study 2 and protected-byte regressions unchanged;\n- static publication audit: exactly 26 paths, 6 added and 20 modified;\n- full suite: exactly 3,974 passed, 15 skipped, and only the same two registered `test_parser_v3_seal_job` failures with unchanged node IDs and signatures.\n\nThe arithmetic must reconcile as:\n\n`3,886 baseline passes + 88 net new design tests = 3,974 passes`.\n\nDisclose the earlier candidate-bound 33-passed/2-failed v0.3 review run, the earlier direct live-input recalculation failure, and how the corrected historical-snapshot execution resolves their scope error. Do not erase or relabel those earlier runs.\n\nRecompute and report every affected artifact identity and registry tail. `paper/evidence_ledger.csv` must remain untouched and end at `EV-0016`. No scientific evidence, method result, bank, seed, model operation, interface selection, positive reference, or confirmation access is authorized.\n\n## 5. Publication\n\nOnly after the corrected candidate passes the full validation envelope:\n\n1. fetch remote `main`;\n2. require it to remain exactly `bc98e5c98a2d4e273142c91497b7600ce751bade`;\n3. require it to be a strict ancestor of the corrected candidate;\n4. publish only by non-force fast-forward:\n`git push origin HEAD:refs/heads/main`\n5. fetch again and verify `HEAD == origin/main`, the exact final tree, clean worktree, the exact 26-path set, protected bytes, artifact identities, and unchanged `EV-0016`.\n\nIf remote `main` moved, another path is required, historical scientific/review content must change, or any validation result differs from the registered expectations, stop and report without publishing.\n\n## 6. Final state\n\nAfter successful publication, use the original \u00a79 completion heading and provide the complete amended handoff.\n\nThe state must remain:\n\n- `frozen=false`;\n- `execution_authorized=false`;\n- every empirical/model counter zero;\n- no bank, seed, checkpoint, winner, RP, or confirmation access;\n- OD2 unresolved.\n\nThe only legal successor remains a fresh-session third independent methods review of published draft-v0.4. Do not begin that review, a v0.5 amendment, or any feasibility pilot in this session.\n"
+  },
+  "the_v0_3_review_itself_was_not_amended": true
+ },
+ "immutable_objects_not_edited": [
+  "paper/claim_evidence_matrix.md",
+  "paper/evidence_ledger.csv",
+  "paper/limitations_ledger.md",
+  "studies/study3/analysis/independent_methods_recalculation.py",
+  "studies/study3/analysis/independent_methods_recalculation_tables.json",
+  "studies/study3/analysis/independent_methods_recalculation_tables_v0_3.json",
+  "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json",
+  "studies/study3/analysis/independent_methods_recalculation_v0_3.py",
+  "studies/study3/analysis/independent_methods_recalculation_v0_4.py",
+  "studies/study3/analysis/independent_methods_review_packet.md",
+  "studies/study3/analysis/independent_methods_review_packet_v0_3.md",
+  "studies/study3/design_receipt_v0_3.json",
+  "studies/study3/design_receipt_v0_4.json",
+  "studies/study3/methods_review_receipt_v0_2.json",
+  "studies/study3/methods_review_receipt_v0_3.json",
+  "studies/study3/methods_review_receipt_v0_4.json",
+  "studies/study3/prompts/study3_v0_2_independent_methods_review_authority.md",
+  "studies/study3/prompts/study3_v0_3_design_amendment_authority.md",
+  "studies/study3/prompts/study3_v0_3_independent_methods_review_authority.md",
+  "studies/study3/prompts/study3_v0_4_design_amendment_authority.md",
+  "studies/study3/prompts/study3_v0_4_independent_methods_review_authority.md",
+  "studies/study3/reviews/v0_1_operator_review.md",
+  "studies/study3/reviews/v0_2_independent_methods_review.json",
+  "studies/study3/reviews/v0_2_independent_methods_review.md",
+  "studies/study3/reviews/v0_2_independent_methods_review.schema.json",
+  "studies/study3/reviews/v0_3_independent_methods_review.json",
+  "studies/study3/reviews/v0_3_independent_methods_review.md",
+  "studies/study3/reviews/v0_3_independent_methods_review.schema.json",
+  "studies/study3/reviews/v0_3_operator_amendment.json",
+  "studies/study3/reviews/v0_3_operator_amendment.md",
+  "studies/study3/reviews/v0_3_operator_amendment.schema.json",
+  "studies/study3/reviews/v0_4_independent_methods_review.json",
+  "studies/study3/reviews/v0_4_independent_methods_review.md",
+  "studies/study3/reviews/v0_4_independent_methods_review.schema.json",
+  "studies/study3/reviews/v0_4_operator_amendment.json",
+  "studies/study3/reviews/v0_4_operator_amendment.md",
+  "studies/study3/reviews/v0_4_operator_amendment.schema.json",
+  "tests/test_study3_methods_review.py",
+  "tests/test_study3_methods_review_v0_3.py",
+  "tests/test_study3_methods_review_v0_4.py"
+ ],
+ "inherited_first_review_findings": [
+  {
+   "finding_id": "S3MR-001",
+   "note": "the I3 estimand is identifiable from the published construction; carried forward unchanged in draft-v0.4, whose sampling frame additionally registers the distribution the unit is drawn from",
+   "original_severity": "BLOCKING",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-002",
+   "note": "the second reviewer found the artifacts reconciled but the named indicator redundant. draft-v0.4 proposes full resolution by narrowing the indicator to J_joint_correct through S3MR2-001; this remains review-pending",
+   "original_severity": "BLOCKING",
+   "status_after_second_review": "PARTIALLY_RESOLVED_BY_DRAFT_V0_3",
+   "v0_5_residual": "still partial. draft-v0.5 is a bounded amendment that closes only the ten S3MR3-* findings; it does not advance this item, and the residual defect remains bounded and non-executable because no execution, bank, seed or confirmation authority exists."
+  },
+  {
+   "finding_id": "S3MR-003",
+   "note": "the exact rational 1/600 derives every development threshold and 1/600 x 3 = 1/200 holds; unchanged",
+   "original_severity": "BLOCKING",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-004",
+   "note": "the false conservativeness assertion is withdrawn; draft-v0.4 introduces no paired procedure",
+   "original_severity": "BLOCKING",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-005",
+   "note": "the four-point discordance grid is removed and no size-control claim over a nuisance domain is made",
+   "original_severity": "BLOCKING",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-006",
+   "note": "exactly one I3 floor is active and 0.95 appears in no active field; the floor is retained in draft-v0.4 with the indicator narrowed",
+   "original_severity": "BLOCKING",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-007",
+   "note": "every emitted binomial row carries an explicit null column; unchanged",
+   "original_severity": "MAJOR",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-008",
+   "note": "the reviewer confirmed the sizes were minimal under the then-registered target; draft-v0.4 re-derives them against the new per-cell target and they change accordingly",
+   "original_severity": "MAJOR",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-009",
+   "note": "the circular verification and the fixed-grid test are gone; the anti-transcription AST audit is retained and strengthened in draft-v0.4",
+   "original_severity": "MAJOR",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-010",
+   "note": "the K5 generating-process text describes the seven one-factor contrasts actually adopted; draft-v0.4 replaces its deterministic block assignment with an iid draw",
+   "original_severity": "MAJOR",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-011",
+   "note": "K6 is two disjoint pairwise cells with the answer cue held byte-identical; unchanged",
+   "original_severity": "MAJOR",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-012",
+   "note": "S3's incremental cost is zero under the four registered preconditions; recomputed in draft-v0.4",
+   "original_severity": "MAJOR",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-013",
+   "note": "the six-stream decomposition was accepted but the S4 forward cost was left unmapped. draft-v0.4 proposes full resolution through the operation ontology in S3MR2-005; this remains review-pending",
+   "original_severity": "MAJOR",
+   "status_after_second_review": "PARTIALLY_RESOLVED_BY_DRAFT_V0_3",
+   "v0_5_residual": "still partial. draft-v0.5 is a bounded amendment that closes only the ten S3MR3-* findings; it does not advance this item, and the residual defect remains bounded and non-executable because no execution, bank, seed or confirmation authority exists."
+  },
+  {
+   "finding_id": "S3MR-014",
+   "note": "the unit registry was accepted but the I0 fixture stream violated it. draft-v0.4 proposes full resolution through S3MR2-009; this remains review-pending",
+   "original_severity": "MAJOR",
+   "status_after_second_review": "PARTIALLY_RESOLVED_BY_DRAFT_V0_3",
+   "v0_5_residual": "still partial. draft-v0.5 is a bounded amendment that closes only the ten S3MR3-* findings; it does not advance this item, and the residual defect remains bounded and non-executable because no execution, bank, seed or confirmation authority exists."
+  },
+  {
+   "finding_id": "S3MR-015",
+   "note": "pass_count < n strictly in every active row; re-derived and re-asserted in draft-v0.4",
+   "original_severity": "MAJOR",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-016",
+   "note": "the selectable-profile denominator is the pre-data integer 3 in every branch; unchanged",
+   "original_severity": "MAJOR",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-017",
+   "note": "I5 and the selection map were accepted but I0 was folded into profile adequacy and the confirmation applicability admitted S4. draft-v0.4 proposes full resolution through S3MR2-006 and S3MR2-004; this remains review-pending",
+   "original_severity": "MAJOR",
+   "status_after_second_review": "PARTIALLY_RESOLVED_BY_DRAFT_V0_3",
+   "v0_5_residual": "still partial. draft-v0.5 is a bounded amendment that closes only the ten S3MR3-* findings; it does not advance this item, and the residual defect remains bounded and non-executable because no execution, bank, seed or confirmation authority exists."
+  },
+  {
+   "finding_id": "S3MR-018",
+   "note": "checkpoint-role records use post-split gate names; unchanged",
+   "original_severity": "MINOR",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-019",
+   "note": "every interval and band names the mass it consumes; unchanged",
+   "original_severity": "MINOR",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  },
+  {
+   "finding_id": "S3MR-020",
+   "note": "the dossier obligation is attributed to D-04 and declares UNSELECTED; draft-v0.4 adds the P3-Q ordering constraint without selecting anything",
+   "original_severity": "MINOR",
+   "status_after_second_review": "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+   "v0_5_residual": "resolved; draft-v0.5 does not reopen it."
+  }
+ ],
+ "next_legal_action": "a fourth bounded independent methods review of draft-v0.5, conducted in a fresh session by a party that did not draft draft-v0.5",
+ "no_review_artifact_was_edited": true,
+ "operation_counters": {
+  "bank_rows_created": 0,
+  "checkpoint_downloads": 0,
+  "confirmation_reads": 0,
+  "evidence_rows_added": 0,
+  "forward_passes": 0,
+  "generations": 0,
+  "logit_reads": 0,
+  "parser_calls": 0,
+  "seeds_drawn": 0,
+  "tokenizer_calls": 0
+ },
+ "operator_decisions_in_this_round": [
+  "S3MR3-001: RESOLVED_BY_NOT_APPLICABLE_REREGISTRATION_AND_FULL_REDERIVATION",
+  "S3MR3-002: RESOLVED_BY_COMPONENT_LEVEL_CONFIRMATION_APPLICABILITY",
+  "S3MR3-003: RESOLVED_ACTIVE_TEXT_ALIGNED_HISTORY_PRESERVED",
+  "S3MR3-004: RESOLVED_ENFORCEMENT_SCOPE_MATCHES_REGISTERED_SCOPE",
+  "S3MR3-005: RESOLVED_S4_I4_REMOVED",
+  "S3MR3-006: RESOLVED_NON_MACHINE_STATUS_REMOVED_FROM_STOP_STATES",
+  "S3MR3-007: RESOLVED_NONMONOTONICITY_DISCLOSED_EXACT_N_REQUIRED",
+  "S3MR3-008: RESOLVED_ROUND_REFERENCES_UPDATED",
+  "S3MR3-009: RESOLVED_UNION_BOUND_CLAIM_ALIGNED",
+  "S3MR3-010: RESOLVED_DETERMINISTIC_RENDERING_SURFACE_REGISTERED"
+ ],
+ "party": "the operator authority holding studies/study3/prompts/study3_v0_5_design_amendment_authority.md",
+ "responds_to": "studies/study3/reviews/v0_4_independent_methods_review.md",
+ "results": [],
+ "round": "Study 3 draft-v0.5 bounded operator amendment",
  "schema_version": "study3_operator_amendment_v0_5",
- "self_approval_prohibited": "this amendment is drafted by the operator authority and adjudicates nothing; the sole legal successor is a fresh-session fourth independent methods review by a party that did not draft it",
+ "scope_boundary": {
+  "accesses_confirmation_material": false,
+  "authorizes_execution": false,
+  "begins_the_fourth_review": false,
+  "creates_a_seed_or_bank": false,
+  "creates_draft_v0_6": false,
+  "freezes_study3": false,
+  "resolves_od2": false,
+  "resolves_ur_22": false,
+  "runs_a_tokenizer_or_model": false,
+  "selects_an_interface": false,
+  "selects_or_inspects_a_positive_reference": false,
+  "starts_a_feasibility_pilot": false,
+  "writes_scientific_evidence": false
+ },
+ "seeds": [],
+ "self_approval_prohibition": {
+  "determination_belongs_to": "the fourth independent methods reviewer",
+  "every_repair_label": "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW",
+  "the_drafting_party_does_not_claim_draft_v0_5_is_correct": true
+ },
+ "separation_of_kinds": {
+  "empirical_result": "none; no measurement of any kind exists",
+  "exact_deterministic_derivation": "every sample size, threshold, tail, power, cell count, joint bound and operation total, derived by studies/study3/analysis/design_statistics.py",
+  "future_implementation_requirement": "the seed authority, the bank construction authority and the OD2/P3-Q authority",
+  "operator_design_choice": "the narrow I3 repair path, the 19/400 per-stage budget, the iid-with-replacement sampling model, the P3-Q ordering constraint and the state-machine separation",
+  "reviewed_fact": "the second review's findings, severities and evidence bindings, quoted unedited",
+  "reviewer_recommendation_adopted_here": "the per-profile I3 claim-ceiling qualification, the S4 I4 not_applicable reading, the confirmation intersection rule and the decode-step ontology",
+  "unresolved_operator_choice": "OD2 and UR-22"
+ },
  "starting_state": {
-  "clean_worktree": true,
   "commit": "79bcc20244ab55045ba1c5d778d829d4caac3dd3",
   "evidence_ledger_last_row": "EV-0016",
   "strict_ancestor_present": "e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43",
   "third_review_publication_paths": 17,
   "tree": "3855a579d0174d2c45587cba248e96d42c319664"
  },
- "state": "INITIAL_CLOSURE_MATRIX_RECORDED_BEFORE_DRAFTING",
- "unresolved_carried_forward": [
-  "OD2",
-  "UR-22",
-  "RP canonical qualification wrapper"
+ "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW",
+ "unresolved_item_dispositions": [
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-01",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "I3 primary estimand identifiability",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "PROPOSED_RESOLVED_IN_V0_4_VIA_S3MR2_001",
+   "id": "UR-02",
+   "note": "proposed fully resolved by the corresponding draft-v0.4 repair and review-pending",
+   "status": "CARRIED_FORWARD",
+   "subject": "I3 primary indicator semantics",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-03",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "Family B per-profile alpha implementation",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-04",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "false conservativeness assertion",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-05",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "paired size control over the nuisance domain",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-06",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "I3 primary floor and its feasibility",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "PROPOSED_RESOLVED_IN_V0_4_VIA_S3MR2_004_AND_S3MR2_002",
+   "id": "UR-07",
+   "note": "proposed fully resolved by the corresponding draft-v0.4 repair and review-pending",
+   "status": "CARRIED_FORWARD",
+   "subject": "I5 confirmation specification",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "PROPOSED_RESOLVED_IN_V0_4_VIA_S3MR2_006",
+   "id": "UR-08",
+   "note": "proposed fully resolved by the corresponding draft-v0.4 repair and review-pending",
+   "status": "CARRIED_FORWARD",
+   "subject": "development profile-selection rule",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-09",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "Family B denominator membership of S3",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "PROPOSED_RESOLVED_IN_V0_4_VIA_S3MR2_009",
+   "id": "UR-10",
+   "note": "proposed fully resolved by the corresponding draft-v0.4 repair and review-pending",
+   "status": "CARRIED_FORWARD",
+   "subject": "unit of every sample-size symbol",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED_AND_RESIZED_IN_V0_4",
+   "id": "UR-11",
+   "note": "resized in draft-v0.4 against the new per-cell power target",
+   "status": "CARRIED_FORWARD",
+   "subject": "I1a and I1b power shortfall",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-12",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "circular committed verification and the grid test",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-13",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "K5 and K6 stale generating-process text",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "PROPOSED_RESOLVED_IN_V0_4_VIA_S3MR2_005",
+   "id": "UR-14",
+   "note": "proposed fully resolved by the corresponding draft-v0.4 repair and review-pending",
+   "status": "CARRIED_FORWARD",
+   "subject": "S3 projection and the undecomposed projection",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-15",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "I4 multiplicity across families and depths",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-16",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "residual pooling paths",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-17",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "degenerate I3 rejection region",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-18",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "paired margin practical-irrelevance justification",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-19",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "Clopper-Pearson and uniformity tail conventions",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-20",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "positive-reference dossier attribution",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "CARRIED_RESOLVED",
+   "id": "UR-21",
+   "note": "carried forward from the second review with no new defect",
+   "status": "CARRIED_FORWARD",
+   "subject": "stale Gate I1 labels",
+   "v0_5_note": "carried forward unchanged; draft-v0.5 reopens no resolved item."
+  },
+  {
+   "disposition": "UNRESOLVED_BLOCKING_OPERATOR_DECISION",
+   "id": "UR-22",
+   "note": "the external canonical qualification interface cannot be registered without deciding which checkpoint the positive reference is, and that decision is OD2. draft-v0.4 registers only the binding P3-Q/I4 ordering constraint and selects nothing.",
+   "status": "UNRESOLVED",
+   "subject": "external qualification interface for the positive reference",
+   "v0_5_note": "UR-22 remains UNRESOLVED because it depends on OD2, which draft-v0.5 does not advance."
+  }
  ]
 }

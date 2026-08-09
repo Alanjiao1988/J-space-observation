@@ -90,21 +90,21 @@ STATS_SCRIPT = os.path.join(STUDY3, "analysis", "design_statistics.py")
 STATS_TABLES = os.path.join(STUDY3, "analysis", "design_statistics_tables.json")
 REVIEW_PATH = os.path.join(STUDY3, "reviews", "v0_1_operator_review.md")
 AMENDMENT_V0_3 = os.path.join(STUDY3, "reviews", "v0_3_operator_amendment.json")
-AMENDMENT_PATH = os.path.join(STUDY3, "reviews", "v0_4_operator_amendment.json")
+AMENDMENT_PATH = os.path.join(STUDY3, "reviews", "v0_5_operator_amendment.json")
 AMENDMENT_SCHEMA = os.path.join(
-    STUDY3, "reviews", "v0_4_operator_amendment.schema.json")
-AMENDMENT_MD = os.path.join(STUDY3, "reviews", "v0_4_operator_amendment.md")
+    STUDY3, "reviews", "v0_5_operator_amendment.schema.json")
+AMENDMENT_MD = os.path.join(STUDY3, "reviews", "v0_5_operator_amendment.md")
 PACKET_V0_3 = os.path.join(
     STUDY3, "analysis", "independent_methods_review_packet_v0_3.md")
 PACKET_PATH = os.path.join(
-    STUDY3, "analysis", "independent_methods_review_packet_v0_4.md")
+    STUDY3, "analysis", "independent_methods_review_packet_v0_5.md")
 
-EXPECTED_STATE = ("STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_"
-                  "AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW")
+EXPECTED_STATE = ("STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_"
+                  "AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW")
 NO_WINNER = "No interface is selected in this round."
 
-DRAFT_VERSION = "draft-v0.4"
-REVIEW_STATE = "awaiting_third_independent_methods_review"
+DRAFT_VERSION = "draft-v0.5"
+REVIEW_STATE = "awaiting_fourth_independent_methods_review"
 
 # The constructs the one-shot confirmation gate must cover. I3 appears as its
 # primary indicator rather than as a bare family label: draft-v0.2 carried two
@@ -113,12 +113,35 @@ REVIEW_STATE = "awaiting_third_independent_methods_review"
 COVERED_CONSTRUCTS = ("I0", "I1a", "I1b", "I2", "I3_J_joint_correct", "I4")
 
 # The twenty findings of the first independent methods review, the twenty-two
-# unresolved items of its packet checklist, and the ten findings of the second
-# independent methods review. All three sets must be closed exactly once each in
-# the draft-v0.4 amendment record.
+# unresolved items of its packet checklist, the ten findings of the second
+# independent methods review and the ten findings of the third. All four sets
+# must be closed exactly once each in the draft-v0.5 amendment record.
 FINDING_IDS = ["S3MR-%03d" % i for i in range(1, 21)]
 UR_IDS = ["UR-%02d" % i for i in range(1, 23)]
 FINDING_IDS_V0_3 = ["S3MR2-%03d" % i for i in range(1, 11)]
+FINDING_IDS_V0_4 = ["S3MR3-%03d" % i for i in range(1, 11)]
+
+# The severities the THIRD review recorded in its structured findings, and the
+# closure status draft-v0.5 must reach for each. These are independent
+# expectations: the amendment record must match them, not define them.
+STRUCTURED_V0_4_SEVERITIES = {"BLOCKING": 1, "MAJOR": 3, "MINOR": 6}
+REQUIRED_V0_4_CLOSURES = {
+    "S3MR3-001": "RESOLVED_BY_NOT_APPLICABLE_REREGISTRATION_AND_FULL_REDERIVATION",
+    "S3MR3-002": "RESOLVED_BY_COMPONENT_LEVEL_CONFIRMATION_APPLICABILITY",
+    "S3MR3-003": "RESOLVED_ACTIVE_TEXT_ALIGNED_HISTORY_PRESERVED",
+    "S3MR3-004": "RESOLVED_ENFORCEMENT_SCOPE_MATCHES_REGISTERED_SCOPE",
+    "S3MR3-005": "RESOLVED_S4_I4_REMOVED",
+    "S3MR3-006": "RESOLVED_NON_MACHINE_STATUS_REMOVED_FROM_STOP_STATES",
+    "S3MR3-007": "RESOLVED_NONMONOTONICITY_DISCLOSED_EXACT_N_REQUIRED",
+    "S3MR3-008": "RESOLVED_ROUND_REFERENCES_UPDATED",
+    "S3MR3-009": "RESOLVED_UNION_BOUND_CLAIM_ALIGNED",
+    "S3MR3-010": "RESOLVED_DETERMINISTIC_RENDERING_SURFACE_REGISTERED",
+}
+
+# S3MR3-001. K6-SEP varies the separator between a displayed option label and its
+# displayed option content. The option-less profiles render neither.
+LABEL_BEARING = ("S1", "S4")
+OPTION_LESS = ("S2", "S3")
 
 # The severities the second review actually recorded in its structured findings.
 # The immutable disposition_basis sentence of that review says "Two BLOCKING and
@@ -520,7 +543,7 @@ def test_amendment_record_validates_against_its_committed_schema(
 
 
 def test_protocol_declares_the_expected_draft_state(protocol):
-    """S3MR2 round: the draft is v0.4 and it awaits the THIRD review."""
+    """S3MR3 round: the draft is v0.5 and it awaits the FOURTH review."""
     assert protocol["state"] == EXPECTED_STATE
     assert protocol["schema_version"].endswith(DRAFT_VERSION)
     status = protocol["status"]
@@ -528,9 +551,9 @@ def test_protocol_declares_the_expected_draft_state(protocol):
     assert status["execution_authorized"] is False
     assert status["review_state"] == REVIEW_STATE
     assert status["document_class"] == "design_draft"
-    assert "third bounded independent methods review of draft-v0.4" in \
+    assert "fourth bounded independent methods review of draft-v0.5" in \
         protocol["required_next_action"]
-    assert "did not draft draft-v0.4" in protocol["required_next_action"]
+    assert "did not draft draft-v0.5" in protocol["required_next_action"]
 
 
 def test_the_artifacts_agree_on_the_draft_version_and_state(
@@ -547,9 +570,9 @@ def test_the_artifacts_agree_on_the_draft_version_and_state(
     for name, text in (("markdown", markdown), ("packet", packet)):
         assert "AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW" not in text, name
     assert protocol["status"]["amendment_record"].endswith(
-        "v0_4_operator_amendment.md")
+        "v0_5_operator_amendment.md")
     assert protocol["status"]["amendment_record_json"].endswith(
-        "v0_4_operator_amendment.json")
+        "v0_5_operator_amendment.json")
 
 
 def test_no_frozen_authorized_or_selected_state(protocol, tables):
@@ -732,9 +755,52 @@ def test_historical_indicators_are_descriptive_only_with_no_decision_path(
     assert protocol["proposed_statistics"]["i3_indicators"]["no_rescue"]
 
 
+def _historical_exemption_markers():
+    """Markers that make a passage unambiguously historical, retired or limiting."""
+    return (
+        "draft-v0.1", "draft-v0.2", "draft-v0.3", "draft-v0.4",
+        "withdrawn", "withdraw", "retired", "retires", "retire",
+        "historical", "history", "superseded", "supersedes",
+        "rejected", "no longer", "not current", "prohibited",
+        "must not", "may never", "never claim", "does not claim",
+        "no active claim", "removed from every active", "carries no",
+        "no_decision_role", "descriptive_only", "s3mr", "erratum",
+    )
+
+
+def _prose_active_claim_lines(path):
+    """Every line of a reviewed prose document that is not an exempt passage.
+
+    S3MR3-004 recorded that the enforcement of the active-claim prohibition was
+    narrower than its registered scope: the scan never reached the charter, the
+    handoff, either README, the protocol Markdown companion, the review packet or
+    the status report, which is why the residue in S3MR3-003 survived a passing
+    suite. Exemptions are explicit and auditable here rather than implicit.
+    """
+    markers = _historical_exemption_markers()
+    out = []
+    for number, raw in enumerate(_load_text(path).split("\n"), 1):
+        line = raw.strip()
+        if not line:
+            continue
+        lowered = line.lower()
+        # Blockquoted review findings and table rows carrying an explicit
+        # finding ID are quoted provenance, not active claims.
+        if line.startswith(">") or line.startswith("|"):
+            continue
+        if any(marker in lowered for marker in markers):
+            continue
+        out.append((number, line))
+    return out
+
+
 def _active_claim_strings(protocol):
     """Every string that carries an active claim, gate question or interpretation."""
     out = []
+    question = protocol["research_question"]
+    for field in ("draft_question", "what_a_pass_would_mean",
+                  "what_a_fail_would_mean", "unit_of_analysis"):
+        out.append(("research_question %s" % field, question[field]))
     for target in protocol["validation_targets"]:
         out.append(("validation_target %s construct" % target["id"],
                     target["construct"]))
@@ -750,6 +816,8 @@ def _active_claim_strings(protocol):
                   "permitted_i3_statement", "i3_claim_ceiling",
                   "what_a_pass_permits"):
         out.append(("claim_ceiling %s" % field, ceiling[field]))
+    out.append(("claim_ceiling i3_single_genuine_contrast_profiles",
+                ceiling["i3_single_genuine_contrast_profiles"]["statement"]))
     for profile, entry in ceiling["i3_claim_ceiling_by_profile"].items():
         out.append(("claim_ceiling by profile %s" % profile, json.dumps(entry)))
     for profile, entry in protocol["i3_contrast_registry"][
@@ -765,6 +833,10 @@ def _active_claim_strings(protocol):
     for row in protocol["proposed_statistics"]["registered_gate_floors"]:
         out.append(("gate floor %s construct" % row["gate_family"],
                     row["construct"]))
+    # The registered rendering surface is a normative input and carries claims.
+    surface = protocol["rendering_surface_v0_5"]
+    for field in ("sufficiency_claim", "k6_instr_rule", "s4_wrapper_boundary"):
+        out.append(("rendering_surface_v0_5 %s" % field, surface[field]))
     return out
 
 
@@ -791,31 +863,142 @@ def test_active_claim_text_contains_no_presentation_effect_claim(protocol):
         assert permitted in prohibition["permitted_only_in"]
 
 
+# S3MR3-003/S3MR3-004. The prose documents the prohibition claims to cover. The
+# registered scope named routing documents, the handoff, the charter, the READMEs,
+# the Markdown companion, the packet and the status report; draft-v0.4's enforcer
+# reached none of them, which is why the retired construct and the withdrawn sizes
+# survived a passing suite.
+ENFORCED_PROSE_PATHS = (
+    "README.md",
+    "reports/current_status.md",
+    "studies/README.md",
+    "studies/study3/NEXT_THREAD_HANDOFF.md",
+    "studies/study3/README.md",
+    "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+    "studies/study3/analysis/study2_to_study3_design_traceability.md",
+    "studies/study3/analysis/independent_methods_review_packet_v0_5.md",
+    "studies/study3/protocol/interface_calibration_protocol_draft.md",
+)
+
+# The retired construct name and the two withdrawn sizes, which may appear only
+# inside an explicitly historical passage.
+RETIRED_ACTIVE_TOKENS = ("j_both", "n = 256", "n = 128")
+
+
+@pytest.mark.parametrize("relative", ENFORCED_PROSE_PATHS)
+def test_reviewed_prose_carries_no_active_retired_or_prohibited_language(relative):
+    """S3MR3-003 and S3MR3-004. Enforcement must reach the registered scope."""
+    path = os.path.join(REPO_ROOT, relative.replace("/", os.sep))
+    assert os.path.exists(path), relative
+    for number, line in _prose_active_claim_lines(path):
+        lowered = line.lower()
+        for stem in PROHIBITED_CLAIM_TERMS:
+            assert stem not in lowered, \
+                "%s:%d asserts a prohibited presentation claim (%r): %s" \
+                % (relative, number, stem, line[:160])
+        for token in RETIRED_ACTIVE_TOKENS:
+            assert token not in lowered, \
+                "%s:%d carries retired language (%r) outside a historical " \
+                "passage: %s" % (relative, number, token, line[:160])
+
+
+def test_the_prohibition_enforcement_scope_matches_the_registered_scope(protocol):
+    """S3MR3-004. The declared scope and the enforced scope must be the same set."""
+    prohibition = protocol["proposed_statistics"]["active_claim_term_prohibition"]
+    assert prohibition["closes_finding"] == "S3MR3-004"
+    declared = set(prohibition["enforced_paths"])
+    enforced = set(ENFORCED_PROSE_PATHS)
+    structured = {
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.json",
+    }
+    assert declared == enforced | structured, declared ^ (enforced | structured)
+    for relative in declared:
+        assert os.path.exists(
+            os.path.join(REPO_ROOT, relative.replace("/", os.sep))), relative
+    # The declared protocol fields must all exist and all be scanned.
+    scanned = {label.split(" ")[0] for label, _ in _active_claim_strings(protocol)}
+    for field in prohibition["enforced_protocol_fields"]:
+        root = field.split(".")[0].split("[")[0]
+        assert root in protocol, field
+        assert root in scanned or root == "proposed_statistics", field
+
+
+def test_a_mutation_moving_retired_language_into_active_scope_is_rejected(tmp_path):
+    """S3MR3-004. The widened scan must be non-vacuous."""
+    active = tmp_path / "active.md"
+    active.write_text(
+        "# Study 3\n\nThe primary indicator is `J_both`, which requires invariance\n"
+        "across the two variants, giving `n = 256` clusters per contrast cell.\n",
+        encoding="utf-8")
+    lines = _prose_active_claim_lines(str(active))
+    blob = " ".join(line.lower() for _, line in lines)
+    assert "j_both" in blob and "n = 256" in blob and "invarian" in blob, \
+        "the scan failed to see prohibited active language"
+
+    historical = tmp_path / "historical.md"
+    historical.write_text(
+        "# Study 3\n\nHistorical record: draft-v0.3 named `J_both` as its primary\n"
+        "indicator and carried `n = 256`. That draft was rejected and the values\n"
+        "are withdrawn from every active field.\n",
+        encoding="utf-8")
+    marked = _prose_active_claim_lines(str(historical))
+    marked_blob = " ".join(line.lower() for _, line in marked)
+    assert "j_both" not in marked_blob, \
+        "an explicitly historical passage must be exempt"
+
+
 def test_per_profile_i3_applicability_and_claim_ceiling_are_exact(
         protocol, tables):
-    """S3MR2-001/S3MR2-004. Nine cells for S1, two for S2 and S3."""
+    """S3MR3-001. Nine cells for S1 and S4, exactly ONE for S2 and S3.
+
+    K6-SEP varies the separator between a displayed option label and its
+    displayed option content. S2 and S3 render neither, so the factor has no
+    referent, the two members of the pair would be byte-identical, and the cell
+    is a self-comparison rather than a presentation pair. Applicability is
+    therefore registered per contrast, never per family.
+    """
     registry = protocol["i3_contrast_registry"]
     k5_ids = registry["k5_contrast_ids"]
     k6_ids = registry["k6_contrast_ids"]
     assert len(k5_ids) == 7 and len(k6_ids) == 2
     assert not set(k5_ids) & set(k6_ids)
-    assert set(registry["k5_applicability"]["applicable_profiles"]) == {"S1", "S4"}
-    assert set(registry["k5_applicability"]["not_applicable_profiles"]) == \
-        {"S2", "S3"}
-    assert set(registry["k6_applicability"]["applicable_profiles"]) == \
+    assert set(registry["k5_applicability"]["applicable_profiles"]) == set(LABEL_BEARING)
+    assert set(registry["k5_applicability"]["not_applicable_profiles"]) == set(OPTION_LESS)
+
+    # Family-level K6 applicability is exactly the defect S3MR3-001 recorded.
+    k6 = registry["k6_applicability"]
+    assert "applicable_profiles" not in k6, \
+        "K6 applicability must be registered per contrast, not per family"
+    assert k6["per_contrast_registration_required"] is True
+    by_contrast = k6["by_contrast"]
+    assert set(by_contrast) == set(k6_ids)
+    assert set(by_contrast["K6-SEP"]["applicable_profiles"]) == set(LABEL_BEARING)
+    assert set(by_contrast["K6-SEP"]["not_applicable_profiles"]) == set(OPTION_LESS)
+    assert set(by_contrast["K6-INSTR"]["applicable_profiles"]) == \
         {"S1", "S2", "S3", "S4"}
+    assert by_contrast["K6-INSTR"]["not_applicable_profiles"] == []
 
     by_profile = registry["claim_ceiling_by_profile"]
     expected_cells = {
         "S1": set(k5_ids) | set(k6_ids),
-        "S2": set(k6_ids),
-        "S3": set(k6_ids),
+        "S2": {"K6-INSTR"},
+        "S3": {"K6-INSTR"},
         "S4": set(k5_ids) | set(k6_ids),
     }
     for profile, entry in by_profile.items():
         assert set(entry["applicable_cells"]) == expected_cells[profile], profile
         assert entry["applicable_cell_count"] == len(expected_cells[profile])
     assert by_profile["S4"]["descriptive_only"] is True
+    # The option-less profiles carry exactly one genuine I3 contrast.
+    for profile in OPTION_LESS:
+        assert by_profile[profile]["applicable_cell_count"] == 1
+        assert "K6-SEP" not in by_profile[profile]["applicable_cells"]
+    single = protocol["claim_ceiling"]["i3_single_genuine_contrast_profiles"]
+    assert set(single["profiles"]) == set(OPTION_LESS)
+    assert single["s3_conditional_status_still_applies"] is True
+    # The two claim-ceiling copies may not drift apart.
+    assert protocol["claim_ceiling"]["i3_claim_ceiling_by_profile"] == by_profile
 
     counts = tables["gate_bearing_cell_counts"]
     roles = len(protocol["proposed_statistics"]["registered_target_roles"])
@@ -823,16 +1006,47 @@ def test_per_profile_i3_applicability_and_claim_ceiling_are_exact(
         assert counts[profile]["I3_cells"] == \
             entry["applicable_cell_count"] * roles, profile
         assert counts[profile]["I3_K5_cells"] == (
-            7 * roles if profile in ("S1", "S4") else 0), profile
-        assert counts[profile]["I3_K6_cells"] == 2 * roles, profile
-    # And the truth table must agree, per profile.
+            7 * roles if profile in LABEL_BEARING else 0), profile
+        assert counts[profile]["I3_K6_cells"] == (
+            2 * roles if profile in LABEL_BEARING else 1 * roles), profile
+        assert counts[profile]["applicable_i3_contrast_count"] == \
+            entry["applicable_cell_count"], profile
+    # And the truth table must agree, per profile AND per contrast.
     for row in protocol["gate_truth_table"]["rows"]:
-        expected = "applicable" if row["profile"] in ("S1", "S4") \
-            else "not_applicable"
-        assert row["I3_K5"] == expected, row["profile"]
-        assert row["I3_K6"] == "applicable", row["profile"]
+        label_bearing = row["profile"] in LABEL_BEARING
+        expected = "applicable" if label_bearing else "not_applicable"
+        for contrast in k5_ids:
+            assert row["I3_K5"][contrast] == expected, (row["profile"], contrast)
+        assert row["I3_K6"]["K6-SEP"] == expected, row["profile"]
+        assert row["I3_K6"]["K6-INSTR"] == "applicable", row["profile"]
         if row["label_bearing"] is False:
-            assert row["I3_K5"] == "not_applicable"
+            assert row["I3_K6"]["K6-SEP"] == "not_applicable"
+
+
+def test_no_duplicate_r_sep_branch_exists_for_the_option_less_profiles(protocol):
+    """S3MR3-001. R-sep must be structurally ABSENT for S2 and S3, not duplicated."""
+    for profile in protocol["interface_profiles"]:
+        applicability = profile["transformation_applicability"]["separator_rendering"]
+        if profile["id"] in OPTION_LESS:
+            assert applicability != "applicable", profile["id"]
+            assert "no referent" in applicability, profile["id"]
+            assert "never a pass" in applicability, profile["id"]
+            names = {entry["transformation"]
+                     for entry in profile["non_applicable_transformations"]}
+            assert "separator_rendering" in names, profile["id"]
+        else:
+            assert applicability == "applicable", profile["id"]
+    for rendering in protocol["counterbalancing_design"]["k6_renderings"]["renderings"]:
+        if rendering["id"] == "R-sep":
+            assert set(rendering["applicable_profiles"]) == set(LABEL_BEARING)
+            assert set(rendering["not_applicable_profiles"]) == set(OPTION_LESS)
+            assert rendering["separator_literal"] == " = "
+        else:
+            assert rendering["separator_literal"] == ": "
+    # No profile-specific replacement separator may be invented.
+    surface = protocol["rendering_surface_v0_5"]
+    assert surface["k6_sep_separators"]["R-base"] == ": "
+    assert surface["k6_sep_separators"]["R-sep"] == " = "
 
 
 def test_all_nine_i3_cells_use_disjoint_namespaces(protocol):
@@ -1150,10 +1364,10 @@ def test_m_max_and_cell_counts_derive_from_the_truth_table(protocol, tables):
         i1a = len(roles) if row["I1a"] == "applicable" else 0
         i1b = len(roles) if row["I1b"] == "applicable" else 0
         i2 = len(roles) * len(families) if row["I2"] == "applicable" else 0
-        i3_k5 = len(registry["k5_contrast_ids"]) \
-            if row["I3_K5"] == "applicable" else 0
-        i3_k6 = len(registry["k6_contrast_ids"]) \
-            if row["I3_K6"] == "applicable" else 0
+        i3_k5 = sum(1 for state in row["I3_K5"].values()
+                    if state == "applicable")
+        i3_k6 = sum(1 for state in row["I3_K6"].values()
+                    if state == "applicable")
         i3 = (i3_k5 + i3_k6) * len(roles)
         i4 = len(families) * len(depths) if row["I4"] == "applicable" else 0
         recomputed[profile] = {
@@ -1174,6 +1388,15 @@ def test_m_max_and_cell_counts_derive_from_the_truth_table(protocol, tables):
     assert sorted(selectable) == ["S1", "S2", "S3"]
     m_max = max(counts[p]["total_gate_bearing_cells"] for p in selectable)
     assert m_max == 43
+    # S3MR3-001: the option-less profiles lose their K6-SEP cells, so their totals
+    # fall from 19 to 16, while S1 -- the profile that ATTAINS m_max -- is
+    # untouched. m_max is unchanged by derivation, not by preservation.
+    assert counts["S1"]["total_gate_bearing_cells"] == 43
+    for profile in OPTION_LESS:
+        assert counts[profile]["total_gate_bearing_cells"] == 16, profile
+        assert counts[profile]["cells_at_i1_i3_floor"] == 6, profile
+        assert counts[profile]["applicable_i3_contrast_count"] == 1, profile
+    assert counts["S4"]["total_gate_bearing_cells"] == 39
     assert tables["power_architecture"]["m_max"] == m_max
     assert protocol["power_architecture_v0_4"]["cell_counts"]["m_max"] == m_max
     assert protocol["power_architecture_v0_4"]["cell_counts"][
@@ -1910,8 +2133,9 @@ def test_the_p3q_i4_ordering_constraint_reconstructs(protocol):
 # --------------------------------------------------------------------------
 
 def test_every_finding_and_item_appears_exactly_once(amendment):
-    closure = amendment["closure_matrix_v0_4"]
-    assert [row["finding_id"] for row in closure] == FINDING_IDS_V0_3
+    """S3MR3 closure, plus the carried-forward earlier matrices."""
+    closure = amendment["closure_matrix_v0_5"]
+    assert [row["finding_id"] for row in closure] == FINDING_IDS_V0_4
     assert len({row["finding_id"] for row in closure}) == 10
     severities = {}
     for row in closure:
@@ -1919,10 +2143,24 @@ def test_every_finding_and_item_appears_exactly_once(amendment):
             severities.get(row["original_severity"], 0) + 1
         assert row["self_approved"] is False
         assert row["disposition"] == \
-            "PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW"
+            "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW"
         assert row["where"] and row["verification"] and row["repair"]
         assert row["repair_kind"] in ("method", "operator_decision_input")
-    assert severities == STRUCTURED_V0_3_SEVERITIES
+        # A status may never be reached by prose alone: it must trace to
+        # normative bytes, a positive assertion and a negative mutation.
+        assert row["closure_status"] == REQUIRED_V0_4_CLOSURES[row["finding_id"]]
+        assert row["affected_normative_fields"], row["finding_id"]
+        assert row["committed_tests"], row["finding_id"]
+        assert row["negative_mutations"], row["finding_id"]
+        assert "residual_limitation" in row, row["finding_id"]
+    assert severities == STRUCTURED_V0_4_SEVERITIES
+
+    # The second review's matrix is carried forward, not reopened.
+    carried = amendment["carried_forward_closure_matrix_v0_4"]
+    assert [row["finding_id"] for row in carried] == FINDING_IDS_V0_3
+    for row in carried:
+        assert row["reopened"] is False
+        assert row["status"]
 
     inherited = amendment["inherited_first_review_findings"]
     assert [row["finding_id"] for row in inherited] == FINDING_IDS
@@ -1931,6 +2169,7 @@ def test_every_finding_and_item_appears_exactly_once(amendment):
             "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
             "PARTIALLY_RESOLVED_BY_DRAFT_V0_3")
         assert row["note"]
+        assert "v0_5_residual" in row
     partial = [row for row in inherited
                if row["status_after_second_review"] == "PARTIALLY_RESOLVED_BY_DRAFT_V0_3"]
     assert len(partial) == 4
@@ -1938,6 +2177,8 @@ def test_every_finding_and_item_appears_exactly_once(amendment):
     items = amendment["unresolved_item_dispositions"]
     assert [row["id"] for row in items] == UR_IDS
     assert len({row["id"] for row in items}) == 22
+    ur22 = next(row for row in items if row["id"] == "UR-22")
+    assert ur22["status"] == "UNRESOLVED"
 
 
 def test_the_historical_count_mismatch_is_recorded_and_not_propagated(
@@ -1955,7 +2196,7 @@ def test_the_historical_count_mismatch_is_recorded_and_not_propagated(
     assert "Two BLOCKING and eight MAJOR" in \
         mismatch["immutable_disposition_basis_phrase"]
     assert mismatch["why_it_does_not_reverse_the_rejection"]
-    # The wrong count must not leak into any draft-v0.4 artifact.
+    # The wrong count must not leak into any draft-v0.5 artifact.
     for name, text in (("protocol", json.dumps(protocol)),
                        ("markdown", markdown), ("packet", packet)):
         assert "eight MAJOR" not in text, name
@@ -1965,24 +2206,24 @@ def test_the_historical_count_mismatch_is_recorded_and_not_propagated(
 def test_the_amendment_does_not_self_approve(amendment, protocol, tables):
     prohibition = amendment["self_approval_prohibition"]
     assert prohibition[
-        "the_drafting_party_does_not_claim_draft_v0_4_is_correct"] is True
+        "the_drafting_party_does_not_claim_draft_v0_5_is_correct"] is True
     assert prohibition["every_repair_label"] == \
-        "PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW"
-    assert "third" in prohibition["determination_belongs_to"].lower()
-    assert amendment["both_independent_reviews_remain_valid_rejections"] is True
+        "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW"
+    assert "fourth" in prohibition["determination_belongs_to"].lower()
+    assert amendment["all_independent_reviews_remain_valid_rejections"] is True
     assert amendment["no_review_artifact_was_edited"] is True
-    assert "third bounded independent methods review of draft-v0.4" in \
+    assert "fourth bounded independent methods review of draft-v0.5" in \
         amendment["next_legal_action"]
     assert protocol["status"]["self_approval_prohibited"]
     assert protocol["claim_ceiling"]["no_self_approval"]
     assert tables["disposition_status"] == \
-        "PROPOSED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW"
+        "PROPOSED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW"
     # Every draft-v0.4 section that repairs a finding carries the same label.
     for section in ("sampling_frame_v0_4", "power_architecture_v0_4",
                     "state_machine_v0_4", "operation_ontology_v0_4"):
         if "disposition_status" in protocol[section]:
             assert protocol[section]["disposition_status"] == \
-                "PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW"
+                "PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW"
 
 
 def test_the_amendment_names_the_immutable_objects_it_did_not_edit(amendment):
@@ -2003,7 +2244,7 @@ def test_the_amendment_names_the_immutable_objects_it_did_not_edit(amendment):
 
 
 def test_prior_receipts_reviews_and_packets_are_untouched():
-    """The v0.4 round may not rewrite any earlier round's record."""
+    """The v0.5 round may not rewrite any earlier round's record."""
     assert os.path.exists(REVIEW_PATH)
     with open(REVIEW_PATH, encoding="utf-8") as handle:
         assert "draft-v0.1" in handle.read()
@@ -2368,7 +2609,7 @@ def test_markdown_agrees_with_json_on_every_decision_marker(protocol, markdown,
     assert statistics["confirmation_component_alpha_exact_rational"] in markdown
     assert str(tables["power_architecture"]["m_max"]) in markdown
     assert "J_joint_correct" in markdown
-    assert "third independent methods review" in markdown.lower()
+    assert "fourth independent methods review" in markdown.lower()
 
 
 def test_markdown_does_not_claim_an_uncommitted_generator(protocol, markdown):
@@ -2392,7 +2633,7 @@ def test_the_packet_states_what_it_does_not_do(packet):
 def test_the_amendment_markdown_matches_the_amendment_record(amendment):
     with open(AMENDMENT_MD, encoding="utf-8") as handle:
         text = handle.read()
-    for row in amendment["closure_matrix_v0_4"]:
+    for row in amendment["closure_matrix_v0_5"]:
         assert row["finding_id"] in text, row["finding_id"]
     for row in amendment["inherited_first_review_findings"]:
         assert row["finding_id"] in text, row["finding_id"]
@@ -2611,7 +2852,128 @@ def _k5_applies_to_a_content_only_profile(doc):
 
 
 def _k5_truth_row_flips(doc):
-    _find(doc["gate_truth_table"]["rows"], "profile", "S2")["I3_K5"] = "applicable"
+    _find(doc["gate_truth_table"]["rows"], "profile", "S2")["I3_K5"] = {
+        cid: "applicable"
+        for cid in doc["i3_contrast_registry"]["k5_contrast_ids"]}
+
+
+# ---- S3MR3-001 ------------------------------------------------------------
+
+def _k6_sep_reapplied_to_an_option_less_profile(doc):
+    _find(doc["gate_truth_table"]["rows"], "profile", "S2")[
+        "I3_K6"]["K6-SEP"] = "applicable"
+
+
+def _k6_applicability_returns_to_family_level(doc):
+    doc["i3_contrast_registry"]["k6_applicability"] = {
+        "applicable_profiles": ["S1", "S2", "S3", "S4"],
+        "semantics": "every profile is rendered, so the rendering contrasts always "
+                     "have a referent",
+    }
+
+
+def _k6_sep_applicability_widens(doc):
+    doc["i3_contrast_registry"]["k6_applicability"]["by_contrast"][
+        "K6-SEP"]["applicable_profiles"] = ["S1", "S2", "S3", "S4"]
+
+
+def _option_less_claim_ceiling_regains_k6_sep(doc):
+    for profile in ("S2", "S3"):
+        entry = doc["i3_contrast_registry"]["claim_ceiling_by_profile"][profile]
+        entry["applicable_cells"] = ["K6-SEP", "K6-INSTR"]
+        entry["applicable_cell_count"] = 2
+
+
+def _r_sep_duplicated_for_an_option_less_profile(doc):
+    for rendering in doc["counterbalancing_design"]["k6_renderings"]["renderings"]:
+        if rendering["id"] == "R-sep":
+            rendering["applicable_profiles"] = ["S1", "S2", "S3", "S4"]
+            rendering["not_applicable_profiles"] = []
+
+
+def _separator_rendering_becomes_applicable_to_an_option_less_profile(doc):
+    for profile in doc["interface_profiles"]:
+        if profile["id"] == "S2":
+            profile["transformation_applicability"]["separator_rendering"] = \
+                "applicable"
+
+
+# ---- S3MR3-002 ------------------------------------------------------------
+
+def _k6_sep_enters_confirmation_for_an_option_less_profile(doc):
+    doc["proposed_statistics"]["confirmation_applicability_rule"][
+        "k6_sep_confirmation_profiles"] = ["S1", "S2", "S3"]
+
+
+def _confirmation_applicability_returns_to_family_level(doc):
+    doc["proposed_statistics"]["confirmation_applicability_rule"][
+        "row_shape"] = "per gate family"
+
+
+def _s4_reenters_a_confirmation_component(doc):
+    doc["proposed_statistics"]["confirmation_applicability_rule"][
+        "i2_confirmation_profiles"] = ["S1", "S2", "S3", "S4"]
+
+
+# ---- S3MR3-006, S3MR3-007, S3MR3-009, S3MR3-010 ---------------------------
+
+def _non_machine_stop_state_returns(doc):
+    doc["gate_truth_table"]["legal_stop_states"].append(
+        "STOP_AWAITING_AUTHORITY, which is the current state")
+
+
+def _at_least_n_interpretation_permitted(doc):
+    doc["proposed_statistics"]["local_power_nonmonotonicity"][
+        "at_least_n_interpretation_prohibited"] = False
+
+
+def _eventual_monotonicity_threshold_replaces_the_minimum(doc):
+    doc["proposed_statistics"]["local_power_nonmonotonicity"][
+        "eventual_monotonicity_threshold_registered"] = True
+
+
+def _union_bound_claims_a_predesignated_profile(doc):
+    doc["power_architecture_v0_4"]["union_bound_proof"]["conclusion"] = (
+        "Pr(the study returns the designated adequate profile and confirms it) "
+        ">= 1 - 19/400 - 1/200 - 19/400 = 9/10")
+
+
+def _registry_demoted_to_an_illustrative_example(doc):
+    doc["rendering_surface_v0_5"]["illustrative_example"] = True
+
+
+def _registry_binding_status_dropped(doc):
+    doc["rendering_surface_v0_5"]["binding_input"] = False
+
+
+def _rp_wrapper_filled_in_by_v0_5(doc):
+    doc["rendering_surface_v0_5"]["rp_wrapper"] = "chatml"
+
+
+def _token_distinctness_treated_as_tested(doc):
+    doc["rendering_surface_v0_5"]["tokenizer_distinctness_status"] = \
+        "TESTED_AND_PASSED"
+
+
+def _token_distinctness_failure_becomes_a_pass(doc):
+    doc["rendering_surface_v0_5"]["future_pre_bank_token_distinctness_rule"] = (
+        "after checkpoints are pinned, an indistinct pair is recorded as a pass")
+
+
+def _prohibition_scope_narrows_to_the_protocol_only(doc):
+    doc["proposed_statistics"]["active_claim_term_prohibition"]["scope"] = [
+        "active claim text"]
+
+
+def _prohibition_historical_exemptions_removed(doc):
+    doc["proposed_statistics"]["active_claim_term_prohibition"][
+        "historical_exemptions"] = []
+
+
+def _round_reference_reverts_to_the_second_review(doc):
+    doc["proposed_statistics"]["unresolved"][1] = (
+        "Every repair in this section is proposed resolved subject to the second "
+        "independent methods review. This document does not adjudicate itself.")
 
 
 def _j_joint_becomes_a_disjunction(doc):
@@ -3059,6 +3421,45 @@ MUTATIONS = [
     ("an operation ontology unit is removed", _ontology_unit_removed),
     ("a sequence evaluation is equated with a batched call",
      _sequence_evaluation_equated_with_a_batched_call),
+    # ---- draft-v0.5, closing the third review's findings -------------------
+    ("K6-SEP is re-applied to an option-less profile",
+     _k6_sep_reapplied_to_an_option_less_profile),
+    ("K6 applicability returns to family level",
+     _k6_applicability_returns_to_family_level),
+    ("K6-SEP applicability widens beyond the label-bearing profiles",
+     _k6_sep_applicability_widens),
+    ("an option-less claim ceiling regains K6-SEP",
+     _option_less_claim_ceiling_regains_k6_sep),
+    ("R-sep is duplicated for an option-less profile",
+     _r_sep_duplicated_for_an_option_less_profile),
+    ("separator rendering becomes applicable to an option-less profile",
+     _separator_rendering_becomes_applicable_to_an_option_less_profile),
+    ("K6-SEP enters confirmation for an option-less profile",
+     _k6_sep_enters_confirmation_for_an_option_less_profile),
+    ("confirmation applicability returns to family level",
+     _confirmation_applicability_returns_to_family_level),
+    ("S4 re-enters a confirmation component", _s4_reenters_a_confirmation_component),
+    ("a non-machine stop state returns", _non_machine_stop_state_returns),
+    ("an 'at least n' reading becomes permitted", _at_least_n_interpretation_permitted),
+    ("an eventual-monotonicity threshold replaces the registered minimum",
+     _eventual_monotonicity_threshold_replaces_the_minimum),
+    ("the union bound claims a predesignated profile",
+     _union_bound_claims_a_predesignated_profile),
+    ("the rendering registry is demoted to an illustrative example",
+     _registry_demoted_to_an_illustrative_example),
+    ("the rendering registry stops being a binding input",
+     _registry_binding_status_dropped),
+    ("the RP wrapper is filled in by v0.5", _rp_wrapper_filled_in_by_v0_5),
+    ("token distinctness is treated as already tested",
+     _token_distinctness_treated_as_tested),
+    ("a token-distinctness failure becomes a pass",
+     _token_distinctness_failure_becomes_a_pass),
+    ("the prohibition scope narrows to the protocol only",
+     _prohibition_scope_narrows_to_the_protocol_only),
+    ("the prohibition's historical exemptions are removed",
+     _prohibition_historical_exemptions_removed),
+    ("a round reference reverts to the second review",
+     _round_reference_reverts_to_the_second_review),
 ]
 
 
@@ -3154,7 +3555,7 @@ def _semantic_laws(doc):
     assert doc["status"]["frozen"] is False
     assert doc["status"]["execution_authorized"] is False
     assert doc["status"]["review_state"] == REVIEW_STATE
-    assert "third bounded independent methods review" in doc["required_next_action"]
+    assert "fourth bounded independent methods review" in doc["required_next_action"]
     assert doc["results"] == [] and doc["bank_rows"] == []
     counters = doc["operation_boundaries"]["performed_this_round"]
     assert set(counters) == set(tables["operation_counts"])
@@ -3173,7 +3574,11 @@ def _semantic_laws(doc):
         {"S2", "S3"}
     for row in doc["gate_truth_table"]["rows"]:
         if row["label_bearing"] is False:
-            assert row["I3_K5"] == "not_applicable"
+            for state in row["I3_K5"].values():
+                assert state == "not_applicable"
+            # S3MR3-001: K6-SEP has no referent without a label and a content.
+            assert row["I3_K6"]["K6-SEP"] == "not_applicable"
+            assert row["I3_K6"]["K6-INSTR"] == "applicable"
     for construct in ("I1a", "I1b", "I2", "I3", "I4"):
         development = _component(doc, "development", construct)
         confirmation = _component(doc, "confirmation", construct)
@@ -3235,10 +3640,9 @@ def _semantic_laws(doc):
         i1a = len(roles) if row["I1a"] == "applicable" else 0
         i1b = len(roles) if row["I1b"] == "applicable" else 0
         i2 = len(roles) * len(families) if row["I2"] == "applicable" else 0
-        i3 = ((len(registry["k5_contrast_ids"])
-               if row["I3_K5"] == "applicable" else 0)
-              + (len(registry["k6_contrast_ids"])
-                 if row["I3_K6"] == "applicable" else 0)) * len(roles)
+        i3 = (sum(1 for state in row["I3_K5"].values() if state == "applicable")
+              + sum(1 for state in row["I3_K6"].values()
+                    if state == "applicable")) * len(roles)
         i4 = len(families) * len(depths) if row["I4"] == "applicable" else 0
         total = i1a + i1b + i2 + i3 + i4
         assert counts[profile]["total_gate_bearing_cells"] == total, profile
@@ -3402,6 +3806,126 @@ def _semantic_laws(doc):
         _rational(i4_floor["p0_exact_rational"])
     assert ordering["no_checkpoint_is_selected_by_registering_this_constraint"] \
         is True
+
+    # ---- v0.5 laws --------------------------------------------------------
+    # S3MR3-001. K6 applicability is per contrast, and K6-SEP has no referent
+    # without a displayed label AND a displayed content.
+    k6 = doc["i3_contrast_registry"]["k6_applicability"]
+    assert "applicable_profiles" not in k6
+    assert k6["per_contrast_registration_required"] is True
+    assert set(k6["by_contrast"]["K6-SEP"]["applicable_profiles"]) == set(LABEL_BEARING)
+    assert set(k6["by_contrast"]["K6-SEP"]["not_applicable_profiles"]) == set(OPTION_LESS)
+    assert set(k6["by_contrast"]["K6-INSTR"]["applicable_profiles"]) == \
+        {"S1", "S2", "S3", "S4"}
+    for profile in OPTION_LESS:
+        entry = doc["i3_contrast_registry"]["claim_ceiling_by_profile"][profile]
+        assert entry["applicable_cells"] == ["K6-INSTR"], profile
+        assert entry["applicable_cell_count"] == 1, profile
+        assert tables["gate_bearing_cell_counts"][profile][
+            "applicable_i3_contrast_count"] == 1, profile
+    for row in doc["gate_truth_table"]["rows"]:
+        expected = "applicable" if row["profile"] in LABEL_BEARING else "not_applicable"
+        assert row["I3_K6"]["K6-SEP"] == expected, row["profile"]
+        assert row["I3_K6"]["K6-INSTR"] == "applicable", row["profile"]
+    for rendering in doc["counterbalancing_design"]["k6_renderings"]["renderings"]:
+        if rendering["id"] == "R-sep":
+            assert set(rendering["applicable_profiles"]) == set(LABEL_BEARING)
+            assert set(rendering["not_applicable_profiles"]) == set(OPTION_LESS)
+    for profile in doc["interface_profiles"]:
+        separator = profile["transformation_applicability"]["separator_rendering"]
+        if profile["id"] in OPTION_LESS:
+            assert separator != "applicable", profile["id"]
+        else:
+            assert separator == "applicable", profile["id"]
+
+    # S3MR3-002. Confirmation applicability is component level, S4 never appears,
+    # and no not-applicable component may reach confirmation.
+    rule = doc["proposed_statistics"]["confirmation_applicability_rule"]
+    assert "PER COMPONENT" in rule["row_shape"]
+    assert rule["s4_can_never_appear"] is True
+    assert rule["i1b_confirmation_profiles"] == ["S1"]
+    assert rule["k5_confirmation_profiles"] == ["S1"]
+    assert rule["k6_sep_confirmation_profiles"] == ["S1"]
+    assert rule["k6_instr_confirmation_profiles"] == ["S1", "S2", "S3"]
+    for field, value in rule.items():
+        if field.endswith("_confirmation_profiles"):
+            assert "S4" not in value, field
+    for component in tables["confirmation_component_applicability"]["components"]:
+        assert "S4" not in component["applicable_profiles"], component["component"]
+        assert component["s4_present"] is False
+    published = {c["component"]: c["applicable_profiles"]
+                 for c in tables["confirmation_component_applicability"]["components"]}
+    assert published["I3/K6-SEP"] == ["S1"]
+    assert published["I3/K6-INSTR"] == ["S1", "S2", "S3"]
+    assert published["I1b"] == ["S1"]
+    for contrast in doc["i3_contrast_registry"]["k5_contrast_ids"]:
+        assert published["I3/" + contrast] == ["S1"], contrast
+    for row in doc["proposed_statistics"]["confirmation_exact_binomial_gates"]:
+        assert "S4" not in row["applicable_profiles"], row["gate"]
+        assert row["applicability_is_component_level"] is True
+
+    # S3MR3-005 and S3MR3-006.
+    s4_profile = next(p for p in doc["interface_profiles"] if p["id"] == "S4")
+    assert "I4" not in s4_profile["applicable_gates"]
+    stop_states = doc["gate_truth_table"]["legal_stop_states"]
+    assert not any(s.startswith("STOP_AWAITING_AUTHORITY") for s in stop_states)
+    machine_terminals = {s["id"] for s in doc["state_machine_v0_4"]["states"]
+                         if s["kind"] == "terminal"}
+    machine_stops = {s for s in machine_terminals if s.startswith("STOP_")}
+    listed_stops = {s.split(" ")[0].rstrip(",") for s in stop_states}
+    # Every legal stop state must BE a terminal state of the registered machine,
+    # and every STOP terminal must be listed. The sets are equal (S3MR3-006).
+    assert listed_stops == machine_stops, (listed_stops, machine_stops)
+    assert listed_stops <= machine_terminals
+
+    # S3MR3-007.
+    nonmono = doc["proposed_statistics"]["local_power_nonmonotonicity"]
+    assert nonmono["at_least_n_interpretation_prohibited"] is True
+    assert nonmono["eventual_monotonicity_threshold_registered"] is False
+    for row in tables["development_exact_binomial_components"]:
+        local = row["local_power_nonmonotonicity"]
+        assert local["execution_must_use_the_exact_registered_cell_size"] is True
+        assert local["at_least_n_interpretation_prohibited"] is True
+        # Non-vacuous: the target genuinely fails again above the registered size.
+        assert local["failing_sizes_within_the_disclosure_window"], row["gate_family"]
+        assert local["target_is_monotone_within_the_disclosure_window"] is False
+
+    # S3MR3-008.
+    assert "FOURTH" in doc["proposed_statistics"]["unresolved"][1]
+    assert "second independent methods review" not in \
+        doc["proposed_statistics"]["unresolved"][1]
+    assert "fourth" in doc["claim_ceiling"]["no_self_approval"]
+    assert doc["status"]["review_state"] == REVIEW_STATE
+
+    # S3MR3-009.
+    proof = doc["power_architecture_v0_4"]["union_bound_proof"]
+    assert "AN ADEQUATE profile" in proof["conclusion"]
+    assert "the designated adequate profile" not in proof["conclusion"]
+    assert "HIGHEST-PRIORITY" in proof["multi_adequate_branch"]
+    assert proof["uses_independence"] is False
+    assert proof["holds_under_arbitrary_dependence"] is True
+
+    # S3MR3-010.
+    surface = doc["rendering_surface_v0_5"]
+    assert surface["binding_input"] is True
+    assert surface["illustrative_example"] is False
+    assert surface["rp_wrapper"] is None
+    assert surface["future_rule_resolves_od2"] is False
+    assert surface["tokenizer_distinctness_status"].startswith("NOT_TESTED_THIS_ROUND")
+    assert "INELIGIBLE" in surface["future_pre_bank_token_distinctness_rule"]
+    assert "pass" not in surface["future_pre_bank_token_distinctness_rule"].split(
+        "INELIGIBLE")[0]
+
+    # S3MR3-004. The declared prohibition scope must cover the reviewed paths.
+    prohibition = doc["proposed_statistics"]["active_claim_term_prohibition"]
+    for required in ("routing documents", "the research charter",
+                     "the Study 3 handoff", "the protocol Markdown companion",
+                     "the status report",
+                     "the research question and its narrowing text"):
+        assert required in prohibition["scope"], required
+    assert prohibition["historical_exemptions"]
+    for exemption in prohibition["historical_exemptions"]:
+        assert exemption["kind"] and exemption["requirement"]
 
 
 @pytest.mark.parametrize("name,mutate", MUTATIONS, ids=[m[0] for m in MUTATIONS])
