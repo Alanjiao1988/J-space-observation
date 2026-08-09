@@ -148,8 +148,14 @@ future, separately authorized execution, and none of it has been executed.
    is stated in the prompt so that only the mapping to a label remains.
 3. **Multiple surfaces, never pooled.** Four families, evaluated per cell, with disagreement treated
    as diagnostic rather than as noise.
-4. **Robustness as equivalence.** Gate `I3` requires an interval inside a pre-specified margin. A
-   non-significant difference is never accepted as invariance.
+4. **Robustness as an item-level conjunction, not an aggregate equivalence test.** Gate `I3` is
+   evaluated on pre-registered **base-item contrast clusters with exactly two variants each**, and
+   its primary indicator `J_both` requires that a cluster be both invariant across its two variants
+   and correct against the registered ground truth. A stable but wrong answer scores `0`; a stable
+   invalid or unparseable answer scores `0`. A non-significant difference is never accepted as
+   invariance. draft-v0.1 and draft-v0.2 stated this requirement as an aggregate paired-equivalence
+   interval inside a pre-specified margin; draft-v0.3 retires that aggregate procedure from every
+   decision role after findings `S3MR-004` and `S3MR-005`.
 5. **Counterbalance by construction.** Positions and labels are balanced in the bank, not corrected
    afterwards.
 6. **New seeds and disjoint banks.** No Study 2 item identity, frozen bank row, selected template
@@ -179,8 +185,8 @@ all eight open without dispositions.
 | `OD2` | which positive-capability reference model is defensible and T4-feasible | **yes - blocks Gate `I4`** |
 | `OD3` | whether bounded final-answer generation belongs in the panel | no |
 | `OD4` | which prompt-rendering variants are methodologically necessary | no |
-| `OD5` | acceptable accuracy, robustness, equivalence and multiplicity thresholds | yes - blocks freeze |
-| `OD6` | development and confirmation sample sizes | yes - blocks freeze |
+| `OD5` | acceptable accuracy, robustness, equivalence and multiplicity thresholds | resolved in the draft-v0.3 operator amendment; still subject to the second independent methods review |
+| `OD6` | development and confirmation sample sizes | resolved in the draft-v0.3 operator amendment; still subject to the second independent methods review |
 | `OD7` | whether a bounded independent methods review is required before freeze | no |
 | `OD8` | whether and where a chat template is applied | no |
 
@@ -188,21 +194,42 @@ all eight open without dispositions.
 `OD2`, `OD5` and `OD6` remain unresolved and blocking. Resolving `OD7` in the affirmative is what
 makes the bounded independent methods review the legal next action rather than a freeze.
 
-**`OD2` is the one that can stop the study before it starts.** If no positive-capability reference
+**draft-v0.3 dispositions.** The operator amendment authority resolves `OD5` and `OD6`. `OD5` fixes
+an exact-rational multiplicity policy: a study-level development screening alpha of `1/200`, a
+per-profile development component alpha of `1/600`, an intersection-union conjunction within a
+profile so that no further within-profile Bonferroni applies, and a **fixed** selectable-profile
+denominator `K = 3` that never shrinks on a post-data fact. `OD6` fixes a single I3 floor at
+`p0 = 0.90` against `p1 = 0.97` with power at least `0.90`, giving `n = 256` base-item contrast
+clusters per applicable contrast cell; the second floor `p0 = 0.95` is deleted from every active
+protocol, table and packet field and survives only in clearly labelled historical narrative.
+**`OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`** and is not touched. Resolving `OD5` and
+`OD6` does not make the design correct; it makes it reviewable. The determination belongs to the
+second independent methods review.
+
+**`OD2` is still the one that can stop the study before it starts, and draft-v0.3 does not move
+it.** If no positive-capability reference
 can be justified within the Tesla T4 envelope without empirical screening, then Gate `I4` cannot be
 evaluated, and a Study 3 null would be as uninterpretable as Study 2's was. The draft's proposed
 answer is a separate prequalification stage that never inspects the Study 3 confirmation bank.
 draft-v0.2 adds `references/positive_reference_dossier.md`, which evaluates named candidates against
 the registered compute envelope from primary sources. The dossier selects nothing and pins nothing;
-`OD2` stays blocking.
+`OD2` stays blocking. draft-v0.3 restates every dossier candidate as `UNSELECTED` and corrects the
+dossier's two back-references from defect `D-07`, the pooling defect, to defect `D-04`, the
+positive-reference circularity and chance-level-floor defect, per finding `S3MR-020`. No checkpoint
+was selected, preferred, pinned, revision-resolved, downloaded, tokenized, loaded or prequalified in
+the draft-v0.3 round.
 
-**`OD5` and `OD6` are now answerable, and that is why they stayed open.** draft-v0.2 derives every
-proposed number in a committed model-free script,
-`analysis/design_statistics.py`. The derivation contradicts a draft-v0.1 assertion: at `n = 192` and
-a target power of 0.90, the aggregate paired-equivalence margin of 0.05 that draft-v0.1 asserted is
-**not** supported at any discordance rate tested, and a 0.10 margin is supported only at discordance
-0.05 and 0.10. The drafting party is not permitted to resolve this by widening the margin to fit the
-sample size, so `OD6` remains blocking and the choice is put to the independent reviewer.
+**`OD5` and `OD6` were answerable, and draft-v0.3 answers them.** draft-v0.2 derived its proposed
+numbers in a committed model-free script, `analysis/design_statistics.py`, but the v0.2 independent
+methods review recorded that the resulting architecture was not usable: a per-profile alpha stated
+but implemented nowhere (`S3MR-003`), a false conservativeness assertion (`S3MR-004`), an
+insufficient discordance grid (`S3MR-005`), two I3 floors of which one was unreachable at any
+admissible sample size (`S3MR-006`), underpowered `I1a`/`I1b` at `n = 192` (`S3MR-008`) and a
+degenerate rejection region whose pass count equalled `n` (`S3MR-015`). draft-v0.3 replaces the
+whole architecture with an exact-binomial primary design in exact rational arithmetic, re-derives
+every planning target rather than transcribing it, and forbids any active rejection region whose
+pass count equals `n`. The script's committed test asserts by AST inspection that the
+reviewer-returned targets appear nowhere in the script as literal constants.
 
 ---
 
@@ -224,12 +251,24 @@ Tier 3  published literature .......... external; motivates risks
                                        |
                                        +--> strata K5/K6, gates I1a/I1b/I3, profile panel
                                        +--> paired-equivalence method (Tango 1998, Liu 2002)
-                                            => the executable I3 secondary criterion
+                                            => draft-v0.2: the executable I3 secondary criterion
+                                            => draft-v0.3: RETAINED AS BIBLIOGRAPHY,
+                                               NO_DECISION_ROLE
 
 Tier 4  prospective requirements ...... constrain a FUTURE authorized execution
 
-Tier 5  unresolved choices ............ independent methods review;
-                                       OD2, OD5, OD6 blocking
+Tier 5  unresolved choices ............ draft-v0.2: OD2, OD5, OD6 blocking
+                                       draft-v0.3: OD5 and OD6 resolved by operator
+                                       amendment, subject to review; OD2 still blocking
+
+Tier 6  draft-v0.1 operator review .... internal, about a document; licenses amendment only
+
+Tier 7  draft-v0.2 independent methods review
+                                       |
+                                       +--> external to the drafting party, internal to the
+                                            repository; 20 findings; licenses amendment only
+                                       +--> its recalculation is immutable historical evidence
+                                       +--> it does NOT license any claim, measurement or freeze
 ```
 
 Nothing in Tier 2 is permitted to move upward into Tier 1, and nothing in Tier 4 has been executed.
@@ -252,3 +291,53 @@ under any of the five above.
 
 What the review licenses is exactly one thing: amending the draft. It does not license any claim,
 any measurement, any freeze, or any relaxation of a blocking decision.
+
+---
+
+## Tier 7 - the draft-v0.2 independent methods review
+
+The independent methods review of draft-v0.2 is a **seventh** kind of input and must not be filed
+under any of the six above.
+
+- It is **not** a Tier 1 sealed fact: it is about a document, not about a measurement.
+- It is **not** a Tier 2 post-hoc observation: it carries full authority over the draft.
+- It is **not** a Tier 3 external risk: it was performed against this repository's own artifacts.
+- It is **not** a Tier 6 operator review: the operator review was performed by the party that holds
+  the authority, whereas this review was performed independently of the drafting party and returned
+  a disposition the drafting party did not choose.
+- It is **not** an empirical finding. Its 20 findings are defects in an unfrozen design document.
+  They are recorded in `reviews/v0_2_independent_methods_review.md` and its JSON and schema
+  companions, and deliberately **not** in `paper/evidence_ledger.csv` or
+  `paper/limitations_ledger.md`, which this repository reserves for executed measurement.
+
+The disposition was `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`: 6 BLOCKING, 11 MAJOR and
+3 MINOR findings, with 22 unresolved items and 22 answered checklist questions.
+
+One product of that review **is** evidence of a kind, and is treated as immutable: the reviewer's
+independent exact recalculation at `analysis/independent_methods_recalculation.py` and
+`analysis/independent_methods_recalculation_tables.json`. It is evidence about the *arithmetic of a
+proposed procedure*, not about any checkpoint, and draft-v0.3 neither edits, re-runs, re-derives nor
+supersedes it. It is preserved precisely because it is the record that draft-v0.2's conservativeness
+assertion was false.
+
+### What the draft-v0.3 amendment licenses, and what it does not
+
+The amendment licenses exactly one thing: amending the draft again and submitting it for a
+**second** independent methods review. It does not license any claim, any measurement, any freeze,
+any bank, any seed, any model operation, any interface selection, any positive-reference selection
+or any confirmation access.
+
+**The drafting party does not claim the amended design is correct.** Every repair in
+`reviews/v0_3_operator_amendment.md` is recorded as
+`PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`. draft-v0.2 was found defensible by
+the party that wrote it and was then rejected by an independent reviewer with 6 blocking findings;
+that is the specific failure mode the draft-v0.3 round is required to avoid repeating.
+
+### The one structural lesson Tier 7 adds
+
+Tier 1 taught that a null without a positive control is uninterpretable. Tier 7 teaches the
+document-level analogue: **a design that has only been checked by the party that wrote it is
+uninterpretable as evidence that the design is sound.** Independent review is to a protocol what
+Gate `I4` is to a measurement. That is why `OD7` was resolved in the affirmative, why a second
+review is the legal next action after this amendment, and why the amendment record is forbidden
+from self-approving.

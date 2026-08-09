@@ -1871,3 +1871,132 @@ load, run, prequalify or substitute a positive reference, does not freeze any
 threshold or sample size, does not adopt any operator decision, and produces no
 evidence row. Its outputs are an audit, a set of recommendations that are
 explicitly not adopted, and one disposition.
+
+
+## M-29 - Exact-rational binomial design for Study 3 draft-v0.3, retirement of the paired equivalence procedure from every decision role, and independent re-derivation of every planning target
+
+**Date.** 2026-08-08
+
+**Scope.** Study 3 design amendment only. No model, no tokenizer, no weights, no
+forward pass, no sequence scoring, no bank, no seed, no measurement, no gate
+evaluated on any model. Every number below is either a property of a published
+statistical procedure or a proposed design parameter. Nothing here is a
+scientific result and nothing here is frozen.
+
+### Why the previous methods entry could not simply be extended
+
+M-28 recorded the independent re-derivation that rejected draft-v0.2. Three of
+its six blocking findings were statistical rather than editorial: the `I3`
+estimand had no denominator, the per-profile level of Family B was asserted in
+prose and implemented nowhere, and the draft asserted that a paired
+aggregate-equivalence criterion was conservative when the reviewer's own
+enumeration showed it was not uniformly so. A methods entry that added rows to
+the existing derivation would have carried those defects forward. This entry
+therefore describes a different design, not a corrected table.
+
+### The primary design is exact-binomial with exact rational levels
+
+Every active gate component is a one-sided exact binomial test of
+`H0: p <= p0` against `H1: p > p0`, evaluated in each applicable atomic cell
+separately. The rejection region is the smallest pass count `x` whose upper tail
+`P(X >= x | n, p0)` does not exceed the component level. Levels are carried as
+exact rationals throughout. The study-level development screening level is
+`1/200`, each per-profile development component level is `1/600`, and each
+confirmation component level is `1/200`. The decimal renderings `0.005`,
+`0.00166...` and `0.005` appear in tables for readability and are explicitly
+declared to be renderings rather than the source of truth, so no rounding of a
+level can silently change a critical value.
+
+Components within a profile are combined as an intersection-union test in the
+sense of Berger and Hsu 1996 *Statistical Science* 11:283-319: the null is the
+union of the component nulls, the alternative is the intersection of the
+component alternatives, and rejecting every component at level `alpha` gives a
+test of the intersection-union null at level `alpha`. No further within-profile
+Bonferroni correction is applied, because applying one would be a second, silent
+correction of a family that is already controlled by construction. Across
+profiles the denominator is fixed at `K = 3` before any data exists and never
+shrinks, so an inactive or eliminated profile does not enlarge the level of the
+profiles that remain.
+
+### The `I3` estimand and its unit
+
+`I3` is evaluated over `base_item_contrast_clusters`. Each registered cluster
+contains exactly two variants that differ in exactly one registered factor. The
+seven `K5` clusters vary content position by `+1`, `+2` or `+3` modulo 4, vary
+the index of the correct displayed symbol by `+1`, `+2` or `+3` modulo 4, or
+replace the label alphabet. The two `K6` clusters vary the separator rendering
+or the instruction rendering. `K5` and `K6` are not crossed and use disjoint
+base-item identities, so the number of scored units is a sum over cells rather
+than a product over factors.
+
+Three indicators are defined on a cluster. `J_inv` scores one when the emitted
+answer is identical across the two variants. `J_cor` scores one when the answer
+is correct on both variants. `J_both` is their conjunction and is the primary
+gate indicator. A stable but wrong answer scores zero under `J_cor` and
+therefore under `J_both`, and a stable but invalid or unparseable answer scores
+zero under `J_inv` and therefore under `J_both`. Under a unique ground truth
+`J_cor` implies `J_inv`, so the truth table has eight enumerated cases rather
+than four, and the implication is registered as an integrity invariant that the
+scoring implementation must satisfy rather than as an independence assumption.
+
+### One floor, and no degenerate rejection region
+
+`I3` carries exactly one floor: `p0 = 9/10`, `p1 = 97/100`, target power at
+least `9/10`, and `n = 256` clusters per applicable contrast cell. The
+`p0 = 19/20` floor that draft-v0.2 also carried is deleted from every active
+field. Each active component is checked for degeneracy: a rejection region whose
+pass count equals `n` has power `p1^n` against the alternative and no power at
+all against any alternative below one, so it is not a hypothesis test. No active
+component in draft-v0.3 has that property.
+
+### Retirement of the paired equivalence procedure
+
+The paired aggregate-equivalence procedure is retired from every decision role:
+gate, eligibility, selection, confirmation, claim language, equivalence margin,
+critical value, discordance grid and conservativeness. The four-point
+discordance grid is removed from active verification because a fixed
+four-point grid cannot establish a claim about a procedure's size over its
+parameter space, and enlarging the grid would only make the same claim harder to
+falsify. Paired summaries survive as descriptive quantities only, with no null,
+no alpha, no p-value, no critical value, no equivalence margin, no pass or fail,
+no rescue path and no ranking weight attached to them.
+
+The reviewer's recalculation of the retired procedure is preserved unchanged as
+`studies/study3/analysis/independent_methods_recalculation.py` and
+`studies/study3/analysis/independent_methods_recalculation_tables.json`. It is
+immutable historical evidence of what the first review computed, and the second
+reviewer is asked to adjudicate whether retirement removes the size-control
+defect or merely relocates it.
+
+### Units
+
+Every `n` in the protocol, in the tables and in the packet carries a unit at its
+definition and at every use. The registered units are base items per atomic cell
+for `I1a`, `I1b` and `I2`, base-item contrast clusters per contrast cell for
+`I3`, and positive-reference base items per operation-family by depth cell per
+candidate profile for `I4`. A rendered row and a scored row are distinct
+quantities from a base item and from a contrast cluster, and the unit registry
+states that they are never interchanged.
+
+### Independent derivation of the planning targets
+
+The amendment authority supplied the development and confirmation targets as
+planning values. `studies/study3/analysis/design_statistics.py` derives every one
+of them from the exact rational levels and the registered floors using exact
+integer and `Fraction` arithmetic, and `--check` compares its own derivation
+against the committed table. The committed design test additionally parses the
+script's abstract syntax tree and fails if any planning constant appears as a
+literal in it, so a value that was transcribed rather than derived cannot pass.
+The derived targets are `x = 244` at `n = 256` for `I1a`, `I1b` and `I3` at
+development, `x = 243` at confirmation, `x = 82` at `n = 128` for `I2` at
+development and `x = 80` at confirmation, and `x = 224` at `n = 256` for `I4` at
+development and `x = 222` at confirmation, with attained power at or above the
+`9/10` target in every case.
+
+### Boundary
+
+Nothing in this entry was measured. No model was downloaded, no tokenizer was
+constructed, no weights were loaded, no forward pass or sequence scoring was
+run, no bank row was generated, no seed was drawn, no interface was selected and
+no positive reference was selected. The design is unfrozen and the repairs are
+proposed resolved subject to a second independent methods review.

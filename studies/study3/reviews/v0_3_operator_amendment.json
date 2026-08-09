@@ -1,0 +1,643 @@
+{
+  "schema_version": "study3-v0-3-operator-amendment-record-v1",
+  "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW",
+  "document_class": "operator_amendment_record",
+  "round": "study3_v0_3_operator_amendment",
+  "party": "drafting party (operator amendment)",
+  "authority": "studies/study3/prompts/study3_v0_3_design_amendment_authority.md",
+  "responds_to": {
+    "review": "studies/study3/reviews/v0_2_independent_methods_review.md",
+    "review_json": "studies/study3/reviews/v0_2_independent_methods_review.json",
+    "review_receipt": "studies/study3/methods_review_receipt_v0_2.json",
+    "reviewed_commit": "8a2c4a0b2a73c5d802988333f11ea6c22828f6f5",
+    "review_commit": "e4bcda3a487ea9c9a085e3943103a07501014431",
+    "disposition": "STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED",
+    "findings": {
+      "blocking": 6,
+      "major": 11,
+      "minor": 3,
+      "total": 20
+    },
+    "unresolved_items": 22
+  },
+  "self_approval_prohibition": {
+    "statement": "This record is written by the drafting party. It does not adjudicate its own repairs. Every repair below is recorded as PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW, which asserts that a repair was made and published, not that the repaired protocol is correct. The drafting party of draft-v0.2 found its own design defensible and an independent reviewer then rejected it with six blocking findings; that outcome is the reason this record may not adjudicate itself.",
+    "the_amendment_does_not_declare_the_protocol_correct": true,
+    "adjudication_belongs_to": "the second independent methods reviewer"
+  },
+  "immutable_objects_not_edited": [
+    "studies/study3/reviews/v0_2_independent_methods_review.md",
+    "studies/study3/reviews/v0_2_independent_methods_review.json",
+    "studies/study3/reviews/v0_2_independent_methods_review.schema.json",
+    "studies/study3/methods_review_receipt_v0_2.json",
+    "studies/study3/analysis/independent_methods_recalculation.py",
+    "studies/study3/analysis/independent_methods_recalculation_tables.json",
+    "studies/study3/prompts/study3_v0_2_independent_methods_review_authority.md",
+    "studies/study3/analysis/independent_methods_review_packet.md",
+    "studies/study3/design_receipt_v0_2.json",
+    "studies/study3/reviews/v0_1_operator_review.md",
+    "studies/study3/design_receipt.json"
+  ],
+  "closure_matrix": [
+    {
+      "finding_id": "S3MR-001",
+      "severity": "BLOCKING",
+      "title": "The I3 primary estimand is not identifiable from the published counterbalancing construction",
+      "reviewer_required_change": "Publish an explicit variants-per-base-item factor for every interface profile and reconcile the construction algorithm with the cluster rule, or restate I3 on a unit the published construction actually produces.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "I3 is restated on a unit the construction actually produces. The independent unit is the base-item contrast cluster, which holds exactly two variants: one baseline presentation and one registered content-equivalent transformed presentation of the same base item. The cross-product reading is deleted; there is no 32 x 3 factorial and no undefined variants-per-base-item factor, because the variants-per-cluster factor is fixed at 2 for every profile and every contrast cell.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (i3_contrast_registry, atomic_evaluation_cells.i3_sampling_unit)",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md",
+        "studies/study3/analysis/design_statistics.py"
+      ],
+      "verification": "tests/test_study3_design.py asserts the unit is base_item_contrast_cluster, that variants_per_cluster == 2 everywhere, and that rendered rows equal clusters x 2 in every I3 component."
+    },
+    {
+      "finding_id": "S3MR-002",
+      "severity": "BLOCKING",
+      "title": "The I3 primary indicator has two mutually exclusive definitions across the authoritative JSON, the companion Markdown and the review packet",
+      "reviewer_required_change": "Publish two indicators - invariance of the chosen content and correctness under every variant - and their explicit conjunction, then reconcile all three artifacts to the published definition and recompute every I3 threshold under it.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "Three indicators are published with disjoint definitions and one of them is named the gate: J_inv (both variants valid and byte-identical after the registered content mapping), J_cor (both variants scored correct against the unique registered ground truth), and J_both = J_inv AND J_cor, which is the primary gate indicator. A stable but wrong answer scores 0 and a stable invalid or unparseable output scores 0. The estimand is the same in the JSON, the Markdown and the v0.3 packet.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (proposed_statistics.i3_indicators)",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md",
+        "studies/study3/analysis/independent_methods_review_packet_v0_3.md",
+        "studies/study3/analysis/design_statistics.py"
+      ],
+      "verification": "An eight-case indicator truth table is derived by the committed script and asserted by tests/test_study3_design.py, including the stable-wrong and stable-invalid cases."
+    },
+    {
+      "finding_id": "S3MR-003",
+      "severity": "BLOCKING",
+      "title": "The Family B per-profile alpha is stated but implemented nowhere; the committed component rules deliver three times the stated study alpha",
+      "reviewer_required_change": "Either implement the per-profile alpha in every component rule and republish every affected threshold, power figure and sample size, or withdraw the 0.001666666667 claim and state the study-level guarantee that alpha 0.005 components actually deliver.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "The exact rational is now the policy and the decimal is a rendering of it. The study-level development screening level is 1/200; the per-profile development component level is 1/600 = (1/200) / 3; the confirmation component level is 1/200. Every component rule in the committed derivation uses the exact rational level it advertises, and the identity per_profile_alpha x 3 == study_alpha is asserted in exact rational arithmetic inside the derivation script rather than narrated.",
+      "where": [
+        "studies/study3/analysis/design_statistics.py",
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "verification": "The derivation script raises if the rational identity fails; tests/test_study3_design.py re-checks it independently with fractions.Fraction."
+    },
+    {
+      "finding_id": "S3MR-004",
+      "severity": "BLOCKING",
+      "title": "The authoritative JSON asserts a conservativeness property that the same draft's own disclosure contradicts",
+      "reviewer_required_change": "Withdraw the conservativeness assertion, restate the decision rule as asymptotic with an empirically maximised realised level, and record the maximised level rather than a grid maximum.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "The conservativeness assertion is WITHDRAWN, not repaired and not re-scoped. The paired aggregate-equivalence procedure is retired from every decision role, so no claim about its size is made anywhere in the active protocol. The reviewer's exceedance finding stands unchallenged and is preserved as immutable historical evidence.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (retired_procedures.tango_paired_equivalence)",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md",
+        "studies/study3/references/methods_sources.md"
+      ],
+      "verification": "tests/test_study3_design.py asserts that no gate, eligibility, selection or confirmation path references the retired procedure and that the withdrawal record is present."
+    },
+    {
+      "finding_id": "S3MR-005",
+      "severity": "BLOCKING",
+      "title": "The four-value discordance grid is a sensitivity check, and maximising over the feasible null boundary finds an undisclosed exceedance at a planned configuration",
+      "reviewer_required_change": "Replace the grid with a justified nuisance maximisation over the feasible null boundary, a critical value calibrated over the full registered domain, or a conservative-by-construction exact procedure such as the unconditional exact approach of Hsueh, Liu and Chen (2001); register the optimisation domain, tolerance, bracketing rule, convergence-failure behaviour and an independent validation.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "The four-value discordance grid is REMOVED and the procedure it supported is retired from every decision role. No nuisance maximisation is substituted, because no paired aggregate-equivalence decision remains to calibrate. What survives is a purely descriptive paired 2x2 summary with no null, no alpha, no p-value, no critical value, no equivalence margin, no pass or fail, no rescue path and no ranking weight.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (retired_procedures)",
+        "studies/study3/analysis/design_statistics.py"
+      ],
+      "verification": "The committed script no longer emits any paired critical value or equivalence margin; tests/test_study3_design.py asserts the descriptive summary carries none of the decision fields."
+    },
+    {
+      "finding_id": "S3MR-006",
+      "severity": "BLOCKING",
+      "title": "The I3 primary floor is left in two mutually exclusive versions, and the higher one is unreachable at every admissible sample size reviewed",
+      "reviewer_required_change": "Register one I3 primary floor and one substantively justified alternative, and demonstrate that the pair is separable at an admissible n at the implemented alpha; if it is not, revise the scientific claim rather than the alternative.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "Exactly one I3 floor is active: p0 = 0.90 (exact rational 9/10) against p1 = 0.97 (97/100) at power >= 0.90 with n = 256 base-item contrast clusters per contrast cell. p0 = 0.95 is deleted from every active protocol, table and packet field and is permitted only in clearly labelled historical narrative describing what draft-v0.2 did.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (proposed_statistics.i3_floor)",
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/analysis/independent_methods_review_packet_v0_3.md"
+      ],
+      "verification": "tests/test_study3_design.py asserts active_floor_count == 1, asserts the achieved power at the registered configuration exceeds the target, and asserts that no active numeric field carries 0.95."
+    },
+    {
+      "finding_id": "S3MR-007",
+      "severity": "MAJOR",
+      "title": "The packet's I3 primary table presents two different nulls under one stated hypothesis with no null column",
+      "reviewer_required_change": "Add an explicit null column, or split the table, and state the registered floor once.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "Every threshold table in the v0.3 packet, the protocol Markdown and the committed tables artifact carries an explicit null column naming p0, and there is only one registered I3 floor to name. No table mixes two nulls under one stated hypothesis.",
+      "where": [
+        "studies/study3/analysis/independent_methods_review_packet_v0_3.md",
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md"
+      ],
+      "verification": "tests/test_study3_design.py asserts every emitted binomial row carries a null_hypothesis field and that the set of distinct I3 nulls has size 1."
+    },
+    {
+      "finding_id": "S3MR-008",
+      "severity": "MAJOR",
+      "title": "I1a and I1b are underpowered at every proposed sample size against the draft's own lowest declared alternative",
+      "reviewer_required_change": "Raise n to the smallest admissible size meeting the reviewed target at the implemented alpha, or lower the target power explicitly and justify it; do not move p1.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "n = 192 is withdrawn from every active field. I1a and I1b are sized at n = 256 base items per atomic cell, which attains exact power 0.953040775 against p1 = 0.97 at the implemented development component level 1/600, above the 0.90 target. p1 was not moved and the target power was not lowered.",
+      "where": [
+        "studies/study3/analysis/design_statistics.py",
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "verification": "The derivation script raises if any active component fails to meet the target power; tests/test_study3_design.py holds the reviewer-returned targets as an independent expectation."
+    },
+    {
+      "finding_id": "S3MR-009",
+      "severity": "MAJOR",
+      "title": "The committed verification of the paired method is circular and the committed design test entrenches the insufficient grid",
+      "reviewer_required_change": "Replace the recorded-rows assertion with a maximisation over the registered nuisance domain, and replace the fixed-grid coverage test with a test of the registered maximisation contract. This change belongs to the amendment round, not to this review.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "The circular verification is deleted with the procedure it verified. design_statistics.py no longer contains verify_paired_method and no longer asserts a bound over rows it recorded itself. The fixed four-value grid test is removed from tests/test_study3_design.py and replaced by an independent expectation of the exact-binomial rules plus a verification of the pairwise construction (complete-block balance, bijective option and label mappings, disjoint base-item identities, no random draw).",
+      "where": [
+        "studies/study3/analysis/design_statistics.py",
+        "tests/test_study3_design.py"
+      ],
+      "verification": "tests/test_study3_design.py contains an AST test asserting that the derived pass counts and tails appear nowhere in the script as literals, so the script cannot pass by transcription."
+    },
+    {
+      "finding_id": "S3MR-010",
+      "severity": "MAJOR",
+      "title": "The K5 stratum retains draft-v0.1 generating-process text that the same file elsewhere forbids",
+      "reviewer_required_change": "Rewrite task_strata[5].data_generating_process to the orthogonal construction actually adopted.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "task_strata K5 data_generating_process is rewritten to the seven one-factor pairwise contrasts actually adopted: K5-P1/P2/P3 (content position offsets +1, +2, +3 mod 4), K5-S1/S2/S3 (correct displayed-symbol index offsets +1, +2, +3 mod 4) and K5-A1 (label alphabet replacement between two alphabets that are disjoint from each other and from the answer domain). The four-cyclic-permutation text and the 1/2/3/4 label-set replacement are gone; digits are forbidden as labels.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (task_strata, counterbalancing_design, i3_contrast_registry)"
+      ],
+      "verification": "tests/test_study3_design.py asserts the K5 contrast set is exactly the seven registered IDs, that no alphabet intersects the answer domain, and that the forbidden v0.1 text does not reappear."
+    },
+    {
+      "finding_id": "S3MR-011",
+      "severity": "MAJOR",
+      "title": "The K6 stratum retains draft-v0.1 generating-process text that contradicts the resolved answer-cue decision",
+      "reviewer_required_change": "Rewrite task_strata[6].data_generating_process to state that only the separator and the instruction sentence vary.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "task_strata K6 data_generating_process is rewritten to say that only the separator and the instruction sentence vary and that the answer cue is held byte-identical. K6 is registered as two disjoint pairwise contrast cells drawn from the three renderings: K6-SEP (R-base versus R-sep) and K6-INSTR (R-base versus R-instr). A three-way comparison is prohibited.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (task_strata, counterbalancing_design.k6_contrasts)"
+      ],
+      "verification": "tests/test_study3_design.py asserts exactly two K6 cells, two variants each, byte-identical answer cue, and disjoint base-item identities across cells."
+    },
+    {
+      "finding_id": "S3MR-012",
+      "severity": "MAJOR",
+      "title": "The S3 projected operation accounting contradicts itself by a factor of four",
+      "reviewer_required_change": "Decide whether S3 scores one sequence or four per item, correct the projection, and republish the totals.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "Under the registered single-token answer domain S3 adds exactly 0 additional forward passes and exactly 0 additional sequence-scoring rows beyond S2, because the length-normalised sequence score of a one-token candidate is a monotone function of that token's log-probability under the same prefix, so S3's ranking is analytically identical to S2's and is computed from the same distribution. The 9728 figure is withdrawn.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (operation_boundaries.projected_future_operations)",
+        "studies/study3/analysis/design_statistics.py"
+      ],
+      "verification": "The derivation script raises if S3's incremental forward passes or incremental sequence-scoring rows are anything other than zero."
+    },
+    {
+      "finding_id": "S3MR-013",
+      "severity": "MAJOR",
+      "title": "The projection is not decomposed into the work streams a feasibility review requires and its role multiplier is not reconcilable",
+      "reviewer_required_change": "Republish the projection decomposed by work stream, with base items, derived variants and scored rows separated, and with the role multiplier stated per gate.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "The projection is decomposed into six named work streams, each reporting its own units: deterministic_I0_fixtures, target_role_development, positive_reference_external_P3Q, RP_I4_under_candidate_profiles, selected_profile_one_shot_confirmation and S4_diagnostic_generation. Base items, contrast clusters, rendered rows, scored rows, forward passes and generated tokens are separate columns. A single undifferentiated total is prohibited, and the role multiplier is stated per gate rather than as one global factor.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/analysis/independent_methods_review_packet_v0_3.md"
+      ],
+      "verification": "tests/test_study3_design.py asserts all six streams are present, that no_single_undifferentiated_total is true, and that generations are reported separately from forward passes."
+    },
+    {
+      "finding_id": "S3MR-014",
+      "severity": "MAJOR",
+      "title": "The sample-size symbol n changes unit between artifacts and no artifact declares its unit",
+      "reviewer_required_change": "Declare the unit of every sample-size symbol at the point of definition and hold it constant across all artifacts.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "A unit registry is published with four distinct units - base_item, base_item_contrast_cluster, rendered_row and scored_row - and every symbol n carries its unit at its definition and in every table in every artifact. Rendered rows and scored rows are never called n. One n is never reused across base items, contrast clusters, rendered rows and scored rows.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (unit_registry)",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md",
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/analysis/independent_methods_review_packet_v0_3.md"
+      ],
+      "verification": "tests/test_study3_design.py asserts every gate record and every emitted binomial row carries a non-empty unit_of_n and that the unit strings partition by gate as registered."
+    },
+    {
+      "finding_id": "S3MR-015",
+      "severity": "MAJOR",
+      "title": "The I3 rejection region is degenerate at one proposed configuration",
+      "reviewer_required_change": "Exclude degenerate rejection regions explicitly, or raise n so that the rejection count is strictly below n at the registered floor and alpha.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "No active rejection region may have a required pass count equal to n. The prohibition is enforced by a raise inside the derivation script rather than asserted in prose, and the configuration that produced the degenerate region (n = 128 at p0 = 0.95) is removed from the active design along with p0 = 0.95 itself.",
+      "where": [
+        "studies/study3/analysis/design_statistics.py",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (proposed_statistics.i3_floor.no_degenerate_rejection_region)"
+      ],
+      "verification": "tests/test_study3_design.py asserts pass_count < n for every emitted development and confirmation component."
+    },
+    {
+      "finding_id": "S3MR-016",
+      "severity": "MAJOR",
+      "title": "S3's membership in the Family B multiplicity denominator is contingent on a post-data fact",
+      "reviewer_required_change": "Register S3's contribution to the Family B denominator before any data, and state it as a fixed number rather than as a condition.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "The selectable-profile denominator is FIXED at K = 3 before any data exists and never shrinks, under every outcome, including the outcome in which S3's multi-token activation condition is not met and S3 is skipped. It is registered as a number, not as a condition. A sixteen-row pre-registered development selection map enumerates every combination and carries the denominator 3 in every row.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (development_selection_and_confirmation_plan.stage_2_selection)",
+        "studies/study3/analysis/design_statistics_tables.json"
+      ],
+      "verification": "tests/test_study3_design.py asserts the denominator is the integer 3 in every row of the selection map and that no row reduces it."
+    },
+    {
+      "finding_id": "S3MR-017",
+      "severity": "MAJOR",
+      "title": "The confirmation gate I5 and the development profile-selection rule have no statistical specification anywhere",
+      "reviewer_required_change": "Publish the full I5 specification - null, alternative, n, alpha, rejection rule and multiplicity treatment - and the development selection rule including tie-breaking, both fixed before any data; state the development and confirmation error roles separately rather than applying one alpha statement to both.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "I5 is fully specified: covered constructs I0, I1a, I1b, I2, I3_J_both and I4; component-level exact rational 1/200; per-component nulls, alternatives, sample sizes with units and rejection counts derived by the committed script; intersection-union conjunction across components; no across-profile correction because exactly one profile is selected on development before confirmation is entered; one-shot; reselection and re-tuning prohibited. The development selection rule is published as an executable sixteen-row map with a fixed admissibility order and a deterministic tie-break, fixed before any data. Development and confirmation error roles are stated separately.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (gate_hierarchy I5, development_selection_and_confirmation_plan)",
+        "studies/study3/analysis/design_statistics.py",
+        "studies/study3/analysis/independent_methods_review_packet_v0_3.md"
+      ],
+      "verification": "tests/test_study3_design.py asserts I5 carries a component for every covered construct with a derived pass count, and that the selection map is total over its enumerated inputs."
+    },
+    {
+      "finding_id": "S3MR-018",
+      "severity": "MINOR",
+      "title": "Checkpoint role records carry gate labels that predate the I1a/I1b split",
+      "reviewer_required_change": "Update every role record to the post-split gate names and state applicability per profile.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "Every checkpoint-role record is updated to the post-split gate names. RC is recorded against Gates I1a and I1b, and every role record states applicability per profile. No record names a gate called I1.",
+      "where": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json (checkpoint_roles)",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md"
+      ],
+      "verification": "tests/test_study3_design.py asserts no checkpoint-role record contains the token 'Gate I1' followed by a non-alphanumeric character."
+    },
+    {
+      "finding_id": "S3MR-019",
+      "severity": "MINOR",
+      "title": "The Clopper-Pearson bounds and the label-uniformity bands use a two-sided tail convention under a one-sided field name",
+      "reviewer_required_change": "Rename the field and state the tail convention explicitly at the point of tabulation.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "Every interval and band now names the mass it actually consumes. The reported Clopper-Pearson quantity is a LOWER bound consuming HALF of a two-sided simultaneous mass, and the label-uniformity bands are stated as two-sided masses across the band. The field named simultaneous_alpha is renamed to two_sided_simultaneous_mass and the consumed tail is tabulated beside it.",
+      "where": [
+        "studies/study3/analysis/design_statistics.py",
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md"
+      ],
+      "verification": "tests/test_study3_design.py asserts the emitted rows carry both two_sided_simultaneous_mass and lower_tail_mass_consumed_by_this_bound and that the latter is exactly half the former."
+    },
+    {
+      "finding_id": "S3MR-020",
+      "severity": "MINOR",
+      "title": "The positive-reference dossier attributes its own obligation to the wrong prior defect",
+      "reviewer_required_change": "Correct both references to D-04.",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "repair": "Both back-references in the positive-reference dossier are corrected from D-07 to D-04. D-07 is the parser-v2 gate decision; D-04 is the decision that records the positive-reference circularity and the chance-level floor issue. The dossier also states explicitly that no candidate is selected.",
+      "where": [
+        "studies/study3/references/positive_reference_dossier.md"
+      ],
+      "verification": "tests/test_study3_design.py asserts the dossier contains no D-07 reference in the positive-reference obligation context and that it declares UNSELECTED."
+    }
+  ],
+  "unresolved_item_dispositions": [
+    {
+      "id": "UR-01",
+      "reviewer_state": "UNRESOLVED_BLOCKING",
+      "subject": "I3 primary estimand identifiability",
+      "finding_ids": [
+        "S3MR-001"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "publishing a variants-per-base-item factor per profile and reconciling the construction algorithm with the cluster rule, or restating I3 on a unit the construction produces",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "I3 is restated on the base-item contrast cluster, a unit the published construction produces, with exactly two variants per cluster. See S3MR-001."
+    },
+    {
+      "id": "UR-02",
+      "reviewer_state": "UNRESOLVED_BLOCKING",
+      "subject": "I3 primary indicator semantics across JSON, Markdown and packet",
+      "finding_ids": [
+        "S3MR-002"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "publishing J_inv, J_cor and their conjunction, and reconciling all three artifacts",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "Three indicators are published with a single named gate indicator, J_both, and all artifacts are reconciled to it. See S3MR-002."
+    },
+    {
+      "id": "UR-03",
+      "reviewer_state": "UNRESOLVED_BLOCKING",
+      "subject": "Family B per-profile alpha not implemented",
+      "finding_ids": [
+        "S3MR-003"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "recomputing every component rule at 0.001666666667 and republishing every affected threshold, power and sample size, or withdrawing the claim",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "The per-profile development component level 1/600 is implemented in every component rule as an exact rational. See S3MR-003."
+    },
+    {
+      "id": "UR-04",
+      "reviewer_state": "UNRESOLVED_BLOCKING",
+      "subject": "false conservativeness assertion in the authoritative JSON",
+      "finding_ids": [
+        "S3MR-004"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "withdrawing the assertion and recording the maximised realised level",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "The conservativeness assertion is withdrawn and the procedure is retired from every decision role. See S3MR-004."
+    },
+    {
+      "id": "UR-05",
+      "reviewer_state": "UNRESOLVED_BLOCKING",
+      "subject": "paired size control over the feasible nuisance domain",
+      "finding_ids": [
+        "S3MR-005"
+      ],
+      "owner": "operator via OD5",
+      "reviewer_resolution_requires": "adopting one of the four admissible remedies and registering the optimisation contract",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "The paired procedure is retired rather than recalibrated, so no size-control claim over the nuisance domain is made. The second reviewer is asked explicitly to adjudicate whether retirement fully removes the defect. See S3MR-005."
+    },
+    {
+      "id": "UR-06",
+      "reviewer_state": "UNRESOLVED_BLOCKING",
+      "subject": "I3 primary floor 0.90 versus 0.95 and its feasibility",
+      "finding_ids": [
+        "S3MR-006"
+      ],
+      "owner": "operator via OD6",
+      "reviewer_resolution_requires": "registering one floor and demonstrating separability at an admissible n, or revising the claim",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "One floor is registered: p0 = 0.90 against p1 = 0.97 at n = 256 contrast clusters per cell, separable at the implemented level with exact power 0.953040775. See S3MR-006."
+    },
+    {
+      "id": "UR-07",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "I5 confirmation specification",
+      "finding_ids": [
+        "S3MR-017"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "publishing null, alternative, n, alpha, rejection rule and multiplicity treatment",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "I5 is fully specified with per-component nulls, sizes, units, levels and rejection counts. See S3MR-017."
+    },
+    {
+      "id": "UR-08",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "development profile-selection rule",
+      "finding_ids": [
+        "S3MR-017"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "publishing the selection map including tie-breaking and the no-profile-passes branch, fixed before any data",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "The development selection rule is published as an executable sixteen-row pre-registered map with a fixed order and deterministic tie-break. See S3MR-017."
+    },
+    {
+      "id": "UR-09",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "Family B denominator membership of S3",
+      "finding_ids": [
+        "S3MR-016"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "fixing the denominator as a number before any data",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "The Family B denominator is fixed at 3 before data and never shrinks. See S3MR-016."
+    },
+    {
+      "id": "UR-10",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "unit of every sample-size symbol",
+      "finding_ids": [
+        "S3MR-014"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "declaring the unit at every point of definition, which is itself blocked until UR-01 fixes the atomic cell",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "A unit registry is published and every n carries its unit at definition and in every table. See S3MR-014."
+    },
+    {
+      "id": "UR-11",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "I1a and I1b power shortfall",
+      "finding_ids": [
+        "S3MR-008"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "raising n to 256 at the corrected alpha, or explicitly lowering and justifying the target power",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "n = 256 base items per atomic cell attains 0.953040775 power at the implemented level; n = 192 is withdrawn and p1 was not moved. See S3MR-008."
+    },
+    {
+      "id": "UR-12",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "circular committed verification and the entrenched four-value grid test",
+      "finding_ids": [
+        "S3MR-009"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "replacing the recorded-rows assertion and the fixed-grid coverage test in the amendment round; RECORDED here, not repaired, because tests/test_study3_design.py is part of the review object",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "The circular verification and the fixed-grid coverage test are both deleted with the procedure they supported, and replaced by an independent expectation plus an anti-transcription AST test. See S3MR-009."
+    },
+    {
+      "id": "UR-13",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "K5 and K6 stale generating-process text",
+      "finding_ids": [
+        "S3MR-010",
+        "S3MR-011"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "rewriting both data_generating_process fields to the resolved constructions",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "Both K5 and K6 data_generating_process fields are rewritten to the constructions actually adopted. See S3MR-010 and S3MR-011."
+    },
+    {
+      "id": "UR-14",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "S3 projection self-contradiction and the undecomposed projection",
+      "finding_ids": [
+        "S3MR-012",
+        "S3MR-013"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "deciding one or four S3 scorings per item and republishing the projection decomposed by work stream",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "S3's incremental cost is fixed at zero in the current domain and the projection is decomposed into six work streams with per-stream units. See S3MR-012 and S3MR-013."
+    },
+    {
+      "id": "UR-15",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "I4 multiplicity across operation families and depths",
+      "finding_ids": [
+        "S3MR-017"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "publishing either a per-family-per-depth level or a registered pooled evaluation",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "I4 is evaluated per operation family and per depth as separate atomic cells with pooling prohibited, and the components form an intersection-union conjunction within the profile at the registered component level, so no further within-profile correction is applied. See S3MR-017."
+    },
+    {
+      "id": "UR-16",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "residual pooling paths across label alphabets and position-symbol cells",
+      "finding_ids": [],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "naming both paths in the pooling prohibitions",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "The pooling prohibition is extended explicitly to pooling across label alphabets, across position and symbol contrast cells, across the three I3 indicators and across splits. Label-set replacement is itself a registered manipulation (K5-A1), so averaging over the alphabet would average over the manipulation."
+    },
+    {
+      "id": "UR-17",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "degenerate I3 rejection region at n 128, p0 0.95",
+      "finding_ids": [
+        "S3MR-015"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "excluding degenerate regions explicitly or raising n",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "No active rejection region may have a pass count equal to n; the prohibition is enforced by a raise in the derivation script and the degenerate configuration is removed from the active design. See S3MR-015."
+    },
+    {
+      "id": "UR-18",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "paired margin practical-irrelevance justification",
+      "finding_ids": [
+        "S3MR-005"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "stating the largest presentation effect considered practically irrelevant, before any data",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "No equivalence margin survives, because the paired aggregate-equivalence decision is retired; there is therefore no margin to justify as practically irrelevant. See S3MR-005."
+    },
+    {
+      "id": "UR-19",
+      "reviewer_state": "UNRESOLVED_MINOR",
+      "subject": "Clopper-Pearson and uniformity tail-convention naming",
+      "finding_ids": [
+        "S3MR-019"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "renaming the field and stating the convention; no number changes",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "Both the Clopper-Pearson bounds and the uniformity bands now name the tail convention at the point of tabulation. See S3MR-019."
+    },
+    {
+      "id": "UR-20",
+      "reviewer_state": "UNRESOLVED_MINOR",
+      "subject": "positive-reference dossier D-07 versus D-04 attribution",
+      "finding_ids": [
+        "S3MR-020"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "correcting both references to D-04",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "Both dossier back-references are corrected to D-04. See S3MR-020."
+    },
+    {
+      "id": "UR-21",
+      "reviewer_state": "UNRESOLVED_MINOR",
+      "subject": "stale Gate I1 labels in checkpoint role records",
+      "finding_ids": [
+        "S3MR-018"
+      ],
+      "owner": "drafting party",
+      "reviewer_resolution_requires": "updating every role record to the post-split names with per-profile applicability",
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+      "note": "Every checkpoint-role record uses the post-split gate names with per-profile applicability. See S3MR-018."
+    },
+    {
+      "id": "UR-22",
+      "reviewer_state": "UNRESOLVED_REQUIRED_CHANGE",
+      "subject": "external-qualification-interface requirement for the positive reference",
+      "finding_ids": [],
+      "owner": "operator via OD2",
+      "reviewer_resolution_requires": "requiring the qualification interface to be external to the candidate panel, not merely the bank to be isolated",
+      "disposition": "UNRESOLVED_BLOCKING_OPERATOR_DECISION",
+      "note": "The external canonical qualification interface for the positive reference cannot be registered without deciding which checkpoint the positive reference is, and that decision is OD2. OD2 is not resolved in draft-v0.3 and no candidate is selected, preferred, pinned, revision-resolved, downloaded, tokenized, loaded or prequalified. The requirement itself is restated in the protocol - the reference must be prequalified through a separate canonical interface that is not S1, S2, S3 or S4, on items disjoint from those used for I4 - but the interface cannot be registered in this round. This item is NOT relabelled resolved."
+    }
+  ],
+  "operator_decisions_in_this_round": [
+    {
+      "id": "OD2",
+      "status": "unresolved",
+      "blocking": true,
+      "note": "No positive reference is selected. Every unresolved item that depends on OD2 remains UNRESOLVED_BLOCKING_OPERATOR_DECISION and is not relabelled resolved."
+    },
+    {
+      "id": "OD5",
+      "status": "resolved_subject_to_independent_review",
+      "blocking": false,
+      "note": "Exact-binomial primary design; study-level development screening level 1/200; per-profile development component level 1/600; intersection-union within profile; fixed selectable-profile denominator 3."
+    },
+    {
+      "id": "OD6",
+      "status": "resolved_subject_to_independent_review",
+      "blocking": false,
+      "note": "One I3 floor: p0 = 0.90, p1 = 0.97, power >= 0.90, n = 256 base-item contrast clusters per applicable contrast cell. p0 = 0.95 deleted from every active field."
+    }
+  ],
+  "questions_for_the_second_reviewer": [
+    "Does retiring the paired aggregate-equivalence procedure from every decision role fully remove the size-control defect recorded in S3MR-004 and S3MR-005, or does a residual decision path remain anywhere in the amended protocol?",
+    "Is the base-item contrast cluster with exactly two variants an identifiable unit for the I3 estimand under every registered contrast cell, and does the J_both conjunction estimate what the protocol says it estimates?",
+    "Is the intersection-union treatment within a profile, combined with a fixed denominator of 3 across profiles and a one-shot confirmation at 1/200 on a physically disjoint split, an adequate multiplicity architecture for the claim the protocol permits?",
+    "Does the six-stream operation projection make the feasibility question answerable, and is the zero-incremental-cost argument for S3 under a single-token answer domain correct as stated?",
+    "Are any of the twenty repairs above cosmetic relabelling rather than substantive design change?"
+  ],
+  "operation_counters": {
+    "ablation_operations": 0,
+    "activation_extractions": 0,
+    "bank_rows_generated": 0,
+    "confirmation_split_accesses": 0,
+    "evidence_rows_created": 0,
+    "forward_passes": 0,
+    "generations": 0,
+    "gpu_jobs": 0,
+    "interfaces_selected": 0,
+    "lens_operations": 0,
+    "model_downloads": 0,
+    "model_weight_loads": 0,
+    "patching_operations": 0,
+    "phase_1_0d_operations": 0,
+    "positive_references_selected": 0,
+    "probe_operations": 0,
+    "provider_calls": 0,
+    "rq2_s4_operations": 0,
+    "seeds_drawn": 0,
+    "study1_files_modified": 0,
+    "study2_files_modified": 0,
+    "tokenizer_constructions": 0
+  },
+  "authority_flags": {
+    "frozen": false,
+    "execution_authorized": false,
+    "bank_authorized": false,
+    "seed_authorized": false,
+    "model_operations_authorized": false,
+    "winner_selected": false,
+    "positive_reference_selected": false,
+    "confirmation_access_authorized": false
+  },
+  "next_legal_action": "second bounded independent methods review of the amended statistical, contrast, selection and confirmation packet at studies/study3/analysis/independent_methods_review_packet_v0_3.md",
+  "results": [],
+  "evidence_rows": [],
+  "bank_rows": [],
+  "seeds": []
+}

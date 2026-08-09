@@ -1,0 +1,1000 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/studies/study3/reviews/v0_3_operator_amendment.schema.json",
+  "title": "Study 3 draft-v0.3 operator amendment record",
+  "description": "Structural contract for the draft-v0.3 operator amendment record. The schema rejects a record that omits any of the twenty findings or any of the twenty-two unresolved items, that carries a non-zero operation counter, that sets any authority flag true, that carries results, evidence rows, bank rows or seeds, that relabels an OD2-dependent item resolved, or that declares the amended protocol correct rather than proposed resolved subject to a second independent methods review.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "state",
+    "document_class",
+    "round",
+    "party",
+    "authority",
+    "responds_to",
+    "self_approval_prohibition",
+    "immutable_objects_not_edited",
+    "closure_matrix",
+    "unresolved_item_dispositions",
+    "operator_decisions_in_this_round",
+    "questions_for_the_second_reviewer",
+    "operation_counters",
+    "authority_flags",
+    "next_legal_action",
+    "results",
+    "evidence_rows",
+    "bank_rows",
+    "seeds"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study3-v0-3-operator-amendment-record-v1"
+    },
+    "state": {
+      "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW"
+    },
+    "document_class": {
+      "const": "operator_amendment_record"
+    },
+    "round": {
+      "const": "study3_v0_3_operator_amendment"
+    },
+    "party": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority": {
+      "const": "studies/study3/prompts/study3_v0_3_design_amendment_authority.md"
+    },
+    "responds_to": {
+      "type": "object",
+      "required": [
+        "review",
+        "review_json",
+        "review_receipt",
+        "reviewed_commit",
+        "review_commit",
+        "disposition",
+        "findings",
+        "unresolved_items"
+      ],
+      "properties": {
+        "reviewed_commit": {
+          "const": "8a2c4a0b2a73c5d802988333f11ea6c22828f6f5"
+        },
+        "review_commit": {
+          "const": "e4bcda3a487ea9c9a085e3943103a07501014431"
+        },
+        "disposition": {
+          "const": "STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED"
+        },
+        "unresolved_items": {
+          "const": 22
+        },
+        "findings": {
+          "type": "object",
+          "required": [
+            "blocking",
+            "major",
+            "minor",
+            "total"
+          ],
+          "properties": {
+            "blocking": {
+              "const": 6
+            },
+            "major": {
+              "const": 11
+            },
+            "minor": {
+              "const": 3
+            },
+            "total": {
+              "const": 20
+            }
+          }
+        }
+      }
+    },
+    "self_approval_prohibition": {
+      "type": "object",
+      "required": [
+        "statement",
+        "the_amendment_does_not_declare_the_protocol_correct",
+        "adjudication_belongs_to"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "the_amendment_does_not_declare_the_protocol_correct": {
+          "const": true
+        },
+        "adjudication_belongs_to": {
+          "const": "the second independent methods reviewer"
+        }
+      }
+    },
+    "immutable_objects_not_edited": {
+      "type": "array",
+      "minItems": 11
+    },
+    "closure_matrix": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "required": [
+          "finding_id",
+          "severity",
+          "title",
+          "reviewer_required_change",
+          "disposition",
+          "repair",
+          "where",
+          "verification"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "finding_id": {
+            "pattern": "^S3MR-0(0[1-9]|1[0-9]|20)$"
+          },
+          "severity": {
+            "enum": [
+              "BLOCKING",
+              "MAJOR",
+              "MINOR"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reviewer_required_change": {
+            "type": "string",
+            "minLength": 1
+          },
+          "disposition": {
+            "enum": [
+              "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+              "UNRESOLVED_BLOCKING_OPERATOR_DECISION"
+            ]
+          },
+          "repair": {
+            "type": "string",
+            "minLength": 1
+          },
+          "where": {
+            "type": "array",
+            "minItems": 1
+          },
+          "verification": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-001"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-002"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-003"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-004"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-005"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-006"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-007"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-008"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-009"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-010"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-011"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-012"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-013"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-014"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-015"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-016"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-017"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-018"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-019"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "finding_id"
+            ],
+            "properties": {
+              "finding_id": {
+                "const": "S3MR-020"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "unresolved_item_dispositions": {
+      "type": "array",
+      "minItems": 22,
+      "maxItems": 22,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "reviewer_state",
+          "subject",
+          "finding_ids",
+          "owner",
+          "reviewer_resolution_requires",
+          "disposition",
+          "note"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "pattern": "^UR-(0[1-9]|1[0-9]|2[0-2])$"
+          },
+          "reviewer_state": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subject": {
+            "type": "string",
+            "minLength": 1
+          },
+          "finding_ids": {
+            "type": "array"
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reviewer_resolution_requires": {
+            "type": "string",
+            "minLength": 1
+          },
+          "disposition": {
+            "enum": [
+              "PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+              "UNRESOLVED_BLOCKING_OPERATOR_DECISION"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-01"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-02"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-03"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-04"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-05"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-06"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-07"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-08"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-09"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-10"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-11"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-12"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-13"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-14"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-15"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-16"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-17"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-18"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-19"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-20"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-21"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-22"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id",
+              "disposition"
+            ],
+            "properties": {
+              "id": {
+                "const": "UR-22"
+              },
+              "disposition": {
+                "const": "UNRESOLVED_BLOCKING_OPERATOR_DECISION"
+              }
+            }
+          },
+          "description": "UR-22 depends on OD2 and must remain UNRESOLVED_BLOCKING_OPERATOR_DECISION."
+        }
+      ]
+    },
+    "operator_decisions_in_this_round": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "blocking",
+          "note"
+        ]
+      },
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id",
+              "status",
+              "blocking"
+            ],
+            "properties": {
+              "id": {
+                "const": "OD2"
+              },
+              "status": {
+                "const": "unresolved"
+              },
+              "blocking": {
+                "const": true
+              }
+            }
+          },
+          "description": "OD2 must remain unresolved and blocking."
+        }
+      ]
+    },
+    "questions_for_the_second_reviewer": {
+      "type": "array",
+      "minItems": 5
+    },
+    "operation_counters": {
+      "type": "object",
+      "required": [
+        "ablation_operations",
+        "activation_extractions",
+        "bank_rows_generated",
+        "confirmation_split_accesses",
+        "evidence_rows_created",
+        "forward_passes",
+        "generations",
+        "gpu_jobs",
+        "interfaces_selected",
+        "lens_operations",
+        "model_downloads",
+        "model_weight_loads",
+        "patching_operations",
+        "phase_1_0d_operations",
+        "positive_references_selected",
+        "probe_operations",
+        "provider_calls",
+        "rq2_s4_operations",
+        "seeds_drawn",
+        "study1_files_modified",
+        "study2_files_modified",
+        "tokenizer_constructions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ablation_operations": {
+          "const": 0
+        },
+        "activation_extractions": {
+          "const": 0
+        },
+        "bank_rows_generated": {
+          "const": 0
+        },
+        "confirmation_split_accesses": {
+          "const": 0
+        },
+        "evidence_rows_created": {
+          "const": 0
+        },
+        "forward_passes": {
+          "const": 0
+        },
+        "generations": {
+          "const": 0
+        },
+        "gpu_jobs": {
+          "const": 0
+        },
+        "interfaces_selected": {
+          "const": 0
+        },
+        "lens_operations": {
+          "const": 0
+        },
+        "model_downloads": {
+          "const": 0
+        },
+        "model_weight_loads": {
+          "const": 0
+        },
+        "patching_operations": {
+          "const": 0
+        },
+        "phase_1_0d_operations": {
+          "const": 0
+        },
+        "positive_references_selected": {
+          "const": 0
+        },
+        "probe_operations": {
+          "const": 0
+        },
+        "provider_calls": {
+          "const": 0
+        },
+        "rq2_s4_operations": {
+          "const": 0
+        },
+        "seeds_drawn": {
+          "const": 0
+        },
+        "study1_files_modified": {
+          "const": 0
+        },
+        "study2_files_modified": {
+          "const": 0
+        },
+        "tokenizer_constructions": {
+          "const": 0
+        }
+      }
+    },
+    "authority_flags": {
+      "type": "object",
+      "required": [
+        "bank_authorized",
+        "confirmation_access_authorized",
+        "execution_authorized",
+        "frozen",
+        "model_operations_authorized",
+        "positive_reference_selected",
+        "seed_authorized",
+        "winner_selected"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "frozen": {
+          "const": false
+        },
+        "execution_authorized": {
+          "const": false
+        },
+        "bank_authorized": {
+          "const": false
+        },
+        "seed_authorized": {
+          "const": false
+        },
+        "model_operations_authorized": {
+          "const": false
+        },
+        "winner_selected": {
+          "const": false
+        },
+        "positive_reference_selected": {
+          "const": false
+        },
+        "confirmation_access_authorized": {
+          "const": false
+        }
+      }
+    },
+    "next_legal_action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "results": {
+      "type": "array",
+      "maxItems": 0
+    },
+    "evidence_rows": {
+      "type": "array",
+      "maxItems": 0
+    },
+    "bank_rows": {
+      "type": "array",
+      "maxItems": 0
+    },
+    "seeds": {
+      "type": "array",
+      "maxItems": 0
+    }
+  }
+}

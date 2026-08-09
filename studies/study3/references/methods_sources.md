@@ -10,6 +10,19 @@ secondary summary. Nothing here is a blog post, a leaderboard, or a survey resta
 evidence about this repository's checkpoints, and none of them is used to predict what Study 3
 would find. They constrain the design; they do not anticipate the result.
 
+**draft-v0.3 amendment note.** The v0.2 independent methods review returned
+`STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`. Findings `S3MR-004` and
+`S3MR-005` recorded that draft-v0.2 asserted the paired aggregate-equivalence
+procedure was conservative and had verified size, while the reviewer's independent
+exact recalculation found its realised one-sided type-I error exceeded its nominal
+level. The operator amendment retires that procedure from **every** decision role.
+Sources `S-07` and `S-08` are therefore **retained as bibliography and demoted to
+`NO_DECISION_ROLE`**: they are no longer the named executable method behind any
+gate, eligibility rule, selection rule, confirmation rule, equivalence margin,
+critical value or claim. Their entries below are amended in place to say so. No
+source is deleted, because deleting the citation behind a withdrawn assertion would
+make the withdrawal harder to audit, not easier.
+
 **Citation correction.** The design authority named the fourth source below as "Lyu et al.". The
 publisher record gives the authors as Wenjie Zhou, Qiang Wang, Mingzhou Xu, Ming Chen and
 Xiangyu Duan. The verified attribution is used here. The paper identity, venue and URL named in
@@ -200,13 +213,21 @@ perform well here. In this repository MCSB is an open question, not a background
 
 ---
 
-## Statistical-methods sources added in draft-v0.2
+## Statistical-methods sources added in draft-v0.2, demoted in draft-v0.3
+
+**Status of this whole section: `RETAINED_AS_BIBLIOGRAPHY_NO_DECISION_ROLE`.**
 
 The draft-v0.1 review found that the paired equivalence criterion was named
 without an executable definition or any verified type-I/power behaviour. The two
 sources below are the primary methods literature for that criterion. They were
 retrieved from their publisher records; the bibliographic fields were read from
 those records rather than from a secondary summary.
+
+draft-v0.3 removes the criterion itself from decision authority. These two entries
+survive as an honest record of what draft-v0.2 relied on and of what was withdrawn.
+Neither source supplies a gate, an eligibility rule, a selection rule, a
+confirmation rule, an equivalence margin, a critical value, a discordance grid, a
+conservativeness statement, a rescue path or a ranking weight in draft-v0.3.
 
 ### S-07 - Score-based equivalence for paired proportions
 
@@ -226,18 +247,26 @@ defined when an off-diagonal cell is zero. The reported Monte Carlo work finds
 empirical type-I error closer to nominal, and better interval coverage, than four
 previously published alternatives.
 
-**How Study 3 uses it.** This is the named executable method behind the I3
-secondary aggregate-equivalence criterion. It is implemented in
-`studies/study3/analysis/design_statistics.py`, and its reduction to McNemar at a
-zero-difference null is used there as a closed-form correctness proof rather than
-a numerical opinion. The committed script fails closed if that reduction, the
-restricted MLE, or the normal-quantile routine does not reproduce.
+**How draft-v0.2 used it, and why that use is withdrawn.** draft-v0.2 made this
+the named executable method behind an I3 secondary aggregate-equivalence criterion.
+The v0.2 independent methods review recalculated the procedure's exact size by
+enumerating the trinomial sampling distribution and recorded, as findings
+`S3MR-004` and `S3MR-005`, that the realised one-sided type-I error exceeded the
+nominal one-sided level at tested configurations, that draft-v0.2's conservativeness
+assertion was therefore false, and that a four-value discordance grid was not a
+sufficient basis to generalise a size claim. The reviewer's recalculation is
+preserved unedited at
+`studies/study3/analysis/independent_methods_recalculation.py` and
+`studies/study3/analysis/independent_methods_recalculation_tables.json`.
 
-**Limitation of application.** The procedure is asymptotic. Exact enumeration of
-the trinomial sampling distribution shows one configuration in the committed
-sensitivity grid whose realised one-sided level is 0.025501 against a nominal
-0.025. That exceedance is disclosed in the methods-review packet and is an
-unresolved item for the independent reviewer; it is not absorbed.
+**How draft-v0.3 uses it: `NO_DECISION_ROLE`.** The operator amendment retires the
+paired aggregate-equivalence procedure entirely rather than recalibrating it,
+because the primary I3 construct is an item-level conjunction that does not need
+it. This source now supports only purely descriptive paired 2x2 summaries carrying
+no null, no alpha, no p-value, no critical value, no equivalence margin, no pass or
+fail, no rescue path and no ranking weight. The second independent methods review
+is explicitly asked to adjudicate whether that retirement fully removes the
+size-control defect.
 
 ### S-08 - Equivalence and non-inferiority tests for paired binary data
 
@@ -254,16 +283,19 @@ the boundary of a zero difference without a continuity correction. The paper
 reports that a symmetric equivalence limit of 0.15 needs a minimum sample size of
 about 120 pairs.
 
-**How Study 3 uses it.** It corroborates the choice of a restricted-MLE score
-form over a Wald form, and it independently frames the sample-size question that
-Study 3's own exact enumeration answers for this design's margins. The published
-minimum sample size is *not* imported as a Study 3 threshold; every number in the
-Study 3 tables is recomputed from first principles by the committed script.
+**How draft-v0.2 used it, and why that use is withdrawn.** draft-v0.2 cited it to
+corroborate a restricted-MLE score form over a Wald form for the retired paired
+criterion. With the criterion retired from every decision role, that corroboration
+no longer supports any Study 3 decision.
 
-**Limitation of application.** The published sample sizes assume the equivalence
-limits and discordance rates of that paper's examples. They are not transferable
-to this design, which is precisely why the committed script enumerates the
-sensitivity grid rather than citing a number.
+**How draft-v0.3 uses it: `NO_DECISION_ROLE`.** Retained as bibliography. Its
+published sample sizes were never imported as Study 3 thresholds and are not
+imported now. Every number in the draft-v0.3 tables is derived from first
+principles in exact rational arithmetic by
+`studies/study3/analysis/design_statistics.py`, whose committed test additionally
+asserts by AST inspection that the reviewer-returned planning targets do not appear
+in the script as literal constants, so a script that reproduced them by
+transcription would fail.
 
 ---
 
@@ -271,8 +303,11 @@ sensitivity grid rather than citing a number.
 
 These entries record the primary material behind the positive-reference dossier
 at `studies/study3/references/positive_reference_dossier.md`. **No model is
-selected, pinned, downloaded, tokenized or loaded by recording them.** OD2 remains
-blocking.
+selected, preferred, pinned, revision-resolved, downloaded, tokenized, loaded or
+prequalified by recording them.** Every candidate is `UNSELECTED`. OD2 remains
+`UNRESOLVED_BLOCKING_OPERATOR_DECISION` at the end of the draft-v0.3 amendment
+round, and unresolved item `UR-22` remains
+`UNRESOLVED_BLOCKING_OPERATOR_DECISION` with it.
 
 ### S-09 - Qwen3-4B-Instruct-2507 model card
 

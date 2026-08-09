@@ -3266,3 +3266,136 @@ counters remain zero. No Study 1 or Study 2 path was touched, `paper/evidence_le
 is unchanged at `EV-0016`, and both protected Phase 1.0D rollups are unchanged.
 The review is recorded additively: no protocol, packet, drafting statistic,
 dossier, prior review, receipt, or prior authority was modified.
+
+
+## D41 - Amend Study 3 to draft-v0.3 in response to the independent methods review, and publish it for a second independent methods review rather than declaring it correct
+
+**Date.** 2026-08-08
+
+**Context.** D40 rejected draft-v0.2 with six confirmed blocking findings and
+required an operator amendment round. The drafting party that wrote draft-v0.2
+had found its own design defensible; an independent reviewer then found six
+defects that no supplied value could close. That is the fact this round is built
+around. An amendment written by the party that must be amended is not evidence
+that the amendment is correct, so the endpoint of this round is deliberately not
+"the protocol is now sound". It is "the protocol has been repaired as the
+authority directs, and the repairs are proposed resolved subject to a second
+independent methods review".
+
+**Decision.** Adopt the operator decisions below, rewrite the affected design,
+and publish the result as an unfrozen draft-v0.3 whose only legal next action is
+a second independent methods review by a party that did not write it.
+
+1. **The `I3` estimand is redefined as a pre-registered pairwise contrast over
+   base-item contrast clusters.** The independent unit is the
+   `base_item_contrast_cluster` and every registered cluster carries exactly two
+   variants. This is the direct repair of S3MR-001: draft-v0.2 defined `I3` over
+   "the set of variants of a base item" while its construction algorithm
+   assigned exactly one `(position, symbol)` pair per base item, so the
+   denominator of the primary indicator did not exist in the document. It is
+   also the repair of the multiplication defect: there is no cross product, `K5`
+   and `K6` are not crossed, they draw on disjoint base-item identities, and no
+   32 x 3 or 96-variant factorial expansion survives anywhere in the active
+   protocol.
+
+2. **`K5` is exactly seven one-factor contrasts and `K6` is exactly two.**
+   `K5-P1`, `K5-P2` and `K5-P3` offset the content position by `+1`, `+2` and
+   `+3` modulo 4. `K5-S1`, `K5-S2` and `K5-S3` offset the index of the correct
+   displayed symbol by `+1`, `+2` and `+3` modulo 4. `K5-A1` replaces the label
+   alphabet with a second alphabet. Both alphabets are disjoint from each other
+   and from the answer domain, and digits are forbidden as labels so that a
+   label can never be read as an answer. `K6` is `K6-SEP` and `K6-INSTR`, two
+   disjoint pairwise cells drawn from the three renderings `R-base`, `R-sep` and
+   `R-instr`, with the answer cue and every other byte held fixed. `K5` is
+   `not_applicable` to `S2` and `S3` rather than trivially passing on them,
+   because a profile that displays no options and no labels cannot be given a
+   position or a label contrast at all. Balancing is deterministic over complete
+   blocks with bijective option and label maps. No random draw occurs anywhere
+   in this design round. This closes S3MR-010 and S3MR-011, which found that the
+   committed `K5` and `K6` text was still the stale draft-v0.1 text.
+
+3. **`I3` carries three named indicators and the primary gate is the
+   conjunction.** `J_inv` is invariance of the emitted answer across the two
+   variants of a cluster, `J_cor` is correctness on both variants, and
+   `J_both = J_inv AND J_cor` is the primary gate indicator. A stable but wrong
+   answer scores zero. A stable but invalid or unparseable answer scores zero.
+   draft-v0.2 carried two mutually exclusive `I3` indicators and never said
+   which one the gate used, which is S3MR-002 and S3MR-007. Under a unique
+   ground truth `J_cor` implies `J_inv`; that is recorded as an expected
+   integrity invariant of the scoring code rather than concealed behind a claim
+   that the two indicators are independent.
+
+4. **`OD5` is resolved as an exact-binomial primary design with exact rational
+   levels.** Study-level development screening uses `1/200`, each per-profile
+   development component uses `1/600`, and the components within a profile are
+   combined as an intersection-union conjunction, so no further within-profile
+   Bonferroni correction is applied or implied. The selectable-profile
+   denominator is fixed at `K = 3` before any data exists and never shrinks,
+   which is the repair of S3MR-016: draft-v0.2 made the Family B denominator
+   contingent on a post-data fact. Decimal fields are renderings of the exact
+   rational policy and are never the source of truth, which is the repair of
+   S3MR-003.
+
+5. **The paired aggregate-equivalence procedure is retired from every decision
+   role.** It carries no gate, no eligibility role, no selection role, no
+   confirmation role, no claim language, no equivalence margin, no critical
+   value, no discordance grid and no conservativeness role. The four-point
+   discordance grid is removed from active verification. Paired summaries
+   survive only as descriptive quantities with no null, no alpha, no p-value, no
+   pass or fail, no rescue path and no ranking weight. This is the response to
+   S3MR-004, S3MR-005 and S3MR-009. The reviewer's own recalculation of the
+   procedure is preserved unchanged as immutable historical evidence, and the
+   second reviewer is asked explicitly to adjudicate whether retirement fully
+   removes the size-control defect rather than merely moving it.
+
+6. **`OD6` is resolved as one `I3` floor only.** `p0 = 0.90`, `p1 = 0.97`, power
+   at least `0.90`, and `n = 256` clusters per applicable contrast cell. The
+   second floor `p0 = 0.95` is deleted from every active protocol field, table
+   and packet field and is permitted only inside clearly labelled historical
+   narrative. This closes S3MR-006. No active rejection region has a pass count
+   equal to `n`, because a region that requires every trial to succeed has no
+   power against any alternative below one and is not a hypothesis test; that is
+   S3MR-015.
+
+7. **Every symbol `n` carries a unit at its definition and in every table.** One
+   `n` is never reused across base items, contrast clusters, rendered rows and
+   scored rows. This closes S3MR-014 and is enforced by a committed test rather
+   than by prose.
+
+8. **`OD2` remains unresolved and blocking.** No positive-reference checkpoint
+   is selected, preferred, pinned, ranked, downloaded, tokenized, loaded or
+   prequalified. The dossier retains its candidates and states `UNSELECTED`
+   explicitly, and its two back-references to `D-07` are corrected to `D-04`,
+   which is S3MR-020.
+
+9. **The Study 3 operation projection is decomposed.** Under the current
+   single-token answer domain, Study 3 adds exactly zero forward passes and zero
+   sequence-scoring rows beyond Study 2, and the projection is stated as six
+   named work streams each carrying its own unit. A single undifferentiated
+   total is prohibited. This closes S3MR-012 and S3MR-013.
+
+**What this decision explicitly does not do.** It does not freeze the protocol,
+does not authorise execution, does not authorise a bank, does not draw a seed,
+does not authorise any model operation, does not select an interface, does not
+select a positive reference and does not authorise confirmation access. It does
+not declare the repairs correct. Each repair is recorded as
+`proposed_resolved_subject_to_independent_review`, and `OD2` is recorded as
+`UNRESOLVED_BLOCKING_OPERATOR_DECISION` rather than quietly relabelled.
+
+**Consequences.** The amendment record closes all twenty findings `S3MR-001`
+through `S3MR-020` and all twenty-two packet checklist items `UR-01` through
+`UR-22` exactly once each with a real disposition. A second independent methods
+review packet is published as
+`studies/study3/analysis/independent_methods_review_packet_v0_3.md`. The
+draft-v0.2 review outputs, its receipt, its recalculation, its authority copy and
+the exact packet the first reviewer reviewed are immutable and are unchanged.
+The only legal next action is a second independent methods review by a party that
+did not write draft-v0.3.
+
+**Alternatives rejected.** Closing the blocking findings by supplying the missing
+values was rejected because D40 established that no supplied value closes them.
+Keeping the paired procedure as a secondary criterion with a corrected grid was
+rejected because a size-control defect that is only made harder to trigger is
+still a size-control defect, and because retiring it removes a decision role
+rather than adding one. Declaring the amendment sound on the drafting party's own
+assessment was rejected as the exact failure mode that produced draft-v0.2.

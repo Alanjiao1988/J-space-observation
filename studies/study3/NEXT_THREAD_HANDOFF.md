@@ -1,21 +1,40 @@
 # Study 3 - next thread handoff
 
-**State: `STUDY3_DRAFT_V0_2_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`**
+**State:
+`STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW`**
 
-**Draft version: `draft-v0.2`, reviewed and rejected.**
+**Draft version: `draft-v0.3`, amended, unfrozen, awaiting a second independent
+methods review.**
 
-**Independent methods review disposition:
+**First independent methods review disposition:
 `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`**, returned against the
 reviewed commit `8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`, tree
 `7e9077a32903adfdaa3bede95beba8752fcb5133`.
 
-**The only legal next action is an operator amendment round producing
-draft-v0.3 (`OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_3`). Not a freeze. Not model
-execution.**
+**The only legal next action is a SECOND bounded independent methods review of
+draft-v0.3. Not a freeze. Not model execution. Not a bank, a seed, a `P3-Q`
+stage, a development round, a confirmation round or any mechanistic work.**
+
+**The drafting party does not claim draft-v0.3 is correct.** Every repair in
+`reviews/v0_3_operator_amendment.md` is recorded as
+`PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`.
+
+| authority flag | value |
+| --- | --- |
+| `frozen` | `false` |
+| `execution_authorized` | `false` |
+| `bank_authorized` | `false` |
+| `seed_authorized` | `false` |
+| `model_operations_authorized` | `false` |
+| `winner_selected` | `false` |
+| `positive_reference_selected` | `false` |
+| `confirmation_access_authorized` | `false` |
 
 Sections 1 through 8 below are the historical record of the draft-v0.2 round and
-are unchanged. Section 9 records the review outcome. Where section 5 asks what
-the independent methods review should check, section 9 records what it found.
+are unchanged. Section 9 records the first review's outcome. Where section 5 asks
+what the independent methods review should check, section 9 records what it found.
+**Section 10 records the draft-v0.3 operator amendment round and supersedes any
+draft-v0.2 statement it contradicts.**
 
 ---
 
@@ -288,3 +307,136 @@ answered checklist questions, the reviewed parameter table, the executable
 multiplicity decision graph and the projected operation table;
 `reviews/v0_2_independent_methods_review.json` is its authoritative machine-readable
 form; `methods_review_receipt_v0_2.json` binds the round.
+
+---
+
+## 10. The draft-v0.3 operator amendment round - outcome
+
+The operator amendment round authorised after the review in section 9 is complete.
+It repaired the design against all 20 findings and all 22 unresolved items and
+published an amended, **still unfrozen** draft for a second independent methods
+review. It performed **zero** empirical and zero model operations of any kind.
+
+**Sections 1 through 9 are historical. Where section 3 or section 4 states an
+`OD5` or `OD6` disposition, section 10 supersedes it.**
+
+### 10.1 What the amendment adopted
+
+| decision | draft-v0.2 state | draft-v0.3 state |
+| --- | --- | --- |
+| `OD5` thresholds and multiplicity | open, blocking | **resolved**, subject to the second review |
+| `OD6` sample sizes | open, blocking | **resolved**, subject to the second review |
+| `OD2` positive reference | open, blocking | **still `UNRESOLVED_BLOCKING_OPERATOR_DECISION`** |
+
+**`I3` is now a pre-registered pairwise design.** The independent unit is a
+`base_item_contrast_cluster` carrying exactly **2** variants. There is no
+cross-product and no factorial multiplication of variants; `K5` and `K6` are not
+crossed and use disjoint base-item identities. `K5` is exactly seven one-factor
+contrasts - `K5-P1`, `K5-P2`, `K5-P3` for content-position offsets `+1`, `+2`,
+`+3` modulo 4; `K5-S1`, `K5-S2`, `K5-S3` for correct-displayed-symbol-index
+offsets `+1`, `+2`, `+3` modulo 4; and `K5-A1` for label-alphabet replacement,
+using two label alphabets disjoint from the answer domain with digits forbidden.
+`K5` is `not_applicable` for `S2` and `S3` rather than passing. `K6` is two
+disjoint pairwise cells, `K6-SEP` and `K6-INSTR`, drawn from the three renderings
+`R-base`, `R-sep` and `R-instr`, with the answer cue and every other byte held
+fixed. Balancing is deterministic over complete blocks with bijective
+option-to-label mappings; **no random draw occurs anywhere in this design round.**
+
+**Three `I3` indicators, one primary.** `J_inv` is invariance across the two
+variants, `J_cor` is correctness against the registered ground truth, and
+`J_both` is their conjunction and the **primary gate indicator**. A stable but
+**wrong** answer scores `0`; a stable invalid or unparseable answer scores `0`.
+That `J_cor` implies `J_inv` under a unique ground truth is recorded as an
+expected integrity invariant rather than presented as independence.
+
+**`OD5`: an exact-binomial primary design in exact rational arithmetic.** A
+study-level development screening alpha of `1/200`; a per-profile development
+component alpha of `1/600`; an intersection-union conjunction within a profile, so
+no further within-profile Bonferroni applies; and a **fixed** selectable-profile
+denominator `K = 3` that never shrinks on a post-data fact. Decimal fields are
+renderings of the exact rational policy and are never the source of truth.
+
+**`OD6`: one `I3` floor.** `p0 = 0.90` against `p1 = 0.97` at power at least
+`0.90`, giving `n = 256` base-item contrast clusters per applicable contrast cell.
+The floor `p0 = 0.95` is **deleted** from every active protocol, table and packet
+field and is permitted only in clearly labelled historical narrative, because the
+review established it was unreachable at any admissible sample size. No active
+rejection region has a pass count equal to `n`.
+
+**Every symbol `n` carries a unit.** Four units are registered - `base_item`,
+`base_item_contrast_cluster`, `rendered_row`, `scored_row` - at their definitions
+and in every table, and one `n` is never reused across them.
+
+**The paired aggregate-equivalence procedure is retired from every decision
+role.** It supplies no gate, eligibility rule, selection rule, confirmation rule,
+claim language, equivalence margin, critical value, discordance grid,
+conservativeness statement, rescue path or ranking weight. Only purely descriptive
+paired 2x2 summaries survive, with no null, no alpha, no p-value and no pass or
+fail. The reviewer's independent recalculation is preserved unedited as immutable
+historical evidence, and the second reviewer is **explicitly asked to adjudicate
+whether retirement fully removes the size-control defect.**
+
+**Operation accounting is decomposed.** Under the current single-token answer
+domain, `S3` adds exactly **0** forward passes and **0** sequence-scoring rows
+beyond `S2`. The projection is decomposed into six named work streams with
+per-stream units; a single undifferentiated total is prohibited.
+
+**Derivation, not transcription.** The reviewer-returned development and
+confirmation target tables are planning targets that the committed script
+**independently derives**. The committed test asserts by AST inspection that those
+targets appear nowhere in the script as literal constants.
+
+### 10.2 What the amendment did not do
+
+- It did not freeze the design and did not approve it for execution.
+- It did not select, prefer, pin, revision-resolve, download, tokenize, load or
+  prequalify any positive-reference checkpoint. `OD2` and `UR-22` remain
+  `UNRESOLVED_BLOCKING_OPERATOR_DECISION`, and the dossier says `UNSELECTED`.
+- It did not select an interface profile, draw a seed, create a bank row, create
+  an evidence row or add a limitations row.
+- It did not perform a single model download, revision resolution by downloading,
+  tokenizer construction, tokenization, weight load, forward pass, sequence
+  scoring, generation, activation extraction, hook, lens, probe, patch, ablation,
+  provider API call or GPU job. Every operation counter is exactly zero.
+- It did not touch any Study 1 or Study 2 path, `paper/evidence_ledger.csv`,
+  `paper/limitations_ledger.md`, `paper/claim_evidence_matrix.md`, any dependency,
+  lockfile, Dockerfile, runtime, model source, infrastructure or workflow.
+- It did not edit any v0.2 review object. All three
+  `reviews/v0_2_independent_methods_review.*` files,
+  `methods_review_receipt_v0_2.json`, both
+  `analysis/independent_methods_recalculation*` files, the v0.2 review authority
+  copy, `analysis/independent_methods_review_packet.md` and
+  `design_receipt_v0_2.json` are byte-identical to the reviewed round.
+- **It did not declare the amended protocol correct**, and it did not execute or
+  predeclare the disposition of the second independent methods review.
+
+### 10.3 The legal next action
+
+A **second** bounded independent methods review of draft-v0.3. Its review object
+is `analysis/independent_methods_review_packet_v0_3.md`, with
+`protocol/interface_calibration_protocol_draft.json` authoritative and
+`reviews/v0_3_operator_amendment.md` recording the disposition of every finding
+and every unresolved item.
+
+Questions the drafting party puts to that reviewer:
+
+1. Does retiring the paired aggregate-equivalence procedure from every decision
+   role fully remove the size-control defect recorded in `S3MR-004` and
+   `S3MR-005`, or does a residual decision path remain anywhere in the amended
+   protocol?
+2. Is the base-item contrast cluster with exactly two variants an identifiable
+   unit for the `I3` estimand under every registered contrast cell, and does
+   `J_both` estimate what the protocol says it estimates?
+3. Is the intersection-union treatment within a profile, combined with a fixed
+   denominator of `3` across profiles and a one-shot confirmation at `1/200` on a
+   physically disjoint split, an adequate multiplicity architecture for the claim
+   the protocol permits?
+4. Does the six-stream operation projection make the feasibility question
+   answerable, and is the zero-incremental-cost argument for `S3` under a
+   single-token answer domain correct as stated?
+5. Are any of the twenty repairs cosmetic relabelling rather than substantive
+   design change?
+
+No freeze prompt, no `P3-Q` prompt, no bank prompt, no seed prompt, no model
+prompt, no GPU prompt, no development prompt, no confirmation prompt and no
+mechanistic-execution prompt exists, and none may be produced by this round.

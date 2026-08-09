@@ -1,10 +1,17 @@
 # Study 3 - positive-reference candidate dossier
 
 - **Document class:** positive-reference candidate dossier
-- **Draft version:** draft-v0.2
+- **Draft version:** draft-v0.3
 - **Operator decision addressed:** OD2
-- **Disposition of OD2:** `UNRESOLVED_BLOCKING`
-- **Selection status:** `NO_POSITIVE_REFERENCE_IS_SELECTED_OR_PINNED_IN_THIS_ROUND`
+- **Disposition of OD2:** `UNRESOLVED_BLOCKING_OPERATOR_DECISION`
+- **Selection status:** `UNSELECTED`
+- **Expanded selection status:** `NO_POSITIVE_REFERENCE_IS_SELECTED_PREFERRED_PINNED_REVISION_RESOLVED_DOWNLOADED_TOKENIZED_LOADED_OR_PREQUALIFIED_IN_THIS_ROUND`
+- **Amendment note:** the v0.2 independent methods review recorded finding
+  `S3MR-020`, that this dossier attributed its own obligation to defect `D-07`
+  when the authoritative record assigns the positive-reference circularity and
+  chance-level-floor issue to `D-04` and assigns `D-07` to the separate pooling
+  defect. Both back-references are corrected to `D-04` in this amendment. The
+  correction is a traceability repair; it resolves nothing about OD2.
 
 ---
 
@@ -14,9 +21,13 @@ Gate I4 requires an independently prequalified capable reference, so that a
 target failure through a given interface can be attributed to the target rather
 than to the interface. draft-v0.1 named that requirement without doing any
 primary-source work behind it, which the operator review recorded as defect
-D-07 and left OD2 blocking.
+D-04, the positive-reference circularity and chance-level-floor defect, and left
+OD2 blocking. Defect `D-07` is a different defect, that pooling could mask a
+failed cell, and is not the obligation this dossier discharges.
 
 This dossier is that primary-source work. It is a **candidate evaluation** only.
+Its selection status is `UNSELECTED` and remains `UNSELECTED` at the end of the
+v0.3 amendment round.
 
 **Nothing in this document selects, pins, downloads, tokenizes, loads, runs or
 prequalifies any model.** Producing it involved no model operation of any kind.
@@ -75,7 +86,7 @@ cost. That is an operator decision, not a drafting decision.
 
 ---
 
-## 3. Candidate 1 (recommended for a future single-candidate stage)
+## 3. Candidate 1 (`UNSELECTED`; retained for a future single-candidate stage)
 
 ### Qwen/Qwen3-4B-Instruct-2507
 
@@ -94,7 +105,13 @@ cost. That is an operator decision, not a drafting decision.
 | Vendor-reported AIME25 | 47.4 | model card |
 | Vendor-reported IFEval | 83.4 | model card |
 
-**Why it is the recommended first candidate.**
+**Status: `UNSELECTED`.** Retaining a candidate in this dossier is not preferring
+it. The v0.3 amendment round performed no selection, no preference ordering, no
+revision resolution, no download, no tokenizer construction, no weight load and no
+prequalification against this or any other repository. The paragraphs below record
+why an operator resolving OD2 might consider it first; they do not choose it.
+
+**Why an OD2 authority might consider it first.**
 
 - It is the smallest checkpoint examined here that is plausibly capable on
   depth-2 and depth-3 arithmetic compositions while fitting the registered T4
@@ -118,7 +135,7 @@ cost. That is an operator decision, not a drafting decision.
 
 ---
 
-## 4. Candidate 2 (stronger, but not feasible on the registered route)
+## 4. Candidate 2 (`UNSELECTED`; stronger, but not feasible on the registered route)
 
 ### Qwen/Qwen2.5-Math-7B-Instruct
 
@@ -158,6 +175,10 @@ operator who is prepared to change the GPU SKU.
 - No capability floor is set for any specific candidate. The floor arithmetic in
   `studies/study3/analysis/design_statistics.py` is generic and model-free.
 - No claim is made that either candidate would pass Gate I4.
+- No candidate is preferred, prequalified or prioritised in a way that binds the
+  authority that resolves OD2. Both candidates are `UNSELECTED`.
+- No candidate has been downloaded, revision-resolved by downloading, tokenized,
+  loaded, run, scored, generated from or measured in any way.
 
 ---
 
@@ -188,9 +209,11 @@ operator who is prepared to change the GPU SKU.
 
 ## 7. Disposition
 
-OD2 remains `UNRESOLVED_BLOCKING`.
+OD2 remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`. Unresolved item `UR-22`,
+the external qualification interface for the positive reference, likewise remains
+`UNRESOLVED_BLOCKING_OPERATOR_DECISION` after the v0.3 amendment round.
 
-This dossier discharges the drafting obligation attached to defect D-07: the
+This dossier discharges the drafting obligation attached to defect D-04: the
 positive-reference requirement is now backed by primary-source evaluation of
 named candidates against the registered compute envelope, with an explicit
 feasibility verdict and an explicit risk register. It does not, and must not,

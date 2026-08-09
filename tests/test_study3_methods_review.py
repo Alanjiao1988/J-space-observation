@@ -13,6 +13,21 @@ one.
 The review under guard is an *independent* review: nothing here may be relaxed
 to make the review pass, and ``tests/test_study3_design.py`` - which belongs to
 the review object - is not touched by this module.
+
+**Commit addressing.** This module guards a *historical* review of a *historical*
+design. Every byte it asserts about is therefore read from an explicit commit,
+never from ``HEAD`` and never from the working tree:
+
+* ``REVIEWED_COMMIT`` is the design draft-v0.2 the reviewer actually reviewed.
+* ``REVIEW_COMMIT`` is the commit that published the review's own outputs.
+
+Later rounds legitimately amend the design, the registries and the routing
+documents. An earlier implementation of this module compared mutable ``HEAD``
+files against draft-v0.2 hashes, which made a *permitted* later amendment look
+like tampering with the review. Addressing the historical blobs by commit removes
+that false coupling without changing a single asserted value: the disposition,
+the finding text, the counts, the checklist answers and every recalculated number
+are exactly as the reviewer returned them, and no assertion is weakened.
 """
 
 from __future__ import annotations
@@ -23,30 +38,41 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 
 import pytest
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-REVIEW_JSON = os.path.join(
-    REPO_ROOT, "studies", "study3", "reviews",
-    "v0_2_independent_methods_review.json")
-REVIEW_SCHEMA = os.path.join(
-    REPO_ROOT, "studies", "study3", "reviews",
-    "v0_2_independent_methods_review.schema.json")
-REVIEW_MD = os.path.join(
-    REPO_ROOT, "studies", "study3", "reviews",
-    "v0_2_independent_methods_review.md")
+# The design bytes the independent reviewer reviewed.
+REVIEWED_COMMIT = "8a2c4a0b2a73c5d802988333f11ea6c22828f6f5"
+# The commit that published the review's own outputs and registrations.
+REVIEW_COMMIT = "e4bcda3a487ea9c9a085e3943103a07501014431"
+
+REVIEW_JSON_PATH = ("studies/study3/reviews/"
+                    "v0_2_independent_methods_review.json")
+REVIEW_SCHEMA_PATH = ("studies/study3/reviews/"
+                      "v0_2_independent_methods_review.schema.json")
+REVIEW_MD_PATH = "studies/study3/reviews/v0_2_independent_methods_review.md"
+RECALC_TABLES_PATH = ("studies/study3/analysis/"
+                      "independent_methods_recalculation_tables.json")
+RECEIPT_PATH = "studies/study3/methods_review_receipt_v0_2.json"
+DESIGN_TEST_PATH = "tests/test_study3_design.py"
+
+# The reviewer's own recalculation is immutable. It is executed from committed
+# bytes rather than from the checkout, because it compares itself against the
+# drafting table it reviewed, and draft-v0.3 legitimately rewrites that table.
+RECALC_SCRIPT_PATH = ("studies/study3/analysis/"
+                      "independent_methods_recalculation.py")
 RECALC_SCRIPT = os.path.join(
     REPO_ROOT, "studies", "study3", "analysis",
     "independent_methods_recalculation.py")
-RECALC_TABLES = os.path.join(
-    REPO_ROOT, "studies", "study3", "analysis",
-    "independent_methods_recalculation_tables.json")
-RECEIPT = os.path.join(
-    REPO_ROOT, "studies", "study3", "methods_review_receipt_v0_2.json")
+RECALC_TABLES_BASENAME = "independent_methods_recalculation_tables.json"
+DRAFTING_TABLES_PATH = "studies/study3/analysis/design_statistics_tables.json"
+DRAFTING_TABLES_BASENAME = "design_statistics_tables.json"
 DRAFTING_SCRIPT_BASENAME = "design_statistics"
 
 PERMITTED_DISPOSITIONS = (
@@ -210,9 +236,49 @@ def _validate(instance, schema, where: str = "") -> None:
 # Fixtures
 # --------------------------------------------------------------------------
 
-def _read_json(path):
-    with open(path, "r", encoding="utf-8") as handle:
-        return json.load(handle)
+def _commit_is_reachable(commit: str) -> bool:
+    """True when ``commit`` is an object in this clone.
+
+    A shallow or partial clone cannot answer questions about history. That is an
+    environment limitation, not a repository defect, so the affected checks skip
+    with an explicit reason rather than failing or silently degrading to a
+    weaker source of bytes.
+    """
+    try:
+        completed = subprocess.run(
+            ["git", "-C", REPO_ROOT, "cat-file", "-e", commit + "^{commit}"],
+            capture_output=True)
+    except OSError:
+        return False
+    return completed.returncode == 0
+
+
+def _blob_at(commit: str, path: str) -> bytes:
+    """Return the bytes Git stores for ``path`` at an explicit ``commit``.
+
+    There is deliberately **no** working-tree fallback. The whole point of
+    addressing a historical blob by commit is that the answer must not depend on
+    what the checkout currently contains, on the platform's line-ending policy,
+    or on how many amendment rounds have happened since.
+    """
+    completed = subprocess.run(
+        ["git", "-C", REPO_ROOT, "cat-file", "blob",
+         "%s:%s" % (commit, path)],
+        capture_output=True)
+    assert completed.returncode == 0, (
+        "cannot read %s at %s: %s"
+        % (path, commit, completed.stderr.decode("utf-8", "replace")))
+    return completed.stdout
+
+
+def _json_at(commit: str, path: str):
+    return json.loads(_blob_at(commit, path).decode("utf-8"))
+
+
+def _require_history(*commits: str) -> None:
+    for commit in commits:
+        if not _commit_is_reachable(commit):
+            pytest.skip("commit %s is not present in this clone" % commit)
 
 
 def _committed_bytes(path: str) -> bytes:
@@ -238,23 +304,32 @@ def _committed_bytes(path: str) -> bytes:
 
 @pytest.fixture(scope="module")
 def review():
-    return _read_json(REVIEW_JSON)
+    _require_history(REVIEW_COMMIT)
+    return _json_at(REVIEW_COMMIT, REVIEW_JSON_PATH)
 
 
 @pytest.fixture(scope="module")
 def schema():
-    return _read_json(REVIEW_SCHEMA)
+    _require_history(REVIEW_COMMIT)
+    return _json_at(REVIEW_COMMIT, REVIEW_SCHEMA_PATH)
 
 
 @pytest.fixture(scope="module")
 def tables():
-    return _read_json(RECALC_TABLES)
+    _require_history(REVIEW_COMMIT)
+    return _json_at(REVIEW_COMMIT, RECALC_TABLES_PATH)
 
 
 @pytest.fixture(scope="module")
 def markdown():
-    with open(REVIEW_MD, "r", encoding="utf-8") as handle:
-        return handle.read()
+    _require_history(REVIEW_COMMIT)
+    return _blob_at(REVIEW_COMMIT, REVIEW_MD_PATH).decode("utf-8")
+
+
+@pytest.fixture(scope="module")
+def receipt():
+    _require_history(REVIEW_COMMIT)
+    return _json_at(REVIEW_COMMIT, RECEIPT_PATH)
 
 
 # --------------------------------------------------------------------------
@@ -279,10 +354,49 @@ def test_the_validator_rejects_a_schema_it_cannot_fully_enforce():
 # --------------------------------------------------------------------------
 
 def test_independent_recalculation_check_mode_reproduces_the_committed_tables():
-    """Requirement 2: recompute from scratch and compare with the committed table."""
-    completed = subprocess.run(
-        [sys.executable, RECALC_SCRIPT, "--check"],
-        cwd=REPO_ROOT, capture_output=True, text=True)
+    """Requirement 2: recompute from scratch and compare with the committed table.
+
+    The reviewer's recalculation compares its own recomputation against the
+    *drafting* table it reviewed. That table is
+    ``design_statistics_tables.json``, which draft-v0.3 legitimately rewrites,
+    so running the check against the working tree would silently start asking a
+    different question: whether the v0.2 reviewer reproduces the v0.3 drafting
+    party. It does not, and it must not be made to.
+
+    The historical assertion is therefore reconstructed from committed blobs by
+    explicit commit. The immutable recalculation script and its committed review
+    table are taken from the review commit, the drafting table is taken from the
+    reviewed design commit, and the three are materialised together in a scratch
+    directory so the script's own ``os.path.dirname(__file__)`` resolution finds
+    exactly the bytes the reviewer had. Nothing is weakened: the same script
+    bytes recompute the same numbers and must still agree exactly.
+    """
+    _require_history(REVIEW_COMMIT)
+    _require_history(REVIEWED_COMMIT)
+
+    script_bytes = _blob_at(REVIEW_COMMIT, RECALC_SCRIPT_PATH)
+    assert script_bytes == _committed_bytes(RECALC_SCRIPT_PATH), (
+        "the independent recalculation script is immutable and must be "
+        "byte-identical at HEAD and at the review commit")
+
+    workdir = tempfile.mkdtemp(prefix="study3_recalc_")
+    try:
+        for name, blob in (
+                (os.path.basename(RECALC_SCRIPT_PATH), script_bytes),
+                (RECALC_TABLES_BASENAME,
+                 _blob_at(REVIEW_COMMIT, RECALC_TABLES_PATH)),
+                (DRAFTING_TABLES_BASENAME,
+                 _blob_at(REVIEWED_COMMIT, DRAFTING_TABLES_PATH))):
+            with open(os.path.join(workdir, name), "wb") as handle:
+                handle.write(blob)
+        completed = subprocess.run(
+            [sys.executable,
+             os.path.join(workdir, os.path.basename(RECALC_SCRIPT_PATH)),
+             "--check"],
+            cwd=workdir, capture_output=True, text=True)
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
+
     assert completed.returncode == 0, (
         "independent recalculation check mode failed:\n%s\n%s"
         % (completed.stdout, completed.stderr))
@@ -375,6 +489,7 @@ def test_the_review_declares_its_own_independence(review):
 
 def test_reviewed_artifact_identities_bind_the_review_to_exact_bytes(review):
     """Requirement 4: the review is bound to content, not to file names."""
+    _require_history(REVIEWED_COMMIT)
     identities = review["reviewed_artifact_identities"]
     assert identities, "the review must record what it reviewed"
     seen = set()
@@ -382,9 +497,10 @@ def test_reviewed_artifact_identities_bind_the_review_to_exact_bytes(review):
         path = row["path"]
         assert path not in seen, "duplicate artifact identity for %s" % path
         seen.add(path)
-        absolute = os.path.join(REPO_ROOT, path.replace("/", os.sep))
-        assert os.path.exists(absolute), "reviewed artifact missing: %s" % path
-        payload = _committed_bytes(path)
+        # Read the reviewed bytes at the reviewed commit. A later authorised
+        # amendment round legitimately changes these files at HEAD; that is not
+        # evidence that the review was tampered with.
+        payload = _blob_at(REVIEWED_COMMIT, path)
         assert len(payload) == row["bytes"], (
             "%s is %d bytes, review recorded %d"
             % (path, len(payload), row["bytes"]))
@@ -965,15 +1081,26 @@ def test_the_review_did_not_edit_the_review_object(review):
 
     ``tests/test_study3_design.py`` is part of what was reviewed, and finding
     S3MR-009 records that it entrenches an insufficient discordance grid. That
-    finding is only meaningful if the file still contains the defect.
+    finding is only meaningful if the file still contained the defect **at the
+    moment the review was published**.
+
+    This is asserted at ``REVIEW_COMMIT``, not at ``HEAD``. The reviewer was
+    forbidden from repairing the review object; a later *operator amendment*
+    round is explicitly required to repair it. Asserting against ``HEAD`` would
+    therefore convert an obligation into a violation.
     """
+    _require_history(REVIEWED_COMMIT, REVIEW_COMMIT)
     identities = {row["path"]: row for row in
                   review["reviewed_artifact_identities"]}
-    design_test = identities["tests/test_study3_design.py"]
-    payload = _committed_bytes("tests/test_study3_design.py")
-    assert hashlib.sha256(payload).hexdigest() == design_test["sha256"], (
-        "tests/test_study3_design.py was modified; the review object must not "
-        "be repaired by its reviewer")
+    design_test = identities[DESIGN_TEST_PATH]
+    reviewed = _blob_at(REVIEWED_COMMIT, DESIGN_TEST_PATH)
+    assert hashlib.sha256(reviewed).hexdigest() == design_test["sha256"], (
+        "the reviewed bytes of %s do not match the identity the review "
+        "recorded" % DESIGN_TEST_PATH)
+    at_review = _blob_at(REVIEW_COMMIT, DESIGN_TEST_PATH)
+    assert at_review == reviewed, (
+        "%s changed between the reviewed commit and the review commit; the "
+        "review object must not be repaired by its reviewer" % DESIGN_TEST_PATH)
 
 
 # --------------------------------------------------------------------------
@@ -983,7 +1110,7 @@ def test_the_review_did_not_edit_the_review_object(review):
 # live in a committed test rather than in an operator-side helper script.
 # --------------------------------------------------------------------------
 
-STARTING_COMMIT = "8a2c4a0b2a73c5d802988333f11ea6c22828f6f5"
+STARTING_COMMIT = REVIEWED_COMMIT
 
 CHANGED_PATH_WHITELIST = frozenset([
     # the eight new files
@@ -1030,43 +1157,39 @@ PROTECTED_FROM_THIS_ROUND = (
 )
 
 
-@pytest.fixture(scope="module")
-def receipt():
-    with open(RECEIPT, "r", encoding="utf-8") as handle:
-        return json.load(handle)
-
-
-def _starting_commit_is_reachable() -> bool:
+def _historical_changed_paths():
     completed = subprocess.run(
-        ["git", "-C", REPO_ROOT, "cat-file", "-e", STARTING_COMMIT + "^{commit}"],
+        ["git", "-C", REPO_ROOT, "diff", "--name-only",
+         STARTING_COMMIT, REVIEW_COMMIT],
         capture_output=True)
-    return completed.returncode == 0
+    assert completed.returncode == 0, completed.stderr.decode()
+    return [line for line in completed.stdout.decode("utf-8").splitlines()
+            if line.strip()]
 
 
 def test_the_changed_path_set_is_inside_the_authority_whitelist():
-    """The authority caps this round at 17 paths: 8 added, 9 modifiable."""
-    if not _starting_commit_is_reachable():
-        pytest.skip("starting commit not present in this clone")
-    completed = subprocess.run(
-        ["git", "-C", REPO_ROOT, "diff", "--name-only", STARTING_COMMIT, "HEAD"],
-        capture_output=True)
-    assert completed.returncode == 0, completed.stderr.decode()
-    changed = [line for line in completed.stdout.decode("utf-8").splitlines()
-               if line.strip()]
+    """The review round was capped at 17 paths: 8 added, 9 modifiable.
+
+    This is a statement about the *review round*, so it compares the reviewed
+    commit with the review commit. Comparing against ``HEAD`` would fold every
+    later authorised round into the review round's ceiling.
+    """
+    _require_history(STARTING_COMMIT, REVIEW_COMMIT)
+    changed = _historical_changed_paths()
     outside = sorted(set(changed) - CHANGED_PATH_WHITELIST)
     assert not outside, "changed paths outside the whitelist: %s" % outside
-    assert len(changed) <= 17, (
-        "%d paths changed; the authority caps the round at 17" % len(changed))
+    assert len(changed) == 17, (
+        "%d paths changed; the review round was capped at 17" % len(changed))
 
 
 def test_no_protected_path_was_touched_by_this_round():
-    """Recording a defect is permitted; repairing the object is not."""
-    if not _starting_commit_is_reachable():
-        pytest.skip("starting commit not present in this clone")
-    completed = subprocess.run(
-        ["git", "-C", REPO_ROOT, "diff", "--name-only", STARTING_COMMIT, "HEAD"],
-        capture_output=True)
-    changed = set(completed.stdout.decode("utf-8").splitlines())
+    """Recording a defect is permitted; repairing the object is not.
+
+    Scoped to the review round, between the reviewed commit and the review
+    commit, for the same reason as the whitelist check above.
+    """
+    _require_history(STARTING_COMMIT, REVIEW_COMMIT)
+    changed = set(_historical_changed_paths())
     for path in PROTECTED_FROM_THIS_ROUND:
         assert path not in changed, "%s must not be modified by this round" % path
     for path in changed:
@@ -1077,8 +1200,14 @@ def test_no_protected_path_was_touched_by_this_round():
 
 
 def test_the_artifact_index_is_unique_contiguous_and_binds_real_blobs():
-    """AR ids must be unique and gapless, and each digest must be a real blob."""
-    payload = _committed_bytes("paper/artifact_index.csv").decode("utf-8")
+    """AR ids must be unique and gapless, and each digest must be a real blob.
+
+    Evaluated at ``REVIEW_COMMIT``. The index grows with every later authorised
+    round, so pinning its tail to ``AR-0221`` is a fact about the review round,
+    not about ``HEAD``.
+    """
+    _require_history(REVIEW_COMMIT)
+    payload = _blob_at(REVIEW_COMMIT, "paper/artifact_index.csv").decode("utf-8")
     lines = [line for line in payload.splitlines() if line.strip()]
     header = lines[0].split(",")
     assert header[0] == "artifact_id"
@@ -1097,7 +1226,8 @@ def test_the_artifact_index_is_unique_contiguous_and_binds_real_blobs():
     assert numbers == sorted(numbers), "artifact ids are not in order"
     assert numbers == list(range(numbers[0], numbers[0] + len(numbers))), (
         "artifact ids are not contiguous")
-    assert ids[-1] == "AR-0221", "this round must end the index at AR-0221"
+    assert ids[-1] == "AR-0221", (
+        "the review round must end the index at AR-0221")
 
     for number in range(212, 222):
         artifact_id = "AR-%04d" % number
@@ -1106,7 +1236,7 @@ def test_the_artifact_index_is_unique_contiguous_and_binds_real_blobs():
         location = fields[columns["storage_location"]]
         assert location.startswith("repo:"), location
         path = location[len("repo:"):]
-        blob = _committed_bytes(path)
+        blob = _blob_at(REVIEW_COMMIT, path)
         assert hashlib.sha256(blob).hexdigest() == fields[columns["sha256"]], (
             "%s digest does not match the committed blob for %s"
             % (artifact_id, path))
@@ -1120,7 +1250,8 @@ def test_the_artifact_index_is_unique_contiguous_and_binds_real_blobs():
 
 def test_the_earlier_registrations_were_not_altered(review):
     """D39, M-27 and AR-0196..AR-0211 belong to the round under review."""
-    payload = _committed_bytes("paper/artifact_index.csv").decode("utf-8")
+    _require_history(REVIEW_COMMIT)
+    payload = _blob_at(REVIEW_COMMIT, "paper/artifact_index.csv").decode("utf-8")
     lines = [line for line in payload.splitlines() if line.strip()]
     for number in range(196, 212):
         artifact_id = "AR-%04d" % number
@@ -1131,17 +1262,25 @@ def test_the_earlier_registrations_were_not_altered(review):
             "%s changed phase; prior registrations are immutable here"
             % artifact_id)
 
-    decisions = _committed_bytes("docs/decision_log.md").decode("utf-8")
+    decisions = _blob_at(REVIEW_COMMIT, "docs/decision_log.md").decode("utf-8")
     assert decisions.count("\n## D39 - ") == 1
     assert decisions.count("\n## D40 - ") == 1
-    methods = _committed_bytes("paper/methods_ledger.md").decode("utf-8")
+    methods = _blob_at(REVIEW_COMMIT, "paper/methods_ledger.md").decode("utf-8")
     assert methods.count("\n## M-27 - ") == 1
     assert methods.count("\n## M-28 - ") == 1
 
 
 def test_the_evidence_ledger_is_untouched_at_ev_0016(receipt):
-    """A methods review produces no evidence row, by construction."""
-    payload = _committed_bytes("paper/evidence_ledger.csv")
+    """A methods review produces no evidence row, by construction.
+
+    Asserted at ``REVIEW_COMMIT`` against the receipt that recorded it, and again
+    at ``HEAD``: the ledger is protected from every subsequent round as well, so
+    both readings must agree byte for byte.
+    """
+    _require_history(REVIEW_COMMIT)
+    payload = _blob_at(REVIEW_COMMIT, "paper/evidence_ledger.csv")
+    assert payload == _committed_bytes("paper/evidence_ledger.csv"), (
+        "paper/evidence_ledger.csv changed after the review round")
     recorded = receipt["protected_state"]["evidence_ledger"]
     assert len(payload) == recorded["bytes"]
     assert hashlib.sha256(payload).hexdigest() == recorded["sha256"]
@@ -1151,9 +1290,16 @@ def test_the_evidence_ledger_is_untouched_at_ev_0016(receipt):
 
 
 def test_both_protected_rollups_are_unchanged(receipt):
-    """The two Phase 1.0D rollup records are frozen state from earlier rounds."""
+    """The two Phase 1.0D rollup records are frozen state from earlier rounds.
+
+    Read at ``REVIEW_COMMIT`` and compared with ``HEAD``: these are protected
+    from every round, so a later amendment may not move them either.
+    """
+    _require_history(REVIEW_COMMIT)
     for recorded in receipt["protected_state"]["protected_rollups"]:
-        payload = _committed_bytes(recorded["path"])
+        payload = _blob_at(REVIEW_COMMIT, recorded["path"])
+        assert payload == _committed_bytes(recorded["path"]), (
+            "%s changed after the review round" % recorded["path"])
         assert len(payload) == recorded["bytes"], recorded["path"]
         assert hashlib.sha256(payload).hexdigest() == recorded["sha256"], (
             recorded["path"])
@@ -1165,22 +1311,24 @@ def test_both_protected_rollups_are_unchanged(receipt):
 
 def test_the_receipt_binds_every_new_artifact_and_omits_its_own_hash(receipt):
     """A receipt that hashed itself would be either stale or circular."""
+    _require_history(REVIEWED_COMMIT, REVIEW_COMMIT)
     assert receipt["new_artifact_identities"]["self_hash_in_body"] is False
     body = json.dumps(receipt, sort_keys=True)
-    own = hashlib.sha256(_committed_bytes(
-        "studies/study3/methods_review_receipt_v0_2.json")).hexdigest()
+    own = hashlib.sha256(_blob_at(REVIEW_COMMIT, RECEIPT_PATH)).hexdigest()
     assert own not in body, "the receipt contains its own digest"
 
     artifacts = receipt["new_artifact_identities"]["artifacts"]
     assert [row["artifact_id"] for row in artifacts] == [
         "AR-%04d" % number for number in range(212, 219)]
+    # New artifacts of the review round are read at the commit that created
+    # them; reviewed artifacts are read at the commit that was reviewed.
     for row in artifacts:
-        payload = _committed_bytes(row["path"])
+        payload = _blob_at(REVIEW_COMMIT, row["path"])
         assert len(payload) == row["bytes"], row["path"]
         assert hashlib.sha256(payload).hexdigest() == row["sha256"], row["path"]
 
     for row in receipt["reviewed_artifact_identities"]:
-        payload = _committed_bytes(row["path"])
+        payload = _blob_at(REVIEWED_COMMIT, row["path"])
         assert len(payload) == row["bytes"], row["path"]
         assert hashlib.sha256(payload).hexdigest() == row["sha256"], row["path"]
 
@@ -1224,11 +1372,12 @@ def test_no_new_file_declares_an_operation_or_an_authority():
                    r'lens_operations|confirmation_accesses|'
                    r'gate_evaluations_on_models)"\s*:\s*(?!0\b)\d+'),
     )
+    _require_history(REVIEW_COMMIT)
     for path in ("studies/study3/reviews/v0_2_independent_methods_review.json",
                  "studies/study3/methods_review_receipt_v0_2.json",
                  "studies/study3/analysis/"
                  "independent_methods_recalculation_tables.json"):
-        text = _committed_bytes(path).decode("utf-8")
+        text = _blob_at(REVIEW_COMMIT, path).decode("utf-8")
         for pattern in prohibited:
             match = pattern.search(text)
             assert match is None, "%s declares %r" % (path, match.group(0))

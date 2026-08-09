@@ -1,12 +1,19 @@
 # Study 3 - Interface Adequacy and Label-Binding Calibration
 
-> **DESIGN DRAFT v0.2 - INDEPENDENT METHODS REVIEW COMPLETE, REJECTED**
+> **DESIGN DRAFT v0.3 - OPERATOR AMENDMENT COMPLETE, AWAITING A SECOND INDEPENDENT METHODS REVIEW**
 >
-> State: `STUDY3_DRAFT_V0_2_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`
+> State: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW`
 >
-> Review disposition: `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`, returned by an
-> independent reviewer against the reviewed commit `8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`.
-> Six blocking findings. Read `reviews/v0_2_independent_methods_review.md`.
+> The bounded independent methods review of draft-v0.2 returned
+> `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED` against the reviewed commit
+> `8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`: 6 BLOCKING, 11 MAJOR and 3 MINOR findings. draft-v0.3
+> is the operator amendment answering all 20. Read `reviews/v0_2_independent_methods_review.md` for
+> the findings and `reviews/v0_3_operator_amendment.md` for their dispositions.
+>
+> **The drafting party does not claim draft-v0.3 is correct.** Every repair is recorded as
+> `PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`. draft-v0.2 was found defensible
+> by the party that wrote it and was then independently rejected; that is the failure mode this
+> round is required not to repeat. The determination belongs to the second reviewer.
 >
 > Nothing here is frozen. Nothing here authorizes execution. Zero model operations have been
 > performed for this study: no download, no weight load, no tokenizer construction, no forward
@@ -14,8 +21,13 @@
 > operation, no GPU job. No seed has been drawn and no task-bank row exists.
 >
 > draft-v0.1 was reviewed by the operator, who found ten design defects and refused freeze
-> (`STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`). draft-v0.2 is the
-> amendment. The defects and their resolutions are recorded in `reviews/v0_1_operator_review.md`.
+> (`STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`). draft-v0.2 is that
+> amendment; its defects and resolutions are in `reviews/v0_1_operator_review.md`. draft-v0.3 is the
+> amendment to draft-v0.2.
+>
+> `OD5` and `OD6` are resolved by the draft-v0.3 operator amendment authority, subject to the second
+> review. **`OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`**: no positive reference is
+> selected, preferred, pinned, revision-resolved, downloaded, tokenized, loaded or prequalified.
 >
 > **The JSON protocol document is authoritative.** The Markdown is a companion rendering of it.
 > Where they disagree the JSON governs and the disagreement is a defect; agreement is enforced by
@@ -54,15 +66,20 @@ or J-lens is valid. Whether Study 2's Gate A should have passed.
 | `protocol/interface_calibration_protocol_draft.md` | companion rendering of the authoritative JSON |
 | `protocol/interface_calibration_protocol.schema.json` | fail-closed structural schema for the JSON |
 | `reviews/v0_1_operator_review.md` | the ten draft-v0.1 defects and their v0.2 resolutions |
+| `reviews/v0_3_operator_amendment.md` | **the draft-v0.3 amendment record: all 20 findings and all 22 unresolved items** |
+| `reviews/v0_3_operator_amendment.json` | authoritative machine-readable form of the amendment record |
+| `reviews/v0_3_operator_amendment.schema.json` | fail-closed schema for the amendment record |
 | `analysis/design_statistics.py` | committed model-free derivation of every proposed number |
 | `analysis/design_statistics_tables.json` | the derived tables the draft quotes |
-| `analysis/independent_methods_review_packet.md` | bounded packet for the independent reviewer |
+| `analysis/independent_methods_review_packet.md` | bounded packet for the **first** independent reviewer, preserved unedited |
+| `analysis/independent_methods_review_packet_v0_3.md` | bounded packet for the **second** independent reviewer |
 | `analysis/study2_to_study3_design_traceability.md` | what came from Study 2, and with what authority |
 | `references/methods_sources.md` | primary sources with limitations of application |
 | `references/positive_reference_dossier.md` | candidate evaluation for OD2; selects nothing |
 | `NEXT_THREAD_HANDOFF.md` | the eight open operator decisions |
 | `design_receipt.json` | cryptographic binding of the draft-v0.1 round |
 | `design_receipt_v0_2.json` | cryptographic binding of the draft-v0.2 amendment round |
+| `design_receipt_v0_3.json` | cryptographic binding of the draft-v0.3 amendment round |
 | `prompts/study3_interface_calibration_design_authority.md` | the v0.1 operator authority, verbatim |
 | `prompts/study3_v0_2_design_amendment_authority.md` | the v0.2 amendment authority, verbatim |
 | `reviews/v0_2_independent_methods_review.md` | **the independent methods review of draft-v0.2** |
@@ -72,6 +89,7 @@ or J-lens is valid. Whether Study 2's Gate A should have passed.
 | `analysis/independent_methods_recalculation_tables.json` | the reviewer's own tables |
 | `methods_review_receipt_v0_2.json` | cryptographic binding of the independent review round |
 | `prompts/study3_v0_2_independent_methods_review_authority.md` | the review authority, verbatim |
+| `prompts/study3_v0_3_design_amendment_authority.md` | the v0.3 amendment authority, verbatim |
 
 The two dedicated tests live outside this directory, at `tests/test_study3_design.py` and
 `tests/test_study3_methods_review.py`, so they run with the repository suite.
@@ -100,12 +118,38 @@ data.
 | `I1a` | can each role recover an answer stated verbatim in the prompt, with a valid output? | yes |
 | `I1b` | does each role bind the correct content to the correct displayed symbol? | yes, where labels exist |
 | `I2` | does each role clear a depth-1 primitive by a usable margin, per operation family? | yes |
-| `I3` | does the reading stay inside a pre-specified margin when only irrelevant things change? | yes |
+| `I3` | on a base-item contrast cluster of exactly two variants, is the reading both invariant across the two variants and correct? | yes |
 | `I4` | can an independently prequalified reference clear the compositional strata here? | yes |
 | `I5` | do the constructs reproduce on a sealed, never-inspected confirmation bank? | no; it is the confirmation |
 
 draft-v0.1 fused trivial recovery with symbol binding into a single `I1`, which made a binding
 failure indistinguishable from a recovery failure; v0.2 splits them into `I1a` and `I1b`.
+
+**What draft-v0.3 changed about the gates.** `I3` is now a pre-registered **pairwise** design over
+`base_item_contrast_clusters` with exactly **2** variants each - no cross-product, no factorial
+multiplication, `K5` and `K6` not crossed and drawn from disjoint base-item identities. `K5` is
+exactly seven one-factor contrasts (`K5-P1`/`P2`/`P3` content-position offsets, `K5-S1`/`S2`/`S3`
+correct-symbol-index offsets, `K5-A1` label-alphabet replacement) and is `not_applicable` for `S2`
+and `S3` rather than passing. `K6` is two disjoint pairwise cells, `K6-SEP` and `K6-INSTR`, with the
+answer cue and every other byte held fixed. The primary indicator is `J_both`, the conjunction of
+invariance and correctness: a stable but **wrong** answer scores `0`, and a stable invalid or
+unparseable answer scores `0`.
+
+**Sizing and multiplicity.** Every gate is sized by an exact-binomial rule in exact rational
+arithmetic: a study-level development screening alpha of `1/200`, a per-profile development component
+alpha of `1/600`, an intersection-union conjunction within a profile, and a **fixed** selectable-profile
+denominator `K = 3` that never shrinks on a post-data fact. There is exactly **one** `I3` floor,
+`p0 = 0.90` against `p1 = 0.97` at power at least `0.90`, giving `n = 256` base-item contrast clusters
+per applicable contrast cell. No active rejection region has a pass count equal to `n`.
+
+**Units.** Four units are registered - `base_item`, `base_item_contrast_cluster`, `rendered_row`,
+`scored_row` - and every symbol `n` carries its unit at its definition and in every table. One `n`
+is never reused across them.
+
+**The paired aggregate-equivalence procedure is retired from every decision role.** It supplies no
+gate, eligibility rule, selection rule, confirmation rule, claim language, equivalence margin,
+critical value, discordance grid, conservativeness statement, rescue path or ranking weight. Only
+purely descriptive paired 2x2 summaries survive, with no null, alpha, p-value or pass/fail.
 
 Gate `I4` is the direct structural response to Study 2's central limitation: without a positive
 control on a different checkpoint, a null cannot be interpreted. Its failure eliminates **that
@@ -132,23 +176,35 @@ bank row, template outcome, confirmation content, seed, or result.
 
 ## Next action
 
-**Operator amendment round for draft-v0.3.** The bounded independent methods review is complete
-and returned `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`. draft-v0.2 is **not** approved
-for freeze and **not** approved for execution.
+**A second bounded independent methods review of draft-v0.3.** The operator amendment round is
+complete. draft-v0.3 is **not** frozen, **not** approved for freeze and **not** approved for
+execution.
 
-Six findings block. In summary: the `I3` primary estimand is not identifiable from the published
-counterbalancing construction, so its denominator does not exist in any committed field; the `I3`
-primary indicator has two incompatible definitions across the authoritative JSON and the review
-packet; the Family B per-profile `alpha = 0.001666666667` is asserted while every component rule is
-computed at `alpha = 0.005`; the authoritative JSON asserts that exact enumeration never exceeds the
-nominal one-sided level while the packet discloses a realised `0.025501`; the four-value discordance
-grid is a sensitivity grid and cannot establish size control, and maximising over the full feasible
-null boundary finds a violation the grid never evaluates; and the `I3` floor at `p0 = 0.95` is
-unreachable at any admissible sample size. The full list, with evidence and file paths, is in
-`reviews/v0_2_independent_methods_review.md`.
+The review object is `analysis/independent_methods_review_packet_v0_3.md`, with
+`protocol/interface_calibration_protocol_draft.json` authoritative and
+`reviews/v0_3_operator_amendment.md` recording the disposition of every one of the 20 findings and
+every one of the 22 unresolved items. The first review's own artifacts, including the reviewer's
+independent recalculation, are preserved unedited as immutable historical evidence.
 
-`OD2`, `OD5` and `OD6` remain open. The review recommends parameters for `OD5` and `OD6` but does
-**not** adopt them, and it selects no positive reference: `OD2` remains an operator decision.
+Specific questions put to the second reviewer:
 
-No freeze prompt and no execution prompt exist. The only authority that may follow this document is
-an operator amendment round producing draft-v0.3.
+1. Does retiring the paired aggregate-equivalence procedure from every decision role fully remove
+   the size-control defect recorded in `S3MR-004` and `S3MR-005`, or does a residual decision path
+   remain anywhere in the amended protocol?
+2. Is the base-item contrast cluster with exactly two variants an identifiable unit for the `I3`
+   estimand under every registered contrast cell, and does `J_both` estimate what the protocol says
+   it estimates?
+3. Is the intersection-union treatment within a profile, combined with a fixed denominator of `3`
+   across profiles and a one-shot confirmation at `1/200` on a physically disjoint split, an
+   adequate multiplicity architecture for the claim the protocol permits?
+4. Does the six-stream operation projection make the feasibility question answerable, and is the
+   zero-incremental-cost argument for `S3` under a single-token answer domain correct as stated?
+5. Are any of the twenty repairs cosmetic relabelling rather than substantive design change?
+
+**`OD2` remains open and blocking.** No positive reference is selected, preferred, pinned,
+revision-resolved, downloaded, tokenized, loaded or prequalified, and unresolved item `UR-22` stays
+`UNRESOLVED_BLOCKING_OPERATOR_DECISION`.
+
+No freeze prompt, no `P3-Q` prompt, no bank prompt, no seed prompt, no model prompt, no GPU prompt,
+no development prompt, no confirmation prompt and no execution prompt exists. The only authority
+that may follow this document is a second bounded independent methods review.

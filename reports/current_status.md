@@ -1,5 +1,104 @@
 # Project Status Report
 
+> **Study 3 draft-v0.3 operator amendment round - 2026-08-08**
+>
+> **Study 3 state:**
+> `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW`
+>
+> The operator amendment round authorised after the draft-v0.2 independent methods
+> review is complete. It repaired the design against all **20** findings
+> (`S3MR-001` through `S3MR-020`) and all **22** unresolved items (`UR-01` through
+> `UR-22`), and published an amended, **still unfrozen** draft for a **second**
+> independent methods review.
+>
+> **The drafting party does not claim draft-v0.3 is correct.** Every repair is
+> recorded as `PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW` in
+> [`studies/study3/reviews/v0_3_operator_amendment.md`](../studies/study3/reviews/v0_3_operator_amendment.md).
+> draft-v0.2 was found defensible by the party that wrote it and was then
+> independently rejected with six blocking findings; that is the specific failure
+> mode this round was required not to repeat.
+>
+> **What the amendment adopted.**
+>
+> - **`I3` becomes a pre-registered pairwise design.** The independent unit is a
+>   `base_item_contrast_cluster` carrying exactly **2** variants. There is no
+>   cross-product and no factorial multiplication; `K5` and `K6` are not crossed and
+>   use disjoint base-item identities. `K5` is exactly seven one-factor contrasts
+>   (`K5-P1`/`P2`/`P3` content-position offsets `+1`/`+2`/`+3` mod 4;
+>   `K5-S1`/`S2`/`S3` correct-displayed-symbol-index offsets `+1`/`+2`/`+3` mod 4;
+>   `K5-A1` label-alphabet replacement) and is `not_applicable` for `S2` and `S3`
+>   rather than passing. `K6` is two disjoint pairwise cells, `K6-SEP` and
+>   `K6-INSTR`, with the answer cue and every other byte fixed. Balancing is
+>   deterministic over complete blocks with bijective option-to-label mappings, and
+>   **no random draw occurs anywhere in this design round.**
+> - **Three `I3` indicators, one primary.** `J_inv`, `J_cor` and their conjunction
+>   `J_both`, which is the **primary gate indicator**. A stable but **wrong** answer
+>   scores `0`; a stable invalid or unparseable answer scores `0`. That `J_cor`
+>   implies `J_inv` under a unique ground truth is recorded as an expected integrity
+>   invariant rather than presented as independence.
+> - **`OD5` resolved: an exact-binomial primary design in exact rational
+>   arithmetic.** Study-level development screening alpha `1/200`; per-profile
+>   development component alpha `1/600`; intersection-union conjunction within a
+>   profile, so no further within-profile Bonferroni; and a **fixed**
+>   selectable-profile denominator `K = 3` that never shrinks on a post-data fact.
+>   Decimal fields are renderings of the exact rational policy, never the source of
+>   truth.
+> - **`OD6` resolved: one `I3` floor.** `p0 = 0.90` against `p1 = 0.97` at power at
+>   least `0.90`, giving `n = 256` base-item contrast clusters per applicable
+>   contrast cell. `p0 = 0.95` is deleted from every active protocol, table and
+>   packet field and survives only in clearly labelled historical narrative. No
+>   active rejection region has a pass count equal to `n`.
+> - **Every symbol `n` carries a unit.** Four units are registered - `base_item`,
+>   `base_item_contrast_cluster`, `rendered_row`, `scored_row` - at their definitions
+>   and in every table, and one `n` is never reused across them.
+> - **The paired aggregate-equivalence procedure is retired from every decision
+>   role.** No gate, eligibility, selection, confirmation, claim-language,
+>   equivalence-margin, critical-value, discordance-grid, conservativeness, rescue or
+>   ranking role remains. Only purely descriptive paired 2x2 summaries survive, with
+>   no null, no alpha, no p-value and no pass or fail. The reviewer's independent
+>   recalculation is preserved **unedited** as immutable historical evidence, and the
+>   second reviewer is explicitly asked to adjudicate whether retirement fully removes
+>   the size-control defect.
+> - **Operation accounting is decomposed into six named work streams** with per-stream
+>   units. Under the current single-token answer domain, `S3` adds exactly **0**
+>   forward passes and **0** sequence-scoring rows beyond `S2`. A single
+>   undifferentiated total is prohibited.
+> - **Derivation, not transcription.** The reviewer-returned planning targets are
+>   independently re-derived by
+>   [`studies/study3/analysis/design_statistics.py`](../studies/study3/analysis/design_statistics.py),
+>   and the committed test asserts by AST inspection that they appear nowhere in the
+>   script as literal constants.
+>
+> **`OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`.** No positive-reference
+> checkpoint was selected, preferred, pinned, revision-resolved, downloaded,
+> tokenized, loaded or prequalified; the dossier says `UNSELECTED`, `UR-22` stays
+> `UNRESOLVED_BLOCKING_OPERATOR_DECISION`, and the dossier's two back-references were
+> corrected from `D-07` to `D-04` per finding `S3MR-020`.
+>
+> **Nothing was measured.** Every operation counter is exactly zero: no model
+> download, no revision resolution by downloading, no tokenizer construction, no
+> tokenization, no weight load, no forward pass, no sequence scoring, no generation,
+> no activation extraction, no hook, lens, probe, patch or ablation, no provider API
+> call and no GPU job. No seed was drawn, no bank row exists, no interface profile was
+> selected, no confirmation access was authorized,
+> [`paper/evidence_ledger.csv`](../paper/evidence_ledger.csv) is unchanged at
+> `EV-0016`, no limitations row was added, and both protected Phase 1.0D rollups are
+> unchanged.
+>
+> **Immutability of the first review.** All three
+> `studies/study3/reviews/v0_2_independent_methods_review.*` files,
+> `methods_review_receipt_v0_2.json`, both
+> `studies/study3/analysis/independent_methods_recalculation*` files, the v0.2 review
+> authority copy, `studies/study3/analysis/independent_methods_review_packet.md` and
+> `studies/study3/design_receipt_v0_2.json` are byte-identical to the reviewed round.
+>
+> The only legal next action is a **second** bounded independent methods review of
+> draft-v0.3. Its review object is
+> [`studies/study3/analysis/independent_methods_review_packet_v0_3.md`](../studies/study3/analysis/independent_methods_review_packet_v0_3.md).
+> No freeze prompt, no `P3-Q` prompt, no bank prompt, no seed prompt, no model prompt,
+> no GPU prompt, no development prompt, no confirmation prompt and no
+> mechanistic-execution prompt exists.
+
 > **Study 3 draft-v0.2 independent methods review - 2026-08-08**
 >
 > **Study 3 state:** `STUDY3_DRAFT_V0_2_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`

@@ -7,10 +7,16 @@
 | study id | `jspace-study3-interface-calibration` |
 | name | Study 3 - Interface Adequacy and Label-Binding Calibration |
 | namespace | `studies/study3` |
-| state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW` |
-| draft version | `draft-v0.2` |
+| state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW` |
+| draft version | `draft-v0.3` |
 | frozen | no |
 | execution authorized | no |
+| bank authorized | no |
+| seed authorized | no |
+| model operations authorized | no |
+| winner selected | no |
+| positive reference selected | no |
+| confirmation access authorized | no |
 | operations performed | zero |
 
 This charter is a draft. It is deliberately **not** named `RESEARCH_CHARTER.md`, because that name
@@ -20,8 +26,20 @@ as a commitment until an operator reviews it, amends it, and freezes it under a 
 **Amendment history.** draft-v0.1 was reviewed by the operator, who recorded ten design defects and
 refused freeze under `STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`.
 draft-v0.2 is the resulting amendment. The defects and their resolutions are in
-`reviews/v0_1_operator_review.md`. The amendment changed the design; it did not perform any
-measurement, and it did not close any blocking decision.
+`reviews/v0_1_operator_review.md`.
+
+draft-v0.2 was then submitted to a **bounded independent methods review**, which returned
+`STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED` with 6 BLOCKING, 11 MAJOR and 3 MINOR findings
+and 22 unresolved items. draft-v0.3 is the operator amendment answering all of them; the
+finding-by-finding dispositions are in `reviews/v0_3_operator_amendment.md`.
+
+**No amendment in this history performed any measurement or closed any blocking decision.**
+
+**The drafting party does not claim draft-v0.3 is correct.** Every repair is recorded as
+`PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`. draft-v0.2 was found defensible by
+the party that wrote it and was then independently rejected with six blocking findings; a design
+checked only by its author is not evidence that the design is sound. That determination belongs to
+the second independent methods review.
 
 ---
 
@@ -68,9 +86,16 @@ is out of protocol regardless of what the numbers say.
 2. **A positive control on a different checkpoint.** Without a checkpoint independently expected to
    succeed, a null cannot distinguish instrument failure from model incapability. This is the single
    most important structural lesson from Study 2.
-3. **Robustness as equivalence.** A reading that moves when only an irrelevant transformation
-   changes is not measuring the intended quantity. Demonstrating robustness requires an interval
-   inside a pre-specified margin, never a failure to detect a difference.
+3. **Robustness as a pre-registered item-level conjunction.** A reading that moves when only an
+   irrelevant transformation changes is not measuring the intended quantity, and a reading that is
+   stably **wrong** is not measuring it either. Robustness is therefore evaluated on
+   `base_item_contrast_clusters` of exactly **two** variants, under a primary indicator `J_both`
+   that requires invariance across the two variants **and** correctness against the registered
+   ground truth. A stable but wrong answer scores `0`; a stable invalid or unparseable answer scores
+   `0`. A failure to detect a difference is never accepted as invariance. draft-v0.1 and draft-v0.2
+   stated this as an aggregate paired-equivalence interval inside a pre-specified margin; the
+   independent methods review found that procedure's realised size exceeded its nominal level, and
+   draft-v0.3 retires it from **every** decision role rather than recalibrating it.
 4. **Multiple surfaces, never pooled.** Four interface profiles are compared per atomic cell. Their
    disagreement is diagnostic information, not noise to be averaged away. Pooling may never be used
    to rescue a failing cell.
@@ -84,6 +109,22 @@ is out of protocol regardless of what the numbers say.
 9. **Every design-critical check is committed.** The statistical derivation is a committed script and
    the design invariants are a committed test with a negative-mutation battery. An ephemeral checker
    that is not committed cannot be relied on, and in draft-v0.1 one such checker missed a defect.
+10. **Derivation, never transcription.** Every proposed sample size, pass count, tail mass and power
+    figure is derived from first principles in **exact rational arithmetic** by the committed
+    script. The committed test additionally asserts, by AST inspection, that the reviewer-returned
+    planning targets appear nowhere in the script as literal constants, so a script that reproduced
+    them by transcription would fail.
+11. **Every `n` carries a unit.** Four units are registered - `base_item`,
+    `base_item_contrast_cluster`, `rendered_row`, `scored_row` - and one `n` is never reused across
+    them. The independent methods review found that the symbol `n` changed unit between artifacts
+    with no unit declared anywhere.
+12. **Multiplicity is exact and its denominator is fixed before data.** A study-level development
+    screening alpha of `1/200` and a per-profile development component alpha of `1/600`, both exact
+    rationals, with an intersection-union conjunction within a profile and a **fixed**
+    selectable-profile denominator `K = 3` that never shrinks on a post-data fact. Decimal fields
+    are renderings of the exact rational policy, never the source of truth.
+13. **Independent review is to a protocol what a positive control is to a measurement.** A design
+    that has only been checked by the party that wrote it cannot be cited as a sound design.
 
 ## 5. Claim ceiling
 
@@ -111,29 +152,37 @@ parser. It inherits no data, no bank, no seed, no item identity, and no result.
 
 ## 7. What has and has not happened
 
-**Has happened.** A design draft was written and then amended after operator review; statistical
-tables were derived by model-free arithmetic in a committed script; design invariants were expressed
-as a committed test; and primary sources were consulted and cited, including the paired-equivalence
-methods literature and the model cards behind the positive-reference dossier.
+**Has happened.** A design draft was written, amended after operator review, submitted to a bounded
+independent methods review that rejected it with six blocking findings, and amended again in
+response; statistical tables were derived by model-free exact rational arithmetic in a committed
+script; design invariants were expressed as a committed test; and primary sources were consulted and
+cited, including the paired-equivalence methods literature - now retained as bibliography with
+`NO_DECISION_ROLE` - and the model cards behind the positive-reference dossier.
 
 **Has not happened.** No model was downloaded, loaded or tokenized. No forward pass, no generation,
 no activation extraction, no probe, no patch, no ablation, no lens operation, and no GPU job was
 run. No seed was drawn. No bank row was generated. No evidence row was created. No interface was
-selected.
+selected. No positive reference was selected, preferred, pinned, revision-resolved, downloaded,
+tokenized, loaded or prequalified. No confirmation access was authorized. Every operation counter is
+exactly zero.
 
 ## 8. Open decisions before any freeze
 
-Eight decisions remain open and are listed with recommendations and trade-offs in
-`NEXT_THREAD_HANDOFF.md`. Three block progress: the positive reference (`OD2`, which blocks Gate
-`I4`), the thresholds (`OD5`), and the sample sizes (`OD6`).
+The open decisions are listed with recommendations and trade-offs in `NEXT_THREAD_HANDOFF.md`.
 
-The v0.2 amendment strengthened the basis for answering them without answering any of them. In
-particular the committed derivation shows that the sample size draft-v0.1 proposed does not support
-the aggregate equivalence margin it asserted, at any discordance rate tested, which is why `OD6`
-remains blocking rather than being quietly resolved in the drafting party's favour.
+The draft-v0.3 operator amendment authority **resolves `OD5` and `OD6`**, subject to the second
+independent methods review. `OD5` fixes the exact-rational multiplicity policy above. `OD6` fixes a
+single `I3` floor, `p0 = 0.90` against `p1 = 0.97` at power at least `0.90`, giving `n = 256`
+base-item contrast clusters per applicable contrast cell; the second floor `p0 = 0.95` is deleted
+from every active protocol, table and packet field and survives only in clearly labelled historical
+narrative, because the review established it was unreachable at any admissible sample size.
 
-The legal next action is a **bounded independent methods review**; the packet for it is
-`analysis/independent_methods_review_packet.md`.
+**`OD2` remains open and blocking.** No positive reference is selected, preferred, pinned,
+revision-resolved, downloaded, tokenized, loaded or prequalified, and unresolved item `UR-22` stays
+`UNRESOLVED_BLOCKING_OPERATOR_DECISION`. `OD2` still blocks Gate `I4`.
+
+The legal next action is a **second bounded independent methods review**; the packet for it is
+`analysis/independent_methods_review_packet_v0_3.md`.
 
 ## 9. Governing documents
 
@@ -145,7 +194,10 @@ The legal next action is a **bounded independent methods review**; the packet fo
 | `reviews/v0_1_operator_review.md` | the ten draft-v0.1 defects and their resolutions |
 | `analysis/design_statistics.py` | committed model-free derivation of every proposed number |
 | `analysis/design_statistics_tables.json` | the derived tables the draft quotes |
-| `analysis/independent_methods_review_packet.md` | bounded packet for the independent reviewer |
+| `analysis/independent_methods_review_packet.md` | bounded packet for the **first** independent reviewer, preserved unedited |
+| `analysis/independent_methods_review_packet_v0_3.md` | bounded packet for the **second** independent reviewer |
+| `reviews/v0_2_independent_methods_review.md` | the independent methods review of draft-v0.2 |
+| `reviews/v0_3_operator_amendment.md` | the draft-v0.3 amendment record: all 20 findings, all 22 unresolved items |
 | `analysis/study2_to_study3_design_traceability.md` | what came from Study 2 and with what authority |
 | `references/methods_sources.md` | primary sources |
 | `references/positive_reference_dossier.md` | candidate evaluation for `OD2`; selects nothing |
@@ -153,9 +205,13 @@ The legal next action is a **bounded independent methods review**; the packet fo
 | `NEXT_THREAD_HANDOFF.md` | operator decisions and the legal next action |
 | `design_receipt.json` | cryptographic binding of the draft-v0.1 round |
 | `design_receipt_v0_2.json` | cryptographic binding of the draft-v0.2 amendment round |
+| `design_receipt_v0_3.json` | cryptographic binding of the draft-v0.3 amendment round |
 | `prompts/study3_interface_calibration_design_authority.md` | the v0.1 operator authority, verbatim |
 | `prompts/study3_v0_2_design_amendment_authority.md` | the v0.2 amendment authority, verbatim |
+| `prompts/study3_v0_3_design_amendment_authority.md` | the v0.3 amendment authority, verbatim |
 
 ---
 
-**The only legal next action is operator review.**
+**The only legal next action is a second bounded independent methods review.** No freeze prompt, no
+`P3-Q` prompt, no bank prompt, no seed prompt, no model prompt, no GPU prompt, no development prompt,
+no confirmation prompt and no mechanistic-execution prompt exists.

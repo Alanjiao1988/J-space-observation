@@ -1,385 +1,84 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Alanjiao1988/J-space-observation/studies/study3/protocol/interface_calibration_protocol.schema.json",
-  "title": "Study 3 interface-calibration protocol draft-v0.2",
-  "description": "Fail-closed structural schema for a Study 3 interface-calibration protocol DRAFT at version v0.2. It is deliberately impossible to satisfy this schema with a document that declares itself frozen, declares itself execution-authorized, reports any nonzero performed-operation count, introduces an unregistered operation counter, carries a result row or a task-bank row, selects a winning interface, marks S4 selectable, omits gate I4 from the eligibility set, omits any gate from the hierarchy, lets a gate authorize mechanistic execution, makes the confirmation split accessible before authority, omits the positive-reference construct from confirmation coverage, selects a positive reference, marks OD2, OD5 or OD6 resolved, enables pooling as a rescue, or removes the claim ceiling. The schema validates structure and boundaries only; it cannot and does not validate scientific adequacy, which is why the independent methods review is still required.",
+  "title": "Study 3 interface-calibration protocol draft-v0.3",
+  "description": "Structural and decision-bearing schema for the Study 3 interface-calibration protocol draft-v0.3. The structural skeleton is exhaustive: every object closes its property set, so a removed key and an injected key are both rejected. Layered on top of it are the constants that carry decision authority, so a draft that flips a frozen flag, moves an alpha, reintroduces a second I3 floor, shrinks the across-profile denominator, changes the number of variants per contrast cluster or restores a decision role to the retired paired procedure fails validation rather than merely reading differently.",
   "type": "object",
   "required": [
+    "admissibility_order",
+    "atomic_evaluation_cells",
+    "bank_construction_policy",
+    "bank_rows",
+    "blocking_decisions",
+    "checkpoint_roles",
+    "claim_ceiling",
+    "compute_and_reproducibility_plan",
+    "counterbalancing_design",
+    "development_selection_and_confirmation_plan",
+    "gate_hierarchy",
+    "gate_truth_table",
+    "i3_contrast_registry",
+    "interface_profiles",
+    "non_questions",
+    "not_applicable_semantics",
+    "operation_boundaries",
+    "operator_review_v0_1",
+    "positive_reference_candidates",
+    "prior_study_statements",
+    "proposed_statistics",
+    "required_next_action",
+    "research_question",
+    "results",
+    "retired_procedures",
     "schema_version",
+    "split_lifecycle",
     "state",
     "status",
     "study_identity",
-    "operator_review_v0_1",
-    "research_question",
-    "non_questions",
-    "validation_targets",
-    "not_applicable_semantics",
-    "interface_profiles",
-    "admissibility_order",
-    "atomic_evaluation_cells",
-    "counterbalancing_design",
-    "task_strata",
-    "bank_construction_policy",
-    "checkpoint_roles",
-    "positive_reference_candidates",
-    "split_lifecycle",
-    "gate_hierarchy",
-    "gate_truth_table",
     "target_must_pass_i1_i2_analysis",
-    "proposed_statistics",
-    "operation_boundaries",
-    "compute_and_reproducibility_plan",
-    "claim_ceiling",
-    "prior_study_statements",
+    "task_strata",
+    "unit_registry",
     "unresolved_operator_decisions",
-    "blocking_decisions",
-    "required_next_action",
-    "results",
-    "bank_rows"
+    "validation_targets"
   ],
   "additionalProperties": false,
   "properties": {
-    "schema_version": {
-      "type": "string",
-      "minLength": 1,
-      "pattern": "draft-v0[.]2$"
-    },
-    "state": {
-      "description": "The only state a conforming v0.2 draft may declare.",
-      "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_2_COMPLETE_AWAITING_INDEPENDENT_METHODS_REVIEW"
-    },
-    "status": {
-      "type": "object",
-      "required": [
-        "document_class",
-        "frozen",
-        "execution_authorized",
-        "review_state",
-        "authoritative_artifact",
-        "note"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "document_class": {
-          "const": "design_draft"
-        },
-        "frozen": {
-          "const": false,
-          "description": "Rejects frozen=true."
-        },
-        "execution_authorized": {
-          "const": false,
-          "description": "Rejects execution_authorized=true."
-        },
-        "review_state": {
-          "const": "awaiting_independent_methods_review"
-        },
-        "authoritative_artifact": {
-          "type": "string",
-          "minLength": 1
-        },
-        "note": {
-          "type": "string",
-          "minLength": 1
-        }
-      }
-    },
-    "study_identity": {
-      "type": "object",
-      "required": [
-        "study_id",
-        "name",
-        "namespace",
-        "draft_version",
-        "predecessors",
-        "successor_authority",
-        "amendment_history"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "study_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "namespace": {
-          "type": "string",
-          "minLength": 1
-        },
-        "draft_version": {
-          "const": "draft-v0.2"
-        },
-        "predecessors": {
-          "type": "array",
-          "minItems": 1
-        },
-        "successor_authority": {
-          "const": "none",
-          "description": "A draft may not name a successor authority."
-        },
-        "amendment_history": {
-          "type": "array",
-          "minItems": 2
-        }
-      }
-    },
-    "operator_review_v0_1": {
-      "type": "object",
-      "required": [
-        "disposition",
-        "record",
-        "additive",
-        "v0_1_preserved_unedited",
-        "v0_1_receipt_retained",
-        "classification",
-        "defects"
-      ],
-      "properties": {
-        "disposition": {
-          "const": "STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE"
-        },
-        "record": {
-          "type": "string",
-          "minLength": 1
-        },
-        "additive": {
-          "const": true
-        },
-        "v0_1_preserved_unedited": {
-          "const": true
-        },
-        "v0_1_receipt_retained": {
-          "type": "string",
-          "minLength": 1
-        },
-        "classification": {
-          "type": "string",
-          "minLength": 1
-        },
-        "defects": {
-          "type": "array",
-          "minItems": 10
-        }
-      }
-    },
-    "research_question": {
-      "type": "object"
-    },
-    "non_questions": {
-      "type": "array",
-      "minItems": 1
-    },
-    "validation_targets": {
-      "type": "array",
-      "minItems": 1
-    },
-    "not_applicable_semantics": {
-      "type": "string",
-      "minLength": 80
-    },
-    "interface_profiles": {
-      "type": "array",
-      "minItems": 4,
-      "items": {
-        "type": "object",
-        "required": [
-          "id",
-          "name",
-          "family",
-          "role_in_panel",
-          "prompt_and_rendering_contract",
-          "options_visible",
-          "labels_visible",
-          "scoring_formula",
-          "tokenizer_eligibility_rule",
-          "output_validity_rule",
-          "chat_template_policy_by_role",
-          "applicable_gates",
-          "transformation_applicability",
-          "non_applicable_transformations",
-          "selectable_status",
-          "selectable_status_reason",
-          "projected_operation_counts_if_later_authorized",
-          "known_confounds",
-          "disqualifying_failures",
-          "notes"
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^S[1-4]$"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "family": {
-            "type": "string",
-            "minLength": 1
-          },
-          "role_in_panel": {
-            "type": "string",
-            "minLength": 1
-          },
-          "prompt_and_rendering_contract": {
-            "type": "string",
-            "minLength": 1
-          },
-          "options_visible": {
-            "type": "boolean"
-          },
-          "labels_visible": {
-            "type": "boolean"
-          },
-          "scoring_formula": {
-            "type": "string",
-            "minLength": 1
-          },
-          "tokenizer_eligibility_rule": {
-            "type": "string",
-            "minLength": 1
-          },
-          "output_validity_rule": {
-            "type": "string",
-            "minLength": 1
-          },
-          "chat_template_policy_by_role": {
-            "type": "object"
-          },
-          "applicable_gates": {
-            "type": "array",
-            "minItems": 1
-          },
-          "transformation_applicability": {
-            "type": "object"
-          },
-          "non_applicable_transformations": {
-            "type": "array"
-          },
-          "selectable_status": {
-            "enum": [
-              "selectable",
-              "selectable_preferred",
-              "conditionally_selectable",
-              "never_selectable"
-            ]
-          },
-          "selectable_status_reason": {
-            "type": "string",
-            "minLength": 1
-          },
-          "projected_operation_counts_if_later_authorized": {
-            "type": "object"
-          },
-          "known_confounds": {
-            "type": "array",
-            "minItems": 1
-          },
-          "disqualifying_failures": {
-            "type": "array",
-            "minItems": 1
-          },
-          "notes": {
-            "type": "array"
-          }
-        }
-      },
-      "allOf": [
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "id",
-              "selectable_status"
-            ],
-            "properties": {
-              "id": {
-                "const": "S1"
-              },
-              "selectable_status": {
-                "const": "selectable"
-              }
-            }
-          }
-        },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "id",
-              "selectable_status"
-            ],
-            "properties": {
-              "id": {
-                "const": "S2"
-              },
-              "selectable_status": {
-                "const": "selectable_preferred"
-              }
-            }
-          }
-        },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "id",
-              "selectable_status"
-            ],
-            "properties": {
-              "id": {
-                "const": "S3"
-              },
-              "selectable_status": {
-                "const": "conditionally_selectable"
-              }
-            }
-          }
-        },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "id",
-              "selectable_status"
-            ],
-            "properties": {
-              "id": {
-                "const": "S4"
-              },
-              "selectable_status": {
-                "const": "never_selectable"
-              }
-            }
-          },
-          "description": "S4 must be never_selectable; marking it selectable is rejected here."
-        }
-      ]
-    },
     "admissibility_order": {
       "type": "object",
       "required": [
-        "principle",
+        "confirmation_bank_prohibition",
+        "denominator_is_fixed_before_data",
+        "denominator_never_shrinks",
+        "denominator_rule",
         "eligibility_rule",
+        "executable_selection_map",
+        "fixed_selectable_profile_denominator",
         "gates_required_for_eligibility",
         "i1b_applicability",
-        "order",
+        "i3_applicability",
         "never_selectable",
         "no_data_dependent_ranking",
         "no_winner_this_round",
         "no_winner_this_round_statement",
+        "order",
+        "principle",
         "proposed_disposition_only",
         "study_stops_only_when",
-        "confirmation_bank_prohibition",
         "what_happens_if_the_highest_ranked_eligible_surface_is_not_s2"
       ],
       "additionalProperties": false,
       "properties": {
-        "principle": {
+        "confirmation_bank_prohibition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "denominator_is_fixed_before_data": {
+          "const": true
+        },
+        "denominator_never_shrinks": {
+          "const": true
+        },
+        "denominator_rule": {
           "type": "string",
           "minLength": 1
         },
@@ -387,47 +86,77 @@
           "type": "string",
           "minLength": 1
         },
+        "executable_selection_map": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fixed_selectable_profile_denominator": {
+          "const": 3
+        },
         "gates_required_for_eligibility": {
           "type": "array",
-          "minItems": 6,
-          "contains": {
-            "const": "I4"
-          },
-          "description": "I4 must be part of eligibility; omitting it is rejected here."
+          "items": {
+            "type": "string"
+          }
         },
         "i1b_applicability": {
           "type": "string",
           "minLength": 1
         },
-        "order": {
-          "type": "array",
-          "minItems": 3
+        "i3_applicability": {
+          "type": "string",
+          "minLength": 1
         },
         "never_selectable": {
           "type": "array",
-          "minItems": 1,
-          "contains": {
-            "const": "S4"
+          "items": {
+            "type": "string"
           }
         },
         "no_data_dependent_ranking": {
           "const": true
         },
         "no_winner_this_round": {
-          "const": true,
-          "description": "Rejects a selected winner."
+          "const": true
         },
         "no_winner_this_round_statement": {
-          "const": "No interface is selected in this round."
+          "type": "string",
+          "minLength": 1
+        },
+        "order": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "condition",
+              "interface",
+              "rank",
+              "why"
+            ],
+            "properties": {
+              "condition": {
+                "type": "string"
+              },
+              "interface": {
+                "type": "string"
+              },
+              "rank": {
+                "type": "integer"
+              },
+              "why": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "principle": {
+          "type": "string",
+          "minLength": 1
         },
         "proposed_disposition_only": {
           "const": true
         },
         "study_stops_only_when": {
-          "type": "string",
-          "minLength": 1
-        },
-        "confirmation_bank_prohibition": {
           "type": "string",
           "minLength": 1
         },
@@ -440,242 +169,1031 @@
     "atomic_evaluation_cells": {
       "type": "object",
       "required": [
-        "sampling_unit",
-        "cluster_rule",
         "cell_factors",
+        "cluster_rule",
         "definition",
-        "pooling_prohibitions",
         "descriptive_pooling",
-        "no_pooling_rescue"
+        "i3_sampling_unit",
+        "no_pooling_rescue",
+        "pooling_prohibitions",
+        "sampling_unit"
       ],
       "additionalProperties": false,
       "properties": {
-        "sampling_unit": {
-          "const": "the base item"
+        "cell_factors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "cluster_rule": {
           "type": "string",
           "minLength": 1
         },
-        "cell_factors": {
-          "type": "array",
-          "minItems": 8
-        },
         "definition": {
           "type": "string",
           "minLength": 1
-        },
-        "pooling_prohibitions": {
-          "type": "array",
-          "minItems": 6
         },
         "descriptive_pooling": {
           "type": "string",
           "minLength": 1
         },
+        "i3_sampling_unit": {
+          "type": "object",
+          "required": [
+            "definition",
+            "disjoint_base_items",
+            "no_cross_product",
+            "unit",
+            "variants_per_cluster",
+            "why_pairwise"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "definition": {
+              "type": "string",
+              "minLength": 1
+            },
+            "disjoint_base_items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "no_cross_product": {
+              "type": "string",
+              "minLength": 1
+            },
+            "unit": {
+              "type": "string",
+              "minLength": 1
+            },
+            "variants_per_cluster": {
+              "type": "integer"
+            },
+            "why_pairwise": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
         "no_pooling_rescue": {
-          "const": true,
-          "description": "Rejects enabling pooling as a rescue."
+          "type": "boolean"
+        },
+        "pooling_prohibitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "prohibited",
+              "why"
+            ],
+            "properties": {
+              "prohibited": {
+                "type": "string"
+              },
+              "why": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "sampling_unit": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "bank_construction_policy": {
+      "type": "object",
+      "required": [
+        "future_bank_sealing_procedure",
+        "future_seed_draw_procedure",
+        "parser_dependence_rule",
+        "rows_generated_this_round",
+        "seeds_drawn_this_round",
+        "study2_reuse_rule"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "future_bank_sealing_procedure": {
+          "type": "string",
+          "minLength": 1
+        },
+        "future_seed_draw_procedure": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parser_dependence_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rows_generated_this_round": {
+          "const": 0
+        },
+        "seeds_drawn_this_round": {
+          "const": 0
+        },
+        "study2_reuse_rule": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "bank_rows": {
+      "type": "array",
+      "maxItems": 0,
+      "description": "A design draft records no bank row."
+    },
+    "blocking_decisions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "const": "OD2"
+      },
+      "description": "OD2 is the only decision that still blocks. OD5 and OD6 are adopted in draft-v0.3 subject to the second independent methods review."
+    },
+    "checkpoint_roles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "gate_role",
+          "id",
+          "identity",
+          "is_model",
+          "name",
+          "notes",
+          "purpose"
+        ],
+        "properties": {
+          "gate_role": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "identity": {
+            "type": "string"
+          },
+          "is_model": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "claim_ceiling": {
+      "type": "object",
+      "required": [
+        "confirmation_claim_is_conditional",
+        "i3_claim_ceiling",
+        "maximum_fail_claim",
+        "maximum_pass_claim",
+        "no_self_approval",
+        "not_applicable_semantics",
+        "prohibited_claims",
+        "study2_relationship",
+        "what_a_pass_does_not_permit",
+        "what_a_pass_permits"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "confirmation_claim_is_conditional": {
+          "type": "string",
+          "minLength": 1
+        },
+        "i3_claim_ceiling": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maximum_fail_claim": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maximum_pass_claim": {
+          "type": "string",
+          "minLength": 1
+        },
+        "no_self_approval": {
+          "type": "string",
+          "minLength": 1
+        },
+        "not_applicable_semantics": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prohibited_claims": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "study2_relationship": {
+          "type": "string",
+          "minLength": 1
+        },
+        "what_a_pass_does_not_permit": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "what_a_pass_permits": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "compute_and_reproducibility_plan": {
+      "type": "object",
+      "required": [
+        "branch_name_handling",
+        "confirmation_bank_physical_exclusion",
+        "github_actions",
+        "image_and_dependency_locking",
+        "independent_finalization_and_validation",
+        "model_and_tokenizer_pinning",
+        "newline_corruption_prevention",
+        "operation_counters",
+        "post_push_verification",
+        "pre_inference_sealing",
+        "publication",
+        "route",
+        "status",
+        "workstation_role"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "branch_name_handling": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmation_bank_physical_exclusion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "github_actions": {
+          "type": "string",
+          "minLength": 1
+        },
+        "image_and_dependency_locking": {
+          "type": "string",
+          "minLength": 1
+        },
+        "independent_finalization_and_validation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model_and_tokenizer_pinning": {
+          "type": "string",
+          "minLength": 1
+        },
+        "newline_corruption_prevention": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation_counters": {
+          "type": "string",
+          "minLength": 1
+        },
+        "post_push_verification": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pre_inference_sealing": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publication": {
+          "type": "string",
+          "minLength": 1
+        },
+        "route": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workstation_role": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
     "counterbalancing_design": {
       "type": "object",
       "required": [
-        "problem_in_v0_1",
-        "requirement",
-        "separated_factors",
         "construction_algorithm",
+        "k5_and_k6_are_not_crossed",
+        "k5_contrast_count",
+        "k5_contrasts",
+        "k6_contrast_count",
+        "k6_contrasts",
+        "k6_renderings",
         "label_alphabets",
-        "k6_renderings"
+        "no_cross_product",
+        "problem_in_v0_1",
+        "problem_in_v0_2",
+        "requirement",
+        "separated_factors"
       ],
+      "additionalProperties": false,
       "properties": {
-        "separated_factors": {
-          "type": "array",
-          "minItems": 3
-        },
         "construction_algorithm": {
           "type": "object",
           "required": [
-            "status",
+            "balancing",
+            "implementation",
             "inputs",
-            "steps",
             "randomness",
+            "status",
+            "steps",
             "verification"
           ],
+          "additionalProperties": false,
           "properties": {
-            "steps": {
+            "balancing": {
+              "type": "string",
+              "minLength": 1
+            },
+            "implementation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "inputs": {
               "type": "array",
-              "minItems": 5
+              "items": {
+                "type": "string"
+              }
             },
             "randomness": {
-              "const": "none; the construction is a deterministic function of the registered base-item index and draws no seed"
+              "type": "string",
+              "minLength": 1
+            },
+            "status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "verification": {
+              "type": "string",
+              "minLength": 1
             }
           }
         },
-        "label_alphabets": {
-          "type": "object",
-          "required": [
-            "requirement",
-            "answer_domain",
-            "forbidden_alphabets",
-            "permitted_alphabet_examples",
-            "label_set_replacement_rule"
-          ],
-          "properties": {
-            "forbidden_alphabets": {
-              "type": "array",
-              "minItems": 1
+        "k5_and_k6_are_not_crossed": {
+          "const": true,
+          "description": "A K5 x K6 cross product would multiply the design out of its own estimand; it is prohibited."
+        },
+        "k5_contrast_count": {
+          "const": 7
+        },
+        "k5_contrasts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "contrast_id",
+              "held_fixed",
+              "transformation",
+              "variants_per_cluster",
+              "varied_factor"
+            ],
+            "properties": {
+              "contrast_id": {
+                "type": "string"
+              },
+              "held_fixed": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "transformation": {
+                "type": "string"
+              },
+              "variants_per_cluster": {
+                "type": "integer"
+              },
+              "varied_factor": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "k6_contrast_count": {
+          "const": 2
+        },
+        "k6_contrasts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "baseline_rendering",
+              "contrast_id",
+              "held_fixed",
+              "variant_rendering",
+              "variants_per_cluster",
+              "varied_factor"
+            ],
+            "properties": {
+              "baseline_rendering": {
+                "type": "string"
+              },
+              "contrast_id": {
+                "type": "string"
+              },
+              "held_fixed": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "variant_rendering": {
+                "type": "string"
+              },
+              "variants_per_cluster": {
+                "type": "integer"
+              },
+              "varied_factor": {
+                "type": "string"
+              }
             }
           }
         },
         "k6_renderings": {
           "type": "object",
           "required": [
+            "answer_cue",
             "count",
             "one_factor_at_a_time",
-            "answer_cue",
+            "pairwise_cells",
             "renderings",
+            "three_way_comparison_prohibited",
             "v0_1_defect"
           ],
+          "additionalProperties": false,
           "properties": {
+            "answer_cue": {
+              "type": "string",
+              "minLength": 1
+            },
             "count": {
               "const": 3
             },
             "one_factor_at_a_time": {
               "const": true
             },
-            "answer_cue": {
-              "const": "held constant across all three renderings"
+            "pairwise_cells": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "contrast_id",
+                  "pair"
+                ],
+                "properties": {
+                  "contrast_id": {
+                    "type": "string"
+                  },
+                  "pair": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
             },
             "renderings": {
               "type": "array",
-              "minItems": 3,
-              "maxItems": 3
+              "items": {
+                "type": "object",
+                "required": [
+                  "description",
+                  "id",
+                  "varies"
+                ],
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "varies": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "three_way_comparison_prohibited": {
+              "type": "string",
+              "minLength": 1
+            },
+            "v0_1_defect": {
+              "type": "string",
+              "minLength": 1
             }
           }
-        }
-      }
-    },
-    "task_strata": {
-      "type": "array",
-      "minItems": 7
-    },
-    "bank_construction_policy": {
-      "type": "object",
-      "required": [
-        "rows_generated_this_round",
-        "seeds_drawn_this_round"
-      ],
-      "properties": {
-        "rows_generated_this_round": {
-          "const": 0
         },
-        "seeds_drawn_this_round": {
-          "const": 0
-        }
-      }
-    },
-    "checkpoint_roles": {
-      "type": "array",
-      "minItems": 6
-    },
-    "positive_reference_candidates": {
-      "type": "object",
-      "required": [
-        "selection_status",
-        "blocking_decision",
-        "dossier",
-        "circularity_rule",
-        "prequalification_stage_proposal"
-      ],
-      "properties": {
-        "selection_status": {
-          "const": "NOT SELECTED; candidate dossier only",
-          "description": "Rejects a selected positive reference."
+        "label_alphabets": {
+          "type": "object",
+          "required": [
+            "alphabets_mutually_disjoint",
+            "answer_domain",
+            "digits_forbidden",
+            "forbidden_alphabets",
+            "label_set_replacement_rule",
+            "permitted_alphabet_examples",
+            "registered_alphabets",
+            "requirement"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "alphabets_mutually_disjoint": {
+              "const": true
+            },
+            "answer_domain": {
+              "type": "string",
+              "minLength": 1
+            },
+            "digits_forbidden": {
+              "type": "string",
+              "minLength": 1
+            },
+            "forbidden_alphabets": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "alphabet",
+                  "why"
+                ],
+                "properties": {
+                  "alphabet": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "why": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "label_set_replacement_rule": {
+              "type": "string",
+              "minLength": 1
+            },
+            "permitted_alphabet_examples": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "alphabet",
+                  "why"
+                ],
+                "properties": {
+                  "alphabet": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "why": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "registered_alphabets": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "requirement": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         },
-        "blocking_decision": {
-          "const": "OD2"
+        "no_cross_product": {
+          "type": "boolean"
         },
-        "dossier": {
+        "problem_in_v0_1": {
           "type": "string",
           "minLength": 1
         },
-        "circularity_rule": {
-          "type": "object",
-          "required": [
-            "problem",
-            "requirement",
-            "canonical_interface_status",
-            "item_disjointness"
-          ]
+        "problem_in_v0_2": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "separated_factors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
-    "split_lifecycle": {
+    "development_selection_and_confirmation_plan": {
       "type": "object",
       "required": [
-        "splits",
-        "ordering",
-        "surface_selection",
-        "hard_stop_before_confirmation",
-        "confirmation_isolation",
-        "prevented_failure_modes",
-        "cluster_rule"
+        "disposition_status",
+        "stage_1_component_evaluation",
+        "stage_2_selection",
+        "stage_3_confirmation",
+        "status",
+        "why"
       ],
+      "additionalProperties": false,
       "properties": {
-        "confirmation_isolation": {
+        "disposition_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stage_1_component_evaluation": {
           "type": "object",
           "required": [
-            "covers_every_gate_bearing_construct",
-            "explicitly_includes",
-            "accessible_before_authority"
+            "component_alpha_exact_rational",
+            "components_by_profile",
+            "rule",
+            "split"
           ],
+          "additionalProperties": false,
           "properties": {
-            "covers_every_gate_bearing_construct": {
-              "const": true
+            "component_alpha_exact_rational": {
+              "const": "1/600"
             },
-            "explicitly_includes": {
-              "type": "array",
-              "minItems": 3,
-              "contains": {
-                "const": "gate I4"
+            "components_by_profile": {
+              "type": "object",
+              "required": [
+                "S1",
+                "S2",
+                "S3",
+                "S4"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "S1": {
+                  "type": "object",
+                  "required": [
+                    "applicable",
+                    "not_applicable"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "applicable": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "not_applicable": {
+                      "type": "array",
+                      "maxItems": 0
+                    }
+                  }
+                },
+                "S2": {
+                  "type": "object",
+                  "required": [
+                    "applicable",
+                    "not_applicable",
+                    "not_applicable_reason"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "applicable": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "not_applicable": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "not_applicable_reason": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "S3": {
+                  "type": "object",
+                  "required": [
+                    "applicable",
+                    "not_applicable",
+                    "not_applicable_reason"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "applicable": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "not_applicable": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "not_applicable_reason": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "S4": {
+                  "type": "object",
+                  "required": [
+                    "applicable",
+                    "never_selectable",
+                    "note"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "applicable": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "never_selectable": {
+                      "type": "boolean"
+                    },
+                    "note": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
               }
             },
-            "accessible_before_authority": {
-              "const": false,
-              "description": "Rejects a confirmation split that is accessible before authority."
+            "rule": {
+              "type": "string",
+              "minLength": 1
+            },
+            "split": {
+              "type": "string",
+              "minLength": 1
             }
           }
+        },
+        "stage_2_selection": {
+          "type": "object",
+          "required": [
+            "denominator_is_fixed_before_data",
+            "denominator_never_shrinks",
+            "enumerated_scenarios",
+            "executable_map",
+            "fixed_selectable_profile_denominator",
+            "never_selectable",
+            "no_data_dependent_reordering",
+            "no_selection_this_round",
+            "no_selection_this_round_statement",
+            "order",
+            "rule"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "denominator_is_fixed_before_data": {
+              "const": true
+            },
+            "denominator_never_shrinks": {
+              "const": true
+            },
+            "enumerated_scenarios": {
+              "type": "integer"
+            },
+            "executable_map": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fixed_selectable_profile_denominator": {
+              "const": 3
+            },
+            "never_selectable": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "no_data_dependent_reordering": {
+              "const": true
+            },
+            "no_selection_this_round": {
+              "const": true
+            },
+            "no_selection_this_round_statement": {
+              "type": "string",
+              "minLength": 1
+            },
+            "order": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "enum": [
+                  "S1",
+                  "S2",
+                  "S3"
+                ]
+              },
+              "description": "The pre-registered admissibility order."
+            },
+            "rule": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "stage_3_confirmation": {
+          "type": "object",
+          "required": [
+            "access_authority",
+            "accessible_now",
+            "component_alpha_exact_rational",
+            "components",
+            "entered_by",
+            "gate",
+            "multiplicity",
+            "one_shot",
+            "reselection_prohibited",
+            "retuning_prohibited",
+            "split",
+            "within_profile"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "access_authority": {
+              "type": "string",
+              "minLength": 1
+            },
+            "accessible_now": {
+              "const": false
+            },
+            "component_alpha_exact_rational": {
+              "const": "1/200"
+            },
+            "components": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "component",
+                  "exact_null_tail_at_p0",
+                  "exact_power_at_p1",
+                  "n",
+                  "null_hypothesis",
+                  "pass_count",
+                  "unit_of_n"
+                ],
+                "properties": {
+                  "component": {
+                    "type": "string"
+                  },
+                  "exact_null_tail_at_p0": {
+                    "type": "number"
+                  },
+                  "exact_power_at_p1": {
+                    "type": "number"
+                  },
+                  "n": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "null_hypothesis": {
+                    "type": "string"
+                  },
+                  "pass_count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "unit_of_n": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "minItems": 5,
+              "maxItems": 5
+            },
+            "entered_by": {
+              "type": "string",
+              "minLength": 1
+            },
+            "gate": {
+              "const": "I5"
+            },
+            "multiplicity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "one_shot": {
+              "const": true
+            },
+            "reselection_prohibited": {
+              "const": true
+            },
+            "retuning_prohibited": {
+              "type": "string",
+              "minLength": 1
+            },
+            "split": {
+              "type": "string",
+              "minLength": 1
+            },
+            "within_profile": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "why": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
     "gate_hierarchy": {
       "type": "array",
-      "minItems": 7,
       "items": {
         "type": "object",
         "required": [
-          "gate_id",
-          "name",
-          "question",
-          "inputs",
-          "model_roles",
           "applicable_profiles",
-          "part_of_eligibility",
-          "evaluated_per",
-          "threshold_logic",
-          "what_passes",
-          "what_fails",
-          "not_applicable_semantics",
-          "merely_descriptive",
-          "legal_next_state_on_pass",
-          "legal_next_state_on_fail",
           "authorizes_mechanistic_execution",
+          "evaluated_per",
           "fail_closed",
-          "no_pooling"
+          "gate_id",
+          "inputs",
+          "legal_next_state_on_fail",
+          "legal_next_state_on_pass",
+          "merely_descriptive",
+          "model_roles",
+          "name",
+          "no_pooling",
+          "not_applicable_semantics",
+          "part_of_eligibility",
+          "question",
+          "threshold_logic",
+          "what_fails",
+          "what_passes"
         ],
         "properties": {
+          "applicable_profiles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "authorizes_mechanistic_execution": {
+            "const": false,
+            "description": "No gate of this study authorizes mechanistic execution."
+          },
+          "evaluated_per": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fail_closed": {
+            "type": "boolean"
+          },
           "gate_id": {
             "enum": [
               "I0",
@@ -687,314 +1205,619 @@
               "I5"
             ]
           },
-          "authorizes_mechanistic_execution": {
-            "const": false,
-            "description": "No gate in a draft may authorize mechanistic execution."
+          "inputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
-          "fail_closed": {
-            "const": true
+          "legal_next_state_on_fail": {
+            "type": "string"
+          },
+          "legal_next_state_on_pass": {
+            "type": "string"
+          },
+          "merely_descriptive": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "model_roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
           },
           "no_pooling": {
             "const": true
+          },
+          "not_applicable_semantics": {
+            "type": "string"
+          },
+          "part_of_eligibility": {
+            "type": "boolean"
+          },
+          "question": {
+            "type": "string"
+          },
+          "threshold_logic": {
+            "type": "string"
+          },
+          "what_fails": {
+            "type": "string"
+          },
+          "what_passes": {
+            "type": "string"
           }
         }
       },
-      "allOf": [
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "authorizes_mechanistic_execution",
-              "fail_closed",
-              "gate_id"
-            ],
-            "properties": {
-              "gate_id": {
-                "const": "I0"
-              },
-              "fail_closed": {
-                "const": true
-              },
-              "authorizes_mechanistic_execution": {
-                "const": false
-              }
-            }
-          }
-        },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "authorizes_mechanistic_execution",
-              "fail_closed",
-              "gate_id"
-            ],
-            "properties": {
-              "gate_id": {
-                "const": "I1a"
-              },
-              "fail_closed": {
-                "const": true
-              },
-              "authorizes_mechanistic_execution": {
-                "const": false
-              }
-            }
-          }
-        },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "authorizes_mechanistic_execution",
-              "fail_closed",
-              "gate_id"
-            ],
-            "properties": {
-              "gate_id": {
-                "const": "I1b"
-              },
-              "fail_closed": {
-                "const": true
-              },
-              "authorizes_mechanistic_execution": {
-                "const": false
-              }
-            }
-          }
-        },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "authorizes_mechanistic_execution",
-              "fail_closed",
-              "gate_id"
-            ],
-            "properties": {
-              "gate_id": {
-                "const": "I2"
-              },
-              "fail_closed": {
-                "const": true
-              },
-              "authorizes_mechanistic_execution": {
-                "const": false
-              }
-            }
-          }
-        },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "authorizes_mechanistic_execution",
-              "fail_closed",
-              "gate_id"
-            ],
-            "properties": {
-              "gate_id": {
-                "const": "I3"
-              },
-              "fail_closed": {
-                "const": true
-              },
-              "authorizes_mechanistic_execution": {
-                "const": false
-              }
-            }
-          }
-        },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "authorizes_mechanistic_execution",
-              "fail_closed",
-              "gate_id"
-            ],
-            "properties": {
-              "gate_id": {
-                "const": "I4"
-              },
-              "fail_closed": {
-                "const": true
-              },
-              "authorizes_mechanistic_execution": {
-                "const": false
-              }
-            }
-          }
-        },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "accessible_before_authority",
-              "authorizes_mechanistic_execution",
-              "covered_constructs",
-              "fail_closed",
-              "gate_id"
-            ],
-            "properties": {
-              "gate_id": {
-                "const": "I5"
-              },
-              "fail_closed": {
-                "const": true
-              },
-              "authorizes_mechanistic_execution": {
-                "const": false
-              },
-              "accessible_before_authority": {
-                "const": false
-              },
-              "covered_constructs": {
-                "type": "array",
-                "minItems": 6,
-                "contains": {
-                  "const": "I4"
-                }
-              }
-            }
-          }
-        },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "authorizes_mechanistic_execution",
-              "fail_closed",
-              "gate_id",
-              "part_of_eligibility",
-              "per_interface_not_global"
-            ],
-            "properties": {
-              "gate_id": {
-                "const": "I4"
-              },
-              "fail_closed": {
-                "const": true
-              },
-              "authorizes_mechanistic_execution": {
-                "const": false
-              },
-              "part_of_eligibility": {
-                "const": true
-              },
-              "per_interface_not_global": {
-                "const": true
-              }
-            }
-          }
-        }
-      ]
+      "minItems": 7,
+      "maxItems": 7
     },
     "gate_truth_table": {
       "type": "object",
       "required": [
+        "legal_stop_states",
+        "no_pass_value_appears_in_this_table",
         "note",
         "rows",
-        "legal_stop_states"
+        "value_semantics"
       ],
+      "additionalProperties": false,
       "properties": {
-        "rows": {
-          "type": "array",
-          "minItems": 7
-        },
         "legal_stop_states": {
           "type": "array",
-          "minItems": 4
+          "items": {
+            "type": "string"
+          }
+        },
+        "no_pass_value_appears_in_this_table": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "I0",
+              "I1a",
+              "I1b",
+              "I2",
+              "I3_K5",
+              "I3_K6",
+              "I4",
+              "label_bearing",
+              "profile",
+              "selectable"
+            ],
+            "properties": {
+              "I0": {
+                "enum": [
+                  "applicable",
+                  "not_applicable"
+                ],
+                "description": "An applicability table records no outcome. not_applicable is a third value and is never a pass."
+              },
+              "I1a": {
+                "enum": [
+                  "applicable",
+                  "not_applicable"
+                ],
+                "description": "An applicability table records no outcome. not_applicable is a third value and is never a pass."
+              },
+              "I1b": {
+                "enum": [
+                  "applicable",
+                  "not_applicable"
+                ],
+                "description": "An applicability table records no outcome. not_applicable is a third value and is never a pass."
+              },
+              "I2": {
+                "enum": [
+                  "applicable",
+                  "not_applicable"
+                ],
+                "description": "An applicability table records no outcome. not_applicable is a third value and is never a pass."
+              },
+              "I3_K5": {
+                "enum": [
+                  "applicable",
+                  "not_applicable"
+                ],
+                "description": "An applicability table records no outcome. not_applicable is a third value and is never a pass."
+              },
+              "I3_K6": {
+                "enum": [
+                  "applicable",
+                  "not_applicable"
+                ],
+                "description": "An applicability table records no outcome. not_applicable is a third value and is never a pass."
+              },
+              "I4": {
+                "enum": [
+                  "applicable",
+                  "not_applicable"
+                ],
+                "description": "An applicability table records no outcome. not_applicable is a third value and is never a pass."
+              },
+              "label_bearing": {
+                "type": "boolean"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "selectable": {
+                "type": "boolean"
+              }
+            }
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "value_semantics": {
+          "type": "object",
+          "required": [
+            "applicable",
+            "not_applicable"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "applicable": {
+              "type": "string",
+              "minLength": 1
+            },
+            "not_applicable": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         }
       }
     },
-    "target_must_pass_i1_i2_analysis": {
-      "type": "object"
-    },
-    "proposed_statistics": {
+    "i3_contrast_registry": {
       "type": "object",
       "required": [
-        "framework",
-        "all_numbers_status",
-        "derivation_script",
-        "derivation_tables",
-        "reproducibility",
-        "model_free",
-        "hypothesis_families",
-        "retained_exact_binomial_gates",
-        "i3_primary_item_level_consistency",
-        "i3_secondary_paired_equivalence_sensitivity",
-        "i3_feasibility_verdict",
-        "i4_competence_floor_thresholds",
-        "rejected_v0_1_i4_chance_null",
-        "label_selection_uniformity_bands",
-        "descriptive_clopper_pearson_lower_bounds",
-        "paired_method_verification",
-        "sample_sizes",
-        "target_power",
-        "study_alpha",
-        "unresolved"
+        "claim_ceiling",
+        "disposition_status",
+        "independent_unit",
+        "k5",
+        "k5_applicability",
+        "k6",
+        "k6_applicability",
+        "variants_per_cluster"
       ],
+      "additionalProperties": false,
       "properties": {
-        "all_numbers_status": {
-          "const": "proposed design parameters, not measurements"
+        "claim_ceiling": {
+          "type": "string",
+          "minLength": 1
         },
-        "model_free": {
-          "const": true
+        "disposition_status": {
+          "type": "string",
+          "minLength": 1
         },
-        "rejected_v0_1_i4_chance_null": {
+        "independent_unit": {
+          "const": "base_item_contrast_cluster"
+        },
+        "k5": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "contrast_id",
+              "held_fixed",
+              "transformation",
+              "variants_per_cluster",
+              "varied_factor"
+            ],
+            "properties": {
+              "contrast_id": {
+                "type": "string",
+                "pattern": "^K5-"
+              },
+              "held_fixed": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "transformation": {
+                "type": "string"
+              },
+              "variants_per_cluster": {
+                "const": 2
+              },
+              "varied_factor": {
+                "type": "string"
+              }
+            }
+          },
+          "minItems": 7,
+          "maxItems": 7
+        },
+        "k5_applicability": {
           "type": "object",
           "required": [
-            "status"
+            "applicable_profiles",
+            "not_applicable_profiles",
+            "semantics"
           ],
+          "additionalProperties": false,
           "properties": {
-            "status": {
-              "const": "REJECTED_BY_OPERATOR_REVIEW"
+            "applicable_profiles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "not_applicable_profiles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "semantics": {
+              "type": "string",
+              "minLength": 1
             }
           }
         },
-        "sample_sizes": {
+        "k6": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "baseline_rendering",
+              "contrast_id",
+              "held_fixed",
+              "variant_rendering",
+              "variants_per_cluster",
+              "varied_factor"
+            ],
+            "properties": {
+              "baseline_rendering": {
+                "type": "string"
+              },
+              "contrast_id": {
+                "type": "string",
+                "pattern": "^K6-"
+              },
+              "held_fixed": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "variant_rendering": {
+                "type": "string"
+              },
+              "variants_per_cluster": {
+                "const": 2
+              },
+              "varied_factor": {
+                "type": "string"
+              }
+            }
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "k6_applicability": {
           "type": "object",
           "required": [
-            "n_192_is_not_an_i3_justification",
-            "blocking_decision"
+            "applicable_profiles",
+            "semantics"
           ],
+          "additionalProperties": false,
           "properties": {
-            "n_192_is_not_an_i3_justification": {
-              "const": true
+            "applicable_profiles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
-            "blocking_decision": {
-              "const": "OD6"
+            "semantics": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "variants_per_cluster": {
+          "const": 2,
+          "description": "Exactly two variants per registered contrast cluster."
+        }
+      }
+    },
+    "interface_profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "applicable_gates",
+          "chat_template_policy_by_role",
+          "disqualifying_failures",
+          "family",
+          "id",
+          "known_confounds",
+          "labels_visible",
+          "name",
+          "non_applicable_transformations",
+          "notes",
+          "options_visible",
+          "output_validity_rule",
+          "projected_operation_counts_if_later_authorized",
+          "prompt_and_rendering_contract",
+          "role_in_panel",
+          "scoring_formula",
+          "selectable_status",
+          "selectable_status_reason",
+          "tokenizer_eligibility_rule",
+          "transformation_applicability"
+        ],
+        "properties": {
+          "applicable_gates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "chat_template_policy_by_role": {
+            "type": "object",
+            "required": [
+              "R0",
+              "RC",
+              "RI",
+              "RL",
+              "RP",
+              "RT"
+            ],
+            "properties": {
+              "R0": {
+                "type": "string"
+              },
+              "RC": {
+                "type": "string"
+              },
+              "RI": {
+                "type": "string"
+              },
+              "RL": {
+                "type": "string"
+              },
+              "RP": {
+                "type": "string"
+              },
+              "RT": {
+                "type": "string"
+              }
+            }
+          },
+          "disqualifying_failures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "family": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "known_confounds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "labels_visible": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "non_applicable_transformations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "reason",
+                "transformation"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string"
+                },
+                "transformation": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "options_visible": {
+            "type": "boolean"
+          },
+          "output_validity_rule": {
+            "type": "string"
+          },
+          "projected_operation_counts_if_later_authorized": {
+            "type": "object",
+            "required": [
+              "forward_passes_per_item",
+              "generated_tokens_per_item",
+              "scored_positions_per_item"
+            ],
+            "properties": {
+              "forward_passes_per_item": {
+                "type": [
+                  "integer",
+                  "string"
+                ]
+              },
+              "generated_tokens_per_item": {
+                "type": [
+                  "integer",
+                  "string"
+                ]
+              },
+              "scored_positions_per_item": {
+                "type": "integer"
+              }
+            }
+          },
+          "prompt_and_rendering_contract": {
+            "type": "string"
+          },
+          "role_in_panel": {
+            "type": "string"
+          },
+          "scoring_formula": {
+            "type": "string"
+          },
+          "selectable_status": {
+            "type": "string"
+          },
+          "selectable_status_reason": {
+            "type": "string"
+          },
+          "tokenizer_eligibility_rule": {
+            "type": "string"
+          },
+          "transformation_applicability": {
+            "type": "object",
+            "required": [
+              "instruction_wording",
+              "label_set_replacement",
+              "label_symbol_permutation",
+              "position_permutation",
+              "separator_rendering"
+            ],
+            "properties": {
+              "instruction_wording": {
+                "type": "string"
+              },
+              "label_set_replacement": {
+                "type": "string"
+              },
+              "label_symbol_permutation": {
+                "type": "string"
+              },
+              "position_permutation": {
+                "type": "string"
+              },
+              "separator_rendering": {
+                "type": "string"
+              }
             }
           }
         }
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "non_questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "reason",
+          "statement"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "statement": {
+            "type": "string"
+          }
+        }
       }
+    },
+    "not_applicable_semantics": {
+      "type": "string",
+      "minLength": 1
     },
     "operation_boundaries": {
       "type": "object",
       "required": [
-        "performed_this_round",
         "all_counters_zero",
         "counter_semantics",
+        "local_operations_disclosure",
+        "performed_this_round",
         "prohibited_without_new_authority",
         "projected_future_operations"
       ],
       "additionalProperties": false,
       "properties": {
+        "all_counters_zero": {
+          "const": true
+        },
+        "counter_semantics": {
+          "type": "string",
+          "minLength": 1
+        },
+        "local_operations_disclosure": {
+          "type": "object",
+          "required": [
+            "authoritative_validation",
+            "local_decision_bearing_statistics",
+            "local_document_assembly",
+            "local_pytest"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "authoritative_validation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "local_decision_bearing_statistics": {
+              "type": "string",
+              "minLength": 1
+            },
+            "local_document_assembly": {
+              "type": "string",
+              "minLength": 1
+            },
+            "local_pytest": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
         "performed_this_round": {
           "type": "object",
-          "description": "Every registered counter must be exactly zero, and no unregistered counter may be introduced.",
           "required": [
             "ablation_operations",
             "activation_extractions",
             "bank_rows_generated",
             "confirmation_split_accesses",
+            "decision_bearing_local_statistical_runs",
             "evidence_rows_created",
             "forward_passes",
             "generations",
             "gpu_jobs",
             "interfaces_selected",
             "lens_operations",
+            "local_pytest_runs",
             "model_downloads",
             "model_weight_loads",
             "patching_operations",
@@ -1004,6 +1827,7 @@
             "provider_calls",
             "rq2_s4_operations",
             "seeds_drawn",
+            "sequence_scorings",
             "study1_files_modified",
             "study2_files_modified",
             "tokenizer_constructions"
@@ -1011,111 +1835,1119 @@
           "additionalProperties": false,
           "properties": {
             "ablation_operations": {
-              "const": 0
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
             },
             "activation_extractions": {
-              "const": 0
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
             },
             "bank_rows_generated": {
-              "const": 0
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
             },
             "confirmation_split_accesses": {
-              "const": 0
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "decision_bearing_local_statistical_runs": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
             },
             "evidence_rows_created": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "forward_passes": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "generations": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "gpu_jobs": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "interfaces_selected": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "lens_operations": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "local_pytest_runs": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "model_downloads": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "model_weight_loads": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "patching_operations": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "phase_1_0d_operations": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "positive_references_selected": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "probe_operations": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "provider_calls": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "rq2_s4_operations": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "seeds_drawn": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "sequence_scorings": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "study1_files_modified": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "study2_files_modified": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            },
+            "tokenizer_constructions": {
+              "const": 0,
+              "description": "Every operation counter of this round is exactly 0."
+            }
+          }
+        },
+        "prohibited_without_new_authority": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "projected_future_operations": {
+          "type": "object",
+          "required": [
+            "caveat",
+            "dimensional_identities",
+            "disposition_status",
+            "open_quantities",
+            "prohibition",
+            "s3_current_domain_accounting",
+            "status",
+            "unit_definitions",
+            "work_streams"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "caveat": {
+              "type": "string",
+              "minLength": 1
+            },
+            "dimensional_identities": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "base_item_contrast_clusters",
+                  "component",
+                  "holds",
+                  "identity",
+                  "profile",
+                  "rendered_rows"
+                ],
+                "properties": {
+                  "base_item_contrast_clusters": {
+                    "type": "integer"
+                  },
+                  "component": {
+                    "type": "string"
+                  },
+                  "holds": {
+                    "type": "boolean"
+                  },
+                  "identity": {
+                    "type": "string"
+                  },
+                  "profile": {
+                    "type": "string"
+                  },
+                  "rendered_rows": {
+                    "type": "integer"
+                  }
+                }
+              }
+            },
+            "disposition_status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "open_quantities": {
+              "type": "object",
+              "required": [
+                "positive_reference_external_P3Q"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "positive_reference_external_P3Q": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "prohibition": {
+              "type": "string",
+              "minLength": 1
+            },
+            "s3_current_domain_accounting": {
+              "type": "object",
+              "required": [
+                "additional_forward_passes",
+                "additional_sequence_scoring_rows",
+                "future_multi_token_activation",
+                "why"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "additional_forward_passes": {
+                  "type": "integer"
+                },
+                "additional_sequence_scoring_rows": {
+                  "type": "integer"
+                },
+                "future_multi_token_activation": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "why": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "unit_definitions": {
+              "type": "object",
+              "required": [
+                "base_item",
+                "base_item_contrast_cluster",
+                "n",
+                "rendered_row",
+                "scored_row"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "base_item": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "base_item_contrast_cluster": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "n": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "rendered_row": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scored_row": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "work_streams": {
+              "type": "object",
+              "required": [
+                "RP_I4_under_candidate_profiles",
+                "S4_diagnostic_generation",
+                "deterministic_I0_fixtures",
+                "positive_reference_external_P3Q",
+                "selected_profile_one_shot_confirmation",
+                "target_role_development"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "RP_I4_under_candidate_profiles": {
+                  "type": "object",
+                  "required": [
+                    "by_profile",
+                    "cells",
+                    "conjunction",
+                    "forward_passes",
+                    "generated_tokens_upper_bound",
+                    "model_roles",
+                    "n_per_cell",
+                    "precondition",
+                    "scope",
+                    "scored_rows",
+                    "unit_of_n",
+                    "uses_model"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "by_profile": {
+                      "type": "object",
+                      "required": [
+                        "S1",
+                        "S2",
+                        "S3"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "S1": {
+                          "type": "object",
+                          "required": [
+                            "base_item_contrast_clusters",
+                            "base_items",
+                            "forward_passes",
+                            "logit_reads",
+                            "rendered_rows",
+                            "scored_rows",
+                            "variants_per_cluster"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "base_item_contrast_clusters": {},
+                            "base_items": {},
+                            "forward_passes": {},
+                            "logit_reads": {},
+                            "rendered_rows": {},
+                            "scored_rows": {},
+                            "variants_per_cluster": {}
+                          }
+                        },
+                        "S2": {
+                          "type": "object",
+                          "required": [
+                            "base_item_contrast_clusters",
+                            "base_items",
+                            "forward_passes",
+                            "logit_reads",
+                            "rendered_rows",
+                            "scored_rows",
+                            "variants_per_cluster"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "base_item_contrast_clusters": {},
+                            "base_items": {},
+                            "forward_passes": {},
+                            "logit_reads": {},
+                            "rendered_rows": {},
+                            "scored_rows": {},
+                            "variants_per_cluster": {}
+                          }
+                        },
+                        "S3": {
+                          "type": "object",
+                          "required": [
+                            "base_items",
+                            "derived_from",
+                            "incremental_forward_passes",
+                            "incremental_rendered_rows",
+                            "incremental_scored_rows"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "base_items": {},
+                            "derived_from": {},
+                            "incremental_forward_passes": {},
+                            "incremental_rendered_rows": {},
+                            "incremental_scored_rows": {}
+                          }
+                        }
+                      }
+                    },
+                    "cells": {
+                      "type": "integer"
+                    },
+                    "conjunction": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "forward_passes": {
+                      "type": "integer"
+                    },
+                    "generated_tokens_upper_bound": {
+                      "type": "integer"
+                    },
+                    "model_roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "n_per_cell": {
+                      "type": "integer"
+                    },
+                    "precondition": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "scope": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "scored_rows": {
+                      "type": "integer"
+                    },
+                    "unit_of_n": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uses_model": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "S4_diagnostic_generation": {
+                  "type": "object",
+                  "required": [
+                    "base_item_contrast_clusters",
+                    "base_items",
+                    "forward_passes",
+                    "generated_tokens_upper_bound",
+                    "generations",
+                    "model_roles",
+                    "registered_generated_token_bound_per_row",
+                    "rendered_rows",
+                    "rendered_rows_per_role",
+                    "scope",
+                    "scored_rows",
+                    "selection_authority",
+                    "uses_model",
+                    "variants_per_cluster"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "base_item_contrast_clusters": {
+                      "type": "integer"
+                    },
+                    "base_items": {
+                      "type": "integer"
+                    },
+                    "forward_passes": {
+                      "type": "null"
+                    },
+                    "generated_tokens_upper_bound": {
+                      "type": "integer"
+                    },
+                    "generations": {
+                      "type": "integer"
+                    },
+                    "model_roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "registered_generated_token_bound_per_row": {
+                      "type": "integer"
+                    },
+                    "rendered_rows": {
+                      "type": "integer"
+                    },
+                    "rendered_rows_per_role": {
+                      "type": "integer"
+                    },
+                    "scope": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "scored_rows": {
+                      "type": "integer"
+                    },
+                    "selection_authority": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uses_model": {
+                      "type": "boolean"
+                    },
+                    "variants_per_cluster": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "deterministic_I0_fixtures": {
+                  "type": "object",
+                  "required": [
+                    "base_item_contrast_clusters",
+                    "base_items",
+                    "breakdown",
+                    "forward_passes",
+                    "generated_tokens_upper_bound",
+                    "logit_reads",
+                    "model_roles",
+                    "rendered_rows",
+                    "scope",
+                    "scored_rows",
+                    "uses_model",
+                    "variants_per_cluster"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "base_item_contrast_clusters": {
+                      "type": "integer"
+                    },
+                    "base_items": {
+                      "type": "integer"
+                    },
+                    "breakdown": {
+                      "type": "object",
+                      "required": [
+                        "indicator_truth_table_fixtures",
+                        "k5_constructor_fixtures",
+                        "k6_constructor_fixtures",
+                        "not_applicable_branch_fixtures",
+                        "scorer_branch_fixtures"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "indicator_truth_table_fixtures": {
+                          "type": "integer"
+                        },
+                        "k5_constructor_fixtures": {
+                          "type": "integer"
+                        },
+                        "k6_constructor_fixtures": {
+                          "type": "integer"
+                        },
+                        "not_applicable_branch_fixtures": {
+                          "type": "integer"
+                        },
+                        "scorer_branch_fixtures": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "forward_passes": {
+                      "type": "integer"
+                    },
+                    "generated_tokens_upper_bound": {
+                      "type": "integer"
+                    },
+                    "logit_reads": {
+                      "type": "integer"
+                    },
+                    "model_roles": {
+                      "type": "integer"
+                    },
+                    "rendered_rows": {
+                      "type": "integer"
+                    },
+                    "scope": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "scored_rows": {
+                      "type": "integer"
+                    },
+                    "uses_model": {
+                      "type": "boolean"
+                    },
+                    "variants_per_cluster": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "positive_reference_external_P3Q": {
+                  "type": "object",
+                  "required": [
+                    "base_item_contrast_clusters",
+                    "base_items",
+                    "forward_passes",
+                    "generated_tokens_upper_bound",
+                    "model_roles",
+                    "numeric_status",
+                    "rendered_rows",
+                    "scope",
+                    "scored_rows",
+                    "uses_model",
+                    "variants_per_cluster",
+                    "why_null"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "base_item_contrast_clusters": {
+                      "type": "null"
+                    },
+                    "base_items": {
+                      "type": "null"
+                    },
+                    "forward_passes": {
+                      "type": "null"
+                    },
+                    "generated_tokens_upper_bound": {
+                      "type": "null"
+                    },
+                    "model_roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "numeric_status": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "rendered_rows": {
+                      "type": "null"
+                    },
+                    "scope": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "scored_rows": {
+                      "type": "null"
+                    },
+                    "uses_model": {
+                      "type": "boolean"
+                    },
+                    "variants_per_cluster": {
+                      "type": "null"
+                    },
+                    "why_null": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "selected_profile_one_shot_confirmation": {
+                  "type": "object",
+                  "required": [
+                    "accessible_now",
+                    "base_item_contrast_clusters",
+                    "base_items",
+                    "forward_passes",
+                    "generated_tokens_upper_bound",
+                    "model_roles",
+                    "rendered_rows",
+                    "rp_i4_rendered_rows",
+                    "scope",
+                    "scored_rows",
+                    "selected_profile",
+                    "target_role_rendered_rows",
+                    "upper_bound_profile_used_for_this_projection",
+                    "uses_model",
+                    "variants_per_cluster",
+                    "why_upper_bound"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "accessible_now": {
+                      "type": "boolean"
+                    },
+                    "base_item_contrast_clusters": {
+                      "type": "integer"
+                    },
+                    "base_items": {
+                      "type": "integer"
+                    },
+                    "forward_passes": {
+                      "type": "integer"
+                    },
+                    "generated_tokens_upper_bound": {
+                      "type": "integer"
+                    },
+                    "model_roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "rendered_rows": {
+                      "type": "integer"
+                    },
+                    "rp_i4_rendered_rows": {
+                      "type": "integer"
+                    },
+                    "scope": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "scored_rows": {
+                      "type": "integer"
+                    },
+                    "selected_profile": {
+                      "type": "null"
+                    },
+                    "target_role_rendered_rows": {
+                      "type": "integer"
+                    },
+                    "upper_bound_profile_used_for_this_projection": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uses_model": {
+                      "type": "boolean"
+                    },
+                    "variants_per_cluster": {
+                      "type": "integer"
+                    },
+                    "why_upper_bound": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "target_role_development": {
+                  "type": "object",
+                  "required": [
+                    "by_profile",
+                    "excludes",
+                    "forward_passes",
+                    "generated_tokens_upper_bound",
+                    "model_roles",
+                    "scope",
+                    "scored_rows",
+                    "uses_model"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "by_profile": {
+                      "type": "object",
+                      "required": [
+                        "S1",
+                        "S2",
+                        "S3"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "S1": {
+                          "type": "object",
+                          "required": [
+                            "base_item_contrast_clusters",
+                            "base_items",
+                            "components",
+                            "forward_passes",
+                            "generated_tokens_upper_bound",
+                            "logit_reads",
+                            "model_roles",
+                            "rendered_rows",
+                            "rendered_rows_per_role",
+                            "scored_rows",
+                            "variants_per_cluster"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "base_item_contrast_clusters": {},
+                            "base_items": {},
+                            "components": {},
+                            "forward_passes": {},
+                            "generated_tokens_upper_bound": {},
+                            "logit_reads": {},
+                            "model_roles": {},
+                            "rendered_rows": {},
+                            "rendered_rows_per_role": {},
+                            "scored_rows": {},
+                            "variants_per_cluster": {}
+                          }
+                        },
+                        "S2": {
+                          "type": "object",
+                          "required": [
+                            "base_item_contrast_clusters",
+                            "base_items",
+                            "components",
+                            "forward_passes",
+                            "generated_tokens_upper_bound",
+                            "logit_reads",
+                            "model_roles",
+                            "rendered_rows",
+                            "rendered_rows_per_role",
+                            "scored_rows",
+                            "variants_per_cluster"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "base_item_contrast_clusters": {},
+                            "base_items": {},
+                            "components": {},
+                            "forward_passes": {},
+                            "generated_tokens_upper_bound": {},
+                            "logit_reads": {},
+                            "model_roles": {},
+                            "rendered_rows": {},
+                            "rendered_rows_per_role": {},
+                            "scored_rows": {},
+                            "variants_per_cluster": {}
+                          }
+                        },
+                        "S3": {
+                          "type": "object",
+                          "required": [
+                            "base_item_contrast_clusters",
+                            "base_items",
+                            "components",
+                            "derived_from",
+                            "incremental_forward_passes",
+                            "incremental_rendered_rows",
+                            "incremental_scored_rows",
+                            "incremental_sequence_scoring_rows",
+                            "rendered_rows_if_independently_rendered",
+                            "variants_per_cluster",
+                            "why"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "base_item_contrast_clusters": {},
+                            "base_items": {},
+                            "components": {},
+                            "derived_from": {},
+                            "incremental_forward_passes": {},
+                            "incremental_rendered_rows": {},
+                            "incremental_scored_rows": {},
+                            "incremental_sequence_scoring_rows": {},
+                            "rendered_rows_if_independently_rendered": {},
+                            "variants_per_cluster": {},
+                            "why": {}
+                          }
+                        }
+                      }
+                    },
+                    "excludes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "forward_passes": {
+                      "type": "integer"
+                    },
+                    "generated_tokens_upper_bound": {
+                      "type": "integer"
+                    },
+                    "model_roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "scope": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "scored_rows": {
+                      "type": "integer"
+                    },
+                    "uses_model": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "operator_review_v0_1": {
+      "type": "object",
+      "required": [
+        "additive",
+        "classification",
+        "defects",
+        "disposition",
+        "record",
+        "v0_1_preserved_unedited",
+        "v0_1_receipt_retained"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "additive": {
+          "type": "boolean"
+        },
+        "classification": {
+          "type": "string",
+          "minLength": 1
+        },
+        "defects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "resolution",
+              "summary"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "resolution": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "disposition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record": {
+          "type": "string",
+          "minLength": 1
+        },
+        "v0_1_preserved_unedited": {
+          "type": "boolean"
+        },
+        "v0_1_receipt_retained": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "positive_reference_candidates": {
+      "type": "object",
+      "required": [
+        "blocking_decision",
+        "candidate_families_for_operator_consideration",
+        "circularity_rule",
+        "dossier",
+        "dossier_correction",
+        "hard_requirements",
+        "operations_performed_on_any_candidate",
+        "prequalification_stage_proposal",
+        "selection_status",
+        "t4_feasibility_analysis"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "blocking_decision": {
+          "const": "OD2"
+        },
+        "candidate_families_for_operator_consideration": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "argument",
+              "family",
+              "risk",
+              "t4_fit"
+            ],
+            "properties": {
+              "argument": {
+                "type": "string"
+              },
+              "family": {
+                "type": "string"
+              },
+              "risk": {
+                "type": "string"
+              },
+              "t4_fit": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "circularity_rule": {
+          "type": "object",
+          "required": [
+            "canonical_interface_status",
+            "item_disjointness",
+            "problem",
+            "requirement"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "canonical_interface_status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "item_disjointness": {
+              "type": "string",
+              "minLength": 1
+            },
+            "problem": {
+              "type": "string",
+              "minLength": 1
+            },
+            "requirement": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "dossier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dossier_correction": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hard_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "operations_performed_on_any_candidate": {
+          "type": "object",
+          "required": [
+            "downloads",
+            "forward_passes",
+            "prequalification_runs",
+            "revision_resolutions_by_download",
+            "tokenizer_constructions",
+            "weight_loads"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "downloads": {
               "const": 0
             },
             "forward_passes": {
               "const": 0
             },
-            "generations": {
+            "prequalification_runs": {
               "const": 0
             },
-            "gpu_jobs": {
-              "const": 0
-            },
-            "interfaces_selected": {
-              "const": 0
-            },
-            "lens_operations": {
-              "const": 0
-            },
-            "model_downloads": {
-              "const": 0
-            },
-            "model_weight_loads": {
-              "const": 0
-            },
-            "patching_operations": {
-              "const": 0
-            },
-            "phase_1_0d_operations": {
-              "const": 0
-            },
-            "positive_references_selected": {
-              "const": 0
-            },
-            "probe_operations": {
-              "const": 0
-            },
-            "provider_calls": {
-              "const": 0
-            },
-            "rq2_s4_operations": {
-              "const": 0
-            },
-            "seeds_drawn": {
-              "const": 0
-            },
-            "study1_files_modified": {
-              "const": 0
-            },
-            "study2_files_modified": {
+            "revision_resolutions_by_download": {
               "const": 0
             },
             "tokenizer_constructions": {
               "const": 0
+            },
+            "weight_loads": {
+              "const": 0
             }
           }
         },
-        "all_counters_zero": {
-          "const": true
+        "prequalification_stage_proposal": {
+          "type": "object",
+          "required": [
+            "authority",
+            "floor",
+            "interface",
+            "isolation_rule",
+            "items",
+            "name",
+            "output",
+            "prohibition",
+            "stage_id",
+            "status"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "authority": {
+              "type": "string",
+              "minLength": 1
+            },
+            "floor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "interface": {
+              "type": "string",
+              "minLength": 1
+            },
+            "isolation_rule": {
+              "type": "string",
+              "minLength": 1
+            },
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "output": {
+              "type": "string",
+              "minLength": 1
+            },
+            "prohibition": {
+              "type": "string",
+              "minLength": 1
+            },
+            "stage_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "status": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         },
-        "counter_semantics": {
+        "selection_status": {
           "type": "string",
           "minLength": 1
         },
-        "prohibited_without_new_authority": {
-          "type": "array",
-          "minItems": 1
-        },
-        "projected_future_operations": {
-          "type": "object"
-        }
-      }
-    },
-    "compute_and_reproducibility_plan": {
-      "type": "object"
-    },
-    "claim_ceiling": {
-      "type": "object",
-      "required": [
-        "maximum_pass_claim",
-        "maximum_fail_claim",
-        "prohibited_claims",
-        "what_a_pass_permits",
-        "what_a_pass_does_not_permit",
-        "study2_relationship",
-        "not_applicable_semantics"
-      ],
-      "properties": {
-        "prohibited_claims": {
-          "type": "array",
-          "minItems": 8
-        },
-        "what_a_pass_does_not_permit": {
-          "type": "array",
-          "minItems": 8
+        "t4_feasibility_analysis": {
+          "type": "object",
+          "required": [
+            "alternative",
+            "class_3b",
+            "class_7b",
+            "class_8b_and_above",
+            "device",
+            "quantization_note",
+            "reference_point"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "alternative": {
+              "type": "string",
+              "minLength": 1
+            },
+            "class_3b": {
+              "type": "string",
+              "minLength": 1
+            },
+            "class_7b": {
+              "type": "string",
+              "minLength": 1
+            },
+            "class_8b_and_above": {
+              "type": "string",
+              "minLength": 1
+            },
+            "device": {
+              "type": "string",
+              "minLength": 1
+            },
+            "quantization_note": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reference_point": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         }
       }
     },
@@ -1131,8 +2963,7 @@
       "properties": {
         "study1": {
           "type": "string",
-          "minLength": 1,
-          "pattern": "do not establish that parsing caused"
+          "minLength": 1
         },
         "study1_classification": {
           "type": "string",
@@ -1148,134 +2979,1875 @@
         }
       }
     },
-    "unresolved_operator_decisions": {
-      "type": "array",
-      "minItems": 8,
-      "items": {
-        "type": "object",
-        "required": [
-          "id",
-          "question",
-          "status",
-          "disposition",
-          "blocking"
-        ],
-        "properties": {
-          "id": {
-            "pattern": "^OD[1-8]$"
+    "proposed_statistics": {
+      "type": "object",
+      "required": [
+        "all_numbers_status",
+        "confirmation_component_alpha",
+        "confirmation_component_alpha_exact_rational",
+        "confirmation_exact_binomial_gates",
+        "derivation_not_transcription",
+        "derivation_script",
+        "derivation_tables",
+        "descriptive_clopper_pearson_lower_bounds",
+        "descriptive_paired_summary",
+        "development_component_alpha",
+        "development_component_alpha_exact_rational",
+        "development_selection_map",
+        "disposition_status",
+        "exact_rational_policy",
+        "framework",
+        "hypothesis_families",
+        "i3_floor",
+        "i3_indicators",
+        "i3_pairwise_construction_verification",
+        "model_free",
+        "rejected_v0_1_i4_chance_null",
+        "reproducibility",
+        "retained_exact_binomial_gates",
+        "sample_sizes",
+        "selected_label_uniformity_diagnostic",
+        "study_development_screening_alpha",
+        "study_development_screening_alpha_exact_rational",
+        "target_power",
+        "unresolved"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "all_numbers_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmation_component_alpha": {
+          "type": "number"
+        },
+        "confirmation_component_alpha_exact_rational": {
+          "const": "1/200"
+        },
+        "confirmation_exact_binomial_gates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "alpha",
+              "alpha_exact_rational",
+              "applicable_profiles",
+              "construct",
+              "degenerate_rejection_region",
+              "evaluated_per",
+              "exact_null_tail_at_p0",
+              "exact_power_at_p1",
+              "gate",
+              "independent_unit",
+              "meets_target_power",
+              "n",
+              "null_hypothesis",
+              "p0",
+              "p0_exact_rational",
+              "p1_exact_rational",
+              "p1_lowest_alternative_of_interest",
+              "pass_count",
+              "rejection_rule",
+              "split",
+              "unit_of_n"
+            ],
+            "properties": {
+              "alpha": {
+                "type": "number"
+              },
+              "alpha_exact_rational": {
+                "const": "1/200"
+              },
+              "applicable_profiles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "construct": {
+                "type": "string"
+              },
+              "degenerate_rejection_region": {
+                "const": false,
+                "description": "A pass count equal to n has no power against any alternative below 1 and is not a hypothesis test."
+              },
+              "evaluated_per": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "exact_null_tail_at_p0": {
+                "type": "number"
+              },
+              "exact_power_at_p1": {
+                "type": "number"
+              },
+              "gate": {
+                "enum": [
+                  "I1a",
+                  "I1b",
+                  "I2",
+                  "I3",
+                  "I4"
+                ]
+              },
+              "independent_unit": {
+                "type": "string"
+              },
+              "meets_target_power": {
+                "const": true
+              },
+              "n": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "null_hypothesis": {
+                "type": "string"
+              },
+              "p0": {
+                "type": "number"
+              },
+              "p0_exact_rational": {
+                "type": "string"
+              },
+              "p1_exact_rational": {
+                "type": "string"
+              },
+              "p1_lowest_alternative_of_interest": {
+                "type": "number"
+              },
+              "pass_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "rejection_rule": {
+                "type": "string"
+              },
+              "split": {
+                "type": "string"
+              },
+              "unit_of_n": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
           },
-          "status": {
-            "enum": [
-              "resolved",
-              "resolved_in_part",
-              "unresolved"
-            ]
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "derivation_not_transcription": {
+          "type": "string",
+          "minLength": 1
+        },
+        "derivation_script": {
+          "type": "string",
+          "minLength": 1
+        },
+        "derivation_tables": {
+          "type": "string",
+          "minLength": 1
+        },
+        "descriptive_clopper_pearson_lower_bounds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "clopper_pearson_lower_bound",
+              "lower_tail_mass_consumed_by_this_bound",
+              "n",
+              "simultaneous_cells",
+              "status",
+              "successes",
+              "tail_convention",
+              "two_sided_simultaneous_mass",
+              "two_sided_simultaneous_mass_exact_rational",
+              "unit_of_n"
+            ],
+            "properties": {
+              "clopper_pearson_lower_bound": {
+                "type": "number"
+              },
+              "lower_tail_mass_consumed_by_this_bound": {
+                "type": "number"
+              },
+              "n": {
+                "type": "integer"
+              },
+              "simultaneous_cells": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "successes": {
+                "type": "integer"
+              },
+              "tail_convention": {
+                "type": "string"
+              },
+              "two_sided_simultaneous_mass": {
+                "type": "number"
+              },
+              "two_sided_simultaneous_mass_exact_rational": {
+                "type": "string"
+              },
+              "unit_of_n": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "descriptive_paired_summary": {
+          "type": "object",
+          "required": [
+            "carries_no",
+            "reported_per",
+            "reported_quantities",
+            "retired_procedure",
+            "status"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "carries_no": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "reported_per": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reported_quantities": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "retired_procedure": {
+              "type": "object",
+              "required": [
+                "disposition_status",
+                "historical_evidence",
+                "name",
+                "operator_resolution",
+                "retired_from",
+                "second_reviewer_question"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "disposition_status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "historical_evidence": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "operator_resolution": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "retired_from": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "second_reviewer_question": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "status": {
+              "const": "DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY"
+            }
+          }
+        },
+        "development_component_alpha": {
+          "type": "number"
+        },
+        "development_component_alpha_exact_rational": {
+          "const": "1/600"
+        },
+        "development_selection_map": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "all_applicable_components_passed",
+              "eligible_profiles",
+              "fixed_selectable_profile_denominator",
+              "s3_multi_token_domain_activated",
+              "selected_profile",
+              "stop_no_selectable_profile_is_eligible"
+            ],
+            "properties": {
+              "all_applicable_components_passed": {
+                "type": "object",
+                "required": [
+                  "S1",
+                  "S2",
+                  "S3"
+                ],
+                "properties": {
+                  "S1": {
+                    "type": "boolean"
+                  },
+                  "S2": {
+                    "type": "boolean"
+                  },
+                  "S3": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "eligible_profiles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "fixed_selectable_profile_denominator": {
+                "type": "integer"
+              },
+              "s3_multi_token_domain_activated": {
+                "type": "boolean"
+              },
+              "selected_profile": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "stop_no_selectable_profile_is_eligible": {
+                "type": "boolean"
+              }
+            }
           },
-          "blocking": {
-            "type": "boolean"
+          "minItems": 16,
+          "maxItems": 16
+        },
+        "disposition_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exact_rational_policy": {
+          "type": "object",
+          "required": [
+            "every_level_carries_its_rational_form",
+            "principle",
+            "why"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "every_level_carries_its_rational_form": {
+              "type": "boolean"
+            },
+            "principle": {
+              "type": "string",
+              "minLength": 1
+            },
+            "why": {
+              "type": "string",
+              "minLength": 1
+            }
           }
-        }
-      },
-      "allOf": [
-        {
-          "contains": {
+        },
+        "framework": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hypothesis_families": {
+          "type": "object",
+          "required": [
+            "family_A_within_profile",
+            "family_B_across_profiles",
+            "family_C_descriptive",
+            "family_D_confirmation",
+            "principle"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "family_A_within_profile": {
+              "type": "object",
+              "required": [
+                "correction",
+                "implemented_where",
+                "members",
+                "note",
+                "per_component_alpha",
+                "per_component_alpha_exact_rational",
+                "type"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "correction": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "implemented_where": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "members": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "note": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "per_component_alpha": {
+                  "type": "number"
+                },
+                "per_component_alpha_exact_rational": {
+                  "const": "1/600"
+                },
+                "type": {
+                  "const": "intersection_union_conjunctive"
+                }
+              }
+            },
+            "family_B_across_profiles": {
+              "type": "object",
+              "required": [
+                "denominator_is_fixed_before_data",
+                "denominator_never_shrinks",
+                "exact_reconstruction",
+                "excluded",
+                "fixed_selectable_profile_denominator",
+                "members",
+                "per_profile_alpha",
+                "per_profile_alpha_exact_rational",
+                "study_development_screening_alpha",
+                "study_development_screening_alpha_exact_rational",
+                "type",
+                "why_the_denominator_never_shrinks"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "denominator_is_fixed_before_data": {
+                  "const": true
+                },
+                "denominator_never_shrinks": {
+                  "const": true
+                },
+                "exact_reconstruction": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "excluded": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "fixed_selectable_profile_denominator": {
+                  "const": 3,
+                  "description": "Fixed before any data exists and never shrinks."
+                },
+                "members": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "per_profile_alpha": {
+                  "type": "number"
+                },
+                "per_profile_alpha_exact_rational": {
+                  "const": "1/600"
+                },
+                "study_development_screening_alpha": {
+                  "type": "number"
+                },
+                "study_development_screening_alpha_exact_rational": {
+                  "const": "1/200"
+                },
+                "type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "why_the_denominator_never_shrinks": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "family_C_descriptive": {
+              "type": "object",
+              "required": [
+                "correction",
+                "members",
+                "type"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "correction": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "members": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "type": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "family_D_confirmation": {
+              "type": "object",
+              "required": [
+                "component_alpha",
+                "component_alpha_exact_rational",
+                "correction",
+                "type",
+                "within_profile"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "component_alpha": {
+                  "type": "number"
+                },
+                "component_alpha_exact_rational": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "correction": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "within_profile": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "principle": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "i3_floor": {
+          "type": "object",
+          "required": [
+            "active_floor_count",
+            "degenerate_region_prohibition",
+            "evaluated_per_cell",
+            "n",
+            "p0",
+            "p0_0_95_status",
+            "p0_exact_rational",
+            "p1_lowest_alternative_of_interest",
+            "target_power",
+            "unit_of_n",
+            "why_p0_0_95_was_deleted"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "active_floor_count": {
+              "const": 1,
+              "description": "Exactly one I3 floor may be active."
+            },
+            "degenerate_region_prohibition": {
+              "type": "string",
+              "minLength": 1
+            },
+            "evaluated_per_cell": {
+              "type": "string",
+              "minLength": 1
+            },
+            "n": {
+              "type": "integer"
+            },
+            "p0": {
+              "const": 0.9
+            },
+            "p0_0_95_status": {
+              "const": "DELETED FROM EVERY ACTIVE FIELD"
+            },
+            "p0_exact_rational": {
+              "const": "9/10"
+            },
+            "p1_lowest_alternative_of_interest": {
+              "type": "number"
+            },
+            "target_power": {
+              "type": "number"
+            },
+            "unit_of_n": {
+              "type": "string",
+              "minLength": 1
+            },
+            "why_p0_0_95_was_deleted": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "i3_indicators": {
+          "type": "object",
+          "required": [
+            "J_both",
+            "J_cor",
+            "J_inv",
+            "expected_integrity_invariant",
+            "independent_unit",
+            "no_rescue",
+            "truth_table",
+            "variants_per_cluster",
+            "why_the_conjunction_is_retained_despite_the_implication"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "J_both": {
+              "type": "object",
+              "required": [
+                "definition",
+                "estimand",
+                "role",
+                "why_primary"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "definition": {
+                  "const": "J_inv AND J_cor",
+                  "description": "The primary I3 indicator is the conjunction. A disjunction would restore the stable-but-wrong pass."
+                },
+                "estimand": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "role": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "why_primary": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "J_cor": {
+              "type": "object",
+              "required": [
+                "definition",
+                "role",
+                "stable_wrong_scores"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "definition": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "role": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "stable_wrong_scores": {
+                  "const": 0
+                }
+              }
+            },
+            "J_inv": {
+              "type": "object",
+              "required": [
+                "definition",
+                "role",
+                "stable_invalid_scores"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "definition": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "role": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "stable_invalid_scores": {
+                  "const": 0
+                }
+              }
+            },
+            "expected_integrity_invariant": {
+              "type": "string",
+              "minLength": 1
+            },
+            "independent_unit": {
+              "const": "base_item_contrast_cluster"
+            },
+            "no_rescue": {
+              "type": "string",
+              "minLength": 1
+            },
+            "truth_table": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "J_both",
+                  "J_cor",
+                  "J_inv",
+                  "case",
+                  "registered_ground_truth",
+                  "scores_for_the_gate",
+                  "variant_1_mapped_content",
+                  "variant_2_mapped_content"
+                ],
+                "properties": {
+                  "J_both": {
+                    "type": "integer"
+                  },
+                  "J_cor": {
+                    "type": "integer"
+                  },
+                  "J_inv": {
+                    "type": "integer"
+                  },
+                  "case": {
+                    "type": "string"
+                  },
+                  "registered_ground_truth": {
+                    "type": "string"
+                  },
+                  "scores_for_the_gate": {
+                    "type": "boolean"
+                  },
+                  "variant_1_mapped_content": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "variant_2_mapped_content": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            },
+            "variants_per_cluster": {
+              "const": 2
+            },
+            "why_the_conjunction_is_retained_despite_the_implication": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "i3_pairwise_construction_verification": {
+          "type": "object",
+          "required": [
+            "k5_baseline_conditions_balanced_over_a_complete_block",
+            "k5_complete_block_size",
+            "k5_contrast_count",
+            "k5_k6_base_item_identities_disjoint",
+            "k5_one_factor_per_contrast",
+            "k5_x_k6_cross_product_exists",
+            "k6_answer_cue_fixed_within_every_pair",
+            "k6_contrast_count",
+            "k6_rendering_set",
+            "label_alphabets_disjoint_from_answer_domain",
+            "label_alphabets_mutually_disjoint",
+            "variants_per_base_item_contrast_cluster"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "k5_baseline_conditions_balanced_over_a_complete_block": {
+              "type": "boolean"
+            },
+            "k5_complete_block_size": {
+              "type": "integer"
+            },
+            "k5_contrast_count": {
+              "type": "integer"
+            },
+            "k5_k6_base_item_identities_disjoint": {
+              "type": "boolean"
+            },
+            "k5_one_factor_per_contrast": {
+              "type": "boolean"
+            },
+            "k5_x_k6_cross_product_exists": {
+              "type": "boolean"
+            },
+            "k6_answer_cue_fixed_within_every_pair": {
+              "type": "boolean"
+            },
+            "k6_contrast_count": {
+              "type": "integer"
+            },
+            "k6_rendering_set": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "label_alphabets_disjoint_from_answer_domain": {
+              "type": "boolean"
+            },
+            "label_alphabets_mutually_disjoint": {
+              "type": "boolean"
+            },
+            "variants_per_base_item_contrast_cluster": {
+              "type": "integer"
+            }
+          }
+        },
+        "model_free": {
+          "const": true
+        },
+        "rejected_v0_1_i4_chance_null": {
+          "type": "object",
+          "required": [
+            "acceptance_count",
+            "acceptance_rate",
+            "alpha",
+            "exact_null_tail",
+            "n",
+            "null_hypothesis",
+            "status",
+            "why"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "acceptance_count": {
+              "type": "integer"
+            },
+            "acceptance_rate": {
+              "type": "number"
+            },
+            "alpha": {
+              "type": "number"
+            },
+            "exact_null_tail": {
+              "type": "number"
+            },
+            "n": {
+              "type": "integer"
+            },
+            "null_hypothesis": {
+              "type": "string",
+              "minLength": 1
+            },
+            "status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "why": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "reproducibility": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retained_exact_binomial_gates": {
+          "type": "array",
+          "items": {
             "type": "object",
             "required": [
-              "id",
-              "status",
-              "blocking"
+              "alpha",
+              "alpha_exact_rational",
+              "applicable_profiles",
+              "construct",
+              "degenerate_rejection_region",
+              "evaluated_per",
+              "exact_null_tail_at_p0",
+              "exact_power_at_p1",
+              "gate",
+              "independent_unit",
+              "meets_target_power",
+              "n",
+              "null_hypothesis",
+              "p0",
+              "p0_exact_rational",
+              "p1_exact_rational",
+              "p1_lowest_alternative_of_interest",
+              "pass_count",
+              "rejection_rule",
+              "split",
+              "unit_of_n"
             ],
             "properties": {
-              "id": {
-                "const": "OD2"
+              "alpha": {
+                "type": "number"
+              },
+              "alpha_exact_rational": {
+                "const": "1/600"
+              },
+              "applicable_profiles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "construct": {
+                "type": "string"
+              },
+              "degenerate_rejection_region": {
+                "const": false,
+                "description": "A pass count equal to n has no power against any alternative below 1 and is not a hypothesis test."
+              },
+              "evaluated_per": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "exact_null_tail_at_p0": {
+                "type": "number"
+              },
+              "exact_power_at_p1": {
+                "type": "number"
+              },
+              "gate": {
+                "enum": [
+                  "I1a",
+                  "I1b",
+                  "I2",
+                  "I3",
+                  "I4"
+                ]
+              },
+              "independent_unit": {
+                "type": "string"
+              },
+              "meets_target_power": {
+                "const": true
+              },
+              "n": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "null_hypothesis": {
+                "type": "string"
+              },
+              "p0": {
+                "type": "number"
+              },
+              "p0_exact_rational": {
+                "type": "string"
+              },
+              "p1_exact_rational": {
+                "type": "string"
+              },
+              "p1_lowest_alternative_of_interest": {
+                "type": "number"
+              },
+              "pass_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "rejection_rule": {
+                "type": "string"
+              },
+              "split": {
+                "type": "string"
+              },
+              "unit_of_n": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "sample_sizes": {
+          "type": "object",
+          "required": [
+            "I1a",
+            "I1b",
+            "I2",
+            "I3",
+            "I4",
+            "blocking_decision",
+            "confirmation_sizes",
+            "n_192_status",
+            "principle"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "I1a": {
+              "type": "object",
+              "required": [
+                "n",
+                "unit_of_n"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer"
+                },
+                "unit_of_n": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "I1b": {
+              "type": "object",
+              "required": [
+                "n",
+                "unit_of_n"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer"
+                },
+                "unit_of_n": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "I2": {
+              "type": "object",
+              "required": [
+                "n",
+                "unit_of_n"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer"
+                },
+                "unit_of_n": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "I3": {
+              "type": "object",
+              "required": [
+                "n",
+                "unit_of_n"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer"
+                },
+                "unit_of_n": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "I4": {
+              "type": "object",
+              "required": [
+                "n",
+                "unit_of_n"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer"
+                },
+                "unit_of_n": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "blocking_decision": {
+              "type": "string",
+              "minLength": 1
+            },
+            "confirmation_sizes": {
+              "type": "string",
+              "minLength": 1
+            },
+            "n_192_status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "principle": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "selected_label_uniformity_diagnostic": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "acceptance_band",
+              "applies_to",
+              "carries_confirmation_authority",
+              "carries_eligibility_authority",
+              "carries_gate_authority",
+              "carries_selection_authority",
+              "expected_per_label",
+              "labels",
+              "n",
+              "status",
+              "tail_convention",
+              "two_sided_mass_across_the_band",
+              "two_sided_mass_exact_rational",
+              "unit_of_n"
+            ],
+            "properties": {
+              "acceptance_band": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "applies_to": {
+                "type": "string"
+              },
+              "carries_confirmation_authority": {
+                "type": "boolean"
+              },
+              "carries_eligibility_authority": {
+                "type": "boolean"
+              },
+              "carries_gate_authority": {
+                "type": "boolean"
+              },
+              "carries_selection_authority": {
+                "type": "boolean"
+              },
+              "expected_per_label": {
+                "type": "number"
+              },
+              "labels": {
+                "type": "integer"
+              },
+              "n": {
+                "type": "integer"
               },
               "status": {
-                "const": "unresolved"
+                "type": "string"
               },
-              "blocking": {
-                "const": true
+              "tail_convention": {
+                "type": "string"
+              },
+              "two_sided_mass_across_the_band": {
+                "type": "number"
+              },
+              "two_sided_mass_exact_rational": {
+                "type": "string"
+              },
+              "unit_of_n": {
+                "type": "string"
               }
             }
           }
         },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "id",
-              "status",
-              "blocking"
-            ],
-            "properties": {
-              "id": {
-                "const": "OD5"
-              },
-              "status": {
-                "const": "unresolved"
-              },
-              "blocking": {
-                "const": true
-              }
-            }
-          }
+        "study_development_screening_alpha": {
+          "type": "number"
         },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "id",
-              "status",
-              "blocking"
-            ],
-            "properties": {
-              "id": {
-                "const": "OD6"
-              },
-              "status": {
-                "const": "unresolved"
-              },
-              "blocking": {
-                "const": true
-              }
-            }
+        "study_development_screening_alpha_exact_rational": {
+          "const": "1/200"
+        },
+        "target_power": {
+          "const": 0.9
+        },
+        "unresolved": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         }
-      ]
-    },
-    "blocking_decisions": {
-      "type": "array",
-      "minItems": 3,
-      "maxItems": 3,
-      "allOf": [
-        {
-          "contains": {
-            "const": "OD2"
-          }
-        },
-        {
-          "contains": {
-            "const": "OD5"
-          }
-        },
-        {
-          "contains": {
-            "const": "OD6"
-          }
-        }
-      ]
+      }
     },
     "required_next_action": {
-      "const": "bounded independent methods review of the statistical and gate packet"
+      "type": "string",
+      "minLength": 1
+    },
+    "research_question": {
+      "type": "object",
+      "required": [
+        "draft_question",
+        "question_class",
+        "unit_of_analysis",
+        "what_a_fail_would_mean",
+        "what_a_pass_would_mean"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "draft_question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "question_class": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unit_of_analysis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "what_a_fail_would_mean": {
+          "type": "string",
+          "minLength": 1
+        },
+        "what_a_pass_would_mean": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     },
     "results": {
       "type": "array",
       "maxItems": 0,
-      "description": "A draft carries no results."
+      "description": "A design draft records no result row."
     },
-    "bank_rows": {
+    "retired_procedures": {
+      "type": "object",
+      "required": [
+        "four_point_discordance_grid",
+        "i3_aggregate_equivalence_secondary_criterion",
+        "tango_paired_equivalence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "four_point_discordance_grid": {
+          "type": "object",
+          "required": [
+            "replacement",
+            "status",
+            "why"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "replacement": {
+              "type": "string",
+              "minLength": 1
+            },
+            "status": {
+              "const": "REMOVED FROM ACTIVE VERIFICATION"
+            },
+            "why": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "i3_aggregate_equivalence_secondary_criterion": {
+          "type": "object",
+          "required": [
+            "status",
+            "why"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "const": "REMOVED"
+            },
+            "why": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "tango_paired_equivalence": {
+          "type": "object",
+          "required": [
+            "citation",
+            "disposition_status",
+            "false_assertion_withdrawn",
+            "historical_evidence_preserved",
+            "historical_evidence_rule",
+            "name",
+            "question_for_the_second_reviewer",
+            "retired_from",
+            "status",
+            "what_survives",
+            "why"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "citation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "disposition_status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "false_assertion_withdrawn": {
+              "type": "string",
+              "minLength": 1
+            },
+            "historical_evidence_preserved": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "historical_evidence_rule": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "question_for_the_second_reviewer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "retired_from": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 9
+            },
+            "status": {
+              "const": "RETIRED FROM EVERY DECISION ROLE",
+              "description": "The paired aggregate-equivalence procedure carries no gate, eligibility, selection, confirmation, claim-language, equivalence-margin, critical-value, discordance-grid or conservativeness role."
+            },
+            "what_survives": {
+              "type": "string",
+              "minLength": 1
+            },
+            "why": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "schema_version": {
+      "const": "study3-interface-calibration-protocol-draft-v0.3"
+    },
+    "split_lifecycle": {
+      "type": "object",
+      "required": [
+        "cluster_rule",
+        "confirmation_isolation",
+        "hard_stop_before_confirmation",
+        "ordering",
+        "prevented_failure_modes",
+        "splits",
+        "surface_selection"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "cluster_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmation_isolation": {
+          "type": "object",
+          "required": [
+            "accessible_before_authority",
+            "covers_every_gate_bearing_construct",
+            "explicitly_includes",
+            "fail_closed",
+            "no_reuse_after_observation",
+            "one_shot",
+            "physical_exclusion_before_authorization",
+            "required",
+            "single_interface_only",
+            "v0_1_defect"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "accessible_before_authority": {
+              "type": "boolean"
+            },
+            "covers_every_gate_bearing_construct": {
+              "type": "boolean"
+            },
+            "explicitly_includes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "fail_closed": {
+              "type": "string",
+              "minLength": 1
+            },
+            "no_reuse_after_observation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "one_shot": {
+              "type": "boolean"
+            },
+            "physical_exclusion_before_authorization": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": {
+              "type": "boolean"
+            },
+            "single_interface_only": {
+              "type": "boolean"
+            },
+            "v0_1_defect": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "hard_stop_before_confirmation": {
+          "type": "object",
+          "required": [
+            "authority_needed",
+            "rationale",
+            "required"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "authority_needed": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rationale": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": {
+              "type": "boolean"
+            }
+          }
+        },
+        "ordering": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prevented_failure_modes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "mode",
+              "prevention"
+            ],
+            "properties": {
+              "mode": {
+                "type": "string"
+              },
+              "prevention": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "splits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "content",
+              "evidential",
+              "id",
+              "may_be_inspected_freely",
+              "name",
+              "purpose"
+            ],
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "evidential": {
+                "type": "boolean"
+              },
+              "id": {
+                "type": "string"
+              },
+              "may_be_inspected_freely": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": "string"
+              },
+              "purpose": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "surface_selection": {
+          "type": "object",
+          "required": [
+            "one_way",
+            "recorded_artifact",
+            "sealed_before_confirmation",
+            "uses"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "one_way": {
+              "type": "boolean"
+            },
+            "recorded_artifact": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sealed_before_confirmation": {
+              "type": "boolean"
+            },
+            "uses": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "state": {
+      "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW"
+    },
+    "status": {
+      "type": "object",
+      "required": [
+        "amendment_record",
+        "amendment_record_json",
+        "authoritative_artifact",
+        "document_class",
+        "execution_authorized",
+        "frozen",
+        "note",
+        "review_state",
+        "self_approval_prohibited"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "amendment_record": {
+          "type": "string",
+          "minLength": 1
+        },
+        "amendment_record_json": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authoritative_artifact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "document_class": {
+          "const": "design_draft"
+        },
+        "execution_authorized": {
+          "const": false,
+          "description": "Rejects execution_authorized=true."
+        },
+        "frozen": {
+          "const": false,
+          "description": "Rejects frozen=true."
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_state": {
+          "const": "awaiting_second_independent_methods_review"
+        },
+        "self_approval_prohibited": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "study_identity": {
+      "type": "object",
+      "required": [
+        "amendment_history",
+        "draft_version",
+        "name",
+        "namespace",
+        "predecessors",
+        "study_id",
+        "successor_authority"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "amendment_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "disposition",
+              "record",
+              "version"
+            ],
+            "properties": {
+              "disposition": {
+                "type": "string"
+              },
+              "record": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "draft_version": {
+          "const": "draft-v0.3"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "predecessors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "relevance",
+              "study_id",
+              "terminal_state"
+            ],
+            "properties": {
+              "relevance": {
+                "type": "string"
+              },
+              "study_id": {
+                "type": "string"
+              },
+              "terminal_state": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "study_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "successor_authority": {
+          "const": "none"
+        }
+      }
+    },
+    "target_must_pass_i1_i2_analysis": {
+      "type": "object",
+      "required": [
+        "argument",
+        "consequence_if_target_fails_i1_or_i2_under_every_interface",
+        "distinctness_from_i4",
+        "position"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "argument": {
+          "type": "string",
+          "minLength": 1
+        },
+        "consequence_if_target_fails_i1_or_i2_under_every_interface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "distinctness_from_i4": {
+          "type": "string",
+          "minLength": 1
+        },
+        "position": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "task_strata": {
       "type": "array",
-      "maxItems": 0,
-      "description": "A draft carries no task-bank rows."
+      "items": {
+        "type": "object",
+        "required": [
+          "balance_invariants",
+          "data_generating_process",
+          "depth",
+          "duplicate_and_leakage_prevention",
+          "expected_failure_mode",
+          "gate_role",
+          "ground_truth_function",
+          "id",
+          "name",
+          "pooling_rule",
+          "uses_model"
+        ],
+        "properties": {
+          "balance_invariants": {
+            "type": "string"
+          },
+          "data_generating_process": {
+            "type": "string"
+          },
+          "depth": {
+            "type": [
+              "array",
+              "integer",
+              "null",
+              "string"
+            ]
+          },
+          "duplicate_and_leakage_prevention": {
+            "type": "string"
+          },
+          "expected_failure_mode": {
+            "type": "string"
+          },
+          "gate_role": {
+            "type": "string"
+          },
+          "ground_truth_function": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "pooling_rule": {
+            "type": "string"
+          },
+          "uses_model": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "unit_registry": {
+      "type": "object",
+      "required": [
+        "prohibition",
+        "units",
+        "why"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "prohibition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "units": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "definition",
+              "never_equals",
+              "unit"
+            ],
+            "properties": {
+              "definition": {
+                "type": "string",
+                "minLength": 1
+              },
+              "never_equals": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 2
+        },
+        "why": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "unresolved_operator_decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "blocking",
+          "disposition",
+          "id",
+          "question",
+          "status"
+        ],
+        "properties": {
+          "blocking": {
+            "type": "boolean"
+          },
+          "disposition": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "minItems": 8,
+      "maxItems": 8
+    },
+    "validation_targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "cannot_prove",
+          "construct",
+          "id",
+          "why_needed"
+        ],
+        "properties": {
+          "cannot_prove": {
+            "type": "string"
+          },
+          "construct": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "why_needed": {
+            "type": "string"
+          }
+        }
+      }
     }
   }
 }

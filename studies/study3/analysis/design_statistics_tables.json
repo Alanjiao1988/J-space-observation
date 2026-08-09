@@ -1,981 +1,1447 @@
 {
+  "confirmation_exact_binomial_components": [
+    {
+      "alpha": 0.005,
+      "alpha_exact_rational": "1/200",
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "construct": "trivial content recovery and output validity",
+      "degenerate_rejection_region": false,
+      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "split"
+      ],
+      "exact_null_tail_at_p0": 0.003307722347,
+      "exact_power_at_p1": 0.976290353,
+      "gate": "I1a",
+      "independent_unit": "base_item",
+      "meets_target_power": true,
+      "n": 256,
+      "null_hypothesis": "p <= 0.9",
+      "p0": 0.9,
+      "p0_exact_rational": "9/10",
+      "p1_exact_rational": "97/100",
+      "p1_lowest_alternative_of_interest": 0.97,
+      "pass_count": 243,
+      "pass_rate": 0.94921875,
+      "rejection_rule": "pass the component when the observed success count is at least 243 out of 256 base items per atomic cell",
+      "source_stratum": "K2",
+      "split": "confirmation",
+      "unit_of_n": "base items per atomic cell"
+    },
+    {
+      "alpha": 0.005,
+      "alpha_exact_rational": "1/200",
+      "applicable_profiles": [
+        "S1",
+        "S4"
+      ],
+      "construct": "explicit content-to-symbol binding",
+      "degenerate_rejection_region": false,
+      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "label alphabet balancing block",
+        "split"
+      ],
+      "exact_null_tail_at_p0": 0.003307722347,
+      "exact_power_at_p1": 0.976290353,
+      "gate": "I1b",
+      "independent_unit": "base_item",
+      "meets_target_power": true,
+      "n": 256,
+      "null_hypothesis": "p <= 0.9",
+      "p0": 0.9,
+      "p0_exact_rational": "9/10",
+      "p1_exact_rational": "97/100",
+      "p1_lowest_alternative_of_interest": 0.97,
+      "pass_count": 243,
+      "pass_rate": 0.94921875,
+      "rejection_rule": "pass the component when the observed success count is at least 243 out of 256 base items per atomic cell",
+      "source_stratum": "K1",
+      "split": "confirmation",
+      "unit_of_n": "base items per atomic cell"
+    },
+    {
+      "alpha": 0.005,
+      "alpha_exact_rational": "1/200",
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "construct": "primitive headroom, evaluated separately per family",
+      "degenerate_rejection_region": false,
+      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "primitive operation family",
+        "split"
+      ],
+      "exact_null_tail_at_p0": 0.002962603303,
+      "exact_power_at_p1": 0.972425829,
+      "gate": "I2",
+      "independent_unit": "base_item",
+      "meets_target_power": true,
+      "n": 128,
+      "null_hypothesis": "p <= 0.5",
+      "p0": 0.5,
+      "p0_exact_rational": "1/2",
+      "p1_exact_rational": "7/10",
+      "p1_lowest_alternative_of_interest": 0.7,
+      "pass_count": 80,
+      "pass_rate": 0.625,
+      "rejection_rule": "pass the component when the observed success count is at least 80 out of 128 base items per primitive-family cell",
+      "source_stratum": "K3",
+      "split": "confirmation",
+      "unit_of_n": "base items per primitive-family cell"
+    },
+    {
+      "alpha": 0.005,
+      "alpha_exact_rational": "1/200",
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "construct": "pairwise presentation invariance and correctness, J_both",
+      "degenerate_rejection_region": false,
+      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "contrast family",
+        "contrast ID",
+        "split"
+      ],
+      "exact_null_tail_at_p0": 0.003307722347,
+      "exact_power_at_p1": 0.976290353,
+      "gate": "I3",
+      "independent_unit": "base_item_contrast_cluster",
+      "meets_target_power": true,
+      "n": 256,
+      "null_hypothesis": "p <= 0.9",
+      "p0": 0.9,
+      "p0_exact_rational": "9/10",
+      "p1_exact_rational": "97/100",
+      "p1_lowest_alternative_of_interest": 0.97,
+      "pass_count": 243,
+      "pass_rate": 0.94921875,
+      "rejection_rule": "pass the component when the observed success count is at least 243 out of 256 base-item contrast clusters per contrast cell",
+      "source_stratum": "K5 and K6",
+      "split": "confirmation",
+      "unit_of_n": "base-item contrast clusters per contrast cell"
+    },
+    {
+      "alpha": 0.005,
+      "alpha_exact_rational": "1/200",
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "construct": "positive-reference competence recovery through the profile",
+      "degenerate_rejection_region": false,
+      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
+      "evaluated_per": [
+        "interface profile",
+        "registered operation family",
+        "depth"
+      ],
+      "exact_null_tail_at_p0": 0.003276850097,
+      "exact_power_at_p1": 0.963820468,
+      "gate": "I4",
+      "independent_unit": "base_item",
+      "meets_target_power": true,
+      "n": 256,
+      "null_hypothesis": "p <= 0.8",
+      "p0": 0.8,
+      "p0_exact_rational": "4/5",
+      "p1_exact_rational": "9/10",
+      "p1_lowest_alternative_of_interest": 0.9,
+      "pass_count": 222,
+      "pass_rate": 0.8671875,
+      "rejection_rule": "pass the component when the observed success count is at least 222 out of 256 RP base items per operation-family x depth cell per candidate profile",
+      "source_stratum": "K4",
+      "split": "confirmation",
+      "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
+    }
+  ],
   "declared_assumptions": {
-    "i4_competence_floor": 0.8,
-    "selectable_surface_count": 3,
-    "study_alpha": 0.005,
-    "target_power": 0.9
+    "across_profile_correction": "Bonferroni over the fixed denominator 3",
+    "confirmation_component_alpha": 0.005,
+    "confirmation_component_alpha_exact_rational": "1/200",
+    "confirmation_correction": "none across profiles; exactly one pre-selected profile enters the one-shot confirmation split and no reselection is permitted, so the claim is conditional on that profile",
+    "decimal_fields_are": "renderings of the exact rational policy, not the source of truth",
+    "denominator_is_fixed_before_data": true,
+    "denominator_never_shrinks": true,
+    "development_component_alpha": 0.001666666667,
+    "development_component_alpha_exact_rational": "1/600",
+    "selectable_profile_denominator": 3,
+    "study_development_screening_alpha": 0.005,
+    "study_development_screening_alpha_exact_rational": "1/200",
+    "target_power": 0.9,
+    "within_profile_correction": "none; the components form an intersection-union conjunction, so every applicable component must pass and no further within-profile Bonferroni correction is applied"
   },
   "descriptive_clopper_pearson_lower_bounds": [
     {
-      "cells": 4,
-      "clopper_pearson_lower": 0.890112,
-      "n": 192,
-      "simultaneous_alpha": 0.00125,
-      "successes": 184
+      "clopper_pearson_lower_bound": 0.928608,
+      "lower_tail_mass_consumed_by_this_bound": 0.000625,
+      "n": 256,
+      "simultaneous_cells": 4,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 250,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.00125,
+      "two_sided_simultaneous_mass_exact_rational": "1/800",
+      "unit_of_n": "independent units in the cell"
     },
     {
-      "cells": 4,
-      "clopper_pearson_lower": 0.833418,
-      "n": 192,
-      "simultaneous_alpha": 0.00125,
-      "successes": 176
+      "clopper_pearson_lower_bound": 0.900046,
+      "lower_tail_mass_consumed_by_this_bound": 0.000625,
+      "n": 256,
+      "simultaneous_cells": 4,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 245,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.00125,
+      "two_sided_simultaneous_mass_exact_rational": "1/800",
+      "unit_of_n": "independent units in the cell"
     },
     {
-      "cells": 4,
-      "clopper_pearson_lower": 0.83815,
+      "clopper_pearson_lower_bound": 0.83815,
+      "lower_tail_mass_consumed_by_this_bound": 0.000625,
       "n": 128,
-      "simultaneous_alpha": 0.00125,
-      "successes": 120
+      "simultaneous_cells": 4,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 120,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.00125,
+      "two_sided_simultaneous_mass_exact_rational": "1/800",
+      "unit_of_n": "independent units in the cell"
     },
     {
-      "cells": 8,
-      "clopper_pearson_lower": 0.885178,
-      "n": 192,
-      "simultaneous_alpha": 0.000625,
-      "successes": 184
+      "clopper_pearson_lower_bound": 0.92502,
+      "lower_tail_mass_consumed_by_this_bound": 0.0003125,
+      "n": 256,
+      "simultaneous_cells": 8,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 250,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.000625,
+      "two_sided_simultaneous_mass_exact_rational": "1/1600",
+      "unit_of_n": "independent units in the cell"
     },
     {
-      "cells": 8,
-      "clopper_pearson_lower": 0.82775,
-      "n": 192,
-      "simultaneous_alpha": 0.000625,
-      "successes": 176
+      "clopper_pearson_lower_bound": 0.895992,
+      "lower_tail_mass_consumed_by_this_bound": 0.0003125,
+      "n": 256,
+      "simultaneous_cells": 8,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 245,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.000625,
+      "two_sided_simultaneous_mass_exact_rational": "1/1600",
+      "unit_of_n": "independent units in the cell"
     },
     {
-      "cells": 8,
-      "clopper_pearson_lower": 0.831111,
+      "clopper_pearson_lower_bound": 0.831111,
+      "lower_tail_mass_consumed_by_this_bound": 0.0003125,
       "n": 128,
-      "simultaneous_alpha": 0.000625,
-      "successes": 120
+      "simultaneous_cells": 8,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 120,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.000625,
+      "two_sided_simultaneous_mass_exact_rational": "1/1600",
+      "unit_of_n": "independent units in the cell"
     },
     {
-      "cells": 12,
-      "clopper_pearson_lower": 0.882352,
-      "n": 192,
-      "simultaneous_alpha": 0.000416666667,
-      "successes": 184
+      "clopper_pearson_lower_bound": 0.922957,
+      "lower_tail_mass_consumed_by_this_bound": 0.000208333333,
+      "n": 256,
+      "simultaneous_cells": 12,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 250,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.000416666667,
+      "two_sided_simultaneous_mass_exact_rational": "1/2400",
+      "unit_of_n": "independent units in the cell"
     },
     {
-      "cells": 12,
-      "clopper_pearson_lower": 0.824521,
-      "n": 192,
-      "simultaneous_alpha": 0.000416666667,
-      "successes": 176
+      "clopper_pearson_lower_bound": 0.893672,
+      "lower_tail_mass_consumed_by_this_bound": 0.000208333333,
+      "n": 256,
+      "simultaneous_cells": 12,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 245,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.000416666667,
+      "two_sided_simultaneous_mass_exact_rational": "1/2400",
+      "unit_of_n": "independent units in the cell"
     },
     {
-      "cells": 12,
-      "clopper_pearson_lower": 0.827088,
+      "clopper_pearson_lower_bound": 0.827088,
+      "lower_tail_mass_consumed_by_this_bound": 0.000208333333,
       "n": 128,
-      "simultaneous_alpha": 0.000416666667,
-      "successes": 120
+      "simultaneous_cells": 12,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 120,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.000416666667,
+      "two_sided_simultaneous_mass_exact_rational": "1/2400",
+      "unit_of_n": "independent units in the cell"
     },
     {
-      "cells": 24,
-      "clopper_pearson_lower": 0.877611,
-      "n": 192,
-      "simultaneous_alpha": 0.000208333333,
-      "successes": 184
+      "clopper_pearson_lower_bound": 0.919488,
+      "lower_tail_mass_consumed_by_this_bound": 0.000104166667,
+      "n": 256,
+      "simultaneous_cells": 24,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 250,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.000208333333,
+      "two_sided_simultaneous_mass_exact_rational": "1/4800",
+      "unit_of_n": "independent units in the cell"
     },
     {
-      "cells": 24,
-      "clopper_pearson_lower": 0.819131,
-      "n": 192,
-      "simultaneous_alpha": 0.000208333333,
-      "successes": 176
+      "clopper_pearson_lower_bound": 0.889786,
+      "lower_tail_mass_consumed_by_this_bound": 0.000104166667,
+      "n": 256,
+      "simultaneous_cells": 24,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 245,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.000208333333,
+      "two_sided_simultaneous_mass_exact_rational": "1/4800",
+      "unit_of_n": "independent units in the cell"
     },
     {
-      "cells": 24,
-      "clopper_pearson_lower": 0.820356,
+      "clopper_pearson_lower_bound": 0.820356,
+      "lower_tail_mass_consumed_by_this_bound": 0.000104166667,
       "n": 128,
-      "simultaneous_alpha": 0.000208333333,
-      "successes": 120
+      "simultaneous_cells": 24,
+      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
+      "successes": 120,
+      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
+      "two_sided_simultaneous_mass": 0.000208333333,
+      "two_sided_simultaneous_mass_exact_rational": "1/4800",
+      "unit_of_n": "independent units in the cell"
     }
   ],
-  "document_class": "design_statistics_derivation",
-  "draft_version": "draft-v0.2",
-  "hypothesis_families_and_alpha_allocation": {
-    "family_A_within_profile": {
-      "correction": "none required; IU size is bounded by the component level",
-      "members": [
-        "I1a",
-        "I1b",
-        "I2",
-        "I3_primary",
-        "I3_uniformity",
-        "I4"
+  "descriptive_paired_summary": {
+    "carries_no": [
+      "null hypothesis",
+      "alpha",
+      "p-value",
+      "critical value",
+      "equivalence margin",
+      "confidence-based pass or fail",
+      "equivalence declaration",
+      "rescue path for a failed J_both",
+      "ranking weight in the selection map"
+    ],
+    "reported_per": "contrast cell",
+    "reported_quantities": [
+      "the paired 2x2 table of variant-1 correctness by variant-2 correctness",
+      "the raw discordance count and rate",
+      "the paired accuracy difference"
+    ],
+    "retired_procedure": {
+      "disposition_status": "PROPOSED_RESOLVED_SUBJECT_TO_INDEPENDENT_REVIEW",
+      "historical_evidence": "the independent review's recalculation is preserved unedited as immutable historical evidence at studies/study3/analysis/independent_methods_recalculation.py and its committed tables",
+      "name": "Tango (1998) paired score equivalence procedure",
+      "operator_resolution": "S3MR-004 and S3MR-005 are resolved by removal rather than by repair: the uncontrolled asymptotic rule is unnecessary for the primary construct, so it is withdrawn from inferential use instead of being recalibrated",
+      "retired_from": [
+        "I3 gate authority",
+        "profile eligibility",
+        "development selection",
+        "confirmation",
+        "claim language",
+        "equivalence margins",
+        "critical values",
+        "the four-point discordance grid",
+        "any conservativeness or verified-size statement"
       ],
-      "note": "each atomic cell inside a gate is itself a conjunctive member; a failed cell fails the gate and no pooled summary may rescue it",
-      "per_component_alpha": 0.005,
-      "type": "intersection_union_conjunctive"
+      "second_reviewer_question": "does retiring the paired aggregate-equivalence procedure from every decision role fully remove the size-control defect recorded in S3MR-004 and S3MR-005, or does a residual decision path remain?"
     },
-    "family_B_across_profiles": {
-      "correction": "Bonferroni over 3 selectable profiles",
-      "excluded": [
-        "S4 is never selectable and never enters selection"
-      ],
-      "members": [
+    "status": "DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY"
+  },
+  "development_exact_binomial_components": [
+    {
+      "alpha": 0.001666666667,
+      "alpha_exact_rational": "1/600",
+      "applicable_profiles": [
         "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "construct": "trivial content recovery and output validity",
+      "degenerate_rejection_region": false,
+      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "split"
+      ],
+      "exact_null_tail_at_p0": 0.001491215117,
+      "exact_power_at_p1": 0.953040775,
+      "gate": "I1a",
+      "independent_unit": "base_item",
+      "meets_target_power": true,
+      "n": 256,
+      "null_hypothesis": "p <= 0.9",
+      "p0": 0.9,
+      "p0_exact_rational": "9/10",
+      "p1_exact_rational": "97/100",
+      "p1_lowest_alternative_of_interest": 0.97,
+      "pass_count": 244,
+      "pass_rate": 0.953125,
+      "rejection_rule": "pass the component when the observed success count is at least 244 out of 256 base items per atomic cell",
+      "source_stratum": "K2",
+      "split": "development",
+      "unit_of_n": "base items per atomic cell"
+    },
+    {
+      "alpha": 0.001666666667,
+      "alpha_exact_rational": "1/600",
+      "applicable_profiles": [
+        "S1",
+        "S4"
+      ],
+      "construct": "explicit content-to-symbol binding",
+      "degenerate_rejection_region": false,
+      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "label alphabet balancing block",
+        "split"
+      ],
+      "exact_null_tail_at_p0": 0.001491215117,
+      "exact_power_at_p1": 0.953040775,
+      "gate": "I1b",
+      "independent_unit": "base_item",
+      "meets_target_power": true,
+      "n": 256,
+      "null_hypothesis": "p <= 0.9",
+      "p0": 0.9,
+      "p0_exact_rational": "9/10",
+      "p1_exact_rational": "97/100",
+      "p1_lowest_alternative_of_interest": 0.97,
+      "pass_count": 244,
+      "pass_rate": 0.953125,
+      "rejection_rule": "pass the component when the observed success count is at least 244 out of 256 base items per atomic cell",
+      "source_stratum": "K1",
+      "split": "development",
+      "unit_of_n": "base items per atomic cell"
+    },
+    {
+      "alpha": 0.001666666667,
+      "alpha_exact_rational": "1/600",
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "construct": "primitive headroom, evaluated separately per family",
+      "degenerate_rejection_region": false,
+      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "primitive operation family",
+        "split"
+      ],
+      "exact_null_tail_at_p0": 0.000931234262,
+      "exact_power_at_p1": 0.938986365,
+      "gate": "I2",
+      "independent_unit": "base_item",
+      "meets_target_power": true,
+      "n": 128,
+      "null_hypothesis": "p <= 0.5",
+      "p0": 0.5,
+      "p0_exact_rational": "1/2",
+      "p1_exact_rational": "7/10",
+      "p1_lowest_alternative_of_interest": 0.7,
+      "pass_count": 82,
+      "pass_rate": 0.640625,
+      "rejection_rule": "pass the component when the observed success count is at least 82 out of 128 base items per primitive-family cell",
+      "source_stratum": "K3",
+      "split": "development",
+      "unit_of_n": "base items per primitive-family cell"
+    },
+    {
+      "alpha": 0.001666666667,
+      "alpha_exact_rational": "1/600",
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "construct": "pairwise presentation invariance and correctness, J_both",
+      "degenerate_rejection_region": false,
+      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
+      "evaluated_per": [
+        "interface profile",
+        "checkpoint role",
+        "contrast family",
+        "contrast ID",
+        "split"
+      ],
+      "exact_null_tail_at_p0": 0.001491215117,
+      "exact_power_at_p1": 0.953040775,
+      "gate": "I3",
+      "independent_unit": "base_item_contrast_cluster",
+      "meets_target_power": true,
+      "n": 256,
+      "null_hypothesis": "p <= 0.9",
+      "p0": 0.9,
+      "p0_exact_rational": "9/10",
+      "p1_exact_rational": "97/100",
+      "p1_lowest_alternative_of_interest": 0.97,
+      "pass_count": 244,
+      "pass_rate": 0.953125,
+      "rejection_rule": "pass the component when the observed success count is at least 244 out of 256 base-item contrast clusters per contrast cell",
+      "source_stratum": "K5 and K6",
+      "split": "development",
+      "unit_of_n": "base-item contrast clusters per contrast cell"
+    },
+    {
+      "alpha": 0.001666666667,
+      "alpha_exact_rational": "1/600",
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "construct": "positive-reference competence recovery through the profile",
+      "degenerate_rejection_region": false,
+      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
+      "evaluated_per": [
+        "interface profile",
+        "registered operation family",
+        "depth"
+      ],
+      "exact_null_tail_at_p0": 0.001081002486,
+      "exact_power_at_p1": 0.921083515,
+      "gate": "I4",
+      "independent_unit": "base_item",
+      "meets_target_power": true,
+      "n": 256,
+      "null_hypothesis": "p <= 0.8",
+      "p0": 0.8,
+      "p0_exact_rational": "4/5",
+      "p1_exact_rational": "9/10",
+      "p1_lowest_alternative_of_interest": 0.9,
+      "pass_count": 224,
+      "pass_rate": 0.875,
+      "rejection_rule": "pass the component when the observed success count is at least 224 out of 256 RP base items per operation-family x depth cell per candidate profile",
+      "source_stratum": "K4",
+      "split": "development",
+      "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
+    }
+  ],
+  "development_selection_map": [
+    {
+      "all_applicable_components_passed": {
+        "S1": false,
+        "S2": false,
+        "S3": false
+      },
+      "eligible_profiles": [],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": false,
+      "selected_profile": null,
+      "stop_no_selectable_profile_is_eligible": true
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": true,
+        "S2": false,
+        "S3": false
+      },
+      "eligible_profiles": [
+        "S1"
+      ],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": false,
+      "selected_profile": "S1",
+      "stop_no_selectable_profile_is_eligible": false
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": false,
+        "S2": true,
+        "S3": false
+      },
+      "eligible_profiles": [
+        "S2"
+      ],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": false,
+      "selected_profile": "S2",
+      "stop_no_selectable_profile_is_eligible": false
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": true,
+        "S2": true,
+        "S3": false
+      },
+      "eligible_profiles": [
+        "S2",
+        "S1"
+      ],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": false,
+      "selected_profile": "S2",
+      "stop_no_selectable_profile_is_eligible": false
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": false,
+        "S2": false,
+        "S3": true
+      },
+      "eligible_profiles": [],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": false,
+      "selected_profile": null,
+      "stop_no_selectable_profile_is_eligible": true
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": true,
+        "S2": false,
+        "S3": true
+      },
+      "eligible_profiles": [
+        "S1"
+      ],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": false,
+      "selected_profile": "S1",
+      "stop_no_selectable_profile_is_eligible": false
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": false,
+        "S2": true,
+        "S3": true
+      },
+      "eligible_profiles": [
+        "S2"
+      ],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": false,
+      "selected_profile": "S2",
+      "stop_no_selectable_profile_is_eligible": false
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": true,
+        "S2": true,
+        "S3": true
+      },
+      "eligible_profiles": [
+        "S2",
+        "S1"
+      ],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": false,
+      "selected_profile": "S2",
+      "stop_no_selectable_profile_is_eligible": false
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": false,
+        "S2": false,
+        "S3": false
+      },
+      "eligible_profiles": [],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": true,
+      "selected_profile": null,
+      "stop_no_selectable_profile_is_eligible": true
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": true,
+        "S2": false,
+        "S3": false
+      },
+      "eligible_profiles": [
+        "S1"
+      ],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": true,
+      "selected_profile": "S1",
+      "stop_no_selectable_profile_is_eligible": false
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": false,
+        "S2": true,
+        "S3": false
+      },
+      "eligible_profiles": [
+        "S2"
+      ],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": true,
+      "selected_profile": "S2",
+      "stop_no_selectable_profile_is_eligible": false
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": true,
+        "S2": true,
+        "S3": false
+      },
+      "eligible_profiles": [
+        "S2",
+        "S1"
+      ],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": true,
+      "selected_profile": "S2",
+      "stop_no_selectable_profile_is_eligible": false
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": false,
+        "S2": false,
+        "S3": true
+      },
+      "eligible_profiles": [
+        "S3"
+      ],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": true,
+      "selected_profile": "S3",
+      "stop_no_selectable_profile_is_eligible": false
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": true,
+        "S2": false,
+        "S3": true
+      },
+      "eligible_profiles": [
+        "S3",
+        "S1"
+      ],
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": true,
+      "selected_profile": "S3",
+      "stop_no_selectable_profile_is_eligible": false
+    },
+    {
+      "all_applicable_components_passed": {
+        "S1": false,
+        "S2": true,
+        "S3": true
+      },
+      "eligible_profiles": [
         "S2",
         "S3"
       ],
-      "per_profile_alpha": 0.001666666667,
-      "study_alpha": 0.005,
-      "type": "union_selection"
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": true,
+      "selected_profile": "S2",
+      "stop_no_selectable_profile_is_eligible": false
     },
-    "family_C_descriptive": {
-      "correction": "simultaneous Clopper-Pearson bounds are reported for readability; they carry no gate authority",
-      "members": [
-        "pooled summaries",
-        "softmax confidences",
-        "per-cell Clopper-Pearson intervals"
+    {
+      "all_applicable_components_passed": {
+        "S1": true,
+        "S2": true,
+        "S3": true
+      },
+      "eligible_profiles": [
+        "S2",
+        "S3",
+        "S1"
       ],
-      "type": "descriptive_only"
-    },
-    "principle": "Two structurally different multiplicity problems are kept apart. Within one interface profile, every gate and every atomic cell must pass; that conjunction is an intersection-union test, whose size is bounded by the level of its individual components, so no inflation correction is applied to the conjunction itself. Across interface profiles, by contrast, the study may proceed if ANY selectable profile qualifies; that is a union event and it does inflate the false-qualification rate, so it is Bonferroni-corrected by the number of selectable profiles.",
-    "unresolved": [
-      "the final alpha allocation is a v0.2 proposal and is part of the blocking OD5 decision"
-    ]
-  },
-  "i3_feasibility_verdict": {
-    "claim_under_review": "v0.1 asserted an aggregate equivalence margin of 0.05 without any paired power analysis",
-    "conclusion": "n = 192 does NOT support the v0.1 aggregate equivalence margin of 0.05 at 0.90 power under any tested discordance rate. The margin, the sample size, or both must be revised by the independent methods review. This is why OD5 and OD6 remain blocking.",
-    "margin_0_05_discordance_rates_supported": [],
-    "margin_0_05_supported_at_any_tested_discordance": false,
-    "margin_0_10_discordance_rates_supported": [
-      0.05,
-      0.1
+      "fixed_selectable_profile_denominator": 3,
+      "s3_multi_token_domain_activated": true,
+      "selected_profile": "S2",
+      "stop_no_selectable_profile_is_eligible": false
+    }
+  ],
+  "disposition_status": "PROPOSED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
+  "document_class": "design_statistics_derivation",
+  "draft_version": "draft-v0.3",
+  "i3_contrast_registry": {
+    "combined_factor_interactions": "outside the Study 3 claim ceiling; the seven K5 cells test registered one-factor contrasts only and imply no full-factorial robustness",
+    "k5": [
+      {
+        "factor": "content_position",
+        "id": "K5-P1",
+        "offset": 1
+      },
+      {
+        "factor": "content_position",
+        "id": "K5-P2",
+        "offset": 2
+      },
+      {
+        "factor": "content_position",
+        "id": "K5-P3",
+        "offset": 3
+      },
+      {
+        "factor": "correct_symbol_index",
+        "id": "K5-S1",
+        "offset": 1
+      },
+      {
+        "factor": "correct_symbol_index",
+        "id": "K5-S2",
+        "offset": 2
+      },
+      {
+        "factor": "correct_symbol_index",
+        "id": "K5-S3",
+        "offset": 3
+      },
+      {
+        "factor": "label_alphabet",
+        "id": "K5-A1",
+        "offset": null
+      }
     ],
-    "n": 192,
-    "target_power": 0.9
+    "k5_applicability": {
+      "applicable_profiles": [
+        "S1",
+        "S4"
+      ],
+      "not_applicable_profiles": [
+        "S2",
+        "S3"
+      ],
+      "not_applicable_semantics": "not_applicable is a third value: it is not a pass, not a zero effect and not evidence of robustness, and it may never be counted as a satisfied component"
+    },
+    "k6": [
+      {
+        "baseline": "R-base",
+        "id": "K6-SEP",
+        "variant": "R-sep",
+        "varies": "the option separator only"
+      },
+      {
+        "baseline": "R-base",
+        "id": "K6-INSTR",
+        "variant": "R-instr",
+        "varies": "the instruction sentence only"
+      }
+    ],
+    "k6_applicability": {
+      "applicable_profiles": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ]
+    }
   },
-  "i3_primary_item_level_consistency": [
+  "i3_indicator_semantics": {
+    "J_both": "J_inv AND J_cor; the primary I3 gate indicator",
+    "J_cor": "1 iff both variants are scored correct against the unique registered ground truth; a stable but wrong answer is 0",
+    "J_inv": "1 iff both variants produce valid answer-domain content and the two mapped contents are byte-identical after the registered content mapping; stable invalid or unparseable output is 0",
+    "estimand": "Pr(J_both = 1) over independently sampled base-item contrast clusters, separately in every applicable atomic contrast cell",
+    "expected_integrity_invariant": "under a unique ground truth J_cor implies J_inv; this is recorded as an expected invariant and is not treated as evidence that the two indicators are independent",
+    "why_the_conjunction_is_retained": "so that stable-wrong and stable-invalid outcomes fail closed rather than being scored as invariance"
+  },
+  "i3_indicator_truth_table": [
     {
-      "acceptance_count": 124,
-      "acceptance_rate": 0.96875,
-      "alpha": 0.005,
-      "exact_null_tail": 0.003071835731,
-      "feasible": true,
-      "n": 128,
-      "null_hypothesis": "p <= 0.9",
-      "power": {
-        "0.97": 0.660555,
-        "0.98": 0.885042,
-        "0.99": 0.990394
-      }
+      "J_both": 1,
+      "J_cor": 1,
+      "J_inv": 1,
+      "case": "both_correct",
+      "registered_ground_truth": "7",
+      "scores_for_the_gate": true,
+      "variant_1_mapped_content": "7",
+      "variant_2_mapped_content": "7"
     },
     {
-      "acceptance_count": 184,
-      "acceptance_rate": 0.9583333333,
-      "alpha": 0.005,
-      "exact_null_tail": 0.002362050279,
-      "feasible": true,
-      "n": 192,
-      "null_hypothesis": "p <= 0.9",
-      "power": {
-        "0.97": 0.87425,
-        "0.98": 0.984073,
-        "0.99": 0.999843
-      }
+      "J_both": 0,
+      "J_cor": 0,
+      "J_inv": 1,
+      "case": "stable_but_wrong",
+      "registered_ground_truth": "7",
+      "scores_for_the_gate": false,
+      "variant_1_mapped_content": "3",
+      "variant_2_mapped_content": "3"
     },
     {
-      "acceptance_count": 243,
-      "acceptance_rate": 0.94921875,
-      "alpha": 0.005,
-      "exact_null_tail": 0.003307722347,
-      "feasible": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.9",
-      "power": {
-        "0.97": 0.97629,
-        "0.98": 0.999248,
-        "0.99": 1.0
-      }
+      "J_both": 0,
+      "J_cor": 0,
+      "J_inv": 0,
+      "case": "one_correct_one_wrong",
+      "registered_ground_truth": "7",
+      "scores_for_the_gate": false,
+      "variant_1_mapped_content": "7",
+      "variant_2_mapped_content": "3"
     },
     {
-      "acceptance_count": 361,
-      "acceptance_rate": 0.9401041667,
-      "alpha": 0.005,
-      "exact_null_tail": 0.003608096462,
-      "feasible": true,
-      "n": 384,
-      "null_hypothesis": "p <= 0.9",
-      "power": {
-        "0.97": 0.999296,
-        "0.98": 0.999999,
-        "0.99": 1.0
-      }
+      "J_both": 0,
+      "J_cor": 0,
+      "J_inv": 0,
+      "case": "one_wrong_one_correct",
+      "registered_ground_truth": "7",
+      "scores_for_the_gate": false,
+      "variant_1_mapped_content": "3",
+      "variant_2_mapped_content": "7"
     },
     {
-      "acceptance_count": 128,
-      "acceptance_rate": 1.0,
-      "alpha": 0.005,
-      "exact_null_tail": 0.001408061024,
-      "feasible": true,
-      "n": 128,
-      "null_hypothesis": "p <= 0.95",
-      "power": {
-        "0.97": 0.020267,
-        "0.98": 0.075325,
-        "0.99": 0.276252
-      }
+      "J_both": 0,
+      "J_cor": 0,
+      "J_inv": 0,
+      "case": "both_wrong_and_different",
+      "registered_ground_truth": "7",
+      "scores_for_the_gate": false,
+      "variant_1_mapped_content": "3",
+      "variant_2_mapped_content": "5"
     },
     {
-      "acceptance_count": 190,
-      "acceptance_rate": 0.9895833333,
-      "alpha": 0.005,
-      "exact_null_tail": 0.003270433875,
-      "feasible": true,
-      "n": 192,
-      "null_hypothesis": "p <= 0.95",
-      "power": {
-        "0.97": 0.070621,
-        "0.98": 0.259555,
-        "0.99": 0.69843
-      }
+      "J_both": 0,
+      "J_cor": 0,
+      "J_inv": 0,
+      "case": "stable_but_invalid",
+      "registered_ground_truth": "7",
+      "scores_for_the_gate": false,
+      "variant_1_mapped_content": null,
+      "variant_2_mapped_content": null
     },
     {
-      "acceptance_count": 252,
-      "acceptance_rate": 0.984375,
-      "alpha": 0.005,
-      "exact_null_tail": 0.003665973641,
-      "feasible": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.95",
-      "power": {
-        "0.97": 0.115754,
-        "0.98": 0.417758,
-        "0.99": 0.884023
-      }
+      "J_both": 0,
+      "J_cor": 0,
+      "J_inv": 0,
+      "case": "one_valid_one_invalid",
+      "registered_ground_truth": "7",
+      "scores_for_the_gate": false,
+      "variant_1_mapped_content": "7",
+      "variant_2_mapped_content": null
     },
     {
-      "acceptance_count": 376,
-      "acceptance_rate": 0.9791666667,
-      "alpha": 0.005,
-      "exact_null_tail": 0.002867099998,
-      "feasible": true,
-      "n": 384,
-      "null_hypothesis": "p <= 0.95",
-      "power": {
-        "0.97": 0.184973,
-        "0.98": 0.637573,
-        "0.99": 0.983552
-      }
+      "J_both": 0,
+      "J_cor": 0,
+      "J_inv": 0,
+      "case": "one_invalid_one_valid",
+      "registered_ground_truth": "7",
+      "scores_for_the_gate": false,
+      "variant_1_mapped_content": null,
+      "variant_2_mapped_content": "7"
     }
   ],
-  "i3_secondary_paired_equivalence_sensitivity": [
-    {
-      "discordance_rate": 0.05,
-      "exact_power": 0.173256,
-      "exact_type_i_at_margin": 0.010894,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 128,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.1,
-      "exact_power": 0.00586,
-      "exact_type_i_at_margin": 0.002787,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 128,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.2,
-      "exact_power": 0.0,
-      "exact_type_i_at_margin": 0.0,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 128,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.3,
-      "exact_power": 0.0,
-      "exact_type_i_at_margin": 0.0,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 128,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.05,
-      "exact_power": 0.541197,
-      "exact_type_i_at_margin": 0.012216,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 192,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.1,
-      "exact_power": 0.114881,
-      "exact_type_i_at_margin": 0.015768,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 192,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.2,
-      "exact_power": 3.5e-05,
-      "exact_type_i_at_margin": 1.9e-05,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 192,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.3,
-      "exact_power": 0.0,
-      "exact_type_i_at_margin": 0.0,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 192,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.05,
-      "exact_power": 0.776425,
-      "exact_type_i_at_margin": 0.01072,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 256,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.1,
-      "exact_power": 0.358216,
-      "exact_type_i_at_margin": 0.022272,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 256,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.2,
-      "exact_power": 0.003664,
-      "exact_type_i_at_margin": 0.001093,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 256,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.3,
-      "exact_power": 0.0,
-      "exact_type_i_at_margin": 0.0,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 256,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.05,
-      "exact_power": 0.9605,
-      "exact_type_i_at_margin": 0.014578,
-      "margin": 0.05,
-      "meets_target_power": true,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 384,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.1,
-      "exact_power": 0.692423,
-      "exact_type_i_at_margin": 0.022519,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 384,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.2,
-      "exact_power": 0.167119,
-      "exact_type_i_at_margin": 0.017435,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 384,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.3,
-      "exact_power": 0.000476,
-      "exact_type_i_at_margin": 0.000131,
-      "margin": 0.05,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 384,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.05,
-      "exact_power": 0.97327,
-      "exact_type_i_at_margin": null,
-      "margin": 0.1,
-      "meets_target_power": true,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 128,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.1,
-      "exact_power": 0.811431,
-      "exact_type_i_at_margin": 0.023487,
-      "margin": 0.1,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 128,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.2,
-      "exact_power": 0.37971,
-      "exact_type_i_at_margin": 0.022592,
-      "margin": 0.1,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 128,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.3,
-      "exact_power": 0.078535,
-      "exact_type_i_at_margin": 0.011778,
-      "margin": 0.1,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 128,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.05,
-      "exact_power": 0.99904,
-      "exact_type_i_at_margin": null,
-      "margin": 0.1,
-      "meets_target_power": true,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 192,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.1,
-      "exact_power": 0.963405,
-      "exact_type_i_at_margin": 0.025501,
-      "margin": 0.1,
-      "meets_target_power": true,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 192,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.2,
-      "exact_power": 0.713243,
-      "exact_type_i_at_margin": 0.023542,
-      "margin": 0.1,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 192,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.3,
-      "exact_power": 0.417343,
-      "exact_type_i_at_margin": 0.023677,
-      "margin": 0.1,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 192,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.05,
-      "exact_power": 0.999972,
-      "exact_type_i_at_margin": null,
-      "margin": 0.1,
-      "meets_target_power": true,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 256,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.1,
-      "exact_power": 0.994856,
-      "exact_type_i_at_margin": 0.023601,
-      "margin": 0.1,
-      "meets_target_power": true,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 256,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.2,
-      "exact_power": 0.876815,
-      "exact_type_i_at_margin": 0.023881,
-      "margin": 0.1,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 256,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.3,
-      "exact_power": 0.653297,
-      "exact_type_i_at_margin": 0.024552,
-      "margin": 0.1,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 256,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.05,
-      "exact_power": 1.0,
-      "exact_type_i_at_margin": null,
-      "margin": 0.1,
-      "meets_target_power": true,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 384,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.1,
-      "exact_power": 0.999909,
-      "exact_type_i_at_margin": 0.017524,
-      "margin": 0.1,
-      "meets_target_power": true,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 384,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.2,
-      "exact_power": 0.981367,
-      "exact_type_i_at_margin": 0.024284,
-      "margin": 0.1,
-      "meets_target_power": true,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 384,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    },
-    {
-      "discordance_rate": 0.3,
-      "exact_power": 0.8907,
-      "exact_type_i_at_margin": 0.024727,
-      "margin": 0.1,
-      "meets_target_power": false,
-      "method": "Tango 1998 score interval, two one-sided tests",
-      "n": 384,
-      "one_sided_alpha": 0.025,
-      "true_difference": 0.0
-    }
-  ],
-  "i4_competence_floor_thresholds": [
-    {
-      "acceptance_count": 114,
-      "acceptance_rate": 0.890625,
-      "alpha": 0.005,
-      "exact_null_tail": 0.004706876109,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 128,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.701983,
-        "0.95": 0.998087,
-        "0.97": 0.999992
-      }
-    },
-    {
-      "acceptance_count": 116,
-      "acceptance_rate": 0.90625,
-      "alpha": 0.001666666667,
-      "exact_null_tail": 0.000911222895,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 128,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.480533,
-        "0.95": 0.987934,
-        "0.97": 0.999865
-      }
-    },
-    {
-      "acceptance_count": 116,
-      "acceptance_rate": 0.90625,
-      "alpha": 0.001,
-      "exact_null_tail": 0.000911222895,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 128,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.480533,
-        "0.95": 0.987934,
-        "0.97": 0.999865
-      }
-    },
-    {
-      "acceptance_count": 168,
-      "acceptance_rate": 0.875,
-      "alpha": 0.005,
-      "exact_null_tail": 0.00432381909,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 192,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.89595,
-        "0.95": 0.999987,
-        "0.97": 1.0
-      }
-    },
-    {
-      "acceptance_count": 170,
-      "acceptance_rate": 0.8854166667,
-      "alpha": 0.001666666667,
-      "exact_null_tail": 0.001202995135,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 192,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.78993,
-        "0.95": 0.999897,
-        "0.97": 1.0
-      }
-    },
-    {
-      "acceptance_count": 171,
-      "acceptance_rate": 0.890625,
-      "alpha": 0.001,
-      "exact_null_tail": 0.000591161236,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 192,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.717503,
-        "0.95": 0.999727,
-        "0.97": 1.0
-      }
-    },
-    {
-      "acceptance_count": 222,
-      "acceptance_rate": 0.8671875,
-      "alpha": 0.005,
-      "exact_null_tail": 0.003276850097,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.96382,
-        "0.95": 1.0,
-        "0.97": 1.0
-      }
-    },
-    {
-      "acceptance_count": 224,
-      "acceptance_rate": 0.875,
-      "alpha": 0.001666666667,
-      "exact_null_tail": 0.001081002486,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.921084,
-        "0.95": 0.999999,
-        "0.97": 1.0
-      }
-    },
-    {
-      "acceptance_count": 225,
-      "acceptance_rate": 0.87890625,
-      "alpha": 0.001,
-      "exact_null_tail": 0.000590803318,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.888306,
-        "0.95": 0.999998,
-        "0.97": 1.0
-      }
-    },
-    {
-      "acceptance_count": 328,
-      "acceptance_rate": 0.8541666667,
-      "alpha": 0.005,
-      "exact_null_tail": 0.003745269173,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 384,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.998248,
-        "0.95": 1.0,
-        "0.97": 1.0
-      }
-    },
-    {
-      "acceptance_count": 330,
-      "acceptance_rate": 0.859375,
-      "alpha": 0.001666666667,
-      "exact_null_tail": 0.001581818398,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 384,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.995536,
-        "0.95": 1.0,
-        "0.97": 1.0
-      }
-    },
-    {
-      "acceptance_count": 331,
-      "acceptance_rate": 0.8619791667,
-      "alpha": 0.001,
-      "exact_null_tail": 0.000997595404,
-      "feasible": true,
-      "meets_target_power_0_90_at_0_95": true,
-      "n": 384,
-      "null_hypothesis": "p <= 0.8",
-      "power": {
-        "0.9": 0.993074,
-        "0.95": 1.0,
-        "0.97": 1.0
-      }
-    }
-  ],
-  "label_selection_uniformity_bands": [
-    {
-      "acceptance_band": [
-        30,
-        68
-      ],
-      "applies_to": "label-bearing profiles only; NA for content-only profiles",
-      "bonferroni_alpha": 0.00125,
-      "expected_per_label": 48.0,
-      "labels": 4,
-      "n": 192
-    },
-    {
-      "acceptance_band": [
-        69,
-        124
-      ],
-      "applies_to": "label-bearing profiles only; NA for content-only profiles",
-      "bonferroni_alpha": 0.00125,
-      "expected_per_label": 96.0,
-      "labels": 4,
-      "n": 384
-    },
-    {
-      "acceptance_band": [
-        154,
-        231
-      ],
-      "applies_to": "label-bearing profiles only; NA for content-only profiles",
-      "bonferroni_alpha": 0.00125,
-      "expected_per_label": 192.0,
-      "labels": 4,
-      "n": 768
-    }
-  ],
+  "i3_pairwise_construction_verification": {
+    "k5_baseline_conditions_balanced_over_a_complete_block": true,
+    "k5_complete_block_size": 32,
+    "k5_contrast_count": 7,
+    "k5_k6_base_item_identities_disjoint": true,
+    "k5_one_factor_per_contrast": true,
+    "k5_x_k6_cross_product_exists": false,
+    "k6_answer_cue_fixed_within_every_pair": true,
+    "k6_contrast_count": 2,
+    "k6_rendering_set": [
+      "R-base",
+      "R-instr",
+      "R-sep"
+    ],
+    "label_alphabets_disjoint_from_answer_domain": true,
+    "label_alphabets_mutually_disjoint": true,
+    "variants_per_base_item_contrast_cluster": 2
+  },
   "operation_counts": {
     "bank_rows": 0,
+    "confirmation_accesses": 0,
     "evidence_rows": 0,
     "forward_passes": 0,
     "generations": 0,
     "gpu_jobs": 0,
+    "interfaces_selected": 0,
     "model_downloads": 0,
+    "positive_references_selected": 0,
     "provider_calls": 0,
     "seeds_drawn": 0,
+    "sequence_scorings": 0,
     "tokenizer_constructions": 0,
     "weight_loads": 0
   },
-  "paired_method_verification": {
-    "constrained_mle_max_abs_deviation": 3.3922399750307974e-09,
-    "exact_type_i_at_boundary": [
+  "pooling_prohibitions": [
+    "K5 and K6 are never pooled",
+    "contrast IDs are never pooled",
+    "the two label alphabets are never pooled",
+    "K5 position contrast cells and K5 symbol contrast cells are never pooled",
+    "source strata are never pooled",
+    "primitive operation families are never pooled",
+    "K4 depth 2 and depth 3 are never pooled",
+    "checkpoint roles are never pooled",
+    "interface profiles are never pooled",
+    "renderings are never pooled",
+    "splits are never pooled",
+    "J_inv, J_cor and the descriptive paired table may never rescue a failed J_both"
+  ],
+  "projected_operation_accounting": {
+    "character": "planning arithmetic only; this authorises nothing, approves no budget and creates no execution authority",
+    "dimensional_identities": [
       {
-        "discordance": 0.2,
-        "exact_type_i": 0.015065,
-        "margin": 0.1,
-        "n": 96
+        "base_item_contrast_clusters": 512,
+        "component": "I3_K6",
+        "holds": true,
+        "identity": "rendered_rows = base_item_contrast_clusters x 2",
+        "profile": "S1",
+        "rendered_rows": 1024
       },
       {
-        "discordance": 0.2,
-        "exact_type_i": 0.022592,
-        "margin": 0.1,
-        "n": 128
+        "base_item_contrast_clusters": 1792,
+        "component": "I3_K5",
+        "holds": true,
+        "identity": "rendered_rows = base_item_contrast_clusters x 2",
+        "profile": "S1",
+        "rendered_rows": 3584
       },
       {
-        "discordance": 0.3,
-        "exact_type_i": 0.023677,
-        "margin": 0.1,
-        "n": 192
+        "base_item_contrast_clusters": 512,
+        "component": "I3_K6",
+        "holds": true,
+        "identity": "rendered_rows = base_item_contrast_clusters x 2",
+        "profile": "S2",
+        "rendered_rows": 1024
+      },
+      {
+        "base_item_contrast_clusters": 512,
+        "component": "I3_K6",
+        "holds": true,
+        "identity": "rendered_rows = base_item_contrast_clusters x 2",
+        "profile": "S3",
+        "rendered_rows": 1024
       }
     ],
-    "mcnemar_reduction_max_abs_deviation": 0.0,
-    "normal_quantile_check": 0.0
+    "executed_operation_counts": {
+      "activation_extractions": 0,
+      "bank_rows": 0,
+      "evidence_rows": 0,
+      "forward_passes": 0,
+      "generations": 0,
+      "gpu_jobs": 0,
+      "model_downloads": 0,
+      "provider_calls": 0,
+      "seeds_drawn": 0,
+      "sequence_scorings": 0,
+      "tokenizer_constructions": 0,
+      "weight_loads": 0
+    },
+    "prohibition": "a single undifferentiated total is prohibited; every stream reports its own units",
+    "s3_current_domain_accounting": {
+      "additional_forward_passes": 0,
+      "additional_sequence_scoring_rows": 0,
+      "future_multi_token_activation": "outside this projection; it requires a new authority, image, scoring contract and cost table",
+      "reuses": "the S2 forward pass and logit read under the same prefix"
+    },
+    "unit_definitions": {
+      "base_item": "one registered question stem",
+      "base_item_contrast_cluster": "one base item rendered in exactly two registered variants; the independent sampling unit for I3",
+      "n": "always the count of independent units in one cell, never a rendered-row or scored-row count; every table states the unit at the point of definition",
+      "rendered_row": "one emitted presentation of one variant",
+      "scored_row": "one rendered row scored under one (profile, role)"
+    },
+    "work_streams": {
+      "RP_I4_under_candidate_profiles": {
+        "by_profile": {
+          "S1": {
+            "base_item_contrast_clusters": 0,
+            "base_items": 1024,
+            "forward_passes": 1024,
+            "logit_reads": 1024,
+            "rendered_rows": 1024,
+            "scored_rows": 1024,
+            "variants_per_cluster": 1
+          },
+          "S2": {
+            "base_item_contrast_clusters": 0,
+            "base_items": 1024,
+            "forward_passes": 1024,
+            "logit_reads": 1024,
+            "rendered_rows": 1024,
+            "scored_rows": 1024,
+            "variants_per_cluster": 1
+          },
+          "S3": {
+            "base_items": 1024,
+            "derived_from": "S2",
+            "incremental_forward_passes": 0,
+            "incremental_rendered_rows": 0,
+            "incremental_scored_rows": 0
+          }
+        },
+        "cells": 4,
+        "conjunction": "every registered operation family and every depth must pass; no pooling across families or depths",
+        "forward_passes": 2048,
+        "generated_tokens_upper_bound": 0,
+        "model_roles": [
+          "RP"
+        ],
+        "n_per_cell": 256,
+        "precondition": "RP must already hold valid external P3-Q evidence under a later authority; no such evidence exists",
+        "scope": "the positive reference scored on the registered K4 construct through each candidate profile, separately per operation family and depth",
+        "scored_rows": 2048,
+        "unit_of_n": "RP base items per operation-family x depth cell per candidate profile",
+        "uses_model": true
+      },
+      "S4_diagnostic_generation": {
+        "base_item_contrast_clusters": 2304,
+        "base_items": 768,
+        "forward_passes": null,
+        "generated_tokens_upper_bound": 258048,
+        "generations": 16128,
+        "model_roles": [
+          "RT",
+          "RL",
+          "RI"
+        ],
+        "registered_generated_token_bound_per_row": 16,
+        "rendered_rows": 16128,
+        "rendered_rows_per_role": 5376,
+        "scope": "the never-selectable free-generation diagnostic profile",
+        "scored_rows": 16128,
+        "selection_authority": "none; excluded from every success union",
+        "uses_model": true,
+        "variants_per_cluster": 2
+      },
+      "deterministic_I0_fixtures": {
+        "base_item_contrast_clusters": 232,
+        "base_items": 464,
+        "breakdown": {
+          "indicator_truth_table_fixtures": 8,
+          "k5_constructor_fixtures": 448,
+          "k6_constructor_fixtures": 16,
+          "not_applicable_branch_fixtures": 14,
+          "scorer_branch_fixtures": 16
+        },
+        "forward_passes": 0,
+        "generated_tokens_upper_bound": 0,
+        "logit_reads": 0,
+        "model_roles": 0,
+        "rendered_rows": 502,
+        "scope": "renderer, content mapping, scorer and indicator fixtures",
+        "scored_rows": 502,
+        "uses_model": false,
+        "variants_per_cluster": 2
+      },
+      "positive_reference_external_P3Q": {
+        "base_item_contrast_clusters": null,
+        "base_items": null,
+        "forward_passes": null,
+        "generated_tokens_upper_bound": null,
+        "model_roles": [
+          "RP"
+        ],
+        "numeric_status": "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2",
+        "rendered_rows": null,
+        "scope": "qualification of the positive reference through a canonical interface external to S1-S4, under a later authority",
+        "scored_rows": null,
+        "uses_model": true,
+        "variants_per_cluster": null,
+        "why_null": "the checkpoint, the canonical qualification interface, the qualification bank, the floor, n, the multiplicity treatment and the stop rule are all open under OD2; a number here would imply a selection that has not been made"
+      },
+      "selected_profile_one_shot_confirmation": {
+        "accessible_now": false,
+        "base_item_contrast_clusters": 2304,
+        "base_items": 768,
+        "forward_passes": 17152,
+        "generated_tokens_upper_bound": 0,
+        "model_roles": [
+          "RT",
+          "RL",
+          "RI",
+          "RP"
+        ],
+        "rendered_rows": 17152,
+        "rp_i4_rendered_rows": 1024,
+        "scope": "every applicable component for the single development-selected profile, on the physically disjoint one-shot confirmation split",
+        "scored_rows": 17152,
+        "selected_profile": null,
+        "target_role_rendered_rows": 16128,
+        "upper_bound_profile_used_for_this_projection": "S1",
+        "uses_model": true,
+        "variants_per_cluster": 2,
+        "why_upper_bound": "no profile is selected in this round; S1 is the most expensive applicable profile, so its cost bounds every outcome of the selection map"
+      },
+      "target_role_development": {
+        "by_profile": {
+          "S1": {
+            "base_item_contrast_clusters": 2304,
+            "base_items": 768,
+            "components": [
+              {
+                "cells": 1,
+                "component": "I1a",
+                "independent_unit_count": 256,
+                "independent_unit_type": "base_item",
+                "independent_units_total": 256,
+                "rendered_rows": 256,
+                "variants_per_independent_unit": 1
+              },
+              {
+                "cells": 2,
+                "component": "I2",
+                "independent_unit_count": 128,
+                "independent_unit_type": "base_item",
+                "independent_units_total": 256,
+                "rendered_rows": 256,
+                "variants_per_independent_unit": 1
+              },
+              {
+                "cells": 2,
+                "component": "I3_K6",
+                "independent_unit_count": 256,
+                "independent_unit_type": "base_item_contrast_cluster",
+                "independent_units_total": 512,
+                "rendered_rows": 1024,
+                "variants_per_independent_unit": 2
+              },
+              {
+                "cells": 1,
+                "component": "I1b",
+                "independent_unit_count": 256,
+                "independent_unit_type": "base_item",
+                "independent_units_total": 256,
+                "rendered_rows": 256,
+                "variants_per_independent_unit": 1
+              },
+              {
+                "cells": 7,
+                "component": "I3_K5",
+                "independent_unit_count": 256,
+                "independent_unit_type": "base_item_contrast_cluster",
+                "independent_units_total": 1792,
+                "rendered_rows": 3584,
+                "variants_per_independent_unit": 2
+              }
+            ],
+            "forward_passes": 16128,
+            "generated_tokens_upper_bound": 0,
+            "logit_reads": 16128,
+            "model_roles": 3,
+            "rendered_rows": 16128,
+            "rendered_rows_per_role": 5376,
+            "scored_rows": 16128,
+            "variants_per_cluster": 2
+          },
+          "S2": {
+            "base_item_contrast_clusters": 512,
+            "base_items": 512,
+            "components": [
+              {
+                "cells": 1,
+                "component": "I1a",
+                "independent_unit_count": 256,
+                "independent_unit_type": "base_item",
+                "independent_units_total": 256,
+                "rendered_rows": 256,
+                "variants_per_independent_unit": 1
+              },
+              {
+                "cells": 2,
+                "component": "I2",
+                "independent_unit_count": 128,
+                "independent_unit_type": "base_item",
+                "independent_units_total": 256,
+                "rendered_rows": 256,
+                "variants_per_independent_unit": 1
+              },
+              {
+                "cells": 2,
+                "component": "I3_K6",
+                "independent_unit_count": 256,
+                "independent_unit_type": "base_item_contrast_cluster",
+                "independent_units_total": 512,
+                "rendered_rows": 1024,
+                "variants_per_independent_unit": 2
+              },
+              {
+                "cells": 0,
+                "component": "I1b",
+                "independent_unit_count": 0,
+                "independent_unit_type": "not_applicable",
+                "independent_units_total": 0,
+                "not_applicable_reason": "this profile displays no label alphabet, so there is no symbol-binding step; not_applicable is not a pass",
+                "rendered_rows": 0,
+                "variants_per_independent_unit": 0
+              },
+              {
+                "cells": 0,
+                "component": "I3_K5",
+                "independent_unit_count": 0,
+                "independent_unit_type": "not_applicable",
+                "independent_units_total": 0,
+                "not_applicable_reason": "this profile renders no option list and no label alphabet, so K5 has no referent; not_applicable is not a pass",
+                "rendered_rows": 0,
+                "variants_per_independent_unit": 0
+              }
+            ],
+            "forward_passes": 4608,
+            "generated_tokens_upper_bound": 0,
+            "logit_reads": 4608,
+            "model_roles": 3,
+            "rendered_rows": 4608,
+            "rendered_rows_per_role": 1536,
+            "scored_rows": 4608,
+            "variants_per_cluster": 2
+          },
+          "S3": {
+            "base_item_contrast_clusters": 512,
+            "base_items": 512,
+            "components": [
+              {
+                "cells": 1,
+                "component": "I1a",
+                "independent_unit_count": 256,
+                "independent_unit_type": "base_item",
+                "independent_units_total": 256,
+                "rendered_rows": 256,
+                "variants_per_independent_unit": 1
+              },
+              {
+                "cells": 2,
+                "component": "I2",
+                "independent_unit_count": 128,
+                "independent_unit_type": "base_item",
+                "independent_units_total": 256,
+                "rendered_rows": 256,
+                "variants_per_independent_unit": 1
+              },
+              {
+                "cells": 2,
+                "component": "I3_K6",
+                "independent_unit_count": 256,
+                "independent_unit_type": "base_item_contrast_cluster",
+                "independent_units_total": 512,
+                "rendered_rows": 1024,
+                "variants_per_independent_unit": 2
+              },
+              {
+                "cells": 0,
+                "component": "I1b",
+                "independent_unit_count": 0,
+                "independent_unit_type": "not_applicable",
+                "independent_units_total": 0,
+                "not_applicable_reason": "this profile displays no label alphabet, so there is no symbol-binding step; not_applicable is not a pass",
+                "rendered_rows": 0,
+                "variants_per_independent_unit": 0
+              },
+              {
+                "cells": 0,
+                "component": "I3_K5",
+                "independent_unit_count": 0,
+                "independent_unit_type": "not_applicable",
+                "independent_units_total": 0,
+                "not_applicable_reason": "this profile renders no option list and no label alphabet, so K5 has no referent; not_applicable is not a pass",
+                "rendered_rows": 0,
+                "variants_per_independent_unit": 0
+              }
+            ],
+            "derived_from": "S2",
+            "incremental_forward_passes": 0,
+            "incremental_rendered_rows": 0,
+            "incremental_scored_rows": 0,
+            "incremental_sequence_scoring_rows": 0,
+            "rendered_rows_if_independently_rendered": 4608,
+            "variants_per_cluster": 2,
+            "why": "under the registered single-token answer domain the length-normalised sequence score of a one-token candidate is a monotone function of that token's log probability, so S3's argmax equals S2's by construction; the comparison is CPU arithmetic on the logits S2 already recorded"
+          }
+        },
+        "excludes": [
+          "I4, which is scoped to the RP role only",
+          "S4, which is a never-selectable diagnostic"
+        ],
+        "forward_passes": 20736,
+        "generated_tokens_upper_bound": 0,
+        "model_roles": [
+          "RT",
+          "RL",
+          "RI"
+        ],
+        "scope": "every applicable development component for each selectable profile, scored on the development split",
+        "scored_rows": 20736,
+        "uses_model": true
+      }
+    }
   },
-  "rejected_v0_1_i4_chance_null": {
-    "acceptance_count": 49,
-    "acceptance_rate": 0.3828125,
-    "alpha": 0.001,
-    "exact_null_tail": 0.000616080915,
-    "n": 128,
-    "null_hypothesis": "p <= 0.25",
-    "status": "REJECTED_BY_OPERATOR_REVIEW",
-    "why": "a chance-level null does not establish a positive-capability floor; clearing 0.25 shows only that the reference is above guessing, which cannot license the inference that the interface is adequate for a capable model"
-  },
-  "retained_exact_binomial_gates": [
+  "selected_label_uniformity_diagnostic": [
     {
-      "acceptance_count": 184,
-      "acceptance_rate": 0.9583333333,
-      "alpha": 0.005,
-      "construct": "trivial content recovery and output validity",
-      "exact_null_tail": 0.002362050279,
-      "gate": "I1a",
-      "meets_target_power_0_90_at_lowest_alternative": false,
-      "n": 192,
-      "null_hypothesis": "p <= 0.9",
-      "power": {
-        "0.97": 0.87425,
-        "0.98": 0.984073,
-        "0.99": 0.999843
-      }
+      "acceptance_band": [
+        43,
+        87
+      ],
+      "applies_to": "label-bearing profiles only; not_applicable to S2 and S3, which display no label alphabet",
+      "carries_confirmation_authority": false,
+      "carries_eligibility_authority": false,
+      "carries_gate_authority": false,
+      "carries_selection_authority": false,
+      "expected_per_label": 64.0,
+      "labels": 4,
+      "n": 256,
+      "status": "DIAGNOSTIC_NUISANCE_REPORT_ONLY",
+      "tail_convention": "two-sided central band; each tail holds at most half the stated mass",
+      "two_sided_mass_across_the_band": 0.00125,
+      "two_sided_mass_exact_rational": "1/800",
+      "unit_of_n": "scored rows in the cell"
     },
     {
-      "acceptance_count": 124,
-      "acceptance_rate": 0.96875,
-      "alpha": 0.005,
-      "construct": "trivial content recovery and output validity",
-      "exact_null_tail": 0.003071835731,
-      "gate": "I1a",
-      "meets_target_power_0_90_at_lowest_alternative": false,
-      "n": 128,
-      "null_hypothesis": "p <= 0.9",
-      "power": {
-        "0.97": 0.660555,
-        "0.98": 0.885042,
-        "0.99": 0.990394
-      }
+      "acceptance_band": [
+        97,
+        160
+      ],
+      "applies_to": "label-bearing profiles only; not_applicable to S2 and S3, which display no label alphabet",
+      "carries_confirmation_authority": false,
+      "carries_eligibility_authority": false,
+      "carries_gate_authority": false,
+      "carries_selection_authority": false,
+      "expected_per_label": 128.0,
+      "labels": 4,
+      "n": 512,
+      "status": "DIAGNOSTIC_NUISANCE_REPORT_ONLY",
+      "tail_convention": "two-sided central band; each tail holds at most half the stated mass",
+      "two_sided_mass_across_the_band": 0.00125,
+      "two_sided_mass_exact_rational": "1/800",
+      "unit_of_n": "scored rows in the cell"
     },
     {
-      "acceptance_count": 184,
-      "acceptance_rate": 0.9583333333,
-      "alpha": 0.005,
-      "construct": "explicit content-to-symbol binding",
-      "exact_null_tail": 0.002362050279,
-      "gate": "I1b",
-      "meets_target_power_0_90_at_lowest_alternative": false,
-      "n": 192,
-      "null_hypothesis": "p <= 0.9",
-      "power": {
-        "0.97": 0.87425,
-        "0.98": 0.984073,
-        "0.99": 0.999843
-      }
-    },
-    {
-      "acceptance_count": 124,
-      "acceptance_rate": 0.96875,
-      "alpha": 0.005,
-      "construct": "explicit content-to-symbol binding",
-      "exact_null_tail": 0.003071835731,
-      "gate": "I1b",
-      "meets_target_power_0_90_at_lowest_alternative": false,
-      "n": 128,
-      "null_hypothesis": "p <= 0.9",
-      "power": {
-        "0.97": 0.660555,
-        "0.98": 0.885042,
-        "0.99": 0.990394
-      }
-    },
-    {
-      "acceptance_count": 115,
-      "acceptance_rate": 0.5989583333,
-      "alpha": 0.005,
-      "construct": "primitive headroom, per family",
-      "exact_null_tail": 0.003709328063,
-      "gate": "I2",
-      "meets_target_power_0_90_at_lowest_alternative": true,
-      "n": 192,
-      "null_hypothesis": "p <= 0.5",
-      "power": {
-        "0.7": 0.998888,
-        "0.75": 0.999999,
-        "0.8": 1.0
-      }
-    },
-    {
-      "acceptance_count": 80,
-      "acceptance_rate": 0.625,
-      "alpha": 0.005,
-      "construct": "primitive headroom, per family",
-      "exact_null_tail": 0.002962603303,
-      "gate": "I2",
-      "meets_target_power_0_90_at_lowest_alternative": true,
-      "n": 128,
-      "null_hypothesis": "p <= 0.5",
-      "power": {
-        "0.7": 0.972426,
-        "0.75": 0.999384,
-        "0.8": 0.999999
-      }
+      "acceptance_band": [
+        212,
+        301
+      ],
+      "applies_to": "label-bearing profiles only; not_applicable to S2 and S3, which display no label alphabet",
+      "carries_confirmation_authority": false,
+      "carries_eligibility_authority": false,
+      "carries_gate_authority": false,
+      "carries_selection_authority": false,
+      "expected_per_label": 256.0,
+      "labels": 4,
+      "n": 1024,
+      "status": "DIAGNOSTIC_NUISANCE_REPORT_ONLY",
+      "tail_convention": "two-sided central band; each tail holds at most half the stated mass",
+      "two_sided_mass_across_the_band": 0.00125,
+      "two_sided_mass_exact_rational": "1/800",
+      "unit_of_n": "scored rows in the cell"
     }
   ],
   "status": "PROPOSED_DESIGN_PARAMETERS_NOT_MEASUREMENTS_NOT_FROZEN"
