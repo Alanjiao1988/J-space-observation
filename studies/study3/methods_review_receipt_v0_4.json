@@ -5,16 +5,18 @@
     "cuda_available": false,
     "dirty": 0,
     "full_suite_reconciliation": {
+      "bound_commit": "fdf99d04062dd89a2bd59baf8a3dc240f66c5abb",
+      "bound_tree": "d61c1d22e2e2feae65a2ae95b3114cf0fb95107f",
       "declared_starting_passed": 3974,
       "declared_starting_registered_historical_failures": 2,
       "declared_starting_skipped": 15,
-      "expected_passed": 4057,
+      "expected_passed": 4062,
       "historical_failure_disappeared_or_changed_signature": false,
       "new_error": false,
       "new_failure": false,
-      "newly_collected_passing_tests": 83,
+      "newly_collected_passing_tests": 88,
       "observed_failed": 2,
-      "observed_passed": 4057,
+      "observed_passed": 4062,
       "observed_skipped": 15,
       "reconciles_exactly": true,
       "unbound_run": false,
@@ -22,12 +24,12 @@
     },
     "github_actions_used": false,
     "gpu_count": 0,
-    "non_vacuity_probes_bound_run": "ca5k",
+    "non_vacuity_probes_bound_run": "ca5k, re-run on the publication commit as ca5x",
     "one_test_path_per_invocation": true,
     "platform": "linux/amd64",
     "python_version": "3.11.15",
     "registry": "acrfinreportdt2tgbdb",
-    "revalidation_on_the_publication_commit": "recorded in docs/run_log.md; the new review test, all three existing Study 3 tests, the independent recalculation check and the registry and static audits are re-run bound to the actual publication commit, so no commit is claimed validated by a run bound only to its parent.",
+    "revalidation_on_the_publication_commit": "The runs above bound to fdf99d04062dd89a2bd59baf8a3dc240f66c5abb are the publication-candidate validation. The terminal commit of this round adds only the run log, the receipt and the recomputed receipt row in the artifact index, none of which collects a test, so the suite envelope is unchanged; its revalidation run identifiers are reported in the round handoff because they cannot precede the commit they bind.",
     "runs": [
       {
         "bound_commit": "8a30067d3094a2e62828536c1bbaa8e704c988e8",
@@ -147,6 +149,65 @@
         "purpose": "full repository suite",
         "result": "4057 passed, 15 skipped, 2 failed",
         "run_id": "ca5w"
+      },
+      {
+        "bound_commit": "fdf99d04062dd89a2bd59baf8a3dc240f66c5abb",
+        "bound_tree": "d61c1d22e2e2feae65a2ae95b3114cf0fb95107f",
+        "command": "python -m pytest tests/test_study3_methods_review_v0_4.py -q",
+        "exit_code": 0,
+        "purpose": "new committed review test, re-run on the publication commit",
+        "result": "88 passed",
+        "run_id": "ca5x"
+      },
+      {
+        "bound_commit": "fdf99d04062dd89a2bd59baf8a3dc240f66c5abb",
+        "bound_tree": "d61c1d22e2e2feae65a2ae95b3114cf0fb95107f",
+        "command": "python -m pytest tests/test_study3_design.py -q",
+        "exit_code": 0,
+        "purpose": "existing Study 3 design test, re-run on the publication commit; required 197 passed",
+        "result": "197 passed",
+        "run_id": "ca5y"
+      },
+      {
+        "bound_commit": "fdf99d04062dd89a2bd59baf8a3dc240f66c5abb",
+        "bound_tree": "d61c1d22e2e2feae65a2ae95b3114cf0fb95107f",
+        "command": "python -m pytest tests/test_study3_methods_review.py -q",
+        "exit_code": 0,
+        "purpose": "existing first methods-review test, re-run on the publication commit; required 78 passed",
+        "result": "78 passed",
+        "run_id": "ca60"
+      },
+      {
+        "bound_commit": "fdf99d04062dd89a2bd59baf8a3dc240f66c5abb",
+        "bound_tree": "d61c1d22e2e2feae65a2ae95b3114cf0fb95107f",
+        "command": "python -m pytest tests/test_study3_methods_review_v0_3.py -q",
+        "exit_code": 0,
+        "purpose": "repaired historical harness, re-run on the publication commit; required 35 passed",
+        "result": "35 passed",
+        "run_id": "ca61"
+      },
+      {
+        "bound_commit": "fdf99d04062dd89a2bd59baf8a3dc240f66c5abb",
+        "bound_tree": "d61c1d22e2e2feae65a2ae95b3114cf0fb95107f",
+        "command": "python studies/study3/analysis/independent_methods_recalculation_v0_4.py --check",
+        "exit_code": 0,
+        "purpose": "independent recalculation --check on the publication commit",
+        "result": "INDEPENDENT_RECALCULATION_V0_4_CHECK_OK sections=25 max_absolute_deviation=0",
+        "run_id": "ca62"
+      },
+      {
+        "bound_commit": "fdf99d04062dd89a2bd59baf8a3dc240f66c5abb",
+        "bound_tree": "d61c1d22e2e2feae65a2ae95b3114cf0fb95107f",
+        "command": "python -m pytest tests -q",
+        "exit_code": 1,
+        "failures": [
+          "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+          "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix"
+        ],
+        "failures_are_the_registered_historical_pair": true,
+        "purpose": "full repository suite on the publication commit",
+        "result": "4062 passed, 15 skipped, 2 failed",
+        "run_id": "ca64"
       }
     ]
   },

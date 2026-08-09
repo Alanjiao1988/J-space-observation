@@ -6800,17 +6800,23 @@ there.
 | `ca5t` | `716bd57b` | Phase 1.0D protected-byte module | 11 passed |
 | `ca5u` | `716bd57b` | Phase 1.0D review-v2 protected-byte module | 30 passed |
 | `ca5w` | `716bd57b` | full repository suite | 4057 passed, 15 skipped, 2 failed |
+| `ca5x` | `fdf99d04` | new committed review test, re-run on the publication commit | 88 passed |
+| `ca5y` | `fdf99d04` | existing Study 3 design test, re-run on the publication commit; required 197 passed | 197 passed |
+| `ca60` | `fdf99d04` | existing first methods-review test, re-run on the publication commit; required 78 passed | 78 passed |
+| `ca61` | `fdf99d04` | repaired historical harness, re-run on the publication commit; required 35 passed | 35 passed |
+| `ca62` | `fdf99d04` | independent recalculation --check on the publication commit | INDEPENDENT_RECALCULATION_V0_4_CHECK_OK sections=25 max_absolute_deviation=0 |
+| `ca64` | `fdf99d04` | full repository suite on the publication commit | 4062 passed, 15 skipped, 2 failed |
 
 **Full-suite reconciliation.** The declared starting envelope is 3,974 passed, 15 skipped and
 exactly two registered historical `tests/test_parser_v3_seal_job` failures. The observed envelope is
-**4,057 passed, 15 skipped and the same two failures**, with identical node identifiers and
-signatures. 3,974 plus the 83 newly collected passing tests of
-`tests/test_study3_methods_review_v0_4.py` is 4,057, so the suite reconciles exactly. There is no
+**4,062 passed, 15 skipped and the same two failures**, with identical node identifiers and
+signatures. 3,974 plus the 88 newly collected passing tests of
+`tests/test_study3_methods_review_v0_4.py` is 4,062, so the suite reconciles exactly. There is no
 new failure, no new error, no unexplained skip change, no disappearance or signature change of a
 historical failure and no unbound run.
 
 **Historical-harness non-vacuity.** Three probes ran inside the committed review test in run
-`ca5k`: the pristine reviewed-commit snapshot passes; substituting the live draft-v0.4
+`ca5k, re-run on the publication commit as ca5x`: the pristine reviewed-commit snapshot passes; substituting the live draft-v0.4
 protocol into that snapshot fails; and perturbing the committed historical recalculation table
 fails. A passing harness is therefore not self-validating, and the anchoring it added is load
 bearing.
