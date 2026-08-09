@@ -2133,12 +2133,12 @@ conditions is adjudicated in the review.
 **Status.** Proposed design parameters, not measurements. Nothing here is frozen or authorised.
 
 
-## `M-32` - Study 3 draft-v0.5 bounded operator amendment
+## M-33 - Derivation method for Study 3 draft-v0.5
 
 **Round.** Study 3 draft-v0.5 bounded operator amendment, answering the ten
 `S3MR3-*` findings of the third independent methods review. Supersedes the
-draft-v0.4 methods record `M-31`, which is retained unedited as historical
-provenance.
+draft-v0.4 methods record `M-31`; `M-31` and `M-32` are retained unedited as
+historical provenance.
 
 **Design change of record.** Contrast applicability is registered per contrast ID
 rather than per contrast family. `K6-SEP` varies the separator between a displayed

@@ -3546,7 +3546,9 @@ freeze, no `P3-Q`, no bank, no seed, no model execution, no development round, n
 access and no feasibility-pilot authority is created. No successor prompt was written.
 
 
-## 2026-08-10 - `D44`: Study 3 draft-v0.5 bounded operator amendment
+## 2026-08-10 - D45 - Amend Study 3 to draft-v0.5 in response to the third independent methods review, and publish it for a fourth independent methods review rather than declaring it correct
+
+**Decision id.** `D45`.
 
 **Supersedes the draft-v0.4 design recorded in `D43`.** `D43` is retained
 unedited as immutable provenance. The third independent methods review of
