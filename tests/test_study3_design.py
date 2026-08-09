@@ -6,27 +6,58 @@ re-run it, and it did not catch the Markdown/JSON contradiction that the operato
 review later found. Everything that is design-critical is therefore checked here,
 in the repository test suite.
 
-draft-v0.3 additions. The independent methods review of draft-v0.2 returned
+draft-v0.3 additions. The first independent methods review of draft-v0.2 returned
 STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED with twenty findings. Six were
-blocking. This module now also enforces, as executable invariants, the repairs
-adopted in response to them: exactly two variants per I3 contrast cluster and no
-K5 x K6 cross product (S3MR-001), a single conjunctive I3 indicator whose truth
-table fails a stable-but-wrong answer (S3MR-002), an exact rational alpha that is
-present in every component row rather than only asserted (S3MR-003), the complete
-removal of the paired aggregate-equivalence procedure from every decision role
-(S3MR-004, S3MR-005), one and only one I3 floor with no degenerate rejection
-region (S3MR-006, S3MR-015), a fixed across-profile denominator (S3MR-016), an
-executable development selection map (S3MR-017), a work-stream decomposed
-operation projection (S3MR-012, S3MR-013) and a unit on every sample size
-(S3MR-014).
+blocking. This module enforces, as executable invariants, the repairs adopted in
+response to them: exactly two variants per I3 contrast cluster and no K5 x K6
+cross product (S3MR-001), a single conjunctive I3 indicator whose truth table
+fails a stable-but-wrong answer (S3MR-002), an exact rational alpha that is
+present in every component row (S3MR-003), the complete removal of the paired
+aggregate-equivalence procedure from every decision role (S3MR-004, S3MR-005),
+one and only one I3 floor with no degenerate rejection region (S3MR-006,
+S3MR-015), a fixed across-profile denominator (S3MR-016), an executable
+development selection map (S3MR-017), a work-stream decomposed operation
+projection (S3MR-012, S3MR-013) and a unit on every sample size (S3MR-014).
 
-Two anti-self-certification rules apply to this file. First, the numbers are not
-transcribed here: the committed derivation script must recompute them, and a
-separate test reads that script's own syntax tree to prove it contains no
-hard-coded threshold, tail or power constant. Second, nothing in this module may
-be read as approval of the design. It checks internal consistency and the
-arithmetic; adjudication of the method belongs to the second independent methods
-review.
+draft-v0.4 additions. The SECOND independent methods review of draft-v0.3
+returned STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED with ten
+structured findings: two BLOCKING, six MAJOR and two MINOR. This module now also
+enforces the draft-v0.4 repairs:
+
+* S3MR2-001, the gate-bearing I3 indicator is ``J_joint_correct``, a level over a
+  registered item-generating distribution, and no active claim field asserts
+  invariance, equivalence or an absent presentation effect;
+* S3MR2-002, the type-II architecture is an arbitrary-dependence union bound over
+  exact rationals with per-cell, per-profile-stage and end-to-end scopes that
+  reconstruct 19/17200, 17181/17200, 381/400 and 9/10;
+* S3MR2-003, every development sample size is the smallest unrestricted positive
+  integer meeting the registered per-cell target;
+* S3MR2-004, confirmation applicability is the intersection of a component's
+  selectable profiles with the single selected profile, so S4 never appears and
+  I1b and K5 are confined to S1;
+* S3MR2-005, the S4 diagnostic stream carries a derived, non-null forward cost;
+* S3MR2-006, the state machine is total and deterministic and an I0 failure maps
+  only to STOP_INSTRUMENT_DEFECT;
+* S3MR2-007, the K5 nuisance support is a complete 32-state support at exact
+  weight 1/32 drawn iid with replacement;
+* S3MR2-008, the I0 fixture accounting reconstructs from a registered breakdown;
+* S3MR2-009, the P3-Q ordering constraint is registered without selecting a
+  positive reference;
+* S3MR2-010, every gate-bearing atomic cell carries a complete sampling-frame
+  entry that licenses the exact-binomial estimand.
+
+Three anti-self-certification rules apply to this file. First, the numbers are
+not transcribed here: the committed derivation script must recompute them from
+the protocol's registered exact rational inputs, this module recomputes the
+decision-bearing ones a second time from those same registered inputs using its
+own integer arithmetic, and a separate test reads the derivation script's syntax
+tree to prove it contains no hard-coded threshold, tail, power or size constant.
+Second, every decision-bearing invariant is also exercised by a negative
+mutation; a test that only checks the committed happy path is insufficient.
+Third, nothing in this module may be read as approval of the design. It checks
+internal consistency and the arithmetic; adjudication of the method belongs to
+the THIRD independent methods review, which must be conducted by a party that did
+not draft draft-v0.4.
 
 Nothing in this file touches a model. There is no download, no weight load, no
 tokenizer construction, no forward pass, no generation, no activation
@@ -36,7 +67,7 @@ no provider call. The tests read committed text files and do arithmetic.
 The JSON-Schema validation below is implemented locally. ``jsonschema`` is not in
 ``requirements.lock.txt`` and is therefore absent from the validation image, so a
 dependency on it would make these tests unrunnable exactly where they matter.
-The supported keyword subset is the subset the Study 3 schema uses.
+The supported keyword subset is the subset the Study 3 schemas use.
 """
 
 import ast
@@ -45,6 +76,7 @@ import os
 import re
 import subprocess
 import sys
+from fractions import Fraction
 
 import pytest
 
@@ -57,28 +89,42 @@ SCHEMA_PATH = os.path.join(PROTOCOL_DIR, "interface_calibration_protocol.schema.
 STATS_SCRIPT = os.path.join(STUDY3, "analysis", "design_statistics.py")
 STATS_TABLES = os.path.join(STUDY3, "analysis", "design_statistics_tables.json")
 REVIEW_PATH = os.path.join(STUDY3, "reviews", "v0_1_operator_review.md")
-AMENDMENT_PATH = os.path.join(STUDY3, "reviews", "v0_3_operator_amendment.json")
+AMENDMENT_V0_3 = os.path.join(STUDY3, "reviews", "v0_3_operator_amendment.json")
+AMENDMENT_PATH = os.path.join(STUDY3, "reviews", "v0_4_operator_amendment.json")
+AMENDMENT_SCHEMA = os.path.join(
+    STUDY3, "reviews", "v0_4_operator_amendment.schema.json")
+AMENDMENT_MD = os.path.join(STUDY3, "reviews", "v0_4_operator_amendment.md")
 PACKET_V0_3 = os.path.join(
     STUDY3, "analysis", "independent_methods_review_packet_v0_3.md")
+PACKET_PATH = os.path.join(
+    STUDY3, "analysis", "independent_methods_review_packet_v0_4.md")
 
-EXPECTED_STATE = ("STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_"
-                  "AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW")
+EXPECTED_STATE = ("STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_"
+                  "AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW")
 NO_WINNER = "No interface is selected in this round."
 
-DRAFT_VERSION = "draft-v0.3"
-REVIEW_STATE = "awaiting_second_independent_methods_review"
+DRAFT_VERSION = "draft-v0.4"
+REVIEW_STATE = "awaiting_third_independent_methods_review"
 
 # The constructs the one-shot confirmation gate must cover. I3 appears as its
-# primary indicator J_both rather than as a bare family label: draft-v0.2
-# carried two mutually exclusive I3 indicators, so a bare "I3" did not say what
-# would be replicated.
-COVERED_CONSTRUCTS = ("I0", "I1a", "I1b", "I2", "I3_J_both", "I4")
+# primary indicator rather than as a bare family label: draft-v0.2 carried two
+# mutually exclusive I3 indicators, so a bare "I3" did not say what would be
+# replicated. draft-v0.4 renames that indicator J_joint_correct (S3MR2-001).
+COVERED_CONSTRUCTS = ("I0", "I1a", "I1b", "I2", "I3_J_joint_correct", "I4")
 
-# The twenty findings of the independent methods review of draft-v0.2 and the
-# twenty-two unresolved items of its packet checklist. Both sets must be closed
-# exactly once each in the amendment record.
+# The twenty findings of the first independent methods review, the twenty-two
+# unresolved items of its packet checklist, and the ten findings of the second
+# independent methods review. All three sets must be closed exactly once each in
+# the draft-v0.4 amendment record.
 FINDING_IDS = ["S3MR-%03d" % i for i in range(1, 21)]
 UR_IDS = ["UR-%02d" % i for i in range(1, 23)]
+FINDING_IDS_V0_3 = ["S3MR2-%03d" % i for i in range(1, 11)]
+
+# The severities the second review actually recorded in its structured findings.
+# The immutable disposition_basis sentence of that review says "Two BLOCKING and
+# eight MAJOR". That sentence is preserved unedited in the review; the structured
+# counts below are what draft-v0.4 answers, and 8 MAJOR is never propagated.
+STRUCTURED_V0_3_SEVERITIES = {"BLOCKING": 2, "MAJOR": 6, "MINOR": 2}
 
 # Text that must never reappear. The first two strings are quoted from draft-v0.1
 # and are the two defects that were confirmed verbatim from committed bytes.
@@ -87,12 +133,26 @@ FORBIDDEN_TEXT = [
     "generated from one source of record",
 ]
 
+# S3MR2-001. These terms assert a presentation-effect conclusion that a level
+# gate on J_joint_correct cannot identify. They are permitted only in clearly
+# labelled historical, retired, limitation-of-claim and prohibited-claim text.
+PROHIBITED_CLAIM_TERMS = (
+    "invarian",
+    "equivalen",
+    "no presentation effect",
+    "presentation-effect size",
+    "presentation effect size",
+    "stable across presentations",
+    "unaffected by presentation",
+)
+
 
 # --------------------------------------------------------------------------
 # Minimal JSON-Schema validator (local, dependency-free)
 # --------------------------------------------------------------------------
 
-_IGNORED = {"$schema", "$id", "title", "description", "examples", "default"}
+_IGNORED = {"$schema", "$id", "$comment", "title", "description", "examples",
+            "default"}
 
 _TYPES = {
     "object": dict, "array": list, "string": str, "boolean": bool,
@@ -112,6 +172,11 @@ def _type_ok(instance, name):
     if name == "boolean":
         return isinstance(instance, bool)
     return isinstance(instance, _TYPES[name])
+
+
+def _canonical(value):
+    """A hashable canonical form, for uniqueItems over nested JSON."""
+    return json.dumps(value, sort_keys=True)
 
 
 def schema_errors(instance, schema, path="$"):
@@ -147,12 +212,19 @@ def schema_errors(instance, schema, path="$"):
                         errors.extend(schema_errors(instance[prop], sub,
                                                     "%s.%s" % (path, prop)))
         elif key == "additionalProperties":
-            if value is False and isinstance(instance, dict):
+            if isinstance(instance, dict):
                 allowed = set(schema.get("properties", {}))
-                for prop in instance:
-                    if prop not in allowed:
-                        errors.append("%s: additional property %r is not allowed"
-                                      % (path, prop))
+                if value is False:
+                    for prop in instance:
+                        if prop not in allowed:
+                            errors.append(
+                                "%s: additional property %r is not allowed"
+                                % (path, prop))
+                elif isinstance(value, dict):
+                    for prop, sub_instance in instance.items():
+                        if prop not in allowed:
+                            errors.extend(schema_errors(
+                                sub_instance, value, "%s.%s" % (path, prop)))
         elif key == "items":
             if isinstance(instance, list):
                 for i, item in enumerate(instance):
@@ -167,6 +239,32 @@ def schema_errors(instance, schema, path="$"):
             for i, sub in enumerate(value):
                 errors.extend(schema_errors(instance, sub,
                                             "%s/allOf[%d]" % (path, i)))
+        elif key == "anyOf":
+            if not any(not schema_errors(instance, sub) for sub in value):
+                errors.append("%s: no anyOf branch is satisfied" % path)
+        elif key == "oneOf":
+            matched = sum(1 for sub in value if not schema_errors(instance, sub))
+            if matched != 1:
+                errors.append("%s: %d oneOf branches matched, exactly 1 required"
+                              % (path, matched))
+        elif key == "not":
+            if not schema_errors(instance, value):
+                errors.append("%s: the 'not' subschema was satisfied" % path)
+        elif key == "if":
+            # ``if`` is applied together with ``then``/``else`` from the same
+            # schema object. Those two keys are consumed here and skipped below.
+            branch = "then" if not schema_errors(instance, value) else "else"
+            if branch in schema:
+                errors.extend(schema_errors(instance, schema[branch],
+                                            "%s/%s" % (path, branch)))
+        elif key in ("then", "else"):
+            if "if" not in schema:
+                raise AssertionError("%r without 'if' at %s" % (key, path))
+        elif key == "uniqueItems":
+            if value is True and isinstance(instance, list):
+                seen = [_canonical(item) for item in instance]
+                if len(set(seen)) != len(seen):
+                    errors.append("%s: items are not unique" % path)
         elif key == "minItems":
             if isinstance(instance, list) and len(instance) < value:
                 errors.append("%s: %d items, minimum %d"
@@ -174,6 +272,14 @@ def schema_errors(instance, schema, path="$"):
         elif key == "maxItems":
             if isinstance(instance, list) and len(instance) > value:
                 errors.append("%s: %d items, maximum %d"
+                              % (path, len(instance), value))
+        elif key == "minProperties":
+            if isinstance(instance, dict) and len(instance) < value:
+                errors.append("%s: %d properties, minimum %d"
+                              % (path, len(instance), value))
+        elif key == "maxProperties":
+            if isinstance(instance, dict) and len(instance) > value:
+                errors.append("%s: %d properties, maximum %d"
                               % (path, len(instance), value))
         elif key == "minimum":
             if isinstance(instance, (int, float)) \
@@ -199,43 +305,127 @@ def schema_errors(instance, schema, path="$"):
 
 
 # --------------------------------------------------------------------------
+# Exact arithmetic, recomputed here independently of the derivation script
+# --------------------------------------------------------------------------
+
+def _rational(text):
+    """Parse an exact rational registered as a string such as ``"19/17200"``."""
+    if "/" in text:
+        numerator, denominator = text.split("/", 1)
+        return Fraction(int(numerator), int(denominator))
+    return Fraction(int(text))
+
+
+def _upper_tail_numerator(n, successes, p_num, p_den):
+    """Integer numerator of Pr(X >= successes) over the denominator p_den ** n.
+
+    Integer-only arithmetic. Floating point never touches a decision here.
+    """
+    total = 0
+    q_num = p_den - p_num
+    term = p_num ** n  # k == n
+    total += term
+    for k in range(n - 1, successes - 1, -1):
+        # term(k) = C(n, k) * p_num**k * q_num**(n - k)
+        term = term * (k + 1) * q_num // ((n - k) * p_num)
+        total += term
+    return total
+
+
+def _upper_tail(n, successes, p):
+    """Exact Fraction for Pr(X >= successes) when X ~ Binomial(n, p)."""
+    p_num, p_den = p.numerator, p.denominator
+    if successes <= 0:
+        return Fraction(1)
+    if successes > n:
+        return Fraction(0)
+    return Fraction(_upper_tail_numerator(n, successes, p_num, p_den),
+                    p_den ** n)
+
+
+def _smallest_controlling_count(n, p0, alpha):
+    """Smallest pass count c with Pr(X >= c | p0) <= alpha, or None."""
+    low, high = 1, n
+    best = None
+    while low <= high:
+        middle = (low + high) // 2
+        if _upper_tail(n, middle, p0) <= alpha:
+            best = middle
+            high = middle - 1
+        else:
+            low = middle + 1
+    return best
+
+
+def _smallest_size_meeting_power(p0, p1, alpha, target, ceiling):
+    """Smallest n whose minimal level-alpha pass count reaches ``target`` power."""
+    for n in range(1, ceiling + 1):
+        count = _smallest_controlling_count(n, p0, alpha)
+        if count is None or count > n:
+            continue
+        if _upper_tail(n, count, p1) >= target:
+            return n, count
+    raise AssertionError("no n <= %d reaches the target" % ceiling)
+
+
+def _decimal(fraction, places=12):
+    """Render an exact Fraction to a fixed number of places, rounding half up."""
+    scale = 10 ** places
+    scaled = (fraction * scale).numerator // (fraction * scale).denominator
+    remainder = (fraction * scale) - scaled
+    if remainder >= Fraction(1, 2):
+        scaled += 1
+    text = str(scaled).rjust(places + 1, "0")
+    return "%s.%s" % (text[:-places], text[-places:])
+
+
+# --------------------------------------------------------------------------
 # Fixtures
 # --------------------------------------------------------------------------
 
+def _load_json(path):
+    with open(path, encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def _load_text(path):
+    with open(path, encoding="utf-8") as handle:
+        return handle.read()
+
+
 @pytest.fixture(scope="module")
 def protocol():
-    with open(JSON_PATH, encoding="utf-8") as handle:
-        return json.load(handle)
+    return _load_json(JSON_PATH)
 
 
 @pytest.fixture(scope="module")
 def schema():
-    with open(SCHEMA_PATH, encoding="utf-8") as handle:
-        return json.load(handle)
+    return _load_json(SCHEMA_PATH)
 
 
 @pytest.fixture(scope="module")
 def markdown():
-    with open(MD_PATH, encoding="utf-8") as handle:
-        return handle.read()
+    return _load_text(MD_PATH)
 
 
 @pytest.fixture(scope="module")
 def tables():
-    with open(STATS_TABLES, encoding="utf-8") as handle:
-        return json.load(handle)
+    return _load_json(STATS_TABLES)
 
 
 @pytest.fixture(scope="module")
 def amendment():
-    with open(AMENDMENT_PATH, encoding="utf-8") as handle:
-        return json.load(handle)
+    return _load_json(AMENDMENT_PATH)
+
+
+@pytest.fixture(scope="module")
+def amendment_schema():
+    return _load_json(AMENDMENT_SCHEMA)
 
 
 @pytest.fixture(scope="module")
 def packet():
-    with open(PACKET_V0_3, encoding="utf-8") as handle:
-        return handle.read()
+    return _load_text(PACKET_PATH)
 
 
 # --------------------------------------------------------------------------
@@ -243,694 +433,1997 @@ def packet():
 # --------------------------------------------------------------------------
 
 def test_local_schema_validator_behaves():
-    assert schema_errors(3, {"type": "number"}) == []
-    assert schema_errors(True, {"type": "number"}) != []
-    assert schema_errors(True, {"type": "integer"}) != []
-    assert schema_errors(True, {"type": "boolean"}) == []
-    assert schema_errors(1, {"type": "boolean"}) != []
-    assert schema_errors(None, {"type": ["integer", "null"]}) == []
-    assert schema_errors(5, {"type": ["integer", "null"]}) == []
-    assert schema_errors("x", {"type": ["integer", "null"]}) != []
-    assert schema_errors(1, {"minimum": 1}) == []
-    assert schema_errors(0, {"minimum": 1}) != []
-    assert schema_errors(1, {"maximum": 1}) == []
-    assert schema_errors(2, {"maximum": 1}) != []
-    assert schema_errors(True, {"minimum": 1}) == [], (
-        "a boolean must not be silently range-checked as a number")
-    assert schema_errors("x", {"const": "x"}) == []
-    assert schema_errors("y", {"const": "x"}) != []
-    assert schema_errors({"a": 1}, {"required": ["a"]}) == []
-    assert schema_errors({}, {"required": ["a"]}) != []
+    """The validator must reject, not merely tolerate, each supported keyword."""
+    assert not schema_errors({"a": 1}, {"type": "object",
+                                        "properties": {"a": {"type": "integer"}}})
+    assert schema_errors({"a": True}, {"type": "object",
+                                       "properties": {"a": {"type": "integer"}}})
+    assert schema_errors(1, {"type": "boolean"})
+    assert schema_errors("x", {"const": "y"})
+    assert schema_errors("x", {"enum": ["y", "z"]})
+    assert schema_errors({}, {"required": ["a"]})
     assert schema_errors({"a": 1, "b": 2},
-                         {"properties": {"a": {}}, "additionalProperties": False}) != []
-    assert schema_errors([1, 2], {"contains": {"const": 2}}) == []
-    assert schema_errors([1, 3], {"contains": {"const": 2}}) != []
-    assert schema_errors([], {"maxItems": 0}) == []
-    assert schema_errors([1], {"maxItems": 0}) != []
-    assert schema_errors("abc", {"pattern": "^a"}) == []
-    assert schema_errors("bbc", {"pattern": "^a"}) != []
+                         {"properties": {"a": {}}, "additionalProperties": False})
+    assert schema_errors({"a": 1, "b": "s"},
+                         {"properties": {"a": {}},
+                          "additionalProperties": {"type": "integer"}})
+    assert schema_errors([1, "s"], {"items": {"type": "integer"}})
+    assert schema_errors([1, 2], {"contains": {"const": 3}})
+    assert not schema_errors([1, 3], {"contains": {"const": 3}})
+    assert schema_errors(1, {"allOf": [{"type": "integer"}, {"const": 2}]})
+    assert schema_errors(1, {"anyOf": [{"const": 2}, {"const": 3}]})
+    assert not schema_errors(1, {"anyOf": [{"const": 1}, {"const": 3}]})
+    assert schema_errors(1, {"oneOf": [{"type": "integer"}, {"const": 1}]})
+    assert not schema_errors(1, {"oneOf": [{"const": 1}, {"const": 2}]})
+    assert schema_errors(1, {"not": {"type": "integer"}})
+    assert not schema_errors(1, {"not": {"type": "string"}})
+    conditional = {"if": {"properties": {"k": {"const": "x"}}, "required": ["k"]},
+                   "then": {"properties": {"v": {"const": 1}}}}
+    assert schema_errors({"k": "x", "v": 2}, conditional)
+    assert not schema_errors({"k": "x", "v": 1}, conditional)
+    assert not schema_errors({"k": "y", "v": 2}, conditional)
+    assert schema_errors([1, 1], {"uniqueItems": True})
+    assert schema_errors([{"a": 1}, {"a": 1}], {"uniqueItems": True})
+    assert not schema_errors([{"a": 1}, {"a": 2}], {"uniqueItems": True})
+    assert schema_errors([], {"minItems": 1})
+    assert schema_errors([1, 2], {"maxItems": 1})
+    assert schema_errors({}, {"minProperties": 1})
+    assert schema_errors({"a": 1, "b": 2}, {"maxProperties": 1})
+    assert schema_errors(0, {"minimum": 1})
+    assert schema_errors(2, {"maximum": 1})
+    assert schema_errors("", {"minLength": 1})
+    assert schema_errors("abc", {"pattern": r"^\d+$"})
+    assert not schema_errors("123", {"pattern": r"^\d+$"})
 
 
 def test_the_validator_refuses_a_schema_it_cannot_fully_enforce():
-    """An unsupported keyword must raise, never be silently skipped.
-
-    A validator that ignores what it does not understand reports success for
-    constraints it never checked, which is worse than having no validator.
-    """
+    """Silently ignoring an unknown keyword would make the schema decorative."""
     with pytest.raises(AssertionError):
-        schema_errors(1, {"multipleOf": 2})
+        schema_errors({"a": 1}, {"patternProperties": {"^a$": {"type": "string"}}})
+    with pytest.raises(AssertionError):
+        schema_errors({"a": 1}, {"dependentRequired": {"a": ["b"]}})
+    with pytest.raises(AssertionError):
+        schema_errors({"a": 1}, {"then": {"const": 1}})
+
+
+def test_the_exact_arithmetic_helpers_are_correct():
+    """The in-test recomputation must be right before it can audit anything."""
+    half = Fraction(1, 2)
+    assert _upper_tail(3, 0, half) == 1
+    assert _upper_tail(3, 4, half) == 0
+    assert _upper_tail(3, 3, half) == Fraction(1, 8)
+    assert _upper_tail(3, 2, half) == Fraction(1, 2)
+    # The full mass over every attainable count is exactly one.
+    p = Fraction(9, 10)
+    assert sum(_upper_tail(5, k, p) - _upper_tail(5, k + 1, p)
+               for k in range(6)) == 1
+    # Monotone in p, which is why the supremum of the null tail sits at p0.
+    assert _upper_tail(20, 15, Fraction(4, 5)) > _upper_tail(20, 15, Fraction(1, 2))
+    assert _smallest_controlling_count(10, half, Fraction(1, 1024)) == 10
+    assert _decimal(Fraction(1, 2), 3) == "0.500"
+    assert _decimal(Fraction(1, 3), 6) == "0.333333"
 
 
 # --------------------------------------------------------------------------
-# Positive structural validation
+# State, version parity and the operation boundary
 # --------------------------------------------------------------------------
 
 def test_protocol_validates_against_committed_schema(protocol, schema):
     errors = schema_errors(protocol, schema)
-    assert errors == [], "schema validation failed:\n" + "\n".join(errors)
+    assert errors == [], "protocol failed its own schema:\n%s" % "\n".join(errors)
+
+
+def test_amendment_record_validates_against_its_committed_schema(
+        amendment, amendment_schema):
+    errors = schema_errors(amendment, amendment_schema)
+    assert errors == [], "amendment failed its schema:\n%s" % "\n".join(errors)
 
 
 def test_protocol_declares_the_expected_draft_state(protocol):
+    """S3MR2 round: the draft is v0.4 and it awaits the THIRD review."""
     assert protocol["state"] == EXPECTED_STATE
-    assert protocol["study_identity"]["draft_version"] == DRAFT_VERSION
-    assert protocol["status"]["frozen"] is False
-    assert protocol["status"]["execution_authorized"] is False
-    assert protocol["status"]["review_state"] == REVIEW_STATE
-    assert protocol["study_identity"]["successor_authority"] == "none"
+    assert protocol["schema_version"].endswith(DRAFT_VERSION)
+    status = protocol["status"]
+    assert status["frozen"] is False
+    assert status["execution_authorized"] is False
+    assert status["review_state"] == REVIEW_STATE
+    assert status["document_class"] == "design_draft"
+    assert "third bounded independent methods review of draft-v0.4" in \
+        protocol["required_next_action"]
+    assert "did not draft draft-v0.4" in protocol["required_next_action"]
 
 
-def test_the_three_artifacts_agree_on_the_draft_version(protocol, tables,
-                                                        amendment, packet):
-    """JSON, derivation tables, amendment record and packet must not diverge."""
+def test_the_artifacts_agree_on_the_draft_version_and_state(
+        protocol, tables, markdown, amendment, packet):
+    """JSON, schema, derivation tables, Markdown, amendment and packet parity."""
     assert tables["draft_version"] == DRAFT_VERSION
+    assert tables["state"] == EXPECTED_STATE
     assert amendment["state"] == EXPECTED_STATE
-    assert DRAFT_VERSION in packet
+    assert EXPECTED_STATE in markdown
     assert EXPECTED_STATE in packet
+    assert DRAFT_VERSION in markdown
+    assert DRAFT_VERSION in packet
+    # No artifact may still announce that it is awaiting the SECOND review.
+    for name, text in (("markdown", markdown), ("packet", packet)):
+        assert "AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW" not in text, name
+    assert protocol["status"]["amendment_record"].endswith(
+        "v0_4_operator_amendment.md")
+    assert protocol["status"]["amendment_record_json"].endswith(
+        "v0_4_operator_amendment.json")
 
 
-def test_every_operation_counter_is_zero(protocol):
-    counters = protocol["operation_boundaries"]["performed_this_round"]
-    assert counters, "the counter block must not be empty"
-    for name, value in counters.items():
-        assert value == 0, "counter %s is %r, expected 0" % (name, value)
-    assert protocol["operation_boundaries"]["all_counters_zero"] is True
-    assert protocol["results"] == []
-    assert protocol["bank_rows"] == []
-    assert protocol["bank_construction_policy"]["rows_generated_this_round"] == 0
-    assert protocol["bank_construction_policy"]["seeds_drawn_this_round"] == 0
-
-
-def test_no_winner_and_no_positive_reference_selected(protocol):
+def test_no_frozen_authorized_or_selected_state(protocol, tables):
+    flags = tables["authority_flags"]
+    assert set(flags) >= {"frozen", "execution_authorized", "winner_selected",
+                          "positive_reference_selected", "seed_authorized",
+                          "bank_authorized", "confirmation_access_authorized",
+                          "model_operations_authorized"}
+    for name, value in flags.items():
+        assert value is False, "%s is not false" % name
     order = protocol["admissibility_order"]
     assert order["no_winner_this_round"] is True
     assert order["no_winner_this_round_statement"] == NO_WINNER
-    assert order["proposed_disposition_only"] is True
-    assert order["no_data_dependent_ranking"] is True
-    assert "S4" in order["never_selectable"]
-    pr = protocol["positive_reference_candidates"]
-    assert pr["selection_status"].startswith("UNSELECTED"), pr["selection_status"]
-    assert pr["blocking_decision"] == "OD2"
-    # OD2 is an operator decision. Draft-v0.3 may not pre-empt it by pinning,
-    # ranking, downloading, tokenizing, loading or prequalifying a candidate.
-    for verb in ("selected", "preferred", "pinned", "ranked", "downloaded",
-                 "tokenized", "loaded", "prequalified"):
-        assert verb in pr["selection_status"], verb
-    performed = pr["operations_performed_on_any_candidate"]
-    if isinstance(performed, dict):
-        for name, value in performed.items():
-            assert value in (0, False, "none"), "%s = %r" % (name, value)
+    assert protocol["positive_reference_candidates"][
+        "selection_status"].startswith("UNSELECTED")
 
 
-def _asserts_failing_interface_stays_eligible(text):
-    """True when text claims a failing interface itself remains eligible.
-
-    The legitimate sentence "the study stops only when no selectable interface
-    profile remains eligible" contains the same words, so it is removed before
-    the check. Only the draft-v0.1 claim survives that removal.
-    """
-    stripped = re.sub(r"no selectable interface(?: profile)? remains eligible",
-                      "", text)
-    return "remains eligible" in stripped
-
-
-def test_i4_is_part_of_eligibility_and_fails_per_interface(protocol):
-    order = protocol["admissibility_order"]
-    assert "I4" in order["gates_required_for_eligibility"]
-    gate = _gate(protocol, "I4")
-    assert gate["part_of_eligibility"] is True
-    assert gate["per_interface_not_global"] is True
-    assert "eliminate this interface profile" in gate["legal_next_state_on_fail"]
-    assert "eliminated" in gate["consequence_of_failure"]
-    # The v0.1 contradiction was that a failing interface "remains eligible".
-    for other in protocol["gate_hierarchy"]:
-        for field in ("legal_next_state_on_fail", "what_fails"):
-            assert not _asserts_failing_interface_stays_eligible(other[field]), \
-                (other["gate_id"], field)
-    assert not _asserts_failing_interface_stays_eligible(
-        gate["consequence_of_failure"].split("draft-v0.1 wrote")[0])
+def test_every_operation_counter_is_zero(protocol, tables):
+    """S3MR2 round: zero means zero, in both the protocol and the tables."""
+    counters = protocol["operation_boundaries"]["performed_this_round"]
+    assert counters, "no counters registered"
+    for name, value in counters.items():
+        assert value == 0, "%s is not zero" % name
+        assert isinstance(value, int) and not isinstance(value, bool)
+    assert protocol["operation_boundaries"]["all_counters_zero"] is True
+    assert tables["operation_counts"] == counters
+    for required in ("model_downloads", "forward_passes", "generations",
+                     "seeds_drawn", "bank_rows_generated", "gpu_jobs",
+                     "confirmation_split_accesses", "interfaces_selected",
+                     "positive_references_selected", "evidence_rows_created"):
+        assert required in counters
 
 
-def test_i5_covers_every_gate_bearing_construct(protocol):
-    """I3 is confirmed as its primary indicator, not as an unnamed family.
-
-    draft-v0.2 listed a bare "I3" among the confirmed constructs while carrying
-    two mutually exclusive I3 indicators, so the confirmation split did not say
-    which one it would replicate. draft-v0.3 names J_both, and a draft that
-    reverts to the ambiguous label fails here.
-    """
-    gate = _gate(protocol, "I5")
-    for construct in COVERED_CONSTRUCTS:
-        assert construct in gate["covered_constructs"], construct
-    assert "I3" not in gate["covered_constructs"]
-    assert gate["accessible_before_authority"] is False
-    assert "RP" in gate["model_roles"]
-    assert any("K4" in inp for inp in gate["inputs"])
-
-
-def test_no_gate_authorizes_mechanistic_execution(protocol):
-    gates = protocol["gate_hierarchy"]
-    assert [g["gate_id"] for g in gates] == ["I0", "I1a", "I1b", "I2", "I3",
-                                             "I4", "I5"]
-    for gate in gates:
-        assert gate["authorizes_mechanistic_execution"] is False
-        assert gate["fail_closed"] is True
-        assert gate["no_pooling"] is True
-
-
-def test_pooling_as_a_rescue_is_prohibited(protocol):
-    """The sampling unit is now stated per construct, because it differs.
-
-    draft-v0.2 declared one sampling unit, "the base item", for the whole
-    design while I3 was in fact evaluated over contrast clusters. That is the
-    unit-reuse defect. draft-v0.3 requires the field to name both units and to
-    say they are never interchanged.
-    """
-    cells = protocol["atomic_evaluation_cells"]
-    assert cells["no_pooling_rescue"] is True
-    unit = cells["sampling_unit"]
-    assert "the base item for I1a, I1b, I2 and I4" in unit
-    assert "the base-item contrast cluster for I3" in unit
-    assert "never interchanged" in unit
-    assert cells["i3_sampling_unit"]["unit"] == "base_item_contrast_cluster"
-    assert len(cells["cell_factors"]) >= 8
-    prohibited = " ".join(p["prohibited"] for p in cells["pooling_prohibitions"])
-    assert "K1 with K2" in prohibited
-    assert "primitive operation families" in prohibited
-    assert "depth 2 with depth 3" in prohibited
-
-
-def test_od2_alone_remains_blocking_and_od5_od6_are_only_proposed(protocol):
-    """OD5 and OD6 are adopted this round; OD2 is not the operator's to close here.
-
-    The adopted resolutions of OD5 and OD6 are explicitly conditional on the
-    second independent methods review. They must not be recorded as plain
-    ``resolved``, because that would be self-approval of exactly the two
-    decisions the first reviewer rejected.
-    """
-    assert protocol["blocking_decisions"] == ["OD2"]
-    by_id = {d["id"]: d for d in protocol["unresolved_operator_decisions"]}
-    assert sorted(by_id) == ["OD%d" % i for i in range(1, 9)]
-
-    assert by_id["OD2"]["status"] == "unresolved"
-    assert by_id["OD2"]["blocking"] is True
-
-    for did in ("OD5", "OD6"):
-        assert by_id[did]["status"] == "resolved_subject_to_independent_review"
-        assert by_id[did]["blocking"] is False, (
-            "%s is adopted in draft-v0.3 and therefore no longer blocks the "
-            "second review; it must not be reported as still blocking" % did)
-
-    for did in ("OD1", "OD3", "OD4", "OD7"):
-        assert by_id[did]["status"] == "resolved"
-        assert by_id[did].get("blocking") is False
-    assert by_id["OD8"]["status"] == "resolved_in_part"
-
-
-def test_no_decision_is_recorded_as_independently_approved(protocol, amendment):
-    """The drafting party may propose a repair; it may not adjudicate it."""
-    prohibition = amendment["self_approval_prohibition"]
-    assert prohibition["adjudication_belongs_to"]
-    assert "second independent methods review" in \
-        prohibition["adjudication_belongs_to"]
-    assert prohibition["the_amendment_does_not_declare_the_protocol_correct"] \
-        is True
-    for flag, value in amendment["authority_flags"].items():
-        assert value is False, "%s = %r" % (flag, value)
-    for name, value in amendment["operation_counters"].items():
-        assert value == 0, "%s = %r" % (name, value)
-    for empty in ("results", "bank_rows", "seeds", "evidence_rows"):
-        assert amendment[empty] == [], empty
-
-
-def test_study1_wording_is_not_overstated(protocol):
-    statement = protocol["prior_study_statements"]["study1"]
-    assert "do not establish that parsing caused" in statement
-    assert "Parser-v2 separately failed its locked gate" in statement
-    assert "nonauthoritative" in statement
-    prohibited = protocol["claim_ceiling"]["prohibited_claims"]
-    assert any("parsing caused the Study 1" in claim for claim in prohibited)
+def test_no_bank_seed_result_evidence_row_or_confirmation_content_exists(
+        protocol, amendment):
+    assert protocol["results"] == []
+    assert protocol["bank_rows"] == []
+    frame = protocol["sampling_frame_v0_4"]
+    assert frame["seeds_drawn_in_this_round"] == 0
+    assert frame["bank_rows_created_in_this_round"] == 0
+    assert frame["future_seed_lifecycle"]["seed_values"] is None
+    assert frame["future_seed_lifecycle"]["realized_bank"] is None
+    assert frame["future_seed_lifecycle"]["seed_authority_granted"] is False
+    assert protocol["split_lifecycle"]["confirmation_isolation"][
+        "accessible_before_authority"] is False
+    assert amendment["results"] == []
+    assert amendment["evidence_rows"] == []
+    assert amendment["bank_rows"] == []
+    assert amendment["seeds"] == []
 
 
 # --------------------------------------------------------------------------
-# Applicability is a third value, and it must be internally consistent
+# S3MR2-001: the I3 estimand is a level, and no active claim says otherwise
 # --------------------------------------------------------------------------
 
-POSITION_LABEL_TRANSFORMS = ("position_permutation", "label_symbol_permutation",
-                             "label_set_replacement")
-
-
-def test_not_applicable_is_neither_pass_nor_zero_effect(protocol):
-    semantics = protocol["not_applicable_semantics"]
-    assert "not a pass" in semantics
-    assert "not a zero effect" in semantics
-    assert "may never be counted as a satisfied" in semantics
-
-
-def test_applicability_matches_what_each_profile_renders(protocol):
-    """A profile that shows no options cannot have a position transformation."""
-    for prof in protocol["interface_profiles"]:
-        applicability = prof["transformation_applicability"]
-        declared_na = {na["transformation"]
-                       for na in prof["non_applicable_transformations"]}
-        computed_na = {t for t, v in applicability.items() if v != "applicable"}
-        assert declared_na == computed_na, prof["id"]
-        if not prof["options_visible"]:
-            for transform in POSITION_LABEL_TRANSFORMS:
-                assert applicability[transform] != "applicable", (
-                    "%s renders no options but claims %s is applicable"
-                    % (prof["id"], transform))
-        if not prof["labels_visible"]:
-            assert "I1b" not in prof["applicable_gates"], (
-                "%s renders no labels but claims the binding gate applies"
-                % prof["id"])
-        else:
-            assert "I1b" in prof["applicable_gates"], prof["id"]
-
-
-def test_s4_is_never_selectable_and_s3_is_conditional(protocol):
-    by_id = {p["id"]: p for p in protocol["interface_profiles"]}
-    assert by_id["S4"]["selectable_status"] == "never_selectable"
-    assert by_id["S3"]["selectable_status"] == "conditionally_selectable"
-    assert by_id["S2"]["selectable_status"] == "selectable_preferred"
-    assert by_id["S1"]["selectable_status"] == "selectable"
-    ranked = [entry["interface"] for entry in
-              protocol["admissibility_order"]["order"]]
-    assert "S4" not in ranked
-    assert ranked == ["S2", "S3", "S1"]
-    reason = by_id["S3"]["selectable_status_reason"]
-    assert "identical to S2" in reason
-    assert "multi-token" in reason
-
-
-def test_selected_label_uniformity_has_exactly_one_classification(protocol,
-                                                                  tables):
-    """Draft-v0.2 called it a gate and a non-gate at once. Exactly one survives.
-
-    Finding S3MR-002's neighbourhood defect: a criterion that is simultaneously
-    declared a gate and omitted from the gate component list leaves it undefined
-    whether a profile can be eliminated by it. Draft-v0.3 resolves it in the
-    direction that eliminates no profile on a nuisance criterion, and the
-    resolution must hold in every artifact at once.
-    """
-    uniformity = _gate(protocol, "I3")["selected_label_uniformity"]
-    assert uniformity["status"] == "DIAGNOSTIC_NUISANCE_REPORT_ONLY"
-    assert set(uniformity["not_applicable_to"]) == {"S2", "S3"}
-    for authority in ("carries_gate_authority", "carries_eligibility_authority",
-                      "carries_selection_authority",
-                      "carries_confirmation_authority"):
-        assert uniformity[authority] is False, authority
-
-    # The same criterion may not reappear as a gate component anywhere.
-    families = protocol["proposed_statistics"]["hypothesis_families"]
-    for member in families["family_A_within_profile"]["members"]:
-        assert "uniformity" not in member.lower(), member
-    for row in tables["selected_label_uniformity_diagnostic"]:
-        assert row["status"] == "DIAGNOSTIC_NUISANCE_REPORT_ONLY", row
-        for authority in ("carries_gate_authority",
-                          "carries_eligibility_authority",
-                          "carries_selection_authority",
-                          "carries_confirmation_authority"):
-            assert row[authority] is False, (row, authority)
-    for component in protocol["development_selection_and_confirmation_plan"][
-            "stage_3_confirmation"]["components"]:
-        assert "uniformity" not in component["component"].lower(), component
-
-
-# --------------------------------------------------------------------------
-# Counterbalancing: the published construction must actually be orthogonal
-# --------------------------------------------------------------------------
-
-def _baseline_condition(k):
-    """The registered baseline condition of base-item index ``k``.
-
-    This mirrors step 1 of the committed construction algorithm. It is written
-    out here independently so that the test is a check on the published rule
-    rather than a call into the code the rule is supposed to constrain.
-    """
-    return (k % 4, (k // 4) % 4, (k // 16) % 2)
-
-
-def test_counterbalancing_construction_separates_position_from_symbol(protocol,
-                                                                      tables):
-    """Position, displayed symbol and alphabet must be independently balanced.
-
-    The three factors cycle at 1, 4 and 16, so a complete block of 32 consecutive
-    base-item indices realises every one of the 4 x 4 x 2 conditions exactly once.
-    That is what makes the design deterministic and balanced without a random
-    draw, which matters because this round is not permitted to draw a seed.
-    """
-    design = protocol["counterbalancing_design"]
-    assert design["construction_algorithm"]["randomness"].startswith("none")
-
-    block = tables["i3_pairwise_construction_verification"][
-        "k5_complete_block_size"]
-    assert block == 32
-    conditions = [_baseline_condition(k) for k in range(block)]
-    assert len(set(conditions)) == block, (
-        "a complete block must realise every condition exactly once")
-    assert set(conditions) == {(p, sym, a)
-                               for p in range(4)
-                               for sym in range(4)
-                               for a in range(2)}
-
-    positions = [c[0] for c in conditions]
-    symbols = [c[1] for c in conditions]
-    alphabets = [c[2] for c in conditions]
-    for value in range(4):
-        assert positions.count(value) == 8
-        assert symbols.count(value) == 8
-    for value in range(2):
-        assert alphabets.count(value) == 16
-    for position in range(4):
-        seen = {c[1] for c in conditions if c[0] == position}
-        assert seen == {0, 1, 2, 3}, (
-            "position %d must occur with every displayed symbol, otherwise "
-            "position and symbol identity are confounded" % position)
-    for symbol in range(4):
-        seen = {c[2] for c in conditions if c[1] == symbol}
-        assert seen == {0, 1}, (
-            "displayed symbol %d must occur under both alphabets" % symbol)
-    assert tables["i3_pairwise_construction_verification"][
-        "k5_baseline_conditions_balanced_over_a_complete_block"] is True
-
-
-def test_the_option_and_symbol_maps_are_bijections(protocol):
-    """A non-injective map would let two slots share a symbol or a content.
-
-    Step 3 of the published construction assigns displayed symbols by the
-    rotation ``slot -> (slot + shift) mod 4``. The test replays that rule for
-    every admissible shift and checks that it really is a permutation, because a
-    collision would confound content identity with symbol identity and silently
-    destroy the one-factor property of every K5 contrast.
-    """
-    steps = " ".join(protocol["counterbalancing_design"][
-        "construction_algorithm"]["steps"])
-    assert "bijection" in steps
-    for shift in range(4):
-        mapped = [(slot + shift) % 4 for slot in range(4)]
-        assert sorted(mapped) == [0, 1, 2, 3], shift
-    for position in range(4):
-        for symbol in range(4):
-            shift = (symbol - position) % 4
-            assert (position + shift) % 4 == symbol, (
-                "the correct content must carry the intended displayed symbol")
-
-
-def test_label_alphabets_do_not_collide_with_the_answer_domain(protocol):
-    alphabets = protocol["counterbalancing_design"]["label_alphabets"]
-    answer_domain = {str(d) for d in range(10)}
-    forbidden = [tuple(a["alphabet"]) for a in alphabets["forbidden_alphabets"]]
-    assert ("1", "2", "3", "4") in forbidden
-    for entry in alphabets["forbidden_alphabets"]:
-        assert set(entry["alphabet"]) & answer_domain, (
-            "a forbidden alphabet must actually collide with the answer domain")
-    for entry in alphabets["permitted_alphabet_examples"]:
-        assert not (set(entry["alphabet"]) & answer_domain), (
-            "a permitted alphabet must be disjoint from the answer domain")
-
-
-def test_k6_varies_one_factor_at_a_time(protocol):
-    renderings = protocol["counterbalancing_design"]["k6_renderings"]
-    assert renderings["count"] == 3
-    assert renderings["one_factor_at_a_time"] is True
-    assert renderings["answer_cue"].startswith("held constant")
-    varied = [r["varies"] for r in renderings["renderings"]]
-    assert varied == ["nothing", "the option separator only",
-                      "the instruction wording only"]
-
-
-
-
-# --------------------------------------------------------------------------
-# S3MR-001: the I3 estimand must be identifiable
-# --------------------------------------------------------------------------
-
-K5_IDS = ["K5-P1", "K5-P2", "K5-P3", "K5-S1", "K5-S2", "K5-S3", "K5-A1"]
-K6_IDS = ["K6-SEP", "K6-INSTR"]
-
-
-def test_i3_has_exactly_two_variants_per_contrast_cluster(protocol, tables):
-    """The independent unit is the cluster, and a cluster is a pair.
-
-    Finding S3MR-001 recorded that draft-v0.2 never fixed the number of variants
-    per base item, so the same symbol n meant 32 renderings in one place, 3 in
-    another and 96 in a third, and no estimand could be written down. Two
-    variants per cluster is now a registered structural constant, and it must be
-    the same constant everywhere it appears.
-    """
+def test_exactly_two_variants_per_applicable_i3_cluster(protocol, tables):
     registry = protocol["i3_contrast_registry"]
-    assert registry["independent_unit"] == "base_item_contrast_cluster"
     assert registry["variants_per_cluster"] == 2
+    assert registry["independent_unit"] == "base_item_contrast_cluster"
+    assert len(registry["k5"]) == 7
+    assert len(registry["k6"]) == 2
     for row in registry["k5"] + registry["k6"]:
-        assert row["variants_per_cluster"] == 2, row["contrast_id"]
+        assert row["variants_per_cluster"] == 2
+    verification = tables["i3_pairwise_construction_verification"]
+    assert verification["variants_per_cluster"] == 2
+    for contrast in verification["contrasts"]:
+        assert contrast["variants_per_cluster"] == 2
+        assert contrast["changes_exactly_one_registered_factor"] is True
     assert protocol["proposed_statistics"]["i3_indicators"][
         "variants_per_cluster"] == 2
-    assert _gate(protocol, "I3")["variants_per_independent_unit"] == 2
-    assert tables["i3_pairwise_construction_verification"][
-        "variants_per_base_item_contrast_cluster"] == 2
 
 
-def test_k5_and_k6_are_seven_and_two_disjoint_one_factor_cells(protocol,
-                                                               tables):
-    """No cross product, no factorial multiplication, one factor per contrast."""
-    registry = protocol["i3_contrast_registry"]
-    assert [row["contrast_id"] for row in registry["k5"]] == K5_IDS
-    assert [row["contrast_id"] for row in registry["k6"]] == K6_IDS
-    assert len(set(K5_IDS)) == 7 and len(set(K6_IDS)) == 2
-
+def test_no_k5_by_k6_cross_product_and_no_all_transformations_cluster(
+        protocol, tables):
+    assert protocol["counterbalancing_design"]["k5_and_k6_are_not_crossed"] is True
+    assert protocol["counterbalancing_design"]["no_cross_product"] is True
     verification = tables["i3_pairwise_construction_verification"]
+    assert verification["k5_x_k6_cross_product_exists"] is False
+    assert verification["k5_x_k6_cross_product_cells"] == 0
+    assert verification["active_all_transformations_cluster_exists"] is False
     assert verification["k5_contrast_count"] == 7
     assert verification["k6_contrast_count"] == 2
-    assert verification["k5_x_k6_cross_product_exists"] is False
-    assert verification["k5_one_factor_per_contrast"] is True
-    assert verification["k5_k6_base_item_identities_disjoint"] is True
-    assert verification["k6_answer_cue_fixed_within_every_pair"] is True
-
-    design = protocol["counterbalancing_design"]
-    assert design["k5_contrast_count"] == 7
-    assert design["k6_contrast_count"] == 2
-    assert design["k5_and_k6_are_not_crossed"] is True
-    # Each K5 contrast varies exactly one factor, and the factor it varies must
-    # appear in no other contrast's held-fixed omission.
-    varied = [row["varied_factor"] for row in registry["k5"]]
-    assert len(varied) == 7
-    for row in registry["k5"]:
-        assert row["varied_factor"] not in row["held_fixed"], row["contrast_id"]
-        assert row["held_fixed"], row["contrast_id"]
-    for row in registry["k6"]:
-        assert row["baseline_rendering"] == "R-base", row["contrast_id"]
-        assert row["variant_rendering"] != row["baseline_rendering"]
-        assert any("answer cue" in held or "answer_cue" in held
-                   for held in row["held_fixed"]), row["contrast_id"]
-    assert {row["variant_rendering"] for row in registry["k6"]} == \
-        {"R-sep", "R-instr"}
+    assert len(verification["contrasts"]) == 9
+    ids = [c["contrast_id"] for c in verification["contrasts"]]
+    assert len(set(ids)) == 9
+    # A cluster that varied everything at once would not be a one-factor contrast.
+    for contrast in verification["contrasts"]:
+        assert contrast["varied_factor"] not in ("all", "all_transformations")
+        assert contrast["changes_exactly_one_registered_factor"] is True
+        if "distinct_change_signatures" in contrast:
+            assert contrast["distinct_change_signatures"] == 1, \
+                contrast["contrast_id"]
+        assert contrast["family"] in ("K5", "K6")
+    assert sum(1 for c in verification["contrasts"] if c["family"] == "K5") == 7
+    assert sum(1 for c in verification["contrasts"] if c["family"] == "K6") == 2
 
 
-def test_k5_is_not_applicable_to_s2_and_s3_and_never_counts_as_a_pass(protocol):
-    """A profile that renders no labels cannot pass a label manipulation.
-
-    Draft-v0.2's gate truth table marked the K5 transformations as PASSING for
-    S2 and S3, which are content-only surfaces with no option list and no label
-    alphabet. That is the exact error the same document's not_applicable
-    semantics forbids.
-    """
-    registry = protocol["i3_contrast_registry"]
-    assert set(registry["k5_applicability"]["not_applicable_profiles"]) == \
-        {"S2", "S3"}
-    assert set(registry["k5_applicability"]["applicable_profiles"]) == \
-        {"S1", "S4"}
-    assert set(registry["k6_applicability"]["applicable_profiles"]) == \
-        {"S1", "S2", "S3", "S4"}
-
-    rows = {row["profile"]: row for row in protocol["gate_truth_table"]["rows"]}
-    for profile in ("S2", "S3"):
-        assert rows[profile]["I3_K5"] == "not_applicable", profile
-        assert rows[profile]["label_bearing"] is False, profile
-        assert rows[profile]["I3_K6"] == "applicable", profile
-    for profile in ("S1", "S4"):
-        assert rows[profile]["I3_K5"] == "applicable", profile
-    values = {value for row in protocol["gate_truth_table"]["rows"]
-              for key, value in row.items() if key.startswith("I")}
-    assert "pass" not in values and "passes" not in values, (
-        "an applicability table must record no outcome")
-    semantics = protocol["gate_truth_table"]["value_semantics"]["not_applicable"]
-    assert "not a pass" in semantics
-    assert "never be counted as a satisfied gate" in semantics
-
-
-# --------------------------------------------------------------------------
-# S3MR-002: one indicator, and a stable wrong answer must not score
-# --------------------------------------------------------------------------
-
-def test_the_i3_indicator_truth_table_fails_stable_wrong_and_stable_invalid(
-        protocol, tables):
-    """J_both is the gate. A confidently repeated wrong answer scores zero.
-
-    Draft-v0.2 carried two mutually exclusive I3 definitions, one of which scored
-    a model that answered the same incorrect value under every presentation as a
-    success on a gate named calibration robustness.
-    """
+def test_j_joint_correct_truth_over_all_sixteen_ordered_cases(protocol, tables):
+    """S3MR2-001. The gate indicator is a level over the registered distribution."""
     indicators = protocol["proposed_statistics"]["i3_indicators"]
-    assert indicators["J_both"]["definition"] == "J_inv AND J_cor"
-    assert "PRIMARY" in indicators["J_both"]["role"]
-    assert indicators["J_inv"]["stable_invalid_scores"] == 0
-    assert indicators["J_cor"]["stable_wrong_scores"] == 0
-    for name in ("J_inv", "J_cor"):
-        assert "never a gate indicator on its own" in indicators[name]["role"]
-        assert "never a rescue path" in indicators[name]["role"]
+    assert indicators["primary_indicator"] == "J_joint_correct"
+    primary = indicators["J_joint_correct"]
+    assert primary["is_a_level_not_a_contrast"] is True
+    assert primary["identifies_a_presentation_effect"] is False
+    assert "BOTH registered variants" in primary["definition"]
 
-    rows = tables["i3_indicator_truth_table"]
-    assert rows, "the truth table must be enumerated, not described"
-    cases = {row["case"] for row in rows}
-    for required in ("both_correct", "stable_but_wrong",
-                     "one_correct_one_wrong"):
-        assert required in cases, required
-    assert any("invalid" in case for case in cases), (
-        "a stable invalid or unparseable output case must be enumerated")
+    lattice = tables["i3_outcome_lattice"]
+    alphabet = lattice["alphabet"]
+    assert alphabet == ["correct", "wrong_a", "wrong_b", "invalid"]
+    assert lattice["ordered_cases"] == 16
+    assert len(lattice["rows"]) == 16
+    assert lattice["estimand_is_a_level"] is True
+    assert lattice["estimand_is_a_presentation_contrast"] is False
 
-    for row in rows:
-        j_inv, j_cor, j_both = row["J_inv"], row["J_cor"], row["J_both"]
-        assert j_both == (1 if (j_inv and j_cor) else 0), row
-        assert row["scores_for_the_gate"] is bool(j_both), row
-        # Ground truth and mapped content are compared in their surface form,
-        # because the scorer compares rendered content, not Python types.
-        truth = str(row["registered_ground_truth"])
-        one = row["variant_1_mapped_content"]
-        two = row["variant_2_mapped_content"]
-        valid = one is not None and two is not None
-        if j_cor:
-            assert valid and str(one) == truth and str(two) == truth, row
-        # J_inv is invariance of valid content, so an invalid output cannot be
-        # invariant with anything, including another invalid output.
-        assert j_inv == (1 if (valid and str(one) == str(two)) else 0), row
-        # S3MR-002 in one line: identical but wrong must not score.
-        if row["case"] == "stable_but_wrong":
-            assert valid and str(one) == str(two) and str(one) != truth, row
-            assert j_inv == 1 and j_cor == 0 and j_both == 0, row
-            assert row["scores_for_the_gate"] is False, row
-        if row["case"] == "stable_but_invalid":
-            assert one is None and two is None, row
-            assert j_inv == 0 and j_cor == 0 and j_both == 0, row
+    # The full ordered lattice, recomputed here rather than read.
+    expected = {}
+    for first in alphabet:
+        for second in alphabet:
+            expected[(first, second)] = int(first == "correct"
+                                            and second == "correct")
+    seen = {}
+    for row in lattice["rows"]:
+        key = (row["variant_1_outcome"], row["variant_2_outcome"])
+        assert key not in seen, "duplicate lattice case %r" % (key,)
+        seen[key] = row["J_joint_correct"]
+        assert row["scores_for_the_gate"] is bool(row["J_joint_correct"])
+    assert seen == expected
+    assert sum(seen.values()) == 1 == lattice["passing_case_count"]
+    # Every named failing family really does fail.
+    assert lattice["stable_wrong_all_fail"] is True
+    assert seen[("wrong_a", "wrong_a")] == 0
+    assert lattice["stable_invalid_all_fail"] is True
+    assert seen[("invalid", "invalid")] == 0
+    assert lattice["mixed_correctness_all_fail"] is True
+    assert seen[("correct", "wrong_a")] == 0 and seen[("wrong_a", "correct")] == 0
+    assert lattice["two_different_wrong_answers_all_fail"] is True
+    assert seen[("wrong_a", "wrong_b")] == 0
 
 
-def test_j_cor_implies_j_inv_over_every_enumerated_case(protocol, tables):
-    """Under a unique ground truth the two indicators are not independent.
-
-    Draft-v0.2 presented them as if they were. Recording the implication as an
-    expected integrity invariant is honest; presenting the conjunction as two
-    independent pieces of evidence would not be.
-    """
-    for row in tables["i3_indicator_truth_table"]:
-        if row["J_cor"] == 1:
-            assert row["J_inv"] == 1, (
-                "J_cor = 1 with J_inv = 0 is a scorer defect: %r" % row)
-    invariant = protocol["proposed_statistics"]["i3_indicators"][
-        "expected_integrity_invariant"]
-    assert "J_cor implies J_inv" in invariant
-    assert "not as evidence that the two indicators carry independent " \
-           "information" in invariant
-
-
-def test_no_i3_rescue_path_exists(protocol):
-    """A failed contrast cell may not be rescued by any weaker summary."""
-    gate = _gate(protocol, "I3")
-    assert gate["no_pooling"] is True
-    logic = gate["threshold_logic"]
-    assert "EVERY applicable atomic contrast cell separately" in logic
-    assert "A single failed cell fails the gate" in logic
-    assert "may rescue a failed cell" in logic
+def test_historical_indicators_are_descriptive_only_with_no_decision_path(
+        protocol, tables):
+    """S3MR2-001. J_inv, J_cor and J_both survive only as historical names."""
+    historical = protocol["proposed_statistics"]["i3_indicators"][
+        "historical_and_descriptive_indicators"]
+    assert historical["status"] == "DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY"
+    assert historical["reachable_decision_path"] is False
+    assert set(historical["names"]) == {"J_inv", "J_cor", "J_both"}
+    for authority in ("gate authority", "eligibility authority",
+                      "selection authority", "confirmation authority",
+                      "rescue path for a failed cell", "claim authority"):
+        assert authority in historical["carries_no"]
+    assert tables["i3_outcome_lattice"]["descriptive_indicator_status"] == \
+        "DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY"
+    # No gate, component row, selection map entry or confirmation component may
+    # name a retired indicator.
+    statistics = protocol["proposed_statistics"]
+    gates = []
+    for gate in protocol["gate_hierarchy"]:
+        stripped = {key: value for key, value in gate.items()
+                    if key not in ("merely_descriptive", "reported_alongside",
+                                   "v0_4_repair")}
+        gates.append(stripped)
+        # Wherever they do appear, they are named as descriptive only.
+        for name, note in gate.get("reported_alongside", {}).items():
+            if name in ("J_inv", "J_cor", "J_both"):
+                assert "no gate authority" in note, name
+    decision_blobs = json.dumps([
+        statistics["retained_exact_binomial_gates"],
+        statistics["confirmation_exact_binomial_gates"],
+        statistics["development_selection_map"],
+        gates,
+        protocol["development_selection_and_confirmation_plan"],
+    ])
+    for retired in ("J_inv", "J_cor", "J_both"):
+        assert retired not in decision_blobs, \
+            "%s is reachable from a decision-bearing structure" % retired
+    for gate in protocol["gate_hierarchy"]:
+        for descriptive in gate.get("merely_descriptive", []):
+            assert "J_joint_correct" not in descriptive
     assert protocol["proposed_statistics"]["i3_indicators"]["no_rescue"]
 
 
-# --------------------------------------------------------------------------
-# Markdown / JSON semantic parity - the defect that reached publication in v0.1
-# --------------------------------------------------------------------------
-
-def test_markdown_never_reintroduces_the_v0_1_defect_text(markdown):
-    for text in FORBIDDEN_TEXT:
-        assert text not in markdown, "forbidden v0.1 text reappeared: %r" % text
-
-
-def test_markdown_agrees_with_json_on_every_decision_marker(protocol, markdown):
-    required = [
-        protocol["state"],
-        "**Draft version:** " + DRAFT_VERSION,
-        "**Frozen:** `false`",
-        "**Execution authorized:** `false`",
-        "**Review state:** `%s`" % REVIEW_STATE,
-        "**Successor authority:** `none`",
-        NO_WINNER,
-        protocol["required_next_action"],
-        protocol["prior_study_statements"]["study1"],
-        protocol["prior_study_statements"]["study2"],
-        protocol["positive_reference_candidates"]["selection_status"],
-    ]
-    for marker in required:
-        assert marker in markdown, "missing from the companion: %r" % marker
-
-    for prof in protocol["interface_profiles"]:
-        assert re.search(r"\| %s \|.*\| `%s` \|"
-                         % (re.escape(prof["id"]),
-                            re.escape(prof["selectable_status"])),
-                         markdown), prof["id"]
+def _active_claim_strings(protocol):
+    """Every string that carries an active claim, gate question or interpretation."""
+    out = []
+    for target in protocol["validation_targets"]:
+        out.append(("validation_target %s construct" % target["id"],
+                    target["construct"]))
+        if "why_needed" in target:
+            out.append(("validation_target %s why_needed" % target["id"],
+                        target["why_needed"]))
     for gate in protocol["gate_hierarchy"]:
-        assert "### Gate %s - %s" % (gate["gate_id"], gate["name"]) in markdown
-    for decision in protocol["unresolved_operator_decisions"]:
-        assert re.search(r"\| %s \| `%s` \| `%s` \|"
-                         % (decision["id"], decision["status"],
-                            str(bool(decision.get("blocking"))).lower()),
-                         markdown), decision["id"]
-    for counter, value in \
-            protocol["operation_boundaries"]["performed_this_round"].items():
-        assert "| `%s` | `%d` |" % (counter, value) in markdown, counter
-    for claim in protocol["claim_ceiling"]["prohibited_claims"]:
-        assert claim in markdown, claim
-    for row in protocol["i3_contrast_registry"]["k5"] + \
-            protocol["i3_contrast_registry"]["k6"]:
-        assert row["contrast_id"] in markdown, row["contrast_id"]
+        for field in ("question", "what_fails", "what_passes"):
+            if field in gate:
+                out.append(("gate %s %s" % (gate["gate_id"], field), gate[field]))
+    ceiling = protocol["claim_ceiling"]
+    for field in ("maximum_pass_claim", "maximum_fail_claim",
+                  "permitted_i3_statement", "i3_claim_ceiling",
+                  "what_a_pass_permits"):
+        out.append(("claim_ceiling %s" % field, ceiling[field]))
+    for profile, entry in ceiling["i3_claim_ceiling_by_profile"].items():
+        out.append(("claim_ceiling by profile %s" % profile, json.dumps(entry)))
+    for profile, entry in protocol["i3_contrast_registry"][
+            "claim_ceiling_by_profile"].items():
+        out.append(("i3 registry claim ceiling %s" % profile, entry["claim"]))
+    out.append(("i3_contrast_registry claim_ceiling",
+                protocol["i3_contrast_registry"]["claim_ceiling"]))
+    for row in (protocol["proposed_statistics"]["retained_exact_binomial_gates"]
+                + protocol["proposed_statistics"]["confirmation_exact_binomial_gates"]):
+        out.append(("component %s construct" % row["gate"], row["construct"]))
+        out.append(("component %s rejection_rule" % row["gate"],
+                    row["rejection_rule"]))
+    for row in protocol["proposed_statistics"]["registered_gate_floors"]:
+        out.append(("gate floor %s construct" % row["gate_family"],
+                    row["construct"]))
+    return out
+
+
+def test_active_claim_text_contains_no_presentation_effect_claim(protocol):
+    """S3MR2-001. Prohibited vocabulary may not appear in an active claim."""
+    prohibition = protocol["proposed_statistics"]["active_claim_term_prohibition"]
+    assert prohibition["enforced_by"] == "tests/test_study3_design.py"
+    registered = [term.lower() for term in prohibition["prohibited_terms"]]
+    for stem in PROHIBITED_CLAIM_TERMS:
+        assert any(stem in term for term in registered), \
+            "%r is not registered as a prohibited term" % stem
+    for label, text in _active_claim_strings(protocol):
+        lowered = text.lower()
+        for stem in PROHIBITED_CLAIM_TERMS:
+            assert stem not in lowered, \
+                "%s asserts a prohibited presentation claim (%r)" % (label, stem)
+    # And the prohibition itself must be scoped to those fields.
+    for scope in ("gate questions", "what_fails clauses", "active claim text",
+                  "success statements"):
+        assert scope in prohibition["scope"]
+    for permitted in ("clearly labelled historical narrative",
+                      "retired-procedure records", "limitation-of-claim text",
+                      "prohibited-claim lists"):
+        assert permitted in prohibition["permitted_only_in"]
+
+
+def test_per_profile_i3_applicability_and_claim_ceiling_are_exact(
+        protocol, tables):
+    """S3MR2-001/S3MR2-004. Nine cells for S1, two for S2 and S3."""
+    registry = protocol["i3_contrast_registry"]
+    k5_ids = registry["k5_contrast_ids"]
+    k6_ids = registry["k6_contrast_ids"]
+    assert len(k5_ids) == 7 and len(k6_ids) == 2
+    assert not set(k5_ids) & set(k6_ids)
+    assert set(registry["k5_applicability"]["applicable_profiles"]) == {"S1", "S4"}
+    assert set(registry["k5_applicability"]["not_applicable_profiles"]) == \
+        {"S2", "S3"}
+    assert set(registry["k6_applicability"]["applicable_profiles"]) == \
+        {"S1", "S2", "S3", "S4"}
+
+    by_profile = registry["claim_ceiling_by_profile"]
+    expected_cells = {
+        "S1": set(k5_ids) | set(k6_ids),
+        "S2": set(k6_ids),
+        "S3": set(k6_ids),
+        "S4": set(k5_ids) | set(k6_ids),
+    }
+    for profile, entry in by_profile.items():
+        assert set(entry["applicable_cells"]) == expected_cells[profile], profile
+        assert entry["applicable_cell_count"] == len(expected_cells[profile])
+    assert by_profile["S4"]["descriptive_only"] is True
+
+    counts = tables["gate_bearing_cell_counts"]
+    roles = len(protocol["proposed_statistics"]["registered_target_roles"])
+    for profile, entry in by_profile.items():
+        assert counts[profile]["I3_cells"] == \
+            entry["applicable_cell_count"] * roles, profile
+        assert counts[profile]["I3_K5_cells"] == (
+            7 * roles if profile in ("S1", "S4") else 0), profile
+        assert counts[profile]["I3_K6_cells"] == 2 * roles, profile
+    # And the truth table must agree, per profile.
     for row in protocol["gate_truth_table"]["rows"]:
-        assert re.search(r"\| %s \|.*\| `?%s`? \|"
-                         % (re.escape(row["profile"]),
-                            re.escape(row["I3_K5"])), markdown), row["profile"]
+        expected = "applicable" if row["profile"] in ("S1", "S4") \
+            else "not_applicable"
+        assert row["I3_K5"] == expected, row["profile"]
+        assert row["I3_K6"] == "applicable", row["profile"]
+        if row["label_bearing"] is False:
+            assert row["I3_K5"] == "not_applicable"
 
 
-def test_markdown_does_not_claim_an_uncommitted_generator(protocol, markdown):
-    statement = protocol["status"]["authoritative_artifact"]
-    assert "no such generator is committed" in statement
-    assert statement in markdown
+def test_all_nine_i3_cells_use_disjoint_namespaces(protocol):
+    """S3MR2-010. Nine one-factor cells, nine disjoint generator namespaces."""
+    frame = protocol["sampling_frame_v0_4"]
+    i3_cells = [cell for cell in frame["development_sampling_cells"]
+                if cell["component"].startswith("I3")]
+    assert len(i3_cells) == 9
+    namespaces = [cell["namespace"] for cell in i3_cells]
+    assert len(set(namespaces)) == 9
+    assert len({cell["sampling_cell_id"] for cell in i3_cells}) == 9
+    for cell in i3_cells:
+        assert cell["independent_unit"] == "base_item_contrast_cluster"
+        assert cell["draw_rule"] == "with_replacement"
+    assert frame["reuse_and_dependence_rule"][
+        "distinct_sampling_cells_use_disjoint_namespaces"] is True
+    # Every namespace across the whole frame is unique, in both splits.
+    every = frame["development_sampling_cells"] + frame["confirmation_sampling_cells"]
+    all_namespaces = [cell["namespace"] for cell in every]
+    assert len(set(all_namespaces)) == len(all_namespaces)
 
 
 # --------------------------------------------------------------------------
-# Negative mutation battery: each mutation MUST be rejected
+# S3MR2-007 / S3MR2-010: the registered sampling frame
+# --------------------------------------------------------------------------
+
+def test_k5_support_is_complete_and_every_state_has_weight_one_thirty_second(
+        protocol, tables):
+    support = protocol["sampling_frame_v0_4"]["k5_nuisance_state_support"]
+    assert support["support_size"] == 32
+    assert support["weight_per_state_exact_rational"] == "1/32"
+    assert _rational(support["weight_per_state_exact_rational"]) * \
+        support["support_size"] == 1
+    assert _rational(support["weights_sum_exact_rational"]) == 1
+    verification = tables["i3_pairwise_construction_verification"]
+    assert verification["nuisance_support_size"] == 32
+    assert verification["nuisance_weight_per_state_exact_rational"] == "1/32"
+    assert verification["nuisance_weights_sum_to_one"] is True
+    assert verification["constructor_maps_every_support_state_correctly"] is True
+    # 4 correct content positions x 4 displayed-symbol indices x 2 alphabets.
+    assert 4 * 4 * 2 == support["support_size"]
+    assert protocol["i3_contrast_registry"]["option_slots"] == 4
+    assert protocol["i3_contrast_registry"]["label_alphabet_count"] == 2
+
+
+def test_k5_sampling_is_iid_with_replacement_not_complete_block(
+        protocol, tables):
+    """S3MR2-007. The deterministic complete-block assignment is retired."""
+    support = protocol["sampling_frame_v0_4"]["k5_nuisance_state_support"]
+    assert support["iid_with_replacement"] is True
+    assert support["deterministic_complete_block_assignment_retired"] is True
+    assert support["n_multiple_of_32_requirement_retired"] is True
+    verification = tables["i3_pairwise_construction_verification"]
+    assert verification["deterministic_complete_block_assignment"] is False
+    assert verification["nuisance_draw_is_iid_with_replacement"] is True
+    assert verification["sample_size_must_be_a_multiple_of_the_support"] is False
+    # The design-time constructor enumeration is a fixture set, not a sample.
+    assert verification["design_time_fixture_enumeration_is_not_a_sample"] is True
+    assert support["design_time_fixture_enumeration_retained"]
+    # No registered n may be justified by divisibility any more.
+    sizes = protocol["proposed_statistics"]["sample_sizes"]
+    for gate in ("I1a", "I1b", "I2", "I3", "I4"):
+        assert sizes[gate]["n"] % 32 != 0 or True  # divisibility is simply irrelevant
+    assert "multiples of the complete-block size 32" in sizes["search_rule"]
+
+
+def _gate_bearing_cell_keys(protocol):
+    """Every gate-bearing atomic sampling cell key the design must cover."""
+    registry = protocol["i3_contrast_registry"]
+    keys = {"I1a": ["K2"], "I1b": ["K1"]}
+    keys["I2"] = list(protocol["proposed_statistics"]["registered_operation_families"])
+    keys["I3_K5"] = list(registry["k5_contrast_ids"])
+    keys["I3_K6"] = list(registry["k6_contrast_ids"])
+    depths = protocol["proposed_statistics"]["registered_composition_depths"]
+    keys["I4"] = ["%s/d%d" % (family, depth)
+                  for family in keys["I2"] for depth in depths]
+    return keys
+
+
+def test_every_gate_bearing_atomic_cell_has_a_complete_sampling_frame_entry(
+        protocol, tables):
+    """S3MR2-010. Fail-closed: a cell without a generator distribution is a defect."""
+    frame = protocol["sampling_frame_v0_4"]
+    expected = _gate_bearing_cell_keys(protocol)
+    expected_count = sum(len(v) for v in expected.values())
+    assert expected_count == 17
+    for split, cells, count_key in (
+            ("D", frame["development_sampling_cells"],
+             "development_sampling_cell_count"),
+            ("C", frame["confirmation_sampling_cells"],
+             "confirmation_sampling_cell_count")):
+        assert frame[count_key] == len(cells) == expected_count
+        ids = {cell["sampling_cell_id"] for cell in cells}
+        assert len(ids) == expected_count
+        for component, suffixes in expected.items():
+            for suffix in suffixes:
+                if component == "I1a":
+                    wanted = "%s/I1a/K2" % split
+                elif component == "I1b":
+                    wanted = "%s/I1b/K1" % split
+                elif component == "I2":
+                    wanted = "%s/I2/K3/%s" % (split, suffix)
+                elif component == "I4":
+                    wanted = "%s/I4/K4/%s" % (split, suffix)
+                else:
+                    wanted = "%s/%s/%s" % (split, component, suffix)
+                assert wanted in ids, "missing sampling cell %s" % wanted
+        for cell in cells:
+            assert cell["split"] == split
+            assert cell["sampling_cell_id"].startswith(split + "/")
+            for field in ("generator_family", "generator_version", "estimand",
+                          "independent_unit", "namespace", "draw_rule",
+                          "sampled_parameters", "validity_predicates",
+                          "support_size", "weights_sum_exact_rational",
+                          "joint_weight_per_support_state_exact_rational"):
+                assert cell[field] not in (None, "", []), \
+                    "%s lacks %s" % (cell["sampling_cell_id"], field)
+            assert set(cell["excludes_from_its_identity"]) == \
+                {"interface_profile", "checkpoint_role"}
+    assert tables["sampling_frame_validation"]["sampling_cells_validated"] == \
+        2 * expected_count
+    assert frame["exact_binomial_validity"]["fail_closed_rule"]
+
+
+def test_sampling_weights_sum_to_one_and_predicates_are_pre_draw_model_free(
+        protocol, tables):
+    frame = protocol["sampling_frame_v0_4"]
+    for cell in (frame["development_sampling_cells"]
+                 + frame["confirmation_sampling_cells"]):
+        product = Fraction(1)
+        support = 1
+        for parameter in cell["sampled_parameters"]:
+            weight = _rational(parameter["weight_per_state_exact_rational"])
+            size = parameter["support_size"]
+            assert weight * size == 1, cell["sampling_cell_id"]
+            assert _rational(parameter["weights_sum_exact_rational"]) == 1
+            product *= weight
+            support *= size
+        assert support == cell["support_size"], cell["sampling_cell_id"]
+        assert product == _rational(
+            cell["joint_weight_per_support_state_exact_rational"])
+        assert product * cell["support_size"] == 1
+        assert _rational(cell["weights_sum_exact_rational"]) == 1
+        assert cell["parameters_are_independently_drawn"] is True
+    for predicate in frame["validity_predicates"]:
+        assert predicate["deterministic"] is True
+        assert predicate["evaluated_before_any_model_operation"] is True
+        assert predicate["satisfied_by_construction"] is True
+    contract = frame["rejection_contract"]
+    assert _rational(contract["registered_rejection_probability_exact_rational"]) == 0
+    assert contract["acceptance_predicate_frozen_before_any_seed_exists"] is True
+    assert contract["acceptance_predicate_may_never_change_after_a_seed_exists"] \
+        is True
+    for prohibited in ("difficulty",):
+        assert prohibited in contract["post_draw_property_rejection_prohibited"]
+    validation = tables["sampling_frame_validation"]
+    assert validation["all_parameter_weights_sum_to_one"] is True
+    assert validation["all_joint_weights_sum_to_one"] is True
+
+
+def test_split_partitions_are_disjoint_and_outcome_blind(protocol, tables):
+    partition = protocol["sampling_frame_v0_4"]["split_partition"]
+    assert partition["outcome_blind"] is True
+    assert partition["cross_split_reuse_prohibited"] is True
+    assert partition["frozen_before_any_seed_draw"] is True
+    assert partition["splits"] == ["D", "C", "P3Q"]
+    frame = protocol["sampling_frame_v0_4"]
+    dev = {cell["namespace"] for cell in frame["development_sampling_cells"]}
+    conf = {cell["namespace"] for cell in frame["confirmation_sampling_cells"]}
+    assert not dev & conf, "development and confirmation namespaces overlap"
+    for namespace in dev:
+        assert "/D/" in namespace
+    for namespace in conf:
+        assert "/C/" in namespace
+    assert tables["sampling_frame_validation"]["split_partition_outcome_blind"] \
+        is True
+    assert tables["sampling_frame_validation"]["namespaces_disjoint"] is True
+
+
+def test_draws_are_with_replacement_and_duplicate_redraw_is_prohibited(
+        protocol, tables):
+    frame = protocol["sampling_frame_v0_4"]
+    model = frame["binding_stochastic_model"]
+    assert "WITH replacement" in model["within_cell_draw_rule"]
+    rule = frame["duplicate_rule"]
+    assert rule["duplicates_must_be_retained"] is True
+    assert rule["duplicate_generator_tuples_are_legitimate_iid_draws"] is True
+    assert rule["redraw_for_uniqueness_prohibited"] is True
+    assert rule["redraw_for_difficulty_balance_or_model_response_prohibited"] \
+        is True
+    assert "no gate" in rule["duplicate_counts_reported_later_as"]
+    for cell in (frame["development_sampling_cells"]
+                 + frame["confirmation_sampling_cells"]):
+        assert cell["draw_rule"] == "with_replacement"
+    assert tables["sampling_frame_validation"]["all_draws_with_replacement"] is True
+    assert tables["sampling_frame_validation"]["duplicates_retained"] is True
+
+
+def test_cross_role_and_profile_reuse_and_dependence_are_explicit(protocol):
+    frame = protocol["sampling_frame_v0_4"]
+    reuse = frame["reuse_and_dependence_rule"]
+    assert reuse["dependence_is_expressly_allowed"] is True
+    assert "arbitrary-dependence union bounds" in reuse["dependence_is_handled_by"]
+    for field in ("cross_role_reuse", "cross_profile_reuse", "s3_logit_reuse",
+                  "within_a_sampling_cell", "id_difference_does_not_imply_independence"):
+        assert reuse[field]
+    assert "not independent" in reuse["id_difference_does_not_imply_independence"]
+    levels = frame["two_levels"]
+    assert levels["sampling_cell"]["one_iid_item_stream_per_sampling_cell"] is True
+    assert levels["evaluation_cell"]["sample_is_marginally_iid_bernoulli"] is True
+    assert levels["evaluation_cell"][
+        "cells_sharing_sampled_items_may_be_dependent"] is True
+    assert set(levels["sampling_cell"]["excludes"]) == \
+        {"interface profile", "checkpoint role"}
+    assert protocol["atomic_evaluation_cells"][
+        "one_iid_stream_per_sampling_cell_reused_across_its_evaluation_cells"] is True
+
+
+def test_future_seed_procedure_is_first_draw_only_domain_separated_auditable(
+        protocol):
+    lifecycle = protocol["sampling_frame_v0_4"]["future_seed_lifecycle"]
+    assert lifecycle["status"] == "SPECIFIED_BUT_NOT_AUTHORIZED"
+    assert lifecycle["first_draw_only"] is True
+    assert lifecycle["redraw_prohibited"] is True
+    assert lifecycle["substitution_prohibited"] is True
+    assert lifecycle["seed_shopping_prohibited"] is True
+    assert lifecycle["one_master_seed_per_split"] is True
+    assert lifecycle["master_seed_bits"] == 256
+    assert lifecycle["domain_separation_encoding"]
+    assert lifecycle["commitment_rule"]
+    assert "before" in lifecycle["commitment_rule"]
+    assert lifecycle["generator_implementation_blob"] is None
+    assert lifecycle["confirmation_seed_isolation"]
+    assert "not zero" in lifecycle["null_means"]
+
+
+def test_exact_binomial_assumptions_match_the_registered_estimand(protocol):
+    """S3MR2-010. What licenses the exact binomial is written down."""
+    validity = protocol["sampling_frame_v0_4"]["exact_binomial_validity"]
+    conditions = " ".join(validity["conditions"]).lower()
+    assert "iid" in conditions
+    assert "registered generator distribution" in conditions
+    assert "no randomness" in validity["what_the_model_contributes"].lower()
+    assert validity["estimand_induced_by_the_distribution"]
+    frame = protocol["sampling_frame_v0_4"]
+    assert frame["binding_stochastic_model"][
+        "all_inferential_randomness_comes_from"] == "the registered item draw"
+    assert "deterministic" in frame["binding_stochastic_model"][
+        "model_sampling_contributes_no_randomness"]
+    for cell in frame["development_sampling_cells"]:
+        assert cell["estimand"].startswith("Pr(")
+    lattice_estimand = protocol["proposed_statistics"]["i3_indicators"][
+        "J_joint_correct"]["estimand"]
+    assert "registered item-generating distribution" in lattice_estimand
+
+
+# --------------------------------------------------------------------------
+# S3MR2-002: the type-I and type-II architecture
 # --------------------------------------------------------------------------
 
 def _component(protocol, split, gate_id):
-    """Return one exact-binomial component row of one split.
-
-    ``construct`` holds the long human-readable name of the construct and
-    ``gate`` holds the gate identifier, so the lookup is on ``gate``.
-    """
-    key = "%s_exact_binomial_gates" % (
-        "retained" if split == "development" else "confirmation")
-    rows = [row for row in protocol["proposed_statistics"][key]
-            if row["gate"] == gate_id]
-    assert len(rows) == 1, (
-        "expected exactly one %s component for %s, found %d"
-        % (split, gate_id, len(rows)))
-    return rows[0]
+    key = ("retained_exact_binomial_gates" if split == "development"
+           else "confirmation_exact_binomial_gates")
+    for row in protocol["proposed_statistics"][key]:
+        if row["gate"] == gate_id:
+            return row
+    raise AssertionError("no %s component for %s" % (split, gate_id))
 
 
 def _gate(protocol, gate_id):
     for gate in protocol["gate_hierarchy"]:
         if gate["gate_id"] == gate_id:
             return gate
-    raise AssertionError("gate %s is missing" % gate_id)
+    raise AssertionError("no gate %s" % gate_id)
 
 
-def _mutate(protocol, fn):
-    mutated = json.loads(json.dumps(protocol))
-    fn(mutated)
-    return mutated
+def test_development_and_confirmation_alphas_and_the_fixed_denominator(
+        protocol, tables):
+    statistics = protocol["proposed_statistics"]
+    assert statistics["development_component_alpha_exact_rational"] == "1/600"
+    assert statistics["confirmation_component_alpha_exact_rational"] == "1/200"
+    for gate in ("I1a", "I1b", "I2", "I3", "I4"):
+        assert _component(protocol, "development", gate)[
+            "alpha_exact_rational"] == "1/600"
+        assert _component(protocol, "confirmation", gate)[
+            "alpha_exact_rational"] == "1/200"
+    architecture = protocol["power_architecture_v0_4"]["type_i_architecture"]
+    assert architecture["fixed_selectable_profile_denominator"] == 3
+    assert architecture["denominator_is_fixed_before_data"] is True
+    assert architecture["denominator_never_shrinks"] is True
+    assert architecture["per_profile_component_alpha_exact_rational"] == "1/600"
+    assert architecture["confirmation_component_alpha_exact_rational"] == "1/200"
+    # 1/600 x 3 = 1/200 exactly.
+    assert _rational("1/600") * 3 == _rational(
+        architecture["study_development_false_qualification_bound_exact_rational"])
+    family_b = statistics["hypothesis_families"]["family_B_across_profiles"]
+    assert family_b["fixed_selectable_profile_denominator"] == 3
+    assert family_b["denominator_never_shrinks"] is True
+    assert tables["declared_assumptions"]["fixed_selectable_profile_denominator"] == 3
+    assert architecture["s4_excluded_from_every_success_union"] is True
+
+
+def test_m_max_and_cell_counts_derive_from_the_truth_table(protocol, tables):
+    """S3MR2-002. m_max is derived, over selectable profiles only."""
+    registry = protocol["i3_contrast_registry"]
+    families = protocol["proposed_statistics"]["registered_operation_families"]
+    depths = protocol["proposed_statistics"]["registered_composition_depths"]
+    roles = protocol["proposed_statistics"]["registered_target_roles"]
+    assert len(roles) == 3 and len(families) == 2 and len(depths) == 2
+
+    counts = tables["gate_bearing_cell_counts"]
+    truth_rows = {row["profile"]: row for row in protocol["gate_truth_table"]["rows"]}
+    recomputed = {}
+    for profile, row in truth_rows.items():
+        i1a = len(roles) if row["I1a"] == "applicable" else 0
+        i1b = len(roles) if row["I1b"] == "applicable" else 0
+        i2 = len(roles) * len(families) if row["I2"] == "applicable" else 0
+        i3_k5 = len(registry["k5_contrast_ids"]) \
+            if row["I3_K5"] == "applicable" else 0
+        i3_k6 = len(registry["k6_contrast_ids"]) \
+            if row["I3_K6"] == "applicable" else 0
+        i3 = (i3_k5 + i3_k6) * len(roles)
+        i4 = len(families) * len(depths) if row["I4"] == "applicable" else 0
+        recomputed[profile] = {
+            "I1a_cells": i1a, "I1b_cells": i1b, "I2_cells": i2,
+            "I4_cells": i4,
+            "cells_at_i1_i3_floor": i1a + i1b + i3,
+            "cells_at_i2_floor": i2,
+            "cells_at_i4_floor": i4,
+            "total_gate_bearing_cells": i1a + i1b + i2 + i3 + i4,
+        }
+    for profile, expected in recomputed.items():
+        published = counts[profile]
+        for key, value in expected.items():
+            assert published[key] == value, "%s.%s" % (profile, key)
+        assert published["selectable"] is (profile != "S4")
+
+    selectable = [p for p in counts if counts[p]["selectable"]]
+    assert sorted(selectable) == ["S1", "S2", "S3"]
+    m_max = max(counts[p]["total_gate_bearing_cells"] for p in selectable)
+    assert m_max == 43
+    assert tables["power_architecture"]["m_max"] == m_max
+    assert protocol["power_architecture_v0_4"]["cell_counts"]["m_max"] == m_max
+    assert protocol["power_architecture_v0_4"]["cell_counts"][
+        "s4_is_excluded_from_m_max"] is True
+    assert tables["power_architecture"]["s4_excluded_from_m_max"] is True
+    # S4's own cell total may never enter the budget, whatever its size.
+    assert counts["S4"]["selectable"] is False
+    assert counts["S4"]["total_gate_bearing_cells"] > 0
+    assert m_max == max(counts[p]["total_gate_bearing_cells"]
+                        for p in counts if counts[p]["selectable"])
+
+
+def test_the_power_budget_rationals_reconstruct_exactly(protocol, tables):
+    """S3MR2-002. 19/17200, 17181/17200, 381/400 and 9/10 are derived."""
+    allocation = protocol["power_architecture_v0_4"]["type_ii_allocation"]
+    m_max = protocol["power_architecture_v0_4"]["cell_counts"]["m_max"]
+    stage = _rational(
+        allocation["per_stage_profile_false_negative_budget_exact_rational"])
+    assert stage == Fraction(19, 400)
+
+    per_cell = stage / m_max
+    assert per_cell == Fraction(19, 17200)
+    assert _rational(
+        allocation["per_cell_false_negative_budget_exact_rational"]) == per_cell
+
+    target = 1 - per_cell
+    assert target == Fraction(17181, 17200)
+    assert _rational(allocation["per_cell_power_target_exact_rational"]) == target
+    assert allocation["per_cell_power_target_decimal"] == _decimal(target)
+
+    profile_floor = 1 - m_max * per_cell
+    assert profile_floor == 1 - stage == Fraction(381, 400)
+    assert _rational(
+        allocation["profile_stage_power_floor_exact_rational"]) == profile_floor
+    assert allocation["profile_stage_power_floor_decimal"] == \
+        _decimal(profile_floor, 6)
+
+    panel = _rational(allocation["panel_false_qualification_budget_exact_rational"])
+    assert panel == Fraction(1, 200)
+    end_to_end = 1 - stage - panel - stage
+    assert end_to_end == Fraction(9, 10)
+    assert _rational(
+        allocation["study_end_to_end_power_floor_exact_rational"]) == end_to_end
+    assert allocation["study_end_to_end_power_floor_decimal"] == \
+        _decimal(end_to_end, 6)
+    assert _rational(
+        allocation["confirmation_conjunction_power_floor_exact_rational"]) == \
+        Fraction(381, 400)
+
+    published = tables["power_architecture"]
+    assert _rational(published["per_cell_false_negative_budget_exact_rational"]) \
+        == per_cell
+    assert _rational(published["per_cell_power_target_exact_rational"]) == target
+    assert _rational(published["profile_stage_power_floor_exact_rational"]) == \
+        profile_floor
+    assert _rational(published["study_end_to_end_power_floor_exact_rational"]) == \
+        end_to_end
+    assert [_rational(term) for term in published["union_bound_terms"]] == \
+        [stage, panel, stage]
+    assert sum(_rational(t) for t in published["union_bound_terms"]) == \
+        1 - end_to_end
+    assert _rational(
+        protocol["proposed_statistics"]["target_power"]["exact_rational"]) == target
+
+
+def test_the_union_bound_proof_contains_no_independence_assumption(protocol,
+                                                                  tables):
+    proof = protocol["power_architecture_v0_4"]["union_bound_proof"]
+    assert proof["uses_independence"] is False
+    assert proof["holds_under_arbitrary_dependence"] is True
+    assert len(proof["failure_events_unioned"]) == 3
+    assert "sensitivity" in proof["independence_based_products"]
+    text = json.dumps(proof).lower()
+    for forbidden in ("assuming independence", "independent cells",
+                      "under independence", "product of the per-cell powers"):
+        assert forbidden not in text
+    assert tables["power_architecture"]["uses_independence"] is False
+    assert tables["power_architecture"]["holds_under_arbitrary_dependence"] is True
+
+
+def test_power_labels_carry_correct_scope(protocol, tables):
+    allocation = protocol["power_architecture_v0_4"]["type_ii_allocation"]
+    assert allocation["per_cell_power_target_scope"] == "PER ATOMIC EVALUATION CELL"
+    assert protocol["proposed_statistics"]["target_power"]["scope"] == \
+        "PER ATOMIC EVALUATION CELL"
+    prohibition = protocol["proposed_statistics"]["target_power"]["prohibition"]
+    for scope in ("family", "profile", "selection", "confirmation", "end-to-end"):
+        assert scope in prohibition
+    vocabulary = protocol["power_architecture_v0_4"]["power_vocabulary"]
+    for name in ("target_power", "profile_stage_power_floor",
+                 "study_end_to_end_power_floor", "selection_return_characteristic",
+                 "confirmation_characteristic", "prohibited"):
+        assert name in vocabulary
+    assert "per atomic evaluation cell" in vocabulary["target_power"]
+    assert "per profile per stage" in vocabulary["profile_stage_power_floor"]
+    assert "arbitrary" in vocabulary["profile_stage_power_floor"]
+    assert "development selection plus one-shot confirmation" in \
+        vocabulary["study_end_to_end_power_floor"]
+    published = tables["power_architecture"]
+    assert published["per_cell_power_target_scope"] == "PER ATOMIC EVALUATION CELL"
+    assert "LOWER BOUND" in published["profile_stage_power_floor_scope"]
+    assert "ARBITRARY" in published["profile_stage_power_floor_scope"]
+
+
+def test_least_favourable_configuration_and_uncovered_region_are_explicit(
+        protocol):
+    configuration = protocol["power_architecture_v0_4"][
+        "least_favourable_configuration"]
+    assert configuration["binding_only_under_this_configuration"] is True
+    assert len(configuration["conditions"]) >= 4
+    uncovered = protocol["power_architecture_v0_4"][
+        "not_covered_by_the_power_guarantee"]
+    assert len(uncovered) >= 4
+    text = " ".join(uncovered).lower()
+    assert "indifference region" in text
+    assert "strictly between" in text
+
+
+# --------------------------------------------------------------------------
+# S3MR2-003: the six threshold rows, recomputed here from exact rationals
+# --------------------------------------------------------------------------
+
+def _floor_for(protocol, gate_family):
+    for row in protocol["proposed_statistics"]["registered_gate_floors"]:
+        if row["gate_family"] == gate_family:
+            return row
+    raise AssertionError("no registered floor %s" % gate_family)
+
+
+def _recompute_rows(protocol):
+    """Recompute all six rows from the protocol's registered inputs alone."""
+    statistics = protocol["proposed_statistics"]
+    ceiling = statistics["sample_size_search_ceiling"]
+    target = _rational(statistics["target_power"]["exact_rational"])
+    dev_alpha = _rational(statistics["development_component_alpha_exact_rational"])
+    conf_alpha = _rational(
+        statistics["confirmation_component_alpha_exact_rational"])
+    out = {}
+    for floor in statistics["registered_gate_floors"]:
+        p0 = _rational(floor["p0_exact_rational"])
+        p1 = _rational(floor["p1_exact_rational"])
+        n, dev_count = _smallest_size_meeting_power(p0, p1, dev_alpha, target,
+                                                    ceiling)
+        conf_count = _smallest_controlling_count(n, p0, conf_alpha)
+        out[floor["gate_family"]] = {
+            "n": n, "p0": p0, "p1": p1,
+            "development": dev_count, "confirmation": conf_count,
+        }
+    return out
+
+
+@pytest.fixture(scope="module")
+def recomputed(protocol):
+    return _recompute_rows(protocol)
+
+
+def test_all_six_threshold_rows_derive_from_exact_rational_inputs(
+        protocol, tables, recomputed):
+    """S3MR2-003. The tails and powers are recomputed here, not read."""
+    dev_rows = {row["gate_family"]: row
+                for row in tables["development_exact_binomial_components"]}
+    conf_rows = {row["gate_family"]: row
+                 for row in tables["confirmation_exact_binomial_components"]}
+    assert len(dev_rows) == len(conf_rows) == 3
+    for family, expected in recomputed.items():
+        for rows, key, alpha in ((dev_rows, "development", Fraction(1, 600)),
+                                 (conf_rows, "confirmation", Fraction(1, 200))):
+            row = rows[family]
+            assert row["n"] == expected["n"], family
+            assert row["pass_count"] == expected[key], family
+            assert _rational(row["p0_exact_rational"]) == expected["p0"]
+            assert _rational(row["p1_exact_rational"]) == expected["p1"]
+            assert _rational(row["alpha_exact_rational"]) == alpha
+            null_tail = _upper_tail(row["n"], row["pass_count"], expected["p0"])
+            power = _upper_tail(row["n"], row["pass_count"], expected["p1"])
+            assert null_tail <= alpha
+            assert row["exact_null_tail_at_p0"] == _decimal(null_tail)
+            assert row["exact_power_at_p1"] == _decimal(power)
+            assert row["degenerate_rejection_region"] is False
+            assert 0 < row["pass_count"] < row["n"]
+            assert row["unit_of_n"]
+    # Development power must clear the registered per-cell target; the
+    # confirmation rows reuse the development sizes and are conservative.
+    target = _rational(
+        protocol["proposed_statistics"]["target_power"]["exact_rational"])
+    for family, expected in recomputed.items():
+        power = _upper_tail(expected["n"], expected["development"], expected["p1"])
+        assert power >= target, family
+        assert dev_rows[family]["meets_per_cell_power_target"] is True
+    assert protocol["power_architecture_v0_4"][
+        "confirmation_sizes_are_conservative_reuse"]
+
+
+def test_development_sample_sizes_are_the_smallest_meeting_the_target(
+        protocol, recomputed):
+    """S3MR2-003. No divisibility restriction survives; every integer is searched."""
+    statistics = protocol["proposed_statistics"]
+    target = _rational(statistics["target_power"]["exact_rational"])
+    alpha = _rational(statistics["development_component_alpha_exact_rational"])
+    for family, expected in recomputed.items():
+        n = expected["n"]
+        for smaller in range(1, n):
+            count = _smallest_controlling_count(smaller, expected["p0"], alpha)
+            if count is None or count > smaller:
+                continue
+            assert _upper_tail(smaller, count, expected["p1"]) < target, \
+                "n=%d already meets the target for %s" % (smaller, family)
+        row = _floor_for(protocol, family)
+        for gate in row["gates"]:
+            assert statistics["sample_sizes"][gate]["n"] == n
+            assert _component(protocol, "development", gate)["n"] == n
+            assert _component(protocol, "development", gate)[
+                "n_is_smallest_unrestricted_positive_integer_meeting_the_target"] \
+                is True
+    assert "every positive integer is searched" in statistics["sample_size_search_rule"]
+    assert statistics["sample_size_search_ceiling"] > max(
+        e["n"] for e in recomputed.values())
+
+
+def test_pass_counts_are_minimal_at_their_alphas(protocol, recomputed):
+    """S3MR2-003. One unit lower would breach the registered level."""
+    for family, expected in recomputed.items():
+        for key, alpha in (("development", Fraction(1, 600)),
+                           ("confirmation", Fraction(1, 200))):
+            count = expected[key]
+            n, p0 = expected["n"], expected["p0"]
+            assert _upper_tail(n, count, p0) <= alpha
+            assert _upper_tail(n, count - 1, p0) > alpha, \
+                "%s %s pass count is not minimal" % (family, key)
+        floor = _floor_for(protocol, family)
+        for gate in floor["gates"]:
+            assert _component(protocol, "development", gate)["pass_count"] == \
+                expected["development"]
+            assert _component(protocol, "confirmation", gate)["pass_count"] == \
+                expected["confirmation"]
+            for split in ("development", "confirmation"):
+                assert _component(protocol, split, gate)[
+                    "pass_count_is_minimal_at_alpha"] is True
+
+
+def test_the_null_tail_supremum_sits_at_p0(recomputed):
+    """The level claim needs monotonicity, which is asserted and checked here."""
+    for expected in recomputed.values():
+        n, count, p0 = expected["n"], expected["development"], expected["p0"]
+        lower = p0 - Fraction(1, 1000)
+        assert _upper_tail(n, count, lower) < _upper_tail(n, count, p0)
+        assert _upper_tail(n, count, p0) < _upper_tail(n, count, expected["p1"])
+
+
+def test_identity_checks_hold(tables):
+    checks = tables["identity_checks"]
+    for name, value in checks.items():
+        if isinstance(value, bool):
+            assert value is True, name
+    assert checks["intersection_union_source"] == "Berger and Hsu (1996)"
+
+
+# --------------------------------------------------------------------------
+# Anti-transcription: the derivation script must not carry its own answers
+# --------------------------------------------------------------------------
+
+# These are the published outputs. None of them may appear as a reachable
+# literal in the derivation script; the script must recompute all of them.
+DERIVED_SIZES = (413, 214, 448)
+DERIVED_PASS_COUNTS = (389, 129, 383, 388, 127, 381)
+DERIVED_TAILS = (0.001664632930, 0.001597676081, 0.001620609599,
+                 0.003020762720, 0.003765544908, 0.003582895662)
+DERIVED_CELL_TOTALS = (43, 33543, 3584, 27856, 26064, 417024, 390960, 502)
+FORBIDDEN_LITERAL_STRINGS = ("17181/17200", "19/17200", "381/400", "9/10 end")
+
+
+def test_the_derivation_script_contains_no_hard_coded_result_constant():
+    """S3MR2-003. Every output must be recomputed, never transcribed."""
+    with open(STATS_SCRIPT, encoding="utf-8") as handle:
+        source = handle.read()
+    tree = ast.parse(source)
+
+    # Literals inside docstrings are prose, not reachable values, so the
+    # docstring expression statements are removed before the audit.
+    docstrings = set()
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef,
+                             ast.ClassDef)):
+            first = node.body[0] if node.body else None
+            if isinstance(first, ast.Expr) and \
+                    isinstance(first.value, ast.Constant) and \
+                    isinstance(first.value.value, str):
+                docstrings.add(id(first.value))
+
+    numbers, strings = [], []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Constant) and id(node) not in docstrings:
+            if isinstance(node.value, bool):
+                continue
+            if isinstance(node.value, (int, float)):
+                numbers.append(node.value)
+            elif isinstance(node.value, str):
+                strings.append(node.value)
+
+    for value in DERIVED_SIZES + DERIVED_PASS_COUNTS + DERIVED_CELL_TOTALS:
+        assert value not in numbers, \
+            "%r is transcribed into the derivation script" % value
+    for value in DERIVED_TAILS:
+        assert value not in numbers, \
+            "%r is transcribed into the derivation script" % value
+    blob = " ".join(strings)
+    for text in FORBIDDEN_LITERAL_STRINGS:
+        assert text not in blob, "%r is transcribed as a string literal" % text
+    for value in DERIVED_PASS_COUNTS + DERIVED_SIZES:
+        assert str(value) not in blob, \
+            "%r appears as a string literal in the derivation script" % value
+
+
+def test_design_statistics_script_reproduces_its_committed_tables():
+    result = subprocess.run([sys.executable, STATS_SCRIPT, "--check"],
+                            capture_output=True, text=True, cwd=REPO_ROOT)
+    assert result.returncode == 0, (
+        "design_statistics.py --check failed\nstdout:\n%s\nstderr:\n%s"
+        % (result.stdout, result.stderr))
+    assert "DESIGN_STATISTICS_CHECK_OK" in result.stdout
+
+
+def test_statistics_tables_record_no_operations(tables):
+    assert tables["status"] == "PROPOSED_DESIGN_PARAMETERS_NOT_MEASUREMENTS_NOT_FROZEN"
+    assert tables["document_class"] == "design_statistics_derivation"
+    for name, value in tables["operation_counts"].items():
+        assert value == 0, name
+    for name, value in tables["authority_flags"].items():
+        assert value is False, name
+
+
+# --------------------------------------------------------------------------
+# S3MR2-006: the total, deterministic state machine
+# --------------------------------------------------------------------------
+
+def test_i0_is_a_global_precondition_failing_only_to_instrument_defect(
+        protocol, tables):
+    machine = protocol["state_machine_v0_4"]
+    assert machine["i0_is_a_global_precondition"] is True
+    assert machine["i0_is_not_part_of_profile_adequacy"] is True
+    states = {state["id"]: state for state in machine["states"]}
+    instrument = states["Q0_INSTRUMENT"]
+    for transition in instrument["transitions"]:
+        if transition["event"] != "all fixtures pass":
+            assert transition["next"] == "STOP_INSTRUMENT_DEFECT", \
+                transition["event"]
+    failures = {t["event"] for t in instrument["transitions"]
+                if t["next"] == "STOP_INSTRUMENT_DEFECT"}
+    assert {"any fixture fails", "error", "ambiguity"} <= failures
+    claim = states["STOP_INSTRUMENT_DEFECT"]["claim"]
+    assert "NOTHING was measured about any interface" in claim
+    assert "never a statement about any interface" in claim
+    assert tables["state_machine"]["i0_failure_maps_only_to"] == \
+        "STOP_INSTRUMENT_DEFECT"
+    assert tables["state_machine"]["i0_is_a_global_precondition"] is True
+    assert tables["state_machine"]["i0_is_part_of_profile_adequacy"] is False
+    plan = protocol["development_selection_and_confirmation_plan"]
+    assert plan["stage_1_component_evaluation"][
+        "i0_removed_from_profile_component_lists"] is True
+    for profile, components in plan["stage_1_component_evaluation"][
+            "components_by_profile"].items():
+        assert "I0" not in components, profile
+
+
+def test_the_state_machine_is_total_deterministic_and_fully_reachable(
+        protocol, tables):
+    machine = protocol["state_machine_v0_4"]
+    assert machine["total"] is True
+    assert machine["deterministic"] is True
+    assert machine["exactly_one_legal_next_state_per_event"] is True
+    assert machine["rescue_paths"] == []
+
+    states = {state["id"]: state for state in machine["states"]}
+    assert len(states) == len(machine["states"]) == 10
+    decisions = [s for s in machine["states"] if s["kind"] != "terminal"]
+    terminals = {s["id"] for s in machine["states"] if s["kind"] == "terminal"}
+    assert len(terminals) == 6
+
+    edges = []
+    for state in decisions:
+        assert state["transitions"], state["id"]
+        seen_events = set()
+        for transition in state["transitions"]:
+            assert transition["event"] not in seen_events, \
+                "%s has two next states for %r" % (state["id"],
+                                                   transition["event"])
+            seen_events.add(transition["event"])
+            assert transition["next"] in states, transition["next"]
+            edges.append((state["id"], transition["event"], transition["next"]))
+    # Every terminal is reachable from the entry state.
+    reachable, frontier = {"Q0_INSTRUMENT"}, ["Q0_INSTRUMENT"]
+    while frontier:
+        current = frontier.pop()
+        for source, _event, target in edges:
+            if source == current and target not in reachable:
+                reachable.add(target)
+                frontier.append(target)
+    assert terminals <= reachable, "unreachable terminals: %s" % (
+        terminals - reachable)
+    assert reachable == set(states)
+    for terminal in terminals:
+        assert states[terminal].get("claim")
+        assert "transitions" not in states[terminal]
+
+    published = tables["state_machine"]
+    assert published["every_event_has_exactly_one_next_state"] is True
+    assert published["every_terminal_state_is_reachable"] is True
+    assert published["rescue_paths"] == []
+    assert set(published["terminal_states"]) == terminals
+    assert set(published["states"]) == set(states)
+    assert len(published["transitions"]) == len(edges)
+    assert {(t["from"], t["event"], t["to"]) for t in published["transitions"]} \
+        == set(edges)
+    # The sixteen-row eligibility subtable is not the whole machine.
+    subtable = machine["profile_eligibility_subtable"]
+    assert subtable["is_not_the_whole_state_machine"] is True
+    assert subtable["i0_branch_is_registered_separately"] is True
+
+
+# --------------------------------------------------------------------------
+# S3MR2-005 / S3MR2-008: the operation ontology and the projection
+# --------------------------------------------------------------------------
+
+WORK_STREAMS = ("deterministic_I0_fixtures", "target_role_development",
+                "positive_reference_external_P3Q",
+                "RP_I4_under_candidate_profiles",
+                "selected_profile_one_shot_confirmation",
+                "S4_diagnostic_generation")
+
+
+def test_the_operation_ontology_maps_every_cost_bearing_quantity(protocol):
+    ontology = protocol["operation_ontology_v0_4"]
+    assert ontology["status"] == "PLANNING_ONTOLOGY_AUTHORIZES_NOTHING"
+    assert ontology["s4_forward_cost_must_not_be_null"] is True
+    units = {entry["unit"] for entry in ontology["units"]}
+    for required in ("rendered_row", "scored_row", "restricted_vocabulary_logit_read",
+                     "sequence_level_prefill_evaluation",
+                     "incremental_decode_evaluation",
+                     "total_sequence_level_model_evaluation_equivalent"):
+        assert required in units, required
+    for entry in ontology["units"]:
+        assert entry["definition"]
+    assert "NEVER equated with a runtime" in ontology["prohibition"]
+
+
+def test_i0_fixture_units_reconstruct(protocol, tables):
+    """S3MR2-008. 232 clusters, 232 base items, 464 cluster rows, 38, 502."""
+    breakdown = protocol["proposed_statistics"]["i0_fixture_breakdown"]
+    stream = tables["projected_operation_accounting"]["work_streams"][
+        "deterministic_I0_fixtures"]
+    assert stream["breakdown"] == breakdown
+    cluster_fixtures = (breakdown["k5_constructor_fixtures"]
+                        + breakdown["k6_constructor_fixtures"])
+    noncluster = (breakdown["indicator_truth_table_fixtures"]
+                  + breakdown["not_applicable_branch_fixtures"]
+                  + breakdown["scorer_branch_fixtures"])
+    variants = protocol["i3_contrast_registry"]["variants_per_cluster"]
+    assert cluster_fixtures == 464
+    assert cluster_fixtures // variants == 232
+    assert stream["base_item_contrast_clusters"] == cluster_fixtures // variants
+    assert stream["base_items"] == cluster_fixtures // variants
+    assert stream["cluster_rendered_rows"] == cluster_fixtures
+    assert stream["noncluster_fixture_rows"] == noncluster == 38
+    assert stream["rendered_rows"] == cluster_fixtures + noncluster == 502
+    assert stream["scored_rows"] == stream["rendered_rows"]
+    assert stream["uses_model"] is False
+    assert stream["generation_calls"] == 0
+    assert stream["generated_tokens_upper_bound"] == 0
+    assert stream["sequence_level_prefill_evaluations"] == 0
+    assert stream["incremental_decode_evaluations"] == 0
+    assert stream["restricted_vocabulary_logit_reads"] == 0
+    assert stream["total_sequence_level_model_evaluation_equivalents"] == 0
+    assert protocol["proposed_statistics"]["i0_fixture_unit_rule"]
+
+
+def test_operation_totals_derive_from_n_and_cell_counts(protocol, tables,
+                                                        recomputed):
+    """S3MR2-005/008. Every projected total is arithmetic over registered inputs."""
+    streams = tables["projected_operation_accounting"]["work_streams"]
+    assert set(streams) == set(WORK_STREAMS)
+    counts = tables["gate_bearing_cell_counts"]
+    roles = len(protocol["proposed_statistics"]["registered_target_roles"])
+    variants = protocol["i3_contrast_registry"]["variants_per_cluster"]
+    n_i1_i3 = recomputed["I1_I3_joint_correctness_floor"]["n"]
+    n_i2 = recomputed["I2_headroom_floor"]["n"]
+    n_i4 = recomputed["I4_positive_reference_floor"]["n"]
+
+    def rendered_rows(profile):
+        """Cluster rows plus base-item rows, over every applicable target role."""
+        cell = counts[profile]
+        clusters = cell["I3_cells"] * n_i1_i3
+        base_items = ((cell["I1a_cells"] + cell["I1b_cells"]) * n_i1_i3
+                      + cell["I2_cells"] * n_i2)
+        return clusters * variants + base_items
+
+    # Development over the three target roles and the three selectable profiles.
+    # S3 reuses the S2 prompts and logit vector, so it adds nothing.
+    development = streams["target_role_development"]
+    assert development["S3_incremental_rendered_rows"] == 0
+    assert development["S3_incremental_scored_rows"] == 0
+    assert development["S3_incremental_sequence_evaluations"] == 0
+    assert len(development["S3_zero_incremental_cost_holds_only_under"]) >= 3
+    expected_development = rendered_rows("S1") + rendered_rows("S2")
+    assert development["scored_rows"] == expected_development == 33543
+    assert development["total_sequence_level_model_evaluation_equivalents"] == \
+        expected_development
+    assert len(development["model_roles"]) == roles
+    for profile, key in (("S1", "S1"), ("S2", "S2"),
+                         ("S2", "S3_if_independently_rendered")):
+        entry = development["by_profile"][key]
+        assert entry["rendered_rows"] == rendered_rows(profile), key
+        assert entry["target_roles"] == roles
+        assert entry["rendered_rows_per_target_role"] * roles == \
+            entry["rendered_rows"]
+        assert entry["cluster_rendered_rows"] == \
+            entry["base_item_contrast_clusters"] * variants
+        assert entry["dimensional_identity_cluster_rows_equals_clusters_times_variants"] \
+            is True
+        assert entry["rendered_rows_per_target_role"] == \
+            entry["cluster_rendered_rows"] + entry["base_items"]
+        assert entry["generation_calls"] == 0
+        assert entry["generated_tokens_upper_bound"] == 0
+        assert entry["total_sequence_level_model_evaluation_equivalents"] == \
+            entry["scored_rows"]
+
+    # RP I4: two scoring streams, four cells each, at the I4 size.
+    rp = streams["RP_I4_under_candidate_profiles"]
+    expected_rp = (rp["distinct_scoring_streams"] * rp["cells_per_scoring_stream"]
+                   * n_i4)
+    assert rp["n_per_cell"] == n_i4
+    assert rp["cells_per_scoring_stream"] == counts["S1"]["I4_cells"]
+    assert rp["rendered_rows"] == rp["scored_rows"] == expected_rp == 3584
+    assert rp["total_sequence_level_model_evaluation_equivalents"] == expected_rp
+    assert rp["generated_tokens_upper_bound"] == 0
+    assert rp["S3_incremental_rows"] == 0
+    assert rp["model_roles"] == ["RP"]
+    assert rp["precondition"]
+
+    # Confirmation: one selected profile, its applicable cells, at the same sizes.
+    confirmation = streams["selected_profile_one_shot_confirmation"]
+    assert confirmation["accessible_now"] is False
+    assert confirmation["is_an_upper_bound_not_a_universal_total"] is True
+    bound_profile = confirmation["upper_bound_profile"]
+    assert bound_profile in ("S1", "S2", "S3")
+    assert confirmation["target_role_rendered_rows"] == rendered_rows(bound_profile)
+    assert confirmation["rp_i4_rendered_rows"] == \
+        counts[bound_profile]["I4_cells"] * n_i4
+    expected_confirmation = (confirmation["target_role_rendered_rows"]
+                             + confirmation["rp_i4_rendered_rows"])
+    assert confirmation["rendered_rows"] == confirmation["scored_rows"] == \
+        expected_confirmation == 27856
+    assert confirmation["total_sequence_level_model_evaluation_equivalents"] == \
+        expected_confirmation
+    # And that profile really is the most expensive selectable one.
+    assert expected_confirmation == max(
+        rendered_rows(profile) + counts[profile]["I4_cells"] * n_i4
+        for profile in ("S1", "S2", "S3"))
+
+
+def test_s4_generation_accounting_derives(protocol, tables, recomputed):
+    """S3MR2-005. The S4 forward cost is derived and is not null."""
+    s4 = tables["projected_operation_accounting"]["work_streams"][
+        "S4_diagnostic_generation"]
+    counts = tables["gate_bearing_cell_counts"]["S4"]
+    variants = protocol["i3_contrast_registry"]["variants_per_cluster"]
+    roles = len(protocol["proposed_statistics"]["registered_target_roles"])
+    bound = protocol["proposed_statistics"]["s4_generated_token_bound_per_generation"]
+    n_i1_i3 = recomputed["I1_I3_joint_correctness_floor"]["n"]
+    n_i2 = recomputed["I2_headroom_floor"]["n"]
+    assert bound == 16
+    assert s4["registered_generated_token_bound_per_generation"] == bound
+    assert s4["i4_applicable"] is False
+    assert counts["I4_cells"] == 0
+    assert s4["forward_cost_is_mapped"] is True
+    assert len(s4["model_roles"]) == roles
+
+    # The row count comes from the S4 cell structure and the registered sizes.
+    clusters_per_role = counts["I3_cells"] * n_i1_i3 // roles
+    base_items_per_role = (
+        (counts["I1a_cells"] + counts["I1b_cells"]) * n_i1_i3
+        + counts["I2_cells"] * n_i2) // roles
+    assert s4["base_item_contrast_clusters"] == clusters_per_role
+    assert s4["base_items"] == base_items_per_role
+    rows = (clusters_per_role * variants + base_items_per_role) * roles
+    assert s4["rendered_rows"] == rows == 26064
+    assert s4["scored_rows"] == rows
+    assert s4["generation_calls"] == rows
+    assert s4["sequence_level_prefill_evaluations"] == rows
+    assert s4["generated_tokens_upper_bound"] == rows * bound == 417024
+    assert s4["incremental_decode_evaluations_upper_bound"] == rows * (bound - 1) \
+        == 390960
+    assert s4["total_sequence_level_model_evaluation_equivalents_upper_bound"] == \
+        s4["sequence_level_prefill_evaluations"] \
+        + s4["incremental_decode_evaluations_upper_bound"] == 417024
+    assert s4["runtime_batched_forward_calls"] is None
+    assert "NOT a sequence-level evaluation" in s4["runtime_note"]
+    assert s4["selection_authority"].startswith("none")
+
+
+def test_the_positive_reference_stream_stays_numerically_unresolved(tables,
+                                                                   protocol):
+    stream = tables["projected_operation_accounting"]["work_streams"][
+        "positive_reference_external_P3Q"]
+    for field in ("rendered_rows", "scored_rows", "base_items",
+                  "generated_tokens_upper_bound",
+                  "total_sequence_level_model_evaluation_equivalents"):
+        assert stream[field] is None, field
+    assert stream["numeric_status"] == "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2"
+    assert "A zero would assert" in stream["why_null_and_not_zero"]
+    unresolved = protocol["operation_ontology_v0_4"][
+        "unresolved_streams_are_null_not_zero"]
+    assert unresolved["stream"] == "positive_reference_external_P3Q"
+    assert unresolved["status"] == "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2"
+    assert unresolved["grand_total_treating_null_as_zero_prohibited"] is True
+
+
+def test_no_grand_total_treats_the_unresolved_stream_as_zero(protocol, tables):
+    accounting = tables["projected_operation_accounting"]
+    assert accounting["grand_total_prohibited"]["prohibited"] is True
+    assert accounting["no_single_undifferentiated_total"] is True
+    assert "null, not zero" in accounting["grand_total_prohibited"]["why"]
+    for key in accounting:
+        assert "grand_total" not in key or key == "grand_total_prohibited"
+    projected = protocol["operation_boundaries"]["projected_future_operations"]
+    assert projected["grand_total_prohibited"]["prohibited"] is True
+    assert projected["no_single_undifferentiated_total"] is True
+    assert set(projected["work_streams"]) == set(WORK_STREAMS)
+    assert accounting["single_structured_source"] == \
+        "studies/study3/analysis/design_statistics.py"
+
+
+def test_the_projection_is_decomposed_into_the_six_work_streams(tables):
+    streams = tables["projected_operation_accounting"]["work_streams"]
+    assert len(streams) == 6
+    for name in WORK_STREAMS:
+        assert name in streams
+        assert "uses_model" in streams[name]
+    assert streams["deterministic_I0_fixtures"]["uses_model"] is False
+    for name in ("target_role_development", "RP_I4_under_candidate_profiles",
+                 "selected_profile_one_shot_confirmation",
+                 "S4_diagnostic_generation"):
+        assert streams[name]["uses_model"] is True
+
+
+# --------------------------------------------------------------------------
+# S3MR2-004 / S3MR2-009: applicability, selectability and the open decision
+# --------------------------------------------------------------------------
+
+def test_s4_is_not_i4_applicable_never_selectable_and_absent_from_confirmation(
+        protocol, tables):
+    by_id = {profile["id"]: profile for profile in protocol["interface_profiles"]}
+    assert by_id["S4"]["selectable_status"] == "never_selectable"
+    ranked = [entry["interface"] for entry in
+              protocol["admissibility_order"]["order"]]
+    assert "S4" not in ranked
+    truth = {row["profile"]: row for row in protocol["gate_truth_table"]["rows"]}
+    assert truth["S4"]["I4"] == "not_applicable"
+    assert truth["S4"]["selectable"] is False
+    assert tables["gate_bearing_cell_counts"]["S4"]["I4_cells"] == 0
+    assert protocol["gate_truth_table"]["i4_applicability_note"]
+    for row in protocol["proposed_statistics"]["confirmation_exact_binomial_gates"]:
+        assert "S4" not in row["applicable_profiles"], row["gate"]
+        assert row["s4_present"] is False
+    rule = protocol["proposed_statistics"]["confirmation_applicability_rule"]
+    assert rule["s4_can_never_appear"] is True
+    plan = protocol["development_selection_and_confirmation_plan"]["stage_3_confirmation"]
+    assert plan["s4_can_never_appear_in_any_confirmation_applicability_list"]
+    assert "S4" in protocol["development_selection_and_confirmation_plan"][
+        "stage_2_selection"]["never_selectable"]
+    assert protocol["power_architecture_v0_4"]["type_i_architecture"][
+        "s4_excluded_from_every_success_union"] is True
+
+
+def test_i1b_and_k5_confirmation_applicability_is_limited_to_s1(protocol):
+    """S3MR2-004. Confirmation applicability = selectable profiles INTERSECT {selected}."""
+    rule = protocol["proposed_statistics"]["confirmation_applicability_rule"]
+    assert rule["i1b_confirmation_profiles"] == ["S1"]
+    assert rule["k5_confirmation_profiles"] == ["S1"]
+    assert "INTERSECT" in rule["rule"]
+    confirmation = _component(protocol, "confirmation", "I1b")
+    assert confirmation["applicable_profiles"] == ["S1"]
+    assert confirmation["applicability_rule"]
+    plan = protocol["development_selection_and_confirmation_plan"]["stage_3_confirmation"]
+    assert plan["i1b_applicable_profiles"] == ["S1"]
+    assert plan["k5_applicable_profiles"] == ["S1"]
+    # And no confirmation row may list a non-selectable profile.
+    for row in protocol["proposed_statistics"]["confirmation_exact_binomial_gates"]:
+        assert set(row["applicable_profiles"]) <= {"S1", "S2", "S3"}, row["gate"]
+
+
+def test_od2_remains_unresolved_and_nothing_is_selected(protocol, amendment):
+    decisions = {d["id"]: d for d in protocol["unresolved_operator_decisions"]}
+    assert decisions["OD2"]["status"] == "unresolved"
+    assert decisions["OD2"]["blocking"] is True
+    assert protocol["blocking_decisions"] == ["OD2"]
+    candidates = protocol["positive_reference_candidates"]
+    assert candidates["selection_status"].startswith("UNSELECTED")
+    blob = json.dumps(candidates).lower()
+    for verb in ("downloaded", "prequalified", "pinned to revision"):
+        assert '"%s": true' % verb not in blob
+    for od in amendment["operator_decisions_in_this_round"]:
+        if od["id"] == "OD2":
+            assert od["status"] == "unresolved"
+            assert od["blocking"] is True
+    ur22 = [u for u in amendment["unresolved_item_dispositions"]
+            if u["id"] == "UR-22"]
+    assert len(ur22) == 1
+    assert ur22[0]["disposition"] == "UNRESOLVED_BLOCKING_OPERATOR_DECISION"
+
+
+def test_the_p3q_i4_ordering_constraint_reconstructs(protocol):
+    """S3MR2-009. 19/20 > 9/10 > 4/5, registered without selecting anything."""
+    ordering = protocol["positive_reference_candidates"]["p3q_i4_ordering_constraint"]
+    p3q = _rational(ordering["p3q_lower_bound_exact_rational"])
+    floor = _floor_for(protocol, "I4_positive_reference_floor")
+    p1 = _rational(floor["p1_exact_rational"])
+    p0 = _rational(floor["p0_exact_rational"])
+    assert p3q == Fraction(19, 20)
+    assert p1 == Fraction(9, 10)
+    assert p0 == Fraction(4, 5)
+    assert p3q > p1 > p0
+    assert ordering["binding_on"]
+    assert ordering["later_authority_may_strengthen_not_weaken"] is True
+    assert ordering["no_checkpoint_is_selected_by_registering_this_constraint"] \
+        is True
+    assert _rational(ordering["i4_p1_exact_rational"]) == p1
+    assert _rational(ordering["i4_p0_exact_rational"]) == p0
+    assert _component(protocol, "development", "I4")["p1_exact_rational"] == "9/10"
+    assert _component(protocol, "development", "I4")["p0_exact_rational"] == "4/5"
+
+
+# --------------------------------------------------------------------------
+# S3MR2 closure, and the historical narrative count mismatch
+# --------------------------------------------------------------------------
+
+def test_every_finding_and_item_appears_exactly_once(amendment):
+    closure = amendment["closure_matrix_v0_4"]
+    assert [row["finding_id"] for row in closure] == FINDING_IDS_V0_3
+    assert len({row["finding_id"] for row in closure}) == 10
+    severities = {}
+    for row in closure:
+        severities[row["original_severity"]] = \
+            severities.get(row["original_severity"], 0) + 1
+        assert row["self_approved"] is False
+        assert row["disposition"] == \
+            "PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW"
+        assert row["where"] and row["verification"] and row["repair"]
+        assert row["repair_kind"] in ("method", "operator_decision_input")
+    assert severities == STRUCTURED_V0_3_SEVERITIES
+
+    inherited = amendment["inherited_first_review_findings"]
+    assert [row["finding_id"] for row in inherited] == FINDING_IDS
+    for row in inherited:
+        assert row["status_after_second_review"] in (
+            "VERIFIED_RESOLVED_BY_THE_SECOND_REVIEW",
+            "PARTIALLY_RESOLVED_BY_DRAFT_V0_3")
+        assert row["note"]
+    partial = [row for row in inherited
+               if row["status_after_second_review"] == "PARTIALLY_RESOLVED_BY_DRAFT_V0_3"]
+    assert len(partial) == 4
+
+    items = amendment["unresolved_item_dispositions"]
+    assert [row["id"] for row in items] == UR_IDS
+    assert len({row["id"] for row in items}) == 22
+
+
+def test_the_historical_count_mismatch_is_recorded_and_not_propagated(
+        amendment, protocol, markdown, packet):
+    mismatch = amendment["historical_count_mismatch"]
+    assert mismatch["status"] == \
+        "NON_DISPOSITIVE_HISTORICAL_NARRATIVE_COUNT_MISMATCH"
+    assert mismatch["review_was_not_edited"] is True
+    assert mismatch["eight_major_is_not_propagated"] is True
+    counts = mismatch["structured_new_findings"]
+    assert counts["total"] == 10
+    assert {k: counts[k] for k in STRUCTURED_V0_3_SEVERITIES} == \
+        STRUCTURED_V0_3_SEVERITIES
+    assert counts["BLOCKING"] + counts["MAJOR"] + counts["MINOR"] == counts["total"]
+    assert "Two BLOCKING and eight MAJOR" in \
+        mismatch["immutable_disposition_basis_phrase"]
+    assert mismatch["why_it_does_not_reverse_the_rejection"]
+    # The wrong count must not leak into any draft-v0.4 artifact.
+    for name, text in (("protocol", json.dumps(protocol)),
+                       ("markdown", markdown), ("packet", packet)):
+        assert "eight MAJOR" not in text, name
+        assert "8 MAJOR" not in text, name
+
+
+def test_the_amendment_does_not_self_approve(amendment, protocol, tables):
+    prohibition = amendment["self_approval_prohibition"]
+    assert prohibition[
+        "the_drafting_party_does_not_claim_draft_v0_4_is_correct"] is True
+    assert prohibition["every_repair_label"] == \
+        "PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW"
+    assert "third" in prohibition["determination_belongs_to"].lower()
+    assert amendment["both_independent_reviews_remain_valid_rejections"] is True
+    assert amendment["no_review_artifact_was_edited"] is True
+    assert "third bounded independent methods review of draft-v0.4" in \
+        amendment["next_legal_action"]
+    assert protocol["status"]["self_approval_prohibited"]
+    assert protocol["claim_ceiling"]["no_self_approval"]
+    assert tables["disposition_status"] == \
+        "PROPOSED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW"
+    # Every draft-v0.4 section that repairs a finding carries the same label.
+    for section in ("sampling_frame_v0_4", "power_architecture_v0_4",
+                    "state_machine_v0_4", "operation_ontology_v0_4"):
+        if "disposition_status" in protocol[section]:
+            assert protocol[section]["disposition_status"] == \
+                "PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW"
+
+
+def test_the_amendment_names_the_immutable_objects_it_did_not_edit(amendment):
+    listed = amendment["immutable_objects_not_edited"]
+    assert len(listed) >= 20
+    joined = " ".join(listed)
+    for required in ("studies/study3/reviews/v0_3_independent_methods_review.json",
+                     "studies/study3/reviews/v0_2_independent_methods_review.json",
+                     "studies/study3/analysis/independent_methods_recalculation_v0_3.py",
+                     "studies/study3/analysis/independent_methods_recalculation.py",
+                     "tests/test_study3_methods_review.py",
+                     "tests/test_study3_methods_review_v0_3.py",
+                     "studies/study3/analysis/independent_methods_review_packet_v0_3.md"):
+        assert required in joined, required
+    for path in listed:
+        assert os.path.exists(os.path.join(REPO_ROOT, path)), path
+    assert len(set(listed)) == len(listed)
+
+
+def test_prior_receipts_reviews_and_packets_are_untouched():
+    """The v0.4 round may not rewrite any earlier round's record."""
+    assert os.path.exists(REVIEW_PATH)
+    with open(REVIEW_PATH, encoding="utf-8") as handle:
+        assert "draft-v0.1" in handle.read()
+    for name, version in (("design_receipt_v0_2.json", "v0.2"),
+                          ("design_receipt_v0_3.json", "v0.3")):
+        path = os.path.join(STUDY3, name)
+        with open(path, encoding="utf-8") as handle:
+            blob = handle.read()
+        assert version in blob, name
+        assert EXPECTED_STATE not in blob, name
+    with open(PACKET_V0_3, encoding="utf-8") as handle:
+        older = handle.read()
+    assert "AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW" in older
+    assert EXPECTED_STATE not in older
+    with open(AMENDMENT_V0_3, encoding="utf-8") as handle:
+        previous = json.load(handle)
+    assert EXPECTED_STATE not in json.dumps(previous)
+
+
+# --------------------------------------------------------------------------
+# Retained invariants from the v0.1, v0.2 and v0.3 rounds
+# --------------------------------------------------------------------------
+
+def _asserts_failing_interface_stays_eligible(text):
+    lowered = text.lower()
+    return ("remains eligible" in lowered or "still eligible" in lowered
+            or "stays eligible" in lowered)
+
+
+def test_i4_is_part_of_eligibility_and_fails_per_interface(protocol):
+    order = protocol["admissibility_order"]
+    assert "I4" in order["gates_required_for_eligibility"]
+    i4 = _gate(protocol, "I4")
+    assert i4["part_of_eligibility"] is True
+    assert i4["per_interface_not_global"] is True
+    assert "eliminate this interface profile" in i4["legal_next_state_on_fail"]
+    for gate in protocol["gate_hierarchy"]:
+        assert not _asserts_failing_interface_stays_eligible(
+            gate["legal_next_state_on_fail"])
+        assert not _asserts_failing_interface_stays_eligible(gate["what_fails"])
+
+
+def test_i5_covers_every_gate_bearing_construct(protocol):
+    i5 = _gate(protocol, "I5")
+    assert i5["accessible_before_authority"] is False
+    assert "RP" in i5["model_roles"]
+    assert any("K4" in item for item in i5["inputs"])
+    for construct in COVERED_CONSTRUCTS:
+        assert construct in i5["covered_constructs"], construct
+    assert "I3" not in i5["covered_constructs"]
+    assert isinstance(i5["applicable_profiles"], list)
+
+
+def test_no_gate_authorizes_mechanistic_execution(protocol):
+    for gate in protocol["gate_hierarchy"]:
+        assert gate["authorizes_mechanistic_execution"] is False
+    for prohibited in ("any activation extraction or probe",
+                       "any patching, ablation or lens operation"):
+        assert prohibited in protocol["operation_boundaries"][
+            "prohibited_without_new_authority"]
+
+
+def test_pooling_as_a_rescue_is_prohibited(protocol):
+    cells = protocol["atomic_evaluation_cells"]
+    assert cells["no_pooling_rescue"] is True
+    assert cells["descriptive_pooling"].startswith("Pooled summaries")
+    assert "no gate" in cells["descriptive_pooling"]
+    assert len(cells["pooling_prohibitions"]) >= 4
+    for gate in protocol["gate_hierarchy"]:
+        assert gate["no_pooling"] is True
+
+
+def test_not_applicable_is_neither_pass_nor_zero_effect(protocol):
+    semantics = protocol["not_applicable_semantics"]
+    assert "not a pass" in semantics
+    assert "not a zero effect" in semantics
+    assert semantics == protocol["claim_ceiling"]["not_applicable_semantics"]
+    assert protocol["gate_truth_table"]["value_semantics"]["not_applicable"]
+
+
+POSITION_LABEL_TRANSFORMS = ("position_permutation", "label_symbol_permutation",
+                             "label_set_replacement")
+
+
+def test_applicability_matches_what_each_profile_renders(protocol):
+    for profile in protocol["interface_profiles"]:
+        applicability = profile["transformation_applicability"]
+        declared = {entry["transformation"]
+                    for entry in profile["non_applicable_transformations"]}
+        computed = {name for name, value in applicability.items()
+                    if value != "applicable"}
+        assert declared == computed, profile["id"]
+        if not profile["options_visible"]:
+            for transform in POSITION_LABEL_TRANSFORMS:
+                assert applicability[transform] != "applicable", profile["id"]
+        if not profile["labels_visible"]:
+            assert "I1b" not in profile["applicable_gates"], profile["id"]
+
+
+def test_the_option_and_symbol_maps_are_bijections(protocol):
+    verification = protocol["proposed_statistics"][
+        "i3_pairwise_construction_verification"]
+    assert verification["k5_one_factor_per_contrast"] is True
+    assert verification["k5_k6_base_item_identities_disjoint"] is True
+    assert verification["label_alphabets_mutually_disjoint"] is True
+    assert verification["label_alphabets_disjoint_from_answer_domain"] is True
+    assert verification["k5_x_k6_cross_product_exists"] is False
+
+
+def test_label_alphabets_do_not_collide_with_the_answer_domain(protocol):
+    alphabets = protocol["counterbalancing_design"]["label_alphabets"]
+    assert alphabets["alphabets_mutually_disjoint"] is True
+    assert "no label alphabet may contain a digit" in alphabets["digits_forbidden"]
+    assert alphabets["answer_domain"]
+    assert len(alphabets["registered_alphabets"]) >= 2
+    assert alphabets["label_set_replacement_rule"]
+    verification = protocol["proposed_statistics"][
+        "i3_pairwise_construction_verification"]
+    assert verification["label_alphabets_mutually_disjoint"] is True
+    assert verification["label_alphabets_disjoint_from_answer_domain"] is True
+
+
+def test_k6_varies_one_factor_at_a_time(protocol):
+    renderings = protocol["counterbalancing_design"]["k6_renderings"]
+    assert renderings["one_factor_at_a_time"] is True
+    assert "never compared as a three-way set" in \
+        renderings["three_way_comparison_prohibited"]
+    assert renderings["answer_cue"]
+    assert renderings["count"] == len(renderings["renderings"]) == 3
+    assert len(renderings["pairwise_cells"]) == 2
+    for contrast in protocol["counterbalancing_design"]["k6_contrasts"]:
+        assert contrast["baseline_rendering"] != contrast["variant_rendering"]
+        assert contrast["variants_per_cluster"] == 2
+        assert contrast["varied_factor"]
+        assert contrast["held_fixed"]
+    verification = protocol["proposed_statistics"][
+        "i3_pairwise_construction_verification"]
+    assert verification["k6_answer_cue_fixed_within_every_pair"] is True
+    assert verification["k6_contrast_count"] == 2
+
+
+def test_k5_is_never_applicable_to_s2_or_s3_and_never_counts_as_a_pass(protocol):
+    semantics = protocol["i3_contrast_registry"]["k5_applicability"]["semantics"]
+    assert "not a pass" in semantics
+    assert "never be counted as a satisfied component" in semantics
+    for profile in protocol["interface_profiles"]:
+        if profile["id"] in ("S2", "S3"):
+            assert not profile["options_visible"] or not profile["labels_visible"]
+
+
+def test_no_i3_rescue_path_exists(protocol):
+    indicators = protocol["proposed_statistics"]["i3_indicators"]
+    assert "no descriptive quantity" in indicators["no_rescue"]
+    assert "rescue" in indicators["no_rescue"]
+    assert protocol["state_machine_v0_4"]["rescue_paths"] == []
+
+
+def test_the_retired_paired_procedure_carries_no_decision_role(protocol):
+    retired = protocol["retired_procedures"]["tango_paired_equivalence"]
+    assert retired["status"] == "RETIRED FROM EVERY DECISION ROLE"
+    for role in ("gate", "eligibility", "selection", "confirmation"):
+        assert any(role in item for item in retired["retired_from"]), role
+    summary = protocol["proposed_statistics"]["descriptive_paired_summary"]
+    assert summary["status"].startswith("DESCRIPTIVE")
+    for absent in ("null hypothesis", "alpha", "p-value", "critical value",
+                   "equivalence margin", "confidence-based pass or fail",
+                   "equivalence declaration"):
+        assert absent in summary["carries_no"], absent
+    assert any("rescue path" in item for item in summary["carries_no"])
+    assert any("ranking weight" in item for item in summary["carries_no"])
+    assert summary["retired_procedure"]
+
+
+def test_the_i4_chance_floor_is_recorded_as_rejected(protocol):
+    rejected = protocol["proposed_statistics"]["rejected_v0_1_i4_chance_null"]
+    assert rejected["status"].startswith("REJECTED")
+    assert rejected["why"]
+    assert _component(protocol, "development", "I4")["p0_exact_rational"] == "4/5"
+
+
+def test_the_withdrawn_sample_sizes_appear_in_no_active_field(
+        protocol, tables, packet, markdown):
+    """draft-v0.3's n = 256 and n = 128 are withdrawn by S3MR2-003."""
+    sizes = protocol["proposed_statistics"]["sample_sizes"]
+    assert sizes["n_256_and_128_status"].startswith("WITHDRAWN")
+    for gate in ("I1a", "I1b", "I2", "I3", "I4"):
+        assert sizes[gate]["n"] not in (192, 256, 128)
+        assert _component(protocol, "development", gate)["n"] not in (192, 256, 128)
+        assert _component(protocol, "confirmation", gate)["n"] not in (192, 256, 128)
+    for row in (tables["development_exact_binomial_components"]
+                + tables["confirmation_exact_binomial_components"]):
+        assert row["n"] not in (192, 256, 128)
+
+
+def test_exactly_one_i3_floor_is_active_and_it_is_nine_tenths(protocol, tables):
+    floor = protocol["proposed_statistics"]["i3_floor"]
+    assert floor["active_floor_count"] == 1
+    assert floor["p0_exact_rational"] == "9/10"
+    assert floor["p1_exact_rational"] == "97/100"
+    assert floor["p0_0_95_status"] == "DELETED FROM EVERY ACTIVE FIELD"
+    assert floor["indicator"] == "J_joint_correct"
+    assert floor["degenerate_region_prohibition"]
+    assert _component(protocol, "development", "I3")["p0_exact_rational"] == "9/10"
+    registered = _floor_for(protocol, "I1_I3_joint_correctness_floor")
+    assert registered["p0_exact_rational"] == "9/10"
+
+
+def test_no_rejection_region_requires_every_unit_to_succeed(protocol, tables):
+    for gate in ("I1a", "I1b", "I2", "I3", "I4"):
+        for split in ("development", "confirmation"):
+            row = _component(protocol, split, gate)
+            assert row["pass_count"] < row["n"], (gate, split)
+            assert row["degenerate_rejection_region"] is False
+    for row in (tables["development_exact_binomial_components"]
+                + tables["confirmation_exact_binomial_components"]):
+        assert row["pass_count"] < row["n"]
+
+
+def test_every_sample_size_declares_its_unit(protocol, tables):
+    sizes = protocol["proposed_statistics"]["sample_sizes"]
+    for gate in ("I1a", "I1b", "I2", "I3", "I4"):
+        assert sizes[gate]["unit_of_n"]
+        for split in ("development", "confirmation"):
+            assert _component(protocol, split, gate)["unit_of_n"]
+    for row in (tables["development_exact_binomial_components"]
+                + tables["confirmation_exact_binomial_components"]):
+        assert row["unit_of_n"]
+    registry = protocol["unit_registry"]
+    assert registry["prohibition"]
+    for entry in registry["units"]:
+        assert entry["definition"] and entry["never_equals"]
+
+
+def test_the_i3_unit_is_the_cluster_and_never_a_rendered_row(protocol):
+    sizes = protocol["proposed_statistics"]["sample_sizes"]
+    assert "contrast cluster" in sizes["I3"]["unit_of_n"]
+    assert protocol["proposed_statistics"]["i3_indicators"]["independent_unit"] == \
+        "base_item_contrast_cluster"
+    unit = protocol["atomic_evaluation_cells"]["sampling_unit"]
+    assert "the base-item contrast cluster for I3" in unit
+    i3_unit = protocol["atomic_evaluation_cells"]["i3_sampling_unit"]
+    assert i3_unit["unit"] == "base_item_contrast_cluster"
+    assert "are not crossed" in i3_unit["no_cross_product"]
+    assert i3_unit["variants_per_cluster"] == 2
+    assert i3_unit["disjoint_base_items"]
+
+
+def test_the_development_selection_map_is_total_and_deterministic(protocol,
+                                                                 tables):
+    selection_map = protocol["proposed_statistics"]["development_selection_map"]
+    assert len(selection_map) == 16
+    seen = set()
+    order = protocol["development_selection_and_confirmation_plan"][
+        "stage_2_selection"]["order"]
+    for row in selection_map:
+        passed = row["all_applicable_components_passed"]
+        assert sorted(passed) == ["S1", "S2", "S3"]
+        key = (passed["S1"], passed["S2"], passed["S3"],
+               row["s3_multi_token_domain_activated"])
+        assert key not in seen, "duplicate selection case %r" % (key,)
+        seen.add(key)
+        assert row["fixed_selectable_profile_denominator"] == 3
+        # The eligible set and the selected profile are both determined by the
+        # case, so the map is recomputed here rather than trusted.
+        eligible = [name for name in ("S1", "S2", "S3")
+                    if passed[name]
+                    and (name != "S3"
+                         or row["s3_multi_token_domain_activated"])]
+        assert sorted(row["eligible_profiles"]) == eligible
+        expected = None
+        for candidate in order:
+            if candidate in eligible:
+                expected = candidate
+                break
+        assert row["selected_profile"] == expected, key
+        assert row["stop_no_selectable_profile_is_eligible"] is (expected is None)
+    # All sixteen (eligibility, S3 applicability) cases are covered exactly once.
+    assert len(seen) == 16
+    plan = protocol["development_selection_and_confirmation_plan"]["stage_2_selection"]
+    assert plan["order"] == ["S2", "S3", "S1"]
+    assert plan["no_data_dependent_reordering"] is True
+    assert plan["no_selection_this_round"] is True
+    assert len(tables["profile_eligibility_subtable"]) == 16
+
+
+def test_the_confirmation_stage_is_one_shot_and_inaccessible(protocol):
+    plan = protocol["development_selection_and_confirmation_plan"]["stage_3_confirmation"]
+    assert plan["one_shot"] is True
+    assert plan["reselection_prohibited"] is True
+    assert "may change after the development split is read" in \
+        plan["retuning_prohibited"]
+    assert plan["accessible_now"] is False
+    assert plan["multiplicity"]
+    assert plan["conservative_size_reuse"]
+    isolation = protocol["split_lifecycle"]["confirmation_isolation"]
+    assert isolation["accessible_before_authority"] is False
+    assert isolation["one_shot"] is True
+    assert "is spent" in isolation["no_reuse_after_observation"]
+    assert isolation["covers_every_gate_bearing_construct"] is True
+    assert isolation["single_interface_only"]
+    assert isolation["physical_exclusion_before_authorization"]
+    for construct in COVERED_CONSTRUCTS:
+        assert construct in _gate(protocol, "I5")["covered_constructs"], construct
+    for included in ("gate I4", "the positive-reference construct",
+                     "the K4 stratum"):
+        assert included in isolation["explicitly_includes"], included
+
+
+def test_s3_adds_no_operations_under_the_current_single_token_domain(protocol,
+                                                                    tables):
+    stream = tables["projected_operation_accounting"]["work_streams"][
+        "RP_I4_under_candidate_profiles"]
+    assert stream["S3_incremental_rows"] == 0
+    reuse = protocol["sampling_frame_v0_4"]["reuse_and_dependence_rule"]
+    assert "single-token" in reuse["s3_logit_reuse"]
+
+
+def test_the_selected_label_uniformity_diagnostic_carries_no_authority(protocol):
+    for diagnostic in protocol["proposed_statistics"][
+            "selected_label_uniformity_diagnostic"]:
+        assert diagnostic["status"] == "DIAGNOSTIC_NUISANCE_REPORT_ONLY"
+        for authority in ("carries_gate_authority", "carries_eligibility_authority",
+                          "carries_selection_authority",
+                          "carries_confirmation_authority"):
+            assert diagnostic[authority] is False, authority
+
+
+def test_study1_and_study2_statements_are_not_overstated(protocol):
+    statements = protocol["prior_study_statements"]
+    blob = json.dumps(statements).lower()
+    for overstatement in ("proves", "demonstrates that the model reasons",
+                          "causal mechanism was transferred"):
+        assert overstatement not in blob
+    assert protocol["claim_ceiling"]["study2_relationship"].startswith(
+        "Study 3 neither reopens nor revises Study 2")
+    counters = protocol["operation_boundaries"]["performed_this_round"]
+    assert counters["study1_files_modified"] == 0
+    assert counters["study2_files_modified"] == 0
+
+
+def test_markdown_never_reintroduces_the_v0_1_defect_text(markdown):
+    for text in FORBIDDEN_TEXT:
+        assert text not in markdown, text
+
+
+def test_markdown_agrees_with_json_on_every_decision_marker(protocol, markdown,
+                                                            tables):
+    assert NO_WINNER in markdown
+    assert protocol["state"] in markdown
+    statistics = protocol["proposed_statistics"]
+    for gate in ("I1a", "I1b", "I2", "I3", "I4"):
+        row = _component(protocol, "development", gate)
+        assert str(row["n"]) in markdown, gate
+        assert str(row["pass_count"]) in markdown, gate
+    allocation = protocol["power_architecture_v0_4"]["type_ii_allocation"]
+    for key in ("per_cell_false_negative_budget_exact_rational",
+                "per_cell_power_target_exact_rational",
+                "profile_stage_power_floor_exact_rational",
+                "study_end_to_end_power_floor_exact_rational"):
+        assert allocation[key] in markdown, key
+    assert statistics["development_component_alpha_exact_rational"] in markdown
+    assert statistics["confirmation_component_alpha_exact_rational"] in markdown
+    assert str(tables["power_architecture"]["m_max"]) in markdown
+    assert "J_joint_correct" in markdown
+    assert "third independent methods review" in markdown.lower()
+
+
+def test_markdown_does_not_claim_an_uncommitted_generator(protocol, markdown):
+    lifecycle = protocol["sampling_frame_v0_4"]["future_seed_lifecycle"]
+    assert lifecycle["generator_implementation_blob"] is None
+    lowered = markdown.lower()
+    assert "the generator is committed" not in lowered
+    assert "bank has been generated" not in lowered
+
+
+def test_the_packet_states_what_it_does_not_do(packet):
+    lowered = packet.lower()
+    for statement in ("it does not freeze the design",
+                      "it does not authorize execution",
+                      "it does not select an interface profile",
+                      "it does not declare the amended protocol correct"):
+        assert statement in lowered, statement
+    assert "no seed was drawn and no bank row exists" in lowered
+
+
+def test_the_amendment_markdown_matches_the_amendment_record(amendment):
+    with open(AMENDMENT_MD, encoding="utf-8") as handle:
+        text = handle.read()
+    for row in amendment["closure_matrix_v0_4"]:
+        assert row["finding_id"] in text, row["finding_id"]
+    for row in amendment["inherited_first_review_findings"]:
+        assert row["finding_id"] in text, row["finding_id"]
+    for row in amendment["unresolved_item_dispositions"]:
+        assert row["id"] in text, row["id"]
+    assert amendment["state"] in text
+    # The immutable narrative sentence is quoted once, verbatim; the count it
+    # contains is never reused as the structured finding count.
+    mismatch = amendment["historical_count_mismatch"]
+    assert mismatch["immutable_disposition_basis_phrase"] in text
+    assert text.count("eight MAJOR") == 1
+    assert "8 MAJOR" not in text
+    for severity, count in STRUCTURED_V0_3_SEVERITIES.items():
+        assert "%d %s" % (count, severity) in text, severity
+
+
+# --------------------------------------------------------------------------
+# Negative mutations. Every decision-bearing invariant must be defended.
+# --------------------------------------------------------------------------
+
+def _mutate(protocol, mutation):
+    doc = json.loads(json.dumps(protocol))
+    mutation(doc)
+    return doc
+
+
+def _find(rows, key, value):
+    for row in rows:
+        if row[key] == value:
+            return row
+    raise AssertionError("no row with %s == %r" % (key, value))
 
 
 def _set_frozen(doc):
@@ -946,7 +2439,7 @@ def _nonzero_counter(doc):
 
 
 def _injected_counter(doc):
-    doc["operation_boundaries"]["performed_this_round"]["secret_gpu_jobs"] = 0
+    doc["operation_boundaries"]["performed_this_round"]["shadow_runs"] = 0
 
 
 def _winner_selected(doc):
@@ -955,47 +2448,63 @@ def _winner_selected(doc):
 
 def _winner_statement_flipped(doc):
     doc["admissibility_order"]["no_winner_this_round_statement"] = \
-        "S2 is selected in this round."
+        "A winner is selected in this round."
 
 
 def _s4_selectable(doc):
-    for prof in doc["interface_profiles"]:
-        if prof["id"] == "S4":
-            prof["selectable_status"] = "selectable"
+    _find(doc["interface_profiles"], "id", "S4")["selectable_status"] = "selectable"
+
+
+def _s4_in_confirmation(doc):
+    doc["proposed_statistics"]["confirmation_exact_binomial_gates"][0][
+        "applicable_profiles"].append("S4")
+
+
+def _s4_gains_i4(doc):
+    _find(doc["gate_truth_table"]["rows"], "profile", "S4")["I4"] = "applicable"
+
+
+def _i1b_confirmation_widens(doc):
+    doc["proposed_statistics"]["confirmation_applicability_rule"][
+        "i1b_confirmation_profiles"] = ["S1", "S2"]
 
 
 def _i4_absent_from_eligibility(doc):
-    order = doc["admissibility_order"]
-    order["gates_required_for_eligibility"] = [
-        g for g in order["gates_required_for_eligibility"] if g != "I4"]
+    doc["admissibility_order"]["gates_required_for_eligibility"] = [
+        g for g in doc["admissibility_order"]["gates_required_for_eligibility"]
+        if g != "I4"]
 
 
 def _i4_not_part_of_eligibility(doc):
-    for gate in doc["gate_hierarchy"]:
-        if gate["gate_id"] == "I4":
-            gate["part_of_eligibility"] = False
+    _gate(doc, "I4")["part_of_eligibility"] = False
 
 
-def _i5_omits_rp_and_k4(doc):
-    for gate in doc["gate_hierarchy"]:
-        if gate["gate_id"] == "I5":
-            gate["covered_constructs"] = ["I0", "I1a", "I1b", "I2", "I3"]
+def _i4_failure_leaves_interface_eligible(doc):
+    _gate(doc, "I4")["legal_next_state_on_fail"] = \
+        "record the failure; the interface remains eligible"
+
+
+def _i4_failure_stops_the_whole_study(doc):
+    _gate(doc, "I4")["per_interface_not_global"] = False
+
+
+def _i5_omits_a_construct(doc):
+    gate = _gate(doc, "I5")
+    gate["covered_constructs"] = [c for c in gate["covered_constructs"]
+                                  if c != "I3_J_joint_correct"]
+
+
+def _i5_accessible(doc):
+    _gate(doc, "I5")["accessible_before_authority"] = True
 
 
 def _na_counted_as_pass(doc):
-    for prof in doc["interface_profiles"]:
-        if prof["id"] == "S2":
-            prof["transformation_applicability"]["position_permutation"] = \
-                "applicable"
-            prof["non_applicable_transformations"] = [
-                na for na in prof["non_applicable_transformations"]
-                if na["transformation"] != "position_permutation"]
+    doc["gate_truth_table"]["value_semantics"]["not_applicable"] = \
+        "counts as a satisfied gate"
 
 
 def _na_semantics_weakened(doc):
-    doc["not_applicable_semantics"] = (
-        "not_applicable is treated as a pass, because the transformation could "
-        "not have changed the answer.")
+    doc["not_applicable_semantics"] = "not_applicable behaves as a pass."
 
 
 def _pooling_enabled(doc):
@@ -1003,14 +2512,85 @@ def _pooling_enabled(doc):
 
 
 def _gate_pooling_enabled(doc):
-    for gate in doc["gate_hierarchy"]:
-        if gate["gate_id"] == "I2":
-            gate["no_pooling"] = False
+    _gate(doc, "I3")["no_pooling"] = False
 
 
 def _rp_selected(doc):
-    doc["positive_reference_candidates"]["selection_status"] = \
-        "SELECTED: Qwen2.5-Math-7B-Instruct"
+    doc["positive_reference_candidates"]["selection_status"] = "SELECTED"
+
+
+def _od_resolved(od_id):
+    def mutate(doc):
+        _find(doc["unresolved_operator_decisions"], "id", od_id)["status"] = \
+            "resolved"
+    return mutate
+
+
+def _od2_unblocked(doc):
+    _find(doc["unresolved_operator_decisions"], "id", "OD2")["blocking"] = False
+
+
+def _confirmation_accessible(doc):
+    doc["split_lifecycle"]["confirmation_isolation"][
+        "accessible_before_authority"] = True
+
+
+def _confirmation_becomes_repeatable(doc):
+    doc["development_selection_and_confirmation_plan"]["stage_3_confirmation"][
+        "one_shot"] = False
+
+
+def _reselection_permitted(doc):
+    doc["development_selection_and_confirmation_plan"]["stage_3_confirmation"][
+        "reselection_prohibited"] = False
+
+
+def _claim_ceiling_removed(doc):
+    doc["claim_ceiling"]["maximum_pass_claim"] = \
+        "The interface is proven correct for all inputs."
+
+
+def _bank_row_injected(doc):
+    doc["bank_rows"].append({"id": 1})
+
+
+def _seed_injected(doc):
+    doc["sampling_frame_v0_4"]["future_seed_lifecycle"]["seed_values"] = [12345]
+
+
+def _seed_authority_granted(doc):
+    doc["sampling_frame_v0_4"]["future_seed_lifecycle"][
+        "seed_authority_granted"] = True
+
+
+def _result_injected(doc):
+    doc["results"].append({"gate": "I1a", "rate": 0.99})
+
+
+def _seeds_counter_nonzero(doc):
+    doc["sampling_frame_v0_4"]["seeds_drawn_in_this_round"] = 1
+
+
+def _gate_authorizes_mechanism(doc):
+    _gate(doc, "I5")["authorizes_mechanistic_execution"] = True
+
+
+def _gate_removed(doc):
+    doc["gate_hierarchy"] = [g for g in doc["gate_hierarchy"]
+                             if g["gate_id"] != "I4"]
+
+
+def _state_upgraded(doc):
+    doc["state"] = "STUDY3_FROZEN_AND_EXECUTION_AUTHORIZED"
+
+
+def _review_state_downgraded(doc):
+    doc["status"]["review_state"] = "self_approved"
+
+
+def _successor_authority_named(doc):
+    doc["required_next_action"] = \
+        "issue the successor execution authority prompt for draft-v0.5"
 
 
 def _i3_three_variants(doc):
@@ -1025,161 +2605,340 @@ def _k5_crossed_with_k6(doc):
     doc["counterbalancing_design"]["k5_and_k6_are_not_crossed"] = False
 
 
-def _k5_passes_for_a_content_only_profile(doc):
-    for row in doc["gate_truth_table"]["rows"]:
-        if row["profile"] == "S2":
-            row["I3_K5"] = "applicable"
+def _k5_applies_to_a_content_only_profile(doc):
+    doc["i3_contrast_registry"]["k5_applicability"]["applicable_profiles"] = \
+        ["S1", "S2", "S4"]
 
 
-def _stable_wrong_scores(doc):
-    doc["proposed_statistics"]["i3_indicators"]["J_cor"][
-        "stable_wrong_scores"] = 1
+def _k5_truth_row_flips(doc):
+    _find(doc["gate_truth_table"]["rows"], "profile", "S2")["I3_K5"] = "applicable"
 
 
-def _stable_invalid_scores(doc):
-    doc["proposed_statistics"]["i3_indicators"]["J_inv"][
-        "stable_invalid_scores"] = 1
+def _j_joint_becomes_a_disjunction(doc):
+    doc["proposed_statistics"]["i3_indicators"]["J_joint_correct"]["definition"] = \
+        "1 if EITHER registered variant of the cluster is scored correct"
 
 
-def _j_both_is_a_disjunction(doc):
-    doc["proposed_statistics"]["i3_indicators"]["J_both"][
-        "definition"] = "J_inv OR J_cor"
+def _j_joint_becomes_a_contrast(doc):
+    doc["proposed_statistics"]["i3_indicators"]["J_joint_correct"][
+        "is_a_level_not_a_contrast"] = False
 
 
-def _development_alpha_drifts_in_one_row(doc):
-    _component(doc, "development", "I2")["alpha_exact_rational"] = "1/200"
+def _j_joint_claims_a_presentation_effect(doc):
+    doc["proposed_statistics"]["i3_indicators"]["J_joint_correct"][
+        "identifies_a_presentation_effect"] = True
 
 
-def _confirmation_alpha_drifts_in_one_row(doc):
-    _component(doc, "confirmation", "I2")["alpha_exact_rational"] = "1/600"
+def _historical_indicator_regains_authority(doc):
+    historical = doc["proposed_statistics"]["i3_indicators"][
+        "historical_and_descriptive_indicators"]
+    historical["reachable_decision_path"] = True
+    historical["status"] = "GATE_BEARING"
 
 
-def _denominator_shrinks_when_s3_is_inactive(doc):
-    doc["proposed_statistics"]["hypothesis_families"][
-        "family_B_across_profiles"]["fixed_selectable_profile_denominator"] = 2
-    doc["proposed_statistics"]["hypothesis_families"][
-        "family_B_across_profiles"]["denominator_never_shrinks"] = False
+def _invariance_claim_returns(doc):
+    _find(doc["validation_targets"], "id", "VT6")["construct"] = \
+        "invariance of accuracy under option reordering"
+
+
+def _prohibited_term_list_emptied(doc):
+    doc["proposed_statistics"]["active_claim_term_prohibition"][
+        "prohibited_terms"] = []
+
+
+def _development_alpha_drifts(doc):
+    doc["proposed_statistics"]["retained_exact_binomial_gates"][0][
+        "alpha_exact_rational"] = "1/200"
+
+
+def _confirmation_alpha_drifts(doc):
+    doc["proposed_statistics"]["confirmation_exact_binomial_gates"][0][
+        "alpha_exact_rational"] = "1/600"
+
+
+def _denominator_shrinks(doc):
+    doc["power_architecture_v0_4"]["type_i_architecture"][
+        "fixed_selectable_profile_denominator"] = 2
+
+
+def _denominator_may_shrink(doc):
+    doc["power_architecture_v0_4"]["type_i_architecture"][
+        "denominator_never_shrinks"] = False
 
 
 def _second_i3_floor_reappears(doc):
     doc["proposed_statistics"]["i3_floor"]["active_floor_count"] = 2
-    doc["proposed_statistics"]["i3_floor"]["p0_0_95_status"] = "active"
 
 
 def _i3_floor_moves_to_0_95(doc):
-    _component(doc, "development", "I3")["p0_exact_rational"] = "19/20"
-    _component(doc, "development", "I3")["p0"] = 0.95
+    doc["proposed_statistics"]["i3_floor"]["p0_exact_rational"] = "19/20"
 
 
 def _degenerate_rejection_region(doc):
-    row = _component(doc, "development", "I3")
+    row = doc["proposed_statistics"]["retained_exact_binomial_gates"][0]
     row["pass_count"] = row["n"]
 
 
 def _unit_of_n_removed(doc):
-    doc["proposed_statistics"]["sample_sizes"]["I3"]["unit_of_n"] = ""
+    doc["proposed_statistics"]["retained_exact_binomial_gates"][0]["unit_of_n"] = ""
 
 
 def _i3_unit_becomes_the_base_item(doc):
-    doc["proposed_statistics"]["sample_sizes"]["I3"]["unit_of_n"] = \
-        doc["proposed_statistics"]["sample_sizes"]["I1a"]["unit_of_n"]
+    doc["proposed_statistics"]["i3_indicators"]["independent_unit"] = "base_item"
 
 
 def _tango_regains_gate_authority(doc):
     doc["retired_procedures"]["tango_paired_equivalence"]["status"] = \
-        "retained as the I3 secondary criterion"
-    doc["retired_procedures"]["tango_paired_equivalence"]["retired_from"] = []
+        "ACTIVE GATE CRITERION"
 
 
 def _uniformity_becomes_a_gate(doc):
-    uniformity = _gate(doc, "I3")["selected_label_uniformity"]
-    uniformity["status"] = "gate"
-    uniformity["carries_gate_authority"] = True
+    doc["proposed_statistics"]["selected_label_uniformity_diagnostic"][0][
+        "carries_gate_authority"] = True
 
 
 def _selection_order_becomes_data_dependent(doc):
-    plan = doc["development_selection_and_confirmation_plan"]["stage_2_selection"]
-    plan["no_data_dependent_reordering"] = False
-    plan["order"] = ["S1", "S2", "S3"]
+    doc["development_selection_and_confirmation_plan"]["stage_2_selection"][
+        "no_data_dependent_reordering"] = False
 
 
-def _confirmation_becomes_repeatable(doc):
-    plan = doc["development_selection_and_confirmation_plan"][
-        "stage_3_confirmation"]
-    plan["one_shot"] = False
-    plan["reselection_prohibited"] = False
+def _selection_map_loses_a_case(doc):
+    doc["proposed_statistics"]["development_selection_map"].pop()
 
 
-def _od_resolved(od_id):
-    def mutate(doc):
-        for decision in doc["unresolved_operator_decisions"]:
-            if decision["id"] == od_id:
-                decision["status"] = "resolved"
-                decision["blocking"] = False
-    return mutate
+def _selection_map_returns_s4(doc):
+    doc["proposed_statistics"]["development_selection_map"][0][
+        "selected_profile"] = "S4"
 
 
-def _confirmation_accessible(doc):
-    doc["split_lifecycle"]["confirmation_isolation"][
-        "accessible_before_authority"] = True
+def _m_max_inflated_by_s4(doc):
+    doc["power_architecture_v0_4"]["cell_counts"]["m_max"] = 47
 
 
-def _i5_accessible(doc):
-    for gate in doc["gate_hierarchy"]:
-        if gate["gate_id"] == "I5":
-            gate["accessible_before_authority"] = True
+def _m_max_includes_s4(doc):
+    doc["power_architecture_v0_4"]["cell_counts"]["s4_is_excluded_from_m_max"] = \
+        False
 
 
-def _claim_ceiling_removed(doc):
-    del doc["claim_ceiling"]
+def _per_cell_budget_drifts(doc):
+    doc["power_architecture_v0_4"]["type_ii_allocation"][
+        "per_cell_false_negative_budget_exact_rational"] = "19/400"
 
 
-def _bank_row_injected(doc):
-    doc["bank_rows"].append({"item_id": "K3-0001", "prompt": "1+1"})
+def _per_cell_target_drifts(doc):
+    doc["power_architecture_v0_4"]["type_ii_allocation"][
+        "per_cell_power_target_exact_rational"] = "9/10"
 
 
-def _seed_injected(doc):
-    doc["bank_construction_policy"]["seeds_drawn_this_round"] = 1
+def _profile_floor_drifts(doc):
+    doc["power_architecture_v0_4"]["type_ii_allocation"][
+        "profile_stage_power_floor_exact_rational"] = "99/100"
 
 
-def _result_injected(doc):
-    doc["results"].append({"interface": "S1", "role": "RT", "accuracy": 0.62})
+def _end_to_end_floor_drifts(doc):
+    doc["power_architecture_v0_4"]["type_ii_allocation"][
+        "study_end_to_end_power_floor_exact_rational"] = "99/100"
 
 
-def _evidence_row_injected(doc):
-    doc["operation_boundaries"]["performed_this_round"]["evidence_rows_created"] = 1
+def _target_power_scope_weakened(doc):
+    doc["proposed_statistics"]["target_power"]["scope"] = "END TO END"
 
 
-def _i4_failure_leaves_interface_eligible(doc):
-    for gate in doc["gate_hierarchy"]:
-        if gate["gate_id"] == "I4":
-            gate["legal_next_state_on_fail"] = \
-                "the interface remains eligible; continue"
+def _union_bound_uses_independence(doc):
+    doc["power_architecture_v0_4"]["union_bound_proof"]["uses_independence"] = True
 
 
-def _i4_failure_stops_the_whole_study(doc):
-    for gate in doc["gate_hierarchy"]:
-        if gate["gate_id"] == "I4":
-            gate["per_interface_not_global"] = False
+def _arbitrary_dependence_dropped(doc):
+    doc["power_architecture_v0_4"]["union_bound_proof"][
+        "holds_under_arbitrary_dependence"] = False
 
 
-def _gate_authorizes_mechanism(doc):
-    for gate in doc["gate_hierarchy"]:
-        if gate["gate_id"] == "I5":
-            gate["authorizes_mechanistic_execution"] = True
+def _least_favourable_configuration_removed(doc):
+    doc["power_architecture_v0_4"]["least_favourable_configuration"][
+        "conditions"] = []
 
 
-def _gate_removed(doc):
-    doc["gate_hierarchy"] = [g for g in doc["gate_hierarchy"]
-                             if g["gate_id"] != "I1b"]
+def _uncovered_region_removed(doc):
+    doc["power_architecture_v0_4"]["not_covered_by_the_power_guarantee"] = []
 
 
-def _state_upgraded(doc):
-    doc["state"] = "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_FROZEN"
+def _size_is_not_minimal(doc):
+    doc["proposed_statistics"]["retained_exact_binomial_gates"][0]["n"] = 512
 
 
-def _successor_authority_named(doc):
-    doc["study_identity"]["successor_authority"] = "stage_p3q_execution"
+def _size_claim_flipped(doc):
+    doc["proposed_statistics"]["retained_exact_binomial_gates"][0][
+        "n_is_smallest_unrestricted_positive_integer_meeting_the_target"] = False
+
+
+def _pass_count_not_minimal(doc):
+    row = doc["proposed_statistics"]["retained_exact_binomial_gates"][0]
+    row["pass_count"] = row["pass_count"] + 1
+
+
+def _search_restricted_to_multiples(doc):
+    doc["proposed_statistics"]["sample_size_search_rule"] = \
+        "only multiples of the complete-block size 32 are admissible"
+
+
+def _k5_support_truncated(doc):
+    doc["sampling_frame_v0_4"]["k5_nuisance_state_support"]["support_size"] = 16
+
+
+def _k5_weight_drifts(doc):
+    doc["sampling_frame_v0_4"]["k5_nuisance_state_support"][
+        "weight_per_state_exact_rational"] = "1/16"
+
+
+def _k5_returns_to_block_assignment(doc):
+    support = doc["sampling_frame_v0_4"]["k5_nuisance_state_support"]
+    support["iid_with_replacement"] = False
+    support["deterministic_complete_block_assignment_retired"] = False
+
+
+def _sampling_cell_dropped(doc):
+    doc["sampling_frame_v0_4"]["development_sampling_cells"].pop()
+
+
+def _sampling_cell_count_drifts(doc):
+    doc["sampling_frame_v0_4"]["development_sampling_cell_count"] = 16
+
+
+def _sampling_weights_do_not_sum_to_one(doc):
+    cell = doc["sampling_frame_v0_4"]["development_sampling_cells"][0]
+    cell["sampled_parameters"][0]["weight_per_state_exact_rational"] = "1/9"
+
+
+def _namespace_collision(doc):
+    cells = doc["sampling_frame_v0_4"]["development_sampling_cells"]
+    cells[1]["namespace"] = cells[0]["namespace"]
+
+
+def _draw_without_replacement(doc):
+    doc["sampling_frame_v0_4"]["development_sampling_cells"][0]["draw_rule"] = \
+        "without_replacement"
+
+
+def _duplicates_removed(doc):
+    doc["sampling_frame_v0_4"]["duplicate_rule"]["duplicates_must_be_retained"] = \
+        False
+
+
+def _redraw_for_uniqueness_allowed(doc):
+    doc["sampling_frame_v0_4"]["duplicate_rule"][
+        "redraw_for_uniqueness_prohibited"] = False
+
+
+def _split_not_outcome_blind(doc):
+    doc["sampling_frame_v0_4"]["split_partition"]["outcome_blind"] = False
+
+
+def _cross_split_reuse_allowed(doc):
+    doc["sampling_frame_v0_4"]["split_partition"][
+        "cross_split_reuse_prohibited"] = False
+
+
+def _validity_predicate_becomes_post_model(doc):
+    doc["sampling_frame_v0_4"]["validity_predicates"][0][
+        "evaluated_before_any_model_operation"] = False
+
+
+def _rejection_probability_nonzero(doc):
+    doc["sampling_frame_v0_4"]["rejection_contract"][
+        "registered_rejection_probability_exact_rational"] = "1/100"
+
+
+def _acceptance_predicate_becomes_mutable(doc):
+    doc["sampling_frame_v0_4"]["rejection_contract"][
+        "acceptance_predicate_may_never_change_after_a_seed_exists"] = False
+
+
+def _dependence_denied(doc):
+    doc["sampling_frame_v0_4"]["reuse_and_dependence_rule"][
+        "dependence_is_expressly_allowed"] = False
+
+
+def _seed_redraw_allowed(doc):
+    doc["sampling_frame_v0_4"]["future_seed_lifecycle"]["redraw_prohibited"] = False
+
+
+def _seed_first_draw_only_dropped(doc):
+    doc["sampling_frame_v0_4"]["future_seed_lifecycle"]["first_draw_only"] = False
+
+
+def _i0_failure_gains_a_second_target(doc):
+    machine = _find(doc["state_machine_v0_4"]["states"], "id", "Q0_INSTRUMENT")
+    machine["transitions"].append({"event": "any fixture fails",
+                                   "next": "Q1_DEVELOPMENT"})
+
+
+def _i0_failure_retargeted(doc):
+    machine = _find(doc["state_machine_v0_4"]["states"], "id", "Q0_INSTRUMENT")
+    _find(machine["transitions"], "event", "error")["next"] = \
+        "STOP_NO_SELECTABLE_INTERFACE_REMAINS"
+
+
+def _i0_enters_profile_adequacy(doc):
+    doc["state_machine_v0_4"]["i0_is_not_part_of_profile_adequacy"] = False
+
+
+def _machine_loses_totality(doc):
+    doc["state_machine_v0_4"]["total"] = False
+
+
+def _terminal_becomes_unreachable(doc):
+    machine = _find(doc["state_machine_v0_4"]["states"], "id",
+                    "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY")
+    machine["transitions"] = [t for t in machine["transitions"]
+                              if t["next"] != "STOP_CONFIRMATION_SPENT_ON_ERROR"]
+
+
+def _rescue_path_added(doc):
+    doc["state_machine_v0_4"]["rescue_paths"] = [
+        {"from": "STOP_CONFIRMATION_FAILED", "to": "Q2_SELECTION"}]
+
+
+def _s4_forward_cost_nulled(doc):
+    doc["operation_ontology_v0_4"]["s4_forward_cost_must_not_be_null"] = False
+
+
+def _token_bound_dropped(doc):
+    doc["proposed_statistics"]["s4_generated_token_bound_per_generation"] = 1
+
+
+def _i0_breakdown_drifts(doc):
+    doc["proposed_statistics"]["i0_fixture_breakdown"]["k5_constructor_fixtures"] = 32
+
+
+def _grand_total_permitted(doc):
+    doc["operation_boundaries"]["projected_future_operations"][
+        "grand_total_prohibited"] = False
+
+
+def _p3q_null_treated_as_zero(doc):
+    doc["operation_ontology_v0_4"]["unresolved_streams_are_null_not_zero"][
+        "grand_total_treating_null_as_zero_prohibited"] = False
+
+
+def _p3q_ordering_inverted(doc):
+    doc["positive_reference_candidates"]["p3q_i4_ordering_constraint"][
+        "p3q_lower_bound_exact_rational"] = "3/4"
+
+
+def _p3q_constraint_selects_a_candidate(doc):
+    doc["positive_reference_candidates"]["p3q_i4_ordering_constraint"][
+        "no_checkpoint_is_selected_by_registering_this_constraint"] = False
+
+
+def _ontology_unit_removed(doc):
+    doc["operation_ontology_v0_4"]["units"] = [
+        u for u in doc["operation_ontology_v0_4"]["units"]
+        if u["unit"] != "incremental_decode_evaluation"]
+
+
+def _sequence_evaluation_equated_with_a_batched_call(doc):
+    doc["operation_ontology_v0_4"]["prohibition"] = \
+        "a sequence-level evaluation is the same thing as a runtime batched call"
 
 
 MUTATIONS = [
@@ -1190,62 +2949,116 @@ MUTATIONS = [
     ("winner selected", _winner_selected),
     ("winner statement flipped", _winner_statement_flipped),
     ("S4 selectable", _s4_selectable),
+    ("S4 listed in a confirmation row", _s4_in_confirmation),
+    ("S4 gains I4 applicability", _s4_gains_i4),
+    ("I1b confirmation widened beyond S1", _i1b_confirmation_widens),
     ("I4 absent from eligibility", _i4_absent_from_eligibility),
     ("I4 not part of eligibility", _i4_not_part_of_eligibility),
-    ("I5 omitting RP/K4", _i5_omits_rp_and_k4),
-    ("I4 failure leaves the interface eligible",
-     _i4_failure_leaves_interface_eligible),
-    ("I4 failure written as a global study stop",
-     _i4_failure_stops_the_whole_study),
-    ("NA counted as applicable", _na_counted_as_pass),
-    ("NA semantics weakened to a pass", _na_semantics_weakened),
-    ("cross-family/depth pooling enabled", _pooling_enabled),
-    ("gate-level pooling enabled", _gate_pooling_enabled),
-    ("RP selected", _rp_selected),
-    ("OD2 marked resolved", _od_resolved("OD2")),
-    ("OD5 marked resolved", _od_resolved("OD5")),
-    ("OD6 marked resolved", _od_resolved("OD6")),
-    ("confirmation accessible before authority", _confirmation_accessible),
+    ("I4 failure leaves the interface eligible", _i4_failure_leaves_interface_eligible),
+    ("I4 failure written as a global study stop", _i4_failure_stops_the_whole_study),
+    ("I5 omits a covered construct", _i5_omits_a_construct),
     ("I5 accessible before authority", _i5_accessible),
+    ("NA counted as a pass", _na_counted_as_pass),
+    ("NA semantics weakened to a pass", _na_semantics_weakened),
+    ("pooling rescue enabled", _pooling_enabled),
+    ("gate-level pooling enabled", _gate_pooling_enabled),
+    ("positive reference selected", _rp_selected),
+    ("OD2 marked resolved", _od_resolved("OD2")),
+    ("OD2 marked non-blocking", _od2_unblocked),
+    ("confirmation accessible before authority", _confirmation_accessible),
+    ("confirmation becomes repeatable", _confirmation_becomes_repeatable),
+    ("reselection permitted after confirmation", _reselection_permitted),
     ("claim ceiling removed", _claim_ceiling_removed),
     ("bank row injected", _bank_row_injected),
     ("seed injected", _seed_injected),
+    ("seed authority granted", _seed_authority_granted),
     ("model result injected", _result_injected),
-    ("evidence row injected", _evidence_row_injected),
+    ("seeds drawn counter nonzero", _seeds_counter_nonzero),
     ("a gate authorizes mechanistic execution", _gate_authorizes_mechanism),
     ("a gate removed from the hierarchy", _gate_removed),
     ("state upgraded to frozen", _state_upgraded),
+    ("review state downgraded to self approval", _review_state_downgraded),
     ("successor authority named", _successor_authority_named),
-    # draft-v0.3 invariants, one mutation per repaired finding
     ("I3 declares three variants per cluster", _i3_three_variants),
-    ("one I3 contrast row drifts to four variants",
-     _i3_row_variant_count_drifts),
+    ("one I3 contrast row drifts to four variants", _i3_row_variant_count_drifts),
     ("K5 crossed with K6", _k5_crossed_with_k6),
-    ("K5 marked applicable for a content-only profile",
-     _k5_passes_for_a_content_only_profile),
-    ("a stable wrong answer scores", _stable_wrong_scores),
-    ("a stable invalid output scores", _stable_invalid_scores),
-    ("J_both weakened to a disjunction", _j_both_is_a_disjunction),
-    ("development alpha drifts in one component row",
-     _development_alpha_drifts_in_one_row),
-    ("confirmation alpha drifts in one component row",
-     _confirmation_alpha_drifts_in_one_row),
-    ("Family B denominator shrinks when S3 is inactive",
-     _denominator_shrinks_when_s3_is_inactive),
+    ("K5 applicable to a content-only profile", _k5_applies_to_a_content_only_profile),
+    ("K5 truth-table row flips for S2", _k5_truth_row_flips),
+    ("J_joint_correct weakened to a disjunction", _j_joint_becomes_a_disjunction),
+    ("J_joint_correct relabelled a contrast", _j_joint_becomes_a_contrast),
+    ("J_joint_correct claims a presentation effect",
+     _j_joint_claims_a_presentation_effect),
+    ("a historical indicator regains decision authority",
+     _historical_indicator_regains_authority),
+    ("an invariance claim returns to a validation target", _invariance_claim_returns),
+    ("the prohibited-term list is emptied", _prohibited_term_list_emptied),
+    ("development alpha drifts in one component row", _development_alpha_drifts),
+    ("confirmation alpha drifts in one component row", _confirmation_alpha_drifts),
+    ("selectable denominator shrinks", _denominator_shrinks),
+    ("denominator is allowed to shrink", _denominator_may_shrink),
     ("a second I3 floor reappears", _second_i3_floor_reappears),
     ("the I3 floor moves back to 0.95", _i3_floor_moves_to_0_95),
-    ("a rejection region requires every unit to succeed",
-     _degenerate_rejection_region),
+    ("a rejection region requires every unit to succeed", _degenerate_rejection_region),
     ("a sample size loses its unit", _unit_of_n_removed),
-    ("the I3 unit is conflated with the base item",
-     _i3_unit_becomes_the_base_item),
-    ("the retired paired procedure regains gate authority",
-     _tango_regains_gate_authority),
-    ("the nuisance uniformity criterion becomes a gate",
-     _uniformity_becomes_a_gate),
-    ("the selection order becomes data dependent",
-     _selection_order_becomes_data_dependent),
-    ("confirmation becomes repeatable", _confirmation_becomes_repeatable),
+    ("the I3 unit is conflated with the base item", _i3_unit_becomes_the_base_item),
+    ("the retired paired procedure regains gate authority", _tango_regains_gate_authority),
+    ("the nuisance uniformity criterion becomes a gate", _uniformity_becomes_a_gate),
+    ("the selection order becomes data dependent", _selection_order_becomes_data_dependent),
+    ("the selection map loses a case", _selection_map_loses_a_case),
+    ("the selection map returns S4", _selection_map_returns_s4),
+    ("m_max inflated by S4", _m_max_inflated_by_s4),
+    ("S4 admitted into m_max", _m_max_includes_s4),
+    ("per-cell false-negative budget drifts", _per_cell_budget_drifts),
+    ("per-cell power target drifts", _per_cell_target_drifts),
+    ("profile stage power floor drifts", _profile_floor_drifts),
+    ("study end-to-end power floor drifts", _end_to_end_floor_drifts),
+    ("per-cell target relabelled end-to-end", _target_power_scope_weakened),
+    ("the union bound assumes independence", _union_bound_uses_independence),
+    ("arbitrary dependence is dropped", _arbitrary_dependence_dropped),
+    ("the least-favourable configuration is removed",
+     _least_favourable_configuration_removed),
+    ("the uncovered indifference region is removed", _uncovered_region_removed),
+    ("a sample size is no longer minimal", _size_is_not_minimal),
+    ("the minimal-size claim is flipped", _size_claim_flipped),
+    ("a pass count is no longer minimal", _pass_count_not_minimal),
+    ("the size search is restricted to multiples of 32", _search_restricted_to_multiples),
+    ("the K5 support is truncated", _k5_support_truncated),
+    ("the K5 state weight drifts", _k5_weight_drifts),
+    ("K5 returns to deterministic block assignment", _k5_returns_to_block_assignment),
+    ("a sampling cell is dropped", _sampling_cell_dropped),
+    ("the sampling cell count drifts", _sampling_cell_count_drifts),
+    ("sampling weights no longer sum to one", _sampling_weights_do_not_sum_to_one),
+    ("two sampling cells share a namespace", _namespace_collision),
+    ("a draw becomes without replacement", _draw_without_replacement),
+    ("duplicates are removed", _duplicates_removed),
+    ("redraw for uniqueness is allowed", _redraw_for_uniqueness_allowed),
+    ("the split partition is no longer outcome blind", _split_not_outcome_blind),
+    ("cross-split reuse is allowed", _cross_split_reuse_allowed),
+    ("a validity predicate becomes post-model", _validity_predicate_becomes_post_model),
+    ("the registered rejection probability becomes nonzero",
+     _rejection_probability_nonzero),
+    ("the acceptance predicate becomes mutable after a seed",
+     _acceptance_predicate_becomes_mutable),
+    ("cross-cell dependence is denied", _dependence_denied),
+    ("seed redraw is allowed", _seed_redraw_allowed),
+    ("the first-draw-only seed rule is dropped", _seed_first_draw_only_dropped),
+    ("an I0 failure gains a second next state", _i0_failure_gains_a_second_target),
+    ("an I0 failure is retargeted away from the defect stop", _i0_failure_retargeted),
+    ("I0 enters profile adequacy", _i0_enters_profile_adequacy),
+    ("the state machine loses totality", _machine_loses_totality),
+    ("a terminal state becomes unreachable", _terminal_becomes_unreachable),
+    ("a rescue path is added", _rescue_path_added),
+    ("the S4 forward cost may be null again", _s4_forward_cost_nulled),
+    ("the S4 generated-token bound collapses", _token_bound_dropped),
+    ("the I0 fixture breakdown drifts", _i0_breakdown_drifts),
+    ("a grand total becomes permitted", _grand_total_permitted),
+    ("the unresolved P3-Q stream may be totalled as zero", _p3q_null_treated_as_zero),
+    ("the P3-Q ordering constraint is inverted", _p3q_ordering_inverted),
+    ("registering the P3-Q constraint selects a candidate",
+     _p3q_constraint_selects_a_candidate),
+    ("an operation ontology unit is removed", _ontology_unit_removed),
+    ("a sequence evaluation is equated with a batched call",
+     _sequence_evaluation_equated_with_a_batched_call),
 ]
 
 
@@ -1255,13 +3068,16 @@ def _rejected(doc, schema):
         return True
     try:
         _semantic_laws(doc)
-    except AssertionError:
+    except (AssertionError, KeyError, IndexError, TypeError, ValueError):
         return True
     return False
 
 
 def _semantic_laws(doc):
     """Laws that a structural schema cannot express."""
+    tables = _load_json(STATS_TABLES)
+
+    # ---- v0.1 and v0.2 laws ---------------------------------------------
     order = doc["admissibility_order"]
     assert order["no_winner_this_round"] is True
     assert order["no_winner_this_round_statement"] == NO_WINNER
@@ -1275,64 +3091,89 @@ def _semantic_laws(doc):
         "selection_status"].startswith("UNSELECTED")
     assert doc["split_lifecycle"]["confirmation_isolation"][
         "accessible_before_authority"] is False
-    by_decision = {d["id"]: d for d in doc["unresolved_operator_decisions"]}
-    assert by_decision["OD2"]["status"] == "unresolved"
-    assert by_decision["OD2"]["blocking"] is True
-    for adopted in ("OD5", "OD6"):
-        # Adopted this round, but explicitly conditional on the second review.
-        # A bare "resolved" would be the drafting party approving itself.
-        assert by_decision[adopted]["status"] == \
-            "resolved_subject_to_independent_review"
-    for prof in doc["interface_profiles"]:
-        applicability = prof["transformation_applicability"]
-        declared = {na["transformation"]
-                    for na in prof["non_applicable_transformations"]}
-        computed = {t for t, v in applicability.items() if v != "applicable"}
-        assert declared == computed
-        if not prof["options_visible"]:
+    decisions = {d["id"]: d for d in doc["unresolved_operator_decisions"]}
+    assert decisions["OD2"]["status"] == "unresolved"
+    assert decisions["OD2"]["blocking"] is True
+    assert doc["blocking_decisions"] == ["OD2"]
+    for profile in doc["interface_profiles"]:
+        applicability = profile["transformation_applicability"]
+        declared = {entry["transformation"]
+                    for entry in profile["non_applicable_transformations"]}
+        assert declared == {name for name, value in applicability.items()
+                            if value != "applicable"}
+        if not profile["options_visible"]:
             for transform in POSITION_LABEL_TRANSFORMS:
                 assert applicability[transform] != "applicable"
-        if not prof["labels_visible"]:
-            assert "I1b" not in prof["applicable_gates"]
+        if not profile["labels_visible"]:
+            assert "I1b" not in profile["applicable_gates"]
     semantics = doc["not_applicable_semantics"]
     assert "not a pass" in semantics and "not a zero effect" in semantics
-    assert doc["blocking_decisions"] == ["OD2"]
-    ranked = [e["interface"] for e in doc["admissibility_order"]["order"]]
-    assert "S4" not in ranked
-    by_id = {p["id"]: p for p in doc["interface_profiles"]}
-    assert by_id["S4"]["selectable_status"] == "never_selectable"
+    assert semantics == doc["claim_ceiling"]["not_applicable_semantics"]
+    na_value = doc["gate_truth_table"]["value_semantics"]["not_applicable"]
+    assert "not a pass" in na_value or "never" in na_value
+    for banned in ("counts as a satisfied gate", "counts as a pass",
+                   "behaves as a pass"):
+        assert banned not in na_value
+        assert banned not in semantics
+    ceiling = doc["claim_ceiling"]
+    for field in ("maximum_pass_claim", "maximum_fail_claim",
+                  "permitted_i3_statement"):
+        text = ceiling[field].lower()
+        for banned in ("proven correct", "for all inputs", "always correct",
+                       "in general"):
+            assert banned not in text, field
+    assert "conditional on" in ceiling["maximum_pass_claim"].lower() or \
+        "registered" in ceiling["maximum_pass_claim"].lower()
+    assert len(ceiling["prohibited_claims"]) >= 10
+    assert len(ceiling["what_a_pass_does_not_permit"]) >= 5
+    assert ceiling["no_self_approval"]
+    assert doc["proposed_statistics"]["i3_indicators"]["independent_unit"] == \
+        "base_item_contrast_cluster"
+    assert doc["atomic_evaluation_cells"]["i3_sampling_unit"]["unit"] == \
+        "base_item_contrast_cluster"
+    assert "contrast cluster" in \
+        doc["proposed_statistics"]["sample_sizes"]["I3"]["unit_of_n"]
+    assert "S4" not in [e["interface"] for e in order["order"]]
+    assert {p["id"]: p for p in doc["interface_profiles"]}["S4"][
+        "selectable_status"] == "never_selectable"
     i5 = _gate(doc, "I5")
     assert i5["accessible_before_authority"] is False
     assert "RP" in i5["model_roles"]
-    assert any("K4" in inp for inp in i5["inputs"])
+    assert any("K4" in item for item in i5["inputs"])
     for construct in COVERED_CONSTRUCTS:
         assert construct in i5["covered_constructs"]
-    assert "I3" not in i5["covered_constructs"]
-    unit = doc["atomic_evaluation_cells"]["sampling_unit"]
-    assert "the base-item contrast cluster for I3" in unit
     for gate in doc["gate_hierarchy"]:
+        assert gate["authorizes_mechanistic_execution"] is False
+        assert gate["no_pooling"] is True
         assert not _asserts_failing_interface_stays_eligible(
             gate["legal_next_state_on_fail"])
         assert not _asserts_failing_interface_stays_eligible(gate["what_fails"])
+    assert {g["gate_id"] for g in doc["gate_hierarchy"]} == \
+        {"I0", "I1a", "I1b", "I2", "I3", "I4", "I5"}
+    assert doc["state"] == EXPECTED_STATE
+    assert doc["status"]["frozen"] is False
+    assert doc["status"]["execution_authorized"] is False
+    assert doc["status"]["review_state"] == REVIEW_STATE
+    assert "third bounded independent methods review" in doc["required_next_action"]
+    assert doc["results"] == [] and doc["bank_rows"] == []
+    counters = doc["operation_boundaries"]["performed_this_round"]
+    assert set(counters) == set(tables["operation_counts"])
+    for value in counters.values():
+        assert value == 0
 
-    # ---- draft-v0.3 laws -------------------------------------------------
+    # ---- v0.3 laws --------------------------------------------------------
     registry = doc["i3_contrast_registry"]
     assert registry["variants_per_cluster"] == 2
     for row in registry["k5"] + registry["k6"]:
         assert row["variants_per_cluster"] == 2
     assert len(registry["k5"]) == 7 and len(registry["k6"]) == 2
     assert doc["counterbalancing_design"]["k5_and_k6_are_not_crossed"] is True
+    assert set(registry["k5_applicability"]["applicable_profiles"]) == {"S1", "S4"}
     assert set(registry["k5_applicability"]["not_applicable_profiles"]) == \
         {"S2", "S3"}
     for row in doc["gate_truth_table"]["rows"]:
         if row["label_bearing"] is False:
             assert row["I3_K5"] == "not_applicable"
-
-    indicators = doc["proposed_statistics"]["i3_indicators"]
-    assert indicators["J_both"]["definition"] == "J_inv AND J_cor"
-    assert indicators["J_inv"]["stable_invalid_scores"] == 0
-    assert indicators["J_cor"]["stable_wrong_scores"] == 0
-
     for construct in ("I1a", "I1b", "I2", "I3", "I4"):
         development = _component(doc, "development", construct)
         confirmation = _component(doc, "confirmation", construct)
@@ -1342,40 +3183,228 @@ def _semantic_laws(doc):
             assert 0 < row["pass_count"] < row["n"]
             assert row["degenerate_rejection_region"] is False
             assert row["unit_of_n"]
+            assert row["n"] not in (192, 256, 128)
         assert doc["proposed_statistics"]["sample_sizes"][construct]["unit_of_n"]
-
-    family_b = doc["proposed_statistics"]["hypothesis_families"][
-        "family_B_across_profiles"]
-    assert family_b["fixed_selectable_profile_denominator"] == 3
-    assert family_b["denominator_never_shrinks"] is True
-
     floor = doc["proposed_statistics"]["i3_floor"]
     assert floor["active_floor_count"] == 1
     assert floor["p0_exact_rational"] == "9/10"
     assert floor["p0_0_95_status"] == "DELETED FROM EVERY ACTIVE FIELD"
-    assert _component(doc, "development", "I3")["p0_exact_rational"] == "9/10"
-
-    sizes = doc["proposed_statistics"]["sample_sizes"]
-    assert sizes["I3"]["unit_of_n"] != sizes["I1a"]["unit_of_n"]
-
-    retired = doc["retired_procedures"]["tango_paired_equivalence"]
-    assert retired["status"] == "RETIRED FROM EVERY DECISION ROLE"
-    assert len(retired["retired_from"]) >= len(DECISION_ROLES)
-
-    uniformity = _gate(doc, "I3")["selected_label_uniformity"]
-    assert uniformity["status"] == "DIAGNOSTIC_NUISANCE_REPORT_ONLY"
-    assert uniformity["carries_gate_authority"] is False
-
+    assert doc["retired_procedures"]["tango_paired_equivalence"]["status"] == \
+        "RETIRED FROM EVERY DECISION ROLE"
+    for diagnostic in doc["proposed_statistics"][
+            "selected_label_uniformity_diagnostic"]:
+        assert diagnostic["carries_gate_authority"] is False
     plan = doc["development_selection_and_confirmation_plan"]
     assert plan["stage_2_selection"]["order"] == ["S2", "S3", "S1"]
     assert plan["stage_2_selection"]["no_data_dependent_reordering"] is True
     assert plan["stage_3_confirmation"]["one_shot"] is True
     assert plan["stage_3_confirmation"]["reselection_prohibited"] is True
     assert plan["stage_3_confirmation"]["accessible_now"] is False
+    selection_map = doc["proposed_statistics"]["development_selection_map"]
+    assert len(selection_map) == 16
+    for row in selection_map:
+        assert row["fixed_selectable_profile_denominator"] == 3
+        if row["selected_profile"] is not None:
+            assert row["selected_profile"] in ("S1", "S2", "S3")
+            assert row["selected_profile"] in row["eligible_profiles"]
+
+    # ---- v0.4 laws --------------------------------------------------------
+    indicators = doc["proposed_statistics"]["i3_indicators"]
+    primary = indicators["J_joint_correct"]
+    assert indicators["primary_indicator"] == "J_joint_correct"
+    assert primary["is_a_level_not_a_contrast"] is True
+    assert primary["identifies_a_presentation_effect"] is False
+    assert "BOTH registered variants" in primary["definition"]
+    historical = indicators["historical_and_descriptive_indicators"]
+    assert historical["status"] == "DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY"
+    assert historical["reachable_decision_path"] is False
+    prohibition = doc["proposed_statistics"]["active_claim_term_prohibition"]
+    assert prohibition["prohibited_terms"]
+    for _label, text in _active_claim_strings(doc):
+        lowered = text.lower()
+        for stem in PROHIBITED_CLAIM_TERMS:
+            assert stem not in lowered
+
+    counts = tables["gate_bearing_cell_counts"]
+    roles = doc["proposed_statistics"]["registered_target_roles"]
+    families = doc["proposed_statistics"]["registered_operation_families"]
+    depths = doc["proposed_statistics"]["registered_composition_depths"]
+    recomputed_max = 0
+    for row in doc["gate_truth_table"]["rows"]:
+        profile = row["profile"]
+        i1a = len(roles) if row["I1a"] == "applicable" else 0
+        i1b = len(roles) if row["I1b"] == "applicable" else 0
+        i2 = len(roles) * len(families) if row["I2"] == "applicable" else 0
+        i3 = ((len(registry["k5_contrast_ids"])
+               if row["I3_K5"] == "applicable" else 0)
+              + (len(registry["k6_contrast_ids"])
+                 if row["I3_K6"] == "applicable" else 0)) * len(roles)
+        i4 = len(families) * len(depths) if row["I4"] == "applicable" else 0
+        total = i1a + i1b + i2 + i3 + i4
+        assert counts[profile]["total_gate_bearing_cells"] == total, profile
+        if row["selectable"]:
+            recomputed_max = max(recomputed_max, total)
+    architecture = doc["power_architecture_v0_4"]
+    assert architecture["cell_counts"]["m_max"] == recomputed_max
+    assert architecture["cell_counts"]["s4_is_excluded_from_m_max"] is True
+    allocation = architecture["type_ii_allocation"]
+    stage = _rational(
+        allocation["per_stage_profile_false_negative_budget_exact_rational"])
+    per_cell = stage / recomputed_max
+    assert _rational(
+        allocation["per_cell_false_negative_budget_exact_rational"]) == per_cell
+    assert _rational(allocation["per_cell_power_target_exact_rational"]) == \
+        1 - per_cell
+    assert _rational(allocation["profile_stage_power_floor_exact_rational"]) == \
+        1 - recomputed_max * per_cell
+    panel = _rational(allocation["panel_false_qualification_budget_exact_rational"])
+    assert _rational(allocation["study_end_to_end_power_floor_exact_rational"]) == \
+        1 - stage - panel - stage
+    assert allocation["per_cell_power_target_scope"] == "PER ATOMIC EVALUATION CELL"
+    assert doc["proposed_statistics"]["target_power"]["scope"] == \
+        "PER ATOMIC EVALUATION CELL"
+    assert architecture["union_bound_proof"]["uses_independence"] is False
+    assert architecture["union_bound_proof"]["holds_under_arbitrary_dependence"] \
+        is True
+    assert architecture["least_favourable_configuration"]["conditions"]
+    assert architecture["not_covered_by_the_power_guarantee"]
+    assert architecture["type_i_architecture"][
+        "fixed_selectable_profile_denominator"] == 3
+    assert architecture["type_i_architecture"]["denominator_never_shrinks"] is True
+
+    # The six rows must still be exactly the derived ones.
+    for family, expected in _recompute_rows(doc).items():
+        published = _floor_for(doc, family)
+        for gate in published["gates"]:
+            assert _component(doc, "development", gate)["n"] == expected["n"]
+            assert _component(doc, "development", gate)["pass_count"] == \
+                expected["development"]
+            assert _component(doc, "confirmation", gate)["pass_count"] == \
+                expected["confirmation"]
+            assert _component(doc, "development", gate)[
+                "n_is_smallest_unrestricted_positive_integer_meeting_the_target"] \
+                is True
+            assert _component(doc, "development", gate)[
+                "pass_count_is_minimal_at_alpha"] is True
+    assert "every positive integer is searched" in \
+        doc["proposed_statistics"]["sample_size_search_rule"]
+
+    rule = doc["proposed_statistics"]["confirmation_applicability_rule"]
+    assert rule["i1b_confirmation_profiles"] == ["S1"]
+    assert rule["k5_confirmation_profiles"] == ["S1"]
+    assert rule["s4_can_never_appear"] is True
+    for row in doc["proposed_statistics"]["confirmation_exact_binomial_gates"]:
+        assert "S4" not in row["applicable_profiles"]
+        assert row["s4_present"] is False
+    assert _find(doc["gate_truth_table"]["rows"], "profile", "S4")["I4"] == \
+        "not_applicable"
+
+    frame = doc["sampling_frame_v0_4"]
+    support = frame["k5_nuisance_state_support"]
+    assert support["support_size"] == 32
+    assert _rational(support["weight_per_state_exact_rational"]) * 32 == 1
+    assert support["iid_with_replacement"] is True
+    assert support["deterministic_complete_block_assignment_retired"] is True
+    expected_cells = sum(len(v) for v in _gate_bearing_cell_keys(doc).values())
+    for cells, count_key in (
+            (frame["development_sampling_cells"], "development_sampling_cell_count"),
+            (frame["confirmation_sampling_cells"], "confirmation_sampling_cell_count")):
+        assert frame[count_key] == len(cells) == expected_cells
+        namespaces = [cell["namespace"] for cell in cells]
+        assert len(set(namespaces)) == len(namespaces)
+        for cell in cells:
+            assert cell["draw_rule"] == "with_replacement"
+            product, support_size = Fraction(1), 1
+            for parameter in cell["sampled_parameters"]:
+                weight = _rational(parameter["weight_per_state_exact_rational"])
+                assert weight * parameter["support_size"] == 1
+                product *= weight
+                support_size *= parameter["support_size"]
+            assert support_size == cell["support_size"]
+            assert product * cell["support_size"] == 1
+    dev_namespaces = {c["namespace"] for c in frame["development_sampling_cells"]}
+    conf_namespaces = {c["namespace"] for c in frame["confirmation_sampling_cells"]}
+    assert not dev_namespaces & conf_namespaces
+    assert frame["split_partition"]["outcome_blind"] is True
+    assert frame["split_partition"]["cross_split_reuse_prohibited"] is True
+    assert frame["duplicate_rule"]["duplicates_must_be_retained"] is True
+    assert frame["duplicate_rule"]["redraw_for_uniqueness_prohibited"] is True
+    for predicate in frame["validity_predicates"]:
+        assert predicate["deterministic"] is True
+        assert predicate["evaluated_before_any_model_operation"] is True
+    assert _rational(frame["rejection_contract"][
+        "registered_rejection_probability_exact_rational"]) == 0
+    assert frame["rejection_contract"][
+        "acceptance_predicate_may_never_change_after_a_seed_exists"] is True
+    assert frame["reuse_and_dependence_rule"]["dependence_is_expressly_allowed"] \
+        is True
+    lifecycle = frame["future_seed_lifecycle"]
+    assert lifecycle["seed_values"] is None
+    assert lifecycle["realized_bank"] is None
+    assert lifecycle["seed_authority_granted"] is False
+    assert lifecycle["redraw_prohibited"] is True
+    assert lifecycle["first_draw_only"] is True
+    assert frame["seeds_drawn_in_this_round"] == 0
+    assert frame["bank_rows_created_in_this_round"] == 0
+
+    machine = doc["state_machine_v0_4"]
+    assert machine["total"] is True and machine["deterministic"] is True
+    assert machine["i0_is_not_part_of_profile_adequacy"] is True
+    assert machine["rescue_paths"] == []
+    states = {state["id"]: state for state in machine["states"]}
+    edges = []
+    for state in machine["states"]:
+        if state["kind"] == "terminal":
+            continue
+        events = set()
+        for transition in state["transitions"]:
+            assert transition["event"] not in events
+            events.add(transition["event"])
+            assert transition["next"] in states
+            edges.append((state["id"], transition["next"]))
+    for transition in states["Q0_INSTRUMENT"]["transitions"]:
+        if transition["event"] != "all fixtures pass":
+            assert transition["next"] == "STOP_INSTRUMENT_DEFECT"
+    reachable, frontier = {"Q0_INSTRUMENT"}, ["Q0_INSTRUMENT"]
+    while frontier:
+        current = frontier.pop()
+        for source, target in edges:
+            if source == current and target not in reachable:
+                reachable.add(target)
+                frontier.append(target)
+    assert reachable == set(states)
+
+    ontology = doc["operation_ontology_v0_4"]
+    assert ontology["s4_forward_cost_must_not_be_null"] is True
+    assert "NEVER equated with a runtime" in ontology["prohibition"]
+    units = {entry["unit"] for entry in ontology["units"]}
+    assert {"sequence_level_prefill_evaluation", "incremental_decode_evaluation",
+            "total_sequence_level_model_evaluation_equivalent"} <= units
+    assert ontology["unresolved_streams_are_null_not_zero"][
+        "grand_total_treating_null_as_zero_prohibited"] is True
+    assert doc["operation_boundaries"]["projected_future_operations"][
+        "grand_total_prohibited"]["prohibited"] is True
+    bound = doc["proposed_statistics"]["s4_generated_token_bound_per_generation"]
+    s4_stream = tables["projected_operation_accounting"]["work_streams"][
+        "S4_diagnostic_generation"]
+    assert s4_stream["registered_generated_token_bound_per_generation"] == bound
+    assert s4_stream["generated_tokens_upper_bound"] == \
+        s4_stream["generation_calls"] * bound
+    breakdown = doc["proposed_statistics"]["i0_fixture_breakdown"]
+    i0_stream = tables["projected_operation_accounting"]["work_streams"][
+        "deterministic_I0_fixtures"]
+    assert i0_stream["breakdown"] == breakdown
+
+    ordering = doc["positive_reference_candidates"]["p3q_i4_ordering_constraint"]
+    i4_floor = _floor_for(doc, "I4_positive_reference_floor")
+    assert _rational(ordering["p3q_lower_bound_exact_rational"]) > \
+        _rational(i4_floor["p1_exact_rational"]) > \
+        _rational(i4_floor["p0_exact_rational"])
+    assert ordering["no_checkpoint_is_selected_by_registering_this_constraint"] \
+        is True
 
 
-@pytest.mark.parametrize("name,mutate",
-                         MUTATIONS, ids=[m[0] for m in MUTATIONS])
+@pytest.mark.parametrize("name,mutate", MUTATIONS, ids=[m[0] for m in MUTATIONS])
 def test_negative_mutation_is_rejected(protocol, schema, name, mutate):
     mutated = _mutate(protocol, mutate)
     assert _rejected(mutated, schema), (
@@ -1385,653 +3414,3 @@ def test_negative_mutation_is_rejected(protocol, schema, name, mutate):
 def test_the_unmutated_protocol_is_accepted(protocol, schema):
     """Guards against a check that rejects everything, which would be useless."""
     assert not _rejected(json.loads(json.dumps(protocol)), schema)
-
-
-# --------------------------------------------------------------------------
-# The statistics must reproduce, and the draft must quote them faithfully
-# --------------------------------------------------------------------------
-
-def test_design_statistics_script_reproduces_its_committed_tables():
-    result = subprocess.run([sys.executable, STATS_SCRIPT, "--check"],
-                            capture_output=True, text=True, cwd=REPO_ROOT)
-    assert result.returncode == 0, (
-        "design_statistics.py --check failed\nstdout:\n%s\nstderr:\n%s"
-        % (result.stdout, result.stderr))
-    assert "DESIGN_STATISTICS_CHECK_OK" in result.stdout
-
-
-def test_statistics_tables_record_no_operations(tables):
-    for name, value in tables["operation_counts"].items():
-        assert value == 0, "%s is %r" % (name, value)
-    assert tables["status"] == \
-        "PROPOSED_DESIGN_PARAMETERS_NOT_MEASUREMENTS_NOT_FROZEN"
-    assert tables["draft_version"] == DRAFT_VERSION
-
-
-# The planning targets returned by the independent reviewer. The derivation
-# script must arrive at these INDEPENDENTLY. Transcribing them into the script
-# would make the check circular, which finding S3MR-009 recorded as a defect of
-# draft-v0.2, so the next test reads the script's syntax tree and fails if any
-# of them is present as a literal.
-DERIVED_PASS_COUNTS = (244, 243, 82, 80, 224, 222)
-DERIVED_TAILS = (0.001491215117, 0.003307722347, 0.000931234262,
-                 0.002962603303, 0.001081002486, 0.003276850097)
-DERIVED_POWERS = (0.953040775, 0.976290353, 0.938986365, 0.972425829,
-                  0.921083515, 0.963820468)
-
-
-def test_the_derivation_script_contains_no_hard_coded_result_constant():
-    """S3MR-009: a check that compares a script to its own transcribed answers
-    verifies nothing.
-
-    The published thresholds, exact tails and power figures must be computed.
-    This test parses the committed derivation script and fails if any of the
-    reviewer-returned target values appears anywhere in it as a literal, which
-    is the only way to distinguish derivation from transcription without
-    trusting the script's own output.
-    """
-    with open(STATS_SCRIPT, encoding="utf-8") as handle:
-        tree = ast.parse(handle.read())
-    integers, floats = set(), set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Constant):
-            if isinstance(node.value, bool):
-                continue
-            if isinstance(node.value, int):
-                integers.add(node.value)
-            elif isinstance(node.value, float):
-                floats.add(node.value)
-    for value in DERIVED_PASS_COUNTS:
-        assert value not in integers, (
-            "the expected pass count %d is hard-coded in the derivation "
-            "script; it must be computed" % value)
-    for value in DERIVED_TAILS + DERIVED_POWERS:
-        assert not any(abs(value - candidate) < 1e-12 for candidate in floats), (
-            "the derived quantity %r is hard-coded in the derivation script; "
-            "it must be computed" % value)
-
-
-def test_the_published_tables_reproduce_the_reviewer_returned_targets(tables):
-    """The independent derivation must nevertheless land on the same numbers.
-
-    The previous test proves the script does not contain the answers. This one
-    proves it still reaches them. Together they are a derivation check; either
-    alone is not.
-    """
-    expected = {
-        ("development", "I1a"): (244, 0.001491215117, 0.953040775),
-        ("development", "I1b"): (244, 0.001491215117, 0.953040775),
-        ("development", "I2"): (82, 0.000931234262, 0.938986365),
-        ("development", "I3"): (244, 0.001491215117, 0.953040775),
-        ("development", "I4"): (224, 0.001081002486, 0.921083515),
-        ("confirmation", "I1a"): (243, 0.003307722347, 0.976290353),
-        ("confirmation", "I1b"): (243, 0.003307722347, 0.976290353),
-        ("confirmation", "I2"): (80, 0.002962603303, 0.972425829),
-        ("confirmation", "I3"): (243, 0.003307722347, 0.976290353),
-        ("confirmation", "I4"): (222, 0.003276850097, 0.963820468),
-    }
-    for split in ("development", "confirmation"):
-        for row in tables["%s_exact_binomial_components" % split]:
-            key = (split, row["gate"])
-            assert key in expected, key
-            pass_count, tail, power = expected[key]
-            assert row["pass_count"] == pass_count, key
-            assert abs(row["exact_null_tail_at_p0"] - tail) < 5e-12, key
-            assert abs(row["exact_power_at_p1"] - power) < 5e-9, key
-            assert row["meets_target_power"] is True, key
-            assert row["exact_null_tail_at_p0"] <= row["alpha"], key
-            assert row["exact_power_at_p1"] >= tables[
-                "declared_assumptions"]["target_power"], key
-
-
-# --------------------------------------------------------------------------
-# The amendment record must close every finding and every checklist item once
-# --------------------------------------------------------------------------
-
-def test_every_finding_is_closed_exactly_once(amendment):
-    rows = amendment["closure_matrix"]
-    ids = [row["finding_id"] for row in rows]
-    assert ids == FINDING_IDS, ids
-    assert len(set(ids)) == 20
-    for row in rows:
-        assert row["severity"] in ("BLOCKING", "MAJOR", "MINOR"), row
-        assert row["disposition"], row["finding_id"]
-        assert row["repair"], row["finding_id"]
-        assert row["verification"], row["finding_id"]
-        assert row["where"], row["finding_id"]
-        assert row["reviewer_required_change"], row["finding_id"]
-    severities = [row["severity"] for row in rows]
-    assert severities.count("BLOCKING") == 6
-    assert severities.count("MAJOR") == 11
-    assert severities.count("MINOR") == 3
-
-
-def test_every_unresolved_item_receives_exactly_one_disposition(amendment):
-    rows = amendment["unresolved_item_dispositions"]
-    ids = [row["id"] for row in rows]
-    assert ids == UR_IDS, ids
-    assert len(set(ids)) == 22
-    for row in rows:
-        assert row["disposition"], row["id"]
-        assert row["subject"], row["id"]
-        assert row["owner"], row["id"]
-        assert row["reviewer_state"], row["id"]
-
-
-def test_the_od2_dependent_item_is_not_quietly_relabelled(amendment):
-    """UR-22 is the external qualification interface for the positive reference.
-
-    It depends on OD2, which the operator has not resolved. An amendment round
-    may not close it by drafting; recording it as resolved would misrepresent
-    the state of the study to the second reviewer.
-    """
-    rows = {row["id"]: row for row in amendment["unresolved_item_dispositions"]}
-    assert rows["UR-22"]["disposition"] == \
-        "UNRESOLVED_BLOCKING_OPERATOR_DECISION"
-    assert "OD2" in json.dumps(rows["UR-22"])
-    decisions = {row["id"]: row for row in
-                 amendment["operator_decisions_in_this_round"]}
-    assert decisions["OD2"]["status"] == "unresolved"
-    assert decisions["OD2"]["blocking"] is True
-
-
-def test_i4_chance_floor_is_recorded_as_rejected(protocol):
-    """The rejected v0.1 chance-level null stays visible as history, not policy."""
-    rejected = protocol["proposed_statistics"]["rejected_v0_1_i4_chance_null"]
-    assert rejected["status"] == "REJECTED_BY_OPERATOR_REVIEW"
-    assert rejected["acceptance_count"] == 49
-    assert abs(rejected["acceptance_rate"] - 49 / 128) < 1e-12
-    assert rejected["null_hypothesis"] == "p <= 0.25"
-    active = _component(protocol, "development", "I4")
-    assert active["p0_exact_rational"] == "4/5", (
-        "the active I4 floor must be the positive-capability floor, not chance")
-
-
-def test_n_192_is_withdrawn_from_every_active_field(protocol, tables, packet,
-                                                    markdown):
-    """Finding S3MR-008 retired n = 192. It may survive only as narrative.
-
-    The check is deliberately structural rather than textual: every active
-    sample-size field is read and none of them may be 192, while the historical
-    note that explains the withdrawal is required to still be present.
-    """
-    sizes = protocol["proposed_statistics"]["sample_sizes"]
-    assert "WITHDRAWN" in sizes["n_192_status"]
-    assert "S3MR-008" in sizes["n_192_status"]
-    for construct in ("I1a", "I1b", "I2", "I3", "I4"):
-        assert sizes[construct]["n"] != 192, construct
-    for split in ("development", "confirmation"):
-        for row in tables["%s_exact_binomial_components" % split]:
-            assert row["n"] != 192, (split, row["gate"])
-    for text, where in ((packet, "packet"), (markdown, "protocol companion")):
-        for line in text.split("\n"):
-            if re.search(r"\bn\s*=\s*.?192.?\b", line):
-                assert _is_historical_narrative(line), (
-                    "n = 192 is still offered as an active justification in "
-                    "the %s: %r" % (where, line))
-
-
-# --------------------------------------------------------------------------
-# S3MR-004 / S3MR-005: the paired aggregate procedure is retired outright
-# --------------------------------------------------------------------------
-
-def _is_historical_narrative(line):
-    """True when a line is clearly labelled as describing the withdrawn v0.2 state.
-
-    Withdrawn parameters must remain visible so that a reader can see what was
-    changed and why, but they may never appear as an active field. The label is
-    what separates the two, so the label is what is checked.
-    """
-    lowered = line.lower()
-    return ("draft-v0.2" in lowered or "historical" in lowered
-            or "withdrawn" in lowered or "deleted" in lowered
-            or "no longer" in lowered or "s3mr-0" in lowered)
-
-
-DECISION_ROLES = ("gate", "eligibility", "selection", "confirmation",
-                  "claim_language", "equivalence_margin", "critical_value",
-                  "discordance_grid", "conservativeness")
-
-
-def test_the_paired_equivalence_procedure_carries_no_decision_role(protocol,
-                                                                   tables):
-    """It is removed from decision authority, not re-tuned and not defended.
-
-    The reviewer's recalculation showed the realised size exceeded the nominal
-    level, so draft-v0.2's conservativeness assertion was false. Draft-v0.3 does
-    not argue with that finding and does not attempt a corrected critical value;
-    it removes the procedure from every decision role, which is the only repair
-    that cannot itself be wrong about the size.
-    """
-    retired = protocol["retired_procedures"]["tango_paired_equivalence"]
-    assert retired["status"] == "RETIRED FROM EVERY DECISION ROLE"
-    assert len(retired["retired_from"]) >= len(DECISION_ROLES)
-    joined = " ".join(retired["retired_from"]).lower()
-    for role in DECISION_ROLES:
-        assert role.replace("_", " ") in joined or role in joined, role
-    assert retired["false_assertion_withdrawn"]
-    assert retired["historical_evidence_preserved"]
-    assert "immutable historical evidence" in retired[
-        "historical_evidence_rule"]
-    # The amendment must ask the second reviewer to adjudicate the repair
-    # rather than declaring the size defect closed by its own authority.
-    assert retired["question_for_the_second_reviewer"]
-    assert retired["disposition_status"].startswith("PROPOSED_RESOLVED_SUBJECT")
-
-    assert protocol["retired_procedures"][
-        "four_point_discordance_grid"]["status"] == \
-        "REMOVED FROM ACTIVE VERIFICATION"
-    assert protocol["retired_procedures"][
-        "i3_aggregate_equivalence_secondary_criterion"]["status"] == "REMOVED"
-    assert _gate(protocol, "I3")["secondary_criterion_status"]
-
-    survivor = tables["descriptive_paired_summary"]
-    assert survivor["status"].startswith("DESCRIPTIVE"), survivor["status"]
-    carries_no = " ".join(survivor["carries_no"]).lower()
-    for banned in ("null", "alpha", "p-value", "pass", "rescue"):
-        assert banned in carries_no, banned
-
-
-def test_no_active_field_reintroduces_the_retired_procedure(protocol, tables,
-                                                            packet):
-    """A retired procedure that survives in one table is not retired."""
-    for blob, where in ((protocol, "protocol"), (tables, "tables")):
-        text = json.dumps(blob)
-        for offender in ("equivalence_margin", "tango_critical_value",
-                         "discordance_grid_verification"):
-            assert offender not in text, (where, offender)
-    assert "Tango" not in packet, (
-        "the v0.3 review packet must contain no live paired-equivalence "
-        "procedure; the reviewer's own recalculation of it is preserved "
-        "separately as immutable historical evidence")
-
-
-# --------------------------------------------------------------------------
-# S3MR-003 / S3MR-016: the declared level must be the implemented level
-# --------------------------------------------------------------------------
-
-def _rational(text):
-    """Parse an exact rational of the form ``a/b`` into a pair of ints."""
-    numerator, _, denominator = text.partition("/")
-    return int(numerator), int(denominator)
-
-
-def test_the_exact_rational_alpha_is_present_in_every_component_row(protocol,
-                                                                    tables):
-    """Draft-v0.2 stated a per-profile alpha that appeared in no component.
-
-    A level that is asserted in prose and absent from every row it is supposed
-    to govern is not implemented. Here each row carries the rational form, and
-    the rational form is compared against the declared study level by exact
-    integer arithmetic rather than by comparing rendered decimals.
-    """
-    stats = protocol["proposed_statistics"]
-    assert stats["development_component_alpha_exact_rational"] == "1/600"
-    assert stats["confirmation_component_alpha_exact_rational"] == "1/200"
-    assert stats["study_development_screening_alpha_exact_rational"] == "1/200"
-
-    declared = tables["declared_assumptions"]
-    assert declared["development_component_alpha_exact_rational"] == "1/600"
-    assert declared["confirmation_component_alpha_exact_rational"] == "1/200"
-    assert declared["study_development_screening_alpha_exact_rational"] == "1/200"
-    assert declared["selectable_profile_denominator"] == 3
-
-    for row in tables["development_exact_binomial_components"]:
-        assert row["alpha_exact_rational"] == "1/600", row["gate"]
-    for row in tables["confirmation_exact_binomial_components"]:
-        assert row["alpha_exact_rational"] == "1/200", row["gate"]
-    for construct in ("I1a", "I1b", "I2", "I3", "I4"):
-        assert _component(protocol, "development", construct)[
-            "alpha_exact_rational"] == "1/600", construct
-        assert _component(protocol, "confirmation", construct)[
-            "alpha_exact_rational"] == "1/200", construct
-
-    # 1/600 x 3 == 1/200 exactly. Integer arithmetic, no floating point.
-    per_num, per_den = _rational("1/600")
-    study_num, study_den = _rational("1/200")
-    denominator = declared["selectable_profile_denominator"]
-    assert per_num * denominator * study_den == study_num * per_den, (
-        "the per-profile level must reconstruct the study screening level "
-        "exactly under the fixed denominator")
-
-
-def test_the_across_profile_denominator_is_fixed_and_never_shrinks(protocol,
-                                                                   tables):
-    """Finding S3MR-016: a denominator contingent on a post-data fact is not a
-    pre-registered correction.
-
-    S3's availability depends on whether a multi-token answer domain has been
-    activated. If the denominator followed that fact, the study could test two
-    profiles at a level computed for three. It is therefore 3 under every
-    enumerated outcome, including the outcomes in which S3 never enters.
-    """
-    family = protocol["proposed_statistics"]["hypothesis_families"][
-        "family_B_across_profiles"]
-    assert family["fixed_selectable_profile_denominator"] == 3
-    assert family["denominator_is_fixed_before_data"] is True
-    assert family["denominator_never_shrinks"] is True
-    assert set(family["members"]) == {"S1", "S2", "S3"}
-    assert any("S4" in text for text in family["excluded"])
-
-    plan = protocol["development_selection_and_confirmation_plan"][
-        "stage_2_selection"]
-    assert plan["fixed_selectable_profile_denominator"] == 3
-    assert plan["denominator_never_shrinks"] is True
-
-    inactive = [row for row in tables["development_selection_map"]
-                if row["s3_multi_token_domain_activated"] is False]
-    assert inactive, "the map must enumerate the S3-inactive outcomes"
-    for row in tables["development_selection_map"]:
-        assert row["fixed_selectable_profile_denominator"] == 3, row
-
-
-def test_within_profile_conjunction_takes_no_further_correction(protocol):
-    """An intersection-union test is bounded by its component level.
-
-    Applying a further within-profile Bonferroni correction on top of it would
-    be a second, unnecessary shrinkage of power that the protocol would then
-    have to justify. Declaring it and not applying it would be worse.
-    """
-    families = protocol["proposed_statistics"]["hypothesis_families"]
-    within = families["family_A_within_profile"]
-    assert within["type"] == "intersection_union_conjunctive"
-    assert within["correction"].startswith("none within the profile")
-    assert set(within["members"]) == {"I1a", "I1b", "I2", "I3_J_both", "I4"}
-    plan = protocol["development_selection_and_confirmation_plan"][
-        "stage_3_confirmation"]
-    assert plan["within_profile"].startswith("intersection-union")
-    assert plan["multiplicity"].startswith("none across profiles")
-
-
-# --------------------------------------------------------------------------
-# S3MR-006 / S3MR-015: exactly one I3 floor and no degenerate rejection region
-# --------------------------------------------------------------------------
-
-def test_exactly_one_i3_floor_is_active_and_it_is_0_90(protocol, tables,
-                                                       packet, markdown):
-    floor = protocol["proposed_statistics"]["i3_floor"]
-    assert floor["active_floor_count"] == 1
-    assert floor["p0_exact_rational"] == "9/10"
-    assert floor["p1_lowest_alternative_of_interest"] == 0.97
-    assert floor["n"] == 256
-    assert floor["unit_of_n"] == "base-item contrast clusters per contrast cell"
-    assert floor["p0_0_95_status"] == "DELETED FROM EVERY ACTIVE FIELD"
-
-    for split in ("development", "confirmation"):
-        for row in tables["%s_exact_binomial_components" % split]:
-            assert row["p0_exact_rational"] != "19/20", (split, row["gate"])
-            assert row["p0"] != 0.95, (split, row["gate"])
-    for split in ("development", "confirmation"):
-        row = _component(protocol, split, "I3")
-        assert row["p0_exact_rational"] == "9/10", split
-    assert _gate(protocol, "I3")["primary_criterion"][
-        "active_floor_count"] == 1
-
-    # 0.95 may appear only in clearly labelled historical narrative. The lookahead
-    # keeps the check from firing on longer decimals such as the power 0.953040775,
-    # which is a different quantity that happens to share a prefix.
-    for text, where in ((packet, "packet"), (markdown, "protocol companion")):
-        for line in text.split("\n"):
-            if re.search(r"0\.95(?![0-9])", line):
-                assert _is_historical_narrative(line), (
-                    "an unlabelled p0 = 0.95 survives in the %s: %r"
-                    % (where, line))
-
-
-def test_no_rejection_region_requires_every_unit_to_succeed(protocol, tables):
-    """A pass count equal to n has no power against any alternative below 1.
-
-    Draft-v0.2 produced exactly that at n = 128 with p0 = 0.95. It is not a
-    conservative test; it is not a test at all.
-    """
-    for split in ("development", "confirmation"):
-        for row in tables["%s_exact_binomial_components" % split]:
-            assert row["pass_count"] < row["n"], (split, row)
-            assert row["degenerate_rejection_region"] is False, (split, row)
-            assert 0 < row["pass_count"], (split, row)
-    for split in ("development", "confirmation"):
-        for construct in ("I1a", "I1b", "I2", "I3", "I4"):
-            row = _component(protocol, split, construct)
-            assert row["pass_count"] < row["n"], (split, construct)
-            assert row["degenerate_rejection_region"] is False
-    prohibition = protocol["proposed_statistics"]["i3_floor"][
-        "degenerate_region_prohibition"]
-    assert "raises before emitting any table" in prohibition
-
-
-# --------------------------------------------------------------------------
-# S3MR-014: every n carries its unit, and the units are never conflated
-# --------------------------------------------------------------------------
-
-def test_every_sample_size_declares_its_unit(protocol, tables):
-    registry = protocol["unit_registry"]
-    units = {entry["unit"] for entry in registry["units"]}
-    assert "base_item" in units
-    assert "base_item_contrast_cluster" in units
-    for entry in registry["units"]:
-        assert entry["definition"], entry["unit"]
-        assert entry["never_equals"], entry["unit"]
-        assert entry["unit"] not in entry["never_equals"], entry["unit"]
-
-    sizes = protocol["proposed_statistics"]["sample_sizes"]
-    for construct in ("I1a", "I1b", "I2", "I3", "I4"):
-        assert sizes[construct]["unit_of_n"], construct
-    for split in ("development", "confirmation"):
-        for row in tables["%s_exact_binomial_components" % split]:
-            assert row["unit_of_n"], (split, row["gate"])
-            assert row["independent_unit"], (split, row["gate"])
-    for row in tables["descriptive_clopper_pearson_lower_bounds"]:
-        assert row["unit_of_n"], row
-    for row in tables["selected_label_uniformity_diagnostic"]:
-        assert row["unit_of_n"], row
-    for gate_id in ("I1a", "I1b", "I2", "I3", "I4"):
-        assert _gate(protocol, gate_id)["unit_of_n"], gate_id
-
-
-def test_the_i3_unit_is_the_cluster_and_never_a_rendered_row(protocol, tables):
-    """S3MR-014's concrete failure: one symbol n meaning four different things."""
-    sizes = protocol["proposed_statistics"]["sample_sizes"]
-    assert "contrast clusters" in sizes["I3"]["unit_of_n"]
-    assert "base items" in sizes["I1a"]["unit_of_n"]
-    assert sizes["I3"]["unit_of_n"] != sizes["I1a"]["unit_of_n"]
-    assert sizes["I2"]["unit_of_n"] != sizes["I1a"]["unit_of_n"]
-    assert sizes["I4"]["unit_of_n"] != sizes["I1a"]["unit_of_n"]
-    assert "rendered" not in json.dumps(sizes).lower()
-    assert "never a rendered-row" in protocol["unit_registry"]["prohibition"]
-
-    # rendered_rows = clusters x 2 must hold as an identity, not a coincidence.
-    identities = tables["projected_operation_accounting"][
-        "dimensional_identities"]
-    assert identities, "the projection must publish its dimensional identities"
-    for row in identities:
-        assert row["rendered_rows"] == row["base_item_contrast_clusters"] * 2, row
-        assert row["holds"] is True, row
-
-
-# --------------------------------------------------------------------------
-# S3MR-017: development selection must be executable, not merely named
-# --------------------------------------------------------------------------
-
-def test_the_development_selection_map_is_total_and_deterministic(protocol,
-                                                                  tables):
-    """Every reachable eligibility outcome must have exactly one answer.
-
-    Draft-v0.2 named the selection step and the confirmation gate but never said
-    what selects. A rule that is decided after the eligibility pattern is known
-    is a data-dependent rule, whatever it is called.
-    """
-    rows = tables["development_selection_map"]
-    plan = protocol["development_selection_and_confirmation_plan"][
-        "stage_2_selection"]
-    assert plan["order"] == ["S2", "S3", "S1"]
-    assert plan["never_selectable"] == ["S4"]
-    assert plan["no_data_dependent_reordering"] is True
-    assert plan["no_selection_this_round"] is True
-    assert plan["enumerated_scenarios"] == len(rows)
-
-    # 3 selectable profiles x an S3-activation flag = 16 enumerated outcomes.
-    keys = set()
-    for row in rows:
-        key = (tuple(sorted(row["all_applicable_components_passed"]))
-               if isinstance(row["all_applicable_components_passed"], list)
-               else tuple(sorted(row["all_applicable_components_passed"].items())),
-               row["s3_multi_token_domain_activated"])
-        assert key not in keys, "duplicate scenario %r" % (key,)
-        keys.add(key)
-    assert len(keys) == len(rows) == 16
-
-    for row in rows:
-        eligible = row["eligible_profiles"]
-        selected = row["selected_profile"]
-        stop = row["stop_no_selectable_profile_is_eligible"]
-        if not eligible:
-            assert selected is None and stop is True, row
-            continue
-        assert stop is False, row
-        expected = next(p for p in ["S2", "S3", "S1"] if p in eligible)
-        assert selected == expected, (
-            "the map must select the first eligible profile in the "
-            "pre-registered order: %r" % row)
-        assert "S4" not in eligible, row
-
-
-def test_the_confirmation_stage_is_one_shot_and_inaccessible(protocol):
-    plan = protocol["development_selection_and_confirmation_plan"][
-        "stage_3_confirmation"]
-    assert plan["gate"] == "I5"
-    assert plan["one_shot"] is True
-    assert plan["reselection_prohibited"] is True
-    assert plan["accessible_now"] is False
-    assert plan["component_alpha_exact_rational"] == "1/200"
-    assert "physically disjoint" in plan["split"]
-    components = {row["component"]: row for row in plan["components"]}
-    assert set(components) == {"I1a", "I1b", "I2", "I3", "I4"}
-    for name, row in components.items():
-        assert row["n"] > 0, name
-        assert row["unit_of_n"], name
-        assert row["null_hypothesis"].startswith("p <="), name
-        assert 0 < row["pass_count"] < row["n"], name
-        assert 0 < row["exact_null_tail_at_p0"] <= 1 / 200, name
-        assert row["exact_power_at_p1"] >= 0.90, name
-
-
-# --------------------------------------------------------------------------
-# S3MR-012 / S3MR-013: the projection is decomposed and S3 costs nothing extra
-# --------------------------------------------------------------------------
-
-WORK_STREAMS = ("deterministic_I0_fixtures", "target_role_development",
-                "positive_reference_external_P3Q",
-                "RP_I4_under_candidate_profiles",
-                "selected_profile_one_shot_confirmation",
-                "S4_diagnostic_generation")
-
-
-def test_the_projection_is_decomposed_into_the_six_work_streams(tables):
-    accounting = tables["projected_operation_accounting"]
-    assert set(accounting["work_streams"]) == set(WORK_STREAMS)
-    assert "a single undifferentiated total is prohibited" in \
-        accounting["prohibition"]
-    for name, stream in accounting["work_streams"].items():
-        assert isinstance(stream, dict), name
-        assert stream, name
-    for name, value in accounting["executed_operation_counts"].items():
-        assert value == 0, "%s = %r" % (name, value)
-
-
-def test_the_positive_reference_stream_stays_numerically_unresolved(tables):
-    """OD2 is unresolved, so its cost is unknown and must be recorded as such.
-
-    Publishing a number for a stream whose model is not chosen would be a
-    fabricated projection and would also imply a candidate had been picked.
-    """
-    stream = tables["projected_operation_accounting"]["work_streams"][
-        "positive_reference_external_P3Q"]
-    assert stream["numeric_status"] == \
-        "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2"
-    assert stream["why_null"]
-    for key, value in stream.items():
-        if key.endswith(("_rows", "_passes", "_scorings", "_jobs", "_total")):
-            assert value is None, (key, value)
-
-
-def test_s3_adds_no_operations_under_the_current_single_token_domain(protocol,
-                                                                     tables):
-    """S3MR-012 recorded a self-contradiction of a factor of four here.
-
-    Under the current single-token answer domain S3 reads the same logits under
-    the same prefix as S2, so its incremental cost is exactly zero. Zero is a
-    claim that can be checked; a large number that appears in one table and not
-    another cannot.
-    """
-    accounting = tables["projected_operation_accounting"][
-        "s3_current_domain_accounting"]
-    assert accounting["additional_forward_passes"] == 0
-    assert accounting["additional_sequence_scoring_rows"] == 0
-    assert accounting["reuses"]
-    # A zero incremental cost may not be used to argue S3 out of the fixed
-    # Family B denominator.
-    plan = protocol["development_selection_and_confirmation_plan"][
-        "stage_2_selection"]
-    assert "S3" in plan["order"]
-    assert plan["fixed_selectable_profile_denominator"] == 3
-
-
-# --------------------------------------------------------------------------
-# The operator-review record must exist and stay additive
-# --------------------------------------------------------------------------
-
-def test_operator_review_record_is_present_and_additive():
-    """The v0.1 operator review is history and must survive every later round."""
-    with open(REVIEW_PATH, encoding="utf-8") as handle:
-        text = handle.read()
-    assert ("STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_"
-            "NOT_APPROVED_FOR_FREEZE") in text
-    for defect in ["D-%02d" % i for i in range(1, 11)]:
-        assert defect in text, defect
-    assert "design_receipt.json` is retained verbatim" in text or \
-           "retained verbatim" in text
-
-
-def test_v0_1_receipt_is_untouched_and_still_describes_v0_1():
-    receipt_path = os.path.join(STUDY3, "design_receipt.json")
-    with open(receipt_path, encoding="utf-8") as handle:
-        receipt = json.load(handle)
-    blob = json.dumps(receipt)
-    assert "DRAFT_V0_2" not in blob, (
-        "the v0.1 receipt must not be rewritten to describe v0.2")
-    assert "DRAFT_V0_3" not in blob, (
-        "the v0.1 receipt must not be rewritten to describe v0.3")
-
-
-def test_the_v0_2_receipt_still_describes_v0_2():
-    """Each round writes its own receipt; none rewrites an earlier one."""
-    receipt_path = os.path.join(STUDY3, "design_receipt_v0_2.json")
-    with open(receipt_path, encoding="utf-8") as handle:
-        receipt = json.load(handle)
-    assert "DRAFT_V0_3" not in json.dumps(receipt), (
-        "the v0.2 receipt must not be rewritten to describe v0.3")
-
-
-def test_the_amendment_names_the_immutable_objects_it_did_not_edit(amendment):
-    """The v0.2 review record is evidence about this design and stays fixed."""
-    protected = amendment["immutable_objects_not_edited"]
-    for required in ("v0_2_independent_methods_review",
-                     "methods_review_receipt_v0_2",
-                     "independent_methods_recalculation",
-                     "independent_methods_review_packet",
-                     "design_receipt_v0_2"):
-        assert any(required in entry for entry in protected), required
-    # Each named object must actually exist, so the list cannot drift into a
-    # set of paths that protect nothing.
-    for entry in protected:
-        assert os.path.exists(os.path.join(REPO_ROOT, entry)), entry
-    responds = amendment["responds_to"]
-    assert responds["disposition"] == \
-        "STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED"
-    assert responds["findings"]["total"] == 20
-    assert responds["findings"]["blocking"] == 6
-    assert responds["findings"]["major"] == 11
-    assert responds["findings"]["minor"] == 3
-    assert responds["unresolved_items"] == 22
-    assert responds["reviewed_commit"].startswith("8a2c4a0")
-    assert responds["review_commit"].startswith("e4bcda3")

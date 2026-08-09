@@ -1,7 +1,7 @@
 # Study 3 - positive-reference candidate dossier
 
 - **Document class:** positive-reference candidate dossier
-- **Draft version:** draft-v0.3
+- **Draft version:** draft-v0.4
 - **Operator decision addressed:** OD2
 - **Disposition of OD2:** `UNRESOLVED_BLOCKING_OPERATOR_DECISION`
 - **Selection status:** `UNSELECTED`
@@ -222,3 +222,34 @@ discharge OD2 itself.
 The remaining authority required is an operator decision that preregisters a
 single candidate and its complete qualification specification. No such authority
 exists.
+
+## draft-v0.4: the registered P3-Q / I4 ordering constraint
+
+The second independent methods review recorded finding `S3MR2-007`: gate I4's null was registered as
+a fixed number while the P3-Q competence floor that makes it interpretable was deferred to `OD2`,
+with no registered relation between the two. Without that relation a reference could be
+"independently prequalified" at or below the I4 null and be structurally unable to clear I4 through
+*any* candidate interface, in which case an I4 failure would be measuring the reference rather than
+the interface, inverting the construct the gate exists to serve.
+
+draft-v0.4 registers the ordering constraint and nothing else:
+
+> **P3-Q one-sided competence lower bound >= 19/20 > I4 p1 = 9/10 > I4 p0 = 4/5**
+
+A later `OD2` / P3-Q authority may choose a **stronger** P3-Q floor. It may not choose a weaker one.
+
+**`OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`.** Registering this constraint selects
+nothing. No checkpoint, revision, tokenizer, wrapper or candidate is selected, preferred, pinned,
+ranked, revision-resolved, downloaded, tokenized, loaded, run or prequalified by draft-v0.4, and no
+operation of any kind has been performed on any candidate.
+
+The later authority must still freeze, at minimum: the checkpoint identity and immutable revision
+hash; a canonical qualification interface external to S1, S2, S3 and S4; the RP-specific I4 wrapper
+and chat-template policy; a physically isolated P3-Q bank and its own seed; the P3-Q competence floor
+at or above 19/20; exact n, alpha and rejection rule; the operation-family and depth treatment; the
+stopping rule; and the provenance record.
+
+**The I4 claim remains narrow.** A pass means only that an independently prequalified reference
+meeting the registered lower-bound constraint retained competence above the registered I4 floor
+through the named candidate interface. It does not establish target-model competence and it creates
+no mechanistic authority.

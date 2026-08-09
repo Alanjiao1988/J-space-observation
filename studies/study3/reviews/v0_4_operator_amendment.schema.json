@@ -1,0 +1,323 @@
+{
+  "$id": "study3-v0-4-operator-amendment-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "$comment": "UR-22 may never be recorded as resolved.",
+      "properties": {
+        "unresolved_item_dispositions": {
+          "items": {
+            "if": {
+              "properties": {
+                "id": {
+                  "const": "UR-22"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "then": {
+              "properties": {
+                "disposition": {
+                  "const": "UNRESOLVED_BLOCKING_OPERATOR_DECISION"
+                }
+              }
+            }
+          },
+          "type": "array"
+        }
+      }
+    }
+  ],
+  "description": "Fail-closed schema for the draft-v0.4 operator amendment record. It refuses a missing, duplicate or extra S3MR2 identifier; fewer than the twenty inherited first-review findings or the twenty-two unresolved items; a repair that self-approves instead of deferring to the third independent review; a resolved OD2 or UR-22; a non-zero operation counter; a true authority flag; any result, evidence row, bank row or seed; a successor action that is not a third independent methods review; and any attempt to record the historical narrative count mismatch as dispositive or to propagate eight MAJOR as the structured finding count.",
+  "properties": {
+    "authority_flags": {
+      "additionalProperties": {
+        "const": false
+      },
+      "minProperties": 8,
+      "type": "object"
+    },
+    "bank_rows": {
+      "maxItems": 0,
+      "type": "array"
+    },
+    "both_independent_reviews_remain_valid_rejections": {
+      "const": true
+    },
+    "closure_matrix_v0_4": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "disposition": {
+            "const": "PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW"
+          },
+          "finding_id": {
+            "pattern": "^S3MR2-\\d{3}$",
+            "type": "string"
+          },
+          "original_severity": {
+            "enum": [
+              "BLOCKING",
+              "MAJOR",
+              "MINOR"
+            ]
+          },
+          "original_title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "repair": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "repair_kind": {
+            "enum": [
+              "method",
+              "operator_decision_input"
+            ]
+          },
+          "self_approved": {
+            "const": false
+          },
+          "verification": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "where": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "finding_id",
+          "original_severity",
+          "original_title",
+          "repair",
+          "where",
+          "verification",
+          "repair_kind",
+          "disposition",
+          "self_approved"
+        ],
+        "type": "object"
+      },
+      "maxItems": 10,
+      "minItems": 10,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "document_class": {
+      "const": "operator_amendment_record"
+    },
+    "evidence_rows": {
+      "maxItems": 0,
+      "type": "array"
+    },
+    "historical_count_mismatch": {
+      "properties": {
+        "eight_major_is_not_propagated": {
+          "const": true
+        },
+        "review_was_not_edited": {
+          "const": true
+        },
+        "status": {
+          "const": "NON_DISPOSITIVE_HISTORICAL_NARRATIVE_COUNT_MISMATCH"
+        },
+        "structured_new_findings": {
+          "properties": {
+            "BLOCKING": {
+              "const": 2
+            },
+            "MAJOR": {
+              "const": 6
+            },
+            "MINOR": {
+              "const": 2
+            },
+            "total": {
+              "const": 10
+            }
+          },
+          "required": [
+            "total",
+            "BLOCKING",
+            "MAJOR",
+            "MINOR"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "structured_new_findings",
+        "immutable_disposition_basis_phrase",
+        "mismatch",
+        "status",
+        "why_it_does_not_reverse_the_rejection",
+        "review_was_not_edited",
+        "structured_count_is_authoritative_for_this_amendment",
+        "eight_major_is_not_propagated"
+      ],
+      "type": "object"
+    },
+    "immutable_objects_not_edited": {
+      "minItems": 20,
+      "type": "array"
+    },
+    "inherited_first_review_findings": {
+      "items": {
+        "properties": {
+          "finding_id": {
+            "pattern": "^S3MR-\\d{3}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "finding_id",
+          "original_severity",
+          "status_after_second_review",
+          "note"
+        ],
+        "type": "object"
+      },
+      "maxItems": 20,
+      "minItems": 20,
+      "type": "array"
+    },
+    "next_legal_action": {
+      "pattern": "third bounded independent methods review of draft-v0\\.4",
+      "type": "string"
+    },
+    "no_review_artifact_was_edited": {
+      "const": true
+    },
+    "operation_counters": {
+      "additionalProperties": {
+        "const": 0
+      },
+      "minProperties": 20,
+      "type": "object"
+    },
+    "operator_decisions_in_this_round": {
+      "items": {
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "id": {
+                  "const": "OD2"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "then": {
+              "properties": {
+                "blocking": {
+                  "const": true
+                },
+                "status": {
+                  "const": "unresolved"
+                }
+              }
+            }
+          }
+        ],
+        "required": [
+          "id",
+          "status",
+          "blocking",
+          "note"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "results": {
+      "maxItems": 0,
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "study3-v0-4-operator-amendment-record-v1"
+    },
+    "seeds": {
+      "maxItems": 0,
+      "type": "array"
+    },
+    "self_approval_prohibition": {
+      "properties": {
+        "every_repair_label": {
+          "const": "PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW"
+        },
+        "the_drafting_party_does_not_claim_draft_v0_4_is_correct": {
+          "const": true
+        }
+      },
+      "required": [
+        "the_drafting_party_does_not_claim_draft_v0_4_is_correct",
+        "every_repair_label",
+        "determination_belongs_to"
+      ],
+      "type": "object"
+    },
+    "state": {
+      "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW"
+    },
+    "unresolved_item_dispositions": {
+      "items": {
+        "properties": {
+          "id": {
+            "pattern": "^UR-\\d{2}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "subject",
+          "disposition",
+          "note"
+        ],
+        "type": "object"
+      },
+      "maxItems": 22,
+      "minItems": 22,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "state",
+    "document_class",
+    "round",
+    "party",
+    "authority",
+    "responds_to",
+    "self_approval_prohibition",
+    "both_independent_reviews_remain_valid_rejections",
+    "no_review_artifact_was_edited",
+    "immutable_objects_not_edited",
+    "closure_matrix_v0_4",
+    "inherited_first_review_findings",
+    "unresolved_item_dispositions",
+    "operator_decisions_in_this_round",
+    "separation_of_kinds",
+    "historical_count_mismatch",
+    "operation_counters",
+    "authority_flags",
+    "next_legal_action",
+    "results",
+    "evidence_rows",
+    "bank_rows",
+    "seeds"
+  ],
+  "title": "Study 3 draft-v0.4 operator amendment record",
+  "type": "object"
+}

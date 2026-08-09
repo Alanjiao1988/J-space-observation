@@ -1047,6 +1047,133 @@ event has exactly one legal next state and every registered terminal state is re
 The sixteen-row profile-eligibility map is retained as the `Q2_SELECTION` subtable that
 applies only once `I0` has passed. It is not the whole state machine.
 
+### Power architecture
+
+Per-cell power alone does not describe this design's operating characteristics. The
+type-II allocation below is binding and every joint bound is a union bound valid under
+**arbitrary dependence**; no independence between cells, profiles, roles or stages is used.
+
+| Quantity | Exact rational | Scope |
+| --- | --- | --- |
+| maximum selectable-profile cell count `m_max` | 43 | over `S1`, `S2`, `S3`; `S4` is excluded |
+| per-stage profile false-negative budget | `19/400` | one profile, one stage |
+| per-cell false-negative budget | `19/17200` | per atomic evaluation cell |
+| per-cell power target | `17181/17200` | **PER ATOMIC EVALUATION CELL** |
+| profile stage power floor | `381/400` | one profile, one stage; union-bound lower bound |
+| confirmation conjunction power floor | `381/400` | one-shot confirmation conjunction |
+| panel false-qualification budget | `1/200` | across the fixed three-profile denominator |
+| study end-to-end power floor | `9/10` | development selection plus one-shot confirmation |
+
+**Cell counts by profile.**
+
+| Profile | Cells at the I1/I3 floor | Cells at the I2 floor | Cells at the I4 floor | Total | Selectable |
+| --- | --- | --- | --- | --- | --- |
+| `S1` | 33 | 6 | 4 | 43 | `true` |
+| `S2` | 9 | 6 | 4 | 19 | `true` |
+| `S3` | 9 | 6 | 4 | 19 | `true` |
+| `S4` | 33 | 6 | 0 | 39 | `false` |
+
+**The union-bound proof.** Pr(the study returns the designated adequate profile and confirms it) >= 1 - 19/400 - 1/200 - 19/400 = 9/10 The unioned failure events are:
+
+- the designated adequate profile fails to qualify in development, bounded by 19/400 as the sum over its at most m_max applicable cells of the per-cell false-negative budget 19/17200
+- a higher-priority profile that lies in its registered profile null is falsely qualified, bounded by the panel false-qualification budget 1/200
+- the selected adequate profile fails the confirmation conjunction, bounded by 19/400 by the same per-cell allocation on the confirmation split
+
+**The binding claim holds only under this least-favourable configuration.**
+
+- I0 passes
+- at least one selectable profile has every applicable atomic-cell success probability at or above that cell's registered p1
+- any higher-priority profile that is not adequate lies in its registered profile null, meaning at least one of its required cells is at or below that cell's p0
+- development and confirmation follow the frozen selection order with no rescue and no substitution
+- the selected adequate profile remains at or above p1 on the confirmation-generating distribution
+
+**Not covered by the power guarantee.**
+
+- profiles whose cell success probabilities lie in the indifference region strictly between p0 and p1
+- distribution shift between the development and confirmation generating distributions
+- I0 failure
+- an invalid or unregistered sampling frame
+- protocol deviations of any kind
+
+**Vocabulary.** `target_power` is per atomic cell. `profile_stage_power_floor` is a
+union-bound lower bound under arbitrary cell dependence.
+`study_end_to_end_power_floor` carries the stated least-favourable configuration.
+Selection-return and confirmation operating characteristics are named separately and are
+never called power. a STOP outcome reports the realized registered gate outcome in that run. It is not a proof that no population-level adequate interface exists and is never a model-capability conclusion.
+
+### The registered sampling frame
+
+within each gate-bearing atomic cell, base-item units or base-item contrast-cluster units are independent draws WITH REPLACEMENT from that cell's registered generator distribution; the deterministic model and scorer map each independently drawn unit to exactly one Bernoulli success indicator.
+
+| Level | Identified by | Excludes |
+| --- | --- | --- |
+| sampling cell | split, gate or component, stratum or operation-family x depth, contrast ID where applicable | interface profile, checkpoint role |
+| evaluation cell | one sampling cell x one applicable profile x one applicable role | - |
+
+One iid item stream is drawn per sampling cell and reused across its applicable
+evaluation cells. Every evaluation cell is therefore marginally iid Bernoulli, while
+evaluation cells sharing sampled items may be dependent. That dependence is expressly
+allowed and is handled by the arbitrary-dependence bounds above.
+
+- Development sampling cells: **17**; confirmation sampling cells: **17**.
+- Draws are **with replacement**. Duplicate generator tuples are legitimate draws and
+  **must be retained**; redrawing for uniqueness, difficulty, balance or model response
+  is prohibited.
+- Every sampled parameter carries an exact rational weight and every parameter's weights
+  sum to exactly one.
+- Validity predicates are deterministic and evaluated before any model operation; every
+  registered support satisfies them by construction, so the registered rejection
+  probability is exactly `0`.
+- Development, confirmation and future `P3-Q` supports are physically disjoint by the
+  registered outcome-blind namespace partition of the generator key, frozen before any
+  seed draw.
+- The K5 baseline nuisance state has a **32**-state support with exact weight
+  `1/32` per state, drawn iid with replacement. `n` is no longer required
+  to be a multiple of the support size.
+- **No seed exists and no bank row exists.** Seed values, the generator implementation
+  blob and the realized bank are `null`, meaning *not yet selected*, not zero.
+
+**Exact-binomial validity holds exactly under these conditions.**
+
+- the n units of the evaluation cell are the images of n iid draws from that cell's registered generator distribution
+- the scorer is a deterministic function of the drawn unit and the pinned checkpoint, so each unit yields exactly one Bernoulli indicator with a common success probability
+- no unit is redrawn, filtered, deduplicated or reordered on any post-draw property
+- the null and the alternative are statements about that cell's registered generating distribution
+- the split namespace of the cell is disjoint from every other split
+
+if any gate-bearing atomic cell lacks a complete generator distribution, or would require an adaptive post-draw choice, the design fails closed for that cell. It is not silently downgraded to descriptive and no exact-binomial validity is claimed for it.
+
+### The total state machine
+
+`I0` is a **global precondition**, evaluated before and outside profile adequacy. Every
+event has exactly one legal next state and every registered terminal state is reachable.
+
+| From | Event | Next |
+| --- | --- | --- |
+| `Q0_INSTRUMENT` | all fixtures pass | `Q1_DEVELOPMENT` |
+| `Q0_INSTRUMENT` | any fixture fails | `STOP_INSTRUMENT_DEFECT` |
+| `Q0_INSTRUMENT` | error | `STOP_INSTRUMENT_DEFECT` |
+| `Q0_INSTRUMENT` | ambiguity | `STOP_INSTRUMENT_DEFECT` |
+| `Q1_DEVELOPMENT` | completed validly | `Q2_SELECTION` |
+| `Q1_DEVELOPMENT` | protocol or integrity error | `STOP_DEVELOPMENT_INTEGRITY_ERROR` |
+| `Q2_SELECTION` | a profile is selected | `Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY` |
+| `Q2_SELECTION` | no profile is eligible and applicable | `STOP_NO_SELECTABLE_INTERFACE_REMAINS` |
+| `Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY` | authority granted and conjunction passes | `CALIBRATED_PENDING_SEPARATE_SUBSTANTIVE_AUTHORITY` |
+| `Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY` | authority granted and any applicable cell fails | `STOP_CONFIRMATION_FAILED` |
+| `Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY` | authority granted and an error or ambiguity occurs | `STOP_CONFIRMATION_SPENT_ON_ERROR` |
+
+| Terminal state | Claim |
+| --- | --- |
+| `STOP_INSTRUMENT_DEFECT` | the instrument is defective. NOTHING was measured about any interface. This is never a statement about any interface or any model. |
+| `STOP_DEVELOPMENT_INTEGRITY_ERROR` | a protocol or integrity error occurred during development. This is a fail-closed integrity stop and is never reinterpreted as a scientific gate failure. |
+| `STOP_NO_SELECTABLE_INTERFACE_REMAINS` | no candidate profile passed the registered development gates in that realized run. It is not a proof that no population-level adequate interface exists and is never a model-capability conclusion. |
+| `STOP_CONFIRMATION_FAILED` | the selected profile did not replicate on the confirmation split. The split is spent and no substitution or reselection is permitted. |
+| `STOP_CONFIRMATION_SPENT_ON_ERROR` | the confirmation split was spent on an error or ambiguity. It may not be re-read. |
+| `CALIBRATED_PENDING_SEPARATE_SUBSTANTIVE_AUTHORITY` | the named interface cleared the registered gates for the named tasks and roles, conditional on the single selected profile. No mechanistic authority is created. |
+
+The sixteen-row profile-eligibility map is retained as the `Q2_SELECTION` subtable that
+applies only once `I0` has passed. It is not the whole state machine.
+
 ### The paired equivalence procedure is retired
 
 The Tango (1998) score-based procedure for the difference of paired proportions is

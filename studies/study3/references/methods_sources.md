@@ -264,7 +264,7 @@ paired aggregate-equivalence procedure entirely rather than recalibrating it,
 because the primary I3 construct is an item-level conjunction that does not need
 it. This source now supports only purely descriptive paired 2x2 summaries carrying
 no null, no alpha, no p-value, no critical value, no equivalence margin, no pass or
-fail, no rescue path and no ranking weight. The second independent methods review
+fail, no rescue path and no ranking weight. The third independent methods review
 is explicitly asked to adjudicate whether that retirement fully removes the
 size-control defect.
 
@@ -350,3 +350,29 @@ performance number in them is a vendor claim measured on the vendor's harness, a
 none of it has been reproduced here. Nothing in these four entries is evidence
 about this repository, and none of it may be cited as a measured property of any
 Study 3 artifact.
+
+## draft-v0.4 additions
+
+The second independent methods review required the sampling model that licenses the exact binomial
+test to be registered explicitly (`S3MR2-010`) and required family, profile and end-to-end power to
+be derived rather than asserted (`S3MR2-002`). The primary sources that carry those methods are:
+
+| Source | Used for |
+| --- | --- |
+| Clopper, C. J. and Pearson, E. S. (1934). The use of confidence or fiducial limits illustrated in the case of the binomial. *Biometrika* 26(4):404-413. DOI 10.1093/biomet/26.4.404 | the binomial sampling model itself: n independent Bernoulli trials with a common success probability, and the exact one-sided tail used for every threshold in this design |
+| Berger, R. L. and Hsu, J. C. (1996). Bioequivalence trials, intersection-union tests and equivalence confidence sets. *Statistical Science* 11(4):283-319. DOI 10.1214/ss/1032280304 | the intersection-union result: a test that rejects only when every component rejects has size bounded by the maximum component level, which is why no further within-profile correction is applied |
+| Bonferroni, C. E. (1936). Teoria statistica delle classi e calcolo delle probabilita. *Pubblicazioni del R. Istituto Superiore di Scienze Economiche e Commerciali di Firenze* 8:3-62. | the union bound used for the across-profile false-qualification budget and, in complement form, for every type-II bound in `power_architecture_v0_4`. The union bound is the reason those bounds hold under **arbitrary dependence** between cells, profiles, roles and stages |
+| Frechet, M. (1935). Generalisations du theoreme des probabilites totales. *Fundamenta Mathematicae* 25:379-387. | the elementary bounds on the probability of an intersection given its marginals, which is the exact form the profile and end-to-end floors take when no independence is assumed |
+
+**A note on what these sources do and do not license.** Clopper-Pearson gives the exact tail *given*
+the sampling model; it does not supply the model. That is why `sampling_frame_v0_4` registers the
+generator distribution, the draw rule, the duplicate rule and the split partition separately, and why
+the protocol fails closed for any cell that lacks a complete generator distribution. Berger and Hsu
+bound the size of the within-profile conjunction; they say nothing about its power, which is why the
+type-II allocation is derived separately and by union bound.
+
+**Retired from every decision role.** Tango (1998), PMID 9595618; Hsueh, Liu and Chen (2001), PMID
+11414572; and Liu et al. (2002), PMID 11782062 are retained in this file only as the historical
+record of the paired aggregate-equivalence procedure that draft-v0.3 retired. draft-v0.4 introduces
+no paired-effect, equivalence, non-inferiority or discordance procedure of any kind, and no margin,
+critical value or nuisance-maximisation contract exists anywhere in the active design.

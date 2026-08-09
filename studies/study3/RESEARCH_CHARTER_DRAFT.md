@@ -7,7 +7,7 @@
 | study id | `jspace-study3-interface-calibration` |
 | name | Study 3 - Interface Adequacy and Label-Binding Calibration |
 | namespace | `studies/study3` |
-| state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW` |
+| state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW` |
 | draft version | `draft-v0.3` |
 | frozen | no |
 | execution authorized | no |
@@ -36,10 +36,10 @@ finding-by-finding dispositions are in `reviews/v0_3_operator_amendment.md`.
 **No amendment in this history performed any measurement or closed any blocking decision.**
 
 **The drafting party does not claim draft-v0.3 is correct.** Every repair is recorded as
-`PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`. draft-v0.2 was found defensible by
+`PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`. draft-v0.2 was found defensible by
 the party that wrote it and was then independently rejected with six blocking findings; a design
 checked only by its author is not evidence that the design is sound. That determination belongs to
-the second independent methods review.
+the third independent methods review.
 
 ---
 
@@ -215,3 +215,27 @@ The legal next action is a **second bounded independent methods review**; the pa
 **The only legal next action is a second bounded independent methods review.** No freeze prompt, no
 `P3-Q` prompt, no bank prompt, no seed prompt, no model prompt, no GPU prompt, no development prompt,
 no confirmation prompt and no mechanistic-execution prompt exists.
+
+## draft-v0.4 amendment summary
+
+draft-v0.4 answers the second bounded independent methods review, which returned
+`STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED` with two BLOCKING, six MAJOR and two MINOR
+structured findings. The charter-level consequences are:
+
+- **The research question is narrowed.** Study 3 asks whether a pre-specified interface registers
+  competence at a high **joint-correctness** rate across registered presentation *pairs*. It does not
+  ask, and cannot answer, whether a presentation change has an effect. Every invariance, equivalence
+  and presentation-effect claim is prohibited in active text.
+- **The design now carries a binding end-to-end operating characteristic**, not a per-cell one. The
+  per-cell power target is derived from a per-stage profile false-negative budget divided across the
+  maximum selectable-profile cell count, and every joint bound is a union bound valid under arbitrary
+  dependence.
+- **The instrument gate is separated from interface adequacy.** An `I0` failure means nothing was
+  measured about any interface, and it can no longer be reported as "no candidate interface passed".
+- **A stochastic item-sampling model is registered**, so the exact binomial inference has a stated
+  warrant. No seed is drawn and no bank exists.
+
+The charter remains a **draft**. It is not frozen, it authorises no execution, it selects no
+interface and no positive reference, and the original research question remains unanswered. The only
+legal next action is a third bounded independent methods review of draft-v0.4, conducted in a fresh
+session by a party that did not draft it.

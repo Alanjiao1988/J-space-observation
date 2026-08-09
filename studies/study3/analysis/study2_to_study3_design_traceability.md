@@ -185,8 +185,8 @@ all eight open without dispositions.
 | `OD2` | which positive-capability reference model is defensible and T4-feasible | **yes - blocks Gate `I4`** |
 | `OD3` | whether bounded final-answer generation belongs in the panel | no |
 | `OD4` | which prompt-rendering variants are methodologically necessary | no |
-| `OD5` | acceptable accuracy, robustness, equivalence and multiplicity thresholds | resolved in the draft-v0.3 operator amendment; still subject to the second independent methods review |
-| `OD6` | development and confirmation sample sizes | resolved in the draft-v0.3 operator amendment; still subject to the second independent methods review |
+| `OD5` | acceptable accuracy, robustness, equivalence and multiplicity thresholds | resolved in the draft-v0.3 operator amendment; still subject to the third independent methods review |
+| `OD6` | development and confirmation sample sizes | resolved in the draft-v0.3 operator amendment; still subject to the third independent methods review |
 | `OD7` | whether a bounded independent methods review is required before freeze | no |
 | `OD8` | whether and where a chat template is applied | no |
 
@@ -204,7 +204,7 @@ clusters per applicable contrast cell; the second floor `p0 = 0.95` is deleted f
 protocol, table and packet field and survives only in clearly labelled historical narrative.
 **`OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`** and is not touched. Resolving `OD5` and
 `OD6` does not make the design correct; it makes it reviewable. The determination belongs to the
-second independent methods review.
+third independent methods review.
 
 **`OD2` is still the one that can stop the study before it starts, and draft-v0.3 does not move
 it.** If no positive-capability reference
@@ -329,7 +329,7 @@ or any confirmation access.
 
 **The drafting party does not claim the amended design is correct.** Every repair in
 `reviews/v0_3_operator_amendment.md` is recorded as
-`PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`. draft-v0.2 was found defensible by
+`PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`. draft-v0.2 was found defensible by
 the party that wrote it and was then rejected by an independent reviewer with 6 blocking findings;
 that is the specific failure mode the draft-v0.3 round is required to avoid repeating.
 
@@ -341,3 +341,31 @@ uninterpretable as evidence that the design is sound.** Independent review is to
 Gate `I4` is to a measurement. That is why `OD7` was resolved in the affirmative, why a second
 review is the legal next action after this amendment, and why the amendment record is forbidden
 from self-approving.
+
+## draft-v0.4: what the second independent review changed about provenance
+
+The second bounded independent methods review returned
+`STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`. Two of its findings change what this
+document must say about the epistemic status of Study 3's inputs.
+
+**Finding `S3MR2-010`, the sampling frame.** draft-v0.3 registered an exact binomial test without
+registering the stochastic model that licenses it, while its own construction was explicitly
+deterministic. draft-v0.4 registers an iid-with-replacement generator distribution per sampling
+cell. This changes nothing about Study 2 provenance, but it makes the boundary sharper: **no Study 1
+or Study 2 item identity, bank row, seed, template outcome or realized measurement enters the Study 3
+generator support.** The Study 3 generator draws from its own registered parameter supports under a
+future seed authority that has not been granted. Operation families are reused from Study 2 at the
+abstract level only, exactly as before, and that reuse is a *design vocabulary* inheritance, never a
+data inheritance.
+
+**Finding `S3MR2-001`, the I3 estimand.** draft-v0.3 inherited from Study 2's post-hoc interface
+diagnostic the intuition that presentation sensitivity is the quantity of interest. The review
+established that the gate statistic identifies joint correctness and not any presentation effect.
+draft-v0.4 narrows the construct to joint robust correctness. The consequence for traceability is
+that **Study 2's post-hoc response-surface observations remain zero-authority motivation only** and
+may not be read as pilot evidence for a presentation-effect estimand that Study 3 does not measure.
+
+**What did not change.** Study 1 remains closed at `INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY`.
+Study 2 remains closed at `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`. Neither is
+reopened, reinterpreted or modified by draft-v0.4, and no Study 1 or Study 2 measurement is used as
+pilot data for choosing any Study 3 parameter.
