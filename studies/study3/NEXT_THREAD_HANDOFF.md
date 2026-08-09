@@ -305,11 +305,6 @@ permitted dispositions.
 
 The reviewer is specifically asked to rule on:
 
-*Historical record only.* The six questions below were posed to the FIRST
-independent methods reviewer of draft-v0.2 and were answered by that completed
-review. They are retained verbatim as immutable provenance; they name no pending
-review and describe no current design.
-
 1. whether the atomic cell is fine enough that no gate can be passed by
    averaging over a heterogeneous mixture;
 2. whether the intersection-union treatment within a profile, and the Bonferroni
@@ -321,6 +316,10 @@ review and describe no current design.
 5. whether the `I4` competence floor is defensible before any model is observed;
 6. whether the `I1a`/`I1b` power shortfall at the nearest alternative requires a
    larger n.
+   *(Historical record only: the six questions above were posed to the FIRST
+   independent methods reviewer of draft-v0.2 and were answered by that completed
+   review. They are retained verbatim as immutable provenance, they name no
+   pending review, and they describe no current design.)*
 
 ## 6. What a future authorized execution would need, in order
 

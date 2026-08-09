@@ -3544,3 +3544,70 @@ opened and no evidence row was created. The original research question remains u
 **Legal successor action.** `OPERATOR_BOUNDED_AMENDMENT_ROUND_FOR_DRAFT_V0_5`, followed by a further independent methods review. No
 freeze, no `P3-Q`, no bank, no seed, no model execution, no development round, no confirmation
 access and no feasibility-pilot authority is created. No successor prompt was written.
+
+
+## 2026-08-10 - `D44`: Study 3 draft-v0.5 bounded operator amendment
+
+**Supersedes the draft-v0.4 design recorded in `D43`.** `D43` is retained
+unedited as immutable provenance. The third independent methods review of
+draft-v0.4 returned `STUDY3_V0_4_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`
+against commit `79bcc20244ab55045ba1c5d778d829d4caac3dd3` with one BLOCKING,
+three MAJOR and six MINOR structured findings. This entry records the bounded
+amendment that answers them. Everything `D43` describes is historical from this
+entry onward and is not current.
+
+**`S3MR3-001`, the blocking finding.** `K6-SEP` varies the separator between a
+displayed option label and its displayed option content. `S2` and `S3` render
+neither, so the factor has no referent for them and the two members of the pair
+would be byte-identical; under the registered deterministic scorer that cell is a
+self-comparison, not a presentation pair. `K6-SEP` is therefore recorded
+`not_applicable` for `S2` and `S3` in every location. `not_applicable` is never a
+pass, a zero effect, robustness evidence, a gate-bearing cell or a denominator
+member. No profile-specific replacement separator is invented and no `R-sep`
+duplicate of `R-base` is rendered. **`S2` and `S3` each carry exactly one genuine
+`I3` contrast, `K6-INSTR`**, and their claim ceiling states joint robust
+correctness for that single pair only. Applicability is now registered per
+contrast ID, because family level cannot express the distinction.
+
+**Re-derivation.** The census counts applicable contrast IDs:
+
+| profile | `I1a` | `I1b` | `I2` | `K5` | `K6` | `I4` | total | applicable `I3` contrasts |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `S1` | 3 | 3 | 6 | 21 | 6 | 4 | **43** | 9 |
+| `S2` | 3 | 0 | 6 | 0 | 3 | 4 | **16** | 1 |
+| `S3` | 3 | 0 | 6 | 0 | 3 | 4 | **16** | 1 |
+| `S4` | 3 | 3 | 6 | 21 | 6 | 0 | **39** | 9 |
+
+`m_max` is the maximum over the selectable profiles, so it is still `S1`'s 43:
+unchanged because the profile that attains it is unchanged, not because the value
+was preserved. By derivation the per-cell budget `19/17200`, the per-cell target
+`17181/17200`, the profile stage floor `381/400`, the end-to-end floor `9/10` and
+the sizes `413`/`214`/`448` with pass counts `389`/`129`/`383` all reproduce.
+
+**`S3MR3-010`.** A byte-exact deterministic rendering registry and schema are
+registered as binding inputs, closing the gap that made the two `K6` cells
+non-instantiable and that hid `S3MR3-001`. Tokenizer distinctness is not tested,
+because no checkpoint or tokenizer may be accessed; a fail-closed pre-bank rule is
+registered instead and it does not resolve `OD2`.
+
+**The remaining repairs.** Confirmation applicability becomes component level
+(`S3MR3-002`); active text is aligned with history preserved (`S3MR3-003`); the
+prohibition's enforcement is widened to its registered scope with explicit
+auditable exemptions (`S3MR3-004`); `I4` is removed from `S4`'s applicable gates
+(`S3MR3-005`); `STOP_AWAITING_AUTHORITY` is removed from the legal stop states
+rather than added to the state machine (`S3MR3-006`); the local power
+non-monotonicity above each registered size is disclosed and execution must use
+the exact registered `n` (`S3MR3-007`); active round references now name the
+fourth review (`S3MR3-008`); and the union-bound conclusion is restated over an
+adequate profile (`S3MR3-009`).
+
+**What this round did not do.** It did not freeze the design, authorise
+execution, resolve `OD2` or `UR-22`, select an interface profile or a positive
+reference, construct a bank, draw a seed, run a tokenizer or a model, open
+confirmation content or create an evidence row. Every operation counter is zero,
+every authority flag is false, and the evidence ledger still ends at `EV-0016`.
+The original research question remains unanswered.
+
+**Disposition.** `PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW`.
+The sole legal successor is a fresh-session fourth independent methods review of
+published draft-v0.5 by a party that did not draft it.

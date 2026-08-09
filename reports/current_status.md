@@ -1,5 +1,44 @@
 # Project Status Report
 
+> **STUDY 3 DRAFT-V0.5 BOUNDED AMENDMENT PUBLISHED - AWAITING A FOURTH INDEPENDENT METHODS REVIEW**
+>
+> State: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`
+>
+> Disposition: `STUDY3_DRAFT_V0_5_BOUNDED_AMENDMENT_PUBLISHED_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`.
+>
+> draft-v0.5 is the bounded operator amendment answering the ten `S3MR3-*` findings of the third
+> independent methods review. It is published for a **fourth** independent methods review and is
+> **not** declared correct: every repair is recorded as
+> `PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW`, and the determination belongs
+> to a party that did not draft it.
+>
+> The blocking repair: `K6-SEP` varies the separator between a displayed option label and its
+> displayed option content, which the option-less profiles `S2` and `S3` do not render, so it is
+> now recorded `not_applicable` for both. `not_applicable` is never a pass, a zero effect,
+> robustness evidence, a gate-bearing cell or a denominator member. **`S2` and `S3` therefore each
+> carry exactly one genuine `I3` contrast, `K6-INSTR`**, and their claim ceiling says only that.
+>
+> Re-derived, not preserved: `S2` and `S3` fall from 19 gate-bearing cells to 16 and from two
+> applicable `I3` contrasts to one, while `S1` is untouched at 43. Because `m_max` is the maximum
+> over the selectable profiles and `S1` attains it, `m_max` stays 43, and the per-cell budget
+> `19/17200`, the per-cell target `17181/17200`, the profile stage floor `381/400`, the end-to-end
+> floor `9/10` and the sizes `413`/`214`/`448` reproduce by derivation.
+>
+> A byte-exact deterministic rendering registry and schema are registered as binding inputs.
+> Tokenizer distinctness is **not** tested, because no checkpoint or tokenizer may be accessed; a
+> fail-closed pre-bank rule is registered instead and it does not resolve `OD2`.
+>
+> The only legal next action is a fresh-session **fourth independent methods review of published
+> draft-v0.5**. **Not a freeze. Not `P3-Q`. Not a bank, a seed, model execution, a development
+> round, a confirmation access, a feasibility pilot or any mechanistic work.**
+>
+> `OD2`, `UR-22` and the `RP` wrappers remain unresolved. Study 3 remains unfrozen. No interface or
+> positive reference is selected. No bank, seed, model operation, gate result, confirmation access
+> or evidence row exists. Every operation counter is zero, the evidence ledger still ends at
+> `EV-0016`, and the original research question remains unanswered.
+
+> **Historical record - third independent methods review of draft-v0.4, superseded by draft-v0.5**
+>
 > **THIRD INDEPENDENT METHODS REVIEW COMPLETE - BOUNDED AMENDMENT REQUIRED**
 >
 > State: `STUDY3_DRAFT_V0_4_THIRD_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`

@@ -399,11 +399,43 @@
   },
   "operator_decisions_in_this_round": {
    "items": {
-    "minLength": 1,
-    "type": "string"
+    "additionalProperties": false,
+    "properties": {
+     "blocking": {
+      "type": "boolean"
+     },
+     "decision": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "id": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "finding_closure",
+       "open_operator_decision",
+       "open_unresolved_item"
+      ]
+     },
+     "status": {
+      "minLength": 1,
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "kind",
+     "status",
+     "blocking",
+     "decision"
+    ],
+    "type": "object"
    },
-   "minItems": 1,
-   "type": "array"
+   "minItems": 12,
+   "type": "array",
+   "uniqueItems": true
   },
   "party": {
    "minLength": 1,

@@ -2131,3 +2131,57 @@ citation is not treated as validation: whether the registered protocol satisfies
 conditions is adjudicated in the review.
 
 **Status.** Proposed design parameters, not measurements. Nothing here is frozen or authorised.
+
+
+## `M-32` - Study 3 draft-v0.5 bounded operator amendment
+
+**Round.** Study 3 draft-v0.5 bounded operator amendment, answering the ten
+`S3MR3-*` findings of the third independent methods review. Supersedes the
+draft-v0.4 methods record `M-31`, which is retained unedited as historical
+provenance.
+
+**Design change of record.** Contrast applicability is registered per contrast ID
+rather than per contrast family. `K6-SEP` varies the separator between a displayed
+option label and its displayed option content; the option-less profiles `S2` and
+`S3` render neither, so the factor has no referent for them and the cell is
+recorded `not_applicable`, which is never a pass, a zero effect, robustness
+evidence, a gate-bearing cell or a denominator member. `S2` and `S3` each carry
+exactly one genuine `I3` contrast, `K6-INSTR`.
+
+**Statistics.** The gate-bearing evaluation-cell census, recomputed from applicable
+contrast IDs, is `S1 = 43`, `S2 = 16`, `S3 = 16`, `S4 = 39`. `m_max` is the maximum
+over the selectable profiles and is therefore still 43, attained by `S1`, which the
+change does not touch. The per-cell false-negative budget is `(19/400) / 43 =
+19/17200`; the per-cell power target is `17181/17200`; the profile stage power
+floor is `1 - 43 * (19/17200) = 381/400`; the study end-to-end power floor is
+`1 - 19/400 - 1/200 - 19/400 = 9/10`. Development sizes are `413` for `I1a`, `I1b`
+and `I3`, `214` for `I2` and `448` for `I4`, with minimal pass counts `389`, `129`
+and `383` at component level `1/600`, and confirmation pass counts `388`, `127` and
+`381` at component level `1/200`. Every value is re-derived by exact rational
+arithmetic; none is preserved for continuity.
+
+**Disclosed limitation of the sizing rule.** The registered sizes are the smallest
+unrestricted positive integers meeting the per-cell target, and the target is NOT
+monotone above them: within the registered disclosure window it fails again at
+421-425 above 413, at 215, 216 and 218 above 214, and at 450-453 and 459 above 448.
+Execution must use the exact registered cell size; the registered size never means
+"at least n".
+
+**Deterministic rendering surface.** The byte-exact rendering registry and schema
+are binding normative inputs. They fix the encoding, newline and normalization
+policy, one question-stem template per gate-bearing generator branch, placeholder
+and escaping rules, the option-line grammar and ordering, the label alphabets and
+separator literals `": "` and `" = "`, the per-`(profile, rendering)` instruction
+strings, the answer cue and candidate-surface whitespace convention, the
+deterministic tie-break order, the `S4` pre-wrapper boundary, the full
+applicability table, and a cryptographic identity for the registry and every
+normative template asset.
+
+**Claim ceiling.** A pass would apply only to the registered synthetic generator
+distributions and the named interface and checkpoint roles. It would not establish
+adequacy on an unregistered substantive task distribution. `UM3-05`, the
+external-validity bridge, remains an unresolved future-methods prerequisite.
+
+**Status.** `PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW`. The
+drafting party does not adjudicate its own amendment. `OD2`, `UR-22` and the `RP`
+wrappers remain unresolved and the original research question is unanswered.

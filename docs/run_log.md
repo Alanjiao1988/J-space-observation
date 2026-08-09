@@ -6838,3 +6838,50 @@ select an interface profile or a positive reference, construct a bank, draw a se
 confirmation split, create an evidence row, or write a successor prompt. Study 1 remains closed,
 Study 2 remains closed, Study 3 remains unfrozen, and the original research question remains
 unanswered.
+
+
+## 2026-08-10 - Study 3 draft-v0.5 bounded operator amendment
+
+**Round.** A bounded operator amendment answering the ten `S3MR3-*` findings of
+the third independent methods review. Starting commit
+`79bcc20244ab55045ba1c5d778d829d4caac3dd3`, tree
+`3855a579d0174d2c45587cba248e96d42c319664`, clean worktree, evidence ledger
+ending at `EV-0016`.
+
+**Ordering.** The operator authority was committed byte-identically at
+`studies/study3/prompts/study3_v0_5_design_amendment_authority.md` (27,458 bytes,
+400 LF, 0 CR, trailing newline present, sha256
+`b9f0023052c9056de1707ba64a8686a8df05d260cbf7aae0673c31d2dc3aadc6`) together with
+an initial closure matrix recording all ten findings at `OPEN_NOT_YET_DRAFTED`,
+before any drafting output existed or was read. Substantive normative choices were
+committed before the derived tables and the routing claims.
+
+**Substantive result.** `K6-SEP` is `not_applicable` for the option-less profiles
+`S2` and `S3`, which therefore each carry exactly one genuine `I3` contrast,
+`K6-INSTR`. The census was recomputed from applicable contrast IDs:
+
+| profile | `I1a` | `I1b` | `I2` | `K5` | `K6` | `I4` | total | applicable `I3` contrasts |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `S1` | 3 | 3 | 6 | 21 | 6 | 4 | **43** | 9 |
+| `S2` | 3 | 0 | 6 | 0 | 3 | 4 | **16** | 1 |
+| `S3` | 3 | 0 | 6 | 0 | 3 | 4 | **16** | 1 |
+| `S4` | 3 | 3 | 6 | 21 | 6 | 0 | **39** | 9 |
+
+`m_max` remains 43 because `S1`, the selectable profile that attains it, is
+unaffected; the per-cell budget `19/17200`, the per-cell target `17181/17200`, the
+profile stage floor `381/400`, the end-to-end floor `9/10` and the sizes and pass
+counts therefore reproduce by derivation rather than by preservation. The
+disclosure window shows the exact-binomial power target failing again at 421-425
+above `n = 413`, at 215, 216 and 218 above `n = 214`, and at 450-453 and 459 above
+`n = 448`, so execution must use the exact registered cell size.
+
+**New normative artifact.** A byte-exact deterministic rendering registry and its
+schema, registered as binding inputs and covered by model-free fixtures that
+render 80 applicable profile/rendering/branch combinations and all 32 registered
+nuisance support states.
+
+**What this round did not do.** It did not freeze the design, authorise
+execution, resolve `OD2` or `UR-22`, select an interface profile or a positive
+reference, construct a bank, draw a seed, run a tokenizer or a model, open
+confirmation content, create an evidence row, or use GitHub Actions. No model
+operation of any kind occurred.

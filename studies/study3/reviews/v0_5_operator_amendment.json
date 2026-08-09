@@ -745,16 +745,90 @@
   "tokenizer_calls": 0
  },
  "operator_decisions_in_this_round": [
-  "S3MR3-001: RESOLVED_BY_NOT_APPLICABLE_REREGISTRATION_AND_FULL_REDERIVATION",
-  "S3MR3-002: RESOLVED_BY_COMPONENT_LEVEL_CONFIRMATION_APPLICABILITY",
-  "S3MR3-003: RESOLVED_ACTIVE_TEXT_ALIGNED_HISTORY_PRESERVED",
-  "S3MR3-004: RESOLVED_ENFORCEMENT_SCOPE_MATCHES_REGISTERED_SCOPE",
-  "S3MR3-005: RESOLVED_S4_I4_REMOVED",
-  "S3MR3-006: RESOLVED_NON_MACHINE_STATUS_REMOVED_FROM_STOP_STATES",
-  "S3MR3-007: RESOLVED_NONMONOTONICITY_DISCLOSED_EXACT_N_REQUIRED",
-  "S3MR3-008: RESOLVED_ROUND_REFERENCES_UPDATED",
-  "S3MR3-009: RESOLVED_UNION_BOUND_CLAIM_ALIGNED",
-  "S3MR3-010: RESOLVED_DETERMINISTIC_RENDERING_SURFACE_REGISTERED"
+  {
+   "blocking": true,
+   "decision": "RESOLVED_BY_NOT_APPLICABLE_REREGISTRATION_AND_FULL_REDERIVATION",
+   "id": "S3MR3-001",
+   "kind": "finding_closure",
+   "status": "closed_subject_to_the_fourth_independent_methods_review"
+  },
+  {
+   "blocking": false,
+   "decision": "RESOLVED_BY_COMPONENT_LEVEL_CONFIRMATION_APPLICABILITY",
+   "id": "S3MR3-002",
+   "kind": "finding_closure",
+   "status": "closed_subject_to_the_fourth_independent_methods_review"
+  },
+  {
+   "blocking": false,
+   "decision": "RESOLVED_ACTIVE_TEXT_ALIGNED_HISTORY_PRESERVED",
+   "id": "S3MR3-003",
+   "kind": "finding_closure",
+   "status": "closed_subject_to_the_fourth_independent_methods_review"
+  },
+  {
+   "blocking": false,
+   "decision": "RESOLVED_ENFORCEMENT_SCOPE_MATCHES_REGISTERED_SCOPE",
+   "id": "S3MR3-004",
+   "kind": "finding_closure",
+   "status": "closed_subject_to_the_fourth_independent_methods_review"
+  },
+  {
+   "blocking": false,
+   "decision": "RESOLVED_S4_I4_REMOVED",
+   "id": "S3MR3-005",
+   "kind": "finding_closure",
+   "status": "closed_subject_to_the_fourth_independent_methods_review"
+  },
+  {
+   "blocking": false,
+   "decision": "RESOLVED_NON_MACHINE_STATUS_REMOVED_FROM_STOP_STATES",
+   "id": "S3MR3-006",
+   "kind": "finding_closure",
+   "status": "closed_subject_to_the_fourth_independent_methods_review"
+  },
+  {
+   "blocking": false,
+   "decision": "RESOLVED_NONMONOTONICITY_DISCLOSED_EXACT_N_REQUIRED",
+   "id": "S3MR3-007",
+   "kind": "finding_closure",
+   "status": "closed_subject_to_the_fourth_independent_methods_review"
+  },
+  {
+   "blocking": false,
+   "decision": "RESOLVED_ROUND_REFERENCES_UPDATED",
+   "id": "S3MR3-008",
+   "kind": "finding_closure",
+   "status": "closed_subject_to_the_fourth_independent_methods_review"
+  },
+  {
+   "blocking": false,
+   "decision": "RESOLVED_UNION_BOUND_CLAIM_ALIGNED",
+   "id": "S3MR3-009",
+   "kind": "finding_closure",
+   "status": "closed_subject_to_the_fourth_independent_methods_review"
+  },
+  {
+   "blocking": false,
+   "decision": "RESOLVED_DETERMINISTIC_RENDERING_SURFACE_REGISTERED",
+   "id": "S3MR3-010",
+   "kind": "finding_closure",
+   "status": "closed_subject_to_the_fourth_independent_methods_review"
+  },
+  {
+   "blocking": true,
+   "decision": "NOT_ADVANCED_BY_DRAFT_V0_5. No positive reference is selected, preferred, pinned, downloaded, tokenized, loaded, prequalified or ranked, and the RP canonical qualification wrapper stays null.",
+   "id": "OD2",
+   "kind": "open_operator_decision",
+   "status": "unresolved"
+  },
+  {
+   "blocking": true,
+   "decision": "NOT_ADVANCED_BY_DRAFT_V0_5. It depends on OD2.",
+   "id": "UR-22",
+   "kind": "open_unresolved_item",
+   "status": "unresolved"
+  }
  ],
  "party": "the operator authority holding studies/study3/prompts/study3_v0_5_design_amendment_authority.md",
  "responds_to": "studies/study3/reviews/v0_4_independent_methods_review.md",

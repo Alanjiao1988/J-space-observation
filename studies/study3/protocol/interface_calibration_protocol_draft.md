@@ -1,15 +1,15 @@
 # Study 3 - interface adequacy and label-binding calibration
 
-**State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW`
+**State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`
 
-**Draft version:** draft-v0.4
+**Draft version:** draft-v0.5
 
-**Frozen:** `false`  **Execution authorized:** `false`  **Review state:** `awaiting_third_independent_methods_review`
+**Frozen:** `false`  **Execution authorized:** `false`  **Review state:** `awaiting_fourth_independent_methods_review`
 
 **Successor authority:** `none`
 
 **This document does not declare its own protocol correct.** Every repair recorded here is
-`PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`. The drafting party of draft-v0.2 found its own design defensible and an independent
+`PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW`. The drafting party of draft-v0.2 found its own design defensible and an independent
 reviewer then rejected it with six blocking findings; that outcome is the reason this
 document may not adjudicate itself.
 
@@ -20,6 +20,107 @@ The JSON document interface_calibration_protocol_draft.json is the authoritative
 
 draft-v0.2 is an amendment produced in response to an operator review that found ten design defects in draft-v0.1 and refused freeze. Nothing here is frozen, nothing here is authorised for execution, and no scientific measurement of any kind was performed to produce it.
 
+## What draft-v0.5 is
+
+draft-v0.5 is a bounded operator amendment produced in response to the **third** bounded
+independent methods review, which returned `STUDY3_V0_4_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`
+against commit `79bcc20244ab55045ba1c5d778d829d4caac3dd3` with one BLOCKING, three MAJOR and six
+MINOR structured findings. All three independent reviews remain valid rejections and none was
+edited. The determination on this amendment belongs to a **fourth independent methods review**,
+conducted in a fresh session by a party that did not draft draft-v0.5.
+
+### `S3MR3-001`: `K6-SEP` is not applicable to the option-less profiles
+
+`K6-SEP` varies the separator between a **displayed option label** and its **displayed option
+content**. `S1` and `S4` render labelled option lists, so the factor has a referent for them. `S2`
+and `S3` render neither an option label nor an option content, so the factor has no referent and the
+two members of the pair would be byte-identical. Under the registered deterministic scorer an
+identical prompt yields an identical score, so such a cell would be a self-comparison whose estimand
+is a plain marginal accuracy rather than a joint-correctness level over a registered presentation
+pair.
+
+`K6-SEP` is therefore recorded `not_applicable` for `S2` and `S3` in every location.
+`not_applicable` is a third value: it is not a pass, not a zero effect, not robustness evidence, not
+a gate-bearing cell and not a denominator member. No profile-specific replacement separator is
+invented, and no `R-sep` duplicate of `R-base` is rendered for an option-less profile.
+
+**`S2` and `S3` each carry exactly ONE genuine `I3` contrast: `K6-INSTR`.** Their per-profile `I3`
+claim ceiling states joint robust correctness for that single registered pair only, subject to
+`S3`'s separately registered conditional status. `S1` retains its seven `K5` pairs plus both `K6`
+pairs, and `S4` retains the same contrast availability for diagnostic description only.
+
+Applicability is now registered **per contrast ID**, because family-level registration cannot
+express this distinction.
+
+### The re-derived census, and the numbers that did not change
+
+| profile | `I1a` | `I1b` | `I2` | `K5` | `K6` | `I4` | total | applicable `I3` contrasts |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `S1` | 3 | 3 | 6 | 21 | 6 | 4 | **43** | 9 |
+| `S2` | 3 | 0 | 6 | 0 | 3 | 4 | **16** | 1 |
+| `S3` | 3 | 0 | 6 | 0 | 3 | 4 | **16** | 1 |
+| `S4` | 3 | 3 | 6 | 21 | 6 | 0 | **39** | 9 |
+
+`S2` and `S3` fall from 19 gate-bearing cells to 16. `m_max` is the maximum total over the
+**selectable** profiles, so it is still `S1`'s **43**: it is unchanged because the profile that
+attains it is unchanged, not because the value was preserved for continuity. By derivation and not
+by transcription, the per-cell false-negative budget is `19/17200`, the per-cell power target is
+`17181/17200`, the profile stage power floor is `381/400`, the study end-to-end power floor is
+`9/10`, the development component alpha is `1/600`, the confirmation component alpha is `1/200`, and
+the development sizes and pass counts remain `413`/`389`, `214`/`129` and `448`/`383`, with
+confirmation pass counts `388`, `127` and `381`.
+
+### `S3MR3-002`: confirmation applicability is component level
+
+The derivation table is regenerated only from the amended normative inputs and now expresses
+applicability **per component**. `S4` appears in no confirmation applicability field. `I1b` and `K5`
+confirmation applicability is restricted to `S1`; `K6-SEP` confirmation applicability excludes `S2`
+and `S3`; `K6-INSTR` confirmation applicability is `S1`, `S2` and `S3`. No row can imply that a
+never-selectable or not-applicable profile reaches confirmation.
+
+### `S3MR3-007`: the power target is locally non-monotone in `n`
+
+The registered sizes are the smallest unrestricted positive integers meeting the per-cell target.
+The target is **not** monotone above them: within the registered disclosure window it fails again at
+`421`-`425` above `n = 413`, at `215`, `216` and `218` above `n = 214`, and at `450`-`453` and `459`
+above `n = 448`. Execution must use the **exact** registered cell size; the registered size never
+means "at least `n`". The registered minimum is retained rather than replaced by an
+eventual-monotonicity threshold, because fresh arithmetic confirms the design is executable at exact
+`n`.
+
+### `S3MR3-009`: what the union bound actually establishes
+
+The end-to-end conclusion is restated over **an adequate profile**: the three unioned terms
+establish that an adequate profile is qualified, selected and confirmed. Where several selectable
+profiles are adequate, the frozen priority order returns the highest-priority adequate profile. No
+claim of recovering an externally predesignated profile is made.
+
+### `S3MR3-010`: the deterministic rendering surface is registered
+
+`studies/study3/protocol/interface_calibration_rendering_registry_v0_5.json` and its schema are
+**binding normative inputs, not illustrative examples**. They fix the encoding, newline and
+normalization policy; one exact question-stem template per gate-bearing generator branch;
+placeholder, interpolation and escaping rules; the option-line grammar and ordering; the label
+alphabets and the exact separator literals `": "` for `R-base` and `" = "` for `R-sep`; two exact,
+semantically co-referential instruction strings per applicable profile for `K6-INSTR`; the answer
+cue and the whitespace convention of every scored candidate surface; the deterministic tie-break
+order; the `S4` pre-wrapper message boundary; the full `(profile, rendering, contrast)` applicability
+table; and a cryptographic identity for the registry and every normative template asset.
+
+Tokenizer distinctness is **not** tested in this round, because no checkpoint or tokenizer may be
+accessed. A future fail-closed pre-bank rule is registered instead: once checkpoints and tokenizers
+are separately authorised and pinned, every gate-bearing pair must produce distinct token-ID
+sequences for every role to which the cell applies, and failure makes that role/profile/contrast
+`INELIGIBLE` rather than a pass. That rule does not resolve `OD2`, and the `RP` canonical
+qualification wrapper remains explicitly null.
+
+### The remaining minor repairs
+
+`I4` is removed from `S4`'s applicable gate list; `STOP_AWAITING_AUTHORITY` is removed from the
+legal stop states and is not added to the registered state machine, because the repository's
+pre-execution governance status is not an experimental stop state; and active round references now
+name the fourth independent methods review.
+
 ## What draft-v0.4 is
 
 draft-v0.4 is an operator amendment produced in response to the **second** bounded independent
@@ -28,7 +129,7 @@ commit `2b36f5321d830ea6f70fff2b7bbca3cb93394046` with two BLOCKING, six MAJOR a
 structured findings. Both independent reviews remain valid rejections and neither was edited.
 
 **The drafting party does not claim draft-v0.4 is correct.** Every repair is recorded as
-`PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`. The determination belongs to the
+`PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW`. The determination belongs to the
 third independent reviewer.
 
 What the amendment adopted:
@@ -853,7 +954,7 @@ declares. The rows above are corrected._
 
 - **Framework:** frequentist, pre-registered, exact-binomial primary; every level is an exact rational and every decimal in this document is a rendering of it
 - **Status of every number below:** proposed design parameters, not measurements
-- **Disposition:** `PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`
+- **Disposition:** `PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW`
 - **Derivation script:** `studies/study3/analysis/design_statistics.py`
 - **Derivation tables:** `studies/study3/analysis/design_statistics_tables.json`
 - **Reproducibility:** the script's --check mode recomputes every table and compares it value-for-value against the committed tables; the committed design test runs that check, and the CPU-only Azure validation runs it again against the exact publication commit
@@ -1188,7 +1289,7 @@ rescue path or any ranking weight.
 - **What survives.** Purely **descriptive** paired 2x2 summaries: the paired table of variant-1 correctness by variant-2 correctness, the raw discordance count and rate, and the paired accuracy difference. These carry no null, no alpha, no p-value, no critical value, no equivalence margin, no pass or fail, no rescue path and no ranking weight.
 - **Historical evidence is preserved unedited** at `studies/study3/analysis/independent_methods_recalculation.py`, its committed tables, and `studies/study3/reviews/v0_2_independent_methods_review.json`. The reviewer's recalculation is immutable historical evidence and is not edited, re-run, re-derived or superseded by this amendment.
 - **Question for the second reviewer.** Does retiring the paired aggregate-equivalence procedure from every decision role fully remove the size-control defect recorded in `S3MR-004` and `S3MR-005`, or does a residual decision path remain anywhere in the amended protocol?
-- **Disposition:** `PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`
+- **Disposition:** `PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW`
 
 ### The pre-registered development selection map
 
@@ -1553,7 +1654,7 @@ any Gate A or Stage B-D operation.
 | `positive_reference_selected` | `false` |
 | `confirmation_access_authorized` | `false` |
 
-**State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW`
+**State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`
 
 **No self-approval.** This document is the drafting party's amendment. It states that repairs
 are **proposed resolved subject to independent review**. It does not, anywhere, declare the

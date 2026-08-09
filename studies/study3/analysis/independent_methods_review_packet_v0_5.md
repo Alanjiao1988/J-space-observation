@@ -13,15 +13,20 @@ This packet is the reviewed object for a **fourth** bounded independent methods
 review, to be conducted in a fresh session by a party that did not draft
 draft-v0.5.
 
-It does **not** freeze Study 3, authorize execution, select an interface, select
-or inspect a positive reference, resolve `OD2` or `UR-22`, create a seed or bank,
-run a tokenizer or model, access confirmation material, write scientific
-evidence, begin the fourth review, create draft-v0.6, or start a feasibility
-pilot.
+It does not freeze the design.
+It does not authorize execution.
+It does not select an interface profile.
+It does not declare the amended protocol correct.
 
-No empirical operation occurred in this round. Every operation counter is zero,
-every authority flag is false, and every bank, seed and result field is empty or
-null. The evidence ledger is unchanged and still ends at `EV-0016`.
+It also does not select or inspect a positive reference, resolve `OD2` or
+`UR-22`, create a seed or bank, run a tokenizer or model, access confirmation
+material, write scientific evidence, begin the fourth review, create draft-v0.6,
+or start a feasibility pilot.
+
+No empirical operation occurred in this round: no seed was drawn and no bank row exists.
+Every operation counter is zero, every authority flag is false, and every
+result field is empty or null. The evidence ledger is unchanged and still ends at
+`EV-0016`.
 
 ## 1. What the third review decided
 
