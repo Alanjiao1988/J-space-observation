@@ -830,9 +830,9 @@ The repaired draft-v0.3 historical-regression harness was audited independently;
 
 | probe | expected | observed | bound run |
 | --- | --- | --- | --- |
-| pristine reviewed snapshot of the draft-v0.3 historical inputs | pass | **pass** | `PENDING` |
-| substitution of the live draft-v0.4 protocol into the snapshot | fail | **fail** | `PENDING` |
-| perturbation of the committed historical recalculation table | fail | **fail** | `PENDING` |
+| pristine reviewed snapshot of the draft-v0.3 historical inputs | pass | **pass** | `ca5k` |
+| substitution of the live draft-v0.4 protocol into the snapshot | fail | **fail** | `ca5k` |
+| perturbation of the committed historical recalculation table | fail | **fail** | `ca5k` |
 
 `AR-0246` retains the pre-erratum harness identity `3e8b50610fc052123c9196a584364a4a10575ac8b7ea33c58a31a369d24f9c60` and `AR-0269` records the corrected current identity `a1676d31ed32225c8e8a3dba40b4ee6f01d5d3490619eeb35d385efb4ea48c61`. The harness was unchanged across the published base and both draft-v0.4 commits preceding the erratum and changed only in the erratum commit, so there is no unregistered intermediate state and the two rows do not contradict each other.
 

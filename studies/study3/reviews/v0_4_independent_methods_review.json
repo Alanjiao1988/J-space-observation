@@ -780,19 +780,19 @@
     "node_id_set_unchanged": true,
     "non_vacuity_probes": [
       {
-        "bound_run": "PENDING",
+        "bound_run": "ca5k",
         "expected": "pass",
         "observed": "pass",
         "probe": "pristine reviewed snapshot of the draft-v0.3 historical inputs"
       },
       {
-        "bound_run": "PENDING",
+        "bound_run": "ca5k",
         "expected": "fail",
         "observed": "fail",
         "probe": "substitution of the live draft-v0.4 protocol into the snapshot"
       },
       {
-        "bound_run": "PENDING",
+        "bound_run": "ca5k",
         "expected": "fail",
         "observed": "fail",
         "probe": "perturbation of the committed historical recalculation table"

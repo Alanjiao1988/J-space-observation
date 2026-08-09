@@ -6736,3 +6736,99 @@ accesses. Nothing is frozen and nothing is authorised. `OD2` remains
 remains `EV-0016`. Study 1 and Study 2 remain closed and untouched. Both independent reviews remain
 valid rejections, and the only legal next action is still a third bounded independent methods review
 of published draft-v0.4 in a fresh session.
+
+## 2026-08-09 - Study 3 draft-v0.4 third independent methods review
+
+**Round.** A bounded, CPU-only, model-free third independent methods review of the already
+published draft-v0.4, run in a fresh session and a fresh worktree based on remote main by a party
+that neither drafted draft-v0.4 nor repaired its historical-regression harness, and that exchanged
+no intermediate conclusion with either drafting session.
+
+**Disposition.** `STUDY3_V0_4_THIRD_METHODS_REVIEW_REJECTED_BOUNDED_AMENDMENT_REQUIRED`, returned against reviewed commit `e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43`, tree
+`86c5a5ec0e475090c14654cff27605f883495a48`. The legal successor action is `OPERATOR_BOUNDED_AMENDMENT_ROUND_FOR_DRAFT_V0_5`,
+followed by a further independent methods review. No freeze.
+
+**Independence and ordering.** The reviewer's own recalculation extracts registered inputs from the
+authoritative protocol JSON only and derives every binding quantity from those inputs and the
+English-language primary statistical sources. It was committed at `76ab1bab8fe947a26390a0c6c6d46c7f9af51842` before any
+drafting output was opened; the field-by-field comparison was added at `8a30067d3094a2e62828536c1bbaa8e704c988e8`, a strict
+descendant, so the ordering is provable from history rather than asserted. Agreement with drafting
+bytes is used nowhere as validation; each statistical family carries a closed-form identity, an
+exhaustive small-case enumeration and a published-example check.
+
+**Result of the comparison.** Every binding statistical number the drafting derivation publishes is
+independently reproduced with zero numeric disagreement: seventy exact-binomial fields across both
+splits, sixteen cell-census fields, eleven power-architecture fields and fifteen operation
+projections. The only classified differences are applicability metadata the derived table did not
+carry forward from the amended protocol.
+
+**Findings.** Five of the ten inherited second-review findings are verified resolved and five are
+partially resolved. Ten new findings are recorded, `S3MR3-001` through `S3MR3-010`, of which one is
+BLOCKING, three are MAJOR and six are MINOR. None is fundamental.
+
+**Disclosed reviewer errors.** Two clean ACR runs rejected the reviewer's own work and both repairs
+are disclosed rather than silently corrected. Run `ca5g` failed because repository paths were
+rendered with the host platform's separator, so a table emitted on one platform could not reproduce
+on another. Run `ca5j` failed two checks: an assertion that every registered sample size is not a
+multiple of the retired complete-block size, which is false because `448` is `14 x 32` by
+coincidence, and a mutation that dropped a mandatory audit answer without being rejected, because
+the schema constrained only the number of answers. No finding, adjudication, verdict, disposition
+or derived quantity changed as a result of either repair.
+
+### Validation
+
+All decision-bearing validation ran in clean CPU-only Azure Container Registry tasks on registry
+`acrfinreportdt2tgbdb` with base image `python:3.11-bookworm`, Python 3.11.15, each bound to an
+exact commit through a fresh clone of a Git bundle with `DIRTY=0`, `GPU_COUNT=0` and
+`CUDA_AVAILABLE=False`, one test path per invocation. GitHub Actions was not used. `pytest` was
+never invoked on the operator machine and no decision-bearing statistical calculation was performed
+there.
+
+| run | commit | purpose | result |
+| --- | --- | --- | --- |
+| `ca5g` | `8a30067d` | independent recalculation --check; disclosed failure that exposed a host-platform path-rendering defect in the reviewer's own module | INDEPENDENT_RECALCULATION_V0_4_CHECK_FAIL differing_sections=drafting_output_comparison,independence |
+| `ca5h` | `f4e3b73a` | independent recalculation --check after the platform-independence repair | INDEPENDENT_RECALCULATION_V0_4_CHECK_OK sections=25 max_absolute_deviation=0 |
+| `ca5j` | `ab02ad77` | new committed review test; disclosed failure that exposed two defects in the reviewer's own checks | 2 failed, 81 passed |
+| `ca5k` | `716bd57b` | new committed review test, including the three historical-harness non-vacuity probes | 83 passed |
+| `ca5m` | `716bd57b` | existing Study 3 design test; required 197 passed | 197 passed |
+| `ca5n` | `716bd57b` | existing first methods-review test; required 78 passed | 78 passed |
+| `ca5p` | `716bd57b` | repaired historical-regression harness; required 35 passed | 35 passed |
+| `ca5q` | `716bd57b` | independent recalculation --check on the review candidate | INDEPENDENT_RECALCULATION_V0_4_CHECK_OK sections=25 max_absolute_deviation=0 |
+| `ca5r` | `716bd57b` | regression of the immutable reviewed drafting derivation; required sections=19 | DESIGN_STATISTICS_CHECK_OK sections=19 |
+| `ca5s` | `716bd57b` | Study 2 Stage T focused tests | 73 passed |
+| `ca5v` | `716bd57b` | Study 2 Stage B-D focused tests | 54 passed |
+| `ca5t` | `716bd57b` | Phase 1.0D protected-byte module | 11 passed |
+| `ca5u` | `716bd57b` | Phase 1.0D review-v2 protected-byte module | 30 passed |
+| `ca5w` | `716bd57b` | full repository suite | 4057 passed, 15 skipped, 2 failed |
+
+**Full-suite reconciliation.** The declared starting envelope is 3,974 passed, 15 skipped and
+exactly two registered historical `tests/test_parser_v3_seal_job` failures. The observed envelope is
+**4,057 passed, 15 skipped and the same two failures**, with identical node identifiers and
+signatures. 3,974 plus the 83 newly collected passing tests of
+`tests/test_study3_methods_review_v0_4.py` is 4,057, so the suite reconciles exactly. There is no
+new failure, no new error, no unexplained skip change, no disappearance or signature change of a
+historical failure and no unbound run.
+
+**Historical-harness non-vacuity.** Three probes ran inside the committed review test in run
+`ca5k`: the pristine reviewed-commit snapshot passes; substituting the live draft-v0.4
+protocol into that snapshot fails; and perturbing the committed historical recalculation table
+fails. A passing harness is therefore not self-validating, and the anchoring it added is load
+bearing.
+
+**Boundaries.** Zero downloads, revision resolutions, tokenizer constructions, tokenizations, weight
+loads, forward passes, sequence scorings, generations, activation extractions, hooks, lenses,
+probes, patches, ablations, provider calls, GPU jobs, bank rows, bank accesses, seeds, interface
+selections, positive-reference selections, model gate evaluations, result rows, evidence rows,
+confirmation accesses, Phase 1.0D operations and RQ2/Study 4 operations. `paper/evidence_ledger.csv`
+is unchanged, still 25,241 bytes, still 16 data rows ending `EV-0016`. Both Phase 1.0D protected
+rollups are unchanged. No Study 1 or Study 2 path, dependency, lockfile, container definition,
+runtime source, infrastructure path, workflow or experiment source was modified.
+
+**Registries.** Decision `D44`, method `M-32` and artifacts `AR-0270` through `AR-0279`, contiguous
+and in the required order. `D43`, `M-31` and `AR-0001` through `AR-0269` are unaltered.
+
+**What this round did not do.** It did not freeze the design, authorise execution, resolve `OD2`,
+select an interface profile or a positive reference, construct a bank, draw a seed, access the
+confirmation split, create an evidence row, or write a successor prompt. Study 1 remains closed,
+Study 2 remains closed, Study 3 remains unfrozen, and the original research question remains
+unanswered.

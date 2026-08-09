@@ -928,6 +928,81 @@ def test_the_artifact_index_preserves_both_harness_identities(review):
 # the reviewer did not edit the reviewed object
 # ----------------------------------------------------------------------------------
 
+def test_the_artifact_index_is_contiguous_through_ar_0279():
+    rows = [line for line in _text("paper/artifact_index.csv").splitlines() if line.strip()]
+    identifiers = [row.split(",")[0] for row in rows[1:]]
+    assert identifiers[-1] == "AR-0279", identifiers[-1]
+    numbers = [int(i.split("-")[1]) for i in identifiers]
+    assert numbers == list(range(1, len(numbers) + 1)), "the artifact index is not contiguous"
+    assert numbers[-1] == 279
+    reviewed_rows = [line for line in
+                     _blob_at(REVIEWED_COMMIT, "paper/artifact_index.csv").decode().splitlines()
+                     if line.strip()]
+    assert reviewed_rows == rows[:len(reviewed_rows)], \
+        "an earlier artifact-index row was altered by the reviewer"
+    assert len(rows) - len(reviewed_rows) == 10, "exactly ten new artifact rows are registered"
+
+
+def test_the_decision_and_method_registries_carry_exactly_this_round():
+    decisions = _text("docs/decision_log.md")
+    assert "`D44`" in decisions
+    assert "D45" not in decisions
+    methods = _text("paper/methods_ledger.md")
+    assert "## M-32 -" in methods
+    assert "M-33" not in methods
+    reviewed_decisions = _blob_at(REVIEWED_COMMIT, "docs/decision_log.md").decode()
+    reviewed_methods = _blob_at(REVIEWED_COMMIT, "paper/methods_ledger.md").decode()
+    assert decisions.startswith(reviewed_decisions.rstrip("\n")), \
+        "an earlier decision-log entry was altered"
+    assert methods.startswith(reviewed_methods.rstrip("\n")), \
+        "an earlier methods-ledger entry was altered"
+    assert "D43" in decisions and "M-31" in methods
+
+
+def test_the_protected_rollups_and_study_one_and_two_paths_are_unchanged():
+    if not _commit_available(REVIEWED_COMMIT):
+        pytest.fail("the reviewed history is not present in this clone")
+    changed = _git("diff", "--name-only", REVIEWED_COMMIT, "HEAD").stdout.decode().split()
+    for path in changed:
+        assert not path.startswith("studies/study1/"), path
+        assert not path.startswith("studies/study2/"), path
+        assert not path.startswith("infra/"), path
+        assert not path.startswith("src/"), path
+        assert not path.startswith("scripts/"), path
+        assert not path.startswith(".github/"), path
+        assert not path.startswith("Dockerfile"), path
+        assert path not in ("requirements.txt", "requirements.lock.txt", "pyproject.toml",
+                            "Makefile", "paper/evidence_ledger.csv",
+                            "paper/limitations_ledger.md", "paper/claim_evidence_matrix.md"), path
+    for path in ("docs/phase1_0d_protected_bytes.json", "docs/phase1_0d_rv2_protected_bytes.json"):
+        assert _committed_bytes(path) == _blob_at(REVIEWED_COMMIT, path), path
+
+
+def test_the_published_change_set_is_within_the_seventeen_path_ceiling():
+    if not _commit_available(REVIEWED_COMMIT):
+        pytest.fail("the reviewed history is not present in this clone")
+    result = _git("diff", "--name-status", REVIEWED_COMMIT, "HEAD")
+    lines = [line for line in result.stdout.decode().strip().splitlines() if line.strip()]
+    added = sorted(line.split("\t")[1] for line in lines if line.startswith("A"))
+    modified = sorted(line.split("\t")[1] for line in lines if line.startswith("M"))
+    assert all(line[0] in "AM" for line in lines), "only additions and modifications are permitted"
+    assert added == sorted(NEW_PATHS), added
+    assert set(modified) <= set(MODIFIABLE_PATHS), modified
+    assert len(added) == 8
+    assert len(modified) <= 9
+    assert len(lines) <= 17, "the hard ceiling is seventeen changed paths"
+
+
+def test_the_reviewer_created_no_successor_prompt(receipt):
+    assert receipt["remaining_legal_authority"]["successor_prompt_created_in_this_round"] is False
+    prompts = _git("ls-tree", "-r", "--name-only", "HEAD", "studies/study3/prompts/")
+    listed = prompts.stdout.decode().split()
+    reviewed = _git("ls-tree", "-r", "--name-only", REVIEWED_COMMIT,
+                    "studies/study3/prompts/").stdout.decode().split()
+    assert set(listed) - set(reviewed) == {AUTHORITY_MD}, \
+        "only this round's authority copy may be added to the prompts directory"
+
+
 def test_the_reviewer_edited_no_reviewed_path(review):
     if not _commit_available(REVIEWED_COMMIT):
         pytest.fail("the reviewed history is not present in this clone")

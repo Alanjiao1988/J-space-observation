@@ -1,11 +1,154 @@
 {
   "acr_evidence": {
     "base_image": "python:3.11-bookworm",
-    "clone_source": "git bundle, fresh clone, checkout of the exact commit",
+    "clone_source": "git bundle, fresh clone, checkout of the exact commit; no working tree can leak into a run",
+    "cuda_available": false,
+    "dirty": 0,
+    "full_suite_reconciliation": {
+      "declared_starting_passed": 3974,
+      "declared_starting_registered_historical_failures": 2,
+      "declared_starting_skipped": 15,
+      "expected_passed": 4057,
+      "historical_failure_disappeared_or_changed_signature": false,
+      "new_error": false,
+      "new_failure": false,
+      "newly_collected_passing_tests": 83,
+      "observed_failed": 2,
+      "observed_passed": 4057,
+      "observed_skipped": 15,
+      "reconciles_exactly": true,
+      "unbound_run": false,
+      "unexplained_skip_change": false
+    },
     "github_actions_used": false,
+    "gpu_count": 0,
+    "non_vacuity_probes_bound_run": "ca5k",
+    "one_test_path_per_invocation": true,
     "platform": "linux/amd64",
+    "python_version": "3.11.15",
     "registry": "acrfinreportdt2tgbdb",
-    "runs": []
+    "revalidation_on_the_publication_commit": "recorded in docs/run_log.md; the new review test, all three existing Study 3 tests, the independent recalculation check and the registry and static audits are re-run bound to the actual publication commit, so no commit is claimed validated by a run bound only to its parent.",
+    "runs": [
+      {
+        "bound_commit": "8a30067d3094a2e62828536c1bbaa8e704c988e8",
+        "command": "python studies/study3/analysis/independent_methods_recalculation_v0_4.py --check",
+        "exit_code": 1,
+        "purpose": "independent recalculation --check; disclosed failure that exposed a host-platform path-rendering defect in the reviewer's own module",
+        "result": "INDEPENDENT_RECALCULATION_V0_4_CHECK_FAIL differing_sections=drafting_output_comparison,independence",
+        "run_id": "ca5g"
+      },
+      {
+        "bound_commit": "f4e3b73aafff15a3e7e465cb791404c4000bb6ee",
+        "command": "python studies/study3/analysis/independent_methods_recalculation_v0_4.py --check",
+        "exit_code": 0,
+        "purpose": "independent recalculation --check after the platform-independence repair",
+        "result": "INDEPENDENT_RECALCULATION_V0_4_CHECK_OK sections=25 max_absolute_deviation=0",
+        "run_id": "ca5h"
+      },
+      {
+        "bound_commit": "ab02ad7723447f95fa27c15832ce35c45d3a2fdd",
+        "command": "python -m pytest tests/test_study3_methods_review_v0_4.py -q",
+        "exit_code": 1,
+        "purpose": "new committed review test; disclosed failure that exposed two defects in the reviewer's own checks",
+        "result": "2 failed, 81 passed",
+        "run_id": "ca5j"
+      },
+      {
+        "bound_commit": "716bd57b725c2b3a307729800f4e7e16be337eb3",
+        "bound_tree": "8a0e515246d6554cc22510179e7e5bc91f43de06",
+        "command": "python -m pytest tests/test_study3_methods_review_v0_4.py -q",
+        "exit_code": 0,
+        "purpose": "new committed review test, including the three historical-harness non-vacuity probes",
+        "result": "83 passed",
+        "run_id": "ca5k"
+      },
+      {
+        "bound_commit": "716bd57b725c2b3a307729800f4e7e16be337eb3",
+        "command": "python -m pytest tests/test_study3_design.py -q",
+        "exit_code": 0,
+        "purpose": "existing Study 3 design test; required 197 passed",
+        "result": "197 passed",
+        "run_id": "ca5m"
+      },
+      {
+        "bound_commit": "716bd57b725c2b3a307729800f4e7e16be337eb3",
+        "command": "python -m pytest tests/test_study3_methods_review.py -q",
+        "exit_code": 0,
+        "purpose": "existing first methods-review test; required 78 passed",
+        "result": "78 passed",
+        "run_id": "ca5n"
+      },
+      {
+        "bound_commit": "716bd57b725c2b3a307729800f4e7e16be337eb3",
+        "command": "python -m pytest tests/test_study3_methods_review_v0_3.py -q",
+        "exit_code": 0,
+        "purpose": "repaired historical-regression harness; required 35 passed",
+        "result": "35 passed",
+        "run_id": "ca5p"
+      },
+      {
+        "bound_commit": "716bd57b725c2b3a307729800f4e7e16be337eb3",
+        "command": "python studies/study3/analysis/independent_methods_recalculation_v0_4.py --check",
+        "exit_code": 0,
+        "purpose": "independent recalculation --check on the review candidate",
+        "result": "INDEPENDENT_RECALCULATION_V0_4_CHECK_OK sections=25 max_absolute_deviation=0",
+        "run_id": "ca5q"
+      },
+      {
+        "bound_commit": "716bd57b725c2b3a307729800f4e7e16be337eb3",
+        "command": "python studies/study3/analysis/design_statistics.py --check",
+        "exit_code": 0,
+        "purpose": "regression of the immutable reviewed drafting derivation; required sections=19",
+        "result": "DESIGN_STATISTICS_CHECK_OK sections=19",
+        "run_id": "ca5r"
+      },
+      {
+        "bound_commit": "716bd57b725c2b3a307729800f4e7e16be337eb3",
+        "command": "python -m pytest tests/test_study2_stage_t.py -q",
+        "exit_code": 0,
+        "purpose": "Study 2 Stage T focused tests",
+        "result": "73 passed",
+        "run_id": "ca5s"
+      },
+      {
+        "bound_commit": "716bd57b725c2b3a307729800f4e7e16be337eb3",
+        "command": "python -m pytest tests/test_study2_stage_bd.py -q",
+        "exit_code": 0,
+        "purpose": "Study 2 Stage B-D focused tests",
+        "result": "54 passed",
+        "run_id": "ca5v"
+      },
+      {
+        "bound_commit": "716bd57b725c2b3a307729800f4e7e16be337eb3",
+        "command": "python -m pytest tests/test_phase1_0d_protected_bytes.py -q",
+        "exit_code": 0,
+        "purpose": "Phase 1.0D protected-byte module",
+        "result": "11 passed",
+        "run_id": "ca5t"
+      },
+      {
+        "bound_commit": "716bd57b725c2b3a307729800f4e7e16be337eb3",
+        "command": "python -m pytest tests/test_phase1_0d_rv2_protected_bytes.py -q",
+        "exit_code": 0,
+        "purpose": "Phase 1.0D review-v2 protected-byte module",
+        "result": "30 passed",
+        "run_id": "ca5u"
+      },
+      {
+        "bound_commit": "716bd57b725c2b3a307729800f4e7e16be337eb3",
+        "bound_tree": "8a0e515246d6554cc22510179e7e5bc91f43de06",
+        "command": "python -m pytest tests -q",
+        "exit_code": 1,
+        "failures": [
+          "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+          "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix"
+        ],
+        "failures_are_the_registered_historical_pair": true,
+        "purpose": "full repository suite",
+        "result": "4057 passed, 15 skipped, 2 failed",
+        "run_id": "ca5w"
+      }
+    ]
   },
   "ancestry": {
     "publication_is_a_non_force_fast_forward": true,
@@ -78,20 +221,20 @@
       "sha256": "c756ba2e5ad147cfc19edc4a451c2d919e51643d19dda7d95469c21786dcdc86"
     },
     "studies/study3/reviews/v0_4_independent_methods_review.json": {
-      "bytes": 143531,
-      "sha256": "3ace4f0a748d240028d4dee8b5f64008ad1e98715892419bb3a66de9e923d036"
+      "bytes": 143522,
+      "sha256": "f88721425d7d90ebf57e43aa313e3eafdf74677ac77f9dbdc69506ca78ec6eda"
     },
     "studies/study3/reviews/v0_4_independent_methods_review.md": {
-      "bytes": 93082,
-      "sha256": "7c8ea59b7fd07d9537551801c37c4307b3e64de221b40ef6cbf109304d3a339f"
+      "bytes": 93073,
+      "sha256": "633d64bbd1af0396f0c1c13e31b732a9586d7bb566eb68624efb2d3bcede06c1"
     },
     "studies/study3/reviews/v0_4_independent_methods_review.schema.json": {
-      "bytes": 54798,
-      "sha256": "2753fed4fd65b1b219193c44d57008249873ee3904eb6b81f2089dc85773d193"
+      "bytes": 56689,
+      "sha256": "6fb7a5485fcaefceaae5211dc5f8b63759ecbb83ea2d8b5a2cbf99be39dbf7cf"
     },
     "tests/test_study3_methods_review_v0_4.py": {
-      "bytes": 54665,
-      "sha256": "aebd8df2b5fe1577b501139043dc96624d3bd61102357ae2cda02fa7279ef3da"
+      "bytes": 59240,
+      "sha256": "666f7e5d75599524e3fe2ad7540caf4058d580b23ac63deb518868ca48c346ac"
     }
   },
   "next_legal_action": "OPERATOR_BOUNDED_AMENDMENT_ROUND_FOR_DRAFT_V0_5",
