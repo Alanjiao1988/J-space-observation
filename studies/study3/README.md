@@ -217,7 +217,11 @@ answer cue and every other byte held fixed. The primary indicator is `J_both`, t
 invariance and correctness: a stable but **wrong** answer scores `0`, and a stable invalid or
 unparseable answer scores `0`.
 
-**Sizing and multiplicity.** Every gate is sized by an exact-binomial rule in exact rational
+**Sizing and multiplicity.** *Historical record only: the sizing paragraph below
+describes draft-v0.3, which the second independent methods review rejected. The
+sizes named here are withdrawn and are not current; the active development sizes
+are `413`, `214` and `448`, derived from the binding end-to-end power design.*
+Every gate is sized by an exact-binomial rule in exact rational
 arithmetic: a study-level development screening alpha of `1/200`, a per-profile development component
 alpha of `1/600`, an intersection-union conjunction within a profile, and a **fixed** selectable-profile
 denominator `K = 3` that never shrinks on a post-data fact. There is exactly **one** `I3` floor,

@@ -130,7 +130,7 @@ checkpoints.
 | First-token probability can disagree with generated text | Wang et al. 2024 | surface `S4` retained; `VT8` agreement target |
 | Multiple-choice and open surfaces measure different behavior | Li et al. 2024 | no pooling across surfaces or strata |
 | Symbol binding is a distinct, model-varying ability | Robinson, Rytting and Wingate 2023 | stratum `K1`; Gate `I1` |
-| Smaller and pretrained checkpoints are least stable under rewrites | Zhou et al. 2024 | stratum `K6`; equivalence framing of `I3` |
+| Smaller and pretrained checkpoints are least stable under rewrites | Zhou et al. 2024 | stratum `K6`; joint robust correctness framing of `I3` |
 
 **Boundary.** These sources justify *looking* for a risk. They do not predict what will be found on
 these checkpoints, and no Study 3 threshold was set from any number in them.

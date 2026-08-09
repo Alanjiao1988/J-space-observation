@@ -305,6 +305,11 @@ permitted dispositions.
 
 The reviewer is specifically asked to rule on:
 
+*Historical record only.* The six questions below were posed to the FIRST
+independent methods reviewer of draft-v0.2 and were answered by that completed
+review. They are retained verbatim as immutable provenance; they name no pending
+review and describe no current design.
+
 1. whether the atomic cell is fine enough that no gate can be passed by
    averaging over a heterogeneous mixture;
 2. whether the intersection-union treatment within a profile, and the Bonferroni
@@ -449,12 +454,16 @@ disjoint pairwise cells, `K6-SEP` and `K6-INSTR`, drawn from the three rendering
 fixed. Balancing is deterministic over complete blocks with bijective
 option-to-label mappings; **no random draw occurs anywhere in this design round.**
 
-**Three `I3` indicators, one primary.** `J_inv` is invariance across the two
-variants, `J_cor` is correctness against the registered ground truth, and
-`J_both` is their conjunction and the **primary gate indicator**. A stable but
-**wrong** answer scores `0`; a stable invalid or unparseable answer scores `0`.
-That `J_cor` implies `J_inv` under a unique ground truth is recorded as an
-expected integrity invariant rather than presented as independence.
+**Three `I3` indicators, one primary.** *Historical record only: this paragraph
+describes draft-v0.3, which the second independent methods review rejected and
+which draft-v0.4 and then draft-v0.5 superseded. The construct named here is
+withdrawn and is not current; the active indicator is `J_joint_correct`.* `J_inv`
+is invariance across the two variants, `J_cor` is correctness against the
+registered ground truth, and `J_both` is their conjunction and the then primary
+gate indicator. A stable but **wrong** answer scores `0`; a stable invalid or
+unparseable answer scores `0`. That `J_cor` implies `J_inv` under a unique ground
+truth is recorded as an expected integrity property rather than presented as
+independence.
 
 **`OD5`: an exact-binomial primary design in exact rational arithmetic.** A
 study-level development screening alpha of `1/200`; a per-profile development

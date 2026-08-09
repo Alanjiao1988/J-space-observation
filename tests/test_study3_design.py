@@ -765,32 +765,75 @@ def _historical_exemption_markers():
         "must not", "may never", "never claim", "does not claim",
         "no active claim", "removed from every active", "carries no",
         "no_decision_role", "descriptive_only", "s3mr", "erratum",
+        "phase 1", "phase1", "parser v2", "parser v3", "parser_v2",
+        "parser_v3", "study 2", "study2", "stage t", "j-lens", "jlens",
     )
 
 
-def _prose_active_claim_lines(path):
-    """Every line of a reviewed prose document that is not an exempt passage.
+# The registered prohibited vocabulary, matched on word boundaries so that a
+# legitimate use such as "design invariants" or "model-evaluation equivalents"
+# is not mistaken for a presentation claim. The registered terms themselves are
+# read from the protocol and asserted to be covered.
+_PROHIBITED_PROSE_PATTERNS = tuple(
+    re.compile(r"\b" + pattern + r"\b", re.IGNORECASE) for pattern in (
+        r"invariance",
+        r"invariant to presentation",
+        r"equivalence",
+        r"equivalent under presentation",
+        r"no presentation effect",
+        r"presentation[- ]effect size",
+        r"stable across presentations",
+        r"unaffected by presentation",
+        r"robust to presentation",
+        r"insensitive to presentation",
+        r"same answer under both presentations",
+        r"J_both",
+        r"n = 256",
+        r"n = 128",
+    ))
+
+
+def _prose_paragraphs(path):
+    """Yield (first_line_number, paragraph_text) for every blank-line-delimited block."""
+    lines = _load_text(path).split("\n")
+    start = None
+    buffer = []
+    for number, raw in enumerate(lines, 1):
+        if raw.strip():
+            if start is None:
+                start = number
+            buffer.append(raw)
+        elif buffer:
+            yield start, "\n".join(buffer)
+            start, buffer = None, []
+    if buffer:
+        yield start, "\n".join(buffer)
+
+
+def _prose_active_claim_violations(path):
+    """Every prohibited or retired occurrence in a NON-exempt paragraph.
 
     S3MR3-004 recorded that the enforcement of the active-claim prohibition was
     narrower than its registered scope: the scan never reached the charter, the
     handoff, either README, the protocol Markdown companion, the review packet or
     the status report, which is why the residue in S3MR3-003 survived a passing
-    suite. Exemptions are explicit and auditable here rather than implicit.
+    suite. Exemptions are explicit and auditable here rather than implicit, and
+    they are applied at PARAGRAPH level, because "enclosed in an unambiguous
+    historical record" is a property of the passage and not of a single line.
     """
     markers = _historical_exemption_markers()
     out = []
-    for number, raw in enumerate(_load_text(path).split("\n"), 1):
-        line = raw.strip()
-        if not line:
-            continue
-        lowered = line.lower()
-        # Blockquoted review findings and table rows carrying an explicit
-        # finding ID are quoted provenance, not active claims.
-        if line.startswith(">") or line.startswith("|"):
+    for number, paragraph in _prose_paragraphs(path):
+        lowered = paragraph.lower()
+        # A blockquoted paragraph is quoted review provenance, not an active claim.
+        if all(line.lstrip().startswith(">") for line in paragraph.split("\n")):
             continue
         if any(marker in lowered for marker in markers):
             continue
-        out.append((number, line))
+        for pattern in _PROHIBITED_PROSE_PATTERNS:
+            match = pattern.search(paragraph)
+            if match:
+                out.append((number, match.group(0), paragraph.strip()[:200]))
     return out
 
 
@@ -890,16 +933,21 @@ def test_reviewed_prose_carries_no_active_retired_or_prohibited_language(relativ
     """S3MR3-003 and S3MR3-004. Enforcement must reach the registered scope."""
     path = os.path.join(REPO_ROOT, relative.replace("/", os.sep))
     assert os.path.exists(path), relative
-    for number, line in _prose_active_claim_lines(path):
-        lowered = line.lower()
-        for stem in PROHIBITED_CLAIM_TERMS:
-            assert stem not in lowered, \
-                "%s:%d asserts a prohibited presentation claim (%r): %s" \
-                % (relative, number, stem, line[:160])
-        for token in RETIRED_ACTIVE_TOKENS:
-            assert token not in lowered, \
-                "%s:%d carries retired language (%r) outside a historical " \
-                "passage: %s" % (relative, number, token, line[:160])
+    violations = _prose_active_claim_violations(path)
+    assert not violations, "\n".join(
+        "%s:%d carries active prohibited or retired language (%r): %s"
+        % (relative, number, term, excerpt)
+        for number, term, excerpt in violations)
+
+
+def test_the_prose_scan_covers_every_registered_prohibited_term(protocol):
+    """The prose patterns must cover the vocabulary the protocol registers."""
+    registered = [term.lower() for term in protocol["proposed_statistics"][
+        "active_claim_term_prohibition"]["prohibited_terms"]]
+    for term in registered:
+        probe = "This sentence claims %s in an active field." % term
+        assert any(pattern.search(probe) for pattern in _PROHIBITED_PROSE_PATTERNS), \
+            "the prose scan does not cover the registered term %r" % term
 
 
 def test_the_prohibition_enforcement_scope_matches_the_registered_scope(protocol):
@@ -916,12 +964,23 @@ def test_the_prohibition_enforcement_scope_matches_the_registered_scope(protocol
     for relative in declared:
         assert os.path.exists(
             os.path.join(REPO_ROOT, relative.replace("/", os.sep))), relative
-    # The declared protocol fields must all exist and all be scanned.
+    # The declared protocol fields must all exist, and every declared field root
+    # must correspond to a category the scan actually visits.
     scanned = {label.split(" ")[0] for label, _ in _active_claim_strings(protocol)}
+    label_roots = {
+        "research_question": "research_question",
+        "validation_targets": "validation_target",
+        "gate_hierarchy": "gate",
+        "claim_ceiling": "claim_ceiling",
+        "i3_contrast_registry": "i3",
+        "proposed_statistics": "component",
+        "rendering_surface_v0_5": "rendering_surface_v0_5",
+    }
     for field in prohibition["enforced_protocol_fields"]:
         root = field.split(".")[0].split("[")[0]
         assert root in protocol, field
-        assert root in scanned or root == "proposed_statistics", field
+        assert root in label_roots, field
+        assert label_roots[root] in scanned, field
 
 
 def test_a_mutation_moving_retired_language_into_active_scope_is_rejected(tmp_path):
@@ -931,9 +990,9 @@ def test_a_mutation_moving_retired_language_into_active_scope_is_rejected(tmp_pa
         "# Study 3\n\nThe primary indicator is `J_both`, which requires invariance\n"
         "across the two variants, giving `n = 256` clusters per contrast cell.\n",
         encoding="utf-8")
-    lines = _prose_active_claim_lines(str(active))
-    blob = " ".join(line.lower() for _, line in lines)
-    assert "j_both" in blob and "n = 256" in blob and "invarian" in blob, \
+    found = {term.lower() for _, term, _ in
+             _prose_active_claim_violations(str(active))}
+    assert "j_both" in found and "n = 256" in found and "invariance" in found, \
         "the scan failed to see prohibited active language"
 
     historical = tmp_path / "historical.md"
@@ -942,10 +1001,18 @@ def test_a_mutation_moving_retired_language_into_active_scope_is_rejected(tmp_pa
         "indicator and carried `n = 256`. That draft was rejected and the values\n"
         "are withdrawn from every active field.\n",
         encoding="utf-8")
-    marked = _prose_active_claim_lines(str(historical))
-    marked_blob = " ".join(line.lower() for _, line in marked)
-    assert "j_both" not in marked_blob, \
+    assert _prose_active_claim_violations(str(historical)) == [], \
         "an explicitly historical passage must be exempt"
+
+    # And an exemption marker in a DIFFERENT paragraph must not launder an
+    # active claim in this one.
+    mixed = tmp_path / "mixed.md"
+    mixed.write_text(
+        "# Study 3\n\nHistorical record: draft-v0.3 is superseded.\n\n"
+        "The primary indicator is `J_both` and it requires invariance.\n",
+        encoding="utf-8")
+    assert _prose_active_claim_violations(str(mixed)), \
+        "a marker in another paragraph must not exempt this one"
 
 
 def test_per_profile_i3_applicability_and_claim_ceiling_are_exact(
