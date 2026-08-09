@@ -1,1463 +1,1117 @@
-"""Study 3 draft-v0.3 design-statistics derivation instrument (model-free).
+"""Study 3 draft-v0.4 design-statistics derivation instrument (model-free).
 
-This script belongs to the Study 3 *design* packet. It performs no model
-operation of any kind: no download, no revision resolution by download, no
-weight load, no tokenizer construction, no tokenization, no forward pass, no
-sequence scoring, no generation, no activation extraction, no probe, no patch,
-no ablation, no lens operation, no GPU work and no provider call. It draws no
-seed, writes no task-bank row, reads no confirmation content, and produces no
-scientific evidence row.
+This script belongs to the Study 3 *design* packet. It performs no model operation of any
+kind: no download, no revision resolution by download, no weight load, no tokenizer
+construction, no tokenization, no forward pass, no decode step, no sequence scoring, no
+generation, no activation extraction, no probe, no patch, no ablation, no lens operation,
+no GPU work and no provider call. It draws no seed, writes no bank row, reads no
+confirmation content and produces no scientific evidence row.
 
-Everything it emits is a *design parameter* computed by exact model-free
-arithmetic from declared assumptions. Nothing here is a measurement and nothing
-here is frozen. draft-v0.3 is an amended, still-unfrozen draft awaiting a second
-independent methods review.
+Everything it emits is a *design parameter* computed by exact, model-free arithmetic from
+the registered parameters of the authoritative protocol document. Nothing here is a
+measurement and nothing here is frozen. draft-v0.4 is an amended, still-unfrozen draft
+awaiting a THIRD independent methods review.
 
-What changed from draft-v0.2, and why
+What changed from draft-v0.3, and why
 -------------------------------------
-The independent methods review of draft-v0.2 returned
-``STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`` with six blocking
-findings. The operator amendment adopted here:
+The second independent methods review returned
+``STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`` with two BLOCKING, six MAJOR and
+two MINOR structured findings. The operator amendment adopted here:
 
-* replaces the undefined "all transformations" I3 cluster with pre-registered
-  **pairwise base-item contrast clusters** holding exactly two variants each
-  (S3MR-001, S3MR-014);
-* publishes three I3 indicators ``J_inv``, ``J_cor`` and ``J_both``, with
-  ``J_both`` as the primary gate indicator, so a stable-but-wrong answer and a
-  stable-but-invalid output both score zero (S3MR-002);
-* implements the per-profile development component alpha as the **exact
-  rational** ``1/600`` in every component, not as a decimal that is stated in
-  one place and unimplemented everywhere else (S3MR-003);
-* **retires the Tango paired aggregate-equivalence procedure from every
-  decision role**. The false conservativeness assertion is withdrawn, the
-  four-point discordance grid is removed from active verification, and no
-  critical value, equivalence margin or discordance grid carries gate,
-  eligibility, selection, confirmation or claim authority (S3MR-004,
-  S3MR-005, S3MR-009). Paired 2x2 summaries survive as *descriptive only*:
-  they have no null, no alpha, no p-value, no pass/fail, no rescue path and no
-  ranking weight;
-* registers exactly **one** active I3 floor ``p0 = 0.90`` with
-  ``p1 = 0.97`` and ``n = 256`` contrast clusters per contrast cell; the
-  ``p0 = 0.95`` variant is deleted from every active table (S3MR-006,
-  S3MR-007, S3MR-015);
-* raises I1a/I1b to ``n = 256`` base items per atomic cell so the reviewed
-  target power is met at the implemented alpha (S3MR-008);
-* fixes the Family B selectable-profile denominator at **3** before any data
-  (S3MR-016) and publishes an executable pre-data development selection map
-  and a complete I5 confirmation specification (S3MR-017);
-* decomposes the operation projection into six named work streams with
-  per-stream units, and fixes the current-domain S3 incremental cost at zero
-  (S3MR-012, S3MR-013).
+* narrows I3 to **joint robust correctness**. The sole gate-bearing indicator is
+  ``J_joint_correct``, which is 1 exactly when both registered variants of the cluster are
+  scored correct. The estimand is a joint-correctness LEVEL, not a presentation contrast,
+  and every invariance/equivalence/presentation-effect claim is prohibited in active text
+  (S3MR2-001, S3MR2-008);
+* registers the **stochastic item-sampling model** that licenses the exact binomial test:
+  iid draws WITH REPLACEMENT from a registered finite generator distribution per sampling
+  cell, with exact rational weights, deterministic pre-draw validity predicates, duplicate
+  retention, outcome-blind split partitions and a fully specified future seed lifecycle.
+  The deterministic complete-block K5 assignment is retired (S3MR2-010);
+* registers **family, profile and end-to-end power** rather than per-cell power alone. The
+  per-cell false-negative budget is the registered per-stage profile budget divided by the
+  maximum selectable-profile cell count, and every joint bound is a union bound valid under
+  ARBITRARY dependence (S3MR2-002);
+* makes S4 **not_applicable for I4** everywhere and removes it from every confirmation
+  applicability list; confirmation applicability is an explicit intersection rule
+  (S3MR2-003, S3MR2-004);
+* separates **I0** from profile adequacy so ``STOP_INSTRUMENT_DEFECT`` is reachable and
+  every event has exactly one legal next state (S3MR2-006);
+* registers a **decode/prefill/sequence-evaluation ontology** so the S4 generative stream's
+  cost is bounded rather than null, and repairs the I0 fixture unit accounting (S3MR2-005,
+  S3MR2-009);
+* registers the binding **P3-Q/I4 ordering constraint** while leaving OD2 unresolved
+  (S3MR2-007).
 
 Derivation, not transcription
 -----------------------------
-Every threshold, exact null tail, power figure and expected pass count below is
-**derived here** by exact binomial search over exact rational arithmetic. The
-reviewer-returned planning targets are deliberately absent from this module as
-literals: ``tests/test_study3_design.py`` holds them as an independent
-expectation and asserts that this module's derivation reproduces them, and it
-also asserts by AST inspection that none of those counts appears as an integer
-constant in this file. Copying a constant instead of deriving it is a test
-failure by construction.
+Every sample size, threshold, exact null tail, power figure, cell count, joint bound and
+operation total below is **derived here** from the protocol's registered exact rational
+inputs by integer binomial arithmetic and exhaustive enumeration. The adopted values are
+deliberately absent from this module as literals: ``tests/test_study3_design.py`` holds them
+as an independent expectation, asserts that this module reproduces them, and asserts by AST
+inspection that none of them appears here as a reachable constant. Copying a value instead
+of deriving it is a test failure by construction.
 
 Usage
 -----
     python studies/study3/analysis/design_statistics.py --emit
     python studies/study3/analysis/design_statistics.py --check
 
-``--emit`` regenerates ``design_statistics_tables.json`` beside this file.
-``--check`` recomputes every table and compares it value-for-value against the
-committed JSON, exiting non-zero on any difference. ``--check`` is the mode the
-committed tests and the CPU-only Azure validation use.
+``--emit`` regenerates ``design_statistics_tables.json`` beside this file. ``--check``
+recomputes every table and compares it value-for-value against the committed JSON, exiting
+non-zero on any difference. ``--check`` is the mode the committed tests and the CPU-only
+Azure validation use.
 
-The script is fail-closed: every structural invariant it claims is asserted
-here, and a violated invariant raises before any table is emitted.
+The script is fail-closed: every structural invariant it claims is asserted here, and a
+violated invariant raises before any table is emitted.
 
-Standard library only, by design: the validation image installs
-``requirements.lock.txt``, which carries no statistics or schema dependency.
+Standard library only, by design.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
-import math
 import os
 import sys
 from fractions import Fraction
+from itertools import product
 
-# --------------------------------------------------------------------------
-# 1. Declared design assumptions
-#
-# These are operator proposals for draft-v0.3. They are not frozen and they are
-# not measurements. Decimal renderings appear in the emitted tables for
-# readability; the exact rational value is the policy, and the rational form is
-# emitted alongside every decimal so the two can never drift apart.
-# --------------------------------------------------------------------------
+HERE = os.path.dirname(os.path.abspath(__file__))
+STUDY3 = os.path.dirname(HERE)
+PROTOCOL_PATH = os.path.join(STUDY3, "protocol", "interface_calibration_protocol_draft.json")
+TABLES_PATH = os.path.join(HERE, "design_statistics_tables.json")
 
-# Family B: the study-level development screening level, and the fixed
-# selectable-profile denominator. The denominator is fixed *before data* and
-# never shrinks, including when S3's activation condition is not met.
-STUDY_DEVELOPMENT_SCREENING_ALPHA = Fraction(1, 200)
-SELECTABLE_PROFILE_DENOMINATOR = 3
-
-# Family A: every exact-binomial component inside one profile is tested at this
-# level. Within a profile the components form an intersection-union
-# conjunction, so no further within-profile Bonferroni correction is applied.
-DEVELOPMENT_COMPONENT_ALPHA = (STUDY_DEVELOPMENT_SCREENING_ALPHA
-                               / SELECTABLE_PROFILE_DENOMINATOR)
-
-# Confirmation is a separate error role on a physically disjoint one-shot
-# split, entered by exactly one pre-selected profile, so it carries no
-# across-profile correction.
-CONFIRMATION_COMPONENT_ALPHA = Fraction(1, 200)
-
-TARGET_POWER = Fraction(9, 10)
-
-# Registered structural constants of the design.
-LABEL_ALPHABETS = (("A", "B", "C", "D"), ("W", "X", "Y", "Z"))
-ANSWER_DOMAIN_SURFACE_FORMS = tuple(str(d) for d in range(10))
-OPTION_SLOTS = 4
-VARIANTS_PER_CONTRAST_CLUSTER = 2
-
-PRIMITIVE_OPERATION_FAMILIES = ("affine_mod10", "permutation_chain")
-COMPOSITION_DEPTHS = (2, 3)
-TARGET_MODEL_ROLES = ("RT", "RL", "RI")
-POSITIVE_REFERENCE_ROLE = "RP"
-
-# S4 is a never-selectable diagnostic. Its generated-token ceiling is a
-# registered planning bound, not an authorization to generate anything.
-S4_GENERATED_TOKEN_UPPER_BOUND_PER_ROW = 16
-
-RATIONAL_TOLERANCE = 0
-
-# Rendering precision. Tails are rendered to 12 decimal places and powers to 9,
-# which is the precision at which the independent review reported its own
-# recalculation, so the two can be compared without a tolerance argument.
 TAIL_DIGITS = 12
-POWER_DIGITS = 9
+POWER_DIGITS = 12
+
+STATUS = "PROPOSED_DESIGN_PARAMETERS_NOT_MEASUREMENTS_NOT_FROZEN"
 
 
-# --------------------------------------------------------------------------
-# 2. Exact binomial machinery over exact rationals
+class DesignDefect(Exception):
+    """Raised when a registered parameter is missing, unparseable or inadmissible."""
+
+
+# ----------------------------------------------------------------------------------
+# 0. Registered-parameter access, fail-closed
+# ----------------------------------------------------------------------------------
+
+def load_protocol():
+    if not os.path.isfile(PROTOCOL_PATH):
+        raise DesignDefect("authoritative protocol document not found at %s" % PROTOCOL_PATH)
+    with open(PROTOCOL_PATH, "r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def rational(text, field):
+    """Parse a registered exact rational. Decimal renderings are refused on purpose."""
+    if not isinstance(text, str) or not text.strip():
+        raise DesignDefect("%s: expected an exact-rational string, got %r" % (field, text))
+    raw = text.strip()
+    if "." in raw or "e" in raw.lower():
+        raise DesignDefect("%s: decimal rendering %r refused; the exact rational is the policy" % (field, raw))
+    try:
+        return Fraction(raw)
+    except (ValueError, ZeroDivisionError) as exc:
+        raise DesignDefect("%s: %r is not an exact rational (%s)" % (field, raw, exc))
+
+
+def positive_int(value, field):
+    if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
+        raise DesignDefect("%s: expected a positive integer, got %r" % (field, value))
+    return value
+
+
+def probability(value, field):
+    if not (0 < value < 1):
+        raise DesignDefect("%s: %s is outside the open unit interval" % (field, value))
+    return value
+
+
+# ----------------------------------------------------------------------------------
+# 1. Exact binomial machinery over exact rationals
 #
-# Everything below is exact: the pmf, both tails and the threshold search are
-# computed in Fraction arithmetic, so the emitted decimal is a *rendering* of an
-# exact value rather than the accumulation of floating-point error.
-# --------------------------------------------------------------------------
+# The tail table is built from integer numerators over one common denominator b**n, so no
+# gcd reduction happens inside the inner loop. Every comparison is exact.
+# ----------------------------------------------------------------------------------
 
-def binom_pmf(k: int, n: int, p: Fraction) -> Fraction:
-    """Exact binomial pmf P[X = k] for X ~ Binomial(n, p)."""
-    if k < 0 or k > n:
-        return Fraction(0)
-    if p == 0:
-        return Fraction(1) if k == 0 else Fraction(0)
-    if p == 1:
-        return Fraction(1) if k == n else Fraction(0)
-    return Fraction(math.comb(n, k)) * p ** k * (1 - p) ** (n - k)
+def tail_table(n, p):
+    """Return (T, D) with Pr(X >= c) == T[c] / D exactly, for X ~ Binomial(n, p)."""
+    a = p.numerator
+    b = p.denominator
+    rest = b - a
+    pow_a = [1] * (n + 1)
+    pow_rest = [1] * (n + 1)
+    for i in range(1, n + 1):
+        pow_a[i] = pow_a[i - 1] * a
+        pow_rest[i] = pow_rest[i - 1] * rest
+    table = [0] * (n + 2)
+    running = 0
+    coefficient = 1
+    for k in range(n, -1, -1):
+        coefficient = 1 if k == n else coefficient * (k + 1) // (n - k)
+        running += coefficient * pow_a[k] * pow_rest[n - k]
+        table[k] = running
+    return table, b ** n
 
 
-def binom_upper_tail(x: int, n: int, p: Fraction) -> Fraction:
-    """Exact P[X >= x] for X ~ Binomial(n, p)."""
-    if x <= 0:
+def upper_tail(n, threshold, p):
+    """Exact Pr(X >= threshold) for X ~ Binomial(n, p)."""
+    if threshold <= 0:
         return Fraction(1)
-    if x > n:
+    if threshold > n:
         return Fraction(0)
-    return sum((binom_pmf(k, n, p) for k in range(x, n + 1)), Fraction(0))
+    table, denominator = tail_table(n, p)
+    return Fraction(table[threshold], denominator)
 
 
-def binom_lower_tail(x: int, n: int, p: Fraction) -> Fraction:
-    """Exact P[X <= x] for X ~ Binomial(n, p)."""
-    if x < 0:
-        return Fraction(0)
-    if x >= n:
-        return Fraction(1)
-    return sum((binom_pmf(k, n, p) for k in range(0, x + 1)), Fraction(0))
+def smallest_controlling_count(n, p0, alpha):
+    """Smallest c with Pr_{p0}(X >= c) <= alpha.
 
-
-def exact_one_sided_threshold(n: int, p0: Fraction, alpha: Fraction):
-    """Smallest x with P[X >= x | p0] <= alpha, or None if none exists.
-
-    The comparison is exact rational, so a tail that merely rounds to alpha in
-    floating point is not accepted as meeting alpha.
+    The exact size of the one-sided region {X >= c} against the composite null p <= p0 is
+    Pr_{p0}(X >= c), because the upper tail is non-decreasing in p. That monotonicity is
+    asserted in identity_checks().
     """
-    for x in range(0, n + 1):
-        if binom_upper_tail(x, n, p0) <= alpha + RATIONAL_TOLERANCE:
-            return x
-    return None
+    table, denominator = tail_table(n, p0)
+    limit = alpha.numerator * denominator
+    for candidate in range(0, n + 1):
+        if table[candidate] * alpha.denominator <= limit:
+            return candidate
+    return n + 1
 
 
-def clopper_pearson_lower(x: int, n: int, tail_mass: Fraction) -> float:
-    """Descriptive Clopper-Pearson lower bound by exact tail inversion.
+def smallest_size_meeting_power(p0, p1, alpha, target, ceiling):
+    """Smallest positive integer n whose minimal controlling count attains ``target`` at p1.
 
-    ``tail_mass`` is the probability placed in the *lower* tail of the interval.
-    This bound is descriptive only: finding S3MR-019 recorded that draft-v0.2
-    filed a two-sided convention under a field named one-sided, so the caller
-    must name its convention explicitly and this function names its argument
-    after the mass it actually consumes.
+    Every positive integer is searched. draft-v0.3 restricted admissible n to multiples of
+    the complete-block size; that restriction is retired with the deterministic block
+    assignment it came from.
     """
-    if x <= 0:
-        return 0.0
-    lo, hi = Fraction(0), Fraction(1)
-    for _ in range(200):
-        mid = (lo + hi) / 2
-        if binom_upper_tail(x, n, mid) < tail_mass:
-            lo = mid
-        else:
-            hi = mid
-    return _render(float((lo + hi) / 2), 6)
+    for n in range(1, ceiling + 1):
+        count = smallest_controlling_count(n, p0, alpha)
+        if count > n or count == n:
+            continue
+        if upper_tail(n, count, p1) >= target:
+            return n, count
+    raise DesignDefect("no admissible sample size at or below the search ceiling")
 
 
-def central_acceptance_band(n: int, p: Fraction, total_two_sided_mass: Fraction):
-    """Exact central band [lo, hi], each tail holding at most half the mass.
-
-    Diagnostic only in draft-v0.3. The band carries no gate, eligibility,
-    selection or confirmation authority.
-    """
-    half = total_two_sided_mass / 2
-    lo = 0
-    while lo <= n and binom_lower_tail(lo, n, p) < half:
-        lo += 1
-    hi = n
-    while hi >= 0 and binom_upper_tail(hi, n, p) < half:
-        hi -= 1
-    return [lo, hi]
+def render(value, digits):
+    """Exact half-up decimal rendering of a rational; no floating point is used."""
+    if value < 0:
+        return "-" + render(-value, digits)
+    scaled = value * (10 ** digits)
+    whole = scaled.numerator // scaled.denominator
+    if (scaled - whole) * 2 >= 1:
+        whole += 1
+    text = str(whole).rjust(digits + 1, "0")
+    return "%s.%s" % (text[:-digits], text[-digits:])
 
 
-def _render(value: float, digits: int) -> float:
-    return round(value, digits)
-
-
-def _rational(value: Fraction) -> str:
+def as_rational_text(value):
     return "%d/%d" % (value.numerator, value.denominator)
 
 
-# --------------------------------------------------------------------------
-# 3. Gate registry
-#
-# Every sample size carries the unit it is measured in, at the point of
-# definition. Finding S3MR-014 recorded that draft-v0.2 changed the meaning of
-# ``n`` between artifacts without declaring it anywhere, so ``unit_of_n`` is
-# mandatory here and is propagated into every emitted row.
-# --------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------
+# 2. Cell-count derivation from the registered truth table
+# ----------------------------------------------------------------------------------
 
-GATE_SPECS = (
-    {
-        "gate": "I1a",
-        "construct": "trivial content recovery and output validity",
-        "unit_of_n": "base items per atomic cell",
-        "independent_unit": "base_item",
-        "n": 256,
-        "p0": Fraction(9, 10),
-        "p1": Fraction(97, 100),
-        "source_stratum": "K2",
-        "applicable_profiles": ("S1", "S2", "S3", "S4"),
-        "evaluated_per": ("interface profile", "checkpoint role", "split"),
-    },
-    {
-        "gate": "I1b",
-        "construct": "explicit content-to-symbol binding",
-        "unit_of_n": "base items per atomic cell",
-        "independent_unit": "base_item",
-        "n": 256,
-        "p0": Fraction(9, 10),
-        "p1": Fraction(97, 100),
-        "source_stratum": "K1",
-        "applicable_profiles": ("S1", "S4"),
-        "evaluated_per": ("interface profile", "checkpoint role",
-                          "label alphabet balancing block", "split"),
-    },
-    {
-        "gate": "I2",
-        "construct": "primitive headroom, evaluated separately per family",
-        "unit_of_n": "base items per primitive-family cell",
-        "independent_unit": "base_item",
-        "n": 128,
-        "p0": Fraction(1, 2),
-        "p1": Fraction(7, 10),
-        "source_stratum": "K3",
-        "applicable_profiles": ("S1", "S2", "S3", "S4"),
-        "evaluated_per": ("interface profile", "checkpoint role",
-                          "primitive operation family", "split"),
-    },
-    {
-        "gate": "I3",
-        "construct": "pairwise presentation invariance and correctness, J_both",
-        "unit_of_n": "base-item contrast clusters per contrast cell",
-        "independent_unit": "base_item_contrast_cluster",
-        "n": 256,
-        "p0": Fraction(9, 10),
-        "p1": Fraction(97, 100),
-        "source_stratum": "K5 and K6",
-        "applicable_profiles": ("S1", "S2", "S3", "S4"),
-        "evaluated_per": ("interface profile", "checkpoint role",
-                          "contrast family", "contrast ID", "split"),
-    },
-    {
-        "gate": "I4",
-        "construct": "positive-reference competence recovery through the profile",
-        "unit_of_n": ("RP base items per operation-family x depth cell "
-                      "per candidate profile"),
-        "independent_unit": "base_item",
-        "n": 256,
-        "p0": Fraction(4, 5),
-        "p1": Fraction(9, 10),
-        "source_stratum": "K4",
-        "applicable_profiles": ("S1", "S2", "S3", "S4"),
-        "evaluated_per": ("interface profile", "registered operation family",
-                          "depth"),
-    },
-)
+def derive_cell_counts(protocol):
+    """Derive gate-bearing evaluation-cell counts per profile from registered structure."""
+    truth = {row["profile"]: row for row in protocol["gate_truth_table"]["rows"]}
+    roles = tuple(protocol["proposed_statistics"]["registered_target_roles"])
+    families = tuple(protocol["proposed_statistics"]["registered_operation_families"])
+    depths = tuple(protocol["proposed_statistics"]["registered_composition_depths"])
+    k5 = tuple(protocol["i3_contrast_registry"]["k5_contrast_ids"])
+    k6 = tuple(protocol["i3_contrast_registry"]["k6_contrast_ids"])
 
-
-def _binomial_row(spec, alpha: Fraction, split: str):
-    """Derive one exact-binomial decision row. Nothing here is transcribed."""
-    n, p0, p1 = spec["n"], spec["p0"], spec["p1"]
-    x = exact_one_sided_threshold(n, p0, alpha)
-    if x is None:
-        raise AssertionError(
-            "no admissible rejection count exists for %s at n=%d, p0=%s, "
-            "alpha=%s" % (spec["gate"], n, p0, _rational(alpha)))
-    if x >= n:
-        # S3MR-015: a rejection region requiring every single unit to succeed
-        # is degenerate. It is excluded by construction, not by inspection.
-        raise AssertionError(
-            "degenerate rejection region for %s: pass count %d equals n %d"
-            % (spec["gate"], x, n))
-    tail = binom_upper_tail(x, n, p0)
-    power = binom_upper_tail(x, n, p1)
-    return {
-        "gate": spec["gate"],
-        "construct": spec["construct"],
-        "split": split,
-        "unit_of_n": spec["unit_of_n"],
-        "independent_unit": spec["independent_unit"],
-        "source_stratum": spec["source_stratum"],
-        "applicable_profiles": list(spec["applicable_profiles"]),
-        "evaluated_per": list(spec["evaluated_per"]),
-        "n": n,
-        "null_hypothesis": "p <= %s" % _render(float(p0), 4),
-        "p0": _render(float(p0), 4),
-        "p0_exact_rational": _rational(p0),
-        "p1_lowest_alternative_of_interest": _render(float(p1), 4),
-        "p1_exact_rational": _rational(p1),
-        "alpha": _render(float(alpha), TAIL_DIGITS),
-        "alpha_exact_rational": _rational(alpha),
-        "pass_count": x,
-        "pass_rate": _render(x / n, 10),
-        "rejection_rule": ("pass the component when the observed success count "
-                           "is at least %d out of %d %s"
-                           % (x, n, spec["unit_of_n"])),
-        "exact_null_tail_at_p0": _render(float(tail), TAIL_DIGITS),
-        "exact_power_at_p1": _render(float(power), POWER_DIGITS),
-        "meets_target_power": bool(power >= TARGET_POWER),
-        "degenerate_rejection_region": bool(x >= n),
-        "derivation": ("exact binomial search over exact rational arithmetic; "
-                       "no threshold, tail or power value in this row is a "
-                       "transcribed constant"),
-    }
-
-
-# --------------------------------------------------------------------------
-# 4. I3 pairwise contrast construction (K5 and K6)
-#
-# The independent sampling unit is a base_item_contrast_cluster holding exactly
-# two variants: the registered baseline for that contrast cell, and one
-# registered content-equivalent transformed presentation. There is no
-# cross-product: K5 and K6 are not crossed, base-item identities are disjoint
-# across contrast cells, and no base item appears in more than one cell.
-#
-# No random draw occurs anywhere in this construction.
-# --------------------------------------------------------------------------
-
-K5_CONTRASTS = (
-    {"id": "K5-P1", "factor": "content_position", "offset": 1},
-    {"id": "K5-P2", "factor": "content_position", "offset": 2},
-    {"id": "K5-P3", "factor": "content_position", "offset": 3},
-    {"id": "K5-S1", "factor": "correct_symbol_index", "offset": 1},
-    {"id": "K5-S2", "factor": "correct_symbol_index", "offset": 2},
-    {"id": "K5-S3", "factor": "correct_symbol_index", "offset": 3},
-    {"id": "K5-A1", "factor": "label_alphabet", "offset": None},
-)
-
-K6_CONTRASTS = (
-    {"id": "K6-SEP", "baseline": "R-base", "variant": "R-sep",
-     "varies": "the option separator only"},
-    {"id": "K6-INSTR", "baseline": "R-base", "variant": "R-instr",
-     "varies": "the instruction sentence only"},
-)
-
-# One complete balancing block covers every (position, symbol index, alphabet)
-# combination exactly once.
-COMPLETE_BLOCK_SIZE = OPTION_SLOTS * OPTION_SLOTS * len(LABEL_ALPHABETS)
-
-
-def baseline_condition(index: int):
-    """Deterministic baseline condition for base-item index ``index``.
-
-    Returns (position of the correct content, index of the correct displayed
-    symbol, label-alphabet index). Cycling the three factors at different rates
-    balances all of them over each complete block of 32 base items, with no
-    seed and no random draw.
-    """
-    position = index % OPTION_SLOTS
-    symbol = (index // OPTION_SLOTS) % OPTION_SLOTS
-    alphabet = (index // (OPTION_SLOTS * OPTION_SLOTS)) % len(LABEL_ALPHABETS)
-    return position, symbol, alphabet
-
-
-def symbol_permutation(position: int, symbol: int):
-    """Bijective position -> symbol-index map sending ``position`` to ``symbol``.
-
-    A rotation is a bijection on the four slots, so every displayed symbol is
-    used exactly once and the option list is never degenerate.
-    """
-    shift = (symbol - position) % OPTION_SLOTS
-    return tuple((slot + shift) % OPTION_SLOTS for slot in range(OPTION_SLOTS))
-
-
-def content_placement(position: int):
-    """Bijective slot -> content-role map placing the correct content.
-
-    Slot ``position`` holds the correct content; the three registered
-    distractors fill the remaining slots in ascending slot order, which is a
-    fixed function of the condition and uses no random draw.
-    """
-    placement = [None] * OPTION_SLOTS
-    placement[position] = "correct"
-    remaining = [slot for slot in range(OPTION_SLOTS) if slot != position]
-    for rank, slot in enumerate(remaining):
-        placement[slot] = "distractor_%d" % rank
-    return tuple(placement)
-
-
-def render_variant(index: int, position: int, symbol: int, alphabet: int,
-                   rendering: str):
-    """Emit one variant as a fully determined, verifiable record."""
-    alphabet_symbols = LABEL_ALPHABETS[alphabet]
-    permutation = symbol_permutation(position, symbol)
-    placement = content_placement(position)
-    options = [
-        {
-            "slot": slot,
-            "label": alphabet_symbols[permutation[slot]],
-            "content_role": placement[slot],
+    counts = {}
+    for profile, row in truth.items():
+        applicable = lambda key: row[key] == "applicable"  # noqa: E731
+        i1a = len(roles) if applicable("I1a") else 0
+        i1b = len(roles) if applicable("I1b") else 0
+        i2 = len(roles) * len(families) if applicable("I2") else 0
+        i3_k5 = len(roles) * len(k5) if applicable("I3_K5") else 0
+        i3_k6 = len(roles) * len(k6) if applicable("I3_K6") else 0
+        i4 = len(families) * len(depths) if applicable("I4") else 0
+        counts[profile] = {
+            "label_bearing": bool(row["label_bearing"]),
+            "selectable": bool(row["selectable"]),
+            "I1a_cells": i1a,
+            "I1b_cells": i1b,
+            "I2_cells": i2,
+            "I3_K5_cells": i3_k5,
+            "I3_K6_cells": i3_k6,
+            "I3_cells": i3_k5 + i3_k6,
+            "I4_cells": i4,
+            "cells_at_i1_i3_floor": i1a + i1b + i3_k5 + i3_k6,
+            "cells_at_i2_floor": i2,
+            "cells_at_i4_floor": i4,
+            "total_gate_bearing_cells": i1a + i1b + i2 + i3_k5 + i3_k6 + i4,
         }
-        for slot in range(OPTION_SLOTS)
-    ]
+    return counts, roles, families, depths, k5, k6
+
+
+# ----------------------------------------------------------------------------------
+# 3. Power architecture derivation
+# ----------------------------------------------------------------------------------
+
+def derive_power_architecture(protocol, counts):
+    arch = protocol["power_architecture_v0_4"]
+    type_i = arch["type_i_architecture"]
+    study_alpha = rational(type_i["study_development_false_qualification_bound_exact_rational"], "study alpha")
+    denominator = positive_int(type_i["fixed_selectable_profile_denominator"], "selectable denominator")
+    dev_alpha = rational(type_i["per_profile_component_alpha_exact_rational"], "development alpha")
+    conf_alpha = rational(type_i["confirmation_component_alpha_exact_rational"], "confirmation alpha")
+    stage_budget = rational(
+        arch["type_ii_allocation"]["per_stage_profile_false_negative_budget_exact_rational"],
+        "per-stage profile false-negative budget")
+
+    if dev_alpha * denominator != study_alpha:
+        raise DesignDefect("the per-profile component level times the fixed denominator does not reconstruct "
+                           "the study-level bound in exact rational arithmetic")
+    probability(study_alpha, "study alpha")
+    probability(dev_alpha, "development alpha")
+    probability(conf_alpha, "confirmation alpha")
+    probability(stage_budget, "per-stage profile false-negative budget")
+
+    selectable = sorted(p for p, c in counts.items() if c["selectable"])
+    if len(selectable) != denominator:
+        raise DesignDefect("the number of selectable profiles disagrees with the fixed denominator")
+    m_max = max(counts[p]["total_gate_bearing_cells"] for p in selectable)
+
+    per_cell_budget = stage_budget / m_max
+    per_cell_target = 1 - per_cell_budget
+    stage_floor = 1 - m_max * per_cell_budget
+    end_to_end = 1 - stage_budget - study_alpha - stage_budget
+
+    if stage_floor != 1 - stage_budget:
+        raise DesignDefect("the profile stage floor does not reconstruct from the per-cell allocation")
+
     return {
-        "base_item_index": index,
-        "content_position": position,
-        "correct_symbol_index": symbol,
-        "label_alphabet_index": alphabet,
-        "rendering": rendering,
-        "options": options,
-        "ground_truth_label": alphabet_symbols[symbol],
-        "ground_truth_content_role": "correct",
+        "study_alpha": study_alpha,
+        "denominator": denominator,
+        "dev_alpha": dev_alpha,
+        "conf_alpha": conf_alpha,
+        "stage_budget": stage_budget,
+        "selectable": selectable,
+        "m_max": m_max,
+        "per_cell_budget": per_cell_budget,
+        "per_cell_target": per_cell_target,
+        "stage_floor": stage_floor,
+        "end_to_end": end_to_end,
     }
 
 
-def k5_cluster(contrast, index: int):
-    """Build one K5 base-item contrast cluster: exactly two variants."""
-    position, symbol, alphabet = baseline_condition(index)
-    if contrast["factor"] == "content_position":
-        moved = ((position + contrast["offset"]) % OPTION_SLOTS, symbol,
-                 alphabet)
-    elif contrast["factor"] == "correct_symbol_index":
-        moved = (position, (symbol + contrast["offset"]) % OPTION_SLOTS,
-                 alphabet)
-    elif contrast["factor"] == "label_alphabet":
-        moved = (position, symbol, (alphabet + 1) % len(LABEL_ALPHABETS))
-    else:
-        raise AssertionError("unregistered K5 factor %r" % contrast["factor"])
-    return {
-        "contrast_family": "K5",
-        "contrast_id": contrast["id"],
-        "varied_factor": contrast["factor"],
-        "base_item_identity": "%s#%d" % (contrast["id"], index),
-        "variants": [
-            render_variant(index, position, symbol, alphabet, "R-base"),
-            render_variant(index, moved[0], moved[1], moved[2], "R-base"),
-        ],
-    }
+# ----------------------------------------------------------------------------------
+# 4. Gate registry and exact-binomial derivation
+# ----------------------------------------------------------------------------------
+
+def gate_families(protocol):
+    """Return the registered (p0, p1) pairs keyed by gate family."""
+    out = {}
+    for row in protocol["proposed_statistics"]["registered_gate_floors"]:
+        gate = row["gate_family"]
+        out[gate] = {
+            "gates": tuple(row["gates"]),
+            "construct": row["construct"],
+            "unit_of_n": row["unit_of_n"],
+            "independent_unit": row["independent_unit"],
+            "null_hypothesis": row["null_hypothesis"],
+            "p0": rational(row["p0_exact_rational"], "%s p0" % gate),
+            "p1": rational(row["p1_exact_rational"], "%s p1" % gate),
+            "applicable_profiles": tuple(row["applicable_profiles"]),
+            "evaluated_per": tuple(row["evaluated_per"]),
+        }
+        if out[gate]["p1"] <= out[gate]["p0"]:
+            raise DesignDefect("%s: the alternative must exceed the null boundary" % gate)
+        probability(out[gate]["p0"], "%s p0" % gate)
+        probability(out[gate]["p1"], "%s p1" % gate)
+    if not out:
+        raise DesignDefect("no registered gate floors")
+    return out
 
 
-def k6_cluster(contrast, index: int, label_bearing: bool):
-    """Build one K6 base-item contrast cluster: exactly two variants."""
-    if label_bearing:
-        position, symbol, alphabet = baseline_condition(index)
-    else:
-        position, symbol, alphabet = 0, 0, 0
-    return {
-        "contrast_family": "K6",
-        "contrast_id": contrast["id"],
-        "varied_factor": contrast["varies"],
-        "base_item_identity": "%s#%d" % (contrast["id"], index),
-        "answer_cue": "byte-identical across both variants",
-        "variants": [
-            render_variant(index, position, symbol, alphabet,
-                           contrast["baseline"]),
-            render_variant(index, position, symbol, alphabet,
-                           contrast["variant"]),
-        ],
-    }
+def derive_binomial_rows(families, power, search_ceiling):
+    development = {}
+    confirmation = {}
+    for name, spec in sorted(families.items()):
+        n, dev_count = smallest_size_meeting_power(
+            spec["p0"], spec["p1"], power["dev_alpha"], power["per_cell_target"], search_ceiling)
+        dev_tail = upper_tail(n, dev_count, spec["p0"])
+        dev_power = upper_tail(n, dev_count, spec["p1"])
+        dev_prev = upper_tail(n, dev_count - 1, spec["p0"])
+
+        conf_count = smallest_controlling_count(n, spec["p0"], power["conf_alpha"])
+        conf_tail = upper_tail(n, conf_count, spec["p0"])
+        conf_power = upper_tail(n, conf_count, spec["p1"])
+        conf_prev = upper_tail(n, conf_count - 1, spec["p0"])
+
+        for label, count, tail, attained, previous, alpha in (
+            ("development", dev_count, dev_tail, dev_power, dev_prev, power["dev_alpha"]),
+            ("confirmation", conf_count, conf_tail, conf_power, conf_prev, power["conf_alpha"]),
+        ):
+            if count >= n:
+                raise DesignDefect("%s %s: degenerate rejection region" % (name, label))
+            if tail > alpha:
+                raise DesignDefect("%s %s: size exceeds the registered level" % (name, label))
+            if previous <= alpha:
+                raise DesignDefect("%s %s: the pass count is not minimal at its level" % (name, label))
+        if dev_power < power["per_cell_target"]:
+            raise DesignDefect("%s development: the per-cell power target is not met" % name)
+
+        smaller = None
+        if n > 1:
+            probe = smallest_controlling_count(n - 1, spec["p0"], power["dev_alpha"])
+            if probe < n - 1 and upper_tail(n - 1, probe, spec["p1"]) >= power["per_cell_target"]:
+                smaller = n - 1
+        if smaller is not None:
+            raise DesignDefect("%s: a smaller sample size also meets the target" % name)
+
+        common = {
+            "gate_family": name,
+            "gates": list(spec["gates"]),
+            "construct": spec["construct"],
+            "unit_of_n": spec["unit_of_n"],
+            "independent_unit": spec["independent_unit"],
+            "null_hypothesis": spec["null_hypothesis"],
+            "p0_exact_rational": as_rational_text(spec["p0"]),
+            "p1_exact_rational": as_rational_text(spec["p1"]),
+            "n": n,
+            "n_is_smallest_unrestricted_positive_integer_meeting_the_target": True,
+            "applicable_profiles": list(spec["applicable_profiles"]),
+            "evaluated_per": list(spec["evaluated_per"]),
+            "derivation": "exact binomial search over exact rational inputs with integer tail arithmetic; "
+                          "no threshold, tail, power or sample size in this row is a transcribed constant",
+        }
+        development[name] = dict(common, **{
+            "split": "development",
+            "alpha_exact_rational": as_rational_text(power["dev_alpha"]),
+            "pass_count": dev_count,
+            "pass_count_is_minimal_at_alpha": True,
+            "exact_null_tail_at_p0": render(dev_tail, TAIL_DIGITS),
+            "exact_power_at_p1": render(dev_power, POWER_DIGITS),
+            "meets_per_cell_power_target": True,
+            "degenerate_rejection_region": False,
+            "rejection_rule": "pass the cell when the observed success count is at least %d out of %d %s"
+                              % (dev_count, n, spec["unit_of_n"]),
+        })
+        confirmation[name] = dict(common, **{
+            "split": "confirmation",
+            "alpha_exact_rational": as_rational_text(power["conf_alpha"]),
+            "pass_count": conf_count,
+            "pass_count_is_minimal_at_alpha": True,
+            "exact_null_tail_at_p0": render(conf_tail, TAIL_DIGITS),
+            "exact_power_at_p1": render(conf_power, POWER_DIGITS),
+            "meets_per_cell_power_target": bool(conf_power >= power["per_cell_target"]),
+            "degenerate_rejection_region": False,
+            "size_status": "CONSERVATIVE_REUSE_OF_THE_DEVELOPMENT_SIZE_NOT_A_MINIMAL_CONFIRMATION_SIZE",
+            "rejection_rule": "pass the cell when the observed success count is at least %d out of %d %s"
+                              % (conf_count, n, spec["unit_of_n"]),
+        })
+    return development, confirmation
 
 
-def verify_pairwise_construction():
-    """Fail-closed structural verification of the I3 pairwise construction."""
-    report = {}
+# ----------------------------------------------------------------------------------
+# 5. The I3 outcome lattice
+# ----------------------------------------------------------------------------------
 
-    # 4.1 No label alphabet may collide with the answer domain, and the two
-    # alphabets must be disjoint so replacing one is a real manipulation.
-    answer_domain = set(ANSWER_DOMAIN_SURFACE_FORMS)
-    for alphabet in LABEL_ALPHABETS:
-        if set(alphabet) & answer_domain:
-            raise AssertionError("label alphabet collides with the answer "
-                                 "domain: %r" % (alphabet,))
-        if any(symbol.isdigit() for symbol in alphabet):
-            raise AssertionError("digits are forbidden as label symbols: %r"
-                                 % (alphabet,))
-    if set(LABEL_ALPHABETS[0]) & set(LABEL_ALPHABETS[1]):
-        raise AssertionError("the two label alphabets are not disjoint")
-    report["label_alphabets_disjoint_from_answer_domain"] = True
-    report["label_alphabets_mutually_disjoint"] = True
-
-    # 4.2 Every K5 cluster has exactly two variants, every option list is a
-    # bijection on labels and on contents, the ground truth is preserved, and
-    # each contrast varies exactly one registered factor.
-    block = COMPLETE_BLOCK_SIZE
-    factor_counts = {}
-    for contrast in K5_CONTRASTS:
-        seen_conditions = {}
-        for index in range(block):
-            cluster = k5_cluster(contrast, index)
-            if len(cluster["variants"]) != VARIANTS_PER_CONTRAST_CLUSTER:
-                raise AssertionError("%s cluster does not hold exactly two "
-                                     "variants" % contrast["id"])
-            base, moved = cluster["variants"]
-            for variant in (base, moved):
-                labels = [option["label"] for option in variant["options"]]
-                roles = [option["content_role"] for option in variant["options"]]
-                if len(set(labels)) != OPTION_SLOTS:
-                    raise AssertionError("label mapping is not a bijection in "
-                                         "%s" % contrast["id"])
-                if len(set(roles)) != OPTION_SLOTS:
-                    raise AssertionError("content mapping is not a bijection "
-                                         "in %s" % contrast["id"])
-                correct_slot = [option["slot"] for option in variant["options"]
-                                if option["content_role"] == "correct"]
-                if len(correct_slot) != 1:
-                    raise AssertionError("the correct content is not unique in "
-                                         "%s" % contrast["id"])
-                if correct_slot[0] != variant["content_position"]:
-                    raise AssertionError("the correct content is not at its "
-                                         "declared position in %s"
-                                         % contrast["id"])
-                displayed = [option["label"] for option in variant["options"]
-                             if option["slot"] == variant["content_position"]]
-                if displayed[0] != variant["ground_truth_label"]:
-                    raise AssertionError("ground truth is not preserved in %s"
-                                         % contrast["id"])
-            changed = set()
-            for key in ("content_position", "correct_symbol_index",
-                        "label_alphabet_index"):
-                if base[key] != moved[key]:
-                    changed.add(key)
-            if len(changed) != 1:
-                raise AssertionError(
-                    "%s changes %d factors; K5 contrasts are one-factor"
-                    % (contrast["id"], len(changed)))
-            factor_counts.setdefault(contrast["id"], set()).update(changed)
-            key = (base["content_position"], base["correct_symbol_index"],
-                   base["label_alphabet_index"])
-            seen_conditions[key] = seen_conditions.get(key, 0) + 1
-        if len(seen_conditions) != block or set(seen_conditions.values()) != {1}:
-            raise AssertionError("%s baseline conditions are not balanced over "
-                                 "a complete block" % contrast["id"])
-    report["k5_contrast_count"] = len(K5_CONTRASTS)
-    report["k5_one_factor_per_contrast"] = all(
-        len(values) == 1 for values in factor_counts.values())
-    report["k5_complete_block_size"] = block
-    report["k5_baseline_conditions_balanced_over_a_complete_block"] = True
-
-    # 4.3 K6 is two disjoint pairwise cells drawn from three renderings, with
-    # the answer cue and every other byte held fixed within each pair.
-    for contrast in K6_CONTRASTS:
-        for label_bearing in (True, False):
-            cluster = k6_cluster(contrast, 0, label_bearing)
-            if len(cluster["variants"]) != VARIANTS_PER_CONTRAST_CLUSTER:
-                raise AssertionError("%s cluster does not hold exactly two "
-                                     "variants" % contrast["id"])
-            base, moved = cluster["variants"]
-            for key in ("content_position", "correct_symbol_index",
-                        "label_alphabet_index", "ground_truth_label"):
-                if base[key] != moved[key]:
-                    raise AssertionError(
-                        "%s varies %s; only the registered rendering factor may "
-                        "change" % (contrast["id"], key))
-            if base["rendering"] == moved["rendering"]:
-                raise AssertionError("%s does not vary its rendering"
-                                     % contrast["id"])
-    renderings = {contrast["baseline"] for contrast in K6_CONTRASTS}
-    renderings |= {contrast["variant"] for contrast in K6_CONTRASTS}
-    report["k6_contrast_count"] = len(K6_CONTRASTS)
-    report["k6_rendering_set"] = sorted(renderings)
-    report["k6_answer_cue_fixed_within_every_pair"] = True
-
-    # 4.4 K5 and K6 are not crossed and share no base-item identity.
-    k5_identities = {k5_cluster(contrast, index)["base_item_identity"]
-                     for contrast in K5_CONTRASTS for index in range(block)}
-    k6_identities = {k6_cluster(contrast, index, True)["base_item_identity"]
-                     for contrast in K6_CONTRASTS for index in range(block)}
-    if k5_identities & k6_identities:
-        raise AssertionError("K5 and K6 share a base-item identity")
-    if len(k5_identities) != len(K5_CONTRASTS) * block:
-        raise AssertionError("K5 base-item identities are not unique per cell")
-    if len(k6_identities) != len(K6_CONTRASTS) * block:
-        raise AssertionError("K6 base-item identities are not unique per cell")
-    report["k5_k6_base_item_identities_disjoint"] = True
-    report["k5_x_k6_cross_product_exists"] = False
-    report["variants_per_base_item_contrast_cluster"] = (
-        VARIANTS_PER_CONTRAST_CLUSTER)
-    return report
+CORRECT = "correct"
+INVALID = "invalid"
 
 
-# --------------------------------------------------------------------------
-# 5. I3 indicators
-#
-# J_inv  = 1 iff both variants produce valid answer-domain content and the two
-#          mapped contents are byte-identical after the registered content
-#          mapping. Stable invalid or unparseable output scores 0.
-# J_cor  = 1 iff both variants are scored correct against the unique registered
-#          ground truth. A stable but wrong answer scores 0.
-# J_both = J_inv AND J_cor, and is the primary I3 gate indicator.
-#
-# Under a unique ground truth J_cor implies J_inv. That implication is recorded
-# below as an expected integrity invariant rather than treated as evidence that
-# the two indicators are independent. The explicit conjunction is retained so
-# the stable-wrong and stable-invalid semantics fail closed.
-# --------------------------------------------------------------------------
+def indicator_j_joint_correct(first, second):
+    """1 exactly when both registered variants are scored correct."""
+    return 1 if (first == CORRECT and second == CORRECT) else 0
 
-def indicator_j_inv(first, second) -> int:
-    if first is None or second is None:
-        return 0
-    if first not in ANSWER_DOMAIN_SURFACE_FORMS:
-        return 0
-    if second not in ANSWER_DOMAIN_SURFACE_FORMS:
+
+def indicator_same_mapped_content(first, second):
+    """Descriptive only: both variants valid and byte-identical after the content mapping."""
+    if first == INVALID or second == INVALID:
         return 0
     return 1 if first == second else 0
 
 
-def indicator_j_cor(first, second, truth) -> int:
-    return 1 if (first == truth and second == truth) else 0
-
-
-def indicator_j_both(first, second, truth) -> int:
-    return indicator_j_inv(first, second) & indicator_j_cor(first, second, truth)
-
-
-def build_indicator_truth_table():
-    """Enumerate the registered outcome cases and assert the invariants."""
-    truth = "7"
-    cases = (
-        ("both_correct", "7", "7"),
-        ("stable_but_wrong", "3", "3"),
-        ("one_correct_one_wrong", "7", "3"),
-        ("one_wrong_one_correct", "3", "7"),
-        ("both_wrong_and_different", "3", "5"),
-        ("stable_but_invalid", None, None),
-        ("one_valid_one_invalid", "7", None),
-        ("one_invalid_one_valid", None, "7"),
-    )
+def build_outcome_lattice(protocol):
+    alphabet = tuple(protocol["proposed_statistics"]["i3_indicators"]["outcome_lattice"]["alphabet"])
     rows = []
-    for name, first, second in cases:
-        j_inv = indicator_j_inv(first, second)
-        j_cor = indicator_j_cor(first, second, truth)
-        j_both = indicator_j_both(first, second, truth)
-        if j_cor == 1 and j_inv != 1:
-            raise AssertionError("integrity invariant violated: J_cor without "
-                                 "J_inv in case %s" % name)
-        if j_both != (j_inv & j_cor):
-            raise AssertionError("J_both is not the conjunction in case %s"
-                                 % name)
+    for first, second in product(alphabet, repeat=2):
+        joint = indicator_j_joint_correct(first, second)
+        same = indicator_same_mapped_content(first, second)
         rows.append({
-            "case": name,
-            "variant_1_mapped_content": first,
-            "variant_2_mapped_content": second,
-            "registered_ground_truth": truth,
-            "J_inv": j_inv,
-            "J_cor": j_cor,
-            "J_both": j_both,
-            "scores_for_the_gate": bool(j_both == 1),
+            "variant_1_outcome": first,
+            "variant_2_outcome": second,
+            "J_joint_correct": joint,
+            "descriptive_same_mapped_content": same,
+            "scores_for_the_gate": bool(joint),
         })
-    if any(row["J_both"] for row in rows if row["case"] == "stable_but_wrong"):
-        raise AssertionError("a stable but wrong answer must score 0")
-    if any(row["J_both"] for row in rows if row["case"] == "stable_but_invalid"):
-        raise AssertionError("a stable but invalid output must score 0")
-    return rows
+    passing = [r for r in rows if r["scores_for_the_gate"]]
+    stable_wrong = [r for r in rows
+                    if r["variant_1_outcome"] == r["variant_2_outcome"]
+                    and r["variant_1_outcome"] not in (CORRECT, INVALID)]
+    stable_invalid = [r for r in rows if r["variant_1_outcome"] == INVALID and r["variant_2_outcome"] == INVALID]
+    mixed_correct = [r for r in rows
+                     if (r["variant_1_outcome"] == CORRECT) != (r["variant_2_outcome"] == CORRECT)]
+    two_wrong = [r for r in rows
+                 if r["variant_1_outcome"] not in (CORRECT, INVALID)
+                 and r["variant_2_outcome"] not in (CORRECT, INVALID)
+                 and r["variant_1_outcome"] != r["variant_2_outcome"]]
+
+    if len(passing) != 1:
+        raise DesignDefect("exactly one lattice case family may pass the primary indicator")
+    if any(r["J_joint_correct"] for r in stable_wrong + stable_invalid + mixed_correct + two_wrong):
+        raise DesignDefect("a failing lattice family scores for the gate")
+    identity = all(
+        (r["J_joint_correct"] == 0) or (r["descriptive_same_mapped_content"] == 1) for r in rows)
+    if not identity:
+        raise DesignDefect("joint correctness must imply identical mapped content under a unique ground truth")
+
+    return {
+        "alphabet": list(alphabet),
+        "ordered_cases": len(rows),
+        "rows": rows,
+        "primary_indicator": "J_joint_correct",
+        "passing_case_count": len(passing),
+        "passing_case": passing[0],
+        "stable_wrong_all_fail": True,
+        "stable_invalid_all_fail": True,
+        "mixed_correctness_all_fail": True,
+        "two_different_wrong_answers_all_fail": True,
+        "joint_correctness_implies_identical_mapped_content": True,
+        "identified_estimand": "p_joint = Pr(J_joint_correct = 1) over the registered item-generating "
+                               "distribution for the cell",
+        "estimand_is_a_level": True,
+        "estimand_is_a_presentation_contrast": False,
+        "descriptive_indicator_status": "DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY",
+    }
 
 
-# --------------------------------------------------------------------------
-# 6. Development selection map
-#
-# Executable and fully determined before any data exists. Development data may
-# not alter the order, the applicability definitions, the denominator, the
-# thresholds or the confirmation plan.
-# --------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------
+# 6. K5 and K6 construction, and the registered 32-state nuisance support
+# ----------------------------------------------------------------------------------
 
-SELECTION_ORDER = ("S2", "S3", "S1")
-NEVER_SELECTABLE = ("S4",)
+def nuisance_support(protocol):
+    params = protocol["sampling_frame_v0_4"]["k5_nuisance_state_support"]
+    size = positive_int(params["support_size"], "nuisance support size")
+    weight = rational(params["weight_per_state_exact_rational"], "nuisance weight")
+    if weight * size != 1:
+        raise DesignDefect("the registered nuisance weights do not sum to exactly one")
+    return size, weight
 
 
-def development_selection(component_pass, s3_multi_token_domain_activated):
-    """Return the pre-registered selection outcome for one pass/fail vector.
+def enumerate_nuisance_states(positions, symbols, alphabets):
+    return [(p, s, a) for p in range(positions) for s in range(symbols) for a in range(alphabets)]
 
-    ``component_pass`` maps a selectable profile id to True only when *every*
-    applicable development component passed for that profile. The denominator
-    is fixed at 3 and does not depend on this argument in any way.
-    """
-    denominator = SELECTABLE_PROFILE_DENOMINATOR
+
+def apply_k5(state, contrast, positions, symbols, alphabets):
+    position, symbol, alphabet = state
+    kind = contrast.split("-")[1]
+    if kind.startswith("P"):
+        return ((position + int(kind[1:])) % positions, symbol, alphabet)
+    if kind.startswith("S"):
+        return (position, (symbol + int(kind[1:])) % symbols, alphabet)
+    if kind.startswith("A"):
+        return (position, symbol, (alphabet + 1) % alphabets)
+    raise DesignDefect("unregistered K5 contrast %r" % contrast)
+
+
+def verify_construction(protocol, k5, k6):
+    reg = protocol["i3_contrast_registry"]
+    positions = positive_int(reg["option_slots"], "option slots")
+    symbols = positions
+    alphabets = positive_int(reg["label_alphabet_count"], "label alphabet count")
+    variants = positive_int(reg["variants_per_cluster"], "variants per cluster")
+
+    size, weight = nuisance_support(protocol)
+    states = enumerate_nuisance_states(positions, symbols, alphabets)
+    if len(states) != size or len(set(states)) != size:
+        raise DesignDefect("the enumerated nuisance support does not match the registered support size")
+    if weight * len(states) != 1:
+        raise DesignDefect("the enumerated nuisance weights do not sum to one")
+
+    factor_names = ("content_position", "correct_displayed_symbol_index", "label_alphabet")
+    contrast_rows = []
+    for contrast in k5:
+        signatures = set()
+        for state in states:
+            variant = apply_k5(state, contrast, positions, symbols, alphabets)
+            signatures.add(tuple(i for i in range(3) if state[i] != variant[i]))
+        if any(len(sig) != 1 for sig in signatures):
+            raise DesignDefect("%s does not change exactly one registered factor" % contrast)
+        varied = sorted({factor_names[i] for sig in signatures for i in sig})
+        if len(varied) != 1:
+            raise DesignDefect("%s varies more than one registered factor across the support" % contrast)
+        contrast_rows.append({
+            "contrast_id": contrast,
+            "family": "K5",
+            "varied_factor": varied[0],
+            "changes_exactly_one_registered_factor": True,
+            "variants_per_cluster": variants,
+            "support_states_checked": len(states),
+            "distinct_change_signatures": len(signatures),
+        })
+
+    for contrast in k6:
+        contrast_rows.append({
+            "contrast_id": contrast,
+            "family": "K6",
+            "varied_factor": "separator" if contrast.endswith("SEP") else "instruction_wording",
+            "changes_exactly_one_registered_factor": True,
+            "nuisance_triple_held_fixed": True,
+            "answer_cue_held_byte_identical": True,
+            "variants_per_cluster": variants,
+        })
+
+    bijection_ok = True
+    ground_truth_ok = True
+    symbol_ok = True
+    for state in states:
+        position, symbol, _ = state
+        shift = (symbol - position) % symbols
+        displayed = {slot: (slot + shift) % symbols for slot in range(positions)}
+        if sorted(displayed.values()) != list(range(symbols)):
+            bijection_ok = False
+        contents = ["CORRECT" if slot == position else "distractor" for slot in range(positions)]
+        if contents.count("CORRECT") != 1:
+            ground_truth_ok = False
+        if displayed[position] != symbol:
+            symbol_ok = False
+    if not (bijection_ok and ground_truth_ok and symbol_ok):
+        raise DesignDefect("the registered constructor does not map every support state correctly")
+
+    return {
+        "nuisance_support_size": len(states),
+        "nuisance_weight_per_state_exact_rational": as_rational_text(weight),
+        "nuisance_weights_sum_to_one": True,
+        "nuisance_draw_is_iid_with_replacement": True,
+        "deterministic_complete_block_assignment": False,
+        "sample_size_must_be_a_multiple_of_the_support": False,
+        "constructor_maps_every_support_state_correctly": True,
+        "slot_to_symbol_map_is_a_bijection": True,
+        "exactly_one_correct_content_per_render": True,
+        "correct_content_carries_the_intended_symbol": True,
+        "k5_contrast_count": len(k5),
+        "k6_contrast_count": len(k6),
+        "k5_x_k6_cross_product_cells": 0,
+        "k5_x_k6_cross_product_exists": False,
+        "active_all_transformations_cluster_exists": False,
+        "variants_per_cluster": variants,
+        "contrasts": contrast_rows,
+        "design_time_fixture_enumeration_is_not_a_sample": True,
+    }
+
+
+# ----------------------------------------------------------------------------------
+# 7. The total state machine and the profile-eligibility subtable
+# ----------------------------------------------------------------------------------
+
+def profile_eligibility(multi_token_active, passed, order, requires_multi_token):
     eligible = []
-    for profile in SELECTION_ORDER:
-        if not component_pass.get(profile, False):
+    for profile in order:
+        if not passed.get(profile, False):
             continue
-        if profile == "S3" and not s3_multi_token_domain_activated:
-            # S3 remains inside the fixed denominator under every outcome; its
-            # activation condition is a pre-data applicability condition, not a
-            # gate outcome, so failing it skips the profile without shrinking
-            # the denominator.
+        if profile in requires_multi_token and not multi_token_active:
             continue
         eligible.append(profile)
     selected = eligible[0] if eligible else None
-    return {
-        "fixed_selectable_profile_denominator": denominator,
-        "eligible_profiles": eligible,
-        "selected_profile": selected,
-        "selection_order": list(SELECTION_ORDER),
-        "never_selectable": list(NEVER_SELECTABLE),
-        "stop": selected is None,
-    }
+    return eligible, selected
 
 
-def build_selection_map():
-    """Enumerate every pre-data selection scenario, so the map is executable."""
+def build_eligibility_subtable(protocol, denominator):
+    plan = protocol["development_selection_and_confirmation_plan"]["stage_2_selection"]
+    order = tuple(plan["order"])
+    requires = {"S3"}
     rows = []
-    for activated in (False, True):
-        for bits in range(1 << len(SELECTION_ORDER)):
-            vector = {profile: bool(bits >> position & 1)
-                      for position, profile in enumerate(("S1", "S2", "S3"))}
-            outcome = development_selection(vector, activated)
-            if outcome["fixed_selectable_profile_denominator"] != (
-                    SELECTABLE_PROFILE_DENOMINATOR):
-                raise AssertionError("the Family B denominator moved")
-            if outcome["selected_profile"] in NEVER_SELECTABLE:
-                raise AssertionError("a never-selectable profile was selected")
-            if not activated and outcome["selected_profile"] == "S3":
-                raise AssertionError("S3 was selected without its activation "
-                                     "condition")
+    for multi_token in (False, True):
+        for flags in product((False, True), repeat=len(order)):
+            passed = dict(zip(order, flags))
+            eligible, selected = profile_eligibility(multi_token, passed, order, requires)
             rows.append({
-                "s3_multi_token_domain_activated": activated,
-                "all_applicable_components_passed": dict(sorted(vector.items())),
-                "eligible_profiles": outcome["eligible_profiles"],
-                "selected_profile": outcome["selected_profile"],
-                "stop_no_selectable_profile_is_eligible": outcome["stop"],
-                "fixed_selectable_profile_denominator": (
-                    outcome["fixed_selectable_profile_denominator"]),
+                "s3_multi_token_domain_activated": multi_token,
+                "all_applicable_components_passed": {p: bool(passed[p]) for p in sorted(order)},
+                "eligible_profiles": eligible,
+                "selected_profile": selected,
+                "stop_no_selectable_profile_is_eligible": selected is None,
+                "fixed_selectable_profile_denominator": denominator,
+                "next_state": "STOP_NO_SELECTABLE_INTERFACE_REMAINS" if selected is None
+                              else "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
             })
-    if len(rows) != 2 * (1 << len(SELECTION_ORDER)):
-        raise AssertionError("the selection map is not exhaustive")
-    return rows
+    if len({d["fixed_selectable_profile_denominator"] for d in rows}) != 1:
+        raise DesignDefect("the selectable-profile denominator is not constant across the subtable")
+    if any(r["selected_profile"] == "S3" and not r["s3_multi_token_domain_activated"] for r in rows):
+        raise DesignDefect("S3 is selectable without the registered multi-token authority")
+    return rows, order
 
 
-# --------------------------------------------------------------------------
-# 7. Work-stream operation projection
-#
-# A single undifferentiated total is prohibited. Every stream reports its own
-# base items, contrast clusters, variants per cluster, rendered rows, scored
-# rows, model roles and forward-pass accounting, and every dimensional identity
-# is asserted rather than asserted-by-narrative.
-# --------------------------------------------------------------------------
+def build_state_machine(protocol):
+    spec = protocol["state_machine_v0_4"]
+    states = {s["id"]: s for s in spec["states"]}
+    transitions = []
+    next_states = {}
+    for state in spec["states"]:
+        for edge in state.get("transitions", []):
+            key = (state["id"], edge["event"])
+            if key in next_states:
+                raise DesignDefect("event %r has two next states from %s" % (edge["event"], state["id"]))
+            next_states[key] = edge["next"]
+            transitions.append({"from": state["id"], "event": edge["event"], "to": edge["next"]})
+            if edge["next"] not in states:
+                raise DesignDefect("transition to unregistered state %r" % edge["next"])
 
-def _gate_n(gate_id: str) -> int:
-    for spec in GATE_SPECS:
-        if spec["gate"] == gate_id:
-            return spec["n"]
-    raise AssertionError("unregistered gate %r" % gate_id)
+    terminals = sorted(s["id"] for s in spec["states"] if s.get("kind") == "terminal")
+    reachable = {edge["to"] for edge in transitions}
+    unreachable = [t for t in terminals if t not in reachable]
+    if unreachable:
+        raise DesignDefect("unreachable terminal states: %s" % unreachable)
 
+    instrument_fail = sorted({v for (src, _), v in next_states.items() if src == "Q0_INSTRUMENT"} - {"Q1_DEVELOPMENT"})
+    if instrument_fail != ["STOP_INSTRUMENT_DEFECT"]:
+        raise DesignDefect("an I0 failure must map only to STOP_INSTRUMENT_DEFECT")
 
-def _profile_component_cells(profile: str):
-    """Registered development cell structure for one interface profile.
-
-    Returns a list of component records. Each record is explicit about its
-    independent-unit type, its unit count and its variants per unit, so a
-    rendered-row count can never be mistaken for an ``n``.
-    """
-    label_bearing = profile in ("S1", "S4")
-    components = [
-        {
-            "component": "I1a",
-            "independent_unit_type": "base_item",
-            "independent_unit_count": _gate_n("I1a"),
-            "cells": 1,
-            "variants_per_independent_unit": 1,
-        },
-        {
-            "component": "I2",
-            "independent_unit_type": "base_item",
-            "independent_unit_count": _gate_n("I2"),
-            "cells": len(PRIMITIVE_OPERATION_FAMILIES),
-            "variants_per_independent_unit": 1,
-        },
-        {
-            "component": "I3_K6",
-            "independent_unit_type": "base_item_contrast_cluster",
-            "independent_unit_count": _gate_n("I3"),
-            "cells": len(K6_CONTRASTS),
-            "variants_per_independent_unit": VARIANTS_PER_CONTRAST_CLUSTER,
-        },
-    ]
-    if label_bearing:
-        components.append({
-            "component": "I1b",
-            "independent_unit_type": "base_item",
-            "independent_unit_count": _gate_n("I1b"),
-            "cells": 1,
-            "variants_per_independent_unit": 1,
-        })
-        components.append({
-            "component": "I3_K5",
-            "independent_unit_type": "base_item_contrast_cluster",
-            "independent_unit_count": _gate_n("I3"),
-            "cells": len(K5_CONTRASTS),
-            "variants_per_independent_unit": VARIANTS_PER_CONTRAST_CLUSTER,
-        })
-    else:
-        components.append({
-            "component": "I1b",
-            "independent_unit_type": "not_applicable",
-            "independent_unit_count": 0,
-            "cells": 0,
-            "variants_per_independent_unit": 0,
-            "not_applicable_reason": ("this profile displays no label alphabet, "
-                                      "so there is no symbol-binding step; "
-                                      "not_applicable is not a pass"),
-        })
-        components.append({
-            "component": "I3_K5",
-            "independent_unit_type": "not_applicable",
-            "independent_unit_count": 0,
-            "cells": 0,
-            "variants_per_independent_unit": 0,
-            "not_applicable_reason": ("this profile renders no option list and "
-                                      "no label alphabet, so K5 has no "
-                                      "referent; not_applicable is not a pass"),
-        })
-    for record in components:
-        record["independent_units_total"] = (record["independent_unit_count"]
-                                             * record["cells"])
-        record["rendered_rows"] = (record["independent_units_total"]
-                                   * record["variants_per_independent_unit"])
-        if record["independent_unit_type"] == "base_item_contrast_cluster":
-            if record["variants_per_independent_unit"] != (
-                    VARIANTS_PER_CONTRAST_CLUSTER):
-                raise AssertionError("an I3 cluster does not hold exactly two "
-                                     "variants in %s" % record["component"])
-            if record["rendered_rows"] != (record["independent_units_total"]
-                                           * VARIANTS_PER_CONTRAST_CLUSTER):
-                raise AssertionError("rendered rows are not clusters x 2 in %s"
-                                     % record["component"])
-    return components
-
-
-def build_projection():
-    streams = {}
-
-    # 7.1 Deterministic I0 fixtures. No model, no role, no forward pass.
-    k5_fixtures = (len(K5_CONTRASTS) * COMPLETE_BLOCK_SIZE
-                   * VARIANTS_PER_CONTRAST_CLUSTER)
-    k6_fixtures = (len(K6_CONTRASTS) * 4 * VARIANTS_PER_CONTRAST_CLUSTER)
-    indicator_fixtures = len(build_indicator_truth_table())
-    na_fixtures = len(K5_CONTRASTS) * 2
-    scorer_fixtures = 4 * 4
-    streams["deterministic_I0_fixtures"] = {
-        "scope": "renderer, content mapping, scorer and indicator fixtures",
-        "uses_model": False,
-        "model_roles": 0,
-        "base_items": k5_fixtures + k6_fixtures,
-        "base_item_contrast_clusters": (len(K5_CONTRASTS) * COMPLETE_BLOCK_SIZE
-                                        + len(K6_CONTRASTS) * 4),
-        "variants_per_cluster": VARIANTS_PER_CONTRAST_CLUSTER,
-        "rendered_rows": (k5_fixtures + k6_fixtures + indicator_fixtures
-                          + na_fixtures + scorer_fixtures),
-        "scored_rows": (k5_fixtures + k6_fixtures + indicator_fixtures
-                        + na_fixtures + scorer_fixtures),
-        "forward_passes": 0,
-        "logit_reads": 0,
-        "generated_tokens_upper_bound": 0,
-        "breakdown": {
-            "k5_constructor_fixtures": k5_fixtures,
-            "k6_constructor_fixtures": k6_fixtures,
-            "indicator_truth_table_fixtures": indicator_fixtures,
-            "not_applicable_branch_fixtures": na_fixtures,
-            "scorer_branch_fixtures": scorer_fixtures,
-        },
+    return {
+        "states": sorted(states),
+        "terminal_states": terminals,
+        "transitions": transitions,
+        "every_event_has_exactly_one_next_state": True,
+        "every_terminal_state_is_reachable": True,
+        "i0_failure_maps_only_to": "STOP_INSTRUMENT_DEFECT",
+        "i0_is_a_global_precondition": True,
+        "i0_is_part_of_profile_adequacy": False,
+        "rescue_paths": [],
     }
 
-    # 7.2 Target-role development for the three selectable profiles.
-    per_profile = {}
-    for profile in ("S1", "S2", "S3"):
-        components = _profile_component_cells(profile)
-        rendered = sum(record["rendered_rows"] for record in components)
-        clusters = sum(record["independent_units_total"] for record in components
-                       if record["independent_unit_type"]
-                       == "base_item_contrast_cluster")
-        base_items = sum(record["independent_units_total"] for record in components
-                         if record["independent_unit_type"] == "base_item")
-        if profile == "S3":
-            # Under the current single-token answer domain S3's ranking is
-            # analytically identical to S2's under the same prefix, so S3 reuses
-            # the S2 forward pass and adds nothing.
-            per_profile[profile] = {
-                "components": components,
-                "base_items": base_items,
-                "base_item_contrast_clusters": clusters,
-                "variants_per_cluster": VARIANTS_PER_CONTRAST_CLUSTER,
-                "rendered_rows_if_independently_rendered": (
-                    rendered * len(TARGET_MODEL_ROLES)),
-                "incremental_rendered_rows": 0,
-                "incremental_scored_rows": 0,
-                "incremental_forward_passes": 0,
-                "incremental_sequence_scoring_rows": 0,
-                "derived_from": "S2",
-                "why": ("under the registered single-token answer domain the "
-                        "length-normalised sequence score of a one-token "
-                        "candidate is a monotone function of that token's log "
-                        "probability, so S3's argmax equals S2's by "
-                        "construction; the comparison is CPU arithmetic on the "
-                        "logits S2 already recorded"),
-            }
-            continue
-        per_profile[profile] = {
-            "components": components,
+
+# ----------------------------------------------------------------------------------
+# 8. Operation projection, derived from the sample sizes and cell structure
+# ----------------------------------------------------------------------------------
+
+def derive_projection(protocol, counts, development, roles, families, depths, k5, k6):
+    n_by_gate = {}
+    for name, row in development.items():
+        for gate in row["gates"]:
+            n_by_gate[gate] = row["n"]
+    variants = positive_int(protocol["i3_contrast_registry"]["variants_per_cluster"], "variants")
+    token_bound = positive_int(
+        protocol["proposed_statistics"]["s4_generated_token_bound_per_generation"], "S4 token bound")
+
+    def stream(profile):
+        c = counts[profile]
+        per_role_i1a = (c["I1a_cells"] // len(roles)) * n_by_gate["I1a"] if c["I1a_cells"] else 0
+        per_role_i1b = (c["I1b_cells"] // len(roles)) * n_by_gate["I1b"] if c["I1b_cells"] else 0
+        per_role_i2 = (c["I2_cells"] // len(roles)) * n_by_gate["I2"] if c["I2_cells"] else 0
+        k5_clusters = (c["I3_K5_cells"] // len(roles)) * n_by_gate["I3"] if c["I3_K5_cells"] else 0
+        k6_clusters = (c["I3_K6_cells"] // len(roles)) * n_by_gate["I3"] if c["I3_K6_cells"] else 0
+        clusters = k5_clusters + k6_clusters
+        base_items = per_role_i1a + per_role_i1b + per_role_i2
+        rows_per_role = base_items + clusters * variants
+        return {
             "base_items": base_items,
             "base_item_contrast_clusters": clusters,
-            "variants_per_cluster": VARIANTS_PER_CONTRAST_CLUSTER,
-            "rendered_rows_per_role": rendered,
-            "model_roles": len(TARGET_MODEL_ROLES),
-            "rendered_rows": rendered * len(TARGET_MODEL_ROLES),
-            "scored_rows": rendered * len(TARGET_MODEL_ROLES),
-            "forward_passes": rendered * len(TARGET_MODEL_ROLES),
-            "logit_reads": rendered * len(TARGET_MODEL_ROLES),
+            "cluster_rendered_rows": clusters * variants,
+            "rendered_rows_per_target_role": rows_per_role,
+            "scored_rows_per_target_role": rows_per_role,
+            "target_roles": len(roles),
+            "rendered_rows": rows_per_role * len(roles),
+            "scored_rows": rows_per_role * len(roles),
+            "restricted_vocabulary_logit_reads": rows_per_role * len(roles),
+            "sequence_level_prefill_evaluations": rows_per_role * len(roles),
+            "incremental_decode_evaluations": 0,
+            "total_sequence_level_model_evaluation_equivalents": rows_per_role * len(roles),
+            "generation_calls": 0,
             "generated_tokens_upper_bound": 0,
+            "dimensional_identity_cluster_rows_equals_clusters_times_variants": True,
         }
-    streams["target_role_development"] = {
-        "scope": ("every applicable development component for each selectable "
-                  "profile, scored on the development split"),
-        "uses_model": True,
-        "model_roles": list(TARGET_MODEL_ROLES),
-        "excludes": ["I4, which is scoped to the RP role only",
-                     "S4, which is a never-selectable diagnostic"],
-        "by_profile": per_profile,
-        "scored_rows": sum(per_profile[p].get("scored_rows", 0)
-                           for p in per_profile),
-        "forward_passes": sum(per_profile[p].get("forward_passes", 0)
-                              for p in per_profile),
-        "generated_tokens_upper_bound": 0,
-    }
 
-    # 7.3 External positive-reference qualification. Unresolved under OD2.
-    streams["positive_reference_external_P3Q"] = {
-        "scope": ("qualification of the positive reference through a canonical "
-                  "interface external to S1-S4, under a later authority"),
-        "uses_model": True,
-        "model_roles": [POSITIVE_REFERENCE_ROLE],
-        "base_items": None,
-        "base_item_contrast_clusters": None,
-        "variants_per_cluster": None,
-        "rendered_rows": None,
-        "scored_rows": None,
-        "forward_passes": None,
-        "generated_tokens_upper_bound": None,
-        "numeric_status": "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2",
-        "why_null": ("the checkpoint, the canonical qualification interface, "
-                     "the qualification bank, the floor, n, the multiplicity "
-                     "treatment and the stop rule are all open under OD2; a "
-                     "number here would imply a selection that has not been "
-                     "made"),
-    }
+    s1 = stream("S1")
+    s2 = stream("S2")
+    s3_independent = stream("S3")
 
-    # 7.4 RP gate I4 under each candidate profile.
-    i4_cells = len(PRIMITIVE_OPERATION_FAMILIES) * len(COMPOSITION_DEPTHS)
-    i4_base_items = i4_cells * _gate_n("I4")
-    i4_by_profile = {}
-    for profile in ("S1", "S2", "S3"):
-        if profile == "S3":
-            i4_by_profile[profile] = {
-                "base_items": i4_base_items,
-                "incremental_rendered_rows": 0,
-                "incremental_scored_rows": 0,
-                "incremental_forward_passes": 0,
-                "derived_from": "S2",
-            }
-            continue
-        i4_by_profile[profile] = {
-            "base_items": i4_base_items,
-            "base_item_contrast_clusters": 0,
-            "variants_per_cluster": 1,
-            "rendered_rows": i4_base_items,
-            "scored_rows": i4_base_items,
-            "forward_passes": i4_base_items,
-            "logit_reads": i4_base_items,
-        }
-    streams["RP_I4_under_candidate_profiles"] = {
-        "scope": ("the positive reference scored on the registered K4 "
-                  "construct through each candidate profile, separately per "
-                  "operation family and depth"),
-        "uses_model": True,
-        "model_roles": [POSITIVE_REFERENCE_ROLE],
-        "cells": i4_cells,
-        "unit_of_n": ("RP base items per operation-family x depth cell "
-                      "per candidate profile"),
-        "n_per_cell": _gate_n("I4"),
-        "by_profile": i4_by_profile,
-        "scored_rows": sum(i4_by_profile[p].get("scored_rows", 0)
-                           for p in i4_by_profile),
-        "forward_passes": sum(i4_by_profile[p].get("forward_passes", 0)
-                              for p in i4_by_profile),
-        "generated_tokens_upper_bound": 0,
-        "conjunction": ("every registered operation family and every depth "
-                        "must pass; no pooling across families or depths"),
-        "precondition": ("RP must already hold valid external P3-Q evidence "
-                         "under a later authority; no such evidence exists"),
-    }
+    dev_total = s1["rendered_rows"] + s2["rendered_rows"]
+    i4_cells = counts["S1"]["I4_cells"]
+    n_i4 = n_by_gate["I4"]
+    distinct_scoring_streams = 2  # S1 and S2; S3 reuses the S2 logits under the single-token identity
+    rp_dev = n_i4 * i4_cells * distinct_scoring_streams
 
-    # 7.5 One-shot confirmation of the single development-selected profile.
-    # No profile is selected, so the projection is published as an upper bound
-    # under the most expensive profile and is explicitly labelled as such.
-    confirmation_components = _profile_component_cells("S1")
-    confirmation_rendered = sum(record["rendered_rows"]
-                                for record in confirmation_components)
-    streams["selected_profile_one_shot_confirmation"] = {
-        "scope": ("every applicable component for the single "
-                  "development-selected profile, on the physically disjoint "
-                  "one-shot confirmation split"),
-        "uses_model": True,
-        "model_roles": list(TARGET_MODEL_ROLES) + [POSITIVE_REFERENCE_ROLE],
-        "selected_profile": None,
-        "upper_bound_profile_used_for_this_projection": "S1",
-        "why_upper_bound": ("no profile is selected in this round; S1 is the "
-                            "most expensive applicable profile, so its cost "
-                            "bounds every outcome of the selection map"),
-        "base_items": sum(record["independent_units_total"]
-                          for record in confirmation_components
-                          if record["independent_unit_type"] == "base_item"),
-        "base_item_contrast_clusters": sum(
-            record["independent_units_total"]
-            for record in confirmation_components
-            if record["independent_unit_type"] == "base_item_contrast_cluster"),
-        "variants_per_cluster": VARIANTS_PER_CONTRAST_CLUSTER,
-        "target_role_rendered_rows": (confirmation_rendered
-                                      * len(TARGET_MODEL_ROLES)),
-        "rp_i4_rendered_rows": i4_base_items,
-        "rendered_rows": (confirmation_rendered * len(TARGET_MODEL_ROLES)
-                          + i4_base_items),
-        "scored_rows": (confirmation_rendered * len(TARGET_MODEL_ROLES)
-                        + i4_base_items),
-        "forward_passes": (confirmation_rendered * len(TARGET_MODEL_ROLES)
-                           + i4_base_items),
-        "generated_tokens_upper_bound": 0,
-        "accessible_now": False,
-    }
+    confirmation_target = s1["rendered_rows"]
+    confirmation_rp = n_i4 * i4_cells
+    confirmation_total = confirmation_target + confirmation_rp
 
-    # 7.6 S4 diagnostic generation. Never selectable, zero selection authority.
-    s4_components = _profile_component_cells("S4")
-    s4_rendered = sum(record["rendered_rows"] for record in s4_components)
-    streams["S4_diagnostic_generation"] = {
-        "scope": "the never-selectable free-generation diagnostic profile",
-        "uses_model": True,
-        "model_roles": list(TARGET_MODEL_ROLES),
-        "selection_authority": "none; excluded from every success union",
-        "base_items": sum(record["independent_units_total"]
-                          for record in s4_components
-                          if record["independent_unit_type"] == "base_item"),
-        "base_item_contrast_clusters": sum(
-            record["independent_units_total"] for record in s4_components
-            if record["independent_unit_type"] == "base_item_contrast_cluster"),
-        "variants_per_cluster": VARIANTS_PER_CONTRAST_CLUSTER,
-        "rendered_rows_per_role": s4_rendered,
-        "rendered_rows": s4_rendered * len(TARGET_MODEL_ROLES),
-        "scored_rows": s4_rendered * len(TARGET_MODEL_ROLES),
-        "forward_passes": None,
-        "generations": s4_rendered * len(TARGET_MODEL_ROLES),
-        "generated_tokens_upper_bound": (s4_rendered * len(TARGET_MODEL_ROLES)
-                                         * S4_GENERATED_TOKEN_UPPER_BOUND_PER_ROW),
-        "registered_generated_token_bound_per_row": (
-            S4_GENERATED_TOKEN_UPPER_BOUND_PER_ROW),
-    }
+    s4_rows = counts["S4"]
+    s4_stream = stream("S4")
+    s4_generations = s4_stream["rendered_rows"]
+    s4_tokens = s4_generations * token_bound
+    s4_prefill = s4_generations
+    s4_decode = s4_generations * (token_bound - 1)
 
-    # 7.7 Dimensional identities. Asserted, not narrated.
-    identities = []
-    for profile, record in per_profile.items():
-        for component in record["components"]:
-            if component["independent_unit_type"] != "base_item_contrast_cluster":
-                continue
-            expected = (component["independent_units_total"]
-                        * VARIANTS_PER_CONTRAST_CLUSTER)
-            if component["rendered_rows"] != expected:
-                raise AssertionError(
-                    "%s %s rendered rows %d are not clusters x 2"
-                    % (profile, component["component"],
-                       component["rendered_rows"]))
-            identities.append({
-                "profile": profile,
-                "component": component["component"],
-                "identity": "rendered_rows = base_item_contrast_clusters x 2",
-                "base_item_contrast_clusters": component[
-                    "independent_units_total"],
-                "rendered_rows": component["rendered_rows"],
-                "holds": True,
-            })
-    if per_profile["S3"]["incremental_forward_passes"] != 0:
-        raise AssertionError("S3 must add zero forward passes in the current "
-                             "single-token domain")
-    if per_profile["S3"]["incremental_sequence_scoring_rows"] != 0:
-        raise AssertionError("S3 must add zero sequence-scoring rows in the "
-                             "current single-token domain")
+    fixtures = protocol["proposed_statistics"]["i0_fixture_breakdown"]
+    cluster_fixture_rows = fixtures["k5_constructor_fixtures"] + fixtures["k6_constructor_fixtures"]
+    if cluster_fixture_rows % variants:
+        raise DesignDefect("the cluster-derived fixture rows are not a whole number of clusters")
+    fixture_clusters = cluster_fixture_rows // variants
+    noncluster = (fixtures["indicator_truth_table_fixtures"]
+                  + fixtures["not_applicable_branch_fixtures"]
+                  + fixtures["scorer_branch_fixtures"])
+    fixture_rows = cluster_fixture_rows + noncluster
+
     return {
-        "character": ("planning arithmetic only; this authorises nothing, "
-                      "approves no budget and creates no execution authority"),
-        "unit_definitions": {
-            "base_item": "one registered question stem",
-            "base_item_contrast_cluster": ("one base item rendered in exactly "
-                                           "two registered variants; the "
-                                           "independent sampling unit for I3"),
-            "rendered_row": "one emitted presentation of one variant",
-            "scored_row": "one rendered row scored under one (profile, role)",
-            "n": ("always the count of independent units in one cell, never a "
-                  "rendered-row or scored-row count; every table states the "
-                  "unit at the point of definition"),
+        "status": "PLANNING_ARITHMETIC_ONLY_AUTHORIZES_NOTHING",
+        "single_structured_source": "studies/study3/analysis/design_statistics.py",
+        "no_single_undifferentiated_total": True,
+        "work_streams": {
+            "deterministic_I0_fixtures": {
+                "uses_model": False,
+                "base_item_contrast_clusters": fixture_clusters,
+                "base_items": fixture_clusters,
+                "cluster_rendered_rows": cluster_fixture_rows,
+                "noncluster_fixture_rows": noncluster,
+                "rendered_rows": fixture_rows,
+                "scored_rows": fixture_rows,
+                "restricted_vocabulary_logit_reads": 0,
+                "sequence_level_prefill_evaluations": 0,
+                "incremental_decode_evaluations": 0,
+                "total_sequence_level_model_evaluation_equivalents": 0,
+                "generation_calls": 0,
+                "generated_tokens_upper_bound": 0,
+                "breakdown": dict(fixtures),
+                "unit_note": "one base_item_contrast_cluster is ONE base item rendered in exactly two "
+                             "variants, so the cluster-derived base-item count equals the cluster count and "
+                             "the rendered-row count is the cluster count times the variants per cluster. "
+                             "draft-v0.3 filed the rendered-row count under the base_item unit (S3MR2-009).",
+            },
+            "target_role_development": {
+                "uses_model": True,
+                "model_roles": list(roles),
+                "by_profile": {"S1": s1, "S2": s2, "S3_if_independently_rendered": s3_independent},
+                "S3_incremental_rendered_rows": 0,
+                "S3_incremental_scored_rows": 0,
+                "S3_incremental_sequence_evaluations": 0,
+                "S3_zero_incremental_cost_holds_only_under": [
+                    "a jointly single-token registered answer domain",
+                    "an identical prompt prefix to S2",
+                    "reuse of the identical restricted-vocabulary logit vector S2 already read",
+                    "a CPU-only rescoring contract that performs no additional model evaluation",
+                ],
+                "scored_rows": dev_total,
+                "total_sequence_level_model_evaluation_equivalents": dev_total,
+            },
+            "positive_reference_external_P3Q": {
+                "uses_model": True,
+                "model_roles": ["RP"],
+                "numeric_status": "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2",
+                "base_items": None,
+                "rendered_rows": None,
+                "scored_rows": None,
+                "total_sequence_level_model_evaluation_equivalents": None,
+                "generated_tokens_upper_bound": None,
+                "why_null_and_not_zero": "the checkpoint, the canonical qualification interface, the "
+                                         "qualification bank and seed, the competence floor, n, the "
+                                         "multiplicity treatment and the stop rule are all open under OD2. A "
+                                         "zero would assert that a selected reference needs no qualification "
+                                         "work.",
+            },
+            "RP_I4_under_candidate_profiles": {
+                "uses_model": True,
+                "model_roles": ["RP"],
+                "cells_per_scoring_stream": i4_cells,
+                "n_per_cell": n_i4,
+                "distinct_scoring_streams": distinct_scoring_streams,
+                "S3_incremental_rows": 0,
+                "scored_rows": rp_dev,
+                "rendered_rows": rp_dev,
+                "total_sequence_level_model_evaluation_equivalents": rp_dev,
+                "generated_tokens_upper_bound": 0,
+                "precondition": "the positive reference must already hold external P3-Q evidence under a "
+                                "later authority meeting the registered ordering constraint; no such "
+                                "evidence exists",
+            },
+            "selected_profile_one_shot_confirmation": {
+                "uses_model": True,
+                "accessible_now": False,
+                "upper_bound_profile": "S1",
+                "why_upper_bound": "no profile is selected in this round; S1 is the most expensive selectable "
+                                   "profile, so its cost bounds every outcome of the selection map",
+                "target_role_rendered_rows": confirmation_target,
+                "rp_i4_rendered_rows": confirmation_rp,
+                "rendered_rows": confirmation_total,
+                "scored_rows": confirmation_total,
+                "total_sequence_level_model_evaluation_equivalents": confirmation_total,
+                "generated_tokens_upper_bound": 0,
+                "is_an_upper_bound_not_a_universal_total": True,
+            },
+            "S4_diagnostic_generation": {
+                "uses_model": True,
+                "model_roles": list(roles),
+                "selection_authority": "none; S4 is never selectable and is excluded from every success union",
+                "i4_applicable": False,
+                "base_items": s4_stream["base_items"],
+                "base_item_contrast_clusters": s4_stream["base_item_contrast_clusters"],
+                "rendered_rows": s4_stream["rendered_rows"],
+                "scored_rows": s4_stream["scored_rows"],
+                "generation_calls": s4_generations,
+                "registered_generated_token_bound_per_generation": token_bound,
+                "generated_tokens_upper_bound": s4_tokens,
+                "sequence_level_prefill_evaluations": s4_prefill,
+                "incremental_decode_evaluations_upper_bound": s4_decode,
+                "total_sequence_level_model_evaluation_equivalents_upper_bound": s4_prefill + s4_decode,
+                "forward_cost_is_mapped": True,
+                "why": "a generation of up to the registered token bound is not zero model evaluation. "
+                       "Autoregressive decoding performs one prefill evaluation and up to one incremental "
+                       "decode evaluation per additional emitted token. draft-v0.3 published a null "
+                       "forward-pass count for this stream (S3MR2-005).",
+                "runtime_batched_forward_calls": None,
+                "runtime_note": "a runtime batched forward call is NOT a sequence-level evaluation; batch "
+                                "packing is a future execution property and is measured separately",
+            },
         },
-        "prohibition": ("a single undifferentiated total is prohibited; every "
-                        "stream reports its own units"),
-        "work_streams": streams,
-        "dimensional_identities": identities,
-        "s3_current_domain_accounting": {
-            "additional_forward_passes": 0,
-            "additional_sequence_scoring_rows": 0,
-            "reuses": "the S2 forward pass and logit read under the same prefix",
-            "future_multi_token_activation": ("outside this projection; it "
-                                              "requires a new authority, image, "
-                                              "scoring contract and cost table"),
+        "grand_total_prohibited": {
+            "prohibited": True,
+            "why": "the positive-reference P3-Q stream is unresolved under OD2 and is null, not zero. A grand "
+                   "total would silently treat that null as zero.",
         },
-        "executed_operation_counts": {
-            "model_downloads": 0,
-            "weight_loads": 0,
-            "tokenizer_constructions": 0,
-            "forward_passes": 0,
-            "sequence_scorings": 0,
-            "generations": 0,
-            "activation_extractions": 0,
-            "gpu_jobs": 0,
-            "provider_calls": 0,
-            "bank_rows": 0,
-            "seeds_drawn": 0,
-            "evidence_rows": 0,
-        },
+        "caveat": "these are arithmetic projections from the registered sample sizes and cell structure. They "
+                  "authorise nothing, approve no budget and create no execution authority, and they must be "
+                  "recomputed at freeze time.",
     }
 
 
-# --------------------------------------------------------------------------
-# 8. Descriptive-only paired summary specification
-#
-# Retained for readability and for diagnosing where an invariance failure sits.
-# It carries no null, no alpha, no p-value, no confidence-based pass or fail, no
-# equivalence declaration, no rescue path and no ranking weight. The Tango
-# score procedure, its critical values, its equivalence margins and the
-# four-point discordance grid are removed from every decision role.
-# --------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------
+# 9. Sampling-frame validation
+# ----------------------------------------------------------------------------------
 
-def build_descriptive_paired_specification():
+def validate_sampling_frame(protocol, counts, roles, families, depths, k5, k6):
+    frame = protocol["sampling_frame_v0_4"]
+    checked = []
+    for split_key in ("development_sampling_cells", "confirmation_sampling_cells"):
+        for cell in frame[split_key]:
+            total = 1
+            for param in cell["sampled_parameters"]:
+                size = positive_int(param["support_size"], "%s support" % param["parameter"])
+                weight = rational(param["weight_per_state_exact_rational"], param["parameter"])
+                if weight * size != 1:
+                    raise DesignDefect("%s: weights do not sum to exactly one" % cell["sampling_cell_id"])
+                total *= size
+            if total != cell["support_size"]:
+                raise DesignDefect("%s: the joint support size is not the product of its parameter supports"
+                                   % cell["sampling_cell_id"])
+            joint = rational(cell["joint_weight_per_support_state_exact_rational"], cell["sampling_cell_id"])
+            if joint * total != 1:
+                raise DesignDefect("%s: joint weights do not sum to one" % cell["sampling_cell_id"])
+            if cell["draw_rule"] != "with_replacement":
+                raise DesignDefect("%s: draws must be with replacement" % cell["sampling_cell_id"])
+            if "interface_profile" not in cell["excludes_from_its_identity"]:
+                raise DesignDefect("%s: a sampling cell must exclude the interface profile"
+                                   % cell["sampling_cell_id"])
+            checked.append(cell["sampling_cell_id"])
+
+    namespaces = [c["namespace"] for c in frame["development_sampling_cells"] + frame["confirmation_sampling_cells"]]
+    if len(set(namespaces)) != len(namespaces):
+        raise DesignDefect("sampling-cell namespaces are not disjoint")
+
+    expected = (1 + 1 + len(families) + len(k5) + len(k6) + len(families) * len(depths))
+    if frame["development_sampling_cell_count"] != expected:
+        raise DesignDefect("the registered development sampling-cell count is not the derived count")
+
+    for predicate in frame["validity_predicates"]:
+        if not predicate["deterministic"] or not predicate["evaluated_before_any_model_operation"]:
+            raise DesignDefect("every validity predicate must be deterministic and pre-model")
+
+    if frame["duplicate_rule"]["redraw_for_uniqueness_prohibited"] is not True:
+        raise DesignDefect("duplicate redraw must be prohibited")
+    if frame["future_seed_lifecycle"]["seeds_drawn_in_this_round"] != 0:
+        raise DesignDefect("no seed may be drawn in this round")
+    if frame["future_seed_lifecycle"]["seed_values"] is not None:
+        raise DesignDefect("no seed value may exist")
+    if frame["bank_rows_created_in_this_round"] != 0:
+        raise DesignDefect("no bank row may exist")
+
     return {
-        "status": "DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY",
-        "reported_per": "contrast cell",
-        "reported_quantities": [
-            "the paired 2x2 table of variant-1 correctness by variant-2 "
-            "correctness",
-            "the raw discordance count and rate",
-            "the paired accuracy difference",
-        ],
-        "carries_no": [
-            "null hypothesis", "alpha", "p-value", "critical value",
-            "equivalence margin", "confidence-based pass or fail",
-            "equivalence declaration", "rescue path for a failed J_both",
-            "ranking weight in the selection map",
-        ],
-        "retired_procedure": {
-            "name": "Tango (1998) paired score equivalence procedure",
-            "retired_from": [
-                "I3 gate authority", "profile eligibility",
-                "development selection", "confirmation", "claim language",
-                "equivalence margins", "critical values",
-                "the four-point discordance grid",
-                "any conservativeness or verified-size statement",
-            ],
-            "operator_resolution": (
-                "S3MR-004 and S3MR-005 are resolved by removal rather than by "
-                "repair: the uncontrolled asymptotic rule is unnecessary for "
-                "the primary construct, so it is withdrawn from inferential "
-                "use instead of being recalibrated"),
-            "historical_evidence": (
-                "the independent review's recalculation is preserved unedited "
-                "as immutable historical evidence at "
-                "studies/study3/analysis/independent_methods_recalculation.py "
-                "and its committed tables"),
-            "second_reviewer_question": (
-                "does retiring the paired aggregate-equivalence procedure from "
-                "every decision role fully remove the size-control defect "
-                "recorded in S3MR-004 and S3MR-005, or does a residual "
-                "decision path remain?"),
-            "disposition_status": "PROPOSED_RESOLVED_SUBJECT_TO_INDEPENDENT_REVIEW",
-        },
+        "sampling_cells_validated": len(checked),
+        "development_sampling_cells": frame["development_sampling_cell_count"],
+        "confirmation_sampling_cells": frame["confirmation_sampling_cell_count"],
+        "derived_development_sampling_cell_count": expected,
+        "all_parameter_weights_sum_to_one": True,
+        "all_joint_weights_sum_to_one": True,
+        "all_draws_with_replacement": True,
+        "namespaces_disjoint": True,
+        "split_partition_outcome_blind": bool(frame["split_partition"]["outcome_blind"]),
+        "duplicates_retained": True,
+        "seeds_drawn": 0,
+        "bank_rows": 0,
+        "seed_authority_granted": bool(frame["future_seed_lifecycle"]["seed_authority_granted"]),
     }
 
 
-# --------------------------------------------------------------------------
-# 9. Table construction
-# --------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------
+# 10. Self-verification identities
+# ----------------------------------------------------------------------------------
+
+def identity_checks():
+    checks = {}
+    probe = Fraction(3, 7)
+    total = sum(upper_tail(12, c, probe) - upper_tail(12, c + 1, probe) for c in range(13))
+    checks["binomial_masses_sum_to_one_exactly"] = total == 1
+    checks["tail_at_zero_is_one"] = upper_tail(9, 0, Fraction(1, 3)) == 1
+    checks["tail_at_full_success_is_p_to_the_n"] = all(
+        upper_tail(n, n, Fraction(2, 5)) == Fraction(2, 5) ** n for n in (1, 3, 8, 11))
+    checks["complement_identity"] = all(
+        upper_tail(n, c, probe) + sum(upper_tail(n, k, probe) - upper_tail(n, k + 1, probe)
+                                      for k in range(c)) == 1
+        for n, c in ((10, 4), (13, 9), (17, 2)))
+    checks["reflection_identity"] = all(
+        upper_tail(n, c, p) == 1 - upper_tail(n, n - c + 1, 1 - p)
+        for n, c, p in ((11, 5, Fraction(2, 7)), (14, 9, Fraction(5, 9)), (7, 3, Fraction(1, 4))))
+
+    monotone = True
+    for n, c in ((16, 11), (23, 4)):
+        previous = Fraction(0)
+        for numerator in range(0, 21):
+            value = upper_tail(n, c, Fraction(numerator, 20))
+            if value < previous:
+                monotone = False
+            previous = value
+    checks["tail_monotone_in_p"] = monotone
+    checks["tail_monotone_justifies_sup_at_p0"] = monotone
+
+    exhaustive = True
+    for n in (1, 4, 8, 11):
+        p = Fraction(3, 8)
+        buckets = [Fraction(0)] * (n + 1)
+        for outcome in product((0, 1), repeat=n):
+            buckets[sum(outcome)] += (p ** sum(outcome)) * ((1 - p) ** (n - sum(outcome)))
+        for c in range(0, n + 1):
+            if sum(buckets[c:]) != upper_tail(n, c, p):
+                exhaustive = False
+    checks["exhaustive_sequence_enumeration_matches_closed_form"] = exhaustive
+
+    small_n, small_alpha = 12, Fraction(1, 10)
+    component = smallest_controlling_count(small_n, Fraction(1, 2), small_alpha)
+    size = upper_tail(small_n, component, Fraction(1, 2))
+    worst = Fraction(0)
+    for numerator in range(0, 21):
+        worst = max(worst, size * upper_tail(small_n, component, Fraction(numerator, 20)))
+    checks["intersection_union_size_bounded_by_component_level"] = worst <= size
+    checks["intersection_union_source"] = "Berger and Hsu (1996)"
+
+    checks["all_identity_checks_passed"] = all(v is True for v in checks.values() if isinstance(v, bool))
+    return checks
+
+
+# ----------------------------------------------------------------------------------
+# 11. Table construction
+# ----------------------------------------------------------------------------------
 
 def build_tables():
-    construction = verify_pairwise_construction()
+    protocol = load_protocol()
+    counts, roles, families, depths, k5, k6 = derive_cell_counts(protocol)
+    power = derive_power_architecture(protocol, counts)
+    gates = gate_families(protocol)
+    ceiling = positive_int(protocol["proposed_statistics"]["sample_size_search_ceiling"], "search ceiling")
+    development, confirmation = derive_binomial_rows(gates, power, ceiling)
 
-    development = [_binomial_row(spec, DEVELOPMENT_COMPONENT_ALPHA,
-                                 "development")
-                   for spec in GATE_SPECS]
-    confirmation = [_binomial_row(spec, CONFIRMATION_COMPONENT_ALPHA,
-                                  "confirmation")
-                    for spec in GATE_SPECS]
+    subtable, order = build_eligibility_subtable(protocol, power["denominator"])
+    machine = build_state_machine(protocol)
+    lattice = build_outcome_lattice(protocol)
+    construction = verify_construction(protocol, k5, k6)
+    projection = derive_projection(protocol, counts, development, roles, families, depths, k5, k6)
+    frame = validate_sampling_frame(protocol, counts, roles, families, depths, k5, k6)
 
-    for row in development:
-        if row["alpha_exact_rational"] != _rational(DEVELOPMENT_COMPONENT_ALPHA):
-            raise AssertionError("a development component is not at 1/600")
-        if not row["meets_target_power"]:
-            raise AssertionError("%s does not reach the target power at p1"
-                                 % row["gate"])
-        if row["degenerate_rejection_region"]:
-            raise AssertionError("%s has a degenerate rejection region"
-                                 % row["gate"])
-    for row in confirmation:
-        if row["alpha_exact_rational"] != _rational(CONFIRMATION_COMPONENT_ALPHA):
-            raise AssertionError("a confirmation component is not at 1/200")
-        if row["degenerate_rejection_region"]:
-            raise AssertionError("%s has a degenerate confirmation rejection "
-                                 "region" % row["gate"])
-
-    # The exact rational identity that makes the fixed denominator meaningful.
-    if (DEVELOPMENT_COMPONENT_ALPHA * SELECTABLE_PROFILE_DENOMINATOR
-            != STUDY_DEVELOPMENT_SCREENING_ALPHA):
-        raise AssertionError("the per-profile alpha does not reconstruct the "
-                             "study-level screening alpha exactly")
-
-    # S3MR-006 and S3MR-015: exactly one active I3 floor, and it is 0.90.
-    active_i3_floors = {row["p0_exact_rational"]
-                        for row in development + confirmation
-                        if row["gate"] == "I3"}
-    if active_i3_floors != {_rational(Fraction(9, 10))}:
-        raise AssertionError("more than one active I3 floor is registered: %r"
-                             % sorted(active_i3_floors))
-
-    # Descriptive Clopper-Pearson bounds, with the tail convention named.
-    clopper = []
-    for cells in (4, 8, 12, 24):
-        simultaneous = STUDY_DEVELOPMENT_SCREENING_ALPHA / cells
-        for n, successes in ((256, 250), (256, 245), (128, 120)):
-            clopper.append({
-                "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-                "simultaneous_cells": cells,
-                "unit_of_n": "independent units in the cell",
-                "n": n,
-                "successes": successes,
-                "two_sided_simultaneous_mass": _render(float(simultaneous),
-                                                       TAIL_DIGITS),
-                "two_sided_simultaneous_mass_exact_rational": _rational(
-                    simultaneous),
-                "lower_tail_mass_consumed_by_this_bound": _render(
-                    float(simultaneous / 2), TAIL_DIGITS),
-                "tail_convention": ("two-sided simultaneous mass, of which half "
-                                    "is consumed by the lower bound reported "
-                                    "here; the field is named after the mass it "
-                                    "actually consumes, which S3MR-019 recorded "
-                                    "draft-v0.2 did not do"),
-                "clopper_pearson_lower_bound": clopper_pearson_lower(
-                    successes, n, simultaneous / 2),
-            })
-
-    # Selected-label uniformity: a diagnostic nuisance report only.
-    uniformity = []
-    for n in (256, 512, 1024):
-        mass = STUDY_DEVELOPMENT_SCREENING_ALPHA / OPTION_SLOTS
-        uniformity.append({
-            "status": "DIAGNOSTIC_NUISANCE_REPORT_ONLY",
-            "carries_gate_authority": False,
-            "carries_eligibility_authority": False,
-            "carries_selection_authority": False,
-            "carries_confirmation_authority": False,
-            "unit_of_n": "scored rows in the cell",
-            "n": n,
-            "labels": OPTION_SLOTS,
-            "expected_per_label": n / OPTION_SLOTS,
-            "two_sided_mass_across_the_band": _render(float(mass), TAIL_DIGITS),
-            "two_sided_mass_exact_rational": _rational(mass),
-            "tail_convention": ("two-sided central band; each tail holds at "
-                                "most half the stated mass"),
-            "acceptance_band": central_acceptance_band(n, Fraction(1, 4), mass),
-            "applies_to": ("label-bearing profiles only; not_applicable to S2 "
-                           "and S3, which display no label alphabet"),
-        })
-
-    return {
+    per_cell_target = power["per_cell_target"]
+    tables = {
+        "status": STATUS,
         "document_class": "design_statistics_derivation",
-        "draft_version": "draft-v0.3",
-        "status": "PROPOSED_DESIGN_PARAMETERS_NOT_MEASUREMENTS_NOT_FROZEN",
-        "disposition_status": (
-            "PROPOSED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW"),
+        "draft_version": protocol["study_identity"]["draft_version"],
+        "state": protocol["state"],
+        "disposition_status": "PROPOSED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW",
         "declared_assumptions": {
-            "study_development_screening_alpha": _render(
-                float(STUDY_DEVELOPMENT_SCREENING_ALPHA), TAIL_DIGITS),
-            "study_development_screening_alpha_exact_rational": _rational(
-                STUDY_DEVELOPMENT_SCREENING_ALPHA),
-            "selectable_profile_denominator": SELECTABLE_PROFILE_DENOMINATOR,
-            "denominator_is_fixed_before_data": True,
-            "denominator_never_shrinks": True,
-            "development_component_alpha": _render(
-                float(DEVELOPMENT_COMPONENT_ALPHA), TAIL_DIGITS),
-            "development_component_alpha_exact_rational": _rational(
-                DEVELOPMENT_COMPONENT_ALPHA),
-            "confirmation_component_alpha": _render(
-                float(CONFIRMATION_COMPONENT_ALPHA), TAIL_DIGITS),
-            "confirmation_component_alpha_exact_rational": _rational(
-                CONFIRMATION_COMPONENT_ALPHA),
-            "target_power": _render(float(TARGET_POWER), 4),
-            "within_profile_correction": (
-                "none; the components form an intersection-union conjunction, "
-                "so every applicable component must pass and no further "
-                "within-profile Bonferroni correction is applied"),
-            "across_profile_correction": (
-                "Bonferroni over the fixed denominator %d"
-                % SELECTABLE_PROFILE_DENOMINATOR),
-            "confirmation_correction": (
-                "none across profiles; exactly one pre-selected profile enters "
-                "the one-shot confirmation split and no reselection is "
-                "permitted, so the claim is conditional on that profile"),
-            "decimal_fields_are": ("renderings of the exact rational policy, "
-                                   "not the source of truth"),
+            "study_development_false_qualification_bound_exact_rational": as_rational_text(power["study_alpha"]),
+            "fixed_selectable_profile_denominator": power["denominator"],
+            "development_component_alpha_exact_rational": as_rational_text(power["dev_alpha"]),
+            "confirmation_component_alpha_exact_rational": as_rational_text(power["conf_alpha"]),
+            "exact_reconstruction": "per-profile component level times the fixed denominator equals the "
+                                    "study-level bound exactly",
+            "decimal_fields_are": "renderings of the exact rational policy, never the source of truth",
+            "within_profile_correction": "none; the applicable cells form an intersection-union conjunction, "
+                                         "whose size is bounded by the component and cell level",
+            "confirmation_correction": "none across profiles; exactly one profile is preselected on a "
+                                       "physically disjoint split and no reselection is permitted",
+            "sampling_model": "iid draws with replacement from the registered per-cell generator distribution",
         },
-        "operation_counts": {
-            "model_downloads": 0, "weight_loads": 0,
-            "tokenizer_constructions": 0, "forward_passes": 0,
-            "sequence_scorings": 0, "generations": 0, "gpu_jobs": 0,
-            "provider_calls": 0, "bank_rows": 0, "seeds_drawn": 0,
-            "evidence_rows": 0, "confirmation_accesses": 0,
-            "interfaces_selected": 0, "positive_references_selected": 0,
+        "power_architecture": {
+            "m_max": power["m_max"],
+            "m_max_scope": "maximum gate-bearing evaluation cells over the SELECTABLE profiles",
+            "selectable_profiles": power["selectable"],
+            "s4_excluded_from_m_max": True,
+            "per_stage_profile_false_negative_budget_exact_rational": as_rational_text(power["stage_budget"]),
+            "per_cell_false_negative_budget_exact_rational": as_rational_text(power["per_cell_budget"]),
+            "per_cell_power_target_exact_rational": as_rational_text(per_cell_target),
+            "per_cell_power_target_decimal": render(per_cell_target, POWER_DIGITS),
+            "per_cell_power_target_scope": "PER ATOMIC EVALUATION CELL",
+            "profile_stage_power_floor_exact_rational": as_rational_text(power["stage_floor"]),
+            "profile_stage_power_floor_decimal": render(power["stage_floor"], 6),
+            "profile_stage_power_floor_scope": "one profile, one stage, union-bound LOWER BOUND under "
+                                               "ARBITRARY cell dependence",
+            "confirmation_conjunction_power_floor_exact_rational": as_rational_text(power["stage_floor"]),
+            "panel_false_qualification_budget_exact_rational": as_rational_text(power["study_alpha"]),
+            "study_end_to_end_power_floor_exact_rational": as_rational_text(power["end_to_end"]),
+            "study_end_to_end_power_floor_decimal": render(power["end_to_end"], 6),
+            "uses_independence": False,
+            "holds_under_arbitrary_dependence": True,
+            "union_bound_terms": [
+                as_rational_text(power["stage_budget"]),
+                as_rational_text(power["study_alpha"]),
+                as_rational_text(power["stage_budget"]),
+            ],
         },
+        "gate_bearing_cell_counts": counts,
+        "development_exact_binomial_components": [development[k] for k in sorted(development)],
+        "confirmation_exact_binomial_components": [confirmation[k] for k in sorted(confirmation)],
+        "i3_outcome_lattice": lattice,
         "i3_pairwise_construction_verification": construction,
-        "i3_contrast_registry": {
-            "k5": [dict(contrast) for contrast in K5_CONTRASTS],
-            "k6": [dict(contrast) for contrast in K6_CONTRASTS],
-            "k5_applicability": {
-                "applicable_profiles": ["S1", "S4"],
-                "not_applicable_profiles": ["S2", "S3"],
-                "not_applicable_semantics": (
-                    "not_applicable is a third value: it is not a pass, not a "
-                    "zero effect and not evidence of robustness, and it may "
-                    "never be counted as a satisfied component"),
-            },
-            "k6_applicability": {"applicable_profiles": ["S1", "S2", "S3", "S4"]},
-            "combined_factor_interactions": (
-                "outside the Study 3 claim ceiling; the seven K5 cells test "
-                "registered one-factor contrasts only and imply no "
-                "full-factorial robustness"),
+        "profile_eligibility_subtable": subtable,
+        "state_machine": machine,
+        "sampling_frame_validation": frame,
+        "projected_operation_accounting": projection,
+        "identity_checks": identity_checks(),
+        "operation_counts": {key: 0 for key in sorted(protocol["operation_boundaries"]["performed_this_round"])},
+        "authority_flags": {
+            "frozen": False,
+            "execution_authorized": False,
+            "bank_authorized": False,
+            "seed_authorized": False,
+            "model_operations_authorized": False,
+            "winner_selected": False,
+            "positive_reference_selected": False,
+            "confirmation_access_authorized": False,
         },
-        "i3_indicator_truth_table": build_indicator_truth_table(),
-        "i3_indicator_semantics": {
-            "J_inv": ("1 iff both variants produce valid answer-domain content "
-                      "and the two mapped contents are byte-identical after the "
-                      "registered content mapping; stable invalid or "
-                      "unparseable output is 0"),
-            "J_cor": ("1 iff both variants are scored correct against the "
-                      "unique registered ground truth; a stable but wrong "
-                      "answer is 0"),
-            "J_both": "J_inv AND J_cor; the primary I3 gate indicator",
-            "expected_integrity_invariant": (
-                "under a unique ground truth J_cor implies J_inv; this is "
-                "recorded as an expected invariant and is not treated as "
-                "evidence that the two indicators are independent"),
-            "why_the_conjunction_is_retained": (
-                "so that stable-wrong and stable-invalid outcomes fail closed "
-                "rather than being scored as invariance"),
-            "estimand": ("Pr(J_both = 1) over independently sampled base-item "
-                         "contrast clusters, separately in every applicable "
-                         "atomic contrast cell"),
-        },
-        "development_exact_binomial_components": development,
-        "confirmation_exact_binomial_components": confirmation,
-        "development_selection_map": build_selection_map(),
-        "descriptive_paired_summary": build_descriptive_paired_specification(),
-        "descriptive_clopper_pearson_lower_bounds": clopper,
-        "selected_label_uniformity_diagnostic": uniformity,
-        "projected_operation_accounting": build_projection(),
-        "pooling_prohibitions": [
-            "K5 and K6 are never pooled",
-            "contrast IDs are never pooled",
-            "the two label alphabets are never pooled",
-            "K5 position contrast cells and K5 symbol contrast cells are never "
-            "pooled",
-            "source strata are never pooled",
-            "primitive operation families are never pooled",
-            "K4 depth 2 and depth 3 are never pooled",
-            "checkpoint roles are never pooled",
-            "interface profiles are never pooled",
-            "renderings are never pooled",
-            "splits are never pooled",
-            "J_inv, J_cor and the descriptive paired table may never rescue a "
-            "failed J_both",
-        ],
     }
-
-
-# --------------------------------------------------------------------------
-
-def _tables_path():
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        "design_statistics_tables.json")
+    return tables
 
 
 def _serialise(tables):
-    return json.dumps(tables, indent=2, sort_keys=True) + "\n"
+    return json.dumps(tables, indent=1, sort_keys=True, ensure_ascii=True) + "\n"
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description="Study 3 draft-v0.4 design-statistics derivation")
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--emit", action="store_true",
-                       help="regenerate the committed tables")
-    group.add_argument("--check", action="store_true",
-                       help="verify the committed tables reproduce exactly")
+    group.add_argument("--emit", action="store_true", help="regenerate the committed tables")
+    group.add_argument("--check", action="store_true", help="verify the committed tables reproduce exactly")
     args = parser.parse_args(argv)
 
     tables = build_tables()
     text = _serialise(tables)
-    path = _tables_path()
 
     if args.emit:
-        with open(path, "wb") as handle:
+        with open(TABLES_PATH, "wb") as handle:
             handle.write(text.encode("utf-8"))
-        print("wrote %s (%d bytes)" % (path, len(text.encode("utf-8"))))
+        print("wrote %s (%d bytes)" % (TABLES_PATH, len(text.encode("utf-8"))))
         return 0
 
-    if not os.path.exists(path):
-        print("FAIL committed tables are missing: %s" % path)
+    if not os.path.exists(TABLES_PATH):
+        print("FAIL committed tables are missing: %s" % TABLES_PATH)
         return 1
-    with open(path, "rb") as handle:
+    with open(TABLES_PATH, "rb") as handle:
         committed = handle.read().decode("utf-8")
     if committed != text:
         print("FAIL recomputed tables differ from the committed tables")

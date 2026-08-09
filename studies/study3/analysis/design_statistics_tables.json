@@ -1,1448 +1,1144 @@
 {
-  "confirmation_exact_binomial_components": [
-    {
-      "alpha": 0.005,
-      "alpha_exact_rational": "1/200",
-      "applicable_profiles": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
-      ],
-      "construct": "trivial content recovery and output validity",
-      "degenerate_rejection_region": false,
-      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
-      "evaluated_per": [
-        "interface profile",
-        "checkpoint role",
-        "split"
-      ],
-      "exact_null_tail_at_p0": 0.003307722347,
-      "exact_power_at_p1": 0.976290353,
-      "gate": "I1a",
-      "independent_unit": "base_item",
-      "meets_target_power": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.9",
-      "p0": 0.9,
-      "p0_exact_rational": "9/10",
-      "p1_exact_rational": "97/100",
-      "p1_lowest_alternative_of_interest": 0.97,
-      "pass_count": 243,
-      "pass_rate": 0.94921875,
-      "rejection_rule": "pass the component when the observed success count is at least 243 out of 256 base items per atomic cell",
-      "source_stratum": "K2",
-      "split": "confirmation",
-      "unit_of_n": "base items per atomic cell"
-    },
-    {
-      "alpha": 0.005,
-      "alpha_exact_rational": "1/200",
-      "applicable_profiles": [
-        "S1",
-        "S4"
-      ],
-      "construct": "explicit content-to-symbol binding",
-      "degenerate_rejection_region": false,
-      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
-      "evaluated_per": [
-        "interface profile",
-        "checkpoint role",
-        "label alphabet balancing block",
-        "split"
-      ],
-      "exact_null_tail_at_p0": 0.003307722347,
-      "exact_power_at_p1": 0.976290353,
-      "gate": "I1b",
-      "independent_unit": "base_item",
-      "meets_target_power": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.9",
-      "p0": 0.9,
-      "p0_exact_rational": "9/10",
-      "p1_exact_rational": "97/100",
-      "p1_lowest_alternative_of_interest": 0.97,
-      "pass_count": 243,
-      "pass_rate": 0.94921875,
-      "rejection_rule": "pass the component when the observed success count is at least 243 out of 256 base items per atomic cell",
-      "source_stratum": "K1",
-      "split": "confirmation",
-      "unit_of_n": "base items per atomic cell"
-    },
-    {
-      "alpha": 0.005,
-      "alpha_exact_rational": "1/200",
-      "applicable_profiles": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
-      ],
-      "construct": "primitive headroom, evaluated separately per family",
-      "degenerate_rejection_region": false,
-      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
-      "evaluated_per": [
-        "interface profile",
-        "checkpoint role",
-        "primitive operation family",
-        "split"
-      ],
-      "exact_null_tail_at_p0": 0.002962603303,
-      "exact_power_at_p1": 0.972425829,
-      "gate": "I2",
-      "independent_unit": "base_item",
-      "meets_target_power": true,
-      "n": 128,
-      "null_hypothesis": "p <= 0.5",
-      "p0": 0.5,
-      "p0_exact_rational": "1/2",
-      "p1_exact_rational": "7/10",
-      "p1_lowest_alternative_of_interest": 0.7,
-      "pass_count": 80,
-      "pass_rate": 0.625,
-      "rejection_rule": "pass the component when the observed success count is at least 80 out of 128 base items per primitive-family cell",
-      "source_stratum": "K3",
-      "split": "confirmation",
-      "unit_of_n": "base items per primitive-family cell"
-    },
-    {
-      "alpha": 0.005,
-      "alpha_exact_rational": "1/200",
-      "applicable_profiles": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
-      ],
-      "construct": "pairwise presentation invariance and correctness, J_both",
-      "degenerate_rejection_region": false,
-      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
-      "evaluated_per": [
-        "interface profile",
-        "checkpoint role",
-        "contrast family",
-        "contrast ID",
-        "split"
-      ],
-      "exact_null_tail_at_p0": 0.003307722347,
-      "exact_power_at_p1": 0.976290353,
-      "gate": "I3",
-      "independent_unit": "base_item_contrast_cluster",
-      "meets_target_power": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.9",
-      "p0": 0.9,
-      "p0_exact_rational": "9/10",
-      "p1_exact_rational": "97/100",
-      "p1_lowest_alternative_of_interest": 0.97,
-      "pass_count": 243,
-      "pass_rate": 0.94921875,
-      "rejection_rule": "pass the component when the observed success count is at least 243 out of 256 base-item contrast clusters per contrast cell",
-      "source_stratum": "K5 and K6",
-      "split": "confirmation",
-      "unit_of_n": "base-item contrast clusters per contrast cell"
-    },
-    {
-      "alpha": 0.005,
-      "alpha_exact_rational": "1/200",
-      "applicable_profiles": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
-      ],
-      "construct": "positive-reference competence recovery through the profile",
-      "degenerate_rejection_region": false,
-      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
-      "evaluated_per": [
-        "interface profile",
-        "registered operation family",
-        "depth"
-      ],
-      "exact_null_tail_at_p0": 0.003276850097,
-      "exact_power_at_p1": 0.963820468,
-      "gate": "I4",
-      "independent_unit": "base_item",
-      "meets_target_power": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.8",
-      "p0": 0.8,
-      "p0_exact_rational": "4/5",
-      "p1_exact_rational": "9/10",
-      "p1_lowest_alternative_of_interest": 0.9,
-      "pass_count": 222,
-      "pass_rate": 0.8671875,
-      "rejection_rule": "pass the component when the observed success count is at least 222 out of 256 RP base items per operation-family x depth cell per candidate profile",
-      "source_stratum": "K4",
-      "split": "confirmation",
-      "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
-    }
-  ],
-  "declared_assumptions": {
-    "across_profile_correction": "Bonferroni over the fixed denominator 3",
-    "confirmation_component_alpha": 0.005,
-    "confirmation_component_alpha_exact_rational": "1/200",
-    "confirmation_correction": "none across profiles; exactly one pre-selected profile enters the one-shot confirmation split and no reselection is permitted, so the claim is conditional on that profile",
-    "decimal_fields_are": "renderings of the exact rational policy, not the source of truth",
-    "denominator_is_fixed_before_data": true,
-    "denominator_never_shrinks": true,
-    "development_component_alpha": 0.001666666667,
-    "development_component_alpha_exact_rational": "1/600",
-    "selectable_profile_denominator": 3,
-    "study_development_screening_alpha": 0.005,
-    "study_development_screening_alpha_exact_rational": "1/200",
-    "target_power": 0.9,
-    "within_profile_correction": "none; the components form an intersection-union conjunction, so every applicable component must pass and no further within-profile Bonferroni correction is applied"
+ "authority_flags": {
+  "bank_authorized": false,
+  "confirmation_access_authorized": false,
+  "execution_authorized": false,
+  "frozen": false,
+  "model_operations_authorized": false,
+  "positive_reference_selected": false,
+  "seed_authorized": false,
+  "winner_selected": false
+ },
+ "confirmation_exact_binomial_components": [
+  {
+   "alpha_exact_rational": "1/200",
+   "applicable_profiles": [
+    "S1",
+    "S2",
+    "S3",
+    "S4"
+   ],
+   "construct": "trivial content recovery, explicit content-to-symbol binding, and joint robust correctness across a registered presentation pair",
+   "degenerate_rejection_region": false,
+   "derivation": "exact binomial search over exact rational inputs with integer tail arithmetic; no threshold, tail, power or sample size in this row is a transcribed constant",
+   "evaluated_per": [
+    "interface profile",
+    "checkpoint role",
+    "contrast family",
+    "contrast ID",
+    "split"
+   ],
+   "exact_null_tail_at_p0": "0.003020762720",
+   "exact_power_at_p1": "0.999609916012",
+   "gate_family": "I1_I3_joint_correctness_floor",
+   "gates": [
+    "I1a",
+    "I1b",
+    "I3"
+   ],
+   "independent_unit": "base_item for I1a and I1b; base_item_contrast_cluster for I3",
+   "meets_per_cell_power_target": true,
+   "n": 413,
+   "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
+   "null_hypothesis": "p <= 9/10",
+   "p0_exact_rational": "9/10",
+   "p1_exact_rational": "97/100",
+   "pass_count": 388,
+   "pass_count_is_minimal_at_alpha": true,
+   "rejection_rule": "pass the cell when the observed success count is at least 388 out of 413 base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3",
+   "size_status": "CONSERVATIVE_REUSE_OF_THE_DEVELOPMENT_SIZE_NOT_A_MINIMAL_CONFIRMATION_SIZE",
+   "split": "confirmation",
+   "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3"
   },
-  "descriptive_clopper_pearson_lower_bounds": [
-    {
-      "clopper_pearson_lower_bound": 0.928608,
-      "lower_tail_mass_consumed_by_this_bound": 0.000625,
-      "n": 256,
-      "simultaneous_cells": 4,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 250,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.00125,
-      "two_sided_simultaneous_mass_exact_rational": "1/800",
-      "unit_of_n": "independent units in the cell"
-    },
-    {
-      "clopper_pearson_lower_bound": 0.900046,
-      "lower_tail_mass_consumed_by_this_bound": 0.000625,
-      "n": 256,
-      "simultaneous_cells": 4,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 245,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.00125,
-      "two_sided_simultaneous_mass_exact_rational": "1/800",
-      "unit_of_n": "independent units in the cell"
-    },
-    {
-      "clopper_pearson_lower_bound": 0.83815,
-      "lower_tail_mass_consumed_by_this_bound": 0.000625,
-      "n": 128,
-      "simultaneous_cells": 4,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 120,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.00125,
-      "two_sided_simultaneous_mass_exact_rational": "1/800",
-      "unit_of_n": "independent units in the cell"
-    },
-    {
-      "clopper_pearson_lower_bound": 0.92502,
-      "lower_tail_mass_consumed_by_this_bound": 0.0003125,
-      "n": 256,
-      "simultaneous_cells": 8,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 250,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.000625,
-      "two_sided_simultaneous_mass_exact_rational": "1/1600",
-      "unit_of_n": "independent units in the cell"
-    },
-    {
-      "clopper_pearson_lower_bound": 0.895992,
-      "lower_tail_mass_consumed_by_this_bound": 0.0003125,
-      "n": 256,
-      "simultaneous_cells": 8,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 245,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.000625,
-      "two_sided_simultaneous_mass_exact_rational": "1/1600",
-      "unit_of_n": "independent units in the cell"
-    },
-    {
-      "clopper_pearson_lower_bound": 0.831111,
-      "lower_tail_mass_consumed_by_this_bound": 0.0003125,
-      "n": 128,
-      "simultaneous_cells": 8,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 120,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.000625,
-      "two_sided_simultaneous_mass_exact_rational": "1/1600",
-      "unit_of_n": "independent units in the cell"
-    },
-    {
-      "clopper_pearson_lower_bound": 0.922957,
-      "lower_tail_mass_consumed_by_this_bound": 0.000208333333,
-      "n": 256,
-      "simultaneous_cells": 12,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 250,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.000416666667,
-      "two_sided_simultaneous_mass_exact_rational": "1/2400",
-      "unit_of_n": "independent units in the cell"
-    },
-    {
-      "clopper_pearson_lower_bound": 0.893672,
-      "lower_tail_mass_consumed_by_this_bound": 0.000208333333,
-      "n": 256,
-      "simultaneous_cells": 12,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 245,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.000416666667,
-      "two_sided_simultaneous_mass_exact_rational": "1/2400",
-      "unit_of_n": "independent units in the cell"
-    },
-    {
-      "clopper_pearson_lower_bound": 0.827088,
-      "lower_tail_mass_consumed_by_this_bound": 0.000208333333,
-      "n": 128,
-      "simultaneous_cells": 12,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 120,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.000416666667,
-      "two_sided_simultaneous_mass_exact_rational": "1/2400",
-      "unit_of_n": "independent units in the cell"
-    },
-    {
-      "clopper_pearson_lower_bound": 0.919488,
-      "lower_tail_mass_consumed_by_this_bound": 0.000104166667,
-      "n": 256,
-      "simultaneous_cells": 24,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 250,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.000208333333,
-      "two_sided_simultaneous_mass_exact_rational": "1/4800",
-      "unit_of_n": "independent units in the cell"
-    },
-    {
-      "clopper_pearson_lower_bound": 0.889786,
-      "lower_tail_mass_consumed_by_this_bound": 0.000104166667,
-      "n": 256,
-      "simultaneous_cells": 24,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 245,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.000208333333,
-      "two_sided_simultaneous_mass_exact_rational": "1/4800",
-      "unit_of_n": "independent units in the cell"
-    },
-    {
-      "clopper_pearson_lower_bound": 0.820356,
-      "lower_tail_mass_consumed_by_this_bound": 0.000104166667,
-      "n": 128,
-      "simultaneous_cells": 24,
-      "status": "DESCRIPTIVE_ONLY_NO_GATE_AUTHORITY",
-      "successes": 120,
-      "tail_convention": "two-sided simultaneous mass, of which half is consumed by the lower bound reported here; the field is named after the mass it actually consumes, which S3MR-019 recorded draft-v0.2 did not do",
-      "two_sided_simultaneous_mass": 0.000208333333,
-      "two_sided_simultaneous_mass_exact_rational": "1/4800",
-      "unit_of_n": "independent units in the cell"
-    }
+  {
+   "alpha_exact_rational": "1/200",
+   "applicable_profiles": [
+    "S1",
+    "S2",
+    "S3",
+    "S4"
+   ],
+   "construct": "primitive headroom, evaluated separately per registered operation family",
+   "degenerate_rejection_region": false,
+   "derivation": "exact binomial search over exact rational inputs with integer tail arithmetic; no threshold, tail, power or sample size in this row is a transcribed constant",
+   "evaluated_per": [
+    "interface profile",
+    "checkpoint role",
+    "primitive operation family",
+    "split"
+   ],
+   "exact_null_tail_at_p0": "0.003765544908",
+   "exact_power_at_p1": "0.999646587923",
+   "gate_family": "I2_headroom_floor",
+   "gates": [
+    "I2"
+   ],
+   "independent_unit": "base_item",
+   "meets_per_cell_power_target": true,
+   "n": 214,
+   "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
+   "null_hypothesis": "p <= 1/2",
+   "p0_exact_rational": "1/2",
+   "p1_exact_rational": "7/10",
+   "pass_count": 127,
+   "pass_count_is_minimal_at_alpha": true,
+   "rejection_rule": "pass the cell when the observed success count is at least 127 out of 214 base items per primitive-family cell",
+   "size_status": "CONSERVATIVE_REUSE_OF_THE_DEVELOPMENT_SIZE_NOT_A_MINIMAL_CONFIRMATION_SIZE",
+   "split": "confirmation",
+   "unit_of_n": "base items per primitive-family cell"
+  },
+  {
+   "alpha_exact_rational": "1/200",
+   "applicable_profiles": [
+    "S1",
+    "S2",
+    "S3"
+   ],
+   "construct": "positive-reference competence recovery through the candidate interface",
+   "degenerate_rejection_region": false,
+   "derivation": "exact binomial search over exact rational inputs with integer tail arithmetic; no threshold, tail, power or sample size in this row is a transcribed constant",
+   "evaluated_per": [
+    "interface profile",
+    "registered operation family",
+    "depth",
+    "split"
+   ],
+   "exact_null_tail_at_p0": "0.003582895662",
+   "exact_power_at_p1": "0.999626931069",
+   "gate_family": "I4_positive_reference_floor",
+   "gates": [
+    "I4"
+   ],
+   "independent_unit": "base_item",
+   "meets_per_cell_power_target": true,
+   "n": 448,
+   "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
+   "null_hypothesis": "p <= 4/5",
+   "p0_exact_rational": "4/5",
+   "p1_exact_rational": "9/10",
+   "pass_count": 381,
+   "pass_count_is_minimal_at_alpha": true,
+   "rejection_rule": "pass the cell when the observed success count is at least 381 out of 448 RP base items per operation-family x depth cell per candidate profile",
+   "size_status": "CONSERVATIVE_REUSE_OF_THE_DEVELOPMENT_SIZE_NOT_A_MINIMAL_CONFIRMATION_SIZE",
+   "split": "confirmation",
+   "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
+  }
+ ],
+ "declared_assumptions": {
+  "confirmation_component_alpha_exact_rational": "1/200",
+  "confirmation_correction": "none across profiles; exactly one profile is preselected on a physically disjoint split and no reselection is permitted",
+  "decimal_fields_are": "renderings of the exact rational policy, never the source of truth",
+  "development_component_alpha_exact_rational": "1/600",
+  "exact_reconstruction": "per-profile component level times the fixed denominator equals the study-level bound exactly",
+  "fixed_selectable_profile_denominator": 3,
+  "sampling_model": "iid draws with replacement from the registered per-cell generator distribution",
+  "study_development_false_qualification_bound_exact_rational": "1/200",
+  "within_profile_correction": "none; the applicable cells form an intersection-union conjunction, whose size is bounded by the component and cell level"
+ },
+ "development_exact_binomial_components": [
+  {
+   "alpha_exact_rational": "1/600",
+   "applicable_profiles": [
+    "S1",
+    "S2",
+    "S3",
+    "S4"
+   ],
+   "construct": "trivial content recovery, explicit content-to-symbol binding, and joint robust correctness across a registered presentation pair",
+   "degenerate_rejection_region": false,
+   "derivation": "exact binomial search over exact rational inputs with integer tail arithmetic; no threshold, tail, power or sample size in this row is a transcribed constant",
+   "evaluated_per": [
+    "interface profile",
+    "checkpoint role",
+    "contrast family",
+    "contrast ID",
+    "split"
+   ],
+   "exact_null_tail_at_p0": "0.001664632930",
+   "exact_power_at_p1": "0.999129439838",
+   "gate_family": "I1_I3_joint_correctness_floor",
+   "gates": [
+    "I1a",
+    "I1b",
+    "I3"
+   ],
+   "independent_unit": "base_item for I1a and I1b; base_item_contrast_cluster for I3",
+   "meets_per_cell_power_target": true,
+   "n": 413,
+   "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
+   "null_hypothesis": "p <= 9/10",
+   "p0_exact_rational": "9/10",
+   "p1_exact_rational": "97/100",
+   "pass_count": 389,
+   "pass_count_is_minimal_at_alpha": true,
+   "rejection_rule": "pass the cell when the observed success count is at least 389 out of 413 base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3",
+   "split": "development",
+   "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3"
+  },
+  {
+   "alpha_exact_rational": "1/600",
+   "applicable_profiles": [
+    "S1",
+    "S2",
+    "S3",
+    "S4"
+   ],
+   "construct": "primitive headroom, evaluated separately per registered operation family",
+   "degenerate_rejection_region": false,
+   "derivation": "exact binomial search over exact rational inputs with integer tail arithmetic; no threshold, tail, power or sample size in this row is a transcribed constant",
+   "evaluated_per": [
+    "interface profile",
+    "checkpoint role",
+    "primitive operation family",
+    "split"
+   ],
+   "exact_null_tail_at_p0": "0.001597676081",
+   "exact_power_at_p1": "0.999042859186",
+   "gate_family": "I2_headroom_floor",
+   "gates": [
+    "I2"
+   ],
+   "independent_unit": "base_item",
+   "meets_per_cell_power_target": true,
+   "n": 214,
+   "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
+   "null_hypothesis": "p <= 1/2",
+   "p0_exact_rational": "1/2",
+   "p1_exact_rational": "7/10",
+   "pass_count": 129,
+   "pass_count_is_minimal_at_alpha": true,
+   "rejection_rule": "pass the cell when the observed success count is at least 129 out of 214 base items per primitive-family cell",
+   "split": "development",
+   "unit_of_n": "base items per primitive-family cell"
+  },
+  {
+   "alpha_exact_rational": "1/600",
+   "applicable_profiles": [
+    "S1",
+    "S2",
+    "S3"
+   ],
+   "construct": "positive-reference competence recovery through the candidate interface",
+   "degenerate_rejection_region": false,
+   "derivation": "exact binomial search over exact rational inputs with integer tail arithmetic; no threshold, tail, power or sample size in this row is a transcribed constant",
+   "evaluated_per": [
+    "interface profile",
+    "registered operation family",
+    "depth",
+    "split"
+   ],
+   "exact_null_tail_at_p0": "0.001620609599",
+   "exact_power_at_p1": "0.999005509196",
+   "gate_family": "I4_positive_reference_floor",
+   "gates": [
+    "I4"
+   ],
+   "independent_unit": "base_item",
+   "meets_per_cell_power_target": true,
+   "n": 448,
+   "n_is_smallest_unrestricted_positive_integer_meeting_the_target": true,
+   "null_hypothesis": "p <= 4/5",
+   "p0_exact_rational": "4/5",
+   "p1_exact_rational": "9/10",
+   "pass_count": 383,
+   "pass_count_is_minimal_at_alpha": true,
+   "rejection_rule": "pass the cell when the observed success count is at least 383 out of 448 RP base items per operation-family x depth cell per candidate profile",
+   "split": "development",
+   "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
+  }
+ ],
+ "disposition_status": "PROPOSED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW",
+ "document_class": "design_statistics_derivation",
+ "draft_version": "draft-v0.4",
+ "gate_bearing_cell_counts": {
+  "S1": {
+   "I1a_cells": 3,
+   "I1b_cells": 3,
+   "I2_cells": 6,
+   "I3_K5_cells": 21,
+   "I3_K6_cells": 6,
+   "I3_cells": 27,
+   "I4_cells": 4,
+   "cells_at_i1_i3_floor": 33,
+   "cells_at_i2_floor": 6,
+   "cells_at_i4_floor": 4,
+   "label_bearing": true,
+   "selectable": true,
+   "total_gate_bearing_cells": 43
+  },
+  "S2": {
+   "I1a_cells": 3,
+   "I1b_cells": 0,
+   "I2_cells": 6,
+   "I3_K5_cells": 0,
+   "I3_K6_cells": 6,
+   "I3_cells": 6,
+   "I4_cells": 4,
+   "cells_at_i1_i3_floor": 9,
+   "cells_at_i2_floor": 6,
+   "cells_at_i4_floor": 4,
+   "label_bearing": false,
+   "selectable": true,
+   "total_gate_bearing_cells": 19
+  },
+  "S3": {
+   "I1a_cells": 3,
+   "I1b_cells": 0,
+   "I2_cells": 6,
+   "I3_K5_cells": 0,
+   "I3_K6_cells": 6,
+   "I3_cells": 6,
+   "I4_cells": 4,
+   "cells_at_i1_i3_floor": 9,
+   "cells_at_i2_floor": 6,
+   "cells_at_i4_floor": 4,
+   "label_bearing": false,
+   "selectable": true,
+   "total_gate_bearing_cells": 19
+  },
+  "S4": {
+   "I1a_cells": 3,
+   "I1b_cells": 3,
+   "I2_cells": 6,
+   "I3_K5_cells": 21,
+   "I3_K6_cells": 6,
+   "I3_cells": 27,
+   "I4_cells": 0,
+   "cells_at_i1_i3_floor": 33,
+   "cells_at_i2_floor": 6,
+   "cells_at_i4_floor": 0,
+   "label_bearing": true,
+   "selectable": false,
+   "total_gate_bearing_cells": 39
+  }
+ },
+ "i3_outcome_lattice": {
+  "alphabet": [
+   "correct",
+   "wrong_a",
+   "wrong_b",
+   "invalid"
   ],
-  "descriptive_paired_summary": {
-    "carries_no": [
-      "null hypothesis",
-      "alpha",
-      "p-value",
-      "critical value",
-      "equivalence margin",
-      "confidence-based pass or fail",
-      "equivalence declaration",
-      "rescue path for a failed J_both",
-      "ranking weight in the selection map"
+  "descriptive_indicator_status": "DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY",
+  "estimand_is_a_level": true,
+  "estimand_is_a_presentation_contrast": false,
+  "identified_estimand": "p_joint = Pr(J_joint_correct = 1) over the registered item-generating distribution for the cell",
+  "joint_correctness_implies_identical_mapped_content": true,
+  "mixed_correctness_all_fail": true,
+  "ordered_cases": 16,
+  "passing_case": {
+   "J_joint_correct": 1,
+   "descriptive_same_mapped_content": 1,
+   "scores_for_the_gate": true,
+   "variant_1_outcome": "correct",
+   "variant_2_outcome": "correct"
+  },
+  "passing_case_count": 1,
+  "primary_indicator": "J_joint_correct",
+  "rows": [
+   {
+    "J_joint_correct": 1,
+    "descriptive_same_mapped_content": 1,
+    "scores_for_the_gate": true,
+    "variant_1_outcome": "correct",
+    "variant_2_outcome": "correct"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "correct",
+    "variant_2_outcome": "wrong_a"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "correct",
+    "variant_2_outcome": "wrong_b"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "correct",
+    "variant_2_outcome": "invalid"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "wrong_a",
+    "variant_2_outcome": "correct"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 1,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "wrong_a",
+    "variant_2_outcome": "wrong_a"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "wrong_a",
+    "variant_2_outcome": "wrong_b"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "wrong_a",
+    "variant_2_outcome": "invalid"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "wrong_b",
+    "variant_2_outcome": "correct"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "wrong_b",
+    "variant_2_outcome": "wrong_a"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 1,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "wrong_b",
+    "variant_2_outcome": "wrong_b"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "wrong_b",
+    "variant_2_outcome": "invalid"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "invalid",
+    "variant_2_outcome": "correct"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "invalid",
+    "variant_2_outcome": "wrong_a"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "invalid",
+    "variant_2_outcome": "wrong_b"
+   },
+   {
+    "J_joint_correct": 0,
+    "descriptive_same_mapped_content": 0,
+    "scores_for_the_gate": false,
+    "variant_1_outcome": "invalid",
+    "variant_2_outcome": "invalid"
+   }
+  ],
+  "stable_invalid_all_fail": true,
+  "stable_wrong_all_fail": true,
+  "two_different_wrong_answers_all_fail": true
+ },
+ "i3_pairwise_construction_verification": {
+  "active_all_transformations_cluster_exists": false,
+  "constructor_maps_every_support_state_correctly": true,
+  "contrasts": [
+   {
+    "changes_exactly_one_registered_factor": true,
+    "contrast_id": "K5-P1",
+    "distinct_change_signatures": 1,
+    "family": "K5",
+    "support_states_checked": 32,
+    "variants_per_cluster": 2,
+    "varied_factor": "content_position"
+   },
+   {
+    "changes_exactly_one_registered_factor": true,
+    "contrast_id": "K5-P2",
+    "distinct_change_signatures": 1,
+    "family": "K5",
+    "support_states_checked": 32,
+    "variants_per_cluster": 2,
+    "varied_factor": "content_position"
+   },
+   {
+    "changes_exactly_one_registered_factor": true,
+    "contrast_id": "K5-P3",
+    "distinct_change_signatures": 1,
+    "family": "K5",
+    "support_states_checked": 32,
+    "variants_per_cluster": 2,
+    "varied_factor": "content_position"
+   },
+   {
+    "changes_exactly_one_registered_factor": true,
+    "contrast_id": "K5-S1",
+    "distinct_change_signatures": 1,
+    "family": "K5",
+    "support_states_checked": 32,
+    "variants_per_cluster": 2,
+    "varied_factor": "correct_displayed_symbol_index"
+   },
+   {
+    "changes_exactly_one_registered_factor": true,
+    "contrast_id": "K5-S2",
+    "distinct_change_signatures": 1,
+    "family": "K5",
+    "support_states_checked": 32,
+    "variants_per_cluster": 2,
+    "varied_factor": "correct_displayed_symbol_index"
+   },
+   {
+    "changes_exactly_one_registered_factor": true,
+    "contrast_id": "K5-S3",
+    "distinct_change_signatures": 1,
+    "family": "K5",
+    "support_states_checked": 32,
+    "variants_per_cluster": 2,
+    "varied_factor": "correct_displayed_symbol_index"
+   },
+   {
+    "changes_exactly_one_registered_factor": true,
+    "contrast_id": "K5-A1",
+    "distinct_change_signatures": 1,
+    "family": "K5",
+    "support_states_checked": 32,
+    "variants_per_cluster": 2,
+    "varied_factor": "label_alphabet"
+   },
+   {
+    "answer_cue_held_byte_identical": true,
+    "changes_exactly_one_registered_factor": true,
+    "contrast_id": "K6-SEP",
+    "family": "K6",
+    "nuisance_triple_held_fixed": true,
+    "variants_per_cluster": 2,
+    "varied_factor": "separator"
+   },
+   {
+    "answer_cue_held_byte_identical": true,
+    "changes_exactly_one_registered_factor": true,
+    "contrast_id": "K6-INSTR",
+    "family": "K6",
+    "nuisance_triple_held_fixed": true,
+    "variants_per_cluster": 2,
+    "varied_factor": "instruction_wording"
+   }
+  ],
+  "correct_content_carries_the_intended_symbol": true,
+  "design_time_fixture_enumeration_is_not_a_sample": true,
+  "deterministic_complete_block_assignment": false,
+  "exactly_one_correct_content_per_render": true,
+  "k5_contrast_count": 7,
+  "k5_x_k6_cross_product_cells": 0,
+  "k5_x_k6_cross_product_exists": false,
+  "k6_contrast_count": 2,
+  "nuisance_draw_is_iid_with_replacement": true,
+  "nuisance_support_size": 32,
+  "nuisance_weight_per_state_exact_rational": "1/32",
+  "nuisance_weights_sum_to_one": true,
+  "sample_size_must_be_a_multiple_of_the_support": false,
+  "slot_to_symbol_map_is_a_bijection": true,
+  "variants_per_cluster": 2
+ },
+ "identity_checks": {
+  "all_identity_checks_passed": true,
+  "binomial_masses_sum_to_one_exactly": true,
+  "complement_identity": true,
+  "exhaustive_sequence_enumeration_matches_closed_form": true,
+  "intersection_union_size_bounded_by_component_level": true,
+  "intersection_union_source": "Berger and Hsu (1996)",
+  "reflection_identity": true,
+  "tail_at_full_success_is_p_to_the_n": true,
+  "tail_at_zero_is_one": true,
+  "tail_monotone_in_p": true,
+  "tail_monotone_justifies_sup_at_p0": true
+ },
+ "operation_counts": {
+  "ablation_operations": 0,
+  "activation_extractions": 0,
+  "bank_rows_generated": 0,
+  "confirmation_split_accesses": 0,
+  "decision_bearing_local_statistical_runs": 0,
+  "evidence_rows_created": 0,
+  "forward_passes": 0,
+  "generations": 0,
+  "gpu_jobs": 0,
+  "interfaces_selected": 0,
+  "lens_operations": 0,
+  "local_pytest_runs": 0,
+  "model_downloads": 0,
+  "model_weight_loads": 0,
+  "patching_operations": 0,
+  "phase_1_0d_operations": 0,
+  "positive_references_selected": 0,
+  "probe_operations": 0,
+  "provider_calls": 0,
+  "rq2_s4_operations": 0,
+  "seeds_drawn": 0,
+  "sequence_scorings": 0,
+  "study1_files_modified": 0,
+  "study2_files_modified": 0,
+  "tokenizer_constructions": 0
+ },
+ "power_architecture": {
+  "confirmation_conjunction_power_floor_exact_rational": "381/400",
+  "holds_under_arbitrary_dependence": true,
+  "m_max": 43,
+  "m_max_scope": "maximum gate-bearing evaluation cells over the SELECTABLE profiles",
+  "panel_false_qualification_budget_exact_rational": "1/200",
+  "per_cell_false_negative_budget_exact_rational": "19/17200",
+  "per_cell_power_target_decimal": "0.998895348837",
+  "per_cell_power_target_exact_rational": "17181/17200",
+  "per_cell_power_target_scope": "PER ATOMIC EVALUATION CELL",
+  "per_stage_profile_false_negative_budget_exact_rational": "19/400",
+  "profile_stage_power_floor_decimal": "0.952500",
+  "profile_stage_power_floor_exact_rational": "381/400",
+  "profile_stage_power_floor_scope": "one profile, one stage, union-bound LOWER BOUND under ARBITRARY cell dependence",
+  "s4_excluded_from_m_max": true,
+  "selectable_profiles": [
+   "S1",
+   "S2",
+   "S3"
+  ],
+  "study_end_to_end_power_floor_decimal": "0.900000",
+  "study_end_to_end_power_floor_exact_rational": "9/10",
+  "union_bound_terms": [
+   "19/400",
+   "1/200",
+   "19/400"
+  ],
+  "uses_independence": false
+ },
+ "profile_eligibility_subtable": [
+  {
+   "all_applicable_components_passed": {
+    "S1": false,
+    "S2": false,
+    "S3": false
+   },
+   "eligible_profiles": [],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "STOP_NO_SELECTABLE_INTERFACE_REMAINS",
+   "s3_multi_token_domain_activated": false,
+   "selected_profile": null,
+   "stop_no_selectable_profile_is_eligible": true
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": true,
+    "S2": false,
+    "S3": false
+   },
+   "eligible_profiles": [
+    "S1"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": false,
+   "selected_profile": "S1",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": false,
+    "S2": false,
+    "S3": true
+   },
+   "eligible_profiles": [],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "STOP_NO_SELECTABLE_INTERFACE_REMAINS",
+   "s3_multi_token_domain_activated": false,
+   "selected_profile": null,
+   "stop_no_selectable_profile_is_eligible": true
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": true,
+    "S2": false,
+    "S3": true
+   },
+   "eligible_profiles": [
+    "S1"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": false,
+   "selected_profile": "S1",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": false,
+    "S2": true,
+    "S3": false
+   },
+   "eligible_profiles": [
+    "S2"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": false,
+   "selected_profile": "S2",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": true,
+    "S2": true,
+    "S3": false
+   },
+   "eligible_profiles": [
+    "S2",
+    "S1"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": false,
+   "selected_profile": "S2",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": false,
+    "S2": true,
+    "S3": true
+   },
+   "eligible_profiles": [
+    "S2"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": false,
+   "selected_profile": "S2",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": true,
+    "S2": true,
+    "S3": true
+   },
+   "eligible_profiles": [
+    "S2",
+    "S1"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": false,
+   "selected_profile": "S2",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": false,
+    "S2": false,
+    "S3": false
+   },
+   "eligible_profiles": [],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "STOP_NO_SELECTABLE_INTERFACE_REMAINS",
+   "s3_multi_token_domain_activated": true,
+   "selected_profile": null,
+   "stop_no_selectable_profile_is_eligible": true
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": true,
+    "S2": false,
+    "S3": false
+   },
+   "eligible_profiles": [
+    "S1"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": true,
+   "selected_profile": "S1",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": false,
+    "S2": false,
+    "S3": true
+   },
+   "eligible_profiles": [
+    "S3"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": true,
+   "selected_profile": "S3",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": true,
+    "S2": false,
+    "S3": true
+   },
+   "eligible_profiles": [
+    "S3",
+    "S1"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": true,
+   "selected_profile": "S3",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": false,
+    "S2": true,
+    "S3": false
+   },
+   "eligible_profiles": [
+    "S2"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": true,
+   "selected_profile": "S2",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": true,
+    "S2": true,
+    "S3": false
+   },
+   "eligible_profiles": [
+    "S2",
+    "S1"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": true,
+   "selected_profile": "S2",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": false,
+    "S2": true,
+    "S3": true
+   },
+   "eligible_profiles": [
+    "S2",
+    "S3"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": true,
+   "selected_profile": "S2",
+   "stop_no_selectable_profile_is_eligible": false
+  },
+  {
+   "all_applicable_components_passed": {
+    "S1": true,
+    "S2": true,
+    "S3": true
+   },
+   "eligible_profiles": [
+    "S2",
+    "S3",
+    "S1"
+   ],
+   "fixed_selectable_profile_denominator": 3,
+   "next_state": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "s3_multi_token_domain_activated": true,
+   "selected_profile": "S2",
+   "stop_no_selectable_profile_is_eligible": false
+  }
+ ],
+ "projected_operation_accounting": {
+  "caveat": "these are arithmetic projections from the registered sample sizes and cell structure. They authorise nothing, approve no budget and create no execution authority, and they must be recomputed at freeze time.",
+  "grand_total_prohibited": {
+   "prohibited": true,
+   "why": "the positive-reference P3-Q stream is unresolved under OD2 and is null, not zero. A grand total would silently treat that null as zero."
+  },
+  "no_single_undifferentiated_total": true,
+  "single_structured_source": "studies/study3/analysis/design_statistics.py",
+  "status": "PLANNING_ARITHMETIC_ONLY_AUTHORIZES_NOTHING",
+  "work_streams": {
+   "RP_I4_under_candidate_profiles": {
+    "S3_incremental_rows": 0,
+    "cells_per_scoring_stream": 4,
+    "distinct_scoring_streams": 2,
+    "generated_tokens_upper_bound": 0,
+    "model_roles": [
+     "RP"
     ],
-    "reported_per": "contrast cell",
-    "reported_quantities": [
-      "the paired 2x2 table of variant-1 correctness by variant-2 correctness",
-      "the raw discordance count and rate",
-      "the paired accuracy difference"
+    "n_per_cell": 448,
+    "precondition": "the positive reference must already hold external P3-Q evidence under a later authority meeting the registered ordering constraint; no such evidence exists",
+    "rendered_rows": 3584,
+    "scored_rows": 3584,
+    "total_sequence_level_model_evaluation_equivalents": 3584,
+    "uses_model": true
+   },
+   "S4_diagnostic_generation": {
+    "base_item_contrast_clusters": 3717,
+    "base_items": 1254,
+    "forward_cost_is_mapped": true,
+    "generated_tokens_upper_bound": 417024,
+    "generation_calls": 26064,
+    "i4_applicable": false,
+    "incremental_decode_evaluations_upper_bound": 390960,
+    "model_roles": [
+     "RT",
+     "RL",
+     "RI"
     ],
-    "retired_procedure": {
-      "disposition_status": "PROPOSED_RESOLVED_SUBJECT_TO_INDEPENDENT_REVIEW",
-      "historical_evidence": "the independent review's recalculation is preserved unedited as immutable historical evidence at studies/study3/analysis/independent_methods_recalculation.py and its committed tables",
-      "name": "Tango (1998) paired score equivalence procedure",
-      "operator_resolution": "S3MR-004 and S3MR-005 are resolved by removal rather than by repair: the uncontrolled asymptotic rule is unnecessary for the primary construct, so it is withdrawn from inferential use instead of being recalibrated",
-      "retired_from": [
-        "I3 gate authority",
-        "profile eligibility",
-        "development selection",
-        "confirmation",
-        "claim language",
-        "equivalence margins",
-        "critical values",
-        "the four-point discordance grid",
-        "any conservativeness or verified-size statement"
-      ],
-      "second_reviewer_question": "does retiring the paired aggregate-equivalence procedure from every decision role fully remove the size-control defect recorded in S3MR-004 and S3MR-005, or does a residual decision path remain?"
+    "registered_generated_token_bound_per_generation": 16,
+    "rendered_rows": 26064,
+    "runtime_batched_forward_calls": null,
+    "runtime_note": "a runtime batched forward call is NOT a sequence-level evaluation; batch packing is a future execution property and is measured separately",
+    "scored_rows": 26064,
+    "selection_authority": "none; S4 is never selectable and is excluded from every success union",
+    "sequence_level_prefill_evaluations": 26064,
+    "total_sequence_level_model_evaluation_equivalents_upper_bound": 417024,
+    "uses_model": true,
+    "why": "a generation of up to the registered token bound is not zero model evaluation. Autoregressive decoding performs one prefill evaluation and up to one incremental decode evaluation per additional emitted token. draft-v0.3 published a null forward-pass count for this stream (S3MR2-005)."
+   },
+   "deterministic_I0_fixtures": {
+    "base_item_contrast_clusters": 232,
+    "base_items": 232,
+    "breakdown": {
+     "indicator_truth_table_fixtures": 16,
+     "k5_constructor_fixtures": 448,
+     "k6_constructor_fixtures": 16,
+     "not_applicable_branch_fixtures": 14,
+     "scorer_branch_fixtures": 8
     },
-    "status": "DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY"
-  },
-  "development_exact_binomial_components": [
-    {
-      "alpha": 0.001666666667,
-      "alpha_exact_rational": "1/600",
-      "applicable_profiles": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
-      ],
-      "construct": "trivial content recovery and output validity",
-      "degenerate_rejection_region": false,
-      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
-      "evaluated_per": [
-        "interface profile",
-        "checkpoint role",
-        "split"
-      ],
-      "exact_null_tail_at_p0": 0.001491215117,
-      "exact_power_at_p1": 0.953040775,
-      "gate": "I1a",
-      "independent_unit": "base_item",
-      "meets_target_power": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.9",
-      "p0": 0.9,
-      "p0_exact_rational": "9/10",
-      "p1_exact_rational": "97/100",
-      "p1_lowest_alternative_of_interest": 0.97,
-      "pass_count": 244,
-      "pass_rate": 0.953125,
-      "rejection_rule": "pass the component when the observed success count is at least 244 out of 256 base items per atomic cell",
-      "source_stratum": "K2",
-      "split": "development",
-      "unit_of_n": "base items per atomic cell"
-    },
-    {
-      "alpha": 0.001666666667,
-      "alpha_exact_rational": "1/600",
-      "applicable_profiles": [
-        "S1",
-        "S4"
-      ],
-      "construct": "explicit content-to-symbol binding",
-      "degenerate_rejection_region": false,
-      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
-      "evaluated_per": [
-        "interface profile",
-        "checkpoint role",
-        "label alphabet balancing block",
-        "split"
-      ],
-      "exact_null_tail_at_p0": 0.001491215117,
-      "exact_power_at_p1": 0.953040775,
-      "gate": "I1b",
-      "independent_unit": "base_item",
-      "meets_target_power": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.9",
-      "p0": 0.9,
-      "p0_exact_rational": "9/10",
-      "p1_exact_rational": "97/100",
-      "p1_lowest_alternative_of_interest": 0.97,
-      "pass_count": 244,
-      "pass_rate": 0.953125,
-      "rejection_rule": "pass the component when the observed success count is at least 244 out of 256 base items per atomic cell",
-      "source_stratum": "K1",
-      "split": "development",
-      "unit_of_n": "base items per atomic cell"
-    },
-    {
-      "alpha": 0.001666666667,
-      "alpha_exact_rational": "1/600",
-      "applicable_profiles": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
-      ],
-      "construct": "primitive headroom, evaluated separately per family",
-      "degenerate_rejection_region": false,
-      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
-      "evaluated_per": [
-        "interface profile",
-        "checkpoint role",
-        "primitive operation family",
-        "split"
-      ],
-      "exact_null_tail_at_p0": 0.000931234262,
-      "exact_power_at_p1": 0.938986365,
-      "gate": "I2",
-      "independent_unit": "base_item",
-      "meets_target_power": true,
-      "n": 128,
-      "null_hypothesis": "p <= 0.5",
-      "p0": 0.5,
-      "p0_exact_rational": "1/2",
-      "p1_exact_rational": "7/10",
-      "p1_lowest_alternative_of_interest": 0.7,
-      "pass_count": 82,
-      "pass_rate": 0.640625,
-      "rejection_rule": "pass the component when the observed success count is at least 82 out of 128 base items per primitive-family cell",
-      "source_stratum": "K3",
-      "split": "development",
-      "unit_of_n": "base items per primitive-family cell"
-    },
-    {
-      "alpha": 0.001666666667,
-      "alpha_exact_rational": "1/600",
-      "applicable_profiles": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
-      ],
-      "construct": "pairwise presentation invariance and correctness, J_both",
-      "degenerate_rejection_region": false,
-      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
-      "evaluated_per": [
-        "interface profile",
-        "checkpoint role",
-        "contrast family",
-        "contrast ID",
-        "split"
-      ],
-      "exact_null_tail_at_p0": 0.001491215117,
-      "exact_power_at_p1": 0.953040775,
-      "gate": "I3",
-      "independent_unit": "base_item_contrast_cluster",
-      "meets_target_power": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.9",
-      "p0": 0.9,
-      "p0_exact_rational": "9/10",
-      "p1_exact_rational": "97/100",
-      "p1_lowest_alternative_of_interest": 0.97,
-      "pass_count": 244,
-      "pass_rate": 0.953125,
-      "rejection_rule": "pass the component when the observed success count is at least 244 out of 256 base-item contrast clusters per contrast cell",
-      "source_stratum": "K5 and K6",
-      "split": "development",
-      "unit_of_n": "base-item contrast clusters per contrast cell"
-    },
-    {
-      "alpha": 0.001666666667,
-      "alpha_exact_rational": "1/600",
-      "applicable_profiles": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
-      ],
-      "construct": "positive-reference competence recovery through the profile",
-      "degenerate_rejection_region": false,
-      "derivation": "exact binomial search over exact rational arithmetic; no threshold, tail or power value in this row is a transcribed constant",
-      "evaluated_per": [
-        "interface profile",
-        "registered operation family",
-        "depth"
-      ],
-      "exact_null_tail_at_p0": 0.001081002486,
-      "exact_power_at_p1": 0.921083515,
-      "gate": "I4",
-      "independent_unit": "base_item",
-      "meets_target_power": true,
-      "n": 256,
-      "null_hypothesis": "p <= 0.8",
-      "p0": 0.8,
-      "p0_exact_rational": "4/5",
-      "p1_exact_rational": "9/10",
-      "p1_lowest_alternative_of_interest": 0.9,
-      "pass_count": 224,
-      "pass_rate": 0.875,
-      "rejection_rule": "pass the component when the observed success count is at least 224 out of 256 RP base items per operation-family x depth cell per candidate profile",
-      "source_stratum": "K4",
-      "split": "development",
-      "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
-    }
-  ],
-  "development_selection_map": [
-    {
-      "all_applicable_components_passed": {
-        "S1": false,
-        "S2": false,
-        "S3": false
-      },
-      "eligible_profiles": [],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": false,
-      "selected_profile": null,
-      "stop_no_selectable_profile_is_eligible": true
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": true,
-        "S2": false,
-        "S3": false
-      },
-      "eligible_profiles": [
-        "S1"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": false,
-      "selected_profile": "S1",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": false,
-        "S2": true,
-        "S3": false
-      },
-      "eligible_profiles": [
-        "S2"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": false,
-      "selected_profile": "S2",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": true,
-        "S2": true,
-        "S3": false
-      },
-      "eligible_profiles": [
-        "S2",
-        "S1"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": false,
-      "selected_profile": "S2",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": false,
-        "S2": false,
-        "S3": true
-      },
-      "eligible_profiles": [],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": false,
-      "selected_profile": null,
-      "stop_no_selectable_profile_is_eligible": true
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": true,
-        "S2": false,
-        "S3": true
-      },
-      "eligible_profiles": [
-        "S1"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": false,
-      "selected_profile": "S1",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": false,
-        "S2": true,
-        "S3": true
-      },
-      "eligible_profiles": [
-        "S2"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": false,
-      "selected_profile": "S2",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": true,
-        "S2": true,
-        "S3": true
-      },
-      "eligible_profiles": [
-        "S2",
-        "S1"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": false,
-      "selected_profile": "S2",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": false,
-        "S2": false,
-        "S3": false
-      },
-      "eligible_profiles": [],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": true,
-      "selected_profile": null,
-      "stop_no_selectable_profile_is_eligible": true
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": true,
-        "S2": false,
-        "S3": false
-      },
-      "eligible_profiles": [
-        "S1"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": true,
-      "selected_profile": "S1",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": false,
-        "S2": true,
-        "S3": false
-      },
-      "eligible_profiles": [
-        "S2"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": true,
-      "selected_profile": "S2",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": true,
-        "S2": true,
-        "S3": false
-      },
-      "eligible_profiles": [
-        "S2",
-        "S1"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": true,
-      "selected_profile": "S2",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": false,
-        "S2": false,
-        "S3": true
-      },
-      "eligible_profiles": [
-        "S3"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": true,
-      "selected_profile": "S3",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": true,
-        "S2": false,
-        "S3": true
-      },
-      "eligible_profiles": [
-        "S3",
-        "S1"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": true,
-      "selected_profile": "S3",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": false,
-        "S2": true,
-        "S3": true
-      },
-      "eligible_profiles": [
-        "S2",
-        "S3"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": true,
-      "selected_profile": "S2",
-      "stop_no_selectable_profile_is_eligible": false
-    },
-    {
-      "all_applicable_components_passed": {
-        "S1": true,
-        "S2": true,
-        "S3": true
-      },
-      "eligible_profiles": [
-        "S2",
-        "S3",
-        "S1"
-      ],
-      "fixed_selectable_profile_denominator": 3,
-      "s3_multi_token_domain_activated": true,
-      "selected_profile": "S2",
-      "stop_no_selectable_profile_is_eligible": false
-    }
-  ],
-  "disposition_status": "PROPOSED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW",
-  "document_class": "design_statistics_derivation",
-  "draft_version": "draft-v0.3",
-  "i3_contrast_registry": {
-    "combined_factor_interactions": "outside the Study 3 claim ceiling; the seven K5 cells test registered one-factor contrasts only and imply no full-factorial robustness",
-    "k5": [
-      {
-        "factor": "content_position",
-        "id": "K5-P1",
-        "offset": 1
-      },
-      {
-        "factor": "content_position",
-        "id": "K5-P2",
-        "offset": 2
-      },
-      {
-        "factor": "content_position",
-        "id": "K5-P3",
-        "offset": 3
-      },
-      {
-        "factor": "correct_symbol_index",
-        "id": "K5-S1",
-        "offset": 1
-      },
-      {
-        "factor": "correct_symbol_index",
-        "id": "K5-S2",
-        "offset": 2
-      },
-      {
-        "factor": "correct_symbol_index",
-        "id": "K5-S3",
-        "offset": 3
-      },
-      {
-        "factor": "label_alphabet",
-        "id": "K5-A1",
-        "offset": null
-      }
+    "cluster_rendered_rows": 464,
+    "generated_tokens_upper_bound": 0,
+    "generation_calls": 0,
+    "incremental_decode_evaluations": 0,
+    "noncluster_fixture_rows": 38,
+    "rendered_rows": 502,
+    "restricted_vocabulary_logit_reads": 0,
+    "scored_rows": 502,
+    "sequence_level_prefill_evaluations": 0,
+    "total_sequence_level_model_evaluation_equivalents": 0,
+    "unit_note": "one base_item_contrast_cluster is ONE base item rendered in exactly two variants, so the cluster-derived base-item count equals the cluster count and the rendered-row count is the cluster count times the variants per cluster. draft-v0.3 filed the rendered-row count under the base_item unit (S3MR2-009).",
+    "uses_model": false
+   },
+   "positive_reference_external_P3Q": {
+    "base_items": null,
+    "generated_tokens_upper_bound": null,
+    "model_roles": [
+     "RP"
     ],
-    "k5_applicability": {
-      "applicable_profiles": [
-        "S1",
-        "S4"
-      ],
-      "not_applicable_profiles": [
-        "S2",
-        "S3"
-      ],
-      "not_applicable_semantics": "not_applicable is a third value: it is not a pass, not a zero effect and not evidence of robustness, and it may never be counted as a satisfied component"
-    },
-    "k6": [
-      {
-        "baseline": "R-base",
-        "id": "K6-SEP",
-        "variant": "R-sep",
-        "varies": "the option separator only"
-      },
-      {
-        "baseline": "R-base",
-        "id": "K6-INSTR",
-        "variant": "R-instr",
-        "varies": "the instruction sentence only"
-      }
+    "numeric_status": "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2",
+    "rendered_rows": null,
+    "scored_rows": null,
+    "total_sequence_level_model_evaluation_equivalents": null,
+    "uses_model": true,
+    "why_null_and_not_zero": "the checkpoint, the canonical qualification interface, the qualification bank and seed, the competence floor, n, the multiplicity treatment and the stop rule are all open under OD2. A zero would assert that a selected reference needs no qualification work."
+   },
+   "selected_profile_one_shot_confirmation": {
+    "accessible_now": false,
+    "generated_tokens_upper_bound": 0,
+    "is_an_upper_bound_not_a_universal_total": true,
+    "rendered_rows": 27856,
+    "rp_i4_rendered_rows": 1792,
+    "scored_rows": 27856,
+    "target_role_rendered_rows": 26064,
+    "total_sequence_level_model_evaluation_equivalents": 27856,
+    "upper_bound_profile": "S1",
+    "uses_model": true,
+    "why_upper_bound": "no profile is selected in this round; S1 is the most expensive selectable profile, so its cost bounds every outcome of the selection map"
+   },
+   "target_role_development": {
+    "S3_incremental_rendered_rows": 0,
+    "S3_incremental_scored_rows": 0,
+    "S3_incremental_sequence_evaluations": 0,
+    "S3_zero_incremental_cost_holds_only_under": [
+     "a jointly single-token registered answer domain",
+     "an identical prompt prefix to S2",
+     "reuse of the identical restricted-vocabulary logit vector S2 already read",
+     "a CPU-only rescoring contract that performs no additional model evaluation"
     ],
-    "k6_applicability": {
-      "applicable_profiles": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
-      ]
-    }
-  },
-  "i3_indicator_semantics": {
-    "J_both": "J_inv AND J_cor; the primary I3 gate indicator",
-    "J_cor": "1 iff both variants are scored correct against the unique registered ground truth; a stable but wrong answer is 0",
-    "J_inv": "1 iff both variants produce valid answer-domain content and the two mapped contents are byte-identical after the registered content mapping; stable invalid or unparseable output is 0",
-    "estimand": "Pr(J_both = 1) over independently sampled base-item contrast clusters, separately in every applicable atomic contrast cell",
-    "expected_integrity_invariant": "under a unique ground truth J_cor implies J_inv; this is recorded as an expected invariant and is not treated as evidence that the two indicators are independent",
-    "why_the_conjunction_is_retained": "so that stable-wrong and stable-invalid outcomes fail closed rather than being scored as invariance"
-  },
-  "i3_indicator_truth_table": [
-    {
-      "J_both": 1,
-      "J_cor": 1,
-      "J_inv": 1,
-      "case": "both_correct",
-      "registered_ground_truth": "7",
-      "scores_for_the_gate": true,
-      "variant_1_mapped_content": "7",
-      "variant_2_mapped_content": "7"
+    "by_profile": {
+     "S1": {
+      "base_item_contrast_clusters": 3717,
+      "base_items": 1254,
+      "cluster_rendered_rows": 7434,
+      "dimensional_identity_cluster_rows_equals_clusters_times_variants": true,
+      "generated_tokens_upper_bound": 0,
+      "generation_calls": 0,
+      "incremental_decode_evaluations": 0,
+      "rendered_rows": 26064,
+      "rendered_rows_per_target_role": 8688,
+      "restricted_vocabulary_logit_reads": 26064,
+      "scored_rows": 26064,
+      "scored_rows_per_target_role": 8688,
+      "sequence_level_prefill_evaluations": 26064,
+      "target_roles": 3,
+      "total_sequence_level_model_evaluation_equivalents": 26064
+     },
+     "S2": {
+      "base_item_contrast_clusters": 826,
+      "base_items": 841,
+      "cluster_rendered_rows": 1652,
+      "dimensional_identity_cluster_rows_equals_clusters_times_variants": true,
+      "generated_tokens_upper_bound": 0,
+      "generation_calls": 0,
+      "incremental_decode_evaluations": 0,
+      "rendered_rows": 7479,
+      "rendered_rows_per_target_role": 2493,
+      "restricted_vocabulary_logit_reads": 7479,
+      "scored_rows": 7479,
+      "scored_rows_per_target_role": 2493,
+      "sequence_level_prefill_evaluations": 7479,
+      "target_roles": 3,
+      "total_sequence_level_model_evaluation_equivalents": 7479
+     },
+     "S3_if_independently_rendered": {
+      "base_item_contrast_clusters": 826,
+      "base_items": 841,
+      "cluster_rendered_rows": 1652,
+      "dimensional_identity_cluster_rows_equals_clusters_times_variants": true,
+      "generated_tokens_upper_bound": 0,
+      "generation_calls": 0,
+      "incremental_decode_evaluations": 0,
+      "rendered_rows": 7479,
+      "rendered_rows_per_target_role": 2493,
+      "restricted_vocabulary_logit_reads": 7479,
+      "scored_rows": 7479,
+      "scored_rows_per_target_role": 2493,
+      "sequence_level_prefill_evaluations": 7479,
+      "target_roles": 3,
+      "total_sequence_level_model_evaluation_equivalents": 7479
+     }
     },
-    {
-      "J_both": 0,
-      "J_cor": 0,
-      "J_inv": 1,
-      "case": "stable_but_wrong",
-      "registered_ground_truth": "7",
-      "scores_for_the_gate": false,
-      "variant_1_mapped_content": "3",
-      "variant_2_mapped_content": "3"
-    },
-    {
-      "J_both": 0,
-      "J_cor": 0,
-      "J_inv": 0,
-      "case": "one_correct_one_wrong",
-      "registered_ground_truth": "7",
-      "scores_for_the_gate": false,
-      "variant_1_mapped_content": "7",
-      "variant_2_mapped_content": "3"
-    },
-    {
-      "J_both": 0,
-      "J_cor": 0,
-      "J_inv": 0,
-      "case": "one_wrong_one_correct",
-      "registered_ground_truth": "7",
-      "scores_for_the_gate": false,
-      "variant_1_mapped_content": "3",
-      "variant_2_mapped_content": "7"
-    },
-    {
-      "J_both": 0,
-      "J_cor": 0,
-      "J_inv": 0,
-      "case": "both_wrong_and_different",
-      "registered_ground_truth": "7",
-      "scores_for_the_gate": false,
-      "variant_1_mapped_content": "3",
-      "variant_2_mapped_content": "5"
-    },
-    {
-      "J_both": 0,
-      "J_cor": 0,
-      "J_inv": 0,
-      "case": "stable_but_invalid",
-      "registered_ground_truth": "7",
-      "scores_for_the_gate": false,
-      "variant_1_mapped_content": null,
-      "variant_2_mapped_content": null
-    },
-    {
-      "J_both": 0,
-      "J_cor": 0,
-      "J_inv": 0,
-      "case": "one_valid_one_invalid",
-      "registered_ground_truth": "7",
-      "scores_for_the_gate": false,
-      "variant_1_mapped_content": "7",
-      "variant_2_mapped_content": null
-    },
-    {
-      "J_both": 0,
-      "J_cor": 0,
-      "J_inv": 0,
-      "case": "one_invalid_one_valid",
-      "registered_ground_truth": "7",
-      "scores_for_the_gate": false,
-      "variant_1_mapped_content": null,
-      "variant_2_mapped_content": "7"
-    }
-  ],
-  "i3_pairwise_construction_verification": {
-    "k5_baseline_conditions_balanced_over_a_complete_block": true,
-    "k5_complete_block_size": 32,
-    "k5_contrast_count": 7,
-    "k5_k6_base_item_identities_disjoint": true,
-    "k5_one_factor_per_contrast": true,
-    "k5_x_k6_cross_product_exists": false,
-    "k6_answer_cue_fixed_within_every_pair": true,
-    "k6_contrast_count": 2,
-    "k6_rendering_set": [
-      "R-base",
-      "R-instr",
-      "R-sep"
+    "model_roles": [
+     "RT",
+     "RL",
+     "RI"
     ],
-    "label_alphabets_disjoint_from_answer_domain": true,
-    "label_alphabets_mutually_disjoint": true,
-    "variants_per_base_item_contrast_cluster": 2
-  },
-  "operation_counts": {
-    "bank_rows": 0,
-    "confirmation_accesses": 0,
-    "evidence_rows": 0,
-    "forward_passes": 0,
-    "generations": 0,
-    "gpu_jobs": 0,
-    "interfaces_selected": 0,
-    "model_downloads": 0,
-    "positive_references_selected": 0,
-    "provider_calls": 0,
-    "seeds_drawn": 0,
-    "sequence_scorings": 0,
-    "tokenizer_constructions": 0,
-    "weight_loads": 0
-  },
-  "pooling_prohibitions": [
-    "K5 and K6 are never pooled",
-    "contrast IDs are never pooled",
-    "the two label alphabets are never pooled",
-    "K5 position contrast cells and K5 symbol contrast cells are never pooled",
-    "source strata are never pooled",
-    "primitive operation families are never pooled",
-    "K4 depth 2 and depth 3 are never pooled",
-    "checkpoint roles are never pooled",
-    "interface profiles are never pooled",
-    "renderings are never pooled",
-    "splits are never pooled",
-    "J_inv, J_cor and the descriptive paired table may never rescue a failed J_both"
+    "scored_rows": 33543,
+    "total_sequence_level_model_evaluation_equivalents": 33543,
+    "uses_model": true
+   }
+  }
+ },
+ "sampling_frame_validation": {
+  "all_draws_with_replacement": true,
+  "all_joint_weights_sum_to_one": true,
+  "all_parameter_weights_sum_to_one": true,
+  "bank_rows": 0,
+  "confirmation_sampling_cells": 17,
+  "derived_development_sampling_cell_count": 17,
+  "development_sampling_cells": 17,
+  "duplicates_retained": true,
+  "namespaces_disjoint": true,
+  "sampling_cells_validated": 34,
+  "seed_authority_granted": false,
+  "seeds_drawn": 0,
+  "split_partition_outcome_blind": true
+ },
+ "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW",
+ "state_machine": {
+  "every_event_has_exactly_one_next_state": true,
+  "every_terminal_state_is_reachable": true,
+  "i0_failure_maps_only_to": "STOP_INSTRUMENT_DEFECT",
+  "i0_is_a_global_precondition": true,
+  "i0_is_part_of_profile_adequacy": false,
+  "rescue_paths": [],
+  "states": [
+   "CALIBRATED_PENDING_SEPARATE_SUBSTANTIVE_AUTHORITY",
+   "Q0_INSTRUMENT",
+   "Q1_DEVELOPMENT",
+   "Q2_SELECTION",
+   "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+   "STOP_CONFIRMATION_FAILED",
+   "STOP_CONFIRMATION_SPENT_ON_ERROR",
+   "STOP_DEVELOPMENT_INTEGRITY_ERROR",
+   "STOP_INSTRUMENT_DEFECT",
+   "STOP_NO_SELECTABLE_INTERFACE_REMAINS"
   ],
-  "projected_operation_accounting": {
-    "character": "planning arithmetic only; this authorises nothing, approves no budget and creates no execution authority",
-    "dimensional_identities": [
-      {
-        "base_item_contrast_clusters": 512,
-        "component": "I3_K6",
-        "holds": true,
-        "identity": "rendered_rows = base_item_contrast_clusters x 2",
-        "profile": "S1",
-        "rendered_rows": 1024
-      },
-      {
-        "base_item_contrast_clusters": 1792,
-        "component": "I3_K5",
-        "holds": true,
-        "identity": "rendered_rows = base_item_contrast_clusters x 2",
-        "profile": "S1",
-        "rendered_rows": 3584
-      },
-      {
-        "base_item_contrast_clusters": 512,
-        "component": "I3_K6",
-        "holds": true,
-        "identity": "rendered_rows = base_item_contrast_clusters x 2",
-        "profile": "S2",
-        "rendered_rows": 1024
-      },
-      {
-        "base_item_contrast_clusters": 512,
-        "component": "I3_K6",
-        "holds": true,
-        "identity": "rendered_rows = base_item_contrast_clusters x 2",
-        "profile": "S3",
-        "rendered_rows": 1024
-      }
-    ],
-    "executed_operation_counts": {
-      "activation_extractions": 0,
-      "bank_rows": 0,
-      "evidence_rows": 0,
-      "forward_passes": 0,
-      "generations": 0,
-      "gpu_jobs": 0,
-      "model_downloads": 0,
-      "provider_calls": 0,
-      "seeds_drawn": 0,
-      "sequence_scorings": 0,
-      "tokenizer_constructions": 0,
-      "weight_loads": 0
-    },
-    "prohibition": "a single undifferentiated total is prohibited; every stream reports its own units",
-    "s3_current_domain_accounting": {
-      "additional_forward_passes": 0,
-      "additional_sequence_scoring_rows": 0,
-      "future_multi_token_activation": "outside this projection; it requires a new authority, image, scoring contract and cost table",
-      "reuses": "the S2 forward pass and logit read under the same prefix"
-    },
-    "unit_definitions": {
-      "base_item": "one registered question stem",
-      "base_item_contrast_cluster": "one base item rendered in exactly two registered variants; the independent sampling unit for I3",
-      "n": "always the count of independent units in one cell, never a rendered-row or scored-row count; every table states the unit at the point of definition",
-      "rendered_row": "one emitted presentation of one variant",
-      "scored_row": "one rendered row scored under one (profile, role)"
-    },
-    "work_streams": {
-      "RP_I4_under_candidate_profiles": {
-        "by_profile": {
-          "S1": {
-            "base_item_contrast_clusters": 0,
-            "base_items": 1024,
-            "forward_passes": 1024,
-            "logit_reads": 1024,
-            "rendered_rows": 1024,
-            "scored_rows": 1024,
-            "variants_per_cluster": 1
-          },
-          "S2": {
-            "base_item_contrast_clusters": 0,
-            "base_items": 1024,
-            "forward_passes": 1024,
-            "logit_reads": 1024,
-            "rendered_rows": 1024,
-            "scored_rows": 1024,
-            "variants_per_cluster": 1
-          },
-          "S3": {
-            "base_items": 1024,
-            "derived_from": "S2",
-            "incremental_forward_passes": 0,
-            "incremental_rendered_rows": 0,
-            "incremental_scored_rows": 0
-          }
-        },
-        "cells": 4,
-        "conjunction": "every registered operation family and every depth must pass; no pooling across families or depths",
-        "forward_passes": 2048,
-        "generated_tokens_upper_bound": 0,
-        "model_roles": [
-          "RP"
-        ],
-        "n_per_cell": 256,
-        "precondition": "RP must already hold valid external P3-Q evidence under a later authority; no such evidence exists",
-        "scope": "the positive reference scored on the registered K4 construct through each candidate profile, separately per operation family and depth",
-        "scored_rows": 2048,
-        "unit_of_n": "RP base items per operation-family x depth cell per candidate profile",
-        "uses_model": true
-      },
-      "S4_diagnostic_generation": {
-        "base_item_contrast_clusters": 2304,
-        "base_items": 768,
-        "forward_passes": null,
-        "generated_tokens_upper_bound": 258048,
-        "generations": 16128,
-        "model_roles": [
-          "RT",
-          "RL",
-          "RI"
-        ],
-        "registered_generated_token_bound_per_row": 16,
-        "rendered_rows": 16128,
-        "rendered_rows_per_role": 5376,
-        "scope": "the never-selectable free-generation diagnostic profile",
-        "scored_rows": 16128,
-        "selection_authority": "none; excluded from every success union",
-        "uses_model": true,
-        "variants_per_cluster": 2
-      },
-      "deterministic_I0_fixtures": {
-        "base_item_contrast_clusters": 232,
-        "base_items": 464,
-        "breakdown": {
-          "indicator_truth_table_fixtures": 8,
-          "k5_constructor_fixtures": 448,
-          "k6_constructor_fixtures": 16,
-          "not_applicable_branch_fixtures": 14,
-          "scorer_branch_fixtures": 16
-        },
-        "forward_passes": 0,
-        "generated_tokens_upper_bound": 0,
-        "logit_reads": 0,
-        "model_roles": 0,
-        "rendered_rows": 502,
-        "scope": "renderer, content mapping, scorer and indicator fixtures",
-        "scored_rows": 502,
-        "uses_model": false,
-        "variants_per_cluster": 2
-      },
-      "positive_reference_external_P3Q": {
-        "base_item_contrast_clusters": null,
-        "base_items": null,
-        "forward_passes": null,
-        "generated_tokens_upper_bound": null,
-        "model_roles": [
-          "RP"
-        ],
-        "numeric_status": "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2",
-        "rendered_rows": null,
-        "scope": "qualification of the positive reference through a canonical interface external to S1-S4, under a later authority",
-        "scored_rows": null,
-        "uses_model": true,
-        "variants_per_cluster": null,
-        "why_null": "the checkpoint, the canonical qualification interface, the qualification bank, the floor, n, the multiplicity treatment and the stop rule are all open under OD2; a number here would imply a selection that has not been made"
-      },
-      "selected_profile_one_shot_confirmation": {
-        "accessible_now": false,
-        "base_item_contrast_clusters": 2304,
-        "base_items": 768,
-        "forward_passes": 17152,
-        "generated_tokens_upper_bound": 0,
-        "model_roles": [
-          "RT",
-          "RL",
-          "RI",
-          "RP"
-        ],
-        "rendered_rows": 17152,
-        "rp_i4_rendered_rows": 1024,
-        "scope": "every applicable component for the single development-selected profile, on the physically disjoint one-shot confirmation split",
-        "scored_rows": 17152,
-        "selected_profile": null,
-        "target_role_rendered_rows": 16128,
-        "upper_bound_profile_used_for_this_projection": "S1",
-        "uses_model": true,
-        "variants_per_cluster": 2,
-        "why_upper_bound": "no profile is selected in this round; S1 is the most expensive applicable profile, so its cost bounds every outcome of the selection map"
-      },
-      "target_role_development": {
-        "by_profile": {
-          "S1": {
-            "base_item_contrast_clusters": 2304,
-            "base_items": 768,
-            "components": [
-              {
-                "cells": 1,
-                "component": "I1a",
-                "independent_unit_count": 256,
-                "independent_unit_type": "base_item",
-                "independent_units_total": 256,
-                "rendered_rows": 256,
-                "variants_per_independent_unit": 1
-              },
-              {
-                "cells": 2,
-                "component": "I2",
-                "independent_unit_count": 128,
-                "independent_unit_type": "base_item",
-                "independent_units_total": 256,
-                "rendered_rows": 256,
-                "variants_per_independent_unit": 1
-              },
-              {
-                "cells": 2,
-                "component": "I3_K6",
-                "independent_unit_count": 256,
-                "independent_unit_type": "base_item_contrast_cluster",
-                "independent_units_total": 512,
-                "rendered_rows": 1024,
-                "variants_per_independent_unit": 2
-              },
-              {
-                "cells": 1,
-                "component": "I1b",
-                "independent_unit_count": 256,
-                "independent_unit_type": "base_item",
-                "independent_units_total": 256,
-                "rendered_rows": 256,
-                "variants_per_independent_unit": 1
-              },
-              {
-                "cells": 7,
-                "component": "I3_K5",
-                "independent_unit_count": 256,
-                "independent_unit_type": "base_item_contrast_cluster",
-                "independent_units_total": 1792,
-                "rendered_rows": 3584,
-                "variants_per_independent_unit": 2
-              }
-            ],
-            "forward_passes": 16128,
-            "generated_tokens_upper_bound": 0,
-            "logit_reads": 16128,
-            "model_roles": 3,
-            "rendered_rows": 16128,
-            "rendered_rows_per_role": 5376,
-            "scored_rows": 16128,
-            "variants_per_cluster": 2
-          },
-          "S2": {
-            "base_item_contrast_clusters": 512,
-            "base_items": 512,
-            "components": [
-              {
-                "cells": 1,
-                "component": "I1a",
-                "independent_unit_count": 256,
-                "independent_unit_type": "base_item",
-                "independent_units_total": 256,
-                "rendered_rows": 256,
-                "variants_per_independent_unit": 1
-              },
-              {
-                "cells": 2,
-                "component": "I2",
-                "independent_unit_count": 128,
-                "independent_unit_type": "base_item",
-                "independent_units_total": 256,
-                "rendered_rows": 256,
-                "variants_per_independent_unit": 1
-              },
-              {
-                "cells": 2,
-                "component": "I3_K6",
-                "independent_unit_count": 256,
-                "independent_unit_type": "base_item_contrast_cluster",
-                "independent_units_total": 512,
-                "rendered_rows": 1024,
-                "variants_per_independent_unit": 2
-              },
-              {
-                "cells": 0,
-                "component": "I1b",
-                "independent_unit_count": 0,
-                "independent_unit_type": "not_applicable",
-                "independent_units_total": 0,
-                "not_applicable_reason": "this profile displays no label alphabet, so there is no symbol-binding step; not_applicable is not a pass",
-                "rendered_rows": 0,
-                "variants_per_independent_unit": 0
-              },
-              {
-                "cells": 0,
-                "component": "I3_K5",
-                "independent_unit_count": 0,
-                "independent_unit_type": "not_applicable",
-                "independent_units_total": 0,
-                "not_applicable_reason": "this profile renders no option list and no label alphabet, so K5 has no referent; not_applicable is not a pass",
-                "rendered_rows": 0,
-                "variants_per_independent_unit": 0
-              }
-            ],
-            "forward_passes": 4608,
-            "generated_tokens_upper_bound": 0,
-            "logit_reads": 4608,
-            "model_roles": 3,
-            "rendered_rows": 4608,
-            "rendered_rows_per_role": 1536,
-            "scored_rows": 4608,
-            "variants_per_cluster": 2
-          },
-          "S3": {
-            "base_item_contrast_clusters": 512,
-            "base_items": 512,
-            "components": [
-              {
-                "cells": 1,
-                "component": "I1a",
-                "independent_unit_count": 256,
-                "independent_unit_type": "base_item",
-                "independent_units_total": 256,
-                "rendered_rows": 256,
-                "variants_per_independent_unit": 1
-              },
-              {
-                "cells": 2,
-                "component": "I2",
-                "independent_unit_count": 128,
-                "independent_unit_type": "base_item",
-                "independent_units_total": 256,
-                "rendered_rows": 256,
-                "variants_per_independent_unit": 1
-              },
-              {
-                "cells": 2,
-                "component": "I3_K6",
-                "independent_unit_count": 256,
-                "independent_unit_type": "base_item_contrast_cluster",
-                "independent_units_total": 512,
-                "rendered_rows": 1024,
-                "variants_per_independent_unit": 2
-              },
-              {
-                "cells": 0,
-                "component": "I1b",
-                "independent_unit_count": 0,
-                "independent_unit_type": "not_applicable",
-                "independent_units_total": 0,
-                "not_applicable_reason": "this profile displays no label alphabet, so there is no symbol-binding step; not_applicable is not a pass",
-                "rendered_rows": 0,
-                "variants_per_independent_unit": 0
-              },
-              {
-                "cells": 0,
-                "component": "I3_K5",
-                "independent_unit_count": 0,
-                "independent_unit_type": "not_applicable",
-                "independent_units_total": 0,
-                "not_applicable_reason": "this profile renders no option list and no label alphabet, so K5 has no referent; not_applicable is not a pass",
-                "rendered_rows": 0,
-                "variants_per_independent_unit": 0
-              }
-            ],
-            "derived_from": "S2",
-            "incremental_forward_passes": 0,
-            "incremental_rendered_rows": 0,
-            "incremental_scored_rows": 0,
-            "incremental_sequence_scoring_rows": 0,
-            "rendered_rows_if_independently_rendered": 4608,
-            "variants_per_cluster": 2,
-            "why": "under the registered single-token answer domain the length-normalised sequence score of a one-token candidate is a monotone function of that token's log probability, so S3's argmax equals S2's by construction; the comparison is CPU arithmetic on the logits S2 already recorded"
-          }
-        },
-        "excludes": [
-          "I4, which is scoped to the RP role only",
-          "S4, which is a never-selectable diagnostic"
-        ],
-        "forward_passes": 20736,
-        "generated_tokens_upper_bound": 0,
-        "model_roles": [
-          "RT",
-          "RL",
-          "RI"
-        ],
-        "scope": "every applicable development component for each selectable profile, scored on the development split",
-        "scored_rows": 20736,
-        "uses_model": true
-      }
-    }
-  },
-  "selected_label_uniformity_diagnostic": [
-    {
-      "acceptance_band": [
-        43,
-        87
-      ],
-      "applies_to": "label-bearing profiles only; not_applicable to S2 and S3, which display no label alphabet",
-      "carries_confirmation_authority": false,
-      "carries_eligibility_authority": false,
-      "carries_gate_authority": false,
-      "carries_selection_authority": false,
-      "expected_per_label": 64.0,
-      "labels": 4,
-      "n": 256,
-      "status": "DIAGNOSTIC_NUISANCE_REPORT_ONLY",
-      "tail_convention": "two-sided central band; each tail holds at most half the stated mass",
-      "two_sided_mass_across_the_band": 0.00125,
-      "two_sided_mass_exact_rational": "1/800",
-      "unit_of_n": "scored rows in the cell"
-    },
-    {
-      "acceptance_band": [
-        97,
-        160
-      ],
-      "applies_to": "label-bearing profiles only; not_applicable to S2 and S3, which display no label alphabet",
-      "carries_confirmation_authority": false,
-      "carries_eligibility_authority": false,
-      "carries_gate_authority": false,
-      "carries_selection_authority": false,
-      "expected_per_label": 128.0,
-      "labels": 4,
-      "n": 512,
-      "status": "DIAGNOSTIC_NUISANCE_REPORT_ONLY",
-      "tail_convention": "two-sided central band; each tail holds at most half the stated mass",
-      "two_sided_mass_across_the_band": 0.00125,
-      "two_sided_mass_exact_rational": "1/800",
-      "unit_of_n": "scored rows in the cell"
-    },
-    {
-      "acceptance_band": [
-        212,
-        301
-      ],
-      "applies_to": "label-bearing profiles only; not_applicable to S2 and S3, which display no label alphabet",
-      "carries_confirmation_authority": false,
-      "carries_eligibility_authority": false,
-      "carries_gate_authority": false,
-      "carries_selection_authority": false,
-      "expected_per_label": 256.0,
-      "labels": 4,
-      "n": 1024,
-      "status": "DIAGNOSTIC_NUISANCE_REPORT_ONLY",
-      "tail_convention": "two-sided central band; each tail holds at most half the stated mass",
-      "two_sided_mass_across_the_band": 0.00125,
-      "two_sided_mass_exact_rational": "1/800",
-      "unit_of_n": "scored rows in the cell"
-    }
+  "terminal_states": [
+   "CALIBRATED_PENDING_SEPARATE_SUBSTANTIVE_AUTHORITY",
+   "STOP_CONFIRMATION_FAILED",
+   "STOP_CONFIRMATION_SPENT_ON_ERROR",
+   "STOP_DEVELOPMENT_INTEGRITY_ERROR",
+   "STOP_INSTRUMENT_DEFECT",
+   "STOP_NO_SELECTABLE_INTERFACE_REMAINS"
   ],
-  "status": "PROPOSED_DESIGN_PARAMETERS_NOT_MEASUREMENTS_NOT_FROZEN"
+  "transitions": [
+   {
+    "event": "all fixtures pass",
+    "from": "Q0_INSTRUMENT",
+    "to": "Q1_DEVELOPMENT"
+   },
+   {
+    "event": "any fixture fails",
+    "from": "Q0_INSTRUMENT",
+    "to": "STOP_INSTRUMENT_DEFECT"
+   },
+   {
+    "event": "error",
+    "from": "Q0_INSTRUMENT",
+    "to": "STOP_INSTRUMENT_DEFECT"
+   },
+   {
+    "event": "ambiguity",
+    "from": "Q0_INSTRUMENT",
+    "to": "STOP_INSTRUMENT_DEFECT"
+   },
+   {
+    "event": "completed validly",
+    "from": "Q1_DEVELOPMENT",
+    "to": "Q2_SELECTION"
+   },
+   {
+    "event": "protocol or integrity error",
+    "from": "Q1_DEVELOPMENT",
+    "to": "STOP_DEVELOPMENT_INTEGRITY_ERROR"
+   },
+   {
+    "event": "a profile is selected",
+    "from": "Q2_SELECTION",
+    "to": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY"
+   },
+   {
+    "event": "no profile is eligible and applicable",
+    "from": "Q2_SELECTION",
+    "to": "STOP_NO_SELECTABLE_INTERFACE_REMAINS"
+   },
+   {
+    "event": "authority granted and conjunction passes",
+    "from": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+    "to": "CALIBRATED_PENDING_SEPARATE_SUBSTANTIVE_AUTHORITY"
+   },
+   {
+    "event": "authority granted and any applicable cell fails",
+    "from": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+    "to": "STOP_CONFIRMATION_FAILED"
+   },
+   {
+    "event": "authority granted and an error or ambiguity occurs",
+    "from": "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+    "to": "STOP_CONFIRMATION_SPENT_ON_ERROR"
+   }
+  ]
+ },
+ "status": "PROPOSED_DESIGN_PARAMETERS_NOT_MEASUREMENTS_NOT_FROZEN"
 }
