@@ -46,10 +46,10 @@
    "trailing_newline": true
   },
   {
-   "bytes": 200507,
+   "bytes": 200654,
    "lf_only": true,
    "path": "docs/decision_log.md",
-   "sha256": "aecc6dbc3fa37ea5a568be33869e6e82148627ac2f2e0a175997eacabd8c5f27",
+   "sha256": "b26aa7074f9e3d546dc1020eed4061fba90a9abbf78998e0df9e2032167e33ad",
    "trailing_newline": true
   },
   {
@@ -63,14 +63,14 @@
    "bytes": 75322,
    "lf_only": true,
    "path": "paper/artifact_index.csv",
-   "sha256": "4c40515b8860c79c953653e16e409561467d01ce95024c480fefface575b9d09",
+   "sha256": "32872797045e0c30f2a07e138669378d4b62e4862677a4fd1beb60808faa0499",
    "trailing_newline": true
   },
   {
-   "bytes": 127579,
+   "bytes": 127585,
    "lf_only": true,
    "path": "paper/methods_ledger.md",
-   "sha256": "49bfb9119e7705503173517e318f8f7c465c6cf1e9f471b7337e11e20382c8a6",
+   "sha256": "83e8145e2bd9263405faa5f26a4fa77b2c738b85ea748b0f3c42e7e346b493f3",
    "trailing_newline": true
   },
   {
@@ -200,17 +200,17 @@
    "trailing_newline": true
   },
   {
-   "bytes": 194184,
+   "bytes": 198472,
    "lf_only": true,
    "path": "tests/test_study3_design.py",
-   "sha256": "47f6be69cebd6c9956b3c5b5b325542d676340080c8bb0dcc10c1bcc21dec323",
+   "sha256": "e0c937bf1136650474255d489e998500204691da5f51e8b1f83b0358780a1e66",
    "trailing_newline": true
   },
   {
-   "bytes": 38038,
+   "bytes": 38658,
    "lf_only": true,
    "path": "tests/test_study3_rendering_registry_v0_5.py",
-   "sha256": "186c034ecc07cf8ce1ddb1cfe965288a7ceac09043593ce9bb34431be2a09262",
+   "sha256": "c667f037c77d3da49ebd46b40e1563aaae0b48d547f00dda284991350986b307",
    "trailing_newline": true
   }
  ],
