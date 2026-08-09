@@ -10,7 +10,7 @@ model operations.
 |---|---|---|---|
 | [Study 1](study1/README.md) | Original J-space observation program, including Phase 0.5, Phase 1, S2 and frozen S3 E0 | `CLOSED` | `INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY`; original question not tested |
 | [Study 2](study2/README.md) | Single-forward behavioral and causal test of task-defined intermediate computation with base and instruction controls | `CLOSED` | `STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY`; the pre-registered development feasibility gate failed, the original question was not answered, and no mechanistic stage was ever opened |
-| [Study 3](study3/README.md) | Interface adequacy and label-binding calibration: whether a pre-specified response and scoring interface can recover deliberately trivial and primitive competence robustly across label permutations, option positions and renderings | `DESIGN DRAFT v0.3, AMENDED, UNFROZEN` | `STUDY3_DRAFT_V0_3_SECOND_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`; the first independent methods review returned `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED` with 6 blocking, 11 major and 3 minor findings, and draft-v0.3 is the operator amendment answering all 20; the drafting party does not claim the amended design is correct; nothing frozen, nothing authorized, every operation counter zero, no bank, no seed, no interface selected, no positive reference selected, no confirmation access authorized |
+| [Study 3](study3/README.md) | Interface adequacy and label-binding calibration: whether a pre-specified response and scoring interface can recover deliberately trivial and primitive competence at a registered joint-correctness level across registered label-permutation, option-position and rendering pairs | `DESIGN DRAFT v0.4, AMENDED, UNFROZEN` | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW`; the second independent methods review returned `STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED` with 2 blocking, 6 major and 2 minor findings, and draft-v0.4 is the operator amendment answering all 10 of them together with the 20 inherited findings and the 22 unresolved items; the drafting party does not claim the amended design is correct; nothing frozen, nothing authorized, every operation counter zero, no bank, no seed, no interface selected, no positive reference selected, no confirmation access authorized |
 
 Study 3's draft-v0.1 was reviewed by the operator, found to contain ten design
 defects, and refused freeze under
@@ -33,6 +33,17 @@ audit is in
 In draft-v0.2 the JSON protocol document is authoritative and the Markdown is a
 companion rendering of it, and the design-critical checks are committed
 artifacts rather than ephemeral scripts.
+
+draft-v0.4 is the second operator amendment round. It answers all ten findings of
+the second independent methods review (`S3MR2-001` through `S3MR2-010`) together
+with the twenty inherited findings and the twenty-two unresolved items, and it is
+recorded in
+[`study3/reviews/v0_4_operator_amendment.md`](study3/reviews/v0_4_operator_amendment.md).
+The review object for the third independent methods review is
+[`study3/analysis/independent_methods_review_packet_v0_4.md`](study3/analysis/independent_methods_review_packet_v0_4.md).
+**The drafting party does not claim draft-v0.4 is correct.** Every repair is
+recorded as `PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`, and both
+independent reviews remain valid rejections that were not edited.
 
 draft-v0.3 is the operator amendment round answering all 20 findings and all 22
 unresolved items; the finding-by-finding dispositions are in

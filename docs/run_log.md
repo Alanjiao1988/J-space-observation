@@ -6592,3 +6592,56 @@ remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`.
 
 The only legal next action is `OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_4`, followed by another
 independent methods review. No successor prompt is created in this round.
+
+
+## Study 3 draft-v0.4 operator amendment round
+
+**State after this round:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW`
+
+**Round:** `study3-design-v0-4`. **Base:** `bc98e5c98a2d4e273142c91497b7600ce751bade`.
+**Decision:** `D43`. **Method:** `M-31`. **Artifacts:** `AR-0251` onwards.
+
+### What was done
+
+draft-v0.4 answers all ten findings of the second independent methods review
+(`S3MR2-001` through `S3MR2-010`: 2 BLOCKING, 6 MAJOR, 2 MINOR), all twenty inherited
+first-review findings and all twenty-two unresolved items. The amendment record is
+`studies/study3/reviews/v0_4_operator_amendment.md` and the object for the next review is
+`studies/study3/analysis/independent_methods_review_packet_v0_4.md`.
+
+The `I3` estimand is narrowed to `J_joint_correct`, a level over a registered
+item-generating distribution, and invariance, equivalence and presentation-effect language
+is removed from every active claim. A binding sampling frame is registered for all 34
+sampling cells. The type-II architecture becomes an arbitrary-dependence union bound with
+`m_max = 43`, per-cell budget `19/17200`, per-cell target `17181/17200`, profile stage
+floor `381/400` and end-to-end floor `9/10`. Development sizes are re-derived as the
+smallest unrestricted positive integers meeting that target: `413`, `214` and `448`, with
+minimal pass counts `389/129/383` at `1/600` and `388/127/381` at `1/200`. Confirmation
+applicability becomes the intersection of a component's selectable profiles with the single
+selected profile. The `S4` diagnostic stream carries a derived, non-null forward cost. The
+state machine is total and deterministic and an `I0` failure maps only to
+`STOP_INSTRUMENT_DEFECT`.
+
+`studies/study3/analysis/design_statistics.py` was rewritten as a derivation engine: the
+protocol registers inputs, the script derives every adopted value with integer-only exact
+arithmetic, and `tests/test_study3_design.py` both re-derives the decision-bearing values a
+second time and audits the script's syntax tree for transcribed constants.
+
+### Boundary
+
+Zero model downloads, revision resolutions by download, tokenizer constructions,
+tokenizations, weight loads, forward passes, decode steps, sequence scorings, generations,
+activation extractions, hook installations, lens operations, probe fits, patching
+operations, ablation operations, provider calls, GPU jobs, bank rows or accesses, seeds,
+interface selections, positive-reference selections, result rows, scientific evidence rows,
+confirmation accesses, Phase 1.0D operations and RQ2 or Study 4 operations. Nothing is
+frozen, nothing is authorised, no interface is selected and no positive reference is
+selected. `OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`. The evidence-ledger tail
+remains `EV-0016`. Study 1 and Study 2 remain closed and untouched.
+
+No review artifact was edited. Both independent reviews remain valid rejections.
+
+**The drafting party does not claim draft-v0.4 is correct.** Every repair is recorded as
+`PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`. The only legal next action is a
+third bounded independent methods review of draft-v0.4, conducted in a fresh session by a
+party that did not draft it. No successor prompt is created in this round.

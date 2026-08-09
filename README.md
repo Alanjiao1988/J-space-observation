@@ -1,6 +1,6 @@
 # J-space observation
 
-本仓库研究 DeepSeek-R1 蒸馏小模型是否形成可观察、可干预、具有因果作用的内部推理状态。项目现已明确划分为三个相互隔离的研究：已经关闭的 **Study 1**，同样已经关闭的 **Study 2**（protocol v1 在前瞻注册的 development feasibility gate 上失败），以及新建的 **Study 3**（仅为设计草案，draft-v0.3，已完成 operator amendment round，**等待第二次 independent methods review**）。Study 1 与 Study 2 都没有回答各自的原始科学问题；Study 3 尚未执行任何测量。
+本仓库研究 DeepSeek-R1 蒸馏小模型是否形成可观察、可干预、具有因果作用的内部推理状态。项目现已明确划分为三个相互隔离的研究：已经关闭的 **Study 1**，同样已经关闭的 **Study 2**（protocol v1 在前瞻注册的 development feasibility gate 上失败），以及新建的 **Study 3**（仅为设计草案，draft-v0.4，已完成第二轮 operator amendment round，**等待第三次 independent methods review**）。Study 1 与 Study 2 都没有回答各自的原始科学问题；Study 3 尚未执行任何测量。
 
 ## 当前状态
 
@@ -8,13 +8,15 @@
 |---|---|---|---|
 | Study 1 | `CLOSED / INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY` | 工程链和证据封存完成，但原始科学问题未被检验 | [Study 1 总结](studies/study1/README.md) |
 | Study 2 | `CLOSED / STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY` | 前瞻注册的 Gate A 在 development 阶段失败；原始研究问题未被回答；B-C 与全部机制阶段从未打开 | [Study 2 终态清单](studies/study2/terminal_manifest.json) · [Study 2 终态 handoff](studies/study2/STUDY2_PROTOCOL_V1_TERMINAL_HANDOFF.md) |
-| Study 3 | `DESIGN DRAFT v0.3 AMENDED, UNFROZEN / STUDY3_DRAFT_V0_3_SECOND_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION` | 第一次独立 methods review 返回 `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`（6 BLOCKING、11 MAJOR、3 MINOR）；draft-v0.3 是对全部 20 项 finding 的 operator amendment，**起草方不宣称该设计正确**，每项修复均记为 `PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`；仍未冻结、未授权执行、operation counter 全为 0、无 bank、无 seed、未选定 interface、未选定 positive reference、未授权 confirmation 访问 | [Study 3 索引](studies/study3/README.md) · [**v0.3 amendment 记录**](studies/study3/reviews/v0_3_operator_amendment.md) · [第一次独立 methods review](studies/study3/reviews/v0_2_independent_methods_review.md) · [权威协议 JSON](studies/study3/protocol/interface_calibration_protocol_draft.json) · [**v0.3 review packet**](studies/study3/analysis/independent_methods_review_packet_v0_3.md) · [operator 决策](studies/study3/NEXT_THREAD_HANDOFF.md) |
+| Study 3 | `DESIGN DRAFT v0.4 AMENDED, UNFROZEN / STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW` | 第二次独立 methods review 返回 `STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`（2 BLOCKING、6 MAJOR、2 MINOR）；draft-v0.4 是对这 10 项 finding、20 项 inherited finding 与 22 项 unresolved item 的 operator amendment，**起草方不宣称该设计正确**，每项修复均记为 `PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`；仍未冻结、未授权执行、operation counter 全为 0、无 bank、无 seed、未选定 interface、未选定 positive reference、未授权 confirmation 访问 | [Study 3 索引](studies/study3/README.md) · [**v0.4 amendment 记录**](studies/study3/reviews/v0_4_operator_amendment.md) · [第二次独立 methods review](studies/study3/reviews/v0_3_independent_methods_review.md) · [权威协议 JSON](studies/study3/protocol/interface_calibration_protocol_draft.json) · [**v0.4 review packet**](studies/study3/analysis/independent_methods_review_packet_v0_4.md) · [operator 决策](studies/study3/NEXT_THREAD_HANDOFF.md) |
 
 Study 3 是一个**设计状态**，不是结果。它把「响应与打分接口」本身当作被测对象，因为 Study 1 与 Study 2 都在不同程度上终止于工具层面的问题。Study 3 未修改、未重开、未重新解释 Study 1 或 Study 2 的任何冻结产物，也没有复用它们的任何 item identity、bank row、template outcome、confirmation content、seed 或结果。
 
 draft-v0.1 曾提交 operator review，被判定存在**十项设计缺陷**并拒绝冻结（`STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`）。draft-v0.2 是相应的修订：JSON 文档成为**权威**记录，Markdown 仅为其渲染；设计关键校验从一次性脚本改为**已提交**的统计推导脚本与带负向变异用例的测试。修订过程中的模型自由推导推翻了 draft-v0.1 自己的一项断言——在 `n = 192`、目标 power 0.90 下，其所声称的 0.05 aggregate equivalence margin 在任何被测 discordance rate 下都不成立——因此 `OD6` 仍为 blocking，而不是通过放宽 margin 来迁就样本量。缺陷与处置见 [v0.1 operator review 记录](studies/study3/reviews/v0_1_operator_review.md)。
 
 draft-v0.2 随后提交 **bounded independent methods review**。审阅方未参与起草，从 Tango (1998)、Hsueh, Liu and Chen (2001)、Berger and Hsu (1996) 重新推导全部统计量，其实现不引用、不加载、不读取 `design_statistics.py`。结论为 `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`：共 20 项 finding（六项 BLOCKING、十一项 MAJOR、三项 MINOR）。其中 `I3` 主要 estimand 在已提交的 counterbalancing 构造下不可识别；Family B 声称的 per-profile alpha 与实际计算所用 alpha 不一致；四个 discordance 取值仅为 sensitivity grid，无法证明 size control。审阅复现了起草方的 `0.025501`，因此枚举本身正确，缺陷在于对它的断言。完整审阅见 [v0.2 independent methods review](studies/study3/reviews/v0_2_independent_methods_review.md)。
+
+draft-v0.4 是针对第二次独立 methods review 全部 10 项 finding 的 **operator amendment round**，其记录见 [v0.4 amendment 记录](studies/study3/reviews/v0_4_operator_amendment.md)。主要变更：`I3` 的判定指标收窄为 `J_joint_correct`（一个 level，而非 presentation contrast），并从全部 active claim 中删除 invariance / equivalence / presentation-effect 语言；为全部 34 个 sampling cell 注册 iid、有放回、精确有理权重的抽样框架，退役 `K5` 32 状态支撑集的确定性完全区组分配；type-II 结构改为任意相依下的 union bound（`m_max = 43`、per-cell `19/17200`、per-cell target `17181/17200`、profile stage `381/400`、end-to-end `9/10`）；样本量重新推导为满足 per-cell target 的最小正整数 `413 / 214 / 448`；confirmation 适用性改为可选 profile 与被选 profile 的交集；`S4` 诊断流补上非 null 的 forward 成本；状态机成为全函数且确定性的。
 
 draft-v0.3 是针对上述 20 项 finding 与 22 项 unresolved item 的 **operator amendment round**，其记录见 [v0.3 amendment 记录](studies/study3/reviews/v0_3_operator_amendment.md)。主要变更：
 
@@ -27,7 +29,7 @@ draft-v0.3 是针对上述 20 项 finding 与 22 项 unresolved item 的 **opera
 - **operation accounting 按六条 work stream 分解。** 在当前单 token 答案域下，`S3` 相对 `S2` 额外增加 **0** 次 forward pass 与 **0** 行 sequence scoring；禁止只给一个不加区分的总数。
 - **`OD2` 仍为 `UNRESOLVED_BLOCKING_OPERATOR_DECISION`。** 本轮未选定、未偏好、未 pin、未解析 revision、未下载、未 tokenize、未加载、未 prequalify 任何 positive reference checkpoint；dossier 一律记为 `UNSELECTED`，`UR-22` 保持 `UNRESOLVED_BLOCKING_OPERATOR_DECISION`。
 
-**起草方不宣称 draft-v0.3 正确。** draft-v0.2 曾被其起草方认为站得住脚，随后被独立审阅以六项 blocking finding 驳回；因此每项修复只记为 `PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`，判定权属于第二次独立 methods review。唯一合法的下一步动作就是这次审阅，其 review 对象为 [v0.3 review packet](studies/study3/analysis/independent_methods_review_packet_v0_3.md)。本轮不存在、也不得产生任何 freeze、`P3-Q`、bank、seed、model、GPU、development、confirmation 或机制执行 prompt。
+**起草方不宣称 draft-v0.4 正确。** draft-v0.3 曾被其起草方认为站得住脚，随后被第二次独立审阅以两项 blocking finding 驳回；因此每项修复只记为 `PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`，判定权属于第三次独立 methods review。唯一合法的下一步动作就是这次审阅，其 review 对象为 [v0.4 review packet](studies/study3/analysis/independent_methods_review_packet_v0_4.md)。本轮不存在、也不得产生任何 freeze、`P3-Q`、bank、seed、model、GPU、development、confirmation 或机制执行 prompt。
 
 Study 1 的终态基线是 commit `6409d2c6d665187e4459d94d490a20d7b085e8af`、tree `bc8b80cb0e66f9426dcdedd52b624c892caa3fc9`。旧文件保持原路径和原字节；新的 `studies/study1/` 只是索引层，不重写历史证据。
 

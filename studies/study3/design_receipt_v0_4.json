@@ -1,0 +1,466 @@
+{
+  "authority_flags": {
+    "bank_authorized": false,
+    "confirmation_access_authorized": false,
+    "execution_authorized": false,
+    "frozen": false,
+    "model_operations_authorized": false,
+    "positive_reference_selected": false,
+    "seed_authorized": false,
+    "self_approval_claimed": false,
+    "successor_authority_created": false,
+    "winner_selected": false
+  },
+  "authority_source": {
+    "bytes": 46543,
+    "committed_verbatim": true,
+    "lf_only": true,
+    "no_wrapper_header_or_trailing_commentary": true,
+    "path": "studies/study3/prompts/study3_v0_4_design_amendment_authority.md",
+    "sha256": "230c57f4bfb874ad724c9448e8cfc1e58b0ff5970159e6741ce61de8104cd173",
+    "trailing_newline": false
+  },
+  "boundary": {
+    "bank_rows": [],
+    "blocking_operator_decision": "OD2",
+    "evidence_rows": [],
+    "original_research_question": "UNANSWERED",
+    "results": [],
+    "seeds": [],
+    "study1_state": "INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY",
+    "study2_documentation_state": "STUDY2_PROTOCOL_V1_TERMINAL_DOCUMENTATION_COMPLETE",
+    "study2_scientific_state": "STUDY2_PROTOCOL_V1_CLOSED_ON_DEVELOPMENT_FEASIBILITY"
+  },
+  "disposition_status": "PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW",
+  "document_class": "design_receipt",
+  "immutable_objects_not_edited": [
+    {
+      "bytes": 100249,
+      "lf_only": true,
+      "path": "studies/study3/reviews/v0_3_independent_methods_review.md",
+      "sha256": "ab1b398e727e82a87f622b94d1384131c12a788f3ca569ae56be69f9cad4bf77",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 129226,
+      "lf_only": true,
+      "path": "studies/study3/reviews/v0_3_independent_methods_review.json",
+      "sha256": "eafe6e9476a858e047f4b046af29f43e4df8f529ae7c475e2e865043be2a3c10",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 32141,
+      "lf_only": true,
+      "path": "studies/study3/reviews/v0_3_independent_methods_review.schema.json",
+      "sha256": "395ef83e18e46dc168bbca84c1520fba734eb9f5ecc6d0f9c948bc5c8904973b",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 12191,
+      "lf_only": true,
+      "path": "studies/study3/methods_review_receipt_v0_3.json",
+      "sha256": "0578db45dd3d8af856b1d716863503d4f906d1dfeaec382b3db559e2400a2353",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 58317,
+      "lf_only": true,
+      "path": "studies/study3/analysis/independent_methods_recalculation_v0_3.py",
+      "sha256": "cb74c035a4a9271e11b4143d0cc32d42955613f4b28608305911ade30c7da688",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 66631,
+      "lf_only": true,
+      "path": "studies/study3/analysis/independent_methods_recalculation_tables_v0_3.json",
+      "sha256": "ea11c345b611c72120a2deb6abac6764bf2abe94653d100a2123d3db8250bace",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 40907,
+      "lf_only": true,
+      "path": "studies/study3/prompts/study3_v0_3_independent_methods_review_authority.md",
+      "sha256": "d58ec53b29846d26e3f4a7f1f45b4b8625a4d59147c9cd5f687f4f86d6f20e62",
+      "trailing_newline": false
+    },
+    {
+      "bytes": 34682,
+      "lf_only": true,
+      "path": "studies/study3/prompts/study3_v0_3_design_amendment_authority.md",
+      "sha256": "de85aeff25e827e49d3e7c60d517b50cc69649d66190995a804ab2bc44308667",
+      "trailing_newline": false
+    },
+    {
+      "bytes": 50720,
+      "lf_only": true,
+      "path": "studies/study3/reviews/v0_3_operator_amendment.md",
+      "sha256": "7d0014ff111974f13dca683e0cebf62f60a6b52e8f40c78bcfb90b3ebd2f7f96",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 46502,
+      "lf_only": true,
+      "path": "studies/study3/reviews/v0_3_operator_amendment.json",
+      "sha256": "29a1b33dde48d6969edea49fcc73e56003d5ebc24233883728a295b9ec265271",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 22608,
+      "lf_only": true,
+      "path": "studies/study3/reviews/v0_3_operator_amendment.schema.json",
+      "sha256": "a7411718527397fb8ea5177032cdcea1274e0fc6a2591b6bb052c50ecdae0edf",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 26342,
+      "lf_only": true,
+      "path": "studies/study3/design_receipt_v0_3.json",
+      "sha256": "9067313a671a318fbedc75b6c486bb55015dbb337d09690f73fddbd573dc9e27",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 29040,
+      "lf_only": true,
+      "path": "studies/study3/analysis/independent_methods_review_packet_v0_3.md",
+      "sha256": "62016c0f0512b616b5342e0a3be0e578dbeb4c97086b91e3618745e525aaa397",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 178888,
+      "lf_only": true,
+      "path": "studies/study3/reviews/v0_2_independent_methods_review.md",
+      "sha256": "b6df5690fc025bb0e705aafc4cf6ac2afa065af5fb3832c36b3d715c4ba062c5",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 257297,
+      "lf_only": true,
+      "path": "studies/study3/reviews/v0_2_independent_methods_review.json",
+      "sha256": "d90153d3a5796791a4afcf84555ecfc2b93754e6321c57377e7441091389a75e",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 32538,
+      "lf_only": true,
+      "path": "studies/study3/reviews/v0_2_independent_methods_review.schema.json",
+      "sha256": "20979a3e17dee64a805a203bd7f0aff52f583ea320f520afaddc567df0ecc7bd",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 93428,
+      "lf_only": true,
+      "path": "studies/study3/analysis/independent_methods_recalculation.py",
+      "sha256": "ec84af2458decc99e847e8f690d770510ea98a8c433c6567cb0c5ace459daa1e",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 242558,
+      "lf_only": true,
+      "path": "studies/study3/analysis/independent_methods_recalculation_tables.json",
+      "sha256": "6fc6297a125e0f9f10720c7da284f9b692f80eefa87beed87fa7cad8ad1fb590",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 16683,
+      "lf_only": true,
+      "path": "studies/study3/methods_review_receipt_v0_2.json",
+      "sha256": "afcb4324688ce05d8b450406266a1d1f49a56356f2ec3ccef8c1559d09e44de5",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 34624,
+      "lf_only": true,
+      "path": "studies/study3/prompts/study3_v0_2_independent_methods_review_authority.md",
+      "sha256": "ec207bb595490417078ec904c71f6bb1fda2035006dded8488a2f9071dad4968",
+      "trailing_newline": false
+    },
+    {
+      "bytes": 28113,
+      "lf_only": true,
+      "path": "studies/study3/analysis/independent_methods_review_packet.md",
+      "sha256": "d438b5c4b0008d6afc63cf77cb5ed0858ef958fe8f18acbf97f50c32f698c5e3",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 15303,
+      "lf_only": true,
+      "path": "studies/study3/reviews/v0_1_operator_review.md",
+      "sha256": "24e659d41588fe2b6239b7340a67516d13faf352147096313c04ef357cca8b54",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 60781,
+      "lf_only": true,
+      "path": "tests/test_study3_methods_review.py",
+      "sha256": "331d2a7644ee3256d7a145fa8ba83d0b02dcfd1faa1ed8989b726c1c656509ba",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 39843,
+      "lf_only": true,
+      "path": "tests/test_study3_methods_review_v0_3.py",
+      "sha256": "3e8b50610fc052123c9196a584364a4a10575ac8b7ea33c58a31a369d24f9c60",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 25241,
+      "lf_only": true,
+      "path": "paper/evidence_ledger.csv",
+      "sha256": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 96771,
+      "lf_only": true,
+      "path": "paper/limitations_ledger.md",
+      "sha256": "9bb8c2a32e584687b90b863b1087fc57ed4a131bc7f52b9d1f8104e19fa63715",
+      "trailing_newline": true
+    },
+    {
+      "bytes": 29677,
+      "lf_only": true,
+      "path": "paper/claim_evidence_matrix.md",
+      "sha256": "62c672daf3f0c48ab02d1f619b6bf986efa56d035c4aaf1500c41da80368d2f5",
+      "trailing_newline": true
+    }
+  ],
+  "next_legal_action": "a third bounded independent methods review of draft-v0.4, conducted in a fresh session by a party that did not draft draft-v0.4",
+  "operation_counters": {
+    "ablation_operations": 0,
+    "activation_extractions": 0,
+    "confirmation_accesses": 0,
+    "confirmation_bank_rows": 0,
+    "decode_steps": 0,
+    "development_bank_rows": 0,
+    "forward_passes": 0,
+    "generations": 0,
+    "gpu_jobs": 0,
+    "historical_test_modules_edited": 0,
+    "hook_installations": 0,
+    "immutable_revision_resolutions_by_download": 0,
+    "interfaces_selected": 0,
+    "lens_operations": 0,
+    "model_downloads": 0,
+    "model_weight_loads": 0,
+    "patching_operations": 0,
+    "phase_1_0d_operations": 0,
+    "positive_references_selected": 0,
+    "probe_fits": 0,
+    "provider_calls": 0,
+    "qualification_bank_rows": 0,
+    "result_rows": 0,
+    "review_artifacts_edited": 0,
+    "rq2_s4_operations": 0,
+    "scientific_evidence_rows": 0,
+    "seeds_consumed": 0,
+    "seeds_drawn": 0,
+    "seeds_revealed": 0,
+    "seeds_selected": 0,
+    "sequence_scorings": 0,
+    "study1_files_modified": 0,
+    "study2_files_modified": 0,
+    "task_bank_rows": 0,
+    "tokenizations": 0,
+    "tokenizer_constructions": 0
+  },
+  "path_sets": {
+    "final_independently_observed_changed_path_set": {
+      "expected_added": 6,
+      "expected_modified": 19,
+      "expected_total": 25,
+      "status": "TO_BE_VERIFIED_AT_PUBLICATION",
+      "verified_by": "an independent static audit of the published commit range against its merge base"
+    },
+    "note": "these three sets are deliberately distinct; the receipt never claims to have observed a commit that did not exist when it was written",
+    "observed_at_the_receipt_commit": [
+      {
+        "bytes": 390029,
+        "lf_only": true,
+        "path": "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "sha256": "6a89e02555a6e98b24fa6a5570ebab3bdee14eb9ae7346863246f2982a0f20cb",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 113490,
+        "lf_only": true,
+        "path": "studies/study3/protocol/interface_calibration_protocol_draft.md",
+        "sha256": "1d700b1e0a7a4990568aba954f48c8c42e3f5ac0a11ac7d7c24ab67382998f79",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 121676,
+        "lf_only": true,
+        "path": "studies/study3/protocol/interface_calibration_protocol.schema.json",
+        "sha256": "0743419b5e3d09b2ee88ef6ef61f29b605c4eeaafc3855426b21823ba2c10854",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 55893,
+        "lf_only": true,
+        "path": "studies/study3/analysis/design_statistics.py",
+        "sha256": "9348bd615b7d51959b97f3fdab9d1ba74ca55cdd49e37f09ef0bbb43f793469c",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 37108,
+        "lf_only": true,
+        "path": "studies/study3/analysis/design_statistics_tables.json",
+        "sha256": "96274e8c4eec3eac699a1cd0c53ea78beb29787e447a52de27c5749a69ae6985",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 14857,
+        "lf_only": true,
+        "path": "studies/study3/analysis/independent_methods_review_packet_v0_4.md",
+        "sha256": "2900615281d05dee6d346876b29130c950efbc17486f28e2437a378ade0142dc",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 23076,
+        "lf_only": true,
+        "path": "studies/study3/analysis/study2_to_study3_design_traceability.md",
+        "sha256": "9bce6a7b92b06beb981be0068dede3a3a9ba277b86bd0655bc5282e2970d72ab",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 23814,
+        "lf_only": true,
+        "path": "studies/study3/references/methods_sources.md",
+        "sha256": "99f9854dc167da6745a76563c187cb310dba258ce48c37a5a126cae4d4540319",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 13712,
+        "lf_only": true,
+        "path": "studies/study3/references/positive_reference_dossier.md",
+        "sha256": "578b35fbfdbc2e3874fca2ea5b5b90ee233690a261b0063f2e27456abe7fae2e",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 31287,
+        "lf_only": true,
+        "path": "studies/study3/reviews/v0_4_operator_amendment.md",
+        "sha256": "08d90c347e10c1a60bef142a18eab00d5643681cf828aa9e43bb5e104871ec59",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 38793,
+        "lf_only": true,
+        "path": "studies/study3/reviews/v0_4_operator_amendment.json",
+        "sha256": "88a8f86736792f93f9f5c126bea2645194814792b8226e4014283da6671ecb8f",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 8292,
+        "lf_only": true,
+        "path": "studies/study3/reviews/v0_4_operator_amendment.schema.json",
+        "sha256": "a34a168d06f8793133f86857447121d5318c65ecc9077953eaac4a4017bca0e3",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 46543,
+        "lf_only": true,
+        "path": "studies/study3/prompts/study3_v0_4_design_amendment_authority.md",
+        "sha256": "230c57f4bfb874ad724c9448e8cfc1e58b0ff5970159e6741ce61de8104cd173",
+        "trailing_newline": false
+      },
+      {
+        "bytes": 15697,
+        "lf_only": true,
+        "path": "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+        "sha256": "09f2ec24b3ab0a9ed27c9ebff1ddf6a747c629789981e4e797d8e332a3e25e5c",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 17436,
+        "lf_only": true,
+        "path": "studies/study3/README.md",
+        "sha256": "1f9b8de94d7bb201ee60657b521a782f1d10610b2ea59d538798518bb8e67d7f",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 30550,
+        "lf_only": true,
+        "path": "studies/study3/NEXT_THREAD_HANDOFF.md",
+        "sha256": "274017ce9ed3638a9ae8a6c526f97d187297338471ca2b549c5eb5ecc8b50064",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 162410,
+        "lf_only": true,
+        "path": "tests/test_study3_design.py",
+        "sha256": "596755be5341cbd794f1df1c698ba8a13ed98384b3b846dd3010da0ab855d862",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 16304,
+        "lf_only": true,
+        "path": "README.md",
+        "sha256": "b59c40b0e4b07335a17b5d191d1fee5cd98d17f0a6deb0dd7512a15dba151f0e",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 7045,
+        "lf_only": true,
+        "path": "studies/README.md",
+        "sha256": "2823a474ebeecae4de486dbd46c941e30182b7a3c0fa32006848a393d79ce1ba",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 139951,
+        "lf_only": true,
+        "path": "reports/current_status.md",
+        "sha256": "c332b4215984321a2bad3eb25c8e7a1f2c2436032f3cfaf39281cc5ba7341218",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 193533,
+        "lf_only": true,
+        "path": "docs/decision_log.md",
+        "sha256": "677156343cb675bf28188677c89cc60796eaec96f52ee4dae8165b9787cfa7f0",
+        "trailing_newline": true
+      },
+      {
+        "bytes": 121163,
+        "lf_only": true,
+        "path": "paper/methods_ledger.md",
+        "sha256": "420af1eadb6acfc05ea4cb859af2ac99a2290e0a691ffb1986e2cde4e97fc48e",
+        "trailing_newline": true
+      }
+    ],
+    "prospectively_declared_tail_paths": {
+      "paths": [
+        "paper/artifact_index.csv",
+        "docs/run_log.md",
+        "studies/study3/design_receipt_v0_4.json"
+      ],
+      "status": "DECLARED_NOT_OBSERVED",
+      "why": "the artifact index, the run log and this receipt are committed at or after the receipt commit, so their bytes are not observable here"
+    }
+  },
+  "provenance": {
+    "amended_from_draft": "draft-v0.3",
+    "amended_to_draft": "draft-v0.4",
+    "amendment_record": "studies/study3/reviews/v0_4_operator_amendment.json",
+    "base_commit_required_at_publication": "bc98e5c98a2d4e273142c91497b7600ce751bade",
+    "responds_to_review": "STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED",
+    "review_object_for_the_next_review": "studies/study3/analysis/independent_methods_review_packet_v0_4.md",
+    "review_published_at_commit": "bc98e5c98a2d4e273142c91497b7600ce751bade",
+    "reviewed_object_commit": "2b36f5321d830ea6f70fff2b7bbca3cb93394046"
+  },
+  "registries": {
+    "artifact_index_first_id": "AR-0251",
+    "decision_log_entry": "D43",
+    "evidence_ledger_tail_unchanged": "EV-0016",
+    "evidence_rows_added": 0,
+    "limitations_rows_added": 0,
+    "methods_ledger_entry": "M-31"
+  },
+  "round": "study3-design-v0-4",
+  "schema_version": "study3-design-receipt-v0-4",
+  "self_hash_prohibited": {
+    "the_receipt_does_not_hash_itself": true,
+    "why": "a self-hash is unverifiable: the digest would have to be known before the bytes that contain it exist"
+  },
+  "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW"
+}

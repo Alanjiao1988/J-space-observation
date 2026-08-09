@@ -3440,3 +3440,63 @@ This decision does not resolve `OD2`, does not select an interface or a positive
 does not freeze anything and authorizes no execution. The only legal successor action is
 `OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_4`, followed by a further independent methods
 review.
+
+## D43 - Amend Study 3 to draft-v0.4 in response to the second independent methods review, and publish it for a third independent methods review rather than declaring it correct
+
+**Date:** 2026-06 (repository time)
+**State after this decision:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW`
+
+The second independent methods review of Study 3 draft-v0.3 returned
+`STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED` with ten structured findings:
+`S3MR2-001` through `S3MR2-010`, comprising 2 BLOCKING, 6 MAJOR and 2 MINOR. This decision
+amends the design to draft-v0.4 and sends it to a THIRD independent methods review. It does
+not declare the amended design correct.
+
+**What was decided.**
+
+The gate-bearing `I3` indicator is narrowed to `J_joint_correct`, a level over a registered
+item-generating distribution, and every active claim field is stripped of invariance,
+equivalence and presentation-effect language. The design does not identify a presentation
+effect and no longer says that it does (`S3MR2-001`).
+
+A registered sampling frame is added. Within each gate-bearing atomic cell, base-item units
+or base-item contrast clusters are drawn independently and identically WITH replacement from
+a registered generator distribution with exact rational weights. Duplicates are legitimate
+and must be retained. The deterministic complete-block assignment of the 32-state `K5`
+nuisance support is retired in favour of iid draws at exact weight `1/32` per state, and the
+requirement that `n` be a multiple of 32 is retired with it (`S3MR2-007`, `S3MR2-010`).
+
+The type-II architecture is re-registered as an arbitrary-dependence union bound over exact
+rationals. The per-stage profile false-negative budget is `19/400`; dividing by the derived
+maximum gate-bearing cell count over the selectable profiles, `m_max = 43`, gives a per-cell
+budget of `19/17200` and a per-cell power target of `17181/17200`. The profile stage power
+floor is `381/400` and the study end-to-end power floor is `9/10`. No binding bound assumes
+independence between cells (`S3MR2-002`).
+
+Every development sample size is re-derived as the smallest unrestricted positive integer
+meeting that per-cell target: `n = 413` for the `I1/I3` joint-correctness floor, `n = 214`
+for the `I2` headroom floor and `n = 448` for the `I4` positive-reference floor. The
+draft-v0.3 sizes `256` and `128` are withdrawn from every active field (`S3MR2-003`).
+
+Confirmation applicability becomes the intersection of a component's registered selectable
+profiles with the single profile selected on the development split, so `S4` can never appear
+and `I1b` and `K5` are confined to `S1` (`S3MR2-004`). The `S4` diagnostic stream now carries
+a derived, non-null forward cost (`S3MR2-005`). The state machine is registered as total and
+deterministic, with an `I0` failure mapping only to `STOP_INSTRUMENT_DEFECT` (`S3MR2-006`).
+The `I0` fixture accounting is reconstructed from a registered breakdown (`S3MR2-008`), and
+the binding ordering constraint `P3Q >= 19/20 > I4 p1 = 9/10 > I4 p0 = 4/5` is registered
+without selecting any positive reference (`S3MR2-009`).
+
+**What was not decided.**
+
+`OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`. No positive reference, checkpoint,
+model revision, tokenizer or wrapper is selected, preferred, pinned, downloaded or
+prequalified. No interface profile is selected. Nothing is frozen, no execution is
+authorised, no seed exists, no bank exists and no confirmation content exists. The original
+research question remains unanswered.
+
+**Self-approval is prohibited.** Every repair is recorded as
+`PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`. Both independent reviews
+remain valid rejections and neither was edited. The only legal successor action is a third
+bounded independent methods review of draft-v0.4, conducted in a fresh session by a party
+that did not draft draft-v0.4.

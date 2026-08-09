@@ -1,5 +1,48 @@
 # Study 3 - Interface Adequacy and Label-Binding Calibration
 
+> **DRAFT-V0.4 OPERATOR AMENDMENT COMPLETE - AWAITING THE THIRD INDEPENDENT METHODS REVIEW**
+>
+> State: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW`
+>
+> draft-v0.4 answers all ten findings of the second independent methods review
+> (`S3MR2-001` through `S3MR2-010`: 2 BLOCKING, 6 MAJOR, 2 MINOR), together with the twenty
+> inherited first-review findings and the twenty-two unresolved items. The record is
+> `reviews/v0_4_operator_amendment.md`; the review object is
+> `analysis/independent_methods_review_packet_v0_4.md`.
+>
+> **The drafting party does not claim draft-v0.4 is correct.** Every repair is recorded as
+> `PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`. Both independent reviews remain valid
+> rejections and neither was edited.
+>
+> Principal changes. The gate-bearing `I3` indicator is `J_joint_correct`, a level over a
+> registered item-generating distribution, and no active claim asserts invariance, equivalence
+> or an absent presentation effect. A binding sampling frame registers iid draws WITH
+> replacement from exact-rational generator distributions in all 34 sampling cells, retires the
+> deterministic complete-block assignment of the 32-state `K5` support in favour of iid draws at
+> weight `1/32`, and requires duplicates to be retained. The type-II architecture becomes an
+> arbitrary-dependence union bound: per-cell budget `19/17200`, per-cell target `17181/17200`,
+> profile stage floor `381/400`, study end-to-end floor `9/10`, with `m_max = 43` derived over
+> the selectable profiles only. Development sizes are re-derived as the smallest unrestricted
+> positive integers meeting that target: `413`, `214` and `448`. Confirmation applicability
+> becomes the intersection of a component's selectable profiles with the single selected
+> profile, so `S4` never appears and `I1b` and `K5` are confined to `S1`. The `S4` diagnostic
+> stream carries a derived, non-null forward cost. The state machine is total and deterministic
+> and an `I0` failure maps only to `STOP_INSTRUMENT_DEFECT`.
+>
+> The only legal next action is a **third** bounded independent methods review of draft-v0.4,
+> conducted in a fresh session by a party that did not draft it. **Not a freeze. Not `P3-Q`.
+> Not a bank, a seed, model execution, a development round, a confirmation access or any
+> mechanistic work.**
+>
+> `OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`: no positive reference is selected,
+> preferred, pinned, revision-resolved, downloaded, tokenized, loaded or prequalified.
+> draft-v0.4 registers only the binding ordering constraint
+> `P3Q >= 19/20 > I4 p1 = 9/10 > I4 p0 = 4/5`.
+>
+> Study 3 remains unfrozen. No interface or positive reference is selected. No bank, seed, model
+> operation, gate result, confirmation access or evidence row exists. Every operation counter is
+> zero. The original research question remains unanswered.
+
 > **SECOND INDEPENDENT METHODS REVIEW COMPLETE - AMENDMENT REQUIRED**
 >
 > State: `STUDY3_DRAFT_V0_3_SECOND_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`
@@ -61,6 +104,12 @@ or J-lens is valid. Whether Study 2's Gate A should have passed.
 | `protocol/interface_calibration_protocol_draft.md` | companion rendering of the authoritative JSON |
 | `protocol/interface_calibration_protocol.schema.json` | fail-closed structural schema for the JSON |
 | `reviews/v0_1_operator_review.md` | the ten draft-v0.1 defects and their v0.2 resolutions |
+| `reviews/v0_4_operator_amendment.md` | **the draft-v0.4 amendment record: all 10 second-review findings, all 20 inherited findings and all 22 unresolved items** |
+| `reviews/v0_4_operator_amendment.json` | authoritative machine-readable form of the draft-v0.4 amendment record |
+| `reviews/v0_4_operator_amendment.schema.json` | fail-closed schema for the draft-v0.4 amendment record |
+| `analysis/independent_methods_review_packet_v0_4.md` | **the review object for the third independent methods review** |
+| `prompts/study3_v0_4_design_amendment_authority.md` | the operator authority for the draft-v0.4 amendment round, committed verbatim |
+| `design_receipt_v0_4.json` | committed-blob receipt for the draft-v0.4 round |
 | `reviews/v0_3_operator_amendment.md` | **the draft-v0.3 amendment record: all 20 findings and all 22 unresolved items** |
 | `reviews/v0_3_operator_amendment.json` | authoritative machine-readable form of the amendment record |
 | `reviews/v0_3_operator_amendment.schema.json` | fail-closed schema for the amendment record |

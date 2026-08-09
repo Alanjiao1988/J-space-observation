@@ -1,5 +1,57 @@
 # Project Status Report
 
+> **Study 3 draft-v0.4 operator amendment round - 2026-08-10**
+>
+> **Study 3 state:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW`
+>
+> draft-v0.4 is the operator amendment answering the ten findings of the second
+> independent methods review. It is published for a **third** independent methods
+> review and is not declared correct. Every repair is recorded as
+> `PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`.
+>
+> **What changed.** The `I3` estimand is narrowed to `J_joint_correct`, a level over a
+> registered item-generating distribution, and invariance, equivalence and
+> presentation-effect language is removed from every active claim, gate question,
+> `what_fails` clause, validation-target construct and claim ceiling. A binding
+> sampling frame is registered for all 34 sampling cells: iid draws WITH replacement
+> from exact-rational generator distributions whose weights sum to one, deterministic
+> pre-model validity predicates, a registered rejection probability of exactly `0`,
+> outcome-blind disjoint split namespaces, retained duplicates, and explicit
+> cross-role, cross-profile and cross-cell dependence. The 32-state `K5` nuisance
+> support is drawn iid at exact weight `1/32` and the deterministic complete-block
+> assignment, with its multiple-of-32 sample-size restriction, is retired.
+>
+> The type-II architecture is re-registered as an arbitrary-dependence union bound.
+> With `m_max = 43` derived over the selectable profiles only, the per-stage profile
+> budget `19/400` gives a per-cell budget of `19/17200`, a per-cell power target of
+> `17181/17200`, a profile stage power floor of `381/400` and a study end-to-end floor
+> of `9/10`. No binding bound assumes independence. Development sizes are re-derived as
+> the smallest unrestricted positive integers meeting the per-cell target: `n = 413`
+> for the `I1/I3` joint-correctness floor, `n = 214` for the `I2` headroom floor and
+> `n = 448` for the `I4` positive-reference floor, with minimal pass counts
+> `389/129/383` at `1/600` and `388/127/381` at `1/200`. The draft-v0.3 sizes `256` and
+> `128` are withdrawn from every active field.
+>
+> Confirmation applicability becomes the intersection of a component's registered
+> selectable profiles with the single selected profile, so `S4` can never appear and
+> `I1b` and `K5` are confined to `S1`. The `S4` diagnostic stream carries a derived,
+> non-null forward cost: `26,064` generation calls, `26,064` prefill evaluations,
+> `390,960` incremental decode evaluations and a `417,024` sequence-evaluation upper
+> bound at the registered 16-token generation bound. The state machine is total and
+> deterministic, every registered terminal state is reachable, no event carries two
+> next states, and an `I0` failure maps only to `STOP_INSTRUMENT_DEFECT`. The `I0`
+> fixture accounting reconstructs `232` clusters, `232` base items, `464` cluster rows,
+> `38` non-cluster rows and `502` rows in total. No grand total is published, because
+> the unresolved `P3-Q` stream is `null` and not zero.
+>
+> **Boundary.** Nothing is frozen and no execution is authorised. Every operation
+> counter is exactly zero. No bank, seed, model operation, gate result, confirmation
+> access, result row or evidence row exists. The evidence-ledger tail remains `EV-0016`.
+> `OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION` and no positive reference is
+> selected; draft-v0.4 registers only the binding ordering constraint
+> `P3Q >= 19/20 > I4 p1 = 9/10 > I4 p0 = 4/5`. Study 1 and Study 2 remain closed and
+> untouched. The original research question remains unanswered.
+
 > **Study 3 draft-v0.3 SECOND independent methods review - 2026-08-09**
 >
 > **Study 3 state:** `STUDY3_DRAFT_V0_3_SECOND_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`

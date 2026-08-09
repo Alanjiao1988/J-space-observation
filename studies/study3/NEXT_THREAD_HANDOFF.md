@@ -1,5 +1,35 @@
 # Study 3 - next thread handoff
 
+**State: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW`**
+
+**Draft version: `draft-v0.4`, amended, unfrozen, awaiting the THIRD independent
+methods review.**
+
+draft-v0.4 is the operator amendment answering the ten findings of the second
+independent methods review (`S3MR2-001` through `S3MR2-010`: 2 BLOCKING, 6 MAJOR,
+2 MINOR), together with the twenty inherited first-review findings and the twenty-two
+unresolved items. The record is `reviews/v0_4_operator_amendment.md` and the review
+object is `analysis/independent_methods_review_packet_v0_4.md`.
+
+**The drafting party does not claim draft-v0.4 is correct.** Every repair is recorded
+as `PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`. Both independent reviews remain
+valid rejections and neither was edited.
+
+**The only legal next action is a THIRD bounded independent methods review of
+draft-v0.4, conducted in a fresh session by a party that did not draft it. Not a
+freeze. Not `P3-Q`. Not a bank, a seed, model execution, a development round, a
+confirmation access or any mechanistic work.**
+
+`OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`. No positive reference is
+selected, preferred, pinned, revision-resolved, downloaded, tokenized, loaded or
+prequalified. draft-v0.4 registers only the binding ordering constraint
+`P3Q >= 19/20 > I4 p1 = 9/10 > I4 p0 = 4/5`.
+
+**Section 11 records the draft-v0.4 operator amendment round and supersedes any
+earlier section where they disagree.**
+
+---
+
 **State:
 `STUDY3_DRAFT_V0_3_SECOND_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`**
 
@@ -448,3 +478,39 @@ Questions the drafting party puts to that reviewer:
 No freeze prompt, no `P3-Q` prompt, no bank prompt, no seed prompt, no model
 prompt, no GPU prompt, no development prompt, no confirmation prompt and no
 mechanistic-execution prompt exists, and none may be produced by this round.
+
+
+## 11. The draft-v0.4 operator amendment round - outcome
+
+This round answered the second independent methods review and published an amended,
+**still unfrozen** draft for a third independent methods review. It selected nothing,
+froze nothing, authorised nothing and measured nothing.
+
+| finding | severity | repair |
+| --- | --- | --- |
+| `S3MR2-001` | BLOCKING | the gate indicator becomes `J_joint_correct`, an explicit level over the registered item-generating distribution; invariance, equivalence and presentation-effect language is removed from every active claim field and the per-profile claim ceiling is made exact |
+| `S3MR2-002` | BLOCKING | an arbitrary-dependence union-bound type-II architecture with `m_max = 43`, per-cell budget `19/17200`, per-cell target `17181/17200`, profile stage floor `381/400` and end-to-end floor `9/10`, each with an explicit scope label |
+| `S3MR2-003` | MAJOR | every development size re-derived as the smallest unrestricted positive integer meeting the per-cell target: `413`, `214`, `448`, with minimal pass counts `389/129/383` and `388/127/381` |
+| `S3MR2-004` | MAJOR | confirmation applicability becomes the intersection of a component's selectable profiles with the single selected profile; `S4` never appears and `I1b` and `K5` are confined to `S1` |
+| `S3MR2-005` | MAJOR | the `S4` diagnostic stream carries a derived forward cost: `26,064` generation calls and prefills, `390,960` incremental decode evaluations and a `417,024` sequence-evaluation upper bound |
+| `S3MR2-006` | MAJOR | a total, deterministic state machine with one next state per event, every terminal reachable, and an `I0` failure mapping only to `STOP_INSTRUMENT_DEFECT` |
+| `S3MR2-007` | MAJOR | the 32-state `K5` support is drawn iid with replacement at exact weight `1/32`; the deterministic complete-block assignment and the multiple-of-32 size restriction are retired |
+| `S3MR2-008` | MAJOR | the `I0` fixture accounting is reconstructed from a registered breakdown: `232` clusters, `232` base items, `464` cluster rows, `38` non-cluster rows, `502` total |
+| `S3MR2-009` | MINOR | the binding ordering constraint `P3Q >= 19/20 > I4 p1 = 9/10 > I4 p0 = 4/5` is registered without selecting any candidate |
+| `S3MR2-010` | MINOR | a binding sampling frame for all 34 sampling cells licenses the exact-binomial estimand in every gate-bearing atomic cell |
+
+The four first-review findings the second reviewer marked `PARTIALLY_RESOLVED`
+(`S3MR-002`, `S3MR-013`, `S3MR-014`, `S3MR-017`) are proposed fully resolved only through
+the corresponding draft-v0.4 repair and remain review-pending.
+
+**Preserved without repair.** The second review's `disposition_basis` sentence says
+"Two BLOCKING and eight MAJOR methods defects remain" while its structured findings are
+2 BLOCKING, 6 MAJOR and 2 MINOR. That mismatch is recorded as
+`NON_DISPOSITIVE_HISTORICAL_NARRATIVE_COUNT_MISMATCH`. The review is **not** edited, and
+the narrative MAJOR count is never propagated as the structured finding count.
+
+**Boundary.** Every operation counter is exactly zero. No bank, seed, model operation,
+gate result, confirmation access, result row or evidence row exists. Nothing is frozen
+and no execution is authorised. The evidence-ledger tail remains `EV-0016`. Study 1 and
+Study 2 remain closed and untouched, and the original research question remains
+unanswered.

@@ -2049,3 +2049,40 @@ bytes is never treated as validation.
 **Modes.** `--emit` writes the canonical committed tables; `--check` recomputes and compares
 them. No network, model, tokenizer, bank, seed, split, result or prior-evidence access
 occurs in either mode.
+
+## M-31 - Derivation method for Study 3 draft-v0.4
+
+`M-30` recorded the independent recalculation that rejected draft-v0.3. This entry records
+how draft-v0.4's design parameters are produced.
+
+**Registered inputs, not adopted outputs.** The protocol JSON registers only inputs: the
+null and alternative rationals per gate family, the component alphas `1/600` and `1/200`,
+the per-stage profile false-negative budget `19/400`, the panel budget `1/200`, the
+selectable-profile denominator `3`, the atomic cell structure, the registered target roles,
+operation families and composition depths, the `K5` nuisance support, the `I0` fixture
+breakdown, the `S4` generated-token bound and the sample-size search ceiling.
+
+**Derivation.** `studies/study3/analysis/design_statistics.py` derives every adopted value
+from those inputs with integer-only exact arithmetic over a common denominator: the maximum
+gate-bearing cell count over the selectable profiles, the per-cell budget and target, the
+profile-stage and end-to-end floors, the minimal sample sizes, the minimal pass counts, the
+exact null tails and powers, the sixteen-case `J_joint_correct` outcome lattice, the
+sixteen-row profile-eligibility subtable, the total state machine and every operation
+projection. Its `--check` mode recomputes all nineteen emitted sections and compares them
+value for value.
+
+**Anti-transcription.** No adopted output appears as a reachable literal in the derivation
+script. `tests/test_study3_design.py` parses the script's syntax tree, removes docstring
+nodes as prose, and asserts that no derived size, pass count, tail, power, cell total or
+registered budget rational occurs as a reachable numeric or string constant. The same test
+module recomputes the six threshold rows a second time, from the protocol's registered
+rationals, with its own independent integer tail arithmetic, and asserts minimality of both
+the sizes and the pass counts.
+
+**Bounds.** The union bound is stated and checked to hold under arbitrary dependence between
+cells; independence-based products may be reported only as an explicitly labelled sensitivity
+analysis and never as a binding bound. The registered least-favourable configuration and the
+uncovered indifference region are published with the guarantee.
+
+**Status.** These are proposed design parameters, not measurements. Nothing here is frozen
+or authorised, and the method is subject to the third independent methods review.
