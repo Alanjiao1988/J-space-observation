@@ -60,10 +60,10 @@
    "trailing_newline": true
   },
   {
-   "bytes": 71209,
+   "bytes": 75322,
    "lf_only": true,
    "path": "paper/artifact_index.csv",
-   "sha256": "d817869b4fd71a45648f626f641b49e2ef36de7158ec16c68dcec85b2ba87d37",
+   "sha256": "4c40515b8860c79c953653e16e409561467d01ce95024c480fefface575b9d09",
    "trailing_newline": true
   },
   {
@@ -88,24 +88,24 @@
    "trailing_newline": true
   },
   {
-   "bytes": 37486,
+   "bytes": 38699,
    "lf_only": true,
    "path": "studies/study3/NEXT_THREAD_HANDOFF.md",
-   "sha256": "f9386da1993b0bdf4ac7e142dcdb3ea7df3ca4ad42389b40ee0efb513f254b1d",
+   "sha256": "3a1458dab89b06bf0692f3ef7e20f3757a325ba19823a509490f641765f597f1",
    "trailing_newline": true
   },
   {
-   "bytes": 20272,
+   "bytes": 21485,
    "lf_only": true,
    "path": "studies/study3/README.md",
-   "sha256": "4a3ba19000cae90b6870ac420210178fb9b0578cdab244e020356a0f1a769ab5",
+   "sha256": "2597da52ae46380b7b71ca84217d686f2e2a6005bd612fce8ad28751587a76a9",
    "trailing_newline": true
   },
   {
-   "bytes": 15697,
+   "bytes": 16565,
    "lf_only": true,
    "path": "studies/study3/RESEARCH_CHARTER_DRAFT.md",
-   "sha256": "09f2ec24b3ab0a9ed27c9ebff1ddf6a747c629789981e4e797d8e332a3e25e5c",
+   "sha256": "97000edb21b81e4f3aaf84edcc9c4986647ee4934cc283ecd28c8d6d1f16ece2",
    "trailing_newline": true
   },
   {
@@ -200,10 +200,10 @@
    "trailing_newline": true
   },
   {
-   "bytes": 191882,
+   "bytes": 194184,
    "lf_only": true,
    "path": "tests/test_study3_design.py",
-   "sha256": "27335c9544f4c28b48810a6ebec5e45266ea2872b9ed55f919d180b0a84bfcca",
+   "sha256": "47f6be69cebd6c9956b3c5b5b325542d676340080c8bb0dcc10c1bcc21dec323",
    "trailing_newline": true
   },
   {
