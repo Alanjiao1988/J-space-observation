@@ -311,8 +311,24 @@ def _labels_and_contents(registry, position, symbol_index, alphabet_index):
 # Registry integrity
 # --------------------------------------------------------------------------
 
+def _design_module():
+    """Load the committed design test module by path.
+
+    Importing it by name depends on the collection root being on sys.path, which
+    is not guaranteed in a clean clone. The schema validator lives there and is
+    reused here rather than duplicated, so that one validator governs both
+    documents.
+    """
+    import importlib.util
+    path = os.path.join(REPO_ROOT, "tests", "test_study3_design.py")
+    spec = importlib.util.spec_from_file_location("study3_design_module", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def test_the_registry_validates_against_its_committed_schema(registry, registry_schema):
-    from test_study3_design import schema_errors
+    schema_errors = _design_module().schema_errors
     assert schema_errors(registry, registry_schema) == []
 
 

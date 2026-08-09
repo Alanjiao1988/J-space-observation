@@ -1729,6 +1729,79 @@ def test_development_sample_sizes_are_the_smallest_meeting_the_target(
         e["n"] for e in recomputed.values())
 
 
+def test_the_local_power_nonmonotonicity_is_independently_reproduced(
+        protocol, tables, recomputed):
+    """S3MR3-007. The disclosed failing sizes are recomputed here, not trusted.
+
+    This recomputation uses only the registered exact rational inputs. It imports
+    no expected numeric value from the protocol or from the generated table, and
+    it must reproduce the published failing sizes exactly.
+    """
+    statistics = protocol["proposed_statistics"]
+    target = _rational(statistics["target_power"]["exact_rational"])
+    alpha = _rational(statistics["development_component_alpha_exact_rational"])
+    window = statistics["local_power_nonmonotonicity_disclosure_window"]
+    assert window >= 1
+    assert statistics["local_power_nonmonotonicity"]["disclosure_window"] == window
+
+    published = {row["gate_family"]: row["local_power_nonmonotonicity"]
+                 for row in tables["development_exact_binomial_components"]}
+    for family, expected in recomputed.items():
+        n, p0, p1 = expected["n"], expected["p0"], expected["p1"]
+        failing = []
+        for probe in range(n + 1, n + window + 1):
+            count = _smallest_controlling_count(probe, p0, alpha)
+            if count is None or count >= probe:
+                failing.append(probe)
+                continue
+            if _upper_tail(probe, count, p1) < target:
+                failing.append(probe)
+        row = published[family]
+        assert row["failing_sizes_within_the_disclosure_window"] == failing, family
+        assert row["disclosure_window_size"] == window
+        # Non-vacuous: the target genuinely fails again above the registered size.
+        assert failing, family
+        assert row["target_is_monotone_within_the_disclosure_window"] is False, family
+        assert row["execution_must_use_the_exact_registered_cell_size"] is True
+        assert row["at_least_n_interpretation_prohibited"] is True
+        # The registered minimum still meets the target, so exact n is executable.
+        count = _smallest_controlling_count(n, p0, alpha)
+        assert count < n and _upper_tail(n, count, p1) >= target, family
+    disclosure = statistics["local_power_nonmonotonicity"]
+    assert disclosure["at_least_n_interpretation_prohibited"] is True
+    assert disclosure["eventual_monotonicity_threshold_registered"] is False
+
+
+def test_the_confirmation_component_applicability_is_independently_reproduced(
+        protocol, tables):
+    """S3MR3-002. Recomputed from the truth table, not read from the table."""
+    truth = {row["profile"]: row for row in protocol["gate_truth_table"]["rows"]}
+    selectable = sorted(p for p, row in truth.items() if row["selectable"])
+    assert selectable == ["S1", "S2", "S3"]
+    expected = {}
+    for gate in ("I1a", "I1b", "I2", "I4"):
+        expected[gate] = [p for p in selectable if truth[p][gate] == "applicable"]
+    for contrast in protocol["i3_contrast_registry"]["k5_contrast_ids"]:
+        expected["I3/" + contrast] = [
+            p for p in selectable if truth[p]["I3_K5"][contrast] == "applicable"]
+    for contrast in protocol["i3_contrast_registry"]["k6_contrast_ids"]:
+        expected["I3/" + contrast] = [
+            p for p in selectable if truth[p]["I3_K6"][contrast] == "applicable"]
+
+    published = {row["component"]: row["applicable_profiles"]
+                 for row in tables["confirmation_component_applicability"]["components"]}
+    assert published == expected, set(published) ^ set(expected)
+    for component, profiles in published.items():
+        assert "S4" not in profiles, component
+    rule = protocol["proposed_statistics"]["confirmation_applicability_rule"]
+    assert rule["i1b_confirmation_profiles"] == expected["I1b"]
+    assert rule["k6_sep_confirmation_profiles"] == expected["I3/K6-SEP"]
+    assert rule["k6_instr_confirmation_profiles"] == expected["I3/K6-INSTR"]
+    for contrast in protocol["i3_contrast_registry"]["k5_contrast_ids"]:
+        assert rule["per_contrast_confirmation_profiles"][contrast] == \
+            expected["I3/" + contrast], contrast
+
+
 def test_pass_counts_are_minimal_at_their_alphas(protocol, recomputed):
     """S3MR2-003. One unit lower would breach the registered level."""
     for family, expected in recomputed.items():
@@ -1777,7 +1850,7 @@ DERIVED_SIZES = (413, 214, 448)
 DERIVED_PASS_COUNTS = (389, 129, 383, 388, 127, 381)
 DERIVED_TAILS = (0.001664632930, 0.001597676081, 0.001620609599,
                  0.003020762720, 0.003765544908, 0.003582895662)
-DERIVED_CELL_TOTALS = (43, 33543, 3584, 27856, 26064, 417024, 390960, 502)
+DERIVED_CELL_TOTALS = (43, 31065, 3584, 27856, 26064, 417024, 390960, 502)
 FORBIDDEN_LITERAL_STRINGS = ("17181/17200", "19/17200", "381/400", "9/10 end")
 
 
@@ -2013,7 +2086,10 @@ def test_operation_totals_derive_from_n_and_cell_counts(protocol, tables,
     assert development["S3_incremental_sequence_evaluations"] == 0
     assert len(development["S3_zero_incremental_cost_holds_only_under"]) >= 3
     expected_development = rendered_rows("S1") + rendered_rows("S2")
-    assert development["scored_rows"] == expected_development == 33543
+    # S3MR3-001: S2 loses its three K6-SEP evaluation cells, so the development
+    # stream falls from 33,543 scored rows to 31,065. The value is recomputed
+    # from the amended census above and is not carried over.
+    assert development["scored_rows"] == expected_development == 31065
     assert development["total_sequence_level_model_evaluation_equivalents"] == \
         expected_development
     assert len(development["model_roles"]) == roles
