@@ -1,0 +1,1923 @@
+{
+  "admissible_sample_size_searches": {
+    "I1a_confirmation": {
+      "admissible_grid_searched": [
+        64,
+        96,
+        128,
+        160,
+        192,
+        224,
+        256
+      ],
+      "balancing_divisor": 32,
+      "grid": [
+        {
+          "degenerate_rejection_region": true,
+          "exact_power_at_p1": "0.142360987885",
+          "meets_target_power": false,
+          "n": 64,
+          "pass_count": 64
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.447482425781",
+          "meets_target_power": false,
+          "n": 96,
+          "pass_count": 94
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.660555477578",
+          "meets_target_power": false,
+          "n": 128,
+          "pass_count": 124
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.793388237920",
+          "meets_target_power": false,
+          "n": 160,
+          "pass_count": 154
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.874249967958",
+          "meets_target_power": false,
+          "n": 192,
+          "pass_count": 184
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.960766898001",
+          "meets_target_power": true,
+          "n": 224,
+          "pass_count": 213
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.976290353246",
+          "meets_target_power": true,
+          "n": 256,
+          "pass_count": 243
+        }
+      ],
+      "smallest_admissible_n_meeting_target": 224,
+      "smallest_admissible_pass_count": 213,
+      "smallest_admissible_power": "0.960766898001",
+      "smallest_unrestricted_n_meeting_target": 181,
+      "smallest_unrestricted_pass_count": 173
+    },
+    "I1a_development": {
+      "admissible_grid_searched": [
+        64,
+        96,
+        128,
+        160,
+        192,
+        224,
+        256,
+        288
+      ],
+      "balancing_divisor": 32,
+      "grid": [
+        {
+          "degenerate_rejection_region": true,
+          "exact_power_at_p1": "0.142360987885",
+          "meets_target_power": false,
+          "n": 64,
+          "pass_count": 64
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.213194248782",
+          "meets_target_power": false,
+          "n": 96,
+          "pass_count": 95
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.462738721884",
+          "meets_target_power": false,
+          "n": 128,
+          "pass_count": 125
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.651556882997",
+          "meets_target_power": false,
+          "n": 160,
+          "pass_count": 155
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.778820445886",
+          "meets_target_power": false,
+          "n": 192,
+          "pass_count": 185
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.860962046157",
+          "meets_target_power": false,
+          "n": 224,
+          "pass_count": 215
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.953040775212",
+          "meets_target_power": true,
+          "n": 256,
+          "pass_count": 244
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.971170030904",
+          "meets_target_power": true,
+          "n": 288,
+          "pass_count": 274
+        }
+      ],
+      "smallest_admissible_n_meeting_target": 256,
+      "smallest_admissible_pass_count": 244,
+      "smallest_admissible_power": "0.953040775212",
+      "smallest_unrestricted_n_meeting_target": 227,
+      "smallest_unrestricted_pass_count": 217
+    },
+    "I1b_confirmation": {
+      "admissible_grid_searched": [
+        64,
+        96,
+        128,
+        160,
+        192,
+        224,
+        256
+      ],
+      "balancing_divisor": 32,
+      "grid": [
+        {
+          "degenerate_rejection_region": true,
+          "exact_power_at_p1": "0.142360987885",
+          "meets_target_power": false,
+          "n": 64,
+          "pass_count": 64
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.447482425781",
+          "meets_target_power": false,
+          "n": 96,
+          "pass_count": 94
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.660555477578",
+          "meets_target_power": false,
+          "n": 128,
+          "pass_count": 124
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.793388237920",
+          "meets_target_power": false,
+          "n": 160,
+          "pass_count": 154
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.874249967958",
+          "meets_target_power": false,
+          "n": 192,
+          "pass_count": 184
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.960766898001",
+          "meets_target_power": true,
+          "n": 224,
+          "pass_count": 213
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.976290353246",
+          "meets_target_power": true,
+          "n": 256,
+          "pass_count": 243
+        }
+      ],
+      "smallest_admissible_n_meeting_target": 224,
+      "smallest_admissible_pass_count": 213,
+      "smallest_admissible_power": "0.960766898001",
+      "smallest_unrestricted_n_meeting_target": 181,
+      "smallest_unrestricted_pass_count": 173
+    },
+    "I1b_development": {
+      "admissible_grid_searched": [
+        64,
+        96,
+        128,
+        160,
+        192,
+        224,
+        256,
+        288
+      ],
+      "balancing_divisor": 32,
+      "grid": [
+        {
+          "degenerate_rejection_region": true,
+          "exact_power_at_p1": "0.142360987885",
+          "meets_target_power": false,
+          "n": 64,
+          "pass_count": 64
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.213194248782",
+          "meets_target_power": false,
+          "n": 96,
+          "pass_count": 95
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.462738721884",
+          "meets_target_power": false,
+          "n": 128,
+          "pass_count": 125
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.651556882997",
+          "meets_target_power": false,
+          "n": 160,
+          "pass_count": 155
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.778820445886",
+          "meets_target_power": false,
+          "n": 192,
+          "pass_count": 185
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.860962046157",
+          "meets_target_power": false,
+          "n": 224,
+          "pass_count": 215
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.953040775212",
+          "meets_target_power": true,
+          "n": 256,
+          "pass_count": 244
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.971170030904",
+          "meets_target_power": true,
+          "n": 288,
+          "pass_count": 274
+        }
+      ],
+      "smallest_admissible_n_meeting_target": 256,
+      "smallest_admissible_pass_count": 244,
+      "smallest_admissible_power": "0.953040775212",
+      "smallest_unrestricted_n_meeting_target": 227,
+      "smallest_unrestricted_pass_count": 217
+    },
+    "I2_confirmation": {
+      "admissible_grid_searched": [
+        32,
+        64,
+        96,
+        128,
+        160
+      ],
+      "balancing_divisor": 32,
+      "grid": [
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.343979059915",
+          "meets_target_power": false,
+          "n": 32,
+          "pass_count": 24
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.738273005289",
+          "meets_target_power": false,
+          "n": 64,
+          "pass_count": 43
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.896492043305",
+          "meets_target_power": false,
+          "n": 96,
+          "pass_count": 62
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.972425828510",
+          "meets_target_power": true,
+          "n": 128,
+          "pass_count": 80
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.995550056638",
+          "meets_target_power": true,
+          "n": 160,
+          "pass_count": 97
+        }
+      ],
+      "smallest_admissible_n_meeting_target": 128,
+      "smallest_admissible_pass_count": 80,
+      "smallest_admissible_power": "0.972425828510",
+      "smallest_unrestricted_n_meeting_target": 92,
+      "smallest_unrestricted_pass_count": 59
+    },
+    "I2_development": {
+      "admissible_grid_searched": [
+        32,
+        64,
+        96,
+        128,
+        160
+      ],
+      "balancing_divisor": 32,
+      "grid": [
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.211767767215",
+          "meets_target_power": false,
+          "n": 32,
+          "pass_count": 25
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.539792134486",
+          "meets_target_power": false,
+          "n": 64,
+          "pass_count": 45
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.852181118560",
+          "meets_target_power": false,
+          "n": 96,
+          "pass_count": 63
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.938986365033",
+          "meets_target_power": true,
+          "n": 128,
+          "pass_count": 82
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.988879441721",
+          "meets_target_power": true,
+          "n": 160,
+          "pass_count": 99
+        }
+      ],
+      "smallest_admissible_n_meeting_target": 128,
+      "smallest_admissible_pass_count": 82,
+      "smallest_admissible_power": "0.938986365033",
+      "smallest_unrestricted_n_meeting_target": 110,
+      "smallest_unrestricted_pass_count": 71
+    },
+    "I3_confirmation": {
+      "admissible_grid_searched": [
+        64,
+        96,
+        128,
+        160,
+        192,
+        224,
+        256
+      ],
+      "balancing_divisor": 32,
+      "grid": [
+        {
+          "degenerate_rejection_region": true,
+          "exact_power_at_p1": "0.142360987885",
+          "meets_target_power": false,
+          "n": 64,
+          "pass_count": 64
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.447482425781",
+          "meets_target_power": false,
+          "n": 96,
+          "pass_count": 94
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.660555477578",
+          "meets_target_power": false,
+          "n": 128,
+          "pass_count": 124
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.793388237920",
+          "meets_target_power": false,
+          "n": 160,
+          "pass_count": 154
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.874249967958",
+          "meets_target_power": false,
+          "n": 192,
+          "pass_count": 184
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.960766898001",
+          "meets_target_power": true,
+          "n": 224,
+          "pass_count": 213
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.976290353246",
+          "meets_target_power": true,
+          "n": 256,
+          "pass_count": 243
+        }
+      ],
+      "smallest_admissible_n_meeting_target": 224,
+      "smallest_admissible_pass_count": 213,
+      "smallest_admissible_power": "0.960766898001",
+      "smallest_unrestricted_n_meeting_target": 181,
+      "smallest_unrestricted_pass_count": 173
+    },
+    "I3_development": {
+      "admissible_grid_searched": [
+        64,
+        96,
+        128,
+        160,
+        192,
+        224,
+        256,
+        288
+      ],
+      "balancing_divisor": 32,
+      "grid": [
+        {
+          "degenerate_rejection_region": true,
+          "exact_power_at_p1": "0.142360987885",
+          "meets_target_power": false,
+          "n": 64,
+          "pass_count": 64
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.213194248782",
+          "meets_target_power": false,
+          "n": 96,
+          "pass_count": 95
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.462738721884",
+          "meets_target_power": false,
+          "n": 128,
+          "pass_count": 125
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.651556882997",
+          "meets_target_power": false,
+          "n": 160,
+          "pass_count": 155
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.778820445886",
+          "meets_target_power": false,
+          "n": 192,
+          "pass_count": 185
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.860962046157",
+          "meets_target_power": false,
+          "n": 224,
+          "pass_count": 215
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.953040775212",
+          "meets_target_power": true,
+          "n": 256,
+          "pass_count": 244
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.971170030904",
+          "meets_target_power": true,
+          "n": 288,
+          "pass_count": 274
+        }
+      ],
+      "smallest_admissible_n_meeting_target": 256,
+      "smallest_admissible_pass_count": 244,
+      "smallest_admissible_power": "0.953040775212",
+      "smallest_unrestricted_n_meeting_target": 227,
+      "smallest_unrestricted_pass_count": 217
+    },
+    "I4_confirmation": {
+      "admissible_grid_searched": [
+        32,
+        64,
+        96,
+        128,
+        160,
+        192,
+        224,
+        256
+      ],
+      "balancing_divisor": 32,
+      "grid": [
+        {
+          "degenerate_rejection_region": true,
+          "exact_power_at_p1": "0.034336838203",
+          "meets_target_power": false,
+          "n": 32,
+          "pass_count": 32
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.220468904160",
+          "meets_target_power": false,
+          "n": 64,
+          "pass_count": 60
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.504785294624",
+          "meets_target_power": false,
+          "n": 96,
+          "pass_count": 87
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.701983017556",
+          "meets_target_power": false,
+          "n": 128,
+          "pass_count": 114
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.823512167778",
+          "meets_target_power": false,
+          "n": 160,
+          "pass_count": 141
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.895950400158",
+          "meets_target_power": false,
+          "n": 192,
+          "pass_count": 168
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.938680486614",
+          "meets_target_power": true,
+          "n": 224,
+          "pass_count": 195
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.963820467515",
+          "meets_target_power": true,
+          "n": 256,
+          "pass_count": 222
+        }
+      ],
+      "smallest_admissible_n_meeting_target": 224,
+      "smallest_admissible_pass_count": 195,
+      "smallest_admissible_power": "0.938680486614",
+      "smallest_unrestricted_n_meeting_target": 191,
+      "smallest_unrestricted_pass_count": 167
+    },
+    "I4_development": {
+      "admissible_grid_searched": [
+        32,
+        64,
+        96,
+        128,
+        160,
+        192,
+        224,
+        256,
+        288
+      ],
+      "balancing_divisor": 32,
+      "grid": [
+        {
+          "degenerate_rejection_region": true,
+          "exact_power_at_p1": "0.034336838203",
+          "meets_target_power": false,
+          "n": 32,
+          "pass_count": 32
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.106291182529",
+          "meets_target_power": false,
+          "n": 64,
+          "pass_count": 61
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.369302128639",
+          "meets_target_power": false,
+          "n": 96,
+          "pass_count": 88
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.480533326554",
+          "meets_target_power": false,
+          "n": 128,
+          "pass_count": 116
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.664480965502",
+          "meets_target_power": false,
+          "n": 160,
+          "pass_count": 143
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.789930350919",
+          "meets_target_power": false,
+          "n": 192,
+          "pass_count": 170
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.870641123356",
+          "meets_target_power": false,
+          "n": 224,
+          "pass_count": 197
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.921083514878",
+          "meets_target_power": true,
+          "n": 256,
+          "pass_count": 224
+        },
+        {
+          "degenerate_rejection_region": false,
+          "exact_power_at_p1": "0.967593734668",
+          "meets_target_power": true,
+          "n": 288,
+          "pass_count": 250
+        }
+      ],
+      "smallest_admissible_n_meeting_target": 256,
+      "smallest_admissible_pass_count": 224,
+      "smallest_admissible_power": "0.921083514878",
+      "smallest_unrestricted_n_meeting_target": 233,
+      "smallest_unrestricted_pass_count": 204
+    }
+  },
+  "authority_flags": {
+    "bank_authorized": false,
+    "confirmation_access_authorized": false,
+    "execution_authorized": false,
+    "frozen": false,
+    "model_operations_authorized": false,
+    "positive_reference_selected": false,
+    "seed_authorized": false,
+    "winner_selected": false
+  },
+  "development_selection_map": {
+    "denominator_is_constant_3": true,
+    "denominator_values_observed": [
+      3
+    ],
+    "enumerated_states": 16,
+    "map_is_deterministic_one_legal_next_state": true,
+    "map_is_total_over_enumerated_inputs": true,
+    "registered_order": [
+      "S2",
+      "S3",
+      "S1"
+    ],
+    "rows": [
+      {
+        "eligible_and_applicable_in_registered_order": [],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "STOP_NO_SELECTABLE_INTERFACE_REMAINS",
+        "passed_S1": false,
+        "passed_S2": false,
+        "passed_S3": false,
+        "s3_multi_token_activated": false,
+        "selected_profile": null,
+        "stop": true
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "STOP_NO_SELECTABLE_INTERFACE_REMAINS",
+        "passed_S1": false,
+        "passed_S2": false,
+        "passed_S3": true,
+        "s3_multi_token_activated": false,
+        "selected_profile": null,
+        "stop": true
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S2"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S2",
+        "passed_S1": false,
+        "passed_S2": true,
+        "passed_S3": false,
+        "s3_multi_token_activated": false,
+        "selected_profile": "S2",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S2"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S2",
+        "passed_S1": false,
+        "passed_S2": true,
+        "passed_S3": true,
+        "s3_multi_token_activated": false,
+        "selected_profile": "S2",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S1"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S1",
+        "passed_S1": true,
+        "passed_S2": false,
+        "passed_S3": false,
+        "s3_multi_token_activated": false,
+        "selected_profile": "S1",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S1"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S1",
+        "passed_S1": true,
+        "passed_S2": false,
+        "passed_S3": true,
+        "s3_multi_token_activated": false,
+        "selected_profile": "S1",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S2",
+          "S1"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S2",
+        "passed_S1": true,
+        "passed_S2": true,
+        "passed_S3": false,
+        "s3_multi_token_activated": false,
+        "selected_profile": "S2",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S2",
+          "S1"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S2",
+        "passed_S1": true,
+        "passed_S2": true,
+        "passed_S3": true,
+        "s3_multi_token_activated": false,
+        "selected_profile": "S2",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "STOP_NO_SELECTABLE_INTERFACE_REMAINS",
+        "passed_S1": false,
+        "passed_S2": false,
+        "passed_S3": false,
+        "s3_multi_token_activated": true,
+        "selected_profile": null,
+        "stop": true
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S3"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S3",
+        "passed_S1": false,
+        "passed_S2": false,
+        "passed_S3": true,
+        "s3_multi_token_activated": true,
+        "selected_profile": "S3",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S2"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S2",
+        "passed_S1": false,
+        "passed_S2": true,
+        "passed_S3": false,
+        "s3_multi_token_activated": true,
+        "selected_profile": "S2",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S2",
+          "S3"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S2",
+        "passed_S1": false,
+        "passed_S2": true,
+        "passed_S3": true,
+        "s3_multi_token_activated": true,
+        "selected_profile": "S2",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S1"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S1",
+        "passed_S1": true,
+        "passed_S2": false,
+        "passed_S3": false,
+        "s3_multi_token_activated": true,
+        "selected_profile": "S1",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S3",
+          "S1"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S3",
+        "passed_S1": true,
+        "passed_S2": false,
+        "passed_S3": true,
+        "s3_multi_token_activated": true,
+        "selected_profile": "S3",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S2",
+          "S1"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S2",
+        "passed_S1": true,
+        "passed_S2": true,
+        "passed_S3": false,
+        "s3_multi_token_activated": true,
+        "selected_profile": "S2",
+        "stop": false
+      },
+      {
+        "eligible_and_applicable_in_registered_order": [
+          "S2",
+          "S3",
+          "S1"
+        ],
+        "fixed_selectable_profile_denominator": 3,
+        "next_state": "ENTER_CONFIRMATION_WITH_S2",
+        "passed_S1": true,
+        "passed_S2": true,
+        "passed_S3": true,
+        "s3_multi_token_activated": true,
+        "selected_profile": "S2",
+        "stop": false
+      }
+    ],
+    "s3_selectable_without_multi_token_authority": false,
+    "stop_states": 3
+  },
+  "exact_binomial_recalculation": {
+    "confirmation": {
+      "I1a": {
+        "alpha_exact_rational": "1/200",
+        "degenerate_rejection_region": false,
+        "exact_null_tail_at_p0": "0.003307722347",
+        "exact_null_tail_at_p0_rational": "264617787760913877840069969682216414326216275560429098092726187873742881889669159732952508190262322940167893341020051894832872557627624550543497879473611750523426779590417236314196646837226158876093852607810580101961195179637329983465846942633301886389/80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "exact_power_at_p1": "0.976290353246",
+        "exact_power_at_p1_9dp": "0.976290353",
+        "gate": "I1a",
+        "independent_unit": "base_item",
+        "independently_derived_pass_count": 243,
+        "meets_target_power": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.9",
+        "null_tail_at_pass_count_minus_one": "0.006810986291",
+        "p0_exact_rational": "9/10",
+        "p1_exact_rational": "97/100",
+        "pass_count_is_minimal_at_alpha": true,
+        "registered_null_tail_rounds_to_independent": null,
+        "registered_pass_count_matches": null,
+        "registered_power_rounds_to_independent": null,
+        "size_is_at_or_below_alpha": true,
+        "split": "confirmation",
+        "unit_of_n": "base items per atomic cell"
+      },
+      "I1b": {
+        "alpha_exact_rational": "1/200",
+        "degenerate_rejection_region": false,
+        "exact_null_tail_at_p0": "0.003307722347",
+        "exact_null_tail_at_p0_rational": "264617787760913877840069969682216414326216275560429098092726187873742881889669159732952508190262322940167893341020051894832872557627624550543497879473611750523426779590417236314196646837226158876093852607810580101961195179637329983465846942633301886389/80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "exact_power_at_p1": "0.976290353246",
+        "exact_power_at_p1_9dp": "0.976290353",
+        "gate": "I1b",
+        "independent_unit": "base_item",
+        "independently_derived_pass_count": 243,
+        "meets_target_power": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.9",
+        "null_tail_at_pass_count_minus_one": "0.006810986291",
+        "p0_exact_rational": "9/10",
+        "p1_exact_rational": "97/100",
+        "pass_count_is_minimal_at_alpha": true,
+        "registered_null_tail_rounds_to_independent": null,
+        "registered_pass_count_matches": null,
+        "registered_power_rounds_to_independent": null,
+        "size_is_at_or_below_alpha": true,
+        "split": "confirmation",
+        "unit_of_n": "base items per atomic cell"
+      },
+      "I2": {
+        "alpha_exact_rational": "1/200",
+        "degenerate_rejection_region": false,
+        "exact_null_tail_at_p0": "0.002962603303",
+        "exact_null_tail_at_p0_rational": "1008121664319070533864957670526556173/340282366920938463463374607431768211456",
+        "exact_power_at_p1": "0.972425828510",
+        "exact_power_at_p1_9dp": "0.972425829",
+        "gate": "I2",
+        "independent_unit": "base_item",
+        "independently_derived_pass_count": 80,
+        "meets_target_power": true,
+        "n": 128,
+        "null_hypothesis": "p <= 0.5",
+        "null_tail_at_pass_count_minus_one": "0.005045069905",
+        "p0_exact_rational": "1/2",
+        "p1_exact_rational": "7/10",
+        "pass_count_is_minimal_at_alpha": true,
+        "registered_null_tail_rounds_to_independent": null,
+        "registered_pass_count_matches": null,
+        "registered_power_rounds_to_independent": null,
+        "size_is_at_or_below_alpha": true,
+        "split": "confirmation",
+        "unit_of_n": "base items per primitive-family cell"
+      },
+      "I3": {
+        "alpha_exact_rational": "1/200",
+        "degenerate_rejection_region": false,
+        "exact_null_tail_at_p0": "0.003307722347",
+        "exact_null_tail_at_p0_rational": "264617787760913877840069969682216414326216275560429098092726187873742881889669159732952508190262322940167893341020051894832872557627624550543497879473611750523426779590417236314196646837226158876093852607810580101961195179637329983465846942633301886389/80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "exact_power_at_p1": "0.976290353246",
+        "exact_power_at_p1_9dp": "0.976290353",
+        "gate": "I3",
+        "independent_unit": "base_item_contrast_cluster",
+        "independently_derived_pass_count": 243,
+        "meets_target_power": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.9",
+        "null_tail_at_pass_count_minus_one": "0.006810986291",
+        "p0_exact_rational": "9/10",
+        "p1_exact_rational": "97/100",
+        "pass_count_is_minimal_at_alpha": true,
+        "registered_null_tail_rounds_to_independent": null,
+        "registered_pass_count_matches": null,
+        "registered_power_rounds_to_independent": null,
+        "size_is_at_or_below_alpha": true,
+        "split": "confirmation",
+        "unit_of_n": "base-item contrast clusters per contrast cell"
+      },
+      "I4": {
+        "alpha_exact_rational": "1/200",
+        "degenerate_rejection_region": false,
+        "exact_null_tail_at_p0": "0.003276850097",
+        "exact_null_tail_at_p0_rational": "90558175254300653389732090504678583757221243121677621500590896192252654458925515794084601326631645838469167627383938393970375778142088455487456487341565683669340756956413952/27635739376302222801236325960961278627571201166196100432075851104539493770119766585508824011111322324993751340627678923510384316629862229419689612086585839278995990753173828125",
+        "exact_power_at_p1": "0.963820467515",
+        "exact_power_at_p1_9dp": "0.963820468",
+        "gate": "I4",
+        "independent_unit": "base_item",
+        "independently_derived_pass_count": 222,
+        "meets_target_power": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.8",
+        "null_tail_at_pass_count_minus_one": "0.005439755625",
+        "p0_exact_rational": "4/5",
+        "p1_exact_rational": "9/10",
+        "pass_count_is_minimal_at_alpha": true,
+        "registered_null_tail_rounds_to_independent": null,
+        "registered_pass_count_matches": null,
+        "registered_power_rounds_to_independent": null,
+        "size_is_at_or_below_alpha": true,
+        "split": "confirmation",
+        "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
+      }
+    },
+    "development": {
+      "I1a": {
+        "alpha_exact_rational": "1/600",
+        "degenerate_rejection_region": false,
+        "exact_null_tail_at_p0": "0.001491215117",
+        "exact_null_tail_at_p0_rational": "23859441867854545705814061554428396286489560898732982799515737151631722345685235441678942906483827882742350673791529828662202566949710469629346639060163478832100797572277726852968750056212405159002948793319955974854228786714708461341590788588840018161/16000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "exact_power_at_p1": "0.953040775212",
+        "exact_power_at_p1_9dp": "0.953040775",
+        "gate": "I1a",
+        "independent_unit": "base_item",
+        "independently_derived_pass_count": 244,
+        "meets_target_power": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.9",
+        "null_tail_at_pass_count_minus_one": "0.003307722347",
+        "p0_exact_rational": "9/10",
+        "p1_exact_rational": "97/100",
+        "pass_count_is_minimal_at_alpha": true,
+        "registered_null_tail_rounds_to_independent": true,
+        "registered_pass_count": 244,
+        "registered_pass_count_matches": true,
+        "registered_power_rounds_to_independent": true,
+        "size_is_at_or_below_alpha": true,
+        "split": "development",
+        "unit_of_n": "base items per atomic cell"
+      },
+      "I1b": {
+        "alpha_exact_rational": "1/600",
+        "degenerate_rejection_region": false,
+        "exact_null_tail_at_p0": "0.001491215117",
+        "exact_null_tail_at_p0_rational": "23859441867854545705814061554428396286489560898732982799515737151631722345685235441678942906483827882742350673791529828662202566949710469629346639060163478832100797572277726852968750056212405159002948793319955974854228786714708461341590788588840018161/16000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "exact_power_at_p1": "0.953040775212",
+        "exact_power_at_p1_9dp": "0.953040775",
+        "gate": "I1b",
+        "independent_unit": "base_item",
+        "independently_derived_pass_count": 244,
+        "meets_target_power": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.9",
+        "null_tail_at_pass_count_minus_one": "0.003307722347",
+        "p0_exact_rational": "9/10",
+        "p1_exact_rational": "97/100",
+        "pass_count_is_minimal_at_alpha": true,
+        "registered_null_tail_rounds_to_independent": true,
+        "registered_pass_count": 244,
+        "registered_pass_count_matches": true,
+        "registered_power_rounds_to_independent": true,
+        "size_is_at_or_below_alpha": true,
+        "split": "development",
+        "unit_of_n": "base items per atomic cell"
+      },
+      "I2": {
+        "alpha_exact_rational": "1/600",
+        "degenerate_rejection_region": false,
+        "exact_null_tail_at_p0": "0.000931234262",
+        "exact_null_tail_at_p0_rational": "316882598882113230035517072925736773/340282366920938463463374607431768211456",
+        "exact_power_at_p1": "0.938986365033",
+        "exact_power_at_p1_9dp": "0.938986365",
+        "gate": "I2",
+        "independent_unit": "base_item",
+        "independently_derived_pass_count": 82,
+        "meets_target_power": true,
+        "n": 128,
+        "null_hypothesis": "p <= 0.5",
+        "null_tail_at_pass_count_minus_one": "0.001687092510",
+        "p0_exact_rational": "1/2",
+        "p1_exact_rational": "7/10",
+        "pass_count_is_minimal_at_alpha": true,
+        "registered_null_tail_rounds_to_independent": true,
+        "registered_pass_count": 82,
+        "registered_pass_count_matches": true,
+        "registered_power_rounds_to_independent": true,
+        "size_is_at_or_below_alpha": true,
+        "split": "development",
+        "unit_of_n": "base items per primitive-family cell"
+      },
+      "I3": {
+        "alpha_exact_rational": "1/600",
+        "degenerate_rejection_region": false,
+        "exact_null_tail_at_p0": "0.001491215117",
+        "exact_null_tail_at_p0_rational": "23859441867854545705814061554428396286489560898732982799515737151631722345685235441678942906483827882742350673791529828662202566949710469629346639060163478832100797572277726852968750056212405159002948793319955974854228786714708461341590788588840018161/16000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "exact_power_at_p1": "0.953040775212",
+        "exact_power_at_p1_9dp": "0.953040775",
+        "gate": "I3",
+        "independent_unit": "base_item_contrast_cluster",
+        "independently_derived_pass_count": 244,
+        "meets_target_power": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.9",
+        "null_tail_at_pass_count_minus_one": "0.003307722347",
+        "p0_exact_rational": "9/10",
+        "p1_exact_rational": "97/100",
+        "pass_count_is_minimal_at_alpha": true,
+        "registered_null_tail_rounds_to_independent": true,
+        "registered_pass_count": 244,
+        "registered_pass_count_matches": true,
+        "registered_power_rounds_to_independent": true,
+        "size_is_at_or_below_alpha": true,
+        "split": "development",
+        "unit_of_n": "base-item contrast clusters per contrast cell"
+      },
+      "I4": {
+        "alpha_exact_rational": "1/600",
+        "degenerate_rejection_region": false,
+        "exact_null_tail_at_p0": "0.001081002486",
+        "exact_null_tail_at_p0_rational": "746857574273292533841662418566993108342861641974530807482315067960230987628888970088358002434823425525263959155609289644127031614207749708798822097299914337978776830143889408/690893484407555570030908149024031965689280029154902510801896277613487344252994164637720600277783058124843783515691973087759607915746555735492240302164645981974899768829345703125",
+        "exact_power_at_p1": "0.921083514878",
+        "exact_power_at_p1_9dp": "0.921083515",
+        "gate": "I4",
+        "independent_unit": "base_item",
+        "independently_derived_pass_count": 224,
+        "meets_target_power": true,
+        "n": 256,
+        "null_hypothesis": "p <= 0.8",
+        "null_tail_at_pass_count_minus_one": "0.001912855620",
+        "p0_exact_rational": "4/5",
+        "p1_exact_rational": "9/10",
+        "pass_count_is_minimal_at_alpha": true,
+        "registered_null_tail_rounds_to_independent": true,
+        "registered_pass_count": 224,
+        "registered_pass_count_matches": true,
+        "registered_power_rounds_to_independent": true,
+        "size_is_at_or_below_alpha": true,
+        "split": "development",
+        "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
+      }
+    }
+  },
+  "exact_rational_levels": {
+    "confirmation_component_alpha": "1/200",
+    "development_component_alpha": "1/600",
+    "exact_reconstruction_component_times_denominator_equals_study": true,
+    "fixed_selectable_profile_denominator": 3,
+    "study_development_screening_alpha": "1/200",
+    "target_power": "9/10"
+  },
+  "gate_bearing_cell_counts": {
+    "S1": {
+      "I1a_cells": 3,
+      "I1b_cells": 3,
+      "I2_cells": 6,
+      "I3_K5_cells": 21,
+      "I3_K6_cells": 6,
+      "I3_cells": 27,
+      "I4_cells": 4,
+      "cells_at_n128_p0_0_5": 6,
+      "cells_at_n256_p0_0_8": 4,
+      "cells_at_n256_p0_0_9": 33,
+      "label_bearing": true,
+      "total_gate_bearing_cells": 43
+    },
+    "S2": {
+      "I1a_cells": 3,
+      "I1b_cells": 0,
+      "I2_cells": 6,
+      "I3_K5_cells": 0,
+      "I3_K6_cells": 6,
+      "I3_cells": 6,
+      "I4_cells": 4,
+      "cells_at_n128_p0_0_5": 6,
+      "cells_at_n256_p0_0_8": 4,
+      "cells_at_n256_p0_0_9": 9,
+      "label_bearing": false,
+      "total_gate_bearing_cells": 19
+    },
+    "S3": {
+      "I1a_cells": 3,
+      "I1b_cells": 0,
+      "I2_cells": 6,
+      "I3_K5_cells": 0,
+      "I3_K6_cells": 6,
+      "I3_cells": 6,
+      "I4_cells": 4,
+      "cells_at_n128_p0_0_5": 6,
+      "cells_at_n256_p0_0_8": 4,
+      "cells_at_n256_p0_0_9": 9,
+      "label_bearing": false,
+      "total_gate_bearing_cells": 19
+    },
+    "S4": {
+      "I1a_cells": 3,
+      "I1b_cells": 3,
+      "I2_cells": 6,
+      "I3_K5_cells": 21,
+      "I3_K6_cells": 6,
+      "I3_cells": 27,
+      "I4_cells": 0,
+      "cells_at_n128_p0_0_5": 6,
+      "cells_at_n256_p0_0_8": 0,
+      "cells_at_n256_p0_0_9": 33,
+      "label_bearing": true,
+      "total_gate_bearing_cells": 39
+    }
+  },
+  "generator": "studies/study3/analysis/independent_methods_recalculation_v0_3.py",
+  "i3_construction_laws": {
+    "correct_content_carries_the_intended_symbol": true,
+    "exactly_one_correct_content_per_render": true,
+    "k5_all_contrasts_are_one_factor": true,
+    "k5_block_is_a_complete_replicate": true,
+    "k5_complete_block_size": 32,
+    "k5_contrast_count": 7,
+    "k5_contrast_ids": [
+      "K5-P1",
+      "K5-P2",
+      "K5-P3",
+      "K5-S1",
+      "K5-S2",
+      "K5-S3",
+      "K5-A1"
+    ],
+    "k5_every_baseline_condition_occurs_exactly_once_per_block": true,
+    "k5_one_factor_rows": [
+      {
+        "changes_exactly_one_registered_factor": true,
+        "contrast_id": "K5-P1",
+        "distinct_change_signatures": 1,
+        "variants_per_cluster": 2,
+        "varied_factor": "content_position"
+      },
+      {
+        "changes_exactly_one_registered_factor": true,
+        "contrast_id": "K5-P2",
+        "distinct_change_signatures": 1,
+        "variants_per_cluster": 2,
+        "varied_factor": "content_position"
+      },
+      {
+        "changes_exactly_one_registered_factor": true,
+        "contrast_id": "K5-P3",
+        "distinct_change_signatures": 1,
+        "variants_per_cluster": 2,
+        "varied_factor": "content_position"
+      },
+      {
+        "changes_exactly_one_registered_factor": true,
+        "contrast_id": "K5-S1",
+        "distinct_change_signatures": 1,
+        "variants_per_cluster": 2,
+        "varied_factor": "correct_symbol_index"
+      },
+      {
+        "changes_exactly_one_registered_factor": true,
+        "contrast_id": "K5-S2",
+        "distinct_change_signatures": 1,
+        "variants_per_cluster": 2,
+        "varied_factor": "correct_symbol_index"
+      },
+      {
+        "changes_exactly_one_registered_factor": true,
+        "contrast_id": "K5-S3",
+        "distinct_change_signatures": 1,
+        "variants_per_cluster": 2,
+        "varied_factor": "correct_symbol_index"
+      },
+      {
+        "changes_exactly_one_registered_factor": true,
+        "contrast_id": "K5-A1",
+        "distinct_change_signatures": 1,
+        "variants_per_cluster": 2,
+        "varied_factor": "label_alphabet"
+      }
+    ],
+    "k5_x_k6_cross_product_cells": 0,
+    "k5_x_k6_cross_product_exists": false,
+    "k6_contrast_count": 2,
+    "k6_contrast_ids": [
+      "K6-SEP",
+      "K6-INSTR"
+    ],
+    "k6_rows": [
+      {
+        "answer_cue_held_byte_identical": true,
+        "changes_exactly_one_registered_rendering_factor": true,
+        "condition_triple_held_fixed": true,
+        "contrast_id": "K6-SEP",
+        "variants_per_cluster": 2
+      },
+      {
+        "answer_cue_held_byte_identical": true,
+        "changes_exactly_one_registered_rendering_factor": true,
+        "condition_triple_held_fixed": true,
+        "contrast_id": "K6-INSTR",
+        "variants_per_cluster": 2
+      }
+    ],
+    "randomness_used": "none",
+    "slot_to_symbol_map_is_a_bijection": true,
+    "total_registered_contrast_cells_for_a_label_bearing_profile": 9,
+    "total_registered_contrast_cells_for_a_non_label_bearing_profile": 2
+  },
+  "i3_outcome_lattice": {
+    "enumerated_cases": 16,
+    "estimand_is_a_joint_correctness_floor": true,
+    "estimand_is_a_presentation_effect_or_equivalence_contrast": false,
+    "identified_estimand": "Pr(both variants of the cluster are scored correct)",
+    "j_both_is_a_redundant_conjunction": true,
+    "j_both_is_mathematically_identical_to_j_cor": true,
+    "j_both_is_mathematically_identical_to_j_inv": false,
+    "j_cor_implies_j_inv": true,
+    "mixed_correctness_cases_all_fail": true,
+    "outcome_alphabet": [
+      "correct",
+      "wrong_a",
+      "wrong_b",
+      "invalid"
+    ],
+    "rows": [
+      {
+        "J_both": 1,
+        "J_cor": 1,
+        "J_inv": 1,
+        "scores_for_the_gate": true,
+        "variant_1_mapped_content": "7",
+        "variant_2_mapped_content": "7"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": "7",
+        "variant_2_mapped_content": "3"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": "7",
+        "variant_2_mapped_content": "5"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": "7",
+        "variant_2_mapped_content": null
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": "3",
+        "variant_2_mapped_content": "7"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 1,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": "3",
+        "variant_2_mapped_content": "3"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": "3",
+        "variant_2_mapped_content": "5"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": "3",
+        "variant_2_mapped_content": null
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": "5",
+        "variant_2_mapped_content": "7"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": "5",
+        "variant_2_mapped_content": "3"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 1,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": "5",
+        "variant_2_mapped_content": "5"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": "5",
+        "variant_2_mapped_content": null
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": null,
+        "variant_2_mapped_content": "7"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": null,
+        "variant_2_mapped_content": "3"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": null,
+        "variant_2_mapped_content": "5"
+      },
+      {
+        "J_both": 0,
+        "J_cor": 0,
+        "J_inv": 0,
+        "scores_for_the_gate": false,
+        "variant_1_mapped_content": null,
+        "variant_2_mapped_content": null
+      }
+    ],
+    "stable_invalid_cases_all_fail": true,
+    "stable_wrong_cases_all_fail": true
+  },
+  "i3_presentation_decrement_counterexamples": [
+    {
+      "baseline_accuracy": "1.0000",
+      "exceeds_registered_null_p0": true,
+      "has_material_presentation_decrement": true,
+      "label": "nested_failures_baseline_1_00_transformed_0_91",
+      "nesting_assumption": "every transformed failure is a strict subset of the baseline successes",
+      "pr_j_both_equals_1": "0.9100",
+      "presentation_decrement": "0.0900",
+      "reaches_registered_alternative_p1": false,
+      "transformed_accuracy": "0.9100"
+    },
+    {
+      "baseline_accuracy": "1.0000",
+      "exceeds_registered_null_p0": true,
+      "has_material_presentation_decrement": true,
+      "label": "nested_failures_baseline_1_00_transformed_0_98",
+      "nesting_assumption": "every transformed failure is a strict subset of the baseline successes",
+      "pr_j_both_equals_1": "0.9800",
+      "presentation_decrement": "0.0200",
+      "reaches_registered_alternative_p1": true,
+      "transformed_accuracy": "0.9800"
+    },
+    {
+      "baseline_accuracy": "0.8500",
+      "exceeds_registered_null_p0": false,
+      "has_material_presentation_decrement": false,
+      "label": "perfect_invariance_but_low_correctness",
+      "nesting_assumption": "the two variants succeed on exactly the same clusters (zero presentation effect)",
+      "pr_j_both_equals_1": "0.8500",
+      "presentation_decrement": "0.0000",
+      "reaches_registered_alternative_p1": false,
+      "transformed_accuracy": "0.8500"
+    },
+    {
+      "baseline_accuracy": "0.9700",
+      "exceeds_registered_null_p0": true,
+      "has_material_presentation_decrement": false,
+      "label": "no_presentation_effect_high_correctness",
+      "nesting_assumption": "the two variants succeed on exactly the same clusters (zero presentation effect)",
+      "pr_j_both_equals_1": "0.9700",
+      "presentation_decrement": "0.0000",
+      "reaches_registered_alternative_p1": true,
+      "transformed_accuracy": "0.9700"
+    }
+  ],
+  "identity_checks": {
+    "all_identity_checks_passed": true,
+    "binomial_masses_sum_to_one_exactly": true,
+    "bonferroni_union_bound_reconstructs_study_level": true,
+    "clopper_pearson_boundary_closed_form": true,
+    "clopper_pearson_x_equals_n_lower_limit_solves_p_to_the_n_equals_alpha": true,
+    "complement_identity": true,
+    "exhaustive_enumeration_sizes": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "exhaustive_sequence_enumeration_matches_closed_form": true,
+    "frechet_lower_bound_is_bonferroni_complement": true,
+    "frechet_upper_bound_is_min_component_power": true,
+    "intersection_union_bound_source": "Berger and Hsu (1996)",
+    "intersection_union_component_size_value": "0.072998046875",
+    "intersection_union_size_bound": true,
+    "intersection_union_size_bound_value": "0.072998046875",
+    "reflection_identity": true,
+    "tail_at_full_success_is_p_to_the_n": true,
+    "tail_at_zero_is_one": true,
+    "tail_monotone_in_p": true,
+    "tail_monotone_justifies_sup_at_p0": true
+  },
+  "independence": {
+    "derived_from": "the reviewed protocol object's registered exact-rational inputs and the English-language primary sources listed in primary_sources",
+    "prohibited_sources": [
+      "studies/study3/analysis/design_statistics.py",
+      "studies/study3/analysis/independent_methods_recalculation.py"
+    ],
+    "prohibited_sources_executed": false,
+    "prohibited_sources_imported": false,
+    "prohibited_sources_read_for_control_flow": false
+  },
+  "independence_ordering": {
+    "recorded_because": "the review authority requires the ordering to be recorded",
+    "step_1": "registered parameters extracted from the reviewed protocol object only",
+    "step_2": "every derivation in this module authored and committed",
+    "step_3": "drafting derived outputs (design_statistics.py, design_statistics_tables.json) opened only after step 2 was committed"
+  },
+  "operation_counters": {
+    "activation_extractions": 0,
+    "bank_rows": 0,
+    "confirmation_split_accesses": 0,
+    "evidence_rows": 0,
+    "forward_passes": 0,
+    "generations": 0,
+    "gpu_jobs": 0,
+    "interfaces_selected": 0,
+    "model_downloads": 0,
+    "positive_references_selected": 0,
+    "provider_calls": 0,
+    "seeds_drawn": 0,
+    "tokenizer_constructions": 0,
+    "weight_loads": 0
+  },
+  "operation_projection": {
+    "RP_I4_under_candidate_profiles": {
+      "S3_incremental_rows": 0,
+      "cells_per_profile": 4,
+      "difference_created_by_the_S4_I4_applicability_conflict": 1024,
+      "independently_derived_scored_rows": 2048,
+      "profiles_accounted": [
+        "S1",
+        "S2"
+      ],
+      "rows_if_S4_I4_were_genuinely_applicable": 3072,
+      "rows_per_profile": 1024
+    },
+    "S4_diagnostic_generation": {
+      "forward_pass_accounting_gap": "a generation of up to 16 tokens is not zero forward passes; autoregressive decoding performs one forward pass per generated token, so a null here is an unmapped quantity in the repository operation ontology, not an absence of cost",
+      "forward_passes": null,
+      "generated_tokens_upper_bound": 258048,
+      "generations": 16128,
+      "implied_decode_step_upper_bound_if_one_pass_per_token": 258048,
+      "rendered_rows": 16128
+    },
+    "deterministic_I0_fixtures": {
+      "base_items_implied_by_the_registered_unit_definition": 232,
+      "cluster_derived_rendered_rows": 464,
+      "clusters": 232,
+      "non_cluster_fixture_rows": 38,
+      "note": "one base_item_contrast_cluster is ONE base item rendered in exactly two variants, so 232 clusters imply 232 base items and 464 rendered rows",
+      "rendered_rows": 502
+    },
+    "ontology_separation": {
+      "distinguished_consistently_in_the_reviewed_projection": false,
+      "forward_passes": "one model forward evaluation",
+      "generated_tokens": "one emitted token",
+      "generation_calls": "one autoregressive decoding call",
+      "logit_reads": "one restricted-vocabulary read at one position",
+      "rendered_rows": "one emitted presentation of one variant",
+      "scored_rows": "one rendered row scored under one (profile, role) pair"
+    },
+    "positive_reference_external_P3Q": {
+      "every_quantity": null,
+      "null_rather_than_zero_is_correct": true,
+      "status": "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2",
+      "why": "a zero would assert that a selected positive reference requires no qualification work; a null records that no checkpoint, interface, bank, floor, n, multiplicity treatment or stop rule has been chosen"
+    },
+    "primitive_inputs": {
+      "generated_token_bound_per_row": 16,
+      "n_I1a": 256,
+      "n_I1b": 256,
+      "n_I2": 128,
+      "n_I3": 256,
+      "n_I4": 256,
+      "target_checkpoint_roles": 3,
+      "variants_per_contrast_cluster": 2
+    },
+    "selected_profile_one_shot_confirmation": {
+      "independently_derived_upper_bound_rows": 17152,
+      "is_an_upper_bound_not_a_universal_total": true,
+      "rp_i4_rendered_rows": 1024,
+      "target_role_rendered_rows": 16128,
+      "upper_bound_profile": "S1"
+    },
+    "target_role_development": {
+      "S3_incremental_forward_passes": 0,
+      "S3_incremental_scored_rows": 0,
+      "S3_zero_incremental_cost_holds_only_under": [
+        "a jointly single-token registered answer domain",
+        "an identical prefix to S2",
+        "reuse of the identical logit vector S2 already read",
+        "a CPU-only rescoring contract with no additional forward pass"
+      ],
+      "by_profile": {
+        "S1": {
+          "I1a_rendered_rows": 768,
+          "I1b_rendered_rows": 768,
+          "I2_rendered_rows": 768,
+          "I3_K5_rendered_rows": 10752,
+          "I3_K6_rendered_rows": 3072,
+          "rendered_rows": 16128,
+          "rendered_rows_per_role": 5376
+        },
+        "S2": {
+          "I1a_rendered_rows": 768,
+          "I1b_rendered_rows": 0,
+          "I2_rendered_rows": 768,
+          "I3_K5_rendered_rows": 0,
+          "I3_K6_rendered_rows": 3072,
+          "rendered_rows": 4608,
+          "rendered_rows_per_role": 1536
+        },
+        "S3_if_independently_rendered": {
+          "I1a_rendered_rows": 768,
+          "I1b_rendered_rows": 0,
+          "I2_rendered_rows": 768,
+          "I3_K5_rendered_rows": 0,
+          "I3_K6_rendered_rows": 3072,
+          "rendered_rows": 4608,
+          "rendered_rows_per_role": 1536
+        }
+      },
+      "independently_derived_forward_passes": 20736,
+      "independently_derived_scored_rows": 20736
+    }
+  },
+  "power_structure": {
+    "per_cell_power": {
+      "confirmation": {
+        "I1a": {
+          "exact_power_at_p1": "0.976290353246",
+          "n": 256,
+          "pass_count": 243
+        },
+        "I1b": {
+          "exact_power_at_p1": "0.976290353246",
+          "n": 256,
+          "pass_count": 243
+        },
+        "I2": {
+          "exact_power_at_p1": "0.972425828510",
+          "n": 128,
+          "pass_count": 80
+        },
+        "I3": {
+          "exact_power_at_p1": "0.976290353246",
+          "n": 256,
+          "pass_count": 243
+        },
+        "I4": {
+          "exact_power_at_p1": "0.963820467515",
+          "n": 256,
+          "pass_count": 222
+        }
+      },
+      "development": {
+        "I1a": {
+          "exact_power_at_p1": "0.953040775212",
+          "n": 256,
+          "pass_count": 244
+        },
+        "I1b": {
+          "exact_power_at_p1": "0.953040775212",
+          "n": 256,
+          "pass_count": 244
+        },
+        "I2": {
+          "exact_power_at_p1": "0.938986365033",
+          "n": 128,
+          "pass_count": 82
+        },
+        "I3": {
+          "exact_power_at_p1": "0.953040775212",
+          "n": 256,
+          "pass_count": 244
+        },
+        "I4": {
+          "exact_power_at_p1": "0.921083514878",
+          "n": 256,
+          "pass_count": 224
+        }
+      }
+    },
+    "profile_level": {
+      "S1": {
+        "confirmation_conjunction": {
+          "gate_bearing_cells": 43,
+          "illustrative_value_under_independence": "0.330544875",
+          "independence_is_an_assumption_not_a_derivation": true,
+          "upper_bound_arbitrary_dependence": "0.963820468",
+          "worst_case_lower_bound_arbitrary_dependence": "0.000000000"
+        },
+        "development_eligibility": {
+          "gate_bearing_cells": 43,
+          "illustrative_value_under_independence": "0.100885944",
+          "independence_is_an_assumption_not_a_derivation": true,
+          "upper_bound_arbitrary_dependence": "0.921083515",
+          "worst_case_lower_bound_arbitrary_dependence": "0.000000000"
+        },
+        "development_then_confirmation_under_independence": "0.033347332",
+        "per_cell_target_power": "9/10",
+        "profile_level_power_meets_per_cell_target": false
+      },
+      "S2": {
+        "confirmation_conjunction": {
+          "gate_bearing_cells": 19,
+          "illustrative_value_under_independence": "0.587941985",
+          "independence_is_an_assumption_not_a_derivation": true,
+          "upper_bound_arbitrary_dependence": "0.963820468",
+          "worst_case_lower_bound_arbitrary_dependence": "0.476450020"
+        },
+        "development_eligibility": {
+          "gate_bearing_cells": 19,
+          "illustrative_value_under_independence": "0.320003768",
+          "independence_is_an_assumption_not_a_derivation": true,
+          "upper_bound_arbitrary_dependence": "0.921083515",
+          "worst_case_lower_bound_arbitrary_dependence": "0.000000000"
+        },
+        "development_then_confirmation_under_independence": "0.188143651",
+        "per_cell_target_power": "9/10",
+        "profile_level_power_meets_per_cell_target": false
+      },
+      "S3": {
+        "confirmation_conjunction": {
+          "gate_bearing_cells": 19,
+          "illustrative_value_under_independence": "0.587941985",
+          "independence_is_an_assumption_not_a_derivation": true,
+          "upper_bound_arbitrary_dependence": "0.963820468",
+          "worst_case_lower_bound_arbitrary_dependence": "0.476450020"
+        },
+        "development_eligibility": {
+          "gate_bearing_cells": 19,
+          "illustrative_value_under_independence": "0.320003768",
+          "independence_is_an_assumption_not_a_derivation": true,
+          "upper_bound_arbitrary_dependence": "0.921083515",
+          "worst_case_lower_bound_arbitrary_dependence": "0.000000000"
+        },
+        "development_then_confirmation_under_independence": "0.188143651",
+        "per_cell_target_power": "9/10",
+        "profile_level_power_meets_per_cell_target": false
+      }
+    },
+    "selection_and_confirmation": {
+      "full_study_success_probability_S1_route_under_independence": "0.033347332",
+      "full_study_success_probability_S2_route_under_independence": "0.188143651",
+      "note": "these are operating characteristics of the registered design under an explicitly stated independence assumption, not measurements and not a claim that the cells are independent",
+      "probability_selection_map_returns_a_winner_under_independence_if_only_S1_is_truly_at_p1": "0.100885944",
+      "probability_selection_map_returns_a_winner_under_independence_if_only_S2_is_truly_at_p1": "0.320003768"
+    }
+  },
+  "primary_sources": [
+    {
+      "citation": "Clopper, C. J. and Pearson, E. S. (1934). The use of confidence or fiducial limits illustrated in the case of the binomial. Biometrika 26(4):404-413.",
+      "doi": "10.1093/biomet/26.4.404",
+      "used_for": "the binomial sampling model, the exact one-sided tail, and the exact confidence-limit construction whose defining equation is checked in identity_checks.clopper_pearson_boundary_closed_form"
+    },
+    {
+      "citation": "Berger, R. L. and Hsu, J. C. (1996). Bioequivalence trials, intersection-union tests and equivalence confidence sets. Statistical Science 11(4):283-319.",
+      "doi": "10.1214/ss/1032280304",
+      "used_for": "intersection-union logic: the size of an IUT that rejects only when every component rejects is bounded by the maximum component level, verified by exhaustive enumeration in identity_checks.intersection_union_size_bound"
+    },
+    {
+      "citation": "Tango, T. (1998). Equivalence test and confidence interval for the difference in proportions for the paired-sample design. Statistics in Medicine 17(8):891-908.",
+      "pmid": "9595618",
+      "used_for": "verifying ONLY that the previously defective paired procedure is genuinely retired from decision authority; no Tango quantity is computed here"
+    },
+    {
+      "citation": "Hsueh, H. M., Liu, J. P. and Chen, J. J. (2001). Unconditional exact tests for equivalence or noninferiority for paired binary endpoints. Biometrics 57(2):478-483.",
+      "pmid": "11414572",
+      "used_for": "verifying ONLY that no unconditional-exact paired replacement was silently introduced into a decision path"
+    },
+    {
+      "citation": "Liu, J. P., Hsueh, H. M., Hsieh, E. and Chen, J. J. (2002). Tests for equivalence or non-inferiority for paired binary data. Statistics in Medicine 21(2):231-245.",
+      "pmid": "11782062",
+      "used_for": "verifying ONLY that no paired equivalence margin survives in a decision role"
+    }
+  ],
+  "retired_procedure_decision_path_audit": {
+    "artifacts_audited": 6,
+    "findings": [
+      {
+        "artifact": "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "mentions_tango": true,
+        "retired_procedure_token_hits": {
+          "conservativeness": 2,
+          "discordance_grid": 1
+        },
+        "status": "PRESENT"
+      },
+      {
+        "artifact": "studies/study3/protocol/interface_calibration_protocol_draft.md",
+        "mentions_tango": true,
+        "retired_procedure_token_hits": {},
+        "status": "PRESENT"
+      },
+      {
+        "artifact": "studies/study3/protocol/interface_calibration_protocol.schema.json",
+        "mentions_tango": true,
+        "retired_procedure_token_hits": {
+          "conservativeness": 1,
+          "discordance_grid": 2
+        },
+        "status": "PRESENT"
+      },
+      {
+        "artifact": "studies/study3/analysis/independent_methods_review_packet_v0_3.md",
+        "mentions_tango": false,
+        "retired_procedure_token_hits": {
+          "conservativeness": 1
+        },
+        "status": "PRESENT"
+      },
+      {
+        "artifact": "studies/study3/reviews/v0_3_operator_amendment.json",
+        "mentions_tango": true,
+        "retired_procedure_token_hits": {
+          "conservativeness": 5
+        },
+        "status": "PRESENT"
+      },
+      {
+        "artifact": "studies/study3/reviews/v0_3_operator_amendment.md",
+        "mentions_tango": true,
+        "retired_procedure_token_hits": {
+          "conservativeness": 7
+        },
+        "status": "PRESENT"
+      }
+    ],
+    "interpretation": "token presence alone is not a decision path; each hit is adjudicated in the review document against whether it carries a null, a level, a pass or fail, an eligibility input, a selection input or a rescue path",
+    "tokens_searched": [
+      "equivalence_margin",
+      "critical_value",
+      "paired_critical",
+      "discordance_grid",
+      "conservativeness"
+    ]
+  },
+  "reviewed_commit": "2b36f5321d830ea6f70fff2b7bbca3cb93394046",
+  "reviewed_tree": "98d71cb35cca7b55d8f96f131064a5b9654dd3c7",
+  "schema_version": "study3-independent-methods-recalculation-v0-3-v1",
+  "status": "PROPOSED_DESIGN_PARAMETERS_NOT_MEASUREMENTS"
+}
