@@ -430,6 +430,7 @@ def test_every_binding_number_in_the_review_matches_the_independent_table(review
 
 
 def test_the_sample_size_search_was_unrestricted(review, tables):
+    registered = []
     for gate, block in review["minimal_sample_size_searches"].items():
         search = tables["minimal_sample_size_searches"][gate]
         assert block["search_restriction"] == search["search_restriction"]
@@ -437,7 +438,12 @@ def test_the_sample_size_search_was_unrestricted(review, tables):
         assert block["first_admissible_n"] == search["first_admissible_n"]
         assert block["registered_claim_verified"] is True
         assert block["first_admissible_n"] == block["registered_n"]
-        assert block["registered_n"] % 32 != 0, "the retired multiple-of-32 restriction survived"
+        registered.append(block["registered_n"])
+    # The retired restriction admitted only multiples of the complete-block size. It cannot still
+    # be in force if a registered size is not a multiple of it. A size that happens to be a
+    # multiple is not evidence either way, so only the existence of a non-multiple is asserted.
+    assert any(n % 32 != 0 for n in registered), \
+        "every registered size is a multiple of 32; the retired restriction may have survived"
 
 
 # ----------------------------------------------------------------------------------
