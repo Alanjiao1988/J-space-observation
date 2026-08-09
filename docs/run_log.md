@@ -6423,3 +6423,172 @@ The only legal next action is a second independent methods review of
 `studies/study3/analysis/independent_methods_review_packet_v0_3.md` by a party
 that did not write draft-v0.3, conducted under a separate authority. Its
 disposition is not predeclared here.
+
+## Study 3 draft-v0.3 second independent methods review - 2026-08-09 (UTC)
+
+**State:** `STUDY3_DRAFT_V0_3_SECOND_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`
+
+**Disposition:** `STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`
+
+**Reviewed commit:** `2b36f5321d830ea6f70fff2b7bbca3cb93394046`
+**Reviewed tree:** `98d71cb35cca7b55d8f96f131064a5b9654dd3c7`
+
+### What this round was
+
+A bounded, CPU-only, model-free second independent methods review of the already-published
+draft-v0.3, conducted in a fresh session and a fresh worktree from remote `main` by a party
+that did not write draft-v0.3 and did not coordinate with the drafting session. It is not an
+amendment, a freeze, a preregistration, a bank construction, a seed draw, a model round or a
+mechanistic round. It produced no scientific evidence.
+
+### Starting state
+
+Remote `main`, the starting commit and the starting tree matched the authority exactly.
+draft-v0.3 is exactly three commits ahead of `e4bcda3a487ea9c9a085e3943103a07501014431`, and
+the diff is exactly twenty-six paths, six added and twenty modified, with no deletion,
+rename, copy or type change. All sixteen enumerated draft-v0.3 blobs were verified from
+committed blobs rather than from CRLF-converted working-tree bytes, and all sixteen matched
+their registered byte counts and SHA-256 digests. The first-review authority is unchanged at
+34,624 bytes, SHA-256
+`ec207bb595490417078ec904c71f6bb1fda2035006dded8488a2f9071dad4968`, LF-only, with no trailing
+newline, and every first-review evidence artifact is byte-identical to `e4bcda3a`. The one
+first-review output that is not byte-identical is `tests/test_study3_methods_review.py`,
+which draft-v0.3 amended deliberately and which this authority itself lists among the
+twenty-six reviewed paths at SHA-256
+`331d2a7644ee3256d7a145fa8ba83d0b02dcfd1faa1ed8989b726c1c656509ba`; it is a review object,
+not a corrupted review artifact. Registry tails were `D41`, `M-29` and `AR-0240`, the
+evidence ledger was 25,241 bytes with sixteen rows ending `EV-0016`, every operation counter
+was zero and every authority flag was false.
+
+### Independence
+
+The reviewer authored `studies/study3/analysis/independent_methods_recalculation_v0_3.py`
+from the reviewed protocol's registered exact-rational inputs and from English-language
+primary sources only. It does not import, execute, dynamically load, copy constants from or
+derive control flow from `studies/study3/analysis/design_statistics.py` or
+`studies/study3/analysis/independent_methods_recalculation.py`, and the committed test proves
+that by AST inspection and a reachable-source-literal scan.
+
+The ordering the authority requires was fixed by a separate commit: the parameter extraction
+and every derivation were committed at `47ace671ebfc9e0e2270fc2025909d53e25d3adf` **before**
+the reviewing session opened `design_statistics.py` or `design_statistics_tables.json`. The
+field-by-field comparison happened only afterwards.
+
+One deviation is disclosed. After the drafting implementation was opened, the reviewer
+noticed that one helper shared the name `baseline_condition` with a drafting function and
+renamed it to `registered_baseline_triple` purely to remove the appearance of convergence.
+The rename is value-neutral and was proved so: the emitted table is byte-identical before and
+after at SHA-256 `ea11c345b611c72120a2deb6abac6764bf2abe94653d100a2123d3db8250bace`.
+
+### What the review verified independently
+
+Every registered exact-binomial threshold, null tail and power reproduced exactly from
+integer-only arithmetic over exact rationals, with decimal renderings refused as arithmetic
+inputs: development `244`, `244`, `82`, `244`, `224` and confirmation `243`, `243`, `80`,
+`243`, `222`. Every threshold is minimal at its level. No rejection region is degenerate. The
+exact rational identity `1/600 x 3 = 1/200` holds. A full admissible-size sweep over
+multiples of the registered complete-block size 32 showed that `256` and `128` are the
+*smallest* admissible per-cell sizes meeting the `9/10` per-cell target at the development
+level, so the registered sizes are justified rather than merely sufficient. The `K5` and `K6`
+construction laws, re-implemented from the seven published steps, hold: the 32-condition
+block is a complete replicate, the slot-to-symbol rotation is a bijection, ground truth is
+preserved, and each of the seven `K5` contrasts changes exactly one registered factor. The
+sixteen-row development selection map was reproduced row for row by an independently authored
+resolver, with the denominator constant at `3` and `S3` never selectable without a multi-token
+authority. Every operation total was rebuilt from primitive cell counts: `20,736`, `2,048`,
+`17,152`, `16,128` and `258,048`. The Tango paired aggregate-equivalence procedure is retired
+from every decision role with no residual decision path, which is the reviewer's affirmative
+answer to the drafting party's first question.
+
+### Disposition and findings
+
+Sixteen inherited findings are `VERIFIED_RESOLVED`; four are `PARTIALLY_RESOLVED`
+(`S3MR-002`, `S3MR-013`, `S3MR-014`, `S3MR-017`). Sixteen `UR` items are `VERIFIED_RESOLVED`,
+five are `PARTIALLY_RESOLVED`, and `UR-22` alone is
+`CORRECTLY_RETAINED_AS_BLOCKING_OPERATOR_DECISION`.
+
+Ten new findings, `S3MR2-001` through `S3MR2-010`: two BLOCKING, six MAJOR, two MINOR. The
+two blocking findings are that the `I3` primary indicator `J_both` is mathematically
+identical to `J_cor` and therefore identifies joint correctness rather than any presentation
+effect, while `VT6`, `VT7`, the `I3` gate question, its `what_fails` clause and the
+`i3_claim_ceiling` all require a presentation-effect estimand; and that profile-level,
+selection-level and confirmation-level power are derived nowhere while an unqualified
+study-level `target power 9/10` is published beside the scope-qualified alpha levels and
+verified only per cell, when the independently derived profile-eligibility power at the
+registered alternative is `0.100885944` for `S1` and `0.320003768` for `S2` and `S3` under
+independence, with development-then-confirmation success `0.033347332` and `0.188143651`.
+
+Rejection rather than acceptance with required changes was returned because every valid
+repair requires a substantive choice: a changed estimand, a changed claim ceiling, a new
+family-level power target, or a registered sampling frame in place of the currently unstated
+one.
+
+### Changed paths and registrations
+
+Exactly seventeen paths changed against `2b36f532`: the eight section 7 outputs added and the
+nine whitelisted routing and registry paths modified, with no deletion, rename, copy or type
+change. `D42` and `M-30` are the only new registry entries and `AR-0241` through `AR-0250`
+the only new artifact rows; `D41`, `M-29` and `AR-0001` through `AR-0240` are unaltered and
+both ledgers are append-only. No evidence row and no limitations row was added: a defect in
+an unfrozen design document is not a limitation of executed measurement.
+`paper/evidence_ledger.csv`, `paper/limitations_ledger.md`, `paper/claim_evidence_matrix.md`,
+every Study 1 and Study 2 path, every dependency, lock file, container definition, runtime
+source, infrastructure path, script and GitHub workflow are untouched. `infra/` is not in the
+whitelist, so the container task definitions were kept operator-side and uncommitted.
+
+The twenty-six-path review object is byte-identical to the reviewed commit. Neither existing
+Study 3 test module was modified, and no assertion anywhere was weakened to make the new
+review pass.
+
+### Validation
+
+All decision-bearing validation ran in clean CPU-only Azure Container Registry tasks on
+registry `acrfinreportdt2tgbdb` with base image `python:3.11-bookworm`, each bound to an exact
+commit through a clean clone with `DIRTY=0`, Python 3.11.15, `GPU_COUNT=0` and
+`CUDA_AVAILABLE=False`, with one test path per invocation. GitHub Actions was not used.
+
+The full repository suite reconciles exactly. The declared starting envelope is 3,851 passed,
+15 skipped and exactly two registered historical `tests/test_parser_v3_seal_job` failures. The
+observed envelope is **3,886 passed, 15 skipped and the same two failures**, with identical
+identities `test_seal_writes_twelve_objects_with_the_set_manifest_last` and
+`test_seal_refuses_a_non_empty_parent_prefix`. The difference of exactly 35 passing tests is
+exactly the new `tests/test_study3_methods_review_v0_3.py`. There is no new failure, no new
+error and no change in the skip count.
+
+Because this run-log entry is itself part of the final commit, the new review test, both
+existing Study 3 test modules, the independent recalculation check, the drafting statistics
+check, the protected-byte modules, the static publication audit and the clean-state check are
+run again on the actual publication commit, so that no commit is claimed to have been
+validated by a run bound only to its parent.
+
+### Non-authoritative operator-side activity, disclosed
+
+Read-only Git inspection of committed blobs, trees and diffs; blob hashing; JSON parsing and
+static text audits; local execution of the reviewer's own independent recalculation in emit
+and check modes; local pytest runs of the reviewer's own new module used only as a shape
+probe before the container runs; and document assembly through throwaway generator scripts
+kept outside the repository. None of that activity carries decision authority and none of it
+is cited as evidence.
+
+One environment artifact is recorded so it is not mistaken for drift, and it is the same
+class the previous round recorded. On the Windows operator machine `core.autocrlf` is `true`,
+so the working tree carries CRLF while every committed blob is LF. Because
+`design_statistics.py --check` compares the tables in binary mode, it fails locally purely on
+line endings, and `tests/test_study3_design.py` fails locally for the same single reason. In
+the clean Linux CPU-only container both pass: `DESIGN_STATISTICS_CHECK_OK sections=18` and
+109 passed. This is an operator-machine artifact, not a defect in the reviewed object, and no
+reviewed path was touched to accommodate it.
+
+### Boundary
+
+Zero model downloads, revision resolutions by download, tokenizer constructions,
+tokenizations, weight loads, forward passes, sequence scorings, generations, activation
+extractions, hook installations, lens operations, probe fits, patching operations, ablation
+operations, provider calls, GPU jobs, bank rows or accesses, seeds, interface selections,
+positive-reference selections, model gate evaluations, result rows, scientific evidence rows,
+confirmation accesses, Phase 1.0D operations and RQ2 or Study 4 operations. Nothing is frozen,
+nothing is authorised, no interface is selected and no positive reference is selected. `OD2`
+remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`.
+
+The only legal next action is `OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_4`, followed by another
+independent methods review. No successor prompt is created in this round.
