@@ -1,5 +1,48 @@
 # Project Status Report
 
+> **Study 3 draft-v0.3 SECOND independent methods review - 2026-08-09**
+>
+> **Study 3 state:** `STUDY3_DRAFT_V0_3_SECOND_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`
+>
+> **Disposition:** **`STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`**, returned
+> against the reviewed commit `2b36f5321d830ea6f70fff2b7bbca3cb93394046`,
+> tree `98d71cb35cca7b55d8f96f131064a5b9654dd3c7`.
+>
+> The second bounded independent methods review of draft-v0.3 is complete. It was
+> conducted in a fresh session by a party that did not write draft-v0.3, with an
+> independently authored recalculation that imports nothing from the drafting
+> implementation and was committed before the drafting derived outputs were opened.
+>
+> **What the review verified.** Every registered exact-binomial threshold, null tail and
+> power reproduced exactly from integer-only exact-rational arithmetic: development
+> `244/244/82/244/224` and confirmation `243/243/80/243/222`. The registered per-cell
+> sizes `256` and `128` are the smallest admissible sizes under the registered
+> complete-block balancing rule at the development level. The exact rational identity
+> `1/600 x 3 = 1/200` holds. The sixteen-row selection map is total, deterministic and
+> reproduced row for row, with the denominator fixed at `3` throughout and `S3`
+> unselectable without a multi-token authority. The `K5` and `K6` construction laws,
+> re-implemented from the published steps, hold. The Tango paired aggregate-equivalence
+> procedure is retired from every decision role with **no residual decision path**.
+>
+> **What the review rejected.** 10 new findings, `S3MR2-001` through `S3MR2-010`:
+> 2 BLOCKING, 6 MAJOR, 2 MINOR. `S3MR2-001`: `J_both` is mathematically identical to
+> `J_cor`, so the `I3` estimand is a joint correctness floor that identifies no
+> presentation effect, while `VT6`, `VT7`, the `I3` gate question, its `what_fails`
+> clause and the `i3_claim_ceiling` all require a presentation-effect estimand.
+> `S3MR2-002`: profile-level, selection-level and confirmation-level power are derived
+> nowhere, while an unqualified study-level `target power 9/10` is published beside the
+> scope-qualified alpha levels and verified only per cell; independently derived
+> profile-eligibility power at the registered alternative is `0.100885944` for `S1` and
+> `0.320003768` for `S2` and `S3` under independence, with development-then-confirmation
+> success `0.033347332` and `0.188143651`.
+>
+> **Boundary.** Study 3 remains unfrozen. No interface or positive reference is selected.
+> No bank, seed, model operation, gate result, confirmation access or evidence row
+> exists. Every operation counter is zero and every authority flag is false. `OD2`
+> remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`. The original research question remains
+> unanswered. The only legal next action is `OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_4`,
+> then another independent methods review.
+
 > **Study 3 draft-v0.3 operator amendment round - 2026-08-08**
 >
 > **Study 3 state:**

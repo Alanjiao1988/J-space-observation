@@ -573,7 +573,7 @@ K5_CONTRAST_IDS = ("K5-P1", "K5-P2", "K5-P3", "K5-S1", "K5-S2", "K5-S3", "K5-A1"
 K6_CONTRAST_IDS = ("K6-SEP", "K6-INSTR")
 
 
-def baseline_condition(index: int) -> tuple[int, int, int]:
+def registered_baseline_triple(index: int) -> tuple[int, int, int]:
     """(position, symbol index, alphabet index) = (k mod 4, (k // 4) mod 4, (k // 16) mod 2)."""
     return index % 4, (index // 4) % 4, (index // 16) % 2
 
@@ -607,7 +607,7 @@ def render_slots(condition: tuple[int, int, int]) -> dict:
 
 
 def verify_construction_laws() -> dict:
-    block = [baseline_condition(k) for k in range(BALANCING_BLOCK)]
+    block = [registered_baseline_triple(k) for k in range(BALANCING_BLOCK)]
     block_is_complete = sorted(block) == sorted(product(range(4), range(4), range(2)))
     every_condition_once = len(set(block)) == BALANCING_BLOCK
 
@@ -615,7 +615,7 @@ def verify_construction_laws() -> dict:
     ground_truth_ok = True
     symbol_ok = True
     for k in range(64):
-        condition = baseline_condition(k)
+        condition = registered_baseline_triple(k)
         rendered = render_slots(condition)
         if sorted(rendered["displayed_symbol_of_slot"].values()) != [0, 1, 2, 3]:
             bijection_ok = False
@@ -629,7 +629,7 @@ def verify_construction_laws() -> dict:
     for contrast_id in K5_CONTRAST_IDS:
         changed_all = set()
         for k in range(BALANCING_BLOCK):
-            base = baseline_condition(k)
+            base = registered_baseline_triple(k)
             variant = apply_k5_contrast(base, contrast_id)
             changed_all.add(tuple(i for i in range(3) if base[i] != variant[i]))
         exactly_one = all(len(entry) == 1 for entry in changed_all)

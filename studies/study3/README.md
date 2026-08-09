@@ -1,37 +1,32 @@
 # Study 3 - Interface Adequacy and Label-Binding Calibration
 
-> **DESIGN DRAFT v0.3 - OPERATOR AMENDMENT COMPLETE, AWAITING A SECOND INDEPENDENT METHODS REVIEW**
+> **SECOND INDEPENDENT METHODS REVIEW COMPLETE - AMENDMENT REQUIRED**
 >
-> State: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW`
+> State: `STUDY3_DRAFT_V0_3_SECOND_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`
 >
-> The bounded independent methods review of draft-v0.2 returned
-> `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED` against the reviewed commit
-> `8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`: 6 BLOCKING, 11 MAJOR and 3 MINOR findings. draft-v0.3
-> is the operator amendment answering all 20. Read `reviews/v0_2_independent_methods_review.md` for
-> the findings and `reviews/v0_3_operator_amendment.md` for their dispositions.
+> Disposition: **`STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`**, returned against the reviewed commit
+> `2b36f5321d830ea6f70fff2b7bbca3cb93394046`, tree `98d71cb35cca7b55d8f96f131064a5b9654dd3c7`.
 >
-> **The drafting party does not claim draft-v0.3 is correct.** Every repair is recorded as
-> `PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`. draft-v0.2 was found defensible
-> by the party that wrote it and was then independently rejected; that is the failure mode this
-> round is required not to repeat. The determination belongs to the second reviewer.
+> The second bounded independent methods review of draft-v0.3 verified 16 of the 20 inherited
+> findings resolved and 4 partially resolved, and recorded 10 new findings: 2 BLOCKING, 6 MAJOR
+> and 2 MINOR (`S3MR2-001` through `S3MR2-010`). The two blocking findings are that the `I3`
+> primary indicator `J_both` is mathematically identical to joint correctness and identifies no
+> presentation effect while the protocol's registered constructs and claim language require one,
+> and that profile-level, selection-level and confirmation-level power are registered nowhere
+> while an unqualified study-level target power of `9/10` is published and verified only per cell.
+> Read `reviews/v0_3_independent_methods_review.md`.
 >
-> Nothing here is frozen. Nothing here authorizes execution. Zero model operations have been
-> performed for this study: no download, no weight load, no tokenizer construction, no forward
-> pass, no generation, no activation extraction, no probe, no patch, no ablation, no lens
-> operation, no GPU job. No seed has been drawn and no task-bank row exists.
+> The only legal next action is `OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_4`, followed by a
+> further independent methods review. **Not a freeze. Not `P3-Q`. Not a bank, a seed, model
+> execution, a development round, a confirmation access or any mechanistic work.**
 >
-> draft-v0.1 was reviewed by the operator, who found ten design defects and refused freeze
-> (`STUDY3_DRAFT_V0_1_REVIEWED_AMENDMENT_REQUIRED_NOT_APPROVED_FOR_FREEZE`). draft-v0.2 is that
-> amendment; its defects and resolutions are in `reviews/v0_1_operator_review.md`. draft-v0.3 is the
-> amendment to draft-v0.2.
+> `OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`: no positive reference is selected,
+> preferred, pinned, revision-resolved, downloaded, tokenized, loaded or prequalified. The review
+> neither resolves nor advances it.
 >
-> `OD5` and `OD6` are resolved by the draft-v0.3 operator amendment authority, subject to the second
-> review. **`OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`**: no positive reference is
-> selected, preferred, pinned, revision-resolved, downloaded, tokenized, loaded or prequalified.
->
-> **The JSON protocol document is authoritative.** The Markdown is a companion rendering of it.
-> Where they disagree the JSON governs and the disagreement is a defect; agreement is enforced by
-> the committed test `tests/test_study3_design.py`.
+> Study 3 remains unfrozen. No interface or positive reference is selected. No bank, seed, model
+> operation, gate result, confirmation access or evidence row exists. Every operation counter is
+> zero. The original research question remains unanswered.
 
 ## What this study is
 

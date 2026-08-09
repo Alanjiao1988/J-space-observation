@@ -1,0 +1,1261 @@
+{
+  "$id": "study3-v0-3-independent-methods-review.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "$comment": "Acceptance as specified is impossible while any BLOCKING or MAJOR methods finding stands.",
+      "if": {
+        "properties": {
+          "disposition": {
+            "const": "STUDY3_V0_3_METHODS_REVIEW_ACCEPTED_AS_SPECIFIED"
+          }
+        },
+        "required": [
+          "disposition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "new_findings": {
+            "items": {
+              "properties": {
+                "severity": {
+                  "enum": [
+                    "MINOR"
+                  ]
+                }
+              }
+            },
+            "type": "array"
+          },
+          "unresolved_methods_items": {
+            "maxItems": 0,
+            "type": "array"
+          }
+        }
+      }
+    },
+    {
+      "$comment": "Acceptance as specified requires every inherited BLOCKING item VERIFIED_RESOLVED.",
+      "if": {
+        "properties": {
+          "disposition": {
+            "const": "STUDY3_V0_3_METHODS_REVIEW_ACCEPTED_AS_SPECIFIED"
+          }
+        },
+        "required": [
+          "disposition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "inherited_finding_adjudications": {
+            "items": {
+              "if": {
+                "properties": {
+                  "original_severity": {
+                    "const": "BLOCKING"
+                  }
+                },
+                "required": [
+                  "original_severity"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "status": {
+                    "const": "VERIFIED_RESOLVED"
+                  }
+                }
+              }
+            },
+            "type": "array"
+          }
+        }
+      }
+    },
+    {
+      "$comment": "Successor action must match the disposition and may never jump to freeze or execution.",
+      "if": {
+        "properties": {
+          "disposition": {
+            "const": "STUDY3_V0_3_METHODS_REVIEW_ACCEPTED_AS_SPECIFIED"
+          }
+        },
+        "required": [
+          "disposition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "next_legal_action": {
+            "const": "OPERATOR_REVIEW_ADOPTION_AND_OD2_RESOLUTION_ROUND"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "disposition": {
+            "const": "STUDY3_V0_3_METHODS_REVIEW_ACCEPTED_WITH_REQUIRED_CHANGES"
+          }
+        },
+        "required": [
+          "disposition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "next_legal_action": {
+            "const": "OPERATOR_CONFORMANCE_AMENDMENT_FOR_DRAFT_V0_3_1"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "disposition": {
+            "const": "STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED"
+          }
+        },
+        "required": [
+          "disposition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "next_legal_action": {
+            "const": "OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_4"
+          }
+        }
+      }
+    },
+    {
+      "$comment": "CORRECTLY_RETAINED_AS_BLOCKING_OPERATOR_DECISION is legal only for UR-22.",
+      "properties": {
+        "inherited_finding_adjudications": {
+          "items": {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "CORRECTLY_RETAINED_AS_BLOCKING_OPERATOR_DECISION"
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "properties": {
+                "finding_id": {
+                  "const": "__NEVER__"
+                }
+              }
+            }
+          },
+          "type": "array"
+        },
+        "unresolved_item_adjudications": {
+          "items": {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "CORRECTLY_RETAINED_AS_BLOCKING_OPERATOR_DECISION"
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "properties": {
+                "item_id": {
+                  "const": "UR-22"
+                }
+              }
+            }
+          },
+          "type": "array"
+        }
+      }
+    },
+    {
+      "$comment": "Per-cell power may never be presented as profile-level power without a derivation.",
+      "if": {
+        "properties": {
+          "per_cell_and_joint_power_decisions": {
+            "properties": {
+              "does_the_protocol_label_per_cell_power_as_overall_power": {
+                "const": true
+              }
+            },
+            "required": [
+              "does_the_protocol_label_per_cell_power_as_overall_power"
+            ]
+          }
+        },
+        "required": [
+          "per_cell_and_joint_power_decisions"
+        ]
+      },
+      "then": {
+        "properties": {
+          "per_cell_and_joint_power_decisions": {
+            "properties": {
+              "derived_values": {
+                "required": [
+                  "assumption_stated"
+                ]
+              }
+            },
+            "required": [
+              "derived_values",
+              "decision",
+              "blocking_or_not"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "description": "Fail-closed schema for the second bounded independent methods review of the Study 3 interface-calibration protocol. It rejects an unknown disposition or state; a missing, duplicate or extra inherited identifier; a missing mandatory audit answer; a finding without severity, evidence path, field, rationale or consequence; a binding number without a unit and an authority status; a claim that per-cell power is profile-level power without a derivation; a selected interface or positive reference; any non-zero operation counter or true execution or freeze flag; any bank row, seed, result, model output, confirmation access or evidence row; acceptance as specified with an unresolved blocking or major methods item; acceptance as specified with any inherited BLOCKING item not VERIFIED_RESOLVED; misuse of CORRECTLY_RETAINED_AS_BLOCKING_OPERATOR_DECISION outside OD2 and UR-22; and a successor action that jumps directly to freeze or execution.",
+  "properties": {
+    "authority_flags": {
+      "additionalProperties": false,
+      "properties": {
+        "bank_authorized": {
+          "const": false
+        },
+        "confirmation_access_authorized": {
+          "const": false
+        },
+        "execution_authorized": {
+          "const": false
+        },
+        "frozen": {
+          "const": false
+        },
+        "model_operations_authorized": {
+          "const": false
+        },
+        "positive_reference_selected": {
+          "const": false
+        },
+        "seed_authorized": {
+          "const": false
+        },
+        "winner_selected": {
+          "const": false
+        }
+      },
+      "required": [
+        "frozen",
+        "execution_authorized",
+        "bank_authorized",
+        "seed_authorized",
+        "model_operations_authorized",
+        "winner_selected",
+        "positive_reference_selected",
+        "confirmation_access_authorized"
+      ],
+      "type": "object"
+    },
+    "bank_rows": {
+      "maxItems": 0,
+      "type": "array"
+    },
+    "binomial_sampling_model_decision": {
+      "required": [
+        "registered",
+        "required_elements_missing",
+        "randomness_present_in_the_current_design_round",
+        "decision"
+      ],
+      "type": "object"
+    },
+    "claim_ceiling_restatement": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "committed_authority": {
+      "properties": {
+        "byte_identical_to_source": {
+          "const": true
+        },
+        "bytes": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "path": {
+          "const": "studies/study3/prompts/study3_v0_3_independent_methods_review_authority.md"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256",
+        "byte_identical_to_source"
+      ],
+      "type": "object"
+    },
+    "confirmation_decision": {
+      "required": [
+        "specification_complete",
+        "decision"
+      ],
+      "type": "object"
+    },
+    "cross_artifact_adjudications": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "candidate": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "evidence_fields": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "evidence_paths": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "finding_ids": {
+            "items": {
+              "pattern": "^S3MR2-\\d{3}$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "note": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "CONFIRMED_BLOCKING",
+              "CONFIRMED_MAJOR",
+              "CONFIRMED_MINOR",
+              "CONFIRMED_NONBLOCKING",
+              "NOT_CONFIRMED",
+              "QUALIFIED"
+            ]
+          }
+        },
+        "required": [
+          "candidate",
+          "status",
+          "finding_ids",
+          "evidence_paths",
+          "evidence_fields",
+          "note"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "disposition": {
+      "enum": [
+        "STUDY3_V0_3_METHODS_REVIEW_ACCEPTED_AS_SPECIFIED",
+        "STUDY3_V0_3_METHODS_REVIEW_ACCEPTED_WITH_REQUIRED_CHANGES",
+        "STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED"
+      ]
+    },
+    "disposition_basis": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "document_class": {
+      "const": "independent_methods_review"
+    },
+    "estimand_and_claim_ceiling_decisions": {
+      "required": [
+        "identified_estimand",
+        "j_both_equals_j_cor",
+        "is_a_joint_robust_correctness_floor",
+        "is_a_presentation_invariance_or_equivalence_claim",
+        "permitted_claim_ceiling",
+        "protocol_claim_language_exceeds_the_identified_estimand",
+        "decision"
+      ],
+      "type": "object"
+    },
+    "evidence_rows": {
+      "maxItems": 0,
+      "type": "array"
+    },
+    "exact_binomial_recalculation": {
+      "properties": {
+        "confirmation": {
+          "items": {
+            "properties": {
+              "agrees": {
+                "type": "boolean"
+              },
+              "alpha": {
+                "pattern": "^\\d+/\\d+$",
+                "type": "string"
+              },
+              "degenerate": {
+                "const": false
+              },
+              "exact_null_tail_at_p0": {
+                "type": "string"
+              },
+              "exact_power_at_p1": {
+                "type": "string"
+              },
+              "gate": {
+                "enum": [
+                  "I1a",
+                  "I1b",
+                  "I2",
+                  "I3",
+                  "I4"
+                ]
+              },
+              "minimal_at_alpha": {
+                "const": true
+              },
+              "n": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "p0": {
+                "pattern": "^\\d+/\\d+$",
+                "type": "string"
+              },
+              "p1": {
+                "pattern": "^\\d+/\\d+$",
+                "type": "string"
+              },
+              "pass_count": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "registered_pass_count": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gate",
+              "p0",
+              "p1",
+              "alpha",
+              "n",
+              "pass_count",
+              "exact_null_tail_at_p0",
+              "exact_power_at_p1",
+              "minimal_at_alpha",
+              "degenerate",
+              "registered_pass_count",
+              "agrees"
+            ],
+            "type": "object"
+          },
+          "maxItems": 5,
+          "minItems": 5,
+          "type": "array"
+        },
+        "development": {
+          "items": {
+            "properties": {
+              "agrees": {
+                "type": "boolean"
+              },
+              "alpha": {
+                "pattern": "^\\d+/\\d+$",
+                "type": "string"
+              },
+              "degenerate": {
+                "const": false
+              },
+              "exact_null_tail_at_p0": {
+                "type": "string"
+              },
+              "exact_power_at_p1": {
+                "type": "string"
+              },
+              "gate": {
+                "enum": [
+                  "I1a",
+                  "I1b",
+                  "I2",
+                  "I3",
+                  "I4"
+                ]
+              },
+              "minimal_at_alpha": {
+                "const": true
+              },
+              "n": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "p0": {
+                "pattern": "^\\d+/\\d+$",
+                "type": "string"
+              },
+              "p1": {
+                "pattern": "^\\d+/\\d+$",
+                "type": "string"
+              },
+              "pass_count": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "registered_pass_count": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gate",
+              "p0",
+              "p1",
+              "alpha",
+              "n",
+              "pass_count",
+              "exact_null_tail_at_p0",
+              "exact_power_at_p1",
+              "minimal_at_alpha",
+              "degenerate",
+              "registered_pass_count",
+              "agrees"
+            ],
+            "type": "object"
+          },
+          "maxItems": 5,
+          "minItems": 5,
+          "type": "array"
+        }
+      },
+      "required": [
+        "method",
+        "size_justification",
+        "independent_source",
+        "development",
+        "confirmation",
+        "admissible_size_search"
+      ],
+      "type": "object"
+    },
+    "i4_s4_od2_decision": {
+      "type": "object"
+    },
+    "inherited_finding_adjudications": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "closes_original_defect_without_creating_a_new_one": {
+            "type": "boolean"
+          },
+          "evidence_fields": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "evidence_paths": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "finding_id": {
+            "enum": [
+              "S3MR-001",
+              "S3MR-002",
+              "S3MR-003",
+              "S3MR-004",
+              "S3MR-005",
+              "S3MR-006",
+              "S3MR-007",
+              "S3MR-008",
+              "S3MR-009",
+              "S3MR-010",
+              "S3MR-011",
+              "S3MR-012",
+              "S3MR-013",
+              "S3MR-014",
+              "S3MR-015",
+              "S3MR-016",
+              "S3MR-017",
+              "S3MR-018",
+              "S3MR-019",
+              "S3MR-020"
+            ]
+          },
+          "new_defect_created": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "original_severity": {
+            "enum": [
+              "BLOCKING",
+              "MAJOR",
+              "MINOR"
+            ]
+          },
+          "rationale": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "repair_character": {
+            "enum": [
+              "substantive",
+              "cosmetic"
+            ]
+          },
+          "status": {
+            "enum": [
+              "VERIFIED_RESOLVED",
+              "PARTIALLY_RESOLVED",
+              "NOT_RESOLVED",
+              "CORRECTLY_RETAINED_AS_BLOCKING_OPERATOR_DECISION"
+            ]
+          }
+        },
+        "required": [
+          "finding_id",
+          "original_severity",
+          "status",
+          "repair_character",
+          "evidence_paths",
+          "evidence_fields",
+          "rationale",
+          "closes_original_defect_without_creating_a_new_one",
+          "new_defect_created"
+        ],
+        "type": "object"
+      },
+      "maxItems": 20,
+      "minItems": 20,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "mandatory_audit_answers": {
+      "required": [
+        "6.1_i3_estimand_and_construct_validity",
+        "6.2_exact_binomial_model_and_sampling_frame",
+        "6.3_type_i_multiplicity_and_executable_selection",
+        "6.4_family_and_profile_level_power",
+        "6.5_tango_retirement_and_descriptive_remnants",
+        "6.6_i4_s4_and_od2",
+        "6.7_i5_confirmation_lifecycle",
+        "6.8_operation_accounting_and_feasibility",
+        "6.9_cross_artifact_consistency_and_claim_ceiling"
+      ],
+      "type": "object"
+    },
+    "multiplicity_and_selection_graph": {
+      "properties": {
+        "executable": {
+          "const": true
+        },
+        "fixed_selectable_profile_denominator": {
+          "const": 3
+        },
+        "never_selectable": {
+          "const": [
+            "S4"
+          ],
+          "type": "array"
+        },
+        "rescue_paths": {
+          "maxItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "authored_by",
+        "executable",
+        "input_alphabet",
+        "registered_order",
+        "never_selectable",
+        "fixed_selectable_profile_denominator",
+        "states",
+        "rescue_paths",
+        "quantities_with_no_selection_authority",
+        "reviewer_verdict"
+      ],
+      "type": "object"
+    },
+    "new_findings": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "consequence": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "evidence_fields": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "evidence_paths": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "finding_id": {
+            "pattern": "^S3MR2-\\d{3}$",
+            "type": "string"
+          },
+          "rationale": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "repair_class": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "BLOCKING",
+              "MAJOR",
+              "MINOR"
+            ]
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "finding_id",
+          "severity",
+          "title",
+          "evidence_paths",
+          "evidence_fields",
+          "rationale",
+          "consequence",
+          "repair_class"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "next_legal_action": {
+      "enum": [
+        "OPERATOR_REVIEW_ADOPTION_AND_OD2_RESOLUTION_ROUND",
+        "OPERATOR_CONFORMANCE_AMENDMENT_FOR_DRAFT_V0_3_1",
+        "OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_4"
+      ]
+    },
+    "next_legal_action_note": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "operation_counters": {
+      "additionalProperties": false,
+      "properties": {
+        "ablation_operations": {
+          "const": 0
+        },
+        "activation_extractions": {
+          "const": 0
+        },
+        "bank_rows_generated": {
+          "const": 0
+        },
+        "confirmation_split_accesses": {
+          "const": 0
+        },
+        "evidence_rows_created": {
+          "const": 0
+        },
+        "forward_passes": {
+          "const": 0
+        },
+        "generations": {
+          "const": 0
+        },
+        "gpu_jobs": {
+          "const": 0
+        },
+        "interfaces_selected": {
+          "const": 0
+        },
+        "lens_operations": {
+          "const": 0
+        },
+        "model_downloads": {
+          "const": 0
+        },
+        "model_weight_loads": {
+          "const": 0
+        },
+        "patching_operations": {
+          "const": 0
+        },
+        "phase_1_0d_operations": {
+          "const": 0
+        },
+        "positive_references_selected": {
+          "const": 0
+        },
+        "probe_operations": {
+          "const": 0
+        },
+        "provider_calls": {
+          "const": 0
+        },
+        "rq2_s4_operations": {
+          "const": 0
+        },
+        "seeds_drawn": {
+          "const": 0
+        },
+        "study1_files_modified": {
+          "const": 0
+        },
+        "study2_files_modified": {
+          "const": 0
+        },
+        "tokenizer_constructions": {
+          "const": 0
+        }
+      },
+      "required": [
+        "ablation_operations",
+        "activation_extractions",
+        "bank_rows_generated",
+        "confirmation_split_accesses",
+        "evidence_rows_created",
+        "forward_passes",
+        "generations",
+        "gpu_jobs",
+        "interfaces_selected",
+        "lens_operations",
+        "model_downloads",
+        "model_weight_loads",
+        "patching_operations",
+        "phase_1_0d_operations",
+        "positive_references_selected",
+        "probe_operations",
+        "provider_calls",
+        "rq2_s4_operations",
+        "seeds_drawn",
+        "study1_files_modified",
+        "study2_files_modified",
+        "tokenizer_constructions"
+      ],
+      "type": "object"
+    },
+    "parent_review_commit": {
+      "const": "e4bcda3a487ea9c9a085e3943103a07501014431"
+    },
+    "party": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "per_cell_and_joint_power_decisions": {
+      "properties": {
+        "derived_values": {
+          "properties": {
+            "assumption_stated": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "assumption_stated"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "cell_counts_by_profile_and_split",
+        "power_levels_distinguished",
+        "derived_values",
+        "does_the_protocol_label_per_cell_power_as_overall_power",
+        "where",
+        "decision",
+        "blocking_or_not",
+        "bounded_recommendation"
+      ],
+      "type": "object"
+    },
+    "prohibited_source_audit": {
+      "properties": {
+        "exec_or_eval_found": {
+          "const": false
+        },
+        "importlib_found": {
+          "const": false
+        },
+        "imports_found": {
+          "maxItems": 0,
+          "type": "array"
+        },
+        "prohibited_path_literals_found": {
+          "maxItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "method",
+        "imports_found",
+        "exec_or_eval_found",
+        "importlib_found",
+        "prohibited_path_literals_found"
+      ],
+      "type": "object"
+    },
+    "projected_operation_accounting": {
+      "type": "object"
+    },
+    "results": {
+      "maxItems": 0,
+      "type": "array"
+    },
+    "review_object": {
+      "properties": {
+        "added": {
+          "const": 6
+        },
+        "changed_paths": {
+          "const": 26
+        },
+        "deletions_renames_copies_type_changes": {
+          "const": 0
+        },
+        "immutable_during_this_review": {
+          "const": true
+        },
+        "modified": {
+          "const": 20
+        },
+        "reviewer_edited_any_reviewed_path": {
+          "const": false
+        }
+      },
+      "required": [
+        "changed_paths",
+        "added",
+        "modified",
+        "deletions_renames_copies_type_changes",
+        "immutable_during_this_review",
+        "reviewer_edited_any_reviewed_path"
+      ],
+      "type": "object"
+    },
+    "reviewed_artifact_identities": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "minProperties": 16,
+      "type": "object"
+    },
+    "reviewed_commit": {
+      "const": "2b36f5321d830ea6f70fff2b7bbca3cb93394046"
+    },
+    "reviewed_draft_v0_2_commit": {
+      "const": "8a2c4a0b2a73c5d802988333f11ea6c22828f6f5"
+    },
+    "reviewed_tree": {
+      "const": "98d71cb35cca7b55d8f96f131064a5b9654dd3c7"
+    },
+    "reviewer_independence_declaration": {
+      "properties": {
+        "coordinated_with_drafting_session": {
+          "const": false
+        },
+        "not_the_drafting_party": {
+          "const": true
+        },
+        "ordering": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "prohibited_sources_copied_through_reachable_literals": {
+          "const": false
+        },
+        "prohibited_sources_dynamically_loaded": {
+          "const": false
+        },
+        "prohibited_sources_executed": {
+          "const": false
+        },
+        "prohibited_sources_imported": {
+          "const": false
+        },
+        "prohibited_sources_used_for_control_flow": {
+          "const": false
+        }
+      },
+      "required": [
+        "fresh_session",
+        "not_the_drafting_party",
+        "coordinated_with_drafting_session",
+        "independent_implementation",
+        "independent_tables",
+        "prohibited_sources",
+        "prohibited_sources_imported",
+        "prohibited_sources_executed",
+        "prohibited_sources_dynamically_loaded",
+        "prohibited_sources_copied_through_reachable_literals",
+        "prohibited_sources_used_for_control_flow",
+        "ordering",
+        "disclosed_deviation",
+        "local_operations_disclosure"
+      ],
+      "type": "object"
+    },
+    "round": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "study3-v0-3-independent-methods-review-v1"
+    },
+    "seeds": {
+      "maxItems": 0,
+      "type": "array"
+    },
+    "source_authority": {
+      "properties": {
+        "bytes": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "cr_count": {
+          "const": 0
+        },
+        "preserved_before_any_repository_mutation": {
+          "const": true
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "trailing_newline": {
+          "const": false
+        }
+      },
+      "required": [
+        "observed_source_path",
+        "source_kind",
+        "bytes",
+        "sha256",
+        "cr_count",
+        "lf_count",
+        "trailing_newline",
+        "preserved_before_any_repository_mutation"
+      ],
+      "type": "object"
+    },
+    "state": {
+      "const": "STUDY3_DRAFT_V0_3_SECOND_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION"
+    },
+    "tango_retirement_decision": {
+      "properties": {
+        "historical_evidence_immutable": {
+          "const": true
+        }
+      },
+      "required": [
+        "retired_from_every_decision_role",
+        "residual_decision_path_found",
+        "false_conservativeness_assertion_withdrawn",
+        "historical_evidence_immutable",
+        "descriptive_remnants_carry_no_authority",
+        "decision"
+      ],
+      "type": "object"
+    },
+    "unresolved_item_adjudications": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "adjudication": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "item_id": {
+            "enum": [
+              "UR-01",
+              "UR-02",
+              "UR-03",
+              "UR-04",
+              "UR-05",
+              "UR-06",
+              "UR-07",
+              "UR-08",
+              "UR-09",
+              "UR-10",
+              "UR-11",
+              "UR-12",
+              "UR-13",
+              "UR-14",
+              "UR-15",
+              "UR-16",
+              "UR-17",
+              "UR-18",
+              "UR-19",
+              "UR-20",
+              "UR-21",
+              "UR-22"
+            ]
+          },
+          "status": {
+            "enum": [
+              "VERIFIED_RESOLVED",
+              "PARTIALLY_RESOLVED",
+              "NOT_RESOLVED",
+              "CORRECTLY_RETAINED_AS_BLOCKING_OPERATOR_DECISION"
+            ]
+          },
+          "subject": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "subject",
+          "status",
+          "adjudication"
+        ],
+        "type": "object"
+      },
+      "maxItems": 22,
+      "minItems": 22,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "unresolved_methods_items": {
+      "items": {
+        "properties": {
+          "severity": {
+            "enum": [
+              "BLOCKING",
+              "MAJOR",
+              "MINOR"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "severity",
+          "owner",
+          "requires"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "unresolved_operator_items": {
+      "items": {
+        "properties": {
+          "kept_separate_from_methods_blockers": {
+            "const": true
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "owner",
+          "subject",
+          "kept_separate_from_methods_blockers",
+          "note"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "document_class",
+    "state",
+    "disposition",
+    "disposition_basis",
+    "round",
+    "party",
+    "reviewed_commit",
+    "reviewed_tree",
+    "parent_review_commit",
+    "reviewed_draft_v0_2_commit",
+    "reviewed_artifact_identities",
+    "review_object",
+    "source_authority",
+    "committed_authority",
+    "reviewer_independence_declaration",
+    "prohibited_source_audit",
+    "inherited_finding_adjudications",
+    "unresolved_item_adjudications",
+    "new_findings",
+    "cross_artifact_adjudications",
+    "mandatory_audit_answers",
+    "estimand_and_claim_ceiling_decisions",
+    "binomial_sampling_model_decision",
+    "exact_binomial_recalculation",
+    "multiplicity_and_selection_graph",
+    "per_cell_and_joint_power_decisions",
+    "tango_retirement_decision",
+    "i4_s4_od2_decision",
+    "confirmation_decision",
+    "projected_operation_accounting",
+    "unresolved_methods_items",
+    "unresolved_operator_items",
+    "operation_counters",
+    "authority_flags",
+    "results",
+    "bank_rows",
+    "seeds",
+    "evidence_rows",
+    "next_legal_action",
+    "next_legal_action_note",
+    "claim_ceiling_restatement"
+  ],
+  "title": "Study 3 draft-v0.3 second independent methods review",
+  "type": "object"
+}

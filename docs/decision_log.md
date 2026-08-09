@@ -3399,3 +3399,44 @@ rejected because a size-control defect that is only made harder to trigger is
 still a size-control defect, and because retiring it removes a decision role
 rather than adding one. Declaring the amendment sound on the drafting party's own
 assessment was rejected as the exact failure mode that produced draft-v0.2.
+
+## D42 - Study 3 draft-v0.3 second independent methods review disposition
+
+**Date:** 2026-08-09 (UTC)
+**Decision class:** independent methods review disposition on an unfrozen design draft
+**Reviewed commit:** `2b36f5321d830ea6f70fff2b7bbca3cb93394046`
+**Reviewed tree:** `98d71cb35cca7b55d8f96f131064a5b9654dd3c7`
+**Record:** `studies/study3/reviews/v0_3_independent_methods_review.md`
+**Machine-readable:** `studies/study3/reviews/v0_3_independent_methods_review.json`
+**Receipt:** `studies/study3/methods_review_receipt_v0_3.json`
+
+**Disposition:** `STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`
+
+**State:** `STUDY3_DRAFT_V0_3_SECOND_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`
+
+The second bounded independent methods review of the Study 3 interface-calibration
+protocol adjudicated all 20 inherited findings and all 22 unresolved items on independent
+evidence, answered every mandatory audit target, and returned one of the three permitted
+dispositions.
+
+Sixteen inherited findings are `VERIFIED_RESOLVED` and four are `PARTIALLY_RESOLVED`
+(`S3MR-002`, `S3MR-013`, `S3MR-014`, `S3MR-017`). `UR-22` is
+`CORRECTLY_RETAINED_AS_BLOCKING_OPERATOR_DECISION`; it is the only item carrying that
+status. Ten new findings were recorded, `S3MR2-001` through `S3MR2-010`, comprising
+2 BLOCKING, 6 MAJOR and 2 MINOR.
+
+Rejection rather than acceptance with required changes was returned because every valid
+repair requires a substantive choice rather than a bounded conformance edit. `S3MR2-001`
+requires either a new presentation-effect estimand or a narrowed claim ceiling, because
+`J_both` is mathematically identical to `J_cor` and therefore identifies joint correctness
+rather than presentation invariance. `S3MR2-002` requires either a registered family-level
+power target with re-derived sizes or a re-registered per-cell power semantics, because
+the published unqualified `9/10` target is verified only per cell while the derived
+profile-eligibility power is `0.100885944` for `S1` and `0.320003768` for `S2` and `S3`.
+`S3MR2-010` requires registering a stochastic model or replacing the binomial architecture,
+because no artifact states the sampling frame that licenses the exact binomial test.
+
+This decision does not resolve `OD2`, does not select an interface or a positive reference,
+does not freeze anything and authorizes no execution. The only legal successor action is
+`OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_4`, followed by a further independent methods
+review.

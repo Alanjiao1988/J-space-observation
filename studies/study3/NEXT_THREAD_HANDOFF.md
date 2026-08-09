@@ -1,23 +1,31 @@
 # Study 3 - next thread handoff
 
 **State:
-`STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW`**
+`STUDY3_DRAFT_V0_3_SECOND_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`**
 
-**Draft version: `draft-v0.3`, amended, unfrozen, awaiting a second independent
-methods review.**
+**Draft version: `draft-v0.3`, amended, unfrozen, SECOND independent methods review
+complete.**
 
-**First independent methods review disposition:
-`STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`**, returned against the
-reviewed commit `8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`, tree
-`7e9077a32903adfdaa3bede95beba8752fcb5133`.
+**Second independent methods review disposition:
+`STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED`**, returned against the
+reviewed commit `2b36f5321d830ea6f70fff2b7bbca3cb93394046`, tree
+`98d71cb35cca7b55d8f96f131064a5b9654dd3c7`.
 
-**The only legal next action is a SECOND bounded independent methods review of
-draft-v0.3. Not a freeze. Not model execution. Not a bank, a seed, a `P3-Q`
-stage, a development round, a confirmation round or any mechanistic work.**
+The review adjudicated all 20 inherited findings (`S3MR-001` through `S3MR-020`) and
+all 22 unresolved items (`UR-01` through `UR-22`) on independent evidence, and recorded
+10 new findings `S3MR2-001` through `S3MR2-010`: 2 BLOCKING, 6 MAJOR, 2 MINOR. It
+independently reproduced every registered exact-binomial threshold, tail and power, the
+sixteen-row selection map, the construction laws and every operation total, and it
+confirmed that the Tango paired aggregate-equivalence procedure is retired from every
+decision role with no residual decision path.
 
-**The drafting party does not claim draft-v0.3 is correct.** Every repair in
-`reviews/v0_3_operator_amendment.md` is recorded as
-`PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`.
+**The only legal next action is `OPERATOR_AMENDMENT_ROUND_FOR_DRAFT_V0_4`, followed by
+another independent methods review. Not a freeze. Not `P3-Q`. Not a bank, a seed, model
+execution, a development round, a confirmation access or any mechanistic work.**
+
+`OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`. The review neither resolves nor
+advances it, and no positive reference is selected, preferred, pinned, revision-resolved,
+downloaded, tokenized, loaded or prequalified.
 
 | authority flag | value |
 | --- | --- |

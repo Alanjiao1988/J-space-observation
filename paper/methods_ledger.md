@@ -2000,3 +2000,52 @@ constructed, no weights were loaded, no forward pass or sequence scoring was
 run, no bank row was generated, no seed was drawn, no interface was selected and
 no positive reference was selected. The design is unfrozen and the repairs are
 proposed resolved subject to a second independent methods review.
+
+## M-30 - Independent recalculation and review method for Study 3 draft-v0.3
+
+**Round:** Study 3 draft-v0.3 second independent methods review
+**Reviewed commit:** `2b36f5321d830ea6f70fff2b7bbca3cb93394046`
+**Implementation:** `studies/study3/analysis/independent_methods_recalculation_v0_3.py`
+**Committed tables:** `studies/study3/analysis/independent_methods_recalculation_tables_v0_3.json`
+**Committed validation:** `tests/test_study3_methods_review_v0_3.py`
+
+The method is a CPU-only, model-free, deterministic recalculation of a proposed design.
+Every quantity it produces is a proposed design parameter and none is a measurement; the
+committed tables carry the status `PROPOSED_DESIGN_PARAMETERS_NOT_MEASUREMENTS`.
+
+**Independence.** The implementation derives its formulas from the reviewed protocol's
+registered exact-rational inputs and from English-language primary sources: Clopper and
+Pearson (1934) for the binomial sampling model and the exact one-sided tail; Berger and Hsu
+(1996) for intersection-union logic; and Tango (1998), Hsueh, Liu and Chen (2001) and Liu
+et al. (2002) used only to verify that the previously defective paired procedure is retired
+from decision authority. It does not import, execute, dynamically load, copy constants from,
+or derive control flow from `studies/study3/analysis/design_statistics.py` or
+`studies/study3/analysis/independent_methods_recalculation.py`. The committed test proves
+this by AST inspection and a reachable-source-literal scan. The parameter extraction and
+every derivation were committed before the reviewing session opened the drafting derived
+outputs, and that ordering is recorded in the emitted tables.
+
+**What it computes.** Exact one-sided binomial thresholds, null tails and powers from
+integer-only arithmetic over exact rationals, with decimal renderings refused as arithmetic
+inputs by a fail-closed parser; a full admissible sample-size sweep under the registered
+complete-block balancing divisor; the complete ordered `I3` outcome lattice and the
+resulting estimand identification; an independent re-implementation of the registered `K5`
+and `K6` construction laws; an independently authored resolver for the sixteen-state
+development selection map; gate-bearing cell counts by profile, role, family, depth,
+contrast and split; per-cell, gate-family, profile, selection and confirmation power with
+both Frechet bounds valid under arbitrary dependence and illustrative values under an
+explicitly stated independence assumption; operation projections rebuilt from primitive
+counts; and a static audit for surviving retired-procedure decision paths.
+
+**Self-verification.** Every statistical family carries at least one closed-form identity,
+exhaustive enumeration or published-example check: binomial masses summing to one exactly,
+the complement and reflection identities, the closed form at full success, exhaustive
+sequence enumeration for several small `n`, monotonicity of the upper tail in `p` which
+justifies evaluating the supremum at `p0`, the Clopper-Pearson boundary closed form, the
+Berger-Hsu intersection-union size bound by exhaustive enumeration, the exact Bonferroni
+reconstruction `1/600 x 3 = 1/200`, and the Frechet bounds. Agreement with the drafting
+bytes is never treated as validation.
+
+**Modes.** `--emit` writes the canonical committed tables; `--check` recomputes and compares
+them. No network, model, tokenizer, bank, seed, split, result or prior-evidence access
+occurs in either mode.
