@@ -1,0 +1,163 @@
+{
+ "authority_flags_all_false": true,
+ "closure_matrix": [
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [],
+   "committed_tests": [],
+   "finding_id": "S3MR3-001",
+   "negative_mutations": [],
+   "operator_decision": null,
+   "required_closure": "RESOLVED_BY_NOT_APPLICABLE_REREGISTRATION_AND_FULL_REDERIVATION",
+   "residual_limitation": null,
+   "severity": "BLOCKING",
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-001]",
+   "status": "OPEN_NOT_YET_DRAFTED"
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [],
+   "committed_tests": [],
+   "finding_id": "S3MR3-002",
+   "negative_mutations": [],
+   "operator_decision": null,
+   "required_closure": "RESOLVED_BY_COMPONENT_LEVEL_CONFIRMATION_APPLICABILITY",
+   "residual_limitation": null,
+   "severity": "MAJOR",
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-002]",
+   "status": "OPEN_NOT_YET_DRAFTED"
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [],
+   "committed_tests": [],
+   "finding_id": "S3MR3-003",
+   "negative_mutations": [],
+   "operator_decision": null,
+   "required_closure": "RESOLVED_ACTIVE_TEXT_ALIGNED_HISTORY_PRESERVED",
+   "residual_limitation": null,
+   "severity": "MAJOR",
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-003]",
+   "status": "OPEN_NOT_YET_DRAFTED"
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [],
+   "committed_tests": [],
+   "finding_id": "S3MR3-004",
+   "negative_mutations": [],
+   "operator_decision": null,
+   "required_closure": "RESOLVED_ENFORCEMENT_SCOPE_MATCHES_REGISTERED_SCOPE",
+   "residual_limitation": null,
+   "severity": "MINOR",
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-004]",
+   "status": "OPEN_NOT_YET_DRAFTED"
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [],
+   "committed_tests": [],
+   "finding_id": "S3MR3-005",
+   "negative_mutations": [],
+   "operator_decision": null,
+   "required_closure": "RESOLVED_S4_I4_REMOVED",
+   "residual_limitation": null,
+   "severity": "MINOR",
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-005]",
+   "status": "OPEN_NOT_YET_DRAFTED"
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [],
+   "committed_tests": [],
+   "finding_id": "S3MR3-006",
+   "negative_mutations": [],
+   "operator_decision": null,
+   "required_closure": "RESOLVED_NON_MACHINE_STATUS_REMOVED_FROM_STOP_STATES",
+   "residual_limitation": null,
+   "severity": "MINOR",
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-006]",
+   "status": "OPEN_NOT_YET_DRAFTED"
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [],
+   "committed_tests": [],
+   "finding_id": "S3MR3-007",
+   "negative_mutations": [],
+   "operator_decision": null,
+   "required_closure": "RESOLVED_NONMONOTONICITY_DISCLOSED_EXACT_N_REQUIRED",
+   "residual_limitation": null,
+   "severity": "MINOR",
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-007]",
+   "status": "OPEN_NOT_YET_DRAFTED"
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [],
+   "committed_tests": [],
+   "finding_id": "S3MR3-008",
+   "negative_mutations": [],
+   "operator_decision": null,
+   "required_closure": "RESOLVED_ROUND_REFERENCES_UPDATED",
+   "residual_limitation": null,
+   "severity": "MINOR",
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-008]",
+   "status": "OPEN_NOT_YET_DRAFTED"
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [],
+   "committed_tests": [],
+   "finding_id": "S3MR3-009",
+   "negative_mutations": [],
+   "operator_decision": null,
+   "required_closure": "RESOLVED_UNION_BOUND_CLAIM_ALIGNED",
+   "residual_limitation": null,
+   "severity": "MINOR",
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-009]",
+   "status": "OPEN_NOT_YET_DRAFTED"
+  },
+  {
+   "affected_derived_fields": [],
+   "affected_normative_fields": [],
+   "committed_tests": [],
+   "finding_id": "S3MR3-010",
+   "negative_mutations": [],
+   "operator_decision": null,
+   "required_closure": "RESOLVED_DETERMINISTIC_RENDERING_SURFACE_REGISTERED",
+   "residual_limitation": null,
+   "severity": "MAJOR",
+   "starting_evidence": "third independent methods review, new_findings[S3MR3-010]",
+   "status": "OPEN_NOT_YET_DRAFTED"
+  }
+ ],
+ "committed_authority": {
+  "bytes": 27458,
+  "committed_byte_identically": true,
+  "cr_count": 0,
+  "ends_with_newline": true,
+  "lf_count": 400,
+  "path": "studies/study3/prompts/study3_v0_5_design_amendment_authority.md",
+  "sha256": "b9f0023052c9056de1707ba64a8686a8df05d260cbf7aae0673c31d2dc3aadc6"
+ },
+ "document_class": "operator_amendment",
+ "operation_counters_all_zero": true,
+ "round": "draft-v0.5 bounded operator amendment",
+ "schema_version": "study3_operator_amendment_v0_5",
+ "self_approval_prohibited": "this amendment is drafted by the operator authority and adjudicates nothing; the sole legal successor is a fresh-session fourth independent methods review by a party that did not draft it",
+ "starting_state": {
+  "clean_worktree": true,
+  "commit": "79bcc20244ab55045ba1c5d778d829d4caac3dd3",
+  "evidence_ledger_last_row": "EV-0016",
+  "strict_ancestor_present": "e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43",
+  "third_review_publication_paths": 17,
+  "tree": "3855a579d0174d2c45587cba248e96d42c319664"
+ },
+ "state": "INITIAL_CLOSURE_MATRIX_RECORDED_BEFORE_DRAFTING",
+ "unresolved_carried_forward": [
+  "OD2",
+  "UR-22",
+  "RP canonical qualification wrapper"
+ ]
+}
