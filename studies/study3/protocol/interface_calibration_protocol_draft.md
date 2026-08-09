@@ -1,10 +1,10 @@
 # Study 3 - interface adequacy and label-binding calibration
 
-**State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW`
+**State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW`
 
-**Draft version:** draft-v0.3
+**Draft version:** draft-v0.4
 
-**Frozen:** `false`  **Execution authorized:** `false`  **Review state:** `awaiting_second_independent_methods_review`
+**Frozen:** `false`  **Execution authorized:** `false`  **Review state:** `awaiting_third_independent_methods_review`
 
 **Successor authority:** `none`
 
@@ -20,39 +20,43 @@ The JSON document interface_calibration_protocol_draft.json is the authoritative
 
 draft-v0.2 is an amendment produced in response to an operator review that found ten design defects in draft-v0.1 and refused freeze. Nothing here is frozen, nothing here is authorised for execution, and no scientific measurement of any kind was performed to produce it.
 
-## What draft-v0.3 is
+## What draft-v0.4 is
 
-draft-v0.3 is an **operator amendment**. An independent methods review of draft-v0.2
-returned `STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED` with 6 blocking, 11 major and
-3 minor findings, recorded as `S3MR-001` through `S3MR-020`, together with 22 unresolved
-items `UR-01` through `UR-22`. draft-v0.2 is preserved unedited at commit
-`8a2c4a0b2a73c5d802988333f11ea6c22828f6f5`, and the full review record is at
-`studies/study3/reviews/v0_2_independent_methods_review.md`. The exact packet the reviewer
-reviewed is preserved unedited at
-`studies/study3/analysis/independent_methods_review_packet.md`.
+draft-v0.4 is an operator amendment produced in response to the **second** bounded independent
+methods review, which returned `STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED` against
+commit `2b36f5321d830ea6f70fff2b7bbca3cb93394046` with two BLOCKING, six MAJOR and two MINOR
+structured findings. Both independent reviews remain valid rejections and neither was edited.
 
-Every item in that review is classified as **design defects in an unfrozen draft; not
-empirical findings, not measurements, not results**. Nothing here is frozen, nothing here
-is authorised for execution, and no scientific measurement of any kind was performed to
-produce this amendment. Every operation counter is exactly zero.
+**The drafting party does not claim draft-v0.4 is correct.** Every repair is recorded as
+`PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`. The determination belongs to the
+third independent reviewer.
 
-The complete finding-by-finding closure matrix, with a disposition for all 20 findings and
-all 22 unresolved items, is at `studies/study3/reviews/v0_3_operator_amendment.md`. What
-follows is a summary of the six blocking repairs.
+What the amendment adopted:
 
-| Finding | Summary | Repair in draft-v0.3 |
-| --- | --- | --- |
-| S3MR-001 | the I3 indicator was defined over "every applicable transformed variant" without ever fixing how many variants that is, so the estimand changed between cells while one floor was applied to all of them | I3 now samples **base-item contrast clusters of exactly two variants**; nine pre-registered pairwise contrast cells replace the undefined cluster; no cross-product anywhere |
-| S3MR-002 | the I3 indicator scored a stable but **wrong** answer as a success | three indicators `J_inv`, `J_cor` and `J_both` are published; **`J_both` is the primary gate indicator**, so stable-wrong and stable-invalid both score 0 |
-| S3MR-003 | the declared per-profile alpha `0.001666666667` was implemented nowhere; every component actually used `0.005` | the per-profile development component level is the **exact rational `1/600`** and is carried in every component row beside its decimal rendering |
-| S3MR-004 | the paired procedure was asserted conservative while its exact type-I error exceeded its nominal level | the assertion is **withdrawn** and the procedure is **retired from every decision role** |
-| S3MR-005 | a four-point discordance grid was presented as verification of size across the operating range | the grid is **removed from active verification**; nothing depends on it because the procedure it verified carries no decision role |
-| S3MR-006 | two I3 floors, `0.90` and `0.95`, were active at once with no rule saying which governs | exactly **one** active floor, `p0 = 0.9`; `p0 = 0.95` is deleted from every active protocol, table and packet field |
+- **`I3` is narrowed to joint robust correctness.** The sole gate-bearing indicator is
+  `J_joint_correct`, which is 1 exactly when BOTH registered variants of the cluster are scored
+  correct. The estimand `p_joint` is a joint-correctness **level**, not a contrast, and it
+  identifies no presentation effect. Every invariance, equivalence and presentation-effect claim
+  is prohibited in active text (`S3MR2-001`, `S3MR2-008`).
+- **The stochastic item-sampling model is registered.** Within each gate-bearing cell, units are
+  independent draws **with replacement** from a registered finite generator distribution with
+  exact rational weights. Duplicates are legitimate draws and must be retained. The K5
+  deterministic complete-block assignment is retired in favour of an iid nuisance draw at exact
+  weight `1/32` per state (`S3MR2-010`).
+- **Family, profile and end-to-end power are registered**, not per-cell power alone. Every joint
+  bound is a union bound valid under **arbitrary dependence** (`S3MR2-002`).
+- **`S4` is `not_applicable` for `I4`** everywhere, and no confirmation applicability list
+  contains it (`S3MR2-003`, `S3MR2-004`).
+- **`I0` is separated from profile adequacy**, so `STOP_INSTRUMENT_DEFECT` is reachable and every
+  event has exactly one legal next state (`S3MR2-006`).
+- **A decode/prefill/sequence-evaluation ontology is registered**, so the `S4` generative stream's
+  cost is bounded rather than null, and the `I0` fixture units are repaired (`S3MR2-005`,
+  `S3MR2-009`).
+- **The `P3-Q`/`I4` ordering constraint is registered** while `OD2` remains unresolved
+  (`S3MR2-007`).
 
-**Repairs are proposed, not self-approved.** Each disposition above is recorded as
-`PROPOSED_RESOLVED_SUBJECT_TO_SECOND_INDEPENDENT_METHODS_REVIEW`. A second independent methods review is required, and this document does not
-predeclare its outcome.
-
+Nothing here is frozen. Nothing here authorizes execution. Zero model operations have been
+performed. No seed has been drawn and no bank row exists.
 
 ## Research question
 
@@ -300,7 +304,7 @@ A pre-registered, fail-closed admissibility order replaces the data-dependent ra
 **The Family B denominator is fixed at 3 and never shrinks.**
 Finding `S3MR-016` recorded that draft-v0.2 corrected over 3 selectable profiles while also
 declaring S3 conditionally unavailable, so if S3 were unavailable the study would have
-tested 2 profiles at a level computed for 3. In draft-v0.3 the denominator is 3 under
+tested 2 profiles at a level computed for 3. In draft-v0.4 the denominator is 3 under
 **every** outcome, including the outcome in which S3's multi-token activation condition is
 not met and S3 is skipped. Shrinking the denominator after seeing which profiles are
 available would be a data-dependent relaxation of the level and is prohibited.
@@ -327,7 +331,7 @@ pre-data scenarios are enumerated in `design_statistics_tables.json` under
 
 Finding `S3MR-014` recorded that draft-v0.2 used the bare symbol `n` for four structurally
 different things and changed its referent between artifacts without declaring the change
-anywhere. In draft-v0.3 **every `n` carries its unit at the point of definition and in
+anywhere. In draft-v0.4 **every `n` carries its unit at the point of definition and in
 every table that reports it**, and no single `n` is reused across unit types.
 
 | Unit | Definition | Never equals |
@@ -378,7 +382,7 @@ An atomic evaluation cell is one combination of interface profile, checkpoint ro
 - **pooling contrast IDs within K5 or within K6** - each contrast ID is a separately registered one-factor manipulation; pooling them would let an insensitive factor mask a sensitive one, which is precisely the failure I3 exists to find
 - **pooling the K5 content-position cells with the K5 correct-symbol-index cells** - separating the physical position of the correct content from the identity of the displayed symbol is the entire reason the v0.1 cyclic design was withdrawn; pooling them re-creates the confound
 - **pooling the two label alphabets** - label-set replacement is itself a registered manipulation (K5-A1), so averaging over the alphabet would average over the manipulation
-- **pooling J_inv, J_cor and the descriptive paired summary** - J_both is the gate indicator; J_inv, J_cor and the descriptive paired table are reported alongside it and may never rescue a failed J_both
+- **pooling J_joint_correct with any descriptive summary** - `J_joint_correct` is the sole gate indicator; J_inv, J_cor and the descriptive paired table are reported alongside it and may never rescue a failed J_both
 - **pooling across splits** - the confirmation split is a separate error role on data that was never inspected; pooling it with development would spend it
 
 Pooled summaries may be reported for readability. They carry no gate authority, may never be substituted for a failed cell, and must be labelled descriptive wherever they appear.
@@ -510,7 +514,7 @@ no longer exists. The labels above are corrected._
 - **Dossier:** `studies/study3/references/positive_reference_dossier.md`
 - **Candidate families retained for a future operator decision:** 3 (families, not selections)
 
-**No positive reference is selected in draft-v0.3, and none may be selected without a new
+**No positive reference is selected in draft-v0.4, and none may be selected without a new
 operator authority.** No checkpoint has been selected, preferred, pinned, revision-resolved,
 downloaded, tokenized, loaded or prequalified. The dossier retains candidates for a future
 operator decision and records each of them as `UNSELECTED`.
@@ -535,7 +539,7 @@ it.
 | I1a | trivial content recovery and output validity | `true` | `false` | `true` |
 | I1b | explicit content-to-symbol binding | `true` | `false` | `true` |
 | I2 | primitive headroom | `true` | `false` | `true` |
-| I3 | pairwise presentation invariance and correctness | `true` | `false` | `true` |
+| I3 | joint robust correctness across a registered presentation pair | `true` | `false` | `true` |
 | I4 | positive reference adequacy | `true` | `false` | `true` |
 | I5 | one-shot confirmation | `false` | `false` | `true` |
 
@@ -572,7 +576,7 @@ it.
 - **Pooling across cells:** `prohibited`
 - **Independent unit:** `base items per atomic cell`
 - **n:** `256` base items per atomic cell
-- **Threshold logic:** exact one-sided binomial test against the null p <= 0.9 at the per-component level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 244 of 256 base items per atomic cell succeed. Every applicable cell must pass; no pooled summary may rescue a failed cell.
+- **Threshold logic:** exact one-sided binomial test against the null p <= 9/10 at the per-component development level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 389 of 413 base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 succeed. On the confirmation split the same form is used at level 1/200 with a pass count of 388.
 
 | Split | Null | p1 | n | Unit of n | alpha (exact rational) | Required pass count | Exact null tail at p0 | Exact power at p1 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -599,7 +603,7 @@ it.
 - **Pooling across cells:** `prohibited`
 - **Independent unit:** `base items per atomic cell`
 - **n:** `256` base items per atomic cell
-- **Threshold logic:** exact one-sided binomial test against the null p <= 0.9 at the per-component level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 244 of 256 base items per atomic cell succeed. Every applicable cell must pass; no pooled summary may rescue a failed cell.
+- **Threshold logic:** exact one-sided binomial test against the null p <= 9/10 at the per-component development level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 389 of 413 base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 succeed. On the confirmation split the same form is used at level 1/200 with a pass count of 388.
 
 | Split | Null | p1 | n | Unit of n | alpha (exact rational) | Required pass count | Exact null tail at p0 | Exact power at p1 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -626,7 +630,7 @@ it.
 - **Pooling across cells:** `prohibited`
 - **Independent unit:** `base items per primitive-family cell`
 - **n:** `128` base items per primitive-family cell
-- **Threshold logic:** exact one-sided binomial test against the null p <= 0.5 at the per-component level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 82 of 128 base items per primitive-family cell succeed. Every applicable cell must pass; no pooled summary may rescue a failed cell.
+- **Threshold logic:** exact one-sided binomial test against the null p <= 1/2 at the per-component development level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 129 of 214 base items per primitive-family cell succeed. On the confirmation split the same form is used at level 1/200 with a pass count of 127.
 
 | Split | Null | p1 | n | Unit of n | alpha (exact rational) | Required pass count | Exact null tail at p0 | Exact power at p1 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -641,78 +645,83 @@ it.
 - **Authorizes mechanistic execution:** `false`
 - **Fail closed:** `true`
 
-### Gate I3 - pairwise presentation invariance and correctness
+### Gate I3 - joint robust correctness across a registered presentation pair
 
-**Question.** Does the checkpoint give the same CORRECT answer to the same question when exactly one registered aspect of the presentation changes in a way that does not change the question?
+**Question.** Does the joint-correctness probability under both registered presentations of the same base item exceed the registered floor in this contrast cell?
 
-- **Inputs:** stratum K5 pairwise contrast cells (`K5-P1`, `K5-P2`, `K5-P3`, `K5-S1`, `K5-S2`, `K5-S3`, `K5-A1`), stratum K6 pairwise contrast cells (`K6-SEP`, `K6-INSTR`)
-- **Model roles:** `RT`, `RL`, `RI`
-- **Applicable profiles:** S1, S2, S3, S4
-- **Part of eligibility:** `true`
-- **Independent unit:** `base_item_contrast_cluster`, holding exactly **2** variants
-- **n:** `256` base-item contrast clusters per contrast cell
-- **Evaluated per:** interface profile, checkpoint role, contrast family, contrast ID, split
-- **Pooling across cells:** `prohibited`
-- **Threshold logic:** J_both must clear its floor by the exact one-sided binomial test in EVERY applicable atomic contrast cell separately: seven K5 cells for label-bearing profiles and two K6 cells for every profile. A single failed cell fails the gate. No pooled summary, no J_inv value, no J_cor value and no descriptive paired table may rescue a failed cell.
+**Primary indicator.** `J_joint_correct` = 1 if and only if BOTH registered variants of the
+base-item contrast cluster are scored correct against the same unique registered ground truth.
 
-#### The three indicators
+**Estimand.** `p_joint` = Pr(`J_joint_correct` = 1) over the registered item-generating
+distribution for that atomic contrast cell. This is a **level**, not a contrast. It does not
+identify the direction, magnitude or existence of a presentation effect.
 
-| Indicator | Definition | Role |
+| Field | Value |
+| --- | --- |
+| null hypothesis | `p <= 9/10` |
+| p0 | `9/10` |
+| p1 | `97/100` |
+| n | 413 |
+| unit of n | base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 |
+| development alpha | `1/600` |
+| development pass count | 389 |
+| exact null tail at p0 | 0.001664632930 |
+| exact power at p1 | 0.999129439838 |
+
+**What passes.** the registered joint-correctness floor was cleared for this applicable pairwise cell, and nothing more
+
+**What fails.** the joint-correctness probability under the registered presentation pair does not clear the registered floor. This localises inadequate joint robust correctness for the named pair. It does not identify the direction, the magnitude or the existence of a presentation effect.
+
+#### The full ordered outcome lattice
+
+Over the alphabet `correct`, `wrong_a`, `wrong_b`, `invalid` for the two variants there are 16 ordered cases. Exactly
+1 case family passes the primary indicator: both variants correct.
+
+| Variant 1 | Variant 2 | `J_joint_correct` | Scores |
+| --- | --- | --- | --- |
+| `correct` | `correct` | 1 | `true` |
+| `correct` | `wrong_a` | 0 | `false` |
+| `correct` | `wrong_b` | 0 | `false` |
+| `correct` | `invalid` | 0 | `false` |
+| `wrong_a` | `correct` | 0 | `false` |
+| `wrong_a` | `wrong_a` | 0 | `false` |
+| `wrong_a` | `wrong_b` | 0 | `false` |
+| `wrong_a` | `invalid` | 0 | `false` |
+| `wrong_b` | `correct` | 0 | `false` |
+| `wrong_b` | `wrong_a` | 0 | `false` |
+| `wrong_b` | `wrong_b` | 0 | `false` |
+| `wrong_b` | `invalid` | 0 | `false` |
+| `invalid` | `correct` | 0 | `false` |
+| `invalid` | `wrong_a` | 0 | `false` |
+| `invalid` | `wrong_b` | 0 | `false` |
+| `invalid` | `invalid` | 0 | `false` |
+
+Stable wrong, stable invalid, mixed correctness and two different wrong answers all fail.
+
+#### Historical indicators
+
+`J_inv`, `J_cor` and the retired conjunction `J_both` survive only as historical names and
+descriptive audit quantities with status `DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY`. They carry no
+gate, eligibility, selection, confirmation, ranking, rescue or claim authority and no reachable
+decision path. Under a unique registered ground truth `J_cor` implies `J_inv`, so the retired
+`J_both` was identically `J_cor` and is identically `J_joint_correct`; the active name makes the
+identity explicit.
+
+#### Claim ceiling, by profile
+
+| Profile | Applicable cells | Claim |
 | --- | --- | --- |
-| `J_inv` | 1 iff both variants produce valid answer-domain content and the two mapped contents are byte-identical after the registered content mapping; stable **invalid** output scores 0 | reported alongside; never a gate indicator, never a rescue path |
-| `J_cor` | 1 iff both variants are scored correct against the unique registered ground truth; a stable but **wrong** answer scores 0 | reported alongside; never a gate indicator, never a rescue path |
-| `J_both` | `J_inv AND J_cor` | **the primary gate indicator** |
+| `S1` | 9 | joint robust correctness for each of the seven applicable K5 pairs and the two applicable K6 pairs, separately |
+| `S2` | 2 | joint robust correctness for the two applicable K6 pairs only; the seven K5 pairs are not_applicable and are never counted as passes or as evidence |
+| `S3` | 2 | joint robust correctness for the two applicable K6 pairs only, and only while S3's separately registered single-token applicability condition holds |
+| `S4` | 9 | descriptive only; S4 is never selectable and never enters an interface-selection or confirmation claim |
 
-- **Estimand:** Pr(J_both = 1) over independently sampled base-item contrast clusters, evaluated separately in every applicable atomic contrast cell
-- **Why `J_both` is primary:** an aggregate criterion can be satisfied while a large number of clusters flip in compensating directions, and an invariance-only criterion can be satisfied by a model that is stably wrong. J_both excludes both outcomes at the level of the individual cluster.
+Passing an applicable cell supports only this statement:
 
-**Expected integrity invariant.** Under a unique registered ground truth `J_cor` implies
-`J_inv`, because two outputs that both equal the ground truth are necessarily equal to each
-other. This is recorded as an expected invariant of the scorer, **not** as evidence that the
-two indicators carry independent information. A run in which `J_cor = 1` and `J_inv = 0` is a
-scorer defect. The conjunction is retained anyway because it is what makes the stable-wrong
-and stable-invalid cases fail closed at the point of scoring.
+> Under the registered item-generating distribution for this named contrast cell, the probability that both the baseline and the named transformed presentation are scored correct exceeded the registered floor.
 
-| Case | Variant 1 | Variant 2 | `J_inv` | `J_cor` | `J_both` | Scores for the gate |
-| --- | --- | --- | --- | --- | --- | --- |
-| both correct | `7` | `7` | 1 | 1 | 1 | `true` |
-| stable but wrong | `3` | `3` | 1 | 0 | 0 | `false` |
-| one correct one wrong | `7` | `3` | 0 | 0 | 0 | `false` |
-| one wrong one correct | `3` | `7` | 0 | 0 | 0 | `false` |
-| both wrong and different | `3` | `5` | 0 | 0 | 0 | `false` |
-| stable but invalid | _invalid_ | _invalid_ | 0 | 0 | 0 | `false` |
-| one valid one invalid | `7` | _invalid_ | 0 | 0 | 0 | `false` |
-| one invalid one valid | _invalid_ | `7` | 0 | 0 | 0 | `false` |
-
-_(registered ground truth in the enumerated cases: `7`)_
-
-#### The single active floor
-
-| Split | Null | p1 | n | Unit of n | alpha (exact rational) | Required pass count | Exact null tail at p0 | Exact power at p1 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| development | p <= 0.9 | 0.97 | 256 | base-item contrast clusters per contrast cell | `1/600` | 244 | 0.001491215117 | 0.953040775 |
-| confirmation | p <= 0.9 | 0.97 | 256 | base-item contrast clusters per contrast cell | `1/200` | 243 | 0.003307722347 | 0.976290353 |
-
-- **Active floor count:** `1`
-- **`p0 = 0.95` status:** `DELETED FROM EVERY ACTIVE FIELD`. Findings `S3MR-006` and `S3MR-015` recorded that draft-v0.2 carried two floors at once with no rule saying which governs, and that the `0.95` variant produced a degenerate rejection region requiring **every single unit** to succeed, which has no power against any alternative below 1 and is not a hypothesis test. The `0.95` variant may appear only in clearly labelled historical narrative describing what draft-v0.2 did.
-- **Degenerate-region prohibition:** no active rejection region may have a required pass count equal to `n`. The derivation script **raises** before emitting any table if that condition arises, so the prohibition is enforced rather than asserted.
-- **Derivation, not transcription:** every value above is derived by exact binomial search over exact rational arithmetic in `studies/study3/analysis/design_statistics.py`. None of the pass counts appears in that script as an integer constant, and the committed design test asserts both the values and their absence as literals.
-
-#### What was removed
-
-- **Secondary criterion:** REMOVED. draft-v0.2 carried an aggregate paired-equivalence secondary criterion built on the Tango (1998) procedure. That procedure is retired from every decision role in draft-v0.3, so the secondary criterion has been removed rather than re-scoped.
-- **Selected-label uniformity:** now `DIAGNOSTIC_NUISANCE_REPORT_ONLY`. the operator amendment authority, section 5, records that draft-v0.2 declared this criterion a gate and simultaneously said it must never be reclassified as diagnostic, while its own components table omitted it from the gate list, so the document contradicted itself about whether a profile could be eliminated by it. draft-v0.3 resolves the contradiction in the direction that eliminates no profile on a nuisance criterion: it is a diagnostic report everywhere, in every artifact, with no exception and no reclassification path.
-
-- **What passes:** the same question yields the same CORRECT answer when exactly one registered presentation factor changes
-- **What fails:** answers move with presentation, or answers are stable but wrong, or outputs are stable but invalid
-- **`not_applicable` semantics:** The seven K5 contrasts are not_applicable to S2 and S3, which render neither an option list nor a label alphabet, so the manipulation has no referent. The two K6 contrasts are applicable to every profile. not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied component, averaged into any rate, or used as an input to admissibility. The operator amendment authority, section 4.1, requires that K5 be recorded not_applicable for S2 and S3 and never counted as a pass; the draft-v0.2 gate truth table showed K5 as passing for those profiles, which is the exact error this semantics forbids; that row is corrected.
-- **Merely descriptive:** J_inv considered alone, J_cor considered alone, the paired 2x2 discordance summary, aggregate rate differences, pooled consistency across cells, the selected-label uniformity diagnostic
-- **Claim ceiling:** passing all nine cells supports a claim about each registered factor SEPARATELY and supports no claim about combined or interacting presentation changes
-- **Legal next state on pass:** evaluate I4
-- **Legal next state on fail:** eliminate this interface profile for this role; if no selectable profile remains, STOP
-- **Authorizes mechanistic execution:** `false`
-- **Fail closed:** `true`
-
+It supports no statement that the two marginal accuracies are equal and no statement that the
+transformation has no effect.
 
 ### Gate I4 - positive reference adequacy
 
@@ -726,7 +735,7 @@ _(registered ground truth in the enumerated cases: `7`)_
 - **n:** `256` RP base items per operation-family x depth cell per candidate profile
 - **Evaluated per:** interface profile, operation family, depth
 - **Pooling across cells:** `prohibited`
-- **Threshold logic:** exact one-sided binomial test against the null p <= 0.8 at the per-component level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 224 of 256 RP base items per operation-family x depth cell per candidate profile succeed. Every applicable cell must pass; no pooled summary may rescue a failed cell.
+- **Threshold logic:** exact one-sided binomial test against the null p <= 4/5 at the per-component development level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 383 of 448 RP base items per operation-family x depth cell per candidate profile succeed. On the confirmation split the same form is used at level 1/200 with a pass count of 381.
 
 | Split | Null | p1 | n | Unit of n | alpha (exact rational) | Required pass count | Exact null tail at p0 | Exact power at p1 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -755,7 +764,7 @@ _(registered ground truth in the enumerated cases: `7`)_
 - **Model roles:** `RT`, `RL`, `RI`, `RP`
 - **Applicable profiles:** the single **development-selected** interface profile only
 - **Part of eligibility:** `false`
-- **Covered constructs:** `I0`, `I1a`, `I1b`, `I2`, `I3_J_both`, `I4`
+- **Covered constructs:** `I0`, `I1a`, `I1b`, `I2`, `I3_J_joint_correct`, `I4`
 - **Component alpha:** exact rational `1/200`
 - **Pooling across cells:** `prohibited`
 - **Accessible before authority:** `false`
@@ -772,7 +781,7 @@ _(registered ground truth in the enumerated cases: `7`)_
 | I3 | p <= 0.9 | 256 | base-item contrast clusters per contrast cell | `1/200` | 243 | 0.003307722347 | 0.976290353 |
 | I4 | p <= 0.8 | 256 | RP base items per operation-family x depth cell per candidate profile | `1/200` | 222 | 0.003276850097 | 0.963820468 |
 
-- **Threshold logic:** Each covered construct is tested by the same exact one-sided binomial form used on the development split, against the same registered null, at the confirmation component level 1/200, in every applicable atomic cell separately. The constructs form an intersection-union conjunction: every applicable cell of every applicable construct must pass. No threshold, floor, sample size, unit, indicator or applicability rule may be re-tuned after the development split is read.
+- **Threshold logic:** each covered construct is tested by the same exact one-sided binomial form used on the development split, against the same registered null, at the confirmation component level 1/200, in every applicable atomic cell separately. The applicable cells form an intersection-union conjunction. Confirmation applicability is the intersection of the component's registered SELECTABLE profiles with the single development-selected profile, so S4 can never appear. No threshold, floor, sample size, unit, indicator or applicability rule may be re-tuned after the development split is read.
 - **Multiplicity:** no across-profile correction is applied at confirmation, because exactly one profile is selected on the development split before confirmation is entered and no reselection is permitted. The resulting claim is explicitly conditional on that single profile.
 - **Selection precondition:** I5 may be entered only after the pre-registered development selection map has returned exactly one selected profile. If the map returns none, the study STOPS and the confirmation split is never opened.
 - **One-shot rule:** the confirmation split is read exactly once, for exactly one profile, under exactly one pre-registered analysis. It is spent by that reading. There is no second look, no re-analysis, no rescue path and no re-selection.
@@ -872,7 +881,7 @@ divergence detectable by inspection.
 
 Two structurally different multiplicity problems are kept apart. Within one interface profile every applicable component must pass; that conjunction is an intersection-union test whose size is bounded by the level of its individual components, so no further within-profile correction is applied to the conjunction itself. Across interface profiles the study may proceed if ANY selectable profile qualifies; that is a union event, it inflates the false-qualification rate, and it is Bonferroni-corrected by a denominator fixed before any data exists.
 
-- **Family A, within a profile** (`intersection_union_conjunctive`): members I1a, I1b, I2, I3_J_both, I4; per-component alpha exact rational `1/600`; correction: **none within the profile** - the intersection-union size is bounded by the component level, so no further within-profile Bonferroni correction is applied
+- **Family A, within a profile** (`intersection_union_conjunctive`): members I1a, I1b, I2, I3_J_joint_correct, I4; per-component alpha exact rational `1/600`; correction: **none within the profile** - the intersection-union size is bounded by the component level, so no further within-profile Bonferroni correction is applied
 - **Family B, across profiles** (`union_selection`): members S1, S2, S3; study-level screening alpha exact rational `1/200`; **fixed** selectable-profile denominator `3`, fixed before data and never shrinking; per-profile alpha exact rational `1/600`; `per_profile_alpha x 3 = study_alpha` exactly, asserted in the derivation script
 - **Family D, confirmation** (`single_preselected_profile_one_shot`): component alpha exact rational `1/200`; **no across-profile correction**, because exactly one profile is selected on the development split before confirmation is entered, no reselection is permitted, and the resulting claim is explicitly conditional on that profile
 - **Family C, descriptive:** pooled summaries, softmax confidences, per-cell Clopper-Pearson intervals, the paired 2x2 discordance summary and the selected-label uniformity diagnostic; reported for readability, carrying **no** gate, eligibility, selection or confirmation authority anywhere
@@ -880,26 +889,163 @@ Two structurally different multiplicity problems are kept apart. Within one inte
 
 ### Development exact-binomial components
 
-| Gate | Construct | Null | p1 | n | Unit of n | alpha (exact rational) | Required pass count | Exact null tail at p0 | Exact power at p1 | Meets target power |
+| Gate | Construct | Null | p1 | n | Unit of n | alpha | Pass count | Exact null tail | Exact power at p1 | Degenerate |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| I1a | trivial content recovery and output validity | p <= 0.9 | 0.97 | 256 | base items per atomic cell | `1/600` | 244 | 0.001491215117 | 0.953040775 | `true` |
-| I1b | explicit content-to-symbol binding | p <= 0.9 | 0.97 | 256 | base items per atomic cell | `1/600` | 244 | 0.001491215117 | 0.953040775 | `true` |
-| I2 | primitive headroom, evaluated separately per family | p <= 0.5 | 0.7 | 128 | base items per primitive-family cell | `1/600` | 82 | 0.000931234262 | 0.938986365 | `true` |
-| I3 | pairwise presentation invariance and correctness, J_both | p <= 0.9 | 0.97 | 256 | base-item contrast clusters per contrast cell | `1/600` | 244 | 0.001491215117 | 0.953040775 | `true` |
-| I4 | positive-reference competence recovery through the profile | p <= 0.8 | 0.9 | 256 | RP base items per operation-family x depth cell per candidate profile | `1/600` | 224 | 0.001081002486 | 0.921083515 | `true` |
+| I1a | trivial content recovery, explicit content-to-symbol binding, and joint robust correctness across a registered presentation pair | `p <= 9/10` | `97/100` | 413 | base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 | `1/600` | 389 | 0.001664632930 | 0.999129439838 | `false` |
+| I1b | trivial content recovery, explicit content-to-symbol binding, and joint robust correctness across a registered presentation pair | `p <= 9/10` | `97/100` | 413 | base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 | `1/600` | 389 | 0.001664632930 | 0.999129439838 | `false` |
+| I2 | primitive headroom, evaluated separately per registered operation family | `p <= 1/2` | `7/10` | 214 | base items per primitive-family cell | `1/600` | 129 | 0.001597676081 | 0.999042859186 | `false` |
+| I3 | joint robust correctness across a registered presentation pair | `p <= 9/10` | `97/100` | 413 | base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 | `1/600` | 389 | 0.001664632930 | 0.999129439838 | `false` |
+| I4 | positive-reference competence recovery through the candidate interface | `p <= 4/5` | `9/10` | 448 | RP base items per operation-family x depth cell per candidate profile | `1/600` | 383 | 0.001620609599 | 0.999005509196 | `false` |
+
+Each development `n` is the **smallest unrestricted positive integer** that reaches the registered
+per-cell power target at its registered `p1` and alpha. draft-v0.3 restricted admissible `n` to
+multiples of the complete-block size 32; that restriction is retired with the deterministic block
+assignment it came from. Each pass count is the smallest count controlling its registered null.
 
 ### Confirmation exact-binomial components
 
-| Gate | Construct | Null | p1 | n | Unit of n | alpha (exact rational) | Required pass count | Exact null tail at p0 | Exact power at p1 | Meets target power |
+| Gate | Construct | Null | p1 | n | Unit of n | alpha | Pass count | Exact null tail | Exact power at p1 | Degenerate |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| I1a | trivial content recovery and output validity | p <= 0.9 | 0.97 | 256 | base items per atomic cell | `1/200` | 243 | 0.003307722347 | 0.976290353 | `true` |
-| I1b | explicit content-to-symbol binding | p <= 0.9 | 0.97 | 256 | base items per atomic cell | `1/200` | 243 | 0.003307722347 | 0.976290353 | `true` |
-| I2 | primitive headroom, evaluated separately per family | p <= 0.5 | 0.7 | 128 | base items per primitive-family cell | `1/200` | 80 | 0.002962603303 | 0.972425829 | `true` |
-| I3 | pairwise presentation invariance and correctness, J_both | p <= 0.9 | 0.97 | 256 | base-item contrast clusters per contrast cell | `1/200` | 243 | 0.003307722347 | 0.976290353 | `true` |
-| I4 | positive-reference competence recovery through the profile | p <= 0.8 | 0.9 | 256 | RP base items per operation-family x depth cell per candidate profile | `1/200` | 222 | 0.003276850097 | 0.963820468 | `true` |
+| I1a | trivial content recovery, explicit content-to-symbol binding, and joint robust correctness across a registered presentation pair | `p <= 9/10` | `97/100` | 413 | base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 | `1/200` | 388 | 0.003020762720 | 0.999609916012 | `false` |
+| I1b | trivial content recovery, explicit content-to-symbol binding, and joint robust correctness across a registered presentation pair | `p <= 9/10` | `97/100` | 413 | base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 | `1/200` | 388 | 0.003020762720 | 0.999609916012 | `false` |
+| I2 | primitive headroom, evaluated separately per registered operation family | `p <= 1/2` | `7/10` | 214 | base items per primitive-family cell | `1/200` | 127 | 0.003765544908 | 0.999646587923 | `false` |
+| I3 | joint robust correctness across a registered presentation pair | `p <= 9/10` | `97/100` | 413 | base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 | `1/200` | 388 | 0.003020762720 | 0.999609916012 | `false` |
+| I4 | positive-reference competence recovery through the candidate interface | `p <= 4/5` | `9/10` | 448 | RP base items per operation-family x depth cell per candidate profile | `1/200` | 381 | 0.003582895662 | 0.999626931069 | `false` |
 
-Confirmation sizes equal the development sizes, at the confirmation component level, on the
-physically disjoint one-shot split.
+Confirmation applicability is the **intersection** of each component's registered selectable
+profiles with the single development-selected profile, so `S4` can never appear. `I1b` and the seven
+`K5` pairs are label-bearing only, so their confirmation applicability is `S1` alone; for `S2` and
+`S3` they are `not_applicable` and never a pass.
+
+The confirmation sizes are **conservative reuse** of the development sizes, not minimal confirmation
+sizes.
+
+### Power architecture
+
+Per-cell power alone does not describe this design's operating characteristics. The
+type-II allocation below is binding and every joint bound is a union bound valid under
+**arbitrary dependence**; no independence between cells, profiles, roles or stages is used.
+
+| Quantity | Exact rational | Scope |
+| --- | --- | --- |
+| maximum selectable-profile cell count `m_max` | 43 | over `S1`, `S2`, `S3`; `S4` is excluded |
+| per-stage profile false-negative budget | `19/400` | one profile, one stage |
+| per-cell false-negative budget | `19/17200` | per atomic evaluation cell |
+| per-cell power target | `17181/17200` | **PER ATOMIC EVALUATION CELL** |
+| profile stage power floor | `381/400` | one profile, one stage; union-bound lower bound |
+| confirmation conjunction power floor | `381/400` | one-shot confirmation conjunction |
+| panel false-qualification budget | `1/200` | across the fixed three-profile denominator |
+| study end-to-end power floor | `9/10` | development selection plus one-shot confirmation |
+
+**Cell counts by profile.**
+
+| Profile | Cells at the I1/I3 floor | Cells at the I2 floor | Cells at the I4 floor | Total | Selectable |
+| --- | --- | --- | --- | --- | --- |
+| `S1` | 33 | 6 | 4 | 43 | `true` |
+| `S2` | 9 | 6 | 4 | 19 | `true` |
+| `S3` | 9 | 6 | 4 | 19 | `true` |
+| `S4` | 33 | 6 | 0 | 39 | `false` |
+
+**The union-bound proof.** Pr(the study returns the designated adequate profile and confirms it) >= 1 - 19/400 - 1/200 - 19/400 = 9/10 The unioned failure events are:
+
+- the designated adequate profile fails to qualify in development, bounded by 19/400 as the sum over its at most m_max applicable cells of the per-cell false-negative budget 19/17200
+- a higher-priority profile that lies in its registered profile null is falsely qualified, bounded by the panel false-qualification budget 1/200
+- the selected adequate profile fails the confirmation conjunction, bounded by 19/400 by the same per-cell allocation on the confirmation split
+
+**The binding claim holds only under this least-favourable configuration.**
+
+- I0 passes
+- at least one selectable profile has every applicable atomic-cell success probability at or above that cell's registered p1
+- any higher-priority profile that is not adequate lies in its registered profile null, meaning at least one of its required cells is at or below that cell's p0
+- development and confirmation follow the frozen selection order with no rescue and no substitution
+- the selected adequate profile remains at or above p1 on the confirmation-generating distribution
+
+**Not covered by the power guarantee.**
+
+- profiles whose cell success probabilities lie in the indifference region strictly between p0 and p1
+- distribution shift between the development and confirmation generating distributions
+- I0 failure
+- an invalid or unregistered sampling frame
+- protocol deviations of any kind
+
+**Vocabulary.** `target_power` is per atomic cell. `profile_stage_power_floor` is a
+union-bound lower bound under arbitrary cell dependence.
+`study_end_to_end_power_floor` carries the stated least-favourable configuration.
+Selection-return and confirmation operating characteristics are named separately and are
+never called power. a STOP outcome reports the realized registered gate outcome in that run. It is not a proof that no population-level adequate interface exists and is never a model-capability conclusion.
+
+### The registered sampling frame
+
+within each gate-bearing atomic cell, base-item units or base-item contrast-cluster units are independent draws WITH REPLACEMENT from that cell's registered generator distribution; the deterministic model and scorer map each independently drawn unit to exactly one Bernoulli success indicator.
+
+| Level | Identified by | Excludes |
+| --- | --- | --- |
+| sampling cell | split, gate or component, stratum or operation-family x depth, contrast ID where applicable | interface profile, checkpoint role |
+| evaluation cell | one sampling cell x one applicable profile x one applicable role | - |
+
+One iid item stream is drawn per sampling cell and reused across its applicable
+evaluation cells. Every evaluation cell is therefore marginally iid Bernoulli, while
+evaluation cells sharing sampled items may be dependent. That dependence is expressly
+allowed and is handled by the arbitrary-dependence bounds above.
+
+- Development sampling cells: **17**; confirmation sampling cells: **17**.
+- Draws are **with replacement**. Duplicate generator tuples are legitimate draws and
+  **must be retained**; redrawing for uniqueness, difficulty, balance or model response
+  is prohibited.
+- Every sampled parameter carries an exact rational weight and every parameter's weights
+  sum to exactly one.
+- Validity predicates are deterministic and evaluated before any model operation; every
+  registered support satisfies them by construction, so the registered rejection
+  probability is exactly `0`.
+- Development, confirmation and future `P3-Q` supports are physically disjoint by the
+  registered outcome-blind namespace partition of the generator key, frozen before any
+  seed draw.
+- The K5 baseline nuisance state has a **32**-state support with exact weight
+  `1/32` per state, drawn iid with replacement. `n` is no longer required
+  to be a multiple of the support size.
+- **No seed exists and no bank row exists.** Seed values, the generator implementation
+  blob and the realized bank are `null`, meaning *not yet selected*, not zero.
+
+**Exact-binomial validity holds exactly under these conditions.**
+
+- the n units of the evaluation cell are the images of n iid draws from that cell's registered generator distribution
+- the scorer is a deterministic function of the drawn unit and the pinned checkpoint, so each unit yields exactly one Bernoulli indicator with a common success probability
+- no unit is redrawn, filtered, deduplicated or reordered on any post-draw property
+- the null and the alternative are statements about that cell's registered generating distribution
+- the split namespace of the cell is disjoint from every other split
+
+if any gate-bearing atomic cell lacks a complete generator distribution, or would require an adaptive post-draw choice, the design fails closed for that cell. It is not silently downgraded to descriptive and no exact-binomial validity is claimed for it.
+
+### The total state machine
+
+`I0` is a **global precondition**, evaluated before and outside profile adequacy. Every
+event has exactly one legal next state and every registered terminal state is reachable.
+
+| From | Event | Next |
+| --- | --- | --- |
+| `Q0_INSTRUMENT` | all fixtures pass | `Q1_DEVELOPMENT` |
+| `Q0_INSTRUMENT` | any fixture fails | `STOP_INSTRUMENT_DEFECT` |
+| `Q0_INSTRUMENT` | error | `STOP_INSTRUMENT_DEFECT` |
+| `Q0_INSTRUMENT` | ambiguity | `STOP_INSTRUMENT_DEFECT` |
+| `Q1_DEVELOPMENT` | completed validly | `Q2_SELECTION` |
+| `Q1_DEVELOPMENT` | protocol or integrity error | `STOP_DEVELOPMENT_INTEGRITY_ERROR` |
+| `Q2_SELECTION` | a profile is selected | `Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY` |
+| `Q2_SELECTION` | no profile is eligible and applicable | `STOP_NO_SELECTABLE_INTERFACE_REMAINS` |
+| `Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY` | authority granted and conjunction passes | `CALIBRATED_PENDING_SEPARATE_SUBSTANTIVE_AUTHORITY` |
+| `Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY` | authority granted and any applicable cell fails | `STOP_CONFIRMATION_FAILED` |
+| `Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY` | authority granted and an error or ambiguity occurs | `STOP_CONFIRMATION_SPENT_ON_ERROR` |
+
+| Terminal state | Claim |
+| --- | --- |
+| `STOP_INSTRUMENT_DEFECT` | the instrument is defective. NOTHING was measured about any interface. This is never a statement about any interface or any model. |
+| `STOP_DEVELOPMENT_INTEGRITY_ERROR` | a protocol or integrity error occurred during development. This is a fail-closed integrity stop and is never reinterpreted as a scientific gate failure. |
+| `STOP_NO_SELECTABLE_INTERFACE_REMAINS` | no candidate profile passed the registered development gates in that realized run. It is not a proof that no population-level adequate interface exists and is never a model-capability conclusion. |
+| `STOP_CONFIRMATION_FAILED` | the selected profile did not replicate on the confirmation split. The split is spent and no substitution or reselection is permitted. |
+| `STOP_CONFIRMATION_SPENT_ON_ERROR` | the confirmation split was spent on an error or ambiguity. It may not be re-read. |
+| `CALIBRATED_PENDING_SEPARATE_SUBSTANTIVE_AUTHORITY` | the named interface cleared the registered gates for the named tasks and roles, conditional on the single selected profile. No mechanistic authority is created. |
+
+The sixteen-row profile-eligibility map is retained as the `Q2_SELECTION` subtable that
+applies only once `I0` has passed. It is not the whole state machine.
 
 ### The paired equivalence procedure is retired
 
@@ -941,7 +1087,7 @@ outcome. The denominator is `3` in every row.
 | `true` | S1=false, S2=true, S3=true | S2, S3 | `S2` | `false` | 3 |
 | `true` | S1=true, S2=true, S3=true | S2, S3, S1 | `S2` | `false` | 3 |
 
-**No interface profile is selected in draft-v0.3.** The map is published so that the
+**No interface profile is selected in draft-v0.4.** The map is published so that the
 selection is determined before any data exists; running it requires data that does not exist
 and an authority that has not been granted.
 
@@ -957,7 +1103,7 @@ and an authority that has not been granted.
 authority, no selection authority and no confirmation authority. The operator amendment authority, section 5, records
 that draft-v0.2 declared it a gate and simultaneously said it must never be reclassified as
 diagnostic, while its own components table omitted it from the gate list, so the document
-contradicted itself about whether a profile could be eliminated by it. draft-v0.3 resolves
+contradicted itself about whether a profile could be eliminated by it. draft-v0.4 resolves
 the contradiction in the direction that **eliminates no profile on a nuisance criterion**.
 It applies to label-bearing profiles only and is `not_applicable` to `S2` and `S3`.
 
@@ -988,16 +1134,15 @@ one-sided. Every bound below names the mass it actually consumes: the reported q
 
 | Gate | n | Unit of n |
 | --- | --- | --- |
-| I1a | `256` | base items per atomic cell |
-| I1b | `256` | base items per atomic cell |
-| I2 | `128` | base items per primitive-family cell |
-| I3 | `256` | base-item contrast clusters per contrast cell |
-| I4 | `256` | RP base items per operation-family x depth cell per candidate profile |
+| I1a | 413 | base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 |
+| I1b | 413 | base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 |
+| I2 | 214 | base items per primitive-family cell |
+| I3 | 413 | base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 |
+| I4 | 448 | RP base items per operation-family x depth cell per candidate profile |
 
-**`n = 192` is withdrawn.** draft-v0.2 carried it as a provisional I1/I2 value. Finding
-`S3MR-008` recorded that at the implemented alpha it delivered materially less power than the
-draft claimed. It appears in no active field of draft-v0.3.
-
+- **Confirmation sizes.** conservative reuse of the development sizes at the confirmation component level, on the physically disjoint one-shot split; they are NOT minimal confirmation sizes
+- **Withdrawn.** WITHDRAWN. The draft immediately preceding this one carried n = 256 and n = 128 against a per-cell power target of 9/10. This draft registers a per-cell target derived from the binding end-to-end design (S3MR2-002), which requires larger sizes. The withdrawn values appear in no active field.
+- **Search rule.** every positive integer is searched; draft-v0.3 restricted admissible n to multiples of the complete-block size 32, and that restriction is retired with the deterministic block assignment it came from (S3MR2-010)
 
 ## Operations performed in this round
 
@@ -1056,39 +1201,56 @@ to exact commits.
 
 ### Projected future operations, by work stream
 
-`PROJECTION ONLY - not an authorization, not a budget approval, not a schedule.`
+Planning arithmetic only. This authorises nothing, approves no budget and creates no execution
+authority. Every count is derived by `studies/study3/analysis/design_statistics.py` from the
+registered sample sizes and cell structure; no total is hand-copied.
 
-**A single undifferentiated total is prohibited.** Finding `S3MR-013` recorded that
-draft-v0.2 published one aggregate figure of `68096` that could not be reconstructed from any
-stated per-unit quantity and silently mixed forward passes, sequence scorings and
-generations, which are different operations with different costs. Every stream below reports
-its own units.
+| Work stream | Rendered rows | Scored rows | Sequence-level evaluations | Generation calls | Generated tokens |
+| --- | --- | --- | --- | --- | --- |
+| `deterministic_I0_fixtures` | 502 | 502 | 0 | 0 | 0 |
+| `target_role_development` | 33,543 | 33,543 | 33,543 | 0 | 0 |
+| `positive_reference_external_P3Q` | `null` | `null` | `null` | `null` | `null` |
+| `RP_I4_under_candidate_profiles` | 3,584 | 3,584 | 3,584 | 0 | 0 |
+| `selected_profile_one_shot_confirmation` | 27,856 | 27,856 | 27,856 | 0 | 0 |
+| `S4_diagnostic_generation` | 26,064 | 26,064 | 417,024 | 26,064 | 417,024 |
 
-| Work stream | Uses a model | Base items | Contrast clusters | Rendered rows | Scored rows | Forward passes | Generated tokens (upper bound) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `deterministic_I0_fixtures` | false | 464 | 232 | 502 | 502 | 0 | 0 |
-| `target_role_development` | true | `null` | `null` | `null` | 20,736 | 20,736 | 0 |
-| `positive_reference_external_P3Q` | true | `null` | `null` | `null` | `null` | `null` | `null` |
-| `RP_I4_under_candidate_profiles` | true | `null` | `null` | `null` | 2,048 | 2,048 | 0 |
-| `selected_profile_one_shot_confirmation` | true | 768 | 2,304 | 17,152 | 17,152 | 17,152 | 0 |
-| `S4_diagnostic_generation` | true | 768 | 2,304 | 16,128 | 16,128 | `null` | 258,048 |
+**Per-profile target-role development.**
 
-- **`positive_reference_external_P3Q`** is `UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2`. Every quantity in that stream is published as `null`, because a number there would imply a selection that has not been made.
-- **`S4_diagnostic_generation`** reports **generations**, not forward passes, because they are different operations. Its registered generated-token bound is `16` tokens per row.
-- **`selected_profile_one_shot_confirmation`** is an **upper bound** computed under the most expensive applicable profile `S1`, because no profile is selected in this round.
+| Profile | Base items | Contrast clusters | Rows per target role | Target roles | Rows |
+| --- | --- | --- | --- | --- | --- |
+| `S1` | 1,254 | 3,717 | 8,688 | 3 | 26,064 |
+| `S2` | 841 | 826 | 2,493 | 3 | 7,479 |
+| `S3` (0 incremental; reuses the S2 logits) | 841 | 826 | 2,493 | 3 | 7,479 |
 
-**S3 adds exactly zero operations in the current answer domain.**
+`S3` adds **0** incremental rendered rows, scored rows and sequence evaluations, and that holds
+only under the registered conditions:
 
-- additional forward passes: `0`
-- additional sequence-scoring rows: `0`
-- **Why.** finding S3MR-012 recorded that draft-v0.2 attributed 9728 sequence scorings to S3 while the same document stated that under the current single-token answer domain S3 is analytically identical to S2. Under the registered single-token answer domain the length-normalised sequence score of a one-token candidate is a monotone function of that token's log probability, so S3's argmax equals S2's by construction. The comparison is CPU arithmetic on logits that S2 has already recorded. S3 therefore adds exactly zero forward passes and exactly zero sequence-scoring rows beyond S2.
-- **Future multi-token activation.** outside this projection. Activating a multi-token answer domain requires a new authority, a registered multi-token stratum, a boundary-token rule, a length-confound gate, a new scoring contract and a new cost table.
+- a jointly single-token registered answer domain
+- an identical prompt prefix to S2
+- reuse of the identical restricted-vocabulary logit vector S2 already read
+- a CPU-only rescoring contract that performs no additional model evaluation
 
-**Dimensional identities are asserted, not narrated.** The derivation script raises if
-`rendered_rows != base_item_contrast_clusters x 2` in any I3 component, and if S3's
-incremental forward passes or incremental sequence-scoring rows are anything other than
-zero.
+**`S4` generative cost is mapped, not null.** a generation of up to the registered token bound is not zero model evaluation. Autoregressive decoding performs one prefill evaluation and up to one incremental decode evaluation per additional emitted token. draft-v0.3 published a null forward-pass count for this stream (S3MR2-005).
 
+- generation calls: **26,064**
+- registered maximum new tokens per generation: **16**
+- generated-token upper bound: **417,024**
+- sequence-level prefill evaluations: **26,064**
+- incremental decode evaluations upper bound: **390,960**
+- total sequence-level model-evaluation equivalents upper bound: **417,024**
+
+A sequence-level evaluation is **never** equated with a runtime batched forward call; batch
+packing is a future execution property measured separately.
+
+**`I0` fixture units.** one base_item_contrast_cluster is ONE base item rendered in exactly two variants, so the cluster-derived base-item count equals the cluster count and the rendered-row count is the cluster count times the variants per cluster. draft-v0.3 filed the rendered-row count under the base_item unit (S3MR2-009).
+
+- base-item contrast clusters: **232**
+- cluster-derived base items: **232**
+- cluster rendered rows: **464**
+- non-cluster fixture rows: **38**
+- rendered rows = scored rows: **502**
+
+**No grand total is published.** the positive-reference P3-Q stream is unresolved under OD2 and is null, not zero. A grand total would silently treat that null as zero.
 
 ## Claim ceiling
 
@@ -1208,7 +1370,7 @@ zero.
 
 **The confirmation claim is conditional.** the confirmation claim is explicitly conditional on the single development-selected interface profile and makes no statement about the profiles that were not selected.
 
-**No self-approval.** this document does not declare its own protocol correct. Every repair is proposed resolved subject to a second independent methods review.
+**No self-approval.** this document does not declare its own protocol correct. Every repair is proposed resolved subject to a third independent methods review.
 
 
 ## Study 1 and Study 2
@@ -1226,12 +1388,12 @@ _closed and unchanged; zero-authority motivation only_
 | Decision | Status | Blocking | Disposition |
 | --- | --- | --- | --- |
 | OD1 | `resolved` | `false` | retain RT, RL and RI. All three are required for the later distillation, lineage and instruction contrast, and each gate is evaluated per role. |
-| OD2 | `unresolved` | `true` | UNRESOLVED. Candidate dossier only. No positive reference is selected, preferred, pinned, downloaded, tokenized, loaded, prequalified or ranked. The RP canonical qualification interface and the RP-specific I4 wrapper must be registered by a separate operator authority before P3-Q and before I4. draft-v0.3 makes no progress on this decision and does not attempt to. |
+| OD2 | `unresolved` | `true` | UNRESOLVED. Candidate dossier only. No positive reference is selected, preferred, pinned, downloaded, tokenized, loaded, prequalified or ranked. The RP canonical qualification interface and the RP-specific I4 wrapper must be registered by a separate operator authority before P3-Q and before I4. draft-v0.4 makes no progress on OD2 and does not attempt to. It registers only the binding P3-Q/I4 ordering constraint that the later OD2 authority must respect. |
 | OD3 | `resolved` | `false` | retain S4 only as a non-selectable diagnostic. It never enters admissibility and can never be selected. |
 | OD4 | `resolved` | `false` | exactly three one-factor renderings: baseline, separator-only and instruction-wording-only. The answer cue is held constant across all three. |
 | OD5 | `resolved_subject_to_independent_review` | `false` | Exact-binomial primary design throughout. The study-level development screening level is the exact rational 1/200. The per-profile development component level is the exact rational 1/600, obtained by dividing the study-level level by the fixed selectable-profile denominator 3. Within a profile the components form an intersection-union conjunction, so no further within-profile Bonferroni correction is applied. The confirmation component level is the exact rational 1/200 on a physically disjoint one-shot split entered by exactly one pre-selected profile, so it carries no across-profile correction. Every decimal in the protocol is a rendering of the exact rational, which is the policy. The Tango paired aggregate-equivalence procedure is retired from every decision role, so no equivalence margin, critical value or discordance grid remains to be chosen. The I4 competence floor is p0 = 0.8 with p1 = 0.9. |
-| OD6 | `resolved_subject_to_independent_review` | `false` | Exactly one I3 floor is active: p0 = 0.9, with p1 = 0.97 as the lowest alternative of interest, target power at least 0.9, and n = 256 base-item contrast clusters per contrast cell. The p0 = 0.95 variant is deleted from every active protocol, table and packet field and may appear only in clearly labelled historical narrative. I1a and I1b are sized at n = 256 base items per atomic cell, I2 at n = 128 base items per primitive-family cell, and I4 at n = 256 RP base items per operation-family x depth cell per candidate profile. The provisional n = 192 is withdrawn. Confirmation sizes equal the development sizes at the confirmation component level. No active rejection region has a required pass count equal to n, and the derivation script raises before emitting any table if that condition arises. |
-| OD7 | `resolved` | `false` | yes, and it has been carried out once. The independent methods review of draft-v0.2 returned STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED. A SECOND independent methods review of draft-v0.3 is now mandatory before freeze and before any bank construction or seed draw. The drafting party may not adjudicate its own amendment. |
+| OD6 | `resolved_subject_to_third_independent_review` | `false` | Exactly one I3 floor is active: p0 = 9/10, with p1 = 97/100 as the lowest alternative of interest, a per-cell power target derived from the binding end-to-end design, and n = 413 base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3. p0 = 0.95 is deleted from every active field. draft-v0.4 additionally narrows the indicator to J_joint_correct, so the floor is a joint-correctness level and not a presentation contrast. |
+| OD7 | `resolved` | `false` | yes, and it has been carried out once. The independent methods review of draft-v0.2 returned STUDY3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED. A THIRD independent methods review of draft-v0.4 is now mandatory before freeze and before any bank construction or seed draw. The drafting party may not adjudicate its own amendment. |
 | OD8 | `resolved_in_part` | `false` | no chat template for RT, RL or RI on S1, S2 or S3. S4 uses each role's native template or explicitly records its absence. The RP canonical qualification wrapper and the RP-specific I4 wrapper remain part of OD2 and must be frozen before P3-Q and I4. No cross-role byte parity is claimed where native wrappers differ. |
 
 **Blocking decisions:** `OD2`
@@ -1264,7 +1426,7 @@ any Gate A or Stage B-D operation.
 | `positive_reference_selected` | `false` |
 | `confirmation_access_authorized` | `false` |
 
-**State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_3_COMPLETE_AWAITING_SECOND_INDEPENDENT_METHODS_REVIEW`
+**State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW`
 
 **No self-approval.** This document is the drafting party's amendment. It states that repairs
 are **proposed resolved subject to independent review**. It does not, anywhere, declare the

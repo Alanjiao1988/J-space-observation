@@ -833,8 +833,10 @@
    ],
    "authorizes_mechanistic_execution": false,
    "confirmation_alpha_exact_rational": "1/200",
-   "derivation": "studies/study3/analysis/design_statistics.py; the threshold is derived, not transcribed",
+   "confirmation_pass_count": 388,
+   "derivation": "studies/study3/analysis/design_statistics.py; every threshold, tail, power and sample size is derived, not transcribed",
    "development_alpha_exact_rational": "1/600",
+   "development_pass_count": 389,
    "evaluated_per": [
     "interface profile",
     "checkpoint role",
@@ -856,15 +858,15 @@
     "RL",
     "RI"
    ],
-   "n": 256,
+   "n": 413,
    "name": "trivial content recovery and output validity",
    "no_pooling": true,
    "not_applicable_semantics": "none; I1a applies to every profile",
    "part_of_eligibility": true,
    "question": "Can the checkpoint recover an answer that is trivially present in the prompt, and does it emit a structurally valid output while doing so?",
    "separated_from": "I1b, which draft-v0.1 conflated with this gate",
-   "threshold_logic": "exact one-sided binomial test against the null p <= 0.9 at the per-component level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 244 of 256 base items per atomic cell succeed. Every applicable cell must pass; no pooled summary may rescue a failed cell.",
-   "unit_of_n": "base items per atomic cell",
+   "threshold_logic": "exact one-sided binomial test against the null p <= 9/10 at the per-component development level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 389 of 413 base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 succeed. On the confirmation split the same form is used at level 1/200 with a pass count of 388.",
+   "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3",
    "what_fails": "the checkpoint cannot echo content that is already in the prompt, in which case nothing downstream is interpretable",
    "what_passes": "the checkpoint recovers trivially present content at a rate exceeding the floor, and its outputs are valid"
   },
@@ -875,8 +877,10 @@
    ],
    "authorizes_mechanistic_execution": false,
    "confirmation_alpha_exact_rational": "1/200",
-   "derivation": "studies/study3/analysis/design_statistics.py; the threshold is derived, not transcribed",
+   "confirmation_pass_count": 388,
+   "derivation": "studies/study3/analysis/design_statistics.py; every threshold, tail, power and sample size is derived, not transcribed",
    "development_alpha_exact_rational": "1/600",
+   "development_pass_count": 389,
    "evaluated_per": [
     "interface profile",
     "checkpoint role",
@@ -899,15 +903,15 @@
     "RL",
     "RI"
    ],
-   "n": 256,
+   "n": 413,
    "name": "explicit content-to-symbol binding",
    "new_in_v0_2": true,
    "no_pooling": true,
    "not_applicable_semantics": "For content-only profiles S2 and S3 this gate is not_applicable. not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied gate, averaged into any rate, or used as an input to admissibility. A gate whose transformation is not applicable to a profile is simply not evaluated for that profile, and the profile's eligibility rests on the gates that are applicable to it.",
    "part_of_eligibility": true,
    "question": "When a symbol stands for an answer, does the checkpoint bind the correct content to the correct displayed symbol, rather than following a symbol prior?",
-   "threshold_logic": "exact one-sided binomial test against the null p <= 0.9 at the per-component level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 244 of 256 base items per atomic cell succeed. Every applicable cell must pass; no pooled summary may rescue a failed cell.",
-   "unit_of_n": "base items per atomic cell",
+   "threshold_logic": "exact one-sided binomial test against the null p <= 9/10 at the per-component development level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 389 of 413 base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 succeed. On the confirmation split the same form is used at level 1/200 with a pass count of 388.",
+   "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3",
    "what_fails": "the checkpoint tracks the symbol rather than the content, or tracks position rather than either",
    "what_passes": "the correct content is selected through its displayed symbol across the counterbalanced conditions"
   },
@@ -920,8 +924,10 @@
    ],
    "authorizes_mechanistic_execution": false,
    "confirmation_alpha_exact_rational": "1/200",
-   "derivation": "studies/study3/analysis/design_statistics.py; the threshold is derived, not transcribed",
+   "confirmation_pass_count": 127,
+   "derivation": "studies/study3/analysis/design_statistics.py; every threshold, tail, power and sample size is derived, not transcribed",
    "development_alpha_exact_rational": "1/600",
+   "development_pass_count": 129,
    "evaluated_per": [
     "interface profile",
     "checkpoint role",
@@ -944,13 +950,13 @@
     "RL",
     "RI"
    ],
-   "n": 128,
+   "n": 214,
    "name": "primitive headroom",
    "no_pooling": true,
    "not_applicable_semantics": "none; I2 applies to every profile",
    "part_of_eligibility": true,
    "question": "Does the checkpoint have measurable headroom on each single primitive operation family, so that a later compositional failure cannot be explained by inability to do the parts?",
-   "threshold_logic": "exact one-sided binomial test against the null p <= 0.5 at the per-component level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 82 of 128 base items per primitive-family cell succeed. Every applicable cell must pass; no pooled summary may rescue a failed cell.",
+   "threshold_logic": "exact one-sided binomial test against the null p <= 1/2 at the per-component development level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 129 of 214 base items per primitive-family cell succeed. On the confirmation split the same form is used at level 1/200 with a pass count of 127.",
    "unit_of_n": "base items per primitive-family cell",
    "what_fails": "any single family falls below the floor, regardless of the pooled rate across families",
    "what_passes": "every primitive family independently clears the floor"
@@ -1013,6 +1019,11 @@
      "descriptive_only": true
     }
    },
+   "confirmation_alpha_exact_rational": "1/200",
+   "confirmation_pass_count": 388,
+   "derivation": "studies/study3/analysis/design_statistics.py; every threshold, tail, power and sample size is derived, not transcribed",
+   "development_alpha_exact_rational": "1/600",
+   "development_pass_count": 389,
    "evaluated_per": [
     "interface profile",
     "checkpoint role",
@@ -1044,7 +1055,7 @@
     "RL",
     "RI"
    ],
-   "n": 256,
+   "n": 413,
    "name": "joint robust correctness across a registered presentation pair",
    "no_pooling": true,
    "not_applicable_semantics": "The seven K5 contrasts are not_applicable to S2 and S3, which render neither an option list nor a label alphabet, so the manipulation has no referent. The two K6 contrasts are applicable to every profile. not_applicable is a third value. It is not a pass, it is not a zero effect, it is not evidence of robustness, and it may never be counted as a satisfied component, averaged into any rate, or used as an input to admissibility. The operator amendment authority, section 4.1, requires that K5 be recorded not_applicable for S2 and S3 and never counted as a pass; the draft-v0.2 gate truth table showed K5 as passing for those profiles, which is the exact error this semantics forbids; that row is corrected.",
@@ -1078,8 +1089,8 @@
     "test": "exact central acceptance band around the uniform rate, reported for information only",
     "why_demoted": "the operator amendment authority, section 5, records that draft-v0.2 declared this criterion a gate and simultaneously said it must never be reclassified as diagnostic, while its own components table omitted it from the gate list, so the document contradicted itself about whether a profile could be eliminated by it. draft-v0.3 resolves the contradiction in the direction that eliminates no profile on a nuisance criterion: it is a diagnostic report everywhere, in every artifact, with no exception and no reclassification path."
    },
-   "threshold_logic": "J_both must clear its floor by the exact one-sided binomial test in EVERY applicable atomic contrast cell separately: seven K5 cells for label-bearing profiles and two K6 cells for every profile. A single failed cell fails the gate. No pooled summary, no J_inv value, no J_cor value and no descriptive paired table may rescue a failed cell.",
-   "unit_of_n": "base-item contrast clusters per contrast cell",
+   "threshold_logic": "exact one-sided binomial test against the null p <= 9/10 at the per-component development level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 389 of 413 base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3 succeed. On the confirmation split the same form is used at level 1/200 with a pass count of 388.",
+   "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3",
    "variants_per_independent_unit": 2,
    "what_fails": "the joint-correctness probability under the registered presentation pair does not clear the registered floor. This localises inadequate joint robust correctness for the named pair. It does not identify the direction, the magnitude or the existence of a presentation effect.",
    "what_passes": "the registered joint-correctness floor was cleared for this applicable pairwise cell, and nothing more"
@@ -1092,9 +1103,11 @@
    ],
    "authorizes_mechanistic_execution": false,
    "confirmation_alpha_exact_rational": "1/200",
+   "confirmation_pass_count": 381,
    "consequence_of_failure": "this interface profile is eliminated, and only this interface profile. The study stops only if no selectable interface profile remains eligible. draft-v0.1 wrote this failure as a global study stop, and separately said a failing interface remained eligible; both statements are withdrawn.",
-   "derivation": "studies/study3/analysis/design_statistics.py; the threshold is derived, not transcribed",
+   "derivation": "studies/study3/analysis/design_statistics.py; every threshold, tail, power and sample size is derived, not transcribed",
    "development_alpha_exact_rational": "1/600",
+   "development_pass_count": 383,
    "evaluated_per": [
     "interface profile",
     "operation family",
@@ -1114,7 +1127,7 @@
    "model_roles": [
     "RP"
    ],
-   "n": 256,
+   "n": 448,
    "name": "positive reference adequacy",
    "no_pooling": true,
    "not_applicable_semantics": "I4 is not_applicable to S4. S4 is a never-selectable diagnostic, so an I4 cell for it could license no attribution and enters no success union. not_applicable is a third value: it is not a pass, not a zero effect and never a satisfied component.",
@@ -1128,7 +1141,7 @@
     "why": "if a candidate interface were used to establish that the reference is capable, the interface's adequacy would be established by an argument that presupposes it"
    },
    "question": "Does an independently prequalified capable reference succeed through this interface, so that a target failure through the same interface can be attributed to the target rather than to the interface?",
-   "threshold_logic": "exact one-sided binomial test against the null p <= 0.8 at the per-component level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 224 of 256 RP base items per operation-family x depth cell per candidate profile succeed. Every applicable cell must pass; no pooled summary may rescue a failed cell.",
+   "threshold_logic": "exact one-sided binomial test against the null p <= 4/5 at the per-component development level 1/600, in every applicable atomic cell separately; the component passes a cell when at least 383 of 448 RP base items per operation-family x depth cell per candidate profile succeed. On the confirmation split the same form is used at level 1/200 with a pass count of 381.",
    "unit_of_n": "RP base items per operation-family x depth cell per candidate profile",
    "what_fails": "the reference does not clear the floor through this interface",
    "what_passes": "the prequalified reference clears the competence floor through this interface in every family and at every depth"
@@ -3490,7 +3503,7 @@
     "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
    },
    "confirmation_sizes": "conservative reuse of the development sizes at the confirmation component level, on the physically disjoint one-shot split; they are NOT minimal confirmation sizes",
-   "n_256_and_128_status": "WITHDRAWN. draft-v0.3 carried n = 256 and n = 128 against a per-cell power target of 9/10. draft-v0.4 registers a per-cell target derived from the binding end-to-end design (S3MR2-002), which requires larger sizes.",
+   "n_256_and_128_status": "WITHDRAWN. The draft immediately preceding this one carried n = 256 and n = 128 against a per-cell power target of 9/10. This draft registers a per-cell target derived from the binding end-to-end design (S3MR2-002), which requires larger sizes. The withdrawn values appear in no active field.",
    "principle": "every sample size states the unit it counts, at the point of definition and in every table that reports it",
    "search_rule": "every positive integer is searched; draft-v0.3 restricted admissible n to multiples of the complete-block size 32, and that restriction is retired with the deterministic block assignment it came from (S3MR2-010)"
   },
@@ -7372,7 +7385,7 @@
   {
    "blocking": false,
    "blocks": [],
-   "disposition": "Exactly one I3 floor is active: p0 = 0.9, with p1 = 0.97 as the lowest alternative of interest, target power at least 0.9, and n = 256 base-item contrast clusters per contrast cell. The p0 = 0.95 variant is deleted from every active protocol, table and packet field and may appear only in clearly labelled historical narrative. I1a and I1b are sized at n = 256 base items per atomic cell, I2 at n = 128 base items per primitive-family cell, and I4 at n = 256 RP base items per operation-family x depth cell per candidate profile. The provisional n = 192 is withdrawn. Confirmation sizes equal the development sizes at the confirmation component level. No active rejection region has a required pass count equal to n, and the derivation script raises before emitting any table if that condition arises.",
+   "disposition": "Exactly one I3 floor is active: p0 = 9/10, with p1 = 97/100 as the lowest alternative of interest, a per-cell power target derived from the binding end-to-end design, and n = 413 base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3. p0 = 0.95 is deleted from every active field. draft-v0.4 additionally narrows the indicator to J_joint_correct, so the floor is a joint-correctness level and not a presentation contrast.",
    "disposition_status": "PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW",
    "id": "OD6",
    "question": "What sample sizes does the design require?",
