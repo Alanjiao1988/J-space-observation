@@ -514,3 +514,27 @@ gate result, confirmation access, result row or evidence row exists. Nothing is 
 and no execution is authorised. The evidence-ledger tail remains `EV-0016`. Study 1 and
 Study 2 remain closed and untouched, and the original research question remains
 unanswered.
+
+## 12. Historical-review test-harness scope erratum
+
+Before draft-v0.4 was published, the committed draft-v0.3 regression module
+`tests/test_study3_methods_review_v0_3.py` was found to contain a scope defect: two of its checks
+read live index or working-tree bytes although their stated purpose is to validate draft-v0.3
+against its reviewed historical inputs. The authorized draft-v0.4 amendment therefore broke them,
+which is the harness misbehaving rather than the draft.
+
+Both checks are now anchored to `REVIEWED_COMMIT` `2b36f5321d830ea6f70fff2b7bbca3cb93394046`.
+The recalculation check runs the **unchanged** v0.3 generator and **unchanged** committed v0.3 table
+inside an isolated snapshot built from that commit, and asserts that no current-draft byte is
+reachable from it.
+
+This is a test-harness erratum, **not** an amendment to the second independent methods review. Its
+findings, its rejection disposition and every reviewed-artifact identity are untouched, and no
+draft-v0.4 scientific content changed. The module keeps exactly its 35 node IDs; no assertion was
+deleted, weakened, skipped or xfailed.
+
+The third independent methods review of draft-v0.4 should treat
+`tests/test_study3_methods_review_v0_3.py` as an amended path in the published set, read section 8
+of `studies/study3/reviews/v0_4_operator_amendment.md` for the full record including the verbatim
+supplemental authority, and note that `AR-0246` deliberately retains the pre-erratum identity of
+that module while the new row records the corrected one.

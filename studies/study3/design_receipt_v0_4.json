@@ -33,6 +33,16 @@
   },
   "disposition_status": "PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW",
   "document_class": "design_receipt",
+  "historical_review_test_harness_scope_erratum": {
+    "no_v0_4_scientific_content_changed": true,
+    "recorded_in": "studies/study3/reviews/v0_4_operator_amendment.json",
+    "reviewed_commit_anchor": "2b36f5321d830ea6f70fff2b7bbca3cb93394046",
+    "sole_newly_authorized_path": "tests/test_study3_methods_review_v0_3.py",
+    "status": "HISTORICAL_REVIEW_TEST_HARNESS_SCOPE_ERRATUM",
+    "supplemental_authority_bytes": 5938,
+    "supplemental_authority_sha256": "165acb770db3f25c0403a7d376a81b569fff11d623610a802e135633ec9c503b",
+    "v0_3_review_not_amended": true
+  },
   "immutable_objects_not_edited": [
     {
       "bytes": 100249,
@@ -265,9 +275,11 @@
   },
   "path_sets": {
     "final_independently_observed_changed_path_set": {
+      "erratum_note": "the sole newly authorized path is the draft-v0.3 historical-regression module, amended under the supplemental operator authority recorded in section 8 of the amendment record; it is a modification because the module already exists at the published base",
+      "erratum_path": "tests/test_study3_methods_review_v0_3.py",
       "expected_added": 6,
-      "expected_modified": 19,
-      "expected_total": 25,
+      "expected_modified": 20,
+      "expected_total": 26,
       "status": "TO_BE_VERIFIED_AT_PUBLICATION",
       "verified_by": "an independent static audit of the published commit range against its merge base"
     },
@@ -337,24 +349,27 @@
         "trailing_newline": true
       },
       {
-        "bytes": 31287,
+        "bytes": 40052,
         "lf_only": true,
         "path": "studies/study3/reviews/v0_4_operator_amendment.md",
-        "sha256": "08d90c347e10c1a60bef142a18eab00d5643681cf828aa9e43bb5e104871ec59",
+        "restated_after_the_erratum": true,
+        "sha256": "f93f76dbef397ce9aba8e548254899f2818cafc08265a338c1e6ca7d9e70bb77",
         "trailing_newline": true
       },
       {
-        "bytes": 38793,
+        "bytes": 49874,
         "lf_only": true,
         "path": "studies/study3/reviews/v0_4_operator_amendment.json",
-        "sha256": "88a8f86736792f93f9f5c126bea2645194814792b8226e4014283da6671ecb8f",
+        "restated_after_the_erratum": true,
+        "sha256": "451089a70f4fc9b26e6e67399f413854e612a2b6f233c7fb7ec0a565e585eb57",
         "trailing_newline": true
       },
       {
-        "bytes": 8292,
+        "bytes": 12979,
         "lf_only": true,
         "path": "studies/study3/reviews/v0_4_operator_amendment.schema.json",
-        "sha256": "a34a168d06f8793133f86857447121d5318c65ecc9077953eaac4a4017bca0e3",
+        "restated_after_the_erratum": true,
+        "sha256": "41cd6e6fce0d2e2155f2ca733b47e750b0fae5662373e770946dfd4b5ffe03c9",
         "trailing_newline": true
       },
       {
@@ -379,10 +394,11 @@
         "trailing_newline": true
       },
       {
-        "bytes": 30550,
+        "bytes": 32083,
         "lf_only": true,
         "path": "studies/study3/NEXT_THREAD_HANDOFF.md",
-        "sha256": "274017ce9ed3638a9ae8a6c526f97d187297338471ca2b549c5eb5ecc8b50064",
+        "restated_after_the_erratum": true,
+        "sha256": "2efa91da83ae881340e8bca6ce87f216a08d111fb591c14600ae41c5b0648064",
         "trailing_newline": true
       },
       {
@@ -450,6 +466,7 @@
   },
   "registries": {
     "artifact_index_first_id": "AR-0251",
+    "artifact_index_tail_id": "AR-0269",
     "decision_log_entry": "D43",
     "evidence_ledger_tail_unchanged": "EV-0016",
     "evidence_rows_added": 0,

@@ -166,6 +166,164 @@
       ],
       "type": "object"
     },
+    "historical_review_test_harness_scope_erratum": {
+      "properties": {
+        "no_v0_4_scientific_content_changed": {
+          "const": true
+        },
+        "original_committed_authority_unchanged": {
+          "properties": {
+            "byte_identical": {
+              "const": true
+            },
+            "bytes": {
+              "const": 46543
+            },
+            "sha256": {
+              "const": "230c57f4bfb874ad724c9448e8cfc1e58b0ff5970159e6741ce61de8104cd173"
+            }
+          },
+          "required": [
+            "path",
+            "bytes",
+            "sha256",
+            "byte_identical"
+          ],
+          "type": "object"
+        },
+        "path_set_after_the_erratum": {
+          "properties": {
+            "added": {
+              "const": 6
+            },
+            "deletions_renames_copies_type_changes": {
+              "const": 0
+            },
+            "modified": {
+              "const": 20
+            },
+            "total": {
+              "const": 26
+            }
+          },
+          "required": [
+            "total",
+            "added",
+            "modified",
+            "deletions_renames_copies_type_changes"
+          ],
+          "type": "object"
+        },
+        "prohibited_repairs_not_used": {
+          "properties": {
+            "assertion_deleted_or_weakened": {
+              "const": false
+            },
+            "exception_swallowed": {
+              "const": false
+            },
+            "expected_hash_or_value_changed_to_accept_live_v0_4_bytes": {
+              "const": false
+            },
+            "registered_parser_v3_seal_job_failures_changed": {
+              "const": false
+            },
+            "skip_or_xfail_added": {
+              "const": false
+            },
+            "treated_as_allowed_failure": {
+              "const": false
+            },
+            "warning_only_behaviour_added": {
+              "const": false
+            }
+          },
+          "required": [
+            "assertion_deleted_or_weakened",
+            "skip_or_xfail_added",
+            "warning_only_behaviour_added",
+            "exception_swallowed",
+            "expected_hash_or_value_changed_to_accept_live_v0_4_bytes",
+            "treated_as_allowed_failure",
+            "registered_parser_v3_seal_job_failures_changed"
+          ],
+          "type": "object"
+        },
+        "repair": {
+          "properties": {
+            "expected_sizes_digests_and_results_unchanged": {
+              "const": true
+            },
+            "node_ids_unchanged": {
+              "const": true
+            },
+            "reviewed_commit_anchor": {
+              "const": "2b36f5321d830ea6f70fff2b7bbca3cb93394046"
+            },
+            "test_count_unchanged": {
+              "const": 35
+            }
+          },
+          "required": [
+            "reviewed_commit_anchor",
+            "test_module_comparison",
+            "recalculation_execution",
+            "expected_sizes_digests_and_results_unchanged",
+            "node_ids_unchanged",
+            "test_count_unchanged"
+          ],
+          "type": "object"
+        },
+        "review_disposition_unchanged": {
+          "const": "STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED"
+        },
+        "sole_newly_authorized_path": {
+          "const": "tests/test_study3_methods_review_v0_3.py"
+        },
+        "status": {
+          "const": "HISTORICAL_REVIEW_TEST_HARNESS_SCOPE_ERRATUM"
+        },
+        "supplemental_authority": {
+          "properties": {
+            "bytes": {
+              "const": 5938
+            },
+            "no_additional_authority_file_was_added": {
+              "const": true
+            },
+            "sha256": {
+              "const": "165acb770db3f25c0403a7d376a81b569fff11d623610a802e135633ec9c503b"
+            }
+          },
+          "required": [
+            "selected_option",
+            "recorded_verbatim_in",
+            "bytes",
+            "sha256",
+            "verbatim_text"
+          ],
+          "type": "object"
+        },
+        "the_v0_3_review_itself_was_not_amended": {
+          "const": true
+        }
+      },
+      "required": [
+        "status",
+        "classification",
+        "the_v0_3_review_itself_was_not_amended",
+        "no_v0_4_scientific_content_changed",
+        "supplemental_authority",
+        "original_committed_authority_unchanged",
+        "sole_newly_authorized_path",
+        "defect",
+        "repair",
+        "prohibited_repairs_not_used",
+        "disclosed_earlier_runs",
+        "path_set_after_the_erratum"
+      ],
+      "type": "object"
+    },
     "immutable_objects_not_edited": {
       "minItems": 20,
       "type": "array"
@@ -316,7 +474,8 @@
     "results",
     "evidence_rows",
     "bank_rows",
-    "seeds"
+    "seeds",
+    "historical_review_test_harness_scope_erratum"
   ],
   "title": "Study 3 draft-v0.4 operator amendment record",
   "type": "object"

@@ -188,6 +188,85 @@
     },
     "why_it_does_not_reverse_the_rejection": "both BLOCKING findings and the substantive sampling-model defect independently require amendment, so the disposition stands on either reading"
   },
+  "historical_review_test_harness_scope_erratum": {
+    "classification": "a scope erratum in the committed historical-regression harness, not an amendment to the second independent methods review",
+    "defect": {
+      "affected_node_ids": [
+        "tests/test_study3_methods_review_v0_3.py::test_the_reviewer_did_not_edit_either_existing_study3_test_module",
+        "tests/test_study3_methods_review_v0_3.py::test_independent_recalculation_check_mode_reproduces_the_committed_tables"
+      ],
+      "summary": "two committed checks in the draft-v0.3 historical-regression module read live index or working-tree bytes instead of the reviewed history, so they silently measured whichever draft happened to be checked out",
+      "why_it_surfaced_now": "the authorized draft-v0.4 amendment legitimately enlarged tests/test_study3_design.py and legitimately amended the protocol, which a correctly scoped historical check must ignore"
+    },
+    "disclosed_earlier_runs": {
+      "candidate_bound_v0_3_module_run": {
+        "candidate_commit": "3c229017d85259af2e2e3a6654b66b4383c064a0",
+        "result": "33 passed, 2 failed",
+        "scope_error": "both failures were produced by reading live current-draft bytes inside a check whose stated purpose is historical"
+      },
+      "direct_live_input_recalculation_failure": {
+        "cause": "the live draft-v0.4 protocol was consumed in place of the reviewed draft-v0.3 protocol",
+        "invocation": "independent_methods_recalculation_v0_3.py --check executed with the live repository as its root",
+        "observed": "FAIL: recomputed tables differ from the committed tables"
+      },
+      "how_the_corrected_execution_resolves_them": "pinning the mutable inputs to REVIEWED_COMMIT restores the intended historical scope, after which the unchanged script reproduces the unchanged committed table exactly and the module returns 35 passed",
+      "note": "these runs are disclosed, not erased and not relabelled"
+    },
+    "immutable_objects_not_modified": [
+      "studies/study3/analysis/independent_methods_recalculation_v0_3.py",
+      "studies/study3/analysis/independent_methods_recalculation_tables_v0_3.json",
+      "studies/study3/reviews/v0_3_independent_methods_review.json",
+      "studies/study3/reviews/v0_3_independent_methods_review.md",
+      "studies/study3/reviews/v0_3_independent_methods_review.schema.json",
+      "studies/study3/methods_review_receipt_v0_3.json",
+      "paper/evidence_ledger.csv"
+    ],
+    "no_v0_4_scientific_content_changed": true,
+    "original_committed_authority_unchanged": {
+      "byte_identical": true,
+      "bytes": 46543,
+      "path": "studies/study3/prompts/study3_v0_4_design_amendment_authority.md",
+      "sha256": "230c57f4bfb874ad724c9448e8cfc1e58b0ff5970159e6741ce61de8104cd173"
+    },
+    "path_set_after_the_erratum": {
+      "added": 6,
+      "deletions_renames_copies_type_changes": 0,
+      "modified": 20,
+      "total": 26
+    },
+    "pre_erratum_test_module_identity_retained_at": "AR-0246",
+    "prohibited_repairs_not_used": {
+      "assertion_deleted_or_weakened": false,
+      "exception_swallowed": false,
+      "expected_hash_or_value_changed_to_accept_live_v0_4_bytes": false,
+      "registered_parser_v3_seal_job_failures_changed": false,
+      "skip_or_xfail_added": false,
+      "treated_as_allowed_failure": false,
+      "warning_only_behaviour_added": false
+    },
+    "repair": {
+      "expected_sizes_digests_and_results_unchanged": true,
+      "isolation_proof": "the generator resolves every path it reads from its own __file__, so the snapshot root is its repository; the check asserts that no current-draft byte is reachable from that root",
+      "node_ids_unchanged": true,
+      "recalculation_execution": "the unchanged v0.3 recalculation script and the unchanged committed v0.3 table are executed inside an isolated snapshot whose mutable protocol and design inputs are materialised from REVIEWED_COMMIT",
+      "reviewed_commit_anchor": "2b36f5321d830ea6f70fff2b7bbca3cb93394046",
+      "test_count_unchanged": 35,
+      "test_module_comparison": "compares tests/test_study3_design.py and tests/test_study3_methods_review.py with their committed blobs at REVIEWED_COMMIT, never with live index or working-tree bytes"
+    },
+    "review_disposition_unchanged": "STUDY3_V0_3_METHODS_REVIEW_REJECTED_AMENDMENT_REQUIRED",
+    "scientific_design_statistics_sampling_estimands_thresholds_claims_unchanged": true,
+    "sole_newly_authorized_path": "tests/test_study3_methods_review_v0_3.py",
+    "status": "HISTORICAL_REVIEW_TEST_HARNESS_SCOPE_ERRATUM",
+    "supplemental_authority": {
+      "bytes": 5938,
+      "no_additional_authority_file_was_added": true,
+      "recorded_verbatim_in": "studies/study3/reviews/v0_4_operator_amendment.md",
+      "selected_option": "operator option 1, narrowly construed",
+      "sha256": "165acb770db3f25c0403a7d376a81b569fff11d623610a802e135633ec9c503b",
+      "verbatim_text": "# Supplemental operator authority — Study 3 draft-v0.4 historical-regression harness erratum\n\nI select operator option 1, narrowly construed.\n\nThis authority resolves only the proven historical-regression harness contradiction. It does not amend the Study 3 scientific design, statistics, sampling frame, estimands, thresholds, claims, state machine, operation projection, or review disposition.\n\n## 1. Starting point\n\nContinue from the exact local candidate:\n\n- commit: `3c229017d85259af2e2e3a6654b66b4383c064a0`\n- tree: `ac4acd703ca1169dbbf5016c2b0796f625ef2196`\n- published base: `bc98e5c98a2d4e273142c91497b7600ce751bade`\n\nRequire a clean worktree and verify that the candidate remains a strict descendant of the published base before making any change.\n\n## 2. Sole path exception\n\nThe only newly authorized path is:\n\n`tests/test_study3_methods_review_v0_3.py`\n\nThe final changed-path set relative to `bc98e5c…` must therefore be exactly:\n\n- 26 paths;\n- 6 added;\n- 20 modified;\n- no deletion, rename, copy, or type change.\n\nNo 27th path is authorized.\n\nThe existing 25 paths may be updated only where necessary to record this disclosed erratum, update path counts, hashes, receipts, registry metadata, and validation results. They must not receive any substantive scientific or statistical redesign.\n\nThe original committed authority:\n\n`studies/study3/prompts/study3_v0_4_design_amendment_authority.md`\n\nmust remain byte-identical at 46,543 bytes with SHA-256 `230c57f4…d173`. Record this supplemental authority verbatim, or with its complete text and byte identity, inside an already-authorized v0.4 amendment record. Do not add another authority file.\n\n## 3. Required semantic repair\n\nRepair the historical regression harness so that its implementation matches its existing stated purpose: validating draft-v0.3 against its reviewed historical inputs.\n\nSpecifically:\n\n1. `test_the_reviewer_did_not_edit_either_existing_study3_test_module` must compare the relevant files with their committed blobs at:\n`REVIEWED_COMMIT = 2b36f5321d830ea6f70fff2b7bbca3cb93394046`\nIt must not compare them with the candidate’s live index or working-tree bytes.\n2. The v0.3 independent recalculation check must execute the unchanged v0.3 recalculation script and unchanged committed v0.3 table against an isolated historical snapshot whose mutable protocol/design inputs come from `REVIEWED_COMMIT`.\n3. The isolated check must not consume the live draft-v0.4 protocol, design statistics, test file, or other mutable current-draft bytes.\n4. Do not modify either immutable v0.3 recalculation file, any review finding, review disposition, reviewed-artifact identity, expected scientific result, or historical commit.\n\nThis authority forbids:\n\n- deleting or weakening either failing assertion;\n- adding `skip`, `xfail`, warning-only behavior, or exception swallowing;\n- changing expected hashes or values to accept live v0.4 bytes;\n- treating the two failures as allowed failures;\n- changing the two existing registered `test_parser_v3_seal_job` failures;\n- changing any v0.4 scientific content.\n\nThe repair must be recorded as a historical-review test-harness scope erratum, not as an amendment to the v0.3 review itself.\n\n## 4. Required validation\n\nRun the complete clean CPU-only ACR validation envelope on the new final candidate commit, with `GPU_COUNT=0`, `CUDA_AVAILABLE=False`, and a clean worktree.\n\nAt minimum require:\n\n- `tests/test_study3_design.py`: 197 passed;\n- `tests/test_study3_methods_review.py`: 78 passed;\n- `tests/test_study3_methods_review_v0_3.py`: 35 passed;\n- the unchanged v0.3 recalculation script reproduces its committed table exactly when run against the isolated reviewed snapshot;\n- `DESIGN_STATISTICS_CHECK_OK sections=19`;\n- all previously required Study 2 and protected-byte regressions unchanged;\n- static publication audit: exactly 26 paths, 6 added and 20 modified;\n- full suite: exactly 3,974 passed, 15 skipped, and only the same two registered `test_parser_v3_seal_job` failures with unchanged node IDs and signatures.\n\nThe arithmetic must reconcile as:\n\n`3,886 baseline passes + 88 net new design tests = 3,974 passes`.\n\nDisclose the earlier candidate-bound 33-passed/2-failed v0.3 review run, the earlier direct live-input recalculation failure, and how the corrected historical-snapshot execution resolves their scope error. Do not erase or relabel those earlier runs.\n\nRecompute and report every affected artifact identity and registry tail. `paper/evidence_ledger.csv` must remain untouched and end at `EV-0016`. No scientific evidence, method result, bank, seed, model operation, interface selection, positive reference, or confirmation access is authorized.\n\n## 5. Publication\n\nOnly after the corrected candidate passes the full validation envelope:\n\n1. fetch remote `main`;\n2. require it to remain exactly `bc98e5c98a2d4e273142c91497b7600ce751bade`;\n3. require it to be a strict ancestor of the corrected candidate;\n4. publish only by non-force fast-forward:\n`git push origin HEAD:refs/heads/main`\n5. fetch again and verify `HEAD == origin/main`, the exact final tree, clean worktree, the exact 26-path set, protected bytes, artifact identities, and unchanged `EV-0016`.\n\nIf remote `main` moved, another path is required, historical scientific/review content must change, or any validation result differs from the registered expectations, stop and report without publishing.\n\n## 6. Final state\n\nAfter successful publication, use the original §9 completion heading and provide the complete amended handoff.\n\nThe state must remain:\n\n- `frozen=false`;\n- `execution_authorized=false`;\n- every empirical/model counter zero;\n- no bank, seed, checkpoint, winner, RP, or confirmation access;\n- OD2 unresolved.\n\nThe only legal successor remains a fresh-session third independent methods review of published draft-v0.4. Do not begin that review, a v0.5 amendment, or any feasibility pilot in this session.\n"
+    },
+    "the_v0_3_review_itself_was_not_amended": true
+  },
   "immutable_objects_not_edited": [
     "studies/study3/reviews/v0_3_independent_methods_review.md",
     "studies/study3/reviews/v0_3_independent_methods_review.json",

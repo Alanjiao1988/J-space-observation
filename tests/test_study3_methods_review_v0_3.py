@@ -40,6 +40,31 @@ PROHIBITED_SOURCES = (
     "studies/study3/analysis/independent_methods_recalculation.py",
 )
 
+# Mutable, reviewed inputs that the immutable v0.3 generator reads. The historical check
+# materialises every one of them from REVIEWED_COMMIT, so it never consumes current-draft
+# bytes. This list is cross-checked against the generator's own declaration below.
+HISTORICAL_GENERATOR_INPUTS = (
+    "studies/study3/protocol/interface_calibration_protocol_draft.json",
+    "studies/study3/protocol/interface_calibration_protocol_draft.md",
+    "studies/study3/protocol/interface_calibration_protocol.schema.json",
+    "studies/study3/analysis/independent_methods_review_packet_v0_3.md",
+    "studies/study3/reviews/v0_3_operator_amendment.json",
+    "studies/study3/reviews/v0_3_operator_amendment.md",
+)
+
+# Current-draft bytes that must never be reachable from the isolated historical snapshot.
+CURRENT_DRAFT_BYTES_FORBIDDEN_IN_SNAPSHOT = (
+    "studies/study3/analysis/design_statistics.py",
+    "studies/study3/analysis/design_statistics_tables.json",
+    "studies/study3/analysis/independent_methods_review_packet_v0_4.md",
+    "studies/study3/design_receipt_v0_4.json",
+    "studies/study3/reviews/v0_4_operator_amendment.json",
+    "studies/study3/reviews/v0_4_operator_amendment.md",
+    "tests/test_study3_design.py",
+    "tests/test_study3_methods_review.py",
+    "tests/test_study3_methods_review_v0_3.py",
+)
+
 INHERITED_IDS = tuple(f"S3MR-{i:03d}" for i in range(1, 21))
 UR_IDS = tuple(f"UR-{i:02d}" for i in range(1, 23))
 
@@ -129,6 +154,35 @@ def _text(path: str) -> str:
 
 def _json(path: str) -> dict:
     return json.loads(_text(path))
+
+
+def _declared_decision_bearing_artifacts() -> tuple[str, ...]:
+    """Artifacts the immutable v0.3 generator declares it reads, parsed without importing it."""
+    tree = ast.parse(_text(RECALC_PY))
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id == "DECISION_BEARING_ARTIFACTS"
+            for target in node.targets
+        ):
+            return tuple(ast.literal_eval(node.value))
+    raise AssertionError("the v0.3 generator no longer declares DECISION_BEARING_ARTIFACTS")
+
+
+def _materialise_reviewed_snapshot(root: Path) -> None:
+    """Build an isolated tree holding only reviewed-commit inputs and the immutable outputs.
+
+    The generator resolves every path it reads from its own ``__file__``, so placing it under
+    ``root`` makes ``root`` its repository. Nothing outside this tree is reachable, which is
+    what keeps the historical check independent of the current draft.
+    """
+    for relative in HISTORICAL_GENERATOR_INPUTS:
+        destination = root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(_blob_at_reviewed_commit(relative))
+    for relative in (RECALC_PY, RECALC_JSON):
+        destination = root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(_committed_bytes(relative))
 
 
 @pytest.fixture(scope="module")
@@ -305,10 +359,39 @@ def test_the_committed_review_validates_against_the_committed_schema(review, sch
 # independent recalculation
 # ----------------------------------------------------------------------------------
 
-def test_independent_recalculation_check_mode_reproduces_the_committed_tables():
+def test_independent_recalculation_check_mode_reproduces_the_committed_tables(tmp_path):
+    """The v0.3 recalculation is a historical check, so it runs on a reviewed-commit snapshot.
+
+    Historical-review test-harness scope erratum: executing the generator inside the live
+    repository silently turned a check on draft-v0.3 into a check on whichever draft happens
+    to be checked out, so an authorised draft-v0.4 protocol amendment necessarily broke it.
+    The generator, its committed table and the expected result are all unchanged; only the
+    inputs are pinned to the commit that was actually reviewed.
+    """
+    if not _reviewed_commit_available():
+        pytest.fail(
+            f"reviewed commit {REVIEWED_COMMIT} is not present; the review must be validated against a clone "
+            f"that contains the reviewed history"
+        )
+
+    snapshot = tmp_path / "reviewed_snapshot"
+    _materialise_reviewed_snapshot(snapshot)
+
+    declared = _declared_decision_bearing_artifacts()
+    uncovered = [path for path in declared if not (snapshot / path).is_file()]
+    assert uncovered == [], f"the reviewed snapshot does not cover every declared input: {uncovered}"
+
+    for path in CURRENT_DRAFT_BYTES_FORBIDDEN_IN_SNAPSHOT:
+        assert not (snapshot / path).exists(), \
+            f"{path} must not be reachable from the isolated historical recalculation"
+
+    for relative in (RECALC_PY, RECALC_JSON):
+        assert (snapshot / relative).read_bytes() == _committed_bytes(relative), \
+            f"{relative} must enter the snapshot byte-for-byte unchanged"
+
     result = subprocess.run(
-        [sys.executable, str(REPO_ROOT / RECALC_PY), "--check"],
-        cwd=REPO_ROOT, capture_output=True, text=True,
+        [sys.executable, str(snapshot / RECALC_PY), "--check"],
+        cwd=snapshot, capture_output=True, text=True,
     )
     assert result.returncode == 0, f"--check failed:\n{result.stdout}\n{result.stderr}"
     assert "PROPOSED_DESIGN_PARAMETERS_NOT_MEASUREMENTS" in result.stdout
@@ -440,9 +523,22 @@ def test_the_review_object_is_recorded_as_unmodified(review):
 
 
 def test_the_reviewer_did_not_edit_either_existing_study3_test_module():
+    """Both test modules that existed at the reviewed commit are unchanged in that history.
+
+    Historical-review test-harness scope erratum: this assertion is about what the reviewer
+    did to the reviewed history, so it must read the committed blobs at REVIEWED_COMMIT.
+    Reading live index or working-tree bytes made it a check on the current draft instead,
+    which any later authorised amendment of tests/test_study3_design.py necessarily breaks.
+    The expected sizes and digests are unchanged.
+    """
+    if not _reviewed_commit_available():
+        pytest.fail(
+            f"reviewed commit {REVIEWED_COMMIT} is not present; the review must be validated against a clone "
+            f"that contains the reviewed history"
+        )
     for path in ("tests/test_study3_design.py", "tests/test_study3_methods_review.py"):
         size, digest = REVIEWED_BLOBS[path]
-        data = _committed_bytes(path)
+        data = _blob_at_reviewed_commit(path)
         assert len(data) == size, f"{path} was modified by the reviewer"
         assert hashlib.sha256(data).hexdigest() == digest, f"{path} was modified by the reviewer"
 

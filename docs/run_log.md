@@ -6645,3 +6645,94 @@ No review artifact was edited. Both independent reviews remain valid rejections.
 `PROPOSED_RESOLVED_SUBJECT_TO_THIRD_INDEPENDENT_METHODS_REVIEW`. The only legal next action is a
 third bounded independent methods review of draft-v0.4, conducted in a fresh session by a
 party that did not draft it. No successor prompt is created in this round.
+
+## Study 3 draft-v0.4 historical-review test-harness scope erratum
+
+This round changes **no** Study 3 scientific design, statistics, sampling frame, estimand,
+threshold, claim, state machine, operation projection or review disposition. It repairs a
+committed test harness whose implementation had drifted from its own stated purpose, under a
+supplemental operator authority recorded verbatim in section 8 of
+`studies/study3/reviews/v0_4_operator_amendment.md` (5,938 bytes, SHA-256
+`165acb770db3f25c0403a7d376a81b569fff11d623610a802e135633ec9c503b`). No additional authority file was
+created, and `studies/study3/prompts/study3_v0_4_design_amendment_authority.md` remains
+byte-identical at 46,543 bytes with SHA-256
+`230c57f4bfb874ad724c9448e8cfc1e58b0ff5970159e6741ce61de8104cd173`.
+
+### The defect
+
+`tests/test_study3_methods_review_v0_3.py` validates draft-v0.3 against the inputs that were
+actually reviewed at `REVIEWED_COMMIT`
+`2b36f5321d830ea6f70fff2b7bbca3cb93394046`. Two of its checks instead read live index or
+working-tree bytes, which silently rescoped them onto whichever draft happened to be checked
+out. The authorized draft-v0.4 amendment then broke them, which is the harness misbehaving
+rather than the draft.
+
+### Disclosed earlier runs, neither erased nor relabelled
+
+| Run | Scope | Result |
+| --- | --- | --- |
+| `er01` | `tests/test_study3_methods_review_v0_3.py` on candidate `3c229017` | 33 passed, **2 failed** |
+| `er02` | `independent_methods_recalculation_v0_3.py --check` with the live repository as root | **FAIL: recomputed tables differ from the committed tables** |
+
+`er01` failed on `test_the_reviewer_did_not_edit_either_existing_study3_test_module`, which
+compared `tests/test_study3_design.py` against live bytes (162,410) rather than against its
+committed blob at `REVIEWED_COMMIT` (93,590), and on
+`test_independent_recalculation_check_mode_reproduces_the_committed_tables`. `er02` is the same
+scope error observed directly: the generator consumed the amended draft-v0.4 protocol in place of
+the reviewed draft-v0.3 protocol. Both are scope errors in the harness, not defects in the
+reviewed object and not new scientific results.
+
+### The repair
+
+Both checks are anchored to `REVIEWED_COMMIT`. The first compares committed blobs at that commit.
+The second materialises the reviewed protocol and design inputs into an isolated snapshot and
+executes the **unchanged** v0.3 generator against the **unchanged** committed v0.3 table inside it.
+Because the generator resolves every path it reads from its own `__file__`, that snapshot root is
+its entire repository; the check additionally asserts that no current-draft byte is reachable from
+it, and that the generator's own declared input list is fully covered.
+
+No assertion was deleted or weakened. No `skip`, `xfail`, warning-only behaviour or exception
+swallowing was added. No expected hash or value was changed to accept live draft-v0.4 bytes. The two
+registered historical `tests/test_parser_v3_seal_job` failures are untouched. Neither immutable v0.3
+recalculation file, nor any review finding, disposition, reviewed-artifact identity or historical
+commit was modified. The module keeps exactly its 35 node IDs.
+
+### Local verification on the corrected candidate
+
+| Run | Scope | Result |
+| --- | --- | --- |
+| `er03` | `tests/test_study3_methods_review_v0_3.py` | 35 passed |
+| `er04` | node-ID comparison before and against after the repair | identical |
+| `er05` | `tests/test_study3_design.py` | 197 passed |
+| `er06` | `tests/test_study3_methods_review.py` | 78 passed |
+| `er07` | `design_statistics.py --check` | `DESIGN_STATISTICS_CHECK_OK sections=19` |
+| `er08` | `tests/test_paper_registries.py` with the design and review modules | 322 passed |
+| `er09` | non-vacuity probe of the repaired harness, outside the working tree | pristine reviewed snapshot passes; live draft-v0.4 protocol swapped in fails; perturbed committed table fails |
+
+`er09` matters because a historical check that cannot fail is worthless. The repaired harness still
+rejects a substituted current-draft input and a perturbed committed table, so the repair restored
+its scope without softening it.
+
+### Changed paths and registrations
+
+The published changed-path set relative to `bc98e5c98a2d4e273142c91497b7600ce751bade` becomes
+exactly **26 paths: 6 added and 20 modified**, with no deletion, rename, copy or type change. The
+sole newly authorized path is `tests/test_study3_methods_review_v0_3.py`, which is a modification
+because the module already exists at the published base.
+
+`AR-0246` deliberately retains the pre-erratum identity of that module, matching this repository's
+convention that a round registers a new row rather than rewriting a historical one. `AR-0269` records
+the corrected identity, and the artifact-index tail moves `AR-0268` to `AR-0269`. `AR-0251`,
+`AR-0252`, `AR-0253`, `AR-0256` and `AR-0268` are restated because those draft-v0.4 artifacts changed
+within the round that is being published.
+
+### Boundary
+
+Zero model downloads, tokenizations, weight loads, forward passes, generations, activation
+extractions, lens operations, probe fits, provider calls, GPU jobs, bank rows, seeds, interface
+selections, positive-reference selections, result rows, scientific evidence rows and confirmation
+accesses. Nothing is frozen and nothing is authorised. `OD2` remains
+`UNRESOLVED_BLOCKING_OPERATOR_DECISION`. `paper/evidence_ledger.csv` is untouched and its tail
+remains `EV-0016`. Study 1 and Study 2 remain closed and untouched. Both independent reviews remain
+valid rejections, and the only legal next action is still a third bounded independent methods review
+of published draft-v0.4 in a fresh session.
