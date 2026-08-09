@@ -88,3 +88,44 @@ result as Study 3 selection data. It may not modify, reopen, revise, or
 reinterpret the terminal state of either predecessor. Study 2 post-hoc
 observations carry zero authority in Study 3 and may motivate a question but may
 never serve as a premise, a hypothesis result, or evidence of a defect.
+
+## Study 3 draft-v0.4 third independent methods review
+
+> **THIRD INDEPENDENT METHODS REVIEW COMPLETE - BOUNDED AMENDMENT REQUIRED**
+>
+> State: `STUDY3_DRAFT_V0_4_THIRD_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`
+>
+> Disposition: **`STUDY3_V0_4_THIRD_METHODS_REVIEW_REJECTED_BOUNDED_AMENDMENT_REQUIRED`**, returned against reviewed commit
+> `e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43`, tree `86c5a5ec0e475090c14654cff27605f883495a48`.
+>
+> The third bounded independent methods review of draft-v0.4 verified 5 of the 10 inherited
+> second-review findings resolved and 5 partially resolved, and recorded 1 BLOCKING,
+> 3 MAJOR and 6 MINOR new findings (`S3MR3-001` through `S3MR3-010`), none of them
+> fundamental. Every binding statistical number in the drafting derivation was independently
+> reproduced with zero numeric disagreement.
+>
+> The blocking finding is that the `K6-SEP` contrast cell has no referent for the option-less
+> selectable profiles `S2` and `S3`: `R-sep` differs from `R-base` only in the separator between a
+> label and its option content, which neither profile renders, so under the registered
+> deterministic scorer that cell is a self-comparison rather than a presentation pair. The major
+> findings are that the derived statistics table still admits the never-selectable profile `S4` to
+> two confirmation rows, that the retired `J_both` invariance construct and the withdrawn sample
+> size `256` survive in active charter, README and handoff text, and that the deterministic
+> rendering surface is unregistered so the two `K6` cells cannot be instantiated.
+>
+> Both construct verdicts are `ADEQUATE_SUBJECT_TO_A_BOUNDED_REPAIR`. The narrowed
+> `J_joint_correct` estimand does serve Study 3's instrument-calibration purpose, and excluding
+> generation from the selectable set is correct rather than a gap. Read
+> `reviews/v0_4_independent_methods_review.md`.
+>
+> The only legal next action is `OPERATOR_BOUNDED_AMENDMENT_ROUND_FOR_DRAFT_V0_5`, followed by a further independent methods
+> review. **Not a freeze. Not `P3-Q`. Not a bank, a seed, model execution, a development round, a
+> confirmation access, a feasibility pilot or any mechanistic work.**
+>
+> `OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`. The review neither resolves nor advances
+> it, and the disposition is not driven by it.
+>
+> Study 3 remains unfrozen. No interface or positive reference is selected. No bank, seed, model
+> operation, gate result, confirmation access or evidence row exists. Every operation counter is
+> zero. The original research question remains unanswered.
+

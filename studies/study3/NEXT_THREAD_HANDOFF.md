@@ -1,5 +1,74 @@
 # Study 3 - next thread handoff
 
+> **THIRD INDEPENDENT METHODS REVIEW COMPLETE - BOUNDED AMENDMENT REQUIRED**
+>
+> State: `STUDY3_DRAFT_V0_4_THIRD_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION`
+>
+> Disposition: **`STUDY3_V0_4_THIRD_METHODS_REVIEW_REJECTED_BOUNDED_AMENDMENT_REQUIRED`**, returned against reviewed commit
+> `e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43`, tree `86c5a5ec0e475090c14654cff27605f883495a48`.
+>
+> The third bounded independent methods review of draft-v0.4 verified 5 of the 10 inherited
+> second-review findings resolved and 5 partially resolved, and recorded 1 BLOCKING,
+> 3 MAJOR and 6 MINOR new findings (`S3MR3-001` through `S3MR3-010`), none of them
+> fundamental. Every binding statistical number in the drafting derivation was independently
+> reproduced with zero numeric disagreement.
+>
+> The blocking finding is that the `K6-SEP` contrast cell has no referent for the option-less
+> selectable profiles `S2` and `S3`: `R-sep` differs from `R-base` only in the separator between a
+> label and its option content, which neither profile renders, so under the registered
+> deterministic scorer that cell is a self-comparison rather than a presentation pair. The major
+> findings are that the derived statistics table still admits the never-selectable profile `S4` to
+> two confirmation rows, that the retired `J_both` invariance construct and the withdrawn sample
+> size `256` survive in active charter, README and handoff text, and that the deterministic
+> rendering surface is unregistered so the two `K6` cells cannot be instantiated.
+>
+> Both construct verdicts are `ADEQUATE_SUBJECT_TO_A_BOUNDED_REPAIR`. The narrowed
+> `J_joint_correct` estimand does serve Study 3's instrument-calibration purpose, and excluding
+> generation from the selectable set is correct rather than a gap. Read
+> `reviews/v0_4_independent_methods_review.md`.
+>
+> The only legal next action is `OPERATOR_BOUNDED_AMENDMENT_ROUND_FOR_DRAFT_V0_5`, followed by a further independent methods
+> review. **Not a freeze. Not `P3-Q`. Not a bank, a seed, model execution, a development round, a
+> confirmation access, a feasibility pilot or any mechanistic work.**
+>
+> `OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION`. The review neither resolves nor advances
+> it, and the disposition is not driven by it.
+>
+> Study 3 remains unfrozen. No interface or positive reference is selected. No bank, seed, model
+> operation, gate result, confirmation access or evidence row exists. Every operation counter is
+> zero. The original research question remains unanswered.
+
+## What the bounded amendment round must decide
+
+The successor round is `OPERATOR_BOUNDED_AMENDMENT_ROUND_FOR_DRAFT_V0_5`. It is an operator amendment round, not a freeze and not an
+execution authority. The reviewer does not design it; the following are the review findings it must
+close, restated as the decisions they require.
+
+1. `S3MR3-001` (BLOCKING). Decide, as a substantive design act, how the separator-rendering
+   contrast applies to profiles that render no option list: record it `not_applicable` for `S2` and
+   `S3` and re-derive their cell census and per-profile claim ceiling, or register a separator
+   factor that exists in the option-less prompt, or state explicitly that those profiles carry a
+   single genuine `I3` contrast. It may not be closed by editing claim text alone.
+2. `S3MR3-010` (MAJOR). Register the byte-exact rendering surface - stem, option-line format,
+   `R-base` and `R-sep` separators, `R-base` and `R-instr` instruction sentences, and the answer
+   cue for each profile - and re-derive `K6` applicability from the registered strings.
+3. `S3MR3-002` (MAJOR). Regenerate the derived statistics table so its confirmation applicability
+   agrees with the amended protocol, give it a per-component row shape, and bind that field in a
+   committed assertion.
+4. `S3MR3-003` (MAJOR). Bring the charter, both READMEs and this handoff into conformance with the
+   registered v0.4 design, or mark the superseded passages unambiguously as historical narrative.
+5. `S3MR3-004` through `S3MR3-009` (MINOR). Widen or narrow the prohibited-term enforcement to
+   match its declared scope; remove `I4` from `S4`'s applicable gate list; reconcile the registered
+   stop-state sets; disclose the sample-size non-monotonicity; correct the stale round references;
+   and either define `designated` as the highest-priority adequate profile or restate the
+   end-to-end conclusion over an adequate profile.
+
+`OD2` is untouched and remains a blocking operator decision. No positive reference is selected,
+preferred, pinned, revision-resolved, downloaded, tokenized, loaded or prequalified.
+
+A fundamental rejection was considered and not earned, so the round limit rule does not apply and
+no feasibility-pilot authority exists. No successor prompt was created by this review.
+
 **State: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_4_COMPLETE_AWAITING_THIRD_INDEPENDENT_METHODS_REVIEW`**
 
 **Draft version: `draft-v0.4`, amended, unfrozen, awaiting the THIRD independent

@@ -1,0 +1,271 @@
+{
+  "acr_evidence": {
+    "base_image": "python:3.11-bookworm",
+    "clone_source": "git bundle, fresh clone, checkout of the exact commit",
+    "github_actions_used": false,
+    "platform": "linux/amd64",
+    "registry": "acrfinreportdt2tgbdb",
+    "runs": []
+  },
+  "ancestry": {
+    "publication_is_a_non_force_fast_forward": true,
+    "published_pre_amendment_base": "bc98e5c98a2d4e273142c91497b7600ce751bade",
+    "reset_merge_rebase_cherry_pick_or_force_push_used": false,
+    "starting_commit_is_a_strict_descendant_of_the_base": true
+  },
+  "authority_flags": {
+    "bank_authorized": false,
+    "confirmation_access_authorized": false,
+    "execution_authorized": false,
+    "frozen": false,
+    "model_operations_authorized": false,
+    "positive_reference_selected": false,
+    "seed_authorized": false,
+    "winner_selected": false
+  },
+  "committed_authority": {
+    "byte_identical_to_source": true,
+    "bytes": 47885,
+    "path": "studies/study3/prompts/study3_v0_4_independent_methods_review_authority.md",
+    "sha256": "c756ba2e5ad147cfc19edc4a451c2d919e51643d19dda7d95469c21786dcdc86"
+  },
+  "disposition": "STUDY3_V0_4_THIRD_METHODS_REVIEW_REJECTED_BOUNDED_AMENDMENT_REQUIRED",
+  "document_class": "methods_review_receipt",
+  "evidence_ledger": {
+    "bytes": 25241,
+    "data_rows": 16,
+    "last_row": "EV-0016",
+    "modified_by_this_round": false,
+    "path": "paper/evidence_ledger.csv",
+    "sha256": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1"
+  },
+  "final_commit": "RECORDED_IN_THE_RUN_LOG_ENTRY_FOR_THIS_ROUND",
+  "final_tree": "RECORDED_IN_THE_RUN_LOG_ENTRY_FOR_THIS_ROUND",
+  "independent_implementation": {
+    "derivation_commit": "76ab1bab8fe947a26390a0c6c6d46c7f9af51842",
+    "derivation_precedes_inspection": true,
+    "drafting_inspection_commit": "8a30067d3094a2e62828536c1bbaa8e704c988e8",
+    "identity": {
+      "bytes": 97890,
+      "sha256": "34ba8e9254e79c190a95f2f39ada2bc56ab6b39d03585ed809beda10f4f5595d"
+    },
+    "path": "studies/study3/analysis/independent_methods_recalculation_v0_4.py",
+    "prohibited_sources_reachable": false,
+    "table": "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json",
+    "table_identity": {
+      "bytes": 148003,
+      "sha256": "2bb11346ac948bd67099bee3100b3dbb33c8cab255b58e0e9938b8aa509fbe78"
+    }
+  },
+  "local_operations_disclosure": {
+    "authoritative_validation": "clean CPU-only Azure Container Registry tasks bound to exact commits from a fresh clone of a Git bundle, one test path per invocation, GitHub Actions not used.",
+    "local_decision_bearing_statistical_runs": 0,
+    "local_non_authoritative_debugging": "The independent recalculation module was executed locally in --emit mode to assemble its table and in --check mode as a syntax and self-consistency check while it was being written. Neither run is evidence. A clean CPU-only ACR run bound to an exact commit rejected an early emission because repository paths were rendered with the host platform's separator; that defect was repaired and disclosed rather than silently corrected.",
+    "local_pytest_runs": 0,
+    "local_read_only_inspection": "Git inspection, committed-blob hashing, JSON and AST reading of committed artifacts, and document assembly."
+  },
+  "new_artifacts": {
+    "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json": {
+      "bytes": 148003,
+      "sha256": "2bb11346ac948bd67099bee3100b3dbb33c8cab255b58e0e9938b8aa509fbe78"
+    },
+    "studies/study3/analysis/independent_methods_recalculation_v0_4.py": {
+      "bytes": 97890,
+      "sha256": "34ba8e9254e79c190a95f2f39ada2bc56ab6b39d03585ed809beda10f4f5595d"
+    },
+    "studies/study3/prompts/study3_v0_4_independent_methods_review_authority.md": {
+      "bytes": 47885,
+      "sha256": "c756ba2e5ad147cfc19edc4a451c2d919e51643d19dda7d95469c21786dcdc86"
+    },
+    "studies/study3/reviews/v0_4_independent_methods_review.json": {
+      "bytes": 143531,
+      "sha256": "3ace4f0a748d240028d4dee8b5f64008ad1e98715892419bb3a66de9e923d036"
+    },
+    "studies/study3/reviews/v0_4_independent_methods_review.md": {
+      "bytes": 93082,
+      "sha256": "7c8ea59b7fd07d9537551801c37c4307b3e64de221b40ef6cbf109304d3a339f"
+    },
+    "studies/study3/reviews/v0_4_independent_methods_review.schema.json": {
+      "bytes": 54798,
+      "sha256": "2753fed4fd65b1b219193c44d57008249873ee3904eb6b81f2089dc85773d193"
+    },
+    "tests/test_study3_methods_review_v0_4.py": {
+      "bytes": 54665,
+      "sha256": "aebd8df2b5fe1577b501139043dc96624d3bd61102357ae2cda02fa7279ef3da"
+    }
+  },
+  "next_legal_action": "OPERATOR_BOUNDED_AMENDMENT_ROUND_FOR_DRAFT_V0_5",
+  "operation_counters": {
+    "ablation_operations": 0,
+    "activation_extractions": 0,
+    "bank_accesses": 0,
+    "bank_rows_generated": 0,
+    "confirmation_split_accesses": 0,
+    "decision_bearing_local_statistical_runs": 0,
+    "decode_steps": 0,
+    "evidence_rows_created": 0,
+    "forward_passes": 0,
+    "generations": 0,
+    "gpu_jobs": 0,
+    "interfaces_selected": 0,
+    "lens_operations": 0,
+    "local_pytest_runs": 0,
+    "model_downloads": 0,
+    "model_weight_loads": 0,
+    "patching_operations": 0,
+    "phase_1_0d_operations": 0,
+    "positive_references_selected": 0,
+    "probe_operations": 0,
+    "provider_calls": 0,
+    "revision_resolutions": 0,
+    "rq2_s4_operations": 0,
+    "seeds_drawn": 0,
+    "sequence_scorings": 0,
+    "study1_files_modified": 0,
+    "study2_files_modified": 0,
+    "tokenizer_constructions": 0
+  },
+  "path_whitelist": {
+    "added": [
+      "studies/study3/reviews/v0_4_independent_methods_review.md",
+      "studies/study3/reviews/v0_4_independent_methods_review.json",
+      "studies/study3/reviews/v0_4_independent_methods_review.schema.json",
+      "studies/study3/analysis/independent_methods_recalculation_v0_4.py",
+      "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json",
+      "tests/test_study3_methods_review_v0_4.py",
+      "studies/study3/prompts/study3_v0_4_independent_methods_review_authority.md",
+      "studies/study3/methods_review_receipt_v0_4.json"
+    ],
+    "hard_ceiling": 17,
+    "modified": [
+      "README.md",
+      "studies/README.md",
+      "studies/study3/README.md",
+      "studies/study3/NEXT_THREAD_HANDOFF.md",
+      "reports/current_status.md",
+      "docs/decision_log.md",
+      "docs/run_log.md",
+      "paper/methods_ledger.md",
+      "paper/artifact_index.csv"
+    ],
+    "observed": [
+      "README.md",
+      "docs/decision_log.md",
+      "docs/run_log.md",
+      "paper/artifact_index.csv",
+      "paper/methods_ledger.md",
+      "reports/current_status.md",
+      "studies/README.md",
+      "studies/study3/NEXT_THREAD_HANDOFF.md",
+      "studies/study3/README.md",
+      "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json",
+      "studies/study3/analysis/independent_methods_recalculation_v0_4.py",
+      "studies/study3/methods_review_receipt_v0_4.json",
+      "studies/study3/prompts/study3_v0_4_independent_methods_review_authority.md",
+      "studies/study3/reviews/v0_4_independent_methods_review.json",
+      "studies/study3/reviews/v0_4_independent_methods_review.md",
+      "studies/study3/reviews/v0_4_independent_methods_review.schema.json",
+      "tests/test_study3_methods_review_v0_4.py"
+    ],
+    "observed_count": 17
+  },
+  "protected_bytes": {
+    "docs/phase1_0d_protected_bytes.json": {
+      "bytes": 33243,
+      "sha256": "dcd41ea706c66743fb3923cc3f993c9135f0b2ab9dd32977869d16473cf3dfbf"
+    },
+    "docs/phase1_0d_rv2_protected_bytes.json": {
+      "bytes": 9123,
+      "sha256": "9b7705ccdc630bce5fe77503c35ff6644cd37f876b886fa9cd8a14f8c7012e77"
+    }
+  },
+  "registry_entries": {
+    "artifacts": [
+      "AR-0270",
+      "AR-0271",
+      "AR-0272",
+      "AR-0273",
+      "AR-0274",
+      "AR-0275",
+      "AR-0276",
+      "AR-0277",
+      "AR-0278",
+      "AR-0279"
+    ],
+    "contiguous": true,
+    "decision": "D44",
+    "method": "M-32",
+    "prior_rows_altered": false
+  },
+  "rejection_class": "bounded_amendment",
+  "remaining_legal_authority": {
+    "bank_construction": false,
+    "confirmation_access": false,
+    "execution": false,
+    "feasibility_pilot_execution": false,
+    "freeze": false,
+    "model_operations": false,
+    "od2_resolution": false,
+    "only_legal_successor": "OPERATOR_BOUNDED_AMENDMENT_ROUND_FOR_DRAFT_V0_5",
+    "p3q": false,
+    "seed_draw": false,
+    "successor_prompt_created_in_this_round": false
+  },
+  "reviewed_object": {
+    "added": [
+      "studies/study3/analysis/independent_methods_review_packet_v0_4.md",
+      "studies/study3/design_receipt_v0_4.json",
+      "studies/study3/prompts/study3_v0_4_design_amendment_authority.md",
+      "studies/study3/reviews/v0_4_operator_amendment.json",
+      "studies/study3/reviews/v0_4_operator_amendment.md",
+      "studies/study3/reviews/v0_4_operator_amendment.schema.json"
+    ],
+    "base_commit": "bc98e5c98a2d4e273142c91497b7600ce751bade",
+    "deletions_renames_copies_or_type_changes": 0,
+    "head_commit": "e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43",
+    "modified": [
+      "README.md",
+      "docs/decision_log.md",
+      "docs/run_log.md",
+      "paper/artifact_index.csv",
+      "paper/methods_ledger.md",
+      "reports/current_status.md",
+      "studies/README.md",
+      "studies/study3/NEXT_THREAD_HANDOFF.md",
+      "studies/study3/README.md",
+      "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+      "studies/study3/analysis/design_statistics.py",
+      "studies/study3/analysis/design_statistics_tables.json",
+      "studies/study3/analysis/study2_to_study3_design_traceability.md",
+      "studies/study3/protocol/interface_calibration_protocol.schema.json",
+      "studies/study3/protocol/interface_calibration_protocol_draft.json",
+      "studies/study3/protocol/interface_calibration_protocol_draft.md",
+      "studies/study3/references/methods_sources.md",
+      "studies/study3/references/positive_reference_dossier.md",
+      "tests/test_study3_design.py",
+      "tests/test_study3_methods_review_v0_3.py"
+    ],
+    "path_count": 26,
+    "reviewer_edited_any_reviewed_path": false
+  },
+  "round": "third_independent_methods_review_of_draft_v0_4",
+  "schema_version": "study3-v0-4-third-independent-methods-review-receipt-1",
+  "selection_state": {
+    "selected_checkpoint": null,
+    "selected_interface_profile": null,
+    "selected_positive_reference": null,
+    "selected_profile_ranking_produced": false
+  },
+  "self_hash_excluded": "studies/study3/methods_review_receipt_v0_4.json",
+  "source_authority": {
+    "bytes": 47885,
+    "cr_count": 0,
+    "ends_with_newline": false,
+    "lf_count": 940,
+    "observed_absolute_path": "C:\\Users\\alanjiao\\.copilot\\workspaces\\4f9087c8-ebef-4dba-a9b4-a2b620ce1ecd\\attachments\\pasted-text-6fe3b48d-0969-4986-a94e-f56f33ea93cf.txt",
+    "sha256": "c756ba2e5ad147cfc19edc4a451c2d919e51643d19dda7d95469c21786dcdc86"
+  },
+  "starting_commit": "e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43",
+  "starting_tree": "86c5a5ec0e475090c14654cff27605f883495a48",
+  "state": "STUDY3_DRAFT_V0_4_THIRD_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION"
+}

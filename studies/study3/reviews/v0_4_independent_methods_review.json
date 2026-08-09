@@ -1,0 +1,2160 @@
+{
+  "arbitrary_dependence_power_decision": {
+    "end_to_end_floor": "9/10",
+    "exclusions_are_explicit": true,
+    "independence_appears_only_as_labelled_sensitivity": true,
+    "least_favourable_configuration_sufficient": true,
+    "m_max": 43,
+    "m_max_over_selectable_only": true,
+    "panel_bound": "1/200",
+    "per_cell_budget": "19/17200",
+    "per_cell_power_target": "17181/17200",
+    "power_labels_are_distinguished": true,
+    "profile_stage_floor": "381/400",
+    "uses_independence_in_any_binding_bound": false
+  },
+  "authority_flags": {
+    "bank_authorized": false,
+    "confirmation_access_authorized": false,
+    "execution_authorized": false,
+    "frozen": false,
+    "model_operations_authorized": false,
+    "positive_reference_selected": false,
+    "seed_authorized": false,
+    "winner_selected": false
+  },
+  "bank_rows": [],
+  "claim_ceiling_restatement": {
+    "generator_local": true,
+    "no_execution_authority": true,
+    "original_research_question_answered": false,
+    "statement": "Study 3 remains an unfrozen design. Nothing in this review is a scientific result. No interface profile and no positive reference is selected. No bank, seed, model operation, gate result, confirmation access or evidence row exists, and every empirical and model operation counter is exactly zero. The strongest claim any future pass could support is cell-wise joint robust correctness on the registered synthetic generator distributions for the named tasks, checkpoint roles and registered presentation pairs. The original research question remains unanswered, and this review creates no freeze, execution, amendment or pilot authority.",
+    "unfrozen": true
+  },
+  "committed_authority": {
+    "byte_identical_to_source": true,
+    "bytes": 47885,
+    "path": "studies/study3/prompts/study3_v0_4_independent_methods_review_authority.md",
+    "sha256": "c756ba2e5ad147cfc19edc4a451c2d919e51643d19dda7d95469c21786dcdc86"
+  },
+  "confirmation_decision": {
+    "applicability_rule": "Confirmation applicability is the intersection of the component's registered selectable profiles with the single profile selected on the development split, so exactly one profile is ever evaluated.",
+    "i1b_confirmation_profiles": [
+      "S1"
+    ],
+    "k5_confirmation_profiles": [
+      "S1"
+    ],
+    "physically_disjoint": true,
+    "read_once": true,
+    "registered_correctly_in_every_artifact": false,
+    "rescue_permitted": false,
+    "reselection_permitted": false,
+    "retry_permitted": false,
+    "s4_can_appear": false,
+    "separately_authorized": true,
+    "spent_on_error_or_ambiguity": true
+  },
+  "construct_verdicts": {
+    "METHOD_INTERNAL_VALIDITY_VERDICT": {
+      "adequate": false,
+      "basis": "The statistical machinery is sound and was independently reproduced without a single numeric disagreement across seventy exact-binomial fields, sixteen cell-census fields, eleven power-architecture fields and fifteen operation-projection fields. The exact binomial model, the intersection-union logic, the fixed-denominator union correction, the arbitrary-dependence type-II ladder, the total deterministic state machine, the selection map, the confirmation lifecycle and the operation ontology are all valid as registered, and every joint bound was verified to hold under arbitrary dependence with no independence assumption anywhere. Internal validity nonetheless falls short of adequate for one reason that is not statistical: a gate-bearing atomic cell is registered as applicable to two selectable profiles for which its transformation has no referent, so that cell can be passed without testing the construct the floor was derived for. Once that applicability is corrected and the deterministic rendering surface is registered, the internal validity of the design is adequate.",
+      "verdict": "ADEQUATE_SUBJECT_TO_A_BOUNDED_REPAIR"
+    },
+    "STUDY3_PURPOSE_AND_CONSTRUCT_RELEVANCE_VERDICT": {
+      "adequate": false,
+      "basis": "This verdict was reached separately and is not inferred from internal validity. The narrowed J_joint_correct estimand does serve Study 3's purpose. Study 3 exists because two predecessors died on the instrument, and the decision it must inform is whether an interface reliably registers competence that is present. That is a level question, not a contrast question, so narrowing to a level is the right move rather than a retreat; and because p_joint + d <= 1, a passing joint-correctness gate bounds correctness-state discordance from above without claiming to estimate it. Excluding generation from the selectable set is likewise the direct implementation of the Study 1 lesson and does not leave a purpose-critical gap, since S4 is retained as a costed diagnostic with an explicit causal-ambiguity ceiling. Construct relevance nevertheless falls short of adequate for the preferred profile specifically: S2 and S3 have only two registered I3 cells each, one of which is a self-comparison under the registered rendering definition, so the joint-correctness evidence supporting the profile the design most wants to select is half of what the claim ceiling states. That is a bounded repair, not a redefinition of what Study 3 measures.",
+      "verdict": "ADEQUATE_SUBJECT_TO_A_BOUNDED_REPAIR"
+    },
+    "second_verdict_is_not_inferred_from_the_first": true
+  },
+  "cross_artifact_adjudications": [
+    {
+      "candidate": "Whether J_joint_correct is described identically as a level and never as a presentation effect in every active claim field across the JSON, the Markdown, the schema, the packet and the routing documents.",
+      "candidate_id": "CI-01",
+      "evidence_fields": [
+        "proposed_statistics.i3_indicators",
+        "RESEARCH_CHARTER_DRAFT.md section 2",
+        "RESEARCH_CHARTER_DRAFT.md section 4 commitment 3",
+        "studies/README.md primary indicator sentence",
+        "NEXT_THREAD_HANDOFF.md Three I3 indicators"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md",
+        "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+        "studies/README.md",
+        "studies/study3/README.md",
+        "studies/study3/NEXT_THREAD_HANDOFF.md"
+      ],
+      "status": "CONFIRMED_MAJOR"
+    },
+    {
+      "candidate": "Whether the descriptive b, c and d lattice quantities have any reachable decision path into eligibility, selection, confirmation, ranking or rescue.",
+      "candidate_id": "CI-02",
+      "evidence_fields": [
+        "proposed_statistics.descriptive_paired_summary.carries_no",
+        "proposed_statistics.hypothesis_families.family_C_descriptive",
+        "proposed_statistics.i3_indicators.historical_and_descriptive_indicators.reachable_decision_path",
+        "proposed_statistics.development_selection_map"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "status": "NOT_CONFIRMED"
+    },
+    {
+      "candidate": "Whether p_joint and the correctness-state discordance d are anywhere treated as independent parameters or as a product of marginals.",
+      "candidate_id": "CI-03",
+      "evidence_fields": [
+        "proposed_statistics.i3_indicators",
+        "i3_discordance_parameterisation.identity_p_joint_plus_d_at_most_one_holds"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json"
+      ],
+      "status": "NOT_CONFIRMED"
+    },
+    {
+      "candidate": "Whether every gate-bearing cell has a complete registered generator distribution with exact weights summing to one and a with-replacement draw of the full tuple per draw ordinal.",
+      "candidate_id": "CI-04",
+      "evidence_fields": [
+        "sampling_frame_v0_4.development_sampling_cells",
+        "sampling_frame_v0_4.confirmation_sampling_cells",
+        "sampling_frame_reconstruction.every_parameter_weight_sums_to_one"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "status": "NOT_CONFIRMED"
+    },
+    {
+      "candidate": "Whether any cell draws a template once and generates a batch beneath it, which would introduce template-level clustering incompatible with iid Bernoulli.",
+      "candidate_id": "CI-05",
+      "evidence_fields": [
+        "sampling_frame_v0_4.binding_stochastic_model.within_cell_draw_rule",
+        "sampling_frame_v0_4.development_sampling_cells[*].parameters_are_independently_drawn",
+        "sampling_frame_v0_4.reuse_and_dependence_rule.id_difference_does_not_imply_independence"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "status": "NOT_CONFIRMED"
+    },
+    {
+      "candidate": "Whether the deterministic rendering surface needed to instantiate the registered generator is registered anywhere.",
+      "candidate_id": "CI-06",
+      "evidence_fields": [
+        "counterbalancing_design.k6_renderings.renderings",
+        "interface_profiles[*].prompt_and_rendering_contract",
+        "bank_construction_policy"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md"
+      ],
+      "status": "CONFIRMED_MAJOR"
+    },
+    {
+      "candidate": "Whether the generator-local external-validity ceiling is stated explicitly wherever a pass claim is made.",
+      "candidate_id": "CI-07",
+      "evidence_fields": [
+        "claim_ceiling.maximum_pass_claim",
+        "claim_ceiling.permitted_i3_statement",
+        "research_question.what_a_pass_would_mean"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/independent_methods_review_packet_v0_4.md"
+      ],
+      "status": "NOT_CONFIRMED"
+    },
+    {
+      "candidate": "Whether per-cell power is ever labelled family, profile, selection, confirmation or end-to-end power, and whether the arbitrary-dependence proof is stated wherever a joint bound is published.",
+      "candidate_id": "CI-08",
+      "evidence_fields": [
+        "power_architecture_v0_4.power_vocabulary",
+        "power_architecture_v0_4.union_bound_proof.uses_independence",
+        "design_statistics_tables.json :: power_architecture.uses_independence"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/analysis/independent_methods_review_packet_v0_4.md"
+      ],
+      "status": "NOT_CONFIRMED"
+    },
+    {
+      "candidate": "Whether the K6 contrast applicability recorded for the option-less profiles is consistent with what those profiles render.",
+      "candidate_id": "CI-09",
+      "evidence_fields": [
+        "i3_contrast_registry.k6_applicability",
+        "counterbalancing_design.k6_renderings.renderings[R-sep]",
+        "interface_profiles[S2].prompt_and_rendering_contract",
+        "gate_truth_table.rows[S2].I3_K6"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md",
+        "studies/study3/analysis/independent_methods_review_packet_v0_4.md"
+      ],
+      "status": "CONFIRMED_BLOCKING"
+    },
+    {
+      "candidate": "Whether the confirmation applicability recorded in the derived statistics table agrees with the amended protocol and its schema.",
+      "candidate_id": "CI-10",
+      "evidence_fields": [
+        "design_statistics_tables.json :: confirmation_exact_binomial_components[*].applicable_profiles",
+        "proposed_statistics.confirmation_exact_binomial_gates[*].applicable_profiles"
+      ],
+      "evidence_paths": [
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/protocol/interface_calibration_protocol.schema.json"
+      ],
+      "status": "CONFIRMED_MAJOR"
+    },
+    {
+      "candidate": "Whether S4's diagnostic-only authority, its composite causal ambiguity and its exclusion from every success union are stated consistently.",
+      "candidate_id": "CI-11",
+      "evidence_fields": [
+        "interface_profiles[S4].selectable_status_reason",
+        "power_architecture_v0_4.type_i_architecture.s4_excluded_from_every_success_union",
+        "operation_boundaries.projected_future_operations.work_streams.S4_diagnostic_generation.selection_authority"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/independent_methods_review_packet_v0_4.md"
+      ],
+      "status": "NOT_CONFIRMED"
+    },
+    {
+      "candidate": "Whether the gate applicability of I4 to S4 is recorded consistently in every artifact that states it.",
+      "candidate_id": "CI-12",
+      "evidence_fields": [
+        "interface_profiles[S4].applicable_gates",
+        "gate_truth_table.rows[S4].I4",
+        "gate_truth_table.i4_applicability_note"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "status": "CONFIRMED_MINOR"
+    },
+    {
+      "candidate": "Whether the registered stop-state set is the same in the state machine and in the gate truth table.",
+      "candidate_id": "CI-13",
+      "evidence_fields": [
+        "state_machine_v0_4.states",
+        "gate_truth_table.legal_stop_states"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "status": "CONFIRMED_MINOR"
+    },
+    {
+      "candidate": "Whether every operation quantity is derived from primitive counts and whether any null stream is treated as zero or folded into a grand total.",
+      "candidate_id": "CI-14",
+      "evidence_fields": [
+        "operation_boundaries.projected_future_operations.work_streams",
+        "operation_ontology_v0_4.unresolved_streams_are_null_not_zero",
+        "operation_projection"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/design_statistics_tables.json"
+      ],
+      "status": "NOT_CONFIRMED"
+    },
+    {
+      "candidate": "Whether the ten inherited repair claims are matched by the artifacts they name as their locations.",
+      "candidate_id": "CI-15",
+      "evidence_fields": [
+        "closure_matrix_v0_4[S3MR2-001].where",
+        "closure_matrix_v0_4[S3MR2-003].verification",
+        "closure_matrix_v0_4[S3MR2-004].verification"
+      ],
+      "evidence_paths": [
+        "studies/study3/reviews/v0_4_operator_amendment.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/design_statistics_tables.json"
+      ],
+      "status": "CONFIRMED_MAJOR"
+    },
+    {
+      "candidate": "Whether the historical-harness erratum left the collected node-ID set, the expected scientific values and the immutable v0.3 recalculation identities unchanged.",
+      "candidate_id": "CI-16",
+      "evidence_fields": [
+        "REVIEWED_COMMIT",
+        "collected node identifiers",
+        "historical_harness_static_audit"
+      ],
+      "evidence_paths": [
+        "tests/test_study3_methods_review_v0_3.py",
+        "studies/study3/analysis/independent_methods_recalculation_v0_3.py",
+        "studies/study3/analysis/independent_methods_recalculation_tables_v0_3.json"
+      ],
+      "status": "NOT_CONFIRMED"
+    },
+    {
+      "candidate": "Whether AR-0246 and AR-0269 record two contradictory claims about the current harness blob.",
+      "candidate_id": "CI-17",
+      "evidence_fields": [
+        "AR-0246.sha256",
+        "AR-0246.bytes",
+        "AR-0269.sha256",
+        "AR-0269.bytes",
+        "AR-0269.paper_usage"
+      ],
+      "evidence_paths": [
+        "paper/artifact_index.csv"
+      ],
+      "status": "NOT_CONFIRMED"
+    },
+    {
+      "candidate": "Whether the withdrawn sample sizes appear in any active field despite the protocol asserting they do not.",
+      "candidate_id": "CI-18",
+      "evidence_fields": [
+        "proposed_statistics.sample_sizes.n_256_and_128_status",
+        "RESEARCH_CHARTER_DRAFT.md section 8",
+        "studies/README.md sizing sentence",
+        "studies/study3/README.md Sizing and multiplicity"
+      ],
+      "evidence_paths": [
+        "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+        "studies/README.md",
+        "studies/study3/README.md",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "status": "CONFIRMED_MAJOR"
+    },
+    {
+      "candidate": "Whether the evidence ledger, the operation counters and the authority flags record any operation, result or evidence row for this design.",
+      "candidate_id": "CI-19",
+      "evidence_fields": [
+        "operation_boundaries.performed_this_round",
+        "status",
+        "bank_rows",
+        "results"
+      ],
+      "evidence_paths": [
+        "paper/evidence_ledger.csv",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "status": "NOT_CONFIRMED"
+    },
+    {
+      "candidate": "Whether the active round references in the protocol name the correct review round.",
+      "candidate_id": "CI-20",
+      "evidence_fields": [
+        "claim_ceiling.no_self_approval",
+        "proposed_statistics.unresolved[1]",
+        "unresolved_operator_decisions[OD7].disposition"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "status": "CONFIRMED_MINOR"
+    }
+  ],
+  "descriptive_lattice_decision": {
+    "a_presentation_sensitivity_gate_is_required": false,
+    "authority": "DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY",
+    "has_alpha": false,
+    "has_claim_authority": false,
+    "has_confirmation": false,
+    "has_eligibility": false,
+    "has_null": false,
+    "has_p_value": false,
+    "has_pass_fail": false,
+    "has_ranking": false,
+    "has_rescue": false,
+    "has_selection": false,
+    "quantities": [
+      "the paired 2x2 table of variant-1 by variant-2 correctness",
+      "the off-diagonal counts conventionally named b and c",
+      "the raw discordance count and rate, d",
+      "the paired accuracy difference",
+      "J_inv, J_cor and J_both as historical names",
+      "pooled summaries, softmax confidences, per-cell Clopper-Pearson intervals and the selected-label uniformity diagnostic"
+    ],
+    "reachable_decision_path": false
+  },
+  "disposition": "STUDY3_V0_4_THIRD_METHODS_REVIEW_REJECTED_BOUNDED_AMENDMENT_REQUIRED",
+  "disposition_basis": "One BLOCKING and three MAJOR methods defects remain, so acceptance as specified is unavailable. The blocking defect S3MR3-001 and the major defect S3MR3-010 cannot be repaired by a bounded conformance edit, because closing them necessarily changes registered applicability, the gate-bearing atomic cell set of two of the three selectable profiles, the generator specification and the per-profile claim ceiling; section 8 excludes exactly those from an accepted-with-conformance disposition. No rejection-driving defect is fundamental: every required repair is a localized design choice that leaves the estimand, the interface panel, the task strata, the difficulty, the model roles and the feasibility strategy intact, and none of them requires first learning whether any cell approaches the registered success floor. The correct disposition is therefore a bounded amendment.",
+  "document_class": "independent_methods_review",
+  "earlier_review_non_regression": {
+    "first_review_findings": [
+      {
+        "evidence": "The estimand was made identical in every cell by fixing two variants per cluster, and the reviewer's census confirms it. S3MR3-001 reopens the underlying concern for one cell: under S2 and S3 the K6-SEP cluster carries a null transformation, so a single floor again means something structurally different there than in every other I3 cell.",
+        "finding_id": "S3MR-001",
+        "non_regression_status": "PARTIALLY_REOPENED"
+      },
+      {
+        "evidence": "No cross-product or factorial expansion exists and variants per cluster are fixed at two. The K6-SEP degeneracy under the option-less profiles is the residual case in which the applied floor does not test the registered construct.",
+        "finding_id": "S3MR-002",
+        "non_regression_status": "PARTIALLY_REOPENED"
+      },
+      {
+        "evidence": "Every level carries its exact rational form and the reviewer independently reconstructed 1/600 x 3 = 1/200; no declared level diverges from an implemented level.",
+        "finding_id": "S3MR-003",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "The paired aggregate-equivalence procedure holds no gate, eligibility, selection, confirmation, ranking or rescue role, and draft-v0.4 introduces no equivalence, non-inferiority or discordance procedure of any kind.",
+        "finding_id": "S3MR-004",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "No discordance grid, margin or nuisance maximisation survives in any decision role; discordance is descriptive only and the reviewer confirmed no reachable decision path from it.",
+        "finding_id": "S3MR-005",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Exactly one I3 floor is active at p0 = 9/10 and the 0.95 floor is absent from every active protocol, table and packet field.",
+        "finding_id": "S3MR-006",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "The packet states one null per component and the tabulated rows are consistent with it; the reviewer reproduced every tabulated null tail and power.",
+        "finding_id": "S3MR-007",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "The registered sizes 413, 214 and 448 genuinely meet the registered per-cell target; the reviewer's independent unrestricted search confirms they are the smallest positive integers that do. The non-monotonicity above them is recorded separately as S3MR3-007 and is not a reopening.",
+        "finding_id": "S3MR-008",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "The verification routine whose conditional raise was the defect belonged to the retired paired method and no longer exists in any decision role.",
+        "finding_id": "S3MR-009",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "The four cyclic permutations are gone; K5 is seven registered one-factor contrasts and the reviewer confirmed position and displayed symbol are separated.",
+        "finding_id": "S3MR-010",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "The answer cue is held byte-identical across all three renderings in every field the reviewer inspected, including task_strata[6].",
+        "finding_id": "S3MR-011",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "S3 is budgeted as reusing the S2 logit vector and contributes zero incremental rows; the reviewer's projection reproduces the 33543 target-role total on that basis.",
+        "finding_id": "S3MR-012",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "The projection separates deterministic fixtures, target-role development, external P3-Q, RP I4, one-shot confirmation and S4 diagnostic generation, and the reviewer recomputed each from primitives.",
+        "finding_id": "S3MR-013",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Every sample size carries its unit at the point of definition and in every table row, and the unit registry prohibits reuse across units.",
+        "finding_id": "S3MR-014",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "No active rejection region has a pass count equal to n; the reviewer independently confirmed non-degeneracy for all five components on both splits.",
+        "finding_id": "S3MR-015",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "The selectable denominator is 3 in all sixteen branches of the reviewer's independently reconstructed selection map, including every branch in which S3 is not activated.",
+        "finding_id": "S3MR-016",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "I5 publishes its sample sizes, thresholds and multiplicity treatment, and the reviewer reproduced every confirmation threshold.",
+        "finding_id": "S3MR-017",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "The checkpoint role records name I1a and I1b; no gate set naming an undivided I1 remains in a decision-bearing field.",
+        "finding_id": "S3MR-018",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "The Clopper-Pearson lower bounds and the label-uniformity bands are registered as descriptive with no gate authority, and the reviewer confirmed no reachable decision path.",
+        "finding_id": "S3MR-019",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "The positive-reference dossier attributes the obligation consistently and selects nothing.",
+        "finding_id": "S3MR-020",
+        "non_regression_status": "NOT_REOPENED"
+      }
+    ],
+    "reopened_any": true,
+    "statement": "Eighteen of the twenty first-review findings are not reopened and twenty-one of the twenty-two unresolved items are not reopened, with UR-22 correctly remaining an open blocking operator decision. S3MR-001 and S3MR-002 are partially reopened by the K6-SEP referent defect, which restores in one cell the very condition those findings closed: a single registered floor applied to a cell whose estimand is not the estimand the floor was derived for. This matrix rewrites neither prior review.",
+    "unresolved_items": [
+      {
+        "evidence": "Addressed by the registered estimand and not reopened by draft-v0.4.",
+        "item_id": "UR-01",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the pairwise construction and not reopened.",
+        "item_id": "UR-02",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the exact-rational multiplicity policy and not reopened.",
+        "item_id": "UR-03",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by retiring the paired procedure and not reopened.",
+        "item_id": "UR-04",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by retiring the discordance grid and not reopened.",
+        "item_id": "UR-05",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by registering exactly one I3 floor and not reopened.",
+        "item_id": "UR-06",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the per-component null statement and not reopened.",
+        "item_id": "UR-07",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the re-derived sample sizes, independently reproduced here.",
+        "item_id": "UR-08",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by removing the retired verification routine and not reopened.",
+        "item_id": "UR-09",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the one-factor K5 contrasts and not reopened.",
+        "item_id": "UR-10",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by holding the answer cue byte-identical and not reopened.",
+        "item_id": "UR-11",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the S3 logit-reuse budgeting and not reopened.",
+        "item_id": "UR-12",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the separated work streams and not reopened.",
+        "item_id": "UR-13",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the unit registry and not reopened.",
+        "item_id": "UR-14",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the non-degeneracy prohibition and not reopened.",
+        "item_id": "UR-15",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the fixed selectable denominator and not reopened.",
+        "item_id": "UR-16",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by publishing the I5 confirmation parameters and not reopened.",
+        "item_id": "UR-17",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the I1a and I1b split and not reopened.",
+        "item_id": "UR-18",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the descriptive-only status of the interval and uniformity diagnostics.",
+        "item_id": "UR-19",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the dossier attribution correction and not reopened.",
+        "item_id": "UR-20",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "Addressed by the registered claim ceiling and not reopened.",
+        "item_id": "UR-21",
+        "non_regression_status": "NOT_REOPENED"
+      },
+      {
+        "evidence": "UR-22 tracks OD2. No positive reference is selected, preferred, pinned, revision-resolved, downloaded, tokenized, loaded or prequalified anywhere in the reviewed object, and draft-v0.4 explicitly declines to make progress on it. The reviewed draft does not unlawfully claim otherwise.",
+        "item_id": "UR-22",
+        "non_regression_status": "REMAINS_UNRESOLVED_BLOCKING_OPERATOR_DECISION"
+      }
+    ]
+  },
+  "evidence_rows": [],
+  "exact_binomial_recalculation": {
+    "any_binding_number_disagrees": false,
+    "arithmetic": "exact integer and exact rational only",
+    "confirmation": {
+      "I1a": {
+        "alpha": "1/200",
+        "authority_status": "PROPOSED_DESIGN_PARAMETER_NOT_A_MEASUREMENT",
+        "degenerate": false,
+        "exact_null_tail_at_p0": "0.003020762720",
+        "exact_power_at_p1": "0.999609916012",
+        "meets_per_cell_power_target": true,
+        "n": 413,
+        "p0": "9/10",
+        "p1": "97/100",
+        "pass_count": 388,
+        "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3"
+      },
+      "I1b": {
+        "alpha": "1/200",
+        "authority_status": "PROPOSED_DESIGN_PARAMETER_NOT_A_MEASUREMENT",
+        "degenerate": false,
+        "exact_null_tail_at_p0": "0.003020762720",
+        "exact_power_at_p1": "0.999609916012",
+        "meets_per_cell_power_target": true,
+        "n": 413,
+        "p0": "9/10",
+        "p1": "97/100",
+        "pass_count": 388,
+        "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3"
+      },
+      "I2": {
+        "alpha": "1/200",
+        "authority_status": "PROPOSED_DESIGN_PARAMETER_NOT_A_MEASUREMENT",
+        "degenerate": false,
+        "exact_null_tail_at_p0": "0.003765544908",
+        "exact_power_at_p1": "0.999646587923",
+        "meets_per_cell_power_target": true,
+        "n": 214,
+        "p0": "1/2",
+        "p1": "7/10",
+        "pass_count": 127,
+        "unit_of_n": "base items per primitive-family cell"
+      },
+      "I3": {
+        "alpha": "1/200",
+        "authority_status": "PROPOSED_DESIGN_PARAMETER_NOT_A_MEASUREMENT",
+        "degenerate": false,
+        "exact_null_tail_at_p0": "0.003020762720",
+        "exact_power_at_p1": "0.999609916012",
+        "meets_per_cell_power_target": true,
+        "n": 413,
+        "p0": "9/10",
+        "p1": "97/100",
+        "pass_count": 388,
+        "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3"
+      },
+      "I4": {
+        "alpha": "1/200",
+        "authority_status": "PROPOSED_DESIGN_PARAMETER_NOT_A_MEASUREMENT",
+        "degenerate": false,
+        "exact_null_tail_at_p0": "0.003582895662",
+        "exact_power_at_p1": "0.999626931069",
+        "meets_per_cell_power_target": true,
+        "n": 448,
+        "p0": "4/5",
+        "p1": "9/10",
+        "pass_count": 381,
+        "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
+      }
+    },
+    "development": {
+      "I1a": {
+        "alpha": "1/600",
+        "authority_status": "PROPOSED_DESIGN_PARAMETER_NOT_A_MEASUREMENT",
+        "degenerate": false,
+        "exact_null_tail_at_p0": "0.001664632930",
+        "exact_power_at_p1": "0.999129439838",
+        "meets_per_cell_power_target": true,
+        "n": 413,
+        "p0": "9/10",
+        "p1": "97/100",
+        "pass_count": 389,
+        "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3"
+      },
+      "I1b": {
+        "alpha": "1/600",
+        "authority_status": "PROPOSED_DESIGN_PARAMETER_NOT_A_MEASUREMENT",
+        "degenerate": false,
+        "exact_null_tail_at_p0": "0.001664632930",
+        "exact_power_at_p1": "0.999129439838",
+        "meets_per_cell_power_target": true,
+        "n": 413,
+        "p0": "9/10",
+        "p1": "97/100",
+        "pass_count": 389,
+        "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3"
+      },
+      "I2": {
+        "alpha": "1/600",
+        "authority_status": "PROPOSED_DESIGN_PARAMETER_NOT_A_MEASUREMENT",
+        "degenerate": false,
+        "exact_null_tail_at_p0": "0.001597676081",
+        "exact_power_at_p1": "0.999042859186",
+        "meets_per_cell_power_target": true,
+        "n": 214,
+        "p0": "1/2",
+        "p1": "7/10",
+        "pass_count": 129,
+        "unit_of_n": "base items per primitive-family cell"
+      },
+      "I3": {
+        "alpha": "1/600",
+        "authority_status": "PROPOSED_DESIGN_PARAMETER_NOT_A_MEASUREMENT",
+        "degenerate": false,
+        "exact_null_tail_at_p0": "0.001664632930",
+        "exact_power_at_p1": "0.999129439838",
+        "meets_per_cell_power_target": true,
+        "n": 413,
+        "p0": "9/10",
+        "p1": "97/100",
+        "pass_count": 389,
+        "unit_of_n": "base items per atomic cell for I1a and I1b; base-item contrast clusters per contrast cell for I3"
+      },
+      "I4": {
+        "alpha": "1/600",
+        "authority_status": "PROPOSED_DESIGN_PARAMETER_NOT_A_MEASUREMENT",
+        "degenerate": false,
+        "exact_null_tail_at_p0": "0.001620609599",
+        "exact_power_at_p1": "0.999005509196",
+        "meets_per_cell_power_target": true,
+        "n": 448,
+        "p0": "4/5",
+        "p1": "9/10",
+        "pass_count": 383,
+        "unit_of_n": "RP base items per operation-family x depth cell per candidate profile"
+      }
+    },
+    "independently_reproduced": true
+  },
+  "external_validity_decision": {
+    "acceptable_for_the_registered_next_stage": true,
+    "basis": "The ceiling is stated explicitly in the maximum pass claim, the permitted I3 statement and the research question, each of which conditions on the registered item-generating distributions. It is acceptable for the registered next decision, which is only whether to design a later substantive protocol, and it is more than adequate in the negative direction: an instrument that fails on items whose answer is stated in the prompt cannot be trusted on anything harder. It is not adequate as a warrant that the instrument will work on a later substantive task distribution, and no bridge is registered. That gap is recorded as an unresolved methods item for the successor round rather than as a rejection driver, because the design does not claim the bridge.",
+    "bridge_to_real_tasks_registered": false,
+    "ceiling": "Passing supports only the registered synthetic generator distributions: mod-10 residue answers, four option slots, two registered label alphabets, ordered distinct distractor triples, and the registered renderings, for the named checkpoint roles. It supports no statement about natural task distributions, benchmark universes or unrestricted model behaviour.",
+    "ceiling_is_explicit_in_active_claim_text": true
+  },
+  "generator_completeness_decision": {
+    "basis": "The stochastic half of the generator is complete: every sampled parameter, support, exact weight, validity predicate, draw rule and namespace is registered and revalidated. The deterministic half is not. For K6-SEP and K6-INSTR the unregistered string is the manipulated factor itself, so the estimand of both gate-bearing I3 cells of the preferred profile depends on choices that do not yet exist. A later seed authority and bank authority cannot instantiate the registered distribution without first making those choices, and they are not nuisance choices.",
+    "deterministic_rendering_surface_registered": false,
+    "instantiable_without_a_substantive_design_choice": false,
+    "missing_registrations": [
+      "the byte-exact question stem template",
+      "the byte-exact option-line format for label-bearing profiles",
+      "the byte-exact R-base option separator string",
+      "the byte-exact R-sep option separator string",
+      "the byte-exact R-base instruction sentence",
+      "the byte-exact R-instr instruction sentence",
+      "the byte-exact answer cue for each profile",
+      "the byte-exact prompt template for the option-less profiles S2 and S3"
+    ],
+    "sampled_parameters_complete": true
+  },
+  "historical_harness_audit": {
+    "amends_any_v0_3_finding_or_disposition": false,
+    "anchor_commit": "2b36f5321d830ea6f70fff2b7bbca3cb93394046",
+    "ar_0246_identity": "3e8b50610fc052123c9196a584364a4a10575ac8b7ea33c58a31a369d24f9c60",
+    "ar_0269_identity": "a1676d31ed32225c8e8a3dba40b4ee6f01d5d3490619eeb35d385efb4ea48c61",
+    "assertions_weakened": false,
+    "collected_node_ids_after": 35,
+    "collected_node_ids_before": 35,
+    "exceptions_swallowed": false,
+    "expected_scientific_values_changed": false,
+    "input_coverage_asserted": true,
+    "node_id_set_unchanged": true,
+    "non_vacuity_probes": [
+      {
+        "bound_run": "PENDING",
+        "expected": "pass",
+        "observed": "pass",
+        "probe": "pristine reviewed snapshot of the draft-v0.3 historical inputs"
+      },
+      {
+        "bound_run": "PENDING",
+        "expected": "fail",
+        "observed": "fail",
+        "probe": "substitution of the live draft-v0.4 protocol into the snapshot"
+      },
+      {
+        "bound_run": "PENDING",
+        "expected": "fail",
+        "observed": "fail",
+        "probe": "perturbation of the committed historical recalculation table"
+      }
+    ],
+    "rows_contradict_each_other": false,
+    "skips_added": 0,
+    "snapshot_isolation_asserted": true,
+    "v0_3_recalculation_identity_unchanged": true,
+    "xfails_added": 0
+  },
+  "i3_estimand_decision": {
+    "estimand": "p_joint = Pr(J_joint_correct = 1) over the registered item-generating distribution of the atomic contrast cell",
+    "identifies_a_presentation_effect": false,
+    "indicator": "J_joint_correct",
+    "is_a_level_not_a_contrast": true,
+    "ordered_lattice_cases": 16,
+    "passing_case_count": 1,
+    "q_parameterisation": {
+      "discordance": "q10 + q01",
+      "identity": "p_joint + d <= 1",
+      "identity_holds": true,
+      "independence_asserted": false,
+      "one_way_implication": "A high p_joint forces a small correctness-state discordance, because the two are masses of disjoint atoms of one joint law. A small discordance does not force a high p_joint, because q00 absorbs the remaining mass, so a low discordance carries no information about correctness at all.",
+      "p_joint": "q11"
+    },
+    "residual_presentation_effect_language_found": true,
+    "strongest_permitted_claim_by_profile": {
+      "S1": "Under the registered item-generating distribution of each named contrast cell, the probability that both the registered baseline and the named registered transformed presentation are scored correct exceeded 9/10, separately for each of the seven applicable K5 pairs and each of the two applicable K6 pairs. No statement about combined or interacting presentation changes, and no statement about the direction, magnitude or existence of a presentation effect.",
+      "S2": "The same joint-correctness statement for the two applicable K6 pairs only. As registered this overstates what a pass supports, because the K6-SEP pair carries no referent for a profile that renders no option list, so at most one of the two cells is a genuine presentation pair.",
+      "S3": "The same joint-correctness statement for the two applicable K6 pairs only and only while the registered single-token applicability condition holds, subject to the same K6-SEP qualification as S2.",
+      "S4": "Descriptive only. S4 is never selectable, never enters an interface-selection or confirmation claim, and its outcomes carry no selection authority."
+    }
+  },
+  "i4_p3q_od2_decision": {
+    "any_document_treats_the_constraint_as_completed_qualification": false,
+    "checkpoint_selected": false,
+    "fields_a_later_od2_authority_must_freeze": [
+      "the positive-reference checkpoint identity and its immutable revision",
+      "the canonical qualification interface, which must not be S1, S2, S3 or S4",
+      "the RP-specific I4 rendering and scoring wrapper, including the chat-template policy for RP",
+      "a physically isolated P3-Q bank and its seed",
+      "the exact P3-Q sample size, level and rejection rule meeting the registered ordering constraint",
+      "the P3-Q operation-family and depth treatment",
+      "the P3-Q stop rule and its provenance record",
+      "the P3-Q item-generating distribution and its disjointness from the I4 items",
+      "the P3-Q multiplicity treatment",
+      "the complete positive_reference_external_P3Q operation projection that is currently null"
+    ],
+    "generic_method_is_internally_defined": true,
+    "i4_cells": 4,
+    "i4_p0": "4/5",
+    "i4_p1": "9/10",
+    "od2_status": "UNRESOLVED_BLOCKING_OPERATOR_DECISION",
+    "ordering_constraint": "P3Q >= 19/20 > I4 p1 = 9/10 > I4 p0 = 4/5",
+    "ordering_constraint_sufficient": true
+  },
+  "inherited_finding_adjudications": [
+    {
+      "closes_the_original_defect": false,
+      "creates_a_new_defect": false,
+      "drafting_party_claim": "I3 is narrowed to J_joint_correct, a level over the registered item-generating distribution; the construct strings, the gate question, the claim ceiling and the research question are narrowed and a prohibited-term list is registered and enforced.",
+      "evidence_fields": [
+        "proposed_statistics.i3_indicators.J_joint_correct",
+        "proposed_statistics.active_claim_term_prohibition",
+        "RESEARCH_CHARTER_DRAFT.md section 2 What Study 3 asks",
+        "RESEARCH_CHARTER_DRAFT.md section 4 design commitment 3",
+        "studies/README.md primary indicator description",
+        "studies/study3/README.md What draft-v0.3 changed about the gates",
+        "NEXT_THREAD_HANDOFF.md Three I3 indicators, one primary"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+        "studies/README.md",
+        "studies/study3/README.md",
+        "studies/study3/NEXT_THREAD_HANDOFF.md"
+      ],
+      "finding_id": "S3MR2-001",
+      "original_severity": "BLOCKING",
+      "repair_is_substantive_or_cosmetic": "substantive_but_incompletely_propagated",
+      "reviewer_evidence": "The repair is real and correct inside the authoritative protocol. The reviewer independently enumerated the ordered 4x4 lattice and confirms exactly one of sixteen cases scores, that J_cor implies J_inv under a unique ground truth, and that J_both is identically J_cor, so the narrowed indicator is the quantity the design actually identifies. The repair is nevertheless not propagated to reviewed narrative paths. RESEARCH_CHARTER_DRAFT.md section 2 still states the research question in the draft-v0.3 form the protocol itself classifies as a presentation-effect question, and section 4 commitment 3 still names J_both and defines it as requiring invariance across the two variants. studies/README.md still describes the primary indicator as requiring both invariance and correctness, studies/study3/README.md repeats it, and NEXT_THREAD_HANDOFF.md still names J_both the primary gate indicator. The claim that no active claim asserts invariance is therefore false in four reviewed paths.",
+      "status": "PARTIALLY_RESOLVED"
+    },
+    {
+      "closes_the_original_defect": true,
+      "creates_a_new_defect": false,
+      "drafting_party_claim": "A binding end-to-end power design is registered: a per-stage profile false-negative budget divided across m_max gives a per-cell budget and target, a profile stage floor and a study end-to-end floor, all by union bound under arbitrary dependence.",
+      "evidence_fields": [
+        "power_architecture_v0_4.type_ii_allocation",
+        "power_architecture_v0_4.union_bound_proof",
+        "power_architecture_v0_4.power_vocabulary",
+        "error_budget_ladder",
+        "method_validation.multiplicity_and_arbitrary_dependence"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json"
+      ],
+      "finding_id": "S3MR2-002",
+      "original_severity": "BLOCKING",
+      "repair_is_substantive_or_cosmetic": "substantive",
+      "reviewer_evidence": "The reviewer derived the whole ladder independently from the registered per-stage budget and the independently recomputed cell census, without reading the drafting values. m_max is 43 over the selectable profiles only; the per-cell budget is 19/17200; the per-cell target is 17181/17200; the profile stage floor is 381/400 and equals one minus the per-stage budget exactly; the panel bound is the fixed denominator three times the per-component level 1/600, giving 1/200; and the end-to-end floor is 9/10. Every step is a union bound. The union bound was separately validated by exhaustive enumeration over 1716 finite joint distributions covering arbitrary dependence, with a disjoint witness attaining equality, so no independence assumption is needed or used. Per-cell, profile-stage, selection-return and end-to-end quantities are named separately and the protocol prohibits relabelling one as another.",
+      "status": "VERIFIED_RESOLVED"
+    },
+    {
+      "closes_the_original_defect": false,
+      "creates_a_new_defect": false,
+      "drafting_party_claim": "I4 applies only to S1, S2 and S3; S4 is not_applicable for I4 in the exact-binomial rows, the gate hierarchy, the gate truth table, the stage-1 component lists, the statistics tables and the operation projection, and the truth table records that the contradiction is resolved in favour of not_applicable in every location.",
+      "evidence_fields": [
+        "interface_profiles[S4].applicable_gates",
+        "gate_truth_table.i4_applicability_note",
+        "gate_truth_table.rows[S4].I4",
+        "gate_hierarchy[I4].applicable_profiles",
+        "gate_bearing_cell_census.by_profile.S4.cells_at_i4_floor"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json"
+      ],
+      "finding_id": "S3MR2-003",
+      "original_severity": "MAJOR",
+      "repair_is_substantive_or_cosmetic": "substantive_but_incompletely_propagated",
+      "reviewer_evidence": "Every decision-bearing field is now consistent: gate_hierarchy I4 lists S1, S2 and S3; the development I4 exact-binomial row lists S1, S2 and S3; the gate truth table records I4 not_applicable for S4; the independently derived cell census gives S4 zero I4 cells; and the independently derived RP I4 projection of 3584 rendered rows follows from two scoring streams over four cells at n = 448 with no S4 contribution. One location was not updated: interface_profiles[S4].applicable_gates still contains I4. The universal claim in gate_truth_table.i4_applicability_note is therefore false, although no number or decision depends on the stale entry.",
+      "status": "PARTIALLY_RESOLVED"
+    },
+    {
+      "closes_the_original_defect": false,
+      "creates_a_new_defect": false,
+      "drafting_party_claim": "S4 is removed from every confirmation applicability list, confirmation applicability is the intersection of a component's selectable profiles with the single selected profile, and I1b and K5 confirmation apply only to S1. The committed schema rejects any confirmation row containing S4.",
+      "evidence_fields": [
+        "design_statistics_tables.json :: confirmation_exact_binomial_components[I1_I3_joint_correctness_floor].applicable_profiles",
+        "design_statistics_tables.json :: confirmation_exact_binomial_components[I2_headroom_floor].applicable_profiles",
+        "proposed_statistics.confirmation_exact_binomial_gates[*].applicable_profiles",
+        "proposed_statistics.confirmation_applicability_rule"
+      ],
+      "evidence_paths": [
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/protocol/interface_calibration_protocol.schema.json",
+        "tests/test_study3_design.py"
+      ],
+      "finding_id": "S3MR2-004",
+      "original_severity": "MAJOR",
+      "repair_is_substantive_or_cosmetic": "substantive_but_incompletely_propagated",
+      "reviewer_evidence": "The repair is complete and correct in the authoritative protocol: all five confirmation rows list only selectable profiles, I1b lists S1 alone, the K5 contrast applicability lists S1 alone, and the protocol schema constrains confirmation applicable_profiles to the enum S1, S2, S3 so a protocol row carrying S4 is rejected. The repair was not propagated to the derived table the protocol names as its source. design_statistics_tables.json confirmation_exact_binomial_components still lists S1, S2, S3 and S4 in the I1_I3 family row and in the I2 family row, which is the original defect verbatim. The table's gate-family row shape also cannot represent the I1b-only-for-S1 and K5-only-for-S1 repair, so that part of the repair is absent from the derived table entirely. No committed test asserts the applicable_profiles field of any table confirmation row, which is why the residue survived validation.",
+      "status": "PARTIALLY_RESOLVED"
+    },
+    {
+      "closes_the_original_defect": true,
+      "creates_a_new_defect": false,
+      "drafting_party_claim": "operation_ontology_v0_4 registers nine distinct units including prefill evaluations, incremental decode evaluations and total sequence-level model-evaluation equivalents, prohibits equating a sequence-level evaluation with a runtime batched forward call, and the S4 stream publishes a non-null forward cost.",
+      "evidence_fields": [
+        "operation_ontology_v0_4.units",
+        "operation_boundaries.projected_future_operations.work_streams.S4_diagnostic_generation",
+        "operation_projection.S4_diagnostic_generation"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json"
+      ],
+      "finding_id": "S3MR2-005",
+      "original_severity": "MAJOR",
+      "repair_is_substantive_or_cosmetic": "substantive",
+      "reviewer_evidence": "The reviewer recomputed the S4 stream from primitives rather than reading it. S4's applicable cell structure yields 1254 base items and 3717 contrast clusters per role, hence 8688 rendered rows per role and 26064 over the three target roles. With the registered bound of 16 new tokens, autoregressive decoding gives 26064 generation calls, 26064 prefill evaluations, at most 26064 x 15 = 390960 incremental decode evaluations, at most 417024 total sequence-level evaluation equivalents and at most 417024 generated tokens. All five figures reproduce exactly. The runtime batched forward call is registered as a separate unit and is left null, and the P3-Q stream remains null rather than zero with no grand total published.",
+      "status": "VERIFIED_RESOLVED"
+    },
+    {
+      "closes_the_original_defect": true,
+      "creates_a_new_defect": false,
+      "drafting_party_claim": "state_machine_v0_4 publishes one total deterministic graph in which I0 is a global precondition and an I0 failure, error or ambiguity maps only to STOP_INSTRUMENT_DEFECT, with a separately registered development integrity stop.",
+      "evidence_fields": [
+        "state_machine_v0_4.states",
+        "state_machine_v0_4.total",
+        "transition_system.machine_is_total_and_deterministic",
+        "transition_system.i0_failure_maps_to_exactly_one_terminal"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json"
+      ],
+      "finding_id": "S3MR2-006",
+      "original_severity": "MAJOR",
+      "repair_is_substantive_or_cosmetic": "substantive",
+      "reviewer_evidence": "The reviewer reconstructed the transition system from the registered states without reading the drafting state-machine section. There are ten states, six terminal, eleven transitions. No state-event pair carries two next states, every transition target is a registered state, the entry state Q0_INSTRUMENT is unique, every non-terminal state has at least one outgoing transition, and every one of the six terminal states is reachable from the entry state. The three non-pass events at Q0_INSTRUMENT all map to STOP_INSTRUMENT_DEFECT and to nothing else, and that terminal state's registered claim states that nothing was measured about any interface. The machine is total and deterministic as claimed.",
+      "status": "VERIFIED_RESOLVED"
+    },
+    {
+      "closes_the_original_defect": true,
+      "creates_a_new_defect": false,
+      "drafting_party_claim": "The binding ordering constraint P3Q >= 19/20 > I4 p1 = 9/10 > I4 p0 = 4/5 is registered for the later OD2 authority, together with the list of fields that authority must still freeze, and OD2 remains unresolved.",
+      "evidence_fields": [
+        "gate_hierarchy[I4].p3q_ordering_constraint",
+        "gate_hierarchy[I4].prequalification",
+        "unresolved_operator_decisions[OD2]",
+        "positive_reference_candidates"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/references/positive_reference_dossier.md"
+      ],
+      "finding_id": "S3MR2-007",
+      "original_severity": "MAJOR",
+      "repair_is_substantive_or_cosmetic": "substantive",
+      "reviewer_evidence": "The ordering constraint is registered and the reviewer confirms in exact rational arithmetic that 19/20 > 9/10 > 4/5, so a positive reference qualified at or above the P3-Q floor is required to be strictly more capable than the I4 alternative it must clear, which is what makes an I4 failure attributable to the interface rather than to the reference. The constraint is stated as a requirement on a later authority and no document treats it as completed qualification: the I4 prequalification record states the stage is not executed, RP is not selected and P3-Q is not authorised. No checkpoint, revision, wrapper or bank is selected anywhere.",
+      "status": "VERIFIED_RESOLVED"
+    },
+    {
+      "closes_the_original_defect": false,
+      "creates_a_new_defect": true,
+      "drafting_party_claim": "The I3 claim ceiling is qualified per profile: S1 carries seven K5 pairs and two K6 pairs, S2 and S3 carry only the two K6 pairs, and S4 is descriptive only.",
+      "evidence_fields": [
+        "claim_ceiling.i3_claim_ceiling_by_profile.S2",
+        "claim_ceiling.i3_claim_ceiling_by_profile.S3",
+        "i3_contrast_registry.k6_applicability.applicable_profiles",
+        "counterbalancing_design.k6_renderings.renderings[R-sep].description",
+        "interface_profiles[S2].prompt_and_rendering_contract"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json"
+      ],
+      "finding_id": "S3MR2-008",
+      "original_severity": "MINOR",
+      "repair_is_substantive_or_cosmetic": "substantive_but_incompletely_propagated",
+      "reviewer_evidence": "The K5 half of the overstatement is genuinely removed and the reviewer's independent census confirms that S2 and S3 contribute no K5 cell. The repair simultaneously introduces a new and stronger overstatement on the K6 half. By positively registering both K6 pairs as applicable to S2 and S3, draft-v0.4 asserts that the separator contrast has a referent for two profiles that render no option list and no label. R-sep is registered as differing from R-base only in the separator string between a label and its option content, so for S2 and S3 the two variants of the K6-SEP cluster are byte-identical and, under the registered deterministic scorer, J_joint_correct in that cell collapses to a single marginal correctness indicator. The per-profile ceiling for S2 and S3 therefore still claims more than a pass can support, and it now does so for a cell that is counted and can be passed. This is recorded as new finding S3MR3-001.",
+      "status": "PARTIALLY_RESOLVED"
+    },
+    {
+      "closes_the_original_defect": true,
+      "creates_a_new_defect": false,
+      "drafting_party_claim": "The I0 fixture stream registers 232 clusters, 232 cluster-derived base items, 464 cluster rendered rows, 38 non-cluster rows and 502 rendered rows, with the dimensional identity that cluster rows equal clusters times variants per cluster.",
+      "evidence_fields": [
+        "proposed_statistics.i0_fixture_breakdown",
+        "proposed_statistics.i0_fixture_unit_rule",
+        "operation_projection.deterministic_I0_fixtures"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json"
+      ],
+      "finding_id": "S3MR2-009",
+      "original_severity": "MINOR",
+      "repair_is_substantive_or_cosmetic": "substantive",
+      "reviewer_evidence": "The reviewer recomputed the accounting from the registered fixture breakdown alone. The 448 K5 constructor fixtures plus 16 K6 constructor fixtures give 464 cluster-derived rendered rows, which is a whole number of clusters at two variants each, giving 232 clusters and therefore 232 cluster-derived base items rather than 464. The 16 indicator truth-table fixtures, 14 not-applicable branch fixtures and 8 scorer branch fixtures give 38 non-cluster rows, and the total is 502. The unit confusion the finding recorded is gone and the derivation fails closed if the cluster-derived rows are ever not a whole number of clusters.",
+      "status": "VERIFIED_RESOLVED"
+    },
+    {
+      "closes_the_original_defect": false,
+      "creates_a_new_defect": false,
+      "drafting_party_claim": "sampling_frame_v0_4 registers an executable stochastic specification for every gate-bearing atomic cell, with named supports, exact rational weights summing to one, deterministic pre-draw validity predicates, a rejection probability of zero by construction, with-replacement draws, retained duplicates and disjoint split namespaces, and retires the deterministic complete-block assignment.",
+      "evidence_fields": [
+        "sampling_frame_v0_4.binding_stochastic_model",
+        "sampling_frame_v0_4.development_sampling_cells",
+        "sampling_frame_v0_4.confirmation_sampling_cells",
+        "sampling_frame_v0_4.rejection_contract",
+        "sampling_frame_reconstruction",
+        "counterbalancing_design.k6_renderings.renderings"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json"
+      ],
+      "finding_id": "S3MR2-010",
+      "original_severity": "MAJOR",
+      "repair_is_substantive_or_cosmetic": "substantive_but_incompletely_propagated",
+      "reviewer_evidence": "The stochastic half of the repair is real and complete, and it is the repair the exact binomial actually needed. The reviewer revalidated all 34 sampling cells independently: every sampled parameter's weights sum to exactly one, every registered joint support equals the product of its parameter supports, every joint weight closes to one, every draw rule is with replacement, every cell declares that its parameters are independently drawn per draw ordinal, all 34 namespaces are pairwise distinct and the development and confirmation namespace sets are disjoint. No template-level clustering was found: no cell draws a template once and generates a batch beneath it. The K5 nuisance support is 32 states at exactly 1/32 and the multiple-of-32 restriction is retired everywhere in the reviewer's own unrestricted integer search. The registered rejection probability of zero follows from deterministic, pre-model, satisfied-by-construction predicates rather than from assertion. What the repair does not supply is the deterministic half. No byte-exact stem, option-line format, option separator, instruction sentence or answer cue is registered anywhere, so the generator cannot yet be instantiated and the two K6 cells in particular have no registered manipulated string. That gap is recorded as new finding S3MR3-010, and it is the reason the K6-SEP referent defect was not visible to anyone reading only the prose.",
+      "status": "PARTIALLY_RESOLVED"
+    }
+  ],
+  "mandatory_audit_answers": {
+    "6.1.a_j_joint_correct_lattice": {
+      "answer": "The reviewer enumerated all sixteen ordered pairs over correct, wrong_a, wrong_b and invalid independently. Exactly one case scores: both variants correct. The remaining fifteen fall into stable wrong, stable invalid, mixed correctness, two different wrong answers and mixed valid and invalid.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table :: i3_outcome_lattice"
+      ],
+      "question": "Re-derive J_joint_correct for every ordered pair in the registered lattice and confirm exactly which cases score 1."
+    },
+    "6.1.b_algebraic_identity": {
+      "answer": "Over the full lattice J_cor implies J_inv, so the retired J_both is identically J_cor and identically J_joint_correct. The reviewer verified this by enumeration rather than accepting the assertion.",
+      "evidence": [
+        "independent table :: i3_outcome_lattice.identity_J_both_is_identically_J_cor"
+      ],
+      "question": "Confirm the algebraic relationship between the historical indicators and the active one."
+    },
+    "6.1.c_q_parameterisation": {
+      "answer": "p_joint = q11 and d = q10 + q01 are two functionals of one joint law on four atoms, verified over a rational grid. p_joint + d <= 1 holds identically, and p_joint <= min of the two marginals. A high p_joint therefore forces a small d, while a small d forces nothing about p_joint because q00 absorbs the remaining mass. They are not independent parameters and q11 is not in general the product of the marginals.",
+      "evidence": [
+        "independent table :: i3_discordance_parameterisation"
+      ],
+      "question": "Express the joint distribution as q11, q10, q01, q00 and derive p_joint, d and the identity p_joint + d <= 1 with its one-way implications."
+    },
+    "6.1.d_level_not_contrast": {
+      "answer": "Confirmed. It identifies neither the direction, the magnitude nor the existence of a presentation effect, does not distinguish different wrong answers when both variants are wrong, does not distinguish invalid from wrong movement, and is not a general answer-invariance statement.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table :: i3_outcome_lattice.what_the_level_cannot_identify"
+      ],
+      "question": "Verify that J_joint_correct is a level, not a contrast."
+    },
+    "6.1.e_residual_claim_search": {
+      "answer": "Inside the authoritative protocol JSON, the schema, the derived tables and the packet the search is clean: prohibited vocabulary appears only in prohibited-claim lists, retired-procedure records and clearly labelled historical narrative. Outside it the search is not clean. The charter objective, a charter design commitment, both READMEs and the handoff still assert the retired invariance construct in active text. Recorded as S3MR3-003.",
+      "evidence": [
+        "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+        "studies/README.md",
+        "studies/study3/README.md",
+        "studies/study3/NEXT_THREAD_HANDOFF.md"
+      ],
+      "question": "Search every active claim, gate question, what_fails clause, validation target, success statement, charter objective, handoff and downstream routing field for residual or implied invariance, equivalence, stability or no-presentation-effect claims."
+    },
+    "6.1.f_descriptive_leakage": {
+      "answer": "Confirmed. The paired 2x2 table, its off-diagonal counts, the discordance count and rate, the paired accuracy difference and the historical indicators all carry DESCRIPTIVE_ONLY_NO_DECISION_AUTHORITY, and none carries a null, alpha, p-value, pass or fail, ranking, rescue, eligibility, selection, confirmation or claim role. The reviewer independently reconstructed the selection map and confirms eligibility is a function of the component pass pattern and the activation condition alone, so no descriptive quantity has a reachable decision path.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table :: admissibility_and_selection_graph"
+      ],
+      "question": "Verify that every quantity derived from discordance or the broader outcome lattice is descriptive only and cannot leak into a later decision."
+    },
+    "6.1.g_discordance_gate_not_required": {
+      "answer": "Not necessary for the registered purpose. The decision Study 3 must inform is whether an interface reliably registers competence that is present, which is a level question, and p_joint + d <= 1 already bounds correctness-state discordance from above whenever the gate passes. The reviewer therefore does not invent a delta0, a d1 or a power claim, and does not classify the absence of a d gate as a defect.",
+      "evidence": [
+        "independent table :: i3_discordance_parameterisation.one_way_implications"
+      ],
+      "question": "Decide whether a presentation-sensitivity gate is necessary, without requiring one merely because d is available at zero extra forwards."
+    },
+    "6.1.h_internal_validity_of_the_narrowed_claim": {
+      "answer": "Yes for every cell whose registered transformation has a referent, and the statistical machinery supporting it was independently reproduced with no numeric disagreement. No for the K6-SEP cell under S2 and S3, where the transformation is null and the cell tests a marginal accuracy against a joint-correctness floor.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table"
+      ],
+      "question": "Is the narrowed J_joint_correct design internally valid for its exact registered generator-local claim?"
+    },
+    "6.1.i_sufficiency_for_purpose": {
+      "answer": "Yes in kind, subject to one bounded repair in degree. A level of joint correctness across a registered presentation pair is the right quantity for deciding whether an instrument reads out competence that is present, and it is strictly more informative than a marginal accuracy because it requires correctness under both members of the pair. The insufficiency is local: the preferred profile retains only one genuine presentation pair once the K6-SEP defect is corrected, which is thin evidence for the profile the design most wants to select.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/RESEARCH_CHARTER_DRAFT.md"
+      ],
+      "question": "Is the narrowed claim still sufficient to serve Study 3's interface-calibration purpose and the planned downstream mechanistic study?"
+    },
+    "6.1.j_strongest_permitted_claims": {
+      "answer": "Recorded field by field in i3_estimand_decision.strongest_permitted_claim_by_profile. None expands beyond cell-wise joint robust correctness on the registered generator distribution, and S4 carries no selection or confirmation claim at all.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "State the strongest permitted claim for S1, S2, S3 and non-selectable S4."
+    },
+    "6.2.a_generator_tuples": {
+      "answer": "Done independently for all 34. Every sampled parameter's weights sum to exactly one, every registered joint support equals the product of its parameter supports, every joint weight closes to one, every cell declares the base item or the base-item contrast cluster as its independent unit, and every draw rule is with replacement.",
+      "evidence": [
+        "independent table :: sampling_frame_reconstruction"
+      ],
+      "question": "For every one of the 34 sampling cells, reconstruct the generator tuple, support, exact weights, validity predicate, independent unit, with-replacement rule and output-to-Bernoulli mapping."
+    },
+    "6.2.b_draw_ordinal_and_template_clustering": {
+      "answer": "Every cell registers that its parameters are independently drawn per draw ordinal. No cell draws a template once and generates a batch beneath it, and the protocol explicitly warns that differing identifiers do not imply independence, which is why the template family and every nuisance condition are themselves sampled parameters. No template-level clustering was found.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table :: sampling_frame_reconstruction"
+      ],
+      "question": "Verify that every draw ordinal independently draws the complete registered generator tuple, and detect any template-level clustering."
+    },
+    "6.2.c_weights_and_duplicates": {
+      "answer": "Confirmed. The K5 nuisance support is 4 x 4 x 2 = 32 states at exactly 1/32, closing to one. Duplicates must be retained, redrawing for uniqueness or balance is prohibited, and the draft-v0.3 duplicate-rejection text is withdrawn and reversed.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table"
+      ],
+      "question": "Verify all exact weights sum to one including the 32 K5 nuisance states at 1/32, and that duplicate draws are retained."
+    },
+    "6.2.d_rejection_probability": {
+      "answer": "Confirmed. All four validity predicates are deterministic, evaluated before any model operation, and satisfied by construction: the correct answer is drawn from the answer domain, distractors are drawn without replacement from the domain minus the correct answer, both alphabets are disjoint from the domain, and ground truth is computed by the harness. The predicates are retained as fail-closed guards rather than as an active rejection step, and the conditional target distribution is registered for the counterfactual case.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "Verify the registered rejection probability of zero follows from deterministic pre-model support validity rather than from an untested assertion."
+    },
+    "6.2.e_sampling_versus_evaluation_cell": {
+      "answer": "A sampling cell excludes interface profile and checkpoint role; an evaluation cell is a sampling cell crossed with one applicable profile and one applicable role. One iid stream per sampling cell is reused across its evaluation cells, so each evaluation cell is marginally iid Bernoulli and cells sharing items may be dependent. That dependence is permitted only because every binding joint bound is a union bound valid under arbitrary dependence, which the reviewer verified by exhaustive enumeration.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table :: method_validation"
+      ],
+      "question": "Distinguish a sampling cell from an evaluation cell and verify that item-stream reuse preserves marginal iid validity while inducing permitted cross-cell dependence."
+    },
+    "6.2.f_namespace_separation": {
+      "answer": "Confirmed. All 34 namespaces are pairwise distinct and the development and confirmation namespace sets are disjoint. The split is a field of the generator key, so the D, C and P3Q supports are physically disjoint by construction, the partition is outcome-blind and frozen before any seed draw, and cross-split reuse is prohibited. Contrast cells draw disjoint base-item identities.",
+      "evidence": [
+        "independent table :: sampling_frame_reconstruction"
+      ],
+      "question": "Verify physical and identity separation between development and confirmation namespaces, between target and positive-reference roles, and wherever disjointness is claimed."
+    },
+    "6.2.g_instantiability": {
+      "answer": "No. The stochastic half is complete; the deterministic rendering surface is not registered at all, and for the two K6 cells the unregistered string is the manipulated factor. Recorded as S3MR3-010. Null is correctly not treated as zero and nothing is treated as already frozen.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "Determine whether the future generator implementation, seed authority and bank authority can instantiate the registered distribution without a substantive missing choice."
+    },
+    "6.2.h_external_validity_ceiling": {
+      "answer": "The ceiling is generator-local: passing supports only the registered synthetic generator distributions for the named tasks and roles. It is stated explicitly in the maximum pass claim, the permitted I3 statement and the research question. It is acceptable for the registered next decision, which is only whether to design a later substantive protocol, and it is not silently generalized anywhere. No bridge to natural task distributions is registered, which is recorded as an unresolved methods item rather than a rejection driver because the design does not claim a bridge.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "State the external-validity ceiling explicitly and decide whether it is acceptable for the next scientific stage."
+    },
+    "6.3.a_recomputation": {
+      "answer": "Done independently in exact integer and exact-rational arithmetic with no floating point in any decision. All ten component characterisations reproduce the registered values exactly, including every published twelve-digit decimal.",
+      "evidence": [
+        "independent table :: development_exact_binomial_components",
+        "independent table :: confirmation_exact_binomial_components"
+      ],
+      "question": "For I1a, I1b, I2, I3 and I4, separately for development and confirmation, recompute p0, p1, exact alpha, n, pass count, exact null tail and exact power from exact rationals."
+    },
+    "6.3.b_unrestricted_search": {
+      "answer": "Every positive integer from 1 to the registered ceiling of 4096 was tested for each component with no divisibility restriction of any kind. The registered development sizes 413, 214 and 448 are the smallest positive integers meeting the per-cell target. The retired multiple-of-32 restriction plays no role in the reviewer's search and none of the three sizes is a multiple of 32.",
+      "evidence": [
+        "independent table :: minimal_sample_size_searches"
+      ],
+      "question": "Search every unrestricted positive integer n up to the registered ceiling and confirm the multiple-of-32 restriction does not survive."
+    },
+    "6.3.c_pass_counts_and_minimality": {
+      "answer": "All six reproduce exactly. Each pass count is minimal at its level, verified by confirming that the tail one below it exceeds the level, and no rejection region is degenerate because every pass count is strictly less than its n.",
+      "evidence": [
+        "independent table"
+      ],
+      "question": "Verify the development pass counts 389, 129 and 383, the confirmation pass counts 388, 127 and 381, and the claimed minimality and non-degeneracy."
+    },
+    "6.3.d_cell_counts_and_m_max": {
+      "answer": "Reconstructed from applicability rather than read: S1 has 33 + 6 + 4 = 43, S2 and S3 have 9 + 6 + 4 = 19, and S4 has 33 + 6 + 0 = 39 and is never selectable. m_max = 43 is the maximum over the selectable profiles only, and S4's 39 cells enter no budget, no union and no confirmation.",
+      "evidence": [
+        "independent table :: gate_bearing_cell_census"
+      ],
+      "question": "Reconstruct the exact gate-bearing cell counts for every profile and verify m_max = 43 is taken only over selectable profiles and that S4's diagnostic cells never enter selection or confirmation power."
+    },
+    "6.3.e_budget_ladder": {
+      "answer": "The per-stage budget is a registered design input. Everything else was derived: 19/400 divided by m_max = 43 gives 19/17200; one minus that gives 17181/17200; one minus 43 times 19/17200 gives 381/400 and equals one minus 19/400 exactly; the fixed denominator 3 times the per-component level 1/600 gives 1/200; and one minus 19/400 minus 1/200 minus 19/400 gives 9/10.",
+      "evidence": [
+        "independent table :: error_budget_ladder"
+      ],
+      "question": "Independently derive the per-stage budget 19/400, the per-cell budget 19/17200, the per-cell target 17181/17200, the profile-stage floor 381/400, the panel bound 1/200 and the end-to-end floor 9/10."
+    },
+    "6.3.f_arbitrary_dependence": {
+      "answer": "Every binding bound is a union bound and therefore valid under arbitrary dependence. The reviewer verified the union bound, its tightness under a disjoint witness, the Frechet intersection lower bound and the intersection-union size bound by exhaustive enumeration over 1716 finite joint distributions, which covers comonotone and countermonotone extremes. No independence assumption appears in any binding step, and the protocol confines independence products to explicitly labelled sensitivity analysis with no authority.",
+      "evidence": [
+        "independent table :: method_validation.multiplicity_and_arbitrary_dependence"
+      ],
+      "question": "Verify every binding inequality under arbitrary dependence and confirm no independence product strengthens any binding claim."
+    },
+    "6.3.g_least_favourable_configuration": {
+      "answer": "Sufficient. Given the configuration, if the designated adequate profile qualifies and no selectable profile lying in its null is falsely qualified, then any higher-priority qualified profile must itself be adequate, so the profile entering confirmation is adequate and the third term bounds its confirmation failure. The only imprecision is the wording of the conclusion string, recorded as S3MR3-009.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table :: least_favourable_configuration_audit"
+      ],
+      "question": "Verify the registered least-favourable configuration is sufficient for the end-to-end guarantee, including higher-priority inadequate profiles, selection order, one-shot confirmation and the confirmation-generating distribution."
+    },
+    "6.3.h_exclusions": {
+      "answer": "All five are listed explicitly as not covered by the power guarantee, in the protocol and in the packet. They are excluded openly rather than absorbed.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/independent_methods_review_packet_v0_4.md"
+      ],
+      "question": "Verify the indifference regions, I0 failure, distribution shift, invalid sampling frame and protocol deviations are excluded from the guarantee rather than hidden inside it."
+    },
+    "6.3.i_power_labels": {
+      "answer": "The four are named and scoped separately in the registered power vocabulary, the selection-return characteristic is explicitly never called power, and relabelling per-cell power as any of the others is prohibited. The reviewer found no artifact that conflates them.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/analysis/independent_methods_review_packet_v0_4.md"
+      ],
+      "question": "Distinguish per-cell power, profile-stage power, probability of correct selection and full development-plus-confirmation power in every artifact."
+    },
+    "6.4.a_formal_hypotheses": {
+      "answer": "Written in multiplicity_and_selection_decisions.formal_null_sets. The within-profile null is the union of the cell nulls and the test is an intersection-union test; the across-profile event is a union and is Bonferroni-corrected by a denominator fixed before data.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "Write formal null and alternative sets for each atomic cell, the within-profile conjunction, the union over the three selectable profiles, development selection and the one confirmed profile."
+    },
+    "6.4.b_intersection_union": {
+      "answer": "Correct. A profile qualifies only when every applicable cell rejects, so under any profile null at least one applicable cell is at or below its p0 and the probability that all cells reject is at most that cell's level. The reviewer verified the underlying result by exhaustive enumeration and confirms that the protocol's assumptions satisfy the conditions Berger and Hsu require. No further within-profile correction is needed and none is applied.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table :: method_validation"
+      ],
+      "question": "Verify intersection-union logic matches the exact profile claim and that a per-component development alpha of 1/600 bounds a falsely qualified profile without an extra within-profile correction."
+    },
+    "6.4.c_fixed_denominator": {
+      "answer": "Confirmed. All sixteen branches of the independently reconstructed selection map carry a denominator of exactly 3, including every branch in which S3's activation condition is not met, and shrinking it is registered as prohibited.",
+      "evidence": [
+        "independent table :: admissibility_and_selection_graph"
+      ],
+      "question": "Verify the fixed three-profile union bound gives 1/200 and is never data-dependently reduced."
+    },
+    "6.4.d_selection_map": {
+      "answer": "Reconstructed independently from the frozen order and the activation condition, producing all sixteen rows with no disagreement against the registered map on eligible set, selected profile or stop flag. The order resolves every tie deterministically, the empty-eligible case maps to a stop, and S3 is selected in no branch in which its activation condition is false. Error and ambiguity are handled by the state machine rather than the map, which is where they belong.",
+      "evidence": [
+        "independent table :: admissibility_and_selection_graph",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "Reconstruct the full selection map including inapplicability, tie, no-eligible-profile, error and ambiguity cases, and verify S3 cannot be selected outside its registered applicability condition."
+    },
+    "6.4.e_confirmation_applicability": {
+      "answer": "Correct in the authoritative protocol and its schema. Not correct in the derived statistics table, which still lists S4 in two confirmation rows and cannot express the I1b and K5 restriction at all. Recorded as S3MR3-002.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/analysis/design_statistics_tables.json"
+      ],
+      "question": "Verify confirmation applicability is the intersection of the selected profile with component applicability, that S4 never appears, and that I1b and K5 apply only to S1."
+    },
+    "6.4.f_confirmation_lifecycle": {
+      "answer": "Confirmed in every respect. The split is a field of the generator key so it is physically disjoint; it is reachable only through a gated state requiring a later authority; it is read exactly once for exactly one preselected profile; error or ambiguity spends it and maps to a dedicated terminal state; and reselection, substitution and rescue are all prohibited.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table :: transition_system"
+      ],
+      "question": "Verify confirmation is physically disjoint, separately authorized, read once, spent on error or ambiguity, and cannot be retried, retuned, rescued or used to select another profile."
+    },
+    "6.4.g_no_rescue": {
+      "answer": "Confirmed. Pooling is prohibited as a rescue in thirteen registered ways, S4 is excluded from every success union, and every descriptive family is registered without gate, eligibility, selection, confirmation or rescue authority. The independently reconstructed selection map takes no descriptive input.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table"
+      ],
+      "question": "Verify no descriptive lattice statistic, S4 result, label diagnostic, pooled statistic or confidence interval can rescue a failed gate."
+    },
+    "6.5.a_state_machine": {
+      "answer": "Ten states, six terminal, eleven transitions. No state-event pair carries two next states, every target is a registered state, the entry state is unique, every non-terminal state has an outgoing transition and all six terminal states are reachable from the entry state. Total and deterministic as claimed.",
+      "evidence": [
+        "independent table :: transition_system"
+      ],
+      "question": "Reconstruct the state machine independently and prove it is total and deterministic, with every registered event carrying exactly one next state and every terminal state reachable."
+    },
+    "6.5.b_i0_mapping": {
+      "answer": "All three non-pass events at the instrument state map to STOP_INSTRUMENT_DEFECT and to nothing else, and that terminal state's registered claim states the instrument is defective and that nothing was measured about any interface. I0 is a global precondition and is not part of profile adequacy.",
+      "evidence": [
+        "independent table :: transition_system",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "Verify I0 failure, error or ambiguity maps only to STOP_INSTRUMENT_DEFECT and makes no interface claim."
+    },
+    "6.5.c_i0_fixture_accounting": {
+      "answer": "448 K5 plus 16 K6 constructor fixtures give 464 cluster-derived rendered rows, a whole number of clusters at two variants each, hence 232 clusters and 232 cluster-derived base items. 16 truth-table plus 14 not-applicable plus 8 scorer fixtures give 38 non-cluster rows. The total is 502 rendered rows and zero model operations.",
+      "evidence": [
+        "independent table :: operation_projection.deterministic_I0_fixtures"
+      ],
+      "question": "Reconstruct I0 fixture accounting and resolve units explicitly."
+    },
+    "6.5.d_i4_structure": {
+      "answer": "Confirmed. Two registered operation families crossed with two registered depths give exactly four cells per candidate profile, evaluated at the positive-reference role only, applicable to the three selectable profiles and not to S4, combined as an intersection-union conjunction. P3-Q is a separate external stage on items disjoint from the I4 items and through an interface that is not S1, S2, S3 or S4.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table"
+      ],
+      "question": "Verify I4's p0 = 4/5, p1 = 9/10, four operation-family-by-depth cells, applicability, conjunction and disjointness from external P3-Q."
+    },
+    "6.5.e_od2_boundary": {
+      "answer": "The generic method is internally defined: the null, the alternative, the level, the sample size, the pass count, the cell structure, the unit and the conjunction rule are all registered and were independently reproduced, and none of them depends on the identity of the reference. Only the instantiation is deferred. The fields a later authority must freeze are enumerated in i4_p3q_od2_decision, and this review selects, prefers, pins, ranks, resolves, downloads, tokenizes, loads, runs, prequalifies and substitutes nothing.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "Verify unresolved OD2 does not make the generic I4 method internally undefined, and list every field a later OD2 authority must freeze."
+    },
+    "6.5.f_ordering_constraint": {
+      "answer": "Mathematically the inequalities hold in exact rational arithmetic. Procedurally the constraint is sufficient for the generic design because it guarantees that any admissible reference is required to be strictly more capable than the floor it must clear through the candidate interface, which is what makes an I4 failure attributable to the interface. No document treats it as completed qualification: the prequalification record states the stage is not executed, RP is not selected and P3-Q is not authorised.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "Verify the ordering constraint P3Q >= 19/20 > I4 p1 = 9/10 > I4 p0 = 4/5 is mathematically and procedurally sufficient, and that no document treats it as completed qualification."
+    },
+    "6.6.a_work_streams": {
+      "answer": "All six recomputed from applicability, sample sizes, variants per cluster, role count and the registered token bound. Deterministic I0 fixtures 502 rendered rows; target-role development 33,543 rendered rows and sequence-level evaluations; external P3-Q null; RP I4 3,584; selected-profile one-shot confirmation upper bound 27,856 under S1; S4 26,064 generation calls, 26,064 prefill evaluations, at most 390,960 incremental decode evaluations, at most 417,024 sequence-level evaluation equivalents and at most 417,024 generated tokens. Every figure reproduces exactly.",
+      "evidence": [
+        "independent table :: operation_projection"
+      ],
+      "question": "Recompute every work stream from primitive counts and units rather than copying totals."
+    },
+    "6.6.b_unit_distinctions": {
+      "answer": "All six are registered as distinct units with distinct definitions, and equating a sequence-level evaluation with a runtime batched forward call is prohibited. The runtime batched forward call is left null because batch packing is a future execution property.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "Verify the distinction between a sequence-level evaluation, prefill evaluation, incremental decode evaluation, generation call, generated token and runtime batched model call."
+    },
+    "6.6.c_null_not_zero": {
+      "answer": "Confirmed. Every P3-Q quantity is null with an explicit unresolved status and a stated reason that zero would assert a reference needs no qualification work. No grand total is published and treating the null as zero in a total is registered as prohibited.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "independent table"
+      ],
+      "question": "Verify external P3-Q quantities are null rather than zero while OD2 is unresolved, and that no grand total is legal while a cost-bearing stream is null."
+    },
+    "6.6.d_s4_headroom_scope": {
+      "answer": "S4 changes chat template, free generation, output length, decoding and parser simultaneously, so its success while S1 to S3 fail supports only that a generation-enabled composite shows headroom the restricted interfaces lack; it identifies no cause. The exclusion is nevertheless the direct implementation of the Study 1 lesson and is the right choice for a downstream mechanistic study, and S4 is retained and fully costed as a diagnostic. The reviewer does not classify the absent generation axis as a purpose-critical gap and does not create S5.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "Assess the headroom scope of the S4 composite and decide whether excluding every generation-enabled profile from the selectable set leaves a purpose-critical gap."
+    },
+    "6.7.a_harness_diff": {
+      "answer": "The change adds a declared historical-input list, a forbidden-current-bytes list, an AST-based reader of the generator's own declared inputs, and a snapshot materialiser; it repoints two tests at the reviewed commit. The collected node-ID set is identical at 35 before and after, no skip, xfail or bare except is introduced, assertion count rises from 133 to 136, fail-closed pytest.fail sites rise from 1 to 3, and no expected scientific value changes.",
+      "evidence": [
+        "tests/test_study3_methods_review_v0_3.py"
+      ],
+      "question": "Diff the v0.3 historical-review module before and after the erratum and verify the semantic change is limited to anchoring and snapshot isolation."
+    },
+    "6.7.b_harness_invariants": {
+      "answer": "The anchor is the v0.3 reviewed commit and is reachable from the publication candidate. Historical blobs are read through git rather than from the working tree, so no line-ending conversion can corrupt them. The snapshot asserts that every input the generator declares is present and that nine named current-draft artifacts are absent. The immutable v0.3 recalculation script and table are unchanged at 58,317 bytes and 66,631 bytes with their registered digests. Non-vacuity is demonstrated by bound ACR probes.",
+      "evidence": [
+        "independent table :: historical_harness_static_audit"
+      ],
+      "question": "Verify commit anchoring, snapshot isolation, input-coverage assertion, unchanged node-ID set, unchanged v0.3 recalculation bytes and results, and non-vacuity."
+    },
+    "6.7.c_registry_history": {
+      "answer": "The harness identity was unchanged across the published base and the two draft-v0.4 commits preceding the erratum, and changed only in the erratum commit. AR-0246 records the pre-erratum identity and AR-0269 the current one, with AR-0269 stating explicitly that AR-0246 retains the pre-erratum identity. There is no unregistered intermediate state and no contradiction.",
+      "evidence": [
+        "paper/artifact_index.csv"
+      ],
+      "question": "Verify AR-0246 and AR-0269 preserve history without creating two contradictory claims about the current blob."
+    },
+    "6.7.d_counters_versus_mutations": {
+      "answer": "Every empirical and model operation counter is zero and every authority flag is false, which the reviewer verified against the reviewed object. The historical-harness edit is disclosed as a scope erratum in the amendment record, in the run log, in the handoff and in a new artifact row, so no provenance statement denies it. The two classes are kept apart correctly.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "paper/artifact_index.csv"
+      ],
+      "question": "Reconcile counters and flags with actual repository mutations, so that provenance statements do not deny an authorized historical-harness edit that actually occurred."
+    },
+    "6.8.a_internal_validity_verdict": {
+      "answer": "ADEQUATE_SUBJECT_TO_A_BOUNDED_REPAIR. The statistical machinery is valid and fully reproduced; the shortfall is a registered applicability that does not match what two selectable profiles render, plus an unregistered rendering surface.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "question": "Return METHOD_INTERNAL_VALIDITY_VERDICT."
+    },
+    "6.8.b_purpose_verdict": {
+      "answer": "ADEQUATE_SUBJECT_TO_A_BOUNDED_REPAIR. The narrowed level estimand does serve the instrument-calibration purpose and the downstream study, and the generation exclusion is correct. The shortfall is that the preferred profile retains only one genuine presentation pair once the K6-SEP defect is corrected.",
+      "evidence": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/RESEARCH_CHARTER_DRAFT.md"
+      ],
+      "question": "Return STUDY3_PURPOSE_AND_CONSTRUCT_RELEVANCE_VERDICT, reached separately."
+    }
+  },
+  "minimal_sample_size_searches": {
+    "I1a": {
+      "first_admissible_n": 413,
+      "registered_claim_verified": true,
+      "registered_n": 413,
+      "search_ceiling": 4096,
+      "search_restriction": "none; every positive integer in [1, ceiling] was tested",
+      "smallest_n_admissible_for_every_larger_n": 426
+    },
+    "I1b": {
+      "first_admissible_n": 413,
+      "registered_claim_verified": true,
+      "registered_n": 413,
+      "search_ceiling": 4096,
+      "search_restriction": "none; every positive integer in [1, ceiling] was tested",
+      "smallest_n_admissible_for_every_larger_n": 426
+    },
+    "I2": {
+      "first_admissible_n": 214,
+      "registered_claim_verified": true,
+      "registered_n": 214,
+      "search_ceiling": 4096,
+      "search_restriction": "none; every positive integer in [1, ceiling] was tested",
+      "smallest_n_admissible_for_every_larger_n": 219
+    },
+    "I3": {
+      "first_admissible_n": 413,
+      "registered_claim_verified": true,
+      "registered_n": 413,
+      "search_ceiling": 4096,
+      "search_restriction": "none; every positive integer in [1, ceiling] was tested",
+      "smallest_n_admissible_for_every_larger_n": 426
+    },
+    "I4": {
+      "first_admissible_n": 448,
+      "registered_claim_verified": true,
+      "registered_n": 448,
+      "search_ceiling": 4096,
+      "search_restriction": "none; every positive integer in [1, ceiling] was tested",
+      "smallest_n_admissible_for_every_larger_n": 460
+    }
+  },
+  "multiplicity_and_selection_decisions": {
+    "denominator_data_dependently_reduced": false,
+    "fixed_selectable_denominator": 3,
+    "formal_null_sets": {
+      "atomic_cell": "H0 for an atomic gate-bearing cell is p <= p0 for that cell's registered floor, where p is the success probability induced on that cell by its registered generator distribution; H1 is p >= p1.",
+      "confirmation_of_the_selected_profile": "H0 for confirmation is the union over the applicable cells of the single selected profile of the cell nulls on the confirmation split, tested at component level 1/200 as an intersection-union conjunction, with no across-profile correction because exactly one profile is preselected and no reselection is permitted.",
+      "development_selection": "Selection is a deterministic function of the component pass pattern and the registered activation condition; it introduces no additional test and therefore no additional level. Its probability of returning any profile is a selection-return characteristic and is never called power.",
+      "union_over_the_three_selectable_profiles": "The development screening event is that SOME selectable profile qualifies. Its false-qualification probability under the configuration in which every selectable profile lies in its profile null is bounded by the fixed denominator three times the per-component level 1/600, giving 1/200, by Boole's inequality and therefore under arbitrary dependence.",
+      "within_one_profile": "H0 for a profile is the UNION over its applicable cells of the cell nulls: at least one applicable cell has p <= p0. The profile is qualified only when EVERY applicable cell rejects, which is an intersection-union test, so its size is bounded by the largest component level and no further within-profile correction is applied."
+    },
+    "intersection_union_valid": true,
+    "no_descriptive_quantity_can_rescue_a_failed_gate": true,
+    "panel_bound": "1/200",
+    "per_component_development_alpha": "1/600",
+    "s3_gated_by_its_activation_condition": true,
+    "selection_map_rows": 16,
+    "selection_map_total_and_deterministic": true,
+    "within_profile_rule": "intersection_union_conjunctive"
+  },
+  "new_findings": [
+    {
+      "consequence": "A gate-bearing atomic cell can be passed without testing the construct it is registered to test, for two of the three selectable profiles. The effect is concentrated exactly where it matters most: S2 is the preferred profile and the first in the frozen selection order, and K6-SEP is one of only two I3 cells S2 and S3 possess, so half of the joint-correctness evidence behind the design's preferred outcome is a self-comparison. The registered per-profile claim ceiling for S2 and S3, which states joint robust correctness for the two applicable K6 pairs, therefore claims more than a pass can support. This is also the design's own prohibited case: the protocol states that a transformation with no referent must be recorded not_applicable, that not_applicable is never a pass, and that claiming a not_applicable transformation demonstrates robustness is a prohibited claim.",
+      "evidence_fields": [
+        "i3_contrast_registry.k6_applicability.applicable_profiles",
+        "i3_contrast_registry.k6_applicability.semantics",
+        "counterbalancing_design.k6_renderings.renderings[R-sep].description",
+        "counterbalancing_design.k6_contrasts[K6-SEP].varied_factor",
+        "interface_profiles[S2].prompt_and_rendering_contract",
+        "interface_profiles[S3].prompt_and_rendering_contract",
+        "interface_profiles[S2].transformation_applicability.separator_rendering",
+        "interface_profiles[S3].transformation_applicability.separator_rendering",
+        "gate_truth_table.rows[S2].I3_K6",
+        "gate_truth_table.rows[S3].I3_K6",
+        "claim_ceiling.i3_claim_ceiling_by_profile.S2.applicable_cells",
+        "claim_ceiling.i3_claim_ceiling_by_profile.S3.applicable_cells"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md",
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/analysis/independent_methods_review_packet_v0_4.md"
+      ],
+      "finding_id": "S3MR3-001",
+      "fundamental": false,
+      "rationale": "With no label and no option content there is no separator between them, so under S2 and S3 the two registered variants of a K6-SEP cluster are byte-identical. The protocol registers the S2 and S3 scoring surfaces as deterministic argmaxes over a restricted vocabulary at one position with a registered deterministic tie-break, and states that model sampling contributes no randomness and that the model is a deterministic measurement device. An identical prompt therefore yields an identical score, so J_joint_correct in that cell is identically the marginal correctness indicator of a single scoring of the baseline. The cell is not a presentation pair; it is a self-comparison whose estimand is a plain marginal accuracy against a floor derived for a joint-correctness estimand.",
+      "required_repair_alters": [
+        "applicability",
+        "atomic_cell",
+        "claim_ceiling"
+      ],
+      "severity": "BLOCKING",
+      "statement": "draft-v0.4 registers both K6 contrast cells as applicable to every interface profile, on the stated ground that every profile is rendered so a rendering contrast always has a referent. That ground fails for K6-SEP under S2 and S3. The variant rendering R-sep is registered as identical to R-base except for the separator string between a label and its option content, and S2 and S3 render no option list and no label symbol at all.",
+      "successor_implication": "A bounded amendment must decide, as a substantive design act, either to record separator_rendering as not_applicable for S2 and S3 and re-derive their cell census and claim ceiling, or to register a separator factor that actually exists in the option-less prompt, or to state explicitly that S2 and S3 carry a single genuine I3 contrast. It must not be closed by editing the claim text alone.",
+      "title": "The K6-SEP contrast cell has no referent for the option-less selectable profiles S2 and S3, yet is registered applicable, counted and gate-bearing for both"
+    },
+    {
+      "consequence": "The protocol asserts that the draft-v0.3 defect of listing S4 in every confirmation row is repaired, while the derived artifact it names as its source still exhibits that defect verbatim. Any consumer that follows the protocol's own pointer to the derivation table reads the unrepaired applicability, and the confirmation lifecycle guarantee that a never-selectable profile can never appear is not actually enforced end to end.",
+      "evidence_fields": [
+        "design_statistics_tables.json :: confirmation_exact_binomial_components[I1_I3_joint_correctness_floor].applicable_profiles",
+        "design_statistics_tables.json :: confirmation_exact_binomial_components[I2_headroom_floor].applicable_profiles",
+        "proposed_statistics.derivation_tables",
+        "proposed_statistics.confirmation_applicability_rule.s4_can_never_appear",
+        "proposed_statistics.confirmation_applicability_rule.v0_3_defect_repaired"
+      ],
+      "evidence_paths": [
+        "studies/study3/analysis/design_statistics_tables.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "tests/test_study3_design.py"
+      ],
+      "finding_id": "S3MR3-002",
+      "fundamental": false,
+      "rationale": "The reviewer's independent comparison classified this difference after reproducing every binding number in the same rows without disagreement, so the defect is isolated to applicability metadata rather than to arithmetic. It survived because no committed test asserts the applicable_profiles field of any table row, and because the table's gate-family row shape cannot represent per-component applicability at all: the repair confining I1b and K5 confirmation to S1 has no place to live in the table and is simply absent.",
+      "required_repair_alters": [
+        "derived_table_only",
+        "committed_test_only"
+      ],
+      "severity": "MAJOR",
+      "statement": "The amended protocol removes S4 from every confirmation applicability list and its schema constrains confirmation applicable_profiles to S1, S2 and S3. The committed derivation table, which the protocol registers as its derivation_tables and as the single structured source for these values, still lists S1, S2, S3 and S4 in the confirmation I1_I3 family row and in the confirmation I2 family row.",
+      "successor_implication": "Regenerate the derivation table from the amended protocol so that confirmation applicability agrees, give the table a per-component row shape or an explicit per-component applicability field, and add a committed assertion that binds it.",
+      "title": "The drafting derivation table still admits the never-selectable profile S4 to two confirmation rows, so the S3MR2-004 repair is absent from the artifact the protocol names as its derived source"
+    },
+    {
+      "consequence": "A reader of the charter is told that Study 3 asks a presentation-effect question and that the primary indicator requires invariance, which is exactly the estimand and claim mismatch the second review recorded as blocking. The protocol's own universal statements about withdrawn values and prohibited terms are falsified by reviewed paths.",
+      "evidence_fields": [
+        "RESEARCH_CHARTER_DRAFT.md draft version row",
+        "RESEARCH_CHARTER_DRAFT.md section 2 What Study 3 asks",
+        "RESEARCH_CHARTER_DRAFT.md section 4 design commitment 3",
+        "RESEARCH_CHARTER_DRAFT.md section 8 open decisions, OD6 resolution",
+        "RESEARCH_CHARTER_DRAFT.md legal next action statements",
+        "studies/README.md primary indicator and n = 256 sentences",
+        "studies/study3/README.md Sizing and multiplicity paragraph",
+        "studies/study3/NEXT_THREAD_HANDOFF.md Three I3 indicators, one primary",
+        "proposed_statistics.sample_sizes.n_256_and_128_status",
+        "proposed_statistics.active_claim_term_prohibition.scope"
+      ],
+      "evidence_paths": [
+        "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+        "studies/README.md",
+        "studies/study3/README.md",
+        "studies/study3/NEXT_THREAD_HANDOFF.md",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "finding_id": "S3MR3-003",
+      "fundamental": false,
+      "rationale": "The v0.4 amendment touched the charter only to update the state row, rename one disposition string and append a summary section; sections 1 to 9 still describe draft-v0.3 in the present tense. The READMEs prepend a versioned banner and leave the older body in place, so a single document states two mutually exclusive primary indicators and two mutually exclusive sample sizes with nothing marking the older text as historical. S3MR2-001 was a finding about claim language, so claim language outside the protocol JSON is squarely within its scope.",
+      "required_repair_alters": [
+        "narrative_text_only"
+      ],
+      "severity": "MAJOR",
+      "statement": "draft-v0.4 states that the withdrawn sample sizes appear in no active field and that no active claim asserts invariance, equivalence or an absent presentation effect. Both statements are false in reviewed paths. The charter still asks the draft-v0.3 research question, still names J_both as the primary indicator requiring invariance across the two variants, still records the resolution of OD6 as a single I3 floor at power at least 0.90 giving n = 256, still carries a draft version row reading draft-v0.3, and still names a second independent methods review as the legal next action in two places. Both READMEs and the handoff repeat the invariance construct, and the READMEs repeat n = 256.",
+      "successor_implication": "Bring the charter, both READMEs and the handoff into conformance with the registered v0.4 design, or mark the superseded passages unambiguously as historical narrative.",
+      "title": "The retired J_both invariance construct and the withdrawn sample size 256 survive in active charter, README and handoff text, contradicting two explicit protocol claims"
+    },
+    {
+      "consequence": "A registered prohibition is advertised as enforced while its enforcement covers a strict subset of its declared scope, so a passing test suite is not evidence that the prohibition holds.",
+      "evidence_fields": [
+        "tests/test_study3_design.py :: _active_claim_strings",
+        "tests/test_study3_design.py :: test_active_claim_text_contains_no_presentation_effect_claim",
+        "proposed_statistics.active_claim_term_prohibition.enforced_by",
+        "proposed_statistics.active_claim_term_prohibition.scope"
+      ],
+      "evidence_paths": [
+        "tests/test_study3_design.py",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "finding_id": "S3MR3-004",
+      "fundamental": false,
+      "rationale": "The scan never reaches the charter, the handoff, either README, the protocol Markdown companion, the review packet or the status report. It also never reaches research_question.draft_question inside the protocol itself. The enforcement therefore cannot detect the residue recorded in S3MR3-003, which is why that residue survived a passing suite.",
+      "required_repair_alters": [
+        "committed_test_only"
+      ],
+      "severity": "MINOR",
+      "statement": "The protocol registers the prohibited-term scope as covering active claim text, success statements, validation-target interpretations, gate questions and what_fails and what_passes clauses, and names tests/test_study3_design.py as its enforcer. The enforcing helper assembles its candidate strings from a hand-picked subset of protocol JSON fields only.",
+      "successor_implication": "Either widen the scan to the declared scope or narrow the registered scope and the enforced_by claim to what is actually checked.",
+      "title": "The claimed enforcement of the active-claim term prohibition is narrower than the registered scope"
+    },
+    {
+      "consequence": "One artifact still asserts an applicability that the design forbids, and the accompanying claim that the contradiction is resolved everywhere is false.",
+      "evidence_fields": [
+        "interface_profiles[S4].applicable_gates",
+        "gate_truth_table.i4_applicability_note",
+        "gate_truth_table.rows[S4].I4",
+        "gate_hierarchy[I4].applicable_profiles",
+        "proposed_statistics.retained_exact_binomial_gates[I4].applicable_profiles"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "finding_id": "S3MR3-005",
+      "fundamental": false,
+      "rationale": "The reviewer's independently derived cell census gives S4 zero I4 cells, and the independently derived RP I4 projection follows from the selectable profiles alone, so no number depends on the stale entry. The defect is that a universal claim of resolution is made while one location was not updated.",
+      "required_repair_alters": [
+        "narrative_text_only"
+      ],
+      "severity": "MINOR",
+      "statement": "The gate truth table records that the draft-v0.3 I4 applicability contradiction is resolved in favour of not_applicable in every location. interface_profiles[S4].applicable_gates still contains I4.",
+      "successor_implication": "Remove I4 from S4's applicable gate list or qualify the universal claim.",
+      "title": "S4 still lists I4 among its applicable gates although every decision-bearing field records I4 as not_applicable to S4"
+    },
+    {
+      "consequence": "Two artifacts disagree about the registered stop-state set.",
+      "evidence_fields": [
+        "gate_truth_table.legal_stop_states",
+        "state_machine_v0_4.states"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "finding_id": "S3MR3-006",
+      "fundamental": false,
+      "rationale": "The reviewer independently reconstructed the transition system and confirms it is total, deterministic and fully reachable exactly as registered. The defect is that a second artifact names a legal stop state outside it, which weakens the totality claim as a cross-artifact property even though the machine itself is sound.",
+      "required_repair_alters": [
+        "narrative_text_only"
+      ],
+      "severity": "MINOR",
+      "statement": "gate_truth_table.legal_stop_states enumerates six stop states including STOP_AWAITING_AUTHORITY, described as the current state. The registered total state machine contains ten states, six of them terminal, and STOP_AWAITING_AUTHORITY is not among them.",
+      "successor_implication": "Either register the pre-execution awaiting-authority state in the state machine or remove it from the legal stop-state list.",
+      "title": "A stop state is registered in the gate truth table that the total state machine does not contain"
+    },
+    {
+      "consequence": "A reader could reasonably infer that any n at or above the registered size satisfies the target. It does not, so a realized cell size that drifted upward by a few units would silently fall below the registered target.",
+      "evidence_fields": [
+        "minimal_sample_size_searches",
+        "proposed_statistics.sample_sizes.search_rule",
+        "proposed_statistics.retained_exact_binomial_gates[*].n_is_smallest_unrestricted_positive_integer_meeting_the_target"
+      ],
+      "evidence_paths": [
+        "studies/study3/analysis/independent_methods_recalculation_tables_v0_4.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "finding_id": "S3MR3-007",
+      "fundamental": false,
+      "rationale": "Discreteness of the exact binomial rejection region makes realized power non-monotone in n at a fixed level. The registered claim is true as stated, and the reviewer confirms it, but no artifact records that the target is not met for every n at or above the registered size.",
+      "required_repair_alters": [
+        "narrative_text_only"
+      ],
+      "severity": "MINOR",
+      "statement": "The registered sizes are the smallest unrestricted positive integers meeting the per-cell power target, which the reviewer verified by exhaustive search over every positive integer up to the registered ceiling. The target is not monotone above them: it fails again for a short run of larger n before holding for every n.",
+      "successor_implication": "Disclose the non-monotonicity beside the search rule, or register the smallest n from which the target holds for every larger n.",
+      "title": "The per-cell power target is not monotone in n immediately above each registered sample size, and this is disclosed nowhere"
+    },
+    {
+      "consequence": "Round provenance is ambiguous in active fields of the authoritative document.",
+      "evidence_fields": [
+        "claim_ceiling.no_self_approval",
+        "proposed_statistics.unresolved[1]",
+        "proposed_statistics.descriptive_paired_summary.retired_procedure.second_reviewer_question",
+        "unresolved_operator_decisions[OD7].disposition"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "finding_id": "S3MR3-008",
+      "fundamental": false,
+      "rationale": "The round these fields describe has completed and its disposition is already recorded elsewhere in the same document, so the fields are internally inconsistent with the registered state.",
+      "required_repair_alters": [
+        "narrative_text_only"
+      ],
+      "severity": "MINOR",
+      "statement": "Several active fields still refer to the second independent methods review as the review that will adjudicate draft-v0.4.",
+      "successor_implication": "Update the round references.",
+      "title": "Active protocol fields still name a second independent methods review as the governing or pending review"
+    },
+    {
+      "consequence": "The published guarantee reads as stronger than what the registered argument proves, in the multi-adequate branch only.",
+      "evidence_fields": [
+        "power_architecture_v0_4.union_bound_proof.conclusion",
+        "power_architecture_v0_4.least_favourable_configuration.conditions"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json"
+      ],
+      "finding_id": "S3MR3-009",
+      "fundamental": false,
+      "rationale": "When two or more selectable profiles are adequate, the frozen order returns the highest-priority one, which need not be the profile a reader would call designated. The reviewer re-derived the bound and confirms it is sound for the claim that an adequate profile is returned and confirmed, and that it is also sound for the designated profile if designated is defined as the highest-priority adequate profile. No registered field supplies that definition.",
+      "required_repair_alters": [
+        "narrative_text_only"
+      ],
+      "severity": "MINOR",
+      "statement": "The registered conclusion states that the study returns the designated adequate profile and confirms it. The three union-bound terms establish that an adequate profile is qualified, selected and confirmed, not that a particular designated one is.",
+      "successor_implication": "Define designated as the highest-priority adequate profile, or restate the conclusion over an adequate profile.",
+      "title": "The end-to-end conclusion string is narrower than the union-bound argument that supports it"
+    },
+    {
+      "consequence": "The sampling and generator model is not complete enough to instantiate later without a substantive design choice, which section 8 requires for acceptance. It is also the mechanism by which S3MR3-001 went undetected: with no byte-exact templates, nobody could observe that R-sep and R-base coincide under the option-less profiles.",
+      "evidence_fields": [
+        "counterbalancing_design.k6_renderings.renderings",
+        "i3_contrast_registry.k6",
+        "interface_profiles[*].prompt_and_rendering_contract",
+        "bank_construction_policy",
+        "sampling_frame_v0_4.future_seed_lifecycle"
+      ],
+      "evidence_paths": [
+        "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "studies/study3/protocol/interface_calibration_protocol_draft.md"
+      ],
+      "finding_id": "S3MR3-010",
+      "fundamental": false,
+      "rationale": "For every other cell the unregistered surface strings are nuisance, because the manipulated factor is a sampled parameter with a registered support. For K6-SEP and K6-INSTR the unregistered string is the manipulated factor itself, so the estimand of those cells is not determined by anything currently registered. A later seed or bank authority cannot instantiate the registered distribution without choosing them, and the choice determines what the gate tests.",
+      "required_repair_alters": [
+        "generator_distribution",
+        "atomic_cell",
+        "applicability"
+      ],
+      "severity": "MAJOR",
+      "statement": "sampling_frame_v0_4 completely registers the stochastic half of the item generator. No artifact registers a byte-exact question stem, option-line format, option separator, instruction sentence or answer cue for any profile or rendering. The renderings R-base, R-sep and R-instr are defined only by prose descriptions of what they vary.",
+      "successor_implication": "Register the byte-exact rendering surface for every profile and rendering, and re-derive the K6 applicability from the registered strings rather than from prose.",
+      "title": "The registered generator fixes the sampled parameters but not the deterministic rendering surface, so the two K6 cells are not instantiable without a later substantive design choice"
+    }
+  ],
+  "next_legal_action": "OPERATOR_BOUNDED_AMENDMENT_ROUND_FOR_DRAFT_V0_5",
+  "operation_counters": {
+    "ablation_operations": 0,
+    "activation_extractions": 0,
+    "bank_accesses": 0,
+    "bank_rows_generated": 0,
+    "confirmation_split_accesses": 0,
+    "decision_bearing_local_statistical_runs": 0,
+    "decode_steps": 0,
+    "evidence_rows_created": 0,
+    "forward_passes": 0,
+    "generations": 0,
+    "gpu_jobs": 0,
+    "interfaces_selected": 0,
+    "lens_operations": 0,
+    "local_pytest_runs": 0,
+    "model_downloads": 0,
+    "model_weight_loads": 0,
+    "patching_operations": 0,
+    "phase_1_0d_operations": 0,
+    "positive_references_selected": 0,
+    "probe_operations": 0,
+    "provider_calls": 0,
+    "revision_resolutions": 0,
+    "rq2_s4_operations": 0,
+    "seeds_drawn": 0,
+    "sequence_scorings": 0,
+    "study1_files_modified": 0,
+    "study2_files_modified": 0,
+    "tokenizer_constructions": 0
+  },
+  "ordering_proof": {
+    "derivation_precedes_inspection": true,
+    "drafting_inspection_commit": "8a30067d3094a2e62828536c1bbaa8e704c988e8",
+    "independent_derivation_commit": "76ab1bab8fe947a26390a0c6c6d46c7f9af51842",
+    "statement": "Commit 76ab1bab committed the independent parameter extraction, the derivation and the emitted table with no reference to any drafting output. Commit 8a30067d, a strict descendant, added the field-by-field comparison and is the first commit in which design_statistics.py or design_statistics_tables.json is read. The ordering is therefore provable from history rather than asserted. A later commit f4e3b73a repaired a platform-dependent path rendering in the reviewer's own module after a clean ACR run rejected it; no derived quantity changed."
+  },
+  "party": {
+    "authored_draft_v0_4": false,
+    "coordinated_with_either_drafting_session": false,
+    "note": "This review ran in a fresh session and a fresh platform-managed worktree based on remote main. It did not author draft-v0.4, did not repair the draft-v0.3 historical-regression harness, and exchanged no intermediate conclusion with either drafting session.",
+    "repaired_the_historical_harness": false,
+    "role": "independent_reviewer"
+  },
+  "prohibited_source_audit": {
+    "constants_copied": false,
+    "control_flow_derived": false,
+    "dynamically_loaded": false,
+    "executed": false,
+    "imported": false,
+    "method": "The committed review test proves by AST inspection that the independent module contains no import, no import-from, no __import__, no importlib call, no exec, no eval, no runpy call and no subprocess invocation naming any prohibited source, and that no reviewer-returned planning target appears in its reachable source literals. The single repository artifact the module opens for registered inputs is the authoritative protocol JSON; the drafting table is opened only inside the comparison function that was added in a strictly later commit.",
+    "prohibited_sources": [
+      "studies/study3/analysis/design_statistics.py",
+      "studies/study3/analysis/design_statistics_tables.json",
+      "studies/study3/analysis/independent_methods_recalculation.py",
+      "studies/study3/analysis/independent_methods_recalculation_tables.json",
+      "studies/study3/analysis/independent_methods_recalculation_v0_3.py",
+      "studies/study3/analysis/independent_methods_recalculation_tables_v0_3.json"
+    ]
+  },
+  "projected_operation_accounting": {
+    "RP_I4_under_candidate_profiles": {
+      "cells_per_scoring_stream": 4,
+      "distinct_scoring_streams": 2,
+      "rendered_rows": 3584
+    },
+    "S4_diagnostic_generation": {
+      "generated_tokens_upper_bound": 417024,
+      "generation_calls": 26064,
+      "incremental_decode_evaluations_upper_bound": 390960,
+      "runtime_batched_forward_calls": null,
+      "sequence_level_prefill_evaluations": 26064,
+      "total_sequence_level_model_evaluation_equivalents_upper_bound": 417024
+    },
+    "deterministic_I0_fixtures": {
+      "base_item_contrast_clusters": 232,
+      "cluster_derived_base_items": 232,
+      "cluster_rendered_rows": 464,
+      "generated_tokens_upper_bound": 0,
+      "generation_calls": 0,
+      "incremental_decode_evaluations": 0,
+      "noncluster_fixture_rows": 38,
+      "rendered_rows": 502,
+      "sequence_level_prefill_evaluations": 0,
+      "uses_model": false
+    },
+    "grand_total_published": false,
+    "independently_reproduced": true,
+    "null_is_not_zero": true,
+    "positive_reference_external_P3Q": {
+      "null_is_not_zero": true,
+      "numeric_status": "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2",
+      "rendered_rows": null,
+      "sequence_level_evaluations": null
+    },
+    "selected_profile_one_shot_confirmation": {
+      "is_an_upper_bound_not_a_universal_total": true,
+      "rendered_rows": 27856,
+      "rp_i4_rendered_rows": 1792,
+      "target_role_rendered_rows": 26064,
+      "upper_bound_profile": "S1"
+    },
+    "target_role_development": {
+      "by_profile": {
+        "S1": 26064,
+        "S2": 7479,
+        "S3": 7479
+      },
+      "rendered_rows": 33543,
+      "scored_rows": 33543,
+      "sequence_level_evaluations": 33543
+    },
+    "unit_distinctions_registered": true
+  },
+  "rejection_class": "bounded_amendment",
+  "results": [],
+  "reviewed_artifact_identities": {
+    "README.md": {
+      "bytes": 16304,
+      "sha256": "b59c40b0e4b07335a17b5d191d1fee5cd98d17f0a6deb0dd7512a15dba151f0e"
+    },
+    "docs/decision_log.md": {
+      "bytes": 193533,
+      "sha256": "677156343cb675bf28188677c89cc60796eaec96f52ee4dae8165b9787cfa7f0"
+    },
+    "docs/run_log.md": {
+      "bytes": 349882,
+      "sha256": "867560e9507be5ac2f94735ab4b610f943588342057d2b04d8ef4ace60d59fd8"
+    },
+    "paper/artifact_index.csv": {
+      "bytes": 68427,
+      "sha256": "ac4cc027a0af20eacf8990030af5da5473a42f6c7e04b7fac553794d8f09fd65"
+    },
+    "paper/methods_ledger.md": {
+      "bytes": 121163,
+      "sha256": "420af1eadb6acfc05ea4cb859af2ac99a2290e0a691ffb1986e2cde4e97fc48e"
+    },
+    "reports/current_status.md": {
+      "bytes": 139951,
+      "sha256": "c332b4215984321a2bad3eb25c8e7a1f2c2436032f3cfaf39281cc5ba7341218"
+    },
+    "studies/README.md": {
+      "bytes": 7045,
+      "sha256": "2823a474ebeecae4de486dbd46c941e30182b7a3c0fa32006848a393d79ce1ba"
+    },
+    "studies/study3/NEXT_THREAD_HANDOFF.md": {
+      "bytes": 32083,
+      "sha256": "2efa91da83ae881340e8bca6ce87f216a08d111fb591c14600ae41c5b0648064"
+    },
+    "studies/study3/README.md": {
+      "bytes": 17436,
+      "sha256": "1f9b8de94d7bb201ee60657b521a782f1d10610b2ea59d538798518bb8e67d7f"
+    },
+    "studies/study3/RESEARCH_CHARTER_DRAFT.md": {
+      "bytes": 15697,
+      "sha256": "09f2ec24b3ab0a9ed27c9ebff1ddf6a747c629789981e4e797d8e332a3e25e5c"
+    },
+    "studies/study3/analysis/design_statistics.py": {
+      "bytes": 55893,
+      "sha256": "9348bd615b7d51959b97f3fdab9d1ba74ca55cdd49e37f09ef0bbb43f793469c"
+    },
+    "studies/study3/analysis/design_statistics_tables.json": {
+      "bytes": 37108,
+      "sha256": "96274e8c4eec3eac699a1cd0c53ea78beb29787e447a52de27c5749a69ae6985"
+    },
+    "studies/study3/analysis/independent_methods_recalculation_tables_v0_3.json": {
+      "bytes": 66631,
+      "sha256": "ea11c345b611c72120a2deb6abac6764bf2abe94653d100a2123d3db8250bace"
+    },
+    "studies/study3/analysis/independent_methods_recalculation_v0_3.py": {
+      "bytes": 58317,
+      "sha256": "cb74c035a4a9271e11b4143d0cc32d42955613f4b28608305911ade30c7da688"
+    },
+    "studies/study3/analysis/independent_methods_review_packet_v0_3.md": {
+      "bytes": 29040,
+      "sha256": "62016c0f0512b616b5342e0a3be0e578dbeb4c97086b91e3618745e525aaa397"
+    },
+    "studies/study3/analysis/independent_methods_review_packet_v0_4.md": {
+      "bytes": 14857,
+      "sha256": "2900615281d05dee6d346876b29130c950efbc17486f28e2437a378ade0142dc"
+    },
+    "studies/study3/analysis/study2_to_study3_design_traceability.md": {
+      "bytes": 23076,
+      "sha256": "9bce6a7b92b06beb981be0068dede3a3a9ba277b86bd0655bc5282e2970d72ab"
+    },
+    "studies/study3/design_receipt_v0_4.json": {
+      "bytes": 17959,
+      "sha256": "209d4045a082763b48bee8154c78410984476444ce2106bc9d294bab252a4ef2"
+    },
+    "studies/study3/prompts/study3_v0_4_design_amendment_authority.md": {
+      "bytes": 46543,
+      "sha256": "230c57f4bfb874ad724c9448e8cfc1e58b0ff5970159e6741ce61de8104cd173"
+    },
+    "studies/study3/protocol/interface_calibration_protocol.schema.json": {
+      "bytes": 121676,
+      "sha256": "0743419b5e3d09b2ee88ef6ef61f29b605c4eeaafc3855426b21823ba2c10854"
+    },
+    "studies/study3/protocol/interface_calibration_protocol_draft.json": {
+      "bytes": 390029,
+      "sha256": "6a89e02555a6e98b24fa6a5570ebab3bdee14eb9ae7346863246f2982a0f20cb"
+    },
+    "studies/study3/protocol/interface_calibration_protocol_draft.md": {
+      "bytes": 113490,
+      "sha256": "1d700b1e0a7a4990568aba954f48c8c42e3f5ac0a11ac7d7c24ab67382998f79"
+    },
+    "studies/study3/references/methods_sources.md": {
+      "bytes": 23814,
+      "sha256": "99f9854dc167da6745a76563c187cb310dba258ce48c37a5a126cae4d4540319"
+    },
+    "studies/study3/references/positive_reference_dossier.md": {
+      "bytes": 13712,
+      "sha256": "578b35fbfdbc2e3874fca2ea5b5b90ee233690a261b0063f2e27456abe7fae2e"
+    },
+    "studies/study3/reviews/v0_2_independent_methods_review.json": {
+      "bytes": 257297,
+      "sha256": "d90153d3a5796791a4afcf84555ecfc2b93754e6321c57377e7441091389a75e"
+    },
+    "studies/study3/reviews/v0_3_independent_methods_review.json": {
+      "bytes": 129226,
+      "sha256": "eafe6e9476a858e047f4b046af29f43e4df8f529ae7c475e2e865043be2a3c10"
+    },
+    "studies/study3/reviews/v0_4_operator_amendment.json": {
+      "bytes": 49874,
+      "sha256": "451089a70f4fc9b26e6e67399f413854e612a2b6f233c7fb7ec0a565e585eb57"
+    },
+    "studies/study3/reviews/v0_4_operator_amendment.md": {
+      "bytes": 40052,
+      "sha256": "f93f76dbef397ce9aba8e548254899f2818cafc08265a338c1e6ca7d9e70bb77"
+    },
+    "studies/study3/reviews/v0_4_operator_amendment.schema.json": {
+      "bytes": 12979,
+      "sha256": "41cd6e6fce0d2e2155f2ca733b47e750b0fae5662373e770946dfd4b5ffe03c9"
+    },
+    "tests/test_study3_design.py": {
+      "bytes": 162410,
+      "sha256": "596755be5341cbd794f1df1c698ba8a13ed98384b3b846dd3010da0ab855d862"
+    },
+    "tests/test_study3_methods_review.py": {
+      "bytes": 60781,
+      "sha256": "331d2a7644ee3256d7a145fa8ba83d0b02dcfd1faa1ed8989b726c1c656509ba"
+    },
+    "tests/test_study3_methods_review_v0_3.py": {
+      "bytes": 44821,
+      "sha256": "a1676d31ed32225c8e8a3dba40b4ee6f01d5d3490619eeb35d385efb4ea48c61"
+    }
+  },
+  "reviewed_commit": "e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43",
+  "reviewed_path_set": {
+    "added": [
+      "studies/study3/analysis/independent_methods_review_packet_v0_4.md",
+      "studies/study3/design_receipt_v0_4.json",
+      "studies/study3/prompts/study3_v0_4_design_amendment_authority.md",
+      "studies/study3/reviews/v0_4_operator_amendment.json",
+      "studies/study3/reviews/v0_4_operator_amendment.md",
+      "studies/study3/reviews/v0_4_operator_amendment.schema.json"
+    ],
+    "base_commit": "bc98e5c98a2d4e273142c91497b7600ce751bade",
+    "head_commit": "e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43",
+    "modified": [
+      "README.md",
+      "docs/decision_log.md",
+      "docs/run_log.md",
+      "paper/artifact_index.csv",
+      "paper/methods_ledger.md",
+      "reports/current_status.md",
+      "studies/README.md",
+      "studies/study3/NEXT_THREAD_HANDOFF.md",
+      "studies/study3/README.md",
+      "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+      "studies/study3/analysis/design_statistics.py",
+      "studies/study3/analysis/design_statistics_tables.json",
+      "studies/study3/analysis/study2_to_study3_design_traceability.md",
+      "studies/study3/protocol/interface_calibration_protocol.schema.json",
+      "studies/study3/protocol/interface_calibration_protocol_draft.json",
+      "studies/study3/protocol/interface_calibration_protocol_draft.md",
+      "studies/study3/references/methods_sources.md",
+      "studies/study3/references/positive_reference_dossier.md",
+      "tests/test_study3_design.py",
+      "tests/test_study3_methods_review_v0_3.py"
+    ],
+    "path_count": 26
+  },
+  "reviewed_tree": "86c5a5ec0e475090c14654cff27605f883495a48",
+  "reviewer_independence_declaration": {
+    "computational_independence": true,
+    "fresh_session": true,
+    "fresh_worktree_from_remote_main": true,
+    "procedural_independence": true,
+    "statement": "Procedural separation is recorded above and is treated as necessary but not sufficient. Every decision-bearing statistical calculation, construction audit and logical derivation in this review was implemented independently in studies/study3/analysis/independent_methods_recalculation_v0_4.py from the registered inputs of the authoritative protocol JSON and from the English-language primary statistical sources, and was committed before any drafting output was opened."
+  },
+  "round": "third_independent_methods_review_of_draft_v0_4",
+  "s4_headroom_and_generation_axis_decision": {
+    "basis": "Excluding every generation-enabled profile from the selectable set is the direct implementation of the structural lesson Study 1 died of, namely never depend on a permissive parser to establish an answer. It is also the right choice for the downstream mechanistic study, for which a deterministic restricted-vocabulary read at one pinned position is a better instrument than free generation. The genuine residual risk is the branch in which S1, S2 and S3 all fail while S4 shows headroom; the design handles that honestly by registering the stop claim as a statement about the realized run rather than about model capability, and by costing S4 fully so the diagnostic is actually available. A minimal-pair generation profile would be a new design and this review does not create one. The reviewer therefore does not classify the absent generation axis as a purpose defect, and it is not a rejection driver.",
+    "generation_axis_is_purpose_critical": false,
+    "s4_enters_any_success_union": false,
+    "s4_is_a_composite": true,
+    "s4_selectable": false,
+    "s5_created_in_this_review": false,
+    "strongest_permitted_s4_interpretation": "If S4 succeeds while S1, S2 and S3 fail, the strongest permitted reading is that a generation-enabled composite interface shows headroom that the restricted interfaces do not. Because S4 simultaneously changes the chat template, enables free generation, changes output length, changes decoding and introduces a parser, it does not identify generation, or any other single one of those factors, as the cause."
+  },
+  "sampling_frame_decision": {
+    "confirmation_sampling_cells": 17,
+    "cross_cell_dependence_permitted_only_by_arbitrary_dependence_bounds": true,
+    "development_sampling_cells": 17,
+    "duplicates_retained": true,
+    "every_draw_is_with_replacement": true,
+    "every_draw_ordinal_draws_the_complete_tuple": true,
+    "every_weight_sums_to_one": true,
+    "k5_nuisance_states": 32,
+    "k5_nuisance_weight": "1/32",
+    "marginal_iid_preserved_under_reuse": true,
+    "namespaces_disjoint": true,
+    "rejection_probability": "0",
+    "template_level_clustering_detected": false,
+    "zero_rejection_follows_from_construction": true
+  },
+  "schema_version": "study3-v0-4-third-independent-methods-review-1",
+  "seeds": [],
+  "selection_state": {
+    "selected_checkpoint": null,
+    "selected_interface_profile": null,
+    "selected_positive_reference": null,
+    "selected_profile_ranking_produced": false
+  },
+  "source_authority": {
+    "bytes": 47885,
+    "cr_count": 0,
+    "ends_with_newline": false,
+    "lf_count": 940,
+    "observed_absolute_path": "C:\\Users\\alanjiao\\.copilot\\workspaces\\4f9087c8-ebef-4dba-a9b4-a2b620ce1ecd\\attachments\\pasted-text-6fe3b48d-0969-4986-a94e-f56f33ea93cf.txt",
+    "sha256": "c756ba2e5ad147cfc19edc4a451c2d919e51643d19dda7d95469c21786dcdc86"
+  },
+  "state": "STUDY3_DRAFT_V0_4_THIRD_INDEPENDENT_METHODS_REVIEW_COMPLETE_AWAITING_OPERATOR_ACTION",
+  "state_machine_decision": {
+    "deterministic": true,
+    "every_terminal_state_reachable": true,
+    "i0_failure_targets": [
+      "STOP_INSTRUMENT_DEFECT"
+    ],
+    "i0_fixture_accounting": {
+      "cluster_derived_base_items": 232,
+      "cluster_rendered_rows": 464,
+      "clusters": 232,
+      "non_cluster_rows": 38,
+      "total_rows": 502,
+      "units_resolved": true
+    },
+    "i0_makes_no_interface_claim": true,
+    "states": 10,
+    "stop_states_registered_elsewhere_but_absent_here": [
+      "STOP_AWAITING_AUTHORITY"
+    ],
+    "terminal_states": 6,
+    "total": true
+  },
+  "unresolved_methods_items": [
+    {
+      "item_id": "UM3-01",
+      "severity": "BLOCKING",
+      "statement": "The K6-SEP contrast has no referent for the option-less selectable profiles and its applicability, cell census and per-profile claim ceiling must be re-registered together."
+    },
+    {
+      "item_id": "UM3-02",
+      "severity": "MAJOR",
+      "statement": "The deterministic rendering surface is unregistered, so the generator cannot be instantiated and the K6 manipulated strings do not yet exist."
+    },
+    {
+      "item_id": "UM3-03",
+      "severity": "MAJOR",
+      "statement": "The derived statistics table must be regenerated so that its confirmation applicability agrees with the amended protocol, and a committed assertion must bind that field."
+    },
+    {
+      "item_id": "UM3-04",
+      "severity": "MAJOR",
+      "statement": "The retired J_both invariance construct and the withdrawn sample size 256 must be removed from active charter, README and handoff text, and the prohibition scan must be widened to reach those paths."
+    },
+    {
+      "item_id": "UM3-05",
+      "severity": "MINOR",
+      "statement": "No bridge from the registered synthetic generator distributions to any later substantive task distribution is registered. One must exist before the instrument is relied on outside the generator."
+    },
+    {
+      "item_id": "UM3-06",
+      "severity": "MINOR",
+      "statement": "The non-monotonicity of the per-cell power target immediately above each registered sample size is undisclosed."
+    }
+  ],
+  "unresolved_operator_items": [
+    {
+      "item_id": "OD2",
+      "statement": "The identity of the positive reference and its canonical qualification wrapper remain unresolved. No checkpoint is selected, preferred, pinned, revision-resolved, downloaded, tokenized, loaded or prequalified by this review.",
+      "status": "UNRESOLVED_BLOCKING_OPERATOR_DECISION"
+    },
+    {
+      "item_id": "UR-22",
+      "statement": "The unresolved item tracking OD2 remains open and is not advanced by this review.",
+      "status": "UNRESOLVED_BLOCKING_OPERATOR_DECISION"
+    },
+    {
+      "item_id": "OD8-residual",
+      "statement": "The RP chat-template wrappers remain carried by OD2 and are not resolved here.",
+      "status": "UNRESOLVED_NON_BLOCKING_OPERATOR_DECISION"
+    }
+  ]
+}

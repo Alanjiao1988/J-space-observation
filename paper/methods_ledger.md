@@ -2086,3 +2086,48 @@ uncovered indifference region are published with the guarantee.
 
 **Status.** These are proposed design parameters, not measurements. Nothing here is frozen
 or authorised, and the method is subject to the third independent methods review.
+
+## M-32 - Independent recalculation and review method for Study 3 draft-v0.4
+
+**Class.** Review method. Not a scientific result and not an execution authority.
+
+**Object.** The third bounded independent methods review of Study 3 draft-v0.4 at reviewed commit
+`e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43`.
+
+**Independence.** The method extracts registered design inputs from the authoritative protocol JSON
+only, and derives every binding quantity from those inputs and the English-language primary
+statistical sources. It imports, executes, dynamically loads and copies nothing from
+`studies/study3/analysis/design_statistics.py`, from either prior independent recalculation, or
+from either prior recalculation table. The committed test proves this by syntax-tree inspection and
+additionally asserts that no derived result appears as a reachable literal constant.
+
+**Ordering.** The extraction, the derivation and the emitted table were committed before any
+drafting output was opened; the field-by-field comparison was added in a strictly later commit, so
+the ordering is provable from history rather than asserted.
+
+**Arithmetic.** Exact integer and exact-rational only. Binomial tails are accumulated as exact
+integers over an exact integer denominator and compared by cross-multiplication, so no floating
+point participates in a decision. Decimals are comparison renderings and never policy inputs.
+
+**Derived, not transcribed.** The ordered sixteen-case `I3` outcome lattice and its
+`q11/q10/q01/q00` parameterisation; all 34 sampling-cell generator supports, exact weights and
+validity predicates; the gate-bearing evaluation-cell census; the arbitrary-dependence error-budget
+ladder; unrestricted positive-integer sample-size searches over every integer up to the registered
+ceiling; every exact null tail and power; the admissibility and selection graph; the transition
+system; and the operation projection from primitive counts.
+
+**Validation.** Agreement with drafting bytes is never used as validation. Each statistical family
+carries a closed-form identity, an exhaustive small-case enumeration and a published-example check:
+the binomial total-mass identity, the Clopper-Pearson beta duality verified over 220 cases by exact
+polynomial integration, the exact one-sided sign-test tails `7/128` at `n = 10` and `5425/262144`
+at `n = 20`, and exhaustive enumeration of the union bound, its disjoint equality witness, the
+Frechet intersection lower bound and the intersection-union size bound over 1716 finite joint
+distributions covering arbitrary dependence.
+
+**Primary sources.** Clopper and Pearson (1934) for the exact binomial tail and the interval/test
+duality; Berger (1982) and Berger and Hsu (1996) for the intersection-union result; Boole and
+Bonferroni for the union bound; Frechet (1935) for the complementary intersection bound. Source
+citation is not treated as validation: whether the registered protocol satisfies each method's
+conditions is adjudicated in the review.
+
+**Status.** Proposed design parameters, not measurements. Nothing here is frozen or authorised.

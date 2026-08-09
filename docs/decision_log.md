@@ -3500,3 +3500,47 @@ research question remains unanswered.
 remain valid rejections and neither was edited. The only legal successor action is a third
 bounded independent methods review of draft-v0.4, conducted in a fresh session by a party
 that did not draft draft-v0.4.
+
+## 2026-08-09 - D44 - Study 3 draft-v0.4 third independent methods review disposition
+
+**Decision id.** `D44`.
+
+**Decision.** Return `STUDY3_V0_4_THIRD_METHODS_REVIEW_REJECTED_BOUNDED_AMENDMENT_REQUIRED` against reviewed commit `e865be51da6c7e1a7a4f5b1fcad0efc513bd0f43`, tree
+`86c5a5ec0e475090c14654cff27605f883495a48`.
+
+**Round.** A bounded, CPU-only, model-free third independent methods review of the already
+published draft-v0.4, conducted in a fresh session and a fresh worktree by a party that neither
+drafted draft-v0.4 nor repaired its historical-regression harness. Every decision-bearing
+statistical calculation, construction audit and logical derivation was implemented independently
+and committed before any drafting output was opened.
+
+**Basis.** One BLOCKING and three MAJOR methods defects remain, so acceptance as specified is
+unavailable. Closing `S3MR3-001` and `S3MR3-010` necessarily alters registered applicability, the
+atomic cell set of two selectable profiles, the generator specification and the per-profile claim
+ceiling, all of which are excluded from an accepted-with-conformance disposition. No
+rejection-driving defect is fundamental: every required repair is a localized design choice that
+leaves the estimand, the interface panel, the task strata, the difficulty, the model roles and the
+feasibility strategy intact.
+
+**Verified resolved.** `S3MR2-002`, `S3MR2-005`, `S3MR2-006`, `S3MR2-007` and `S3MR2-009`.
+**Partially resolved.** `S3MR2-001`, `S3MR2-003`, `S3MR2-004`, `S3MR2-008` and `S3MR2-010`.
+
+**Independently reproduced with zero numeric disagreement.** All exact-binomial thresholds, null
+tails and powers on both splits; the unrestricted positive-integer sample-size searches returning
+413, 214 and 448; the gate-bearing cell census and `m_max = 43` over the selectable profiles only;
+the arbitrary-dependence budget ladder `19/17200`, `17181/17200`, `381/400`, `1/200` and `9/10`;
+the sixteen-branch selection map; the total deterministic state machine; and every operation
+projection derived from primitive counts.
+
+**Verdicts.** `METHOD_INTERNAL_VALIDITY_VERDICT` and
+`STUDY3_PURPOSE_AND_CONSTRUCT_RELEVANCE_VERDICT` are both
+`ADEQUATE_SUBJECT_TO_A_BOUNDED_REPAIR`, reached separately.
+
+**What was not decided.** `OD2` remains `UNRESOLVED_BLOCKING_OPERATOR_DECISION` and the
+disposition is not driven by it. No interface profile and no positive reference is selected.
+Nothing is frozen, no execution is authorised, no seed or bank exists, no confirmation content was
+opened and no evidence row was created. The original research question remains unanswered.
+
+**Legal successor action.** `OPERATOR_BOUNDED_AMENDMENT_ROUND_FOR_DRAFT_V0_5`, followed by a further independent methods review. No
+freeze, no `P3-Q`, no bank, no seed, no model execution, no development round, no confirmation
+access and no feasibility-pilot authority is created. No successor prompt was written.
