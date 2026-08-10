@@ -1116,3 +1116,97 @@ def test_the_frozen_dependencies_are_exactly_pinned():
     for requirement in requirements:
         assert "==" in requirement, requirement
         assert ">" not in requirement and "<" not in requirement, requirement
+
+
+# ---------------------------------------------------------------------------
+# The result transport is self-verifying
+# ---------------------------------------------------------------------------
+
+def _packed(tmp_path, payloads):
+    import io
+
+    import p0_transport
+
+    source = tmp_path / "out"
+    source.mkdir()
+    for name, blob in payloads.items():
+        (source / name).write_bytes(blob)
+    stream = io.StringIO()
+    p0_transport.pack(str(source), stream=stream)
+    return stream.getvalue()
+
+
+def test_transport_round_trips_byte_exactly(tmp_path):
+    import p0_transport
+
+    payloads = {
+        "p0_tokenizer_gate_result.json": b'{"a": 1}\n',
+        "p0_tokenizer_gate_receipt.json": b'{"b": 2}\n',
+    }
+    log = "noise before\n" + _packed(tmp_path, payloads) + "noise after\n"
+    dest = tmp_path / "materialized"
+    written, digest, size = p0_transport.unpack(log, str(dest))
+    assert len(written) == 2
+    assert len(digest) == 64 and size > 0
+    for name, blob in payloads.items():
+        assert (dest / name).read_bytes() == blob
+
+
+def test_transport_rejects_a_truncated_block(tmp_path):
+    import p0_transport
+
+    log = _packed(tmp_path, {"a.json": b"x" * 4096})
+    lines = log.splitlines()
+    cut = lines[:len(lines) - 3] + [p0_transport.END]
+    with pytest.raises(p0_transport.TransportDefect):
+        p0_transport.unpack("\n".join(cut), str(tmp_path / "d"))
+
+
+def test_transport_rejects_a_corrupted_payload(tmp_path):
+    import p0_transport
+
+    log = _packed(tmp_path, {"a.json": b"y" * 4096})
+    lines = log.splitlines()
+    for index, line in enumerate(lines):
+        if line == p0_transport.BEGIN:
+            body = lines[index + 1]
+            lines[index + 1] = ("A" if body[0] != "A" else "B") + body[1:]
+            break
+    with pytest.raises(p0_transport.TransportDefect):
+        p0_transport.unpack("\n".join(lines), str(tmp_path / "d"))
+
+
+def test_transport_rejects_a_missing_block(tmp_path):
+    import p0_transport
+
+    with pytest.raises(p0_transport.TransportDefect):
+        p0_transport.unpack("nothing here\n", str(tmp_path / "d"))
+
+
+def test_transport_refuses_an_empty_source(tmp_path):
+    import p0_transport
+
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    with pytest.raises(p0_transport.TransportDefect):
+        p0_transport.pack(str(empty))
+
+
+def test_the_stage_script_is_cpu_only_and_fetches_no_weights():
+    path = os.path.join(P0_DIR, "container", "p0_t_stage.sh")
+    with open(path, "rb") as handle:
+        text = handle.read().decode("utf-8")
+    assert "stage P0-T is CPU-only" in text
+    assert "no model weight artifact" in text
+    assert "p0_transport.py" in text
+    for forbidden in ("nvidia-smi", "--gpus", "from_pretrained", "generate("):
+        assert forbidden not in text
+
+
+def test_the_stage_task_pins_the_image_by_digest():
+    path = os.path.join(P0_DIR, "container", "p0_t_acr_task.yaml")
+    with open(path, "rb") as handle:
+        text = handle.read().decode("utf-8")
+    assert "j-space-observation-study3-p0@sha256:" in text
+    assert "{{.Values.COMMIT}}" in text
+    assert "repo.bundle" in text

@@ -6966,3 +6966,39 @@ historical `test_parser_v3_seal_job` failures
 suites 240 + 36 = 276 design/rendering passes (runs `cme8`, `cme9`) and 88
 v0.4-review passes (run `cme7`); the new P0 module 109 passes (run `cme4`).
 Reconciliation: 4,141 baseline passes + 109 net-new P0 passes = 4,250.
+## 2026-08-10 - Study 3-P0 stage P0-T harness registered (still no tokenizer call)
+
+Registered the stage P0-T execution harness before the first tokenizer call, so
+that the stage can be completed, validated, recorded and published in one shot.
+Stage P0-T is effectively single-shot: every encode increments a cumulative,
+non-resettable counter, so a transport that truncated and forced a rerun would
+spend the tokenizer budget a second time.
+
+- `studies/study3/pilot/p0/p0_transport.py` returns the stage artifacts over
+  the job log as a self-describing base64 block carrying its own SHA-256 and
+  byte count. `unpack` refuses anything that does not reproduce both. The
+  channel needs no key, SAS or secret, matching the image's registered
+  authentication policy.
+- `studies/study3/pilot/p0/container/p0_t_stage.sh` clones the exact published
+  commit from an uploaded git bundle, asserts no GPU is visible, re-derives the
+  frozen corpus and protocol inside the container, runs the census, asserts that
+  no model weight artifact was fetched, and packs the artifacts even after a
+  fail-closed stop so that actual counters and partial outcomes are preserved.
+- `studies/study3/pilot/p0/container/p0_t_acr_task.yaml` pins the P0 image by
+  immutable digest, never by tag.
+
+Binding note: the P0 image was built at commit `1aaa46d`. Its P0 science tree
+is `3be2f40576692258e0a76d9a423053c0e6ecb63c`, byte-identical to the published
+head's, so the image is bound to the same frozen science. The stage nevertheless
+executes the code from a clean clone of the exact published commit rather than
+the image's baked copy, which is what binds the run to the published lineage.
+
+Provenance disclosure: the committed 29,282-byte authority is the operative
+authority. It is semantically identical to the original external draft after
+deterministic removal of Markdown syntax, table separator lines and whitespace,
+but it is not byte-identical to that external draft. This is recorded as
+transport-format normalization. The committed authority bytes are unchanged and
+this is not a scientific change.
+
+No tokenizer has been constructed, no checkpoint downloaded, no weight loaded
+and no GPU allocated. Every P0 counter remains zero.

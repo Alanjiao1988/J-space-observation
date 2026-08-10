@@ -1,0 +1,36 @@
+# Stage P0-T task for the registered Azure Container Registry route.
+#
+# Authority: studies/study3/prompts/study3_p0_feasibility_pilot_authority.md
+# section 7.
+#
+# Step 1 clones the exact published commit from an uploaded git bundle, using a
+# git-bearing image. Step 2 runs the census inside the digest-pinned P0 image,
+# so the frozen dependencies that execute the census are exactly the ones the
+# image build pinned and verified.
+#
+# The P0 image is referenced by immutable digest, never by tag alone.
+#
+# Run it with:
+#   az acr run --registry acrjspaceobssea0708231738 --platform linux/amd64 \
+#     -f p0_t_acr_task.yaml --set COMMIT=<sha> --set DRYRUN=<""|--dry-run> <ctx>
+version: v1.1.0
+steps:
+  - id: checkout
+    cmd: >-
+      python:3.11-bookworm
+      bash -lc "set -euo pipefail;
+      rm -rf /workspace/src;
+      git clone -q /workspace/repo.bundle /workspace/src;
+      cd /workspace/src;
+      git checkout -q {{.Values.COMMIT}};
+      echo CHECKOUT_COMMIT=$(git rev-parse HEAD);
+      echo CHECKOUT_TREE=$(git rev-parse HEAD^{tree});
+      echo CHECKOUT_DIRTY=$(git status --porcelain | wc -l)"
+    timeout: 900
+  - id: census
+    cmd: >-
+      --user root
+      acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0@sha256:81f55870787d76bb556b071451676ee57a9fea9dc1de545463af30e830271dcf
+      bash -lc "cp -a /workspace/src /tmp/src &&
+      bash /workspace/p0_t_stage.sh {{.Values.COMMIT}} {{.Values.DRYRUN}}"
+    timeout: 3600
