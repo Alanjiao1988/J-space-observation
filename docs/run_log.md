@@ -7049,3 +7049,51 @@ artifact identities rather than to the transport that delivered them.
 
 No tokenizer has been constructed, no checkpoint downloaded, no weight loaded
 and no GPU allocated. Every P0 counter remains zero.
+## 2026-08-10 - Study 3-P0 stage P0-T executed and stopped
+
+Terminal disposition, published exactly as emitted:
+`STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE`.
+
+- ACR run `cmej`; bound commit `d331b3e774168eec99ad849e983bfe021aebc464`,
+  tree `395a5676c1fd481ee20885eedce8b83024555ece`, `DIRTY=0`; image
+  `j-space-observation-study3-p0@sha256:81f55870...`; CPU only
+  (`cuda_available=false`, device count 0); census wall time 10.05 s.
+- Counters: 4,956 encoded sequences against a cap of 10,000 (4,902 member
+  encodes plus 54 candidate-surface encodes, 1,634 per role); 3 tokenizer
+  identities constructed against a cap of 3. Model downloads, weight loads,
+  prefill, decode, generation, scored rows, GPU jobs, provider calls, seeds,
+  bank rows and positive-reference operations all remain 0.
+- Passed: independent instantiation of the binding registry; byte-exact
+  `decode(encode(x))` round-trip on all 4,902 member encodes, so no
+  unregistered normalization, whitespace repair, truncation or special-token
+  insertion was in effect; **zero** byte-distinct pairs with identical token-ID
+  sequences anywhere in the census for any role; 14 `S2`/`S3` × `K6-SEP`
+  rows recorded as structural absence; zero `S2`/`S3` parity mismatches;
+  `S1` label surfaces are four distinct single tokens under both alphabets for
+  all three roles. Prompt token counts 18-139, mean 67.4.
+- Failed: `S2` and `S3` are `INELIGIBLE_TOKEN_IDS` for all three roles.
+  Each registered content surface is two tokens, `" 0"` to `" 9"` mapping to
+  `[220, 15]` through `[220, 24]`, so the registered single-position
+  restricted-logit rule is not implementable as written. Not repaired, not
+  replaced, not rerun.
+- Disclosed defect, not repaired: the gate's `evaluate_eligibility` propagated
+  the role-level `S2` failure onto the `S1` cells, which are recorded with
+  empty reason lists. With that propagation removed the evidence shows every
+  role retains nine executable genuine `I3` contrasts under `S1`. The
+  emitted state is therefore more severe than this run's own evidence supports.
+  Stage P0-T is single-shot and no fix-and-rerun is authorized, so the defect is
+  recorded as mechanical evidence for the successor calibration round rather
+  than corrected here.
+- Transport: the result and receipt returned over the job log through the
+  committed self-verifying channel and were materialized after their declared
+  SHA-256 `17453e50ac25646816f5e84b35547cfeb1883af34a13b937726266d040503072`
+  and byte count 133,091 both reproduced. One unrelated log line had been
+  interleaved into the base64 block, so the reader was made to skip non-base64
+  lines; the payload digest is what proves the recovery exact. That change is to
+  the reader only and touches no scientific value.
+- Rehearsals before the single-shot run, all with zero encodes: ACR runs
+  `cmec` (failed on CRLF), `cmef` and `cmeg` (image and egress probes) and
+  `cmeh` (full dry-run including transport materialization).
+
+Stage P0-M was not begun. `p0_pilot_execution_authorized` is now false: the
+one-shot authority is consumed.

@@ -1115,10 +1115,35 @@ def test_the_image_verifier_rejects_a_mutated_authority(tmp_path):
     assert p0_image_verify.main(["--project-root", str(root)]) == 1
 
 
-def test_the_image_verifier_accepts_the_committed_tree():
+def test_the_image_verifier_accepts_an_image_shaped_tree(tmp_path):
+    """The image excludes materialized results, so the verifier accepts it.
+
+    Once stage P0-T has published results, the repository worktree legitimately
+    carries a P0 outcome. The image build deliberately removes
+    ``studies/study3/pilot/p0/results`` so that the build still cannot see one,
+    which is what this assembles and checks.
+    """
+    import shutil
+
     import p0_image_verify
 
-    assert p0_image_verify.main(["--project-root", REPO_ROOT]) == 0
+    root = tmp_path / "workspace"
+    for rel in (p0_image_verify.AUTHORITY_REL, p0_image_verify.REGISTRY_REL,
+                p0_image_verify.PROTOCOL_REL):
+        target = root / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(os.path.join(REPO_ROOT, rel), target)
+    shutil.copytree(
+        P0_DIR, root / "studies" / "study3" / "pilot" / "p0",
+        ignore=shutil.ignore_patterns("results", "__pycache__"))
+    assert p0_image_verify.main(["--project-root", str(root)]) == 0
+
+
+def test_the_container_definition_excludes_materialized_results():
+    path = os.path.join(P0_DIR, "container", "Dockerfile.study3-p0")
+    with open(path, "rb") as handle:
+        text = handle.read().decode("utf-8")
+    assert "rm -rf /workspace/studies/study3/pilot/p0/results" in text
 
 
 def test_the_image_verifier_rejects_a_baked_result_artifact(tmp_path):

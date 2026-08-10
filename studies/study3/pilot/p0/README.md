@@ -1,17 +1,31 @@
 # Study 3-P0 — feasibility pilot
 
-> **State:** `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE`
+> **State:** `STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE`
 >
-> `formal_execution_authorized = false` throughout.
-> `p0_pilot_execution_authorized = true` only for the operations and caps in the
-> operator authority, and it becomes false when the pilot closes or stops.
+> Stage P0-T ran and stopped. The emitted terminal disposition is published
+> exactly as emitted; no observed value was edited, relabelled or replaced, and
+> no fix-and-rerun is authorized. Stage P0-M was **not** begun: no checkpoint was
+> downloaded, no weight loaded, no GPU allocated, no forward pass performed and
+> no text generated.
+>
+> Read [`results/p0-t/P0_T_DISPOSITION.md`](results/p0-t/P0_T_DISPOSITION.md)
+> before anything else. In short: the renderer and `S1` are mechanically sound
+> with zero token-ID collisions anywhere in the census, `S2` and `S3` are
+> `INELIGIBLE_TOKEN_IDS` for all three roles because the registered content
+> surfaces are two tokens rather than one, and the gate's own eligibility
+> classifier carries a disclosed defect that made the emitted state more severe
+> than this run's evidence supports.
+>
+> `formal_execution_authorized = false` throughout, and
+> `p0_pilot_execution_authorized` is now **false**: the one-shot authority is
+> consumed.
 >
 > draft-v0.5 remains an **unreviewed, unfrozen candidate protocol**. P0 does not
 > declare it correct, does not reverse or relabel any prior review disposition,
-> and does not waive the final independent methods review. `OD2`, `UR-22` and
+> and does **not** waive the final independent methods review. `OD2`, `UR-22` and
 > every `RP` object remain unresolved and untouched. No seed, bank, development
-> result, confirmation access, winner or evidence row exists. The evidence
-> ledger remains byte-identical through `EV-0016`.
+> result, confirmation access, winner or evidence row exists. The evidence ledger
+> remains byte-identical through `EV-0016`.
 
 Authority: [`studies/study3/prompts/study3_p0_feasibility_pilot_authority.md`](../../prompts/study3_p0_feasibility_pilot_authority.md)
 (sha256 `80efc7ef8bfe5e3b5e5235f530a44730f185187aa52b85945875fe68ef1eda11`,

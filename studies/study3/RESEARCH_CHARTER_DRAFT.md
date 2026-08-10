@@ -5,7 +5,7 @@
 > **Study 3-P0 feasibility pilot registered.** A narrow operator decision supersedes the clause
 > naming a fourth independent methods review as the only legal successor, and authorizes one
 > physically isolated, tightly capped feasibility pilot on `RT`, `RL` and `RI`. Active state:
-> `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE`. `formal_execution_authorized` remains `false`;
+> `STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE`. `formal_execution_authorized` remains `false`;
 > `p0_pilot_execution_authorized` covers only the operations and caps in
 > `prompts/study3_p0_feasibility_pilot_authority.md` and becomes `false` when the pilot closes or
 > stops. This charter is not changed by the pilot, and the pilot does not waive the final
@@ -17,11 +17,11 @@
 | name | Study 3 - Interface Adequacy and Label-Binding Calibration |
 | namespace | `studies/study3` |
 | state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW` |
-| p0 active state | `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE` |
+| p0 active state | `STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE` |
 | draft version | `draft-v0.5` |
 | frozen | no |
 | execution authorized | no |
-| p0 pilot execution authorized | yes, only under `prompts/study3_p0_feasibility_pilot_authority.md` |
+| p0 pilot execution authorized | no; the one-shot authority is consumed |
 | bank authorized | no |
 | seed authorized | no |
 | model operations authorized | no |

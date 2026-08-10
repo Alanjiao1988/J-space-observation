@@ -1,5 +1,37 @@
 # Project Status Report
 
+> **STUDY 3-P0 STAGE P0-T RAN AND STOPPED**
+>
+> State: `STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE`
+>
+> The CPU-only tokenizer and renderer census executed in the registered Azure
+> container route and returned a registered fail-closed stop, published exactly
+> as emitted. Stage P0-M was **not** begun: no checkpoint downloaded, no weight
+> loaded, no GPU allocated, no forward pass, no generation.
+>
+> Findings: the independent renderer instantiated every applicable surface and
+> all 4,902 member encodes round-tripped byte-exactly, so no unregistered
+> normalization was in effect; **zero** byte-distinct pairs produced identical
+> token-ID sequences anywhere in the 32-state census for any role; `S1`'s four
+> label surfaces are distinct single tokens under both alphabets for all three
+> roles; but `S2` and `S3` are `INELIGIBLE_TOKEN_IDS` for all three roles
+> because each registered content surface `" 0"`..`" 9"` is **two** tokens
+> (`[220, digit]`), so the registered single-position restricted-logit rule is
+> not implementable as written.
+>
+> A defect in the gate's own eligibility classifier is disclosed rather than
+> repaired: it propagated the role-level `S2` failure onto the `S1` cells, which
+> made the emitted state more severe than this run's evidence supports. It is
+> not fixed in this round, because stage P0-T is single-shot and no fix-and-rerun
+> is authorized. See
+> `studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md`.
+>
+> `formal_execution_authorized = false`; `p0_pilot_execution_authorized` is now
+> false because the one-shot authority is consumed. draft-v0.5 remains an
+> unreviewed, unfrozen candidate; `OD2`, `UR-22` and every `RP` object remain
+> unresolved; no seed, bank, winner or evidence row exists; the evidence ledger
+> remains byte-identical through `EV-0016`.
+
 > **STUDY 3-P0 FEASIBILITY PILOT REGISTERED - AWAITING THE TOKENIZER GATE**
 >
 > State: `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE`

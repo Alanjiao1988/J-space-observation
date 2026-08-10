@@ -14,6 +14,10 @@
 >
 > 尚未执行任何 model operation：未构造 tokenizer、未下载 checkpoint、未加载权重、未分配 GPU，所有 P0 counter 均为 0。`OD2`、`UR-22` 与全部 `RP` 对象仍未解决且未被触碰；不存在 seed、bank、interface 选择、winner 或 evidence row；`paper/evidence_ledger.csv` 保持逐字节不变，止于 `EV-0016`。
 >
+>
+> **更新（stage P0-T 已执行并停止）**：State 现为 `STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE`。CPU-only tokenizer 与 renderer census 已在注册的 Azure container route 中执行，并返回一个已注册的 fail-closed stop，按原样发布、未作任何编辑。P0-M **未**开始：未下载 checkpoint、未加载权重、未分配 GPU、无 forward pass、无生成。
+>
+> 结论：renderer 与 `S1` 在机械层面成立（全 census 零 token-ID 冲突，4,902 次 encode 全部 byte-exact 往返）；但 `S2`/`S3` 对三个角色全部为 `INELIGIBLE_TOKEN_IDS`，因为注册的候选面 `" 0"`..`" 9"` 在三个 tokenizer 下均为**两个** token（`[220, digit]`），已注册的单点 restricted-logit 规则按原文不可实现。gate 自身的 eligibility 分类器存在一处缺陷，已如实披露而非修复。详见 [`P0_T_DISPOSITION.md`](studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md)。
 > 入口：[P0 协议与状态机](studies/study3/pilot/p0/README.md) · [operator authority](studies/study3/prompts/study3_p0_feasibility_pilot_authority.md) · [冻结语料 census](studies/study3/pilot/p0/corpus/p0_corpus_census.md)
 
 | Study | 状态 | 结论边界 | 入口 |

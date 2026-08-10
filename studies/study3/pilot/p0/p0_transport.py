@@ -27,6 +27,7 @@ import base64
 import hashlib
 import io
 import os
+import re
 import sys
 import tarfile
 
@@ -36,6 +37,10 @@ DIGEST_PREFIX = "STUDY3_P0_TRANSPORT_SHA256="
 BYTES_PREFIX = "STUDY3_P0_TRANSPORT_BYTES="
 NAMES_PREFIX = "STUDY3_P0_TRANSPORT_NAMES="
 LINE_WIDTH = 100
+
+# A payload line is pure base64. Anything else inside the block is an
+# interleaved log line, never payload.
+_BASE64_LINE = re.compile(r"^[A-Za-z0-9+/=]+$")
 
 
 class TransportDefect(Exception):
@@ -103,7 +108,21 @@ def unpack(log_text, destination):
         raise TransportDefect(
             "the log does not carry exactly one complete transport block")
 
-    encoded = "".join(line.strip() for line in lines[starts[0] + 1:ends[0]])
+    # A job log merges stdout and stderr, so an unrelated line can be flushed
+    # into the middle of the block. Non-base64 lines are therefore skipped
+    # rather than treated as payload; the declared byte count and SHA-256 below
+    # are what actually prove the recovery is exact.
+    body = []
+    skipped = []
+    for line in lines[starts[0] + 1:ends[0]]:
+        candidate = line.strip()
+        if not candidate:
+            continue
+        if _BASE64_LINE.match(candidate):
+            body.append(candidate)
+        else:
+            skipped.append(candidate)
+    encoded = "".join(body)
     raw = base64.b64decode(encoded, validate=True)
     if len(raw) != declared_bytes:
         raise TransportDefect(

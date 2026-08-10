@@ -1,0 +1,373 @@
+{
+ "claim_boundary": "a tokenizer and renderer feasibility observation. It selects no interface, passes no formal gate, answers no research question and is not Study 3 evidence.",
+ "counters": {
+  "additional_gpu_attempt_with_signed_zero_operation_receipt": 0,
+  "bank_rows_written": 0,
+  "distinct_checkpoint_identities_downloaded": 0,
+  "distinct_tokenizer_identities_constructed": 3,
+  "exceptions_observed": 0,
+  "generated_tokens": 0,
+  "gpu_jobs_performing_a_model_operation": 0,
+  "hosted_provider_inference_calls": 0,
+  "model_weight_loads": 0,
+  "non_generative_prefill_evaluations": 0,
+  "parser_calls": 0,
+  "positive_reference_operations": 0,
+  "restricted_logit_reads": 0,
+  "runtime_batched_forward_calls": 0,
+  "runtime_batched_tokenizer_calls": 0,
+  "s1_scored_rows": 0,
+  "s2_scored_rows": 0,
+  "s3_cpu_only_reuse_scored_rows": 0,
+  "s4_generation_calls": 0,
+  "s4_incremental_decode_evaluations": 0,
+  "s4_prefill_evaluations": 0,
+  "s4_scored_generation_rows": 0,
+  "seeds_drawn": 0,
+  "tokenizer_encoded_sequences": 4956,
+  "total_scored_rows": 0,
+  "total_sequence_level_model_evaluation_equivalents": 0
+ },
+ "document_class": "study3_p0_tokenizer_gate_receipt",
+ "eligibility_matrix": [
+  {
+   "collision_rows": [],
+   "contrast": "K5-A1",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-P1",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-P2",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-P3",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-S1",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-S2",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-S3",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S2",
+   "reasons": [
+    "S2 answer surfaces are not ten distinct single tokens"
+   ],
+   "role": "RI",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S3",
+   "reasons": [
+    "S2 answer surfaces are not ten distinct single tokens"
+   ],
+   "role": "RI",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S4",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "profile": "S4",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-A1",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-P1",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-P2",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-P3",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-S1",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-S2",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-S3",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S2",
+   "reasons": [
+    "S2 answer surfaces are not ten distinct single tokens"
+   ],
+   "role": "RL",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S3",
+   "reasons": [
+    "S2 answer surfaces are not ten distinct single tokens"
+   ],
+   "role": "RL",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S4",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "profile": "S4",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-A1",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-P1",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-P2",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-P3",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-S1",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-S2",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K5-S3",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S2",
+   "reasons": [
+    "S2 answer surfaces are not ten distinct single tokens"
+   ],
+   "role": "RT",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S3",
+   "reasons": [
+    "S2 answer surfaces are not ten distinct single tokens"
+   ],
+   "role": "RT",
+   "status": "INELIGIBLE_TOKEN_IDS"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "profile": "S4",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "profile": "S4",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  }
+ ],
+ "gpu_allocated": false,
+ "hosted_provider_calls": 0,
+ "model_operations_performed": 0,
+ "result_document": {
+  "bytes": 5820022,
+  "path": "p0_tokenizer_gate_result.json",
+  "sha256": "9603b61165bc0b405fe8eb6103a56e646ceb2e254a33e0eba2ee2d035f03a85f"
+ },
+ "run_id": "20260810T053804Z",
+ "schema_version": "study3-p0-tokenizer-gate-receipt-v1",
+ "seeds_drawn": 0,
+ "stage": "P0-T",
+ "state": "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE",
+ "stop_reason": "no executable genuine I3 contrast remains for RT, RL, RI",
+ "weights_loaded": 0
+}
