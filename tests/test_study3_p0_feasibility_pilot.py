@@ -1040,9 +1040,70 @@ def test_the_container_definition_is_digest_pinned():
     path = os.path.join(P0_DIR, "container", "Dockerfile.study3-p0")
     with open(path, "rb") as handle:
         text = handle.read().decode("utf-8")
-    assert "@sha256:" in text.split("\n")[7] or "@sha256:" in text
+    assert "@sha256:" in text
     assert AUTHORITY_SHA256 in text
     assert "trust-remote-code=\"false\"" in text
+
+
+def test_the_container_definition_uses_no_heredoc():
+    """A shell heredoc is not portable across Dockerfile front ends.
+
+    The classic builder used by ACR Tasks joins only backslash-continued lines,
+    so a ``RUN python - <<'PY'`` body would be parsed as Dockerfile
+    instructions and the build would fail for a reason unrelated to the science.
+    Verification therefore lives in a committed module the build calls.
+    """
+    path = os.path.join(P0_DIR, "container", "Dockerfile.study3-p0")
+    with open(path, "rb") as handle:
+        lines = handle.read().decode("utf-8").splitlines()
+    for line in lines:
+        assert "<<" not in line, line
+    instructions = {"FROM", "LABEL", "ENV", "RUN", "COPY", "WORKDIR", "USER",
+                    "CMD", "ARG", "ENTRYPOINT", "EXPOSE", "VOLUME"}
+    continued = False
+    for line in lines:
+        stripped = line.strip()
+        if continued:
+            continued = stripped.endswith("\\")
+            continue
+        if not stripped or stripped.startswith("#"):
+            continue
+        assert stripped.split()[0] in instructions, line
+        continued = stripped.endswith("\\")
+    assert "p0_image_verify.py" in "\n".join(lines)
+
+
+def test_the_image_verifier_rejects_a_mutated_authority(tmp_path):
+    import p0_image_verify
+
+    root = tmp_path / "workspace"
+    prompts = root / "studies" / "study3" / "prompts"
+    prompts.mkdir(parents=True)
+    (prompts / "study3_p0_feasibility_pilot_authority.md").write_bytes(
+        b"not the authority")
+    assert p0_image_verify.main(["--project-root", str(root)]) == 1
+
+
+def test_the_image_verifier_accepts_the_committed_tree():
+    import p0_image_verify
+
+    assert p0_image_verify.main(["--project-root", REPO_ROOT]) == 0
+
+
+def test_the_image_verifier_rejects_a_baked_result_artifact(tmp_path):
+    import p0_image_verify
+    import shutil
+
+    root = tmp_path / "workspace"
+    for rel in (p0_image_verify.AUTHORITY_REL, p0_image_verify.REGISTRY_REL,
+                p0_image_verify.PROTOCOL_REL):
+        target = root / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(os.path.join(REPO_ROOT, rel), target)
+    baked = root / "studies" / "study3" / "pilot" / "p0"
+    baked.mkdir(parents=True, exist_ok=True)
+    (baked / "p0_model_pilot_result.json").write_bytes(b"{}")
+    assert p0_image_verify.main(["--project-root", str(root)]) == 1
 
 
 def test_the_frozen_dependencies_are_exactly_pinned():

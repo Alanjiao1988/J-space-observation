@@ -62,26 +62,13 @@ COPY studies/study3/prompts/study3_p0_feasibility_pilot_authority.md \
 COPY studies/study3/pilot/p0/ /workspace/studies/study3/pilot/p0/
 
 # Fail the build unless the authority copy inside the image reproduces its
-# registered identity and the frozen corpus and protocol reproduce byte-exactly.
-# If any one of those is false there is no image.
-RUN python - <<'PY' \
+# registered identity, no P0 result artifact is baked in, and the frozen corpus
+# and protocol document reproduce byte-exactly. If any one of those is false
+# there is no image.
+RUN python /workspace/studies/study3/pilot/p0/p0_image_verify.py \
+        --project-root /workspace \
     && python /workspace/studies/study3/pilot/p0/p0_freeze_corpus.py --check \
     && python /workspace/studies/study3/pilot/p0/p0_protocol.py --check
-import hashlib
-import sys
-
-REGISTERED = "80efc7ef8bfe5e3b5e5235f530a44730f185187aa52b85945875fe68ef1eda11"
-path = ("/workspace/studies/study3/prompts/"
-        "study3_p0_feasibility_pilot_authority.md")
-with open(path, "rb") as handle:
-    raw = handle.read()
-digest = hashlib.sha256(raw).hexdigest()
-if digest != REGISTERED:
-    sys.exit("[FAIL] authority sha256 %s != registered %s" % (digest, REGISTERED))
-if b"\r" in raw:
-    sys.exit("[FAIL] the authority copy carries CR; LF only is registered")
-print("[OK] authority identity verified inside the image: %s" % digest)
-PY
 
 RUN install -d -o jspace -g jspace -m 0700 \
         /workspace/runtime/home \
