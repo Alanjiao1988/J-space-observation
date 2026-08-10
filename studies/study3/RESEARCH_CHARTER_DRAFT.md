@@ -16,8 +16,8 @@
 | study id | `jspace-study3-interface-calibration` |
 | name | Study 3 - Interface Adequacy and Label-Binding Calibration |
 | namespace | `studies/study3` |
-| state | `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE` |
-| superseded state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW` |
+| state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW` |
+| p0 active state | `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE` |
 | draft version | `draft-v0.5` |
 | frozen | no |
 | execution authorized | no |
