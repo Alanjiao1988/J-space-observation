@@ -6938,3 +6938,31 @@ no GPU allocated, and every P0 counter was zero. No frozen corpus byte, protocol
 byte, prompt, expected answer, distractor, nuisance state, variant, wrapper or
 allocation changed; `p0_freeze_corpus.py --check` and `p0_protocol.py --check`
 both still reproduce byte-exactly. Failed build: ACR run `cmea`.
+## 2026-08-10 - Study 3-P0 image built and pinned (still no tokenizer or model access)
+
+The registered P0 image was built in the registered Azure Container Registry
+route and passed its own build-time verification: the authority copy inside the
+image reproduces sha256
+`80efc7ef8bfe5e3b5e5235f530a44730f185187aa52b85945875fe68ef1eda11`, no P0
+result artifact is baked in, and both the frozen corpus and the protocol
+document re-derive byte-exactly inside the image.
+
+- registry: `acrjspaceobssea0708231738.azurecr.io`
+- repository: `j-space-observation-study3-p0`
+- tag: `1aaa46da0fabb5080d6a61a1ba885ff7c3808f55` (the exact published commit)
+- immutable digest: `sha256:81f55870787d76bb556b071451676ee57a9fea9dc1de545463af30e830271dcf`
+- base digest: `pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime@sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126`
+- ACR build run ID: `cmeb`
+
+Stage P0-T has **not** begun. No tokenizer has been constructed, no checkpoint
+downloaded, no weight loaded and no GPU allocated. Every P0 counter remains
+zero and the state remains
+`STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE`.
+
+Authoritative CPU validation of this commit's parent tree in the registered ACR
+route recorded: full suite 4,250 passed, 15 skipped, exactly the two registered
+historical `test_parser_v3_seal_job` failures
+(`FULL_SUITE_ACCEPTED_HISTORICAL_FAILURES_ONLY=1`, run `cme6`); targeted
+suites 240 + 36 = 276 design/rendering passes (runs `cme8`, `cme9`) and 88
+v0.4-review passes (run `cme7`); the new P0 module 109 passes (run `cme4`).
+Reconciliation: 4,141 baseline passes + 109 net-new P0 passes = 4,250.
