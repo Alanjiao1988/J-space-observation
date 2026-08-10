@@ -30,6 +30,21 @@ REVIEWED_TREE = "86c5a5ec0e475090c14654cff27605f883495a48"
 PUBLISHED_BASE_COMMIT = "bc98e5c98a2d4e273142c91497b7600ce751bade"
 V0_3_REVIEWED_COMMIT = "2b36f5321d830ea6f70fff2b7bbca3cb93394046"
 
+# The commit at which the v0.4 review round PUBLISHED its outputs.
+#
+# Historical-harness scope erratum, second occurrence. This module verifies what the
+# v0.4 review round did when it moved the repository from REVIEWED_COMMIT to its
+# publication commit. It originally expressed "the publication commit" as ``HEAD``,
+# which was true only while HEAD *was* that commit: any later authorised round then
+# made the harness judge live bytes instead of the round it reviews, and it failed for
+# reasons unrelated to that round's correctness. The v0.3 harness carried the identical
+# defect and was re-anchored to its reviewed commit under a supplemental authority.
+#
+# Anchoring the harness to a fixed commit changes no assertion, no expected value and
+# no disposition. It only fixes WHICH commit is judged, so the verdict is a property of
+# the reviewed round rather than of the checkout.
+PUBLICATION_COMMIT = "79bcc20244ab55045ba1c5d778d829d4caac3dd3"
+
 REVIEW_JSON = "studies/study3/reviews/v0_4_independent_methods_review.json"
 REVIEW_SCHEMA = "studies/study3/reviews/v0_4_independent_methods_review.schema.json"
 REVIEW_MD = "studies/study3/reviews/v0_4_independent_methods_review.md"
@@ -111,19 +126,15 @@ def _blob_at(commit: str, path: str) -> bytes:
 
 
 def _committed_bytes(path: str) -> bytes:
-    """Committed bytes of a review output, preferring the index over the working tree.
+    """Bytes of a review output AS PUBLISHED BY THE V0.4 REVIEW ROUND.
 
-    The repository is checked out with core.autocrlf on some platforms, so working-tree bytes are
-    not authoritative. The index entry is used when available and the file is normalised to LF
-    otherwise, which keeps every byte binding platform-independent.
+    Historical-harness scope erratum. This previously preferred the index over the
+    working tree, which read whatever the current checkout happened to contain. The
+    harness judges the publication commit of the round it reviews, so the bytes are
+    taken from that commit and are therefore platform-independent and stable under any
+    later authorised round.
     """
-    listed = _git("ls-files", "-s", "--", path)
-    if listed.returncode == 0 and listed.stdout.strip():
-        object_id = listed.stdout.split()[1].decode()
-        shown = _git("cat-file", "blob", object_id)
-        if shown.returncode == 0:
-            return shown.stdout
-    return (REPO_ROOT / path).read_bytes().replace(b"\r\n", b"\n")
+    return _blob_at(PUBLICATION_COMMIT, path)
 
 
 def _text(path: str) -> str:
@@ -392,13 +403,49 @@ def test_the_derivation_commit_precedes_the_drafting_inspection_commit(review):
 # the independent recalculation actually reproduces its committed table
 # ----------------------------------------------------------------------------------
 
-def test_the_independent_recalculation_check_mode_reproduces_its_committed_tables():
-    result = subprocess.run(
-        [sys.executable, str(REPO_ROOT / RECALC_PY), "--check"],
-        cwd=REPO_ROOT, capture_output=True, text=True)
+def _materialise_v0_4_recalculation_snapshot(root: Path) -> Path:
+    """Rebuild the publication-commit snapshot the v0.4 recalculation runs in.
+
+    Historical-harness scope erratum. ``--check`` previously ran in the live checkout,
+    so it recomputed against whatever protocol the working tree held. It must recompute
+    against the protocol the v0.4 round actually published, which is the only input its
+    committed tables were ever derived from.
+
+    This mirrors ``_materialise_historical_snapshot`` above, which already applies the
+    same anchoring to the v0.3 generator.
+    """
+    for relative in (RECALC_PY, RECALC_JSON,
+                     "studies/study3/protocol/interface_calibration_protocol_draft.json",
+                     "studies/study3/analysis/design_statistics_tables.json"):
+        destination = root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(_blob_at(PUBLICATION_COMMIT, relative))
+    return root
+
+
+def _run_v0_4_recalculation(snapshot: Path) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, str(snapshot / RECALC_PY), "--check"],
+        cwd=snapshot, capture_output=True, text=True)
+
+
+def test_the_independent_recalculation_check_mode_reproduces_its_committed_tables(tmp_path):
+    snapshot = _materialise_v0_4_recalculation_snapshot(tmp_path / "publication")
+    result = _run_v0_4_recalculation(snapshot)
     assert result.returncode == 0, "--check failed:\n%s\n%s" % (result.stdout, result.stderr)
     assert "INDEPENDENT_RECALCULATION_V0_4_CHECK_OK" in result.stdout
     assert "max_absolute_deviation=0" in result.stdout
+
+    # Non-vacuity: the check must depend on its anchored input. If a later protocol were
+    # reachable, the historical reproduction would prove nothing.
+    substituted = tmp_path / "substituted"
+    _materialise_v0_4_recalculation_snapshot(substituted)
+    live = "studies/study3/protocol/interface_calibration_protocol_draft.json"
+    (substituted / live).write_bytes((REPO_ROOT / live).read_bytes())
+    if (substituted / live).read_bytes() != _blob_at(PUBLICATION_COMMIT, live):
+        assert _run_v0_4_recalculation(substituted).returncode != 0, (
+            "substituting a later protocol must fail the historical check; if it passes, "
+            "the check does not depend on its anchored inputs and is vacuous")
 
 
 def test_the_independent_table_declares_it_is_not_a_measurement(tables):
@@ -962,7 +1009,8 @@ def test_the_decision_and_method_registries_carry_exactly_this_round():
 def test_the_protected_rollups_and_study_one_and_two_paths_are_unchanged():
     if not _commit_available(REVIEWED_COMMIT):
         pytest.fail("the reviewed history is not present in this clone")
-    changed = _git("diff", "--name-only", REVIEWED_COMMIT, "HEAD").stdout.decode().split()
+    changed = _git("diff", "--name-only", REVIEWED_COMMIT,
+                   PUBLICATION_COMMIT).stdout.decode().split()
     for path in changed:
         assert not path.startswith("studies/study1/"), path
         assert not path.startswith("studies/study2/"), path
@@ -981,7 +1029,7 @@ def test_the_protected_rollups_and_study_one_and_two_paths_are_unchanged():
 def test_the_published_change_set_is_within_the_seventeen_path_ceiling():
     if not _commit_available(REVIEWED_COMMIT):
         pytest.fail("the reviewed history is not present in this clone")
-    result = _git("diff", "--name-status", REVIEWED_COMMIT, "HEAD")
+    result = _git("diff", "--name-status", REVIEWED_COMMIT, PUBLICATION_COMMIT)
     lines = [line for line in result.stdout.decode().strip().splitlines() if line.strip()]
     added = sorted(line.split("\t")[1] for line in lines if line.startswith("A"))
     modified = sorted(line.split("\t")[1] for line in lines if line.startswith("M"))
@@ -995,7 +1043,8 @@ def test_the_published_change_set_is_within_the_seventeen_path_ceiling():
 
 def test_the_reviewer_created_no_successor_prompt(receipt):
     assert receipt["remaining_legal_authority"]["successor_prompt_created_in_this_round"] is False
-    prompts = _git("ls-tree", "-r", "--name-only", "HEAD", "studies/study3/prompts/")
+    prompts = _git("ls-tree", "-r", "--name-only", PUBLICATION_COMMIT,
+                   "studies/study3/prompts/")
     listed = prompts.stdout.decode().split()
     reviewed = _git("ls-tree", "-r", "--name-only", REVIEWED_COMMIT,
                     "studies/study3/prompts/").stdout.decode().split()
