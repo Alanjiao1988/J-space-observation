@@ -7023,3 +7023,29 @@ This is a pre-tokenizer repair. At the time of the repair no tokenizer had been
 constructed, no checkpoint downloaded, no weight loaded and no GPU allocated,
 and every P0 counter was zero. Failed rehearsal: ACR run `cmec`. The rehearsal
 existed precisely because stage P0-T is effectively single-shot.
+## 2026-08-10 - Study 3-P0 stage P0-T harness: content binding instead of git
+
+A read-only probe of the required P0 image (ACR runs `cmef`, `cmeg`, no
+tokenizer constructed and no pinned repository content fetched) established:
+
+- the image carries bash and GNU tar but **no git**, which is correct for a
+  science image;
+- its frozen dependencies are exactly the pinned set: Python 3.11.9,
+  torch 2.4.1+cu121, transformers 4.44.2, tokenizers 0.19.1;
+- `torch.cuda.is_available()` is false and the device count is 0, so the stage
+  is structurally CPU-only;
+- `huggingface.co` resolves and answers, as do `cdn-lfs.hf.co`,
+  `cdn-lfs-us-1.hf.co`, `cas-bridge.xethub.hf.co` and
+  `transfer.xethub.hf.co`. Only the retired hostname
+  `cdn-lfs.huggingface.co` fails to resolve, which is expected.
+
+The stage therefore no longer calls git. A dedicated checkout step owns the
+clone in a git-bearing image and records the binding it observed; the science
+step asserts that binding and then re-proves it from content by reproducing
+every registered `STUDY3-P0` row of `paper/artifact_index.csv` against the
+clone's bytes. That is a stronger check than re-running git inside the science
+container would have been, because it binds the executing code to the published
+artifact identities rather than to the transport that delivered them.
+
+No tokenizer has been constructed, no checkpoint downloaded, no weight loaded
+and no GPU allocated. Every P0 counter remains zero.

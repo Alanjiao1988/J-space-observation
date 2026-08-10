@@ -1234,10 +1234,64 @@ def test_the_stage_script_is_cpu_only_and_fetches_no_weights():
         assert forbidden not in text
 
 
+def test_the_stage_script_needs_no_git_and_binds_by_content():
+    """The P0 image is a science image and carries no git.
+
+    The stage therefore reads the binding the checkout step observed and then
+    re-proves it from content, by reproducing every registered STUDY3-P0
+    artifact identity against the clone's bytes. That is a stronger check than
+    re-running git inside the science container would have been.
+    """
+    path = os.path.join(P0_DIR, "container", "p0_t_stage.sh")
+    with open(path, "rb") as handle:
+        text = handle.read().decode("utf-8")
+    executable = [
+        line for line in text.splitlines()
+        if line.strip() and not line.strip().startswith("#")]
+    for line in executable:
+        assert "git" not in line, line
+    assert "BOUND_COMMIT" in text and "BOUND_TREE" in text
+    assert "artifact_index.csv" in text
+    assert "STUDY3-P0" in text
+
+
+def test_the_checkout_script_owns_the_clone_and_records_the_binding():
+    path = os.path.join(P0_DIR, "container", "p0_t_checkout.sh")
+    with open(path, "rb") as handle:
+        raw = handle.read()
+    assert b"\r" not in raw
+    text = raw.decode("utf-8")
+    assert "git clone -q /workspace/repo.bundle" in text
+    assert "/workspace/BOUND_COMMIT" in text
+    assert "/workspace/BOUND_TREE" in text
+    assert "the checkout is not clean" in text
+
+
+def test_every_registered_p0_artifact_reproduces_its_committed_identity():
+    """The same content binding the stage performs, run here on the worktree."""
+    import csv
+
+    index = os.path.join(REPO_ROOT, "paper", "artifact_index.csv")
+    checked = 0
+    with open(index, newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            if row["phase"] != "STUDY3-P0":
+                continue
+            rel = row["storage_location"].split("repo:", 1)[1]
+            with open(os.path.join(REPO_ROOT, rel), "rb") as blob:
+                payload = blob.read()
+            assert hashlib.sha256(payload).hexdigest() == row["sha256"], rel
+            assert len(payload) == int(row["bytes"]), rel
+            checked += 1
+    assert checked >= 20
+
+
 def test_the_stage_task_pins_the_image_by_digest():
     path = os.path.join(P0_DIR, "container", "p0_t_acr_task.yaml")
     with open(path, "rb") as handle:
         text = handle.read().decode("utf-8")
     assert "j-space-observation-study3-p0@sha256:" in text
     assert "{{.Values.COMMIT}}" in text
-    assert "repo.bundle" in text
+    assert "repo.bundle" not in text or "p0_t_checkout.sh" in text
+    assert "p0_t_checkout.sh" in text
+    assert "p0_t_stage.sh" in text

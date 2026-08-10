@@ -25,7 +25,7 @@ COMMIT="$1"
 shift || true
 EXTRA_ARGS=("$@")
 
-SRC=/tmp/src
+SRC=/workspace/src
 OUT=/tmp/p0out
 
 export HOME=/tmp/p0home
@@ -38,17 +38,57 @@ export PYTHONDONTWRITEBYTECODE=1
 mkdir -p "$HOME" "$XDG_CACHE_HOME" "$HF_HOME" "$TMPDIR" "$OUT"
 
 echo "=== STAGE P0-T BINDING ==="
-if [[ -d "$SRC/.git" ]]; then
-    echo "reusing the checkout produced by the preceding step"
-else
-    mkdir -p "$SRC"
-    git clone -q /workspace/repo.bundle "$SRC"
+# The P0 image carries no git on purpose: it is a science image, not a build
+# image. The preceding step owns the clone and records the binding it observed;
+# this step reads those markers and then proves the binding again from content,
+# which is a stronger check than re-running git would be.
+BOUND_COMMIT="$(cat /workspace/BOUND_COMMIT)"
+BOUND_TREE="$(cat /workspace/BOUND_TREE)"
+BOUND_DIRTY="$(cat /workspace/BOUND_DIRTY)"
+echo "BOUND_COMMIT=${BOUND_COMMIT}"
+echo "BOUND_TREE=${BOUND_TREE}"
+echo "DIRTY=${BOUND_DIRTY}"
+if [[ "$BOUND_COMMIT" != "$COMMIT" ]]; then
+    echo "[FAIL] the checkout is bound to ${BOUND_COMMIT}, not the required ${COMMIT}"
+    exit 1
 fi
+if [[ "$BOUND_DIRTY" != "0" ]]; then
+    echo "[FAIL] the checkout is not clean"
+    exit 1
+fi
+
+echo "=== CONTENT BINDING (no version-control tool required) ==="
+# Every STUDY3-P0 row of the committed artifact index must reproduce against the
+# clone's bytes. This binds the executing code to the published artifact
+# identities without trusting the transport that delivered the checkout.
+python - "$SRC" <<'PY'
+import csv
+import hashlib
+import os
+import sys
+
+root = sys.argv[1]
+index = os.path.join(root, "paper", "artifact_index.csv")
+checked = 0
+with open(index, newline="", encoding="utf-8") as handle:
+    for row in csv.DictReader(handle):
+        if row["phase"] != "STUDY3-P0":
+            continue
+        rel = row["storage_location"].split("repo:", 1)[1]
+        path = os.path.join(root, rel)
+        with open(path, "rb") as blob:
+            payload = blob.read()
+        digest = hashlib.sha256(payload).hexdigest()
+        if digest != row["sha256"] or len(payload) != int(row["bytes"]):
+            sys.exit("[FAIL] %s does not reproduce its registered identity" % rel)
+        checked += 1
+if checked == 0:
+    sys.exit("[FAIL] the artifact index registers no STUDY3-P0 artifact")
+print("[OK] %d registered P0 artifacts reproduce their committed identities"
+      % checked)
+PY
+
 cd "$SRC"
-git checkout -q "$COMMIT"
-echo "BOUND_COMMIT=$(git rev-parse HEAD)"
-echo "BOUND_TREE=$(git rev-parse HEAD^{tree})"
-echo "DIRTY=$(git status --porcelain | wc -l)"
 
 echo "=== ENVIRONMENT IDENTITY ==="
 python -V
