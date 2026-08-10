@@ -61,6 +61,12 @@ COPY studies/study3/prompts/study3_p0_feasibility_pilot_authority.md \
 # The frozen P0 science.
 COPY studies/study3/pilot/p0/ /workspace/studies/study3/pilot/p0/
 
+# The byte-protected committed fixture renderer. It is copied read-only as a
+# cross-check target: the frozen corpus manifest records its identity, so the
+# image must carry it for that identity to be verifiable inside the image. It is
+# never executed as a test here and never rewritten.
+COPY tests/test_study3_rendering_registry_v0_5.py /workspace/tests/
+
 # Fail the build unless the authority copy inside the image reproduces its
 # registered identity, no P0 result artifact is baked in, and the frozen corpus
 # and protocol document reproduce byte-exactly. If any one of those is false
@@ -76,8 +82,10 @@ RUN install -d -o jspace -g jspace -m 0700 \
         /workspace/runtime/cache \
         /workspace/runtime/cache/tmp \
         /workspace/runtime/pycache \
-    && chown -R 0:0 /workspace/studies /workspace/requirements-study3-p0.txt \
-    && chmod -R a-w /workspace/studies /workspace/requirements-study3-p0.txt
+    && chown -R 0:0 /workspace/studies /workspace/tests \
+        /workspace/requirements-study3-p0.txt \
+    && chmod -R a-w /workspace/studies /workspace/tests \
+        /workspace/requirements-study3-p0.txt
 
 ENV HOME=/workspace/runtime/home \
     XDG_CACHE_HOME=/workspace/runtime/cache \

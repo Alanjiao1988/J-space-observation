@@ -6919,3 +6919,22 @@ Azure resources touched: **none**. The registered container route
 environments with a `gpu-t4` workload profile) was inspected read-only to confirm
 the route exists before registering the round. No image was built, no job was
 created and no job was started.
+
+## 2026-08-10 - Study 3-P0 container repair before any tokenizer access
+
+The first ACR build of the registered P0 image failed at its own verification
+step: the frozen corpus manifest records the identity of the byte-protected
+committed fixture renderer `tests/test_study3_rendering_registry_v0_5.py` as a
+cross-check target, but the image did not copy it, so `--check` could not
+re-derive the manifest inside the image.
+
+The image now copies that one file read-only. It is never executed as a test in
+the image and never rewritten.
+
+This is an infrastructure repair made **before any tokenizer or model access**,
+not a change in response to an observed P0 result: at the time of the repair no
+tokenizer had been constructed, no checkpoint downloaded, no weight loaded and
+no GPU allocated, and every P0 counter was zero. No frozen corpus byte, protocol
+byte, prompt, expected answer, distractor, nuisance state, variant, wrapper or
+allocation changed; `p0_freeze_corpus.py --check` and `p0_protocol.py --check`
+both still reproduce byte-exactly. Failed build: ACR run `cmea`.
