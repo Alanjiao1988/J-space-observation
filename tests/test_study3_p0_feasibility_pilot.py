@@ -167,6 +167,37 @@ def test_corpus_artifacts_are_lf_only_and_end_with_one_newline():
         assert not raw.endswith(b"\n\n"), path
 
 
+def test_every_committed_p0_source_file_is_lf_only():
+    """A CRLF shell script is not merely untidy; it does not run.
+
+    The stage P0-T script is executed by bash inside the registered container.
+    Authoring it with CRLF made bash read a literal carriage return as part of
+    each command, and the stage aborted before it began. Every committed P0
+    file is therefore held to LF, in a study whose whole subject is byte
+    exactness.
+    """
+    offenders = []
+    for dirpath, dirnames, filenames in os.walk(P0_DIR):
+        dirnames[:] = [d for d in dirnames if d != "__pycache__"]
+        for name in filenames:
+            path = os.path.join(dirpath, name)
+            with open(path, "rb") as handle:
+                if b"\r" in handle.read():
+                    offenders.append(os.path.relpath(path, REPO_ROOT))
+    with open(__file__, "rb") as handle:
+        if b"\r" in handle.read():
+            offenders.append(os.path.relpath(__file__, REPO_ROOT))
+    assert offenders == [], offenders
+
+
+def test_the_stage_script_has_no_crlf_and_starts_with_a_shebang():
+    path = os.path.join(P0_DIR, "container", "p0_t_stage.sh")
+    with open(path, "rb") as handle:
+        raw = handle.read()
+    assert b"\r" not in raw
+    assert raw.startswith(b"#!/usr/bin/env bash\n")
+
+
 def test_manifest_row_digests_match_the_corpus(corpus, manifest):
     by_id = {row["row_id"]: row for row in corpus["rows"]}
     assert len(by_id) == manifest["row_count"]

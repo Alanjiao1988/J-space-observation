@@ -52,14 +52,14 @@
    "sha256": "c667f037c77d3da49ebd46b40e1563aaae0b48d547f00dda284991350986b307"
   },
   "p0_corpus": {
-   "bytes": 19639,
+   "bytes": 19167,
    "path": "studies/study3/pilot/p0/p0_corpus.py",
-   "sha256": "ab8be885f404872fc134aaea655b707dd6cd0f0d7b561eb7fa9a60ad0f18a80c"
+   "sha256": "0a10f59734358bb936b1d8f6a77e3f2a02d0928cea3c00e81d4084188ecedaf0"
   },
   "p0_renderer": {
-   "bytes": 14061,
+   "bytes": 13763,
    "path": "studies/study3/pilot/p0/p0_renderer.py",
-   "sha256": "22bbd87289ed4803acccb8fa73877d408089bdd42c4d84ec522a2cd7f17424ab"
+   "sha256": "568254dcf1889d2bb4348044dd79dda4cc7699d80e97c520dd8cf981af713e2b"
   }
  },
  "hash_algorithm": "sha256",

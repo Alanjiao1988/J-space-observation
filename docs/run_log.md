@@ -7002,3 +7002,24 @@ this is not a scientific change.
 
 No tokenizer has been constructed, no checkpoint downloaded, no weight loaded
 and no GPU allocated. Every P0 counter remains zero.
+## 2026-08-10 - Study 3-P0 LF normalization, caught by the dry-run rehearsal
+
+The stage P0-T dry-run rehearsal, which performs zero encodes, failed inside the
+container with `p0_t_stage.sh: line 21: \$'\r': command not found`. Every P0
+file authored in this round carried CRLF while the rest of the repository is
+strictly LF. Python and Docker tolerated it; bash did not, so the stage aborted
+before it began.
+
+All 18 committed P0 files and the P0 test module were normalized to LF and a
+regression test now holds every committed P0 file to LF.
+
+No frozen scientific byte changed. `p0_corpus.json`, `p0_protocol.json` and
+`p0_corpus_census.md` retain their published blob identities
+`55bd0f0b...`, `3eb65f99...` and `96ef5e4a...`. Only
+`p0_corpus_manifest.json` changed, because it records the generator and
+renderer source digests by design; its aggregate prompt digest is unchanged.
+
+This is a pre-tokenizer repair. At the time of the repair no tokenizer had been
+constructed, no checkpoint downloaded, no weight loaded and no GPU allocated,
+and every P0 counter was zero. Failed rehearsal: ACR run `cmec`. The rehearsal
+existed precisely because stage P0-T is effectively single-shot.
