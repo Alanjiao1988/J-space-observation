@@ -1,0 +1,20 @@
+# Study 3-P0 feasibility pilot: frozen pilot dependencies.
+#
+# Pinned before the first tokenizer call, per section 4 of
+# studies/study3/prompts/study3_p0_feasibility_pilot_authority.md.
+#
+# torch and torchvision are supplied by the digest-pinned CUDA base image and
+# are deliberately NOT reinstalled here, so the image cannot silently drift onto
+# a different CUDA build.
+transformers==4.44.2
+tokenizers==0.19.1
+safetensors==0.4.4
+huggingface-hub==0.24.6
+numpy==1.26.4
+regex==2024.7.24
+requests==2.32.3
+filelock==3.15.4
+packaging==24.1
+pyyaml==6.0.2
+tqdm==4.66.5
+typing-extensions==4.12.2

@@ -1,0 +1,443 @@
+{
+ "authority": {
+  "bytes": 29282,
+  "carries_cr": false,
+  "ends_with_newline": false,
+  "line_feed_count": 684,
+  "path": "studies/study3/prompts/study3_p0_feasibility_pilot_authority.md",
+  "sha256": "80efc7ef8bfe5e3b5e5235f530a44730f185187aa52b85945875fe68ef1eda11"
+ },
+ "authorized_write_paths": [
+  "studies/study3/prompts/study3_p0_feasibility_pilot_authority.md",
+  "studies/study3/pilot/p0/",
+  "tests/test_study3_p0_feasibility_pilot.py",
+  "README.md",
+  "docs/decision_log.md",
+  "docs/run_log.md",
+  "paper/artifact_index.csv",
+  "paper/methods_ledger.md",
+  "reports/current_status.md",
+  "studies/study3/README.md",
+  "studies/study3/NEXT_THREAD_HANDOFF.md",
+  "studies/study3/RESEARCH_CHARTER_DRAFT.md"
+ ],
+ "byte_protected_paths": [
+  "studies/study3/protocol/interface_calibration_protocol_draft.json",
+  "studies/study3/protocol/interface_calibration_protocol_draft.md",
+  "studies/study3/protocol/interface_calibration_protocol.schema.json",
+  "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.json",
+  "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.schema.json",
+  "studies/study3/reviews/v0_5_operator_amendment.json",
+  "studies/study3/reviews/v0_5_operator_amendment.md",
+  "studies/study3/reviews/v0_5_operator_amendment.schema.json",
+  "studies/study3/design_receipt_v0_5.json",
+  "studies/study3/analysis/independent_methods_review_packet_v0_5.md",
+  "studies/study3/analysis/design_statistics.py",
+  "studies/study3/analysis/design_statistics_tables.json",
+  "tests/test_study3_design.py",
+  "tests/test_study3_rendering_registry_v0_5.py",
+  "tests/test_study3_methods_review.py",
+  "tests/test_study3_methods_review_v0_3.py",
+  "tests/test_study3_methods_review_v0_4.py",
+  "paper/evidence_ledger.csv"
+ ],
+ "caps": {
+  "additional_gpu_attempt_with_signed_zero_operation_receipt": 1,
+  "bank_rows_written": 0,
+  "distinct_checkpoint_identities_downloaded": 3,
+  "distinct_tokenizer_identities_constructed": 3,
+  "gpu_jobs_performing_a_model_operation": 1,
+  "hosted_provider_inference_calls": 0,
+  "model_weight_loads": 3,
+  "non_generative_prefill_evaluations": 180,
+  "positive_reference_operations": 0,
+  "s1_scored_rows": 162,
+  "s2_scored_rows": 18,
+  "s3_cpu_only_reuse_scored_rows": 18,
+  "s4_generation_calls": 12,
+  "s4_incremental_decode_evaluations": 36,
+  "s4_prefill_evaluations": 12,
+  "s4_scored_generation_rows": 12,
+  "seeds_drawn": 0,
+  "tokenizer_encoded_sequences": 10000,
+  "total_scored_rows": 210,
+  "total_sequence_level_model_evaluation_equivalents": 228
+ },
+ "corpus": {
+  "k5_contrasts": [
+   "K5-P1",
+   "K5-P2",
+   "K5-P3",
+   "K5-S1",
+   "K5-S2",
+   "K5-S3",
+   "K5-A1"
+  ],
+  "k6_contrasts": [
+   "K6-SEP",
+   "K6-INSTR"
+  ],
+  "k6_sep_not_instantiated_for": [
+   "S2",
+   "S3"
+  ],
+  "namespace": "study3-p0-only",
+  "permanent_exclusion": "the complete study3-p0-only/ namespace and every semantic tuple used by P0 are permanently excluded from every later development, confirmation, P3-Q and external-validity bank",
+  "profile_allocation": [
+   {
+    "contrasts": [
+     "K5-P1",
+     "K5-P2",
+     "K5-P3",
+     "K5-S1",
+     "K5-S2",
+     "K5-S3",
+     "K5-A1",
+     "K6-SEP",
+     "K6-INSTR"
+    ],
+    "profile": "S1",
+    "restricted_to_tuple_class": null
+   },
+   {
+    "contrasts": [
+     "K6-INSTR"
+    ],
+    "profile": "S2",
+    "restricted_to_tuple_class": null
+   },
+   {
+    "contrasts": [
+     "K6-INSTR"
+    ],
+    "profile": "S3",
+    "restricted_to_tuple_class": null
+   },
+   {
+    "contrasts": [
+     "K6-SEP",
+     "K6-INSTR"
+    ],
+    "profile": "S4",
+    "restricted_to_tuple_class": "K2-none-0"
+   }
+  ],
+  "s3_is_a_scoring_rule_not_a_new_surface": true,
+  "seed_policy": "no random seed; no development, confirmation or P3-Q bank",
+  "tuple_classes": [
+   "K2-none-0",
+   "K3-affine_mod10-1",
+   "K3-permutation_chain-1"
+  ]
+ },
+ "counter_ontology": {
+  "caps": {
+   "additional_gpu_attempt_with_signed_zero_operation_receipt": 1,
+   "bank_rows_written": 0,
+   "distinct_checkpoint_identities_downloaded": 3,
+   "distinct_tokenizer_identities_constructed": 3,
+   "gpu_jobs_performing_a_model_operation": 1,
+   "hosted_provider_inference_calls": 0,
+   "model_weight_loads": 3,
+   "non_generative_prefill_evaluations": 180,
+   "positive_reference_operations": 0,
+   "s1_scored_rows": 162,
+   "s2_scored_rows": 18,
+   "s3_cpu_only_reuse_scored_rows": 18,
+   "s4_generation_calls": 12,
+   "s4_incremental_decode_evaluations": 36,
+   "s4_prefill_evaluations": 12,
+   "s4_scored_generation_rows": 12,
+   "seeds_drawn": 0,
+   "tokenizer_encoded_sequences": 10000,
+   "total_scored_rows": 210,
+   "total_sequence_level_model_evaluation_equivalents": 228
+  },
+  "cumulative": true,
+  "namespace": "study3-p0-pilot-counters",
+  "on_cap": "the pilot stops before the operation that would cross a cap; an overrun is never recorded as a completed operation",
+  "on_failure": "a failed, partial, retried or aborted attempt keeps its counters; they are never erased, overwritten or relabelled as a successful run",
+  "resettable": false,
+  "separate_from": "every pre-existing formal Study 3 counter, which remains a historical fact and is never touched by P0",
+  "smoke_exact_allocation": {
+   "non_generative_prefill_evaluations": 60,
+   "s3_cpu_only_reuse_scored_rows": 6,
+   "s4_generation_calls": 0,
+   "total_scored_rows": 66
+  },
+  "uncapped_recorded_observations": [
+   "runtime_batched_forward_calls",
+   "runtime_batched_tokenizer_calls",
+   "parser_calls",
+   "restricted_logit_reads",
+   "generated_tokens",
+   "exceptions_observed"
+  ],
+  "unit_semantics": {
+   "non_generative_prefill_evaluations": "one sequence-level prefill evaluation of one prompt by one role for S1 or S2; it is never a runtime batch call",
+   "runtime_batched_forward_calls": "one runtime batched forward call, recorded separately and never substituted for a sequence-level quantity",
+   "s3_cpu_only_reuse_scored_rows": "one scored row produced on CPU from an already captured S2 logit vector; it adds exactly zero model evaluations",
+   "s4_generation_calls": "one bounded greedy generation call",
+   "s4_incremental_decode_evaluations": "one incremental decode step of one S4 generation call; at max_new_tokens=4 a completed call contributes at most three",
+   "s4_prefill_evaluations": "the sequence-level prefill of one S4 generation call",
+   "tokenizer_encoded_sequences": "one encoded sequence; a batch API must count every sequence it encodes as well as the runtime batch call"
+  },
+  "zero_before_execution": [
+   "additional_gpu_attempt_with_signed_zero_operation_receipt",
+   "bank_rows_written",
+   "distinct_checkpoint_identities_downloaded",
+   "distinct_tokenizer_identities_constructed",
+   "exceptions_observed",
+   "generated_tokens",
+   "gpu_jobs_performing_a_model_operation",
+   "hosted_provider_inference_calls",
+   "model_weight_loads",
+   "non_generative_prefill_evaluations",
+   "parser_calls",
+   "positive_reference_operations",
+   "restricted_logit_reads",
+   "runtime_batched_forward_calls",
+   "runtime_batched_tokenizer_calls",
+   "s1_scored_rows",
+   "s2_scored_rows",
+   "s3_cpu_only_reuse_scored_rows",
+   "s4_generation_calls",
+   "s4_incremental_decode_evaluations",
+   "s4_prefill_evaluations",
+   "s4_scored_generation_rows",
+   "seeds_drawn",
+   "tokenizer_encoded_sequences",
+   "total_scored_rows",
+   "total_sequence_level_model_evaluation_equivalents"
+  ],
+  "zero_operation_retry": "one additional GPU attempt is authorized only when a signed job receipt proves that zero tokenizer, model-load, prefill, decode, scoring and generation operations occurred"
+ },
+ "document_class": "study3_p0_feasibility_pilot_protocol",
+ "execution_route": {
+  "authoritative_cpu_validation": "the registered Azure Container Registry/container route on a clean exact-commit checkout",
+  "gpu_class": "one T4-class 16 GiB GPU or a larger compatible Azure GPU",
+  "image_pinning": "the container image is frozen by immutable digest and Python, PyTorch, Transformers, tokenizer, CUDA and supporting package versions are pinned before the first tokenizer call",
+  "model_operations": "an Azure containerized GPU job only; never on the workstation and never in GitHub Actions",
+  "precision": "fp16, one checkpoint at a time",
+  "prohibited": [
+   "quantization",
+   "mixed checkpoint revisions",
+   "model conversion",
+   "adapter insertion",
+   "remote hosted inference APIs"
+  ],
+  "trust_remote_code": false,
+  "trust_remote_code_policy": "must remain false; if a baseline model cannot load without it, stop and report. This authority permits no silent trust-policy expansion.",
+  "workstation_permitted": [
+   "code inspection",
+   "editing",
+   "git",
+   "hashes",
+   "upload",
+   "submission",
+   "result reading"
+  ]
+ },
+ "inference_behaviour": {
+  "evaluation_mode": true,
+  "inference_mode": "torch.inference_mode() or its exact equivalent",
+  "never_collect": [
+   "hidden states",
+   "activations",
+   "attentions",
+   "gradients",
+   "hooks",
+   "lens outputs",
+   "probes",
+   "patches",
+   "ablations"
+  ],
+  "s1_reads": "next-token logits for the four registered label token IDs",
+  "s2_reads": "the same next-token logit vector, for the ten registered content token IDs",
+  "s3": "CPU-only scoring from the already captured S2 vector; exactly zero prefill, decode, model-load or forward operations",
+  "s4": {
+   "decoding": "greedy",
+   "do_sample": false,
+   "max_new_tokens": 4,
+   "temperature": "not passed",
+   "unparseable": "an explicit retained outcome; never dropped and never imputed",
+   "wrapper": "each role's registered native-wrapper policy"
+  },
+  "sampling": false
+ },
+ "legal_status": {
+  "draft_v0_5_frozen": false,
+  "draft_v0_5_reviewed": false,
+  "draft_v0_5_status": "candidate protocol that has not received a fourth independent methods review; P0 does not declare it correct and does not waive that review",
+  "evidence_ledger_last_row": "EV-0016",
+  "evidence_ledger_policy": "byte-identical; P0 writes no evidence row",
+  "formal_execution_authorized": false,
+  "interface_selected": null,
+  "od2_status": "unresolved",
+  "p0_pilot_execution_authorized": true,
+  "rp_status": "excluded; no positive-reference object is selected or touched",
+  "ur22_status": "unresolved"
+ },
+ "legal_successor": "a fresh-session operator calibration round that reads the P0 feasibility record. It is not another pilot and not immediate formal execution. Any surviving candidate must then receive one focused, fresh-session independent methods review before freeze, seed draw, bank construction, formal model execution or confirmation.",
+ "non_purpose": [
+  "no confirmatory effect size, power validation or null test",
+  "no formal gate pass or fail",
+  "no selection or ranking of S1, S2 or S3 and no qualification of S4",
+  "no scientific checkpoint comparison",
+  "no answer to the original research question",
+  "no reasoning-capability claim",
+  "pilot effect sizes may never justify a threshold, sample size, alpha, seed, bank, profile or confirmation rule"
+ ],
+ "prohibitions": [
+  "any development, confirmation or P3-Q seed or bank",
+  "any access to existing or future confirmation material",
+  "any formal Gate I0-I5 pass/fail, Family A/B/C analysis, selection-map run, winner, interface preference or confirmation release",
+  "any use of draft-v0.5's 413/214/448 sample sizes as pilot allocations",
+  "any change to alpha, power, floors, claims, estimands, m_max or the formal operation projection",
+  "any choice or inspection of RP, any resolution of OD2 or UR-22, or any RP/P3-Q/I4 execution",
+  "any reuse of Study 1/2 item identities, banks, seeds, confirmation data or empirical results as P0 inputs",
+  "any prompt, parser, scoring, tokenizer, item, allocation, checkpoint or dependency change after the pre-execution publication in response to an observed P0 result",
+  "any reroll, output-conditioned retry, cherry-picking, row replacement, exclusion of a valid but inconvenient row, or reset of a cumulative counter",
+  "any quantization, hosted-provider inference, unpinned revision or local workstation model execution",
+  "any activation extraction, hook, lens, probe, patch, intervention, ablation or mechanistic operation",
+  "any entry in paper/evidence_ledger.csv",
+  "any claim that P0 answers the original research question or validates draft-v0.5",
+  "any direct transition from P0 to formal development or confirmation"
+ ],
+ "publication_rule": "non-force fast-forward only, with the explicit refspec git push origin HEAD:refs/heads/main, then re-fetch and require HEAD == origin/main, the exact tree and a clean worktree",
+ "retry_rule": {
+  "output_conditioned_retry": false,
+  "zero_operation_infrastructure_retry": "permitted once only when a signed job receipt proves that zero tokenizer, model-load, prefill, decode, scoring and generation operations occurred"
+ },
+ "roles": [
+  {
+   "immutable_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+   "repository_identity": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+   "role": "RT"
+  },
+  {
+   "immutable_revision": "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2",
+   "repository_identity": "Qwen/Qwen2.5-Math-1.5B",
+   "role": "RL"
+  },
+  {
+   "immutable_revision": "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35",
+   "repository_identity": "Qwen/Qwen2.5-Math-1.5B-Instruct",
+   "role": "RI"
+  }
+ ],
+ "rp_excluded": true,
+ "schema_version": "study3-p0-feasibility-pilot-protocol-v1",
+ "scientific_purpose": [
+  "can an independent implementation instantiate the binding v0.5 rendering registry without an unregistered choice",
+  "do applicable gate-bearing presentation pairs tokenize distinctly under the exact pinned tokenizers, and do the S1/S2 candidate-token eligibility rules hold",
+  "can S1, S2 and CPU-only S3 be executed and reconciled without missing rows, non-finite values, scorer disagreement or hidden evaluations",
+  "can the S4 diagnostic path render, wrap, generate, parse, retain unparseable and account for prefill and incremental decode cost",
+  "what wall time, peak device memory, prompt-token length, generated-token count, failure rate and runtime batching occur",
+  "does this deliberately tiny corpus show any output variation or pairwise discordance worth considering when calibrating the protocol"
+ ],
+ "smoke_exact_allocation": {
+  "non_generative_prefill_evaluations": 60,
+  "s3_cpu_only_reuse_scored_rows": 6,
+  "s4_generation_calls": 0,
+  "total_scored_rows": 66
+ },
+ "state": "STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE",
+ "state_machine": {
+  "disposition_1_vs_2": "descriptive only; it creates no formal eligibility difference. A small pilot cannot establish that a contrast has or lacks a substantive effect.",
+  "states": [
+   {
+    "entered_when": "the pre-execution commit is published by non-force fast-forward and HEAD equals origin/main with the recorded tree and a clean worktree",
+    "forbids": [
+     "every model operation",
+     "every GPU job"
+    ],
+    "kind": "waypoint",
+    "permits": [
+     "stage P0-T, CPU only, in the registered Azure container route"
+    ],
+    "state": "STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE"
+   },
+   {
+    "entered_when": "stage P0-T passes and its result and receipt are published by non-force fast-forward",
+    "forbids": [
+     "merging or rebasing during an active measurement round"
+    ],
+    "kind": "waypoint",
+    "permits": [
+     "stage P0-M, bound to that exact commit and tree"
+    ],
+    "state": "STUDY3_P0_TOKENIZER_GATE_PASSED_AWAITING_MODEL_PILOT"
+   },
+   {
+    "entered_when": "tokenizer and renderer integrity pass, every executed row is complete and mechanically valid, S1/S2/S3 scoring and S3 reuse reconcile, the S4 wrapper/parser/accounting path executes, and the resource and counter records are complete",
+    "kind": "terminal",
+    "state": "STUDY3_P0_COMPLETE_MECHANICALLY_FEASIBLE"
+   },
+   {
+    "entered_when": "every mechanical condition passes but the tiny corpus shows a globally degenerate prediction pattern, no observed discordance anywhere, or another explicitly descriptive low-information pattern",
+    "kind": "terminal",
+    "state": "STUDY3_P0_COMPLETE_MECHANICALLY_FEASIBLE_EMPIRICALLY_LOW_INFORMATION"
+   },
+   {
+    "entered_when": "a registry/schema/renderer mismatch, a non-deterministic render, an unexplained tokenizer identity, a missing census branch or a counter mismatch is observed before any model operation",
+    "kind": "terminal",
+    "state": "STUDY3_P0_STOPPED_ON_TOKENIZER_OR_RENDERER_DEFECT"
+   },
+   {
+    "entered_when": "after the token-ID collision rule, one or more target roles has no executable genuine I3 contrast",
+    "kind": "terminal",
+    "state": "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE"
+   },
+   {
+    "entered_when": "the smoke mechanical gate fails after any model operation",
+    "kind": "terminal",
+    "state": "STUDY3_P0_STOPPED_ON_MODEL_SMOKE_MECHANICAL_FAILURE"
+   },
+   {
+    "entered_when": "an infrastructural or transport failure prevents the round from reaching a mechanical determination",
+    "kind": "terminal",
+    "state": "STUDY3_P0_INCONCLUSIVE_INFRASTRUCTURE_OR_TRANSPORT_FAILURE"
+   },
+   {
+    "entered_when": "the starting state, the protected bytes, the authority identity or the publication path cannot be established exactly",
+    "kind": "terminal",
+    "state": "STUDY3_P0_BLOCKED_ON_AUTHORITY_OR_REPOSITORY_INTEGRITY"
+   }
+  ],
+  "terminal_dispositions": [
+   "STUDY3_P0_COMPLETE_MECHANICALLY_FEASIBLE",
+   "STUDY3_P0_COMPLETE_MECHANICALLY_FEASIBLE_EMPIRICALLY_LOW_INFORMATION",
+   "STUDY3_P0_STOPPED_ON_TOKENIZER_OR_RENDERER_DEFECT",
+   "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE",
+   "STUDY3_P0_STOPPED_ON_MODEL_SMOKE_MECHANICAL_FAILURE",
+   "STUDY3_P0_INCONCLUSIVE_INFRASTRUCTURE_OR_TRANSPORT_FAILURE",
+   "STUDY3_P0_BLOCKED_ON_AUTHORITY_OR_REPOSITORY_INTEGRITY"
+  ],
+  "transitions": [
+   {
+    "fail_closed_to": "STUDY3_P0_BLOCKED_ON_AUTHORITY_OR_REPOSITORY_INTEGRITY",
+    "from": "BLOCKED_ON_STUDY3_P0_STARTING_STATE_INTEGRITY",
+    "guard": "origin/main equals the required baseline commit and tree, the worktree is clean, the authority copy is byte-identical, the frozen corpus reproduces, every protected byte is unchanged, all P0 counters are zero, and the pre-execution commit publishes by non-force fast-forward",
+    "to": "STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE"
+   },
+   {
+    "also_fail_closed_to": "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE",
+    "fail_closed_to": "STUDY3_P0_STOPPED_ON_TOKENIZER_OR_RENDERER_DEFECT",
+    "from": "STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE",
+    "guard": "the complete tokenizer and renderer census passes for RT, RL and RI within the 10,000 encoded-sequence cap, every applicable byte-distinct pair yields distinct full token-ID sequences, the S1 label surfaces and S2 answer surfaces are single-token and pairwise distinct, S2 and S3 share prompt bytes and token IDs, and the S2/S3 K6-SEP rows are structurally absent",
+    "to": "STUDY3_P0_TOKENIZER_GATE_PASSED_AWAITING_MODEL_PILOT"
+   },
+   {
+    "fail_closed_to": "STUDY3_P0_STOPPED_ON_MODEL_SMOKE_MECHANICAL_FAILURE",
+    "from": "STUDY3_P0_TOKENIZER_GATE_PASSED_AWAITING_MODEL_PILOT",
+    "guard": "the K2 smoke mechanical gate passes, the bounded extension runs the two remaining tuple classes and the S4 K2 diagnostic without crossing a cap, and every mechanical, accounting and resource record is complete",
+    "to": "STUDY3_P0_COMPLETE_MECHANICALLY_FEASIBLE"
+   }
+  ]
+ },
+ "token_id_collision_rule": {
+  "never": "repaired after observation, turned into a pass, or reported as a robustness observation",
+  "on_genuine_collision": "mark the specific role/profile/contrast INELIGIBLE_TOKEN_IDS, exclude its model rows, and continue only if at least one genuine I3 contrast remains executable for each of RT, RL and RI"
+ }
+}

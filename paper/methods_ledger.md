@@ -2185,3 +2185,77 @@ external-validity bridge, remains an unresolved future-methods prerequisite.
 **Status.** `PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW`. The
 drafting party does not adjudicate its own amendment. `OD2`, `UR-22` and the `RP`
 wrappers remain unresolved and the original research question is unanswered.
+---
+
+## Study 3-P0 — interface-calibration feasibility pilot, pre-execution registration (2026-08-10)
+
+**Status.** Registered only. No model operation has been performed. This entry
+records a methods-feasibility instrument, never a result, and licenses no claim
+about any checkpoint.
+
+**Models and revisions.** Three target roles, each pinned to an immutable
+revision, with the tokenizer taken from the same repository identity and
+revision as the model: `RT` = `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`
+@ `ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562`; `RL` = `Qwen/Qwen2.5-Math-1.5B`
+@ `4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2`; `RI` =
+`Qwen/Qwen2.5-Math-1.5B-Instruct` @ `aafeb0fc6f22cbf0eaeed126eff8be45b0360a35`.
+`RP` is excluded: no positive-reference candidate is selected, ranked,
+downloaded, tokenized, loaded or called.
+
+**Software.** Frozen in
+`studies/study3/pilot/p0/container/requirements-study3-p0.txt` and pinned by
+immutable base-image digest in
+`studies/study3/pilot/p0/container/Dockerfile.study3-p0`
+(`pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime`
+@ `sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126`).
+`trust_remote_code` is `false` and no silent trust-policy expansion is permitted.
+
+**Hardware.** Authoritative CPU validation runs in the registered ACR/container
+route on a clean exact-commit checkout. Every model operation is confined to one
+Azure containerized GPU job on a T4-class 16 GiB GPU or larger, in fp16, one
+checkpoint at a time. No model operation runs on the workstation or in GitHub
+Actions.
+
+**Task construction.** Three semantic base-tuple classes drawn from the binding
+draft-v0.5 rendering registry: one K2 identity/copy depth-0 tuple, one K3
+affine_mod10 depth-1 tuple and one K3 permutation_chain depth-1 tuple. Prompt
+bytes are produced by an independent registry-driven renderer that validates
+every normative string against its registered SHA-256 asset identity. All 70
+rendered members were verified byte-identical to the committed draft-v0.5
+fixture renderer.
+
+**Generation settings.** S1 and S2 read restricted next-token logits only, over
+the four registered label token IDs and the ten registered mod-10 content token
+IDs respectively. S3 rescores on CPU from the already captured S2 logit vector
+and adds exactly zero model evaluations. S4 is the never-selectable diagnostic:
+role-native wrapper, greedy decoding, `do_sample=false`, `max_new_tokens=4`, no
+sampling temperature passed, every completion retained and mapped by the pinned
+deterministic parser `study3-p0-s4-parser-v1`, with `unparseable` a first-class
+retained outcome.
+
+**Sample size.** Deliberately tiny by construction: 35 contrast cells and 70
+rendered members, giving at most 180 non-generative prefill evaluations, 12 S4
+generation calls and 210 scored rows across the three roles. The draft-v0.5
+`413`/`214`/`448` sizes are **not** used as pilot allocations.
+
+**Random seeds.** None. P0 draws no seed and writes no bank row. All varying
+quantities are closed-form functions of the pilot base-item index.
+
+**Exclusion rules.** A genuine token-ID collision marks the specific
+role/profile/contrast `INELIGIBLE_TOKEN_IDS` and excludes its model rows; it is
+never repaired after observation and never reported as a pass or as robustness.
+`K6-SEP` is structurally absent for the option-less profiles S2 and S3. The
+complete `study3-p0-only/` namespace is permanently excluded from every later
+development, confirmation, P3-Q and external-validity bank.
+
+**Protocol deviations.** None. The round is registered before any tokenizer or
+model access, and no prompt, parser, scoring, tokenizer, item, allocation,
+checkpoint or dependency may change afterwards in response to an observed
+result.
+
+**Claim boundary.** P0 answers only whether the pipeline is runnable. It selects
+no interface, sets no threshold, passes no formal gate, estimates no confirmatory
+effect, resolves neither `OD2` nor `UR-22`, freezes nothing and answers no
+research question. Zero observed discordance would be descriptive, not proof of
+invariance. No entry is made in `paper/evidence_ledger.csv`, which remains
+byte-identical through `EV-0016`.

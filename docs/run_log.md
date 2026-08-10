@@ -6885,3 +6885,37 @@ execution, resolve `OD2` or `UR-22`, select an interface profile or a positive
 reference, construct a bank, draw a seed, run a tokenizer or a model, open
 confirmation content, create an evidence row, or use GitHub Actions. No model
 operation of any kind occurred.
+## 2026-08-10 — Study 3-P0 pre-execution registration (no model operation)
+
+State published: `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE`.
+
+- Starting baseline required and verified: commit
+  `5b15e0ed0ee109955ef805adab3fc3e25b93e5ed`, tree
+  `62cbfb371fdf273f0b8642c06c05b0741000e6a5`, clean worktree, repo
+  `Alanjiao1988/J-space-observation`.
+- Operation context: the worktree was normalized to committed bytes with
+  `core.autocrlf=false` after a stale CRLF checkout was found to break
+  `design_statistics.py --check` locally. No committed byte changed; the local
+  failure was a working-tree newline artifact, exactly the confusion section 1
+  of the authority warns about.
+- Authority copy committed first, as the authority-before-drafting ordering
+  proof: `studies/study3/prompts/study3_p0_feasibility_pilot_authority.md`,
+  29,282 bytes, LF only, no trailing newline, sha256
+  `80efc7ef8bfe5e3b5e5235f530a44730f185187aa52b85945875fe68ef1eda11`.
+- Frozen corpus published before any tokenizer call: 35 contrast cells, 70
+  rendered members, aggregate prompt digest recorded in
+  `studies/study3/pilot/p0/corpus/p0_corpus_manifest.json`.
+- Registered targeted suites retained their published pass counts: 276
+  design/rendering passes and 88 v0.4-review passes.
+- New module `tests/test_study3_p0_feasibility_pilot.py` adds 105 passes,
+  including a negative test for every fail-closed transition.
+- Operation counters at publication: tokenizer sequences 0, model downloads 0,
+  weight loads 0, prefill evaluations 0, incremental decode evaluations 0,
+  generation calls 0, scored rows 0, GPU jobs 0, provider calls 0, seeds 0,
+  bank rows 0, positive-reference operations 0.
+
+Azure resources touched: **none**. The registered container route
+(`rg-jspace-observation-sea`, ACR `acrjspaceobssea0708231738`, Container Apps
+environments with a `gpu-t4` workload profile) was inspected read-only to confirm
+the route exists before registering the round. No image was built, no job was
+created and no job was started.

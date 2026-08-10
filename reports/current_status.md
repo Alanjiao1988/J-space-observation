@@ -1,8 +1,31 @@
 # Project Status Report
 
+> **STUDY 3-P0 FEASIBILITY PILOT REGISTERED - AWAITING THE TOKENIZER GATE**
+>
+> State: `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE`
+>
+> Disposition: one physically isolated, tightly capped feasibility pilot is registered on the
+> already named target roles `RT`, `RL` and `RI`. It tests only whether the registered rendering,
+> tokenization, scoring, parsing, execution, accounting and resource pipeline is **runnable**.
+> `formal_execution_authorized = false` throughout, and `p0_pilot_execution_authorized` covers only
+> the operations and caps in
+> `studies/study3/prompts/study3_p0_feasibility_pilot_authority.md`.
+>
+> No model operation has been performed: no tokenizer constructed, no checkpoint downloaded, no
+> weight loaded, no GPU allocated. Every P0 counter is zero. P0 measurements are
+> methods-feasibility observations, never Study 3 evidence, and live in a separate cumulative
+> pilot counter namespace. `OD2`, `UR-22` and every `RP` object remain unresolved and untouched;
+> no seed, bank, interface selection, winner or evidence row exists; `paper/evidence_ledger.csv`
+> remains byte-identical through `EV-0016`.
+>
+> The successor is **not** another pilot and **not** immediate formal execution: it is a
+> fresh-session operator calibration round, after which any surviving candidate must receive one
+> focused, fresh-session independent methods review before freeze, seed draw, bank construction,
+> formal model execution or confirmation.
+
 > **STUDY 3 DRAFT-V0.5 BOUNDED AMENDMENT PUBLISHED - AWAITING A FOURTH INDEPENDENT METHODS REVIEW**
 >
-> State: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`
+> State (superseded as the active state by the P0 round above, and otherwise unchanged): `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`
 >
 > Disposition: `STUDY3_DRAFT_V0_5_BOUNDED_AMENDMENT_PUBLISHED_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`.
 >

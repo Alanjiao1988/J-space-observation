@@ -1,8 +1,28 @@
 # Study 3 - Interface Adequacy and Label-Binding Calibration
 
+> **STUDY 3-P0 FEASIBILITY PILOT REGISTERED - AWAITING THE TOKENIZER GATE**
+>
+> **State:** `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE`
+>
+> A narrow operator decision supersedes draft-v0.5's clause naming a fourth independent methods
+> review as the only legal successor, and authorizes **one** physically isolated, tightly capped
+> feasibility pilot on the already named target roles `RT`, `RL` and `RI`. The pilot tests only
+> whether the registered rendering, tokenization, scoring, parsing, execution, accounting and
+> resource pipeline is **runnable**. See
+> [`pilot/p0/README.md`](pilot/p0/README.md) and
+> [`prompts/study3_p0_feasibility_pilot_authority.md`](prompts/study3_p0_feasibility_pilot_authority.md).
+>
+> `formal_execution_authorized = false` throughout. draft-v0.5 remains an **unreviewed, unfrozen
+> candidate protocol**; P0 does not declare it correct, does not reverse or relabel any prior
+> review disposition, and does **not** waive the final independent methods review. P0 measurements
+> are methods-feasibility observations, never Study 3 evidence, and are counted in a separate,
+> cumulative, non-resettable pilot namespace. `OD2`, `UR-22` and every `RP` object remain
+> unresolved and untouched; no seed, bank, winner or evidence row exists; the evidence ledger
+> remains byte-identical through `EV-0016`.
+
 > **Study 3 draft-v0.5 bounded operator amendment - published, awaiting a FOURTH independent methods review**
 >
-> **State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`
+> **State (superseded as the active state by the P0 round above, and otherwise unchanged):** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`
 >
 > draft-v0.5 answers the ten `S3MR3-*` findings of the third independent methods review. Its
 > blocking repair records `K6-SEP` as `not_applicable` for the option-less profiles `S2` and `S3`,
@@ -12,10 +32,12 @@
 > while `S1` stays at 43, so `m_max` remains 43 by derivation and the sizes `413`/`214`/`448` and
 > their pass counts reproduce.
 >
-> **The only legal next action is a fresh-session fourth bounded independent methods review of
-> published draft-v0.5, by a party that did not draft it.** Nothing is frozen, nothing is
-> authorized, every operation counter is zero, no bank or seed exists, no interface and no positive
-> reference is selected, and `OD2`, `UR-22` and the `RP` wrappers remain unresolved.
+> **The legal next action is the registered P0 feasibility pilot, after which a fresh-session
+> operator calibration round and then one focused fresh-session independent methods review of the
+> surviving candidate are required.** Nothing is frozen, nothing is
+> authorized for formal execution, every formal operation counter is zero, no bank or seed exists,
+> no interface and no positive reference is selected, and `OD2`, `UR-22` and the `RP` wrappers
+> remain unresolved.
 
 > **THIRD INDEPENDENT METHODS REVIEW COMPLETE - BOUNDED AMENDMENT REQUIRED**
 >

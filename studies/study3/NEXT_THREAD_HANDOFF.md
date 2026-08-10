@@ -1,8 +1,41 @@
 # Study 3 - next thread handoff
 
+> **STUDY 3-P0 FEASIBILITY PILOT REGISTERED - AWAITING THE TOKENIZER GATE**
+>
+> **State:** `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE`
+>
+> The next thread does **not** begin the fourth independent methods review, and does **not** begin
+> formal execution. A narrow operator decision authorizes one physically isolated, tightly capped
+> feasibility pilot first, on `RT`, `RL` and `RI` only. Read
+> [`prompts/study3_p0_feasibility_pilot_authority.md`](prompts/study3_p0_feasibility_pilot_authority.md)
+> and [`pilot/p0/README.md`](pilot/p0/README.md) before anything else.
+>
+> **What is already done.** The authority copy is committed byte-identically and precedes every P0
+> drafting artifact. The frozen corpus (35 contrast cells, 70 rendered members) is published before
+> any tokenizer call and is immutable. The P0 protocol, counter ontology, schemas, tokenizer-gate,
+> model-run, summarization and validation code, the digest-pinned container definition and 105
+> negative and positive tests are registered. Registered targeted suites retained 276
+> design/rendering and 88 v0.4-review passes.
+>
+> **What the next thread may do.** Exactly one thing: run stage **P0-T**, the CPU-only tokenizer and
+> renderer gate, in the registered Azure container route, from the exact published pre-execution
+> commit. If it passes, publish its result and receipt by non-force fast-forward and enter
+> `STUDY3_P0_TOKENIZER_GATE_PASSED_AWAITING_MODEL_PILOT`, then run stage **P0-M** as one Azure
+> containerized GPU job bound to that exact commit and tree.
+>
+> **What the next thread may not do.** Select an interface, set or revise a confirmatory threshold,
+> answer the research question, resolve `OD2` or `UR-22`, freeze Study 3, authorize formal
+> development or confirmation, draw a seed, build a bank, touch any `RP` object, write an evidence
+> row, or change any prompt, parser, scoring, tokenizer, item, allocation, checkpoint or dependency
+> in response to an observed P0 result.
+>
+> `formal_execution_authorized = false` throughout. P0 measurements are methods-feasibility
+> observations, never Study 3 evidence. `paper/evidence_ledger.csv` remains byte-identical through
+> `EV-0016`, and the original research question remains unanswered.
+
 > **Study 3 draft-v0.5 bounded operator amendment - published, awaiting a FOURTH independent methods review**
 >
-> **State:** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`
+> **State (superseded as the active state by the P0 round above, and otherwise unchanged):** `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_5_COMPLETE_AWAITING_FOURTH_INDEPENDENT_METHODS_REVIEW`
 >
 > draft-v0.5 answers the ten `S3MR3-*` findings of the third independent methods review. Its
 > blocking repair records `K6-SEP` as `not_applicable` for the option-less profiles `S2` and `S3`,

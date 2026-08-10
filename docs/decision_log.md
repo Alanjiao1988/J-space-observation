@@ -3613,3 +3613,58 @@ The original research question remains unanswered.
 **Disposition.** `PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW`.
 The sole legal successor is a fresh-session fourth independent methods review of
 published draft-v0.5 by a party that did not draft it.
+## 2026-08-10 — Study 3-P0: a narrowly superseding operator decision, and why it is not a shortcut
+
+The operator narrowly superseded the draft-v0.5 successor clause. draft-v0.5 had
+named a fourth independent methods review as its only legal successor and forbade
+every feasibility pilot. That ordering asked a reviewer to certify a rendering,
+tokenization, scoring and accounting pipeline that nobody had ever run. The
+decision preserves published draft-v0.5 as an unreviewed candidate protocol and
+authorizes one physically isolated, tightly capped feasibility pilot first.
+
+What the decision does **not** do matters as much as what it does. It does not
+declare draft-v0.5 correct, does not reverse, relabel, weaken or edit any prior
+review disposition or finding, and does not waive the final independent methods
+review. `formal_execution_authorized` stays `false` throughout.
+
+Three decisions were made while registering the round:
+
+- **P0 reimplements the renderer instead of importing the committed one.**
+  Section 2 of the authority asks whether an *independent* implementation can
+  instantiate the binding v0.5 registry without an unregistered wording,
+  punctuation, whitespace, ordering, escaping, placeholder or wrapper choice. A
+  renderer that imported `tests/test_study3_rendering_registry_v0_5.py` would
+  inherit that module's choices and could not answer the question. P0 therefore
+  writes `p0_renderer.py` from the registry alone, checks every emitted normative
+  string against its registered SHA-256 asset identity, and raises rather than
+  choosing wherever the registry is silent. The P0 test module then compares all
+  70 rendered members byte-for-byte against the committed fixture renderer. Byte
+  agreement between two independent implementations is the feasibility
+  observation; it is not a claim that draft-v0.5 is correct.
+
+- **The base-item identity carries the contrast *cell*, not just the contrast.**
+  The authority requires a distinct pilot identity per contrast cell and forbids
+  an identity crossing cells, while also requiring S4 to hold base identities
+  distinct from S1's for the same two K6 contrasts. Those two requirements are
+  simultaneously satisfiable only if the identity is qualified by profile, so the
+  registered namespace is `study3-p0-only/<tuple-class>/<profile>-<contrast>`.
+
+- **S3 is registered as a scoring rule, not a surface.** S3 rows carry their own
+  cell identity but are constructed with deliberately parallel semantic tuples,
+  so their prompt bytes are byte-identical to the matching S2 rows by
+  construction. That is what lets S3 reuse the captured S2 logit vector and add
+  exactly zero model evaluations, and it is asserted in both the corpus freezer
+  and the tokenizer gate.
+
+The corpus reconciles exactly with every registered cap: 35 contrast cells, 70
+rendered members, 180 non-generative prefill evaluations, 162/18/18/12 scored
+rows totalling 210, 228 sequence-level model-evaluation equivalents, and a K2
+smoke of exactly 60 prefill evaluations and 66 scored rows of which 6 are S3
+reuse rows. Those numbers are derived by the code and asserted by the tests
+rather than copied from the authority by hand.
+
+**No model operation has been performed.** No tokenizer has been constructed, no
+checkpoint downloaded, no weight loaded, no GPU allocated. Every P0 counter is
+zero. `OD2`, `UR-22` and every `RP` object remain unresolved and untouched, no
+seed or bank row exists, and `paper/evidence_ledger.csv` remains byte-identical
+through `EV-0016`.

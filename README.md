@@ -4,6 +4,18 @@
 
 ## 当前状态
 
+> **STUDY 3-P0 FEASIBILITY PILOT REGISTERED - AWAITING THE TOKENIZER GATE**
+>
+> State: `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE`
+>
+> 一项 narrow operator decision 取代了 draft-v0.5 中「第四次 independent methods review 是唯一合法后继」的条款，改为先授权**一次**物理隔离、严格设限的 feasibility pilot，仅在既有目标角色 `RT`、`RL`、`RI` 上进行，且**只**用于检验已注册的 rendering、tokenization、scoring、parsing、execution、accounting 与 resource pipeline 是否**可运行**。
+>
+> `formal_execution_authorized = false` 始终成立。draft-v0.5 仍是**未审阅、未冻结**的候选协议：P0 不宣称其正确，不推翻、不重贴标签、不削弱任何既往 review disposition，也**不豁免**最终的 independent methods review。P0 的测量是 methods-feasibility observation，**绝不是 Study 3 证据**，并记入独立、累计、不可重置的 pilot counter namespace。
+>
+> 尚未执行任何 model operation：未构造 tokenizer、未下载 checkpoint、未加载权重、未分配 GPU，所有 P0 counter 均为 0。`OD2`、`UR-22` 与全部 `RP` 对象仍未解决且未被触碰；不存在 seed、bank、interface 选择、winner 或 evidence row；`paper/evidence_ledger.csv` 保持逐字节不变，止于 `EV-0016`。
+>
+> 入口：[P0 协议与状态机](studies/study3/pilot/p0/README.md) · [operator authority](studies/study3/prompts/study3_p0_feasibility_pilot_authority.md) · [冻结语料 census](studies/study3/pilot/p0/corpus/p0_corpus_census.md)
+
 | Study | 状态 | 结论边界 | 入口 |
 |---|---|---|---|
 | Study 1 | `CLOSED / INSUFFICIENT_BEHAVIORAL_SUPPORT_FOR_VALIDITY` | 工程链和证据封存完成，但原始科学问题未被检验 | [Study 1 总结](studies/study1/README.md) |
