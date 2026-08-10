@@ -416,7 +416,13 @@ def _materialise_v0_4_recalculation_snapshot(root: Path) -> Path:
     """
     for relative in (RECALC_PY, RECALC_JSON,
                      "studies/study3/protocol/interface_calibration_protocol_draft.json",
-                     "studies/study3/analysis/design_statistics_tables.json"):
+                     "studies/study3/analysis/design_statistics_tables.json",
+                     # The recalculation statically audits the repaired v0.3 historical
+                     # harness and digests the immutable v0.3 recalculation pair, so those
+                     # three inputs belong to the snapshot too.
+                     "tests/test_study3_methods_review_v0_3.py",
+                     "studies/study3/analysis/independent_methods_recalculation_v0_3.py",
+                     "studies/study3/analysis/independent_methods_recalculation_tables_v0_3.json"):
         destination = root / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(_blob_at(PUBLICATION_COMMIT, relative))
