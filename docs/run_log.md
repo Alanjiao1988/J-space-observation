@@ -7097,3 +7097,101 @@ Terminal disposition, published exactly as emitted:
 
 Stage P0-M was not begun. `p0_pilot_execution_authorized` is now false: the
 one-shot authority is consumed.
+## 2026-08-10 - Study 3-P0 post-measurement validation of the published P0-T commit
+
+The authority requires a clean CPU-only ACR exact-commit validation after stage
+P0-T and again after any terminal stop. Stage P0-T had already executed and
+published, so this closing validation performed **zero** tokenizer, model
+download, weight load, GPU, prefill, decode and generation operations. It only
+re-ran committed tests against already published bytes. Every P0 counter is
+unchanged at its published value, and no frozen corpus, rendering, prompt,
+tokenizer revision, dependency, allocation, parser or scoring rule was touched.
+
+The state is unchanged and remains
+`STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE`. Stage P0-T did
+not pass, so `STUDY3_P0_TOKENIZER_GATE_PASSED_AWAITING_MODEL_PILOT` was not
+entered and stage P0-M was not begun.
+
+Validation of published commit `f42e3dba4440370654d24cea41907399c2e088c5`, tree
+`6993b1bfd3e1c66aa01399c6da0d829a44fcce23`, with `DIRTY=0` reported by every
+run:
+
+| ACR run | Scope | Result |
+| --- | --- | --- |
+| `cmem` | `tests/test_study3_p0_feasibility_pilot.py` | 122 passed |
+| `cmep` | `tests/test_study3_design.py` | 240 passed |
+| `cmer` | `tests/test_study3_rendering_registry_v0_5.py` | 36 passed |
+| `cmeq` | `tests/test_study3_methods_review_v0_4.py` | 88 passed |
+| `cmen` | full repository suite | 4,263 passed, 15 skipped, exactly the two registered historical `test_parser_v3_seal_job` failures, `FULL_SUITE_ACCEPTED_HISTORICAL_FAILURES_ONLY=1` |
+
+This record is itself a repository change, so the commit carrying it was
+validated the same way before publication. On candidate
+`3f1f17316ae60a8c8a9d2e1a923564dc400364f0`, tree
+`2a4296e5e6cf9940cb1b7b6ea12aedf6c9b8a685`, `DIRTY=0`: run `cmet` re-ran
+`tests/test_study3_p0_feasibility_pilot.py` at 122 passed, and run `cmes` re-ran
+the full repository suite at 4,263 passed, 15 skipped and the same two registered
+historical failures, `FULL_SUITE_ACCEPTED_HISTORICAL_FAILURES_ONLY=1`. That
+candidate was then amended to carry these two run IDs, so the published commit
+`4029897a4ece8f4bb35d3cea726fbcf69ef18984`, tree
+`18cb3e35a78d2f5bf3eb311de7c0beab25bdcf62`, `DIRTY=0`, was revalidated in turn:
+run `cmev` at 122 passed and run `cmeu` at 4,263 passed, 15 skipped and the same
+two registered historical failures. All four candidate runs performed zero
+tokenizer and zero model operations.
+
+Recording a validation run ID inside the very file the run validates cannot
+terminate: each amendment produces a new tree that the recorded runs did not
+cover. The regress is therefore cut here by rule. This entry records the
+validation lineage up to the tree above; the published commit's own final
+validation runs are reported in the completion handoff for this round rather
+than written back into this file. They are the same two scopes, on the exact
+published commit, and they are subject to the same requirement: 122 passes for
+the P0 module, and 4,263 passed with 15 skipped and only the two registered
+historical failures for the full suite.
+
+Reconciliation: 4,141 baseline passes + 122 net-new P0 passes = 4,263. The P0
+module grew from the 109 passes recorded at the pre-execution commit to 122 at
+the published head, because the stage P0-T harness commits added transport,
+content-binding and LF regression tests. The registered targeted suites retained
+240 + 36 = 276 design/rendering passes and 88 v0.4-review passes. Skips remain
+15, and the only failures are the same two historical node IDs with unchanged
+signatures.
+
+Counter reconciliation against the published result document: planned encoded
+sequences 4,956 equals the observed cumulative counter 4,956, and 4,902 member
+encodes plus 54 candidate-surface encodes = 4,956 against a cap of 10,000. The
+census holds 2,465 records, of which 14 are structural absence with no members,
+leaving 2,451 tokenized rows. `s2_s3_parity_mismatches` is empty,
+`structural_absence_violations` is empty, `model_operations_performed` is 0 and
+`dry_run` is false. The eligibility matrix holds 39 rows with zero collision
+rows anywhere: 27 `S1` cells ineligible with empty reason lists, which is the
+disclosed classifier defect, 6 `S2`/`S3` cells ineligible with the explicit
+registered reason, and 6 eligible `S4` cells.
+
+Artifact identities reproduce byte-exactly against `paper/artifact_index.csv`:
+`AR-0319` result `9603b611...` at 5,820,022 bytes, `AR-0320` receipt
+`0b28fbe6...` at 7,934 bytes, and `AR-0321` disposition `9d6a6508...` at 7,850
+bytes.
+
+Lineage and ordering re-proved from Git rather than restated: baseline
+`5b15e0ed` and pre-execution commit `6be3ecac` are both ancestors of the
+published head; bound commit `d331b3e7` carries tree
+`395a5676c1fd481ee20885eedce8b83024555ece`, exactly as the disposition records;
+the authority commit `59ebaeae` precedes the first P0 drafting artifact
+`99c97f33`; and the frozen corpus was published at `99c97f33`
+(2026-08-10 11:01:18 +0800), before the first tokenizer call of run
+`20260810T053804Z` (2026-08-10 13:38:04 +0800).
+
+Protected-byte audit over the whole baseline-to-head diff: 36 changed paths, all
+inside the authorized allowlist, no path removed, and zero changes among the 169
+audited protected objects. `paper/evidence_ledger.csv` is byte-identical to the
+baseline at blob `e53b9aa5...`, still ends at `EV-0016` and contains no
+`EV-0017`. The committed authority remains 29,282 bytes, LF only, no trailing
+newline, sha256
+`80efc7ef8bfe5e3b5e5235f530a44730f185187aa52b85945875fe68ef1eda11`.
+
+Provenance disclosure, recorded once above at registration and repeated here for
+the audit trail: the committed 29,282-byte authority is the operative authority.
+It is semantically identical to the original external draft after deterministic
+removal of Markdown syntax, table separator lines and whitespace, but it is not
+byte-identical to that external draft. This is transport-format normalization,
+not a scientific change, and the committed authority bytes are unchanged.
