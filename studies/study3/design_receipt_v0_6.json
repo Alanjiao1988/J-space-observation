@@ -68,7 +68,7 @@
    "why": "the v0.5 condition was stated for a jointly single-token answer domain, which the pinned tokenizers do not provide. The condition is restated at the discriminant position so that it is true of the surface actually registered"
   }
  },
- "changed_path_count": 44,
+ "changed_path_count": 41,
  "changed_path_note": "this receipt itself is the remaining authorized changed path and cannot record its own digest",
  "changed_paths": [
   "README.md",
@@ -104,9 +104,6 @@
   "studies/study3/pilot/p0_r1/p0_r1_summarize.py",
   "studies/study3/pilot/p0_r1/p0_r1_validate.py",
   "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
-  "studies/study3/protocol/interface_calibration_protocol.schema.json",
-  "studies/study3/protocol/interface_calibration_protocol_draft.json",
-  "studies/study3/protocol/interface_calibration_protocol_draft.md",
   "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
   "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json",
   "studies/study3/reviews/v0_6_operator_amendment.json",
