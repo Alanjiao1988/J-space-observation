@@ -864,18 +864,33 @@ def test_the_receipt_binds_authority_candidate_corpus_and_code(receipt):
 
 
 def test_the_p0_r1_package_never_edits_the_consumed_p0_namespace():
+    """The successor package may protect the old harness; it may never drive it.
+
+    Naming ``p0_tokenizer_gate.py`` in a byte-protected path list is exactly the
+    behaviour section 9 requires, so the guard targets imports and calls of the
+    historical classifier rather than any mention of its file name.
+    """
     for name in sorted(os.listdir(P0_R1_DIR)):
         if not name.endswith(".py"):
             continue
         source = open(os.path.join(P0_R1_DIR, name), encoding="utf-8").read()
-        stripped = source.replace("p0_tokenizer_gate_result", "").replace(
-            "p0_tokenizer_gate_receipt", "")
-        assert "p0_tokenizer_gate" not in stripped, (
-            "%s imports or drives the historical buggy classifier" % name)
-    runner = open(os.path.join(P0_R1_DIR, "p0_r1_model_runner.py"),
-                  encoding="utf-8").read()
-    assert "import p0_tokenizer_gate" not in runner
-    assert "evaluate_eligibility" not in runner
+        for forbidden in ("import p0_tokenizer_gate",
+                          "from p0_tokenizer_gate",
+                          "evaluate_eligibility",
+                          "executable_contrast_per_role"):
+            assert forbidden not in source, (
+                "%s drives the historical buggy classifier via %r"
+                % (name, forbidden))
+        # An attribute access on the historical module, as opposed to the file
+        # name appearing inside a protected-path string.
+        assert re.search(r"p0_tokenizer_gate\.(?!py\b)", source) is None, (
+            "%s calls into the historical buggy classifier" % name)
+
+    protocol = open(os.path.join(P0_R1_DIR, "p0_r1_protocol.py"),
+                    encoding="utf-8").read()
+    assert "studies/study3/pilot/p0/p0_tokenizer_gate.py" in protocol, (
+        "the historical harness must be listed as a byte-protected path")
+    assert "tests/test_study3_p0_feasibility_pilot.py" in protocol
 
 
 def test_the_registered_caps_and_allocation_are_unchanged(p0_r1_protocol):

@@ -1,0 +1,414 @@
+{
+ "all_independent_reviews_remain_valid_rejections": true,
+ "authority": {
+  "bytes": 19632,
+  "committed_byte_identically": true,
+  "cr_count": 0,
+  "ends_with_newline": false,
+  "lf_count": 375,
+  "path": "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+  "sha256": "f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2"
+ },
+ "authority_flags": {
+  "bank_authorized": false,
+  "confirmation_access_authorized": false,
+  "execution_authorized": false,
+  "frozen": false,
+  "model_operations_authorized": false,
+  "p0_r1_pilot_execution_authorized": true,
+  "p0_r1_pilot_execution_consumed": false,
+  "positive_reference_selected": false,
+  "seed_authorized": false,
+  "winner_selected": false
+ },
+ "bank_rows": [],
+ "closure_matrix_v0_6": [
+  {
+   "affected_derived_fields": [
+    "studies/study3/analysis/scoring_boundary_v0_6_tables.json :: token_accounting",
+    "studies/study3/analysis/scoring_boundary_v0_6_tables.json :: replay_derivation",
+    "studies/study3/analysis/p0_r1_corrected_eligibility_tables.json :: factorization"
+   ],
+   "affected_normative_fields": [
+    "interface_calibration_rendering_registry_v0_6.json :: scoring_boundary",
+    "interface_calibration_rendering_registry_v0_6.json :: profiles[S2|S3].scoring_boundary",
+    "interface_calibration_rendering_registry_v0_6.json :: token_accounting"
+   ],
+   "closure_status": "RESOLVED_BY_FIRST_DISCRIMINATIVE_TOKEN_REGISTRATION",
+   "committed_tests": [
+    "tests/test_study3_rendering_registry_v0_6.py :: test_the_first_discriminative_token_rule_is_registered_exactly",
+    "tests/test_study3_rendering_registry_v0_6.py :: test_the_five_eligibility_conditions_are_registered",
+    "tests/test_study3_rendering_registry_v0_6.py :: test_the_token_identities_are_derived_with_zero_encodes",
+    "tests/test_study3_p0_r1_registration.py :: test_every_section_3_2_condition_holds_for_every_pinned_role",
+    "tests/test_study3_p0_r1_registration.py :: test_the_live_scoring_plan_matches_the_registered_boundary"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+   "finding_id": "S3P0T-001",
+   "negative_mutations": [
+    "one S2/S3 candidate lacks the common prefix",
+    "one candidate has a different prefix",
+    "one candidate has a third token",
+    "two discriminant token IDs collide",
+    "the prefix does not decode to exactly one U+0020",
+    "a digit token maps to the wrong complete candidate surface",
+    "scoring reads logits before rather than after the common prefix"
+   ],
+   "original_severity": "BLOCKING",
+   "original_title": "The registered S2/S3 single-position restricted-logit rule is not implementable under any pinned role tokenizer, because each complete candidate surface is two tokens",
+   "repair": "The visible answer surface is preserved exactly. The answer cue remains 'Answer:' with no trailing whitespace, and each complete candidate surface remains one U+0020 followed by one registered digit. What changes is where the decision statistic is read. Every complete S2/S3 candidate factors as candidate_d = common_prefix || discriminant_d. The scoring context is the registered prompt token IDs followed by the verified common-prefix token, formed by concatenation and never by re-encoding a concatenated string. One ordinary prefill evaluation is performed on that context and the next-token logit vector is read only at the ten verified discriminant token IDs. The deterministic restricted argmax is mapped back to the complete registered candidate surface. The common prefix is a teacher-forced candidate prefix: it is not a prompt-rendering change, not a generated token and not a separate sequence-level model evaluation. S3 reuses the exact S2 discriminant-position logit vector on CPU and adds zero model evaluations.",
+   "repair_kind": "method",
+   "residual_limitation": "The registration holds for the three currently pinned role tokenizers, and only for them. The equivalence is claimed for candidates of equal two-token length sharing one common prefix under a deterministic argmax; it is not extended to arbitrary multi-token candidates, unequal lengths, non-common prefixes, summed log probabilities, free generation or any tokenizer that is not separately pinned and verified.",
+   "self_approved": false,
+   "starting_evidence": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json, candidate_token_eligibility[RT|RL|RI].s2, published at commit d331b3e774168eec99ad849e983bfe021aebc464",
+   "verification": "the common-prefix token and the ten discriminant token IDs are DERIVED from the immutable published P0-T result and the frozen corpus by studies/study3/pilot/p0_r1/p0_r1_factorization.py, which performs zero tokenizer encodes and imports no tokenizer library. The derivation recovers the byte string each token contributes by solving, over 70 published (prompt, token-ID) pairs per role, for a segmentation consistent with every sequence; the common-prefix token and each discriminant token are required to be UNIQUELY determined by that evidence. The result is common prefix 220 carrying exactly one U+0020 and discriminants 15 through 24 carrying '0' through '9', identically for RT, RL and RI. A committed test asserts that no member of {220, 15..24} appears as a numeric literal anywhere in the verifier, so the identities cannot have been transcribed.",
+   "where": [
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json :: scoring_boundary.first_discriminative_token_rule",
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json :: profiles[S2].scoring_boundary",
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json :: profiles[S3].scoring_boundary",
+    "studies/study3/pilot/p0_r1/p0_r1_model_runner.py :: build_scoring_plan, validate_scoring_plan, score_from_logits"
+   ]
+  },
+  {
+   "affected_derived_fields": [
+    "studies/study3/analysis/p0_r1_corrected_eligibility_tables.json :: corrected_matrix",
+    "studies/study3/analysis/p0_r1_corrected_eligibility_tables.json :: classifier_repair_only_under_the_v0_5_rule",
+    "studies/study3/analysis/p0_r1_corrected_eligibility_tables.json :: cells_repaired_from_an_empty_reason_list"
+   ],
+   "affected_normative_fields": [
+    "studies/study3/pilot/p0_r1/p0_r1_protocol.json :: eligibility",
+    "studies/study3/pilot/p0_r1/p0_r1_protocol.json :: state_machine.states"
+   ],
+   "closure_status": "RESOLVED_BY_NARROWEST_KEY_RECLASSIFICATION_AND_A_VERSIONED_SUCCESSOR",
+   "committed_tests": [
+    "tests/test_study3_p0_r1_registration.py :: test_the_corrected_matrix_has_no_empty_reason_ineligible_row",
+    "tests/test_study3_p0_r1_registration.py :: test_the_corrected_matrix_repairs_the_published_propagation_defect",
+    "tests/test_study3_p0_r1_registration.py :: test_every_target_role_retains_an_executable_genuine_i3_contrast",
+    "tests/test_study3_p0_r1_registration.py :: test_structural_absence_is_never_instantiated_or_counted",
+    "tests/test_study3_p0_r1_registration.py :: test_the_stop_label_is_unambiguous_and_the_old_one_is_historical"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+   "finding_id": "S3P0T-002",
+   "negative_mutations": [
+    "an S2 failure propagates to S1",
+    "an S1 failure propagates to S2/S3",
+    "one role's failure propagates to another",
+    "an ineligible row has no reason",
+    "S4 satisfies target-role executability",
+    "a not_applicable row is instantiated or counted"
+   ],
+   "original_severity": "BLOCKING",
+   "original_title": "The P0-T eligibility classifier consulted a role-level flag and propagated a role-level S2 failure onto 27 mechanically valid S1 cells, producing ineligible rows with empty reason lists and an over-severe terminal state",
+   "repair": "A versioned successor classifier computes eligibility at the narrowest applicable key: candidate-surface eligibility at role x profile, presentation-pair distinctness at role x profile x contrast, structural absence at profile x contrast, and target-role executability at role. Every reason carries its own scope, and the production validator rejects any reason whose scope is not a prefix of the cell it is attached to, so a failure cannot cross a profile, a role or a contrast. An ineligible row with an empty reason list is a validator failure rather than an output. S4 is diagnostic-only and can never satisfy target-role executability. not_applicable is structural absence and is never instantiated, never eligible, never ineligible, never a pass, never a zero, never a denominator row and never robustness evidence. The historical P0-T result is not edited: the correction is computed in a new derived view.",
+   "repair_kind": "method",
+   "residual_limitation": "The corrected matrix is a derived view over immutable historical observations. It does not re-run the census, does not create new encodes and does not rewrite the emitted historical terminal state, which remains attached to the consumed P0-T result as historical text.",
+   "self_approved": false,
+   "starting_evidence": "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md, section 'A defect in the gate itself, disclosed rather than repaired', and eligibility_matrix in the published result",
+   "verification": "replaying the immutable P0-T records through the successor classifier reproduces 39 cells. Under the classifier repair ALONE, with the draft-v0.5 scoring rule unchanged, 33 cells are eligible and 6 are ineligible: 3 S2 and 3 S3 cells, each carrying an explicit local reason rather than an empty list, 0 S1 cells ineligible, and each of RT, RL and RI retains exactly NINE executable genuine I3 contrasts. That confirms, mechanically, that the emitted historical terminal state was over-severe. Under the draft-v0.6 scoring boundary as well, all 39 cells are eligible and each role retains ELEVEN executable genuine I3 contrasts, nine under S1 and one each under S2 and S3. 27 cells that the historical result recorded as INELIGIBLE_TOKEN_IDS with an empty reason list are repaired, and all 27 are S1 cells.",
+   "where": [
+    "studies/study3/pilot/p0_r1/p0_r1_eligibility.py :: build_matrix, validate_matrix, target_role_executability",
+    "studies/study3/pilot/p0_r1/p0_r1_replay_gate.py :: derive, derive_classifier_repair_only"
+   ]
+  },
+  {
+   "affected_derived_fields": [
+    "studies/study3/pilot/p0_r1/p0_r1_protocol.json :: state_machine"
+   ],
+   "affected_normative_fields": [
+    "studies/study3/pilot/p0_r1/p0_r1_protocol.json :: eligibility.stop_label"
+   ],
+   "closure_status": "RESOLVED_BY_AN_UNAMBIGUOUS_SUCCESSOR_LABEL",
+   "committed_tests": [
+    "tests/test_study3_p0_r1_registration.py :: test_the_stop_label_is_unambiguous_and_the_old_one_is_historical"
+   ],
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+   "finding_id": "S3P0T-003",
+   "negative_mutations": [
+    "the historical result, receipt, disposition or P0 counter is edited"
+   ],
+   "original_severity": "MAJOR",
+   "original_title": "The terminal label STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE reads as a universal quantifier over roles, while its registered semantics are existential",
+   "repair": "The successor stop label is STUDY3_P0_R1_STOPPED_SOME_TARGET_ROLE_HAS_NO_EXECUTABLE_GENUINE_I3_CONTRAST, whose registered semantics are 'one or more target roles has no executable genuine I3 contrast'. The old label is preserved only as historical text attached to the consumed P0-T result. It is never emitted again and never rewritten in place.",
+   "repair_kind": "presentation",
+   "residual_limitation": "The historical label remains in the published P0-T result, receipt, disposition, run log and status report, where it is a true record of what was emitted.",
+   "self_approved": false,
+   "starting_evidence": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json :: state",
+   "verification": "the successor label and its semantics are registered in the P0-R1 protocol state machine, the historical label is carried alongside with an explicit historical-only status, and no byte of the consumed P0 namespace changed.",
+   "where": [
+    "studies/study3/pilot/p0_r1/p0_r1_eligibility.py :: STOP_SOME_ROLE_HAS_NO_EXECUTABLE_CONTRAST",
+    "studies/study3/pilot/p0_r1/p0_r1_protocol.py :: STATES"
+   ]
+  }
+ ],
+ "derived_quantity_changes": {
+  "changed_and_separately_surfaced": [
+   {
+    "development_projection_effect": "5,001 additional tokens processed; 0 additional sequence-level model evaluations",
+    "field": "S2/S3 scoring_context_token_count",
+    "from": "registered_prompt_token_count",
+    "p0_r1_effect": "18 additional tokens processed across the 18 S2 rows; 0 additional sequence-level model evaluations",
+    "to": "registered_prompt_token_count + 1",
+    "why": "the complete candidate is two tokens and its common prefix is teacher-forced into the scoring context"
+   },
+   {
+    "field": "S3 zero-incremental-cost condition",
+    "from": "a jointly single-token registered answer domain",
+    "numeric_effect": "none; S3 incremental rendered rows, scored rows and sequence-level evaluations all remain 0",
+    "to": "a registered answer domain whose complete candidates share one common prefix token and differ in exactly one discriminant token, rescored from the identical S2 scoring context",
+    "why": "the v0.5 condition was stated for a jointly single-token answer domain, which the pinned tokenizers do not provide. The condition is restated at the discriminant position so that it is true of the surface actually registered"
+   }
+  ],
+  "no_number_preserved_for_continuity": true,
+  "unchanged_by_derivation": {
+   "confirmation_pass_counts": {
+    "I1_I3_joint_correctness_floor": 388,
+    "I2_headroom_floor": 127,
+    "I4_positive_reference_floor": 381
+   },
+   "development_pass_counts": {
+    "I1_I3_joint_correctness_floor": 389,
+    "I2_headroom_floor": 129,
+    "I4_positive_reference_floor": 383
+   },
+   "development_sizes": {
+    "I1_I3_joint_correctness_floor": 413,
+    "I2_headroom_floor": 214,
+    "I4_positive_reference_floor": 448
+   },
+   "m_max": 43,
+   "per_cell_false_negative_budget_exact_rational": "19/17200",
+   "per_cell_power_target_exact_rational": "17181/17200",
+   "profile_stage_power_floor_exact_rational": "381/400",
+   "sequence_level_development_projection": 31065,
+   "study_end_to_end_power_floor_exact_rational": "9/10",
+   "total_gate_bearing_cells": {
+    "S1": 43,
+    "S2": 16,
+    "S3": 16,
+    "S4": 12
+   },
+   "why_nothing_moves": "the new boundary changes where one logit vector is read and adds one teacher-forced token to the S2 scoring context. It changes no cell, no contrast applicability, no independent unit, no null, no alternative, no alpha and no decision rule, so no sample size, pass count, budget, floor or projection is mathematically required to move. Every value above is RECOMPUTED from studies/study3/analysis/design_statistics.py at derivation time and compared, never copied forward."
+  }
+ },
+ "document_class": "operator_amendment_record",
+ "equivalence_proof": {
+  "consequence": "argmax_d P(u, v_d | x) = argmax_d P(v_d | x, u)",
+  "does_not_extend_to": [
+   "arbitrary multi-token candidates",
+   "candidates of unequal length",
+   "candidates without a common prefix",
+   "summed or length-normalised log probabilities",
+   "free generation",
+   "any tokenizer that is not separately pinned and verified"
+  ],
+  "identity": "P(u, v_d | x) = P(u | x) * P(v_d | x, u)",
+  "mechanically_asserted_by": "studies/study3/pilot/p0_r1/p0_r1_factorization.py :: assert_ranking_equivalence, called on every scored two-token row by p0_r1_model_runner.score_from_logits",
+  "valid_because": [
+   "the registered decision statistic is a deterministic argmax over a closed ten-member candidate set",
+   "all ten candidates have the same two-token structure",
+   "all ten candidates share the identical common prefix token u",
+   "the registered digit-order tie break is preserved unchanged"
+  ],
+  "why_exact": "P(u | x) does not depend on d, so it is a strictly positive common factor of all ten complete-candidate probabilities and cancels from the ranking. This is an exact factor cancellation, not an approximation"
+ },
+ "evidence_rows": [],
+ "facts_accepted_from_the_consumed_p0_t_round": {
+  "historical_state": "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE",
+  "historical_state_is_not_rewritten": true,
+  "immutable_artifacts": [
+   "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
+   "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
+   "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md"
+  ],
+  "no_p0_t_encode_is_repeated_in_this_round": true,
+  "observations": [
+   "all 4,902 member encodes round-tripped byte-exactly",
+   "every applicable byte-distinct presentation pair had distinct full token-ID sequences for RT, RL and RI",
+   "S1 label surfaces were distinct single tokens under both alphabets for all three roles",
+   "S2 and S3 had exact prompt/token parity and K6-SEP was structurally absent",
+   "each S2/S3 candidate surface ' 0' through ' 9' encoded as exactly two tokens, [220, digit], with the same first token and ten pairwise-distinct second tokens 15 through 24 for all three roles",
+   "no model download, weight load, GPU job, forward pass, decode, generation or scored row occurred"
+  ],
+  "the_4956_historical_encodes_remain_cumulative_and_non_resettable": true
+ },
+ "immutable_objects_not_edited": [
+  "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
+  "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
+  "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+  "studies/study3/pilot/p0/corpus/p0_corpus.json",
+  "studies/study3/pilot/p0/corpus/p0_corpus_manifest.json",
+  "studies/study3/pilot/p0/corpus/p0_corpus_census.md",
+  "studies/study3/pilot/p0/p0_tokenizer_gate.py",
+  "studies/study3/pilot/p0/p0_protocol.json",
+  "studies/study3/pilot/p0/p0_protocol.py",
+  "studies/study3/pilot/p0/p0_counters.py",
+  "studies/study3/pilot/p0/p0_corpus.py",
+  "studies/study3/pilot/p0/p0_renderer.py",
+  "studies/study3/pilot/p0/p0_model_pilot.py",
+  "studies/study3/pilot/p0/p0_parser.py",
+  "studies/study3/pilot/p0/p0_summarize.py",
+  "studies/study3/pilot/p0/p0_transport.py",
+  "studies/study3/pilot/p0/p0_validate.py",
+  "studies/study3/pilot/p0/p0_freeze_corpus.py",
+  "studies/study3/pilot/p0/p0_image_verify.py",
+  "studies/study3/pilot/p0/README.md",
+  "studies/study3/pilot/p0/container/Dockerfile.study3-p0",
+  "studies/study3/pilot/p0/container/p0_t_acr_task.yaml",
+  "studies/study3/pilot/p0/container/p0_t_checkout.sh",
+  "studies/study3/pilot/p0/container/p0_t_stage.sh",
+  "studies/study3/pilot/p0/container/requirements-study3-p0.txt",
+  "tests/test_study3_p0_feasibility_pilot.py",
+  "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.json",
+  "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.schema.json",
+  "studies/study3/reviews/v0_5_operator_amendment.json",
+  "studies/study3/reviews/v0_5_operator_amendment.md",
+  "studies/study3/reviews/v0_5_operator_amendment.schema.json",
+  "studies/study3/design_receipt_v0_5.json",
+  "studies/study3/analysis/independent_methods_review_packet_v0_5.md",
+  "studies/study3/analysis/design_statistics.py",
+  "studies/study3/analysis/design_statistics_tables.json",
+  "studies/study3/prompts/study3_p0_feasibility_pilot_authority.md",
+  "studies/study3/prompts/study3_v0_5_design_amendment_authority.md",
+  "tests/test_study3_design.py",
+  "tests/test_study3_rendering_registry_v0_5.py",
+  "tests/test_study3_methods_review.py",
+  "tests/test_study3_methods_review_v0_3.py",
+  "tests/test_study3_methods_review_v0_4.py",
+  "paper/evidence_ledger.csv"
+ ],
+ "next_legal_action": "one fresh, focused final methods review of draft-v0.6, conducted in a fresh session by a party that did not draft draft-v0.6, limited to the first-discriminative-token factorization, the classifier repair, the affected accounting and the consistency of the resulting candidate; and, separately and independently, the P0-R1 replay gate followed by the repaired model pilot, continued from the published P0-R1 registration commit",
+ "no_review_artifact_was_edited": true,
+ "operation_counters": {
+  "bank_rows_created": 0,
+  "checkpoint_downloads": 0,
+  "confirmation_reads": 0,
+  "evidence_rows_added": 0,
+  "forward_passes": 0,
+  "generations": 0,
+  "gpu_jobs": 0,
+  "logit_reads": 0,
+  "model_weight_loads": 0,
+  "parser_calls": 0,
+  "seeds_drawn": 0,
+  "tokenizer_calls": 0,
+  "tokenizer_encodes": 0
+ },
+ "operator_decisions_in_this_round": [
+  {
+   "blocking": true,
+   "decision": "PRESERVE_THE_VISIBLE_ANSWER_SURFACE_UNCHANGED",
+   "detail": "the answer cue stays 'Answer:' with no trailing whitespace; the complete candidate surfaces stay ' 0' through ' 9', each with exactly one leading U+0020; S1 rendering and scoring bytes are unchanged; S4 rendering, wrapper, parser and diagnostic-only status are unchanged. The space was not removed, not moved into the global answer cue, and the numeric answers were not changed to letters.",
+   "id": "OD-V06-1",
+   "kind": "design_choice",
+   "status": "registered"
+  },
+  {
+   "blocking": true,
+   "decision": "REGISTER_FIRST_DISCRIMINATIVE_TOKEN_SCORING_FOR_S2_AND_S3",
+   "detail": "candidate_d = common_prefix || discriminant_d, with five registered eligibility conditions and an exact ranking-equivalence proof.",
+   "id": "OD-V06-2",
+   "kind": "design_choice",
+   "status": "registered"
+  },
+  {
+   "blocking": true,
+   "decision": "DERIVE_AND_VERIFY_THE_TOKEN_IDENTITIES_RATHER_THAN_TRANSCRIBE_THEM",
+   "detail": "the common-prefix token and the ten discriminant token IDs are recovered from the immutable published P0-T result and the frozen corpus with zero tokenizer encodes, and are required to be uniquely determined by that evidence.",
+   "id": "OD-V06-3",
+   "kind": "method",
+   "status": "registered"
+  },
+  {
+   "blocking": true,
+   "decision": "REPAIR_ELIGIBILITY_IN_A_VERSIONED_SUCCESSOR_CLASSIFIER",
+   "detail": "a new derived view corrects the algorithm; the old view is never edited in place.",
+   "id": "OD-V06-4",
+   "kind": "method",
+   "status": "registered"
+  },
+  {
+   "blocking": false,
+   "decision": "REGISTER_BUT_DO_NOT_EXECUTE_P0_R1",
+   "detail": "the continuation is registered under studies/study3/pilot/p0_r1/ and awaits its replay gate in a fresh successor session.",
+   "id": "OD-V06-5",
+   "kind": "scope",
+   "status": "registered"
+  },
+  {
+   "blocking": false,
+   "decision": "RETAIN_THE_ORIGINAL_P0_M_ALLOCATION_AND_MAXIMA",
+   "detail": "code-derived accounting shows no strictly smaller maximum, so 60/180 prefills, 12 S4 generations at 4 new tokens, 228 sequence-level equivalents and 162/18/18/12 = 210 scored rows are retained unchanged. The extra common-prefix token changes token processing, not the number of sequence-level prefill evaluations.",
+   "id": "OD-V06-6",
+   "kind": "scope",
+   "status": "registered"
+  }
+ ],
+ "party": "the operator authority holding studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+ "responds_to": "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+ "results": [],
+ "round": "Study 3 draft-v0.6 scoring-boundary calibration and P0-R1 registration",
+ "schema_version": "study3_operator_amendment_v0_6",
+ "scope_boundary": {
+  "accesses_confirmation_material": false,
+  "authorizes_formal_execution": false,
+  "begins_the_final_focused_review": false,
+  "constructs_a_tokenizer": false,
+  "creates_a_seed_or_bank": false,
+  "creates_draft_v0_7": false,
+  "downloads_a_checkpoint": false,
+  "edits_any_byte_under_studies_study3_pilot_p0": false,
+  "executes_the_p0_r1_replay_gate": false,
+  "freezes_study3": false,
+  "performs_a_model_operation": false,
+  "resolves_od2": false,
+  "resolves_ur_22": false,
+  "selects_an_interface": false,
+  "selects_or_inspects_a_positive_reference": false,
+  "writes_an_evidence_row": false,
+  "writes_scientific_evidence": false
+ },
+ "seeds": [],
+ "self_approval_prohibition": {
+  "determination_belongs_to": "a party that did not draft draft-v0.6, in a fresh session",
+  "every_repair_label": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+  "the_drafting_party_does_not_claim_draft_v0_6_is_correct": true
+ },
+ "separation_of_kinds": {
+  "empirical_result": "none. The only measurements in scope are the immutable P0-T tokenizer observations, which are methods-feasibility observations and not Study 3 evidence",
+  "exact_deterministic_derivation": "the token factorization, the corrected eligibility matrix, the token accounting, and every sample size, threshold, tail, power, cell count and operation total re-derived by studies/study3/analysis/design_statistics.py",
+  "future_implementation_requirement": "the P0-R1 replay gate, the repaired model pilot, the final focused methods review, and the seed, bank and OD2/P3-Q authorities",
+  "operator_design_choice": "preserving the visible answer surface, registering first-discriminative-token scoring, and repairing eligibility in a versioned successor",
+  "reviewed_fact": "the published P0-T observations and the defect the published disposition discloses, quoted unedited",
+  "unresolved_operator_choice": "OD2 and UR-22"
+ },
+ "starting_state": {
+  "authority_commit": "593e0b13b46ce3eba5d1978a576f4bfbb857f9b2",
+  "commit": "dfbe6dd6c82fbe0e8906a4aa7f4df6b676496366",
+  "evidence_ledger_last_row": "EV-0016",
+  "p0_t_bound_commit": "d331b3e774168eec99ad849e983bfe021aebc464",
+  "tree": "7779c8fd28aad434096ff9643c3f294b27157980",
+  "worktree_clean": true
+ },
+ "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW",
+ "unresolved_item_dispositions": [
+  {
+   "id": "OD2",
+   "status": "unresolved",
+   "why": "draft-v0.6 registers a scoring boundary. It does not choose a positive reference and performs no P3-Q operation."
+  },
+  {
+   "id": "UR-22",
+   "status": "unresolved",
+   "why": "no external-validity bridge is added, removed or decided in this round."
+  },
+  {
+   "id": "RP",
+   "status": "excluded and null",
+   "why": "the RP wrapper remains null rather than empty. No positive-reference object is selected, inspected, downloaded, tokenized, loaded or called."
+  },
+  {
+   "id": "interface_selection",
+   "status": "not selected",
+   "why": "S1, S2 and S3 remain candidate profiles. Nothing in this round ranks, prefers or qualifies any of them, and S4 remains diagnostic-only."
+  }
+ ]
+}
