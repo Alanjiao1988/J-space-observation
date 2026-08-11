@@ -216,9 +216,6 @@ AUTHORIZED_WRITE_PATHS = (
     "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
     "studies/study3/protocol/"
     "interface_calibration_rendering_registry_v0_6.schema.json",
-    "studies/study3/protocol/interface_calibration_protocol_draft.json",
-    "studies/study3/protocol/interface_calibration_protocol_draft.md",
-    "studies/study3/protocol/interface_calibration_protocol.schema.json",
     "studies/study3/reviews/v0_6_operator_amendment.json",
     "studies/study3/reviews/v0_6_operator_amendment.md",
     "studies/study3/reviews/v0_6_operator_amendment.schema.json",
@@ -242,6 +239,9 @@ AUTHORIZED_WRITE_PATHS = (
 )
 
 BYTE_PROTECTED_PATHS = (
+    "studies/study3/protocol/interface_calibration_protocol_draft.json",
+    "studies/study3/protocol/interface_calibration_protocol_draft.md",
+    "studies/study3/protocol/interface_calibration_protocol.schema.json",
     "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
     "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
     "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",

@@ -420,6 +420,45 @@
    "const": true,
    "type": "boolean"
   },
+  "normative_surface_placement_constraint": {
+   "additionalProperties": false,
+   "description": "The immutable P0 corpus manifest byte-binds the draft protocol JSON, so the normative scoring-boundary registration lives in the v0.6 registry and schema instead. Disclosed rather than hidden.",
+   "properties": {
+    "consequence": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "constraint": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "failed_validation_run": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "observed_and_reverted": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "resolution": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "why_this_is_disclosed": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "constraint",
+    "consequence",
+    "resolution",
+    "observed_and_reverted",
+    "why_this_is_disclosed",
+    "failed_validation_run"
+   ],
+   "type": "object"
+  },
   "operation_counters": {
    "additionalProperties": {
     "const": 0,
@@ -661,6 +700,7 @@
   "all_independent_reviews_remain_valid_rejections",
   "unresolved_item_dispositions",
   "next_legal_action",
+  "normative_surface_placement_constraint",
   "seeds",
   "bank_rows",
   "results",

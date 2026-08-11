@@ -166,6 +166,32 @@ Changed:
 * `OD2`, `UR-22` and the `RP` wrapper remain unresolved; the wrapper is **null**,
   not empty.
 
+## 6a. A structural constraint the reviewer should weigh
+
+The normative scoring boundary is registered **entirely in the v0.6 registry and
+its schema**. The draft-v0.5 protocol JSON, its Markdown companion and the
+protocol schema are byte-identical to the baseline.
+
+That placement is forced. The immutable P0 corpus manifest byte-binds
+`interface_calibration_protocol_draft.json` at 418,733 bytes, sha256
+`1197e087…3c7ca7`, as a generator identity. Editing that file makes the manifest
+stop reproducing and fails
+`tests/test_study3_p0_feasibility_pilot.py::test_frozen_corpus_re_derives_byte_exactly`,
+one of the 122 historical P0 tests §10 requires. §9 forbids editing the P0
+namespace and that test module, so neither may be adjusted.
+
+This was observed, not assumed: an additive block was drafted into the protocol
+JSON, published to a working commit and validated in the registered CPU route.
+Run `cmf4` recorded 4,262 historical passes plus 77 net-new with exactly that one
+extra failure, and the protocol files were then reverted to baseline bytes.
+
+**The question for the reviewer.** Is the v0.6 rendering and scoring registry a
+sufficient normative home for the scoring boundary, given that it carries
+`BINDING_NORMATIVE_INPUT_NOT_AN_ILLUSTRATIVE_EXAMPLE` status and its own
+committed schema? And is it acceptable that the draft protocol JSON is now
+effectively frozen for as long as the published P0 artifacts must reproduce
+byte-exactly?
+
 ## 7. What this packet does not ask for
 
 It does not ask for a freeze, a seed, a bank, an interface selection, a positive

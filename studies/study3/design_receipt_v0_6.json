@@ -134,6 +134,27 @@
  ],
  "immutable_objects_not_edited": [
   {
+   "bytes": 418733,
+   "carries_cr": false,
+   "path": "studies/study3/protocol/interface_calibration_protocol_draft.json",
+   "present": true,
+   "sha256": "1197e08779f6360a50effeafa8035d9b1d21c0a3b038ecc7cbc0930be03c7ca7"
+  },
+  {
+   "bytes": 120132,
+   "carries_cr": false,
+   "path": "studies/study3/protocol/interface_calibration_protocol_draft.md",
+   "present": true,
+   "sha256": "0376c7d5c659fe5535a216b614b6430499c7df235abcf52561dc8f075613b23f"
+  },
+  {
+   "bytes": 137495,
+   "carries_cr": false,
+   "path": "studies/study3/protocol/interface_calibration_protocol.schema.json",
+   "present": true,
+   "sha256": "79a8a68a51c686014f2cfe5c8cf4e782b01fc270cf3c9ae5739964abbe4c30c4"
+  },
+  {
    "bytes": 5820022,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",

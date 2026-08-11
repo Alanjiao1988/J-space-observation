@@ -250,6 +250,39 @@ remained exactly zero in this session. `paper/evidence_ledger.csv` is
 byte-identical and still ends at `EV-0016`. The original research question
 remains unanswered.
 
+## 7a. A structural constraint, disclosed rather than hidden
+
+The normative scoring-boundary registration lives entirely in the **new v0.6
+rendering and scoring registry and its committed schema**, and the draft-v0.5
+protocol JSON, its Markdown companion and the protocol schema are left
+**byte-identical to the baseline**. That placement is forced, and the reason is
+worth stating plainly.
+
+The immutable P0 corpus manifest at
+[`../pilot/p0/corpus/p0_corpus_manifest.json`](../pilot/p0/corpus/p0_corpus_manifest.json)
+byte-binds `interface_calibration_protocol_draft.json` at 418,733 bytes, sha256
+`1197e087…3c7ca7`, as a generator identity. Editing that file makes the immutable
+manifest stop reproducing and fails
+`tests/test_study3_p0_feasibility_pilot.py::test_frozen_corpus_re_derives_byte_exactly`,
+one of the 122 historical P0 tests §10 requires to be retained. §9 forbids
+editing any byte under `studies/study3/pilot/p0/` and forbids editing that test
+module, so neither the manifest nor the test may be adjusted to accommodate an
+edit.
+
+This was **observed, not assumed**. An additive `scoring_boundary_v0_6` block was
+drafted into the protocol JSON, Markdown companion and schema, published to a
+working commit and validated in the registered CPU route. Full-suite run `cmf4`
+recorded the exact consequence: 4,262 historical passes plus 77 net-new, with
+`test_frozen_corpus_re_derives_byte_exactly` failing. The three protocol files
+were then reverted to their baseline bytes and the immutable manifest reproduces
+again.
+
+The consequence for future rounds: **the draft protocol JSON is effectively
+frozen for as long as the published P0 artifacts must reproduce byte-exactly.**
+That is a real structural constraint on any later amendment, and the focused
+review should weigh whether the v0.6 registry is a sufficient normative home for
+the scoring boundary or whether a different arrangement is required.
+
 ## 8. The only legal next actions
 
 1. One **fresh, focused final methods review of draft-v0.6**, by a party that did

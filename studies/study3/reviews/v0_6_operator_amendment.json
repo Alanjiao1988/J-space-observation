@@ -277,6 +277,14 @@
  ],
  "next_legal_action": "one fresh, focused final methods review of draft-v0.6, conducted in a fresh session by a party that did not draft draft-v0.6, limited to the first-discriminative-token factorization, the classifier repair, the affected accounting and the consistency of the resulting candidate; and, separately and independently, the P0-R1 replay gate followed by the repaired model pilot, continued from the published P0-R1 registration commit",
  "no_review_artifact_was_edited": true,
+ "normative_surface_placement_constraint": {
+  "consequence": "editing the draft protocol JSON makes the immutable manifest stop reproducing and fails tests/test_study3_p0_feasibility_pilot.py::test_frozen_corpus_re_derives_byte_exactly, which is one of the 122 historical P0 tests section 10 requires to be retained. Section 9 forbids editing any byte under studies/study3/pilot/p0/ and forbids editing that test module, so neither the manifest nor the test may be adjusted to accommodate the edit",
+  "constraint": "the immutable P0 corpus manifest at studies/study3/pilot/p0/corpus/p0_corpus_manifest.json byte-binds studies/study3/protocol/interface_calibration_protocol_draft.json at 418733 bytes, sha256 1197e08779f6360a50effeafa8035d9b1d21c0a3b038ecc7cbc0930be03c7ca7, as a generator identity",
+  "failed_validation_run": "cmf4",
+  "observed_and_reverted": "an additive scoring_boundary_v0_6 block was drafted into the protocol JSON, Markdown companion and schema, published to a working commit, and validated in the registered CPU route. The full-suite run cmf4 recorded the exact consequence: 4,262 historical passes plus 77 net-new, with test_frozen_corpus_re_derives_byte_exactly failing. The three protocol files were reverted to their baseline bytes and the immutable manifest reproduces again",
+  "resolution": "the normative scoring-context, common-prefix and discriminant-token distinction is registered entirely in the new v0.6 rendering and scoring registry and its committed schema, which section 5 separately requires and which carry BINDING_NORMATIVE_INPUT_NOT_AN_ILLUSTRATIVE_EXAMPLE status. The draft-v0.5 protocol JSON, its Markdown companion and the protocol schema are left byte-identical to the baseline",
+  "why_this_is_disclosed": "the draft protocol JSON is effectively frozen for as long as the published P0 artifacts must reproduce byte-exactly. That is a real structural constraint on any future amendment and it belongs in front of the focused review rather than in a commit message"
+ },
  "operation_counters": {
   "bank_rows_created": 0,
   "checkpoint_downloads": 0,
