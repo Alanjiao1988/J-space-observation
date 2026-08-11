@@ -121,8 +121,8 @@
  "binding_status": "BINDING_NORMATIVE_INPUT_NOT_AN_ILLUSTRATIVE_EXAMPLE. An independent implementation must be able to produce every applicable prompt byte from this registry alone, with no later wording, punctuation, whitespace, ordering, escaping or placeholder choice.",
  "closes_finding": "S3MR3-010",
  "closes_p0_t_demonstrated_defects": [
-  "the S2/S3 single-position scoring rule is not implementable under the pinned role tokenizers",
-  "the eligibility classifier propagated a role-level S2 failure onto mechanically valid S1 cells"
+  "the S2/S3 single-position scoring rule is not implementable under the pinned role tokenizers, because each complete candidate surface is two tokens rather than one",
+  "the eligibility classifier propagated a role-level S2 failure onto mechanically valid S1 cells, producing ineligible rows with empty reason lists"
  ],
  "disposition_status": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
  "document_class": "normative_rendering_registry",
@@ -1207,7 +1207,7 @@
     "sha256": "64f89cf423ee1a167e9c8142a340d7aaef3605a56c73d30275fbdd94d098e36c"
    }
   ],
-  "registry_sha256": "e6a97d39e1bcc7ba42222ed47932e13444a066e376bebe58316b8f69cb0af4fe",
+  "registry_sha256": "1aba57175ddd467023605385d74b60ee0d30b761813c7d4c8a232ea328369f66",
   "self_hash_convention": "registry_identity.registry_sha256 is computed over the canonical serialisation of this document with registry_identity.registry_sha256 set to null"
  },
  "renderings": {

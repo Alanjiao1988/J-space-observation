@@ -1,0 +1,671 @@
+{
+ "$id": "https://github.com/Alanjiao1988/J-space-observation/studies/study3/reviews/v0_6_operator_amendment.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "description": "The Study 3 draft-v0.6 operator amendment record. It registers the first-discriminative-token scoring boundary and the eligibility-classifier repair, and it binds every claim to a code-derived quantity. It declares nothing reviewed, frozen, selected or executable.",
+ "properties": {
+  "all_independent_reviews_remain_valid_rejections": {
+   "const": true,
+   "description": "An amendment never converts a rejection into an acceptance.",
+   "type": "boolean"
+  },
+  "authority": {
+   "additionalProperties": false,
+   "properties": {
+    "bytes": {
+     "const": 19632,
+     "type": "integer"
+    },
+    "committed_byte_identically": {
+     "const": true,
+     "type": "boolean"
+    },
+    "cr_count": {
+     "const": 0,
+     "description": "The committed authority is strict LF.",
+     "type": "integer"
+    },
+    "ends_with_newline": {
+     "const": false,
+     "type": "boolean"
+    },
+    "lf_count": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "path": {
+     "const": "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+     "type": "string"
+    },
+    "sha256": {
+     "const": "f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2",
+     "type": "string"
+    }
+   },
+   "required": [
+    "path",
+    "bytes",
+    "sha256",
+    "cr_count",
+    "ends_with_newline",
+    "committed_byte_identically"
+   ],
+   "type": "object"
+  },
+  "authority_flags": {
+   "additionalProperties": false,
+   "description": "Every formal flag is false. The only true flag is the narrow, not-yet-consumed P0-R1 execution authorization.",
+   "properties": {
+    "bank_authorized": {
+     "const": false,
+     "type": "boolean"
+    },
+    "confirmation_access_authorized": {
+     "const": false,
+     "type": "boolean"
+    },
+    "execution_authorized": {
+     "const": false,
+     "type": "boolean"
+    },
+    "frozen": {
+     "const": false,
+     "type": "boolean"
+    },
+    "model_operations_authorized": {
+     "const": false,
+     "type": "boolean"
+    },
+    "p0_r1_pilot_execution_authorized": {
+     "const": true,
+     "type": "boolean"
+    },
+    "p0_r1_pilot_execution_consumed": {
+     "const": false,
+     "type": "boolean"
+    },
+    "positive_reference_selected": {
+     "const": false,
+     "type": "boolean"
+    },
+    "seed_authorized": {
+     "const": false,
+     "type": "boolean"
+    },
+    "winner_selected": {
+     "const": false,
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "frozen",
+    "execution_authorized",
+    "model_operations_authorized",
+    "seed_authorized",
+    "bank_authorized",
+    "confirmation_access_authorized",
+    "positive_reference_selected",
+    "winner_selected",
+    "p0_r1_pilot_execution_authorized",
+    "p0_r1_pilot_execution_consumed"
+   ],
+   "type": "object"
+  },
+  "bank_rows": {
+   "maxItems": 0,
+   "type": "array"
+  },
+  "closure_matrix_v0_6": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "affected_derived_fields": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "affected_normative_fields": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "closure_status": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "committed_tests": {
+      "description": "Every closure must be bound to committed tests. A closure with no test is a claim, not a repair.",
+      "items": {
+       "pattern": "^tests/.+ :: .+$",
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "disposition": {
+      "const": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+      "type": "string"
+     },
+     "finding_id": {
+      "pattern": "^S3P0T-[0-9]{3}$",
+      "type": "string"
+     },
+     "negative_mutations": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "original_severity": {
+      "enum": [
+       "BLOCKING",
+       "MAJOR",
+       "MINOR"
+      ],
+      "type": "string"
+     },
+     "original_title": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "repair": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "repair_kind": {
+      "enum": [
+       "method",
+       "presentation",
+       "accounting"
+      ],
+      "type": "string"
+     },
+     "residual_limitation": {
+      "description": "A repair that discloses no residual limitation is treated as under-specified.",
+      "minLength": 1,
+      "type": "string"
+     },
+     "self_approved": {
+      "const": false,
+      "type": "boolean"
+     },
+     "starting_evidence": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "verification": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "where": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "finding_id",
+     "original_severity",
+     "original_title",
+     "starting_evidence",
+     "repair",
+     "repair_kind",
+     "verification",
+     "residual_limitation",
+     "closure_status",
+     "disposition",
+     "self_approved",
+     "committed_tests",
+     "negative_mutations",
+     "where",
+     "affected_normative_fields",
+     "affected_derived_fields"
+    ],
+    "type": "object"
+   },
+   "minItems": 3,
+   "type": "array"
+  },
+  "derived_quantity_changes": {
+   "additionalProperties": false,
+   "properties": {
+    "changed_and_separately_surfaced": {
+     "description": "A change the scoring boundary mathematically requires. It must be derived, explained and surfaced, never silently absorbed.",
+     "items": {
+      "type": "object"
+     },
+     "minItems": 1,
+     "type": "array"
+    },
+    "no_number_preserved_for_continuity": {
+     "const": true,
+     "type": "boolean"
+    },
+    "unchanged_by_derivation": {
+     "additionalProperties": true,
+     "properties": {
+      "development_sizes": {
+       "additionalProperties": false,
+       "properties": {
+        "I1_I3_joint_correctness_floor": {
+         "const": 413,
+         "type": "integer"
+        },
+        "I2_headroom_floor": {
+         "const": 214,
+         "type": "integer"
+        },
+        "I4_positive_reference_floor": {
+         "const": 448,
+         "type": "integer"
+        }
+       },
+       "type": "object"
+      },
+      "m_max": {
+       "const": 43,
+       "type": "integer"
+      },
+      "sequence_level_development_projection": {
+       "const": 31065,
+       "type": "integer"
+      },
+      "why_nothing_moves": {
+       "minLength": 1,
+       "type": "string"
+      }
+     },
+     "required": [
+      "m_max",
+      "development_sizes",
+      "sequence_level_development_projection",
+      "why_nothing_moves"
+     ],
+     "type": "object"
+    }
+   },
+   "required": [
+    "unchanged_by_derivation",
+    "changed_and_separately_surfaced",
+    "no_number_preserved_for_continuity"
+   ],
+   "type": "object"
+  },
+  "document_class": {
+   "const": "operator_amendment_record",
+   "type": "string"
+  },
+  "equivalence_proof": {
+   "additionalProperties": false,
+   "properties": {
+    "consequence": {
+     "const": "argmax_d P(u, v_d | x) = argmax_d P(v_d | x, u)",
+     "type": "string"
+    },
+    "does_not_extend_to": {
+     "items": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "minItems": 6,
+     "type": "array"
+    },
+    "identity": {
+     "const": "P(u, v_d | x) = P(u | x) * P(v_d | x, u)",
+     "type": "string"
+    },
+    "mechanically_asserted_by": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "valid_because": {
+     "items": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "minItems": 4,
+     "type": "array"
+    },
+    "why_exact": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "identity",
+    "consequence",
+    "why_exact",
+    "valid_because",
+    "does_not_extend_to",
+    "mechanically_asserted_by"
+   ],
+   "type": "object"
+  },
+  "evidence_rows": {
+   "maxItems": 0,
+   "description": "P0-R1 and draft-v0.6 write no evidence row.",
+   "type": "array"
+  },
+  "facts_accepted_from_the_consumed_p0_t_round": {
+   "additionalProperties": true,
+   "properties": {
+    "historical_state": {
+     "const": "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE",
+     "type": "string"
+    },
+    "historical_state_is_not_rewritten": {
+     "const": true,
+     "type": "boolean"
+    },
+    "immutable_artifacts": {
+     "items": {
+      "pattern": "^studies/study3/pilot/p0/results/p0-t/",
+      "type": "string"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "no_p0_t_encode_is_repeated_in_this_round": {
+     "const": true,
+     "type": "boolean"
+    },
+    "observations": {
+     "items": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "minItems": 6,
+     "type": "array"
+    },
+    "the_4956_historical_encodes_remain_cumulative_and_non_resettable": {
+     "const": true,
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "historical_state",
+    "historical_state_is_not_rewritten",
+    "immutable_artifacts",
+    "observations",
+    "the_4956_historical_encodes_remain_cumulative_and_non_resettable",
+    "no_p0_t_encode_is_repeated_in_this_round"
+   ],
+   "type": "object"
+  },
+  "immutable_objects_not_edited": {
+   "items": {
+    "minLength": 1,
+    "type": "string"
+   },
+   "minItems": 20,
+   "type": "array",
+   "uniqueItems": true
+  },
+  "next_legal_action": {
+   "minLength": 1,
+   "type": "string"
+  },
+  "no_review_artifact_was_edited": {
+   "const": true,
+   "type": "boolean"
+  },
+  "operation_counters": {
+   "additionalProperties": {
+    "const": 0,
+    "type": "integer"
+   },
+   "description": "Every operation counter of the calibration session is exactly 0.",
+   "type": "object"
+  },
+  "operator_decisions_in_this_round": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "blocking": {
+      "type": "boolean"
+     },
+     "decision": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "detail": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "id": {
+      "pattern": "^OD-V06-[0-9]+$",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "design_choice",
+       "method",
+       "scope",
+       "finding_closure"
+      ],
+      "type": "string"
+     },
+     "status": {
+      "minLength": 1,
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "kind",
+     "decision",
+     "status",
+     "blocking",
+     "detail"
+    ],
+    "type": "object"
+   },
+   "minItems": 6,
+   "type": "array"
+  },
+  "party": {
+   "minLength": 1,
+   "type": "string"
+  },
+  "responds_to": {
+   "const": "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+   "type": "string"
+  },
+  "results": {
+   "maxItems": 0,
+   "type": "array"
+  },
+  "round": {
+   "const": "Study 3 draft-v0.6 scoring-boundary calibration and P0-R1 registration",
+   "type": "string"
+  },
+  "schema_version": {
+   "const": "study3_operator_amendment_v0_6",
+   "type": "string"
+  },
+  "scope_boundary": {
+   "additionalProperties": {
+    "const": false,
+    "type": "boolean"
+   },
+   "description": "Every boundary question answers false. This round registers a candidate and a continuation; it decides nothing.",
+   "type": "object"
+  },
+  "seeds": {
+   "maxItems": 0,
+   "type": "array"
+  },
+  "self_approval_prohibition": {
+   "additionalProperties": false,
+   "properties": {
+    "determination_belongs_to": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "every_repair_label": {
+     "const": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+     "type": "string"
+    },
+    "the_drafting_party_does_not_claim_draft_v0_6_is_correct": {
+     "const": true,
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "the_drafting_party_does_not_claim_draft_v0_6_is_correct",
+    "every_repair_label",
+    "determination_belongs_to"
+   ],
+   "type": "object"
+  },
+  "separation_of_kinds": {
+   "additionalProperties": false,
+   "properties": {
+    "empirical_result": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "exact_deterministic_derivation": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "future_implementation_requirement": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "operator_design_choice": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "reviewed_fact": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "unresolved_operator_choice": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "empirical_result",
+    "exact_deterministic_derivation",
+    "operator_design_choice",
+    "reviewed_fact",
+    "unresolved_operator_choice",
+    "future_implementation_requirement"
+   ],
+   "type": "object"
+  },
+  "starting_state": {
+   "additionalProperties": false,
+   "properties": {
+    "authority_commit": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    },
+    "commit": {
+     "const": "dfbe6dd6c82fbe0e8906a4aa7f4df6b676496366",
+     "type": "string"
+    },
+    "evidence_ledger_last_row": {
+     "const": "EV-0016",
+     "type": "string"
+    },
+    "p0_t_bound_commit": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    },
+    "tree": {
+     "const": "7779c8fd28aad434096ff9643c3f294b27157980",
+     "type": "string"
+    },
+    "worktree_clean": {
+     "const": true,
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "commit",
+    "tree",
+    "worktree_clean",
+    "authority_commit",
+    "p0_t_bound_commit",
+    "evidence_ledger_last_row"
+   ],
+   "type": "object"
+  },
+  "state": {
+   "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW",
+   "type": "string"
+  },
+  "unresolved_item_dispositions": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "status": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "why": {
+      "minLength": 1,
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "status",
+     "why"
+    ],
+    "type": "object"
+   },
+   "minItems": 4,
+   "type": "array"
+  }
+ },
+ "required": [
+  "schema_version",
+  "document_class",
+  "round",
+  "party",
+  "responds_to",
+  "authority",
+  "starting_state",
+  "state",
+  "facts_accepted_from_the_consumed_p0_t_round",
+  "operator_decisions_in_this_round",
+  "closure_matrix_v0_6",
+  "equivalence_proof",
+  "derived_quantity_changes",
+  "separation_of_kinds",
+  "scope_boundary",
+  "self_approval_prohibition",
+  "authority_flags",
+  "operation_counters",
+  "immutable_objects_not_edited",
+  "no_review_artifact_was_edited",
+  "all_independent_reviews_remain_valid_rejections",
+  "unresolved_item_dispositions",
+  "next_legal_action",
+  "seeds",
+  "bank_rows",
+  "results",
+  "evidence_rows"
+ ],
+ "title": "Study 3 draft-v0.6 operator amendment record",
+ "type": "object"
+}

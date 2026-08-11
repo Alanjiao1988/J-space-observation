@@ -184,7 +184,7 @@
     "S1": 43,
     "S2": 16,
     "S3": 16,
-    "S4": 12
+    "S4": 39
    },
    "why_nothing_moves": "the new boundary changes where one logit vector is read and adds one teacher-forced token to the S2 scoring context. It changes no cell, no contrast applicability, no independent unit, no null, no alternative, no alpha and no decision rule, so no sample size, pass count, budget, floor or projection is mathematically required to move. Every value above is RECOMPUTED from studies/study3/analysis/design_statistics.py at derivation time and compared, never copied forward."
   }

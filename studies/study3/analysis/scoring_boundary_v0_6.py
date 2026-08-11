@@ -675,9 +675,11 @@ def build_registry(derived=None, token_accounting=None):
     registry["closes_finding"] = v0_5["closes_finding"]
     registry["closes_p0_t_demonstrated_defects"] = [
         "the S2/S3 single-position scoring rule is not implementable under the "
-        "pinned role tokenizers",
+        "pinned role tokenizers, because each complete candidate surface is two "
+        "tokens rather than one",
         "the eligibility classifier propagated a role-level S2 failure onto "
-        "mechanically valid S1 cells",
+        "mechanically valid S1 cells, producing ineligible rows with empty "
+        "reason lists",
     ]
 
     if derived is None:

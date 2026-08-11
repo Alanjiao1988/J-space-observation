@@ -1,0 +1,529 @@
+{
+ "authority_flags": {
+  "bank_authorized": false,
+  "confirmation_access_authorized": false,
+  "execution_authorized": false,
+  "frozen": false,
+  "model_operations_authorized": false,
+  "p0_r1_pilot_execution_authorized": true,
+  "p0_r1_pilot_execution_consumed": false,
+  "positive_reference_selected": false,
+  "seed_authorized": false,
+  "self_approval_claimed": false,
+  "successor_authority_created": false,
+  "winner_selected": false
+ },
+ "authority_source": {
+  "authority_commit": "593e0b13b46ce3eba5d1978a576f4bfbb857f9b2",
+  "bytes": 19632,
+  "committed_as_the_first_new_repository_object": true,
+  "committed_verbatim": true,
+  "cr_count": 0,
+  "lf_count": 375,
+  "lf_only": true,
+  "no_wrapper_header_or_trailing_commentary": true,
+  "path": "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+  "sha256": "f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2",
+  "trailing_newline": false,
+  "transport_format_normalization_applied": "none. The operator-supplied bytes were already LF-only with no trailing newline and no BOM, so the committed blob is byte-identical to the supplied file."
+ },
+ "boundary": {
+  "bank_rows": 0,
+  "blocking_operator_decision": "the final focused methods review of draft-v0.6 has not occurred and is not waived",
+  "evidence_rows": 0,
+  "interface_selected": null,
+  "od2": "unresolved",
+  "original_research_question": "unanswered",
+  "p0_namespace_state": "immutable; not one byte under studies/study3/pilot/p0/ or in tests/test_study3_p0_feasibility_pilot.py changed",
+  "results": 0,
+  "rp_wrapper": null,
+  "seeds": 0,
+  "study1_state": "untouched",
+  "study2_documentation_state": "untouched",
+  "study2_scientific_state": "untouched",
+  "ur_22": "unresolved"
+ },
+ "changed_and_surfaced": {
+  "s2_scoring_context_token_count": {
+   "after": "registered_prompt_token_count + 1",
+   "before": "registered_prompt_token_count",
+   "development_projection_extra_sequence_level_evaluations": 0,
+   "development_projection_extra_tokens_processed": 5001,
+   "why": "the complete candidate is two tokens and its common prefix is teacher-forced into the scoring context"
+  },
+  "s3_zero_incremental_cost_condition": {
+   "after": [
+    "a registered answer domain whose complete candidates share one common prefix token and differ in exactly one discriminant token",
+    "an identical scoring context to S2, including the same teacher-forced common-prefix token",
+    "reuse of the identical restricted discriminant-position logit vector S2 already read",
+    "a CPU-only rescoring contract that performs no additional model evaluation"
+   ],
+   "before": [
+    "a jointly single-token registered answer domain",
+    "an identical prompt prefix to S2",
+    "reuse of the identical restricted-vocabulary logit vector S2 already read",
+    "a CPU-only rescoring contract that performs no additional model evaluation"
+   ],
+   "numeric_effect": "none; S3 incremental rendered rows, scored rows and sequence-level evaluations all remain 0",
+   "why": "the v0.5 condition was stated for a jointly single-token answer domain, which the pinned tokenizers do not provide. The condition is restated at the discriminant position so that it is true of the surface actually registered"
+  }
+ },
+ "changed_path_count": 25,
+ "changed_path_note": "this receipt itself is the remaining authorized changed path and cannot record its own digest",
+ "changed_paths": [
+  "studies/study3/analysis/p0_r1_corrected_eligibility_tables.json",
+  "studies/study3/analysis/scoring_boundary_v0_6.py",
+  "studies/study3/analysis/scoring_boundary_v0_6_tables.json",
+  "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1",
+  "studies/study3/pilot/p0_r1/container/p0_r1_acr_task.yaml",
+  "studies/study3/pilot/p0_r1/container/p0_r1_replay.sh",
+  "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt",
+  "studies/study3/pilot/p0_r1/p0_r1_counters.py",
+  "studies/study3/pilot/p0_r1/p0_r1_eligibility.py",
+  "studies/study3/pilot/p0_r1/p0_r1_factorization.py",
+  "studies/study3/pilot/p0_r1/p0_r1_model_runner.py",
+  "studies/study3/pilot/p0_r1/p0_r1_pre_execution_receipt.json",
+  "studies/study3/pilot/p0_r1/p0_r1_protocol.json",
+  "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
+  "studies/study3/pilot/p0_r1/p0_r1_replay_gate.py",
+  "studies/study3/pilot/p0_r1/p0_r1_schemas.py",
+  "studies/study3/pilot/p0_r1/p0_r1_summarize.py",
+  "studies/study3/pilot/p0_r1/p0_r1_validate.py",
+  "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+  "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
+  "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json",
+  "studies/study3/reviews/v0_6_operator_amendment.json",
+  "tests/test_study3_p0_r1_registration.py",
+  "tests/test_study3_rendering_registry_v0_6.py"
+ ],
+ "closure_matrix": "studies/study3/reviews/v0_6_operator_amendment.json",
+ "disposition_status": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+ "document_class": "design_receipt",
+ "findings_closed": [
+  {
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+   "id": "S3P0T-001"
+  },
+  {
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+   "id": "S3P0T-002"
+  },
+  {
+   "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+   "id": "S3P0T-003"
+  }
+ ],
+ "immutable_objects_not_edited": [
+  {
+   "bytes": 5820022,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
+   "present": true,
+   "sha256": "9603b61165bc0b405fe8eb6103a56e646ceb2e254a33e0eba2ee2d035f03a85f"
+  },
+  {
+   "bytes": 7934,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
+   "present": true,
+   "sha256": "0b28fbe6f633cc5a6d0664588fb685065d15ab1c301a1540d1e12f7c7b69e737"
+  },
+  {
+   "bytes": 7850,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+   "present": true,
+   "sha256": "9d6a6508383ebd5f6e4f0bb97a5b75de282da3cf28afba837b923cd1a6ec66eb"
+  },
+  {
+   "bytes": 69781,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/corpus/p0_corpus.json",
+   "present": true,
+   "sha256": "5343019a334ce666bb3e7f7f57d87181550aa90fad4815ba51a7ba3f571e1c6c"
+  },
+  {
+   "bytes": 23476,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/corpus/p0_corpus_manifest.json",
+   "present": true,
+   "sha256": "a6f4a4ef010f5660765095cfba7380044709d48629b45cd36f1f8d774be656e0"
+  },
+  {
+   "bytes": 9879,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/corpus/p0_corpus_census.md",
+   "present": true,
+   "sha256": "ea1c8c15c9fc06bb4b01a4f23f0594c98a74cb2dc7d6eff582e497cabf8fb69e"
+  },
+  {
+   "bytes": 19167,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_corpus.py",
+   "present": true,
+   "sha256": "0a10f59734358bb936b1d8f6a77e3f2a02d0928cea3c00e81d4084188ecedaf0"
+  },
+  {
+   "bytes": 8908,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_counters.py",
+   "present": true,
+   "sha256": "3015a0ceb326bca8d8f673dcd5c4027626137dcf15c4ebcdc34e2a8a977b7c93"
+  },
+  {
+   "bytes": 13074,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_freeze_corpus.py",
+   "present": true,
+   "sha256": "50e467e42d4289fc5809c206d4c7bb55659d4c4e3c09bbbfe1fe60da5cc1af18"
+  },
+  {
+   "bytes": 3289,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_image_verify.py",
+   "present": true,
+   "sha256": "da3da028bee12c16d27735428c80d5e76a43dfe1dc716458f3d5f1568fcf46b3"
+  },
+  {
+   "bytes": 21706,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_model_pilot.py",
+   "present": true,
+   "sha256": "5a73e6efbad6935b0d9d8fdacd8652a24be85de7458cbac831d77f37ab67ab24"
+  },
+  {
+   "bytes": 4709,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_parser.py",
+   "present": true,
+   "sha256": "6bee82ea3b883d4ed36729e692caf8a7e15b8d9e21a9e982263ac55f50f8b83c"
+  },
+  {
+   "bytes": 19852,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_protocol.json",
+   "present": true,
+   "sha256": "36df304a7d1e0819f91337acfad73b36f9af8ff4134494a2f7a69e6a96e6505a"
+  },
+  {
+   "bytes": 20077,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_protocol.py",
+   "present": true,
+   "sha256": "586a0769470d65cffd2ed40590f9139716b530f81ca044be4b9345977728cca9"
+  },
+  {
+   "bytes": 13763,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_renderer.py",
+   "present": true,
+   "sha256": "568254dcf1889d2bb4348044dd79dda4cc7699d80e97c520dd8cf981af713e2b"
+  },
+  {
+   "bytes": 6674,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_summarize.py",
+   "present": true,
+   "sha256": "ebbdbf3494c77101e707e2fb603b2a8f3aee1bdc3ffd4c40bd82fe6ed0530124"
+  },
+  {
+   "bytes": 25160,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_tokenizer_gate.py",
+   "present": true,
+   "sha256": "4a4756836da189f069b5f36a63c3c572b58e7d8040f6cd06c1df3e0f50401214"
+  },
+  {
+   "bytes": 7040,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_transport.py",
+   "present": true,
+   "sha256": "388b29e49a6eb306c9e25cb9d3e69a16b64df7c30b380bd60b26375f6464990e"
+  },
+  {
+   "bytes": 9941,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/p0_validate.py",
+   "present": true,
+   "sha256": "d37744e65bbc5462bb9f5a5dc0aab25ca30992273b8f7f930e8f2bd85fe9d64d"
+  },
+  {
+   "bytes": 10582,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/README.md",
+   "present": true,
+   "sha256": "d7f5332b07c8fa0bcdc317ae2570bc41df343940b6799fa79fd109c546b07fef"
+  },
+  {
+   "bytes": 5587,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/container/Dockerfile.study3-p0",
+   "present": true,
+   "sha256": "ef360cb0bd60b7ecfe375df4be8c0810d2e9568dd651b5e1149da37326e35cf9"
+  },
+  {
+   "bytes": 1394,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/container/p0_t_acr_task.yaml",
+   "present": true,
+   "sha256": "b323e8efafdd31d6eec860f60a247b20fadd62820f2bcae040fad99fe315a651"
+  },
+  {
+   "bytes": 1285,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/container/p0_t_checkout.sh",
+   "present": true,
+   "sha256": "97f3090429ba4134156973ded45796378003e79088c57c798d8fff81ef5bcb2d"
+  },
+  {
+   "bytes": 5892,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/container/p0_t_stage.sh",
+   "present": true,
+   "sha256": "3ce7089ec29a4aa47db5fc8103685b07d1d9e7f623fc24326be662e46068efdd"
+  },
+  {
+   "bytes": 591,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/container/requirements-study3-p0.txt",
+   "present": true,
+   "sha256": "71b3d36ae990f82a4d8046d5f25642ad27a4a251f1a4cd62174a8204f2a751e7"
+  },
+  {
+   "bytes": 52734,
+   "carries_cr": false,
+   "path": "tests/test_study3_p0_feasibility_pilot.py",
+   "present": true,
+   "sha256": "5c83f0875682997ee25a7812fe2e6a3959ee394c1e12872676695c93e817fa63"
+  },
+  {
+   "bytes": 37259,
+   "carries_cr": false,
+   "path": "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.json",
+   "present": true,
+   "sha256": "7e95c4911a36a3ffa2d2bf834a561e4d3743f1f641d29770dd0bc402b0a87d80"
+  },
+  {
+   "bytes": 27300,
+   "carries_cr": false,
+   "path": "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.schema.json",
+   "present": true,
+   "sha256": "9946aab4507c87077c1d32c37fcc1bfd76464178db8cd09b736038e9a26324bd"
+  },
+  {
+   "bytes": 66819,
+   "carries_cr": false,
+   "path": "studies/study3/reviews/v0_5_operator_amendment.json",
+   "present": true,
+   "sha256": "0dd4a8995a886faac10b68e6d71cbda7cc4cf1b1c12bbfc2668c4969f8fc10e2"
+  },
+  {
+   "bytes": 36584,
+   "carries_cr": false,
+   "path": "studies/study3/reviews/v0_5_operator_amendment.md",
+   "present": true,
+   "sha256": "88df72dcc3282ed92e1e37308f1fd1cbb8ced8085e105dd026532b1d20af01f9"
+  },
+  {
+   "bytes": 12596,
+   "carries_cr": false,
+   "path": "studies/study3/reviews/v0_5_operator_amendment.schema.json",
+   "present": true,
+   "sha256": "992887e6d3aacecb87307e8f294958e78d5fc55d1f7578c4cbd00f171adc3dcd"
+  },
+  {
+   "bytes": 14577,
+   "carries_cr": false,
+   "path": "studies/study3/design_receipt_v0_5.json",
+   "present": true,
+   "sha256": "d0b29865988f19ab3af26fbf58105cb42c67e3db4aac91fc2776e652c614aeac"
+  },
+  {
+   "bytes": 12049,
+   "carries_cr": false,
+   "path": "studies/study3/analysis/independent_methods_review_packet_v0_5.md",
+   "present": true,
+   "sha256": "e93d4987c932331c7634418fea22b30780e20aec986090dc63a9d7637b7ae101"
+  },
+  {
+   "bytes": 66470,
+   "carries_cr": false,
+   "path": "studies/study3/analysis/design_statistics.py",
+   "present": true,
+   "sha256": "553d38e6d2ea9051c4b6354666ca7cfe3aac178f3610e97a2d26abab38277b08"
+  },
+  {
+   "bytes": 53852,
+   "carries_cr": false,
+   "path": "studies/study3/analysis/design_statistics_tables.json",
+   "present": true,
+   "sha256": "754a46c025d8a8186cd6578d7d9b8174cf449be0c2a497f940b67b2ccbc48101"
+  },
+  {
+   "bytes": 29282,
+   "carries_cr": false,
+   "path": "studies/study3/prompts/study3_p0_feasibility_pilot_authority.md",
+   "present": true,
+   "sha256": "80efc7ef8bfe5e3b5e5235f530a44730f185187aa52b85945875fe68ef1eda11"
+  },
+  {
+   "bytes": 27458,
+   "carries_cr": false,
+   "path": "studies/study3/prompts/study3_v0_5_design_amendment_authority.md",
+   "present": true,
+   "sha256": "b9f0023052c9056de1707ba64a8686a8df05d260cbf7aae0673c31d2dc3aadc6"
+  },
+  {
+   "bytes": 198472,
+   "carries_cr": false,
+   "path": "tests/test_study3_design.py",
+   "present": true,
+   "sha256": "e0c937bf1136650474255d489e998500204691da5f51e8b1f83b0358780a1e66"
+  },
+  {
+   "bytes": 38658,
+   "carries_cr": false,
+   "path": "tests/test_study3_rendering_registry_v0_5.py",
+   "present": true,
+   "sha256": "c667f037c77d3da49ebd46b40e1563aaae0b48d547f00dda284991350986b307"
+  },
+  {
+   "bytes": 60781,
+   "carries_cr": false,
+   "path": "tests/test_study3_methods_review.py",
+   "present": true,
+   "sha256": "331d2a7644ee3256d7a145fa8ba83d0b02dcfd1faa1ed8989b726c1c656509ba"
+  },
+  {
+   "bytes": 44821,
+   "carries_cr": false,
+   "path": "tests/test_study3_methods_review_v0_3.py",
+   "present": true,
+   "sha256": "a1676d31ed32225c8e8a3dba40b4ee6f01d5d3490619eeb35d385efb4ea48c61"
+  },
+  {
+   "bytes": 62489,
+   "carries_cr": false,
+   "path": "tests/test_study3_methods_review_v0_4.py",
+   "present": true,
+   "sha256": "37e1f6349b0e8ced2723276cd9c34383c4689d4c034312b87619fd4f7937a7ec"
+  },
+  {
+   "bytes": 25241,
+   "carries_cr": false,
+   "path": "paper/evidence_ledger.csv",
+   "present": true,
+   "sha256": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1"
+  }
+ ],
+ "local_operations_disclosure": {
+  "authoritative_validation": "clean CPU-only Azure Container Registry tasks bound to exact commits from a fresh clone of a Git bundle, one test path per invocation, GitHub Actions not used.",
+  "local_decision_bearing_statistical_runs": 0,
+  "local_non_authoritative_debugging": "the scoring-boundary, replay-gate, protocol and validation modules were executed locally in --write mode to assemble their documents and in --check mode as syntax and self-consistency checks while they were being written. Neither run is evidence.",
+  "local_pytest_runs": 0,
+  "statement": "No decision-bearing computation was performed on the operator machine. The activity below is read-only inspection, document assembly, syntax checking and non-authoritative debugging, and it is disclosed rather than omitted."
+ },
+ "next_legal_action": "one fresh, focused final methods review of draft-v0.6 by a party that did not draft it; and, separately, the P0-R1 replay gate continued from the published registration commit",
+ "operation_counters": {
+  "bank_rows_created": 0,
+  "checkpoint_downloads": 0,
+  "confirmation_reads": 0,
+  "evidence_rows_added": 0,
+  "forward_passes": 0,
+  "generations": 0,
+  "github_actions_runs": 0,
+  "gpu_jobs": 0,
+  "logit_reads": 0,
+  "model_weight_loads": 0,
+  "parser_calls": 0,
+  "scored_rows": 0,
+  "seeds_drawn": 0,
+  "tokenizer_calls": 0,
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0
+ },
+ "rederived_quantities": {
+  "confirmation_pass_counts": {
+   "I1_I3_joint_correctness_floor": 388,
+   "I2_headroom_floor": 127,
+   "I4_positive_reference_floor": 381
+  },
+  "development_pass_counts": {
+   "I1_I3_joint_correctness_floor": 389,
+   "I2_headroom_floor": 129,
+   "I4_positive_reference_floor": 383
+  },
+  "development_sizes": {
+   "I1_I3_joint_correctness_floor": 413,
+   "I2_headroom_floor": 214,
+   "I4_positive_reference_floor": 448
+  },
+  "m_max": 43,
+  "m_max_unchanged_because": "the new boundary changes where one logit vector is read and adds one teacher-forced token to the S2 scoring context; it changes no cell, contrast applicability, independent unit, null, alternative, alpha or decision rule",
+  "no_number_preserved_for_continuity": true,
+  "per_cell_false_negative_budget_exact_rational": "19/17200",
+  "per_cell_power_target_exact_rational": "17181/17200",
+  "profile_stage_power_floor_exact_rational": "381/400",
+  "sequence_level_development_projection": 31065,
+  "study_end_to_end_power_floor_exact_rational": "9/10",
+  "total_gate_bearing_cells": {
+   "S1": 43,
+   "S2": 16,
+   "S3": 16,
+   "S4": 39
+  }
+ },
+ "rendering_and_scoring_registry": {
+  "binding_input": true,
+  "illustrative_example": false,
+  "path": "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
+  "predecessor_preserved_byte_for_byte": true,
+  "registry_sha256": "1aba57175ddd467023605385d74b60ee0d30b761813c7d4c8a232ea328369f66",
+  "schema": "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json",
+  "supersedes": "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.json",
+  "visible_rendering_surface_unchanged": true
+ },
+ "round": "Study 3 draft-v0.6 scoring-boundary calibration and P0-R1 registration",
+ "schema_version": "study3_design_receipt_v0_6",
+ "scoring_boundary": {
+  "common_prefix_token": 220,
+  "derived_with_zero_tokenizer_encodes": true,
+  "discriminant_token_ids": [
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24
+  ],
+  "equivalence_identity": "P(u, v_d | x) = P(u | x) * P(v_d | x, u)",
+  "equivalence_is_exact_factor_cancellation": true,
+  "factorization": "candidate_d = common_prefix || discriminant_d",
+  "rule": "first-discriminative-token restricted argmax for S2/S3; S1 and S4 unchanged"
+ },
+ "self_approval_prohibited": "this receipt records bytes and boundaries. It does not declare the amended protocol correct and creates no successor authority.",
+ "starting_state": {
+  "clean_worktree": true,
+  "commit": "dfbe6dd6c82fbe0e8906a4aa7f4df6b676496366",
+  "evidence_ledger_last_row": "EV-0016",
+  "p0_t_bound_commit": "d331b3e774168eec99ad849e983bfe021aebc464",
+  "p0_t_terminal_state": "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE",
+  "tree": "7779c8fd28aad434096ff9643c3f294b27157980"
+ },
+ "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW",
+ "token_accounting": {
+  "common_prefix_tokens_processed": 18,
+  "extra_sequence_level_model_evaluations_versus_the_v0_5_rule": 0,
+  "extra_tokens_versus_the_v0_5_rule": 18,
+  "registered_prompt_tokens_processed_by_restricted_scoring": 9435,
+  "s3_sequence_level_model_evaluations": 0,
+  "s3_tokens_processed": 0,
+  "s4_registered_prompt_tokens": 510,
+  "scored_rows": 210,
+  "scoring_context_tokens_processed": 9453
+ }
+}

@@ -38,7 +38,7 @@
  },
  "registry_identity": {
   "path": "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
-  "registry_sha256": "e6a97d39e1bcc7ba42222ed47932e13444a066e376bebe58316b8f69cb0af4fe"
+  "registry_sha256": "1aba57175ddd467023605385d74b60ee0d30b761813c7d4c8a232ea328369f66"
  },
  "replay_derivation": {
   "all_roles_eligible": true,
