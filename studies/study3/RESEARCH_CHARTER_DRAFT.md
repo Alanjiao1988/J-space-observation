@@ -1,5 +1,27 @@
 # Study 3 - research charter (DRAFT)
 
+> **draft-v0.6 candidate registered.** A narrow operator amendment repairs the
+> two mechanical defects the published P0-T disposition disclosed: the `S2`/`S3`
+> scoring rule is re-registered at the first discriminative token, and the
+> eligibility classifier is repaired in a versioned successor. The visible
+> answer surface is unchanged and the draft-v0.5 registry is preserved
+> byte-for-byte as history, so the rows below remain the record of what was
+> registered when stage P0-T ran.
+>
+> | field | value |
+> | --- | --- |
+> | candidate draft version | `draft-v0.6` |
+> | candidate state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW` |
+> | candidate disposition | `PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW` |
+> | pilot continuation | `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE` |
+> | frozen | `false` |
+> | formal execution authorized | `false` |
+> | reviewed | `false` |
+>
+> The drafting party **does not claim** draft-v0.6 is correct. Its record is
+> `studies/study3/reviews/v0_6_operator_amendment.md`.
+
+
 **Status: DRAFT. Not frozen. Not an execution authority.**
 
 > **Study 3-P0 feasibility pilot registered.** A narrow operator decision supersedes the clause

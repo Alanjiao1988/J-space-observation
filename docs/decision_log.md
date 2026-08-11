@@ -3668,3 +3668,83 @@ checkpoint downloaded, no weight loaded, no GPU allocated. Every P0 counter is
 zero. `OD2`, `UR-22` and every `RP` object remain unresolved and untouched, no
 seed or bank row exists, and `paper/evidence_ledger.csv` remains byte-identical
 through `EV-0016`.
+
+
+## D42 - Register first-discriminative-token scoring for Study 3 `S2`/`S3` and repair the eligibility classifier in a versioned successor
+
+**Context.** Stage P0-T ran once, on CPU, and published its result exactly as
+emitted. Its own disposition disclosed two mechanical defects. First, under every
+pinned role tokenizer each registered `S2`/`S3` candidate surface `" 0"`..`" 9"`
+is **two** tokens, `[220, digit]`, so the draft-v0.5 rule -- read one next-token
+logit vector at the single position after the answer cue and restrict it to ten
+registered content token IDs -- is not implementable as written. Second, the
+gate's `evaluate_eligibility` consulted a **role-level** flag that was false when
+either the `S1` or the `S2` check failed, and then marked every `S1` cell of that
+role ineligible; because only the `S2` check failed, 27 mechanically valid `S1`
+cells were marked `INELIGIBLE_TOKEN_IDS` with an **empty reason list**, and the
+emitted terminal state was more severe than the run's own evidence supported.
+P0-T is single-shot, so both defects were disclosed rather than repaired.
+
+**Decision.** draft-v0.6 preserves the visible answer surface exactly and changes
+only where the `S2`/`S3` decision statistic is read. Every complete candidate
+factors as `candidate_d = common_prefix || discriminant_d`, subject to five
+registered eligibility conditions. The scoring context is the registered prompt
+token IDs followed by the verified common-prefix token, formed by concatenation
+and never by re-encoding a concatenated string; one ordinary prefill evaluation
+reads the next-token logits at the ten verified discriminant token IDs only; and
+the deterministic restricted argmax maps back to the complete registered
+candidate surface. `S3` reuses that exact vector on CPU and adds zero model
+evaluations. `S1` and `S4` are unchanged. The common-prefix token is a
+teacher-forced candidate prefix: not a prompt-rendering change, not a generated
+token, and not a separate sequence-level model evaluation.
+
+The ranking identity `P(u, v_d | x) = P(u | x) * P(v_d | x, u)` makes the
+restricted ranking at the discriminant position identical to the ranking over the
+complete two-token candidates, because `P(u | x)` is a strictly positive common
+factor. That is an exact factor cancellation, not an approximation, and it is
+asserted mechanically on every scored two-token row. It **must not** be extended
+to arbitrary multi-token candidates, unequal lengths, non-common prefixes, summed
+log probabilities, free generation, or any tokenizer that is not separately
+pinned and verified.
+
+Eligibility is recomputed at the narrowest applicable key by a **versioned
+successor** classifier in `studies/study3/pilot/p0_r1/`. The historical P0-T
+result is never edited: the correction lives in a new derived view. Reasons carry
+their own scope and the production validator rejects any reason whose scope is
+not a prefix of the cell it decorates, so a failure cannot cross a profile, a
+role or a contrast. An ineligible row with an empty reason list is a validator
+failure. `S4` is diagnostic-only and can never satisfy target-role executability.
+The successor stop label is
+`STUDY3_P0_R1_STOPPED_SOME_TARGET_ROLE_HAS_NO_EXECUTABLE_GENUINE_I3_CONTRAST`;
+the old label survives only as historical text on the consumed result.
+
+**Why the token identities are derived rather than transcribed.** Writing `220`
+and `15`-`24` into the verifier as constants would make the registration an
+assumption about a tokenizer nobody re-checked. The verifier instead binds 70
+published `(prompt, token-ID)` pairs per role to the exact frozen prompt bytes by
+SHA-256 and solves for the byte string each token contributes, requiring the
+common-prefix token and each discriminant token to be **uniquely** determined by
+that evidence. It performs zero tokenizer encodes and imports no tokenizer
+library, and a committed test asserts that no member of `{220, 15..24}` appears
+as a numeric literal anywhere in it.
+
+**Consequences.** No registered statistic moves: `m_max` 43, the exact-rational
+budgets and floors, the sizes `413`/`214`/`448`, the development pass counts
+`389`/`129`/`383`, the confirmation pass counts `388`/`127`/`381` and the
+`31,065` sequence-level development projection all reproduce by derivation from
+`design_statistics.py` rather than by preservation. Two quantities change and are
+surfaced separately: the `S2`/`S3` scoring-context token count becomes
+`registered_prompt_token_count + 1`, adding 18 processed tokens in P0-R1 and
+5,001 in the development projection while adding **zero** sequence-level
+evaluations; and the `S3` zero-incremental-cost condition is restated from "a
+jointly single-token registered answer domain" to a common-prefix/discriminant
+formulation, with no numeric effect.
+
+draft-v0.6 is **not** reviewed, **not** frozen and **not** selected; every repair
+is `PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW`. P0-R1 is registered and
+not executed. No model operation of any kind occurred: no tokenizer constructed,
+no checkpoint downloaded, no weight loaded, no GPU allocated, no forward pass, no
+generation. Not one byte under `studies/study3/pilot/p0/` or in
+`tests/test_study3_p0_feasibility_pilot.py` changed. `OD2`, `UR-22` and every
+`RP` object remain unresolved, no seed or bank row exists, and
+`paper/evidence_ledger.csv` remains byte-identical through `EV-0016`.

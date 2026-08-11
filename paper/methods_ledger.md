@@ -2259,3 +2259,81 @@ effect, resolves neither `OD2` nor `UR-22`, freezes nothing and answers no
 research question. Zero observed discordance would be descriptive, not proof of
 invariance. No entry is made in `paper/evidence_ledger.csv`, which remains
 byte-identical through `EV-0016`.
+
+
+## M-30 Study 3 draft-v0.6 first-discriminative-token scoring boundary and the P0-R1 continuation
+
+**Applies to.**
+`studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json`,
+`studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json`,
+`studies/study3/analysis/scoring_boundary_v0_6.py`,
+`studies/study3/analysis/scoring_boundary_v0_6_tables.json`,
+`studies/study3/analysis/p0_r1_corrected_eligibility_tables.json`,
+`studies/study3/pilot/p0_r1/`, `tests/test_study3_rendering_registry_v0_6.py`,
+`tests/test_study3_p0_r1_registration.py`.
+
+**Design.** A registration round, not a measurement. It amends the unfrozen
+Study 3 candidate from draft-v0.5 to draft-v0.6 to repair the two mechanical
+defects the published P0-T disposition disclosed, and it registers one isolated
+feasibility continuation on the unchanged frozen pilot corpus.
+
+**Scoring boundary.** `S1` is unchanged: one prefill on the registered prompt
+token IDs, next-token logits read at the single position after the prompt,
+restricted to the four registered label token IDs. `S2` forms its scoring context
+as the registered prompt token IDs followed by the verified common-prefix token,
+by concatenation rather than re-encoding, performs one ordinary prefill and reads
+the next-token logits only at the ten verified discriminant token IDs. `S3`
+reuses that exact vector on CPU with zero model evaluations. `S4` is unchanged
+and diagnostic-only.
+
+**Derivation, not transcription.** The common-prefix and discriminant token
+identities are recovered from the immutable published P0-T result and the frozen
+corpus by a replay-only verifier that performs zero tokenizer encodes and imports
+no tokenizer library. It binds 70 published `(prompt, token-ID)` pairs per role to
+the exact frozen prompt bytes by SHA-256 and requires each reported token to be
+uniquely determined by that evidence.
+
+**Eligibility.** Computed at the narrowest applicable key: candidate-surface
+eligibility at role x profile, presentation-pair distinctness at role x profile x
+contrast, structural absence at profile x contrast, target-role executability at
+role. Reasons are scoped and non-propagating; an ineligible row with an empty
+reason list is a validator failure; `not_applicable` is structural absence and is
+never instantiated or counted; `S4` can never satisfy target-role executability.
+
+**Sample size.** Unchanged and deliberately tiny: the same frozen 35 contrast
+cells and 70 rendered members, at most 180 non-generative prefill evaluations, 12
+`S4` generation calls and 210 scored rows across the three roles. The
+`413`/`214`/`448` sizes are **not** used as pilot allocations.
+
+**Random seeds.** None. P0-R1 draws no seed and writes no bank row.
+
+**Exclusion rules.** Unchanged in kind. A genuine token-ID collision marks the
+specific role/profile/contrast `INELIGIBLE_TOKEN_IDS` with an explicit local
+reason and excludes its model rows; it is never repaired after observation and
+never reported as a pass or as robustness. `K6-SEP` remains structurally absent
+for the option-less profiles `S2` and `S3`. The complete `study3-p0-only/`
+namespace remains permanently excluded from every later development,
+confirmation, P3-Q and external-validity bank.
+
+**Protocol deviations.** None. The continuation is registered before any
+tokenizer or model access, and no prompt, parser, scoring, tokenizer, item,
+allocation, checkpoint or dependency may change afterwards in response to an
+observed result.
+
+**Counters.** Three views are maintained: the immutable P0-T snapshot carried
+forward unchanged, the cumulative non-resettable P0-R1 attempt counters, and an
+aggregate view in which additive counters are summed while identity counts are
+set cardinalities. `tokenizer_construction_events` is additive and records every
+construction, including a reload of an already-seen identity, so a reload can
+never be hidden inside the identity cardinality.
+`common_prefix_tokens_processed` is reported explicitly, because the extra
+teacher-forced token changes token processing rather than the number of
+sequence-level prefill evaluations.
+
+**Claim boundary.** draft-v0.6 is a candidate, not a reviewed or frozen protocol,
+and every repair is recorded `PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW`.
+P0-R1 answers only whether the repaired pipeline is runnable. Neither selects an
+interface, sets a threshold, passes a formal gate, estimates a confirmatory
+effect, resolves `OD2` or `UR-22`, freezes anything or answers the research
+question. No entry is made in `paper/evidence_ledger.csv`, which remains
+byte-identical through `EV-0016`.

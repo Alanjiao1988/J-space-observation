@@ -1,5 +1,27 @@
 # Study 3 - Interface Adequacy and Label-Binding Calibration
 
+> **DRAFT-V0.6 SCORING BOUNDARY REGISTERED - P0-R1 AWAITING ITS REPLAY GATE**
+>
+> States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
+> and `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE`.
+>
+> draft-v0.6 registers first-discriminative-token scoring for `S2` and `S3` and
+> repairs the eligibility classifier in a versioned successor. The visible
+> answer surface, `S1` and `S4` are unchanged, and the draft-v0.5 registry is
+> preserved byte-for-byte as history.
+>
+> Entry points: [draft-v0.6 amendment](reviews/v0_6_operator_amendment.md) ·
+> [focused review packet](analysis/final_focused_review_packet_v0_6.md) ·
+> [v0.6 rendering and scoring registry](protocol/interface_calibration_rendering_registry_v0_6.json) ·
+> [P0-R1 package](pilot/p0_r1/README.md) ·
+> [P0-R1 handoff](pilot/p0_r1/P0_R1_HANDOFF.md) ·
+> [operator authority](prompts/study3_v0_6_p0_r1_authority.md)
+>
+> Nothing is frozen, selected or authorized for formal execution. `OD2`,
+> `UR-22` and every `RP` object remain unresolved, and the evidence ledger still
+> ends at `EV-0016`.
+
+
 > **STUDY 3-P0 STAGE P0-T RAN AND STOPPED**
 >
 > State: `STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE`

@@ -1,5 +1,66 @@
 # Project Status Report
 
+> **STUDY 3 DRAFT-V0.6 SCORING BOUNDARY REGISTERED - P0-R1 AWAITING ITS REPLAY GATE**
+>
+> States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
+> and `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE`.
+>
+> draft-v0.6 repairs the two mechanical defects the published P0-T disposition
+> disclosed. It changes **one** normative thing - where the `S2`/`S3` decision
+> statistic is read - and changes no visible byte a model would see. The answer
+> cue stays `Answer:` with no trailing whitespace; the complete candidate
+> surfaces stay `" 0"`..`" 9"` with exactly one leading U+0020; `S1` and `S4`
+> are untouched.
+>
+> Every complete `S2`/`S3` candidate factors as
+> `candidate_d = common_prefix || discriminant_d`. The scoring context is the
+> registered prompt token IDs followed by the verified common-prefix token,
+> formed by concatenation and never by re-encoding. One ordinary prefill
+> evaluation reads the next-token logits at the ten verified discriminant token
+> IDs only. `S3` reuses that exact vector on CPU and adds zero model
+> evaluations. The common-prefix token is a teacher-forced candidate prefix: it
+> is not a generated token and not a separate sequence-level evaluation.
+>
+> The token identities are **derived, not transcribed**: common prefix `220`
+> carrying exactly one U+0020, discriminants `15`-`24` carrying `0`-`9`,
+> recovered from the immutable published P0-T result and the frozen corpus with
+> **zero** tokenizer encodes, identically for `RT`, `RL` and `RI`.
+>
+> The eligibility classifier is repaired in a **versioned successor** and the
+> historical result is never edited. Replaying the immutable records: with the
+> propagation removed but the draft-v0.5 scoring rule unchanged, 0 cells are
+> ineligible with an empty reason list (was 27) and each target role retains
+> **nine** executable genuine `I3` contrasts, so the emitted historical terminal
+> state was over-severe, exactly as the published disposition discloses. Under
+> the draft-v0.6 boundary as well, all 39 cells are eligible and each role
+> retains eleven.
+>
+> No registered statistic moves: `m_max` 43, sizes `413`/`214`/`448`, pass
+> counts `389`/`129`/`383` and `388`/`127`/`381`, and the `31,065`
+> sequence-level development projection all reproduce **by derivation**. The two
+> quantities that do change - the `S2`/`S3` scoring-context token count and the
+> `S3` zero-incremental-cost condition - are surfaced separately, and neither
+> adds a sequence-level model evaluation.
+>
+> P0-R1 is **registered, not executed**. No tokenizer was constructed, no
+> checkpoint downloaded, no weight loaded, no GPU allocated, no forward pass
+> performed and no text generated. Every P0-R1 counter is zero, the immutable
+> P0-T counters are untouched, and not one byte under
+> `studies/study3/pilot/p0/` changed.
+>
+> `formal_execution_authorized = false`. draft-v0.6 is **not** reviewed, **not**
+> frozen and **not** selected. `OD2`, `UR-22` and every `RP` object remain
+> unresolved; the `RP` wrapper is **null**, not empty. No seed, bank, winner or
+> evidence row exists; `paper/evidence_ledger.csv` is byte-identical and still
+> ends at `EV-0016`. The original research question remains unanswered.
+>
+> Two independent next actions, in separate fresh sessions: one focused final
+> methods review of draft-v0.6, whose packet is
+> `studies/study3/analysis/final_focused_review_packet_v0_6.md`; and the P0-R1
+> replay gate, continued from the published registration commit per
+> `studies/study3/pilot/p0_r1/P0_R1_HANDOFF.md`.
+
+
 > **STUDY 3-P0 STAGE P0-T RAN AND STOPPED**
 >
 > State: `STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE`

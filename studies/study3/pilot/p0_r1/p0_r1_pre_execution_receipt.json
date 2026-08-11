@@ -85,11 +85,11 @@
    "sha256": "ca3521e3c62d7655ff1d023e94aab2f7c892f9b647c8c398260f5d1b7af3dbd5"
   },
   {
-   "bytes": 31807,
+   "bytes": 31852,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
    "present": true,
-   "sha256": "66950fee63a537494cc9e22c8e92e496d7ccd16ade4335278b55077be2714bb2"
+   "sha256": "d5a29ea7f0ce4508d8761616c3cbfdda51d39bc6b02f05926b68453a63e5b022"
   },
   {
    "bytes": 14277,

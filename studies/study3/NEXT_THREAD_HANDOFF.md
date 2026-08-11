@@ -1,5 +1,37 @@
 # Study 3 - next thread handoff
 
+> **DRAFT-V0.6 AND P0-R1 ARE PUBLISHED - TWO INDEPENDENT NEXT SESSIONS**
+>
+> States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
+> and `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE`.
+>
+> **What the next thread may do — either one, in a fresh session, not both in one.**
+>
+> 1. **The focused final methods review of draft-v0.6.** Its scope is limited by
+>    authority section 11 to the first-discriminative-token factorization, the
+>    classifier repair, the affected accounting and the consistency of the
+>    resulting candidate. It is **not** another general review of every
+>    historical artifact and it **must not** reopen unrelated resolved findings
+>    without a concrete contradiction in live v0.6 bytes. Start from
+>    `studies/study3/analysis/final_focused_review_packet_v0_6.md`.
+> 2. **The P0-R1 replay gate.** Continue from the published P0-R1 registration
+>    commit, not from an older baseline. Run the replay-only factorization gate
+>    first; it performs zero new encodes. If it fails, publish a registered stop
+>    and perform **no** model operation — do not repair and rerun. If it passes,
+>    the repaired model pilot may run in one Azure containerized GPU job. Start
+>    from `studies/study3/pilot/p0_r1/P0_R1_HANDOFF.md`.
+>
+> **What the next thread may not do.** No freeze, no seed, no bank, no interface
+> selection, no positive reference, no confirmation access, no `OD2` or `UR-22`
+> resolution, and no evidence-ledger row. It **may never** edit a byte under
+> `studies/study3/pilot/p0/` or `tests/test_study3_p0_feasibility_pilot.py`,
+> rewrite the historical terminal state, or widen the pilot.
+>
+> Every P0-R1 counter is zero, the immutable P0-T counters are untouched, the
+> evidence ledger still ends at `EV-0016`, and the original research question
+> remains unanswered.
+
+
 > **STUDY 3-P0 STAGE P0-T RAN AND STOPPED**
 >
 > State: `STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE`

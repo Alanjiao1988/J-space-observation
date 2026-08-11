@@ -4,6 +4,28 @@
 
 ## 当前状态
 
+> **STUDY 3 DRAFT-V0.6 SCORING BOUNDARY REGISTERED - P0-R1 AWAITING ITS REPLAY GATE**
+>
+> States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
+> 与 `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE`。
+>
+> draft-v0.6 修复了已发布的 P0-T disposition 所披露的两项机械缺陷，且**只**改变一件规范性的事：`S2`/`S3` 的判定统计量在**哪个位置**读取。模型可见的字节一个都没有改：answer cue 仍为 `Answer:` 且无尾随空白，完整候选面仍为 `" 0"`..`" 9"`（各带恰好一个前导 U+0020），`S1` 与 `S4` 完全不变，draft-v0.5 的 registry 逐字节保留为历史。
+>
+> 每个完整的 `S2`/`S3` 候选分解为 `candidate_d = common_prefix || discriminant_d`。scoring context 为「已注册的 prompt token IDs」后接「已验证的 common-prefix token」，由拼接构成，绝不通过重新编码拼接后的字符串得到；在该 context 上执行**一次**普通 prefill，并**仅**在十个已验证的 discriminant token ID 上读取 next-token logits；`S3` 在 CPU 上复用这一完全相同的向量，新增 **0** 次 model evaluation。common-prefix token 是 teacher-forced 的候选前缀：它不是生成的 token，也不是一次独立的 sequence-level model evaluation。
+>
+> token 身份是**推导得出而非誊抄**的：common prefix `220` 承载恰好一个 U+0020，discriminant `15`-`24` 承载 `0`-`9`，由不可变的已发布 P0-T result 与冻结语料在**零次** tokenizer encode 下恢复，且对 `RT`、`RL`、`RI` 完全一致。
+>
+> eligibility 分类器在一个**带版本的后继实现**中修复，历史结果绝不就地编辑。用不可变记录重放：在仅移除传播、scoring 规则保持 draft-v0.5 不变时，带空 reason 列表的 ineligible cell 由 27 降为 **0**，且每个目标角色仍保有**九**个可执行的真实 `I3` contrast——这机械地确认了当时发出的终态**过于严厉**，与已发布 disposition 的披露一致。在 draft-v0.6 边界下，39 个 cell 全部 eligible，每个角色保有十一个。
+>
+> 没有任何已注册的统计量发生变化：`m_max` 43、样本量 `413`/`214`/`448`、pass count `389`/`129`/`383` 与 `388`/`127`/`381`、以及 `31,065` 的 sequence-level development projection 全部**由推导重现**。确实变化的两项——`S2`/`S3` 的 scoring-context token 计数，以及 `S3` 零增量成本条件的表述——被单独列出而非被吸收，且二者都不增加任何 sequence-level model evaluation。
+>
+> P0-R1 是**已注册、未执行**：未构造 tokenizer、未下载 checkpoint、未加载权重、未分配 GPU、无 forward pass、无生成。全部 P0-R1 counter 为 0，不可变的 P0-T counter 未被触碰，`studies/study3/pilot/p0/` 下没有一个字节改变。
+>
+> `formal_execution_authorized = false`。draft-v0.6 **未**审阅、**未**冻结、**未**被选定。`OD2`、`UR-22` 与全部 `RP` 对象仍未解决，`RP` wrapper 为 **null** 而非空。不存在 seed、bank、winner 或 evidence row；`paper/evidence_ledger.csv` 逐字节不变，仍止于 `EV-0016`；原始研究问题仍未回答。
+>
+> 入口：[draft-v0.6 amendment 记录](studies/study3/reviews/v0_6_operator_amendment.md) · [focused review packet](studies/study3/analysis/final_focused_review_packet_v0_6.md) · [v0.6 rendering/scoring registry](studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json) · [P0-R1 包](studies/study3/pilot/p0_r1/README.md) · [P0-R1 handoff](studies/study3/pilot/p0_r1/P0_R1_HANDOFF.md) · [operator authority](studies/study3/prompts/study3_v0_6_p0_r1_authority.md)
+
+
 > **STUDY 3-P0 FEASIBILITY PILOT REGISTERED - AWAITING THE TOKENIZER GATE**
 >
 > State: `STUDY3_P0_REGISTERED_AWAITING_TOKENIZER_GATE`

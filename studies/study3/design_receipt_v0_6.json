@@ -68,12 +68,17 @@
    "why": "the v0.5 condition was stated for a jointly single-token answer domain, which the pinned tokenizers do not provide. The condition is restated at the discriminant position so that it is true of the surface actually registered"
   }
  },
- "changed_path_count": 25,
+ "changed_path_count": 35,
  "changed_path_note": "this receipt itself is the remaining authorized changed path and cannot record its own digest",
  "changed_paths": [
+  "studies/study3/analysis/final_focused_review_packet_v0_6.md",
   "studies/study3/analysis/p0_r1_corrected_eligibility_tables.json",
   "studies/study3/analysis/scoring_boundary_v0_6.py",
   "studies/study3/analysis/scoring_boundary_v0_6_tables.json",
+  "studies/study3/design_receipt_v0_6.json",
+  "studies/study3/design_receipt_v0_6.py",
+  "studies/study3/pilot/p0_r1/P0_R1_HANDOFF.md",
+  "studies/study3/pilot/p0_r1/README.md",
   "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1",
   "studies/study3/pilot/p0_r1/container/p0_r1_acr_task.yaml",
   "studies/study3/pilot/p0_r1/container/p0_r1_replay.sh",
@@ -90,9 +95,14 @@
   "studies/study3/pilot/p0_r1/p0_r1_summarize.py",
   "studies/study3/pilot/p0_r1/p0_r1_validate.py",
   "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+  "studies/study3/protocol/interface_calibration_protocol.schema.json",
+  "studies/study3/protocol/interface_calibration_protocol_draft.json",
+  "studies/study3/protocol/interface_calibration_protocol_draft.md",
   "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
   "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json",
   "studies/study3/reviews/v0_6_operator_amendment.json",
+  "studies/study3/reviews/v0_6_operator_amendment.md",
+  "studies/study3/reviews/v0_6_operator_amendment.schema.json",
   "tests/test_study3_p0_r1_registration.py",
   "tests/test_study3_rendering_registry_v0_6.py"
  ],

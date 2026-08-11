@@ -223,6 +223,7 @@ AUTHORIZED_WRITE_PATHS = (
     "studies/study3/reviews/v0_6_operator_amendment.md",
     "studies/study3/reviews/v0_6_operator_amendment.schema.json",
     "studies/study3/design_receipt_v0_6.json",
+    "studies/study3/design_receipt_v0_6.py",
     "studies/study3/analysis/scoring_boundary_v0_6.py",
     "studies/study3/analysis/scoring_boundary_v0_6_tables.json",
     "studies/study3/analysis/p0_r1_corrected_eligibility_tables.json",

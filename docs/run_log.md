@@ -7195,3 +7195,103 @@ It is semantically identical to the original external draft after deterministic
 removal of Markdown syntax, table separator lines and whitespace, but it is not
 byte-identical to that external draft. This is transport-format normalization,
 not a scientific change, and the committed authority bytes are unchanged.
+
+## 2026-08-11 - Study 3 draft-v0.6 scoring boundary and the P0-R1 registration
+
+A fresh session opened on the required baseline `dfbe6dd6c82fbe0e8906a4aa7f4df6b676496366`
+with tree `7779c8fd28aad434096ff9643c3f294b27157980`, `HEAD == origin/main` and a
+clean worktree, all re-verified from Git rather than assumed. The operative
+authority was committed first, as its own section 1 requires, and published by
+non-force fast-forward before any draft-v0.6 or P0-R1 artifact existed. Its
+committed blob reproduces the operator-supplied bytes exactly: 19,632
+bytes, sha256 `f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2`,
+LF only with zero CR bytes, no trailing newline and no BOM. No
+transport-format normalization was applied or needed, because the supplied file
+was already strict LF without a trailing newline.
+
+The round has two purposes and no others: amend the unfrozen Study 3 candidate
+from draft-v0.5 to draft-v0.6, and register - without executing - one repaired
+feasibility continuation on the unchanged frozen pilot corpus.
+
+The scoring-boundary repair. Stage P0-T published, as immutable fact, that under
+every pinned role tokenizer each registered `S2`/`S3` candidate surface `" 0"`
+through `" 9"` is two tokens rather than one, which makes the draft-v0.5
+single-position restricted-logit rule unimplementable as written. draft-v0.6
+preserves the visible answer surface exactly - the cue `Answer:` with no trailing
+whitespace, the ten candidate surfaces each carrying exactly one leading U+0020,
+`S1` and `S4` untouched - and changes only where the decision statistic is read.
+Every complete candidate factors as `candidate_d = common_prefix ||
+discriminant_d`; the `S2` scoring context is the registered prompt token IDs
+followed by the verified common-prefix token, built by concatenation and never by
+re-encoding a concatenated string; one ordinary prefill reads the next-token
+logits at the ten verified discriminant token IDs only; and `S3` reuses that
+exact vector on CPU for zero additional model evaluations. The common-prefix
+token is recorded as a teacher-forced candidate prefix, not a generated token and
+not a separate sequence-level model evaluation.
+
+The token identities were derived rather than transcribed, as section 3.2
+requires. The replay verifier reads two immutable sources after verifying their
+byte length and SHA-256 - the published P0-T result at 5,820,022 bytes
+`9603b611...` and the frozen corpus at 69,781 bytes `5343019a...` - binds 70
+published prompt/token-ID pairs per role to the exact frozen prompt bytes by
+SHA-256, and solves for the byte string each token contributes, requiring the
+answer to be unique. It recovers common prefix `220` carrying exactly one U+0020
+and discriminants `15` through `24` carrying `0` through `9`, identically for
+`RT`, `RL` and `RI`, having performed exactly zero tokenizer encodes and having
+imported no tokenizer library. A committed test asserts that no member of that
+token set appears as a numeric literal anywhere in the verifier.
+
+The classifier repair. The published disposition disclosed that
+`evaluate_eligibility` consulted a role-level flag and propagated a role-level
+`S2` failure onto 27 mechanically valid `S1` cells, which then carried empty
+reason lists. A versioned successor classifier recomputes eligibility at the
+narrowest applicable key, with every reason carrying its own scope and the
+production validator rejecting any reason whose scope is not a prefix of the cell
+it decorates. Replaying the immutable records reproduces the disposition's own
+arithmetic: with the propagation removed but the draft-v0.5 scoring rule
+unchanged, 33 of 39 cells are eligible, the 6 ineligible cells are 3 `S2` and 3
+`S3` cells each carrying an explicit local reason rather than an empty list, no
+`S1` cell is ineligible, and each of `RT`, `RL` and `RI` retains nine executable
+genuine `I3` contrasts. Under the draft-v0.6 boundary as well, all 39 cells are
+eligible and each role retains eleven. All 27 empty-reason cells are repaired and
+all 27 are `S1` cells. The historical result, receipt, disposition and counters
+were not edited, and the emitted historical terminal state was not rewritten.
+
+Accounting. Every quantity the new boundary could have moved was recomputed from
+`studies/study3/analysis/design_statistics.py` and compared rather than copied
+forward: `m_max` 43, per-cell budget `19/17200`, per-cell target `17181/17200`,
+profile stage floor `381/400`, end-to-end floor `9/10`, sizes `413`/`214`/`448`,
+development pass counts `389`/`129`/`383`, confirmation pass counts
+`388`/`127`/`381`, gate-bearing cells 43/16/16/39, and the `31,065` sequence-level
+development projection. None moved. Two things did, and both are surfaced
+separately rather than absorbed: the `S2`/`S3` scoring-context token count becomes
+the registered prompt token count plus one, which adds 18 processed tokens across
+the 18 P0-R1 `S2` rows and 5,001 across the development projection while adding
+exactly zero sequence-level evaluations; and the `S3` zero-incremental-cost
+condition is restated from "a jointly single-token registered answer domain" to a
+common-prefix and discriminant formulation, with no numeric effect at all.
+
+Publication artifacts. The draft-v0.6 rendering and scoring registry is
+57,331 bytes, sha256 `8cf04658...`, and the P0-R1 pre-execution
+receipt is 12,261 bytes, sha256 `e26f448c...`. The registry is
+generated from the draft-v0.5 registry by copy-and-extend, and a derivation-time
+guard fails the build if any guarded visible field or any of the 22 normative
+template asset identities differs, so the visible rendering surface cannot drift.
+The draft-v0.5 registry and schema remain byte-identical on disk.
+
+Boundary held throughout. Zero tokenizer constructions, zero tokenizer encodes,
+zero checkpoint downloads, zero weight loads, zero GPU allocations, zero forward
+passes, zero generations and zero scored rows occurred in this session, and zero
+local pytest runs were performed; all authoritative validation ran CPU-only in
+the registered Azure Container Registry route on clean exact-commit checkouts
+from a fresh clone of a Git bundle. Not one byte under
+`studies/study3/pilot/p0/` or in `tests/test_study3_p0_feasibility_pilot.py`
+changed. `paper/evidence_ledger.csv` is byte-identical and still ends at
+`EV-0016`. `formal_execution_authorized` remains false, draft-v0.6 is neither
+reviewed nor frozen nor selected, `OD2`, `UR-22` and every `RP` object remain
+unresolved with the `RP` wrapper null rather than empty, and the original
+research question remains unanswered.
+
+The session ends in `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE`. It did not
+perform the replay gate, construct a tokenizer, download a checkpoint, allocate a
+GPU or begin the model pilot, and it did not begin the final focused review.
