@@ -1,0 +1,1732 @@
+{
+ "answer_cue": {
+  "candidate_surfaces_carry_exactly_one_leading_space": true,
+  "held_byte_identical_across_every_profile_and_rendering": true,
+  "literal": "Answer:",
+  "sha256": "64f89cf423ee1a167e9c8142a340d7aaef3605a56c73d30275fbdd94d098e36c",
+  "trailing_whitespace": "none; the cue ends with U+003A COLON",
+  "why": "the cue carries no trailing space and every scored candidate surface carries exactly one leading U+0020, so the whitespace between the cue and the answer is registered once, on the candidate side, and can never be duplicated or omitted"
+ },
+ "answer_domain": {
+  "description": "the mod-10 residues in their registered surface form",
+  "frozen": true,
+  "surface_forms": [
+   "0",
+   "1",
+   "2",
+   "3",
+   "4",
+   "5",
+   "6",
+   "7",
+   "8",
+   "9"
+  ]
+ },
+ "applicability_table": {
+  "per_profile_applicable_contrast_counts": {
+   "S1": 2,
+   "S2": 1,
+   "S3": 1,
+   "S4": 2
+  },
+  "row_count": 8,
+  "rows": [
+   {
+    "applicability": "applicable",
+    "baseline_rendering": "R-base",
+    "contrast": "K6-SEP",
+    "descriptive_only": false,
+    "gate_bearing": true,
+    "profile": "S1",
+    "reason": null,
+    "variant_rendering": "R-sep"
+   },
+   {
+    "applicability": "applicable",
+    "baseline_rendering": "R-base",
+    "contrast": "K6-INSTR",
+    "descriptive_only": false,
+    "gate_bearing": true,
+    "profile": "S1",
+    "reason": null,
+    "variant_rendering": "R-instr"
+   },
+   {
+    "applicability": "not_applicable",
+    "baseline_rendering": "R-base",
+    "contrast": "K6-SEP",
+    "descriptive_only": false,
+    "gate_bearing": false,
+    "profile": "S2",
+    "reason": "S2 renders neither an option label nor an option content, so the label-to-content separator that K6-SEP varies has no referent",
+    "variant_rendering": "R-sep"
+   },
+   {
+    "applicability": "applicable",
+    "baseline_rendering": "R-base",
+    "contrast": "K6-INSTR",
+    "descriptive_only": false,
+    "gate_bearing": true,
+    "profile": "S2",
+    "reason": null,
+    "variant_rendering": "R-instr"
+   },
+   {
+    "applicability": "not_applicable",
+    "baseline_rendering": "R-base",
+    "contrast": "K6-SEP",
+    "descriptive_only": false,
+    "gate_bearing": false,
+    "profile": "S3",
+    "reason": "S3 renders neither an option label nor an option content, so the label-to-content separator that K6-SEP varies has no referent",
+    "variant_rendering": "R-sep"
+   },
+   {
+    "applicability": "applicable",
+    "baseline_rendering": "R-base",
+    "contrast": "K6-INSTR",
+    "descriptive_only": false,
+    "gate_bearing": true,
+    "profile": "S3",
+    "reason": null,
+    "variant_rendering": "R-instr"
+   },
+   {
+    "applicability": "applicable",
+    "baseline_rendering": "R-base",
+    "contrast": "K6-SEP",
+    "descriptive_only": true,
+    "gate_bearing": false,
+    "profile": "S4",
+    "reason": null,
+    "variant_rendering": "R-sep"
+   },
+   {
+    "applicability": "applicable",
+    "baseline_rendering": "R-base",
+    "contrast": "K6-INSTR",
+    "descriptive_only": true,
+    "gate_bearing": false,
+    "profile": "S4",
+    "reason": null,
+    "variant_rendering": "R-instr"
+   }
+  ],
+  "value_semantics": {
+   "applicable": "the pair is instantiated and, unless the profile is the never-selectable diagnostic S4, it is gate-bearing",
+   "not_applicable": "the factor has no referent for this profile. This is a third value: it is not a pass, not a zero effect, not robustness evidence, not a gate-bearing cell and not a denominator member."
+  }
+ },
+ "binding_status": "BINDING_NORMATIVE_INPUT_NOT_AN_ILLUSTRATIVE_EXAMPLE. An independent implementation must be able to produce every applicable prompt byte from this registry alone, with no later wording, punctuation, whitespace, ordering, escaping or placeholder choice.",
+ "closes_finding": "S3MR3-010",
+ "closes_p0_t_demonstrated_defects": [
+  "the S2/S3 single-position scoring rule is not implementable under the pinned role tokenizers",
+  "the eligibility classifier propagated a role-level S2 failure onto mechanically valid S1 cells"
+ ],
+ "disposition_status": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+ "document_class": "normative_rendering_registry",
+ "draft_version": "draft-v0.6",
+ "encoding_policy": {
+  "byte_order_mark_prohibited": true,
+  "character_encoding": "UTF-8",
+  "line_ending": "LF (U+000A) only; CR (U+000D) is prohibited in every registered string",
+  "non_breaking_space_prohibited": true,
+  "permitted_codepoints": "U+0020 SPACE, U+000A LF, and the printable ASCII range U+0021 to U+007E; every other codepoint is rejected",
+  "tab_prohibited": true,
+  "terminal_newline_policy": "every question stem, option line and instruction sentence ends with exactly one LF; the answer cue carries no terminal newline and is the final registered byte of the prompt",
+  "trailing_whitespace_prohibited_on_every_line": true,
+  "unicode_normalization": "NFC; a renderer must reject any input that is not already NFC"
+ },
+ "future_pre_bank_token_distinctness_rule": {
+  "evaluated_in_this_round": false,
+  "on_failure": "the role/profile/contrast combination becomes INELIGIBLE. Failure is never treated as a pass, never silently repaired, and never rescued.",
+  "resolves_od2": false,
+  "rule": "after checkpoints and tokenizers are separately authorised and pinned, and before any bank is materialised, every gate-bearing contrast pair must be shown to produce DISTINCT token-ID sequences for every role to which the cell applies",
+  "status": "REGISTERED_FUTURE_FAIL_CLOSED_RULE_NOT_EVALUATED_IN_THIS_ROUND",
+  "tokenizer_calls_in_this_round": 0,
+  "why_not_now": "no checkpoint or tokenizer may be accessed in this amendment, so byte distinctness is the only distinctness this round can establish"
+ },
+ "governs": "studies/study3/protocol/interface_calibration_protocol_draft.json registers this file as a binding input; where the two disagree the disagreement is a defect",
+ "instructions": {
+  "co_reference_rule": "for every applicable profile the R-base and R-instr instruction strings are exact, semantically co-referential restatements of the same directive; they differ in wording only and in no other registered field",
+  "entries": [
+   {
+    "applicable": true,
+    "instruction": "Answer with the letter of the correct option.\n",
+    "instruction_sha256": "6206bb6f657a1fe0f0d384818f4a216e0226b22285fe7a5ad596f4f227f5b65b",
+    "profile": "S1",
+    "reason": null,
+    "rendering": "R-base"
+   },
+   {
+    "applicable": true,
+    "instruction": "Answer with the letter of the correct option.\n",
+    "instruction_sha256": "6206bb6f657a1fe0f0d384818f4a216e0226b22285fe7a5ad596f4f227f5b65b",
+    "profile": "S1",
+    "reason": null,
+    "rendering": "R-sep"
+   },
+   {
+    "applicable": true,
+    "instruction": "Reply using only the letter that marks the correct option.\n",
+    "instruction_sha256": "a57c245dd4c189bab86d47bd19b37464bfbabde7c3b9f0105f0a6b65fe061001",
+    "profile": "S1",
+    "reason": null,
+    "rendering": "R-instr"
+   },
+   {
+    "applicable": true,
+    "instruction": "Answer with the value.\n",
+    "instruction_sha256": "1654f794e18f5bd381f2b08a69cb70e0ba2ba07ebe6f210614b8cf84f896bf5b",
+    "profile": "S2",
+    "reason": null,
+    "rendering": "R-base"
+   },
+   {
+    "applicable": false,
+    "instruction": null,
+    "instruction_sha256": null,
+    "profile": "S2",
+    "reason": "R-sep has no referent for an option-less profile",
+    "rendering": "R-sep"
+   },
+   {
+    "applicable": true,
+    "instruction": "Reply using only the value.\n",
+    "instruction_sha256": "3ddf5bcda09edaebbd4c2b04df6ef0f4c0b921a028572684a74ff8a070048d12",
+    "profile": "S2",
+    "reason": null,
+    "rendering": "R-instr"
+   },
+   {
+    "applicable": true,
+    "instruction": "Answer with the value.\n",
+    "instruction_sha256": "1654f794e18f5bd381f2b08a69cb70e0ba2ba07ebe6f210614b8cf84f896bf5b",
+    "profile": "S3",
+    "reason": null,
+    "rendering": "R-base"
+   },
+   {
+    "applicable": false,
+    "instruction": null,
+    "instruction_sha256": null,
+    "profile": "S3",
+    "reason": "R-sep has no referent for an option-less profile",
+    "rendering": "R-sep"
+   },
+   {
+    "applicable": true,
+    "instruction": "Reply using only the value.\n",
+    "instruction_sha256": "3ddf5bcda09edaebbd4c2b04df6ef0f4c0b921a028572684a74ff8a070048d12",
+    "profile": "S3",
+    "reason": null,
+    "rendering": "R-instr"
+   },
+   {
+    "applicable": true,
+    "instruction": "Answer with the letter of the correct option.\n",
+    "instruction_sha256": "6206bb6f657a1fe0f0d384818f4a216e0226b22285fe7a5ad596f4f227f5b65b",
+    "profile": "S4",
+    "reason": null,
+    "rendering": "R-base"
+   },
+   {
+    "applicable": true,
+    "instruction": "Answer with the letter of the correct option.\n",
+    "instruction_sha256": "6206bb6f657a1fe0f0d384818f4a216e0226b22285fe7a5ad596f4f227f5b65b",
+    "profile": "S4",
+    "reason": null,
+    "rendering": "R-sep"
+   },
+   {
+    "applicable": true,
+    "instruction": "Reply using only the letter that marks the correct option.\n",
+    "instruction_sha256": "a57c245dd4c189bab86d47bd19b37464bfbabde7c3b9f0105f0a6b65fe061001",
+    "profile": "S4",
+    "reason": null,
+    "rendering": "R-instr"
+   }
+  ],
+  "r_base_and_r_sep_share_one_instruction": "K6-SEP varies the separator only, so R-sep carries the R-base instruction byte-identically"
+ },
+ "label_alphabets": {
+  "alphabets": {
+   "ALPHA-1": [
+    "A",
+    "B",
+    "C",
+    "D"
+   ],
+   "ALPHA-2": [
+    "W",
+    "X",
+    "Y",
+    "Z"
+   ]
+  },
+  "alphabets_mutually_disjoint": true,
+  "count": 2,
+  "digits_prohibited_as_label_symbols": true,
+  "disjoint_from_answer_domain": true,
+  "registered_order": "the listed order is the registered order and is also the deterministic tie-break order",
+  "symbols_per_alphabet": 4
+ },
+ "pair_isolation_rules": {
+  "byte_identical_applicable_pair_disposition": "REJECT_AS_A_CONSTRUCTION_DEFECT. An applicable contrast pair whose two members are byte-identical is a self-comparison, never a presentation pair, and is never recorded as a pass.",
+  "byte_identical_applicable_pair_is_a_defect": true,
+  "ground_truth_unchanged_within_a_pair": true,
+  "k6_instr": "within a K6-INSTR pair every prompt byte is identical except the registered instruction sentence; the answer cue and the separator are byte-identical",
+  "k6_sep": "within an applicable K6-SEP pair every prompt byte is identical except the registered label-to-content separator literal"
+ },
+ "placeholders": {
+  "interpolation_syntax": "{name} where name matches ^[a-z][a-z0-9_]*$; a literal brace is prohibited in every registered template, so no brace escape exists and none is permitted",
+  "missing_substitution_rejected": true,
+  "names": {
+   "a1": {
+    "allowed_surface_forms": [
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "description": "the multiplier of the first affine step",
+    "type": "affine_multiplier"
+   },
+   "a2": {
+    "allowed_surface_forms": [
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "description": "the multiplier of the second affine step",
+    "type": "affine_multiplier"
+   },
+   "a3": {
+    "allowed_surface_forms": [
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "description": "the multiplier of the third affine step",
+    "type": "affine_multiplier"
+   },
+   "b1": {
+    "allowed_surface_forms": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "description": "the offset of the first affine step",
+    "type": "affine_offset"
+   },
+   "b2": {
+    "allowed_surface_forms": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "description": "the offset of the second affine step",
+    "type": "affine_offset"
+   },
+   "b3": {
+    "allowed_surface_forms": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "description": "the offset of the third affine step",
+    "type": "affine_offset"
+   },
+   "content": {
+    "allowed_surface_forms": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "description": "one displayed option content",
+    "type": "mod10_residue"
+   },
+   "label": {
+    "allowed_surface_forms": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "W",
+     "X",
+     "Y",
+     "Z"
+    ],
+    "description": "one displayed label symbol of the active alphabet",
+    "type": "label_symbol"
+   },
+   "p1": {
+    "allowed_surface_forms": "the registered permutation surface grammar",
+    "description": "the first permutation of the chain",
+    "type": "permutation_surface"
+   },
+   "p2": {
+    "allowed_surface_forms": "the registered permutation surface grammar",
+    "description": "the second permutation of the chain",
+    "type": "permutation_surface"
+   },
+   "p3": {
+    "allowed_surface_forms": "the registered permutation surface grammar",
+    "description": "the third permutation of the chain",
+    "type": "permutation_surface"
+   },
+   "separator": {
+    "allowed_surface_forms": [
+     " = ",
+     ": "
+    ],
+    "description": "the registered label-to-content separator of the active rendering",
+    "type": "registered_separator_literal"
+   },
+   "value": {
+    "allowed_surface_forms": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "description": "a stated answer value in the K1 explicit-binding stem",
+    "type": "mod10_residue"
+   },
+   "x": {
+    "allowed_surface_forms": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "description": "the registered input value v0",
+    "type": "mod10_residue"
+   }
+  },
+  "permutation_surface_grammar": {
+   "closing_bracket": "]",
+   "description": "a one-line image vector of the permutation of the mod-10 residues: the bracketed, single-space-separated images of 0 through 9 in ascending argument order",
+   "element_count": 10,
+   "element_separator": " ",
+   "element_surface_forms": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "example_only_not_normative_content": "[1 2 3 4 5 6 7 8 9 0]",
+   "form": "[d0 d1 d2 d3 d4 d5 d6 d7 d8 d9]",
+   "must_be_a_bijection_on_the_answer_domain": true,
+   "opening_bracket": "["
+  },
+  "residual_brace_after_substitution_rejected": true,
+  "substitution_rule": "exact textual substitution of the registered surface form; no formatting, padding, locale, thousands separator, sign, or width transformation is applied",
+  "unregistered_placeholder_rejected": true
+ },
+ "profiles": [
+  {
+   "candidate_surfaces": {
+    "by_label_alphabet": {
+     "ALPHA-1": [
+      " A",
+      " B",
+      " C",
+      " D"
+     ],
+     "ALPHA-2": [
+      " W",
+      " X",
+      " Y",
+      " Z"
+     ]
+    },
+    "leading_whitespace": "exactly one U+0020 SPACE prefixes every candidate surface",
+    "scored_at": "the single next-token position immediately after the answer cue",
+    "tie_break_order": "the registered order of the label alphabet: index 0 first",
+    "trailing_whitespace": "none"
+   },
+   "chat_wrapper": null,
+   "chat_wrapper_status": "no chat template is applied; the registered bytes are the complete prompt",
+   "option_block": {
+    "line_count": 4,
+    "line_grammar": "{label}{separator}{content}\n",
+    "no_blank_line_between_options": true,
+    "no_leading_whitespace_on_an_option_line": true,
+    "no_trailing_whitespace_on_an_option_line": true,
+    "ordering": "ascending physical option position 0, 1, 2, 3; the label displayed at position i is the registered nuisance-state symbol assignment for that base-item index, and the content at position i is the registered correct content when i is the registered correct-content position and a registered distractor otherwise",
+    "separator": ": ",
+    "separator_codepoints": [
+     "0x3a",
+     "0x20"
+    ],
+    "terminator": "\\n after every option line, including the last"
+   },
+   "option_block_by_rendering": {
+    "R-base": {
+     "line_count": 4,
+     "line_grammar": "{label}{separator}{content}\n",
+     "no_blank_line_between_options": true,
+     "no_leading_whitespace_on_an_option_line": true,
+     "no_trailing_whitespace_on_an_option_line": true,
+     "ordering": "ascending physical option position 0, 1, 2, 3; the label displayed at position i is the registered nuisance-state symbol assignment for that base-item index, and the content at position i is the registered correct content when i is the registered correct-content position and a registered distractor otherwise",
+     "separator": ": ",
+     "separator_codepoints": [
+      "0x3a",
+      "0x20"
+     ],
+     "terminator": "\\n after every option line, including the last"
+    },
+    "R-instr": {
+     "line_count": 4,
+     "line_grammar": "{label}{separator}{content}\n",
+     "no_blank_line_between_options": true,
+     "no_leading_whitespace_on_an_option_line": true,
+     "no_trailing_whitespace_on_an_option_line": true,
+     "ordering": "ascending physical option position 0, 1, 2, 3; the label displayed at position i is the registered nuisance-state symbol assignment for that base-item index, and the content at position i is the registered correct content when i is the registered correct-content position and a registered distractor otherwise",
+     "separator": ": ",
+     "separator_codepoints": [
+      "0x3a",
+      "0x20"
+     ],
+     "terminator": "\\n after every option line, including the last"
+    },
+    "R-sep": {
+     "line_count": 4,
+     "line_grammar": "{label}{separator}{content}\n",
+     "no_blank_line_between_options": true,
+     "no_leading_whitespace_on_an_option_line": true,
+     "no_trailing_whitespace_on_an_option_line": true,
+     "ordering": "ascending physical option position 0, 1, 2, 3; the label displayed at position i is the registered nuisance-state symbol assignment for that base-item index, and the content at position i is the registered correct content when i is the registered correct-content position and a registered distractor otherwise",
+     "separator": " = ",
+     "separator_codepoints": [
+      "0x20",
+      "0x3d",
+      "0x20"
+     ],
+     "terminator": "\\n after every option line, including the last"
+    }
+   },
+   "profile": "S1",
+   "prompt_assembly": {
+    "answer_cue_ends_the_prompt": true,
+    "concatenation_order": [
+     "question_stem",
+     "option_block",
+     "instruction",
+     "answer_cue"
+    ],
+    "joiner": "the empty string; every part except the answer cue already ends with LF",
+    "no_trailing_whitespace_after_the_answer_cue": true
+   },
+   "raw_completion_prompt_template": "{question_stem}{option_block}{instruction}Answer:",
+   "renders_label_symbols": true,
+   "renders_option_list": true,
+   "scoring_boundary": {
+    "candidate_factorization": null,
+    "candidate_token_structure": "every registered candidate surface is exactly one token under every pinned role tokenizer",
+    "common_prefix_token_count": 0,
+    "common_prefix_token_count_per_scored_row": 0,
+    "reads_logits_at": "the single next-token position immediately after the registered answer cue",
+    "registered_prompt_token_count": 8874,
+    "scored_rows": 162,
+    "scoring_context": "the registered prompt token IDs, unchanged",
+    "scoring_context_token_count": 8874,
+    "scoring_rule": "single_next_token_restricted_argmax",
+    "sequence_level_model_evaluations_per_scored_row": 1,
+    "teacher_forced_common_prefix": false,
+    "tokens_processed": 8874,
+    "unchanged_from_v0_5": true
+   },
+   "surface_class": "raw_completion"
+  },
+  {
+   "candidate_surfaces": {
+    "answer_domain": [
+     " 0",
+     " 1",
+     " 2",
+     " 3",
+     " 4",
+     " 5",
+     " 6",
+     " 7",
+     " 8",
+     " 9"
+    ],
+    "leading_whitespace": "exactly one U+0020 SPACE prefixes every candidate surface",
+    "scored_at": "the single next-token position immediately after the answer cue",
+    "tie_break_order": "ascending mod-10 residue order 0, 1, 2, ..., 9",
+    "trailing_whitespace": "none"
+   },
+   "chat_wrapper": null,
+   "chat_wrapper_status": "no chat template is applied; the registered bytes are the complete prompt",
+   "option_block": null,
+   "option_block_by_rendering": {
+    "R-base": null,
+    "R-instr": null
+   },
+   "profile": "S2",
+   "prompt_assembly": {
+    "answer_cue_ends_the_prompt": true,
+    "concatenation_order": [
+     "question_stem",
+     "instruction",
+     "answer_cue"
+    ],
+    "joiner": "the empty string; every part except the answer cue already ends with LF",
+    "no_trailing_whitespace_after_the_answer_cue": true
+   },
+   "raw_completion_prompt_template": "{question_stem}{instruction}Answer:",
+   "renders_label_symbols": false,
+   "renders_option_list": false,
+   "scoring_boundary": {
+    "candidate_factorization": "candidate_d = common_prefix || discriminant_d",
+    "candidate_token_structure": "every registered candidate surface is exactly two tokens under every pinned role tokenizer: one shared leading-space token and one distinct digit token",
+    "common_prefix_token_count": 18,
+    "common_prefix_token_count_per_scored_row": 1,
+    "eligibility_conditions": [
+     {
+      "condition": "every complete candidate is exactly two tokens",
+      "id": "SB-1"
+     },
+     {
+      "condition": "the first token is identical for all ten candidates",
+      "id": "SB-2"
+     },
+     {
+      "condition": "that common token decodes byte-exactly to the registered leading U+0020",
+      "id": "SB-3"
+     },
+     {
+      "condition": "the second token IDs are pairwise distinct and map byte-exactly to 0 through 9 in registered order",
+      "id": "SB-4"
+     },
+     {
+      "condition": "no BOS, EOS, chat template, normalization, padding, truncation or implicit whitespace transformation participates in the factorization",
+      "id": "SB-5"
+     }
+    ],
+    "reads_logits_at": "the single next-token position after the teacher-forced common prefix, restricted to the ten verified discriminant token IDs",
+    "registered_prompt_token_count": 561,
+    "scored_rows": 18,
+    "scoring_context": "the registered prompt token IDs followed by the verified common-prefix token",
+    "scoring_context_token_count": 579,
+    "scoring_rule": "first_discriminative_token_restricted_argmax",
+    "sequence_level_model_evaluations_per_scored_row": 1,
+    "teacher_forced_common_prefix": true,
+    "teacher_forced_common_prefix_is_a_generation": false,
+    "teacher_forced_common_prefix_is_a_prompt_rendering_change": false,
+    "teacher_forced_common_prefix_is_a_separate_sequence_level_model_evaluation": false,
+    "tokens_processed": 579,
+    "unchanged_from_v0_5": {
+     "answer_cue": true,
+     "candidate_surfaces": true,
+     "k6_sep_structural_absence": true,
+     "prompt_bytes": true,
+     "tie_break_order": true
+    },
+    "verified_common_prefix_token": 220,
+    "verified_discriminant_token_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24
+    ]
+   },
+   "surface_class": "raw_completion"
+  },
+  {
+   "candidate_surfaces": {
+    "answer_domain": [
+     " 0",
+     " 1",
+     " 2",
+     " 3",
+     " 4",
+     " 5",
+     " 6",
+     " 7",
+     " 8",
+     " 9"
+    ],
+    "leading_whitespace": "exactly one U+0020 SPACE prefixes every candidate surface",
+    "scored_at": "the single next-token position immediately after the answer cue",
+    "tie_break_order": "ascending mod-10 residue order 0, 1, 2, ..., 9",
+    "trailing_whitespace": "none"
+   },
+   "chat_wrapper": null,
+   "chat_wrapper_status": "no chat template is applied; the registered bytes are the complete prompt",
+   "option_block": null,
+   "option_block_by_rendering": {
+    "R-base": null,
+    "R-instr": null
+   },
+   "profile": "S3",
+   "prompt_assembly": {
+    "answer_cue_ends_the_prompt": true,
+    "concatenation_order": [
+     "question_stem",
+     "instruction",
+     "answer_cue"
+    ],
+    "joiner": "the empty string; every part except the answer cue already ends with LF",
+    "no_trailing_whitespace_after_the_answer_cue": true
+   },
+   "raw_completion_prompt_template": "{question_stem}{instruction}Answer:",
+   "renders_label_symbols": false,
+   "renders_option_list": false,
+   "scoring_boundary": {
+    "adds_zero": [
+     "model evaluations",
+     "model loads",
+     "prefills",
+     "decodes",
+     "generations",
+     "processed tokens"
+    ],
+    "candidate_factorization": "candidate_d = common_prefix || discriminant_d",
+    "candidate_token_structure": "every registered candidate surface is exactly two tokens under every pinned role tokenizer: one shared leading-space token and one distinct digit token",
+    "common_prefix_token_count": 18,
+    "common_prefix_token_count_per_scored_row": 1,
+    "eligibility_conditions": [
+     {
+      "condition": "every complete candidate is exactly two tokens",
+      "id": "SB-1"
+     },
+     {
+      "condition": "the first token is identical for all ten candidates",
+      "id": "SB-2"
+     },
+     {
+      "condition": "that common token decodes byte-exactly to the registered leading U+0020",
+      "id": "SB-3"
+     },
+     {
+      "condition": "the second token IDs are pairwise distinct and map byte-exactly to 0 through 9 in registered order",
+      "id": "SB-4"
+     },
+     {
+      "condition": "no BOS, EOS, chat template, normalization, padding, truncation or implicit whitespace transformation participates in the factorization",
+      "id": "SB-5"
+     }
+    ],
+    "reads_logits_at": "the single next-token position after the teacher-forced common prefix, restricted to the ten verified discriminant token IDs",
+    "registered_prompt_token_count": 561,
+    "reuses": "the exact S2 discriminant-position logit vector, on CPU",
+    "scored_rows": 18,
+    "scoring_context": "the registered prompt token IDs followed by the verified common-prefix token",
+    "scoring_context_is_the_reused_s2_context": true,
+    "scoring_context_token_count": 579,
+    "scoring_rule": "first_discriminative_token_restricted_argmax",
+    "sequence_level_model_evaluations_per_scored_row": 0,
+    "teacher_forced_common_prefix": true,
+    "teacher_forced_common_prefix_is_a_generation": false,
+    "teacher_forced_common_prefix_is_a_prompt_rendering_change": false,
+    "teacher_forced_common_prefix_is_a_separate_sequence_level_model_evaluation": false,
+    "tokens_processed": 0,
+    "unchanged_from_v0_5": {
+     "answer_cue": true,
+     "candidate_surfaces": true,
+     "k6_sep_structural_absence": true,
+     "prompt_bytes": true,
+     "tie_break_order": true
+    },
+    "verified_common_prefix_token": 220,
+    "verified_discriminant_token_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24
+    ]
+   },
+   "surface_class": "raw_completion"
+  },
+  {
+   "candidate_surfaces": {
+    "generation_begins_immediately_after": "the answer cue, with no inserted whitespace",
+    "leading_whitespace": "none is inserted by the renderer; whatever the role-native chat wrapper contributes is wrapper bytes, not registered message bytes",
+    "scored_at": "not applicable; S4 generates text and is mapped by the pinned parser",
+    "tie_break_order": "not applicable; no scoring over a closed candidate set occurs",
+    "trailing_whitespace": "none"
+   },
+   "chat_wrapper_status": "the registered message content above is supplied to the role-native chat wrapper as one user message. The wrapper is role-specific, is applied outside this registry, and its bytes are wrapper bytes rather than registered message bytes. No cross-role byte parity is claimed or required for the wrapper.",
+   "option_block": {
+    "line_count": 4,
+    "line_grammar": "{label}{separator}{content}\n",
+    "no_blank_line_between_options": true,
+    "no_leading_whitespace_on_an_option_line": true,
+    "no_trailing_whitespace_on_an_option_line": true,
+    "ordering": "ascending physical option position 0, 1, 2, 3; the label displayed at position i is the registered nuisance-state symbol assignment for that base-item index, and the content at position i is the registered correct content when i is the registered correct-content position and a registered distractor otherwise",
+    "separator": ": ",
+    "separator_codepoints": [
+     "0x3a",
+     "0x20"
+    ],
+    "terminator": "\\n after every option line, including the last"
+   },
+   "option_block_by_rendering": {
+    "R-base": {
+     "line_count": 4,
+     "line_grammar": "{label}{separator}{content}\n",
+     "no_blank_line_between_options": true,
+     "no_leading_whitespace_on_an_option_line": true,
+     "no_trailing_whitespace_on_an_option_line": true,
+     "ordering": "ascending physical option position 0, 1, 2, 3; the label displayed at position i is the registered nuisance-state symbol assignment for that base-item index, and the content at position i is the registered correct content when i is the registered correct-content position and a registered distractor otherwise",
+     "separator": ": ",
+     "separator_codepoints": [
+      "0x3a",
+      "0x20"
+     ],
+     "terminator": "\\n after every option line, including the last"
+    },
+    "R-instr": {
+     "line_count": 4,
+     "line_grammar": "{label}{separator}{content}\n",
+     "no_blank_line_between_options": true,
+     "no_leading_whitespace_on_an_option_line": true,
+     "no_trailing_whitespace_on_an_option_line": true,
+     "ordering": "ascending physical option position 0, 1, 2, 3; the label displayed at position i is the registered nuisance-state symbol assignment for that base-item index, and the content at position i is the registered correct content when i is the registered correct-content position and a registered distractor otherwise",
+     "separator": ": ",
+     "separator_codepoints": [
+      "0x3a",
+      "0x20"
+     ],
+     "terminator": "\\n after every option line, including the last"
+    },
+    "R-sep": {
+     "line_count": 4,
+     "line_grammar": "{label}{separator}{content}\n",
+     "no_blank_line_between_options": true,
+     "no_leading_whitespace_on_an_option_line": true,
+     "no_trailing_whitespace_on_an_option_line": true,
+     "ordering": "ascending physical option position 0, 1, 2, 3; the label displayed at position i is the registered nuisance-state symbol assignment for that base-item index, and the content at position i is the registered correct content when i is the registered correct-content position and a registered distractor otherwise",
+     "separator": " = ",
+     "separator_codepoints": [
+      "0x20",
+      "0x3d",
+      "0x20"
+     ],
+     "terminator": "\\n after every option line, including the last"
+    }
+   },
+   "profile": "S4",
+   "prompt_assembly": {
+    "answer_cue_ends_the_prompt": true,
+    "concatenation_order": [
+     "question_stem",
+     "option_block",
+     "instruction",
+     "answer_cue"
+    ],
+    "joiner": "the empty string; every part except the answer cue already ends with LF",
+    "no_trailing_whitespace_after_the_answer_cue": true
+   },
+   "registered_message_content_template": "{question_stem}{option_block}{instruction}Answer:",
+   "renders_label_symbols": true,
+   "renders_option_list": true,
+   "scoring_boundary": {
+    "candidate_factorization": null,
+    "candidate_token_structure": "not applicable; S4 generates text over an open vocabulary",
+    "common_prefix_token_count": 0,
+    "common_prefix_token_count_per_scored_row": 0,
+    "participates_in_target_role_executability": false,
+    "reads_logits_at": "not applicable; S4 is diagnostic-only and is never selectable",
+    "registered_prompt_token_count": 510,
+    "scored_rows": 12,
+    "scoring_context": "the registered wrapped message, unchanged",
+    "scoring_context_token_count": 510,
+    "scoring_rule": "bounded_greedy_generation_mapped_by_the_pinned_parser",
+    "teacher_forced_common_prefix": false,
+    "tokens_processed": 510,
+    "unchanged_from_v0_5": true
+   },
+   "surface_class": "role_native_chat_wrapped",
+   "wrapper_boundary": {
+    "boundary_is_the_first_and_last_byte_of_the_registered_message_content": true,
+    "registered_side": "everything produced by the template above, byte-exact",
+    "unregistered_side": "any role-native prefix, suffix, role tag, or system turn",
+    "wrapper_may_not_alter_registered_message_bytes": true
+   }
+  }
+ ],
+ "prohibited_substitutions": [
+  "any whitespace not registered here, including tabs, double spaces and trailing spaces",
+  "any punctuation substitution in a stem, option line, instruction or answer cue",
+  "any unregistered placeholder name",
+  "any option ordering other than ascending physical position",
+  "any instruction sentence not registered for that (profile, rendering) pair",
+  "any answer cue other than the single registered literal",
+  "any chat wrapper applied to S1, S2 or S3",
+  "any profile-specific replacement separator invented for S2 or S3",
+  "any R-sep rendering of S2 or S3",
+  "any template branch not registered in question_stem_templates"
+ ],
+ "question_stem_templates": {
+  "branch_count": 8,
+  "branches": [
+   {
+    "applicable_profiles": [
+     "S1",
+     "S4"
+    ],
+    "branch_id": "K1/none/0",
+    "composition_depth": 0,
+    "feeds_gates": [
+     "I1b"
+    ],
+    "intermediate_values_are_never_displayed": false,
+    "operation_family": null,
+    "task_stratum": "K1",
+    "template": "The value is {value}.\nWhich option shows the value?\n",
+    "template_bytes": 52,
+    "template_sha256": "8dd8220dca1811b727b27c31136ad21eaf2bd13a20ff8f8231d29ed22adf63b9"
+   },
+   {
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3",
+     "S4"
+    ],
+    "branch_id": "K2/none/0",
+    "composition_depth": 0,
+    "feeds_gates": [
+     "I1a"
+    ],
+    "intermediate_values_are_never_displayed": false,
+    "operation_family": null,
+    "task_stratum": "K2",
+    "template": "Let v0 = {x}.\nCompute v0.\n",
+    "template_bytes": 26,
+    "template_sha256": "1f8eb976b71f31dcd83329d3e657c04bcdf60a1e79d2517f41698e5bdcee2e74"
+   },
+   {
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3",
+     "S4"
+    ],
+    "branch_id": "K3/affine_mod10/1",
+    "composition_depth": 1,
+    "feeds_gates": [
+     "I2"
+    ],
+    "intermediate_values_are_never_displayed": false,
+    "operation_family": "affine_mod10",
+    "task_stratum": "K3",
+    "template": "Let v0 = {x}.\nCompute ({a1} * v0 + {b1}) mod 10.\n",
+    "template_bytes": 49,
+    "template_sha256": "2ae4ea79cd99a392c32c9bcb01beadbba3f47cf75378d9b98a4b2c695e8b6e3c"
+   },
+   {
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3",
+     "S4"
+    ],
+    "branch_id": "K3/permutation_chain/1",
+    "composition_depth": 1,
+    "feeds_gates": [
+     "I2"
+    ],
+    "intermediate_values_are_never_displayed": false,
+    "operation_family": "permutation_chain",
+    "task_stratum": "K3",
+    "template": "Let p1 = {p1}.\nLet v0 = {x}.\nCompute p1(v0).\n",
+    "template_bytes": 45,
+    "template_sha256": "061c2dd11a19ee98e0a74c0fc73f346601ce75ef36028d8f08e5ff2d52ef9a3a"
+   },
+   {
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "branch_id": "K4/affine_mod10/2",
+    "composition_depth": 2,
+    "feeds_gates": [
+     "I4"
+    ],
+    "intermediate_values_are_never_displayed": true,
+    "operation_family": "affine_mod10",
+    "task_stratum": "K4",
+    "template": "Let v0 = {x}.\nLet v1 = ({a1} * v0 + {b1}) mod 10.\nCompute ({a2} * v1 + {b2}) mod 10.\n",
+    "template_bytes": 85,
+    "template_sha256": "c8667fe641fbf896d026bbe2460e9f8a36679a430d0179eb269137e7ac265662"
+   },
+   {
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "branch_id": "K4/affine_mod10/3",
+    "composition_depth": 3,
+    "feeds_gates": [
+     "I4"
+    ],
+    "intermediate_values_are_never_displayed": true,
+    "operation_family": "affine_mod10",
+    "task_stratum": "K4",
+    "template": "Let v0 = {x}.\nLet v1 = ({a1} * v0 + {b1}) mod 10.\nLet v2 = ({a2} * v1 + {b2}) mod 10.\nCompute ({a3} * v2 + {b3}) mod 10.\n",
+    "template_bytes": 121,
+    "template_sha256": "1d0d57aa2a24a551a7c3313c5c1773d53da1589a02c63700bedacb718a0f3d9f"
+   },
+   {
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "branch_id": "K4/permutation_chain/2",
+    "composition_depth": 2,
+    "feeds_gates": [
+     "I4"
+    ],
+    "intermediate_values_are_never_displayed": true,
+    "operation_family": "permutation_chain",
+    "task_stratum": "K4",
+    "template": "Let p1 = {p1}.\nLet p2 = {p2}.\nLet v0 = {x}.\nLet v1 = p1(v0).\nCompute p2(v1).\n",
+    "template_bytes": 77,
+    "template_sha256": "7882bbe4a976e8a96be46f163b97d992ff3729c63201dddfb3a740536f502e91"
+   },
+   {
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "branch_id": "K4/permutation_chain/3",
+    "composition_depth": 3,
+    "feeds_gates": [
+     "I4"
+    ],
+    "intermediate_values_are_never_displayed": true,
+    "operation_family": "permutation_chain",
+    "task_stratum": "K4",
+    "template": "Let p1 = {p1}.\nLet p2 = {p2}.\nLet p3 = {p3}.\nLet v0 = {x}.\nLet v1 = p1(v0).\nLet v2 = p2(v1).\nCompute p3(v2).\n",
+    "template_bytes": 109,
+    "template_sha256": "e70a805a705ccf68c50a381401a09c986d240d089f3bfd035a36d2a229e89fd0"
+   }
+  ],
+  "completeness_rule": "exactly one template is registered for every (task stratum, operation family, composition depth) branch that can enter a gate-bearing cell; a missing branch is a fail-closed rejection, never a default",
+  "k5_and_k6_inherit": "K5 and K6 register no stem of their own: a K5 or K6 contrast cluster renders a base item drawn from K1, K2 or K3 using that base item's registered stem branch, and varies only its own registered factor"
+ },
+ "registry_identity": {
+  "canonical_serialisation": "json.dumps(document, indent=1, sort_keys=True, ensure_ascii=True) followed by one LF",
+  "hash_algorithm": "sha256",
+  "normative_template_asset_count": 22,
+  "normative_template_assets": [
+   {
+    "asset_id": "stem/K1/none/0",
+    "bytes": 52,
+    "sha256": "8dd8220dca1811b727b27c31136ad21eaf2bd13a20ff8f8231d29ed22adf63b9"
+   },
+   {
+    "asset_id": "stem/K2/none/0",
+    "bytes": 26,
+    "sha256": "1f8eb976b71f31dcd83329d3e657c04bcdf60a1e79d2517f41698e5bdcee2e74"
+   },
+   {
+    "asset_id": "stem/K3/affine_mod10/1",
+    "bytes": 49,
+    "sha256": "2ae4ea79cd99a392c32c9bcb01beadbba3f47cf75378d9b98a4b2c695e8b6e3c"
+   },
+   {
+    "asset_id": "stem/K3/permutation_chain/1",
+    "bytes": 45,
+    "sha256": "061c2dd11a19ee98e0a74c0fc73f346601ce75ef36028d8f08e5ff2d52ef9a3a"
+   },
+   {
+    "asset_id": "stem/K4/affine_mod10/2",
+    "bytes": 85,
+    "sha256": "c8667fe641fbf896d026bbe2460e9f8a36679a430d0179eb269137e7ac265662"
+   },
+   {
+    "asset_id": "stem/K4/affine_mod10/3",
+    "bytes": 121,
+    "sha256": "1d0d57aa2a24a551a7c3313c5c1773d53da1589a02c63700bedacb718a0f3d9f"
+   },
+   {
+    "asset_id": "stem/K4/permutation_chain/2",
+    "bytes": 77,
+    "sha256": "7882bbe4a976e8a96be46f163b97d992ff3729c63201dddfb3a740536f502e91"
+   },
+   {
+    "asset_id": "stem/K4/permutation_chain/3",
+    "bytes": 109,
+    "sha256": "e70a805a705ccf68c50a381401a09c986d240d089f3bfd035a36d2a229e89fd0"
+   },
+   {
+    "asset_id": "instruction/S1/R-base",
+    "bytes": 46,
+    "sha256": "6206bb6f657a1fe0f0d384818f4a216e0226b22285fe7a5ad596f4f227f5b65b"
+   },
+   {
+    "asset_id": "instruction/S1/R-sep",
+    "bytes": 46,
+    "sha256": "6206bb6f657a1fe0f0d384818f4a216e0226b22285fe7a5ad596f4f227f5b65b"
+   },
+   {
+    "asset_id": "instruction/S1/R-instr",
+    "bytes": 59,
+    "sha256": "a57c245dd4c189bab86d47bd19b37464bfbabde7c3b9f0105f0a6b65fe061001"
+   },
+   {
+    "asset_id": "instruction/S2/R-base",
+    "bytes": 23,
+    "sha256": "1654f794e18f5bd381f2b08a69cb70e0ba2ba07ebe6f210614b8cf84f896bf5b"
+   },
+   {
+    "asset_id": "instruction/S2/R-instr",
+    "bytes": 28,
+    "sha256": "3ddf5bcda09edaebbd4c2b04df6ef0f4c0b921a028572684a74ff8a070048d12"
+   },
+   {
+    "asset_id": "instruction/S3/R-base",
+    "bytes": 23,
+    "sha256": "1654f794e18f5bd381f2b08a69cb70e0ba2ba07ebe6f210614b8cf84f896bf5b"
+   },
+   {
+    "asset_id": "instruction/S3/R-instr",
+    "bytes": 28,
+    "sha256": "3ddf5bcda09edaebbd4c2b04df6ef0f4c0b921a028572684a74ff8a070048d12"
+   },
+   {
+    "asset_id": "instruction/S4/R-base",
+    "bytes": 46,
+    "sha256": "6206bb6f657a1fe0f0d384818f4a216e0226b22285fe7a5ad596f4f227f5b65b"
+   },
+   {
+    "asset_id": "instruction/S4/R-sep",
+    "bytes": 46,
+    "sha256": "6206bb6f657a1fe0f0d384818f4a216e0226b22285fe7a5ad596f4f227f5b65b"
+   },
+   {
+    "asset_id": "instruction/S4/R-instr",
+    "bytes": 59,
+    "sha256": "a57c245dd4c189bab86d47bd19b37464bfbabde7c3b9f0105f0a6b65fe061001"
+   },
+   {
+    "asset_id": "separator/R-base",
+    "bytes": 2,
+    "sha256": "45822f54a0d0e030f75698c9252f1345982e743c9466806048f542467b3ca4f9"
+   },
+   {
+    "asset_id": "separator/R-sep",
+    "bytes": 3,
+    "sha256": "7bacf9de79aa5b6a042a24b94793080dd1d895aae2baddc87d58c35053bda176"
+   },
+   {
+    "asset_id": "separator/R-instr",
+    "bytes": 2,
+    "sha256": "45822f54a0d0e030f75698c9252f1345982e743c9466806048f542467b3ca4f9"
+   },
+   {
+    "asset_id": "answer_cue",
+    "bytes": 7,
+    "sha256": "64f89cf423ee1a167e9c8142a340d7aaef3605a56c73d30275fbdd94d098e36c"
+   }
+  ],
+  "registry_sha256": "e6a97d39e1bcc7ba42222ed47932e13444a066e376bebe58316b8f69cb0af4fe",
+  "self_hash_convention": "registry_identity.registry_sha256 is computed over the canonical serialisation of this document with registry_identity.registry_sha256 set to null"
+ },
+ "renderings": {
+  "answer_cue_held_byte_identical_across_all_renderings": true,
+  "count": 3,
+  "entries": [
+   {
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3",
+     "S4"
+    ],
+    "label_to_content_separator": ": ",
+    "not_applicable_profiles": [],
+    "not_applicable_reason": null,
+    "rendering_id": "R-base",
+    "varies_relative_to_R_base": "nothing"
+   },
+   {
+    "applicable_profiles": [
+     "S1",
+     "S4"
+    ],
+    "label_to_content_separator": " = ",
+    "not_applicable_profiles": [
+     "S2",
+     "S3"
+    ],
+    "not_applicable_reason": "S2 and S3 render neither an option label nor an option content, so the label-to-content separator has no referent. R-sep is structurally absent for them and is never rendered as a duplicate of R-base.",
+    "rendering_id": "R-sep",
+    "varies_relative_to_R_base": "the label-to-content separator only"
+   },
+   {
+    "applicable_profiles": [
+     "S1",
+     "S2",
+     "S3",
+     "S4"
+    ],
+    "label_to_content_separator": ": ",
+    "not_applicable_profiles": [],
+    "not_applicable_reason": null,
+    "rendering_id": "R-instr",
+    "varies_relative_to_R_base": "the instruction sentence only"
+   }
+  ],
+  "one_factor_at_a_time": true,
+  "registered_ids": [
+   "R-base",
+   "R-sep",
+   "R-instr"
+  ]
+ },
+ "rp_wrapper": {
+  "filled_in_by_v0_5": false,
+  "status": "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2",
+  "why_null_and_not_empty": "an empty wrapper would assert that the positive reference needs no canonical qualification surface; the decision is open under OD2",
+  "wrapper": null
+ },
+ "schema_version": "study3-interface-calibration-rendering-registry-v0.6",
+ "scoring_boundary": {
+  "claim_boundary": [
+   "draft-v0.6 is not reviewed, not frozen, not selected and not formally executable",
+   "the equivalence does not extend to arbitrary multi-token candidates, unequal lengths, non-common prefixes, summed log probabilities, free generation, or any unpinned tokenizer",
+   "no interface is selected, no threshold or sample size is set, no effect is estimated and the original research question is unanswered"
+  ],
+  "common_prefix_token_for_every_pinned_role": 220,
+  "derived_token_identities": {
+   "by_role": {
+    "RI": {
+     "common_prefix_bytes": " ",
+     "common_prefix_token": 220,
+     "discriminant_bytes": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9"
+     ],
+     "discriminant_token_ids": [
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24
+     ],
+     "eligible": true
+    },
+    "RL": {
+     "common_prefix_bytes": " ",
+     "common_prefix_token": 220,
+     "discriminant_bytes": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9"
+     ],
+     "discriminant_token_ids": [
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24
+     ],
+     "eligible": true
+    },
+    "RT": {
+     "common_prefix_bytes": " ",
+     "common_prefix_token": 220,
+     "discriminant_bytes": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9"
+     ],
+     "discriminant_token_ids": [
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24
+     ],
+     "eligible": true
+    }
+   },
+   "common_prefix_token_common_to_every_pinned_role": true,
+   "derivation_module": "studies/study3/pilot/p0_r1/p0_r1_factorization.py",
+   "immutable_sources": [
+    {
+     "bytes": 69781,
+     "path": "studies/study3/pilot/p0/corpus/p0_corpus.json",
+     "role": "the frozen 35-cell / 70-member P0 corpus",
+     "sha256": "5343019a334ce666bb3e7f7f57d87181550aa90fad4815ba51a7ba3f571e1c6c"
+    },
+    {
+     "bytes": 7850,
+     "path": "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+     "role": "the published P0-T disposition",
+     "sha256": "9d6a6508383ebd5f6e4f0bb97a5b75de282da3cf28afba837b923cd1a6ec66eb"
+    },
+    {
+     "bytes": 7934,
+     "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
+     "role": "the published P0-T receipt",
+     "sha256": "0b28fbe6f633cc5a6d0664588fb685065d15ab1c301a1540d1e12f7c7b69e737"
+    },
+    {
+     "bytes": 5820022,
+     "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
+     "role": "the published P0-T tokenizer gate result",
+     "sha256": "9603b61165bc0b405fe8eb6103a56e646ceb2e254a33e0eba2ee2d035f03a85f"
+    }
+   ],
+   "pinned_roles_only": "these identities hold for the three currently pinned role tokenizers. Any further tokenizer must be separately pinned and re-verified before the rule may be applied to it",
+   "provenance": "derived and verified by replaying the immutable published P0-T result and the frozen P0 corpus; never transcribed as an unverified assumption",
+   "tokenizer_encodes_performed_by_the_derivation": 0
+  },
+  "eligibility_conditions": [
+   {
+    "condition": "every complete candidate is exactly two tokens",
+    "id": "SB-1"
+   },
+   {
+    "condition": "the first token is identical for all ten candidates",
+    "id": "SB-2"
+   },
+   {
+    "condition": "that common token decodes byte-exactly to the registered leading U+0020",
+    "id": "SB-3"
+   },
+   {
+    "condition": "the second token IDs are pairwise distinct and map byte-exactly to 0 through 9 in registered order",
+    "id": "SB-4"
+   },
+   {
+    "condition": "no BOS, EOS, chat template, normalization, padding, truncation or implicit whitespace transformation participates in the factorization",
+    "id": "SB-5"
+   }
+  ],
+  "equivalence_proof": {
+   "consequence": "argmax_d P(u, v_d | x) = argmax_d P(v_d | x, u)",
+   "does_not_extend_to": [
+    "arbitrary multi-token candidates",
+    "candidates of unequal length",
+    "candidates without a common prefix",
+    "summed or length-normalised log probabilities",
+    "free generation",
+    "any tokenizer that is not separately pinned and verified"
+   ],
+   "identity": "P(u, v_d | x) = P(u | x) * P(v_d | x, u)",
+   "tie_break_order": "ascending mod-10 residue order 0, 1, 2, ..., 9, unchanged from the registered v0.5 order",
+   "valid_because": [
+    "the registered decision statistic is a deterministic argmax over a closed ten-member candidate set",
+    "all ten candidates have the same two-token structure",
+    "all ten candidates share the identical common prefix token u",
+    "the registered digit-order tie break is preserved unchanged"
+   ],
+   "why_exact": "P(u | x) does not depend on d, so it is a strictly positive common factor of all ten complete-candidate probabilities and cancels from the ranking. This is an exact factor cancellation, not an approximation"
+  },
+  "first_discriminative_token_rule": {
+   "common_prefix_is": "a teacher-forced candidate prefix. It is not a prompt-rendering change and it is not a generated token",
+   "factorization": "candidate_d = common_prefix || discriminant_d",
+   "prohibited": [
+    "scoring the shared first token",
+    "pretending the two-token candidate is one token",
+    "summing unrelated positions",
+    "using free generation",
+    "introducing a new calibration parameter"
+   ],
+   "s2_decision": "the deterministic restricted argmax over the ten discriminant logits, mapped back to the complete registered candidate surface",
+   "s2_evaluation": "one ordinary prefill evaluation on that context, reading the next-token logit vector only at the ten verified discriminant token IDs",
+   "s2_scoring_context": "the registered prompt token IDs followed by the verified common-prefix token",
+   "s2_scoring_context_construction": "concatenation of the registered prompt token IDs with the verified common-prefix token ID. The scoring context is never produced by re-encoding a concatenated string, so no additional tokenizer encode is introduced",
+   "s3_evaluation": "reuse of the exact S2 discriminant-position logit vector on CPU; S3 adds zero model evaluations, model loads, prefills, decodes and generations",
+   "tie_break_order": "ascending mod-10 residue order 0, 1, 2, ..., 9, unchanged from draft-v0.5"
+  },
+  "registered_in": "draft-v0.6",
+  "repairs": [
+   "the demonstrated S2/S3 scoring-surface defect: under every pinned role tokenizer each registered content surface is two tokens, so the v0.5 single-position rule is not implementable as written",
+   "the demonstrated eligibility-classifier propagation defect: a role-level S2 failure was propagated onto mechanically valid S1 cells, producing ineligible rows with empty reason lists"
+  ],
+  "s1_scoring_boundary_unchanged": {
+   "observed_label_token_ids": {
+    "RI": {
+     "ALPHA-1": {
+      "all_single_token": true,
+      "pairwise_distinct": true,
+      "surfaces": [
+       " A",
+       " B",
+       " C",
+       " D"
+      ],
+      "token_ids": [
+       [
+        362
+       ],
+       [
+        425
+       ],
+       [
+        356
+       ],
+       [
+        422
+       ]
+      ]
+     },
+     "ALPHA-2": {
+      "all_single_token": true,
+      "pairwise_distinct": true,
+      "surfaces": [
+       " W",
+       " X",
+       " Y",
+       " Z"
+      ],
+      "token_ids": [
+       [
+        467
+       ],
+       [
+        1599
+       ],
+       [
+        809
+       ],
+       [
+        1863
+       ]
+      ]
+     }
+    },
+    "RL": {
+     "ALPHA-1": {
+      "all_single_token": true,
+      "pairwise_distinct": true,
+      "surfaces": [
+       " A",
+       " B",
+       " C",
+       " D"
+      ],
+      "token_ids": [
+       [
+        362
+       ],
+       [
+        425
+       ],
+       [
+        356
+       ],
+       [
+        422
+       ]
+      ]
+     },
+     "ALPHA-2": {
+      "all_single_token": true,
+      "pairwise_distinct": true,
+      "surfaces": [
+       " W",
+       " X",
+       " Y",
+       " Z"
+      ],
+      "token_ids": [
+       [
+        467
+       ],
+       [
+        1599
+       ],
+       [
+        809
+       ],
+       [
+        1863
+       ]
+      ]
+     }
+    },
+    "RT": {
+     "ALPHA-1": {
+      "all_single_token": true,
+      "pairwise_distinct": true,
+      "surfaces": [
+       " A",
+       " B",
+       " C",
+       " D"
+      ],
+      "token_ids": [
+       [
+        362
+       ],
+       [
+        425
+       ],
+       [
+        356
+       ],
+       [
+        422
+       ]
+      ]
+     },
+     "ALPHA-2": {
+      "all_single_token": true,
+      "pairwise_distinct": true,
+      "surfaces": [
+       " W",
+       " X",
+       " Y",
+       " Z"
+      ],
+      "token_ids": [
+       [
+        467
+       ],
+       [
+        1599
+       ],
+       [
+        809
+       ],
+       [
+        1863
+       ]
+      ]
+     }
+    }
+   },
+   "rule": "one next-token logit vector at the single position immediately after the answer cue, restricted to the four registered label token IDs",
+   "why_unaffected": "each registered S1 label surface is one token under every pinned role tokenizer, so no factorization is required"
+  },
+  "s4_scoring_boundary_unchanged": {
+   "participates_in_target_role_executability": false,
+   "rule": "bounded greedy generation mapped by the pinned parser",
+   "status": "diagnostic-only; never selectable"
+  },
+  "supersedes": "the draft-v0.5 rule that read one next-token logit vector at the single position immediately after the answer cue and restricted it to ten registered content token IDs",
+  "visible_answer_surface_unchanged": {
+   "answer_cue": "Answer:",
+   "answer_cue_trailing_whitespace": "none",
+   "candidate_surfaces": [
+    " 0",
+    " 1",
+    " 2",
+    " 3",
+    " 4",
+    " 5",
+    " 6",
+    " 7",
+    " 8",
+    " 9"
+   ],
+   "each_candidate_carries_exactly_one_leading_u0020": true,
+   "no_question_option_instruction_contrast_nuisance_tuple_ground_truth_or_candidate_mapping_changed": true,
+   "s1_rendering_and_scoring_bytes_unchanged": true,
+   "s4_rendering_wrapper_parser_and_diagnostic_only_status_unchanged": true,
+   "the_space_was_not_removed_moved_into_the_cue_or_replaced_by_letters": true
+  }
+ },
+ "separators": {
+  "R-base": ": ",
+  "R-instr": ": ",
+  "R-sep": " = ",
+  "ascii_only": true,
+  "no_profile_specific_replacement_separator_is_registered": true,
+  "r_instr_separator_equals_r_base": "R-instr holds the separator byte-identical to R-base because R-instr varies the instruction sentence only",
+  "semantics": "K6-SEP varies the separator between a DISPLAYED OPTION LABEL and its DISPLAYED OPTION CONTENT. A profile that renders neither has no referent for the factor."
+ },
+ "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW",
+ "supersedes": {
+  "preserved_byte_for_byte_as_history": true,
+  "registry": "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.json",
+  "schema": "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.schema.json",
+  "why": "draft-v0.5 remains the record of what was registered when P0-T ran. It is never edited, and the P0-T observations are never restated against a surface that did not exist when they were made"
+ },
+ "token_accounting": {
+  "by_profile": {
+   "S1": {
+    "common_prefix_token_count": 0,
+    "common_prefix_token_count_per_scored_row": 0,
+    "maximum_registered_prompt_tokens": 71,
+    "minimum_registered_prompt_tokens": 42,
+    "registered_prompt_token_count": 8874,
+    "scored_rows": 162,
+    "scoring_context_token_count": 8874,
+    "sequence_level_model_evaluations_per_scored_row": 1,
+    "sequence_level_prefill_evaluations": 162,
+    "tokens_processed": 8874
+   },
+   "S2": {
+    "common_prefix_token_count": 18,
+    "common_prefix_token_count_per_scored_row": 1,
+    "maximum_registered_prompt_tokens": 46,
+    "minimum_registered_prompt_tokens": 18,
+    "registered_prompt_token_count": 561,
+    "scored_rows": 18,
+    "scoring_context_token_count": 579,
+    "sequence_level_model_evaluations_per_scored_row": 1,
+    "sequence_level_prefill_evaluations": 18,
+    "tokens_processed": 579
+   },
+   "S3": {
+    "common_prefix_token_count": 18,
+    "common_prefix_token_count_per_scored_row": 1,
+    "maximum_registered_prompt_tokens": 46,
+    "minimum_registered_prompt_tokens": 18,
+    "registered_prompt_token_count": 561,
+    "scored_rows": 18,
+    "scoring_context_token_count": 579,
+    "sequence_level_model_evaluations_per_scored_row": 0,
+    "sequence_level_prefill_evaluations": 0,
+    "tokens_processed": 0
+   },
+   "S4": {
+    "common_prefix_token_count": 0,
+    "common_prefix_token_count_per_scored_row": 0,
+    "maximum_registered_prompt_tokens": 44,
+    "minimum_registered_prompt_tokens": 42,
+    "registered_prompt_token_count": 510,
+    "scored_rows": 12,
+    "scoring_context_token_count": 510,
+    "sequence_level_model_evaluations_per_scored_row": 1,
+    "sequence_level_prefill_evaluations": 12,
+    "tokens_processed": 510
+   }
+  },
+  "p0_r1_totals": {
+   "common_prefix_tokens_processed": 18,
+   "extra_sequence_level_model_evaluations_versus_the_v0_5_rule": 0,
+   "extra_tokens_versus_the_v0_5_rule": 18,
+   "registered_prompt_tokens_processed_by_restricted_scoring": 9435,
+   "s3_sequence_level_model_evaluations": 0,
+   "s3_tokens_processed": 0,
+   "s4_registered_prompt_tokens": 510,
+   "scored_rows": 210,
+   "scoring_context_tokens_processed": 9453
+  },
+  "s3_note": "S3 reuses the S2 discriminant-position logit vector on CPU, so it processes no token and performs no sequence-level evaluation. Its scoring-context token count records the S2 context it rescores, which is why the two profiles report the same context length",
+  "s3_processes_no_additional_token": true,
+  "source": "the immutable published P0-T result, frozen-corpus records only; derived, not assumed",
+  "unit": "tokens"
+ }
+}

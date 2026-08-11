@@ -1,0 +1,332 @@
+"""The Study 3 P0-R1 replay gate: factorization plus repaired eligibility.
+
+Authority: ``studies/study3/prompts/study3_v0_6_p0_r1_authority.md`` sections 4,
+6, 7 and 10.
+
+The replay gate reads the immutable published P0-T artifacts and the frozen P0
+corpus, derives the first-discriminative-token factorization, and recomputes the
+eligibility matrix with the repaired classifier. It performs **zero** tokenizer
+encodes, zero tokenizer constructions, zero checkpoint downloads, zero weight
+loads and zero model operations, and it writes nothing into
+``studies/study3/pilot/p0/``.
+
+Two modes exist and they are deliberately different objects:
+
+``--derive``
+    the *calibration* derivation. It recomputes the corrected matrix so the
+    draft-v0.6 amendment can report it, and it emits a derived table under
+    ``studies/study3/analysis/``. It advances no state, consumes no one-shot
+    authorization and writes no gate receipt. This is what the drafting session
+    is permitted to run.
+
+``--gate``
+    the *registered* P0-R1 replay gate of section 7. It is the first action of
+    the successor session, it writes its result and receipt under
+    ``studies/study3/pilot/p0_r1/results/``, and it advances the state machine.
+    Section 10 forbids the drafting session from performing it.
+"""
+
+import argparse
+import datetime
+import hashlib
+import json
+import os
+import sys
+
+P0_R1_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.abspath(os.path.join(P0_R1_DIR, "..", "..", "..", ".."))
+
+sys.path.insert(0, P0_R1_DIR)
+
+import p0_r1_eligibility as ELIG  # noqa: E402
+import p0_r1_factorization as FACT  # noqa: E402
+from p0_r1_counters import P0R1Counters  # noqa: E402
+
+SCHEMA_VERSION = "study3-p0-r1-replay-gate-v1"
+
+DERIVED_TABLE_PATH = os.path.join(
+    REPO_ROOT, "studies", "study3", "analysis",
+    "p0_r1_corrected_eligibility_tables.json")
+
+REGISTRY_PATH = os.path.join(
+    REPO_ROOT, "studies", "study3", "protocol",
+    "interface_calibration_rendering_registry_v0_6.json")
+
+ROLES = ("RI", "RL", "RT")
+
+REGISTERED_STATE_AFTER_REGISTRATION = (
+    "STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE")
+STATE_AFTER_REPLAY_PASS = (
+    "STUDY3_P0_R1_REPLAY_GATE_PASSED_AWAITING_MODEL_PILOT")
+STATE_REPLAY_DEFECT = "STUDY3_P0_R1_STOPPED_ON_REPLAY_FACTORIZATION_DEFECT"
+
+
+def utc_now():
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+
+def load_registry():
+    with open(REGISTRY_PATH, "rb") as handle:
+        return json.loads(handle.read().decode("utf-8"))
+
+
+def published_s1_surfaces(result):
+    """The published S1 label-surface encodes, per role and alphabet."""
+    out = {}
+    for role, entry in result.get("candidate_token_eligibility", {}).items():
+        out[role] = {
+            alphabet: {
+                "surfaces": list(body["surfaces"]),
+                "token_ids": [list(ids) for ids in body["token_ids"]],
+                "all_single_token": bool(body["all_single_token"]),
+                "pairwise_distinct": bool(body["pairwise_distinct"]),
+            }
+            for alphabet, body in sorted(entry.get("s1_by_alphabet", {}).items())
+        }
+    return out
+
+
+def v0_5_rule_verdict(result):
+    """The candidate verdict the *registered v0.5 rule* yields, per role.
+
+    This isolates the classifier repair from the scoring-boundary repair. It
+    applies the single-token rule that was registered when P0-T ran, to the same
+    immutable published encodes, and produces an explicit local reason instead of
+    a role-level flag. It exists so the amendment can show what the propagation
+    repair alone would have produced, without restating the P0-T observations
+    against a surface that did not exist when they were made.
+    """
+    roles = []
+    for role in sorted(result.get("candidate_token_eligibility", {})):
+        s2 = result["candidate_token_eligibility"][role]["s2"]
+        reasons = []
+        if not s2.get("all_single_token"):
+            reasons.append(
+                "the registered v0.5 rule requires ten single-token candidate "
+                "surfaces; observed token-sequence lengths %s"
+                % sorted({len(ids) for ids in s2["token_ids"]}))
+        if not s2.get("pairwise_distinct"):
+            reasons.append(
+                "the registered v0.5 rule requires ten pairwise-distinct single "
+                "candidate tokens at one position")
+        roles.append({
+            "role": role,
+            "eligible": not reasons,
+            "reasons": reasons,
+        })
+    return {"roles": roles}
+
+
+def derive_classifier_repair_only(result, s1_by_role):
+    """The corrected matrix under the *v0.5* scoring rule: classifier repair only."""
+    corrected = ELIG.classify(
+        result["records"], v0_5_rule_verdict(result), s1_by_role, ROLES)
+    matrix = corrected["matrix"]
+    return {
+        "scoring_rule_applied": (
+            "the draft-v0.5 single-next-token rule, unchanged, applied to the "
+            "same immutable published encodes"),
+        "classifier_version": corrected["classifier_version"],
+        "cells": len(matrix),
+        "eligible_cells": sum(1 for cell in matrix
+                              if cell["status"] == ELIG.ELIGIBLE),
+        "ineligible_cells": sum(1 for cell in matrix
+                                if cell["status"] == ELIG.INELIGIBLE),
+        "ineligible_cells_with_an_empty_reason_list": sum(
+            1 for cell in matrix
+            if cell["status"] == ELIG.INELIGIBLE and not cell["reasons"]),
+        "executable_genuine_i3_contrasts_per_role": {
+            role: len(values)
+            for role, values in sorted(
+                corrected["executable_genuine_i3_contrasts"].items())
+        },
+        "roles_without_executable_contrast":
+            corrected["roles_without_executable_contrast"],
+        "ineligible_cells_by_profile": {
+            profile: sum(1 for cell in matrix
+                         if cell["profile"] == profile
+                         and cell["status"] == ELIG.INELIGIBLE)
+            for profile in ("S1", "S2", "S3", "S4")
+        },
+        "what_this_shows": (
+            "with the propagation removed but the v0.5 scoring rule unchanged, "
+            "every S1 cell is eligible with no reason, every S2/S3 cell is "
+            "ineligible with an explicit local reason rather than an empty list, "
+            "and each target role retains nine executable genuine I3 contrasts. "
+            "The historical terminal state was therefore over-severe, exactly as "
+            "the published P0-T disposition discloses."),
+    }
+
+
+def derive(registry=None, counters=None, root=None):
+    """Recompute the factorization and the corrected eligibility matrix."""
+    registry = registry or load_registry()
+    counters = counters if counters is not None else P0R1Counters()
+    factorization = FACT.replay(registry, root=root, counters=counters)
+    result = FACT.load_immutable(FACT.RESULT_PATH, root=root)
+    records = result["records"]
+    s1_by_role = published_s1_surfaces(result)
+
+    corrected = ELIG.classify(records, factorization, s1_by_role, ROLES)
+    repaired = ELIG.validate_no_propagation(
+        corrected["matrix"], result.get("eligibility_matrix", []))
+
+    historical = result.get("eligibility_matrix", [])
+    historical_summary = {
+        "cells": len(historical),
+        "ineligible_cells": sum(1 for cell in historical
+                                if cell.get("status") != "eligible"),
+        "ineligible_cells_with_an_empty_reason_list": sum(
+            1 for cell in historical
+            if cell.get("status") != "eligible" and not cell.get("reasons")),
+        "emitted_state": result.get("state"),
+        "emitted_stop_reason": result.get("stop_reason"),
+        "status": (
+            "immutable historical observation. It is accepted as the record of "
+            "what the P0-T harness emitted and it is never edited, replaced, "
+            "relabelled or rerun."),
+    }
+
+    corrected_summary = {
+        "cells": len(corrected["matrix"]),
+        "eligible_cells": sum(1 for cell in corrected["matrix"]
+                              if cell["status"] == ELIG.ELIGIBLE),
+        "ineligible_cells": sum(1 for cell in corrected["matrix"]
+                                if cell["status"] == ELIG.INELIGIBLE),
+        "ineligible_cells_with_an_empty_reason_list": 0,
+        "structurally_absent_pairs": len(corrected["structurally_absent"]),
+        "executable_genuine_i3_contrasts_per_role": {
+            role: len(values)
+            for role, values in sorted(
+                corrected["executable_genuine_i3_contrasts"].items())
+        },
+        "roles_without_executable_contrast":
+            corrected["roles_without_executable_contrast"],
+    }
+
+    counter_snapshot = counters.snapshot()
+    for name in ("tokenizer_encoded_sequences", "tokenizer_construction_events",
+                 "distinct_checkpoint_identities_downloaded",
+                 "model_weight_loads", "non_generative_prefill_evaluations",
+                 "s4_generation_calls", "total_scored_rows",
+                 "gpu_jobs_performing_a_model_operation"):
+        if counter_snapshot[name] != 0:
+            raise FACT.FactorizationDefect(
+                "the replay derivation advanced %s to %d; it must perform zero "
+                "tokenizer and model operations"
+                % (name, counter_snapshot[name]))
+
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "document_class": "study3_p0_r1_corrected_eligibility",
+        "stage": "P0-R1-REPLAY-DERIVATION",
+        "kind": (
+            "calibration derivation only. It advances no state, consumes no "
+            "one-shot authorization and is not the registered replay gate."),
+        "authority": "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+        "target_roles": list(ROLES),
+        "tokenizer_encodes_performed": 0,
+        "tokenizer_constructions_performed": 0,
+        "model_operations_performed": 0,
+        "factorization": factorization,
+        "classifier_version": corrected["classifier_version"],
+        "eligibility_keys": corrected["eligibility_keys"],
+        "corrected_matrix": corrected["matrix"],
+        "structurally_absent": corrected["structurally_absent"],
+        "executable_genuine_i3_contrasts":
+            corrected["executable_genuine_i3_contrasts"],
+        "roles_without_executable_contrast":
+            corrected["roles_without_executable_contrast"],
+        "stop_label_if_any_role_has_none":
+            corrected["stop_label_if_any_role_has_none"],
+        "stop_label_semantics": corrected["stop_label_semantics"],
+        "historical_stop_label": corrected["historical_stop_label"],
+        "historical_stop_label_status":
+            corrected["historical_stop_label_status"],
+        "not_applicable_semantics": corrected["not_applicable_semantics"],
+        "historical_matrix_summary": historical_summary,
+        "classifier_repair_only_under_the_v0_5_rule":
+            derive_classifier_repair_only(result, s1_by_role),
+        "corrected_matrix_summary": corrected_summary,
+        "cells_repaired_from_an_empty_reason_list": repaired,
+        "counters": counter_snapshot,
+    }
+
+
+def dumps(document):
+    return json.dumps(document, indent=1, sort_keys=True, ensure_ascii=True) + "\n"
+
+
+def _write_derived_table(document):
+    with open(DERIVED_TABLE_PATH, "wb") as handle:
+        handle.write(dumps(document).encode("utf-8"))
+    return DERIVED_TABLE_PATH
+
+
+def _check_derived_table(document):
+    if not os.path.exists(DERIVED_TABLE_PATH):
+        return ["the corrected-eligibility table is missing"]
+    with open(DERIVED_TABLE_PATH, "rb") as handle:
+        on_disk = handle.read()
+    if on_disk != dumps(document).encode("utf-8"):
+        return ["the corrected-eligibility table does not reproduce from code"]
+    return []
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--derive", action="store_true",
+                       help="recompute and write the calibration derivation")
+    group.add_argument("--check", action="store_true",
+                       help="verify the derivation reproduces byte-exactly")
+    group.add_argument("--gate", action="store_true",
+                       help="the registered replay gate; successor session only")
+    parser.add_argument("--out-dir")
+    args = parser.parse_args(argv)
+
+    if args.gate:
+        print("REFUSED: the registered P0-R1 replay gate is the first action of "
+              "the successor session.")
+        print("The calibration session may only run --derive or --check "
+              "(authority sections 6 and 10).")
+        print("state remains: %s" % REGISTERED_STATE_AFTER_REGISTRATION)
+        return 3
+
+    try:
+        document = derive()
+    except (FACT.FactorizationDefect, ELIG.EligibilityDefect) as exc:
+        print("%s: %s" % (STATE_REPLAY_DEFECT, exc))
+        return 2
+
+    if args.derive:
+        path = _write_derived_table(document)
+        print("wrote %s" % os.path.relpath(path, REPO_ROOT).replace(os.sep, "/"))
+        return 0
+
+    findings = _check_derived_table(document)
+    if findings:
+        print("REPLAY DERIVATION CHECK FAILED")
+        for finding in findings:
+            print("  FAIL %s" % finding)
+        return 1
+    summary = document["corrected_matrix_summary"]
+    print("replay derivation: OK")
+    print("  encodes performed             : %d"
+          % document["tokenizer_encodes_performed"])
+    print("  corrected cells               : %d (%d eligible, %d ineligible)"
+          % (summary["cells"], summary["eligible_cells"],
+             summary["ineligible_cells"]))
+    print("  empty-reason ineligible cells : %d (was %d)"
+          % (summary["ineligible_cells_with_an_empty_reason_list"],
+             document["historical_matrix_summary"][
+                 "ineligible_cells_with_an_empty_reason_list"]))
+    print("  executable contrasts per role : %s"
+          % summary["executable_genuine_i3_contrasts_per_role"])
+    print("  roles without a contrast      : %s"
+          % (document["roles_without_executable_contrast"] or "none"))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

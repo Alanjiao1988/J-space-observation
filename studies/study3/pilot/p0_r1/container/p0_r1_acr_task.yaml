@@ -1,0 +1,34 @@
+# Stage P0-R1 task for the registered Azure Container Registry route.
+#
+# Authority: studies/study3/prompts/study3_v0_6_p0_r1_authority.md sections 7
+# and 10.
+#
+# Step 1 clones the exact published commit from an uploaded git bundle, using a
+# git-bearing image, and records the binding it observed. Step 2 runs the
+# replay-only factorization gate inside the digest-pinned P0-R1 image, so the
+# frozen dependencies that execute the replay are exactly the ones the image
+# build pinned and verified.
+#
+# The P0-R1 image is referenced by immutable digest, never by tag alone. The
+# digest is null until the successor session builds the image; it is deliberately
+# not a placeholder, and this task cannot run until it is filled in from a real
+# build.
+#
+# Run it with:
+#   az acr run --registry acrjspaceobssea0708231738 \
+#     --subscription 943bacdf-8b6e-4e3a-8126-a149f623d32e \
+#     --platform linux/amd64 \
+#     -f p0_r1_acr_task.yaml --set COMMIT=<sha> --set IMAGE=<digest-ref> <ctx>
+version: v1.1.0
+steps:
+  - id: checkout
+    cmd: >-
+      python:3.11-bookworm
+      bash /workspace/p0_r1_checkout.sh {{.Values.COMMIT}}
+    timeout: 900
+  - id: replay
+    cmd: >-
+      --user root
+      {{.Values.IMAGE}}
+      bash /workspace/p0_r1_replay.sh {{.Values.COMMIT}}
+    timeout: 3600

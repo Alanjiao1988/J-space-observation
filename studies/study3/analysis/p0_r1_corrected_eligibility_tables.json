@@ -1,0 +1,1209 @@
+{
+ "authority": "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+ "cells_repaired_from_an_empty_reason_list": [
+  {
+   "contrast": "K5-A1",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RI"
+  },
+  {
+   "contrast": "K5-P1",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RI"
+  },
+  {
+   "contrast": "K5-P2",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RI"
+  },
+  {
+   "contrast": "K5-P3",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RI"
+  },
+  {
+   "contrast": "K5-S1",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RI"
+  },
+  {
+   "contrast": "K5-S2",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RI"
+  },
+  {
+   "contrast": "K5-S3",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RI"
+  },
+  {
+   "contrast": "K6-INSTR",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RI"
+  },
+  {
+   "contrast": "K6-SEP",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RI"
+  },
+  {
+   "contrast": "K5-A1",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RL"
+  },
+  {
+   "contrast": "K5-P1",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RL"
+  },
+  {
+   "contrast": "K5-P2",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RL"
+  },
+  {
+   "contrast": "K5-P3",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RL"
+  },
+  {
+   "contrast": "K5-S1",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RL"
+  },
+  {
+   "contrast": "K5-S2",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RL"
+  },
+  {
+   "contrast": "K5-S3",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RL"
+  },
+  {
+   "contrast": "K6-INSTR",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RL"
+  },
+  {
+   "contrast": "K6-SEP",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RL"
+  },
+  {
+   "contrast": "K5-A1",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RT"
+  },
+  {
+   "contrast": "K5-P1",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RT"
+  },
+  {
+   "contrast": "K5-P2",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RT"
+  },
+  {
+   "contrast": "K5-P3",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RT"
+  },
+  {
+   "contrast": "K5-S1",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RT"
+  },
+  {
+   "contrast": "K5-S2",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RT"
+  },
+  {
+   "contrast": "K5-S3",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RT"
+  },
+  {
+   "contrast": "K6-INSTR",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RT"
+  },
+  {
+   "contrast": "K6-SEP",
+   "corrected_reasons": [],
+   "corrected_status": "eligible",
+   "historical_reasons": [],
+   "historical_status": "INELIGIBLE_TOKEN_IDS",
+   "profile": "S1",
+   "role": "RT"
+  }
+ ],
+ "classifier_repair_only_under_the_v0_5_rule": {
+  "cells": 39,
+  "classifier_version": "study3-p0-r1-eligibility-classifier-v2",
+  "eligible_cells": 33,
+  "executable_genuine_i3_contrasts_per_role": {
+   "RI": 9,
+   "RL": 9,
+   "RT": 9
+  },
+  "ineligible_cells": 6,
+  "ineligible_cells_by_profile": {
+   "S1": 0,
+   "S2": 3,
+   "S3": 3,
+   "S4": 0
+  },
+  "ineligible_cells_with_an_empty_reason_list": 0,
+  "roles_without_executable_contrast": [],
+  "scoring_rule_applied": "the draft-v0.5 single-next-token rule, unchanged, applied to the same immutable published encodes",
+  "what_this_shows": "with the propagation removed but the v0.5 scoring rule unchanged, every S1 cell is eligible with no reason, every S2/S3 cell is ineligible with an explicit local reason rather than an empty list, and each target role retains nine executable genuine I3 contrasts. The historical terminal state was therefore over-severe, exactly as the published P0-T disposition discloses."
+ },
+ "classifier_version": "study3-p0-r1-eligibility-classifier-v2",
+ "corrected_matrix": [
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-A1",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-P1",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-P2",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-P3",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-S1",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-S2",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-S3",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 259,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 259,
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 10,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S2",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 10,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S3",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 129,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": true,
+   "genuine_gate_bearing_i3_contrast": false,
+   "profile": "S4",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 129,
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "diagnostic_only": true,
+   "genuine_gate_bearing_i3_contrast": false,
+   "profile": "S4",
+   "reasons": [],
+   "role": "RI",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-A1",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-P1",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-P2",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-P3",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-S1",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-S2",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-S3",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 259,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 259,
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 10,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S2",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 10,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S3",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 129,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": true,
+   "genuine_gate_bearing_i3_contrast": false,
+   "profile": "S4",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 129,
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "diagnostic_only": true,
+   "genuine_gate_bearing_i3_contrast": false,
+   "profile": "S4",
+   "reasons": [],
+   "role": "RL",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-A1",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-P1",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-P2",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-P3",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-S1",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-S2",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 3,
+   "collision_rows": [],
+   "contrast": "K5-S3",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 259,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 259,
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S1",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 10,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S2",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 10,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": false,
+   "genuine_gate_bearing_i3_contrast": true,
+   "profile": "S3",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 129,
+   "collision_rows": [],
+   "contrast": "K6-INSTR",
+   "diagnostic_only": true,
+   "genuine_gate_bearing_i3_contrast": false,
+   "profile": "S4",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  },
+  {
+   "checked_rows": 129,
+   "collision_rows": [],
+   "contrast": "K6-SEP",
+   "diagnostic_only": true,
+   "genuine_gate_bearing_i3_contrast": false,
+   "profile": "S4",
+   "reasons": [],
+   "role": "RT",
+   "status": "eligible"
+  }
+ ],
+ "corrected_matrix_summary": {
+  "cells": 39,
+  "eligible_cells": 39,
+  "executable_genuine_i3_contrasts_per_role": {
+   "RI": 11,
+   "RL": 11,
+   "RT": 11
+  },
+  "ineligible_cells": 0,
+  "ineligible_cells_with_an_empty_reason_list": 0,
+  "roles_without_executable_contrast": [],
+  "structurally_absent_pairs": 2
+ },
+ "counters": {
+  "additional_gpu_attempt_with_signed_zero_operation_receipt": 0,
+  "bank_rows_written": 0,
+  "common_prefix_tokens_processed": 0,
+  "distinct_checkpoint_identities_downloaded": 0,
+  "distinct_tokenizer_identities_constructed": 0,
+  "exceptions_observed": 0,
+  "generated_tokens": 0,
+  "gpu_jobs_performing_a_model_operation": 0,
+  "hosted_provider_inference_calls": 0,
+  "model_weight_loads": 0,
+  "non_generative_prefill_evaluations": 0,
+  "parser_calls": 0,
+  "positive_reference_operations": 0,
+  "registered_prompt_tokens_processed": 0,
+  "replay_gate_evaluations": 1,
+  "restricted_logit_reads": 0,
+  "runtime_batched_forward_calls": 0,
+  "runtime_batched_tokenizer_calls": 0,
+  "s1_scored_rows": 0,
+  "s2_scored_rows": 0,
+  "s3_cpu_only_reuse_scored_rows": 0,
+  "s4_generation_calls": 0,
+  "s4_incremental_decode_evaluations": 0,
+  "s4_prefill_evaluations": 0,
+  "s4_scored_generation_rows": 0,
+  "scoring_context_tokens_processed": 0,
+  "seeds_drawn": 0,
+  "tokenizer_construction_events": 0,
+  "tokenizer_encoded_sequences": 0,
+  "total_scored_rows": 0,
+  "total_sequence_level_model_evaluation_equivalents": 0
+ },
+ "document_class": "study3_p0_r1_corrected_eligibility",
+ "eligibility_keys": {
+  "candidate_surface_eligibility": "role x profile",
+  "presentation_pair_distinctness": "role x profile x contrast",
+  "structural_absence": "profile x contrast",
+  "target_role_executability": "role"
+ },
+ "executable_genuine_i3_contrasts": {
+  "RI": [
+   "S1/K5-A1",
+   "S1/K5-P1",
+   "S1/K5-P2",
+   "S1/K5-P3",
+   "S1/K5-S1",
+   "S1/K5-S2",
+   "S1/K5-S3",
+   "S1/K6-INSTR",
+   "S1/K6-SEP",
+   "S2/K6-INSTR",
+   "S3/K6-INSTR"
+  ],
+  "RL": [
+   "S1/K5-A1",
+   "S1/K5-P1",
+   "S1/K5-P2",
+   "S1/K5-P3",
+   "S1/K5-S1",
+   "S1/K5-S2",
+   "S1/K5-S3",
+   "S1/K6-INSTR",
+   "S1/K6-SEP",
+   "S2/K6-INSTR",
+   "S3/K6-INSTR"
+  ],
+  "RT": [
+   "S1/K5-A1",
+   "S1/K5-P1",
+   "S1/K5-P2",
+   "S1/K5-P3",
+   "S1/K5-S1",
+   "S1/K5-S2",
+   "S1/K5-S3",
+   "S1/K6-INSTR",
+   "S1/K6-SEP",
+   "S2/K6-INSTR",
+   "S3/K6-INSTR"
+  ]
+ },
+ "factorization": {
+  "all_roles_eligible": true,
+  "bound_frozen_corpus_sequences": {
+   "RI": 70,
+   "RL": 70,
+   "RT": 70
+  },
+  "common_prefix_token_is_common_to_every_role": true,
+  "derived_not_transcribed": "the common-prefix token and the ten discriminant token IDs are recovered from the immutable published P0-T result and the frozen corpus; no token identity is written into this module as a constant",
+  "discriminant_token_ids_are_common_to_every_role": true,
+  "document_class": "study3_p0_r1_factorization_replay",
+  "equivalence": {
+   "consequence": "argmax_d P(u, v_d | x) = argmax_d P(v_d | x, u)",
+   "does_not_extend_to": [
+    "arbitrary multi-token candidates",
+    "candidates of unequal length",
+    "candidates without a common prefix",
+    "summed or length-normalised log probabilities",
+    "free generation",
+    "any tokenizer that is not separately pinned and verified"
+   ],
+   "identity": "P(u, v_d | x) = P(u | x) * P(v_d | x, u)",
+   "tie_break_order": "ascending mod-10 residue order 0, 1, 2, ..., 9, unchanged from the registered v0.5 order",
+   "valid_because": [
+    "the registered decision statistic is a deterministic argmax over a closed ten-member candidate set",
+    "all ten candidates have the same two-token structure",
+    "all ten candidates share the identical common prefix token u",
+    "the registered digit-order tie break is preserved unchanged"
+   ],
+   "why_exact": "P(u | x) does not depend on d, so it is a strictly positive common factor of all ten complete-candidate probabilities and cancels from the ranking. This is an exact factor cancellation, not an approximation"
+  },
+  "immutable_sources": [
+   {
+    "bytes": 69781,
+    "path": "studies/study3/pilot/p0/corpus/p0_corpus.json",
+    "role": "the frozen 35-cell / 70-member P0 corpus",
+    "sha256": "5343019a334ce666bb3e7f7f57d87181550aa90fad4815ba51a7ba3f571e1c6c"
+   },
+   {
+    "bytes": 7850,
+    "path": "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+    "role": "the published P0-T disposition",
+    "sha256": "9d6a6508383ebd5f6e4f0bb97a5b75de282da3cf28afba837b923cd1a6ec66eb"
+   },
+   {
+    "bytes": 7934,
+    "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
+    "role": "the published P0-T receipt",
+    "sha256": "0b28fbe6f633cc5a6d0664588fb685065d15ab1c301a1540d1e12f7c7b69e737"
+   },
+   {
+    "bytes": 5820022,
+    "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
+    "role": "the published P0-T tokenizer gate result",
+    "sha256": "9603b61165bc0b405fe8eb6103a56e646ceb2e254a33e0eba2ee2d035f03a85f"
+   }
+  ],
+  "model_operations_performed": 0,
+  "registered_candidate_surfaces": [
+   " 0",
+   " 1",
+   " 2",
+   " 3",
+   " 4",
+   " 5",
+   " 6",
+   " 7",
+   " 8",
+   " 9"
+  ],
+  "roles": [
+   {
+    "common_prefix_bytes": " ",
+    "common_prefix_token": 220,
+    "complete_candidate_token_ids": [
+     [
+      220,
+      15
+     ],
+     [
+      220,
+      16
+     ],
+     [
+      220,
+      17
+     ],
+     [
+      220,
+      18
+     ],
+     [
+      220,
+      19
+     ],
+     [
+      220,
+      20
+     ],
+     [
+      220,
+      21
+     ],
+     [
+      220,
+      22
+     ],
+     [
+      220,
+      23
+     ],
+     [
+      220,
+      24
+     ]
+    ],
+    "conditions": {
+     "every_complete_candidate_is_exactly_two_tokens": true,
+     "every_published_sequence_reconciles_with_its_prompt_bytes": true,
+     "no_constant_sequence_initial_token_across_distinct_prompts": true,
+     "no_registered_prompt_ends_with_the_common_prefix_token": true,
+     "no_sequence_final_token_absent_from_every_interior_position": true,
+     "the_common_token_decodes_byte_exactly_to_one_registered_u0020": true,
+     "the_factorization_reproduces_every_complete_candidate_surface": true,
+     "the_first_token_is_identical_for_all_ten_candidates": true,
+     "the_second_token_ids_are_pairwise_distinct": true,
+     "the_second_token_ids_map_byte_exactly_to_0_through_9_in_order": true,
+     "unresolved_token_occurrences": 1280
+    },
+    "discriminant_bytes": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "discriminant_token_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24
+    ],
+    "eligible": true,
+    "reasons": [],
+    "registered_candidate_surfaces": [
+     " 0",
+     " 1",
+     " 2",
+     " 3",
+     " 4",
+     " 5",
+     " 6",
+     " 7",
+     " 8",
+     " 9"
+    ],
+    "role": "RI"
+   },
+   {
+    "common_prefix_bytes": " ",
+    "common_prefix_token": 220,
+    "complete_candidate_token_ids": [
+     [
+      220,
+      15
+     ],
+     [
+      220,
+      16
+     ],
+     [
+      220,
+      17
+     ],
+     [
+      220,
+      18
+     ],
+     [
+      220,
+      19
+     ],
+     [
+      220,
+      20
+     ],
+     [
+      220,
+      21
+     ],
+     [
+      220,
+      22
+     ],
+     [
+      220,
+      23
+     ],
+     [
+      220,
+      24
+     ]
+    ],
+    "conditions": {
+     "every_complete_candidate_is_exactly_two_tokens": true,
+     "every_published_sequence_reconciles_with_its_prompt_bytes": true,
+     "no_constant_sequence_initial_token_across_distinct_prompts": true,
+     "no_registered_prompt_ends_with_the_common_prefix_token": true,
+     "no_sequence_final_token_absent_from_every_interior_position": true,
+     "the_common_token_decodes_byte_exactly_to_one_registered_u0020": true,
+     "the_factorization_reproduces_every_complete_candidate_surface": true,
+     "the_first_token_is_identical_for_all_ten_candidates": true,
+     "the_second_token_ids_are_pairwise_distinct": true,
+     "the_second_token_ids_map_byte_exactly_to_0_through_9_in_order": true,
+     "unresolved_token_occurrences": 1280
+    },
+    "discriminant_bytes": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "discriminant_token_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24
+    ],
+    "eligible": true,
+    "reasons": [],
+    "registered_candidate_surfaces": [
+     " 0",
+     " 1",
+     " 2",
+     " 3",
+     " 4",
+     " 5",
+     " 6",
+     " 7",
+     " 8",
+     " 9"
+    ],
+    "role": "RL"
+   },
+   {
+    "common_prefix_bytes": " ",
+    "common_prefix_token": 220,
+    "complete_candidate_token_ids": [
+     [
+      220,
+      15
+     ],
+     [
+      220,
+      16
+     ],
+     [
+      220,
+      17
+     ],
+     [
+      220,
+      18
+     ],
+     [
+      220,
+      19
+     ],
+     [
+      220,
+      20
+     ],
+     [
+      220,
+      21
+     ],
+     [
+      220,
+      22
+     ],
+     [
+      220,
+      23
+     ],
+     [
+      220,
+      24
+     ]
+    ],
+    "conditions": {
+     "every_complete_candidate_is_exactly_two_tokens": true,
+     "every_published_sequence_reconciles_with_its_prompt_bytes": true,
+     "no_constant_sequence_initial_token_across_distinct_prompts": true,
+     "no_registered_prompt_ends_with_the_common_prefix_token": true,
+     "no_sequence_final_token_absent_from_every_interior_position": true,
+     "the_common_token_decodes_byte_exactly_to_one_registered_u0020": true,
+     "the_factorization_reproduces_every_complete_candidate_surface": true,
+     "the_first_token_is_identical_for_all_ten_candidates": true,
+     "the_second_token_ids_are_pairwise_distinct": true,
+     "the_second_token_ids_map_byte_exactly_to_0_through_9_in_order": true,
+     "unresolved_token_occurrences": 1280
+    },
+    "discriminant_bytes": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "discriminant_token_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24
+    ],
+    "eligible": true,
+    "reasons": [],
+    "registered_candidate_surfaces": [
+     " 0",
+     " 1",
+     " 2",
+     " 3",
+     " 4",
+     " 5",
+     " 6",
+     " 7",
+     " 8",
+     " 9"
+    ],
+    "role": "RT"
+   }
+  ],
+  "schema_version": "study3-p0-r1-factorization-replay-v1",
+  "stage": "P0-R1-REPLAY",
+  "tokenizer_constructions_performed": 0,
+  "tokenizer_encodes_performed": 0
+ },
+ "historical_matrix_summary": {
+  "cells": 39,
+  "emitted_state": "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE",
+  "emitted_stop_reason": "no executable genuine I3 contrast remains for RT, RL, RI",
+  "ineligible_cells": 33,
+  "ineligible_cells_with_an_empty_reason_list": 27,
+  "status": "immutable historical observation. It is accepted as the record of what the P0-T harness emitted and it is never edited, replaced, relabelled or rerun."
+ },
+ "historical_stop_label": "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE",
+ "historical_stop_label_status": "historical text attached to the consumed P0-T result only. It is never emitted again and it is never rewritten in place.",
+ "kind": "calibration derivation only. It advances no state, consumes no one-shot authorization and is not the registered replay gate.",
+ "model_operations_performed": 0,
+ "not_applicable_semantics": "structural absence. It can never become eligible, ineligible, a pass, a zero, a denominator row or robustness evidence.",
+ "roles_without_executable_contrast": [],
+ "schema_version": "study3-p0-r1-replay-gate-v1",
+ "stage": "P0-R1-REPLAY-DERIVATION",
+ "stop_label_if_any_role_has_none": "STUDY3_P0_R1_STOPPED_SOME_TARGET_ROLE_HAS_NO_EXECUTABLE_GENUINE_I3_CONTRAST",
+ "stop_label_semantics": "one or more target roles has no executable genuine I3 contrast",
+ "structurally_absent": [
+  {
+   "applicability": "not_applicable",
+   "contrast": "K6-SEP",
+   "counted": false,
+   "instantiated": false,
+   "profile": "S2",
+   "semantics": "structural absence. Never a pass, never a zero, never a denominator row and never robustness evidence."
+  },
+  {
+   "applicability": "not_applicable",
+   "contrast": "K6-SEP",
+   "counted": false,
+   "instantiated": false,
+   "profile": "S3",
+   "semantics": "structural absence. Never a pass, never a zero, never a denominator row and never robustness evidence."
+  }
+ ],
+ "target_roles": [
+  "RI",
+  "RL",
+  "RT"
+ ],
+ "tokenizer_constructions_performed": 0,
+ "tokenizer_encodes_performed": 0
+}

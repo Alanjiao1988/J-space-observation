@@ -1,0 +1,107 @@
+# Study 3 P0-R1 continuation image.
+#
+# Authority: studies/study3/prompts/study3_v0_6_p0_r1_authority.md
+#
+# One image serves both P0-R1 stages, so the CPU replay gate and the GPU model
+# pilot provably run the same interpreter, the same frozen dependencies and the
+# same frozen science code. Which stage runs is a command, not a rebuild.
+#
+# Section 6 requires exact dependency and base-image pinning. The base image is
+# therefore pinned by digest, never by tag alone, and torch is taken from the
+# base image rather than reinstalled.
+#
+# This image performs no model download at build time and bakes in no P0-T or
+# P0-R1 result. The build cannot see an outcome, and an outcome cannot change
+# the build.
+
+FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime@sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126
+
+LABEL org.opencontainers.image.title="J-space Study 3 P0-R1 continuation"
+LABEL org.opencontainers.image.base.name="pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime"
+LABEL org.opencontainers.image.base.digest="sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126"
+LABEL io.jspace.study="3"
+LABEL io.jspace.stage="P0-R1"
+LABEL io.jspace.authority-sha256="f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2"
+LABEL io.jspace.draft-version="draft-v0.6"
+LABEL io.jspace.formal-execution-authorized="false"
+LABEL io.jspace.p0-r1-pilot-execution-authorized="true"
+LABEL io.jspace.p0-r1-pilot-execution-consumed="false"
+LABEL io.jspace.roles="RT=deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B@ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562; RL=Qwen/Qwen2.5-Math-1.5B@4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2; RI=Qwen/Qwen2.5-Math-1.5B-Instruct@aafeb0fc6f22cbf0eaeed126eff8be45b0360a35"
+LABEL io.jspace.scoring-boundary="first-discriminative-token restricted argmax for S2/S3; S1 and S4 unchanged"
+LABEL io.jspace.rp="excluded; no positive-reference candidate is selected, downloaded, tokenized, loaded or called"
+LABEL io.jspace.trust-remote-code="false"
+LABEL io.jspace.authentication="microsoft entra managed identity only; no key, SAS or secret is baked, read or printed"
+LABEL io.jspace.claim-boundary="a methods-feasibility continuation. It selects no interface, sets no threshold, passes no formal gate, answers no research question, resolves neither OD2 nor UR-22, freezes nothing and produces no evidence-ledger row."
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HUB_DISABLE_TELEMETRY=1 \
+    TRANSFORMERS_NO_ADVISORY_WARNINGS=1 \
+    TOKENIZERS_PARALLELISM=false
+
+RUN groupadd --system --gid 10001 jspace \
+    && useradd --system --uid 10001 --gid jspace --create-home \
+        --home-dir /workspace/runtime/home --shell /usr/sbin/nologin jspace
+
+WORKDIR /workspace
+
+COPY studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt /workspace/
+RUN python -m pip install --no-cache-dir \
+        -r /workspace/requirements-study3-p0-r1.txt
+
+# The binding scientific inputs. They are byte-protected: the build copies them,
+# never rewrites them.
+COPY studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json \
+     studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json \
+     studies/study3/protocol/interface_calibration_protocol_draft.json \
+     /workspace/studies/study3/protocol/
+COPY studies/study3/prompts/study3_v0_6_p0_r1_authority.md \
+     /workspace/studies/study3/prompts/
+
+# The immutable P0-T evidence and the frozen corpus. The replay gate reads them
+# and never writes them, so they are copied read-only. The consumed P0 results
+# ARE required here, unlike the P0-T build: replay is defined over them.
+COPY studies/study3/pilot/p0/ /workspace/studies/study3/pilot/p0/
+
+# The frozen P0-R1 science.
+COPY studies/study3/pilot/p0_r1/ /workspace/studies/study3/pilot/p0_r1/
+RUN rm -rf /workspace/studies/study3/pilot/p0_r1/results
+
+COPY studies/study3/analysis/design_statistics.py \
+     studies/study3/analysis/scoring_boundary_v0_6.py \
+     /workspace/studies/study3/analysis/
+
+# Fail the build unless the authority copy inside the image reproduces its
+# registered identity, the immutable P0-T artifacts reproduce byte-exactly, the
+# replay factorization derives with zero tokenizer encodes, and the protocol and
+# receipt reproduce from code. If any one of those is false there is no image.
+RUN python /workspace/studies/study3/pilot/p0_r1/p0_r1_validate.py --image-build \
+    && python /workspace/studies/study3/pilot/p0_r1/p0_r1_factorization.py --check \
+    && python /workspace/studies/study3/pilot/p0_r1/p0_r1_protocol.py --check
+
+RUN install -d -o jspace -g jspace -m 0700 \
+        /workspace/runtime/home \
+        /workspace/runtime/results \
+        /workspace/runtime/cache \
+        /workspace/runtime/cache/tmp \
+        /workspace/runtime/pycache \
+    && chown -R 0:0 /workspace/studies \
+        /workspace/requirements-study3-p0-r1.txt \
+    && chmod -R a-w /workspace/studies \
+        /workspace/requirements-study3-p0-r1.txt
+
+ENV HOME=/workspace/runtime/home \
+    XDG_CACHE_HOME=/workspace/runtime/cache \
+    HF_HOME=/workspace/runtime/cache/huggingface \
+    TMPDIR=/workspace/runtime/cache/tmp \
+    PYTHONPYCACHEPREFIX=/workspace/runtime/pycache \
+    RESULTS_DIR=/workspace/runtime/results
+
+USER 10001:10001
+
+# The default mode is the one that cannot touch a model: it replays the
+# immutable P0-T evidence with zero encodes and stops. Neither the registered
+# replay gate nor the model pilot runs by accident.
+CMD ["python", "/workspace/studies/study3/pilot/p0_r1/p0_r1_factorization.py", "--check"]

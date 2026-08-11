@@ -1,0 +1,539 @@
+{
+ "allocation": {
+  "automatic_extension_upper_bound_prefills": 180,
+  "non_generative_prefill_evaluations_in_the_k2_smoke": 60,
+  "s1_scored_rows": 162,
+  "s2_scored_rows": 18,
+  "s3_cpu_reuse_scored_rows": 18,
+  "s4_generations": 12,
+  "s4_max_new_tokens_each": 4,
+  "s4_scored_rows": 12,
+  "the_common_prefix_changes_token_processing_not_evaluations": true,
+  "total_scored_rows": 210,
+  "total_sequence_level_model_evaluation_equivalents_upper_bound": 228
+ },
+ "authority": {
+  "byte_identical": true,
+  "bytes": 19632,
+  "carries_cr": false,
+  "lf_only": true,
+  "path": "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+  "present": true,
+  "registered_bytes": 19632,
+  "registered_sha256": "f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2",
+  "sha256": "f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2"
+ },
+ "authorized_write_paths": [
+  "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+  "studies/study3/pilot/p0_r1/",
+  "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
+  "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json",
+  "studies/study3/protocol/interface_calibration_protocol_draft.json",
+  "studies/study3/protocol/interface_calibration_protocol_draft.md",
+  "studies/study3/protocol/interface_calibration_protocol.schema.json",
+  "studies/study3/reviews/v0_6_operator_amendment.json",
+  "studies/study3/reviews/v0_6_operator_amendment.md",
+  "studies/study3/reviews/v0_6_operator_amendment.schema.json",
+  "studies/study3/design_receipt_v0_6.json",
+  "studies/study3/analysis/scoring_boundary_v0_6.py",
+  "studies/study3/analysis/scoring_boundary_v0_6_tables.json",
+  "studies/study3/analysis/p0_r1_corrected_eligibility_tables.json",
+  "studies/study3/analysis/final_focused_review_packet_v0_6.md",
+  "tests/test_study3_rendering_registry_v0_6.py",
+  "tests/test_study3_p0_r1_registration.py",
+  "README.md",
+  "docs/decision_log.md",
+  "docs/run_log.md",
+  "paper/artifact_index.csv",
+  "paper/methods_ledger.md",
+  "reports/current_status.md",
+  "studies/study3/README.md",
+  "studies/study3/NEXT_THREAD_HANDOFF.md",
+  "studies/study3/RESEARCH_CHARTER_DRAFT.md"
+ ],
+ "byte_protected_paths": [
+  "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
+  "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
+  "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+  "studies/study3/pilot/p0/corpus/p0_corpus.json",
+  "studies/study3/pilot/p0/corpus/p0_corpus_manifest.json",
+  "studies/study3/pilot/p0/corpus/p0_corpus_census.md",
+  "studies/study3/pilot/p0/p0_corpus.py",
+  "studies/study3/pilot/p0/p0_counters.py",
+  "studies/study3/pilot/p0/p0_freeze_corpus.py",
+  "studies/study3/pilot/p0/p0_image_verify.py",
+  "studies/study3/pilot/p0/p0_model_pilot.py",
+  "studies/study3/pilot/p0/p0_parser.py",
+  "studies/study3/pilot/p0/p0_protocol.json",
+  "studies/study3/pilot/p0/p0_protocol.py",
+  "studies/study3/pilot/p0/p0_renderer.py",
+  "studies/study3/pilot/p0/p0_summarize.py",
+  "studies/study3/pilot/p0/p0_tokenizer_gate.py",
+  "studies/study3/pilot/p0/p0_transport.py",
+  "studies/study3/pilot/p0/p0_validate.py",
+  "studies/study3/pilot/p0/README.md",
+  "studies/study3/pilot/p0/container/Dockerfile.study3-p0",
+  "studies/study3/pilot/p0/container/p0_t_acr_task.yaml",
+  "studies/study3/pilot/p0/container/p0_t_checkout.sh",
+  "studies/study3/pilot/p0/container/p0_t_stage.sh",
+  "studies/study3/pilot/p0/container/requirements-study3-p0.txt",
+  "tests/test_study3_p0_feasibility_pilot.py",
+  "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.json",
+  "studies/study3/protocol/interface_calibration_rendering_registry_v0_5.schema.json",
+  "studies/study3/reviews/v0_5_operator_amendment.json",
+  "studies/study3/reviews/v0_5_operator_amendment.md",
+  "studies/study3/reviews/v0_5_operator_amendment.schema.json",
+  "studies/study3/design_receipt_v0_5.json",
+  "studies/study3/analysis/independent_methods_review_packet_v0_5.md",
+  "studies/study3/analysis/design_statistics.py",
+  "studies/study3/analysis/design_statistics_tables.json",
+  "studies/study3/prompts/study3_p0_feasibility_pilot_authority.md",
+  "studies/study3/prompts/study3_v0_5_design_amendment_authority.md",
+  "tests/test_study3_design.py",
+  "tests/test_study3_rendering_registry_v0_5.py",
+  "tests/test_study3_methods_review.py",
+  "tests/test_study3_methods_review_v0_3.py",
+  "tests/test_study3_methods_review_v0_4.py",
+  "paper/evidence_ledger.csv"
+ ],
+ "caps": {
+  "additional_gpu_attempt_with_signed_zero_operation_receipt": 1,
+  "bank_rows_written": 0,
+  "distinct_checkpoint_identities_downloaded": 3,
+  "distinct_tokenizer_identities_constructed": 3,
+  "gpu_jobs_performing_a_model_operation": 1,
+  "hosted_provider_inference_calls": 0,
+  "model_weight_loads": 3,
+  "non_generative_prefill_evaluations": 180,
+  "positive_reference_operations": 0,
+  "s1_scored_rows": 162,
+  "s2_scored_rows": 18,
+  "s3_cpu_only_reuse_scored_rows": 18,
+  "s4_generation_calls": 12,
+  "s4_incremental_decode_evaluations": 36,
+  "s4_prefill_evaluations": 12,
+  "s4_scored_generation_rows": 12,
+  "seeds_drawn": 0,
+  "tokenizer_encoded_sequences": 10000,
+  "total_scored_rows": 210,
+  "total_sequence_level_model_evaluation_equivalents": 228
+ },
+ "corpus": {
+  "member_count": 70,
+  "namespace": "study3-p0-only",
+  "path": "studies/study3/pilot/p0/corpus/p0_corpus.json",
+  "permanent_exclusion": "the complete study3-p0-only/ namespace and every semantic tuple used by the pilot are permanently excluded from every formal development, confirmation, P3-Q and external-validity bank",
+  "reuse_rule": "P0-R1 reuses the exact frozen 35-cell / 70-member P0 corpus and its hashes. No row, member, tuple, prompt, rendering, answer, nuisance state, allocation or ground truth may be added, removed, replaced or edited.",
+  "row_count": 35
+ },
+ "counter_ontology": {
+  "aggregate_view_rule": "additive counters are summed across the immutable P0-T snapshot and every P0-R1 attempt; identity counters are the cardinality of the union of the identity sets and are never summed",
+  "caps": {
+   "additional_gpu_attempt_with_signed_zero_operation_receipt": 1,
+   "bank_rows_written": 0,
+   "distinct_checkpoint_identities_downloaded": 3,
+   "distinct_tokenizer_identities_constructed": 3,
+   "gpu_jobs_performing_a_model_operation": 1,
+   "hosted_provider_inference_calls": 0,
+   "model_weight_loads": 3,
+   "non_generative_prefill_evaluations": 180,
+   "positive_reference_operations": 0,
+   "s1_scored_rows": 162,
+   "s2_scored_rows": 18,
+   "s3_cpu_only_reuse_scored_rows": 18,
+   "s4_generation_calls": 12,
+   "s4_incremental_decode_evaluations": 36,
+   "s4_prefill_evaluations": 12,
+   "s4_scored_generation_rows": 12,
+   "seeds_drawn": 0,
+   "tokenizer_encoded_sequences": 10000,
+   "total_scored_rows": 210,
+   "total_sequence_level_model_evaluation_equivalents": 228
+  },
+  "cumulative": true,
+  "historical_namespace": "study3-p0-pilot-counters",
+  "identity_cardinality_counters": [
+   "distinct_checkpoint_identities_downloaded",
+   "distinct_tokenizer_identities_constructed"
+  ],
+  "namespace": "study3-p0-r1-pilot-counters",
+  "on_cap": "the continuation stops before the operation that would cross a cap; an overrun is never recorded as a completed operation",
+  "on_failure": "a failed, partial, retried or aborted attempt keeps its counters; they are never erased, overwritten or relabelled as a successful run",
+  "resettable": false,
+  "separate_from": "every pre-existing formal Study 3 counter and the immutable P0-T snapshot, both of which remain historical facts that P0-R1 never touches",
+  "smoke_exact_allocation": {
+   "non_generative_prefill_evaluations": 60,
+   "s3_cpu_only_reuse_scored_rows": 6,
+   "s4_generation_calls": 0,
+   "total_scored_rows": 66
+  },
+  "uncapped_recorded_observations": [
+   "runtime_batched_forward_calls",
+   "runtime_batched_tokenizer_calls",
+   "parser_calls",
+   "restricted_logit_reads",
+   "generated_tokens",
+   "exceptions_observed",
+   "tokenizer_construction_events",
+   "common_prefix_tokens_processed",
+   "registered_prompt_tokens_processed",
+   "scoring_context_tokens_processed",
+   "replay_gate_evaluations"
+  ],
+  "unit_semantics": {
+   "common_prefix_tokens_processed": "the number of teacher-forced common-prefix tokens appended to a scoring context. It is token processing, not a generation and not a sequence-level model evaluation",
+   "distinct_checkpoint_identities_downloaded": "the cardinality of the set of distinct repository/revision checkpoint identities downloaded; a set cardinality",
+   "distinct_tokenizer_identities_constructed": "the cardinality of the set of distinct repository/revision tokenizer identities constructed; a set cardinality, never a load-event count",
+   "non_generative_prefill_evaluations": "one sequence-level prefill evaluation of one scoring context by one role for S1 or S2; it is never a runtime batch call and it does not increase because the S2 scoring context carries one extra teacher-forced token",
+   "registered_prompt_tokens_processed": "the number of registered prompt tokens processed, excluding the teacher-forced common prefix",
+   "replay_gate_evaluations": "one replay-only factorization gate evaluation over immutable source artifacts; it performs zero tokenizer encodes and zero model operations",
+   "runtime_batched_forward_calls": "one runtime batched forward call, recorded separately and never substituted for a sequence-level quantity",
+   "s3_cpu_only_reuse_scored_rows": "one scored row produced on CPU from an already captured S2 discriminant-position logit vector; it adds exactly zero model evaluations, prefills, decodes and generations",
+   "s4_generation_calls": "one bounded greedy generation call",
+   "s4_incremental_decode_evaluations": "one incremental decode step of one S4 generation call; at max_new_tokens=4 a completed call contributes at most three",
+   "s4_prefill_evaluations": "the sequence-level prefill of one S4 generation call",
+   "scoring_context_tokens_processed": "registered prompt tokens plus common-prefix tokens; the two component counters must reconcile to this total",
+   "tokenizer_construction_events": "one construction of a tokenizer object. Reloading the same pinned identity is a further event and is never hidden; it does not increase the distinct-identity cardinality",
+   "tokenizer_encoded_sequences": "one encoded sequence; a batch API must count every sequence it encodes as well as the runtime batch call"
+  },
+  "zero_before_execution": [
+   "additional_gpu_attempt_with_signed_zero_operation_receipt",
+   "bank_rows_written",
+   "common_prefix_tokens_processed",
+   "distinct_checkpoint_identities_downloaded",
+   "distinct_tokenizer_identities_constructed",
+   "exceptions_observed",
+   "generated_tokens",
+   "gpu_jobs_performing_a_model_operation",
+   "hosted_provider_inference_calls",
+   "model_weight_loads",
+   "non_generative_prefill_evaluations",
+   "parser_calls",
+   "positive_reference_operations",
+   "registered_prompt_tokens_processed",
+   "replay_gate_evaluations",
+   "restricted_logit_reads",
+   "runtime_batched_forward_calls",
+   "runtime_batched_tokenizer_calls",
+   "s1_scored_rows",
+   "s2_scored_rows",
+   "s3_cpu_only_reuse_scored_rows",
+   "s4_generation_calls",
+   "s4_incremental_decode_evaluations",
+   "s4_prefill_evaluations",
+   "s4_scored_generation_rows",
+   "scoring_context_tokens_processed",
+   "seeds_drawn",
+   "tokenizer_construction_events",
+   "tokenizer_encoded_sequences",
+   "total_scored_rows",
+   "total_sequence_level_model_evaluation_equivalents"
+  ],
+  "zero_operation_retry": "one infrastructure retry is authorized only when a signed job receipt proves that zero tokenizer, model-load, prefill, decode, scoring and generation operations occurred"
+ },
+ "document_class": "study3_p0_r1_continuation_protocol",
+ "eligibility": {
+  "an_ineligible_row_must_carry_a_local_reason": true,
+  "classifier_version": "study3-p0-r1-eligibility-classifier-v2",
+  "historical_stop_label": "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE",
+  "historical_stop_label_status": "historical text attached to the consumed P0-T result only. It is never emitted again and it is never rewritten in place.",
+  "keys": {
+   "candidate_surface_eligibility": "role x profile",
+   "presentation_pair_distinctness": "role x profile x contrast",
+   "structural_absence": "profile x contrast",
+   "target_role_executability": "role"
+  },
+  "no_propagation": [
+   "a failure in S1 never propagates to S2 or S3",
+   "a failure in S2 or S3 never propagates to S1",
+   "a failure in one role never propagates to another role",
+   "one contrast's collision never propagates to an unrelated contrast"
+  ],
+  "not_applicable_semantics": "structural absence. It can never become eligible, ineligible, a pass, a zero, a denominator row or robustness evidence.",
+  "s4_is_diagnostic_only": true,
+  "stop_label": "STUDY3_P0_R1_STOPPED_SOME_TARGET_ROLE_HAS_NO_EXECUTABLE_GENUINE_I3_CONTRAST",
+  "stop_label_semantics": "one or more target roles has no executable genuine I3 contrast"
+ },
+ "evidence_status": "methods-feasibility observations only; never Study 3 evidence and never an entry in paper/evidence_ledger.csv",
+ "execution_route": {
+  "authoritative_cpu_validation": "the registered Azure Container Registry/container route on a clean exact-commit checkout",
+  "gpu_class": "one T4-class 16 GiB GPU or a larger compatible Azure GPU",
+  "image_pinning": "the container image is frozen by immutable digest and Python, PyTorch, Transformers, tokenizer, CUDA and supporting package versions are pinned before the first tokenizer call",
+  "model_operations": "an Azure containerized GPU job only; never on the workstation and never in GitHub Actions",
+  "precision": "fp16, one checkpoint at a time",
+  "prohibited": [
+   "quantization",
+   "mixed checkpoint revisions",
+   "model conversion",
+   "adapter insertion",
+   "remote hosted inference APIs",
+   "local workstation model execution"
+  ],
+  "trust_remote_code": false,
+  "workstation_permitted": [
+   "code inspection",
+   "editing",
+   "git",
+   "hashes",
+   "upload",
+   "submission",
+   "result reading"
+  ]
+ },
+ "inference_behaviour": {
+  "adapters": false,
+  "evaluation_mode": true,
+  "gradients": false,
+  "inference_mode": "torch.inference_mode() or its exact equivalent",
+  "never_collect": [
+   "hidden states",
+   "activations",
+   "attentions",
+   "gradients",
+   "hooks",
+   "lens outputs",
+   "probes",
+   "patches",
+   "ablations"
+  ],
+  "quantization": false,
+  "s1_reads": "next-token logits for the four registered label token IDs at the single position after the registered prompt",
+  "s2_reads": "next-token logits for the ten verified discriminant token IDs at the single position after the teacher-forced common prefix",
+  "s3": "CPU-only scoring from the already captured S2 discriminant-position vector; exactly zero prefill, decode, model-load or forward operations",
+  "s4": {
+   "decoding": "greedy",
+   "do_sample": false,
+   "max_new_tokens": 4,
+   "temperature": "not passed",
+   "unparseable": "an explicit retained outcome; never dropped and never imputed",
+   "wrapper": "each role's registered native-wrapper policy"
+  },
+  "sampling": false
+ },
+ "legal_status": {
+  "draft_v0_6_frozen": false,
+  "draft_v0_6_reviewed": false,
+  "draft_v0_6_status": "candidate protocol that has not received the final focused methods review; P0-R1 does not declare it correct and does not waive that review",
+  "evidence_ledger_last_row": "EV-0016",
+  "evidence_ledger_policy": "byte-identical; P0-R1 writes no evidence row",
+  "formal_execution_authorized": false,
+  "interface_selected": null,
+  "od2_status": "unresolved",
+  "p0_r1_pilot_execution_authorized": true,
+  "p0_r1_pilot_execution_consumed": false,
+  "rp_status": "excluded; no positive-reference object is selected or touched",
+  "ur22_status": "unresolved"
+ },
+ "non_purpose": [
+  "no confirmatory effect size, power validation or null test",
+  "no formal gate pass or fail",
+  "no selection or ranking of S1, S2 or S3 and no qualification of S4",
+  "no scientific checkpoint comparison",
+  "no answer to the original research question",
+  "pilot observations may never justify a threshold, sample size, alpha, seed, bank, profile or confirmation rule"
+ ],
+ "prohibitions": [
+  "any development, confirmation or P3-Q seed or bank",
+  "any access to existing or future confirmation material",
+  "any formal Gate I0-I5 pass/fail, selection-map run, winner, interface preference or confirmation release",
+  "any use of draft-v0.6's 413/214/448 sample sizes as pilot allocations",
+  "any change to alpha, power, floors, claims, estimands, m_max or the formal operation projection",
+  "any choice or inspection of RP, any resolution of OD2 or UR-22",
+  "any reuse of Study 1/2 item identities, banks, seeds, confirmation data or empirical results as P0-R1 inputs",
+  "any edit to any byte under studies/study3/pilot/p0/ or to tests/test_study3_p0_feasibility_pilot.py",
+  "any prompt, parser, scoring, tokenizer, item, allocation, checkpoint or dependency change after the registration publication in response to an observed result",
+  "any reroll, output-conditioned retry, cherry-picking, row replacement, exclusion of a valid but inconvenient row, or reset of a cumulative counter",
+  "any quantization, hosted-provider inference, unpinned revision or local workstation model execution",
+  "any activation extraction, hook, lens, probe, patch, intervention or ablation",
+  "any entry in paper/evidence_ledger.csv",
+  "any claim that P0-R1 answers the original research question or validates draft-v0.6",
+  "any direct transition from P0-R1 to formal development or confirmation"
+ ],
+ "retry_rule": {
+  "output_conditioned_retry": false,
+  "zero_operation_infrastructure_retry": "permitted once only when a signed job receipt proves that zero tokenizer, model-load, prefill, decode, scoring and generation operations occurred"
+ },
+ "roles": [
+  {
+   "immutable_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+   "len_tokenizer": 151665,
+   "repository_identity": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+   "role": "RT",
+   "source": "read back from the immutable published P0-T result; not restated by hand",
+   "tokenizer_class": "LlamaTokenizerFast",
+   "trust_remote_code": false,
+   "vocabulary_size": 151643
+  },
+  {
+   "immutable_revision": "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2",
+   "len_tokenizer": 151665,
+   "repository_identity": "Qwen/Qwen2.5-Math-1.5B",
+   "role": "RL",
+   "source": "read back from the immutable published P0-T result; not restated by hand",
+   "tokenizer_class": "Qwen2TokenizerFast",
+   "trust_remote_code": false,
+   "vocabulary_size": 151643
+  },
+  {
+   "immutable_revision": "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35",
+   "len_tokenizer": 151665,
+   "repository_identity": "Qwen/Qwen2.5-Math-1.5B-Instruct",
+   "role": "RI",
+   "source": "read back from the immutable published P0-T result; not restated by hand",
+   "tokenizer_class": "Qwen2TokenizerFast",
+   "trust_remote_code": false,
+   "vocabulary_size": 151643
+  }
+ ],
+ "rp_excluded": true,
+ "schema_version": "study3-p0-r1-continuation-protocol-v1",
+ "scientific_purpose": [
+  "does the repaired first-discriminative-token factorization verify from the immutable P0-T evidence with zero new encodes",
+  "does the repaired eligibility classifier compute at the narrowest applicable key without cross-profile, cross-role or cross-contrast propagation",
+  "can S1, S2 and CPU-only S3 be executed and reconciled under the draft-v0.6 scoring boundary without missing rows, non-finite values, scorer disagreement or hidden evaluations",
+  "can the S4 diagnostic path render, wrap, generate, parse, retain unparseable output and account for its cost",
+  "what wall time, peak device memory, prompt-token length, scoring-context token length, generated-token count, failure rate and runtime batching occur"
+ ],
+ "scoring_boundary": {
+  "common_prefix_is_not_a_separate_sequence_level_evaluation": true,
+  "common_prefix_is_teacher_forced_not_generated": true,
+  "equivalence": {
+   "consequence": "argmax_d P(u, v_d | x) = argmax_d P(v_d | x, u)",
+   "does_not_extend_to": [
+    "arbitrary multi-token candidates",
+    "candidates of unequal length",
+    "candidates without a common prefix",
+    "summed or length-normalised log probabilities",
+    "free generation",
+    "any tokenizer that is not separately pinned and verified"
+   ],
+   "identity": "P(u, v_d | x) = P(u | x) * P(v_d | x, u)",
+   "tie_break_order": "ascending mod-10 residue order 0, 1, 2, ..., 9, unchanged from the registered v0.5 order",
+   "valid_because": [
+    "the registered decision statistic is a deterministic argmax over a closed ten-member candidate set",
+    "all ten candidates have the same two-token structure",
+    "all ten candidates share the identical common prefix token u",
+    "the registered digit-order tie break is preserved unchanged"
+   ],
+   "why_exact": "P(u | x) does not depend on d, so it is a strictly positive common factor of all ten complete-candidate probabilities and cancels from the ranking. This is an exact factor cancellation, not an approximation"
+  },
+  "registry": "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
+  "registry_schema": "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json",
+  "rule": "first-discriminative-token restricted argmax for S2/S3",
+  "s1_rule_unchanged": true,
+  "s4_rule_unchanged": true
+ },
+ "smoke_exact_allocation": {
+  "non_generative_prefill_evaluations": 60,
+  "s3_cpu_only_reuse_scored_rows": 6,
+  "s4_generation_calls": 0,
+  "total_scored_rows": 66
+ },
+ "state": "STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE",
+ "state_machine": {
+  "states": [
+   {
+    "entered_when": "the draft-v0.6 candidate and the P0-R1 package are published by non-force fast-forward and HEAD equals origin/main with the recorded tree and a clean worktree",
+    "forbids": [
+     "the replay gate in the calibration session",
+     "constructing a tokenizer",
+     "downloading a checkpoint",
+     "allocating a GPU",
+     "beginning the model pilot"
+    ],
+    "kind": "waypoint",
+    "permits": [
+     "one fresh successor session continuing from this exact published registration commit"
+    ],
+    "state": "STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE"
+   },
+   {
+    "entered_when": "the replay-only factorization gate verifies all five conditions of section 3.2 and the corrected eligibility matrix from immutable source artifacts, performing zero new encodes",
+    "forbids": [
+     "merging or rebasing during an active measurement round"
+    ],
+    "kind": "waypoint",
+    "permits": [
+     "one Azure containerized GPU job running the repaired model pilot, one checkpoint at a time"
+    ],
+    "state": "STUDY3_P0_R1_REPLAY_GATE_PASSED_AWAITING_MODEL_PILOT"
+   },
+   {
+    "entered_when": "the replay-only gate cannot verify the factorization or the corrected eligibility matrix from the immutable artifacts",
+    "kind": "terminal",
+    "on_entry": "publish a registered stop and perform no model operation. Do not repair and rerun.",
+    "state": "STUDY3_P0_R1_STOPPED_ON_REPLAY_FACTORIZATION_DEFECT"
+   },
+   {
+    "entered_when": "one or more target roles has no executable genuine I3 contrast",
+    "kind": "terminal",
+    "semantics": "one or more target roles has no executable genuine I3 contrast",
+    "state": "STUDY3_P0_R1_STOPPED_SOME_TARGET_ROLE_HAS_NO_EXECUTABLE_GENUINE_I3_CONTRAST",
+    "supersedes_label": "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE",
+    "supersedes_label_status": "historical text attached to the consumed P0-T result only. It is never emitted again and it is never rewritten in place."
+   },
+   {
+    "entered_when": "the replay gate passes, every executed row is complete and mechanically valid, S1/S2/S3 scoring and S3 reuse reconcile, the S4 diagnostic path executes, and the resource and counter records are complete",
+    "kind": "terminal",
+    "state": "STUDY3_P0_R1_COMPLETE_MECHANICALLY_FEASIBLE"
+   },
+   {
+    "entered_when": "every mechanical condition passes but the tiny corpus shows a globally degenerate prediction pattern or another explicitly descriptive low-information pattern",
+    "kind": "terminal",
+    "state": "STUDY3_P0_R1_COMPLETE_MECHANICALLY_FEASIBLE_EMPIRICALLY_LOW_INFORMATION"
+   },
+   {
+    "entered_when": "the smoke mechanical gate fails after any model operation",
+    "kind": "terminal",
+    "state": "STUDY3_P0_R1_STOPPED_ON_MODEL_SMOKE_MECHANICAL_FAILURE"
+   },
+   {
+    "entered_when": "an infrastructural or transport failure prevents the round from reaching a mechanical determination",
+    "kind": "terminal",
+    "state": "STUDY3_P0_R1_INCONCLUSIVE_INFRASTRUCTURE_OR_TRANSPORT_FAILURE"
+   },
+   {
+    "entered_when": "the starting state, the protected bytes, the authority identity or the publication path cannot be established exactly",
+    "kind": "terminal",
+    "state": "STUDY3_P0_R1_BLOCKED_ON_AUTHORITY_OR_REPOSITORY_INTEGRITY"
+   }
+  ],
+  "terminal_dispositions": [
+   "STUDY3_P0_R1_STOPPED_ON_REPLAY_FACTORIZATION_DEFECT",
+   "STUDY3_P0_R1_STOPPED_SOME_TARGET_ROLE_HAS_NO_EXECUTABLE_GENUINE_I3_CONTRAST",
+   "STUDY3_P0_R1_COMPLETE_MECHANICALLY_FEASIBLE",
+   "STUDY3_P0_R1_COMPLETE_MECHANICALLY_FEASIBLE_EMPIRICALLY_LOW_INFORMATION",
+   "STUDY3_P0_R1_STOPPED_ON_MODEL_SMOKE_MECHANICAL_FAILURE",
+   "STUDY3_P0_R1_INCONCLUSIVE_INFRASTRUCTURE_OR_TRANSPORT_FAILURE",
+   "STUDY3_P0_R1_BLOCKED_ON_AUTHORITY_OR_REPOSITORY_INTEGRITY"
+  ],
+  "transitions": [
+   {
+    "fail_closed_to": "STUDY3_P0_R1_BLOCKED_ON_AUTHORITY_OR_REPOSITORY_INTEGRITY",
+    "from": "BLOCKED_ON_STUDY3_V0_6_STARTING_STATE_INTEGRITY",
+    "guard": "origin/main equals the required baseline commit and tree, the worktree is clean, the authority copy is byte-identical and is the first new repository object, the frozen corpus reproduces, every protected byte is unchanged, all P0-R1 counters are zero, and the registration commit publishes by non-force fast-forward",
+    "to": "STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE"
+   },
+   {
+    "also_fail_closed_to": "STUDY3_P0_R1_STOPPED_SOME_TARGET_ROLE_HAS_NO_EXECUTABLE_GENUINE_I3_CONTRAST",
+    "fail_closed_to": "STUDY3_P0_R1_STOPPED_ON_REPLAY_FACTORIZATION_DEFECT",
+    "from": "STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE",
+    "guard": "in a new session continuing from the exact published registration commit, the replay-only factorization gate verifies, from immutable source artifacts and with zero new encodes, all five conditions of section 3.2 and the corrected eligibility matrix, and at least one eligible genuine gate-bearing I3 contrast remains for each of RT, RL and RI",
+    "to": "STUDY3_P0_R1_REPLAY_GATE_PASSED_AWAITING_MODEL_PILOT"
+   },
+   {
+    "fail_closed_to": "STUDY3_P0_R1_STOPPED_ON_MODEL_SMOKE_MECHANICAL_FAILURE",
+    "from": "STUDY3_P0_R1_REPLAY_GATE_PASSED_AWAITING_MODEL_PILOT",
+    "guard": "the K2 smoke mechanical gate passes, the bounded extension runs without crossing a cap, and every mechanical, accounting and resource record is complete",
+    "to": "STUDY3_P0_R1_COMPLETE_MECHANICALLY_FEASIBLE"
+   }
+  ]
+ },
+ "supersedes": {
+  "historical_terminal_state": "STUDY3_P0_STOPPED_NO_EXECUTABLE_CONTRAST_FOR_EVERY_TARGET_ROLE",
+  "historical_terminal_state_status": "not rewritten. The published disposition already discloses that it was over-severe.",
+  "namespace": "studies/study3/pilot/p0/",
+  "namespace_status": "immutable. Every byte of the consumed P0 namespace, including its result, receipt, disposition and counters, remains historical truth and is never edited, replaced, relabelled or rerun.",
+  "round": "the consumed Study 3-P0 feasibility pilot"
+ }
+}

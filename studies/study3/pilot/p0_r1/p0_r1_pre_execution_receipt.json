@@ -1,0 +1,360 @@
+{
+ "authority": {
+  "byte_identical": true,
+  "bytes": 19632,
+  "carries_cr": false,
+  "lf_only": true,
+  "path": "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+  "present": true,
+  "registered_bytes": 19632,
+  "registered_sha256": "f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2",
+  "sha256": "f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2"
+ },
+ "authority_flags": {
+  "bank_authorized": false,
+  "confirmation_access_authorized": false,
+  "draft_v0_6_reviewed": false,
+  "draft_v0_6_selected": false,
+  "evidence_ledger_last_row": "EV-0016",
+  "evidence_row_written": false,
+  "formal_execution_authorized": false,
+  "frozen": false,
+  "interface_selected": null,
+  "od2_resolved": false,
+  "p0_r1_pilot_execution_authorized": true,
+  "p0_r1_pilot_execution_consumed": false,
+  "positive_reference": null,
+  "positive_reference_selected": false,
+  "rp_selected": false,
+  "rp_wrapper": null,
+  "seed_authorized": false,
+  "selection_map_run": false,
+  "ur22_resolved": false,
+  "winner_selected": false
+ },
+ "caps": {
+  "additional_gpu_attempt_with_signed_zero_operation_receipt": 1,
+  "bank_rows_written": 0,
+  "distinct_checkpoint_identities_downloaded": 3,
+  "distinct_tokenizer_identities_constructed": 3,
+  "gpu_jobs_performing_a_model_operation": 1,
+  "hosted_provider_inference_calls": 0,
+  "model_weight_loads": 3,
+  "non_generative_prefill_evaluations": 180,
+  "positive_reference_operations": 0,
+  "s1_scored_rows": 162,
+  "s2_scored_rows": 18,
+  "s3_cpu_only_reuse_scored_rows": 18,
+  "s4_generation_calls": 12,
+  "s4_incremental_decode_evaluations": 36,
+  "s4_prefill_evaluations": 12,
+  "s4_scored_generation_rows": 12,
+  "seeds_drawn": 0,
+  "tokenizer_encoded_sequences": 10000,
+  "total_scored_rows": 210,
+  "total_sequence_level_model_evaluation_equivalents": 228
+ },
+ "claim_boundary": "a registration receipt. It binds bytes and boundaries. It selects no interface, passes no formal gate, estimates no effect, resolves neither OD2 nor UR-22, freezes nothing and answers no research question.",
+ "code_blobs": [
+  {
+   "bytes": 17530,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/p0_r1_counters.py",
+   "present": true,
+   "sha256": "da6aa9a8038ac5b53ea04cc8e31eaaf7f7aa5614cc600a8433b80e9369245d07"
+  },
+  {
+   "bytes": 17986,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/p0_r1_eligibility.py",
+   "present": true,
+   "sha256": "e63e804b6590e8f1474af47374c1fc96e5b66cf6c1472c9c3b386fc62e6dc5ea"
+  },
+  {
+   "bytes": 31955,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/p0_r1_factorization.py",
+   "present": true,
+   "sha256": "fdc564c6a0e6fea17b39089f7c2f9403d401e47ad14bb6e8bb7880eed73d380e"
+  },
+  {
+   "bytes": 19213,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/p0_r1_model_runner.py",
+   "present": true,
+   "sha256": "ca3521e3c62d7655ff1d023e94aab2f7c892f9b647c8c398260f5d1b7af3dbd5"
+  },
+  {
+   "bytes": 31807,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
+   "present": true,
+   "sha256": "66950fee63a537494cc9e22c8e92e496d7ccd16ade4335278b55077be2714bb2"
+  },
+  {
+   "bytes": 14277,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/p0_r1_replay_gate.py",
+   "present": true,
+   "sha256": "1ebbb9af279359ee2750e43dc8d4405288a6f43216d9279b38906f7d8a37f06e"
+  },
+  {
+   "bytes": 25696,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/p0_r1_schemas.py",
+   "present": true,
+   "sha256": "1e500abe2df45e9454af420e28c225fcdc96fa212dd2532e41e39f7613732a05"
+  },
+  {
+   "bytes": 4334,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/p0_r1_summarize.py",
+   "present": true,
+   "sha256": "996f7e44bb3e6bef0cfc70fa16e44c883a954bec4613358d5c5421f37457e413"
+  },
+  {
+   "bytes": 13947,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/p0_r1_validate.py",
+   "present": true,
+   "sha256": "16c1ba8e31019df76711462d007fa0deeb0784d146ddf615c2c5e31df11edefa"
+  },
+  {
+   "bytes": 5637,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1",
+   "present": true,
+   "sha256": "c4868745beab67cdc56a1e55fb0e436fd00023f644531431957db2da710ed7b4"
+  },
+  {
+   "bytes": 790,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt",
+   "present": true,
+   "sha256": "a33a66e11ad104b0c402e6decc70f62d1941580c4ea46c1b56f0c023849d2fd8"
+  },
+  {
+   "bytes": 1290,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/container/p0_r1_acr_task.yaml",
+   "present": true,
+   "sha256": "9b9dc746c1721d3f6a54e271ebe096bb5af318f971b061af295efb35bae1dd2c"
+  },
+  {
+   "bytes": 2480,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/container/p0_r1_replay.sh",
+   "present": true,
+   "sha256": "3ace4b0fb7b79bf882994bbe55af12481b4812811630d646a17b83b3512203ff"
+  },
+  {
+   "bytes": 47753,
+   "carries_cr": false,
+   "path": "studies/study3/analysis/scoring_boundary_v0_6.py",
+   "present": true,
+   "sha256": "2385ecaea58871c995494161f61786541622193b32a15be9c96e3a448b8eed16"
+  }
+ ],
+ "container": {
+  "acr_task": {
+   "bytes": 1290,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/container/p0_r1_acr_task.yaml",
+   "present": true,
+   "sha256": "9b9dc746c1721d3f6a54e271ebe096bb5af318f971b061af295efb35bae1dd2c"
+  },
+  "definition": {
+   "bytes": 5637,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1",
+   "present": true,
+   "sha256": "c4868745beab67cdc56a1e55fb0e436fd00023f644531431957db2da710ed7b4"
+  },
+  "image_digest": null,
+  "image_digest_status": "null until the successor session builds the image. It is not zero, not empty and not a placeholder digest.",
+  "replay_entrypoint": {
+   "bytes": 2480,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/container/p0_r1_replay.sh",
+   "present": true,
+   "sha256": "3ace4b0fb7b79bf882994bbe55af12481b4812811630d646a17b83b3512203ff"
+  },
+  "requirements": {
+   "bytes": 790,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt",
+   "present": true,
+   "sha256": "a33a66e11ad104b0c402e6decc70f62d1941580c4ea46c1b56f0c023849d2fd8"
+  }
+ },
+ "corpus": {
+  "identity": {
+   "bytes": 69781,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/corpus/p0_corpus.json",
+   "present": true,
+   "sha256": "5343019a334ce666bb3e7f7f57d87181550aa90fad4815ba51a7ba3f571e1c6c"
+  },
+  "manifest": {
+   "bytes": 23476,
+   "carries_cr": false,
+   "path": "studies/study3/pilot/p0/corpus/p0_corpus_manifest.json",
+   "present": true,
+   "sha256": "a6f4a4ef010f5660765095cfba7380044709d48629b45cd36f1f8d774be656e0"
+  },
+  "member_count": 70,
+  "path": "studies/study3/pilot/p0/corpus/p0_corpus.json",
+  "reused_unchanged": true,
+  "row_count": 35
+ },
+ "counters": {
+  "historical_p0_t_snapshot": {
+   "additional_gpu_attempt_with_signed_zero_operation_receipt": 0,
+   "bank_rows_written": 0,
+   "distinct_checkpoint_identities_downloaded": 0,
+   "distinct_tokenizer_identities_constructed": 3,
+   "exceptions_observed": 0,
+   "generated_tokens": 0,
+   "gpu_jobs_performing_a_model_operation": 0,
+   "hosted_provider_inference_calls": 0,
+   "model_weight_loads": 0,
+   "non_generative_prefill_evaluations": 0,
+   "parser_calls": 0,
+   "positive_reference_operations": 0,
+   "restricted_logit_reads": 0,
+   "runtime_batched_forward_calls": 0,
+   "runtime_batched_tokenizer_calls": 0,
+   "s1_scored_rows": 0,
+   "s2_scored_rows": 0,
+   "s3_cpu_only_reuse_scored_rows": 0,
+   "s4_generation_calls": 0,
+   "s4_incremental_decode_evaluations": 0,
+   "s4_prefill_evaluations": 0,
+   "s4_scored_generation_rows": 0,
+   "seeds_drawn": 0,
+   "tokenizer_encoded_sequences": 4956,
+   "total_scored_rows": 0,
+   "total_sequence_level_model_evaluation_equivalents": 0
+  },
+  "historical_snapshot_is_immutable": true,
+  "p0_r1_before_execution": {
+   "additional_gpu_attempt_with_signed_zero_operation_receipt": 0,
+   "bank_rows_written": 0,
+   "distinct_checkpoint_identities_downloaded": 0,
+   "distinct_tokenizer_identities_constructed": 0,
+   "gpu_jobs_performing_a_model_operation": 0,
+   "hosted_provider_inference_calls": 0,
+   "model_weight_loads": 0,
+   "non_generative_prefill_evaluations": 0,
+   "positive_reference_operations": 0,
+   "s1_scored_rows": 0,
+   "s2_scored_rows": 0,
+   "s3_cpu_only_reuse_scored_rows": 0,
+   "s4_generation_calls": 0,
+   "s4_incremental_decode_evaluations": 0,
+   "s4_prefill_evaluations": 0,
+   "s4_scored_generation_rows": 0,
+   "seeds_drawn": 0,
+   "tokenizer_encoded_sequences": 0,
+   "total_scored_rows": 0,
+   "total_sequence_level_model_evaluation_equivalents": 0
+  }
+ },
+ "document_class": "study3_p0_r1_pre_execution_receipt",
+ "draft_v0_6_candidate": {
+  "disposition_status": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+  "draft_version": "draft-v0.6",
+  "frozen": false,
+  "registry": {
+   "bytes": 57209,
+   "carries_cr": false,
+   "path": "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
+   "present": true,
+   "sha256": "e83014b8ff9dca55c3e8f72c2476b41f304c359734d5ecdd8f20ea2d1b5e0f71"
+  },
+  "registry_schema": {
+   "bytes": 34252,
+   "carries_cr": false,
+   "path": "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json",
+   "present": true,
+   "sha256": "22a12a695ae18562870e9c62a2c56a75b6c37639f457220a2173966c0146e576"
+  },
+  "registry_sha256_self_hash": "e6a97d39e1bcc7ba42222ed47932e13444a066e376bebe58316b8f69cb0af4fe",
+  "reviewed": false,
+  "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW"
+ },
+ "model_and_tokenizer_revisions": [
+  {
+   "immutable_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+   "len_tokenizer": 151665,
+   "repository_identity": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+   "role": "RT",
+   "source": "read back from the immutable published P0-T result; not restated by hand",
+   "tokenizer_class": "LlamaTokenizerFast",
+   "trust_remote_code": false,
+   "vocabulary_size": 151643
+  },
+  {
+   "immutable_revision": "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2",
+   "len_tokenizer": 151665,
+   "repository_identity": "Qwen/Qwen2.5-Math-1.5B",
+   "role": "RL",
+   "source": "read back from the immutable published P0-T result; not restated by hand",
+   "tokenizer_class": "Qwen2TokenizerFast",
+   "trust_remote_code": false,
+   "vocabulary_size": 151643
+  },
+  {
+   "immutable_revision": "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35",
+   "len_tokenizer": 151665,
+   "repository_identity": "Qwen/Qwen2.5-Math-1.5B-Instruct",
+   "role": "RI",
+   "source": "read back from the immutable published P0-T result; not restated by hand",
+   "tokenizer_class": "Qwen2TokenizerFast",
+   "trust_remote_code": false,
+   "vocabulary_size": 151643
+  }
+ ],
+ "operations_in_the_calibration_session": {
+  "bank_rows_written": 0,
+  "checkpoint_downloads": 0,
+  "evidence_rows_added": 0,
+  "forward_passes": 0,
+  "generations": 0,
+  "gpu_allocations": 0,
+  "model_weight_loads": 0,
+  "replay_gates_performed": 0,
+  "scored_rows": 0,
+  "seeds_drawn": 0,
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0
+ },
+ "p0_t_source_artifacts": [
+  {
+   "bytes": 69781,
+   "path": "studies/study3/pilot/p0/corpus/p0_corpus.json",
+   "role": "the frozen 35-cell / 70-member P0 corpus",
+   "sha256": "5343019a334ce666bb3e7f7f57d87181550aa90fad4815ba51a7ba3f571e1c6c"
+  },
+  {
+   "bytes": 7850,
+   "path": "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+   "role": "the published P0-T disposition",
+   "sha256": "9d6a6508383ebd5f6e4f0bb97a5b75de282da3cf28afba837b923cd1a6ec66eb"
+  },
+  {
+   "bytes": 7934,
+   "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
+   "role": "the published P0-T receipt",
+   "sha256": "0b28fbe6f633cc5a6d0664588fb685065d15ab1c301a1540d1e12f7c7b69e737"
+  },
+  {
+   "bytes": 5820022,
+   "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
+   "role": "the published P0-T tokenizer gate result",
+   "sha256": "9603b61165bc0b405fe8eb6103a56e646ceb2e254a33e0eba2ee2d035f03a85f"
+  }
+ ],
+ "schema_version": "study3-p0-r1-pre-execution-receipt-v1",
+ "state": "STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE"
+}

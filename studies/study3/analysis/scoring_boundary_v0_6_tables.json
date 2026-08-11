@@ -1,0 +1,564 @@
+{
+ "authority": "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+ "authority_flags": {
+  "bank_authorized": false,
+  "confirmation_access_authorized": false,
+  "draft_v0_6_reviewed": false,
+  "draft_v0_6_selected": false,
+  "evidence_ledger_last_row": "EV-0016",
+  "formal_execution_authorized": false,
+  "frozen": false,
+  "interface_selected": null,
+  "od2_status": "unresolved",
+  "positive_reference_selected": false,
+  "seed_authorized": false,
+  "ur22_status": "unresolved",
+  "winner_selected": false
+ },
+ "claim_boundary": "planning and derivation arithmetic only. This document authorises nothing, selects nothing, freezes nothing and answers no research question.",
+ "disposition_status": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+ "document_class": "study3_scoring_boundary_v0_6_tables",
+ "draft_version": "draft-v0.6",
+ "operation_counters_in_the_calibration_session": {
+  "bank_rows_written": 0,
+  "checkpoint_downloads": 0,
+  "decision_bearing_local_statistical_runs": 0,
+  "evidence_rows_added": 0,
+  "forward_passes": 0,
+  "generations": 0,
+  "gpu_jobs": 0,
+  "local_pytest_runs": 0,
+  "model_weight_loads": 0,
+  "positive_reference_operations": 0,
+  "restricted_logit_reads": 0,
+  "scored_rows": 0,
+  "seeds_drawn": 0,
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0
+ },
+ "registry_identity": {
+  "path": "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
+  "registry_sha256": "e6a97d39e1bcc7ba42222ed47932e13444a066e376bebe58316b8f69cb0af4fe"
+ },
+ "replay_derivation": {
+  "all_roles_eligible": true,
+  "bound_frozen_corpus_sequences": {
+   "RI": 70,
+   "RL": 70,
+   "RT": 70
+  },
+  "common_prefix_token_is_common_to_every_role": true,
+  "derived_not_transcribed": "the common-prefix token and the ten discriminant token IDs are recovered from the immutable published P0-T result and the frozen corpus; no token identity is written into this module as a constant",
+  "discriminant_token_ids_are_common_to_every_role": true,
+  "document_class": "study3_p0_r1_factorization_replay",
+  "equivalence": {
+   "consequence": "argmax_d P(u, v_d | x) = argmax_d P(v_d | x, u)",
+   "does_not_extend_to": [
+    "arbitrary multi-token candidates",
+    "candidates of unequal length",
+    "candidates without a common prefix",
+    "summed or length-normalised log probabilities",
+    "free generation",
+    "any tokenizer that is not separately pinned and verified"
+   ],
+   "identity": "P(u, v_d | x) = P(u | x) * P(v_d | x, u)",
+   "tie_break_order": "ascending mod-10 residue order 0, 1, 2, ..., 9, unchanged from the registered v0.5 order",
+   "valid_because": [
+    "the registered decision statistic is a deterministic argmax over a closed ten-member candidate set",
+    "all ten candidates have the same two-token structure",
+    "all ten candidates share the identical common prefix token u",
+    "the registered digit-order tie break is preserved unchanged"
+   ],
+   "why_exact": "P(u | x) does not depend on d, so it is a strictly positive common factor of all ten complete-candidate probabilities and cancels from the ranking. This is an exact factor cancellation, not an approximation"
+  },
+  "immutable_sources": [
+   {
+    "bytes": 69781,
+    "path": "studies/study3/pilot/p0/corpus/p0_corpus.json",
+    "role": "the frozen 35-cell / 70-member P0 corpus",
+    "sha256": "5343019a334ce666bb3e7f7f57d87181550aa90fad4815ba51a7ba3f571e1c6c"
+   },
+   {
+    "bytes": 7850,
+    "path": "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+    "role": "the published P0-T disposition",
+    "sha256": "9d6a6508383ebd5f6e4f0bb97a5b75de282da3cf28afba837b923cd1a6ec66eb"
+   },
+   {
+    "bytes": 7934,
+    "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
+    "role": "the published P0-T receipt",
+    "sha256": "0b28fbe6f633cc5a6d0664588fb685065d15ab1c301a1540d1e12f7c7b69e737"
+   },
+   {
+    "bytes": 5820022,
+    "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
+    "role": "the published P0-T tokenizer gate result",
+    "sha256": "9603b61165bc0b405fe8eb6103a56e646ceb2e254a33e0eba2ee2d035f03a85f"
+   }
+  ],
+  "model_operations_performed": 0,
+  "registered_candidate_surfaces": [
+   " 0",
+   " 1",
+   " 2",
+   " 3",
+   " 4",
+   " 5",
+   " 6",
+   " 7",
+   " 8",
+   " 9"
+  ],
+  "roles": [
+   {
+    "common_prefix_bytes": " ",
+    "common_prefix_token": 220,
+    "complete_candidate_token_ids": [
+     [
+      220,
+      15
+     ],
+     [
+      220,
+      16
+     ],
+     [
+      220,
+      17
+     ],
+     [
+      220,
+      18
+     ],
+     [
+      220,
+      19
+     ],
+     [
+      220,
+      20
+     ],
+     [
+      220,
+      21
+     ],
+     [
+      220,
+      22
+     ],
+     [
+      220,
+      23
+     ],
+     [
+      220,
+      24
+     ]
+    ],
+    "conditions": {
+     "every_complete_candidate_is_exactly_two_tokens": true,
+     "every_published_sequence_reconciles_with_its_prompt_bytes": true,
+     "no_constant_sequence_initial_token_across_distinct_prompts": true,
+     "no_registered_prompt_ends_with_the_common_prefix_token": true,
+     "no_sequence_final_token_absent_from_every_interior_position": true,
+     "the_common_token_decodes_byte_exactly_to_one_registered_u0020": true,
+     "the_factorization_reproduces_every_complete_candidate_surface": true,
+     "the_first_token_is_identical_for_all_ten_candidates": true,
+     "the_second_token_ids_are_pairwise_distinct": true,
+     "the_second_token_ids_map_byte_exactly_to_0_through_9_in_order": true,
+     "unresolved_token_occurrences": 1280
+    },
+    "discriminant_bytes": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "discriminant_token_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24
+    ],
+    "eligible": true,
+    "reasons": [],
+    "registered_candidate_surfaces": [
+     " 0",
+     " 1",
+     " 2",
+     " 3",
+     " 4",
+     " 5",
+     " 6",
+     " 7",
+     " 8",
+     " 9"
+    ],
+    "role": "RI"
+   },
+   {
+    "common_prefix_bytes": " ",
+    "common_prefix_token": 220,
+    "complete_candidate_token_ids": [
+     [
+      220,
+      15
+     ],
+     [
+      220,
+      16
+     ],
+     [
+      220,
+      17
+     ],
+     [
+      220,
+      18
+     ],
+     [
+      220,
+      19
+     ],
+     [
+      220,
+      20
+     ],
+     [
+      220,
+      21
+     ],
+     [
+      220,
+      22
+     ],
+     [
+      220,
+      23
+     ],
+     [
+      220,
+      24
+     ]
+    ],
+    "conditions": {
+     "every_complete_candidate_is_exactly_two_tokens": true,
+     "every_published_sequence_reconciles_with_its_prompt_bytes": true,
+     "no_constant_sequence_initial_token_across_distinct_prompts": true,
+     "no_registered_prompt_ends_with_the_common_prefix_token": true,
+     "no_sequence_final_token_absent_from_every_interior_position": true,
+     "the_common_token_decodes_byte_exactly_to_one_registered_u0020": true,
+     "the_factorization_reproduces_every_complete_candidate_surface": true,
+     "the_first_token_is_identical_for_all_ten_candidates": true,
+     "the_second_token_ids_are_pairwise_distinct": true,
+     "the_second_token_ids_map_byte_exactly_to_0_through_9_in_order": true,
+     "unresolved_token_occurrences": 1280
+    },
+    "discriminant_bytes": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "discriminant_token_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24
+    ],
+    "eligible": true,
+    "reasons": [],
+    "registered_candidate_surfaces": [
+     " 0",
+     " 1",
+     " 2",
+     " 3",
+     " 4",
+     " 5",
+     " 6",
+     " 7",
+     " 8",
+     " 9"
+    ],
+    "role": "RL"
+   },
+   {
+    "common_prefix_bytes": " ",
+    "common_prefix_token": 220,
+    "complete_candidate_token_ids": [
+     [
+      220,
+      15
+     ],
+     [
+      220,
+      16
+     ],
+     [
+      220,
+      17
+     ],
+     [
+      220,
+      18
+     ],
+     [
+      220,
+      19
+     ],
+     [
+      220,
+      20
+     ],
+     [
+      220,
+      21
+     ],
+     [
+      220,
+      22
+     ],
+     [
+      220,
+      23
+     ],
+     [
+      220,
+      24
+     ]
+    ],
+    "conditions": {
+     "every_complete_candidate_is_exactly_two_tokens": true,
+     "every_published_sequence_reconciles_with_its_prompt_bytes": true,
+     "no_constant_sequence_initial_token_across_distinct_prompts": true,
+     "no_registered_prompt_ends_with_the_common_prefix_token": true,
+     "no_sequence_final_token_absent_from_every_interior_position": true,
+     "the_common_token_decodes_byte_exactly_to_one_registered_u0020": true,
+     "the_factorization_reproduces_every_complete_candidate_surface": true,
+     "the_first_token_is_identical_for_all_ten_candidates": true,
+     "the_second_token_ids_are_pairwise_distinct": true,
+     "the_second_token_ids_map_byte_exactly_to_0_through_9_in_order": true,
+     "unresolved_token_occurrences": 1280
+    },
+    "discriminant_bytes": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "discriminant_token_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24
+    ],
+    "eligible": true,
+    "reasons": [],
+    "registered_candidate_surfaces": [
+     " 0",
+     " 1",
+     " 2",
+     " 3",
+     " 4",
+     " 5",
+     " 6",
+     " 7",
+     " 8",
+     " 9"
+    ],
+    "role": "RT"
+   }
+  ],
+  "schema_version": "study3-p0-r1-factorization-replay-v1",
+  "stage": "P0-R1-REPLAY",
+  "tokenizer_constructions_performed": 0,
+  "tokenizer_encodes_performed": 0
+ },
+ "schema_version": "study3-scoring-boundary-v0-6-tables-v1",
+ "single_structured_source": "studies/study3/analysis/scoring_boundary_v0_6.py",
+ "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW",
+ "statistical_invariance": {
+  "changed_and_surfaced": {
+   "s2_scoring_context_token_count": {
+    "after": "registered_prompt_token_count + 1",
+    "before": "registered_prompt_token_count",
+    "development_projection_extra_sequence_level_evaluations": 0,
+    "development_projection_extra_tokens_processed": 5001,
+    "why": "the complete candidate is two tokens and its common prefix is teacher-forced into the scoring context"
+   },
+   "s3_zero_incremental_cost_condition": {
+    "after": [
+     "a registered answer domain whose complete candidates share one common prefix token and differ in exactly one discriminant token",
+     "an identical scoring context to S2, including the same teacher-forced common-prefix token",
+     "reuse of the identical restricted discriminant-position logit vector S2 already read",
+     "a CPU-only rescoring contract that performs no additional model evaluation"
+    ],
+    "before": [
+     "a jointly single-token registered answer domain",
+     "an identical prompt prefix to S2",
+     "reuse of the identical restricted-vocabulary logit vector S2 already read",
+     "a CPU-only rescoring contract that performs no additional model evaluation"
+    ],
+    "numeric_effect": "none; S3 incremental rendered rows, scored rows and sequence-level evaluations all remain 0",
+    "why": "the v0.5 condition was stated for a jointly single-token answer domain, which the pinned tokenizers do not provide. The condition is restated at the discriminant position so that it is true of the surface actually registered"
+   }
+  },
+  "method": "every quantity below is recomputed from studies/study3/analysis/design_statistics.py at derivation time and compared against the published draft-v0.5 value; none is copied forward for continuity",
+  "no_number_preserved_for_continuity": true,
+  "unchanged_and_why": {
+   "values": {
+    "applicable_i3_contrast_counts": {
+     "S1": 9,
+     "S2": 1,
+     "S3": 1,
+     "S4": 9
+    },
+    "confirmation_pass_counts": {
+     "I1_I3_joint_correctness_floor": 388,
+     "I2_headroom_floor": 127,
+     "I4_positive_reference_floor": 381
+    },
+    "confirmation_sizes": {
+     "I1_I3_joint_correctness_floor": 413,
+     "I2_headroom_floor": 214,
+     "I4_positive_reference_floor": 448
+    },
+    "development_pass_counts": {
+     "I1_I3_joint_correctness_floor": 389,
+     "I2_headroom_floor": 129,
+     "I4_positive_reference_floor": 383
+    },
+    "development_projection_by_profile_prefill_evaluations": {
+     "S1": 26064,
+     "S2": 5001,
+     "S3_if_independently_rendered": 5001
+    },
+    "development_projection_scored_rows": 31065,
+    "development_projection_sequence_level_model_evaluation_equivalents": 31065,
+    "development_sizes": {
+     "I1_I3_joint_correctness_floor": 413,
+     "I2_headroom_floor": 214,
+     "I4_positive_reference_floor": 448
+    },
+    "m_max": 43,
+    "m_max_scope": "maximum gate-bearing evaluation cells over the SELECTABLE profiles",
+    "per_cell_false_negative_budget_exact_rational": "19/17200",
+    "per_cell_power_target_exact_rational": "17181/17200",
+    "profile_stage_power_floor_exact_rational": "381/400",
+    "s3_incremental_sequence_evaluations": 0,
+    "study_end_to_end_power_floor_exact_rational": "9/10",
+    "total_gate_bearing_cells": {
+     "S1": 43,
+     "S2": 16,
+     "S3": 16,
+     "S4": 39
+    }
+   },
+   "why_no_statistic_moves": "the new boundary changes where one logit vector is read and adds one teacher-forced token to the S2 scoring context. It changes no cell, no contrast applicability, no independent unit, no null, no alternative, no alpha and no decision rule, so no sample size, pass count, budget, floor or projection is mathematically required to move"
+  }
+ },
+ "token_accounting": {
+  "by_profile": {
+   "S1": {
+    "common_prefix_token_count": 0,
+    "common_prefix_token_count_per_scored_row": 0,
+    "maximum_registered_prompt_tokens": 71,
+    "minimum_registered_prompt_tokens": 42,
+    "registered_prompt_token_count": 8874,
+    "scored_rows": 162,
+    "scoring_context_token_count": 8874,
+    "sequence_level_model_evaluations_per_scored_row": 1,
+    "sequence_level_prefill_evaluations": 162,
+    "tokens_processed": 8874
+   },
+   "S2": {
+    "common_prefix_token_count": 18,
+    "common_prefix_token_count_per_scored_row": 1,
+    "maximum_registered_prompt_tokens": 46,
+    "minimum_registered_prompt_tokens": 18,
+    "registered_prompt_token_count": 561,
+    "scored_rows": 18,
+    "scoring_context_token_count": 579,
+    "sequence_level_model_evaluations_per_scored_row": 1,
+    "sequence_level_prefill_evaluations": 18,
+    "tokens_processed": 579
+   },
+   "S3": {
+    "common_prefix_token_count": 18,
+    "common_prefix_token_count_per_scored_row": 1,
+    "maximum_registered_prompt_tokens": 46,
+    "minimum_registered_prompt_tokens": 18,
+    "registered_prompt_token_count": 561,
+    "scored_rows": 18,
+    "scoring_context_token_count": 579,
+    "sequence_level_model_evaluations_per_scored_row": 0,
+    "sequence_level_prefill_evaluations": 0,
+    "tokens_processed": 0
+   },
+   "S4": {
+    "common_prefix_token_count": 0,
+    "common_prefix_token_count_per_scored_row": 0,
+    "maximum_registered_prompt_tokens": 44,
+    "minimum_registered_prompt_tokens": 42,
+    "registered_prompt_token_count": 510,
+    "scored_rows": 12,
+    "scoring_context_token_count": 510,
+    "sequence_level_model_evaluations_per_scored_row": 1,
+    "sequence_level_prefill_evaluations": 12,
+    "tokens_processed": 510
+   }
+  },
+  "p0_r1_totals": {
+   "common_prefix_tokens_processed": 18,
+   "extra_sequence_level_model_evaluations_versus_the_v0_5_rule": 0,
+   "extra_tokens_versus_the_v0_5_rule": 18,
+   "registered_prompt_tokens_processed_by_restricted_scoring": 9435,
+   "s3_sequence_level_model_evaluations": 0,
+   "s3_tokens_processed": 0,
+   "s4_registered_prompt_tokens": 510,
+   "scored_rows": 210,
+   "scoring_context_tokens_processed": 9453
+  },
+  "s3_note": "S3 reuses the S2 discriminant-position logit vector on CPU, so it processes no token and performs no sequence-level evaluation. Its scoring-context token count records the S2 context it rescores, which is why the two profiles report the same context length",
+  "s3_processes_no_additional_token": true,
+  "source": "the immutable published P0-T result, frozen-corpus records only; derived, not assumed",
+  "unit": "tokens"
+ }
+}

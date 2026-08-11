@@ -1,0 +1,1597 @@
+{
+ "$id": "https://github.com/Alanjiao1988/J-space-observation/studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "description": "The binding normative rendering and scoring registry for Study 3 draft-v0.6. It extends the draft-v0.5 rendering registry with the first-discriminative-token scoring boundary and its token accounting. Every rendering field is unchanged.",
+ "properties": {
+  "answer_cue": {
+   "additionalProperties": false,
+   "properties": {
+    "candidate_surfaces_carry_exactly_one_leading_space": {
+     "const": true,
+     "type": "boolean"
+    },
+    "held_byte_identical_across_every_profile_and_rendering": {
+     "const": true,
+     "type": "boolean"
+    },
+    "literal": {
+     "const": "Answer:",
+     "type": "string"
+    },
+    "sha256": {
+     "pattern": "^[0-9a-f]{64}$",
+     "type": "string"
+    },
+    "trailing_whitespace": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "why": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "literal",
+    "sha256",
+    "held_byte_identical_across_every_profile_and_rendering",
+    "trailing_whitespace",
+    "candidate_surfaces_carry_exactly_one_leading_space",
+    "why"
+   ],
+   "type": "object"
+  },
+  "answer_domain": {
+   "additionalProperties": false,
+   "properties": {
+    "description": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "frozen": {
+     "const": true,
+     "type": "boolean"
+    },
+    "surface_forms": {
+     "items": {
+      "pattern": "^[0-9]$",
+      "type": "string"
+     },
+     "maxItems": 10,
+     "minItems": 10,
+     "type": "array",
+     "uniqueItems": true
+    }
+   },
+   "required": [
+    "surface_forms",
+    "description",
+    "frozen"
+   ],
+   "type": "object"
+  },
+  "applicability_table": {
+   "additionalProperties": false,
+   "properties": {
+    "per_profile_applicable_contrast_counts": {
+     "additionalProperties": {
+      "maximum": 2,
+      "minimum": 1,
+      "type": "integer"
+     },
+     "type": "object"
+    },
+    "row_count": {
+     "const": 8,
+     "type": "integer"
+    },
+    "rows": {
+     "items": {
+      "additionalProperties": false,
+      "properties": {
+       "applicability": {
+        "enum": [
+         "applicable",
+         "not_applicable"
+        ],
+        "type": "string"
+       },
+       "baseline_rendering": {
+        "const": "R-base",
+        "type": "string"
+       },
+       "contrast": {
+        "enum": [
+         "K6-SEP",
+         "K6-INSTR"
+        ],
+        "type": "string"
+       },
+       "descriptive_only": {
+        "type": "boolean"
+       },
+       "gate_bearing": {
+        "type": "boolean"
+       },
+       "profile": {
+        "enum": [
+         "S1",
+         "S2",
+         "S3",
+         "S4"
+        ],
+        "type": "string"
+       },
+       "reason": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "variant_rendering": {
+        "enum": [
+         "R-sep",
+         "R-instr"
+        ],
+        "type": "string"
+       }
+      },
+      "required": [
+       "profile",
+       "contrast",
+       "baseline_rendering",
+       "variant_rendering",
+       "applicability",
+       "gate_bearing",
+       "descriptive_only",
+       "reason"
+      ],
+      "type": "object"
+     },
+     "maxItems": 8,
+     "minItems": 8,
+     "type": "array",
+     "uniqueItems": true
+    },
+    "value_semantics": {
+     "additionalProperties": false,
+     "properties": {
+      "applicable": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "not_applicable": {
+       "pattern": "not a pass",
+       "type": "string"
+      }
+     },
+     "required": [
+      "applicable",
+      "not_applicable"
+     ],
+     "type": "object"
+    }
+   },
+   "required": [
+    "row_count",
+    "value_semantics",
+    "rows",
+    "per_profile_applicable_contrast_counts"
+   ],
+   "type": "object"
+  },
+  "binding_status": {
+   "pattern": "^BINDING_NORMATIVE_INPUT_NOT_AN_ILLUSTRATIVE_EXAMPLE",
+   "type": "string"
+  },
+  "closes_finding": {
+   "const": "S3MR3-010",
+   "type": "string"
+  },
+  "closes_p0_t_demonstrated_defects": {
+   "items": {
+    "minLength": 1,
+    "type": "string"
+   },
+   "minItems": 2,
+   "type": "array"
+  },
+  "disposition_status": {
+   "const": "PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW",
+   "type": "string"
+  },
+  "document_class": {
+   "const": "normative_rendering_registry",
+   "type": "string"
+  },
+  "draft_version": {
+   "const": "draft-v0.6",
+   "type": "string"
+  },
+  "encoding_policy": {
+   "additionalProperties": false,
+   "properties": {
+    "byte_order_mark_prohibited": {
+     "const": true,
+     "type": "boolean"
+    },
+    "character_encoding": {
+     "const": "UTF-8",
+     "type": "string"
+    },
+    "line_ending": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "non_breaking_space_prohibited": {
+     "const": true,
+     "type": "boolean"
+    },
+    "permitted_codepoints": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "tab_prohibited": {
+     "const": true,
+     "type": "boolean"
+    },
+    "terminal_newline_policy": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "trailing_whitespace_prohibited_on_every_line": {
+     "const": true,
+     "type": "boolean"
+    },
+    "unicode_normalization": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "character_encoding",
+    "byte_order_mark_prohibited",
+    "line_ending",
+    "terminal_newline_policy",
+    "unicode_normalization",
+    "permitted_codepoints",
+    "tab_prohibited",
+    "non_breaking_space_prohibited",
+    "trailing_whitespace_prohibited_on_every_line"
+   ],
+   "type": "object"
+  },
+  "future_pre_bank_token_distinctness_rule": {
+   "additionalProperties": false,
+   "properties": {
+    "evaluated_in_this_round": {
+     "const": false,
+     "type": "boolean"
+    },
+    "on_failure": {
+     "pattern": "INELIGIBLE",
+     "type": "string"
+    },
+    "resolves_od2": {
+     "const": false,
+     "type": "boolean"
+    },
+    "rule": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "status": {
+     "const": "REGISTERED_FUTURE_FAIL_CLOSED_RULE_NOT_EVALUATED_IN_THIS_ROUND",
+     "type": "string"
+    },
+    "tokenizer_calls_in_this_round": {
+     "const": 0,
+     "type": "integer"
+    },
+    "why_not_now": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "status",
+    "rule",
+    "on_failure",
+    "evaluated_in_this_round",
+    "tokenizer_calls_in_this_round",
+    "resolves_od2",
+    "why_not_now"
+   ],
+   "type": "object"
+  },
+  "governs": {
+   "minLength": 1,
+   "type": "string"
+  },
+  "instructions": {
+   "additionalProperties": false,
+   "properties": {
+    "co_reference_rule": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "entries": {
+     "items": {
+      "additionalProperties": false,
+      "properties": {
+       "applicable": {
+        "type": "boolean"
+       },
+       "instruction": {
+        "pattern": "^[^\\r]*$",
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "instruction_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "profile": {
+        "enum": [
+         "S1",
+         "S2",
+         "S3",
+         "S4"
+        ],
+        "type": "string"
+       },
+       "reason": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "rendering": {
+        "enum": [
+         "R-base",
+         "R-sep",
+         "R-instr"
+        ],
+        "type": "string"
+       }
+      },
+      "required": [
+       "profile",
+       "rendering",
+       "applicable",
+       "instruction",
+       "instruction_sha256",
+       "reason"
+      ],
+      "type": "object"
+     },
+     "maxItems": 12,
+     "minItems": 12,
+     "type": "array",
+     "uniqueItems": true
+    },
+    "r_base_and_r_sep_share_one_instruction": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "co_reference_rule",
+    "r_base_and_r_sep_share_one_instruction",
+    "entries"
+   ],
+   "type": "object"
+  },
+  "label_alphabets": {
+   "additionalProperties": false,
+   "properties": {
+    "alphabets": {
+     "additionalProperties": {
+      "items": {
+       "pattern": "^[A-Z]$",
+       "type": "string"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array",
+      "uniqueItems": true
+     },
+     "minProperties": 2,
+     "type": "object"
+    },
+    "alphabets_mutually_disjoint": {
+     "const": true,
+     "type": "boolean"
+    },
+    "count": {
+     "const": 2,
+     "type": "integer"
+    },
+    "digits_prohibited_as_label_symbols": {
+     "const": true,
+     "type": "boolean"
+    },
+    "disjoint_from_answer_domain": {
+     "const": true,
+     "type": "boolean"
+    },
+    "registered_order": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "symbols_per_alphabet": {
+     "const": 4,
+     "type": "integer"
+    }
+   },
+   "required": [
+    "alphabets",
+    "count",
+    "symbols_per_alphabet",
+    "disjoint_from_answer_domain",
+    "alphabets_mutually_disjoint",
+    "digits_prohibited_as_label_symbols",
+    "registered_order"
+   ],
+   "type": "object"
+  },
+  "pair_isolation_rules": {
+   "additionalProperties": false,
+   "properties": {
+    "byte_identical_applicable_pair_disposition": {
+     "pattern": "^REJECT_AS_A_CONSTRUCTION_DEFECT",
+     "type": "string"
+    },
+    "byte_identical_applicable_pair_is_a_defect": {
+     "const": true,
+     "type": "boolean"
+    },
+    "ground_truth_unchanged_within_a_pair": {
+     "const": true,
+     "type": "boolean"
+    },
+    "k6_instr": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "k6_sep": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "k6_sep",
+    "k6_instr",
+    "byte_identical_applicable_pair_is_a_defect",
+    "byte_identical_applicable_pair_disposition",
+    "ground_truth_unchanged_within_a_pair"
+   ],
+   "type": "object"
+  },
+  "placeholders": {
+   "additionalProperties": false,
+   "properties": {
+    "interpolation_syntax": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "missing_substitution_rejected": {
+     "const": true,
+     "type": "boolean"
+    },
+    "names": {
+     "additionalProperties": {
+      "additionalProperties": false,
+      "properties": {
+       "allowed_surface_forms": {
+        "type": [
+         "array",
+         "string"
+        ]
+       },
+       "description": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "type": {
+        "minLength": 1,
+        "type": "string"
+       }
+      },
+      "required": [
+       "type",
+       "allowed_surface_forms",
+       "description"
+      ],
+      "type": "object"
+     },
+     "minProperties": 1,
+     "type": "object"
+    },
+    "permutation_surface_grammar": {
+     "additionalProperties": false,
+     "properties": {
+      "closing_bracket": {
+       "const": "]",
+       "type": "string"
+      },
+      "description": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "element_count": {
+       "const": 10,
+       "type": "integer"
+      },
+      "element_separator": {
+       "const": " ",
+       "type": "string"
+      },
+      "element_surface_forms": {
+       "items": {
+        "pattern": "^[0-9]$",
+        "type": "string"
+       },
+       "maxItems": 10,
+       "minItems": 10,
+       "type": "array",
+       "uniqueItems": true
+      },
+      "example_only_not_normative_content": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "form": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "must_be_a_bijection_on_the_answer_domain": {
+       "const": true,
+       "type": "boolean"
+      },
+      "opening_bracket": {
+       "const": "[",
+       "type": "string"
+      }
+     },
+     "required": [
+      "form",
+      "description",
+      "opening_bracket",
+      "closing_bracket",
+      "element_separator",
+      "element_count",
+      "element_surface_forms",
+      "must_be_a_bijection_on_the_answer_domain",
+      "example_only_not_normative_content"
+     ],
+     "type": "object"
+    },
+    "residual_brace_after_substitution_rejected": {
+     "const": true,
+     "type": "boolean"
+    },
+    "substitution_rule": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "unregistered_placeholder_rejected": {
+     "const": true,
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "interpolation_syntax",
+    "substitution_rule",
+    "unregistered_placeholder_rejected",
+    "missing_substitution_rejected",
+    "residual_brace_after_substitution_rejected",
+    "names",
+    "permutation_surface_grammar"
+   ],
+   "type": "object"
+  },
+  "profiles": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "candidate_surfaces": {
+      "additionalProperties": false,
+      "properties": {
+       "answer_domain": {
+        "items": {
+         "pattern": "^ [0-9]$",
+         "type": "string"
+        },
+        "maxItems": 10,
+        "minItems": 10,
+        "type": "array",
+        "uniqueItems": true
+       },
+       "by_label_alphabet": {
+        "additionalProperties": {
+         "items": {
+          "pattern": "^ [A-Z]$",
+          "type": "string"
+         },
+         "maxItems": 4,
+         "minItems": 4,
+         "type": "array",
+         "uniqueItems": true
+        },
+        "type": "object"
+       },
+       "generation_begins_immediately_after": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "leading_whitespace": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "scored_at": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "tie_break_order": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "trailing_whitespace": {
+        "minLength": 1,
+        "type": "string"
+       }
+      },
+      "required": [
+       "scored_at",
+       "leading_whitespace",
+       "trailing_whitespace",
+       "tie_break_order"
+      ],
+      "type": "object"
+     },
+     "chat_wrapper": {
+      "type": "null"
+     },
+     "chat_wrapper_status": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "option_block": {
+      "additionalProperties": false,
+      "properties": {
+       "line_count": {
+        "const": 4,
+        "type": "integer"
+       },
+       "line_grammar": {
+        "const": "{label}{separator}{content}\n",
+        "type": "string"
+       },
+       "no_blank_line_between_options": {
+        "const": true,
+        "type": "boolean"
+       },
+       "no_leading_whitespace_on_an_option_line": {
+        "const": true,
+        "type": "boolean"
+       },
+       "no_trailing_whitespace_on_an_option_line": {
+        "const": true,
+        "type": "boolean"
+       },
+       "ordering": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "separator": {
+        "minLength": 1,
+        "pattern": "^[^\\r]*$",
+        "type": "string"
+       },
+       "separator_codepoints": {
+        "items": {
+         "pattern": "^0x[0-9a-f]+$",
+         "type": "string"
+        },
+        "minItems": 1,
+        "type": "array"
+       },
+       "terminator": {
+        "minLength": 1,
+        "type": "string"
+       }
+      },
+      "type": [
+       "object",
+       "null"
+      ]
+     },
+     "option_block_by_rendering": {
+      "additionalProperties": {
+       "additionalProperties": false,
+       "properties": {
+        "line_count": {
+         "const": 4,
+         "type": "integer"
+        },
+        "line_grammar": {
+         "const": "{label}{separator}{content}\n",
+         "type": "string"
+        },
+        "no_blank_line_between_options": {
+         "const": true,
+         "type": "boolean"
+        },
+        "no_leading_whitespace_on_an_option_line": {
+         "const": true,
+         "type": "boolean"
+        },
+        "no_trailing_whitespace_on_an_option_line": {
+         "const": true,
+         "type": "boolean"
+        },
+        "ordering": {
+         "minLength": 1,
+         "type": "string"
+        },
+        "separator": {
+         "minLength": 1,
+         "pattern": "^[^\\r]*$",
+         "type": "string"
+        },
+        "separator_codepoints": {
+         "items": {
+          "pattern": "^0x[0-9a-f]+$",
+          "type": "string"
+         },
+         "minItems": 1,
+         "type": "array"
+        },
+        "terminator": {
+         "minLength": 1,
+         "type": "string"
+        }
+       },
+       "type": [
+        "object",
+        "null"
+       ]
+      },
+      "type": "object"
+     },
+     "profile": {
+      "enum": [
+       "S1",
+       "S2",
+       "S3",
+       "S4"
+      ],
+      "type": "string"
+     },
+     "prompt_assembly": {
+      "additionalProperties": false,
+      "properties": {
+       "answer_cue_ends_the_prompt": {
+        "const": true,
+        "type": "boolean"
+       },
+       "concatenation_order": {
+        "items": {
+         "enum": [
+          "question_stem",
+          "option_block",
+          "instruction",
+          "answer_cue"
+         ],
+         "type": "string"
+        },
+        "minItems": 3,
+        "type": "array",
+        "uniqueItems": true
+       },
+       "joiner": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "no_trailing_whitespace_after_the_answer_cue": {
+        "const": true,
+        "type": "boolean"
+       }
+      },
+      "required": [
+       "concatenation_order",
+       "joiner",
+       "answer_cue_ends_the_prompt",
+       "no_trailing_whitespace_after_the_answer_cue"
+      ],
+      "type": "object"
+     },
+     "raw_completion_prompt_template": {
+      "minLength": 1,
+      "pattern": "^[^\\r]*$",
+      "type": "string"
+     },
+     "registered_message_content_template": {
+      "minLength": 1,
+      "pattern": "^[^\\r]*$",
+      "type": "string"
+     },
+     "renders_label_symbols": {
+      "type": "boolean"
+     },
+     "renders_option_list": {
+      "type": "boolean"
+     },
+     "scoring_boundary": {
+      "additionalProperties": true,
+      "properties": {
+       "common_prefix_token_count": {
+        "minimum": 0,
+        "type": "integer"
+       },
+       "common_prefix_token_count_per_scored_row": {
+        "maximum": 1,
+        "minimum": 0,
+        "type": "integer"
+       },
+       "registered_prompt_token_count": {
+        "minimum": 0,
+        "type": "integer"
+       },
+       "scored_rows": {
+        "minimum": 1,
+        "type": "integer"
+       },
+       "scoring_context": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "scoring_context_token_count": {
+        "minimum": 0,
+        "type": "integer"
+       },
+       "scoring_rule": {
+        "enum": [
+         "single_next_token_restricted_argmax",
+         "first_discriminative_token_restricted_argmax",
+         "bounded_greedy_generation_mapped_by_the_pinned_parser"
+        ],
+        "type": "string"
+       },
+       "teacher_forced_common_prefix": {
+        "type": "boolean"
+       },
+       "tokens_processed": {
+        "minimum": 0,
+        "type": "integer"
+       }
+      },
+      "required": [
+       "scoring_rule",
+       "common_prefix_token_count_per_scored_row",
+       "common_prefix_token_count",
+       "teacher_forced_common_prefix",
+       "scoring_context",
+       "scored_rows",
+       "registered_prompt_token_count",
+       "scoring_context_token_count",
+       "tokens_processed"
+      ],
+      "type": "object"
+     },
+     "surface_class": {
+      "enum": [
+       "raw_completion",
+       "role_native_chat_wrapped"
+      ],
+      "type": "string"
+     },
+     "wrapper_boundary": {
+      "additionalProperties": false,
+      "properties": {
+       "boundary_is_the_first_and_last_byte_of_the_registered_message_content": {
+        "const": true,
+        "type": "boolean"
+       },
+       "registered_side": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "unregistered_side": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "wrapper_may_not_alter_registered_message_bytes": {
+        "const": true,
+        "type": "boolean"
+       }
+      },
+      "required": [
+       "registered_side",
+       "unregistered_side",
+       "boundary_is_the_first_and_last_byte_of_the_registered_message_content",
+       "wrapper_may_not_alter_registered_message_bytes"
+      ],
+      "type": "object"
+     }
+    },
+    "required": [
+     "candidate_surfaces",
+     "chat_wrapper_status",
+     "option_block",
+     "option_block_by_rendering",
+     "profile",
+     "prompt_assembly",
+     "renders_label_symbols",
+     "renders_option_list",
+     "scoring_boundary",
+     "surface_class"
+    ],
+    "type": "object"
+   },
+   "maxItems": 4,
+   "minItems": 4,
+   "type": "array",
+   "uniqueItems": true
+  },
+  "prohibited_substitutions": {
+   "items": {
+    "minLength": 1,
+    "type": "string"
+   },
+   "minItems": 8,
+   "type": "array",
+   "uniqueItems": true
+  },
+  "question_stem_templates": {
+   "additionalProperties": false,
+   "properties": {
+    "branch_count": {
+     "minimum": 8,
+     "type": "integer"
+    },
+    "branches": {
+     "items": {
+      "additionalProperties": false,
+      "properties": {
+       "applicable_profiles": {
+        "items": {
+         "enum": [
+          "S1",
+          "S2",
+          "S3",
+          "S4"
+         ],
+         "type": "string"
+        },
+        "minItems": 1,
+        "type": "array",
+        "uniqueItems": true
+       },
+       "branch_id": {
+        "pattern": "^K[1-4]/(none|affine_mod10|permutation_chain)/[0-3]$",
+        "type": "string"
+       },
+       "composition_depth": {
+        "maximum": 3,
+        "minimum": 0,
+        "type": "integer"
+       },
+       "feeds_gates": {
+        "items": {
+         "enum": [
+          "I1a",
+          "I1b",
+          "I2",
+          "I4"
+         ],
+         "type": "string"
+        },
+        "minItems": 1,
+        "type": "array",
+        "uniqueItems": true
+       },
+       "intermediate_values_are_never_displayed": {
+        "type": "boolean"
+       },
+       "operation_family": {
+        "enum": [
+         "affine_mod10",
+         "permutation_chain",
+         null
+        ],
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "task_stratum": {
+        "enum": [
+         "K1",
+         "K2",
+         "K3",
+         "K4"
+        ],
+        "type": "string"
+       },
+       "template": {
+        "minLength": 1,
+        "pattern": "^[^\\r]*$",
+        "type": "string"
+       },
+       "template_bytes": {
+        "minimum": 1,
+        "type": "integer"
+       },
+       "template_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+       }
+      },
+      "required": [
+       "branch_id",
+       "task_stratum",
+       "operation_family",
+       "composition_depth",
+       "feeds_gates",
+       "applicable_profiles",
+       "template",
+       "template_sha256",
+       "template_bytes",
+       "intermediate_values_are_never_displayed"
+      ],
+      "type": "object"
+     },
+     "minItems": 8,
+     "type": "array",
+     "uniqueItems": true
+    },
+    "completeness_rule": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "k5_and_k6_inherit": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "branch_count",
+    "completeness_rule",
+    "k5_and_k6_inherit",
+    "branches"
+   ],
+   "type": "object"
+  },
+  "registry_identity": {
+   "additionalProperties": false,
+   "properties": {
+    "canonical_serialisation": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "hash_algorithm": {
+     "const": "sha256",
+     "type": "string"
+    },
+    "normative_template_asset_count": {
+     "minimum": 22,
+     "type": "integer"
+    },
+    "normative_template_assets": {
+     "items": {
+      "additionalProperties": false,
+      "properties": {
+       "asset_id": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "bytes": {
+        "minimum": 1,
+        "type": "integer"
+       },
+       "sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+       }
+      },
+      "required": [
+       "asset_id",
+       "sha256",
+       "bytes"
+      ],
+      "type": "object"
+     },
+     "minItems": 22,
+     "type": "array",
+     "uniqueItems": true
+    },
+    "registry_sha256": {
+     "pattern": "^[0-9a-f]{64}$",
+     "type": "string"
+    },
+    "self_hash_convention": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "hash_algorithm",
+    "self_hash_convention",
+    "canonical_serialisation",
+    "registry_sha256",
+    "normative_template_assets",
+    "normative_template_asset_count"
+   ],
+   "type": "object"
+  },
+  "renderings": {
+   "additionalProperties": false,
+   "properties": {
+    "answer_cue_held_byte_identical_across_all_renderings": {
+     "const": true,
+     "type": "boolean"
+    },
+    "count": {
+     "const": 3,
+     "type": "integer"
+    },
+    "entries": {
+     "items": {
+      "additionalProperties": false,
+      "properties": {
+       "applicable_profiles": {
+        "items": {
+         "enum": [
+          "S1",
+          "S2",
+          "S3",
+          "S4"
+         ],
+         "type": "string"
+        },
+        "minItems": 1,
+        "type": "array",
+        "uniqueItems": true
+       },
+       "label_to_content_separator": {
+        "minLength": 1,
+        "pattern": "^[^\\r]*$",
+        "type": "string"
+       },
+       "not_applicable_profiles": {
+        "items": {
+         "enum": [
+          "S1",
+          "S2",
+          "S3",
+          "S4"
+         ],
+         "type": "string"
+        },
+        "type": "array",
+        "uniqueItems": true
+       },
+       "not_applicable_reason": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "rendering_id": {
+        "enum": [
+         "R-base",
+         "R-sep",
+         "R-instr"
+        ],
+        "type": "string"
+       },
+       "varies_relative_to_R_base": {
+        "minLength": 1,
+        "type": "string"
+       }
+      },
+      "required": [
+       "rendering_id",
+       "varies_relative_to_R_base",
+       "label_to_content_separator",
+       "applicable_profiles",
+       "not_applicable_profiles",
+       "not_applicable_reason"
+      ],
+      "type": "object"
+     },
+     "maxItems": 3,
+     "minItems": 3,
+     "type": "array",
+     "uniqueItems": true
+    },
+    "one_factor_at_a_time": {
+     "const": true,
+     "type": "boolean"
+    },
+    "registered_ids": {
+     "items": {
+      "enum": [
+       "R-base",
+       "R-sep",
+       "R-instr"
+      ],
+      "type": "string"
+     },
+     "maxItems": 3,
+     "minItems": 3,
+     "type": "array",
+     "uniqueItems": true
+    }
+   },
+   "required": [
+    "count",
+    "registered_ids",
+    "one_factor_at_a_time",
+    "answer_cue_held_byte_identical_across_all_renderings",
+    "entries"
+   ],
+   "type": "object"
+  },
+  "rp_wrapper": {
+   "additionalProperties": false,
+   "properties": {
+    "filled_in_by_v0_5": {
+     "const": false,
+     "type": "boolean"
+    },
+    "status": {
+     "const": "UNRESOLVED_BLOCKING_OPERATOR_DECISION_OD2",
+     "type": "string"
+    },
+    "why_null_and_not_empty": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "wrapper": {
+     "type": "null"
+    }
+   },
+   "required": [
+    "status",
+    "wrapper",
+    "filled_in_by_v0_5",
+    "why_null_and_not_empty"
+   ],
+   "type": "object"
+  },
+  "schema_version": {
+   "const": "study3-interface-calibration-rendering-registry-v0.6",
+   "type": "string"
+  },
+  "scoring_boundary": {
+   "additionalProperties": true,
+   "properties": {
+    "claim_boundary": {
+     "items": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "derived_token_identities": {
+     "additionalProperties": true,
+     "properties": {
+      "by_role": {
+       "type": "object"
+      },
+      "derivation_module": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "provenance": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "tokenizer_encodes_performed_by_the_derivation": {
+       "const": 0,
+       "type": "integer"
+      }
+     },
+     "required": [
+      "provenance",
+      "derivation_module",
+      "tokenizer_encodes_performed_by_the_derivation",
+      "by_role"
+     ],
+     "type": "object"
+    },
+    "eligibility_conditions": {
+     "items": {
+      "additionalProperties": false,
+      "properties": {
+       "condition": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "id": {
+        "pattern": "^SB-[1-5]$",
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "condition"
+      ],
+      "type": "object"
+     },
+     "maxItems": 5,
+     "minItems": 5,
+     "type": "array"
+    },
+    "equivalence_proof": {
+     "additionalProperties": true,
+     "properties": {
+      "consequence": {
+       "const": "argmax_d P(u, v_d | x) = argmax_d P(v_d | x, u)",
+       "type": "string"
+      },
+      "does_not_extend_to": {
+       "items": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "minItems": 6,
+       "type": "array"
+      },
+      "identity": {
+       "const": "P(u, v_d | x) = P(u | x) * P(v_d | x, u)",
+       "type": "string"
+      },
+      "valid_because": {
+       "items": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "minItems": 4,
+       "type": "array"
+      },
+      "why_exact": {
+       "minLength": 1,
+       "type": "string"
+      }
+     },
+     "required": [
+      "identity",
+      "consequence",
+      "why_exact",
+      "valid_because",
+      "does_not_extend_to"
+     ],
+     "type": "object"
+    },
+    "first_discriminative_token_rule": {
+     "additionalProperties": true,
+     "properties": {
+      "common_prefix_is": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "factorization": {
+       "const": "candidate_d = common_prefix || discriminant_d",
+       "type": "string"
+      },
+      "prohibited": {
+       "items": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "minItems": 5,
+       "type": "array"
+      },
+      "s2_scoring_context": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "s3_evaluation": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "tie_break_order": {
+       "minLength": 1,
+       "type": "string"
+      }
+     },
+     "required": [
+      "factorization",
+      "s2_scoring_context",
+      "s3_evaluation",
+      "common_prefix_is",
+      "prohibited",
+      "tie_break_order"
+     ],
+     "type": "object"
+    },
+    "registered_in": {
+     "const": "draft-v0.6",
+     "type": "string"
+    },
+    "visible_answer_surface_unchanged": {
+     "additionalProperties": true,
+     "properties": {
+      "answer_cue": {
+       "const": "Answer:",
+       "type": "string"
+      },
+      "candidate_surfaces": {
+       "items": {
+        "pattern": "^ [0-9]$",
+        "type": "string"
+       },
+       "maxItems": 10,
+       "minItems": 10,
+       "type": "array",
+       "uniqueItems": true
+      },
+      "each_candidate_carries_exactly_one_leading_u0020": {
+       "const": true,
+       "type": "boolean"
+      },
+      "s1_rendering_and_scoring_bytes_unchanged": {
+       "const": true,
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "answer_cue",
+      "candidate_surfaces",
+      "each_candidate_carries_exactly_one_leading_u0020",
+      "s1_rendering_and_scoring_bytes_unchanged"
+     ],
+     "type": "object"
+    }
+   },
+   "required": [
+    "registered_in",
+    "visible_answer_surface_unchanged",
+    "first_discriminative_token_rule",
+    "eligibility_conditions",
+    "equivalence_proof",
+    "derived_token_identities",
+    "claim_boundary"
+   ],
+   "type": "object"
+  },
+  "separators": {
+   "additionalProperties": false,
+   "properties": {
+    "R-base": {
+     "const": ": ",
+     "type": "string"
+    },
+    "R-instr": {
+     "const": ": ",
+     "type": "string"
+    },
+    "R-sep": {
+     "const": " = ",
+     "type": "string"
+    },
+    "ascii_only": {
+     "const": true,
+     "type": "boolean"
+    },
+    "no_profile_specific_replacement_separator_is_registered": {
+     "const": true,
+     "type": "boolean"
+    },
+    "r_instr_separator_equals_r_base": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "semantics": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "semantics",
+    "R-base",
+    "R-sep",
+    "R-instr",
+    "r_instr_separator_equals_r_base",
+    "ascii_only",
+    "no_profile_specific_replacement_separator_is_registered"
+   ],
+   "type": "object"
+  },
+  "state": {
+   "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW",
+   "type": "string"
+  },
+  "supersedes": {
+   "additionalProperties": true,
+   "properties": {
+    "preserved_byte_for_byte_as_history": {
+     "const": true,
+     "type": "boolean"
+    },
+    "registry": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "schema": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "why": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "registry",
+    "schema",
+    "preserved_byte_for_byte_as_history"
+   ],
+   "type": "object"
+  },
+  "token_accounting": {
+   "additionalProperties": true,
+   "properties": {
+    "by_profile": {
+     "type": "object"
+    },
+    "p0_r1_totals": {
+     "type": "object"
+    },
+    "s3_processes_no_additional_token": {
+     "const": true,
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "by_profile",
+    "p0_r1_totals",
+    "s3_processes_no_additional_token"
+   ],
+   "type": "object"
+  }
+ },
+ "required": [
+  "answer_cue",
+  "answer_domain",
+  "applicability_table",
+  "binding_status",
+  "closes_finding",
+  "closes_p0_t_demonstrated_defects",
+  "disposition_status",
+  "document_class",
+  "draft_version",
+  "encoding_policy",
+  "future_pre_bank_token_distinctness_rule",
+  "governs",
+  "instructions",
+  "label_alphabets",
+  "pair_isolation_rules",
+  "placeholders",
+  "profiles",
+  "prohibited_substitutions",
+  "question_stem_templates",
+  "registry_identity",
+  "renderings",
+  "rp_wrapper",
+  "schema_version",
+  "scoring_boundary",
+  "separators",
+  "state",
+  "supersedes",
+  "token_accounting"
+ ],
+ "title": "Study 3 interface-calibration rendering and scoring registry, draft-v0.6",
+ "type": "object"
+}
