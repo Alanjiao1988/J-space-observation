@@ -209,3 +209,13 @@ studies/study2/stage_t/** text eol=lf
 docs/decisions/study2_stage_t_tokenizer_gate.md text eol=lf
 studies/study2/STAGE_T_FINAL_HANDOFF.md text eol=lf
 studies/study2/STAGE_T_AUTHORITY_RECEIPT.md text eol=lf
+# Study 3 P0-R1 generation-2 transport, runtime binding and exception safety.
+# Registered for the same reason as the Stage T block above: a container entry
+# point or ACR task file that reaches the Linux agent with CRLF endings cannot
+# be executed by bash, and cannot compare equal to its own in-repo checkout,
+# which would break the byte-exact executable-code binding in the v2 lock.
+studies/study3/pilot/p0_r1/*.py text eol=lf
+studies/study3/pilot/p0_r1/execution/*.py text eol=lf
+studies/study3/pilot/p0_r1/container/* text eol=lf
+studies/study3/prompts/*.md text eol=lf
+tests/test_study3_p0_r1_generation2_transport.py text eol=lf

@@ -1,0 +1,54 @@
+# Stage P0-R1 generation-2 replay-gate task for the registered ACR route.
+#
+# Authority:
+#   studies/study3/prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md
+#   sections 5, 6 and 9.
+#
+# The generation-1 task mounted the build context at /workspace and then ran
+# /workspace/p0_r1_replay.sh from that mount, so the shell that executed was the
+# checkout's, not the image's, and the image's own copy was shadowed. That made
+# the "one image, both stages" guarantee unverifiable in practice.
+#
+# This task runs the entry point the image installed, at /usr/local/bin, and
+# reads its source from /opt/jspace/src. Neither path can be shadowed by a
+# context mount, so the CPU replay gate provably executes the same frozen bytes
+# the GPU pilot will.
+#
+# The lock is injected as an environment payload rather than baked, because the
+# image is built before the lock exists. The gate writes its complete artifact
+# bytes over the verified transport, so the result survives a truncated log.
+#
+# This task contains, downloads and launches NO model. The replay gate performs
+# zero tokenizer constructions, zero encodes, zero checkpoint downloads, zero
+# weight loads and zero GPU operations, and the entry point asserts all of that.
+#
+# Run it with:
+#   az acr run --registry acrjspaceobssea0708231738 \
+#     --subscription 943bacdf-8b6e-4e3a-8126-a149f623d32e \
+#     --platform linux/amd64 \
+#     -f p0_r1_acr_task_v2.yaml \
+#     --set IMAGE=<registry>/<repo>@sha256:<digest> \
+#     --set DIGEST=sha256:<digest> --set COMMIT=<ready-commit> \
+#     --set LOCK_B64=<base64 injection payload> <ctx>
+version: v1.1.0
+steps:
+  - id: replay
+    cmd: >-
+      {{.Values.IMAGE}}
+      /usr/local/bin/p0_r1_replay_v2.sh {{.Values.DIGEST}} {{.Values.COMMIT}}
+    env:
+      - P0_R1_LOCK_V2_B64={{.Values.LOCK_B64}}
+      - P0_R1_SRC=/opt/jspace/src
+      - RESULTS_DIR=/workspace/runtime/results
+      - INJECTED_DIR=/workspace/runtime/injected
+    timeout: 3600
+boundary:
+  runs_from_the_image_not_the_context_mount: true
+  entrypoint: /usr/local/bin/p0_r1_replay_v2.sh
+  standalone_source_root: /opt/jspace/src
+  tokenizer_constructions: 0
+  tokenizer_encodes: 0
+  checkpoint_downloads: 0
+  model_weight_loads: 0
+  model_operations_performed: 0
+  gpu_workload_allocated: false
