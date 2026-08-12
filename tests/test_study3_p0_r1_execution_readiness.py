@@ -248,13 +248,26 @@ def test_the_live_gate_writes_outputs_only_into_the_runtime_directory(tmp_path):
 
 
 def test_the_live_gate_imports_no_model_library_and_leaves_counters_at_zero(tmp_path):
+    """A structural guard, deliberately not a process-global ``sys.modules`` probe.
+
+    In a full-suite run another module legitimately imports torch and
+    transformers, so a process-global probe would report a fact about the suite
+    rather than about the replay path. The guard is therefore over the exact
+    module chain the live gate executes.
+    """
     root = _fixture_repo(tmp_path)
     counters = COUNTERS.P0R1Counters()
     GATE.gate_run(str(tmp_path / "results"),
                   authorization=GATE.SUCCESSOR_AUTHORIZATION,
                   image_digest=DIGEST, root=str(root), counters=counters)
-    assert "transformers" not in sys.modules
-    assert "tokenizers" not in sys.modules
+    for name in ("p0_r1_replay_gate.py", "p0_r1_factorization.py",
+                 "p0_r1_eligibility.py", "p0_r1_counters.py",
+                 "p0_r1_execution_lock.py"):
+        source = _text(os.path.join(P0_R1_DIR, name))
+        for forbidden in ("import torch", "from transformers",
+                          "import transformers", "import tokenizers",
+                          "AutoTokenizer", "AutoModel"):
+            assert forbidden not in source, "%s contains %r" % (name, forbidden)
     snapshot = counters.snapshot()
     assert snapshot["replay_gate_evaluations"] == 1
     for name, value in snapshot.items():
