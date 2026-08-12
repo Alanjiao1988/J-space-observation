@@ -1,9 +1,16 @@
 # Study 3 - Interface Adequacy and Label-Binding Calibration
 
-> **DRAFT-V0.6 SCORING BOUNDARY REGISTERED - P0-R1 AWAITING ITS REPLAY GATE**
+> **P0-R1 IS EXECUTION READY - AWAITING ITS REPLAY GATE**
 >
 > States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
-> and `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE`.
+> and `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE`.
+>
+> A model-free execution-completion round closed the gap between a registered
+> P0-R1 and a runnable one: the live replay gate, the canonical
+> result/receipt/disposition writers, the complete bounded model runner, the
+> Azure Container Apps T4 launcher and the immutable image digest now exist and
+> are bound by `studies/study3/pilot/p0_r1/p0_r1_execution_lock.json`. Nothing
+> was executed and `p0_r1_pilot_execution_authorized` is **not consumed**.
 >
 > draft-v0.6 registers first-discriminative-token scoring for `S2` and `S3` and
 > repairs the eligibility classifier in a versioned successor. The visible

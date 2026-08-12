@@ -7516,3 +7516,53 @@ every bound blob from the checkout, so executable byte drift after the build is
 detected rather than assumed away; if a byte does change, the unexecuted image is
 discarded and rebuilt before any measurement, which is pre-observation build
 iteration and not a retry of anything observed.
+
+Authoritative CPU-only validation, in clean exact-commit ACR clones with
+`GPU_COUNT=0` and `CUDA_AVAILABLE=False`. Every published targeted node ID and
+pass count is retained; none was weakened, renamed, skipped or deleted.
+
+| ACR run | Scope | Result |
+| --- | --- | --- |
+| `cmfw` | `tests/test_study3_design.py` | 240 passed |
+| `cmfx` | `tests/test_study3_rendering_registry_v0_5.py` | 36 passed |
+| `cmfy` | `tests/test_study3_rendering_registry_v0_6.py` | 31 passed |
+| `cmg1` | `tests/test_study3_methods_review_v0_4.py` | 88 passed |
+| `cmg2` | `tests/test_study3_p0_feasibility_pilot.py` | 122 passed |
+| `cmg0` | `tests/test_study3_p0_r1_registration.py` | 46 passed |
+| `cmfv` | `tests/test_study3_p0_r1_execution_readiness.py` | 47 passed |
+| `cmg3` | full repository suite | 4,387 passed, 15 skipped, exactly the two registered historical `test_parser_v3_seal_job` failures, `FULL_SUITE_ACCEPTED_HISTORICAL_FAILURES_ONLY=1` |
+
+Reconciliation: 4,340 historical passes + 47 net-new execution-readiness passes
+= 4,387. Skips remain 15 and the only failures are the same two historical node
+IDs with unchanged signatures.
+
+One full-suite run is recorded as a failure rather than discarded. Run `cmfu`
+returned 3 failed, 4,386 passed, 15 skipped: the two historical failures plus
+`test_the_live_gate_imports_no_model_library_and_leaves_counters_at_zero`. The
+defect was in the new test, not in production code. It probed `sys.modules`,
+which in a full-suite run reports that some other module legitimately imported
+transformers rather than a fact about the replay path -- exactly the caveat the
+registration suite had already documented for its own static guard. The guard is
+now structural, over the exact module chain the live gate executes, and it still
+fails on live input. The suite catching this is the reason a targeted-only
+validation is not sufficient evidence.
+
+The 46 published registration nodes remain valid without modification, and that
+is not an accident of wording. Two of them constrain this round directly:
+`test_the_registered_replay_gate_is_refused_in_the_calibration_session` requires
+`--gate` to return 3, and `test_the_model_pilot_refuses_to_start_in_the_calibration_session`
+requires `run()` to raise without a lock and receipt. Both still hold, because
+the refusal became *conditional* rather than being removed: `--gate` refuses
+without successor-mode authorization and an output directory, and `run()`
+refuses without an unconsumed lock and a byte-valid replay-pass receipt.
+
+A third published node forced a structural decision worth recording.
+`test_no_model_or_tokenizer_library_is_imported` asserts that no `.py` file in
+the top-level P0-R1 directory imports torch or transformers or names
+`AutoTokenizer`/`AutoModel`. The supplement requires a real model executor,
+which must name those APIs. Both hold at once because the executor was placed in
+its own `execution/` subpackage rather than beside the replay code: the
+top-level package stays importable and testable with no model library present,
+and the model-free boundary is now structural rather than incidental. The
+published node was not narrowed, exempted or weakened to accommodate the new
+code.

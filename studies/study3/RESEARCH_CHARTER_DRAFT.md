@@ -13,7 +13,7 @@
 > | candidate draft version | `draft-v0.6` |
 > | candidate state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW` |
 > | candidate disposition | `PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW` |
-> | pilot continuation | `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE` |
+> | pilot continuation | `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE` |
 > | frozen | `false` |
 > | formal execution authorized | `false` |
 > | reviewed | `false` |

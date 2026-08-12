@@ -3748,3 +3748,51 @@ generation. Not one byte under `studies/study3/pilot/p0/` or in
 `tests/test_study3_p0_feasibility_pilot.py` changed. `OD2`, `UR-22` and every
 `RP` object remain unresolved, no seed or bank row exists, and
 `paper/evidence_ledger.csv` remains byte-identical through `EV-0016`.
+## 2026-08-12 - Study 3 P0-R1 pre-replay execution completion
+
+**Decision.** Complete the already-registered P0-R1 replay and model execution
+machinery so that a later fresh session can actually run the immutable replay
+gate and, only if it passes, the bounded GPU feasibility pilot. This round is
+strictly model-free and changes no scoring rule, corpus, allocation, cap, model
+identity, tokenizer identity, rendering, parser, statistic, claim boundary or
+terminal-state meaning.
+
+**Why it was needed.** The published registration described an execution path
+that could not run: `--gate` was an unconditional refusal, the replay shell
+called the calibration `derive()` rather than a live gate and wrote no result,
+receipt, disposition or state transition, the ACR task referenced a checkout
+script that did not exist, the model runner always raised, no GPU job definition
+or launcher existed, and the pre-execution receipt carried `image_digest = null`
+while the handoff's own first command required an immutable digest. A replay
+pass therefore could not legally or physically advance to the model pilot, and
+treating the derivation's successful exit as a replay-gate pass would have been
+invalid.
+
+**State.** `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE`.
+`p0_r1_pilot_execution_authorized` is `true` and **not consumed**;
+`formal_execution_authorized` and `frozen` remain `false`.
+
+**Boundary.** Zero replay-gate evaluations against the published lock, zero
+tokenizer constructions, zero encodes, zero checkpoint downloads, zero model
+loads, zero GPU allocations, zero forward passes, zero generations, zero scored
+rows, zero seeds, zero bank rows, zero provider calls and zero evidence-ledger
+rows. Not one byte under `studies/study3/pilot/p0/` or in
+`tests/test_study3_p0_feasibility_pilot.py` changed. `OD2`, `UR-22` and every
+`RP` object remain unresolved, and `paper/evidence_ledger.csv` remains
+byte-identical through `EV-0016`.
+
+**Two provenance corrections.** The authority provenance is now recorded as two
+hops rather than one end-to-end claim: the source artifact delivered before the
+registration session was 20,217 bytes / `db42214e...` with a trailing newline,
+the file the registration executor received and staged was 19,632 bytes /
+`f72292e7...`, and that received file was committed byte-identically with no
+further normalization. The registration executor did not rewrite the file, and
+the end-to-end chain was not byte-identical. Separately, the exact
+`dfbe6dd6..167d3067` comparison contains 40 changed repository paths, 9 modified
+and 31 added; the active run-log statement of 41 was a one-count erratum and is
+corrected, with the historical commit and failed-run record preserved.
+
+**Successor ordering.** Sequential, not a choice: the fresh-session replay gate
+first; only if it passes, the single bounded GPU pilot in that same session; and
+only after a mechanically feasible terminal P0-R1 disposition, one fresh focused
+final methods review of draft-v0.6. This neither waives nor begins that review.

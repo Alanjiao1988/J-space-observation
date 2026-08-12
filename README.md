@@ -4,10 +4,14 @@
 
 ## 当前状态
 
-> **STUDY 3 DRAFT-V0.6 SCORING BOUNDARY REGISTERED - P0-R1 AWAITING ITS REPLAY GATE**
+> **STUDY 3 P0-R1 IS EXECUTION READY - AWAITING ITS REPLAY GATE**
 >
 > States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
-> 与 `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE`。
+> 与 `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE`。
+>
+> 一轮 model-free 的 execution-completion round 补齐了「已注册」与「可运行」之间的缺口：此前 `--gate` 是无条件拒绝，replay shell 调用的是 calibration 用的 `derive()` 而非 live gate，model runner 恒抛异常，既无 GPU launcher 也无 job definition，pre-execution receipt 的 `image_digest` 仍为 `null`。以上全部补齐，并由 `studies/study3/pilot/p0_r1/p0_r1_execution_lock.json` 中的不可变 image digest 绑定。
+>
+> 本轮**未执行任何测量**：零 replay-gate evaluation、零 tokenizer construction、零 encode、零 checkpoint 下载、零权重加载、零 GPU 分配、零 forward pass、零生成、零 scored row。`p0_r1_pilot_execution_authorized` 为 `true` 且**尚未消耗**；`formal_execution_authorized` 仍为 `false`。
 >
 > draft-v0.6 修复了已发布的 P0-T disposition 所披露的两项机械缺陷，且**只**改变一件规范性的事：`S2`/`S3` 的判定统计量在**哪个位置**读取。模型可见的字节一个都没有改：answer cue 仍为 `Answer:` 且无尾随空白，完整候选面仍为 `" 0"`..`" 9"`（各带恰好一个前导 U+0020），`S1` 与 `S4` 完全不变，draft-v0.5 的 registry 逐字节保留为历史。
 >

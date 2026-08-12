@@ -2337,3 +2337,30 @@ interface, sets a threshold, passes a formal gate, estimates a confirmatory
 effect, resolves `OD2` or `UR-22`, freezes anything or answers the research
 question. No entry is made in `paper/evidence_ledger.csv`, which remains
 byte-identical through `EV-0016`.
+### Study 3 P0-R1 execution readiness (2026-08-12)
+
+The P0-R1 replay gate and model pilot are implemented and bound, and neither was
+executed. The live gate verifies the execution lock, the immutable image digest,
+the executable code commit and tree, both operative authority identities, the
+frozen corpus hashes and the P0-T source hashes; reads the immutable P0-T
+artifacts; checks the five factorization conditions and the corrected 39-cell
+matrix with 39 eligible cells, zero empty-reason ineligible rows and 11
+executable genuine I3 contrasts per role; increments `replay_gate_evaluations`
+exactly once with every tokenizer, model, GPU and scoring counter at zero; and
+writes canonical result, receipt, counter and disposition bytes before returning
+on both the pass and the failure path.
+
+The model executor refuses without an unconsumed execution lock and a byte-valid
+replay-pass receipt from the same authorized attempt. It constructs exactly the
+three pinned tokenizers, loads exactly the three pinned fp16 checkpoints with at
+most one GPU-resident at a time, refuses any reload after observation, and
+enforces the exact 60-prefill K2 smoke in code before any extension prefill or
+S4 generation. The derived allocation reconciles exactly: 60 smoke prefills, 120
+extension prefills, 180 non-generative prefills, 12 S4 generation calls. S2
+appends the verified common-prefix token by ID concatenation and reads the
+discriminant position; S3 reuses that exact captured vector with zero model
+evaluations.
+
+The model-free boundary is structural: every byte that can touch a checkpoint
+lives in `studies/study3/pilot/p0_r1/execution/`, so the replay and registration
+path remains importable and testable with no model library present.
