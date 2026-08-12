@@ -39,10 +39,31 @@ REPO_ROOT = os.path.abspath(os.path.join(P0_R1_DIR, "..", "..", "..", ".."))
 sys.path.insert(0, P0_R1_DIR)
 
 import p0_r1_eligibility as ELIG  # noqa: E402
+import p0_r1_execution_lock as LOCK  # noqa: E402
 import p0_r1_factorization as FACT  # noqa: E402
 from p0_r1_counters import P0R1Counters  # noqa: E402
 
 SCHEMA_VERSION = "study3-p0-r1-replay-gate-v1"
+
+GATE_RESULT_SCHEMA_VERSION = "study3-p0-r1-replay-gate-result-v1"
+GATE_RECEIPT_SCHEMA_VERSION = "study3-p0-r1-replay-gate-receipt-v1"
+
+#: The exact successor-mode token. ``--gate`` reaches live gate logic only when
+#: the caller supplies it, so a calibration or build-time invocation cannot
+#: consume the one-shot replay evaluation by accident.
+SUCCESSOR_AUTHORIZATION = "p0-r1-successor-session"
+
+#: Canonical artifact names written into the writable runtime result directory.
+GATE_RESULT_NAME = "p0_r1_replay_result.json"
+GATE_RECEIPT_NAME = "p0_r1_replay_receipt.json"
+GATE_COUNTERS_NAME = "p0_r1_replay_counters.json"
+GATE_DISPOSITION_NAME = "P0_R1_REPLAY_DISPOSITION.md"
+
+#: The corrected matrix the replay gate must reproduce exactly.
+REQUIRED_MATRIX_CELLS = 39
+REQUIRED_ELIGIBLE_CELLS = 39
+REQUIRED_EMPTY_REASON_INELIGIBLE_CELLS = 0
+REQUIRED_EXECUTABLE_CONTRASTS_PER_ROLE = 11
 
 DERIVED_TABLE_PATH = os.path.join(
     REPO_ROOT, "studies", "study3", "analysis",
@@ -257,6 +278,372 @@ def dumps(document):
     return json.dumps(document, indent=1, sort_keys=True, ensure_ascii=True) + "\n"
 
 
+# ---------------------------------------------------------------------------
+# The registered live replay gate. Successor session only.
+# ---------------------------------------------------------------------------
+
+class GateRefused(Exception):
+    """Raised when the live gate is reached without successor authorization."""
+
+
+def _matrix_summary(corrected):
+    matrix = corrected["matrix"]
+    return {
+        "cells": len(matrix),
+        "eligible_cells": sum(1 for cell in matrix
+                              if cell["status"] == ELIG.ELIGIBLE),
+        "ineligible_cells": sum(1 for cell in matrix
+                                if cell["status"] == ELIG.INELIGIBLE),
+        "ineligible_cells_with_an_empty_reason_list": sum(
+            1 for cell in matrix
+            if cell["status"] == ELIG.INELIGIBLE and not cell["reasons"]),
+        "structurally_absent_pairs": len(corrected["structurally_absent"]),
+        "executable_genuine_i3_contrasts_per_role": {
+            role: len(values)
+            for role, values in sorted(
+                corrected["executable_genuine_i3_contrasts"].items())
+        },
+        "roles_without_executable_contrast":
+            corrected["roles_without_executable_contrast"],
+    }
+
+
+def check_corrected_matrix(summary):
+    """The registered acceptance conditions of the corrected matrix."""
+    findings = []
+    if summary["cells"] != REQUIRED_MATRIX_CELLS:
+        findings.append(
+            "the corrected matrix has %d cells, not the registered %d"
+            % (summary["cells"], REQUIRED_MATRIX_CELLS))
+    if summary["eligible_cells"] != REQUIRED_ELIGIBLE_CELLS:
+        findings.append(
+            "the corrected matrix has %d eligible cells, not the registered %d"
+            % (summary["eligible_cells"], REQUIRED_ELIGIBLE_CELLS))
+    if summary["ineligible_cells_with_an_empty_reason_list"] != \
+            REQUIRED_EMPTY_REASON_INELIGIBLE_CELLS:
+        findings.append(
+            "%d ineligible cells carry an empty reason list; an ineligible row "
+            "without an exact local reason is a validator failure"
+            % summary["ineligible_cells_with_an_empty_reason_list"])
+    per_role = summary["executable_genuine_i3_contrasts_per_role"]
+    for role in ROLES:
+        observed = per_role.get(role)
+        if observed != REQUIRED_EXECUTABLE_CONTRASTS_PER_ROLE:
+            findings.append(
+                "role %s retains %r executable genuine I3 contrasts, not the "
+                "registered %d"
+                % (role, observed, REQUIRED_EXECUTABLE_CONTRASTS_PER_ROLE))
+    if summary["roles_without_executable_contrast"]:
+        findings.append(
+            "one or more target roles has no executable genuine I3 contrast: %s"
+            % summary["roles_without_executable_contrast"])
+    return findings
+
+
+def _counter_guard(snapshot):
+    """Every tokenizer, model, GPU and scoring counter must remain zero."""
+    findings = []
+    for name, value in sorted(snapshot.items()):
+        if name == "replay_gate_evaluations":
+            continue
+        if value != 0:
+            findings.append(
+                "the replay gate advanced %s to %d; it performs zero tokenizer, "
+                "checkpoint, model, GPU and scoring operations" % (name, value))
+    if snapshot.get("replay_gate_evaluations") != 1:
+        findings.append(
+            "replay_gate_evaluations is %r; the registered gate increments it "
+            "exactly once" % snapshot.get("replay_gate_evaluations"))
+    return findings
+
+
+def _write_artifacts(out_dir, result, receipt, counters, disposition):
+    """Write every canonical byte before the gate returns, pass or fail."""
+    if not out_dir:
+        raise GateRefused(
+            "the registered replay gate requires an explicit writable runtime "
+            "result directory; /workspace/studies is read-only in the image")
+    os.makedirs(out_dir, exist_ok=True)
+    written = []
+    for name, payload in (
+            (GATE_RESULT_NAME, dumps(result).encode("utf-8")),
+            (GATE_RECEIPT_NAME, dumps(receipt).encode("utf-8")),
+            (GATE_COUNTERS_NAME, dumps(counters).encode("utf-8")),
+            (GATE_DISPOSITION_NAME, disposition.encode("utf-8"))):
+        path = os.path.join(out_dir, name)
+        with open(path, "wb") as handle:
+            handle.write(payload)
+        written.append({
+            "name": name,
+            "bytes": len(payload),
+            "sha256": hashlib.sha256(payload).hexdigest(),
+        })
+    return written
+
+
+def _disposition_markdown(state, summary, factorization, stop_reason, lock):
+    lines = [
+        "# Stage P0-R1 replay gate: disposition",
+        "",
+        "> **Emitted terminal state:** `%s`" % state,
+        ">",
+        "> Published exactly as emitted. No observed value is edited, replaced,",
+        "> regenerated or rerun.",
+        "",
+        "| field | value |",
+        "| --- | --- |",
+        "| stage | `P0-R1-REPLAY-GATE` |",
+        "| image digest | `%s` |" % lock["image"]["digest"],
+        "| executable code commit | `%s` |" % lock["executable_code"]["commit"],
+        "| tokenizer encodes | `0` |",
+        "| tokenizer constructions | `0` |",
+        "| model operations | `0` |",
+        "| GPU allocations | `0` |",
+        "",
+        "## Corrected eligibility matrix",
+        "",
+        "| quantity | observed | required |",
+        "| --- | --- | --- |",
+        "| cells | %d | %d |" % (summary["cells"], REQUIRED_MATRIX_CELLS),
+        "| eligible cells | %d | %d |"
+        % (summary["eligible_cells"], REQUIRED_ELIGIBLE_CELLS),
+        "| ineligible cells with an empty reason list | %d | %d |"
+        % (summary["ineligible_cells_with_an_empty_reason_list"],
+           REQUIRED_EMPTY_REASON_INELIGIBLE_CELLS),
+    ]
+    for role in ROLES:
+        lines.append(
+            "| executable genuine I3 contrasts, %s | %s | %d |"
+            % (role,
+               summary["executable_genuine_i3_contrasts_per_role"].get(role),
+               REQUIRED_EXECUTABLE_CONTRASTS_PER_ROLE))
+    lines += [
+        "",
+        "## Factorization",
+        "",
+        "Derived from the immutable published P0-T result and the frozen P0",
+        "corpus, never transcribed and never re-encoded.",
+        "",
+        "* common-prefix token common to every role: `%s`"
+        % factorization["common_prefix_token_is_common_to_every_role"],
+        "* discriminant token IDs common to every role: `%s`"
+        % factorization["discriminant_token_ids_are_common_to_every_role"],
+        "* all roles eligible: `%s`" % factorization["all_roles_eligible"],
+        "",
+    ]
+    if stop_reason:
+        lines += [
+            "## Why the gate stopped",
+            "",
+            stop_reason,
+            "",
+            "No model operation follows this stop. The partial evidence above is",
+            "preserved exactly as observed and is never repaired or rerun.",
+            "",
+        ]
+    else:
+        lines += [
+            "## What this authorizes",
+            "",
+            "Exactly one bounded GPU model pilot, in this same execution",
+            "session, bound to the locked image digest and this receipt. It",
+            "authorizes nothing else: no interface selection, no threshold, no",
+            "formal gate, no evidence-ledger row.",
+            "",
+        ]
+    return "\n".join(lines)
+
+
+def gate_run(out_dir, authorization=None, image_digest=None, commit=None,
+             tree=None, root=None, registry=None, counters=None):
+    """The registered P0-R1 replay gate. Successor session only.
+
+    Reads the immutable P0-T artifacts, verifies the five factorization
+    conditions and the corrected eligibility matrix, and writes canonical result,
+    receipt, counter and disposition bytes to ``out_dir`` **before returning**,
+    on both the pass and the failure path.
+
+    Performs zero tokenizer constructions, zero encodes, zero checkpoint
+    downloads, zero model loads, zero forward passes and zero GPU operations.
+    """
+    if authorization != SUCCESSOR_AUTHORIZATION:
+        raise GateRefused(
+            "the registered P0-R1 replay gate is the first action of the "
+            "successor execution session. It requires explicit successor-mode "
+            "authorization (%r); the calibration and image-build modes may only "
+            "run --derive or --check." % SUCCESSOR_AUTHORIZATION)
+    if not out_dir:
+        raise GateRefused(
+            "the registered replay gate requires an explicit writable runtime "
+            "result directory")
+
+    lock = LOCK.load_lock(root=root)
+    LOCK.verify_binding(lock, image_digest=image_digest, root=root)
+    if commit is not None and commit != lock["executable_code"]["commit"]:
+        # The gate runs from the ready commit, a strict descendant. Only the
+        # executable bytes must match, and verify_binding already proved that.
+        pass
+    del tree
+
+    counters = counters if counters is not None else P0R1Counters()
+    registry = registry if registry is not None else load_registry()
+    started = utc_now()
+
+    try:
+        immutable_sources = FACT.verify_immutable_sources(root=root)
+        immutable_source_defect = None
+    except FACT.FactorizationDefect as exc:
+        immutable_sources = []
+        immutable_source_defect = str(exc)
+
+    stop_reason = None
+    findings = []
+    try:
+        factorization = FACT.gate(registry, root=root, counters=counters)
+    except FACT.FactorizationDefect as exc:
+        factorization = {
+            "all_roles_eligible": False,
+            "common_prefix_token_is_common_to_every_role": False,
+            "discriminant_token_ids_are_common_to_every_role": False,
+            "defect": str(exc),
+        }
+        stop_reason = (
+            "The replay factorization gate failed on immutable evidence: %s"
+            % exc)
+        state = STATE_REPLAY_DEFECT
+        summary = {
+            "cells": 0, "eligible_cells": 0, "ineligible_cells": 0,
+            "ineligible_cells_with_an_empty_reason_list": 0,
+            "structurally_absent_pairs": 0,
+            "executable_genuine_i3_contrasts_per_role": {},
+            "roles_without_executable_contrast": list(ROLES),
+        }
+        corrected = None
+    else:
+        result = FACT.load_immutable(FACT.RESULT_PATH, root=root)
+        corrected = ELIG.classify(
+            result["records"], factorization,
+            published_s1_surfaces(result), ROLES)
+        ELIG.validate_matrix(corrected["matrix"], roles=ROLES)
+        summary = _matrix_summary(corrected)
+        findings = check_corrected_matrix(summary)
+        if findings:
+            stop_reason = (
+                "The corrected eligibility matrix did not reproduce the "
+                "registered acceptance conditions:\n\n"
+                + "\n".join("* %s" % finding for finding in findings))
+            state = (ELIG.STOP_SOME_ROLE_HAS_NO_EXECUTABLE_CONTRAST
+                     if summary["roles_without_executable_contrast"]
+                     else STATE_REPLAY_DEFECT)
+        else:
+            state = STATE_AFTER_REPLAY_PASS
+
+    snapshot = counters.snapshot()
+    counter_findings = _counter_guard(snapshot)
+    if counter_findings and state == STATE_AFTER_REPLAY_PASS:
+        stop_reason = (
+            "The replay gate counters did not reconcile:\n\n"
+            + "\n".join("* %s" % finding for finding in counter_findings))
+        state = STATE_REPLAY_DEFECT
+        findings = findings + counter_findings
+
+    passed = state == STATE_AFTER_REPLAY_PASS
+    attempt_id = "%s-%s" % (
+        lock["executable_code"]["commit"][:12], started)
+
+    result_document = {
+        "schema_version": GATE_RESULT_SCHEMA_VERSION,
+        "document_class": "study3_p0_r1_replay_gate_result",
+        "stage": "P0-R1-REPLAY-GATE",
+        "state": state,
+        "passed": passed,
+        "attempt_id": attempt_id,
+        "started_utc": started,
+        "completed_utc": utc_now(),
+        "authority": LOCK.REGISTRATION_AUTHORITY["path"],
+        "supplemental_authority": LOCK.SUPPLEMENTAL_AUTHORITY["path"],
+        "execution_lock": LOCK.lock_identity(root=root),
+        "image_digest": lock["image"]["digest"],
+        "executable_code_commit": lock["executable_code"]["commit"],
+        "executable_code_tree": lock["executable_code"]["tree"],
+        "immutable_sources": immutable_sources,
+        "immutable_source_defect": immutable_source_defect,
+        "target_roles": list(ROLES),
+        "tokenizer_encodes_performed": 0,
+        "tokenizer_constructions_performed": 0,
+        "model_operations_performed": 0,
+        "gpu_allocated": False,
+        "factorization": factorization,
+        "corrected_matrix": (corrected["matrix"] if corrected else []),
+        "structurally_absent": (corrected["structurally_absent"]
+                                if corrected else []),
+        "executable_genuine_i3_contrasts": (
+            corrected["executable_genuine_i3_contrasts"] if corrected else {}),
+        "corrected_matrix_summary": summary,
+        "acceptance_findings": findings,
+        "stop_reason": stop_reason,
+        "counters": snapshot,
+        "evidence_status": (
+            "a methods-feasibility replay observation over immutable evidence. "
+            "It is not Study 3 evidence, selects no interface, sets no "
+            "threshold and answers no research question."),
+    }
+
+    receipt_document = {
+        "schema_version": GATE_RECEIPT_SCHEMA_VERSION,
+        "document_class": "study3_p0_r1_replay_gate_receipt",
+        "stage": "P0-R1-REPLAY-GATE",
+        "state": state,
+        "passed": passed,
+        "attempt_id": attempt_id,
+        "completed_utc": result_document["completed_utc"],
+        "execution_lock": LOCK.lock_identity(root=root),
+        "image_digest": lock["image"]["digest"],
+        "executable_code_commit": lock["executable_code"]["commit"],
+        "executable_code_tree": lock["executable_code"]["tree"],
+        "result_document": {"name": GATE_RESULT_NAME},
+        "counters": snapshot,
+        "tokenizer_constructions": 0,
+        "tokenizer_encodes": 0,
+        "checkpoint_downloads": 0,
+        "model_weight_loads": 0,
+        "gpu_allocated": False,
+        "model_operations_performed": 0,
+        "stop_reason": stop_reason,
+        "authorizes_model_pilot": passed,
+        "authorization_scope": (
+            "exactly one bounded GPU model pilot in this same execution "
+            "session, bound to the locked image digest and this attempt id"
+            if passed else
+            "nothing. A replay failure authorizes no model operation."),
+    }
+
+    disposition = _disposition_markdown(
+        state, summary, factorization, stop_reason, lock)
+
+    written = _write_artifacts(
+        out_dir, result_document, receipt_document, snapshot, disposition)
+
+    payload = dumps(result_document).encode("utf-8")
+    receipt_document["result_document"] = {
+        "name": GATE_RESULT_NAME,
+        "bytes": len(payload),
+        "sha256": hashlib.sha256(payload).hexdigest(),
+    }
+    written = _write_artifacts(
+        out_dir, result_document, receipt_document, snapshot, disposition)
+
+    return {
+        "state": state,
+        "passed": passed,
+        "attempt_id": attempt_id,
+        "result": result_document,
+        "receipt": receipt_document,
+        "artifacts": written,
+        "out_dir": out_dir,
+    }
+
+
 def _write_derived_table(document):
     with open(DERIVED_TABLE_PATH, "wb") as handle:
         handle.write(dumps(document).encode("utf-8"))
@@ -283,15 +670,50 @@ def main(argv=None):
     group.add_argument("--gate", action="store_true",
                        help="the registered replay gate; successor session only")
     parser.add_argument("--out-dir")
+    parser.add_argument("--successor-authorization",
+                        help="the explicit successor-mode token required to "
+                             "reach live gate logic")
+    parser.add_argument("--image-digest",
+                        help="the immutable digest of the running image; it "
+                             "must equal the locked digest")
     args = parser.parse_args(argv)
 
     if args.gate:
-        print("REFUSED: the registered P0-R1 replay gate is the first action of "
-              "the successor session.")
-        print("The calibration session may only run --derive or --check "
-              "(authority sections 6 and 10).")
-        print("state remains: %s" % REGISTERED_STATE_AFTER_REGISTRATION)
-        return 3
+        if args.successor_authorization != SUCCESSOR_AUTHORIZATION:
+            print("REFUSED: the registered P0-R1 replay gate is the first "
+                  "action of the successor execution session.")
+            print("It requires explicit successor-mode authorization and a "
+                  "writable runtime result directory.")
+            print("The calibration and image-build modes may only run --derive "
+                  "or --check (authority sections 6 and 10).")
+            print("state remains: %s" % REGISTERED_STATE_AFTER_REGISTRATION)
+            return 3
+        if not args.out_dir:
+            print("REFUSED: --gate requires --out-dir, a writable runtime "
+                  "result directory. /workspace/studies is read-only.")
+            print("state remains: %s" % REGISTERED_STATE_AFTER_REGISTRATION)
+            return 3
+        try:
+            outcome = gate_run(
+                args.out_dir,
+                authorization=args.successor_authorization,
+                image_digest=args.image_digest)
+        except (GateRefused, LOCK.LockDefect) as exc:
+            print("REFUSED: %s" % exc)
+            return 3
+        for artifact in outcome["artifacts"]:
+            print("wrote %s (%d bytes, sha256 %s)"
+                  % (artifact["name"], artifact["bytes"], artifact["sha256"]))
+        print("TOKENIZER_ENCODES=0")
+        print("TOKENIZER_CONSTRUCTIONS=0")
+        print("MODEL_OPERATIONS=0")
+        print("P0_R1_REPLAY_ATTEMPT_ID=%s" % outcome["attempt_id"])
+        if outcome["passed"]:
+            print(outcome["state"])
+            return 0
+        print("%s: %s" % (outcome["state"],
+                          outcome["result"].get("stop_reason") or "stopped"))
+        return 2
 
     try:
         document = derive()

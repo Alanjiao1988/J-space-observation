@@ -1,24 +1,34 @@
-# Stage P0-R1 task for the registered Azure Container Registry route.
+# Stage P0-R1 replay-gate task for the registered Azure Container Registry route.
 #
-# Authority: studies/study3/prompts/study3_v0_6_p0_r1_authority.md sections 7
-# and 10.
+# Authority:
+#   studies/study3/prompts/study3_p0_r1_pre_replay_execution_completion_authority_rev2.md
+#   section 5.
 #
-# Step 1 clones the exact published commit from an uploaded git bundle, using a
-# git-bearing image, and records the binding it observed. Step 2 runs the
-# replay-only factorization gate inside the digest-pinned P0-R1 image, so the
-# frozen dependencies that execute the replay are exactly the ones the image
-# build pinned and verified.
+# Step 1 clones the exact published ready commit from an uploaded git bundle,
+# using a git-bearing image, and records the binding it observed. Step 2 runs the
+# REGISTERED LIVE REPLAY GATE inside the digest-pinned P0-R1 image, so the frozen
+# dependencies that execute the replay are exactly the ones the image build
+# pinned and verified.
 #
-# The P0-R1 image is referenced by immutable digest, never by tag alone. The
-# digest is null until the successor session builds the image; it is deliberately
-# not a placeholder, and this task cannot run until it is filled in from a real
-# build.
+# The image is referenced by immutable digest, never by tag. The digest comes
+# from the published execution lock, which exists only after the image is built,
+# because a digest cannot be embedded in the image whose digest it defines.
+#
+# This task contains, downloads and launches NO model. The replay gate performs
+# zero tokenizer constructions, zero encodes, zero checkpoint downloads, zero
+# weight loads and zero GPU operations, and the shell asserts all of that.
+#
+# Result transport is content-addressed: the gate writes its canonical bytes to
+# the writable runtime result directory and prints each artifact's SHA-256 and
+# byte count, so the result is recoverable without rerunning the gate.
 #
 # Run it with:
 #   az acr run --registry acrjspaceobssea0708231738 \
 #     --subscription 943bacdf-8b6e-4e3a-8126-a149f623d32e \
 #     --platform linux/amd64 \
-#     -f p0_r1_acr_task.yaml --set COMMIT=<sha> --set IMAGE=<digest-ref> <ctx>
+#     -f p0_r1_acr_task.yaml \
+#     --set COMMIT=<ready-commit> --set IMAGE=<registry>/<repo>@sha256:<digest> \
+#     --set DIGEST=sha256:<digest> <ctx>
 version: v1.1.0
 steps:
   - id: checkout
@@ -30,5 +40,5 @@ steps:
     cmd: >-
       --user root
       {{.Values.IMAGE}}
-      bash /workspace/p0_r1_replay.sh {{.Values.COMMIT}}
+      bash /workspace/p0_r1_replay.sh {{.Values.COMMIT}} {{.Values.DIGEST}}
     timeout: 3600

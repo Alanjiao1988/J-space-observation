@@ -22,6 +22,7 @@ LABEL org.opencontainers.image.base.digest="sha256:ac7c098a81512e719afa5d2d497f8
 LABEL io.jspace.study="3"
 LABEL io.jspace.stage="P0-R1"
 LABEL io.jspace.authority-sha256="f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2"
+LABEL io.jspace.supplemental-authority-sha256="ffe75ba42c023e959f3beb23927604c3ae72c07fb4b25be346f504c8ea2930de"
 LABEL io.jspace.draft-version="draft-v0.6"
 LABEL io.jspace.formal-execution-authorized="false"
 LABEL io.jspace.p0-r1-pilot-execution-authorized="true"
@@ -58,6 +59,7 @@ COPY studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json 
      studies/study3/protocol/interface_calibration_protocol_draft.json \
      /workspace/studies/study3/protocol/
 COPY studies/study3/prompts/study3_v0_6_p0_r1_authority.md \
+     studies/study3/prompts/study3_p0_r1_pre_replay_execution_completion_authority_rev2.md \
      /workspace/studies/study3/prompts/
 
 # The immutable P0-T evidence and the frozen corpus. The replay gate reads them

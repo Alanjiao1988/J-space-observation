@@ -1,9 +1,28 @@
 # Project Status Report
 
-> **STUDY 3 DRAFT-V0.6 SCORING BOUNDARY REGISTERED - P0-R1 AWAITING ITS REPLAY GATE**
+> **STUDY 3 P0-R1 IS EXECUTION READY - AWAITING ITS REPLAY GATE**
 >
 > States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
-> and `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE`.
+> and `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE`.
+>
+> A model-free execution-completion round closed the gap between a registered
+> P0-R1 and a runnable one. At the previous baseline `--gate` was an
+> unconditional refusal, the replay shell called the calibration `derive()`
+> rather than a live gate, the model runner always raised, no GPU launcher or
+> job definition existed, and the pre-execution receipt carried
+> `image_digest = null`. All of those are now closed and bound by an immutable
+> image digest in `studies/study3/pilot/p0_r1/p0_r1_execution_lock.json`.
+>
+> Nothing was executed. Zero replay-gate evaluations against the published lock,
+> zero tokenizer constructions, zero encodes, zero checkpoint downloads, zero
+> model loads, zero GPU allocations, zero forward passes, zero generations and
+> zero scored rows. `p0_r1_pilot_execution_authorized` is `true` and **not
+> consumed**; `formal_execution_authorized` remains `false`.
+>
+> The successor ordering is sequential: the fresh-session replay gate first;
+> only if it passes, the single bounded GPU pilot in that same session; and only
+> after a mechanically feasible terminal P0-R1 disposition, one fresh focused
+> final methods review of draft-v0.6.
 >
 > draft-v0.6 repairs the two mechanical defects the published P0-T disposition
 > disclosed. It changes **one** normative thing - where the `S2`/`S3` decision

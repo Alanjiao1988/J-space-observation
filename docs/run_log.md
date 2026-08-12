@@ -7356,6 +7356,106 @@ objects are verified unchanged, including every byte under
 `studies/study3/pilot/p0/`, `tests/test_study3_p0_feasibility_pilot.py`, the
 draft-v0.5 registry and schema, the v0.5 amendment record and design receipt, and
 `paper/evidence_ledger.csv`, which is byte-identical and still ends at `EV-0016`.
-The changed-path census is 41 paths, every one of them inside the section 9
+The changed-path census is 40 changed repository paths, 9 modified and 31 added,
+every one of them inside the section 9
 allowlist, with no deletion, rename, copy, symlink, submodule, binary artifact,
 merge commit, rebase, force push, workflow or branch-label operation.
+## 2026-08-12 - Study 3 P0-R1 pre-replay execution completion
+
+A fresh model-free round opened on the required baseline
+`167d3067d7d9a2866999a51ec49c3c57c1d31546` with tree
+`f7166f0441780bf0d034eb88a03c0d61e9049a2a`, `HEAD == origin/main` and a clean
+worktree, all re-verified from Git. The supplemental authority was committed
+first and alone, as its section 1 requires, and published by non-force
+fast-forward before any other object in this round existed. Its committed blob
+reproduces the operator-supplied bytes exactly: 23,486 bytes, sha256
+`ffe75ba42c023e959f3beb23927604c3ae72c07fb4b25be346f504c8ea2930de`, LF only with
+zero CR bytes, no BOM and no trailing newline. No transport-format normalization
+was applied or needed. It is not the superseded draft
+`7609bca3a30d53ee6f9c8272c8c30370ac9ec4a347549d0ef3d5ab303621e26a`, which the
+operator reports was never executed or committed.
+
+The round is strictly model-free. It performed zero replay-gate evaluations
+against the published lock, zero tokenizer constructions, zero encodes, zero
+checkpoint downloads, zero model loads, zero GPU allocations, zero forward
+passes, zero generations, zero scored rows, zero seeds, zero bank operations,
+zero provider calls and zero evidence-ledger rows. No scoring rule, corpus,
+allocation, cap, model identity, tokenizer identity, rendering, parser,
+statistic, claim boundary or terminal-state meaning changed.
+
+What was actually broken, and what now exists. The published registration
+described an execution path that could not run. `--gate` printed an
+unconditional refusal and returned 3 for every input; `p0_r1_replay.sh` called
+`derive()`, the calibration derivation, which advances no state and writes no
+receipt, so treating its successful exit as a replay-gate pass would have been
+invalid; the shell created no result, receipt, disposition, state transition or
+attempt-counter record; `p0_r1_acr_task.yaml` referenced a checkout step,
+`p0_r1_checkout.sh`, that did not exist; `p0_r1_model_runner.run()` always
+raised `ExecutionRefused` stating the pilot was not implemented; no model-pilot
+container entry point, Azure Container Apps GPU job definition or launcher
+existed; and the pre-execution receipt carried `image_digest = null` while the
+handoff's own first command required an immutable digest.
+
+The replay gate is now real. `--gate` reaches live logic only with the explicit
+successor-mode token and a writable runtime result directory, and still returns
+3 without them, so the published registration node that asserts the calibration
+refusal remains true rather than weakened. `gate_run` verifies the execution
+lock, the image digest, the code commit and tree, the operative authority
+identity, the frozen corpus hashes and the P0-T source hashes; reads the
+immutable P0-T artifacts; verifies the five factorization conditions and the
+corrected 39-cell matrix with 39 eligible cells, zero empty-reason ineligible
+rows and 11 executable genuine I3 contrasts for each of RT, RL and RI;
+increments `replay_gate_evaluations` exactly once while every tokenizer, model,
+GPU and scoring counter stays at zero; and writes canonical result, receipt,
+counter and disposition bytes to the runtime directory before returning, on both
+the pass and the failure path. `p0_r1_replay.sh` now calls `--gate`, passes the
+writable directory, asserts no GPU is visible, and propagates a non-zero gate
+exit only after the artifact bytes exist, so a stop can never be lost.
+
+The model pilot is now real. `run()` refuses unless it receives an unconsumed
+execution lock and a byte-valid replay-pass receipt whose image digest, commit,
+tree, lock hash and attempt id all agree; a prose log line is not authorization.
+It then imports torch and transformers lazily, constructs exactly the three
+pinned tokenizers counting construction events separately from distinct
+identities, loads exactly the three pinned fp16 checkpoints, keeps at most one
+resident on the GPU at a time while retaining the others in CPU memory so all
+three role-smoke slices complete without a second load, refuses any reload after
+observation, enforces the exact 60-prefill K2 smoke in code before any extension
+prefill or S4 generation, and writes canonical raw result, receipt, counter,
+resource and disposition artifacts. The derived allocation reconciles exactly:
+60 smoke prefills, 120 extension prefills, 180 non-generative prefills in total,
+and 12 S4 generation calls. S2 appends the verified common-prefix token by ID
+concatenation to the already-encoded prompt IDs and reads the discriminant
+position; S3 reuses that exact captured vector and adds zero model evaluations.
+
+Two provenance clarifications, recorded as two separate hops rather than one
+end-to-end claim. The source artifact delivered before the registration session
+was 20,217 bytes, sha256
+`db42214e37e9b44feab5c36c8ca4359b0d269cba3b9f0444c60b8837bc59975f`, 430 LF, zero
+CR, with a trailing newline. The committed authority is 19,632 bytes, sha256
+`f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2`, zero CR,
+without a trailing newline. They are not byte-identical end to end. The narrower
+and compatible fact the independent report establishes is that the 19,632-byte
+file the registration executor received and staged was committed
+byte-identically with no further normalization. Both hops are preserved: source
+delivery to executor-received attachment changed the bytes, and
+executor-received attachment to repository commit did not. The registration
+executor did not rewrite the file, and no historical object is edited. The
+committed 19,632-byte file remains the operative repository authority.
+
+The second clarification is a one-count erratum. The exact comparison from
+`dfbe6dd6c82fbe0e8906a4aa7f4df6b676496366` to
+`167d3067d7d9a2866999a51ec49c3c57c1d31546` contains 40 changed repository paths,
+9 modified and 31 added, re-verified from Git in this round. A staged durable
+copy outside the committed tree is not an additional changed repository path.
+The active run-log statement is corrected from 41 to 40; the historical commit
+and failed-run record is preserved unchanged.
+
+The next-action ordering is corrected. The final focused methods review and
+P0-R1 execution were presented as interchangeable immediate successors. The
+controlling authority requires the review only after P0-R1 reaches a terminal
+mechanically feasible disposition, so the active ordering is now:
+execution-completion publication; fresh-session replay gate; if replay passes,
+the single bounded GPU pilot in that same execution session; and only after a
+mechanically feasible terminal P0-R1 disposition, one fresh focused final
+methods review. This correction neither waives nor begins that review.

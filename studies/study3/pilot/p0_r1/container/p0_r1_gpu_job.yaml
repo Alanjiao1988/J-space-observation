@@ -1,0 +1,70 @@
+# Study 3 P0-R1 bounded GPU model-pilot job definition.
+#
+# Authority:
+#   studies/study3/prompts/study3_p0_r1_pre_replay_execution_completion_authority_rev2.md
+#   section 6.
+#
+# This is the immutable definition of the ONE model-operating Azure Container
+# Apps execution. This round commits and validates it; it does not create,
+# update, start or allocate the job.
+#
+# Every field that could silently authorize a second model operation is pinned:
+#   * replicaRetryLimit 0        - the platform may never re-run a model job;
+#   * parallelism 1              - one replica;
+#   * replicaCompletionCount 1   - one completion;
+#   * triggerType Manual         - nothing starts on a schedule or an event;
+#   * image bound by digest      - a tag is never sufficient.
+#
+# The image carries no model weights. The checkpoints are fetched at run time
+# from the exact pinned revisions recorded in the execution lock, one at a time,
+# in fp16, with trust_remote_code=false.
+apiVersion: 2024-03-01
+kind: containerapp-job
+name: job-jspace-study3-p0-r1-pilot
+resourceGroup: rg-jspace-observation-sea
+subscription: 943bacdf-8b6e-4e3a-8126-a149f623d32e
+properties:
+  environmentId: cae-jspace-observation-sea-vnet2
+  workloadProfileName: gpu-t4
+  configuration:
+    triggerType: Manual
+    replicaTimeout: 7200
+    replicaRetryLimit: 0
+    manualTriggerConfig:
+      parallelism: 1
+      replicaCompletionCount: 1
+    registries:
+      - server: acrjspaceobssea0708231738.azurecr.io
+        identity: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+  template:
+    containers:
+      - name: p0-r1-pilot
+        # The digest is filled in from the published execution lock at launch
+        # time. It is deliberately not a tag and deliberately not a placeholder
+        # that could resolve to something else.
+        image: acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@IMAGE_DIGEST_FROM_EXECUTION_LOCK
+        command: ["/bin/bash"]
+        args: ["/workspace/p0_r1_model_pilot.sh", "READY_COMMIT", "IMAGE_DIGEST_FROM_EXECUTION_LOCK"]
+        resources:
+          cpu: 8
+          memory: 56Gi
+        env:
+          - name: RESULTS_DIR
+            value: /workspace/runtime/results
+          - name: HF_HUB_DISABLE_TELEMETRY
+            value: "1"
+          - name: TOKENIZERS_PARALLELISM
+            value: "false"
+identity:
+  type: UserAssigned
+  userAssignedIdentities:
+    /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea: {}
+boundary:
+  model_operating_executions_authorized: 1
+  additional_infrastructure_attempt: "only with a signed receipt proving zero tokenizer constructions, encodes, checkpoint downloads, model loads, GPU model operations, prefills, decodes, generations and scored rows"
+  output_conditioned_retry_authorized: false
+  hosted_provider_inference_calls: 0
+  seeds: 0
+  bank_rows: 0
+  positive_reference_operations: 0
+  evidence_ledger_rows: 0

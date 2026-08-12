@@ -1,25 +1,39 @@
 # Study 3 - next thread handoff
 
-> **DRAFT-V0.6 AND P0-R1 ARE PUBLISHED - TWO INDEPENDENT NEXT SESSIONS**
+> **P0-R1 IS EXECUTION READY - THE REPLAY GATE IS THE ONE NEXT SESSION**
 >
 > States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
-> and `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE`.
+> and `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE`.
 >
-> **What the next thread may do — either one, in a fresh session, not both in one.**
+> **The successor ordering is sequential, not a choice.** An earlier revision of
+> this handoff presented the final focused methods review and P0-R1 execution as
+> two interchangeable immediate successors. That was wrong: the controlling
+> authority requires the final focused review only **after** P0-R1 reaches a
+> terminal mechanically feasible disposition. The corrected order is:
 >
-> 1. **The focused final methods review of draft-v0.6.** Its scope is limited by
->    authority section 11 to the first-discriminative-token factorization, the
->    classifier repair, the affected accounting and the consistency of the
->    resulting candidate. It is **not** another general review of every
->    historical artifact and it **must not** reopen unrelated resolved findings
->    without a concrete contradiction in live v0.6 bytes. Start from
+> 1. **Execution-completion publication.** Done: the live replay gate, the
+>    canonical result/receipt/disposition writers, the complete bounded model
+>    runner, the Azure Container Apps T4 launcher and the immutable image digest
+>    now exist, and the execution lock in
+>    `studies/study3/pilot/p0_r1/p0_r1_execution_lock.json` binds them.
+> 2. **The fresh-session P0-R1 replay gate.** Continue from the published ready
+>    commit, not from an older baseline. The gate is replay-only: it reads the
+>    immutable P0-T artifacts and performs zero new encodes and zero model
+>    operations. If it fails, publish the registered stop and perform **no**
+>    model operation — do not repair and rerun.
+> 3. **Only if replay passes,** the single bounded GPU pilot, in that same
+>    execution session, bound to the locked image digest and the replay-pass
+>    receipt.
+> 4. **Only after a mechanically feasible terminal P0-R1 disposition,** one
+>    fresh, focused final methods review of draft-v0.6, scoped by authority
+>    section 11 to the first-discriminative-token factorization, the classifier
+>    repair, the affected accounting and the consistency of the resulting
+>    candidate. It is **not** another general review and it **must not** reopen
+>    unrelated resolved findings without a concrete contradiction in live v0.6
+>    bytes. Start from
 >    `studies/study3/analysis/final_focused_review_packet_v0_6.md`.
-> 2. **The P0-R1 replay gate.** Continue from the published P0-R1 registration
->    commit, not from an older baseline. Run the replay-only factorization gate
->    first; it performs zero new encodes. If it fails, publish a registered stop
->    and perform **no** model operation — do not repair and rerun. If it passes,
->    the repaired model pilot may run in one Azure containerized GPU job. Start
->    from `studies/study3/pilot/p0_r1/P0_R1_HANDOFF.md`.
+>
+> Start from `studies/study3/pilot/p0_r1/P0_R1_HANDOFF.md`.
 >
 > **What the next thread may not do.** No freeze, no seed, no bank, no interface
 > selection, no positive reference, no confirmation access, no `OD2` or `UR-22`
