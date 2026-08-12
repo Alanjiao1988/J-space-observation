@@ -1,0 +1,606 @@
+{
+  "attempt_binding": {
+    "attempt_id_rule": "the replay gate mints exactly one attempt id of the form gen2-<executable_code_commit[:12]>-<utc>; the model pilot consumes that same attempt id, writes under exactly that Blob prefix and refuses any receipt minted for a different attempt",
+    "one_replay_attempt_authorizes_at_most_one_model_pilot": true
+  },
+  "authorities": [
+    {
+      "bytes": 19632,
+      "path": "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+      "role": "the operative P0-R1 scientific and operational boundary",
+      "sha256": "f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2"
+    },
+    {
+      "bytes": 23486,
+      "path": "studies/study3/prompts/study3_p0_r1_pre_replay_execution_completion_authority_rev2.md",
+      "role": "the model-free execution-completion supplement; it corrects pre-replay implementation and sequencing defects and changes no scoring rule, corpus, allocation, cap or claim boundary",
+      "sha256": "ffe75ba42c023e959f3beb23927604c3ae72c07fb4b25be346f504c8ea2930de"
+    },
+    {
+      "bytes": 30706,
+      "path": "studies/study3/prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md",
+      "role": "the model-free post-ready transport, runtime-binding, durable partial-result and exception-safety completion authority; it changes no scoring rule, corpus, allocation, cap, model or tokenizer identity, rendering, parser, statistic, claim boundary, role meaning, smoke criterion or terminal-state meaning",
+      "sha256": "5594e9728e8e4eb14635c34fb4895e65f2a8fa152ff2bffe76aec33a3ea84d18"
+    }
+  ],
+  "caps": {
+    "additional_gpu_attempt_with_signed_zero_operation_receipt": 1,
+    "bank_rows_written": 0,
+    "distinct_checkpoint_identities_downloaded": 3,
+    "distinct_tokenizer_identities_constructed": 3,
+    "gpu_jobs_performing_a_model_operation": 1,
+    "hosted_provider_inference_calls": 0,
+    "model_weight_loads": 3,
+    "non_generative_prefill_evaluations": 180,
+    "positive_reference_operations": 0,
+    "s1_scored_rows": 162,
+    "s2_scored_rows": 18,
+    "s3_cpu_only_reuse_scored_rows": 18,
+    "s4_generation_calls": 12,
+    "s4_incremental_decode_evaluations": 36,
+    "s4_prefill_evaluations": 12,
+    "s4_scored_generation_rows": 12,
+    "seeds_drawn": 0,
+    "tokenizer_encoded_sequences": 10000,
+    "total_scored_rows": 210,
+    "total_sequence_level_model_evaluation_equivalents": 228
+  },
+  "claim_boundary": "a methods-feasibility continuation. It selects no interface, sets no threshold, passes no formal gate, answers no research question, resolves neither OD2 nor UR-22, freezes nothing and produces no evidence-ledger row.",
+  "corpus_and_p0_t": [
+    {
+      "bytes": 69781,
+      "path": "studies/study3/pilot/p0/corpus/p0_corpus.json",
+      "role": "the frozen 35-cell / 70-member P0 corpus",
+      "sha256": "5343019a334ce666bb3e7f7f57d87181550aa90fad4815ba51a7ba3f571e1c6c"
+    },
+    {
+      "bytes": 7850,
+      "path": "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+      "role": "the published P0-T disposition",
+      "sha256": "9d6a6508383ebd5f6e4f0bb97a5b75de282da3cf28afba837b923cd1a6ec66eb"
+    },
+    {
+      "bytes": 7934,
+      "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
+      "role": "the published P0-T receipt",
+      "sha256": "0b28fbe6f633cc5a6d0664588fb685065d15ab1c301a1540d1e12f7c7b69e737"
+    },
+    {
+      "bytes": 5820022,
+      "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
+      "role": "the published P0-T tokenizer gate result",
+      "sha256": "9603b61165bc0b405fe8eb6103a56e646ceb2e254a33e0eba2ee2d035f03a85f"
+    }
+  ],
+  "counters_before_execution": {
+    "additional_gpu_attempt_with_signed_zero_operation_receipt": 0,
+    "bank_rows_written": 0,
+    "common_prefix_tokens_processed": 0,
+    "distinct_checkpoint_identities_downloaded": 0,
+    "distinct_tokenizer_identities_constructed": 0,
+    "exceptions_observed": 0,
+    "generated_tokens": 0,
+    "gpu_jobs_performing_a_model_operation": 0,
+    "hosted_provider_inference_calls": 0,
+    "model_weight_loads": 0,
+    "non_generative_prefill_evaluations": 0,
+    "parser_calls": 0,
+    "positive_reference_operations": 0,
+    "registered_prompt_tokens_processed": 0,
+    "replay_gate_evaluations": 0,
+    "restricted_logit_reads": 0,
+    "runtime_batched_forward_calls": 0,
+    "runtime_batched_tokenizer_calls": 0,
+    "s1_scored_rows": 0,
+    "s2_scored_rows": 0,
+    "s3_cpu_only_reuse_scored_rows": 0,
+    "s4_generation_calls": 0,
+    "s4_incremental_decode_evaluations": 0,
+    "s4_prefill_evaluations": 0,
+    "s4_scored_generation_rows": 0,
+    "scoring_context_tokens_processed": 0,
+    "seeds_drawn": 0,
+    "tokenizer_construction_events": 0,
+    "tokenizer_encoded_sequences": 0,
+    "total_scored_rows": 0,
+    "total_sequence_level_model_evaluation_equivalents": 0
+  },
+  "dependency_lock": {
+    "durable_transport": {
+      "bytes": 1779,
+      "path": "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1-transport-v2.txt",
+      "sha256": "e53ed34b97c83285fc7a738b573a08f9155e66ff909ead5de9f762d94745aea9"
+    },
+    "frozen_science": {
+      "bytes": 790,
+      "path": "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt",
+      "sha256": "a33a66e11ad104b0c402e6decc70f62d1941580c4ea46c1b56f0c023849d2fd8"
+    },
+    "generation_2_moves_no_frozen_science_pin": true,
+    "the_build_constructs_the_real_managed_identity_client": true,
+    "the_transport_closure_is_installed_under_the_science_set_as_a_constraint_file": true
+  },
+  "document_class": "study3_p0_r1_execution_lock",
+  "executable_code": {
+    "blobs": [
+      {
+        "bytes": 6577,
+        "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1",
+        "sha256": "3a39f1b7e6939ee77aff438524041d891bd5ae4bf09b9e4e4ea437e89a26b324"
+      },
+      {
+        "bytes": 10413,
+        "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1-v2",
+        "sha256": "2e3703ea3c8fc8373e8f9a470137c7e32314361c5a0c8977ced579fe2d1d1abe"
+      },
+      {
+        "bytes": 1883,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_acr_task.yaml",
+        "sha256": "5594284e8be22b31786ca7cdfd2b66d244b24fcd30c67dd486f3708c5cec2081"
+      },
+      {
+        "bytes": 2288,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_acr_task_v2.yaml",
+        "sha256": "a89a259b530aa56d3ef0cd63023bb707947e2466a7ff618694f0068942b51867"
+      },
+      {
+        "bytes": 1472,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_checkout.sh",
+        "sha256": "9c3abed6e3cd2cd19b389c0b438b073f5ae1ea54f7af4acc14b94bbcebd5643b"
+      },
+      {
+        "bytes": 3143,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_gpu_job.yaml",
+        "sha256": "7a04e957b25a6ad090b7d4da92f8506f126f0c4a7390bd37e5d44480d36edd4f"
+      },
+      {
+        "bytes": 5008,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_gpu_job_v2.yaml",
+        "sha256": "b82d0d7b2e604f5929b18121ce156c45877cae07e4ecb04819493d22f55d0b9c"
+      },
+      {
+        "bytes": 2905,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_image_manifest.py",
+        "sha256": "4dec7de4a317c1d220110829644b32d9270ee819f3d08874717b412f442a39b4"
+      },
+      {
+        "bytes": 6784,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_image_manifest_v2.py",
+        "sha256": "ca04e402b7847754ebcbee3986fceab6fc3f3ff32f060c918f3670808b2b3f4b"
+      },
+      {
+        "bytes": 3594,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_launch_gpu_pilot.sh",
+        "sha256": "260429387ee95b1ea7ae362f4da7b07b51b23e3c5c2b58e565051e17d5055668"
+      },
+      {
+        "bytes": 5914,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_launch_gpu_pilot_v2.sh",
+        "sha256": "b173a94dcc2f541a3e944eca09249222e4003dcf6fc96687124539b7aff01cb2"
+      },
+      {
+        "bytes": 2462,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_model_pilot.sh",
+        "sha256": "82aca125898d3232cb2de71cb2c72af8bf8caedc608272f6def564da5f14a7c0"
+      },
+      {
+        "bytes": 4442,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_model_pilot_v2.sh",
+        "sha256": "98ca42c0b06a55ebdd5e61cf80a9f181996baf71d0bc422b06f7e76d91dac1a0"
+      },
+      {
+        "bytes": 1554,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_no_accelerator_probe.py",
+        "sha256": "c300ef13736f1d950a0bfdd5b37bd95ba7bc21bb115f59b13dda2a00b5161b14"
+      },
+      {
+        "bytes": 2672,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_prestart_guard.py",
+        "sha256": "1da8da02201770151b8f74cb439832ebad19db2327f1c1fc90677b186203068e"
+      },
+      {
+        "bytes": 3711,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_replay.sh",
+        "sha256": "abe8095911d79773b768516701b720ab8dbe7fa15165ab01a2cadf9419514788"
+      },
+      {
+        "bytes": 3474,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_replay_v2.sh",
+        "sha256": "9bfe7838fd77eb6e6f45f5b8eb77fa95d1a95f0743d97897c912012ceaccb097"
+      },
+      {
+        "bytes": 1521,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_require_accelerator.py",
+        "sha256": "346a9de638ba7f6554dc563901e424ea60171e38c6760884039cf42ca42d3a84"
+      },
+      {
+        "bytes": 6300,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_successor.sh",
+        "sha256": "f55a0daba18e33b44ae33d465e8bdd815489de94a4d573fd2bec5505adf9bc14"
+      },
+      {
+        "bytes": 2152,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_transport_canary_v2.sh",
+        "sha256": "30f3d5553ae1c11fc00325f9defda8a970250c817d562553bb7e047a3cd86363"
+      },
+      {
+        "bytes": 3597,
+        "path": "studies/study3/pilot/p0_r1/container/p0_r1_verify_replay_receipt.py",
+        "sha256": "80cec0a71e942bef50db5050c28eb108a929bfd09a6649a9cf6a59b9389c6c15"
+      },
+      {
+        "bytes": 1779,
+        "path": "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1-transport-v2.txt",
+        "sha256": "e53ed34b97c83285fc7a738b573a08f9155e66ff909ead5de9f762d94745aea9"
+      },
+      {
+        "bytes": 790,
+        "path": "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt",
+        "sha256": "a33a66e11ad104b0c402e6decc70f62d1941580c4ea46c1b56f0c023849d2fd8"
+      },
+      {
+        "bytes": 10229,
+        "path": "studies/study3/pilot/p0_r1/execution/p0_r1_model_execution.py",
+        "sha256": "392f78466ee61ed303b5cf4b1fba4423e38b128441aeec1de119315b2e52a5ee"
+      },
+      {
+        "bytes": 13630,
+        "path": "studies/study3/pilot/p0_r1/execution/p0_r1_model_execution_v2.py",
+        "sha256": "e6cc55fb354dc697a825fc57c476f5969c89c9c10f5f19fc868d71fac18b6542"
+      },
+      {
+        "bytes": 27409,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_blob_transport.py",
+        "sha256": "c1465a62330441e2e889bfd5a62dcf8aeaee6a7be7bce2bde0286159a7693489"
+      },
+      {
+        "bytes": 17530,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_counters.py",
+        "sha256": "da6aa9a8038ac5b53ea04cc8e31eaaf7f7aa5614cc600a8433b80e9369245d07"
+      },
+      {
+        "bytes": 17986,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_eligibility.py",
+        "sha256": "e63e804b6590e8f1474af47374c1fc96e5b66cf6c1472c9c3b386fc62e6dc5ea"
+      },
+      {
+        "bytes": 23461,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock.py",
+        "sha256": "c620412991ad94316b360fdc2160caffda21d57c48f3f28693d7e4eddacf3453"
+      },
+      {
+        "bytes": 33933,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.py",
+        "sha256": "b7a7c91c6bdf796ee651cac981092007e45618ea2cb5a492f2f7966cf87ef969"
+      },
+      {
+        "bytes": 31955,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_factorization.py",
+        "sha256": "fdc564c6a0e6fea17b39089f7c2f9403d401e47ad14bb6e8bb7880eed73d380e"
+      },
+      {
+        "bytes": 27676,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_journal.py",
+        "sha256": "8b871ac7f9f874fc4ff3a936b354021fad629c9f91327cc891f291636f35a632"
+      },
+      {
+        "bytes": 36992,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_model_runner.py",
+        "sha256": "4691c87974562c7c9d2a0694ce383751224c582ad230f5ddbda37db2f0b90cd3"
+      },
+      {
+        "bytes": 20951,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_model_runner_v2.py",
+        "sha256": "1457c57c28491f3c66789a6894fa416ff3d20c960fbf61fb40202b9de26ebb19"
+      },
+      {
+        "bytes": 32006,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
+        "sha256": "072f29962e8472b54c16303fb04ca610cf3d85be14f973593b4a32dea49ad917"
+      },
+      {
+        "bytes": 32355,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_replay_gate.py",
+        "sha256": "1755ee5e188021ce849dce18362365decc9f67d35d3602b037d4c1e7d7e4a15a"
+      },
+      {
+        "bytes": 20501,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_replay_gate_v2.py",
+        "sha256": "da8711f9b48efbc17499a2b3c91e9e7a72a73a10c5714197b6f64bbbf6001cde"
+      },
+      {
+        "bytes": 22100,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_runtime_binding.py",
+        "sha256": "da6d624a76d4052a6c586199f8d70b6b29a0b1571f064ca766a6548d0df98e24"
+      },
+      {
+        "bytes": 25696,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_schemas.py",
+        "sha256": "1e500abe2df45e9454af420e28c225fcdc96fa212dd2532e41e39f7613732a05"
+      },
+      {
+        "bytes": 4334,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_summarize.py",
+        "sha256": "996f7e44bb3e6bef0cfc70fa16e44c883a954bec4613358d5c5421f37457e413"
+      },
+      {
+        "bytes": 25796,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_transport.py",
+        "sha256": "ebe1f8e49f831c18474e1a0f82551bf4734f3ebdadde57754b092d7b5c396599"
+      },
+      {
+        "bytes": 13947,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_validate.py",
+        "sha256": "16c1ba8e31019df76711462d007fa0deeb0784d146ddf615c2c5e31df11edefa"
+      }
+    ],
+    "commit": "863aca8b3a2ac73d9e8c031f762bda6fae125059",
+    "no_executable_byte_may_change_after_the_image_build": true,
+    "tree": "f48f577fa008d3e0ecfabff281bdae2e4a14a6b0"
+  },
+  "generation": 2,
+  "generation_1": {
+    "bytes": 10728,
+    "checkpoint_downloads": 0,
+    "consumed": false,
+    "executable_code_commit": "aad14c45e9681a34f382aa95c55ac875d2ca98ce",
+    "executions": 0,
+    "gpu_allocations": 0,
+    "image_digest": "sha256:7e2690feb6854a53f096d5b321e69fddebd2b744289c760e2fe74ed1ccec8176",
+    "launchable": false,
+    "model_weight_loads": 0,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock.json",
+    "reason": "the generation-1 image could not have run: its job command /workspace/p0_r1_model_pilot.sh is not a path in the image, its entry point defaults SRC to the /workspace/src checkout mount that no GPU job provides, and the executor loads an execution lock the image cannot contain because the lock necessarily postdates the digest it binds. It remains an unconsumed historical object and is inert for execution.",
+    "sha256": "f0e0e6b609091adeb063893687659b0df3e919135c11b8e977575f15bec26c40",
+    "superseded": true,
+    "superseded_by": "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json",
+    "tokenizer_constructions": 0,
+    "tokenizer_encodes": 0
+  },
+  "image": {
+    "base_image": "pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime",
+    "base_image_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
+    "bound_by_digest_never_by_tag": true,
+    "build_performed_no_replay_gate_tokenizer_checkpoint_or_gpu_operation": true,
+    "built_from_commit": "863aca8b3a2ac73d9e8c031f762bda6fae125059",
+    "contains_no_model_weights": true,
+    "contains_no_result_and_no_outcome_conditioned_byte": true,
+    "digest": "sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827",
+    "reference": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827",
+    "registry": "acrjspaceobssea0708231738.azurecr.io",
+    "repository": "j-space-observation-study3-p0-r1",
+    "supersedes_digest": "sha256:7e2690feb6854a53f096d5b321e69fddebd2b744289c760e2fe74ed1ccec8176"
+  },
+  "immutable_sources": [
+    {
+      "bytes": 69781,
+      "path": "studies/study3/pilot/p0/corpus/p0_corpus.json",
+      "role": "the frozen 35-cell / 70-member P0 corpus",
+      "sha256": "5343019a334ce666bb3e7f7f57d87181550aa90fad4815ba51a7ba3f571e1c6c"
+    },
+    {
+      "bytes": 7850,
+      "path": "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+      "role": "the published P0-T disposition",
+      "sha256": "9d6a6508383ebd5f6e4f0bb97a5b75de282da3cf28afba837b923cd1a6ec66eb"
+    },
+    {
+      "bytes": 7934,
+      "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
+      "role": "the published P0-T receipt",
+      "sha256": "0b28fbe6f633cc5a6d0664588fb685065d15ab1c301a1540d1e12f7c7b69e737"
+    },
+    {
+      "bytes": 5820022,
+      "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
+      "role": "the published P0-T tokenizer gate result",
+      "sha256": "9603b61165bc0b405fe8eb6103a56e646ceb2e254a33e0eba2ee2d035f03a85f"
+    }
+  ],
+  "legal_status": {
+    "draft_v0_6_frozen": false,
+    "draft_v0_6_reviewed": false,
+    "evidence_ledger_last_row": "EV-0016",
+    "formal_execution_authorized": false,
+    "interface_selected": null,
+    "od2": "UNRESOLVED_BLOCKING_OPERATOR_DECISION",
+    "p0_r1_pilot_execution_authorized": true,
+    "p0_r1_pilot_execution_consumed": false,
+    "positive_reference": null,
+    "rp_wrapper": null,
+    "ur22": "UNRESOLVED"
+  },
+  "permitted_sequence": [
+    "the replay gate runs first, CPU-only, inside the image bound by digest above, and emits its four exact artifacts through the verified complete-byte transport",
+    "only a recovered, byte-complete replay pass receipt authorizes the single bounded GPU model pilot",
+    "a replay failure publishes the registered stop and performs no model operation"
+  ],
+  "ready_commit_relationship": {
+    "executable_code_commit_is_an_ancestor_of_the_ready_commit": true,
+    "parent": "863aca8b3a2ac73d9e8c031f762bda6fae125059",
+    "rule": "the ready commit carries this lock and is a strict descendant of the executable code commit; the image digest is a function of the executable code commit, so it cannot be embedded in the image whose digest it defines. The launcher therefore receives the ready commit as an explicit argument, injects this lock's exact bytes into the container, and the container validates both before any model library is loaded."
+  },
+  "registration": {
+    "commit": "167d3067d7d9a2866999a51ec49c3c57c1d31546",
+    "state": "STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE",
+    "tree": "f7166f0441780bf0d034eb88a03c0d61e9049a2a"
+  },
+  "roles": {
+    "RI": {
+      "repository": "Qwen/Qwen2.5-Math-1.5B-Instruct",
+      "revision": "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35"
+    },
+    "RL": {
+      "repository": "Qwen/Qwen2.5-Math-1.5B",
+      "revision": "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2"
+    },
+    "RT": {
+      "repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+      "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+    }
+  },
+  "runtime_binding": {
+    "depends_on_the_acr_workspace_mount": false,
+    "entrypoints": [
+      "/usr/local/bin/p0_r1_model_pilot_v2.sh",
+      "/usr/local/bin/p0_r1_replay_v2.sh",
+      "/usr/local/bin/p0_r1_transport_canary_v2.sh"
+    ],
+    "injection_version": "study3-p0-r1-runtime-injection-v2",
+    "job_name": "job-jspace-study3-p0-r1-pilot-g2",
+    "lock_and_receipt_are_injected_as_exact_size_checked_bytes": true,
+    "model_pilot_job_command": "/usr/local/bin/p0_r1_model_pilot_v2.sh",
+    "standalone_source_root": "/opt/jspace/src",
+    "writable_runtime_root": "/workspace/runtime"
+  },
+  "schema_version": "study3-p0-r1-execution-lock-v2",
+  "smoke_exact_allocation": {
+    "non_generative_prefill_evaluations": 60,
+    "s3_cpu_only_reuse_scored_rows": 6,
+    "s4_generation_calls": 0,
+    "total_scored_rows": 66
+  },
+  "stage": "P0-R1",
+  "state": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE",
+  "state_transition": [
+    "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE",
+    "STUDY3_P0_R1_REPLAY_GATE_PASSED_AWAITING_MODEL_PILOT"
+  ],
+  "superseded": false,
+  "transport": {
+    "artifacts_are_persisted_to_private_blob_under_managed_identity": true,
+    "canaries": {
+      "private_blob": {
+        "accelerator_visible": false,
+        "account": "stjspacefiles0709085305",
+        "attempt_id": "gen2canary-863aca8b3a2a",
+        "azure_execution_name": "job-jspace-s3-p0r1-canary-g2-kqpquxz",
+        "backend": "azure-private-blob",
+        "canary": "private_blob",
+        "checkpoint_downloads": 0,
+        "container": "jspace-results",
+        "credential_kind": "managed-identity",
+        "gpu_workload_allocated": false,
+        "image_digest": "sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827",
+        "job": "job-jspace-s3-p0r1-canary-g2",
+        "manifest": {
+          "object": "study3/p0_r1/gen2/gen2canary-863aca8b3a2a/p0_r1_artifact_manifest.json",
+          "sha256": "6f157cd79a30961249b28eb0739dd524249b1e837780ec0f38400b773d868843"
+        },
+        "manifest_written_last": true,
+        "model_operations": 0,
+        "objects": [
+          {
+            "bytes": 262144,
+            "object": "study3/p0_r1/gen2/gen2canary-863aca8b3a2a/p0_r1_canary_a.bin",
+            "sha256": "a51f910e2e4984d6c7aa69bce7846045b607bc5b0660f3f41b76c1a492a9e40c"
+          },
+          {
+            "bytes": 262144,
+            "object": "study3/p0_r1/gen2/gen2canary-863aca8b3a2a/p0_r1_canary_b.bin",
+            "sha256": "d547be8df2565cce1c41781f106ea8d20e70a17ea874f3bccb897dff7de5fe04"
+          },
+          {
+            "bytes": 262144,
+            "object": "study3/p0_r1/gen2/gen2canary-863aca8b3a2a/p0_r1_canary_c.bin",
+            "sha256": "7ee335d17d37b07ab33abd055fb76a34295b2a910191f482467702ec6c42c4d0"
+          },
+          {
+            "bytes": 262144,
+            "object": "study3/p0_r1/gen2/gen2canary-863aca8b3a2a/p0_r1_canary_d.bin",
+            "sha256": "98abb4608ed498c3c281fe2583622d0e36acb710e38d6ab4e96f105373b0aac8"
+          }
+        ],
+        "one_shot_envelope_consumed": false,
+        "overwrite_used": false,
+        "passed": true,
+        "prefix": "study3/p0_r1/gen2/gen2canary-863aca8b3a2a/",
+        "prior_failed_execution": {
+          "azure_execution_name": "job-jspace-s3-p0r1-canary-g2-56y38fa",
+          "failure": "ModuleNotFoundError: No module named 'azure'",
+          "image_digest": "sha256:928dc59b86c6ba5b3162b7f79f68f5195b59c6fb6a30bfbfabf34a774b8eef1c",
+          "meaning": "that image carried no client for the private object store and was discarded",
+          "objects_written": 0
+        },
+        "recovered_byte_exact": true,
+        "replay_gate_run": false,
+        "token": "P0_R1_BLOB_CANARY_COMPLETE=1",
+        "tokenizer_constructions": 0,
+        "tokenizer_encodes": 0,
+        "total_object_bytes": 1048576,
+        "workload_profile": "Consumption"
+      },
+      "replay_transport": {
+        "accelerator_visible": false,
+        "artifacts": 4,
+        "attempt_id": "p0-r1-transport-self-check",
+        "azure_execution_name": "job-jspace-s3-p0r1-canary-g2-kqpquxz",
+        "canary": "replay_transport",
+        "checkpoint_downloads": 0,
+        "gpu_workload_allocated": false,
+        "image_digest": "sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827",
+        "job": "job-jspace-s3-p0r1-canary-g2",
+        "lines": 2053,
+        "max_line_bytes": 945,
+        "model_operations": 0,
+        "one_shot_envelope_consumed": false,
+        "passed": true,
+        "recovered_byte_exact": true,
+        "replay_gate_run": false,
+        "token": "P0_R1_TRANSPORT_SELF_CHECK=1",
+        "tokenizer_constructions": 0,
+        "tokenizer_encodes": 0,
+        "total_bytes": 1048576,
+        "workload_profile": "Consumption"
+      },
+      "standalone_layout": {
+        "accelerator_visible": false,
+        "azure_execution_name": "job-jspace-s3-p0r1-canary-g2-kqpquxz",
+        "canary": "standalone_layout",
+        "checkpoint_downloads": 0,
+        "depends_on_the_acr_workspace_mount": false,
+        "entrypoints": [
+          "/usr/local/bin/p0_r1_model_pilot_v2.sh",
+          "/usr/local/bin/p0_r1_replay_v2.sh",
+          "/usr/local/bin/p0_r1_transport_canary_v2.sh"
+        ],
+        "gpu_workload_allocated": false,
+        "image_digest": "sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827",
+        "job": "job-jspace-s3-p0r1-canary-g2",
+        "model_operations": 0,
+        "one_shot_envelope_consumed": false,
+        "passed": true,
+        "replay_gate_run": false,
+        "required_source_paths": 17,
+        "standalone_source_root": "/opt/jspace/src",
+        "token": "P0_R1_STANDALONE_LAYOUT_OK=1",
+        "tokenizer_constructions": 0,
+        "tokenizer_encodes": 0,
+        "workload_profile": "Consumption"
+      }
+    },
+    "complete_byte_recovery_is_verified_before_any_pass_authorization": true,
+    "implementation": [
+      {
+        "bytes": 25796,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_transport.py",
+        "sha256": "ebe1f8e49f831c18474e1a0f82551bf4734f3ebdadde57754b092d7b5c396599"
+      },
+      {
+        "bytes": 27409,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_blob_transport.py",
+        "sha256": "c1465a62330441e2e889bfd5a62dcf8aeaee6a7be7bce2bde0286159a7693489"
+      },
+      {
+        "bytes": 27676,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_journal.py",
+        "sha256": "8b871ac7f9f874fc4ff3a936b354021fad629c9f91327cc891f291636f35a632"
+      },
+      {
+        "bytes": 22100,
+        "path": "studies/study3/pilot/p0_r1/p0_r1_runtime_binding.py",
+        "sha256": "da6d624a76d4052a6c586199f8d70b6b29a0b1571f064ca766a6548d0df98e24"
+      }
+    ]
+  }
+}

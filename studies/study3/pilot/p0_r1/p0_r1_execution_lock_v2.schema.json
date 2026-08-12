@@ -1,0 +1,181 @@
+{
+  "$id": "https://j-space-observation/study3/p0_r1_execution_lock_v2.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "attempt_binding": {
+      "type": "object"
+    },
+    "authorities": {
+      "minItems": 3,
+      "type": "array"
+    },
+    "caps": {
+      "type": "object"
+    },
+    "claim_boundary": {
+      "type": "string"
+    },
+    "corpus_and_p0_t": {
+      "type": "array"
+    },
+    "counters_before_execution": {
+      "type": "object"
+    },
+    "dependency_lock": {
+      "type": "object"
+    },
+    "document_class": {
+      "const": "study3_p0_r1_execution_lock"
+    },
+    "executable_code": {
+      "required": [
+        "commit",
+        "tree",
+        "blobs"
+      ],
+      "type": "object"
+    },
+    "generation": {
+      "const": 2
+    },
+    "generation_1": {
+      "properties": {
+        "consumed": {
+          "const": false
+        },
+        "launchable": {
+          "const": false
+        },
+        "superseded": {
+          "const": true
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256",
+        "consumed",
+        "superseded",
+        "launchable",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "image": {
+      "required": [
+        "registry",
+        "repository",
+        "digest",
+        "reference",
+        "base_image",
+        "base_image_digest",
+        "built_from_commit"
+      ],
+      "type": "object"
+    },
+    "immutable_sources": {
+      "type": "array"
+    },
+    "legal_status": {
+      "properties": {
+        "formal_execution_authorized": {
+          "const": false
+        },
+        "p0_r1_pilot_execution_authorized": {
+          "const": true
+        },
+        "p0_r1_pilot_execution_consumed": {
+          "const": false
+        }
+      },
+      "required": [
+        "formal_execution_authorized",
+        "p0_r1_pilot_execution_authorized",
+        "p0_r1_pilot_execution_consumed"
+      ],
+      "type": "object"
+    },
+    "permitted_sequence": {
+      "type": "array"
+    },
+    "ready_commit_relationship": {
+      "type": "object"
+    },
+    "registration": {
+      "type": "object"
+    },
+    "roles": {
+      "type": "object"
+    },
+    "runtime_binding": {
+      "properties": {
+        "depends_on_the_acr_workspace_mount": {
+          "const": false
+        }
+      },
+      "required": [
+        "standalone_source_root",
+        "entrypoints",
+        "model_pilot_job_command",
+        "job_name",
+        "depends_on_the_acr_workspace_mount"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "study3-p0-r1-execution-lock-v2"
+    },
+    "smoke_exact_allocation": {
+      "type": "object"
+    },
+    "stage": {
+      "const": "P0-R1"
+    },
+    "state": {
+      "const": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE"
+    },
+    "state_transition": {
+      "type": "array"
+    },
+    "superseded": {
+      "const": false
+    },
+    "transport": {
+      "required": [
+        "implementation",
+        "canaries"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "document_class",
+    "generation",
+    "stage",
+    "state",
+    "superseded",
+    "authorities",
+    "registration",
+    "generation_1",
+    "executable_code",
+    "ready_commit_relationship",
+    "image",
+    "runtime_binding",
+    "transport",
+    "dependency_lock",
+    "corpus_and_p0_t",
+    "immutable_sources",
+    "roles",
+    "caps",
+    "smoke_exact_allocation",
+    "counters_before_execution",
+    "state_transition",
+    "attempt_binding",
+    "legal_status",
+    "claim_boundary",
+    "permitted_sequence"
+  ],
+  "title": "Study 3 P0-R1 generation-2 execution lock",
+  "type": "object"
+}
