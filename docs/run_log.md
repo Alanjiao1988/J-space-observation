@@ -7295,3 +7295,67 @@ research question remains unanswered.
 The session ends in `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE`. It did not
 perform the replay gate, construct a tokenizer, download a checkpoint, allocate a
 GPU or begin the model pilot, and it did not begin the final focused review.
+
+Where the normative scoring boundary lives, and why. The registration lives
+entirely in the new v0.6 rendering and scoring registry and its committed schema.
+The draft-v0.5 protocol JSON, its Markdown companion and the protocol schema are
+byte-identical to the baseline. That placement is forced rather than chosen: the
+immutable P0 corpus manifest byte-binds
+`studies/study3/protocol/interface_calibration_protocol_draft.json` at 418,733
+bytes, sha256 `1197e08779f6360a50effeafa8035d9b1d21c0a3b038ecc7cbc0930be03c7ca7`,
+as a generator identity, so editing that file makes the manifest stop reproducing
+and fails
+`tests/test_study3_p0_feasibility_pilot.py::test_frozen_corpus_re_derives_byte_exactly`,
+one of the 122 historical P0 tests section 10 requires to be retained and one
+that section 9 forbids adjusting.
+
+This was observed rather than assumed. An additive `scoring_boundary_v0_6` block
+was drafted into the protocol JSON, its Markdown companion and the protocol
+schema, published to working commit `81d9dfa5`, and validated in the registered
+CPU route. Full-suite run `cmf4` recorded the exact consequence: 3 failed, 4,339
+passed, 15 skipped, where the third failure was that manifest test and the
+arithmetic reconciled as 4,262 historical passes plus 77 net-new. Targeted run
+`cmfa` isolated it further at 121 passed and 1 failed. The three protocol files
+were then restored to their baseline blobs `90bf98e4`, `31d0f00c` and `755c39ba`,
+the manifest reproduces again, and the constraint is disclosed in the amendment
+record, its schema, the focused-review packet and this log rather than left in a
+commit message. The consequence for later rounds is stated plainly there: the
+draft protocol JSON is effectively frozen for as long as the published P0
+artifacts must reproduce byte-exactly.
+
+Authoritative validation. Every run below is CPU-only in the registered Azure
+Container Registry route, on a clean exact-commit checkout cloned from an
+uploaded Git bundle, with `GPU_COUNT=0`, `CUDA_AVAILABLE=False`, zero tokenizer
+encodes and zero model operations. Against the published registration commit
+`2e9814b8cbcd3f9e3f98c574379f21e23dbc584a`: `cmfc` 122 passed for the historical
+P0 module, `cmfd` 46 passed for `tests/test_study3_p0_r1_registration.py`, `cmfe`
+31 passed for `tests/test_study3_rendering_registry_v0_6.py`, `cmff` 240 passed
+for `tests/test_study3_design.py`, `cmfg` 36 passed for
+`tests/test_study3_rendering_registry_v0_5.py`, and `cmf9` 88 passed for
+`tests/test_study3_methods_review_v0_4.py`. Every published targeted baseline is
+retained exactly: 240, 36, 88 and 122.
+
+Full-suite run `cmfb` returned 4,340 passed, 15 skipped and exactly 2 failed,
+both the registered historical `tests/test_parser_v3_seal_job` failures
+`test_seal_writes_twelve_objects_with_the_set_manifest_last` and
+`test_seal_refuses_a_non_empty_parent_prefix`, with
+`FULL_SUITE_ACCEPTED_HISTORICAL_FAILURES_ONLY=1`. The reconciliation is exact:
+4,263 historical passes plus 77 net-new calibration passes equals 4,340, where
+the 77 are the 46 node IDs of the P0-R1 registration module and the 31 node IDs
+of the draft-v0.6 registry module. Earlier runs are recorded rather than
+discarded: `cmf0` and `cmf1` failed on three over-strict assertions in the new
+test modules themselves, `cmf4` and `cmfa` failed on the manifest binding
+described above, and each was repaired and re-run rather than retried unchanged.
+
+Counters and protected bytes at publication. Tokenizer constructions 0, tokenizer
+encodes 0, checkpoint downloads 0, model weight loads 0, GPU allocations 0,
+forward passes 0, generations 0, scored rows 0, seeds 0, bank rows 0, evidence
+rows 0, and 0 local pytest runs. The immutable P0-T counter snapshot is carried
+forward unchanged at 4,956 encodes and 3 tokenizer identities. 46 byte-protected
+objects are verified unchanged, including every byte under
+`studies/study3/pilot/p0/`, `tests/test_study3_p0_feasibility_pilot.py`, the
+draft-v0.5 registry and schema, the v0.5 amendment record and design receipt, and
+`paper/evidence_ledger.csv`, which is byte-identical and still ends at `EV-0016`.
+The changed-path census is 41 paths, every one of them inside the section 9
+allowlist, with no deletion, rename, copy, symlink, submodule, binary artifact,
+merge commit, rebase, force push, workflow or branch-label operation.
