@@ -83,6 +83,48 @@ RUN python /workspace/studies/study3/pilot/p0_r1/p0_r1_validate.py --image-build
     && python /workspace/studies/study3/pilot/p0_r1/p0_r1_factorization.py --check \
     && python /workspace/studies/study3/pilot/p0_r1/p0_r1_protocol.py --check
 
+# Emit an image self-manifest at a path the ACR task source mount cannot shadow.
+# An `az acr run` step mounts its uploaded context over /workspace, so a
+# post-build check that read /workspace/studies would be reading the context,
+# not the image. Recording the blob identities under /opt makes the
+# "this image really carries these exact bytes" check verifiable after the build
+# rather than merely asserted at build time.
+RUN mkdir -p /opt/jspace && python - <<'PY'
+import hashlib
+import json
+import os
+
+paths = [
+    "studies/study3/pilot/p0_r1/p0_r1_counters.py",
+    "studies/study3/pilot/p0_r1/p0_r1_eligibility.py",
+    "studies/study3/pilot/p0_r1/p0_r1_execution_lock.py",
+    "studies/study3/pilot/p0_r1/p0_r1_factorization.py",
+    "studies/study3/pilot/p0_r1/p0_r1_model_runner.py",
+    "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
+    "studies/study3/pilot/p0_r1/p0_r1_replay_gate.py",
+    "studies/study3/pilot/p0_r1/p0_r1_schemas.py",
+    "studies/study3/pilot/p0_r1/p0_r1_summarize.py",
+    "studies/study3/pilot/p0_r1/p0_r1_validate.py",
+    "studies/study3/pilot/p0_r1/execution/p0_r1_model_execution.py",
+    "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt",
+    "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+    "studies/study3/prompts/"
+    "study3_p0_r1_pre_replay_execution_completion_authority_rev2.md",
+]
+manifest = {}
+for relative in paths:
+    full = os.path.join("/workspace", *relative.split("/"))
+    with open(full, "rb") as handle:
+        raw = handle.read()
+    manifest[relative] = {
+        "bytes": len(raw),
+        "sha256": hashlib.sha256(raw).hexdigest(),
+    }
+with open("/opt/jspace/p0_r1_image_manifest.json", "w") as handle:
+    json.dump(manifest, handle, indent=1, sort_keys=True)
+print("wrote /opt/jspace/p0_r1_image_manifest.json with %d blobs" % len(manifest))
+PY
+
 RUN install -d -o jspace -g jspace -m 0700 \
         /workspace/runtime/home \
         /workspace/runtime/results \
