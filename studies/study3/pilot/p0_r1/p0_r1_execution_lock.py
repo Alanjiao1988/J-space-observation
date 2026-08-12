@@ -91,6 +91,7 @@ EXECUTABLE_CODE_PATHS = (
     "studies/study3/pilot/p0_r1/container/p0_r1_acr_task.yaml",
     "studies/study3/pilot/p0_r1/container/p0_r1_checkout.sh",
     "studies/study3/pilot/p0_r1/container/p0_r1_gpu_job.yaml",
+    "studies/study3/pilot/p0_r1/container/p0_r1_image_manifest.py",
     "studies/study3/pilot/p0_r1/container/p0_r1_launch_gpu_pilot.sh",
     "studies/study3/pilot/p0_r1/container/p0_r1_model_pilot.sh",
     "studies/study3/pilot/p0_r1/container/p0_r1_replay.sh",
