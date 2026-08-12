@@ -7536,6 +7536,17 @@ Reconciliation: 4,340 historical passes + 47 net-new execution-readiness passes
 = 4,387. Skips remain 15 and the only failures are the same two historical node
 IDs with unchanged signatures.
 
+The governance-surface commit that carries this record was validated the same
+way before publication. On candidate `58397859d1a525b2b0b4ffeb0bf442d95d4014ec`,
+tree `fdf1f6a348adbf092bd757484ab7dc466618b146`, `DIRTY=0`, full-suite run
+`cmg4` returned 4,387 passed, 15 skipped and the same two registered historical
+failures, with `FULL_SUITE_ACCEPTED_HISTORICAL_FAILURES_ONLY=1`. As in the
+preceding round, recording a validation run ID inside the very file the run
+validates cannot terminate, so the regress is cut by rule here: this entry
+records the validation lineage up to the tree above, and the published commit's
+own final validation is reported in the round handoff rather than written back
+into this file.
+
 One full-suite run is recorded as a failure rather than discarded. Run `cmfu`
 returned 3 failed, 4,386 passed, 15 skipped: the two historical failures plus
 `test_the_live_gate_imports_no_model_library_and_leaves_counters_at_zero`. The
