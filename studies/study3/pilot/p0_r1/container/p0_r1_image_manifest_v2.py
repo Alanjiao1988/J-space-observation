@@ -24,6 +24,87 @@ import sys
 SRC = os.environ.get("P0_R1_SRC", "/opt/jspace/src")
 OUTPUT = "/opt/jspace/p0_r1_image_manifest_v2.json"
 
+#: The generation-1 frozen science set. Nothing installed for generation 2 may
+#: move any pin in it.
+FROZEN_SCIENCE_REQUIREMENTS = (
+    "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt")
+
+#: The generation-2 durable-transport closure, installed under the set above as
+#: a constraint file.
+TRANSPORT_REQUIREMENTS = (
+    "studies/study3/pilot/p0_r1/container/"
+    "requirements-study3-p0-r1-transport-v2.txt")
+
+
+def read_pins(relative):
+    """Return the ``name==version`` pins declared by a requirements file."""
+    pins = {}
+    with open(os.path.join(SRC, *relative.split("/")), "rb") as handle:
+        text = handle.read().decode("utf-8")
+    for line in text.splitlines():
+        line = line.split("#", 1)[0].strip()
+        if not line or "==" not in line:
+            continue
+        name, version = line.split("==", 1)
+        pins[name.strip()] = version.strip()
+    return pins
+
+
+def installed_version(name):
+    from importlib.metadata import PackageNotFoundError, version
+    for candidate in (name, name.lower(), name.replace("-", "_"),
+                      name.replace("_", "-")):
+        try:
+            return version(candidate)
+        except PackageNotFoundError:
+            continue
+    return None
+
+
+def verify_frozen_dependencies():
+    """Fail the build if a generation-2 install moved a science pin.
+
+    The frozen set is the one the consumed P0-T round pinned, so an
+    environment change could otherwise be mistaken for a scoring-boundary
+    effect. Generation 2 adds a durable-transport closure to the image; this is
+    the check that proves adding it changed nothing the science reads.
+    """
+    science = read_pins(FROZEN_SCIENCE_REQUIREMENTS)
+    transport = read_pins(TRANSPORT_REQUIREMENTS)
+    overlap = sorted(set(science) & set(transport))
+    if overlap:
+        raise AssertionError(
+            "the transport closure redeclares the frozen science pin(s) %s; "
+            "the science set is protected and may not be restated"
+            % ", ".join(overlap))
+    drifted = []
+    for name in sorted(science):
+        observed = installed_version(name)
+        if observed != science[name]:
+            drifted.append("%s pinned %s, installed %s"
+                           % (name, science[name], observed))
+    if drifted:
+        raise AssertionError(
+            "the generation-2 image moved the frozen science environment: %s"
+            % "; ".join(drifted))
+    missing = []
+    for name in sorted(transport):
+        observed = installed_version(name)
+        if observed != transport[name]:
+            missing.append("%s pinned %s, installed %s"
+                           % (name, transport[name], observed))
+    if missing:
+        raise AssertionError(
+            "the durable-transport closure is not installed as pinned: %s"
+            % "; ".join(missing))
+    return {
+        "frozen_science_pins": len(science),
+        "frozen_science_pins_unchanged_by_generation_2": True,
+        "transport_pins": len(transport),
+        "transport_closure_installed_as_pinned": True,
+        "transport_shares_no_pin_with_the_science_set": True,
+    }
+
 sys.path.insert(0, os.path.join(SRC, "studies", "study3", "pilot", "p0_r1"))
 
 import p0_r1_execution_lock_v2 as LOCK  # noqa: E402
@@ -69,10 +150,17 @@ def main():
         sys.stderr.write("FAIL: %s\n" % exc)
         return 2
 
+    try:
+        dependencies = verify_frozen_dependencies()
+    except AssertionError as exc:
+        sys.stderr.write("FAIL: %s\n" % exc)
+        return 2
+
     document = {
         "schema_version": "study3-p0-r1-image-manifest-v2",
         "standalone_source_root": SRC,
         "layout": layout,
+        "dependencies": dependencies,
         "authorities": [dict(entry) for entry in LOCK.AUTHORITIES],
         "blobs": manifest,
         "carries_no_result_and_no_outcome_conditioned_byte": True,
@@ -84,6 +172,9 @@ def main():
     print("wrote %s with %d blob identities" % (OUTPUT, len(manifest)))
     print("standalone source root %s; %d entry points verified"
           % (SRC, len(layout["entrypoints"])))
+    print("frozen science pins %d, unchanged; transport pins %d, installed"
+          % (dependencies["frozen_science_pins"],
+             dependencies["transport_pins"]))
     return 0
 
 

@@ -143,6 +143,78 @@ class InMemoryBackend(object):
         return sorted(name for name in self.objects if name.startswith(prefix))
 
 
+#: The pinned closure that makes the production route reachable. It is
+#: installed from container/requirements-study3-p0-r1-transport-v2.txt under
+#: the generation-1 frozen science set as a constraint file, so adding it
+#: cannot move a science pin.
+TRANSPORT_REQUIREMENTS = (
+    "studies/study3/pilot/p0_r1/container/"
+    "requirements-study3-p0-r1-transport-v2.txt")
+
+
+def _import_azure_sdk():
+    """Import the production SDK, or refuse in a way that names the repair.
+
+    Generation 1 had no export route at all. The first generation-2 image added
+    the route in code and still shipped without the client library, and the
+    failure surfaced only on the real infrastructure, as a bare
+    ``ModuleNotFoundError`` raised from deep inside a read-back. That is both
+    undiagnosable from a job log and the wrong exception type for the code that
+    exists to preserve partial results. A missing durable route is a transport
+    defect, and it now says so.
+    """
+    try:
+        from azure.identity import ManagedIdentityCredential
+        from azure.storage.blob import BlobServiceClient
+    except ImportError as exc:
+        raise BlobTransportDefect(
+            "the private object-store route is unreachable because the Azure "
+            "SDK is not installed in this image (%s). The durable transport "
+            "is not optional: install %s, whose closure is pinned, and "
+            "rebuild. Hashes printed to a console are not a recoverable "
+            "record." % (exc, TRANSPORT_REQUIREMENTS))
+    return ManagedIdentityCredential, BlobServiceClient
+
+
+def verify_production_backend():
+    """Prove at build time that the real route could be opened.
+
+    Constructs the managed-identity credential and the container client and
+    performs no request: authentication and I/O are both lazy. This is the gate
+    the earlier builds lacked. They exercised the transport against an
+    in-memory backend only, so an image with no client for the storage account
+    at all satisfied every gate it had and still could not have exported one
+    byte. A hash of a byte that cannot be fetched is not a durable record.
+    """
+    ManagedIdentityCredential, BlobServiceClient = _import_azure_sdk()
+    backend = AzureManagedIdentityBackend()
+    credential = ManagedIdentityCredential(client_id=backend.client_id)
+    service = BlobServiceClient(account_url=backend.account_url,
+                                credential=credential)
+    container = service.get_container_client(backend.container)
+    if container.container_name != backend.container:
+        raise BlobTransportDefect(
+            "the constructed client addresses %r, not the registered "
+            "container %r" % (container.container_name, backend.container))
+    versions = {}
+    for distribution in ("azure-identity", "azure-storage-blob", "azure-core"):
+        try:
+            from importlib.metadata import version as _version
+            versions[distribution] = _version(distribution)
+        except Exception as exc:  # pragma: no cover - reported, never fatal
+            versions[distribution] = "unknown (%s)" % exc
+    return {
+        "backend": "azure-private-blob",
+        "account_url": backend.account_url,
+        "container": backend.container,
+        "credential_kind": backend.credential_kind,
+        "identity_client_id": backend.client_id,
+        "client_constructed_without_any_request": True,
+        "sdk_versions": versions,
+        "requirements": TRANSPORT_REQUIREMENTS,
+    }
+
+
 class AzureManagedIdentityBackend(object):
     """The production backend. Managed identity through the private endpoint."""
 
@@ -157,8 +229,7 @@ class AzureManagedIdentityBackend(object):
     def _client(self):
         if self._container_client is not None:
             return self._container_client
-        from azure.identity import ManagedIdentityCredential
-        from azure.storage.blob import BlobServiceClient
+        ManagedIdentityCredential, BlobServiceClient = _import_azure_sdk()
 
         credential = ManagedIdentityCredential(client_id=self.client_id)
         service = BlobServiceClient(account_url=self.account_url,
@@ -441,6 +512,10 @@ def main(argv=None):
                         help="recover an attempt's artifacts to a local dir")
     parser.add_argument("--dry-run", action="store_true",
                         help="run the canary against the in-memory backend")
+    parser.add_argument("--verify-production-backend", action="store_true",
+                        help="construct the real managed-identity client and "
+                             "issue no request; the build gate that proves "
+                             "the image can reach the private object store")
     parser.add_argument("--attempt")
     parser.add_argument("--in-dir")
     parser.add_argument("--out-dir")
@@ -450,6 +525,21 @@ def main(argv=None):
 
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     try:
+        if args.verify_production_backend:
+            report = verify_production_backend()
+            for key in sorted(report):
+                if key != "sdk_versions":
+                    print("  %-34s %s" % (key, report[key]))
+            for name in sorted(report["sdk_versions"]):
+                print("  %-34s %s" % (name, report["sdk_versions"][name]))
+            if args.receipt:
+                with open(args.receipt, "wb") as handle:
+                    handle.write((json.dumps(report, indent=1, sort_keys=True,
+                                             ensure_ascii=True) + "\n")
+                                 .encode("utf-8"))
+            print("P0_R1_PRODUCTION_BLOB_BACKEND_CONSTRUCTIBLE=1")
+            return 0
+
         if args.recover:
             if not args.attempt or not args.out_dir:
                 print("--recover requires --attempt and --out-dir")

@@ -1,0 +1,41 @@
+# Study 3 P0-R1 generation-2 durable-transport dependencies.
+#
+# Authority: studies/study3/prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md
+# section 6, which requires the private Azure Blob route to be the primary
+# durable transport for the GPU pilot.
+#
+# Why this file exists at all, and why it is separate.
+#
+# The generation-1 frozen dependency set in requirements-study3-p0-r1.txt is a
+# protected scientific input: it is exactly the set the consumed P0-T round
+# pinned, and it is bound by the generation-1 execution lock and by the
+# protocol dependency hash. It may not be edited, so the transport SDK cannot
+# be added to it. It is also the constraint file for this install, so resolving
+# these packages cannot move a single science pin. If pip would have to move
+# one, the image build fails instead.
+#
+# The generation-1 image carried no client for the private object store at all.
+# Its build "verified transport" against an in-memory backend, so an image that
+# could not reach the storage account still passed every build gate. Hashes of
+# bytes that cannot be fetched are not a durable record. The build now
+# constructs the real managed-identity backend, so that failure mode cannot
+# ship again.
+#
+# The whole closure is pinned, not just the two direct packages, so the route
+# is reproducible from this file alone.
+#
+# None of these packages is imported by the replay gate, the factorization, the
+# parser, the scoring boundary or any model path. They carry result bytes out;
+# they never participate in producing them.
+azure-core==1.30.2
+azure-identity==1.17.1
+azure-storage-blob==12.22.0
+msal==1.30.0
+msal-extensions==1.2.0
+portalocker==2.10.1
+PyJWT==2.9.0
+cryptography==43.0.1
+cffi==1.17.1
+pycparser==2.22
+isodate==0.6.1
+six==1.16.0

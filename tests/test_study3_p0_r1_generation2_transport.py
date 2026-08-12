@@ -23,6 +23,7 @@ throughout, and each mutation reaches production code.
 """
 
 import base64
+import builtins
 import hashlib
 import json
 import os
@@ -1521,3 +1522,185 @@ def test_the_partial_result_state_is_new_not_a_reinterpretation():
                 if name.startswith("STATE_")}
     assert RUNNER.STATE_STOPPED_WITH_PARTIAL_RESULT not in existing
     assert RUNNER.STATE_COMPLETE == GEN1.STATE_COMPLETE
+
+
+# --- the durable route must exist, not merely be described -------------------
+#
+# The generation-2 image built at 76473be2766c passed every build gate it had
+# and still could not export one byte: it carried no client for the private
+# storage account. The dry-run canary used the in-memory backend, so nothing in
+# the build ever touched the production route. These nodes bind that repair.
+
+
+def _sdk_is_absent(monkeypatch):
+    """Make `import azure.*` fail the way a dependency-less image fails."""
+    real_import = builtins.__import__
+
+    def refuse(name, *args, **kwargs):
+        if name == "azure" or name.startswith("azure."):
+            raise ImportError("No module named 'azure'")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", refuse)
+    for name in [m for m in sys.modules if m == "azure" or m.startswith("azure.")]:
+        monkeypatch.delitem(sys.modules, name, raising=False)
+
+
+def test_an_image_without_a_private_store_client_fails_its_own_build_gate(
+        monkeypatch):
+    _sdk_is_absent(monkeypatch)
+    with pytest.raises(BLOB.BlobTransportDefect) as raised:
+        BLOB.verify_production_backend()
+    message = str(raised.value)
+    assert "requirements-study3-p0-r1-transport-v2.txt" in message
+    assert "not recoverable" in message or "not a recoverable record" in message
+
+
+def test_a_missing_transport_sdk_refuses_as_a_transport_defect(monkeypatch):
+    """The pilot's degradation path is written around BlobTransportDefect.
+
+    A bare ModuleNotFoundError raised from inside a read-back is both
+    undiagnosable from a job log and the wrong exception type for the code that
+    is supposed to preserve partial results, so the missing route must present
+    itself as what it is.
+    """
+    _sdk_is_absent(monkeypatch)
+    backend = BLOB.AzureManagedIdentityBackend()
+    with pytest.raises(BLOB.BlobTransportDefect):
+        backend.exists("study3/p0_r1/gen2/anything")
+    with pytest.raises(BLOB.BlobTransportDefect):
+        backend.upload("study3/p0_r1/gen2/anything", b"x")
+    with pytest.raises(BLOB.BlobTransportDefect):
+        backend.download("study3/p0_r1/gen2/anything")
+
+
+def test_the_build_gate_constructs_the_real_client_and_issues_no_request():
+    pytest.importorskip("azure.identity")
+    pytest.importorskip("azure.storage.blob")
+    report = BLOB.verify_production_backend()
+    assert report["credential_kind"] == "managed-identity"
+    assert report["container"] == BLOB.CONTAINER
+    assert report["identity_client_id"] == BLOB.IDENTITY_CLIENT_ID
+    assert report["client_constructed_without_any_request"] is True
+
+
+def test_the_image_build_runs_the_production_backend_gate_not_only_the_dry_run():
+    with open(os.path.join(CONTAINER_DIR, "Dockerfile.study3-p0-r1-v2"),
+              "rb") as handle:
+        dockerfile = handle.read().decode("utf-8")
+    assert "--verify-production-backend" in dockerfile
+    # The gate is only meaningful if it is a real, failing entry point.
+    completed = subprocess.run(
+        [sys.executable, os.path.join(P0_R1_DIR, "p0_r1_blob_transport.py"),
+         "--verify-production-backend"],
+        capture_output=True, text=True,
+        env=dict(os.environ, PYTHONPATH=P0_R1_DIR))
+    if completed.returncode == 0:
+        assert "P0_R1_PRODUCTION_BLOB_BACKEND_CONSTRUCTIBLE=1" in completed.stdout
+    else:
+        assert "BLOB TRANSPORT REFUSED" in completed.stdout
+        assert "requirements-study3-p0-r1-transport-v2.txt" in completed.stdout
+
+
+def test_the_transport_closure_is_fully_pinned_and_bound_by_the_lock():
+    relative = ("studies/study3/pilot/p0_r1/container/"
+                "requirements-study3-p0-r1-transport-v2.txt")
+    assert relative in LOCK.GENERATION_2_CODE_PATHS
+    assert relative in RUNTIME.REQUIRED_SOURCE_PATHS
+    assert relative not in LOCK1.EXECUTABLE_CODE_PATHS
+    with open(os.path.join(REPO_ROOT, *relative.split("/")), "rb") as handle:
+        raw = handle.read().decode("utf-8")
+    pins = [line for line in raw.splitlines()
+            if line.strip() and not line.strip().startswith("#")]
+    assert pins, "the closure declares no dependency at all"
+    for line in pins:
+        assert "==" in line, "%r is not pinned" % line
+    assert any(line.startswith("azure-storage-blob==") for line in pins)
+    assert any(line.startswith("azure-identity==") for line in pins)
+
+
+def test_the_generation_1_frozen_science_set_is_not_edited_by_generation_2():
+    frozen = os.path.join(CONTAINER_DIR, "requirements-study3-p0-r1.txt")
+    with open(frozen, "rb") as handle:
+        raw = handle.read()
+    committed = subprocess.run(
+        ["git", "show",
+         "%s:studies/study3/pilot/p0_r1/container/"
+         "requirements-study3-p0-r1.txt" % LOCK.GENERATION_1_EXECUTABLE_CODE_COMMIT],
+        capture_output=True, cwd=REPO_ROOT)
+    if committed.returncode == 0:
+        assert raw == committed.stdout, \
+            "the protected generation-1 dependency set was modified"
+    assert b"azure-" not in raw
+
+
+def _manifest_module():
+    import importlib.util
+    path = os.path.join(CONTAINER_DIR, "p0_r1_image_manifest_v2.py")
+    spec = importlib.util.spec_from_file_location(
+        "p0_r1_image_manifest_v2_under_test", path)
+    module = importlib.util.module_from_spec(spec)
+    os.environ.setdefault("P0_R1_SRC", REPO_ROOT)
+    previous = os.environ.get("P0_R1_SRC")
+    os.environ["P0_R1_SRC"] = REPO_ROOT
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        if previous is not None:
+            os.environ["P0_R1_SRC"] = previous
+    return module
+
+
+def test_the_build_refuses_an_environment_that_moved_a_frozen_science_pin(
+        monkeypatch):
+    manifest = _manifest_module()
+    monkeypatch.setattr(manifest, "SRC", REPO_ROOT)
+    science = manifest.read_pins(manifest.FROZEN_SCIENCE_REQUIREMENTS)
+    transport = manifest.read_pins(manifest.TRANSPORT_REQUIREMENTS)
+    assert science and transport
+    assert set(science).isdisjoint(set(transport))
+
+    installed = dict(science)
+    installed.update(transport)
+    monkeypatch.setattr(manifest, "installed_version",
+                        lambda name: installed.get(name))
+    assert manifest.verify_frozen_dependencies()[
+        "frozen_science_pins_unchanged_by_generation_2"] is True
+
+    drifted = dict(installed)
+    victim = sorted(science)[0]
+    drifted[victim] = "0.0.0-not-the-pinned-version"
+    monkeypatch.setattr(manifest, "installed_version",
+                        lambda name: drifted.get(name))
+    with pytest.raises(AssertionError) as raised:
+        manifest.verify_frozen_dependencies()
+    assert victim in str(raised.value)
+    assert "moved the frozen science environment" in str(raised.value)
+
+
+def test_the_build_refuses_a_transport_closure_that_is_not_installed(
+        monkeypatch):
+    manifest = _manifest_module()
+    monkeypatch.setattr(manifest, "SRC", REPO_ROOT)
+    science = manifest.read_pins(manifest.FROZEN_SCIENCE_REQUIREMENTS)
+    absent = dict(science)
+    monkeypatch.setattr(manifest, "installed_version",
+                        lambda name: absent.get(name))
+    with pytest.raises(AssertionError) as raised:
+        manifest.verify_frozen_dependencies()
+    assert "durable-transport closure is not installed" in str(raised.value)
+
+
+def test_the_v2_lock_records_both_dependency_sets():
+    lock = _valid_lock()
+    dependency = lock["dependency_lock"]
+    assert dependency["frozen_science"]["path"].endswith(
+        "requirements-study3-p0-r1.txt")
+    assert dependency["durable_transport"]["path"].endswith(
+        "requirements-study3-p0-r1-transport-v2.txt")
+    assert dependency["generation_2_moves_no_frozen_science_pin"] is True
+    assert dependency[
+        "the_build_constructs_the_real_managed_identity_client"] is True
+    assert len(dependency["frozen_science"]["sha256"]) == 64
+    assert dependency["frozen_science"]["sha256"] \
+        != dependency["durable_transport"]["sha256"]

@@ -67,6 +67,8 @@ REQUIRED_SOURCE_PATHS = (
     "studies/study3/pilot/p0_r1/p0_r1_journal.py",
     "studies/study3/pilot/p0_r1/p0_r1_runtime_binding.py",
     "studies/study3/pilot/p0_r1/execution/p0_r1_model_execution_v2.py",
+    "studies/study3/pilot/p0_r1/container/"
+    "requirements-study3-p0-r1-transport-v2.txt",
     "studies/study3/pilot/p0/corpus/p0_corpus.json",
     "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
     "studies/study3/prompts/"

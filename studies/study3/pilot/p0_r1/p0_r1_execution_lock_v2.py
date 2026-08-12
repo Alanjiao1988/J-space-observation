@@ -112,6 +112,8 @@ GENERATION_2_CODE_PATHS = (
     "studies/study3/pilot/p0_r1/container/p0_r1_transport_canary_v2.sh",
     "studies/study3/pilot/p0_r1/container/p0_r1_verify_replay_receipt.py",
     "studies/study3/pilot/p0_r1/container/p0_r1_successor.sh",
+    "studies/study3/pilot/p0_r1/container/"
+    "requirements-study3-p0-r1-transport-v2.txt",
 )
 
 #: Every executable byte this lock binds: generation 1 unchanged, plus
@@ -339,9 +341,18 @@ def build_lock(executable_code_commit, executable_code_tree, image_digest,
             "artifacts_are_persisted_to_private_blob_under_managed_identity":
                 True,
         },
-        "dependency_lock": blob_identity(
-            "studies/study3/pilot/p0_r1/container/"
-            "requirements-study3-p0-r1.txt", root=root),
+        "dependency_lock": {
+            "frozen_science": blob_identity(
+                "studies/study3/pilot/p0_r1/container/"
+                "requirements-study3-p0-r1.txt", root=root),
+            "durable_transport": blob_identity(
+                "studies/study3/pilot/p0_r1/container/"
+                "requirements-study3-p0-r1-transport-v2.txt", root=root),
+            "the_transport_closure_is_installed_under_the_science_set_as_a_"
+            "constraint_file": True,
+            "generation_2_moves_no_frozen_science_pin": True,
+            "the_build_constructs_the_real_managed_identity_client": True,
+        },
         "corpus_and_p0_t": FACT.verify_immutable_sources(root=root),
         "immutable_sources": FACT.verify_immutable_sources(root=root),
         "roles": {role: dict(ROLE_IDENTITIES[role])

@@ -70,6 +70,18 @@ COPY studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt \
 RUN python -m pip install --no-cache-dir \
         -r /opt/jspace/requirements-study3-p0-r1.txt
 
+# The durable-transport closure. Generation 1 had no export route at all, and
+# the first generation-2 image added the route in code but still shipped
+# without the client library, so its artifacts could not have left the
+# container. It is installed with the frozen science set as a CONSTRAINT
+# file: if resolving the transport would move a single science pin, the build
+# fails here rather than shipping a silently different environment.
+COPY studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1-transport-v2.txt \
+     /opt/jspace/requirements-study3-p0-r1-transport-v2.txt
+RUN python -m pip install --no-cache-dir \
+        --constraint /opt/jspace/requirements-study3-p0-r1.txt \
+        -r /opt/jspace/requirements-study3-p0-r1-transport-v2.txt
+
 # The binding scientific inputs, at the standalone root. They are byte-protected:
 # the build copies them, never rewrites them.
 COPY studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json \
@@ -96,6 +108,8 @@ COPY studies/study3/analysis/design_statistics.py \
 
 COPY studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt \
      /opt/jspace/src/studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt
+COPY studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1-transport-v2.txt \
+     /opt/jspace/src/studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1-transport-v2.txt
 
 # Install every entry point at a stable absolute path. The Container Apps job
 # command is one of these files, so `job create` names something that exists.
@@ -119,9 +133,17 @@ RUN python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_validate.py --image-
 
 # Fail the build unless the transport, journal and runtime-binding modules pass
 # their own self-checks inside the image. These are model-free by construction.
+#
+# The dry-run canary alone is not enough, and two builds proved it: an
+# in-memory backend passes whether or not the image can reach the storage
+# account. The build therefore also constructs the REAL managed-identity client.
+# It issues no request, authenticates nothing and touches no blob; it only
+# proves the route exists before the image is allowed to claim durability.
 RUN python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_transport.py --self-check \
     && python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_blob_transport.py \
         --canary --dry-run --attempt gen2-imagebuild-000000000000 \
+    && python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_blob_transport.py \
+        --verify-production-backend \
     && python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_journal.py \
         --self-check
 
@@ -139,8 +161,10 @@ RUN install -d -o jspace -g jspace -m 0700 \
         /workspace/runtime/pycache \
     && chown -R 0:0 /opt/jspace/src \
         /opt/jspace/requirements-study3-p0-r1.txt \
+        /opt/jspace/requirements-study3-p0-r1-transport-v2.txt \
     && chmod -R a-w /opt/jspace/src \
-        /opt/jspace/requirements-study3-p0-r1.txt
+        /opt/jspace/requirements-study3-p0-r1.txt \
+        /opt/jspace/requirements-study3-p0-r1-transport-v2.txt
 
 ENV HOME=/workspace/runtime/home \
     XDG_CACHE_HOME=/workspace/runtime/cache \
