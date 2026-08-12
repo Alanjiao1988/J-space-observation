@@ -1,0 +1,100 @@
+{
+ "$id": "https://j-space-observation/study3/p0_r1_execution_lock.schema.json",
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "properties": {
+  "authorities": {
+   "type": "array"
+  },
+  "caps": {
+   "type": "object"
+  },
+  "claim_boundary": {
+   "type": "string"
+  },
+  "counters_before_execution": {
+   "type": "object"
+  },
+  "dependency_lock": {
+   "type": "object"
+  },
+  "document_class": {
+   "const": "study3_p0_r1_execution_lock"
+  },
+  "executable_code": {
+   "required": [
+    "commit",
+    "tree",
+    "blobs"
+   ],
+   "type": "object"
+  },
+  "image": {
+   "required": [
+    "registry",
+    "repository",
+    "digest",
+    "reference",
+    "base_image",
+    "base_image_digest",
+    "built_from_commit"
+   ],
+   "type": "object"
+  },
+  "immutable_sources": {
+   "type": "array"
+  },
+  "legal_status": {
+   "type": "object"
+  },
+  "permitted_sequence": {
+   "type": "array"
+  },
+  "ready_commit_relationship": {
+   "type": "object"
+  },
+  "registration": {
+   "type": "object"
+  },
+  "roles": {
+   "type": "object"
+  },
+  "schema_version": {
+   "const": "study3-p0-r1-execution-lock-v1"
+  },
+  "smoke_exact_allocation": {
+   "type": "object"
+  },
+  "stage": {
+   "const": "P0-R1"
+  },
+  "state": {
+   "const": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE"
+  },
+  "state_transition": {
+   "type": "array"
+  }
+ },
+ "required": [
+  "schema_version",
+  "document_class",
+  "stage",
+  "state",
+  "authorities",
+  "registration",
+  "executable_code",
+  "ready_commit_relationship",
+  "image",
+  "dependency_lock",
+  "immutable_sources",
+  "roles",
+  "caps",
+  "smoke_exact_allocation",
+  "counters_before_execution",
+  "state_transition",
+  "legal_status",
+  "claim_boundary",
+  "permitted_sequence"
+ ],
+ "title": "Study 3 P0-R1 execution lock",
+ "type": "object"
+}

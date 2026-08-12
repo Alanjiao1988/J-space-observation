@@ -7459,3 +7459,60 @@ execution-completion publication; fresh-session replay gate; if replay passes,
 the single bounded GPU pilot in that same execution session; and only after a
 mechanically feasible terminal P0-R1 disposition, one fresh focused final
 methods review. This correction neither waives nor begins that review.
+
+Image build and execution-lock sequence. The order of section 7 was followed
+exactly, with zero measurement operations at every step. The completed
+implementations and their tests were committed and published as the executable
+code commit `aad14c45e9681a34f382aa95c55ac875d2ca98ce`; the image was built in
+ACR from exactly that commit; its immutable manifest digest was read back from
+the registry; and the execution lock was created only afterwards, in the later
+ready commit. That ordering is forced rather than stylistic: the digest is a
+function of the executable code commit, so it cannot be embedded in the image
+whose digest it defines.
+
+| item | value |
+| --- | --- |
+| registry | `acrjspaceobssea0708231738.azurecr.io` |
+| repository | `j-space-observation-study3-p0-r1` |
+| immutable digest | `sha256:7e2690feb6854a53f096d5b321e69fddebd2b744289c760e2fe74ed1ccec8176` |
+| base image digest | `sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126` |
+| executable code commit | `aad14c45e9681a34f382aa95c55ac875d2ca98ce` |
+| Python / torch / transformers / tokenizers | 3.11.9 / 2.4.1+cu121 / 4.44.2 / 0.19.1 |
+| device inside the image | `CUDA_AVAILABLE=False`, `GPU_COUNT=0` |
+
+The image was verified after the build rather than only during it. ACR run
+`cmft` read the image by digest and printed the 14 blob identities it carries;
+all 14 reproduce the working tree byte-for-byte, including both operative
+authorities at 19,632 bytes / `f72292e7...` and 23,486 bytes / `ffe75ba4...`.
+
+Three pre-observation build failures are recorded rather than relabelled, and
+none of them is a replay or model attempt: every one occurred with zero
+replay-gate evaluations, zero tokenizer constructions, zero encodes, zero
+checkpoint downloads, zero model loads and zero GPU operations.
+
+* `cmfk` failed at the image's own verification step because the emitted
+  protocol and pre-execution receipt no longer reproduced from code after the
+  authorized-path set grew. Re-deriving them fixed it.
+* `cmfp` failed the same check because the receipt binds the code blob
+  identities and the Dockerfile had changed. Re-deriving the receipt fixed it.
+* `cmfq` is the more interesting one: it **reported success while doing
+  nothing**. The image self-manifest was written with a `RUN python - <<'PY'`
+  heredoc, and the ACR classic Dockerfile front end truncates the instruction at
+  the heredoc opener, so `python -` ran with no stdin and the body was silently
+  discarded. The build passed, the manifest never existed, and the post-build
+  content check then failed to find it in run `cmfr`. A step that appears to
+  succeed while producing nothing is worse than one that fails, so the emitter
+  is now a copied script that either runs or fails loudly. This is the same
+  front-end portability class the P0-T round already recorded.
+
+The execution lock. `studies/study3/pilot/p0_r1/p0_r1_execution_lock.json` binds
+the registration commit and tree, both operative authority identities, the
+executable code commit and tree, the ready-commit relationship, the image and
+base-image digests, 20 executable code blob identities, the dependency lock, the
+frozen corpus and P0-T source hashes, the three pinned role revisions, the
+unchanged caps and exact smoke allocation, an all-zero counter set, and the one
+permitted replay-then-GPU state transition. `verify_executable_bytes` recomputes
+every bound blob from the checkout, so executable byte drift after the build is
+detected rather than assumed away; if a byte does change, the unexecuted image is
+discarded and rebuilt before any measurement, which is pre-observation build
+iteration and not a retry of anything observed.

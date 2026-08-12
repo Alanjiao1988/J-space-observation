@@ -1,0 +1,278 @@
+{
+ "authorities": [
+  {
+   "bytes": 19632,
+   "path": "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+   "role": "the operative P0-R1 scientific and operational boundary",
+   "sha256": "f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2"
+  },
+  {
+   "bytes": 23486,
+   "path": "studies/study3/prompts/study3_p0_r1_pre_replay_execution_completion_authority_rev2.md",
+   "role": "the model-free execution-completion supplement; it corrects pre-replay implementation and sequencing defects and changes no scoring rule, corpus, allocation, cap or claim boundary",
+   "sha256": "ffe75ba42c023e959f3beb23927604c3ae72c07fb4b25be346f504c8ea2930de"
+  }
+ ],
+ "caps": {
+  "additional_gpu_attempt_with_signed_zero_operation_receipt": 1,
+  "bank_rows_written": 0,
+  "distinct_checkpoint_identities_downloaded": 3,
+  "distinct_tokenizer_identities_constructed": 3,
+  "gpu_jobs_performing_a_model_operation": 1,
+  "hosted_provider_inference_calls": 0,
+  "model_weight_loads": 3,
+  "non_generative_prefill_evaluations": 180,
+  "positive_reference_operations": 0,
+  "s1_scored_rows": 162,
+  "s2_scored_rows": 18,
+  "s3_cpu_only_reuse_scored_rows": 18,
+  "s4_generation_calls": 12,
+  "s4_incremental_decode_evaluations": 36,
+  "s4_prefill_evaluations": 12,
+  "s4_scored_generation_rows": 12,
+  "seeds_drawn": 0,
+  "tokenizer_encoded_sequences": 10000,
+  "total_scored_rows": 210,
+  "total_sequence_level_model_evaluation_equivalents": 228
+ },
+ "claim_boundary": "a methods-feasibility continuation. It selects no interface, sets no threshold, passes no formal gate, answers no research question, resolves neither OD2 nor UR-22, freezes nothing and produces no evidence-ledger row.",
+ "counters_before_execution": {
+  "additional_gpu_attempt_with_signed_zero_operation_receipt": 0,
+  "bank_rows_written": 0,
+  "common_prefix_tokens_processed": 0,
+  "distinct_checkpoint_identities_downloaded": 0,
+  "distinct_tokenizer_identities_constructed": 0,
+  "exceptions_observed": 0,
+  "generated_tokens": 0,
+  "gpu_jobs_performing_a_model_operation": 0,
+  "hosted_provider_inference_calls": 0,
+  "model_weight_loads": 0,
+  "non_generative_prefill_evaluations": 0,
+  "parser_calls": 0,
+  "positive_reference_operations": 0,
+  "registered_prompt_tokens_processed": 0,
+  "replay_gate_evaluations": 0,
+  "restricted_logit_reads": 0,
+  "runtime_batched_forward_calls": 0,
+  "runtime_batched_tokenizer_calls": 0,
+  "s1_scored_rows": 0,
+  "s2_scored_rows": 0,
+  "s3_cpu_only_reuse_scored_rows": 0,
+  "s4_generation_calls": 0,
+  "s4_incremental_decode_evaluations": 0,
+  "s4_prefill_evaluations": 0,
+  "s4_scored_generation_rows": 0,
+  "scoring_context_tokens_processed": 0,
+  "seeds_drawn": 0,
+  "tokenizer_construction_events": 0,
+  "tokenizer_encoded_sequences": 0,
+  "total_scored_rows": 0,
+  "total_sequence_level_model_evaluation_equivalents": 0
+ },
+ "dependency_lock": {
+  "bytes": 790,
+  "path": "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt",
+  "sha256": "a33a66e11ad104b0c402e6decc70f62d1941580c4ea46c1b56f0c023849d2fd8"
+ },
+ "document_class": "study3_p0_r1_execution_lock",
+ "executable_code": {
+  "blobs": [
+   {
+    "bytes": 17530,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_counters.py",
+    "sha256": "da6aa9a8038ac5b53ea04cc8e31eaaf7f7aa5614cc600a8433b80e9369245d07"
+   },
+   {
+    "bytes": 17986,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_eligibility.py",
+    "sha256": "e63e804b6590e8f1474af47374c1fc96e5b66cf6c1472c9c3b386fc62e6dc5ea"
+   },
+   {
+    "bytes": 23461,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock.py",
+    "sha256": "c620412991ad94316b360fdc2160caffda21d57c48f3f28693d7e4eddacf3453"
+   },
+   {
+    "bytes": 31955,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_factorization.py",
+    "sha256": "fdc564c6a0e6fea17b39089f7c2f9403d401e47ad14bb6e8bb7880eed73d380e"
+   },
+   {
+    "bytes": 36992,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_model_runner.py",
+    "sha256": "4691c87974562c7c9d2a0694ce383751224c582ad230f5ddbda37db2f0b90cd3"
+   },
+   {
+    "bytes": 10229,
+    "path": "studies/study3/pilot/p0_r1/execution/p0_r1_model_execution.py",
+    "sha256": "392f78466ee61ed303b5cf4b1fba4423e38b128441aeec1de119315b2e52a5ee"
+   },
+   {
+    "bytes": 32006,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
+    "sha256": "072f29962e8472b54c16303fb04ca610cf3d85be14f973593b4a32dea49ad917"
+   },
+   {
+    "bytes": 32355,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_replay_gate.py",
+    "sha256": "1755ee5e188021ce849dce18362365decc9f67d35d3602b037d4c1e7d7e4a15a"
+   },
+   {
+    "bytes": 25696,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_schemas.py",
+    "sha256": "1e500abe2df45e9454af420e28c225fcdc96fa212dd2532e41e39f7613732a05"
+   },
+   {
+    "bytes": 4334,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_summarize.py",
+    "sha256": "996f7e44bb3e6bef0cfc70fa16e44c883a954bec4613358d5c5421f37457e413"
+   },
+   {
+    "bytes": 13947,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_validate.py",
+    "sha256": "16c1ba8e31019df76711462d007fa0deeb0784d146ddf615c2c5e31df11edefa"
+   },
+   {
+    "bytes": 6577,
+    "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1",
+    "sha256": "3a39f1b7e6939ee77aff438524041d891bd5ae4bf09b9e4e4ea437e89a26b324"
+   },
+   {
+    "bytes": 1883,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_acr_task.yaml",
+    "sha256": "5594284e8be22b31786ca7cdfd2b66d244b24fcd30c67dd486f3708c5cec2081"
+   },
+   {
+    "bytes": 1472,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_checkout.sh",
+    "sha256": "9c3abed6e3cd2cd19b389c0b438b073f5ae1ea54f7af4acc14b94bbcebd5643b"
+   },
+   {
+    "bytes": 3143,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_gpu_job.yaml",
+    "sha256": "7a04e957b25a6ad090b7d4da92f8506f126f0c4a7390bd37e5d44480d36edd4f"
+   },
+   {
+    "bytes": 2905,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_image_manifest.py",
+    "sha256": "4dec7de4a317c1d220110829644b32d9270ee819f3d08874717b412f442a39b4"
+   },
+   {
+    "bytes": 3594,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_launch_gpu_pilot.sh",
+    "sha256": "260429387ee95b1ea7ae362f4da7b07b51b23e3c5c2b58e565051e17d5055668"
+   },
+   {
+    "bytes": 2462,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_model_pilot.sh",
+    "sha256": "82aca125898d3232cb2de71cb2c72af8bf8caedc608272f6def564da5f14a7c0"
+   },
+   {
+    "bytes": 3711,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_replay.sh",
+    "sha256": "abe8095911d79773b768516701b720ab8dbe7fa15165ab01a2cadf9419514788"
+   },
+   {
+    "bytes": 790,
+    "path": "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt",
+    "sha256": "a33a66e11ad104b0c402e6decc70f62d1941580c4ea46c1b56f0c023849d2fd8"
+   }
+  ],
+  "commit": "aad14c45e9681a34f382aa95c55ac875d2ca98ce",
+  "no_executable_byte_may_change_after_the_image_build": true,
+  "tree": "a26c02bc230857b5fa8002b0b1b31a570b1c95be"
+ },
+ "image": {
+  "base_image": "pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime",
+  "base_image_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
+  "bound_by_digest_never_by_tag": true,
+  "build_performed_no_replay_gate_tokenizer_checkpoint_or_gpu_operation": true,
+  "built_from_commit": "aad14c45e9681a34f382aa95c55ac875d2ca98ce",
+  "contains_no_model_weights": true,
+  "digest": "sha256:7e2690feb6854a53f096d5b321e69fddebd2b744289c760e2fe74ed1ccec8176",
+  "reference": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@sha256:7e2690feb6854a53f096d5b321e69fddebd2b744289c760e2fe74ed1ccec8176",
+  "registry": "acrjspaceobssea0708231738.azurecr.io",
+  "repository": "j-space-observation-study3-p0-r1"
+ },
+ "immutable_sources": [
+  {
+   "bytes": 69781,
+   "path": "studies/study3/pilot/p0/corpus/p0_corpus.json",
+   "role": "the frozen 35-cell / 70-member P0 corpus",
+   "sha256": "5343019a334ce666bb3e7f7f57d87181550aa90fad4815ba51a7ba3f571e1c6c"
+  },
+  {
+   "bytes": 7850,
+   "path": "studies/study3/pilot/p0/results/p0-t/P0_T_DISPOSITION.md",
+   "role": "the published P0-T disposition",
+   "sha256": "9d6a6508383ebd5f6e4f0bb97a5b75de282da3cf28afba837b923cd1a6ec66eb"
+  },
+  {
+   "bytes": 7934,
+   "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_receipt.json",
+   "role": "the published P0-T receipt",
+   "sha256": "0b28fbe6f633cc5a6d0664588fb685065d15ab1c301a1540d1e12f7c7b69e737"
+  },
+  {
+   "bytes": 5820022,
+   "path": "studies/study3/pilot/p0/results/p0-t/p0_tokenizer_gate_result.json",
+   "role": "the published P0-T tokenizer gate result",
+   "sha256": "9603b61165bc0b405fe8eb6103a56e646ceb2e254a33e0eba2ee2d035f03a85f"
+  }
+ ],
+ "legal_status": {
+  "draft_v0_6_frozen": false,
+  "draft_v0_6_reviewed": false,
+  "evidence_ledger_last_row": "EV-0016",
+  "formal_execution_authorized": false,
+  "interface_selected": null,
+  "od2": "UNRESOLVED_BLOCKING_OPERATOR_DECISION",
+  "p0_r1_pilot_execution_authorized": true,
+  "p0_r1_pilot_execution_consumed": false,
+  "positive_reference": null,
+  "rp_wrapper": null,
+  "ur22": "UNRESOLVED"
+ },
+ "permitted_sequence": [
+  "the replay gate runs first, from a clean checkout of the ready commit, inside the image bound by digest above",
+  "only a replay pass authorizes the single bounded GPU model pilot",
+  "a replay failure publishes the registered stop and performs no model operation"
+ ],
+ "ready_commit_relationship": {
+  "executable_code_commit_is_an_ancestor_of_the_ready_commit": true,
+  "parent": "aad14c45e9681a34f382aa95c55ac875d2ca98ce",
+  "rule": "the ready commit carries this lock and is a strict descendant of the executable code commit; the image digest is a function of the executable code commit, so it cannot be embedded in the image whose digest it defines"
+ },
+ "registration": {
+  "commit": "167d3067d7d9a2866999a51ec49c3c57c1d31546",
+  "state": "STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE",
+  "tree": "f7166f0441780bf0d034eb88a03c0d61e9049a2a"
+ },
+ "roles": {
+  "RI": {
+   "repository": "Qwen/Qwen2.5-Math-1.5B-Instruct",
+   "revision": "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35"
+  },
+  "RL": {
+   "repository": "Qwen/Qwen2.5-Math-1.5B",
+   "revision": "4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2"
+  },
+  "RT": {
+   "repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+   "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+  }
+ },
+ "schema_version": "study3-p0-r1-execution-lock-v1",
+ "smoke_exact_allocation": {
+  "non_generative_prefill_evaluations": 60,
+  "s3_cpu_only_reuse_scored_rows": 6,
+  "s4_generation_calls": 0,
+  "total_scored_rows": 66
+ },
+ "stage": "P0-R1",
+ "state": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE",
+ "state_transition": [
+  "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE",
+  "STUDY3_P0_R1_REPLAY_GATE_PASSED_AWAITING_MODEL_PILOT"
+ ]
+}
