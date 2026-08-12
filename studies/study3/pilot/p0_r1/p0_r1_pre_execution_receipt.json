@@ -120,11 +120,11 @@
    "sha256": "16c1ba8e31019df76711462d007fa0deeb0784d146ddf615c2c5e31df11edefa"
   },
   {
-   "bytes": 5843,
+   "bytes": 7693,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1",
    "present": true,
-   "sha256": "4e3ffef1f8771b61423dff00196fd4b1d148a9f1f38aae6e8b384bc566cdfe93"
+   "sha256": "40f44a99a5ea9bb7eb01f39f61f4d48cd34d53d3040dbd7b7338142ad9550673"
   },
   {
    "bytes": 790,
@@ -164,11 +164,11 @@
    "sha256": "5594284e8be22b31786ca7cdfd2b66d244b24fcd30c67dd486f3708c5cec2081"
   },
   "definition": {
-   "bytes": 5843,
+   "bytes": 7693,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1",
    "present": true,
-   "sha256": "4e3ffef1f8771b61423dff00196fd4b1d148a9f1f38aae6e8b384bc566cdfe93"
+   "sha256": "40f44a99a5ea9bb7eb01f39f61f4d48cd34d53d3040dbd7b7338142ad9550673"
   },
   "image_digest": null,
   "image_digest_status": "null until the successor session builds the image. It is not zero, not empty and not a placeholder digest.",
