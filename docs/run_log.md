@@ -7577,3 +7577,45 @@ top-level package stays importable and testable with no model library present,
 and the model-free boundary is now structural rather than incidental. The
 published node was not narrowed, exempted or weakened to accommodate the new
 code.
+
+Changed-path census and protected-byte audit for this round. The exact
+comparison from `167d3067d7d9a2866999a51ec49c3c57c1d31546` to the published
+ready commit contains 29 changed repository paths: 11 added and 18 modified,
+with nothing deleted, renamed, copied, symlinked or submoduled. Every one falls
+inside the section 4 allowlist, which is `studies/study3/pilot/p0_r1/`, the new
+committed supplemental authority, the new and existing P0-R1 test modules, and
+the named governance surfaces. The census is stable under this entry itself,
+because `docs/run_log.md` is already among the 18 modified paths.
+
+Added: the supplemental authority; `p0_r1_execution_lock.py`, its emitted
+`p0_r1_execution_lock.json` and schema; `execution/p0_r1_model_execution.py`;
+the container `p0_r1_checkout.sh`, `p0_r1_model_pilot.sh`,
+`p0_r1_launch_gpu_pilot.sh`, `p0_r1_gpu_job.yaml` and `p0_r1_image_manifest.py`;
+and `tests/test_study3_p0_r1_execution_readiness.py`.
+
+Modified: `p0_r1_replay_gate.py`, `p0_r1_model_runner.py`, `p0_r1_protocol.py`
+and its two derived documents, the Dockerfile, `p0_r1_acr_task.yaml`,
+`p0_r1_replay.sh`, `P0_R1_HANDOFF.md`, and the nine governance surfaces.
+
+119 byte-protected objects were audited and none changed. That set includes
+every path under `studies/study3/pilot/p0/`,
+`tests/test_study3_p0_feasibility_pilot.py`, every Study 1 and Study 2 path,
+every Study 3 review artifact, the draft-v0.6 rendering/scoring registry and its
+schema, the draft-v0.5 protocol JSON and Markdown bound by the P0 manifest, the
+operative 19,632-byte P0-R1 authority, and `paper/evidence_ledger.csv`, which is
+byte-identical and still ends at `EV-0016` with no `EV-0017` row.
+
+Ordering proof: the supplemental authority commit `cfcb89e1` precedes the first
+P0-R1 implementation commit `17c20efd`, and it was published by non-force
+fast-forward before any other object in this round existed. Lineage: the
+required baseline is an ancestor of the published head, reached by a strict
+first-parent fast-forward chain with no merge, rebase or force push.
+
+One lineage correction is recorded rather than hidden. After publishing the
+first executable code commit `17c20efd`, the emitted protocol and receipt were
+re-derived and the change was initially applied with `git commit --amend`, which
+would have rewritten an already-published commit and broken the fast-forward
+guarantee. It was never pushed in that form: the amend was discarded with a
+mixed reset back to the published commit and the change was re-committed on top
+as `e6e7e7e1`, preserving a strict append-only history. No published object was
+rewritten.
