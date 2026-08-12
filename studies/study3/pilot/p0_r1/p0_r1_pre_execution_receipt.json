@@ -78,25 +78,25 @@
    "sha256": "fdc564c6a0e6fea17b39089f7c2f9403d401e47ad14bb6e8bb7880eed73d380e"
   },
   {
-   "bytes": 19213,
+   "bytes": 36992,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/p0_r1_model_runner.py",
    "present": true,
-   "sha256": "ca3521e3c62d7655ff1d023e94aab2f7c892f9b647c8c398260f5d1b7af3dbd5"
+   "sha256": "4691c87974562c7c9d2a0694ce383751224c582ad230f5ddbda37db2f0b90cd3"
   },
   {
-   "bytes": 31852,
+   "bytes": 32006,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
    "present": true,
-   "sha256": "5ede4398a47bfa4a1c62c2183c4610a24053e65552d169bcd88232b5f454a6bc"
+   "sha256": "072f29962e8472b54c16303fb04ca610cf3d85be14f973593b4a32dea49ad917"
   },
   {
-   "bytes": 14277,
+   "bytes": 32355,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/p0_r1_replay_gate.py",
    "present": true,
-   "sha256": "1ebbb9af279359ee2750e43dc8d4405288a6f43216d9279b38906f7d8a37f06e"
+   "sha256": "1755ee5e188021ce849dce18362365decc9f67d35d3602b037d4c1e7d7e4a15a"
   },
   {
    "bytes": 25696,
@@ -120,11 +120,11 @@
    "sha256": "16c1ba8e31019df76711462d007fa0deeb0784d146ddf615c2c5e31df11edefa"
   },
   {
-   "bytes": 5637,
+   "bytes": 5843,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1",
    "present": true,
-   "sha256": "c4868745beab67cdc56a1e55fb0e436fd00023f644531431957db2da710ed7b4"
+   "sha256": "4e3ffef1f8771b61423dff00196fd4b1d148a9f1f38aae6e8b384bc566cdfe93"
   },
   {
    "bytes": 790,
@@ -134,18 +134,18 @@
    "sha256": "a33a66e11ad104b0c402e6decc70f62d1941580c4ea46c1b56f0c023849d2fd8"
   },
   {
-   "bytes": 1290,
+   "bytes": 1883,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/container/p0_r1_acr_task.yaml",
    "present": true,
-   "sha256": "9b9dc746c1721d3f6a54e271ebe096bb5af318f971b061af295efb35bae1dd2c"
+   "sha256": "5594284e8be22b31786ca7cdfd2b66d244b24fcd30c67dd486f3708c5cec2081"
   },
   {
-   "bytes": 2480,
+   "bytes": 3711,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/container/p0_r1_replay.sh",
    "present": true,
-   "sha256": "3ace4b0fb7b79bf882994bbe55af12481b4812811630d646a17b83b3512203ff"
+   "sha256": "abe8095911d79773b768516701b720ab8dbe7fa15165ab01a2cadf9419514788"
   },
   {
    "bytes": 47897,
@@ -157,27 +157,27 @@
  ],
  "container": {
   "acr_task": {
-   "bytes": 1290,
+   "bytes": 1883,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/container/p0_r1_acr_task.yaml",
    "present": true,
-   "sha256": "9b9dc746c1721d3f6a54e271ebe096bb5af318f971b061af295efb35bae1dd2c"
+   "sha256": "5594284e8be22b31786ca7cdfd2b66d244b24fcd30c67dd486f3708c5cec2081"
   },
   "definition": {
-   "bytes": 5637,
+   "bytes": 5843,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1",
    "present": true,
-   "sha256": "c4868745beab67cdc56a1e55fb0e436fd00023f644531431957db2da710ed7b4"
+   "sha256": "4e3ffef1f8771b61423dff00196fd4b1d148a9f1f38aae6e8b384bc566cdfe93"
   },
   "image_digest": null,
   "image_digest_status": "null until the successor session builds the image. It is not zero, not empty and not a placeholder digest.",
   "replay_entrypoint": {
-   "bytes": 2480,
+   "bytes": 3711,
    "carries_cr": false,
    "path": "studies/study3/pilot/p0_r1/container/p0_r1_replay.sh",
    "present": true,
-   "sha256": "3ace4b0fb7b79bf882994bbe55af12481b4812811630d646a17b83b3512203ff"
+   "sha256": "abe8095911d79773b768516701b720ab8dbe7fa15165ab01a2cadf9419514788"
   },
   "requirements": {
    "bytes": 790,

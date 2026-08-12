@@ -25,6 +25,7 @@
  },
  "authorized_write_paths": [
   "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+  "studies/study3/prompts/study3_p0_r1_pre_replay_execution_completion_authority_rev2.md",
   "studies/study3/pilot/p0_r1/",
   "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
   "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json",
@@ -39,6 +40,7 @@
   "studies/study3/analysis/final_focused_review_packet_v0_6.md",
   "tests/test_study3_rendering_registry_v0_6.py",
   "tests/test_study3_p0_r1_registration.py",
+  "tests/test_study3_p0_r1_execution_readiness.py",
   "README.md",
   "docs/decision_log.md",
   "docs/run_log.md",
