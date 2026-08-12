@@ -9,7 +9,13 @@
 > States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
 > 与 `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE`。
 >
-> 一轮 model-free 的 execution-completion round 补齐了「已注册」与「可运行」之间的缺口：此前 `--gate` 是无条件拒绝，replay shell 调用的是 calibration 用的 `derive()` 而非 live gate，model runner 恒抛异常，既无 GPU launcher 也无 job definition，pre-execution receipt 的 `image_digest` 仍为 `null`。以上全部补齐，并由 `studies/study3/pilot/p0_r1/p0_r1_execution_lock.json` 中的不可变 image digest 绑定。
+> 一轮 model-free 的 execution-completion round 补齐了「已注册」与「可运行」之间的缺口：此前 `--gate` 是无条件拒绝，replay shell 调用的是 calibration 用的 `derive()` 而非 live gate，model runner 恒抛异常，既无 GPU launcher 也无 job definition，pre-execution receipt 的 `image_digest` 仍为 `null`。以上全部补齐。
+>
+> **generation 2 现为当前代**：一轮 model-free 的 transport 与 exception-safety round 修复了 generation 1 的五项缺陷——runtime binding 只比对路径清单而不比对字节、结果只回传 hash 而不回传完整字节、replay receipt 从不注入 GPU 作业、异常路径丢弃已完成的部分结果、以及验证只覆盖 in-memory 替身。绑定对象为 `studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json`（26,172 字节，sha256 `f506f632b8602cc000229b9a40991fc666cf0cf9f0195712cfe93d12fbee4714`，绑定 42 条可执行路径），image digest 为 `sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827`。
+>
+> 本轮**诚实记录了一次真实失败**：第一版 generation-2 image 通过了全部七道 build gate，却连一个结果字节都导不出——它根本没有装私有对象存储的客户端；build 的 transport gate 走的是 `--dry-run` 的 in-memory backend，能否真正联通存储账户对它毫无区别。该缺陷由真实基础设施上的 private-Blob canary 捕获（执行 `job-jspace-s3-p0r1-canary-g2-56y38fa` 失败，写出 0 个对象），该 image 已作废；修复后重建的 image 上三条 canary 全部通过（执行 `job-jspace-s3-p0r1-canary-g2-kqpquxz`）。
+>
+> generation 1 **未经消耗即被取代**：零 execution、零 GPU 分配、零 tokenizer construction、零 encode、零 checkpoint 下载、零权重加载；其 lock、image 与 handoff 字节原样保留。
 >
 > 本轮**未执行任何测量**：零 replay-gate evaluation、零 tokenizer construction、零 encode、零 checkpoint 下载、零权重加载、零 GPU 分配、零 forward pass、零生成、零 scored row。`p0_r1_pilot_execution_authorized` 为 `true` 且**尚未消耗**；`formal_execution_authorized` 仍为 `false`。
 >
@@ -27,7 +33,7 @@
 >
 > `formal_execution_authorized = false`。draft-v0.6 **未**审阅、**未**冻结、**未**被选定。`OD2`、`UR-22` 与全部 `RP` 对象仍未解决，`RP` wrapper 为 **null** 而非空。不存在 seed、bank、winner 或 evidence row；`paper/evidence_ledger.csv` 逐字节不变，仍止于 `EV-0016`；原始研究问题仍未回答。
 >
-> 入口：[draft-v0.6 amendment 记录](studies/study3/reviews/v0_6_operator_amendment.md) · [focused review packet](studies/study3/analysis/final_focused_review_packet_v0_6.md) · [v0.6 rendering/scoring registry](studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json) · [P0-R1 包](studies/study3/pilot/p0_r1/README.md) · [P0-R1 handoff](studies/study3/pilot/p0_r1/P0_R1_HANDOFF.md) · [operator authority](studies/study3/prompts/study3_v0_6_p0_r1_authority.md)
+> 入口：[draft-v0.6 amendment 记录](studies/study3/reviews/v0_6_operator_amendment.md) · [focused review packet](studies/study3/analysis/final_focused_review_packet_v0_6.md) · [v0.6 rendering/scoring registry](studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json) · [P0-R1 包](studies/study3/pilot/p0_r1/README.md) · [P0-R1 handoff（generation 2，当前）](studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V2.md) · [P0-R1 handoff（generation 1，历史）](studies/study3/pilot/p0_r1/P0_R1_HANDOFF.md) · [operator authority](studies/study3/prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md)
 
 
 > **STUDY 3-P0 FEASIBILITY PILOT REGISTERED - AWAITING THE TOKENIZER GATE**

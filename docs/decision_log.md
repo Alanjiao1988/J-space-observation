@@ -3796,3 +3796,58 @@ corrected, with the historical commit and failed-run record preserved.
 first; only if it passes, the single bounded GPU pilot in that same session; and
 only after a mechanically feasible terminal P0-R1 disposition, one fresh focused
 final methods review of draft-v0.6. This neither waives nor begins that review.
+
+## Study 3 P0-R1 generation 2: what was decided and why
+
+**A hash is not a byte.** Generation 1 returned a digest of each result and
+called that the result transport. A digest cannot be re-scored, re-examined or
+reconstructed, so a run whose container exited would leave a receipt that proved
+only that some bytes once existed. Generation 2 transports the complete bytes by
+two independent routes, the log envelope and the private object store, and
+verifies each recovered artifact against its recorded digest and length.
+
+**The bound thing is bytes, not names.** Generation-1 runtime binding compared a
+list of source paths against the lock. A path list is satisfied by a file whose
+contents were replaced, so the binding proved nothing about what would run.
+Generation 2 hashes the bytes of every bound source inside the container and
+refuses to start on any mismatch.
+
+**Partial results are results.** Generation 1 discarded everything produced so
+far when any exception reached the top of the run. Work that was completed and
+verified is evidence; destroying it converts a recoverable interruption into a
+total loss and silently biases what survives toward runs that happened not to
+fail. Generation 2 journals each completed unit durably as it is produced, and
+the exception path preserves and exports what exists rather than truncating it.
+
+**Do not edit a protected input to fix an unrelated gap.** The missing private
+store client sat in `requirements-study3-p0-r1.txt`, which is bound by the
+generation-1 lock and hashed into the protocol. Editing it would have
+invalidated a published immutable record to add a dependency. The transport
+closure was therefore added as a separate fully pinned file, installed with the
+frozen science set as a pip **constraint**, so resolving the transport cannot
+move a science pin: the build fails instead.
+
+**A gate that cannot fail is not a gate.** The generation-1 transport gate ran
+the canary with `--dry-run` against an in-memory backend and passed identically
+whether or not the image could reach the storage account. That is precisely how
+an image with no store client shipped. Generation 2 additionally constructs the
+real managed-identity client at build time and verifies the installed versions
+of every frozen pin, and the private-store canary now runs against the real
+account from inside the VNet.
+
+**Failure is recorded, not overwritten.** Execution
+`job-jspace-s3-p0r1-canary-g2-56y38fa` failed against image
+`sha256:928dc59b...` with zero objects written. That image is discarded and that
+execution is recorded in the canary receipt beside the passing one, rather than
+being replaced by it.
+
+**Generation 1 is superseded without being consumed.** It was never launched, so
+its authorization is intact. Its lock, image and handoff bytes are preserved
+unedited, and generation 2 is additive: not one generation-1 executable byte
+changed.
+
+**Successor ordering is unchanged and sequential.** The fresh-session replay
+gate first; only if it passes, the single bounded GPU pilot in that same
+session; and only after a mechanically feasible terminal P0-R1 disposition, one
+fresh focused final methods review of draft-v0.6. This round neither waived nor
+began that review, and did not run the gate.

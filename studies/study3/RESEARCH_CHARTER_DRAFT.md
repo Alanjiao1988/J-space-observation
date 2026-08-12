@@ -14,6 +14,7 @@
 > | candidate state | `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW` |
 > | candidate disposition | `PROPOSED_RESOLVED_SUBJECT_TO_FINAL_FOCUSED_REVIEW` |
 > | pilot continuation | `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE` |
+> | pilot continuation generation | `2` (generation 1 superseded **without consumption**; bound by `pilot/p0_r1/p0_r1_execution_lock_v2.json`) |
 > | frozen | `false` |
 > | formal execution authorized | `false` |
 > | reviewed | `false` |

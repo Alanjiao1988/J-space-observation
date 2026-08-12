@@ -2364,3 +2364,21 @@ evaluations.
 The model-free boundary is structural: every byte that can touch a checkpoint
 lives in `studies/study3/pilot/p0_r1/execution/`, so the replay and registration
 path remains importable and testable with no model library present.
+
+**Generation-2 result transport and exception safety.** Every P0-R1 result byte
+leaves the compute environment by two independent routes: a chunked, ordered,
+digest-checked log envelope readable from the container log stream, and a
+private object store whose per-run prefix is refused if it is already non-empty
+and whose set manifest is written last. Each recovered artifact is verified
+against both its recorded sha256 and its recorded length, so a receipt cannot
+stand in for the bytes it describes. Completed units are journaled durably as
+they are produced, and an exception at any point preserves and exports what has
+already been completed rather than discarding it, with the interruption recorded
+explicitly in the disposition. Runtime binding compares the sha256 of every
+bound source file inside the container against the execution lock before any
+work begins, so a substituted file with an unchanged path cannot run. The
+replay-gate receipt is injected into the compute job and re-verified there,
+which makes the gate a precondition of the run rather than a claim about it.
+None of this is exercised against stand-ins alone: the production route is
+validated on the real infrastructure by model-free canaries before any model
+operation is authorized.

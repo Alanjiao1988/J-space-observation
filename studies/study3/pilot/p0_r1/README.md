@@ -1,14 +1,23 @@
 # Stage P0-R1 — the repaired feasibility continuation
 
-> **State:** `STUDY3_P0_R1_REGISTERED_AWAITING_REPLAY_GATE`
+> **State:** `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE`
+>
+> **Generation 2 is the current generation.** The binding object is
+> [`p0_r1_execution_lock_v2.json`](p0_r1_execution_lock_v2.json) and the
+> operative handoff is [`P0_R1_HANDOFF_V2.md`](P0_R1_HANDOFF_V2.md). Generation 1
+> — `p0_r1_execution_lock.json`, `P0_R1_HANDOFF.md` and image
+> `sha256:7e2690...` — is **superseded without consumption**, retained
+> byte-for-byte as history, and must not be launched.
 >
 > P0-R1 is **registered, not executed**. No tokenizer has been constructed, no
 > checkpoint downloaded, no weight loaded, no GPU allocated, no forward pass
-> performed and no text generated in the round that created this package. Every
-> P0-R1 counter is zero.
+> performed and no text generated in any round that created or repaired this
+> package. Every P0-R1 counter is zero.
 
 Authority: [`../../prompts/study3_v0_6_p0_r1_authority.md`](../../prompts/study3_v0_6_p0_r1_authority.md)
-§6 and §7.
+§6 and §7 (registration), then
+[`../../prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md`](../../prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md)
+(generation-2 transport and exception safety).
 
 ## Why there is a P0-R1
 

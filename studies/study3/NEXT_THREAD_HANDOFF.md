@@ -14,13 +14,22 @@
 > 1. **Execution-completion publication.** Done: the live replay gate, the
 >    canonical result/receipt/disposition writers, the complete bounded model
 >    runner, the Azure Container Apps T4 launcher and the immutable image digest
->    now exist, and the execution lock in
->    `studies/study3/pilot/p0_r1/p0_r1_execution_lock.json` binds them.
+>    now exist. **Superseded by generation 2**, which additionally binds every
+>    bound source by its bytes rather than by its path, transports complete
+>    result bytes by two independent routes, injects the replay receipt into the
+>    compute job, preserves completed partial results through any exception, and
+>    validates all of it against the production route on the real
+>    infrastructure. The binding object is now
+>    `studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json`, pinned to image
+>    digest
+>    `sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827`.
+>    Generation 1 is superseded **without consumption** and must not be launched.
 > 2. **The fresh-session P0-R1 replay gate.** Continue from the published ready
->    commit, not from an older baseline. The gate is replay-only: it reads the
->    immutable P0-T artifacts and performs zero new encodes and zero model
->    operations. If it fails, publish the registered stop and perform **no**
->    model operation — do not repair and rerun.
+>    commit `c7e02b43e1dbf811d1b35ae0fc0fe9d1a1d12947`, not from an older
+>    baseline. The gate is replay-only: it reads the immutable P0-T artifacts and
+>    performs zero new encodes and zero model operations. If it fails, publish
+>    the registered stop and perform **no** model operation — do not repair and
+>    rerun.
 > 3. **Only if replay passes,** the single bounded GPU pilot, in that same
 >    execution session, bound to the locked image digest and the replay-pass
 >    receipt.
@@ -33,7 +42,9 @@
 >    bytes. Start from
 >    `studies/study3/analysis/final_focused_review_packet_v0_6.md`.
 >
-> Start from `studies/study3/pilot/p0_r1/P0_R1_HANDOFF.md`.
+> Start from `studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V2.md`, which is the
+> corrected generation-2 handoff. `P0_R1_HANDOFF.md` is retained unedited as
+> generation-1 history and its commands must not be used.
 >
 > **What the next thread may not do.** No freeze, no seed, no bank, no interface
 > selection, no positive reference, no confirmation access, no `OD2` or `UR-22`

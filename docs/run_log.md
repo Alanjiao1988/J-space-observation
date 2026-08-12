@@ -7619,3 +7619,86 @@ guarantee. It was never pushed in that form: the amend was discarded with a
 mixed reset back to the published commit and the change was re-committed on top
 as `e6e7e7e1`, preserving a strict append-only history. No published object was
 rewritten.
+
+## Study 3 P0-R1 generation 2: transport, runtime binding and exception safety
+
+Round `study3-p0-r1-generation2-transport-20260812`, under
+`studies/study3/prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md`
+(30,706 bytes, sha256 `5594e9728e8e4eb14635c34fb4895e65f2a8fa152ff2bffe76aec33a3ea84d18`,
+LF only, no BOM, no trailing newline), committed byte-identically as
+`bbe83ecc476f898d26b8837d59f8e88a72ccd199` before any implementation write.
+
+Required starting `origin/main` `71f4ab903295d1320881b654bda2d49cf1808794`,
+required starting tree `65f87e310a883495af5c3d926fceaa192411a27d`; both verified
+against a clean worktree before the round began.
+
+Published objects, by strict non-force fast-forward:
+
+- `bbe83ecc476f898d26b8837d59f8e88a72ccd199` - the authority alone.
+- `76473be2766c81ca37e3c865ed942f4b7a09fe07` / tree
+  `0c2fa0833fb4ab1a898dd5b3bdd41893f8c561cd` - the first generation-2
+  executable code commit.
+- `863aca8b3a2ac73d9e8c031f762bda6fae125059` / tree
+  `f48f577fa008d3e0ecfabff281bdae2e4a14a6b0` - the executable code commit the
+  active image was built from.
+- `c7e02b43e1dbf811d1b35ae0fc0fe9d1a1d12947` / tree
+  `dc972850dccbd80c54abd74c4c99a7acf54a1103` - the ready commit carrying the
+  active lock.
+
+Images: ACR run `cmg7` produced `sha256:928dc59b86c6ba5b3162b7f79f68f5195b59c6fb6a30bfbfabf34a774b8eef1c`,
+which was **discarded**; ACR run `cmga` produced the active
+`sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827`
+from base `sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126`.
+
+**A failure is recorded here rather than hidden.** The first generation-2 image
+passed all seven of its build gates and could not have exported a single result
+byte: it carried no client for the private object store. The private-Blob canary
+caught it on the real infrastructure, in Azure Container Apps execution
+`job-jspace-s3-p0r1-canary-g2-56y38fa`, which failed with
+`ModuleNotFoundError: No module named 'azure'` after writing zero objects. The
+build could not have caught it, because its transport gate ran the canary with
+`--dry-run` against an in-memory backend, which passes identically whether or
+not the image can reach the storage account.
+
+The repair is additive and does not touch the frozen science environment. The
+generation-1 dependency set `requirements-study3-p0-r1.txt` is a protected input
+bound by the generation-1 lock and hashed into the protocol, so it was not
+edited; it is instead the pip **constraint** file for the new
+`requirements-study3-p0-r1-transport-v2.txt`, whose whole closure is pinned. If
+resolving the transport would move a single science pin, the build now fails
+instead. The build additionally constructs the **real** managed-identity client
+and verifies that every frozen pin is still installed at its pinned version, so
+this failure mode cannot ship again.
+
+All three authorized model-free canaries then passed on the real infrastructure
+in execution `job-jspace-s3-p0r1-canary-g2-kqpquxz`: standalone layout, replay
+transport envelope (1,048,576 bytes across 4 artifacts, 2,053 lines, recovered
+byte-exact), and the private object store (4 objects of 262,144 bytes plus a
+manifest written last, under prefix
+`study3/p0_r1/gen2/gen2canary-863aca8b3a2a/`, read back byte-exact, no
+overwrite).
+
+Active lock: `studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json`, 26,172
+bytes, sha256 `f506f632b8602cc000229b9a40991fc666cf0cf9f0195712cfe93d12fbee4714`,
+binding 42 executable paths (20 generation-1, unchanged, plus 22 generation-2).
+
+Generation 1 is superseded **without consumption**: zero executions, zero GPU
+allocations, zero tokenizer constructions, zero encodes, zero checkpoint
+downloads, zero model weight loads. Its lock, image and handoff bytes are
+preserved unedited.
+
+Validation: `tests/test_study3_p0_r1_generation2_transport.py` contributes 124
+production-bound nodes; 217 across all P0-R1 modules. The full suite at the
+executable code commit ran 4,502 passed, 11 failed, 15 skipped. The 11 failures
+are the identical set observed at the required baseline `71f4ab9` on this host,
+where the run was 4,378 passed, 11 failed, 15 skipped: two registered historical
+failures plus nine that are environmental on this machine, because its `bash` is
+the WSL stub with no distribution installed, so `bash -n` returns non-zero
+regardless of file content. Reconciliation is exact and there are no
+regressions.
+
+No live replay gate was run, no tokenizer was constructed, nothing was encoded,
+no checkpoint was downloaded or loaded, no GPU workload was allocated or
+started, no model operation was performed, and the one-shot envelope was neither
+consumed nor re-armed. The state remains
+`STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE`, now at generation 2.

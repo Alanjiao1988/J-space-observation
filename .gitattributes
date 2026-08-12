@@ -218,4 +218,6 @@ studies/study3/pilot/p0_r1/*.py text eol=lf
 studies/study3/pilot/p0_r1/execution/*.py text eol=lf
 studies/study3/pilot/p0_r1/container/* text eol=lf
 studies/study3/prompts/*.md text eol=lf
+studies/study3/pilot/p0_r1/*.md text eol=lf
+studies/study3/pilot/p0_r1/*.json text eol=lf
 tests/test_study3_p0_r1_generation2_transport.py text eol=lf

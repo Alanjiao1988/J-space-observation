@@ -8,9 +8,31 @@
 > A model-free execution-completion round closed the gap between a registered
 > P0-R1 and a runnable one: the live replay gate, the canonical
 > result/receipt/disposition writers, the complete bounded model runner, the
-> Azure Container Apps T4 launcher and the immutable image digest now exist and
-> are bound by `studies/study3/pilot/p0_r1/p0_r1_execution_lock.json`. Nothing
-> was executed and `p0_r1_pilot_execution_authorized` is **not consumed**.
+> Azure Container Apps T4 launcher and the immutable image digest now exist.
+>
+> **Generation 2 is the current generation.** A model-free transport and
+> exception-safety round repaired five generation-1 defects: runtime binding
+> compared a path list rather than bytes, results returned a hash rather than
+> the complete bytes, the replay receipt was never injected into the GPU job,
+> the exception path discarded completed partial results, and validation
+> exercised in-memory stand-ins rather than the production route. The bound
+> object is now
+> `studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json` (26,172 bytes,
+> sha256 `f506f632b8602cc000229b9a40991fc666cf0cf9f0195712cfe93d12fbee4714`,
+> 42 bound executable paths), pinned to image digest
+> `sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827`.
+>
+> That round also recorded a real failure rather than hiding it. The first
+> generation-2 image passed all seven of its build gates and could not have
+> exported one result byte, because it shipped no client for the private object
+> store and its transport gate ran against an in-memory backend. The private
+> object store canary caught it on the real infrastructure; that image was
+> discarded, and all three canaries pass on the rebuilt image.
+>
+> Generation 1 is superseded **without consumption**: zero executions, zero GPU
+> allocations, zero tokenizer constructions, zero encodes, zero checkpoint
+> downloads, zero weight loads. Its lock, image and handoff bytes are preserved
+> unedited, and `p0_r1_pilot_execution_authorized` is still **not consumed**.
 >
 > draft-v0.6 registers first-discriminative-token scoring for `S2` and `S3` and
 > repairs the eligibility classifier in a versioned successor. The visible
@@ -21,8 +43,9 @@
 > [focused review packet](analysis/final_focused_review_packet_v0_6.md) ·
 > [v0.6 rendering and scoring registry](protocol/interface_calibration_rendering_registry_v0_6.json) ·
 > [P0-R1 package](pilot/p0_r1/README.md) ·
-> [P0-R1 handoff](pilot/p0_r1/P0_R1_HANDOFF.md) ·
-> [operator authority](prompts/study3_v0_6_p0_r1_authority.md)
+> [P0-R1 handoff, generation 2, current](pilot/p0_r1/P0_R1_HANDOFF_V2.md) ·
+> [P0-R1 handoff, generation 1, history](pilot/p0_r1/P0_R1_HANDOFF.md) ·
+> [operator authority](prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md)
 >
 > Nothing is frozen, selected or authorized for formal execution. `OD2`,
 > `UR-22` and every `RP` object remain unresolved, and the evidence ledger still

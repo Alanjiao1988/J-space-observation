@@ -10,8 +10,36 @@
 > unconditional refusal, the replay shell called the calibration `derive()`
 > rather than a live gate, the model runner always raised, no GPU launcher or
 > job definition existed, and the pre-execution receipt carried
-> `image_digest = null`. All of those are now closed and bound by an immutable
-> image digest in `studies/study3/pilot/p0_r1/p0_r1_execution_lock.json`.
+> `image_digest = null`. All of those are now closed.
+>
+> **Generation 2 is the current generation.** A model-free transport and
+> exception-safety round repaired five further defects that would have made a
+> run unverifiable or unrecoverable: runtime binding compared a path list rather
+> than bytes, results were transported as a digest rather than as the complete
+> bytes, the replay-gate receipt was never injected into the compute job, the
+> exception path discarded completed partial results, and validation exercised
+> in-memory stand-ins rather than the production route. The bound object is
+> `studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json` (26,172 bytes,
+> sha256 `f506f632b8602cc000229b9a40991fc666cf0cf9f0195712cfe93d12fbee4714`,
+> 42 bound executable paths), pinned to image digest
+> `sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827`
+> built from commit `863aca8b3a2ac73d9e8c031f762bda6fae125059`. The ready commit
+> is `c7e02b43e1dbf811d1b35ae0fc0fe9d1a1d12947`.
+>
+> **One real failure is on the record.** The first generation-2 image passed all
+> seven of its build gates while being incapable of exporting a single result
+> byte: it carried no client for the private object store, and its transport
+> gate ran `--dry-run` against an in-memory backend, which passes identically
+> whether or not the image can reach the storage account. The private-store
+> canary caught it on the real infrastructure in execution
+> `job-jspace-s3-p0r1-canary-g2-56y38fa`, which wrote zero objects. That image
+> was discarded, the route was repaired without editing the protected frozen
+> science dependency set, and all three model-free canaries pass on the rebuilt
+> image in execution `job-jspace-s3-p0r1-canary-g2-kqpquxz`.
+>
+> Generation 1 is superseded **without consumption**: it was never launched, so
+> its authorization is intact and its lock, image and handoff bytes are
+> preserved unedited.
 >
 > Nothing was executed. Zero replay-gate evaluations against the published lock,
 > zero tokenizer constructions, zero encodes, zero checkpoint downloads, zero
@@ -73,11 +101,14 @@
 > evidence row exists; `paper/evidence_ledger.csv` is byte-identical and still
 > ends at `EV-0016`. The original research question remains unanswered.
 >
-> Two independent next actions, in separate fresh sessions: one focused final
-> methods review of draft-v0.6, whose packet is
-> `studies/study3/analysis/final_focused_review_packet_v0_6.md`; and the P0-R1
-> replay gate, continued from the published registration commit per
-> `studies/study3/pilot/p0_r1/P0_R1_HANDOFF.md`.
+> The successor ordering is sequential, not two independent choices: the
+> fresh-session P0-R1 replay gate first, continued from the published ready
+> commit `c7e02b43e1dbf811d1b35ae0fc0fe9d1a1d12947` per
+> `studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V2.md`; only if it passes, the
+> single bounded GPU pilot in that same session; and only after a mechanically
+> feasible terminal P0-R1 disposition, one focused final methods review of
+> draft-v0.6, whose packet is
+> `studies/study3/analysis/final_focused_review_packet_v0_6.md`.
 
 
 > **STUDY 3-P0 STAGE P0-T RAN AND STOPPED**
