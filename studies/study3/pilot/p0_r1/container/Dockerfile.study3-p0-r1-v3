@@ -93,7 +93,11 @@ COPY studies/study3/pilot/p0/ /opt/jspace/src/studies/study3/pilot/p0/
 
 COPY studies/study3/pilot/p0_r1/ /opt/jspace/src/studies/study3/pilot/p0_r1/
 RUN rm -rf /opt/jspace/src/studies/study3/pilot/p0_r1/results \
-    && rm -f /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json
+    && rm -f \
+        /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json \
+        /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.schema.json \
+        /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_canary_receipts_v3.json \
+        /opt/jspace/src/studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V3.md
 
 COPY studies/study3/analysis/design_statistics.py \
      studies/study3/analysis/scoring_boundary_v0_6.py \
