@@ -36,7 +36,7 @@
    "ERROR"
   ]
  },
- "built_at": "2026-08-13T10:28:01Z",
+ "built_at": "2026-08-13T10:44:55Z",
  "claim_boundary": "this lock authorizes routing and execution mechanics only. It makes no scientific claim, selects no interface, freezes no draft, and adds no evidence row.",
  "counters_before_execution": {
   "additional_gpu_attempt_with_signed_zero_operation_receipt": 0,
@@ -179,9 +179,9 @@
     "sha256": "e9c4d61d15d2c84ab7bf5a72ba3f7e31050a56345390cfe9576dfbaf6d3d52ad"
    },
    {
-    "bytes": 6579,
+    "bytes": 8602,
     "path": "studies/study3/pilot/p0_r1/container/p0_r1_cli_wiring_canary_v3.py",
-    "sha256": "b4f8c03dfd50179cf0818419818baebd27c42280f281cec3b74c6319d45bcb36"
+    "sha256": "b0e3299d0587cf5eb28a15e0a79a8c469cf8db31c6831b6585a4101121594407"
    },
    {
     "bytes": 4554,

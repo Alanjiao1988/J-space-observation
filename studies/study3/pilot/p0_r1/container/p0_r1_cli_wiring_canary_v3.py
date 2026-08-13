@@ -33,11 +33,44 @@ SENTINEL_LINE = "P0_R1_SENTINEL_EXECUTOR_REACHED=1"
 
 ATTEMPT = "g3cliwiring-000000000000"
 
+#: The image deliberately does NOT contain the execution lock: the lock binds
+#: the image digest, so it necessarily postdates the image and the Dockerfile
+#: removes it. The canary therefore synthesizes a structurally valid lock
+#: rather than reading one. That is the honest arrangement -- this canary
+#: tests the shell-to-CLI authorization wiring, not the authenticity of a
+#: lock, and a canary that could only run when a real lock happened to be
+#: present would not run at build time at all.
+SYNTHETIC_LOCK = {
+    "schema_version": "study3-p0-r1-execution-lock-v3",
+    "generation": 3,
+    "state": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE",
+    "executable_code": {"commit": "c" * 40, "tree": "d" * 40, "files": []},
+    "ready_commit_relationship": {
+        "ready_anchor_parent": "a" * 40,
+        "ready_anchor_commit": None,
+        "published_head_is_recorded_in_the_lock": False,
+    },
+    "image": {"digest": "sha256:" + "1" * 64},
+    "legal_status": {
+        "p0_r1_pilot_execution_authorized": True,
+        "p0_r1_pilot_execution_consumed": False,
+        "formal_execution_authorized": False,
+    },
+    "attempt_binding": {"remaining_overall_envelopes": 1},
+}
+
+
+def _lock_document(lock_path):
+    """Read the active lock when present, otherwise synthesize one."""
+    if lock_path and os.path.exists(lock_path):
+        with open(lock_path, "rb") as handle:
+            return json.loads(handle.read().decode("utf-8")), lock_path
+    return dict(SYNTHETIC_LOCK), None
+
 
 def _synthetic_inputs(work, lock_path):
     """Build four consistent documents the production path will accept."""
-    with open(lock_path, "rb") as handle:
-        lock = json.loads(handle.read().decode("utf-8"))
+    lock, _actual = _lock_document(lock_path)
 
     executable = lock["executable_code"]
     relationship = lock["ready_commit_relationship"]
@@ -98,6 +131,15 @@ def _synthetic_inputs(work, lock_path):
             handle.write((json.dumps(document, indent=2, sort_keys=True)
                           + "\n").encode("utf-8"))
         paths[name] = path
+
+    # When no real lock exists (inside the image, by design), write the
+    # synthetic one so the shell has a concrete file to pass through.
+    if not (lock_path and os.path.exists(lock_path)):
+        synthetic = os.path.join(work, "p0_r1_execution_lock_v3.json")
+        with open(synthetic, "wb") as handle:
+            handle.write((json.dumps(lock, indent=1, sort_keys=True)
+                          + "\n").encode("utf-8"))
+        paths["p0_r1_execution_lock_v3.json"] = synthetic
     return paths
 
 
@@ -109,6 +151,7 @@ def run(lock_path=None, shell=None, stream=None):
 
     work = tempfile.mkdtemp(prefix="p0r1-cliwiring-")
     paths = _synthetic_inputs(work, lock_path)
+    effective_lock = paths.get("p0_r1_execution_lock_v3.json", lock_path)
 
     environment = dict(os.environ)
     environment.update({
@@ -116,7 +159,7 @@ def run(lock_path=None, shell=None, stream=None):
                                                   "..")),
         "P0_R1_RUNTIME_ROOT": work,
         "P0_R1_OUT_DIR": os.path.join(work, "result"),
-        "P0_R1_LOCK_FILE": lock_path,
+        "P0_R1_LOCK_FILE": effective_lock,
         "P0_R1_REPLAY_RECEIPT": paths["p0_r1_replay_receipt.json"],
         "P0_R1_RECONSTRUCTION_RECEIPT":
             paths["p0_r1_replay_reconstruction_receipt_v3.json"],
