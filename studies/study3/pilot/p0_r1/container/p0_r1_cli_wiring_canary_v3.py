@@ -167,15 +167,18 @@ def run(lock_path=None, shell=None, stream=None):
     shell = shell or os.path.join(CONTAINER_DIR, "p0_r1_model_pilot_v3.sh")
 
     work = tempfile.mkdtemp(prefix="p0r1-cliwiring-")
-    paths = _synthetic_inputs(work, lock_path)
+    source = os.path.join(work, "source")
+    runtime = os.path.join(work, "runtime")
+    os.makedirs(source)
+    paths = _synthetic_inputs(source, lock_path)
     effective_lock = paths.get("p0_r1_execution_lock_v3.json", lock_path)
 
     environment = dict(os.environ)
     environment.update({
         "P0_R1_SRC": _bash_path(os.path.abspath(os.path.join(
             P0_R1_DIR, "..", "..", "..", ".."))),
-        "P0_R1_RUNTIME_ROOT": _bash_path(work),
-        "P0_R1_OUT_DIR": _bash_path(os.path.join(work, "result")),
+        "P0_R1_RUNTIME_ROOT": _bash_path(runtime),
+        "P0_R1_OUT_DIR": _bash_path(os.path.join(runtime, "result")),
         "PYTHON": _bash_path(sys.executable),
         "P0_R1_EXECUTOR": "sentinel",
         "P0_R1_ATTEMPT": ATTEMPT,
