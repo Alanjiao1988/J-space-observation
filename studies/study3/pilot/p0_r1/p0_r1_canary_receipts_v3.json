@@ -1,55 +1,55 @@
 {
   "blob_journal": {
-    "attempt_id": "gen3canary-1e4324bb4bb0-20260813t1845z",
+    "attempt_id": "gen3canary-db0403381ab6-20260813t1925z",
     "create_only": true,
-    "execution": "job-jspace-s3-p0r1-canary-g3-0qly695",
+    "execution": "job-jspace-s3-p0r1-canary-g3-rmyr8v9",
     "job": "job-jspace-s3-p0r1-canary-g3",
     "journal_objects": 5,
     "log": {
-      "bytes": 108713,
-      "name": "p0_r1_final_vnet_log.json",
-      "sha256": "8513f5ebc5f1024f679ee6ce071d988c65cdc95380640ede8ac7c61a2fd6254e"
+      "bytes": 108705,
+      "name": "p0_r1_e1_vnet_log.json",
+      "sha256": "2eed48e7d167aab5d4665085a9e6c86a4fc4433c8d888a75e14cc3ccad366425"
     },
-    "manifest_sha256": "dc224bb75228b78ceda80e746feed6537ed338306151024565c200932dd37957",
+    "manifest_bytes": 1479,
+    "manifest_sha256": "5cc555bf9411994b6e5b34482e0de19e2321c1064cc739015306cabb4e2ef638",
     "passed": true,
-    "prefix": "study3/p0_r1/gen3/gen3canary-1e4324bb4bb0-20260813t1845z/",
     "recursive_manifest": true,
-    "recursive_manifest_sha256": "0e6b822c263b066a8ccac24aca5bc8c7c2047f370aadd97179ec7d258cecdeae",
+    "recursive_manifest_bytes": 2251,
+    "recursive_manifest_sha256": "376eb730824f00d278acf53bca83c75dcb2491ea5fca5c8522b0274feb655914",
     "row_bytes": 4222
   },
   "cpu_managed_identity_recovery": {
-    "attempt_id": "gen3canary-1e4324bb4bb0-20260813t1845z",
-    "execution": "job-jspace-s3-p0r1-recover-g3-xvzmicz",
+    "attempt_id": "gen3canary-db0403381ab6-20260813t1925z",
+    "execution": "job-jspace-s3-p0r1-recover-g3-irp4giq",
     "identity_client_id": "479d9229-632e-4490-ad92-854a34dfddf8",
     "job": "job-jspace-s3-p0r1-recover-g3",
     "journal_objects_verified": 5,
     "log": {
       "bytes": 41325,
-      "name": "p0_r1_final_recovery_log.json",
-      "sha256": "0bdcf82213c8f82885d61a80ee70d3a56dd5cbf0e47b1df0cc335d8261b781b3"
+      "name": "p0_r1_e1_recovery_log.json",
+      "sha256": "50ec8ab443830ab6a74d4f5958d90e48d42b83dd8bd50776e0586b5c9b451114"
     },
     "manifest_written_last": true,
     "partial_attempt": false,
     "passed": true,
-    "prefix": "study3/p0_r1/gen3/gen3canary-1e4324bb4bb0-20260813t1845z/",
     "recovery_receipt": {
       "bytes": 2160,
-      "name": "p0_r1_final_cpu_recovery_receipt.json",
-      "sha256": "9146bcd3ccc71ee6d04c746982959da71cc917bd12f475bd550436bb61ccf288"
+      "name": "p0_r1_e1_cpu_recovery_receipt.json",
+      "sha256": "c45661f7e439172ff16d53266a1aebccb34751a3527604c3c63553ea25b7216a"
     },
     "recursive_objects_verified": 6,
     "sequence_continuous": true,
     "workload_profile": "Consumption"
   },
   "exact_cli_wiring": {
-    "acr_build_gate_run_id": "cmgu",
-    "execution": "job-jspace-s3-p0r1-cli-canary-g3-045bda2",
+    "acr_build_gate_run_id": "cmh5",
+    "execution": "job-jspace-s3-p0r1-cli-canary-g3-d9h2uxv",
     "injected_exact_inputs": 4,
     "job": "job-jspace-s3-p0r1-cli-canary-g3",
     "log": {
-      "bytes": 28430,
-      "name": "p0_r1_final_cli_log.json",
-      "sha256": "3960f3bcd77bed58679c5b9b3cdc4f8378ecb1aece464874153e00af03b6f9b9"
+      "bytes": 28436,
+      "name": "p0_r1_e1_cli_log.json",
+      "sha256": "0d3474faf501074fb2cccaae318f1d21329b77d718e2f9a9c8035786087c4bc1"
     },
     "model_operations": 0,
     "passed": true,
@@ -57,14 +57,14 @@
     "shell_exit_trap_completed": true,
     "workload_profile": "Consumption"
   },
-  "executable_commit": "1e4324bb4bb09de6d2373560b3edd7442cf8352c",
-  "executable_tree": "161f9c12cead6bc72235270ddeb260fd3b40ba89",
+  "executable_commit": "db0403381ab68073d497df370197ffbb5bd4ba10",
+  "executable_tree": "512f2afe857a8a1012f8cfd6ebad91e7da9851e5",
   "hard_kill_recovery": {
-    "attempt_id": "gen3canary-1e4324bb4bb0-20260813t1845z-hardkill",
+    "attempt_id": "gen3canary-db0403381ab6-20260813t1925z-hardkill",
     "authorizes_a_retry": false,
     "child_return_code": -9,
     "cpu_recovery_classification": "partial",
-    "execution": "job-jspace-s3-p0r1-canary-g3-0qly695",
+    "execution": "job-jspace-s3-p0r1-canary-g3-rmyr8v9",
     "job": "job-jspace-s3-p0r1-canary-g3",
     "journal_objects": 5,
     "open_admission": "generation_call",
@@ -74,40 +74,40 @@
   "image": {
     "base_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
     "build_log": {
-      "bytes": 60193,
-      "name": "acr_cmgu.log",
-      "sha256": "27c0d89630350af608d5f19a47f8e83919c3ee3eb1d306e14a176705a32ac650"
+      "bytes": 60374,
+      "name": "acr_cmh5.log",
+      "sha256": "12d97513d234ef8808d6c0ef8601f3075370d4d99fdd2638fb31a61d3c1236b5"
     },
-    "build_run_id": "cmgu",
+    "build_run_id": "cmh5",
     "context": {
-      "bytes": 16722050,
+      "bytes": 16731616,
       "kind": "git archive of exact committed objects",
-      "sha256": "5efb30efa5368bb24bae97fc744026f064e73581252b1109dc8b52cb3ee5e303"
+      "sha256": "957d535384a77b759e0c050f64d2de4caab50011449c21b395773fe7b4928452"
     },
-    "digest": "sha256:7be1b7543ea2b618a9745369169f861ba447e25f5522ef65ea5c7f6218384012",
-    "reference": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@sha256:7be1b7543ea2b618a9745369169f861ba447e25f5522ef65ea5c7f6218384012",
-    "tag": "gen3-1e4324bb4bb0"
+    "digest": "sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c",
+    "reference": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c",
+    "tag": "gen3-db0403381ab6"
   },
   "image_bound_bytes": {
-    "acr_run_id": "cmgw",
+    "acr_run_id": "cmh7",
     "audit": {
       "bytes": 906,
-      "name": "p0_r1_final_image_bound_audit.json",
-      "sha256": "4186310edc0475c8316d2d5dab6e4ada0cbf58c7db2e7156116e5eb2f07e16c1"
+      "name": "p0_r1_e1_image_bound_audit.json",
+      "sha256": "45f1b24be26462c7e951fe6b54356b746317addf6e4e5499d180ceb24420adc7"
     },
     "git_objects_verified": 79,
     "manifest": {
-      "bytes": 16271,
-      "name": "p0_r1_final_image_manifest.json",
-      "sha256": "078dbadf115ece896fca5bc5f1f690df3fe00c9aa512c8507ad986a07a1406a4"
+      "bytes": 16286,
+      "name": "p0_r1_e1_image_manifest.json",
+      "sha256": "537deec77bb12b1472e6b2d6a48d54d3c575a34b857fd75a2988116099d2efbf"
     },
     "manifest_blob_count": 79,
     "mismatches": [],
     "passed": true,
     "raw_log": {
-      "bytes": 20857,
-      "name": "p0_r1_final_image_manifest_raw_log.txt",
-      "sha256": "45116ca21b5245c4cccfac073bc5852174a1a5eaf33ffb9781b1b817884b0dba"
+      "bytes": 20871,
+      "name": "p0_r1_e1_image_manifest_raw_log.txt",
+      "sha256": "93efe0af1653efc609da39ec4a238517bd3cfcc987d3dc892ef3e7aea9a83d42"
     },
     "requires_a_context_mount": false,
     "results_present": false
@@ -130,139 +130,121 @@
     ]
   },
   "private_prefix": {
-    "attempt_id": "gen3-prefix-canary-1e4324bb4bb0-20260813t1845z",
-    "execution": "job-jspace-s3-p0r1-recover-g3-obx7x7k",
+    "attempt_id": "gen3-prefix-canary-db0403381ab6-20260813t1925z",
+    "execution": "job-jspace-s3-p0r1-recover-g3-vvaeb2a",
     "job": "job-jspace-s3-p0r1-recover-g3",
     "log": {
-      "bytes": 9430,
-      "name": "p0_r1_final_prefix_log.json",
-      "sha256": "e338cfe5cccd76c2b508ee27755a743016a90827225675a311d458de15144da4"
+      "bytes": 9428,
+      "name": "p0_r1_e1_prefix_log.json",
+      "sha256": "24f6f0c0b41bbbe909a7f44cfab43ccf13df8a7c73ca2f681162cfe9c5462bfd"
     },
     "objects_under_prefix": 0,
     "outcome": "PROVED_ABSENT",
     "passed": true,
-    "prefix": "study3/p0_r1/gen3/gen3-prefix-canary-1e4324bb4bb0-20260813t1845z/",
     "reserved_collisions": [],
     "workload_profile": "Consumption"
   },
   "registered_failed_or_discarded_runs": [
     {
-      "image_digest": "sha256:67d6c524035762087e6dfada3fb7e244d5b983005621976fd629791a905da19c",
-      "kind": "discarded_pre-6608856_image",
       "launchable": false,
       "run_id": "cmgc"
     },
     {
-      "image_digest": "sha256:a9eb372f440d3ab4ac3130d0ac743fb19e7d98ea420a7495ffe5fcffda00e1f5",
-      "kind": "discarded_pre-repair_image",
       "launchable": false,
       "run_id": "cmgd"
     },
     {
-      "failure": "enhanced CLI canary caught source/runtime aliasing",
-      "image_pushed": false,
-      "kind": "failed_build",
-      "run_id": "cmgp"
-    },
-    {
-      "image_digest": "sha256:1d89c130391f018aa1f6f20ef6c28a3cfb35f00fc88e94f76261030da7fff635",
-      "kind": "discarded_image_after_executable_change",
       "launchable": false,
       "run_id": "cmgq"
     },
     {
-      "image_digest": "sha256:9f0202df8fbaf015f88b4b381d7584303a289521793cafcc409f485c1dfb56ac",
-      "kind": "discarded_image_after_executable_change",
       "launchable": false,
       "run_id": "cmgr"
     },
     {
-      "failure": "quick-run acb.yaml absent",
-      "kind": "failed_operator_canary_wrapper",
-      "model_operations": 0,
-      "run_id": "cmgh"
+      "launchable": false,
+      "run_id": "cmh2"
     },
     {
-      "failure": "temporary script CRLF",
-      "kind": "failed_operator_canary_wrapper",
-      "model_operations": 0,
-      "run_id": "cmgj"
+      "launchable": false,
+      "run_id": "cmh3"
     },
     {
-      "failure": "temporary wrapper TMPDIR shadowed",
-      "kind": "failed_operator_canary_wrapper",
+      "launchable": false,
+      "run_id": "cmh5"
+    },
+    {
       "model_operations": 0,
-      "run_id": "cmgk"
+      "run_id": "cmgp",
+      "status": "Failed"
+    },
+    {
+      "model_operations": 0,
+      "reason": "pre-lock validation",
+      "run_id": "cmgx",
+      "status": "Failed"
     },
     {
       "execution": "job-jspace-s3-p0r1-recover-g3-9l66ewp",
-      "failure": "runtime root not writable before production-UID build gate",
-      "kind": "failed_recovery_canary",
-      "model_operations": 0
+      "model_operations": 0,
+      "status": "Failed"
     },
     {
       "execution": "job-jspace-s3-p0r1-cli-canary-g3-g2jqcm1",
-      "failure": "runtime root not writable before production-UID build gate",
-      "kind": "failed_cli_canary",
-      "model_operations": 0
+      "model_operations": 0,
+      "status": "Failed"
     },
     {
       "execution": "job-jspace-s3-p0r1-cli-canary-g3-5m6aeh8",
-      "failure": "operator supplied canary attempt did not match synthetic receipt",
-      "kind": "failed_cli_canary",
-      "model_operations": 0
-    },
-    {
-      "failure": "exact executable commit still carried placeholder lock",
-      "kind": "expected_pre-lock_validation_failure",
       "model_operations": 0,
-      "run_id": "cmgx"
+      "status": "Failed"
     }
   ],
   "replay_capture_recovery": {
-    "acr_run_id": "cmgv",
+    "acr_fragment_repair_count": 0,
+    "acr_run_id": "cmh6",
     "artifacts": [
       {
         "bytes": 262144,
         "chunks": 512,
         "name": "P0_R1_REPLAY_DISPOSITION.md",
-        "sha256": "5f756bc40137e8226dc9c35c34c0ee9da0e2c5b922f8bc15563e8b2c2d4d86d9"
+        "sha256": "3f7894011431f25c52f216c379e77bbf84fd65b6050a4ef661637423127183c4"
       },
       {
         "bytes": 262144,
         "chunks": 512,
         "name": "p0_r1_replay_counters.json",
-        "sha256": "f689cee53293f9e87592ea3499965ccf635abb61a1ed9b6aa6bf2e15c0790333"
+        "sha256": "ad0afe00a13fa0d6eb1f57f473daa51090d1f7297ecffd4d53457f07b067a951"
       },
       {
         "bytes": 262144,
         "chunks": 512,
         "name": "p0_r1_replay_receipt.json",
-        "sha256": "1c4c5ffbc4acacf35cef594d17a7c8d3790145c4b153bd3659515d28393b4bd5"
+        "sha256": "07fab40da0c404e21770b3428dc4c56132c72361defa9c3be02fe69685c0c203"
       },
       {
         "bytes": 262144,
         "chunks": 512,
         "name": "p0_r1_replay_result.json",
-        "sha256": "3a98e2d8d13e6b5362adb5dc10238417ac02e30b0313f43ec11c7ae7db623a6d"
+        "sha256": "3c2499f03b3774eac2e529b6210380eaf34502e16a983515e468603c08bf05a3"
       }
     ],
-    "attempt_id": "gen3-transport-canary-1e4324bb4bb0-20260813t1845z",
+    "attempt_id": "gen3-transport-canary-db0403381ab6-20260813t1925z",
     "entrypoint": "/usr/local/bin/p0_r1_replay_v3.sh",
     "fixture_is_synthetic": true,
-    "manifest_sha256": "acb5f86ee7f6caafd11f75ab52db8e196240b7cbe298435e5885f92f58a0d975",
+    "manifest_sha256": "02e1a621a5f3c3e72426b3b1b91e5b58189f9b20cd699a3228c1374d2c9a6375",
     "mode": "transport-canary",
     "one_shot_envelope_consumed": false,
     "passed": true,
     "raw_log": {
-      "bytes": 1989866,
-      "name": "p0_r1_final_exact_task_raw_log.txt",
-      "sha256": "7ca029a496f50b9a4018dda73ca4d5a3b9918e26eb6a2ce18db09e99abb24d95"
+      "bytes": 1989868,
+      "name": "acr_cmh6.log",
+      "sha256": "fe0b3dde2aa6b686ef4f423f4a901b30bf95077e1f9c2070db7ec39551ba8c9b"
     },
     "reconstruction_receipt": {
-      "bytes": 1573,
-      "name": "p0_r1_final_task_reconstruction.json",
-      "sha256": "bee3d255fa6197c13e8b2f7949e68c597b0c7d8d82a3f652b811b04cda8acaa4"
+      "bytes": 1702,
+      "name": "p0_r1_e1_task_reconstruction.json",
+      "sha256": "c1c14de6c350ecc3a9bd2320e24d15216632482ea1dc6c907b5be5b533c5838f"
     },
     "recovered_without_rerunning_the_gate": true,
     "replay_gate_run": false,
@@ -271,18 +253,17 @@
   },
   "schema_version": "study3-p0-r1-model-free-production-canaries-v3",
   "standalone_layout": {
-    "execution": "job-jspace-s3-p0r1-canary-g3-0qly695",
+    "execution": "job-jspace-s3-p0r1-canary-g3-rmyr8v9",
     "job": "job-jspace-s3-p0r1-canary-g3",
     "log": {
-      "bytes": 108713,
-      "name": "p0_r1_final_vnet_log.json",
-      "sha256": "8513f5ebc5f1024f679ee6ce071d988c65cdc95380640ede8ac7c61a2fd6254e"
+      "bytes": 108705,
+      "name": "p0_r1_e1_vnet_log.json",
+      "sha256": "2eed48e7d167aab5d4665085a9e6c86a4fc4433c8d888a75e14cc3ccad366425"
     },
     "passed": true,
     "requires_a_context_mount": false,
     "runtime_root_writable_as_uid_10001": true,
     "standalone_source_root": "/opt/jspace/src",
-    "token": "P0_R1_G3_STANDALONE_LAYOUT=1",
     "workload_profile": "Consumption"
   }
 }
