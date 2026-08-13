@@ -26,6 +26,10 @@ canary_layout() {
   done
   "$PY" "$P0_R1_DIR/p0_r1_model_runner_v3.py" --identity >/dev/null
   "$PY" "$P0_R1_DIR/p0_r1_recovery_v3.py" --identity >/dev/null
+  runtime="${P0_R1_RUNTIME_ROOT:-/workspace/runtime}"
+  probe="$runtime/.p0-r1-write-canary"
+  : >"$probe" || { echo "FAIL: runtime root $runtime is not writable" >&2; exit 1; }
+  rm -f "$probe"
   echo "P0_R1_G3_STANDALONE_LAYOUT=1"
 }
 

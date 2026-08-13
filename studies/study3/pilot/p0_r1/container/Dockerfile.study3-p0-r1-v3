@@ -154,16 +154,13 @@ RUN bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_successor
     && bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_recovery_v3.sh \
     && bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_canary_v3.sh
 
-# Execute the real model shell -> runner CLI -> authorization -> sentinel seam.
-# A syntax-only gate is exactly how generation 2 published an unusable command.
-RUN /usr/local/bin/p0_r1_canary_v3.sh build
-
 # Fail the build unless every bound generation-3 blob inside the image matches
 # the repository bytes, every entry point exists and is executable, and no
 # result byte is present anywhere.
 RUN python /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_image_manifest_v3.py
 
 RUN install -d -o jspace -g jspace -m 0700 \
+        /workspace/runtime \
         /workspace/runtime/home \
         /workspace/runtime/results \
         /workspace/runtime/injected \
@@ -186,6 +183,10 @@ ENV HOME=/workspace/runtime/home \
     INJECTED_DIR=/workspace/runtime/injected
 
 USER 10001:10001
+
+# Execute the real shell/CLI seam as the non-root production UID. This also
+# proves the runtime root itself accepts the injected authorization files.
+RUN /usr/local/bin/p0_r1_canary_v3.sh build
 
 # The default mode is the one that cannot touch a model.
 CMD ["python", "/opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_factorization.py", "--check"]
