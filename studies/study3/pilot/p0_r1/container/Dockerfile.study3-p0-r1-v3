@@ -98,6 +98,8 @@ RUN rm -rf /opt/jspace/src/studies/study3/pilot/p0_r1/results \
 COPY studies/study3/analysis/design_statistics.py \
      studies/study3/analysis/scoring_boundary_v0_6.py \
      /opt/jspace/src/studies/study3/analysis/
+COPY tests/test_study3_p0_r1_generation3_execution_closure.py \
+     /opt/jspace/src/tests/test_study3_p0_r1_generation3_execution_closure.py
 
 COPY studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt \
      /opt/jspace/src/studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt
@@ -151,6 +153,10 @@ RUN bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_successor
     && bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_replay_v3.sh \
     && bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_recovery_v3.sh \
     && bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_canary_v3.sh
+
+# Execute the real model shell -> runner CLI -> authorization -> sentinel seam.
+# A syntax-only gate is exactly how generation 2 published an unusable command.
+RUN /usr/local/bin/p0_r1_canary_v3.sh build
 
 # Fail the build unless every bound generation-3 blob inside the image matches
 # the repository bytes, every entry point exists and is executable, and no

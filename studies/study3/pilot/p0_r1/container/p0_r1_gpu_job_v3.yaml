@@ -73,6 +73,14 @@ properties:
             value: REPLACED_WITH_CAPTURED_ATTEMPT_ID
           - name: P0_R1_IMAGE_DIGEST
             value: REPLACED_WITH_LOCKED_DIGEST
+          - name: P0_R1_LOCK_V3_B64
+            value: REPLACED_WITH_SIZE_AND_HASH_CHECKED_LOCK_ENVELOPE
+          - name: P0_R1_REPLAY_RECEIPT_V3_B64
+            value: REPLACED_WITH_SIZE_AND_HASH_CHECKED_REPLAY_RECEIPT
+          - name: P0_R1_RECONSTRUCTION_RECEIPT_V3_B64
+            value: REPLACED_WITH_SIZE_AND_HASH_CHECKED_RECONSTRUCTION_RECEIPT
+          - name: P0_R1_HEAD_PROOF_V3_B64
+            value: REPLACED_WITH_SIZE_AND_HASH_CHECKED_HEAD_PROOF
   identity:
     type: UserAssigned
     userAssignedIdentities:

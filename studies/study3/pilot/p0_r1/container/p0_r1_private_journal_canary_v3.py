@@ -68,12 +68,19 @@ def run(attempt_id, backend=None, stream=None):
                                         "model_operations_performed": 0})
 
     manifest = journal.manifest(canonical=[])
+    recursive = transport.write_recursive_manifest({
+        "canary": "private_journal_v3",
+        "journal_manifest": manifest["manifest_identity"],
+    })
     stream.write("P0_R1_G3_JOURNAL_OBJECTS=%d\n"
                  % manifest["journal_object_count"])
     stream.write("P0_R1_G3_JOURNAL_MANIFEST=%s SHA256=%s BYTES=%d\n"
                  % (manifest["manifest_identity"]["name"],
                     manifest["manifest_identity"]["sha256"],
                     manifest["manifest_identity"]["bytes"]))
+    stream.write("P0_R1_G3_RECURSIVE_MANIFEST=%s SHA256=%s BYTES=%d\n"
+                 % (recursive["name"], recursive["sha256"],
+                    recursive["bytes"]))
 
     receipt, payloads = RECOVERY.recover(attempt_id, backend=backend,
                                          stream=stream)

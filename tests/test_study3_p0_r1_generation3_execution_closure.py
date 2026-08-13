@@ -50,6 +50,7 @@ import p0_r1_prefix_preflight_v3 as PREFIX  # noqa: E402
 import p0_r1_ready_anchor_v3 as ANCHOR  # noqa: E402
 import p0_r1_recovery_v3 as RECOVERY  # noqa: E402
 import p0_r1_replay_capture_v3 as CAPTURE  # noqa: E402
+import p0_r1_replay_gate_v3 as GATE_V3  # noqa: E402
 import p0_r1_transport as TRANSPORT  # noqa: E402
 import p0_r1_cli_wiring_canary_v3 as WIRING  # noqa: E402
 
@@ -313,7 +314,7 @@ def test_the_exact_production_model_shell_reaches_the_boundary_once():
 def _gate_shaped_receipt(attempt="gen3-000000000000-20260813T000000Z"):
     """A receipt shaped exactly as the gate emits it, including false."""
     return {
-        "schema_version": "study3-p0-r1-replay-receipt-v2",
+        "schema_version": "study3-p0-r1-replay-gate-receipt-v3",
         "attempt_id": attempt,
         "ready_commit": "b" * 40,
         "image_digest": "sha256:" + "1" * 64,
@@ -330,8 +331,9 @@ def _gate_shaped_receipt(attempt="gen3-000000000000-20260813T000000Z"):
     }
 
 
-def _gate_shaped_result(state="STUDY3_P0_R1_REPLAY_GATE_PASSED"):
-    return {"state": state, "schema_version": "study3-p0-r1-gate-result"}
+def _gate_shaped_result(state=GATE_V3.PASS_STATE):
+    return {"state": state, "schema_version":
+            "study3-p0-r1-replay-gate-result-v3"}
 
 
 def _envelope(attempt, receipt=None, result=None, extra=None):
@@ -352,16 +354,27 @@ def _envelope(attempt, receipt=None, result=None, extra=None):
     return "\n".join(TRANSPORT.encode(attempt, payloads)), payloads
 
 
-def test_the_gate_emitted_receipt_flows_through_recovery_into_authorization():
+def test_the_gate_emitted_receipt_flows_through_recovery_into_authorization(
+        tmp_path, lock_document):
     """The receipt that says false still authorizes, via the second document.
 
     Generation 2 required ``complete_byte_recovery_verified`` to be true on
     the recovered receipt, and its gate wrote false. No genuine replay could
     ever have authorized the pilot; only a hand-edited receipt could.
     """
-    attempt = "gen3-000000000000-20260813T000000Z"
-    log, _payloads = _envelope(attempt)
-    receipt, recovered = CAPTURE.reconstruct(log, "cmz1", attempt_id=attempt)
+    lock_bytes = LOCK_V3.dumps(lock_document).encode("utf-8")
+    stream = io.StringIO()
+    outcome = GATE_V3.run(
+        str(tmp_path / "gate"), lock_bytes=lock_bytes,
+        image_digest=lock_document["image"]["digest"],
+        ready_commit="b" * 40, root=REPO_ROOT, stream=stream)
+    attempt = outcome["attempt_id"]
+    assert attempt.startswith("gen3-")
+    assert outcome["state"] == GATE_V3.PASS_STATE
+    receipt, recovered = CAPTURE.reconstruct(
+        stream.getvalue(), "cmz1", attempt_id=attempt,
+        executable_commit=lock_document["executable_code"]["commit"],
+        image_digest=lock_document["image"]["digest"])
 
     emitted = json.loads(
         recovered["p0_r1_replay_receipt.json"].decode("utf-8"))
@@ -817,7 +830,8 @@ def test_the_exit_boundary_emits_complete_recoverable_bytes(tmp_path):
     assert "P0_R1_SECONDARY_ENVELOPE_COMPLETE=1" in text
 
     recovered = TRANSPORT.recover(text, attempt_id="gen3-trap-000000000000",
-                                  allowed=(RECEIPT.RECEIPT_NAME,))
+                                  allowed=(RECEIPT.RECEIPT_NAME,
+                                           BLOB_V3.MANIFEST_NAME))
     assert recovered[RECEIPT.RECEIPT_NAME] == payload, (
         "the receipt must be recoverable from the captured log alone")
 
@@ -1132,6 +1146,18 @@ def test_the_authorization_requires_all_four_documents(synthetic_inputs):
     for identity in authorization["input_identities"].values():
         assert len(identity["sha256"]) == 64
         assert identity["bytes"] > 0
+    for target, filename in (
+            ("lock", "p0_r1_execution_lock_v3.json"),
+            ("replay_receipt", "p0_r1_replay_receipt.json"),
+            ("reconstruction_receipt",
+             "p0_r1_replay_reconstruction_receipt_v3.json"),
+            ("head_proof", "p0_r1_head_proof_v3.json")):
+        path = (LOCK_V3_PATH if target == "lock"
+                else synthetic_inputs[filename])
+        with open(path, "rb") as handle:
+            payload = handle.read()
+        assert AUTHZ.decode_injection(
+            AUTHZ.encode_injection(payload)) == payload
 
 
 def test_a_generation_2_lock_cannot_authorize_a_generation_3_pilot(
@@ -1162,9 +1188,18 @@ def test_a_replay_that_touched_a_model_is_not_a_replay(synthetic_inputs,
 # --- the lock itself ------------------------------------------------------
 
 def test_the_v3_lock_validates_every_bound_byte():
+    import hashlib
     with open(LOCK_V3_PATH, "rb") as handle:
         document = json.loads(handle.read().decode("utf-8"))
     assert LOCK_V3.validate(document, root=REPO_ROOT) is True
+    commit = document["executable_code"]["commit"]
+    for entry in document["executable_code"]["files"]:
+        payload = subprocess.check_output(
+            ["git", "cat-file", "blob", "%s:%s" % (commit, entry["path"])],
+            cwd=REPO_ROOT)
+        assert len(payload) == entry["bytes"], entry["path"]
+        assert hashlib.sha256(payload).hexdigest() == entry["sha256"], \
+            entry["path"]
 
 
 def test_the_v3_lock_binds_all_four_authorities(lock_document):
@@ -1201,6 +1236,18 @@ def test_the_lock_records_the_azure_and_replay_contracts(lock_document):
     assert transport["journal_stores_complete_payloads"] is True
     assert transport["manifest_enumerates_recursively"] is True
     assert transport["prefix_root"] == "study3/p0_r1/gen3"
+    assert set(LOCK_V3.CANARY_NAMES).issubset(transport["canaries"])
+    assert all(transport["canaries"][name]["passed"]
+               for name in LOCK_V3.CANARY_NAMES)
+    assert set(lock_document["executable_code"]["commit"]) != {"0"}
+    assert set(lock_document["executable_code"]["tree"]) != {"0"}
+    assert set(lock_document["image"]["digest"][7:]) != {"0"}
+    for key in ("registration", "corpus_and_p0_t", "immutable_sources",
+                "roles", "caps", "smoke_exact_allocation",
+                "state_transition", "successor_context"):
+        assert key in lock_document
+    assert replay["gate_result_schema"].endswith("-v3")
+    assert replay["gate_receipt_schema"].endswith("-v3")
 
 
 def test_the_replay_gate_v3_refuses_to_rewrite_its_own_receipt():

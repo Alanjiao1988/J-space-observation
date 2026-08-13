@@ -33,9 +33,14 @@ case "$MODE" in
       --attempt "$ATTEMPT"
     ;;
   recover)
+    if [ ! -f "$LOCK_FILE" ]; then
+      "$PY" "$P0_R1_DIR/p0_r1_authorization_v3.py" --reconstruct \
+        --out-dir "$RUNTIME_ROOT" --require lock \
+        || fail "the active generation-3 lock could not be reconstructed"
+    fi
+    [ -f "$LOCK_FILE" ] || fail "recovery requires the active lock bytes"
     exec "$PY" "$P0_R1_DIR/p0_r1_recovery_v3.py" --recover \
-      --attempt "$ATTEMPT" \
-      ${LOCK_FILE:+--lock-file "$LOCK_FILE"}
+      --attempt "$ATTEMPT" --lock-file "$LOCK_FILE"
     ;;
   *)
     fail "unknown recovery mode $MODE; expected prefix-preflight or recover"

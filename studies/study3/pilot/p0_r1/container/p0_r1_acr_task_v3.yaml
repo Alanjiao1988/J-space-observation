@@ -35,7 +35,9 @@ steps:
     env:
       - P0_R1_LOCK_V3_B64={{.Values.LOCK_B64}}
       - P0_R1_IMAGE_DIGEST={{.Values.DIGEST}}
-      - P0_R1_READY_COMMIT={{.Values.COMMIT}}
+      - P0_R1_READY_COMMIT={{.Values.READY_ANCHOR}}
+      - P0_R1_REPLAY_MODE={{.Values.MODE}}
+      - P0_R1_ATTEMPT={{.Values.ATTEMPT}}
       - P0_R1_SRC=/opt/jspace/src
       - P0_R1_RUNTIME_ROOT=/workspace/runtime
       - RESULTS_DIR=/workspace/runtime/results
@@ -50,6 +52,12 @@ boundary:
   raw_log_retained_from_first_byte: true
   raw_log_tail_limited: false
   gate_receipt_is_rewritten_after_transport: false
+  required_values:
+    - IMAGE
+    - LOCK_B64
+    - DIGEST
+    - READY_ANCHOR
+    - MODE
   recovery_proof_document: p0_r1_replay_reconstruction_receipt_v3.json
   tokenizer_constructions: 0
   tokenizer_encodes: 0

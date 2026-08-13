@@ -97,12 +97,17 @@ def emit(exit_code, attempt_id=None, out_dir=None, lock_sha256=None,
             stream.write("P0_R1_LOCAL_RECEIPT_FAILED=1 %s\n" % exc)
 
     durable = False
+    recursive = None
     if attempt_id and attempt_id != "unknown":
         try:
             import p0_r1_blob_transport_v3 as BLOB_V3
             transport = BLOB_V3.PrivateBlobTransportV3(
                 attempt_id, backend=backend)
             transport.upload_and_verify(RECEIPT_NAME, payload)
+            recursive = transport.write_recursive_manifest({
+                "terminal_receipt": RECEIPT_NAME,
+                "shell_exit_code": exit_code,
+            })
             durable = True
             stream.write("P0_R1_INFRASTRUCTURE_RECEIPT_DURABLE=1 PREFIX=%s\n"
                          % transport.prefix)
@@ -114,9 +119,13 @@ def emit(exit_code, attempt_id=None, out_dir=None, lock_sha256=None,
     # complete bytes belong in the captured log so a single store failure at
     # read time is not a second single point of failure.
     try:
+        envelope = {RECEIPT_NAME: payload}
+        if recursive is not None:
+            envelope[recursive["name"]] = recursive["payload"]
+        allowed = tuple(sorted(envelope))
         for line in TRANSPORT.encode(
                 attempt_id or "p0-r1-infrastructure",
-                {RECEIPT_NAME: payload}, allowed=(RECEIPT_NAME,)):
+                envelope, allowed=allowed):
             stream.write(line + "\n")
         stream.write("P0_R1_SECONDARY_ENVELOPE_COMPLETE=1\n")
     except Exception as exc:  # noqa: BLE001
@@ -128,6 +137,28 @@ def emit(exit_code, attempt_id=None, out_dir=None, lock_sha256=None,
                     "1" if durable else "0"))
     stream.flush()
     return document, payload, durable
+
+
+def reemit_existing(path, attempt_id, stream=None):
+    """Re-emit the exact receipt already finalized before the shell exits."""
+    stream = stream if stream is not None else sys.stdout
+    with open(path, "rb") as handle:
+        payload = handle.read()
+    try:
+        document = json.loads(payload.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError) as exc:
+        raise ValueError("the finalized infrastructure receipt is invalid: %s"
+                         % exc)
+    if document.get("attempt_id") != attempt_id:
+        raise ValueError(
+            "the finalized receipt binds attempt %r, not %r"
+            % (document.get("attempt_id"), attempt_id))
+    for line in TRANSPORT.encode(
+            attempt_id, {RECEIPT_NAME: payload}, allowed=(RECEIPT_NAME,)):
+        stream.write(line + "\n")
+    stream.write("P0_R1_FINALIZED_RECEIPT_REEMITTED=1\n")
+    stream.flush()
+    return document, payload
 
 
 def implementation_identity(root=None):
@@ -145,6 +176,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--identity", action="store_true")
     parser.add_argument("--emit", action="store_true")
+    parser.add_argument("--reemit-existing")
     parser.add_argument("--exit-code", type=int, default=0)
     parser.add_argument("--attempt")
     parser.add_argument("--out-dir")
@@ -167,6 +199,19 @@ def main(argv=None):
             backend = BLOB.InMemoryBackend()
         emit(args.exit_code, attempt_id=args.attempt, out_dir=args.out_dir,
              lock_sha256=lock_sha, backend=backend)
+        return 0
+
+    if args.reemit_existing:
+        if not args.attempt:
+            print("FAIL: --reemit-existing requires --attempt",
+                  file=sys.stderr)
+            return 2
+        try:
+            reemit_existing(args.reemit_existing, args.attempt)
+        except (OSError, ValueError) as exc:
+            print("P0_R1_EXISTING_RECEIPT_REFUSED=1 %s" % exc,
+                  file=sys.stderr)
+            return 3
         return 0
 
     parser.print_help()

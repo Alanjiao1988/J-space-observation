@@ -34,12 +34,14 @@ computes the anchor and head at run time and proves the chain.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import subprocess
 import sys
 
 SCHEMA_VERSION = "study3-p0-r1-ready-anchor-v3"
+LOCK_PATH = "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json"
 
 # Paths that may legitimately change after the ready anchor. Every one of them
 # is documentation, governance or navigation: none is executable, none is bound
@@ -80,6 +82,17 @@ def _git(args, root=None, check=True):
     return completed.stdout.strip(), completed.returncode
 
 
+def _git_bytes(args, root=None):
+    completed = subprocess.run(  # noqa: S603 - fixed executable
+        ["git"] + list(args), cwd=root, capture_output=True)
+    if completed.returncode != 0:
+        raise ReadyAnchorDefect(
+            "git %s failed: %s"
+            % (" ".join(args),
+               completed.stderr.decode("utf-8", "replace").strip()))
+    return completed.stdout
+
+
 def _require_sha(value, label):
     if not isinstance(value, str) or len(value) != 40:
         raise ReadyAnchorDefect(
@@ -104,9 +117,34 @@ def changed_paths(base, head, root=None):
     return sorted(line.strip() for line in out.splitlines() if line.strip())
 
 
+def resolve_ready_anchor(ready_anchor_parent, root=None, head=None, git=None):
+    """Resolve the direct first-parent child that introduced the active lock."""
+    runner = git or (lambda args, check=True: _git(args, root=root,
+                                                    check=check))
+    parent = _require_sha(ready_anchor_parent, "ready_anchor_parent")
+    if head is None:
+        head, _ = runner(["rev-parse", "HEAD"])
+    head = _require_sha(head, "HEAD")
+    out, _ = runner([
+        "rev-list", "--first-parent", "--reverse", "%s..%s" % (parent, head)])
+    candidates = [line.strip() for line in out.splitlines() if line.strip()]
+    if not candidates:
+        raise ReadyAnchorDefect(
+            "no first-parent descendant of ready anchor parent %s exists"
+            % parent)
+    anchor = _require_sha(candidates[0], "resolved ready anchor")
+    actual_parent, _ = runner(["rev-parse", "%s^1" % anchor])
+    if _require_sha(actual_parent, "ready anchor parent") != parent:
+        raise ReadyAnchorDefect(
+            "resolved anchor %s is not a direct child of %s"
+            % (anchor, parent))
+    return anchor
+
+
 def prove(root=None, executable_commit=None, executable_tree=None,
-          ready_anchor=None, bound_paths=None, require_clean=True,
-          remote="origin", branch="main", git=None):
+          ready_anchor=None, ready_anchor_parent=None, bound_paths=None,
+          lock_identity=None, require_clean=True, remote="origin",
+          branch="main", git=None):
     """Build a head proof, or raise with the exact reason it cannot be built.
 
     ``git`` may be supplied as a callable for tests; production passes None
@@ -139,6 +177,15 @@ def prove(root=None, executable_commit=None, executable_tree=None,
     executable_commit = _require_sha(executable_commit, "executable_commit")
     executable_tree = _require_sha(executable_tree, "executable_tree")
     ready_anchor = _require_sha(ready_anchor, "ready_anchor")
+    if ready_anchor_parent:
+        parent = _require_sha(ready_anchor_parent, "ready_anchor_parent")
+        actual_parent, _ = runner(["rev-parse", "%s^1" % ready_anchor])
+        if _require_sha(actual_parent, "ready anchor parent") != parent:
+            raise ReadyAnchorDefect(
+                "ready anchor %s has parent %s, not locked parent %s"
+                % (ready_anchor, actual_parent, parent))
+    else:
+        parent = None
 
     for older, newer, label in (
             (executable_commit, ready_anchor, "executable commit -> anchor"),
@@ -158,6 +205,28 @@ def prove(root=None, executable_commit=None, executable_tree=None,
 
     anchor_tree, _ = runner(["rev-parse", "%s^{tree}" % ready_anchor])
     anchor_tree = _require_sha(anchor_tree, "anchor tree")
+
+    lock_proof = None
+    if lock_identity:
+        path = lock_identity.get("path") or LOCK_PATH
+        if git is None:
+            payload = _git_bytes(
+                ["cat-file", "blob", "%s:%s" % (ready_anchor, path)],
+                root=root)
+        else:
+            body, _ = runner(["show", "%s:%s" % (ready_anchor, path)])
+            payload = body.encode("utf-8")
+        actual = {
+            "path": path,
+            "bytes": len(payload),
+            "sha256": hashlib.sha256(payload).hexdigest(),
+        }
+        if actual["bytes"] != lock_identity.get("bytes") \
+                or actual["sha256"] != lock_identity.get("sha256"):
+            raise ReadyAnchorDefect(
+                "ready anchor %s does not carry the injected lock bytes"
+                % ready_anchor)
+        lock_proof = actual
 
     out, _ = runner(["diff", "--name-only", ready_anchor, head])
     changed = sorted(line.strip() for line in out.splitlines() if line.strip())
@@ -183,7 +252,8 @@ def prove(root=None, executable_commit=None, executable_tree=None,
     return {
         "schema_version": SCHEMA_VERSION,
         "published_head": {"commit": head, "tree": head_tree},
-        "ready_anchor": {"commit": ready_anchor, "tree": anchor_tree},
+        "ready_anchor": {"commit": ready_anchor, "tree": anchor_tree,
+                         "parent": parent},
         "executable_code": {"commit": executable_commit,
                             "tree": executable_tree},
         "remote_ref": remote_ref,
@@ -194,11 +264,13 @@ def prove(root=None, executable_commit=None, executable_tree=None,
         "all_changes_are_governance_only": True,
         "bound_paths_checked": len(bound_paths or ()),
         "bound_paths_changed_after_image_build": bound_changed,
+        "execution_lock": lock_proof,
     }
 
 
 def validate_proof(proof, executable_commit=None, executable_tree=None,
-                   ready_anchor=None):
+                   ready_anchor=None, ready_anchor_parent=None,
+                   lock_sha256=None):
     """Re-check a serialized proof against the identities it must bind."""
     if not isinstance(proof, dict):
         raise ReadyAnchorDefect("the head proof must be a document")
@@ -215,6 +287,9 @@ def validate_proof(proof, executable_commit=None, executable_tree=None,
     if not proof.get("head_equals_published"):
         raise ReadyAnchorDefect(
             "the head proof does not record HEAD == origin/main")
+    if not proof.get("worktree_clean"):
+        raise ReadyAnchorDefect(
+            "the head proof does not record a clean worktree")
     if not proof.get("all_changes_are_governance_only"):
         raise ReadyAnchorDefect(
             "the head proof records non-governance changes after the anchor")
@@ -233,6 +308,19 @@ def validate_proof(proof, executable_commit=None, executable_tree=None,
             raise ReadyAnchorDefect(
                 "the head proof binds %s %s, not the required %s"
                 % (label, actual, expected))
+    if ready_anchor_parent:
+        actual_parent = proof["ready_anchor"].get("parent")
+        if _require_sha(actual_parent, "ready anchor parent") != \
+                _require_sha(ready_anchor_parent, "ready_anchor_parent"):
+            raise ReadyAnchorDefect(
+                "the proof binds ready anchor parent %s, not %s"
+                % (actual_parent, ready_anchor_parent))
+    if lock_sha256:
+        lock = proof.get("execution_lock")
+        if not isinstance(lock, dict) or lock.get("path") != LOCK_PATH \
+                or lock.get("sha256") != lock_sha256:
+            raise ReadyAnchorDefect(
+                "the ready anchor proof does not bind the active lock bytes")
     return proof
 
 
@@ -267,15 +355,32 @@ def main(argv=None):
             print("FAIL: --prove requires --lock-file", file=sys.stderr)
             return 2
         with open(args.lock_file, "rb") as handle:
-            lock = json.loads(handle.read().decode("utf-8"))
+            lock_raw = handle.read()
+        lock = json.loads(lock_raw.decode("utf-8"))
         executable = lock["executable_code"]
-        anchor = lock["ready_commit_relationship"]["ready_anchor_commit"]
+        relationship = lock["ready_commit_relationship"]
+        anchor = relationship.get("ready_anchor_commit")
+        if anchor is None:
+            try:
+                anchor = resolve_ready_anchor(
+                    relationship.get("ready_anchor_parent"), root=args.root)
+            except ReadyAnchorDefect as exc:
+                print("P0_R1_READY_ANCHOR_REFUSED=1", file=sys.stderr)
+                print("  %s" % exc, file=sys.stderr)
+                return 3
         bound = [entry["path"] for entry in executable["files"]]
+        lock_identity = {
+            "path": LOCK_PATH,
+            "bytes": len(lock_raw),
+            "sha256": hashlib.sha256(lock_raw).hexdigest(),
+        }
         try:
             proof = prove(
                 root=args.root, executable_commit=executable["commit"],
                 executable_tree=executable["tree"], ready_anchor=anchor,
-                bound_paths=bound, require_clean=not args.allow_dirty)
+                ready_anchor_parent=relationship.get("ready_anchor_parent"),
+                bound_paths=bound, lock_identity=lock_identity,
+                require_clean=not args.allow_dirty)
         except ReadyAnchorDefect as exc:
             print("P0_R1_READY_ANCHOR_REFUSED=1", file=sys.stderr)
             print("  %s" % exc, file=sys.stderr)

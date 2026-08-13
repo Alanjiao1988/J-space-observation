@@ -59,6 +59,8 @@ properties:
             value: recover
           - name: P0_R1_ATTEMPT
             value: REPLACED_WITH_CAPTURED_ATTEMPT_ID
+          - name: P0_R1_LOCK_V3_B64
+            value: REPLACED_WITH_SIZE_AND_HASH_CHECKED_LOCK_ENVELOPE
   identity:
     type: UserAssigned
     userAssignedIdentities:

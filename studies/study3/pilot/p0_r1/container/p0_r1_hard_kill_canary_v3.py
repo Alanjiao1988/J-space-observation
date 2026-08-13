@@ -33,6 +33,8 @@ CONTAINER_DIR = os.path.dirname(os.path.abspath(__file__))
 P0_R1_DIR = os.path.dirname(CONTAINER_DIR)
 sys.path.insert(0, P0_R1_DIR)
 
+import p0_r1_recovery_v3 as RECOVERY  # noqa: E402
+
 CHILD_SOURCE = '''
 import json, os, sys, time
 sys.path.insert(0, %(p0_r1)r)
@@ -128,6 +130,13 @@ def run(attempt_id, stream=None):
                  % recovered_row["row_id"])
     stream.write("P0_R1_G3_HARD_KILL_OPEN_ADMISSION=%s\n"
                  % open_admission.get("operation"))
+    receipt, _payloads = RECOVERY.recover(attempt_id, stream=stream)
+    if not receipt.get("partial_attempt") \
+            or receipt.get("manifest_written_last"):
+        raise SystemExit(
+            "hard-kill recovery did not classify the manifest-less attempt "
+            "as a retained partial result")
+    stream.write("P0_R1_G3_HARD_KILL_CPU_RECOVERY=partial\n")
     stream.write("P0_R1_G3_HARD_KILL_CANARY=passed\n")
     stream.flush()
     return {"objects": len(names), "row_id": recovered_row["row_id"]}

@@ -17,6 +17,7 @@ on the single GPU attempt.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import subprocess
@@ -28,6 +29,8 @@ P0_R1_DIR = os.path.dirname(CONTAINER_DIR)
 sys.path.insert(0, P0_R1_DIR)
 
 import p0_r1_transport as TRANSPORT  # noqa: E402
+import p0_r1_authorization_v3 as AUTHZ  # noqa: E402
+import p0_r1_execution_lock_v3 as LOCK_V3  # noqa: E402
 
 SENTINEL_LINE = "P0_R1_SENTINEL_EXECUTOR_REACHED=1"
 
@@ -40,32 +43,21 @@ ATTEMPT = "g3cliwiring-000000000000"
 #: tests the shell-to-CLI authorization wiring, not the authenticity of a
 #: lock, and a canary that could only run when a real lock happened to be
 #: present would not run at build time at all.
-SYNTHETIC_LOCK = {
-    "schema_version": "study3-p0-r1-execution-lock-v3",
-    "generation": 3,
-    "state": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE",
-    "executable_code": {"commit": "c" * 40, "tree": "d" * 40, "files": []},
-    "ready_commit_relationship": {
-        "ready_anchor_parent": "a" * 40,
-        "ready_anchor_commit": None,
-        "published_head_is_recorded_in_the_lock": False,
-    },
-    "image": {"digest": "sha256:" + "1" * 64},
-    "legal_status": {
-        "p0_r1_pilot_execution_authorized": True,
-        "p0_r1_pilot_execution_consumed": False,
-        "formal_execution_authorized": False,
-    },
-    "attempt_binding": {"remaining_overall_envelopes": 1},
-}
-
-
 def _lock_document(lock_path):
     """Read the active lock when present, otherwise synthesize one."""
     if lock_path and os.path.exists(lock_path):
         with open(lock_path, "rb") as handle:
             return json.loads(handle.read().decode("utf-8")), lock_path
-    return dict(SYNTHETIC_LOCK), None
+    root = os.path.abspath(os.path.join(P0_R1_DIR, "..", "..", "..", ".."))
+    canaries = {name: {"passed": True, "synthetic": True}
+                for name in LOCK_V3.CANARY_NAMES}
+    lock = LOCK_V3.build(
+        root=root, executable_commit="c" * 40, executable_tree="d" * 40,
+        ready_anchor_parent="a" * 40,
+        image_digest="sha256:" + "1" * 64,
+        base_digest="sha256:" + "2" * 64,
+        canary_receipts=canaries)
+    return lock, None
 
 
 def _synthetic_inputs(work, lock_path):
@@ -77,12 +69,11 @@ def _synthetic_inputs(work, lock_path):
     # The lock deliberately records no anchor commit: a commit cannot contain
     # its own hash, so the successor computes it at run time. The canary
     # supplies a synthetic one, which is exactly what the real proof does.
-    anchor = (relationship.get("ready_anchor_commit")
-              or relationship.get("ready_anchor_parent") or "a" * 40)
+    anchor = relationship.get("ready_anchor_commit") or "b" * 40
     digest = lock["image"]["digest"]
 
     receipt = {
-        "schema_version": "study3-p0-r1-replay-receipt-v2",
+        "schema_version": "study3-p0-r1-replay-gate-receipt-v3",
         "attempt_id": ATTEMPT,
         "ready_commit": anchor,
         "image_digest": digest,
@@ -104,22 +95,37 @@ def _synthetic_inputs(work, lock_path):
         "gate_receipt_was_mutated": False,
         "complete_byte_recovery_verified": True,
         "gate": {
-            "state": "STUDY3_P0_R1_REPLAY_GATE_PASSED",
+            "state":
+                "STUDY3_P0_R1_REPLAY_GATE_PASSED_AWAITING_MODEL_PILOT",
             "passed": True,
             "image_digest": digest,
             "executable_code_commit": executable["commit"],
             "executable_code_tree": executable["tree"],
+            "ready_commit": anchor,
         },
     }
+    lock_payload = (
+        json.dumps(lock, indent=1, sort_keys=True) + "\n").encode("utf-8")
     proof = {
         "schema_version": "study3-p0-r1-ready-anchor-v3",
         "published_head": {"commit": "f" * 40, "tree": "e" * 40},
-        "ready_anchor": {"commit": anchor, "tree": "d" * 40},
+        "ready_anchor": {
+            "commit": anchor, "tree": "d" * 40,
+            "parent": relationship["ready_anchor_parent"],
+        },
         "executable_code": {"commit": executable["commit"],
                             "tree": executable["tree"]},
         "head_equals_published": True,
+        "worktree_clean": True,
         "all_changes_are_governance_only": True,
         "bound_paths_changed_after_image_build": [],
+        "execution_lock": {
+            "path": LOCK_V3.LOCK_NAME.rsplit("/", 1)[-1]
+            if "/" in LOCK_V3.LOCK_NAME else
+            "studies/study3/pilot/p0_r1/" + LOCK_V3.LOCK_NAME,
+            "bytes": len(lock_payload),
+            "sha256": hashlib.sha256(lock_payload).hexdigest(),
+        },
     }
     paths = {}
     for name, document in (("p0_r1_replay_receipt.json", receipt),
@@ -137,10 +143,21 @@ def _synthetic_inputs(work, lock_path):
     if not (lock_path and os.path.exists(lock_path)):
         synthetic = os.path.join(work, "p0_r1_execution_lock_v3.json")
         with open(synthetic, "wb") as handle:
-            handle.write((json.dumps(lock, indent=1, sort_keys=True)
-                          + "\n").encode("utf-8"))
+            handle.write(lock_payload)
         paths["p0_r1_execution_lock_v3.json"] = synthetic
     return paths
+
+
+def _bash_path(path):
+    """Translate Windows paths only when the available bash is Git/MSYS bash."""
+    if os.name != "nt":
+        return path
+    try:
+        return subprocess.check_output(
+            ["cygpath", "-u", path], text=True,
+            encoding="utf-8", errors="strict").strip()
+    except (OSError, subprocess.CalledProcessError):
+        return path
 
 
 def run(lock_path=None, shell=None, stream=None):
@@ -155,19 +172,26 @@ def run(lock_path=None, shell=None, stream=None):
 
     environment = dict(os.environ)
     environment.update({
-        "P0_R1_SRC": os.path.abspath(os.path.join(P0_R1_DIR, "..", "..", "..",
-                                                  "..")),
-        "P0_R1_RUNTIME_ROOT": work,
-        "P0_R1_OUT_DIR": os.path.join(work, "result"),
-        "P0_R1_LOCK_FILE": effective_lock,
-        "P0_R1_REPLAY_RECEIPT": paths["p0_r1_replay_receipt.json"],
-        "P0_R1_RECONSTRUCTION_RECEIPT":
-            paths["p0_r1_replay_reconstruction_receipt_v3.json"],
-        "P0_R1_HEAD_PROOF": paths["p0_r1_head_proof_v3.json"],
+        "P0_R1_SRC": _bash_path(os.path.abspath(os.path.join(
+            P0_R1_DIR, "..", "..", "..", ".."))),
+        "P0_R1_RUNTIME_ROOT": _bash_path(work),
+        "P0_R1_OUT_DIR": _bash_path(os.path.join(work, "result")),
+        "PYTHON": _bash_path(sys.executable),
         "P0_R1_EXECUTOR": "sentinel",
         "P0_R1_ATTEMPT": ATTEMPT,
         "P0_R1_CANARY_IN_MEMORY_BLOB": "1",
     })
+    injections = {
+        "P0_R1_LOCK_V3_B64": effective_lock,
+        "P0_R1_REPLAY_RECEIPT_V3_B64":
+            paths["p0_r1_replay_receipt.json"],
+        "P0_R1_RECONSTRUCTION_RECEIPT_V3_B64":
+            paths["p0_r1_replay_reconstruction_receipt_v3.json"],
+        "P0_R1_HEAD_PROOF_V3_B64": paths["p0_r1_head_proof_v3.json"],
+    }
+    for env_name, path in injections.items():
+        with open(path, "rb") as handle:
+            environment[env_name] = AUTHZ.encode_injection(handle.read())
 
     completed = subprocess.run(  # noqa: S603 - fixed script
         ["bash", shell], env=environment, capture_output=True, text=True,
@@ -183,6 +207,12 @@ def run(lock_path=None, shell=None, stream=None):
         raise SystemExit(
             "the production model shell did not reach the authorized executor "
             "boundary exactly once (saw %d)" % reached)
+    if output.count("P0_R1_INJECTED=") != 4:
+        raise SystemExit(
+            "the production shell did not reconstruct all four exact inputs")
+    if "P0_R1_PILOT_SHELL_TRAP_COMPLETE=1" not in output \
+            or "P0_R1_FINALIZED_RECEIPT_REEMITTED=1" not in output:
+        raise SystemExit("the production shell EXIT durability trap did not run")
     for forbidden in ("transformers", "torch"):
         if "import %s" % forbidden in output:
             raise SystemExit(

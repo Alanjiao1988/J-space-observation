@@ -25,6 +25,7 @@ reported for artifacts that could not be transported.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -33,16 +34,223 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import p0_r1_replay_gate_v2 as GATE_V2  # noqa: E402
 import p0_r1_transport as TRANSPORT  # noqa: E402
+import p0_r1_execution_lock_v3 as LOCK  # noqa: E402
+import p0_r1_factorization as FACT  # noqa: E402
+import p0_r1_eligibility as ELIG  # noqa: E402
+import p0_r1_replay_gate as GATE  # noqa: E402
+import p0_r1_runtime_binding as RUNTIME  # noqa: E402
+from p0_r1_counters import P0R1Counters  # noqa: E402
 
 SCHEMA_VERSION = "study3-p0-r1-replay-gate-v3"
+GATE_RESULT_SCHEMA_VERSION = "study3-p0-r1-replay-gate-result-v3"
+GATE_RECEIPT_SCHEMA_VERSION = "study3-p0-r1-replay-gate-receipt-v3"
 
 GateRefused = GATE_V2.GateRefused
 
-PASS_STATE = "STUDY3_P0_R1_REPLAY_GATE_PASSED"
+PASS_STATE = GATE_V2.STATE_AFTER_REPLAY_PASS
 TRANSPORT_VERIFIED_LINE = GATE_V2.TRANSPORT_VERIFIED_LINE
 PASS_AUTHORIZATION_LINE = GATE_V2.PASS_AUTHORIZATION_LINE
 
 RECEIPT_NAME = "p0_r1_replay_receipt.json"
+
+
+def _sha256(payload):
+    return hashlib.sha256(payload).hexdigest()
+
+
+def mint_attempt_id(executable_code_commit, now=None):
+    return "gen3-%s-%s" % (
+        executable_code_commit[:12], now or GATE.utc_now())
+
+
+def gate_run_v3(out_dir, authorization=None, image_digest=None,
+                ready_commit=None, lock_bytes=None, root=None, registry=None,
+                counters=None, execution_name=None, now=None):
+    """Run unchanged factorization science under the generation-3 bindings."""
+    if authorization != GATE_V2.SUCCESSOR_AUTHORIZATION:
+        raise GateRefused(
+            "the replay gate requires explicit successor-session authorization")
+    if not out_dir:
+        raise GateRefused("the replay gate requires a writable result directory")
+    if not ready_commit or len(str(ready_commit)) != 40 \
+            or any(character not in "0123456789abcdef"
+                   for character in str(ready_commit)):
+        raise GateRefused("the proved ready anchor is mandatory")
+    if not isinstance(lock_bytes, bytes):
+        raise GateRefused("the exact generation-3 lock bytes are mandatory")
+    try:
+        lock = json.loads(lock_bytes.decode("utf-8"))
+        LOCK.validate(lock, root=root, image_digest=image_digest)
+    except (UnicodeDecodeError, ValueError, LOCK.LockDefect,
+            KeyError, TypeError) as exc:
+        raise GateRefused("the generation-3 lock is invalid: %s" % exc)
+    lock_identity = {
+        "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json",
+        "bytes": len(lock_bytes),
+        "sha256": _sha256(lock_bytes),
+    }
+
+    counters = counters if counters is not None else P0R1Counters()
+    registry = registry if registry is not None else GATE.load_registry()
+    started = GATE.utc_now()
+    attempt_id = mint_attempt_id(lock["executable_code"]["commit"], now=now)
+
+    try:
+        immutable_sources = FACT.verify_immutable_sources(root=root)
+        immutable_source_defect = None
+    except FACT.FactorizationDefect as exc:
+        immutable_sources = []
+        immutable_source_defect = str(exc)
+
+    stop_reason = None
+    findings = []
+    try:
+        factorization = FACT.gate(registry, root=root, counters=counters)
+    except FACT.FactorizationDefect as exc:
+        factorization = {
+            "all_roles_eligible": False,
+            "common_prefix_token_is_common_to_every_role": False,
+            "discriminant_token_ids_are_common_to_every_role": False,
+            "defect": str(exc),
+        }
+        stop_reason = (
+            "The replay factorization gate failed on immutable evidence: %s"
+            % exc)
+        state = GATE_V2.STATE_REPLAY_DEFECT
+        summary = {
+            "cells": 0, "eligible_cells": 0, "ineligible_cells": 0,
+            "ineligible_cells_with_an_empty_reason_list": 0,
+            "structurally_absent_pairs": 0,
+            "executable_genuine_i3_contrasts_per_role": {},
+            "roles_without_executable_contrast": list(GATE_V2.ROLES),
+        }
+        corrected = None
+    else:
+        result = FACT.load_immutable(FACT.RESULT_PATH, root=root)
+        corrected = ELIG.classify(
+            result["records"], factorization,
+            GATE.published_s1_surfaces(result), GATE_V2.ROLES)
+        ELIG.validate_matrix(corrected["matrix"], roles=GATE_V2.ROLES)
+        summary = GATE._matrix_summary(corrected)
+        findings = GATE.check_corrected_matrix(summary)
+        if findings:
+            stop_reason = (
+                "The corrected eligibility matrix did not reproduce the "
+                "registered acceptance conditions:\n\n"
+                + "\n".join("* %s" % finding for finding in findings))
+            state = (ELIG.STOP_SOME_ROLE_HAS_NO_EXECUTABLE_CONTRAST
+                     if summary["roles_without_executable_contrast"]
+                     else GATE_V2.STATE_REPLAY_DEFECT)
+        else:
+            state = PASS_STATE
+
+    snapshot = counters.snapshot()
+    counter_findings = GATE._counter_guard(snapshot)
+    if counter_findings and state == PASS_STATE:
+        stop_reason = (
+            "The replay gate counters did not reconcile:\n\n"
+            + "\n".join("* %s" % finding for finding in counter_findings))
+        state = GATE_V2.STATE_REPLAY_DEFECT
+        findings += counter_findings
+    passed = state == PASS_STATE
+    identities = RUNTIME.bound_identities(
+        lock, {"attempt_id": attempt_id, "execution_lock": lock_identity},
+        ready_commit, execution_name=execution_name)
+
+    result_document = {
+        "schema_version": GATE_RESULT_SCHEMA_VERSION,
+        "document_class": "study3_p0_r1_replay_gate_result",
+        "generation": 3,
+        "stage": "P0-R1-REPLAY-GATE",
+        "state": state,
+        "passed": passed,
+        "attempt_id": attempt_id,
+        "started_utc": started,
+        "completed_utc": GATE.utc_now(),
+        "identities": identities,
+        "ready_commit": ready_commit,
+        "authorities": lock["authorities"],
+        "corpus_and_p0_t": lock["corpus_and_p0_t"],
+        "execution_lock": lock_identity,
+        "image_digest": lock["image"]["digest"],
+        "executable_code_commit": lock["executable_code"]["commit"],
+        "executable_code_tree": lock["executable_code"]["tree"],
+        "immutable_sources": immutable_sources,
+        "immutable_source_defect": immutable_source_defect,
+        "target_roles": list(GATE_V2.ROLES),
+        "tokenizer_encodes_performed": 0,
+        "tokenizer_constructions_performed": 0,
+        "model_operations_performed": 0,
+        "gpu_allocated": False,
+        "factorization": factorization,
+        "corrected_matrix": corrected["matrix"] if corrected else [],
+        "structurally_absent": (
+            corrected["structurally_absent"] if corrected else []),
+        "executable_genuine_i3_contrasts": (
+            corrected["executable_genuine_i3_contrasts"]
+            if corrected else {}),
+        "corrected_matrix_summary": summary,
+        "acceptance_findings": findings,
+        "stop_reason": stop_reason,
+        "counters": snapshot,
+        "evidence_status": (
+            "a methods-feasibility replay observation over immutable evidence; "
+            "it selects no interface and answers no research question"),
+    }
+    receipt_document = {
+        "schema_version": GATE_RECEIPT_SCHEMA_VERSION,
+        "document_class": "study3_p0_r1_replay_gate_receipt",
+        "generation": 3,
+        "stage": "P0-R1-REPLAY-GATE",
+        "state": state,
+        "passed": passed,
+        "attempt_id": attempt_id,
+        "completed_utc": result_document["completed_utc"],
+        "identities": identities,
+        "ready_commit": ready_commit,
+        "authorities": lock["authorities"],
+        "corpus_and_p0_t": lock["corpus_and_p0_t"],
+        "execution_lock": lock_identity,
+        "image_digest": lock["image"]["digest"],
+        "executable_code_commit": lock["executable_code"]["commit"],
+        "executable_code_tree": lock["executable_code"]["tree"],
+        "result_document": {"name": GATE.GATE_RESULT_NAME},
+        "transport": {
+            "envelope_version": TRANSPORT.ENVELOPE_VERSION,
+            "artifacts": list(TRANSPORT.REPLAY_ARTIFACTS),
+            "complete_byte_recovery_verified": False,
+        },
+        "counters": snapshot,
+        "tokenizer_constructions": 0,
+        "tokenizer_encodes": 0,
+        "checkpoint_downloads": 0,
+        "model_weight_loads": 0,
+        "gpu_allocated": False,
+        "model_operations_performed": 0,
+        "stop_reason": stop_reason,
+        "authorizes_model_pilot": passed,
+        "authorization_scope": (
+            "exactly one bounded GPU model pilot for this attempt"
+            if passed else "nothing"),
+    }
+    disposition = GATE._disposition_markdown(
+        state, summary, factorization, stop_reason, lock)
+    result_payload = GATE.dumps(result_document).encode("utf-8")
+    receipt_document["result_document"] = {
+        "name": GATE.GATE_RESULT_NAME,
+        "bytes": len(result_payload),
+        "sha256": _sha256(result_payload),
+    }
+    annotate_receipt_honestly(receipt_document)
+    written = GATE._write_artifacts(
+        out_dir, result_document, receipt_document, snapshot, disposition)
+    return {
+        "state": state, "passed": passed, "attempt_id": attempt_id,
+        "ready_commit": ready_commit, "result": result_document,
+        "receipt": receipt_document, "artifacts": written,
+        "out_dir": out_dir, "execution_lock": lock_identity,
+        "identities": identities,
+    }
 
 
 def annotate_receipt_honestly(receipt):
@@ -65,22 +273,11 @@ def run(out_dir, lock_bytes=None, image_digest=None, ready_commit=None,
     """Gate, annotate honestly, transport complete bytes, then report."""
     stream = stream if stream is not None else sys.stdout
 
-    outcome = GATE_V2.gate_run_v2(
-        out_dir, authorization=None, image_digest=image_digest,
+    outcome = gate_run_v3(
+        out_dir, authorization=GATE_V2.SUCCESSOR_AUTHORIZATION,
+        image_digest=image_digest,
         ready_commit=ready_commit, lock_bytes=lock_bytes, root=root,
         execution_name=execution_name)
-
-    annotate_receipt_honestly(outcome["receipt"])
-    GATE_V2.GATE._write_artifacts(
-        out_dir, outcome["result"], outcome["receipt"],
-        outcome["result"]["counters"],
-        GATE_V2.GATE._disposition_markdown(
-            outcome["state"], outcome["result"]["corrected_matrix_summary"],
-            outcome["result"]["factorization"],
-            outcome["result"]["stop_reason"],
-            {"image": {"digest": outcome["result"]["image_digest"]},
-             "executable_code": {
-                 "commit": outcome["result"]["executable_code_commit"]}}))
 
     payloads = {}
     for name in TRANSPORT.REPLAY_ARTIFACTS:
@@ -117,7 +314,8 @@ def implementation_identity(root=None):
     return {
         "schema_version": SCHEMA_VERSION,
         "module": "p0_r1_replay_gate_v3.py",
-        "delegates_science_to": "p0_r1_replay_gate_v2.gate_run_v2",
+        "delegates_science_to":
+            "p0_r1_factorization + p0_r1_eligibility + p0_r1_replay_gate",
         "changes_any_scientific_rule": False,
         "rewrites_its_own_receipt": False,
         "emitted_receipt_claims_its_own_recovery": False,

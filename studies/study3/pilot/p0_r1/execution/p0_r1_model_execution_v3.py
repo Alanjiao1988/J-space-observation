@@ -61,12 +61,14 @@ IRREVERSIBLE_ALIASES = {
     "tokenizer_construction": "tokenizer_construction",
     "tokenizer_encode": "tokenizer_encode",
     "encode": "tokenizer_encode",
+    "prompt_encode": "tokenizer_encode",
     "model_weight_load": "model_weight_load",
     "cuda_initialization": "cuda_initialization",
     "prefill": "prefill_evaluation",
     "prefill_evaluation": "prefill_evaluation",
     "s4_generation": "generation_call",
     "generation": "generation_call",
+    "generation_or_decode": "generation_call",
 }
 
 

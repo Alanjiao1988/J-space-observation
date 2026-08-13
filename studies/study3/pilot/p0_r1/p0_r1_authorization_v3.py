@@ -31,6 +31,8 @@ means a test cannot accidentally prove a seam that production does not have.
 from __future__ import annotations
 
 import argparse
+import base64
+import binascii
 import hashlib
 import json
 import os
@@ -40,8 +42,21 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import p0_r1_ready_anchor_v3 as ANCHOR  # noqa: E402
 import p0_r1_replay_capture_v3 as CAPTURE  # noqa: E402
+import p0_r1_execution_lock_v3 as LOCK_V3  # noqa: E402
 
 SCHEMA_VERSION = "study3-p0-r1-model-authorization-v3"
+INJECTION_VERSION = "study3-p0-r1-runtime-injection-v3"
+MAX_INJECTION_BYTES = 262144
+INJECTION_TARGETS = {
+    "lock": ("P0_R1_LOCK_V3_B64", "p0_r1_execution_lock_v3.json"),
+    "replay_receipt": (
+        "P0_R1_REPLAY_RECEIPT_V3_B64", "p0_r1_replay_receipt.json"),
+    "reconstruction_receipt": (
+        "P0_R1_RECONSTRUCTION_RECEIPT_V3_B64",
+        "p0_r1_replay_reconstruction_receipt_v3.json"),
+    "head_proof": (
+        "P0_R1_HEAD_PROOF_V3_B64", "p0_r1_head_proof_v3.json"),
+}
 
 
 class AuthorizationRefused(Exception):
@@ -50,6 +65,67 @@ class AuthorizationRefused(Exception):
 
 def _sha256(payload):
     return hashlib.sha256(payload).hexdigest()
+
+
+def encode_injection(payload):
+    """Encode exact bytes with an independently checked length and digest."""
+    if not isinstance(payload, bytes) or not payload:
+        raise AuthorizationRefused(
+            "an injected authorization input must be non-empty raw bytes")
+    if len(payload) > MAX_INJECTION_BYTES:
+        raise AuthorizationRefused(
+            "an injected input of %d bytes exceeds the %d-byte ceiling"
+            % (len(payload), MAX_INJECTION_BYTES))
+    return "%s|%d|%s|%s" % (
+        INJECTION_VERSION, len(payload), _sha256(payload),
+        base64.b64encode(payload).decode("ascii"))
+
+
+def decode_injection(encoded):
+    """Decode one exact-byte envelope, refusing truncation or substitution."""
+    parts = encoded.split("|") if isinstance(encoded, str) else []
+    if len(parts) != 4 or parts[0] != INJECTION_VERSION \
+            or not parts[1].isdigit():
+        raise AuthorizationRefused("an injected authorization input is malformed")
+    try:
+        payload = base64.b64decode(parts[3].encode("ascii"), validate=True)
+    except (binascii.Error, UnicodeEncodeError, ValueError):
+        raise AuthorizationRefused(
+            "an injected authorization input is not lossless base64")
+    if len(payload) != int(parts[1]) or _sha256(payload) != parts[2]:
+        raise AuthorizationRefused(
+            "an injected authorization input fails its byte identity")
+    return payload
+
+
+def reconstruct_injections(out_dir, required=None, environ=None):
+    """Rebuild required inputs in the writable runtime namespace."""
+    environ = os.environ if environ is None else environ
+    required = tuple(required or sorted(INJECTION_TARGETS))
+    unknown = [name for name in required if name not in INJECTION_TARGETS]
+    if unknown:
+        raise AuthorizationRefused(
+            "unknown injection target(s): %s" % ", ".join(sorted(unknown)))
+    os.makedirs(out_dir, exist_ok=True)
+    written = {}
+    for target in required:
+        env_name, file_name = INJECTION_TARGETS[target]
+        encoded = environ.get(env_name)
+        if not encoded:
+            raise AuthorizationRefused(
+                "%s was not injected; no authorization input has a default"
+                % env_name)
+        payload = decode_injection(encoded)
+        path = os.path.join(out_dir, file_name)
+        with open(path, "wb") as handle:
+            handle.write(payload)
+        with open(path, "rb") as handle:
+            if handle.read() != payload:
+                raise AuthorizationRefused(
+                    "%s did not read back byte-exactly" % file_name)
+        written[target] = {
+            "path": path, "bytes": len(payload), "sha256": _sha256(payload)}
+    return written
 
 
 def _document(raw, label):
@@ -69,7 +145,8 @@ def _document(raw, label):
 
 
 def build(lock_bytes, replay_receipt_bytes, reconstruction_receipt_bytes,
-          head_proof_bytes, attempt_id=None, image_digest=None, run_id=None):
+          head_proof_bytes, attempt_id=None, image_digest=None, run_id=None,
+          root=None):
     """Return an authorization mapping, or refuse with the exact disagreement.
 
     Every cross-check is between two independently produced documents. No
@@ -87,6 +164,11 @@ def build(lock_bytes, replay_receipt_bytes, reconstruction_receipt_bytes,
         raise AuthorizationRefused(
             "the model pilot requires the generation-3 execution lock; this "
             "lock declares generation %r" % (generation,))
+    try:
+        LOCK_V3.validate(lock, root=root)
+    except (LOCK_V3.LockDefect, KeyError, TypeError) as exc:
+        raise AuthorizationRefused(
+            "the generation-3 execution lock is invalid: %s" % exc)
 
     legal = lock.get("legal_status") or {}
     if not legal.get("p0_r1_pilot_execution_authorized"):
@@ -105,12 +187,13 @@ def build(lock_bytes, replay_receipt_bytes, reconstruction_receipt_bytes,
         raise AuthorizationRefused(str(exc))
 
     executable = lock.get("executable_code") or {}
-    anchor = (lock.get("ready_commit_relationship") or {}).get(
-        "ready_anchor_commit")
+    relationship = lock.get("ready_commit_relationship") or {}
     try:
         ANCHOR.validate_proof(
             proof, executable_commit=executable.get("commit"),
-            executable_tree=executable.get("tree"), ready_anchor=anchor)
+            executable_tree=executable.get("tree"),
+            ready_anchor_parent=relationship.get("ready_anchor_parent"),
+            lock_sha256=_sha256(lock_raw))
     except ANCHOR.ReadyAnchorDefect as exc:
         raise AuthorizationRefused(str(exc))
 
@@ -133,6 +216,12 @@ def build(lock_bytes, replay_receipt_bytes, reconstruction_receipt_bytes,
             raise AuthorizationRefused(
                 "the recovered replay binds %s %r, but the active lock binds "
                 "%r" % (label, recovered, locked_value))
+    ready_anchor = proof["ready_anchor"]["commit"]
+    if receipt.get("ready_commit") != ready_anchor \
+            or gate.get("ready_commit") != ready_anchor:
+        raise AuthorizationRefused(
+            "the replay receipt/reconstruction do not bind the proved ready "
+            "anchor %s" % ready_anchor)
 
     receipt_digest = receipt.get("execution_lock") or {}
     lock_sha = receipt_digest.get("sha256") if isinstance(receipt_digest, dict) \
@@ -185,7 +274,8 @@ def build(lock_bytes, replay_receipt_bytes, reconstruction_receipt_bytes,
 
 def build_from_files(lock_file, replay_receipt_file,
                      reconstruction_receipt_file, head_proof_file,
-                     attempt_id=None, image_digest=None, run_id=None):
+                     attempt_id=None, image_digest=None, run_id=None,
+                     root=None):
     """Read four exact files and build the authorization from their bytes."""
     payloads = []
     for path, label in ((lock_file, "--lock-file"),
@@ -203,7 +293,7 @@ def build_from_files(lock_file, replay_receipt_file,
             payloads.append(handle.read())
     return build(payloads[0], payloads[1], payloads[2], payloads[3],
                  attempt_id=attempt_id, image_digest=image_digest,
-                 run_id=run_id)
+                 run_id=run_id, root=root)
 
 
 def implementation_identity(root=None):
@@ -222,6 +312,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--identity", action="store_true")
     parser.add_argument("--build", action="store_true")
+    parser.add_argument("--encode", action="store_true")
+    parser.add_argument("--reconstruct", action="store_true")
+    parser.add_argument("--file")
+    parser.add_argument("--require", action="append",
+                        choices=sorted(INJECTION_TARGETS))
     parser.add_argument("--lock-file")
     parser.add_argument("--replay-receipt")
     parser.add_argument("--reconstruction-receipt")
@@ -229,10 +324,39 @@ def main(argv=None):
     parser.add_argument("--attempt")
     parser.add_argument("--image-digest")
     parser.add_argument("--out")
+    parser.add_argument("--out-dir")
+    parser.add_argument("--src")
     args = parser.parse_args(argv)
 
     if args.identity:
         print(json.dumps(implementation_identity(), indent=2, sort_keys=True))
+        return 0
+
+    if args.encode:
+        if not args.file:
+            print("FAIL: --encode requires --file", file=sys.stderr)
+            return 2
+        try:
+            with open(args.file, "rb") as handle:
+                print(encode_injection(handle.read()))
+        except (OSError, AuthorizationRefused) as exc:
+            print("P0_R1_INJECTION_REFUSED=1 %s" % exc, file=sys.stderr)
+            return 3
+        return 0
+
+    if args.reconstruct:
+        if not args.out_dir:
+            print("FAIL: --reconstruct requires --out-dir", file=sys.stderr)
+            return 2
+        try:
+            written = reconstruct_injections(
+                args.out_dir, required=args.require)
+        except AuthorizationRefused as exc:
+            print("P0_R1_INJECTION_REFUSED=1 %s" % exc, file=sys.stderr)
+            return 3
+        for name in sorted(written):
+            print("P0_R1_INJECTED=%s BYTES=%d SHA256=%s"
+                  % (name, written[name]["bytes"], written[name]["sha256"]))
         return 0
 
     if args.build:
@@ -240,7 +364,8 @@ def main(argv=None):
             authorization = build_from_files(
                 args.lock_file, args.replay_receipt,
                 args.reconstruction_receipt, args.head_proof,
-                attempt_id=args.attempt, image_digest=args.image_digest)
+                attempt_id=args.attempt, image_digest=args.image_digest,
+                root=args.src)
         except AuthorizationRefused as exc:
             print("P0_R1_MODEL_AUTHORIZATION_REFUSED=1", file=sys.stderr)
             print("  %s" % exc, file=sys.stderr)

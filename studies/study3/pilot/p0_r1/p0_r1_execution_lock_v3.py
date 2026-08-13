@@ -48,6 +48,12 @@ REPOSITORY = "j-space-observation-study3-p0-r1"
 GPU_JOB_NAME = "job-jspace-s3-p0r1-pilot-g3"
 RECOVERY_JOB_NAME = "job-jspace-s3-p0r1-recover-g3"
 
+CANARY_NAMES = (
+    "standalone_layout", "exact_cli_wiring", "replay_capture_recovery",
+    "private_prefix", "blob_journal", "hard_kill_recovery",
+    "cpu_managed_identity_recovery", "image_bound_bytes",
+)
+
 #: The four controlling authorities, in the order they were issued.
 AUTHORITY_PATHS = (
     "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
@@ -123,6 +129,7 @@ GENERATION_1 = {
     "image_digest": ("sha256:7e2690feb6854a53f096d5b321e69fddebd2b744289c760e"
                      "2fe74ed1ccec8176"),
     "executable_code_commit": "aad14c45e9681a34f382aa95c55ac875d2ca98ce",
+    "executable_code_tree": "a26c02bc230857b5fa8002b0b1b31a570b1c95be",
     "reason": (
         "the generation-1 image could not have run: its job command "
         "/workspace/p0_r1_model_pilot.sh is not a path in the image, its entry "
@@ -136,6 +143,7 @@ GENERATION_2 = {
     "image_digest": ("sha256:5f964edb414b8a22682693d8314063693daca3b915398094"
                      "ec008d2c03308827"),
     "executable_code_commit": "863aca8b3a2ac73d9e8c031f762bda6fae125059",
+    "executable_code_tree": "f48f577fa008d3e0ecfabff281bdae2e4a14a6b0",
     "ready_commit": "c7e02b43e1dbf811d1b35ae0fc0fe9d1a1d12947",
     "published_head": "c04ec748a4b2b63af22f50595816b5e6b6805ff6",
     "reason": (
@@ -177,6 +185,31 @@ def _sha256(payload):
     return hashlib.sha256(payload).hexdigest()
 
 
+def _require_sha(value, label):
+    if not isinstance(value, str) or len(value) != 40 \
+            or any(character not in "0123456789abcdef" for character in value):
+        raise LockDefect("%s is not a 40-character lowercase hex object" % label)
+    if set(value) == {"0"}:
+        raise LockDefect("%s is an all-zero placeholder" % label)
+    return value
+
+
+def _require_digest(value, label):
+    if not isinstance(value, str) or not value.startswith("sha256:") \
+            or len(value) != 71 \
+            or any(character not in "0123456789abcdef"
+                   for character in value[7:]):
+        raise LockDefect("%s is not an immutable sha256 digest" % label)
+    if set(value[7:]) == {"0"}:
+        raise LockDefect("%s is an all-zero placeholder" % label)
+    return value
+
+
+def _load_json(root, relative):
+    with open(os.path.join(root, relative.replace("/", os.sep)), "rb") as fh:
+        return json.loads(fh.read().decode("utf-8"))
+
+
 def _file_identity(root, relative):
     path = os.path.join(root, relative.replace("/", os.sep))
     if not os.path.exists(path):
@@ -211,12 +244,20 @@ def build(root=None, executable_commit=None, executable_tree=None,
           canary_receipts=None):
     """Assemble the complete generation-3 lock document."""
     root = root or REPO_ROOT
-    if not executable_commit or not executable_tree:
+    _require_sha(executable_commit, "executable commit")
+    _require_sha(executable_tree, "executable tree")
+    _require_sha(ready_anchor_parent, "ready anchor parent")
+    _require_digest(image_digest, "image digest")
+    _require_digest(base_digest, "base digest")
+    if not isinstance(canary_receipts, dict):
+        raise LockDefect("the final lock requires model-free canary receipts")
+    missing_canaries = [name for name in CANARY_NAMES
+                        if not isinstance(canary_receipts.get(name), dict)
+                        or canary_receipts[name].get("passed") is not True]
+    if missing_canaries:
         raise LockDefect(
-            "the lock must bind the exact executable commit and tree the "
-            "image was built from")
-    if not image_digest or not image_digest.startswith("sha256:"):
-        raise LockDefect("the lock must bind an immutable image digest")
+            "missing passing canary receipt(s): %s"
+            % ", ".join(sorted(missing_canaries)))
 
     generation_3_files = [_file_identity(root, path)
                           for path in GENERATION_3_CODE_PATHS]
@@ -224,6 +265,8 @@ def build(root=None, executable_commit=None, executable_tree=None,
                        for path in INHERITED_CODE_PATHS]
     authorities = [_file_identity(root, path) for path in AUTHORITY_PATHS]
     dependencies = [_file_identity(root, path) for path in DEPENDENCY_PATHS]
+    v2 = _load_json(
+        root, "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json")
 
     generation_1 = dict(GENERATION_1)
     generation_1.update(_inherited_lock_identity(root, GENERATION_1["lock"]))
@@ -249,6 +292,7 @@ def build(root=None, executable_commit=None, executable_tree=None,
         "schema_version": SCHEMA_VERSION,
         "document_class": "study3_p0_r1_execution_lock",
         "generation": GENERATION,
+        "superseded": False,
         "state": STATE,
         "stage": "STUDY3-P0-R1",
         "built_at": datetime.datetime.now(
@@ -273,6 +317,9 @@ def build(root=None, executable_commit=None, executable_tree=None,
                 "ancestry, and every post-anchor change inside the governance "
                 "allowlist."),
             "published_head_is_recorded_in_the_lock": False,
+            "resolution": (
+                "resolve the direct first-parent child of ready_anchor_parent "
+                "and require that commit to carry this exact lock blob"),
         },
         "image": {
             "registry": REGISTRY,
@@ -295,6 +342,11 @@ def build(root=None, executable_commit=None, executable_tree=None,
             "authorization_inputs_are_mandatory": True,
             "authorization_construction_path": "p0_r1_authorization_v3.build",
             "injection_version": "study3-p0-r1-runtime-injection-v3",
+            "injection_environment": [
+                "P0_R1_LOCK_V3_B64", "P0_R1_REPLAY_RECEIPT_V3_B64",
+                "P0_R1_RECONSTRUCTION_RECEIPT_V3_B64",
+                "P0_R1_HEAD_PROOF_V3_B64",
+            ],
         },
         "transport": {
             "prefix_root": "study3/p0_r1/gen3",
@@ -305,6 +357,18 @@ def build(root=None, executable_commit=None, executable_tree=None,
             "manifest_enumerates_recursively": True,
             "secondary_route": "bounded complete-byte console envelope",
             "canaries": canary_receipts or {},
+        },
+        "successor_context": {
+            "source": "git archive of the exact published HEAD",
+            "archive_format": "tar",
+            "archive_is_hashed_before_submission": True,
+            "archive_is_extracted_to_a_new_empty_directory": True,
+            "mutable_worktree_is_submitted": False,
+            "acr_task": (
+                "studies/study3/pilot/p0_r1/container/"
+                "p0_r1_acr_task_v3.yaml"),
+            "required_task_values": [
+                "IMAGE", "LOCK_B64", "DIGEST", "READY_ANCHOR", "MODE"],
         },
         "replay_contract": {
             "gate_receipt_is_never_rewritten": True,
@@ -318,6 +382,11 @@ def build(root=None, executable_commit=None, executable_tree=None,
                 "the published-head proof",
             ],
             "either_receipt_alone_authorizes": False,
+            "gate_result_schema": "study3-p0-r1-replay-gate-result-v3",
+            "gate_receipt_schema": "study3-p0-r1-replay-gate-receipt-v3",
+            "reconstruction_receipt_schema":
+                "study3-p0-r1-replay-reconstruction-v3",
+            "authorization_schema": "study3-p0-r1-model-authorization-v3",
         },
         "azure_query_contract": {
             "outcomes": ["PROVED_ABSENT", "PROVED_PRESENT", "ERROR"],
@@ -329,6 +398,13 @@ def build(root=None, executable_commit=None, executable_tree=None,
             "durable_transport": dependencies[1],
             "generation_1_dependency_set_edited": False,
         },
+        "registration": v2["registration"],
+        "corpus_and_p0_t": v2["corpus_and_p0_t"],
+        "immutable_sources": v2["immutable_sources"],
+        "roles": v2["roles"],
+        "caps": v2["caps"],
+        "smoke_exact_allocation": v2["smoke_exact_allocation"],
+        "state_transition": v2["state_transition"],
         "generation_1": generation_1,
         "generation_2": generation_2,
         "superseded_generations": 2,
@@ -391,17 +467,22 @@ def schema():
         "title": "Study 3 P0-R1 generation-3 execution lock",
         "type": "object",
         "required": [
-            "schema_version", "generation", "state", "authorities",
+            "schema_version", "generation", "state", "superseded",
+            "authorities",
             "executable_code", "ready_commit_relationship", "image",
             "runtime_binding", "transport", "replay_contract",
             "azure_query_contract", "dependency_lock", "generation_1",
             "generation_2", "counters_before_execution", "legal_status",
             "permitted_sequence", "attempt_binding",
+            "registration", "corpus_and_p0_t", "immutable_sources", "roles",
+            "caps", "smoke_exact_allocation", "state_transition",
+            "successor_context",
         ],
         "properties": {
             "schema_version": {"const": SCHEMA_VERSION},
             "generation": {"const": GENERATION},
             "state": {"const": STATE},
+            "superseded": {"const": False},
             "executable_code": {
                 "type": "object",
                 "required": ["commit", "tree", "files"],
@@ -426,6 +507,19 @@ def validate(document, root=None, image_digest=None):
         raise LockDefect("this is not a generation-3 lock")
     if document.get("state") != STATE:
         raise LockDefect("state %r is not %r" % (document.get("state"), STATE))
+    if document.get("superseded") is not False:
+        raise LockDefect("the active generation-3 lock is marked superseded")
+    executable = document.get("executable_code") or {}
+    _require_sha(executable.get("commit"), "executable commit")
+    _require_sha(executable.get("tree"), "executable tree")
+    _require_digest((document.get("image") or {}).get("digest"),
+                    "image digest")
+    _require_digest((document.get("image") or {}).get("base_digest"),
+                    "base digest")
+    _require_sha(
+        (document.get("ready_commit_relationship") or {}).get(
+            "ready_anchor_parent"),
+        "ready anchor parent")
 
     for entry in document["executable_code"]["files"]:
         actual = _file_identity(root, entry["path"])
@@ -469,6 +563,27 @@ def validate(document, root=None, image_digest=None):
             raise LockDefect(
                 "%s lock bytes changed; superseded generations are preserved "
                 "byte-for-byte" % key)
+
+    canaries = (document.get("transport") or {}).get("canaries")
+    if not isinstance(canaries, dict):
+        raise LockDefect("transport.canaries must be a non-empty mapping")
+    missing_canaries = [name for name in CANARY_NAMES
+                        if not isinstance(canaries.get(name), dict)
+                        or canaries[name].get("passed") is not True]
+    if missing_canaries:
+        raise LockDefect(
+            "transport.canaries lacks passing receipt(s): %s"
+            % ", ".join(sorted(missing_canaries)))
+
+    v2 = _load_json(
+        root, "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json")
+    for key in ("registration", "corpus_and_p0_t", "immutable_sources",
+                "roles", "caps", "smoke_exact_allocation",
+                "state_transition"):
+        if document.get(key) != v2.get(key):
+            raise LockDefect(
+                "the generation-3 lock changed inherited scientific binding %s"
+                % key)
 
     if image_digest and document["image"]["digest"] != image_digest:
         raise LockDefect(

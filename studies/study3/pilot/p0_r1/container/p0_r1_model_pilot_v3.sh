@@ -34,16 +34,34 @@ on_exit() {
   local code=$?
   set +e
   echo "P0_R1_PILOT_SHELL_EXIT=$code"
-  "$PY" "$P0_R1_DIR/p0_r1_infrastructure_receipt_v3.py" \
-    --emit --exit-code "$code" --out-dir "$OUT_DIR" \
-    --attempt "${P0_R1_ATTEMPT:-unknown}" \
-    --lock-file "$LOCK_FILE" 2>&1 || echo "P0_R1_DURABILITY_DEGRADED=1"
+  if [ -f "$OUT_DIR/p0_r1_artifact_manifest.json" ] \
+      && [ -f "$OUT_DIR/p0_r1_infrastructure_receipt.json" ]; then
+    "$PY" "$P0_R1_DIR/container/p0_r1_infrastructure_receipt_v3.py" \
+      --reemit-existing "$OUT_DIR/p0_r1_infrastructure_receipt.json" \
+      --attempt "${P0_R1_ATTEMPT:-unknown}" 2>&1 \
+      || echo "P0_R1_DURABILITY_DEGRADED=1"
+  else
+    "$PY" "$P0_R1_DIR/container/p0_r1_infrastructure_receipt_v3.py" \
+      --emit --exit-code "$code" --out-dir "$OUT_DIR" \
+      --attempt "${P0_R1_ATTEMPT:-unknown}" \
+      --lock-file "$LOCK_FILE" \
+      ${P0_R1_CANARY_IN_MEMORY_BLOB:+--dry-run} 2>&1 \
+      || echo "P0_R1_DURABILITY_DEGRADED=1"
+  fi
   echo "P0_R1_PILOT_SHELL_TRAP_COMPLETE=1"
   exit "$code"
 }
 trap on_exit EXIT
 
-mkdir -p "$OUT_DIR"
+mkdir -p "$OUT_DIR" "$RUNTIME_ROOT/cache/tmp" "$RUNTIME_ROOT/injected"
+
+if [ ! -f "$LOCK_FILE" ] || [ ! -f "$REPLAY_RECEIPT" ] \
+    || [ ! -f "$RECONSTRUCTION_RECEIPT" ] || [ ! -f "$HEAD_PROOF" ]; then
+  "$PY" "$P0_R1_DIR/p0_r1_authorization_v3.py" --reconstruct \
+    --out-dir "$RUNTIME_ROOT" --require lock --require replay_receipt \
+    --require reconstruction_receipt --require head_proof \
+    || fail "the four exact authorization inputs could not be reconstructed"
+fi
 
 for required in "$LOCK_FILE" "$REPLAY_RECEIPT" "$RECONSTRUCTION_RECEIPT" \
                 "$HEAD_PROOF"; do
@@ -57,7 +75,7 @@ echo "P0_R1_PILOT_EXECUTOR=$EXECUTOR"
 # Every input is passed explicitly. The runner builds the authorization from
 # these exact bytes; there is no in-process shortcut a test could take that
 # production does not.
-exec "$PY" "$P0_R1_DIR/p0_r1_model_runner_v3.py" --run \
+"$PY" "$P0_R1_DIR/p0_r1_model_runner_v3.py" --run \
   --lock-file "$LOCK_FILE" \
   --replay-receipt "$REPLAY_RECEIPT" \
   --reconstruction-receipt "$RECONSTRUCTION_RECEIPT" \

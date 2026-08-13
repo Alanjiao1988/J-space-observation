@@ -38,6 +38,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import p0_r1_transport as TRANSPORT  # noqa: E402
+import p0_r1_replay_gate_v3 as GATE_V3  # noqa: E402
 
 SCHEMA_VERSION = "study3-p0-r1-replay-reconstruction-v3"
 
@@ -47,7 +48,7 @@ RAW_LOG_NAME = "p0_r1_replay_raw_log.txt"
 GATE_RECEIPT_NAME = "p0_r1_replay_receipt.json"
 GATE_RESULT_NAME = "p0_r1_replay_result.json"
 
-PASS_STATE = "STUDY3_P0_R1_REPLAY_GATE_PASSED"
+PASS_STATE = GATE_V3.PASS_STATE
 
 
 class ReplayCaptureDefect(Exception):
@@ -233,7 +234,8 @@ def validate_authorization_pair(gate_receipt, reconstruction,
 
     for field, label in (("image_digest", "image digest"),
                          ("executable_code_commit", "executable commit"),
-                         ("executable_code_tree", "executable tree")):
+                         ("executable_code_tree", "executable tree"),
+                         ("ready_commit", "ready anchor")):
         emitted = gate_receipt.get(field)
         recovered = gate.get(field)
         if emitted and recovered and emitted != recovered:
@@ -306,6 +308,9 @@ def main(argv=None):
     parser.add_argument("--attempt")
     parser.add_argument("--out-dir")
     parser.add_argument("--exit-code", type=int, default=0)
+    parser.add_argument("--executable-commit")
+    parser.add_argument("--image-digest")
+    parser.add_argument("--stderr-file")
     args = parser.parse_args(argv)
 
     if args.identity:
@@ -319,10 +324,17 @@ def main(argv=None):
             return 2
         with open(args.raw_log, "rb") as handle:
             raw = handle.read()
+        stderr = None
+        if args.stderr_file:
+            with open(args.stderr_file, "r", encoding="utf-8",
+                      errors="replace") as handle:
+                stderr = handle.read()
         try:
             receipt, written = write_capture(
                 args.out_dir, args.run_id, raw, attempt_id=args.attempt,
-                exit_code=args.exit_code)
+                exit_code=args.exit_code, stderr=stderr,
+                executable_commit=args.executable_commit,
+                image_digest=args.image_digest)
         except ReplayCaptureDefect as exc:
             print("P0_R1_REPLAY_RECONSTRUCTION_REFUSED=1", file=sys.stderr)
             print("  %s" % exc, file=sys.stderr)
