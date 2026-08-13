@@ -221,3 +221,16 @@ studies/study3/prompts/*.md text eol=lf
 studies/study3/pilot/p0_r1/*.md text eol=lf
 studies/study3/pilot/p0_r1/*.json text eol=lf
 tests/test_study3_p0_r1_generation2_transport.py text eol=lf
+# Study 3 P0-R1 generation-3 narrow historical exception.
+# p0_r1_model_execution.py was committed with CRLF endings before the rule
+# above existed, and it is a bound, published, immutable generation-1 object:
+# its exact bytes are hashed into p0_r1_execution_lock.json and both later
+# locks. The eol=lf rule above therefore made a fresh Linux checkout report it
+# as modified even when its raw worktree bytes equal its committed blob, and
+# any `git add -A` would silently renormalize a protected historical file.
+# `-text` disables all conversion for this one path, so the CRLF blob is
+# preserved byte-for-byte and every platform checks out clean. This changes no
+# committed byte: the blob is and remains 10,229 bytes, sha256
+# 392f78466ee61ed303b5cf4b1fba4423e38b128441aeec1de119315b2e52a5ee.
+studies/study3/pilot/p0_r1/execution/p0_r1_model_execution.py -text
+tests/test_study3_p0_r1_generation3_execution_closure.py text eol=lf

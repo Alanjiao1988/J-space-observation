@@ -1,0 +1,52 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "properties": {
+  "executable_code": {
+   "required": [
+    "commit",
+    "tree",
+    "files"
+   ],
+   "type": "object"
+  },
+  "generation": {
+   "const": 3
+  },
+  "legal_status": {
+   "required": [
+    "p0_r1_pilot_execution_authorized",
+    "p0_r1_pilot_execution_consumed",
+    "formal_execution_authorized"
+   ],
+   "type": "object"
+  },
+  "schema_version": {
+   "const": "study3-p0-r1-execution-lock-v3"
+  },
+  "state": {
+   "const": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE"
+  }
+ },
+ "required": [
+  "schema_version",
+  "generation",
+  "state",
+  "authorities",
+  "executable_code",
+  "ready_commit_relationship",
+  "image",
+  "runtime_binding",
+  "transport",
+  "replay_contract",
+  "azure_query_contract",
+  "dependency_lock",
+  "generation_1",
+  "generation_2",
+  "counters_before_execution",
+  "legal_status",
+  "permitted_sequence",
+  "attempt_binding"
+ ],
+ "title": "Study 3 P0-R1 generation-3 execution lock",
+ "type": "object"
+}

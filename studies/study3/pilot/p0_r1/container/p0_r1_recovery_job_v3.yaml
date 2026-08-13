@@ -1,0 +1,84 @@
+# Study 3 P0-R1 generation-3 CPU-only private preflight and recovery job.
+#
+# Authority:
+#   studies/study3/prompts/study3_p0_r1_generation3_execution_closure_authority.md
+#   sections 4.4 and 4.7.
+#
+# This job exists because two necessary operations cannot be performed from an
+# operator workstation:
+#
+#   * proving the attempt prefix and every reserved object name absent BEFORE
+#     the one-shot GPU job is created; and
+#   * reading the completed attempt's evidence back afterwards.
+#
+# The results account has public network access disabled and shared keys
+# disabled, and it is reachable only through a private endpoint inside the
+# virtual network. A workstation also does not hold the resource's
+# user-assigned managed identity. The generation-2 handoff nonetheless told the
+# operator to construct ManagedIdentityCredential locally, which could not have
+# worked; and generation 2 shipped no recovery job at all, so a completed pilot
+# could have written perfect evidence that nobody could read.
+#
+# This job is deliberately separate from the pilot job and deliberately CPU
+# only. It is not a replay and not a model retry: it reads, verifies and
+# re-emits. It constructs no tokenizer, downloads no checkpoint, loads no
+# weights and allocates no accelerator.
+apiVersion: 2024-03-01
+kind: containerapp-job
+name: job-jspace-s3-p0r1-recover-g3
+resourceGroup: rg-jspace-observation-sea
+subscription: 943bacdf-8b6e-4e3a-8126-a149f623d32e
+properties:
+  environmentId: cae-jspace-observation-sea-vnet2
+  workloadProfileName: Consumption
+  configuration:
+    triggerType: Manual
+    replicaTimeout: 1800
+    replicaRetryLimit: 0
+    manualTriggerConfig:
+      parallelism: 1
+      replicaCompletionCount: 1
+    registries:
+      - server: acrjspaceobssea0708231738.azurecr.io
+        identity: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+  template:
+    containers:
+      - name: p0-r1-recover-g3
+        image: acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@REPLACED_WITH_LOCKED_DIGEST
+        command:
+          - /usr/local/bin/p0_r1_recovery_v3.sh
+        resources:
+          cpu: 1
+          memory: 2Gi
+        env:
+          - name: P0_R1_SRC
+            value: /opt/jspace/src
+          - name: P0_R1_RUNTIME_ROOT
+            value: /workspace/runtime
+          - name: P0_R1_RECOVERY_MODE
+            value: recover
+          - name: P0_R1_ATTEMPT
+            value: REPLACED_WITH_CAPTURED_ATTEMPT_ID
+  identity:
+    type: UserAssigned
+    userAssignedIdentities:
+      /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea: {}
+boundary:
+  modes:
+    - prefix-preflight
+    - recover
+  cpu_only: true
+  gpu_workload_allocated: false
+  is_a_replay: false
+  is_a_model_retry: false
+  tokenizer_constructions: 0
+  checkpoint_downloads: 0
+  model_weight_loads: 0
+  verifies:
+    - bytes
+    - sha256
+    - counts
+    - sequence_continuity
+    - attempt_binding
+    - manifest_last
+  secondary_route: bounded complete-byte console envelope

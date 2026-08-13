@@ -1,0 +1,93 @@
+# Study 3 P0-R1 generation-3 bounded GPU model-pilot job definition.
+#
+# Authority:
+#   studies/study3/prompts/study3_p0_r1_generation3_execution_closure_authority.md
+#   sections 4.3, 4.4, 4.5 and 4.6.
+#
+# This is the immutable definition of the ONE model-operating execution. This
+# round commits and validates it. It does not create, update, start or allocate
+# the job, and the job name below is proved absent at preflight.
+#
+# The name is new for this generation on purpose. Reusing a generation-2 name
+# would let a stale or foreign job configuration be started, or quietly updated
+# into compliance, on the single attempt. The wrapper refuses a job that already
+# exists even with zero executions, rather than repairing it.
+#
+# Every field that could silently authorize a second model operation is pinned:
+#   * replicaRetryLimit 0        - the platform may never re-run a model job;
+#   * parallelism 1              - one replica;
+#   * replicaCompletionCount 1   - one completion;
+#   * triggerType Manual         - nothing starts on a schedule or an event;
+#   * image bound by digest      - a tag is never sufficient.
+#
+# All four authorization inputs are injected as size-checked, hash-checked
+# payloads and every one is mandatory. Generation 2's command omitted the
+# authorization entirely and omitted --blob, so the real job would have refused
+# itself and, had it not, would have journaled only to a filesystem that dies
+# with the replica.
+apiVersion: 2024-03-01
+kind: containerapp-job
+name: job-jspace-s3-p0r1-pilot-g3
+resourceGroup: rg-jspace-observation-sea
+subscription: 943bacdf-8b6e-4e3a-8126-a149f623d32e
+properties:
+  environmentId: cae-jspace-observation-sea-vnet2
+  workloadProfileName: gpu-t4
+  configuration:
+    triggerType: Manual
+    replicaTimeout: 7200
+    replicaRetryLimit: 0
+    manualTriggerConfig:
+      parallelism: 1
+      replicaCompletionCount: 1
+    registries:
+      - server: acrjspaceobssea0708231738.azurecr.io
+        identity: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+  template:
+    containers:
+      - name: p0-r1-pilot-g3
+        image: acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@REPLACED_WITH_LOCKED_DIGEST
+        command:
+          - /usr/local/bin/p0_r1_model_pilot_v3.sh
+        resources:
+          cpu: 4
+          memory: 28Gi
+        env:
+          - name: P0_R1_SRC
+            value: /opt/jspace/src
+          - name: P0_R1_RUNTIME_ROOT
+            value: /workspace/runtime
+          - name: P0_R1_OUT_DIR
+            value: /workspace/runtime/result
+          - name: P0_R1_EXECUTOR
+            value: production
+          - name: P0_R1_LOCK_FILE
+            value: /workspace/runtime/p0_r1_execution_lock_v3.json
+          - name: P0_R1_REPLAY_RECEIPT
+            value: /workspace/runtime/p0_r1_replay_receipt.json
+          - name: P0_R1_RECONSTRUCTION_RECEIPT
+            value: /workspace/runtime/p0_r1_replay_reconstruction_receipt_v3.json
+          - name: P0_R1_HEAD_PROOF
+            value: /workspace/runtime/p0_r1_head_proof_v3.json
+          - name: P0_R1_ATTEMPT
+            value: REPLACED_WITH_CAPTURED_ATTEMPT_ID
+          - name: P0_R1_IMAGE_DIGEST
+            value: REPLACED_WITH_LOCKED_DIGEST
+  identity:
+    type: UserAssigned
+    userAssignedIdentities:
+      /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea: {}
+boundary:
+  created_or_started_by_this_round: false
+  proved_absent_at_preflight: true
+  reuses_a_generation_2_job_name: false
+  stale_or_foreign_job_is_updated_into_compliance: false
+  authorization_inputs_are_mandatory: true
+  authorization_inputs:
+    - p0_r1_execution_lock_v3.json
+    - p0_r1_replay_receipt.json
+    - p0_r1_replay_reconstruction_receipt_v3.json
+    - p0_r1_head_proof_v3.json
+  private_prefix_proved_unused_before_create: true
+  journal_primary_sink: private_blob
+  exactly_one_execution_is_captured_and_monitored: true

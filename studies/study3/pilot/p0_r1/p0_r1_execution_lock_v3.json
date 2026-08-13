@@ -1,0 +1,423 @@
+{
+ "attempt_binding": {
+  "attempt_id_rule": "the replay gate mints exactly one attempt id of the form gen3-<executable_code_commit[:12]>-<utc>; the pilot consumes that same attempt id, writes only under that generation-3 Blob prefix, and refuses a receipt minted for any other attempt",
+  "envelopes_are_per_study_not_per_lock_generation": true,
+  "one_replay_attempt_authorizes_at_most_one_model_pilot": true,
+  "remaining_overall_envelopes": 1
+ },
+ "authorities": [
+  {
+   "bytes": 19632,
+   "path": "studies/study3/prompts/study3_v0_6_p0_r1_authority.md",
+   "sha256": "f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2"
+  },
+  {
+   "bytes": 23486,
+   "path": "studies/study3/prompts/study3_p0_r1_pre_replay_execution_completion_authority_rev2.md",
+   "sha256": "ffe75ba42c023e959f3beb23927604c3ae72c07fb4b25be346f504c8ea2930de"
+  },
+  {
+   "bytes": 30706,
+   "path": "studies/study3/prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md",
+   "sha256": "5594e9728e8e4eb14635c34fb4895e65f2a8fa152ff2bffe76aec33a3ea84d18"
+  },
+  {
+   "bytes": 32068,
+   "path": "studies/study3/prompts/study3_p0_r1_generation3_execution_closure_authority.md",
+   "sha256": "debdece69a5441c8a63de680293b9969d79c27bb4012a93786fcbd14128697fd"
+  }
+ ],
+ "azure_query_contract": {
+  "error_is_treated_as_absence": false,
+  "only_proved_absent_may_create_or_start": true,
+  "outcomes": [
+   "PROVED_ABSENT",
+   "PROVED_PRESENT",
+   "ERROR"
+  ]
+ },
+ "built_at": "2026-08-13T10:28:01Z",
+ "claim_boundary": "this lock authorizes routing and execution mechanics only. It makes no scientific claim, selects no interface, freezes no draft, and adds no evidence row.",
+ "counters_before_execution": {
+  "additional_gpu_attempt_with_signed_zero_operation_receipt": 0,
+  "bank_rows_written": 0,
+  "common_prefix_tokens_processed": 0,
+  "distinct_checkpoint_identities_downloaded": 0,
+  "distinct_tokenizer_identities_constructed": 0,
+  "exceptions_observed": 0,
+  "generated_tokens": 0,
+  "gpu_jobs_performing_a_model_operation": 0,
+  "hosted_provider_inference_calls": 0,
+  "model_weight_loads": 0,
+  "non_generative_prefill_evaluations": 0,
+  "parser_calls": 0,
+  "positive_reference_operations": 0,
+  "registered_prompt_tokens_processed": 0,
+  "replay_gate_evaluations": 0,
+  "restricted_logit_reads": 0,
+  "runtime_batched_forward_calls": 0,
+  "runtime_batched_tokenizer_calls": 0,
+  "s1_scored_rows": 0,
+  "s2_scored_rows": 0,
+  "s3_cpu_only_reuse_scored_rows": 0,
+  "s4_generation_calls": 0,
+  "s4_incremental_decode_evaluations": 0,
+  "s4_prefill_evaluations": 0,
+  "s4_scored_generation_rows": 0,
+  "scoring_context_tokens_processed": 0,
+  "seeds_drawn": 0,
+  "tokenizer_construction_events": 0,
+  "tokenizer_encoded_sequences": 0,
+  "total_scored_rows": 0,
+  "total_sequence_level_model_evaluation_equivalents": 0
+ },
+ "dependency_lock": {
+  "durable_transport": {
+   "bytes": 1779,
+   "path": "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1-transport-v2.txt",
+   "sha256": "e53ed34b97c83285fc7a738b573a08f9155e66ff909ead5de9f762d94745aea9"
+  },
+  "frozen_science": {
+   "bytes": 790,
+   "path": "studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt",
+   "sha256": "a33a66e11ad104b0c402e6decc70f62d1941580c4ea46c1b56f0c023849d2fd8"
+  },
+  "generation_1_dependency_set_edited": false
+ },
+ "document_class": "study3_p0_r1_execution_lock",
+ "executable_code": {
+  "commit": "0000000000000000000000000000000000000000",
+  "files": [
+   {
+    "bytes": 10682,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_azure_query_v3.py",
+    "sha256": "9b56cc55376699498bc190d296f295036dfe20c653b2b13b01a743db93b2b805"
+   },
+   {
+    "bytes": 12425,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_ready_anchor_v3.py",
+    "sha256": "770f1fcc1821f6f58a454605051669756cff15915bc9c51d07aff7a4f20ad18d"
+   },
+   {
+    "bytes": 14734,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_replay_capture_v3.py",
+    "sha256": "2e048ef25d7ba91d8a67374b0d248b40e202ee72670cdbb58caa9d090be36163"
+   },
+   {
+    "bytes": 10862,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_authorization_v3.py",
+    "sha256": "c030160211835c18f5bb1ed857f6f94c45ead36c20c861d25854d3dc48ed16fa"
+   },
+   {
+    "bytes": 18767,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_journal_v3.py",
+    "sha256": "77ca0e7df117bee5e0579cc15ecc0936e999f74b34a7af8750a9a2db3ed72f39"
+   },
+   {
+    "bytes": 3357,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_blob_transport_v3.py",
+    "sha256": "934cec89d396a955bd18e606e1a0edd43833ceddc12d8ed164e0f864b24b7a43"
+   },
+   {
+    "bytes": 6800,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_prefix_preflight_v3.py",
+    "sha256": "f2fe43249999cf64ab79474732c9b6a916099919b0f686022a317687080cdf20"
+   },
+   {
+    "bytes": 14150,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_model_runner_v3.py",
+    "sha256": "d4e598747cbb4a5bbe1c2d8c92781339cf51404c15663ed89bccda84cb7646ec"
+   },
+   {
+    "bytes": 6629,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_replay_gate_v3.py",
+    "sha256": "6c12e887563a1a3dd593be55c2eb5ceb56c4c5b8cfa0555b86f735e2f75ad330"
+   },
+   {
+    "bytes": 9372,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_recovery_v3.py",
+    "sha256": "ec93387d22fb890b16dfa4f8c89c2580f8230163ad7bb19cfbc9ec494bcac77b"
+   },
+   {
+    "bytes": 26129,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.py",
+    "sha256": "13f8cbf9302fd134a0b8b33886b113a15f12850423ce7600eb4b5eea5ac3d609"
+   },
+   {
+    "bytes": 9009,
+    "path": "studies/study3/pilot/p0_r1/execution/p0_r1_model_execution_v3.py",
+    "sha256": "4bcedcb9107c8e5c14055ae516b72e1ab71a8d4c59cb22e64c299e4b1b22ba72"
+   },
+   {
+    "bytes": 10275,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_successor_v3.sh",
+    "sha256": "aa93bb3d80b46ee8eaabae0bb6e1354cd9c8b40ba88a36c23f02e61e0f0fab4c"
+   },
+   {
+    "bytes": 2842,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_model_pilot_v3.sh",
+    "sha256": "bfec1b3282796b9472a32593d55e22c9d44c6d98e978360d03e2569edd60d3b9"
+   },
+   {
+    "bytes": 1749,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_replay_v3.sh",
+    "sha256": "265ced4f1830285c3fb7699fd297d50108a243b08614871fe70c129112ce0f63"
+   },
+   {
+    "bytes": 1544,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_recovery_v3.sh",
+    "sha256": "386410e609ea39e04def96522ca0deb745df0a8caa0e398bf4eca3a7c7cbe25f"
+   },
+   {
+    "bytes": 2944,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_canary_v3.sh",
+    "sha256": "99f6afbbf5177de8631181d485c46936758a3d69ce9362f63e8368ce72688439"
+   },
+   {
+    "bytes": 6948,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_infrastructure_receipt_v3.py",
+    "sha256": "e9c4d61d15d2c84ab7bf5a72ba3f7e31050a56345390cfe9576dfbaf6d3d52ad"
+   },
+   {
+    "bytes": 6579,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_cli_wiring_canary_v3.py",
+    "sha256": "b4f8c03dfd50179cf0818419818baebd27c42280f281cec3b74c6319d45bcb36"
+   },
+   {
+    "bytes": 4554,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_private_journal_canary_v3.py",
+    "sha256": "1c72f2905c641c457419b0e053ef5f045ab75489e6458ecb1e60920ae2857f59"
+   },
+   {
+    "bytes": 5308,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_hard_kill_canary_v3.py",
+    "sha256": "669cfca01774d82ce7b03ef8a187252bff061e3aefca901003c928347dcf9d80"
+   },
+   {
+    "bytes": 8014,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_image_manifest_v3.py",
+    "sha256": "bf718c431f99e92f58f3821da7fd0a8b62325f1c218d2b8ed217da7086f44966"
+   },
+   {
+    "bytes": 10797,
+    "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1-v3",
+    "sha256": "ea91bacdfaab8bdb9a5fc994373d493133644b9c5a4c11cccafe000d98e1e1e8"
+   },
+   {
+    "bytes": 2434,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_acr_task_v3.yaml",
+    "sha256": "27c9dac2d89123238b891703cd2a9d60c98ca2f5ad5b36b0d535342680936748"
+   },
+   {
+    "bytes": 4138,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_gpu_job_v3.yaml",
+    "sha256": "ba5e659ff1f83212bf2a08539eb6d9a0a0f415b49d4c7c40e0e02461fea37a0f"
+   },
+   {
+    "bytes": 3233,
+    "path": "studies/study3/pilot/p0_r1/container/p0_r1_recovery_job_v3.yaml",
+    "sha256": "7fd923fe1a1e0df691208512c3a7a8104ac2525c37699b0e452d6795e3cb4968"
+   },
+   {
+    "bytes": 52145,
+    "path": "tests/test_study3_p0_r1_generation3_execution_closure.py",
+    "sha256": "7b69b5db30677f57a6e2fcbfd55526aed8b3954a70d389aa48ce5837d17e3441"
+   },
+   {
+    "bytes": 32006,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
+    "sha256": "072f29962e8472b54c16303fb04ca610cf3d85be14f973593b4a32dea49ad917"
+   },
+   {
+    "bytes": 31955,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_factorization.py",
+    "sha256": "fdc564c6a0e6fea17b39089f7c2f9403d401e47ad14bb6e8bb7880eed73d380e"
+   },
+   {
+    "bytes": 32355,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_replay_gate.py",
+    "sha256": "1755ee5e188021ce849dce18362365decc9f67d35d3602b037d4c1e7d7e4a15a"
+   },
+   {
+    "bytes": 36992,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_model_runner.py",
+    "sha256": "4691c87974562c7c9d2a0694ce383751224c582ad230f5ddbda37db2f0b90cd3"
+   },
+   {
+    "bytes": 23461,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock.py",
+    "sha256": "c620412991ad94316b360fdc2160caffda21d57c48f3f28693d7e4eddacf3453"
+   },
+   {
+    "bytes": 10229,
+    "path": "studies/study3/pilot/p0_r1/execution/p0_r1_model_execution.py",
+    "sha256": "392f78466ee61ed303b5cf4b1fba4423e38b128441aeec1de119315b2e52a5ee"
+   },
+   {
+    "bytes": 25796,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_transport.py",
+    "sha256": "ebe1f8e49f831c18474e1a0f82551bf4734f3ebdadde57754b092d7b5c396599"
+   },
+   {
+    "bytes": 27409,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_blob_transport.py",
+    "sha256": "c1465a62330441e2e889bfd5a62dcf8aeaee6a7be7bce2bde0286159a7693489"
+   },
+   {
+    "bytes": 27676,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_journal.py",
+    "sha256": "8b871ac7f9f874fc4ff3a936b354021fad629c9f91327cc891f291636f35a632"
+   },
+   {
+    "bytes": 22100,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_runtime_binding.py",
+    "sha256": "da6d624a76d4052a6c586199f8d70b6b29a0b1571f064ca766a6548d0df98e24"
+   },
+   {
+    "bytes": 20951,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_model_runner_v2.py",
+    "sha256": "1457c57c28491f3c66789a6894fa416ff3d20c960fbf61fb40202b9de26ebb19"
+   },
+   {
+    "bytes": 20501,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_replay_gate_v2.py",
+    "sha256": "da8711f9b48efbc17499a2b3c91e9e7a72a73a10c5714197b6f64bbbf6001cde"
+   },
+   {
+    "bytes": 33933,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.py",
+    "sha256": "b7a7c91c6bdf796ee651cac981092007e45618ea2cb5a492f2f7966cf87ef969"
+   },
+   {
+    "bytes": 13630,
+    "path": "studies/study3/pilot/p0_r1/execution/p0_r1_model_execution_v2.py",
+    "sha256": "e6cc55fb354dc697a825fc57c476f5969c89c9c10f5f19fc868d71fac18b6542"
+   }
+  ],
+  "generation_3_file_count": 27,
+  "inherited_file_count": 14,
+  "tree": "0000000000000000000000000000000000000000"
+ },
+ "generation": 3,
+ "generation_1": {
+  "bytes": 10728,
+  "checkpoint_downloads": 0,
+  "consumed": false,
+  "executable_code_commit": "aad14c45e9681a34f382aa95c55ac875d2ca98ce",
+  "executions": 0,
+  "generation": 1,
+  "gpu_allocations": 0,
+  "handoff": "studies/study3/pilot/p0_r1/P0_R1_HANDOFF.md",
+  "image_digest": "sha256:7e2690feb6854a53f096d5b321e69fddebd2b744289c760e2fe74ed1ccec8176",
+  "launchable": false,
+  "lock": "studies/study3/pilot/p0_r1/p0_r1_execution_lock.json",
+  "model_weight_loads": 0,
+  "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock.json",
+  "reason": "the generation-1 image could not have run: its job command /workspace/p0_r1_model_pilot.sh is not a path in the image, its entry point defaults SRC to a checkout mount no GPU job provides, and the executor loads a lock the image cannot contain.",
+  "sha256": "f0e0e6b609091adeb063893687659b0df3e919135c11b8e977575f15bec26c40",
+  "state": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE",
+  "superseded": true,
+  "superseded_by": "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json",
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0
+ },
+ "generation_2": {
+  "bytes": 26172,
+  "checkpoint_downloads": 0,
+  "consumed": false,
+  "executable_code_commit": "863aca8b3a2ac73d9e8c031f762bda6fae125059",
+  "executions": 0,
+  "generation": 2,
+  "gpu_allocations": 0,
+  "handoff": "studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V2.md",
+  "image_digest": "sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827",
+  "launchable": false,
+  "lock": "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json",
+  "model_free_canary_executions": 2,
+  "model_weight_loads": 0,
+  "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json",
+  "published_head": "c04ec748a4b2b63af22f50595816b5e6b6805ff6",
+  "ready_commit": "c7e02b43e1dbf811d1b35ae0fc0fe9d1a1d12947",
+  "reason": "the generation-2 successor path could not perform the authorized sequence without an unrecoverable one-shot failure. Its documented preflight command exits 2 on unrecognized arguments; its production runner CLI never builds the authorization it requires and refuses itself; the receipt it emits records complete_byte_recovery_verified as false while its launcher requires true, so no genuine replay could authorize the pilot; its live-replay mode captures no run identity or raw log; and its journal is not durable on the production command.",
+  "sha256": "f506f632b8602cc000229b9a40991fc666cf0cf9f0195712cfe93d12fbee4714",
+  "state": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE",
+  "superseded": true,
+  "superseded_by": "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json",
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0
+ },
+ "image": {
+  "base_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
+  "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "reference": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "registry": "acrjspaceobssea0708231738.azurecr.io",
+  "repository": "j-space-observation-study3-p0-r1",
+  "requires_a_context_mount": false,
+  "standalone_source_root": "/opt/jspace/src"
+ },
+ "legal_status": {
+  "draft_v0_6_frozen": false,
+  "draft_v0_6_reviewed": false,
+  "evidence_ledger_last_row": "EV-0016",
+  "formal_execution_authorized": false,
+  "interface_selected": null,
+  "od2": "UNRESOLVED_BLOCKING_OPERATOR_DECISION",
+  "p0_r1_pilot_execution_authorized": true,
+  "p0_r1_pilot_execution_consumed": false,
+  "positive_reference": null,
+  "research_question_answered": false,
+  "rp_wrapper": null,
+  "ur22": "UNRESOLVED"
+ },
+ "permitted_sequence": [
+  "the replay gate runs first, CPU-only, inside the image bound by the digest above, and emits its four exact artifacts through the verified complete-byte transport",
+  "the operator captures the run identity and the complete raw log and builds an independent reconstruction receipt from it",
+  "only the recovered receipt plus that reconstruction receipt plus this lock plus a published-head proof authorize the single bounded GPU model pilot",
+  "a replay failure, capture failure, reconstruction failure or any ambiguity publishes the registered stop and performs no model operation"
+ ],
+ "ready_commit_relationship": {
+  "published_head_is_recorded_in_the_lock": false,
+  "ready_anchor_commit": null,
+  "ready_anchor_parent": "0000000000000000000000000000000000000000",
+  "rule": "the ready anchor is the commit that carries this lock. A commit cannot contain its own hash, so it is recorded as a parent here and proved at successor time by p0_r1_ready_anchor_v3.prove, which requires HEAD == origin/main, a clean tree, executable -> anchor -> head ancestry, and every post-anchor change inside the governance allowlist."
+ },
+ "replay_contract": {
+  "authorization_tuple": [
+   "the exact recovered replay receipt",
+   "the independent reconstruction receipt from the raw log",
+   "the active generation-3 lock",
+   "the published-head proof"
+  ],
+  "either_receipt_alone_authorizes": false,
+  "emitted_receipt_claims_its_own_recovery": false,
+  "gate_receipt_is_never_rewritten": true,
+  "recovery_proof_document": "p0_r1_replay_reconstruction_receipt_v3.json"
+ },
+ "runtime_binding": {
+  "authorization_construction_path": "p0_r1_authorization_v3.build",
+  "authorization_inputs_are_mandatory": true,
+  "entrypoints": [
+   "/usr/local/bin/p0_r1_model_pilot_v3.sh",
+   "/usr/local/bin/p0_r1_replay_v3.sh",
+   "/usr/local/bin/p0_r1_recovery_v3.sh"
+  ],
+  "gpu_job_name": "job-jspace-s3-p0r1-pilot-g3",
+  "injection_version": "study3-p0-r1-runtime-injection-v3",
+  "model_pilot_job_command": "/usr/local/bin/p0_r1_model_pilot_v3.sh",
+  "recovery_job_name": "job-jspace-s3-p0r1-recover-g3"
+ },
+ "schema_version": "study3-p0-r1-execution-lock-v3",
+ "stage": "STUDY3-P0-R1",
+ "state": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE",
+ "superseded_generations": 2,
+ "transport": {
+  "canaries": {},
+  "journal_is_create_only": true,
+  "journal_stores_complete_payloads": true,
+  "local_filesystem_is": "cache_only",
+  "manifest_enumerates_recursively": true,
+  "prefix_root": "study3/p0_r1/gen3",
+  "primary_journal_sink": "private_blob",
+  "secondary_route": "bounded complete-byte console envelope"
+ }
+}

@@ -1,0 +1,59 @@
+# Stage P0-R1 generation-3 replay-gate task for the registered ACR route.
+#
+# Authority:
+#   studies/study3/prompts/study3_p0_r1_generation3_execution_closure_authority.md
+#   sections 4.2 and 6.
+#
+# Two things differ from the generation-2 task, and both exist because a
+# one-shot replay must be recoverable by whoever reads the log afterwards.
+#
+# First, the successor builds this task's context from committed Git objects
+# with `git archive`, never from the mutable working directory. Generation 2 ran
+# `az acr run` against whatever happened to be on disk, so the bytes that
+# executed were not provably the published bytes.
+#
+# Second, the run is captured rather than merely launched: the successor records
+# the ACR run ID, retains the complete raw log from its first byte with no tail
+# limit, and rebuilds the four canonical artifacts from that log alone. The gate
+# below therefore emits its complete artifact bytes through the transport
+# envelope and does NOT rewrite its own receipt to claim that a later recovery
+# succeeded. That proof is a separate document.
+#
+# This task contains, downloads and launches NO model. Zero tokenizer
+# constructions, zero encodes, zero checkpoint downloads, zero weight loads,
+# zero GPU operations.
+#
+# Run it through the wrapper, never by hand:
+#   p0_r1_successor_v3.sh live-replay --lock-file <lock> --work-dir <dir> \
+#     --i-am-sure
+version: v1.1.0
+steps:
+  - id: replay
+    cmd: >-
+      {{.Values.IMAGE}}
+      /usr/local/bin/p0_r1_replay_v3.sh
+    env:
+      - P0_R1_LOCK_V3_B64={{.Values.LOCK_B64}}
+      - P0_R1_IMAGE_DIGEST={{.Values.DIGEST}}
+      - P0_R1_READY_COMMIT={{.Values.COMMIT}}
+      - P0_R1_SRC=/opt/jspace/src
+      - P0_R1_RUNTIME_ROOT=/workspace/runtime
+      - RESULTS_DIR=/workspace/runtime/results
+      - INJECTED_DIR=/workspace/runtime/injected
+    timeout: 3600
+boundary:
+  runs_from_the_image_not_the_context_mount: true
+  entrypoint: /usr/local/bin/p0_r1_replay_v3.sh
+  standalone_source_root: /opt/jspace/src
+  context_built_from_committed_git_objects_only: true
+  run_id_is_captured: true
+  raw_log_retained_from_first_byte: true
+  raw_log_tail_limited: false
+  gate_receipt_is_rewritten_after_transport: false
+  recovery_proof_document: p0_r1_replay_reconstruction_receipt_v3.json
+  tokenizer_constructions: 0
+  tokenizer_encodes: 0
+  checkpoint_downloads: 0
+  model_weight_loads: 0
+  model_operations_performed: 0
+  gpu_workload_allocated: false

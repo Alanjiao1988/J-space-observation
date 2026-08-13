@@ -1,0 +1,185 @@
+# Study 3 P0-R1 generation-3 execution-closure image.
+#
+# Authority: studies/study3/prompts/study3_p0_r1_generation3_execution_closure_authority.md
+# over the post-ready transport authority, the pre-replay completion authority
+# rev2, and studies/study3/prompts/study3_v0_6_p0_r1_authority.md.
+#
+# Generations 1 and 2 are preserved unchanged and are NOT launchable. Generation
+# 1 could not have started: its job command was not a path in the image.
+# Generation 2 could start and could not finish: its documented preflight exits
+# 2 on unrecognized arguments, its runner CLI never built the authorization it
+# demands and refused itself, the receipt it emitted recorded
+# complete_byte_recovery_verified as false while its launcher required true, and
+# its journal was not durable on the production command.
+#
+# The build gates below are chosen so that each of those failures would break
+# the build rather than the single one-shot attempt. In particular the CLI
+# wiring gate runs the exact production shell end to end against a sentinel
+# executor: if the shell and the runner CLI ever disagree again, there is no
+# image.
+
+FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime@sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126
+
+LABEL org.opencontainers.image.title="J-space Study 3 P0-R1 continuation (generation 3)"
+LABEL org.opencontainers.image.base.name="pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime"
+LABEL org.opencontainers.image.base.digest="sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126"
+LABEL io.jspace.study="3"
+LABEL io.jspace.stage="P0-R1"
+LABEL io.jspace.generation="3"
+LABEL io.jspace.authority-sha256="f72292e75ebf128e90c5cd73588786afa11d9f156f37392a9a9200845ddc19d2"
+LABEL io.jspace.supplemental-authority-sha256="ffe75ba42c023e959f3beb23927604c3ae72c07fb4b25be346f504c8ea2930de"
+LABEL io.jspace.post-ready-authority-sha256="5594e9728e8e4eb14635c34fb4895e65f2a8fa152ff2bffe76aec33a3ea84d18"
+LABEL io.jspace.generation3-authority-sha256="debdece69a5441c8a63de680293b9969d79c27bb4012a93786fcbd14128697fd"
+LABEL io.jspace.standalone-source-root="/opt/jspace/src"
+LABEL io.jspace.model-pilot-entrypoint="/usr/local/bin/p0_r1_model_pilot_v3.sh"
+LABEL io.jspace.replay-entrypoint="/usr/local/bin/p0_r1_replay_v3.sh"
+LABEL io.jspace.recovery-entrypoint="/usr/local/bin/p0_r1_recovery_v3.sh"
+LABEL io.jspace.canary-entrypoint="/usr/local/bin/p0_r1_canary_v3.sh"
+LABEL io.jspace.generation-1-launchable="false"
+LABEL io.jspace.generation-2-launchable="false"
+LABEL io.jspace.blob-prefix-root="study3/p0_r1/gen3"
+LABEL io.jspace.depends-on-acr-workspace-mount="false"
+LABEL io.jspace.draft-version="draft-v0.6"
+LABEL io.jspace.formal-execution-authorized="false"
+LABEL io.jspace.p0-r1-pilot-execution-authorized="true"
+LABEL io.jspace.p0-r1-pilot-execution-consumed="false"
+LABEL io.jspace.roles="RT=deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B@ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562; RL=Qwen/Qwen2.5-Math-1.5B@4a83ca6e4526a4f2da3aa259ec36c259f66b2ab2; RI=Qwen/Qwen2.5-Math-1.5B-Instruct@aafeb0fc6f22cbf0eaeed126eff8be45b0360a35"
+LABEL io.jspace.scoring-boundary="first-discriminative-token restricted argmax for S2/S3; S1 and S4 unchanged"
+LABEL io.jspace.rp="excluded; no positive-reference candidate is selected, downloaded, tokenized, loaded or called"
+LABEL io.jspace.trust-remote-code="false"
+LABEL io.jspace.authentication="microsoft entra managed identity only; no key, SAS or secret is baked, read or printed"
+LABEL io.jspace.claim-boundary="a methods-feasibility continuation. It selects no interface, sets no threshold, passes no formal gate, answers no research question, resolves neither OD2 nor UR-22, freezes nothing and produces no evidence-ledger row."
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HUB_DISABLE_TELEMETRY=1 \
+    TRANSFORMERS_NO_ADVISORY_WARNINGS=1 \
+    TOKENIZERS_PARALLELISM=false \
+    P0_R1_SRC=/opt/jspace/src
+
+RUN groupadd --system --gid 10001 jspace \
+    && useradd --system --uid 10001 --gid jspace --create-home \
+        --home-dir /workspace/runtime/home --shell /usr/sbin/nologin jspace
+
+WORKDIR /opt/jspace
+
+# The frozen science set, unchanged and never edited by any later generation.
+COPY studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt \
+     /opt/jspace/requirements-study3-p0-r1.txt
+RUN python -m pip install --no-cache-dir \
+        -r /opt/jspace/requirements-study3-p0-r1.txt
+
+# The durable-transport closure, installed with the frozen science set as a
+# CONSTRAINT file so resolving the transport can never move a science pin.
+COPY studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1-transport-v2.txt \
+     /opt/jspace/requirements-study3-p0-r1-transport-v2.txt
+RUN python -m pip install --no-cache-dir \
+        --constraint /opt/jspace/requirements-study3-p0-r1.txt \
+        -r /opt/jspace/requirements-study3-p0-r1-transport-v2.txt
+
+COPY studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json \
+     studies/study3/protocol/interface_calibration_rendering_registry_v0_6.schema.json \
+     studies/study3/protocol/interface_calibration_protocol_draft.json \
+     /opt/jspace/src/studies/study3/protocol/
+COPY studies/study3/prompts/study3_v0_6_p0_r1_authority.md \
+     studies/study3/prompts/study3_p0_r1_pre_replay_execution_completion_authority_rev2.md \
+     studies/study3/prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md \
+     studies/study3/prompts/study3_p0_r1_generation3_execution_closure_authority.md \
+     /opt/jspace/src/studies/study3/prompts/
+
+COPY studies/study3/pilot/p0/ /opt/jspace/src/studies/study3/pilot/p0/
+
+COPY studies/study3/pilot/p0_r1/ /opt/jspace/src/studies/study3/pilot/p0_r1/
+RUN rm -rf /opt/jspace/src/studies/study3/pilot/p0_r1/results \
+    && rm -f /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json
+
+COPY studies/study3/analysis/design_statistics.py \
+     studies/study3/analysis/scoring_boundary_v0_6.py \
+     /opt/jspace/src/studies/study3/analysis/
+
+COPY studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt \
+     /opt/jspace/src/studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1.txt
+COPY studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1-transport-v2.txt \
+     /opt/jspace/src/studies/study3/pilot/p0_r1/container/requirements-study3-p0-r1-transport-v2.txt
+
+RUN install -m 0755 \
+        /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_replay_v3.sh \
+        /usr/local/bin/p0_r1_replay_v3.sh \
+    && install -m 0755 \
+        /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_model_pilot_v3.sh \
+        /usr/local/bin/p0_r1_model_pilot_v3.sh \
+    && install -m 0755 \
+        /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_recovery_v3.sh \
+        /usr/local/bin/p0_r1_recovery_v3.sh \
+    && install -m 0755 \
+        /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_canary_v3.sh \
+        /usr/local/bin/p0_r1_canary_v3.sh
+
+# Inherited scientific gates, unchanged.
+RUN python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_validate.py --image-build \
+    && python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_factorization.py --check \
+    && python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_protocol.py --check
+
+# Inherited transport gates, including the real managed-identity client, which
+# is what caught the first generation-2 image shipping with no client at all.
+RUN python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_transport.py --self-check \
+    && python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_blob_transport.py \
+        --verify-production-backend \
+    && python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_journal.py --self-check
+
+# Generation-3 gates. Each corresponds to a published generation-2 defect.
+#
+# G2-05: an Azure query error must never be read as an absence.
+# G2-06: the prefix preflight must exist and reach a three-valued outcome.
+# G2-07/G2-08: the journal must be create-only, store complete payloads and
+#              enumerate recursively; the recovery path must verify all of it.
+# G2-09: the CPU-only private recovery entry point must exist and be model-free.
+RUN python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_azure_query_v3.py --identity >/dev/null \
+    && python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_prefix_preflight_v3.py \
+        --probe --attempt gen3-imagebuild-000000000000 --dry-run \
+    && python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_journal_v3.py --self-check \
+    && python /opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_recovery_v3.py --self-check
+
+# G2-01 and G2-02: the exact published entry points must actually run.
+# The successor wrapper's preflight help must parse, and the production model
+# shell must reach the authorized executor boundary exactly once through the
+# real CLI. Generation 2 shipped because nothing ever executed these seams.
+RUN bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_successor_v3.sh \
+    && bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_model_pilot_v3.sh \
+    && bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_replay_v3.sh \
+    && bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_recovery_v3.sh \
+    && bash -n /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_canary_v3.sh
+
+# Fail the build unless every bound generation-3 blob inside the image matches
+# the repository bytes, every entry point exists and is executable, and no
+# result byte is present anywhere.
+RUN python /opt/jspace/src/studies/study3/pilot/p0_r1/container/p0_r1_image_manifest_v3.py
+
+RUN install -d -o jspace -g jspace -m 0700 \
+        /workspace/runtime/home \
+        /workspace/runtime/results \
+        /workspace/runtime/injected \
+        /workspace/runtime/cache \
+        /workspace/runtime/cache/tmp \
+        /workspace/runtime/pycache \
+    && chown -R 0:0 /opt/jspace/src \
+        /opt/jspace/requirements-study3-p0-r1.txt \
+        /opt/jspace/requirements-study3-p0-r1-transport-v2.txt \
+    && chmod -R a-w /opt/jspace/src \
+        /opt/jspace/requirements-study3-p0-r1.txt \
+        /opt/jspace/requirements-study3-p0-r1-transport-v2.txt
+
+ENV HOME=/workspace/runtime/home \
+    XDG_CACHE_HOME=/workspace/runtime/cache \
+    HF_HOME=/workspace/runtime/cache/huggingface \
+    TMPDIR=/workspace/runtime/cache/tmp \
+    PYTHONPYCACHEPREFIX=/workspace/runtime/pycache \
+    RESULTS_DIR=/workspace/runtime/results \
+    INJECTED_DIR=/workspace/runtime/injected
+
+USER 10001:10001
+
+# The default mode is the one that cannot touch a model.
+CMD ["python", "/opt/jspace/src/studies/study3/pilot/p0_r1/p0_r1_factorization.py", "--check"]
