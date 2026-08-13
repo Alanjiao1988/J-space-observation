@@ -60,6 +60,7 @@ GOVERNANCE_ALLOWLIST = (
     "studies/study3/README.md",
     "studies/study3/RESEARCH_CHARTER_DRAFT.md",
     "studies/study3/pilot/p0_r1/README.md",
+    "studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V3.md",
 )
 
 GOVERNANCE_ALLOWLIST_PREFIXES = (

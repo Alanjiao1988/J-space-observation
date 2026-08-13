@@ -1131,6 +1131,8 @@ def test_the_governance_allowlist_covers_only_non_executable_paths():
         "studies/study3/pilot/p0_r1/p0_r1_model_runner_v3.py")
     assert not ANCHOR.path_is_governance_only(
         "studies/study3/pilot/p0_r1/container/p0_r1_model_pilot_v3.sh")
+    assert ANCHOR.path_is_governance_only(
+        "studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V3.md")
 
 
 # --- the authorization tuple binds all four documents ---------------------
