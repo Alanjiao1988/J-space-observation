@@ -389,6 +389,24 @@ def test_the_gate_emitted_receipt_flows_through_recovery_into_authorization(
     assert receipt["complete_byte_recovery_verified"] is True
     assert receipt["independent_of_the_gate_process"] is True
 
+    # ACR can interleave its own status line inside one stdout chunk at an
+    # internal log-buffer boundary, then emit the remainder as an orphan line.
+    # Repair is permitted only when the reconstructed raw chunk matches its
+    # declared length and sha256.
+    lines = stream.getvalue().splitlines()
+    split_at = next(index for index, line in enumerate(lines)
+                    if line.startswith("P0R1TXC|") and "|i=0|" in line)
+    prefix, data = lines[split_at].split("|d=", 1)
+    orphan = data[-100:]
+    lines[split_at] = (
+        prefix + "|d=" + data[:-100]
+        + "2026/08/13 19:11:36 Successfully executed container: replay")
+    lines.insert(split_at + 1, "2026/08/13 status")
+    lines.insert(split_at + 2, orphan)
+    repaired, _ = CAPTURE.reconstruct(
+        "\n".join(lines), "cmz2", attempt_id=attempt)
+    assert repaired["raw_log"]["acr_fragment_repair_count"] == 1
+
 
 def test_the_reconstruction_receipt_is_mandatory_for_authorization():
     """The emitted receipt alone never authorizes a model operation."""

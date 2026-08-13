@@ -36,6 +36,7 @@ REQUIRED_MODULES = (
     "p0_r1_azure_query_v3.py",
     "p0_r1_ready_anchor_v3.py",
     "p0_r1_replay_capture_v3.py",
+    "p0_r1_transport_v3.py",
     "p0_r1_authorization_v3.py",
     "p0_r1_journal_v3.py",
     "p0_r1_blob_transport_v3.py",

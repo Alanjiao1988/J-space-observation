@@ -42,6 +42,7 @@ import p0_r1_blob_transport as BLOB  # noqa: E402
 import p0_r1_blob_transport_v3 as BLOB_V3  # noqa: E402
 import p0_r1_journal_v3 as JOURNAL  # noqa: E402
 import p0_r1_transport as TRANSPORT  # noqa: E402
+import p0_r1_transport_v3 as TRANSPORT_V3  # noqa: E402
 
 SCHEMA_VERSION = "study3-p0-r1-recovery-v3"
 
@@ -306,7 +307,7 @@ def main(argv=None):
                       errors="replace") as handle:
                 text = handle.read()
             allowed = declared_names(text)
-            recovered = TRANSPORT.recover(
+            recovered = TRANSPORT_V3.recover(
                 text, attempt_id=args.attempt, allowed=allowed)
             written = TRANSPORT.write_recovered(
                 recovered, args.out_dir, allowed=allowed)

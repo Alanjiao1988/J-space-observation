@@ -38,6 +38,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import p0_r1_transport as TRANSPORT  # noqa: E402
+import p0_r1_transport_v3 as TRANSPORT_V3  # noqa: E402
 import p0_r1_replay_gate_v3 as GATE_V3  # noqa: E402
 
 SCHEMA_VERSION = "study3-p0-r1-replay-reconstruction-v3"
@@ -87,7 +88,8 @@ def reconstruct(raw_log, run_id, attempt_id=None, executable_commit=None,
             "and authorizes no reconstruction" % (run_id, exit_code))
 
     try:
-        recovered = TRANSPORT.recover(text, attempt_id=attempt_id)
+        recovered, fragment_repairs = TRANSPORT_V3.recover_with_report(
+            text, attempt_id=attempt_id)
     except TRANSPORT.TransportDefect as exc:
         raise ReplayCaptureDefect(
             "the captured log of run %s does not contain a complete transport "
@@ -140,6 +142,8 @@ def reconstruct(raw_log, run_id, attempt_id=None, executable_commit=None,
             "sha256": _sha256(raw_bytes),
             "captured_from_first_byte": True,
             "tail_limited": False,
+            "acr_fragment_repairs": fragment_repairs,
+            "acr_fragment_repair_count": len(fragment_repairs),
         },
         "gate": {
             "state": gate_result.get("state"),
