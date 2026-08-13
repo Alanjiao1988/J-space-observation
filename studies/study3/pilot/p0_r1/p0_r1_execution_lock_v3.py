@@ -80,6 +80,7 @@ GENERATION_3_CODE_PATHS = (
     "studies/study3/pilot/p0_r1/p0_r1_replay_gate_v3.py",
     "studies/study3/pilot/p0_r1/p0_r1_recovery_v3.py",
     "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.py",
+    "studies/study3/pilot/p0_r1/p0_r1_job_spec_v3.py",
     "studies/study3/pilot/p0_r1/execution/p0_r1_model_execution_v3.py",
     "studies/study3/pilot/p0_r1/container/p0_r1_successor_v3.sh",
     "studies/study3/pilot/p0_r1/container/p0_r1_model_pilot_v3.sh",
@@ -368,7 +369,7 @@ def build(root=None, executable_commit=None, executable_tree=None,
                 "studies/study3/pilot/p0_r1/container/"
                 "p0_r1_acr_task_v3.yaml"),
             "required_task_values": [
-                "IMAGE", "LOCK_B64", "DIGEST", "READY_ANCHOR", "MODE"],
+                "IMAGE", "DIGEST", "READY_ANCHOR", "MODE"],
         },
         "replay_contract": {
             "gate_receipt_is_never_rewritten": True,

@@ -33,7 +33,7 @@ steps:
       {{.Values.IMAGE}}
       /usr/local/bin/p0_r1_replay_v3.sh
     env:
-      - P0_R1_LOCK_V3_B64={{.Values.LOCK_B64}}
+      - P0_R1_LOCK_CONTEXT=/workspace/studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json
       - P0_R1_IMAGE_DIGEST={{.Values.DIGEST}}
       - P0_R1_READY_COMMIT={{.Values.READY_ANCHOR}}
       - P0_R1_REPLAY_MODE={{.Values.MODE}}
@@ -54,7 +54,6 @@ boundary:
   gate_receipt_is_rewritten_after_transport: false
   required_values:
     - IMAGE
-    - LOCK_B64
     - DIGEST
     - READY_ANCHOR
     - MODE

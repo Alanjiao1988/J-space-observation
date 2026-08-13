@@ -46,6 +46,7 @@ import p0_r1_blob_transport as BLOB  # noqa: E402
 import p0_r1_blob_transport_v3 as BLOB_V3  # noqa: E402
 import p0_r1_execution_lock_v3 as LOCK_V3  # noqa: E402
 import p0_r1_journal_v3 as JOURNAL_V3  # noqa: E402
+import p0_r1_job_spec_v3 as JOB_SPEC  # noqa: E402
 import p0_r1_prefix_preflight_v3 as PREFIX  # noqa: E402
 import p0_r1_ready_anchor_v3 as ANCHOR  # noqa: E402
 import p0_r1_recovery_v3 as RECOVERY  # noqa: E402
@@ -1158,6 +1159,19 @@ def test_the_authorization_requires_all_four_documents(synthetic_inputs):
             payload = handle.read()
         assert AUTHZ.decode_injection(
             AUTHZ.encode_injection(payload)) == payload
+    spec = JOB_SPEC.gpu_spec(
+        "job-jspace-s3-p0r1-cli-canary-g3",
+        "acrjspaceobssea0708231738.azurecr.io/repo@sha256:" + "1" * 64,
+        WIRING.ATTEMPT, LOCK_V3_PATH,
+        synthetic_inputs["p0_r1_replay_receipt.json"],
+        synthetic_inputs["p0_r1_replay_reconstruction_receipt_v3.json"],
+        synthetic_inputs["p0_r1_head_proof_v3.json"], sentinel=True)
+    assert spec["properties"]["workloadProfileName"] == "Consumption"
+    assert spec["properties"]["configuration"]["replicaRetryLimit"] == 0
+    names = {entry["name"] for entry in
+             spec["properties"]["template"]["containers"][0]["env"]}
+    assert set(AUTHZ.INJECTION_TARGETS[target][0]
+               for target in AUTHZ.INJECTION_TARGETS).issubset(names)
 
 
 def test_a_generation_2_lock_cannot_authorize_a_generation_3_pilot(

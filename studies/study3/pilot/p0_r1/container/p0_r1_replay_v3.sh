@@ -57,9 +57,15 @@ esac
 
 mkdir -p "$OUT_DIR" "$RUNTIME_ROOT/cache/tmp" "$RUNTIME_ROOT/injected"
 if [ ! -f "$LOCK_FILE" ]; then
-  "$PY" "$P0_R1_DIR/p0_r1_authorization_v3.py" --reconstruct \
-    --out-dir "$RUNTIME_ROOT" --require lock \
-    || fail "the exact generation-3 lock could not be reconstructed"
+  if [ -n "${P0_R1_LOCK_CONTEXT:-}" ] \
+      && [ -f "$P0_R1_LOCK_CONTEXT" ]; then
+    cp "$P0_R1_LOCK_CONTEXT" "$LOCK_FILE" \
+      || fail "the context lock could not be copied byte-exactly"
+  else
+    "$PY" "$P0_R1_DIR/p0_r1_authorization_v3.py" --reconstruct \
+      --out-dir "$RUNTIME_ROOT" --require lock \
+      || fail "the exact generation-3 lock could not be reconstructed"
+  fi
 fi
 [ -f "$LOCK_FILE" ] || fail "the injected execution lock $LOCK_FILE is missing"
 

@@ -107,9 +107,17 @@ capture_execution_log() {
 }
 
 configure_recovery_job() {
-  local mode="$1" attempt="$2" image="$3"
-  local lock_b64="${4:-not-required-in-prefix-preflight}"
+  local mode="$1" attempt="$2" image="$3" lock_file="${4:-}"
   local presence="$WORK_DIR/p0_r1_recovery_job_presence.json"
+  local spec="$WORK_DIR/p0_r1_recovery_job_${mode}.json"
+  local lock_args=()
+  if [ "$mode" = "recover" ]; then
+    lock_args=(--lock-file "$lock_file")
+  fi
+  "$PY" "$P0_R1_DIR/p0_r1_job_spec_v3.py" --recovery "$mode" \
+    --name "$RECOVERY_JOB" --image "$image" --attempt "$attempt" \
+    "${lock_args[@]}" --out "$spec" \
+    || fail "the CPU recovery job spec could not be built"
   "$PY" "$P0_R1_DIR/p0_r1_azure_query_v3.py" \
     --job-presence "$RECOVERY_JOB" --resource-group "$RESOURCE_GROUP" \
     --subscription "$SUBSCRIPTION" >"$presence" \
@@ -117,17 +125,7 @@ configure_recovery_job() {
   if grep -q '"outcome": "PROVED_ABSENT"' "$presence"; then
     az containerapp job create --name "$RECOVERY_JOB" \
       --resource-group "$RESOURCE_GROUP" --subscription "$SUBSCRIPTION" \
-      --environment "$ENVIRONMENT" --workload-profile-name Consumption \
-      --trigger-type Manual --replica-timeout 1800 --replica-retry-limit 0 \
-      --parallelism 1 --replica-completion-count 1 --image "$image" \
-      --cpu 1 --memory 2Gi --mi-user-assigned "$IDENTITY" \
-      --registry-server "$REGISTRY_SERVER" --registry-identity "$IDENTITY" \
-      --command /usr/local/bin/p0_r1_recovery_v3.sh --env-vars \
-        "P0_R1_SRC=/opt/jspace/src" \
-        "P0_R1_RUNTIME_ROOT=/workspace/runtime" \
-        "P0_R1_RECOVERY_MODE=$mode" "P0_R1_ATTEMPT=$attempt" \
-        "P0_R1_LOCK_V3_B64=$lock_b64" \
-        "AZURE_CLIENT_ID=479d9229-632e-4490-ad92-854a34dfddf8" \
+      --yaml "$spec" \
       >"$WORK_DIR/p0_r1_recovery_job_create.json" \
       || fail "the CPU-only recovery job could not be created"
   else
@@ -135,12 +133,7 @@ configure_recovery_job() {
       || fail "recovery job presence was ambiguous"
     az containerapp job update --name "$RECOVERY_JOB" \
       --resource-group "$RESOURCE_GROUP" --subscription "$SUBSCRIPTION" \
-      --image "$image" --command /usr/local/bin/p0_r1_recovery_v3.sh \
-      --set-env-vars "P0_R1_SRC=/opt/jspace/src" \
-        "P0_R1_RUNTIME_ROOT=/workspace/runtime" \
-        "P0_R1_RECOVERY_MODE=$mode" "P0_R1_ATTEMPT=$attempt" \
-        "P0_R1_LOCK_V3_B64=$lock_b64" \
-        "AZURE_CLIENT_ID=479d9229-632e-4490-ad92-854a34dfddf8" \
+      --yaml "$spec" \
       >"$WORK_DIR/p0_r1_recovery_job_update.json" \
       || fail "the CPU-only recovery job could not be updated"
   fi
@@ -239,7 +232,7 @@ run_live_replay() {
   mkdir -p "$WORK_DIR"
 
   local head context context_dir raw_log run_id replay_attempt
-  local locked_digest executable_commit image_ref lock_b64 ready_anchor
+  local locked_digest executable_commit image_ref ready_anchor
   head="$(git -C "$SRC" rev-parse HEAD)"
   [ "$head" = "$(git -C "$SRC" rev-parse origin/main)" ] \
     || fail "HEAD is not origin/main; refusing to replay a local variant"
@@ -263,8 +256,6 @@ run_live_replay() {
     fail "the requested image digest is not the locked digest"
   fi
   image_ref="$REGISTRY_SERVER/$REPOSITORY@$locked_digest"
-  lock_b64="$("$PY" "$P0_R1_DIR/p0_r1_authorization_v3.py" \
-    --encode --file "$LOCK_FILE")"
   ready_anchor="$("$PY" -c \
     'import json,sys; print(json.load(open(sys.argv[1]))["ready_anchor"]["commit"])' \
     "$WORK_DIR/p0_r1_head_proof_v3.json")"
@@ -285,7 +276,7 @@ run_live_replay() {
   set +e
   az acr run --registry "$REGISTRY" --subscription "$SUBSCRIPTION" \
     --file studies/study3/pilot/p0_r1/container/p0_r1_acr_task_v3.yaml \
-    --set "IMAGE=$image_ref" --set "LOCK_B64=$lock_b64" \
+    --set "IMAGE=$image_ref" \
     --set "DIGEST=$locked_digest" --set "READY_ANCHOR=$ready_anchor" \
     --set "MODE=live" --set "ATTEMPT=live-gate-mints-attempt" \
     "$context_dir" >"$raw_log" 2>"$WORK_DIR/p0_r1_replay_stderr.txt"
@@ -350,7 +341,7 @@ run_launch_pilot() {
     || fail "$GPU_JOB is not proved absent; refusing to reuse or update a job"
 
   local authorization="$WORK_DIR/p0_r1_authorization_v3.json"
-  local attempt image lock_b64 receipt_b64 reconstruction_b64 proof_b64
+  local attempt image gpu_spec
   local prefix_execution prefix_status prefix_container prefix_log
   local gpu_execution gpu_status gpu_container recovery_execution
   local recovery_status recovery_container recovery_log
@@ -360,11 +351,8 @@ run_launch_pilot() {
   image="$REGISTRY_SERVER/$REPOSITORY@$("$PY" -c \
     'import json,sys; print(json.load(open(sys.argv[1]))["image_digest"])' \
     "$authorization")"
-  lock_b64="$("$PY" "$P0_R1_DIR/p0_r1_authorization_v3.py" \
-    --encode --file "$LOCK_FILE")"
-
   # The exact prefix is proved absent from inside the VNet before GPU creation.
-  configure_recovery_job prefix-preflight "$attempt" "$image" ""
+  configure_recovery_job prefix-preflight "$attempt" "$image"
   prefix_execution="$(az containerapp job start --name "$RECOVERY_JOB" \
     --resource-group "$RESOURCE_GROUP" --subscription "$SUBSCRIPTION" \
     --query name -o tsv)" \
@@ -388,31 +376,16 @@ run_launch_pilot() {
     "$WORK_DIR/p0_r1_gpu_job_presence_after_prefix.json" \
     || fail "$GPU_JOB is no longer proved absent"
 
-  receipt_b64="$("$PY" "$P0_R1_DIR/p0_r1_authorization_v3.py" \
-    --encode --file "$REPLAY_RECEIPT")"
-  reconstruction_b64="$("$PY" "$P0_R1_DIR/p0_r1_authorization_v3.py" \
-    --encode --file "$RECONSTRUCTION_RECEIPT")"
-  proof_b64="$("$PY" "$P0_R1_DIR/p0_r1_authorization_v3.py" \
-    --encode --file "$HEAD_PROOF")"
-
+  gpu_spec="$WORK_DIR/p0_r1_gpu_job_v3.json"
+  "$PY" "$P0_R1_DIR/p0_r1_job_spec_v3.py" --gpu --name "$GPU_JOB" \
+    --image "$image" --attempt "$attempt" --lock-file "$LOCK_FILE" \
+    --replay-receipt "$REPLAY_RECEIPT" \
+    --reconstruction-receipt "$RECONSTRUCTION_RECEIPT" \
+    --head-proof "$HEAD_PROOF" --out "$gpu_spec" \
+    || fail "the exact GPU job spec could not be generated"
   az containerapp job create --name "$GPU_JOB" \
     --resource-group "$RESOURCE_GROUP" --subscription "$SUBSCRIPTION" \
-    --environment "$ENVIRONMENT" --workload-profile-name gpu-t4 \
-    --trigger-type Manual --replica-timeout 7200 --replica-retry-limit 0 \
-    --parallelism 1 --replica-completion-count 1 --image "$image" \
-    --cpu 4 --memory 28Gi --mi-user-assigned "$IDENTITY" \
-    --registry-server "$REGISTRY_SERVER" --registry-identity "$IDENTITY" \
-    --command /usr/local/bin/p0_r1_model_pilot_v3.sh --env-vars \
-      "P0_R1_SRC=/opt/jspace/src" \
-      "P0_R1_RUNTIME_ROOT=/workspace/runtime" \
-      "P0_R1_OUT_DIR=/workspace/runtime/result" \
-      "P0_R1_EXECUTOR=production" "P0_R1_ATTEMPT=$attempt" \
-      "P0_R1_IMAGE_DIGEST=${image##*@}" \
-      "P0_R1_LOCK_V3_B64=$lock_b64" \
-      "P0_R1_REPLAY_RECEIPT_V3_B64=$receipt_b64" \
-      "P0_R1_RECONSTRUCTION_RECEIPT_V3_B64=$reconstruction_b64" \
-      "P0_R1_HEAD_PROOF_V3_B64=$proof_b64" \
-      "AZURE_CLIENT_ID=479d9229-632e-4490-ad92-854a34dfddf8" \
+    --yaml "$gpu_spec" \
     >"$WORK_DIR/p0_r1_gpu_job_create.json" \
     || fail "the one GPU job could not be created"
 
@@ -424,7 +397,7 @@ run_launch_pilot() {
   gpu_status="$(monitor_execution "$GPU_JOB" "$gpu_execution" 7200)"
 
   # Recovery is model-free and always runs after the captured terminal status.
-  configure_recovery_job recover "$attempt" "$image" "$lock_b64"
+  configure_recovery_job recover "$attempt" "$image" "$LOCK_FILE"
   recovery_execution="$(az containerapp job start --name "$RECOVERY_JOB" \
     --resource-group "$RESOURCE_GROUP" --subscription "$SUBSCRIPTION" \
     --query name -o tsv)" || fail "the recovery execution could not be started"

@@ -44,6 +44,7 @@ REQUIRED_MODULES = (
     "p0_r1_replay_gate_v3.py",
     "p0_r1_recovery_v3.py",
     "p0_r1_execution_lock_v3.py",
+    "p0_r1_job_spec_v3.py",
     "execution/p0_r1_model_execution_v3.py",
     "container/p0_r1_infrastructure_receipt_v3.py",
     "container/p0_r1_cli_wiring_canary_v3.py",
