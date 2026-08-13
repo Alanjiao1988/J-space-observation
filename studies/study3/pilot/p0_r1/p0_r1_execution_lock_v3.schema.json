@@ -25,12 +25,16 @@
   },
   "state": {
    "const": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE"
+  },
+  "superseded": {
+   "const": false
   }
  },
  "required": [
   "schema_version",
   "generation",
   "state",
+  "superseded",
   "authorities",
   "executable_code",
   "ready_commit_relationship",
@@ -45,7 +49,15 @@
   "counters_before_execution",
   "legal_status",
   "permitted_sequence",
-  "attempt_binding"
+  "attempt_binding",
+  "registration",
+  "corpus_and_p0_t",
+  "immutable_sources",
+  "roles",
+  "caps",
+  "smoke_exact_allocation",
+  "state_transition",
+  "successor_context"
  ],
  "title": "Study 3 P0-R1 generation-3 execution lock",
  "type": "object"

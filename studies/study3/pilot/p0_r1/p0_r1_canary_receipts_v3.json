@@ -1,0 +1,288 @@
+{
+  "blob_journal": {
+    "attempt_id": "gen3canary-1e4324bb4bb0-20260813t1845z",
+    "create_only": true,
+    "execution": "job-jspace-s3-p0r1-canary-g3-0qly695",
+    "job": "job-jspace-s3-p0r1-canary-g3",
+    "journal_objects": 5,
+    "log": {
+      "bytes": 108713,
+      "name": "p0_r1_final_vnet_log.json",
+      "sha256": "8513f5ebc5f1024f679ee6ce071d988c65cdc95380640ede8ac7c61a2fd6254e"
+    },
+    "manifest_sha256": "dc224bb75228b78ceda80e746feed6537ed338306151024565c200932dd37957",
+    "passed": true,
+    "prefix": "study3/p0_r1/gen3/gen3canary-1e4324bb4bb0-20260813t1845z/",
+    "recursive_manifest": true,
+    "recursive_manifest_sha256": "0e6b822c263b066a8ccac24aca5bc8c7c2047f370aadd97179ec7d258cecdeae",
+    "row_bytes": 4222
+  },
+  "cpu_managed_identity_recovery": {
+    "attempt_id": "gen3canary-1e4324bb4bb0-20260813t1845z",
+    "execution": "job-jspace-s3-p0r1-recover-g3-xvzmicz",
+    "identity_client_id": "479d9229-632e-4490-ad92-854a34dfddf8",
+    "job": "job-jspace-s3-p0r1-recover-g3",
+    "journal_objects_verified": 5,
+    "log": {
+      "bytes": 41325,
+      "name": "p0_r1_final_recovery_log.json",
+      "sha256": "0bdcf82213c8f82885d61a80ee70d3a56dd5cbf0e47b1df0cc335d8261b781b3"
+    },
+    "manifest_written_last": true,
+    "partial_attempt": false,
+    "passed": true,
+    "prefix": "study3/p0_r1/gen3/gen3canary-1e4324bb4bb0-20260813t1845z/",
+    "recovery_receipt": {
+      "bytes": 2160,
+      "name": "p0_r1_final_cpu_recovery_receipt.json",
+      "sha256": "9146bcd3ccc71ee6d04c746982959da71cc917bd12f475bd550436bb61ccf288"
+    },
+    "recursive_objects_verified": 6,
+    "sequence_continuous": true,
+    "workload_profile": "Consumption"
+  },
+  "exact_cli_wiring": {
+    "acr_build_gate_run_id": "cmgu",
+    "execution": "job-jspace-s3-p0r1-cli-canary-g3-045bda2",
+    "injected_exact_inputs": 4,
+    "job": "job-jspace-s3-p0r1-cli-canary-g3",
+    "log": {
+      "bytes": 28430,
+      "name": "p0_r1_final_cli_log.json",
+      "sha256": "3960f3bcd77bed58679c5b9b3cdc4f8378ecb1aece464874153e00af03b6f9b9"
+    },
+    "model_operations": 0,
+    "passed": true,
+    "sentinel_executor_calls": 1,
+    "shell_exit_trap_completed": true,
+    "workload_profile": "Consumption"
+  },
+  "executable_commit": "1e4324bb4bb09de6d2373560b3edd7442cf8352c",
+  "executable_tree": "161f9c12cead6bc72235270ddeb260fd3b40ba89",
+  "hard_kill_recovery": {
+    "attempt_id": "gen3canary-1e4324bb4bb0-20260813t1845z-hardkill",
+    "authorizes_a_retry": false,
+    "child_return_code": -9,
+    "cpu_recovery_classification": "partial",
+    "execution": "job-jspace-s3-p0r1-canary-g3-0qly695",
+    "job": "job-jspace-s3-p0r1-canary-g3",
+    "journal_objects": 5,
+    "open_admission": "generation_call",
+    "passed": true,
+    "row_recovered": "KILL-0001"
+  },
+  "image": {
+    "base_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
+    "build_log": {
+      "bytes": 60193,
+      "name": "acr_cmgu.log",
+      "sha256": "27c0d89630350af608d5f19a47f8e83919c3ee3eb1d306e14a176705a32ac650"
+    },
+    "build_run_id": "cmgu",
+    "context": {
+      "bytes": 16722050,
+      "kind": "git archive of exact committed objects",
+      "sha256": "5efb30efa5368bb24bae97fc744026f064e73581252b1109dc8b52cb3ee5e303"
+    },
+    "digest": "sha256:7be1b7543ea2b618a9745369169f861ba447e25f5522ef65ea5c7f6218384012",
+    "reference": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@sha256:7be1b7543ea2b618a9745369169f861ba447e25f5522ef65ea5c7f6218384012",
+    "tag": "gen3-1e4324bb4bb0"
+  },
+  "image_bound_bytes": {
+    "acr_run_id": "cmgw",
+    "audit": {
+      "bytes": 906,
+      "name": "p0_r1_final_image_bound_audit.json",
+      "sha256": "4186310edc0475c8316d2d5dab6e4ada0cbf58c7db2e7156116e5eb2f07e16c1"
+    },
+    "git_objects_verified": 79,
+    "manifest": {
+      "bytes": 16271,
+      "name": "p0_r1_final_image_manifest.json",
+      "sha256": "078dbadf115ece896fca5bc5f1f690df3fe00c9aa512c8507ad986a07a1406a4"
+    },
+    "manifest_blob_count": 79,
+    "mismatches": [],
+    "passed": true,
+    "raw_log": {
+      "bytes": 20857,
+      "name": "p0_r1_final_image_manifest_raw_log.txt",
+      "sha256": "45116ca21b5245c4cccfac073bc5852174a1a5eaf33ffb9781b1b817884b0dba"
+    },
+    "requires_a_context_mount": false,
+    "results_present": false
+  },
+  "model_free_boundary": {
+    "checkpoint_downloads": 0,
+    "gpu_job_created": false,
+    "gpu_job_started": false,
+    "gpu_workload_allocated": false,
+    "model_operations_performed": 0,
+    "model_weight_loads": 0,
+    "one_shot_envelope_consumed": false,
+    "passed": true,
+    "replay_gate_evaluations": 0,
+    "tokenizer_constructions": 0,
+    "tokenizer_encodes": 0,
+    "workload_profiles": [
+      "ACR CPU",
+      "Consumption"
+    ]
+  },
+  "private_prefix": {
+    "attempt_id": "gen3-prefix-canary-1e4324bb4bb0-20260813t1845z",
+    "execution": "job-jspace-s3-p0r1-recover-g3-obx7x7k",
+    "job": "job-jspace-s3-p0r1-recover-g3",
+    "log": {
+      "bytes": 9430,
+      "name": "p0_r1_final_prefix_log.json",
+      "sha256": "e338cfe5cccd76c2b508ee27755a743016a90827225675a311d458de15144da4"
+    },
+    "objects_under_prefix": 0,
+    "outcome": "PROVED_ABSENT",
+    "passed": true,
+    "prefix": "study3/p0_r1/gen3/gen3-prefix-canary-1e4324bb4bb0-20260813t1845z/",
+    "reserved_collisions": [],
+    "workload_profile": "Consumption"
+  },
+  "registered_failed_or_discarded_runs": [
+    {
+      "image_digest": "sha256:67d6c524035762087e6dfada3fb7e244d5b983005621976fd629791a905da19c",
+      "kind": "discarded_pre-6608856_image",
+      "launchable": false,
+      "run_id": "cmgc"
+    },
+    {
+      "image_digest": "sha256:a9eb372f440d3ab4ac3130d0ac743fb19e7d98ea420a7495ffe5fcffda00e1f5",
+      "kind": "discarded_pre-repair_image",
+      "launchable": false,
+      "run_id": "cmgd"
+    },
+    {
+      "failure": "enhanced CLI canary caught source/runtime aliasing",
+      "image_pushed": false,
+      "kind": "failed_build",
+      "run_id": "cmgp"
+    },
+    {
+      "image_digest": "sha256:1d89c130391f018aa1f6f20ef6c28a3cfb35f00fc88e94f76261030da7fff635",
+      "kind": "discarded_image_after_executable_change",
+      "launchable": false,
+      "run_id": "cmgq"
+    },
+    {
+      "image_digest": "sha256:9f0202df8fbaf015f88b4b381d7584303a289521793cafcc409f485c1dfb56ac",
+      "kind": "discarded_image_after_executable_change",
+      "launchable": false,
+      "run_id": "cmgr"
+    },
+    {
+      "failure": "quick-run acb.yaml absent",
+      "kind": "failed_operator_canary_wrapper",
+      "model_operations": 0,
+      "run_id": "cmgh"
+    },
+    {
+      "failure": "temporary script CRLF",
+      "kind": "failed_operator_canary_wrapper",
+      "model_operations": 0,
+      "run_id": "cmgj"
+    },
+    {
+      "failure": "temporary wrapper TMPDIR shadowed",
+      "kind": "failed_operator_canary_wrapper",
+      "model_operations": 0,
+      "run_id": "cmgk"
+    },
+    {
+      "execution": "job-jspace-s3-p0r1-recover-g3-9l66ewp",
+      "failure": "runtime root not writable before production-UID build gate",
+      "kind": "failed_recovery_canary",
+      "model_operations": 0
+    },
+    {
+      "execution": "job-jspace-s3-p0r1-cli-canary-g3-g2jqcm1",
+      "failure": "runtime root not writable before production-UID build gate",
+      "kind": "failed_cli_canary",
+      "model_operations": 0
+    },
+    {
+      "execution": "job-jspace-s3-p0r1-cli-canary-g3-5m6aeh8",
+      "failure": "operator supplied canary attempt did not match synthetic receipt",
+      "kind": "failed_cli_canary",
+      "model_operations": 0
+    },
+    {
+      "failure": "exact executable commit still carried placeholder lock",
+      "kind": "expected_pre-lock_validation_failure",
+      "model_operations": 0,
+      "run_id": "cmgx"
+    }
+  ],
+  "replay_capture_recovery": {
+    "acr_run_id": "cmgv",
+    "artifacts": [
+      {
+        "bytes": 262144,
+        "chunks": 512,
+        "name": "P0_R1_REPLAY_DISPOSITION.md",
+        "sha256": "5f756bc40137e8226dc9c35c34c0ee9da0e2c5b922f8bc15563e8b2c2d4d86d9"
+      },
+      {
+        "bytes": 262144,
+        "chunks": 512,
+        "name": "p0_r1_replay_counters.json",
+        "sha256": "f689cee53293f9e87592ea3499965ccf635abb61a1ed9b6aa6bf2e15c0790333"
+      },
+      {
+        "bytes": 262144,
+        "chunks": 512,
+        "name": "p0_r1_replay_receipt.json",
+        "sha256": "1c4c5ffbc4acacf35cef594d17a7c8d3790145c4b153bd3659515d28393b4bd5"
+      },
+      {
+        "bytes": 262144,
+        "chunks": 512,
+        "name": "p0_r1_replay_result.json",
+        "sha256": "3a98e2d8d13e6b5362adb5dc10238417ac02e30b0313f43ec11c7ae7db623a6d"
+      }
+    ],
+    "attempt_id": "gen3-transport-canary-1e4324bb4bb0-20260813t1845z",
+    "entrypoint": "/usr/local/bin/p0_r1_replay_v3.sh",
+    "fixture_is_synthetic": true,
+    "manifest_sha256": "acb5f86ee7f6caafd11f75ab52db8e196240b7cbe298435e5885f92f58a0d975",
+    "mode": "transport-canary",
+    "one_shot_envelope_consumed": false,
+    "passed": true,
+    "raw_log": {
+      "bytes": 1989866,
+      "name": "p0_r1_final_exact_task_raw_log.txt",
+      "sha256": "7ca029a496f50b9a4018dda73ca4d5a3b9918e26eb6a2ce18db09e99abb24d95"
+    },
+    "reconstruction_receipt": {
+      "bytes": 1573,
+      "name": "p0_r1_final_task_reconstruction.json",
+      "sha256": "bee3d255fa6197c13e8b2f7949e68c597b0c7d8d82a3f652b811b04cda8acaa4"
+    },
+    "recovered_without_rerunning_the_gate": true,
+    "replay_gate_run": false,
+    "task": "studies/study3/pilot/p0_r1/container/p0_r1_acr_task_v3.yaml",
+    "total_bytes": 1048576
+  },
+  "schema_version": "study3-p0-r1-model-free-production-canaries-v3",
+  "standalone_layout": {
+    "execution": "job-jspace-s3-p0r1-canary-g3-0qly695",
+    "job": "job-jspace-s3-p0r1-canary-g3",
+    "log": {
+      "bytes": 108713,
+      "name": "p0_r1_final_vnet_log.json",
+      "sha256": "8513f5ebc5f1024f679ee6ce071d988c65cdc95380640ede8ac7c61a2fd6254e"
+    },
+    "passed": true,
+    "requires_a_context_mount": false,
+    "runtime_root_writable_as_uid_10001": true,
+    "standalone_source_root": "/opt/jspace/src",
+    "token": "P0_R1_G3_STANDALONE_LAYOUT=1",
+    "workload_profile": "Consumption"
+  }
+}
