@@ -3851,3 +3851,27 @@ gate first; only if it passes, the single bounded GPU pilot in that same
 session; and only after a mechanically feasible terminal P0-R1 disposition, one
 fresh focused final methods review of draft-v0.6. This round neither waived nor
 began that review, and did not run the gate.
+
+## 2026-08-13 — P0-R1 generation 3 is the only launchable generation
+
+**Decision.** Supersede generations 1 and 2 without consumption and make
+generation 3 the sole active P0-R1 execution package. The active lock is
+`studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json` (sha256
+`f219a472705dec4e5c590614d392f39c9ec672d45397471632ad951d69097794`);
+the active image is digest
+`sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c`.
+
+**Reason.** Production-path canaries, rather than substring tests or in-memory
+stand-ins, now prove the committed-object ACR context, exact shell/CLI
+authorization, complete-byte capture/recovery, private prefix, Blob-primary
+journal, hard-kill retention, recursive manifest, CPU managed-identity recovery
+and non-root runtime permissions. Clean ACR validation at the ready anchor
+returned 74 targeted passes and a full-suite result of 4,585 passed, 15 skipped
+and exactly the two registered historical failures.
+
+**Boundary.** This decision authorizes no immediate execution. The live replay
+gate and GPU pilot were not run. A fresh successor must first execute the
+model-free preflight in `P0_R1_HANDOFF_V3.md`; the one replay-then-conditional-
+pilot envelope remains unconsumed. Formal execution, interface selection,
+positive reference, draft freeze, OD2, UR-22 and the research question remain
+unchanged.

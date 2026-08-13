@@ -11,21 +11,17 @@
 > authority requires the final focused review only **after** P0-R1 reaches a
 > terminal mechanically feasible disposition. The corrected order is:
 >
-> 1. **Execution-completion publication.** Done: the live replay gate, the
->    canonical result/receipt/disposition writers, the complete bounded model
->    runner, the Azure Container Apps T4 launcher and the immutable image digest
->    now exist. **Superseded by generation 2**, which additionally binds every
->    bound source by its bytes rather than by its path, transports complete
->    result bytes by two independent routes, injects the replay receipt into the
->    compute job, preserves completed partial results through any exception, and
->    validates all of it against the production route on the real
->    infrastructure. The binding object is now
->    `studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json`, pinned to image
->    digest
->    `sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827`.
->    Generation 1 is superseded **without consumption** and must not be launched.
+> 1. **Execution-completion publication.** Done at generation 3. The active
+>    binding is `studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json`,
+>    pinned to image digest
+>    `sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c`.
+>    Exact ACR-task, non-root CLI injection, private-prefix, Blob journal,
+>    recursive-manifest, hard-kill and CPU recovery canaries passed, and clean
+>    ACR validation returned 4,585 passes, 15 skips and only the two registered
+>    historical failures. Generations 1 and 2 are superseded **without
+>    consumption** and must not be launched.
 > 2. **The fresh-session P0-R1 replay gate.** Continue from the published ready
->    commit `c7e02b43e1dbf811d1b35ae0fc0fe9d1a1d12947`, not from an older
+>    anchor `0ecb90854ac1e9928a2728493af0678e757810ee`, not from an older
 >    baseline. The gate is replay-only: it reads the immutable P0-T artifacts and
 >    performs zero new encodes and zero model operations. If it fails, publish
 >    the registered stop and perform **no** model operation — do not repair and
@@ -42,9 +38,9 @@
 >    bytes. Start from
 >    `studies/study3/analysis/final_focused_review_packet_v0_6.md`.
 >
-> Start from `studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V2.md`, which is the
-> corrected generation-2 handoff. `P0_R1_HANDOFF.md` is retained unedited as
-> generation-1 history and its commands must not be used.
+> Start from `studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V3.md`.
+> `P0_R1_HANDOFF.md` and `P0_R1_HANDOFF_V2.md` are retained unedited as
+> generation-1/2 history and their commands must not be used.
 >
 > **What the next thread may not do.** No freeze, no seed, no bank, no interface
 > selection, no positive reference, no confirmation access, no `OD2` or `UR-22`

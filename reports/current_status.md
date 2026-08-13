@@ -5,41 +5,24 @@
 > States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
 > and `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE`.
 >
-> A model-free execution-completion round closed the gap between a registered
-> P0-R1 and a runnable one. At the previous baseline `--gate` was an
-> unconditional refusal, the replay shell called the calibration `derive()`
-> rather than a live gate, the model runner always raised, no GPU launcher or
-> job definition existed, and the pre-execution receipt carried
-> `image_digest = null`. All of those are now closed.
+> **Generation 3 is the current and only launchable generation.** Its executable
+> commit is `db0403381ab68073d497df370197ffbb5bd4ba10`; its ready anchor is
+> `0ecb90854ac1e9928a2728493af0678e757810ee`; and its digest-pinned image is
+> `sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c`.
+> The active lock is `p0_r1_execution_lock_v3.json` (31,025 bytes, sha256
+> `f219a472705dec4e5c590614d392f39c9ec672d45397471632ad951d69097794`,
+> 43 bound executable paths).
 >
-> **Generation 2 is the current generation.** A model-free transport and
-> exception-safety round repaired five further defects that would have made a
-> run unverifiable or unrecoverable: runtime binding compared a path list rather
-> than bytes, results were transported as a digest rather than as the complete
-> bytes, the replay-gate receipt was never injected into the compute job, the
-> exception path discarded completed partial results, and validation exercised
-> in-memory stand-ins rather than the production route. The bound object is
-> `studies/study3/pilot/p0_r1/p0_r1_execution_lock_v2.json` (26,172 bytes,
-> sha256 `f506f632b8602cc000229b9a40991fc666cf0cf9f0195712cfe93d12fbee4714`,
-> 42 bound executable paths), pinned to image digest
-> `sha256:5f964edb414b8a22682693d8314063693daca3b915398094ec008d2c03308827`
-> built from commit `863aca8b3a2ac73d9e8c031f762bda6fae125059`. The ready commit
-> is `c7e02b43e1dbf811d1b35ae0fc0fe9d1a1d12947`.
+> Model-free production canaries now execute the exact ACR task, the non-root
+> standalone image, four-input shell/CLI injection, private-prefix preflight,
+> Blob-primary journal, recursive manifest, hard-kill recovery, and separately
+> named CPU managed-identity recovery. The image/Git audit matched 79 of 79
+> blobs. Clean ACR validation returned 74 targeted passes and a full-suite result
+> of 4,585 passed, 15 skipped, and exactly the two registered historical
+> failures.
 >
-> **One real failure is on the record.** The first generation-2 image passed all
-> seven of its build gates while being incapable of exporting a single result
-> byte: it carried no client for the private object store, and its transport
-> gate ran `--dry-run` against an in-memory backend, which passes identically
-> whether or not the image can reach the storage account. The private-store
-> canary caught it on the real infrastructure in execution
-> `job-jspace-s3-p0r1-canary-g2-56y38fa`, which wrote zero objects. That image
-> was discarded, the route was repaired without editing the protected frozen
-> science dependency set, and all three model-free canaries pass on the rebuilt
-> image in execution `job-jspace-s3-p0r1-canary-g2-kqpquxz`.
->
-> Generation 1 is superseded **without consumption**: it was never launched, so
-> its authorization is intact and its lock, image and handoff bytes are
-> preserved unedited.
+> Generations 1 and 2 are superseded **without consumption**. Their locks, images
+> and handoffs remain byte-identical historical records and are not launchable.
 >
 > Nothing was executed. Zero replay-gate evaluations against the published lock,
 > zero tokenizer constructions, zero encodes, zero checkpoint downloads, zero

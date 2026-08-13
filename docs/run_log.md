@@ -7702,3 +7702,143 @@ no checkpoint was downloaded or loaded, no GPU workload was allocated or
 started, no model operation was performed, and the one-shot envelope was neither
 consumed nor re-armed. The state remains
 `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE`, now at generation 2.
+
+## 2026-08-13 — Study 3 P0-R1 generation-3 execution closure
+
+The generation-3 authority was continued from published commit
+`6608856b4cc9593a8dab460ed30c61bec0c708f3`, tree
+`26fd698420056f3812a5a5199387b9e1bb09161c`. The final executable object is
+`db0403381ab68073d497df370197ffbb5bd4ba10`, tree
+`512f2afe857a8a1012f8cfd6ebad91e7da9851e5`. The ready anchor is its direct
+child `0ecb90854ac1e9928a2728493af0678e757810ee`, tree
+`cf522e57ee5d1b2e0cbf2e1ae5ccf2324ace3495`.
+
+The active image is:
+
+```text
+acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c
+```
+
+It was built by ACR run `cmh5` from a 16,731,616-byte `git archive` of the
+executable commit, sha256
+`957d535384a77b759e0c050f64d2de4caab50011449c21b395773fe7b4928452`.
+The base remains pinned at
+`sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126`.
+
+The active lock is 31,025 bytes, sha256
+`f219a472705dec4e5c590614d392f39c9ec672d45397471632ad951d69097794`.
+Its schema is 1,224 bytes, sha256
+`c5fcc19ebc234377f0d6b0281766678a1d109a18275e3c59f66f365118d8716a`.
+Its canary receipt is 8,623 bytes, sha256
+`d83ee2c91cfaeaaa0270198d32cd560092b80fff76982e2953aff1944cf0c1c1`.
+`transport.canaries` is non-empty and carries every required production
+receipt. All 31 pre-execution counters are zero.
+
+### Production closure by published defect
+
+| defect | generation-3 production closure | executable proof |
+| --- | --- | --- |
+| G2-01 documented preflight cannot run | v3 lock CLI accepts and validates the exact lock/image; successor has explicit modes and no default | targeted test runs the real CLI; final preflight uses the ready-anchor proof |
+| G2-02 runner never constructs authorization | `p0_r1_authorization_v3.py` builds one four-document authorization; model shell reconstructs all exact inputs before the runner | ACA sentinel execution `job-jspace-s3-p0r1-cli-canary-g3-d9h2uxv` |
+| G2-03 emitted receipt cannot authorize | gate receipt remains honestly false about its future recovery; independent reconstruction receipt supplies that proof | actual gate -> envelope -> capture -> authorization test; exact-task canary `cmh6` |
+| G2-04 successor is only a dispatcher | live mode is one transaction: committed-object context, one ACR submission, run ID/raw log capture, reconstruction, and stop/pass boundary | `p0_r1_successor_v3.sh`; no mutable worktree context |
+| G2-05 Azure errors mean absence | read-only three-outcome query module preserves exit/stdout/stderr and permits mutation only after `PROVED_ABSENT` | parameterized auth/network/timeout/malformed-output tests |
+| G2-06 prefix checked too late | separately named CPU Consumption job proves exact private prefix and reserved names absent before GPU create | execution `job-jspace-s3-p0r1-recover-g3-vvaeb2a` |
+| G2-07 production journal is ephemeral/incomplete | Blob-primary create-only journal records full observations and irreversible admissions | execution `job-jspace-s3-p0r1-canary-g3-rmyr8v9`; five journal objects |
+| G2-08 ordinary failure evidence can vanish | live EXIT traps run; canonical bytes, journal objects, journal manifest and recursive artifact manifest use both Blob and bounded console routes | non-root build canary plus recursive-manifest/recovery canaries |
+| G2-09 no private recovery path | separately named CPU managed-identity job verifies and re-emits final or partial attempts | execution `job-jspace-s3-p0r1-recover-g3-irp4giq` |
+| G2-10 ready identity is propagated | first-parent anchor resolver proves direct parent, exact lock blob, `HEAD == origin/main`, ancestry, clean status and no bound drift | `p0_r1_ready_anchor_v3.py` |
+| G2-11 frozen ACR validation absent | clean exact ready-anchor validation produced the required arithmetic | targeted `cmh8`; full `cmh9` |
+| G2-12 seam tests are vacuous | tests and production canaries execute the actual shell, runner, gate/capture pair, Azure failure modes, private Blob, hard kill, recovery and lock/Git identities | 74 targeted nodes; build and ACA canaries |
+
+### Final model-free production canaries
+
+| identity | result |
+| --- | --- |
+| ACR build `cmh5` | non-root build gates, exact CLI sentinel and dependency closure passed |
+| ACR exact task `cmh6` | four deterministic 262,144-byte artifacts emitted; 1,048,576 bytes recovered from the retained server log; replay gate false; envelope unconsumed |
+| ACR image audit `cmh7` | 79 of 79 image blobs matched `db04033:path`; no result bytes |
+| ACA `job-jspace-s3-p0r1-canary-g3-rmyr8v9` | standalone, private Blob journal, recursive manifest and hard-kill recovery passed |
+| ACA `job-jspace-s3-p0r1-cli-canary-g3-d9h2uxv` | four file-carried injection envelopes reconstructed; sentinel reached once; trap completed |
+| ACA `job-jspace-s3-p0r1-recover-g3-vvaeb2a` | private prefix `PROVED_ABSENT`, zero objects and collisions |
+| ACA `job-jspace-s3-p0r1-recover-g3-irp4giq` | five journal and six recursive objects verified; sequence continuous; manifest last |
+
+The ACR service can interleave a status line inside a large stdout chunk.
+Generation 3 preserves the v2 envelope bytes and adds a decoder that repairs
+only when the reconstructed decoded length and per-chunk sha256 both match. The
+real fragmented `cmh3` log was recovered byte-exactly with one such repair; the
+final `cmh6` log required zero repairs and recovered 1,048,576 bytes.
+
+### Build and canary history retained, not rewritten
+
+The authority requires failed and discarded infrastructure history to remain.
+The canary receipt records all of it. Material events include:
+
+- `cmgc`, pre-`6608856` image, discarded;
+- `cmgd`, `a9eb372f…` image, discarded after exact-chain defects were found;
+- `cmgh`, `cmgj`, `cmgk`, operator canary-wrapper failures before fixture bytes;
+- `cmgp`, failed build whose enhanced canary caught source/runtime aliasing;
+- `cmgq`, `cmgr`, `cmh2`, `cmh3`, discarded after later executable changes;
+- recovery execution `9l66ewp`, which exposed non-writable runtime-root
+  ownership before any model operation;
+- CLI executions `g2jqcm1` and `5m6aeh8`, which exposed that same ownership
+  issue and one operator-supplied synthetic attempt mismatch;
+- `cmgx`, the expected exact-commit validation failure while the executable
+  commit still carried the placeholder lock.
+
+None of these ran the replay gate, allocated a GPU, imported a model for
+execution, consumed an envelope, or authorized a retry. No Azure history was
+deleted.
+
+### Authoritative validation
+
+| run | commit/tree | result |
+| --- | --- | --- |
+| `cmh8` targeted | `0ecb90854ac1…` / `cf522e57ee5d…`; `DIRTY=0` | 74 passed |
+| `cmh9` full | same exact commit/tree | **4,585 passed, 15 skipped, 2 failed**, with only the registered historical `test_parser_v3_seal_job` node IDs; `FULL_SUITE_ACCEPTED_HISTORICAL_FAILURES_ONLY=1` |
+
+Raw retained log identities:
+
+- `cmh8`: 3,020 bytes, sha256
+  `f8eb9a00718ca93bb1fb0f585d40942c2304919d3a70a62e8f19b2637b8bc71a`;
+- `cmh9`: 12,386 bytes, sha256
+  `b9f0a734137575ee45bcca458f140c74c7cc49f18acebe5bae20a479ee51299d`.
+
+The workstation's earlier 4,572/11 result remains diagnostic only and was not
+used as acceptance evidence.
+
+### Protected-byte and supersession audit
+
+From starting commit `6608856…` to the ready anchor, 29 paths changed: 28
+additive generation-3 executable/governance paths plus the generation-3 test.
+No immutable P0-T, frozen corpus, scientific rule, earlier authority, Study 1,
+Study 2, evidence-ledger, OD2, UR-22, RP, seed, bank or formal-development path
+changed.
+
+The historical CRLF object
+`execution/p0_r1_model_execution.py` remains exactly 10,229 bytes, sha256
+`392f78466ee61ed303b5cf4b1fba4423e38b128441aeec1de119315b2e52a5ee`,
+with 230 CR and 230 LF bytes. Its narrow `.gitattributes -text` exception makes
+a fresh Linux checkout clean without normalizing history.
+
+Generation 1 lock remains 10,728 bytes,
+`f0e0e6b609091adeb063893687659b0df3e919135c11b8e977575f15bec26c40`.
+Generation 2 lock remains 26,172 bytes,
+`f506f632b8602cc000229b9a40991fc666cf0cf9f0195712cfe93d12fbee4714`.
+Both are unconsumed, superseded and `launchable=false`, with zero executions,
+GPU allocations, tokenizer constructions/encodes, checkpoint downloads and
+model-weight loads.
+
+### Stop
+
+No live replay gate ran. No generation-3 GPU job was created or started. The
+state remains:
+
+```text
+STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE
+```
+
+The exact successor instruction is
+`studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V3.md`. This closeout begins no
+focused methods review, selects no interface, sets no threshold, freezes no
+draft, resolves neither OD2 nor UR-22, and adds no evidence-ledger row.

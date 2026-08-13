@@ -2,11 +2,10 @@
 
 > **State:** `STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE`
 >
-> **Generation 2 is the current generation.** The binding object is
-> [`p0_r1_execution_lock_v2.json`](p0_r1_execution_lock_v2.json) and the
-> operative handoff is [`P0_R1_HANDOFF_V2.md`](P0_R1_HANDOFF_V2.md). Generation 1
-> — `p0_r1_execution_lock.json`, `P0_R1_HANDOFF.md` and image
-> `sha256:7e2690...` — is **superseded without consumption**, retained
+> **Generation 3 is the current generation.** The binding object is
+> [`p0_r1_execution_lock_v3.json`](p0_r1_execution_lock_v3.json) and the
+> operative handoff is [`P0_R1_HANDOFF_V3.md`](P0_R1_HANDOFF_V3.md).
+> Generations 1 and 2 are **superseded without consumption**, retained
 > byte-for-byte as history, and must not be launched.
 >
 > P0-R1 is **registered, not executed**. No tokenizer has been constructed, no
@@ -17,7 +16,9 @@
 Authority: [`../../prompts/study3_v0_6_p0_r1_authority.md`](../../prompts/study3_v0_6_p0_r1_authority.md)
 §6 and §7 (registration), then
 [`../../prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md`](../../prompts/study3_p0_r1_post_ready_transport_exception_safety_authority.md)
-(generation-2 transport and exception safety).
+(generation-2 transport and exception safety), then
+[`../../prompts/study3_p0_r1_generation3_execution_closure_authority.md`](../../prompts/study3_p0_r1_generation3_execution_closure_authority.md)
+(generation-3 production-path closure).
 
 ## Why there is a P0-R1
 
