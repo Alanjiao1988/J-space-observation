@@ -1,0 +1,40 @@
+# P0-R2 generation-1 minimal-context ACR task.
+#
+# This file is placed at the root of the two-file source context as task.yaml.
+# The context is used only to supply this task definition and the governance
+# manifest. The executable is the digest-pinned standalone image; no source
+# directory is mounted as executable code.
+version: v1.1.0
+steps:
+  - id: replay
+    cmd: >-
+      {{.Values.IMAGE}}
+      /usr/local/bin/p0_r2_replay_v1.sh
+    env:
+      - P0_R2_CONTEXT_MANIFEST=/workspace/context_manifest.json
+      - P0_R2_IMAGE_DIGEST={{.Values.DIGEST}}
+      - P0_R2_READY_COMMIT={{.Values.READY_ANCHOR}}
+      - P0_R2_REPLAY_MODE={{.Values.MODE}}
+      - P0_R2_ATTEMPT={{.Values.ATTEMPT}}
+      - P0_R2_SRC=/opt/jspace/src
+      - P0_R2_RUNTIME_ROOT=/workspace/runtime
+      - RESULTS_DIR=/workspace/runtime/results
+    timeout: 3600
+boundary:
+  stage: STUDY3-P0-R2
+  runs_from_digest_pinned_image: true
+  context_is_executable_code: false
+  context_entry_count: 2
+  context_entries:
+    - task.yaml
+    - context_manifest.json
+  context_contains_model_bytes: false
+  context_contains_checkpoint_bytes: false
+  context_contains_corpus_bytes: false
+  context_contains_result_bytes: false
+  tokenizer_constructions: 0
+  tokenizer_encodes: 0
+  checkpoint_downloads: 0
+  model_weight_loads: 0
+  model_operations_performed: 0
+  gpu_workload_allocated: false

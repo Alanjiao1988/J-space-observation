@@ -1,0 +1,33 @@
+{
+  "schema_version": "study3-p0-r2-authority-publication-receipt-v1",
+  "stage": "STUDY3-P0-R2",
+  "publication": {
+    "commit": "e1de0ef2ffb4ab8ab87c62a9efde667461876a4a",
+    "tree": "ced10783c216b7410a1cec63ad214119e509a354",
+    "parent": "30806d793872a50e581d3252382b4a0ec2af3889",
+    "non_force_fast_forward": true,
+    "single_new_path": true
+  },
+  "authority": {
+    "path": "studies/study3/prompts/study3_p0_r2_infrastructure_successor_authority.md",
+    "git_blob": "0e4fe8e2ff3bb0e5353a5bb878fac5b8234d3ab6",
+    "bytes": 11288,
+    "sha256": "eb2407216fcb48506b97b43a88d541ab27e857e72ef319cbf575799cf8451deb",
+    "lf_count": 221,
+    "cr_count": 0,
+    "bom": false,
+    "trailing_newline": true
+  },
+  "operations": {
+    "azure_cli_invocations": 0,
+    "acr_runs_created": 0,
+    "tokenizer_constructions": 0,
+    "tokenizer_encodes": 0,
+    "checkpoint_downloads": 0,
+    "model_weight_loads": 0,
+    "gpu_operations": 0,
+    "model_operations_performed": 0,
+    "scored_rows": 0
+  },
+  "state": "STUDY3_P0_R2_INFRASTRUCTURE_SUCCESSOR_IMPLEMENTATION_IN_PROGRESS"
+}
