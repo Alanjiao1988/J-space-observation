@@ -404,6 +404,8 @@ def acr_run_command(*, registry: str, subscription: str, image: str,
     if not registry or not subscription or not image \
             or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest or ""):
         raise ContextDefect("registry, subscription, image and digest are required")
+    if not image.endswith("@" + digest):
+        raise ContextDefect("the image reference is not pinned by the supplied digest")
     _require_sha40(ready_anchor, "ready anchor")
     context_dir = _context_directory(context_dir, create=False)
     return [

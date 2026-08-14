@@ -17,6 +17,13 @@ No model, corpus, result, checkpoint, or mutable-worktree byte is present in
 that context. The implementation authority is
 `studies/study3/prompts/study3_p0_r2_infrastructure_successor_authority.md`.
 
+`p0_r2_acr_submission.py` owns the next seam. It re-verifies the retained
+admission receipt, constructs the command with root-level `task.yaml` and the
+minimal directory as its only context, captures stdout/stderr from the first
+byte, and requires one ACR run ID. `live` additionally requires a passing,
+same-image packing-canary receipt. Both Azure-writing modes require the
+explicit `--i-am-sure` flag and neither can authorize a model pilot.
+
 Current state:
 
 `STUDY3_P0_R2_INFRASTRUCTURE_SUCCESSOR_IMPLEMENTATION_IN_PROGRESS`
