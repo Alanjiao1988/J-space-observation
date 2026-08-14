@@ -1,0 +1,6 @@
+REPLAY_WORK_DIR=C:\Users\alanjiao\.copilot\session-state\0658bb9e-8615-4ded-95d4-9f633a6e5a12\files\p0-r1-gen3-live-replay-20260814T001628Z-e11496c7
+REPLAY_COMMAND=bash studies/study3/pilot/p0_r1/container/p0_r1_successor_v3.sh live-replay --lock-file studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json --image-digest sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c --work-dir '/c/Users/alanjiao/.copilot/session-state/0658bb9e-8615-4ded-95d4-9f633a6e5a12/files/p0-r1-gen3-live-replay-20260814T001628Z-e11496c7' --i-am-sure
+P0_R1_REPLAY_CONTEXT=/c/Users/alanjiao/.copilot/session-state/0658bb9e-8615-4ded-95d4-9f633a6e5a12/files/p0-r1-gen3-live-replay-20260814T001628Z-e11496c7/context-aed13b7257096963c90a1ae5340d14ef3892392c.tar SHA256=7b0b2980df21897c9a5aec892c411f8c5e3638b85539adacb119a54d267ac9e4
+P0_R1_REPLAY_EXIT_CODE=1
+FAIL: the replay submission exited 1; publish the registered stop and perform no model operation
+REPLAY_EXIT_CODE=1

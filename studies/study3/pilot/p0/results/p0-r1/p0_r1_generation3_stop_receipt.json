@@ -1,0 +1,137 @@
+{
+  "schema_version": "study3-p0-r1-generation3-replay-submission-stop-v1",
+  "stage": "STUDY3-P0-R1",
+  "generation": 3,
+  "operational_disposition": "STOP_NO_MODEL_OPERATION",
+  "reason_class": "REPLAY_SUBMISSION_FAILED_BEFORE_ACR_RUN_ID_CAPTURE",
+  "registered_fail_closed_rule": {
+    "lock_json_pointer": "/permitted_sequence/3",
+    "text": "a replay failure, capture failure, reconstruction failure or any ambiguity publishes the registered stop and performs no model operation"
+  },
+  "operator_decision_received_at": "2026-08-14T07:03:09.385+08:00",
+  "required_start": {
+    "commit": "aed13b7257096963c90a1ae5340d14ef3892392c",
+    "tree": "0643b03b8eb58217491f2c8749ca0f5b0dc5b7d2",
+    "origin_main": "aed13b7257096963c90a1ae5340d14ef3892392c",
+    "clean_worktree": true
+  },
+  "authorities": {
+    "handoff": {
+      "path": "studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V3.md",
+      "bytes": 8381,
+      "sha256": "4b0bdc9adff44415224e2ce3963fd6519e24676369554ac322564c66fd376482"
+    },
+    "active_lock": {
+      "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json",
+      "bytes": 31025,
+      "sha256": "f219a472705dec4e5c590614d392f39c9ec672d45397471632ad951d69097794"
+    }
+  },
+  "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c",
+  "preflight": {
+    "invocations": 1,
+    "work_directory_started_empty": true,
+    "started_at_utc": "2026-08-14T00:14:19.9719807Z",
+    "completed_at_utc": "2026-08-14T00:15:22.9401431Z",
+    "exit_code": 0,
+    "complete_marker_count": 1,
+    "state_marker_count": 1,
+    "state": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE",
+    "gpu_job_presence_outcome": "PROVED_ABSENT",
+    "command_log": {
+      "path": "p0_r1_preflight_command.log",
+      "bytes": 1170,
+      "sha256": "81aa5b3c55a9a4ac89693aec748832a8ce3ddccbe8e7a8a71b761bf28b365d8d"
+    },
+    "gpu_job_presence": {
+      "path": "p0_r1_preflight_gpu_job_presence.json",
+      "bytes": 266,
+      "sha256": "f255bbe189db189c0e3ae74e7de4cf4cd867293296ff93da0616fdd9dc7ea879"
+    },
+    "head_proof": {
+      "path": "p0_r1_preflight_head_proof_v3.json",
+      "bytes": 1283,
+      "sha256": "ae5b1e66ecd2f14bbb418b144a8e7b93ef33a536339431657b21845fd75398c5"
+    },
+    "supersession_proof": {
+      "path": "p0_r1_preflight_supersession_v3.json",
+      "bytes": 3260,
+      "sha256": "664e702d9a3cd5303806351889c2c3503673baee16d2bfbb6cbcf309ef2a8edd"
+    }
+  },
+  "live_replay": {
+    "invocations": 1,
+    "replay_envelope_consumed": true,
+    "retry_authorized": false,
+    "retry_attempted": false,
+    "work_directory_started_empty": true,
+    "started_at_utc": "2026-08-14T00:16:28.8996561Z",
+    "failure_observed_at_utc": "2026-08-14T00:17:50.6756614Z",
+    "command_completed_at_utc": "2026-08-14T00:17:51.0884872Z",
+    "exit_code": 1,
+    "failure_detail": "Azure CLI failed locally with WinError 3 while packing the committed Git context for upload.",
+    "acr_run_id": null,
+    "replay_attempt_id": null,
+    "gate_started": false,
+    "gate_result_observed": false,
+    "command_log": {
+      "path": "p0_r1_live_replay_command.log",
+      "bytes": 979,
+      "sha256": "400fe156cdc402618f7ac4127d581bfb96131743e36953fb45cef1e3871062a3"
+    },
+    "raw_log": {
+      "path": "p0_r1_replay_raw_log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "complete_as_captured": true
+    },
+    "stderr": {
+      "path": "p0_r1_replay_stderr.txt",
+      "bytes": 433,
+      "sha256": "1323c36df5943c9dcdb34918fdd8a8c34656d48bdc7643dc3fcacfc2e59b110e",
+      "complete_as_captured": true
+    },
+    "pre_replay_head_proof": {
+      "path": "p0_r1_pre_replay_head_proof_v3.json",
+      "bytes": 1283,
+      "sha256": "ae5b1e66ecd2f14bbb418b144a8e7b93ef33a536339431657b21845fd75398c5"
+    },
+    "committed_context_tar": {
+      "bytes": 108625920,
+      "sha256": "7b0b2980df21897c9a5aec892c411f8c5e3638b85539adacb119a54d267ac9e4",
+      "source_commit": "aed13b7257096963c90a1ae5340d14ef3892392c",
+      "preserved_in_operator_session_artifacts": true,
+      "published_in_git": false,
+      "is_replay_result": false
+    },
+    "canonical_replay_artifacts": {
+      "P0_R1_REPLAY_DISPOSITION.md": "NOT_EMITTED",
+      "p0_r1_replay_counters.json": "NOT_EMITTED",
+      "p0_r1_replay_receipt.json": "NOT_EMITTED",
+      "p0_r1_replay_result.json": "NOT_EMITTED"
+    },
+    "independent_reconstruction_receipt": null
+  },
+  "model_and_gpu_operations": {
+    "launch_pilot_invocations": 0,
+    "model_pilot_envelope_consumed": false,
+    "gpu_jobs_created": 0,
+    "gpu_executions_started": 0,
+    "cpu_recovery_executions_started": 0,
+    "model_operations_performed": 0
+  },
+  "scientific_state": {
+    "gate_evaluated": false,
+    "state_before": "STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE",
+    "state_after": "UNCHANGED_NOT_EVALUATED",
+    "formal_execution_authorized": false,
+    "draft_v0_6_reviewed": false,
+    "draft_v0_6_frozen": false,
+    "interface_selected": null,
+    "positive_reference": null,
+    "rp_wrapper": null,
+    "evidence_ledger_last_row": "EV-0016",
+    "research_question_answered": false
+  },
+  "next_action": "TERMINAL_STOP_NO_REPLAY_RETRY_NO_MODEL_OPERATION"
+}

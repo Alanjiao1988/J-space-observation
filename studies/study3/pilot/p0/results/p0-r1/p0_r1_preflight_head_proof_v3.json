@@ -1,0 +1,38 @@
+{
+  "all_changes_are_governance_only": true,
+  "bound_paths_changed_after_image_build": [],
+  "bound_paths_checked": 43,
+  "changed_since_anchor": [
+    "README.md",
+    "docs/decision_log.md",
+    "docs/run_log.md",
+    "reports/current_status.md",
+    "studies/study3/NEXT_THREAD_HANDOFF.md",
+    "studies/study3/README.md",
+    "studies/study3/pilot/p0_r1/P0_R1_HANDOFF_V3.md",
+    "studies/study3/pilot/p0_r1/README.md"
+  ],
+  "changed_since_anchor_count": 8,
+  "executable_code": {
+    "commit": "db0403381ab68073d497df370197ffbb5bd4ba10",
+    "tree": "512f2afe857a8a1012f8cfd6ebad91e7da9851e5"
+  },
+  "execution_lock": {
+    "bytes": 31025,
+    "path": "studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json",
+    "sha256": "f219a472705dec4e5c590614d392f39c9ec672d45397471632ad951d69097794"
+  },
+  "head_equals_published": true,
+  "published_head": {
+    "commit": "aed13b7257096963c90a1ae5340d14ef3892392c",
+    "tree": "0643b03b8eb58217491f2c8749ca0f5b0dc5b7d2"
+  },
+  "ready_anchor": {
+    "commit": "0ecb90854ac1e9928a2728493af0678e757810ee",
+    "parent": "db0403381ab68073d497df370197ffbb5bd4ba10",
+    "tree": "cf522e57ee5d1b2e0cbf2e1ae5ccf2324ace3495"
+  },
+  "remote_ref": "origin/main",
+  "schema_version": "study3-p0-r1-ready-anchor-v3",
+  "worktree_clean": true
+}

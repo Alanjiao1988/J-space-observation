@@ -1,0 +1,9 @@
+{
+  "check": "container_apps_job_presence",
+  "exit_code": 0,
+  "job": "job-jspace-s3-p0r1-pilot-g3",
+  "jobs_returned": 160,
+  "outcome": "PROVED_ABSENT",
+  "resource_group": "rg-jspace-observation-sea",
+  "schema_version": "study3-p0-r1-azure-query-v3"
+}

@@ -1,0 +1,13 @@
+PREFLIGHT_WORK_DIR=C:\Users\alanjiao\.copilot\session-state\0658bb9e-8615-4ded-95d4-9f633a6e5a12\files\p0-r1-gen3-preflight-20260814T001419Z-0e5e15f2
+PREFLIGHT_COMMAND=bash studies/study3/pilot/p0_r1/container/p0_r1_successor_v3.sh preflight --lock-file studies/study3/pilot/p0_r1/p0_r1_execution_lock_v3.json --image-digest sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c --work-dir /c/Users/alanjiao/.copilot/session-state/0658bb9e-8615-4ded-95d4-9f633a6e5a12/files/p0-r1-gen3-preflight-20260814T001419Z-0e5e15f2
+P0_R1_PREFLIGHT_BEGIN=1
+P0_R1_EXECUTION_LOCK_V3_VALID=1
+  bytes  31025
+  sha256 f219a472705dec4e5c590614d392f39c9ec672d45397471632ad951d69097794
+  bound  43 paths
+P0_R1_HEAD_PROOF=/c/Users/alanjiao/.copilot/session-state/0658bb9e-8615-4ded-95d4-9f633a6e5a12/files/p0-r1-gen3-preflight-20260814T001419Z-0e5e15f2/p0_r1_head_proof_v3.json
+P0_R1_GPU_JOB_PROVED_ABSENT=1 JOB=job-jspace-s3-p0r1-pilot-g3
+P0_R1_PREFLIGHT_COMPLETE=1
+P0_R1_STATE=STUDY3_P0_R1_EXECUTION_READY_AWAITING_REPLAY_GATE
+P0_R1_NEXT=an explicit operator decision is required before live-replay; preflight never spends the envelope
+PREFLIGHT_EXIT_CODE=0
