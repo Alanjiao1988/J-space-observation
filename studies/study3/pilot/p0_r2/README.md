@@ -24,6 +24,13 @@ byte, and requires one ACR run ID. `live` additionally requires a passing,
 same-image packing-canary receipt. Both Azure-writing modes require the
 explicit `--i-am-sure` flag and neither can authorize a model pilot.
 
+The replay/result transport primitives are also isolated from P0-R1:
+`p0_r2_transport.py` uses new `P0R2TX*` markers and a fixed P0-R2 artifact
+allow-list; `p0_r2_blob_transport.py` writes only below
+`study3/p0_r2/g1/<attempt>/`; and `p0_r2_journal_v1.py` retains complete
+payloads in create-only sequence objects. These are implementation primitives,
+not a live replay authorization.
+
 Current state:
 
 `STUDY3_P0_R2_INFRASTRUCTURE_SUCCESSOR_IMPLEMENTATION_IN_PROGRESS`
