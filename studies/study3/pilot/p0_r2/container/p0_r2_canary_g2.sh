@@ -39,7 +39,6 @@ emit_identity() {
         p0_r2_execution_lock_g2 \
         p0_r2_closure_binding_g2 \
         p0_r2_replay_gate_g2 \
-        p0_r2_transport \
         p0_r2_transport_v1 \
         p0_r2_blob_transport_v1 \
         p0_r2_journal_v1 \
@@ -49,6 +48,16 @@ emit_identity() {
     do
         python3 "${R2}/${module}.py" --identity > "${OUT}/${module}.identity.json"
         echo "P0_R2_G2_IDENTITY_OK=${module}"
+    done
+    # p0_r2_transport exposes --self-check rather than --identity. Generation 1
+    # knew that and generation 2's first canary did not, which is precisely the
+    # kind of defect a canary exists to find before the one-shot invocation.
+    for module in \
+        p0_r2_transport \
+        p0_r2_journal_v1
+    do
+        python3 "${R2}/${module}.py" --self-check > "${OUT}/${module}.self_check.json"
+        echo "P0_R2_G2_SELF_CHECK_OK=${module}"
     done
     python3 "${R2}/p0_r2_namespace_g2.py" --self-check > "${OUT}/namespace_self_check.txt"
     echo "P0_R2_G2_SELF_CHECK_OK=p0_r2_namespace_g2"
