@@ -1514,7 +1514,7 @@
   "caps_are_enforced_not_reported": true,
   "changes_only": "host-to-registry submission transport; corrective closure tooling",
   "closure_base": {
-    "commit": "dc68c3cf54ea33ae10630ab1a7698c394778d238"
+    "commit": "5e8550fa9a5299a49a3c006f92371cec3e3c75b9"
   },
   "delegated_scientific_modules": [
     {
@@ -1635,6 +1635,13 @@
       "mode": "100644",
       "path": "studies/study3/pilot/p0_r2/p0_r2_validation_receipts_v2.json",
       "sha256": "eb8eb774edb1ae15807955df75c03d70e428f07cc456b5acf630b8ee843fda56"
+    },
+    {
+      "bytes": 534,
+      "git_blob": "31dd58e31e6dfc8bc9fc2755d46b0b67944bc603",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_image_zero_overlap_proof_v2.json",
+      "sha256": "a8d7a24a5b47402ea5c9f15bdbb2ab65c8baae23e35c57c19d9704204e37bbe2"
     }
   ],
   "governance_evidence_closure": [
@@ -1760,7 +1767,7 @@
     }
   ],
   "host_closure_executable": {
-    "commit": "dc68c3cf54ea33ae10630ab1a7698c394778d238",
+    "commit": "5e8550fa9a5299a49a3c006f92371cec3e3c75b9",
     "file_count": 12,
     "files": [
       {
@@ -1820,11 +1827,11 @@
         "sha256": "be0baf4da2f7c1c9fbaa1ab504fa9034d067400f712087272c280f4ece434255"
       },
       {
-        "bytes": 20867,
-        "git_blob": "8001be873f4dca45e853b164c3e1ad36b6287628",
+        "bytes": 25055,
+        "git_blob": "5bfe79fa9f158cab62fdeab90000c34ea028fb95",
         "mode": "100644",
         "path": "studies/study3/pilot/p0_r2/validation/p0_r2_phase_b_admission_v2.py",
-        "sha256": "011f6fb8dbabf611aa19081213cf219e9364313a6c4c595a61460f53304d362f"
+        "sha256": "b62f901248a529286f90ebafbe92025d35522bada3afa62308cdc54d7fa13382"
       },
       {
         "bytes": 3240,
@@ -1841,14 +1848,14 @@
         "sha256": "d45aa488b5a4fd58cd7d908f18a3c5575d86c1b095dc6f5899e994aeeeaf5d7c"
       },
       {
-        "bytes": 47247,
-        "git_blob": "5b3fcc44e32a7aca5f8023bcc4362f358d15014b",
+        "bytes": 50161,
+        "git_blob": "98ed84425e4fdb1413cb8887944edb31a6ba6b60",
         "mode": "100644",
         "path": "tests/test_study3_p0_r2_corrective_closure_v2.py",
-        "sha256": "f9044172a602244738764055eb29ec90b9794826e2e7ae2aed42d9b269f583f0"
+        "sha256": "a69b9004aecbc637150f754abfe48a95f452249ecbdaa9135c072b9eb730dfc9"
       }
     ],
-    "tree": "b1e0064f65a8ec0833a4244b86ec9af5d754929a"
+    "tree": "00a9543a950b7f8e9dd44e756049659f5a97376e"
   },
   "image": {
     "base_digest": "sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c",
@@ -2396,7 +2403,7 @@
     "anchor_is_resolved_by_ancestry": true,
     "anchor_must_be_strict_descendant_of_closure_base": true,
     "lock_records_its_own_commit": false,
-    "ready_anchor_parent": "dc68c3cf54ea33ae10630ab1a7698c394778d238"
+    "ready_anchor_parent": "5e8550fa9a5299a49a3c006f92371cec3e3c75b9"
   },
   "replay_envelope": {
     "consumed": false,
