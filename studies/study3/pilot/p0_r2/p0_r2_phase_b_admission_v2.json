@@ -1,0 +1,581 @@
+{
+  "caller_may_supply_a_condition_value": false,
+  "checkpoint_downloads": 0,
+  "condition_count": 28,
+  "conditions": {
+    "all_replay_model_gpu_and_scoring_counters_are_zero": {
+      "evidence": {
+        "counters": {
+          "checkpoint_downloads": 0,
+          "checkpoint_loads": 0,
+          "evidence_rows_added": 0,
+          "generations": 0,
+          "gpu_allocations": 0,
+          "gpu_operations": 0,
+          "live_replay_invocations": 0,
+          "model_weight_loads": 0,
+          "pilot_executions_started": 0,
+          "prefills": 0,
+          "scored_rows": 0,
+          "tokenizer_constructions": 0,
+          "tokenizer_encodes": 0
+        },
+        "nonzero": {}
+      },
+      "value": true
+    },
+    "azure_cli_and_log_capture_are_available": {
+      "evidence": {
+        "az": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.CMD",
+        "sealed_logs": 45
+      },
+      "value": true
+    },
+    "canonical_p0_r2_replay_artifacts_are_absent": {
+      "evidence": {
+        "found": []
+      },
+      "value": true
+    },
+    "corrective_authority_is_published_and_bound": {
+      "evidence": {
+        "authority": {
+          "bytes": 16404,
+          "git_blob": "79dc2f56712ef09dcd92b815ba038e800c905474",
+          "path": "studies/study3/prompts/study3_p0_r2_corrective_closure_and_conditional_execution_authority.md",
+          "role": "corrective",
+          "sha256": "8d34def46c822fd7794b00f79c184e717f8799de6180c5413adaab5253899556"
+        },
+        "observed": {
+          "bytes": 16404,
+          "git_blob": "79dc2f56712ef09dcd92b815ba038e800c905474",
+          "mode": "100644",
+          "path": "studies/study3/prompts/study3_p0_r2_corrective_closure_and_conditional_execution_authority.md",
+          "sha256": "8d34def46c822fd7794b00f79c184e717f8799de6180c5413adaab5253899556"
+        }
+      },
+      "value": true
+    },
+    "exactly_the_four_registered_standing_failures_at_baseline_and_head": {
+      "evidence": {
+        "baseline": [
+          "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+          "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+          "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+          "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+        ],
+        "corrected": [
+          "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+          "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+          "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+          "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+        ],
+        "registered": [
+          "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+          "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+          "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+          "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+        ],
+        "signatures_agree": true
+      },
+      "value": true
+    },
+    "focused_and_correction_suites_pass": {
+      "evidence": {
+        "baseline_commit": "005aa087e40c641affc8ca537e6c6a075bcbfe98",
+        "checkpoint_downloads": 0,
+        "collection_errors": 0,
+        "corrected_commit": "d8c01a4793b5caf13999419029a5fd6aa1cedbf5",
+        "derived_from": {
+          "acr_run_id": "cmjs",
+          "why": "the focused suites are a strict subset of the full repository suite, which ran in the registered closure at both the unmodified baseline and the corrected head. A test absent from the captured non-passing set passed. Deriving the focused result from that capture is evidence; rerunning the same tests in a different environment and calling the answer authoritative would not be."
+        },
+        "environment_dependent_observations": [
+          {
+            "fails_identically_at_the_unmodified_baseline": true,
+            "fails_on_the_authoring_windows_host": true,
+            "introduced_by_this_work": false,
+            "nodeid": "tests/test_study3_p0_r1_generation3_execution_closure.py::test_the_gate_emitted_receipt_flows_through_recovery_into_authorization",
+            "note": "recorded rather than hidden. It is the mirror image of standing failure 3, which passes on Windows and fails in the registered Linux closure. Neither is introduced by this work: both reproduce at the unmodified baseline 005aa087 on the same host.",
+            "passes_in_the_registered_closure": true
+          }
+        ],
+        "errors": 0,
+        "failed": 0,
+        "generations": 0,
+        "gpu_operations": 0,
+        "model_operations_performed": 0,
+        "model_weight_loads": 0,
+        "outcome": "PASS",
+        "per_suite": {
+          "tests/test_study3_p0_r1_generation3_execution_closure.py": {
+            "BASELINE": {
+              "non_passing": [],
+              "non_passing_count": 0
+            },
+            "CORRECTED": {
+              "non_passing": [],
+              "non_passing_count": 0
+            }
+          },
+          "tests/test_study3_p0_r2_acr_submission.py": {
+            "BASELINE": {
+              "non_passing": [],
+              "non_passing_count": 0
+            },
+            "CORRECTED": {
+              "non_passing": [],
+              "non_passing_count": 0
+            }
+          },
+          "tests/test_study3_p0_r2_corrective_closure_v2.py": {
+            "BASELINE": {
+              "non_passing": [],
+              "non_passing_count": 0
+            },
+            "CORRECTED": {
+              "non_passing": [],
+              "non_passing_count": 0
+            }
+          },
+          "tests/test_study3_p0_r2_execution_closure.py": {
+            "BASELINE": {
+              "non_passing": [],
+              "non_passing_count": 0
+            },
+            "CORRECTED": {
+              "non_passing": [],
+              "non_passing_count": 0
+            }
+          },
+          "tests/test_study3_p0_r2_submission_context.py": {
+            "BASELINE": {
+              "non_passing": [],
+              "non_passing_count": 0
+            },
+            "CORRECTED": {
+              "non_passing": [],
+              "non_passing_count": 0
+            }
+          },
+          "tests/test_study3_p0_r2_transport_primitives.py": {
+            "BASELINE": {
+              "non_passing": [],
+              "non_passing_count": 0
+            },
+            "CORRECTED": {
+              "non_passing": [],
+              "non_passing_count": 0
+            }
+          }
+        },
+        "prefills": 0,
+        "registered_closure": {
+          "image": "python:3.11-bookworm",
+          "pinned_packages_verified": 94,
+          "pytest_version": "9.1.1",
+          "python_version": "3.11.16",
+          "requirements_lock_sha256": "570775850eb31b5a8613295fa6e9099400670408a6ce3a162dc6d9159dda87bf"
+        },
+        "schema_version": "study3-p0-r2-focused-suite-receipt-v2",
+        "scored_rows": 0,
+        "stage": "STUDY3-P0-R2",
+        "suites": [
+          "tests/test_study3_p0_r2_corrective_closure_v2.py",
+          "tests/test_study3_p0_r2_execution_closure.py",
+          "tests/test_study3_p0_r1_generation3_execution_closure.py",
+          "tests/test_study3_p0_r2_acr_submission.py",
+          "tests/test_study3_p0_r2_submission_context.py",
+          "tests/test_study3_p0_r2_transport_primitives.py"
+        ],
+        "tokenizer_constructions": 0
+      },
+      "value": true
+    },
+    "full_differential_suite_has_zero_collection_errors": {
+      "evidence": {
+        "baseline": 0,
+        "corrected": 0
+      },
+      "value": true
+    },
+    "head_equals_origin_main_at_the_corrected_final_head": {
+      "evidence": {
+        "head": "a85d79c8e5dbabdbecc35f4f0be3fa5276df568e",
+        "origin_main": "a85d79c8e5dbabdbecc35f4f0be3fa5276df568e"
+      },
+      "value": true
+    },
+    "its_blob_prefix_is_proved_unused": {
+      "evidence": {
+        "attempt_id": "p0r2-g1-live-20260815-0800",
+        "checkpoint_downloads": 0,
+        "collisions": 0,
+        "execution_identity": {
+          "credential_kind": "managed-identity",
+          "environment": "cae-jspace-observation-sea-vnet2",
+          "execution": "job-jspace-s3-p0r2-prefix-g1-qm5qp8k",
+          "host_can_reach_the_private_account": false,
+          "job": "job-jspace-s3-p0r2-prefix-g1",
+          "query_error_is_absence": false,
+          "ran_inside_the_vnet": true,
+          "workload_profile": "Consumption"
+        },
+        "gpu_allocations": 0,
+        "model_operations_performed": 0,
+        "model_weight_loads": 0,
+        "object_count": 0,
+        "objects": [],
+        "outcome": "PROVED_UNUSED",
+        "prefix": "study3/p0_r2/g1/p0r2-g1-live-20260815-0800/",
+        "schema_version": "study3-p0-r2-prefix-preflight-v1",
+        "stage": "STUDY3-P0-R2",
+        "tokenizer_constructions": 0,
+        "wrote_any_object": false
+      },
+      "value": true
+    },
+    "no_disallowed_path_changed_after_the_v2_anchor": {
+      "evidence": {
+        "classification": [
+          {
+            "admitted": true,
+            "bytes": 7692,
+            "classification": "NON_EXECUTABLE",
+            "commit": "a85d79c8e5dbabdbecc35f4f0be3fa5276df568e",
+            "declared_class": "evidence",
+            "gates": {
+              "classifies_non_executable": true,
+              "member_of_published_closure": true,
+              "outside_bound_executable_closure": true,
+              "outside_protected_p0_r1": true
+            },
+            "git_blob": "448c23a6bf95871586f9a26282462a616d0042ab",
+            "in_bound_executable_closure": false,
+            "in_published_governance_evidence_closure": true,
+            "mode": "100644",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_governance_chain_proof_v2.json",
+            "protected_p0_r1": false,
+            "reasons": [],
+            "schema_version": "study3-p0-r2-path-classification-v2",
+            "sha256": "446f6ba4c37c79c3cdde2f85123b3afb944c43a7935db2a1964ebc29102658e6",
+            "starts_with_shebang": false
+          },
+          {
+            "admitted": true,
+            "bytes": 20602,
+            "classification": "NON_EXECUTABLE",
+            "commit": "a85d79c8e5dbabdbecc35f4f0be3fa5276df568e",
+            "declared_class": "evidence",
+            "gates": {
+              "classifies_non_executable": true,
+              "member_of_published_closure": true,
+              "outside_bound_executable_closure": true,
+              "outside_protected_p0_r1": true
+            },
+            "git_blob": "974865349a25e32e523d2d0b51db1d60006da93f",
+            "in_bound_executable_closure": false,
+            "in_published_governance_evidence_closure": true,
+            "mode": "100644",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_host_preflight_proof_v2.json",
+            "protected_p0_r1": false,
+            "reasons": [],
+            "schema_version": "study3-p0-r2-path-classification-v2",
+            "sha256": "b3c2b8279a5023f9805530322bc1b2f6132a775878fc898b9b444eeedb380ef7",
+            "starts_with_shebang": false
+          }
+        ]
+      },
+      "value": true
+    },
+    "no_query_run_id_image_prefix_receipt_or_ancestry_result_is_ambiguous": {
+      "evidence": {
+        "ambiguities": []
+      },
+      "value": true
+    },
+    "p0_r1_protected_bytes_are_unchanged": {
+      "evidence": {
+        "changed": [],
+        "stop_commit": "30806d793872a50e581d3252382b4a0ec2af3889"
+      },
+      "value": true
+    },
+    "p0_r1_remains_terminal_and_nonlaunchable": {
+      "evidence": {
+        "launchable": false,
+        "state": "STOP_NO_MODEL_OPERATION"
+      },
+      "value": true
+    },
+    "the_complete_attempt_ledger_is_published": {
+      "evidence": {
+        "ambiguous": 0,
+        "run_count": 45,
+        "sealed": 45,
+        "unavailable": 0
+      },
+      "value": true
+    },
+    "the_cpu_recovery_job_is_proved_absent": {
+      "evidence": {
+        "job": "job-jspace-s3-p0r2-recover-g1",
+        "outcome": "PROVED_ABSENT",
+        "query_error_is_absence": false
+      },
+      "value": true
+    },
+    "the_designated_packing_canary_used_the_active_task_and_image": {
+      "evidence": {
+        "active_digest": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+        "active_task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
+        "canary": {
+          "acr_run_id": "cmju",
+          "attempt_id": "p0r2-g1-packing-canary-20260815-0940",
+          "context_entry_count": 2,
+          "context_max_native_path_chars": 40,
+          "digest": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+          "executable_commit": "c9344c52bfbacc4f2a24010fffa534a940104140",
+          "executable_tree": "bb27933ebf42e811ec7e5a42a13d65377cdd2f5c",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+          "outcome": "PASS",
+          "p0_r1_fatal_native_path_chars": 265,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
+          "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v2.yaml"
+        }
+      },
+      "value": true
+    },
+    "the_exact_active_lock_schema_image_and_task_all_verify": {
+      "evidence": {
+        "execution_lock": {
+          "bytes": 158754,
+          "git_blob": "d1d706801a079d99794341d65173ae0fb2ace64b",
+          "identical_at_governance_source": true,
+          "mode": "100644",
+          "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.json",
+          "sha256": "5c43372b8b8c629cba23c26fa64a02d1e615a8c7bff55611793db9fe8948fc88"
+        },
+        "image": {
+          "digest": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+          "reference": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58"
+        },
+        "task_object": {
+          "bytes": 1671,
+          "git_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
+          "mode": "100644",
+          "path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v2.yaml",
+          "sha256": "e0376d458911a8a5bbdcc4890c0f973419a936e1ac1716583422fc52dea35e12"
+        }
+      },
+      "value": true
+    },
+    "the_exact_preregistered_live_attempt_id_is_new": {
+      "evidence": {
+        "attempt_id": "p0r2-g1-live-20260815-0800",
+        "receipt_attempt": "p0r2-g1-live-20260815-0800"
+      },
+      "value": true
+    },
+    "the_gpu_pilot_job_is_proved_absent": {
+      "evidence": {
+        "job": "job-jspace-s3-p0r2-pilot-g1",
+        "outcome": "PROVED_ABSENT",
+        "query_error_is_absence": false
+      },
+      "value": true
+    },
+    "the_hard_kill_open_admission_recovery_canary_passes": {
+      "evidence": {
+        "accelerator_requested": false,
+        "attempt_id": "p0r2-g1-hardkill-canary-20260815-0945",
+        "canary": "hard-kill / open-admission CPU recovery",
+        "child_returncode": -9,
+        "cpu_only": true,
+        "evidence": {
+          "log_bytes": 16153,
+          "log_sha256": "5064c6b10fc70958cc8516f23d5a2c8ab8b090eb13ecd7930232774d1eed1ca4",
+          "markers": [
+            "F P0_R2_HARD_KILL_ATTEMPT=p0r2-g1-hardkill-canary-20260815-0945",
+            "F P0_R2_HARD_KILL_CANARY_COMPLETE=1",
+            "F P0_R2_HARD_KILL_OPEN_ADMISSION_RECOVERED=1",
+            "F P0_R2_HARD_KILL_RECOVERY_BYTE_EXACT=1",
+            "F P0_R2_MODEL_OPERATIONS_PERFORMED=0",
+            "F P0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false",
+            "F P0_R2_REPLAY_GATE_RUN=false",
+            "F P0_R2_STAGE=STUDY3-P0-R2"
+          ]
+        },
+        "job": "job-jspace-s3-p0r2-hardkill-g1",
+        "journal_sequence_continuous_and_create_only": true,
+        "kill_classification": "HARD_TERMINATION_SIGKILL",
+        "no_observation_overwritten_or_inferred": true,
+        "open_admission_operation": "synthetic_irreversible_operation",
+        "open_admission_sequence": 3,
+        "prefix": "study3/p0_r2/g1/p0r2-g1-hardkill-canary-20260815-0945/",
+        "production_identity": "ACA job-jspace-s3-p0r2-hardkill-g1-i3o654p",
+        "recovered_rows_byte_exact": true,
+        "recursive_manifest_written_last": true,
+        "result": "PASS: a SIGKILLed child (returncode -9) left an open admission at sequence 3; an independent CPU recovery process recovered it and every committed payload byte byte-exactly against independently regenerated bytes, verified a continuous create-only journal sequence, and wrote a recursive recovery manifest last",
+        "superseded_executions": [
+          {
+            "execution": "job-jspace-s3-p0r2-hardkill-g1-5j74wjv",
+            "objects_written": 0,
+            "outcome": "REFUSED",
+            "reason": "the replica exposed NVIDIA_VISIBLE_DEVICES and NVIDIA_DRIVER_CAPABILITIES; the CPU-only guard refused before writing any object"
+          },
+          {
+            "execution": "job-jspace-s3-p0r2-hardkill-g1-yt14nnd",
+            "objects_written": "5 journal objects plus a recovery manifest",
+            "outcome": "PASS",
+            "reason": "superseded: passed against an image digest that a later corrective commit replaced"
+          },
+          {
+            "execution": "job-jspace-s3-p0r2-hardkill-g1-2fevxfp",
+            "objects_written": "5 journal objects plus a recovery manifest",
+            "outcome": "PASS",
+            "reason": "superseded: passed against an image digest that a later corrective commit replaced"
+          },
+          {
+            "execution": "job-jspace-s3-p0r2-hardkill-g1-bi289zk",
+            "objects_written": "5 journal objects plus a recovery manifest",
+            "outcome": "PASS",
+            "reason": "superseded: passed against an image digest that a later corrective commit replaced"
+          }
+        ],
+        "waived": false
+      },
+      "value": true
+    },
+    "the_replay_envelope_is_unconsumed": {
+      "evidence": {
+        "consumed": false,
+        "consumed_on_invocation_even_without_a_run_id": true,
+        "invocations": 0,
+        "regenerable": false,
+        "rerunnable": false,
+        "substitutable": false
+      },
+      "value": true
+    },
+    "the_replay_gate_has_never_run": {
+      "evidence": {
+        "consumed": false,
+        "consumed_on_invocation_even_without_a_run_id": true,
+        "invocations": 0,
+        "regenerable": false,
+        "rerunnable": false,
+        "substitutable": false
+      },
+      "value": true
+    },
+    "the_true_host_side_preflight_passes": {
+      "evidence": {
+        "outcome": "HOST_PREFLIGHT_PROVED",
+        "refusals": []
+      },
+      "value": true
+    },
+    "the_v2_governance_chain_proves_successfully": {
+      "evidence": {
+        "ancestry": [
+          "image executable -> closure base",
+          "host closure executable -> closure base",
+          "closure base -> ready anchor",
+          "ready anchor -> governance source",
+          "governance source -> published head"
+        ],
+        "anchor_resolution": {
+          "carries_the_bound_lock_bytes": true,
+          "parent": "5e8550fa9a5299a49a3c006f92371cec3e3c75b9",
+          "source": "ancestry"
+        },
+        "changed_since_anchor": [
+          "studies/study3/pilot/p0_r2/p0_r2_governance_chain_proof_v2.json",
+          "studies/study3/pilot/p0_r2/p0_r2_host_preflight_proof_v2.json"
+        ],
+        "ready_anchor": "ae18d34232a5740ef702648537368580509111a3"
+      },
+      "value": true
+    },
+    "v1_p0_r2_closure_is_preserved_but_superseded_and_nonlaunchable": {
+      "evidence": {
+        "supersession": {
+          "launchable": false,
+          "record_path": "studies/study3/pilot/p0_r2/p0_r2_v1_supersession_v2.json",
+          "superseded": true,
+          "v1_bytes_edited": 0,
+          "v1_executable_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+          "v1_image_digest": "sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+          "v1_lock_bytes": 17961,
+          "v1_lock_path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json",
+          "v1_lock_sha256": "2c9789e27fad5ac463e105a42a69d686cdcf1389bcfd44503baf79cabd61f7d7",
+          "v1_ready_anchor": "7fd5fe57707461fcf70bfc9ab00b707b3c44ef71"
+        },
+        "v1_lock": {
+          "bytes": 17961,
+          "git_blob": "09bc5b10a2fbb104d84f80218aeb2841072c8bec",
+          "mode": "100644",
+          "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json",
+          "sha256": "2c9789e27fad5ac463e105a42a69d686cdcf1389bcfd44503baf79cabd61f7d7"
+        }
+      },
+      "value": true
+    },
+    "windows_native_path_maximum_is_at_most_240": {
+      "evidence": {
+        "context_dir": "C:\\p0r2\\pc3\\acrctx",
+        "context_max_native_path_chars": 40,
+        "entries": [
+          {
+            "chars": 40,
+            "path": "C:\\p0r2\\pc3\\acrctx\\context_manifest.json"
+          },
+          {
+            "chars": 28,
+            "path": "C:\\p0r2\\pc3\\acrctx\\task.yaml"
+          },
+          {
+            "chars": 18,
+            "path": "C:\\p0r2\\pc3\\acrctx"
+          }
+        ],
+        "limit": 240,
+        "p0_r1_fatal_length": 265,
+        "worktree_max_native_path_chars": 136
+      },
+      "value": true
+    },
+    "worktree_is_clean": {
+      "evidence": {
+        "dirty_entries": []
+      },
+      "value": true
+    },
+    "zero_new_failure_is_introduced": {
+      "evidence": {
+        "fixed_failures": [],
+        "new_failures": []
+      },
+      "value": true
+    }
+  },
+  "created_updated_or_started_anything": false,
+  "disposition": null,
+  "every_field_is_derived_from_evidence": true,
+  "failed_condition_count": 0,
+  "failed_conditions": [],
+  "generations": 0,
+  "gpu_operations": 0,
+  "lock_sha256": "5c43372b8b8c629cba23c26fa64a02d1e615a8c7bff55611793db9fe8948fc88",
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "override_available": false,
+  "phase_b_authorized": true,
+  "prefills": 0,
+  "schema_version": "study3-p0-r2-phase-b-admission-v2",
+  "scored_rows": 0,
+  "stage": "STUDY3-P0-R2",
+  "tokenizer_constructions": 0,
+  "underived_conditions": []
+}
