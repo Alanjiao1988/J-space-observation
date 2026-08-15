@@ -411,6 +411,39 @@ def _preflight(tmp_path, lock):
     return HOST.Preflight(REPO_ROOT, lock_path)
 
 
+def test_the_host_preflight_resolves_the_anchor_by_ancestry_not_by_a_field(
+        tmp_path):
+    """The lock cannot record its own commit, so the preflight must resolve it.
+
+    Reading a ``ready_anchor_commit`` field is not merely stylistically wrong:
+    the lock never sets it, so the first run of the sealed closure refused with
+    'ready_anchor must be a lowercase 40-character Git object name, got None'.
+    """
+    preflight = _preflight(tmp_path, {
+        "ready_commit_relationship": {"ready_anchor_parent": None}})
+    anchor, resolution = preflight.resolve_ready_anchor()
+    assert anchor is None
+    assert resolution["source"] == "unresolvable"
+
+    preflight = _preflight(tmp_path, {
+        "ready_commit_relationship": {"ready_anchor_commit": "a" * 40}})
+    anchor, resolution = preflight.resolve_ready_anchor()
+    assert anchor == "a" * 40
+    assert resolution["source"] == "declared"
+
+
+def test_the_host_preflight_scopes_the_results_directory_to_the_repository(
+        tmp_path):
+    results = tmp_path / "results"
+    results.mkdir()
+    preflight = _preflight(tmp_path, {
+        "replay_envelope": {"consumed": False, "invocations": 0}})
+    preflight.check_replay_unconsumed(results)
+    detail = preflight.checks[0]["detail"]
+    assert "results_dir_repository_path" in detail
+    assert preflight.refusals == []
+
+
 def test_the_host_preflight_refuses_a_foreign_head(tmp_path):
     preflight = _preflight(tmp_path, {})
     preflight.check_exact_published_commit_and_tree("f" * 40, None)

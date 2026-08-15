@@ -251,11 +251,61 @@ class Preflight:
         detail["image_is_digest_pinned"] = reference.endswith("@" + digest)
         self.require("exact_image_digest_and_task_blob", proved, detail)
 
-    def check_governance_chain(self, *, require_head=True, require_clean=True):
+    def resolve_ready_anchor(self):
+        """Resolve the anchor by ancestry, never by a field in the lock.
+
+        The lock cannot record its own commit, so it records the anchor's
+        *parent*. The anchor is the first first-parent descendant of that parent
+        that actually carries the bound lock blob. Reading a ``ready_anchor``
+        field instead would either be empty -- which is what refused here the
+        first time -- or would be a value the lock could not honestly know.
+        """
         relationship = self.lock.get("ready_commit_relationship") or {}
-        anchor = relationship.get("ready_anchor_commit")
+        declared = relationship.get("ready_anchor_commit")
+        if declared:
+            return declared, {"source": "declared"}
+        parent = relationship.get("ready_anchor_parent")
+        if not parent:
+            return None, {"source": "unresolvable",
+                          "reason": "the lock records neither a ready anchor "
+                                    "nor its parent"}
+        out, code = self.git("rev-list", "--first-parent", "--reverse",
+                             "%s..HEAD" % parent, check=False)
+        candidates = [line.strip() for line in out.splitlines() if line.strip()]
+        if not candidates:
+            return None, {"source": "ancestry", "parent": parent,
+                          "reason": "no first-parent descendant of the "
+                                    "recorded parent exists"}
+        lock_path = (self.lock.get("self") or {}).get("path") or CB2.LOCK_PATH
+        expected = _sha256(self.lock_raw)
+        for candidate in candidates:
+            try:
+                blob = self.blob(candidate, lock_path)
+            except CB2.ClosureBindingDefect:
+                continue
+            if blob["sha256"] == expected:
+                return candidate, {"source": "ancestry", "parent": parent,
+                                   "carries_the_bound_lock_bytes": True,
+                                   "candidates_examined": candidates.index(
+                                       candidate) + 1}
+        return None, {"source": "ancestry", "parent": parent,
+                      "reason": "no first-parent descendant carries the bound "
+                                "lock bytes", "candidates": candidates[:8]}
+
+    def check_governance_chain(self, *, require_head=True, require_clean=True):
+        anchor, resolution = self.resolve_ready_anchor()
         head, _ = self.git("rev-parse", "HEAD")
-        detail = {"ready_anchor": anchor, "governance_commit": head.strip()}
+        detail = {"ready_anchor": anchor, "anchor_resolution": resolution,
+                  "governance_commit": head.strip()}
+        if not anchor:
+            self.require("governance_chain_proved", False, detail)
+            for name in ("every_post_anchor_path_is_governance_or_evidence",
+                         "no_bound_executable_or_scientific_path_changed",
+                         "task_blob_unchanged"):
+                self.require(name, False,
+                             {"reason": "the ready anchor could not be "
+                                        "resolved by ancestry"})
+            return None
         try:
             proof = CB2.prove_v2_chain(
                 root=self.root, lock=self.lock, ready_anchor=anchor,
@@ -348,23 +398,30 @@ class Preflight:
             proved = False
         self.require("p0_r2_v1_superseded_and_nonlaunchable", proved, detail)
 
-    def check_replay_unconsumed(self, results_dir: Path) -> None:
+    def check_replay_unconsumed(self, results_dir) -> None:
+        results_dir = Path(results_dir)
         present = []
         for name in CANONICAL_REPLAY_ARTIFACTS:
-            candidate = Path(results_dir) / name
+            candidate = results_dir / name
             if candidate.exists():
                 present.append(str(candidate))
+        try:
+            relative = results_dir.resolve().relative_to(self.root).as_posix()
+        except ValueError:
+            relative = results_dir.as_posix()
         tracked = []
-        out, _ = self.git("ls-files", "--", str(Path(results_dir).name))
-        for line in out.splitlines():
-            if Path(line.strip()).name in CANONICAL_REPLAY_ARTIFACTS:
-                tracked.append(line.strip())
+        out, code = self.git("ls-files", "--", relative, check=False)
+        if code == 0:
+            for line in out.splitlines():
+                if Path(line.strip()).name in CANONICAL_REPLAY_ARTIFACTS:
+                    tracked.append(line.strip())
         envelope = self.lock.get("replay_envelope") or {}
         proved = not present and not tracked \
             and envelope.get("consumed") is False \
             and int(envelope.get("invocations", 0)) == 0
         self.require("p0_r2_replay_envelope_unconsumed", proved,
                      {"results_dir": str(results_dir),
+                      "results_dir_repository_path": relative,
                       "artifacts_present_on_disk": present,
                       "artifacts_tracked_in_git": tracked,
                       "envelope": envelope})
