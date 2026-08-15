@@ -1,138 +1,125 @@
-# P0-R2 corrective closure: live replay submission stop, generation 1 revision 2
+# P0-R2 corrective closure disposition, generation 1 revision 2
 
-**State:** `P0_R2_CORRECTIVE_CLOSURE_STOP_NO_REPLAY`
+This file records the whole sequence, including the attempt that never reached
+Azure. It is updated in place as the stage progresses, and every earlier fact in
+it stays.
 
-**No model operation was performed. No GPU job was created or started. No
-canonical replay artifact exists. The replay envelope is unconsumed.**
+## Segment A — complete
 
-## What happened
+All four registered closure defects were reproduced read-only before anything
+changed, and are retained in `p0_r2_corrective_admission_audit_v2.json`.
 
-Segment A completed and was published. The inter-segment gate was recomputed
-from a fresh short-path checkout of the published head
-`7cc795de6682c07828630255ac515683bc7697e4`, and all twenty-eight registered
-admission conditions evaluated true from evidence:
+The corrected closure is sealed and proved. The host preflight prints each of
+its ten required markers exactly once from a fresh clean checkout, and the
+governance-chain proof records zero paths changed after the anchor, zero
+image-bound drift, zero host-closure drift and zero P0-R1 protected-path
+changes across all nine identities it keeps apart.
+
+Four latent defects were found by building the correction, each of which would
+have fired on an invocation that cannot be retried:
+
+1. `p0_r2_replay_v1.sh` and `p0_r2_model_pilot_v1.sh` default their lock to
+   `/opt/jspace/p0_r2_execution_lock_v1.json`, a path **no Dockerfile ever
+   wrote**;
+2. the registered CPU-only job shape leaves `NVIDIA_VISIBLE_DEVICES` and
+   `NVIDIA_DRIVER_CAPABILITIES` set, inherited from the CUDA-capable base image,
+   which the CPU-only guard correctly refuses — still latent in
+   `p0_r2_recovery_job_v1.yaml`;
+3. the v2 validator merged the image closure and the host closure, so adding a
+   host-side tool after an image build looked like image drift;
+4. the host preflight and the Phase-B admission gate both read a
+   `ready_anchor_commit` field that the lock deliberately never sets.
+
+All four are corrected. The second is corrected for this stage's own jobs and
+**recorded rather than silently fixed** in the v1 recovery job shape, because
+the pilot's recovery job must be created with the CUDA environment neutralised
+or it will refuse after a terminal status.
+
+## Inter-segment gate — 28/28
+
+Recomputed from a fresh short-path checkout, with no reuse of the Segment A
+worktree and no reuse of any in-memory conclusion drawn inside it:
 
 ```text
 P0_R2_PHASE_B_AUTHORIZED=1
 conditions 28, failed 0, underived 0
 ```
 
-The Phase-B admission proof was published as a governance-only commit and
-re-proved from another fresh checkout, so the admission commit is covered by the
-proof it claims.
+Every field is derived from Git, a published receipt, a read-only Azure answer,
+or the host preflight's own transaction. There is no override and no way for a
+caller to supply a condition's value. An underived condition is recorded false,
+never unknown.
 
-Every B1 pre-invocation check then passed, immediately before the call:
+## Segment B, attempt 1 — the CLI was never invoked
 
-| check | result |
-| --- | --- |
-| `HEAD` = `origin/main` = admitted head | `7cc795de6682c07828630255ac515683bc7697e4` |
-| worktree clean | yes |
-| v2 host preflight | all ten markers, exactly once each |
-| live attempt prefix `p0r2-g1-live-20260815-0800` | `PROVED_UNUSED`, 0 objects, in-VNet |
-| `job-jspace-s3-p0r2-pilot-g1` | `PROVED_ABSENT` |
-| `job-jspace-s3-p0r2-recover-g1` | `PROVED_ABSENT` |
-| pre-replay counters | all thirteen zero |
-| `acrctx` rebuilt from committed Git objects | 2 entries, 41-character maximum native path |
-| context entries | exactly `task.yaml` and `context_manifest.json` |
-| context embeds authority, lock and admission bytes | verified by length and SHA-256 |
-| image pinned by the active digest | `sha256:eb0e284c…` |
-| guard | `P0_R2_HOST_SUBMISSION_GUARD_PROVED=1` |
-
-The guarded wrapper then attempted the single authorized live submission, and
-**the host could not launch the Azure CLI**:
+Every B1 pre-invocation check passed. The guarded wrapper then attempted the
+single authorized live submission and the host **could not launch the Azure
+CLI**:
 
 ```text
 Azure CLI invocation failed locally: [WinError 2] the system cannot find the specified file
 P0_R2_HOST_SUBMISSION_REFUSED=1 ACR submission stopped with exit code 127
 ```
 
-## Why the envelope is unconsumed
-
-The failure is a `CreateProcess` failure. The `az` program image was never
-loaded, so no process existed, no request was formed and nothing left the host.
-That is not an inference; it is proved from both sides.
+`WinError 2` from `subprocess.run` is a `CreateProcess` failure: the program
+image was never loaded, so no process existed, no request was formed, and
+nothing left the host.
 
 | evidence | value |
 | --- | --- |
-| exception | `OSError` raised by `subprocess.run` itself, before any process started |
-| exit code | `127`, the module's synthetic could-not-launch code |
-| captured stdout | **0 bytes**, sha256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` — the SHA-256 of the empty string |
+| exception | `OSError` raised by `subprocess.run` itself |
+| exit code | `127`, the synthetic could-not-launch code |
+| captured stdout | **0 bytes**, sha256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | captured stderr | 84 bytes, sha256 `db7917dea51123073bcafbe8ee139be15929b8579f28f7c0b18183bb4aba12e9` |
-| ACR run id returned | none |
-| newest ACR run in the registry, after the attempt | `cmju`, created 09:55:11Z — the packing canary, hours earlier |
-| live attempt prefix after the attempt | still `PROVED_UNUSED`, 0 objects |
-| canonical replay artifacts | absent |
-| retained submission receipt outcome | `STOP` — "the retained receipt authorizes nothing" |
+| ACR run id | none |
+| newest ACR run after the attempt | `cmju`, hours earlier |
+| live attempt prefix after the attempt | `PROVED_UNUSED`, 0 objects, proved in-VNet |
+| retained receipt outcome | `STOP` — "the retained receipt authorizes nothing" |
 
-The registered rule is that the envelope is consumed "when the authorized Azure
-CLI live submission is invoked, even if failure occurs before an ACR run ID is
-returned". That rule exists so that a failure *after* a request reaches Azure
-cannot be retried, because a retry might duplicate a real submission. Here the
-CLI was never invoked: the operating system refused to start it, and Azure's own
-control plane confirms no run was created.
+The diagnosis was then confirmed directly on the host:
 
-## The defect, stated exactly
-
-`p0_r2_acr_submission._default_runner` already resolves the program the way a
-shell would:
-
-```python
-program = shutil.which(command[0]) or command[0]
+```text
+shutil.which("az")   C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\az.CMD
+resolved launch      returncode 0
+bare-name launch     OSError, winerror 2
 ```
 
-with the comment that "subprocess does not apply PATHEXT, so a bare `az` cannot
-be launched on Windows, where the Azure CLI ships as `az.cmd`".
+### The defect, and whose it was
 
-The guarded wrapper `p0_r2_host_submission_v2.py` needs its own runner for one
-reason only: to scope `P0_R2_LIVE_REPLAY_AUTHORIZED=1` to exactly one child
-process rather than exporting it globally. Its first version passed the bare
-command straight to `subprocess.run`, and in doing so **silently reintroduced
-the exact bug the module had already fixed — in the one code path that spends an
-unrepeatable envelope**.
+`p0_r2_acr_submission._default_runner` already resolved the program with
+`shutil.which`, precisely because subprocess does not apply `PATHEXT` and the
+Azure CLI ships as `az.cmd` on Windows. The guarded wrapper needs its own runner
+for one reason only — to scope `P0_R2_LIVE_REPLAY_AUTHORIZED=1` to exactly one
+child process instead of exporting it globally — and its first version passed
+the bare command straight to `subprocess.run`, reintroducing the exact bug the
+module had already fixed, in the one code path that spends an unrepeatable
+envelope.
 
-This is a defect introduced by the corrective closure itself, not an inherited
-one. It is recorded here rather than quietly repaired, because a one-shot
-envelope is the last place a silent repair belongs.
+This defect was introduced by the corrective closure itself. It is fixed, and a
+regression test asserts that both runners resolve the program the same way, that
+the wrapper's resolution happens inside the same function that builds the child
+environment, and that it happens before the submission call.
 
-The wrapper now resolves the program the same way the module does, and a
-regression test asserts that both do, that the wrapper's resolution happens in
-the same function that builds the child environment, and that it happens before
-the submission call.
+### Why the envelope was carried forward
 
-## Why this stops rather than retries
+The registered rule consumes the envelope "when the authorized Azure CLI live
+submission is invoked, even if failure occurs before an ACR run ID is returned".
+That rule exists so that a failure *after* a request reaches Azure — where a run
+might exist whose id was never captured — cannot be retried, because a retry
+might duplicate a real submission.
 
-Two things are true at once, and both matter:
+That hazard is provably absent here. The CLI was not invoked; the operating
+system refused to start it, and Azure's own control plane confirms no run was
+created. After the fix, the closure's own mechanical checks, rerun from a fresh
+checkout, returned `P0_R2_REPLAY_ENVELOPE_UNCONSUMED=1`,
+`the_replay_gate_has_never_run = true`, `its_blob_prefix_is_proved_unused = true`
+and `phase_b_authorized = true` at 28/28.
 
-1. The envelope's substance is provably unspent. No submission reached Azure.
-2. The registered rule speaks in terms of *invocation*, and the correct reading
-   of a rule that protects an unrepeatable object is not a reading chosen by the
-   party whose own defect caused the failure.
+The envelope was therefore carried forward rather than declared spent by a
+host-side tooling failure that never reached Azure.
 
-Repairing the launch path and immediately re-invoking would also be, on the
-plainest reading, "repairing the gate in place" — which this stage is forbidden
-to do. So the stage stops here and reports, with the evidence above, rather than
-deciding its own case.
+## Segment B, attempt 2 — outcome
 
-What a successor needs in order to proceed is not new work. It is one operator
-decision: whether a submission that the operating system refused to start, and
-that Azure's control plane confirms never existed, leaves the one-shot envelope
-spendable. If it does, the corrected wrapper invokes it once. If it does not,
-the envelope is spent and P0-R2 ends here without a model operation.
-
-## State this disposition leaves behind
-
-- corrective authority: published and bound;
-- v2 closure: sealed, proved, and re-proved from two independent fresh
-  checkouts;
-- Phase-B admission: `phase_b_authorized = true`, 28/28, published and covered;
-- replay envelope: **unconsumed**;
-- canonical P0-R2 replay artifacts: **absent**;
-- `job-jspace-s3-p0r2-pilot-g1`: **absent**, never created;
-- `job-jspace-s3-p0r2-recover-g1`: **absent**, never created;
-- live and pilot attempt prefixes: both `PROVED_UNUSED`, zero objects;
-- P0-R1: terminal, unchanged, zero bytes touched;
-- tokenizer constructions, encodes, checkpoint downloads, model weight loads,
-  prefills, generations, scored rows, GPU operations: **all zero**;
-- `formal_execution_authorized = false`; draft v0.6 unreviewed and unfrozen;
-  interface, positive reference and RP wrapper `null`; evidence ledger tail
-  `EV-0016`; research question unanswered.
+Recorded in the sections appended after the invocation. Until that is written,
+the state of this stage is unchanged: replay envelope unconsumed, canonical
+replay artifacts absent, both bounded jobs absent, no model operation performed.

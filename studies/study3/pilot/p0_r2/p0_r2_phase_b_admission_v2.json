@@ -201,8 +201,8 @@
     },
     "head_equals_origin_main_at_the_corrected_final_head": {
       "evidence": {
-        "head": "a85d79c8e5dbabdbecc35f4f0be3fa5276df568e",
-        "origin_main": "a85d79c8e5dbabdbecc35f4f0be3fa5276df568e"
+        "head": "886c6375d526ccb2411675e5186f677bcc0ade14",
+        "origin_main": "886c6375d526ccb2411675e5186f677bcc0ade14"
       },
       "value": true
     },
@@ -214,7 +214,7 @@
         "execution_identity": {
           "credential_kind": "managed-identity",
           "environment": "cae-jspace-observation-sea-vnet2",
-          "execution": "job-jspace-s3-p0r2-prefix-g1-qm5qp8k",
+          "execution": "job-jspace-s3-p0r2-prefix-g1-n106wwk",
           "host_can_reach_the_private_account": false,
           "job": "job-jspace-s3-p0r2-prefix-g1",
           "query_error_is_absence": false,
@@ -242,7 +242,7 @@
             "admitted": true,
             "bytes": 7692,
             "classification": "NON_EXECUTABLE",
-            "commit": "a85d79c8e5dbabdbecc35f4f0be3fa5276df568e",
+            "commit": "886c6375d526ccb2411675e5186f677bcc0ade14",
             "declared_class": "evidence",
             "gates": {
               "classifies_non_executable": true,
@@ -250,7 +250,7 @@
               "outside_bound_executable_closure": true,
               "outside_protected_p0_r1": true
             },
-            "git_blob": "448c23a6bf95871586f9a26282462a616d0042ab",
+            "git_blob": "725f448d07157da8a66a73d8d5fab0565b8c21a9",
             "in_bound_executable_closure": false,
             "in_published_governance_evidence_closure": true,
             "mode": "100644",
@@ -258,14 +258,14 @@
             "protected_p0_r1": false,
             "reasons": [],
             "schema_version": "study3-p0-r2-path-classification-v2",
-            "sha256": "446f6ba4c37c79c3cdde2f85123b3afb944c43a7935db2a1964ebc29102658e6",
+            "sha256": "1d5c98d05e8f45469e5514477c9186252333fbac0ce10b2d82c245c38da69b63",
             "starts_with_shebang": false
           },
           {
             "admitted": true,
-            "bytes": 20602,
+            "bytes": 20606,
             "classification": "NON_EXECUTABLE",
-            "commit": "a85d79c8e5dbabdbecc35f4f0be3fa5276df568e",
+            "commit": "886c6375d526ccb2411675e5186f677bcc0ade14",
             "declared_class": "evidence",
             "gates": {
               "classifies_non_executable": true,
@@ -273,7 +273,7 @@
               "outside_bound_executable_closure": true,
               "outside_protected_p0_r1": true
             },
-            "git_blob": "974865349a25e32e523d2d0b51db1d60006da93f",
+            "git_blob": "ec58016d73f7cdcc7b265027ada84c00a44fbde5",
             "in_bound_executable_closure": false,
             "in_published_governance_evidence_closure": true,
             "mode": "100644",
@@ -281,7 +281,7 @@
             "protected_p0_r1": false,
             "reasons": [],
             "schema_version": "study3-p0-r2-path-classification-v2",
-            "sha256": "b3c2b8279a5023f9805530322bc1b2f6132a775878fc898b9b444eeedb380ef7",
+            "sha256": "1e495fd1746d7da7daee918c0e6a5c6a2688077473ea3dbd7e3f2f6c99441278",
             "starts_with_shebang": false
           }
         ]
@@ -350,11 +350,11 @@
       "evidence": {
         "execution_lock": {
           "bytes": 158754,
-          "git_blob": "d1d706801a079d99794341d65173ae0fb2ace64b",
+          "git_blob": "0ce962477c1f58b6b3086511b1870ce79a128c9d",
           "identical_at_governance_source": true,
           "mode": "100644",
           "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.json",
-          "sha256": "5c43372b8b8c629cba23c26fa64a02d1e615a8c7bff55611793db9fe8948fc88"
+          "sha256": "f3bf629998ffde67fc0e140539cfb4156db78533f90154cfe02f291e0a1be4f6"
         },
         "image": {
           "digest": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
@@ -487,14 +487,14 @@
         ],
         "anchor_resolution": {
           "carries_the_bound_lock_bytes": true,
-          "parent": "5e8550fa9a5299a49a3c006f92371cec3e3c75b9",
+          "parent": "24768c3a0fce9b7a0e6980fe62cb22a4bd8be74a",
           "source": "ancestry"
         },
         "changed_since_anchor": [
           "studies/study3/pilot/p0_r2/p0_r2_governance_chain_proof_v2.json",
           "studies/study3/pilot/p0_r2/p0_r2_host_preflight_proof_v2.json"
         ],
-        "ready_anchor": "ae18d34232a5740ef702648537368580509111a3"
+        "ready_anchor": "7ff6700621ca1db9bdf06d1d91a49e935e66e2b7"
       },
       "value": true
     },
@@ -524,25 +524,25 @@
     },
     "windows_native_path_maximum_is_at_most_240": {
       "evidence": {
-        "context_dir": "C:\\p0r2\\pc3\\acrctx",
-        "context_max_native_path_chars": 40,
+        "context_dir": "C:\\p0r2\\live2\\acrctx",
+        "context_max_native_path_chars": 42,
         "entries": [
           {
-            "chars": 40,
-            "path": "C:\\p0r2\\pc3\\acrctx\\context_manifest.json"
+            "chars": 42,
+            "path": "C:\\p0r2\\live2\\acrctx\\context_manifest.json"
           },
           {
-            "chars": 28,
-            "path": "C:\\p0r2\\pc3\\acrctx\\task.yaml"
+            "chars": 30,
+            "path": "C:\\p0r2\\live2\\acrctx\\task.yaml"
           },
           {
-            "chars": 18,
-            "path": "C:\\p0r2\\pc3\\acrctx"
+            "chars": 20,
+            "path": "C:\\p0r2\\live2\\acrctx"
           }
         ],
         "limit": 240,
         "p0_r1_fatal_length": 265,
-        "worktree_max_native_path_chars": 136
+        "worktree_max_native_path_chars": 134
       },
       "value": true
     },
@@ -567,7 +567,7 @@
   "failed_conditions": [],
   "generations": 0,
   "gpu_operations": 0,
-  "lock_sha256": "5c43372b8b8c629cba23c26fa64a02d1e615a8c7bff55611793db9fe8948fc88",
+  "lock_sha256": "f3bf629998ffde67fc0e140539cfb4156db78533f90154cfe02f291e0a1be4f6",
   "model_operations_performed": 0,
   "model_weight_loads": 0,
   "override_available": false,
