@@ -248,7 +248,70 @@ def test_the_chain_refuses_a_bound_path_that_moved_after_the_image_build(repo):
         CB2.prove_v2_chain(root=repo.root, lock=lock, ready_anchor=repo.anchor,
                            governance_commit=head, require_head=False)
     assert "outside_bound_executable_closure" in str(excinfo.value) \
-        or "bound path" in str(excinfo.value)
+        or "image-bound" in str(excinfo.value)
+
+
+def test_adding_a_host_tool_after_the_image_build_is_not_image_drift(repo):
+    """The defect this module found in itself.
+
+    A host-side tool committed after the image was built is not image drift:
+    it was never in the image. Merging the two closures made a correct closure
+    refuse, and -- worse -- told the operator to discard a perfectly good image
+    and rebuild.
+    """
+    (repo.root / "host_tool.py").write_text("#!/usr/bin/env python3\n",
+                                            encoding="utf-8")
+    (repo.root / "handoff.md").write_text("handoff\n", encoding="utf-8")
+    _git(repo.root, "add", "-A")
+    _git(repo.root, "commit", "-q", "-m", "host tool plus handoff")
+    host_commit = _git(repo.root, "rev-parse", "HEAD")
+
+    lock = _lock_for(repo, closure=("handoff.md",))
+    lock["host_closure_executable"] = {
+        "commit": host_commit,
+        "tree": _git(repo.root, "rev-parse", "%s^{tree}" % host_commit),
+        "files": [{"path": "host_tool.py"}]}
+    lock["closure_base"] = {"commit": host_commit}
+
+    _git(repo.root, "commit", "-q", "--allow-empty", "-m", "anchor v2")
+    anchor = _git(repo.root, "rev-parse", "HEAD")
+
+    proof = CB2.prove_v2_chain(root=repo.root, lock=lock, ready_anchor=anchor,
+                               governance_commit=anchor, require_head=False)
+    assert proof["bound_paths_changed_after_image_build"] == []
+    assert proof["host_closure_paths_changed_after_freeze"] == []
+    assert proof["image_bound_closure_size"] >= 1
+    assert proof["host_bound_closure_size"] >= 1
+
+
+def test_the_chain_refuses_a_host_tool_that_moved_after_the_freeze(repo):
+    (repo.root / "host_tool.py").write_text("#!/usr/bin/env python3\n",
+                                            encoding="utf-8")
+    _git(repo.root, "add", "-A")
+    _git(repo.root, "commit", "-q", "-m", "host tool")
+    host_commit = _git(repo.root, "rev-parse", "HEAD")
+
+    (repo.root / "host_tool.py").write_text("#!/usr/bin/env python3\n# moved\n",
+                                            encoding="utf-8")
+    (repo.root / "handoff.md").write_text("handoff\n", encoding="utf-8")
+    _git(repo.root, "add", "-A")
+    _git(repo.root, "commit", "-q", "-m", "host tool drift")
+    head = _git(repo.root, "rev-parse", "HEAD")
+
+    lock = _lock_for(repo, closure=("handoff.md",))
+    lock["host_closure_executable"] = {
+        "commit": host_commit,
+        "tree": _git(repo.root, "rev-parse", "%s^{tree}" % host_commit),
+        "files": [{"path": "host_tool.py"}]}
+    lock["closure_base"] = {"commit": host_commit}
+
+    _git(repo.root, "commit", "-q", "--allow-empty", "-m", "anchor v2")
+    anchor = _git(repo.root, "rev-parse", "HEAD")
+
+    with pytest.raises(CB2.ClosureBindingDefect) as excinfo:
+        CB2.prove_v2_chain(root=repo.root, lock=lock, ready_anchor=anchor,
+                           governance_commit=anchor, require_head=False)
+    assert "host-closure" in str(excinfo.value)
 
 
 def test_the_closure_is_an_exact_path_set_and_rejects_patterns(repo):

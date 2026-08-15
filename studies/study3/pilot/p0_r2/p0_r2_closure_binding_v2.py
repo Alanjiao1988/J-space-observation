@@ -305,7 +305,22 @@ def verify_canary_live_agreement(canary: dict, live: dict) -> dict:
 
 
 def _closure_from_lock(lock: dict) -> dict:
-    """Derive the bound closures from the lock. Nothing here is caller input."""
+    """Derive the bound closures from the lock. Nothing here is caller input.
+
+    The image closure and the host closure are kept apart on purpose. They are
+    protected against *different* drift:
+
+    * an image-bound path may not move after the image was built, because the
+      image is already pushed and pinned by digest;
+    * a host-closure path may not move after the host closure was frozen,
+      because that is the tooling the successor is about to run.
+
+    Merging them was a real defect in the first draft of this module. It made
+    the mere *addition* of a host-side tool after the image build look like
+    image drift, and refused a closure that was correct -- while, worse,
+    reporting the reason as "discard the unexecuted image, rebuild and relock",
+    which would have been the wrong repair.
+    """
     executable = lock.get("image_executable") or {}
     host = lock.get("host_closure_executable") or {}
 
@@ -313,17 +328,19 @@ def _closure_from_lock(lock: dict) -> dict:
         return [entry["path"] for entry in (entries or [])
                 if isinstance(entry, dict) and entry.get("path")]
 
-    bound = set()
-    bound.update(paths(executable.get("files")))
-    bound.update(paths(host.get("files")))
-    bound.update(paths(lock.get("immutable_sources")))
-    bound.update(paths(lock.get("validation_inputs")))
+    image_bound = set()
+    image_bound.update(paths(executable.get("files")))
+    image_bound.update(paths(lock.get("immutable_sources")))
     transport = lock.get("transport") or {}
     if transport.get("task_path"):
-        bound.add(transport["task_path"])
+        image_bound.add(transport["task_path"])
     for entry in (lock.get("job_specifications") or []):
         if isinstance(entry, dict) and entry.get("path"):
-            bound.add(entry["path"])
+            image_bound.add(entry["path"])
+
+    host_bound = set()
+    host_bound.update(paths(host.get("files")))
+    host_bound.update(paths(lock.get("validation_inputs")))
 
     closure = lock.get("governance_evidence_closure") or []
     admitted = {}
@@ -337,7 +354,8 @@ def _closure_from_lock(lock: dict) -> dict:
                 "the governance/evidence closure is an exact path set; %r is a "
                 "pattern" % path)
         admitted[path] = entry.get("class") or "evidence"
-    return {"bound": bound, "admitted": admitted}
+    return {"image_bound": image_bound, "host_bound": host_bound,
+            "bound": image_bound | host_bound, "admitted": admitted}
 
 
 def prove_v2_chain(*, root=None, lock: dict, ready_anchor: str,
@@ -434,8 +452,8 @@ def prove_v2_chain(*, root=None, lock: dict, ready_anchor: str,
     closures = _closure_from_lock(lock)
     admitted = closures["admitted"]
     bound = closures["bound"]
-
     newest = head if head is not None else governance_commit
+
     out, _ = run(["diff", "--name-only", ready_anchor, newest])
     changed = sorted(line.strip() for line in out.splitlines() if line.strip())
 
@@ -471,17 +489,26 @@ def prove_v2_chain(*, root=None, lock: dict, ready_anchor: str,
             % (len(refusals), "; ".join(refusals)))
 
     bound_changed = []
-    if bound:
+    image_drift = []
+    host_drift = []
+    if closures["image_bound"]:
         out, _ = run(["diff", "--name-only", executable_commit, newest])
-        drifted_exec = {line.strip() for line in out.splitlines() if line.strip()}
+        drifted = {line.strip() for line in out.splitlines() if line.strip()}
+        image_drift = sorted(drifted & closures["image_bound"])
+    if closures["host_bound"]:
         out, _ = run(["diff", "--name-only", host_commit, newest])
-        drifted_host = {line.strip() for line in out.splitlines() if line.strip()}
-        bound_changed = sorted((drifted_exec | drifted_host) & bound)
-        if bound_changed:
-            raise ClosureBindingDefect(
-                "%d bound path(s) changed after the image build or the host "
-                "closure: %s. Discard the unexecuted image, rebuild and relock."
-                % (len(bound_changed), ", ".join(bound_changed)))
+        drifted = {line.strip() for line in out.splitlines() if line.strip()}
+        host_drift = sorted(drifted & closures["host_bound"])
+    bound_changed = sorted(set(image_drift) | set(host_drift))
+    if bound_changed:
+        raise ClosureBindingDefect(
+            "%d bound path(s) drifted: %s image-bound path(s) changed after the "
+            "image build (%s) and %s host-closure path(s) changed after the host "
+            "closure was frozen (%s). An image-bound drift means discard the "
+            "unexecuted image, rebuild and relock; a host-closure drift means "
+            "refreeze the host closure."
+            % (len(bound_changed), len(image_drift), ", ".join(image_drift),
+               len(host_drift), ", ".join(host_drift)))
 
     p0_r1_changed = []
     for reference in (closure_base, ready_anchor, newest):
@@ -572,7 +599,10 @@ def prove_v2_chain(*, root=None, lock: dict, ready_anchor: str,
         "caller_supplied_allowlist_accepted": False,
         "published_governance_evidence_closure": sorted(admitted),
         "bound_executable_closure_size": len(bound),
-        "bound_paths_changed_after_image_build": bound_changed,
+        "image_bound_closure_size": len(closures["image_bound"]),
+        "host_bound_closure_size": len(closures["host_bound"]),
+        "bound_paths_changed_after_image_build": image_drift,
+        "host_closure_paths_changed_after_freeze": host_drift,
         "p0_r1_protected_paths_changed": p0_r1_changed,
         "task_blob_identical_at_governance_source": True,
         "execution_lock": lock_proof,
@@ -620,6 +650,7 @@ def validate_proof(proof, *, image_executable=None, host_executable=None,
         raise ClosureBindingDefect(
             "the proof accepted a caller-supplied allow-list")
     for key in ("bound_paths_changed_after_image_build",
+                "host_closure_paths_changed_after_freeze",
                 "p0_r1_protected_paths_changed"):
         if proof.get(key):
             raise ClosureBindingDefect("the proof records %s" % key)
