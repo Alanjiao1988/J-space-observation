@@ -297,12 +297,12 @@
     },
     {
       "added_by_corrective_closure": true,
-      "bytes": 28949,
-      "git_blob": "f33b5de5cc0630eb01b953dee30ab637eb8b30e8",
+      "bytes": 31973,
+      "git_blob": "bceb746c5f93ca20d04ba07d8dc8721d09f34268",
       "image_path": "/opt/jspace/src/studies/study3/pilot/p0_r2/p0_r2_host_preflight_v2.py",
       "kind": "operational",
       "path": "studies/study3/pilot/p0_r2/p0_r2_host_preflight_v2.py",
-      "sha256": "e8d420795b79c96e58188f262a990ca6c0f9491dc878421e214b5c044b0b05a3"
+      "sha256": "9b183d315e17d3e163ed9c1e9bfb74cec2ea04d0639048d8268181008b5cbe24"
     },
     {
       "added_by_corrective_closure": false,
@@ -422,12 +422,12 @@
       "sha256": "d0567f7fa808049a622d447b2672bf67f858c499e46d250e1afc0adc82387f40"
     }
   ],
-  "entries_sha256": "21e30727501bc763f245d685e4e4971b62732ec85f5ad93b57c5663875692f22",
+  "entries_sha256": "ed0aac75034b44e29a95942b3ebb3d6d52e120fcbc5f2e1555b0de55e67df6a3",
   "entry_count": 44,
   "entrypoint_count": 10,
   "entrypoint_install_root": "/usr/local/bin",
-  "executable_commit": "2e0b6a20447074803c5210583c660ec2ef195bd8",
-  "executable_tree": "2a36ff35f1ab1129887c4c337997019a7b98a661",
+  "executable_commit": "c9344c52bfbacc4f2a24010fffa534a940104140",
+  "executable_tree": "bb27933ebf42e811ec7e5a42a13d65377cdd2f5c",
   "image_root": "/opt/jspace/src",
   "model_operations_performed": 0,
   "operational_count": 25,
