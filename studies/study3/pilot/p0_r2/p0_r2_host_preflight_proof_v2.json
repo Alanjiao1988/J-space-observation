@@ -1,0 +1,506 @@
+{
+  "azure_query_error_is_absence": false,
+  "check_count": 21,
+  "checkpoint_downloads": 0,
+  "checks": [
+    {
+      "check": "head_equals_origin_main",
+      "detail": {
+        "fetch_attempted": true,
+        "fetch_exit_code": 0,
+        "head": "11e6dfb8620c30e61310f6b8faba1faf0660a8a4",
+        "origin_main": "11e6dfb8620c30e61310f6b8faba1faf0660a8a4"
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "worktree_clean",
+      "detail": {
+        "dirty_entries": [],
+        "dirty_entry_count": 0
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "exact_final_published_commit_and_tree",
+      "detail": {
+        "actual": {
+          "commit": "11e6dfb8620c30e61310f6b8faba1faf0660a8a4",
+          "tree": "5df5c1de201eae49d34b97cb8f19e25d1b850b44"
+        },
+        "expected": {
+          "commit": null,
+          "tree": null
+        },
+        "note": "when no exact head is admitted yet, the final published head is whatever origin/main proves it to be, and the chain proof covers the rest"
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "exact_v2_authority_lock_schema_and_handoff_bytes",
+      "detail": {
+        "count": 10,
+        "entries": [
+          {
+            "actual_bytes": 16404,
+            "actual_sha256": "8d34def46c822fd7794b00f79c184e717f8799de6180c5413adaab5253899556",
+            "agrees": true,
+            "expected_bytes": 16404,
+            "expected_sha256": "8d34def46c822fd7794b00f79c184e717f8799de6180c5413adaab5253899556",
+            "path": "studies/study3/prompts/study3_p0_r2_corrective_closure_and_conditional_execution_authority.md"
+          },
+          {
+            "actual_bytes": 11288,
+            "actual_sha256": "eb2407216fcb48506b97b43a88d541ab27e857e72ef319cbf575799cf8451deb",
+            "agrees": true,
+            "expected_bytes": 11288,
+            "expected_sha256": "eb2407216fcb48506b97b43a88d541ab27e857e72ef319cbf575799cf8451deb",
+            "path": "studies/study3/prompts/study3_p0_r2_infrastructure_successor_authority.md"
+          },
+          {
+            "actual_bytes": 14082,
+            "actual_sha256": "d82e3446a8f25756110d6e501f6d294bb436059758e7c84e7ef8a952e19ecf14",
+            "agrees": true,
+            "expected_bytes": 14082,
+            "expected_sha256": "d82e3446a8f25756110d6e501f6d294bb436059758e7c84e7ef8a952e19ecf14",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.schema.json"
+          },
+          {
+            "actual_bytes": 4693,
+            "actual_sha256": "cd099fbb2f8da7e69396ce1647464affc1aca2fc99188c8ac0139fc4defd9c31",
+            "agrees": true,
+            "expected_bytes": 4693,
+            "expected_sha256": "cd099fbb2f8da7e69396ce1647464affc1aca2fc99188c8ac0139fc4defd9c31",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_v1_supersession_v2.json"
+          },
+          {
+            "actual_bytes": 17961,
+            "actual_sha256": "2c9789e27fad5ac463e105a42a69d686cdcf1389bcfd44503baf79cabd61f7d7",
+            "agrees": true,
+            "expected_bytes": 17961,
+            "expected_sha256": "2c9789e27fad5ac463e105a42a69d686cdcf1389bcfd44503baf79cabd61f7d7",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json"
+          },
+          {
+            "actual_bytes": 11860,
+            "actual_sha256": "f02b04312653a95ed5011fbfabc5a4558d362424be39ce62250dcc1f655ae158",
+            "agrees": true,
+            "expected_bytes": 11860,
+            "expected_sha256": "f02b04312653a95ed5011fbfabc5a4558d362424be39ce62250dcc1f655ae158",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_v2.json"
+          },
+          {
+            "actual_bytes": 109978,
+            "actual_sha256": "aba9b65813518bf3dd2aa8bd85764c6476479b3b68fb99995d5bdff615019949",
+            "agrees": true,
+            "expected_bytes": 109978,
+            "expected_sha256": "aba9b65813518bf3dd2aa8bd85764c6476479b3b68fb99995d5bdff615019949",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_attempt_ledger_v2.json"
+          },
+          {
+            "actual_bytes": 17009,
+            "actual_sha256": "7f7575eaf7d49e3174430850789106baa3273e5de9fdf69738e18fb3b6f521ea",
+            "agrees": true,
+            "expected_bytes": 17009,
+            "expected_sha256": "7f7575eaf7d49e3174430850789106baa3273e5de9fdf69738e18fb3b6f521ea",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_corrective_admission_audit_v2.json"
+          },
+          {
+            "actual_bytes": 19808,
+            "actual_sha256": "1cea287b8168c5dd1689984846b634454788ebe70f552193fefff75c3148a856",
+            "agrees": true,
+            "expected_bytes": 19808,
+            "expected_sha256": "1cea287b8168c5dd1689984846b634454788ebe70f552193fefff75c3148a856",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_image_manifest_v2.json"
+          },
+          {
+            "actual_bytes": 18779,
+            "actual_sha256": "eb8eb774edb1ae15807955df75c03d70e428f07cc456b5acf630b8ee843fda56",
+            "agrees": true,
+            "expected_bytes": 18779,
+            "expected_sha256": "eb8eb774edb1ae15807955df75c03d70e428f07cc456b5acf630b8ee843fda56",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_validation_receipts_v2.json"
+          }
+        ]
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "active_lock_on_disk_is_the_committed_lock",
+      "detail": {
+        "committed": {
+          "bytes": 158469,
+          "git_blob": "9436097f46b422596bf035802c66f5b1b4c03697",
+          "mode": "100644",
+          "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.json",
+          "sha256": "3223050894967e0135f649467c0cb197dc6babdb80f2507c154bb3cdf7241582"
+        },
+        "on_disk": {
+          "bytes": 158469,
+          "sha256": "3223050894967e0135f649467c0cb197dc6babdb80f2507c154bb3cdf7241582"
+        },
+        "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.json"
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "exact_image_digest_and_task_blob",
+      "detail": {
+        "bound_task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
+        "committed_task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
+        "digest": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+        "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+        "image_is_digest_pinned": true,
+        "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v2.yaml"
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "governance_chain_proved",
+      "detail": {
+        "ancestry_proved": [
+          "image executable -> closure base",
+          "host closure executable -> closure base",
+          "closure base -> ready anchor",
+          "ready anchor -> governance source",
+          "governance source -> published head"
+        ],
+        "anchor_resolution": {
+          "candidates_examined": 1,
+          "carries_the_bound_lock_bytes": true,
+          "parent": "dc68c3cf54ea33ae10630ab1a7698c394778d238",
+          "source": "ancestry"
+        },
+        "changed_since_anchor": [],
+        "governance_commit": "11e6dfb8620c30e61310f6b8faba1faf0660a8a4",
+        "ready_anchor": "11e6dfb8620c30e61310f6b8faba1faf0660a8a4"
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "every_post_anchor_path_is_governance_or_evidence",
+      "detail": {
+        "caller_supplied_allowlist_accepted": false,
+        "classification": [],
+        "paths": []
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "no_bound_executable_or_scientific_path_changed",
+      "detail": {
+        "changed": []
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "task_blob_unchanged",
+      "detail": {
+        "task_object": {
+          "bytes": 1671,
+          "git_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
+          "mode": "100644",
+          "path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v2.yaml",
+          "sha256": "e0376d458911a8a5bbdcc4890c0f973419a936e1ac1716583422fc52dea35e12"
+        }
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "p0_r1_terminal_and_nonlaunchable",
+      "detail": {
+        "protected_bytes": [
+          {
+            "actual_sha256": "feb26a6f5d528dd67a6f9dc44cbf469debb0b4ba6e03aa5c1dd1959324601108",
+            "agrees": true,
+            "path": "studies/study3/pilot/p0/results/p0-r1/P0_R1_GENERATION3_STOP_DISPOSITION.md"
+          },
+          {
+            "actual_sha256": "ddb684ff0bc6623d9baa00503bdc28b14e39504a14872d9e4e70c5348bfdd0a7",
+            "agrees": true,
+            "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_generation3_stop_counters.json"
+          },
+          {
+            "actual_sha256": "52c68ff886a25f4df775cda9bf79201012df9ca35d5b8a446366d4af77dc8dfc",
+            "agrees": true,
+            "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_generation3_stop_receipt.json"
+          },
+          {
+            "actual_sha256": "400fe156cdc402618f7ac4127d581bfb96131743e36953fb45cef1e3871062a3",
+            "agrees": true,
+            "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_live_replay_command.log"
+          },
+          {
+            "actual_sha256": "81aa5b3c55a9a4ac89693aec748832a8ce3ddccbe8e7a8a71b761bf28b365d8d",
+            "agrees": true,
+            "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_command.log"
+          },
+          {
+            "actual_sha256": "f255bbe189db189c0e3ae74e7de4cf4cd867293296ff93da0616fdd9dc7ea879",
+            "agrees": true,
+            "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_gpu_job_presence.json"
+          },
+          {
+            "actual_sha256": "664e702d9a3cd5303806351889c2c3503673baee16d2bfbb6cbcf309ef2a8edd",
+            "agrees": true,
+            "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_supersession_v3.json"
+          },
+          {
+            "actual_sha256": "1323c36df5943c9dcdb34918fdd8a8c34656d48bdc7643dc3fcacfc2e59b110e",
+            "agrees": true,
+            "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_replay_stderr.txt"
+          },
+          {
+            "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "agrees": true,
+            "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_replay_raw_log.txt"
+          },
+          {
+            "actual_sha256": "ae5b1e66ecd2f14bbb418b144a8e7b93ef33a536339431657b21845fd75398c5",
+            "agrees": true,
+            "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_pre_replay_head_proof_v3.json"
+          },
+          {
+            "actual_sha256": "ae5b1e66ecd2f14bbb418b144a8e7b93ef33a536339431657b21845fd75398c5",
+            "agrees": true,
+            "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_head_proof_v3.json"
+          }
+        ],
+        "protected_paths_changed_since_stop_commit": [],
+        "state": "STOP_NO_MODEL_OPERATION",
+        "stop_commit": "30806d793872a50e581d3252382b4a0ec2af3889"
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "p0_r2_v1_superseded_and_nonlaunchable",
+      "detail": {
+        "launchable": false,
+        "observed": {
+          "record_path": {
+            "bytes": 4693,
+            "git_blob": "35fdeedae1b592b687f51a4dd62e363f33268378",
+            "mode": "100644",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_v1_supersession_v2.json",
+            "sha256": "cd099fbb2f8da7e69396ce1647464affc1aca2fc99188c8ac0139fc4defd9c31"
+          },
+          "v1_lock_path": {
+            "bytes": 17961,
+            "git_blob": "09bc5b10a2fbb104d84f80218aeb2841072c8bec",
+            "mode": "100644",
+            "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json",
+            "sha256": "2c9789e27fad5ac463e105a42a69d686cdcf1389bcfd44503baf79cabd61f7d7"
+          }
+        },
+        "record_path": "studies/study3/pilot/p0_r2/p0_r2_v1_supersession_v2.json",
+        "superseded": true,
+        "v1_bytes_edited": 0,
+        "v1_executable_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+        "v1_image_digest": "sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+        "v1_lock_bytes": 17961,
+        "v1_lock_path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json",
+        "v1_lock_sha256": "2c9789e27fad5ac463e105a42a69d686cdcf1389bcfd44503baf79cabd61f7d7",
+        "v1_ready_anchor": "7fd5fe57707461fcf70bfc9ab00b707b3c44ef71"
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "p0_r2_replay_envelope_unconsumed",
+      "detail": {
+        "artifacts_present_on_disk": [],
+        "artifacts_tracked_in_git": [],
+        "envelope": {
+          "consumed": false,
+          "consumed_on_invocation_even_without_a_run_id": true,
+          "invocations": 0,
+          "regenerable": false,
+          "rerunnable": false,
+          "substitutable": false
+        },
+        "results_dir": "studies\\study3\\pilot\\p0\\results\\p0-r2",
+        "results_dir_repository_path": "studies/study3/pilot/p0/results/p0-r2"
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "canonical_p0_r2_replay_artifacts_absent",
+      "detail": {
+        "expected_names": [
+          "p0_r2_replay_result.json",
+          "p0_r2_replay_receipt.json",
+          "p0_r2_replay_counters.json",
+          "P0_R2_REPLAY_DISPOSITION.md"
+        ],
+        "found": []
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "preregistered_live_attempt_prefix_unused",
+      "detail": {
+        "host_can_reach_the_private_account": false,
+        "preregistered_attempt_id": "p0r2-g1-live-20260815-0800",
+        "query_error_is_absence": false,
+        "receipt": {
+          "attempt_id": "p0r2-g1-live-20260815-0800",
+          "execution_identity": {
+            "credential_kind": "managed-identity",
+            "environment": "cae-jspace-observation-sea-vnet2",
+            "execution": "job-jspace-s3-p0r2-prefix-g1-qm5qp8k",
+            "host_can_reach_the_private_account": false,
+            "job": "job-jspace-s3-p0r2-prefix-g1",
+            "query_error_is_absence": false,
+            "ran_inside_the_vnet": true,
+            "workload_profile": "Consumption"
+          },
+          "object_count": 0,
+          "outcome": "PROVED_UNUSED",
+          "prefix": "study3/p0_r2/g1/p0r2-g1-live-20260815-0800/",
+          "schema_version": "study3-p0-r2-prefix-preflight-v1",
+          "wrote_any_object": false
+        }
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "gpu_job_proved_absent",
+      "detail": {
+        "exit_code": 1,
+        "job": "job-jspace-s3-p0r2-pilot-g1",
+        "outcome": "PROVED_ABSENT",
+        "query_error_is_absence": false,
+        "stderr_excerpt": "WARNING: The behavior of this command has been altered by the following extension: containerapp\nERROR: (ResourceNotFound) The Resource 'Microsoft.App/jobs/job-jspace-s3-p0r2-pilot-g1' under resource group 'rg-jspace-observation-sea' was not found. For more details please go to https://aka.ms/ARMResourceNotFoundFix"
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "recovery_job_proved_absent",
+      "detail": {
+        "exit_code": 1,
+        "job": "job-jspace-s3-p0r2-recover-g1",
+        "outcome": "PROVED_ABSENT",
+        "query_error_is_absence": false,
+        "stderr_excerpt": "WARNING: The behavior of this command has been altered by the following extension: containerapp\nERROR: (ResourceNotFound) The Resource 'Microsoft.App/jobs/job-jspace-s3-p0r2-recover-g1' under resource group 'rg-jspace-observation-sea' was not found. For more details please go to https://aka.ms/ARMResourceNotFoundFix"
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "designated_packing_canary_matches_active_identity",
+      "detail": {
+        "agreement": {
+          "canary_source_commit": null,
+          "immutable_identity_agrees": true,
+          "immutable_keys_checked": [
+            "executable_commit",
+            "executable_tree",
+            "task_path",
+            "task_blob",
+            "image",
+            "digest"
+          ],
+          "live_source_commit": null,
+          "schema_version": "study3-p0-r2-canary-live-agreement-v2",
+          "source_commit_difference_requires_governance_proof": true,
+          "source_commit_may_differ": true,
+          "stage": "STUDY3-P0-R2"
+        },
+        "canary": {
+          "acr_run_id": "cmju",
+          "attempt_id": "p0r2-g1-packing-canary-20260815-0940",
+          "context_entry_count": 2,
+          "context_max_native_path_chars": 40,
+          "digest": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+          "executable_commit": "c9344c52bfbacc4f2a24010fffa534a940104140",
+          "executable_tree": "bb27933ebf42e811ec7e5a42a13d65377cdd2f5c",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+          "outcome": "PASS",
+          "p0_r1_fatal_native_path_chars": 265,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
+          "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v2.yaml"
+        },
+        "live": {
+          "digest": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+          "executable_commit": "c9344c52bfbacc4f2a24010fffa534a940104140",
+          "executable_tree": "bb27933ebf42e811ec7e5a42a13d65377cdd2f5c",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
+          "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v2.yaml"
+        }
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "native_windows_packer_paths_within_budget",
+      "detail": {
+        "context_dir": "C:\\p0r2\\pc3\\acrctx",
+        "context_max_native_path_chars": 40,
+        "entries": [
+          {
+            "chars": 40,
+            "path": "C:\\p0r2\\pc3\\acrctx\\context_manifest.json"
+          },
+          {
+            "chars": 28,
+            "path": "C:\\p0r2\\pc3\\acrctx\\task.yaml"
+          },
+          {
+            "chars": 18,
+            "path": "C:\\p0r2\\pc3\\acrctx"
+          }
+        ],
+        "limit": 240,
+        "p0_r1_fatal_length": 265,
+        "worktree_max_native_path_chars": 221
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "all_pre_replay_counters_zero",
+      "detail": {
+        "counters": {
+          "checkpoint_downloads": 0,
+          "checkpoint_loads": 0,
+          "evidence_rows_added": 0,
+          "generations": 0,
+          "gpu_allocations": 0,
+          "gpu_operations": 0,
+          "live_replay_invocations": 0,
+          "model_weight_loads": 0,
+          "pilot_executions_started": 0,
+          "prefills": 0,
+          "scored_rows": 0,
+          "tokenizer_constructions": 0,
+          "tokenizer_encodes": 0
+        },
+        "missing": [],
+        "nonzero": {}
+      },
+      "outcome": "PROVED"
+    },
+    {
+      "check": "subordinate_image_canary",
+      "detail": {
+        "note": "optional; an image-only /dev/null command is never sufficient on its own",
+        "supplied": false
+      },
+      "outcome": "PROVED"
+    }
+  ],
+  "created_updated_or_started_anything": false,
+  "generations": 0,
+  "gpu_operations": 0,
+  "image_only_dev_null_command_is_sufficient": false,
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "outcome": "HOST_PREFLIGHT_PROVED",
+  "prefills": 0,
+  "refusal_count": 0,
+  "refusals": [],
+  "root": "C:\\Users\\alanjiao\\.copilot\\repos\\copilot-worktrees\\J-space-observation\\alanjiao1988-fluffy-dollop",
+  "runs_from_a_fresh_clean_checkout": true,
+  "schema_version": "study3-p0-r2-host-preflight-v2",
+  "scored_rows": 0,
+  "stage": "STUDY3-P0-R2",
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0
+}
