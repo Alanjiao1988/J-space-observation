@@ -13,29 +13,29 @@
   "changed_since_anchor_count": 0,
   "checkpoint_downloads": 0,
   "closure_base": {
-    "commit": "dc68c3cf54ea33ae10630ab1a7698c394778d238"
+    "commit": "5e8550fa9a5299a49a3c006f92371cec3e3c75b9"
   },
   "every_post_anchor_path_in_published_closure": true,
   "every_post_anchor_path_proved_non_executable": true,
   "execution_lock": {
-    "bytes": 158469,
-    "git_blob": "9436097f46b422596bf035802c66f5b1b4c03697",
+    "bytes": 158754,
+    "git_blob": "d1d706801a079d99794341d65173ae0fb2ace64b",
     "identical_at_governance_source": true,
     "mode": "100644",
     "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.json",
-    "sha256": "3223050894967e0135f649467c0cb197dc6babdb80f2507c154bb3cdf7241582"
+    "sha256": "5c43372b8b8c629cba23c26fa64a02d1e615a8c7bff55611793db9fe8948fc88"
   },
   "generations": 0,
   "governance_source": {
-    "commit": "11e6dfb8620c30e61310f6b8faba1faf0660a8a4",
-    "tree": "5df5c1de201eae49d34b97cb8f19e25d1b850b44"
+    "commit": "ae18d34232a5740ef702648537368580509111a3",
+    "tree": "e85f5973b707bc2a50f9de63d4106f7b8f9ceea5"
   },
   "gpu_operations": 0,
   "head_equals_published": true,
   "host_bound_closure_size": 12,
   "host_closure_executable": {
-    "commit": "dc68c3cf54ea33ae10630ab1a7698c394778d238",
-    "tree": "b1e0064f65a8ec0833a4244b86ec9af5d754929a"
+    "commit": "5e8550fa9a5299a49a3c006f92371cec3e3c75b9",
+    "tree": "00a9543a950b7f8e9dd44e756049659f5a97376e"
   },
   "host_closure_paths_changed_after_freeze": [],
   "identities": [
@@ -165,12 +165,12 @@
     "studies/study3/pilot/p0_r2/p0_r2_validation_receipts_v2.json"
   ],
   "published_head": {
-    "commit": "11e6dfb8620c30e61310f6b8faba1faf0660a8a4",
-    "tree": "5df5c1de201eae49d34b97cb8f19e25d1b850b44"
+    "commit": "ae18d34232a5740ef702648537368580509111a3",
+    "tree": "e85f5973b707bc2a50f9de63d4106f7b8f9ceea5"
   },
   "ready_anchor": {
-    "commit": "11e6dfb8620c30e61310f6b8faba1faf0660a8a4",
-    "tree": "5df5c1de201eae49d34b97cb8f19e25d1b850b44"
+    "commit": "ae18d34232a5740ef702648537368580509111a3",
+    "tree": "e85f5973b707bc2a50f9de63d4106f7b8f9ceea5"
   },
   "schema_version": "study3-p0-r2-governance-chain-proof-v2",
   "scored_rows": 0,
