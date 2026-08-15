@@ -15,6 +15,10 @@
       "cmk1",
       "cmk4"
     ],
+    "cpu-validation": [
+      "cmk5",
+      "cmk6"
+    ],
     "model-capable": [],
     "replay-capable": [
       "cmjv"
@@ -133,7 +137,7 @@
   "generation2_gpu_capable_runs": 0,
   "generation2_model_capable_runs": 0,
   "generation2_replay_capable_runs": 0,
-  "generation2_run_count": 8,
+  "generation2_run_count": 10,
   "gpu_operations": 0,
   "imported_historical_count": 45,
   "imported_historical_sealed": 45,
@@ -145,7 +149,7 @@
     "cmjv"
   ],
   "resource_group": "rg-jspace-observation-sea",
-  "run_count": 54,
+  "run_count": 56,
   "runs": [
     {
       "azure_retains_log": true,
@@ -2102,10 +2106,60 @@
       "sealed": true,
       "start_time": "2026-08-15T17:51:11.561803+00:00",
       "status": "ACCEPTED"
+    },
+    {
+      "azure_status": null,
+      "could_have_entered_gpu_code": false,
+      "could_have_entered_model_code": false,
+      "could_have_entered_replay_code": false,
+      "entered_replay_gate": false,
+      "executable_commit": null,
+      "finish_time": null,
+      "generation": 2,
+      "image_digest": null,
+      "kind": "cpu-validation",
+      "log": {
+        "available": true,
+        "bytes": 44545,
+        "sha256": "7887cc9d21ed45dc2aec191b40520f6e605a65527439867c75ac6b79c59e27e6"
+      },
+      "mode": "validation",
+      "model_operations_performed": 0,
+      "note": "full differential suite; refused on one new failure in the additive suite's own launch-path test",
+      "origin": "generation-2",
+      "run_id": "cmk5",
+      "sealed": true,
+      "start_time": null,
+      "status": "FAILED_DISCARDED"
+    },
+    {
+      "azure_status": null,
+      "could_have_entered_gpu_code": false,
+      "could_have_entered_model_code": false,
+      "could_have_entered_replay_code": false,
+      "entered_replay_gate": false,
+      "executable_commit": null,
+      "finish_time": null,
+      "generation": 2,
+      "image_digest": null,
+      "kind": "cpu-validation",
+      "log": {
+        "available": true,
+        "bytes": 42880,
+        "sha256": "688d3a4e8d4e2991ed3cb7f4710f76fe1ebe7b2615f13cb9654422d3058ddbb3"
+      },
+      "mode": "validation",
+      "model_operations_performed": 0,
+      "note": "full differential suite; 0 new failures, 0 collection errors, exactly the four registered standing failures on both sides",
+      "origin": "generation-2",
+      "run_id": "cmk6",
+      "sealed": true,
+      "start_time": null,
+      "status": "ACCEPTED"
     }
   ],
   "schema_version": "study3-p0-r2-attempt-ledger-g2",
-  "sealed_count": 54,
+  "sealed_count": 56,
   "stage": "STUDY3-P0-R2",
   "subscription": "943bacdf-8b6e-4e3a-8126-a149f623d32e",
   "tokenizer_constructions": 0,

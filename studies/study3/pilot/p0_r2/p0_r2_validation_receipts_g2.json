@@ -1,0 +1,96 @@
+{
+  "checkpoint_downloads": 0,
+  "focused_suite": {
+    "exit_code_captured_directly": true,
+    "failed": 0,
+    "files": [
+      "tests/test_study3_p0_r1_execution_readiness.py",
+      "tests/test_study3_p0_r1_generation2_transport.py",
+      "tests/test_study3_p0_r1_generation3_execution_closure.py",
+      "tests/test_study3_p0_r1_registration.py",
+      "tests/test_study3_p0_r2_acr_submission.py",
+      "tests/test_study3_p0_r2_corrective_closure_v2.py",
+      "tests/test_study3_p0_r2_execution_closure.py",
+      "tests/test_study3_p0_r2_generation2_closure.py",
+      "tests/test_study3_p0_r2_submission_context.py",
+      "tests/test_study3_p0_r2_transport_primitives.py"
+    ],
+    "host": "windows-authoring-host",
+    "passed": 578,
+    "piped_into_a_process_that_could_hide_status": false,
+    "pytest_exit_code": 0,
+    "skipped": 1
+  },
+  "full_differential_suite": {
+    "acr_run_id": "cmk6",
+    "baseline": "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5",
+    "baseline_counts": {
+      "error": 0,
+      "failed": 4,
+      "passed": 4796,
+      "skipped": 15,
+      "xfailed": 0,
+      "xpassed": 0
+    },
+    "closure": "registered linux closure, requirements.lock.txt",
+    "corrected": "64e2d7836b876d0a9c19e79a09dc3343ebe39e2b",
+    "corrected_counts": {
+      "error": 0,
+      "failed": 4,
+      "passed": 4872,
+      "skipped": 15,
+      "xfailed": 0,
+      "xpassed": 0
+    },
+    "fixed_failures": [],
+    "log_bytes": 42880,
+    "log_sha256": "688d3a4e8d4e2991ed3cb7f4710f76fe1ebe7b2615f13cb9654422d3058ddbb3",
+    "net_new_passing": 76,
+    "new_failure_count": 0,
+    "new_failures": [],
+    "outcome": "PASS",
+    "pytest_status_captured_directly": true,
+    "registered_standing_failures": [
+      "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+      "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+      "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+      "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+    ],
+    "shared_failures": [
+      "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+      "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+      "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+      "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+    ],
+    "signatures_agree": true,
+    "signatures_disagreeing_on_shared_failures": [],
+    "standing_failures_are_the_registered_four": true,
+    "superseded_run_id": "cmk5",
+    "zero_collection_errors": true
+  },
+  "generation": 2,
+  "gpu_operations": 0,
+  "host_preflight": {
+    "condition_count": 17,
+    "failed_count": 0,
+    "first_checkout": "PREFLIGHT_PASS",
+    "fresh_checkout_path_length": 15,
+    "second_fresh_short_path_checkout": "PREFLIGHT_PASS"
+  },
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "one_shot_envelope_consumed": false,
+  "replay_gate_invoked": false,
+  "schema_version": "study3-p0-r2-validation-receipts-g2",
+  "stage": "STUDY3-P0-R2",
+  "superseded_differential": {
+    "acr_run_id": "cmk5",
+    "new_failure_count": 1,
+    "new_failures": [
+      "tests/test_study3_p0_r2_generation2_closure.py::test_the_launch_proof_records_the_exact_resolved_program"
+    ],
+    "outcome": "REFUSED",
+    "reason": "the additive suite's own launch-path test asserted a basename PosixPath cannot split out of a Windows path"
+  },
+  "tokenizer_constructions": 0
+}
