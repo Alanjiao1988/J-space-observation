@@ -693,6 +693,50 @@ def test_the_image_manifest_covers_every_operational_and_scientific_module():
         assert (ROOT / path).is_file()
 
 
+def test_the_image_manifest_also_binds_the_installed_entry_points():
+    # The entry points carry the refusals, so an unaudited entry point would
+    # let the image's behaviour drift from Git while the audit still passed.
+    assert IMAGE.ENTRYPOINT_PATHS
+    for path in IMAGE.ENTRYPOINT_PATHS:
+        assert path.startswith("studies/study3/pilot/p0_r2/container/")
+        assert path.endswith(".sh")
+        assert (ROOT / path).is_file()
+
+
+def test_the_image_audit_refuses_a_tampered_entry_point(tmp_path):
+    src, install = tmp_path / "src", tmp_path / "bin"
+    install.mkdir()
+    manifest = {
+        "schema_version": IMAGE.SCHEMA_VERSION,
+        "image_root": str(src),
+        "entrypoint_install_root": str(install),
+        "entries": [{"kind": "entrypoint",
+                     "path": "studies/study3/pilot/p0_r2/container/x.sh",
+                     "install_name": "x.sh", "bytes": 3,
+                     "sha256": "0" * 64, "git_blob": "1" * 40,
+                     "image_path": "/usr/local/bin/x.sh"}],
+    }
+    (install / "x.sh").write_text("abc")
+    with pytest.raises(IMAGE.ImageManifestDefect):
+        IMAGE.audit(manifest, image_root=src, install_root=install)
+
+
+def test_the_image_audit_refuses_a_missing_entry_point(tmp_path):
+    manifest = {
+        "schema_version": IMAGE.SCHEMA_VERSION,
+        "image_root": str(tmp_path),
+        "entrypoint_install_root": str(tmp_path / "absent"),
+        "entries": [{"kind": "entrypoint",
+                     "path": "studies/study3/pilot/p0_r2/container/x.sh",
+                     "install_name": "x.sh", "bytes": 3,
+                     "sha256": "0" * 64, "git_blob": "1" * 40,
+                     "image_path": "/usr/local/bin/x.sh"}],
+    }
+    with pytest.raises(IMAGE.ImageManifestDefect):
+        IMAGE.audit(manifest, image_root=tmp_path,
+                    install_root=tmp_path / "absent")
+
+
 def test_the_image_audit_refuses_when_a_carried_byte_differs(tmp_path):
     manifest = {
         "schema_version": IMAGE.SCHEMA_VERSION,

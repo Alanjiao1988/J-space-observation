@@ -67,6 +67,23 @@ SCIENTIFIC_PATHS = (
 #: whole checkout.
 IMAGE_ROOT = "/opt/jspace/src"
 
+#: The entry points are the surface that actually launches everything, and
+#: they are the bytes that hold the refusals: no live replay, no envelope
+#: consumption, no model operation. Auditing only the Python modules would
+#: leave that surface free to drift from Git while the audit still reported
+#: success, so the installed scripts are bound too. They are installed flat
+#: into ``/usr/local/bin``, not under the image root, so each entry records
+#: where it was installed as well as where Git keeps it.
+ENTRYPOINT_INSTALL_ROOT = "/usr/local/bin"
+
+ENTRYPOINT_PATHS = (
+    "studies/study3/pilot/p0_r2/container/p0_r2_successor_v1.sh",
+    "studies/study3/pilot/p0_r2/container/p0_r2_canary_v1.sh",
+    "studies/study3/pilot/p0_r2/container/p0_r2_replay_v1.sh",
+    "studies/study3/pilot/p0_r2/container/p0_r2_model_pilot_v1.sh",
+    "studies/study3/pilot/p0_r2/container/p0_r2_recovery_v1.sh",
+)
+
 SCHEMA_VERSION = "study3-p0-r2-image-manifest-v1"
 STAGE = "STUDY3-P0-R2"
 MANIFEST_NAME = "p0_r2_image_manifest_v1.json"
@@ -98,7 +115,8 @@ def build(root=None, *, commit="HEAD") -> dict:
 
     entries = []
     for kind, paths in (("operational", OPERATIONAL_PATHS),
-                        ("scientific", SCIENTIFIC_PATHS)):
+                        ("scientific", SCIENTIFIC_PATHS),
+                        ("entrypoint", ENTRYPOINT_PATHS)):
         for path in paths:
             payload = subprocess.run(
                 ["git", "-C", str(root), "show", "%s:%s" % (resolved, path)],
@@ -107,14 +125,21 @@ def build(root=None, *, commit="HEAD") -> dict:
                 raise ImageManifestDefect(
                     "%s is absent at %s; the image cannot carry it"
                     % (path, resolved[:12]))
-            entries.append({
+            entry = {
                 "kind": kind,
                 "path": path,
                 "image_path": "%s/%s" % (IMAGE_ROOT, path),
                 "bytes": len(payload),
                 "sha256": _sha256(payload),
                 "git_blob": _git(root, "rev-parse", "%s:%s" % (resolved, path)),
-            })
+            }
+            if kind == "entrypoint":
+                # The Dockerfile flattens ``entrypoints/`` into a single
+                # directory, so the audited location is the installed name.
+                entry["install_name"] = path.rsplit("/", 1)[-1]
+                entry["image_path"] = "%s/%s" % (ENTRYPOINT_INSTALL_ROOT,
+                                                 entry["install_name"])
+            entries.append(entry)
 
     entries.sort(key=lambda entry: entry["path"])
     canonical = json.dumps(entries, sort_keys=True,
@@ -125,8 +150,10 @@ def build(root=None, *, commit="HEAD") -> dict:
         "executable_commit": resolved,
         "executable_tree": tree,
         "image_root": IMAGE_ROOT,
+        "entrypoint_install_root": ENTRYPOINT_INSTALL_ROOT,
         "operational_count": len(OPERATIONAL_PATHS),
         "scientific_count": len(SCIENTIFIC_PATHS),
+        "entrypoint_count": len(ENTRYPOINT_PATHS),
         "entry_count": len(entries),
         "entries": entries,
         "entries_sha256": _sha256(canonical),
@@ -135,24 +162,32 @@ def build(root=None, *, commit="HEAD") -> dict:
     }
 
 
-def audit(manifest, *, image_root=None) -> dict:
+def audit(manifest, *, image_root=None, install_root=None) -> dict:
     """Refuse unless every carried byte in the image matches the manifest."""
     if not isinstance(manifest, dict) \
             or manifest.get("schema_version") != SCHEMA_VERSION:
         raise ImageManifestDefect("the manifest is not a P0-R2 image manifest")
     base = Path(image_root or manifest.get("image_root") or IMAGE_ROOT)
+    installed = Path(install_root
+                     or manifest.get("entrypoint_install_root")
+                     or ENTRYPOINT_INSTALL_ROOT)
     checked, defects = [], []
     for entry in manifest.get("entries") or []:
-        target = base / entry["path"]
+        if entry.get("kind") == "entrypoint":
+            name = entry.get("install_name") or entry["path"].rsplit("/", 1)[-1]
+            target, label = installed / name, "%s (installed as %s)" % (
+                entry["path"], name)
+        else:
+            target, label = base / entry["path"], entry["path"]
         if not target.is_file():
-            defects.append("%s is missing from the image" % entry["path"])
+            defects.append("%s is missing from the image" % label)
             continue
         payload = target.read_bytes()
         digest = _sha256(payload)
         if digest != entry["sha256"] or len(payload) != entry["bytes"]:
             defects.append(
                 "%s carries %s (%d bytes), not the bound %s (%d bytes)"
-                % (entry["path"], digest[:12], len(payload),
+                % (label, digest[:12], len(payload),
                    entry["sha256"][:12], entry["bytes"]))
             continue
         checked.append(entry["path"])
@@ -178,8 +213,10 @@ def implementation_identity() -> dict:
         "stage": STAGE,
         "manifest_name": MANIFEST_NAME,
         "image_root": IMAGE_ROOT,
+        "entrypoint_install_root": ENTRYPOINT_INSTALL_ROOT,
         "operational_count": len(OPERATIONAL_PATHS),
         "scientific_count": len(SCIENTIFIC_PATHS),
+        "entrypoint_count": len(ENTRYPOINT_PATHS),
         "model_operations_performed": 0,
     }
 
@@ -193,6 +230,7 @@ def main(argv=None) -> int:
     parser.add_argument("--commit", default="HEAD")
     parser.add_argument("--root")
     parser.add_argument("--image-root")
+    parser.add_argument("--install-root")
     parser.add_argument("--out")
     args = parser.parse_args(argv)
 
@@ -204,7 +242,8 @@ def main(argv=None) -> int:
             document = build(args.root, commit=args.commit)
         else:
             manifest = json.loads(Path(args.audit).read_text(encoding="utf-8"))
-            document = audit(manifest, image_root=args.image_root)
+            document = audit(manifest, image_root=args.image_root,
+                             install_root=args.install_root)
     except ImageManifestDefect as exc:
         print("P0_R2_IMAGE_MANIFEST_REFUSED=1 %s" % exc, file=sys.stderr)
         return 3

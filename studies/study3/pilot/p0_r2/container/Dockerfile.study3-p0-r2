@@ -56,10 +56,13 @@ USER 10001
 
 ENV PYTHONPATH=${P0_R2_SRC}/studies/study3/pilot/p0_r2:${P0_R2_SRC}/studies/study3/pilot/p0_r1
 
-# Fail the build if the image does not carry exactly the bytes Git holds.
+# Fail the build if the image does not carry exactly the bytes Git holds --
+# both the Python modules under the image root and the entry points that were
+# flattened into /usr/local/bin.
 RUN python3 ${P0_R2_SRC}/studies/study3/pilot/p0_r2/p0_r2_image_manifest_v1.py \
         --audit /opt/jspace/p0_r2_image_manifest_v1.json \
-        --image-root ${P0_R2_SRC}
+        --image-root ${P0_R2_SRC} \
+        --install-root /usr/local/bin
 
 # No default command. Every entry point is named explicitly by the caller, so
 # an image that is started by accident does nothing at all.
