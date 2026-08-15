@@ -1,0 +1,39 @@
+# Study 3 P0-R2 corrective closure: truthful standing-failure baseline (A3).
+#
+# One exact commit, one container, one registered dependency closure. The task
+# clones the commit from an uploaded one-file git bundle, so the Azure CLI
+# packer never walks a repository tree -- the step that stopped P0-R1.
+#
+# This task validates; it never executes the stage. Zero tokenizer
+# constructions, zero encodes, zero checkpoint downloads, zero model weight
+# loads, zero GPU operations. The replay gate is never invoked and the one-shot
+# envelope is never opened.
+version: v1.1.0
+steps:
+  - id: checkout
+    cmd: >-
+      python:3.11-bookworm
+      bash /workspace/p0_r2_full_suite_checkout_v5.sh {{.Values.BASELINE}}
+    timeout: 900
+  - id: baseline
+    cmd: >-
+      python:3.11-bookworm
+      bash /workspace/p0_r2_baseline_signatures_v2.sh BASELINE /workspace/base
+    timeout: 7200
+boundary:
+  stage: STUDY3-P0-R2
+  context_is_a_single_git_bundle_plus_validation_inputs: true
+  checkout_is_a_fresh_clone_of_an_exact_commit: true
+  suite_runs_in_the_registered_dependency_closure: true
+  pytest_status_is_captured_directly: true
+  pytest_summary_is_independently_reconciled: true
+  gpu_workload_allocated: false
+  replay_gate_invoked: false
+  one_shot_envelope_opened: false
+  tokenizer_constructions: 0
+  tokenizer_encodes: 0
+  checkpoint_downloads: 0
+  model_weight_loads: 0
+  model_operations_performed: 0
+  required_values:
+    - BASELINE
