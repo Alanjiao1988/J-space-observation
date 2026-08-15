@@ -21,6 +21,7 @@ Model-free: no tokenizer, checkpoint, model weight, GPU or scoring operation.
 from __future__ import annotations
 
 import argparse
+import datetime
 import hashlib
 import json
 from pathlib import Path
@@ -86,7 +87,9 @@ def build(root=None, *, lock_file, canary_receipts, attempt_ledger,
     lock = json.loads(lock_payload.decode("utf-8"))
     canaries = _read(canary_receipts)
     ledger = _read(attempt_ledger)
-    differential_document = _read(differential) if differential else None
+    validation = _read(differential) if differential else None
+    differential_document = ((validation or {}).get("full_differential_suite")
+                             if validation else None)
     preflight = _read(host_preflight) if host_preflight else None
 
     head = (_git(root, ["rev-parse", "HEAD"]) or "").strip() or None
@@ -137,10 +140,29 @@ def build(root=None, *, lock_file, canary_receipts, attempt_ledger,
     if generation2_start_times and all(generation2_start_times):
         earliest_generation2 = min(generation2_start_times)
 
-    def _authority_precedes_azure():
-        if not authority_time or earliest_generation2 is None:
+    def _instant(value):
+        if not value or not isinstance(value, str):
             return None
-        return authority_time < earliest_generation2
+        text = value.strip()
+        if text.endswith("Z"):
+            text = text[:-1] + "+00:00"
+        try:
+            parsed = datetime.datetime.fromisoformat(text)
+        except ValueError:
+            return None
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=datetime.timezone.utc)
+        return parsed.astimezone(datetime.timezone.utc)
+
+    def _authority_precedes_azure():
+        # Compared as instants. The authority commit carries the authoring
+        # host's UTC offset and Azure reports +00:00, so a string comparison
+        # would silently answer a different question.
+        published = _instant(authority_time)
+        earliest = _instant(earliest_generation2)
+        if published is None or earliest is None:
+            return None
+        return published < earliest
 
     prefix_canary = ((canaries or {}).get("in_vnet_prefix_canary") or {})
     packing = ((canaries or {}).get("acr_packing_and_pre_gate_canary") or {})
