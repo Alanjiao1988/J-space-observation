@@ -120,6 +120,28 @@ def build(root=None, *, lock_file, canary_receipts, attempt_ledger,
         except Exception:  # noqa: BLE001
             absence = None
 
+    authority_commit = None
+    authority_time = None
+    if chain is not None:
+        authority_commit = chain["authority_first_proof"]["first_commit"]
+        raw = _git(root, ["show", "-s", "--format=%cI", authority_commit])
+        authority_time = (raw or "").strip() or None
+
+    generation2_start_times = []
+    if ledger is not None:
+        for run in ledger.get("runs", []):
+            if run.get("generation") != 2:
+                continue
+            generation2_start_times.append(run.get("start_time"))
+    earliest_generation2 = None
+    if generation2_start_times and all(generation2_start_times):
+        earliest_generation2 = min(generation2_start_times)
+
+    def _authority_precedes_azure():
+        if not authority_time or earliest_generation2 is None:
+            return None
+        return authority_time < earliest_generation2
+
     prefix_canary = ((canaries or {}).get("in_vnet_prefix_canary") or {})
     packing = ((canaries or {}).get("acr_packing_and_pre_gate_canary") or {})
     hardkill = ((canaries or {})
@@ -152,10 +174,7 @@ def build(root=None, *, lock_file, canary_receipts, attempt_ledger,
             else chain["authority_first_proof"][
                 "authority_was_the_first_committed_object"]),
         "2_authority_published_before_any_generation2_azure_operation":
-            condition(None if ledger is None else all(
-                run.get("generation") != 2
-                or run.get("start_time", "") >= "2026-08-15T16:0"
-                for run in ledger.get("runs", []))),
+            condition(_authority_precedes_azure()),
         "3_p0_r1_terminal_and_byte_unchanged": condition(
             None if chain is None
             else chain["conditions"]["p0_r1_remains_terminal"]
@@ -285,6 +304,9 @@ def build(root=None, *, lock_file, canary_receipts, attempt_ledger,
         "origin_main": origin,
         "ready_anchor": ready_anchor,
         "lock_sha256": _sha256(lock_payload),
+        "authority_commit": authority_commit,
+        "authority_committed_at": authority_time,
+        "earliest_generation2_azure_start": earliest_generation2,
         "image_digest": (lock.get("image") or {}).get("digest"),
         "live_attempt_id": namespace.get("live_replay_attempt_id"),
         "pilot_attempt_id": namespace.get("pilot_attempt_id"),

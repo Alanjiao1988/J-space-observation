@@ -2108,13 +2108,13 @@
       "status": "ACCEPTED"
     },
     {
-      "azure_status": null,
+      "azure_status": "Failed",
       "could_have_entered_gpu_code": false,
       "could_have_entered_model_code": false,
       "could_have_entered_replay_code": false,
       "entered_replay_gate": false,
       "executable_commit": null,
-      "finish_time": null,
+      "finish_time": "2026-08-15T18:27:09.736097+00:00",
       "generation": 2,
       "image_digest": null,
       "kind": "cpu-validation",
@@ -2129,17 +2129,17 @@
       "origin": "generation-2",
       "run_id": "cmk5",
       "sealed": true,
-      "start_time": null,
+      "start_time": "2026-08-15T17:57:50.874136+00:00",
       "status": "FAILED_DISCARDED"
     },
     {
-      "azure_status": null,
+      "azure_status": "Succeeded",
       "could_have_entered_gpu_code": false,
       "could_have_entered_model_code": false,
       "could_have_entered_replay_code": false,
       "entered_replay_gate": false,
       "executable_commit": null,
-      "finish_time": null,
+      "finish_time": "2026-08-15T18:57:48.777375+00:00",
       "generation": 2,
       "image_digest": null,
       "kind": "cpu-validation",
@@ -2154,7 +2154,7 @@
       "origin": "generation-2",
       "run_id": "cmk6",
       "sealed": true,
-      "start_time": null,
+      "start_time": "2026-08-15T18:28:53.349079+00:00",
       "status": "ACCEPTED"
     }
   ],
