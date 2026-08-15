@@ -1,0 +1,55 @@
+{
+  "authorization_outcome": null,
+  "authorization_refusal": "AuthorizationDefect: the lock state None is not the ready-awaiting-replay state",
+  "checkpoint_downloads": 0,
+  "condition_count": 11,
+  "conditions": {
+    "all_four_canonical_artifacts_reconstructed_from_raw_bytes": true,
+    "exactly_one_acr_run_id_exists": true,
+    "image_lock_science_task_and_authority_unchanged": true,
+    "pilot_authorization_receipt_is_generated_mechanically": false,
+    "replay_counters_contain_zero_model_or_gpu_operations": true,
+    "replay_evidence_and_head_proof_published": true,
+    "replay_gate_invoked_exactly_once": true,
+    "replay_invoked_exactly_once": true,
+    "replay_outcome_is_the_registered_pass": true,
+    "strict_receipt_validation_passes": true,
+    "the_registered_runner_can_perform_a_bounded_model_operation": false
+  },
+  "evidence_ledger_tail": "EV-0016",
+  "evidence_rows_added": 0,
+  "failed_conditions": [
+    "pilot_authorization_receipt_is_generated_mechanically",
+    "the_registered_runner_can_perform_a_bounded_model_operation"
+  ],
+  "failed_count": 2,
+  "formal_execution_authorized": false,
+  "generation": 2,
+  "gpu_allocations": 0,
+  "gpu_job": "job-jspace-s3-p0r2-pilot-g2",
+  "gpu_job_created": false,
+  "gpu_job_started": false,
+  "gpu_operations": 0,
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "pilot_attempt_id": "p0r2-g2-pilot-20260815-1700",
+  "recovery_job": "job-jspace-s3-p0r2-recover-g2",
+  "recovery_job_created": false,
+  "registered_runner": {
+    "cli_modes": [
+      "--identity",
+      "--sentinel"
+    ],
+    "default_executor": "sentinel",
+    "module": "p0_r2_model_runner_v1.py",
+    "note": "the inherited generation-1 runner exposes only --identity and --sentinel; its production_executor is a library function that no entry point invokes, so the pinned image cannot perform a bounded model operation without changing reused logic, which section 5 forbids",
+    "production_executor_reachable_from_any_entry_point": false
+  },
+  "research_question_answered": false,
+  "schema_version": "study3-p0-r2-pilot-disposition-g2",
+  "scored_rows": 0,
+  "stage": "STUDY3-P0-R2",
+  "state": "STOP_NO_MODEL_OPERATION",
+  "tokenizer_constructions": 0,
+  "why_no_job_was_created": "Section 14 authorizes the bounded T4 pilot only if every condition is true. Two are false and both are machine-derived, not asserted. First, the pilot authorization receipt cannot be generated mechanically: the frozen p0_r2_authorization_v1.build reads lock['state'], and the generation-2 lock publishes its terminal state under 'terminal_state', so the authorization refuses. Second, the registered runner's production executor is unreachable from any entry point the image carries. Repairing either would mean editing reused logic or resealing a ready anchor the already-consumed replay is bound to, and section 11 forbids repairing the gate in place after invocation."
+}

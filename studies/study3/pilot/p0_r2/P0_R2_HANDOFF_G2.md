@@ -1,6 +1,12 @@
 # P0-R2 cross-session handoff, generation 2
 
-> **Entry state:** see the terminal state recorded at the end of this document.
+> **Terminal state:** `STOP_NO_MODEL_OPERATION`.
+>
+> The generation-2 live replay **passed** and was independently
+> reconstructed from its raw log. The bounded T4 pilot was **not**
+> authorized: no GPU job was created or started and no model operation was
+> performed. The generation-2 one-shot replay envelope is **consumed** and
+> must never be reopened.
 > Generation 2 is a **new, disjoint execution** of the P0-R2 infrastructure
 > successor. It does not reopen P0-R1 and it does not reopen P0-R2 generation 1.
 > Both remain terminal, consumed and byte-unchanged.
@@ -198,3 +204,41 @@ This publication did not run the live replay gate, create or start the
 generation-2 GPU job, allocate any GPU workload, construct a tokenizer, download
 or load a checkpoint, load a model weight, perform a model operation, select an
 interface, set a threshold, freeze a draft, or add an evidence row.
+
+## 10. Segment B: what actually happened
+
+| step | identity | result |
+| --- | --- | --- |
+| inter-segment admission gate | fresh checkout at `59a52bc…` | `P0_R2_G2_PHASE_B_AUTHORIZED=1`, 38 conditions, 0 failed, 0 underived |
+| final live-prefix proof | ACA `job-jspace-s3-p0r2-prefix-g2-4l4b68i` | `study3/p0_r2/g2/p0r2-g2-live-20260815-1700/` `PROVED_UNUSED`, `object_count 0` |
+| **one live replay** | ACR `cmk7` | **PASS** — exactly one run id, exit 0, gate invoked exactly once, envelope consumed |
+| independent reconstruction | captured raw log only | 4 of 4 canonical artifacts, 0 repairs, 18 of 18 strict checks pass |
+| bounded T4 pilot | — | **not authorized**; no job created, no job started, 0 model operations |
+
+The live path did exactly what generation 1 could not: it validated a bound,
+host-verified in-VNet prefix receipt, printed
+`P0_R2_PREFIX_PROOF_DEFERRED_TO_HOST=1` exactly once, made no managed-identity
+or Storage call, and reached the replay gate.
+
+### Why the bounded pilot stopped
+
+Two section-14 conditions are false, and both are derived, not asserted:
+
+1. **The pilot authorization receipt cannot be generated mechanically.** The
+   frozen `p0_r2_authorization_v1.build` reads `lock["state"]`. The generation-2
+   lock publishes its terminal state under `terminal_state`, following the v2
+   lock's own field name, so the authorization refuses.
+2. **The registered runner cannot perform a bounded model operation.**
+   `p0_r2_model_runner_v1` exposes only `--identity` and `--sentinel`, and the
+   sentinel performs no model work by construction. Its `production_executor` is
+   a library function that no entry point in the image invokes.
+
+Repairing either would mean editing reused logic, which section 5 forbids, or
+resealing a ready anchor that the already-consumed replay is bound to, which
+section 11 forbids. The truthful stop is therefore `STOP_NO_MODEL_OPERATION`,
+published in `studies/study3/pilot/p0/results/p0-r2-g2/`.
+
+A successor authority that wants the bounded pilot must decide, explicitly,
+whether the generation-2 lock should also publish `state`, and whether the
+registered runner should expose a production entry point. Neither decision
+belongs to this authority.
