@@ -27,24 +27,44 @@ from pathlib import Path
 import re
 import sys
 
+import p0_r2_blob_transport as BLOB
+
 
 SCHEMA_VERSION = "study3-p0-r2-job-spec-v1"
 STAGE = "STUDY3-P0-R2"
 
 GPU_JOB = "job-jspace-s3-p0r2-pilot-g1"
 RECOVERY_JOB = "job-jspace-s3-p0r2-recover-g1"
-BLOB_PREFIX_ROOT = "study3/p0_r2/g1/"
 RECOVERY_MODES = ("prefix-preflight", "recover")
 
 SUBSCRIPTION = "943bacdf-8b6e-4e3a-8126-a149f623d32e"
 RESOURCE_GROUP = "rg-jspace-observation-sea"
 ENVIRONMENT = "cae-jspace-observation-sea-vnet2"
-IDENTITY = (
-    "/subscriptions/%s/resourcegroups/%s/providers/Microsoft.ManagedIdentity"
-    "/userAssignedIdentities/id-jspace-aca-acrpull-sea"
-    % (SUBSCRIPTION, RESOURCE_GROUP))
-STORAGE_ACCOUNT = "stjspaceobssea0708231738"
-BLOB_CONTAINER = "jspace-study3-runtime"
+
+# The storage identity is *derived*, never restated. A rendered job tells the
+# container where to write its results, and the transport module decides where
+# it actually writes. Two hand-maintained copies of that answer can drift, and
+# the drift would only surface at the first result write -- which happens after
+# the one-shot replay envelope has already been consumed, so it could not be
+# retried. Deriving them makes the disagreement impossible instead.
+IDENTITY = BLOB.IDENTITY_RESOURCE_ID
+STORAGE_ACCOUNT = BLOB.ACCOUNT
+BLOB_CONTAINER = BLOB.CONTAINER
+BLOB_PREFIX_ROOT = "%s/" % BLOB.PREFIX_ROOT.rstrip("/")
+
+# A Container Apps environment with workload profiles places any job that does
+# not name one on the default Consumption profile, which has no accelerator. A
+# GPU pilot rendered without a profile name would therefore be created as a CPU
+# job and fail its own accelerator guard -- after the one-shot replay envelope
+# had been consumed. These values are the reviewed P0-R1 generation-3 ones, and
+# a test holds them to that file so they cannot drift away from it.
+GPU_WORKLOAD_PROFILE = "gpu-t4"
+CPU_WORKLOAD_PROFILE = "Consumption"
+
+#: Allocatable to a single replica on the gpu-t4 profile. Asking for the whole
+#: node instead would be rejected at creation time.
+GPU_RESOURCES = {"cpu": 4.0, "memory": "28Gi"}
+CPU_RESOURCES = {"cpu": 2.0, "memory": "4Gi"}
 
 _DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
 _ATTEMPT = re.compile(r"^p0r2-g1-[0-9A-Za-z-]{1,96}$")
@@ -109,6 +129,7 @@ def recovery_spec(mode: str, *, name: str = RECOVERY_JOB, image: str,
                      "userAssignedIdentities": {IDENTITY: {}}},
         "properties": {
             "environmentId": ENVIRONMENT,
+            "workloadProfileName": CPU_WORKLOAD_PROFILE,
             "configuration": {
                 "triggerType": "Manual",
                 "replicaTimeout": 3600,
@@ -123,7 +144,7 @@ def recovery_spec(mode: str, *, name: str = RECOVERY_JOB, image: str,
                     "name": "recover",
                     "image": image,
                     "command": ["/usr/local/bin/p0_r2_recovery_v1.sh"],
-                    "resources": {"cpu": 2.0, "memory": "4Gi"},
+                    "resources": dict(CPU_RESOURCES),
                     "env": env,
                 }],
             },
@@ -160,6 +181,7 @@ def gpu_spec(*, name: str = GPU_JOB, image: str, attempt: str,
                      "userAssignedIdentities": {IDENTITY: {}}},
         "properties": {
             "environmentId": ENVIRONMENT,
+            "workloadProfileName": GPU_WORKLOAD_PROFILE,
             "configuration": {
                 "triggerType": "Manual",
                 "replicaTimeout": 7200,
@@ -176,7 +198,7 @@ def gpu_spec(*, name: str = GPU_JOB, image: str, attempt: str,
                     "name": "pilot",
                     "image": image,
                     "command": ["/usr/local/bin/p0_r2_model_pilot_v1.sh"],
-                    "resources": {"cpu": 8.0, "memory": "56Gi"},
+                    "resources": dict(GPU_RESOURCES),
                     "env": [
                         {"name": "P0_R2_ATTEMPT", "value": attempt},
                         {"name": "P0_R2_IMAGE_DIGEST", "value": digest},

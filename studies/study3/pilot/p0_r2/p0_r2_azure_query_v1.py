@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
 
@@ -33,6 +34,14 @@ GPU_JOB = "job-jspace-s3-p0r2-pilot-g1"
 RECOVERY_JOB = "job-jspace-s3-p0r2-recover-g1"
 BLOB_PREFIX_ROOT = "study3/p0_r2/g1/"
 
+#: Roles that actually permit a blob write. Ownership of the account (a control
+#: plane role such as Owner or Contributor) does not grant data plane access, so
+#: it must not be accepted here.
+BLOB_DATA_ROLES = (
+    "Storage Blob Data Contributor",
+    "Storage Blob Data Owner",
+)
+
 #: Substrings that prove Azure understood the request and reported absence.
 _ABSENCE_MARKERS = (
     "ResourceNotFound",
@@ -40,6 +49,11 @@ _ABSENCE_MARKERS = (
     "could not be found",
     "NotFound",
 )
+
+#: Emitted by the runner when the Azure CLI could not be started at all. A host
+#: that cannot launch the CLI has learned nothing about Azure, so this must be
+#: read as an ambiguity and never as an absence.
+LAUNCH_FAILURE_MARKER = "P0_R2_AZURE_CLI_LAUNCH_FAILED"
 
 #: Substrings that prove the answer is an authorization or transport problem
 #: rather than an absence. These must never be read as "not there".
@@ -54,6 +68,7 @@ _AMBIGUITY_MARKERS = (
     "ServiceUnavailable",
     "GatewayTimeout",
     "Forbidden",
+    LAUNCH_FAILURE_MARKER,
 )
 
 _SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
@@ -70,8 +85,23 @@ def _require_name(value, label):
 
 
 def _default_runner(command):
-    return subprocess.run(  # noqa: S603 - fixed executable
-        command, capture_output=True, text=True, check=False)
+    # subprocess does not apply PATHEXT, so a bare "az" cannot be launched on
+    # Windows, where the Azure CLI ships as az.cmd. Resolve the program the way
+    # a shell would, and keep the original name as the fallback so an absolute
+    # path or a POSIX host behaves exactly as before.
+    program = shutil.which(command[0]) or command[0]
+    try:
+        return subprocess.run(  # noqa: S603 - fixed executable
+            [program] + list(command[1:]), capture_output=True, text=True,
+            check=False)
+    except OSError as exc:
+        # A host that could not start the CLI has not observed Azure at all.
+        # Returning a synthetic ambiguous answer keeps the single rule of this
+        # module intact -- a query error is never an absence -- where raising
+        # would abandon the receipt and report nothing at all.
+        return subprocess.CompletedProcess(
+            command, 127, "",
+            "%s: %s" % (LAUNCH_FAILURE_MARKER, exc))
 
 
 def classify(returncode: int, stdout: str, stderr: str) -> str:
@@ -171,6 +201,121 @@ def repository_tag_absence(*, registry: str, repository: str, tag: str,
     }
 
 
+def _json_answer(command, label, runner):
+    """Run one read-only query and return its parsed payload or an ambiguity."""
+    completed = (runner or _default_runner)(command)
+    stdout = getattr(completed, "stdout", "") or ""
+    stderr = getattr(completed, "stderr", "") or ""
+    returncode = int(getattr(completed, "returncode", 1))
+    outcome = classify(returncode, stdout, stderr)
+    if outcome != "PROVED_PRESENT":
+        return None, outcome, stderr, returncode
+    try:
+        return json.loads(stdout), outcome, stderr, returncode
+    except ValueError:
+        return None, "AMBIGUOUS", stderr, returncode
+
+
+def _scope_covers(scope: str, resource_id: str) -> bool:
+    """True when an assignment scope contains the storage account."""
+    scope = (scope or "").rstrip("/").lower()
+    resource_id = (resource_id or "").rstrip("/").lower()
+    if not scope or not resource_id:
+        return False
+    return resource_id == scope or resource_id.startswith(scope + "/")
+
+
+def blob_data_access(*, account: str, identity_name: str, resource_group: str,
+                     subscription: str, roles=BLOB_DATA_ROLES,
+                     runner=None) -> dict:
+    """Prove the registered identity may write blobs to the account the
+    transport actually uses.
+
+    The transport decides the account; a job specification only repeats it. If
+    the identity holds no blob data role at a scope covering that account, the
+    first result write fails -- and that write happens after the one-shot replay
+    envelope has been consumed, so it cannot be retried. This query is the only
+    place that failure can be found while it is still cheap.
+    """
+    account = _require_name(account, "storage account")
+    identity_name = _require_name(identity_name, "identity name")
+    resource_group = _require_name(resource_group, "resource group")
+    subscription = _require_name(subscription, "subscription")
+
+    receipt = {
+        "schema_version": SCHEMA_VERSION,
+        "stage": STAGE,
+        "query": "blob-data-access",
+        "account": account,
+        "identity_name": identity_name,
+        "resource_group": resource_group,
+        "subscription": subscription,
+        "accepted_roles": list(roles),
+        "read_only": True,
+        "created_updated_or_started": False,
+        "model_operations_performed": 0,
+    }
+
+    identity, outcome, stderr, code = _json_answer(
+        ["az", "identity", "show", "--name", identity_name,
+         "--resource-group", resource_group, "--subscription", subscription,
+         "--output", "json"], "identity", runner)
+    if outcome != "PROVED_PRESENT":
+        receipt.update({"outcome": "AMBIGUOUS", "exit_code": code,
+                        "stderr_excerpt": stderr.strip()[:512],
+                        "step": "identity"})
+        return receipt
+    principal = (identity or {}).get("principalId")
+    receipt["principal_id"] = principal
+    if not principal:
+        receipt.update({"outcome": "AMBIGUOUS", "exit_code": code,
+                        "step": "identity", "stderr_excerpt": ""})
+        return receipt
+
+    storage, outcome, stderr, code = _json_answer(
+        ["az", "storage", "account", "show", "--name", account,
+         "--subscription", subscription, "--output", "json"], "storage", runner)
+    if outcome != "PROVED_PRESENT":
+        receipt.update({"outcome": "AMBIGUOUS", "exit_code": code,
+                        "stderr_excerpt": stderr.strip()[:512],
+                        "step": "storage-account"})
+        return receipt
+    account_id = (storage or {}).get("id")
+    receipt["account_id"] = account_id
+    if not account_id:
+        receipt.update({"outcome": "AMBIGUOUS", "exit_code": code,
+                        "step": "storage-account", "stderr_excerpt": ""})
+        return receipt
+
+    assignments, outcome, stderr, code = _json_answer(
+        ["az", "role", "assignment", "list", "--assignee", principal, "--all",
+         "--subscription", subscription, "--output", "json"], "roles", runner)
+    if outcome == "PROVED_ABSENT":
+        # An empty list is a real answer: the identity holds no role at all.
+        assignments = []
+    elif outcome != "PROVED_PRESENT":
+        receipt.update({"outcome": "AMBIGUOUS", "exit_code": code,
+                        "stderr_excerpt": stderr.strip()[:512],
+                        "step": "role-assignments"})
+        return receipt
+    if not isinstance(assignments, list):
+        receipt.update({"outcome": "AMBIGUOUS", "exit_code": code,
+                        "step": "role-assignments", "stderr_excerpt": ""})
+        return receipt
+
+    granting = [
+        {"role": item.get("roleDefinitionName"), "scope": item.get("scope")}
+        for item in assignments
+        if item.get("roleDefinitionName") in roles
+        and _scope_covers(item.get("scope"), account_id)
+    ]
+    receipt["granting_assignments"] = granting
+    receipt["exit_code"] = code
+    receipt["stderr_excerpt"] = stderr.strip()[:512]
+    receipt["outcome"] = "PROVED_PRESENT" if granting else "PROVED_ABSENT"
+    return receipt
+
+
 def implementation_identity() -> dict:
     return {
         "schema_version": SCHEMA_VERSION,
@@ -192,10 +337,13 @@ def main(argv=None) -> int:
     mode.add_argument("--identity", action="store_true")
     mode.add_argument("--job-presence")
     mode.add_argument("--repository-tag")
+    mode.add_argument("--blob-data-access", action="store_true")
     parser.add_argument("--resource-group")
     parser.add_argument("--subscription")
     parser.add_argument("--registry")
     parser.add_argument("--repository")
+    parser.add_argument("--account")
+    parser.add_argument("--identity-name")
     args = parser.parse_args(argv)
 
     if args.identity:
@@ -206,6 +354,11 @@ def main(argv=None) -> int:
         if args.job_presence:
             receipt = job_presence(
                 args.job_presence, resource_group=args.resource_group,
+                subscription=args.subscription)
+        elif args.blob_data_access:
+            receipt = blob_data_access(
+                account=args.account, identity_name=args.identity_name,
+                resource_group=args.resource_group,
                 subscription=args.subscription)
         else:
             receipt = repository_tag_absence(

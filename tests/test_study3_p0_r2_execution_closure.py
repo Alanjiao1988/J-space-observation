@@ -431,6 +431,87 @@ def test_a_recovery_specification_never_requests_an_accelerator():
     assert spec["properties"]["configuration"]["replicaRetryLimit"] == 0
 
 
+def test_a_rendered_job_cannot_name_a_storage_account_the_transport_never_uses():
+    # A job specification only repeats where results go; the transport decides.
+    # A second hand-maintained copy of that answer can drift, and the drift only
+    # surfaces at the first result write -- after the one-shot replay envelope
+    # has been consumed, so it could never be retried.
+    assert JOBSPEC.STORAGE_ACCOUNT == BLOB.ACCOUNT
+    assert JOBSPEC.BLOB_CONTAINER == BLOB.CONTAINER
+    assert JOBSPEC.IDENTITY == BLOB.IDENTITY_RESOURCE_ID
+    assert JOBSPEC.BLOB_PREFIX_ROOT.rstrip("/") == BLOB.PREFIX_ROOT.rstrip("/")
+
+
+def _yaml_scalar(path, key):
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if stripped.startswith("%s:" % key):
+            return stripped.split(":", 1)[1].strip()
+    return None
+
+
+def test_the_pilot_names_the_accelerator_profile_the_reviewed_job_names():
+    # Without a profile name a Container Apps environment silently uses the
+    # default Consumption profile, which has no accelerator, so the pilot would
+    # be created as a CPU job and fail its own guard after the envelope was
+    # already spent.
+    reviewed = (P0_R1_DIR / "container" / "p0_r1_gpu_job_v3.yaml")
+    assert _yaml_scalar(reviewed, "workloadProfileName") == \
+        JOBSPEC.GPU_WORKLOAD_PROFILE
+    assert float(_yaml_scalar(reviewed, "cpu")) == JOBSPEC.GPU_RESOURCES["cpu"]
+    assert _yaml_scalar(reviewed, "memory") == JOBSPEC.GPU_RESOURCES["memory"]
+
+
+def test_every_rendered_job_names_a_workload_profile_explicitly():
+    gpu = JOBSPEC.gpu_spec(
+        image="reg.example/repo@" + DIGEST, attempt="p0r2-g1-pilot",
+        authorization={"outcome": "AUTHORIZED", "image_digest": DIGEST,
+                       "attempt_id": "p0r2-g1-pilot",
+                       "attempt": "p0r2-g1-pilot"})
+    recovery = JOBSPEC.recovery_spec(
+        "recover", image="reg.example/repo@" + DIGEST,
+        attempt="p0r2-g1-recover")
+    assert gpu["properties"]["workloadProfileName"] == \
+        JOBSPEC.GPU_WORKLOAD_PROFILE
+    assert recovery["properties"]["workloadProfileName"] == \
+        JOBSPEC.CPU_WORKLOAD_PROFILE
+    assert gpu["properties"]["template"]["containers"][0]["resources"] == \
+        JOBSPEC.GPU_RESOURCES
+    assert recovery["properties"]["template"]["containers"][0]["resources"] == \
+        JOBSPEC.CPU_RESOURCES
+
+
+def test_the_registered_shapes_agree_with_what_is_rendered():
+    gpu_shape = CONTAINER / "p0_r2_gpu_job_v1.yaml"
+    recovery_shape = CONTAINER / "p0_r2_recovery_job_v1.yaml"
+    assert _yaml_scalar(gpu_shape, "workloadProfileName") == \
+        JOBSPEC.GPU_WORKLOAD_PROFILE
+    assert _yaml_scalar(recovery_shape, "workloadProfileName") == \
+        JOBSPEC.CPU_WORKLOAD_PROFILE
+    assert float(_yaml_scalar(gpu_shape, "cpu")) == JOBSPEC.GPU_RESOURCES["cpu"]
+    assert float(_yaml_scalar(recovery_shape, "cpu")) == \
+        JOBSPEC.CPU_RESOURCES["cpu"]
+
+
+def test_every_rendered_job_sends_results_where_the_transport_writes():
+    def env_of(spec):
+        container = spec["properties"]["template"]["containers"][0]
+        return {item["name"]: item["value"] for item in container["env"]}
+
+    gpu = env_of(JOBSPEC.gpu_spec(
+        image="reg.example/repo@" + DIGEST, attempt="p0r2-g1-pilot",
+        authorization={"outcome": "AUTHORIZED", "image_digest": DIGEST,
+                       "attempt_id": "p0r2-g1-pilot",
+                       "attempt": "p0r2-g1-pilot"}))
+    recovery = env_of(JOBSPEC.recovery_spec(
+        "recover", image="reg.example/repo@" + DIGEST,
+        attempt="p0r2-g1-recover"))
+    for env in (gpu, recovery):
+        assert env["P0_R2_BLOB_ACCOUNT"] == BLOB.ACCOUNT
+        assert env["P0_R2_BLOB_CONTAINER"] == BLOB.CONTAINER
+        assert env["P0_R2_BLOB_PREFIX"].startswith(BLOB.PREFIX_ROOT)
+
+
 def test_an_unpinned_image_is_refused():
     with pytest.raises(JOBSPEC.JobSpecDefect):
         JOBSPEC.recovery_spec("recover", image="reg.example/repo:latest",
@@ -692,10 +773,129 @@ def test_the_default_runner_resolves_the_cli_the_way_a_shell_would(monkeypatch):
     assert seen["command"][1:] == ["acr", "run", "--registry", "r"]
 
 
+def test_the_read_only_query_runner_resolves_the_cli_the_way_a_shell_would(
+        monkeypatch):
+    seen = {}
+
+    monkeypatch.setattr(AZQUERY.shutil, "which",
+                        lambda name: "/resolved/%s" % name)
+    monkeypatch.setattr(AZQUERY.subprocess, "run",
+                        lambda command, **kw: seen.setdefault(
+                            "command", command))
+    AZQUERY._default_runner(["az", "containerapp", "job", "show"])
+    assert seen["command"][0] == "/resolved/az"
+    assert seen["command"][1:] == ["containerapp", "job", "show"]
+
+
+def test_a_cli_that_cannot_be_launched_is_ambiguous_and_never_an_absence(
+        monkeypatch):
+    # The whole point of this module is that a query error is never an absence.
+    # A host that cannot even start the CLI has observed nothing about Azure,
+    # so it must not be able to report the GPU job as proved absent.
+    def refuse(command, **kwargs):
+        raise OSError(2, "The system cannot find the file specified")
+
+    monkeypatch.setattr(AZQUERY.subprocess, "run", refuse)
+    receipt = AZQUERY.job_presence(
+        AZQUERY.GPU_JOB, resource_group="rg-jspace-observation-sea",
+        subscription="943bacdf-8b6e-4e3a-8126-a149f623d32e")
+    assert receipt["outcome"] == "AMBIGUOUS"
+    assert receipt["exit_code"] == 127
+    assert AZQUERY.LAUNCH_FAILURE_MARKER in receipt["stderr_excerpt"]
+    assert receipt["read_only"] is True
+    assert receipt["created_updated_or_started"] is False
+
+
+def test_a_launch_failure_marker_outranks_any_absence_text():
+    # The Windows launcher error text must not be mined for an absence.
+    combined = "%s: [WinError 2] cannot find the file" % (
+        AZQUERY.LAUNCH_FAILURE_MARKER,)
+    assert AZQUERY.classify(127, "", combined) == "AMBIGUOUS"
+    assert AZQUERY.classify(
+        127, "", "%s ResourceNotFound" % AZQUERY.LAUNCH_FAILURE_MARKER
+    ) == "AMBIGUOUS"
+
+
+class _Answer:
+    def __init__(self, stdout="", stderr="", returncode=0):
+        self.stdout = stdout
+        self.stderr = stderr
+        self.returncode = returncode
+
+
+def _access_runner(assignments, *, account_found=True):
+    identity = json.dumps({"principalId": "principal-1"})
+    account = json.dumps({
+        "id": "/subscriptions/s/resourceGroups/rg/providers/Microsoft.Storage"
+              "/storageAccounts/stjspacefiles0709085305"})
+
+    def runner(command):
+        if command[1] == "identity":
+            return _Answer(identity)
+        if command[1] == "storage":
+            if not account_found:
+                return _Answer("", "ERROR: Storage account 'x' not found.", 1)
+            return _Answer(account)
+        return _Answer(json.dumps(assignments))
+
+    return runner
+
+
+def _access(assignments, **kw):
+    return AZQUERY.blob_data_access(
+        account="stjspacefiles0709085305",
+        identity_name="id-jspace-aca-acrpull-sea",
+        resource_group="rg-jspace-observation-sea", subscription="sub-1",
+        runner=_access_runner(assignments, **kw))
+
+
+def test_a_blob_data_role_on_the_account_proves_the_write_can_happen():
+    receipt = _access([{
+        "roleDefinitionName": "Storage Blob Data Contributor",
+        "scope": "/subscriptions/s/resourceGroups/rg/providers/"
+                 "Microsoft.Storage/storageAccounts/stjspacefiles0709085305"}])
+    assert receipt["outcome"] == "PROVED_PRESENT"
+    assert len(receipt["granting_assignments"]) == 1
+
+
+def test_a_role_inherited_from_a_wider_scope_still_covers_the_account():
+    receipt = _access([{"roleDefinitionName": "Storage Blob Data Owner",
+                        "scope": "/subscriptions/s/resourceGroups/rg"}])
+    assert receipt["outcome"] == "PROVED_PRESENT"
+
+
+def test_a_control_plane_role_does_not_prove_a_data_plane_write():
+    # Owner and Contributor manage the account; neither can write a blob.
+    receipt = _access([
+        {"roleDefinitionName": "Owner", "scope": "/subscriptions/s"},
+        {"roleDefinitionName": "Contributor", "scope": "/subscriptions/s"}])
+    assert receipt["outcome"] == "PROVED_ABSENT"
+    assert receipt["granting_assignments"] == []
+
+
+def test_a_blob_role_on_a_different_account_proves_nothing_about_this_one():
+    receipt = _access([{
+        "roleDefinitionName": "Storage Blob Data Contributor",
+        "scope": "/subscriptions/s/resourceGroups/rg/providers/"
+                 "Microsoft.Storage/storageAccounts/someotheraccount"}])
+    assert receipt["outcome"] == "PROVED_ABSENT"
+
+
+def test_an_account_that_cannot_be_resolved_is_ambiguous_not_absent():
+    # This is the exact answer the registered-but-nonexistent account gave.
+    receipt = _access([], account_found=False)
+    assert receipt["outcome"] == "AMBIGUOUS"
+    assert receipt["step"] == "storage-account"
+
+
+def test_the_access_query_never_mutates_anything():
+    receipt = _access([])
+    assert receipt["read_only"] is True
+    assert receipt["created_updated_or_started"] is False
+    assert receipt["model_operations_performed"] == 0
+
+
 def test_the_replay_script_refuses_any_mode_it_was_not_given():
-    # The packing canary and the live replay reach this script by the same
-    # route, so an absent or unknown mode must refuse rather than default into
-    # consuming the one-shot envelope.
     text = (CONTAINER / "p0_r2_replay_v1.sh").read_text(encoding="utf-8")
     assert "P0_R2_REPLAY_MODE" in text
     assert "P0_R2_REPLAY_REFUSED=1 P0_R2_REPLAY_MODE is required" in text
