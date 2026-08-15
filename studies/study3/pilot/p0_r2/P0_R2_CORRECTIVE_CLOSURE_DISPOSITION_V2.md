@@ -118,8 +118,58 @@ and `phase_b_authorized = true` at 28/28.
 The envelope was therefore carried forward rather than declared spent by a
 host-side tooling failure that never reached Azure.
 
-## Segment B, attempt 2 — outcome
+## Segment B, attempt 2 — invoked once, `STOP_NO_MODEL_OPERATION`
 
-Recorded in the sections appended after the invocation. Until that is written,
-the state of this stage is unchanged: replay envelope unconsumed, canonical
-replay artifacts absent, both bounded jobs absent, no model operation performed.
+The corrected wrapper invoked the live submission. The envelope is **consumed**:
+exactly one invocation, exactly one ACR run id, `cmjv`.
+
+| item | value |
+| --- | --- |
+| attempt | `p0r2-g1-live-20260815-0800` |
+| ACR run id | `cmjv` — exactly one |
+| run status | `Failed`, `exit status 1`, 14:25:01Z → 14:30:48Z |
+| raw log | 7,334 bytes, sha256 `48e87c66d011f5218b91e7e477d258e102c995160d43e8ae83b3f3f93e9b2364` |
+| stderr | 370 bytes, sha256 `b166c3d20c55c16f6ea2e896609b13a8b05af5d574b45d3342efdb13f555b64c` |
+| artifacts reconstructed | **0 of 4**, zero envelope markers |
+| model operations | **0** |
+
+Everything the container checked, passed — the image carried exactly the bytes
+Git holds, 44/44 with zero mismatches, and the active lock was taken from the
+submitted two-file context and verified by length and SHA-256. That is the
+corrected path working: the v1 path would have died here on an `/opt/jspace`
+lock no Dockerfile ever wrote.
+
+It then refused, fail-closed:
+
+```text
+ManagedIdentityCredential.get_token failed: No token received.
+P0_R2_PREFIX_PREFLIGHT_REFUSED=1 the private listing failed (Bad Gateway); a query error is never an absence
+```
+
+An ACR Tasks agent holds no managed identity and is not in the VNet, so it
+cannot reach a storage account whose public network access is `Disabled`.
+
+### The fifth defect
+
+The design already knew this. The packing-canary branch of the same script
+defers exactly this proof to the host and prints
+`P0_R2_PREFIX_PROOF_DEFERRED_TO_HOST=1`. The **live** branch does not — it calls
+the in-VNet-only probe on a credential-less agent. The host had already proved
+that prefix unused from inside the VNet four times, including after this run.
+
+This is the only one of the five latent defects that could not be found without
+spending the envelope, because the only way to learn whether an ACR agent can
+reach the private account is to make it try.
+
+### Terminal consequences
+
+The replay-pass conditions are not met, so under the registered rule: no pilot
+is authorized, created or started; the replay is not rerun, regenerated or
+substituted; the gate is not repaired in place; no second `az acr run --live` is
+invoked. `p0_r2_replay_result.json` and `p0_r2_replay_receipt.json` are
+deliberately **not** created, because recovered bytes do not prove them.
+
+Full detail: `studies/study3/pilot/p0/results/p0-r2/P0_R2_REPLAY_DISPOSITION.md`.
+
+P0-R2 generation 1 ends at `STOP_NO_MODEL_OPERATION` with its envelope spent and
+its evidence complete. A successor generation requires a new operator authority.
