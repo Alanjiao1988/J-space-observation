@@ -1,0 +1,81 @@
+# Study 3 P0-R2 generation-2 image.
+#
+# Authority: studies/study3/prompts/
+# study3_p0_r2_generation2_successor_and_conditional_execution_authority.md
+# section 6.4.
+#
+# Generation 2 changes an image-bound live entry point -- the replay entry point
+# no longer performs an in-container Storage listing, and validates a bound
+# host receipt instead -- so a new image is mandatory and the generation-1
+# digest may not be reused as the generation-2 execution image.
+#
+# This is still a thin infrastructure successor and it still changes no science:
+# the P0-R1 generation-3 scientific modules are copied in byte-identically from
+# the same commit and verified by SHA-256 at runtime before they are imported.
+#
+# The base is the same digest-pinned P0-R1 generation-3 image, so the dependency
+# closure cannot move underneath the science.
+#
+# Nothing is fetched from the network during the build. No model weight,
+# checkpoint, tokenizer or corpus byte is ever baked into this image.
+
+ARG BASE_IMAGE=acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c
+FROM ${BASE_IMAGE}
+
+LABEL org.jspace.stage="STUDY3-P0-R2" \
+      org.jspace.generation="2" \
+      org.jspace.revision="1" \
+      org.jspace.kind="infrastructure-successor-generation-2" \
+      org.jspace.changes-only="in-VNet prefix proof deferred to host; shared canary/live receipt validation" \
+      org.jspace.science="unchanged-p0-r1-generation-3" \
+      org.jspace.supersedes="sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58" \
+      org.jspace.terminal-state="STUDY3_P0_R2_GENERATION2_EXECUTION_READY_AWAITING_REPLAY_GATE" \
+      org.jspace.model-operations-performed="0"
+
+ENV P0_R2_SRC=/opt/jspace/src \
+    P0_R2_STAGE=STUDY3-P0-R2 \
+    P0_R2_GENERATION=2 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_INDEX=1
+
+WORKDIR /opt/jspace
+
+# The P0-R1 scientific modules first, so a change to P0-R2 operational bytes
+# does not invalidate the layer that carries the science.
+COPY src/studies/study3/pilot/p0_r1/ ${P0_R2_SRC}/studies/study3/pilot/p0_r1/
+COPY src/studies/study3/pilot/p0_r2/ ${P0_R2_SRC}/studies/study3/pilot/p0_r2/
+
+# The image-to-Git audit manifest travels with the bytes it describes.
+COPY src/studies/study3/pilot/p0_r2/p0_r2_image_manifest_g2.json \
+     /opt/jspace/p0_r2_image_manifest_g2.json
+
+COPY entrypoints/ /usr/local/bin/
+
+# The P0-R1 base image runs as the unprivileged account uid=10001(jspace).
+# Marking the entry points executable needs root, so elevate for exactly that
+# one step and hand the privilege straight back.
+USER root
+RUN chmod 0755 /usr/local/bin/p0_r2_*.sh
+USER 10001
+
+ENV PYTHONPATH=${P0_R2_SRC}/studies/study3/pilot/p0_r2:${P0_R2_SRC}/studies/study3/pilot/p0_r1
+
+# Fail the build if the image does not carry exactly the bytes Git holds -- both
+# the Python modules under the image root and the entry points flattened into
+# /usr/local/bin. A drifted image can therefore never be pushed. The audited
+# count is derived from the manifest, never asserted here.
+RUN python3 ${P0_R2_SRC}/studies/study3/pilot/p0_r2/p0_r2_image_manifest_g2.py \
+        --audit /opt/jspace/p0_r2_image_manifest_g2.json \
+        --image-root ${P0_R2_SRC} \
+        --install-root /usr/local/bin
+
+# Prove at build time that the generation-2 namespace is disjoint from the
+# closed generation 1 and that the reused primitives are the frozen bytes.
+RUN python3 ${P0_R2_SRC}/studies/study3/pilot/p0_r2/p0_r2_namespace_g2.py \
+        --self-check
+
+# There is no default execution mode. An image started without an explicit
+# entry point refuses and exits nonzero rather than doing something.
+ENTRYPOINT []
+CMD ["/bin/sh", "-c", "echo P0_R2_G2_NO_DEFAULT_EXECUTION_MODE=1 >&2; exit 2"]

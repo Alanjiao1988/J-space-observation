@@ -141,15 +141,19 @@ if [ "${MODE}" = "canary" ]; then
     exit 0
 fi
 
-# 4. Live only: invoke the registered replay gate exactly once.
-python3 "${R2}/p0_r2_replay_gate_v1.py" \
+# 4. Live only: invoke the registered generation-2 replay gate exactly once.
+#    The authorization is named explicitly here rather than left to the
+#    environment. Generation 1 left it to the environment and never set it, so
+#    its live path carried a second latent refusal behind the one that fired.
+python3 "${R2}/p0_r2_replay_gate_g2.py" \
     --run \
     --out-dir "${RESULTS}" \
     --attempt "${ATTEMPT}" \
     --image-digest "${DIGEST}" \
     --ready-anchor "${P0_R2_READY_COMMIT:-}" \
     --lock-file "${LOCK_FILE}" \
-    --root "${SRC}"
+    --root "${SRC}" \
+    --authorization "p0-r2-generation-2-successor-session"
 
 echo "P0_R2_G2_REPLAY_GATE_RUN=true"
 echo "P0_R2_G2_ONE_SHOT_ENVELOPE_CONSUMED=true"

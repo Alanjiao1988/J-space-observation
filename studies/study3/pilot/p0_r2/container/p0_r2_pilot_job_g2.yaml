@@ -1,0 +1,85 @@
+# Study 3 P0-R2 generation-2 bounded T4 model pilot.
+#
+# Authority: studies/study3/prompts/
+# study3_p0_r2_generation2_successor_and_conditional_execution_authority.md
+# section 15.
+#
+# Created exactly once and started exactly once. It is never updated, replaced,
+# restarted or rerun, and an ambiguous create or start answer is resolved by
+# read-only query, never by a second create or start.
+#
+# The runner enforces the bounded maxima; this specification only records them.
+# Smoke runs first, and if the registered extension criterion does not pass the
+# stage stops without extension and makes no further prefill or generation.
+apiVersion: 2024-03-01
+kind: containerapp-job
+name: job-jspace-s3-p0r2-pilot-g2
+resourceGroup: rg-jspace-observation-sea
+environmentId: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourceGroups/rg-jspace-observation-sea/providers/Microsoft.App/managedEnvironments/cae-jspace-observation-sea-vnet2
+workloadProfileName: gpu-t4
+identity:
+  type: UserAssigned
+  userAssignedIdentities:
+    - /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+configuration:
+  triggerType: Manual
+  replicaTimeout: 7200
+  replicaRetryLimit: 0
+  manualTriggerConfig:
+    parallelism: 1
+    replicaCompletionCount: 1
+  registries:
+    - server: acrjspaceobssea0708231738.azurecr.io
+      identity: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+template:
+  containers:
+    - name: pilot
+      image: DIGEST_PINNED_AT_CREATION
+      command:
+        - /usr/local/bin/p0_r2_model_pilot_g2.sh
+      resources:
+        cpu: 4.0
+        memory: 16Gi
+      env:
+        - name: P0_R2_ATTEMPT
+          value: ATTEMPT_ID_AT_CREATION
+        - name: P0_R2_SRC
+          value: /opt/jspace/src
+        - name: P0_R2_RUNTIME_ROOT
+          value: /workspace/runtime
+        - name: P0_R2_PILOT_AUTHORIZED
+          value: "1"
+        - name: P0_R2_LOCK_FILE
+          value: SET_AT_CREATION
+        - name: P0_R2_REPLAY_RECEIPT
+          value: SET_AT_CREATION
+        - name: P0_R2_RECONSTRUCTION_RECEIPT
+          value: SET_AT_CREATION
+        - name: P0_R2_HEAD_PROOF
+          value: SET_AT_CREATION
+        - name: P0_R2_PREFIX_RECEIPT
+          value: SET_AT_CREATION
+boundary:
+  stage: STUDY3-P0-R2
+  generation: 2
+  workload_profile: gpu-t4
+  replicas: 1
+  parallelism: 1
+  completion_count: 1
+  replica_retry_limit: 0
+  digest_pinned: true
+  created_once: true
+  started_once: true
+  updated_or_restarted: false
+  credential: managed-identity
+  caps_are_enforced_not_reported: true
+  caps:
+    max_smoke_prefills_before_extension: 60
+    max_non_generative_prefills: 180
+    max_s4_generations: 12
+    max_model_evaluation_equivalents: 228
+    possible_scored_rows: 210
+  smoke_runs_first: true
+  extends_without_criterion: false
+  reruns_after_smoke_stop: false
+  requires_pilot_authorization_receipt: true

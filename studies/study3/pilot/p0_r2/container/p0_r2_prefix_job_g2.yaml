@@ -1,0 +1,97 @@
+# Study 3 P0-R2 generation-2 in-VNet CPU prefix-proof job.
+#
+# Authority: studies/study3/prompts/
+# study3_p0_r2_generation2_successor_and_conditional_execution_authority.md
+# sections 6.2 and 7.2.
+#
+# This job is the whole correction to the generation-1 fatal defect. An ACR
+# Tasks agent has neither the registered managed identity nor a route into
+# cae-jspace-observation-sea-vnet2, so it cannot list the private results
+# account; generation 1 discovered that on the one invocation it could not
+# retry. This CPU-only execution runs inside the environment, with the
+# registered user-assigned identity, performs the exact prefix listing, and
+# emits a machine-readable observation between two unambiguous markers.
+#
+# It writes nothing. It requests no accelerator. It constructs no tokenizer,
+# downloads no checkpoint, loads no weight and performs no model operation.
+apiVersion: 2024-03-01
+kind: containerapp-job
+name: job-jspace-s3-p0r2-prefix-g2
+resourceGroup: rg-jspace-observation-sea
+environmentId: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourceGroups/rg-jspace-observation-sea/providers/Microsoft.App/managedEnvironments/cae-jspace-observation-sea-vnet2
+workloadProfileName: Consumption
+identity:
+  type: UserAssigned
+  userAssignedIdentities:
+    - /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+configuration:
+  triggerType: Manual
+  replicaTimeout: 900
+  replicaRetryLimit: 0
+  manualTriggerConfig:
+    parallelism: 1
+    replicaCompletionCount: 1
+  registries:
+    - server: acrjspaceobssea0708231738.azurecr.io
+      identity: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+template:
+  containers:
+    - name: prefix
+      image: DIGEST_PINNED_AT_CREATION
+      command:
+        - /bin/sh
+      args:
+        - -c
+        - |
+          set -eu
+          R2="${P0_R2_SRC}/studies/study3/pilot/p0_r2"
+          export PYTHONPATH="${R2}:${P0_R2_SRC}/studies/study3/pilot/p0_r1"
+          echo "P0_R2_G2_PREFIX_JOB=${P0_R2_G2_PREFIX_JOB}"
+          echo "P0_R2_G2_PREFIX_ATTEMPT=${P0_R2_G2_ATTEMPT}"
+          python3 "${R2}/p0_r2_prefix_proof_g2.py" --observe "${P0_R2_G2_ATTEMPT}"
+          echo "P0_R2_G2_PREFIX_PROBE_COMPLETE=1"
+          echo "P0_R2_MODEL_OPERATIONS_PERFORMED=0"
+      resources:
+        cpu: 1.0
+        memory: 2Gi
+      env:
+        - name: P0_R2_G2_ATTEMPT
+          value: ATTEMPT_ID_AT_CREATION
+        - name: P0_R2_G2_PREFIX_JOB
+          value: job-jspace-s3-p0r2-prefix-g2
+        - name: P0_R2_IMAGE_DIGEST
+          value: DIGEST_PINNED_AT_CREATION
+        - name: P0_R2_SRC
+          value: /opt/jspace/src
+        # The P0-R1 generation-3 base image is CUDA-capable. A CPU-only job that
+        # leaves the accelerator markers set is correctly read as an accelerator
+        # replica by the model-free guards, so they are neutralised explicitly.
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: void
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: void
+        - name: CUDA_VISIBLE_DEVICES
+          value: "-1"
+boundary:
+  stage: STUDY3-P0-R2
+  generation: 2
+  cpu_only: true
+  accelerator_requested: false
+  accelerator_environment_explicitly_neutralised: true
+  workload_profile: Consumption
+  replica_retry_limit: 0
+  credential: managed-identity
+  runs_inside_registered_vnet_environment: true
+  writes_any_object: false
+  query_error_is_absence: false
+  tokenizer_constructions: 0
+  tokenizer_encodes: 0
+  checkpoint_downloads: 0
+  model_weight_loads: 0
+  prefills: 0
+  generations: 0
+  scored_rows: 0
+  gpu_allocations: 0
+  model_operations_performed: 0
+  replay_gate_invoked: false
+  one_shot_envelope_opened: false

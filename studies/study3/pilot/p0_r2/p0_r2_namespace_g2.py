@@ -61,36 +61,51 @@ HARD_KILL_JOB = "job-jspace-s3-p0r2-hardkill-g2"
 
 RESULTS_ROOT = "studies/study3/pilot/p0/results/p0-r2-g2"
 
+class _Instance(object):
+    """A marker: rebind this name to another primitive's generation-2 instance."""
+
+    def __init__(self, module_name):
+        self.module_name = module_name
+
+
 #: The frozen generation-1 primitives generation 2 re-executes unchanged, and
-#: the module-level names rebound in each generation-2 instance. A name that
-#: resolves to a module is rebound to that module's generation-2 instance, so a
-#: reused primitive never reaches back into generation 1's namespace.
+#: the exact module-level names rebound in each generation-2 instance. Overrides
+#: are per module on purpose: two primitives use the name ``ATTEMPT_PREFIX`` for
+#: different things, and a shared table would silently give one of them the
+#: other's value.
 REUSED_PRIMITIVES = {
-    "p0_r2_transport": ("ATTEMPT_ID_PREFIX",),
-    "p0_r2_transport_v1": ("BASE",),
-    "p0_r2_blob_transport": ("ATTEMPT_ID_PREFIX", "PREFIX_ROOT"),
-    "p0_r2_blob_transport_v1": ("PREFIX_ROOT", "BLOB"),
-    "p0_r2_journal_v1": ("ATTEMPT_ID_PREFIX",),
-    "p0_r2_recovery_v1": ("RECOVERY_JOB", "BLOB", "JOURNAL"),
-    "p0_r2_hard_kill_canary_v2": ("ATTEMPT_PREFIX", "BLOB", "JOURNAL",
-                                  "RECOVERY"),
-}
-
-#: Scalar rebinds. Module rebinds are resolved by :func:`_module_override`.
-_SCALAR_OVERRIDES = {
-    "ATTEMPT_ID_PREFIX": ATTEMPT_ID_PREFIX,
-    "PREFIX_ROOT": PREFIX_ROOT,
-    "RECOVERY_JOB": RECOVERY_JOB,
-    "ATTEMPT_PREFIX": CANARY_ATTEMPT_PREFIX + "hardkill-",
-}
-
-#: Names whose generation-2 value is another generation-2 instance.
-_MODULE_OVERRIDES = {
-    "BASE": "p0_r2_transport",
-    "BLOB": "p0_r2_blob_transport",
-    "JOURNAL": "p0_r2_journal_v1",
-    "TRANSPORT": "p0_r2_transport",
-    "RECOVERY": "p0_r2_recovery_v1",
+    "p0_r2_transport": {
+        "ATTEMPT_ID_PREFIX": ATTEMPT_ID_PREFIX,
+    },
+    "p0_r2_transport_v1": {
+        "BASE": _Instance("p0_r2_transport"),
+    },
+    "p0_r2_blob_transport": {
+        "ATTEMPT_ID_PREFIX": ATTEMPT_ID_PREFIX,
+        "PREFIX_ROOT": PREFIX_ROOT,
+    },
+    "p0_r2_blob_transport_v1": {
+        "PREFIX_ROOT": PREFIX_ROOT,
+        "BLOB": _Instance("p0_r2_blob_transport"),
+    },
+    "p0_r2_journal_v1": {
+        "ATTEMPT_ID_PREFIX": ATTEMPT_ID_PREFIX,
+    },
+    "p0_r2_recovery_v1": {
+        "RECOVERY_JOB": RECOVERY_JOB,
+        "BLOB": _Instance("p0_r2_blob_transport"),
+        "JOURNAL": _Instance("p0_r2_journal_v1"),
+    },
+    "p0_r2_hard_kill_canary_v2": {
+        "ATTEMPT_PREFIX": CANARY_ATTEMPT_PREFIX + "hardkill-",
+        "BLOB": _Instance("p0_r2_blob_transport"),
+        "JOURNAL": _Instance("p0_r2_journal_v1"),
+        "RECOVERY": _Instance("p0_r2_recovery_v1"),
+    },
+    "p0_r2_authorization_v1": {
+        "GPU_JOB": GPU_JOB,
+        "ATTEMPT_PREFIX": ATTEMPT_ID_PREFIX,
+    },
 }
 
 _SHA256 = __import__("re").compile(r"^[0-9a-f]{64}$")
@@ -153,33 +168,31 @@ def instantiate(module_name: str, *, expected_sha256=None):
     exec(compile(payload, str(path), "exec"), instance.__dict__)  # noqa: S102
 
     rebound = {}
-    for constant in REUSED_PRIMITIVES[module_name]:
+    for constant, override in REUSED_PRIMITIVES[module_name].items():
         if not hasattr(instance, constant):
             raise NamespaceDefect(
                 "%s does not define %s; the reuse contract is broken"
                 % (module_name, constant))
         previous = getattr(instance, constant)
-        if constant in _MODULE_OVERRIDES:
-            target = _MODULE_OVERRIDES[constant]
-            replacement = instantiate(target)
+        if isinstance(override, _Instance):
+            target = override.module_name
             if getattr(previous, "__name__", None) not in (
                     target, "%s__g2" % target):
                 raise NamespaceDefect(
                     "%s.%s does not reference %s; the reuse contract is broken"
                     % (module_name, constant, target))
-            setattr(instance, constant, replacement)
+            setattr(instance, constant, instantiate(target))
             rebound[constant] = {
                 "generation1": target,
                 "generation2": "%s__g2" % target,
             }
             continue
-        replacement = _SCALAR_OVERRIDES[constant]
-        if previous == replacement:
+        if previous == override:
             raise NamespaceDefect(
                 "%s.%s is already the generation-2 value; the frozen "
                 "generation-1 primitive was expected" % (module_name, constant))
-        setattr(instance, constant, replacement)
-        rebound[constant] = {"generation1": previous, "generation2": replacement}
+        setattr(instance, constant, override)
+        rebound[constant] = {"generation1": previous, "generation2": override}
 
     instance.__p0_r2_generation__ = GENERATION
     instance.__p0_r2_source_sha256__ = actual
@@ -210,6 +223,10 @@ def recovery():
 
 def hard_kill_canary():
     return instantiate("p0_r2_hard_kill_canary_v2")
+
+
+def authorization():
+    return instantiate("p0_r2_authorization_v1")
 
 
 def attempt_prefix(attempt_id: str) -> str:
@@ -312,6 +329,9 @@ def main(argv=None) -> int:
         hardkill = hard_kill_canary()
         if not hardkill.ATTEMPT_PREFIX.startswith(CANARY_ATTEMPT_PREFIX):
             raise NamespaceDefect("the hard-kill attempt prefix was not rebound")
+        auth = authorization()
+        if auth.GPU_JOB != GPU_JOB or auth.ATTEMPT_PREFIX != ATTEMPT_ID_PREFIX:
+            raise NamespaceDefect("the authorization identities were not rebound")
         try:
             G1TX.validate_attempt_id(probe)
         except G1TX.TransportDefect:

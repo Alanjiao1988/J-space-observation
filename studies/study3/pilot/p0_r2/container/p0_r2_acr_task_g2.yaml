@@ -1,0 +1,56 @@
+version: v1.1.0
+
+# Study 3 P0-R2 generation-2 ACR task.
+#
+# Authority: studies/study3/prompts/
+# study3_p0_r2_generation2_successor_and_conditional_execution_authority.md
+# sections 6.2, 6.5 and 11.
+#
+# The submitted context is exactly two root-level regular files: this task and
+# context_manifest.json. The manifest carries the generation-2 execution lock
+# and the host-verified in-VNet prefix receipt as embedded, hash-bound bytes.
+# The container never lists Storage and never requests a managed-identity token.
+
+steps:
+  - id: replay
+    cmd: >-
+      {{.Values.IMAGE}}
+      /usr/local/bin/p0_r2_replay_g2.sh
+    env:
+      - P0_R2_CONTEXT_MANIFEST=/workspace/context_manifest.json
+      - P0_R2_IMAGE_DIGEST={{.Values.DIGEST}}
+      - P0_R2_READY_COMMIT={{.Values.READY_ANCHOR}}
+      - P0_R2_REPLAY_MODE={{.Values.MODE}}
+      - P0_R2_ATTEMPT={{.Values.ATTEMPT}}
+      - P0_R2_PREFIX_RECEIPT_SHA256={{.Values.PREFIX_RECEIPT_SHA256}}
+      - P0_R2_SRC=/opt/jspace/src
+      - P0_R2_RUNTIME_ROOT=/workspace/runtime
+      - RESULTS_DIR=/workspace/runtime/results
+    timeout: 3600
+
+boundary:
+  stage: STUDY3-P0-R2
+  generation: 2
+  runs_from_digest_pinned_image: true
+  context_is_executable_code: false
+  context_entry_count: 2
+  context_entries:
+    - task.yaml
+    - context_manifest.json
+  lock_is_taken_from_the_submitted_context: true
+  prefix_proof_is_taken_from_the_submitted_context: true
+  prefix_proof_performed_in_container: false
+  managed_identity_token_requested_in_container: false
+  private_storage_listed_in_container: false
+  shared_canary_and_live_prefix_validator: true
+  context_contains_model_bytes: false
+  context_contains_checkpoint_bytes: false
+  context_contains_corpus_bytes: false
+  context_contains_result_bytes: false
+  context_contains_credentials: false
+  tokenizer_constructions: 0
+  tokenizer_encodes: 0
+  checkpoint_downloads: 0
+  model_weight_loads: 0
+  model_operations_performed: 0
+  gpu_workload_allocated: false
