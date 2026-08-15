@@ -169,6 +169,11 @@ def build(root, inputs: dict) -> dict:
         "changes_only": ("host-to-registry submission transport; corrective "
                          "closure tooling"),
         "terminal_state": TERMINAL_STATE,
+        # p0_r2_authorization_v1.py reads these two names unchanged. Carrying
+        # them makes the corrected lock usable by the modules that were already
+        # correct, instead of forcing an edit to code that has no defect.
+        "state": TERMINAL_STATE,
+        "superseded": False,
         "science_is_unchanged_p0_r1_generation3": True,
         "self": {"path": inputs["lock_repository_path"], "name": LOCK_NAME},
         "schema": {"path": inputs["schema_repository_path"],

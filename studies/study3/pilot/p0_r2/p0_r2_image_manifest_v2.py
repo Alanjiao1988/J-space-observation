@@ -61,6 +61,7 @@ ADDED_ENTRYPOINT_PATHS = (
     "studies/study3/pilot/p0_r2/container/p0_r2_successor_v2.sh",
     "studies/study3/pilot/p0_r2/container/p0_r2_canary_v2.sh",
     "studies/study3/pilot/p0_r2/container/p0_r2_replay_v2.sh",
+    "studies/study3/pilot/p0_r2/container/p0_r2_model_pilot_v2.sh",
     "studies/study3/pilot/p0_r2/container/p0_r2_hard_kill_canary_v2.sh",
 )
 

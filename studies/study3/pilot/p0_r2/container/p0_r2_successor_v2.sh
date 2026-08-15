@@ -70,7 +70,7 @@ case "${MODE}" in
                  "authorization and P0_R2_PILOT_AUTHORIZED=1" >&2
             exit 3
         fi
-        exec /usr/local/bin/p0_r2_model_pilot_v1.sh
+        exec /usr/local/bin/p0_r2_model_pilot_v2.sh
         ;;
     *)
         echo "P0_R2_SUCCESSOR_REFUSED=1 unrecognised mode ${MODE}" >&2
