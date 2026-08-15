@@ -1,0 +1,119 @@
+{
+  "accepted_differential_run_ids": [
+    "cmjh",
+    "cmjk"
+  ],
+  "acr_run_id": "cmjk",
+  "baseline_collection_errors": 0,
+  "baseline_commit": "005aa087e40c641affc8ca537e6c6a075bcbfe98",
+  "baseline_counts": {
+    "error": 0,
+    "failed": 4,
+    "passed": 4720,
+    "skipped": 15,
+    "xfailed": 0,
+    "xpassed": 0
+  },
+  "baseline_non_passing": [
+    "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+    "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+    "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+    "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+  ],
+  "baseline_registration_run_id": "cmj8",
+  "baseline_signature_set_sha256": "9527f29a426e8a1d94d6b1ec9f1af821d83fbd38185a4ce6ef54829df7f7028e",
+  "checkpoint_downloads": 0,
+  "compared_by_node_id_only": false,
+  "corrected_collection_errors": 0,
+  "corrected_commit": "609310b7b4bfae13c81a66f4809ecf891208b5fd",
+  "corrected_counts": {
+    "error": 0,
+    "failed": 4,
+    "passed": 4787,
+    "skipped": 15,
+    "xfailed": 0,
+    "xpassed": 0
+  },
+  "corrected_non_passing": [
+    "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+    "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+    "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+    "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+  ],
+  "corrected_signature_set_sha256": "9527f29a426e8a1d94d6b1ec9f1af821d83fbd38185a4ce6ef54829df7f7028e",
+  "fixed_failures": [],
+  "generations": 0,
+  "gpu_operations": 0,
+  "image": "python:3.11-bookworm",
+  "installed_closure_matches_lock": true,
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "net_new_passing_tests": 67,
+  "new_failure_count": 0,
+  "new_failures": [],
+  "one_shot_envelope_consumed": false,
+  "pinned_packages_verified": 94,
+  "prefills": 0,
+  "pytest_status_captured_directly": true,
+  "pytest_summary_independently_reconciled": true,
+  "pytest_version": "9.1.1",
+  "python_version": "3.11.16",
+  "replay_gate_ran": false,
+  "requirements_lock_sha256": "570775850eb31b5a8613295fa6e9099400670408a6ce3a162dc6d9159dda87bf",
+  "schema_version": "study3-p0-r2-validation-receipts-v2",
+  "scope": "full repository suite, differential, by exact node id and complete normalized failure signature",
+  "scored_rows": 0,
+  "shared_failures": [
+    "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+    "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+    "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+    "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+  ],
+  "signatures_agree": true,
+  "signatures_disagreeing_on_shared_failures": [],
+  "stage": "STUDY3-P0-R2",
+  "standing_failure_signatures": [
+    {
+      "first_line": "tmp_path = PosixPath('<PYTEST_TMP>')",
+      "kind": "failed",
+      "nodeid": "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+      "normalized_bytes": 1409,
+      "normalized_longrepr": "tmp_path = PosixPath('<PYTEST_TMP>')\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at <ADDR>>\n\n    def test_seal_refuses_a_non_empty_parent_prefix(tmp_path, monkeypatch):\n        retired = [f\"retired parser-v2 fixture {index} says {index}/13\" for index in range(60)]\n        monkeypatch.setattr(\n            job,\n            \"RETIRED_INPUTS_REGISTERED_SHA256\",\n            job.sha256_bytes(_retired_payload(retired)),\n        )\n        stamp = \"20260725T162000Z\"\n        service = _payload_service(retired)\n        service.store[f\"{job.SEAL_ROOT}/{stamp}/manifests/inputs_manifest.json\"] = b\"x\"\n        service.etags[f\"{job.SEAL_ROOT}/{stamp}/manifests/inputs_manifest.json\"] = '\"e\"'\n        with pytest.raises(job.JobAbort) as error:\n            _run(tmp_path, retired, \"seal\", service=service, seal_timestamp=stamp)\n>       assert \"already happened\" in str(error.value)\nE       AssertionError: assert 'already happened' in 'seal object is missing from the payload: locked_inputs.jsonl'\nE        +  where 'seal object is missing from the payload: locked_inputs.jsonl' = str(JobAbort('seal object is missing from the payload: locked_inputs.jsonl'))\nE        +    where JobAbort('seal object is missing from the payload: locked_inputs.jsonl') = <ExceptionInfo JobAbort('seal object is missing from the payload: locked_inputs.jsonl') tblen=4>.value\n\ntests/test_parser_v3_seal_job.py:433: AssertionError\n",
+      "normalized_sha256": "5d05aaaffc975c0ef929ac17c9bc18a5544d4c4c4a1d7a7635f53f371f48584e"
+    },
+    {
+      "first_line": "tmp_path = PosixPath('<PYTEST_TMP>')",
+      "kind": "failed",
+      "nodeid": "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+      "normalized_bytes": 7931,
+      "normalized_longrepr": "tmp_path = PosixPath('<PYTEST_TMP>')\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at <ADDR>>\n\n    def test_seal_writes_twelve_objects_with_the_set_manifest_last(tmp_path, monkeypatch):\n        retired = [f\"retired parser-v2 fixture {index} says {index}/13\" for index in range(60)]\n        monkeypatch.setattr(\n            job,\n            \"RETIRED_INPUTS_REGISTERED_SHA256\",\n            job.sha256_bytes(_retired_payload(retired)),\n        )\n        service = _payload_service(retired)\n        stamp = \"20260725T161500Z\"\n>       code, summary, _ = _run(tmp_path, retired, \"seal\", service=service, seal_timestamp=stamp)\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_parser_v3_seal_job.py:397:\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ntmp_path = PosixPath('<PYTEST_TMP>')\nretired_texts = ['retired parser-v2 fixture 0 says 0/13', 'retired parser-v2 fixture 1 says 1/13', 'retired parser-v2 fixture 2 says 2... parser-v2 fixture 3 says 3/13', 'retired parser-v2 fixture 4 says 4/13', 'retired parser-v2 fixture 5 says 5/13', ...]\nmode = 'seal'\nservice = <tests.test_parser_v3_seal_job.FakeService object at <ADDR>>\nseal_timestamp = '20260725T161500Z'\n\n    def _run(tmp_path, retired_texts, mode, service=None, seal_timestamp=None):\n        manifest = _synthetic_manifest(tmp_path, _new_texts())\n        service = service or _service_with_retired(_retired_payload(retired_texts))\n        sys.modules.pop(\"_jspace_parser_v3_fingerprints\", None)\n>       code, summary = job.run(\n            mode=mode,\n            account=\"stjspacefiles0709085305\",\n            container=\"jspace-results\",\n            seal_timestamp=seal_timestamp,\n            builder_path=BUILDER_PATH,\n            manifest_path=manifest,\n            locked_inputs=None,\n            payload_dir=None,\n            repo_root=ROOT,\n            environment={\"AZURE_CLIENT_ID\": \"x\"},\n            service_factory=lambda: service,\n            emit=lambda *_: None,\n        )\n\ntests/test_parser_v3_seal_job.py:300:\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nmode = 'seal', account = 'stjspacefiles0709085305', container = 'jspace-results'\nseal_timestamp = '20260725T161500Z'\nbuilder_path = PosixPath('<CHECKOUT>/scripts/build_parser_v3_validation_set.py')\nmanifest_path = PosixPath('<PYTEST_TMP>')\nlocked_inputs = None, payload_dir = None\nrepo_root = PosixPath('<CHECKOUT>'), environment = {'AZURE_CLIENT_ID': 'x'}\nservice_factory = <function _run.<locals>.<lambda> at <ADDR>>\nemit = <function _run.<locals>.<lambda> at <ADDR>>\n\n    def run(\n        *,\n        mode: str,\n        account: str,\n        container: str,\n        seal_timestamp: str | None,\n        builder_path: Path,\n        manifest_path: Path,\n        locked_inputs: Path | None,\n        payload_dir: Path | None,\n        repo_root: Path | None,\n        environment: Mapping[str, str],\n        service_factory: Any = None,\n        emit: Any = print,\n    ) -> tuple[int, dict[str, Any]]:\n        started_at = utc_now()\n        container = validate_container(container)\n        module = load_builder_module(builder_path)\n        registration = verify_fingerprint_registration(module)\n        manifest = json.loads(Path(manifest_path).read_text(encoding=\"utf-8\"))\n        reproduction = verify_manifest_reproduction(module, manifest, locked_inputs)\n        new_index = new_fingerprint_index(manifest)\n        for field in MANIFEST_FIELDS:\n            if len(new_index[field]) != 120:\n                raise JobAbort(\n                    f\"expected 120 distinct {field} fingerprints in the inputs manifest\"\n                )\n        emit(f\"[gate] fingerprint registration: {registration['status']}\")\n        emit(f\"[gate] manifest reproduction: {reproduction['status']}\")\n\n        if mode == \"preflight\":\n            payload = load_seal_payload(payload_dir, repo_root)\n            emit(f\"[preflight] verified {len(payload)} seal objects against Track D digests\")\n            summary = {\n                \"mode\": \"preflight\",\n                \"started_at_utc\": started_at,\n                \"finished_at_utc\": utc_now(),\n                \"fingerprint_registration\": registration,\n                \"manifest_reproduction\": reproduction,\n                \"seal_objects_verified\": len(payload),\n                \"cross_check\": \"NOT PERFORMED\",\n                \"status\": \"PREFLIGHT_OK\",\n                \"state\": \"PREFLIGHT_OK\",\n            }\n            emit(\"[preflight] cross_check=NOT PERFORMED (no Azure access in this mode)\")\n            return 0, summary\n\n        account_url = f\"https://{account}.blob.core.windows.net\"\n        factory = service_factory or (lambda: create_blob_service(account_url, environment))\n        service = factory()\n\n        listed = list_retired_inputs(service, container)\n        emit(f\"[source] listed {len(listed)} objects under the retired locked-inputs leaf\")\n        source = read_retired_inputs(service, container)\n        emit(f\"[source] retired records with output-bearing text: {len(source['texts'])}\")\n        collisions = compare_fingerprints(\n            module, new_index, source[\"texts\"], source[\"case_ids\"]\n        )\n        report = build_crosscheck_report(\n            account=account,\n            container=container,\n            listed_names=listed,\n            source=source,\n            registration=registration,\n            reproduction=reproduction,\n            new_index=new_index,\n            collisions=collisions,\n            started_at=started_at,\n            seal_timestamp=seal_timestamp,\n            mode=mode,\n        )\n        emit(\n            \"[crosscheck] new_count={new_count} retired_count={retired_count} \"\n            \"exact={exact_collision_count} normalised={normalised_collision_count} \"\n            \"numeric_normalised={numeric_normalised_collision_count} \"\n            \"verdict={cross_check}\".format(**report)\n        )\n\n        if seal_timestamp:\n            sidecar = upload_sidecar(\n                service, container, seal_timestamp, \"crosscheck_report.json\", report\n            )\n            report = dict(report)\n            report[\"report_blob\"] = sidecar\n            emit(f\"[crosscheck] report written to {sidecar['blob_name']}\")\n\n        if report[\"cross_check\"] == \"FAIL\":\n            emit(\"[decision] DO NOT SEAL: at least one fingerprint collision\")\n            return 2, {\"crosscheck\": report, \"seal\": None, \"state\": \"BLOCKED_COLLISION\"}\n        if report[\"cross_check\"] != \"PASS\":\n            emit(\"[decision] DO NOT SEAL: cross-check aborted on a guard\")\n            return 3, {\"crosscheck\": report, \"seal\": None, \"state\": \"BLOCKED_INFRASTRUCTURE\"}\n\n        if mode == \"crosscheck\":\n            emit(\"[decision] cross-check PASS; seal not requested in this mode\")\n            return 0, {\"crosscheck\": report, \"seal\": None, \"state\": \"CROSSCHECK_PASS\"}\n\n        if not seal_timestamp:\n            raise JobAbort(\"seal mode requires an explicit --seal-timestamp\")\n>       payload = load_seal_payload(payload_dir, repo_root)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nscripts/parser_v3_seal_job.py:1059:\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\npayload_dir = None, repo_root = PosixPath('<CHECKOUT>')\n\n    def load_seal_payload(\n        payload_dir: Path | None, repo_root: Path | None\n    ) -> list[dict[str, Any]]:\n        \"\"\"Read the twelve objects and abort on any digest or size mismatch.\"\"\"\n        loaded: list[dict[str, Any]] = []\n        for item in SEAL_OBJECTS:\n            path = resolve_payload_path(item, payload_dir, repo_root)\n            if not path.is_file():\n>               raise JobAbort(f\"seal object is missing from the payload: {item['name']}\")\nE               scripts.parser_v3_seal_job.JobAbort: seal object is missing from the payload: locked_inputs.jsonl\n\nscripts/parser_v3_seal_job.py:733: JobAbort\n",
+      "normalized_sha256": "5c39706f440e1bc5c4e4dfba98930a2eab57b70bd3133826797d5238d04d6962"
+    },
+    {
+      "first_line": "self_test_pack = PosixPath('<PYTEST_TMP>')",
+      "kind": "failed",
+      "nodeid": "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+      "normalized_bytes": 1792,
+      "normalized_longrepr": "self_test_pack = PosixPath('<PYTEST_TMP>')\n\n    def test_no_artifact_asserts_a_prohibited_claim(self_test_pack: Path) -> None:\n        summary = (self_test_pack / \"05_summary.md\").read_text(encoding=\"utf-8\")\n        sections = _summary_sections(summary)\n        allowed = {\"## Scope\", \"## Scientific interpretation\"}\n        for phrase in (\n            \"workspace found\",\n            \"hidden reasoning\",\n            \"invisible chain-of-thought\",\n            \"internal workspace\",\n            \"J-space validated\",\n        ):\n            assert phrase in sections[\"## Scientific interpretation\"]\n            for name, body in sections.items():\n                if name not in allowed:\n                    assert phrase not in body, f\"{phrase} leaked into {name}\"\n        for name in (\"02_records.jsonl\", \"03_metrics.csv\", \"06_paper_table.csv\"):\n            text = (self_test_pack / name).read_text(encoding=\"utf-8\").lower()\n>           assert \"workspace\" not in text\nE           assert 'workspace' not in '{\"condition...\"track-a\"}\\n'\nE\nE             'workspace' is contained here:\nE               ,\"path\":\"<CHECKOUT>/data/jlens_saturation_prompts.jsonl\",\"proxy_token_max\":44,\"proxy_token_min\":38,\"proxy_tokenizer\":\"regex_word_punctuation_proxy_v1\",\"reserve_prompt_ids\":[\"sat-reserve-001\",\"sat-reserve-002\",\"sat-reserve-003\",\"sat-reserve-004\",\"sat-reserve-005\",\"sat-reserve-006\",\"sat-reserve-007\",\"sat-reserve-008\",\"sat-reserve-009\",\"sat-reserve-010\",\"sat-reserve-011\",\"sat-reserve-012\",\"sat-reserve-013\",\"sat-reserve-014\",\"sat-reserve-015\",\"sat-reserve-016\",\"sat-reserve-017\",\"sat-reserve-018\",\"sat-reserve-019\",\"sat-reserve-020\",\"sat-reserve-021\",\"sat-...\nE\nE             ...Full output truncated (23 lines hidden), use '-vv' to show\n\ntests/test_phase05_jlens_saturation.py:648: AssertionError\n",
+      "normalized_sha256": "b47bdc5b5c4041b703fe4463d83ac4152102d3a896ff3a037250101c155b3ebd"
+    },
+    {
+      "first_line": "def test_every_committed_p0_source_file_is_lf_only():",
+      "kind": "failed",
+      "nodeid": "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only",
+      "normalized_bytes": 1623,
+      "normalized_longrepr": "def test_every_committed_p0_source_file_is_lf_only():\n        \"\"\"A CRLF shell script is not merely untidy; it does not run.\n\n        The stage P0-T script is executed by bash inside the registered container.\n        Authoring it with CRLF made bash read a literal carriage return as part of\n        each command, and the stage aborted before it began. Every committed P0\n        file is therefore held to LF, in a study whose whole subject is byte\n        exactness.\n        \"\"\"\n        offenders = []\n        for dirpath, dirnames, filenames in os.walk(P0_DIR):\n            dirnames[:] = [d for d in dirnames if d != \"__pycache__\"]\n            for name in filenames:\n                path = os.path.join(dirpath, name)\n                with open(path, \"rb\") as handle:\n                    if b\"\\r\" in handle.read():\n                        offenders.append(os.path.relpath(path, REPO_ROOT))\n        with open(__file__, \"rb\") as handle:\n            if b\"\\r\" in handle.read():\n                offenders.append(os.path.relpath(__file__, REPO_ROOT))\n>       assert offenders == [], offenders\nE       AssertionError: ['studies/study3/pilot/p0/results/p0-r1/p0_r1_replay_stderr.txt', 'studies/study3/pilot/p0/results/p0-r1/p0_r1_preflig...r1_generation3_stop_counters.json', 'studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_gpu_job_presence.json', ...]\nE       assert ['studies/stu...ce.json', ...] == []\nE\nE         Left contains 8 more items, first extra item: 'studies/study3/pilot/p0/results/p0-r1/p0_r1_replay_stderr.txt'\nE         Use -v to get more diff\n\ntests/test_study3_p0_feasibility_pilot.py:190: AssertionError\n",
+      "normalized_sha256": "22916a464721d88e8bd54ede79ec3d3aec006c1064fc10935c20e749d78e5b90"
+    }
+  ],
+  "superseded_differential_run_ids": [
+    {
+      "outcome": "REFUSED",
+      "reason": "a shared failure signature disagreed only on the checkout root inside PosixPath('/workspace/base') versus PosixPath('/workspace/head'); the normalizer ended the checkout root at /, whitespace, : or end of line and therefore missed a closing quote",
+      "run_id": "cmja"
+    }
+  ],
+  "supersedes": "p0_r2_validation_full_suite_v1.json",
+  "tokenizer_constructions": 0,
+  "zero_collection_errors": true
+}
