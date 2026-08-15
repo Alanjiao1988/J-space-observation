@@ -99,13 +99,13 @@
     },
     {
       "added_by_generation2": true,
-      "bytes": 5352,
-      "git_blob": "7630658ed7d71049f06101f456bd6e25ed280749",
+      "bytes": 5785,
+      "git_blob": "653cb843fe3f48295d20617df04ad13cf61afd09",
       "image_path": "/usr/local/bin/p0_r2_canary_g2.sh",
       "install_name": "p0_r2_canary_g2.sh",
       "kind": "entrypoint",
       "path": "studies/study3/pilot/p0_r2/container/p0_r2_canary_g2.sh",
-      "sha256": "9b1ce03c64b0c8ac871855a54c3a05ef95118249ecbcfee65cd7f640e233da6f"
+      "sha256": "3d889b8f5c228daf578a25f30ae1cb8cf55b13779369beb8d1ca4f2afefac552"
     },
     {
       "added_by_generation2": false,
@@ -535,13 +535,13 @@
       "sha256": "d0567f7fa808049a622d447b2672bf67f858c499e46d250e1afc0adc82387f40"
     }
   ],
-  "entries_sha256": "1902d698921e321fda5e130ea31a32cc50137afd3bd367db0221dd426613db71",
+  "entries_sha256": "948873f102127ee3a4b2b4bb7da7b073256ce0e3c406c2825b51eb104e68e4fe",
   "entry_count": 56,
   "entry_count_is_derived_not_asserted": true,
   "entrypoint_count": 14,
   "entrypoint_install_root": "/usr/local/bin",
-  "executable_commit": "4b7a08ed0b180558c57e1386b73823db13600bed",
-  "executable_tree": "caac814e961f565833ed87a9ce655cb8aa72b98c",
+  "executable_commit": "073183945d72ee86cc8b1f31a691019e935f393d",
+  "executable_tree": "74d3683f4f09475ab278aa00ec3a09ffb4bb6275",
   "generation": 2,
   "image_root": "/opt/jspace/src",
   "model_operations_performed": 0,
