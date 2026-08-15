@@ -234,3 +234,19 @@ tests/test_study3_p0_r1_generation2_transport.py text eol=lf
 # 392f78466ee61ed303b5cf4b1fba4423e38b128441aeec1de119315b2e52a5ee.
 studies/study3/pilot/p0_r1/execution/p0_r1_model_execution.py -text
 tests/test_study3_p0_r1_generation3_execution_closure.py text eol=lf
+# Study 3 P0-R2 generation-1 infrastructure successor.
+# Registered for exactly the reason recorded in the P0-R1 block above, and
+# because that omission was not theoretical here: the first generation-1
+# canary run failed with `exec /usr/local/bin/p0_r2_canary_v1.sh: no such
+# file or directory` because the entry points had been authored on Windows
+# and committed with CRLF, so the Linux kernel read the shebang as
+# `/bin/sh\r`. The image-to-Git audit passed at the same time, correctly:
+# the image carried exactly the bytes Git held. Only the bytes were wrong.
+# Pinning these paths to LF keeps the entry points executable on the agent
+# and keeps a fresh Linux checkout byte-identical to the executable-code
+# binding recorded in the P0-R2 lock.
+studies/study3/pilot/p0_r2/*.py text eol=lf
+studies/study3/pilot/p0_r2/*.json text eol=lf
+studies/study3/pilot/p0_r2/*.md text eol=lf
+studies/study3/pilot/p0_r2/container/* text eol=lf
+tests/test_study3_p0_r2_execution_closure.py text eol=lf
