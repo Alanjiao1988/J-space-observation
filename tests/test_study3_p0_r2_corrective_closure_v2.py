@@ -411,6 +411,43 @@ def _preflight(tmp_path, lock):
     return HOST.Preflight(REPO_ROOT, lock_path)
 
 
+def test_the_guarded_wrapper_resolves_the_cli_the_way_a_shell_would():
+    """The defect that stopped the one-shot invocation.
+
+    p0_r2_acr_submission._default_runner already resolves the program with
+    shutil.which, precisely because subprocess does not apply PATHEXT and the
+    Azure CLI ships as az.cmd on Windows. The guarded wrapper needs its own
+    runner only to scope P0_R2_LIVE_REPLAY_AUTHORIZED to one child, and its
+    first version passed the bare command straight to subprocess -- silently
+    reintroducing the bug the module had already fixed, in the one code path
+    that spends an unrepeatable envelope.
+    """
+    import p0_r2_acr_submission as SUB
+    import p0_r2_host_submission_v2 as WRAP
+
+    module_source = (P0_R2_DIR / "p0_r2_acr_submission.py").read_text(
+        encoding="utf-8")
+    wrapper_source = (VALIDATION_DIR / "p0_r2_host_submission_v2.py").read_text(
+        encoding="utf-8")
+
+    assert "shutil.which(command[0])" in module_source
+    assert "shutil.which(command[0])" in wrapper_source
+
+    # The wrapper's runner is defined inside submit_once; assert the resolution
+    # appears in the same function that builds the child environment.
+    start = wrapper_source.index("def submit_once(")
+    body = wrapper_source[start:]
+    assert "shutil.which(command[0])" in body
+    assert "env=child_env" in body
+    assert body.index("shutil.which(command[0])") < body.index("SUBMISSION.submit")
+
+    identity = WRAP.implementation_identity()
+    assert identity["invocations_permitted"] == 1
+    assert identity["retries_permitted"] == 0
+    assert identity["sets_authorization_env_globally"] is False
+    assert SUB.SCHEMA_VERSION
+
+
 def test_the_admission_gate_resolves_the_anchor_by_ancestry(tmp_path):
     """The same defect as the preflight's, found in a second module.
 

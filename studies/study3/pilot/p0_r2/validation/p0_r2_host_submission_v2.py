@@ -37,6 +37,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 
@@ -194,9 +195,20 @@ def submit_once(root, *, lock_path, admission_path, preflight_report_path,
     previous = os.environ.pop(AUTHORIZED_ENV, None)
 
     def runner(command, context):
+        # The module's own default runner resolves the program the way a shell
+        # would, because subprocess does not apply PATHEXT and the Azure CLI
+        # ships as az.cmd on Windows. This wrapper only needs a custom runner in
+        # order to scope P0_R2_LIVE_REPLAY_AUTHORIZED to exactly one child, so
+        # it must keep that resolution rather than silently reintroduce the bug
+        # the module had already fixed.
+        #
+        # It did reintroduce it, and it fired on the one invocation that
+        # matters: CreateProcess failed with WinError 2, no az process ever
+        # existed, stdout was zero bytes and Azure never saw a request.
+        program = shutil.which(command[0]) or command[0]
         return subprocess.run(  # noqa: S603 - fixed executable
-            command, cwd=str(context), capture_output=True, check=False,
-            env=child_env)
+            [program] + list(command[1:]), cwd=str(context),
+            capture_output=True, text=False, check=False, env=child_env)
 
     try:
         receipt = SUBMISSION.submit(
