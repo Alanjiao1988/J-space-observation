@@ -1,0 +1,176 @@
+{
+  "acr_packing_and_pre_gate_canary": {
+    "attempt_id": "p0r2-g2-canary-packing-20260815-1800",
+    "checks": {
+      "context_two_entries": true,
+      "counters_zero": true,
+      "deferred_marker_exactly_once": true,
+      "envelope_not_consumed": true,
+      "exactly_one_run_id": true,
+      "exit_code_zero": true,
+      "image_to_git_audit_ran": true,
+      "lock_from_context_verified": true,
+      "max_native_path_le_100": true,
+      "no_in_container_storage_call": true,
+      "no_managed_identity_probe": true,
+      "packing_canary_complete": true,
+      "prefix_receipt_validated": true,
+      "receipt_matches_submission": true,
+      "registered_markers_exactly_once": true,
+      "replay_gate_not_invoked": true,
+      "shared_validator_ran": true,
+      "transport_roundtrip_ok": true
+    },
+    "context_entry_count": 2,
+    "exit_code": 0,
+    "maximum_native_path": 38,
+    "native_path_ceiling": 100,
+    "one_shot_envelope_consumed": false,
+    "outcome_class": "PASS",
+    "raw_log": {
+      "bytes": 8750,
+      "name": "p0_r2_g2_acr_raw_log.txt",
+      "sha256": "1a06c4b3ccf8968205749db73982cfb2f0dee0d1073172289ad73b451dd724b6"
+    },
+    "run_id": "cmk4",
+    "run_id_count": 1
+  },
+  "checkpoint_downloads": 0,
+  "executable_commit": "a5115e0faf6acc686f777c8f9b3e496602832493",
+  "generation": 2,
+  "gpu_operations": 0,
+  "hard_kill_open_admission_recovery_canary": {
+    "accelerator_requested": false,
+    "all_committed_payload_bytes_recovered": true,
+    "attempt_id": "p0r2-g2-canary-hardkill-20260815-1800",
+    "execution": "job-jspace-s3-p0r2-hardkill-g2-5rwdm03",
+    "job": "job-jspace-s3-p0r2-hardkill-g2",
+    "journal_sequence_continuous_and_create_only": true,
+    "kill": {
+      "catchable": false,
+      "child_returncode": -9,
+      "child_was_given_no_chance_to_clean_up": true,
+      "classification": "HARD_TERMINATION_SIGKILL",
+      "killed_at_epoch": 1786816025.7265437,
+      "signal": 9,
+      "signal_name": "SIGKILL"
+    },
+    "no_observation_overwritten_or_inferred": true,
+    "open_admission_recovered": true,
+    "outcome_class": "PASS",
+    "prefix": "study3/p0_r2/g2/p0r2-g2-canary-hardkill-20260815-1800/",
+    "prior_refusals": [
+      {
+        "execution": "job-jspace-s3-p0r2-hardkill-g2-v8iabiy",
+        "objects_written": 0,
+        "reason": "CUDA_VISIBLE_DEVICES=-1 read as an accelerator replica by the frozen guard"
+      },
+      {
+        "execution": "job-jspace-s3-p0r2-hardkill-g2-hcb7ki0",
+        "objects_written": 0,
+        "reason": "attempt id did not begin with the registered generation-2 hard-kill canary prefix"
+      }
+    ],
+    "recovery_is_independent_process_state": true,
+    "recursive_manifest_written_last": true,
+    "report_sha256": "f314a122a0b6062cb0cc91ca01c6277926efd6ffc485237522b56dc5fbc6196a",
+    "simulated_exception_substituted": false
+  },
+  "image_digest": "sha256:4c4f815b86917a6867b014a2591ac415eba5544f7dc32968fad6ca04af6e0079",
+  "in_vnet_prefix_canary": {
+    "all_model_and_gpu_counters_zero": true,
+    "attempt_id": "p0r2-g2-canary-packing-20260815-1800",
+    "did_not_use_live_or_pilot_prefix": true,
+    "execution": "job-jspace-s3-p0r2-prefix-g2-h6hd2sv",
+    "job": "job-jspace-s3-p0r2-prefix-g2",
+    "log": {
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 2780,
+      "stdout_sha256": "3bf0456d6219c17f07f0911d2b5e9b176bba0be98b6eb3b12adfc4d9b0daeda8"
+    },
+    "managed_identity_token_acquired": true,
+    "object_count": 0,
+    "outcome": "PROVED_UNUSED",
+    "outcome_class": "PASS",
+    "prefix": "study3/p0_r2/g2/p0r2-g2-canary-packing-20260815-1800/",
+    "private_listing_succeeded": true,
+    "receipt_reconstructed_from_captured_log_alone": true,
+    "receipt_sha256": "efad0f92135a8cb2aca402252a1942ec2862050195c829f9b3cb16f1d867f380",
+    "wrote_any_object": false
+  },
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "non_vacuous_job_absence": {
+    "ambiguous_count": 0,
+    "at_least_one_generation2_cpu_job_present": true,
+    "generation": 2,
+    "model_operations_performed": 0,
+    "non_vacuous": true,
+    "pilot_job_proved_absent": true,
+    "query_error_is_absence": false,
+    "recovery_job_proved_absent": true,
+    "resource_group": "rg-jspace-observation-sea",
+    "results": [
+      {
+        "job": "job-jspace-s3-p0r2-pilot-g2",
+        "outcome": "PROVED_ABSENT"
+      },
+      {
+        "job": "job-jspace-s3-p0r2-recover-g2",
+        "outcome": "PROVED_ABSENT"
+      },
+      {
+        "job": "job-jspace-s3-p0r2-prefix-g2",
+        "outcome": "PROVED_PRESENT"
+      },
+      {
+        "job": "job-jspace-s3-p0r2-hardkill-g2",
+        "outcome": "PROVED_ABSENT"
+      }
+    ],
+    "schema_version": "study3-p0-r2-job-absence-proof-g2",
+    "stage": "STUDY3-P0-R2",
+    "subscription": "943bacdf-8b6e-4e3a-8126-a149f623d32e"
+  },
+  "one_shot_envelope_consumed_by_any_canary": false,
+  "replay_gate_invoked_by_any_canary": false,
+  "schema_version": "study3-p0-r2-canary-receipts-g2",
+  "stage": "STUDY3-P0-R2",
+  "tokenizer_constructions": 0,
+  "windows_launch_path_proof": {
+    "authorization_environment": "P0_R2_LIVE_REPLAY_AUTHORIZED",
+    "authorization_exported_globally": false,
+    "azure_cli_version": "2.83.0",
+    "checks": [
+      {
+        "argv0": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.CMD",
+        "check": "version",
+        "passed": true,
+        "returncode": 0,
+        "stderr_bytes": 0,
+        "stdout_bytes": 534,
+        "stdout_sha256": "2a9c3bd30b787a3340eb6ef55776cf9b0745388bb58791b003193a86cebcb751"
+      },
+      {
+        "argv0": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.CMD",
+        "check": "account_show",
+        "passed": true,
+        "returncode": 0,
+        "stderr_bytes": 0,
+        "stdout_bytes": 482,
+        "stdout_sha256": "7d31deb158bd3614ee8c5a5712ff46778b41ae79fccdebe5e480cad98a54c35e"
+      }
+    ],
+    "generation": 2,
+    "model_operations_performed": 0,
+    "relies_on_pathext": false,
+    "resolved_basename": "az.CMD",
+    "resolved_executable": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.CMD",
+    "resolved_with": "shutil.which",
+    "schema_version": "study3-p0-r2-windows-launch-proof-g2",
+    "stage": "STUDY3-P0-R2",
+    "subscription": "943bacdf-8b6e-4e3a-8126-a149f623d32e",
+    "uses_shell": false
+  }
+}
