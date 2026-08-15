@@ -18,6 +18,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -673,6 +674,26 @@ def test_the_canary_script_is_model_free():
     assert "P0_R2_MODEL_OPERATIONS_PERFORMED=0" in text
     assert "P0_R2_REPLAY_GATE_RUN=false" in text
     assert "P0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false" in text
+
+
+def test_the_canary_only_invokes_command_lines_the_modules_expose():
+    # A canary that calls a flag a module does not implement fails in the
+    # container for a reason that has nothing to do with what it was checking,
+    # so the pairing is asserted here where it is cheap to notice.
+    text = (CONTAINER / "p0_r2_canary_v1.sh").read_text(encoding="utf-8")
+    blocks = re.findall(r"for module in (.+?); do\s*\n(.*?)\n\s*done",
+                        text, re.S)
+    assert blocks, "the canary no longer loops over modules"
+    checked = 0
+    for names, body in blocks:
+        flag = "--identity" if "--identity" in body else "--self-check"
+        for name in names.replace("\\\n", " ").split():
+            source = (P0_R2_DIR / ("%s.py" % name))
+            assert source.is_file(), "%s is named but absent" % name
+            assert flag in source.read_text(encoding="utf-8"), \
+                "%s does not implement %s" % (name, flag)
+            checked += 1
+    assert checked >= 15
 
 
 def test_the_pilot_script_refuses_before_it_reaches_a_model():

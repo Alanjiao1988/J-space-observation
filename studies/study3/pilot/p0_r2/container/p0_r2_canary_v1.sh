@@ -27,14 +27,29 @@ echo "P0_R2_CANARY_MODE=${MODE}"
 echo "P0_R2_STAGE=${STAGE}"
 
 emit_identity() {
-    for module in p0_r2_transport p0_r2_transport_v1 p0_r2_blob_transport \
-                  p0_r2_journal_v1 p0_r2_closure_binding_v1 \
+    # Every module that can describe itself is asked to, which also proves it
+    # imports cleanly inside the image. The two transport modules that predate
+    # the identity convention expose a self-check instead, so they are run the
+    # way they actually work rather than being skipped.
+    for module in p0_r2_transport_v1 p0_r2_blob_transport_v1 p0_r2_journal_v1 \
+                  p0_r2_submission_context p0_r2_acr_submission \
+                  p0_r2_closure_binding_v1 p0_r2_azure_query_v1 \
+                  p0_r2_replay_capture_v1 p0_r2_verify_replay_receipt \
+                  p0_r2_authorization_v1 p0_r2_job_spec_v1 \
                   p0_r2_replay_gate_v1 p0_r2_prefix_preflight_v1 \
                   p0_r2_recovery_v1 p0_r2_model_runner_v1 \
                   p0_r2_image_manifest_v1 p0_r2_execution_lock_v1; do
         python3 "${R2}/${module}.py" --identity > "${OUT}/${module}.identity.json"
         echo "P0_R2_IDENTITY_OK=${module}"
     done
+    for module in p0_r2_transport p0_r2_journal_v1; do
+        python3 "${R2}/${module}.py" --self-check > "${OUT}/${module}.selfcheck.json"
+        echo "P0_R2_SELF_CHECK_OK=${module}"
+    done
+    # p0_r2_blob_transport carries no command line of its own; importing it is
+    # the only thing there is to prove.
+    python3 -c "import p0_r2_blob_transport" \
+        && echo "P0_R2_IMPORT_OK=p0_r2_blob_transport"
 }
 
 audit_image() {
