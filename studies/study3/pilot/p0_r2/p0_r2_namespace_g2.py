@@ -145,10 +145,6 @@ def instantiate(module_name: str, *, expected_sha256=None):
     if module_name not in REUSED_PRIMITIVES:
         raise NamespaceDefect(
             "%r is not a registered reusable primitive" % module_name)
-    cached = _INSTANCES.get(module_name)
-    if cached is not None:
-        return cached
-
     path = P0_R2_DIR / (module_name + ".py")
     payload = path.read_bytes()
     actual = _sha256(payload)
@@ -161,6 +157,13 @@ def instantiate(module_name: str, *, expected_sha256=None):
                 "%s is sha256 %s, not the bound %s; generation 2 refuses to "
                 "execute a primitive whose bytes are not the bound bytes"
                 % (module_name, actual, expected_sha256))
+
+    # The cache is consulted only after the byte binding is checked. Checking it
+    # first would let a second caller pass a wrong expected hash and be handed a
+    # cached instance without the refusal it asked for.
+    cached = _INSTANCES.get(module_name)
+    if cached is not None:
+        return cached
 
     instance = types.ModuleType("%s__g2" % module_name)
     instance.__file__ = str(path)
