@@ -1,0 +1,2282 @@
+{
+  "attempt": {
+    "hard_kill_canary_attempt_id": "p0r2-g1-hardkill-canary-20260815-0748",
+    "live_replay_attempt_id": "p0r2-g1-live-20260815-0800",
+    "pilot_attempt_id": "p0r2-g1-pilot-20260815-0800",
+    "prefix_root": "study3/p0_r2/g1"
+  },
+  "attempt_ledger": {
+    "bytes": 90680,
+    "document": {
+      "ambiguous_count": 0,
+      "append_only": true,
+      "by_category": {
+        "accepted": [
+          "cmht",
+          "cmhu",
+          "cmhv",
+          "cmj3",
+          "cmj5",
+          "cmj6"
+        ],
+        "claimed-but-previously-unsealed": [
+          "cmj7"
+        ],
+        "corrective-closure": [
+          "cmj8",
+          "cmj9",
+          "cmja",
+          "cmjb",
+          "cmjc",
+          "cmjd",
+          "cmje",
+          "cmjf",
+          "cmjg",
+          "cmjh",
+          "cmjj",
+          "cmjk"
+        ],
+        "failed-or-discarded": [
+          "cmhb",
+          "cmhd",
+          "cmhe",
+          "cmhf",
+          "cmhg",
+          "cmhh",
+          "cmhk",
+          "cmhn",
+          "cmhw",
+          "cmhx",
+          "cmhy",
+          "cmj0",
+          "cmj1"
+        ],
+        "superseded": [
+          "cmhp",
+          "cmhq",
+          "cmhs",
+          "cmj2",
+          "cmj4"
+        ]
+      },
+      "checkpoint_downloads": 0,
+      "complete_and_admissible": true,
+      "created_updated_or_started_anything": false,
+      "fabricated_hashes": 0,
+      "gpu_operations": 0,
+      "ledger_sha256": "0f38fe7a87aebbdcae48d29fcbae748a3a06c5c00c540a5cb6a9f2ec2fee436f",
+      "model_operations_performed": 0,
+      "model_weight_loads": 0,
+      "registry": "acrjspaceobssea0708231738",
+      "resource_group": "rg-jspace-observation-sea",
+      "run_count": 37,
+      "runs": [
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T00:50:01.218070+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T00:51:49.283940+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 6726,
+          "log_excerpt_head": "2026/08/15 00:50:02 Downloading source code...\n\n2026/08/15 00:50:02 Finished downloading source code\n\n2026/08/15 00:50:03 Using acb_vol_9919298b-6dc3-44bc-893e-15ab311ea5b3 as the home volume\n2026/08/15 00:50:03 Setting up Docker configuration...\n2026/08/15 00:50:03 Successfully set up Docker configuration\n2026/08/15 00:50:03 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 00:50:04 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 00:50:04 Executing step ID: bu",
+          "log_excerpt_tail": "v1.sh': Operation not permitted\nchmod: changing permissions of '/usr/local/bin/p0_r2_replay_v1.sh': Operation not permitted\nchmod: changing permissions of '/usr/local/bin/p0_r2_successor_v1.sh': Operation not permitted\nThe command '/bin/sh -c chmod 0755 /usr/local/bin/p0_r2_*.sh' returned a non-zero code: 1\n2026/08/15 00:51:45 Container failed during run: build. No retries remaining.\nfailed to run step ID: build: exit status 1\n\n\nRun ID: cmhb failed after 1m44s. Error: failed during run, err: exit status 1\n\n",
+          "log_sha256": "96b6325be3ae192dd64a2d0a307625db71bf77a8060594d7becabff561085afe",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": "failed during run, err: exit status 1",
+          "run_id": "cmhb",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Failed",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T01:14:18.966136+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T01:16:43.611807+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11725,
+          "log_excerpt_head": "2026/08/15 01:14:19 Downloading source code...\n\n2026/08/15 01:14:20 Finished downloading source code\n\n2026/08/15 01:14:21 Using acb_vol_cc16f7fa-bef1-433a-8cde-9d3b2a62c7af as the home volume\n2026/08/15 01:14:21 Setting up Docker configuration...\n2026/08/15 01:14:21 Successfully set up Docker configuration\n2026/08/15 01:14:21 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 01:14:22 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 01:14:22 Executing step ID: bu",
+          "log_excerpt_tail": "ere found:\n2026/08/15 01:16:42 \n- image:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r2\n    tag: gen1-d21bc5b4802a\n    digest: sha256:a78504dd361af227db34a0b0a59190b1be59b0953b889c00885e1cce96de2bf0\n  runtime-dependency:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r1\n    digest: sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c\n  git: {}\n\n\n\nRun ID: cmhd was successful after 2m23s\n\n",
+          "log_sha256": "30046ddfd51ba345bc3af9bae2700921ce6fc9b77bc59b1f19b20dc64e0a293a",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": [
+            {
+              "digest": "sha256:a78504dd361af227db34a0b0a59190b1be59b0953b889c00885e1cce96de2bf0",
+              "registry": "acrjspaceobssea0708231738.azurecr.io",
+              "repository": "j-space-observation-study3-p0-r2",
+              "tag": "gen1-d21bc5b4802a"
+            }
+          ],
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": null,
+          "run_id": "cmhd",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T01:17:54.144627+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T01:19:25.410041+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 5509,
+          "log_excerpt_head": "2026/08/15 01:17:55 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 01:17:55 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 01:17:55 Successfully set up Docker network: acb_default_network\n2026/08/15 01:17:55 Setting up Docker configuration...\n2026/08/15 01:17:55 Successfully set up Docker configuration\n2026/08/15 01:17:55 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 01:17:56 S",
+          "log_excerpt_tail": "1af227db34a0b0a59190b1be59b0953b889c00885e1cce96de2bf0\nStatus: Downloaded newer image for acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:a78504dd361af227db34a0b0a59190b1be59b0953b889c00885e1cce96de2bf0\nexec /usr/local/bin/p0_r2_canary_v1.sh: no such file or directory\n2026/08/15 01:19:23 Container failed during run: acb_step_0. No retries remaining.\n\nfailed to run step ID: acb_step_0: exit status 1\n\n\nRun ID: cmhe failed after 1m29s. Error: failed during run, err: exit status 1\n\n",
+          "log_sha256": "46f1c3bd7e1c9d7e658c70bcc4372b51e8d6d28b61ee865859fdf8fc3955349c",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": "failed during run, err: exit status 1",
+          "run_id": "cmhe",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Failed",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T01:24:50.468497+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T01:26:57.618988+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11174,
+          "log_excerpt_head": "2026/08/15 01:24:51 Downloading source code...\n\n2026/08/15 01:24:51 Finished downloading source code\n\n2026/08/15 01:24:52 Using acb_vol_a2a66a3b-f830-4cef-86d5-0db4a78482b6 as the home volume\n2026/08/15 01:24:52 Setting up Docker configuration...\n2026/08/15 01:24:52 Successfully set up Docker configuration\n2026/08/15 01:24:52 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 01:24:53 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 01:24:53 Executing step ID: bu",
+          "log_excerpt_tail": "were found:\n2026/08/15 01:26:57 \n- image:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r2\n    tag: gen1-f39657fa5362\n    digest: sha256:54235c03a121f0b240d82a2a96ce26fef9ac9112bec35b51d96d12fef2fd481e\n  runtime-dependency:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r1\n    digest: sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c\n  git: {}\n\n\n\nRun ID: cmhf was successful after 2m7s\n\n",
+          "log_sha256": "f87df7b2f8b071f73b242343e0003b5c8189fbc66ab5db79bdd4930665fb1b2f",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": [
+            {
+              "digest": "sha256:54235c03a121f0b240d82a2a96ce26fef9ac9112bec35b51d96d12fef2fd481e",
+              "registry": "acrjspaceobssea0708231738.azurecr.io",
+              "repository": "j-space-observation-study3-p0-r2",
+              "tag": "gen1-f39657fa5362"
+            }
+          ],
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": null,
+          "run_id": "cmhf",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T01:31:40.969035+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T01:33:12.007029+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 5905,
+          "log_excerpt_head": "2026/08/15 01:31:41 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 01:31:41 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 01:31:42 Successfully set up Docker network: acb_default_network\n2026/08/15 01:31:42 Setting up Docker configuration...\n2026/08/15 01:31:42 Successfully set up Docker configuration\n2026/08/15 01:31:42 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 01:31:43 S",
+          "log_excerpt_tail": "                [--canary-fixture] [--attempt ATTEMPT]\n                          [--in-dir IN_DIR] [--out-dir OUT_DIR] [--log LOG]\n                          [--receipt RECEIPT] [--run-id RUN_ID]\n                          [--bytes BYTES]\np0_r2_transport.py: error: unrecognized arguments: --identity\n2026/08/15 01:33:09 Container failed during run: acb_step_0. No retries remaining.\nfailed to run step ID: acb_step_0: exit status 2\n\n\nRun ID: cmhg failed after 1m29s. Error: failed during run, err: exit status 1\n\n",
+          "log_sha256": "fc18e7acacd0dc1d7118872124a8313110ed579cc34f6c817b3279bd50933260",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": "failed during run, err: exit status 1",
+          "run_id": "cmhg",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Failed",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T01:41:43.510639+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T01:43:55.650016+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11174,
+          "log_excerpt_head": "2026/08/15 01:41:44 Downloading source code...\n\n2026/08/15 01:41:44 Finished downloading source code\n\n2026/08/15 01:41:45 Using acb_vol_8e22f3b0-6683-4e10-ac71-2291d75addf5 as the home volume\n2026/08/15 01:41:45 Setting up Docker configuration...\n2026/08/15 01:41:45 Successfully set up Docker configuration\n2026/08/15 01:41:45 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 01:41:46 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 01:41:46 Executing step ID: bu",
+          "log_excerpt_tail": "ere found:\n2026/08/15 01:43:55 \n- image:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r2\n    tag: gen1-548119c47f24\n    digest: sha256:583accfcfe0ec57d17efa3230d79a64d7324dc03eb2135ab94baf2622037aa7a\n  runtime-dependency:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r1\n    digest: sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c\n  git: {}\n\n\n\nRun ID: cmhh was successful after 2m12s\n\n",
+          "log_sha256": "d5fe52c259646fa24a566e65b9a03971206b2dd30f878712d894bc3a66513e93",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": [
+            {
+              "digest": "sha256:583accfcfe0ec57d17efa3230d79a64d7324dc03eb2135ab94baf2622037aa7a",
+              "registry": "acrjspaceobssea0708231738.azurecr.io",
+              "repository": "j-space-observation-study3-p0-r2",
+              "tag": "gen1-548119c47f24"
+            }
+          ],
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": null,
+          "run_id": "cmhh",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T01:53:01.744779+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T01:55:06.597230+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11174,
+          "log_excerpt_head": "2026/08/15 01:53:02 Downloading source code...\n\n2026/08/15 01:53:03 Finished downloading source code\n\n2026/08/15 01:53:03 Using acb_vol_6260d659-e3e5-473c-94ac-0d4c90604ec9 as the home volume\n2026/08/15 01:53:03 Setting up Docker configuration...\n2026/08/15 01:53:03 Successfully set up Docker configuration\n2026/08/15 01:53:03 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 01:53:04 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 01:53:04 Executing step ID: bu",
+          "log_excerpt_tail": "were found:\n2026/08/15 01:55:05 \n- image:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r2\n    tag: gen1-38f291644513\n    digest: sha256:59447c7beabdc7445fff757b9833f563e2e8f4d227ba000ba975c37b1b86fdc5\n  runtime-dependency:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r1\n    digest: sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c\n  git: {}\n\n\n\nRun ID: cmhk was successful after 2m3s\n\n",
+          "log_sha256": "90d0e8fb1afa6b2e2ca388d3db050e02b6c5cd2c499507c284ea9abc637a88da",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": [
+            {
+              "digest": "sha256:59447c7beabdc7445fff757b9833f563e2e8f4d227ba000ba975c37b1b86fdc5",
+              "registry": "acrjspaceobssea0708231738.azurecr.io",
+              "repository": "j-space-observation-study3-p0-r2",
+              "tag": "gen1-38f291644513"
+            }
+          ],
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": null,
+          "run_id": "cmhk",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T02:04:12.101638+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T02:06:03.580196+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 33039,
+          "log_excerpt_head": "2026/08/15 02:04:12 Downloading source code...\n\n2026/08/15 02:04:13 Finished downloading source code\n\n2026/08/15 02:04:13 Using acb_vol_c44219b5-d053-4d6e-ac9c-783947d76ffa as the home volume\n2026/08/15 02:04:13 Setting up Docker configuration...\n2026/08/15 02:04:14 Successfully set up Docker configuration\n2026/08/15 02:04:14 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 02:04:14 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 02:04:14 Executing step ID: bu",
+          "log_excerpt_tail": "7) ...\n\nProcessing triggers for libc-bin (2.35-0ubuntu3.8) ...\n\nRemoving intermediate container 5352e4ae2bfb\n ---> efbad7318588\nStep 4/11 : COPY requirements.txt /workspace/requirements.txt\n\nCOPY failed: file not found in build context or excluded by .dockerignore: stat requirements.txt: file does not exist\n2026/08/15 02:06:02 Container failed during run: build. No retries remaining.\nfailed to run step ID: build: exit status 1\n\n\nRun ID: cmhn failed after 1m51s. Error: failed during run, err: exit status 1\n\n",
+          "log_sha256": "92f79e19af0bc0815c7b97556e1fcce4d87492749a43fd2f9cb38f806f4b9451",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": "failed during run, err: exit status 1",
+          "run_id": "cmhn",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Failed",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "superseded",
+          "create_time": "2026-08-15T02:09:01.881850+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T02:11:08.211003+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11174,
+          "log_excerpt_head": "2026/08/15 02:09:02 Downloading source code...\n\n2026/08/15 02:09:03 Finished downloading source code\n\n2026/08/15 02:09:03 Using acb_vol_5be709a1-f70f-413d-b4ad-1798b39ac099 as the home volume\n2026/08/15 02:09:03 Setting up Docker configuration...\n2026/08/15 02:09:04 Successfully set up Docker configuration\n2026/08/15 02:09:04 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 02:09:04 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 02:09:04 Executing step ID: bu",
+          "log_excerpt_tail": "were found:\n2026/08/15 02:11:06 \n- image:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r2\n    tag: gen1-4a7f45dc461d\n    digest: sha256:f31db2e56fc97a9ff4748289b950f2f017b5432fe275c1c868f221f2bd1ba1cc\n  runtime-dependency:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r1\n    digest: sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c\n  git: {}\n\n\n\nRun ID: cmhp was successful after 2m5s\n\n",
+          "log_sha256": "dc5edd5063ebe9c11b801d5fee11460ac4dadda457c319bb3993e449db855a00",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": [
+            {
+              "digest": "sha256:f31db2e56fc97a9ff4748289b950f2f017b5432fe275c1c868f221f2bd1ba1cc",
+              "registry": "acrjspaceobssea0708231738.azurecr.io",
+              "repository": "j-space-observation-study3-p0-r2",
+              "tag": "gen1-4a7f45dc461d"
+            }
+          ],
+          "registered_purpose": "superseded validation attempt",
+          "run_error_message": null,
+          "run_id": "cmhp",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "superseded",
+          "create_time": "2026-08-15T02:11:57.170098+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T02:13:34.326932+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 7025,
+          "log_excerpt_head": "2026/08/15 02:11:58 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 02:11:58 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 02:11:58 Successfully set up Docker network: acb_default_network\n2026/08/15 02:11:58 Setting up Docker configuration...\n2026/08/15 02:11:58 Successfully set up Docker configuration\n2026/08/15 02:11:58 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 02:11:59 S",
+          "log_excerpt_tail": "AUDIT_COMPLETE=1\nP0_R2_TRANSPORT_ROUNDTRIP_BYTES=1048576\nP0_R2_TRANSPORT_ROUNDTRIP_COMPLETE=1\nP0_R2_PREFIX_PREFLIGHT_SKIPPED=1 no attempt id was supplied\nP0_R2_PREFLIGHT_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\nP0_R2_CANARY_COMPLETE=1\n2026/08/15 02:13:30 Successfully executed container: acb_step_0\n2026/08/15 02:13:30 Step ID: acb_step_0 marked as successful (elapsed time in seconds: 91.002669)\n\n\nRun ID: cmhq was successful after 1m33s\n\n",
+          "log_sha256": "ac21acf35395c9c1557c144dc93916ba0ebce215103a15e1020c6a79cac451fc",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "superseded validation attempt",
+          "run_error_message": null,
+          "run_id": "cmhq",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "superseded",
+          "create_time": "2026-08-15T02:19:52.294296+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T02:21:26.948605+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 7282,
+          "log_excerpt_head": "2026/08/15 02:19:52 Downloading source code...\n\n2026/08/15 02:19:53 Finished downloading source code\n\n2026/08/15 02:19:53 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 02:19:53 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 02:19:53 Successfully set up Docker network: acb_default_network\n2026/08/15 02:19:53 Setting up Docker configuration...\n2026/08/15 02:19:54 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "o attempt id was supplied\nP0_R2_PREFLIGHT_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\nP0_R2_CANARY_COMPLETE=1\nP0_R2_PACKING_CANARY_ATTEMPT=p0r2-g1-packing-canary-20260815-0221\nP0_R2_PREFIX_PROOF_DEFERRED_TO_HOST=1\nP0_R2_PACKING_CANARY_COMPLETE=1\n2026/08/15 02:21:23 Successfully executed container: replay\n2026/08/15 02:21:23 Step ID: replay marked as successful (elapsed time in seconds: 89.107989)\n\n\nRun ID: cmhs was successful after 1m32s\n\n",
+          "log_sha256": "0bc140980061bdb78b6e31a1a4030e90172f9e31eb2de96daa3cdf04b12cee1b",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "superseded validation attempt",
+          "run_error_message": null,
+          "run_id": "cmhs",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "accepted",
+          "create_time": "2026-08-15T02:49:40.081299+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T02:51:45.994993+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11174,
+          "log_excerpt_head": "2026/08/15 02:49:40 Downloading source code...\n\n2026/08/15 02:49:41 Finished downloading source code\n\n2026/08/15 02:49:41 Using acb_vol_e7c52333-bee6-4458-bdf0-5d6f0cf6503c as the home volume\n2026/08/15 02:49:41 Setting up Docker configuration...\n2026/08/15 02:49:42 Successfully set up Docker configuration\n2026/08/15 02:49:42 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 02:49:42 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 02:49:42 Executing step ID: bu",
+          "log_excerpt_tail": "were found:\n2026/08/15 02:51:44 \n- image:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r2\n    tag: gen1-1eb3e21b4082\n    digest: sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7\n  runtime-dependency:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r1\n    digest: sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c\n  git: {}\n\n\n\nRun ID: cmht was successful after 2m4s\n\n",
+          "log_sha256": "fd4256b8a6a60492544c425d222291c6cfca3539df5f3d1fd6b8067c59ebade2",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": [
+            {
+              "digest": "sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+              "registry": "acrjspaceobssea0708231738.azurecr.io",
+              "repository": "j-space-observation-study3-p0-r2",
+              "tag": "gen1-1eb3e21b4082"
+            }
+          ],
+          "registered_purpose": "image build; in-build image-to-Git audit",
+          "run_error_message": null,
+          "run_id": "cmht",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "accepted",
+          "create_time": "2026-08-15T02:53:16.239246+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T02:54:49.559983+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 7028,
+          "log_excerpt_head": "2026/08/15 02:53:17 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 02:53:17 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 02:53:17 Successfully set up Docker network: acb_default_network\n2026/08/15 02:53:17 Setting up Docker configuration...\n2026/08/15 02:53:17 Successfully set up Docker configuration\n2026/08/15 02:53:17 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 02:53:18 S",
+          "log_excerpt_tail": "AUDIT_COMPLETE=1\nP0_R2_TRANSPORT_ROUNDTRIP_BYTES=1048576\nP0_R2_TRANSPORT_ROUNDTRIP_COMPLETE=1\nP0_R2_PREFIX_PREFLIGHT_SKIPPED=1 no attempt id was supplied\nP0_R2_PREFLIGHT_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\nP0_R2_CANARY_COMPLETE=1\n2026/08/15 02:54:48 Successfully executed container: acb_step_0\n2026/08/15 02:54:48 Step ID: acb_step_0 marked as successful (elapsed time in seconds: 90.029160)\n\n\nRun ID: cmhu was successful after 1m32s\n\n",
+          "log_sha256": "85cc3839468a54e24160c33c13cb1528092b96bd66d2336b95fd08eb5dfe8fc4",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "model-free preflight canary",
+          "run_error_message": null,
+          "run_id": "cmhu",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "accepted",
+          "create_time": "2026-08-15T02:56:35.787974+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T02:58:08.853971+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 7282,
+          "log_excerpt_head": "2026/08/15 02:56:36 Downloading source code...\n\n2026/08/15 02:56:37 Finished downloading source code\n\n2026/08/15 02:56:37 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 02:56:37 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 02:56:37 Successfully set up Docker network: acb_default_network\n2026/08/15 02:56:37 Setting up Docker configuration...\n2026/08/15 02:56:37 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "o attempt id was supplied\nP0_R2_PREFLIGHT_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\nP0_R2_CANARY_COMPLETE=1\nP0_R2_PACKING_CANARY_ATTEMPT=p0r2-g1-packing-canary-20260815-0257\nP0_R2_PREFIX_PROOF_DEFERRED_TO_HOST=1\nP0_R2_PACKING_CANARY_COMPLETE=1\n2026/08/15 02:58:07 Successfully executed container: replay\n2026/08/15 02:58:07 Step ID: replay marked as successful (elapsed time in seconds: 89.277242)\n\n\nRun ID: cmhv was successful after 1m32s\n\n",
+          "log_sha256": "59be7666ecf3e03ce84fbd2124681d97c60a011b8f3a0cf1beb773a4014bbdae",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "designated packing canary",
+          "run_error_message": null,
+          "run_id": "cmhv",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T03:01:50.876381+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T03:03:22.797758+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 5524,
+          "log_excerpt_head": "2026/08/15 03:01:51 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 03:01:51 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 03:01:51 Successfully set up Docker network: acb_default_network\n2026/08/15 03:01:51 Setting up Docker configuration...\n2026/08/15 03:01:52 Successfully set up Docker configuration\n2026/08/15 03:01:52 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 03:01:52 S",
+          "log_excerpt_tail": " sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7\nStatus: Downloaded newer image for acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7\nsh: 1: Syntax error: Unterminated quoted string\n2026/08/15 03:03:18 Container failed during run: acb_step_0. No retries remaining.\n\nfailed to run step ID: acb_step_0: exit status 2\n\n\nRun ID: cmhw failed after 1m28s. Error: failed during run, err: exit status 1\n\n",
+          "log_sha256": "062608b5b112971047408900eea6b95d0f135502ac7ef3965a5e205d5e9db0c6",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": "failed during run, err: exit status 1",
+          "run_id": "cmhw",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Failed",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T03:04:04.378178+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T03:05:37.644077+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 5414,
+          "log_excerpt_head": "2026/08/15 03:04:05 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 03:04:05 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 03:04:05 Successfully set up Docker network: acb_default_network\n2026/08/15 03:04:05 Setting up Docker configuration...\n2026/08/15 03:04:06 Successfully set up Docker configuration\n2026/08/15 03:04:06 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 03:04:06 S",
+          "log_excerpt_tail": "78c38: Pull complete\nd7cb04bc4ed8: Pull complete\nDigest: sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7\nStatus: Downloaded newer image for acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7\n2026/08/15 03:05:36 Successfully executed container: acb_step_0\n\n2026/08/15 03:05:36 Step ID: acb_step_0 marked as successful (elapsed time in seconds: 89.731770)\n\n\nRun ID: cmhx was successful after 1m32s\n\n",
+          "log_sha256": "4fc4d04508f6457fa2b0de9d1a66124bfd8d97d3376daee8ad60118556783d30",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": null,
+          "run_id": "cmhx",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "bound_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T03:10:29.446213+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T03:12:28.220076+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 7252,
+          "log_excerpt_head": "2026/08/15 03:10:30 Downloading source code...\n\n2026/08/15 03:10:31 Finished downloading source code\n\n2026/08/15 03:10:31 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 03:10:31 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 03:10:31 Successfully set up Docker network: acb_default_network\n2026/08/15 03:10:31 Setting up Docker configuration...\n2026/08/15 03:10:32 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "ation-study3-p0-r2@sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7\nP0_R2_FULL_SUITE_STAGE=STUDY3-P0-R2\n\nCOMMIT=1eb3e21b408213cb183bd8d2f55c3554b9713160\nPYVER=3.11.9\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nModuleNotFoundError: No module named 'pytest'\n2026/08/15 03:12:27 Container failed during run: suite. No retries remaining.\nfailed to run step ID: suite: exit status 1\n\n\nRun ID: cmhy failed after 1m57s. Error: failed during run, err: exit status 1\n\n",
+          "log_sha256": "0a4ee68d8a204019db211baf5d35b3344a20ba2345fd82116f36a80726529ff2",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": "failed during run, err: exit status 1",
+          "run_id": "cmhy",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "source_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+          "status": "Failed",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "bound_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T03:13:57.305046+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T03:16:06.657867+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11290,
+          "log_excerpt_head": "2026/08/15 03:13:57 Downloading source code...\n\n2026/08/15 03:13:58 Finished downloading source code\n\n2026/08/15 03:13:59 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 03:13:59 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 03:13:59 Successfully set up Docker network: acb_default_network\n2026/08/15 03:13:59 Setting up Docker configuration...\n2026/08/15 03:13:59 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "!!!!!!!!!\n33 errors in 10.99s\nP0_R2_FULL_SUITE_PYTEST_STATUS=2\n\nP0_R2_FULL_SUITE_LINES=519\nP0_R2_FULL_SUITE_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\n2026/08/15 03:16:05 Successfully executed container: suite\n2026/08/15 03:16:05 Step ID: checkout marked as successful (elapsed time in seconds: 21.072891)\n2026/08/15 03:16:05 Step ID: suite marked as successful (elapsed time in seconds: 104.217554)\n\n\nRun ID: cmj0 was successful after 2m8s\n\n",
+          "log_sha256": "53142be28401fb4869a3ab28c2af62d4005b310a7daee26ee659fdc92db3e60c",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": null,
+          "run_id": "cmj0",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "source_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "bound_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+          "category": "failed-or-discarded",
+          "create_time": "2026-08-15T03:21:56.709785+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T03:33:23.927719+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 19292,
+          "log_excerpt_head": "2026/08/15 03:21:57 Downloading source code...\n\n2026/08/15 03:21:58 Finished downloading source code\n\n2026/08/15 03:21:58 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 03:21:58 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 03:21:58 Successfully set up Docker network: acb_default_network\n2026/08/15 03:21:58 Setting up Docker configuration...\n2026/08/15 03:21:58 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "rrors in 561.79s (0:09:21)\nP0_R2_FULL_SUITE_PYTEST_STATUS=1\nP0_R2_FULL_SUITE_LINES=52649\nP0_R2_FULL_SUITE_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\n2026/08/15 03:33:20 Successfully executed container: suite\n2026/08/15 03:33:20 Step ID: checkout marked as successful (elapsed time in seconds: 21.061484)\n2026/08/15 03:33:20 Step ID: suite marked as successful (elapsed time in seconds: 660.231435)\n\n\nRun ID: cmj1 was successful after 11m24s\n\n",
+          "log_sha256": "8588616f32e192035812d42b24998795665234eb6e1cdab089f35d7ea90082cf",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "failed build or validation attempt",
+          "run_error_message": null,
+          "run_id": "cmj1",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "source_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "bound_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+          "category": "superseded",
+          "create_time": "2026-08-15T03:41:52.141863+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T03:57:10.851283+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 4369,
+          "log_excerpt_head": "2026/08/15 03:41:52 Downloading source code...\n\n2026/08/15 03:41:53 Finished downloading source code\n\n2026/08/15 03:41:53 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 03:41:53 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 03:41:54 Successfully set up Docker network: acb_default_network\n2026/08/15 03:41:54 Setting up Docker configuration...\n2026/08/15 03:41:54 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "P0_R2_FULL_SUITE_FAILED_COUNT=4\nP0_R2_FULL_SUITE_ERROR_COUNT=0\nP0_R2_FULL_SUITE_LINES=92\nP0_R2_FULL_SUITE_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\n2026/08/15 03:57:08 Successfully executed container: suite\n2026/08/15 03:57:08 Step ID: checkout marked as successful (elapsed time in seconds: 21.356737)\n2026/08/15 03:57:08 Step ID: suite marked as successful (elapsed time in seconds: 892.291814)\n\n\nRun ID: cmj2 was successful after 15m16s\n\n",
+          "log_sha256": "1472cdac1fa4d11b2ed76adebbfea8e7799dbfabbbafb3cf0b980aacc75d2978",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "superseded full-suite attempt",
+          "run_error_message": null,
+          "run_id": "cmj2",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "source_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "baseline_commit": "22ae685b83daeaf3fb89057db0761f20644d9b7a",
+          "category": "accepted",
+          "create_time": "2026-08-15T04:00:00.217000+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T04:29:57.469114+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 5359,
+          "log_excerpt_head": "2026/08/15 04:00:00 Downloading source code...\n\n2026/08/15 04:00:01 Finished downloading source code\n\n2026/08/15 04:00:02 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 04:00:02 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 04:00:02 Successfully set up Docker network: acb_default_network\n2026/08/15 04:00:02 Setting up Docker configuration...\n2026/08/15 04:00:03 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "tted_p0_source_file_is_lf_only\nFAILURES_FIXED_BY_THIS_CHANGE:\nP0_R2_NEW_FAILURE_COUNT=0\nP0_R2_FULL_SUITE_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\n2026/08/15 04:29:55 Successfully executed container: suite\n2026/08/15 04:29:55 Step ID: checkout marked as successful (elapsed time in seconds: 24.940478)\n2026/08/15 04:29:55 Step ID: suite marked as successful (elapsed time in seconds: 1766.460682)\n\n\nRun ID: cmj3 was successful after 29m55s\n\n",
+          "log_sha256": "1830fb381f14e091a1ec77d6cb266c09698bf9424bb5eb813e190abe51d4b482",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "full repository differential suite",
+          "run_error_message": null,
+          "run_id": "cmj3",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "bound_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+          "category": "superseded",
+          "create_time": "2026-08-15T04:01:38.749428+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T04:03:37.804165+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 3706,
+          "log_excerpt_head": "2026/08/15 04:01:39 Downloading source code...\n\n2026/08/15 04:01:40 Finished downloading source code\n\n2026/08/15 04:01:40 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 04:01:40 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 04:01:40 Successfully set up Docker network: acb_default_network\n2026/08/15 04:01:40 Setting up Docker configuration...\n2026/08/15 04:01:41 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "                                  [100%]\n95 passed in 0.69s\nP0_R2_FOCUSED_PYTEST_STATUS=0\nP0_R2_FOCUSED_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\n2026/08/15 04:03:35 Successfully executed container: focused\n2026/08/15 04:03:35 Step ID: checkout marked as successful (elapsed time in seconds: 21.689984)\n2026/08/15 04:03:35 Step ID: focused marked as successful (elapsed time in seconds: 92.600614)\n\n\nRun ID: cmj4 was successful after 1m57s\n\n",
+          "log_sha256": "6ae283b6267961850ed5e2cbeafba327d1458729857c927bca36f052f78e94c8",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "superseded validation attempt",
+          "run_error_message": null,
+          "run_id": "cmj4",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "source_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "bound_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+          "category": "accepted",
+          "create_time": "2026-08-15T04:04:35.650229+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T04:06:38.928566+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 3739,
+          "log_excerpt_head": "2026/08/15 04:04:36 Downloading source code...\n\n2026/08/15 04:04:37 Finished downloading source code\n\n2026/08/15 04:04:37 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 04:04:37 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 04:04:37 Successfully set up Docker network: acb_default_network\n2026/08/15 04:04:37 Setting up Docker configuration...\n2026/08/15 04:04:38 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "                                  [100%]\n95 passed in 0.77s\nP0_R2_FOCUSED_PYTEST_STATUS=0\nP0_R2_FOCUSED_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\n2026/08/15 04:06:36 Successfully executed container: focused\n\n2026/08/15 04:06:36 Step ID: checkout marked as successful (elapsed time in seconds: 21.950449)\n2026/08/15 04:06:36 Step ID: focused marked as successful (elapsed time in seconds: 95.862014)\n\n\nRun ID: cmj5 was successful after 2m1s\n\n",
+          "log_sha256": "86b8a48b4e9320c4af4a5fac04e3141d40bf61b77ed835a775290b221df12cf3",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "focused execution-closure suite",
+          "run_error_message": null,
+          "run_id": "cmj5",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "source_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "accepted",
+          "create_time": "2026-08-15T04:32:05.745563+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T04:33:40.868901+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 7083,
+          "log_excerpt_head": "2026/08/15 04:32:06 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 04:32:06 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 04:32:06 Successfully set up Docker network: acb_default_network\n2026/08/15 04:32:06 Setting up Docker configuration...\n2026/08/15 04:32:07 Successfully set up Docker configuration\n2026/08/15 04:32:07 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 04:32:07 S",
+          "log_excerpt_tail": "AUDIT_COMPLETE=1\nP0_R2_TRANSPORT_ROUNDTRIP_BYTES=1048576\nP0_R2_TRANSPORT_ROUNDTRIP_COMPLETE=1\nP0_R2_PREFIX_PREFLIGHT_SKIPPED=1 no attempt id was supplied\nP0_R2_PREFLIGHT_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\nP0_R2_CANARY_COMPLETE=1\n2026/08/15 04:33:38 Successfully executed container: acb_step_0\n2026/08/15 04:33:38 Step ID: acb_step_0 marked as successful (elapsed time in seconds: 90.436538)\n\n\nRun ID: cmj6 was successful after 1m33s\n\n",
+          "log_sha256": "8b41efbe7c5544ac9ce32cab6f2c44c172434cde41ba69b89fc97a6fab529e58",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "published first command, end to end",
+          "run_error_message": null,
+          "run_id": "cmj6",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "claimed-but-previously-unsealed",
+          "create_time": "2026-08-15T04:41:03.597280+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T04:42:35.819383+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 7115,
+          "log_excerpt_head": "2026/08/15 04:41:04 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 04:41:04 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 04:41:04 Successfully set up Docker network: acb_default_network\n2026/08/15 04:41:04 Setting up Docker configuration...\n2026/08/15 04:41:05 Successfully set up Docker configuration\n2026/08/15 04:41:05 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 04:41:05 S",
+          "log_excerpt_tail": "AUDIT_COMPLETE=1\nP0_R2_TRANSPORT_ROUNDTRIP_BYTES=1048576\nP0_R2_TRANSPORT_ROUNDTRIP_COMPLETE=1\nP0_R2_PREFIX_PREFLIGHT_SKIPPED=1 no attempt id was supplied\nP0_R2_PREFLIGHT_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\nP0_R2_CANARY_COMPLETE=1\n2026/08/15 04:42:34 Successfully executed container: acb_step_0\n2026/08/15 04:42:34 Step ID: acb_step_0 marked as successful (elapsed time in seconds: 89.142029)\n\n\nRun ID: cmj7 was successful after 1m31s\n\n",
+          "log_sha256": "25a020337f24eff0e8989e90edf35ff3318559246a2cbe7d2b860eb93f1e4ded",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "claimed final run; never sealed in repository",
+          "run_error_message": null,
+          "run_id": "cmj7",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "baseline_commit": "005aa087e40c641affc8ca537e6c6a075bcbfe98",
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T06:16:55.479408+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T06:32:43.195567+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 5163,
+          "log_excerpt_head": "2026/08/15 06:16:56 Downloading source code...\n\n2026/08/15 06:16:56 Finished downloading source code\n\n2026/08/15 06:16:57 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 06:16:57 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 06:16:57 Successfully set up Docker network: acb_default_network\n2026/08/15 06:16:57 Setting up Docker configuration...\n2026/08/15 06:16:57 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "\"failed\": 4, \"passed\": 4720, \"skipped\": 15}\nBASELINE_SUMMARY_RECONCILED=1\nP0_R2_BASELINE_SIGNATURES_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\n2026/08/15 06:32:42 Successfully executed container: baseline\n2026/08/15 06:32:42 Step ID: checkout marked as successful (elapsed time in seconds: 22.070699)\n2026/08/15 06:32:42 Step ID: baseline marked as successful (elapsed time in seconds: 921.774686)\n\n\nRun ID: cmj8 was successful after 15m47s\n\n",
+          "log_sha256": "722c9a234444362a3e0d9270b4003b52376054de827243392fe8b566494b31f7",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "corrective closure A3 truthful baseline signature registration",
+          "run_error_message": null,
+          "run_id": "cmj8",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T06:52:18.198612+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T06:54:31.307051+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11368,
+          "log_excerpt_head": "2026/08/15 06:52:18 Downloading source code...\n\n2026/08/15 06:52:19 Finished downloading source code\n\n2026/08/15 06:52:19 Using acb_vol_399077f0-2b0d-46cb-9bd8-f25c1e3a5864 as the home volume\n2026/08/15 06:52:19 Setting up Docker configuration...\n2026/08/15 06:52:20 Successfully set up Docker configuration\n2026/08/15 06:52:20 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 06:52:20 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 06:52:20 Executing step ID: bu",
+          "log_excerpt_tail": "e found:\n2026/08/15 06:54:30 \n- image:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r2\n    tag: gen1r2-6939e767cc5c\n    digest: sha256:5669b253de230160b57bef6d535ee907c75a2c92759bc7cd980eb7912156ec25\n  runtime-dependency:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r1\n    digest: sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c\n  git: {}\n\n\n\nRun ID: cmj9 was successful after 2m12s\n\n",
+          "log_sha256": "7cb940ef1efed2ee16e0c31e2465bd117cd86c6fefbcab501744bc2cba35ddb1",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": [
+            {
+              "digest": "sha256:5669b253de230160b57bef6d535ee907c75a2c92759bc7cd980eb7912156ec25",
+              "registry": "acrjspaceobssea0708231738.azurecr.io",
+              "repository": "j-space-observation-study3-p0-r2",
+              "tag": "gen1r2-6939e767cc5c"
+            }
+          ],
+          "registered_purpose": "corrective closure image build, superseded and unexecuted",
+          "run_error_message": null,
+          "run_id": "cmj9",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "baseline_commit": "005aa087e40c641affc8ca537e6c6a075bcbfe98",
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T06:56:49.490877+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T07:25:33.147845+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 42135,
+          "log_excerpt_head": "2026/08/15 06:56:49 Downloading source code...\n\n2026/08/15 06:56:50 Finished downloading source code\n\n2026/08/15 06:56:51 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 06:56:51 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 06:56:51 Successfully set up Docker network: acb_default_network\n2026/08/15 06:56:51 Setting up Docker configuration...\n2026/08/15 06:56:51 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "rror\": 0, \"failed\": 4, \"passed\": 4720, \"skipped\": 15, \"xfailed\": 0, \"xpassed\": 0}\nP0_R2_CORRECTED_COUNTS={\"error\": 0, \"failed\": 4, \"passed\": 4785, \"skipped\": 15, \"xfailed\": 0, \"xpassed\": 0}\nP0_R2_NET_NEW_PASSING=65\nP0_R2_DIFFERENTIAL_REFUSED=1 a shared failure changed its normalized signature\n2026/08/15 07:25:29 Container failed during run: differential. No retries remaining.\nfailed to run step ID: differential: exit status 1\n\n\nRun ID: cmja failed after 28m41s. Error: failed during run, err: exit status 1\n\n",
+          "log_sha256": "dfdf1b9a2a5be6dcf1d1375c9ef5dea3385f88a8ef27c0844f68b1a8d8724648",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "corrective closure differential attempt, superseded: refused because a shared failure signature disagreed on the checkout root inside PosixPath(...)",
+          "run_error_message": "failed during run, err: exit status 1",
+          "run_id": "cmja",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Failed",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T07:00:00.594400+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T07:02:16.048016+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11333,
+          "log_excerpt_head": "2026/08/15 07:00:01 Downloading source code...\n\n2026/08/15 07:00:02 Finished downloading source code\n\n2026/08/15 07:00:02 Using acb_vol_77acd8d9-b745-4530-a6b3-cd616be0cc1d as the home volume\n2026/08/15 07:00:02 Setting up Docker configuration...\n2026/08/15 07:00:03 Successfully set up Docker configuration\n2026/08/15 07:00:03 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 07:00:03 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 07:00:03 Executing step ID: bu",
+          "log_excerpt_tail": "e found:\n2026/08/15 07:02:12 \n- image:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r2\n    tag: gen1r2-f8e32abbee6a\n    digest: sha256:e94b5f8f241387cea28f6c092bc40fc7b5aba0e003d6d68ed5c6430a7d5c7c57\n  runtime-dependency:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r1\n    digest: sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c\n  git: {}\n\n\n\nRun ID: cmjb was successful after 2m11s\n\n",
+          "log_sha256": "c2f873ede01ec4138724e526d0e8d8a9317bf46aad8bc4dc8916beb2fb27a91c",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": [
+            {
+              "digest": "sha256:e94b5f8f241387cea28f6c092bc40fc7b5aba0e003d6d68ed5c6430a7d5c7c57",
+              "registry": "acrjspaceobssea0708231738.azurecr.io",
+              "repository": "j-space-observation-study3-p0-r2",
+              "tag": "gen1r2-f8e32abbee6a"
+            }
+          ],
+          "registered_purpose": "corrective closure image build, superseded",
+          "run_error_message": null,
+          "run_id": "cmjb",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T07:02:54.952443+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T07:04:29.232619+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 7424,
+          "log_excerpt_head": "2026/08/15 07:02:55 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 07:02:55 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 07:02:56 Successfully set up Docker network: acb_default_network\n2026/08/15 07:02:56 Setting up Docker configuration...\n2026/08/15 07:02:56 Successfully set up Docker configuration\n2026/08/15 07:02:56 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 07:02:57 S",
+          "log_excerpt_tail": "IT_V2_COMPLETE=1\nP0_R2_TRANSPORT_ROUNDTRIP_BYTES=1048576\nP0_R2_TRANSPORT_ROUNDTRIP_COMPLETE=1\nP0_R2_PREFIX_PREFLIGHT_SKIPPED=1 no attempt id was supplied\nP0_R2_PREFLIGHT_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\nP0_R2_CANARY_COMPLETE=1\n2026/08/15 07:04:27 Successfully executed container: acb_step_0\n2026/08/15 07:04:27 Step ID: acb_step_0 marked as successful (elapsed time in seconds: 90.257847)\n\n\nRun ID: cmjc was successful after 1m32s\n\n",
+          "log_sha256": "0f92d17610c229cc9acf806891d74085d50032f0e685dc43422ee607203fcd4b",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "corrective closure model-free preflight canary against superseded digest sha256:e94b5f8f",
+          "run_error_message": null,
+          "run_id": "cmjc",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T07:10:47.428083+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T07:12:55.069066+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11333,
+          "log_excerpt_head": "2026/08/15 07:10:48 Downloading source code...\n\n2026/08/15 07:10:48 Finished downloading source code\n\n2026/08/15 07:10:49 Using acb_vol_60e2fffe-2cc9-4a89-8986-5d746fcc0f82 as the home volume\n2026/08/15 07:10:49 Setting up Docker configuration...\n2026/08/15 07:10:49 Successfully set up Docker configuration\n2026/08/15 07:10:49 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 07:10:50 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 07:10:50 Executing step ID: bu",
+          "log_excerpt_tail": "re found:\n2026/08/15 07:12:52 \n- image:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r2\n    tag: gen1r2-4148efeabd9c\n    digest: sha256:f445ce8799dd00bab8ccb773b0b970e39fb0f0ea5eaa54a483e2f61c59ca40ec\n  runtime-dependency:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r1\n    digest: sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c\n  git: {}\n\n\n\nRun ID: cmjd was successful after 2m4s\n\n",
+          "log_sha256": "1c1060ee47a96fc2f1f479121944ff95f5b0cf4632d2238635b007c4f8d4b667",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": [
+            {
+              "digest": "sha256:f445ce8799dd00bab8ccb773b0b970e39fb0f0ea5eaa54a483e2f61c59ca40ec",
+              "registry": "acrjspaceobssea0708231738.azurecr.io",
+              "repository": "j-space-observation-study3-p0-r2",
+              "tag": "gen1r2-4148efeabd9c"
+            }
+          ],
+          "registered_purpose": "corrective closure image build, superseded",
+          "run_error_message": null,
+          "run_id": "cmjd",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T07:33:00.330916+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T07:35:04.274332+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11366,
+          "log_excerpt_head": "2026/08/15 07:33:01 Downloading source code...\n\n2026/08/15 07:33:01 Finished downloading source code\n\n2026/08/15 07:33:02 Using acb_vol_bb99eada-ed58-4de8-90b3-fc1682c08424 as the home volume\n2026/08/15 07:33:02 Setting up Docker configuration...\n2026/08/15 07:33:02 Successfully set up Docker configuration\n2026/08/15 07:33:02 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 07:33:03 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 07:33:03 Executing step ID: bu",
+          "log_excerpt_tail": "re found:\n2026/08/15 07:35:02 \n- image:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r2\n    tag: gen1r2-1c40426200fc\n    digest: sha256:fb45fe97be5a28c144b86baafb12e0b2b639f0053a055af16827bcf9a5901763\n  runtime-dependency:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r1\n    digest: sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c\n  git: {}\n\n\n\nRun ID: cmje was successful after 2m2s\n\n",
+          "log_sha256": "67de3ad14347a0cf2b614f0ac7b9722d9e125bd451f8e75ea76a07b0463188c2",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": [
+            {
+              "digest": "sha256:fb45fe97be5a28c144b86baafb12e0b2b639f0053a055af16827bcf9a5901763",
+              "registry": "acrjspaceobssea0708231738.azurecr.io",
+              "repository": "j-space-observation-study3-p0-r2",
+              "tag": "gen1r2-1c40426200fc"
+            }
+          ],
+          "registered_purpose": "corrective closure image build, superseded",
+          "run_error_message": null,
+          "run_id": "cmje",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T07:38:05.545580+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T07:40:11.202364+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 11366,
+          "log_excerpt_head": "2026/08/15 07:38:06 Downloading source code...\n\n2026/08/15 07:38:06 Finished downloading source code\n\n2026/08/15 07:38:07 Using acb_vol_40731c58-59d8-4c05-87bd-57fab3159ec2 as the home volume\n2026/08/15 07:38:07 Setting up Docker configuration...\n2026/08/15 07:38:07 Successfully set up Docker configuration\n2026/08/15 07:38:07 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 07:38:08 Successfully logged into acrjspaceobssea0708231738.azurecr.io\n2026/08/15 07:38:08 Executing step ID: bu",
+          "log_excerpt_tail": "re found:\n2026/08/15 07:40:09 \n- image:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r2\n    tag: gen1r2-422d3d9695a4\n    digest: sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5\n  runtime-dependency:\n    registry: acrjspaceobssea0708231738.azurecr.io\n    repository: j-space-observation-study3-p0-r1\n    digest: sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c\n  git: {}\n\n\n\nRun ID: cmjf was successful after 2m4s\n\n",
+          "log_sha256": "9c971ed9b6a7e0c920b2c736a363c31b253b0d2a0098e519640d899fb5505bc2",
+          "logs_exit_code": 0,
+          "model_free_marker_present": false,
+          "model_path_marker_present": false,
+          "output_images": [
+            {
+              "digest": "sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+              "registry": "acrjspaceobssea0708231738.azurecr.io",
+              "repository": "j-space-observation-study3-p0-r2",
+              "tag": "gen1r2-422d3d9695a4"
+            }
+          ],
+          "registered_purpose": "corrective closure active image build with in-build image-to-Git audit",
+          "run_error_message": null,
+          "run_id": "cmjf",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T07:41:54.597825+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T07:43:32.623264+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 7565,
+          "log_excerpt_head": "2026/08/15 07:41:55 Downloading source code...\n\n2026/08/15 07:41:56 Finished downloading source code\n\n2026/08/15 07:41:56 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 07:41:56 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 07:41:56 Successfully set up Docker network: acb_default_network\n2026/08/15 07:41:56 Setting up Docker configuration...\n2026/08/15 07:41:57 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": " attempt id was supplied\nP0_R2_PREFLIGHT_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\nP0_R2_CANARY_COMPLETE=1\nP0_R2_PACKING_CANARY_ATTEMPT=p0r2-g1-packing-canary-20260815-0745\nP0_R2_PREFIX_PROOF_DEFERRED_TO_HOST=1\nP0_R2_PACKING_CANARY_COMPLETE=1\n2026/08/15 07:43:30 Successfully executed container: replay\n\n2026/08/15 07:43:30 Step ID: replay marked as successful (elapsed time in seconds: 92.951561)\n\n\nRun ID: cmjg was successful after 1m36s\n\n",
+          "log_sha256": "ba0194f55eb0ee0177b3b57f2e623126f4873756d79ccfb2ae38d05293927b4c",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "corrective closure designated packing canary against the active digest",
+          "run_error_message": null,
+          "run_id": "cmjg",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "baseline_commit": "005aa087e40c641affc8ca537e6c6a075bcbfe98",
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T07:45:41.280248+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T08:14:23.412417+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 42182,
+          "log_excerpt_head": "2026/08/15 07:45:41 Downloading source code...\n\n2026/08/15 07:45:42 Finished downloading source code\n\n2026/08/15 07:45:43 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 07:45:43 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 07:45:43 Successfully set up Docker network: acb_default_network\n2026/08/15 07:45:43 Setting up Docker configuration...\n2026/08/15 07:45:43 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "=1\nP0_R2_ZERO_NEW_FAILURES=1\nP0_R2_ZERO_COLLECTION_ERRORS=1\nP0_R2_FULL_SUITE_DIFFERENTIAL_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\n\n2026/08/15 08:14:21 Successfully executed container: differential\n2026/08/15 08:14:21 Step ID: checkout marked as successful (elapsed time in seconds: 22.283775)\n2026/08/15 08:14:21 Step ID: differential marked as successful (elapsed time in seconds: 1695.189591)\n\n\nRun ID: cmjh was successful after 28m40s\n\n",
+          "log_sha256": "f8574c1dff6f865402b6de5fae8dd8726dfcc013499f97a97d6348f247ed1ebb",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "corrective closure full repository differential at the corrected head",
+          "run_error_message": null,
+          "run_id": "cmjh",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T07:45:46.927788+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T07:47:21.383874+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 7424,
+          "log_excerpt_head": "2026/08/15 07:45:47 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 07:45:47 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 07:45:47 Successfully set up Docker network: acb_default_network\n2026/08/15 07:45:47 Setting up Docker configuration...\n2026/08/15 07:45:48 Successfully set up Docker configuration\n2026/08/15 07:45:48 Logging in to registry: acrjspaceobssea0708231738.azurecr.io\n2026/08/15 07:45:49 S",
+          "log_excerpt_tail": "IT_V2_COMPLETE=1\nP0_R2_TRANSPORT_ROUNDTRIP_BYTES=1048576\nP0_R2_TRANSPORT_ROUNDTRIP_COMPLETE=1\nP0_R2_PREFIX_PREFLIGHT_SKIPPED=1 no attempt id was supplied\nP0_R2_PREFLIGHT_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\nP0_R2_CANARY_COMPLETE=1\n2026/08/15 07:47:19 Successfully executed container: acb_step_0\n2026/08/15 07:47:19 Step ID: acb_step_0 marked as successful (elapsed time in seconds: 90.531437)\n\n\nRun ID: cmjj was successful after 1m33s\n\n",
+          "log_sha256": "872151f7eff61c25452c90f6eb99bf83748c097cd0a80e49ff29ec67934af763",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "corrective closure model-free preflight canary against the active digest",
+          "run_error_message": null,
+          "run_id": "cmjj",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        },
+        {
+          "azure_retains_log": true,
+          "azure_retains_metadata": true,
+          "baseline_commit": "005aa087e40c641affc8ca537e6c6a075bcbfe98",
+          "category": "corrective-closure",
+          "create_time": "2026-08-15T08:17:16.523467+00:00",
+          "evidence_outcome": "SEALED",
+          "finish_time": "2026-08-15T08:45:51.567431+00:00",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+          "log_bytes": 42182,
+          "log_excerpt_head": "2026/08/15 08:17:17 Downloading source code...\n\n2026/08/15 08:17:18 Finished downloading source code\n\n2026/08/15 08:17:18 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.\n2026/08/15 08:17:18 Creating Docker network: acb_default_network, driver: 'bridge'\n2026/08/15 08:17:18 Successfully set up Docker network: acb_default_network\n2026/08/15 08:17:18 Setting up Docker configuration...\n2026/08/15 08:17:18 Successfully set up Docker configuration\n",
+          "log_excerpt_tail": "S=1\nP0_R2_ZERO_NEW_FAILURES=1\nP0_R2_ZERO_COLLECTION_ERRORS=1\nP0_R2_FULL_SUITE_DIFFERENTIAL_COMPLETE=1\nP0_R2_REPLAY_GATE_RUN=false\nP0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false\nP0_R2_MODEL_OPERATIONS_PERFORMED=0\n2026/08/15 08:45:50 Successfully executed container: differential\n2026/08/15 08:45:50 Step ID: checkout marked as successful (elapsed time in seconds: 22.841169)\n2026/08/15 08:45:50 Step ID: differential marked as successful (elapsed time in seconds: 1687.914371)\n\n\nRun ID: cmjk was successful after 28m34s\n\n",
+          "log_sha256": "bb176587d7b3a5c48aff4404c1cc0c191c17a0e86780d769044b4ab4e6bb279e",
+          "logs_exit_code": 0,
+          "model_free_marker_present": true,
+          "model_path_marker_present": false,
+          "output_images": null,
+          "registered_purpose": "corrective closure full repository differential at the closure base",
+          "run_error_message": null,
+          "run_id": "cmjk",
+          "run_type": "QuickRun",
+          "show_exit_code": 0,
+          "status": "Succeeded",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "submitted_identity_could_enter_replay_model_or_gpu_path": false,
+          "superseded_by": null,
+          "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912"
+        }
+      ],
+      "schema_version": "study3-p0-r2-attempt-ledger-v2",
+      "sealed_count": 37,
+      "stage": "STUDY3-P0-R2",
+      "stops": [],
+      "subscription": "943bacdf-8b6e-4e3a-8126-a149f623d32e",
+      "tokenizer_constructions": 0,
+      "unavailable_count": 0,
+      "unavailable_runs_called_a_pass": 0
+    },
+    "path": "studies/study3/pilot/p0_r2/p0_r2_attempt_ledger_v2.json",
+    "sha256": "f1ebd28c7ab2f6d0d8d6969e82f3d1723e2c3fff85583686388ed193ba0d71f7"
+  },
+  "authorities": [
+    {
+      "bytes": 11288,
+      "git_blob": "0e4fe8e2ff3bb0e5353a5bb878fac5b8234d3ab6",
+      "path": "studies/study3/prompts/study3_p0_r2_infrastructure_successor_authority.md",
+      "role": "infrastructure-successor",
+      "sha256": "eb2407216fcb48506b97b43a88d541ab27e857e72ef319cbf575799cf8451deb"
+    },
+    {
+      "bytes": 16404,
+      "git_blob": "79dc2f56712ef09dcd92b815ba038e800c905474",
+      "path": "studies/study3/prompts/study3_p0_r2_corrective_closure_and_conditional_execution_authority.md",
+      "role": "corrective",
+      "sha256": "8d34def46c822fd7794b00f79c184e717f8799de6180c5413adaab5253899556"
+    }
+  ],
+  "azure": {
+    "container": "jspace-results",
+    "gpu_job": "job-jspace-s3-p0r2-pilot-g1",
+    "gpu_workload_profile": "gpu-t4",
+    "hard_kill_job": "job-jspace-s3-p0r2-hardkill-g1",
+    "managed_identity": "id-jspace-aca-acrpull-sea",
+    "query_error_is_absence": false,
+    "recovery_job": "job-jspace-s3-p0r2-recover-g1",
+    "registry": "acrjspaceobssea0708231738",
+    "resource_group": "rg-jspace-observation-sea",
+    "storage_account": "stjspacefiles0709085305",
+    "subscription": "943bacdf-8b6e-4e3a-8126-a149f623d32e"
+  },
+  "canaries": {
+    "designated_packing_canary": "cmjg",
+    "hard_kill_open_admission_cpu_recovery": {
+      "attempt": "p0r2-g1-hardkill-canary-20260815-0748",
+      "execution": "job-jspace-s3-p0r2-hardkill-g1-2fevxfp",
+      "job": "job-jspace-s3-p0r2-hardkill-g1",
+      "outcome": "PASS",
+      "waived": false
+    },
+    "in_build_image_to_git_audit": "cmjf",
+    "model_free_preflight": "cmjj",
+    "receipts_path": "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_v2.json"
+  },
+  "caps": {
+    "max_model_evaluation_equivalents": 228,
+    "max_non_generative_prefills": 180,
+    "max_s4_generations": 12,
+    "max_smoke_prefills_before_extension": 60,
+    "possible_scored_rows": 210
+  },
+  "caps_are_enforced_not_reported": true,
+  "changes_only": "host-to-registry submission transport; corrective closure tooling",
+  "closure_base": {
+    "commit": "07a20023824d448db9972e056368d8165fada69b"
+  },
+  "delegated_scientific_modules": [
+    {
+      "bytes": 31955,
+      "git_blob": "2f1b32b60e511eabffbb45c0b5ee2908e177ac0c",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_factorization.py",
+      "sha256": "fdc564c6a0e6fea17b39089f7c2f9403d401e47ad14bb6e8bb7880eed73d380e"
+    },
+    {
+      "bytes": 17986,
+      "git_blob": "06d6cdcaf5b7c4e69276093f723128ee16808b91",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_eligibility.py",
+      "sha256": "e63e804b6590e8f1474af47374c1fc96e5b66cf6c1472c9c3b386fc62e6dc5ea"
+    },
+    {
+      "bytes": 32006,
+      "git_blob": "28ac8f29ca69ce709a115b7c8affa8cde5fc9bde",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
+      "sha256": "072f29962e8472b54c16303fb04ca610cf3d85be14f973593b4a32dea49ad917"
+    },
+    {
+      "bytes": 17530,
+      "git_blob": "5338f5704a67de2673cb8511ea40a692d8f8de79",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_counters.py",
+      "sha256": "da6aa9a8038ac5b53ea04cc8e31eaaf7f7aa5614cc600a8433b80e9369245d07"
+    }
+  ],
+  "designated_packing_canary": {
+    "acr_run_id": "cmjg",
+    "attempt_id": "p0r2-g1-packing-canary-20260815-0745",
+    "context_entry_count": 2,
+    "context_max_native_path_chars": 39,
+    "digest": "sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+    "executable_commit": "422d3d9695a444be4f09cc10fbc919110ecccbf0",
+    "executable_tree": "93acf512af266c346b0bc2e592410821804d7251",
+    "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+    "outcome": "PASS",
+    "p0_r1_fatal_native_path_chars": 265,
+    "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
+    "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v2.yaml"
+  },
+  "executable_code": {
+    "commit": "422d3d9695a444be4f09cc10fbc919110ecccbf0",
+    "tree": "93acf512af266c346b0bc2e592410821804d7251"
+  },
+  "generation": 1,
+  "governance_bytes": [
+    {
+      "bytes": 16404,
+      "git_blob": "79dc2f56712ef09dcd92b815ba038e800c905474",
+      "mode": "100644",
+      "path": "studies/study3/prompts/study3_p0_r2_corrective_closure_and_conditional_execution_authority.md",
+      "sha256": "8d34def46c822fd7794b00f79c184e717f8799de6180c5413adaab5253899556"
+    },
+    {
+      "bytes": 11288,
+      "git_blob": "0e4fe8e2ff3bb0e5353a5bb878fac5b8234d3ab6",
+      "mode": "100644",
+      "path": "studies/study3/prompts/study3_p0_r2_infrastructure_successor_authority.md",
+      "sha256": "eb2407216fcb48506b97b43a88d541ab27e857e72ef319cbf575799cf8451deb"
+    },
+    {
+      "bytes": 14082,
+      "git_blob": "b4cdd58da02aaa16fd4edad91d3126e4dc9ac882",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.schema.json",
+      "sha256": "d82e3446a8f25756110d6e501f6d294bb436059758e7c84e7ef8a952e19ecf14"
+    },
+    {
+      "bytes": 4693,
+      "git_blob": "35fdeedae1b592b687f51a4dd62e363f33268378",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_v1_supersession_v2.json",
+      "sha256": "cd099fbb2f8da7e69396ce1647464affc1aca2fc99188c8ac0139fc4defd9c31"
+    },
+    {
+      "bytes": 17961,
+      "git_blob": "09bc5b10a2fbb104d84f80218aeb2841072c8bec",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json",
+      "sha256": "2c9789e27fad5ac463e105a42a69d686cdcf1389bcfd44503baf79cabd61f7d7"
+    },
+    {
+      "bytes": 11083,
+      "git_blob": "66e991f6f65b5874dfe742dd637b54c759045070",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_v2.json",
+      "sha256": "d1ab000690e2bd81a1f8808bd7759fb85c93d5687111af23d60bf9c2e37d68fb"
+    },
+    {
+      "bytes": 90680,
+      "git_blob": "a515d81977d0f5254951a76997fbf489b02910d3",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_attempt_ledger_v2.json",
+      "sha256": "f1ebd28c7ab2f6d0d8d6969e82f3d1723e2c3fff85583686388ed193ba0d71f7"
+    },
+    {
+      "bytes": 17009,
+      "git_blob": "b6ea255905374b26b407a94c32eb615b5e6040a5",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_corrective_admission_audit_v2.json",
+      "sha256": "7f7575eaf7d49e3174430850789106baa3273e5de9fdf69738e18fb3b6f521ea"
+    },
+    {
+      "bytes": 19808,
+      "git_blob": "0c5601cc6323ff30884079e2b87095e805774777",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_image_manifest_v2.json",
+      "sha256": "c2125be6b29d9bbec6c2b9c0d2ad8f3f710aa9e9571b9d1768bef9b3e66346c0"
+    },
+    {
+      "bytes": 18310,
+      "git_blob": "3dc07e95e9857d76f276478f215507872b7931f5",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_validation_receipts_v2.json",
+      "sha256": "f3f601f7d4bbe76cbaeba28ddf6b31c6a83cba57fd8d3066e79ea8528345e477"
+    }
+  ],
+  "governance_evidence_closure": [
+    {
+      "class": "governance",
+      "path": "studies/study3/pilot/p0_r2/P0_R2_HANDOFF_V2.md"
+    },
+    {
+      "class": "governance",
+      "path": "studies/study3/pilot/p0_r2/README.md"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_governance_chain_proof_v2.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_host_preflight_proof_v2.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_validation_receipts_v2.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_phase_b_admission_v2.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_phase_b_admission_recheck_v2.json"
+    },
+    {
+      "class": "governance",
+      "path": "studies/study3/pilot/p0_r2/P0_R2_CORRECTIVE_CLOSURE_DISPOSITION_V2.md"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_current_head_proof_v2.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_replay_result.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_replay_receipt.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_replay_counters.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/P0_R2_REPLAY_DISPOSITION.md"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_replay_raw_log.txt"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_replay_stderr.txt"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_reconstruction_receipt.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_acr_submission_receipt.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_host_submission_receipt.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_pilot_authorization.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_pilot_result.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_pilot_receipt.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_pilot_counters.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_pilot_raw_log.txt"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_pilot_recovery_receipt.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2/P0_R2_PILOT_DISPOSITION.md"
+    },
+    {
+      "class": "governance",
+      "path": "docs/run_log.md"
+    },
+    {
+      "class": "governance",
+      "path": "docs/decision_log.md"
+    },
+    {
+      "class": "governance",
+      "path": "reports/current_status.md"
+    },
+    {
+      "class": "governance",
+      "path": "studies/study3/NEXT_THREAD_HANDOFF.md"
+    },
+    {
+      "class": "governance",
+      "path": "studies/study3/README.md"
+    }
+  ],
+  "host_closure_executable": {
+    "commit": "07a20023824d448db9972e056368d8165fada69b",
+    "file_count": 12,
+    "files": [
+      {
+        "bytes": 12662,
+        "git_blob": "cb6f37ef60efcfd2253a6282e300ac4b10f085b1",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0_r2/validation/p0_r2_admission_audit_v2.py",
+        "sha256": "6b87e85b1c150b7afc5bf974ed72c158a9a5fbd609a1d2bded34bcca411eedb2"
+      },
+      {
+        "bytes": 5246,
+        "git_blob": "fc5e0247e75fb1cab8e3e24a4216b04f342a81fc",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0_r2/validation/p0_r2_baseline_signatures_v2.sh",
+        "sha256": "4ce9b764c582456bb1e025e2f57a8bdf3950163c2cecbd93a5e7c1b71e3c786a"
+      },
+      {
+        "bytes": 7413,
+        "git_blob": "108c6c26cab03e421bebe5c02416df5c5834c806",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0_r2/validation/p0_r2_canary_receipts_v2.py",
+        "sha256": "53773edc2aed76b95cbfd1cb34de8f6e2bba0c784885495cedba61f4fa84241f"
+      },
+      {
+        "bytes": 1752,
+        "git_blob": "dc78a991458e228f7ebdedd7fffa7ca2ce598051",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0_r2/validation/p0_r2_differential_task_v2.yaml",
+        "sha256": "c7eefb817f68f5bf68b5cbee31696bd86d30cbe0b0016c7a782848e207c4f871"
+      },
+      {
+        "bytes": 4056,
+        "git_blob": "3756aa3ce33ef79b8eaee3de4441d8602dded3f3",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0_r2/validation/p0_r2_differential_v2.sh",
+        "sha256": "5237a90ab7977aa45550644bc741f2f64b1480f6a81a6b6eb2aa61fcb4432ca6"
+      },
+      {
+        "bytes": 1662,
+        "git_blob": "315378e1bfc65684fdbae4e3d042a32ecd1af3bb",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_checkout_v5.sh",
+        "sha256": "89a7eaff9000098399ffdff509c6a2d9620bf46c8291ffbb18d851e1e104a498"
+      },
+      {
+        "bytes": 14567,
+        "git_blob": "cac09554cb8d84b56298899c5d8eb1700ca89024",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0_r2/validation/p0_r2_host_submission_v2.py",
+        "sha256": "f90417c0f5520570191311d5a75502f079239c53e8e7c12bae9819c2569aa324"
+      },
+      {
+        "bytes": 6452,
+        "git_blob": "43b5d09c7b9f166f5e038b5ee9cb280a1e0b8d1a",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0_r2/validation/p0_r2_normalize_signatures_v2.py",
+        "sha256": "be0baf4da2f7c1c9fbaa1ab504fa9034d067400f712087272c280f4ece434255"
+      },
+      {
+        "bytes": 20867,
+        "git_blob": "8001be873f4dca45e853b164c3e1ad36b6287628",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0_r2/validation/p0_r2_phase_b_admission_v2.py",
+        "sha256": "011f6fb8dbabf611aa19081213cf219e9364313a6c4c595a61460f53304d362f"
+      },
+      {
+        "bytes": 3240,
+        "git_blob": "e4d24123b3745b1ca2201a6d393628752004a90f",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0_r2/validation/p0_r2_signature_plugin_v2.py",
+        "sha256": "4c874c2d0123dea9dbd7b78c86617d0a32320dc9b1631e26791656bf1a61d276"
+      },
+      {
+        "bytes": 1441,
+        "git_blob": "a64a33d40e1f5b08d9fb6d699a8147cdcb7e8cea",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0_r2/validation/p0_r2_baseline_signatures_task_v2.yaml",
+        "sha256": "d45aa488b5a4fd58cd7d908f18a3c5575d86c1b095dc6f5899e994aeeeaf5d7c"
+      },
+      {
+        "bytes": 42960,
+        "git_blob": "6479f12fd3c8d64ff4fe0c82abb044265d5a16c6",
+        "mode": "100644",
+        "path": "tests/test_study3_p0_r2_corrective_closure_v2.py",
+        "sha256": "8b93fc962f001d2ce4790ae814fef0f8743f1c6622d54f2d5eb19daf43c6f3f9"
+      }
+    ],
+    "tree": "8ee95150a76f2ccf30db5cd274783a8d016cf381"
+  },
+  "image": {
+    "base_digest": "sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c",
+    "base_image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1",
+    "build_run_id": "cmjf",
+    "digest": "sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+    "manifest_entries_sha256": "c6a816124cf8db1ab18653144a6e9801d1af9dfb474f7ed7bc971f8cb314fbab",
+    "manifest_entry_count": 43,
+    "manifest_path": "studies/study3/pilot/p0_r2/p0_r2_image_manifest_v2.json",
+    "reference": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:f4102efbde940a67b0b42f333cf284c877abff9c4627b000a2365db55936e5f5",
+    "tag": "gen1r2-422d3d9695a4"
+  },
+  "image_executable": {
+    "commit": "422d3d9695a444be4f09cc10fbc919110ecccbf0",
+    "file_count": 43,
+    "files": [
+      {
+        "bytes": 16189,
+        "git_blob": "c6df7d04a8e3baa4dfbd4f9959a399f649c9b5c1",
+        "kind": "scientific",
+        "path": "studies/study3/pilot/p0_r1/p0_r1_authorization_v3.py",
+        "sha256": "73e6c52395aee93ebfb037634b71ef4420d7ac1bd1fe89a249295c87ef1e1f7d"
+      },
+      {
+        "bytes": 17530,
+        "git_blob": "5338f5704a67de2673cb8511ea40a692d8f8de79",
+        "kind": "scientific",
+        "path": "studies/study3/pilot/p0_r1/p0_r1_counters.py",
+        "sha256": "da6aa9a8038ac5b53ea04cc8e31eaaf7f7aa5614cc600a8433b80e9369245d07"
+      },
+      {
+        "bytes": 17986,
+        "git_blob": "06d6cdcaf5b7c4e69276093f723128ee16808b91",
+        "kind": "scientific",
+        "path": "studies/study3/pilot/p0_r1/p0_r1_eligibility.py",
+        "sha256": "e63e804b6590e8f1474af47374c1fc96e5b66cf6c1472c9c3b386fc62e6dc5ea"
+      },
+      {
+        "bytes": 31955,
+        "git_blob": "2f1b32b60e511eabffbb45c0b5ee2908e177ac0c",
+        "kind": "scientific",
+        "path": "studies/study3/pilot/p0_r1/p0_r1_factorization.py",
+        "sha256": "fdc564c6a0e6fea17b39089f7c2f9403d401e47ad14bb6e8bb7880eed73d380e"
+      },
+      {
+        "bytes": 25958,
+        "git_blob": "8ae1ca1543c6a1f413084552a9820ab5957cc464",
+        "kind": "scientific",
+        "path": "studies/study3/pilot/p0_r1/p0_r1_model_runner_v3.py",
+        "sha256": "a70790895e089f72b7fddff2101829c04a1f1d8553ffa698a79e9ef7c2406471"
+      },
+      {
+        "bytes": 6800,
+        "git_blob": "dcbc2fe2c089586eae76336ad0bca2501931682b",
+        "kind": "scientific",
+        "path": "studies/study3/pilot/p0_r1/p0_r1_prefix_preflight_v3.py",
+        "sha256": "f2fe43249999cf64ab79474732c9b6a916099919b0f686022a317687080cdf20"
+      },
+      {
+        "bytes": 32006,
+        "git_blob": "28ac8f29ca69ce709a115b7c8affa8cde5fc9bde",
+        "kind": "scientific",
+        "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
+        "sha256": "072f29962e8472b54c16303fb04ca610cf3d85be14f973593b4a32dea49ad917"
+      },
+      {
+        "bytes": 13713,
+        "git_blob": "6af638bf0cdeb2e796aad0af13a55d38fa1a2284",
+        "kind": "scientific",
+        "path": "studies/study3/pilot/p0_r1/p0_r1_recovery_v3.py",
+        "sha256": "2a3a51e33d04736e61f5acd7d763ca970ff763702b15c135369adeaac24f81ca"
+      },
+      {
+        "bytes": 32355,
+        "git_blob": "b3179819e9612253e5ea3e00f1f684e8543f0865",
+        "kind": "scientific",
+        "path": "studies/study3/pilot/p0_r1/p0_r1_replay_gate.py",
+        "sha256": "1755ee5e188021ce849dce18362365decc9f67d35d3602b037d4c1e7d7e4a15a"
+      },
+      {
+        "bytes": 4899,
+        "git_blob": "1eeba5668354a71f68b2b8afcc033f5f7b42a50a",
+        "kind": "entrypoint",
+        "path": "studies/study3/pilot/p0_r2/container/p0_r2_canary_v1.sh",
+        "sha256": "b9b6297b4cb38eaa3eb1f4f72ea64eb8b62245f6d047f7007fd5a94dd8970d7c"
+      },
+      {
+        "bytes": 4889,
+        "git_blob": "aaed83f135be3a8c92e59edc8b123e448945a822",
+        "kind": "entrypoint",
+        "path": "studies/study3/pilot/p0_r2/container/p0_r2_canary_v2.sh",
+        "sha256": "6487d1019b48a3e0b92de70157a2434422c02c0b5d7fbe12d6dc493d22bc68f0"
+      },
+      {
+        "bytes": 1263,
+        "git_blob": "93cd0d20e8f1bb10f383471d966dc1be6ce74a87",
+        "kind": "entrypoint",
+        "path": "studies/study3/pilot/p0_r2/container/p0_r2_hard_kill_canary_v2.sh",
+        "sha256": "8a8a8cc435bfb1039ca80fb67971afb24a8e4eace92bf29277344b964978ae4c"
+      },
+      {
+        "bytes": 2826,
+        "git_blob": "b107494f8f945a4896e8406a41a85a2f7ee85e48",
+        "kind": "entrypoint",
+        "path": "studies/study3/pilot/p0_r2/container/p0_r2_model_pilot_v1.sh",
+        "sha256": "01eb43ef51232b567f53cb29d45e6cabf4837e005b881fd98496bd528dca949f"
+      },
+      {
+        "bytes": 1098,
+        "git_blob": "fd37a9e5d02c090f82c9d47e3e29d1db764a7097",
+        "kind": "entrypoint",
+        "path": "studies/study3/pilot/p0_r2/container/p0_r2_recovery_v1.sh",
+        "sha256": "90fa2f0bd746005c4d124a154f765836b290cb85a5cb6598c51945043c5c5438"
+      },
+      {
+        "bytes": 3886,
+        "git_blob": "c4ef2d7332b201f06382ae1d0fc3a442fb3831d3",
+        "kind": "entrypoint",
+        "path": "studies/study3/pilot/p0_r2/container/p0_r2_replay_v1.sh",
+        "sha256": "6d3f60891a940bdde81901b1bfcffb3854bf35f1a7aa2e63ee9633b3c893ca99"
+      },
+      {
+        "bytes": 5999,
+        "git_blob": "a20b488f783eebc183d78e67cd8c3aba1f210628",
+        "kind": "entrypoint",
+        "path": "studies/study3/pilot/p0_r2/container/p0_r2_replay_v2.sh",
+        "sha256": "4950595ce2c96b7f073177596d92ed238e006e52636cbf7dad91795c612312c1"
+      },
+      {
+        "bytes": 2304,
+        "git_blob": "42460dcc121d32847195b9c632f534100d17b1dd",
+        "kind": "entrypoint",
+        "path": "studies/study3/pilot/p0_r2/container/p0_r2_successor_v1.sh",
+        "sha256": "ac413daa395f686be465442ebe836e0b3b2e80d2bbbfbc80c15449c74ca12a4d"
+      },
+      {
+        "bytes": 2737,
+        "git_blob": "6790ef3c8ce1c7ec0f1ff8678bbe426f0d120b36",
+        "kind": "entrypoint",
+        "path": "studies/study3/pilot/p0_r2/container/p0_r2_successor_v2.sh",
+        "sha256": "fbb4495b9799dfa0bb7961f593ba3c4766d58b0089b38d2629af8ec3f091c15e"
+      },
+      {
+        "bytes": 16957,
+        "git_blob": "7725db8257c453d42101a3fb03b0ff71c4b98ad1",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_acr_submission.py",
+        "sha256": "eb0b33d6386f10a039070eb359265efb18daeb728d455d4165c3ce062e9581dc"
+      },
+      {
+        "bytes": 15686,
+        "git_blob": "19c711caece008e98d505b8920632e9d643a92df",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_attempt_ledger_v2.py",
+        "sha256": "d2660a139e0c136bc8a5affec6d5211f8c7d0bb97e196b1acd5c159f28808d71"
+      },
+      {
+        "bytes": 7323,
+        "git_blob": "df562d9f6c7695e6209de5e325bde33107aec621",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_authorization_v1.py",
+        "sha256": "feaa9f078c5403ac4dea282a9d7deb2b15e32530fa1ba4336369834f8b923026"
+      },
+      {
+        "bytes": 14661,
+        "git_blob": "ff35ddeb223517953b121dccfe29ac53166e8579",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_azure_query_v1.py",
+        "sha256": "0b205d190c7550bb2d59d8a55d1032b066544aed011b23fc4a5b3c76dd03fd79"
+      },
+      {
+        "bytes": 32339,
+        "git_blob": "84a65713675461f16ac82a3ce9c590b00988dfe0",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_blob_transport.py",
+        "sha256": "4f08aabbd96d4e354583077c1a13f9292bf52ebc0ea0325081cac4975805f7e9"
+      },
+      {
+        "bytes": 8898,
+        "git_blob": "53f3260ba4c0634ca3c319e76cb7f06b846ad2ac",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_blob_transport_v1.py",
+        "sha256": "07096099d793961c07bea9e4bb2efb828308230d9afe4944d6945df30fd17267"
+      },
+      {
+        "bytes": 30097,
+        "git_blob": "c3f809d9add98bdaa30f499354c7a8ac270686c3",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_closure_binding_v1.py",
+        "sha256": "364c0ae0559c89422ee5b812a5fe962f27a9b515cef406ed596708c1e7cab625"
+      },
+      {
+        "bytes": 34517,
+        "git_blob": "6a7a15387947b2198e871b4381a89f0f7c5b193b",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_closure_binding_v2.py",
+        "sha256": "e8b29e3eb07884464109ccd5644b10ee1473fb09344a462e954e69f727ee2bbe"
+      },
+      {
+        "bytes": 14530,
+        "git_blob": "1b51ab623fd5f892934b45c5eb266b3f779a5f4a",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.py",
+        "sha256": "191fab796eae6349226d914ecc2330549cb4c54c2249895b241c1cee1daaf4ba"
+      },
+      {
+        "bytes": 28139,
+        "git_blob": "dd247cc2706e5157272d20e8c5889984204ff7f9",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.py",
+        "sha256": "94eeb4fbec82d7e7a082a4a665fd4a35082537057089911504e8cbd32e8470fc"
+      },
+      {
+        "bytes": 22258,
+        "git_blob": "34c50a5b69f95d32a5df1167cbfc655cfe21d32d",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_hard_kill_canary_v2.py",
+        "sha256": "fec906e2d883eaa08d474db9686344f9ec061ef8e722692f9ab562dd5c68bd6c"
+      },
+      {
+        "bytes": 28949,
+        "git_blob": "f33b5de5cc0630eb01b953dee30ab637eb8b30e8",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_host_preflight_v2.py",
+        "sha256": "e8d420795b79c96e58188f262a990ca6c0f9491dc878421e214b5c044b0b05a3"
+      },
+      {
+        "bytes": 10821,
+        "git_blob": "f3d5cf47e492a1f9072034709c9e1a2a0baa7b38",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_image_manifest_v1.py",
+        "sha256": "86c1c38b7e4844b419bcc86e3689ae38eccfec64eae779f421b676943aa36ca2"
+      },
+      {
+        "bytes": 10177,
+        "git_blob": "52009596c81995aa5725a4ee38f261e3b7f530e8",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_image_manifest_v2.py",
+        "sha256": "5200dea93bbf725d23537f8250bb36c0bb42ac50a9c43e10f79e10d2473802d4"
+      },
+      {
+        "bytes": 11314,
+        "git_blob": "53f2d4418a5e8b9727ee7482fa97103fd90f8bf4",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_job_spec_v1.py",
+        "sha256": "350b170c0a21dd7102d48a67506c0f364bcd5a74920fcca240e055761959496f"
+      },
+      {
+        "bytes": 21756,
+        "git_blob": "93d37d4f9020eb91be7043fe686d611b6880c27f",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_journal_v1.py",
+        "sha256": "1c750b2a6e82922fb8d3107c5124f382d37cefd70bdc2d0251c5e90973769628"
+      },
+      {
+        "bytes": 7636,
+        "git_blob": "caec68a544ccb15e6709dbdee0c0e87b1c161441",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_model_runner_v1.py",
+        "sha256": "a5e9281c09bd4c5458bf28dec7267a5748b5368ef0f116b586e37ce3acd2731c"
+      },
+      {
+        "bytes": 4091,
+        "git_blob": "d2a1c0783cc845895601d0069f03b61dc7e6a8f2",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_prefix_preflight_v1.py",
+        "sha256": "5464a56d9ec1f4842e0296b1a604bd83d16adcd027f10aa01d49b57aa4e3fdce"
+      },
+      {
+        "bytes": 7123,
+        "git_blob": "ca664d66ab99266b14c9d7b253c45f6e7b88c27f",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_recovery_v1.py",
+        "sha256": "9511d059e00196f2e08f0125923eee1b45d4416b6be1c31e6951ada84fa3b696"
+      },
+      {
+        "bytes": 10498,
+        "git_blob": "f67b4ded4d50662dce371887f631fd1470bb9218",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_replay_capture_v1.py",
+        "sha256": "f9effb8fdb63230417b25ecbd7f99ce1d6057a4668b6461d2ff03ff64d9efeb2"
+      },
+      {
+        "bytes": 12303,
+        "git_blob": "251057ed38600846a7cb49e66df7751c5f33c88f",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_replay_gate_v1.py",
+        "sha256": "7f0d27eff8ec7efbf0191da4641f52d98c6337f3e8dda39e3e003cdc2dc38467"
+      },
+      {
+        "bytes": 20728,
+        "git_blob": "f5b7d1040c7111ec377e86e67078e77c072961de",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_submission_context.py",
+        "sha256": "83b9126ea374c19be21a70a5fbcf8a7a1baf128b74952226faa119bdc55bdc7d"
+      },
+      {
+        "bytes": 29555,
+        "git_blob": "6033d7e6c6165cdea31ce8963bdbcfbe08228881",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_transport.py",
+        "sha256": "a6125d2af75afca9d65030f134c9222da782add79efb2cbff3eb368314e06fd1"
+      },
+      {
+        "bytes": 5566,
+        "git_blob": "d13fcde48a54ec43391728364503b19e2f97d7eb",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_transport_v1.py",
+        "sha256": "5dc5f71be5518cf2b00db162e6b5e04aec69edebaa92376f985cb6804c3d70e9"
+      },
+      {
+        "bytes": 8180,
+        "git_blob": "5f6b083797c78531d111537e7694607376fcd664",
+        "kind": "operational",
+        "path": "studies/study3/pilot/p0_r2/p0_r2_verify_replay_receipt.py",
+        "sha256": "d0567f7fa808049a622d447b2672bf67f858c499e46d250e1afc0adc82387f40"
+      }
+    ],
+    "tree": "93acf512af266c346b0bc2e592410821804d7251"
+  },
+  "immutable_sources": [
+    {
+      "bytes": 31955,
+      "git_blob": "2f1b32b60e511eabffbb45c0b5ee2908e177ac0c",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_factorization.py",
+      "sha256": "fdc564c6a0e6fea17b39089f7c2f9403d401e47ad14bb6e8bb7880eed73d380e"
+    },
+    {
+      "bytes": 17986,
+      "git_blob": "06d6cdcaf5b7c4e69276093f723128ee16808b91",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_eligibility.py",
+      "sha256": "e63e804b6590e8f1474af47374c1fc96e5b66cf6c1472c9c3b386fc62e6dc5ea"
+    },
+    {
+      "bytes": 32006,
+      "git_blob": "28ac8f29ca69ce709a115b7c8affa8cde5fc9bde",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
+      "sha256": "072f29962e8472b54c16303fb04ca610cf3d85be14f973593b4a32dea49ad917"
+    },
+    {
+      "bytes": 17530,
+      "git_blob": "5338f5704a67de2673cb8511ea40a692d8f8de79",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_counters.py",
+      "sha256": "da6aa9a8038ac5b53ea04cc8e31eaaf7f7aa5614cc600a8433b80e9369245d07"
+    },
+    {
+      "bytes": 32355,
+      "git_blob": "b3179819e9612253e5ea3e00f1f684e8543f0865",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_replay_gate.py",
+      "sha256": "1755ee5e188021ce849dce18362365decc9f67d35d3602b037d4c1e7d7e4a15a"
+    },
+    {
+      "bytes": 25958,
+      "git_blob": "8ae1ca1543c6a1f413084552a9820ab5957cc464",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_model_runner_v3.py",
+      "sha256": "a70790895e089f72b7fddff2101829c04a1f1d8553ffa698a79e9ef7c2406471"
+    },
+    {
+      "bytes": 16189,
+      "git_blob": "c6df7d04a8e3baa4dfbd4f9959a399f649c9b5c1",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_authorization_v3.py",
+      "sha256": "73e6c52395aee93ebfb037634b71ef4420d7ac1bd1fe89a249295c87ef1e1f7d"
+    },
+    {
+      "bytes": 6800,
+      "git_blob": "dcbc2fe2c089586eae76336ad0bca2501931682b",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_prefix_preflight_v3.py",
+      "sha256": "f2fe43249999cf64ab79474732c9b6a916099919b0f686022a317687080cdf20"
+    },
+    {
+      "bytes": 13713,
+      "git_blob": "6af638bf0cdeb2e796aad0af13a55d38fa1a2284",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_recovery_v3.py",
+      "sha256": "2a3a51e33d04736e61f5acd7d763ca970ff763702b15c135369adeaac24f81ca"
+    }
+  ],
+  "job_specifications": [
+    {
+      "bytes": 3998,
+      "git_blob": "69b5cfb801285b757db5718c0e309d0198575aff",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/container/p0_r2_hard_kill_canary_job_v2.yaml",
+      "sha256": "88d2ba1c1324ef4002a2f4f273577e88155c55f93e10ad67f7d8be1ce79a59f6"
+    },
+    {
+      "bytes": 3202,
+      "git_blob": "2abd2ee6c87525ac89bce040a3eae6bc81b9dd9b",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/container/p0_r2_gpu_job_v1.yaml",
+      "sha256": "554c4ce1fb05ef6e4f18447ac3e3e8ead1f175d89dcbade0c9d51ef5537ac4d4"
+    },
+    {
+      "bytes": 2438,
+      "git_blob": "21f3207df3efa309238f5821ab257dbe7184cd09",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/container/p0_r2_recovery_job_v1.yaml",
+      "sha256": "1765860dc57c702d063509cdd8713f249c36d4aa798a3f13acdcdb3484623421"
+    }
+  ],
+  "kind": "infrastructure-successor-corrective-closure",
+  "legal_state": {
+    "draft_v0_6_frozen": false,
+    "draft_v0_6_reviewed": false,
+    "evidence_ledger_tail": "EV-0016",
+    "formal_execution_authorized": false,
+    "interface": null,
+    "positive_reference": null,
+    "research_question_answered": false,
+    "rp_wrapper": null
+  },
+  "p0_r1_terminal": {
+    "launchable": false,
+    "protected_bytes": [
+      {
+        "bytes": 2173,
+        "git_blob": "9eab456dd6b98a2af253b893b4546e67b8153a3b",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0/results/p0-r1/P0_R1_GENERATION3_STOP_DISPOSITION.md",
+        "sha256": "feb26a6f5d528dd67a6f9dc44cbf469debb0b4ba6e03aa5c1dd1959324601108"
+      },
+      {
+        "bytes": 2707,
+        "git_blob": "434ec5a0a15d53327b06852e5be6e51bcf6cf08c",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_generation3_stop_counters.json",
+        "sha256": "ddb684ff0bc6623d9baa00503bdc28b14e39504a14872d9e4e70c5348bfdd0a7"
+      },
+      {
+        "bytes": 5447,
+        "git_blob": "15cdede7b69cdaeb9f82e8202c70607579427803",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_generation3_stop_receipt.json",
+        "sha256": "52c68ff886a25f4df775cda9bf79201012df9ca35d5b8a446366d4af77dc8dfc"
+      },
+      {
+        "bytes": 979,
+        "git_blob": "18b2cefbd56c07764537c0b63d7f10aa74c7f1e9",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_live_replay_command.log",
+        "sha256": "400fe156cdc402618f7ac4127d581bfb96131743e36953fb45cef1e3871062a3"
+      },
+      {
+        "bytes": 1170,
+        "git_blob": "1551f23d91ca38f6c9339b77f0603c518b9e1075",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_command.log",
+        "sha256": "81aa5b3c55a9a4ac89693aec748832a8ce3ddccbe8e7a8a71b761bf28b365d8d"
+      },
+      {
+        "bytes": 266,
+        "git_blob": "886c5a63b44422691e1354ff9aea7a921ae70a3c",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_gpu_job_presence.json",
+        "sha256": "f255bbe189db189c0e3ae74e7de4cf4cd867293296ff93da0616fdd9dc7ea879"
+      },
+      {
+        "bytes": 3260,
+        "git_blob": "d98ece32fa7f000a8e8753e6592d8154088a3019",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_supersession_v3.json",
+        "sha256": "664e702d9a3cd5303806351889c2c3503673baee16d2bfbb6cbcf309ef2a8edd"
+      },
+      {
+        "bytes": 433,
+        "git_blob": "f9a9e96e80339fb5548dbcb040adde85ec8d9c19",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_replay_stderr.txt",
+        "sha256": "1323c36df5943c9dcdb34918fdd8a8c34656d48bdc7643dc3fcacfc2e59b110e"
+      },
+      {
+        "bytes": 0,
+        "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_replay_raw_log.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 1283,
+        "git_blob": "4564582eb2cd778f274e5db05ce07d9ca0339791",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_pre_replay_head_proof_v3.json",
+        "sha256": "ae5b1e66ecd2f14bbb418b144a8e7b93ef33a536339431657b21845fd75398c5"
+      },
+      {
+        "bytes": 1283,
+        "git_blob": "4564582eb2cd778f274e5db05ce07d9ca0339791",
+        "mode": "100644",
+        "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_head_proof_v3.json",
+        "sha256": "ae5b1e66ecd2f14bbb418b144a8e7b93ef33a536339431657b21845fd75398c5"
+      }
+    ],
+    "protected_prefixes": [
+      "studies/study3/pilot/p0_r1/",
+      "studies/study3/pilot/p0/results/p0-r1/"
+    ],
+    "replay_envelope_consumed": true,
+    "state": "STOP_NO_MODEL_OPERATION",
+    "stop_commit": "30806d793872a50e581d3252382b4a0ec2af3889"
+  },
+  "pre_replay_counters": {
+    "checkpoint_downloads": 0,
+    "checkpoint_loads": 0,
+    "evidence_rows_added": 0,
+    "generations": 0,
+    "gpu_allocations": 0,
+    "gpu_operations": 0,
+    "live_replay_invocations": 0,
+    "model_weight_loads": 0,
+    "pilot_executions_started": 0,
+    "prefills": 0,
+    "scored_rows": 0,
+    "tokenizer_constructions": 0,
+    "tokenizer_encodes": 0
+  },
+  "prohibitions": {
+    "caller_supplied_governance_allowlist": true,
+    "create_success_artifacts_without_recovered_bytes": true,
+    "edit_v1_or_p0_r1_bytes": true,
+    "regenerate_replay": true,
+    "repair_the_gate_in_place": true,
+    "rerun_replay": true,
+    "second_az_acr_run_live": true,
+    "second_start_to_resolve_ambiguity": true,
+    "set_live_replay_authorized_globally": true,
+    "substitute_another_attempt": true,
+    "update_or_repurpose_an_existing_gpu_job": true
+  },
+  "ready_commit_relationship": {
+    "anchor_is_resolved_by_ancestry": true,
+    "anchor_must_be_strict_descendant_of_closure_base": true,
+    "lock_records_its_own_commit": false,
+    "ready_anchor_parent": "07a20023824d448db9972e056368d8165fada69b"
+  },
+  "replay_envelope": {
+    "consumed": false,
+    "consumed_on_invocation_even_without_a_run_id": true,
+    "invocations": 0,
+    "regenerable": false,
+    "rerunnable": false,
+    "substitutable": false
+  },
+  "revision": 2,
+  "schema": {
+    "name": "p0_r2_execution_lock_v2.schema.json",
+    "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.schema.json"
+  },
+  "schema_version": "study3-p0-r2-execution-lock-v2",
+  "science_is_unchanged_p0_r1_generation3": true,
+  "self": {
+    "name": "p0_r2_execution_lock_v2.json",
+    "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.json"
+  },
+  "stage": "STUDY3-P0-R2",
+  "standing_failures": {
+    "accepted_only_if": [
+      "all four occur at both the baseline and the corrected head",
+      "their normalized signatures agree",
+      "no fifth failure occurs",
+      "collection errors equal zero",
+      "the corrected work introduces zero new failure"
+    ],
+    "baseline_commit": "005aa087e40c641affc8ca537e6c6a075bcbfe98",
+    "baseline_signature_set_sha256": "9527f29a426e8a1d94d6b1ec9f1af821d83fbd38185a4ce6ef54829df7f7028e",
+    "conditionally_accepted": true,
+    "corrected_signature_set_sha256": "9527f29a426e8a1d94d6b1ec9f1af821d83fbd38185a4ce6ef54829df7f7028e",
+    "count": 4,
+    "node_ids": [
+      "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+      "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+      "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+      "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+    ]
+  },
+  "state": "STUDY3_P0_R2_EXECUTION_READY_AWAITING_REPLAY_GATE",
+  "superseded": false,
+  "terminal_state": "STUDY3_P0_R2_EXECUTION_READY_AWAITING_REPLAY_GATE",
+  "transport": {
+    "context_entries": [
+      "task.yaml",
+      "context_manifest.json"
+    ],
+    "context_entry_count": 2,
+    "context_is_executable_code": false,
+    "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
+    "task_bytes": 1671,
+    "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v2.yaml",
+    "task_sha256": "e0376d458911a8a5bbdcc4890c0f973419a936e1ac1716583422fc52dea35e12"
+  },
+  "v1_supersession": {
+    "launchable": false,
+    "record_path": "studies/study3/pilot/p0_r2/p0_r2_v1_supersession_v2.json",
+    "superseded": true,
+    "v1_bytes_edited": 0,
+    "v1_executable_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+    "v1_image_digest": "sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+    "v1_lock_bytes": 17961,
+    "v1_lock_path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json",
+    "v1_lock_sha256": "2c9789e27fad5ac463e105a42a69d686cdcf1389bcfd44503baf79cabd61f7d7",
+    "v1_ready_anchor": "7fd5fe57707461fcf70bfc9ab00b707b3c44ef71"
+  },
+  "validation": {
+    "baseline_commit": "005aa087e40c641affc8ca537e6c6a075bcbfe98",
+    "baseline_registration_run_id": "cmj8",
+    "differential_run_ids": [
+      "cmja",
+      "cmjh",
+      "cmjk"
+    ],
+    "focused_suites": [
+      "tests/test_study3_p0_r2_corrective_closure_v2.py",
+      "tests/test_study3_p0_r2_execution_closure.py",
+      "tests/test_study3_p0_r1_generation3_execution_closure.py",
+      "tests/test_study3_p0_r2_acr_submission.py",
+      "tests/test_study3_p0_r2_submission_context.py",
+      "tests/test_study3_p0_r2_transport_primitives.py"
+    ],
+    "receipts_path": "studies/study3/pilot/p0_r2/p0_r2_validation_receipts_v2.json"
+  },
+  "validation_inputs": [
+    {
+      "bytes": 5246,
+      "git_blob": "fc5e0247e75fb1cab8e3e24a4216b04f342a81fc",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/validation/p0_r2_baseline_signatures_v2.sh",
+      "sha256": "4ce9b764c582456bb1e025e2f57a8bdf3950163c2cecbd93a5e7c1b71e3c786a"
+    },
+    {
+      "bytes": 4056,
+      "git_blob": "3756aa3ce33ef79b8eaee3de4441d8602dded3f3",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/validation/p0_r2_differential_v2.sh",
+      "sha256": "5237a90ab7977aa45550644bc741f2f64b1480f6a81a6b6eb2aa61fcb4432ca6"
+    },
+    {
+      "bytes": 1662,
+      "git_blob": "315378e1bfc65684fdbae4e3d042a32ecd1af3bb",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_checkout_v5.sh",
+      "sha256": "89a7eaff9000098399ffdff509c6a2d9620bf46c8291ffbb18d851e1e104a498"
+    },
+    {
+      "bytes": 6452,
+      "git_blob": "43b5d09c7b9f166f5e038b5ee9cb280a1e0b8d1a",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/validation/p0_r2_normalize_signatures_v2.py",
+      "sha256": "be0baf4da2f7c1c9fbaa1ab504fa9034d067400f712087272c280f4ece434255"
+    },
+    {
+      "bytes": 3240,
+      "git_blob": "e4d24123b3745b1ca2201a6d393628752004a90f",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/validation/p0_r2_signature_plugin_v2.py",
+      "sha256": "4c874c2d0123dea9dbd7b78c86617d0a32320dc9b1631e26791656bf1a61d276"
+    },
+    {
+      "bytes": 1752,
+      "git_blob": "dc78a991458e228f7ebdedd7fffa7ca2ce598051",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/validation/p0_r2_differential_task_v2.yaml",
+      "sha256": "c7eefb817f68f5bf68b5cbee31696bd86d30cbe0b0016c7a782848e207c4f871"
+    },
+    {
+      "bytes": 1441,
+      "git_blob": "a64a33d40e1f5b08d9fb6d699a8147cdcb7e8cea",
+      "mode": "100644",
+      "path": "studies/study3/pilot/p0_r2/validation/p0_r2_baseline_signatures_task_v2.yaml",
+      "sha256": "d45aa488b5a4fd58cd7d908f18a3c5575d86c1b095dc6f5899e994aeeeaf5d7c"
+    }
+  ]
+}
