@@ -1514,7 +1514,7 @@
   "caps_are_enforced_not_reported": true,
   "changes_only": "host-to-registry submission transport; corrective closure tooling",
   "closure_base": {
-    "commit": "5e8550fa9a5299a49a3c006f92371cec3e3c75b9"
+    "commit": "24768c3a0fce9b7a0e6980fe62cb22a4bd8be74a"
   },
   "delegated_scientific_modules": [
     {
@@ -1767,7 +1767,7 @@
     }
   ],
   "host_closure_executable": {
-    "commit": "5e8550fa9a5299a49a3c006f92371cec3e3c75b9",
+    "commit": "24768c3a0fce9b7a0e6980fe62cb22a4bd8be74a",
     "file_count": 12,
     "files": [
       {
@@ -1813,11 +1813,11 @@
         "sha256": "89a7eaff9000098399ffdff509c6a2d9620bf46c8291ffbb18d851e1e104a498"
       },
       {
-        "bytes": 14567,
-        "git_blob": "cac09554cb8d84b56298899c5d8eb1700ca89024",
+        "bytes": 15339,
+        "git_blob": "04eced9b738cb4d7e68fab057f56519769647d92",
         "mode": "100644",
         "path": "studies/study3/pilot/p0_r2/validation/p0_r2_host_submission_v2.py",
-        "sha256": "f90417c0f5520570191311d5a75502f079239c53e8e7c12bae9819c2569aa324"
+        "sha256": "d791ea9c9c0d7c0e0e937bca6ec7597b78b84532bd06ecc5c21dc32a40fcdb7c"
       },
       {
         "bytes": 6452,
@@ -1848,14 +1848,14 @@
         "sha256": "d45aa488b5a4fd58cd7d908f18a3c5575d86c1b095dc6f5899e994aeeeaf5d7c"
       },
       {
-        "bytes": 50161,
-        "git_blob": "98ed84425e4fdb1413cb8887944edb31a6ba6b60",
+        "bytes": 51840,
+        "git_blob": "bd7650e0bd10ce7d401c005d201a3b45f894d70e",
         "mode": "100644",
         "path": "tests/test_study3_p0_r2_corrective_closure_v2.py",
-        "sha256": "a69b9004aecbc637150f754abfe48a95f452249ecbdaa9135c072b9eb730dfc9"
+        "sha256": "d55864300f1f5e4c461d8dec48c5f2118a694637b776ba2d4d87f6d6bd4d5fda"
       }
     ],
-    "tree": "00a9543a950b7f8e9dd44e756049659f5a97376e"
+    "tree": "f1629884639756661ae4b720fd66fbfb84642f2b"
   },
   "image": {
     "base_digest": "sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c",
@@ -2403,7 +2403,7 @@
     "anchor_is_resolved_by_ancestry": true,
     "anchor_must_be_strict_descendant_of_closure_base": true,
     "lock_records_its_own_commit": false,
-    "ready_anchor_parent": "5e8550fa9a5299a49a3c006f92371cec3e3c75b9"
+    "ready_anchor_parent": "24768c3a0fce9b7a0e6980fe62cb22a4bd8be74a"
   },
   "replay_envelope": {
     "consumed": false,
