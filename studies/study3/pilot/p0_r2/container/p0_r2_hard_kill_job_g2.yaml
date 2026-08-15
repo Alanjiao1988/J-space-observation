@@ -45,14 +45,10 @@ template:
           R2="${P0_R2_SRC}/studies/study3/pilot/p0_r2"
           export PYTHONPATH="${R2}:${P0_R2_SRC}/studies/study3/pilot/p0_r1"
           echo "P0_R2_G2_HARDKILL_ATTEMPT=${P0_R2_ATTEMPT}"
-          python3 - <<'PY'
-          import json, os
-          import p0_r2_namespace_g2 as NS
-          canary = NS.hard_kill_canary()
-          report = canary.run_canary(attempt_id=os.environ["P0_R2_ATTEMPT"],
-                                     rows=int(os.environ.get("P0_R2_HARD_KILL_ROWS", "2")))
-          print(json.dumps(report, indent=2, sort_keys=True))
-          PY
+          python3 "${R2}/p0_r2_hard_kill_g2.py" --run \
+              --attempt "${P0_R2_ATTEMPT}" \
+              --rows "${P0_R2_HARD_KILL_ROWS}" \
+              --out "${P0_R2_RUNTIME_ROOT}/p0_r2_g2_hard_kill_report.json"
           echo "P0_R2_G2_HARDKILL_COMPLETE=1"
           echo "P0_R2_MODEL_OPERATIONS_PERFORMED=0"
       resources:

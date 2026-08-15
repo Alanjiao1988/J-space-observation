@@ -136,18 +136,18 @@
   ],
   "image": {
     "base_digest": "sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c",
-    "build_run_id": "cmk0",
-    "digest": "sha256:a14adbd8653a0caae8204ff7ee2793f20e1162c7a15267af742d14268a258580",
+    "build_run_id": "cmk2",
+    "digest": "sha256:6000df859733638c39c8bd301c60fbc138dbdeec9a87add5fa6a81867bf11d58",
     "is_new_digest": true,
-    "reference": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:a14adbd8653a0caae8204ff7ee2793f20e1162c7a15267af742d14268a258580",
-    "tag": "gen2-073183945d72"
+    "reference": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:6000df859733638c39c8bd301c60fbc138dbdeec9a87add5fa6a81867bf11d58",
+    "tag": "gen2-df4475b5ac3c"
   },
   "image_executable": {
-    "commit": "073183945d72ee86cc8b1f31a691019e935f393d",
-    "entries_sha256": "948873f102127ee3a4b2b4bb7da7b073256ce0e3c406c2825b51eb104e68e4fe",
+    "commit": "df4475b5ac3c5379da1c4871616958216f96367a",
+    "entries_sha256": "1b0cea7390e5f40d32a13a60a9d355cffdc9eb4a3f760545a1b21469f048b966",
     "file_count": 56,
     "manifest_name": "p0_r2_image_manifest_g2.json",
-    "tree": "74d3683f4f09475ab278aa00ec3a09ffb4bb6275"
+    "tree": "000cea5658ef78214e42a80d5b1f5e8981852030"
   },
   "immutable_science": {
     "comparison": [
@@ -348,7 +348,7 @@
   "self": {
     "name": "p0_r2_execution_lock_g2.json",
     "schema": "p0_r2_execution_lock_g2.schema.json",
-    "sha256": "019676257a4267fd383c267c609468662b437c009235c3ca188d237ded1a8d1f"
+    "sha256": "be20ca78eb8a1ac68e5384f4f2ae50e4c1065a7c37ba9296be710f73dd19d9c5"
   },
   "stage": "STUDY3-P0-R2",
   "standing_failures": [

@@ -62,6 +62,7 @@ ADDED_OPERATIONAL_PATHS = (
     "studies/study3/pilot/p0_r2/p0_r2_closure_binding_g2.py",
     "studies/study3/pilot/p0_r2/p0_r2_host_preflight_g2.py",
     "studies/study3/pilot/p0_r2/p0_r2_replay_gate_g2.py",
+    "studies/study3/pilot/p0_r2/p0_r2_hard_kill_g2.py",
 )
 
 ADDED_ENTRYPOINT_PATHS = (
