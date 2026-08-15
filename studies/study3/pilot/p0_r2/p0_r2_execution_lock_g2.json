@@ -163,6 +163,42 @@
     {
       "class": "evidence",
       "path": "studies/study3/pilot/p0_r2/p0_r2_phase_b_admission_g2.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2-g2/P0_R2_REPLAY_DISPOSITION.md"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2-g2/p0_r2_replay_counters.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2-g2/p0_r2_replay_receipt.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2-g2/p0_r2_replay_result.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2-g2/p0_r2_g2_acr_raw_log.txt"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2-g2/p0_r2_g2_acr_stderr.txt"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2-g2/p0_r2_g2_acr_submission_receipt.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2-g2/p0_r2_g2_prefix_receipt.json"
+    },
+    {
+      "class": "evidence",
+      "path": "studies/study3/pilot/p0/results/p0-r2-g2/p0_r2_g2_reconstruction_receipt.json"
     }
   ],
   "image": {
@@ -379,7 +415,7 @@
   "self": {
     "name": "p0_r2_execution_lock_g2.json",
     "schema": "p0_r2_execution_lock_g2.schema.json",
-    "sha256": "a3683efc151b696af6f5238f81caca496ccdf12cdfbc3683bccd96167aab8a85"
+    "sha256": "74391594bc5178ed806d45a2463443f38ea64d66df942b291bffdefffd2577a4"
   },
   "stage": "STUDY3-P0-R2",
   "standing_failures": [
