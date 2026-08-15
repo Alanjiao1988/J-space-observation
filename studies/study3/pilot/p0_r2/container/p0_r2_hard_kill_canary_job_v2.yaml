@@ -49,10 +49,35 @@ template:
           value: /workspace/runtime
         - name: P0_R2_HARD_KILL_ROWS
           value: "2"
+        # The P0-R1 generation-3 base image is CUDA-capable and exports
+        # NVIDIA_VISIBLE_DEVICES and NVIDIA_DRIVER_CAPABILITIES. A CPU-only job
+        # that leaves them set is *correctly* refused by
+        # p0_r2_recovery_v1.assert_model_free, which reads a set accelerator
+        # variable as an accelerator replica. The first execution of this canary
+        # (job-jspace-s3-p0r2-hardkill-g1-5j74wjv) failed for exactly that
+        # reason, before writing a single object.
+        #
+        # Neutralising them here is the CPU-only declaration the guard is asking
+        # for, not a way around it: "void" is the registered way to say that no
+        # device is offered, and the guard accepts only "", "void" or "none".
+        # The same omission is latent in p0_r2_recovery_job_v1.yaml and would
+        # have stopped the bounded pilot's own CPU recovery.
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: void
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: void
+        - name: CUDA_VISIBLE_DEVICES
+          value: ""
 boundary:
   stage: STUDY3-P0-R2
   cpu_only: true
   accelerator_requested: false
+  accelerator_environment_explicitly_neutralised: true
+  first_execution_refused_for_accelerator_environment:
+    execution: job-jspace-s3-p0r2-hardkill-g1-5j74wjv
+    outcome: P0_R2_HARD_KILL_CANARY_REFUSED
+    objects_written: 0
+    prefix_still_unused: true
   workload_profile: Consumption
   replica_retry_limit: 0
   credential: managed-identity
