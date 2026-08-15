@@ -70,8 +70,16 @@ template:
           value: void
         - name: NVIDIA_DRIVER_CAPABILITIES
           value: void
+        # Section 7.4 of the authority names CUDA_VISIBLE_DEVICES=-1. The
+        # frozen p0_r2_recovery_v1.assert_model_free guard, which section 5
+        # forbids changing, reads any value other than "", "void" or "none"
+        # as an exposed accelerator and refuses; execution
+        # job-jspace-s3-p0r2-hardkill-g2-v8iabiy refused for exactly that
+        # reason, before writing a single object. "" is the registered way
+        # to say that no device is offered, so it satisfies the intent the
+        # authority states and the guard that enforces it.
         - name: CUDA_VISIBLE_DEVICES
-          value: "-1"
+          value: ""
 boundary:
   stage: STUDY3-P0-R2
   generation: 2

@@ -755,7 +755,17 @@ def test_the_image_has_no_default_execution_mode():
 
 
 def test_every_generation2_job_declares_no_retry_and_neutralised_accelerators():
+    """The declared CPU-only environment must satisfy the frozen guard itself.
+
+    Section 7.4 names ``CUDA_VISIBLE_DEVICES=-1``, but the immutable
+    ``p0_r2_recovery_v1.assert_model_free`` reads any value other than ``""``,
+    ``void`` or ``none`` as an exposed accelerator. Rather than assert on a
+    literal, this executes the guard against each job's declared environment, so
+    a specification that would refuse in Azure refuses here first.
+    """
     import yaml
+
+    import p0_r2_recovery_v1 as RECOVERY
 
     for name in ("p0_r2_prefix_job_g2.yaml", "p0_r2_recovery_job_g2.yaml",
                  "p0_r2_hard_kill_job_g2.yaml"):
@@ -766,7 +776,19 @@ def test_every_generation2_job_declares_no_retry_and_neutralised_accelerators():
                        in document["template"]["containers"][0]["env"]}
         assert environment["NVIDIA_VISIBLE_DEVICES"] == "void"
         assert environment["NVIDIA_DRIVER_CAPABILITIES"] == "void"
-        assert environment["CUDA_VISIBLE_DEVICES"] == "-1"
+        assert "CUDA_VISIBLE_DEVICES" in environment
+        report = RECOVERY.assert_model_free(environ=environment)
+        assert report["cpu_only"] is True
+        assert report["gpu_allocations"] == 0
+
+
+def test_an_accelerator_environment_is_still_refused_by_the_frozen_guard():
+    import p0_r2_recovery_v1 as RECOVERY
+
+    with pytest.raises(RECOVERY.RecoveryDefect):
+        RECOVERY.assert_model_free(environ={"CUDA_VISIBLE_DEVICES": "0"})
+    with pytest.raises(RECOVERY.RecoveryDefect):
+        RECOVERY.assert_model_free(environ={"NVIDIA_VISIBLE_DEVICES": "all"})
 
 
 def test_the_pilot_job_is_bounded_and_created_once():
