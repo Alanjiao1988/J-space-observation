@@ -3,6 +3,7 @@
     "studies/study3/pilot/p0_r2/container/p0_r2_successor_v2.sh",
     "studies/study3/pilot/p0_r2/container/p0_r2_canary_v2.sh",
     "studies/study3/pilot/p0_r2/container/p0_r2_replay_v2.sh",
+    "studies/study3/pilot/p0_r2/container/p0_r2_model_pilot_v2.sh",
     "studies/study3/pilot/p0_r2/container/p0_r2_hard_kill_canary_v2.sh"
   ],
   "added_operational_paths": [
@@ -136,6 +137,16 @@
       "sha256": "01eb43ef51232b567f53cb29d45e6cabf4837e005b881fd98496bd528dca949f"
     },
     {
+      "added_by_corrective_closure": true,
+      "bytes": 3141,
+      "git_blob": "f79271a628a82a94d07b2fa2759f47c23f099d91",
+      "image_path": "/usr/local/bin/p0_r2_model_pilot_v2.sh",
+      "install_name": "p0_r2_model_pilot_v2.sh",
+      "kind": "entrypoint",
+      "path": "studies/study3/pilot/p0_r2/container/p0_r2_model_pilot_v2.sh",
+      "sha256": "ec332c982a632d9f3135400dd09b4bb98cf9dc16a735ac2025b233f529eab211"
+    },
+    {
       "added_by_corrective_closure": false,
       "bytes": 1098,
       "git_blob": "fd37a9e5d02c090f82c9d47e3e29d1db764a7097",
@@ -178,12 +189,12 @@
     {
       "added_by_corrective_closure": true,
       "bytes": 2737,
-      "git_blob": "6790ef3c8ce1c7ec0f1ff8678bbe426f0d120b36",
+      "git_blob": "8c9f33793b2101f51098a642cbf6b2aba76dc9b1",
       "image_path": "/usr/local/bin/p0_r2_successor_v2.sh",
       "install_name": "p0_r2_successor_v2.sh",
       "kind": "entrypoint",
       "path": "studies/study3/pilot/p0_r2/container/p0_r2_successor_v2.sh",
-      "sha256": "fbb4495b9799dfa0bb7961f593ba3c4766d58b0089b38d2629af8ec3f091c15e"
+      "sha256": "a9d230d520e915de506b8708ee39b4b71feba0ff63bac9cd9e196dfd18e3b913"
     },
     {
       "added_by_corrective_closure": false,
@@ -268,12 +279,12 @@
     },
     {
       "added_by_corrective_closure": true,
-      "bytes": 28139,
-      "git_blob": "dd247cc2706e5157272d20e8c5889984204ff7f9",
+      "bytes": 28433,
+      "git_blob": "2382ca79adc3d96dd422100f457268258836b5df",
       "image_path": "/opt/jspace/src/studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.py",
       "kind": "operational",
       "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.py",
-      "sha256": "94eeb4fbec82d7e7a082a4a665fd4a35082537057089911504e8cbd32e8470fc"
+      "sha256": "17e28e8225a8b9364d2718172c88715d242b6835d92b17c6bb632d8afa0de0ff"
     },
     {
       "added_by_corrective_closure": true,
@@ -304,12 +315,12 @@
     },
     {
       "added_by_corrective_closure": true,
-      "bytes": 10177,
-      "git_blob": "52009596c81995aa5725a4ee38f261e3b7f530e8",
+      "bytes": 10245,
+      "git_blob": "7d1f850b35acaa30fbd3d5705b07bfb004a89d34",
       "image_path": "/opt/jspace/src/studies/study3/pilot/p0_r2/p0_r2_image_manifest_v2.py",
       "kind": "operational",
       "path": "studies/study3/pilot/p0_r2/p0_r2_image_manifest_v2.py",
-      "sha256": "5200dea93bbf725d23537f8250bb36c0bb42ac50a9c43e10f79e10d2473802d4"
+      "sha256": "12409c865f83be9fa4c72684ad53447eba8352ae582266b8fff565d5ccd60344"
     },
     {
       "added_by_corrective_closure": false,
@@ -411,12 +422,12 @@
       "sha256": "d0567f7fa808049a622d447b2672bf67f858c499e46d250e1afc0adc82387f40"
     }
   ],
-  "entries_sha256": "c6a816124cf8db1ab18653144a6e9801d1af9dfb474f7ed7bc971f8cb314fbab",
-  "entry_count": 43,
-  "entrypoint_count": 9,
+  "entries_sha256": "2f48852882ee222223df935e7b4e6a1d7d06ac360a6093bad552911a4139a5d5",
+  "entry_count": 44,
+  "entrypoint_count": 10,
   "entrypoint_install_root": "/usr/local/bin",
-  "executable_commit": "1c40426200fc68bdaef3db704278454118463655",
-  "executable_tree": "460c5d1116ce24e7c9a093b63d5294c22f57a36e",
+  "executable_commit": "422d3d9695a444be4f09cc10fbc919110ecccbf0",
+  "executable_tree": "93acf512af266c346b0bc2e592410821804d7251",
   "image_root": "/opt/jspace/src",
   "model_operations_performed": 0,
   "operational_count": 25,
