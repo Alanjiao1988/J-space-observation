@@ -72,4 +72,4 @@ RUN python3 ${P0_R2_SRC}/studies/study3/pilot/p0_r2/p0_r2_image_manifest_v2.py \
 # No default command. Every entry point is named explicitly by the caller, so an
 # image that is started by accident does nothing at all.
 ENTRYPOINT []
-CMD ["/usr/local/bin/p0_r2_successor_v1.sh"]
+CMD ["/usr/local/bin/p0_r2_successor_v2.sh"]
