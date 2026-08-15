@@ -13,7 +13,8 @@
     "studies/study3/pilot/p0_r2/p0_r2_execution_lock_g2.py",
     "studies/study3/pilot/p0_r2/p0_r2_closure_binding_g2.py",
     "studies/study3/pilot/p0_r2/p0_r2_host_preflight_g2.py",
-    "studies/study3/pilot/p0_r2/p0_r2_replay_gate_g2.py"
+    "studies/study3/pilot/p0_r2/p0_r2_replay_gate_g2.py",
+    "studies/study3/pilot/p0_r2/p0_r2_hard_kill_g2.py"
   ],
   "entries": [
     {
@@ -356,6 +357,15 @@
     },
     {
       "added_by_generation2": true,
+      "bytes": 3600,
+      "git_blob": "2c4e1953f27e0d3bab72f2b2b6d08d649c8e1c7d",
+      "image_path": "/opt/jspace/src/studies/study3/pilot/p0_r2/p0_r2_hard_kill_g2.py",
+      "kind": "operational",
+      "path": "studies/study3/pilot/p0_r2/p0_r2_hard_kill_g2.py",
+      "sha256": "7df653d9ae8529896b241a2755fa3677568cd8c07d10d6f6732dc55a55387579"
+    },
+    {
+      "added_by_generation2": true,
       "bytes": 14103,
       "git_blob": "e874c8974434b2ec5c016ef376138ae3d655204d",
       "image_path": "/opt/jspace/src/studies/study3/pilot/p0_r2/p0_r2_host_preflight_g2.py",
@@ -383,12 +393,12 @@
     },
     {
       "added_by_generation2": true,
-      "bytes": 11677,
-      "git_blob": "3696d7f117f0d825f0a4e45a3d46dfb8eb4d4d80",
+      "bytes": 11733,
+      "git_blob": "a94d37a8b7e1a72ef28f3746ce56b6c0a8648277",
       "image_path": "/opt/jspace/src/studies/study3/pilot/p0_r2/p0_r2_image_manifest_g2.py",
       "kind": "operational",
       "path": "studies/study3/pilot/p0_r2/p0_r2_image_manifest_g2.py",
-      "sha256": "436e4da3814b3211bcc208c1b7177def9142fc305623b44c8a78b7528cce7211"
+      "sha256": "fc84e116e9afd3019044c645a87dedaa302d86529f7e68d26eb861deb7a6e2ff"
     },
     {
       "added_by_generation2": false,
@@ -535,17 +545,17 @@
       "sha256": "d0567f7fa808049a622d447b2672bf67f858c499e46d250e1afc0adc82387f40"
     }
   ],
-  "entries_sha256": "1b0cea7390e5f40d32a13a60a9d355cffdc9eb4a3f760545a1b21469f048b966",
-  "entry_count": 56,
+  "entries_sha256": "b3fac17159c8d8a5bbae36c5cefd5601510647f373011620eb2b786d8d02f2f9",
+  "entry_count": 57,
   "entry_count_is_derived_not_asserted": true,
   "entrypoint_count": 14,
   "entrypoint_install_root": "/usr/local/bin",
-  "executable_commit": "df4475b5ac3c5379da1c4871616958216f96367a",
-  "executable_tree": "000cea5658ef78214e42a80d5b1f5e8981852030",
+  "executable_commit": "a5115e0faf6acc686f777c8f9b3e496602832493",
+  "executable_tree": "c9f6736b008ba6cfabb05221f1af04bcf1fe81fa",
   "generation": 2,
   "image_root": "/opt/jspace/src",
   "model_operations_performed": 0,
-  "operational_count": 33,
+  "operational_count": 34,
   "schema_version": "study3-p0-r2-image-manifest-g2",
   "science_is_unchanged_p0_r1_generation3": true,
   "scientific_count": 9,
