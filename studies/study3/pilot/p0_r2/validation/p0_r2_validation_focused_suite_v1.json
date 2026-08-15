@@ -1,0 +1,20 @@
+{
+  "acr_run_id": "cmj5",
+  "bound_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+  "bound_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+  "counts": {
+    "passed": 95
+  },
+  "dependency_closure": "requirements.lock.txt, as registered",
+  "dirty": 0,
+  "gpu_operations": 0,
+  "image": "python:3.11-bookworm",
+  "model_operations_performed": 0,
+  "one_shot_envelope_consumed": false,
+  "pytest_status": 0,
+  "raw_log_bytes": 4193,
+  "raw_log_sha256": "1501208e0be8d3f5bc2ea0922c0ab0653d91fba9f9a2d844c9877b8dd0d2ba03",
+  "replay_gate_ran": false,
+  "requirements_lock_sha256": "570775850eb31b5a8613295fa6e9099400670408a6ce3a162dc6d9159dda87bf",
+  "scope": "tests/test_study3_p0_r2_execution_closure.py"
+}

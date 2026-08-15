@@ -1,0 +1,38 @@
+# Study 3 P0-R2 generation-1 full-repository validation task, differential form.
+#
+# This task validates; it never executes the stage. It clones the unmodified
+# baseline and the exact executable commit from an uploaded one-file git bundle
+# -- which is how P0-R2 avoids ever presenting a repository tree to the Azure CLI
+# packer, the step that stopped P0-R1 -- and runs the whole suite against both in
+# one container, in the dependency closure requirements.lock.txt registers.
+#
+# Zero tokenizer constructions, zero encodes, zero checkpoint downloads, zero
+# model weight loads, zero GPU operations. The replay gate is never invoked and
+# the one-shot envelope is never opened.
+version: v1.1.0
+steps:
+  - id: checkout
+    cmd: >-
+      python:3.11-bookworm
+      bash /workspace/p0_r2_full_suite_checkout_v3.sh {{.Values.BASELINE}} {{.Values.COMMIT}}
+    timeout: 900
+  - id: suite
+    cmd: >-
+      python:3.11-bookworm
+      bash /workspace/p0_r2_full_suite_v5.sh
+    timeout: 7200
+boundary:
+  context_is_a_single_git_bundle: true
+  both_checkouts_are_fresh_clones_of_exact_commits: true
+  suite_runs_in_the_registered_dependency_closure: true
+  outcome_sets_are_compared_rather_than_asserted: true
+  gpu_workload_allocated: false
+  replay_gate_invoked: false
+  one_shot_envelope_opened: false
+  tokenizer_constructions: 0
+  checkpoint_downloads: 0
+  model_weight_loads: 0
+  model_operations_performed: 0
+  required_values:
+    - BASELINE
+    - COMMIT

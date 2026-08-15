@@ -1,0 +1,40 @@
+{
+  "acr_run_id": "cmj3",
+  "baseline_commit": "22ae685b83daeaf3fb89057db0761f20644d9b7a",
+  "baseline_counts": {
+    "failed": 4,
+    "passed": 4625,
+    "skipped": 15
+  },
+  "baseline_dirty": 0,
+  "collection_errors": 0,
+  "dependency_closure": "requirements.lock.txt, as registered",
+  "executable_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+  "executable_counts": {
+    "failed": 4,
+    "passed": 4720,
+    "skipped": 15
+  },
+  "executable_dirty": 0,
+  "failures_fixed_by_this_change": [],
+  "failures_present_at_baseline_and_still_present": [
+    "FAILED tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+    "FAILED tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+    "FAILED tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+    "FAILED tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+  ],
+  "git_available": "git version 2.39.5",
+  "gpu_operations": 0,
+  "image": "python:3.11-bookworm",
+  "installed_closure_matches_lock": true,
+  "model_operations_performed": 0,
+  "net_new_passing_tests": 95,
+  "new_failures_introduced_by_this_change": [],
+  "one_shot_envelope_consumed": false,
+  "python_version": "3.11.16",
+  "raw_log_bytes": 5841,
+  "raw_log_sha256": "890ad0b275533bedd89413a4f183955897f5ef677a93e1083c7e3e4867651052",
+  "replay_gate_ran": false,
+  "requirements_lock_sha256": "570775850eb31b5a8613295fa6e9099400670408a6ce3a162dc6d9159dda87bf",
+  "scope": "full repository suite, differential"
+}

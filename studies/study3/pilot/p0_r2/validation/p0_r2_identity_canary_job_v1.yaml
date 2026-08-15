@@ -1,0 +1,112 @@
+# Study 3 P0-R2 generation-1 CPU-only managed-identity canary job.
+#
+# Why this job exists.
+#
+# P0-R2 is an infrastructure successor, and the bytes it changes are exactly the
+# transport bytes. Its blob transport, journal and recovery modules are NOT
+# byte-identical to P0-R1's, so P0-R1's identity-bound canary receipts cannot be
+# carried forward to describe them: they describe bytes that no longer exist.
+# The evidence therefore has to be produced again, against these bytes.
+#
+# It cannot be produced from the authoring host. The storage account's data
+# plane is VNet-restricted by design, the host holds no managed identity, and
+# `az acr run` has no --assign-identity, so an ACR run can never carry one. A
+# CPU-only Container Apps job on the VNet-integrated environment is the only
+# place these questions can be asked, which is where P0-R1 asked them too.
+#
+# What it proves:
+#   1. the image can construct the real managed-identity blob client;
+#   2. a payload written through that identity reads back byte-identical;
+#   3. the prefix preflight reports ABSENT for an unused prefix; and
+#   4. the prefix preflight reports OCCUPIED for a prefix that now has objects,
+#      which is what makes proof (3) worth anything rather than vacuous.
+#
+# It requests no accelerator. It performs no tokenizer construction, no
+# checkpoint download, no model weight load, no prefill, no generation and no
+# GPU operation. It never runs the replay gate and never opens the one-shot
+# envelope. It writes only under its own canary prefix, never under a prefix any
+# pilot attempt could claim.
+name: job-jspace-s3-p0r2-canary-g1
+kind: cpu-identity-canary
+resourceGroup: rg-jspace-observation-sea
+subscription: 943bacdf-8b6e-4e3a-8126-a149f623d32e
+identity:
+  type: UserAssigned
+  userAssignedIdentities:
+    /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea: {}
+properties:
+  environmentId: cae-jspace-observation-sea-vnet2
+  workloadProfileName: Consumption
+  configuration:
+    triggerType: Manual
+    replicaTimeout: 1800
+    replicaRetryLimit: 0
+    manualTriggerConfig:
+      parallelism: 1
+      replicaCompletionCount: 1
+    registries:
+      - server: acrjspaceobssea0708231738.azurecr.io
+        identity: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+  template:
+    containers:
+      - name: p0-r2-canary
+        image: "{{IMAGE}}"
+        command:
+          - /bin/sh
+        args:
+          - -c
+          - |
+            set -eu
+            R2="${P0_R2_SRC}/studies/study3/pilot/p0_r2"
+            export PYTHONPATH="${R2}:${P0_R2_SRC}/studies/study3/pilot/p0_r1"
+            OUT="${P0_R2_RUNTIME_ROOT}/canary"
+            mkdir -p "${OUT}"
+            echo "P0_R2_IDENTITY_CANARY_ATTEMPT=${P0_R2_ATTEMPT}"
+            echo "P0_R2_IDENTITY_CANARY_UNUSED=${P0_R2_UNUSED_ATTEMPT}"
+            python3 "${R2}/p0_r2_blob_transport.py" --verify-production-backend
+            echo "P0_R2_PRODUCTION_BACKEND_CONSTRUCTED=1"
+            python3 "${R2}/p0_r2_prefix_preflight_v1.py" \
+                --probe "${P0_R2_UNUSED_ATTEMPT}" \
+                --out "${OUT}/prefix_absent.json"
+            echo "P0_R2_PREFIX_ABSENCE_PROVED=1"
+            python3 "${R2}/p0_r2_blob_transport.py" --canary \
+                --attempt "${P0_R2_ATTEMPT}" \
+                --receipt "${OUT}/blob_canary.json"
+            echo "P0_R2_BLOB_ROUND_TRIP_PROVED=1"
+            if python3 "${R2}/p0_r2_prefix_preflight_v1.py" \
+                    --probe "${P0_R2_ATTEMPT}" \
+                    --out "${OUT}/prefix_occupied.json"; then
+                echo "P0_R2_PREFIX_PREFLIGHT_IS_VACUOUS=1" >&2
+                exit 9
+            fi
+            echo "P0_R2_PREFIX_OCCUPANCY_DETECTED=1"
+            cat "${OUT}/blob_canary.json"
+            cat "${OUT}/prefix_absent.json"
+            echo "P0_R2_REPLAY_GATE_RUN=false"
+            echo "P0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false"
+            echo "P0_R2_MODEL_OPERATIONS_PERFORMED=0"
+            echo "P0_R2_IDENTITY_CANARY_COMPLETE=1"
+        resources:
+          cpu: 2
+          memory: 4Gi
+        env:
+          - name: P0_R2_ATTEMPT
+            value: "{{ATTEMPT}}"
+          - name: P0_R2_UNUSED_ATTEMPT
+            value: "{{UNUSED_ATTEMPT}}"
+          - name: P0_R2_SRC
+            value: /opt/jspace/src
+          - name: P0_R2_RUNTIME_ROOT
+            value: /workspace/runtime
+boundary:
+  stage: STUDY3-P0-R2
+  generation: 1
+  cpu_only: true
+  requests_accelerator: false
+  writes_under_a_pilot_prefix: false
+  replay_gate_invoked: false
+  one_shot_envelope_opened: false
+  tokenizer_constructions: 0
+  checkpoint_downloads: 0
+  model_weight_loads: 0
+  model_operations_performed: 0
