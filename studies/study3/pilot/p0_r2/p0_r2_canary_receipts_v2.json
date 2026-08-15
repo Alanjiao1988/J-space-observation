@@ -3,26 +3,26 @@
     {
       "canary": "in-build image-to-Git audit",
       "checked_count": 44,
-      "entries_sha256": "21e30727501bc763f245d685e4e4971b62732ec85f5ad93b57c5663875692f22",
+      "entries_sha256": "ed0aac75034b44e29a95942b3ebb3d6d52e120fcbc5f2e1555b0de55e67df6a3",
       "evidence": {
         "log_available": true,
-        "log_bytes": 11344,
-        "log_sha256": "bc49f9df6e0358bde9fbfe0665d13457ce8ffcb40d34eee3e3232678ac89d34c",
+        "log_bytes": 11334,
+        "log_sha256": "48b934842f52f98648c84ced3f98eab1d1140689affb6300dc95b1ca2334becc",
         "markers": [
           "P0_R2_IMAGE_TO_GIT_AUDIT_V2_COMPLETE=1"
         ],
-        "run_id": "cmjm"
+        "run_id": "cmjr"
       },
       "mismatches": 0,
-      "production_identity": "ACR cmjm",
+      "production_identity": "ACR cmjr",
       "result": "the build itself fails unless the image carries exactly the executable commit's bytes, so a drifted image could never have been pushed"
     },
     {
       "canary": "model-free preflight",
       "evidence": {
         "log_available": true,
-        "log_bytes": 7391,
-        "log_sha256": "4fd242da86f017daf8c5570dd94b0ce3f4ddde040aac75a06fc9589272dee6d2",
+        "log_bytes": 7425,
+        "log_sha256": "0bb56ce1e993a7a4fc0599fe6084514159f0300344b06b086a70b381eebc6ef2",
         "markers": [
           "P0_R2_CANARY_COMPLETE=1",
           "P0_R2_CANARY_MODE=preflight",
@@ -65,17 +65,17 @@
           "P0_R2_TRANSPORT_ROUNDTRIP_BYTES=1048576",
           "P0_R2_TRANSPORT_ROUNDTRIP_COMPLETE=1"
         ],
-        "run_id": "cmjp"
+        "run_id": "cmjt"
       },
-      "production_identity": "ACR cmjp",
+      "production_identity": "ACR cmjt",
       "result": "44/44 image blobs equal the executable commit's Git blobs, 0 mismatches; 1,048,576-byte transport round trip; 0 repairs"
     },
     {
       "canary": "designated packing canary",
       "evidence": {
         "log_available": true,
-        "log_bytes": 7564,
-        "log_sha256": "db77882adfd6ebfb03440b3742ed0b0949ad452619858cd572331f646dad1e77",
+        "log_bytes": 7529,
+        "log_sha256": "cf625d86badc58c83af8e55320a90156baf8a877eca88d0435a98bbcb40d50fb",
         "markers": [
           "P0_R2_CANARY_COMPLETE=1",
           "P0_R2_CANARY_MODE=preflight",
@@ -107,7 +107,7 @@
           "P0_R2_IMPORT_OK=p0_r2_blob_transport",
           "P0_R2_MODEL_OPERATIONS_PERFORMED=0",
           "P0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false",
-          "P0_R2_PACKING_CANARY_ATTEMPT=p0r2-g1-packing-canary-20260815-0906",
+          "P0_R2_PACKING_CANARY_ATTEMPT=p0r2-g1-packing-canary-20260815-0940",
           "P0_R2_PACKING_CANARY_COMPLETE=1",
           "P0_R2_PREFIX_PREFLIGHT_SKIPPED=1 no attempt id was supplied",
           "P0_R2_PREFIX_PROOF_DEFERRED_TO_HOST=1",
@@ -119,57 +119,57 @@
           "P0_R2_TRANSPORT_ROUNDTRIP_BYTES=1048576",
           "P0_R2_TRANSPORT_ROUNDTRIP_COMPLETE=1"
         ],
-        "run_id": "cmjq"
+        "run_id": "cmju"
       },
-      "production_identity": "ACR cmjq",
+      "production_identity": "ACR cmju",
       "result": "the exact step that stopped P0-R1 succeeds: 2 context entries, 40-character maximum native path against P0-R1's fatal 265, exit 0",
       "submission_receipt": {
-        "acr_run_id": "cmjq",
-        "attempt_id": "p0r2-g1-packing-canary-20260815-0906",
+        "acr_run_id": "cmju",
+        "attempt_id": "p0r2-g1-packing-canary-20260815-0940",
         "azure_cli_version": "2.83.0",
         "binding": {
-          "digest": "sha256:a8cf78676bf549e8cd4f8988813fb7b271aae18e88f83c566da0cf3075ffda9d",
-          "executable_commit": "2e0b6a20447074803c5210583c660ec2ef195bd8",
-          "executable_tree": "2a36ff35f1ab1129887c4c337997019a7b98a661",
-          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:a8cf78676bf549e8cd4f8988813fb7b271aae18e88f83c566da0cf3075ffda9d",
-          "ready_anchor": "2e0b6a20447074803c5210583c660ec2ef195bd8",
-          "source_commit": "2e0b6a20447074803c5210583c660ec2ef195bd8",
-          "source_tree": "2a36ff35f1ab1129887c4c337997019a7b98a661",
+          "digest": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+          "executable_commit": "c9344c52bfbacc4f2a24010fffa534a940104140",
+          "executable_tree": "bb27933ebf42e811ec7e5a42a13d65377cdd2f5c",
+          "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+          "ready_anchor": "c9344c52bfbacc4f2a24010fffa534a940104140",
+          "source_commit": "c9344c52bfbacc4f2a24010fffa534a940104140",
+          "source_tree": "bb27933ebf42e811ec7e5a42a13d65377cdd2f5c",
           "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
           "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v2.yaml"
         },
         "context_admission": {
           "bytes": 2040,
           "name": "context_admission.json",
-          "sha256": "6602ab3c4dde5d391cd8177109645a2b96b42096264143eaa40edb8369789155"
+          "sha256": "fff2c9908cfc7595f8f68e2cf6829e8ee33c29300a42c6f411dff6c4bdc350d8"
         },
         "mode": "packing-canary",
         "model_operations_performed": 0,
         "one_shot_envelope_consumed": false,
         "outcome": "PASS",
         "raw_log": {
-          "bytes": 7768,
+          "bytes": 7731,
           "name": "p0_r2_acr_raw_log.txt",
-          "sha256": "1d8b8fd4a7c7703dccf0a4797aa53598bf90dc9c45c551feeeada46445bdda55"
+          "sha256": "7e1fab38542ae8774ade0083d6dee28fe28be8f05f90753718385926157a9c1d"
         },
         "stderr": {
           "bytes": 351,
           "name": "p0_r2_acr_stderr.txt",
-          "sha256": "a8e0be433b758085cb931997329e06c1ca089721dbcff83ef5921161e017d755"
+          "sha256": "e6e2bbc1d84f36c454357cb1f8782c731ec7192baa50f0ed40e42ea928bef531"
         }
       }
     },
     {
       "accelerator_requested": false,
-      "attempt_id": "p0r2-g1-hardkill-canary-20260815-0908",
+      "attempt_id": "p0r2-g1-hardkill-canary-20260815-0945",
       "canary": "hard-kill / open-admission CPU recovery",
       "child_returncode": -9,
       "cpu_only": true,
       "evidence": {
-        "log_bytes": 16154,
-        "log_sha256": "f9b50f44c78b9f5ed3948f826aaef3232ddd7bba3724c5e578fb1411b39a8382",
+        "log_bytes": 16153,
+        "log_sha256": "5064c6b10fc70958cc8516f23d5a2c8ab8b090eb13ecd7930232774d1eed1ca4",
         "markers": [
-          "F P0_R2_HARD_KILL_ATTEMPT=p0r2-g1-hardkill-canary-20260815-0908",
+          "F P0_R2_HARD_KILL_ATTEMPT=p0r2-g1-hardkill-canary-20260815-0945",
           "F P0_R2_HARD_KILL_CANARY_COMPLETE=1",
           "F P0_R2_HARD_KILL_OPEN_ADMISSION_RECOVERED=1",
           "F P0_R2_HARD_KILL_RECOVERY_BYTE_EXACT=1",
@@ -185,8 +185,8 @@
       "no_observation_overwritten_or_inferred": true,
       "open_admission_operation": "synthetic_irreversible_operation",
       "open_admission_sequence": 3,
-      "prefix": "study3/p0_r2/g1/p0r2-g1-hardkill-canary-20260815-0908/",
-      "production_identity": "ACA job-jspace-s3-p0r2-hardkill-g1-bi289zk",
+      "prefix": "study3/p0_r2/g1/p0r2-g1-hardkill-canary-20260815-0945/",
+      "production_identity": "ACA job-jspace-s3-p0r2-hardkill-g1-i3o654p",
       "recovered_rows_byte_exact": true,
       "recursive_manifest_written_last": true,
       "result": "PASS: a SIGKILLed child (returncode -9) left an open admission at sequence 3; an independent CPU recovery process recovered it and every committed payload byte byte-exactly against independently regenerated bytes, verified a continuous create-only journal sequence, and wrote a recursive recovery manifest last",
@@ -201,13 +201,19 @@
           "execution": "job-jspace-s3-p0r2-hardkill-g1-yt14nnd",
           "objects_written": "5 journal objects plus a recovery manifest",
           "outcome": "PASS",
-          "reason": "superseded: passed against image digest sha256:f445ce87"
+          "reason": "superseded: passed against an image digest that a later corrective commit replaced"
         },
         {
           "execution": "job-jspace-s3-p0r2-hardkill-g1-2fevxfp",
           "objects_written": "5 journal objects plus a recovery manifest",
           "outcome": "PASS",
-          "reason": "superseded: passed against image digest sha256:f4102efb"
+          "reason": "superseded: passed against an image digest that a later corrective commit replaced"
+        },
+        {
+          "execution": "job-jspace-s3-p0r2-hardkill-g1-bi289zk",
+          "objects_written": "5 journal objects plus a recovery manifest",
+          "outcome": "PASS",
+          "reason": "superseded: passed against an image digest that a later corrective commit replaced"
         }
       ],
       "waived": false
@@ -216,18 +222,18 @@
       "canary": "bounded job absence",
       "production_identity": "read-only control plane",
       "query_error_is_absence": false,
-      "result": "job-jspace-s3-p0r2-pilot-g1 and job-jspace-s3-p0r2-recover-g1 both PROVED_ABSENT; job-jspace-s3-p0r2-hardkill-g1 and job-jspace-s3-p0r2-prefix-g1 PROVED_PRESENT, which is what makes the absence proof non-vacuous. In-VNet prefix proof: ACA job-jspace-s3-p0r2-prefix-g1-oa7u633, both the live and pilot prefixes PROVED_UNUSED with object_count 0 and wrote_any_object false."
+      "result": "job-jspace-s3-p0r2-pilot-g1 and job-jspace-s3-p0r2-recover-g1 both PROVED_ABSENT; job-jspace-s3-p0r2-hardkill-g1 and job-jspace-s3-p0r2-prefix-g1 PROVED_PRESENT, which is what makes the absence proof non-vacuous. In-VNet prefix proof: ACA job-jspace-s3-p0r2-prefix-g1-qm5qp8k, both the live and pilot prefixes PROVED_UNUSED with object_count 0 and wrote_any_object false."
     }
   ],
   "checkpoint_downloads": 0,
-  "digest": "sha256:a8cf78676bf549e8cd4f8988813fb7b271aae18e88f83c566da0cf3075ffda9d",
-  "executable_commit": "2e0b6a20447074803c5210583c660ec2ef195bd8",
-  "executable_tree": "2a36ff35f1ab1129887c4c337997019a7b98a661",
+  "digest": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+  "executable_commit": "c9344c52bfbacc4f2a24010fffa534a940104140",
+  "executable_tree": "bb27933ebf42e811ec7e5a42a13d65377cdd2f5c",
   "generation": 1,
   "generations": 0,
   "gpu_allocations": 0,
   "gpu_operations": 0,
-  "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:a8cf78676bf549e8cd4f8988813fb7b271aae18e88f83c566da0cf3075ffda9d",
+  "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
   "model_operations_performed": 0,
   "model_weight_loads": 0,
   "one_shot_envelope_consumed": false,
