@@ -25,6 +25,7 @@ if str(P0_R2_DIR) not in sys.path:
     sys.path.insert(0, str(P0_R2_DIR))
 
 import p0_r2_submission_context as CONTEXT  # noqa: E402
+import p0_r2_closure_binding_v1 as CLOSURE  # noqa: E402
 
 
 SCHEMA_VERSION = "study3-p0-r2-acr-submission-receipt-v1"
@@ -107,8 +108,19 @@ def require_context_admission(path: Path, recomputed: dict) -> dict:
     return {"document": published, "identity": _identity(raw, Path(path).name)}
 
 
-def require_packing_canary(path: Path, *, source_commit: str,
+def require_packing_canary(path: Path, *, root, task_path: str,
+                           executable_commit: str, executable_tree: str,
                            task_blob: str, image: str, digest: str) -> dict:
+    """Require immutable agreement, not identical source commits.
+
+    The live submission necessarily reads its embedded governance objects from
+    a *later* commit than the canary, because publishing the lock creates that
+    commit. Demanding an identical source commit would make the canary
+    unsatisfiable by construction. What must be identical is the immutable
+    executable/task/image identity, which no governance-only descendant can
+    touch. The governance relationship itself is proved separately by
+    ``p0_r2_closure_binding_v1.prove_governance_chain``.
+    """
     document, raw = _load_json(path, "packing canary receipt")
     if document.get("schema_version") != SCHEMA_VERSION \
             or document.get("mode") != "packing-canary" \
@@ -116,24 +128,26 @@ def require_packing_canary(path: Path, *, source_commit: str,
             or document.get("exit_code") != 0 \
             or not document.get("acr_run_id"):
         raise SubmissionDefect("the packing canary receipt is not a pass")
-    binding = document.get("binding") or {}
-    expected = {
-        "source_commit": source_commit,
-        "task_blob": task_blob,
-        "image": image,
-        "digest": digest,
-    }
-    for key, value in expected.items():
-        if binding.get(key) != value:
-            raise SubmissionDefect(
-                "packing canary %s %r does not match live submission %r" %
-                (key, binding.get(key), value))
     if document.get("replay_gate_ran") is not False \
             or document.get("one_shot_envelope_consumed") is not False \
             or document.get("model_operations_performed") != 0:
         raise SubmissionDefect(
             "the packing canary is not a disjoint zero-operation canary")
-    return {"document": document, "identity": _identity(raw, Path(path).name)}
+    try:
+        resolved = CLOSURE.resolve_canary_binding(
+            root, document.get("binding") or {}, task_path=task_path)
+        live = CLOSURE.canary_binding(
+            executable_commit=executable_commit,
+            executable_tree=executable_tree, task_path=task_path,
+            task_blob=task_blob, image=image, digest=digest)
+        agreement = CLOSURE.verify_canary_live_agreement(resolved, live)
+    except CLOSURE.ClosureBindingDefect as exc:
+        raise SubmissionDefect(str(exc)) from exc
+    return {
+        "document": document,
+        "identity": _identity(raw, Path(path).name),
+        "agreement": agreement,
+    }
 
 
 def classify_packing_canary(raw_log: bytes) -> None:
@@ -155,7 +169,9 @@ def submit(*, root: Path, source_commit: str, task_path: str,
            registry: str, subscription: str, image: str, digest: str,
            ready_anchor: str, mode: str, attempt: str,
            packing_canary_receipt: Path | None = None, runner=None,
-           azure_cli_version=None) -> dict:
+           azure_cli_version=None, executable_commit: str | None = None,
+           executable_tree: str | None = None,
+           governance_proof: Path | None = None) -> dict:
     """Perform one host submission after every local refusal check."""
     if mode not in ("packing-canary", "live"):
         raise SubmissionDefect("mode must be packing-canary or live")
@@ -181,14 +197,42 @@ def submit(*, root: Path, source_commit: str, task_path: str,
     admission = require_context_admission(context_admission, recomputed)
     task_blob = recomputed["context"]["task"]["git_blob"]
 
+    # A canary runs at the executable commit itself, so the executable identity
+    # defaults to the context source. A live run is a governance descendant and
+    # must state the executable identity explicitly from the lock.
+    if executable_commit is None:
+        executable_commit = source_commit
+    if executable_tree is None:
+        executable_tree = (
+            recomputed["source"]["tree"]
+            if executable_commit == source_commit
+            else CLOSURE._git(root, ["rev-parse", "%s^{tree}" %
+                                     executable_commit])[0].strip())
+
     canary = None
+    governance = None
     if mode == "live":
         if packing_canary_receipt is None:
             raise SubmissionDefect(
                 "live submission requires the final packing canary receipt")
         canary = require_packing_canary(
-            packing_canary_receipt, source_commit=source_commit,
-            task_blob=task_blob, image=image, digest=digest)
+            packing_canary_receipt, root=root, task_path=task_path,
+            executable_commit=executable_commit,
+            executable_tree=executable_tree, task_blob=task_blob,
+            image=image, digest=digest)
+        if governance_proof is not None:
+            document, raw = _load_json(governance_proof,
+                                       "governance chain proof")
+            try:
+                CLOSURE.validate_proof(
+                    document, executable_commit=executable_commit,
+                    ready_anchor=ready_anchor, governance_commit=source_commit,
+                    task_blob=task_blob)
+            except CLOSURE.ClosureBindingDefect as exc:
+                raise SubmissionDefect(
+                    "the governance chain proof does not bind this live "
+                    "submission: %s" % exc) from exc
+            governance = _identity(raw, Path(governance_proof).name)
 
     try:
         command = CONTEXT.acr_run_command(
@@ -242,6 +286,8 @@ def submit(*, root: Path, source_commit: str, task_path: str,
         "binding": {
             "source_commit": source_commit,
             "source_tree": recomputed["source"]["tree"],
+            "executable_commit": executable_commit,
+            "executable_tree": executable_tree,
             "task_path": task_path,
             "task_blob": task_blob,
             "image": image,
@@ -249,6 +295,9 @@ def submit(*, root: Path, source_commit: str, task_path: str,
             "ready_anchor": ready_anchor,
         },
         "context_admission": admission["identity"],
+        "governance_chain_proof": governance,
+        "canary_live_agreement": (
+            canary["agreement"] if canary is not None else None),
         "packing_canary_receipt": (
             canary["identity"] if canary is not None else None),
         "command": {
@@ -301,6 +350,9 @@ def main(argv=None) -> int:
     parser.add_argument("--ready-anchor")
     parser.add_argument("--attempt")
     parser.add_argument("--packing-canary-receipt")
+    parser.add_argument("--executable-commit")
+    parser.add_argument("--executable-tree")
+    parser.add_argument("--governance-proof")
     parser.add_argument("--azure-cli-version")
     parser.add_argument("--i-am-sure", action="store_true")
     args = parser.parse_args(argv)
@@ -337,6 +389,9 @@ def main(argv=None) -> int:
             ready_anchor=args.ready_anchor, mode=selected_mode,
             attempt=args.attempt,
             packing_canary_receipt=args.packing_canary_receipt,
+            executable_commit=args.executable_commit,
+            executable_tree=args.executable_tree,
+            governance_proof=args.governance_proof,
             azure_cli_version=args.azure_cli_version)
     except (SubmissionDefect, OSError) as exc:
         print("P0_R2_SUBMISSION_REFUSED=1 %s" % exc, file=sys.stderr)

@@ -1,0 +1,69 @@
+# Study 3 P0-R2 generation-1 bounded GPU pilot job.
+#
+# This file is the registered *shape* of the job. It is never applied directly:
+# the authoritative document is rendered by
+# ``p0_r2_job_spec_v1.py --gpu``, which refuses to render anything at all
+# without a built authorization document. The two must agree, and the focused
+# suite asserts that they do.
+#
+# The important properties, and why they are what they are:
+#
+#   replicaRetryLimit: 0     a retried replica would be a second, unrecorded
+#                            model execution. The bounded pilot is allowed
+#                            exactly one.
+#   parallelism: 1           one replica, so the caps cannot be multiplied.
+#   replicaCompletionCount: 1
+#   triggerType: Manual      nothing schedules this job; a human names it.
+#   image: digest-pinned     a tag could move; a digest cannot.
+#
+# In the P0-R2 preparation round this job was never created and never started.
+name: job-jspace-s3-p0r2-pilot-g1
+kind: gpu-bounded-pilot
+resourceGroup: rg-jspace-observation-sea
+subscription: 943bacdf-8b6e-4e3a-8126-a149f623d32e
+identity:
+  type: UserAssigned
+  userAssignedIdentities:
+    /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea: {}
+properties:
+  environmentId: cae-jspace-observation-sea-vnet2
+  configuration:
+    triggerType: Manual
+    replicaTimeout: 3600
+    replicaRetryLimit: 0
+    manualTriggerConfig:
+      parallelism: 1
+      replicaCompletionCount: 1
+    registries:
+      - server: acrjspaceobssea0708231738.azurecr.io
+        identity: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+  template:
+    containers:
+      - name: p0-r2-pilot
+        # Rendered as acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@{{DIGEST}}
+        image: "{{IMAGE}}"
+        command:
+          - /usr/local/bin/p0_r2_model_pilot_v1.sh
+        env:
+          - name: P0_R2_ATTEMPT
+            value: "{{ATTEMPT}}"
+          - name: P0_R2_IMAGE_DIGEST
+            value: "{{DIGEST}}"
+          - name: P0_R2_PILOT_AUTHORIZED
+            value: "1"
+          - name: P0_R2_SRC
+            value: /opt/jspace/src
+          - name: P0_R2_RUNTIME_ROOT
+            value: /workspace/runtime
+boundary:
+  stage: STUDY3-P0-R2
+  generation: 1
+  created_in_preparation_round: false
+  started_in_preparation_round: false
+  science: unchanged-p0-r1-generation-3
+  caps:
+    max_smoke_prefills_before_extension: 60
+    max_non_generative_prefills: 180
+    max_s4_generations: 12
+    max_model_evaluation_equivalents: 228
+    possible_scored_rows: 210

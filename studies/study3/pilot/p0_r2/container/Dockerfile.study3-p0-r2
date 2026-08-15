@@ -1,0 +1,58 @@
+# Study 3 P0-R2 generation-1 image.
+#
+# This is a *thin* infrastructure successor. It changes the host-to-registry
+# submission transport and adds the P0-R2 operational modules. It changes no
+# science: the P0-R1 generation-3 scientific modules are copied in
+# byte-identically from the same commit and are verified by SHA-256 at runtime
+# before they are imported.
+#
+# Preferred base: the already-published P0-R1 generation-3 image, pinned by
+# digest. Reusing it means the dependency closure cannot move underneath the
+# science, which is the whole reason the successor is allowed to be thin.
+#
+# The build must be reproducible from exact Git objects. Nothing is fetched
+# from the network during the build; no model weight, checkpoint, tokenizer, or
+# corpus byte is ever baked into this image.
+
+ARG BASE_IMAGE=acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r1@sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c
+FROM ${BASE_IMAGE}
+
+LABEL org.jspace.stage="STUDY3-P0-R2" \
+      org.jspace.generation="1" \
+      org.jspace.kind="infrastructure-successor" \
+      org.jspace.changes-only="host-to-registry submission transport" \
+      org.jspace.science="unchanged-p0-r1-generation-3" \
+      org.jspace.terminal-state="STUDY3_P0_R2_EXECUTION_READY_AWAITING_REPLAY_GATE" \
+      org.jspace.model-operations-performed="0"
+
+ENV P0_R2_SRC=/opt/jspace/src \
+    P0_R2_STAGE=STUDY3-P0-R2 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_INDEX=1
+
+WORKDIR /opt/jspace
+
+# The P0-R1 scientific modules first, so a change to P0-R2 operational bytes
+# does not invalidate the layer that carries the science.
+COPY src/studies/study3/pilot/p0_r1/ ${P0_R2_SRC}/studies/study3/pilot/p0_r1/
+COPY src/studies/study3/pilot/p0_r2/ ${P0_R2_SRC}/studies/study3/pilot/p0_r2/
+
+# The image-to-Git audit manifest travels with the bytes it describes.
+COPY src/studies/study3/pilot/p0_r2/p0_r2_image_manifest_v1.json \
+     /opt/jspace/p0_r2_image_manifest_v1.json
+
+COPY entrypoints/ /usr/local/bin/
+RUN chmod 0755 /usr/local/bin/p0_r2_*.sh
+
+ENV PYTHONPATH=${P0_R2_SRC}/studies/study3/pilot/p0_r2:${P0_R2_SRC}/studies/study3/pilot/p0_r1
+
+# Fail the build if the image does not carry exactly the bytes Git holds.
+RUN python3 ${P0_R2_SRC}/studies/study3/pilot/p0_r2/p0_r2_image_manifest_v1.py \
+        --audit /opt/jspace/p0_r2_image_manifest_v1.json \
+        --image-root ${P0_R2_SRC}
+
+# No default command. Every entry point is named explicitly by the caller, so
+# an image that is started by accident does nothing at all.
+ENTRYPOINT []
+CMD ["/usr/local/bin/p0_r2_successor_v1.sh"]

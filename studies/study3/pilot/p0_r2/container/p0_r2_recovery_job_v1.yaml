@@ -1,0 +1,58 @@
+# Study 3 P0-R2 generation-1 CPU-only recovery job.
+#
+# This job runs after any terminal status of the bounded pilot, including a
+# hard kill. It reads the durable journal and the recursive manifest from the
+# attempt-bound private prefix and classifies the attempt as COMPLETE or
+# PARTIAL. It never repairs, replaces, or deletes an observation, and a PARTIAL
+# classification never authorizes a retry.
+#
+# It requests no accelerator, and ``p0_r2_recovery_v1.py`` refuses to run at
+# all on a replica that exposes one.
+#
+# The authoritative document is rendered by
+# ``p0_r2_job_spec_v1.py --recovery {prefix-preflight|recover}``; this file is
+# the registered shape and the focused suite asserts the two agree.
+name: job-jspace-s3-p0r2-recover-g1
+kind: cpu-recovery
+resourceGroup: rg-jspace-observation-sea
+subscription: 943bacdf-8b6e-4e3a-8126-a149f623d32e
+identity:
+  type: UserAssigned
+  userAssignedIdentities:
+    /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea: {}
+properties:
+  environmentId: cae-jspace-observation-sea-vnet2
+  configuration:
+    triggerType: Manual
+    replicaTimeout: 3600
+    replicaRetryLimit: 0
+    manualTriggerConfig:
+      parallelism: 1
+      replicaCompletionCount: 1
+    registries:
+      - server: acrjspaceobssea0708231738.azurecr.io
+        identity: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+  template:
+    containers:
+      - name: p0-r2-recover
+        image: "{{IMAGE}}"
+        command:
+          - /usr/local/bin/p0_r2_recovery_v1.sh
+        env:
+          # One of: prefix-preflight, recover
+          - name: P0_R2_RECOVERY_MODE
+            value: "{{MODE}}"
+          - name: P0_R2_ATTEMPT
+            value: "{{ATTEMPT}}"
+          - name: P0_R2_SRC
+            value: /opt/jspace/src
+          - name: P0_R2_RUNTIME_ROOT
+            value: /workspace/runtime
+boundary:
+  stage: STUDY3-P0-R2
+  generation: 1
+  cpu_only: true
+  requests_accelerator: false
+  repairs_observations: false
+  partial_authorizes_retry: false
+  model_operations_performed: 0

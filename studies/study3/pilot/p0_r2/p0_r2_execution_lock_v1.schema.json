@@ -1,0 +1,371 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.schema.json",
+  "title": "Study 3 P0-R2 generation-1 execution lock",
+  "description": "The single governance object a successor session reads to learn exactly what it may run. It binds the six identities that resolve the closure-binding cycle, the pinned image digest, the delegated P0-R1 generation-3 scientific bytes, the transport parameters, the registered Azure identities and namespace, the bounded-pilot caps, and the model-free canary evidence that made the lock issuable. It never contains its own hash.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "stage",
+    "generation",
+    "terminal_state",
+    "kind",
+    "changes_only",
+    "science_is_unchanged_p0_r1_generation3",
+    "executable_code",
+    "transport",
+    "image",
+    "ready_commit_relationship",
+    "immutable_sources",
+    "delegated_scientific_modules",
+    "azure",
+    "namespace",
+    "caps",
+    "canaries",
+    "validation",
+    "predecessor",
+    "prohibitions",
+    "counters"
+  ],
+  "properties": {
+    "schema_version": { "const": "study3-p0-r2-execution-lock-v1" },
+    "stage": { "const": "STUDY3-P0-R2" },
+    "generation": { "const": 1 },
+    "terminal_state": {
+      "const": "STUDY3_P0_R2_EXECUTION_READY_AWAITING_REPLAY_GATE"
+    },
+    "kind": { "const": "infrastructure-successor" },
+    "changes_only": { "const": "host-to-registry submission transport" },
+    "science_is_unchanged_p0_r1_generation3": { "const": true },
+
+    "executable_code": {
+      "description": "The commit and tree whose bytes were built into the image. Immutable: the live submission must run this exact code.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "tree"],
+      "properties": {
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "tree": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+
+    "transport": {
+      "description": "The only thing P0-R2 changes relative to P0-R1: how bytes leave the host and how they are recovered from the ACR log.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_path",
+        "task_blob",
+        "envelope_version",
+        "attempt_id_prefix",
+        "raw_chunk_bytes",
+        "max_line_bytes",
+        "max_projected_combined_replay_artifact_bytes",
+        "canary_minimum_total_bytes",
+        "replay_artifacts"
+      ],
+      "properties": {
+        "task_path": {
+          "const": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v1.yaml"
+        },
+        "task_blob": {
+          "description": "The content-addressed Git blob of the task file. Stable across governance-only descendants, which is what makes the binding satisfiable.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "envelope_version": { "type": "string" },
+        "attempt_id_prefix": { "const": "p0r2-g1-" },
+        "raw_chunk_bytes": { "const": 512 },
+        "max_line_bytes": { "const": 1024 },
+        "max_projected_combined_replay_artifact_bytes": { "const": 524288 },
+        "canary_minimum_total_bytes": { "const": 1048576 },
+        "replay_artifacts": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "p0_r2_replay_result.json",
+              "p0_r2_replay_receipt.json",
+              "p0_r2_replay_counters.json",
+              "P0_R2_REPLAY_DISPOSITION.md"
+            ]
+          }
+        }
+      }
+    },
+
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry",
+        "repository",
+        "digest",
+        "base_digest",
+        "reference",
+        "build_run_id",
+        "manifest_entries_sha256",
+        "image_root"
+      ],
+      "properties": {
+        "registry": { "const": "acrjspaceobssea0708231738.azurecr.io" },
+        "repository": { "type": "string", "minLength": 1 },
+        "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "base_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "reference": { "type": "string", "pattern": "@sha256:[0-9a-f]{64}$" },
+        "build_run_id": { "type": "string", "minLength": 1 },
+        "manifest_entries_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "image_root": { "type": "string", "minLength": 1 }
+      }
+    },
+
+    "ready_commit_relationship": {
+      "description": "A commit cannot contain its own hash, so the lock records the ready anchor's parent and the anchor is proved by ancestry rather than self-reference.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "anchor_parent",
+        "anchor_contains_this_lock",
+        "anchor_is_proved_by_ancestry_not_self_reference"
+      ],
+      "properties": {
+        "anchor_parent": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "anchor_contains_this_lock": { "const": true },
+        "anchor_is_proved_by_ancestry_not_self_reference": { "const": true },
+        "governance_source": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "published_head": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+
+    "immutable_sources": {
+      "description": "The binding keys on which a canary and the live submission must agree exactly, plus the paths a governance-only descendant is permitted to touch.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "immutable_binding_keys",
+        "governance_allowlist",
+        "governance_allowlist_prefixes"
+      ],
+      "properties": {
+        "immutable_binding_keys": {
+          "type": "array",
+          "minItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "executable_commit",
+              "executable_tree",
+              "task_path",
+              "task_blob",
+              "image",
+              "digest"
+            ]
+          }
+        },
+        "governance_allowlist": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "governance_allowlist_prefixes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+
+    "delegated_scientific_modules": {
+      "description": "P0-R1 generation-3 science, reused byte-identically. The replay gate verifies each SHA-256 before importing the module.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "bytes", "sha256", "git_blob"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^studies/study3/pilot/p0_r1/"
+          },
+          "bytes": { "type": "integer", "minimum": 1 },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "git_blob": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+        }
+      }
+    },
+
+    "azure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subscription_id",
+        "tenant_id",
+        "resource_group",
+        "registry_name",
+        "container_apps_environment",
+        "managed_identity",
+        "log_analytics_workspace"
+      ],
+      "properties": {
+        "subscription_id": {
+          "const": "943bacdf-8b6e-4e3a-8126-a149f623d32e"
+        },
+        "tenant_id": { "const": "16b3c013-d300-468d-ac64-7eda0820b6d3" },
+        "resource_group": { "const": "rg-jspace-observation-sea" },
+        "registry_name": { "const": "acrjspaceobssea0708231738" },
+        "container_apps_environment": {
+          "const": "cae-jspace-observation-sea-vnet2"
+        },
+        "managed_identity": { "const": "id-jspace-aca-acrpull-sea" },
+        "log_analytics_workspace": {
+          "const": "8daddd67-1cfd-47c5-857e-af3c4a4e3787"
+        }
+      }
+    },
+
+    "namespace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt_prefix",
+        "gpu_job",
+        "recovery_job",
+        "blob_prefix_root",
+        "results_path"
+      ],
+      "properties": {
+        "attempt_prefix": { "const": "p0r2-g1-" },
+        "gpu_job": { "const": "job-jspace-s3-p0r2-pilot-g1" },
+        "recovery_job": { "const": "job-jspace-s3-p0r2-recover-g1" },
+        "blob_prefix_root": { "const": "study3/p0_r2/g1/" },
+        "results_path": { "const": "studies/study3/pilot/p0/results/p0-r2/" }
+      }
+    },
+
+    "caps": {
+      "description": "The bounded-pilot maxima. The model runner refuses if the lock caps differ from the registered numbers.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_smoke_prefills_before_extension",
+        "max_non_generative_prefills",
+        "max_s4_generations",
+        "max_model_evaluation_equivalents",
+        "possible_scored_rows"
+      ],
+      "properties": {
+        "max_smoke_prefills_before_extension": { "const": 60 },
+        "max_non_generative_prefills": { "const": 180 },
+        "max_s4_generations": { "const": 12 },
+        "max_model_evaluation_equivalents": { "const": 228 },
+        "possible_scored_rows": { "const": 210 }
+      }
+    },
+
+    "canaries": {
+      "description": "The model-free production canaries that made the lock issuable. Every entry must have passed; the packing canary must record exactly one ACR run id.",
+      "type": "object",
+      "minProperties": 1,
+      "required": ["packing_canary"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["outcome"],
+        "properties": {
+          "outcome": { "const": "PASS" },
+          "run_id": { "type": ["string", "null"] },
+          "evidence": { "type": ["string", "object", "null"] }
+        }
+      },
+      "properties": {
+        "packing_canary": {
+          "type": "object",
+          "required": ["outcome", "run_id"],
+          "properties": {
+            "outcome": { "const": "PASS" },
+            "run_id": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["focused_suite", "full_suite"],
+      "properties": {
+        "focused_suite": { "type": ["object", "null"] },
+        "full_suite": { "type": ["object", "null"] }
+      }
+    },
+
+    "predecessor": {
+      "description": "P0-R1 stopped permanently and P0-R2 does not reopen it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "study",
+        "stop_commit",
+        "stop_state",
+        "bytes_modified_by_p0_r2",
+        "reopened"
+      ],
+      "properties": {
+        "study": { "const": "study3-p0-r1" },
+        "stop_commit": {
+          "const": "30806d793872a50e581d3252382b4a0ec2af3889"
+        },
+        "stop_state": { "const": "STOP_NO_MODEL_OPERATION" },
+        "bytes_modified_by_p0_r2": { "const": 0 },
+        "reopened": { "const": false }
+      }
+    },
+
+    "prohibitions": {
+      "description": "Every one of these must be false for the preparation round to be honest.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "live_replay_run",
+        "replay_envelope_consumed",
+        "tokenizer_constructed",
+        "checkpoint_downloaded_or_loaded",
+        "model_weight_loaded",
+        "prefill_or_generation_performed",
+        "gpu_job_created_or_started",
+        "evidence_ledger_row_added"
+      ],
+      "patternProperties": { "^.*$": { "const": false } }
+    },
+
+    "counters": {
+      "description": "All zero, without exception, for a preparation-round lock.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tokenizer_constructions",
+        "checkpoint_downloads",
+        "model_weight_loads",
+        "prefills",
+        "generations",
+        "scored_rows",
+        "evidence_rows_added",
+        "gpu_allocations",
+        "gpu_jobs_created",
+        "gpu_jobs_started",
+        "model_operations_performed"
+      ],
+      "patternProperties": { "^.*$": { "const": 0 } }
+    }
+  }
+}
