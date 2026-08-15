@@ -1,0 +1,168 @@
+{
+  "blob_data_access": {
+    "accepted_roles": [
+      "Storage Blob Data Contributor",
+      "Storage Blob Data Owner"
+    ],
+    "account": "stjspacefiles0709085305",
+    "azure_outcome": "PROVED_PRESENT",
+    "created_updated_or_started": false,
+    "granting_assignments": [
+      {
+        "role": "Storage Blob Data Contributor",
+        "scope": "/subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourceGroups/rg-jspace-observation-sea/providers/Microsoft.Storage/storageAccounts/stjspacefiles0709085305"
+      }
+    ],
+    "identity_name": "id-jspace-aca-acrpull-sea",
+    "model_operations_performed": 0,
+    "outcome": "PASS",
+    "previously_advertised_account": "stjspaceobssea0708231738",
+    "previously_advertised_account_outcome": "AMBIGUOUS",
+    "principal_id": "78d4348b-57eb-4fb9-aaa7-99148b303292",
+    "read_only": true,
+    "what_it_proves": "the pilot identity holds a blob DATA-plane role whose scope covers the account the transport actually writes to; the same query returns AMBIGUOUS rather than PRESENT for the account the job specification used to advertise, which does not exist"
+  },
+  "gpu_job_absence": {
+    "azure_outcome": "PROVED_ABSENT",
+    "created_updated_or_started": false,
+    "gpu_operations": 0,
+    "model_operations_performed": 0,
+    "name": "job-jspace-s3-p0r2-pilot-g1",
+    "outcome": "PASS",
+    "read_only": true,
+    "what_it_proves": "the bounded GPU pilot job does not exist, so nothing this stage did could have created or started it"
+  },
+  "identity_blob_canary": {
+    "artifact_manifest_written_last": true,
+    "attempt_id": "p0r2-g1-blob-canary-20260815-0315",
+    "execution": "job-jspace-s3-p0r2-canary-g1-2x3cpyj",
+    "job": "job-jspace-s3-p0r2-canary-g1",
+    "markers": [
+      "P0_R2_PRODUCTION_BACKEND_CONSTRUCTED=1",
+      "P0_R2_PRODUCTION_BLOB_BACKEND_CONSTRUCTIBLE=1",
+      "P0_R2_PREFIX_ABSENCE_PROVED=1",
+      "P0_R2_PREFIX_PREFLIGHT_PROVED_ABSENT=1",
+      "P0_R2_BLOB_ROUND_TRIP_PROVED=1",
+      "P0_R2_BLOB_CANARY_COMPLETE=1",
+      "P0_R2_PREFIX_OCCUPANCY_DETECTED=1",
+      "P0_R2_IDENTITY_CANARY_COMPLETE=1"
+    ],
+    "model_operations_performed": 0,
+    "object_bytes_round_tripped": 1048576,
+    "objects_written_and_read_back": [
+      "study3/p0_r2/g1/p0r2-g1-blob-canary-20260815-0315/p0_r2_canary_a.bin",
+      "study3/p0_r2/g1/p0r2-g1-blob-canary-20260815-0315/p0_r2_canary_b.bin",
+      "study3/p0_r2/g1/p0r2-g1-blob-canary-20260815-0315/p0_r2_canary_c.bin",
+      "study3/p0_r2/g1/p0r2-g1-blob-canary-20260815-0315/p0_r2_canary_d.bin"
+    ],
+    "one_shot_envelope_consumed": false,
+    "outcome": "PASS",
+    "recovered_byte_exact": true,
+    "replay_gate_ran": false,
+    "requests_accelerator": false,
+    "what_it_proves": "P0-R2's own transport bytes -- which are not byte-identical to P0-R1's and therefore cannot inherit P0-R1's receipts -- can construct the real managed-identity client, write through it, and read back byte-exact, from the only place the question can be asked: a VNet-integrated CPU-only Container Apps job",
+    "workload_profile": "Consumption"
+  },
+  "in_build_image_audit": {
+    "entries": 33,
+    "model_operations_performed": 0,
+    "outcome": "PASS",
+    "run_id": "cmht",
+    "what_it_proves": "the audit is not merely available at runtime: the build itself fails if the image does not carry exactly the executable commit's bytes, so an image that drifted could never have been pushed"
+  },
+  "job_absence_is_not_vacuous": {
+    "absent_names": [
+      "job-jspace-s3-p0r2-pilot-g1",
+      "job-jspace-s3-p0r2-recover-g1"
+    ],
+    "absent_outcome": "PROVED_ABSENT",
+    "gpu_operations": 0,
+    "model_operations_performed": 0,
+    "outcome": "PASS",
+    "present_job_requests_accelerator": false,
+    "present_job_workload_profile": "Consumption",
+    "present_name": "job-jspace-s3-p0r2-canary-g1",
+    "present_outcome": "PROVED_PRESENT",
+    "read_only": true,
+    "what_it_proves": "the same read-only query that reports PROVED_ABSENT for both bounded pilot jobs reports PROVED_PRESENT for the CPU-only canary job this stage did create, so the absence proofs are answers from Azure and not a query that cannot find anything"
+  },
+  "journal_self_check": {
+    "model_operations_performed": 0,
+    "objects": 4,
+    "outcome": "PASS",
+    "sequences": 4,
+    "what_it_proves": "the create-only journal writes monotonic immutable sequences and reads them back; a duplicate sequence number is a defect, never a retry"
+  },
+  "packing_canary": {
+    "attempt_id": "p0r2-g1-packing-canary-20260815-0257",
+    "authorizes_model_pilot": false,
+    "binding": {
+      "digest": "sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+      "executable_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+      "executable_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+      "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+      "ready_anchor": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+      "source_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+      "source_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+      "task_blob": "0ec0bfa0c2e3ebe882963564ef758b06bf890657",
+      "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v1.yaml"
+    },
+    "context_admission": {
+      "bytes": 1684,
+      "name": "admission.json",
+      "sha256": "b88c2c7bef355a848bcee785268326549d689250b9f6cc23ac137cd465f1480d"
+    },
+    "context_entry_count": 2,
+    "context_max_native_path_length": 40,
+    "context_sent_kib": 1.319,
+    "exit_code": 0,
+    "model_operations_performed": 0,
+    "one_shot_envelope_consumed": false,
+    "outcome": "PASS",
+    "p0_r1_fatal_native_path_length": 265,
+    "raw_log": {
+      "bytes": 7479,
+      "name": "p0_r2_acr_raw_log.txt",
+      "sha256": "da81a700914cf2fee84f1a507f0fcabad5744d24f205fa64ab5337106edb34e9"
+    },
+    "replay_gate_ran": false,
+    "run_id": "cmhv",
+    "stderr": {
+      "bytes": 350,
+      "name": "p0_r2_acr_stderr.txt",
+      "sha256": "cece92753d9ac1fd705cff361c87b1c1edfaee7cd3f4cc51ed76198bd3a7ca60"
+    },
+    "what_it_proves": "the exact host step that permanently stopped P0-R1 -- Azure CLI packing a context into a tar for upload -- now completes, because P0-R2 presents two files at a 40-character maximum native path instead of a repository tree at 265"
+  },
+  "prefix_preflight_is_not_vacuous": {
+    "model_operations_performed": 0,
+    "occupied_attempt_id": "p0r2-g1-blob-canary-20260815-0315",
+    "occupied_outcome": "REFUSED",
+    "outcome": "PASS",
+    "unused_attempt_id": "p0r2-g1-unused-probe-20260815-0315",
+    "unused_object_count": 0,
+    "unused_outcome": "PROVED_UNUSED",
+    "what_it_proves": "the same preflight that reported PROVED_UNUSED for an unused prefix refused the prefix once objects existed under it, so the absence proof the pilot depends on is a real test and not a function that always says yes",
+    "wrote_any_object_during_probe": false
+  },
+  "preflight_canary": {
+    "image_to_git_entries_checked": 33,
+    "image_to_git_mismatches": 0,
+    "model_operations_performed": 0,
+    "one_shot_envelope_consumed": false,
+    "outcome": "PASS",
+    "replay_gate_ran": false,
+    "run_id": "cmhu",
+    "transport_repairs_applied": 0,
+    "transport_roundtrip_bytes": 1048576,
+    "what_it_proves": "inside the pinned image, every operational module imports and identifies itself, all 33 image blobs equal the executable commit's Git blobs, and a 1 MiB payload survives the transport envelope byte-identically with no repair accepted"
+  },
+  "recovery_job_absence": {
+    "azure_outcome": "PROVED_ABSENT",
+    "created_updated_or_started": false,
+    "model_operations_performed": 0,
+    "name": "job-jspace-s3-p0r2-recover-g1",
+    "outcome": "PASS",
+    "what_it_proves": "the CPU recovery job does not exist yet either"
+  }
+}

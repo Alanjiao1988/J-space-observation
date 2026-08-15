@@ -1,0 +1,418 @@
+{
+  "azure": {
+    "container_apps_environment": "cae-jspace-observation-sea-vnet2",
+    "log_analytics_workspace": "8daddd67-1cfd-47c5-857e-af3c4a4e3787",
+    "managed_identity": "id-jspace-aca-acrpull-sea",
+    "registry_name": "acrjspaceobssea0708231738",
+    "resource_group": "rg-jspace-observation-sea",
+    "subscription_id": "943bacdf-8b6e-4e3a-8126-a149f623d32e",
+    "tenant_id": "16b3c013-d300-468d-ac64-7eda0820b6d3"
+  },
+  "canaries": {
+    "blob_data_access": {
+      "accepted_roles": [
+        "Storage Blob Data Contributor",
+        "Storage Blob Data Owner"
+      ],
+      "account": "stjspacefiles0709085305",
+      "azure_outcome": "PROVED_PRESENT",
+      "created_updated_or_started": false,
+      "granting_assignments": [
+        {
+          "role": "Storage Blob Data Contributor",
+          "scope": "/subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourceGroups/rg-jspace-observation-sea/providers/Microsoft.Storage/storageAccounts/stjspacefiles0709085305"
+        }
+      ],
+      "identity_name": "id-jspace-aca-acrpull-sea",
+      "model_operations_performed": 0,
+      "outcome": "PASS",
+      "previously_advertised_account": "stjspaceobssea0708231738",
+      "previously_advertised_account_outcome": "AMBIGUOUS",
+      "principal_id": "78d4348b-57eb-4fb9-aaa7-99148b303292",
+      "read_only": true,
+      "what_it_proves": "the pilot identity holds a blob DATA-plane role whose scope covers the account the transport actually writes to; the same query returns AMBIGUOUS rather than PRESENT for the account the job specification used to advertise, which does not exist"
+    },
+    "gpu_job_absence": {
+      "azure_outcome": "PROVED_ABSENT",
+      "created_updated_or_started": false,
+      "gpu_operations": 0,
+      "model_operations_performed": 0,
+      "name": "job-jspace-s3-p0r2-pilot-g1",
+      "outcome": "PASS",
+      "read_only": true,
+      "what_it_proves": "the bounded GPU pilot job does not exist, so nothing this stage did could have created or started it"
+    },
+    "identity_blob_canary": {
+      "artifact_manifest_written_last": true,
+      "attempt_id": "p0r2-g1-blob-canary-20260815-0315",
+      "execution": "job-jspace-s3-p0r2-canary-g1-2x3cpyj",
+      "job": "job-jspace-s3-p0r2-canary-g1",
+      "markers": [
+        "P0_R2_PRODUCTION_BACKEND_CONSTRUCTED=1",
+        "P0_R2_PRODUCTION_BLOB_BACKEND_CONSTRUCTIBLE=1",
+        "P0_R2_PREFIX_ABSENCE_PROVED=1",
+        "P0_R2_PREFIX_PREFLIGHT_PROVED_ABSENT=1",
+        "P0_R2_BLOB_ROUND_TRIP_PROVED=1",
+        "P0_R2_BLOB_CANARY_COMPLETE=1",
+        "P0_R2_PREFIX_OCCUPANCY_DETECTED=1",
+        "P0_R2_IDENTITY_CANARY_COMPLETE=1"
+      ],
+      "model_operations_performed": 0,
+      "object_bytes_round_tripped": 1048576,
+      "objects_written_and_read_back": [
+        "study3/p0_r2/g1/p0r2-g1-blob-canary-20260815-0315/p0_r2_canary_a.bin",
+        "study3/p0_r2/g1/p0r2-g1-blob-canary-20260815-0315/p0_r2_canary_b.bin",
+        "study3/p0_r2/g1/p0r2-g1-blob-canary-20260815-0315/p0_r2_canary_c.bin",
+        "study3/p0_r2/g1/p0r2-g1-blob-canary-20260815-0315/p0_r2_canary_d.bin"
+      ],
+      "one_shot_envelope_consumed": false,
+      "outcome": "PASS",
+      "recovered_byte_exact": true,
+      "replay_gate_ran": false,
+      "requests_accelerator": false,
+      "what_it_proves": "P0-R2's own transport bytes -- which are not byte-identical to P0-R1's and therefore cannot inherit P0-R1's receipts -- can construct the real managed-identity client, write through it, and read back byte-exact, from the only place the question can be asked: a VNet-integrated CPU-only Container Apps job",
+      "workload_profile": "Consumption"
+    },
+    "in_build_image_audit": {
+      "entries": 33,
+      "model_operations_performed": 0,
+      "outcome": "PASS",
+      "run_id": "cmht",
+      "what_it_proves": "the audit is not merely available at runtime: the build itself fails if the image does not carry exactly the executable commit's bytes, so an image that drifted could never have been pushed"
+    },
+    "job_absence_is_not_vacuous": {
+      "absent_names": [
+        "job-jspace-s3-p0r2-pilot-g1",
+        "job-jspace-s3-p0r2-recover-g1"
+      ],
+      "absent_outcome": "PROVED_ABSENT",
+      "gpu_operations": 0,
+      "model_operations_performed": 0,
+      "outcome": "PASS",
+      "present_job_requests_accelerator": false,
+      "present_job_workload_profile": "Consumption",
+      "present_name": "job-jspace-s3-p0r2-canary-g1",
+      "present_outcome": "PROVED_PRESENT",
+      "read_only": true,
+      "what_it_proves": "the same read-only query that reports PROVED_ABSENT for both bounded pilot jobs reports PROVED_PRESENT for the CPU-only canary job this stage did create, so the absence proofs are answers from Azure and not a query that cannot find anything"
+    },
+    "journal_self_check": {
+      "model_operations_performed": 0,
+      "objects": 4,
+      "outcome": "PASS",
+      "sequences": 4,
+      "what_it_proves": "the create-only journal writes monotonic immutable sequences and reads them back; a duplicate sequence number is a defect, never a retry"
+    },
+    "packing_canary": {
+      "attempt_id": "p0r2-g1-packing-canary-20260815-0257",
+      "authorizes_model_pilot": false,
+      "binding": {
+        "digest": "sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+        "executable_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+        "executable_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+        "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+        "ready_anchor": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+        "source_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+        "source_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+        "task_blob": "0ec0bfa0c2e3ebe882963564ef758b06bf890657",
+        "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v1.yaml"
+      },
+      "context_admission": {
+        "bytes": 1684,
+        "name": "admission.json",
+        "sha256": "b88c2c7bef355a848bcee785268326549d689250b9f6cc23ac137cd465f1480d"
+      },
+      "context_entry_count": 2,
+      "context_max_native_path_length": 40,
+      "context_sent_kib": 1.319,
+      "exit_code": 0,
+      "model_operations_performed": 0,
+      "one_shot_envelope_consumed": false,
+      "outcome": "PASS",
+      "p0_r1_fatal_native_path_length": 265,
+      "raw_log": {
+        "bytes": 7479,
+        "name": "p0_r2_acr_raw_log.txt",
+        "sha256": "da81a700914cf2fee84f1a507f0fcabad5744d24f205fa64ab5337106edb34e9"
+      },
+      "replay_gate_ran": false,
+      "run_id": "cmhv",
+      "stderr": {
+        "bytes": 350,
+        "name": "p0_r2_acr_stderr.txt",
+        "sha256": "cece92753d9ac1fd705cff361c87b1c1edfaee7cd3f4cc51ed76198bd3a7ca60"
+      },
+      "what_it_proves": "the exact host step that permanently stopped P0-R1 -- Azure CLI packing a context into a tar for upload -- now completes, because P0-R2 presents two files at a 40-character maximum native path instead of a repository tree at 265"
+    },
+    "prefix_preflight_is_not_vacuous": {
+      "model_operations_performed": 0,
+      "occupied_attempt_id": "p0r2-g1-blob-canary-20260815-0315",
+      "occupied_outcome": "REFUSED",
+      "outcome": "PASS",
+      "unused_attempt_id": "p0r2-g1-unused-probe-20260815-0315",
+      "unused_object_count": 0,
+      "unused_outcome": "PROVED_UNUSED",
+      "what_it_proves": "the same preflight that reported PROVED_UNUSED for an unused prefix refused the prefix once objects existed under it, so the absence proof the pilot depends on is a real test and not a function that always says yes",
+      "wrote_any_object_during_probe": false
+    },
+    "preflight_canary": {
+      "image_to_git_entries_checked": 33,
+      "image_to_git_mismatches": 0,
+      "model_operations_performed": 0,
+      "one_shot_envelope_consumed": false,
+      "outcome": "PASS",
+      "replay_gate_ran": false,
+      "run_id": "cmhu",
+      "transport_repairs_applied": 0,
+      "transport_roundtrip_bytes": 1048576,
+      "what_it_proves": "inside the pinned image, every operational module imports and identifies itself, all 33 image blobs equal the executable commit's Git blobs, and a 1 MiB payload survives the transport envelope byte-identically with no repair accepted"
+    },
+    "recovery_job_absence": {
+      "azure_outcome": "PROVED_ABSENT",
+      "created_updated_or_started": false,
+      "model_operations_performed": 0,
+      "name": "job-jspace-s3-p0r2-recover-g1",
+      "outcome": "PASS",
+      "what_it_proves": "the CPU recovery job does not exist yet either"
+    }
+  },
+  "caps": {
+    "max_model_evaluation_equivalents": 228,
+    "max_non_generative_prefills": 180,
+    "max_s4_generations": 12,
+    "max_smoke_prefills_before_extension": 60,
+    "possible_scored_rows": 210
+  },
+  "changes_only": "host-to-registry submission transport",
+  "counters": {
+    "checkpoint_downloads": 0,
+    "evidence_rows_added": 0,
+    "generations": 0,
+    "gpu_allocations": 0,
+    "gpu_jobs_created": 0,
+    "gpu_jobs_started": 0,
+    "model_operations_performed": 0,
+    "model_weight_loads": 0,
+    "prefills": 0,
+    "scored_rows": 0,
+    "tokenizer_constructions": 0
+  },
+  "delegated_scientific_modules": [
+    {
+      "bytes": 16189,
+      "git_blob": "c6df7d04a8e3baa4dfbd4f9959a399f649c9b5c1",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_authorization_v3.py",
+      "sha256": "73e6c52395aee93ebfb037634b71ef4420d7ac1bd1fe89a249295c87ef1e1f7d"
+    },
+    {
+      "bytes": 17530,
+      "git_blob": "5338f5704a67de2673cb8511ea40a692d8f8de79",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_counters.py",
+      "sha256": "da6aa9a8038ac5b53ea04cc8e31eaaf7f7aa5614cc600a8433b80e9369245d07"
+    },
+    {
+      "bytes": 17986,
+      "git_blob": "06d6cdcaf5b7c4e69276093f723128ee16808b91",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_eligibility.py",
+      "sha256": "e63e804b6590e8f1474af47374c1fc96e5b66cf6c1472c9c3b386fc62e6dc5ea"
+    },
+    {
+      "bytes": 31955,
+      "git_blob": "2f1b32b60e511eabffbb45c0b5ee2908e177ac0c",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_factorization.py",
+      "sha256": "fdc564c6a0e6fea17b39089f7c2f9403d401e47ad14bb6e8bb7880eed73d380e"
+    },
+    {
+      "bytes": 25958,
+      "git_blob": "8ae1ca1543c6a1f413084552a9820ab5957cc464",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_model_runner_v3.py",
+      "sha256": "a70790895e089f72b7fddff2101829c04a1f1d8553ffa698a79e9ef7c2406471"
+    },
+    {
+      "bytes": 6800,
+      "git_blob": "dcbc2fe2c089586eae76336ad0bca2501931682b",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_prefix_preflight_v3.py",
+      "sha256": "f2fe43249999cf64ab79474732c9b6a916099919b0f686022a317687080cdf20"
+    },
+    {
+      "bytes": 32006,
+      "git_blob": "28ac8f29ca69ce709a115b7c8affa8cde5fc9bde",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py",
+      "sha256": "072f29962e8472b54c16303fb04ca610cf3d85be14f973593b4a32dea49ad917"
+    },
+    {
+      "bytes": 13713,
+      "git_blob": "6af638bf0cdeb2e796aad0af13a55d38fa1a2284",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_recovery_v3.py",
+      "sha256": "2a3a51e33d04736e61f5acd7d763ca970ff763702b15c135369adeaac24f81ca"
+    },
+    {
+      "bytes": 32355,
+      "git_blob": "b3179819e9612253e5ea3e00f1f684e8543f0865",
+      "path": "studies/study3/pilot/p0_r1/p0_r1_replay_gate.py",
+      "sha256": "1755ee5e188021ce849dce18362365decc9f67d35d3602b037d4c1e7d7e4a15a"
+    }
+  ],
+  "executable_code": {
+    "commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+    "tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b"
+  },
+  "generation": 1,
+  "image": {
+    "base_digest": "sha256:e1adda95862ea14bf0397f496aa0ef9f7e5918e95b5436b0eb84ee3480d91e4c",
+    "build_run_id": "cmht",
+    "digest": "sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+    "image_root": "/opt/jspace/src",
+    "manifest_entries_sha256": "7a1f27e96dbaff239c544ec48692b05b5faafb25df4eef37500c2ee8f842d04e",
+    "reference": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+    "registry": "acrjspaceobssea0708231738.azurecr.io",
+    "repository": "j-space-observation-study3-p0-r2"
+  },
+  "immutable_sources": {
+    "governance_allowlist": [
+      ".gitattributes",
+      "README.md",
+      "docs/decision_log.md",
+      "docs/run_log.md",
+      "paper/artifact_index.csv",
+      "paper/methods_ledger.md",
+      "reports/current_status.md",
+      "studies/study3/NEXT_THREAD_HANDOFF.md",
+      "studies/study3/README.md",
+      "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+      "studies/study3/pilot/p0_r2/README.md",
+      "studies/study3/pilot/p0_r2/P0_R2_HANDOFF.md",
+      "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json",
+      "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.schema.json",
+      "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_v1.json",
+      "studies/study3/pilot/p0_r2/p0_r2_validation_receipts_v1.json",
+      "studies/study3/pilot/p0_r2/p0_r2_image_manifest_v1.json"
+    ],
+    "governance_allowlist_prefixes": [
+      "studies/study3/prompts/",
+      "studies/study3/pilot/p0/results/p0-r2/"
+    ],
+    "immutable_binding_keys": [
+      "executable_commit",
+      "executable_tree",
+      "task_path",
+      "task_blob",
+      "image",
+      "digest"
+    ]
+  },
+  "kind": "infrastructure-successor",
+  "namespace": {
+    "attempt_prefix": "p0r2-g1-",
+    "blob_prefix_root": "study3/p0_r2/g1/",
+    "gpu_job": "job-jspace-s3-p0r2-pilot-g1",
+    "recovery_job": "job-jspace-s3-p0r2-recover-g1",
+    "results_path": "studies/study3/pilot/p0/results/p0-r2/"
+  },
+  "predecessor": {
+    "bytes_modified_by_p0_r2": 0,
+    "reopened": false,
+    "stop_commit": "30806d793872a50e581d3252382b4a0ec2af3889",
+    "stop_state": "STOP_NO_MODEL_OPERATION",
+    "study": "study3-p0-r1"
+  },
+  "prohibitions": {
+    "checkpoint_downloaded_or_loaded": false,
+    "evidence_ledger_row_added": false,
+    "gpu_job_created_or_started": false,
+    "live_replay_run": false,
+    "model_weight_loaded": false,
+    "prefill_or_generation_performed": false,
+    "replay_envelope_consumed": false,
+    "tokenizer_constructed": false
+  },
+  "ready_commit_relationship": {
+    "anchor_contains_this_lock": true,
+    "anchor_is_proved_by_ancestry_not_self_reference": true,
+    "anchor_parent": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+    "governance_source": null,
+    "published_head": null
+  },
+  "schema_version": "study3-p0-r2-execution-lock-v1",
+  "science_is_unchanged_p0_r1_generation3": true,
+  "stage": "STUDY3-P0-R2",
+  "terminal_state": "STUDY3_P0_R2_EXECUTION_READY_AWAITING_REPLAY_GATE",
+  "transport": {
+    "attempt_id_prefix": "p0r2-g1-",
+    "canary_minimum_total_bytes": 1048576,
+    "envelope_version": "study3-p0-r2-transport-envelope-v1",
+    "max_line_bytes": 1024,
+    "max_projected_combined_replay_artifact_bytes": 524288,
+    "raw_chunk_bytes": 512,
+    "replay_artifacts": [
+      "p0_r2_replay_result.json",
+      "p0_r2_replay_receipt.json",
+      "p0_r2_replay_counters.json",
+      "P0_R2_REPLAY_DISPOSITION.md"
+    ],
+    "task_blob": "0ec0bfa0c2e3ebe882963564ef758b06bf890657",
+    "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v1.yaml"
+  },
+  "validation": {
+    "focused_suite": {
+      "acr_run_id": "cmj5",
+      "bound_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+      "bound_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+      "counts": {
+        "passed": 95
+      },
+      "dependency_closure": "requirements.lock.txt, as registered",
+      "dirty": 0,
+      "gpu_operations": 0,
+      "image": "python:3.11-bookworm",
+      "model_operations_performed": 0,
+      "one_shot_envelope_consumed": false,
+      "pytest_status": 0,
+      "raw_log_bytes": 4193,
+      "raw_log_sha256": "1501208e0be8d3f5bc2ea0922c0ab0653d91fba9f9a2d844c9877b8dd0d2ba03",
+      "replay_gate_ran": false,
+      "requirements_lock_sha256": "570775850eb31b5a8613295fa6e9099400670408a6ce3a162dc6d9159dda87bf",
+      "scope": "tests/test_study3_p0_r2_execution_closure.py"
+    },
+    "full_suite": {
+      "acr_run_id": "cmj3",
+      "baseline_commit": "22ae685b83daeaf3fb89057db0761f20644d9b7a",
+      "baseline_counts": {
+        "failed": 4,
+        "passed": 4625,
+        "skipped": 15
+      },
+      "baseline_dirty": 0,
+      "collection_errors": 0,
+      "dependency_closure": "requirements.lock.txt, as registered",
+      "executable_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+      "executable_counts": {
+        "failed": 4,
+        "passed": 4720,
+        "skipped": 15
+      },
+      "executable_dirty": 0,
+      "failures_fixed_by_this_change": [],
+      "failures_present_at_baseline_and_still_present": [
+        "FAILED tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+        "FAILED tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+        "FAILED tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+        "FAILED tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+      ],
+      "git_available": "git version 2.39.5",
+      "gpu_operations": 0,
+      "image": "python:3.11-bookworm",
+      "installed_closure_matches_lock": true,
+      "model_operations_performed": 0,
+      "net_new_passing_tests": 95,
+      "new_failures_introduced_by_this_change": [],
+      "one_shot_envelope_consumed": false,
+      "python_version": "3.11.16",
+      "raw_log_bytes": 5841,
+      "raw_log_sha256": "890ad0b275533bedd89413a4f183955897f5ef677a93e1083c7e3e4867651052",
+      "replay_gate_ran": false,
+      "requirements_lock_sha256": "570775850eb31b5a8613295fa6e9099400670408a6ce3a162dc6d9159dda87bf",
+      "scope": "full repository suite, differential"
+    }
+  }
+}
