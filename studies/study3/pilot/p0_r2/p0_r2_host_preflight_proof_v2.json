@@ -8,8 +8,8 @@
       "detail": {
         "fetch_attempted": true,
         "fetch_exit_code": 0,
-        "head": "ae18d34232a5740ef702648537368580509111a3",
-        "origin_main": "ae18d34232a5740ef702648537368580509111a3"
+        "head": "7ff6700621ca1db9bdf06d1d91a49e935e66e2b7",
+        "origin_main": "7ff6700621ca1db9bdf06d1d91a49e935e66e2b7"
       },
       "outcome": "PROVED"
     },
@@ -25,8 +25,8 @@
       "check": "exact_final_published_commit_and_tree",
       "detail": {
         "actual": {
-          "commit": "ae18d34232a5740ef702648537368580509111a3",
-          "tree": "e85f5973b707bc2a50f9de63d4106f7b8f9ceea5"
+          "commit": "7ff6700621ca1db9bdf06d1d91a49e935e66e2b7",
+          "tree": "11716dcf6c8b515983cf084a7fe9decd5583a4fa"
         },
         "expected": {
           "commit": null,
@@ -138,14 +138,14 @@
       "detail": {
         "committed": {
           "bytes": 158754,
-          "git_blob": "d1d706801a079d99794341d65173ae0fb2ace64b",
+          "git_blob": "0ce962477c1f58b6b3086511b1870ce79a128c9d",
           "mode": "100644",
           "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.json",
-          "sha256": "5c43372b8b8c629cba23c26fa64a02d1e615a8c7bff55611793db9fe8948fc88"
+          "sha256": "f3bf629998ffde67fc0e140539cfb4156db78533f90154cfe02f291e0a1be4f6"
         },
         "on_disk": {
           "bytes": 158754,
-          "sha256": "5c43372b8b8c629cba23c26fa64a02d1e615a8c7bff55611793db9fe8948fc88"
+          "sha256": "f3bf629998ffde67fc0e140539cfb4156db78533f90154cfe02f291e0a1be4f6"
         },
         "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.json"
       },
@@ -176,12 +176,12 @@
         "anchor_resolution": {
           "candidates_examined": 1,
           "carries_the_bound_lock_bytes": true,
-          "parent": "5e8550fa9a5299a49a3c006f92371cec3e3c75b9",
+          "parent": "24768c3a0fce9b7a0e6980fe62cb22a4bd8be74a",
           "source": "ancestry"
         },
         "changed_since_anchor": [],
-        "governance_commit": "ae18d34232a5740ef702648537368580509111a3",
-        "ready_anchor": "ae18d34232a5740ef702648537368580509111a3"
+        "governance_commit": "7ff6700621ca1db9bdf06d1d91a49e935e66e2b7",
+        "ready_anchor": "7ff6700621ca1db9bdf06d1d91a49e935e66e2b7"
       },
       "outcome": "PROVED"
     },
@@ -354,7 +354,7 @@
           "execution_identity": {
             "credential_kind": "managed-identity",
             "environment": "cae-jspace-observation-sea-vnet2",
-            "execution": "job-jspace-s3-p0r2-prefix-g1-qm5qp8k",
+            "execution": "job-jspace-s3-p0r2-prefix-g1-8dn6gx6",
             "host_can_reach_the_private_account": false,
             "job": "job-jspace-s3-p0r2-prefix-g1",
             "query_error_is_absence": false,
@@ -440,20 +440,20 @@
     {
       "check": "native_windows_packer_paths_within_budget",
       "detail": {
-        "context_dir": "C:\\p0r2\\pc3\\acrctx",
-        "context_max_native_path_chars": 40,
+        "context_dir": "C:\\p0r2\\live\\acrctx",
+        "context_max_native_path_chars": 41,
         "entries": [
           {
-            "chars": 40,
-            "path": "C:\\p0r2\\pc3\\acrctx\\context_manifest.json"
+            "chars": 41,
+            "path": "C:\\p0r2\\live\\acrctx\\context_manifest.json"
           },
           {
-            "chars": 28,
-            "path": "C:\\p0r2\\pc3\\acrctx\\task.yaml"
+            "chars": 29,
+            "path": "C:\\p0r2\\live\\acrctx\\task.yaml"
           },
           {
-            "chars": 18,
-            "path": "C:\\p0r2\\pc3\\acrctx"
+            "chars": 19,
+            "path": "C:\\p0r2\\live\\acrctx"
           }
         ],
         "limit": 240,
