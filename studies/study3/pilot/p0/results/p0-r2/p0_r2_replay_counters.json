@@ -1,0 +1,23 @@
+{
+  "acr_run_id": "cmjv",
+  "acr_run_ids_returned": 1,
+  "attempt_id": "p0r2-g1-live-20260815-0800",
+  "checkpoint_downloads": 0,
+  "checkpoint_loads": 0,
+  "evidence_rows_added": 0,
+  "generations": 0,
+  "gpu_allocations": 0,
+  "gpu_operations": 0,
+  "live_replay_invocations": 1,
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "one_shot_envelope_consumed": true,
+  "pilot_executions_started": 0,
+  "prefills": 0,
+  "replay_gate_invocations": 0,
+  "schema_version": "study3-p0-r2-replay-counters-v2",
+  "scored_rows": 0,
+  "stage": "STUDY3-P0-R2",
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0
+}

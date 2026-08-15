@@ -1,0 +1,97 @@
+{
+  "acr_run_id": "cmjv",
+  "attempt_id": "p0r2-g1-live-20260815-0800",
+  "authorizes_model_pilot": false,
+  "azure_cli_version": "2.83.0",
+  "binding": {
+    "digest": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+    "executable_commit": "c9344c52bfbacc4f2a24010fffa534a940104140",
+    "executable_tree": "bb27933ebf42e811ec7e5a42a13d65377cdd2f5c",
+    "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+    "ready_anchor": "7ff6700621ca1db9bdf06d1d91a49e935e66e2b7",
+    "source_commit": "a7fb84e56826d1cc9d412d9becd350f2043a48c9",
+    "source_tree": "44be5ee7ed6e7e45a3b49ac985e0d75545063f7c",
+    "task_blob": "93d9fa5710b057c71b3c6e297650b21c4c641912",
+    "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v2.yaml"
+  },
+  "canary_live_agreement": {
+    "canary_source_commit": "c9344c52bfbacc4f2a24010fffa534a940104140",
+    "immutable_identity_agrees": true,
+    "immutable_keys_checked": [
+      "executable_commit",
+      "executable_tree",
+      "task_path",
+      "task_blob",
+      "image",
+      "digest"
+    ],
+    "live_source_commit": null,
+    "schema_version": "study3-p0-r2-canary-live-agreement-v1",
+    "source_commit_difference_requires_governance_proof": true,
+    "source_commit_may_differ": true,
+    "stage": "STUDY3-P0-R2"
+  },
+  "checkpoint_downloads": 0,
+  "command": {
+    "argv": [
+      "az",
+      "acr",
+      "run",
+      "--registry",
+      "acrjspaceobssea0708231738",
+      "--subscription",
+      "943bacdf-8b6e-4e3a-8126-a149f623d32e",
+      "--file",
+      "task.yaml",
+      "--set",
+      "IMAGE=acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+      "--set",
+      "DIGEST=sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+      "--set",
+      "READY_ANCHOR=7ff6700621ca1db9bdf06d1d91a49e935e66e2b7",
+      "--set",
+      "MODE=live",
+      "--set",
+      "ATTEMPT=p0r2-g1-live-20260815-0800",
+      "C:\\p0r2\\live3\\acrctx"
+    ],
+    "context_argument": "C:\\p0r2\\live3\\acrctx",
+    "credentials_recorded": false,
+    "file_argument": "task.yaml"
+  },
+  "context_admission": {
+    "bytes": 2670,
+    "name": "context_admission.json",
+    "sha256": "4f9e45f0b2624842ea34c43aefcea394f80441046b8da313bdff58b4cc463989"
+  },
+  "exit_code": 1,
+  "failure_detail": null,
+  "governance_chain_proof": null,
+  "gpu_operations": 0,
+  "mode": "live",
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "one_shot_envelope_consumed": true,
+  "outcome": "STOP",
+  "packing_canary_receipt": {
+    "bytes": 2759,
+    "name": "p0_r2_acr_submission_receipt.json",
+    "sha256": "1ee09b4d12e475e716df580310b2a66eac1cbbe20dda61f020e793705e7be5ef"
+  },
+  "raw_log": {
+    "bytes": 7334,
+    "name": "p0_r2_acr_raw_log.txt",
+    "sha256": "48e87c66d011f5218b91e7e477d258e102c995160d43e8ae83b3f3f93e9b2364"
+  },
+  "replay_gate_ran": null,
+  "schema_version": "study3-p0-r2-acr-submission-receipt-v1",
+  "scored_rows": 0,
+  "stage": "STUDY3-P0-R2",
+  "stderr": {
+    "bytes": 370,
+    "name": "p0_r2_acr_stderr.txt",
+    "sha256": "b166c3d20c55c16f6ea2e896609b13a8b05af5d574b45d3342efdb13f555b64c"
+  },
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0
+}

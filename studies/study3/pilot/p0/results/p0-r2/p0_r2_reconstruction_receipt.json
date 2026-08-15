@@ -1,0 +1,45 @@
+{
+  "acr_run_id": "cmjv",
+  "attempt_id": "p0r2-g1-live-20260815-0800",
+  "canonical_success_artifacts_created": 0,
+  "checkpoint_downloads": 0,
+  "checksum_proved_repairs_applied": 0,
+  "decoder": "p0_r2_transport_v1.recover_with_report, strict decoder first",
+  "envelope_marker_count": 0,
+  "expected_artifact_names": [
+    "P0_R2_REPLAY_DISPOSITION.md",
+    "p0_r2_replay_counters.json",
+    "p0_r2_replay_receipt.json",
+    "p0_r2_replay_result.json"
+  ],
+  "generations": 0,
+  "gpu_operations": 0,
+  "image_to_git_audit_passed": true,
+  "lock_from_context_verified": true,
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "outcome": "NO_ARTIFACTS_EMITTED",
+  "prefills": 0,
+  "raw_log": {
+    "bytes": 7334,
+    "name": "p0_r2_replay_raw_log.txt",
+    "sha256": "48e87c66d011f5218b91e7e477d258e102c995160d43e8ae83b3f3f93e9b2364"
+  },
+  "reconstruction_refusal": "the captured log carries no study3-p0-r2-transport-envelope-v1 envelope",
+  "recovered_artifact_count": 0,
+  "recovered_artifact_names": [],
+  "refusal_marker": true,
+  "replay_complete_marker": false,
+  "replay_gate_ran": false,
+  "schema_version": "study3-p0-r2-reconstruction-receipt-v2",
+  "scored_rows": 0,
+  "stage": "STUDY3-P0-R2",
+  "stderr": {
+    "bytes": 370,
+    "name": "p0_r2_replay_stderr.txt",
+    "sha256": "b166c3d20c55c16f6ea2e896609b13a8b05af5d574b45d3342efdb13f555b64c"
+  },
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0,
+  "why_no_success_artifacts": "recovered bytes do not prove them; the gate never emitted an envelope"
+}

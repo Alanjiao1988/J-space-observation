@@ -1,0 +1,184 @@
+2026/08/15 14:25:01 Downloading source code...
+2026/08/15 14:25:01 Finished downloading source code
+2026/08/15 14:25:02 Alias support enabled for version >= 1.1.0, please see https://aka.ms/acr/tasks/task-aliases for more information.
+2026/08/15 14:25:02 Creating Docker network: acb_default_network, driver: 'bridge'
+2026/08/15 14:25:02 Successfully set up Docker network: acb_default_network
+2026/08/15 14:25:02 Setting up Docker configuration...
+2026/08/15 14:25:02 Successfully set up Docker configuration
+2026/08/15 14:25:02 Logging in to registry: acrjspaceobssea0708231738.azurecr.io
+2026/08/15 14:25:03 Successfully logged into acrjspaceobssea0708231738.azurecr.io
+2026/08/15 14:25:03 Executing step ID: replay. Timeout(sec): 3600, Working directory: '', Network: 'acb_default_network'
+2026/08/15 14:25:03 Launching container with name: replay
+Unable to find image 'acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58' locally
+acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58: Pulling from j-space-observation-study3-p0-r2
+762bedf4b1b7: Pulling fs layer
+7ed37ffdc5d1: Pulling fs layer
+000d344b13cf: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+55a3e0099b43: Pulling fs layer
+298c62bc00a6: Pulling fs layer
+378621e7063f: Pulling fs layer
+3b6b30072967: Pulling fs layer
+570810cd0bbc: Pulling fs layer
+eb607ae5820b: Pulling fs layer
+8bf1455554ac: Pulling fs layer
+ef394ad584c0: Pulling fs layer
+1b5d1c5655b9: Pulling fs layer
+7e2f955a5334: Pulling fs layer
+230de9af5e76: Pulling fs layer
+a8a52cec0cc6: Pulling fs layer
+ed7bdbbfca36: Pulling fs layer
+34cf24fce3e0: Pulling fs layer
+dd68808d4742: Pulling fs layer
+f6ffa7ccbb5b: Pulling fs layer
+9eb8e236f7fe: Pulling fs layer
+7f83c64d9725: Pulling fs layer
+13b359f9a676: Pulling fs layer
+d23841f09b01: Pulling fs layer
+de46bd254e0e: Pulling fs layer
+93d97918c218: Pulling fs layer
+17477c486c61: Pulling fs layer
+4f4fb700ef54: Waiting
+55a3e0099b43: Waiting
+298c62bc00a6: Waiting
+378621e7063f: Waiting
+3b6b30072967: Waiting
+570810cd0bbc: Waiting
+eb607ae5820b: Waiting
+8bf1455554ac: Waiting
+ef394ad584c0: Waiting
+1b5d1c5655b9: Waiting
+7e2f955a5334: Waiting
+230de9af5e76: Waiting
+a8a52cec0cc6: Waiting
+ed7bdbbfca36: Waiting
+34cf24fce3e0: Waiting
+dd68808d4742: Waiting
+f6ffa7ccbb5b: Waiting
+9eb8e236f7fe: Waiting
+7f83c64d9725: Waiting
+13b359f9a676: Waiting
+d23841f09b01: Waiting
+de46bd254e0e: Waiting
+93d97918c218: Waiting
+17477c486c61: Waiting
+7ed37ffdc5d1: Verifying Checksum
+7ed37ffdc5d1: Download complete
+762bedf4b1b7: Verifying Checksum
+762bedf4b1b7: Download complete
+4f4fb700ef54: Verifying Checksum
+4f4fb700ef54: Download complete
+55a3e0099b43: Verifying Checksum
+55a3e0099b43: Download complete
+298c62bc00a6: Verifying Checksum
+298c62bc00a6: Download complete
+3b6b30072967: Verifying Checksum
+3b6b30072967: Download complete
+378621e7063f: Verifying Checksum
+378621e7063f: Download complete
+eb607ae5820b: Verifying Checksum
+eb607ae5820b: Download complete
+8bf1455554ac: Verifying Checksum
+8bf1455554ac: Download complete
+ef394ad584c0: Verifying Checksum
+ef394ad584c0: Download complete
+570810cd0bbc: Verifying Checksum
+570810cd0bbc: Download complete
+1b5d1c5655b9: Verifying Checksum
+1b5d1c5655b9: Download complete
+7e2f955a5334: Verifying Checksum
+7e2f955a5334: Download complete
+230de9af5e76: Verifying Checksum
+230de9af5e76: Download complete
+a8a52cec0cc6: Verifying Checksum
+a8a52cec0cc6: Download complete
+ed7bdbbfca36: Verifying Checksum
+ed7bdbbfca36: Download complete
+34cf24fce3e0: Verifying Checksum
+34cf24fce3e0: Download complete
+dd68808d4742: Verifying Checksum
+dd68808d4742: Download complete
+f6ffa7ccbb5b: Verifying Checksum
+f6ffa7ccbb5b: Download complete
+9eb8e236f7fe: Verifying Checksum
+9eb8e236f7fe: Download complete
+7f83c64d9725: Verifying Checksum
+7f83c64d9725: Download complete
+762bedf4b1b7: Pull complete
+7ed37ffdc5d1: Pull complete
+d23841f09b01: Verifying Checksum
+d23841f09b01: Download complete
+13b359f9a676: Verifying Checksum
+13b359f9a676: Download complete
+93d97918c218: Verifying Checksum
+93d97918c218: Download complete
+de46bd254e0e: Verifying Checksum
+de46bd254e0e: Download complete
+17477c486c61: Verifying Checksum
+17477c486c61: Download complete
+
+000d344b13cf: Verifying Checksum
+000d344b13cf: Download complete
+000d344b13cf: Pull complete
+4f4fb700ef54: Pull complete
+55a3e0099b43: Pull complete
+298c62bc00a6: Pull complete
+378621e7063f: Pull complete
+3b6b30072967: Pull complete
+570810cd0bbc: Pull complete
+eb607ae5820b: Pull complete
+8bf1455554ac: Pull complete
+ef394ad584c0: Pull complete
+1b5d1c5655b9: Pull complete
+7e2f955a5334: Pull complete
+230de9af5e76: Pull complete
+a8a52cec0cc6: Pull complete
+ed7bdbbfca36: Pull complete
+34cf24fce3e0: Pull complete
+dd68808d4742: Pull complete
+f6ffa7ccbb5b: Pull complete
+9eb8e236f7fe: Pull complete
+7f83c64d9725: Pull complete
+13b359f9a676: Pull complete
+d23841f09b01: Pull complete
+de46bd254e0e: Pull complete
+93d97918c218: Pull complete
+17477c486c61: Pull complete
+Digest: sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58
+Status: Downloaded newer image for acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58
+P0_R2_STAGE=STUDY3-P0-R2
+P0_R2_ATTEMPT=p0r2-g1-live-20260815-0800
+P0_R2_IMAGE_DIGEST=sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58
+{
+  "checked_count": 44,
+  "entries_sha256": "ed0aac75034b44e29a95942b3ebb3d6d52e120fcbc5f2e1555b0de55e67df6a3",
+  "executable_commit": "c9344c52bfbacc4f2a24010fffa534a940104140",
+  "executable_tree": "bb27933ebf42e811ec7e5a42a13d65377cdd2f5c",
+  "mismatches": 0,
+  "model_operations_performed": 0,
+  "outcome": "IMAGE_MATCHES_GIT",
+  "schema_version": "study3-p0-r2-image-manifest-v2",
+  "stage": "STUDY3-P0-R2"
+}
+P0_R2_IMAGE_TO_GIT_AUDIT_V2_COMPLETE=1
+P0_R2_IMAGE_TO_GIT_AUDIT_V2_COMPLETE=1
+P0_R2_LOCK_FROM_CONTEXT_BYTES=158754
+P0_R2_LOCK_FROM_CONTEXT_SHA256=f3bf629998ffde67fc0e140539cfb4156db78533f90154cfe02f291e0a1be4f6
+P0_R2_LOCK_FROM_CONTEXT_PATH=studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.json
+P0_R2_LOCK_FROM_CONTEXT_VERIFIED=1
+
+ImdsCredential.get_token failed: No token received.
+ManagedIdentityCredential.get_token failed: No token received.
+ImdsCredential.get_token failed: No token received.
+ManagedIdentityCredential.get_token failed: No token received.
+ImdsCredential.get_token failed: No token received.
+ManagedIdentityCredential.get_token failed: No token received.
+ImdsCredential.get_token failed: No token received.
+ManagedIdentityCredential.get_token failed: No token received.
+Unexpected return type <class 'str'> from ContentDecodePolicy.deserialize_from_http_generics.
+P0_R2_PREFIX_PREFLIGHT_REFUSED=1 the private listing failed (Bad Gateway
+ErrorCode:None); a query error is never an absence
+2026/08/15 14:30:45 Container failed during run: replay. No retries remaining.
+failed to run step ID: replay: exit status 3
+
+Run ID: cmjv failed after 5m45s. Error: failed during run, err: exit status 1
