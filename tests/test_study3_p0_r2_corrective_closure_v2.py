@@ -411,6 +411,78 @@ def _preflight(tmp_path, lock):
     return HOST.Preflight(REPO_ROOT, lock_path)
 
 
+def test_the_admission_gate_resolves_the_anchor_by_ancestry(tmp_path):
+    """The same defect as the preflight's, found in a second module.
+
+    Both modules ask 'which commit is the ready anchor?'. The lock answers by
+    recording the anchor's parent, because a commit cannot carry its own hash.
+    A module that reads a ready_anchor_commit field gets None and refuses -- and
+    that is exactly how the sealed closure failed its own admission gate after
+    the identical bug had already been fixed in the host preflight.
+    """
+    import p0_r2_phase_b_admission_v2 as GATE
+
+    anchor, resolution = GATE._resolve_ready_anchor(
+        REPO_ROOT, {"ready_commit_relationship": {}}, b"{}")
+    assert anchor is None
+    assert resolution["source"] == "unresolvable"
+
+    anchor, resolution = GATE._resolve_ready_anchor(
+        REPO_ROOT,
+        {"ready_commit_relationship": {"ready_anchor_commit": "a" * 40}},
+        b"{}")
+    assert anchor == "a" * 40
+    assert resolution["source"] == "declared"
+
+
+def test_the_admission_gate_registers_all_twenty_eight_conditions():
+    import p0_r2_phase_b_admission_v2 as GATE
+
+    assert len(GATE.CONDITION_ORDER) == 28
+    assert len(set(GATE.CONDITION_ORDER)) == 28
+    identity = GATE.implementation_identity()
+    assert identity["condition_count"] == 28
+    assert identity["override_available"] is False
+    assert identity["caller_may_supply_a_condition_value"] is False
+    assert identity["underived_condition_is_false"] is True
+
+
+def test_an_underived_condition_is_false_not_unknown(tmp_path):
+    import p0_r2_phase_b_admission_v2 as GATE
+
+    lock_path = tmp_path / "lock.json"
+    lock_path.write_text("{}", encoding="utf-8")
+    gate = GATE.Gate(REPO_ROOT, lock_path)
+    gate.set("worktree_is_clean", True, {})
+    document = gate.document()
+    assert document["phase_b_authorized"] is False
+    assert len(document["underived_conditions"]) == 27
+    for name in document["underived_conditions"]:
+        assert document["conditions"][name]["value"] is False
+
+
+def test_the_zero_overlap_proof_reports_the_intersection(tmp_path):
+    import p0_r2_phase_b_admission_v2 as GATE
+
+    lock = {
+        "image_executable": {"files": [{"path": "a.py"}, {"path": "b.py"}]},
+        "immutable_sources": [{"path": "science.py"}],
+        "job_specifications": [{"path": "job.yaml"}],
+        "transport": {"task_path": "task.yaml"},
+        "image": {"digest": "sha256:" + "e" * 64},
+    }
+    clean = GATE.prove_image_zero_overlap(REPO_ROOT, lock, ["host_tool.py"])
+    assert clean["zero_overlap"] is True
+    assert clean["digest_may_be_retained"] is True
+    assert clean["overlap"] == []
+
+    dirty = GATE.prove_image_zero_overlap(REPO_ROOT, lock,
+                                          ["host_tool.py", "b.py"])
+    assert dirty["zero_overlap"] is False
+    assert dirty["digest_may_be_retained"] is False
+    assert dirty["overlap"] == ["b.py"]
+
+
 def test_the_host_preflight_resolves_the_anchor_by_ancestry_not_by_a_field(
         tmp_path):
     """The lock cannot record its own commit, so the preflight must resolve it.

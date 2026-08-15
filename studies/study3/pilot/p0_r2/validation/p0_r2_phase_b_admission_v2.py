@@ -94,6 +94,79 @@ def _git(root, *args, check=True):
     return done.stdout.strip(), done.returncode
 
 
+def _resolve_ready_anchor(root, lock, lock_raw):
+    """Resolve the anchor by ancestry, exactly as the host preflight does.
+
+    The lock records the anchor's *parent*, because a commit cannot carry its
+    own hash. Reading a ``ready_anchor_commit`` field therefore yields None and
+    refuses -- which is precisely how this defect was found, after the same
+    defect had already been found and fixed in the host preflight. Two modules
+    asking the same question must answer it the same way.
+    """
+    relationship = lock.get("ready_commit_relationship") or {}
+    declared = relationship.get("ready_anchor_commit")
+    if declared:
+        return declared, {"source": "declared"}
+    parent = relationship.get("ready_anchor_parent")
+    if not parent:
+        return None, {"source": "unresolvable",
+                      "reason": "the lock records neither a ready anchor nor "
+                                "its parent"}
+    out, code = _git(root, "rev-list", "--first-parent", "--reverse",
+                     "%s..HEAD" % parent, check=False)
+    candidates = [line.strip() for line in out.splitlines() if line.strip()]
+    lock_path = (lock.get("self") or {}).get("path") or CB2.LOCK_PATH
+    expected = _sha256(lock_raw)
+    for candidate in candidates:
+        try:
+            blob = CB2.blob_identity(root, candidate, lock_path)
+        except CB2.ClosureBindingDefect:
+            continue
+        if blob["sha256"] == expected:
+            return candidate, {"source": "ancestry", "parent": parent,
+                               "carries_the_bound_lock_bytes": True}
+    return None, {"source": "ancestry", "parent": parent,
+                  "reason": "no first-parent descendant carries the bound lock "
+                            "bytes", "candidates": candidates[:8]}
+
+
+def prove_image_zero_overlap(root, lock, changed_paths) -> dict:
+    """Prove a host-side change touches no image-bound or runtime path.
+
+    A8 permits retaining an existing digest when only host-side validation or
+    governance tooling changes, but only after a *mechanical* zero-overlap
+    proof. This is that proof: it compares the changed set against every path
+    the image manifest binds, the task, the job specifications and the
+    immutable scientific sources, and reports the intersection rather than an
+    assurance that there isn't one.
+    """
+    image = lock.get("image_executable") or {}
+    bound = {entry["path"] for entry in (image.get("files") or [])
+             if isinstance(entry, dict) and entry.get("path")}
+    bound |= {entry["path"] for entry in (lock.get("immutable_sources") or [])
+              if isinstance(entry, dict) and entry.get("path")}
+    bound |= {entry["path"] for entry in (lock.get("job_specifications") or [])
+              if isinstance(entry, dict) and entry.get("path")}
+    transport = lock.get("transport") or {}
+    if transport.get("task_path"):
+        bound.add(transport["task_path"])
+    changed = sorted(set(changed_paths))
+    overlap = sorted(set(changed) & bound)
+    return {
+        "schema_version": "study3-p0-r2-image-zero-overlap-proof-v2",
+        "stage": STAGE,
+        "changed_paths": changed,
+        "changed_path_count": len(changed),
+        "image_bound_path_count": len(bound),
+        "overlap": overlap,
+        "overlap_count": len(overlap),
+        "zero_overlap": not overlap,
+        "digest_may_be_retained": not overlap,
+        "image_digest": (lock.get("image") or {}).get("digest"),
+        "model_operations_performed": 0,
+    }
+
+
 class Gate:
     def __init__(self, root, lock_path):
         self.root = Path(root).resolve()
@@ -162,39 +235,51 @@ class Gate:
         self.set("v1_p0_r2_closure_is_preserved_but_superseded_and_nonlaunchable",
                  preserved, detail)
 
-        anchor = (lock.get("ready_commit_relationship") or {}).get(
-            "ready_anchor_commit")
+        anchor, resolution = _resolve_ready_anchor(root, lock, self.lock_raw)
+        head_commit = head
         chain_ok = False
-        chain_detail = {}
-        try:
-            proof = CB2.prove_v2_chain(
-                root=root, lock=lock, ready_anchor=anchor,
-                governance_commit=head, require_head=True, require_clean=True,
-                lock_identity={"path": (lock.get("self") or {}).get("path"),
-                               "bytes": len(self.lock_raw),
-                               "sha256": _sha256(self.lock_raw)})
-            chain_ok = proof["outcome"] == "GOVERNANCE_CHAIN_PROVED"
-            chain_detail = {"ancestry": proof["ancestry_proved"],
-                            "changed_since_anchor": proof["changed_since_anchor"]}
-            self.set("no_disallowed_path_changed_after_the_v2_anchor", True,
-                     {"classification": proof["post_anchor_classification"]})
-            self.set("the_exact_active_lock_schema_image_and_task_all_verify",
-                     bool(proof.get("execution_lock"))
-                     and proof["task_object"]["git_blob"]
-                     == (lock.get("transport") or {}).get("task_blob")
-                     and (proof.get("image") or {}).get("digest")
-                     == (lock.get("image") or {}).get("digest"),
-                     {"execution_lock": proof.get("execution_lock"),
-                      "task_object": proof["task_object"],
-                      "image": proof.get("image")})
-        except CB2.ClosureBindingDefect as exc:
-            chain_detail = {"refusal": str(exc)}
+        chain_detail = {"ready_anchor": anchor, "anchor_resolution": resolution}
+        if not anchor:
+            self.set("the_v2_governance_chain_proves_successfully", False,
+                     chain_detail)
             self.set("no_disallowed_path_changed_after_the_v2_anchor", False,
-                     {"reason": "the chain proof refused"})
+                     {"reason": "the ready anchor could not be resolved"})
             self.set("the_exact_active_lock_schema_image_and_task_all_verify",
-                     False, {"reason": "the chain proof refused"})
-        self.set("the_v2_governance_chain_proves_successfully", chain_ok,
-                 chain_detail)
+                     False, {"reason": "the ready anchor could not be resolved"})
+        else:
+            try:
+                proof = CB2.prove_v2_chain(
+                    root=root, lock=lock, ready_anchor=anchor,
+                    governance_commit=head, require_head=True,
+                    require_clean=True,
+                    lock_identity={"path": (lock.get("self") or {}).get("path"),
+                                   "bytes": len(self.lock_raw),
+                                   "sha256": _sha256(self.lock_raw)})
+                chain_ok = proof["outcome"] == "GOVERNANCE_CHAIN_PROVED"
+                chain_detail.update({
+                    "ancestry": proof["ancestry_proved"],
+                    "changed_since_anchor": proof["changed_since_anchor"]})
+                self.set("no_disallowed_path_changed_after_the_v2_anchor", True,
+                         {"classification": proof["post_anchor_classification"]})
+                self.set(
+                    "the_exact_active_lock_schema_image_and_task_all_verify",
+                    bool(proof.get("execution_lock"))
+                    and proof["task_object"]["git_blob"]
+                    == (lock.get("transport") or {}).get("task_blob")
+                    and (proof.get("image") or {}).get("digest")
+                    == (lock.get("image") or {}).get("digest"),
+                    {"execution_lock": proof.get("execution_lock"),
+                     "task_object": proof["task_object"],
+                     "image": proof.get("image")})
+            except CB2.ClosureBindingDefect as exc:
+                chain_detail["refusal"] = str(exc)
+                self.set("no_disallowed_path_changed_after_the_v2_anchor", False,
+                         {"reason": "the chain proof refused"})
+                self.set(
+                    "the_exact_active_lock_schema_image_and_task_all_verify",
+                    False, {"reason": "the chain proof refused"})
+            self.set("the_v2_governance_chain_proves_successfully", chain_ok,
+                     chain_detail)
 
         self.set("the_true_host_side_preflight_passes",
                  (preflight_report or {}).get("outcome")

@@ -1,0 +1,16 @@
+{
+  "changed_path_count": 2,
+  "changed_paths": [
+    "studies/study3/pilot/p0_r2/validation/p0_r2_phase_b_admission_v2.py",
+    "tests/test_study3_p0_r2_corrective_closure_v2.py"
+  ],
+  "digest_may_be_retained": true,
+  "image_bound_path_count": 48,
+  "image_digest": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58",
+  "model_operations_performed": 0,
+  "overlap": [],
+  "overlap_count": 0,
+  "schema_version": "study3-p0-r2-image-zero-overlap-proof-v2",
+  "stage": "STUDY3-P0-R2",
+  "zero_overlap": true
+}
