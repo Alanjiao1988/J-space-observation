@@ -1,9 +1,8 @@
 {
   "accepted_differential_run_ids": [
-    "cmjh",
-    "cmjk"
+    "cmjn"
   ],
-  "acr_run_id": "cmjk",
+  "acr_run_id": "cmjn",
   "baseline_collection_errors": 0,
   "baseline_commit": "005aa087e40c641affc8ca537e6c6a075bcbfe98",
   "baseline_counts": {
@@ -25,11 +24,11 @@
   "checkpoint_downloads": 0,
   "compared_by_node_id_only": false,
   "corrected_collection_errors": 0,
-  "corrected_commit": "609310b7b4bfae13c81a66f4809ecf891208b5fd",
+  "corrected_commit": "74616831543ab73aee7c38ff8e4632ece662faae",
   "corrected_counts": {
     "error": 0,
     "failed": 4,
-    "passed": 4787,
+    "passed": 4789,
     "skipped": 15,
     "xfailed": 0,
     "xpassed": 0
@@ -48,7 +47,7 @@
   "installed_closure_matches_lock": true,
   "model_operations_performed": 0,
   "model_weight_loads": 0,
-  "net_new_passing_tests": 67,
+  "net_new_passing_tests": 69,
   "new_failure_count": 0,
   "new_failures": [],
   "one_shot_envelope_consumed": false,
@@ -107,6 +106,16 @@
     }
   ],
   "superseded_differential_run_ids": [
+    {
+      "outcome": "PASS",
+      "reason": "superseded: ran at an intermediate corrected head before the validator drift-separation fix",
+      "run_id": "cmjh"
+    },
+    {
+      "outcome": "PASS",
+      "reason": "superseded: ran at an intermediate closure base before the validator drift-separation fix",
+      "run_id": "cmjk"
+    },
     {
       "outcome": "REFUSED",
       "reason": "a shared failure signature disagreed only on the checkout root inside PosixPath('/workspace/base') versus PosixPath('/workspace/head'); the normalizer ended the checkout root at /, whitespace, : or end of line and therefore missed a closing quote",
