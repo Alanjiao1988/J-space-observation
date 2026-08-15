@@ -82,6 +82,12 @@ python3 /workspace/p0_r2_normalize_signatures_v2.py \
     --summarize "/workspace/${LABEL}.capture.json" \
     --out "/workspace/${LABEL}.signatures.json" > /dev/null
 
+# Retain the complete normalized signature document in the run log. A sha256
+# proves two runs agree; only the text says what the failure actually is.
+echo "===== ${LABEL} COMPLETE NORMALIZED SIGNATURES BEGIN ====="
+cat "/workspace/${LABEL}.signatures.json"
+echo "===== ${LABEL} COMPLETE NORMALIZED SIGNATURES END ====="
+
 python3 - "$LABEL" "$STATUS" <<'PY'
 import json, sys
 label, status = sys.argv[1], int(sys.argv[2])

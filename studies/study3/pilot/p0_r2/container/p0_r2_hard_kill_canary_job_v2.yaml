@@ -1,0 +1,72 @@
+# Study 3 P0-R2 hard-kill / open-admission CPU recovery canary job (A6).
+#
+# This is the job shape the corrective closure creates and starts exactly once.
+# It reproduces, for P0-R2, the hard-kill CPU recovery canary that P0-R1
+# recorded and P0-R2 generation 1 did not.
+#
+# It is CPU-only and requests no accelerator. It uses managed identity against
+# the private results account, writes only synthetic bytes to a disjoint attempt
+# prefix, and never constructs a tokenizer, downloads a checkpoint, loads a
+# model weight, allocates a GPU or performs any model operation.
+#
+# replicaRetryLimit is 0 because a retried canary would silently replace the
+# very evidence it exists to produce.
+apiVersion: 2024-03-01
+kind: containerapp-job
+name: job-jspace-s3-p0r2-hardkill-g1
+resourceGroup: rg-jspace-observation-sea
+environmentId: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourceGroups/rg-jspace-observation-sea/providers/Microsoft.App/managedEnvironments/cae-jspace-observation-sea-vnet2
+workloadProfileName: Consumption
+identity:
+  type: UserAssigned
+  userAssignedIdentities:
+    - /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+configuration:
+  triggerType: Manual
+  replicaTimeout: 1800
+  replicaRetryLimit: 0
+  manualTriggerConfig:
+    parallelism: 1
+    replicaCompletionCount: 1
+  registries:
+    - server: acrjspaceobssea0708231738.azurecr.io
+      identity: /subscriptions/943bacdf-8b6e-4e3a-8126-a149f623d32e/resourcegroups/rg-jspace-observation-sea/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jspace-aca-acrpull-sea
+template:
+  containers:
+    - name: hardkill
+      image: DIGEST_PINNED_AT_CREATION
+      command:
+        - /usr/local/bin/p0_r2_hard_kill_canary_v2.sh
+      resources:
+        cpu: 2.0
+        memory: 4Gi
+      env:
+        - name: P0_R2_ATTEMPT
+          value: ATTEMPT_ID_AT_CREATION
+        - name: P0_R2_SRC
+          value: /opt/jspace/src
+        - name: P0_R2_RUNTIME_ROOT
+          value: /workspace/runtime
+        - name: P0_R2_HARD_KILL_ROWS
+          value: "2"
+boundary:
+  stage: STUDY3-P0-R2
+  cpu_only: true
+  accelerator_requested: false
+  workload_profile: Consumption
+  replica_retry_limit: 0
+  credential: managed-identity
+  payload: synthetic-only
+  disjoint_attempt_prefix: true
+  tokenizer_constructions: 0
+  tokenizer_encodes: 0
+  checkpoint_downloads: 0
+  model_weight_loads: 0
+  prefills: 0
+  generations: 0
+  scored_rows: 0
+  gpu_allocations: 0
+  model_operations_performed: 0
+  replay_gate_invoked: false
+  one_shot_envelope_opened: false
+  waivable: false

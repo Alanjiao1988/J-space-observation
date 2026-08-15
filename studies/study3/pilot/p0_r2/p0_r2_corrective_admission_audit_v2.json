@@ -1,0 +1,389 @@
+{
+  "azure_mutations_performed": 0,
+  "bound_state": {
+    "executable_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+    "executable_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+    "head": "005aa087e40c641affc8ca537e6c6a075bcbfe98",
+    "head_tree": "9d3610a85d5fb35dd8a34544296b81c8f5e77f28",
+    "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+    "p0_r1_stop_commit": "30806d793872a50e581d3252382b4a0ec2af3889",
+    "ready_anchor": "7fd5fe57707461fcf70bfc9ab00b707b3c44ef71",
+    "task_blob": "0ec0bfa0c2e3ebe882963564ef758b06bf890657"
+  },
+  "checkpoint_downloads": 0,
+  "defects": {
+    "d1_final_validation_paths_changed_after_anchor": {
+      "changed_path_count": 10,
+      "changed_paths_since_anchor": [
+        ".gitattributes",
+        "studies/study3/pilot/p0_r2/P0_R2_HANDOFF.md",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_focused_v1.sh",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_checkout_v3.sh",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_checkout_v4.sh",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_task_v3.yaml",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_v5.sh",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_identity_canary_job_v1.yaml",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_validation_focused_suite_v1.json",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_validation_full_suite_v1.json"
+      ],
+      "confirmed": true,
+      "extensions": [
+        ".json",
+        ".sh",
+        ".yaml"
+      ],
+      "validation_path_count": 8,
+      "validation_paths": [
+        "studies/study3/pilot/p0_r2/validation/p0_r2_focused_v1.sh",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_checkout_v3.sh",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_checkout_v4.sh",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_task_v3.yaml",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_v5.sh",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_identity_canary_job_v1.yaml",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_validation_focused_suite_v1.json",
+        "studies/study3/pilot/p0_r2/validation/p0_r2_validation_full_suite_v1.json"
+      ]
+    },
+    "d2_validation_paths_not_accepted_by_published_allowlist": {
+      "confirmed": true,
+      "per_path": [
+        {
+          "accepted_by_published_allowlist": true,
+          "in_allowlist": true,
+          "in_allowlist_prefix": false,
+          "path": ".gitattributes"
+        },
+        {
+          "accepted_by_published_allowlist": true,
+          "in_allowlist": true,
+          "in_allowlist_prefix": false,
+          "path": "studies/study3/pilot/p0_r2/P0_R2_HANDOFF.md"
+        },
+        {
+          "accepted_by_published_allowlist": false,
+          "in_allowlist": false,
+          "in_allowlist_prefix": false,
+          "path": "studies/study3/pilot/p0_r2/validation/p0_r2_focused_v1.sh"
+        },
+        {
+          "accepted_by_published_allowlist": false,
+          "in_allowlist": false,
+          "in_allowlist_prefix": false,
+          "path": "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_checkout_v3.sh"
+        },
+        {
+          "accepted_by_published_allowlist": false,
+          "in_allowlist": false,
+          "in_allowlist_prefix": false,
+          "path": "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_checkout_v4.sh"
+        },
+        {
+          "accepted_by_published_allowlist": false,
+          "in_allowlist": false,
+          "in_allowlist_prefix": false,
+          "path": "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_task_v3.yaml"
+        },
+        {
+          "accepted_by_published_allowlist": false,
+          "in_allowlist": false,
+          "in_allowlist_prefix": false,
+          "path": "studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_v5.sh"
+        },
+        {
+          "accepted_by_published_allowlist": false,
+          "in_allowlist": false,
+          "in_allowlist_prefix": false,
+          "path": "studies/study3/pilot/p0_r2/validation/p0_r2_identity_canary_job_v1.yaml"
+        },
+        {
+          "accepted_by_published_allowlist": false,
+          "in_allowlist": false,
+          "in_allowlist_prefix": false,
+          "path": "studies/study3/pilot/p0_r2/validation/p0_r2_validation_focused_suite_v1.json"
+        },
+        {
+          "accepted_by_published_allowlist": false,
+          "in_allowlist": false,
+          "in_allowlist_prefix": false,
+          "path": "studies/study3/pilot/p0_r2/validation/p0_r2_validation_full_suite_v1.json"
+        }
+      ],
+      "published_allowlist": [
+        ".gitattributes",
+        "README.md",
+        "docs/decision_log.md",
+        "docs/run_log.md",
+        "paper/artifact_index.csv",
+        "paper/methods_ledger.md",
+        "reports/current_status.md",
+        "studies/study3/NEXT_THREAD_HANDOFF.md",
+        "studies/study3/README.md",
+        "studies/study3/RESEARCH_CHARTER_DRAFT.md",
+        "studies/study3/pilot/p0_r2/README.md",
+        "studies/study3/pilot/p0_r2/P0_R2_HANDOFF.md",
+        "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json",
+        "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.schema.json",
+        "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_v1.json",
+        "studies/study3/pilot/p0_r2/p0_r2_validation_receipts_v1.json",
+        "studies/study3/pilot/p0_r2/p0_r2_image_manifest_v1.json"
+      ],
+      "published_allowlist_prefixes": [
+        "studies/study3/prompts/",
+        "studies/study3/pilot/p0/results/p0-r2/"
+      ]
+    },
+    "d3_real_governance_chain_proof_refuses": {
+      "confirmed": true,
+      "executable_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+      "exit_code": 3,
+      "false_pass_route": null,
+      "governance_commit": "005aa087e40c641affc8ca537e6c6a075bcbfe98",
+      "ready_anchor": "7fd5fe57707461fcf70bfc9ab00b707b3c44ef71",
+      "refusal_marker_present": true,
+      "refusal_stderr": "P0_R2_CLOSURE_BINDING_REFUSED=1\r\n  the governance source changed 8 path(s) outside the governance allowlist after the ready anchor; this is not a governance-only descendant: studies/study3/pilot/p0_r2/validation/p0_r2_focused_v1.sh, studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_checkout_v3.sh, studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_checkout_v4.sh, studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_task_v3.yaml, studies/study3/pilot/p0_r2/validation/p0_r2_full_suite_v5.sh, studies/study3/pilot/p0_r2/validation/p0_r2_identity_canary_job_v1.yaml, studies/study3/pilot/p0_r2/validation/p0_r2_validation_focused_suite_v1.json, studies/study3/pilot/p0_r2/validation/p0_r2_validation_full_suite_v1.json"
+    },
+    "d4_dev_null_image_preflight_cannot_prove_host_facts": {
+      "checks_structurally_absent": [
+        "head_equals_origin_main",
+        "worktree_clean",
+        "ready_anchor_ancestry",
+        "post_anchor_changed_paths",
+        "exact_published_lock_bytes",
+        "gpu_job_absence",
+        "recovery_job_absence",
+        "exact_future_live_prefix_absence"
+      ],
+      "confirmed": true,
+      "image_preflight_steps": [
+        "emit_identity",
+        "audit_image",
+        "transport_roundtrip",
+        "prefix_absence"
+      ],
+      "prefix_check_skipped_without_attempt": true,
+      "published_first_command_context": "/dev/null",
+      "published_first_command_supplies_attempt": false,
+      "reason": "the published first command runs from /dev/null inside the pinned image, so no Git working tree, no origin/main ref, no anchor ancestry and no Azure control-plane answer is in scope"
+    },
+    "d5_hard_kill_open_admission_canary_not_reproduced": {
+      "confirmed": true,
+      "handoff_states_it_was_not_reproduced": true,
+      "p0_r1_hard_kill_assets": [
+        "studies/study3/pilot/p0_r1/container/p0_r1_hard_kill_canary_v3.py"
+      ],
+      "p0_r2_canary_receipt_names": [],
+      "p0_r2_hard_kill_assets": [],
+      "p0_r2_hard_kill_receipt_present": false
+    },
+    "d6_no_sealed_receipt_for_claimed_final_run_cmj7": {
+      "confirmed": true,
+      "files_mentioning_it_at_head": [],
+      "run_id": "cmj7"
+    },
+    "d7_superseded_and_failed_runs_unsealed": {
+      "accepted_for_contrast": {
+        "cmht": [
+          "studies/study3/pilot/p0_r2/P0_R2_HANDOFF.md",
+          "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_v1.json",
+          "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json"
+        ],
+        "cmhu": [
+          "studies/study3/pilot/p0_r2/P0_R2_HANDOFF.md",
+          "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_v1.json",
+          "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json"
+        ],
+        "cmhv": [
+          "studies/study3/pilot/p0_r2/P0_R2_HANDOFF.md",
+          "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_v1.json",
+          "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json"
+        ],
+        "cmj3": [
+          "studies/study3/pilot/p0_r2/P0_R2_HANDOFF.md",
+          "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json",
+          "studies/study3/pilot/p0_r2/validation/p0_r2_validation_full_suite_v1.json"
+        ],
+        "cmj5": [
+          "studies/study3/pilot/p0_r2/P0_R2_HANDOFF.md",
+          "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json",
+          "studies/study3/pilot/p0_r2/validation/p0_r2_validation_focused_suite_v1.json"
+        ],
+        "cmj6": [
+          "studies/study3/pilot/p0_r2/P0_R2_HANDOFF.md"
+        ]
+      },
+      "confirmed": true,
+      "failed_or_discarded": {
+        "cmhb": [],
+        "cmhd": [],
+        "cmhe": [],
+        "cmhf": [],
+        "cmhg": [],
+        "cmhh": [],
+        "cmhk": [],
+        "cmhn": [],
+        "cmhw": [],
+        "cmhx": [],
+        "cmhy": [],
+        "cmj0": [],
+        "cmj1": []
+      },
+      "superseded": {
+        "cmhp": [],
+        "cmhq": [],
+        "cmhs": [],
+        "cmj2": [],
+        "cmj4": []
+      }
+    },
+    "d8_standing_failure_baseline_is_stale_by_two": {
+      "actual_count": 4,
+      "actual_standing_failures": [
+        "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+        "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+        "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+        "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+      ],
+      "all_offenders_are_protected_p0_r1_bytes": true,
+      "all_offenders_introduced_by_p0_r1_stop_commit": true,
+      "confirmed": true,
+      "lf_only_offender_count": 8,
+      "lf_only_offenders": [
+        {
+          "bytes": 2173,
+          "crlf_count": 42,
+          "git_blob": "9eab456dd6b98a2af253b893b4546e67b8153a3b",
+          "introduced_by_commit": "30806d793872a50e581d3252382b4a0ec2af3889",
+          "introduced_by_p0_r1_stop_commit": true,
+          "lf_count": 42,
+          "lone_cr_count": 0,
+          "only_ever_touched_by_p0_r1_stop_commit": true,
+          "path": "studies/study3/pilot/p0/results/p0-r1/P0_R1_GENERATION3_STOP_DISPOSITION.md",
+          "postdates_p0_r1_full_suite_run_cmh9": true,
+          "protected_p0_r1_path": true,
+          "sha256": "feb26a6f5d528dd67a6f9dc44cbf469debb0b4ba6e03aa5c1dd1959324601108"
+        },
+        {
+          "bytes": 2707,
+          "crlf_count": 70,
+          "git_blob": "434ec5a0a15d53327b06852e5be6e51bcf6cf08c",
+          "introduced_by_commit": "30806d793872a50e581d3252382b4a0ec2af3889",
+          "introduced_by_p0_r1_stop_commit": true,
+          "lf_count": 70,
+          "lone_cr_count": 0,
+          "only_ever_touched_by_p0_r1_stop_commit": true,
+          "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_generation3_stop_counters.json",
+          "postdates_p0_r1_full_suite_run_cmh9": true,
+          "protected_p0_r1_path": true,
+          "sha256": "ddb684ff0bc6623d9baa00503bdc28b14e39504a14872d9e4e70c5348bfdd0a7"
+        },
+        {
+          "bytes": 5447,
+          "crlf_count": 137,
+          "git_blob": "15cdede7b69cdaeb9f82e8202c70607579427803",
+          "introduced_by_commit": "30806d793872a50e581d3252382b4a0ec2af3889",
+          "introduced_by_p0_r1_stop_commit": true,
+          "lf_count": 137,
+          "lone_cr_count": 0,
+          "only_ever_touched_by_p0_r1_stop_commit": true,
+          "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_generation3_stop_receipt.json",
+          "postdates_p0_r1_full_suite_run_cmh9": true,
+          "protected_p0_r1_path": true,
+          "sha256": "52c68ff886a25f4df775cda9bf79201012df9ca35d5b8a446366d4af77dc8dfc"
+        },
+        {
+          "bytes": 979,
+          "crlf_count": 6,
+          "git_blob": "18b2cefbd56c07764537c0b63d7f10aa74c7f1e9",
+          "introduced_by_commit": "30806d793872a50e581d3252382b4a0ec2af3889",
+          "introduced_by_p0_r1_stop_commit": true,
+          "lf_count": 6,
+          "lone_cr_count": 0,
+          "only_ever_touched_by_p0_r1_stop_commit": true,
+          "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_live_replay_command.log",
+          "postdates_p0_r1_full_suite_run_cmh9": true,
+          "protected_p0_r1_path": true,
+          "sha256": "400fe156cdc402618f7ac4127d581bfb96131743e36953fb45cef1e3871062a3"
+        },
+        {
+          "bytes": 1170,
+          "crlf_count": 13,
+          "git_blob": "1551f23d91ca38f6c9339b77f0603c518b9e1075",
+          "introduced_by_commit": "30806d793872a50e581d3252382b4a0ec2af3889",
+          "introduced_by_p0_r1_stop_commit": true,
+          "lf_count": 13,
+          "lone_cr_count": 0,
+          "only_ever_touched_by_p0_r1_stop_commit": true,
+          "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_command.log",
+          "postdates_p0_r1_full_suite_run_cmh9": true,
+          "protected_p0_r1_path": true,
+          "sha256": "81aa5b3c55a9a4ac89693aec748832a8ce3ddccbe8e7a8a71b761bf28b365d8d"
+        },
+        {
+          "bytes": 266,
+          "crlf_count": 9,
+          "git_blob": "886c5a63b44422691e1354ff9aea7a921ae70a3c",
+          "introduced_by_commit": "30806d793872a50e581d3252382b4a0ec2af3889",
+          "introduced_by_p0_r1_stop_commit": true,
+          "lf_count": 9,
+          "lone_cr_count": 0,
+          "only_ever_touched_by_p0_r1_stop_commit": true,
+          "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_gpu_job_presence.json",
+          "postdates_p0_r1_full_suite_run_cmh9": true,
+          "protected_p0_r1_path": true,
+          "sha256": "f255bbe189db189c0e3ae74e7de4cf4cd867293296ff93da0616fdd9dc7ea879"
+        },
+        {
+          "bytes": 3260,
+          "crlf_count": 58,
+          "git_blob": "d98ece32fa7f000a8e8753e6592d8154088a3019",
+          "introduced_by_commit": "30806d793872a50e581d3252382b4a0ec2af3889",
+          "introduced_by_p0_r1_stop_commit": true,
+          "lf_count": 58,
+          "lone_cr_count": 0,
+          "only_ever_touched_by_p0_r1_stop_commit": true,
+          "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_preflight_supersession_v3.json",
+          "postdates_p0_r1_full_suite_run_cmh9": true,
+          "protected_p0_r1_path": true,
+          "sha256": "664e702d9a3cd5303806351889c2c3503673baee16d2bfbb6cbcf309ef2a8edd"
+        },
+        {
+          "bytes": 433,
+          "crlf_count": 3,
+          "git_blob": "f9a9e96e80339fb5548dbcb040adde85ec8d9c19",
+          "introduced_by_commit": "30806d793872a50e581d3252382b4a0ec2af3889",
+          "introduced_by_p0_r1_stop_commit": true,
+          "lf_count": 3,
+          "lone_cr_count": 0,
+          "only_ever_touched_by_p0_r1_stop_commit": true,
+          "path": "studies/study3/pilot/p0/results/p0-r1/p0_r1_replay_stderr.txt",
+          "postdates_p0_r1_full_suite_run_cmh9": true,
+          "protected_p0_r1_path": true,
+          "sha256": "1323c36df5943c9dcdb34918fdd8a8c34656d48bdc7643dc3fcacfc2e59b110e"
+        }
+      ],
+      "registered_by_original_authority": [
+        "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+        "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last"
+      ],
+      "registered_count": 2,
+      "unregistered": [
+        "tests/test_phase05_jlens_saturation.py::test_no_artifact_asserts_a_prohibited_claim",
+        "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+      ]
+    }
+  },
+  "generations": 0,
+  "gpu_operations": 0,
+  "model_free": true,
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "prefills": 0,
+  "read_only": true,
+  "repository_bytes_modified": 0,
+  "schema_version": "study3-p0-r2-corrective-admission-audit-v2",
+  "scored_rows": 0,
+  "segment": "A",
+  "stage": "STUDY3-P0-R2",
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0
+}

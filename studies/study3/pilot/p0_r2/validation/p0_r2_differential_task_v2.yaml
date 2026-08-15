@@ -1,0 +1,46 @@
+# Study 3 P0-R2 corrective closure: full repository differential suite (A9).
+#
+# Baseline 005aa087 and the corrected head, in one container, in one registered
+# dependency closure, compared by exact node id and complete normalized failure
+# signature rather than by summary line.
+#
+# The context is a one-file git bundle plus the committed validation inputs, so
+# the Azure CLI packer never walks a repository tree -- the step that stopped
+# P0-R1 at a 265-character native Windows path.
+#
+# This task validates; it never executes the stage. Zero tokenizer
+# constructions, zero encodes, zero checkpoint downloads, zero model weight
+# loads, zero GPU operations. The replay gate is never invoked and the one-shot
+# envelope is never opened.
+version: v1.1.0
+steps:
+  - id: checkout
+    cmd: >-
+      python:3.11-bookworm
+      bash /workspace/p0_r2_full_suite_checkout_v5.sh {{.Values.BASELINE}} {{.Values.CORRECTED}}
+    timeout: 900
+  - id: differential
+    cmd: >-
+      python:3.11-bookworm
+      bash /workspace/p0_r2_differential_v2.sh
+    timeout: 7200
+boundary:
+  stage: STUDY3-P0-R2
+  context_is_a_single_git_bundle_plus_validation_inputs: true
+  both_checkouts_are_fresh_clones_of_exact_commits: true
+  suite_runs_in_the_registered_dependency_closure: true
+  outcome_sets_are_compared_rather_than_asserted: true
+  failure_signatures_are_compared_not_only_node_ids: true
+  pytest_status_is_captured_directly: true
+  pytest_summary_is_independently_reconciled: true
+  gpu_workload_allocated: false
+  replay_gate_invoked: false
+  one_shot_envelope_opened: false
+  tokenizer_constructions: 0
+  tokenizer_encodes: 0
+  checkpoint_downloads: 0
+  model_weight_loads: 0
+  model_operations_performed: 0
+  required_values:
+    - BASELINE
+    - CORRECTED

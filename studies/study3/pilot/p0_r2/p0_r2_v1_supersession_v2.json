@@ -1,0 +1,89 @@
+{
+  "schema_version": "study3-p0-r2-v1-supersession-v2",
+  "stage": "STUDY3-P0-R2",
+  "generation": 1,
+  "outcome": "V1_CLOSURE_SUPERSEDED_AND_NONLAUNCHABLE",
+  "v1_bytes_edited": 0,
+  "v1_is_historical_and_must_not_be_edited": true,
+  "supersedes_by": "additive v2 artifacts only; no v1 object is replaced in place",
+  "superseded_objects": [
+    {
+      "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.json",
+      "role": "v1 execution lock",
+      "bytes": 17961,
+      "sha256": "2c9789e27fad5ac463e105a42a69d686cdcf1389bcfd44503baf79cabd61f7d7",
+      "git_blob": "09bc5b10a2fbb104d84f80218aeb2841072c8bec",
+      "successor": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.json"
+    },
+    {
+      "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v1.schema.json",
+      "role": "v1 execution lock schema",
+      "bytes": 12544,
+      "sha256": "44a0c1e6b50ec70b411d4a82f7e25c60002dca724fda1731c485991055a87d9d",
+      "git_blob": "c653993ea4d608ba1188ae1a1f3da64b0aae6208",
+      "successor": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_v2.schema.json"
+    },
+    {
+      "path": "studies/study3/pilot/p0_r2/P0_R2_HANDOFF.md",
+      "role": "v1 cross-session handoff",
+      "bytes": 13584,
+      "sha256": "ff49bb4f35c93a0dd8f505c85be5da42ae1c1c86c402ce50f53af56504af8dc5",
+      "git_blob": "ff5bd84a85d85172ce75d62cdeb8a188d6be0b05",
+      "successor": "studies/study3/pilot/p0_r2/P0_R2_HANDOFF_V2.md"
+    },
+    {
+      "path": "studies/study3/pilot/p0_r2/p0_r2_image_manifest_v1.json",
+      "role": "v1 image manifest",
+      "bytes": 12790,
+      "sha256": "ab70d7ae34e78bff434e286aa8d1fe211112aa8e537099a5f8fed7360d5ff613",
+      "git_blob": "96f9a7375099c550cfc14c1a656b57733327cd75",
+      "successor": "studies/study3/pilot/p0_r2/p0_r2_image_manifest_v2.json"
+    },
+    {
+      "path": "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_v1.json",
+      "role": "v1 canary receipts",
+      "bytes": 7915,
+      "sha256": "f3f1df213650ed02fbbc71f71938a6764c9bcf304273723e214f56d5a5acb0e7",
+      "git_blob": "cb6bcfb317aeda60c1d65e4a2106100504465525",
+      "successor": "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_v2.json"
+    },
+    {
+      "path": "studies/study3/pilot/p0_r2/p0_r2_closure_binding_v1.py",
+      "role": "v1 governance-chain validator",
+      "successor": "studies/study3/pilot/p0_r2/p0_r2_closure_binding_v2.py"
+    }
+  ],
+  "v1_ready_anchor": "7fd5fe57707461fcf70bfc9ab00b707b3c44ef71",
+  "v1_executable_commit": "1eb3e21b408213cb183bd8d2f55c3554b9713160",
+  "v1_executable_tree": "88d7e9a016772c4129f56637edd2d7fbd96b105b",
+  "v1_image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+  "v1_image_digest": "sha256:3d857e54007d12bd943b383db522b913ba627a544b4d31b3e648eef30a65d8e7",
+  "v1_image_build_run_id": "cmht",
+  "v1_launchable": false,
+  "v1_replay_envelope_consumed": false,
+  "why_v1_is_superseded": [
+    "the governance-chain proof the v1 readiness claim names refuses against executable 1eb3e21b408213cb183bd8d2f55c3554b9713160, anchor 7fd5fe57707461fcf70bfc9ab00b707b3c44ef71 and governance head 005aa087e40c641affc8ca537e6c6a075bcbfe98, because eight executable validation inputs were committed after the anchor and are not inert",
+    "the published first command runs from /dev/null inside the image and structurally cannot observe HEAD == origin/main, a clean worktree, ready-anchor ancestry, post-anchor changed paths, the exact published lock bytes, GPU or recovery job absence, or the exact future live attempt prefix",
+    "the hard-kill / open-admission CPU recovery canary was never reproduced for P0-R2, so its open-admission recovery property was unproven",
+    "the run record was incomplete: cmj7 was claimed but never sealed, and eighteen superseded, failed or discarded runs existed only in external disclosure; the standing-failure baseline was registered as two where four occur"
+  ],
+  "what_supersession_does_not_do": [
+    "it does not edit a single v1 byte",
+    "it does not reopen P0-R1",
+    "it does not change any scientific invariant",
+    "it does not consume the replay envelope",
+    "it does not make v1 launchable again"
+  ],
+  "replay_envelope_still_unconsumed": true,
+  "generation_remains": 1,
+  "generation_reason": "the replay envelope is unconsumed, so version 2 is a closure and execution revision rather than a second replay generation",
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0,
+  "checkpoint_downloads": 0,
+  "model_weight_loads": 0,
+  "prefills": 0,
+  "generations": 0,
+  "scored_rows": 0,
+  "gpu_operations": 0,
+  "model_operations_performed": 0
+}

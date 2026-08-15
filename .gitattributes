@@ -251,3 +251,4 @@ studies/study3/pilot/p0_r2/*.md text eol=lf
 studies/study3/pilot/p0_r2/container/* text eol=lf
 tests/test_study3_p0_r2_execution_closure.py text eol=lf
 studies/study3/pilot/p0_r2/validation/* text eol=lf
+tests/test_study3_p0_r2_corrective_closure_v2.py text eol=lf
