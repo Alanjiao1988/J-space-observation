@@ -1,0 +1,534 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "authority": {
+      "properties": {
+        "bytes": {
+          "type": "integer"
+        },
+        "git_blob": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256",
+        "git_blob"
+      ],
+      "type": "object"
+    },
+    "azure": {
+      "properties": {
+        "container_apps_environment": {
+          "const": "cae-jspace-observation-sea-vnet2"
+        },
+        "gpu_job": {
+          "const": "job-jspace-s3-p0r2-pilot-g2"
+        },
+        "recovery_job": {
+          "const": "job-jspace-s3-p0r2-recover-g2"
+        }
+      },
+      "required": [
+        "subscription",
+        "resource_group",
+        "registry",
+        "storage_account",
+        "results_container",
+        "container_apps_environment",
+        "gpu_job",
+        "recovery_job"
+      ],
+      "type": "object"
+    },
+    "caps": {
+      "properties": {
+        "max_model_evaluation_equivalents": {
+          "const": 228
+        },
+        "max_non_generative_prefills": {
+          "const": 180
+        },
+        "max_s4_generations": {
+          "const": 12
+        },
+        "max_smoke_prefills_before_extension": {
+          "const": 60
+        },
+        "possible_scored_rows": {
+          "const": 210
+        }
+      },
+      "required": [
+        "max_model_evaluation_equivalents",
+        "max_non_generative_prefills",
+        "max_s4_generations",
+        "max_smoke_prefills_before_extension",
+        "possible_scored_rows"
+      ],
+      "type": "object"
+    },
+    "delegated_scientific_modules": {
+      "items": {
+        "properties": {
+          "bytes": {
+            "type": "integer"
+          },
+          "git_blob": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256",
+          "git_blob"
+        ],
+        "type": "object"
+      },
+      "minItems": 4,
+      "type": "array"
+    },
+    "generation": {
+      "const": 2
+    },
+    "generation1_terminal": {
+      "properties": {
+        "closure_head": {
+          "const": "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5"
+        },
+        "image_digest": {
+          "const": "sha256:eb0e284c6b420aa4992dcdee9a43b9cb92a96937499bca605f96b141619e9b58"
+        },
+        "state": {
+          "const": "STOP_NO_MODEL_OPERATION"
+        }
+      },
+      "required": [
+        "closure_head",
+        "image_digest",
+        "state"
+      ],
+      "type": "object"
+    },
+    "image": {
+      "properties": {
+        "base_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "is_new_digest": {
+          "const": true
+        },
+        "reference": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "reference",
+        "digest",
+        "base_digest",
+        "is_new_digest"
+      ],
+      "type": "object"
+    },
+    "image_executable": {
+      "properties": {
+        "commit": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "entries_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "file_count": {
+          "type": "integer"
+        },
+        "tree": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "commit",
+        "tree",
+        "file_count",
+        "entries_sha256"
+      ],
+      "type": "object"
+    },
+    "immutable_science": {
+      "properties": {
+        "proved": {
+          "const": true
+        },
+        "science_is_unchanged_p0_r1_generation3": {
+          "const": true
+        }
+      },
+      "required": [
+        "proved",
+        "science_is_unchanged_p0_r1_generation3"
+      ],
+      "type": "object"
+    },
+    "immutable_sources": {
+      "items": {
+        "properties": {
+          "bytes": {
+            "type": "integer"
+          },
+          "git_blob": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256",
+          "git_blob"
+        ],
+        "type": "object"
+      },
+      "minItems": 4,
+      "type": "array"
+    },
+    "legal_state": {
+      "properties": {
+        "draft_v0_6_frozen": {
+          "const": false
+        },
+        "draft_v0_6_reviewed": {
+          "const": false
+        },
+        "evidence_ledger_tail": {
+          "const": "EV-0016"
+        },
+        "formal_execution_authorized": {
+          "const": false
+        },
+        "research_question_answered": {
+          "const": false
+        }
+      },
+      "required": [
+        "draft_v0_6_frozen",
+        "draft_v0_6_reviewed",
+        "evidence_ledger_tail",
+        "formal_execution_authorized",
+        "interface",
+        "positive_reference",
+        "research_question_answered",
+        "rp_wrapper"
+      ],
+      "type": "object"
+    },
+    "namespace": {
+      "properties": {
+        "attempt_id_prefix": {
+          "const": "p0r2-g2-"
+        },
+        "disjoint_from_generation1": {
+          "const": true
+        },
+        "live_replay_attempt_id": {
+          "pattern": "^p0r2-g2-live-",
+          "type": "string"
+        },
+        "pilot_attempt_id": {
+          "pattern": "^p0r2-g2-pilot-",
+          "type": "string"
+        },
+        "prefix_root": {
+          "const": "study3/p0_r2/g2"
+        }
+      },
+      "required": [
+        "prefix_root",
+        "attempt_id_prefix",
+        "live_replay_attempt_id",
+        "pilot_attempt_id",
+        "live_blob_prefix",
+        "pilot_blob_prefix"
+      ],
+      "type": "object"
+    },
+    "p0_r1_terminal": {
+      "properties": {
+        "launchable": {
+          "const": false
+        },
+        "replay_envelope_consumed": {
+          "const": true
+        },
+        "state": {
+          "const": "STOP_NO_MODEL_OPERATION"
+        },
+        "stop_commit": {
+          "const": "30806d793872a50e581d3252382b4a0ec2af3889"
+        }
+      },
+      "required": [
+        "stop_commit",
+        "state",
+        "replay_envelope_consumed",
+        "launchable"
+      ],
+      "type": "object"
+    },
+    "pre_replay_counters": {
+      "properties": {
+        "checkpoint_downloads": {
+          "const": 0
+        },
+        "checkpoint_loads": {
+          "const": 0
+        },
+        "evidence_rows_added": {
+          "const": 0
+        },
+        "generations": {
+          "const": 0
+        },
+        "gpu_allocations": {
+          "const": 0
+        },
+        "gpu_operations": {
+          "const": 0
+        },
+        "live_replay_invocations": {
+          "const": 0
+        },
+        "model_weight_loads": {
+          "const": 0
+        },
+        "pilot_executions_started": {
+          "const": 0
+        },
+        "prefills": {
+          "const": 0
+        },
+        "scored_rows": {
+          "const": 0
+        },
+        "tokenizer_constructions": {
+          "const": 0
+        },
+        "tokenizer_encodes": {
+          "const": 0
+        }
+      },
+      "required": [
+        "checkpoint_downloads",
+        "checkpoint_loads",
+        "evidence_rows_added",
+        "generations",
+        "gpu_allocations",
+        "gpu_operations",
+        "live_replay_invocations",
+        "model_weight_loads",
+        "pilot_executions_started",
+        "prefills",
+        "scored_rows",
+        "tokenizer_constructions",
+        "tokenizer_encodes"
+      ],
+      "type": "object"
+    },
+    "prefix_proof": {
+      "properties": {
+        "performed_in_acr": {
+          "const": false
+        },
+        "performed_in_vnet": {
+          "const": true
+        },
+        "shared_canary_and_live_validator": {
+          "const": true
+        }
+      },
+      "required": [
+        "performed_in_vnet",
+        "performed_in_acr",
+        "shared_canary_and_live_validator"
+      ],
+      "type": "object"
+    },
+    "prohibitions": {
+      "properties": {
+        "caller_supplied_governance_allowlist": {
+          "const": true
+        },
+        "create_success_artifacts_without_recovered_bytes": {
+          "const": true
+        },
+        "edit_generation1_or_p0_r1_bytes": {
+          "const": true
+        },
+        "regenerate_replay": {
+          "const": true
+        },
+        "repair_the_gate_in_place": {
+          "const": true
+        },
+        "rerun_replay": {
+          "const": true
+        },
+        "reuse_a_generation1_attempt_prefix_job_or_receipt": {
+          "const": true
+        },
+        "second_az_acr_run_live": {
+          "const": true
+        },
+        "second_start_to_resolve_ambiguity": {
+          "const": true
+        },
+        "set_live_replay_authorized_globally": {
+          "const": true
+        },
+        "substitute_another_attempt": {
+          "const": true
+        },
+        "update_or_repurpose_an_existing_gpu_job": {
+          "const": true
+        }
+      },
+      "required": [
+        "caller_supplied_governance_allowlist",
+        "create_success_artifacts_without_recovered_bytes",
+        "edit_generation1_or_p0_r1_bytes",
+        "regenerate_replay",
+        "repair_the_gate_in_place",
+        "rerun_replay",
+        "reuse_a_generation1_attempt_prefix_job_or_receipt",
+        "second_az_acr_run_live",
+        "second_start_to_resolve_ambiguity",
+        "set_live_replay_authorized_globally",
+        "substitute_another_attempt",
+        "update_or_repurpose_an_existing_gpu_job"
+      ],
+      "type": "object"
+    },
+    "replay_envelope": {
+      "properties": {
+        "consumed": {
+          "const": false
+        },
+        "invocations": {
+          "const": 0
+        },
+        "rerunnable": {
+          "const": false
+        }
+      },
+      "required": [
+        "consumed",
+        "invocations",
+        "rerunnable"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "study3-p0-r2-execution-lock-g2"
+    },
+    "stage": {
+      "const": "STUDY3-P0-R2"
+    },
+    "standing_failures": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 4,
+      "type": "array"
+    },
+    "terminal_state": {
+      "const": "STUDY3_P0_R2_GENERATION2_EXECUTION_READY_AWAITING_REPLAY_GATE"
+    },
+    "transport": {
+      "properties": {
+        "context_entry_count": {
+          "const": 2
+        },
+        "context_is_executable_code": {
+          "const": false
+        },
+        "max_native_context_path": {
+          "const": 100
+        },
+        "task_blob": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "task_path": {
+          "const": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_g2.yaml"
+        }
+      },
+      "required": [
+        "task_path",
+        "task_blob",
+        "context_entry_count",
+        "context_entries",
+        "max_native_context_path"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "stage",
+    "generation",
+    "terminal_state",
+    "self",
+    "authority",
+    "image_executable",
+    "image",
+    "transport",
+    "namespace",
+    "azure",
+    "prefix_proof",
+    "immutable_sources",
+    "delegated_scientific_modules",
+    "immutable_science",
+    "generation1_terminal",
+    "p0_r1_terminal",
+    "frozen_roots",
+    "replay_envelope",
+    "caps",
+    "pre_replay_counters",
+    "standing_failures",
+    "legal_state",
+    "prohibitions"
+  ],
+  "title": "p0_r2_execution_lock_g2.schema.json",
+  "type": "object"
+}
