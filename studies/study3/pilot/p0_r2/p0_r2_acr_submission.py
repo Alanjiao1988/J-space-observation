@@ -16,6 +16,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 
@@ -160,8 +161,15 @@ def classify_packing_canary(raw_log: bytes) -> None:
 
 
 def _default_runner(command, cwd):
+    # subprocess does not apply PATHEXT, so a bare "az" cannot be launched on
+    # Windows, where the Azure CLI ships as az.cmd. This module exists to own
+    # the host submission boundary, and a host it cannot launch the CLI on is
+    # exactly the kind of failure it is supposed to remove, so the program is
+    # resolved the way the shell would resolve it.
+    program = shutil.which(command[0]) or command[0]
     return subprocess.run(
-        command, cwd=str(cwd), capture_output=True, text=False, check=False)
+        [program] + list(command[1:]), cwd=str(cwd), capture_output=True,
+        text=False, check=False)
 
 
 def submit(*, root: Path, source_commit: str, task_path: str,

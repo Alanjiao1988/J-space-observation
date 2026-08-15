@@ -57,6 +57,7 @@ IMAGE = _load("p0_r2_image_manifest_v1")
 LOCK = _load("p0_r2_execution_lock_v1")
 TRANSPORT = _load("p0_r2_transport")
 BLOB = _load("p0_r2_blob_transport")
+SUBMIT = _load("p0_r2_acr_submission")
 
 TASK_PATH = "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_v1.yaml"
 DIGEST = "sha256:" + "a1" * 32
@@ -667,6 +668,28 @@ def test_the_dockerfile_does_not_leave_the_image_running_as_root():
     assert users[-1] == "10001"
     if "USER root" in text:
         assert users.index("root") < len(users) - 1, "root privilege is never handed back"
+
+
+def test_the_default_runner_resolves_the_cli_the_way_a_shell_would(monkeypatch):
+    # A bare "az" cannot be launched by subprocess on Windows, where the CLI is
+    # az.cmd, and this module is the one place that has to survive that.
+    seen = {}
+
+    def fake_which(name):
+        seen["which"] = name
+        return "/resolved/%s" % name
+
+    def fake_run(command, **kwargs):
+        seen["command"] = command
+        raise AssertionError("stop here")
+
+    monkeypatch.setattr(SUBMIT.shutil, "which", fake_which)
+    monkeypatch.setattr(SUBMIT.subprocess, "run", fake_run)
+    with pytest.raises(AssertionError):
+        SUBMIT._default_runner(["az", "acr", "run", "--registry", "r"], ".")
+    assert seen["which"] == "az"
+    assert seen["command"][0] == "/resolved/az"
+    assert seen["command"][1:] == ["acr", "run", "--registry", "r"]
 
 
 def test_the_replay_script_refuses_any_mode_it_was_not_given():
