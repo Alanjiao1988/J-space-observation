@@ -1,0 +1,646 @@
+{
+  "$id": "p0_r2_execution_lock_v2.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "attempt": {
+      "properties": {
+        "live_replay_attempt_id": {
+          "pattern": "^p0r2-g1-",
+          "type": "string"
+        },
+        "pilot_attempt_id": {
+          "pattern": "^p0r2-g1-",
+          "type": "string"
+        }
+      },
+      "required": [
+        "prefix_root",
+        "live_replay_attempt_id",
+        "pilot_attempt_id"
+      ],
+      "type": "object"
+    },
+    "authorities": {
+      "items": {
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "git_blob": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "minItems": 2,
+      "type": "array"
+    },
+    "caps": {
+      "properties": {
+        "max_model_evaluation_equivalents": {
+          "const": 228
+        },
+        "max_non_generative_prefills": {
+          "const": 180
+        },
+        "max_s4_generations": {
+          "const": 12
+        },
+        "max_smoke_prefills_before_extension": {
+          "const": 60
+        },
+        "possible_scored_rows": {
+          "const": 210
+        }
+      },
+      "required": [
+        "max_smoke_prefills_before_extension",
+        "max_non_generative_prefills",
+        "max_s4_generations",
+        "max_model_evaluation_equivalents",
+        "possible_scored_rows"
+      ],
+      "type": "object"
+    },
+    "caps_are_enforced_not_reported": {
+      "const": true
+    },
+    "closure_base": {
+      "properties": {
+        "commit": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "commit"
+      ],
+      "type": "object"
+    },
+    "generation": {
+      "const": 1
+    },
+    "governance_bytes": {
+      "items": {
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "git_blob": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "minItems": 2,
+      "type": "array"
+    },
+    "governance_evidence_closure": {
+      "items": {
+        "properties": {
+          "class": {
+            "enum": [
+              "governance",
+              "evidence"
+            ]
+          },
+          "path": {
+            "pattern": "^[^*?]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "class"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "host_closure_executable": {
+      "properties": {
+        "commit": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "files": {
+          "minItems": 1,
+          "type": "array"
+        },
+        "tree": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "commit",
+        "tree",
+        "files"
+      ],
+      "type": "object"
+    },
+    "image": {
+      "properties": {
+        "base_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "build_run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "manifest_entries_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "reference",
+        "digest",
+        "base_digest",
+        "build_run_id",
+        "manifest_entries_sha256"
+      ],
+      "type": "object"
+    },
+    "image_executable": {
+      "properties": {
+        "commit": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "files": {
+          "minItems": 1,
+          "type": "array"
+        },
+        "tree": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "commit",
+        "tree",
+        "files"
+      ],
+      "type": "object"
+    },
+    "immutable_sources": {
+      "items": {
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "git_blob": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "minItems": 4,
+      "type": "array"
+    },
+    "job_specifications": {
+      "items": {
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "git_blob": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "legal_state": {
+      "properties": {
+        "draft_v0_6_frozen": {
+          "const": false
+        },
+        "draft_v0_6_reviewed": {
+          "const": false
+        },
+        "evidence_ledger_tail": {
+          "const": "EV-0016"
+        },
+        "formal_execution_authorized": {
+          "const": false
+        },
+        "interface": {
+          "type": "null"
+        },
+        "positive_reference": {
+          "type": "null"
+        },
+        "research_question_answered": {
+          "const": false
+        },
+        "rp_wrapper": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "formal_execution_authorized",
+        "draft_v0_6_reviewed",
+        "draft_v0_6_frozen",
+        "interface",
+        "positive_reference",
+        "rp_wrapper",
+        "evidence_ledger_tail",
+        "research_question_answered"
+      ],
+      "type": "object"
+    },
+    "p0_r1_terminal": {
+      "properties": {
+        "launchable": {
+          "const": false
+        },
+        "protected_bytes": {
+          "items": {
+            "properties": {
+              "bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "git_blob": {
+                "pattern": "^[0-9a-f]{40}$",
+                "type": "string"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "bytes",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "minItems": 8,
+          "type": "array"
+        },
+        "replay_envelope_consumed": {
+          "const": true
+        },
+        "state": {
+          "const": "STOP_NO_MODEL_OPERATION"
+        },
+        "stop_commit": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stop_commit",
+        "state",
+        "replay_envelope_consumed",
+        "launchable",
+        "protected_bytes"
+      ],
+      "type": "object"
+    },
+    "pre_replay_counters": {
+      "properties": {
+        "checkpoint_downloads": {
+          "const": 0
+        },
+        "checkpoint_loads": {
+          "const": 0
+        },
+        "evidence_rows_added": {
+          "const": 0
+        },
+        "generations": {
+          "const": 0
+        },
+        "gpu_allocations": {
+          "const": 0
+        },
+        "gpu_operations": {
+          "const": 0
+        },
+        "live_replay_invocations": {
+          "const": 0
+        },
+        "model_weight_loads": {
+          "const": 0
+        },
+        "pilot_executions_started": {
+          "const": 0
+        },
+        "prefills": {
+          "const": 0
+        },
+        "scored_rows": {
+          "const": 0
+        },
+        "tokenizer_constructions": {
+          "const": 0
+        },
+        "tokenizer_encodes": {
+          "const": 0
+        }
+      },
+      "required": [
+        "tokenizer_constructions",
+        "tokenizer_encodes",
+        "checkpoint_downloads",
+        "checkpoint_loads",
+        "model_weight_loads",
+        "prefills",
+        "generations",
+        "scored_rows",
+        "evidence_rows_added",
+        "gpu_allocations",
+        "gpu_operations",
+        "live_replay_invocations",
+        "pilot_executions_started"
+      ],
+      "type": "object"
+    },
+    "prohibitions": {
+      "additionalProperties": {
+        "const": true
+      },
+      "minProperties": 8,
+      "type": "object"
+    },
+    "ready_commit_relationship": {
+      "properties": {
+        "anchor_is_resolved_by_ancestry": {
+          "const": true
+        },
+        "lock_records_its_own_commit": {
+          "const": false
+        },
+        "ready_anchor_parent": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ready_anchor_parent",
+        "lock_records_its_own_commit"
+      ],
+      "type": "object"
+    },
+    "replay_envelope": {
+      "properties": {
+        "consumed": {
+          "const": false
+        },
+        "consumed_on_invocation_even_without_a_run_id": {
+          "const": true
+        },
+        "invocations": {
+          "const": 0
+        },
+        "rerunnable": {
+          "const": false
+        }
+      },
+      "required": [
+        "consumed",
+        "invocations"
+      ],
+      "type": "object"
+    },
+    "revision": {
+      "const": 2
+    },
+    "schema_version": {
+      "const": "study3-p0-r2-execution-lock-v2"
+    },
+    "science_is_unchanged_p0_r1_generation3": {
+      "const": true
+    },
+    "stage": {
+      "const": "STUDY3-P0-R2"
+    },
+    "standing_failures": {
+      "properties": {
+        "conditionally_accepted": {
+          "const": true
+        },
+        "count": {
+          "const": 4
+        },
+        "node_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array"
+        }
+      },
+      "required": [
+        "count",
+        "node_ids",
+        "conditionally_accepted"
+      ],
+      "type": "object"
+    },
+    "terminal_state": {
+      "const": "STUDY3_P0_R2_EXECUTION_READY_AWAITING_REPLAY_GATE"
+    },
+    "transport": {
+      "properties": {
+        "context_entry_count": {
+          "const": 2
+        },
+        "context_is_executable_code": {
+          "const": false
+        },
+        "task_blob": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "task_path": {
+          "type": "string"
+        },
+        "task_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task_path",
+        "task_blob",
+        "task_sha256"
+      ],
+      "type": "object"
+    },
+    "v1_supersession": {
+      "properties": {
+        "launchable": {
+          "const": false
+        },
+        "superseded": {
+          "const": true
+        },
+        "v1_bytes_edited": {
+          "const": 0
+        },
+        "v1_lock_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "superseded",
+        "launchable",
+        "record_path",
+        "v1_lock_path",
+        "v1_lock_sha256"
+      ],
+      "type": "object"
+    },
+    "validation_inputs": {
+      "items": {
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "git_blob": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "stage",
+    "generation",
+    "revision",
+    "terminal_state",
+    "self",
+    "schema",
+    "authorities",
+    "image_executable",
+    "host_closure_executable",
+    "closure_base",
+    "ready_commit_relationship",
+    "validation_inputs",
+    "job_specifications",
+    "immutable_sources",
+    "governance_bytes",
+    "transport",
+    "image",
+    "p0_r1_terminal",
+    "v1_supersession",
+    "replay_envelope",
+    "attempt",
+    "azure",
+    "designated_packing_canary",
+    "canaries",
+    "attempt_ledger",
+    "validation",
+    "standing_failures",
+    "governance_evidence_closure",
+    "caps",
+    "pre_replay_counters",
+    "legal_state",
+    "prohibitions"
+  ],
+  "title": "Study 3 P0-R2 corrective execution lock, version 2",
+  "type": "object"
+}
