@@ -25,7 +25,7 @@ from __future__ import annotations
 import base64
 import importlib.util
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import subprocess
 import sys
 
@@ -480,11 +480,17 @@ def test_the_launch_proof_records_the_exact_resolved_program():
 
     proof = SUBMIT.prove_launch_path(
         which=lambda name: r"C:\tools\az.CMD", runner=lambda argv: _Completed())
+    # Section 6.6 asks for the exact resolved executable to be recorded,
+    # including az.CMD on Windows. The exact string is what matters; the
+    # basename is split by the platform running the audit, so it is compared
+    # with Windows semantics rather than with whatever the host happens to use.
     assert proof["resolved_executable"] == r"C:\tools\az.CMD"
-    assert proof["resolved_basename"] == "az.CMD"
+    assert PureWindowsPath(proof["resolved_executable"]).name == "az.CMD"
     assert proof["uses_shell"] is False
     assert proof["relies_on_pathext"] is False
     assert [check["passed"] for check in proof["checks"]] == [True, True]
+    assert [check["argv0"] for check in proof["checks"]] == [
+        r"C:\tools\az.CMD", r"C:\tools\az.CMD"]
 
 
 def test_a_failing_benign_check_stops_before_any_submission():
