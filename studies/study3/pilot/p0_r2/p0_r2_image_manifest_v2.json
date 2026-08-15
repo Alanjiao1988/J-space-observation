@@ -1,5 +1,7 @@
 {
   "added_entrypoint_paths": [
+    "studies/study3/pilot/p0_r2/container/p0_r2_successor_v2.sh",
+    "studies/study3/pilot/p0_r2/container/p0_r2_canary_v2.sh",
     "studies/study3/pilot/p0_r2/container/p0_r2_hard_kill_canary_v2.sh"
   ],
   "added_operational_paths": [
@@ -104,6 +106,16 @@
     },
     {
       "added_by_corrective_closure": true,
+      "bytes": 4889,
+      "git_blob": "aaed83f135be3a8c92e59edc8b123e448945a822",
+      "image_path": "/usr/local/bin/p0_r2_canary_v2.sh",
+      "install_name": "p0_r2_canary_v2.sh",
+      "kind": "entrypoint",
+      "path": "studies/study3/pilot/p0_r2/container/p0_r2_canary_v2.sh",
+      "sha256": "6487d1019b48a3e0b92de70157a2434422c02c0b5d7fbe12d6dc493d22bc68f0"
+    },
+    {
+      "added_by_corrective_closure": true,
       "bytes": 1263,
       "git_blob": "93cd0d20e8f1bb10f383471d966dc1be6ce74a87",
       "image_path": "/usr/local/bin/p0_r2_hard_kill_canary_v2.sh",
@@ -151,6 +163,16 @@
       "kind": "entrypoint",
       "path": "studies/study3/pilot/p0_r2/container/p0_r2_successor_v1.sh",
       "sha256": "ac413daa395f686be465442ebe836e0b3b2e80d2bbbfbc80c15449c74ca12a4d"
+    },
+    {
+      "added_by_corrective_closure": true,
+      "bytes": 2737,
+      "git_blob": "300ba650add326d570286db9f1338f6b756a9e85",
+      "image_path": "/usr/local/bin/p0_r2_successor_v2.sh",
+      "install_name": "p0_r2_successor_v2.sh",
+      "kind": "entrypoint",
+      "path": "studies/study3/pilot/p0_r2/container/p0_r2_successor_v2.sh",
+      "sha256": "a65a031c857f2f88c5273a091cd506407be9809db46daaf7ea94c07c4a22c198"
     },
     {
       "added_by_corrective_closure": false,
@@ -271,12 +293,12 @@
     },
     {
       "added_by_corrective_closure": true,
-      "bytes": 9985,
-      "git_blob": "cc331527c1014473611f1aec25dbf39df27d5490",
+      "bytes": 10114,
+      "git_blob": "d0f778407642c67fdd06a296cb44f57e71d42c4e",
       "image_path": "/opt/jspace/src/studies/study3/pilot/p0_r2/p0_r2_image_manifest_v2.py",
       "kind": "operational",
       "path": "studies/study3/pilot/p0_r2/p0_r2_image_manifest_v2.py",
-      "sha256": "699c32eeff8ee42149ce7abea6d3ced1c472bffee5b673785879825fa0f63ab6"
+      "sha256": "dc4221d056a0fff49f66c804ed5729cb91a429a8cf4ed00337502312772c2e33"
     },
     {
       "added_by_corrective_closure": false,
@@ -378,12 +400,12 @@
       "sha256": "d0567f7fa808049a622d447b2672bf67f858c499e46d250e1afc0adc82387f40"
     }
   ],
-  "entries_sha256": "f9aea47d8cb2cbe022829704449233f29b2f3cedcd0ba2dbeb98479fe5099350",
-  "entry_count": 40,
-  "entrypoint_count": 6,
+  "entries_sha256": "5de9084cc6cb9e529d9f1482d347610a674ca2975df362fa24ff1d24a275f221",
+  "entry_count": 42,
+  "entrypoint_count": 8,
   "entrypoint_install_root": "/usr/local/bin",
-  "executable_commit": "6939e767cc5c9770ad45a2d47d95a1a0f8420cf5",
-  "executable_tree": "e14e2d25187c933e4c1a4eee5bf93ed6c3ba3942",
+  "executable_commit": "f8e32abbee6acaeb0ec608bdd118095c40a67f58",
+  "executable_tree": "406a239a69e17448e8dfdfd91d77a07c69e37ce9",
   "image_root": "/opt/jspace/src",
   "model_operations_performed": 0,
   "operational_count": 25,
