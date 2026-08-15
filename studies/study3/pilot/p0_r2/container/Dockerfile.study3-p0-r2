@@ -43,7 +43,16 @@ COPY src/studies/study3/pilot/p0_r2/p0_r2_image_manifest_v1.json \
      /opt/jspace/p0_r2_image_manifest_v1.json
 
 COPY entrypoints/ /usr/local/bin/
+
+# The P0-R1 base image runs as the unprivileged account uid=10001(jspace).
+# Marking the entry points executable needs root, so elevate for exactly that
+# one step and hand the privilege straight back. The successor must not quietly
+# become a root image: that would be an unreviewed change to the runtime
+# security posture, and this stage is only allowed to change the submission
+# transport.
+USER root
 RUN chmod 0755 /usr/local/bin/p0_r2_*.sh
+USER 10001
 
 ENV PYTHONPATH=${P0_R2_SRC}/studies/study3/pilot/p0_r2:${P0_R2_SRC}/studies/study3/pilot/p0_r1
 

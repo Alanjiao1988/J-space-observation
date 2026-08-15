@@ -652,6 +652,22 @@ def test_the_dockerfile_pins_its_base_by_digest_and_audits_itself():
     assert "--audit" in text
 
 
+def test_the_dockerfile_does_not_leave_the_image_running_as_root():
+    # The P0-R1 base runs as uid 10001. Marking the entry points executable
+    # needs root, but a successor that is only allowed to change the submission
+    # transport must not silently promote the runtime to root as a side effect.
+    text = (CONTAINER / "Dockerfile.study3-p0-r2").read_text(encoding="utf-8")
+    users = [
+        line.split(maxsplit=1)[1].strip()
+        for line in text.splitlines()
+        if line.strip().upper().startswith("USER ")
+    ]
+    assert users, "the Dockerfile never states which account it runs as"
+    assert users[-1] == "10001"
+    if "USER root" in text:
+        assert users.index("root") < len(users) - 1, "root privilege is never handed back"
+
+
 def test_the_canary_script_is_model_free():
     text = (CONTAINER / "p0_r2_canary_v1.sh").read_text(encoding="utf-8")
     assert "P0_R2_MODEL_OPERATIONS_PERFORMED=0" in text
