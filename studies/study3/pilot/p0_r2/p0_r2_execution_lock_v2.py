@@ -185,6 +185,12 @@ def build(root, inputs: dict) -> dict:
         "image_executable": {"commit": image_commit, "tree": image_tree,
                              "files": image_files,
                              "file_count": len(image_files)},
+        # The unchanged P0-R1 replay gate reads these two names. Keeping them in
+        # the v2 lock is not duplication for its own sake: it is what lets the
+        # corrected closure delegate to science whose bytes were never touched.
+        "executable_code": {"commit": image_commit, "tree": image_tree},
+        "delegated_scientific_modules": _entries(
+            root, image_commit, inputs["delegated_scientific_modules"]),
         "host_closure_executable": {"commit": host_commit, "tree": host_tree,
                                     "files": host_files,
                                     "file_count": len(host_files)},

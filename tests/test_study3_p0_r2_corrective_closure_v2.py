@@ -864,6 +864,28 @@ def test_two_checkouts_of_the_same_failure_normalize_identically():
     assert base == head
 
 
+def test_a_quoted_checkout_root_normalizes_too():
+    """The exact miss that made differential run cmja refuse.
+
+    ``repo_root = PosixPath('/workspace/base')`` and its ``/workspace/head``
+    twin are the same failure. The first normalizer only ended the checkout
+    root at ``/``, whitespace, ``:`` or end of line, so a closing quote left the
+    two signatures different by two characters and the differential correctly
+    refused. Ending the match at any non-path character fixes it without
+    loosening anything that carries meaning.
+    """
+    base = SIG.normalize("repo_root = PosixPath('/workspace/base'), x = 1\n")
+    head = SIG.normalize("repo_root = PosixPath('/workspace/head'), x = 1\n")
+    assert base == head
+    assert "<CHECKOUT>" in base
+
+
+def test_normalization_does_not_swallow_a_longer_name():
+    text = SIG.normalize("/workspace/baseline/tests/t.py:1: AssertionError\n")
+    assert "/workspace/baseline" in text
+    assert "<CHECKOUT>" not in text
+
+
 def test_the_comparison_detects_a_changed_signature_on_the_same_node_id():
     baseline = SIG.summarize({
         "label": "BASELINE", "exitstatus": 1, "counts": {"failed": 1},

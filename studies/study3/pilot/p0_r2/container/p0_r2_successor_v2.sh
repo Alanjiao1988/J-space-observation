@@ -62,7 +62,7 @@ case "${MODE}" in
                  "envelope and requires P0_R2_LIVE_REPLAY_AUTHORIZED=1" >&2
             exit 3
         fi
-        exec /usr/local/bin/p0_r2_replay_v1.sh
+        exec /usr/local/bin/p0_r2_replay_v2.sh
         ;;
     launch-pilot)
         if [ "${P0_R2_PILOT_AUTHORIZED:-0}" != "1" ]; then

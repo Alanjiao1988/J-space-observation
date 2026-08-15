@@ -33,7 +33,13 @@ import sys
 SCHEMA_VERSION = "study3-p0-r2-normalized-failure-signature-v2"
 
 _SUBSTITUTIONS = (
-    (re.compile(r"/workspace/(?:base|src|head)(?=[/\s:]|$)"), "<CHECKOUT>"),
+    # The checkout root is the one thing that is guaranteed to differ between
+    # the two clones and guaranteed to mean nothing. The negative lookahead
+    # ends the match at a non-path character -- a quote, a bracket, a comma,
+    # whitespace or end of line -- so PosixPath('/workspace/base') normalizes
+    # exactly like /workspace/base/tests/x.py does, while /workspace/baseline
+    # would not be touched.
+    (re.compile(r"/workspace/(?:base|src|head)(?![A-Za-z0-9_-])"), "<CHECKOUT>"),
     (re.compile(r"/tmp/pytest-of-[^/\s]+/pytest-\d+(?:/[^\s:'\"]*)?"), "<PYTEST_TMP>"),
     (re.compile(r"/tmp/[A-Za-z0-9_]{6,}"), "<TMP>"),
     (re.compile(r"0x[0-9a-fA-F]{6,}"), "<ADDR>"),
