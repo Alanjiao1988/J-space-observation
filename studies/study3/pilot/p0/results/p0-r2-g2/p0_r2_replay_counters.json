@@ -1,0 +1,18 @@
+{
+  "attempt_id": "p0r2-g2-live-20260815-1700",
+  "checkpoint_downloads": 0,
+  "checkpoint_loads": 0,
+  "evidence_rows_added": 0,
+  "generation": 2,
+  "generations": 0,
+  "gpu_allocations": 0,
+  "gpu_operations": 0,
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "prefills": 0,
+  "schema_version": "study3-p0-r2-replay-counters-g2",
+  "scored_rows": 0,
+  "stage": "STUDY3-P0-R2",
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0
+}

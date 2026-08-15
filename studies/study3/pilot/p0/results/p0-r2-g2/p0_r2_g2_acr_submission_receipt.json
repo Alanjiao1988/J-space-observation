@@ -1,0 +1,197 @@
+{
+  "acr_run_id": "cmk7",
+  "acr_run_id_count": 1,
+  "acr_run_ids": [
+    "cmk7"
+  ],
+  "attempt_id": "p0r2-g2-live-20260815-1700",
+  "authorization_exported_globally": false,
+  "authorization_scoped_to_child": true,
+  "binding": {
+    "digest": "sha256:4c4f815b86917a6867b014a2591ac415eba5544f7dc32968fad6ca04af6e0079",
+    "image": "acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:4c4f815b86917a6867b014a2591ac415eba5544f7dc32968fad6ca04af6e0079",
+    "prefix_receipt_bytes": 1897,
+    "prefix_receipt_sha256": "4fd1a6c70e989fe4b131fa5ae43802ade264f59e3965657150fcfcd2b8c48954",
+    "ready_anchor": "59a52bc3fdb305e0689e20efd24ff7ae4ce7e8a1",
+    "source_commit": "59a52bc3fdb305e0689e20efd24ff7ae4ce7e8a1",
+    "task_blob": "49cd120cc8f2bb3d7fb315b4bfbc3e07fe2d3347",
+    "task_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_g2.yaml"
+  },
+  "checkpoint_downloads": 0,
+  "command": {
+    "argv": [
+      "az",
+      "acr",
+      "run",
+      "--registry",
+      "acrjspaceobssea0708231738",
+      "--subscription",
+      "943bacdf-8b6e-4e3a-8126-a149f623d32e",
+      "--file",
+      "task.yaml",
+      "--set",
+      "IMAGE=acrjspaceobssea0708231738.azurecr.io/j-space-observation-study3-p0-r2@sha256:4c4f815b86917a6867b014a2591ac415eba5544f7dc32968fad6ca04af6e0079",
+      "--set",
+      "DIGEST=sha256:4c4f815b86917a6867b014a2591ac415eba5544f7dc32968fad6ca04af6e0079",
+      "--set",
+      "READY_ANCHOR=59a52bc3fdb305e0689e20efd24ff7ae4ce7e8a1",
+      "--set",
+      "MODE=live",
+      "--set",
+      "ATTEMPT=p0r2-g2-live-20260815-1700",
+      "--set",
+      "PREFIX_RECEIPT_SHA256=4fd1a6c70e989fe4b131fa5ae43802ade264f59e3965657150fcfcd2b8c48954",
+      "C:\\p0r2g2\\acrctx"
+    ],
+    "context_argument": "C:\\p0r2g2\\acrctx",
+    "credentials_recorded": false,
+    "file_argument": "task.yaml",
+    "resolved_executable": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.CMD",
+    "uses_shell": false
+  },
+  "context_admission": {
+    "contains_credentials": false,
+    "context": {
+      "directory_name": "acrctx",
+      "embedded_governance_objects": [
+        {
+          "bytes": 32944,
+          "label": "authority",
+          "origin": "git",
+          "sha256": "9b1f50843b8d7170142f0aa0640f19f7d3fb126120a0cd83db0440cae2919f50",
+          "source_path": "studies/study3/prompts/study3_p0_r2_generation2_successor_and_conditional_execution_authority.md"
+        },
+        {
+          "bytes": 16622,
+          "label": "execution_lock",
+          "origin": "git",
+          "sha256": "02a710516050e13b362e819301c6f45074c5dcdc71ef05ed6552e45c6b6a02da",
+          "source_path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_g2.json"
+        },
+        {
+          "bytes": 1897,
+          "label": "prefix_receipt",
+          "origin": "machine-receipt",
+          "sha256": "4fd1a6c70e989fe4b131fa5ae43802ade264f59e3965657150fcfcd2b8c48954",
+          "source_path": "prefix_receipt_live.json"
+        }
+      ],
+      "entries": [
+        "context_manifest.json",
+        "task.yaml"
+      ],
+      "entry_count": 2,
+      "manifest_bytes": 70650,
+      "manifest_sha256": "5aae9992038bf12cf84cb489989ed775df4a265c65b74c332b7c8b7a560af360",
+      "maximum_native_path": 38,
+      "native_directory": "C:\\p0r2g2\\acrctx",
+      "native_path_ceiling": 100,
+      "task": {
+        "bytes": 1960,
+        "context_name": "task.yaml",
+        "git_blob": "49cd120cc8f2bb3d7fb315b4bfbc3e07fe2d3347",
+        "sha256": "0148400f3e0c88cb625aadc63b2d65f0044e3714cd22daff945788100624ffc7",
+        "source_path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_g2.yaml"
+      }
+    },
+    "generation": 2,
+    "model_operations_performed": 0,
+    "prefix_validation": {
+      "attempt_id": "p0r2-g2-live-20260815-1700",
+      "generation": 2,
+      "host_freshness_checked": false,
+      "mode": "live",
+      "model_operations_performed": 0,
+      "observation_age_seconds": null,
+      "outcome": "PREFIX_RECEIPT_VALID",
+      "prefix": "study3/p0_r2/g2/p0r2-g2-live-20260815-1700/",
+      "receipt_sha256": "4fd1a6c70e989fe4b131fa5ae43802ade264f59e3965657150fcfcd2b8c48954",
+      "schema_version": "study3-p0-r2-prefix-validation-g2",
+      "shared_by_canary_and_live": true,
+      "stage": "STUDY3-P0-R2",
+      "validator": "p0_r2_prefix_proof_g2.validate_receipt"
+    },
+    "schema_version": "study3-p0-r2-context-admission-receipt-g2",
+    "source": {
+      "commit": "59a52bc3fdb305e0689e20efd24ff7ae4ce7e8a1",
+      "tree": "32315ffc8ccf1a22652c915a901c7685eaaefb54"
+    },
+    "stage": "STUDY3-P0-R2"
+  },
+  "exit_code": 0,
+  "finished_at_utc": "2026-08-15T19:12:54Z",
+  "generation": 2,
+  "gpu_operations": 0,
+  "launch_failure": null,
+  "launch_proof": {
+    "authorization_environment": "P0_R2_LIVE_REPLAY_AUTHORIZED",
+    "authorization_exported_globally": false,
+    "azure_cli_version": "2.83.0",
+    "checks": [
+      {
+        "argv0": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.CMD",
+        "check": "version",
+        "passed": true,
+        "returncode": 0,
+        "stderr_bytes": 0,
+        "stdout_bytes": 534,
+        "stdout_sha256": "2a9c3bd30b787a3340eb6ef55776cf9b0745388bb58791b003193a86cebcb751"
+      },
+      {
+        "argv0": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.CMD",
+        "check": "account_show",
+        "passed": true,
+        "returncode": 0,
+        "stderr_bytes": 0,
+        "stdout_bytes": 482,
+        "stdout_sha256": "7d31deb158bd3614ee8c5a5712ff46778b41ae79fccdebe5e480cad98a54c35e"
+      }
+    ],
+    "generation": 2,
+    "model_operations_performed": 0,
+    "relies_on_pathext": false,
+    "resolved_basename": "az.CMD",
+    "resolved_executable": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.CMD",
+    "resolved_with": "shutil.which",
+    "schema_version": "study3-p0-r2-windows-launch-proof-g2",
+    "stage": "STUDY3-P0-R2",
+    "subscription": "943bacdf-8b6e-4e3a-8126-a149f623d32e",
+    "uses_shell": false
+  },
+  "mode": "live",
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "one_shot_envelope_consumed": true,
+  "outcome": "PASS",
+  "prefix_freshness": {
+    "attempt_id": "p0r2-g2-live-20260815-1700",
+    "generation": 2,
+    "host_freshness_checked": true,
+    "mode": "live",
+    "model_operations_performed": 0,
+    "observation_age_seconds": 40,
+    "outcome": "PREFIX_RECEIPT_VALID",
+    "prefix": "study3/p0_r2/g2/p0r2-g2-live-20260815-1700/",
+    "receipt_sha256": "4fd1a6c70e989fe4b131fa5ae43802ade264f59e3965657150fcfcd2b8c48954",
+    "schema_version": "study3-p0-r2-prefix-validation-g2",
+    "shared_by_canary_and_live": true,
+    "stage": "STUDY3-P0-R2",
+    "validator": "p0_r2_prefix_proof_g2.validate_receipt"
+  },
+  "process_started": true,
+  "raw_log": {
+    "bytes": 35208,
+    "name": "p0_r2_g2_acr_raw_log.txt",
+    "sha256": "a9662d14e2f9da4052bd18a9114ee9eaad33bd4d94687b8407e9f93ee228d998"
+  },
+  "schema_version": "study3-p0-r2-acr-submission-receipt-g2",
+  "scored_rows": 0,
+  "stage": "STUDY3-P0-R2",
+  "started_at_utc": "2026-08-15T19:10:56Z",
+  "stderr": {
+    "bytes": 351,
+    "name": "p0_r2_g2_acr_stderr.txt",
+    "sha256": "84fed3a1e023f76b7bc3e9491c967b4a59515dfa85ee7fe7aadb42b4b513d1ed"
+  },
+  "tokenizer_constructions": 0
+}

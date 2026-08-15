@@ -1,0 +1,59 @@
+{
+  "acr_run_id": "cmk7",
+  "artifact_count": 4,
+  "artifacts": {
+    "P0_R2_REPLAY_DISPOSITION.md": {
+      "bytes": 563,
+      "sha256": "4ed0e538fd91efc338e91d0c9a472fd2e634abb06962c26b8490b37f24b736da"
+    },
+    "p0_r2_replay_counters.json": {
+      "bytes": 456,
+      "sha256": "8626cfbbf6a6e8e15a3d13f3cf378c02a0abd106a0e91f613557bb2e8bc2b47b"
+    },
+    "p0_r2_replay_receipt.json": {
+      "bytes": 737,
+      "sha256": "c25a4c8159c1f29401bbbaa11a8a31cfe3ed0b56b9f5a8dc738eec58cce4b904"
+    },
+    "p0_r2_replay_result.json": {
+      "bytes": 12442,
+      "sha256": "576d3962bd8b5a72f1591f69f040f1cdb05751552650c81184d42eab52891b93"
+    }
+  },
+  "attempt_id": "p0r2-g2-live-20260815-1700",
+  "checks": {
+    "attempt_identity_agrees": true,
+    "authorizes_model_pilot_false": true,
+    "envelope_consumed": true,
+    "every_registered_counter_is_zero": true,
+    "exactly_four_artifacts": true,
+    "exactly_one_acr_run_id": true,
+    "factorization_logic_unchanged": true,
+    "generation_identity_is_two": true,
+    "image_digest_agrees": true,
+    "lock_binding_agrees": true,
+    "no_path_traversal": true,
+    "no_repairs_applied": true,
+    "no_undeclared_or_duplicate_name": true,
+    "ready_anchor_agrees": true,
+    "receipt_outcome_agrees": true,
+    "result_outcome_is_the_registered_pass": true,
+    "science_unchanged": true,
+    "written_bytes_match_reconstruction": true
+  },
+  "generation": 2,
+  "model_operations_performed": 0,
+  "nonzero_counters": {},
+  "outcome": "RECONSTRUCTED",
+  "raw_log": {
+    "bytes": 35208,
+    "sha256": "a9662d14e2f9da4052bd18a9114ee9eaad33bd4d94687b8407e9f93ee228d998"
+  },
+  "ready_anchor": "59a52bc3fdb305e0689e20efd24ff7ae4ce7e8a1",
+  "repairs_applied": [],
+  "schema_version": "study3-p0-r2-reconstruction-receipt-g2",
+  "source": "captured raw ACR log only",
+  "stage": "STUDY3-P0-R2",
+  "strict_decoder": "p0_r2_transport_v1.recover_with_report (generation-2 instance)",
+  "used_a_locally_generated_result": false,
+  "used_an_emitted_receipt_as_a_source": false
+}

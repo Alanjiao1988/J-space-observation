@@ -1,0 +1,21 @@
+{
+  "attempt_id": "p0r2-g2-live-20260815-1700",
+  "authorization_requires_independent_reconstruction": true,
+  "authorizes_model_pilot": false,
+  "executable_commit": "a5115e0faf6acc686f777c8f9b3e496602832493",
+  "generation": 2,
+  "image_digest": "sha256:4c4f815b86917a6867b014a2591ac415eba5544f7dc32968fad6ca04af6e0079",
+  "lock": {
+    "bytes": 16622,
+    "sha256": "02a710516050e13b362e819301c6f45074c5dcdc71ef05ed6552e45c6b6a02da"
+  },
+  "model_operations_performed": 0,
+  "one_shot_envelope_consumed": true,
+  "outcome": "PASS",
+  "ready_anchor": "59a52bc3fdb305e0689e20efd24ff7ae4ce7e8a1",
+  "result": {
+    "name": "p0_r2_replay_result.json"
+  },
+  "schema_version": "study3-p0-r2-replay-receipt-g2",
+  "stage": "STUDY3-P0-R2"
+}
