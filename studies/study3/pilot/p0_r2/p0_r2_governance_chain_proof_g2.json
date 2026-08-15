@@ -1,0 +1,161 @@
+{
+  "authority": {
+    "agrees_with_lock": true,
+    "bytes": 32944,
+    "path": "studies/study3/prompts/study3_p0_r2_generation2_successor_and_conditional_execution_authority.md",
+    "sha256": "9b1f50843b8d7170142f0aa0640f19f7d3fb126120a0cd83db0440cae2919f50"
+  },
+  "authority_first_proof": {
+    "authority_path": "studies/study3/prompts/study3_p0_r2_generation2_successor_and_conditional_execution_authority.md",
+    "authority_was_the_first_committed_object": true,
+    "baseline": "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5",
+    "commit_count_after_baseline": 18,
+    "first_commit": "2740648761bd49af52b2e106afebd9a5883f420c",
+    "first_commit_parents": [
+      "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5"
+    ],
+    "first_commit_paths": [
+      "studies/study3/prompts/study3_p0_r2_generation2_successor_and_conditional_execution_authority.md"
+    ],
+    "generation": 2,
+    "model_operations_performed": 0,
+    "schema_version": "study3-p0-r2-authority-first-proof-g2",
+    "stage": "STUDY3-P0-R2"
+  },
+  "baseline": "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5",
+  "caller_supplied_allowlist": false,
+  "condition_count": 8,
+  "conditions": {
+    "authority_bytes_bound": true,
+    "authority_was_first_committed_object": true,
+    "frozen_roots_unchanged": true,
+    "generation1_remains_terminal": true,
+    "image_digest_is_new": true,
+    "immutable_science_proved": true,
+    "namespace_disjoint": true,
+    "p0_r1_remains_terminal": true
+  },
+  "failed_conditions": [],
+  "failed_count": 0,
+  "frozen_roots_proof": {
+    "all_frozen_bytes_unchanged": true,
+    "baseline": "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5",
+    "changed_count": 0,
+    "changed_paths": [],
+    "generation": 2,
+    "head": "dbbc0252ed2353aea2c717c1526971de826a2cf4",
+    "model_operations_performed": 0,
+    "protected_file_count": 182,
+    "removed_count": 0,
+    "removed_paths": [],
+    "roots": [
+      {
+        "added_under_root": [],
+        "baseline_file_count": 83,
+        "head_file_count": 83,
+        "root": "studies/study3/pilot/p0_r1/"
+      },
+      {
+        "added_under_root": [],
+        "baseline_file_count": 11,
+        "head_file_count": 11,
+        "root": "studies/study3/pilot/p0/results/p0-r1/"
+      },
+      {
+        "added_under_root": [
+          "studies/study3/pilot/p0_r2/P0_R2_HANDOFF_G2.md",
+          "studies/study3/pilot/p0_r2/container/Dockerfile.study3-p0-r2-g2",
+          "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_g2.yaml",
+          "studies/study3/pilot/p0_r2/container/p0_r2_canary_g2.sh",
+          "studies/study3/pilot/p0_r2/container/p0_r2_hard_kill_job_g2.yaml",
+          "studies/study3/pilot/p0_r2/container/p0_r2_model_pilot_g2.sh",
+          "studies/study3/pilot/p0_r2/container/p0_r2_pilot_job_g2.yaml",
+          "studies/study3/pilot/p0_r2/container/p0_r2_prefix_job_g2.yaml",
+          "studies/study3/pilot/p0_r2/container/p0_r2_recovery_g2.sh",
+          "studies/study3/pilot/p0_r2/container/p0_r2_recovery_job_g2.yaml",
+          "studies/study3/pilot/p0_r2/container/p0_r2_replay_g2.sh",
+          "studies/study3/pilot/p0_r2/p0_r2_attempt_ledger_g2.json",
+          "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_g2.json",
+          "studies/study3/pilot/p0_r2/p0_r2_closure_binding_g2.py",
+          "studies/study3/pilot/p0_r2/p0_r2_execution_lock_g2.json",
+          "studies/study3/pilot/p0_r2/p0_r2_execution_lock_g2.py",
+          "studies/study3/pilot/p0_r2/p0_r2_execution_lock_g2.schema.json",
+          "studies/study3/pilot/p0_r2/p0_r2_hard_kill_g2.py",
+          "studies/study3/pilot/p0_r2/p0_r2_host_preflight_g2.py",
+          "studies/study3/pilot/p0_r2/p0_r2_host_submission_g2.py",
+          "studies/study3/pilot/p0_r2/p0_r2_image_manifest_g2.json",
+          "studies/study3/pilot/p0_r2/p0_r2_image_manifest_g2.py",
+          "studies/study3/pilot/p0_r2/p0_r2_namespace_g2.py",
+          "studies/study3/pilot/p0_r2/p0_r2_prefix_proof_g2.py",
+          "studies/study3/pilot/p0_r2/p0_r2_replay_gate_g2.py",
+          "studies/study3/pilot/p0_r2/p0_r2_validation_receipts_g2.json",
+          "studies/study3/pilot/p0_r2/validation/p0_r2_phase_b_admission_g2.py"
+        ],
+        "baseline_file_count": 81,
+        "head_file_count": 108,
+        "root": "studies/study3/pilot/p0_r2/"
+      },
+      {
+        "added_under_root": [],
+        "baseline_file_count": 7,
+        "head_file_count": 7,
+        "root": "studies/study3/pilot/p0/results/p0-r2/"
+      }
+    ],
+    "schema_version": "study3-p0-r2-frozen-roots-proof-g2",
+    "stage": "STUDY3-P0-R2"
+  },
+  "generation": 2,
+  "generation1_terminal_proof": {
+    "acr_run_id": "cmjv",
+    "agrees_with_registered_terminal_facts": true,
+    "closure_head": "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5",
+    "closure_head_is_ancestor": true,
+    "consumed_attempt": "p0r2-g1-live-20260815-0800",
+    "envelope_consumed": true,
+    "generation": 2,
+    "model_operations_performed": 0,
+    "p0_r1_stop_commit_is_ancestor": true,
+    "receipt_path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_acr_submission_receipt.json",
+    "receipt_sha256": "255325af1beddfe05393a4623e9eee710cb10298b2e82487134a165f0f39f994",
+    "schema_version": "study3-p0-r2-generation1-terminal-proof-g2",
+    "stage": "STUDY3-P0-R2",
+    "state": "STOP_NO_MODEL_OPERATION"
+  },
+  "head": "dbbc0252ed2353aea2c717c1526971de826a2cf4",
+  "identities": [
+    "immutable_science",
+    "image_executable",
+    "host_closure_executable",
+    "task_object",
+    "image",
+    "closure_base",
+    "ready_anchor",
+    "governance_source",
+    "published_head",
+    "generation1_closure",
+    "authority_object"
+  ],
+  "model_operations_performed": 0,
+  "namespace_disjointness_proof": {
+    "checked_values": [
+      "p0r2-g2-live-20260815-1700",
+      "p0r2-g2-pilot-20260815-1700",
+      "study3/p0_r2/g2/p0r2-g2-live-20260815-1700/",
+      "study3/p0_r2/g2/p0r2-g2-pilot-20260815-1700/",
+      "study3/p0_r2/g2",
+      "job-jspace-s3-p0r2-pilot-g2",
+      "job-jspace-s3-p0r2-recover-g2"
+    ],
+    "disjoint": true,
+    "generation": 2,
+    "generation1_attempt_id_prefix": "p0r2-g1-",
+    "generation1_prefix_root": "study3/p0_r2/g1",
+    "reason": null,
+    "schema_version": "study3-p0-r2-namespace-disjointness-proof-g2",
+    "stage": "STUDY3-P0-R2"
+  },
+  "outcome": "CHAIN_PROVED",
+  "schema_version": "study3-p0-r2-governance-chain-proof-g2",
+  "stage": "STUDY3-P0-R2"
+}

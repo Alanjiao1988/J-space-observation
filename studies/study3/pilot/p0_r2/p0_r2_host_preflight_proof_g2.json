@@ -1,0 +1,283 @@
+{
+  "checkpoint_downloads": 0,
+  "condition_count": 17,
+  "conditions": {
+    "all_counters_zero": true,
+    "azure_cli_launch_proved": true,
+    "frozen_bytes_unchanged": true,
+    "generation1_terminal": true,
+    "governance_chain_proved": true,
+    "gpu_job_proved_absent": true,
+    "head_equals_origin_main": true,
+    "image_digest_is_new": true,
+    "lock_bytes_match_commit": true,
+    "lock_validates": true,
+    "namespace_disjoint": true,
+    "no_ambiguous_azure_answer": true,
+    "p0_r1_terminal": true,
+    "recovery_job_proved_absent": true,
+    "replay_envelope_unconsumed": true,
+    "task_blob_matches_lock": true,
+    "worktree_clean": true
+  },
+  "context_admission": null,
+  "failed_conditions": [],
+  "failed_count": 0,
+  "generation": 2,
+  "governance_chain": {
+    "authority": {
+      "agrees_with_lock": true,
+      "bytes": 32944,
+      "path": "studies/study3/prompts/study3_p0_r2_generation2_successor_and_conditional_execution_authority.md",
+      "sha256": "9b1f50843b8d7170142f0aa0640f19f7d3fb126120a0cd83db0440cae2919f50"
+    },
+    "authority_first_proof": {
+      "authority_path": "studies/study3/prompts/study3_p0_r2_generation2_successor_and_conditional_execution_authority.md",
+      "authority_was_the_first_committed_object": true,
+      "baseline": "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5",
+      "commit_count_after_baseline": 18,
+      "first_commit": "2740648761bd49af52b2e106afebd9a5883f420c",
+      "first_commit_parents": [
+        "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5"
+      ],
+      "first_commit_paths": [
+        "studies/study3/prompts/study3_p0_r2_generation2_successor_and_conditional_execution_authority.md"
+      ],
+      "generation": 2,
+      "model_operations_performed": 0,
+      "schema_version": "study3-p0-r2-authority-first-proof-g2",
+      "stage": "STUDY3-P0-R2"
+    },
+    "baseline": "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5",
+    "caller_supplied_allowlist": false,
+    "condition_count": 8,
+    "conditions": {
+      "authority_bytes_bound": true,
+      "authority_was_first_committed_object": true,
+      "frozen_roots_unchanged": true,
+      "generation1_remains_terminal": true,
+      "image_digest_is_new": true,
+      "immutable_science_proved": true,
+      "namespace_disjoint": true,
+      "p0_r1_remains_terminal": true
+    },
+    "failed_conditions": [],
+    "failed_count": 0,
+    "frozen_roots_proof": {
+      "all_frozen_bytes_unchanged": true,
+      "baseline": "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5",
+      "changed_count": 0,
+      "changed_paths": [],
+      "generation": 2,
+      "head": "dbbc0252ed2353aea2c717c1526971de826a2cf4",
+      "model_operations_performed": 0,
+      "protected_file_count": 182,
+      "removed_count": 0,
+      "removed_paths": [],
+      "roots": [
+        {
+          "added_under_root": [],
+          "baseline_file_count": 83,
+          "head_file_count": 83,
+          "root": "studies/study3/pilot/p0_r1/"
+        },
+        {
+          "added_under_root": [],
+          "baseline_file_count": 11,
+          "head_file_count": 11,
+          "root": "studies/study3/pilot/p0/results/p0-r1/"
+        },
+        {
+          "added_under_root": [
+            "studies/study3/pilot/p0_r2/P0_R2_HANDOFF_G2.md",
+            "studies/study3/pilot/p0_r2/container/Dockerfile.study3-p0-r2-g2",
+            "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_g2.yaml",
+            "studies/study3/pilot/p0_r2/container/p0_r2_canary_g2.sh",
+            "studies/study3/pilot/p0_r2/container/p0_r2_hard_kill_job_g2.yaml",
+            "studies/study3/pilot/p0_r2/container/p0_r2_model_pilot_g2.sh",
+            "studies/study3/pilot/p0_r2/container/p0_r2_pilot_job_g2.yaml",
+            "studies/study3/pilot/p0_r2/container/p0_r2_prefix_job_g2.yaml",
+            "studies/study3/pilot/p0_r2/container/p0_r2_recovery_g2.sh",
+            "studies/study3/pilot/p0_r2/container/p0_r2_recovery_job_g2.yaml",
+            "studies/study3/pilot/p0_r2/container/p0_r2_replay_g2.sh",
+            "studies/study3/pilot/p0_r2/p0_r2_attempt_ledger_g2.json",
+            "studies/study3/pilot/p0_r2/p0_r2_canary_receipts_g2.json",
+            "studies/study3/pilot/p0_r2/p0_r2_closure_binding_g2.py",
+            "studies/study3/pilot/p0_r2/p0_r2_execution_lock_g2.json",
+            "studies/study3/pilot/p0_r2/p0_r2_execution_lock_g2.py",
+            "studies/study3/pilot/p0_r2/p0_r2_execution_lock_g2.schema.json",
+            "studies/study3/pilot/p0_r2/p0_r2_hard_kill_g2.py",
+            "studies/study3/pilot/p0_r2/p0_r2_host_preflight_g2.py",
+            "studies/study3/pilot/p0_r2/p0_r2_host_submission_g2.py",
+            "studies/study3/pilot/p0_r2/p0_r2_image_manifest_g2.json",
+            "studies/study3/pilot/p0_r2/p0_r2_image_manifest_g2.py",
+            "studies/study3/pilot/p0_r2/p0_r2_namespace_g2.py",
+            "studies/study3/pilot/p0_r2/p0_r2_prefix_proof_g2.py",
+            "studies/study3/pilot/p0_r2/p0_r2_replay_gate_g2.py",
+            "studies/study3/pilot/p0_r2/p0_r2_validation_receipts_g2.json",
+            "studies/study3/pilot/p0_r2/validation/p0_r2_phase_b_admission_g2.py"
+          ],
+          "baseline_file_count": 81,
+          "head_file_count": 108,
+          "root": "studies/study3/pilot/p0_r2/"
+        },
+        {
+          "added_under_root": [],
+          "baseline_file_count": 7,
+          "head_file_count": 7,
+          "root": "studies/study3/pilot/p0/results/p0-r2/"
+        }
+      ],
+      "schema_version": "study3-p0-r2-frozen-roots-proof-g2",
+      "stage": "STUDY3-P0-R2"
+    },
+    "generation": 2,
+    "generation1_terminal_proof": {
+      "acr_run_id": "cmjv",
+      "agrees_with_registered_terminal_facts": true,
+      "closure_head": "135f725baff7f5c9c1b0ae15ad5692bf77dd4fc5",
+      "closure_head_is_ancestor": true,
+      "consumed_attempt": "p0r2-g1-live-20260815-0800",
+      "envelope_consumed": true,
+      "generation": 2,
+      "model_operations_performed": 0,
+      "p0_r1_stop_commit_is_ancestor": true,
+      "receipt_path": "studies/study3/pilot/p0/results/p0-r2/p0_r2_acr_submission_receipt.json",
+      "receipt_sha256": "255325af1beddfe05393a4623e9eee710cb10298b2e82487134a165f0f39f994",
+      "schema_version": "study3-p0-r2-generation1-terminal-proof-g2",
+      "stage": "STUDY3-P0-R2",
+      "state": "STOP_NO_MODEL_OPERATION"
+    },
+    "head": "dbbc0252ed2353aea2c717c1526971de826a2cf4",
+    "identities": [
+      "immutable_science",
+      "image_executable",
+      "host_closure_executable",
+      "task_object",
+      "image",
+      "closure_base",
+      "ready_anchor",
+      "governance_source",
+      "published_head",
+      "generation1_closure",
+      "authority_object"
+    ],
+    "model_operations_performed": 0,
+    "namespace_disjointness_proof": {
+      "checked_values": [
+        "p0r2-g2-live-20260815-1700",
+        "p0r2-g2-pilot-20260815-1700",
+        "study3/p0_r2/g2/p0r2-g2-live-20260815-1700/",
+        "study3/p0_r2/g2/p0r2-g2-pilot-20260815-1700/",
+        "study3/p0_r2/g2",
+        "job-jspace-s3-p0r2-pilot-g2",
+        "job-jspace-s3-p0r2-recover-g2"
+      ],
+      "disjoint": true,
+      "generation": 2,
+      "generation1_attempt_id_prefix": "p0r2-g1-",
+      "generation1_prefix_root": "study3/p0_r2/g1",
+      "reason": null,
+      "schema_version": "study3-p0-r2-namespace-disjointness-proof-g2",
+      "stage": "STUDY3-P0-R2"
+    },
+    "outcome": "CHAIN_PROVED",
+    "schema_version": "study3-p0-r2-governance-chain-proof-g2",
+    "stage": "STUDY3-P0-R2"
+  },
+  "gpu_operations": 0,
+  "head_state": {
+    "dirty_entries": [],
+    "head": "dbbc0252ed2353aea2c717c1526971de826a2cf4",
+    "head_equals_origin_main": true,
+    "head_required": true,
+    "origin_head": "dbbc0252ed2353aea2c717c1526971de826a2cf4",
+    "origin_ref": "origin/main",
+    "tree": "d7e89b0e02190522e7b259d7d8f9ed5989ac4180",
+    "worktree_clean": true
+  },
+  "job_absence": {
+    "all_proved_absent": true,
+    "any_ambiguous": false,
+    "generation": 2,
+    "jobs": [
+      {
+        "ambiguous": false,
+        "job": "job-jspace-s3-p0r2-pilot-g2",
+        "outcome": "PROVED_ABSENT",
+        "proved_absent": true
+      },
+      {
+        "ambiguous": false,
+        "job": "job-jspace-s3-p0r2-recover-g2",
+        "outcome": "PROVED_ABSENT",
+        "proved_absent": true
+      }
+    ],
+    "query_error_is_absence": false,
+    "schema_version": "study3-p0-r2-job-absence-g2",
+    "stage": "STUDY3-P0-R2"
+  },
+  "launch_proof": {
+    "authorization_environment": "P0_R2_LIVE_REPLAY_AUTHORIZED",
+    "authorization_exported_globally": false,
+    "azure_cli_version": "2.83.0",
+    "checks": [
+      {
+        "argv0": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.CMD",
+        "check": "version",
+        "passed": true,
+        "returncode": 0,
+        "stderr_bytes": 0,
+        "stdout_bytes": 534,
+        "stdout_sha256": "2a9c3bd30b787a3340eb6ef55776cf9b0745388bb58791b003193a86cebcb751"
+      },
+      {
+        "argv0": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.CMD",
+        "check": "account_show",
+        "passed": true,
+        "returncode": 0,
+        "stderr_bytes": 0,
+        "stdout_bytes": 482,
+        "stdout_sha256": "7d31deb158bd3614ee8c5a5712ff46778b41ae79fccdebe5e480cad98a54c35e"
+      }
+    ],
+    "generation": 2,
+    "model_operations_performed": 0,
+    "relies_on_pathext": false,
+    "resolved_basename": "az.CMD",
+    "resolved_executable": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.CMD",
+    "resolved_with": "shutil.which",
+    "schema_version": "study3-p0-r2-windows-launch-proof-g2",
+    "stage": "STUDY3-P0-R2",
+    "subscription": "943bacdf-8b6e-4e3a-8126-a149f623d32e",
+    "uses_shell": false
+  },
+  "lock": {
+    "bytes": 15491,
+    "matches_committed_bytes": true,
+    "path": "studies/study3/pilot/p0_r2/p0_r2_execution_lock_g2.json",
+    "sha256": "9f43e1add0f965b74189521122f3c0d5af48f598bbc383367013baa75bae97ea",
+    "validation": {
+      "errors": 0,
+      "generation": 2,
+      "lock_sha256": "a3683efc151b696af6f5238f81caca496ccdf12cdfbc3683bccd96167aab8a85",
+      "model_operations_performed": 0,
+      "outcome": "LOCK_VALID",
+      "schema_version": "study3-p0-r2-execution-lock-validation-g2",
+      "stage": "STUDY3-P0-R2"
+    }
+  },
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "outcome": "PREFLIGHT_PASS",
+  "prefix_validation": null,
+  "schema_version": "study3-p0-r2-host-preflight-g2",
+  "stage": "STUDY3-P0-R2",
+  "task": {
+    "git_blob": "49cd120cc8f2bb3d7fb315b4bfbc3e07fe2d3347",
+    "matches_lock": true,
+    "path": "studies/study3/pilot/p0_r2/container/p0_r2_acr_task_g2.yaml"
+  },
+  "tokenizer_constructions": 0
+}
