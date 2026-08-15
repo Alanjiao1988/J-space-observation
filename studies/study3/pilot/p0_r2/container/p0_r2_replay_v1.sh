@@ -23,6 +23,7 @@ RUNTIME="${P0_R2_RUNTIME_ROOT:-/workspace/runtime}"
 RESULTS="${RESULTS_DIR:-${RUNTIME}/results}"
 ATTEMPT="${P0_R2_ATTEMPT:-}"
 DIGEST="${P0_R2_IMAGE_DIGEST:-}"
+MODE="${P0_R2_REPLAY_MODE:-}"
 
 if [ -z "${ATTEMPT}" ]; then
     echo "P0_R2_REPLAY_REFUSED=1 P0_R2_ATTEMPT is required" >&2
@@ -32,6 +33,41 @@ if [ -z "${DIGEST}" ]; then
     echo "P0_R2_REPLAY_REFUSED=1 P0_R2_IMAGE_DIGEST is required" >&2
     exit 2
 fi
+
+# The registered task file passes the submission mode straight through, and the
+# packing canary and the live replay reach this script by exactly the same
+# route. Branching on the mode is therefore the only thing standing between a
+# transport rehearsal and an irreversible consumption of the one-shot envelope,
+# so an absent or unrecognised mode is refused rather than assumed.
+case "${MODE}" in
+    packing-canary)
+        # A rehearsal of the submission transport only. Nothing here reads or
+        # writes the replay envelope, reaches the gate, or touches a model.
+        #
+        # The prefix absence proof is deliberately not attempted here: it needs
+        # Azure credentials that this task is not granted, and a probe that
+        # cannot reach the control plane can only report ambiguity, never
+        # absence. It is run from the host, where the credentials exist, as its
+        # own canary.
+        env P0_R2_ATTEMPT= P0_R2_RUNTIME_ROOT=/tmp/p0r2-packing-canary \
+            /usr/local/bin/p0_r2_canary_v1.sh preflight
+        echo "P0_R2_PACKING_CANARY_ATTEMPT=${ATTEMPT}"
+        echo "P0_R2_PREFIX_PROOF_DEFERRED_TO_HOST=1"
+        echo "P0_R2_PACKING_CANARY_COMPLETE=1"
+        exit 0
+        ;;
+    live)
+        : # fall through to the gate below
+        ;;
+    "")
+        echo "P0_R2_REPLAY_REFUSED=1 P0_R2_REPLAY_MODE is required" >&2
+        exit 2
+        ;;
+    *)
+        echo "P0_R2_REPLAY_REFUSED=1 unrecognised mode ${MODE}" >&2
+        exit 2
+        ;;
+esac
 
 mkdir -p "${RESULTS}"
 

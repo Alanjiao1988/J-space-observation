@@ -669,6 +669,45 @@ def test_the_dockerfile_does_not_leave_the_image_running_as_root():
         assert users.index("root") < len(users) - 1, "root privilege is never handed back"
 
 
+def test_the_replay_script_refuses_any_mode_it_was_not_given():
+    # The packing canary and the live replay reach this script by the same
+    # route, so an absent or unknown mode must refuse rather than default into
+    # consuming the one-shot envelope.
+    text = (CONTAINER / "p0_r2_replay_v1.sh").read_text(encoding="utf-8")
+    assert "P0_R2_REPLAY_MODE" in text
+    assert "P0_R2_REPLAY_REFUSED=1 P0_R2_REPLAY_MODE is required" in text
+    assert "unrecognised mode" in text
+    canary = text.index("packing-canary)")
+    live = text.index("live)")
+    gate = text.index("p0_r2_replay_gate_v1.py")
+    assert canary < live < gate, "the gate is reachable before the mode is known"
+    # The canary branch must leave before the gate can run.
+    assert "exit 0" in text[canary:live]
+
+
+def test_the_packing_canary_branch_emits_each_marker_exactly_once():
+    replay = (CONTAINER / "p0_r2_replay_v1.sh").read_text(encoding="utf-8")
+    canary = (CONTAINER / "p0_r2_canary_v1.sh").read_text(encoding="utf-8")
+    branch = replay[replay.index("packing-canary)"):replay.index("live)")]
+    # The canary script supplies three markers; the branch supplies the fourth.
+    combined = branch + canary
+    for marker in ("P0_R2_PACKING_CANARY_COMPLETE=1",
+                   "P0_R2_REPLAY_GATE_RUN=false",
+                   "P0_R2_ONE_SHOT_ENVELOPE_CONSUMED=false",
+                   "P0_R2_MODEL_OPERATIONS_PERFORMED=0"):
+        assert combined.count(marker) == 1, marker
+    # and the branch must not emit the live markers at all
+    assert "P0_R2_REPLAY_GATE_RUN=true" not in branch
+    assert "P0_R2_ONE_SHOT_ENVELOPE_CONSUMED=true" not in branch
+
+
+def test_the_packing_canary_branch_never_reaches_the_gate_or_the_envelope():
+    replay = (CONTAINER / "p0_r2_replay_v1.sh").read_text(encoding="utf-8")
+    branch = replay[replay.index("packing-canary)"):replay.index("live)")]
+    for forbidden in ("p0_r2_replay_gate_v1.py", "--run", "p0_r2_model_pilot",
+                      "p0_r1_model_runner"):
+        assert forbidden not in branch, forbidden
+
 def test_the_canary_script_is_model_free():
     text = (CONTAINER / "p0_r2_canary_v1.sh").read_text(encoding="utf-8")
     assert "P0_R2_MODEL_OPERATIONS_PERFORMED=0" in text
