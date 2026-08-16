@@ -1,0 +1,1154 @@
+{
+ "adversarial_mutation_count": 25,
+ "adversarial_mutations": [
+  {
+   "category": "d2_d3_allocation",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_d2_d3_family_mix_drops_depth_three",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "d2_d3_allocation",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_d2_d3_ceiling_mix_drops_depth_three",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "d2_d3_allocation",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json"
+   ],
+   "class": "artifact_only",
+   "detail": "manifest byte length drifted for studies/study3r/protocol/study3r_protocol_v1.json",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_d2_d3_family_mix_artifact_only",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/protocol/study3r_protocol_v1.json"
+  },
+  {
+   "category": "d2_d3_allocation",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_d3_family_depth_relabelled",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/tasks/study3r_task_generators_v1.py"
+  },
+  {
+   "category": "global_vs_candidate_scoped_failure",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_state_machine_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "state transition changed for S03_GENERATED_COT_CEILING",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_cot_ceiling_failure_scope_becomes_candidate_scoped",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "global_vs_candidate_scoped_failure",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_state_machine_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "state transition changed for S06_TWO_WRAPPER_JOINT_ADEQUACY",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_wrapper_adequacy_failure_scope_changed",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "global_vs_candidate_scoped_failure",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_state_machine_v1.json"
+   ],
+   "class": "artifact_only",
+   "detail": "state transition changed for S03_GENERATED_COT_CEILING",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_state_machine_failure_target_artifact_only",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/protocol/study3r_state_machine_v1.json"
+  },
+  {
+   "category": "cot_do_sample_temperature_top_p",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json"
+   ],
+   "class": "artifact_only",
+   "detail": "manifest byte length drifted for studies/study3r/protocol/study3r_protocol_v1.json",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_cot_do_sample_true_artifact_only",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "Additional properties are not allowed ('do_sample' was unexpected)\n\nFailed validating 'additionalProperties' in schema['properties']['estimands']['properties']['generated_cot_ceiling']:\n    {'addition"
+     }
+    ]
+   },
+   "target": "studies/study3r/protocol/study3r_protocol_v1.json"
+  },
+  {
+   "category": "cot_do_sample_temperature_top_p",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json"
+   ],
+   "class": "artifact_only",
+   "detail": "CoT per-item generation bound changed for RT",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_cot_max_new_tokens_artifact_only",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "4096 was expected\n\nFailed validating 'const' in schema['properties']['estimands']['properties']['generated_cot_ceiling']['properties']['resource_bounds_per_checkpoint']['properties']['RT']['properties"
+     }
+    ]
+   },
+   "target": "studies/study3r/protocol/study3r_protocol_v1.json"
+  },
+  {
+   "category": "cot_do_sample_temperature_top_p",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "E0 sampling enabled",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_e0_do_sample_true",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "False was expected\n\nFailed validating 'const' in schema['properties']['estimands']['properties']['primary']['properties']['decoding']['properties']['do_sample']:\n    {'const': False}\n\nOn instance['est"
+     }
+    ]
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "d0_per_item_position_rule",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_rendering_registry_v1.json"
+   ],
+   "class": "artifact_only",
+   "detail": "manifest digest drifted for studies/study3r/protocol/study3r_rendering_registry_v1.json",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_d0_registry_position_artifact_only",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/protocol/study3r_rendering_registry_v1.json"
+  },
+  {
+   "category": "d0_per_item_position_rule",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json"
+   ],
+   "class": "artifact_only",
+   "detail": "D0 discriminant position changed for RT/W2_ROLE_CANONICAL",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_d0_protocol_position_artifact_only",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/protocol/study3r_protocol_v1.json"
+  },
+  {
+   "category": "forced_think_closure",
+   "changed_artifacts": [
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_rendering_registry_v1.schema.json"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_forced_reasoning_closure_removed",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "'</think>\\n\\n' is not one of ['', '']\n\nFailed validating 'enum' in schema['properties']['interfaces']['properties']['e0_arms']['items']['properties']['per_checkpoint']['properties']['RT']['properties'"
+     },
+     {
+      "document": "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+      "error": "'</think>\\n\\n' is not one of ['', '']\n\nFailed validating 'enum' in schema['properties']['entries']['items']['properties']['frozen_reasoning_closure']:\n    {'enum': ['', ''], 'type': 'string'}\n\nOn inst"
+     }
+    ]
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "forced_think_closure",
+   "changed_artifacts": [
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_rendering_registry_v1.schema.json"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_forced_reasoning_closure_changed",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "'</think>\\n\\n' is not one of ['', '</think>\\n']\n\nFailed validating 'enum' in schema['properties']['interfaces']['properties']['e0_arms']['items']['properties']['per_checkpoint']['properties']['RT']['p"
+     },
+     {
+      "document": "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+      "error": "'</think>\\n\\n' is not one of ['', '</think>\\n']\n\nFailed validating 'enum' in schema['properties']['entries']['items']['properties']['frozen_reasoning_closure']:\n    {'enum': ['', '</think>\\n'], 'type'"
+     }
+    ]
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "forced_think_closure",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_rendering_registry_v1.json"
+   ],
+   "class": "artifact_only",
+   "detail": "manifest byte length drifted for studies/study3r/protocol/study3r_rendering_registry_v1.json",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_closure_artifact_only",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/protocol/study3r_rendering_registry_v1.json"
+  },
+  {
+   "category": "forced_think_closure",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_surfaces_closure_emptied_while_rendered_bytes_unchanged",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/acquisition/study3r_tokenizer_surfaces_v1.json"
+  },
+  {
+   "category": "parser_anchoring",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_cot_parser_regex_unanchored",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/acquisition/study3r_tokenizer_surfaces_v1.json"
+  },
+  {
+   "category": "parser_anchoring",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json"
+   ],
+   "class": "artifact_only",
+   "detail": "manifest byte length drifted for studies/study3r/protocol/study3r_protocol_v1.json",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_cot_parser_regex_artifact_only",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/protocol/study3r_protocol_v1.json"
+  },
+  {
+   "category": "checkpoint_dtype_quantization",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json"
+   ],
+   "class": "artifact_only",
+   "detail": "manifest byte length drifted for studies/study3r/protocol/study3r_protocol_v1.json",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_checkpoint_dtype_injected",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "Additional properties are not allowed ('quantization', 'torch_dtype' were unexpected)\n\nFailed validating 'additionalProperties' in schema['properties']['checkpoints']['items']:\n    {'additionalPropert"
+     }
+    ]
+   },
+   "target": "studies/study3r/protocol/study3r_protocol_v1.json"
+  },
+  {
+   "category": "manifest_path_omission",
+   "changed_artifacts": [
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "the manifest inclusion rule set changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_manifest_omits_the_rendering_registry",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_manifest.py"
+  },
+  {
+   "category": "manifest_path_omission",
+   "changed_artifacts": [
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "the manifest inclusion rule set changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_manifest_omits_the_state_machine",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_manifest.py"
+  },
+  {
+   "category": "manifest_path_omission",
+   "changed_artifacts": [
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "the manifest inclusion rule set changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_manifest_omits_the_task_generator",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_manifest.py"
+  },
+  {
+   "category": "current_pointer_omission",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_current.json"
+   ],
+   "class": "artifact_only",
+   "detail": "manifest byte length drifted for studies/study3r/protocol/study3r_protocol_current.json",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_pointer_drops_the_authoritative_schema",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_current.json",
+      "error": "'authoritative_schema' is a required property\n\nFailed validating 'required' in schema:\n    {'$id': 'https://study3r.invalid/study3r_protocol_current.schema.json',\n     '$schema': 'https://json-schema."
+     }
+    ]
+   },
+   "target": "studies/study3r/protocol/study3r_protocol_current.json"
+  },
+  {
+   "category": "current_pointer_omission",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_current.json"
+   ],
+   "class": "artifact_only",
+   "detail": "an alternative authoritative artifact appeared",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_pointer_adds_an_alternative_authoritative_artifact",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_current.json",
+      "error": "['studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json'] is expected to be empty\n\nFailed validating 'maxItems' in schema['properties']['alternative_authoritative_artifacts']:\n    {'i"
+     }
+    ]
+   },
+   "target": "studies/study3r/protocol/study3r_protocol_current.json"
+  },
+  {
+   "category": "current_pointer_omission",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_current.json"
+   ],
+   "class": "artifact_only",
+   "detail": "a runtime overlay was permitted",
+   "killed_by": "semantic_validation",
+   "mutation_id": "adv_pointer_permits_a_runtime_overlay",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_current.json",
+      "error": "False was expected\n\nFailed validating 'const' in schema['properties']['runtime_overlay_permitted']:\n    {'const': False}\n\nOn instance['runtime_overlay_permitted']:\n    True"
+     }
+    ]
+   },
+   "target": "studies/study3r/protocol/study3r_protocol_current.json"
+  }
+ ],
+ "authority": "studies/study3r/prompts/study3r_protocol_v1_single_focused_review_authority.md",
+ "decision_bearing_survivor_count": 7,
+ "governance_test_predicate_audit": {
+  "after_declares_a_namespace_prefix_predicate": true,
+  "before_declares_a_namespace_prefix_predicate": false,
+  "newly_admitted_exact_paths": [
+   ".gitattributes",
+   "studies/study3r/README.md",
+   "tests/test_study3r_operator_governance.py",
+   "tests/test_study3r_protocol_v1.py"
+  ],
+  "newly_admitted_prefix": "studies/study3r/",
+  "no_protected_path_lies_inside_the_newly_admitted_prefix": true,
+  "per_path_protected_blob_assertions_unchanged": true,
+  "the_module_added_itself_to_its_own_permitted_modified_set": true
+ },
+ "killed_count": 42,
+ "no_effect_count": 0,
+ "no_effect_mutations": [],
+ "not_applicable_count": 0,
+ "outcome_definitions": {
+  "killed": "the rebuild failed or the semantic validator rejected the mutated bundle",
+  "no_effect_on_the_bundle": "the mutated generator symbol is not consumed by any committed artifact, so the rebuilt bundle is byte-identical; this is not a survivor because no registered value moved",
+  "not_applicable": "the mutation anchor did not resolve",
+  "survived": "at least one committed artifact changed and the semantic validator still accepted the bundle"
+ },
+ "registered_mutation_count": 24,
+ "registered_mutations": [
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "target checkpoint identity changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "target_checkpoint_identity",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "'deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B' is not one of ['deepseek-ai/DeepSeek-R1-Distill-Qwen-7B', 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B', 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B', 'deepseek-a"
+     }
+    ]
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "RP-B ladder membership or order changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "rp_b_membership_and_order",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "RP-B ladder length changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "rp_b_ladder_length_l",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "['deepseek-ai/DeepSeek-R1-Distill-Qwen-7B', 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B', 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B'] is too long\n\nFailed validating 'maxItems' in schema['properties']['s"
+     }
+    ]
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "immutable revision changed for RT",
+   "killed_by": "semantic_validation",
+   "mutation_id": "immutable_revision",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "True was expected\n\nFailed validating 'const' in schema['properties']['checkpoints']['items']['properties']['revision_matches_acquisition_record']:\n    {'const': True}\n\nOn instance['checkpoints'][0]['r"
+     }
+    ]
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md",
+    "studies/study3r/protocol/study3r_rendering_registry_v1.schema.json"
+   ],
+   "class": "coordinated",
+   "detail": "E0 legal answer surface set changed for RT",
+   "killed_by": "semantic_validation",
+   "mutation_id": "e0_legal_answer_surface",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "None is not of type 'string'\n\nFailed validating 'type' in schema['properties']['checkpoints']['items']['properties']['e0_legal_answer_surfaces']['properties']['E']['properties']['utf8_sha256']:\n    {'"
+     }
+    ]
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "E0 termination margin changed for RT",
+   "killed_by": "semantic_validation",
+   "mutation_id": "e0_max_new_tokens",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json"
+   ],
+   "class": "coordinated",
+   "detail": "D0 discriminant position offset changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "d0_discriminant_position",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md",
+    "studies/study3r/protocol/study3r_rendering_registry_v1.schema.json"
+   ],
+   "class": "coordinated",
+   "detail": "the role-canonical wrapper role changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "wrapper_role",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "the registered answer cue changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "wrapper_bytes",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/tasks/study3r_task_generators_v1.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md",
+    "studies/study3r/analysis/study3r_design_statistics_tables.json",
+    "studies/study3r/analysis/study3r_independent_recalculation_tables.json"
+   ],
+   "class": "coordinated",
+   "detail": "the global error budget changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "gate_alpha",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_design_statistics.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md",
+    "studies/study3r/analysis/study3r_design_statistics_tables.json",
+    "studies/study3r/analysis/study3r_independent_recalculation_tables.json"
+   ],
+   "class": "coordinated",
+   "detail": "G01_COT_CEILING sample size changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "gate_sample_size",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_design_statistics.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md",
+    "studies/study3r/analysis/study3r_design_statistics_tables.json",
+    "studies/study3r/analysis/study3r_independent_recalculation_tables.json"
+   ],
+   "class": "coordinated",
+   "detail": "G01_COT_CEILING floor or upper margin changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "gate_floor",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_design_statistics.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md",
+    "studies/study3r/analysis/study3r_design_statistics_tables.json",
+    "studies/study3r/analysis/study3r_independent_recalculation_tables.json"
+   ],
+   "class": "coordinated",
+   "detail": "G01_COT_CEILING sample size changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "gate_pass_count",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_design_statistics.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md",
+    "studies/study3r/analysis/study3r_design_statistics_tables.json"
+   ],
+   "class": "coordinated",
+   "detail": "the multiplicity family changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "multiplicity_family",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_design_statistics.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md",
+    "studies/study3r/analysis/study3r_design_statistics_tables.json",
+    "studies/study3r/analysis/study3r_independent_recalculation_tables.json"
+   ],
+   "class": "coordinated",
+   "detail": "G05_NEGATIVE_CONTROL floor or upper margin changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "negative_control_margin",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_design_statistics.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md",
+    "studies/study3r/analysis/study3r_design_statistics_tables.json",
+    "studies/study3r/analysis/study3r_independent_recalculation_tables.json"
+   ],
+   "class": "coordinated",
+   "detail": "the task-population chance level changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "negative_control_chance_level",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_design_statistics.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "CoT k changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "cot_k",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "CoT parser changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "cot_parser",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "CoT per-item generation bound changed for RT",
+   "killed_by": "semantic_validation",
+   "mutation_id": "cot_resource_bound",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "True was expected\n\nFailed validating 'const' in schema['properties']['estimands']['properties']['generated_cot_ceiling']['properties']['resource_bounds_per_checkpoint']['properties']['RT']['properties"
+     }
+    ]
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_state_machine_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "state transition changed for S04_COMPETENCE_CONTROLS",
+   "killed_by": "semantic_validation",
+   "mutation_id": "state_transition",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/analysis/study3r_atomic_cell_census_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md",
+    "studies/study3r/analysis/study3r_design_statistics_tables.json",
+    "studies/study3r/analysis/study3r_independent_recalculation_tables.json"
+   ],
+   "class": "coordinated",
+   "detail": "m_max changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "census_wrapper_factor",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_design_statistics.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/protocol/study3r_protocol_current.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_protocol_current.schema.json"
+   ],
+   "class": "coordinated",
+   "detail": "current authoritative protocol path changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "current_authoritative_path",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/protocol/study3r_protocol_current.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "execution was authorized",
+   "killed_by": "semantic_validation",
+   "mutation_id": "execution_authorization",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "False was expected\n\nFailed validating 'const' in schema['properties']['status']['properties']['execution_authorized']:\n    {'const': False}\n\nOn instance['status']['execution_authorized']:\n    True"
+     },
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_current.json",
+      "error": "False was expected\n\nFailed validating 'const' in schema['properties']['execution_authorized']:\n    {'const': False}\n\nOn instance['execution_authorized']:\n    True"
+     }
+    ]
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "candidate_registered",
+   "changed_artifacts": [
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "the manifest inclusion rule set changed",
+   "killed_by": "semantic_validation",
+   "mutation_id": "manifest_inclusion_rule",
+   "outcome": "killed",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_manifest.py"
+  }
+ ],
+ "repository_worktree_was_mutated": false,
+ "schema_version": "study3r-review-mutation-audit-v1",
+ "survivor_count": 7,
+ "survivors": [
+  {
+   "category": "d2_d3_allocation",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_d2_d3_family_mix_drops_depth_three",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "d2_d3_allocation",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.md"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_d2_d3_ceiling_mix_drops_depth_three",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "d2_d3_allocation",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_d3_family_depth_relabelled",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/tasks/study3r_task_generators_v1.py"
+  },
+  {
+   "category": "forced_think_closure",
+   "changed_artifacts": [
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_rendering_registry_v1.schema.json"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_forced_reasoning_closure_removed",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "'</think>\\n\\n' is not one of ['', '']\n\nFailed validating 'enum' in schema['properties']['interfaces']['properties']['e0_arms']['items']['properties']['per_checkpoint']['properties']['RT']['properties'"
+     },
+     {
+      "document": "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+      "error": "'</think>\\n\\n' is not one of ['', '']\n\nFailed validating 'enum' in schema['properties']['entries']['items']['properties']['frozen_reasoning_closure']:\n    {'enum': ['', ''], 'type': 'string'}\n\nOn inst"
+     }
+    ]
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "forced_think_closure",
+   "changed_artifacts": [
+    "studies/study3r/study3r_candidate_manifest_v1.json",
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+    "studies/study3r/protocol/study3r_rendering_registry_v1.schema.json"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_forced_reasoning_closure_changed",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": [
+     {
+      "document": "studies/study3r/protocol/study3r_protocol_v1.json",
+      "error": "'</think>\\n\\n' is not one of ['', '</think>\\n']\n\nFailed validating 'enum' in schema['properties']['interfaces']['properties']['e0_arms']['items']['properties']['per_checkpoint']['properties']['RT']['p"
+     },
+     {
+      "document": "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+      "error": "'</think>\\n\\n' is not one of ['', '</think>\\n']\n\nFailed validating 'enum' in schema['properties']['entries']['items']['properties']['frozen_reasoning_closure']:\n    {'enum': ['', '</think>\\n'], 'type'"
+     }
+    ]
+   },
+   "target": "studies/study3r/analysis/study3r_protocol_build.py"
+  },
+  {
+   "category": "forced_think_closure",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_surfaces_closure_emptied_while_rendered_bytes_unchanged",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/acquisition/study3r_tokenizer_surfaces_v1.json"
+  },
+  {
+   "category": "parser_anchoring",
+   "changed_artifacts": [
+    "studies/study3r/protocol/study3r_protocol_v1.json",
+    "studies/study3r/study3r_candidate_manifest_v1.json"
+   ],
+   "class": "coordinated",
+   "detail": "the semantic validator accepted a bundle whose committed artifacts changed",
+   "killed_by": null,
+   "mutation_id": "adv_cot_parser_regex_unanchored",
+   "outcome": "survived",
+   "schema_conformance": {
+    "available": true,
+    "failures": []
+   },
+   "target": "studies/study3r/acquisition/study3r_tokenizer_surfaces_v1.json"
+  }
+ ],
+ "total_mutation_count": 49,
+ "validator_performs_json_schema_validation": false,
+ "validator_under_audit": "tests/test_study3r_protocol_v1.py::validate_bundle"
+}
