@@ -1,0 +1,561 @@
+{
+ "authority": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md",
+ "both_wrapper_arms_enter_the_census": true,
+ "cells": [
+  {
+   "cell_id": "G01_COT_CEILING|RT|C1_CANONICAL_GENERATED_COT",
+   "checkpoint_role": "RT",
+   "gate_id": "G01_COT_CEILING",
+   "phase": "precondition",
+   "route": "C1_CANONICAL_GENERATED_COT",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_CEILING_BANK"
+  },
+  {
+   "cell_id": "G01_COT_CEILING|RP_B1|C1_CANONICAL_GENERATED_COT",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G01_COT_CEILING",
+   "phase": "precondition",
+   "route": "C1_CANONICAL_GENERATED_COT",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_CEILING_BANK"
+  },
+  {
+   "cell_id": "G01_COT_CEILING|RP_B2|C1_CANONICAL_GENERATED_COT",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G01_COT_CEILING",
+   "phase": "precondition",
+   "route": "C1_CANONICAL_GENERATED_COT",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_CEILING_BANK"
+  },
+  {
+   "cell_id": "G01_COT_CEILING|RP_B3|C1_CANONICAL_GENERATED_COT",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G01_COT_CEILING",
+   "phase": "precondition",
+   "route": "C1_CANONICAL_GENERATED_COT",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_CEILING_BANK"
+  },
+  {
+   "cell_id": "G02_CONTROL_RECOVERY|RT|W1_RAW_DIRECT",
+   "checkpoint_role": "RT",
+   "gate_id": "G02_CONTROL_RECOVERY",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "REC"
+  },
+  {
+   "cell_id": "G02_CONTROL_RECOVERY|RT|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RT",
+   "gate_id": "G02_CONTROL_RECOVERY",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "REC"
+  },
+  {
+   "cell_id": "G02_CONTROL_RECOVERY|RP_B1|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G02_CONTROL_RECOVERY",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "REC"
+  },
+  {
+   "cell_id": "G02_CONTROL_RECOVERY|RP_B1|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G02_CONTROL_RECOVERY",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "REC"
+  },
+  {
+   "cell_id": "G02_CONTROL_RECOVERY|RP_B2|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G02_CONTROL_RECOVERY",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "REC"
+  },
+  {
+   "cell_id": "G02_CONTROL_RECOVERY|RP_B2|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G02_CONTROL_RECOVERY",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "REC"
+  },
+  {
+   "cell_id": "G02_CONTROL_RECOVERY|RP_B3|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G02_CONTROL_RECOVERY",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "REC"
+  },
+  {
+   "cell_id": "G02_CONTROL_RECOVERY|RP_B3|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G02_CONTROL_RECOVERY",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "REC"
+  },
+  {
+   "cell_id": "G03_CONTROL_BINDING|RT|W1_RAW_DIRECT",
+   "checkpoint_role": "RT",
+   "gate_id": "G03_CONTROL_BINDING",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "BIND"
+  },
+  {
+   "cell_id": "G03_CONTROL_BINDING|RT|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RT",
+   "gate_id": "G03_CONTROL_BINDING",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "BIND"
+  },
+  {
+   "cell_id": "G03_CONTROL_BINDING|RP_B1|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G03_CONTROL_BINDING",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "BIND"
+  },
+  {
+   "cell_id": "G03_CONTROL_BINDING|RP_B1|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G03_CONTROL_BINDING",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "BIND"
+  },
+  {
+   "cell_id": "G03_CONTROL_BINDING|RP_B2|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G03_CONTROL_BINDING",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "BIND"
+  },
+  {
+   "cell_id": "G03_CONTROL_BINDING|RP_B2|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G03_CONTROL_BINDING",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "BIND"
+  },
+  {
+   "cell_id": "G03_CONTROL_BINDING|RP_B3|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G03_CONTROL_BINDING",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "BIND"
+  },
+  {
+   "cell_id": "G03_CONTROL_BINDING|RP_B3|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G03_CONTROL_BINDING",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "BIND"
+  },
+  {
+   "cell_id": "G04_CONTROL_PRIMITIVE|RT|W1_RAW_DIRECT",
+   "checkpoint_role": "RT",
+   "gate_id": "G04_CONTROL_PRIMITIVE",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "PRIM"
+  },
+  {
+   "cell_id": "G04_CONTROL_PRIMITIVE|RT|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RT",
+   "gate_id": "G04_CONTROL_PRIMITIVE",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "PRIM"
+  },
+  {
+   "cell_id": "G04_CONTROL_PRIMITIVE|RP_B1|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G04_CONTROL_PRIMITIVE",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "PRIM"
+  },
+  {
+   "cell_id": "G04_CONTROL_PRIMITIVE|RP_B1|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G04_CONTROL_PRIMITIVE",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "PRIM"
+  },
+  {
+   "cell_id": "G04_CONTROL_PRIMITIVE|RP_B2|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G04_CONTROL_PRIMITIVE",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "PRIM"
+  },
+  {
+   "cell_id": "G04_CONTROL_PRIMITIVE|RP_B2|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G04_CONTROL_PRIMITIVE",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "PRIM"
+  },
+  {
+   "cell_id": "G04_CONTROL_PRIMITIVE|RP_B3|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G04_CONTROL_PRIMITIVE",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "PRIM"
+  },
+  {
+   "cell_id": "G04_CONTROL_PRIMITIVE|RP_B3|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G04_CONTROL_PRIMITIVE",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "PRIM"
+  },
+  {
+   "cell_id": "G05_NEGATIVE_CONTROL|RT|W1_RAW_DIRECT",
+   "checkpoint_role": "RT",
+   "gate_id": "G05_NEGATIVE_CONTROL",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "NEG"
+  },
+  {
+   "cell_id": "G05_NEGATIVE_CONTROL|RT|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RT",
+   "gate_id": "G05_NEGATIVE_CONTROL",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "NEG"
+  },
+  {
+   "cell_id": "G05_NEGATIVE_CONTROL|RP_B1|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G05_NEGATIVE_CONTROL",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "NEG"
+  },
+  {
+   "cell_id": "G05_NEGATIVE_CONTROL|RP_B1|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G05_NEGATIVE_CONTROL",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "NEG"
+  },
+  {
+   "cell_id": "G05_NEGATIVE_CONTROL|RP_B2|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G05_NEGATIVE_CONTROL",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "NEG"
+  },
+  {
+   "cell_id": "G05_NEGATIVE_CONTROL|RP_B2|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G05_NEGATIVE_CONTROL",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "NEG"
+  },
+  {
+   "cell_id": "G05_NEGATIVE_CONTROL|RP_B3|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G05_NEGATIVE_CONTROL",
+   "phase": "control",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "NEG"
+  },
+  {
+   "cell_id": "G05_NEGATIVE_CONTROL|RP_B3|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G05_NEGATIVE_CONTROL",
+   "phase": "control",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "NEG"
+  },
+  {
+   "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RT|W1_RAW_DIRECT",
+   "checkpoint_role": "RT",
+   "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+   "phase": "adequacy",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "D2_ADEQUACY_BANK"
+  },
+  {
+   "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RT|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RT",
+   "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+   "phase": "adequacy",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "D2_ADEQUACY_BANK"
+  },
+  {
+   "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B1|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+   "phase": "adequacy",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "D2_ADEQUACY_BANK"
+  },
+  {
+   "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B1|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+   "phase": "adequacy",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "D2_ADEQUACY_BANK"
+  },
+  {
+   "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B2|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+   "phase": "adequacy",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "D2_ADEQUACY_BANK"
+  },
+  {
+   "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B2|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+   "phase": "adequacy",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "D2_ADEQUACY_BANK"
+  },
+  {
+   "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B3|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+   "phase": "adequacy",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "D2_ADEQUACY_BANK"
+  },
+  {
+   "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B3|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+   "phase": "adequacy",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "D2_ADEQUACY_BANK"
+  },
+  {
+   "cell_id": "G07_RPB_DEVELOPMENT|RP_B1|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G07_RPB_DEVELOPMENT",
+   "phase": "development",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_DEVELOPMENT_BANK"
+  },
+  {
+   "cell_id": "G07_RPB_DEVELOPMENT|RP_B1|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G07_RPB_DEVELOPMENT",
+   "phase": "development",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_DEVELOPMENT_BANK"
+  },
+  {
+   "cell_id": "G07_RPB_DEVELOPMENT|RP_B2|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G07_RPB_DEVELOPMENT",
+   "phase": "development",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_DEVELOPMENT_BANK"
+  },
+  {
+   "cell_id": "G07_RPB_DEVELOPMENT|RP_B2|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G07_RPB_DEVELOPMENT",
+   "phase": "development",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_DEVELOPMENT_BANK"
+  },
+  {
+   "cell_id": "G07_RPB_DEVELOPMENT|RP_B3|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G07_RPB_DEVELOPMENT",
+   "phase": "development",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_DEVELOPMENT_BANK"
+  },
+  {
+   "cell_id": "G07_RPB_DEVELOPMENT|RP_B3|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G07_RPB_DEVELOPMENT",
+   "phase": "development",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_DEVELOPMENT_BANK"
+  },
+  {
+   "cell_id": "G08_RPB_CONFIRMATION|RP_B1|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G08_RPB_CONFIRMATION",
+   "phase": "confirmation",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_CONFIRMATION_BANK"
+  },
+  {
+   "cell_id": "G08_RPB_CONFIRMATION|RP_B1|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B1",
+   "gate_id": "G08_RPB_CONFIRMATION",
+   "phase": "confirmation",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_CONFIRMATION_BANK"
+  },
+  {
+   "cell_id": "G08_RPB_CONFIRMATION|RP_B2|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G08_RPB_CONFIRMATION",
+   "phase": "confirmation",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_CONFIRMATION_BANK"
+  },
+  {
+   "cell_id": "G08_RPB_CONFIRMATION|RP_B2|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B2",
+   "gate_id": "G08_RPB_CONFIRMATION",
+   "phase": "confirmation",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_CONFIRMATION_BANK"
+  },
+  {
+   "cell_id": "G08_RPB_CONFIRMATION|RP_B3|W1_RAW_DIRECT",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G08_RPB_CONFIRMATION",
+   "phase": "confirmation",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_CONFIRMATION_BANK"
+  },
+  {
+   "cell_id": "G08_RPB_CONFIRMATION|RP_B3|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RP_B3",
+   "gate_id": "G08_RPB_CONFIRMATION",
+   "phase": "confirmation",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_CONFIRMATION_BANK"
+  },
+  {
+   "cell_id": "G09_RT_E0_QUALIFICATION|RT|W1_RAW_DIRECT",
+   "checkpoint_role": "RT",
+   "gate_id": "G09_RT_E0_QUALIFICATION",
+   "phase": "target",
+   "route": "W1_RAW_DIRECT",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_TARGET_BANK"
+  },
+  {
+   "cell_id": "G09_RT_E0_QUALIFICATION|RT|W2_ROLE_CANONICAL",
+   "checkpoint_role": "RT",
+   "gate_id": "G09_RT_E0_QUALIFICATION",
+   "phase": "target",
+   "route": "W2_ROLE_CANONICAL",
+   "statistical_unit": "item",
+   "task_family": "D2_D3_TARGET_BANK"
+  }
+ ],
+ "count": 58,
+ "counts_by_gate": {
+  "G01_COT_CEILING": 4,
+  "G02_CONTROL_RECOVERY": 8,
+  "G03_CONTROL_BINDING": 8,
+  "G04_CONTROL_PRIMITIVE": 8,
+  "G05_NEGATIVE_CONTROL": 8,
+  "G06_WRAPPER_JOINT_ADEQUACY": 8,
+  "G07_RPB_DEVELOPMENT": 6,
+  "G08_RPB_CONFIRMATION": 6,
+  "G09_RT_E0_QUALIFICATION": 2
+ },
+ "diagnostic_contributes_no_cell": true,
+ "factors": {
+  "checkpoint_role": [
+   "RT",
+   "RP_B1",
+   "RP_B2",
+   "RP_B3"
+  ],
+  "cot_route": [
+   "C1_CANONICAL_GENERATED_COT"
+  ],
+  "e0_wrapper_arm": [
+   "W1_RAW_DIRECT",
+   "W2_ROLE_CANONICAL"
+  ],
+  "rp_b_ladder_length": 3
+ },
+ "full_ladder_enters_the_census": true,
+ "m_max": 58,
+ "protocol_id": "STUDY3R_PROTOCOL_V1",
+ "schema_version": "study3r-atomic-cell-census-v1"
+}

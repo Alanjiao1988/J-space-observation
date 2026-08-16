@@ -1,0 +1,239 @@
+{
+ "$id": "https://study3r.invalid/study3r_candidate_manifest_v1.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "properties": {
+  "aggregate_sha256": {
+   "pattern": "^[0-9a-f]{64}$",
+   "type": "string"
+  },
+  "authority": {
+   "const": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md"
+  },
+  "deferred_exclusions": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "path": {
+      "pattern": "^studies/study3r/",
+      "type": "string"
+     },
+     "reason": {
+      "minLength": 40,
+      "type": "string"
+     }
+    },
+    "required": [
+     "path",
+     "reason"
+    ],
+    "type": "object"
+   },
+   "minItems": 1,
+   "type": "array"
+  },
+  "entries": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "bytes": {
+      "minimum": 1,
+      "type": "integer"
+     },
+     "category": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "git_blob": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "lf_only": {
+      "const": true
+     },
+     "path": {
+      "pattern": "^(studies/study3r/|tests/)",
+      "type": "string"
+     },
+     "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+     },
+     "utf8_bom": {
+      "const": false
+     }
+    },
+    "required": [
+     "bytes",
+     "category",
+     "git_blob",
+     "lf_only",
+     "path",
+     "sha256",
+     "utf8_bom"
+    ],
+    "type": "object"
+   },
+   "minItems": 1,
+   "type": "array"
+  },
+  "entry_count": {
+   "minimum": 1,
+   "type": "integer"
+  },
+  "every_entry_is_lf_only": {
+   "const": true
+  },
+  "execution_authorized": {
+   "const": false
+  },
+  "git": {
+   "additionalProperties": false,
+   "properties": {
+    "branch": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "commit": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "is_outer_recursive_identity": {
+     "const": true
+    },
+    "tree": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "required": [
+    "branch",
+    "commit",
+    "is_outer_recursive_identity",
+    "tree"
+   ],
+   "type": "object"
+  },
+  "inclusion_categories": {
+   "items": {
+    "minLength": 1,
+    "type": "string"
+   },
+   "minItems": 1,
+   "type": "array"
+  },
+  "inclusion_rule_count": {
+   "minimum": 1,
+   "type": "integer"
+  },
+  "is_an_execution_seal": {
+   "const": false
+  },
+  "manifest_kind": {
+   "const": "candidate_reproducibility_manifest"
+  },
+  "missing_paths": {
+   "items": {
+    "type": "string"
+   },
+   "maxItems": 0,
+   "type": "array"
+  },
+  "no_entry_has_a_utf8_bom": {
+   "const": true
+  },
+  "protocol_frozen": {
+   "const": false
+  },
+  "protocol_id": {
+   "const": "STUDY3R_PROTOCOL_V1"
+  },
+  "schema_version": {
+   "const": "study3r-candidate-manifest-v1"
+  },
+  "sealing_design": {
+   "additionalProperties": false,
+   "properties": {
+    "acyclic": {
+     "const": true
+    },
+    "aggregate_rule": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "claims_to_contain_its_own_hash": {
+     "const": false
+    },
+    "inner_identity": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "outer_recursive_identity": {
+     "const": "git_commit_and_tree"
+    }
+   },
+   "required": [
+    "acyclic",
+    "aggregate_rule",
+    "claims_to_contain_its_own_hash",
+    "inner_identity",
+    "outer_recursive_identity"
+   ],
+   "type": "object"
+  },
+  "self_exclusions": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "path": {
+      "const": "studies/study3r/study3r_candidate_manifest_v1.json"
+     },
+     "reason": {
+      "minLength": 40,
+      "type": "string"
+     }
+    },
+    "required": [
+     "path",
+     "reason"
+    ],
+    "type": "object"
+   },
+   "maxItems": 1,
+   "minItems": 1,
+   "type": "array"
+  }
+ },
+ "required": [
+  "aggregate_sha256",
+  "authority",
+  "deferred_exclusions",
+  "entries",
+  "entry_count",
+  "every_entry_is_lf_only",
+  "execution_authorized",
+  "git",
+  "inclusion_categories",
+  "inclusion_rule_count",
+  "is_an_execution_seal",
+  "manifest_kind",
+  "missing_paths",
+  "no_entry_has_a_utf8_bom",
+  "protocol_frozen",
+  "protocol_id",
+  "schema_version",
+  "sealing_design",
+  "self_exclusions"
+ ],
+ "title": "Study 3R candidate reproducibility manifest",
+ "type": "object"
+}

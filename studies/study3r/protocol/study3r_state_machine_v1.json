@@ -1,0 +1,292 @@
+{
+ "activation_patching_states": [],
+ "authority": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md",
+ "current_state": "S00_AUTHORED",
+ "current_terminal": "T00_NOT_EXECUTED",
+ "execution_order": [
+  "S00_AUTHORED",
+  "S01_SEALED_ENGINEERING_SHAKEDOWN",
+  "S02_CHECKPOINT_TOKENIZER_FUNCTIONAL_EQUIVALENCE",
+  "S03_GENERATED_COT_CEILING",
+  "S04_COMPETENCE_CONTROLS",
+  "S05_NEGATIVE_CONTROL",
+  "S06_TWO_WRAPPER_JOINT_ADEQUACY",
+  "S07_RPB_LADDER_DEVELOPMENT_AND_CONFIRMATION",
+  "S08_RPB_FIRST_CONFIRMED_PASS_FREEZE",
+  "S09_RT_E0_BEHAVIORAL_QUALIFICATION",
+  "S10_D0_DIAGNOSTIC_REPORT",
+  "S11_TERMINAL_DISPOSITION"
+ ],
+ "identifier_uniqueness": {
+  "every_registered_gate_appears_exactly_once": true,
+  "rp_b_decision_id": "Q0_RPB_QUALIFICATION_DECISION",
+  "state_and_terminal_namespaces_are_disjoint": true,
+  "state_ids_are_unique": true,
+  "terminal_ids_are_unique": true
+ },
+ "initial_state": "S00_AUTHORED",
+ "mechanism_claim_states": [],
+ "protocol_id": "STUDY3R_PROTOCOL_V1",
+ "rp_m_states": [],
+ "schema_version": "study3r-state-machine-v1",
+ "states": [
+  {
+   "gate_ids": [],
+   "kind": "initial",
+   "state_id": "S00_AUTHORED",
+   "title": "Protocol candidate authored, execution unauthorized",
+   "transitions": [
+    {
+     "outcome": "execution_authorization_granted",
+     "target": "S01_SEALED_ENGINEERING_SHAKEDOWN"
+    },
+    {
+     "outcome": "execution_authorization_absent",
+     "target": "T00_NOT_EXECUTED"
+    }
+   ]
+  },
+  {
+   "gate_ids": [],
+   "kind": "operational",
+   "state_id": "S01_SEALED_ENGINEERING_SHAKEDOWN",
+   "title": "Sealed engineering shakedown",
+   "transitions": [
+    {
+     "outcome": "shakedown_reproduced_every_sealed_surface",
+     "target": "S02_CHECKPOINT_TOKENIZER_FUNCTIONAL_EQUIVALENCE"
+    },
+    {
+     "outcome": "shakedown_failed_to_reproduce_a_sealed_surface",
+     "target": "T01_SHAKEDOWN_FAILED"
+    }
+   ]
+  },
+  {
+   "gate_ids": [],
+   "kind": "operational",
+   "state_id": "S02_CHECKPOINT_TOKENIZER_FUNCTIONAL_EQUIVALENCE",
+   "title": "Checkpoint and tokenizer functional-equivalence verification",
+   "transitions": [
+    {
+     "outcome": "every_registered_tuple_verified_and_stratified",
+     "target": "S03_GENERATED_COT_CEILING"
+    },
+    {
+     "outcome": "a_registered_tuple_could_not_be_verified",
+     "target": "T02_TOKENIZER_EQUIVALENCE_FAILED"
+    }
+   ]
+  },
+  {
+   "gate_ids": [
+    "G01_COT_CEILING"
+   ],
+   "kind": "statistical",
+   "state_id": "S03_GENERATED_COT_CEILING",
+   "title": "Generated-CoT ceiling per checkpoint",
+   "transitions": [
+    {
+     "outcome": "every_checkpoint_cell_passed",
+     "target": "S04_COMPETENCE_CONTROLS"
+    },
+    {
+     "outcome": "at_least_one_checkpoint_cell_failed",
+     "target": "T03_COT_CEILING_FAILED"
+    }
+   ]
+  },
+  {
+   "gate_ids": [
+    "G02_CONTROL_RECOVERY",
+    "G03_CONTROL_BINDING",
+    "G04_CONTROL_PRIMITIVE"
+   ],
+   "kind": "statistical",
+   "state_id": "S04_COMPETENCE_CONTROLS",
+   "title": "Trivial recovery, explicit binding and single-primitive controls",
+   "transitions": [
+    {
+     "outcome": "every_control_cell_passed",
+     "target": "S05_NEGATIVE_CONTROL"
+    },
+    {
+     "outcome": "at_least_one_control_cell_failed",
+     "target": "T04_COMPETENCE_CONTROL_FAILED"
+    }
+   ]
+  },
+  {
+   "gate_ids": [
+    "G05_NEGATIVE_CONTROL"
+   ],
+   "kind": "statistical",
+   "state_id": "S05_NEGATIVE_CONTROL",
+   "title": "Deliberately invalid negative control",
+   "transitions": [
+    {
+     "outcome": "every_negative_control_cell_passed",
+     "target": "S06_TWO_WRAPPER_JOINT_ADEQUACY"
+    },
+    {
+     "outcome": "at_least_one_negative_control_cell_failed",
+     "target": "T05_NEGATIVE_CONTROL_FAILED"
+    }
+   ]
+  },
+  {
+   "gate_ids": [
+    "G06_WRAPPER_JOINT_ADEQUACY"
+   ],
+   "kind": "statistical",
+   "state_id": "S06_TWO_WRAPPER_JOINT_ADEQUACY",
+   "title": "Two-wrapper joint adequacy",
+   "transitions": [
+    {
+     "outcome": "both_arms_cleared_the_floor_for_every_checkpoint",
+     "target": "S07_RPB_LADDER_DEVELOPMENT_AND_CONFIRMATION"
+    },
+    {
+     "outcome": "at_least_one_arm_failed_for_at_least_one_checkpoint",
+     "target": "T06_WRAPPER_ADEQUACY_FAILED"
+    }
+   ]
+  },
+  {
+   "gate_ids": [
+    "G07_RPB_DEVELOPMENT",
+    "G08_RPB_CONFIRMATION"
+   ],
+   "kind": "statistical",
+   "state_id": "S07_RPB_LADDER_DEVELOPMENT_AND_CONFIRMATION",
+   "title": "RP-B ladder development and item-disjoint confirmation scan",
+   "transitions": [
+    {
+     "outcome": "a_candidate_passed_development_and_confirmation_on_both_arms",
+     "target": "S08_RPB_FIRST_CONFIRMED_PASS_FREEZE"
+    },
+    {
+     "outcome": "the_full_registered_ladder_was_scanned_without_a_confirmed_pass",
+     "target": "T07_NO_QUALIFIED_REFERENCE"
+    }
+   ]
+  },
+  {
+   "gate_ids": [],
+   "kind": "operational",
+   "state_id": "S08_RPB_FIRST_CONFIRMED_PASS_FREEZE",
+   "title": "First-confirmed-pass RP-B freeze",
+   "transitions": [
+    {
+     "outcome": "freeze_record_written",
+     "target": "S09_RT_E0_BEHAVIORAL_QUALIFICATION"
+    },
+    {
+     "outcome": "freeze_record_could_not_be_written",
+     "target": "T08_RPB_FREEZE_RECORD_FAILED"
+    }
+   ]
+  },
+  {
+   "gate_ids": [
+    "G09_RT_E0_QUALIFICATION"
+   ],
+   "kind": "statistical",
+   "state_id": "S09_RT_E0_BEHAVIORAL_QUALIFICATION",
+   "title": "RT E0 behavioral qualification",
+   "transitions": [
+    {
+     "outcome": "rt_cleared_the_floor_on_both_arms",
+     "target": "S10_D0_DIAGNOSTIC_REPORT"
+    },
+    {
+     "outcome": "rt_failed_at_least_one_arm",
+     "target": "S10_D0_DIAGNOSTIC_REPORT"
+    }
+   ]
+  },
+  {
+   "gate_ids": [],
+   "kind": "diagnostic",
+   "state_id": "S10_D0_DIAGNOSTIC_REPORT",
+   "title": "D0 diagnostic reporting",
+   "transitions": [
+    {
+     "outcome": "diagnostic_readout_reported",
+     "target": "S11_TERMINAL_DISPOSITION"
+    },
+    {
+     "outcome": "diagnostic_readout_unavailable_and_recorded_as_such",
+     "target": "S11_TERMINAL_DISPOSITION"
+    }
+   ]
+  },
+  {
+   "gate_ids": [],
+   "kind": "disposition",
+   "state_id": "S11_TERMINAL_DISPOSITION",
+   "title": "Terminal Study 3R disposition",
+   "transitions": [
+    {
+     "outcome": "carried_outcome_is_rt_cleared_the_floor_on_both_arms",
+     "target": "T10_STUDY3R_COMPLETE_RT_QUALIFIED"
+    },
+    {
+     "outcome": "carried_outcome_is_rt_failed_at_least_one_arm",
+     "target": "T09_RT_NOT_QUALIFIED"
+    }
+   ]
+  }
+ ],
+ "terminals": [
+  {
+   "meaning": "The candidate protocol was never executed. This is the currently active terminal outcome.",
+   "terminal_id": "T00_NOT_EXECUTED"
+  },
+  {
+   "meaning": "The sealed engineering shakedown did not reproduce a sealed surface. No scientific measurement is taken.",
+   "terminal_id": "T01_SHAKEDOWN_FAILED"
+  },
+  {
+   "meaning": "A registered (bytes, token IDs, common prefix, discriminant position) tuple could not be verified.",
+   "terminal_id": "T02_TOKENIZER_EQUIVALENCE_FAILED"
+  },
+  {
+   "meaning": "At least one checkpoint lacked generated-CoT headroom on the registered ceiling bank.",
+   "terminal_id": "T03_COT_CEILING_FAILED"
+  },
+  {
+   "meaning": "At least one trivial-recovery, binding or single-primitive control cell fell below its floor.",
+   "terminal_id": "T04_COMPETENCE_CONTROL_FAILED"
+  },
+  {
+   "meaning": "At least one negative-control cell failed its one-sided upper-bound rule.",
+   "terminal_id": "T05_NEGATIVE_CONTROL_FAILED"
+  },
+  {
+   "meaning": "At least one E0 wrapper arm failed to clear the competence floor for at least one checkpoint.",
+   "terminal_id": "T06_WRAPPER_ADEQUACY_FAILED"
+  },
+  {
+   "meaning": "T07_NO_QUALIFIED_REFERENCE is bounded to the registered ladder membership at the registered immutable revisions, the registered task populations and item banks, and the two registered E0 wrapper arms. It makes no claim about other models, other revisions, other task populations, other interfaces, or restricted-logit interfaces in general.",
+   "terminal_id": "T07_NO_QUALIFIED_REFERENCE"
+  },
+  {
+   "meaning": "The first-confirmed-pass RP-B freeze record could not be written.",
+   "terminal_id": "T08_RPB_FREEZE_RECORD_FAILED"
+  },
+  {
+   "meaning": "RT did not clear the E0 competence floor on both registered wrapper arms, bounded to the registered revisions, task populations and interfaces.",
+   "terminal_id": "T09_RT_NOT_QUALIFIED"
+  },
+  {
+   "meaning": "RT cleared the E0 competence floor on both registered wrapper arms against a first-confirmed-pass RP-B reference.",
+   "terminal_id": "T10_STUDY3R_COMPLETE_RT_QUALIFIED"
+  }
+ ],
+ "totality": {
+  "every_state_has_at_least_two_transitions": true,
+  "every_transition_target_is_a_state_or_terminal": true,
+  "outcomes_are_mutually_exclusive_within_a_state": true
+ }
+}

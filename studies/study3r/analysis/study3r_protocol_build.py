@@ -1,0 +1,1676 @@
+"""Study 3R protocol candidate builder.
+
+Authority: ``studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md``
+
+This is the single generator for the Study 3R protocol bundle. It reads the
+sealed tokenizer-only acquisition artifacts, derives the design statistics from
+:mod:`study3r_design_statistics`, and writes:
+
+* ``protocol/study3r_protocol_v1.json`` and its schema and Markdown;
+* ``protocol/study3r_rendering_registry_v1.json`` and its schema;
+* ``protocol/study3r_state_machine_v1.json`` and its schema;
+* ``protocol/study3r_protocol_current.json`` and its schema;
+* ``analysis/study3r_design_statistics_tables.json``;
+* ``analysis/study3r_atomic_cell_census_v1.json``.
+
+The candidate is written with ``frozen = false`` and
+``execution_authorized = false``. Nothing here loads a model, runs a forward
+pass, scores a logit, generates a token, realizes a scientific bank, draws a
+seed or selects an interface.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import pathlib
+import sys
+
+DEFAULT_ROOT = pathlib.Path(__file__).resolve().parents[3]
+
+# ---------------------------------------------------------------------------
+# Registered identities. These are the mutation-bearing protocol constants.
+# ---------------------------------------------------------------------------
+
+PROTOCOL_ID = "STUDY3R_PROTOCOL_V1"
+SCHEMA_VERSION = "study3r-protocol-v1"
+AUTHORITY_PATH = \
+    "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md"
+
+#: The sole target checkpoint.
+TARGET_CHECKPOINT = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+
+#: Fixed membership, fixed order, L = 3. No fallback and no expansion.
+RP_B_LADDER = (
+    "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+    "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+    "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+)
+LADDER_LENGTH = 3
+
+#: Immutable revisions resolved and sealed before protocol freeze.
+IMMUTABLE_REVISIONS = {
+    "RT": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+    "RP_B1": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+    "RP_B2": "1df8507178afcc1bef68cd8c393f61a886323761",
+    "RP_B3": "711ad2ea6aa40cfca18895e8aca02ab92df1a746",
+}
+
+CHECKPOINT_ROLES = ("RT", "RP_B1", "RP_B2", "RP_B3")
+
+#: The legal E0 answer surfaces, as text. Token IDs are checkpoint-specific.
+REGISTERED_LABELS = ("A", "B", "C", "D")
+
+#: Added to the longest legal answer surface to obtain ``max_new_tokens``.
+E0_TERMINATION_MARGIN_TOKENS = 1
+
+#: Offset applied to the probed D0 discriminant position. Registered as zero:
+#: the discriminant position *is* the first position after the common prefix.
+D0_DISCRIMINANT_POSITION_OFFSET = 0
+
+#: The message role carried by the role-canonical wrapper arm.
+ROLE_CANONICAL_MESSAGE_ROLE = "user"
+
+RAW_ARM_ID = "W1_RAW_DIRECT"
+CHAT_ARM_ID = "W2_ROLE_CANONICAL"
+COT_ROUTE_ID = "C1_CANONICAL_GENERATED_COT"
+E0_ESTIMAND_ID = "E0_zero_generated_reasoning_token_expressed_competence"
+D0_ESTIMAND_ID = "D0_single_forward_decodability"
+COT_ESTIMAND_ID = "COT_generated_reasoning_ceiling"
+
+#: Generated-CoT ceiling resource bounds.
+COT_K = 1
+COT_MAX_NEW_TOKENS_PER_ITEM = 4096
+COT_PARSER_ID = "P1_FINAL_ANSWER_LAST_LINE"
+
+#: The one authoritative protocol and the one unambiguous current pointer.
+AUTHORITATIVE_PROTOCOL_PATH = "studies/study3r/protocol/study3r_protocol_v1.json"
+AUTHORITATIVE_SCHEMA_PATH = \
+    "studies/study3r/protocol/study3r_protocol_v1.schema.json"
+AUTHORITATIVE_MARKDOWN_PATH = "studies/study3r/protocol/study3r_protocol_v1.md"
+CURRENT_POINTER_PATH = \
+    "studies/study3r/protocol/study3r_protocol_current.json"
+MANIFEST_GENERATOR_PATH = "studies/study3r/analysis/study3r_manifest.py"
+
+#: The candidate is not frozen and execution is not authorized.
+PROTOCOL_FROZEN = False
+EXECUTION_AUTHORIZED = False
+FORMAL_EXECUTION_AUTHORIZED = False
+
+AUTHORED_STATE = \
+    "STUDY3R_PROTOCOL_V1_AUTHORED_AWAITING_SINGLE_INDEPENDENT_FOCUSED_REVIEW"
+
+D0_TIE_RULE = (
+    "An exact tie between two or more candidate scores is resolved as "
+    "D0_UNDECIDED and scored incorrect. No label ordering, no lowest token id "
+    "and no random draw is used to break a tie.")
+
+D0_LIMITATION = (
+    "D0_single_forward_decodability proves only conditional discriminant "
+    "decodability at a frozen position under a frozen counterfactual surface. "
+    "It never demonstrates natural expression, never demonstrates "
+    "complete-answer competence, is never an RP-B gate and never qualifies a "
+    "candidate.")
+
+COT_LIMITATION = (
+    "A generated-CoT ceiling pass proves only that the checkpoint has "
+    "generated-CoT headroom on the registered ceiling bank. Neither a pass nor "
+    "a failure selects an interface, selects a wrapper arm, or demonstrates "
+    "no-CoT capability.")
+
+NO_QUALIFIED_REFERENCE_BOUND = (
+    "T07_NO_QUALIFIED_REFERENCE is bounded to the registered ladder "
+    "membership at the registered immutable revisions, the registered task "
+    "populations and item banks, and the two registered E0 wrapper arms. It "
+    "makes no claim about other models, other revisions, other task "
+    "populations, other interfaces, or restricted-logit interfaces in general.")
+
+WRAPPER_GATE_LIMITATION = (
+    "The wrapper gate is joint adequacy: both arms must independently clear "
+    "the registered competence floor. Study 3R does not claim template "
+    "invariance and does not estimate a template effect. Paired discordance is "
+    "reported descriptively for every checkpoint and stratum, in both "
+    "directions.")
+
+# ---------------------------------------------------------------------------
+# State machine
+# ---------------------------------------------------------------------------
+
+STATE_MACHINE_STATES = (
+    {
+        "state_id": "S00_AUTHORED",
+        "title": "Protocol candidate authored, execution unauthorized",
+        "kind": "initial",
+        "gate_ids": [],
+        "transitions": [
+            {"outcome": "execution_authorization_granted",
+             "target": "S01_SEALED_ENGINEERING_SHAKEDOWN"},
+            {"outcome": "execution_authorization_absent",
+             "target": "T00_NOT_EXECUTED"},
+        ],
+    },
+    {
+        "state_id": "S01_SEALED_ENGINEERING_SHAKEDOWN",
+        "title": "Sealed engineering shakedown",
+        "kind": "operational",
+        "gate_ids": [],
+        "transitions": [
+            {"outcome": "shakedown_reproduced_every_sealed_surface",
+             "target": "S02_CHECKPOINT_TOKENIZER_FUNCTIONAL_EQUIVALENCE"},
+            {"outcome": "shakedown_failed_to_reproduce_a_sealed_surface",
+             "target": "T01_SHAKEDOWN_FAILED"},
+        ],
+    },
+    {
+        "state_id": "S02_CHECKPOINT_TOKENIZER_FUNCTIONAL_EQUIVALENCE",
+        "title": "Checkpoint and tokenizer functional-equivalence verification",
+        "kind": "operational",
+        "gate_ids": [],
+        "transitions": [
+            {"outcome": "every_registered_tuple_verified_and_stratified",
+             "target": "S03_GENERATED_COT_CEILING"},
+            {"outcome": "a_registered_tuple_could_not_be_verified",
+             "target": "T02_TOKENIZER_EQUIVALENCE_FAILED"},
+        ],
+    },
+    {
+        "state_id": "S03_GENERATED_COT_CEILING",
+        "title": "Generated-CoT ceiling per checkpoint",
+        "kind": "statistical",
+        "gate_ids": ["G01_COT_CEILING"],
+        "transitions": [
+            {"outcome": "every_checkpoint_cell_passed",
+             "target": "S04_COMPETENCE_CONTROLS"},
+            {"outcome": "at_least_one_checkpoint_cell_failed",
+             "target": "T03_COT_CEILING_FAILED"},
+        ],
+    },
+    {
+        "state_id": "S04_COMPETENCE_CONTROLS",
+        "title": "Trivial recovery, explicit binding and single-primitive controls",
+        "kind": "statistical",
+        "gate_ids": ["G02_CONTROL_RECOVERY", "G03_CONTROL_BINDING",
+                     "G04_CONTROL_PRIMITIVE"],
+        "transitions": [
+            {"outcome": "every_control_cell_passed",
+             "target": "S05_NEGATIVE_CONTROL"},
+            {"outcome": "at_least_one_control_cell_failed",
+             "target": "T04_COMPETENCE_CONTROL_FAILED"},
+        ],
+    },
+    {
+        "state_id": "S05_NEGATIVE_CONTROL",
+        "title": "Deliberately invalid negative control",
+        "kind": "statistical",
+        "gate_ids": ["G05_NEGATIVE_CONTROL"],
+        "transitions": [
+            {"outcome": "every_negative_control_cell_passed",
+             "target": "S06_TWO_WRAPPER_JOINT_ADEQUACY"},
+            {"outcome": "at_least_one_negative_control_cell_failed",
+             "target": "T05_NEGATIVE_CONTROL_FAILED"},
+        ],
+    },
+    {
+        "state_id": "S06_TWO_WRAPPER_JOINT_ADEQUACY",
+        "title": "Two-wrapper joint adequacy",
+        "kind": "statistical",
+        "gate_ids": ["G06_WRAPPER_JOINT_ADEQUACY"],
+        "transitions": [
+            {"outcome": "both_arms_cleared_the_floor_for_every_checkpoint",
+             "target": "S07_RPB_LADDER_DEVELOPMENT_AND_CONFIRMATION"},
+            {"outcome": "at_least_one_arm_failed_for_at_least_one_checkpoint",
+             "target": "T06_WRAPPER_ADEQUACY_FAILED"},
+        ],
+    },
+    {
+        "state_id": "S07_RPB_LADDER_DEVELOPMENT_AND_CONFIRMATION",
+        "title": "RP-B ladder development and item-disjoint confirmation scan",
+        "kind": "statistical",
+        "gate_ids": ["G07_RPB_DEVELOPMENT", "G08_RPB_CONFIRMATION"],
+        "transitions": [
+            {"outcome": "a_candidate_passed_development_and_confirmation_on_both_arms",
+             "target": "S08_RPB_FIRST_CONFIRMED_PASS_FREEZE"},
+            {"outcome": "the_full_registered_ladder_was_scanned_without_a_confirmed_pass",
+             "target": "T07_NO_QUALIFIED_REFERENCE"},
+        ],
+    },
+    {
+        "state_id": "S08_RPB_FIRST_CONFIRMED_PASS_FREEZE",
+        "title": "First-confirmed-pass RP-B freeze",
+        "kind": "operational",
+        "gate_ids": [],
+        "transitions": [
+            {"outcome": "freeze_record_written",
+             "target": "S09_RT_E0_BEHAVIORAL_QUALIFICATION"},
+            {"outcome": "freeze_record_could_not_be_written",
+             "target": "T08_RPB_FREEZE_RECORD_FAILED"},
+        ],
+    },
+    {
+        "state_id": "S09_RT_E0_BEHAVIORAL_QUALIFICATION",
+        "title": "RT E0 behavioral qualification",
+        "kind": "statistical",
+        "gate_ids": ["G09_RT_E0_QUALIFICATION"],
+        "transitions": [
+            {"outcome": "rt_cleared_the_floor_on_both_arms",
+             "target": "S10_D0_DIAGNOSTIC_REPORT"},
+            {"outcome": "rt_failed_at_least_one_arm",
+             "target": "S10_D0_DIAGNOSTIC_REPORT"},
+        ],
+    },
+    {
+        "state_id": "S10_D0_DIAGNOSTIC_REPORT",
+        "title": "D0 diagnostic reporting",
+        "kind": "diagnostic",
+        "gate_ids": [],
+        "transitions": [
+            {"outcome": "diagnostic_readout_reported",
+             "target": "S11_TERMINAL_DISPOSITION"},
+            {"outcome": "diagnostic_readout_unavailable_and_recorded_as_such",
+             "target": "S11_TERMINAL_DISPOSITION"},
+        ],
+    },
+    {
+        "state_id": "S11_TERMINAL_DISPOSITION",
+        "title": "Terminal Study 3R disposition",
+        "kind": "disposition",
+        "gate_ids": [],
+        "transitions": [
+            {"outcome": "carried_outcome_is_rt_cleared_the_floor_on_both_arms",
+             "target": "T10_STUDY3R_COMPLETE_RT_QUALIFIED"},
+            {"outcome": "carried_outcome_is_rt_failed_at_least_one_arm",
+             "target": "T09_RT_NOT_QUALIFIED"},
+        ],
+    },
+)
+
+STATE_MACHINE_TERMINALS = (
+    {"terminal_id": "T00_NOT_EXECUTED",
+     "meaning": "The candidate protocol was never executed. This is the "
+                "currently active terminal outcome."},
+    {"terminal_id": "T01_SHAKEDOWN_FAILED",
+     "meaning": "The sealed engineering shakedown did not reproduce a sealed "
+                "surface. No scientific measurement is taken."},
+    {"terminal_id": "T02_TOKENIZER_EQUIVALENCE_FAILED",
+     "meaning": "A registered (bytes, token IDs, common prefix, discriminant "
+                "position) tuple could not be verified."},
+    {"terminal_id": "T03_COT_CEILING_FAILED",
+     "meaning": "At least one checkpoint lacked generated-CoT headroom on the "
+                "registered ceiling bank."},
+    {"terminal_id": "T04_COMPETENCE_CONTROL_FAILED",
+     "meaning": "At least one trivial-recovery, binding or single-primitive "
+                "control cell fell below its floor."},
+    {"terminal_id": "T05_NEGATIVE_CONTROL_FAILED",
+     "meaning": "At least one negative-control cell failed its one-sided "
+                "upper-bound rule."},
+    {"terminal_id": "T06_WRAPPER_ADEQUACY_FAILED",
+     "meaning": "At least one E0 wrapper arm failed to clear the competence "
+                "floor for at least one checkpoint."},
+    {"terminal_id": "T07_NO_QUALIFIED_REFERENCE",
+     "meaning": NO_QUALIFIED_REFERENCE_BOUND},
+    {"terminal_id": "T08_RPB_FREEZE_RECORD_FAILED",
+     "meaning": "The first-confirmed-pass RP-B freeze record could not be "
+                "written."},
+    {"terminal_id": "T09_RT_NOT_QUALIFIED",
+     "meaning": "RT did not clear the E0 competence floor on both registered "
+                "wrapper arms, bounded to the registered revisions, task "
+                "populations and interfaces."},
+    {"terminal_id": "T10_STUDY3R_COMPLETE_RT_QUALIFIED",
+     "meaning": "RT cleared the E0 competence floor on both registered "
+                "wrapper arms against a first-confirmed-pass RP-B reference."},
+)
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def write_json(path: pathlib.Path, payload) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rendered = json.dumps(payload, indent=1, sort_keys=True,
+                          ensure_ascii=True) + "\n"
+    with open(path, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(rendered)
+
+
+def write_text(path: pathlib.Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(text)
+
+
+def read_json(path: pathlib.Path):
+    with open(path, "r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def _probe_by_role(surfaces):
+    return {entry["role"]: entry for entry in surfaces["checkpoints"]}
+
+
+# ---------------------------------------------------------------------------
+# Bundle sections
+# ---------------------------------------------------------------------------
+
+
+def build_checkpoints(surfaces, acquisition):
+    probes = _probe_by_role(surfaces)
+    acquired = {entry["role"]: entry for entry in acquisition["checkpoints"]}
+    equivalence_roles = {}
+    rows = []
+    for role in CHECKPOINT_ROLES:
+        probe = probes.get(role, {})
+        record = acquired.get(role, {})
+        repository = (TARGET_CHECKPOINT if role == "RT"
+                      else RP_B_LADDER[CHECKPOINT_ROLES.index(role) - 1])
+        e0 = probe.get("e0", {})
+        surface_ids = {
+            label: e0.get("legal_answer_surfaces", {})
+                     .get(label, {}).get("token_ids", [])
+            for label in REGISTERED_LABELS
+        }
+        longest = max([len(ids) for ids in surface_ids.values()] or [0])
+        rows.append({
+            "role": role,
+            "repository_id": repository,
+            "acquisition_repository_id": record.get("repository_id"),
+            "immutable_revision": IMMUTABLE_REVISIONS.get(role),
+            "acquisition_immutable_revision": record.get("immutable_revision"),
+            "revision_matches_acquisition_record":
+                IMMUTABLE_REVISIONS.get(role) == record.get("immutable_revision"),
+            "tokenizer_class": probe.get("tokenizer_class"),
+            "model_type": probe.get("model_type"),
+            "vocab_size": probe.get("tokenizer_vocab_size"),
+            "max_position_embeddings": probe.get("max_position_embeddings"),
+            "chat_template_sha256": probe.get("chat_template_sha256"),
+            "special_tokens": probe.get("special_tokens", {}),
+            "e0_legal_answer_surfaces": {
+                label: {
+                    "text": label,
+                    "utf8_sha256": e0.get("legal_answer_surfaces", {})
+                                     .get(label, {}).get("utf8_sha256"),
+                    "token_ids": surface_ids[label],
+                }
+                for label in REGISTERED_LABELS
+            },
+            "e0_longest_legal_answer_surface_tokens": longest,
+            "e0_termination_margin_tokens": E0_TERMINATION_MARGIN_TOKENS,
+            "e0_max_new_tokens": longest + E0_TERMINATION_MARGIN_TOKENS,
+            "acquired_file_sha256": probe.get("acquired_file_hashes", {}),
+        })
+        equivalence_roles[role] = repository
+    return rows
+
+
+def build_interfaces(surfaces):
+    probes = _probe_by_role(surfaces)
+    arms = []
+    for arm_id in (RAW_ARM_ID, CHAT_ARM_ID):
+        per_checkpoint = {}
+        for role in CHECKPOINT_ROLES:
+            arm = probes.get(role, {}).get("arms", {}).get(arm_id, {})
+            envelope = probes.get(role, {}).get("role_canonical_envelope", {})
+            prompt = arm.get("prompt", {})
+            per_checkpoint[role] = {
+                "prompt_utf8_sha256": prompt.get("utf8_sha256"),
+                "prompt_utf8_bytes": prompt.get("utf8_bytes"),
+                "prompt_token_count": prompt.get("token_count"),
+                "d0_common_prefix_token_length":
+                    arm.get("d0_common_prefix_token_length"),
+                "d0_discriminant_position":
+                    (arm.get("d0_discriminant_position", 0)
+                     + D0_DISCRIMINANT_POSITION_OFFSET),
+                "d0_discriminant_token_ids":
+                    arm.get("d0_discriminant_token_ids", {}),
+                "reasoning_span_opened_by_template":
+                    envelope.get("reasoning_span_opened_by_template")
+                    if arm_id == CHAT_ARM_ID else False,
+                "frozen_reasoning_closure":
+                    envelope.get("frozen_reasoning_closure")
+                    if arm_id == CHAT_ARM_ID else "",
+            }
+        arms.append({
+            "arm_id": arm_id,
+            "estimand": E0_ESTIMAND_ID,
+            "message_roles": ([] if arm_id == RAW_ARM_ID
+                              else [ROLE_CANONICAL_MESSAGE_ROLE]),
+            "envelope_kind": ("raw_plaintext_direct_answer"
+                              if arm_id == RAW_ARM_ID
+                              else "checkpoint_revision_specific_role_canonical"),
+            "checkpoint_specific": arm_id == CHAT_ARM_ID,
+            "few_shot_examples": [],
+            "few_shot_example_count": 0,
+            "answer_cue": surfaces.get("answer_cue"),
+            "per_checkpoint": per_checkpoint,
+        })
+    return {
+        "e0_arms": arms,
+        "arm_count": len(arms),
+        "arm_differentiating_field": surfaces.get("arm_differentiating_field"),
+        "arm_gate": "joint_adequacy",
+        "arm_gate_limitation": WRAPPER_GATE_LIMITATION,
+    }
+
+
+def build_estimands(surfaces, statistics):
+    probes = _probe_by_role(surfaces)
+    gates = {gate["gate_id"]: gate for gate in statistics["gates"]}
+    cot_bounds = {}
+    total_cot_tokens = 0
+    for role in CHECKPOINT_ROLES:
+        probe = probes.get(role, {})
+        cot = probe.get("cot_route", {})
+        prompt_tokens = cot.get("prompt", {}).get("token_count", 0)
+        context = probe.get("max_position_embeddings") or 0
+        n_ceiling = gates["G01_COT_CEILING"]["n"]
+        per_item_total = prompt_tokens + COT_MAX_NEW_TOKENS_PER_ITEM
+        total_cot_tokens += per_item_total * n_ceiling
+        cot_bounds[role] = {
+            "context_window_tokens": context,
+            "canonical_prompt_token_count": prompt_tokens,
+            "max_new_tokens_per_item": COT_MAX_NEW_TOKENS_PER_ITEM,
+            "worst_case_sequence_tokens": per_item_total,
+            "fits_context_window": per_item_total <= context,
+            "items": n_ceiling,
+            "worst_case_total_tokens": per_item_total * n_ceiling,
+        }
+
+    total_e0_tokens = 0
+    for gate in statistics["gates"]:
+        if gate["gate_id"] == "G01_COT_CEILING":
+            continue
+        for cell in gate["atomic_cells"]:
+            _, role, arm_id = cell.split("|")
+            probe = probes.get(role, {})
+            prompt_tokens = (probe.get("arms", {}).get(arm_id, {})
+                             .get("prompt", {}).get("token_count", 0))
+            max_new = probe.get("e0", {}).get("max_new_tokens", 0)
+            total_e0_tokens += gate["n"] * (prompt_tokens + max_new)
+
+    return {
+        "primary": {
+            "estimand_id": E0_ESTIMAND_ID,
+            "role": "primary_headline",
+            "statistical_unit": "item",
+            "decoding": {
+                "do_sample": False,
+                "temperature": None,
+                "num_beams": 1,
+                "add_special_tokens": False,
+            },
+            "scoring": {
+                "rule": "full_sequence_exact_match",
+                "prefix_matching_permitted": False,
+                "trailing_eos_tokens_stripped_before_comparison": 1,
+                "rationale_or_extra_emitted_token_permitted": False,
+                "unparseable_output": "incorrect",
+                "empty_output": "incorrect",
+                "runtime_failure": "incorrect",
+            },
+            "max_new_tokens_rule": (
+                "per checkpoint revision: the longest frozen legal answer "
+                "surface in tokens plus the registered termination margin"),
+            "termination_margin_tokens": E0_TERMINATION_MARGIN_TOKENS,
+            "descriptive_only_diagnostics": [
+                "answer_set_mass",
+                "full_vocabulary_rank",
+                "complete_candidate_joint_likelihood",
+            ],
+            "descriptive_only_diagnostics_may_determine_a_gate": False,
+            "worst_case_total_generated_and_prompt_tokens": total_e0_tokens,
+        },
+        "diagnostic": {
+            "estimand_id": D0_ESTIMAND_ID,
+            "role": "conditional_diagnostic_only",
+            "is_ever_a_gate": False,
+            "is_ever_an_rp_b_gate": False,
+            "qualifies_a_candidate": False,
+            "readout": "single_forward_restricted_candidate_scoring",
+            "candidate_set": list(REGISTERED_LABELS),
+            "scoring_rule": (
+                "sum of the conditional log-probabilities of the candidate's "
+                "token ids at the frozen discriminant positions, given the "
+                "frozen common prefix, from one forward pass"),
+            "selection_rule": "argmax over the registered candidate set",
+            "tie_rule": D0_TIE_RULE,
+            "discriminant_position_offset": D0_DISCRIMINANT_POSITION_OFFSET,
+            "limitation": D0_LIMITATION,
+        },
+        "generated_cot_ceiling": {
+            "estimand_id": COT_ESTIMAND_ID,
+            "route_id": COT_ROUTE_ID,
+            "separate_from_e0": True,
+            "granularity": "per_checkpoint_revision",
+            "k": COT_K,
+            "statistical_unit": "item",
+            "parser_id": COT_PARSER_ID,
+            "parser_regex": surfaces["checkpoints"][0]["cot_route"]["parser_regex"]
+            if surfaces.get("checkpoints") else None,
+            "unparseable_output": "incorrect",
+            "task_population": "D2_D3_CEILING_BANK",
+            "bank_relationship": (
+                "The ceiling bank is drawn from the same registered depth-2 and "
+                "depth-3 generators as the E0 qualification banks and is "
+                "item-disjoint from every E0 bank."),
+            "resource_bounds_per_checkpoint": cot_bounds,
+            "worst_case_total_tokens": total_cot_tokens,
+            "limitation": COT_LIMITATION,
+            "is_an_interface_selector": False,
+        },
+    }
+
+
+def build_task_populations(surfaces, statistics, tasks_module):
+    gates = {gate["gate_id"]: gate for gate in statistics["gates"]}
+    banks = [
+        {"bank_id": "D2_D3_CEILING_BANK", "family_mix": ["D2", "D3"],
+         "gate_id": "G01_COT_CEILING", "n": gates["G01_COT_CEILING"]["n"]},
+        {"bank_id": "REC", "family_mix": ["REC"],
+         "gate_id": "G02_CONTROL_RECOVERY", "n": gates["G02_CONTROL_RECOVERY"]["n"]},
+        {"bank_id": "BIND", "family_mix": ["BIND"],
+         "gate_id": "G03_CONTROL_BINDING", "n": gates["G03_CONTROL_BINDING"]["n"]},
+        {"bank_id": "PRIM", "family_mix": ["PRIM"],
+         "gate_id": "G04_CONTROL_PRIMITIVE", "n": gates["G04_CONTROL_PRIMITIVE"]["n"]},
+        {"bank_id": "NEG", "family_mix": ["NEG"],
+         "gate_id": "G05_NEGATIVE_CONTROL", "n": gates["G05_NEGATIVE_CONTROL"]["n"]},
+        {"bank_id": "D2_ADEQUACY_BANK", "family_mix": ["D2"],
+         "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+         "n": gates["G06_WRAPPER_JOINT_ADEQUACY"]["n"]},
+        {"bank_id": "D2_D3_DEVELOPMENT_BANK", "family_mix": ["D2", "D3"],
+         "gate_id": "G07_RPB_DEVELOPMENT", "n": gates["G07_RPB_DEVELOPMENT"]["n"]},
+        {"bank_id": "D2_D3_CONFIRMATION_BANK", "family_mix": ["D2", "D3"],
+         "gate_id": "G08_RPB_CONFIRMATION", "n": gates["G08_RPB_CONFIRMATION"]["n"]},
+        {"bank_id": "D2_D3_TARGET_BANK", "family_mix": ["D2", "D3"],
+         "gate_id": "G09_RT_E0_QUALIFICATION",
+         "n": gates["G09_RT_E0_QUALIFICATION"]["n"]},
+    ]
+    return {
+        "generator_module": "studies/study3r/tasks/study3r_task_generators_v1.py",
+        "operation_ontology": dict(tasks_module.OPERATIONS),
+        "operand_domain": {"min": tasks_module.OPERAND_MIN,
+                           "max": tasks_module.OPERAND_MAX},
+        "result_domain": {"min": tasks_module.RESULT_MIN,
+                          "max": tasks_module.RESULT_MAX},
+        "label_alphabet": list(REGISTERED_LABELS),
+        "answer_domain": "one label drawn from the registered label alphabet",
+        "chance_level": statistics["chance_level"],
+        "families": dict(tasks_module.FAMILY_DEPTH),
+        "derivable_families": list(tasks_module.DERIVABLE_FAMILIES),
+        "negative_control_family": tasks_module.NEGATIVE_CONTROL_FAMILY,
+        "negative_control_construction": (
+            "The stem is well formed but no option carries the derivable "
+            "value, and the registered label is drawn uniformly and "
+            "independently of the item content. No strategy can exceed the "
+            "registered chance level."),
+        "item_eligibility_rules": [
+            "exactly four options, all distinct",
+            "every option value is a non-negative integer",
+            "the evaluated value lies inside the registered result domain",
+            "subtraction never produces a negative partial value",
+            "a derivable family binds the registered label to the value",
+            "the negative-control family never exposes the derivable value",
+        ],
+        "rendering_rules": {
+            "item_body_template": tasks_module.ITEM_BODY_TEMPLATE,
+            "answer_cue": tasks_module.ANSWER_CUE,
+            "raw_envelope_separator": tasks_module.RAW_ENVELOPE_SEPARATOR,
+            "stem_templates": dict(tasks_module.STEM_TEMPLATES),
+            "newline_bytes": "\n",
+        },
+        "duplicate_and_collision_rule": (
+            "The item key is the SHA-256 of "
+            "'family|stem|option_a|option_b|option_c|option_d'. Keys are "
+            "unique inside a bank and disjoint across every pair of banks that "
+            "the protocol declares item-disjoint."),
+        "statistical_unit": "item",
+        "banks": banks,
+        "item_disjoint_pairs": [
+            ["D2_D3_DEVELOPMENT_BANK", "D2_D3_CONFIRMATION_BANK"],
+            ["D2_D3_DEVELOPMENT_BANK", "D2_D3_TARGET_BANK"],
+            ["D2_D3_CONFIRMATION_BANK", "D2_D3_TARGET_BANK"],
+            ["D2_ADEQUACY_BANK", "D2_D3_DEVELOPMENT_BANK"],
+            ["D2_ADEQUACY_BANK", "D2_D3_CONFIRMATION_BANK"],
+            ["D2_ADEQUACY_BANK", "D2_D3_TARGET_BANK"],
+            ["D2_D3_CEILING_BANK", "D2_D3_DEVELOPMENT_BANK"],
+            ["D2_D3_CEILING_BANK", "D2_D3_CONFIRMATION_BANK"],
+            ["D2_D3_CEILING_BANK", "D2_D3_TARGET_BANK"],
+        ],
+        "seed_commitment_procedure": {
+            "seed_drawn_in_the_authoring_session": False,
+            "banks_realized_in_the_authoring_session": False,
+            "rule": (
+                "At execution time the operator draws one execution seed, "
+                "publishes a seed-commitment receipt containing its hexadecimal "
+                "value and the sealed manifest identity, and only then realizes "
+                "any bank. Every bank generator is derived as "
+                "SHA-256('<seed>|<bank_id>|<counter>') seeded into the "
+                "registered pseudo-random generator."),
+            "realization_guard": (
+                "studies/study3r/tasks/study3r_task_generators_v1.py::"
+                "realize_bank raises Study3RExecutionNotAuthorizedError while "
+                "formal_execution_authorized is false"),
+        },
+        "tokenizer_fixtures": {
+            "purpose": "byte and token surface freezing only",
+            "are_scientific_items": False,
+            "count": len(tasks_module.TOKENIZER_FIXTURE_SPECS),
+            "canonical_fixture_index": tasks_module.CANONICAL_FIXTURE_INDEX,
+            "separation_rule": (
+                "Fixtures carry is_scientific_item = false, are literal "
+                "constants rather than draws, and never enter an estimand, a "
+                "gate, a bank or a statistical unit."),
+        },
+    }
+
+
+def build_state_machine(statistics):
+    gate_ids = {gate["gate_id"] for gate in statistics["gates"]}
+    used = set()
+    for state in STATE_MACHINE_STATES:
+        used.update(state["gate_ids"])
+    terminals = {entry["terminal_id"] for entry in STATE_MACHINE_TERMINALS}
+    state_ids = {state["state_id"] for state in STATE_MACHINE_STATES}
+    return {
+        "schema_version": "study3r-state-machine-v1",
+        "authority": AUTHORITY_PATH,
+        "protocol_id": PROTOCOL_ID,
+        "initial_state": "S00_AUTHORED",
+        "current_state": "S00_AUTHORED",
+        "current_terminal": "T00_NOT_EXECUTED",
+        "states": [dict(state) for state in STATE_MACHINE_STATES],
+        "terminals": [dict(entry) for entry in STATE_MACHINE_TERMINALS],
+        "execution_order": [state["state_id"] for state in STATE_MACHINE_STATES],
+        "identifier_uniqueness": {
+            "state_ids_are_unique": len(state_ids) == len(STATE_MACHINE_STATES),
+            "terminal_ids_are_unique":
+                len(terminals) == len(STATE_MACHINE_TERMINALS),
+            "state_and_terminal_namespaces_are_disjoint":
+                not (state_ids & terminals),
+            "every_registered_gate_appears_exactly_once": sorted(used) == sorted(
+                gate_ids),
+            "rp_b_decision_id": statistics["rp_b_decision_id"],
+        },
+        "totality": {
+            "every_state_has_at_least_two_transitions": all(
+                len(state["transitions"]) >= 2
+                for state in STATE_MACHINE_STATES),
+            "every_transition_target_is_a_state_or_terminal": all(
+                transition["target"] in state_ids | terminals
+                for state in STATE_MACHINE_STATES
+                for transition in state["transitions"]),
+            "outcomes_are_mutually_exclusive_within_a_state": all(
+                len({transition["outcome"]
+                     for transition in state["transitions"]})
+                == len(state["transitions"])
+                for state in STATE_MACHINE_STATES),
+        },
+        "activation_patching_states": [],
+        "rp_m_states": [],
+        "mechanism_claim_states": [],
+    }
+
+
+def build_rendering_registry(surfaces):
+    probes = _probe_by_role(surfaces)
+    entries = []
+    for role in CHECKPOINT_ROLES:
+        probe = probes.get(role, {})
+        envelope = probe.get("role_canonical_envelope", {})
+        for arm_id in (RAW_ARM_ID, CHAT_ARM_ID):
+            arm = probe.get("arms", {}).get(arm_id, {})
+            prompt = arm.get("prompt", {})
+            entries.append({
+                "registry_key": "%s|%s" % (role, arm_id),
+                "checkpoint_role": role,
+                "immutable_revision": IMMUTABLE_REVISIONS.get(role),
+                "arm_id": arm_id,
+                "message_roles": ([] if arm_id == RAW_ARM_ID
+                                  else [ROLE_CANONICAL_MESSAGE_ROLE]),
+                "system_content": None,
+                "user_content_source": "item_body_template",
+                "assistant_content": None,
+                "separators": {
+                    "raw_envelope_separator":
+                        surfaces.get("raw_envelope_separator"),
+                    "newline_bytes": "\n",
+                    "option_line_separator": "\n",
+                },
+                "bos_insertion": ("none" if arm_id == RAW_ARM_ID
+                                  else "as embedded by the frozen chat template"),
+                "eos_insertion": "none in the prompt; stopping is EOS driven",
+                "answer_cue": surfaces.get("answer_cue"),
+                "few_shot_examples": [],
+                "chat_template_sha256": (None if arm_id == RAW_ARM_ID
+                                         else probe.get("chat_template_sha256")),
+                "tokenizer_class": probe.get("tokenizer_class"),
+                "reasoning_span_opened_by_template":
+                    envelope.get("reasoning_span_opened_by_template")
+                    if arm_id == CHAT_ARM_ID else False,
+                "frozen_reasoning_closure":
+                    envelope.get("frozen_reasoning_closure")
+                    if arm_id == CHAT_ARM_ID else "",
+                "rendered_with_deterministic_placeholders": prompt.get("text"),
+                "rendered_utf8_bytes": prompt.get("utf8_bytes"),
+                "rendered_utf8_sha256": prompt.get("utf8_sha256"),
+                "rendered_token_ids": prompt.get("token_ids"),
+                "rendered_token_count": prompt.get("token_count"),
+                "d0_common_prefix_token_length":
+                    arm.get("d0_common_prefix_token_length"),
+                "d0_discriminant_position":
+                    (arm.get("d0_discriminant_position", 0)
+                     + D0_DISCRIMINANT_POSITION_OFFSET),
+            })
+    return {
+        "schema_version": "study3r-rendering-registry-v1",
+        "authority": AUTHORITY_PATH,
+        "protocol_id": PROTOCOL_ID,
+        "deterministic_placeholder_fixture": surfaces.get("canonical_fixture"),
+        "arm_differentiating_field": surfaces.get("arm_differentiating_field"),
+        "entries": entries,
+        "entry_count": len(entries),
+        "paired_discordance_reporting": {
+            "required": True,
+            "scope": "every checkpoint and every stratum",
+            "directional": "both directions are reported",
+            "is_a_gate": False,
+            "estimates_a_template_effect": False,
+        },
+    }
+
+
+# ---------------------------------------------------------------------------
+# Schemas
+# ---------------------------------------------------------------------------
+
+
+def _string(**extra):
+    payload = {"type": "string"}
+    payload.update(extra)
+    return payload
+
+
+def _integer(**extra):
+    payload = {"type": "integer"}
+    payload.update(extra)
+    return payload
+
+
+def _object(properties, required=None):
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": properties,
+        "required": sorted(required if required is not None else properties),
+    }
+
+
+RATIONAL_PATTERN = r"^[0-9]+/[0-9]+$"
+SHA256_PATTERN = r"^[0-9a-f]{64}$"
+REVISION_PATTERN = r"^[0-9a-f]{40}$"
+
+
+def build_protocol_schema(statistics, checkpoints):
+    gate_ids = [gate["gate_id"] for gate in statistics["gates"]]
+    cell_ids = [cell["cell_id"]
+                for cell in statistics["atomic_cell_census"]["cells"]]
+    state_ids = [state["state_id"] for state in STATE_MACHINE_STATES]
+    terminal_ids = [entry["terminal_id"] for entry in STATE_MACHINE_TERMINALS]
+    checkpoint_schema = _object({
+        "role": _string(enum=list(CHECKPOINT_ROLES)),
+        "repository_id": _string(enum=[TARGET_CHECKPOINT] + list(RP_B_LADDER)),
+        "acquisition_repository_id": _string(
+            enum=[TARGET_CHECKPOINT] + list(RP_B_LADDER)),
+        "immutable_revision": _string(pattern=REVISION_PATTERN),
+        "acquisition_immutable_revision": _string(pattern=REVISION_PATTERN),
+        "revision_matches_acquisition_record": {"const": True},
+        "tokenizer_class": _string(minLength=1),
+        "model_type": _string(minLength=1),
+        "vocab_size": _integer(minimum=1),
+        "max_position_embeddings": _integer(minimum=1),
+        "chat_template_sha256": _string(pattern=SHA256_PATTERN),
+        "special_tokens": {"type": "object"},
+        "e0_legal_answer_surfaces": _object({
+            label: _object({
+                "text": {"const": label},
+                "utf8_sha256": _string(pattern=SHA256_PATTERN),
+                "token_ids": {"type": "array", "minItems": 1,
+                              "items": _integer(minimum=0)},
+            }) for label in REGISTERED_LABELS
+        }),
+        "e0_longest_legal_answer_surface_tokens": _integer(minimum=1),
+        "e0_termination_margin_tokens": {"const": E0_TERMINATION_MARGIN_TOKENS},
+        "e0_max_new_tokens": _integer(minimum=1),
+        "acquired_file_sha256": {
+            "type": "object",
+            "additionalProperties": _string(pattern=SHA256_PATTERN),
+            "minProperties": 3,
+        },
+    })
+    gate_schema = _object({
+        "gate_id": _string(enum=gate_ids),
+        "title": _string(minLength=1),
+        "estimand": _string(enum=[E0_ESTIMAND_ID, COT_ESTIMAND_ID]),
+        "phase": _string(enum=["precondition", "control", "adequacy",
+                               "development", "confirmation", "target"]),
+        "task_family": _string(minLength=1),
+        "checkpoint_roles": {"type": "array", "minItems": 1,
+                             "items": _string(enum=list(CHECKPOINT_ROLES))},
+        "routes": {"type": "array", "minItems": 1,
+                   "items": _string(enum=[RAW_ARM_ID, CHAT_ARM_ID,
+                                          COT_ROUTE_ID])},
+        "atomic_cells": {"type": "array", "minItems": 1,
+                         "items": _string(enum=cell_ids)},
+        "atomic_cell_count": _integer(minimum=1),
+        "statistical_unit": {"const": "item"},
+        "direction": _string(enum=["greater_than_floor",
+                                   "less_than_upper_margin"]),
+        "null_hypothesis": _string(minLength=1),
+        "alternative_hypothesis": _string(minLength=1),
+        "chance_level": {"const": statistics["chance_level"]},
+        "floor_or_upper_margin": _string(pattern=RATIONAL_PATTERN),
+        "effect_or_adequacy_margin": _string(pattern=RATIONAL_PATTERN),
+        "test": {"const": "exact one-sided binomial test on integer arithmetic"},
+        "multiplicity_family": {
+            "const": statistics["global_error_budget"]["family_id"]},
+        "multiplicity_method": {"const": "bonferroni_equal_allocation"},
+        "alpha_global": {
+            "const": statistics["global_error_budget"]["alpha_global"]},
+        "alpha_per_cell": {
+            "const": statistics["global_error_budget"]["alpha_per_cell"]},
+        "development_alpha": {
+            "const": statistics["global_error_budget"]["alpha_per_cell"]},
+        "confirmation_alpha": {
+            "const": statistics["global_error_budget"]["alpha_per_cell"]},
+        "power_target": _string(pattern=RATIONAL_PATTERN),
+        "n": _integer(minimum=1),
+        "pass_boundary": _integer(minimum=0),
+        "decision_rule": _string(minLength=1),
+        "exact_size": _string(pattern=RATIONAL_PATTERN),
+        "exact_size_display_only": _string(minLength=1),
+        "exact_power": _string(pattern=RATIONAL_PATTERN),
+        "exact_power_display_only": _string(minLength=1),
+        "adjacent_boundary_size": _string(pattern=RATIONAL_PATTERN),
+        "adjacent_boundary_size_display_only": _string(minLength=1),
+        "boundary_minimality_proof": _string(minLength=1),
+        "sample_size_minimality_proof": _object({
+            "claim": _string(minLength=1),
+            "search_lower_bound": {"const": 1},
+            "smaller_n_values_checked": _integer(minimum=0),
+            "every_smaller_n_falls_short": {"const": True},
+            "best_power_below_n": {
+                "type": ["object", "null"],
+                "additionalProperties": False,
+                "properties": {
+                    "n": _integer(minimum=1),
+                    "power": _string(pattern=RATIONAL_PATTERN),
+                    "power_display_only": _string(minLength=1),
+                },
+                "required": ["n", "power", "power_display_only"],
+            },
+        }),
+        "stop_rule": _string(minLength=1),
+        "missing_or_unparseable_treatment": _string(minLength=1),
+        "terminal_on_failure": _string(enum=terminal_ids),
+    })
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://study3r.invalid/study3r_protocol_v1.schema.json",
+        "title": "Study 3R protocol candidate v1",
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "authority", "boundaries", "checkpoints", "estimands",
+            "interfaces", "protocol_id", "references", "schema_version",
+            "scope", "state_machine", "statistics", "status",
+            "task_populations",
+        ],
+        "properties": {
+            "schema_version": {"const": SCHEMA_VERSION},
+            "protocol_id": {"const": PROTOCOL_ID},
+            "authority": {"const": AUTHORITY_PATH},
+            "status": _object({
+                "frozen": {"const": False},
+                "execution_authorized": {"const": False},
+                "formal_execution_authorized": {"const": False},
+                "authored_state": {"const": AUTHORED_STATE},
+                "is_a_copy_on_write_continuation": {"const": False},
+                "legacy_overlay_or_fallback_permitted": {"const": False},
+            }),
+            "scope": _object({
+                "covers": {"const": "behavioral and interface qualification only"},
+                "rp_b_ladder": {
+                    "type": "array",
+                    "minItems": LADDER_LENGTH,
+                    "maxItems": LADDER_LENGTH,
+                    "prefixItems": [{"const": repo}
+                                    for repo in RP_B_LADDER],
+                },
+                "rp_b_ladder_length": {"const": LADDER_LENGTH},
+                "rp_b_fallback_candidate": {"type": "null"},
+                "rp_b_post_result_expansion_permitted": {"const": False},
+                "target_checkpoint": {"const": TARGET_CHECKPOINT},
+                "excluded_roles": {"type": "array",
+                                   "items": _string(minLength=1)},
+                "activation_patching_authorized": {"const": False},
+                "rp_m_authorized": {"const": False},
+                "mechanism_claims_authorized": {"const": False},
+                "interface_profile_selection_performed": {"const": False},
+                "recreates_s1_to_s4": {"const": False},
+            }),
+            "checkpoints": {"type": "array", "minItems": 4, "maxItems": 4,
+                            "items": checkpoint_schema},
+            "estimands": {"type": "object"},
+            "interfaces": {"type": "object"},
+            "task_populations": {"type": "object"},
+            "statistics": _object({
+                "chance_level": {"const": statistics["chance_level"]},
+                "global_error_budget": {"type": "object"},
+                "atomic_cell_count": {
+                    "const": statistics["atomic_cell_census"]["count"]},
+                "m_max": {"const": statistics["global_error_budget"]["m_max"]},
+                "rp_b_decision_id": {
+                    "const": statistics["rp_b_decision_id"]},
+                "diagnostic_without_a_gate": {"const": D0_ESTIMAND_ID},
+                "gates": {"type": "array",
+                          "minItems": len(gate_ids), "maxItems": len(gate_ids),
+                          "items": gate_schema},
+                "ladder_multiplicity": _object({
+                    "corrects_over_full_registered_l": {"const": True},
+                    "registered_l": {"const": LADDER_LENGTH},
+                    "claims_fixed_sequence_protection": {"const": False},
+                    "evaluations_per_candidate": _object({
+                        "development": {"const": 1},
+                        "confirmation": {"const": 1},
+                    }),
+                    "selection_rule": {"const": "first_confirmed_pass"},
+                }),
+                "unresolved_values": {"type": "array", "maxItems": 0,
+                                      "items": _string()},
+            }),
+            "state_machine": _object({
+                "path": {"const":
+                         "studies/study3r/protocol/study3r_state_machine_v1.json"},
+                "initial_state": {"const": "S00_AUTHORED"},
+                "current_state": {"const": "S00_AUTHORED"},
+                "current_terminal": {"const": "T00_NOT_EXECUTED"},
+                "state_ids": {"type": "array",
+                              "minItems": len(state_ids),
+                              "maxItems": len(state_ids),
+                              "items": _string(enum=state_ids)},
+                "terminal_ids": {"type": "array",
+                                 "minItems": len(terminal_ids),
+                                 "maxItems": len(terminal_ids),
+                                 "items": _string(enum=terminal_ids)},
+            }),
+            "references": _object({
+                "authoritative_protocol": {"const": AUTHORITATIVE_PROTOCOL_PATH},
+                "authoritative_schema": {"const": AUTHORITATIVE_SCHEMA_PATH},
+                "authoritative_markdown": {"const": AUTHORITATIVE_MARKDOWN_PATH},
+                "current_pointer": {"const": CURRENT_POINTER_PATH},
+                "rendering_registry": {"const":
+                    "studies/study3r/protocol/study3r_rendering_registry_v1.json"},
+                "state_machine": {"const":
+                    "studies/study3r/protocol/study3r_state_machine_v1.json"},
+                "acquisition_record": {"const":
+                    "studies/study3r/acquisition/study3r_checkpoint_acquisition_v1.json"},
+                "tokenizer_surfaces": {"const":
+                    "studies/study3r/acquisition/study3r_tokenizer_surfaces_v1.json"},
+                "tokenizer_equivalence": {"const":
+                    "studies/study3r/acquisition/study3r_tokenizer_equivalence_v1.json"},
+                "design_statistics_generator": {"const":
+                    "studies/study3r/analysis/study3r_design_statistics.py"},
+                "independent_recalculation": {"const":
+                    "studies/study3r/analysis/study3r_independent_recalculation.py"},
+                "task_generators": {"const":
+                    "studies/study3r/tasks/study3r_task_generators_v1.py"},
+                "manifest_generator": {"const": MANIFEST_GENERATOR_PATH},
+                "protocol_builder": {"const":
+                    "studies/study3r/analysis/study3r_protocol_build.py"},
+                "tokenizer_probe": {"const":
+                    "studies/study3r/analysis/study3r_tokenizer_probe.py"},
+            }),
+            "boundaries": _object({
+                "zero_operation_counters": {
+                    "type": "object",
+                    "additionalProperties": {"const": 0},
+                    "minProperties": 10,
+                },
+                "tokenizer_only_counters": {"type": "object",
+                                            "minProperties": 3},
+                "no_weight_file_acquired": {"const": True},
+                "trust_remote_code": {"const": False},
+                "evidence_ledger_rows_written": {"const": 0},
+                "scientific_claims_made": {"const": 0},
+                "study3m_artifacts": {"type": "array", "maxItems": 0,
+                                      "items": _string()},
+            }),
+        },
+    }
+
+
+def build_registry_schema(registry):
+    entry = _object({
+        "registry_key": _string(minLength=3),
+        "checkpoint_role": _string(enum=list(CHECKPOINT_ROLES)),
+        "immutable_revision": _string(pattern=REVISION_PATTERN),
+        "arm_id": _string(enum=[RAW_ARM_ID, CHAT_ARM_ID]),
+        "message_roles": {"type": "array", "maxItems": 1,
+                          "items": _string(enum=[ROLE_CANONICAL_MESSAGE_ROLE])},
+        "system_content": {"type": "null"},
+        "user_content_source": {"const": "item_body_template"},
+        "assistant_content": {"type": "null"},
+        "separators": _object({
+            "raw_envelope_separator": _string(minLength=1),
+            "newline_bytes": {"const": "\n"},
+            "option_line_separator": {"const": "\n"},
+        }),
+        "bos_insertion": _string(minLength=1),
+        "eos_insertion": _string(minLength=1),
+        "answer_cue": _string(minLength=1),
+        "few_shot_examples": {"type": "array", "maxItems": 0,
+                              "items": _string()},
+        "chat_template_sha256": {
+            "type": ["string", "null"], "pattern": SHA256_PATTERN},
+        "tokenizer_class": _string(minLength=1),
+        "reasoning_span_opened_by_template": {"type": "boolean"},
+        "frozen_reasoning_closure": _string(),
+        "rendered_with_deterministic_placeholders": _string(minLength=1),
+        "rendered_utf8_bytes": _integer(minimum=1),
+        "rendered_utf8_sha256": _string(pattern=SHA256_PATTERN),
+        "rendered_token_ids": {"type": "array", "minItems": 1,
+                               "items": _integer(minimum=0)},
+        "rendered_token_count": _integer(minimum=1),
+        "d0_common_prefix_token_length": _integer(minimum=1),
+        "d0_discriminant_position": _integer(minimum=1),
+    })
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://study3r.invalid/study3r_rendering_registry_v1.schema.json",
+        "title": "Study 3R rendering registry v1",
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["arm_differentiating_field", "authority",
+                     "deterministic_placeholder_fixture", "entries",
+                     "entry_count", "paired_discordance_reporting",
+                     "protocol_id", "schema_version"],
+        "properties": {
+            "schema_version": {"const": "study3r-rendering-registry-v1"},
+            "authority": {"const": AUTHORITY_PATH},
+            "protocol_id": {"const": PROTOCOL_ID},
+            "deterministic_placeholder_fixture": _object({
+                "family": _string(minLength=1),
+                "depth": _integer(minimum=0),
+                "operands": {"type": "array", "items": _integer()},
+                "operations": {"type": "array", "items": _string()},
+                "value": _integer(),
+                "options": {"type": "array", "minItems": 4, "maxItems": 4,
+                            "items": _integer()},
+                "correct_index": _integer(minimum=0, maximum=3),
+                "correct_label": _string(enum=list(REGISTERED_LABELS)),
+                "stem": _string(minLength=1),
+                "item_body": _string(minLength=1),
+                "item_key": _string(pattern=SHA256_PATTERN),
+                "is_scientific_item": {"const": False},
+            }),
+            "arm_differentiating_field": {"const": "envelope"},
+            "entries": {"type": "array",
+                        "minItems": registry["entry_count"],
+                        "maxItems": registry["entry_count"],
+                        "items": entry},
+            "entry_count": {"const": registry["entry_count"]},
+            "paired_discordance_reporting": _object({
+                "required": {"const": True},
+                "scope": _string(minLength=1),
+                "directional": _string(minLength=1),
+                "is_a_gate": {"const": False},
+                "estimates_a_template_effect": {"const": False},
+            }),
+        },
+    }
+
+
+def build_state_machine_schema(machine):
+    state_ids = [state["state_id"] for state in STATE_MACHINE_STATES]
+    terminal_ids = [entry["terminal_id"] for entry in STATE_MACHINE_TERMINALS]
+    transition = _object({
+        "outcome": _string(minLength=1),
+        "target": _string(enum=state_ids + terminal_ids),
+    })
+    state = _object({
+        "state_id": _string(enum=state_ids),
+        "title": _string(minLength=1),
+        "kind": _string(enum=["initial", "operational", "statistical",
+                              "diagnostic", "disposition"]),
+        "gate_ids": {"type": "array", "items": _string(minLength=3)},
+        "transitions": {"type": "array", "minItems": 2, "items": transition},
+    })
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://study3r.invalid/study3r_state_machine_v1.schema.json",
+        "title": "Study 3R state machine v1",
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["activation_patching_states", "authority",
+                     "current_state", "current_terminal", "execution_order",
+                     "identifier_uniqueness", "initial_state",
+                     "mechanism_claim_states", "protocol_id", "rp_m_states",
+                     "schema_version", "states", "terminals", "totality"],
+        "properties": {
+            "schema_version": {"const": "study3r-state-machine-v1"},
+            "authority": {"const": AUTHORITY_PATH},
+            "protocol_id": {"const": PROTOCOL_ID},
+            "initial_state": {"const": "S00_AUTHORED"},
+            "current_state": {"const": "S00_AUTHORED"},
+            "current_terminal": {"const": "T00_NOT_EXECUTED"},
+            "states": {"type": "array", "minItems": len(state_ids),
+                       "maxItems": len(state_ids), "items": state},
+            "terminals": {"type": "array", "minItems": len(terminal_ids),
+                          "maxItems": len(terminal_ids),
+                          "items": _object({
+                              "terminal_id": _string(enum=terminal_ids),
+                              "meaning": _string(minLength=1)})},
+            "execution_order": {"type": "array", "minItems": len(state_ids),
+                                "maxItems": len(state_ids),
+                                "items": _string(enum=state_ids)},
+            "identifier_uniqueness": _object({
+                "state_ids_are_unique": {"const": True},
+                "terminal_ids_are_unique": {"const": True},
+                "state_and_terminal_namespaces_are_disjoint": {"const": True},
+                "every_registered_gate_appears_exactly_once": {"const": True},
+                "rp_b_decision_id": {"const": machine[
+                    "identifier_uniqueness"]["rp_b_decision_id"]},
+            }),
+            "totality": _object({
+                "every_state_has_at_least_two_transitions": {"const": True},
+                "every_transition_target_is_a_state_or_terminal": {"const": True},
+                "outcomes_are_mutually_exclusive_within_a_state": {"const": True},
+            }),
+            "activation_patching_states": {"type": "array", "maxItems": 0,
+                                           "items": _string()},
+            "rp_m_states": {"type": "array", "maxItems": 0, "items": _string()},
+            "mechanism_claim_states": {"type": "array", "maxItems": 0,
+                                       "items": _string()},
+        },
+    }
+
+
+def build_current_pointer():
+    return {
+        "schema_version": "study3r-protocol-current-v1",
+        "authority": AUTHORITY_PATH,
+        "protocol_id": PROTOCOL_ID,
+        "authoritative_protocol": AUTHORITATIVE_PROTOCOL_PATH,
+        "authoritative_schema": AUTHORITATIVE_SCHEMA_PATH,
+        "authoritative_markdown": AUTHORITATIVE_MARKDOWN_PATH,
+        "frozen": PROTOCOL_FROZEN,
+        "execution_authorized": EXECUTION_AUTHORIZED,
+        "authored_state": AUTHORED_STATE,
+        "supersedes": [],
+        "runtime_overlay_permitted": False,
+        "fallback_protocol_permitted": False,
+        "legacy_pointers_not_consulted": [
+            "studies/study3/protocol/interface_calibration_protocol_current.json",
+        ],
+        "alternative_authoritative_artifacts": [],
+    }
+
+
+def build_current_pointer_schema():
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://study3r.invalid/study3r_protocol_current.schema.json",
+        "title": "Study 3R current protocol pointer",
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["alternative_authoritative_artifacts", "authored_state",
+                     "authoritative_markdown", "authoritative_protocol",
+                     "authoritative_schema", "authority",
+                     "execution_authorized", "fallback_protocol_permitted",
+                     "frozen", "legacy_pointers_not_consulted", "protocol_id",
+                     "runtime_overlay_permitted", "schema_version",
+                     "supersedes"],
+        "properties": {
+            "schema_version": {"const": "study3r-protocol-current-v1"},
+            "authority": {"const": AUTHORITY_PATH},
+            "protocol_id": {"const": PROTOCOL_ID},
+            "authoritative_protocol": {"const": AUTHORITATIVE_PROTOCOL_PATH},
+            "authoritative_schema": {"const": AUTHORITATIVE_SCHEMA_PATH},
+            "authoritative_markdown": {"const": AUTHORITATIVE_MARKDOWN_PATH},
+            "frozen": {"const": False},
+            "execution_authorized": {"const": False},
+            "authored_state": {"const": AUTHORED_STATE},
+            "supersedes": {"type": "array", "maxItems": 0, "items": _string()},
+            "runtime_overlay_permitted": {"const": False},
+            "fallback_protocol_permitted": {"const": False},
+            "legacy_pointers_not_consulted": {
+                "type": "array", "minItems": 1, "items": _string(minLength=1)},
+            "alternative_authoritative_artifacts": {
+                "type": "array", "maxItems": 0, "items": _string()},
+        },
+    }
+
+
+# ---------------------------------------------------------------------------
+# Protocol assembly
+# ---------------------------------------------------------------------------
+
+
+def build_protocol(surfaces, acquisition, equivalence, statistics,
+                   tasks_module):
+    checkpoints = build_checkpoints(surfaces, acquisition)
+    interfaces = build_interfaces(surfaces)
+    interfaces["tokenizer_functional_equivalence"] = {
+        "verified_tuple_elements": equivalence.get("verified_tuple_elements"),
+        "reference_role": equivalence.get("reference_role"),
+        "distinct_stratum_count": equivalence.get("distinct_stratum_count"),
+        "role_to_stratum": equivalence.get("role_to_stratum"),
+        "pooling_rule": equivalence.get("pooling_rule"),
+        "isomorphic_reinstantiation_strata_are_never_pooled": True,
+    }
+    estimands = build_estimands(surfaces, statistics)
+    populations = build_task_populations(surfaces, statistics, tasks_module)
+    machine = build_state_machine(statistics)
+    counters = acquisition.get("counters", {})
+    zero_counters = {name: value for name, value in sorted(counters.items())
+                     if value == 0}
+    tokenizer_counters = {
+        name: counters.get(name, 0)
+        for name in ("network_metadata_requests", "network_file_downloads",
+                     "files_acquired", "tokenizer_constructions",
+                     "encode_calls", "chat_template_renders")
+    }
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "protocol_id": PROTOCOL_ID,
+        "authority": AUTHORITY_PATH,
+        "status": {
+            "frozen": PROTOCOL_FROZEN,
+            "execution_authorized": EXECUTION_AUTHORIZED,
+            "formal_execution_authorized": FORMAL_EXECUTION_AUTHORIZED,
+            "authored_state": AUTHORED_STATE,
+            "is_a_copy_on_write_continuation": False,
+            "legacy_overlay_or_fallback_permitted": False,
+        },
+        "scope": {
+            "covers": "behavioral and interface qualification only",
+            "target_checkpoint": TARGET_CHECKPOINT,
+            "rp_b_ladder": list(RP_B_LADDER),
+            "rp_b_ladder_length": LADDER_LENGTH,
+            "rp_b_fallback_candidate": None,
+            "rp_b_post_result_expansion_permitted": False,
+            "excluded_roles": [
+                "Qwen2.5-Math base lineage",
+                "Qwen2.5-Math instruct lineage",
+                "any base/instruct lineage comparison",
+            ],
+            "activation_patching_authorized": False,
+            "rp_m_authorized": False,
+            "mechanism_claims_authorized": False,
+            "interface_profile_selection_performed": False,
+            "recreates_s1_to_s4": False,
+        },
+        "checkpoints": checkpoints,
+        "estimands": estimands,
+        "interfaces": interfaces,
+        "task_populations": populations,
+        "statistics": {
+            "chance_level": statistics["chance_level"],
+            "global_error_budget": statistics["global_error_budget"],
+            "atomic_cell_count": statistics["atomic_cell_census"]["count"],
+            "m_max": statistics["global_error_budget"]["m_max"],
+            "rp_b_decision_id": statistics["rp_b_decision_id"],
+            "diagnostic_without_a_gate": D0_ESTIMAND_ID,
+            "gates": statistics["gates"],
+            "ladder_multiplicity": {
+                "corrects_over_full_registered_l": True,
+                "registered_l": LADDER_LENGTH,
+                "claims_fixed_sequence_protection": False,
+                "evaluations_per_candidate": {"development": 1,
+                                              "confirmation": 1},
+                "selection_rule": "first_confirmed_pass",
+            },
+            "unresolved_values": [],
+        },
+        "state_machine": {
+            "path": "studies/study3r/protocol/study3r_state_machine_v1.json",
+            "initial_state": machine["initial_state"],
+            "current_state": machine["current_state"],
+            "current_terminal": machine["current_terminal"],
+            "state_ids": [state["state_id"] for state in machine["states"]],
+            "terminal_ids": [entry["terminal_id"]
+                             for entry in machine["terminals"]],
+        },
+        "references": {
+            "authoritative_protocol": AUTHORITATIVE_PROTOCOL_PATH,
+            "authoritative_schema": AUTHORITATIVE_SCHEMA_PATH,
+            "authoritative_markdown": AUTHORITATIVE_MARKDOWN_PATH,
+            "current_pointer": CURRENT_POINTER_PATH,
+            "rendering_registry":
+                "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+            "state_machine":
+                "studies/study3r/protocol/study3r_state_machine_v1.json",
+            "acquisition_record":
+                "studies/study3r/acquisition/study3r_checkpoint_acquisition_v1.json",
+            "tokenizer_surfaces":
+                "studies/study3r/acquisition/study3r_tokenizer_surfaces_v1.json",
+            "tokenizer_equivalence":
+                "studies/study3r/acquisition/study3r_tokenizer_equivalence_v1.json",
+            "design_statistics_generator":
+                "studies/study3r/analysis/study3r_design_statistics.py",
+            "independent_recalculation":
+                "studies/study3r/analysis/study3r_independent_recalculation.py",
+            "task_generators":
+                "studies/study3r/tasks/study3r_task_generators_v1.py",
+            "manifest_generator": MANIFEST_GENERATOR_PATH,
+            "protocol_builder":
+                "studies/study3r/analysis/study3r_protocol_build.py",
+            "tokenizer_probe":
+                "studies/study3r/analysis/study3r_tokenizer_probe.py",
+        },
+        "boundaries": {
+            "zero_operation_counters": zero_counters,
+            "tokenizer_only_counters": tokenizer_counters,
+            "no_weight_file_acquired": True,
+            "trust_remote_code": False,
+            "evidence_ledger_rows_written": 0,
+            "scientific_claims_made": 0,
+            "study3m_artifacts": [],
+        },
+    }, machine
+
+
+# ---------------------------------------------------------------------------
+# Markdown
+# ---------------------------------------------------------------------------
+
+
+def render_markdown(protocol, machine, equivalence):
+    lines = []
+    add = lines.append
+    add("# Study 3R protocol candidate v1")
+    add("")
+    add("> **State:** `%s`" % protocol["status"]["authored_state"])
+    add(">")
+    add("> `frozen = %s`, `execution_authorized = %s`, "
+        "`formal_execution_authorized = %s`."
+        % (str(protocol["status"]["frozen"]).lower(),
+           str(protocol["status"]["execution_authorized"]).lower(),
+           str(protocol["status"]["formal_execution_authorized"]).lower()))
+    add(">")
+    add("> This document is the human-readable rendering of "
+        "[`study3r_protocol_v1.json`](study3r_protocol_v1.json), which is the "
+        "single authoritative artifact. No runtime overlay and no fallback "
+        "protocol is permitted.")
+    add("")
+    add("Authority: [`%s`](../../../%s)" % (AUTHORITY_PATH, AUTHORITY_PATH))
+    add("")
+    add("## 1. Roles and immutable revisions")
+    add("")
+    add("| role | repository | immutable revision | tokenizer | vocab | context |")
+    add("| --- | --- | --- | --- | --- | --- |")
+    for row in protocol["checkpoints"]:
+        add("| `%s` | `%s` | `%s` | `%s` | %s | %s |"
+            % (row["role"], row["repository_id"], row["immutable_revision"],
+               row["tokenizer_class"], row["vocab_size"],
+               row["max_position_embeddings"]))
+    add("")
+    add("`RT` is the sole target checkpoint. The natural positive-reference "
+        "ladder has fixed membership and fixed order with `L = %d`; there is "
+        "no fallback candidate, no substitution, no reordering and no "
+        "post-result expansion." % protocol["scope"]["rp_b_ladder_length"])
+    add("")
+    add("## 2. Estimands")
+    add("")
+    add("### 2.1 `%s` (primary)" % protocol["estimands"]["primary"]["estimand_id"])
+    add("")
+    add("Greedy decoding with `do_sample = false`. Scoring is full-sequence "
+        "exact match against the frozen legal answer surfaces for that "
+        "checkpoint revision. Prefix matching is prohibited. An unparseable "
+        "generation, an empty generation, any rationale or any extra emitted "
+        "token is scored incorrect.")
+    add("")
+    add("| role | legal surfaces | longest surface (tokens) | margin | `max_new_tokens` |")
+    add("| --- | --- | --- | --- | --- |")
+    for row in protocol["checkpoints"]:
+        surfaces = ", ".join("`%s`=%s" % (label, entry["token_ids"])
+                             for label, entry
+                             in sorted(row["e0_legal_answer_surfaces"].items()))
+        add("| `%s` | %s | %d | %d | %d |"
+            % (row["role"], surfaces,
+               row["e0_longest_legal_answer_surface_tokens"],
+               row["e0_termination_margin_tokens"], row["e0_max_new_tokens"]))
+    add("")
+    add("Answer-set mass, full-vocabulary rank and complete-candidate joint "
+        "likelihood are registered as descriptive diagnostics only and may "
+        "never determine a gate.")
+    add("")
+    add("### 2.2 `%s` (diagnostic only)"
+        % protocol["estimands"]["diagnostic"]["estimand_id"])
+    add("")
+    add(protocol["estimands"]["diagnostic"]["limitation"])
+    add("")
+    add("Tie rule: %s" % protocol["estimands"]["diagnostic"]["tie_rule"])
+    add("")
+    add("### 2.3 Generated-CoT ceiling")
+    add("")
+    add("`k = %d`, item as the statistical unit, parser `%s`, unparseable "
+        "output scored incorrect."
+        % (protocol["estimands"]["generated_cot_ceiling"]["k"],
+           protocol["estimands"]["generated_cot_ceiling"]["parser_id"]))
+    add("")
+    add("| role | context window | prompt tokens | `max_new_tokens` | worst-case sequence | fits |")
+    add("| --- | --- | --- | --- | --- | --- |")
+    bounds = protocol["estimands"]["generated_cot_ceiling"][
+        "resource_bounds_per_checkpoint"]
+    for role in CHECKPOINT_ROLES:
+        entry = bounds.get(role, {})
+        add("| `%s` | %s | %s | %s | %s | %s |"
+            % (role, entry.get("context_window_tokens"),
+               entry.get("canonical_prompt_token_count"),
+               entry.get("max_new_tokens_per_item"),
+               entry.get("worst_case_sequence_tokens"),
+               str(entry.get("fits_context_window")).lower()))
+    add("")
+    add(protocol["estimands"]["generated_cot_ceiling"]["limitation"])
+    add("")
+    add("## 3. Wrapper arms and tokenizer strata")
+    add("")
+    add("| arm | envelope | checkpoint specific | message roles | few-shot |")
+    add("| --- | --- | --- | --- | --- |")
+    for arm in protocol["interfaces"]["e0_arms"]:
+        add("| `%s` | %s | %s | %s | %d |"
+            % (arm["arm_id"], arm["envelope_kind"],
+               str(arm["checkpoint_specific"]).lower(),
+               arm["message_roles"] or "none",
+               arm["few_shot_example_count"]))
+    add("")
+    add("The single field that differs between the matched arms is "
+        "`%s`. %s" % (protocol["interfaces"]["arm_differentiating_field"],
+                      protocol["interfaces"]["arm_gate_limitation"]))
+    add("")
+    add("Verified tuple: `(bytes, token IDs, common prefix, discriminant "
+        "position)`. %s" % equivalence.get("pooling_rule"))
+    add("")
+    add("| role | stratum |")
+    add("| --- | --- |")
+    for role in CHECKPOINT_ROLES:
+        add("| `%s` | `%s` |"
+            % (role, equivalence.get("role_to_stratum", {}).get(role)))
+    add("")
+    add("## 4. Task populations")
+    add("")
+    add("Operation ontology: %s. Operands are drawn from "
+        "`[%d, %d]`; evaluated values lie in `[%d, %d]`."
+        % (", ".join("`%s` = `%s`" % (name, symbol) for name, symbol
+                     in sorted(protocol["task_populations"][
+                         "operation_ontology"].items())),
+           protocol["task_populations"]["operand_domain"]["min"],
+           protocol["task_populations"]["operand_domain"]["max"],
+           protocol["task_populations"]["result_domain"]["min"],
+           protocol["task_populations"]["result_domain"]["max"]))
+    add("")
+    add("| bank | families | gate | n |")
+    add("| --- | --- | --- | --- |")
+    for bank in protocol["task_populations"]["banks"]:
+        add("| `%s` | %s | `%s` | %d |"
+            % (bank["bank_id"], ", ".join("`%s`" % f for f in bank["family_mix"]),
+               bank["gate_id"], bank["n"]))
+    add("")
+    add("Neither the execution seed nor any scientific bank is realized in the "
+        "authoring session. Tokenizer fixtures are literal constants carrying "
+        "`is_scientific_item = false` and never enter a bank.")
+    add("")
+    add("## 5. Statistical closure")
+    add("")
+    add("Global one-sided error budget `%s`, single multiplicity family `%s`, "
+        "Bonferroni equal allocation over `m_max = %d` gate-bearing atomic "
+        "cells, giving `alpha_per_cell = %s`. Power target `%s` per cell. All "
+        "arithmetic is exact integer binomial arithmetic."
+        % (protocol["statistics"]["global_error_budget"]["alpha_global"],
+           protocol["statistics"]["global_error_budget"]["family_id"],
+           protocol["statistics"]["m_max"],
+           protocol["statistics"]["global_error_budget"]["alpha_per_cell"],
+           protocol["statistics"]["gates"][0]["power_target"]))
+    add("")
+    add("| gate | cells | direction | floor / margin | alternative | n | pass boundary | exact power |")
+    add("| --- | --- | --- | --- | --- | --- | --- | --- |")
+    for gate in protocol["statistics"]["gates"]:
+        add("| `%s` | %d | %s | `%s` | `%s` | %d | %s | %s |"
+            % (gate["gate_id"], gate["atomic_cell_count"], gate["direction"],
+               gate["floor_or_upper_margin"], gate["effect_or_adequacy_margin"],
+               gate["n"],
+               ("k >= %d" % gate["pass_boundary"])
+               if gate["direction"] == "greater_than_floor"
+               else ("k <= %d" % gate["pass_boundary"]),
+               gate["exact_power_display_only"]))
+    add("")
+    add("The RP-B ladder scans past failures until the first confirmed pass. "
+        "Study 3R does not claim classical fixed-sequence protection: "
+        "multiplicity is corrected over the full registered `L = %d` "
+        "regardless of where scanning stops, and each candidate receives at "
+        "most one development evaluation and one item-disjoint confirmation "
+        "evaluation." % protocol["scope"]["rp_b_ladder_length"])
+    add("")
+    add("## 6. State machine")
+    add("")
+    add("| state | kind | gates | outcomes |")
+    add("| --- | --- | --- | --- |")
+    for state in machine["states"]:
+        outcomes = "; ".join("`%s` &rarr; `%s`"
+                             % (transition["outcome"], transition["target"])
+                             for transition in state["transitions"])
+        add("| `%s` | %s | %s | %s |"
+            % (state["state_id"], state["kind"],
+               ", ".join("`%s`" % gate for gate in state["gate_ids"]) or "none",
+               outcomes))
+    add("")
+    add("| terminal | meaning |")
+    add("| --- | --- |")
+    for entry in machine["terminals"]:
+        add("| `%s` | %s |" % (entry["terminal_id"], entry["meaning"]))
+    add("")
+    add("## 7. Boundary")
+    add("")
+    add("No model weights, adapters or activations were acquired. No model "
+        "load, prefill, forward pass, logit read, scoring operation or "
+        "generation was performed. No cloud or GPU job was created. No "
+        "scientific bank was realized, no RP-B candidate was selected, no "
+        "evidence-ledger row was written and no scientific claim was made. "
+        "Activation patching, RP-M and every Study 3M artifact are absent and "
+        "unauthorized.")
+    add("")
+    add("`formal_execution_authorized` remains `false`.")
+    add("")
+    add("`%s`" % protocol["status"]["authored_state"])
+    add("")
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source-root", default=str(DEFAULT_ROOT))
+    parser.add_argument("--out-root", default=None)
+    args = parser.parse_args(argv)
+
+    source_root = pathlib.Path(args.source_root)
+    out_root = pathlib.Path(args.out_root or args.source_root)
+
+    analysis_dir = source_root / "studies" / "study3r" / "analysis"
+    tasks_dir = source_root / "studies" / "study3r" / "tasks"
+    for candidate in (str(analysis_dir), str(tasks_dir)):
+        if candidate not in sys.path:
+            sys.path.insert(0, candidate)
+
+    import study3r_design_statistics as design
+    import study3r_task_generators_v1 as tasks_module
+
+    acquisition_dir = source_root / "studies" / "study3r" / "acquisition"
+    acquisition = read_json(
+        acquisition_dir / "study3r_checkpoint_acquisition_v1.json")
+    surfaces = read_json(
+        acquisition_dir / "study3r_tokenizer_surfaces_v1.json")
+    equivalence = read_json(
+        acquisition_dir / "study3r_tokenizer_equivalence_v1.json")
+
+    statistics = design.build_tables()
+    protocol, machine = build_protocol(surfaces, acquisition, equivalence,
+                                       statistics, tasks_module)
+    registry = build_rendering_registry(surfaces)
+
+    out_analysis = out_root / "studies" / "study3r" / "analysis"
+    out_protocol = out_root / "studies" / "study3r" / "protocol"
+
+    write_json(out_analysis / "study3r_design_statistics_tables.json",
+               statistics)
+    write_json(out_analysis / "study3r_atomic_cell_census_v1.json", {
+        "schema_version": "study3r-atomic-cell-census-v1",
+        "authority": AUTHORITY_PATH,
+        "protocol_id": PROTOCOL_ID,
+        "factors": statistics["factors"],
+        "cells": statistics["atomic_cell_census"]["cells"],
+        "count": statistics["atomic_cell_census"]["count"],
+        "counts_by_gate": statistics["atomic_cell_census"]["counts_by_gate"],
+        "m_max": statistics["global_error_budget"]["m_max"],
+        "both_wrapper_arms_enter_the_census": sorted({
+            cell["route"] for cell in statistics["atomic_cell_census"]["cells"]
+            if cell["route"] in (RAW_ARM_ID, CHAT_ARM_ID)}) == sorted(
+                [RAW_ARM_ID, CHAT_ARM_ID]),
+        "full_ladder_enters_the_census": sorted({
+            cell["checkpoint_role"]
+            for cell in statistics["atomic_cell_census"]["cells"]
+            if cell["checkpoint_role"].startswith("RP_B")}) == [
+                "RP_B1", "RP_B2", "RP_B3"],
+        "diagnostic_contributes_no_cell": not any(
+            cell["gate_id"].startswith("D0")
+            for cell in statistics["atomic_cell_census"]["cells"]),
+    })
+    write_json(out_protocol / "study3r_protocol_v1.json", protocol)
+    write_json(out_protocol / "study3r_protocol_v1.schema.json",
+               build_protocol_schema(statistics, protocol["checkpoints"]))
+    write_json(out_protocol / "study3r_rendering_registry_v1.json", registry)
+    write_json(out_protocol / "study3r_rendering_registry_v1.schema.json",
+               build_registry_schema(registry))
+    write_json(out_protocol / "study3r_state_machine_v1.json", machine)
+    write_json(out_protocol / "study3r_state_machine_v1.schema.json",
+               build_state_machine_schema(machine))
+    write_json(out_protocol / "study3r_protocol_current.json",
+               build_current_pointer())
+    write_json(out_protocol / "study3r_protocol_current.schema.json",
+               build_current_pointer_schema())
+    write_text(out_protocol / "study3r_protocol_v1.md",
+               render_markdown(protocol, machine, equivalence))
+    print("built Study 3R protocol candidate: m_max=%d gates=%d cells=%d"
+          % (protocol["statistics"]["m_max"],
+             len(protocol["statistics"]["gates"]),
+             protocol["statistics"]["atomic_cell_count"]))
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover
+    raise SystemExit(main())

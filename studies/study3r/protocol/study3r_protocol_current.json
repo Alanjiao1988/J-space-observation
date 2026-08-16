@@ -1,0 +1,18 @@
+{
+ "alternative_authoritative_artifacts": [],
+ "authored_state": "STUDY3R_PROTOCOL_V1_AUTHORED_AWAITING_SINGLE_INDEPENDENT_FOCUSED_REVIEW",
+ "authoritative_markdown": "studies/study3r/protocol/study3r_protocol_v1.md",
+ "authoritative_protocol": "studies/study3r/protocol/study3r_protocol_v1.json",
+ "authoritative_schema": "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+ "authority": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md",
+ "execution_authorized": false,
+ "fallback_protocol_permitted": false,
+ "frozen": false,
+ "legacy_pointers_not_consulted": [
+  "studies/study3/protocol/interface_calibration_protocol_current.json"
+ ],
+ "protocol_id": "STUDY3R_PROTOCOL_V1",
+ "runtime_overlay_permitted": false,
+ "schema_version": "study3r-protocol-current-v1",
+ "supersedes": []
+}

@@ -1,0 +1,996 @@
+{
+ "$id": "https://study3r.invalid/study3r_protocol_v1.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "properties": {
+  "authority": {
+   "const": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md"
+  },
+  "boundaries": {
+   "additionalProperties": false,
+   "properties": {
+    "evidence_ledger_rows_written": {
+     "const": 0
+    },
+    "no_weight_file_acquired": {
+     "const": true
+    },
+    "scientific_claims_made": {
+     "const": 0
+    },
+    "study3m_artifacts": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 0,
+     "type": "array"
+    },
+    "tokenizer_only_counters": {
+     "minProperties": 3,
+     "type": "object"
+    },
+    "trust_remote_code": {
+     "const": false
+    },
+    "zero_operation_counters": {
+     "additionalProperties": {
+      "const": 0
+     },
+     "minProperties": 10,
+     "type": "object"
+    }
+   },
+   "required": [
+    "evidence_ledger_rows_written",
+    "no_weight_file_acquired",
+    "scientific_claims_made",
+    "study3m_artifacts",
+    "tokenizer_only_counters",
+    "trust_remote_code",
+    "zero_operation_counters"
+   ],
+   "type": "object"
+  },
+  "checkpoints": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "acquired_file_sha256": {
+      "additionalProperties": {
+       "pattern": "^[0-9a-f]{64}$",
+       "type": "string"
+      },
+      "minProperties": 3,
+      "type": "object"
+     },
+     "acquisition_immutable_revision": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+     },
+     "acquisition_repository_id": {
+      "enum": [
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+      ],
+      "type": "string"
+     },
+     "chat_template_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+     },
+     "e0_legal_answer_surfaces": {
+      "additionalProperties": false,
+      "properties": {
+       "A": {
+        "additionalProperties": false,
+        "properties": {
+         "text": {
+          "const": "A"
+         },
+         "token_ids": {
+          "items": {
+           "minimum": 0,
+           "type": "integer"
+          },
+          "minItems": 1,
+          "type": "array"
+         },
+         "utf8_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+         }
+        },
+        "required": [
+         "text",
+         "token_ids",
+         "utf8_sha256"
+        ],
+        "type": "object"
+       },
+       "B": {
+        "additionalProperties": false,
+        "properties": {
+         "text": {
+          "const": "B"
+         },
+         "token_ids": {
+          "items": {
+           "minimum": 0,
+           "type": "integer"
+          },
+          "minItems": 1,
+          "type": "array"
+         },
+         "utf8_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+         }
+        },
+        "required": [
+         "text",
+         "token_ids",
+         "utf8_sha256"
+        ],
+        "type": "object"
+       },
+       "C": {
+        "additionalProperties": false,
+        "properties": {
+         "text": {
+          "const": "C"
+         },
+         "token_ids": {
+          "items": {
+           "minimum": 0,
+           "type": "integer"
+          },
+          "minItems": 1,
+          "type": "array"
+         },
+         "utf8_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+         }
+        },
+        "required": [
+         "text",
+         "token_ids",
+         "utf8_sha256"
+        ],
+        "type": "object"
+       },
+       "D": {
+        "additionalProperties": false,
+        "properties": {
+         "text": {
+          "const": "D"
+         },
+         "token_ids": {
+          "items": {
+           "minimum": 0,
+           "type": "integer"
+          },
+          "minItems": 1,
+          "type": "array"
+         },
+         "utf8_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+         }
+        },
+        "required": [
+         "text",
+         "token_ids",
+         "utf8_sha256"
+        ],
+        "type": "object"
+       }
+      },
+      "required": [
+       "A",
+       "B",
+       "C",
+       "D"
+      ],
+      "type": "object"
+     },
+     "e0_longest_legal_answer_surface_tokens": {
+      "minimum": 1,
+      "type": "integer"
+     },
+     "e0_max_new_tokens": {
+      "minimum": 1,
+      "type": "integer"
+     },
+     "e0_termination_margin_tokens": {
+      "const": 1
+     },
+     "immutable_revision": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+     },
+     "max_position_embeddings": {
+      "minimum": 1,
+      "type": "integer"
+     },
+     "model_type": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "repository_id": {
+      "enum": [
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+      ],
+      "type": "string"
+     },
+     "revision_matches_acquisition_record": {
+      "const": true
+     },
+     "role": {
+      "enum": [
+       "RT",
+       "RP_B1",
+       "RP_B2",
+       "RP_B3"
+      ],
+      "type": "string"
+     },
+     "special_tokens": {
+      "type": "object"
+     },
+     "tokenizer_class": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "vocab_size": {
+      "minimum": 1,
+      "type": "integer"
+     }
+    },
+    "required": [
+     "acquired_file_sha256",
+     "acquisition_immutable_revision",
+     "acquisition_repository_id",
+     "chat_template_sha256",
+     "e0_legal_answer_surfaces",
+     "e0_longest_legal_answer_surface_tokens",
+     "e0_max_new_tokens",
+     "e0_termination_margin_tokens",
+     "immutable_revision",
+     "max_position_embeddings",
+     "model_type",
+     "repository_id",
+     "revision_matches_acquisition_record",
+     "role",
+     "special_tokens",
+     "tokenizer_class",
+     "vocab_size"
+    ],
+    "type": "object"
+   },
+   "maxItems": 4,
+   "minItems": 4,
+   "type": "array"
+  },
+  "estimands": {
+   "type": "object"
+  },
+  "interfaces": {
+   "type": "object"
+  },
+  "protocol_id": {
+   "const": "STUDY3R_PROTOCOL_V1"
+  },
+  "references": {
+   "additionalProperties": false,
+   "properties": {
+    "acquisition_record": {
+     "const": "studies/study3r/acquisition/study3r_checkpoint_acquisition_v1.json"
+    },
+    "authoritative_markdown": {
+     "const": "studies/study3r/protocol/study3r_protocol_v1.md"
+    },
+    "authoritative_protocol": {
+     "const": "studies/study3r/protocol/study3r_protocol_v1.json"
+    },
+    "authoritative_schema": {
+     "const": "studies/study3r/protocol/study3r_protocol_v1.schema.json"
+    },
+    "current_pointer": {
+     "const": "studies/study3r/protocol/study3r_protocol_current.json"
+    },
+    "design_statistics_generator": {
+     "const": "studies/study3r/analysis/study3r_design_statistics.py"
+    },
+    "independent_recalculation": {
+     "const": "studies/study3r/analysis/study3r_independent_recalculation.py"
+    },
+    "manifest_generator": {
+     "const": "studies/study3r/analysis/study3r_manifest.py"
+    },
+    "protocol_builder": {
+     "const": "studies/study3r/analysis/study3r_protocol_build.py"
+    },
+    "rendering_registry": {
+     "const": "studies/study3r/protocol/study3r_rendering_registry_v1.json"
+    },
+    "state_machine": {
+     "const": "studies/study3r/protocol/study3r_state_machine_v1.json"
+    },
+    "task_generators": {
+     "const": "studies/study3r/tasks/study3r_task_generators_v1.py"
+    },
+    "tokenizer_equivalence": {
+     "const": "studies/study3r/acquisition/study3r_tokenizer_equivalence_v1.json"
+    },
+    "tokenizer_probe": {
+     "const": "studies/study3r/analysis/study3r_tokenizer_probe.py"
+    },
+    "tokenizer_surfaces": {
+     "const": "studies/study3r/acquisition/study3r_tokenizer_surfaces_v1.json"
+    }
+   },
+   "required": [
+    "acquisition_record",
+    "authoritative_markdown",
+    "authoritative_protocol",
+    "authoritative_schema",
+    "current_pointer",
+    "design_statistics_generator",
+    "independent_recalculation",
+    "manifest_generator",
+    "protocol_builder",
+    "rendering_registry",
+    "state_machine",
+    "task_generators",
+    "tokenizer_equivalence",
+    "tokenizer_probe",
+    "tokenizer_surfaces"
+   ],
+   "type": "object"
+  },
+  "schema_version": {
+   "const": "study3r-protocol-v1"
+  },
+  "scope": {
+   "additionalProperties": false,
+   "properties": {
+    "activation_patching_authorized": {
+     "const": false
+    },
+    "covers": {
+     "const": "behavioral and interface qualification only"
+    },
+    "excluded_roles": {
+     "items": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "type": "array"
+    },
+    "interface_profile_selection_performed": {
+     "const": false
+    },
+    "mechanism_claims_authorized": {
+     "const": false
+    },
+    "recreates_s1_to_s4": {
+     "const": false
+    },
+    "rp_b_fallback_candidate": {
+     "type": "null"
+    },
+    "rp_b_ladder": {
+     "maxItems": 3,
+     "minItems": 3,
+     "prefixItems": [
+      {
+       "const": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+      },
+      {
+       "const": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B"
+      },
+      {
+       "const": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+      }
+     ],
+     "type": "array"
+    },
+    "rp_b_ladder_length": {
+     "const": 3
+    },
+    "rp_b_post_result_expansion_permitted": {
+     "const": false
+    },
+    "rp_m_authorized": {
+     "const": false
+    },
+    "target_checkpoint": {
+     "const": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+    }
+   },
+   "required": [
+    "activation_patching_authorized",
+    "covers",
+    "excluded_roles",
+    "interface_profile_selection_performed",
+    "mechanism_claims_authorized",
+    "recreates_s1_to_s4",
+    "rp_b_fallback_candidate",
+    "rp_b_ladder",
+    "rp_b_ladder_length",
+    "rp_b_post_result_expansion_permitted",
+    "rp_m_authorized",
+    "target_checkpoint"
+   ],
+   "type": "object"
+  },
+  "state_machine": {
+   "additionalProperties": false,
+   "properties": {
+    "current_state": {
+     "const": "S00_AUTHORED"
+    },
+    "current_terminal": {
+     "const": "T00_NOT_EXECUTED"
+    },
+    "initial_state": {
+     "const": "S00_AUTHORED"
+    },
+    "path": {
+     "const": "studies/study3r/protocol/study3r_state_machine_v1.json"
+    },
+    "state_ids": {
+     "items": {
+      "enum": [
+       "S00_AUTHORED",
+       "S01_SEALED_ENGINEERING_SHAKEDOWN",
+       "S02_CHECKPOINT_TOKENIZER_FUNCTIONAL_EQUIVALENCE",
+       "S03_GENERATED_COT_CEILING",
+       "S04_COMPETENCE_CONTROLS",
+       "S05_NEGATIVE_CONTROL",
+       "S06_TWO_WRAPPER_JOINT_ADEQUACY",
+       "S07_RPB_LADDER_DEVELOPMENT_AND_CONFIRMATION",
+       "S08_RPB_FIRST_CONFIRMED_PASS_FREEZE",
+       "S09_RT_E0_BEHAVIORAL_QUALIFICATION",
+       "S10_D0_DIAGNOSTIC_REPORT",
+       "S11_TERMINAL_DISPOSITION"
+      ],
+      "type": "string"
+     },
+     "maxItems": 12,
+     "minItems": 12,
+     "type": "array"
+    },
+    "terminal_ids": {
+     "items": {
+      "enum": [
+       "T00_NOT_EXECUTED",
+       "T01_SHAKEDOWN_FAILED",
+       "T02_TOKENIZER_EQUIVALENCE_FAILED",
+       "T03_COT_CEILING_FAILED",
+       "T04_COMPETENCE_CONTROL_FAILED",
+       "T05_NEGATIVE_CONTROL_FAILED",
+       "T06_WRAPPER_ADEQUACY_FAILED",
+       "T07_NO_QUALIFIED_REFERENCE",
+       "T08_RPB_FREEZE_RECORD_FAILED",
+       "T09_RT_NOT_QUALIFIED",
+       "T10_STUDY3R_COMPLETE_RT_QUALIFIED"
+      ],
+      "type": "string"
+     },
+     "maxItems": 11,
+     "minItems": 11,
+     "type": "array"
+    }
+   },
+   "required": [
+    "current_state",
+    "current_terminal",
+    "initial_state",
+    "path",
+    "state_ids",
+    "terminal_ids"
+   ],
+   "type": "object"
+  },
+  "statistics": {
+   "additionalProperties": false,
+   "properties": {
+    "atomic_cell_count": {
+     "const": 58
+    },
+    "chance_level": {
+     "const": "1/4"
+    },
+    "diagnostic_without_a_gate": {
+     "const": "D0_single_forward_decodability"
+    },
+    "gates": {
+     "items": {
+      "additionalProperties": false,
+      "properties": {
+       "adjacent_boundary_size": {
+        "pattern": "^[0-9]+/[0-9]+$",
+        "type": "string"
+       },
+       "adjacent_boundary_size_display_only": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "alpha_global": {
+        "const": "1/20"
+       },
+       "alpha_per_cell": {
+        "const": "1/1160"
+       },
+       "alternative_hypothesis": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "atomic_cell_count": {
+        "minimum": 1,
+        "type": "integer"
+       },
+       "atomic_cells": {
+        "items": {
+         "enum": [
+          "G01_COT_CEILING|RT|C1_CANONICAL_GENERATED_COT",
+          "G01_COT_CEILING|RP_B1|C1_CANONICAL_GENERATED_COT",
+          "G01_COT_CEILING|RP_B2|C1_CANONICAL_GENERATED_COT",
+          "G01_COT_CEILING|RP_B3|C1_CANONICAL_GENERATED_COT",
+          "G02_CONTROL_RECOVERY|RT|W1_RAW_DIRECT",
+          "G02_CONTROL_RECOVERY|RT|W2_ROLE_CANONICAL",
+          "G02_CONTROL_RECOVERY|RP_B1|W1_RAW_DIRECT",
+          "G02_CONTROL_RECOVERY|RP_B1|W2_ROLE_CANONICAL",
+          "G02_CONTROL_RECOVERY|RP_B2|W1_RAW_DIRECT",
+          "G02_CONTROL_RECOVERY|RP_B2|W2_ROLE_CANONICAL",
+          "G02_CONTROL_RECOVERY|RP_B3|W1_RAW_DIRECT",
+          "G02_CONTROL_RECOVERY|RP_B3|W2_ROLE_CANONICAL",
+          "G03_CONTROL_BINDING|RT|W1_RAW_DIRECT",
+          "G03_CONTROL_BINDING|RT|W2_ROLE_CANONICAL",
+          "G03_CONTROL_BINDING|RP_B1|W1_RAW_DIRECT",
+          "G03_CONTROL_BINDING|RP_B1|W2_ROLE_CANONICAL",
+          "G03_CONTROL_BINDING|RP_B2|W1_RAW_DIRECT",
+          "G03_CONTROL_BINDING|RP_B2|W2_ROLE_CANONICAL",
+          "G03_CONTROL_BINDING|RP_B3|W1_RAW_DIRECT",
+          "G03_CONTROL_BINDING|RP_B3|W2_ROLE_CANONICAL",
+          "G04_CONTROL_PRIMITIVE|RT|W1_RAW_DIRECT",
+          "G04_CONTROL_PRIMITIVE|RT|W2_ROLE_CANONICAL",
+          "G04_CONTROL_PRIMITIVE|RP_B1|W1_RAW_DIRECT",
+          "G04_CONTROL_PRIMITIVE|RP_B1|W2_ROLE_CANONICAL",
+          "G04_CONTROL_PRIMITIVE|RP_B2|W1_RAW_DIRECT",
+          "G04_CONTROL_PRIMITIVE|RP_B2|W2_ROLE_CANONICAL",
+          "G04_CONTROL_PRIMITIVE|RP_B3|W1_RAW_DIRECT",
+          "G04_CONTROL_PRIMITIVE|RP_B3|W2_ROLE_CANONICAL",
+          "G05_NEGATIVE_CONTROL|RT|W1_RAW_DIRECT",
+          "G05_NEGATIVE_CONTROL|RT|W2_ROLE_CANONICAL",
+          "G05_NEGATIVE_CONTROL|RP_B1|W1_RAW_DIRECT",
+          "G05_NEGATIVE_CONTROL|RP_B1|W2_ROLE_CANONICAL",
+          "G05_NEGATIVE_CONTROL|RP_B2|W1_RAW_DIRECT",
+          "G05_NEGATIVE_CONTROL|RP_B2|W2_ROLE_CANONICAL",
+          "G05_NEGATIVE_CONTROL|RP_B3|W1_RAW_DIRECT",
+          "G05_NEGATIVE_CONTROL|RP_B3|W2_ROLE_CANONICAL",
+          "G06_WRAPPER_JOINT_ADEQUACY|RT|W1_RAW_DIRECT",
+          "G06_WRAPPER_JOINT_ADEQUACY|RT|W2_ROLE_CANONICAL",
+          "G06_WRAPPER_JOINT_ADEQUACY|RP_B1|W1_RAW_DIRECT",
+          "G06_WRAPPER_JOINT_ADEQUACY|RP_B1|W2_ROLE_CANONICAL",
+          "G06_WRAPPER_JOINT_ADEQUACY|RP_B2|W1_RAW_DIRECT",
+          "G06_WRAPPER_JOINT_ADEQUACY|RP_B2|W2_ROLE_CANONICAL",
+          "G06_WRAPPER_JOINT_ADEQUACY|RP_B3|W1_RAW_DIRECT",
+          "G06_WRAPPER_JOINT_ADEQUACY|RP_B3|W2_ROLE_CANONICAL",
+          "G07_RPB_DEVELOPMENT|RP_B1|W1_RAW_DIRECT",
+          "G07_RPB_DEVELOPMENT|RP_B1|W2_ROLE_CANONICAL",
+          "G07_RPB_DEVELOPMENT|RP_B2|W1_RAW_DIRECT",
+          "G07_RPB_DEVELOPMENT|RP_B2|W2_ROLE_CANONICAL",
+          "G07_RPB_DEVELOPMENT|RP_B3|W1_RAW_DIRECT",
+          "G07_RPB_DEVELOPMENT|RP_B3|W2_ROLE_CANONICAL",
+          "G08_RPB_CONFIRMATION|RP_B1|W1_RAW_DIRECT",
+          "G08_RPB_CONFIRMATION|RP_B1|W2_ROLE_CANONICAL",
+          "G08_RPB_CONFIRMATION|RP_B2|W1_RAW_DIRECT",
+          "G08_RPB_CONFIRMATION|RP_B2|W2_ROLE_CANONICAL",
+          "G08_RPB_CONFIRMATION|RP_B3|W1_RAW_DIRECT",
+          "G08_RPB_CONFIRMATION|RP_B3|W2_ROLE_CANONICAL",
+          "G09_RT_E0_QUALIFICATION|RT|W1_RAW_DIRECT",
+          "G09_RT_E0_QUALIFICATION|RT|W2_ROLE_CANONICAL"
+         ],
+         "type": "string"
+        },
+        "minItems": 1,
+        "type": "array"
+       },
+       "boundary_minimality_proof": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "chance_level": {
+        "const": "1/4"
+       },
+       "checkpoint_roles": {
+        "items": {
+         "enum": [
+          "RT",
+          "RP_B1",
+          "RP_B2",
+          "RP_B3"
+         ],
+         "type": "string"
+        },
+        "minItems": 1,
+        "type": "array"
+       },
+       "confirmation_alpha": {
+        "const": "1/1160"
+       },
+       "decision_rule": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "development_alpha": {
+        "const": "1/1160"
+       },
+       "direction": {
+        "enum": [
+         "greater_than_floor",
+         "less_than_upper_margin"
+        ],
+        "type": "string"
+       },
+       "effect_or_adequacy_margin": {
+        "pattern": "^[0-9]+/[0-9]+$",
+        "type": "string"
+       },
+       "estimand": {
+        "enum": [
+         "E0_zero_generated_reasoning_token_expressed_competence",
+         "COT_generated_reasoning_ceiling"
+        ],
+        "type": "string"
+       },
+       "exact_power": {
+        "pattern": "^[0-9]+/[0-9]+$",
+        "type": "string"
+       },
+       "exact_power_display_only": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "exact_size": {
+        "pattern": "^[0-9]+/[0-9]+$",
+        "type": "string"
+       },
+       "exact_size_display_only": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "floor_or_upper_margin": {
+        "pattern": "^[0-9]+/[0-9]+$",
+        "type": "string"
+       },
+       "gate_id": {
+        "enum": [
+         "G01_COT_CEILING",
+         "G02_CONTROL_RECOVERY",
+         "G03_CONTROL_BINDING",
+         "G04_CONTROL_PRIMITIVE",
+         "G05_NEGATIVE_CONTROL",
+         "G06_WRAPPER_JOINT_ADEQUACY",
+         "G07_RPB_DEVELOPMENT",
+         "G08_RPB_CONFIRMATION",
+         "G09_RT_E0_QUALIFICATION"
+        ],
+        "type": "string"
+       },
+       "missing_or_unparseable_treatment": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "multiplicity_family": {
+        "const": "F_GLOBAL_STUDY3R"
+       },
+       "multiplicity_method": {
+        "const": "bonferroni_equal_allocation"
+       },
+       "n": {
+        "minimum": 1,
+        "type": "integer"
+       },
+       "null_hypothesis": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "pass_boundary": {
+        "minimum": 0,
+        "type": "integer"
+       },
+       "phase": {
+        "enum": [
+         "precondition",
+         "control",
+         "adequacy",
+         "development",
+         "confirmation",
+         "target"
+        ],
+        "type": "string"
+       },
+       "power_target": {
+        "pattern": "^[0-9]+/[0-9]+$",
+        "type": "string"
+       },
+       "routes": {
+        "items": {
+         "enum": [
+          "W1_RAW_DIRECT",
+          "W2_ROLE_CANONICAL",
+          "C1_CANONICAL_GENERATED_COT"
+         ],
+         "type": "string"
+        },
+        "minItems": 1,
+        "type": "array"
+       },
+       "sample_size_minimality_proof": {
+        "additionalProperties": false,
+        "properties": {
+         "best_power_below_n": {
+          "additionalProperties": false,
+          "properties": {
+           "n": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "power": {
+            "pattern": "^[0-9]+/[0-9]+$",
+            "type": "string"
+           },
+           "power_display_only": {
+            "minLength": 1,
+            "type": "string"
+           }
+          },
+          "required": [
+           "n",
+           "power",
+           "power_display_only"
+          ],
+          "type": [
+           "object",
+           "null"
+          ]
+         },
+         "claim": {
+          "minLength": 1,
+          "type": "string"
+         },
+         "every_smaller_n_falls_short": {
+          "const": true
+         },
+         "search_lower_bound": {
+          "const": 1
+         },
+         "smaller_n_values_checked": {
+          "minimum": 0,
+          "type": "integer"
+         }
+        },
+        "required": [
+         "best_power_below_n",
+         "claim",
+         "every_smaller_n_falls_short",
+         "search_lower_bound",
+         "smaller_n_values_checked"
+        ],
+        "type": "object"
+       },
+       "statistical_unit": {
+        "const": "item"
+       },
+       "stop_rule": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "task_family": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "terminal_on_failure": {
+        "enum": [
+         "T00_NOT_EXECUTED",
+         "T01_SHAKEDOWN_FAILED",
+         "T02_TOKENIZER_EQUIVALENCE_FAILED",
+         "T03_COT_CEILING_FAILED",
+         "T04_COMPETENCE_CONTROL_FAILED",
+         "T05_NEGATIVE_CONTROL_FAILED",
+         "T06_WRAPPER_ADEQUACY_FAILED",
+         "T07_NO_QUALIFIED_REFERENCE",
+         "T08_RPB_FREEZE_RECORD_FAILED",
+         "T09_RT_NOT_QUALIFIED",
+         "T10_STUDY3R_COMPLETE_RT_QUALIFIED"
+        ],
+        "type": "string"
+       },
+       "test": {
+        "const": "exact one-sided binomial test on integer arithmetic"
+       },
+       "title": {
+        "minLength": 1,
+        "type": "string"
+       }
+      },
+      "required": [
+       "adjacent_boundary_size",
+       "adjacent_boundary_size_display_only",
+       "alpha_global",
+       "alpha_per_cell",
+       "alternative_hypothesis",
+       "atomic_cell_count",
+       "atomic_cells",
+       "boundary_minimality_proof",
+       "chance_level",
+       "checkpoint_roles",
+       "confirmation_alpha",
+       "decision_rule",
+       "development_alpha",
+       "direction",
+       "effect_or_adequacy_margin",
+       "estimand",
+       "exact_power",
+       "exact_power_display_only",
+       "exact_size",
+       "exact_size_display_only",
+       "floor_or_upper_margin",
+       "gate_id",
+       "missing_or_unparseable_treatment",
+       "multiplicity_family",
+       "multiplicity_method",
+       "n",
+       "null_hypothesis",
+       "pass_boundary",
+       "phase",
+       "power_target",
+       "routes",
+       "sample_size_minimality_proof",
+       "statistical_unit",
+       "stop_rule",
+       "task_family",
+       "terminal_on_failure",
+       "test",
+       "title"
+      ],
+      "type": "object"
+     },
+     "maxItems": 9,
+     "minItems": 9,
+     "type": "array"
+    },
+    "global_error_budget": {
+     "type": "object"
+    },
+    "ladder_multiplicity": {
+     "additionalProperties": false,
+     "properties": {
+      "claims_fixed_sequence_protection": {
+       "const": false
+      },
+      "corrects_over_full_registered_l": {
+       "const": true
+      },
+      "evaluations_per_candidate": {
+       "additionalProperties": false,
+       "properties": {
+        "confirmation": {
+         "const": 1
+        },
+        "development": {
+         "const": 1
+        }
+       },
+       "required": [
+        "confirmation",
+        "development"
+       ],
+       "type": "object"
+      },
+      "registered_l": {
+       "const": 3
+      },
+      "selection_rule": {
+       "const": "first_confirmed_pass"
+      }
+     },
+     "required": [
+      "claims_fixed_sequence_protection",
+      "corrects_over_full_registered_l",
+      "evaluations_per_candidate",
+      "registered_l",
+      "selection_rule"
+     ],
+     "type": "object"
+    },
+    "m_max": {
+     "const": 58
+    },
+    "rp_b_decision_id": {
+     "const": "Q0_RPB_QUALIFICATION_DECISION"
+    },
+    "unresolved_values": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 0,
+     "type": "array"
+    }
+   },
+   "required": [
+    "atomic_cell_count",
+    "chance_level",
+    "diagnostic_without_a_gate",
+    "gates",
+    "global_error_budget",
+    "ladder_multiplicity",
+    "m_max",
+    "rp_b_decision_id",
+    "unresolved_values"
+   ],
+   "type": "object"
+  },
+  "status": {
+   "additionalProperties": false,
+   "properties": {
+    "authored_state": {
+     "const": "STUDY3R_PROTOCOL_V1_AUTHORED_AWAITING_SINGLE_INDEPENDENT_FOCUSED_REVIEW"
+    },
+    "execution_authorized": {
+     "const": false
+    },
+    "formal_execution_authorized": {
+     "const": false
+    },
+    "frozen": {
+     "const": false
+    },
+    "is_a_copy_on_write_continuation": {
+     "const": false
+    },
+    "legacy_overlay_or_fallback_permitted": {
+     "const": false
+    }
+   },
+   "required": [
+    "authored_state",
+    "execution_authorized",
+    "formal_execution_authorized",
+    "frozen",
+    "is_a_copy_on_write_continuation",
+    "legacy_overlay_or_fallback_permitted"
+   ],
+   "type": "object"
+  },
+  "task_populations": {
+   "type": "object"
+  }
+ },
+ "required": [
+  "authority",
+  "boundaries",
+  "checkpoints",
+  "estimands",
+  "interfaces",
+  "protocol_id",
+  "references",
+  "schema_version",
+  "scope",
+  "state_machine",
+  "statistics",
+  "status",
+  "task_populations"
+ ],
+ "title": "Study 3R protocol candidate v1",
+ "type": "object"
+}

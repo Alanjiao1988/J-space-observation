@@ -1,0 +1,271 @@
+{
+ "$id": "https://study3r.invalid/study3r_state_machine_v1.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "properties": {
+  "activation_patching_states": {
+   "items": {
+    "type": "string"
+   },
+   "maxItems": 0,
+   "type": "array"
+  },
+  "authority": {
+   "const": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md"
+  },
+  "current_state": {
+   "const": "S00_AUTHORED"
+  },
+  "current_terminal": {
+   "const": "T00_NOT_EXECUTED"
+  },
+  "execution_order": {
+   "items": {
+    "enum": [
+     "S00_AUTHORED",
+     "S01_SEALED_ENGINEERING_SHAKEDOWN",
+     "S02_CHECKPOINT_TOKENIZER_FUNCTIONAL_EQUIVALENCE",
+     "S03_GENERATED_COT_CEILING",
+     "S04_COMPETENCE_CONTROLS",
+     "S05_NEGATIVE_CONTROL",
+     "S06_TWO_WRAPPER_JOINT_ADEQUACY",
+     "S07_RPB_LADDER_DEVELOPMENT_AND_CONFIRMATION",
+     "S08_RPB_FIRST_CONFIRMED_PASS_FREEZE",
+     "S09_RT_E0_BEHAVIORAL_QUALIFICATION",
+     "S10_D0_DIAGNOSTIC_REPORT",
+     "S11_TERMINAL_DISPOSITION"
+    ],
+    "type": "string"
+   },
+   "maxItems": 12,
+   "minItems": 12,
+   "type": "array"
+  },
+  "identifier_uniqueness": {
+   "additionalProperties": false,
+   "properties": {
+    "every_registered_gate_appears_exactly_once": {
+     "const": true
+    },
+    "rp_b_decision_id": {
+     "const": "Q0_RPB_QUALIFICATION_DECISION"
+    },
+    "state_and_terminal_namespaces_are_disjoint": {
+     "const": true
+    },
+    "state_ids_are_unique": {
+     "const": true
+    },
+    "terminal_ids_are_unique": {
+     "const": true
+    }
+   },
+   "required": [
+    "every_registered_gate_appears_exactly_once",
+    "rp_b_decision_id",
+    "state_and_terminal_namespaces_are_disjoint",
+    "state_ids_are_unique",
+    "terminal_ids_are_unique"
+   ],
+   "type": "object"
+  },
+  "initial_state": {
+   "const": "S00_AUTHORED"
+  },
+  "mechanism_claim_states": {
+   "items": {
+    "type": "string"
+   },
+   "maxItems": 0,
+   "type": "array"
+  },
+  "protocol_id": {
+   "const": "STUDY3R_PROTOCOL_V1"
+  },
+  "rp_m_states": {
+   "items": {
+    "type": "string"
+   },
+   "maxItems": 0,
+   "type": "array"
+  },
+  "schema_version": {
+   "const": "study3r-state-machine-v1"
+  },
+  "states": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "gate_ids": {
+      "items": {
+       "minLength": 3,
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "kind": {
+      "enum": [
+       "initial",
+       "operational",
+       "statistical",
+       "diagnostic",
+       "disposition"
+      ],
+      "type": "string"
+     },
+     "state_id": {
+      "enum": [
+       "S00_AUTHORED",
+       "S01_SEALED_ENGINEERING_SHAKEDOWN",
+       "S02_CHECKPOINT_TOKENIZER_FUNCTIONAL_EQUIVALENCE",
+       "S03_GENERATED_COT_CEILING",
+       "S04_COMPETENCE_CONTROLS",
+       "S05_NEGATIVE_CONTROL",
+       "S06_TWO_WRAPPER_JOINT_ADEQUACY",
+       "S07_RPB_LADDER_DEVELOPMENT_AND_CONFIRMATION",
+       "S08_RPB_FIRST_CONFIRMED_PASS_FREEZE",
+       "S09_RT_E0_BEHAVIORAL_QUALIFICATION",
+       "S10_D0_DIAGNOSTIC_REPORT",
+       "S11_TERMINAL_DISPOSITION"
+      ],
+      "type": "string"
+     },
+     "title": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "transitions": {
+      "items": {
+       "additionalProperties": false,
+       "properties": {
+        "outcome": {
+         "minLength": 1,
+         "type": "string"
+        },
+        "target": {
+         "enum": [
+          "S00_AUTHORED",
+          "S01_SEALED_ENGINEERING_SHAKEDOWN",
+          "S02_CHECKPOINT_TOKENIZER_FUNCTIONAL_EQUIVALENCE",
+          "S03_GENERATED_COT_CEILING",
+          "S04_COMPETENCE_CONTROLS",
+          "S05_NEGATIVE_CONTROL",
+          "S06_TWO_WRAPPER_JOINT_ADEQUACY",
+          "S07_RPB_LADDER_DEVELOPMENT_AND_CONFIRMATION",
+          "S08_RPB_FIRST_CONFIRMED_PASS_FREEZE",
+          "S09_RT_E0_BEHAVIORAL_QUALIFICATION",
+          "S10_D0_DIAGNOSTIC_REPORT",
+          "S11_TERMINAL_DISPOSITION",
+          "T00_NOT_EXECUTED",
+          "T01_SHAKEDOWN_FAILED",
+          "T02_TOKENIZER_EQUIVALENCE_FAILED",
+          "T03_COT_CEILING_FAILED",
+          "T04_COMPETENCE_CONTROL_FAILED",
+          "T05_NEGATIVE_CONTROL_FAILED",
+          "T06_WRAPPER_ADEQUACY_FAILED",
+          "T07_NO_QUALIFIED_REFERENCE",
+          "T08_RPB_FREEZE_RECORD_FAILED",
+          "T09_RT_NOT_QUALIFIED",
+          "T10_STUDY3R_COMPLETE_RT_QUALIFIED"
+         ],
+         "type": "string"
+        }
+       },
+       "required": [
+        "outcome",
+        "target"
+       ],
+       "type": "object"
+      },
+      "minItems": 2,
+      "type": "array"
+     }
+    },
+    "required": [
+     "gate_ids",
+     "kind",
+     "state_id",
+     "title",
+     "transitions"
+    ],
+    "type": "object"
+   },
+   "maxItems": 12,
+   "minItems": 12,
+   "type": "array"
+  },
+  "terminals": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "meaning": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "terminal_id": {
+      "enum": [
+       "T00_NOT_EXECUTED",
+       "T01_SHAKEDOWN_FAILED",
+       "T02_TOKENIZER_EQUIVALENCE_FAILED",
+       "T03_COT_CEILING_FAILED",
+       "T04_COMPETENCE_CONTROL_FAILED",
+       "T05_NEGATIVE_CONTROL_FAILED",
+       "T06_WRAPPER_ADEQUACY_FAILED",
+       "T07_NO_QUALIFIED_REFERENCE",
+       "T08_RPB_FREEZE_RECORD_FAILED",
+       "T09_RT_NOT_QUALIFIED",
+       "T10_STUDY3R_COMPLETE_RT_QUALIFIED"
+      ],
+      "type": "string"
+     }
+    },
+    "required": [
+     "meaning",
+     "terminal_id"
+    ],
+    "type": "object"
+   },
+   "maxItems": 11,
+   "minItems": 11,
+   "type": "array"
+  },
+  "totality": {
+   "additionalProperties": false,
+   "properties": {
+    "every_state_has_at_least_two_transitions": {
+     "const": true
+    },
+    "every_transition_target_is_a_state_or_terminal": {
+     "const": true
+    },
+    "outcomes_are_mutually_exclusive_within_a_state": {
+     "const": true
+    }
+   },
+   "required": [
+    "every_state_has_at_least_two_transitions",
+    "every_transition_target_is_a_state_or_terminal",
+    "outcomes_are_mutually_exclusive_within_a_state"
+   ],
+   "type": "object"
+  }
+ },
+ "required": [
+  "activation_patching_states",
+  "authority",
+  "current_state",
+  "current_terminal",
+  "execution_order",
+  "identifier_uniqueness",
+  "initial_state",
+  "mechanism_claim_states",
+  "protocol_id",
+  "rp_m_states",
+  "schema_version",
+  "states",
+  "terminals",
+  "totality"
+ ],
+ "title": "Study 3R state machine v1",
+ "type": "object"
+}

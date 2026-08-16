@@ -1,0 +1,1167 @@
+{
+ "arithmetic": {
+  "inherited_sample_size_or_alpha_reused": false,
+  "representation": "exact integer numerators over a common denominator",
+  "uses_floating_point_comparison": false,
+  "uses_normal_approximation": false
+ },
+ "atomic_cell_census": {
+  "cells": [
+   {
+    "cell_id": "G01_COT_CEILING|RT|C1_CANONICAL_GENERATED_COT",
+    "checkpoint_role": "RT",
+    "gate_id": "G01_COT_CEILING",
+    "phase": "precondition",
+    "route": "C1_CANONICAL_GENERATED_COT",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_CEILING_BANK"
+   },
+   {
+    "cell_id": "G01_COT_CEILING|RP_B1|C1_CANONICAL_GENERATED_COT",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G01_COT_CEILING",
+    "phase": "precondition",
+    "route": "C1_CANONICAL_GENERATED_COT",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_CEILING_BANK"
+   },
+   {
+    "cell_id": "G01_COT_CEILING|RP_B2|C1_CANONICAL_GENERATED_COT",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G01_COT_CEILING",
+    "phase": "precondition",
+    "route": "C1_CANONICAL_GENERATED_COT",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_CEILING_BANK"
+   },
+   {
+    "cell_id": "G01_COT_CEILING|RP_B3|C1_CANONICAL_GENERATED_COT",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G01_COT_CEILING",
+    "phase": "precondition",
+    "route": "C1_CANONICAL_GENERATED_COT",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_CEILING_BANK"
+   },
+   {
+    "cell_id": "G02_CONTROL_RECOVERY|RT|W1_RAW_DIRECT",
+    "checkpoint_role": "RT",
+    "gate_id": "G02_CONTROL_RECOVERY",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "REC"
+   },
+   {
+    "cell_id": "G02_CONTROL_RECOVERY|RT|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RT",
+    "gate_id": "G02_CONTROL_RECOVERY",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "REC"
+   },
+   {
+    "cell_id": "G02_CONTROL_RECOVERY|RP_B1|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G02_CONTROL_RECOVERY",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "REC"
+   },
+   {
+    "cell_id": "G02_CONTROL_RECOVERY|RP_B1|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G02_CONTROL_RECOVERY",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "REC"
+   },
+   {
+    "cell_id": "G02_CONTROL_RECOVERY|RP_B2|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G02_CONTROL_RECOVERY",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "REC"
+   },
+   {
+    "cell_id": "G02_CONTROL_RECOVERY|RP_B2|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G02_CONTROL_RECOVERY",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "REC"
+   },
+   {
+    "cell_id": "G02_CONTROL_RECOVERY|RP_B3|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G02_CONTROL_RECOVERY",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "REC"
+   },
+   {
+    "cell_id": "G02_CONTROL_RECOVERY|RP_B3|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G02_CONTROL_RECOVERY",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "REC"
+   },
+   {
+    "cell_id": "G03_CONTROL_BINDING|RT|W1_RAW_DIRECT",
+    "checkpoint_role": "RT",
+    "gate_id": "G03_CONTROL_BINDING",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "BIND"
+   },
+   {
+    "cell_id": "G03_CONTROL_BINDING|RT|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RT",
+    "gate_id": "G03_CONTROL_BINDING",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "BIND"
+   },
+   {
+    "cell_id": "G03_CONTROL_BINDING|RP_B1|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G03_CONTROL_BINDING",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "BIND"
+   },
+   {
+    "cell_id": "G03_CONTROL_BINDING|RP_B1|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G03_CONTROL_BINDING",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "BIND"
+   },
+   {
+    "cell_id": "G03_CONTROL_BINDING|RP_B2|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G03_CONTROL_BINDING",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "BIND"
+   },
+   {
+    "cell_id": "G03_CONTROL_BINDING|RP_B2|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G03_CONTROL_BINDING",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "BIND"
+   },
+   {
+    "cell_id": "G03_CONTROL_BINDING|RP_B3|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G03_CONTROL_BINDING",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "BIND"
+   },
+   {
+    "cell_id": "G03_CONTROL_BINDING|RP_B3|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G03_CONTROL_BINDING",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "BIND"
+   },
+   {
+    "cell_id": "G04_CONTROL_PRIMITIVE|RT|W1_RAW_DIRECT",
+    "checkpoint_role": "RT",
+    "gate_id": "G04_CONTROL_PRIMITIVE",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "PRIM"
+   },
+   {
+    "cell_id": "G04_CONTROL_PRIMITIVE|RT|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RT",
+    "gate_id": "G04_CONTROL_PRIMITIVE",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "PRIM"
+   },
+   {
+    "cell_id": "G04_CONTROL_PRIMITIVE|RP_B1|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G04_CONTROL_PRIMITIVE",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "PRIM"
+   },
+   {
+    "cell_id": "G04_CONTROL_PRIMITIVE|RP_B1|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G04_CONTROL_PRIMITIVE",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "PRIM"
+   },
+   {
+    "cell_id": "G04_CONTROL_PRIMITIVE|RP_B2|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G04_CONTROL_PRIMITIVE",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "PRIM"
+   },
+   {
+    "cell_id": "G04_CONTROL_PRIMITIVE|RP_B2|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G04_CONTROL_PRIMITIVE",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "PRIM"
+   },
+   {
+    "cell_id": "G04_CONTROL_PRIMITIVE|RP_B3|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G04_CONTROL_PRIMITIVE",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "PRIM"
+   },
+   {
+    "cell_id": "G04_CONTROL_PRIMITIVE|RP_B3|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G04_CONTROL_PRIMITIVE",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "PRIM"
+   },
+   {
+    "cell_id": "G05_NEGATIVE_CONTROL|RT|W1_RAW_DIRECT",
+    "checkpoint_role": "RT",
+    "gate_id": "G05_NEGATIVE_CONTROL",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "NEG"
+   },
+   {
+    "cell_id": "G05_NEGATIVE_CONTROL|RT|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RT",
+    "gate_id": "G05_NEGATIVE_CONTROL",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "NEG"
+   },
+   {
+    "cell_id": "G05_NEGATIVE_CONTROL|RP_B1|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G05_NEGATIVE_CONTROL",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "NEG"
+   },
+   {
+    "cell_id": "G05_NEGATIVE_CONTROL|RP_B1|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G05_NEGATIVE_CONTROL",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "NEG"
+   },
+   {
+    "cell_id": "G05_NEGATIVE_CONTROL|RP_B2|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G05_NEGATIVE_CONTROL",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "NEG"
+   },
+   {
+    "cell_id": "G05_NEGATIVE_CONTROL|RP_B2|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G05_NEGATIVE_CONTROL",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "NEG"
+   },
+   {
+    "cell_id": "G05_NEGATIVE_CONTROL|RP_B3|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G05_NEGATIVE_CONTROL",
+    "phase": "control",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "NEG"
+   },
+   {
+    "cell_id": "G05_NEGATIVE_CONTROL|RP_B3|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G05_NEGATIVE_CONTROL",
+    "phase": "control",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "NEG"
+   },
+   {
+    "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RT|W1_RAW_DIRECT",
+    "checkpoint_role": "RT",
+    "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+    "phase": "adequacy",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "D2_ADEQUACY_BANK"
+   },
+   {
+    "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RT|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RT",
+    "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+    "phase": "adequacy",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "D2_ADEQUACY_BANK"
+   },
+   {
+    "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B1|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+    "phase": "adequacy",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "D2_ADEQUACY_BANK"
+   },
+   {
+    "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B1|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+    "phase": "adequacy",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "D2_ADEQUACY_BANK"
+   },
+   {
+    "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B2|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+    "phase": "adequacy",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "D2_ADEQUACY_BANK"
+   },
+   {
+    "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B2|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+    "phase": "adequacy",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "D2_ADEQUACY_BANK"
+   },
+   {
+    "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B3|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+    "phase": "adequacy",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "D2_ADEQUACY_BANK"
+   },
+   {
+    "cell_id": "G06_WRAPPER_JOINT_ADEQUACY|RP_B3|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+    "phase": "adequacy",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "D2_ADEQUACY_BANK"
+   },
+   {
+    "cell_id": "G07_RPB_DEVELOPMENT|RP_B1|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G07_RPB_DEVELOPMENT",
+    "phase": "development",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_DEVELOPMENT_BANK"
+   },
+   {
+    "cell_id": "G07_RPB_DEVELOPMENT|RP_B1|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G07_RPB_DEVELOPMENT",
+    "phase": "development",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_DEVELOPMENT_BANK"
+   },
+   {
+    "cell_id": "G07_RPB_DEVELOPMENT|RP_B2|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G07_RPB_DEVELOPMENT",
+    "phase": "development",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_DEVELOPMENT_BANK"
+   },
+   {
+    "cell_id": "G07_RPB_DEVELOPMENT|RP_B2|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G07_RPB_DEVELOPMENT",
+    "phase": "development",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_DEVELOPMENT_BANK"
+   },
+   {
+    "cell_id": "G07_RPB_DEVELOPMENT|RP_B3|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G07_RPB_DEVELOPMENT",
+    "phase": "development",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_DEVELOPMENT_BANK"
+   },
+   {
+    "cell_id": "G07_RPB_DEVELOPMENT|RP_B3|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G07_RPB_DEVELOPMENT",
+    "phase": "development",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_DEVELOPMENT_BANK"
+   },
+   {
+    "cell_id": "G08_RPB_CONFIRMATION|RP_B1|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G08_RPB_CONFIRMATION",
+    "phase": "confirmation",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_CONFIRMATION_BANK"
+   },
+   {
+    "cell_id": "G08_RPB_CONFIRMATION|RP_B1|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B1",
+    "gate_id": "G08_RPB_CONFIRMATION",
+    "phase": "confirmation",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_CONFIRMATION_BANK"
+   },
+   {
+    "cell_id": "G08_RPB_CONFIRMATION|RP_B2|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G08_RPB_CONFIRMATION",
+    "phase": "confirmation",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_CONFIRMATION_BANK"
+   },
+   {
+    "cell_id": "G08_RPB_CONFIRMATION|RP_B2|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B2",
+    "gate_id": "G08_RPB_CONFIRMATION",
+    "phase": "confirmation",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_CONFIRMATION_BANK"
+   },
+   {
+    "cell_id": "G08_RPB_CONFIRMATION|RP_B3|W1_RAW_DIRECT",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G08_RPB_CONFIRMATION",
+    "phase": "confirmation",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_CONFIRMATION_BANK"
+   },
+   {
+    "cell_id": "G08_RPB_CONFIRMATION|RP_B3|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RP_B3",
+    "gate_id": "G08_RPB_CONFIRMATION",
+    "phase": "confirmation",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_CONFIRMATION_BANK"
+   },
+   {
+    "cell_id": "G09_RT_E0_QUALIFICATION|RT|W1_RAW_DIRECT",
+    "checkpoint_role": "RT",
+    "gate_id": "G09_RT_E0_QUALIFICATION",
+    "phase": "target",
+    "route": "W1_RAW_DIRECT",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_TARGET_BANK"
+   },
+   {
+    "cell_id": "G09_RT_E0_QUALIFICATION|RT|W2_ROLE_CANONICAL",
+    "checkpoint_role": "RT",
+    "gate_id": "G09_RT_E0_QUALIFICATION",
+    "phase": "target",
+    "route": "W2_ROLE_CANONICAL",
+    "statistical_unit": "item",
+    "task_family": "D2_D3_TARGET_BANK"
+   }
+  ],
+  "count": 58,
+  "counts_by_gate": {
+   "G01_COT_CEILING": 4,
+   "G02_CONTROL_RECOVERY": 8,
+   "G03_CONTROL_BINDING": 8,
+   "G04_CONTROL_PRIMITIVE": 8,
+   "G05_NEGATIVE_CONTROL": 8,
+   "G06_WRAPPER_JOINT_ADEQUACY": 8,
+   "G07_RPB_DEVELOPMENT": 6,
+   "G08_RPB_CONFIRMATION": 6,
+   "G09_RT_E0_QUALIFICATION": 2
+  }
+ },
+ "authority": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md",
+ "chance_level": "1/4",
+ "diagnostic_without_a_gate": "D0_single_forward_decodability",
+ "factors": {
+  "checkpoint_role": [
+   "RT",
+   "RP_B1",
+   "RP_B2",
+   "RP_B3"
+  ],
+  "cot_route": [
+   "C1_CANONICAL_GENERATED_COT"
+  ],
+  "e0_wrapper_arm": [
+   "W1_RAW_DIRECT",
+   "W2_ROLE_CANONICAL"
+  ],
+  "rp_b_ladder_length": 3
+ },
+ "gates": [
+  {
+   "adjacent_boundary_size": "214580319894327316504506487640103182565280254684721222444024972160095476777/115792089237316195423570985008687907853269984665640564039457584007913129639936",
+   "adjacent_boundary_size_display_only": "0.001853151811",
+   "alpha_global": "1/20",
+   "alpha_per_cell": "1/1160",
+   "alternative_hypothesis": "H1: p > 3/4",
+   "atomic_cell_count": 4,
+   "atomic_cells": [
+    "G01_COT_CEILING|RP_B1|C1_CANONICAL_GENERATED_COT",
+    "G01_COT_CEILING|RP_B2|C1_CANONICAL_GENERATED_COT",
+    "G01_COT_CEILING|RP_B3|C1_CANONICAL_GENERATED_COT",
+    "G01_COT_CEILING|RT|C1_CANONICAL_GENERATED_COT"
+   ],
+   "boundary_minimality_proof": "k = 111 is the smallest integer whose exact upper-tail probability under the floor does not exceed the per-cell alpha; k = 110 exceeds it.",
+   "chance_level": "1/4",
+   "checkpoint_roles": [
+    "RT",
+    "RP_B1",
+    "RP_B2",
+    "RP_B3"
+   ],
+   "confirmation_alpha": "1/1160",
+   "decision_rule": "pass if and only if the number of correct items k satisfies k >= 111 out of n = 128",
+   "development_alpha": "1/1160",
+   "direction": "greater_than_floor",
+   "effect_or_adequacy_margin": "9/10",
+   "estimand": "COT_generated_reasoning_ceiling",
+   "exact_power": "3649994395511386045662950343266438314941294991100214716358181957251678990356249827186560912045348197252159489752942195288002513/4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "exact_power_display_only": "0.912498598878",
+   "exact_size": "99171381114898181924170235025500042403684356486489326500278890009840169577/115792089237316195423570985008687907853269984665640564039457584007913129639936",
+   "exact_size_display_only": "0.000856460763",
+   "floor_or_upper_margin": "3/4",
+   "gate_id": "G01_COT_CEILING",
+   "missing_or_unparseable_treatment": "Every scheduled item is scored. An unparseable generation, an empty generation, a generation that is not a full-sequence exact match to a frozen legal answer surface, and any runtime failure are all scored incorrect. No item is dropped and no registered n is reduced.",
+   "multiplicity_family": "F_GLOBAL_STUDY3R",
+   "multiplicity_method": "bonferroni_equal_allocation",
+   "n": 128,
+   "null_hypothesis": "H0: p <= 3/4",
+   "pass_boundary": 111,
+   "phase": "precondition",
+   "power_target": "9/10",
+   "routes": [
+    "C1_CANONICAL_GENERATED_COT"
+   ],
+   "sample_size_minimality_proof": {
+    "best_power_below_n": {
+     "n": 123,
+     "power": "893298461808114533698783277023158532087568367038520461457598530320436233936589417716810824448437026538426667671998040057917/1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+     "power_display_only": "0.893298461808"
+    },
+    "claim": "n = 128 is the smallest sample size whose exact power at the registered alternative reaches the registered power target under the per-cell alpha.",
+    "every_smaller_n_falls_short": true,
+    "search_lower_bound": 1,
+    "smaller_n_values_checked": 127
+   },
+   "statistical_unit": "item",
+   "stop_rule": "Each atomic cell is evaluated exactly once at its registered n. There is no interim analysis, no adaptive stopping, no sample-size re-estimation and no post-result expansion. The RP-B ladder scan stops at the first confirmed pass, but every cell in the census is corrected over the full registered L = 3 regardless of where scanning stops.",
+   "task_family": "D2_D3_CEILING_BANK",
+   "terminal_on_failure": "T03_COT_CEILING_FAILED",
+   "test": "exact one-sided binomial test on integer arithmetic",
+   "title": "Generated-CoT ceiling"
+  },
+  {
+   "adjacent_boundary_size": "177487052388246963164334362873265806235945818666524889652010370293156106312590138977763607071696775234902083/50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "adjacent_boundary_size_display_only": "0.003549741048",
+   "alpha_global": "1/20",
+   "alpha_per_cell": "1/1160",
+   "alternative_hypothesis": "H1: p > 9/10",
+   "atomic_cell_count": 8,
+   "atomic_cells": [
+    "G02_CONTROL_RECOVERY|RP_B1|W1_RAW_DIRECT",
+    "G02_CONTROL_RECOVERY|RP_B1|W2_ROLE_CANONICAL",
+    "G02_CONTROL_RECOVERY|RP_B2|W1_RAW_DIRECT",
+    "G02_CONTROL_RECOVERY|RP_B2|W2_ROLE_CANONICAL",
+    "G02_CONTROL_RECOVERY|RP_B3|W1_RAW_DIRECT",
+    "G02_CONTROL_RECOVERY|RP_B3|W2_ROLE_CANONICAL",
+    "G02_CONTROL_RECOVERY|RT|W1_RAW_DIRECT",
+    "G02_CONTROL_RECOVERY|RT|W2_ROLE_CANONICAL"
+   ],
+   "boundary_minimality_proof": "k = 108 is the smallest integer whose exact upper-tail probability under the floor does not exceed the per-cell alpha; k = 107 exceeds it.",
+   "chance_level": "1/4",
+   "checkpoint_roles": [
+    "RT",
+    "RP_B1",
+    "RP_B2",
+    "RP_B3"
+   ],
+   "confirmation_alpha": "1/1160",
+   "decision_rule": "pass if and only if the number of correct items k satisfies k >= 108 out of n = 110",
+   "development_alpha": "1/1160",
+   "direction": "greater_than_floor",
+   "effect_or_adequacy_margin": "99/100",
+   "estimand": "E0_zero_generated_reasoning_token_expressed_competence",
+   "exact_power": "4506656971194053735815962173566367159989924170019189853505934746634239456089502084935152525616331894158700482905595073496815006322798888702473578101700958556827868579858435365411550411091601429453857958313847495806448943/5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "exact_power_display_only": "0.901331394239",
+   "exact_size": "40395655226932714092610533017538368448856314974478672623884084149051119216799649617241436821768002763957293/50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "exact_size_display_only": "0.000807913105",
+   "floor_or_upper_margin": "9/10",
+   "gate_id": "G02_CONTROL_RECOVERY",
+   "missing_or_unparseable_treatment": "Every scheduled item is scored. An unparseable generation, an empty generation, a generation that is not a full-sequence exact match to a frozen legal answer surface, and any runtime failure are all scored incorrect. No item is dropped and no registered n is reduced.",
+   "multiplicity_family": "F_GLOBAL_STUDY3R",
+   "multiplicity_method": "bonferroni_equal_allocation",
+   "n": 110,
+   "null_hypothesis": "H0: p <= 9/10",
+   "pass_boundary": 108,
+   "phase": "control",
+   "power_target": "9/10",
+   "routes": [
+    "W1_RAW_DIRECT",
+    "W2_ROLE_CANONICAL"
+   ],
+   "sample_size_minimality_proof": {
+    "best_power_below_n": {
+     "n": 90,
+     "power": "772670129658618713649848078273458863813325355744031426091304747578469434129987940597538155159400811585207143449916882311649412742121278087309715054378799904097977123386104796441911/1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+     "power_display_only": "0.772670129659"
+    },
+    "claim": "n = 110 is the smallest sample size whose exact power at the registered alternative reaches the registered power target under the per-cell alpha.",
+    "every_smaller_n_falls_short": true,
+    "search_lower_bound": 1,
+    "smaller_n_values_checked": 109
+   },
+   "statistical_unit": "item",
+   "stop_rule": "Each atomic cell is evaluated exactly once at its registered n. There is no interim analysis, no adaptive stopping, no sample-size re-estimation and no post-result expansion. The RP-B ladder scan stops at the first confirmed pass, but every cell in the census is corrected over the full registered L = 3 regardless of where scanning stops.",
+   "task_family": "REC",
+   "terminal_on_failure": "T04_COMPETENCE_CONTROL_FAILED",
+   "test": "exact one-sided binomial test on integer arithmetic",
+   "title": "Trivial content-recovery competence control"
+  },
+  {
+   "adjacent_boundary_size": "177487052388246963164334362873265806235945818666524889652010370293156106312590138977763607071696775234902083/50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "adjacent_boundary_size_display_only": "0.003549741048",
+   "alpha_global": "1/20",
+   "alpha_per_cell": "1/1160",
+   "alternative_hypothesis": "H1: p > 9/10",
+   "atomic_cell_count": 8,
+   "atomic_cells": [
+    "G03_CONTROL_BINDING|RP_B1|W1_RAW_DIRECT",
+    "G03_CONTROL_BINDING|RP_B1|W2_ROLE_CANONICAL",
+    "G03_CONTROL_BINDING|RP_B2|W1_RAW_DIRECT",
+    "G03_CONTROL_BINDING|RP_B2|W2_ROLE_CANONICAL",
+    "G03_CONTROL_BINDING|RP_B3|W1_RAW_DIRECT",
+    "G03_CONTROL_BINDING|RP_B3|W2_ROLE_CANONICAL",
+    "G03_CONTROL_BINDING|RT|W1_RAW_DIRECT",
+    "G03_CONTROL_BINDING|RT|W2_ROLE_CANONICAL"
+   ],
+   "boundary_minimality_proof": "k = 108 is the smallest integer whose exact upper-tail probability under the floor does not exceed the per-cell alpha; k = 107 exceeds it.",
+   "chance_level": "1/4",
+   "checkpoint_roles": [
+    "RT",
+    "RP_B1",
+    "RP_B2",
+    "RP_B3"
+   ],
+   "confirmation_alpha": "1/1160",
+   "decision_rule": "pass if and only if the number of correct items k satisfies k >= 108 out of n = 110",
+   "development_alpha": "1/1160",
+   "direction": "greater_than_floor",
+   "effect_or_adequacy_margin": "99/100",
+   "estimand": "E0_zero_generated_reasoning_token_expressed_competence",
+   "exact_power": "4506656971194053735815962173566367159989924170019189853505934746634239456089502084935152525616331894158700482905595073496815006322798888702473578101700958556827868579858435365411550411091601429453857958313847495806448943/5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "exact_power_display_only": "0.901331394239",
+   "exact_size": "40395655226932714092610533017538368448856314974478672623884084149051119216799649617241436821768002763957293/50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "exact_size_display_only": "0.000807913105",
+   "floor_or_upper_margin": "9/10",
+   "gate_id": "G03_CONTROL_BINDING",
+   "missing_or_unparseable_treatment": "Every scheduled item is scored. An unparseable generation, an empty generation, a generation that is not a full-sequence exact match to a frozen legal answer surface, and any runtime failure are all scored incorrect. No item is dropped and no registered n is reduced.",
+   "multiplicity_family": "F_GLOBAL_STUDY3R",
+   "multiplicity_method": "bonferroni_equal_allocation",
+   "n": 110,
+   "null_hypothesis": "H0: p <= 9/10",
+   "pass_boundary": 108,
+   "phase": "control",
+   "power_target": "9/10",
+   "routes": [
+    "W1_RAW_DIRECT",
+    "W2_ROLE_CANONICAL"
+   ],
+   "sample_size_minimality_proof": {
+    "best_power_below_n": {
+     "n": 90,
+     "power": "772670129658618713649848078273458863813325355744031426091304747578469434129987940597538155159400811585207143449916882311649412742121278087309715054378799904097977123386104796441911/1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+     "power_display_only": "0.772670129659"
+    },
+    "claim": "n = 110 is the smallest sample size whose exact power at the registered alternative reaches the registered power target under the per-cell alpha.",
+    "every_smaller_n_falls_short": true,
+    "search_lower_bound": 1,
+    "smaller_n_values_checked": 109
+   },
+   "statistical_unit": "item",
+   "stop_rule": "Each atomic cell is evaluated exactly once at its registered n. There is no interim analysis, no adaptive stopping, no sample-size re-estimation and no post-result expansion. The RP-B ladder scan stops at the first confirmed pass, but every cell in the census is corrected over the full registered L = 3 regardless of where scanning stops.",
+   "task_family": "BIND",
+   "terminal_on_failure": "T04_COMPETENCE_CONTROL_FAILED",
+   "test": "exact one-sided binomial test on integer arithmetic",
+   "title": "Explicit answer-label binding control"
+  },
+  {
+   "adjacent_boundary_size": "177487052388246963164334362873265806235945818666524889652010370293156106312590138977763607071696775234902083/50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "adjacent_boundary_size_display_only": "0.003549741048",
+   "alpha_global": "1/20",
+   "alpha_per_cell": "1/1160",
+   "alternative_hypothesis": "H1: p > 9/10",
+   "atomic_cell_count": 8,
+   "atomic_cells": [
+    "G04_CONTROL_PRIMITIVE|RP_B1|W1_RAW_DIRECT",
+    "G04_CONTROL_PRIMITIVE|RP_B1|W2_ROLE_CANONICAL",
+    "G04_CONTROL_PRIMITIVE|RP_B2|W1_RAW_DIRECT",
+    "G04_CONTROL_PRIMITIVE|RP_B2|W2_ROLE_CANONICAL",
+    "G04_CONTROL_PRIMITIVE|RP_B3|W1_RAW_DIRECT",
+    "G04_CONTROL_PRIMITIVE|RP_B3|W2_ROLE_CANONICAL",
+    "G04_CONTROL_PRIMITIVE|RT|W1_RAW_DIRECT",
+    "G04_CONTROL_PRIMITIVE|RT|W2_ROLE_CANONICAL"
+   ],
+   "boundary_minimality_proof": "k = 108 is the smallest integer whose exact upper-tail probability under the floor does not exceed the per-cell alpha; k = 107 exceeds it.",
+   "chance_level": "1/4",
+   "checkpoint_roles": [
+    "RT",
+    "RP_B1",
+    "RP_B2",
+    "RP_B3"
+   ],
+   "confirmation_alpha": "1/1160",
+   "decision_rule": "pass if and only if the number of correct items k satisfies k >= 108 out of n = 110",
+   "development_alpha": "1/1160",
+   "direction": "greater_than_floor",
+   "effect_or_adequacy_margin": "99/100",
+   "estimand": "E0_zero_generated_reasoning_token_expressed_competence",
+   "exact_power": "4506656971194053735815962173566367159989924170019189853505934746634239456089502084935152525616331894158700482905595073496815006322798888702473578101700958556827868579858435365411550411091601429453857958313847495806448943/5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "exact_power_display_only": "0.901331394239",
+   "exact_size": "40395655226932714092610533017538368448856314974478672623884084149051119216799649617241436821768002763957293/50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "exact_size_display_only": "0.000807913105",
+   "floor_or_upper_margin": "9/10",
+   "gate_id": "G04_CONTROL_PRIMITIVE",
+   "missing_or_unparseable_treatment": "Every scheduled item is scored. An unparseable generation, an empty generation, a generation that is not a full-sequence exact match to a frozen legal answer surface, and any runtime failure are all scored incorrect. No item is dropped and no registered n is reduced.",
+   "multiplicity_family": "F_GLOBAL_STUDY3R",
+   "multiplicity_method": "bonferroni_equal_allocation",
+   "n": 110,
+   "null_hypothesis": "H0: p <= 9/10",
+   "pass_boundary": 108,
+   "phase": "control",
+   "power_target": "9/10",
+   "routes": [
+    "W1_RAW_DIRECT",
+    "W2_ROLE_CANONICAL"
+   ],
+   "sample_size_minimality_proof": {
+    "best_power_below_n": {
+     "n": 90,
+     "power": "772670129658618713649848078273458863813325355744031426091304747578469434129987940597538155159400811585207143449916882311649412742121278087309715054378799904097977123386104796441911/1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+     "power_display_only": "0.772670129659"
+    },
+    "claim": "n = 110 is the smallest sample size whose exact power at the registered alternative reaches the registered power target under the per-cell alpha.",
+    "every_smaller_n_falls_short": true,
+    "search_lower_bound": 1,
+    "smaller_n_values_checked": 109
+   },
+   "statistical_unit": "item",
+   "stop_rule": "Each atomic cell is evaluated exactly once at its registered n. There is no interim analysis, no adaptive stopping, no sample-size re-estimation and no post-result expansion. The RP-B ladder scan stops at the first confirmed pass, but every cell in the census is corrected over the full registered L = 3 regardless of where scanning stops.",
+   "task_family": "PRIM",
+   "terminal_on_failure": "T04_COMPETENCE_CONTROL_FAILED",
+   "test": "exact one-sided binomial test on integer arithmetic",
+   "title": "Single-primitive operation control"
+  },
+  {
+   "adjacent_boundary_size": "8027834012048669798585074452082642497252989926299100945245190161907067582203152680196795725402794176233697474711423217027061659471772782042019221842170457577262671864127597518221272633342947839963559861652698637669729856261883884050444428606762836276499593580462293403070016815260756223344306246642667306467766266813095383725206091684270403659826158017520548776160530495022492825698142300150240551966395951773395797607686073520474931334586197145652219971560519293134456495866211679679741651094192930143034449455991341405853796957284133/6769213120412145653267612754255575447842863953554239685474803663609915302259828181249937514902684516839334011136239189035581440000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "adjacent_boundary_size_display_only": "0.001185933116",
+   "alpha_global": "1/20",
+   "alpha_per_cell": "1/1160",
+   "alternative_hypothesis": "H1: p < 35/100",
+   "atomic_cell_count": 8,
+   "atomic_cells": [
+    "G05_NEGATIVE_CONTROL|RP_B1|W1_RAW_DIRECT",
+    "G05_NEGATIVE_CONTROL|RP_B1|W2_ROLE_CANONICAL",
+    "G05_NEGATIVE_CONTROL|RP_B2|W1_RAW_DIRECT",
+    "G05_NEGATIVE_CONTROL|RP_B2|W2_ROLE_CANONICAL",
+    "G05_NEGATIVE_CONTROL|RP_B3|W1_RAW_DIRECT",
+    "G05_NEGATIVE_CONTROL|RP_B3|W2_ROLE_CANONICAL",
+    "G05_NEGATIVE_CONTROL|RT|W1_RAW_DIRECT",
+    "G05_NEGATIVE_CONTROL|RT|W2_ROLE_CANONICAL"
+   ],
+   "boundary_minimality_proof": "k = 115 is the largest integer whose exact lower-tail probability under the upper margin does not exceed the per-cell alpha; k = 116 exceeds it.",
+   "chance_level": "1/4",
+   "checkpoint_roles": [
+    "RT",
+    "RP_B1",
+    "RP_B2",
+    "RP_B3"
+   ],
+   "confirmation_alpha": "1/1160",
+   "decision_rule": "pass if and only if the number of correct items k satisfies k <= 115 out of n = 416",
+   "development_alpha": "1/1160",
+   "direction": "less_than_upper_margin",
+   "effect_or_adequacy_margin": "1/4",
+   "estimand": "E0_zero_generated_reasoning_token_expressed_competence",
+   "exact_power": "6461848196043103114032933024383513554559942433358302164132930278790937265096225209096795071193758781068958735730971076034432255107707470848167794165935647228141029640171995984538415614612701907358428896422618303840318973592122224085788857158447622717/7159725979618740301104695983418709622680434793042663132360362425577766001338226039836321066456157093857339877304749930018599215189268344175111256510391144905128218576994803025566700315369744694061260002057936311868982638401684395903839696776618573824",
+   "exact_power_display_only": "0.902527305436",
+   "exact_size": "700095588884830512618414956592135547479344789106724538899373420123468816379431755095406328390948350571830879856287489567221866413668655402010948295219618821871814370337297722507619525208114868262527239082401231963046303643633653400140521134068072920356170510360734056577773498755560610443019884167507145804454157580756480609599147726662752676327556014977858681051713759107022066949632333821317653009625410432751069295051814730843525349976238866804740217885110798754423861380667134832000136114785692822045133608972045290280456844415615449/846151640051518206658451594281946930980357994194279960684350457951239412782478522656242189362835564604916751392029898629447680000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "exact_size_display_only": "0.000827387853",
+   "floor_or_upper_margin": "35/100",
+   "gate_id": "G05_NEGATIVE_CONTROL",
+   "missing_or_unparseable_treatment": "Every scheduled item is scored. An unparseable generation, an empty generation, a generation that is not a full-sequence exact match to a frozen legal answer surface, and any runtime failure are all scored incorrect. No item is dropped and no registered n is reduced.",
+   "multiplicity_family": "F_GLOBAL_STUDY3R",
+   "multiplicity_method": "bonferroni_equal_allocation",
+   "n": 416,
+   "null_hypothesis": "H0: p >= 35/100",
+   "pass_boundary": 115,
+   "phase": "control",
+   "power_target": "9/10",
+   "routes": [
+    "W1_RAW_DIRECT",
+    "W2_ROLE_CANONICAL"
+   ],
+   "sample_size_minimality_proof": {
+    "best_power_below_n": {
+     "n": 413,
+     "power": "50256591675494621920884175433032076961680784059793491737588154580746379743967341323038028535403137099309771694500268558108816155186968877476202716583940453671869465100699485732381405534657374486475029174567938533839467363589038395022169956807387649/55935359215771408602380437370458668927190896820645805721565331449826296885454890936221258331688727295760467791443358828270306368666158938868056691487430819571314207632771898637239846213826130422353593766077627436476426862513159342998747631067332608",
+     "power_display_only": "0.898476247942"
+    },
+    "claim": "n = 416 is the smallest sample size whose exact power at the registered alternative reaches the registered power target under the per-cell alpha.",
+    "every_smaller_n_falls_short": true,
+    "search_lower_bound": 1,
+    "smaller_n_values_checked": 415
+   },
+   "statistical_unit": "item",
+   "stop_rule": "Each atomic cell is evaluated exactly once at its registered n. There is no interim analysis, no adaptive stopping, no sample-size re-estimation and no post-result expansion. The RP-B ladder scan stops at the first confirmed pass, but every cell in the census is corrected over the full registered L = 3 regardless of where scanning stops.",
+   "task_family": "NEG",
+   "terminal_on_failure": "T05_NEGATIVE_CONTROL_FAILED",
+   "test": "exact one-sided binomial test on integer arithmetic",
+   "title": "Deliberately invalid negative control"
+  },
+  {
+   "adjacent_boundary_size": "7962460834798303549/4722366482869645213696",
+   "adjacent_boundary_size_display_only": "0.001686116667",
+   "alpha_global": "1/20",
+   "alpha_per_cell": "1/1160",
+   "alternative_hypothesis": "H1: p > 1/2",
+   "atomic_cell_count": 8,
+   "atomic_cells": [
+    "G06_WRAPPER_JOINT_ADEQUACY|RP_B1|W1_RAW_DIRECT",
+    "G06_WRAPPER_JOINT_ADEQUACY|RP_B1|W2_ROLE_CANONICAL",
+    "G06_WRAPPER_JOINT_ADEQUACY|RP_B2|W1_RAW_DIRECT",
+    "G06_WRAPPER_JOINT_ADEQUACY|RP_B2|W2_ROLE_CANONICAL",
+    "G06_WRAPPER_JOINT_ADEQUACY|RP_B3|W1_RAW_DIRECT",
+    "G06_WRAPPER_JOINT_ADEQUACY|RP_B3|W2_ROLE_CANONICAL",
+    "G06_WRAPPER_JOINT_ADEQUACY|RT|W1_RAW_DIRECT",
+    "G06_WRAPPER_JOINT_ADEQUACY|RT|W2_ROLE_CANONICAL"
+   ],
+   "boundary_minimality_proof": "k = 51 is the smallest integer whose exact upper-tail probability under the floor does not exceed the per-cell alpha; k = 50 exceeds it.",
+   "chance_level": "1/4",
+   "checkpoint_roles": [
+    "RT",
+    "RP_B1",
+    "RP_B2",
+    "RP_B3"
+   ],
+   "confirmation_alpha": "1/1160",
+   "decision_rule": "pass if and only if the number of correct items k satisfies k >= 51 out of n = 74",
+   "development_alpha": "1/1160",
+   "direction": "greater_than_floor",
+   "effect_or_adequacy_margin": "3/4",
+   "estimand": "E0_zero_generated_reasoning_token_expressed_competence",
+   "exact_power": "20245397847811067920827077383531164683046705/22300745198530623141535718272648361505980416",
+   "exact_power_display_only": "0.907835037241",
+   "exact_size": "447510238296153635/590295810358705651712",
+   "exact_size_display_only": "0.000758111832",
+   "floor_or_upper_margin": "1/2",
+   "gate_id": "G06_WRAPPER_JOINT_ADEQUACY",
+   "missing_or_unparseable_treatment": "Every scheduled item is scored. An unparseable generation, an empty generation, a generation that is not a full-sequence exact match to a frozen legal answer surface, and any runtime failure are all scored incorrect. No item is dropped and no registered n is reduced.",
+   "multiplicity_family": "F_GLOBAL_STUDY3R",
+   "multiplicity_method": "bonferroni_equal_allocation",
+   "n": 74,
+   "null_hypothesis": "H0: p <= 1/2",
+   "pass_boundary": 51,
+   "phase": "adequacy",
+   "power_target": "9/10",
+   "routes": [
+    "W1_RAW_DIRECT",
+    "W2_ROLE_CANONICAL"
+   ],
+   "sample_size_minimality_proof": {
+    "best_power_below_n": {
+     "n": 72,
+     "power": "4950403100758529832011072493185537941960461/5575186299632655785383929568162090376495104",
+     "power_display_only": "0.887935009649"
+    },
+    "claim": "n = 74 is the smallest sample size whose exact power at the registered alternative reaches the registered power target under the per-cell alpha.",
+    "every_smaller_n_falls_short": true,
+    "search_lower_bound": 1,
+    "smaller_n_values_checked": 73
+   },
+   "statistical_unit": "item",
+   "stop_rule": "Each atomic cell is evaluated exactly once at its registered n. There is no interim analysis, no adaptive stopping, no sample-size re-estimation and no post-result expansion. The RP-B ladder scan stops at the first confirmed pass, but every cell in the census is corrected over the full registered L = 3 regardless of where scanning stops.",
+   "task_family": "D2_ADEQUACY_BANK",
+   "terminal_on_failure": "T06_WRAPPER_ADEQUACY_FAILED",
+   "test": "exact one-sided binomial test on integer arithmetic",
+   "title": "Two-wrapper joint adequacy"
+  },
+  {
+   "adjacent_boundary_size": "7962460834798303549/4722366482869645213696",
+   "adjacent_boundary_size_display_only": "0.001686116667",
+   "alpha_global": "1/20",
+   "alpha_per_cell": "1/1160",
+   "alternative_hypothesis": "H1: p > 1/2",
+   "atomic_cell_count": 6,
+   "atomic_cells": [
+    "G07_RPB_DEVELOPMENT|RP_B1|W1_RAW_DIRECT",
+    "G07_RPB_DEVELOPMENT|RP_B1|W2_ROLE_CANONICAL",
+    "G07_RPB_DEVELOPMENT|RP_B2|W1_RAW_DIRECT",
+    "G07_RPB_DEVELOPMENT|RP_B2|W2_ROLE_CANONICAL",
+    "G07_RPB_DEVELOPMENT|RP_B3|W1_RAW_DIRECT",
+    "G07_RPB_DEVELOPMENT|RP_B3|W2_ROLE_CANONICAL"
+   ],
+   "boundary_minimality_proof": "k = 51 is the smallest integer whose exact upper-tail probability under the floor does not exceed the per-cell alpha; k = 50 exceeds it.",
+   "chance_level": "1/4",
+   "checkpoint_roles": [
+    "RP_B1",
+    "RP_B2",
+    "RP_B3"
+   ],
+   "confirmation_alpha": "1/1160",
+   "decision_rule": "pass if and only if the number of correct items k satisfies k >= 51 out of n = 74",
+   "development_alpha": "1/1160",
+   "direction": "greater_than_floor",
+   "effect_or_adequacy_margin": "3/4",
+   "estimand": "E0_zero_generated_reasoning_token_expressed_competence",
+   "exact_power": "20245397847811067920827077383531164683046705/22300745198530623141535718272648361505980416",
+   "exact_power_display_only": "0.907835037241",
+   "exact_size": "447510238296153635/590295810358705651712",
+   "exact_size_display_only": "0.000758111832",
+   "floor_or_upper_margin": "1/2",
+   "gate_id": "G07_RPB_DEVELOPMENT",
+   "missing_or_unparseable_treatment": "Every scheduled item is scored. An unparseable generation, an empty generation, a generation that is not a full-sequence exact match to a frozen legal answer surface, and any runtime failure are all scored incorrect. No item is dropped and no registered n is reduced.",
+   "multiplicity_family": "F_GLOBAL_STUDY3R",
+   "multiplicity_method": "bonferroni_equal_allocation",
+   "n": 74,
+   "null_hypothesis": "H0: p <= 1/2",
+   "pass_boundary": 51,
+   "phase": "development",
+   "power_target": "9/10",
+   "routes": [
+    "W1_RAW_DIRECT",
+    "W2_ROLE_CANONICAL"
+   ],
+   "sample_size_minimality_proof": {
+    "best_power_below_n": {
+     "n": 72,
+     "power": "4950403100758529832011072493185537941960461/5575186299632655785383929568162090376495104",
+     "power_display_only": "0.887935009649"
+    },
+    "claim": "n = 74 is the smallest sample size whose exact power at the registered alternative reaches the registered power target under the per-cell alpha.",
+    "every_smaller_n_falls_short": true,
+    "search_lower_bound": 1,
+    "smaller_n_values_checked": 73
+   },
+   "statistical_unit": "item",
+   "stop_rule": "Each atomic cell is evaluated exactly once at its registered n. There is no interim analysis, no adaptive stopping, no sample-size re-estimation and no post-result expansion. The RP-B ladder scan stops at the first confirmed pass, but every cell in the census is corrected over the full registered L = 3 regardless of where scanning stops.",
+   "task_family": "D2_D3_DEVELOPMENT_BANK",
+   "terminal_on_failure": "T07_NO_QUALIFIED_REFERENCE",
+   "test": "exact one-sided binomial test on integer arithmetic",
+   "title": "RP-B ladder development evaluation"
+  },
+  {
+   "adjacent_boundary_size": "7962460834798303549/4722366482869645213696",
+   "adjacent_boundary_size_display_only": "0.001686116667",
+   "alpha_global": "1/20",
+   "alpha_per_cell": "1/1160",
+   "alternative_hypothesis": "H1: p > 1/2",
+   "atomic_cell_count": 6,
+   "atomic_cells": [
+    "G08_RPB_CONFIRMATION|RP_B1|W1_RAW_DIRECT",
+    "G08_RPB_CONFIRMATION|RP_B1|W2_ROLE_CANONICAL",
+    "G08_RPB_CONFIRMATION|RP_B2|W1_RAW_DIRECT",
+    "G08_RPB_CONFIRMATION|RP_B2|W2_ROLE_CANONICAL",
+    "G08_RPB_CONFIRMATION|RP_B3|W1_RAW_DIRECT",
+    "G08_RPB_CONFIRMATION|RP_B3|W2_ROLE_CANONICAL"
+   ],
+   "boundary_minimality_proof": "k = 51 is the smallest integer whose exact upper-tail probability under the floor does not exceed the per-cell alpha; k = 50 exceeds it.",
+   "chance_level": "1/4",
+   "checkpoint_roles": [
+    "RP_B1",
+    "RP_B2",
+    "RP_B3"
+   ],
+   "confirmation_alpha": "1/1160",
+   "decision_rule": "pass if and only if the number of correct items k satisfies k >= 51 out of n = 74",
+   "development_alpha": "1/1160",
+   "direction": "greater_than_floor",
+   "effect_or_adequacy_margin": "3/4",
+   "estimand": "E0_zero_generated_reasoning_token_expressed_competence",
+   "exact_power": "20245397847811067920827077383531164683046705/22300745198530623141535718272648361505980416",
+   "exact_power_display_only": "0.907835037241",
+   "exact_size": "447510238296153635/590295810358705651712",
+   "exact_size_display_only": "0.000758111832",
+   "floor_or_upper_margin": "1/2",
+   "gate_id": "G08_RPB_CONFIRMATION",
+   "missing_or_unparseable_treatment": "Every scheduled item is scored. An unparseable generation, an empty generation, a generation that is not a full-sequence exact match to a frozen legal answer surface, and any runtime failure are all scored incorrect. No item is dropped and no registered n is reduced.",
+   "multiplicity_family": "F_GLOBAL_STUDY3R",
+   "multiplicity_method": "bonferroni_equal_allocation",
+   "n": 74,
+   "null_hypothesis": "H0: p <= 1/2",
+   "pass_boundary": 51,
+   "phase": "confirmation",
+   "power_target": "9/10",
+   "routes": [
+    "W1_RAW_DIRECT",
+    "W2_ROLE_CANONICAL"
+   ],
+   "sample_size_minimality_proof": {
+    "best_power_below_n": {
+     "n": 72,
+     "power": "4950403100758529832011072493185537941960461/5575186299632655785383929568162090376495104",
+     "power_display_only": "0.887935009649"
+    },
+    "claim": "n = 74 is the smallest sample size whose exact power at the registered alternative reaches the registered power target under the per-cell alpha.",
+    "every_smaller_n_falls_short": true,
+    "search_lower_bound": 1,
+    "smaller_n_values_checked": 73
+   },
+   "statistical_unit": "item",
+   "stop_rule": "Each atomic cell is evaluated exactly once at its registered n. There is no interim analysis, no adaptive stopping, no sample-size re-estimation and no post-result expansion. The RP-B ladder scan stops at the first confirmed pass, but every cell in the census is corrected over the full registered L = 3 regardless of where scanning stops.",
+   "task_family": "D2_D3_CONFIRMATION_BANK",
+   "terminal_on_failure": "T07_NO_QUALIFIED_REFERENCE",
+   "test": "exact one-sided binomial test on integer arithmetic",
+   "title": "RP-B ladder item-disjoint confirmation evaluation"
+  },
+  {
+   "adjacent_boundary_size": "7962460834798303549/4722366482869645213696",
+   "adjacent_boundary_size_display_only": "0.001686116667",
+   "alpha_global": "1/20",
+   "alpha_per_cell": "1/1160",
+   "alternative_hypothesis": "H1: p > 1/2",
+   "atomic_cell_count": 2,
+   "atomic_cells": [
+    "G09_RT_E0_QUALIFICATION|RT|W1_RAW_DIRECT",
+    "G09_RT_E0_QUALIFICATION|RT|W2_ROLE_CANONICAL"
+   ],
+   "boundary_minimality_proof": "k = 51 is the smallest integer whose exact upper-tail probability under the floor does not exceed the per-cell alpha; k = 50 exceeds it.",
+   "chance_level": "1/4",
+   "checkpoint_roles": [
+    "RT"
+   ],
+   "confirmation_alpha": "1/1160",
+   "decision_rule": "pass if and only if the number of correct items k satisfies k >= 51 out of n = 74",
+   "development_alpha": "1/1160",
+   "direction": "greater_than_floor",
+   "effect_or_adequacy_margin": "3/4",
+   "estimand": "E0_zero_generated_reasoning_token_expressed_competence",
+   "exact_power": "20245397847811067920827077383531164683046705/22300745198530623141535718272648361505980416",
+   "exact_power_display_only": "0.907835037241",
+   "exact_size": "447510238296153635/590295810358705651712",
+   "exact_size_display_only": "0.000758111832",
+   "floor_or_upper_margin": "1/2",
+   "gate_id": "G09_RT_E0_QUALIFICATION",
+   "missing_or_unparseable_treatment": "Every scheduled item is scored. An unparseable generation, an empty generation, a generation that is not a full-sequence exact match to a frozen legal answer surface, and any runtime failure are all scored incorrect. No item is dropped and no registered n is reduced.",
+   "multiplicity_family": "F_GLOBAL_STUDY3R",
+   "multiplicity_method": "bonferroni_equal_allocation",
+   "n": 74,
+   "null_hypothesis": "H0: p <= 1/2",
+   "pass_boundary": 51,
+   "phase": "target",
+   "power_target": "9/10",
+   "routes": [
+    "W1_RAW_DIRECT",
+    "W2_ROLE_CANONICAL"
+   ],
+   "sample_size_minimality_proof": {
+    "best_power_below_n": {
+     "n": 72,
+     "power": "4950403100758529832011072493185537941960461/5575186299632655785383929568162090376495104",
+     "power_display_only": "0.887935009649"
+    },
+    "claim": "n = 74 is the smallest sample size whose exact power at the registered alternative reaches the registered power target under the per-cell alpha.",
+    "every_smaller_n_falls_short": true,
+    "search_lower_bound": 1,
+    "smaller_n_values_checked": 73
+   },
+   "statistical_unit": "item",
+   "stop_rule": "Each atomic cell is evaluated exactly once at its registered n. There is no interim analysis, no adaptive stopping, no sample-size re-estimation and no post-result expansion. The RP-B ladder scan stops at the first confirmed pass, but every cell in the census is corrected over the full registered L = 3 regardless of where scanning stops.",
+   "task_family": "D2_D3_TARGET_BANK",
+   "terminal_on_failure": "T09_RT_NOT_QUALIFIED",
+   "test": "exact one-sided binomial test on integer arithmetic",
+   "title": "RT E0 behavioral qualification"
+  }
+ ],
+ "global_error_budget": {
+  "alpha_global": "1/20",
+  "alpha_per_cell": "1/1160",
+  "claims_fixed_sequence_protection": false,
+  "correction_scope": "every gate-bearing atomic cell in the census, including both E0 wrapper arms and the full registered L = 3 ladder, regardless of where ladder scanning stops",
+  "family_id": "F_GLOBAL_STUDY3R",
+  "m_max": 58,
+  "method": "bonferroni_equal_allocation",
+  "sided": "one_sided"
+ },
+ "rp_b_decision_id": "Q0_RPB_QUALIFICATION_DECISION",
+ "schema_version": "study3r-design-statistics-v1",
+ "totals": {
+  "atomic_cell_count": 58,
+  "gate_count": 9,
+  "scheduled_item_evaluations": 8108
+ }
+}

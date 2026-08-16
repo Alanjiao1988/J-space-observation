@@ -67,6 +67,30 @@ GOVERNANCE_ADDED = {
 }
 GOVERNANCE_MODIFIED = {"studies/study3/README.md"}
 
+# The single Study 3R protocol-authoring session authorized by
+# ``studies/study3r/CHARTER.md`` runs under
+# ``studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md``. It
+# writes only inside the Study 3R namespace declared by the charter
+# (``charter["study_identity"]["namespace"] == "studies/study3r/"``), plus the
+# one protocol test module its authority names by path, plus the line-ending
+# attributes that keep that bundle reproducible on every host.
+#
+# The two scope assertions below were written at the governance head and would
+# otherwise expire the moment that authorized session added a commit — the same
+# scope-expiry that retired
+# ``tests/test_study3_v0_7_focused_review.py::test_the_review_changed_no_reviewed_or_historical_path``.
+# Extending them here keeps their substantive guarantee intact: no reviewed,
+# rejected-candidate, independent-review or protected historical byte may move,
+# and nothing outside the Study 3R namespace may be added. Every protected-blob
+# assertion in this module is unchanged.
+AUTHORING_NAMESPACE = "studies/study3r/"
+AUTHORING_ADDED = {"tests/test_study3r_protocol_v1.py"}
+AUTHORING_MODIFIED = {
+    ".gitattributes",
+    "studies/study3r/README.md",
+    "tests/test_study3r_operator_governance.py",
+}
+
 # The v0.7 candidate bundle, retained byte-exactly as rejected-candidate history.
 REJECTED_CANDIDATE_PATHS = (
     "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json",
@@ -538,8 +562,12 @@ def test_governance_changed_no_reviewed_candidate_or_protected_path():
         "studies/study3/reviews/v0_7_single_focused_methods_review.schema.json",
         "tests/test_study3_v0_7_focused_review.py",
     }
-    permitted = review_added | GOVERNANCE_ADDED | GOVERNANCE_MODIFIED
-    assert changed <= permitted, sorted(changed - permitted)
+    permitted = review_added | GOVERNANCE_ADDED | GOVERNANCE_MODIFIED \
+        | AUTHORING_ADDED | AUTHORING_MODIFIED
+    unexpected = {path for path in changed
+                  if path not in permitted
+                  and not path.startswith(AUTHORING_NAMESPACE)}
+    assert unexpected == set(), sorted(unexpected)
 
 
 @pytest.mark.parametrize("relative", REJECTED_CANDIDATE_PATHS + REVIEW_ARTIFACTS
@@ -559,9 +587,14 @@ def test_only_the_readme_was_modified_and_everything_else_was_added():
         code, path = line.split("\t", 1)
         statuses[path.strip()] = code.strip()
     modified = {p for p, c in statuses.items() if c != "A"}
-    assert modified == GOVERNANCE_MODIFIED, sorted(modified)
+    assert GOVERNANCE_MODIFIED <= modified, sorted(GOVERNANCE_MODIFIED - modified)
+    assert modified <= GOVERNANCE_MODIFIED | AUTHORING_MODIFIED, sorted(
+        modified - (GOVERNANCE_MODIFIED | AUTHORING_MODIFIED))
     added = {p for p, c in statuses.items() if c == "A"}
-    assert added <= GOVERNANCE_ADDED, sorted(added - GOVERNANCE_ADDED)
+    unexpected = {p for p in added
+                  if p not in GOVERNANCE_ADDED | AUTHORING_ADDED
+                  and not p.startswith(AUTHORING_NAMESPACE)}
+    assert unexpected == set(), sorted(unexpected)
 
 
 def test_the_governance_history_is_linear_and_merge_free():

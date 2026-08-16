@@ -1,0 +1,313 @@
+{
+ "$id": "https://study3r.invalid/study3r_rendering_registry_v1.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "properties": {
+  "arm_differentiating_field": {
+   "const": "envelope"
+  },
+  "authority": {
+   "const": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md"
+  },
+  "deterministic_placeholder_fixture": {
+   "additionalProperties": false,
+   "properties": {
+    "correct_index": {
+     "maximum": 3,
+     "minimum": 0,
+     "type": "integer"
+    },
+    "correct_label": {
+     "enum": [
+      "A",
+      "B",
+      "C",
+      "D"
+     ],
+     "type": "string"
+    },
+    "depth": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "family": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "is_scientific_item": {
+     "const": false
+    },
+    "item_body": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "item_key": {
+     "pattern": "^[0-9a-f]{64}$",
+     "type": "string"
+    },
+    "operands": {
+     "items": {
+      "type": "integer"
+     },
+     "type": "array"
+    },
+    "operations": {
+     "items": {
+      "type": "string"
+     },
+     "type": "array"
+    },
+    "options": {
+     "items": {
+      "type": "integer"
+     },
+     "maxItems": 4,
+     "minItems": 4,
+     "type": "array"
+    },
+    "stem": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "value": {
+     "type": "integer"
+    }
+   },
+   "required": [
+    "correct_index",
+    "correct_label",
+    "depth",
+    "family",
+    "is_scientific_item",
+    "item_body",
+    "item_key",
+    "operands",
+    "operations",
+    "options",
+    "stem",
+    "value"
+   ],
+   "type": "object"
+  },
+  "entries": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "answer_cue": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "arm_id": {
+      "enum": [
+       "W1_RAW_DIRECT",
+       "W2_ROLE_CANONICAL"
+      ],
+      "type": "string"
+     },
+     "assistant_content": {
+      "type": "null"
+     },
+     "bos_insertion": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "chat_template_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "checkpoint_role": {
+      "enum": [
+       "RT",
+       "RP_B1",
+       "RP_B2",
+       "RP_B3"
+      ],
+      "type": "string"
+     },
+     "d0_common_prefix_token_length": {
+      "minimum": 1,
+      "type": "integer"
+     },
+     "d0_discriminant_position": {
+      "minimum": 1,
+      "type": "integer"
+     },
+     "eos_insertion": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "few_shot_examples": {
+      "items": {
+       "type": "string"
+      },
+      "maxItems": 0,
+      "type": "array"
+     },
+     "frozen_reasoning_closure": {
+      "type": "string"
+     },
+     "immutable_revision": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+     },
+     "message_roles": {
+      "items": {
+       "enum": [
+        "user"
+       ],
+       "type": "string"
+      },
+      "maxItems": 1,
+      "type": "array"
+     },
+     "reasoning_span_opened_by_template": {
+      "type": "boolean"
+     },
+     "registry_key": {
+      "minLength": 3,
+      "type": "string"
+     },
+     "rendered_token_count": {
+      "minimum": 1,
+      "type": "integer"
+     },
+     "rendered_token_ids": {
+      "items": {
+       "minimum": 0,
+       "type": "integer"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "rendered_utf8_bytes": {
+      "minimum": 1,
+      "type": "integer"
+     },
+     "rendered_utf8_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+     },
+     "rendered_with_deterministic_placeholders": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "separators": {
+      "additionalProperties": false,
+      "properties": {
+       "newline_bytes": {
+        "const": "\n"
+       },
+       "option_line_separator": {
+        "const": "\n"
+       },
+       "raw_envelope_separator": {
+        "minLength": 1,
+        "type": "string"
+       }
+      },
+      "required": [
+       "newline_bytes",
+       "option_line_separator",
+       "raw_envelope_separator"
+      ],
+      "type": "object"
+     },
+     "system_content": {
+      "type": "null"
+     },
+     "tokenizer_class": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "user_content_source": {
+      "const": "item_body_template"
+     }
+    },
+    "required": [
+     "answer_cue",
+     "arm_id",
+     "assistant_content",
+     "bos_insertion",
+     "chat_template_sha256",
+     "checkpoint_role",
+     "d0_common_prefix_token_length",
+     "d0_discriminant_position",
+     "eos_insertion",
+     "few_shot_examples",
+     "frozen_reasoning_closure",
+     "immutable_revision",
+     "message_roles",
+     "reasoning_span_opened_by_template",
+     "registry_key",
+     "rendered_token_count",
+     "rendered_token_ids",
+     "rendered_utf8_bytes",
+     "rendered_utf8_sha256",
+     "rendered_with_deterministic_placeholders",
+     "separators",
+     "system_content",
+     "tokenizer_class",
+     "user_content_source"
+    ],
+    "type": "object"
+   },
+   "maxItems": 8,
+   "minItems": 8,
+   "type": "array"
+  },
+  "entry_count": {
+   "const": 8
+  },
+  "paired_discordance_reporting": {
+   "additionalProperties": false,
+   "properties": {
+    "directional": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "estimates_a_template_effect": {
+     "const": false
+    },
+    "is_a_gate": {
+     "const": false
+    },
+    "required": {
+     "const": true
+    },
+    "scope": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "directional",
+    "estimates_a_template_effect",
+    "is_a_gate",
+    "required",
+    "scope"
+   ],
+   "type": "object"
+  },
+  "protocol_id": {
+   "const": "STUDY3R_PROTOCOL_V1"
+  },
+  "schema_version": {
+   "const": "study3r-rendering-registry-v1"
+  }
+ },
+ "required": [
+  "arm_differentiating_field",
+  "authority",
+  "deterministic_placeholder_fixture",
+  "entries",
+  "entry_count",
+  "paired_discordance_reporting",
+  "protocol_id",
+  "schema_version"
+ ],
+ "title": "Study 3R rendering registry v1",
+ "type": "object"
+}

@@ -1,0 +1,80 @@
+{
+ "$id": "https://study3r.invalid/study3r_protocol_current.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "properties": {
+  "alternative_authoritative_artifacts": {
+   "items": {
+    "type": "string"
+   },
+   "maxItems": 0,
+   "type": "array"
+  },
+  "authored_state": {
+   "const": "STUDY3R_PROTOCOL_V1_AUTHORED_AWAITING_SINGLE_INDEPENDENT_FOCUSED_REVIEW"
+  },
+  "authoritative_markdown": {
+   "const": "studies/study3r/protocol/study3r_protocol_v1.md"
+  },
+  "authoritative_protocol": {
+   "const": "studies/study3r/protocol/study3r_protocol_v1.json"
+  },
+  "authoritative_schema": {
+   "const": "studies/study3r/protocol/study3r_protocol_v1.schema.json"
+  },
+  "authority": {
+   "const": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md"
+  },
+  "execution_authorized": {
+   "const": false
+  },
+  "fallback_protocol_permitted": {
+   "const": false
+  },
+  "frozen": {
+   "const": false
+  },
+  "legacy_pointers_not_consulted": {
+   "items": {
+    "minLength": 1,
+    "type": "string"
+   },
+   "minItems": 1,
+   "type": "array"
+  },
+  "protocol_id": {
+   "const": "STUDY3R_PROTOCOL_V1"
+  },
+  "runtime_overlay_permitted": {
+   "const": false
+  },
+  "schema_version": {
+   "const": "study3r-protocol-current-v1"
+  },
+  "supersedes": {
+   "items": {
+    "type": "string"
+   },
+   "maxItems": 0,
+   "type": "array"
+  }
+ },
+ "required": [
+  "alternative_authoritative_artifacts",
+  "authored_state",
+  "authoritative_markdown",
+  "authoritative_protocol",
+  "authoritative_schema",
+  "authority",
+  "execution_authorized",
+  "fallback_protocol_permitted",
+  "frozen",
+  "legacy_pointers_not_consulted",
+  "protocol_id",
+  "runtime_overlay_permitted",
+  "schema_version",
+  "supersedes"
+ ],
+ "title": "Study 3R current protocol pointer",
+ "type": "object"
+}

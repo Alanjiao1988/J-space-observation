@@ -1,0 +1,326 @@
+{
+ "aggregate_sha256": "5e0a875155f5cd8f4cdfc50f91dc06488b7e036cfad217ca85e0b1ba4c97ba04",
+ "authority": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md",
+ "deferred_exclusions": [
+  {
+   "path": "studies/study3r/study3r_authoring_disclosure_v1.json",
+   "reason": "The authoring disclosure records this manifest's own aggregate digest and the commit that publishes it, so it is necessarily written in the following commit of the registered linear publication order. It is bound by the Git commit and tree, and it is decision-reporting rather than decision-bearing."
+  },
+  {
+   "path": "studies/study3r/study3r_authoring_disclosure_v1.schema.json",
+   "reason": "The disclosure schema is published with the disclosure it constrains, in the same later commit, for the same reason."
+  },
+  {
+   "path": "studies/study3r/AUTHORING_DISCLOSURE.md",
+   "reason": "The human-readable disclosure is the Markdown rendering of the machine-readable disclosure and is published with it."
+  },
+  {
+   "path": "studies/study3r/README.md",
+   "reason": "The Study 3R routing update points readers at the disclosure and is published in the same later commit. It carries no protocol decision."
+  }
+ ],
+ "entries": [
+  {
+   "bytes": 11748,
+   "category": "tokenizer_acquisition_record",
+   "git_blob": "e340b52574c7e15d6b9383e5f0e82c81e2ad5991",
+   "lf_only": true,
+   "path": "studies/study3r/acquisition/study3r_checkpoint_acquisition_v1.json",
+   "sha256": "9553310bfe14d01969321de8c51d651d580eae6f146388c566b74a0ddf04665c",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 7877,
+   "category": "tokenizer_acquisition_schema",
+   "git_blob": "4c00cf14b772c5bbb85674bd7b4ca1a2de73ab83",
+   "lf_only": true,
+   "path": "studies/study3r/acquisition/study3r_checkpoint_acquisition_v1.schema.json",
+   "sha256": "9a47a016e0a225759fc6bff224d69339afc67565dbebe3fd3b9440492915b930",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 3250,
+   "category": "tokenizer_equivalence_record",
+   "git_blob": "f2c6c2150c6450ba31d35765b335bc261a456703",
+   "lf_only": true,
+   "path": "studies/study3r/acquisition/study3r_tokenizer_equivalence_v1.json",
+   "sha256": "2501a8e2e91b5b7cf519ce4debb8579b6139960345b32f9cd4bba9f5bda675b3",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 3697,
+   "category": "tokenizer_equivalence_schema",
+   "git_blob": "eb68b3f98b3788a7d7582cf4f752b30951eee63f",
+   "lf_only": true,
+   "path": "studies/study3r/acquisition/study3r_tokenizer_equivalence_v1.schema.json",
+   "sha256": "5b2a64ddd71cbd4512dd1b8ded2ff422ed7a6cd832230afd57e50e1bcbf1cb6d",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 80771,
+   "category": "wrapper_bytes_and_token_surfaces",
+   "git_blob": "3dc986103f30209251b301ff3c67b230d632d788",
+   "lf_only": true,
+   "path": "studies/study3r/acquisition/study3r_tokenizer_surfaces_v1.json",
+   "sha256": "28e09d944703be720a3533465f0511d69235229333700398d4cd45a6d29a611b",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 25673,
+   "category": "wrapper_bytes_and_token_surfaces_schema",
+   "git_blob": "66671129f4074fe6a6fd8e1d80a72320fa3dfcd9",
+   "lf_only": true,
+   "path": "studies/study3r/acquisition/study3r_tokenizer_surfaces_v1.schema.json",
+   "sha256": "956a35798ad8581bfae730971169fe91a11736f26f7c6002088e8b080fa68bf0",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 15789,
+   "category": "atomic_cell_census",
+   "git_blob": "d4cfb405f21b0784898e1677ace4a170dc8c2ce7",
+   "lf_only": true,
+   "path": "studies/study3r/analysis/study3r_atomic_cell_census_v1.json",
+   "sha256": "76df49bb8d88d1c215a1b0531249244c1978f4dd79e3a7d88b69d515ee951bdc",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 22060,
+   "category": "statistical_code",
+   "git_blob": "e73460e37e098b43f1105d4f16bb3536bd87c6f0",
+   "lf_only": true,
+   "path": "studies/study3r/analysis/study3r_design_statistics.py",
+   "sha256": "a6c9cf7bc14b5fc58eeb6611d09118248da8c4abad1c9f31749fa82692c82969",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 52941,
+   "category": "statistical_tables",
+   "git_blob": "9c73994302f6edb7287c5a982add21e107af31a7",
+   "lf_only": true,
+   "path": "studies/study3r/analysis/study3r_design_statistics_tables.json",
+   "sha256": "c00494c2213ce849fdaae583a99c2e84edfe54045761d4fd2ed54787c39bf478",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 12027,
+   "category": "independent_recalculation_code",
+   "git_blob": "7e51832b6f4f8c8ca5d761804077c54793cf504d",
+   "lf_only": true,
+   "path": "studies/study3r/analysis/study3r_independent_recalculation.py",
+   "sha256": "6e9b43670684063abf156f5153e9128f9652b8355ad2986833e944063cb14532",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 28587,
+   "category": "independent_recalculation_tables",
+   "git_blob": "b584cf47d580b10e111747121d7cfd13292ba48a",
+   "lf_only": true,
+   "path": "studies/study3r/analysis/study3r_independent_recalculation_tables.json",
+   "sha256": "4bd019631027c9232b08cb7b65428524347c06b8c6c8ab860b332e5a1a1ef02c",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 16186,
+   "category": "manifest_generator",
+   "git_blob": "71ed42f7ac37276e026f397f44d0ec4176a57898",
+   "lf_only": true,
+   "path": "studies/study3r/analysis/study3r_manifest.py",
+   "sha256": "1e5a3672a21ee695b454a6b84718fbf57b040bfcf707ce6d7a36205fba3a6131",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 78968,
+   "category": "protocol_builder",
+   "git_blob": "e2abdba6294b71c0f5484aff0e2a30ee14609578",
+   "lf_only": true,
+   "path": "studies/study3r/analysis/study3r_protocol_build.py",
+   "sha256": "4d777e8f0de9511936ff3c1f79139800f3e8f4bd692e3a681d6a5651fea7a6c9",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 49401,
+   "category": "tokenizer_probe",
+   "git_blob": "c57936cedc677149a656f3c591c84b914daf2911",
+   "lf_only": true,
+   "path": "studies/study3r/analysis/study3r_tokenizer_probe.py",
+   "sha256": "40722a54f82808821b9018e235f1f4198fb50070f37ccec1036f8eb3bf113c36",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 16972,
+   "category": "authoring_authority",
+   "git_blob": "6d5c2b2657185d3088e10f03fa7713881b2b9c57",
+   "lf_only": true,
+   "path": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md",
+   "sha256": "bafd90a73261dc710b861a1f9bcf286804b3e902bc31b8342e39174b9bfe0200",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 814,
+   "category": "current_pointer",
+   "git_blob": "2b3c467fe121d0419901f8ff1eb89fab2bb02521",
+   "lf_only": true,
+   "path": "studies/study3r/protocol/study3r_protocol_current.json",
+   "sha256": "37c18746ae6f580a0dc7ee23b4df3145ff2d111d75d0787f5f43e4b4da1cc401",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 1831,
+   "category": "current_pointer_schema",
+   "git_blob": "4828c3904e0e16f5e531ea331d0878b15a153aef",
+   "lf_only": true,
+   "path": "studies/study3r/protocol/study3r_protocol_current.schema.json",
+   "sha256": "29dee1d6dd085a9802e529ab47cbd304659ca6522e45eac56777644e9afc9183",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 65773,
+   "category": "protocol",
+   "git_blob": "df11cbe1621000a06d2363baad479afd6270dc34",
+   "lf_only": true,
+   "path": "studies/study3r/protocol/study3r_protocol_v1.json",
+   "sha256": "96efefbaa52b9860c84a854f35ef71b8a283ae631f1267dcee105a700ca3f819",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 12584,
+   "category": "protocol_markdown",
+   "git_blob": "cd0270ead07b268188b17848784a85de50cf1667",
+   "lf_only": true,
+   "path": "studies/study3r/protocol/study3r_protocol_v1.md",
+   "sha256": "eaccf354902ddc5cd64dc024b8c704404e0089981663e9cc3f7949fe58905a8f",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 25088,
+   "category": "protocol_schema",
+   "git_blob": "8c89b2405fae11233b53f280722ef196d15dc795",
+   "lf_only": true,
+   "path": "studies/study3r/protocol/study3r_protocol_v1.schema.json",
+   "sha256": "f380194b0fa547424e72c67c67d111447f6fd2a27d40c7de8074d77d635614cb",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 16057,
+   "category": "rendering_registry",
+   "git_blob": "4e1a92bffd4e1d593a355465a621177c7c9ae2e9",
+   "lf_only": true,
+   "path": "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+   "sha256": "830898eca5b385b3e4c35f613d8feea020dfaaa338c9813a117f287f1e74633f",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 6147,
+   "category": "rendering_registry_schema",
+   "git_blob": "1f3cec0a967b3cf4c29ab3076b426cd0a829a377",
+   "lf_only": true,
+   "path": "studies/study3r/protocol/study3r_rendering_registry_v1.schema.json",
+   "sha256": "c588309a0bbce4c7ef34ce89bc6c90b03e86a099ef40a86003f5982d0586f1f6",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 8677,
+   "category": "state_machine",
+   "git_blob": "d5e6e44d018a7ed98d2ff0b19fc2f26bfdc7411a",
+   "lf_only": true,
+   "path": "studies/study3r/protocol/study3r_state_machine_v1.json",
+   "sha256": "450fc3c33d87cd8b608426d817f9b0a0e10d409e7337bef288ef6f0ddd687755",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 6428,
+   "category": "state_machine_schema",
+   "git_blob": "dfdcc042a3cf9c9e63896419ec67102e5925fe87",
+   "lf_only": true,
+   "path": "studies/study3r/protocol/study3r_state_machine_v1.schema.json",
+   "sha256": "e5c86ab6509d4d15427bfaed41ead4bea396934e3e0dadf651a3aaa41c663b52",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 4355,
+   "category": "manifest_schema",
+   "git_blob": "b8d43d723ace285eb33bf90ffc72b799ab54fb91",
+   "lf_only": true,
+   "path": "studies/study3r/study3r_candidate_manifest_v1.schema.json",
+   "sha256": "e7d10d928c297da86c41691829c3800f73c04a76ddb6e4a09811113378a012b5",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 16233,
+   "category": "task_generator_specification",
+   "git_blob": "88951091f1efe412458b87acc322813071b3abc2",
+   "lf_only": true,
+   "path": "studies/study3r/tasks/study3r_task_generators_v1.py",
+   "sha256": "47383a8f1c95f9efa868964097be5b2f9dfcce06d527678b1593685cdf52f97e",
+   "utf8_bom": false
+  },
+  {
+   "bytes": 65435,
+   "category": "semantic_and_mutation_tests",
+   "git_blob": "9a7e3e99f1c865db005b88db194ba7c6ff7ea4e3",
+   "lf_only": true,
+   "path": "tests/test_study3r_protocol_v1.py",
+   "sha256": "eeb2c8c2e138f96000d334adc4a12d425d9efabe9907b680c235d8367f3ce68c",
+   "utf8_bom": false
+  }
+ ],
+ "entry_count": 27,
+ "every_entry_is_lf_only": true,
+ "execution_authorized": false,
+ "git": {
+  "branch": "alanjiao1988-study3r-protocol-v1-authoring",
+  "commit": "c650e45c9a7aaaa3d070edd585d391dbac49dfca",
+  "is_outer_recursive_identity": true,
+  "tree": "27ad5141af3f61f02e18c3714c1fabbd1f896a77"
+ },
+ "inclusion_categories": [
+  "atomic_cell_census",
+  "authoring_authority",
+  "current_pointer",
+  "current_pointer_schema",
+  "independent_recalculation_code",
+  "independent_recalculation_tables",
+  "manifest_generator",
+  "manifest_schema",
+  "protocol",
+  "protocol_builder",
+  "protocol_markdown",
+  "protocol_schema",
+  "rendering_registry",
+  "rendering_registry_schema",
+  "semantic_and_mutation_tests",
+  "state_machine",
+  "state_machine_schema",
+  "statistical_code",
+  "statistical_tables",
+  "task_generator_specification",
+  "tokenizer_acquisition_record",
+  "tokenizer_acquisition_schema",
+  "tokenizer_equivalence_record",
+  "tokenizer_equivalence_schema",
+  "tokenizer_probe",
+  "wrapper_bytes_and_token_surfaces",
+  "wrapper_bytes_and_token_surfaces_schema"
+ ],
+ "inclusion_rule_count": 27,
+ "is_an_execution_seal": false,
+ "manifest_kind": "candidate_reproducibility_manifest",
+ "missing_paths": [],
+ "no_entry_has_a_utf8_bom": true,
+ "protocol_frozen": false,
+ "protocol_id": "STUDY3R_PROTOCOL_V1",
+ "schema_version": "study3r-candidate-manifest-v1",
+ "sealing_design": {
+  "acyclic": true,
+  "aggregate_rule": "SHA-256 over the path-sorted concatenation of '<path>\\0<sha256>\\0<bytes>\\n' for every included entry",
+  "claims_to_contain_its_own_hash": false,
+  "inner_identity": "deterministic path/blob/sha256 content manifest",
+  "outer_recursive_identity": "git_commit_and_tree"
+ },
+ "self_exclusions": [
+  {
+   "path": "studies/study3r/study3r_candidate_manifest_v1.json",
+   "reason": "A content manifest cannot contain its own SHA-256: including it would require a fixed point of SHA-256 over a document that embeds that same digest. The manifest is therefore excluded from its own entry list, and the Git blob, tree and commit that carry the manifest supply the outer recursive identity instead."
+  }
+ ]
+}
