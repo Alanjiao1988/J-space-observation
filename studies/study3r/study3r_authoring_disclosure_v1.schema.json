@@ -1,0 +1,379 @@
+{
+ "$id": "https://study3r.invalid/study3r_authoring_disclosure_v1.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "properties": {
+  "acquisition": {
+   "minProperties": 7,
+   "type": "object"
+  },
+  "authority": {
+   "const": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md"
+  },
+  "authority_identity": {
+   "additionalProperties": false,
+   "properties": {
+    "bytes": {
+     "const": 16972
+    },
+    "commit": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    },
+    "git_blob": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    },
+    "lf_only": {
+     "const": true
+    },
+    "parent_commit": {
+     "const": "cd9c0af3118ca2f254bd0bbaa8eb2ee4dad6d1ed"
+    },
+    "path": {
+     "const": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md"
+    },
+    "published_alone_as_the_first_commit_after_the_starting_state": {
+     "const": true
+    },
+    "published_before_any_other_artifact": {
+     "const": true
+    },
+    "sha256": {
+     "const": "bafd90a73261dc710b861a1f9bcf286804b3e902bc31b8342e39174b9bfe0200"
+    }
+   },
+   "required": [
+    "bytes",
+    "commit",
+    "git_blob",
+    "lf_only",
+    "parent_commit",
+    "path",
+    "published_alone_as_the_first_commit_after_the_starting_state",
+    "published_before_any_other_artifact",
+    "sha256"
+   ],
+   "type": "object"
+  },
+  "boundary": {
+   "minProperties": 12,
+   "type": "object"
+  },
+  "census": {
+   "minProperties": 4,
+   "type": "object"
+  },
+  "checkpoints": {
+   "items": {
+    "minProperties": 8,
+    "type": "object"
+   },
+   "maxItems": 4,
+   "minItems": 4,
+   "type": "array"
+  },
+  "estimands": {
+   "minProperties": 8,
+   "type": "object"
+  },
+  "final_origin_main": {
+   "additionalProperties": false,
+   "properties": {
+    "before_the_disclosure_commit": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    },
+    "reason": {
+     "minLength": 100,
+     "type": "string"
+    },
+    "recorded_in_this_document": {
+     "type": "null"
+    }
+   },
+   "required": [
+    "before_the_disclosure_commit",
+    "reason",
+    "recorded_in_this_document"
+   ],
+   "type": "object"
+  },
+  "force_pushes": {
+   "const": 0
+  },
+  "gates": {
+   "items": {
+    "minProperties": 15,
+    "type": "object"
+   },
+   "maxItems": 9,
+   "minItems": 9,
+   "type": "array"
+  },
+  "governance_test_scope_extension": {
+   "additionalProperties": false,
+   "properties": {
+    "assertions_weakened": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 0,
+     "type": "array"
+    },
+    "path": {
+     "const": "tests/test_study3r_operator_governance.py"
+    },
+    "protected_blob_assertions_changed": {
+     "const": 0
+    },
+    "reason": {
+     "minLength": 100,
+     "type": "string"
+    },
+    "rejected_review_artifact_edited": {
+     "const": false
+    }
+   },
+   "required": [
+    "assertions_weakened",
+    "protected_blob_assertions_changed",
+    "path",
+    "reason",
+    "rejected_review_artifact_edited"
+   ],
+   "type": "object"
+  },
+  "history_rewrites": {
+   "const": 0
+  },
+  "independent_recalculation": {
+   "additionalProperties": false,
+   "properties": {
+    "exact_agreement": {
+     "const": true
+    },
+    "gates_compared": {
+     "const": 9
+    },
+    "gates_in_agreement": {
+     "const": 9
+    },
+    "imports_production_calculators": {
+     "const": false
+    },
+    "recomputed_alpha_per_cell": {
+     "const": "1/1160"
+    },
+    "recomputed_m_max": {
+     "const": 58
+    }
+   },
+   "required": [
+    "exact_agreement",
+    "gates_compared",
+    "gates_in_agreement",
+    "imports_production_calculators",
+    "recomputed_alpha_per_cell",
+    "recomputed_m_max"
+   ],
+   "type": "object"
+  },
+  "linear_ancestry": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+     },
+     "paths": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "subject": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "tree": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+     }
+    },
+    "required": [
+     "commit",
+     "paths",
+     "subject",
+     "tree"
+    ],
+    "type": "object"
+   },
+   "minItems": 3,
+   "type": "array"
+  },
+  "manifest": {
+   "minProperties": 7,
+   "type": "object"
+  },
+  "merge_commits": {
+   "const": 0
+  },
+  "mutations": {
+   "additionalProperties": false,
+   "properties": {
+    "killed_by": {
+     "const": "semantic_validation"
+    },
+    "killed_count": {
+     "minimum": 15,
+     "type": "integer"
+    },
+    "registered": {
+     "items": {
+      "minLength": 3,
+      "type": "string"
+     },
+     "minItems": 15,
+     "type": "array"
+    },
+    "registered_count": {
+     "minimum": 15,
+     "type": "integer"
+    },
+    "survivor_count": {
+     "const": 0
+    }
+   },
+   "required": [
+    "killed_by",
+    "killed_count",
+    "registered",
+    "registered_count",
+    "survivor_count"
+   ],
+   "type": "object"
+  },
+  "protected_bytes": {
+   "additionalProperties": false,
+   "properties": {
+    "all_identical": {
+     "const": true
+    },
+    "compared": {
+     "minimum": 25,
+     "type": "integer"
+    },
+    "comparisons": {
+     "items": {
+      "minProperties": 4,
+      "type": "object"
+     },
+     "minItems": 25,
+     "type": "array"
+    },
+    "reference_head": {
+     "const": "a08ec1462f023da49247cac0756b7af5f32ba75a"
+    }
+   },
+   "required": [
+    "all_identical",
+    "compared",
+    "comparisons",
+    "reference_head"
+   ],
+   "type": "object"
+  },
+  "protocol_id": {
+   "const": "STUDY3R_PROTOCOL_V1"
+  },
+  "rp_b_ladder": {
+   "items": {
+    "minLength": 10,
+    "type": "string"
+   },
+   "maxItems": 3,
+   "minItems": 3,
+   "type": "array"
+  },
+  "rp_b_ladder_length": {
+   "const": 3
+  },
+  "schema_version": {
+   "const": "study3r-authoring-disclosure-v1"
+  },
+  "starting_state": {
+   "additionalProperties": false,
+   "properties": {
+    "charter_state": {
+     "minLength": 10,
+     "type": "string"
+    },
+    "commit": {
+     "const": "cd9c0af3118ca2f254bd0bbaa8eb2ee4dad6d1ed"
+    },
+    "tree": {
+     "const": "fc303a001bbfea60149e9f425f64230c022b6d91"
+    },
+    "verified": {
+     "const": true
+    }
+   },
+   "required": [
+    "charter_state",
+    "commit",
+    "tree",
+    "verified"
+   ],
+   "type": "object"
+  },
+  "target_checkpoint": {
+   "const": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+  },
+  "terminal_state": {
+   "const": "STUDY3R_PROTOCOL_V1_AUTHORED_AWAITING_SINGLE_INDEPENDENT_FOCUSED_REVIEW"
+  },
+  "test_results": {
+   "minProperties": 3,
+   "type": "object"
+  },
+  "tokenizer_equivalence": {
+   "minProperties": 6,
+   "type": "object"
+  }
+ },
+ "required": [
+  "acquisition",
+  "authority",
+  "authority_identity",
+  "boundary",
+  "census",
+  "checkpoints",
+  "estimands",
+  "final_origin_main",
+  "force_pushes",
+  "gates",
+  "governance_test_scope_extension",
+  "history_rewrites",
+  "independent_recalculation",
+  "linear_ancestry",
+  "manifest",
+  "merge_commits",
+  "mutations",
+  "protected_bytes",
+  "protocol_id",
+  "rp_b_ladder",
+  "rp_b_ladder_length",
+  "schema_version",
+  "starting_state",
+  "target_checkpoint",
+  "terminal_state",
+  "test_results",
+  "tokenizer_equivalence"
+ ],
+ "title": "Study 3R protocol-authoring disclosure",
+ "type": "object"
+}
