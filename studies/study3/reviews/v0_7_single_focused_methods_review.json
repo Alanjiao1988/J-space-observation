@@ -1,0 +1,563 @@
+{
+ "authority": {
+  "bytes": 16515,
+  "commit": "66fec8af948e4c21c6818d0007bd2b3619738b4e",
+  "git_blob": "428af94069adffb9636499313405d7c1153445ab",
+  "newline_convention": "LF only, no BOM, exactly one trailing newline",
+  "path": "studies/study3/prompts/study3_v0_7_single_focused_methods_review_authority.md",
+  "published_alone_as_the_first_commit_after_the_reviewed_target": true,
+  "sha256": "83d5d21975601ad99b505ed7e35dad263fb453e503752ebf2b5d5f78c12f7c5b",
+  "tree": "d717130936e4bd7537fe0862f3d6a7826fe7b283"
+ },
+ "boundary": {
+  "evidence_ledger_tail": "EV-0016",
+  "formal_execution_authorized": false,
+  "historical_protected_paths_changed": 0,
+  "prohibited_operation_counters": {
+   "activation_loads": 0,
+   "adapter_loads": 0,
+   "azure_acr_aca_gpu_cloud_operations": 0,
+   "checkpoint_downloads": 0,
+   "checkpoint_loads": 0,
+   "checkpoint_resolutions": 0,
+   "confirmation_accesses": 0,
+   "evidence_rows_added": 0,
+   "forward_passes": 0,
+   "generations": 0,
+   "interface_qualifications": 0,
+   "interface_selections": 0,
+   "logit_reads": 0,
+   "model_output_parses": 0,
+   "model_weight_loads": 0,
+   "prefills": 0,
+   "rp_b_qualifications": 0,
+   "rp_m_qualifications": 0,
+   "scientific_evidence_claims": 0,
+   "scoring_operations": 0,
+   "seeds_drawn": 0,
+   "split_realizations": 0,
+   "task_bank_rows_generated": 0,
+   "tokenizer_constructions": 0,
+   "tokenizer_decodes": 0,
+   "tokenizer_encodes": 0
+  },
+  "research_question_answered": false,
+  "reviewed_candidate_paths_changed": 0
+ },
+ "findings": [
+  {
+   "affected": "Which document an executor must obey; every rule that differs between the legacy v0.5 JSON and draft-v0.7; the JSON/Markdown agreement guarantee.",
+   "authority_section": "5.1, 5.4",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "status.authoritative_artifact reads: 'The JSON document interface_calibration_protocol_draft.json is the authoritative record of this design.' That names the legacy unversioned v0.5 JSON.",
+    "protocol_placement_v0_7.sole_top_level_normative_protocol reads 'studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json'.",
+    "The current pointer sets must_not_load_interface_calibration_protocol_draft_json = true and fallback_to_legacy_permitted = false.",
+    "status.authoritative_artifact also states that JSON/Markdown agreement 'is enforced by the committed test at tests/test_study3_design.py'. That file contains 0 occurrences of 'v0_7' and 2 occurrences of 'interface_calibration_protocol_draft.json', so it binds the legacy pair only."
+   ],
+   "id": "S3V07-B01",
+   "minimal_operator_decision": "Decide whether status.authoritative_artifact is rewritten to name the v0.7 JSON and a v0.7 agreement test, or is mechanically demoted to a historical field excluded from active interpretation.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> status.authoritative_artifact",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> protocol_placement_v0_7.sole_top_level_normative_protocol",
+    "studies/study3/protocol/interface_calibration_protocol_current.json -> loader_contract.must_not_load_interface_calibration_protocol_draft_json",
+    "tests/test_study3_design.py"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "Two active fields name different top-level normative protocols",
+   "why_existing_tests_did_or_did_not_detect_it": "No committed test compares status.authoritative_artifact with protocol_placement_v0_7.sole_top_level_normative_protocol. test_the_legacy_bundle_is_labelled_historical_everywhere inspects the pointer and the amendment, not this field, and test_the_legacy_files_do_not_carry_the_new_status_string only checks the legacy files."
+  },
+  {
+   "affected": "Every active scoring and rendering rule: prompt bytes, separators, instructions, label alphabets, answer cue, encoding policy and the first-discriminative-token scoring boundary. No executor can render or score an item from the active bundle alone.",
+   "authority_section": "5.1",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "The v0.7 registry records inherited_v0_6_scoring_boundary with why = 'the v0.6 first-discriminative-token scoring boundary is normative and is inherited byte-identically by reference'.",
+    "provenance_v0_7.derived_from lists the v0.6 registry with role 'normative v0.6 scoring and rendering registry'.",
+    "The current pointer's active_bundle contains exactly four paths: the v0.7 protocol JSON, schema, Markdown and v0.7 registry. The v0.6 registry is in neither the pointer's active_bundle nor the amendment's new_bundle (seven paths), while must_resolve_only_to_the_versioned_v0_7_bundle = true and fallback_to_legacy_permitted = false.",
+    "The v0.7 registry is 3,243 bytes and holds only answer surfaces, roles, wrapper arms and a pointer. The v0.6 registry is 57,331 bytes and is the only committed home of question_stem_templates, instructions, separators, label_alphabets, answer_cue, placeholders, encoding_policy, token_accounting, pair_isolation_rules, renderings, scoring_boundary, applicability_table and 22 hashed normative template assets.",
+    "The v0.6 registry itself states binding_status 'BINDING_NORMATIVE_INPUT_NOT_AN_ILLUSTRATIVE_EXAMPLE. An independent implementation must be able to produce every applicable prompt byte from this registry alone', governs 'studies/study3/protocol/interface_calibration_protocol_draft.json registers this file as a binding input', supersedes the v0.5 registry, and carries state 'STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW'.",
+    "protocol_placement_v0_7 asserts the opposite of the registry: legacy_and_v0_6_are_provenance_inputs_not_runtime_overlays = true, while provenance_v0_7 asserts self_contained = true and executor_must_layer_amendments_manually = false."
+   ],
+   "id": "S3V07-B02",
+   "minimal_operator_decision": "Decide whether the v0.6 registry is added to the sealed active bundle as a subordinate normative asset with an exact path and hash, or its content is carried into the v0.7 registry so the active bundle is genuinely closed.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.json -> inherited_v0_6_scoring_boundary",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> provenance_v0_7.derived_from[].role",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> provenance_v0_7.self_contained",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> provenance_v0_7.executor_must_layer_amendments_manually",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> protocol_placement_v0_7.legacy_and_v0_6_are_provenance_inputs_not_runtime_overlays",
+    "studies/study3/protocol/interface_calibration_protocol_current.json -> active_bundle",
+    "studies/study3/protocol/interface_calibration_protocol_current.json -> loader_contract.must_resolve_only_to_the_versioned_v0_7_bundle",
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json -> binding_status, governs, supersedes, state"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "The active bundle omits the v0.6 rendering registry that the v0.7 registry declares normative, so the active protocol is not self-contained",
+   "why_existing_tests_did_or_did_not_detect_it": "test_the_protocol_is_self_contained asserts only the two self-declared booleans in provenance_v0_7 and that the v0.7 protocol has every top-level key the legacy protocol had. It never checks that a normative dependency is reachable inside the active bundle. test_every_recorded_pointer_hash_matches_the_file_on_disk only hashes the four paths the pointer already lists."
+  },
+  {
+   "affected": "L, the candidate-level Bonferroni denominator (study development screening alpha 1/200 divided by L), Gate I4, stage P3-Q, and freeze eligibility.",
+   "authority_section": "5.2",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "blocking_decisions is ['OD2']. OD2 carries status 'unresolved', blocking true, and blocks ['Gate I4', 'stage P3-Q', 'freeze', 'every quantity in the positive_reference_external_P3Q work stream'].",
+    "q0_and_rp_b_v0_7.ladder.blocked_on = 'OD2' and deterministic_deferrals_v0_7 DEFER-02 blocked_on = 'OD2'.",
+    "ladder.priority reads 'same-tokenizer natural candidates first, including the predeclared Qwen-family size ladder where eligible'. An exhaustive search of the committed protocol bytes finds six occurrences of 'Qwen': three are checkpoint_roles target identities (deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B, Qwen/Qwen2.5-Math-1.5B, Qwen/Qwen2.5-Math-1.5B-Instruct) and one is this sentence. No predeclared Qwen-family size ladder exists anywhere in the protocol.",
+    "The only candidate universe registered is three generic families in positive_reference_candidates.candidate_families_for_operator_consideration: '3B-class instruction-tuned general model', '7B-class instruction-tuned general or math model', 'hosted or larger-SKU reference'. The strings 'candidate universe' and 'observation date' do not occur in the protocol.",
+    "Three of the five eligibility predicates require judgement at seal time: 'license permitting research use and redistribution of derived measurements', 'runnable on the registered route', and 'natural model, not a training-constructed implicit-CoT or direct-answer model'. The ordering tie-break 'publication time' names no frozen source.",
+    "numerical_closure_v0_7.operator_discretion_clause_count = 0 is therefore false, and every_execution_value_is_frozen_or_deterministically_deferred = true is not established for DEFER-02."
+   ],
+   "id": "S3V07-B03",
+   "minimal_operator_decision": "Issue the separate OD2 authority that freezes the candidate universe, its observation date and source, the resolved eligibility set, L, and the P3-Q qualification interface; or explicitly re-scope v0.7 so no gate depends on an unenumerated ladder.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> blocking_decisions",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> unresolved_operator_decisions[OD2]",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> q0_and_rp_b_v0_7.ladder",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> deterministic_deferrals_v0_7.entries[DEFER-02]",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> positive_reference_candidates",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> numerical_closure_v0_7.operator_discretion_clause_count"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "OD2 remains an open blocking decision and the RP-B ladder is not a deterministic enumeration, so L and the Bonferroni denominator are not fixed",
+   "why_existing_tests_did_or_did_not_detect_it": "test_q0_multiplicity_uses_the_full_ladder_length checks that the allocation text refers to the full ladder length; it cannot check that the ladder is enumerable. No committed test resolves ladder.priority's reference to a 'predeclared Qwen-family size ladder', and no test asserts that blocking_decisions is empty."
+  },
+  {
+   "affected": "Every v0.7 gate's legal successor state, and the completeness claim that each complete outcome has exactly one legal transition.",
+   "authority_section": "5.3",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "state_machine_v0_4.states contains exactly nine states: Q0_INSTRUMENT, Q1_DEVELOPMENT, Q2_SELECTION, Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY and five terminals.",
+    "No state, transition, precondition or guard exists for the engineering shakedown exit, the generated-CoT ceiling, E0, the D0 descriptive-only branch, Q0 RP-B qualification, RP-M method validation, wrapper joint adequacy, negative-control equivalence, or the activation and patching authorization boundary.",
+    "Q0_INSTRUMENT's rule is 'run only the deterministic, model-free I0 fixtures'. v0.7's Q0 is the positive-reference RP-B prequalification layer, which is model-executing and one-way. The same identifier designates two different constructs in one active protocol.",
+    "state_machine_v0_4 is byte-identical to the same key in the legacy v0.5 protocol, so total = true and exactly_one_legal_next_state_per_event = true describe the v0.5 design and are false for the v0.7 design."
+   ],
+   "id": "S3V07-B04",
+   "minimal_operator_decision": "Decide whether the v0.7 gates are integrated into one total executable state machine with a distinct identifier for the RP-B layer, or v0.7 is re-scoped so the unintegrated blocks carry no gate authority.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> state_machine_v0_4.states",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> state_machine_v0_4.total",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> state_machine_v0_4.exactly_one_legal_next_state_per_event",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> q0_and_rp_b_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> engineering_shakedown_authority_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> generated_cot_ceiling_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> e0_answer_and_decoding_contract",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> full_context_tokenization_and_d0_diagnostics",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> rp_b_and_rp_m_separation_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> wrapper_matched_contrast_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> negative_control_equivalence_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> activation_and_causal_claim_boundary_v0_7"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "The registered state machine integrates no v0.7 gate and reuses the identifier Q0 for two different constructs",
+   "why_existing_tests_did_or_did_not_detect_it": "test_the_governance_state_is_preserved checks the state string, not the machine. test_confirmation_cannot_be_reused_after_failure and test_diagnostics_are_excluded_from_rescue_paths inspect the four legacy states only. No test asserts that the v0.7 blocks appear in the machine."
+  },
+  {
+   "affected": "The S2 and S3 intersection-union conjunction membership (16 versus 19 gate-bearing cells), their I3 claim ceilings, and the projected rendered and scored row counts (2,478 rows per profile).",
+   "authority_section": "5.4, 5.9",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "Four locations agree that K6-SEP is not_applicable to S2 and S3: gate_truth_table.rows, competence_floor_battery_v0_7.gate_bearing_cell_counts (applicable_i3_contrast_ids = ['K6-INSTR']), power_architecture_v0_4.cell_counts.by_profile, and the v0.6 registry's applicability_table (per_profile_applicable_contrast_counts S2 = 1, S3 = 1).",
+    "Two active fields contradict them: gate_hierarchy[I3].claim_ceiling_by_profile.S2 and .S3 record applicable_cell_count = 2 with applicable_cells ['K6-SEP', 'K6-INSTR'], and gate_hierarchy[I3].not_applicable_semantics states 'The two K6 contrasts are applicable to every profile.'",
+    "Independent recomputation from the gate truth table and the registered evaluated_per factor structure reproduces every committed census number for all four profiles (74 agreements) and produces, for S2 and S3, base_item_contrast_clusters 413, cluster_rendered_rows 826 and rendered_rows_per_target_role 1,667. The committed operation projection records 826, 1,652 and 2,493, which is exactly the two-contrast figure (2 x 413).",
+    "gate_truth_table.k6_applicability_note claims draft-v0.5 'records K6-SEP as not_applicable for S2 and S3 in every location and re-derives the affected census, claim ceilings, sampling and evaluation mapping, operation projection and tests', and power_architecture_v0_4.cell_counts.v0_5_rederivation claims every_number_was_recomputed_from_the_amended_inputs = true. Both are false.",
+    "35 of the 40 top-level keys listed in provenance_v0_7.carried_forward_top_level_keys are byte-identical to the legacy v0.5 protocol, including gate_hierarchy, gate_truth_table and operation_boundaries; only required_next_action, schema_version, state, status and study_identity differ. The legacy protocol carries the same two-contrast claim ceiling and the same 826, so v0.7 copied the contradiction forward."
+   ],
+   "id": "S3V07-B05",
+   "minimal_operator_decision": "Decide the single applicable K6 contrast set for S2 and S3 and re-derive the claim ceilings, the not_applicable semantics text and the operation projection from it.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> gate_truth_table.rows[S2,S3].I3_K6",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> gate_truth_table.k6_applicability_note",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> gate_hierarchy[I3].claim_ceiling_by_profile.S2,S3",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> gate_hierarchy[I3].not_applicable_semantics",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> competence_floor_battery_v0_7.gate_bearing_cell_counts.S2,S3",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> power_architecture_v0_4.cell_counts.by_profile.S2,S3",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> power_architecture_v0_4.cell_counts.v0_5_rederivation",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> operation_boundaries.projected_future_operations.work_streams.target_role_development.by_profile.S2,S3_if_independently_rendered",
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json -> applicability_table.per_profile_applicable_contrast_counts"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "K6-SEP applicability contradicts itself across five active locations, and the S2/S3 operation projection is arithmetically derived from the wrong count",
+   "why_existing_tests_did_or_did_not_detect_it": "test_every_numeric_constant_agrees_with_the_committed_tables compares the protocol against design_statistics_tables.json, which is the source of the census only. gate_hierarchy and operation_boundaries are carried forward verbatim from the legacy protocol and are never cross-checked against that census by any committed test."
+  },
+  {
+   "affected": "Both arms of the wrapper-matched contrast, the joint-adequacy gate that depends on them, and every prompt byte an executor would render.",
+   "authority_section": "5.5",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "Every entry in registry.wrappers carries only role, arm, wrapper_id, chat_template_applied, description, and in some cases shared_across_roles, deterministic and few_shot_completion_format. The union of all registered wrapper fields contains no byte-level field.",
+    "None of the following is registered anywhere for any arm: message roles and ordering; literal system, user or assistant content; separators and newlines; BOS/EOS handling; generation-prompt behaviour; chat-template revision or exact template bytes; RL few-shot demonstrations, their ordering and answer cue; and the exact field allowed to differ inside each within-role pair.",
+    "wrapper_canonical_rt_v0_7 and wrapper_canonical_ri_v0_7 are described as 'the role's registered canonical chat template'. A chat template is carried by the checkpoint's tokenizer configuration, whose immutable revision is deferred to DEFER-01 and is unsealed, so the bytes are unknowable at review time.",
+    "wrapper_canonical_rl_v0_7 is 'a deterministic few-shot completion-format wrapper'. No demonstration item, ordering rule or answer cue is committed. No wrapper asset file exists in the repository and the recursive-manifest seal registers no wrapper-asset path.",
+    "It is therefore not mechanically verifiable that each within-role pair differs only in the registered wrapper transformation."
+   ],
+   "id": "S3V07-B06",
+   "minimal_operator_decision": "Decide whether the wrapper arms are frozen as committed executable bytes or as a deterministic rendering algorithm with a pinned template revision, or the wrapper contrast is withdrawn from gate authority.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.json -> wrappers",
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.json -> wrapper_arms",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> wrapper_matched_contrast_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> deterministic_deferrals_v0_7.entries[DEFER-01]"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "Wrapper arms are registered by identifier and prose only, so no wrapper rendering can be reconstructed before data",
+   "why_existing_tests_did_or_did_not_detect_it": "test_the_wrapper_gate_is_joint_adequacy_not_an_effect_claim checks the gate kind and three claim booleans. test_no_contradictory_duplicate_rule_across_protocol_and_registry checks answer surfaces, two booleans and subordinate_to. Neither reaches wrapper content, and the registry schema constrains wrappers only to require the same five keys."
+  },
+  {
+   "affected": "m_max, the per-cell false-negative budget, the per-cell power target, every registered sample size and pass count, the profile-stage and study end-to-end power floors, and every operation projection.",
+   "authority_section": "5.9",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "wrapper_matched_contrast_v0_7.gate has kind 'joint_adequacy' with conditions ['raw rendering meets its competence floor', 'role-canonical rendering meets its competence floor'], so every gate-bearing cell must be evaluated under both registered arms.",
+    "atomic_evaluation_cells.cell_factors lists ten factors and contains no wrapper factor. m_max = 43 counts one arm.",
+    "Independent recomputation at the registered budgets: with the wrapper factor m_max becomes 86, the per-cell false-negative budget falls from 19/17200 to 19/34400, and the per-cell power target rises from 17181/17200 to 34381/34400.",
+    "Independent minimal-size recomputation at that target raises the minimal (n, pass count) from (413, 389) to (439, 413) for I1a/I1b/I3, from (214, 129) to (225, 135) for I2, and from (448, 383) to (477, 407) for I4. The registered sizes are confirmed minimal only at m_max = 43.",
+    "projected_future_operations.work_streams contains five streams: RP_I4_under_candidate_profiles, S4_diagnostic_generation, deterministic_I0_fixtures, positive_reference_external_P3Q, selected_profile_one_shot_confirmation and target_role_development. There is no stream for the wrapper arms, E0, the generated-CoT ceiling, the negative control, or Q0/RP-B qualification, and the block still carries disposition_status PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW."
+   ],
+   "id": "S3V07-B07",
+   "minimal_operator_decision": "Decide whether the wrapper arm is a gate-bearing cell factor, in which case m_max and every size must be re-derived, or the wrapper contrast is descriptive-only with no competence-floor condition.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> wrapper_matched_contrast_v0_7.gate",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> atomic_evaluation_cells.cell_factors",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> power_architecture_v0_4.cell_counts.m_max",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> power_architecture_v0_4.type_ii_allocation",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> competence_floor_battery_v0_7.development_components",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> operation_boundaries.projected_future_operations.work_streams"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "Wrapper joint adequacy doubles the gate-bearing cell census, which m_max and every registered sample size ignore",
+   "why_existing_tests_did_or_did_not_detect_it": "test_the_battery_is_unchanged_and_no_new_mde_is_registered asserts the battery is unchanged, which is precisely the assumption in question. test_every_numeric_constant_agrees_with_the_committed_tables compares the protocol against design_statistics_tables.json, which was computed without a wrapper factor."
+  },
+  {
+   "affected": "Whether any negative control can be run at all, and whether a negative control that is run can pass or fail.",
+   "authority_section": "5.8",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "negative_control_equivalence_v0_7 contains exactly four keys: derivation, not_significantly_above_chance_is_an_equivalence_demonstration, quantitative_upper_bound_exact_rational and test.",
+    "It registers no independent unit, no sample size, no pass count or deterministic equivalent, no multiplicity family, no expected null or chance distribution, and no resource or operation projection.",
+    "The alpha is given only as 'the registered development alpha'. Two different development alphas are registered: the study development screening level 1/200 and the per-profile component level 1/600. The block does not say which applies.",
+    "No confidence-bound construction is named. The strings 'Clopper', 'Pearson' and 'beta quantile' do not occur in the block, so 'exact one-sided upper confidence bound' is not tied to a specific construction.",
+    "The bound is independently reproduced as 1/10 + 7/100 = 17/100, so the arithmetic is correct and the design is still not executable.",
+    "The block carries no decision marker: decision_markers_v0_7 registers 14 markers and negative_control_equivalence_v0_7 is not among their json_key values."
+   ],
+   "id": "S3V07-B08",
+   "minimal_operator_decision": "Register the negative control's independent unit, sample size, resolved alpha, exact confidence-bound construction, decision rule, multiplicity family and operation projection, or withdraw it from the v0.7 gate set.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> negative_control_equivalence_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> numerical_closure_v0_7.derived_constants.negative_control_equivalence_upper_bound_exact_rational",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> decision_markers_v0_7"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "The negative-control equivalence rule registers a margin, not an executable design",
+   "why_existing_tests_did_or_did_not_detect_it": "test_the_negative_control_rule_is_quantitative asserts only that a quantitative bound exists and that the 'not significantly above chance' boolean is false. It cannot detect the missing unit, n, alpha resolution, bound construction or multiplicity family, and the protocol schema leaves this key as the empty schema."
+  },
+  {
+   "affected": "max_new_tokens, the EOS margin, the full-sequence exact-match rule, and the E0 pass or fail of every RP-B candidate and every isomorphic stratum.",
+   "authority_section": "5.6",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "eos_and_stop_semantics.derivation reads 'every registered surface is exactly two tokens under the pinned role tokenizers, plus a one-token EOS margin', with max_new_tokens = 3 and eos_margin_tokens = 1; numerical_closure_v0_7.derived_constants.e0_answer_token_count = 2.",
+    "complete_token_id_sequence_per_surface_and_revision is deferred to DEFER-01, whose value is 'immutable checkpoint revision hashes' and whose fail-closed absent state is STUDY3_V0_7_CHECKPOINT_REVISION_UNSEALED. The revisions are unsealed, so the universal claim is asserted before the objects that could verify it exist.",
+    "estimands_v0_7.E0.is_the_primary_gate_for_rp_b = true, and RP-B candidates are unknown because OD2 is unresolved. Their tokenizers may render ' 0'..' 9' in one, two or more tokens.",
+    "checkpoint_functional_equivalence_v0_7 classifies any failure of the four-part functional test as isomorphic_reinstantiation, to be 'analysed as a separate stratum'. No separately frozen legal-surface contract and no separate generation-length contract is registered for that stratum, it is not declared ineligible for E0 or RP-B, and no fail-closed state exists for 'a registered surface is not exactly two tokens'.",
+    "The training-constructed fallback stratum in q0_and_rp_b_v0_7.ladder.fallback_stratum inherits the same gap."
+   ],
+   "id": "S3V07-B09",
+   "minimal_operator_decision": "Decide whether the two-token contract is a per-revision sealed fact with a fail-closed state and a per-stratum surface and generation-length contract, or the isomorphic stratum is declared ineligible for E0 and RP-B.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> e0_answer_and_decoding_contract.eos_and_stop_semantics",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> e0_answer_and_decoding_contract.complete_token_id_sequence_per_surface_and_revision",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> numerical_closure_v0_7.derived_constants.e0_answer_token_count",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> checkpoint_functional_equivalence_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> estimands_v0_7.E0.is_the_primary_gate_for_rp_b",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> q0_and_rp_b_v0_7.ladder.fallback_stratum",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> deterministic_deferrals_v0_7.entries[DEFER-01]"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "The E0 two-token and max_new_tokens = 3 contract is a universal claim over tokenizers that are not pinned, with no fail-closed branch",
+   "why_existing_tests_did_or_did_not_detect_it": "test_the_e0_parser_rejects_prefixes_and_unregistered_surfaces checks the parser's reject list. test_checkpoint_equivalence_is_the_four_part_functional_test checks the four criteria are named. Neither test relates the two-token claim to the deferred revisions or to the isomorphic stratum, and the protocol schema leaves both keys as the empty schema."
+  },
+  {
+   "affected": "Whether the ceiling can be executed at all, what population a pass or failure describes, and the study's generated-token and compute cost.",
+   "authority_section": "5.7",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "The frozen block registers alpha 1/600, n 214, pass count 129, theta 1/2, p1 7/10, k 1, canonical route, route marker '<think>', parser id cot_ceiling_parser_v0_7, per-revision granularity, aggregation and reproducibility tolerance 0.",
+    "It registers no exact task population or stratum, no generator or bank relationship, and no operation or resource upper bound. The 17 registered development sampling cells are I1a/K2, I1b/K1, two I2/K3 cells, seven I3_K5 cells, two I3_K6 cells and four I4/K4 cells. None of them is the ceiling's cell, so the exact-binomial validity predicate cannot be checked for it.",
+    "Independently recomputed: at n = 214, theta = 1/2 and alpha = 1/600 the minimal critical count is 129, exact null tail 0.001597676081, exact power at 7/10 0.999042859186. The critical accuracy is 129/214 = 0.602803738318, which is distinct from the null floor 1/2 and from the registered restricted chance level 1/10.",
+    "theta_derivation states the ceiling 'reuses the registered I2 primitive-headroom construct exactly'. I2's population is stratum K3 single-primitive items read through a restricted two-token exact match. The ceiling is free generation with a required '<think>' route marker, a separate parser and a per-item generation length up to the whole remaining context. The operating characteristic is transplanted, not re-derived for the new measurement process.",
+    "DEFER-03 resolves the maximum generation length to 'the largest length the sealed checkpoint's registered context window permits after the rendered prompt and the registered EOS margin'. That is per item and per checkpoint, is not comparable across checkpoints with different context windows, appears in no operation projection, and places no upper bound on generated tokens or cost."
+   ],
+   "id": "S3V07-B10",
+   "minimal_operator_decision": "Decide the ceiling's exact task population, stratum, generator and bank relationship, and either a pre-registered generated-token resource bound or an explicit acceptance that the ceiling's cost is unbounded.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> generated_cot_ceiling_v0_7.frozen",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> generated_cot_ceiling_v0_7.frozen.theta_derivation",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> deterministic_deferrals_v0_7.entries[DEFER-03]",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> operation_boundaries.projected_future_operations.work_streams",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> sampling_frame_v0_4.development_sampling_cells"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "The generated-CoT ceiling registers no task population, no generator or bank relationship and no resource bound, and its reuse of the I2 construct is not established as construct-valid",
+   "why_existing_tests_did_or_did_not_detect_it": "test_the_ceiling_reuses_the_registered_i2_headroom_construct asserts the reuse rather than testing its validity, and test_the_ceiling_unit_is_the_item_and_k_is_singular checks two booleans. No test requires a registered population, a bank relationship or a resource bound, and the schema constrains only booleans and the failure state."
+  },
+  {
+   "affected": "Every decision-bearing value in the protocol, registry, pointer and amendment, including thresholds, gate membership, the normative protocol path, the manifest seal and the zero-operation counters.",
+   "authority_section": "5.10, 5.12",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "The v0.7 protocol schema declares 62 top-level properties. 52 of them are the empty schema {}, which accepts any value: they include gate_hierarchy, gate_truth_table, competence_floor_battery_v0_7, blocking_decisions, unresolved_operator_decisions, deterministic_deferrals_v0_7, state_machine_v0_4, recursive_manifest_seal_v0_7, negative_control_equivalence_v0_7, e0_answer_and_decoding_contract, positive_reference_candidates, operation_boundaries, proposed_statistics and power_architecture_v0_4.",
+    "generated_cot_ceiling_v0_7 constrains five booleans and one state string but not frozen.theta_exact_rational, frozen.n or frozen.pass_count. numerical_closure_v0_7 constrains three counters but not derived_constants. The registry schema leaves answer_surfaces and inherited_v0_6_scoring_boundary as bare objects and permits any wrapper_id. The pointer schema types every active_bundle path as a free string. The amendment schema leaves derived_constants, deterministic_deferrals, zero_operation_boundary and new_bundle as bare objects.",
+    "Artifact-only mutation testing in a temporary detached worktree at the reviewed commit: 16 decision-bearing mutations, 15 accepted by the committed schema. Only frozen/execution_authorized was rejected, by the two const clauses. Two mutations also passed the entire committed test module: setting the amendment's zero_operation_boundary.forward_passes to 4096 and confirmation_accesses to 1, and rewriting the amendment's generated-CoT theta to 1/10 and pass count to 108.",
+    "Coordinated mutation testing, which reproduces the path an author actually takes: edit v0_7_protocol_build.py, run it with --write, then run the committed test module. 7 of 7 decision-bearing coordinated mutations regenerated cleanly and passed all 58 tests: the generated-CoT route marker '<think>' to '<REASONING>'; the E0 answer token count 2 to 5, which moves max_new_tokens from 3 to 6; the shakedown max_gpu_hours 0 to 40; the RP-B ladder ordering rule replaced by operator judgement at seal time; the manifest inclusion glob replaced by a glob that matches nothing; the negative-control restricted chance level 1/10 to 4/10, which moves the bound from 17/100 to 47/100; and sole_top_level_normative_protocol redirected to the legacy JSON that the loader contract forbids loading.",
+    "test_the_schema_is_fail_closed asserts only additionalProperties = false and two const values, so a schema of 48 empty property schemas satisfies it. test_the_bundle_reproduces_byte_exactly_from_its_generator re-runs the drafting party's own generator and compares bytes, so it measures drift between artifact and generator, not whether a value is defensible."
+   ],
+   "id": "S3V07-B11",
+   "minimal_operator_decision": "Decide whether the v0.7 schemas must constrain decision-bearing values (enums, consts and exact rationals) and whether at least one validator must be independent of v0_7_protocol_build.py.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.schema.json",
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.schema.json",
+    "studies/study3/protocol/interface_calibration_protocol_current.schema.json",
+    "studies/study3/reviews/v0_7_operator_amendment.schema.json",
+    "tests/test_study3_v0_7_protocol.py::test_the_schema_is_fail_closed",
+    "tests/test_study3_v0_7_protocol.py::test_the_bundle_reproduces_byte_exactly_from_its_generator",
+    "studies/study3/analysis/v0_7_protocol_build.py"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "The schemas do not constrain decision-bearing values, and coordinated decision-bearing changes pass every committed validator",
+   "why_existing_tests_did_or_did_not_detect_it": "The committed tests detect artifact-only edits almost entirely through identity comparisons against the same generator that produced the bytes. Once the generator is edited too, the identity comparisons agree again and no substantive test objects."
+  },
+  {
+   "affected": "Which bytes are sealed, and therefore whether any decision-bearing artifact's byte-exact reproducibility criterion can be enforced.",
+   "authority_section": "5.11",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "inclusion is ten conceptual nouns with no paths: image digest, immutable checkpoint revisions, tokenizer files, renderer and wrapper registry, task banks, readout and parser code, thresholds and decision tables, analysis code, decoding configuration, and manifests and provenance records.",
+    "inclusion_path_globs is four globs: the v0.7 protocol family, the v0.7 registry family, studies/study3/analysis/*.py and studies/study3/analysis/*_tables.json.",
+    "Not covered by any glob: interface_calibration_protocol_current.json and its schema; the transitively normative v0.6 rendering registry; parser, renderer, runner and scoring code under src/; task banks and generators; checkpoint and tokenizer identities; wrapper assets; and any finalizer or validator outside studies/study3/analysis.",
+    "manifest_generation_script_is_included_and_hashed = true, but no manifest-generator path is named anywhere and no such script exists in the repository, so the level-one construction has no implementation to include or hash.",
+    "covers_all_decision_bearing_bytes = true is therefore not established.",
+    "Coordinated mutation C05 replaced studies/study3/analysis/*.py with a glob matching nothing and all 58 committed tests still passed."
+   ],
+   "id": "S3V07-B12",
+   "minimal_operator_decision": "Decide the exact named manifest-generator path and the deterministic future path rules that map every inclusion noun, including the pointer and the v0.6 registry, to concrete sealed paths.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> recursive_manifest_seal_v0_7.inclusion",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> recursive_manifest_seal_v0_7.inclusion_path_globs",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> recursive_manifest_seal_v0_7.manifest_generation_script_is_included_and_hashed",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> recursive_manifest_seal_v0_7.covers_all_decision_bearing_bytes"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "BLOCKING",
+   "title": "The recursive-manifest seal has no named generator, no mapped paths for most inclusion nouns, and omits the pointer and the normative v0.6 registry",
+   "why_existing_tests_did_or_did_not_detect_it": "test_the_manifest_seal_is_not_self_referential checks the self_referential and two-level fields only. No test resolves an inclusion noun to a path, checks glob coverage, or requires a named generator."
+  },
+  {
+   "affected": "Which review round adjudicates the statistics, the sampling frame, the power architecture, the state machine, the operation projections and OD5 and OD6.",
+   "authority_section": "5.4",
+   "creates_operator_discretion": true,
+   "evidence": [
+    "Eleven fields carry disposition_status PROPOSED_RESOLVED_SUBJECT_TO_FOURTH_INDEPENDENT_METHODS_REVIEW; proposed_statistics.unresolved[1] names 'the FOURTH independent methods review of draft-v0.5'; OD7's disposition states that 'A FOURTH independent methods review, of draft-v0.5, is now mandatory before freeze'; status.self_approval_prohibited and claim_ceiling.no_self_approval assign the determination to the fourth reviewer.",
+    "The registered active state is STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_7_COMPLETE_AWAITING_SINGLE_FOCUSED_METHODS_REVIEW and every disposition in the v0.7 operator amendment reads PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW.",
+    "status.note additionally reads 'draft-v0.5 is a bounded operator amendment produced in response to the THIRD independent methods review', which describes a different document version.",
+    "None of the fifteen fields is mechanically identified as historical."
+   ],
+   "id": "S3V07-M01",
+   "minimal_operator_decision": "Decide whether the fifteen fields are rewritten to name the single focused review, or are mechanically marked historical and excluded from active interpretation.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> state_machine_v0_4.disposition_status",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> proposed_statistics.disposition_status",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> proposed_statistics.unresolved[1]",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> power_architecture_v0_4.disposition_status",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> sampling_frame_v0_4.disposition_status",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> operation_boundaries.projected_future_operations.disposition_status",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> i3_contrast_registry.disposition_status",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> development_selection_and_confirmation_plan.disposition_status",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> operation_ontology_v0_4.disposition_status",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> retired_procedures.tango_paired_equivalence.disposition_status",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> unresolved_operator_decisions[OD5,OD6].disposition_status",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> unresolved_operator_decisions[OD7].disposition",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> status.self_approval_prohibited",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> status.note",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> claim_ceiling.no_self_approval"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "MAJOR",
+   "title": "Fifteen active decision-bearing fields assign adjudication to a 'fourth independent methods review of draft-v0.5'",
+   "why_existing_tests_did_or_did_not_detect_it": "test_the_governance_state_is_preserved checks the state string. No committed test scans active fields for a review-round mismatch, and the schema leaves every one of these keys as the empty schema."
+  },
+  {
+   "affected": "The marker-completeness and Markdown-agreement guarantees for eight decision-bearing blocks, including the negative control and the zero-operation boundary.",
+   "authority_section": "5.4, 5.12",
+   "creates_operator_discretion": false,
+   "evidence": [
+    "decision_markers_v0_7 registers 14 markers V07-D01..V07-D14. Their json_key values omit negative_control_equivalence_v0_7, numerical_closure_v0_7, provenance_v0_7, zero_operation_boundary_v0_7, prohibited_language_v0_7, p0_r2_historical_treatment_v0_7, focused_review_packet_v0_7 and decision_markers_v0_7 itself.",
+    "The Markdown companion therefore has no obligation to agree with those blocks, and it files the negative-control paragraph under the 'Engineering shakedown authority [V07-D10]' heading."
+   ],
+   "id": "S3V07-M02",
+   "minimal_operator_decision": "Decide whether the eight blocks receive decision markers and Markdown sections, or are explicitly declared non-decision-bearing.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> decision_markers_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> negative_control_equivalence_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> numerical_closure_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> provenance_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> zero_operation_boundary_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> prohibited_language_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> p0_r2_historical_treatment_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> focused_review_packet_v0_7",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.md"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "MAJOR",
+   "title": "Eight v0.7 blocks carry no decision marker, so the marker and Markdown agreement tests never reach them",
+   "why_existing_tests_did_or_did_not_detect_it": "test_every_decision_marker_appears_exactly_once_in_the_markdown and test_every_decision_marker_resolves_to_a_real_protocol_key iterate over the registered marker list, so an unregistered block is invisible to both."
+  },
+  {
+   "affected": "A reader's understanding of whether draft-v0.7 is executable and whether any decision is still open.",
+   "authority_section": "5.1, 5.4",
+   "creates_operator_discretion": false,
+   "evidence": [
+    "The Markdown states 'Every legacy top-level key is carried forward, so an executor reads one protocol plus the exact subordinate assets it names, and never layers v0.5, v0.6 and v0.7 by hand', which finding S3V07-B02 contradicts.",
+    "The Markdown records no blocking decision anywhere, while the JSON records blocking_decisions = ['OD2'] and OD2 blocks freeze.",
+    "The Markdown presents the RP-B ladder as ordered by predeclared observable metadata without disclosing that ladder.blocked_on = 'OD2'."
+   ],
+   "id": "S3V07-M03",
+   "minimal_operator_decision": "Decide whether the Markdown must disclose blocking_decisions and drop the self-containment sentence.",
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.md",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> blocking_decisions",
+    "tests/test_study3_v0_7_protocol.py::test_the_markdown_agrees_with_the_decision_bearing_numbers"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "MAJOR",
+   "title": "The Markdown companion asserts self-containment and records no blocking decision",
+   "why_existing_tests_did_or_did_not_detect_it": "test_the_markdown_agrees_with_the_decision_bearing_numbers checks three battery rows, three exact rationals and the state string. It does not require the Markdown to disclose blocking_decisions."
+  },
+  {
+   "affected": "Nothing. The field records provenance of validation runs and enters no estimand, threshold, gate, transition, parser, interface or normative byte.",
+   "authority_section": "5.12",
+   "creates_operator_discretion": false,
+   "evidence": [
+    "local_pytest = 'not run in this round' and decision_bearing_local_statistical_runs = 0, while authoritative_validation names clean CPU-only Azure Container Registry task runs. This reviewer's runs are local and are disclosed as such."
+   ],
+   "id": "S3V07-N01",
+   "minimal_operator_decision": null,
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> operation_boundaries.local_operations_disclosure"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "MINOR",
+   "title": "The local-operations disclosure records that no local pytest run occurred, which is a disclosure field with no gate effect",
+   "why_existing_tests_did_or_did_not_detect_it": "No test asserts anything about this field, and none needs to."
+  },
+  {
+   "affected": "Nothing beyond readability. The substantive OD2 status is carried by S3V07-B03 and these strings cannot independently change a gate.",
+   "authority_section": "5.4",
+   "creates_operator_discretion": false,
+   "evidence": [
+    "selection_status ends 'in draft-v0.4'; prequalification_stage_proposal.floor says the floor 'is not set by draft-v0.4'; OD2 carries a v0_4_note. These are version-stamped historical notes whose substantive content is unchanged in v0.7 and is already captured by finding S3V07-B03."
+   ],
+   "id": "S3V07-N02",
+   "minimal_operator_decision": null,
+   "paths_and_fields": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> positive_reference_candidates.selection_status",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> positive_reference_candidates.prequalification_stage_proposal.floor",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json -> unresolved_operator_decisions[OD2].v0_4_note"
+   ],
+   "reviewer_implemented_a_repair": false,
+   "severity": "MINOR",
+   "title": "Several carried-forward dispositions still describe their own progress as 'draft-v0.4' or 'draft-v0.3'",
+   "why_existing_tests_did_or_did_not_detect_it": "No test checks version stamps in prose fields."
+  }
+ ],
+ "full_suite_differential": {
+  "base_commit": "5b961cb42bada34a88a7895f83ccb2af4e5690e5",
+  "failing_node_ids_at_base_commit": [
+   "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+   "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+   "tests/test_phase1_0d_build_provenance.py::test_the_bundle_digest_ignores_the_checkout_line_endings",
+   "tests/test_phase1_0d_generation_launcher_rp_compat.py::test_shim_has_valid_bash_syntax_and_frozen_launcher_remains_in_baseline",
+   "tests/test_phase1_0d_protected_bytes.py::test_line_endings_do_not_change_the_rollup",
+   "tests/test_phase1_0d_review_image.py::test_v2_refuses_a_rehashed_record_with_moved_metadata",
+   "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+  ],
+  "failing_node_ids_at_review_head": [
+   "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+   "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+   "tests/test_phase1_0d_build_provenance.py::test_the_bundle_digest_ignores_the_checkout_line_endings",
+   "tests/test_phase1_0d_generation_launcher_rp_compat.py::test_shim_has_valid_bash_syntax_and_frozen_launcher_remains_in_baseline",
+   "tests/test_phase1_0d_protected_bytes.py::test_line_endings_do_not_change_the_rollup",
+   "tests/test_phase1_0d_review_image.py::test_v2_refuses_a_rehashed_record_with_moved_metadata",
+   "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+  ],
+  "new_failures_introduced_by_v0_7": 0,
+  "review_head_result": "7 failed, 4926 passed, 16 skipped",
+  "standing_failures_are_byte_identical": true
+ },
+ "independence": {
+  "did_not_draft_the_amendment_artifacts_or_tests": true,
+  "did_not_draft_the_consolidated_amendment_authority": true,
+  "did_not_draft_the_copy_on_write_successor_authority": true,
+  "did_not_draft_the_protocol_builder": true,
+  "did_not_draft_v0_7": true
+ },
+ "independent_recalculation": {
+  "agreement_count": 74,
+  "does_not_import": [
+   "studies/study3/analysis/v0_7_protocol_build.py",
+   "studies/study3/analysis/design_statistics.py",
+   "studies/study3/analysis/scoring_boundary_v0_6.py"
+  ],
+  "external_packages_used": [],
+  "mismatch_count": 6,
+  "script": "studies/study3/analysis/independent_methods_recalculation_v0_7.py",
+  "tables": "studies/study3/analysis/independent_methods_recalculation_tables_v0_7.json"
+ },
+ "mutation_testing": {
+  "artifact_only_accepted_by_schema": 15,
+  "artifact_only_mutations": 16,
+  "artifact_only_surviving_schema_and_semantic_tests": 2,
+  "coordinated_mutations": 7,
+  "coordinated_surviving_every_committed_validator": 7,
+  "performed_in": "a temporary detached git worktree at the reviewed commit",
+  "reviewed_worktree_modified": false
+ },
+ "next_legal_action": "one operator-level decision on the twelve BLOCKING and three MAJOR findings, issued as a new authority. This review implements no repair, drafts no v0.8 or v0.7.1, proposes no automatic amendment, and does not continue into freeze or execution.",
+ "review_identity": {
+  "is_a_freeze": false,
+  "is_a_repair": false,
+  "is_an_amendment": false,
+  "reviewed_commit": "459d002442641039196ac3880d47a45a3b79a4c8",
+  "reviewed_parent": "b9cddfc3a4c57a55bfef6105702be914c2545da1",
+  "reviewed_tree": "2c84d55e6a965972e7cd3f69e3b0cded0bddfb04",
+  "round": "single independent focused methods review"
+ },
+ "schema_version": "study3-v0-7-single-focused-methods-review",
+ "severity_counts": {
+  "BLOCKING": 12,
+  "MAJOR": 3,
+  "MINOR": 2
+ },
+ "starting_state_integrity": {
+  "changed_path_set_is_thirteen_additions_and_one_additive_readme_modification": true,
+  "clean_worktree_at_review_start": true,
+  "evidence_ledger_ends_at": "EV-0016",
+  "force_push_count_is_not_establishable_from_the_git_dag": true,
+  "formal_execution_authorized": false,
+  "head_equals_fetched_origin_main_at_review_start": true,
+  "linear_commits_ahead_of_5b961cb": 3,
+  "merge_commits_in_that_range": 0,
+  "repository": "Alanjiao1988/J-space-observation"
+ },
+ "verdict": "STUDY3_V0_7_TERMINAL_OPERATOR_DECISION_REQUIRED"
+}

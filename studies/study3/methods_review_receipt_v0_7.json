@@ -1,0 +1,207 @@
+{
+ "ancestry": {
+  "authority_only_commit": "66fec8af948e4c21c6818d0007bd2b3619738b4e",
+  "authority_only_tree": "d717130936e4bd7537fe0862f3d6a7826fe7b283",
+  "final_commit_note": "a receipt cannot contain the hash of the commit that introduces it; the final commit and tree are stated in the review disclosure and are the commit that adds this file",
+  "linear_commits_ahead_of_5b961cb_at_review_start": 3,
+  "merge_commits_since_the_reviewed_target": 0,
+  "no_force_push_performed_by_this_review": true,
+  "no_history_rewrite_merge_or_rebase_performed": true,
+  "publication_order": [
+   "the review authority alone",
+   "the independent recalculation script and tables",
+   "the review report, JSON, schema, receipt and tests"
+  ],
+  "recalculation_commit": "d5ead7f1a2e376810dd71fedbcdbc98d43ee7e4f",
+  "recalculation_tree": "d5d046e8f7bee616477efc9eebc64361354e962f",
+  "reviewed_commit": "459d002442641039196ac3880d47a45a3b79a4c8",
+  "reviewed_parent": "b9cddfc3a4c57a55bfef6105702be914c2545da1",
+  "reviewed_tree": "2c84d55e6a965972e7cd3f69e3b0cded0bddfb04",
+  "the_git_dag_cannot_establish_an_historical_force_push_count": true
+ },
+ "committed_authority": {
+  "bytes": 16515,
+  "git_blob": "428af94069adffb9636499313405d7c1153445ab",
+  "newline_convention": "LF only, no BOM, exactly one trailing newline",
+  "path": "studies/study3/prompts/study3_v0_7_single_focused_methods_review_authority.md",
+  "published_alone_before_any_review_finding": true,
+  "sha256": "83d5d21975601ad99b505ed7e35dad263fb453e503752ebf2b5d5f78c12f7c5b"
+ },
+ "disposition": "STUDY3_V0_7_TERMINAL_OPERATOR_DECISION_REQUIRED",
+ "document_class": "independent_methods_review_receipt",
+ "evidence_ledger": {
+  "bytes_changed_by_this_review": 0,
+  "rows_added_by_this_review": 0,
+  "tail": "EV-0016"
+ },
+ "full_suite_differential": {
+  "base_commit_for_standing_failures": "5b961cb42bada34a88a7895f83ccb2af4e5690e5",
+  "new_failures_introduced_by_v0_7": 0,
+  "review_head_result": "7 failed, 4926 passed, 16 skipped",
+  "standing_failure_node_ids": [
+   "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+   "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+   "tests/test_phase1_0d_build_provenance.py::test_the_bundle_digest_ignores_the_checkout_line_endings",
+   "tests/test_phase1_0d_generation_launcher_rp_compat.py::test_shim_has_valid_bash_syntax_and_frozen_launcher_remains_in_baseline",
+   "tests/test_phase1_0d_protected_bytes.py::test_line_endings_do_not_change_the_rollup",
+   "tests/test_phase1_0d_review_image.py::test_v2_refuses_a_rehashed_record_with_moved_metadata",
+   "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+  ],
+  "standing_failures_are_byte_identical_at_base_and_review_head": true,
+  "standing_failures_are_host_checkout_line_ending_artifacts_not_v0_7_failures": true
+ },
+ "independence": {
+  "did_not_draft_draft_v0_7": true,
+  "did_not_draft_the_amendment_artifacts": true,
+  "did_not_draft_the_candidate_tests": true,
+  "did_not_draft_the_consolidated_amendment_authority": true,
+  "did_not_draft_the_copy_on_write_successor_authority": true,
+  "did_not_draft_the_protocol_builder": true
+ },
+ "independent_implementation": {
+  "does_not_import_a_production_gate_calculator": true,
+  "does_not_import_design_statistics_py": true,
+  "does_not_import_scoring_boundary_v0_6_py": true,
+  "does_not_import_v0_7_protocol_build_py": true,
+  "exact_arithmetic": "integer binomial sums over a common denominator, reduced once, with fractions.Fraction comparisons; no floating-point tolerance is used in any comparison",
+  "external_packages_used": [],
+  "recalculation_agreements": 74,
+  "recalculation_mismatches": 6,
+  "stdlib_modules_used": [
+   "argparse",
+   "fractions",
+   "json",
+   "math",
+   "pathlib",
+   "sys"
+  ]
+ },
+ "local_operations_disclosure": {
+  "full_suite_runs": 1,
+  "local_pytest_runs": "the committed v0.7 candidate module, the new focused-review module, the full suite at the review head, six test files at the base commit, and the mutation and coordinated-mutation batches inside a temporary worktree",
+  "mutation_worktree": "a temporary detached git worktree at 459d002442641039196ac3880d47a45a3b79a4c8, removed after use; the reviewed worktree was never mutated",
+  "no_cloud_validation_was_performed_by_this_review": true,
+  "platform": "Windows, CPU only"
+ },
+ "mutation_testing": {
+  "artifact_only_accepted_by_the_committed_schema": 15,
+  "artifact_only_mutations_applied": 16,
+  "artifact_only_surviving_schema_and_semantic_tests": 2,
+  "coordinated_mutations_applied": 7,
+  "coordinated_mutations_surviving_every_committed_validator": 7,
+  "coordinated_mutation_definition": "edit v0_7_protocol_build.py, run it with --write, then run the complete committed test module; this reproduces the path an author actually takes and defeats the byte-identity regeneration test",
+  "reviewed_worktree_modified": false
+ },
+ "new_artifacts": {
+  "studies/study3/analysis/independent_methods_recalculation_tables_v0_7.json": {
+   "bytes": 21304,
+   "sha256": "9b97753be2d710feeee52807b81271bc6c2af57af0835b07c98a3504b664899b"
+  },
+  "studies/study3/analysis/independent_methods_recalculation_v0_7.py": {
+   "bytes": 34956,
+   "sha256": "6c3da321084136fda19e972188f0ab81265a737a13205d170d23bbf28d31cf02"
+  },
+  "studies/study3/reviews/v0_7_single_focused_methods_review.json": {
+   "bytes": 56758,
+   "sha256": "e8f72076f40d1eae303fea91758816857c08de02333992388c5f305d6860f6fa"
+  },
+  "studies/study3/reviews/v0_7_single_focused_methods_review.md": {
+   "bytes": 21928,
+   "sha256": "a008e3250d3282d8091fd388fa33d7bf80a99258a60fb991f4cdc4b2a3b7946a"
+  },
+  "studies/study3/reviews/v0_7_single_focused_methods_review.schema.json": {
+   "bytes": 10376,
+   "sha256": "f01ce5a126c2a814495a882c612f1a3fd734e810a9c82bb6de2ecb8dede804a2"
+  },
+  "tests/test_study3_v0_7_focused_review.py": {
+   "bytes": 23504,
+   "sha256": "85592e7d20e21f7c845371a1e1a4ff17558471327887bc04af4314cc2b726f80"
+  }
+ },
+ "next_legal_action": "one operator-level decision on the twelve BLOCKING and three MAJOR findings, issued as a new authority",
+ "operation_counters": {
+  "activation_loads": 0,
+  "adapter_loads": 0,
+  "azure_acr_aca_gpu_cloud_operations": 0,
+  "checkpoint_downloads": 0,
+  "checkpoint_loads": 0,
+  "checkpoint_resolutions": 0,
+  "confirmation_accesses": 0,
+  "evidence_rows_added": 0,
+  "forward_passes": 0,
+  "generations": 0,
+  "interface_qualifications": 0,
+  "interface_selections": 0,
+  "logit_reads": 0,
+  "model_output_parses": 0,
+  "model_weight_loads": 0,
+  "prefills": 0,
+  "rp_b_qualifications": 0,
+  "rp_m_qualifications": 0,
+  "scientific_evidence_claims": 0,
+  "scoring_operations": 0,
+  "seeds_drawn": 0,
+  "split_realizations": 0,
+  "task_bank_rows_generated": 0,
+  "tokenizer_constructions": 0,
+  "tokenizer_decodes": 0,
+  "tokenizer_encodes": 0
+ },
+ "protected_bytes": {
+  "design_statistics_check": "DESIGN_STATISTICS_CHECK_OK sections=20",
+  "historical_protected_paths_changed": 0,
+  "legacy_protocol_trio_unchanged": true,
+  "p0_corpus_manifest_unchanged": true,
+  "p0_freeze_corpus_check": "OK the committed frozen P0 corpus reproduces byte-exactly",
+  "p0_protocol_check": "OK the committed P0 protocol reproduces byte-exactly",
+  "placement_probe_still_reproducible": true,
+  "reviewed_candidate_paths_changed": 0,
+  "v0_7_protocol_build_check": "STUDY3_V0_7_BUNDLE_REPRODUCES=1 files=10"
+ },
+ "rejection_class": "unresolved_blocking_and_major_methods_findings",
+ "remaining_legal_authority": {
+  "may_begin_execution": false,
+  "may_draft_a_repair_or_an_automatic_amendment": false,
+  "may_draft_v0_7_1": false,
+  "may_draft_v0_8": false,
+  "may_freeze": false,
+  "review_acceptance_would_not_have_authorized_execution": true
+ },
+ "reviewed_object": {
+  "amendment": "studies/study3/reviews/v0_7_operator_amendment.json",
+  "current_pointer": "studies/study3/protocol/interface_calibration_protocol_current.json",
+  "draft_version": "draft-v0.7",
+  "protocol_json": "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json",
+  "rendering_registry": "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.json",
+  "state_at_review": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_7_COMPLETE_AWAITING_SINGLE_FOCUSED_METHODS_REVIEW"
+ },
+ "round": "single independent focused methods review of draft-v0.7",
+ "schema_version": "study3-v0-7-methods-review-receipt",
+ "selection_state": {
+  "banks_generated": 0,
+  "formal_execution_authorized": false,
+  "frozen": false,
+  "interface_selected": false,
+  "positive_reference_selected": false,
+  "research_question_answered": false,
+  "seeds_drawn": 0
+ },
+ "self_hash_excluded": "this receipt records the hashes of the other review artifacts and never its own",
+ "severity_counts": {
+  "BLOCKING": 12,
+  "MAJOR": 3,
+  "MINOR": 2
+ },
+ "source_authority": {
+  "binding_order": [
+   "studies/study3/prompts/study3_v0_7_single_focused_methods_review_authority.md",
+   "studies/study3/prompts/study3_v0_7_copy_on_write_protocol_successor_authority.md",
+   "studies/study3/prompts/study3_v0_7_consolidated_amendment_authority.md",
+   "earlier Study 3 authorities and immutable history"
+  ],
+  "path": "studies/study3/prompts/study3_v0_7_single_focused_methods_review_authority.md"
+ },
+ "starting_commit": "459d002442641039196ac3880d47a45a3b79a4c8",
+ "starting_tree": "2c84d55e6a965972e7cd3f69e3b0cded0bddfb04",
+ "state": "STUDY3_V0_7_TERMINAL_OPERATOR_DECISION_REQUIRED"
+}

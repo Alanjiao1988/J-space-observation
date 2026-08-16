@@ -1,0 +1,444 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "properties": {
+  "authority": {
+   "additionalProperties": false,
+   "properties": {
+    "bytes": {
+     "const": 16515
+    },
+    "commit": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    },
+    "git_blob": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    },
+    "newline_convention": {
+     "const": "LF only, no BOM, exactly one trailing newline"
+    },
+    "path": {
+     "const": "studies/study3/prompts/study3_v0_7_single_focused_methods_review_authority.md"
+    },
+    "published_alone_as_the_first_commit_after_the_reviewed_target": {
+     "const": true
+    },
+    "sha256": {
+     "pattern": "^[0-9a-f]{64}$",
+     "type": "string"
+    },
+    "tree": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    }
+   },
+   "required": [
+    "path",
+    "bytes",
+    "sha256",
+    "git_blob",
+    "newline_convention",
+    "commit",
+    "tree",
+    "published_alone_as_the_first_commit_after_the_reviewed_target"
+   ],
+   "type": "object"
+  },
+  "boundary": {
+   "additionalProperties": false,
+   "properties": {
+    "evidence_ledger_tail": {
+     "const": "EV-0016"
+    },
+    "formal_execution_authorized": {
+     "const": false
+    },
+    "historical_protected_paths_changed": {
+     "const": 0
+    },
+    "prohibited_operation_counters": {
+     "additionalProperties": {
+      "const": 0
+     },
+     "type": "object"
+    },
+    "research_question_answered": {
+     "const": false
+    },
+    "reviewed_candidate_paths_changed": {
+     "const": 0
+    }
+   },
+   "required": [
+    "reviewed_candidate_paths_changed",
+    "historical_protected_paths_changed",
+    "prohibited_operation_counters",
+    "evidence_ledger_tail",
+    "formal_execution_authorized",
+    "research_question_answered"
+   ],
+   "type": "object"
+  },
+  "findings": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "affected": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "authority_section": {
+      "pattern": "^5\\.[0-9]+([, ]+5\\.[0-9]+)*$",
+      "type": "string"
+     },
+     "creates_operator_discretion": {
+      "type": "boolean"
+     },
+     "evidence": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "id": {
+      "pattern": "^S3V07-[BMN][0-9]{2}$",
+      "type": "string"
+     },
+     "minimal_operator_decision": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "paths_and_fields": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "reviewer_implemented_a_repair": {
+      "const": false
+     },
+     "severity": {
+      "enum": [
+       "BLOCKING",
+       "MAJOR",
+       "MINOR"
+      ]
+     },
+     "title": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "why_existing_tests_did_or_did_not_detect_it": {
+      "minLength": 1,
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "severity",
+     "authority_section",
+     "title",
+     "paths_and_fields",
+     "evidence",
+     "affected",
+     "why_existing_tests_did_or_did_not_detect_it",
+     "creates_operator_discretion",
+     "minimal_operator_decision",
+     "reviewer_implemented_a_repair"
+    ],
+    "type": "object"
+   },
+   "minItems": 1,
+   "type": "array"
+  },
+  "full_suite_differential": {
+   "additionalProperties": false,
+   "properties": {
+    "base_commit": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    },
+    "failing_node_ids_at_base_commit": {
+     "items": {
+      "type": "string"
+     },
+     "type": "array"
+    },
+    "failing_node_ids_at_review_head": {
+     "items": {
+      "type": "string"
+     },
+     "type": "array"
+    },
+    "new_failures_introduced_by_v0_7": {
+     "const": 0
+    },
+    "review_head_result": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "standing_failures_are_byte_identical": {
+     "const": true
+    }
+   },
+   "required": [
+    "review_head_result",
+    "failing_node_ids_at_review_head",
+    "base_commit",
+    "failing_node_ids_at_base_commit",
+    "standing_failures_are_byte_identical",
+    "new_failures_introduced_by_v0_7"
+   ],
+   "type": "object"
+  },
+  "independence": {
+   "additionalProperties": false,
+   "properties": {
+    "did_not_draft_the_amendment_artifacts_or_tests": {
+     "const": true
+    },
+    "did_not_draft_the_consolidated_amendment_authority": {
+     "const": true
+    },
+    "did_not_draft_the_copy_on_write_successor_authority": {
+     "const": true
+    },
+    "did_not_draft_the_protocol_builder": {
+     "const": true
+    },
+    "did_not_draft_v0_7": {
+     "const": true
+    }
+   },
+   "required": [
+    "did_not_draft_v0_7",
+    "did_not_draft_the_consolidated_amendment_authority",
+    "did_not_draft_the_copy_on_write_successor_authority",
+    "did_not_draft_the_protocol_builder",
+    "did_not_draft_the_amendment_artifacts_or_tests"
+   ],
+   "type": "object"
+  },
+  "independent_recalculation": {
+   "additionalProperties": false,
+   "properties": {
+    "agreement_count": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "does_not_import": {
+     "items": {
+      "type": "string"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "external_packages_used": {
+     "maxItems": 0,
+     "type": "array"
+    },
+    "mismatch_count": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "script": {
+     "const": "studies/study3/analysis/independent_methods_recalculation_v0_7.py"
+    },
+    "tables": {
+     "const": "studies/study3/analysis/independent_methods_recalculation_tables_v0_7.json"
+    }
+   },
+   "required": [
+    "script",
+    "tables",
+    "external_packages_used",
+    "does_not_import",
+    "agreement_count",
+    "mismatch_count"
+   ],
+   "type": "object"
+  },
+  "mutation_testing": {
+   "additionalProperties": false,
+   "properties": {
+    "artifact_only_accepted_by_schema": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "artifact_only_mutations": {
+     "minimum": 10,
+     "type": "integer"
+    },
+    "artifact_only_surviving_schema_and_semantic_tests": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "coordinated_mutations": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "coordinated_surviving_every_committed_validator": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "performed_in": {
+     "const": "a temporary detached git worktree at the reviewed commit"
+    },
+    "reviewed_worktree_modified": {
+     "const": false
+    }
+   },
+   "required": [
+    "performed_in",
+    "reviewed_worktree_modified",
+    "artifact_only_mutations",
+    "artifact_only_accepted_by_schema",
+    "artifact_only_surviving_schema_and_semantic_tests",
+    "coordinated_mutations",
+    "coordinated_surviving_every_committed_validator"
+   ],
+   "type": "object"
+  },
+  "next_legal_action": {
+   "minLength": 1,
+   "type": "string"
+  },
+  "review_identity": {
+   "additionalProperties": false,
+   "properties": {
+    "is_an_amendment": {
+     "const": false
+    },
+    "is_a_freeze": {
+     "const": false
+    },
+    "is_a_repair": {
+     "const": false
+    },
+    "reviewed_commit": {
+     "const": "459d002442641039196ac3880d47a45a3b79a4c8"
+    },
+    "reviewed_parent": {
+     "const": "b9cddfc3a4c57a55bfef6105702be914c2545da1"
+    },
+    "reviewed_tree": {
+     "const": "2c84d55e6a965972e7cd3f69e3b0cded0bddfb04"
+    },
+    "round": {
+     "const": "single independent focused methods review"
+    }
+   },
+   "required": [
+    "round",
+    "reviewed_commit",
+    "reviewed_tree",
+    "reviewed_parent",
+    "is_an_amendment",
+    "is_a_freeze",
+    "is_a_repair"
+   ],
+   "type": "object"
+  },
+  "schema_version": {
+   "const": "study3-v0-7-single-focused-methods-review"
+  },
+  "severity_counts": {
+   "additionalProperties": false,
+   "properties": {
+    "BLOCKING": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "MAJOR": {
+     "minimum": 0,
+     "type": "integer"
+    },
+    "MINOR": {
+     "minimum": 0,
+     "type": "integer"
+    }
+   },
+   "required": [
+    "BLOCKING",
+    "MAJOR",
+    "MINOR"
+   ],
+   "type": "object"
+  },
+  "starting_state_integrity": {
+   "additionalProperties": false,
+   "properties": {
+    "changed_path_set_is_thirteen_additions_and_one_additive_readme_modification": {
+     "const": true
+    },
+    "clean_worktree_at_review_start": {
+     "const": true
+    },
+    "evidence_ledger_ends_at": {
+     "const": "EV-0016"
+    },
+    "force_push_count_is_not_establishable_from_the_git_dag": {
+     "const": true
+    },
+    "formal_execution_authorized": {
+     "const": false
+    },
+    "head_equals_fetched_origin_main_at_review_start": {
+     "const": true
+    },
+    "linear_commits_ahead_of_5b961cb": {
+     "const": 3
+    },
+    "merge_commits_in_that_range": {
+     "const": 0
+    },
+    "repository": {
+     "const": "Alanjiao1988/J-space-observation"
+    }
+   },
+   "required": [
+    "repository",
+    "head_equals_fetched_origin_main_at_review_start",
+    "clean_worktree_at_review_start",
+    "linear_commits_ahead_of_5b961cb",
+    "merge_commits_in_that_range",
+    "changed_path_set_is_thirteen_additions_and_one_additive_readme_modification",
+    "evidence_ledger_ends_at",
+    "formal_execution_authorized",
+    "force_push_count_is_not_establishable_from_the_git_dag"
+   ],
+   "type": "object"
+  },
+  "verdict": {
+   "enum": [
+    "STUDY3_V0_7_FOCUSED_METHODS_REVIEW_ACCEPTED_AWAITING_SEPARATE_FREEZE_AUTHORITY",
+    "STUDY3_V0_7_TERMINAL_OPERATOR_DECISION_REQUIRED"
+   ]
+  }
+ },
+ "required": [
+  "schema_version",
+  "review_identity",
+  "independence",
+  "starting_state_integrity",
+  "authority",
+  "independent_recalculation",
+  "mutation_testing",
+  "full_suite_differential",
+  "findings",
+  "severity_counts",
+  "boundary",
+  "verdict",
+  "next_legal_action"
+ ],
+ "title": "Study 3 draft-v0.7 single independent focused methods review",
+ "type": "object"
+}
