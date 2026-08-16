@@ -1,0 +1,387 @@
+{
+ "$id": "https://study3r.invalid/study3r_checkpoint_acquisition_v1.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "properties": {
+  "authority": {
+   "const": "studies/study3r/prompts/study3r_protocol_v1_authoring_authority.md"
+  },
+  "checkpoints": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "acquired_files": {
+      "items": {
+       "additionalProperties": false,
+       "properties": {
+        "bytes": {
+         "minimum": 1,
+         "type": "integer"
+        },
+        "path": {
+         "enum": [
+          "config.json",
+          "generation_config.json",
+          "tokenizer_config.json",
+          "tokenizer.json"
+         ],
+         "type": "string"
+        },
+        "sha256": {
+         "pattern": "^[0-9a-f]{64}$",
+         "type": "string"
+        }
+       },
+       "required": [
+        "bytes",
+        "path",
+        "sha256"
+       ],
+       "type": "object"
+      },
+      "minItems": 3,
+      "type": "array"
+     },
+     "immutable_revision": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+     },
+     "local_paths_on_disk": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 3,
+      "type": "array"
+     },
+     "repository_id": {
+      "enum": [
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+       "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+      ],
+      "type": "string"
+     },
+     "repository_paths_at_revision": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "role": {
+      "enum": [
+       "RT",
+       "RP_B1",
+       "RP_B2",
+       "RP_B3"
+      ],
+      "type": "string"
+     },
+     "weight_bytes_acquired": {
+      "const": 0
+     },
+     "weight_paths_present_in_repository": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "weight_paths_requested": {
+      "items": {
+       "type": "string"
+      },
+      "maxItems": 0,
+      "type": "array"
+     }
+    },
+    "required": [
+     "acquired_files",
+     "immutable_revision",
+     "local_paths_on_disk",
+     "repository_id",
+     "repository_paths_at_revision",
+     "role",
+     "weight_bytes_acquired",
+     "weight_paths_present_in_repository",
+     "weight_paths_requested"
+    ],
+    "type": "object"
+   },
+   "maxItems": 4,
+   "minItems": 4,
+   "type": "array"
+  },
+  "counters": {
+   "additionalProperties": false,
+   "properties": {
+    "chat_template_renders": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "decode_calls": {
+     "const": 0
+    },
+    "encode_calls": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "evidence_ledger_rows_written": {
+     "const": 0
+    },
+    "execution_seeds_drawn": {
+     "const": 0
+    },
+    "files_acquired": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "forward_passes": {
+     "const": 0
+    },
+    "generations": {
+     "const": 0
+    },
+    "gpu_or_cloud_jobs": {
+     "const": 0
+    },
+    "interfaces_selected": {
+     "const": 0
+    },
+    "logit_reads": {
+     "const": 0
+    },
+    "model_constructions": {
+     "const": 0
+    },
+    "network_file_downloads": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "network_metadata_requests": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "prefill_operations": {
+     "const": 0
+    },
+    "remote_code_executions": {
+     "const": 0
+    },
+    "scientific_items_realized": {
+     "const": 0
+    },
+    "scoring_operations": {
+     "const": 0
+    },
+    "tokenizer_constructions": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "weight_files_acquired": {
+     "const": 0
+    }
+   },
+   "required": [
+    "chat_template_renders",
+    "decode_calls",
+    "encode_calls",
+    "evidence_ledger_rows_written",
+    "execution_seeds_drawn",
+    "files_acquired",
+    "forward_passes",
+    "generations",
+    "gpu_or_cloud_jobs",
+    "interfaces_selected",
+    "logit_reads",
+    "model_constructions",
+    "network_file_downloads",
+    "network_metadata_requests",
+    "prefill_operations",
+    "remote_code_executions",
+    "scientific_items_realized",
+    "scoring_operations",
+    "tokenizer_constructions",
+    "weight_files_acquired"
+   ],
+   "type": "object"
+  },
+  "download_allow_list": {
+   "items": {
+    "enum": [
+     "config.json",
+     "generation_config.json",
+     "tokenizer_config.json",
+     "tokenizer.json"
+    ],
+    "type": "string"
+   },
+   "minItems": 1,
+   "type": "array"
+  },
+  "library_versions": {
+   "additionalProperties": false,
+   "properties": {
+    "huggingface_hub": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "python": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "tokenizers": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "transformers": {
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "huggingface_hub",
+    "python",
+    "tokenizers",
+    "transformers"
+   ],
+   "type": "object"
+  },
+  "network_request_count": {
+   "minimum": 1,
+   "type": "integer"
+  },
+  "network_requests": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "kind": {
+      "enum": [
+       "metadata",
+       "file"
+      ],
+      "type": "string"
+     },
+     "method": {
+      "const": "GET"
+     },
+     "url": {
+      "pattern": "^https://huggingface\\.co/",
+      "type": "string"
+     }
+    },
+    "required": [
+     "kind",
+     "method",
+     "url"
+    ],
+    "type": "object"
+   },
+   "minItems": 1,
+   "type": "array"
+  },
+  "no_weight_file_proof": {
+   "additionalProperties": false,
+   "properties": {
+    "every_acquired_path_is_in_the_allow_list": {
+     "const": true
+    },
+    "no_acquired_path_has_a_weight_suffix": {
+     "const": true
+    },
+    "weight_bytes_acquired_total": {
+     "const": 0
+    },
+    "weight_files_acquired_total": {
+     "const": 0
+    },
+    "weight_paths_requested_total": {
+     "const": 0
+    },
+    "weight_suffixes_treated_as_weight_bearing": {
+     "items": {
+      "enum": [
+       ".safetensors",
+       ".bin",
+       ".pt",
+       ".pth",
+       ".ckpt",
+       ".h5",
+       ".msgpack",
+       ".gguf",
+       ".onnx",
+       ".npz",
+       ".pkl"
+      ],
+      "type": "string"
+     },
+     "minItems": 1,
+     "type": "array"
+    }
+   },
+   "required": [
+    "every_acquired_path_is_in_the_allow_list",
+    "no_acquired_path_has_a_weight_suffix",
+    "weight_bytes_acquired_total",
+    "weight_files_acquired_total",
+    "weight_paths_requested_total",
+    "weight_suffixes_treated_as_weight_bearing"
+   ],
+   "type": "object"
+  },
+  "observation_timestamp_utc": {
+   "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+   "type": "string"
+  },
+  "rp_b_ladder": {
+   "maxItems": 3,
+   "minItems": 3,
+   "prefixItems": [
+    {
+     "const": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+    },
+    {
+     "const": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B"
+    },
+    {
+     "const": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+    }
+   ],
+   "type": "array"
+  },
+  "rp_b_ladder_length": {
+   "const": 3
+  },
+  "schema_version": {
+   "const": "study3r-checkpoint-acquisition-v1"
+  },
+  "target_checkpoint": {
+   "const": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+  },
+  "trust_remote_code": {
+   "const": false
+  }
+ },
+ "required": [
+  "authority",
+  "checkpoints",
+  "counters",
+  "download_allow_list",
+  "library_versions",
+  "network_request_count",
+  "network_requests",
+  "no_weight_file_proof",
+  "observation_timestamp_utc",
+  "rp_b_ladder",
+  "rp_b_ladder_length",
+  "schema_version",
+  "target_checkpoint",
+  "trust_remote_code"
+ ],
+ "title": "Study 3R sealed tokenizer-only acquisition record",
+ "type": "object"
+}
