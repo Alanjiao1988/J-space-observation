@@ -1,0 +1,157 @@
+{
+ "authority": {
+  "bytes": 9969,
+  "commit": "16b975996a47c9a3368741cb8ebf001d952d172b",
+  "git_blob": "aacb4fac36de07542279e7b830096bbdde98d26b",
+  "newline_convention": "LF only, no BOM, exactly one trailing newline",
+  "parent_commit": "a08ec1462f023da49247cac0756b7af5f32ba75a",
+  "path": "studies/study3/prompts/study3_v0_7_terminal_decision_and_study3r_successor_authority.md",
+  "published_alone_as_the_first_commit_after_the_review_head": true,
+  "sha256": "afbcc051e26ea71a8aa485fb0173b4289ffc3e8714dad6895840d01c8e5d0c00",
+  "tree": "a7690678a9c79cb43c1a2a91baeac96909861eb6"
+ },
+ "boundary": {
+  "evidence_ledger_tail": "EV-0016",
+  "formal_execution_authorized": false,
+  "no_scientific_evidence_was_produced": true,
+  "prohibited_operation_counters": {
+   "activation_loads": 0,
+   "adapter_loads": 0,
+   "azure_acr_aca_gpu_cloud_operations": 0,
+   "checkpoint_downloads": 0,
+   "checkpoint_loads": 0,
+   "checkpoint_resolutions": 0,
+   "confirmation_accesses": 0,
+   "evidence_rows_added": 0,
+   "forward_passes": 0,
+   "generations": 0,
+   "interface_qualifications": 0,
+   "interface_selections": 0,
+   "logit_reads": 0,
+   "model_output_parses": 0,
+   "model_weight_loads": 0,
+   "patching_operations": 0,
+   "prefills": 0,
+   "rp_b_qualifications": 0,
+   "rp_m_qualifications": 0,
+   "scientific_evidence_claims": 0,
+   "scoring_operations": 0,
+   "seeds_drawn": 0,
+   "split_realizations": 0,
+   "task_bank_rows_generated": 0,
+   "tokenizer_constructions": 0,
+   "tokenizer_decodes": 0,
+   "tokenizer_encodes": 0
+  },
+  "research_question_answered": false
+ },
+ "decision": "STUDY3_DRAFT_V0_7_REJECTED_TERMINAL_NO_EXECUTION",
+ "document_class": "operator_terminal_decision",
+ "draft_v0_7_status": {
+  "amendable": false,
+  "executable": false,
+  "failed_its_single_allowed_independent_focused_review": true,
+  "frozen": false,
+  "no_finding_is_converted_into_a_limitation": true,
+  "selected": false
+ },
+ "governing_assessment": {
+  "accepted_as_governing": true,
+  "review_disposition": "STUDY3_V0_7_TERMINAL_OPERATOR_DECISION_REQUIRED",
+  "review_head_commit": "a08ec1462f023da49247cac0756b7af5f32ba75a",
+  "review_json": "studies/study3/reviews/v0_7_single_focused_methods_review.json",
+  "review_report": "studies/study3/reviews/v0_7_single_focused_methods_review.md",
+  "reviewed_commit": "459d002442641039196ac3880d47a45a3b79a4c8",
+  "reviewed_tree": "2c84d55e6a965972e7cd3f69e3b0cded0bddfb04",
+  "severity_counts": {
+   "BLOCKING": 12,
+   "MAJOR": 3,
+   "MINOR": 2
+  }
+ },
+ "old_current_pointer": {
+  "belongs_to": "the rejected draft-v0.7 candidate",
+  "is_an_active_project_protocol": false,
+  "is_an_internal_pointer_of_the_rejected_candidate": true,
+  "path": "studies/study3/protocol/interface_calibration_protocol_current.json",
+  "prospective_readers_must_not_resolve_it": true
+ },
+ "prohibitions": {
+  "incremental_carry_forward_repair_permitted": false,
+  "v0_7_1_may_be_automatically_drafted": false,
+  "v0_7_may_be_repaired": false,
+  "v0_8_may_be_automatically_drafted": false
+ },
+ "retained_rejected_candidate_history": {
+  "artifacts": {
+   "studies/study3/analysis/v0_7_protocol_build.py": {
+    "bytes": 102741,
+    "sha256": "0e55fb5b3a764478824ef5d9d18bd7dea8a731b010d1f17057492d222a2cefec"
+   },
+   "studies/study3/protocol/interface_calibration_protocol_current.json": {
+    "bytes": 3237,
+    "sha256": "9a51d1ba3bacf2db9a19884e66aefce0bf289e994ab6a583fdad7ea028fd5f46"
+   },
+   "studies/study3/protocol/interface_calibration_protocol_current.schema.json": {
+    "bytes": 4505,
+    "sha256": "e26a57a9e1cd97e879e79688e8b366f91a00d200923d68e0a671c66a13f01c4f"
+   },
+   "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json": {
+    "bytes": 461502,
+    "sha256": "775d3add8dd368bce92268a24c7eb10a99c2fb4c82141e8d3cd29b3cb52d7194"
+   },
+   "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.md": {
+    "bytes": 13925,
+    "sha256": "c220e429a43c897105170b06ffa17bedef89d2d278cd8bd5fa6cd741108bc515"
+   },
+   "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.schema.json": {
+    "bytes": 9266,
+    "sha256": "dde4b2b1b68dda1dedfe0eef1398af28f23c2902399b9e291b14a7de41e8dad1"
+   },
+   "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.json": {
+    "bytes": 3243,
+    "sha256": "8bc27e4ebb2e31461cf890403603708ec1a63115bb4bc9bc6fbc897f2575a738"
+   },
+   "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.schema.json": {
+    "bytes": 2392,
+    "sha256": "93fbcd721a40b79f60ca0f4235e7fad501aeda9106946dd5c35ac00fd6079ccc"
+   },
+   "studies/study3/reviews/v0_7_operator_amendment.json": {
+    "bytes": 16246,
+    "sha256": "d7f26f905224fd1e0499376c6299cd912e1dc198760b5e050b0e6e16c3f8664f"
+   },
+   "studies/study3/reviews/v0_7_operator_amendment.md": {
+    "bytes": 6823,
+    "sha256": "90e11694e22399721b98fccdbff61283ed153742a5bb91fc5a9e975e8194a065"
+   },
+   "studies/study3/reviews/v0_7_operator_amendment.schema.json": {
+    "bytes": 3442,
+    "sha256": "658ad1964ce94c9d3aece98f4e9025a7c6e59427ebea6608cceebee7810e119e"
+   },
+   "tests/test_study3_v0_7_protocol.py": {
+    "bytes": 27008,
+    "sha256": "d1815aee6e50645bc63e972a24e1bc08a90c11d32c17e226cae8060100cbc53c"
+   }
+  },
+  "bytes_changed_by_this_decision": 0,
+  "immutable": true,
+  "status": "REJECTED_CANDIDATE_HISTORY_NOT_AN_ACTIVE_PROTOCOL"
+ },
+ "schema_version": "study3-v0-7-operator-terminal-decision",
+ "successor": {
+  "authorized": true,
+  "charter": "studies/study3r/study3r_charter.json",
+  "is_a_copy_on_write_continuation_of_the_legacy_protocol": false,
+  "is_v0_8": false,
+  "kind": "clean_room_successor",
+  "name": "Study 3R",
+  "namespace": "studies/study3r/",
+  "protocol_authored_in_this_session": false,
+  "state": "STUDY3R_CLEAN_ROOM_PROTOCOL_AUTHORIZED_AWAITING_SINGLE_AUTHORING_SESSION"
+ },
+ "test_count_reconciliation": {
+  "json": "studies/study3/reviews/v0_7_review_head_test_count_reconciliation.json",
+  "markdown": "studies/study3/reviews/v0_7_review_head_test_count_reconciliation.md",
+  "reconciled": true
+ }
+}

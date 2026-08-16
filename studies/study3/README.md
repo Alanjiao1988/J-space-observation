@@ -1,24 +1,50 @@
 # Study 3 - Interface Adequacy and Label-Binding Calibration
 
-> ## Active protocol routing, draft-v0.7
+> ## TERMINAL ROUTING — draft-v0.7 is a REJECTED, NON-EXECUTABLE candidate
 >
-> The active normative protocol is
-> [`protocol/interface_calibration_protocol_draft_v0_7.json`](protocol/interface_calibration_protocol_draft_v0_7.json),
-> resolved through
-> [`protocol/interface_calibration_protocol_current.json`](protocol/interface_calibration_protocol_current.json).
+> **Operator decision:** `STUDY3_DRAFT_V0_7_REJECTED_TERMINAL_NO_EXECUTION`.
+> Read it first:
+> [`reviews/v0_7_operator_terminal_decision.md`](reviews/v0_7_operator_terminal_decision.md)
+> ([machine-readable](reviews/v0_7_operator_terminal_decision.json)).
+>
+> draft-v0.7 failed its single allowed independent focused methods review with
+> **12 BLOCKING, 3 MAJOR and 2 MINOR** findings
+> ([review](reviews/v0_7_single_focused_methods_review.md)). It is rejected and
+> terminally closed **without repair**: not frozen, not selected, not executable
+> and **not amendable**. No v0.7.1, no v0.8 and no incremental carry-forward
+> repair is permitted.
+>
+> **There is no active Study 3 interface-calibration protocol.** Every v0.7
+> protocol artifact below is `REJECTED_CANDIDATE_HISTORY_NOT_AN_ACTIVE_PROTOCOL`,
+> retained byte-exactly for provenance only and never to be loaded, resolved,
+> executed or used as a starting point:
+>
+> * `protocol/interface_calibration_protocol_draft_v0_7.json`, its Markdown
+>   companion and its schema — **rejected candidate**;
+> * `protocol/interface_calibration_rendering_registry_v0_7.json` and its schema —
+>   **rejected candidate**;
+> * `protocol/interface_calibration_protocol_current.json` and its schema — an
+>   **internal pointer of the rejected candidate**, not an active project
+>   protocol; a prospective reader must not resolve it;
+> * `analysis/v0_7_protocol_build.py`, `tests/test_study3_v0_7_protocol.py` and
+>   the `reviews/v0_7_operator_amendment.*` artifacts — **rejected candidate**.
 >
 > `protocol/interface_calibration_protocol_draft.json`, its Markdown companion
-> and `protocol/interface_calibration_protocol.schema.json` are
-> `HISTORICAL_P0_BINDING_ONLY_NOT_CURRENT_PROTOCOL`. They are preserved
-> byte-exactly because the immutable P0 corpus manifest byte-binds the JSON, and
-> a prospective reader must not load them. A missing or mismatched v0.7 file
-> fails closed; it never falls back to the legacy bundle.
+> and `protocol/interface_calibration_protocol.schema.json` remain
+> `HISTORICAL_P0_BINDING_ONLY_NOT_CURRENT_PROTOCOL`, preserved byte-exactly
+> because the immutable P0 corpus manifest byte-binds the JSON. They are not a
+> fallback and never become current.
 >
-> draft-v0.7 is **unfrozen** and **unexecuted**: `frozen = false`,
-> `execution_authorized = false`, `formal_execution_authorized = false`.
+> `frozen = false`, `execution_authorized = false`,
+> `formal_execution_authorized = false`. `paper/evidence_ledger.csv` still ends
+> at `EV-0016`, no scientific evidence exists, and the research question remains
+> unanswered.
 >
-> The next legal action is one fresh, independent, single focused methods review
-> of draft-v0.7 by a party that did not draft it.
+> **The authorized continuation is the clean-room successor Study 3R**, in
+> [`../study3r/`](../study3r/README.md), state
+> `STUDY3R_CLEAN_ROOM_PROTOCOL_AUTHORIZED_AWAITING_SINGLE_AUTHORING_SESSION`.
+> The next legal action is one Study 3R protocol-authoring session under a
+> separate authority.
 
 > **P0-R1 IS EXECUTION READY - AWAITING ITS REPLAY GATE**
 >

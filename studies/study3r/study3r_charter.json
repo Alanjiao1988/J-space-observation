@@ -1,0 +1,229 @@
+{
+ "authorization": {
+  "authoring_sessions_allowed": 1,
+  "authority": "studies/study3/prompts/study3_v0_7_terminal_decision_and_study3r_successor_authority.md",
+  "automatic_amendment_after_a_blocking_review_finding": false,
+  "independent_focused_reviews_allowed": 1,
+  "predecessor_decision": "STUDY3_DRAFT_V0_7_REJECTED_TERMINAL_NO_EXECUTION",
+  "terminates_on_any_blocking_review_finding": true
+ },
+ "charter_boundary": {
+  "contains_a_checkpoint_download": false,
+  "contains_a_numerical_gate_calculation": false,
+  "contains_a_protocol": false,
+  "contains_a_selected_interface": false,
+  "contains_a_task_bank_realization": false,
+  "contains_an_execution_authorization": false,
+  "contains_tokenizer_output": false
+ },
+ "document_class": "successor_study_charter",
+ "e0_surface_contract": {
+  "is_checkpoint_revision_specific": true,
+  "max_new_tokens_derivation": "per checkpoint, the longest frozen legal answer surface plus the registered termination margin",
+  "universal_max_new_tokens_3_is_inherited": false
+ },
+ "estimands": {
+  "D0": {
+   "id": "D0_single_forward_decodability",
+   "is_ever_an_rp_b_gate": false,
+   "role": "conditional_diagnostic_only"
+  },
+  "E0": {
+   "id": "E0_zero_generated_reasoning_token_expressed_competence",
+   "role": "primary_headline"
+  }
+ },
+ "frozen_project_decisions": [
+  {
+   "decision": "The primary headline estimand is E0_zero_generated_reasoning_token_expressed_competence.",
+   "id": "S3R-D01",
+   "title": "Primary headline estimand"
+  },
+  {
+   "decision": "D0_single_forward_decodability is a conditional diagnostic only. It is never an RP-B gate and never qualifies a candidate.",
+   "id": "S3R-D02",
+   "title": "D0 is a conditional diagnostic only"
+  },
+  {
+   "decision": "The natural RP-B ladder has fixed membership and fixed order with L = 3: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B, deepseek-ai/DeepSeek-R1-Distill-Qwen-14B, deepseek-ai/DeepSeek-R1-Distill-Qwen-32B, ordered by parameter count ascending. There is no fallback candidate and no post-result expansion.",
+   "id": "S3R-D03",
+   "title": "Fixed RP-B ladder, L = 3"
+  },
+  {
+   "decision": "Immutable checkpoint revisions must be resolved and sealed before protocol freeze.",
+   "id": "S3R-D04",
+   "title": "Checkpoint revisions sealed before freeze"
+  },
+  {
+   "decision": "Q0 uses E0 as its primary gate, item-disjoint development and confirmation sets, first-confirmed-pass selection, and multiplicity correction over the full registered L = 3.",
+   "id": "S3R-D05",
+   "title": "Q0 structure and multiplicity"
+  },
+  {
+   "decision": "Wrapper qualification remains a two-arm joint-adequacy gate. Both arms must be represented in the atomic-cell census and in the multiplicity calculation. The author may not reuse m_max = 43 without independently re-deriving it.",
+   "id": "S3R-D06",
+   "title": "Two-arm wrapper joint adequacy enters the census"
+  },
+  {
+   "decision": "Wrapper bytes, roles, separators, BOS/EOS behavior, answer cues, few-shot examples and template revisions must be frozen exactly.",
+   "id": "S3R-D07",
+   "title": "Wrapper bytes frozen exactly"
+  },
+  {
+   "decision": "The negative control must use an executable one-sided upper-bound or equivalence design with a registered unit, chance level, margin, sample size, alpha, exact construction and multiplicity family.",
+   "id": "S3R-D08",
+   "title": "Executable negative-control design"
+  },
+  {
+   "decision": "E0 legal answer surfaces and token sequences are checkpoint-revision-specific. max_new_tokens is derived per checkpoint as the longest frozen legal answer surface plus the registered termination margin. The universal value 3 is not inherited.",
+   "id": "S3R-D09",
+   "title": "Per-checkpoint answer surfaces and generation length"
+  },
+  {
+   "decision": "Tokenizer-functional inequality creates an explicitly separate isomorphic-reinstantiation stratum and may never be pooled as the same frozen interface.",
+   "id": "S3R-D10",
+   "title": "Isomorphic-reinstantiation stratum is separate"
+  },
+  {
+   "decision": "The generated-CoT ceiling is a per-checkpoint execution precondition with k = 1 and a frozen task population, bank relationship, parser, context and generation bound, and total resource bound. It is not an interface selector.",
+   "id": "S3R-D11",
+   "title": "Generated-CoT ceiling is a bounded execution precondition"
+  },
+  {
+   "decision": "Study 3R covers behavioral and interface qualification only.",
+   "id": "S3R-D12",
+   "title": "Scope is behavioral and interface qualification"
+  },
+  {
+   "decision": "RP-M, activation patching and mechanism claims are outside Study 3R and are not authorized. They may be considered later as a separate Study 3M, only after all Study 3R gates pass.",
+   "id": "S3R-D13",
+   "title": "Mechanism work is out of scope"
+  },
+  {
+   "decision": "The Study 3R state machine, schema, registry, statistics, manifest generator and semantic tests must be written cleanly from scratch. The legacy 40-key protocol structure is not carried forward.",
+   "id": "S3R-D14",
+   "title": "Clean-room authoring, no legacy structure"
+  },
+  {
+   "decision": "Every decision-bearing schema field must be constrained. Validation must include coordinated generator-mutation tests, not only artifact-versus-generator byte equality.",
+   "id": "S3R-D15",
+   "title": "Constrained schemas and coordinated mutation testing"
+  },
+  {
+   "decision": "Study 3R receives one protocol-authoring session and one independent focused review. If that review returns any BLOCKING finding, Study 3R terminates and no automatic amendment follows.",
+   "id": "S3R-D16",
+   "title": "One authoring session and one review"
+  }
+ ],
+ "generated_cot_ceiling": {
+  "is_a_per_checkpoint_execution_precondition": true,
+  "is_an_interface_selector": false,
+  "k": 1,
+  "must_freeze": [
+   "task population",
+   "bank relationship",
+   "parser",
+   "context and generation bound",
+   "total resource bound"
+  ]
+ },
+ "negative_control": {
+  "must_be_executable_one_sided_upper_bound_or_equivalence_design": true,
+  "must_register": [
+   "unit",
+   "chance level",
+   "margin",
+   "sample size",
+   "alpha",
+   "exact construction",
+   "multiplicity family"
+  ]
+ },
+ "out_of_scope": {
+  "activation_patching": false,
+  "authorized_now": false,
+  "may_be_considered_later_as": "Study 3M, only after all Study 3R gates pass",
+  "mechanism_claims": false,
+  "rp_m": false
+ },
+ "q0": {
+  "development_and_confirmation_are_item_disjoint": true,
+  "multiplicity_correction_over": "the full registered L = 3",
+  "primary_gate": "E0_zero_generated_reasoning_token_expressed_competence",
+  "selection_rule": "first confirmed pass"
+ },
+ "rp_b_ladder": {
+  "L": 3,
+  "fallback_candidate": null,
+  "immutable_revisions_sealed_before_protocol_freeze": true,
+  "membership": [
+   "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+   "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+   "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+  ],
+  "membership_is_fixed": true,
+  "order_is_fixed": true,
+  "ordering_rule": "parameter count ascending",
+  "post_result_expansion_permitted": false
+ },
+ "schema_version": "study3r-clean-room-charter",
+ "scope": {
+  "covers": "behavioral and interface qualification only",
+  "is_a_copy_on_write_continuation": false,
+  "is_v0_8": false
+ },
+ "state": "STUDY3R_CLEAN_ROOM_PROTOCOL_AUTHORIZED_AWAITING_SINGLE_AUTHORING_SESSION",
+ "study_identity": {
+  "name": "Study 3R",
+  "namespace": "studies/study3r/",
+  "predecessor": "draft-v0.7, rejected terminally",
+  "relationship_to_predecessor": "clean-room successor; no protocol text, structure, schema, registry, statistics, manifest generator or test is carried forward"
+ },
+ "tokenizer_functional_inequality": {
+  "creates_a_separate_isomorphic_reinstantiation_stratum": true,
+  "may_be_pooled_as_the_same_frozen_interface": false
+ },
+ "validation_requirements": {
+  "artifact_versus_generator_byte_equality_is_sufficient": false,
+  "coordinated_generator_mutation_tests_required": true,
+  "every_decision_bearing_schema_field_must_be_constrained": true,
+  "legacy_forty_key_protocol_structure_carried_forward": false,
+  "written_cleanly_from_scratch": [
+   "state machine",
+   "schema",
+   "registry",
+   "statistics",
+   "manifest generator",
+   "semantic tests"
+  ]
+ },
+ "wrapper_qualification": {
+  "arms": 2,
+  "both_arms_in_the_atomic_cell_census": true,
+  "both_arms_in_the_multiplicity_calculation": true,
+  "gate_kind": "joint_adequacy",
+  "m_max_43_may_be_reused_without_independent_rederivation": false,
+  "must_freeze_exactly": [
+   "wrapper bytes",
+   "roles",
+   "separators",
+   "BOS/EOS behavior",
+   "answer cues",
+   "few-shot examples",
+   "template revisions"
+  ]
+ },
+ "zero_operation_boundary": {
+  "banks_realized": 0,
+  "checkpoint_downloads": 0,
+  "cloud_or_gpu_jobs": 0,
+  "forward_passes": 0,
+  "gate_calculations_performed": 0,
+  "generations": 0,
+  "interfaces_selected": 0,
+  "patching_operations": 0,
+  "scoring_operations": 0,
+  "seeds_drawn": 0,
+  "tokenizer_constructions": 0
+ }
+}

@@ -1,0 +1,358 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "properties": {
+  "authority": {
+   "additionalProperties": false,
+   "properties": {
+    "bytes": {
+     "const": 9969
+    },
+    "commit": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    },
+    "git_blob": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    },
+    "newline_convention": {
+     "const": "LF only, no BOM, exactly one trailing newline"
+    },
+    "parent_commit": {
+     "const": "a08ec1462f023da49247cac0756b7af5f32ba75a"
+    },
+    "path": {
+     "const": "studies/study3/prompts/study3_v0_7_terminal_decision_and_study3r_successor_authority.md"
+    },
+    "published_alone_as_the_first_commit_after_the_review_head": {
+     "const": true
+    },
+    "sha256": {
+     "pattern": "^[0-9a-f]{64}$",
+     "type": "string"
+    },
+    "tree": {
+     "pattern": "^[0-9a-f]{40}$",
+     "type": "string"
+    }
+   },
+   "required": [
+    "path",
+    "bytes",
+    "sha256",
+    "git_blob",
+    "newline_convention",
+    "parent_commit",
+    "commit",
+    "tree",
+    "published_alone_as_the_first_commit_after_the_review_head"
+   ],
+   "type": "object"
+  },
+  "boundary": {
+   "additionalProperties": false,
+   "properties": {
+    "evidence_ledger_tail": {
+     "const": "EV-0016"
+    },
+    "formal_execution_authorized": {
+     "const": false
+    },
+    "no_scientific_evidence_was_produced": {
+     "const": true
+    },
+    "prohibited_operation_counters": {
+     "additionalProperties": {
+      "const": 0
+     },
+     "type": "object"
+    },
+    "research_question_answered": {
+     "const": false
+    }
+   },
+   "required": [
+    "formal_execution_authorized",
+    "evidence_ledger_tail",
+    "no_scientific_evidence_was_produced",
+    "research_question_answered",
+    "prohibited_operation_counters"
+   ],
+   "type": "object"
+  },
+  "decision": {
+   "const": "STUDY3_DRAFT_V0_7_REJECTED_TERMINAL_NO_EXECUTION"
+  },
+  "document_class": {
+   "const": "operator_terminal_decision"
+  },
+  "draft_v0_7_status": {
+   "additionalProperties": false,
+   "properties": {
+    "amendable": {
+     "const": false
+    },
+    "executable": {
+     "const": false
+    },
+    "failed_its_single_allowed_independent_focused_review": {
+     "const": true
+    },
+    "frozen": {
+     "const": false
+    },
+    "no_finding_is_converted_into_a_limitation": {
+     "const": true
+    },
+    "selected": {
+     "const": false
+    }
+   },
+   "required": [
+    "failed_its_single_allowed_independent_focused_review",
+    "no_finding_is_converted_into_a_limitation",
+    "frozen",
+    "selected",
+    "executable",
+    "amendable"
+   ],
+   "type": "object"
+  },
+  "governing_assessment": {
+   "additionalProperties": false,
+   "properties": {
+    "accepted_as_governing": {
+     "const": true
+    },
+    "review_disposition": {
+     "const": "STUDY3_V0_7_TERMINAL_OPERATOR_DECISION_REQUIRED"
+    },
+    "review_head_commit": {
+     "const": "a08ec1462f023da49247cac0756b7af5f32ba75a"
+    },
+    "review_json": {
+     "const": "studies/study3/reviews/v0_7_single_focused_methods_review.json"
+    },
+    "review_report": {
+     "const": "studies/study3/reviews/v0_7_single_focused_methods_review.md"
+    },
+    "reviewed_commit": {
+     "const": "459d002442641039196ac3880d47a45a3b79a4c8"
+    },
+    "reviewed_tree": {
+     "const": "2c84d55e6a965972e7cd3f69e3b0cded0bddfb04"
+    },
+    "severity_counts": {
+     "additionalProperties": false,
+     "properties": {
+      "BLOCKING": {
+       "const": 12
+      },
+      "MAJOR": {
+       "const": 3
+      },
+      "MINOR": {
+       "const": 2
+      }
+     },
+     "required": [
+      "BLOCKING",
+      "MAJOR",
+      "MINOR"
+     ],
+     "type": "object"
+    }
+   },
+   "required": [
+    "reviewed_commit",
+    "reviewed_tree",
+    "review_head_commit",
+    "review_disposition",
+    "severity_counts",
+    "accepted_as_governing",
+    "review_report",
+    "review_json"
+   ],
+   "type": "object"
+  },
+  "old_current_pointer": {
+   "additionalProperties": false,
+   "properties": {
+    "belongs_to": {
+     "const": "the rejected draft-v0.7 candidate"
+    },
+    "is_an_active_project_protocol": {
+     "const": false
+    },
+    "is_an_internal_pointer_of_the_rejected_candidate": {
+     "const": true
+    },
+    "path": {
+     "const": "studies/study3/protocol/interface_calibration_protocol_current.json"
+    },
+    "prospective_readers_must_not_resolve_it": {
+     "const": true
+    }
+   },
+   "required": [
+    "path",
+    "belongs_to",
+    "is_an_active_project_protocol",
+    "is_an_internal_pointer_of_the_rejected_candidate",
+    "prospective_readers_must_not_resolve_it"
+   ],
+   "type": "object"
+  },
+  "prohibitions": {
+   "additionalProperties": false,
+   "properties": {
+    "incremental_carry_forward_repair_permitted": {
+     "const": false
+    },
+    "v0_7_1_may_be_automatically_drafted": {
+     "const": false
+    },
+    "v0_7_may_be_repaired": {
+     "const": false
+    },
+    "v0_8_may_be_automatically_drafted": {
+     "const": false
+    }
+   },
+   "required": [
+    "v0_7_may_be_repaired",
+    "v0_7_1_may_be_automatically_drafted",
+    "v0_8_may_be_automatically_drafted",
+    "incremental_carry_forward_repair_permitted"
+   ],
+   "type": "object"
+  },
+  "retained_rejected_candidate_history": {
+   "additionalProperties": false,
+   "patternProperties": {},
+   "properties": {
+    "artifacts": {
+     "additionalProperties": {
+      "additionalProperties": false,
+      "properties": {
+       "bytes": {
+        "type": "integer"
+       },
+       "sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+       }
+      },
+      "required": [
+       "bytes",
+       "sha256"
+      ],
+      "type": "object"
+     },
+     "minProperties": 12,
+     "type": "object"
+    },
+    "bytes_changed_by_this_decision": {
+     "const": 0
+    },
+    "immutable": {
+     "const": true
+    },
+    "status": {
+     "const": "REJECTED_CANDIDATE_HISTORY_NOT_AN_ACTIVE_PROTOCOL"
+    }
+   },
+   "required": [
+    "status",
+    "immutable",
+    "bytes_changed_by_this_decision",
+    "artifacts"
+   ],
+   "type": "object"
+  },
+  "schema_version": {
+   "const": "study3-v0-7-operator-terminal-decision"
+  },
+  "successor": {
+   "additionalProperties": false,
+   "properties": {
+    "authorized": {
+     "const": true
+    },
+    "charter": {
+     "const": "studies/study3r/study3r_charter.json"
+    },
+    "is_a_copy_on_write_continuation_of_the_legacy_protocol": {
+     "const": false
+    },
+    "is_v0_8": {
+     "const": false
+    },
+    "kind": {
+     "const": "clean_room_successor"
+    },
+    "name": {
+     "const": "Study 3R"
+    },
+    "namespace": {
+     "const": "studies/study3r/"
+    },
+    "protocol_authored_in_this_session": {
+     "const": false
+    },
+    "state": {
+     "const": "STUDY3R_CLEAN_ROOM_PROTOCOL_AUTHORIZED_AWAITING_SINGLE_AUTHORING_SESSION"
+    }
+   },
+   "required": [
+    "name",
+    "kind",
+    "namespace",
+    "charter",
+    "authorized",
+    "state",
+    "is_v0_8",
+    "is_a_copy_on_write_continuation_of_the_legacy_protocol",
+    "protocol_authored_in_this_session"
+   ],
+   "type": "object"
+  },
+  "test_count_reconciliation": {
+   "additionalProperties": false,
+   "properties": {
+    "json": {
+     "const": "studies/study3/reviews/v0_7_review_head_test_count_reconciliation.json"
+    },
+    "markdown": {
+     "const": "studies/study3/reviews/v0_7_review_head_test_count_reconciliation.md"
+    },
+    "reconciled": {
+     "const": true
+    }
+   },
+   "required": [
+    "markdown",
+    "json",
+    "reconciled"
+   ],
+   "type": "object"
+  }
+ },
+ "required": [
+  "schema_version",
+  "document_class",
+  "decision",
+  "governing_assessment",
+  "draft_v0_7_status",
+  "prohibitions",
+  "retained_rejected_candidate_history",
+  "old_current_pointer",
+  "boundary",
+  "test_count_reconciliation",
+  "successor",
+  "authority"
+ ],
+ "title": "Study 3 draft-v0.7 operator terminal decision",
+ "type": "object"
+}
