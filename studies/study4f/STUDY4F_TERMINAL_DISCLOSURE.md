@@ -152,7 +152,51 @@ unregistered model substitution was attempted.** The registered state is therefo
 Because the shakedown did not pass, the banks were **not** realized, no execution seal was created,
 and developmental execution authorization remains `false`.
 
-## 6. Executed cells and skipped cells
+## 6. Scope expiries, recorded not repaired
+
+Three assertions in out-of-tree modules expired during this work. All three are **scope predicates
+over `git diff <old commit> HEAD`**, so they hold only while HEAD is the commit they were written at
+and expire the moment any authorized commit is added after it — the same expiry that already retired
+`tests/test_study3_v0_7_focused_review.py::test_the_review_changed_no_reviewed_or_historical_path`.
+
+**None of the three is inside the registered repository baseline**, the eight standing repository
+failure node IDs are unchanged, and there are **zero new repository failure node IDs**. Every one of
+the three modules is byte-identical to the Study 3R closure head, so none was repaired or suppressed.
+
+| expired assertion | introduced by | guarantee carried forward by |
+| --- | --- | --- |
+| `…single_focused_review.py::test_every_review_path_is_additive_and_inside_the_reviews_directory` | the inherited authority commit `f393529…`, before this session began | `…test_study4f_behavioral_feasibility.py::test_every_study3r_byte_is_identical_to_the_closure_head` |
+| `…test_study3r_terminal_closure.py::test_the_closure_only_added_its_own_paths_and_touched_one_readme` | publishing the Study 4F authority alone at `7d5ff08…` | `…::test_study4f_added_paths_live_only_in_its_own_namespace` |
+| `…single_focused_review.py::test_the_review_changed_no_candidate_or_protected_path` | the Study 4F governance scope admission | `…::test_the_governance_change_is_a_scope_predicate_only_change` |
+
+### The governance scope admission
+
+`tests/test_study3r_operator_governance.py` carries two predicates enumerating the namespaces an
+authorized session may add paths inside. They reject every path outside `studies/study3r/`, so
+publishing Study 4F at all required admitting its namespace — otherwise two tests **inside** the
+registered repository baseline would have failed and the eight standing node IDs would no longer have
+been the whole set.
+
+The module lists itself in `AUTHORING_MODIFIED`, so it is the designated place to carry these scope
+guarantees forward. The change adds one namespace constant and rewrites two predicate expressions. A
+Study 4F test proves mechanically, by comparing the parsed syntax trees, that it:
+
+* adds **0** tests and removes **0** tests;
+* changes **0** assertions;
+* leaves `REJECTED_CANDIDATE_PATHS`, `REVIEW_ARTIFACTS`, `PROTECTED_HISTORICAL`, `GOVERNANCE_ADDED`,
+  `GOVERNANCE_MODIFIED`, `AUTHORING_ADDED` and `AUTHORING_MODIFIED` **byte-for-byte identical**;
+* admits exactly one namespace, `studies/study4f/`, and **no** individual path.
+
+The Study 3R focused-review module classifies that governance module as a candidate path, which is
+why the admission expires the review module's third assertion. It is disclosed here rather than left
+implicit because Study 3R finding **F-10** recorded a previous *silent* self-widening of these same
+predicates.
+
+Substantively, nothing moved: `git diff ee8a852…HEAD` touches **no** path under `studies/study3r/`,
+and leaves `paper/evidence_ledger.csv`, `.gitattributes` and `tests/test_study3r_protocol_v1.py`
+untouched.
+
+## 7. Executed cells and skipped cells
 
 **Zero of the sixteen registered cells were executed.** All sixteen are skipped for one registered
 reason: `STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE`, reached before weight acquisition.
@@ -166,7 +210,7 @@ Per-cell reporting (correct, incorrect and unparseable counts, exact binomial ta
 parser-validity rate, output-label distribution, generated-token count, accelerator time, container
 and seal hashes) is **not applicable**: no cell ran and no seal exists.
 
-## 7. Counters
+## 8. Counters
 
 | counter | value |
 | --- | --- |
@@ -192,7 +236,7 @@ and seal hashes) is **not applicable**: no cell ran and no seal exists.
 `paper/evidence_ledger.csv` is unchanged, SHA-256
 `3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1`, tail `EV-0016`.
 
-## 8. What this state does and does not establish
+## 9. What this state does and does not establish
 
 ### It establishes
 
@@ -218,7 +262,7 @@ and seal hashes) is **not applicable**: no cell ran and no seal exists.
 No `RP_B_DEVELOPMENTAL_CANDIDATE_PENDING_CONFIRMATION` was identified, and no RP-B was confirmed —
 Study 4F could not have confirmed one in any case.
 
-## 9. Next action
+## 10. Next action
 
 Study 4F stops here, in exactly one registered state. Resuming requires one accelerator able to hold
 the 32B checkpoint, the maximum registered KV cache and the fixed safety reserve without offloading.

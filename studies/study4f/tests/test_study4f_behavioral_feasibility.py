@@ -90,7 +90,20 @@ STUDY3R_CLOSURE_PATHS = (
 
 def _git(*args: str) -> str:
     return subprocess.run(["git", "--no-pager", *args], cwd=str(ROOT),
-                          capture_output=True, text=True, check=True).stdout
+                          capture_output=True, text=True, encoding="utf-8",
+                          errors="replace", check=True).stdout
+
+
+def _load_governance_module():
+    """Load the Study 3R governance module by path, without importing ``tests``."""
+    import importlib.util
+
+    path = ROOT / "tests" / "test_study3r_operator_governance.py"
+    spec = importlib.util.spec_from_file_location(
+        "study4f_governance_probe", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def _json(path: pathlib.Path):
@@ -864,6 +877,110 @@ def test_the_governance_admission_is_narrow_and_bound_to_this_authority():
     for protected in ("REJECTED_CANDIDATE_PATHS", "REVIEW_ARTIFACTS",
                       "PROTECTED_HISTORICAL"):
         assert protected in source, protected
+
+
+def test_the_governance_change_is_a_scope_predicate_only_change():
+    """Mechanical proof that only scope constants and predicates moved.
+
+    The Study 3R focused-review module classifies
+    ``tests/test_study3r_operator_governance.py`` as a candidate path, so
+    admitting the Study 4F namespace expires that module's
+    ``test_the_review_changed_no_candidate_or_protected_path``. The expiry is
+    recorded rather than repaired, and this test carries the substantive
+    guarantee forward: the change adds and removes no test, changes no
+    assertion, and moves no protected-blob list.
+    """
+    import ast
+
+    before = _git("show", "%s:tests/test_study3r_operator_governance.py"
+                  % STUDY3R_CLOSURE_COMMIT)
+    after = (ROOT / "tests" / "test_study3r_operator_governance.py"
+             ).read_text(encoding="utf-8")
+
+    def functions(source):
+        tree = ast.parse(source)
+        return {node.name: ast.dump(node) for node in ast.walk(tree)
+                if isinstance(node, ast.FunctionDef)}
+
+    def literals(source, names):
+        tree = ast.parse(source)
+        found = {}
+        for node in tree.body:
+            if not isinstance(node, ast.Assign):
+                continue
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id in names:
+                    found[target.id] = ast.literal_eval(node.value)
+        return found
+
+    old_functions, new_functions = functions(before), functions(after)
+    assert set(old_functions) == set(new_functions), \
+        set(old_functions) ^ set(new_functions)
+
+    # Only the two scope predicates may differ, and only in the namespace tuple.
+    changed = {name for name in old_functions
+               if old_functions[name] != new_functions[name]}
+    assert changed == {"test_governance_changed_no_reviewed_candidate_or_protected_path",
+                       "test_only_the_readme_was_modified_and_everything_else_was_added"}, \
+        sorted(changed)
+    for name in changed:
+        assert new_functions[name].count("Assert") == \
+            old_functions[name].count("Assert"), name
+
+    protected = ("REJECTED_CANDIDATE_PATHS", "REVIEW_ARTIFACTS",
+                 "PROTECTED_HISTORICAL", "GOVERNANCE_ADDED",
+                 "GOVERNANCE_MODIFIED", "AUTHORING_ADDED", "AUTHORING_MODIFIED")
+    old_literals = literals(before, protected)
+    new_literals = literals(after, protected)
+    assert old_literals == new_literals, \
+        {key for key in old_literals if old_literals[key] != new_literals.get(key)}
+
+    admitted = _load_governance_module().ADMITTED_NAMESPACES
+    assert admitted == ("studies/study3r/", "studies/study4f/"), admitted
+
+
+def test_every_scope_expiry_is_recorded_and_none_is_suppressed(status):
+    expiries = status["scope_expiries"]
+    assert expiries["count"] == len(expiries["expired_assertions"]) == 3
+    assert expiries["in_the_registered_repository_baseline"] == 0
+    assert expiries["new_repository_failure_node_ids"] == []
+    assert expiries["standing_repository_failure_node_ids_unchanged"] is True
+    for record in expiries["expired_assertions"]:
+        assert record["repaired"] is False
+        assert record["suppressed"] is False
+        assert record["editable_under_this_authority"] is False
+        assert record["inside_the_registered_repository_baseline"] is False
+        module, _, name = record["node_id"].partition("::")
+        assert (ROOT / module).is_file(), module
+        # The expired module itself must be byte-identical to the closure head.
+        if module.startswith("studies/study3r/"):
+            assert _git("rev-parse", "%s:%s" % (STUDY3R_CLOSURE_COMMIT, module)
+                        ).strip() == _git("rev-parse", "HEAD:%s" % module).strip()
+        carrier_module, _, carrier = \
+            record["guarantee_carried_forward_by"].partition("::")
+        assert carrier_module == \
+            "studies/study4f/tests/test_study4f_behavioral_feasibility.py"
+        assert carrier in globals(), carrier
+    governance = expiries["governance_change"]
+    assert governance["namespaces_admitted"] == ["studies/study4f/"]
+    assert governance["individual_paths_admitted"] == []
+    assert governance["test_functions_added"] == 0
+    assert governance["test_functions_removed"] == 0
+    assert governance["assertions_changed"] == 0
+    assert governance["study3r_lifecycle_value_changed"] is False
+
+
+def test_no_expiry_hides_a_moved_study3r_byte():
+    """Every expired predicate's substantive claim still holds at this head."""
+    changed = [line.strip() for line
+               in _git("diff", "--name-only", STUDY3R_CLOSURE_COMMIT,
+                       "HEAD").splitlines() if line.strip()]
+    study3r_changed = [path for path in changed
+                       if path.startswith("studies/study3r/")]
+    assert study3r_changed == [], study3r_changed
+    assert "paper/evidence_ledger.csv" not in changed
+    assert ".gitattributes" not in changed
+    assert "tests/test_study3r_protocol_v1.py" not in changed
 
 
 def test_the_eight_standing_failure_node_ids_are_recorded_unchanged():

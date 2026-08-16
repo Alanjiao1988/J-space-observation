@@ -10,7 +10,7 @@
     "lifecycle_state", "terminal", "study_kind", "authority", "predecessor",
     "reached_stage", "not_reached", "authorization_flags", "claim_boundary",
     "evidence_ledger", "zero_operation_counters", "what_this_state_establishes",
-    "next_action_rule", "artifacts"
+    "scope_expiries", "next_action_rule", "artifacts"
   ],
   "properties": {
     "schema_version": {"const": "study4f-status-v1"},
@@ -208,6 +208,84 @@
           "type": "array",
           "minItems": 5,
           "items": {"type": "string", "minLength": 20}
+        }
+      }
+    },
+    "scope_expiries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "count", "in_the_registered_repository_baseline",
+        "standing_repository_failure_node_ids_unchanged",
+        "new_repository_failure_node_ids", "governance_change",
+        "expired_assertions"
+      ],
+      "properties": {
+        "count": {"const": 3},
+        "in_the_registered_repository_baseline": {"const": 0},
+        "standing_repository_failure_node_ids_unchanged": {"const": true},
+        "new_repository_failure_node_ids": {
+          "type": "array", "minItems": 0, "maxItems": 0, "items": false
+        },
+        "governance_change": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path", "namespaces_admitted", "individual_paths_admitted",
+            "test_functions_added", "test_functions_removed",
+            "assertions_changed", "protected_blob_lists_changed",
+            "study3r_lifecycle_value_changed", "self_declared_modifiable",
+            "rationale"
+          ],
+          "properties": {
+            "path": {"const": "tests/test_study3r_operator_governance.py"},
+            "namespaces_admitted": {
+              "type": "array", "minItems": 1, "maxItems": 1,
+              "items": {"const": "studies/study4f/"}
+            },
+            "individual_paths_admitted": {
+              "type": "array", "minItems": 0, "maxItems": 0, "items": false
+            },
+            "test_functions_added": {"const": 0},
+            "test_functions_removed": {"const": 0},
+            "assertions_changed": {"const": 0},
+            "protected_blob_lists_changed": {"const": 0},
+            "study3r_lifecycle_value_changed": {"const": false},
+            "self_declared_modifiable": {"const": true},
+            "rationale": {"type": "string", "minLength": 120}
+          }
+        },
+        "expired_assertions": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["node_id", "kind", "introduced_by",
+                         "inside_the_registered_repository_baseline",
+                         "editable_under_this_authority", "repaired",
+                         "suppressed", "guarantee_carried_forward_by"],
+            "properties": {
+              "node_id": {"type": "string", "minLength": 20},
+              "kind": {"const": "scope_predicate_over_a_git_diff_to_HEAD"},
+              "introduced_by": {
+                "enum": [
+                  "the inherited Study 3R terminal-closure authority commit f3935293",
+                  "publishing the Study 4F authority alone at 7d5ff083",
+                  "the Study 4F governance scope admission"
+                ]
+              },
+              "inside_the_registered_repository_baseline": {"const": false},
+              "editable_under_this_authority": {"const": false},
+              "repaired": {"const": false},
+              "suppressed": {"const": false},
+              "guarantee_carried_forward_by": {
+                "type": "string", "minLength": 40
+              }
+            }
+          }
         }
       }
     },
