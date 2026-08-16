@@ -26,7 +26,41 @@
      "type": "array"
     },
     "tokenizer_only_counters": {
-     "minProperties": 3,
+     "additionalProperties": false,
+     "properties": {
+      "chat_template_renders": {
+       "minimum": 1,
+       "type": "integer"
+      },
+      "encode_calls": {
+       "minimum": 1,
+       "type": "integer"
+      },
+      "files_acquired": {
+       "minimum": 1,
+       "type": "integer"
+      },
+      "network_file_downloads": {
+       "minimum": 1,
+       "type": "integer"
+      },
+      "network_metadata_requests": {
+       "minimum": 1,
+       "type": "integer"
+      },
+      "tokenizer_constructions": {
+       "minimum": 1,
+       "type": "integer"
+      }
+     },
+     "required": [
+      "chat_template_renders",
+      "encode_calls",
+      "files_acquired",
+      "network_file_downloads",
+      "network_metadata_requests",
+      "tokenizer_constructions"
+     ],
      "type": "object"
     },
     "trust_remote_code": {
@@ -241,6 +275,80 @@
       "type": "string"
      },
      "special_tokens": {
+      "additionalProperties": false,
+      "properties": {
+       "bos_token": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "bos_token_id": {
+        "minimum": 0,
+        "type": "integer"
+       },
+       "eos_token": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "eos_token_id": {
+        "minimum": 0,
+        "type": "integer"
+       },
+       "generation_config_bos_token_id": {
+        "minimum": 0,
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "generation_config_eos_token_id": {
+        "items": {
+         "minimum": 0,
+         "type": "integer"
+        },
+        "minimum": 0,
+        "type": [
+         "integer",
+         "array"
+        ]
+       },
+       "pad_token": {
+        "minLength": 1,
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "pad_token_id": {
+        "minimum": 0,
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "tokenizer_config_eos_token": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "unk_token": {
+        "minLength": 1,
+        "type": [
+         "string",
+         "null"
+        ]
+       }
+      },
+      "required": [
+       "bos_token",
+       "bos_token_id",
+       "eos_token",
+       "eos_token_id",
+       "generation_config_bos_token_id",
+       "generation_config_eos_token_id",
+       "pad_token",
+       "pad_token_id",
+       "tokenizer_config_eos_token",
+       "unk_token"
+      ],
       "type": "object"
      },
      "tokenizer_class": {
@@ -278,9 +386,1026 @@
    "type": "array"
   },
   "estimands": {
+   "additionalProperties": false,
+   "properties": {
+    "diagnostic": {
+     "additionalProperties": false,
+     "properties": {
+      "candidate_set": {
+       "maxItems": 4,
+       "minItems": 4,
+       "prefixItems": [
+        {
+         "const": "A"
+        },
+        {
+         "const": "B"
+        },
+        {
+         "const": "C"
+        },
+        {
+         "const": "D"
+        }
+       ],
+       "type": "array"
+      },
+      "discriminant_position_offset": {
+       "const": 0
+      },
+      "estimand_id": {
+       "const": "D0_single_forward_decodability"
+      },
+      "is_ever_a_gate": {
+       "const": false
+      },
+      "is_ever_an_rp_b_gate": {
+       "const": false
+      },
+      "limitation": {
+       "minLength": 40,
+       "type": "string"
+      },
+      "qualifies_a_candidate": {
+       "const": false
+      },
+      "readout": {
+       "const": "single_forward_restricted_candidate_scoring"
+      },
+      "role": {
+       "const": "conditional_diagnostic_only"
+      },
+      "scoring_rule": {
+       "minLength": 40,
+       "type": "string"
+      },
+      "selection_rule": {
+       "const": "argmax over the registered candidate set"
+      },
+      "tie_rule": {
+       "minLength": 40,
+       "type": "string"
+      }
+     },
+     "required": [
+      "candidate_set",
+      "discriminant_position_offset",
+      "estimand_id",
+      "is_ever_a_gate",
+      "is_ever_an_rp_b_gate",
+      "limitation",
+      "qualifies_a_candidate",
+      "readout",
+      "role",
+      "scoring_rule",
+      "selection_rule",
+      "tie_rule"
+     ],
+     "type": "object"
+    },
+    "generated_cot_ceiling": {
+     "additionalProperties": false,
+     "properties": {
+      "bank_relationship": {
+       "minLength": 40,
+       "type": "string"
+      },
+      "canonical_wrapper_per_checkpoint": {
+       "additionalProperties": false,
+       "properties": {
+        "RP_B1": {
+         "additionalProperties": false,
+         "properties": {
+          "token_count": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "utf8_bytes": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "utf8_sha256": {
+           "pattern": "^[0-9a-f]{64}$",
+           "type": "string"
+          }
+         },
+         "required": [
+          "token_count",
+          "utf8_bytes",
+          "utf8_sha256"
+         ],
+         "type": "object"
+        },
+        "RP_B2": {
+         "additionalProperties": false,
+         "properties": {
+          "token_count": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "utf8_bytes": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "utf8_sha256": {
+           "pattern": "^[0-9a-f]{64}$",
+           "type": "string"
+          }
+         },
+         "required": [
+          "token_count",
+          "utf8_bytes",
+          "utf8_sha256"
+         ],
+         "type": "object"
+        },
+        "RP_B3": {
+         "additionalProperties": false,
+         "properties": {
+          "token_count": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "utf8_bytes": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "utf8_sha256": {
+           "pattern": "^[0-9a-f]{64}$",
+           "type": "string"
+          }
+         },
+         "required": [
+          "token_count",
+          "utf8_bytes",
+          "utf8_sha256"
+         ],
+         "type": "object"
+        },
+        "RT": {
+         "additionalProperties": false,
+         "properties": {
+          "token_count": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "utf8_bytes": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "utf8_sha256": {
+           "pattern": "^[0-9a-f]{64}$",
+           "type": "string"
+          }
+         },
+         "required": [
+          "token_count",
+          "utf8_bytes",
+          "utf8_sha256"
+         ],
+         "type": "object"
+        }
+       },
+       "required": [
+        "RP_B1",
+        "RP_B2",
+        "RP_B3",
+        "RT"
+       ],
+       "type": "object"
+      },
+      "estimand_id": {
+       "const": "COT_generated_reasoning_ceiling"
+      },
+      "granularity": {
+       "const": "per_checkpoint_revision"
+      },
+      "is_an_interface_selector": {
+       "const": false
+      },
+      "k": {
+       "const": 1
+      },
+      "limitation": {
+       "minLength": 40,
+       "type": "string"
+      },
+      "parser_id": {
+       "const": "P1_FINAL_ANSWER_LAST_LINE"
+      },
+      "parser_regex": {
+       "minLength": 5,
+       "type": "string"
+      },
+      "resource_bounds_per_checkpoint": {
+       "additionalProperties": false,
+       "properties": {
+        "RP_B1": {
+         "additionalProperties": false,
+         "properties": {
+          "canonical_prompt_token_count": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "context_window_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "fits_context_window": {
+           "const": true
+          },
+          "items": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "max_new_tokens_per_item": {
+           "const": 4096
+          },
+          "worst_case_sequence_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "worst_case_total_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          }
+         },
+         "required": [
+          "canonical_prompt_token_count",
+          "context_window_tokens",
+          "fits_context_window",
+          "items",
+          "max_new_tokens_per_item",
+          "worst_case_sequence_tokens",
+          "worst_case_total_tokens"
+         ],
+         "type": "object"
+        },
+        "RP_B2": {
+         "additionalProperties": false,
+         "properties": {
+          "canonical_prompt_token_count": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "context_window_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "fits_context_window": {
+           "const": true
+          },
+          "items": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "max_new_tokens_per_item": {
+           "const": 4096
+          },
+          "worst_case_sequence_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "worst_case_total_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          }
+         },
+         "required": [
+          "canonical_prompt_token_count",
+          "context_window_tokens",
+          "fits_context_window",
+          "items",
+          "max_new_tokens_per_item",
+          "worst_case_sequence_tokens",
+          "worst_case_total_tokens"
+         ],
+         "type": "object"
+        },
+        "RP_B3": {
+         "additionalProperties": false,
+         "properties": {
+          "canonical_prompt_token_count": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "context_window_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "fits_context_window": {
+           "const": true
+          },
+          "items": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "max_new_tokens_per_item": {
+           "const": 4096
+          },
+          "worst_case_sequence_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "worst_case_total_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          }
+         },
+         "required": [
+          "canonical_prompt_token_count",
+          "context_window_tokens",
+          "fits_context_window",
+          "items",
+          "max_new_tokens_per_item",
+          "worst_case_sequence_tokens",
+          "worst_case_total_tokens"
+         ],
+         "type": "object"
+        },
+        "RT": {
+         "additionalProperties": false,
+         "properties": {
+          "canonical_prompt_token_count": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "context_window_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "fits_context_window": {
+           "const": true
+          },
+          "items": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "max_new_tokens_per_item": {
+           "const": 4096
+          },
+          "worst_case_sequence_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          },
+          "worst_case_total_tokens": {
+           "minimum": 1,
+           "type": "integer"
+          }
+         },
+         "required": [
+          "canonical_prompt_token_count",
+          "context_window_tokens",
+          "fits_context_window",
+          "items",
+          "max_new_tokens_per_item",
+          "worst_case_sequence_tokens",
+          "worst_case_total_tokens"
+         ],
+         "type": "object"
+        }
+       },
+       "required": [
+        "RP_B1",
+        "RP_B2",
+        "RP_B3",
+        "RT"
+       ],
+       "type": "object"
+      },
+      "route_id": {
+       "const": "C1_CANONICAL_GENERATED_COT"
+      },
+      "separate_from_e0": {
+       "const": true
+      },
+      "statistical_unit": {
+       "const": "item"
+      },
+      "task_population": {
+       "const": "D2_D3_CEILING_BANK"
+      },
+      "unparseable_output": {
+       "const": "incorrect"
+      },
+      "worst_case_total_tokens": {
+       "minimum": 1,
+       "type": "integer"
+      }
+     },
+     "required": [
+      "bank_relationship",
+      "canonical_wrapper_per_checkpoint",
+      "estimand_id",
+      "granularity",
+      "is_an_interface_selector",
+      "k",
+      "limitation",
+      "parser_id",
+      "parser_regex",
+      "resource_bounds_per_checkpoint",
+      "route_id",
+      "separate_from_e0",
+      "statistical_unit",
+      "task_population",
+      "unparseable_output",
+      "worst_case_total_tokens"
+     ],
+     "type": "object"
+    },
+    "primary": {
+     "additionalProperties": false,
+     "properties": {
+      "decoding": {
+       "additionalProperties": false,
+       "properties": {
+        "add_special_tokens": {
+         "const": false
+        },
+        "do_sample": {
+         "const": false
+        },
+        "num_beams": {
+         "const": 1
+        },
+        "temperature": {
+         "type": "null"
+        }
+       },
+       "required": [
+        "add_special_tokens",
+        "do_sample",
+        "num_beams",
+        "temperature"
+       ],
+       "type": "object"
+      },
+      "descriptive_only_diagnostics": {
+       "items": {
+        "enum": [
+         "answer_set_mass",
+         "full_vocabulary_rank",
+         "complete_candidate_joint_likelihood"
+        ],
+        "type": "string"
+       },
+       "maxItems": 3,
+       "minItems": 3,
+       "type": "array"
+      },
+      "descriptive_only_diagnostics_may_determine_a_gate": {
+       "const": false
+      },
+      "estimand_id": {
+       "const": "E0_zero_generated_reasoning_token_expressed_competence"
+      },
+      "max_new_tokens_rule": {
+       "minLength": 40,
+       "type": "string"
+      },
+      "role": {
+       "const": "primary_headline"
+      },
+      "scoring": {
+       "additionalProperties": false,
+       "properties": {
+        "empty_output": {
+         "const": "incorrect"
+        },
+        "prefix_matching_permitted": {
+         "const": false
+        },
+        "rationale_or_extra_emitted_token_permitted": {
+         "const": false
+        },
+        "rule": {
+         "const": "full_sequence_exact_match"
+        },
+        "runtime_failure": {
+         "const": "incorrect"
+        },
+        "trailing_eos_tokens_stripped_before_comparison": {
+         "const": 1
+        },
+        "unparseable_output": {
+         "const": "incorrect"
+        }
+       },
+       "required": [
+        "empty_output",
+        "prefix_matching_permitted",
+        "rationale_or_extra_emitted_token_permitted",
+        "rule",
+        "runtime_failure",
+        "trailing_eos_tokens_stripped_before_comparison",
+        "unparseable_output"
+       ],
+       "type": "object"
+      },
+      "statistical_unit": {
+       "const": "item"
+      },
+      "termination_margin_tokens": {
+       "const": 1
+      },
+      "worst_case_total_generated_and_prompt_tokens": {
+       "minimum": 1,
+       "type": "integer"
+      }
+     },
+     "required": [
+      "decoding",
+      "descriptive_only_diagnostics",
+      "descriptive_only_diagnostics_may_determine_a_gate",
+      "estimand_id",
+      "max_new_tokens_rule",
+      "role",
+      "scoring",
+      "statistical_unit",
+      "termination_margin_tokens",
+      "worst_case_total_generated_and_prompt_tokens"
+     ],
+     "type": "object"
+    }
+   },
+   "required": [
+    "diagnostic",
+    "generated_cot_ceiling",
+    "primary"
+   ],
    "type": "object"
   },
   "interfaces": {
+   "additionalProperties": false,
+   "properties": {
+    "arm_count": {
+     "const": 2
+    },
+    "arm_differentiating_field": {
+     "const": "envelope"
+    },
+    "arm_gate": {
+     "const": "joint_adequacy"
+    },
+    "arm_gate_limitation": {
+     "minLength": 40,
+     "type": "string"
+    },
+    "e0_arms": {
+     "items": {
+      "additionalProperties": false,
+      "properties": {
+       "answer_cue": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "arm_id": {
+        "enum": [
+         "W1_RAW_DIRECT",
+         "W2_ROLE_CANONICAL"
+        ],
+        "type": "string"
+       },
+       "checkpoint_specific": {
+        "type": "boolean"
+       },
+       "envelope_kind": {
+        "enum": [
+         "raw_plaintext_direct_answer",
+         "checkpoint_revision_specific_role_canonical"
+        ],
+        "type": "string"
+       },
+       "estimand": {
+        "const": "E0_zero_generated_reasoning_token_expressed_competence"
+       },
+       "few_shot_example_count": {
+        "const": 0
+       },
+       "few_shot_examples": {
+        "items": {
+         "type": "string"
+        },
+        "maxItems": 0,
+        "type": "array"
+       },
+       "message_roles": {
+        "items": {
+         "enum": [
+          "user"
+         ],
+         "type": "string"
+        },
+        "maxItems": 1,
+        "type": "array"
+       },
+       "per_checkpoint": {
+        "additionalProperties": false,
+        "properties": {
+         "RP_B1": {
+          "additionalProperties": false,
+          "properties": {
+           "d0_common_prefix_token_length": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "d0_discriminant_position": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "d0_discriminant_token_ids": {
+            "additionalProperties": false,
+            "properties": {
+             "A": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "B": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "C": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "D": {
+              "minimum": 0,
+              "type": "integer"
+             }
+            },
+            "required": [
+             "A",
+             "B",
+             "C",
+             "D"
+            ],
+            "type": "object"
+           },
+           "frozen_reasoning_closure": {
+            "enum": [
+             "",
+             "</think>\n\n"
+            ],
+            "type": "string"
+           },
+           "prompt_token_count": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "prompt_utf8_bytes": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "prompt_utf8_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+           },
+           "reasoning_span_opened_by_template": {
+            "type": "boolean"
+           }
+          },
+          "required": [
+           "d0_common_prefix_token_length",
+           "d0_discriminant_position",
+           "d0_discriminant_token_ids",
+           "frozen_reasoning_closure",
+           "prompt_token_count",
+           "prompt_utf8_bytes",
+           "prompt_utf8_sha256",
+           "reasoning_span_opened_by_template"
+          ],
+          "type": "object"
+         },
+         "RP_B2": {
+          "additionalProperties": false,
+          "properties": {
+           "d0_common_prefix_token_length": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "d0_discriminant_position": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "d0_discriminant_token_ids": {
+            "additionalProperties": false,
+            "properties": {
+             "A": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "B": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "C": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "D": {
+              "minimum": 0,
+              "type": "integer"
+             }
+            },
+            "required": [
+             "A",
+             "B",
+             "C",
+             "D"
+            ],
+            "type": "object"
+           },
+           "frozen_reasoning_closure": {
+            "enum": [
+             "",
+             "</think>\n\n"
+            ],
+            "type": "string"
+           },
+           "prompt_token_count": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "prompt_utf8_bytes": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "prompt_utf8_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+           },
+           "reasoning_span_opened_by_template": {
+            "type": "boolean"
+           }
+          },
+          "required": [
+           "d0_common_prefix_token_length",
+           "d0_discriminant_position",
+           "d0_discriminant_token_ids",
+           "frozen_reasoning_closure",
+           "prompt_token_count",
+           "prompt_utf8_bytes",
+           "prompt_utf8_sha256",
+           "reasoning_span_opened_by_template"
+          ],
+          "type": "object"
+         },
+         "RP_B3": {
+          "additionalProperties": false,
+          "properties": {
+           "d0_common_prefix_token_length": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "d0_discriminant_position": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "d0_discriminant_token_ids": {
+            "additionalProperties": false,
+            "properties": {
+             "A": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "B": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "C": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "D": {
+              "minimum": 0,
+              "type": "integer"
+             }
+            },
+            "required": [
+             "A",
+             "B",
+             "C",
+             "D"
+            ],
+            "type": "object"
+           },
+           "frozen_reasoning_closure": {
+            "enum": [
+             "",
+             "</think>\n\n"
+            ],
+            "type": "string"
+           },
+           "prompt_token_count": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "prompt_utf8_bytes": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "prompt_utf8_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+           },
+           "reasoning_span_opened_by_template": {
+            "type": "boolean"
+           }
+          },
+          "required": [
+           "d0_common_prefix_token_length",
+           "d0_discriminant_position",
+           "d0_discriminant_token_ids",
+           "frozen_reasoning_closure",
+           "prompt_token_count",
+           "prompt_utf8_bytes",
+           "prompt_utf8_sha256",
+           "reasoning_span_opened_by_template"
+          ],
+          "type": "object"
+         },
+         "RT": {
+          "additionalProperties": false,
+          "properties": {
+           "d0_common_prefix_token_length": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "d0_discriminant_position": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "d0_discriminant_token_ids": {
+            "additionalProperties": false,
+            "properties": {
+             "A": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "B": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "C": {
+              "minimum": 0,
+              "type": "integer"
+             },
+             "D": {
+              "minimum": 0,
+              "type": "integer"
+             }
+            },
+            "required": [
+             "A",
+             "B",
+             "C",
+             "D"
+            ],
+            "type": "object"
+           },
+           "frozen_reasoning_closure": {
+            "enum": [
+             "",
+             "</think>\n\n"
+            ],
+            "type": "string"
+           },
+           "prompt_token_count": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "prompt_utf8_bytes": {
+            "minimum": 1,
+            "type": "integer"
+           },
+           "prompt_utf8_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+           },
+           "reasoning_span_opened_by_template": {
+            "type": "boolean"
+           }
+          },
+          "required": [
+           "d0_common_prefix_token_length",
+           "d0_discriminant_position",
+           "d0_discriminant_token_ids",
+           "frozen_reasoning_closure",
+           "prompt_token_count",
+           "prompt_utf8_bytes",
+           "prompt_utf8_sha256",
+           "reasoning_span_opened_by_template"
+          ],
+          "type": "object"
+         }
+        },
+        "required": [
+         "RP_B1",
+         "RP_B2",
+         "RP_B3",
+         "RT"
+        ],
+        "type": "object"
+       }
+      },
+      "required": [
+       "answer_cue",
+       "arm_id",
+       "checkpoint_specific",
+       "envelope_kind",
+       "estimand",
+       "few_shot_example_count",
+       "few_shot_examples",
+       "message_roles",
+       "per_checkpoint"
+      ],
+      "type": "object"
+     },
+     "maxItems": 2,
+     "minItems": 2,
+     "type": "array"
+    },
+    "tokenizer_functional_equivalence": {
+     "additionalProperties": false,
+     "properties": {
+      "distinct_stratum_count": {
+       "maximum": 4,
+       "minimum": 1,
+       "type": "integer"
+      },
+      "isomorphic_reinstantiation_strata_are_never_pooled": {
+       "const": true
+      },
+      "pooling_rule": {
+       "minLength": 40,
+       "type": "string"
+      },
+      "reference_role": {
+       "const": "RT"
+      },
+      "role_to_stratum": {
+       "additionalProperties": false,
+       "properties": {
+        "RP_B1": {
+         "pattern": "^STRATUM_[0-9]{2}$",
+         "type": "string"
+        },
+        "RP_B2": {
+         "pattern": "^STRATUM_[0-9]{2}$",
+         "type": "string"
+        },
+        "RP_B3": {
+         "pattern": "^STRATUM_[0-9]{2}$",
+         "type": "string"
+        },
+        "RT": {
+         "pattern": "^STRATUM_[0-9]{2}$",
+         "type": "string"
+        }
+       },
+       "required": [
+        "RP_B1",
+        "RP_B2",
+        "RP_B3",
+        "RT"
+       ],
+       "type": "object"
+      },
+      "verified_tuple_elements": {
+       "items": {
+        "enum": [
+         "bytes",
+         "token_ids",
+         "common_prefix",
+         "discriminant_position",
+         "answer_surface_token_ids"
+        ],
+        "type": "string"
+       },
+       "maxItems": 5,
+       "minItems": 5,
+       "type": "array"
+      }
+     },
+     "required": [
+      "distinct_stratum_count",
+      "isomorphic_reinstantiation_strata_are_never_pooled",
+      "pooling_rule",
+      "reference_role",
+      "role_to_stratum",
+      "verified_tuple_elements"
+     ],
+     "type": "object"
+    }
+   },
+   "required": [
+    "arm_count",
+    "arm_differentiating_field",
+    "arm_gate",
+    "arm_gate_limitation",
+    "e0_arms",
+    "tokenizer_functional_equivalence"
+   ],
    "type": "object"
   },
   "protocol_id": {
@@ -870,6 +1995,44 @@
      "type": "array"
     },
     "global_error_budget": {
+     "additionalProperties": false,
+     "properties": {
+      "alpha_global": {
+       "const": "1/20"
+      },
+      "alpha_per_cell": {
+       "const": "1/1160"
+      },
+      "claims_fixed_sequence_protection": {
+       "const": false
+      },
+      "correction_scope": {
+       "minLength": 40,
+       "type": "string"
+      },
+      "family_id": {
+       "const": "F_GLOBAL_STUDY3R"
+      },
+      "m_max": {
+       "const": 58
+      },
+      "method": {
+       "const": "bonferroni_equal_allocation"
+      },
+      "sided": {
+       "const": "one_sided"
+      }
+     },
+     "required": [
+      "alpha_global",
+      "alpha_per_cell",
+      "claims_fixed_sequence_protection",
+      "correction_scope",
+      "family_id",
+      "m_max",
+      "method",
+      "sided"
+     ],
      "type": "object"
     },
     "ladder_multiplicity": {
@@ -973,6 +2136,410 @@
    "type": "object"
   },
   "task_populations": {
+   "additionalProperties": false,
+   "properties": {
+    "answer_domain": {
+     "minLength": 10,
+     "type": "string"
+    },
+    "banks": {
+     "items": {
+      "additionalProperties": false,
+      "properties": {
+       "bank_id": {
+        "enum": [
+         "BIND",
+         "D2_ADEQUACY_BANK",
+         "D2_D3_CEILING_BANK",
+         "D2_D3_CONFIRMATION_BANK",
+         "D2_D3_DEVELOPMENT_BANK",
+         "D2_D3_TARGET_BANK",
+         "NEG",
+         "PRIM",
+         "REC"
+        ],
+        "type": "string"
+       },
+       "family_mix": {
+        "items": {
+         "enum": [
+          "BIND",
+          "D2",
+          "D3",
+          "NEG",
+          "PRIM",
+          "REC"
+         ],
+         "type": "string"
+        },
+        "maxItems": 2,
+        "minItems": 1,
+        "type": "array"
+       },
+       "gate_id": {
+        "enum": [
+         "G01_COT_CEILING",
+         "G02_CONTROL_RECOVERY",
+         "G03_CONTROL_BINDING",
+         "G04_CONTROL_PRIMITIVE",
+         "G05_NEGATIVE_CONTROL",
+         "G06_WRAPPER_JOINT_ADEQUACY",
+         "G07_RPB_DEVELOPMENT",
+         "G08_RPB_CONFIRMATION",
+         "G09_RT_E0_QUALIFICATION"
+        ],
+        "type": "string"
+       },
+       "n": {
+        "minimum": 1,
+        "type": "integer"
+       }
+      },
+      "required": [
+       "bank_id",
+       "family_mix",
+       "gate_id",
+       "n"
+      ],
+      "type": "object"
+     },
+     "maxItems": 9,
+     "minItems": 9,
+     "type": "array"
+    },
+    "chance_level": {
+     "const": "1/4"
+    },
+    "derivable_families": {
+     "items": {
+      "enum": [
+       "BIND",
+       "D2",
+       "D3",
+       "NEG",
+       "PRIM",
+       "REC"
+      ],
+      "type": "string"
+     },
+     "minItems": 1,
+     "type": "array"
+    },
+    "duplicate_and_collision_rule": {
+     "minLength": 40,
+     "type": "string"
+    },
+    "families": {
+     "additionalProperties": false,
+     "properties": {
+      "BIND": {
+       "maximum": 3,
+       "minimum": 0,
+       "type": "integer"
+      },
+      "D2": {
+       "maximum": 3,
+       "minimum": 0,
+       "type": "integer"
+      },
+      "D3": {
+       "maximum": 3,
+       "minimum": 0,
+       "type": "integer"
+      },
+      "NEG": {
+       "maximum": 3,
+       "minimum": 0,
+       "type": "integer"
+      },
+      "PRIM": {
+       "maximum": 3,
+       "minimum": 0,
+       "type": "integer"
+      },
+      "REC": {
+       "maximum": 3,
+       "minimum": 0,
+       "type": "integer"
+      }
+     },
+     "required": [
+      "BIND",
+      "D2",
+      "D3",
+      "NEG",
+      "PRIM",
+      "REC"
+     ],
+     "type": "object"
+    },
+    "generator_module": {
+     "const": "studies/study3r/tasks/study3r_task_generators_v1.py"
+    },
+    "item_disjoint_pairs": {
+     "items": {
+      "items": {
+       "enum": [
+        "BIND",
+        "D2_ADEQUACY_BANK",
+        "D2_D3_CEILING_BANK",
+        "D2_D3_CONFIRMATION_BANK",
+        "D2_D3_DEVELOPMENT_BANK",
+        "D2_D3_TARGET_BANK",
+        "NEG",
+        "PRIM",
+        "REC"
+       ],
+       "type": "string"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+     },
+     "minItems": 9,
+     "type": "array"
+    },
+    "item_eligibility_rules": {
+     "items": {
+      "minLength": 10,
+      "type": "string"
+     },
+     "minItems": 5,
+     "type": "array"
+    },
+    "label_alphabet": {
+     "maxItems": 4,
+     "minItems": 4,
+     "prefixItems": [
+      {
+       "const": "A"
+      },
+      {
+       "const": "B"
+      },
+      {
+       "const": "C"
+      },
+      {
+       "const": "D"
+      }
+     ],
+     "type": "array"
+    },
+    "negative_control_construction": {
+     "minLength": 40,
+     "type": "string"
+    },
+    "negative_control_family": {
+     "const": "NEG"
+    },
+    "operand_domain": {
+     "additionalProperties": false,
+     "properties": {
+      "max": {
+       "minimum": 1,
+       "type": "integer"
+      },
+      "min": {
+       "minimum": 0,
+       "type": "integer"
+      }
+     },
+     "required": [
+      "max",
+      "min"
+     ],
+     "type": "object"
+    },
+    "operation_ontology": {
+     "additionalProperties": false,
+     "properties": {
+      "ADD": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "MUL": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "SUB": {
+       "minLength": 1,
+       "type": "string"
+      }
+     },
+     "required": [
+      "ADD",
+      "MUL",
+      "SUB"
+     ],
+     "type": "object"
+    },
+    "rendering_rules": {
+     "additionalProperties": false,
+     "properties": {
+      "answer_cue": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "item_body_template": {
+       "minLength": 40,
+       "type": "string"
+      },
+      "newline_bytes": {
+       "const": "\n"
+      },
+      "raw_envelope_separator": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "stem_templates": {
+       "additionalProperties": false,
+       "properties": {
+        "BIND": {
+         "minLength": 5,
+         "type": "string"
+        },
+        "D2": {
+         "minLength": 5,
+         "type": "string"
+        },
+        "D3": {
+         "minLength": 5,
+         "type": "string"
+        },
+        "NEG": {
+         "minLength": 5,
+         "type": "string"
+        },
+        "PRIM": {
+         "minLength": 5,
+         "type": "string"
+        },
+        "REC": {
+         "minLength": 5,
+         "type": "string"
+        }
+       },
+       "required": [
+        "BIND",
+        "D2",
+        "D3",
+        "NEG",
+        "PRIM",
+        "REC"
+       ],
+       "type": "object"
+      }
+     },
+     "required": [
+      "answer_cue",
+      "item_body_template",
+      "newline_bytes",
+      "raw_envelope_separator",
+      "stem_templates"
+     ],
+     "type": "object"
+    },
+    "result_domain": {
+     "additionalProperties": false,
+     "properties": {
+      "max": {
+       "minimum": 1,
+       "type": "integer"
+      },
+      "min": {
+       "minimum": 0,
+       "type": "integer"
+      }
+     },
+     "required": [
+      "max",
+      "min"
+     ],
+     "type": "object"
+    },
+    "seed_commitment_procedure": {
+     "additionalProperties": false,
+     "properties": {
+      "banks_realized_in_the_authoring_session": {
+       "const": false
+      },
+      "realization_guard": {
+       "minLength": 40,
+       "type": "string"
+      },
+      "rule": {
+       "minLength": 40,
+       "type": "string"
+      },
+      "seed_drawn_in_the_authoring_session": {
+       "const": false
+      }
+     },
+     "required": [
+      "banks_realized_in_the_authoring_session",
+      "realization_guard",
+      "rule",
+      "seed_drawn_in_the_authoring_session"
+     ],
+     "type": "object"
+    },
+    "statistical_unit": {
+     "const": "item"
+    },
+    "tokenizer_fixtures": {
+     "additionalProperties": false,
+     "properties": {
+      "are_scientific_items": {
+       "const": false
+      },
+      "canonical_fixture_index": {
+       "minimum": 0,
+       "type": "integer"
+      },
+      "count": {
+       "minimum": 1,
+       "type": "integer"
+      },
+      "purpose": {
+       "const": "byte and token surface freezing only"
+      },
+      "separation_rule": {
+       "minLength": 40,
+       "type": "string"
+      }
+     },
+     "required": [
+      "are_scientific_items",
+      "canonical_fixture_index",
+      "count",
+      "purpose",
+      "separation_rule"
+     ],
+     "type": "object"
+    }
+   },
+   "required": [
+    "answer_domain",
+    "banks",
+    "chance_level",
+    "derivable_families",
+    "duplicate_and_collision_rule",
+    "families",
+    "generator_module",
+    "item_disjoint_pairs",
+    "item_eligibility_rules",
+    "label_alphabet",
+    "negative_control_construction",
+    "negative_control_family",
+    "operand_domain",
+    "operation_ontology",
+    "rendering_rules",
+    "result_domain",
+    "seed_commitment_procedure",
+    "statistical_unit",
+    "tokenizer_fixtures"
+   ],
    "type": "object"
   }
  },

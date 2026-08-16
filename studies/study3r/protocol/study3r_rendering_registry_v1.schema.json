@@ -70,6 +70,7 @@
      "type": "string"
     },
     "value": {
+     "minimum": 0,
      "type": "integer"
     }
    },
@@ -147,6 +148,10 @@
       "type": "array"
      },
      "frozen_reasoning_closure": {
+      "enum": [
+       "",
+       "</think>\n\n"
+      ],
       "type": "string"
      },
      "immutable_revision": {

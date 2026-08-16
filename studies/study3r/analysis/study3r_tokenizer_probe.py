@@ -816,7 +816,43 @@ def surfaces_schema():
                                                     "minimum": 1},
                         "model_type": {"type": "string", "minLength": 1},
                         "trust_remote_code": {"const": False},
-                        "special_tokens": {"type": "object"},
+                        "special_tokens": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": [
+                                "bos_token", "bos_token_id", "eos_token",
+                                "eos_token_id",
+                                "generation_config_bos_token_id",
+                                "generation_config_eos_token_id", "pad_token",
+                                "pad_token_id", "tokenizer_config_eos_token",
+                                "unk_token"],
+                            "properties": {
+                                "bos_token": {"type": "string",
+                                              "minLength": 1},
+                                "bos_token_id": {"type": "integer",
+                                                 "minimum": 0},
+                                "eos_token": {"type": "string",
+                                              "minLength": 1},
+                                "eos_token_id": {"type": "integer",
+                                                 "minimum": 0},
+                                "pad_token": {"type": ["string", "null"],
+                                              "minLength": 1},
+                                "pad_token_id": {"type": ["integer", "null"],
+                                                 "minimum": 0},
+                                "unk_token": {"type": ["string", "null"],
+                                              "minLength": 1},
+                                "tokenizer_config_eos_token": {
+                                    "type": "string", "minLength": 1},
+                                "generation_config_eos_token_id": {
+                                    "type": ["integer", "array"],
+                                    "minimum": 0,
+                                    "items": {"type": "integer",
+                                              "minimum": 0}},
+                                "generation_config_bos_token_id": {
+                                    "type": ["integer", "null"],
+                                    "minimum": 0},
+                            },
+                        },
                         "chat_template_sha256": {"type": "string",
                                                  "pattern": SHA256_PATTERN},
                         "chat_template_bytes": {"type": "integer",
@@ -861,8 +897,12 @@ def surfaces_schema():
                                 "reasoning_span_opened_by_template": {
                                     "type": "boolean"},
                                 "reasoning_open_marker": {
-                                    "type": ["string", "null"]},
-                                "frozen_reasoning_closure": {"type": "string"},
+                                    "type": ["string", "null"],
+                                    "enum": list(REASONING_OPEN_MARKERS)
+                                            + [None]},
+                                "frozen_reasoning_closure": {
+                                    "type": "string",
+                                    "enum": ["", REASONING_CLOSE_BYTES]},
                                 "answer_cue": {"const": tasks.ANSWER_CUE},
                             },
                         },
@@ -985,19 +1025,35 @@ def equivalence_schema():
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cache-root", required=True,
+    parser.add_argument("--cache-root", required=False,
                         help="directory outside the repository for acquired files")
     parser.add_argument("--out-dir", default=str(ACQUISITION_DIR))
-    parser.add_argument("--observation-timestamp", required=True,
+    parser.add_argument("--observation-timestamp", required=False,
                         help="RFC 3339 UTC observation timestamp")
+    parser.add_argument("--schemas-only", action="store_true",
+                        help="regenerate only the three acquisition schemas; "
+                             "performs no network or tokenizer operation")
     args = parser.parse_args(argv)
+
+    out_dir = pathlib.Path(args.out_dir)
+    if args.schemas_only:
+        write_json(out_dir / "study3r_checkpoint_acquisition_v1.schema.json",
+                   acquisition_schema())
+        write_json(out_dir / "study3r_tokenizer_surfaces_v1.schema.json",
+                   surfaces_schema())
+        write_json(out_dir / "study3r_tokenizer_equivalence_v1.schema.json",
+                   equivalence_schema())
+        print("regenerated 3 acquisition schemas; 0 network requests, "
+              "0 tokenizer constructions")
+        return 0
+    if not args.observation_timestamp:
+        parser.error("--observation-timestamp is required for acquisition")
 
     import huggingface_hub
     import tokenizers
     import transformers
 
     cache_root = pathlib.Path(args.cache_root)
-    out_dir = pathlib.Path(args.out_dir)
 
     records = []
     probes = []

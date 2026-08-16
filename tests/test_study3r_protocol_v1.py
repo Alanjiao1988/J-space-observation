@@ -308,6 +308,18 @@ EXPECTED_STRATA = {
     "RP_B3": "STRATUM_01",
 }
 
+#: SHA-256 of the frozen canonical generated-CoT wrapper bytes.
+EXPECTED_COT_WRAPPER_SHA256 = {
+    "RT":
+        "4ea1868024141139b82f19615a57fc76b6264d7a30a2bdea8fc146ecf1c62081",
+    "RP_B1":
+        "4ea1868024141139b82f19615a57fc76b6264d7a30a2bdea8fc146ecf1c62081",
+    "RP_B2":
+        "4ea1868024141139b82f19615a57fc76b6264d7a30a2bdea8fc146ecf1c62081",
+    "RP_B3":
+        "4ea1868024141139b82f19615a57fc76b6264d7a30a2bdea8fc146ecf1c62081",
+}
+
 
 # ---------------------------------------------------------------------------
 # Loading helpers
@@ -545,6 +557,9 @@ def validate_bundle(root):
         _require(bound["context_window_tokens"]
                  == EXPECTED_CONTEXT_WINDOWS[role],
                  "CoT context window changed for %s" % role)
+        wrapper = ceiling["canonical_wrapper_per_checkpoint"][role]
+        _require(wrapper["utf8_sha256"] == EXPECTED_COT_WRAPPER_SHA256[role],
+                 "canonical CoT wrapper bytes changed for %s" % role)
 
     # -- wrapper arms -------------------------------------------------------
     arms = {arm["arm_id"]: arm for arm in protocol["interfaces"]["e0_arms"]}
@@ -1150,17 +1165,33 @@ def test_each_acquisition_artifact_validates_against_its_schema(
     "studies/study3r/protocol/study3r_state_machine_v1.schema.json",
     "studies/study3r/protocol/study3r_protocol_current.schema.json",
     "studies/study3r/study3r_candidate_manifest_v1.schema.json",
+    "studies/study3r/study3r_authoring_disclosure_v1.schema.json",
     "studies/study3r/acquisition/study3r_checkpoint_acquisition_v1.schema.json",
     "studies/study3r/acquisition/study3r_tokenizer_surfaces_v1.schema.json",
     "studies/study3r/acquisition/study3r_tokenizer_equivalence_v1.schema.json",
 ])
-def test_no_decision_bearing_property_schema_is_empty(schema_path):
+def test_no_decision_bearing_property_schema_is_unconstrained(schema_path):
+    """No property schema may be empty or a bare type with no constraint.
+
+    ``null`` and ``boolean`` are exempt: their value domains are already finite
+    and completely enumerated by the type alone. Every other property schema
+    must carry at least one further keyword (``const``, ``enum``, ``pattern``,
+    ``minimum``, ``minLength``, ``properties``, ``items`` and so on).
+    """
     document = _json(ROOT / pathlib.PurePosixPath(schema_path))
+    exempt = {"null", "boolean"}
 
     def walk(node, trail):
         if isinstance(node, dict):
             if trail and trail[-2:-1] == ["properties"]:
                 assert node != {}, "empty schema at %s" % "/".join(trail)
+                if set(node) <= {"type"}:
+                    declared = node.get("type")
+                    declared = (declared if isinstance(declared, list)
+                                else [declared])
+                    assert set(declared) <= exempt, (
+                        "unconstrained %r property schema at %s"
+                        % (declared, "/".join(trail)))
             for key, value in node.items():
                 walk(value, trail + [str(key)])
         elif isinstance(node, list):
@@ -1168,6 +1199,7 @@ def test_no_decision_bearing_property_schema_is_empty(schema_path):
                 walk(value, trail + [str(index)])
 
     walk(document, [])
+    assert document.get("additionalProperties") is False, schema_path
 
 
 # ---------------------------------------------------------------------------
@@ -1298,10 +1330,70 @@ def test_the_negative_control_family_never_exposes_a_derivable_option():
         tasks.check_eligibility("NEG", 7, [7, 1, 2, 3], 0)
 
 
+def test_the_authoring_disclosure_validates_against_its_schema():
+    jsonschema = pytest.importorskip("jsonschema")
+    document = _json(STUDY3R / "study3r_authoring_disclosure_v1.json")
+    schema = _json(STUDY3R / "study3r_authoring_disclosure_v1.schema.json")
+    jsonschema.Draft202012Validator.check_schema(schema)
+    jsonschema.validate(document, schema)
+
+
+def test_the_authoring_disclosure_reports_the_registered_design():
+    document = _json(STUDY3R / "study3r_authoring_disclosure_v1.json")
+    assert document["terminal_state"] == EXPECTED_AUTHORED_STATE
+    assert document["target_checkpoint"] == EXPECTED_TARGET
+    assert tuple(document["rp_b_ladder"]) == EXPECTED_LADDER
+    assert document["rp_b_ladder_length"] == EXPECTED_LADDER_LENGTH
+    assert document["census"]["m_max"] == EXPECTED_M_MAX
+    assert document["mutations"]["survivor_count"] == 0
+    assert document["mutations"]["registered_count"] == len(MUTATIONS)
+    assert sorted(document["mutations"]["registered"]) == sorted(
+        mutation[0] for mutation in MUTATIONS)
+    assert document["independent_recalculation"]["exact_agreement"] is True
+    assert document["protected_bytes"]["all_identical"] is True
+    assert document["boundary"]["formal_execution_authorized"] is False
+    assert document["boundary"]["evidence_ledger_rows_written"] == 0
+    assert document["test_results"]["final_head"]["new_failure_node_ids"] == []
+    assert document["test_results"]["baseline"]["failed"] == 8
+    assert document["authority_identity"][
+        "published_alone_as_the_first_commit_after_the_starting_state"] is True
+    assert document["starting_state"]["commit"] == STARTING_COMMIT
+    assert document["starting_state"]["tree"] == STARTING_TREE
+    for role in EXPECTED_ROLES:
+        recorded = [row for row in document["checkpoints"]
+                    if row["role"] == role][0]
+        assert recorded["immutable_revision"] == EXPECTED_REVISIONS[role]
+
+
+def test_the_study3r_readme_routes_to_the_authored_candidate():
+    text = (STUDY3R / "README.md").read_text(encoding="utf-8")
+    assert EXPECTED_AUTHORED_STATE in text
+    assert "protocol/study3r_protocol_current.json" in text
+    assert "protocol/study3r_protocol_v1.json" in text
+    assert "AUTHORING_DISCLOSURE.md" in text
+    assert "one independent focused methods review" in text
+    assert "formal_execution_authorized" in text
+    banner = text.splitlines()[2]
+    assert EXPECTED_AUTHORED_STATE in banner
+
+
+def test_the_authoring_disclosure_markdown_matches_the_machine_readable_form():
+    document = _json(STUDY3R / "study3r_authoring_disclosure_v1.json")
+    text = (STUDY3R / "AUTHORING_DISCLOSURE.md").read_text(encoding="utf-8")
+    assert document["terminal_state"] in text
+    assert document["starting_state"]["commit"] in text
+    assert document["starting_state"]["tree"] in text
+    assert document["authority_identity"]["sha256"] in text
+    assert document["manifest"]["aggregate_sha256"] in text
+    for role in EXPECTED_ROLES:
+        assert EXPECTED_REVISIONS[role] in text
+    for node in document["test_results"]["baseline"]["failure_node_ids"]:
+        assert node in text
+
+
 # ---------------------------------------------------------------------------
 # 4. Coordinated generator-mutation tests
 # ---------------------------------------------------------------------------
-
 
 def test_the_registered_mutation_set_covers_every_required_category():
     registered = [mutation[0] for mutation in MUTATIONS]

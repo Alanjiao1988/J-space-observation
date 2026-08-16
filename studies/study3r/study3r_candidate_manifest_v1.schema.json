@@ -94,12 +94,14 @@
    "additionalProperties": false,
    "properties": {
     "branch": {
+     "minLength": 1,
      "type": [
       "string",
       "null"
      ]
     },
     "commit": {
+     "pattern": "^[0-9a-f]{40}$",
      "type": [
       "string",
       "null"
@@ -109,6 +111,7 @@
      "const": true
     },
     "tree": {
+     "pattern": "^[0-9a-f]{40}$",
      "type": [
       "string",
       "null"

@@ -897,6 +897,10 @@
         "const": "Answer:\n"
        },
        "frozen_reasoning_closure": {
+        "enum": [
+         "",
+         "</think>\n\n"
+        ],
         "type": "string"
        },
        "generation_prompt": {
@@ -937,6 +941,12 @@
         "type": "object"
        },
        "reasoning_open_marker": {
+        "enum": [
+         "<think>",
+         "<think>\n",
+         "<think>\n\n",
+         null
+        ],
         "type": [
          "string",
          "null"
@@ -956,6 +966,80 @@
       "type": "object"
      },
      "special_tokens": {
+      "additionalProperties": false,
+      "properties": {
+       "bos_token": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "bos_token_id": {
+        "minimum": 0,
+        "type": "integer"
+       },
+       "eos_token": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "eos_token_id": {
+        "minimum": 0,
+        "type": "integer"
+       },
+       "generation_config_bos_token_id": {
+        "minimum": 0,
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "generation_config_eos_token_id": {
+        "items": {
+         "minimum": 0,
+         "type": "integer"
+        },
+        "minimum": 0,
+        "type": [
+         "integer",
+         "array"
+        ]
+       },
+       "pad_token": {
+        "minLength": 1,
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "pad_token_id": {
+        "minimum": 0,
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "tokenizer_config_eos_token": {
+        "minLength": 1,
+        "type": "string"
+       },
+       "unk_token": {
+        "minLength": 1,
+        "type": [
+         "string",
+         "null"
+        ]
+       }
+      },
+      "required": [
+       "bos_token",
+       "bos_token_id",
+       "eos_token",
+       "eos_token_id",
+       "generation_config_bos_token_id",
+       "generation_config_eos_token_id",
+       "pad_token",
+       "pad_token_id",
+       "tokenizer_config_eos_token",
+       "unk_token"
+      ],
       "type": "object"
      },
      "tokenizer_class": {

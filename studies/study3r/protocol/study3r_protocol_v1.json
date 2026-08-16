@@ -311,6 +311,28 @@
   },
   "generated_cot_ceiling": {
    "bank_relationship": "The ceiling bank is drawn from the same registered depth-2 and depth-3 generators as the E0 qualification banks and is item-disjoint from every E0 bank.",
+   "canonical_wrapper_per_checkpoint": {
+    "RP_B1": {
+     "token_count": 88,
+     "utf8_bytes": 333,
+     "utf8_sha256": "4ea1868024141139b82f19615a57fc76b6264d7a30a2bdea8fc146ecf1c62081"
+    },
+    "RP_B2": {
+     "token_count": 88,
+     "utf8_bytes": 333,
+     "utf8_sha256": "4ea1868024141139b82f19615a57fc76b6264d7a30a2bdea8fc146ecf1c62081"
+    },
+    "RP_B3": {
+     "token_count": 88,
+     "utf8_bytes": 333,
+     "utf8_sha256": "4ea1868024141139b82f19615a57fc76b6264d7a30a2bdea8fc146ecf1c62081"
+    },
+    "RT": {
+     "token_count": 88,
+     "utf8_bytes": 333,
+     "utf8_sha256": "4ea1868024141139b82f19615a57fc76b6264d7a30a2bdea8fc146ecf1c62081"
+    }
+   },
    "estimand_id": "COT_generated_reasoning_ceiling",
    "granularity": "per_checkpoint_revision",
    "is_an_interface_selector": false,
