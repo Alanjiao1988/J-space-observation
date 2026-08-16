@@ -1,5 +1,25 @@
 # Study 3 - Interface Adequacy and Label-Binding Calibration
 
+> ## Active protocol routing, draft-v0.7
+>
+> The active normative protocol is
+> [`protocol/interface_calibration_protocol_draft_v0_7.json`](protocol/interface_calibration_protocol_draft_v0_7.json),
+> resolved through
+> [`protocol/interface_calibration_protocol_current.json`](protocol/interface_calibration_protocol_current.json).
+>
+> `protocol/interface_calibration_protocol_draft.json`, its Markdown companion
+> and `protocol/interface_calibration_protocol.schema.json` are
+> `HISTORICAL_P0_BINDING_ONLY_NOT_CURRENT_PROTOCOL`. They are preserved
+> byte-exactly because the immutable P0 corpus manifest byte-binds the JSON, and
+> a prospective reader must not load them. A missing or mismatched v0.7 file
+> fails closed; it never falls back to the legacy bundle.
+>
+> draft-v0.7 is **unfrozen** and **unexecuted**: `frozen = false`,
+> `execution_authorized = false`, `formal_execution_authorized = false`.
+>
+> The next legal action is one fresh, independent, single focused methods review
+> of draft-v0.7 by a party that did not draft it.
+
 > **P0-R1 IS EXECUTION READY - AWAITING ITS REPLAY GATE**
 >
 > States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
