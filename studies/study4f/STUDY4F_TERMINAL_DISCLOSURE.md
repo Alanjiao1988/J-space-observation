@@ -154,32 +154,46 @@ and developmental execution authorization remains `false`.
 
 ## 6. Scope expiries, recorded not repaired
 
-Three assertions in out-of-tree modules expired during this work. All three are **scope predicates
-over `git diff <old commit> HEAD`**, so they hold only while HEAD is the commit they were written at
-and expire the moment any authorized commit is added after it — the same expiry that already retired
+Four assertions expired during this work. All four are **scope predicates over
+`git diff <old commit> HEAD`**, so they hold only while HEAD is the commit they were written at and
+expire the moment any authorized commit is added after it — the same expiry that already retired
 `tests/test_study3_v0_7_focused_review.py::test_the_review_changed_no_reviewed_or_historical_path`.
 
-**None of the three is inside the registered repository baseline**, the eight standing repository
-failure node IDs are unchanged, and there are **zero new repository failure node IDs**. Every one of
-the three modules is byte-identical to the Study 3R closure head, so none was repaired or suppressed.
+Every one of the affected modules is **byte-identical** to the Study 3R closure head, so none was
+repaired, edited or suppressed.
 
-| expired assertion | introduced by | guarantee carried forward by |
-| --- | --- | --- |
-| `…single_focused_review.py::test_every_review_path_is_additive_and_inside_the_reviews_directory` | the inherited authority commit `f393529…`, before this session began | `…test_study4f_behavioral_feasibility.py::test_every_study3r_byte_is_identical_to_the_closure_head` |
-| `…test_study3r_terminal_closure.py::test_the_closure_only_added_its_own_paths_and_touched_one_readme` | publishing the Study 4F authority alone at `7d5ff08…` | `…::test_study4f_added_paths_live_only_in_its_own_namespace` |
-| `…single_focused_review.py::test_the_review_changed_no_candidate_or_protected_path` | the Study 4F governance scope admission | `…::test_the_governance_change_is_a_scope_predicate_only_change` |
+| expired assertion | in the baseline? | introduced by | guarantee carried forward by |
+| --- | --- | --- | --- |
+| `…single_focused_review.py::test_every_review_path_is_additive_and_inside_the_reviews_directory` | no | the inherited authority commit `f393529…`, before this session began | `…::test_every_study3r_byte_is_identical_to_the_closure_head` |
+| `…test_study3r_terminal_closure.py::test_the_closure_only_added_its_own_paths_and_touched_one_readme` | no | publishing the Study 4F authority alone | `…::test_study4f_added_paths_live_only_in_its_own_namespace` |
+| `…single_focused_review.py::test_the_review_changed_no_candidate_or_protected_path` | no | the governance scope admission | `…::test_the_governance_change_is_a_scope_predicate_only_change` |
+| **`tests/test_study3r_protocol_v1.py::test_the_authoring_session_wrote_nothing_outside_the_study3r_namespace`** | **yes** | publishing the Study 4F authority alone | `…::test_no_expiry_hides_a_moved_study3r_byte` |
+
+### The repository suite
+
+| head | result |
+| --- | --- |
+| Study 3R closure head `ee8a852…` | `8 failed, 5,120 passed, 16 skipped` — the registered baseline, exactly |
+| this Study 4F head | `9 failed, 5,119 passed, 16 skipped` |
+
+The **eight standing failure node IDs are unchanged**. The ninth is the fourth expiry above, and it
+is **structurally unavoidable**: that assertion permits only the Study 3R authored path set plus
+anything inside `studies/study3r/`, while the Study 4F authority requires publishing an instrument
+outside that namespace — and the module is a candidate test that section 11 of this authority and
+section 3 of the Study 3R terminal-closure authority both forbid editing. There is therefore no
+publication of Study 4F that leaves it passing, and no repair that does not change a protected byte.
+It is recorded here rather than repaired or suppressed.
 
 ### The governance scope admission
 
 `tests/test_study3r_operator_governance.py` carries two predicates enumerating the namespaces an
 authorized session may add paths inside. They reject every path outside `studies/study3r/`, so
-publishing Study 4F at all required admitting its namespace — otherwise two tests **inside** the
-registered repository baseline would have failed and the eight standing node IDs would no longer have
-been the whole set.
+admitting the Study 4F namespace **strictly reduced** the damage: without it, two further tests
+inside the registered baseline would also have failed, giving eleven rather than nine.
 
 The module lists itself in `AUTHORING_MODIFIED`, so it is the designated place to carry these scope
 guarantees forward. The change adds one namespace constant and rewrites two predicate expressions. A
-Study 4F test proves mechanically, by comparing the parsed syntax trees, that it:
+Study 4F test proves mechanically, by comparing the parsed syntax trees before and after, that it:
 
 * adds **0** tests and removes **0** tests;
 * changes **0** assertions;

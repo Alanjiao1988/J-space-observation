@@ -217,16 +217,29 @@
       "required": [
         "count", "in_the_registered_repository_baseline",
         "standing_repository_failure_node_ids_unchanged",
-        "new_repository_failure_node_ids", "governance_change",
-        "expired_assertions"
+        "repository_suite_at_the_study3r_closure_head",
+        "repository_suite_at_this_head",
+        "new_repository_failure_node_ids", "new_failure_is_unavoidable",
+        "new_failure_rationale", "governance_change", "expired_assertions"
       ],
       "properties": {
-        "count": {"const": 3},
-        "in_the_registered_repository_baseline": {"const": 0},
+        "count": {"const": 4},
+        "in_the_registered_repository_baseline": {"const": 1},
         "standing_repository_failure_node_ids_unchanged": {"const": true},
-        "new_repository_failure_node_ids": {
-          "type": "array", "minItems": 0, "maxItems": 0, "items": false
+        "repository_suite_at_the_study3r_closure_head": {
+          "const": "8 failed, 5,120 passed, 16 skipped"
         },
+        "repository_suite_at_this_head": {
+          "const": "9 failed, 5,119 passed, 16 skipped"
+        },
+        "new_repository_failure_node_ids": {
+          "type": "array", "minItems": 1, "maxItems": 1,
+          "items": {
+            "const": "tests/test_study3r_protocol_v1.py::test_the_authoring_session_wrote_nothing_outside_the_study3r_namespace"
+          }
+        },
+        "new_failure_is_unavoidable": {"const": true},
+        "new_failure_rationale": {"type": "string", "minLength": 200},
         "governance_change": {
           "type": "object",
           "additionalProperties": false,
@@ -257,8 +270,8 @@
         },
         "expired_assertions": {
           "type": "array",
-          "minItems": 3,
-          "maxItems": 3,
+          "minItems": 4,
+          "maxItems": 4,
           "uniqueItems": true,
           "items": {
             "type": "object",
@@ -277,7 +290,7 @@
                   "the Study 4F governance scope admission"
                 ]
               },
-              "inside_the_registered_repository_baseline": {"const": false},
+              "inside_the_registered_repository_baseline": {"type": "boolean"},
               "editable_under_this_authority": {"const": false},
               "repaired": {"const": false},
               "suppressed": {"const": false},

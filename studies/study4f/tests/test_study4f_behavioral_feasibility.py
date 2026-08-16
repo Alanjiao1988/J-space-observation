@@ -941,21 +941,28 @@ def test_the_governance_change_is_a_scope_predicate_only_change():
 
 def test_every_scope_expiry_is_recorded_and_none_is_suppressed(status):
     expiries = status["scope_expiries"]
-    assert expiries["count"] == len(expiries["expired_assertions"]) == 3
-    assert expiries["in_the_registered_repository_baseline"] == 0
-    assert expiries["new_repository_failure_node_ids"] == []
+    assert expiries["count"] == len(expiries["expired_assertions"]) == 4
     assert expiries["standing_repository_failure_node_ids_unchanged"] is True
+    assert expiries["repository_suite_at_the_study3r_closure_head"] == \
+        "8 failed, 5,120 passed, 16 skipped"
+    assert expiries["repository_suite_at_this_head"] == \
+        "9 failed, 5,119 passed, 16 skipped"
+    inside = [record for record in expiries["expired_assertions"]
+              if record["inside_the_registered_repository_baseline"]]
+    assert len(inside) == expiries["in_the_registered_repository_baseline"] == 1
+    assert [record["node_id"] for record in inside] == \
+        expiries["new_repository_failure_node_ids"]
+    assert expiries["new_failure_is_unavoidable"] is True
     for record in expiries["expired_assertions"]:
         assert record["repaired"] is False
         assert record["suppressed"] is False
         assert record["editable_under_this_authority"] is False
-        assert record["inside_the_registered_repository_baseline"] is False
         module, _, name = record["node_id"].partition("::")
         assert (ROOT / module).is_file(), module
         # The expired module itself must be byte-identical to the closure head.
-        if module.startswith("studies/study3r/"):
-            assert _git("rev-parse", "%s:%s" % (STUDY3R_CLOSURE_COMMIT, module)
-                        ).strip() == _git("rev-parse", "HEAD:%s" % module).strip()
+        assert _git("rev-parse", "%s:%s" % (STUDY3R_CLOSURE_COMMIT, module)
+                    ).strip() == _git("rev-parse", "HEAD:%s" % module).strip(), \
+            module
         carrier_module, _, carrier = \
             record["guarantee_carried_forward_by"].partition("::")
         assert carrier_module == \
@@ -968,6 +975,43 @@ def test_every_scope_expiry_is_recorded_and_none_is_suppressed(status):
     assert governance["test_functions_removed"] == 0
     assert governance["assertions_changed"] == 0
     assert governance["study3r_lifecycle_value_changed"] is False
+
+
+def test_the_one_new_baseline_failure_is_structurally_unavoidable(status):
+    """No Study 4F publication can leave that candidate assertion passing.
+
+    The assertion permits only the Study 3R authored path set plus anything
+    inside ``studies/study3r/``. The Study 4F authority requires publishing an
+    instrument outside that namespace, and the module is a candidate test that
+    section 11 forbids editing, so the two requirements cannot both hold.
+    """
+    new_ids = status["scope_expiries"]["new_repository_failure_node_ids"]
+    assert len(new_ids) == 1
+    module, _, name = new_ids[0].partition("::")
+    assert module == "tests/test_study3r_protocol_v1.py"
+    source = (ROOT / module).read_text(encoding="utf-8")
+    assert name in source
+    body = source[source.index("def %s" % name):]
+    body = body[:body.index("\ndef ")]
+    # It is a scope predicate over a diff to HEAD, not a substantive claim.
+    assert "STARTING_COMMIT" in body and "HEAD" in body
+    assert 'not path.startswith("studies/study3r/")' in body
+    # The module is untouched, so the failure is recorded, not repaired.
+    assert _git("rev-parse", "%s:%s" % (STUDY3R_CLOSURE_COMMIT, module)).strip() \
+        == _git("rev-parse", "HEAD:%s" % module).strip()
+    # And the admission strictly reduced the damage rather than adding to it.
+    assert status["scope_expiries"]["governance_change"]["namespaces_admitted"] \
+        == ["studies/study4f/"]
+
+
+def test_the_eight_standing_failures_are_still_exactly_the_registered_eight(status):
+    disclosure = _json(ROOT / "studies" / "study3r" /
+                       "study3r_authoring_disclosure_v1.json")
+    registered = set(disclosure["test_results"]["baseline"]["failure_node_ids"])
+    assert registered == set(STANDING_FAILURE_NODE_IDS)
+    new_ids = set(status["scope_expiries"]["new_repository_failure_node_ids"])
+    assert registered & new_ids == set(), sorted(registered & new_ids)
+    assert len(registered) == 8
 
 
 def test_no_expiry_hides_a_moved_study3r_byte():

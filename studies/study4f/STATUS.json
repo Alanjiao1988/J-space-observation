@@ -111,10 +111,16 @@
     ]
   },
   "scope_expiries": {
-    "count": 3,
-    "in_the_registered_repository_baseline": 0,
+    "count": 4,
+    "in_the_registered_repository_baseline": 1,
     "standing_repository_failure_node_ids_unchanged": true,
-    "new_repository_failure_node_ids": [],
+    "repository_suite_at_the_study3r_closure_head": "8 failed, 5,120 passed, 16 skipped",
+    "repository_suite_at_this_head": "9 failed, 5,119 passed, 16 skipped",
+    "new_repository_failure_node_ids": [
+      "tests/test_study3r_protocol_v1.py::test_the_authoring_session_wrote_nothing_outside_the_study3r_namespace"
+    ],
+    "new_failure_is_unavoidable": true,
+    "new_failure_rationale": "The assertion compares 'git diff --name-only <authoring start> HEAD' against the Study 3R authored path set plus the studies/study3r/ namespace, so it fails as soon as any authorized session writes anywhere else. Study 4F is a fresh project-level operator decision whose authority requires publishing an instrument outside that namespace, and the module is a candidate test that section 11 of the Study 4F authority and section 3 of the Study 3R terminal-closure authority both forbid editing. There is therefore no publication of Study 4F that leaves this assertion passing, and no repair that does not change a protected byte. The failure is recorded rather than repaired or suppressed, the eight standing node IDs remain exactly as registered, and the substantive guarantee -- that no Study 3R byte moved -- is re-established over the whole studies/study3r/ tree by a Study 4F test. Admitting the Study 4F namespace into the governance scope predicates strictly reduced the damage: without it, two further tests inside the registered baseline would also have failed.",
     "governance_change": {
       "path": "tests/test_study3r_operator_governance.py",
       "namespaces_admitted": ["studies/study4f/"],
@@ -157,6 +163,16 @@
         "repaired": false,
         "suppressed": false,
         "guarantee_carried_forward_by": "studies/study4f/tests/test_study4f_behavioral_feasibility.py::test_the_governance_change_is_a_scope_predicate_only_change"
+      },
+      {
+        "node_id": "tests/test_study3r_protocol_v1.py::test_the_authoring_session_wrote_nothing_outside_the_study3r_namespace",
+        "kind": "scope_predicate_over_a_git_diff_to_HEAD",
+        "introduced_by": "publishing the Study 4F authority alone at 7d5ff083",
+        "inside_the_registered_repository_baseline": true,
+        "editable_under_this_authority": false,
+        "repaired": false,
+        "suppressed": false,
+        "guarantee_carried_forward_by": "studies/study4f/tests/test_study4f_behavioral_feasibility.py::test_no_expiry_hides_a_moved_study3r_byte"
       }
     ]
   },
