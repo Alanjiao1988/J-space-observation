@@ -1,0 +1,147 @@
+{
+ "amendment_authorized": false,
+ "artifact_count": 11,
+ "artifacts": [
+  {
+   "bytes": 19227,
+   "git_blob": "046774722b1c90d70a4dfd271adb45601b84b099",
+   "path": "studies/study3r/prompts/study3r_protocol_v1_single_focused_review_authority.md",
+   "sha256": "ffa051d5994c9d41435c6f5bc5b693cdfab6c843b604c063cfe4def286b5a882"
+  },
+  {
+   "bytes": 20171,
+   "git_blob": "9af90dd7a7415f475eb9d405d4a5aef2f9da93e8",
+   "path": "studies/study3r/reviews/study3r_review_tokenizer_reconstruction.py",
+   "sha256": "cf56b8ed6f5d17a08efa6329a147fe63b9ca8b7d27146c2fc5bede4448b77743"
+  },
+  {
+   "bytes": 386371,
+   "git_blob": "6a197f0fc23a92bf5752647eb36d8a0cada88cd8",
+   "path": "studies/study3r/reviews/study3r_review_tokenizer_reconstruction.json",
+   "sha256": "f2caf54b71958fa52bb0a139535a845512248f9164d735a64f81366de97f5efa"
+  },
+  {
+   "bytes": 20158,
+   "git_blob": "66d964a7faf55022bcfb119bbc33a88f07bc206c",
+   "path": "studies/study3r/reviews/study3r_review_independent_recalculation.py",
+   "sha256": "4054dfc63c42e8d830dd20244434c973aa02915f12fa3feccadd9d1753413cec"
+  },
+  {
+   "bytes": 163167,
+   "git_blob": "dd3fb440ff0aba080e8d0020ab9a8b406057b9fc",
+   "path": "studies/study3r/reviews/study3r_review_independent_recalculation_tables.json",
+   "sha256": "c26426666104a86f375b8169923e0eb723da64601ffdc0efc46c6fbb24fe0da0"
+  },
+  {
+   "bytes": 23412,
+   "git_blob": "9ef128163ee75e7d3c7fa075425eb5dab8726688",
+   "path": "studies/study3r/reviews/study3r_review_mutation_audit.py",
+   "sha256": "2b03f0715b1a787090d2ed1cd6195b0ebbfc5958e0a1c83b7c7487c2a1f3302e"
+  },
+  {
+   "bytes": 42818,
+   "git_blob": "f350e03c4ac12b8e6452f59c7401e7d2cabe2362",
+   "path": "studies/study3r/reviews/study3r_review_mutation_audit.json",
+   "sha256": "9d79841eae8c06709513471ac21ce89abac98b0cecdf8c89b267a913d05368c3"
+  },
+  {
+   "bytes": 36366,
+   "git_blob": "f6de0a6d374812f6bbb8f154d49e527996a491b4",
+   "path": "studies/study3r/reviews/study3r_protocol_v1_single_focused_review.md",
+   "sha256": "54aca0892b66b6d2cbd7596f5d0d2bc2f779ec40cd49ae277c34c3ed04c6c486"
+  },
+  {
+   "bytes": 25362,
+   "git_blob": "93002368e0851522aaf58486bd0a308650c3d2fc",
+   "path": "studies/study3r/reviews/study3r_protocol_v1_single_focused_review.json",
+   "sha256": "71d201fa3536b9e475e02d515bea06034e7d3a98118d0257ca2d5d8752cdc1c8"
+  },
+  {
+   "bytes": 26671,
+   "git_blob": "763b4e4932e641875f4415bb9f136b704ef93bb8",
+   "path": "studies/study3r/reviews/study3r_protocol_v1_single_focused_review.schema.json",
+   "sha256": "e12a33f1d9c74d0ca297a7db44456ea570d392bde7c1d9dae9bd3a340a4a0b08"
+  },
+  {
+   "bytes": 26291,
+   "git_blob": "3fe24f1b528b2f0cd10d48b09b84dd21f4e9a43b",
+   "path": "studies/study3r/reviews/test_study3r_protocol_v1_single_focused_review.py",
+   "sha256": "b2984c3e4b0a9240e95fe2819af7483a3521e422dc3c87bff17746d37bd7686e"
+  }
+ ],
+ "authority": "studies/study3r/prompts/study3r_protocol_v1_single_focused_review_authority.md",
+ "blocking_finding_ids": [
+  "F-01",
+  "F-02",
+  "F-03",
+  "F-04"
+ ],
+ "candidate_frozen": false,
+ "candidate_state_pointer_changed": false,
+ "disposition_is_additive": true,
+ "evidence_ledger_last_row": "EV-0016",
+ "evidence_ledger_rows_added": 0,
+ "execution_authorized": false,
+ "formal_execution_authorized": false,
+ "major_finding_ids": [
+  "F-05",
+  "F-06",
+  "F-07",
+  "F-08",
+  "F-09"
+ ],
+ "minor_finding_ids": [
+  "F-10",
+  "F-11"
+ ],
+ "model_execution_authorized": false,
+ "permitted_operation_counters": {
+  "chat_template_renders": 292,
+  "encode_calls": 596,
+  "network_file_downloads": 16,
+  "network_metadata_requests": 4,
+  "tokenizer_constructions": 4
+ },
+ "prohibited_operation_counters": {
+  "adapter_or_activation_loads": 0,
+  "candidate_repairs_or_amendments": 0,
+  "cloud_or_gpu_jobs": 0,
+  "evidence_ledger_rows_written": 0,
+  "execution_seeds_drawn": 0,
+  "forward_passes": 0,
+  "generations": 0,
+  "logit_reads": 0,
+  "model_constructions": 0,
+  "prefill_operations": 0,
+  "rp_b_selections": 0,
+  "scientific_banks_realized": 0,
+  "scoring_operations": 0,
+  "weight_files_acquired": 0
+ },
+ "review_authority_commit": "9952263865694dfafea4f61643e596e193edf4b4",
+ "review_evidence_commit": "51754eeb263535ece1ef13af45408a0624b4e7a1",
+ "review_kind": "single_independent_focused_methods_review",
+ "reviewed_commit": "da1ea31b51b784cb1ab3529f9de2f6ee27c853dd",
+ "reviewed_state": "STUDY3R_PROTOCOL_V1_AUTHORED_AWAITING_SINGLE_INDEPENDENT_FOCUSED_REVIEW",
+ "reviewed_tree": "c1de862ba3782b4930191a51df8790bb4279344c",
+ "schema_version": "study3r-protocol-v1-review-receipt-v1",
+ "second_authoring_session_authorized": false,
+ "severity_counts": {
+  "BLOCKING": 4,
+  "MAJOR": 5,
+  "MINOR": 2
+ },
+ "test_differential": {
+  "candidate_module_results": "tests/test_study3r_protocol_v1.py and tests/test_study3r_operator_governance.py: 163 passed, 0 failed, 0 errors",
+  "collection_errors": 0,
+  "final_head_failed": 8,
+  "final_head_passed": 5120,
+  "final_head_skipped": 16,
+  "historical_or_protected_blobs_unchanged": true,
+  "new_failure_node_ids": [],
+  "registered_baseline": "8 failed, 5120 passed, 16 skipped at da1ea31b51b784cb1ab3529f9de2f6ee27c853dd",
+  "review_module_results": "studies/study3r/reviews/test_study3r_protocol_v1_single_focused_review.py: 38 passed, 0 failed, 0 errors",
+  "study2_mtime_flake_classified": false
+ },
+ "verdict": "STUDY3R_PROTOCOL_V1_REJECTED_TERMINAL_NO_EXECUTION"
+}

@@ -1,0 +1,433 @@
+{
+ "authority": "studies/study3r/prompts/study3r_protocol_v1_single_focused_review_authority.md",
+ "cot_ceiling_audit": {
+  "aggregation_registered": false,
+  "batch_size_registered": false,
+  "context_and_generation_bounds_registered": true,
+  "do_sample_registered": true,
+  "dtype_or_quantization_registered": false,
+  "eos_or_stop_tokens_registered": false,
+  "every_checkpoint_must_pass_before_ladder_scanning": true,
+  "k_registered": true,
+  "library_version_pinned_as_part_of_the_execution_contract": false,
+  "num_beams_registered": false,
+  "padding_side_registered": false,
+  "parser_is_unambiguous_over_multiline_output": false,
+  "parser_note": "P1_FINAL_ANSWER_LAST_LINE with ^Final answer: ([ABCD])$ is unambiguous provided the runner applies it in multiline mode and takes the last match, but the protocol registers neither the regex flags nor the last-match rule, so two compliant runners can parse a two-surface output differently.",
+  "parser_registered": true,
+  "seed_semantics_registered": false,
+  "temperature_registered": false,
+  "top_k_registered": false,
+  "top_p_registered": false,
+  "total_token_bound_registered": true,
+  "unparseable_handling_registered": true
+ },
+ "depth_audit": {
+  "allocation_rule_registered_anywhere": false,
+  "counterexamples": [
+   {
+    "balanced_minimum_depth_three_accuracy": "14/37",
+    "balanced_minimum_depth_three_beats_chance_at_alpha_per_cell": false,
+    "balanced_minimum_depth_three_correct": 14,
+    "balanced_minimum_depth_three_exact_p_versus_chance": "0.057656922510",
+    "gate_id": "G09_RT_E0_QUALIFICATION",
+    "largest_depth_three_size_whose_minimum_passing_record_fails_to_beat_chance": 44,
+    "n": 74,
+    "pass_boundary": 51,
+    "zero_depth_three_success_passes_when_depth_three_size_at_most": 23
+   },
+   {
+    "balanced_minimum_depth_three_accuracy": "14/37",
+    "balanced_minimum_depth_three_beats_chance_at_alpha_per_cell": false,
+    "balanced_minimum_depth_three_correct": 14,
+    "balanced_minimum_depth_three_exact_p_versus_chance": "0.057656922510",
+    "gate_id": "G07_RPB_DEVELOPMENT",
+    "largest_depth_three_size_whose_minimum_passing_record_fails_to_beat_chance": 44,
+    "n": 74,
+    "pass_boundary": 51,
+    "zero_depth_three_success_passes_when_depth_three_size_at_most": 23
+   },
+   {
+    "balanced_minimum_depth_three_accuracy": "14/37",
+    "balanced_minimum_depth_three_beats_chance_at_alpha_per_cell": false,
+    "balanced_minimum_depth_three_correct": 14,
+    "balanced_minimum_depth_three_exact_p_versus_chance": "0.057656922510",
+    "gate_id": "G08_RPB_CONFIRMATION",
+    "largest_depth_three_size_whose_minimum_passing_record_fails_to_beat_chance": 44,
+    "n": 74,
+    "pass_boundary": 51,
+    "zero_depth_three_success_passes_when_depth_three_size_at_most": 23
+   },
+   {
+    "balanced_minimum_depth_three_accuracy": "47/64",
+    "balanced_minimum_depth_three_beats_chance_at_alpha_per_cell": true,
+    "balanced_minimum_depth_three_correct": 47,
+    "balanced_minimum_depth_three_exact_p_versus_chance": "0E-12",
+    "gate_id": "G01_COT_CEILING",
+    "largest_depth_three_size_whose_minimum_passing_record_fails_to_beat_chance": 34,
+    "n": 128,
+    "pass_boundary": 111,
+    "zero_depth_three_success_passes_when_depth_three_size_at_most": 17
+   }
+  ],
+  "depth_is_a_gate_bearing_factor": false,
+  "mixed_banks": [
+   "D2_D3_CEILING_BANK",
+   "D2_D3_DEVELOPMENT_BANK",
+   "D2_D3_CONFIRMATION_BANK",
+   "D2_D3_TARGET_BANK"
+  ],
+  "realize_bank_accepts_one_family_only": true
+ },
+ "e0_and_wrapper_audit": {
+  "arm_differentiating_field_registered": "envelope",
+  "chat_template_emits_the_closure_itself": false,
+  "chat_template_opens_a_reasoning_span": true,
+  "do_sample_registered_false": true,
+  "empty_malformed_extra_token_and_rationale_are_incorrect": true,
+  "forced_closure_appears_in_the_authoritative_markdown": false,
+  "forced_reasoning_closure_bytes": "</think>\n\n",
+  "full_sequence_exact_match_consistently_specified": true,
+  "max_new_tokens": 2,
+  "max_new_tokens_cannot_silently_accept_a_truncated_non_eos_output": true,
+  "num_beams_registered": 1,
+  "temperature_registered": null,
+  "trailing_eos_tokens_stripped_before_comparison": 1
+ },
+ "execution_feasibility": {
+  "batching_and_padding_specified": false,
+  "deterministic_execution_fully_specified": false,
+  "device_mapping_specified": false,
+  "dtype_specified": false,
+  "framework_or_library_versions_pinned_for_execution": false,
+  "memory_feasibility_established_for_the_32b_checkpoint": false,
+  "note": "The 32B checkpoint carries no hardware, memory or precision commitment and the historical T4 environment cannot be assumed. Because dtype and quantization change logits and E0 scores a single greedy token by full-sequence exact match, those unresolved choices can change the primary endpoint, so freeze is not possible without resolving them.",
+  "quantization_specified": false,
+  "token_bounds_are_true_upper_bounds": false,
+  "wall_clock_or_compute_ceiling_specified": false
+ },
+ "findings": [
+  {
+   "affected_decision": "task population, atomic-cell content, execution reproducibility and the registered depth-3 competence claim",
+   "authority_section": "9",
+   "downgraded_to_a_limitation": false,
+   "evidence": "Four banks register family_mix [D2, D3] with only bank_id, family_mix, gate_id and n. No allocation constant, proportion, per-depth count, minimum or balancing rule exists in the protocol, its schema, the Markdown, the registry, the census, the statistics module or the generator. realize_bank(bank_id, family, size) accepts exactly one family and cannot realize a two-family bank; the candidate's own suite calls it as realize_bank('D2_D3_TARGET_BANK', 'D2', 4).",
+   "finding_id": "F-01",
+   "severity": "BLOCKING",
+   "title": "No registered depth-2/depth-3 allocation rule for any mixed bank"
+  },
+  {
+   "affected_decision": "pass/fail decision of G01_COT_CEILING, G07_RPB_DEVELOPMENT, G08_RPB_CONFIRMATION and the primary headline gate G09_RT_E0_QUALIFICATION",
+   "authority_section": "9",
+   "downgraded_to_a_limitation": false,
+   "evidence": "At n = 74 with k >= 51 the balanced 37/37 allocation passes with a depth-3 record of 14/37 = 0.378, below the registered 1/2 floor and not distinguishable from the 1/4 chance level (exact one-sided p = 0.057656922510 > alpha_per_cell = 1/1160). Any allocation with 23 or fewer depth-3 items passes with zero depth-3 correct; up to n_d3 = 44 the minimal passing depth-3 record fails to beat chance. At n = 128 with k >= 111 the same holds for n_d3 <= 17 and up to n_d3 = 34. Operation family is pooled identically.",
+   "finding_id": "F-02",
+   "severity": "BLOCKING",
+   "title": "The pooled depth cell lets depth-3 performance be masked to chance or to zero"
+  },
+  {
+   "affected_decision": "state transition, candidate-selection result and reachability of the primary endpoint",
+   "authority_section": "8",
+   "downgraded_to_a_limitation": false,
+   "evidence": "S03, S04, S05 and S06 each carry a single failure outcome predicated on at_least_one cell and target a global terminal T03/T04/T05/T06. Those gates span RT and all three RP-B roles, so 44 of the 58 atomic cells must pass before S07 is reachable. RP_B1 failure therefore blocks RP_B2 and RP_B3, and RP_B2 failure blocks RP_B3, while study3r_protocol_v1.md states the ladder 'scans past failures until the first confirmed pass' and the charter registers the CoT ceiling as a per-checkpoint precondition. RT and RP-B failures share one terminal, so the scopes are not separated.",
+   "finding_id": "F-03",
+   "severity": "BLOCKING",
+   "title": "Prequalification gates are globally conjunctive, so one candidate's failure ends the study"
+  },
+  {
+   "affected_decision": "rendered model input, execution reproducibility and the G01_COT_CEILING pass/fail decision that preconditions every later state",
+   "authority_section": "7",
+   "downgraded_to_a_limitation": false,
+   "evidence": "The cot_route and generated_cot_ceiling records register only do_sample, k, parser_id, parser_regex, unparseable_output, task_population, statistical_unit, granularity, wrapper bytes and token bounds. temperature, top_p, top_k, num_beams, seed semantics, aggregation, batch size, padding side, EOS/stop tokens, dtype, quantization, device mapping and framework/library versions appear nowhere in the CoT contract, and no library version is pinned as part of the contract. The parser regex is registered without flags or a last-match rule.",
+   "finding_id": "F-04",
+   "severity": "BLOCKING",
+   "title": "The generated-CoT route freezes no decoding contract beyond do_sample and k"
+  },
+  {
+   "affected_decision": "D0 readout reproducibility; demonstrated not to move a registered decision because D0 bears no gate, no task population and no n",
+   "authority_section": "5",
+   "downgraded_to_a_limitation": false,
+   "evidence": "The registry records 57 (W1) and 63 (W2) for all four checkpoints; these are the token lengths of the one canonical depth-2 fixture. Independent reconstruction over 36 synthetic non-scientific surfaces per checkpoint gives 13 distinct W1 positions spanning 49-65 and 13 distinct W2 positions spanning 55-71 (53-65 and 59-71 restricted to D2/D3). The per-item derivation rule exists only as a source comment in study3r_protocol_build.py; the sole registered normative field is discriminant_position_offset = 0.",
+   "finding_id": "F-05",
+   "severity": "MAJOR",
+   "title": "d0_discriminant_position is a single fixture constant, not a per-item rule"
+  },
+  {
+   "affected_decision": "construct definition of the second wrapper arm; the arm is a role-canonical envelope with a forced reasoning closure, not the checkpoint's unmodified canonical route",
+   "authority_section": "6",
+   "downgraded_to_a_limitation": false,
+   "evidence": "The native chat template (sha256 56a1447ad31926fdc21fb07e56e5642bd9c850c4f52d8c8af7bbe5f079a84f5f, identical on all four revisions) opens <think>\\n and never emits </think>; independent reconstruction confirms both. The arm appends </think>\\n\\n before the answer cue. The JSON registers frozen_reasoning_closure and reasoning_span_opened_by_template accurately, but study3r_protocol_v1.md omits the closure entirely and states that the single differing field is envelope. Apart from the envelope the arms are byte-identical and share discriminant token ids {A:32, B:33, C:34, D:35}.",
+   "finding_id": "F-06",
+   "severity": "MAJOR",
+   "title": "W2_ROLE_CANONICAL injects a forced reasoning closure absent from the authoritative Markdown"
+  },
+  {
+   "affected_decision": "registered resource ceilings; demonstrated not to move a decision because the 131072-token context window is not threatened",
+   "authority_section": "7",
+   "downgraded_to_a_limitation": false,
+   "evidence": "worst_case_total_generated_and_prompt_tokens = 470952 = 7596 x 62, the canonical fixture length; CoT worst_case_sequence_tokens = 4184 = 88 + 4096 uses the fixture prompt. Observed lengths over the adversarial grid are 49-65 (W1), 55-71 (W2) and 80-96 (CoT).",
+   "finding_id": "F-07",
+   "severity": "MAJOR",
+   "title": "Registered worst-case token bounds are fixture-length point estimates"
+  },
+  {
+   "affected_decision": "reproducibility of the nine declared item-disjoint bank pairs",
+   "authority_section": "10",
+   "downgraded_to_a_limitation": false,
+   "evidence": "realize_bank accepts excluded_item_keys and accumulates keys within one bank, but no registered caller, ordering or exclusion-chaining rule exists anywhere in the bundle, so cross-bank disjointness is not mechanically enforced. Combined with F-01 no registered procedure can produce the nine declared pairs at all. The PRNG is random.Random seeded from a SHA-256 digest, deterministic for a fixed CPython, but no Python or library version is pinned; verified on CPython 3.13.15.",
+   "finding_id": "F-08",
+   "severity": "MAJOR",
+   "title": "Item-disjointness and bank realization have no registered orchestration"
+  },
+  {
+   "affected_decision": "validation adequacy for D2/D3 allocation, the forced reasoning closure and parser anchoring",
+   "authority_section": "12",
+   "downgraded_to_a_limitation": false,
+   "evidence": "49 mutations executed in temporary staged trees: all 24 registered mutations killed, 42 of 49 killed overall, 7 coordinated adversarial survivors each producing a changed committed bundle that validate_bundle accepted. Depth-3 can be removed from the target and ceiling banks and the D3 family depth relabelled from 3 to 2; the forced closure can be emptied or shortened, in two variants leaving committed data that no longer validates against its own committed schema and in one variant leaving rendered_utf8_bytes = 231 and rendered_token_count = 63 contradicting an emptied closure; the CoT parser regex can be unanchored. validate_bundle performs no JSON-schema validation.",
+   "finding_id": "F-09",
+   "severity": "MAJOR",
+   "title": "Seven coordinated decision-bearing mutations survive the semantic validator"
+  },
+  {
+   "affected_decision": "none demonstrated",
+   "authority_section": "4",
+   "downgraded_to_a_limitation": false,
+   "evidence": "Two exact-set assertions became set-plus-namespace-prefix assertions. The namespace prefix studies/study3r/ merely advances the charter-declared namespace and tests/test_study3r_protocol_v1.py is named by path in the authoring authority section 9, so both are pre-declared. .gitattributes and the module's self-permission were not pre-declared and are a genuine widening, but every per-path protected-blob assertion is unchanged, no reviewed, rejected-candidate, independent-review or protected historical path lies inside the widened prefix, and an independent blob comparison against reviewed commit 459d0024 confirms every rejected-candidate and protected historical path retains its registered blob.",
+   "finding_id": "F-10",
+   "severity": "MINOR",
+   "title": "The governance policing test widened its own scope predicates"
+  },
+  {
+   "affected_decision": "none demonstrated",
+   "authority_section": "13",
+   "downgraded_to_a_limitation": false,
+   "evidence": "The manifest asserts every_entry_is_lf_only = true, a property produced by .gitattributes rules covering studies/study3r/* and tests/test_study3r_protocol_v1.py. .gitattributes appears in none of the 27 entries, the 4 deferred exclusions or the 1 self-exclusion, although review authority section 13 lists it where it affects byte reproduction. Its content is bound by the Git tree, so no decision can move.",
+   "finding_id": "F-11",
+   "severity": "MINOR",
+   "title": "The .gitattributes file is neither a manifest entry nor a declared exclusion"
+  }
+ ],
+ "gate_scope_audit": {
+  "candidate_specific_failure_is_promoted_to_study_wide_failure": true,
+  "cells_that_must_pass_before_ladder_scanning_begins": 44,
+  "globally_conjunctive_states": [
+   "S03_GENERATED_COT_CEILING",
+   "S04_COMPETENCE_CONTROLS",
+   "S05_NEGATIVE_CONTROL",
+   "S06_TWO_WRAPPER_JOINT_ADEQUACY"
+  ],
+  "markdown_claims_the_ladder_scans_past_failures": true,
+  "rp_b1_failure_blocks_rp_b2": true,
+  "rp_b2_failure_blocks_rp_b3": true,
+  "rt_e0_failure_scope": "correctly candidate-scoped; S09 routes both outcomes to S10 and the disposition is carried to T09_RT_NOT_QUALIFIED or T10_STUDY3R_COMPLETE_RT_QUALIFIED",
+  "rt_precondition_failure_scope": "global; an RT failure at S03-S06 reaches the same study-wide terminal as an RP-B failure, which is defensible for the target checkpoint but conflates the two roles",
+  "state_paths_reconstructed_independently": true
+ },
+ "independence": {
+  "drafted_or_edited_any_candidate_artifact": false,
+  "imported_any_candidate_calculator_in_the_recalculation": false,
+  "imported_the_candidate_tokenizer_probe": false,
+  "is_independent_of_the_authoring_party": true,
+  "statement": "This reviewer did not draft or materially edit the Study 3R authority, protocol, schemas, registry, state machine, task generators, statistical calculators, tokenizer probe, manifest generator or candidate tests. Every rendering rule and factor level used by the review artifacts was re-typed from the committed candidate text rather than imported."
+ },
+ "manifest_and_bundle_audit": {
+  "aggregate_sha256_recomputed": "c3983f570281c1ab0a987d97d7861943dc8e11681e3d5bb2938f5a6276db8fe0",
+  "aggregate_sha256_registered": "c3983f570281c1ab0a987d97d7861943dc8e11681e3d5bb2938f5a6276db8fe0",
+  "current_pointer_route_note": "The pointer names the protocol JSON, its schema, the Markdown and the authority; the registry, state machine, task generator, statistics and acquisition records are reachable one hop further through protocol['references']. The route is complete and single-valued but indirect.",
+  "current_pointer_routes_to_the_complete_bundle": true,
+  "deferred_exclusion_count": 4,
+  "deferred_exclusions_are_non_decision_bearing": true,
+  "entry_count": 27,
+  "every_entry_reproduces": true,
+  "gitattributes_is_bound": false,
+  "self_exclusion_count": 1
+ },
+ "mutation_audit": {
+  "adversarial_mutation_count": 25,
+  "decision_bearing_survivor_count": 7,
+  "killed_count": 42,
+  "no_effect_count": 0,
+  "registered_mutation_count": 24,
+  "report": "studies/study3r/reviews/study3r_review_mutation_audit.json",
+  "survivor_count": 7,
+  "survivor_ids": [
+   "adv_cot_parser_regex_unanchored",
+   "adv_d2_d3_ceiling_mix_drops_depth_three",
+   "adv_d2_d3_family_mix_drops_depth_three",
+   "adv_d3_family_depth_relabelled",
+   "adv_forced_reasoning_closure_changed",
+   "adv_forced_reasoning_closure_removed",
+   "adv_surfaces_closure_emptied_while_rendered_bytes_unchanged"
+  ],
+  "total_mutation_count": 49,
+  "validator_performs_json_schema_validation": false
+ },
+ "permitted_operation_counters": {
+  "chat_template_renders": 292,
+  "encode_calls": 596,
+  "network_file_downloads": 16,
+  "network_metadata_requests": 4,
+  "tokenizer_constructions": 4
+ },
+ "prohibited_operation_counters": {
+  "adapter_or_activation_loads": 0,
+  "candidate_repairs_or_amendments": 0,
+  "cloud_or_gpu_jobs": 0,
+  "evidence_ledger_rows_written": 0,
+  "execution_seeds_drawn": 0,
+  "forward_passes": 0,
+  "generations": 0,
+  "logit_reads": 0,
+  "model_constructions": 0,
+  "prefill_operations": 0,
+  "rp_b_selections": 0,
+  "scientific_banks_realized": 0,
+  "scoring_operations": 0,
+  "weight_files_acquired": 0
+ },
+ "repository_and_governance_audit": {
+  "authoring_paths_outside_the_study3r_namespace": [
+   ".gitattributes",
+   "tests/test_study3r_operator_governance.py",
+   "tests/test_study3r_protocol_v1.py"
+  ],
+  "authority_commit_contains_only_the_authority": true,
+  "authority_commit_is_first": true,
+  "bundle_reproduces_from_its_generators": true,
+  "every_json_artifact_validates_against_its_schema": true,
+  "governance_test_newly_admitted_exact_paths": [
+   ".gitattributes",
+   "studies/study3r/README.md",
+   "tests/test_study3r_operator_governance.py",
+   "tests/test_study3r_protocol_v1.py"
+  ],
+  "governance_test_newly_admitted_prefix": "studies/study3r/",
+  "governance_test_self_permitted_its_own_modification": true,
+  "governance_test_widening_verdict": "The namespace prefix and tests/test_study3r_protocol_v1.py merely advance the charter-declared Study 3R namespace and the path the authoring authority names; .gitattributes and the module's self-permission are a genuine post-hoc widening, but the widening is demonstrated not to admit any protected, reviewed, rejected-candidate or independent-review path and every per-path protected-blob assertion is unchanged, so it is classified MINOR as F-10.",
+  "immutable_revision_records_verified": true,
+  "linear_commit_count_from_cd9c0af": 5,
+  "merge_rebase_or_rewrite_count": 0,
+  "no_legacy_runtime_overlay_or_fallback": true,
+  "no_schema_property_is_unconstrained": true,
+  "no_weight_file_acquired": true,
+  "protected_paths_retain_their_registered_blobs": true,
+  "single_unambiguous_current_pointer": true
+ },
+ "review_authority_commit": {
+  "authority_blob": "046774722b1c90d70a4dfd271adb45601b84b099",
+  "authority_byte_length": 19227,
+  "authority_path": "studies/study3r/prompts/study3r_protocol_v1_single_focused_review_authority.md",
+  "authority_sha256": "ffa051d5994c9d41435c6f5bc5b693cdfab6c843b604c063cfe4def286b5a882",
+  "commit": "9952263865694dfafea4f61643e596e193edf4b4",
+  "parent": "da1ea31b51b784cb1ab3529f9de2f6ee27c853dd",
+  "published_alone_before_any_finding": true,
+  "tree": "e67731b37450c56a0cfe5e412ed295cb744a7f78"
+ },
+ "review_kind": "single_independent_focused_methods_review",
+ "schema_version": "study3r-protocol-v1-single-focused-review-v1",
+ "severity_counts": {
+  "BLOCKING": 4,
+  "MAJOR": 5,
+  "MINOR": 2
+ },
+ "starting_state": {
+  "all_execution_authorized_fields_false": true,
+  "clean_worktree": true,
+  "evidence_ledger_last_row": "EV-0016",
+  "expected_commit": "da1ea31b51b784cb1ab3529f9de2f6ee27c853dd",
+  "expected_state": "STUDY3R_PROTOCOL_V1_AUTHORED_AWAITING_SINGLE_INDEPENDENT_FOCUSED_REVIEW",
+  "expected_tree": "c1de862ba3782b4930191a51df8790bb4279344c",
+  "head_equals_fetched_origin_main": true,
+  "integrity_verified": true
+ },
+ "statistical_recalculation": {
+  "alpha_global": "1/20",
+  "alpha_per_cell_agrees": true,
+  "alpha_per_cell_recomputed": "1/1160",
+  "counterfactual_alpha_per_cell": "1/1520",
+  "counterfactual_is_a_diagnostic_not_a_repair": true,
+  "counterfactual_m_max_with_separate_depth_cells": 76,
+  "counterfactual_total_scheduled_evaluations": 10404,
+  "development_and_confirmation_are_separate_cells": true,
+  "every_boundary_is_minimal": true,
+  "every_exact_power_agrees": true,
+  "every_exact_size_agrees": true,
+  "every_n_is_minimal": true,
+  "every_pass_boundary_agrees": true,
+  "every_sample_size_agrees": true,
+  "imports_no_candidate_calculator": true,
+  "ladder_multiplicity_over_full_l": true,
+  "m_max_agrees": true,
+  "m_max_recomputed": 58,
+  "mismatches": [],
+  "single_bonferroni_family_is_complete": true,
+  "total_scheduled_evaluations": 8108
+ },
+ "task_generator_audit": {
+  "adversarial_draws_per_family": 4000,
+  "arithmetic_violations": 0,
+  "duplicate_and_collision_rule_enforced_within_a_bank": true,
+  "eligibility_violations": 0,
+  "item_disjointness_has_a_registered_orchestration": false,
+  "label_position_is_uniform_by_construction": true,
+  "negative_control_exposes_the_derivable_value": false,
+  "negative_control_label_is_uniform_and_independent": true,
+  "no_strategy_can_exceed_chance_on_neg": true,
+  "operation_balance_is_enforced": false,
+  "operation_counts_note": "SUB is rejection-sampled to avoid a negative partial value, so it appears roughly half as often as ADD and MUL (1818 vs 3145 vs 3037 over 4000 D2 draws). No balance claim is registered anywhere in the bundle, so this changes no decision.",
+  "option_values_may_exceed_the_registered_result_domain": true,
+  "prng_version_pinned": false,
+  "rejection_loops_terminate": true,
+  "scientific_bank_realized": false,
+  "test_seed_is_explicitly_non_scientific": true
+ },
+ "test_differential": {
+  "candidate_module_results": "tests/test_study3r_protocol_v1.py and tests/test_study3r_operator_governance.py: 163 passed, 0 failed, 0 errors",
+  "collection_errors": 0,
+  "final_head_failed": 8,
+  "final_head_passed": 5120,
+  "final_head_skipped": 16,
+  "historical_or_protected_blobs_unchanged": true,
+  "new_failure_node_ids": [],
+  "registered_baseline": "8 failed, 5120 passed, 16 skipped at da1ea31b51b784cb1ab3529f9de2f6ee27c853dd",
+  "review_module_results": "studies/study3r/reviews/test_study3r_protocol_v1_single_focused_review.py: 38 passed, 0 failed, 0 errors",
+  "study2_mtime_flake_classified": false
+ },
+ "tokenizer_reconstruction": {
+  "adversarial_grid_size": 30,
+  "all_acquired_file_hashes_match": true,
+  "all_revisions_resolve_to_themselves": true,
+  "candidate_discriminant_token_ids": {
+   "A": 32,
+   "B": 33,
+   "C": 34,
+   "D": 35
+  },
+  "canonical_fixture_surfaces_agree_byte_and_token_exactly": true,
+  "chat_template_sha256_agrees_for_every_checkpoint": true,
+  "d0_position_is_fixture_specific": true,
+  "d0_position_range_w1": [
+   49,
+   65
+  ],
+  "d0_position_range_w2": [
+   55,
+   71
+  ],
+  "d0_registered_position_w1": 57,
+  "d0_registered_position_w2": 63,
+  "distinct_functional_equivalence_strata_over_the_full_surface_set": 1,
+  "fixture_count": 6,
+  "imported_the_candidate_probe": false,
+  "surfaces_rendered_per_checkpoint": 36,
+  "trust_remote_code": false
+ },
+ "verdict": {
+  "acceptance_would_not_authorize_execution": true,
+  "authorizes_an_amendment": false,
+  "authorizes_execution": false,
+  "no_confirmed_decision_bearing_defect_was_downgraded": true,
+  "rationale": "Four BLOCKING findings are confirmed: the depth-2/depth-3 allocation of four registered banks is undefined (F-01); the pooled depth cell permits a checkpoint to clear the primary headline gate while performing at chance or at zero on depth-3 (F-02); the prequalification gates are globally conjunctive so one candidate's failure terminates the study and the registered first-confirmed-pass ladder is unreachable as described (F-03); and the generated-CoT route freezes no decoding contract beyond do_sample and k, so the ceiling precondition is not reproducibly executable (F-04). Under the review authority's verdict rules one or more BLOCKING findings is terminal and no execution is authorized.",
+  "state": "STUDY3R_PROTOCOL_V1_REJECTED_TERMINAL_NO_EXECUTION"
+ }
+}
