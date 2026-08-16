@@ -1,0 +1,391 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "properties": {
+  "accounting": {
+   "additionalProperties": false,
+   "properties": {
+    "delta_total_collected": {
+     "const": 32
+    },
+    "difference_is_fully_accounted_for": {
+     "const": true
+    },
+    "explanation": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "new_test_module": {
+     "const": "tests/test_study3_v0_7_focused_review.py"
+    },
+    "new_test_module_added_in_commit": {
+     "const": "a08ec1462f023da49247cac0756b7af5f32ba75a"
+    },
+    "new_test_module_collected_count": {
+     "const": 32
+    },
+    "other_modules_added_removed_or_reparametrized": {
+     "const": 0
+    },
+    "residual_unexplained_tests": {
+     "const": 0
+    },
+    "total_collected_reviewed_target": {
+     "const": 4949
+    },
+    "total_collected_review_head_disclosed": {
+     "const": 4981
+    },
+    "total_collected_review_head_rerun": {
+     "const": 4981
+    }
+   },
+   "required": [
+    "total_collected_reviewed_target",
+    "total_collected_review_head_disclosed",
+    "total_collected_review_head_rerun",
+    "delta_total_collected",
+    "new_test_module",
+    "new_test_module_added_in_commit",
+    "new_test_module_collected_count",
+    "other_modules_added_removed_or_reparametrized",
+    "residual_unexplained_tests",
+    "difference_is_fully_accounted_for",
+    "explanation"
+   ],
+   "type": "object"
+  },
+  "counts": {
+   "additionalProperties": false,
+   "properties": {
+    "review_head": {
+     "additionalProperties": false,
+     "properties": {
+      "commit": {
+       "const": "a08ec1462f023da49247cac0756b7af5f32ba75a"
+      },
+      "failed": {
+       "const": 7
+      },
+      "passed": {
+       "const": 4958
+      },
+      "quoted_from": {
+       "const": "the independent review's terminal disclosure"
+      },
+      "skipped": {
+       "const": 16
+      },
+      "total_collected": {
+       "const": 4981
+      },
+      "verbatim": {
+       "const": "7 failed, 4,958 passed, 16 skipped"
+      }
+     },
+     "required": [
+      "commit",
+      "quoted_from",
+      "verbatim",
+      "failed",
+      "passed",
+      "skipped",
+      "total_collected"
+     ],
+     "type": "object"
+    },
+    "reviewed_target": {
+     "additionalProperties": false,
+     "properties": {
+      "commit": {
+       "const": "459d002442641039196ac3880d47a45a3b79a4c8"
+      },
+      "failed": {
+       "const": 7
+      },
+      "label_in_the_committed_artifacts": {
+       "const": "review_head_result"
+      },
+      "label_is_imprecise_and_is_not_edited_here": {
+       "const": true
+      },
+      "passed": {
+       "const": 4926
+      },
+      "quoted_from": {
+       "const": "the committed independent-review artifacts"
+      },
+      "skipped": {
+       "const": 16
+      },
+      "total_collected": {
+       "const": 4949
+      },
+      "verbatim": {
+       "const": "7 failed, 4,926 passed, 16 skipped"
+      }
+     },
+     "required": [
+      "commit",
+      "quoted_from",
+      "verbatim",
+      "failed",
+      "passed",
+      "skipped",
+      "total_collected",
+      "label_in_the_committed_artifacts",
+      "label_is_imprecise_and_is_not_edited_here"
+     ],
+     "type": "object"
+    }
+   },
+   "required": [
+    "reviewed_target",
+    "review_head"
+   ],
+   "type": "object"
+  },
+  "document_class": {
+   "const": "provenance_reconciliation_addendum"
+  },
+  "independent_rerun": {
+   "additionalProperties": false,
+   "properties": {
+    "checkout": {
+     "const": "a clean detached git worktree at a08ec1462f023da49247cac0756b7af5f32ba75a with an empty git status"
+    },
+    "command": {
+     "const": "python -m pytest -q -p no:randomly"
+    },
+    "commit": {
+     "const": "a08ec1462f023da49247cac0756b7af5f32ba75a"
+    },
+    "environment": {
+     "additionalProperties": false,
+     "properties": {
+      "os": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "python": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "pytest": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "random_order_plugin": {
+       "const": "disabled with -p no:randomly"
+      }
+     },
+     "required": [
+      "python",
+      "pytest",
+      "os",
+      "random_order_plugin"
+     ],
+     "type": "object"
+    },
+    "failed": {
+     "const": 8
+    },
+    "failing_node_ids": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 8,
+     "minItems": 8,
+     "type": "array"
+    },
+    "passed": {
+     "const": 4957
+    },
+    "skipped": {
+     "const": 16
+    },
+    "summary_line": {
+     "const": "8 failed, 4957 passed, 16 skipped, 2 warnings in 1392.72s (0:23:12)"
+    },
+    "total_collected": {
+     "const": 4981
+    },
+    "total_collected_matches_the_terminal_disclosure": {
+     "const": true
+    },
+    "pass_fail_split_matches_the_terminal_disclosure": {
+     "const": false
+    }
+   },
+   "required": [
+    "commit",
+    "checkout",
+    "command",
+    "environment",
+    "summary_line",
+    "failed",
+    "passed",
+    "skipped",
+    "total_collected",
+    "failing_node_ids",
+    "total_collected_matches_the_terminal_disclosure",
+    "pass_fail_split_matches_the_terminal_disclosure"
+   ],
+   "type": "object"
+  },
+  "reconciliation_state": {
+   "const": "STUDY3_V0_7_REVIEW_HEAD_TEST_COUNT_RECONCILED"
+  },
+  "review_artifacts_modified": {
+   "const": 0
+  },
+  "revises_the_methods_verdict": {
+   "const": false
+  },
+  "schema_version": {
+   "const": "study3-v0-7-review-head-test-count-reconciliation"
+  },
+  "scope": {
+   "additionalProperties": false,
+   "properties": {
+    "governing_verdict_unchanged": {
+     "const": "STUDY3_V0_7_TERMINAL_OPERATOR_DECISION_REQUIRED"
+    },
+    "is_a_provenance_reconciliation": {
+     "const": true
+    },
+    "is_a_revision_of_the_methods_verdict": {
+     "const": false
+    },
+    "severity_counts_unchanged": {
+     "additionalProperties": false,
+     "properties": {
+      "BLOCKING": {
+       "const": 12
+      },
+      "MAJOR": {
+       "const": 3
+      },
+      "MINOR": {
+       "const": 2
+      }
+     },
+     "required": [
+      "BLOCKING",
+      "MAJOR",
+      "MINOR"
+     ],
+     "type": "object"
+    }
+   },
+   "required": [
+    "is_a_provenance_reconciliation",
+    "is_a_revision_of_the_methods_verdict",
+    "governing_verdict_unchanged",
+    "severity_counts_unchanged"
+   ],
+   "type": "object"
+  },
+  "standing_failures": {
+   "additionalProperties": false,
+   "properties": {
+    "are_host_checkout_line_ending_artifacts": {
+     "const": true
+    },
+    "new_failures_introduced_between_the_two_commits": {
+     "const": 0
+    },
+    "node_ids": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 7,
+     "minItems": 7,
+     "type": "array"
+    },
+    "seven_identical_at_both_commits": {
+     "const": true
+    },
+    "touch_a_v0_7_path": {
+     "const": false
+    }
+   },
+   "required": [
+    "node_ids",
+    "seven_identical_at_both_commits",
+    "new_failures_introduced_between_the_two_commits",
+    "are_host_checkout_line_ending_artifacts",
+    "touch_a_v0_7_path"
+   ],
+   "type": "object"
+  },
+  "unstable_test_disclosure": {
+   "additionalProperties": false,
+   "properties": {
+    "affects_the_total_collected_count": {
+     "const": false
+    },
+    "affects_the_v0_7_verdict": {
+     "const": false
+    },
+    "belongs_to_study_3": {
+     "const": false
+    },
+    "evidence": {
+     "items": {
+      "type": "string"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "instability_mechanism": {
+     "minLength": 1,
+     "type": "string"
+    },
+    "node_id": {
+     "const": "tests/test_study2_stage_bd.py::test_pack_writes_the_core_manifest_last"
+    },
+    "observed_in_the_full_suite_rerun": {
+     "const": "failed"
+    },
+    "repaired_by_this_session": {
+     "const": false
+    },
+    "result_in_isolation": {
+     "const": "passed"
+    },
+    "result_in_its_own_module": {
+     "const": "passed"
+    }
+   },
+   "required": [
+    "node_id",
+    "belongs_to_study_3",
+    "observed_in_the_full_suite_rerun",
+    "result_in_isolation",
+    "result_in_its_own_module",
+    "instability_mechanism",
+    "evidence",
+    "affects_the_total_collected_count",
+    "affects_the_v0_7_verdict",
+    "repaired_by_this_session"
+   ],
+   "type": "object"
+  }
+ },
+ "required": [
+  "schema_version",
+  "document_class",
+  "scope",
+  "counts",
+  "independent_rerun",
+  "accounting",
+  "standing_failures",
+  "unstable_test_disclosure",
+  "review_artifacts_modified",
+  "revises_the_methods_verdict",
+  "reconciliation_state"
+ ],
+ "title": "Study 3 draft-v0.7 review-head test-count reconciliation",
+ "type": "object"
+}

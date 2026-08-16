@@ -1,0 +1,112 @@
+{
+ "accounting": {
+  "delta_total_collected": 32,
+  "difference_is_fully_accounted_for": true,
+  "explanation": "The reviewed target collected 7 + 4926 + 16 = 4949 tests. The review head collected 7 + 4958 + 16 = 4981 in the terminal disclosure and 8 + 4957 + 16 = 4981 in this independent rerun. Both review-head totals are 4981, so the difference from the reviewed target is exactly 32. The three commits between the two targets add eight paths and modify none; exactly one of those paths is a test module, tests/test_study3_v0_7_focused_review.py, added in a08ec146, which collects exactly 32 tests. 32 collected minus 32 delta leaves 0 residual. No other module was added, removed, renamed, reparametrized, skipped or unskipped between the two commits, so the 32-test difference is fully and exactly accounted for.",
+  "new_test_module": "tests/test_study3_v0_7_focused_review.py",
+  "new_test_module_added_in_commit": "a08ec1462f023da49247cac0756b7af5f32ba75a",
+  "new_test_module_collected_count": 32,
+  "other_modules_added_removed_or_reparametrized": 0,
+  "residual_unexplained_tests": 0,
+  "total_collected_review_head_disclosed": 4981,
+  "total_collected_review_head_rerun": 4981,
+  "total_collected_reviewed_target": 4949
+ },
+ "counts": {
+  "review_head": {
+   "commit": "a08ec1462f023da49247cac0756b7af5f32ba75a",
+   "failed": 7,
+   "passed": 4958,
+   "quoted_from": "the independent review's terminal disclosure",
+   "skipped": 16,
+   "total_collected": 4981,
+   "verbatim": "7 failed, 4,958 passed, 16 skipped"
+  },
+  "reviewed_target": {
+   "commit": "459d002442641039196ac3880d47a45a3b79a4c8",
+   "failed": 7,
+   "label_in_the_committed_artifacts": "review_head_result",
+   "label_is_imprecise_and_is_not_edited_here": true,
+   "passed": 4926,
+   "quoted_from": "the committed independent-review artifacts",
+   "skipped": 16,
+   "total_collected": 4949,
+   "verbatim": "7 failed, 4,926 passed, 16 skipped"
+  }
+ },
+ "document_class": "provenance_reconciliation_addendum",
+ "independent_rerun": {
+  "checkout": "a clean detached git worktree at a08ec1462f023da49247cac0756b7af5f32ba75a with an empty git status",
+  "command": "python -m pytest -q -p no:randomly",
+  "commit": "a08ec1462f023da49247cac0756b7af5f32ba75a",
+  "environment": {
+   "os": "Windows",
+   "python": "3.13.15",
+   "pytest": "9.0.2",
+   "random_order_plugin": "disabled with -p no:randomly"
+  },
+  "failed": 8,
+  "failing_node_ids": [
+   "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+   "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+   "tests/test_phase1_0d_build_provenance.py::test_the_bundle_digest_ignores_the_checkout_line_endings",
+   "tests/test_phase1_0d_generation_launcher_rp_compat.py::test_shim_has_valid_bash_syntax_and_frozen_launcher_remains_in_baseline",
+   "tests/test_phase1_0d_protected_bytes.py::test_line_endings_do_not_change_the_rollup",
+   "tests/test_phase1_0d_review_image.py::test_v2_refuses_a_rehashed_record_with_moved_metadata",
+   "tests/test_study2_stage_bd.py::test_pack_writes_the_core_manifest_last",
+   "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+  ],
+  "pass_fail_split_matches_the_terminal_disclosure": false,
+  "passed": 4957,
+  "skipped": 16,
+  "summary_line": "8 failed, 4957 passed, 16 skipped, 2 warnings in 1392.72s (0:23:12)",
+  "total_collected": 4981,
+  "total_collected_matches_the_terminal_disclosure": true
+ },
+ "reconciliation_state": "STUDY3_V0_7_REVIEW_HEAD_TEST_COUNT_RECONCILED",
+ "review_artifacts_modified": 0,
+ "revises_the_methods_verdict": false,
+ "schema_version": "study3-v0-7-review-head-test-count-reconciliation",
+ "scope": {
+  "governing_verdict_unchanged": "STUDY3_V0_7_TERMINAL_OPERATOR_DECISION_REQUIRED",
+  "is_a_provenance_reconciliation": true,
+  "is_a_revision_of_the_methods_verdict": false,
+  "severity_counts_unchanged": {
+   "BLOCKING": 12,
+   "MAJOR": 3,
+   "MINOR": 2
+  }
+ },
+ "standing_failures": {
+  "are_host_checkout_line_ending_artifacts": true,
+  "new_failures_introduced_between_the_two_commits": 0,
+  "node_ids": [
+   "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+   "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+   "tests/test_phase1_0d_build_provenance.py::test_the_bundle_digest_ignores_the_checkout_line_endings",
+   "tests/test_phase1_0d_generation_launcher_rp_compat.py::test_shim_has_valid_bash_syntax_and_frozen_launcher_remains_in_baseline",
+   "tests/test_phase1_0d_protected_bytes.py::test_line_endings_do_not_change_the_rollup",
+   "tests/test_phase1_0d_review_image.py::test_v2_refuses_a_rehashed_record_with_moved_metadata",
+   "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only"
+  ],
+  "seven_identical_at_both_commits": true,
+  "touch_a_v0_7_path": false
+ },
+ "unstable_test_disclosure": {
+  "affects_the_total_collected_count": false,
+  "affects_the_v0_7_verdict": false,
+  "belongs_to_study_3": false,
+  "evidence": [
+   "isolated run 1 of the single node id: 1 passed in 34.22s",
+   "isolated run 2 of the single node id: 1 passed in 34.07s",
+   "its whole module tests/test_study2_stage_bd.py: 54 passed in 168.52s",
+   "the same detached worktree at a08ec146 was byte-clean for every run, with git status empty"
+  ],
+  "instability_mechanism": "the test asserts max(tmp_path.iterdir(), key=lambda path: path.stat().st_mtime_ns).name == bd.CORE_MANIFEST_NAME. Under a loaded full-suite run several pack files can land inside one filesystem timestamp tick, so the manifest ties with an earlier file and max returns whichever the directory iterator yields first. This is a host filesystem timestamp-resolution race, not a defect in the packed bytes.",
+  "node_id": "tests/test_study2_stage_bd.py::test_pack_writes_the_core_manifest_last",
+  "observed_in_the_full_suite_rerun": "failed",
+  "repaired_by_this_session": false,
+  "result_in_isolation": "passed",
+  "result_in_its_own_module": "passed"
+ }
+}
