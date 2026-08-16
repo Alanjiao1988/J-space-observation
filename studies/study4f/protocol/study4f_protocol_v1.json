@@ -1,0 +1,312 @@
+{
+  "schema_version": "study4f-protocol-v1",
+  "study_id": "STUDY4F",
+  "study_kind": "developmental_non_confirmatory_behavioral_feasibility_pilot",
+  "authority": {
+    "path": "studies/study4f/prompts/study4f_minimal_behavioral_feasibility_authority.md",
+    "bytes": 17822,
+    "sha256": "bafba585ba4fe0030f2bae14e7be8d2f060732e56b3696422102605668de0773",
+    "git_blob": "2f120b05893ed2f09b07c3ebd2a99f23c536c752",
+    "commit": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729",
+    "parent_commit": "ee8a852111d27cb39bf21743e18857485cff1efe",
+    "parent_tree": "8b4127139e1cbbd4ffb2ccc1cb1af075c511d6a1",
+    "tree": "be74ae0ec7daf991024b7930e758c3136f59f89f",
+    "published_alone_as_the_first_study4f_commit": true,
+    "derives_authority_from_study3r": false,
+    "amends_repairs_or_reactivates_study3r": false
+  },
+  "research_question": "Under one frozen raw direct-answer interface, does at least one member of the registered natural Qwen-tokenizer ladder demonstrate generated-CoT task headroom and zero-generated-reasoning-token expressed competence separately on both D2 and D3, thereby providing a developmentally qualified natural positive-reference candidate for later confirmation?",
+  "claim_boundary": {
+    "tests_whether_j_space_exists": false,
+    "claims_j_space_is_observable": false,
+    "claims_j_space_is_unobservable": false,
+    "makes_a_mechanistic_claim": false,
+    "runs_d0": false,
+    "reads_restricted_logits": false,
+    "performs_activation_collection_or_patching": false,
+    "performs_study3m_work": false,
+    "adds_a_scientific_evidence_row": false,
+    "can_produce_a_confirmed_rp_b": false,
+    "may_only_identify": "RP_B_DEVELOPMENTAL_CANDIDATE_PENDING_CONFIRMATION",
+    "open_ended_methods_review_authorized": false
+  },
+  "checkpoints": [
+    {
+      "role": "RT",
+      "repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+      "immutable_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+    },
+    {
+      "role": "RP_B1",
+      "repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "immutable_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60"
+    },
+    {
+      "role": "RP_B2",
+      "repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+      "immutable_revision": "1df8507178afcc1bef68cd8c393f61a886323761"
+    },
+    {
+      "role": "RP_B3",
+      "repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+      "immutable_revision": "711ad2ea6aa40cfca18895e8aca02ab92df1a746"
+    }
+  ],
+  "ladder_order": [
+    "RP_B1",
+    "RP_B2",
+    "RP_B3"
+  ],
+  "model_loading_contract": {
+    "trust_remote_code": false,
+    "unquantized_weights": true,
+    "torch_dtype": "bfloat16",
+    "adapter": null,
+    "cpu_offload": false,
+    "disk_offload": false,
+    "device_map_auto": false,
+    "one_explicitly_recorded_accelerator_device": true,
+    "batch_size": 1,
+    "evaluation_mode": true,
+    "explicit_attention_implementation_required": true,
+    "deterministic_algorithms_enabled_where_supported": true,
+    "pinned_versions_required": [
+      "container_digest",
+      "python",
+      "cuda",
+      "torch",
+      "transformers",
+      "tokenizers",
+      "safetensors"
+    ],
+    "resource_route_must_be_proven_before_weight_acquisition": true,
+    "unavailable_route_state": "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE"
+  },
+  "banks": {
+    "mixed_family_banks_permitted": false,
+    "confirmation_bank_exists": false,
+    "registered": [
+      {
+        "bank_id": "D2_DEVELOPMENT_BANK",
+        "family": "D2",
+        "depth": 2,
+        "size": 104
+      },
+      {
+        "bank_id": "D3_DEVELOPMENT_BANK",
+        "family": "D3",
+        "depth": 3,
+        "size": 104
+      }
+    ],
+    "label_count_per_bank": 26,
+    "deterministic_prefix": 60,
+    "label_count_per_prefix": 15,
+    "cross_bank_disjointness_proved_by": "canonical content hash (sha256 over family|stem|options)",
+    "seed_derivation": {
+      "material": "STUDY4F|<study4f authority commit>|<literal bank id>",
+      "digest": "sha256",
+      "frozen_before_bank_realization": true,
+      "authority_commit": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729"
+    },
+    "reuse_semantics": "paired repeated evaluation, not independent sampling",
+    "capacity_failure_state": "STUDY4F_REGISTERED_BANK_CAPACITY_UNAVAILABLE",
+    "realized": false,
+    "realization_requires_a_passed_shakedown": true
+  },
+  "routes": {
+    "primary": {
+      "route_id": "W1_RAW_DIRECT",
+      "estimand": "E0_zero_generated_reasoning_token_expressed_competence",
+      "uses_chat_template": false,
+      "forced_reasoning_closure": null,
+      "forced_reasoning_closure_is_explicitly_absent": true,
+      "answer_cue": "Answer:\n",
+      "raw_envelope_separator": "\n\n",
+      "legal_answer_surfaces": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "correct_shape": "[one registered answer token, registered EOS]",
+      "prefix_matching_permitted": false,
+      "whitespace_normalization_permitted": false,
+      "textual_reparsing_permitted": false,
+      "post_hoc_surface_addition_permitted": false,
+      "generation_contract": {
+        "do_sample": false,
+        "temperature": 1.0,
+        "temperature_is_the_explicitly_frozen_neutral_value": true,
+        "top_p": 1.0,
+        "top_k": 0,
+        "num_beams": 1,
+        "num_return_sequences": 1,
+        "repetition_penalty": 1.0,
+        "length_penalty": 1.0,
+        "early_stopping": false,
+        "use_cache": true,
+        "batch_size": 1,
+        "padding": "none",
+        "max_new_tokens": 2,
+        "max_new_tokens_rationale": "one answer token plus one EOS opportunity"
+      },
+      "provenance": {
+        "source_path": "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+        "source_arm_id": "W1_RAW_DIRECT",
+        "source_rendered_utf8_sha256": "9dab5a865967308bc43b219f5b44476cc610fb0b310dd6f528dd3fd0934a4c95",
+        "source_rendered_utf8_bytes": 157,
+        "source_rendered_token_count": 57,
+        "independently_reproduced_by_the_study3r_focused_review": true,
+        "uses_a_chat_template": false,
+        "forced_reasoning_closure": null,
+        "forced_reasoning_closure_is_explicitly_absent": true
+      }
+    },
+    "headroom": {
+      "route_id": "C1_LONG_GENERATED_COT_HEADROOM",
+      "is_a_precondition_only": true,
+      "selects_an_interface": false,
+      "instruction": "Reason step by step. End your response with a final line of exactly \"FINAL: X\", where X is one of A, B, C or D.",
+      "legal_final_lines": [
+        "FINAL: A",
+        "FINAL: B",
+        "FINAL: C",
+        "FINAL: D"
+      ],
+      "unparseable_responses_dropped": false,
+      "seed_material": "<sealed study identity>|<checkpoint role>|<depth>|<item id>",
+      "seeds_recorded_before_generation": true,
+      "context_window_requirement": "every prompt length plus 4096 generated tokens must fit the checkpoint's registered context window",
+      "generation_contract": {
+        "do_sample": true,
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "top_k": 0,
+        "num_beams": 1,
+        "num_return_sequences": 1,
+        "k": 1,
+        "aggregation": "per-item exact correctness",
+        "repetition_penalty": 1.0,
+        "length_penalty": 1.0,
+        "early_stopping": false,
+        "use_cache": true,
+        "max_new_tokens": 4096,
+        "batch_size": 1,
+        "padding": "none"
+      },
+      "provenance": {
+        "source_path": "studies/study3r/protocol/study3r_rendering_registry_v1.json",
+        "source_arm_id": "W2_ROLE_CANONICAL",
+        "source_chat_template_sha256": "56a1447ad31926fdc21fb07e56e5642bd9c850c4f52d8c8af7bbe5f079a84f5f",
+        "chat_template_digest_agrees_for_every_checkpoint": true,
+        "reasoning_span_opened_by_template": true,
+        "forced_reasoning_closure": null,
+        "forced_reasoning_closure_is_explicitly_absent": true,
+        "closure_absence_is_decision_bearing": true
+      }
+    }
+  },
+  "statistics": {
+    "statistical_unit": "item",
+    "alpha_global": "1/20",
+    "m_max": 16,
+    "bonferroni_over_all_cells_regardless_of_how_many_are_reached": true,
+    "alpha_per_cell": "1/320",
+    "target_power": "9/10",
+    "test": "exact one-sided integer binomial",
+    "depths_may_be_pooled": false,
+    "cells": {
+      "COT": {
+        "null_floor": "3/4",
+        "design_alternative": "9/10",
+        "n": 104,
+        "pass_boundary": 90,
+        "exact_size": "453780760/151879736303",
+        "exact_power": "850404252885/939133443977"
+      },
+      "E0": {
+        "null_floor": "1/2",
+        "design_alternative": "3/4",
+        "n": 60,
+        "pass_boundary": 41,
+        "exact_size": "1619809156/521039778433",
+        "exact_power": "684616462843/754385230619"
+      }
+    },
+    "registered_cells": [
+      "RP_B1|D2|COT",
+      "RP_B1|D3|COT",
+      "RP_B2|D2|COT",
+      "RP_B2|D3|COT",
+      "RP_B3|D2|COT",
+      "RP_B3|D3|COT",
+      "RT|D2|COT",
+      "RT|D3|COT",
+      "RP_B1|D2|E0",
+      "RP_B1|D3|E0",
+      "RP_B2|D2|E0",
+      "RP_B2|D3|E0",
+      "RP_B3|D2|E0",
+      "RP_B3|D3|E0",
+      "RT|D2|E0",
+      "RT|D3|E0"
+    ]
+  },
+  "state_machine": {
+    "candidate_local": true,
+    "a_candidate_failure_blocks_a_later_candidate": false,
+    "ladder": [
+      "RP_B1",
+      "RP_B2",
+      "RP_B3"
+    ],
+    "target": "RT",
+    "candidate_positive_disposition": "RP_B_DEVELOPMENTAL_CANDIDATE_PENDING_CONFIRMATION",
+    "registered_terminal_states": [
+      "STUDY4F_BEHAVIORAL_FEASIBILITY_SUPPORTED_AWAITING_SEPARATE_CONFIRMATION",
+      "STUDY4F_RP_DEV_IDENTIFIED_TARGET_NO_COT_HEADROOM",
+      "STUDY4F_RP_DEV_IDENTIFIED_TARGET_E0_NOT_OBSERVED",
+      "STUDY4F_NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_REGISTERED_LADDER",
+      "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE",
+      "STUDY4F_REGISTERED_BANK_CAPACITY_UNAVAILABLE",
+      "STUDY4F_PREFLIGHT_FAILED_NO_MODEL_EXECUTION",
+      "STUDY4F_TERMINAL_OPERATOR_DECISION_REQUIRED",
+      "STUDY4F_BLOCKED_ON_CONCURRENT_REPOSITORY_ADVANCE",
+      "STUDY4F_RESTART_BLOCKED_ON_STUDY3R_CLOSURE_INTEGRITY"
+    ]
+  },
+  "prohibited_conclusions": [
+    "J-space does not exist",
+    "J-space is unobservable",
+    "the model cannot reason internally",
+    "single-forward reasoning was demonstrated",
+    "RP-B was confirmed",
+    "the result generalizes beyond the registered checkpoints, depths and interface"
+  ],
+  "code": {
+    "task_banks": "studies/study4f/analysis/study4f_task_banks.py",
+    "interfaces": "studies/study4f/analysis/study4f_interfaces.py",
+    "design_statistics": "studies/study4f/analysis/study4f_design_statistics.py",
+    "state_machine": "studies/study4f/analysis/study4f_state_machine.py",
+    "validation": "studies/study4f/analysis/study4f_validation.py",
+    "resource_route": "studies/study4f/analysis/study4f_resource_route.py",
+    "tests": "studies/study4f/tests/test_study4f_behavioral_feasibility.py"
+  },
+  "study3r_relationship": {
+    "reads_a_study3r_pointer_at_runtime": false,
+    "treats_a_rejected_study3r_protocol_as_normative": false,
+    "copies_verified_bytes_or_algorithms_with_provenance": true,
+    "study3r_terminal_status_modified": false,
+    "study3r_closure_commit": "ee8a852111d27cb39bf21743e18857485cff1efe",
+    "surviving_mutation_dispositions": {
+      "adv_cot_parser_regex_unanchored": "structurally_inapplicable",
+      "adv_d2_d3_ceiling_mix_drops_depth_three": "structurally_inapplicable",
+      "adv_d2_d3_family_mix_drops_depth_three": "killed",
+      "adv_d3_family_depth_relabelled": "killed",
+      "adv_forced_reasoning_closure_changed": "killed",
+      "adv_forced_reasoning_closure_removed": "structurally_inapplicable",
+      "adv_surfaces_closure_emptied_while_rendered_bytes_unchanged": "structurally_inapplicable"
+    }
+  }
+}

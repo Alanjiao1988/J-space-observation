@@ -91,6 +91,33 @@ AUTHORING_MODIFIED = {
     "tests/test_study3r_operator_governance.py",
 }
 
+# Study 4F is a *fresh project-level* operator decision, published outside the
+# terminal Study 3R authority exactly as ``studies/study3r/STATUS.json`` requires
+# of any restart. Its authority is
+# ``studies/study4f/prompts/study4f_minimal_behavioral_feasibility_authority.md``,
+# committed alone at 7d5ff0837d77af9e6df9f49d580ec0e42bdc2729 on top of the
+# Study 3R terminal closure ee8a852111d27cb39bf21743e18857485cff1efe.
+#
+# The two scope predicates below enumerate the namespaces an authorized session
+# may add to. They would otherwise reject every Study 4F path and turn an
+# authorized publication into a spurious failure. Study 3R finding F-10 recorded
+# that this module had previously widened its own predicates, so the admission
+# here is deliberately narrow and auditable:
+#
+#   * it admits exactly one new namespace, ``studies/study4f/``;
+#   * it admits no new individual path outside that namespace;
+#   * it changes no protected-blob assertion, no rejected-candidate path, no
+#     independent-review artifact and no Study 3R lifecycle value;
+#   * ``studies/study4f/tests/test_study4f_behavioral_feasibility.py`` asserts
+#     that this admission is exactly this namespace and is bound to that commit.
+STUDY4F_NAMESPACE = "studies/study4f/"
+STUDY4F_AUTHORITY = (
+    "studies/study4f/prompts/study4f_minimal_behavioral_feasibility_authority.md")
+STUDY4F_AUTHORITY_COMMIT = "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729"
+
+#: Namespaces an authorized session may add paths inside.
+ADMITTED_NAMESPACES = (AUTHORING_NAMESPACE, STUDY4F_NAMESPACE)
+
 # The v0.7 candidate bundle, retained byte-exactly as rejected-candidate history.
 REJECTED_CANDIDATE_PATHS = (
     "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json",
@@ -566,7 +593,7 @@ def test_governance_changed_no_reviewed_candidate_or_protected_path():
         | AUTHORING_ADDED | AUTHORING_MODIFIED
     unexpected = {path for path in changed
                   if path not in permitted
-                  and not path.startswith(AUTHORING_NAMESPACE)}
+                  and not path.startswith(ADMITTED_NAMESPACES)}
     assert unexpected == set(), sorted(unexpected)
 
 
@@ -593,7 +620,7 @@ def test_only_the_readme_was_modified_and_everything_else_was_added():
     added = {p for p, c in statuses.items() if c == "A"}
     unexpected = {p for p in added
                   if p not in GOVERNANCE_ADDED | AUTHORING_ADDED
-                  and not p.startswith(AUTHORING_NAMESPACE)}
+                  and not p.startswith(ADMITTED_NAMESPACES)}
     assert unexpected == set(), sorted(unexpected)
 
 

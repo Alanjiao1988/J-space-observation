@@ -1,0 +1,565 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/studies/study4f/protocol/study4f_protocol_v1.schema.json",
+  "title": "Study 4F developmental behavioral-feasibility protocol",
+  "description": "Restrictive schema for studies/study4f/protocol/study4f_protocol_v1.json. Every decision-bearing value is pinned with a const or an enum; no decision-bearing value is left as a bare type. Every object is closed with additionalProperties=false and names its required keys.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "study_id", "study_kind", "authority", "research_question",
+    "claim_boundary", "checkpoints", "ladder_order", "model_loading_contract",
+    "banks", "routes", "statistics", "state_machine", "prohibited_conclusions",
+    "code", "study3r_relationship"
+  ],
+  "properties": {
+    "schema_version": {"const": "study4f-protocol-v1"},
+    "study_id": {"const": "STUDY4F"},
+    "study_kind": {
+      "const": "developmental_non_confirmatory_behavioral_feasibility_pilot"
+    },
+    "research_question": {"type": "string", "minLength": 200},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path", "bytes", "sha256", "git_blob", "commit", "parent_commit",
+        "parent_tree", "tree", "published_alone_as_the_first_study4f_commit",
+        "derives_authority_from_study3r", "amends_repairs_or_reactivates_study3r"
+      ],
+      "properties": {
+        "path": {
+          "const": "studies/study4f/prompts/study4f_minimal_behavioral_feasibility_authority.md"
+        },
+        "bytes": {"const": 17822},
+        "sha256": {
+          "const": "bafba585ba4fe0030f2bae14e7be8d2f060732e56b3696422102605668de0773"
+        },
+        "git_blob": {"const": "2f120b05893ed2f09b07c3ebd2a99f23c536c752"},
+        "commit": {"const": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729"},
+        "parent_commit": {"const": "ee8a852111d27cb39bf21743e18857485cff1efe"},
+        "parent_tree": {"const": "8b4127139e1cbbd4ffb2ccc1cb1af075c511d6a1"},
+        "tree": {"const": "be74ae0ec7daf991024b7930e758c3136f59f89f"},
+        "published_alone_as_the_first_study4f_commit": {"const": true},
+        "derives_authority_from_study3r": {"const": false},
+        "amends_repairs_or_reactivates_study3r": {"const": false}
+      }
+    },
+    "claim_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tests_whether_j_space_exists", "claims_j_space_is_observable",
+        "claims_j_space_is_unobservable", "makes_a_mechanistic_claim", "runs_d0",
+        "reads_restricted_logits", "performs_activation_collection_or_patching",
+        "performs_study3m_work", "adds_a_scientific_evidence_row",
+        "can_produce_a_confirmed_rp_b", "may_only_identify",
+        "open_ended_methods_review_authorized"
+      ],
+      "properties": {
+        "tests_whether_j_space_exists": {"const": false},
+        "claims_j_space_is_observable": {"const": false},
+        "claims_j_space_is_unobservable": {"const": false},
+        "makes_a_mechanistic_claim": {"const": false},
+        "runs_d0": {"const": false},
+        "reads_restricted_logits": {"const": false},
+        "performs_activation_collection_or_patching": {"const": false},
+        "performs_study3m_work": {"const": false},
+        "adds_a_scientific_evidence_row": {"const": false},
+        "can_produce_a_confirmed_rp_b": {"const": false},
+        "may_only_identify": {
+          "const": "RP_B_DEVELOPMENTAL_CANDIDATE_PENDING_CONFIRMATION"
+        },
+        "open_ended_methods_review_authorized": {"const": false}
+      }
+    },
+    "checkpoints": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "repository", "immutable_revision"],
+        "properties": {
+          "role": {"enum": ["RT", "RP_B1", "RP_B2", "RP_B3"]},
+          "repository": {
+            "enum": [
+              "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+              "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+              "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+              "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+            ]
+          },
+          "immutable_revision": {
+            "enum": [
+              "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+              "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+              "1df8507178afcc1bef68cd8c393f61a886323761",
+              "711ad2ea6aa40cfca18895e8aca02ab92df1a746"
+            ]
+          }
+        }
+      }
+    },
+    "ladder_order": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "prefixItems": [{"const": "RP_B1"}, {"const": "RP_B2"}, {"const": "RP_B3"}],
+      "items": false
+    },
+    "model_loading_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trust_remote_code", "unquantized_weights", "torch_dtype", "adapter",
+        "cpu_offload", "disk_offload", "device_map_auto",
+        "one_explicitly_recorded_accelerator_device", "batch_size",
+        "evaluation_mode", "explicit_attention_implementation_required",
+        "deterministic_algorithms_enabled_where_supported", "pinned_versions_required",
+        "resource_route_must_be_proven_before_weight_acquisition",
+        "unavailable_route_state"
+      ],
+      "properties": {
+        "trust_remote_code": {"const": false},
+        "unquantized_weights": {"const": true},
+        "torch_dtype": {"const": "bfloat16"},
+        "adapter": {"type": "null"},
+        "cpu_offload": {"const": false},
+        "disk_offload": {"const": false},
+        "device_map_auto": {"const": false},
+        "one_explicitly_recorded_accelerator_device": {"const": true},
+        "batch_size": {"const": 1},
+        "evaluation_mode": {"const": true},
+        "explicit_attention_implementation_required": {"const": true},
+        "deterministic_algorithms_enabled_where_supported": {"const": true},
+        "pinned_versions_required": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["container_digest", "python", "cuda", "torch",
+                     "transformers", "tokenizers", "safetensors"]
+          }
+        },
+        "resource_route_must_be_proven_before_weight_acquisition": {"const": true},
+        "unavailable_route_state": {
+          "const": "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE"
+        }
+      }
+    },
+    "banks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mixed_family_banks_permitted", "confirmation_bank_exists", "registered",
+        "label_count_per_bank", "deterministic_prefix", "label_count_per_prefix",
+        "cross_bank_disjointness_proved_by", "seed_derivation", "reuse_semantics",
+        "capacity_failure_state", "realized", "realization_requires_a_passed_shakedown"
+      ],
+      "properties": {
+        "mixed_family_banks_permitted": {"const": false},
+        "confirmation_bank_exists": {"const": false},
+        "registered": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["bank_id", "family", "depth", "size"],
+            "properties": {
+              "bank_id": {"enum": ["D2_DEVELOPMENT_BANK", "D3_DEVELOPMENT_BANK"]},
+              "family": {"enum": ["D2", "D3"]},
+              "depth": {"enum": [2, 3]},
+              "size": {"const": 104}
+            }
+          }
+        },
+        "label_count_per_bank": {"const": 26},
+        "deterministic_prefix": {"const": 60},
+        "label_count_per_prefix": {"const": 15},
+        "cross_bank_disjointness_proved_by": {
+          "const": "canonical content hash (sha256 over family|stem|options)"
+        },
+        "seed_derivation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["material", "digest", "frozen_before_bank_realization",
+                       "authority_commit"],
+          "properties": {
+            "material": {
+              "const": "STUDY4F|<study4f authority commit>|<literal bank id>"
+            },
+            "digest": {"const": "sha256"},
+            "frozen_before_bank_realization": {"const": true},
+            "authority_commit": {
+              "const": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729"
+            }
+          }
+        },
+        "reuse_semantics": {
+          "const": "paired repeated evaluation, not independent sampling"
+        },
+        "capacity_failure_state": {
+          "const": "STUDY4F_REGISTERED_BANK_CAPACITY_UNAVAILABLE"
+        },
+        "realized": {"type": "boolean"},
+        "realization_requires_a_passed_shakedown": {"const": true}
+      }
+    },
+    "routes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary", "headroom"],
+      "properties": {
+        "primary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "route_id", "estimand", "uses_chat_template",
+            "forced_reasoning_closure", "forced_reasoning_closure_is_explicitly_absent",
+            "answer_cue", "raw_envelope_separator", "legal_answer_surfaces",
+            "correct_shape", "prefix_matching_permitted",
+            "whitespace_normalization_permitted", "textual_reparsing_permitted",
+            "post_hoc_surface_addition_permitted", "generation_contract", "provenance"
+          ],
+          "properties": {
+            "route_id": {"const": "W1_RAW_DIRECT"},
+            "estimand": {
+              "const": "E0_zero_generated_reasoning_token_expressed_competence"
+            },
+            "uses_chat_template": {"const": false},
+            "forced_reasoning_closure": {"type": "null"},
+            "forced_reasoning_closure_is_explicitly_absent": {"const": true},
+            "answer_cue": {"const": "Answer:\n"},
+            "raw_envelope_separator": {"const": "\n\n"},
+            "legal_answer_surfaces": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "uniqueItems": true,
+              "items": {"enum": ["A", "B", "C", "D"]}
+            },
+            "correct_shape": {
+              "const": "[one registered answer token, registered EOS]"
+            },
+            "prefix_matching_permitted": {"const": false},
+            "whitespace_normalization_permitted": {"const": false},
+            "textual_reparsing_permitted": {"const": false},
+            "post_hoc_surface_addition_permitted": {"const": false},
+            "generation_contract": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "do_sample", "temperature",
+                "temperature_is_the_explicitly_frozen_neutral_value", "top_p",
+                "top_k", "num_beams", "num_return_sequences", "repetition_penalty",
+                "length_penalty", "early_stopping", "use_cache", "batch_size",
+                "padding", "max_new_tokens", "max_new_tokens_rationale"
+              ],
+              "properties": {
+                "do_sample": {"const": false},
+                "temperature": {"const": 1.0},
+                "temperature_is_the_explicitly_frozen_neutral_value": {"const": true},
+                "top_p": {"const": 1.0},
+                "top_k": {"const": 0},
+                "num_beams": {"const": 1},
+                "num_return_sequences": {"const": 1},
+                "repetition_penalty": {"const": 1.0},
+                "length_penalty": {"const": 1.0},
+                "early_stopping": {"const": false},
+                "use_cache": {"const": true},
+                "batch_size": {"const": 1},
+                "padding": {"const": "none"},
+                "max_new_tokens": {"const": 2},
+                "max_new_tokens_rationale": {
+                  "const": "one answer token plus one EOS opportunity"
+                }
+              }
+            },
+            "provenance": {"$ref": "#/$defs/provenance"}
+          }
+        },
+        "headroom": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "route_id", "is_a_precondition_only", "selects_an_interface",
+            "instruction", "legal_final_lines", "unparseable_responses_dropped",
+            "seed_material", "seeds_recorded_before_generation",
+            "context_window_requirement", "generation_contract", "provenance"
+          ],
+          "properties": {
+            "route_id": {"const": "C1_LONG_GENERATED_COT_HEADROOM"},
+            "is_a_precondition_only": {"const": true},
+            "selects_an_interface": {"const": false},
+            "instruction": {"type": "string", "minLength": 40},
+            "legal_final_lines": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "uniqueItems": true,
+              "items": {
+                "enum": ["FINAL: A", "FINAL: B", "FINAL: C", "FINAL: D"]
+              }
+            },
+            "unparseable_responses_dropped": {"const": false},
+            "seed_material": {
+              "const": "<sealed study identity>|<checkpoint role>|<depth>|<item id>"
+            },
+            "seeds_recorded_before_generation": {"const": true},
+            "context_window_requirement": {
+              "const": "every prompt length plus 4096 generated tokens must fit the checkpoint's registered context window"
+            },
+            "generation_contract": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "do_sample", "temperature", "top_p", "top_k", "num_beams",
+                "num_return_sequences", "k", "aggregation", "repetition_penalty",
+                "length_penalty", "early_stopping", "use_cache", "max_new_tokens",
+                "batch_size", "padding"
+              ],
+              "properties": {
+                "do_sample": {"const": true},
+                "temperature": {"const": 0.6},
+                "top_p": {"const": 0.95},
+                "top_k": {"const": 0},
+                "num_beams": {"const": 1},
+                "num_return_sequences": {"const": 1},
+                "k": {"const": 1},
+                "aggregation": {"const": "per-item exact correctness"},
+                "repetition_penalty": {"const": 1.0},
+                "length_penalty": {"const": 1.0},
+                "early_stopping": {"const": false},
+                "use_cache": {"const": true},
+                "max_new_tokens": {"const": 4096},
+                "batch_size": {"const": 1},
+                "padding": {"const": "none"}
+              }
+            },
+            "provenance": {"$ref": "#/$defs/provenance"}
+          }
+        }
+      }
+    },
+    "statistics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statistical_unit", "alpha_global", "m_max",
+        "bonferroni_over_all_cells_regardless_of_how_many_are_reached",
+        "alpha_per_cell", "target_power", "test", "depths_may_be_pooled",
+        "cells", "registered_cells"
+      ],
+      "properties": {
+        "statistical_unit": {"const": "item"},
+        "alpha_global": {"const": "1/20"},
+        "m_max": {"const": 16},
+        "bonferroni_over_all_cells_regardless_of_how_many_are_reached": {"const": true},
+        "alpha_per_cell": {"const": "1/320"},
+        "target_power": {"const": "9/10"},
+        "test": {"const": "exact one-sided integer binomial"},
+        "depths_may_be_pooled": {"const": false},
+        "cells": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["COT", "E0"],
+          "properties": {
+            "COT": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["null_floor", "design_alternative", "n",
+                           "pass_boundary", "exact_size", "exact_power"],
+              "properties": {
+                "null_floor": {"const": "3/4"},
+                "design_alternative": {"const": "9/10"},
+                "n": {"const": 104},
+                "pass_boundary": {"const": 90},
+                "exact_size": {"type": "string", "minLength": 3},
+                "exact_power": {"type": "string", "minLength": 3}
+              }
+            },
+            "E0": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["null_floor", "design_alternative", "n",
+                           "pass_boundary", "exact_size", "exact_power"],
+              "properties": {
+                "null_floor": {"const": "1/2"},
+                "design_alternative": {"const": "3/4"},
+                "n": {"const": 60},
+                "pass_boundary": {"const": 41},
+                "exact_size": {"type": "string", "minLength": 3},
+                "exact_power": {"type": "string", "minLength": 3}
+              }
+            }
+          }
+        },
+        "registered_cells": {
+          "type": "array",
+          "minItems": 16,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^(RT|RP_B[123])\\|(D2|D3)\\|(COT|E0)$"}
+        }
+      }
+    },
+    "state_machine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_local", "a_candidate_failure_blocks_a_later_candidate",
+        "ladder", "target", "candidate_positive_disposition",
+        "registered_terminal_states"
+      ],
+      "properties": {
+        "candidate_local": {"const": true},
+        "a_candidate_failure_blocks_a_later_candidate": {"const": false},
+        "ladder": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "prefixItems": [{"const": "RP_B1"}, {"const": "RP_B2"}, {"const": "RP_B3"}],
+          "items": false
+        },
+        "target": {"const": "RT"},
+        "candidate_positive_disposition": {
+          "const": "RP_B_DEVELOPMENTAL_CANDIDATE_PENDING_CONFIRMATION"
+        },
+        "registered_terminal_states": {
+          "type": "array",
+          "minItems": 10,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "STUDY4F_BEHAVIORAL_FEASIBILITY_SUPPORTED_AWAITING_SEPARATE_CONFIRMATION",
+              "STUDY4F_RP_DEV_IDENTIFIED_TARGET_NO_COT_HEADROOM",
+              "STUDY4F_RP_DEV_IDENTIFIED_TARGET_E0_NOT_OBSERVED",
+              "STUDY4F_NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_REGISTERED_LADDER",
+              "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE",
+              "STUDY4F_REGISTERED_BANK_CAPACITY_UNAVAILABLE",
+              "STUDY4F_PREFLIGHT_FAILED_NO_MODEL_EXECUTION",
+              "STUDY4F_TERMINAL_OPERATOR_DECISION_REQUIRED",
+              "STUDY4F_BLOCKED_ON_CONCURRENT_REPOSITORY_ADVANCE",
+              "STUDY4F_RESTART_BLOCKED_ON_STUDY3R_CLOSURE_INTEGRITY"
+            ]
+          }
+        }
+      }
+    },
+    "prohibited_conclusions": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "J-space does not exist",
+          "J-space is unobservable",
+          "the model cannot reason internally",
+          "single-forward reasoning was demonstrated",
+          "RP-B was confirmed",
+          "the result generalizes beyond the registered checkpoints, depths and interface"
+        ]
+      }
+    },
+    "code": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_banks", "interfaces", "design_statistics",
+                   "state_machine", "validation", "resource_route", "tests"],
+      "properties": {
+        "task_banks": {"const": "studies/study4f/analysis/study4f_task_banks.py"},
+        "interfaces": {"const": "studies/study4f/analysis/study4f_interfaces.py"},
+        "design_statistics": {
+          "const": "studies/study4f/analysis/study4f_design_statistics.py"
+        },
+        "state_machine": {
+          "const": "studies/study4f/analysis/study4f_state_machine.py"
+        },
+        "validation": {"const": "studies/study4f/analysis/study4f_validation.py"},
+        "resource_route": {
+          "const": "studies/study4f/analysis/study4f_resource_route.py"
+        },
+        "tests": {
+          "const": "studies/study4f/tests/test_study4f_behavioral_feasibility.py"
+        }
+      }
+    },
+    "study3r_relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reads_a_study3r_pointer_at_runtime",
+        "treats_a_rejected_study3r_protocol_as_normative",
+        "copies_verified_bytes_or_algorithms_with_provenance",
+        "study3r_terminal_status_modified", "study3r_closure_commit",
+        "surviving_mutation_dispositions"
+      ],
+      "properties": {
+        "reads_a_study3r_pointer_at_runtime": {"const": false},
+        "treats_a_rejected_study3r_protocol_as_normative": {"const": false},
+        "copies_verified_bytes_or_algorithms_with_provenance": {"const": true},
+        "study3r_terminal_status_modified": {"const": false},
+        "study3r_closure_commit": {
+          "const": "ee8a852111d27cb39bf21743e18857485cff1efe"
+        },
+        "surviving_mutation_dispositions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "adv_cot_parser_regex_unanchored",
+            "adv_d2_d3_ceiling_mix_drops_depth_three",
+            "adv_d2_d3_family_mix_drops_depth_three",
+            "adv_d3_family_depth_relabelled",
+            "adv_forced_reasoning_closure_changed",
+            "adv_forced_reasoning_closure_removed",
+            "adv_surfaces_closure_emptied_while_rendered_bytes_unchanged"
+          ],
+          "properties": {
+            "adv_cot_parser_regex_unanchored": {
+              "enum": ["killed", "structurally_inapplicable"]
+            },
+            "adv_d2_d3_ceiling_mix_drops_depth_three": {
+              "enum": ["killed", "structurally_inapplicable"]
+            },
+            "adv_d2_d3_family_mix_drops_depth_three": {
+              "enum": ["killed", "structurally_inapplicable"]
+            },
+            "adv_d3_family_depth_relabelled": {
+              "enum": ["killed", "structurally_inapplicable"]
+            },
+            "adv_forced_reasoning_closure_changed": {
+              "enum": ["killed", "structurally_inapplicable"]
+            },
+            "adv_forced_reasoning_closure_removed": {
+              "enum": ["killed", "structurally_inapplicable"]
+            },
+            "adv_surfaces_closure_emptied_while_rendered_bytes_unchanged": {
+              "enum": ["killed", "structurally_inapplicable"]
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["source_path", "forced_reasoning_closure",
+                   "forced_reasoning_closure_is_explicitly_absent"],
+      "properties": {
+        "source_path": {"type": "string", "pattern": "^studies/study3r/"},
+        "forced_reasoning_closure": {"type": "null"},
+        "forced_reasoning_closure_is_explicitly_absent": {"const": true}
+      }
+    }
+  }
+}
