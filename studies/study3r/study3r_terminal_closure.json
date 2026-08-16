@@ -1,0 +1,342 @@
+{
+  "schema_version": "study3r-terminal-closure-v1",
+  "study_id": "STUDY3R",
+  "closure_kind": "terminal_governance_and_archival_closure",
+  "final_lifecycle_state": "STUDY3R_TERMINAL_CLOSURE_COMPLETE_RESEARCH_QUESTION_UNANSWERED",
+  "authority": {
+    "path": "studies/study3r/prompts/study3r_terminal_closure_authority.md",
+    "bytes": 9236,
+    "sha256": "5daf943cc1a236715e39c29013addfb3e1b34da54b98ffc4f385ea4ace5f3a99",
+    "git_blob": "4ffb72895562be28dbb2ad8d77b6c1cb7050502f",
+    "commit": "f3935293d29dac6df0277179ebcdf9f5778d304b",
+    "parent_commit": "08c01ff4753b98ad0f43843fc49c93fac68c89da",
+    "tree": "d103c3342b8301879d0706f69c71f7a4c4e0c1ae",
+    "published_alone_first": true,
+    "authorizes_repair": false,
+    "authorizes_amendment": false,
+    "authorizes_a_successor_study": false,
+    "authorizes_protocol_authoring": false,
+    "authorizes_model_execution": false
+  },
+  "starting_state": {
+    "expected_commit": "08c01ff4753b98ad0f43843fc49c93fac68c89da",
+    "expected_tree": "0dbf9ab33c19606c12c84a985dfabb93131bc0aa",
+    "expected_disposition": "STUDY3R_PROTOCOL_V1_REJECTED_TERMINAL_NO_EXECUTION",
+    "clean_worktree": true,
+    "head_equals_fetched_origin_main": true,
+    "linear_commits_after_da1ea31": 3,
+    "review_authority_committed_alone_first": true,
+    "review_files_are_additive": true,
+    "candidate_historical_protected_or_paper_path_changed": false,
+    "merges_rebases_force_pushes_or_rewrites": 0,
+    "all_execution_flags_false": true,
+    "integrity_verified": true
+  },
+  "operator_decision": {
+    "decision_count": 10,
+    "qualified": false,
+    "decisions": [
+      {
+        "index": 1,
+        "statement": "The independent focused review is accepted as the governing methods disposition."
+      },
+      {
+        "index": 2,
+        "statement": "Study 3R protocol v1 is rejected and terminal."
+      },
+      {
+        "index": 3,
+        "statement": "The four BLOCKING findings are decision-bearing and cannot be converted into limitations."
+      },
+      {
+        "index": 4,
+        "statement": "The candidate is not frozen, selected, executable or amendable."
+      },
+      {
+        "index": 5,
+        "statement": "No protocol v1.1, v2, repair commit or second authoring session is authorized."
+      },
+      {
+        "index": 6,
+        "statement": "No Study 3S, Study 4, Study 3M or other successor is authorized by this session."
+      },
+      {
+        "index": 7,
+        "statement": "No model, tokenizer, bank, seed, interface, RP-B, GPU or cloud operation is authorized."
+      },
+      {
+        "index": 8,
+        "statement": "The research question remains unanswered."
+      },
+      {
+        "index": 9,
+        "statement": "The repository records a methods-development failure, not a negative scientific result about J-space or reasoning."
+      },
+      {
+        "index": 10,
+        "statement": "Any future restart requires a fresh explicit project-level operator decision issued outside this terminal Study 3R authority."
+      }
+    ]
+  },
+  "validated_protocol_development_components": {
+    "is_scientific_evidence": false,
+    "independently_reproduced_by_the_review": true,
+    "immutable_revisions_reproduced": 4,
+    "tokenizer_and_config_file_hashes_reproduced": 16,
+    "chat_template_digests_reproduced": 4,
+    "registered_wrapper_surfaces_reproduced": 2,
+    "tokenizer_equivalence_strata_over_the_adversarial_reconstruction_set": 1,
+    "adversarial_reconstruction_grid_size": 30,
+    "candidate_m_max": 58,
+    "alpha_per_cell": "1/1160",
+    "every_registered_sample_size_boundary_size_and_power_agrees": true,
+    "candidate_manifest_entries_reproduced": 27,
+    "candidate_registered_mutations_killed": 24
+  },
+  "terminal_defects": {
+    "severity_counts": {
+      "BLOCKING": 4,
+      "MAJOR": 5,
+      "MINOR": 2
+    },
+    "silently_repaired": 0,
+    "downgraded_to_limitations": 0,
+    "blocking": [
+      {
+        "finding_id": "F-01",
+        "severity": "BLOCKING",
+        "title": "No registered depth-2/depth-3 allocation rule for any mixed bank",
+        "affected_decision": "task population, atomic-cell content, execution reproducibility and the registered depth-3 competence claim",
+        "repaired": false,
+        "downgraded_to_a_limitation": false
+      },
+      {
+        "finding_id": "F-02",
+        "severity": "BLOCKING",
+        "title": "The pooled depth cell lets depth-3 performance be masked to chance or to zero",
+        "affected_decision": "pass/fail decision of G01_COT_CEILING, G07_RPB_DEVELOPMENT, G08_RPB_CONFIRMATION and the primary headline gate G09_RT_E0_QUALIFICATION",
+        "repaired": false,
+        "downgraded_to_a_limitation": false
+      },
+      {
+        "finding_id": "F-03",
+        "severity": "BLOCKING",
+        "title": "Prequalification gates are globally conjunctive, so one candidate's failure ends the study",
+        "affected_decision": "state transition, candidate-selection result and reachability of the primary endpoint",
+        "repaired": false,
+        "downgraded_to_a_limitation": false
+      },
+      {
+        "finding_id": "F-04",
+        "severity": "BLOCKING",
+        "title": "The generated-CoT route freezes no decoding contract beyond do_sample and k",
+        "affected_decision": "rendered model input, execution reproducibility and the G01_COT_CEILING pass/fail decision that preconditions every later state",
+        "repaired": false,
+        "downgraded_to_a_limitation": false
+      }
+    ],
+    "major": [
+      {
+        "finding_id": "F-05",
+        "severity": "MAJOR",
+        "title": "d0_discriminant_position is a single fixture constant, not a per-item rule",
+        "affected_decision": "D0 readout reproducibility; demonstrated not to move a registered decision because D0 bears no gate, no task population and no n",
+        "repaired": false,
+        "downgraded_to_a_limitation": false
+      },
+      {
+        "finding_id": "F-06",
+        "severity": "MAJOR",
+        "title": "W2_ROLE_CANONICAL injects a forced reasoning closure absent from the authoritative Markdown",
+        "affected_decision": "construct definition of the second wrapper arm; the arm is a role-canonical envelope with a forced reasoning closure, not the checkpoint's unmodified canonical route",
+        "repaired": false,
+        "downgraded_to_a_limitation": false
+      },
+      {
+        "finding_id": "F-07",
+        "severity": "MAJOR",
+        "title": "Registered worst-case token bounds are fixture-length point estimates",
+        "affected_decision": "registered resource ceilings; demonstrated not to move a decision because the 131072-token context window is not threatened",
+        "repaired": false,
+        "downgraded_to_a_limitation": false
+      },
+      {
+        "finding_id": "F-08",
+        "severity": "MAJOR",
+        "title": "Item-disjointness and bank realization have no registered orchestration",
+        "affected_decision": "reproducibility of the nine declared item-disjoint bank pairs",
+        "repaired": false,
+        "downgraded_to_a_limitation": false
+      },
+      {
+        "finding_id": "F-09",
+        "severity": "MAJOR",
+        "title": "Seven coordinated decision-bearing mutations survive the semantic validator",
+        "affected_decision": "validation adequacy for D2/D3 allocation, the forced reasoning closure and parser anchoring",
+        "repaired": false,
+        "downgraded_to_a_limitation": false
+      }
+    ],
+    "minor": [
+      {
+        "finding_id": "F-10",
+        "severity": "MINOR",
+        "title": "The governance policing test widened its own scope predicates",
+        "affected_decision": "none demonstrated",
+        "repaired": false,
+        "downgraded_to_a_limitation": false
+      },
+      {
+        "finding_id": "F-11",
+        "severity": "MINOR",
+        "title": "The .gitattributes file is neither a manifest entry nor a declared exclusion",
+        "affected_decision": "none demonstrated",
+        "repaired": false,
+        "downgraded_to_a_limitation": false
+      }
+    ],
+    "surviving_coordinated_mutations": [
+      "adv_cot_parser_regex_unanchored",
+      "adv_d2_d3_ceiling_mix_drops_depth_three",
+      "adv_d2_d3_family_mix_drops_depth_three",
+      "adv_d3_family_depth_relabelled",
+      "adv_forced_reasoning_closure_changed",
+      "adv_forced_reasoning_closure_removed",
+      "adv_surfaces_closure_emptied_while_rendered_bytes_unchanged"
+    ]
+  },
+  "claim_boundary": {
+    "claim_about_rt_competence": false,
+    "claim_about_any_rp_b_candidate": false,
+    "claim_that_the_interface_is_valid": false,
+    "claim_that_the_interface_is_invalid": false,
+    "claim_about_the_existence_of_j_space": false,
+    "claim_about_the_absence_of_j_space": false,
+    "claim_about_reasoning_internalization": false,
+    "is_a_scientific_negative_result": false,
+    "only_conclusion": "Study 3R protocol v1 is not a valid executable instrument."
+  },
+  "nonauthoritative_future_prerequisites": {
+    "label": "NONAUTHORITATIVE_FUTURE_PREREQUISITES_NOT_A_SUCCESSOR_DESIGN",
+    "is_a_protocol": false,
+    "is_a_successor_design": false,
+    "contains_a_sample_size_recommendation": false,
+    "contains_a_successor_name": false,
+    "confers_execution_authority": false,
+    "prerequisites": [
+      "separate D2 and D3 populations and gates",
+      "explicit allocation and bank orchestration",
+      "candidate-local prequalification transitions",
+      "complete CoT decoding/runtime contract",
+      "per-item D0 discriminant-position derivation",
+      "explicit forced-reasoning-closure naming",
+      "semantic tests that kill all seven surviving coordinated mutations"
+    ]
+  },
+  "preserved_bytes": {
+    "candidate_bytes_unchanged": true,
+    "review_bytes_unchanged": true,
+    "historical_and_protected_bytes_unchanged": true,
+    "gitattributes_unchanged": true,
+    "paper_paths_unchanged": true,
+    "study1_study2_study3_paths_unchanged": true,
+    "candidate_pointer_unchanged": true,
+    "modified_paths": [
+      "studies/study3r/README.md"
+    ],
+    "added_paths": [
+      "studies/study3r/STATUS.json",
+      "studies/study3r/STATUS.schema.json",
+      "studies/study3r/STUDY3R_TERMINAL_CLOSURE.md",
+      "studies/study3r/closure/test_study3r_terminal_closure.py",
+      "studies/study3r/study3r_terminal_closure.json",
+      "studies/study3r/study3r_terminal_closure.schema.json"
+    ]
+  },
+  "publication": {
+    "history_is_strictly_linear": true,
+    "merges": 0,
+    "rebases": 0,
+    "squashes": 0,
+    "force_pushes": 0,
+    "history_rewrites": 0,
+    "github_actions_runs": 0,
+    "fast_forward_only": true,
+    "order": [
+      "terminal-closure authority alone",
+      "terminal closure, STATUS artifacts, schemas and closure tests",
+      "Study 3R README terminal routing and final closure disclosure"
+    ]
+  },
+  "zero_operation_counters": {
+    "model_constructions": 0,
+    "weight_files_acquired": 0,
+    "forward_passes": 0,
+    "prefill_operations": 0,
+    "generations": 0,
+    "logit_reads": 0,
+    "adapter_or_activation_loads": 0,
+    "activation_patches": 0,
+    "execution_seeds_drawn": 0,
+    "scientific_banks_realized": 0,
+    "rp_b_selections": 0,
+    "scoring_operations": 0,
+    "cloud_or_gpu_jobs": 0,
+    "evidence_ledger_rows_written": 0,
+    "candidate_repairs_or_amendments": 0,
+    "successor_authorizations": 0
+  },
+  "validation": {
+    "registered_baseline": "8 failed, 5,120 passed, 16 skipped",
+    "standing_failure_node_ids": [
+      "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+      "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+      "tests/test_phase1_0d_build_provenance.py::test_the_bundle_digest_ignores_the_checkout_line_endings",
+      "tests/test_phase1_0d_generation_launcher_rp_compat.py::test_shim_has_valid_bash_syntax_and_frozen_launcher_remains_in_baseline",
+      "tests/test_phase1_0d_protected_bytes.py::test_line_endings_do_not_change_the_rollup",
+      "tests/test_phase1_0d_review_image.py::test_v2_refuses_a_rehashed_record_with_moved_metadata",
+      "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only",
+      "tests/test_study3_v0_7_focused_review.py::test_the_review_changed_no_reviewed_or_historical_path"
+    ],
+    "full_suite": {
+      "testpaths": "tests",
+      "failed": 8,
+      "passed": 5120,
+      "skipped": 16,
+      "collection_errors": 0
+    },
+    "new_failure_node_ids": [],
+    "closure_module": {
+      "path": "studies/study3r/closure/test_study3r_terminal_closure.py",
+      "passed": 98,
+      "failed": 0,
+      "errors": 0
+    },
+    "candidate_and_governance_modules": {
+      "path": "tests/test_study3r_protocol_v1.py tests/test_study3r_operator_governance.py",
+      "passed": 163,
+      "failed": 0,
+      "errors": 0
+    },
+    "focused_review_module": {
+      "path": "studies/study3r/reviews/test_study3r_protocol_v1_single_focused_review.py",
+      "passed": 37,
+      "failed": 1,
+      "errors": 0
+    },
+    "every_json_artifact_validates_against_its_schema": true,
+    "standing_failures_edited_or_suppressed": 0,
+    "inherited_scope_expiry": {
+      "node_id": "studies/study3r/reviews/test_study3r_protocol_v1_single_focused_review.py::test_every_review_path_is_additive_and_inside_the_reviews_directory",
+      "introduced_by_commit": "f3935293d29dac6df0277179ebcdf9f5778d304b",
+      "introduced_by_this_closure": false,
+      "passes_at_commit": "08c01ff4753b98ad0f43843fc49c93fac68c89da",
+      "fails_at_commit": "f3935293d29dac6df0277179ebcdf9f5778d304b",
+      "module_is_an_independent_review_artifact": true,
+      "editable_under_this_authority": false,
+      "inside_the_registered_repository_baseline": false,
+      "substantive_guarantee_carried_forward_by": "studies/study3r/closure/test_study3r_terminal_closure.py::test_no_candidate_review_or_protected_byte_moved",
+      "explanation": "The assertion compares `git diff --name-status <reviewed> HEAD` against the review's own path set, so it expires the moment any authorized commit is added after the review head. It was already failing at the inherited starting head f3935293, which the predecessor session published, and it was verified to pass at 08c01ff in a detached worktree. The module is an independent-review artifact that section 3 of this authority forbids editing, so the failure is recorded rather than repaired or suppressed. Its substantive guarantee -- that no candidate, review, historical or protected byte moved -- is re-established at the closure head by the closure module's byte-identity test."
+    }
+  }
+}

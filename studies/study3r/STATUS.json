@@ -1,0 +1,204 @@
+{
+  "schema_version": "study3r-status-v1",
+  "study_id": "STUDY3R",
+  "namespace": "studies/study3r/",
+  "is_authoritative_lifecycle_router": true,
+  "lifecycle_state": "STUDY3R_TERMINAL_CLOSURE_COMPLETE_RESEARCH_QUESTION_UNANSWERED",
+  "terminal": true,
+  "active_protocol": null,
+  "closure_authority": {
+    "path": "studies/study3r/prompts/study3r_terminal_closure_authority.md",
+    "bytes": 9236,
+    "sha256": "5daf943cc1a236715e39c29013addfb3e1b34da54b98ffc4f385ea4ace5f3a99",
+    "git_blob": "4ffb72895562be28dbb2ad8d77b6c1cb7050502f",
+    "commit": "f3935293d29dac6df0277179ebcdf9f5778d304b",
+    "parent_commit": "08c01ff4753b98ad0f43843fc49c93fac68c89da",
+    "tree": "d103c3342b8301879d0706f69c71f7a4c4e0c1ae",
+    "published_alone_as_the_first_commit_after_the_review_disposition": true
+  },
+  "governing_review": {
+    "review_kind": "single_independent_focused_methods_review",
+    "disposition": "STUDY3R_PROTOCOL_V1_REJECTED_TERMINAL_NO_EXECUTION",
+    "accepted_as_governing": true,
+    "review_authority_commit": "9952263865694dfafea4f61643e596e193edf4b4",
+    "review_evidence_commit": "51754eeb263535ece1ef13af45408a0624b4e7a1",
+    "review_disposition_commit": "08c01ff4753b98ad0f43843fc49c93fac68c89da",
+    "review_disposition_tree": "0dbf9ab33c19606c12c84a985dfabb93131bc0aa",
+    "review_json": "studies/study3r/reviews/study3r_protocol_v1_single_focused_review.json",
+    "review_markdown": "studies/study3r/reviews/study3r_protocol_v1_single_focused_review.md",
+    "review_schema": "studies/study3r/reviews/study3r_protocol_v1_single_focused_review.schema.json",
+    "review_receipt": "studies/study3r/reviews/study3r_protocol_v1_review_receipt.json",
+    "severity_counts": {
+      "BLOCKING": 4,
+      "MAJOR": 5,
+      "MINOR": 2
+    },
+    "blocking_finding_ids": [
+      "F-01",
+      "F-02",
+      "F-03",
+      "F-04"
+    ],
+    "major_finding_ids": [
+      "F-05",
+      "F-06",
+      "F-07",
+      "F-08",
+      "F-09"
+    ],
+    "minor_finding_ids": [
+      "F-10",
+      "F-11"
+    ],
+    "artifact_count": 11,
+    "artifacts": [
+      {
+        "path": "studies/study3r/prompts/study3r_protocol_v1_single_focused_review_authority.md",
+        "bytes": 19227,
+        "sha256": "ffa051d5994c9d41435c6f5bc5b693cdfab6c843b604c063cfe4def286b5a882",
+        "git_blob": "046774722b1c90d70a4dfd271adb45601b84b099"
+      },
+      {
+        "path": "studies/study3r/reviews/study3r_review_tokenizer_reconstruction.py",
+        "bytes": 20171,
+        "sha256": "cf56b8ed6f5d17a08efa6329a147fe63b9ca8b7d27146c2fc5bede4448b77743",
+        "git_blob": "9af90dd7a7415f475eb9d405d4a5aef2f9da93e8"
+      },
+      {
+        "path": "studies/study3r/reviews/study3r_review_tokenizer_reconstruction.json",
+        "bytes": 386371,
+        "sha256": "f2caf54b71958fa52bb0a139535a845512248f9164d735a64f81366de97f5efa",
+        "git_blob": "6a197f0fc23a92bf5752647eb36d8a0cada88cd8"
+      },
+      {
+        "path": "studies/study3r/reviews/study3r_review_independent_recalculation.py",
+        "bytes": 20158,
+        "sha256": "4054dfc63c42e8d830dd20244434c973aa02915f12fa3feccadd9d1753413cec",
+        "git_blob": "66d964a7faf55022bcfb119bbc33a88f07bc206c"
+      },
+      {
+        "path": "studies/study3r/reviews/study3r_review_independent_recalculation_tables.json",
+        "bytes": 163167,
+        "sha256": "c26426666104a86f375b8169923e0eb723da64601ffdc0efc46c6fbb24fe0da0",
+        "git_blob": "dd3fb440ff0aba080e8d0020ab9a8b406057b9fc"
+      },
+      {
+        "path": "studies/study3r/reviews/study3r_review_mutation_audit.py",
+        "bytes": 23412,
+        "sha256": "2b03f0715b1a787090d2ed1cd6195b0ebbfc5958e0a1c83b7c7487c2a1f3302e",
+        "git_blob": "9ef128163ee75e7d3c7fa075425eb5dab8726688"
+      },
+      {
+        "path": "studies/study3r/reviews/study3r_review_mutation_audit.json",
+        "bytes": 42818,
+        "sha256": "9d79841eae8c06709513471ac21ce89abac98b0cecdf8c89b267a913d05368c3",
+        "git_blob": "f350e03c4ac12b8e6452f59c7401e7d2cabe2362"
+      },
+      {
+        "path": "studies/study3r/reviews/study3r_protocol_v1_single_focused_review.md",
+        "bytes": 36366,
+        "sha256": "54aca0892b66b6d2cbd7596f5d0d2bc2f779ec40cd49ae277c34c3ed04c6c486",
+        "git_blob": "f6de0a6d374812f6bbb8f154d49e527996a491b4"
+      },
+      {
+        "path": "studies/study3r/reviews/study3r_protocol_v1_single_focused_review.json",
+        "bytes": 25362,
+        "sha256": "71d201fa3536b9e475e02d515bea06034e7d3a98118d0257ca2d5d8752cdc1c8",
+        "git_blob": "93002368e0851522aaf58486bd0a308650c3d2fc"
+      },
+      {
+        "path": "studies/study3r/reviews/study3r_protocol_v1_single_focused_review.schema.json",
+        "bytes": 26671,
+        "sha256": "e12a33f1d9c74d0ca297a7db44456ea570d392bde7c1d9dae9bd3a340a4a0b08",
+        "git_blob": "763b4e4932e641875f4415bb9f136b704ef93bb8"
+      },
+      {
+        "path": "studies/study3r/reviews/test_study3r_protocol_v1_single_focused_review.py",
+        "bytes": 26291,
+        "sha256": "b2984c3e4b0a9240e95fe2819af7483a3521e422dc3c87bff17746d37bd7686e",
+        "git_blob": "3fe24f1b528b2f0cd10d48b09b84dd21f4e9a43b"
+      }
+    ]
+  },
+  "rejected_candidate": {
+    "candidate_commit": "da1ea31b51b784cb1ab3529f9de2f6ee27c853dd",
+    "candidate_tree": "c1de862ba3782b4930191a51df8790bb4279344c",
+    "candidate_state_at_review": "STUDY3R_PROTOCOL_V1_AUTHORED_AWAITING_SINGLE_INDEPENDENT_FOCUSED_REVIEW",
+    "pointer_path": "studies/study3r/protocol/study3r_protocol_current.json",
+    "pointer_is_an_internal_pointer_of_the_rejected_candidate": true,
+    "pointer_is_the_current_lifecycle_authority": false,
+    "prospective_readers_must_not_resolve_the_pointer": true,
+    "candidate_frozen": false,
+    "candidate_selected": false,
+    "candidate_executable": false,
+    "candidate_amendable": false,
+    "candidate_bytes_changed_by_this_closure": false
+  },
+  "authorization_flags": {
+    "frozen": false,
+    "execution_authorized": false,
+    "formal_execution_authorized": false,
+    "repair_authorized": false,
+    "amendment_authorized": false,
+    "second_authoring_session_authorized": false,
+    "successor_study_authorized": false,
+    "model_execution_authorized": false,
+    "protocol_v1_1_authorized": false,
+    "protocol_v2_authorized": false,
+    "study3s_authorized": false,
+    "study3m_authorized": false,
+    "study4_authorized": false,
+    "tokenizer_bank_seed_or_interface_operation_authorized": false,
+    "gpu_or_cloud_operation_authorized": false,
+    "rp_b_selection_authorized": false,
+    "github_actions_run_authorized": false
+  },
+  "research_question_answered": false,
+  "scientific_result_recorded": false,
+  "repository_records": {
+    "outcome_kind": "methods_development_failure",
+    "is_a_negative_scientific_result_about_j_space": false,
+    "is_a_negative_scientific_result_about_reasoning": false,
+    "statement": "The repository records a methods-development failure, not a negative scientific result about J-space or reasoning."
+  },
+  "evidence_ledger": {
+    "path": "paper/evidence_ledger.csv",
+    "last_row": "EV-0016",
+    "rows_added_by_study3r": 0,
+    "sha256": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1"
+  },
+  "zero_operation_counters": {
+    "model_constructions": 0,
+    "weight_files_acquired": 0,
+    "forward_passes": 0,
+    "prefill_operations": 0,
+    "generations": 0,
+    "logit_reads": 0,
+    "adapter_or_activation_loads": 0,
+    "activation_patches": 0,
+    "execution_seeds_drawn": 0,
+    "scientific_banks_realized": 0,
+    "rp_b_selections": 0,
+    "scoring_operations": 0,
+    "cloud_or_gpu_jobs": 0,
+    "evidence_ledger_rows_written": 0,
+    "candidate_repairs_or_amendments": 0,
+    "successor_authorizations": 0
+  },
+  "next_action_rule": {
+    "statement": "Any future restart requires a fresh explicit project-level operator decision issued outside this terminal Study 3R authority.",
+    "requires_a_fresh_explicit_project_level_operator_decision": true,
+    "the_decision_must_be_issued_outside_this_terminal_study3r_authority": true,
+    "this_authority_may_issue_it": false,
+    "automatic_amendment_permitted": false,
+    "automatic_successor_permitted": false,
+    "study3r_authorizes_a_successor": false
+  },
+  "closure_artifacts": {
+    "report_markdown": "studies/study3r/STUDY3R_TERMINAL_CLOSURE.md",
+    "closure_json": "studies/study3r/study3r_terminal_closure.json",
+    "closure_schema": "studies/study3r/study3r_terminal_closure.schema.json",
+    "status_schema": "studies/study3r/STATUS.schema.json",
+    "closure_tests": "studies/study3r/closure/test_study3r_terminal_closure.py"
+  }
+}
