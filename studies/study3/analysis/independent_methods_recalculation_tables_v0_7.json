@@ -1,0 +1,590 @@
+{
+ "census": {
+  "S1": {
+   "I1a_cells": 3,
+   "I1b_cells": 3,
+   "I2_cells": 6,
+   "I3_K5_cells": 21,
+   "I3_K6_cells": 6,
+   "I3_cells": 27,
+   "I4_cells": 4,
+   "applicable_i3_contrast_count": 9,
+   "applicable_i3_contrast_ids": [
+    "K5-A1",
+    "K5-P1",
+    "K5-P2",
+    "K5-P3",
+    "K5-S1",
+    "K5-S2",
+    "K5-S3",
+    "K6-INSTR",
+    "K6-SEP"
+   ],
+   "cells_at_i1_i3_floor": 33,
+   "cells_at_i2_floor": 6,
+   "cells_at_i4_floor": 4,
+   "selectable": true,
+   "total_gate_bearing_cells": 43
+  },
+  "S2": {
+   "I1a_cells": 3,
+   "I1b_cells": 0,
+   "I2_cells": 6,
+   "I3_K5_cells": 0,
+   "I3_K6_cells": 3,
+   "I3_cells": 3,
+   "I4_cells": 4,
+   "applicable_i3_contrast_count": 1,
+   "applicable_i3_contrast_ids": [
+    "K6-INSTR"
+   ],
+   "cells_at_i1_i3_floor": 6,
+   "cells_at_i2_floor": 6,
+   "cells_at_i4_floor": 4,
+   "selectable": true,
+   "total_gate_bearing_cells": 16
+  },
+  "S3": {
+   "I1a_cells": 3,
+   "I1b_cells": 0,
+   "I2_cells": 6,
+   "I3_K5_cells": 0,
+   "I3_K6_cells": 3,
+   "I3_cells": 3,
+   "I4_cells": 4,
+   "applicable_i3_contrast_count": 1,
+   "applicable_i3_contrast_ids": [
+    "K6-INSTR"
+   ],
+   "cells_at_i1_i3_floor": 6,
+   "cells_at_i2_floor": 6,
+   "cells_at_i4_floor": 4,
+   "selectable": true,
+   "total_gate_bearing_cells": 16
+  },
+  "S4": {
+   "I1a_cells": 3,
+   "I1b_cells": 3,
+   "I2_cells": 6,
+   "I3_K5_cells": 21,
+   "I3_K6_cells": 6,
+   "I3_cells": 27,
+   "I4_cells": 0,
+   "applicable_i3_contrast_count": 9,
+   "applicable_i3_contrast_ids": [
+    "K5-A1",
+    "K5-P1",
+    "K5-P2",
+    "K5-P3",
+    "K5-S1",
+    "K5-S2",
+    "K5-S3",
+    "K6-INSTR",
+    "K6-SEP"
+   ],
+   "cells_at_i1_i3_floor": 33,
+   "cells_at_i2_floor": 6,
+   "cells_at_i4_floor": 0,
+   "selectable": false,
+   "total_gate_bearing_cells": 39
+  },
+  "m_max_definition": "maximum total gate-bearing cell count over the selectable profiles",
+  "m_max_recomputed": 43
+ },
+ "comparison": {
+  "agreement_count": 74,
+  "mismatch_count": 6,
+  "mismatches": [
+   {
+    "committed": 826,
+    "independent": 413,
+    "where": "operation_boundaries.projected_future_operations.work_streams.target_role_development.by_profile.S2.base_item_contrast_clusters"
+   },
+   {
+    "committed": 1652,
+    "independent": 826,
+    "where": "operation_boundaries.projected_future_operations.work_streams.target_role_development.by_profile.S2.cluster_rendered_rows"
+   },
+   {
+    "committed": 2493,
+    "independent": 1667,
+    "where": "operation_boundaries.projected_future_operations.work_streams.target_role_development.by_profile.S2.rendered_rows_per_target_role"
+   },
+   {
+    "committed": 826,
+    "independent": 413,
+    "where": "operation_boundaries.projected_future_operations.work_streams.target_role_development.by_profile.S3_if_independently_rendered.base_item_contrast_clusters"
+   },
+   {
+    "committed": 1652,
+    "independent": 826,
+    "where": "operation_boundaries.projected_future_operations.work_streams.target_role_development.by_profile.S3_if_independently_rendered.cluster_rendered_rows"
+   },
+   {
+    "committed": 2493,
+    "independent": 1667,
+    "where": "operation_boundaries.projected_future_operations.work_streams.target_role_development.by_profile.S3_if_independently_rendered.rendered_rows_per_target_role"
+   }
+  ]
+ },
+ "components": {
+  "I1a+I1b+I3": {
+   "confirmation": {
+    "alpha_exact_rational": "1/200",
+    "critical_accuracy_decimal": "0.939467312349",
+    "critical_accuracy_exact_rational": "388/413",
+    "exact_null_tail_at_p0": "0.003020762720",
+    "exact_null_tail_at_p0_rational": "151038136002368143973377737108052491403773472523322451261820020925470692702746403104878885651783907369210853753359986125382128941200705258422361427654046177482223015607887349291102573553452610826617610485769366129074322197760917978190365701428893745981469400808244776599068180208832041691232389374132055286669556463694856088816848540173817845820319228493700296928094018982251026481840902449542945557536739655903/50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "exact_power_at_p1": "0.999609916012",
+    "pass_count": 388,
+    "pass_count_is_minimal_at_alpha": true
+   },
+   "development": {
+    "alpha_exact_rational": "1/600",
+    "critical_accuracy_decimal": "0.941888619855",
+    "critical_accuracy_exact_rational": "389/413",
+    "exact_null_tail_at_p0": "0.001664632930",
+    "exact_null_tail_at_p0_rational": "6658531718109188707333816607843542580091076593632812764736624257723208178693723145603070156280920937540035732846028325084844322316352978854806423683758609653214989442012009048081428255372350884254396608227855750315019483528713928561228725538724818041360545659611028304354618305419858377661309317808482479874391789379866338690802252462502665176330437454087816838065787893693299421886428488797712756172103448743/4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "exact_power_at_p1": "0.999129439838",
+    "pass_count": 389,
+    "pass_count_is_minimal_at_alpha": true
+   },
+   "n": 413,
+   "p0_exact_rational": "9/10",
+   "p1_exact_rational": "97/100"
+  },
+  "I2": {
+   "confirmation": {
+    "alpha_exact_rational": "1/200",
+    "critical_accuracy_decimal": "0.593457943925",
+    "critical_accuracy_exact_rational": "127/214",
+    "exact_null_tail_at_p0": "0.003765544908",
+    "exact_null_tail_at_p0_rational": "1549055326584515791773668362122747751697052520888308639468033/411376139330301510538742295639337626245683966408394965837152256",
+    "exact_power_at_p1": "0.999646587923",
+    "pass_count": 127,
+    "pass_count_is_minimal_at_alpha": true
+   },
+   "development": {
+    "alpha_exact_rational": "1/600",
+    "critical_accuracy_decimal": "0.602803738318",
+    "critical_accuracy_exact_rational": "129/214",
+    "exact_null_tail_at_p0": "0.001597676081",
+    "exact_null_tail_at_p0_rational": "42063732348927226722030972526215614674716030537459586616138857/26328072917139296674479506920917608079723773850137277813577744384",
+    "exact_power_at_p1": "0.999042859186",
+    "pass_count": 129,
+    "pass_count_is_minimal_at_alpha": true
+   },
+   "n": 214,
+   "p0_exact_rational": "1/2",
+   "p1_exact_rational": "7/10"
+  },
+  "I4": {
+   "confirmation": {
+    "alpha_exact_rational": "1/200",
+    "critical_accuracy_decimal": "0.850446428571",
+    "critical_accuracy_exact_rational": "381/448",
+    "exact_null_tail_at_p0": "0.003582895662",
+    "exact_null_tail_at_p0_rational": "49294231882801100551493438387614755214019973857060128251021296710979589499498823923440996750178571675796888131668179692498903037223854352225469689970252338274339081426445029178352241232516100544108015875428671808471708928804776583654912677894335897701480453633549655522934712840970826569064731850095057715593216/13758210268297397763667897526170065161360224664295482687804518709187165186228035782046256351936415984866562007864681289743809729483076688138689000775561590089077540942492315433079966305645224459264885892815950336399244485230678125897498848681247288853784423224176824141471754681109729290255927480757236480712890625",
+    "exact_power_at_p1": "0.999626931069",
+    "pass_count": 381,
+    "pass_count_is_minimal_at_alpha": true
+   },
+   "development": {
+    "alpha_exact_rational": "1/600",
+    "critical_accuracy_decimal": "0.854910714286",
+    "critical_accuracy_exact_rational": "383/448",
+    "exact_null_tail_at_p0": "0.001620609599",
+    "exact_null_tail_at_p0_rational": "22296687626541537491201943688430873445161719719511987128403407047094979917970630374471299919788406594869329229127913163240204025907019192012804815874235600082586517173454268488213593907889387564443787598111807413565456161475346807759917442251420161371860765785133251206792310993417369319585526570567447521263616/13758210268297397763667897526170065161360224664295482687804518709187165186228035782046256351936415984866562007864681289743809729483076688138689000775561590089077540942492315433079966305645224459264885892815950336399244485230678125897498848681247288853784423224176824141471754681109729290255927480757236480712890625",
+    "exact_power_at_p1": "0.999005509196",
+    "pass_count": 383,
+    "pass_count_is_minimal_at_alpha": true
+   },
+   "n": 448,
+   "p0_exact_rational": "4/5",
+   "p1_exact_rational": "9/10"
+  }
+ },
+ "cot_ceiling": {
+  "alpha_exact_rational": "1/600",
+  "critical_accuracy_decimal": "0.602803738318",
+  "critical_accuracy_exact_rational": "129/214",
+  "exact_null_tail_at_theta": "0.001597676081",
+  "exact_power_at_p1": "0.999042859186",
+  "identical_to_i2_development_row": true,
+  "n": 214,
+  "null_floor_equals_e0_restricted_chance_level": false,
+  "null_floor_is_not_the_critical_accuracy": true,
+  "p1_exact_rational": "7/10",
+  "recomputed_pass_count": 129,
+  "registered_e0_restricted_chance_level_exact_rational": "1/10",
+  "theta_exact_rational": "1/2"
+ },
+ "cross_field_probes": {
+  "e0_tokenizer_contract": {
+   "isomorphic_stratum_declared_ineligible_for_e0_or_rp_b": false,
+   "isomorphic_stratum_failure_handling": "analysed as a separate stratum; may not be pooled with checkpoints described as sharing the exact frozen interface",
+   "isomorphic_stratum_has_its_own_surface_contract": false,
+   "max_new_tokens": 3,
+   "token_ids_deferred_to": "DEFER-01",
+   "universal_two_token_claim": "every registered surface is exactly two tokens under the pinned role tokenizers, plus a one-token EOS margin"
+  },
+  "k6_applicability": {
+   "S1": {
+    "competence_floor_battery_census": [
+     "K6-INSTR",
+     "K6-SEP"
+    ],
+    "consistent": true,
+    "gate_hierarchy_claim_ceiling": [
+     "K6-INSTR",
+     "K6-SEP"
+    ],
+    "gate_truth_table": [
+     "K6-INSTR",
+     "K6-SEP"
+    ],
+    "rendering_registry_v0_6_applicable_contrast_count": 2
+   },
+   "S2": {
+    "competence_floor_battery_census": [
+     "K6-INSTR"
+    ],
+    "consistent": false,
+    "gate_hierarchy_claim_ceiling": [
+     "K6-INSTR",
+     "K6-SEP"
+    ],
+    "gate_truth_table": [
+     "K6-INSTR"
+    ],
+    "rendering_registry_v0_6_applicable_contrast_count": 1
+   },
+   "S3": {
+    "competence_floor_battery_census": [
+     "K6-INSTR"
+    ],
+    "consistent": false,
+    "gate_hierarchy_claim_ceiling": [
+     "K6-INSTR",
+     "K6-SEP"
+    ],
+    "gate_truth_table": [
+     "K6-INSTR"
+    ],
+    "rendering_registry_v0_6_applicable_contrast_count": 1
+   },
+   "S4": {
+    "competence_floor_battery_census": [
+     "K6-INSTR",
+     "K6-SEP"
+    ],
+    "consistent": true,
+    "gate_hierarchy_claim_ceiling": [
+     "K6-INSTR",
+     "K6-SEP"
+    ],
+    "gate_truth_table": [
+     "K6-INSTR",
+     "K6-SEP"
+    ],
+    "rendering_registry_v0_6_applicable_contrast_count": 2
+   }
+  },
+  "negative_control": {
+   "alpha_resolved_to_a_rational": false,
+   "confidence_bound_construction_named": false,
+   "independent_unit_registered": false,
+   "multiplicity_family_registered": false,
+   "operation_projection_registered": false,
+   "pass_count_registered": false,
+   "registered_fields": [
+    "derivation",
+    "not_significantly_above_chance_is_an_equivalence_demonstration",
+    "quantitative_upper_bound_exact_rational",
+    "test"
+   ],
+   "sample_size_registered": false
+  },
+  "normative_sources": {
+   "placement_says_v0_6_is_provenance_only": true,
+   "pointer_active_bundle_paths": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.md",
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.schema.json",
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.json"
+   ],
+   "pointer_must_not_load_legacy_json": true,
+   "protocol_placement_sole_top_level_normative_protocol": "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json",
+   "provenance_self_contained": true,
+   "provenance_v0_6_role": [
+    "normative v0.6 scoring and rendering registry"
+   ],
+   "status_authoritative_artifact_names_legacy_json": true,
+   "v0_6_registry_binding_status": "BINDING_NORMATIVE_INPUT_NOT_AN_ILLUSTRATIVE_EXAMPLE. An independ",
+   "v0_6_registry_governs": "studies/study3/protocol/interface_calibration_protocol_draft.json registers this file as a binding input; where the two disagree the disagreement is a defect",
+   "v0_6_registry_in_active_bundle": false,
+   "v0_7_registry_declares_v0_6_normative": "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json"
+  },
+  "od2_and_ladder": {
+   "blocking_decisions": [
+    "OD2"
+   ],
+   "candidate_families_are_generic": [
+    "3B-class instruction-tuned general model",
+    "7B-class instruction-tuned general or math model",
+    "hosted or larger-SKU reference"
+   ],
+   "candidate_universe_enumerated": false,
+   "ladder_blocked_on": "OD2",
+   "ladder_length_deferred_to": "DEFER-02",
+   "ladder_priority": "same-tokenizer natural candidates first, including the predeclared Qwen-family size ladder where eligible",
+   "numerical_closure_operator_discretion_clause_count": 0,
+   "observation_date_or_source_frozen": false,
+   "od2_blocking": true,
+   "od2_blocks": [
+    "Gate I4",
+    "stage P3-Q",
+    "freeze",
+    "every quantity in the positive_reference_external_P3Q work stream"
+   ],
+   "od2_status": "unresolved",
+   "predeclared_qwen_size_ladder_has_a_referent": false
+  },
+  "projection_coverage": {
+   "cell_factors": [
+    "interface profile",
+    "checkpoint role",
+    "task stratum",
+    "contrast family",
+    "contrast ID",
+    "operation family",
+    "depth",
+    "rendering",
+    "label alphabet",
+    "split"
+   ],
+   "cot_ceiling_stream_present": false,
+   "e0_stream_present": false,
+   "negative_control_stream_present": false,
+   "registered_work_streams": [
+    "RP_I4_under_candidate_profiles",
+    "S4_diagnostic_generation",
+    "deterministic_I0_fixtures",
+    "positive_reference_external_P3Q",
+    "selected_profile_one_shot_confirmation",
+    "target_role_development"
+   ],
+   "rp_b_q0_stream_present": false,
+   "wrapper_is_a_registered_cell_factor": false,
+   "wrapper_stream_present": false
+  },
+  "recursive_manifest": {
+   "conceptual_inclusion_nouns": [
+    "image digest",
+    "immutable checkpoint revisions",
+    "tokenizer files",
+    "renderer and wrapper registry",
+    "task banks",
+    "readout and parser code",
+    "thresholds and decision tables",
+    "analysis code",
+    "decoding configuration",
+    "manifests and provenance records required by the registered construction"
+   ],
+   "current_pointer_covered_by_a_glob": false,
+   "declares_covers_all_decision_bearing_bytes": true,
+   "declares_manifest_generator_included": true,
+   "inclusion_path_globs": [
+    "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.*",
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.*",
+    "studies/study3/analysis/*.py",
+    "studies/study3/analysis/*_tables.json"
+   ],
+   "named_manifest_generator_path": null,
+   "unmapped_conceptual_nouns": [
+    "image digest",
+    "immutable checkpoint revisions",
+    "tokenizer files",
+    "task banks",
+    "readout and parser code",
+    "decoding configuration"
+   ],
+   "v0_6_registry_covered_by_a_glob": false
+  },
+  "state_machine": {
+   "declares_exactly_one_legal_next_state_per_event": true,
+   "declares_total": true,
+   "legacy_q0_instrument_rule": "run only the deterministic, model-free I0 fixtures",
+   "q0_name_collision": true,
+   "registered_state_ids": [
+    "Q0_INSTRUMENT",
+    "Q1_DEVELOPMENT",
+    "Q2_SELECTION",
+    "Q3_CONFIRMATION_PENDING_SEPARATE_AUTHORITY",
+    "STOP_INSTRUMENT_DEFECT",
+    "STOP_DEVELOPMENT_INTEGRITY_ERROR",
+    "STOP_NO_SELECTABLE_INTERFACE_REMAINS",
+    "STOP_CONFIRMATION_FAILED",
+    "STOP_CONFIRMATION_SPENT_ON_ERROR",
+    "CALIBRATED_PENDING_SEPARATE_SUBSTANTIVE_AUTHORITY"
+   ],
+   "v0_7_blocks_absent_from_the_state_machine": [
+    "engineering_shakedown_authority_v0_7",
+    "generated_cot_ceiling_v0_7",
+    "e0_answer_and_decoding_contract",
+    "full_context_tokenization_and_d0_diagnostics",
+    "q0_and_rp_b_v0_7",
+    "rp_b_and_rp_m_separation_v0_7",
+    "wrapper_matched_contrast_v0_7",
+    "negative_control_equivalence_v0_7",
+    "activation_and_causal_claim_boundary_v0_7"
+   ],
+   "v0_7_q0_meaning": "positive-reference RP-B prequalification ladder"
+  },
+  "wrapper_identifiability": {
+   "chat_template_bytes_registered": false,
+   "few_shot_demonstrations_registered": false,
+   "registered_wrapper_fields": [
+    "arm",
+    "chat_template_applied",
+    "description",
+    "deterministic",
+    "few_shot_completion_format",
+    "role",
+    "shared_across_roles",
+    "wrapper_id"
+   ],
+   "registry_bytes": 3243,
+   "required_by_review_authority": [
+    "message roles and ordering",
+    "literal system/user/assistant content",
+    "separators and newlines",
+    "BOS/EOS handling",
+    "generation prompt behavior",
+    "chat-template revision or exact template bytes",
+    "RL few-shot demonstrations, ordering and answer cue",
+    "the exact field allowed to differ inside each within-role pair"
+   ],
+   "within_role_pair_differing_field_registered": false
+  }
+ },
+ "derived_gaps": {
+  "negative_control_equivalence_upper_bound_exact_rational": "17/100",
+  "registered_alternative_gap_exact_rational": "7/100",
+  "restricted_chance_level_derivation": "1 / 10 registered answer surfaces",
+  "restricted_chance_level_exact_rational": "1/10",
+  "wrapper_descriptive_bandwidth_exact_rational": "7/100"
+ },
+ "does_not_import": [
+  "studies/study3/analysis/v0_7_protocol_build.py",
+  "studies/study3/analysis/design_statistics.py",
+  "studies/study3/analysis/scoring_boundary_v0_6.py"
+ ],
+ "external_packages_used": [],
+ "minimal_sizes_at_registered_per_cell_target": {
+  "I1a+I1b+I3": {
+   "attained_power": "0.999129439838",
+   "minimal_n": 413,
+   "minimal_pass_count": 389,
+   "registered_n": 413,
+   "registered_n_equals_minimal_n": true
+  },
+  "I2": {
+   "attained_power": "0.999042859186",
+   "minimal_n": 214,
+   "minimal_pass_count": 129,
+   "registered_n": 214,
+   "registered_n_equals_minimal_n": true
+  },
+  "I4": {
+   "attained_power": "0.999005509196",
+   "minimal_n": 448,
+   "minimal_pass_count": 383,
+   "registered_n": 448,
+   "registered_n_equals_minimal_n": true
+  }
+ },
+ "power_architecture": {
+  "m_max_used": 43,
+  "panel_false_qualification_budget_exact_rational": "1/200",
+  "per_cell_false_negative_budget_exact_rational": "19/17200",
+  "per_cell_power_target_decimal": "0.998895348837",
+  "per_cell_power_target_exact_rational": "17181/17200",
+  "per_stage_profile_false_negative_budget_exact_rational": "19/400",
+  "profile_stage_power_floor_decimal": "0.952500",
+  "profile_stage_power_floor_exact_rational": "381/400",
+  "study_end_to_end_power_floor_decimal": "0.900000",
+  "study_end_to_end_power_floor_exact_rational": "9/10"
+ },
+ "projection": {
+  "S1": {
+   "base_item_contrast_clusters": 3717,
+   "base_items": 1254,
+   "cluster_rendered_rows": 7434,
+   "rendered_rows_all_target_roles": 26064,
+   "rendered_rows_per_target_role": 8688
+  },
+  "S2": {
+   "base_item_contrast_clusters": 413,
+   "base_items": 841,
+   "cluster_rendered_rows": 826,
+   "rendered_rows_all_target_roles": 5001,
+   "rendered_rows_per_target_role": 1667
+  },
+  "S3": {
+   "base_item_contrast_clusters": 413,
+   "base_items": 841,
+   "cluster_rendered_rows": 826,
+   "rendered_rows_all_target_roles": 5001,
+   "rendered_rows_per_target_role": 1667
+  },
+  "S4": {
+   "base_item_contrast_clusters": 3717,
+   "base_items": 1254,
+   "cluster_rendered_rows": 7434,
+   "rendered_rows_all_target_roles": 26064,
+   "rendered_rows_per_target_role": 8688
+  }
+ },
+ "reviewed_commit": "459d002442641039196ac3880d47a45a3b79a4c8",
+ "reviewed_tree": "2c84d55e6a965972e7cd3f69e3b0cded0bddfb04",
+ "schema_version": "study3-v0-7-independent-methods-recalculation",
+ "stdlib_modules_used": [
+  "argparse",
+  "fractions",
+  "json",
+  "math",
+  "pathlib",
+  "sys"
+ ],
+ "wrapper_multiplicity": {
+  "m_max_with_wrapper_factor": 86,
+  "m_max_without_wrapper_factor": 43,
+  "minimal_sizes_with_wrapper_factor": {
+   "I1a+I1b+I3": {
+    "attained_power": "0.999562075378",
+    "minimal_n": 439,
+    "minimal_pass_count": 413,
+    "registered_n": 413,
+    "registered_n_equals_minimal_n": false
+   },
+   "I2": {
+    "attained_power": "0.999453372472",
+    "minimal_n": 225,
+    "minimal_pass_count": 135,
+    "registered_n": 214,
+    "registered_n_equals_minimal_n": false
+   },
+   "I4": {
+    "attained_power": "0.999503743774",
+    "minimal_n": 477,
+    "minimal_pass_count": 407,
+    "registered_n": 448,
+    "registered_n_equals_minimal_n": false
+   }
+  },
+  "per_cell_power_target_with_wrapper_factor": "34381/34400",
+  "per_cell_power_target_without_wrapper_factor": "17181/17200",
+  "registered_wrapper_arms": 2
+ }
+}
