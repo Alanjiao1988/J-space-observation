@@ -1,0 +1,143 @@
+{
+  "artifacts_created": [
+    "studies/study3/prompts/study3_v0_7_consolidated_amendment_authority.md",
+    "studies/study3/analysis/v0_7_protocol_placement_probe.py",
+    "studies/study3/analysis/v0_7_protocol_placement_probe.json",
+    "studies/study3/reviews/v0_7_terminal_operator_decision_required.md",
+    "studies/study3/reviews/v0_7_terminal_operator_decision_required.json"
+  ],
+  "artifacts_not_created": [
+    "studies/study3/reviews/v0_7_operator_amendment.md",
+    "studies/study3/reviews/v0_7_operator_amendment.json",
+    "studies/study3/reviews/v0_7_operator_amendment.schema.json",
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.json",
+    "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.schema.json"
+  ],
+  "authority": {
+    "bytes": 23782,
+    "commit": "71d346ed1444bdbfb7dd3505824332d32a72585c",
+    "exactly_one_trailing_newline": true,
+    "git_blob": "9e15540b2550c0382748dd5440260d118c60043e",
+    "lf_only": true,
+    "path": "studies/study3/prompts/study3_v0_7_consolidated_amendment_authority.md",
+    "sha256": "3ec79dfc3a7c77e063135cb8414fb400697d83eefb36d5e59e78aad76dac98bc",
+    "tree": "d209e3c56572760ec9f33d7273b3e66e22c39903",
+    "was_first_commit_after_starting_commit": true
+  },
+  "blocking_contradiction": {
+    "amendable_paths": [
+      "studies/study3/protocol/interface_calibration_protocol.schema.json",
+      "studies/study3/protocol/interface_calibration_protocol_draft.md"
+    ],
+    "binding_artifact": "studies/study3/pilot/p0/corpus/p0_corpus_manifest.json",
+    "binding_field": "generator_and_renderer_identities/binding_protocol_draft",
+    "bound_sha256": "1197e08779f6360a50effeafa8035d9b1d21c0a3b038ecc7cbc0930be03c7ca7",
+    "byte_frozen_path": "studies/study3/protocol/interface_calibration_protocol_draft.json",
+    "byte_frozen_paths": [
+      "studies/study3/protocol/interface_calibration_protocol_draft.json"
+    ],
+    "check_broken_by_one_benign_byte": "studies/study3/pilot/p0/p0_freeze_corpus.py --check",
+    "jointly_satisfiable": false,
+    "protocol_is_draft_version": "draft-v0.5",
+    "protocol_schema_additional_properties": false,
+    "protocol_schema_pins_const_schema_version": "study3-interface-calibration-protocol-draft-v0.5",
+    "requirement_section_3": "do not alter historical manifests",
+    "requirement_section_5": "update studies/study3/protocol/interface_calibration_protocol_draft.json",
+    "requirement_section_8": "publish no passing state with a waived decision-bearing test",
+    "test_that_asserts_it": "tests/test_study3_p0_feasibility_pilot.py::test_frozen_corpus_re_derives_byte_exactly",
+    "why_the_json_edit_is_unavoidable": "a v0.7 amendment must move schema_version, study_identity.draft_version and state, and section 6 registers new decision-bearing objects that do not exist as registered keys under additionalProperties false"
+  },
+  "candidate_published": false,
+  "drafting_party_recommendation": null,
+  "evidence_ledger": {
+    "byte_identical_to_starting_state": true,
+    "bytes": 25241,
+    "path": "paper/evidence_ledger.csv",
+    "sha256": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1",
+    "tail": "EV-0016"
+  },
+  "formal_execution_authorized": false,
+  "historical_bytes_changed": 0,
+  "operator_options": [
+    {
+      "breaks_historical_artifacts": false,
+      "follows_precedent": "draft-v0.6",
+      "option": "A",
+      "requires_relaxing": "section 5 literal three-file list",
+      "summary": "register the v0.7 rendering registry as the normative home, leaving the protocol JSON byte-identical"
+    },
+    {
+      "breaks_historical_artifacts": true,
+      "follows_precedent": null,
+      "option": "B",
+      "requires_relaxing": "section 3",
+      "summary": "authorize regenerating the P0 corpus manifest so the protocol JSON can be edited"
+    },
+    {
+      "breaks_historical_artifacts": false,
+      "follows_precedent": null,
+      "option": "C",
+      "requires_relaxing": "section 8",
+      "summary": "authorize retiring or re-scoping the frozen-corpus test"
+    }
+  ],
+  "p0_r2_g2_inherited_disposition": {
+    "audit_exceptions": [
+      "aggregate attempt-ledger and handoff counts predate the final live-prefix/replay operations and are not a complete final aggregate, although the individual terminal receipts exist",
+      "committed Phase-B/preflight evidence binds an earlier head and lock; no committed artifact proves the entire 38-condition admission result at the exact replay anchor",
+      "the final hard-kill job used an empty CUDA_VISIBLE_DEVICES value although the authority literally specified -1; the safe no-GPU intent was preserved, but literal byte-level compliance cannot be claimed",
+      "the current Git DAG establishes linear history and no merge, but historical force-push count is UNKNOWN without an independent GitHub audit log"
+    ],
+    "bounded_pilot_authorization_failed": true,
+    "evidence_ledger_tail": "EV-0016",
+    "gpu_job_created": false,
+    "gpu_job_started": false,
+    "independently_reconstructed": true,
+    "legal_characterization": "P0_R2_G2_TERMINAL_VERIFIED_WITH_AUDIT_EXCEPTIONS",
+    "live_replay_mechanically_passed": true,
+    "model_tokenizer_scoring_gpu_counters_zero": true,
+    "research_question_answered": false
+  },
+  "protocol_bytes_changed": 0,
+  "research_question_answered": false,
+  "schema_version": "study3-v0-7-terminal-operator-decision-required",
+  "stage": "STUDY3-V0-7",
+  "starting_state": {
+    "commit": "9fa28a02eb578f7743e325703b812873b57e0ed2",
+    "evidence_ledger_tail": "EV-0016",
+    "formal_execution_authorized": false,
+    "tree": "5863bfcd25dc005fdca27707ac5f76b61e0c3f87",
+    "verified": true,
+    "worktree_clean": true
+  },
+  "study3_frozen": false,
+  "terminal_state": "STUDY3_V0_7_TERMINAL_OPERATOR_DECISION_REQUIRED",
+  "zero_operation_counters": {
+    "activation_loads": 0,
+    "adapter_loads": 0,
+    "azure_acr_aca_gpu_cloud_operations": 0,
+    "checkpoint_loads": 0,
+    "checkpoint_resolutions_with_download": 0,
+    "confirmation_accesses": 0,
+    "evidence_rows_added": 0,
+    "forward_passes": 0,
+    "generations": 0,
+    "github_actions_runs": 0,
+    "interface_qualifications": 0,
+    "interface_selections": 0,
+    "logit_reads": 0,
+    "model_output_parses": 0,
+    "prefills": 0,
+    "rp_b_qualifications": 0,
+    "rp_m_qualifications": 0,
+    "scientific_evidence_claims": 0,
+    "scoring_operations": 0,
+    "seed_draws": 0,
+    "split_realizations": 0,
+    "task_bank_rows_generated": 0,
+    "tokenizer_constructions": 0,
+    "tokenizer_decodes": 0,
+    "tokenizer_encodes": 0,
+    "weight_loads": 0
+  }
+}

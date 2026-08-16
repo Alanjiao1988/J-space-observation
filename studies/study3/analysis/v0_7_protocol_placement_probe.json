@@ -1,0 +1,190 @@
+{
+  "all_three_amendable": false,
+  "amendable_paths": [
+    "studies/study3/protocol/interface_calibration_protocol.schema.json",
+    "studies/study3/protocol/interface_calibration_protocol_draft.md"
+  ],
+  "baseline_checks": {
+    "p0_freeze_corpus": {
+      "exit_code": 0,
+      "last_line": "OK the committed frozen P0 corpus reproduces byte-exactly",
+      "reproduces": true
+    },
+    "p0_protocol": {
+      "exit_code": 0,
+      "last_line": "OK the committed P0 protocol reproduces byte-exactly",
+      "reproduces": true
+    }
+  },
+  "byte_frozen_paths": [
+    "studies/study3/protocol/interface_calibration_protocol_draft.json"
+  ],
+  "checkpoint_downloads": 0,
+  "cloud_operations": 0,
+  "evidence_rows_added": 0,
+  "files": [
+    {
+      "amendable": false,
+      "bytes": 418733,
+      "checks_broken_by_one_benign_byte": [
+        "p0_freeze_corpus"
+      ],
+      "checks_when_perturbed": {
+        "p0_freeze_corpus": {
+          "exit_code": 1,
+          "last_line": "FAIL DIFFERS studies/study3/pilot/p0/corpus/p0_corpus_manifest.json (committed 23476 bytes sha256 a6f4a4ef010f5660765095cfba7380044709d48629b45cd36f1f8d774be656e0; recomputed 23476 bytes sha256 3949f96e3a0a5c190c3c2e76d9e9bef07106c773c3588aebc756527d00c313a2)",
+          "reproduces": false
+        },
+        "p0_protocol": {
+          "exit_code": 0,
+          "last_line": "OK the committed P0 protocol reproduces byte-exactly",
+          "reproduces": true
+        }
+      },
+      "immutable_references": [
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0/container/Dockerfile.study3-p0"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0/corpus/p0_corpus.json"
+        },
+        {
+          "binds": "sha256",
+          "path": "studies/study3/pilot/p0/corpus/p0_corpus_manifest.json"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0/p0_freeze_corpus.py"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0/p0_image_verify.py"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0/p0_protocol.json"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0/p0_protocol.py"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1-v2"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0_r1/container/Dockerfile.study3-p0-r1-v3"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.json"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py"
+        }
+      ],
+      "label": "protocol_json",
+      "path": "studies/study3/protocol/interface_calibration_protocol_draft.json",
+      "restored_byte_exactly": true,
+      "sha256": "1197e08779f6360a50effeafa8035d9b1d21c0a3b038ecc7cbc0930be03c7ca7"
+    },
+    {
+      "amendable": true,
+      "bytes": 120132,
+      "checks_broken_by_one_benign_byte": [],
+      "checks_when_perturbed": {
+        "p0_freeze_corpus": {
+          "exit_code": 0,
+          "last_line": "OK the committed frozen P0 corpus reproduces byte-exactly",
+          "reproduces": true
+        },
+        "p0_protocol": {
+          "exit_code": 0,
+          "last_line": "OK the committed P0 protocol reproduces byte-exactly",
+          "reproduces": true
+        }
+      },
+      "immutable_references": [
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0/p0_protocol.json"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0/p0_protocol.py"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.json"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py"
+        }
+      ],
+      "label": "protocol_md",
+      "path": "studies/study3/protocol/interface_calibration_protocol_draft.md",
+      "restored_byte_exactly": true,
+      "sha256": "0376c7d5c659fe5535a216b614b6430499c7df235abcf52561dc8f075613b23f"
+    },
+    {
+      "amendable": true,
+      "bytes": 137495,
+      "checks_broken_by_one_benign_byte": [],
+      "checks_when_perturbed": {
+        "p0_freeze_corpus": {
+          "exit_code": 0,
+          "last_line": "OK the committed frozen P0 corpus reproduces byte-exactly",
+          "reproduces": true
+        },
+        "p0_protocol": {
+          "exit_code": 0,
+          "last_line": "OK the committed P0 protocol reproduces byte-exactly",
+          "reproduces": true
+        }
+      },
+      "immutable_references": [
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0/p0_protocol.json"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0/p0_protocol.py"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.json"
+        },
+        {
+          "binds": "path-only",
+          "path": "studies/study3/pilot/p0_r1/p0_r1_protocol.py"
+        }
+      ],
+      "label": "protocol_schema",
+      "path": "studies/study3/protocol/interface_calibration_protocol.schema.json",
+      "restored_byte_exactly": true,
+      "sha256": "79a8a68a51c686014f2cfe5c8cf4e782b01fc270cf3c9ae5739964abbe4c30c4"
+    }
+  ],
+  "generations": 0,
+  "gpu_operations": 0,
+  "head": "5fb1143ebd628759fda9c252a306e89bf6ef715f",
+  "model_operations_performed": 0,
+  "model_weight_loads": 0,
+  "prefills": 0,
+  "schema_version": "study3-v0-7-protocol-placement-probe",
+  "scored_rows": 0,
+  "stage": "STUDY3-V0-7",
+  "tokenizer_constructions": 0,
+  "tokenizer_encodes": 0,
+  "worktree_restored_clean": true
+}
