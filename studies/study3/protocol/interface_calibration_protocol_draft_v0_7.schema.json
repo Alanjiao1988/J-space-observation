@@ -1,0 +1,336 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "activation_and_causal_claim_boundary_v0_7": {},
+    "admissibility_order": {},
+    "atomic_evaluation_cells": {},
+    "bank_construction_policy": {},
+    "bank_rows": {},
+    "blocking_decisions": {},
+    "checkpoint_functional_equivalence_v0_7": {},
+    "checkpoint_roles": {},
+    "claim_ceiling": {},
+    "competence_floor_battery_v0_7": {},
+    "compute_and_reproducibility_plan": {},
+    "counterbalancing_design": {},
+    "decision_markers_v0_7": {
+      "items": {
+        "required": [
+          "marker",
+          "title",
+          "json_key"
+        ],
+        "type": "object"
+      },
+      "minItems": 14,
+      "type": "array"
+    },
+    "deterministic_deferrals_v0_7": {},
+    "development_selection_and_confirmation_plan": {},
+    "e0_answer_and_decoding_contract": {},
+    "engineering_shakedown_authority_v0_7": {},
+    "estimands_v0_7": {
+      "properties": {
+        "D0": {
+          "properties": {
+            "enters_q0": {
+              "const": false
+            },
+            "enters_the_rp_b_gate": {
+              "const": false
+            },
+            "id": {
+              "const": "D0_single_forward_decodability"
+            }
+          },
+          "required": [
+            "id",
+            "enters_q0",
+            "enters_the_rp_b_gate"
+          ],
+          "type": "object"
+        },
+        "E0": {
+          "properties": {
+            "establishes_absence_of_internal_computation": {
+              "const": false
+            },
+            "id": {
+              "const": "E0_zero_generated_reasoning_token_expressed_competence"
+            },
+            "role": {
+              "const": "primary"
+            }
+          },
+          "required": [
+            "id",
+            "role",
+            "establishes_absence_of_internal_computation"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "E0",
+        "D0",
+        "claim_ceiling"
+      ],
+      "type": "object"
+    },
+    "focused_review_packet_v0_7": {},
+    "full_context_tokenization_and_d0_diagnostics": {},
+    "gate_hierarchy": {},
+    "gate_truth_table": {},
+    "generated_cot_ceiling_v0_7": {
+      "properties": {
+        "can_select_an_interface": {
+          "const": false
+        },
+        "failure_state": {
+          "const": "NO_CANONICAL_TASK_HEADROOM_FOR_TARGET_ROUTE"
+        },
+        "is_an_execution_precondition_gate": {
+          "const": true
+        },
+        "is_an_interface_selector": {
+          "const": false
+        },
+        "is_s4": {
+          "const": false
+        },
+        "n_times_k_responses_treated_as_independent_items": {
+          "const": false
+        },
+        "statistical_unit_is_the_item": {
+          "const": true
+        }
+      },
+      "required": [
+        "is_an_execution_precondition_gate",
+        "is_an_interface_selector",
+        "statistical_unit_is_the_item",
+        "failure_state",
+        "can_select_an_interface"
+      ],
+      "type": "object"
+    },
+    "i3_contrast_registry": {},
+    "interface_profiles": {},
+    "negative_control_equivalence_v0_7": {},
+    "non_questions": {},
+    "not_applicable_semantics": {},
+    "numerical_closure_v0_7": {
+      "properties": {
+        "every_execution_value_is_frozen_or_deterministically_deferred": {
+          "const": true
+        },
+        "operator_discretion_clause_count": {
+          "const": 0
+        },
+        "tbd_count": {
+          "const": 0
+        },
+        "unresolved_alternative_count": {
+          "const": 0
+        }
+      },
+      "required": [
+        "tbd_count",
+        "operator_discretion_clause_count",
+        "every_execution_value_is_frozen_or_deterministically_deferred"
+      ],
+      "type": "object"
+    },
+    "operation_boundaries": {},
+    "operation_ontology_v0_4": {},
+    "operator_review_v0_1": {},
+    "p0_r2_historical_treatment_v0_7": {},
+    "positive_reference_candidates": {},
+    "power_architecture_v0_4": {},
+    "prior_study_statements": {},
+    "prohibited_language_v0_7": {},
+    "proposed_statistics": {},
+    "protocol_placement_v0_7": {
+      "properties": {
+        "frozen_corpus_test_retired_or_weakened": {
+          "const": false
+        },
+        "legacy_bundle_bytes_changed": {
+          "const": 0
+        },
+        "operator_decision": {
+          "const": "OPTION_D_COPY_ON_WRITE_VERSIONED_PROTOCOL"
+        },
+        "p0_corpus_manifest_regenerated": {
+          "const": false
+        }
+      },
+      "required": [
+        "operator_decision",
+        "legacy_bundle_bytes_changed",
+        "p0_corpus_manifest_regenerated",
+        "frozen_corpus_test_retired_or_weakened"
+      ],
+      "type": "object"
+    },
+    "provenance_v0_7": {},
+    "q0_and_rp_b_v0_7": {
+      "properties": {
+        "d0_alone_can_qualify_a_candidate": {
+          "const": false
+        },
+        "no_candidate_qualifies_state": {
+          "const": "NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_THE_REGISTERED_LADDER"
+        },
+        "q0_must_contain_an_e0_expressed_competence_component": {
+          "const": true
+        }
+      },
+      "required": [
+        "q0_must_contain_an_e0_expressed_competence_component",
+        "d0_alone_can_qualify_a_candidate",
+        "multiplicity",
+        "no_candidate_qualifies_state"
+      ],
+      "type": "object"
+    },
+    "recursive_manifest_seal_v0_7": {},
+    "rendering_surface_v0_5": {},
+    "required_next_action": {},
+    "research_question": {},
+    "results": {},
+    "retired_procedures": {},
+    "rp_b_and_rp_m_separation_v0_7": {},
+    "sampling_frame_v0_4": {},
+    "schema_version": {
+      "const": "study3-interface-calibration-protocol-draft-v0.7"
+    },
+    "split_lifecycle": {},
+    "state": {
+      "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_7_COMPLETE_AWAITING_SINGLE_FOCUSED_METHODS_REVIEW"
+    },
+    "state_machine_v0_4": {},
+    "status": {
+      "properties": {
+        "execution_authorized": {
+          "const": false
+        },
+        "frozen": {
+          "const": false
+        }
+      },
+      "required": [
+        "frozen",
+        "execution_authorized"
+      ],
+      "type": "object"
+    },
+    "study_identity": {},
+    "target_must_pass_i1_i2_analysis": {},
+    "task_strata": {},
+    "unit_registry": {},
+    "unresolved_operator_decisions": {},
+    "validation_targets": {},
+    "wrapper_matched_contrast_v0_7": {
+      "properties": {
+        "comparison_is_within_role": {
+          "const": true
+        },
+        "gate": {
+          "properties": {
+            "kind": {
+              "const": "joint_adequacy"
+            },
+            "registers_a_template_effect_claim": {
+              "const": false
+            },
+            "registers_an_equivalence_claim": {
+              "const": false
+            },
+            "registers_an_invariance_claim": {
+              "const": false
+            }
+          },
+          "required": [
+            "kind",
+            "registers_a_template_effect_claim"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "gate",
+        "comparison_is_within_role"
+      ],
+      "type": "object"
+    },
+    "zero_operation_boundary_v0_7": {}
+  },
+  "required": [
+    "activation_and_causal_claim_boundary_v0_7",
+    "admissibility_order",
+    "atomic_evaluation_cells",
+    "bank_construction_policy",
+    "bank_rows",
+    "blocking_decisions",
+    "checkpoint_functional_equivalence_v0_7",
+    "checkpoint_roles",
+    "claim_ceiling",
+    "competence_floor_battery_v0_7",
+    "compute_and_reproducibility_plan",
+    "counterbalancing_design",
+    "decision_markers_v0_7",
+    "deterministic_deferrals_v0_7",
+    "development_selection_and_confirmation_plan",
+    "e0_answer_and_decoding_contract",
+    "engineering_shakedown_authority_v0_7",
+    "estimands_v0_7",
+    "focused_review_packet_v0_7",
+    "full_context_tokenization_and_d0_diagnostics",
+    "gate_hierarchy",
+    "gate_truth_table",
+    "generated_cot_ceiling_v0_7",
+    "i3_contrast_registry",
+    "interface_profiles",
+    "negative_control_equivalence_v0_7",
+    "non_questions",
+    "not_applicable_semantics",
+    "numerical_closure_v0_7",
+    "operation_boundaries",
+    "operation_ontology_v0_4",
+    "operator_review_v0_1",
+    "p0_r2_historical_treatment_v0_7",
+    "positive_reference_candidates",
+    "power_architecture_v0_4",
+    "prior_study_statements",
+    "prohibited_language_v0_7",
+    "proposed_statistics",
+    "protocol_placement_v0_7",
+    "provenance_v0_7",
+    "q0_and_rp_b_v0_7",
+    "recursive_manifest_seal_v0_7",
+    "rendering_surface_v0_5",
+    "required_next_action",
+    "research_question",
+    "results",
+    "retired_procedures",
+    "rp_b_and_rp_m_separation_v0_7",
+    "sampling_frame_v0_4",
+    "schema_version",
+    "split_lifecycle",
+    "state",
+    "state_machine_v0_4",
+    "status",
+    "study_identity",
+    "target_must_pass_i1_i2_analysis",
+    "task_strata",
+    "unit_registry",
+    "unresolved_operator_decisions",
+    "validation_targets",
+    "wrapper_matched_contrast_v0_7",
+    "zero_operation_boundary_v0_7"
+  ],
+  "title": "Study 3 interface-calibration protocol draft-v0.7",
+  "type": "object"
+}

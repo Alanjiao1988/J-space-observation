@@ -1,0 +1,68 @@
+{
+  "active_bundle": {
+    "protocol_json": {
+      "bytes": 461502,
+      "path": "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json",
+      "sha256": "775d3add8dd368bce92268a24c7eb10a99c2fb4c82141e8d3cd29b3cb52d7194"
+    },
+    "protocol_markdown": {
+      "bytes": 13925,
+      "path": "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.md",
+      "sha256": "c220e429a43c897105170b06ffa17bedef89d2d278cd8bd5fa6cd741108bc515"
+    },
+    "protocol_schema": {
+      "bytes": 9266,
+      "path": "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.schema.json",
+      "sha256": "dde4b2b1b68dda1dedfe0eef1398af28f23c2902399b9e291b14a7de41e8dad1"
+    },
+    "rendering_registry": {
+      "bytes": 3243,
+      "path": "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.json",
+      "sha256": "8bc27e4ebb2e31461cf890403603708ec1a63115bb4bc9bc6fbc897f2575a738"
+    }
+  },
+  "active_draft_version": "draft-v0.7",
+  "amendment": "studies/study3/reviews/v0_7_operator_amendment.json",
+  "authorities": {
+    "original_amendment_authority": "studies/study3/prompts/study3_v0_7_consolidated_amendment_authority.md",
+    "placement_probe": "studies/study3/analysis/v0_7_protocol_placement_probe.py",
+    "successor_authority": "studies/study3/prompts/study3_v0_7_copy_on_write_protocol_successor_authority.md",
+    "terminal_disposition": "studies/study3/reviews/v0_7_terminal_operator_decision_required.md"
+  },
+  "execution_authorized": false,
+  "fallback_to_legacy_permitted": false,
+  "frozen": false,
+  "legacy_protocol_historical_p0_binding_only": {
+    "files": [
+      {
+        "bytes": 137495,
+        "path": "studies/study3/protocol/interface_calibration_protocol.schema.json",
+        "sha256": "79a8a68a51c686014f2cfe5c8cf4e782b01fc270cf3c9ae5739964abbe4c30c4"
+      },
+      {
+        "bytes": 418733,
+        "path": "studies/study3/protocol/interface_calibration_protocol_draft.json",
+        "sha256": "1197e08779f6360a50effeafa8035d9b1d21c0a3b038ecc7cbc0930be03c7ca7"
+      },
+      {
+        "bytes": 120132,
+        "path": "studies/study3/protocol/interface_calibration_protocol_draft.md",
+        "sha256": "0376c7d5c659fe5535a216b614b6430499c7df235abcf52561dc8f075613b23f"
+      }
+    ],
+    "is_current_protocol": false,
+    "status": "HISTORICAL_P0_BINDING_ONLY_NOT_CURRENT_PROTOCOL",
+    "why": "the immutable P0 corpus manifest byte-binds the legacy protocol JSON; it is preserved as historical P0 input and is not the active protocol"
+  },
+  "loader_contract": {
+    "fail_closed_state": "STUDY3_V0_7_ACTIVE_PROTOCOL_UNRESOLVABLE",
+    "must_fail_closed_if_any_active_bundle_file_is_absent": true,
+    "must_fail_closed_if_any_recorded_hash_mismatches": true,
+    "must_not_load_interface_calibration_protocol_draft_json": true,
+    "must_resolve_only_to_the_versioned_v0_7_bundle": true
+  },
+  "model_operations_performed": 0,
+  "next_legal_action": "one fresh independent single focused methods review of draft-v0.7 by a party that did not draft it",
+  "protocol_state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_7_COMPLETE_AWAITING_SINGLE_FOCUSED_METHODS_REVIEW",
+  "schema_version": "study3-interface-calibration-protocol-current-v0.7"
+}

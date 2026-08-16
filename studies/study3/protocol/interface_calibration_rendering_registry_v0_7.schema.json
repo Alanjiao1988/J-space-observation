@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "answer_surfaces": {
+      "type": "object"
+    },
+    "comparison_is_within_role": {
+      "const": true
+    },
+    "draft_version": {
+      "const": "draft-v0.7"
+    },
+    "inherited_v0_6_scoring_boundary": {
+      "type": "object"
+    },
+    "model_operations_performed": {
+      "const": 0
+    },
+    "registers_a_template_effect_claim": {
+      "const": false
+    },
+    "roles": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 3,
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "study3-interface-calibration-rendering-registry-v0.7"
+    },
+    "status": {
+      "additionalProperties": false,
+      "properties": {
+        "execution_authorized": {
+          "const": false
+        },
+        "frozen": {
+          "const": false
+        }
+      },
+      "required": [
+        "frozen",
+        "execution_authorized"
+      ],
+      "type": "object"
+    },
+    "subordinate_to": {
+      "const": "interface_calibration_protocol_draft_v0_7.json"
+    },
+    "wrapper_arms": {
+      "items": {
+        "enum": [
+          "raw",
+          "canonical"
+        ]
+      },
+      "minItems": 2,
+      "type": "array"
+    },
+    "wrapper_count": {
+      "type": "integer"
+    },
+    "wrappers": {
+      "items": {
+        "properties": {
+          "arm": {
+            "enum": [
+              "raw",
+              "canonical"
+            ]
+          },
+          "role": {
+            "enum": [
+              "RT",
+              "RL",
+              "RI"
+            ]
+          },
+          "wrapper_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "arm",
+          "wrapper_id",
+          "chat_template_applied",
+          "description"
+        ],
+        "type": "object"
+      },
+      "minItems": 6,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "draft_version",
+    "status",
+    "subordinate_to",
+    "inherited_v0_6_scoring_boundary",
+    "answer_surfaces",
+    "roles",
+    "wrapper_arms",
+    "wrappers",
+    "wrapper_count",
+    "comparison_is_within_role",
+    "registers_a_template_effect_claim",
+    "model_operations_performed"
+  ],
+  "title": "Study 3 interface-calibration rendering registry draft-v0.7",
+  "type": "object"
+}

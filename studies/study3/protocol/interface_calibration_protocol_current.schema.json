@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "active_bundle": {
+      "additionalProperties": false,
+      "properties": {
+        "protocol_json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "protocol_markdown": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "protocol_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "rendering_registry": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "protocol_json",
+        "protocol_schema",
+        "protocol_markdown",
+        "rendering_registry"
+      ],
+      "type": "object"
+    },
+    "active_draft_version": {
+      "const": "draft-v0.7"
+    },
+    "amendment": {
+      "type": "string"
+    },
+    "authorities": {
+      "type": "object"
+    },
+    "execution_authorized": {
+      "const": false
+    },
+    "fallback_to_legacy_permitted": {
+      "const": false
+    },
+    "frozen": {
+      "const": false
+    },
+    "legacy_protocol_historical_p0_binding_only": {
+      "properties": {
+        "is_current_protocol": {
+          "const": false
+        },
+        "status": {
+          "const": "HISTORICAL_P0_BINDING_ONLY_NOT_CURRENT_PROTOCOL"
+        }
+      },
+      "required": [
+        "status",
+        "is_current_protocol",
+        "files"
+      ],
+      "type": "object"
+    },
+    "loader_contract": {
+      "properties": {
+        "must_fail_closed_if_any_recorded_hash_mismatches": {
+          "const": true
+        },
+        "must_not_load_interface_calibration_protocol_draft_json": {
+          "const": true
+        },
+        "must_resolve_only_to_the_versioned_v0_7_bundle": {
+          "const": true
+        }
+      },
+      "required": [
+        "must_resolve_only_to_the_versioned_v0_7_bundle",
+        "must_fail_closed_if_any_recorded_hash_mismatches",
+        "must_not_load_interface_calibration_protocol_draft_json",
+        "fail_closed_state"
+      ],
+      "type": "object"
+    },
+    "model_operations_performed": {
+      "const": 0
+    },
+    "next_legal_action": {
+      "type": "string"
+    },
+    "protocol_state": {
+      "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_7_COMPLETE_AWAITING_SINGLE_FOCUSED_METHODS_REVIEW"
+    },
+    "schema_version": {
+      "const": "study3-interface-calibration-protocol-current-v0.7"
+    }
+  },
+  "required": [
+    "schema_version",
+    "active_draft_version",
+    "protocol_state",
+    "frozen",
+    "execution_authorized",
+    "active_bundle",
+    "legacy_protocol_historical_p0_binding_only",
+    "authorities",
+    "amendment",
+    "next_legal_action",
+    "fallback_to_legacy_permitted",
+    "loader_contract",
+    "model_operations_performed"
+  ],
+  "title": "Study 3 current interface-calibration protocol pointer",
+  "type": "object"
+}

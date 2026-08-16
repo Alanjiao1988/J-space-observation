@@ -1,0 +1,332 @@
+{
+  "authorities": {
+    "binding_order": [
+      "studies/study3/prompts/study3_v0_7_copy_on_write_protocol_successor_authority.md",
+      "studies/study3/prompts/study3_v0_7_consolidated_amendment_authority.md",
+      "studies/study3/reviews/v0_7_terminal_operator_decision_required.md",
+      "earlier Study 3 authorities and immutable history"
+    ],
+    "original_amendment_authority": {
+      "bytes": 23782,
+      "path": "studies/study3/prompts/study3_v0_7_consolidated_amendment_authority.md",
+      "sha256": "3ec79dfc3a7c77e063135cb8414fb400697d83eefb36d5e59e78aad76dac98bc"
+    },
+    "successor_authority": {
+      "bytes": 14569,
+      "path": "studies/study3/prompts/study3_v0_7_copy_on_write_protocol_successor_authority.md",
+      "sha256": "17193fbf7dcd727b2d1fa2399e23cf00a5d024d2b784d33cf1d8949e91d275ed"
+    }
+  },
+  "battery_unchanged": true,
+  "decision_count": 14,
+  "decisions": [
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "estimands_v0_7",
+      "marker": "V07-D01",
+      "title": "Dual estimands E0 and D0, and the claim ceiling"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "e0_answer_and_decoding_contract",
+      "marker": "V07-D02",
+      "title": "E0 answer surfaces, parser and decoding contract"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "full_context_tokenization_and_d0_diagnostics",
+      "marker": "V07-D03",
+      "title": "Full-context tokenization and D0 diagnostics"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "competence_floor_battery_v0_7",
+      "marker": "V07-D04",
+      "title": "The registered I1a/I1b/I2 competence-floor battery is retained"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "wrapper_matched_contrast_v0_7",
+      "marker": "V07-D05",
+      "title": "Wrapper-only matched contrast and joint adequacy"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "generated_cot_ceiling_v0_7",
+      "marker": "V07-D06",
+      "title": "Canonical generated-CoT ceiling"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "q0_and_rp_b_v0_7",
+      "marker": "V07-D07",
+      "title": "Q0 prequalification and the RP-B ladder"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "rp_b_and_rp_m_separation_v0_7",
+      "marker": "V07-D08",
+      "title": "RP-B and RP-M are separate constructs"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "checkpoint_functional_equivalence_v0_7",
+      "marker": "V07-D09",
+      "title": "Per-checkpoint functional equivalence"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "engineering_shakedown_authority_v0_7",
+      "marker": "V07-D10",
+      "title": "Engineering shakedown authority and its numeric bounds"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "recursive_manifest_seal_v0_7",
+      "marker": "V07-D11",
+      "title": "Recursive-manifest seal"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "activation_and_causal_claim_boundary_v0_7",
+      "marker": "V07-D12",
+      "title": "Activation and causal-claim boundary"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "protocol_placement_v0_7",
+      "marker": "V07-D13",
+      "title": "Copy-on-write protocol placement"
+    },
+    {
+      "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+      "json_key": "deterministic_deferrals_v0_7",
+      "marker": "V07-D14",
+      "title": "Deterministically deferred values and their fail-closed states"
+    }
+  ],
+  "derived_constants": {
+    "e0_answer_token_count": 2,
+    "e0_eos_margin_tokens": 1,
+    "e0_max_new_tokens": 3,
+    "e0_max_new_tokens_derivation": "every registered surface is exactly two tokens under the pinned role tokenizers, plus a one-token EOS margin",
+    "generated_cot_ceiling_aggregation": "per_item_single_response_full_sequence_exact_match",
+    "generated_cot_ceiling_alpha_exact_rational": "1/600",
+    "generated_cot_ceiling_derivation": "the ceiling is a task-headroom gate, so it reuses the registered I2 primitive-headroom construct exactly: same null, same lowest alternative of interest, same alpha, same exact one-sided binomial, same regenerated n and pass count. No new MDE is introduced",
+    "generated_cot_ceiling_k": 1,
+    "generated_cot_ceiling_k_derivation": "k = 1 with deterministic decoding. Exactly one estimand is therefore registered before data and the pass@1 versus majority-vote@k choice cannot arise at execution time. Majority-vote@k is NOT registered",
+    "generated_cot_ceiling_n": 214,
+    "generated_cot_ceiling_p1_exact_rational": "7/10",
+    "generated_cot_ceiling_pass_count": 129,
+    "generated_cot_ceiling_theta_exact_rational": "1/2",
+    "negative_control_equivalence_derivation": "restricted chance level plus the registered alternative gap; a negative control passes only when its exact one-sided upper confidence bound at the registered development alpha lies strictly below this value. 'not significantly above chance' is not accepted",
+    "negative_control_equivalence_upper_bound_exact_rational": "17/100",
+    "registered_alternative_gap_derivation": "p1 - p0 for the registered I1a/I1b/I3 floor, 97/100 - 9/10",
+    "registered_alternative_gap_exact_rational": "7/100",
+    "reproducibility_criterion": "byte-exact. Every decision-bearing artifact must reproduce with an identical SHA-256 under the sealed recursive manifest. The decision statistic is an integer exact-match count, so no floating-point tolerance is registered and none may be introduced",
+    "reproducibility_tolerance": 0,
+    "restricted_chance_level_derivation": "one over the ten registered candidate surfaces",
+    "restricted_chance_level_exact_rational": "1/10",
+    "s4_bound_is_unchanged": true,
+    "s4_generated_token_bound_per_generation": 16,
+    "wrapper_descriptive_bandwidth_derivation": "the same registered alternative gap; a paired risk difference wider than the distance between the null floor and the lowest alternative of interest triggers the fixed limitation paragraph. The trigger has no gate effect",
+    "wrapper_descriptive_bandwidth_exact_rational": "7/100"
+  },
+  "deterministic_deferrals": {
+    "entries": [
+      {
+        "acquisition_rule": "populated only by the later pre-execution seal, by resolving each registered repository identity to its immutable revision and recording the revision hash in the recursive manifest",
+        "fail_closed_absent_state": "STUDY3_V0_7_CHECKPOINT_REVISION_UNSEALED",
+        "id": "DEFER-01",
+        "may_default": false,
+        "value": "immutable checkpoint revision hashes"
+      },
+      {
+        "acquisition_rule": "the eligibility predicate and the ordering rule are frozen here; the concrete ladder is enumerated at the pre-execution seal by applying them to the registered candidate families, and L is the resulting count. The ladder is sealed before any Q0 development result is observed, and the candidate-level Bonferroni allocation is the registered study development screening alpha divided by that sealed L",
+        "blocked_on": "OD2",
+        "fail_closed_absent_state": "STUDY3_V0_7_RP_B_LADDER_UNSEALED",
+        "id": "DEFER-02",
+        "may_default": false,
+        "value": "RP-B ladder membership and its length L"
+      },
+      {
+        "acquisition_rule": "per item, the largest length the sealed checkpoint's registered context window permits after the rendered prompt and the registered EOS margin. A ceiling must never truncate, because a truncation artifact would be indistinguishable from absent headroom; the maximum is therefore the most permissive value the context allows, computed deterministically and recorded per item in the seal",
+        "fail_closed_absent_state": "CANONICAL_COT_CEILING_CONTEXT_WINDOW_UNAVAILABLE",
+        "id": "DEFER-03",
+        "may_default": false,
+        "value": "canonical generated-CoT maximum generation length"
+      }
+    ],
+    "policy": "every entry has a deterministic acquisition rule and a fail-closed absent state; none may be resolved at execution time by operator discretion",
+    "tbd_permitted": false
+  },
+  "disposition": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW",
+  "draft_version": "draft-v0.7",
+  "evidence_ledger_tail": "EV-0016",
+  "focused_review_packet": {
+    "contains_a_verdict": false,
+    "may_automatically_draft_v0_8": false,
+    "permitted_returns": [
+      "freeze or accept under its registered acceptance state",
+      "STUDY3_V0_7_TERMINAL_OPERATOR_DECISION_REQUIRED"
+    ],
+    "review_is_performed_by": "a fresh independent party that did not draft v0.7",
+    "scope": [
+      "the copy-on-write placement and the self-containment claim",
+      "the dual E0/D0 estimands and the claim ceiling",
+      "the E0 answer, parser and decoding contract",
+      "full-context tokenization and the descriptive D0 diagnostics",
+      "the retained I1a/I1b/I2 battery and its regenerated numbers",
+      "wrapper joint adequacy and its descriptive bandwidth",
+      "the generated-CoT ceiling and its reuse of the I2 headroom construct",
+      "Q0, the RP-B ladder rule and the deferred ladder length L",
+      "RP-B versus RP-M separation",
+      "per-checkpoint functional equivalence",
+      "the engineering shakedown budget",
+      "the recursive-manifest seal construction",
+      "the three deterministic deferrals and their fail-closed states"
+    ]
+  },
+  "formal_execution_authorized": false,
+  "four_hundred_cluster_mde_registered": false,
+  "frozen": false,
+  "new_bundle": {
+    "current_pointer": {
+      "bytes": 3237,
+      "path": "studies/study3/protocol/interface_calibration_protocol_current.json",
+      "sha256": "9a51d1ba3bacf2db9a19884e66aefce0bf289e994ab6a583fdad7ea028fd5f46"
+    },
+    "current_pointer_schema": {
+      "bytes": 4505,
+      "path": "studies/study3/protocol/interface_calibration_protocol_current.schema.json",
+      "sha256": "e26a57a9e1cd97e879e79688e8b366f91a00d200923d68e0a671c66a13f01c4f"
+    },
+    "protocol_json": {
+      "bytes": 461502,
+      "path": "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.json",
+      "sha256": "775d3add8dd368bce92268a24c7eb10a99c2fb4c82141e8d3cd29b3cb52d7194"
+    },
+    "protocol_markdown": {
+      "bytes": 13925,
+      "path": "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.md",
+      "sha256": "c220e429a43c897105170b06ffa17bedef89d2d278cd8bd5fa6cd741108bc515"
+    },
+    "protocol_schema": {
+      "bytes": 9266,
+      "path": "studies/study3/protocol/interface_calibration_protocol_draft_v0_7.schema.json",
+      "sha256": "dde4b2b1b68dda1dedfe0eef1398af28f23c2902399b9e291b14a7de41e8dad1"
+    },
+    "rendering_registry": {
+      "bytes": 3243,
+      "path": "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.json",
+      "sha256": "8bc27e4ebb2e31461cf890403603708ec1a63115bb4bc9bc6fbc897f2575a738"
+    },
+    "rendering_registry_schema": {
+      "bytes": 2392,
+      "path": "studies/study3/protocol/interface_calibration_rendering_registry_v0_7.schema.json",
+      "sha256": "93fbcd721a40b79f60ca0f4235e7fad501aeda9106946dd5c35ac00fd6079ccc"
+    }
+  },
+  "new_mde_registered": false,
+  "next_legal_action": "one fresh independent single focused methods review of draft-v0.7 by a party that did not draft it",
+  "operator_decision": {
+    "frozen_corpus_test_retired_or_weakened": false,
+    "legacy_bundle": {
+      "bytes_changed": 0,
+      "files": {
+        "studies/study3/protocol/interface_calibration_protocol.schema.json": {
+          "bytes": 137495,
+          "sha256": "79a8a68a51c686014f2cfe5c8cf4e782b01fc270cf3c9ae5739964abbe4c30c4",
+          "status": "HISTORICAL_P0_BINDING_ONLY_NOT_CURRENT_PROTOCOL"
+        },
+        "studies/study3/protocol/interface_calibration_protocol_draft.json": {
+          "bytes": 418733,
+          "sha256": "1197e08779f6360a50effeafa8035d9b1d21c0a3b038ecc7cbc0930be03c7ca7",
+          "status": "HISTORICAL_P0_BINDING_ONLY_NOT_CURRENT_PROTOCOL"
+        },
+        "studies/study3/protocol/interface_calibration_protocol_draft.md": {
+          "bytes": 120132,
+          "sha256": "0376c7d5c659fe5535a216b614b6430499c7df235abcf52561dc8f075613b23f",
+          "status": "HISTORICAL_P0_BINDING_ONLY_NOT_CURRENT_PROTOCOL"
+        }
+      },
+      "status": "HISTORICAL_P0_BINDING_ONLY_NOT_CURRENT_PROTOCOL"
+    },
+    "p0_corpus_manifest_regenerated": false,
+    "rejected": [
+      "OPTION_A_REGISTRY_AS_OMNIBUS_HOME",
+      "OPTION_B_REGENERATE_P0_CORPUS_MANIFEST",
+      "OPTION_C_RETIRE_FROZEN_CORPUS_TEST"
+    ],
+    "selected": "OPTION_D_COPY_ON_WRITE_VERSIONED_PROTOCOL"
+  },
+  "p0_r2_historical_treatment": {
+    "audit_exceptions": [
+      "aggregate attempt-ledger and handoff counts predate the final live-prefix and replay operations and are not a complete final aggregate, although the individual terminal receipts exist",
+      "committed Phase-B and preflight evidence binds an earlier head and lock; no committed artifact proves the entire 38-condition admission result at the exact replay anchor",
+      "the final hard-kill job used an empty CUDA_VISIBLE_DEVICES value although the authority literally specified -1; the safe no-GPU intent was preserved, but literal byte-level compliance cannot be claimed",
+      "the current Git DAG establishes linear history and no merge, but historical force-push count is UNKNOWN without an independent GitHub audit log"
+    ],
+    "bounded_pilot_authorization_failed": true,
+    "evidence_ledger_tail": "EV-0016",
+    "generation2_live_replay_mechanically_passed": true,
+    "generation_3_created": false,
+    "gpu_job_created_or_started": false,
+    "independently_reconstructed": true,
+    "legal_characterization": "P0_R2_G2_TERMINAL_VERIFIED_WITH_AUDIT_EXCEPTIONS",
+    "model_competence_inferred_from_p0_r2": false,
+    "model_tokenizer_scoring_gpu_counters_zero": true,
+    "p0_result_is_scientific_evidence": false,
+    "prohibited_phrases": [
+      "full authority compliance verified",
+      "zero force-pushes verified"
+    ],
+    "research_question_answered": false
+  },
+  "prohibited_language": [
+    "robust to prompt format",
+    "template-independent",
+    "format-insensitive",
+    "single forward pass",
+    "one forward pass",
+    "no intermediate computation",
+    "proves reasoning was absent",
+    "distillation caused the mechanism",
+    "\u5bf9\u63d0\u793a\u683c\u5f0f\u7a33\u5065",
+    "\u4e0e\u6a21\u677f\u65e0\u5173",
+    "\u5bf9\u683c\u5f0f\u4e0d\u654f\u611f"
+  ],
+  "research_question_answered": false,
+  "review_verdict_contained": false,
+  "schema_version": "study3-v0-7-operator-amendment",
+  "self_approval_prohibited": "the drafting party does not claim draft-v0.7 is correct; the determination belongs to a party that did not draft it",
+  "state": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_7_COMPLETE_AWAITING_SINGLE_FOCUSED_METHODS_REVIEW",
+  "zero_operation_boundary": {
+    "activation_loads": 0,
+    "adapter_loads": 0,
+    "azure_acr_aca_gpu_cloud_operations": 0,
+    "checkpoint_downloads": 0,
+    "checkpoint_loads": 0,
+    "confirmation_accesses": 0,
+    "evidence_rows_added": 0,
+    "forward_passes": 0,
+    "generations": 0,
+    "github_actions_runs": 0,
+    "interface_qualifications": 0,
+    "interface_selections": 0,
+    "logit_reads": 0,
+    "model_output_parses": 0,
+    "model_weight_loads": 0,
+    "prefills": 0,
+    "rp_b_qualifications": 0,
+    "rp_m_qualifications": 0,
+    "scientific_evidence_claims": 0,
+    "scoring_operations": 0,
+    "seeds_drawn": 0,
+    "split_realizations": 0,
+    "task_bank_rows_generated": 0,
+    "tokenizer_constructions": 0,
+    "tokenizer_decodes": 0,
+    "tokenizer_encodes": 0
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authorities": {
+      "type": "object"
+    },
+    "battery_unchanged": {
+      "const": true
+    },
+    "decision_count": {
+      "const": 14
+    },
+    "decisions": {
+      "items": {
+        "required": [
+          "marker",
+          "title",
+          "json_key",
+          "disposition"
+        ],
+        "type": "object"
+      },
+      "minItems": 14,
+      "type": "array"
+    },
+    "derived_constants": {
+      "type": "object"
+    },
+    "deterministic_deferrals": {
+      "type": "object"
+    },
+    "disposition": {
+      "const": "PROPOSED_RESOLVED_SUBJECT_TO_SINGLE_FOCUSED_REVIEW"
+    },
+    "draft_version": {
+      "const": "draft-v0.7"
+    },
+    "evidence_ledger_tail": {
+      "const": "EV-0016"
+    },
+    "focused_review_packet": {
+      "properties": {
+        "contains_a_verdict": {
+          "const": false
+        },
+        "may_automatically_draft_v0_8": {
+          "const": false
+        }
+      },
+      "required": [
+        "contains_a_verdict",
+        "may_automatically_draft_v0_8"
+      ],
+      "type": "object"
+    },
+    "formal_execution_authorized": {
+      "const": false
+    },
+    "four_hundred_cluster_mde_registered": {
+      "const": false
+    },
+    "frozen": {
+      "const": false
+    },
+    "new_bundle": {
+      "type": "object"
+    },
+    "new_mde_registered": {
+      "const": false
+    },
+    "next_legal_action": {
+      "type": "string"
+    },
+    "operator_decision": {
+      "properties": {
+        "frozen_corpus_test_retired_or_weakened": {
+          "const": false
+        },
+        "p0_corpus_manifest_regenerated": {
+          "const": false
+        },
+        "selected": {
+          "const": "OPTION_D_COPY_ON_WRITE_VERSIONED_PROTOCOL"
+        }
+      },
+      "required": [
+        "selected",
+        "rejected",
+        "p0_corpus_manifest_regenerated",
+        "frozen_corpus_test_retired_or_weakened"
+      ],
+      "type": "object"
+    },
+    "p0_r2_historical_treatment": {
+      "type": "object"
+    },
+    "prohibited_language": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 6,
+      "type": "array"
+    },
+    "research_question_answered": {
+      "const": false
+    },
+    "review_verdict_contained": {
+      "const": false
+    },
+    "schema_version": {
+      "const": "study3-v0-7-operator-amendment"
+    },
+    "self_approval_prohibited": {
+      "type": "string"
+    },
+    "state": {
+      "const": "STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_7_COMPLETE_AWAITING_SINGLE_FOCUSED_METHODS_REVIEW"
+    },
+    "zero_operation_boundary": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "draft_version",
+    "disposition",
+    "state",
+    "self_approval_prohibited",
+    "authorities",
+    "operator_decision",
+    "new_bundle",
+    "decisions",
+    "decision_count",
+    "derived_constants",
+    "deterministic_deferrals",
+    "battery_unchanged",
+    "new_mde_registered",
+    "four_hundred_cluster_mde_registered",
+    "p0_r2_historical_treatment",
+    "zero_operation_boundary",
+    "prohibited_language",
+    "evidence_ledger_tail",
+    "formal_execution_authorized",
+    "frozen",
+    "research_question_answered",
+    "focused_review_packet",
+    "review_verdict_contained",
+    "next_legal_action"
+  ],
+  "title": "Study 3 draft-v0.7 operator amendment",
+  "type": "object"
+}

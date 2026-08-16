@@ -1,0 +1,107 @@
+{
+  "answer_surfaces": {
+    "count": 10,
+    "leading_code_point": "U+0020",
+    "structure": "[common_prefix_token, discriminant_token]",
+    "surfaces": [
+      " 0",
+      " 1",
+      " 2",
+      " 3",
+      " 4",
+      " 5",
+      " 6",
+      " 7",
+      " 8",
+      " 9"
+    ],
+    "tokens_per_surface": 2,
+    "unchanged_from_v0_5": true
+  },
+  "comparison_is_within_role": true,
+  "draft_version": "draft-v0.7",
+  "inherited_v0_6_scoring_boundary": {
+    "carried_forward_unchanged": true,
+    "schema_version": "study3-interface-calibration-rendering-registry-v0.6",
+    "source": {
+      "bytes": 57331,
+      "path": "studies/study3/protocol/interface_calibration_rendering_registry_v0_6.json",
+      "sha256": "8cf04658449d7003545ad03a1bd7265507960e08d5530f92eb91167924ae19a7"
+    },
+    "why": "the v0.6 first-discriminative-token scoring boundary is normative and is inherited byte-identically by reference; v0.7 adds wrapper arms and changes no scoring rule"
+  },
+  "model_operations_performed": 0,
+  "registers_a_template_effect_claim": false,
+  "roles": [
+    "RT",
+    "RL",
+    "RI"
+  ],
+  "schema_version": "study3-interface-calibration-rendering-registry-v0.7",
+  "status": {
+    "execution_authorized": false,
+    "frozen": false
+  },
+  "subordinate_to": "interface_calibration_protocol_draft_v0_7.json",
+  "wrapper_arms": [
+    "raw",
+    "canonical"
+  ],
+  "wrapper_count": 6,
+  "wrappers": [
+    {
+      "arm": "raw",
+      "chat_template_applied": false,
+      "description": "the registered common raw wrapper; identical bytes for every role",
+      "role": "RT",
+      "shared_across_roles": true,
+      "wrapper_id": "wrapper_raw_common_v0_7"
+    },
+    {
+      "arm": "canonical",
+      "chat_template_applied": true,
+      "description": "the role's registered canonical chat template",
+      "deterministic": true,
+      "few_shot_completion_format": false,
+      "role": "RT",
+      "shared_across_roles": false,
+      "wrapper_id": "wrapper_canonical_rt_v0_7"
+    },
+    {
+      "arm": "raw",
+      "chat_template_applied": false,
+      "description": "the registered common raw wrapper; identical bytes for every role",
+      "role": "RL",
+      "shared_across_roles": true,
+      "wrapper_id": "wrapper_raw_common_v0_7"
+    },
+    {
+      "arm": "canonical",
+      "chat_template_applied": false,
+      "description": "RL has no canonical chat template, so its role-canonical arm is a deterministic few-shot completion-format wrapper",
+      "deterministic": true,
+      "few_shot_completion_format": true,
+      "role": "RL",
+      "shared_across_roles": false,
+      "wrapper_id": "wrapper_canonical_rl_v0_7"
+    },
+    {
+      "arm": "raw",
+      "chat_template_applied": false,
+      "description": "the registered common raw wrapper; identical bytes for every role",
+      "role": "RI",
+      "shared_across_roles": true,
+      "wrapper_id": "wrapper_raw_common_v0_7"
+    },
+    {
+      "arm": "canonical",
+      "chat_template_applied": true,
+      "description": "the role's registered canonical chat template",
+      "deterministic": true,
+      "few_shot_completion_format": false,
+      "role": "RI",
+      "shared_across_roles": false,
+      "wrapper_id": "wrapper_canonical_ri_v0_7"
+    }
+  ]
+}
