@@ -1,0 +1,128 @@
+{
+  "schema_version": "study4f-status-v1",
+  "study_id": "STUDY4F",
+  "namespace": "studies/study4f/",
+  "is_authoritative_lifecycle_router": true,
+  "lifecycle_state": "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE",
+  "terminal": true,
+  "study_kind": "developmental_non_confirmatory_behavioral_feasibility_pilot",
+  "authority": {
+    "path": "studies/study4f/prompts/study4f_minimal_behavioral_feasibility_authority.md",
+    "bytes": 17822,
+    "sha256": "bafba585ba4fe0030f2bae14e7be8d2f060732e56b3696422102605668de0773",
+    "git_blob": "2f120b05893ed2f09b07c3ebd2a99f23c536c752",
+    "commit": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729",
+    "published_alone_as_the_first_study4f_commit": true
+  },
+  "predecessor": {
+    "study_id": "STUDY3R",
+    "lifecycle_state": "STUDY3R_TERMINAL_CLOSURE_COMPLETE_RESEARCH_QUESTION_UNANSWERED",
+    "closure_commit": "ee8a852111d27cb39bf21743e18857485cff1efe",
+    "study3r_bytes_changed_by_study4f": false,
+    "study3r_terminal_status_modified": false,
+    "study4f_derives_authority_from_study3r": false
+  },
+  "reached_stage": {
+    "authority_published": true,
+    "instrument_published": true,
+    "mechanical_preflight_passed": true,
+    "shakedown_run": true,
+    "shakedown_disposition": "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE"
+  },
+  "not_reached": {
+    "study_banks_realized": false,
+    "execution_seal_created": false,
+    "developmental_execution_authorized": false,
+    "weights_acquired": false,
+    "any_model_call": false,
+    "ladder_executed": false,
+    "rt_executed": false
+  },
+  "authorization_flags": {
+    "developmental_execution_authorized": false,
+    "model_execution_authorized": false,
+    "quantization_authorized": false,
+    "sharding_authorized": false,
+    "offload_authorized": false,
+    "unregistered_model_authorized": false,
+    "d0_authorized": false,
+    "activation_capture_or_patching_authorized": false,
+    "study3m_authorized": false,
+    "confirmation_authorized": false,
+    "evidence_ledger_row_authorized": false,
+    "github_actions_run_authorized": false,
+    "threshold_or_estimand_change_authorized": false
+  },
+  "claim_boundary": {
+    "rp_b_developmental_candidate_identified": false,
+    "rp_b_confirmed": false,
+    "claims_j_space_exists": false,
+    "claims_j_space_does_not_exist": false,
+    "claims_j_space_is_observable": false,
+    "claims_j_space_is_unobservable": false,
+    "claims_the_model_cannot_reason_internally": false,
+    "claims_single_forward_reasoning_was_demonstrated": false,
+    "claims_the_interface_is_valid": false,
+    "claims_the_interface_is_invalid": false,
+    "claims_any_result_generalizes": false,
+    "is_a_scientific_result": false,
+    "is_a_negative_result_about_any_checkpoint": false
+  },
+  "evidence_ledger": {
+    "path": "paper/evidence_ledger.csv",
+    "last_row": "EV-0016",
+    "rows_added_by_study4f": 0,
+    "sha256": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1"
+  },
+  "zero_operation_counters": {
+    "checkpoint_downloads": 0,
+    "weight_files_acquired": 0,
+    "model_constructions": 0,
+    "forward_passes": 0,
+    "prefill_operations": 0,
+    "generations": 0,
+    "generated_tokens": 0,
+    "logit_reads": 0,
+    "activation_collections": 0,
+    "activation_patches": 0,
+    "d0_runs": 0,
+    "execution_seeds_drawn": 0,
+    "study_banks_realized": 0,
+    "rp_b_selections": 0,
+    "gpu_seconds": 0,
+    "accelerator_hours": 0,
+    "evidence_ledger_rows_written": 0,
+    "github_actions_runs": 0,
+    "cells_executed": 0
+  },
+  "what_this_state_establishes": {
+    "establishes": [
+      "A complete, published and mechanically validated Study 4F instrument exists: separate single-family D2 and D3 banks with an exact answer-label allocation, two fully frozen decoding contracts, exactly sixteen Bonferroni cells at alpha_per_cell = 1/320, and a candidate-local ladder.",
+      "The registered unquantized single-accelerator route for the 32B checkpoint could not be proven on this host: no accelerator was visible and 64.73 GiB would be required for weights, the maximum registered KV cache and the fixed safety reserve.",
+      "No prohibited fallback was taken: no quantization, no sharding, no CPU or disk offload, no device_map='auto' and no unregistered model substitution."
+    ],
+    "does_not_establish": [
+      "Nothing about whether any registered checkpoint has generated-CoT task headroom on D2 or on D3, because no cell was executed.",
+      "Nothing about whether any registered checkpoint shows zero-generated-reasoning-token expressed competence, because no E0 cell was executed.",
+      "Nothing about whether a natural positive-reference candidate exists in the registered ladder, because the ladder was never run.",
+      "Nothing about whether J-space exists, is observable or is unobservable; Study 4F never tested any of these and could not have.",
+      "Nothing about whether the raw direct-answer interface is valid or invalid, because it was never exercised against a model.",
+      "Nothing that generalizes beyond the registered checkpoints, depths and interface, because there is no result to generalize."
+    ]
+  },
+  "next_action_rule": {
+    "statement": "Study 4F stops at the registered section 4 state. Resuming requires one accelerator that can hold the 32B checkpoint, the maximum registered KV cache and the fixed safety reserve without offloading; the published instrument may then be reused unchanged from the shakedown step. Quantizing, sharding or offloading to proceed is prohibited and would not be the registered study.",
+    "requires_a_qualifying_accelerator": true,
+    "quantization_or_sharding_is_a_permitted_workaround": false,
+    "the_instrument_may_be_reused_unchanged": true,
+    "reopening_the_shakedown_after_a_study_bank_call": false
+  },
+  "artifacts": {
+    "protocol": "studies/study4f/protocol/study4f_protocol_v1.json",
+    "protocol_schema": "studies/study4f/protocol/study4f_protocol_v1.schema.json",
+    "shakedown_disposition": "studies/study4f/shakedown/study4f_shakedown_disposition.json",
+    "status_schema": "studies/study4f/STATUS.schema.json",
+    "tests": "studies/study4f/tests/test_study4f_behavioral_feasibility.py",
+    "disclosure": "studies/study4f/STUDY4F_TERMINAL_DISCLOSURE.md"
+  }
+}

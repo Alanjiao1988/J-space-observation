@@ -163,6 +163,61 @@ def test_the_study3r_closure_is_complete_and_untouched():
         assert at_closure == now, relative
 
 
+def test_every_study3r_byte_is_identical_to_the_closure_head():
+    """The substantive guarantee the expired closure scope predicate asserted.
+
+    ``studies/study3r/closure/test_study3r_terminal_closure.py::test_the_closure_only_added_its_own_paths_and_touched_one_readme``
+    compares ``git diff --name-status <closure authority> HEAD`` against the
+    closure's own path set, so it expires the moment any authorized commit is
+    added after the closure -- which publishing the Study 4F authority alone
+    necessarily is. That module is a Study 3R closure byte and section 11 of the
+    Study 4F authority forbids changing it, so the expiry is recorded rather
+    than edited or suppressed.
+
+    This test carries the underlying guarantee forward, and strengthens it: it
+    compares *every* tracked path under ``studies/study3r/`` at the closure head
+    against the current head, not a sampled subset.
+    """
+    listed = [line.strip() for line
+              in _git("ls-tree", "-r", "--name-only", STUDY3R_CLOSURE_COMMIT,
+                      "studies/study3r").splitlines() if line.strip()]
+    assert len(listed) >= 50, len(listed)
+    moved = []
+    for relative in listed:
+        at_closure = _git("rev-parse",
+                          "%s:%s" % (STUDY3R_CLOSURE_COMMIT, relative)).strip()
+        now = _git("rev-parse", "HEAD:%s" % relative).strip()
+        if at_closure != now:
+            moved.append(relative)
+    assert moved == [], moved
+    # No Study 3R path was deleted either.
+    now_listed = [line.strip() for line
+                  in _git("ls-tree", "-r", "--name-only", "HEAD",
+                          "studies/study3r").splitlines() if line.strip()]
+    assert set(listed) <= set(now_listed), sorted(set(listed) - set(now_listed))
+
+
+def test_study4f_added_paths_live_only_in_its_own_namespace():
+    """Everything Study 4F published sits under ``studies/study4f/``.
+
+    The one exception is the governance scope admission, which is named
+    explicitly here so it can never be a silent widening.
+    """
+    statuses = {}
+    for line in _git("diff", "--name-status", STUDY3R_CLOSURE_COMMIT,
+                     "HEAD").splitlines():
+        if not line.strip():
+            continue
+        code, path = line.split("\t", 1)
+        statuses[path.strip()] = code.strip()
+    added = {path for path, code in statuses.items() if code == "A"}
+    modified = {path for path, code in statuses.items() if code != "A"}
+    assert all(path.startswith("studies/study4f/") for path in added), \
+        sorted(path for path in added if not path.startswith("studies/study4f/"))
+    assert modified <= {"tests/test_study3r_operator_governance.py"}, \
+        sorted(modified)
+
+
 def test_the_history_is_strictly_linear_and_merge_free():
     merges = [line for line
               in _git("rev-list", "--merges",
@@ -817,6 +872,166 @@ def test_the_eight_standing_failure_node_ids_are_recorded_unchanged():
     registered = disclosure["test_results"]["baseline"]["failure_node_ids"]
     assert sorted(STANDING_FAILURE_NODE_IDS) == sorted(registered)
     assert len(STANDING_FAILURE_NODE_IDS) == 8
+
+
+# ---------------------------------------------------------------------------
+# 10. The registered terminal state
+# ---------------------------------------------------------------------------
+
+STATUS_JSON = STUDY4F / "STATUS.json"
+STATUS_SCHEMA = STUDY4F / "STATUS.schema.json"
+SHAKEDOWN = STUDY4F / "shakedown" / "study4f_shakedown_disposition.json"
+DISCLOSURE = STUDY4F / "STUDY4F_TERMINAL_DISCLOSURE.md"
+README = STUDY4F / "README.md"
+
+
+@pytest.fixture(scope="module")
+def status():
+    return _json(STATUS_JSON)
+
+
+@pytest.fixture(scope="module")
+def shakedown():
+    return _json(SHAKEDOWN)
+
+
+def test_status_validates_against_its_restrictive_schema(status):
+    jsonschema = pytest.importorskip("jsonschema")
+    schema = _json(STATUS_SCHEMA)
+    jsonschema.Draft202012Validator.check_schema(schema)
+    jsonschema.validate(status, schema)
+
+
+def test_the_final_state_is_exactly_one_registered_state(status, shakedown):
+    assert status["lifecycle_state"] == \
+        "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE"
+    assert machine.state_is_registered(status["lifecycle_state"])
+    assert status["terminal"] is True
+    assert shakedown["disposition"] == status["lifecycle_state"]
+    assert status["reached_stage"]["shakedown_disposition"] == \
+        status["lifecycle_state"]
+    text = DISCLOSURE.read_text(encoding="utf-8")
+    reached = [state for state in machine.REGISTERED_TERMINAL_STATES
+               if state in text and state.startswith("STUDY4F_")]
+    assert status["lifecycle_state"] in reached
+
+
+def test_the_resource_proof_recomputes_from_the_published_module(shakedown):
+    recorded = shakedown["resource_route_proof"]
+    proof = resource_route.prove_route("RP_B3")
+    assert recorded["weight_bytes"] == proof["weight_bytes"] == 64_000_000_000
+    assert recorded["max_registered_kv_cache_bytes"] == proof["kv_cache_bytes"]
+    assert recorded["safety_reserve_bytes"] == proof["safety_reserve_bytes"]
+    assert recorded["required_bytes"] == proof["required_bytes"]
+    assert recorded["required_bytes"] == (
+        recorded["weight_bytes"] + recorded["max_registered_kv_cache_bytes"]
+        + recorded["safety_reserve_bytes"])
+    assert recorded["immutable_revision"] == \
+        "711ad2ea6aa40cfca18895e8aca02ab92df1a746"
+
+
+def test_no_prohibited_fallback_was_attempted(shakedown):
+    fallbacks = shakedown["prohibited_fallbacks_not_attempted"]
+    assert all(value is False for value in fallbacks.values()), fallbacks
+    assert shakedown["decision_bearing_value_changed"] is False
+    assert shakedown["white_listed_fixes_applied"] == []
+
+
+def test_the_shakedown_stayed_inside_its_registered_budget(shakedown):
+    assert shakedown["attempts_used"] <= shakedown["attempts_permitted"] == 3
+    assert shakedown["accelerator_hours_used"] <= \
+        shakedown["accelerator_hours_permitted"] == 6
+    assert shakedown["fixtures"]["kind"] == "synthetic non-study"
+    assert shakedown["fixtures"]["is_the_registered_authority_commit"] is False
+    assert shakedown["fixtures"]["study_bank_model_outputs_inspected"] == 0
+    assert shakedown["fixtures"]["study_banks_realized"] == 0
+    assert shakedown["fixtures"]["fixture_identity"] != AUTHORITY_COMMIT
+
+
+def test_nothing_downstream_of_the_stop_was_reached(status, shakedown):
+    for key, value in status["not_reached"].items():
+        assert value is False, key
+    assert shakedown["banks_realized"] is False
+    assert shakedown["execution_seal_created"] is False
+    assert shakedown["developmental_execution_authorized"] is False
+    committed = _git("ls-files", "studies/study4f").split()
+    assert not any("seal" in path for path in committed), committed
+
+
+def test_every_authorization_flag_and_counter_is_false_or_zero(status, shakedown):
+    assert all(value is False for value in status["authorization_flags"].values())
+    assert all(value == 0 for value in status["zero_operation_counters"].values())
+    assert all(value == 0 for value in shakedown["counters"].values())
+    for key in ("d0_runs", "logit_reads", "activation_collections",
+                "activation_patches"):
+        assert status["zero_operation_counters"][key] == 0, key
+
+
+def test_no_scientific_claim_is_recorded(status):
+    for key, value in status["claim_boundary"].items():
+        assert value is False, key
+    assert status["evidence_ledger"]["rows_added_by_study4f"] == 0
+    assert status["evidence_ledger"]["last_row"] == "EV-0016"
+
+
+@pytest.mark.parametrize("claim", [
+    "J-space does not exist",
+    "J-space is unobservable",
+    "the model cannot reason internally",
+    "single-forward reasoning was demonstrated",
+    "RP-B was confirmed",
+])
+def test_the_disclosure_asserts_no_prohibited_conclusion(claim):
+    """A prohibited phrase may appear only inside an explicit negation.
+
+    The check is paragraph-scoped rather than line-scoped, because Markdown
+    line wrapping is arbitrary and can separate a phrase from the negation that
+    governs it.
+    """
+    negations = {"no", "not", "never", "neither", "nor", "prohibited",
+                 "prohibits", "unanswered"}
+    for path in (DISCLOSURE, README):
+        text = path.read_text(encoding="utf-8")
+        for paragraph in text.split("\n\n"):
+            if claim.lower() not in paragraph.lower():
+                continue
+            lowered = paragraph.lower()
+            for character in "*`_|#>":
+                lowered = lowered.replace(character, " ")
+            assert negations & set(lowered.split()), (path.name, paragraph)
+
+
+def test_the_disclosure_states_what_the_state_does_and_does_not_establish(status):
+    text = DISCLOSURE.read_text(encoding="utf-8")
+    assert "It establishes" in text
+    assert "It does not establish" in text
+    assert len(status["what_this_state_establishes"]["establishes"]) >= 3
+    assert len(status["what_this_state_establishes"]["does_not_establish"]) >= 5
+    for phrase in ("AUTHORITY_ONLY_PARTIALLY_EXECUTED",
+                   "STUDY3R_TERMINAL_CLOSURE_COMPLETE_RESEARCH_QUESTION_UNANSWERED",
+                   "EV-0016", "8 failed, 5,120 passed, 16 skipped"):
+        assert phrase in text, phrase
+
+
+def test_the_disclosure_reports_the_skipped_cells_and_their_reason():
+    text = DISCLOSURE.read_text(encoding="utf-8")
+    assert "Zero of the sixteen registered cells were executed" in text
+    assert "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE" in text
+    assert "skipped" in text.lower()
+
+
+def test_the_readme_routes_to_the_status_router_first():
+    text = README.read_text(encoding="utf-8")
+    assert text.index("STATUS.json") < text.index("study4f_protocol_v1.json")
+    assert "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE" in text
+    lowered = text.lower()
+    assert "no scientific result" in lowered
+    assert "ev-0016" in lowered
+
+
+# ---------------------------------------------------------------------------
+# 11. Byte hygiene
+# ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize("relative", [

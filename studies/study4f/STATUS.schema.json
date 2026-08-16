@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Alanjiao1988/J-space-observation/studies/study4f/STATUS.schema.json",
+  "title": "Study 4F authoritative lifecycle router",
+  "description": "Restrictive schema for studies/study4f/STATUS.json. Every decision-bearing value is pinned with a const or an enum, every object is closed with additionalProperties=false, and every counter is pinned to zero.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "study_id", "namespace", "is_authoritative_lifecycle_router",
+    "lifecycle_state", "terminal", "study_kind", "authority", "predecessor",
+    "reached_stage", "not_reached", "authorization_flags", "claim_boundary",
+    "evidence_ledger", "zero_operation_counters", "what_this_state_establishes",
+    "next_action_rule", "artifacts"
+  ],
+  "properties": {
+    "schema_version": {"const": "study4f-status-v1"},
+    "study_id": {"const": "STUDY4F"},
+    "namespace": {"const": "studies/study4f/"},
+    "is_authoritative_lifecycle_router": {"const": true},
+    "lifecycle_state": {
+      "const": "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE"
+    },
+    "terminal": {"const": true},
+    "study_kind": {
+      "const": "developmental_non_confirmatory_behavioral_feasibility_pilot"
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256", "git_blob", "commit",
+                   "published_alone_as_the_first_study4f_commit"],
+      "properties": {
+        "path": {
+          "const": "studies/study4f/prompts/study4f_minimal_behavioral_feasibility_authority.md"
+        },
+        "bytes": {"const": 17822},
+        "sha256": {
+          "const": "bafba585ba4fe0030f2bae14e7be8d2f060732e56b3696422102605668de0773"
+        },
+        "git_blob": {"const": "2f120b05893ed2f09b07c3ebd2a99f23c536c752"},
+        "commit": {"const": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729"},
+        "published_alone_as_the_first_study4f_commit": {"const": true}
+      }
+    },
+    "predecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["study_id", "lifecycle_state", "closure_commit",
+                   "study3r_bytes_changed_by_study4f",
+                   "study3r_terminal_status_modified",
+                   "study4f_derives_authority_from_study3r"],
+      "properties": {
+        "study_id": {"const": "STUDY3R"},
+        "lifecycle_state": {
+          "const": "STUDY3R_TERMINAL_CLOSURE_COMPLETE_RESEARCH_QUESTION_UNANSWERED"
+        },
+        "closure_commit": {"const": "ee8a852111d27cb39bf21743e18857485cff1efe"},
+        "study3r_bytes_changed_by_study4f": {"const": false},
+        "study3r_terminal_status_modified": {"const": false},
+        "study4f_derives_authority_from_study3r": {"const": false}
+      }
+    },
+    "reached_stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority_published", "instrument_published",
+                   "mechanical_preflight_passed", "shakedown_run",
+                   "shakedown_disposition"],
+      "properties": {
+        "authority_published": {"const": true},
+        "instrument_published": {"const": true},
+        "mechanical_preflight_passed": {"const": true},
+        "shakedown_run": {"const": true},
+        "shakedown_disposition": {
+          "const": "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE"
+        }
+      }
+    },
+    "not_reached": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["study_banks_realized", "execution_seal_created",
+                   "developmental_execution_authorized", "weights_acquired",
+                   "any_model_call", "ladder_executed", "rt_executed"],
+      "properties": {
+        "study_banks_realized": {"const": false},
+        "execution_seal_created": {"const": false},
+        "developmental_execution_authorized": {"const": false},
+        "weights_acquired": {"const": false},
+        "any_model_call": {"const": false},
+        "ladder_executed": {"const": false},
+        "rt_executed": {"const": false}
+      }
+    },
+    "authorization_flags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "developmental_execution_authorized", "model_execution_authorized",
+        "quantization_authorized", "sharding_authorized", "offload_authorized",
+        "unregistered_model_authorized", "d0_authorized",
+        "activation_capture_or_patching_authorized", "study3m_authorized",
+        "confirmation_authorized", "evidence_ledger_row_authorized",
+        "github_actions_run_authorized", "threshold_or_estimand_change_authorized"
+      ],
+      "properties": {
+        "developmental_execution_authorized": {"const": false},
+        "model_execution_authorized": {"const": false},
+        "quantization_authorized": {"const": false},
+        "sharding_authorized": {"const": false},
+        "offload_authorized": {"const": false},
+        "unregistered_model_authorized": {"const": false},
+        "d0_authorized": {"const": false},
+        "activation_capture_or_patching_authorized": {"const": false},
+        "study3m_authorized": {"const": false},
+        "confirmation_authorized": {"const": false},
+        "evidence_ledger_row_authorized": {"const": false},
+        "github_actions_run_authorized": {"const": false},
+        "threshold_or_estimand_change_authorized": {"const": false}
+      }
+    },
+    "claim_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rp_b_developmental_candidate_identified", "rp_b_confirmed",
+        "claims_j_space_exists", "claims_j_space_does_not_exist",
+        "claims_j_space_is_observable", "claims_j_space_is_unobservable",
+        "claims_the_model_cannot_reason_internally",
+        "claims_single_forward_reasoning_was_demonstrated",
+        "claims_the_interface_is_valid", "claims_the_interface_is_invalid",
+        "claims_any_result_generalizes", "is_a_scientific_result",
+        "is_a_negative_result_about_any_checkpoint"
+      ],
+      "properties": {
+        "rp_b_developmental_candidate_identified": {"const": false},
+        "rp_b_confirmed": {"const": false},
+        "claims_j_space_exists": {"const": false},
+        "claims_j_space_does_not_exist": {"const": false},
+        "claims_j_space_is_observable": {"const": false},
+        "claims_j_space_is_unobservable": {"const": false},
+        "claims_the_model_cannot_reason_internally": {"const": false},
+        "claims_single_forward_reasoning_was_demonstrated": {"const": false},
+        "claims_the_interface_is_valid": {"const": false},
+        "claims_the_interface_is_invalid": {"const": false},
+        "claims_any_result_generalizes": {"const": false},
+        "is_a_scientific_result": {"const": false},
+        "is_a_negative_result_about_any_checkpoint": {"const": false}
+      }
+    },
+    "evidence_ledger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "last_row", "rows_added_by_study4f", "sha256"],
+      "properties": {
+        "path": {"const": "paper/evidence_ledger.csv"},
+        "last_row": {"const": "EV-0016"},
+        "rows_added_by_study4f": {"const": 0},
+        "sha256": {
+          "const": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1"
+        }
+      }
+    },
+    "zero_operation_counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checkpoint_downloads", "weight_files_acquired", "model_constructions",
+        "forward_passes", "prefill_operations", "generations", "generated_tokens",
+        "logit_reads", "activation_collections", "activation_patches", "d0_runs",
+        "execution_seeds_drawn", "study_banks_realized", "rp_b_selections",
+        "gpu_seconds", "accelerator_hours", "evidence_ledger_rows_written",
+        "github_actions_runs", "cells_executed"
+      ],
+      "properties": {
+        "checkpoint_downloads": {"const": 0},
+        "weight_files_acquired": {"const": 0},
+        "model_constructions": {"const": 0},
+        "forward_passes": {"const": 0},
+        "prefill_operations": {"const": 0},
+        "generations": {"const": 0},
+        "generated_tokens": {"const": 0},
+        "logit_reads": {"const": 0},
+        "activation_collections": {"const": 0},
+        "activation_patches": {"const": 0},
+        "d0_runs": {"const": 0},
+        "execution_seeds_drawn": {"const": 0},
+        "study_banks_realized": {"const": 0},
+        "rp_b_selections": {"const": 0},
+        "gpu_seconds": {"const": 0},
+        "accelerator_hours": {"const": 0},
+        "evidence_ledger_rows_written": {"const": 0},
+        "github_actions_runs": {"const": 0},
+        "cells_executed": {"const": 0}
+      }
+    },
+    "what_this_state_establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["establishes", "does_not_establish"],
+      "properties": {
+        "establishes": {
+          "type": "array",
+          "minItems": 3,
+          "items": {"type": "string", "minLength": 20}
+        },
+        "does_not_establish": {
+          "type": "array",
+          "minItems": 5,
+          "items": {"type": "string", "minLength": 20}
+        }
+      }
+    },
+    "next_action_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "requires_a_qualifying_accelerator",
+                   "quantization_or_sharding_is_a_permitted_workaround",
+                   "the_instrument_may_be_reused_unchanged",
+                   "reopening_the_shakedown_after_a_study_bank_call"],
+      "properties": {
+        "statement": {"type": "string", "minLength": 60},
+        "requires_a_qualifying_accelerator": {"const": true},
+        "quantization_or_sharding_is_a_permitted_workaround": {"const": false},
+        "the_instrument_may_be_reused_unchanged": {"const": true},
+        "reopening_the_shakedown_after_a_study_bank_call": {"const": false}
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "protocol_schema", "shakedown_disposition",
+                   "status_schema", "tests", "disclosure"],
+      "properties": {
+        "protocol": {"const": "studies/study4f/protocol/study4f_protocol_v1.json"},
+        "protocol_schema": {
+          "const": "studies/study4f/protocol/study4f_protocol_v1.schema.json"
+        },
+        "shakedown_disposition": {
+          "const": "studies/study4f/shakedown/study4f_shakedown_disposition.json"
+        },
+        "status_schema": {"const": "studies/study4f/STATUS.schema.json"},
+        "tests": {
+          "const": "studies/study4f/tests/test_study4f_behavioral_feasibility.py"
+        },
+        "disclosure": {"const": "studies/study4f/STUDY4F_TERMINAL_DISCLOSURE.md"}
+      }
+    }
+  }
+}
