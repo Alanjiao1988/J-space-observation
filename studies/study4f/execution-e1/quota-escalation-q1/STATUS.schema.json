@@ -1,0 +1,310 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "study4f-e1-q1-status-v1",
+  "title": "Study 4F-E1-Q1 quota-escalation lifecycle router",
+  "description": "Restrictive schema for studies/study4f/execution-e1/quota-escalation-q1/STATUS.json. It pins the three registered Q1 lifecycle states, forces every authorization flag, claim-boundary flag and operation counter to false or zero, and closes every object so a later edit cannot quietly widen what this escalation is allowed to have done or claimed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "study_id", "namespace", "is_authoritative_lifecycle_router",
+    "routes_only_this_quota_escalation", "lifecycle_state",
+    "terminal_for_this_invocation", "resumable", "kind", "is_a_new_study",
+    "is_a_protocol_revision", "is_a_methods_review", "is_a_scientific_amendment",
+    "authority", "predecessor_chain", "quota", "support_ticket", "a100_fallback",
+    "authorization_flags", "claim_boundary", "evidence_ledger",
+    "shakedown_allowance_carried_forward", "zero_operation_counters",
+    "test_differential", "execution_reachability", "what_this_state_establishes",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {"const": "study4f-e1-q1-status-v1"},
+    "study_id": {"const": "STUDY4F_E1_Q1"},
+    "namespace": {"const": "studies/study4f/execution-e1/quota-escalation-q1/"},
+    "is_authoritative_lifecycle_router": {"const": true},
+    "routes_only_this_quota_escalation": {"const": true},
+    "lifecycle_state": {
+      "enum": ["STUDY4F_E1_Q1_AWAITING_AZURE_SUPPORT_DECISION",
+               "STUDY4F_E1_Q1_MANUAL_PORTAL_SUBMISSION_REQUIRED",
+               "STUDY4F_E1_Q1_BLOCKED_ON_STARTING_STATE_INTEGRITY"]
+    },
+    "terminal_for_this_invocation": {"const": true},
+    "resumable": {"const": true},
+    "kind": {"const": "manual_quota_escalation_and_conditional_resume"},
+    "is_a_new_study": {"const": false},
+    "is_a_protocol_revision": {"const": false},
+    "is_a_methods_review": {"const": false},
+    "is_a_scientific_amendment": {"const": false},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256", "git_blob", "commit", "tree",
+                   "parent_commit", "parent_tree",
+                   "published_alone_as_the_first_commit_after_the_predecessor",
+                   "newly_published_in_this_invocation",
+                   "reused_existing_published_copy"],
+      "properties": {
+        "path": {"const": "studies/study4f/prompts/study4f_e1_q1_manual_quota_escalation_and_conditional_resume_authority.md"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "git_blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "parent_commit": {"const": "1900aa374bf000353580b042b275a730bbad6b1f"},
+        "parent_tree": {"const": "a0b5d7304b6d08e55c45f927b048af01ad409126"},
+        "published_alone_as_the_first_commit_after_the_predecessor": {"const": true},
+        "newly_published_in_this_invocation": {"type": "boolean"},
+        "reused_existing_published_copy": {"type": "boolean"}
+      }
+    },
+    "predecessor_chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["study4f_commit", "study4f_e1_authority_commit",
+                   "study4f_e1_head_commit", "study4f_e1_lifecycle_state",
+                   "study4f_e1_status_modified", "study4f_e1_launcher_modified",
+                   "study4f_instrument_modified", "study3r_bytes_modified",
+                   "historical_study_or_paper_bytes_modified",
+                   "evidence_ledger_modified"],
+      "properties": {
+        "study4f_commit": {"const": "5fd9602df207e95789263d0f8d52428540f48fb8"},
+        "study4f_e1_authority_commit": {"const": "58cdcda0ec3848ba2bd3a6c525b3c28ac8955d69"},
+        "study4f_e1_head_commit": {"const": "1900aa374bf000353580b042b275a730bbad6b1f"},
+        "study4f_e1_lifecycle_state": {"const": "STUDY4F_E1_AWAITING_AZURE_GPU_QUOTA_APPROVAL"},
+        "study4f_e1_status_modified": {"const": false},
+        "study4f_e1_launcher_modified": {"const": false},
+        "study4f_instrument_modified": {"const": false},
+        "study3r_bytes_modified": {"const": false},
+        "historical_study_or_paper_bytes_modified": {"const": false},
+        "evidence_ledger_modified": {"const": false}
+      }
+    },
+    "quota": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_only_recheck_performed", "region", "h100_family_limit",
+                   "h100_family_used", "a100_family_limit", "a100_family_used",
+                   "total_regional_vcpu_limit", "total_regional_vcpu_used",
+                   "qualifying_quota_visible", "approval_rule",
+                   "additional_self_service_quota_put_submitted"],
+      "properties": {
+        "read_only_recheck_performed": {"const": true},
+        "region": {"type": "string", "minLength": 1},
+        "h100_family_limit": {"type": "integer", "minimum": 0},
+        "h100_family_used": {"type": "integer", "minimum": 0},
+        "a100_family_limit": {"type": "integer", "minimum": 0},
+        "a100_family_used": {"type": "integer", "minimum": 0},
+        "total_regional_vcpu_limit": {"type": "integer", "minimum": 0},
+        "total_regional_vcpu_used": {"type": "integer", "minimum": 0},
+        "qualifying_quota_visible": {"type": "boolean"},
+        "approval_rule": {"type": "string", "minLength": 1},
+        "additional_self_service_quota_put_submitted": {"const": false}
+      }
+    },
+    "support_ticket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pre_existing_matching_ticket_found",
+                   "tickets_created_in_this_invocation",
+                   "total_tickets_created_under_this_authority",
+                   "duplicate_created", "programmatic_creation_authorized",
+                   "manual_portal_submission_required",
+                   "ticket_id_salted_sha256", "ticket_id_last_four",
+                   "ticket_id_committed_in_full", "created_date", "status",
+                   "azure_acknowledged_receipt", "azure_stated_review_window",
+                   "azure_acknowledgement_is_an_approval",
+                   "requested_new_limit", "requested_instances", "target_sku",
+                   "spot_requested", "azure_decision_recorded",
+                   "azure_is_reviewing_claimed_beyond_the_recorded_status"],
+      "properties": {
+        "pre_existing_matching_ticket_found": {"type": "boolean"},
+        "tickets_created_in_this_invocation": {"type": "integer", "minimum": 0, "maximum": 1},
+        "total_tickets_created_under_this_authority": {"type": "integer", "minimum": 0, "maximum": 1},
+        "duplicate_created": {"const": false},
+        "programmatic_creation_authorized": {"type": "boolean"},
+        "manual_portal_submission_required": {"type": "boolean"},
+        "ticket_id_salted_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "ticket_id_last_four": {"type": ["string", "null"], "pattern": "^[0-9a-zA-Z]{4}$"},
+        "ticket_id_committed_in_full": {"const": false},
+        "created_date": {"type": ["string", "null"]},
+        "status": {"type": ["string", "null"]},
+        "azure_acknowledged_receipt": {"type": "boolean"},
+        "azure_stated_review_window": {"type": ["string", "null"]},
+        "azure_acknowledgement_is_an_approval": {"const": false},
+        "requested_new_limit": {"enum": [24, 40]},
+        "requested_instances": {"const": 1},
+        "target_sku": {"enum": ["Standard_NC40ads_H100_v5", "Standard_NC24ads_A100_v4"]},
+        "spot_requested": {"const": false},
+        "azure_decision_recorded": {"type": "boolean"},
+        "azure_is_reviewing_claimed_beyond_the_recorded_status": {"const": false}
+      }
+    },
+    "a100_fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authorized", "submitted",
+                   "coexists_with_an_unresolved_h100_request"],
+      "properties": {
+        "authorized": {"type": "boolean"},
+        "submitted": {"type": "boolean"},
+        "coexists_with_an_unresolved_h100_request": {"const": false}
+      }
+    },
+    "authorization_flags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provisioning_authorized", "deployment_attempt_authorized",
+                   "developmental_execution_authorized", "model_execution_authorized",
+                   "a100_fallback_authorized", "additional_support_ticket_authorized",
+                   "additional_self_service_quota_request_authorized",
+                   "quantization_authorized", "sharding_authorized",
+                   "offload_authorized", "device_map_auto_authorized",
+                   "unregistered_model_authorized", "spot_capacity_authorized",
+                   "d0_authorized", "activation_capture_or_patching_authorized",
+                   "study3m_authorized", "confirmation_authorized",
+                   "evidence_ledger_row_authorized", "github_actions_run_authorized",
+                   "threshold_or_estimand_change_authorized",
+                   "reinterpretation_authorized"],
+      "patternProperties": {"^.*$": {"const": false}}
+    },
+    "claim_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["is_a_scientific_result", "claims_azure_capacity_is_available",
+                   "claims_azure_capacity_is_unavailable",
+                   "claims_any_checkpoint_competence", "claims_an_rp_b_candidate",
+                   "rp_b_developmental_candidate_identified", "rp_b_confirmed",
+                   "claims_j_space_exists", "claims_j_space_does_not_exist",
+                   "claims_j_space_is_observable", "claims_j_space_is_unobservable",
+                   "claims_the_interface_is_valid", "claims_the_interface_is_invalid",
+                   "claims_any_result_generalizes"],
+      "patternProperties": {"^.*$": {"const": false}}
+    },
+    "evidence_ledger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "last_row", "rows_added_by_study4f_e1_q1", "sha256"],
+      "properties": {
+        "path": {"const": "paper/evidence_ledger.csv"},
+        "last_row": {"const": "EV-0016"},
+        "rows_added_by_study4f_e1_q1": {"const": 0},
+        "sha256": {"const": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1"}
+      }
+    },
+    "shakedown_allowance_carried_forward": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attempts_remaining", "accelerator_hours_remaining",
+                   "consumed_by_this_invocation"],
+      "properties": {
+        "attempts_remaining": {"const": 2},
+        "accelerator_hours_remaining": {"const": 6},
+        "consumed_by_this_invocation": {"const": 0}
+      }
+    },
+    "zero_operation_counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["azure_resource_groups_created", "vms_provisioned",
+                   "deployment_attempts", "additional_self_service_quota_requests",
+                   "duplicate_support_tickets", "checkpoint_downloads",
+                   "weight_files_acquired", "model_constructions", "forward_passes",
+                   "generations", "generated_tokens", "logit_reads",
+                   "activation_collections", "activation_patches", "d0_runs",
+                   "execution_seeds_drawn", "study_banks_realized", "rp_b_selections",
+                   "gpu_seconds", "accelerator_hours", "evidence_ledger_rows_written",
+                   "github_actions_runs", "cells_executed"],
+      "patternProperties": {"^.*$": {"const": 0}}
+    },
+    "test_differential": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registered_starting_baseline", "final_head_suite",
+                   "failure_node_ids_identical_to_the_starting_nine",
+                   "new_non_scope_failures", "new_scope_expiries_recorded",
+                   "historical_failures_edited_or_suppressed", "q1_tests_passing",
+                   "study4f_tests_passing",
+                   "e1_tests_passing_except_the_recorded_scope_expiry",
+                   "e1_test_failures",
+                   "e1_test_failures_that_are_recorded_scope_expiries",
+                   "scope_expiries"],
+      "properties": {
+        "registered_starting_baseline": {"const": "9 failed, 5,119 passed, 16 skipped"},
+        "final_head_suite": {"type": "string", "minLength": 1},
+        "failure_node_ids_identical_to_the_starting_nine": {"const": true},
+        "new_non_scope_failures": {"const": 0},
+        "new_scope_expiries_recorded": {"type": "integer", "minimum": 0},
+        "historical_failures_edited_or_suppressed": {"const": 0},
+        "q1_tests_passing": {"const": true},
+        "study4f_tests_passing": {"const": true},
+        "e1_tests_passing_except_the_recorded_scope_expiry": {"const": true},
+        "e1_test_failures": {"type": "integer", "minimum": 0},
+        "e1_test_failures_that_are_recorded_scope_expiries": {"type": "integer", "minimum": 0},
+        "scope_expiries": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count", "in_the_registered_repository_baseline",
+                       "expired_assertions"],
+          "properties": {
+            "count": {"type": "integer", "minimum": 0},
+            "in_the_registered_repository_baseline": {"const": 0},
+            "expired_assertions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["node_id", "kind", "introduced_by",
+                             "inside_the_registered_repository_baseline",
+                             "editable_under_this_authority", "repaired",
+                             "suppressed", "unavoidable", "rationale",
+                             "guarantee_carried_forward_by",
+                             "proved_scope_only_by"],
+                "properties": {
+                  "node_id": {"type": "string", "minLength": 1},
+                  "kind": {"const": "scope_predicate_over_a_git_diff_to_HEAD"},
+                  "introduced_by": {"type": "string", "minLength": 1},
+                  "inside_the_registered_repository_baseline": {"const": false},
+                  "editable_under_this_authority": {"const": false},
+                  "repaired": {"const": false},
+                  "suppressed": {"const": false},
+                  "unavoidable": {"const": true},
+                  "rationale": {"type": "string", "minLength": 1},
+                  "guarantee_carried_forward_by": {"type": "string", "minLength": 1},
+                  "proved_scope_only_by": {"type": "string", "minLength": 1}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "execution_reachability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["e1_execution_became_reachable",
+                   "conditional_resumption_entered", "next_action_rule"],
+      "properties": {
+        "e1_execution_became_reachable": {"type": "boolean"},
+        "conditional_resumption_entered": {"type": "boolean"},
+        "next_action_rule": {"type": "string", "minLength": 1}
+      }
+    },
+    "what_this_state_establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["establishes", "does_not_establish"],
+      "properties": {
+        "establishes": {"type": "array", "items": {"type": "string"}, "minItems": 3},
+        "does_not_establish": {"type": "array", "items": {"type": "string"}, "minItems": 5}
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "receipt", "receipt_schema", "status_schema",
+                   "operator_record", "tests"],
+      "patternProperties": {
+        "^.*$": {"type": "string", "pattern": "^studies/study4f/"}
+      }
+    }
+  }
+}

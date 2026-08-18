@@ -1,0 +1,144 @@
+{
+  "schema_version": "study4f-e1-q1-support-ticket-receipt-v1",
+  "study_id": "STUDY4F_E1_Q1",
+  "namespace": "studies/study4f/execution-e1/quota-escalation-q1/",
+  "authority": {
+    "path": "studies/study4f/prompts/study4f_e1_q1_manual_quota_escalation_and_conditional_resume_authority.md",
+    "bytes": 11316,
+    "sha256": "ce61fd32c6546e1e98bb79d4220651fa855bca05fe2d39bf88c1089bb2cf8975",
+    "git_blob": "6622504c13e479d32dfaf4002b80250616a0a1a9",
+    "commit": "8a9bb7617fcc6507aba86c4359042b5e90818ce4",
+    "tree": "f7693e3aee94ff41d1b1879b1837fa78c915cf87",
+    "parent_commit": "1900aa374bf000353580b042b275a730bbad6b1f",
+    "parent_tree": "a0b5d7304b6d08e55c45f927b048af01ad409126",
+    "published_alone_as_the_first_commit_after_the_predecessor": true,
+    "newly_published_in_this_invocation": true,
+    "reused_existing_published_copy": false
+  },
+  "authority_section": "4.1",
+  "predecessor": {
+    "study_id": "STUDY4F_E1",
+    "commit": "1900aa374bf000353580b042b275a730bbad6b1f",
+    "lifecycle_state_at_binding": "STUDY4F_E1_AWAITING_AZURE_GPU_QUOTA_APPROVAL",
+    "failed_self_service_request_id": "a6817961-e0f7-4cbe-a1ef-7ac4104e1089",
+    "failed_self_service_error_code": "QuotaNotAvailableForResource",
+    "predecessor_bytes_modified": false
+  },
+  "quota_state_before_the_ticket": {
+    "read_only": true,
+    "queried_at": "2026-08-18T06:20:00Z",
+    "region": "australiaeast",
+    "h100_family": "StandardNCadsH100v5Family",
+    "h100_family_limit": 0,
+    "h100_family_used": 0,
+    "a100_family": "StandardNCADSA100v4Family",
+    "a100_family_limit": 0,
+    "a100_family_used": 0,
+    "total_regional_vcpu_limit": 100,
+    "total_regional_vcpu_used": 0,
+    "quota_already_granted": false,
+    "mechanisms": [
+      "az vm list-usage --location australiaeast",
+      "GET Microsoft.Quota/quotas/standardNCadsH100v5Family (api-version 2023-02-01)"
+    ]
+  },
+  "pre_existing_support_ticket": {
+    "searched": true,
+    "mechanism": "GET Microsoft.Support/supportTickets (api-version 2024-04-01)",
+    "matching_non_closed_ticket_found": false,
+    "tickets_present_before_this_invocation": 0,
+    "branch_taken": "2.3_no_operator_support_ticket_exists"
+  },
+  "self_service_quota_path": {
+    "exhausted": true,
+    "additional_microsoft_quota_put_submitted": false,
+    "reason": "The single permitted self-service request was already submitted and refused under the E1 authority. Section 3 forbids another Microsoft.Quota PUT."
+  },
+  "submitted_support_ticket": {
+    "count": 1,
+    "created_in_this_invocation": true,
+    "duplicate_created": false,
+    "api": "Microsoft.Support/supportTickets PUT (api-version 2024-04-01)",
+    "programmatic_creation_authorized": true,
+    "ticket_id_salted_sha256": "3115437c07487a4b825eaa7b5017b570db8e38da9cd88824cc88cf8147f84021",
+    "ticket_id_salt_material": "STUDY4F_E1_Q1|<q1 authority commit>|<support ticket id>",
+    "ticket_id_last_four": "3753",
+    "ticket_id_committed_in_full": false,
+    "ticket_resource_name": "study4f-e1-q1-h100-australiaeast",
+    "created_date": "2026-08-18T06:25:01Z",
+    "modified_date": "2026-08-18T06:26:25Z",
+    "status": "Open",
+    "azure_acknowledgement": {
+      "received": true,
+      "kind": "receipt_acknowledgement_only",
+      "is_an_approval": false,
+      "is_a_denial": false,
+      "grants_quota": false,
+      "stated_review_window": "two business days",
+      "restates_the_requested_region": "Australia East",
+      "restates_the_requested_family": "standardNCadsH100v5Family",
+      "restates_the_requested_new_limit": 40,
+      "note": "Microsoft Support acknowledged receipt and stated it is reviewing the request. An acknowledgement is not a decision and does not grant quota. Section 5 of the Q1 authority treats quota as approved only when the ARM API visibly reports the family limit, which still reports zero."
+    },
+    "severity": "Minimal",
+    "sla_minutes": 480,
+    "sla_expiration_time": "2026-08-19T05:26:00Z",
+    "issue_type": "Service and subscription limits (quotas)",
+    "service_display_name": "Service and subscription limits (quotas)",
+    "problem_classification_display_name": "Compute-VM (cores-vCPUs) subscription limit increases",
+    "title": "Manual enablement request: one NC40ads_H100_v5 GPU VM for bounded non-production research"
+  },
+  "requested_quota": {
+    "subscription_last_four": "d32e",
+    "subscription_salted_sha256": "9adb2550056c6e57f03aca51c3a82a4fed3808d9c17b9b0357f15260adc0bb59",
+    "subscription_id_committed": false,
+    "tenant_id_committed": false,
+    "region": "australiaeast",
+    "vm_family": "Standard NCadsH100v5 Family vCPUs",
+    "vm_family_api_name": "standardNCadsH100v5Family",
+    "requested_new_limit": 40,
+    "requested_instances": 1,
+    "target_sku": "Standard_NC40ads_H100_v5",
+    "capacity_type": "standard on-demand",
+    "spot_requested": false,
+    "more_than_forty_h100_vcpus_requested": false,
+    "multiple_instances_requested": false,
+    "multiple_regions_requested_simultaneously": false,
+    "another_gpu_family_requested_in_this_ticket": false
+  },
+  "a100_fallback": {
+    "authorized": false,
+    "submitted": false,
+    "reason": "Section 4.3 authorizes the fallback only after Azure explicitly determines that H100 cannot be enabled in any eligible region. The H100 request is unresolved, and the fallback may never coexist with an unresolved H100 request.",
+    "registered_sku": "Standard_NC24ads_A100_v4",
+    "registered_family": "Standard NCADSA100v4 Family vCPUs",
+    "registered_region": "brazilsouth",
+    "registered_new_limit": 24,
+    "registered_instances": 1
+  },
+  "azure_resource_counters": {
+    "resource_groups_created": 0,
+    "vms_provisioned": 0,
+    "deployment_attempts": 0,
+    "billable_accelerators_remaining": 0,
+    "resources_remaining": 0
+  },
+  "execution_reachability": {
+    "e1_execution_became_reachable": false,
+    "qualifying_quota_visible": false,
+    "conditional_resumption_entered": false,
+    "reason": "Quota is approved only when az vm list-usage or the corresponding ARM API visibly reports an H100 family limit of at least 40 in the approved region. It reports 0."
+  },
+  "claim_boundary": {
+    "is_a_scientific_result": false,
+    "claims_azure_capacity_is_available": false,
+    "claims_azure_capacity_is_unavailable": false,
+    "claims_azure_is_reviewing_beyond_the_recorded_ticket_status": false,
+    "claims_any_checkpoint_competence": false,
+    "claims_an_rp_b_candidate": false,
+    "claims_j_space_exists": false,
+    "claims_j_space_is_observable": false,
+    "claims_j_space_is_unobservable": false
+  },
+  "state": "STUDY4F_E1_Q1_AWAITING_AZURE_SUPPORT_DECISION"
+}
