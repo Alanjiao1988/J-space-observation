@@ -301,7 +301,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["authority", "receipt", "receipt_schema", "status_schema",
-                   "operator_record", "tests"],
+                   "operator_record", "disclosure", "tests"],
       "patternProperties": {
         "^.*$": {"type": "string", "pattern": "^studies/study4f/"}
       }

@@ -689,6 +689,26 @@ def test_the_q1_namespace_contains_no_model_or_azure_mutating_code():
 # ---------------------------------------------------------------------------
 
 
+def test_the_disclosure_reports_the_registered_items():
+    disclosure = Q1 / "Q1_INVOCATION_DISCLOSURE.md"
+    text = disclosure.read_text(encoding="utf-8")
+    for required in (E1_HEAD_COMMIT, E1_HEAD_TREE, FAILED_SELF_SERVICE_REQUEST,
+                     "STUDY4F_E1_Q1_AWAITING_AZURE_SUPPORT_DECISION",
+                     "Standard_NC40ads_H100_v5", "australiaeast",
+                     "Standard NCadsH100v5 Family vCPUs",
+                     "3115437c07487a4b825eaa7b5017b570db8e38da9cd88824cc88cf8147f84021",
+                     "3753", "d32e", "EV-0016",
+                     "9 failed, 5,119 passed, 16 skipped"):
+        assert required in text, required
+    lowered = text.lower()
+    assert "no scientific result" in lowered
+    assert "acknowledgement, not a decision" in lowered
+    assert "unknown" in lowered
+    # It must name the recorded expiry and prove it scope-only.
+    assert "test_the_successor_added_paths_only_inside_its_own_namespace" in text
+    assert "recorded, not repaired" in lowered
+
+
 def test_the_operator_record_states_the_exact_registered_request():
     text = OPERATOR_RECORD.read_text(encoding="utf-8")
     for required in ("Standard_NC40ads_H100_v5", "australiaeast",
@@ -705,7 +725,8 @@ def test_the_operator_record_states_the_exact_registered_request():
 
 
 def test_the_operator_record_asserts_no_prohibited_conclusion():
-    for path in (OPERATOR_RECORD, STATUS_JSON, RECEIPT_JSON):
+    for path in (OPERATOR_RECORD, STATUS_JSON, RECEIPT_JSON,
+                 Q1 / "Q1_INVOCATION_DISCLOSURE.md"):
         text = path.read_text(encoding="utf-8").lower()
         for prohibited in ("j-space exists", "j-space does not exist",
                            "j-space is observable", "j-space is unobservable",

@@ -209,6 +209,7 @@
     "receipt_schema": "studies/study4f/execution-e1/quota-escalation-q1/support_ticket_receipt.schema.json",
     "status_schema": "studies/study4f/execution-e1/quota-escalation-q1/STATUS.schema.json",
     "operator_record": "studies/study4f/execution-e1/quota-escalation-q1/OPERATOR_RECORD.md",
+    "disclosure": "studies/study4f/execution-e1/quota-escalation-q1/Q1_INVOCATION_DISCLOSURE.md",
     "tests": "studies/study4f/execution-e1/quota-escalation-q1/tests/test_study4f_e1_q1_quota_escalation.py"
   }
 }
