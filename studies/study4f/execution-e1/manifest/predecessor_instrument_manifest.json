@@ -1,0 +1,148 @@
+{
+  "schema_version": "study4f-e1-predecessor-instrument-manifest-v1",
+  "read_only": true,
+  "predecessor_commit": "5fd9602df207e95789263d0f8d52428540f48fb8",
+  "predecessor_tree": "365a5d090e1474305143a7e5aa268db969e62069",
+  "e1_authority_commit": "58cdcda0ec3848ba2bd3a6c525b3c28ac8955d69",
+  "original_study4f_authority_commit": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729",
+  "file_count": 15,
+  "files": [
+    {
+      "role": "protocol",
+      "path": "studies/study4f/protocol/study4f_protocol_v1.json",
+      "git_blob": "a27b4460d369a5fdb6b66307c5a0d24aad52117d",
+      "bytes": 11749,
+      "sha256": "0bd1fff18a19aff4e64a7f03f2310c112a3c7277d5a213cd7888f5655d13a240",
+      "recomputed_worktree_sha256": "0bd1fff18a19aff4e64a7f03f2310c112a3c7277d5a213cd7888f5655d13a240",
+      "recompute_agrees": true
+    },
+    {
+      "role": "protocol_schema",
+      "path": "studies/study4f/protocol/study4f_protocol_v1.schema.json",
+      "git_blob": "6765ede05d76eca44ede5d10b10f4ca7605606c0",
+      "bytes": 23523,
+      "sha256": "a8d242a56c151e0842ffadd36c54ffcf5104e6e32d8d159a9f5641bb40e6e941",
+      "recomputed_worktree_sha256": "a8d242a56c151e0842ffadd36c54ffcf5104e6e32d8d159a9f5641bb40e6e941",
+      "recompute_agrees": true
+    },
+    {
+      "role": "task_bank_generator_and_ordering",
+      "path": "studies/study4f/analysis/study4f_task_banks.py",
+      "git_blob": "4efda4af44e30de07f8cbd4e16d3c96696ea011f",
+      "bytes": 14757,
+      "sha256": "dc39782d31234509553a5c0f8ee9795bc49257099bf123589ae74be2fdbff766",
+      "recomputed_worktree_sha256": "dc39782d31234509553a5c0f8ee9795bc49257099bf123589ae74be2fdbff766",
+      "recompute_agrees": true
+    },
+    {
+      "role": "e0_and_cot_renderers_and_parsers",
+      "path": "studies/study4f/analysis/study4f_interfaces.py",
+      "git_blob": "9f015608218c2eea73e968aa124f95d3b82245e5",
+      "bytes": 11391,
+      "sha256": "7828bca30bfa1b61c26e316177aa60991e71d12cb01947c503d4395ce9a2f705",
+      "recomputed_worktree_sha256": "7828bca30bfa1b61c26e316177aa60991e71d12cb01947c503d4395ce9a2f705",
+      "recompute_agrees": true
+    },
+    {
+      "role": "statistical_calculator",
+      "path": "studies/study4f/analysis/study4f_design_statistics.py",
+      "git_blob": "3e42c85c38271b17eb27478a6c67dd8801162358",
+      "bytes": 5614,
+      "sha256": "10ce33b092cd23ade97ebd7a8034a78605453b1d19f001b1a75a006e989c30b0",
+      "recomputed_worktree_sha256": "10ce33b092cd23ade97ebd7a8034a78605453b1d19f001b1a75a006e989c30b0",
+      "recompute_agrees": true
+    },
+    {
+      "role": "candidate_local_state_machine",
+      "path": "studies/study4f/analysis/study4f_state_machine.py",
+      "git_blob": "5821e50e52cac74978b1db1f646a95e1f9e72e3d",
+      "bytes": 5988,
+      "sha256": "78e15c37d39036d6bbfeff908fa22b34bb59df42b34d64639e3e7ea7b344e137",
+      "recomputed_worktree_sha256": "78e15c37d39036d6bbfeff908fa22b34bb59df42b34d64639e3e7ea7b344e137",
+      "recompute_agrees": true
+    },
+    {
+      "role": "semantic_and_mutation_validators",
+      "path": "studies/study4f/analysis/study4f_validation.py",
+      "git_blob": "1174fab64916f74c5a5d1c1257ef43e84550eb8d",
+      "bytes": 15445,
+      "sha256": "2534b6d55a2378b0ed0e3457d3f34d8074620c43a05d3ece851014e2a5baff94",
+      "recomputed_worktree_sha256": "2534b6d55a2378b0ed0e3457d3f34d8074620c43a05d3ece851014e2a5baff94",
+      "recompute_agrees": true
+    },
+    {
+      "role": "checkpoint_identities_and_resource_route",
+      "path": "studies/study4f/analysis/study4f_resource_route.py",
+      "git_blob": "ac623496d7349f397568b70e6eb143dce9ad67fe",
+      "bytes": 6002,
+      "sha256": "7c1f701f99d05e27d43939401ab0d5eff97825ff6463540bba3924e21a432897",
+      "recomputed_worktree_sha256": "7c1f701f99d05e27d43939401ab0d5eff97825ff6463540bba3924e21a432897",
+      "recompute_agrees": true
+    },
+    {
+      "role": "original_shakedown_disposition",
+      "path": "studies/study4f/shakedown/study4f_shakedown_disposition.json",
+      "git_blob": "14aeeb6ffabb83133e7a85a8ce6cfd311611e25e",
+      "bytes": 3036,
+      "sha256": "81efd8f6c87d2d78b97d5d155111dda50f5245a2fa9f18765e5c167a56c3aaca",
+      "recomputed_worktree_sha256": "81efd8f6c87d2d78b97d5d155111dda50f5245a2fa9f18765e5c167a56c3aaca",
+      "recompute_agrees": true
+    },
+    {
+      "role": "original_authority",
+      "path": "studies/study4f/prompts/study4f_minimal_behavioral_feasibility_authority.md",
+      "git_blob": "2f120b05893ed2f09b07c3ebd2a99f23c536c752",
+      "bytes": 17822,
+      "sha256": "bafba585ba4fe0030f2bae14e7be8d2f060732e56b3696422102605668de0773",
+      "recomputed_worktree_sha256": "bafba585ba4fe0030f2bae14e7be8d2f060732e56b3696422102605668de0773",
+      "recompute_agrees": true
+    },
+    {
+      "role": "original_status_router",
+      "path": "studies/study4f/STATUS.json",
+      "git_blob": "5c6a99a006db9f70837fb59443313d09f63c31eb",
+      "bytes": 11747,
+      "sha256": "4229cb69d93f7fb95e6f11e5bf19727eee14e21c3a6de966ad715c12bd1ed3d0",
+      "recomputed_worktree_sha256": "4229cb69d93f7fb95e6f11e5bf19727eee14e21c3a6de966ad715c12bd1ed3d0",
+      "recompute_agrees": true
+    },
+    {
+      "role": "original_status_schema",
+      "path": "studies/study4f/STATUS.schema.json",
+      "git_blob": "faeb2cae9e3f4a32029dc24b1e458a4137e846e0",
+      "bytes": 14860,
+      "sha256": "3f5e73d759e477f6ae492ad5d0bfc7f059b3a9e3904f5d54191d6ddc927647fb",
+      "recomputed_worktree_sha256": "3f5e73d759e477f6ae492ad5d0bfc7f059b3a9e3904f5d54191d6ddc927647fb",
+      "recompute_agrees": true
+    },
+    {
+      "role": "study4f_tests",
+      "path": "studies/study4f/tests/test_study4f_behavioral_feasibility.py",
+      "git_blob": "086faead4be7f2cb85da1559b59f700c243cb835",
+      "bytes": 54691,
+      "sha256": "1389a2baaa66596d769c8926cacc1f8dba362d3f771662b283b92726d558b6ca",
+      "recomputed_worktree_sha256": "1389a2baaa66596d769c8926cacc1f8dba362d3f771662b283b92726d558b6ca",
+      "recompute_agrees": true
+    },
+    {
+      "role": "original_terminal_disclosure",
+      "path": "studies/study4f/STUDY4F_TERMINAL_DISCLOSURE.md",
+      "git_blob": "cfe4a7de43544e093364115a43f71562f3e14f6d",
+      "bytes": 15446,
+      "sha256": "7fa015e57529d317590f8c27f0b46ffb31adeeb0a2d430106a981bab6323e4f0",
+      "recomputed_worktree_sha256": "7fa015e57529d317590f8c27f0b46ffb31adeeb0a2d430106a981bab6323e4f0",
+      "recompute_agrees": true
+    },
+    {
+      "role": "original_readme",
+      "path": "studies/study4f/README.md",
+      "git_blob": "859b76e50967a0918bd907380b4941691b14f6ac",
+      "bytes": 5465,
+      "sha256": "7d62915e6f5cb116fd61f4988f5951f8556e9dff8ac452ec3625958f24eee7bb",
+      "recomputed_worktree_sha256": "7d62915e6f5cb116fd61f4988f5951f8556e9dff8ac452ec3625958f24eee7bb",
+      "recompute_agrees": true
+    }
+  ],
+  "all_files_agree": true,
+  "binding_failure_state": "STUDY4F_E1_INSTRUMENT_BINDING_FAILED"
+}

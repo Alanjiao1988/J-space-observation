@@ -1,0 +1,856 @@
+{
+  "schema_version": "study4f-e1-azure-discovery-v1",
+  "authority_commit": "58cdcda0ec3848ba2bd3a6c525b3c28ac8955d69",
+  "read_only": true,
+  "resources_created": 0,
+  "identity": {
+    "mechanism": "already configured Azure CLI identity",
+    "credentials_requested": false,
+    "credentials_printed": false,
+    "credentials_committed": false,
+    "subscription_salted_sha256": "9adb2550056c6e57f03aca51c3a82a4fed3808d9c17b9b0357f15260adc0bb59",
+    "subscription_salt_material": "STUDY4F_E1|<e1 authority commit>|<subscription id>",
+    "subscription_last_four": "d32e",
+    "subscription_id_committed": false,
+    "tenant_id_committed": false,
+    "cloud": "AzureCloud",
+    "state": "Enabled"
+  },
+  "azure_policy": {
+    "assignments_in_scope": 3,
+    "display_names": [
+      "ASC DataProtection (subscription: <redacted-guid>)",
+      "ASC OpenSourceRelationalDatabasesProtection (subscription: <redacted-guid>)",
+      "Defender for SQL Servers on Machines provisioning (subscription: <redacted-guid>)"
+    ],
+    "any_assignment_denies_a_registered_sku": false,
+    "any_assignment_restricts_a_registered_region": false,
+    "note": "Every assignment in scope is a Defender/ASC provisioning or data protection assignment. None carries a deny effect on a compute SKU or a location, so Azure Policy removes no region from consideration."
+  },
+  "mechanisms_used": [
+    "az account show",
+    "az policy assignment list --disable-scope-strict-match",
+    "az vm list-skus --size <registered sku> --resource-type virtualMachines",
+    "az vm list-usage --location <region>",
+    "GET Microsoft.Quota/quotas (authenticated quota API)"
+  ],
+  "arm_deployment_validation": {
+    "performed": false,
+    "reason": "Section 4.1 forbids provisioning anything when no eligible SKU/region has sufficient quota, and an ARM validation needs a resource group that would have to be created first."
+  },
+  "registered_sku_order": [
+    {
+      "order": 1,
+      "sku": "Standard_NC40ads_H100_v5",
+      "gpu": "H100 NVL",
+      "gpu_count": 1,
+      "nominal_gpu_memory_gb": 94,
+      "vcpus": 40
+    },
+    {
+      "order": 2,
+      "sku": "Standard_NC24ads_A100_v4",
+      "gpu": "A100",
+      "gpu_count": 1,
+      "nominal_gpu_memory_gb": 80,
+      "vcpus": 24
+    }
+  ],
+  "prohibited_substitutions": [
+    "T4",
+    "A10",
+    "V100",
+    "multi_gpu_nd_series",
+    "spot_vm",
+    "confidential_gpu"
+  ],
+  "offers": [
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "australiaeast",
+      "region_sort_key": "australiaeast",
+      "zones": [
+        "1",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "CanadaCentral",
+      "region_sort_key": "canadacentral",
+      "zones": [
+        "1"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "CentralIndia",
+      "region_sort_key": "centralindia",
+      "zones": [
+        "1",
+        "2"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "centralus",
+      "region_sort_key": "centralus",
+      "zones": [
+        "1"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "CentralUSEUAP",
+      "region_sort_key": "centraluseuap",
+      "zones": [],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": false,
+      "not_permitted_reason": "NoRegisteredProviderFound for locations/usages",
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 0,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "eastus",
+      "region_sort_key": "eastus",
+      "zones": [
+        "1",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "eastus2",
+      "region_sort_key": "eastus2",
+      "zones": [
+        "1",
+        "2",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "GermanyWestCentral",
+      "region_sort_key": "germanywestcentral",
+      "zones": [
+        "1",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "IndonesiaCentral",
+      "region_sort_key": "indonesiacentral",
+      "zones": [
+        "1",
+        "2"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "japaneast",
+      "region_sort_key": "japaneast",
+      "zones": [
+        "2",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "JioIndiaCentral",
+      "region_sort_key": "jioindiacentral",
+      "zones": [],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": false,
+      "not_permitted_reason": "NoRegisteredProviderFound for locations/usages",
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 0,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "JioIndiaWest",
+      "region_sort_key": "jioindiawest",
+      "zones": [],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "KoreaCentral",
+      "region_sort_key": "koreacentral",
+      "zones": [
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "MalaysiaWest",
+      "region_sort_key": "malaysiawest",
+      "zones": [
+        "1",
+        "2"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "northeurope",
+      "region_sort_key": "northeurope",
+      "zones": [
+        "2"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "southcentralus",
+      "region_sort_key": "southcentralus",
+      "zones": [
+        "1",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "southeastasia",
+      "region_sort_key": "southeastasia",
+      "zones": [
+        "1",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 2
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "SpainCentral",
+      "region_sort_key": "spaincentral",
+      "zones": [
+        "1",
+        "2"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "SwedenCentral",
+      "region_sort_key": "swedencentral",
+      "zones": [
+        "1",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "SwitzerlandNorth",
+      "region_sort_key": "switzerlandnorth",
+      "zones": [
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "uksouth",
+      "region_sort_key": "uksouth",
+      "zones": [
+        "1",
+        "2",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "westeurope",
+      "region_sort_key": "westeurope",
+      "zones": [
+        "1"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "westus",
+      "region_sort_key": "westus",
+      "zones": [],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "westus2",
+      "region_sort_key": "westus2",
+      "zones": [
+        "1",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC40ads_H100_v5",
+      "family": "StandardNCadsH100v5Family",
+      "region": "WestUS3",
+      "region_sort_key": "westus3",
+      "zones": [
+        "1",
+        "2",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 40,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "brazilsouth",
+      "region_sort_key": "brazilsouth",
+      "zones": [
+        "2"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "CanadaCentral",
+      "region_sort_key": "canadacentral",
+      "zones": [
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "centralus",
+      "region_sort_key": "centralus",
+      "zones": [
+        "2",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "CentralUSEUAP",
+      "region_sort_key": "centraluseuap",
+      "zones": [],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": false,
+      "not_permitted_reason": "NoRegisteredProviderFound for locations/usages",
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 0,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "eastus2",
+      "region_sort_key": "eastus2",
+      "zones": [
+        "2",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "FranceCentral",
+      "region_sort_key": "francecentral",
+      "zones": [
+        "2",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "GermanyWestCentral",
+      "region_sort_key": "germanywestcentral",
+      "zones": [
+        "1",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "ItalyNorth",
+      "region_sort_key": "italynorth",
+      "zones": [
+        "1",
+        "2"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "japaneast",
+      "region_sort_key": "japaneast",
+      "zones": [
+        "2"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "PolandCentral",
+      "region_sort_key": "polandcentral",
+      "zones": [
+        "2",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "southeastasia",
+      "region_sort_key": "southeastasia",
+      "zones": [
+        "2",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 2
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "SwedenCentral",
+      "region_sort_key": "swedencentral",
+      "zones": [
+        "1",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "SwitzerlandNorth",
+      "region_sort_key": "switzerlandnorth",
+      "zones": [
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "uksouth",
+      "region_sort_key": "uksouth",
+      "zones": [
+        "1",
+        "2"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    },
+    {
+      "sku": "Standard_NC24ads_A100_v4",
+      "family": "StandardNCADSA100v4Family",
+      "region": "WestUS3",
+      "region_sort_key": "westus3",
+      "zones": [
+        "1",
+        "3"
+      ],
+      "returned_for_sku": true,
+      "permitted_by_subscription_and_policy": true,
+      "not_permitted_reason": null,
+      "restrictions": [],
+      "reported_vcpus": 24,
+      "reported_gpus": 1,
+      "family_vcpu_limit": 0,
+      "family_vcpu_used": 0,
+      "total_regional_vcpu_limit": 100,
+      "total_regional_vcpu_used": 0
+    }
+  ],
+  "regions_returned": {
+    "Standard_NC40ads_H100_v5": 25,
+    "Standard_NC24ads_A100_v4": 15
+  },
+  "regions_with_a_disqualifying_restriction": [],
+  "regions_not_permitted_for_this_subscription": [
+    "CentralUSEUAP",
+    "JioIndiaCentral"
+  ]
+}

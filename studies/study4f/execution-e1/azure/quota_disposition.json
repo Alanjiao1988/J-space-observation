@@ -1,0 +1,49 @@
+{
+  "schema_version": "study4f-e1-quota-disposition-v1",
+  "authority_commit": "58cdcda0ec3848ba2bd3a6c525b3c28ac8955d69",
+  "authority_section": "4.1",
+  "branch": "no_sufficient_quota",
+  "quota": {
+    "reported_separately_from_capacity": true,
+    "eligible_sku_region_pairs_with_sufficient_quota": 0,
+    "family_vcpu_limit_in_every_returned_region": 0,
+    "total_regional_vcpu_limit": 100,
+    "total_regional_vcpu_used": 0,
+    "total_regional_quota_would_admit_one_instance": true,
+    "blocking_dimension": "VM-family vCPU quota"
+  },
+  "capacity": {
+    "observed": false,
+    "deployment_attempts": 0,
+    "max_attempts_permitted_when_quota_exists": 4,
+    "spot_capacity_used": false,
+    "reason_not_observed": "Section 4.1 forbids provisioning when no eligible SKU/region has sufficient quota. Capacity is therefore unknown, and is not reported as unavailable."
+  },
+  "otherwise_eligible_order_head": {
+    "sku": "Standard_NC40ads_H100_v5",
+    "region": "australiaeast",
+    "region_sort_key": "australiaeast",
+    "selection_rule": "H100 before A100; within a SKU, otherwise eligible regions ordered lexicographically by canonical name"
+  },
+  "submitted_request": {
+    "count": 1,
+    "larger_request_submitted": false,
+    "sku": "Standard_NC40ads_H100_v5",
+    "family": "StandardNCadsH100v5Family",
+    "region": "australiaeast",
+    "requested_family_vcpus": 40,
+    "instances_requested": 1,
+    "api": "Microsoft.Quota/quotas PUT (api-version 2023-02-01)",
+    "request_id": "a6817961-e0f7-4cbe-a1ef-7ac4104e1089",
+    "request_submit_time": "2026-08-18T03:40:05Z",
+    "provisioning_state": "Failed",
+    "error_code": "QuotaNotAvailableForResource",
+    "quota_granted": false,
+    "family_vcpu_limit_after_the_request": 0
+  },
+  "operator_action_required": true,
+  "operator_packet": "studies/study4f/execution-e1/azure/operator_quota_request_packet.md",
+  "resources_created": 0,
+  "provisioning_performed": false,
+  "state": "STUDY4F_E1_AWAITING_AZURE_GPU_QUOTA_APPROVAL"
+}

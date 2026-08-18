@@ -1,0 +1,89 @@
+{
+  "schema_version": "study4f-e1-predecessor-semantic-invariants-v1",
+  "read_only": true,
+  "predecessor_commit": "5fd9602df207e95789263d0f8d52428540f48fb8",
+  "reconfirmed_without_modification": true,
+  "required": [
+    "d2_and_d3_are_separate",
+    "each_planned_bank_has_104_items",
+    "m_max_is_16",
+    "alpha_per_cell_is_1_over_320",
+    "cot_gate_is_n104_pass_90",
+    "e0_gate_is_n60_pass_41",
+    "candidate_order_is_7b_14b_32b",
+    "candidate_failures_are_local",
+    "rt_unreachable_without_a_qualified_candidate",
+    "quantization_sharding_offload_and_substitution_prohibited",
+    "only_developmental_candidate_disposition",
+    "w1_raw_direct_surface_hash_reproduces",
+    "bank_seed_derives_from_the_original_study4f_authority_commit"
+  ],
+  "checks": [
+    {
+      "invariant": "d2_and_d3_are_separate",
+      "holds": true,
+      "detail": "pool() raises; depths_may_be_pooled=False; mixed banks prohibited"
+    },
+    {
+      "invariant": "each_planned_bank_has_104_items",
+      "holds": true,
+      "detail": "{'D2_DEVELOPMENT_BANK': 104, 'D3_DEVELOPMENT_BANK': 104}"
+    },
+    {
+      "invariant": "m_max_is_16",
+      "holds": true,
+      "detail": "16"
+    },
+    {
+      "invariant": "alpha_per_cell_is_1_over_320",
+      "holds": true,
+      "detail": "1/320"
+    },
+    {
+      "invariant": "cot_gate_is_n104_pass_90",
+      "holds": true,
+      "detail": "n=104 boundary=90"
+    },
+    {
+      "invariant": "e0_gate_is_n60_pass_41",
+      "holds": true,
+      "detail": "n=60 boundary=41"
+    },
+    {
+      "invariant": "candidate_order_is_7b_14b_32b",
+      "holds": true,
+      "detail": "['deepseek-ai/DeepSeek-R1-Distill-Qwen-7B', 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B', 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B']"
+    },
+    {
+      "invariant": "candidate_failures_are_local",
+      "holds": true,
+      "detail": "RP_B2"
+    },
+    {
+      "invariant": "rt_unreachable_without_a_qualified_candidate",
+      "holds": true,
+      "detail": "STUDY4F_NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_REGISTERED_LADDER"
+    },
+    {
+      "invariant": "quantization_sharding_offload_and_substitution_prohibited",
+      "holds": true,
+      "detail": "STUDY4F_UNQUANTIZED_RESOURCE_ROUTE_UNAVAILABLE"
+    },
+    {
+      "invariant": "only_developmental_candidate_disposition",
+      "holds": true,
+      "detail": "RP_B_DEVELOPMENTAL_CANDIDATE_PENDING_CONFIRMATION"
+    },
+    {
+      "invariant": "w1_raw_direct_surface_hash_reproduces",
+      "holds": true,
+      "detail": "9dab5a865967308bc43b219f5b44476cc610fb0b310dd6f528dd3fd0934a4c95"
+    },
+    {
+      "invariant": "bank_seed_derives_from_the_original_study4f_authority_commit",
+      "holds": true,
+      "detail": "STUDY4F|7d5ff0837d77af9e6df9f49d580ec0e42bdc2729|D2_DEVELOPMENT_BANK"
+    }
+  ],
+  "all_hold": true
+}
