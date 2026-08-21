@@ -1,0 +1,363 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "study4f-e1-q1r-global-routing-survey-v1",
+  "title": "Study 4F-E1-Q1R read-only Global Azure routing survey",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "observed_at",
+    "scope",
+    "read_counts",
+    "classification_definitions",
+    "ranking_rule",
+    "physical_capacity_for_every_entry",
+    "class_counts",
+    "recommendations",
+    "rankings",
+    "entries",
+    "safety"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "study4f-e1-q1r-global-routing-survey-v1"
+    },
+    "observed_at": {"const": "2026-08-21T02:59:03Z"},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cloud",
+        "subscription_last_four",
+        "subscription_salted_sha256",
+        "full_subscription_id_persisted",
+        "physical_regions_enumerated",
+        "route_pairs_classified",
+        "target_skus",
+        "target_families"
+      ],
+      "properties": {
+        "cloud": {"const": "Global Azure"},
+        "subscription_last_four": {"const": "d32e"},
+        "subscription_salted_sha256": {
+          "const": "9adb2550056c6e57f03aca51c3a82a4fed3808d9c17b9b0357f15260adc0bb59"
+        },
+        "full_subscription_id_persisted": {"const": false},
+        "physical_regions_enumerated": {"const": 63},
+        "route_pairs_classified": {"const": 126},
+        "target_skus": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "Standard_NC40ads_H100_v5",
+              "Standard_NC24ads_A100_v4"
+            ]
+          }
+        },
+        "target_families": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "StandardNCadsH100v5Family",
+              "StandardNCADSA100v4Family"
+            ]
+          }
+        }
+      }
+    },
+    "read_counts": {"$ref": "#/definitions/read_counts"},
+    "classification_definitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["R0", "R1", "R2", "R3"],
+      "properties": {
+        "R0": {"const": "R0_QUOTA_ALREADY_SUFFICIENT"},
+        "R1": {"const": "R1_SKU_ALLOWED_QUOTA_INSUFFICIENT"},
+        "R2": {"const": "R2_SUBSCRIPTION_RESTRICTED"},
+        "R3": {"const": "R3_NOT_OFFERED_OR_UNRESOLVABLE"}
+      }
+    },
+    "ranking_rule": {
+      "const": [
+        "classification order R0, R1, R2, R3",
+        "smallest family-quota deficit",
+        "smallest regional-quota deficit",
+        "region name lexicographically"
+      ]
+    },
+    "physical_capacity_for_every_entry": {
+      "const": "UNKNOWN_NOT_TESTED"
+    },
+    "class_counts": {"$ref": "#/definitions/class_counts"},
+    "recommendations": {"$ref": "#/definitions/recommendations"},
+    "rankings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["H100", "A100"],
+      "properties": {
+        "H100": {
+          "type": "array",
+          "minItems": 63,
+          "maxItems": 63,
+          "items": {"$ref": "#/definitions/ranking"}
+        },
+        "A100": {
+          "type": "array",
+          "minItems": 63,
+          "maxItems": 63,
+          "items": {"$ref": "#/definitions/ranking"}
+        }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 126,
+      "maxItems": 126,
+      "items": {"$ref": "#/definitions/entry"}
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "azure_writes",
+        "quota_puts",
+        "support_ticket_writes",
+        "deployments",
+        "resource_groups_created",
+        "vms_created",
+        "disks_created",
+        "nics_created",
+        "a100_fallback_activated",
+        "physical_capacity_tested",
+        "model_calls",
+        "cells_executed"
+      ],
+      "properties": {
+        "azure_writes": {"const": 0},
+        "quota_puts": {"const": 0},
+        "support_ticket_writes": {"const": 0},
+        "deployments": {"const": 0},
+        "resource_groups_created": {"const": 0},
+        "vms_created": {"const": 0},
+        "disks_created": {"const": 0},
+        "nics_created": {"const": 0},
+        "a100_fallback_activated": {"const": false},
+        "physical_capacity_tested": {"const": false},
+        "model_calls": {"const": 0},
+        "cells_executed": {"const": 0}
+      }
+    }
+  },
+  "definitions": {
+    "nullable_nonnegative_integer": {
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+    "classification": {
+      "enum": [
+        "R0_QUOTA_ALREADY_SUFFICIENT",
+        "R1_SKU_ALLOWED_QUOTA_INSUFFICIENT",
+        "R2_SUBSCRIPTION_RESTRICTED",
+        "R3_NOT_OFFERED_OR_UNRESOLVABLE"
+      ]
+    },
+    "read_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subscription_location_queries",
+        "target_sku_queries",
+        "current_australiaeast_h100_quota_queries",
+        "current_australiaeast_h100_quota_queries_reused",
+        "additional_compute_usage_queries",
+        "australiaeast_a100_specific_quota_queries",
+        "support_ticket_gets_reused",
+        "survey_retries",
+        "polling_loops"
+      ],
+      "properties": {
+        "subscription_location_queries": {"const": 1},
+        "target_sku_queries": {"const": 2},
+        "current_australiaeast_h100_quota_queries": {"const": 1},
+        "current_australiaeast_h100_quota_queries_reused": {"const": 1},
+        "additional_compute_usage_queries": {"const": 28},
+        "australiaeast_a100_specific_quota_queries": {"const": 1},
+        "support_ticket_gets_reused": {"const": 1},
+        "survey_retries": {"const": 0},
+        "polling_loops": {"const": 0}
+      }
+    },
+    "class_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["H100", "A100"],
+      "properties": {
+        "H100": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["R0", "R1", "R2", "R3"],
+          "properties": {
+            "R0": {"const": 0},
+            "R1": {"const": 23},
+            "R2": {"const": 0},
+            "R3": {"const": 40}
+          }
+        },
+        "A100": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["R0", "R1", "R2", "R3"],
+          "properties": {
+            "R0": {"const": 0},
+            "R1": {"const": 14},
+            "R2": {"const": 10},
+            "R3": {"const": 39}
+          }
+        }
+      }
+    },
+    "recommendations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["H100", "A100"],
+      "properties": {
+        "H100": {
+          "allOf": [
+            {"$ref": "#/definitions/recommendation"},
+            {
+              "properties": {
+                "region": {"const": "australiaeast"},
+                "family_quota_deficit": {"const": 40}
+              }
+            }
+          ]
+        },
+        "A100": {
+          "allOf": [
+            {"$ref": "#/definitions/recommendation"},
+            {
+              "properties": {
+                "region": {"const": "brazilsouth"},
+                "family_quota_deficit": {"const": 24}
+              }
+            }
+          ]
+        }
+      }
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "region",
+        "classification",
+        "family_quota_deficit",
+        "regional_quota_deficit",
+        "future_quota_request_recommended"
+      ],
+      "properties": {
+        "kind": {
+          "const": "ONE_FUTURE_OPERATOR_AUTHORIZED_QUOTA_CANDIDATE"
+        },
+        "region": {"type": "string", "pattern": "^[a-z0-9]+$"},
+        "classification": {
+          "const": "R1_SKU_ALLOWED_QUOTA_INSUFFICIENT"
+        },
+        "family_quota_deficit": {"type": "integer", "minimum": 1},
+        "regional_quota_deficit": {"const": 0},
+        "future_quota_request_recommended": {"const": true}
+      }
+    },
+    "ranking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rank",
+        "region",
+        "classification",
+        "family_quota_deficit",
+        "regional_quota_deficit"
+      ],
+      "properties": {
+        "rank": {"type": "integer", "minimum": 1, "maximum": 63},
+        "region": {"type": "string", "pattern": "^[a-z0-9]+$"},
+        "classification": {"$ref": "#/definitions/classification"},
+        "family_quota_deficit": {
+          "$ref": "#/definitions/nullable_nonnegative_integer"
+        },
+        "regional_quota_deficit": {
+          "$ref": "#/definitions/nullable_nonnegative_integer"
+        }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "route",
+        "sku",
+        "family",
+        "region",
+        "subscription_visible_physical_region",
+        "sku_offered",
+        "not_available_for_subscription",
+        "family_quota_used",
+        "family_quota_limit",
+        "family_quota_deficit",
+        "total_regional_vcpu_used",
+        "total_regional_vcpu_limit",
+        "regional_quota_deficit",
+        "classification",
+        "physical_capacity",
+        "quota_query_status"
+      ],
+      "properties": {
+        "route": {"enum": ["H100", "A100"]},
+        "sku": {
+          "enum": [
+            "Standard_NC40ads_H100_v5",
+            "Standard_NC24ads_A100_v4"
+          ]
+        },
+        "family": {
+          "enum": [
+            "StandardNCadsH100v5Family",
+            "StandardNCADSA100v4Family"
+          ]
+        },
+        "region": {"type": "string", "pattern": "^[a-z0-9]+$"},
+        "subscription_visible_physical_region": {"const": true},
+        "sku_offered": {"type": "boolean"},
+        "not_available_for_subscription": {"type": "boolean"},
+        "family_quota_used": {
+          "$ref": "#/definitions/nullable_nonnegative_integer"
+        },
+        "family_quota_limit": {
+          "$ref": "#/definitions/nullable_nonnegative_integer"
+        },
+        "family_quota_deficit": {
+          "$ref": "#/definitions/nullable_nonnegative_integer"
+        },
+        "total_regional_vcpu_used": {
+          "$ref": "#/definitions/nullable_nonnegative_integer"
+        },
+        "total_regional_vcpu_limit": {
+          "$ref": "#/definitions/nullable_nonnegative_integer"
+        },
+        "regional_quota_deficit": {
+          "$ref": "#/definitions/nullable_nonnegative_integer"
+        },
+        "classification": {"$ref": "#/definitions/classification"},
+        "physical_capacity": {"const": "UNKNOWN_NOT_TESTED"},
+        "quota_query_status": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

@@ -1,0 +1,239 @@
+{
+  "schema_version": "study4f-e1-q1r-ticket-reconciliation-receipt-v1",
+  "study_id": "STUDY4F_E1_Q1R",
+  "namespace": "studies/study4f/execution-e1/quota-escalation-q1/reconciliation-q1r/",
+  "authority": {
+    "path": "studies/study4f/prompts/study4f_e1_q1_ticket_identity_reconciliation_and_global_routing_authority.md",
+    "bytes": 8544,
+    "sha256": "b395c91d3db0e48134e8cf4c9546bdfc7f35dfd6e440ea22e3d986cca354cc17",
+    "git_blob": "fb0ad4691b44e94fbe7694fd8dd0b65535b9d7a4",
+    "commit": "6e38543a68acffc4014fda7beff79d675a51d44a",
+    "tree": "328d2c281dfd87f9cbae71c4ee0838a0c0b85e2a",
+    "parent_commit": "01c07d83e8be3dd9ba2bebb31869af944ae2a21b",
+    "parent_tree": "cca35c2178bd1c2b8688468a888eab8cd9d5b2ed",
+    "published_alone_as_first_successor_commit": true
+  },
+  "starting_state": {
+    "commit": "01c07d83e8be3dd9ba2bebb31869af944ae2a21b",
+    "tree": "cca35c2178bd1c2b8688468a888eab8cd9d5b2ed",
+    "head_equalled_origin_main": true,
+    "worktree_clean": true,
+    "linear_ancestry": true,
+    "lifecycle_state": "STUDY4F_E1_Q1_AWAITING_AZURE_SUPPORT_DECISION",
+    "cloud": "Global Azure",
+    "region": "australiaeast",
+    "target_sku": "Standard_NC40ads_H100_v5",
+    "family": "StandardNCadsH100v5Family",
+    "requested_limit": 40,
+    "requested_instances": 1,
+    "capacity_type": "standard on-demand"
+  },
+  "historical_q1_preservation": {
+    "protected_start_commit": "01c07d83e8be3dd9ba2bebb31869af944ae2a21b",
+    "artifacts": {
+      "authority": {
+        "path": "studies/study4f/prompts/study4f_e1_q1_manual_quota_escalation_and_conditional_resume_authority.md",
+        "bytes": 11316,
+        "sha256": "ce61fd32c6546e1e98bb79d4220651fa855bca05fe2d39bf88c1089bb2cf8975",
+        "git_blob": "6622504c13e479d32dfaf4002b80250616a0a1a9",
+        "blob_at_start": "6622504c13e479d32dfaf4002b80250616a0a1a9",
+        "byte_identical_to_start": true
+      },
+      "receipt": {
+        "path": "studies/study4f/execution-e1/quota-escalation-q1/support_ticket_receipt.json",
+        "bytes": 6662,
+        "sha256": "76bab95a4b602ac10cd6950815732ff67f10faea986862108152d347cb5ef126",
+        "git_blob": "a7d6354eab3a95a8171fbc2228a4b45a1bd8a06d",
+        "blob_at_start": "a7d6354eab3a95a8171fbc2228a4b45a1bd8a06d",
+        "byte_identical_to_start": true
+      },
+      "disclosure": {
+        "path": "studies/study4f/execution-e1/quota-escalation-q1/Q1_INVOCATION_DISCLOSURE.md",
+        "bytes": 10023,
+        "sha256": "515aa29a9906241af927f3c27cc2309e1ffcff687cf65c737b0247773a686ca8",
+        "git_blob": "def06addb83a41660f2da4929fb57551297e853b",
+        "blob_at_start": "def06addb83a41660f2da4929fb57551297e853b",
+        "byte_identical_to_start": true
+      },
+      "status": {
+        "path": "studies/study4f/execution-e1/quota-escalation-q1/STATUS.json",
+        "bytes": 10896,
+        "sha256": "70ec58c8bde4b1e5b8b46e437a0e9c523aeaaa5426710ed7fab3afca6b6e8006",
+        "git_blob": "54f321a5d426a4fafd0f8cc935331da8a99f3755",
+        "blob_at_start": "54f321a5d426a4fafd0f8cc935331da8a99f3755",
+        "byte_identical_to_start": true
+      }
+    },
+    "original_q1_bytes_modified": false,
+    "original_incorrect_suffix_preserved_in_historical_bytes": true
+  },
+  "reconciliation": {
+    "classification": "Q1_REGISTERED_REDACTED_TICKET_IDENTITY_TRANSCRIPTION_ERROR_CONFIRMED",
+    "mismatch_type": "suffix_transcription",
+    "suffix_transcription_error": true,
+    "wrong_api_field_comparison": false,
+    "governing_customer_identity_field": "properties.supportTicketId",
+    "arm_resource_identity_field": "name",
+    "identities_are_distinct": true,
+    "corrected_customer_ticket_suffix": "1753",
+    "historical_incorrect_registered_suffix": "3753",
+    "customer_ticket_id_salted_sha256": "91638bfadf1b15b017bcdc7fd84488b1bc817ac5d4179d03cd781770912c73a5",
+    "customer_ticket_id_salt_material": "STUDY4F_E1_Q1R|6e38543a68acffc4014fda7beff79d675a51d44a|customer-facing-support-ticket-id|<customer-facing support ticket id>",
+    "arm_resource_name_salted_sha256": "4a8a1e91733a04f30c23d7097bcf40a22e666c93396eef6474073ac279a737f6",
+    "arm_resource_name_salt_material": "STUDY4F_E1_Q1R|6e38543a68acffc4014fda7beff79d675a51d44a|arm-support-ticket-resource-name|<ARM support ticket resource name>",
+    "full_customer_ticket_id_committed_by_q1r": false,
+    "full_arm_resource_name_committed_by_q1r": false,
+    "historical_q1_already_contains_the_arm_resource_name": true,
+    "historical_hash_matches_customer_ticket_id": true,
+    "historical_hash_matches_arm_resource_name": false,
+    "complete_tuple_matched": true,
+    "tuple_checks": {
+      "customer_facing_ticket_id_full_match": true,
+      "corrected_suffix": true,
+      "arm_resource_name_separate_and_matches_path": true,
+      "creation_time": true,
+      "region": true,
+      "family": true,
+      "requested_limit": true,
+      "quota_request_problem_classification": true,
+      "service": true,
+      "title": true,
+      "subscription_binding": true
+    }
+  },
+  "support_ticket_observation": {
+    "read_only": true,
+    "get_count": 1,
+    "created_date_normalized": "2026-08-18T06:25:01Z",
+    "timestamp_normalization": "MM/dd/yyyy HH:mm:ss interpreted as UTC per ARM support-ticket timestamp semantics",
+    "status": "Open",
+    "title": "Manual enablement request: one NC40ads_H100_v5 GPU VM for bounded non-production research",
+    "service_display_name": "Service and subscription limits (quotas)",
+    "problem_classification_display_name": "Compute-VM (cores-vCPUs) subscription limit increases",
+    "region": "australiaeast",
+    "vm_family": "standardNCadsH100v5Family",
+    "requested_limit": 40,
+    "subscription_last_four": "d32e",
+    "subscription_salted_sha256": "9adb2550056c6e57f03aca51c3a82a4fed3808d9c17b9b0357f15260adc0bb59",
+    "full_subscription_id_committed": false
+  },
+  "support_correspondence": {
+    "classification": "BACKLOG_PENDING_NO_APPROVAL_NO_FINAL_DENIAL",
+    "is_approval": false,
+    "grants_quota": false,
+    "is_final_denial": false,
+    "request_remains_pending": true,
+    "additional_information_required": false,
+    "authorizes_h100_execution": false,
+    "authorizes_a100_fallback": false,
+    "authorizes_duplicate_ticket": false
+  },
+  "current_quota_observation": {
+    "queried_at": "2026-08-21T02:46:24Z",
+    "query_count": 1,
+    "read_only": true,
+    "region": "australiaeast",
+    "family": "StandardNCadsH100v5Family",
+    "used": 0,
+    "limit": 0,
+    "required_limit": 40,
+    "visible_quota_gate_satisfied": false,
+    "total_regional_vcpu_used": 0,
+    "total_regional_vcpu_limit": 100
+  },
+  "global_routing_survey": {
+    "path": "studies/study4f/execution-e1/quota-escalation-q1/reconciliation-q1r/global_routing_survey.json",
+    "sha256": "d113bf8d4627689d64bb219c0661eb52d18a150cfc452104ba4b1e607a1d997d",
+    "observed_at": "2026-08-21T02:59:03Z",
+    "physical_regions": 63,
+    "route_pairs": 126,
+    "class_counts": {
+      "H100": {
+        "R0": 0,
+        "R1": 23,
+        "R2": 0,
+        "R3": 40
+      },
+      "A100": {
+        "R0": 0,
+        "R1": 14,
+        "R2": 10,
+        "R3": 39
+      }
+    },
+    "recommendations": {
+      "H100": {
+        "kind": "ONE_FUTURE_OPERATOR_AUTHORIZED_QUOTA_CANDIDATE",
+        "region": "australiaeast",
+        "classification": "R1_SKU_ALLOWED_QUOTA_INSUFFICIENT",
+        "family_quota_deficit": 40,
+        "regional_quota_deficit": 0,
+        "future_quota_request_recommended": true
+      },
+      "A100": {
+        "kind": "ONE_FUTURE_OPERATOR_AUTHORIZED_QUOTA_CANDIDATE",
+        "region": "brazilsouth",
+        "classification": "R1_SKU_ALLOWED_QUOTA_INSUFFICIENT",
+        "family_quota_deficit": 24,
+        "regional_quota_deficit": 0,
+        "future_quota_request_recommended": true
+      }
+    },
+    "read_counts": {
+      "subscription_location_queries": 1,
+      "target_sku_queries": 2,
+      "current_australiaeast_h100_quota_queries": 1,
+      "current_australiaeast_h100_quota_queries_reused": 1,
+      "additional_compute_usage_queries": 28,
+      "australiaeast_a100_specific_quota_queries": 1,
+      "support_ticket_gets_reused": 1,
+      "survey_retries": 0,
+      "polling_loops": 0
+    },
+    "r0_routes": 0,
+    "physical_capacity": "UNKNOWN_NOT_TESTED"
+  },
+  "a100_fallback": {
+    "authorized": false,
+    "activated": false,
+    "support_request_submitted": false
+  },
+  "write_counters": {
+    "azure_writes": 0,
+    "quota_puts": 0,
+    "support_ticket_creates": 0,
+    "support_ticket_updates": 0,
+    "resource_groups_created": 0,
+    "vms_created": 0,
+    "disks_created": 0,
+    "nics_created": 0,
+    "deployments": 0
+  },
+  "scientific_counters": {
+    "models_loaded": 0,
+    "model_calls": 0,
+    "banks_realized": 0,
+    "scoring_runs": 0,
+    "generations": 0,
+    "generated_tokens": 0,
+    "d0_runs": 0,
+    "activation_collections": 0,
+    "activation_patches": 0,
+    "cells_executed": 0,
+    "accelerator_hours": 0
+  },
+  "shakedown_allowance": {
+    "attempts_remaining": 2,
+    "accelerator_hours_remaining": 6,
+    "consumed_by_this_invocation": 0
+  },
+  "claim_boundary": {
+    "is_a_scientific_result": false,
+    "establishes_j_space_exists": false,
+    "establishes_j_space_does_not_exist": false,
+    "establishes_j_space_is_observable": false,
+    "establishes_j_space_is_unobservable": false,
+    "physical_capacity_known": false
+  },
+  "state": "STUDY4F_E1_Q1_AWAITING_AZURE_SUPPORT_DECISION"
+}

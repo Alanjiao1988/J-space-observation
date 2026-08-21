@@ -1,0 +1,650 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "study4f-e1-q1r-ticket-reconciliation-receipt-v1",
+  "title": "Study 4F-E1-Q1R ticket reconciliation receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "study_id",
+    "namespace",
+    "authority",
+    "starting_state",
+    "historical_q1_preservation",
+    "reconciliation",
+    "support_ticket_observation",
+    "support_correspondence",
+    "current_quota_observation",
+    "global_routing_survey",
+    "a100_fallback",
+    "write_counters",
+    "scientific_counters",
+    "shakedown_allowance",
+    "claim_boundary",
+    "state"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "study4f-e1-q1r-ticket-reconciliation-receipt-v1"
+    },
+    "study_id": {"const": "STUDY4F_E1_Q1R"},
+    "namespace": {
+      "const": "studies/study4f/execution-e1/quota-escalation-q1/reconciliation-q1r/"
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256",
+        "git_blob",
+        "commit",
+        "tree",
+        "parent_commit",
+        "parent_tree",
+        "published_alone_as_first_successor_commit"
+      ],
+      "properties": {
+        "path": {
+          "const": "studies/study4f/prompts/study4f_e1_q1_ticket_identity_reconciliation_and_global_routing_authority.md"
+        },
+        "bytes": {"const": 8544},
+        "sha256": {
+          "const": "b395c91d3db0e48134e8cf4c9546bdfc7f35dfd6e440ea22e3d986cca354cc17"
+        },
+        "git_blob": {
+          "const": "fb0ad4691b44e94fbe7694fd8dd0b65535b9d7a4"
+        },
+        "commit": {
+          "const": "6e38543a68acffc4014fda7beff79d675a51d44a"
+        },
+        "tree": {
+          "const": "328d2c281dfd87f9cbae71c4ee0838a0c0b85e2a"
+        },
+        "parent_commit": {
+          "const": "01c07d83e8be3dd9ba2bebb31869af944ae2a21b"
+        },
+        "parent_tree": {
+          "const": "cca35c2178bd1c2b8688468a888eab8cd9d5b2ed"
+        },
+        "published_alone_as_first_successor_commit": {"const": true}
+      }
+    },
+    "starting_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commit",
+        "tree",
+        "head_equalled_origin_main",
+        "worktree_clean",
+        "linear_ancestry",
+        "lifecycle_state",
+        "cloud",
+        "region",
+        "target_sku",
+        "family",
+        "requested_limit",
+        "requested_instances",
+        "capacity_type"
+      ],
+      "properties": {
+        "commit": {
+          "const": "01c07d83e8be3dd9ba2bebb31869af944ae2a21b"
+        },
+        "tree": {
+          "const": "cca35c2178bd1c2b8688468a888eab8cd9d5b2ed"
+        },
+        "head_equalled_origin_main": {"const": true},
+        "worktree_clean": {"const": true},
+        "linear_ancestry": {"const": true},
+        "lifecycle_state": {
+          "const": "STUDY4F_E1_Q1_AWAITING_AZURE_SUPPORT_DECISION"
+        },
+        "cloud": {"const": "Global Azure"},
+        "region": {"const": "australiaeast"},
+        "target_sku": {"const": "Standard_NC40ads_H100_v5"},
+        "family": {"const": "StandardNCadsH100v5Family"},
+        "requested_limit": {"const": 40},
+        "requested_instances": {"const": 1},
+        "capacity_type": {"const": "standard on-demand"}
+      }
+    },
+    "historical_q1_preservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protected_start_commit",
+        "artifacts",
+        "original_q1_bytes_modified",
+        "original_incorrect_suffix_preserved_in_historical_bytes"
+      ],
+      "properties": {
+        "protected_start_commit": {
+          "const": "01c07d83e8be3dd9ba2bebb31869af944ae2a21b"
+        },
+        "artifacts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["authority", "receipt", "disclosure", "status"],
+          "properties": {
+            "authority": {
+              "allOf": [
+                {"$ref": "#/definitions/historical_artifact"},
+                {
+                  "properties": {
+                    "path": {
+                      "const": "studies/study4f/prompts/study4f_e1_q1_manual_quota_escalation_and_conditional_resume_authority.md"
+                    },
+                    "bytes": {"const": 11316},
+                    "sha256": {
+                      "const": "ce61fd32c6546e1e98bb79d4220651fa855bca05fe2d39bf88c1089bb2cf8975"
+                    },
+                    "git_blob": {
+                      "const": "6622504c13e479d32dfaf4002b80250616a0a1a9"
+                    },
+                    "blob_at_start": {
+                      "const": "6622504c13e479d32dfaf4002b80250616a0a1a9"
+                    }
+                  }
+                }
+              ]
+            },
+            "receipt": {
+              "allOf": [
+                {"$ref": "#/definitions/historical_artifact"},
+                {
+                  "properties": {
+                    "path": {
+                      "const": "studies/study4f/execution-e1/quota-escalation-q1/support_ticket_receipt.json"
+                    },
+                    "bytes": {"const": 6662},
+                    "sha256": {
+                      "const": "76bab95a4b602ac10cd6950815732ff67f10faea986862108152d347cb5ef126"
+                    },
+                    "git_blob": {
+                      "const": "a7d6354eab3a95a8171fbc2228a4b45a1bd8a06d"
+                    },
+                    "blob_at_start": {
+                      "const": "a7d6354eab3a95a8171fbc2228a4b45a1bd8a06d"
+                    }
+                  }
+                }
+              ]
+            },
+            "disclosure": {
+              "allOf": [
+                {"$ref": "#/definitions/historical_artifact"},
+                {
+                  "properties": {
+                    "path": {
+                      "const": "studies/study4f/execution-e1/quota-escalation-q1/Q1_INVOCATION_DISCLOSURE.md"
+                    },
+                    "bytes": {"const": 10023},
+                    "sha256": {
+                      "const": "515aa29a9906241af927f3c27cc2309e1ffcff687cf65c737b0247773a686ca8"
+                    },
+                    "git_blob": {
+                      "const": "def06addb83a41660f2da4929fb57551297e853b"
+                    },
+                    "blob_at_start": {
+                      "const": "def06addb83a41660f2da4929fb57551297e853b"
+                    }
+                  }
+                }
+              ]
+            },
+            "status": {
+              "allOf": [
+                {"$ref": "#/definitions/historical_artifact"},
+                {
+                  "properties": {
+                    "path": {
+                      "const": "studies/study4f/execution-e1/quota-escalation-q1/STATUS.json"
+                    },
+                    "bytes": {"const": 10896},
+                    "sha256": {
+                      "const": "70ec58c8bde4b1e5b8b46e437a0e9c523aeaaa5426710ed7fab3afca6b6e8006"
+                    },
+                    "git_blob": {
+                      "const": "54f321a5d426a4fafd0f8cc935331da8a99f3755"
+                    },
+                    "blob_at_start": {
+                      "const": "54f321a5d426a4fafd0f8cc935331da8a99f3755"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "original_q1_bytes_modified": {"const": false},
+        "original_incorrect_suffix_preserved_in_historical_bytes": {
+          "const": true
+        }
+      }
+    },
+    "reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "mismatch_type",
+        "suffix_transcription_error",
+        "wrong_api_field_comparison",
+        "governing_customer_identity_field",
+        "arm_resource_identity_field",
+        "identities_are_distinct",
+        "corrected_customer_ticket_suffix",
+        "historical_incorrect_registered_suffix",
+        "customer_ticket_id_salted_sha256",
+        "customer_ticket_id_salt_material",
+        "arm_resource_name_salted_sha256",
+        "arm_resource_name_salt_material",
+        "full_customer_ticket_id_committed_by_q1r",
+        "full_arm_resource_name_committed_by_q1r",
+        "historical_q1_already_contains_the_arm_resource_name",
+        "historical_hash_matches_customer_ticket_id",
+        "historical_hash_matches_arm_resource_name",
+        "complete_tuple_matched",
+        "tuple_checks"
+      ],
+      "properties": {
+        "classification": {
+          "const": "Q1_REGISTERED_REDACTED_TICKET_IDENTITY_TRANSCRIPTION_ERROR_CONFIRMED"
+        },
+        "mismatch_type": {"const": "suffix_transcription"},
+        "suffix_transcription_error": {"const": true},
+        "wrong_api_field_comparison": {"const": false},
+        "governing_customer_identity_field": {
+          "const": "properties.supportTicketId"
+        },
+        "arm_resource_identity_field": {"const": "name"},
+        "identities_are_distinct": {"const": true},
+        "corrected_customer_ticket_suffix": {"const": "1753"},
+        "historical_incorrect_registered_suffix": {"const": "3753"},
+        "customer_ticket_id_salted_sha256": {
+          "const": "91638bfadf1b15b017bcdc7fd84488b1bc817ac5d4179d03cd781770912c73a5"
+        },
+        "customer_ticket_id_salt_material": {
+          "const": "STUDY4F_E1_Q1R|6e38543a68acffc4014fda7beff79d675a51d44a|customer-facing-support-ticket-id|<customer-facing support ticket id>"
+        },
+        "arm_resource_name_salted_sha256": {
+          "const": "4a8a1e91733a04f30c23d7097bcf40a22e666c93396eef6474073ac279a737f6"
+        },
+        "arm_resource_name_salt_material": {
+          "const": "STUDY4F_E1_Q1R|6e38543a68acffc4014fda7beff79d675a51d44a|arm-support-ticket-resource-name|<ARM support ticket resource name>"
+        },
+        "full_customer_ticket_id_committed_by_q1r": {"const": false},
+        "full_arm_resource_name_committed_by_q1r": {"const": false},
+        "historical_q1_already_contains_the_arm_resource_name": {
+          "const": true
+        },
+        "historical_hash_matches_customer_ticket_id": {"const": true},
+        "historical_hash_matches_arm_resource_name": {"const": false},
+        "complete_tuple_matched": {"const": true},
+        "tuple_checks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "customer_facing_ticket_id_full_match",
+            "corrected_suffix",
+            "arm_resource_name_separate_and_matches_path",
+            "creation_time",
+            "region",
+            "family",
+            "requested_limit",
+            "quota_request_problem_classification",
+            "service",
+            "title",
+            "subscription_binding"
+          ],
+          "patternProperties": {"^.*$": {"const": true}}
+        }
+      }
+    },
+    "support_ticket_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read_only",
+        "get_count",
+        "created_date_normalized",
+        "timestamp_normalization",
+        "status",
+        "title",
+        "service_display_name",
+        "problem_classification_display_name",
+        "region",
+        "vm_family",
+        "requested_limit",
+        "subscription_last_four",
+        "subscription_salted_sha256",
+        "full_subscription_id_committed"
+      ],
+      "properties": {
+        "read_only": {"const": true},
+        "get_count": {"const": 1},
+        "created_date_normalized": {
+          "const": "2026-08-18T06:25:01Z"
+        },
+        "timestamp_normalization": {
+          "const": "MM/dd/yyyy HH:mm:ss interpreted as UTC per ARM support-ticket timestamp semantics"
+        },
+        "status": {"const": "Open"},
+        "title": {
+          "const": "Manual enablement request: one NC40ads_H100_v5 GPU VM for bounded non-production research"
+        },
+        "service_display_name": {
+          "const": "Service and subscription limits (quotas)"
+        },
+        "problem_classification_display_name": {
+          "const": "Compute-VM (cores-vCPUs) subscription limit increases"
+        },
+        "region": {"const": "australiaeast"},
+        "vm_family": {"const": "standardNCadsH100v5Family"},
+        "requested_limit": {"const": 40},
+        "subscription_last_four": {"const": "d32e"},
+        "subscription_salted_sha256": {
+          "const": "9adb2550056c6e57f03aca51c3a82a4fed3808d9c17b9b0357f15260adc0bb59"
+        },
+        "full_subscription_id_committed": {"const": false}
+      }
+    },
+    "support_correspondence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "is_approval",
+        "grants_quota",
+        "is_final_denial",
+        "request_remains_pending",
+        "additional_information_required",
+        "authorizes_h100_execution",
+        "authorizes_a100_fallback",
+        "authorizes_duplicate_ticket"
+      ],
+      "properties": {
+        "classification": {
+          "const": "BACKLOG_PENDING_NO_APPROVAL_NO_FINAL_DENIAL"
+        },
+        "is_approval": {"const": false},
+        "grants_quota": {"const": false},
+        "is_final_denial": {"const": false},
+        "request_remains_pending": {"const": true},
+        "additional_information_required": {"const": false},
+        "authorizes_h100_execution": {"const": false},
+        "authorizes_a100_fallback": {"const": false},
+        "authorizes_duplicate_ticket": {"const": false}
+      }
+    },
+    "current_quota_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "queried_at",
+        "query_count",
+        "read_only",
+        "region",
+        "family",
+        "used",
+        "limit",
+        "required_limit",
+        "visible_quota_gate_satisfied",
+        "total_regional_vcpu_used",
+        "total_regional_vcpu_limit"
+      ],
+      "properties": {
+        "queried_at": {"const": "2026-08-21T02:46:24Z"},
+        "query_count": {"const": 1},
+        "read_only": {"const": true},
+        "region": {"const": "australiaeast"},
+        "family": {"const": "StandardNCadsH100v5Family"},
+        "used": {"const": 0},
+        "limit": {"const": 0},
+        "required_limit": {"const": 40},
+        "visible_quota_gate_satisfied": {"const": false},
+        "total_regional_vcpu_used": {"const": 0},
+        "total_regional_vcpu_limit": {"const": 100}
+      }
+    },
+    "global_routing_survey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "observed_at",
+        "physical_regions",
+        "route_pairs",
+        "class_counts",
+        "recommendations",
+        "read_counts",
+        "r0_routes",
+        "physical_capacity"
+      ],
+      "properties": {
+        "path": {
+          "const": "studies/study4f/execution-e1/quota-escalation-q1/reconciliation-q1r/global_routing_survey.json"
+        },
+        "sha256": {
+          "const": "d113bf8d4627689d64bb219c0661eb52d18a150cfc452104ba4b1e607a1d997d"
+        },
+        "observed_at": {"const": "2026-08-21T02:59:03Z"},
+        "physical_regions": {"const": 63},
+        "route_pairs": {"const": 126},
+        "class_counts": {"$ref": "#/definitions/class_counts"},
+        "recommendations": {"$ref": "#/definitions/recommendations"},
+        "read_counts": {"$ref": "#/definitions/read_counts"},
+        "r0_routes": {"const": 0},
+        "physical_capacity": {"const": "UNKNOWN_NOT_TESTED"}
+      }
+    },
+    "a100_fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authorized", "activated", "support_request_submitted"],
+      "properties": {
+        "authorized": {"const": false},
+        "activated": {"const": false},
+        "support_request_submitted": {"const": false}
+      }
+    },
+    "write_counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "azure_writes",
+        "quota_puts",
+        "support_ticket_creates",
+        "support_ticket_updates",
+        "resource_groups_created",
+        "vms_created",
+        "disks_created",
+        "nics_created",
+        "deployments"
+      ],
+      "patternProperties": {"^.*$": {"const": 0}}
+    },
+    "scientific_counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "models_loaded",
+        "model_calls",
+        "banks_realized",
+        "scoring_runs",
+        "generations",
+        "generated_tokens",
+        "d0_runs",
+        "activation_collections",
+        "activation_patches",
+        "cells_executed",
+        "accelerator_hours"
+      ],
+      "patternProperties": {"^.*$": {"const": 0}}
+    },
+    "shakedown_allowance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempts_remaining",
+        "accelerator_hours_remaining",
+        "consumed_by_this_invocation"
+      ],
+      "properties": {
+        "attempts_remaining": {"const": 2},
+        "accelerator_hours_remaining": {"const": 6},
+        "consumed_by_this_invocation": {"const": 0}
+      }
+    },
+    "claim_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "is_a_scientific_result",
+        "establishes_j_space_exists",
+        "establishes_j_space_does_not_exist",
+        "establishes_j_space_is_observable",
+        "establishes_j_space_is_unobservable",
+        "physical_capacity_known"
+      ],
+      "patternProperties": {"^.*$": {"const": false}}
+    },
+    "state": {
+      "const": "STUDY4F_E1_Q1_AWAITING_AZURE_SUPPORT_DECISION"
+    }
+  },
+  "definitions": {
+    "historical_artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256",
+        "git_blob",
+        "blob_at_start",
+        "byte_identical_to_start"
+      ],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "git_blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "blob_at_start": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "byte_identical_to_start": {"const": true}
+      }
+    },
+    "class_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["H100", "A100"],
+      "properties": {
+        "H100": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["R0", "R1", "R2", "R3"],
+          "properties": {
+            "R0": {"const": 0},
+            "R1": {"const": 23},
+            "R2": {"const": 0},
+            "R3": {"const": 40}
+          }
+        },
+        "A100": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["R0", "R1", "R2", "R3"],
+          "properties": {
+            "R0": {"const": 0},
+            "R1": {"const": 14},
+            "R2": {"const": 10},
+            "R3": {"const": 39}
+          }
+        }
+      }
+    },
+    "recommendations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["H100", "A100"],
+      "properties": {
+        "H100": {
+          "allOf": [
+            {"$ref": "#/definitions/recommendation"},
+            {
+              "properties": {
+                "region": {"const": "australiaeast"},
+                "family_quota_deficit": {"const": 40}
+              }
+            }
+          ]
+        },
+        "A100": {
+          "allOf": [
+            {"$ref": "#/definitions/recommendation"},
+            {
+              "properties": {
+                "region": {"const": "brazilsouth"},
+                "family_quota_deficit": {"const": 24}
+              }
+            }
+          ]
+        }
+      }
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "region",
+        "classification",
+        "family_quota_deficit",
+        "regional_quota_deficit",
+        "future_quota_request_recommended"
+      ],
+      "properties": {
+        "kind": {
+          "const": "ONE_FUTURE_OPERATOR_AUTHORIZED_QUOTA_CANDIDATE"
+        },
+        "region": {"type": "string", "minLength": 1},
+        "classification": {
+          "const": "R1_SKU_ALLOWED_QUOTA_INSUFFICIENT"
+        },
+        "family_quota_deficit": {"type": "integer", "minimum": 1},
+        "regional_quota_deficit": {"const": 0},
+        "future_quota_request_recommended": {"const": true}
+      }
+    },
+    "read_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subscription_location_queries",
+        "target_sku_queries",
+        "current_australiaeast_h100_quota_queries",
+        "current_australiaeast_h100_quota_queries_reused",
+        "additional_compute_usage_queries",
+        "australiaeast_a100_specific_quota_queries",
+        "support_ticket_gets_reused",
+        "survey_retries",
+        "polling_loops"
+      ],
+      "properties": {
+        "subscription_location_queries": {"const": 1},
+        "target_sku_queries": {"const": 2},
+        "current_australiaeast_h100_quota_queries": {"const": 1},
+        "current_australiaeast_h100_quota_queries_reused": {"const": 1},
+        "additional_compute_usage_queries": {"const": 28},
+        "australiaeast_a100_specific_quota_queries": {"const": 1},
+        "support_ticket_gets_reused": {"const": 1},
+        "survey_retries": {"const": 0},
+        "polling_loops": {"const": 0}
+      }
+    }
+  }
+}
