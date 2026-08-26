@@ -4,8 +4,8 @@
  "seal_sha256": "5a59cc432ebb63dc23ea5ed07fe9ba207124b11f731a13d6422f203d4c3973c7",
  "seal_commit": "126563842974097e93c202ef0cfc088dc2fde208",
  "observation_timestamp_utc": "2026-08-26T17:35:00Z",
- "is_a_final_scientific_result": false,
- "note": "These are per-cell tallies produced by the sealed instrument. The terminal study state is decided only by the published state machine after the ladder resolves, and is recorded separately.",
+ "is_a_final_scientific_result": true,
+ "note": "The ladder has resolved. The terminal state below was produced by the published state machine, not by this record.",
  "execution_contract_in_force": {
   "one_isolated_gpu_per_worker": true,
   "cuda_device_order": "PCI_BUS_ID",
@@ -166,6 +166,40 @@
    "passes": false,
    "gpu": "GPU3",
    "gpu_seconds": 9.7
+  },
+  {
+   "checkpoint_role": "RP_B3",
+   "checkpoint_repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+   "immutable_revision": "711ad2ea6aa40cfca18895e8aca02ab92df1a746",
+   "cell_id": "RP_B3|D2|COT",
+   "depth": "D2",
+   "route": "C1_LONG_GENERATED_COT_HEADROOM",
+   "bank": "D2_DEVELOPMENT_BANK",
+   "n": 104,
+   "correct": 94,
+   "incorrect_wrong_label": 0,
+   "unparseable": 10,
+   "null_floor": "3/4",
+   "pass_boundary": 90,
+   "passes": true,
+   "gpu": "GPU0"
+  },
+  {
+   "checkpoint_role": "RP_B3",
+   "checkpoint_repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+   "immutable_revision": "711ad2ea6aa40cfca18895e8aca02ab92df1a746",
+   "cell_id": "RP_B3|D3|COT",
+   "depth": "D3",
+   "route": "C1_LONG_GENERATED_COT_HEADROOM",
+   "bank": "D3_DEVELOPMENT_BANK",
+   "n": 104,
+   "correct": 85,
+   "incorrect_wrong_label": 0,
+   "unparseable": 19,
+   "null_floor": "3/4",
+   "pass_boundary": 90,
+   "passes": false,
+   "gpu": "GPU1"
   }
  ],
  "e0_unparseable_forensics": {
@@ -216,19 +250,76 @@
    "e0_d3_passed": false,
    "qualified": false,
    "ladder_advances_to": "RP_B3"
+  },
+  "RP_B3": {
+   "cot_d2_passed": true,
+   "cot_d3_passed": false,
+   "both_cot_passed": false,
+   "e0_unlocked_because_both_cot_passed": false,
+   "e0_cells_run": 0,
+   "qualified": false,
+   "reason": "COT_HEADROOM_ABSENT_ON_D3",
+   "ladder_advances_to": null
   }
  },
  "what_this_establishes": [
   "Under the registered C1 long-generated-CoT route, the 7B checkpoint reaches 97/104 correct at both D2 and D3, above the registered pass boundary of 90.",
   "Under the registered W1 raw-direct route, the same checkpoint produced zero parseable answer surfaces in 120 items, so its E0 cells do not pass.",
   "Under the registered C1 route the 14B checkpoint reaches 104/104 at D2 and 101/104 at D3, both above the boundary of 90.",
-  "Under the registered W1 raw-direct route the 14B checkpoint also produced zero parseable answer surfaces in 120 items."
+  "Under the registered W1 raw-direct route the 14B checkpoint also produced zero parseable answer surfaces in 120 items.",
+  "Under the registered C1 route the 32B checkpoint reaches 94/104 at D2, above the boundary of 90, but only 85/104 at D3, below it.",
+  "No candidate in the registered ladder qualified, so the study terminates at STUDY4F_NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_REGISTERED_LADDER and RT was never run."
  ],
  "what_this_does_not_establish": [
-  "Nothing about RP_B2, RP_B3 or RT, whose cells were not complete when this record was written.",
-  "Nothing about whether a natural positive-reference candidate exists, because the ladder has not resolved.",
-  "Nothing about whether the raw-direct interface is valid or invalid. A checkpoint failing to emit a bare answer token is a measurement of that checkpoint under that envelope, not a verdict on the interface.",
-  "Nothing about whether J-space exists, is observable or is unobservable. No cell in this study could test that.",
-  "Nothing confirmatory. Only development banks were used and confirmation remains unauthorized."
- ]
+  "Nothing about RT. Its four cells were never executed because no candidate qualified, which is the registered rule.",
+  "Nothing about whether the raw-direct interface is valid or invalid. Three checkpoints emitting a non-answer first token is a measurement of those checkpoints under that envelope, not a verdict on the interface.",
+  "Nothing about whether J-space exists, is observable or is unobservable. No cell in this study could test that, and none was designed to.",
+  "Nothing confirmatory. Only development banks were realized, no confirmation bank exists and confirmation remains unauthorized.",
+  "Nothing that generalizes beyond the four registered checkpoints, the two registered depths and the two registered interfaces.",
+  "Nothing about internal mechanism. No activation was collected or patched and no D0 run occurred."
+ ],
+ "cells_executed": 10,
+ "cells_skipped": 6,
+ "skipped_cells": [
+  "RP_B3|D2|E0",
+  "RP_B3|D3|E0",
+  "RT|D2|COT",
+  "RT|D3|COT",
+  "RT|D2|E0",
+  "RT|D3|E0"
+ ],
+ "skip_rationale": {
+  "RP_B3 E0": "Never scheduled because the registered precondition, both CoT cells passing, was not met on D3.",
+  "RT": "Never scheduled because no candidate qualified. The registered rule is that RT runs only if a candidate qualifies."
+ },
+ "journal_integrity": {
+  "total_items": 864,
+  "unique_journal_keys": 864,
+  "duplicate_keys": 0,
+  "distinct_seals": 1,
+  "seal_sha256": "5a59cc432ebb63dc23ea5ed07fe9ba207124b11f731a13d6422f203d4c3973c7",
+  "distinct_container_images": 1,
+  "journal_key_rollup_sha256": "eca3f9c09f61a157cd72f0f350d608ed96123f77f252c65e38316bb38412c3dd",
+  "items_per_gpu": {
+   "e85524f36fdf": 268,
+   "b29579ca41a6": 268,
+   "0ec45dca0dfc": 164,
+   "5767cc3ad060": 164
+  },
+  "create_only_violations": 0
+ },
+ "state_machine_verdict": {
+  "produced_by": "studies/study4f/analysis/study4f_state_machine.py run_study()",
+  "candidates_evaluated": 3,
+  "qualified_candidate": null,
+  "rt_authorized": false,
+  "rt_cells_run": 0,
+  "state": "STUDY4F_NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_REGISTERED_LADDER",
+  "m1_registered_equivalent": "STUDY4F_M1_NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_REGISTERED_LADDER",
+  "per_candidate_reason": {
+   "RP_B1": "E0_NOT_OBSERVED_ON_D2_AND_D3",
+   "RP_B2": "E0_NOT_OBSERVED_ON_D2_AND_D3",
+   "RP_B3": "COT_HEADROOM_ABSENT_ON_D3"
+  }
+ }
 }

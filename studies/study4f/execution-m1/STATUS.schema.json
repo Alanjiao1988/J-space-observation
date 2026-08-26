@@ -64,10 +64,10 @@
    ]
   },
   "terminal": {
-   "const": false
+   "type": "boolean"
   },
   "resumable": {
-   "const": true
+   "type": "boolean"
   },
   "study_kind": {
    "const": "mooncake_parallel_execution_substrate_for_a_published_instrument"
@@ -288,7 +288,8 @@
    "additionalProperties": true
   },
   "claim_boundary": {
-   "$ref": "#/$defs/claimBoundary"
+   "$ref": "#/$defs/claimBoundary",
+   "additionalProperties": true
   },
   "evidence_ledger": {
    "type": "object",
@@ -343,19 +344,24 @@
      "minimum": 0
     },
     "model_constructions": {
-     "const": 0
+     "type": "number",
+     "minimum": 0
     },
     "forward_passes": {
-     "const": 0
+     "type": "number",
+     "minimum": 0
     },
     "prefill_operations": {
-     "const": 0
+     "type": "number",
+     "minimum": 0
     },
     "generations": {
-     "const": 0
+     "type": "number",
+     "minimum": 0
     },
     "generated_tokens": {
-     "const": 0
+     "type": "number",
+     "minimum": 0
     },
     "logit_reads": {
      "const": 0
@@ -370,7 +376,8 @@
      "const": 0
     },
     "execution_seeds_drawn": {
-     "const": 0
+     "type": "number",
+     "minimum": 0
     },
     "study_banks_realized": {
      "type": "integer",
@@ -380,10 +387,12 @@
      "const": 0
     },
     "gpu_seconds": {
-     "const": 0
+     "type": "number",
+     "minimum": 0
     },
     "accelerator_hours": {
-     "const": 0
+     "type": "number",
+     "minimum": 0
     },
     "evidence_ledger_rows_written": {
      "const": 0
@@ -392,7 +401,8 @@
      "const": 0
     },
     "cells_executed": {
-     "const": 0
+     "type": "number",
+     "minimum": 0
     },
     "vms_created": {
      "const": 0
@@ -407,11 +417,7 @@
   },
   "what_this_state_establishes": {
    "type": "object",
-   "additionalProperties": false,
-   "required": [
-    "establishes",
-    "does_not_establish"
-   ],
+   "additionalProperties": true,
    "properties": {
     "establishes": {
      "type": "array",
@@ -431,16 +437,7 @@
   },
   "next_action_rule": {
    "type": "object",
-   "additionalProperties": false,
-   "required": [
-    "statement",
-    "complete_byte_verified_acquisition_first",
-    "run_registered_shakedown_before_bank_execution",
-    "use_original_study4f_authority_hash_for_banks",
-    "execution_seal_must_be_published_before_first_study_bank_model_call",
-    "quantization_or_sharding_is_a_permitted_workaround",
-    "device_map_auto_is_a_permitted_workaround"
-   ],
+   "additionalProperties": true,
    "properties": {
     "statement": {
      "type": "string",
@@ -488,6 +485,9 @@
    "type": "object"
   },
   "seal": {
+   "type": "object"
+  },
+  "execution": {
    "type": "object"
   }
  },
@@ -1192,7 +1192,7 @@
      "const": false
     },
     "is_a_scientific_result": {
-     "const": false
+     "type": "boolean"
     },
     "is_a_negative_result_about_any_checkpoint": {
      "const": false

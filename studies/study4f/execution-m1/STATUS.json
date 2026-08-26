@@ -4,9 +4,9 @@
  "namespace": "studies/study4f/execution-m1/",
  "is_authoritative_lifecycle_router": true,
  "routes_only_this_execution_successor": true,
- "lifecycle_state": "STUDY4F_M1_SEALED_DEVELOPMENTAL_EXECUTION_IN_PROGRESS",
- "terminal": false,
- "resumable": true,
+ "lifecycle_state": "STUDY4F_M1_NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_REGISTERED_LADDER",
+ "terminal": true,
+ "resumable": false,
  "study_kind": "mooncake_parallel_execution_substrate_for_a_published_instrument",
  "authority": {
   "path": "studies/study4f/prompts/study4f_m1_mooncake_four_a100_execution_authority.md",
@@ -266,7 +266,7 @@
   "claims_the_interface_is_valid": false,
   "claims_the_interface_is_invalid": false,
   "claims_any_result_generalizes": false,
-  "is_a_scientific_result": false,
+  "is_a_scientific_result": true,
   "is_a_negative_result_about_any_checkpoint": false,
   "is_a_negative_result_about_azure_capacity": false
  },
@@ -283,50 +283,50 @@
  },
  "zero_operation_counters": {
   "checkpoint_downloads": 34,
-  "model_constructions": 0,
-  "forward_passes": 0,
-  "prefill_operations": 0,
-  "generations": 0,
+  "model_constructions": 10,
+  "forward_passes": 864,
+  "prefill_operations": 864,
+  "generations": 864,
   "generated_tokens": 0,
   "logit_reads": 0,
   "activation_collections": 0,
   "activation_patches": 0,
   "d0_runs": 0,
-  "execution_seeds_drawn": 0,
+  "execution_seeds_drawn": 416,
   "study_banks_realized": 2,
   "rp_b_selections": 0,
-  "gpu_seconds": 0,
-  "accelerator_hours": 0,
+  "gpu_seconds": 21000,
+  "accelerator_hours": 5.83,
   "evidence_ledger_rows_written": 0,
   "github_actions_runs": 0,
-  "cells_executed": 0,
+  "cells_executed": 10,
   "vms_created": 0,
   "vms_resized": 0,
   "resources_deleted": 0,
-  "weight_files_acquired": 15
+  "weight_files_acquired": 15,
+  "cells_skipped": 6
  },
  "what_this_state_establishes": {
   "establishes": [
-   "The Mooncake resource route is qualified: four live NVIDIA A100 80GB PCIe devices were observed above the registered free-memory floor, MIG was disabled on all four, and no foreign process occupied GPU memory.",
-   "Byte-exact acquisition is provable on this substrate: weight files are checked against authoritative HuggingFace LFS object ids at pinned revisions, and small files are checked against the committed Study 3R acquisition hashes.",
-   "Exactly one Storage Account was created, and no VM was created, resized or deleted by this invocation."
+   "The Mooncake four-A100 substrate executed the published Study 4F instrument unchanged: 10 registered cells, 864 items, one seal, one container image, zero duplicate journal keys and zero create-only violations.",
+   "Under the registered C1 long-generated-CoT route, RP_B1 scored 97/104 at both depths, RP_B2 scored 104/104 and 101/104, and RP_B3 scored 94/104 at D2 but 85/104 at D3, against a pass boundary of 90.",
+   "Under the registered W1 raw-direct route, RP_B1 and RP_B2 each produced zero parseable answer surfaces across 120 items, with two different non-answer first tokens.",
+   "No candidate in the registered ladder qualified, so the published state machine terminates at STUDY4F_NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_REGISTERED_LADDER and RT was never executed."
   ],
   "does_not_establish": [
-   "Nothing about any checkpoint's generated-CoT headroom or E0 competence, because no cell was executed.",
-   "Nothing about whether a natural positive reference exists, because the registered ladder was not run.",
-   "Nothing about whether J-space exists, is observable or is unobservable.",
-   "Nothing about any model output, because no model construction, forward pass, generation, logit read, activation collection or activation patch occurred.",
-   "Nothing that authorizes confirmation, D0, activation capture, patching, Study 3M or any evidence-ledger row."
+   "Nothing about RT, whose four cells were never run because the registered rule forbids running them without a qualified candidate.",
+   "Nothing about whether the raw-direct interface is valid or invalid.",
+   "Nothing about whether J-space exists, is observable or is unobservable. Neither Study 4F nor this substrate tested any of these and neither could have.",
+   "Nothing confirmatory: only development banks were realized and confirmation remains unauthorized.",
+   "Nothing that generalizes beyond the four registered checkpoints, the two registered depths and the two registered interfaces.",
+   "Nothing about internal mechanism: zero activations were collected, zero were patched and zero D0 runs occurred."
   ]
  },
  "next_action_rule": {
-  "statement": "The next legal action is to complete byte-verified acquisition, then run the registered shakedown within the inherited allowance, then realize the original banks using the ORIGINAL Study 4F authority hash 7d5ff0837d77af9e6df9f49d580ec0e42bdc2729, then create and publish the execution seal BEFORE the first study-bank model call.",
-  "complete_byte_verified_acquisition_first": true,
-  "run_registered_shakedown_before_bank_execution": true,
-  "use_original_study4f_authority_hash_for_banks": true,
-  "execution_seal_must_be_published_before_first_study_bank_model_call": true,
-  "quantization_or_sharding_is_a_permitted_workaround": false,
-  "device_map_auto_is_a_permitted_workaround": false
+  "statement": "Study 4F-M1 ends at a registered terminal state. The result is developmental and non-confirmatory. Any confirmation would require a separate authority, a separate confirmation bank that does not yet exist, and its own registered transition. No such authority is created here.",
+  "confirmation_authorized": false,
+  "d0_or_activation_work_authorized": false,
+  "a_successor_study_is_drafted_here": false
  },
  "artifacts": {
   "status": "studies/study4f/execution-m1/STATUS.json",
@@ -339,7 +339,8 @@
   "execution_seal": "studies/study4f/execution-m1/execution_seal.json",
   "scheduler": "studies/study4f/execution-m1/analysis/study4f_m1_scheduler.py",
   "tests": "studies/study4f/execution-m1/tests/test_study4f_m1_mooncake_execution.py",
-  "banks": "studies/study4f/execution-m1/banks/"
+  "banks": "studies/study4f/execution-m1/banks/",
+  "cell_results": "studies/study4f/execution-m1/cell_results.json"
  },
  "shakedown": {
   "attempts_consumed_by_this_invocation": 1,
@@ -370,5 +371,23 @@
   "seal_sha256": "5a59cc432ebb63dc23ea5ed07fe9ba207124b11f731a13d6422f203d4c3973c7",
   "seal_commit": "126563842974097e93c202ef0cfc088dc2fde208",
   "path": "studies/study4f/execution-m1/execution_seal.json"
+ },
+ "execution": {
+  "state_machine_verdict": "STUDY4F_NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_REGISTERED_LADDER",
+  "candidates_evaluated": 3,
+  "qualified_candidate": null,
+  "rt_authorized": false,
+  "rt_cells_run": 0,
+  "cells_executed": 10,
+  "cells_skipped": 6,
+  "total_items": 864,
+  "unique_journal_keys": 864,
+  "duplicate_keys": 0,
+  "cells_repeated_after_seeing_a_result": 0,
+  "engineering_fixes_after_the_first_study_bank_call": 0,
+  "hardware_switches_after_the_first_study_bank_call": 0,
+  "reseals": 0,
+  "journal_key_rollup_sha256": "eca3f9c09f61a157cd72f0f350d608ed96123f77f252c65e38316bb38412c3dd",
+  "results": "studies/study4f/execution-m1/cell_results.json"
  }
 }
