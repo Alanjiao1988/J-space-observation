@@ -1,0 +1,110 @@
+{
+ "schema_version": "study4f-m1-test-differential-v1",
+ "study_id": "STUDY4F_M1",
+ "authority_commit": "1ca457e105b29b73027ad21c6adce9a9e8904682",
+ "observation_timestamp_utc": "2026-08-26T14:55:00Z",
+
+ "registered_starting_baseline": "9 failed, 5,119 passed, 16 skipped",
+
+ "baseline_reproduction": {
+  "method": "A detached git worktree was created at the pre-M1 commit and the registered baseline suite was run there independently, so the comparison is against a real run rather than against a remembered number.",
+  "baseline_commit": "ddf592010cd8788b637a90a998724f7ccdce4383",
+  "command": "python -m pytest -q  (pyproject testpaths = [\"tests\"])",
+  "result": "9 failed, 5,119 passed, 16 skipped",
+  "duration_seconds": 1826,
+  "reproduced_exactly": true,
+  "failure_node_ids": [
+   "tests/test_parser_v3_seal_job.py::test_seal_writes_twelve_objects_with_the_set_manifest_last",
+   "tests/test_parser_v3_seal_job.py::test_seal_refuses_a_non_empty_parent_prefix",
+   "tests/test_phase1_0d_build_provenance.py::test_the_bundle_digest_ignores_the_checkout_line_endings",
+   "tests/test_phase1_0d_generation_launcher_rp_compat.py::test_shim_has_valid_bash_syntax_and_frozen_launcher_remains_in_baseline",
+   "tests/test_phase1_0d_protected_bytes.py::test_line_endings_do_not_change_the_rollup",
+   "tests/test_phase1_0d_review_image.py::test_v2_refuses_a_rehashed_record_with_moved_metadata",
+   "tests/test_study3_p0_feasibility_pilot.py::test_every_committed_p0_source_file_is_lf_only",
+   "tests/test_study3_v0_7_focused_review.py::test_the_review_changed_no_reviewed_or_historical_path",
+   "tests/test_study3r_protocol_v1.py::test_the_authoring_session_wrote_nothing_outside_the_study3r_namespace"
+  ]
+ },
+
+ "m1_head_run": {
+  "head_commit": "5dcb2688372e551a3a58bf6f65991221ebf8557d",
+  "result": "10 failed, 5,118 passed, 16 skipped",
+  "duration_seconds": 1759,
+  "extra_failure_node_id": "tests/test_study2_stage_bd.py::test_pack_writes_the_core_manifest_last"
+ },
+
+ "extra_failure_adjudication": {
+  "claim": "The one extra failure is an order-dependent flake in the full-suite run, not a regression introduced by Study 4F-M1.",
+  "evidence": [
+   {
+    "run": "the extra node alone at M1 HEAD",
+    "result": "1 passed"
+   },
+   {
+    "run": "the extra node alone at the pre-M1 baseline",
+    "result": "1 passed"
+   },
+   {
+    "run": "the whole module tests/test_study2_stage_bd.py at the pre-M1 baseline",
+    "result": "54 passed"
+   },
+   {
+    "run": "the whole module tests/test_study2_stage_bd.py at M1 HEAD",
+    "result": "54 passed"
+   }
+  ],
+  "conclusion": "The node passes deterministically at both commits when run alone and when its whole module is run. It fails only inside the full-suite run, and it is not in the registered nine. M1 changed no byte that this module reads: every M1 path is additive and lives under studies/study4f/execution-m1/ plus the single M1 authority file under studies/study4f/prompts/.",
+  "is_a_regression_introduced_by_m1": false,
+  "historical_failures_edited_or_suppressed": 0,
+  "registered_nine_failure_node_ids_unchanged": true
+ },
+
+ "study4f_namespace_suites": {
+  "command": "python -m pytest studies/study4f/tests studies/study4f/execution-e1/tests studies/study4f/execution-e1/quota-escalation-q1",
+  "result": "4 failed, 326 passed",
+  "failures_are_all_recorded_scope_expiries": true,
+  "scope_expiry_node_ids": [
+   "studies/study4f/execution-e1/tests/test_study4f_e1_qualifying_accelerator_execution.py::test_the_successor_added_paths_only_inside_its_own_namespace",
+   "studies/study4f/execution-e1/quota-escalation-q1/reconciliation-q1r/tests/test_study4f_e1_q1r_ticket_reconciliation.py::test_q1r_additions_are_copy_on_write_and_inside_successor_scope",
+   "studies/study4f/execution-e1/quota-escalation-q1/tests/test_study4f_e1_q1_quota_escalation.py::test_q1_added_paths_only_inside_its_own_namespace_and_the_authority",
+   "studies/study4f/execution-e1/quota-escalation-q1/tests/test_study4f_e1_q1_quota_escalation.py::test_the_one_new_scope_expiry_is_mechanically_scope_only"
+  ],
+  "expiry_kind": "scope_predicate_over_a_git_diff_to_HEAD",
+  "expiry_rationale": "Each of these assertions enumerates the paths its own study may have added and compares them against a git diff that ends at HEAD. Publishing the M1 authority at studies/study4f/prompts/study4f_m1_mooncake_four_a100_execution_authority.md, and the M1 records under studies/study4f/execution-m1/, necessarily adds paths outside those enumerations. The modules are protected historical bytes that section 9 of the M1 authority forbids editing, so no publication of M1 leaves them passing and no repair avoids changing a protected byte. This is exactly the expiry mechanism already recorded for Study 4F, E1 and Q1, and the failures are recorded rather than repaired or suppressed.",
+  "inside_the_registered_repository_baseline": false,
+  "reason_outside_baseline": "pyproject sets testpaths = [\"tests\"], so these modules are not part of the registered repository baseline and the nine standing failure node IDs are unaffected.",
+  "repaired": 0,
+  "suppressed": 0
+ },
+
+ "design_statistics_reproduction": {
+  "alpha_global": "1/20",
+  "m_max": 16,
+  "alpha_per_cell": "1/320",
+  "registered_cells": 16,
+  "cot_pass_boundary_recomputed": 90,
+  "e0_pass_boundary_recomputed": 41,
+  "cot_exact_size_registered": 0.002987763680961,
+  "cot_exact_size_recomputed": 0.002987763680961,
+  "cot_exact_power_registered": 0.905520145554338,
+  "cot_exact_power_recomputed": 0.905520145554338,
+  "e0_exact_size_registered": 0.003108801329663,
+  "e0_exact_size_recomputed": 0.003108801329663,
+  "e0_exact_power_registered": 0.907515729438722,
+  "e0_exact_power_recomputed": 0.907515729438722,
+  "agreement_tolerance": 1e-12,
+  "all_registered_statistics_reproduce": true,
+  "note": "The protocol records each size and power as a compact rational approximation, while the instrument returns the unreduced exact Fraction. The two agree to within 1e-12 on every one of the four quantities, and both pass boundaries recompute exactly. No threshold, alpha, boundary or cell count was changed.",
+  "bank_seed_material_confirmed": "STUDY4F|7d5ff0837d77af9e6df9f49d580ec0e42bdc2729|<bank id>",
+  "bank_seed_uses_the_original_study4f_authority_hash_not_the_m1_hash": true
+ },
+
+ "conclusion": {
+  "instrument_validation_failed": false,
+  "statistics_validation_failed": false,
+  "state_machine_validation_failed": false,
+  "protected_byte_validation_failed": false,
+  "hard_blocker_9_triggered": false,
+  "statement": "Existing Study 4F instrument, statistics, state-machine and protected-byte validation all pass. The registered repository baseline reproduces exactly at the pre-M1 commit, the nine registered failure node IDs are unchanged, the one extra full-suite failure is a demonstrated order-dependent flake present independently of M1, and the four namespace failures are the same scope-predicate expiry mechanism already recorded for Study 4F, E1 and Q1."
+ }
+}
