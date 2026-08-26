@@ -211,12 +211,19 @@
    "price_source": "official_azure_cn_page_unparseable",
    "price_source_url": "https://www.azure.cn/pricing/details/storage/blobs/index.html",
    "price_source_note": "The official blob pricing page returned no parseable rate table at retrieval time. No number is invented.",
-   "capacity_used_gb": 0.0006,
-   "blobs_written": 19,
-   "estimated_accrued_cost": 0.0,
-   "continuing_cost_rate": "negligible at 0.0006 GB; grows only if more is uploaded",
+   "capacity_used_gb": 109.0,
+   "blobs_written": 47,
+   "estimated_accrued_cost": "UNRESOLVED",
+   "continuing_cost_rate": "109.00 GiB of Hot LRS capacity now bills continuously. The unit price is CONTRACT_UNIT_PRICE_UNAVAILABLE because the official azure.cn blob pricing page returned no parseable rate table, so no number is invented. This is a small charge relative to four running A100s, and it is what makes deallocating the GPU VM safe.",
    "deallocation_stops_compute_charge": false,
-   "retention_continues_storage_or_ip_charge": true
+   "retention_continues_storage_or_ip_charge": true,
+   "contents": {
+    "models": "34 checkpoint files, content-addressed, 113,881,744,368 bytes",
+    "oci": "frozen execution image archive + manifest, 3,183,944,622 bytes",
+    "runs": "10 per-cell item journals + execution logs",
+    "logs": "shakedown report + four device canaries",
+    "seals": "acquisition manifest, acquisition report, model blob index"
+   }
   },
   {
    "safe_name": "a100-vnet / a100-nsg / a100-vmVMNic / cpuserver-vnet / cpuserver-nsg / cpuserver422",
@@ -249,7 +256,7 @@
  "egress": {
   "internet_egress_observed_gb": 0,
   "cross_region_egress_observed_gb": 0,
-  "note": "Model bytes were pulled INTO chinaeast3 from a public source, which is inbound and unbilled. No blob upload and no cross-region copy had occurred at observation time, so no egress meter was triggered. A deliberate topology choice avoided a cross-region transfer: the GPU host in chinaeast3 fetched checkpoints directly rather than staging them through the chinanorth3 CPU host. Final check: 19 blobs totalling 611,828 bytes were written into chinaeast3 from the same-region GPU host, so no cross-region or internet egress meter was triggered by this invocation.",
+  "note": "Model bytes were pulled INTO chinaeast3 from a public source, which is inbound and unbilled. No blob upload and no cross-region copy had occurred at observation time, so no egress meter was triggered. A deliberate topology choice avoided a cross-region transfer: the GPU host in chinaeast3 fetched checkpoints directly rather than staging them through the chinanorth3 CPU host. Final check: 19 blobs totalling 611,828 bytes were written into chinaeast3 from the same-region GPU host, so no cross-region or internet egress meter was triggered by this invocation. Final: 47 blobs totalling 117,045,201,262 bytes were written from the GPU host in chinaeast3 into a storage account in chinaeast3, so the upload is same-region and triggers no egress meter.",
   "unit_price": "CONTRACT_UNIT_PRICE_UNAVAILABLE"
  },
  "marketplace_charges": {
@@ -262,7 +269,8 @@
   "resolved_invocation_cost_estimate_cny_low": 70.87,
   "resolved_invocation_cost_estimate_cny_high": 74.9,
   "unresolved_components": [
-   "a100-vm compute for 10.75 hours -- the dominant cost, CONTRACT_UNIT_PRICE_UNAVAILABLE"
+   "a100-vm compute for the running period -- the dominant cost, CONTRACT_UNIT_PRICE_UNAVAILABLE",
+   "blob capacity for 109.00 GiB Hot LRS -- CONTRACT_UNIT_PRICE_UNAVAILABLE"
   ],
   "total_invocation_cost_estimate": "UNRESOLVED_BECAUSE_THE_DOMINANT_METER_HAS_NO_RESOLVABLE_PRICE",
   "continuing_cost_per_hour_resolved_portion_cny": 7.05,
@@ -274,7 +282,8 @@
    "both managed disks",
    "both public IPs",
    "blob capacity"
-  ]
+  ],
+  "storage_now_makes_deallocation_safe": "Every verified checkpoint byte and the frozen execution image now live in Blob, so deallocating a100-vm no longer destroys unrecoverable work. Before this upload, deallocation would have destroyed 113.9 GB of verified bytes."
  },
  "actions_that_stop_each_continuing_charge_without_deleting_anything": [
   {
@@ -327,8 +336,8 @@
   "final_power_state_a100_vm": "running",
   "final_power_state_cpuserver": "running",
   "both_vms_left_running_as_required": true,
-  "blobs_written": 19,
-  "blob_bytes": 611828
+  "blobs_written": 47,
+  "blob_bytes": 117045201262
  },
  "is_final": true
 }

@@ -197,7 +197,15 @@
   "managed_identity_data_plane_verified": true,
   "evidence_blobs_written": 7,
   "sas_tokens_issued": 0,
-  "keys_committed": false
+  "keys_committed": false,
+  "blobs_written": 47,
+  "blob_bytes": 117045201262,
+  "models_container_populated": true,
+  "oci_container_populated": true,
+  "content_addressed_scheme": "models/sha256/<aa>/<full sha256>",
+  "content_address_round_trip_verified": true,
+  "oci_archive_round_trip_verified": true,
+  "deallocating_the_gpu_vm_no_longer_destroys_verified_bytes": true
  },
  "nvme": {
   "devices": 4,
@@ -341,7 +349,9 @@
   "tests": "studies/study4f/execution-m1/tests/test_study4f_m1_mooncake_execution.py",
   "banks": "studies/study4f/execution-m1/banks/",
   "cell_results": "studies/study4f/execution-m1/cell_results.json",
-  "final_disclosure": "studies/study4f/execution-m1/M1_FINAL_DISCLOSURE.md"
+  "final_disclosure": "studies/study4f/execution-m1/M1_FINAL_DISCLOSURE.md",
+  "oci_manifest": "studies/study4f/execution-m1/oci_manifest.json",
+  "model_blob_index": "studies/study4f/execution-m1/model_blob_index.json"
  },
  "shakedown": {
   "attempts_consumed_by_this_invocation": 1,

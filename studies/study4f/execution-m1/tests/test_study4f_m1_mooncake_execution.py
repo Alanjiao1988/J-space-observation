@@ -702,6 +702,68 @@ def test_execution_counters_moved_but_the_prohibited_ones_stayed_at_zero():
         assert counters[key] == 0, key
 
 
+def test_the_oci_archive_is_frozen_and_round_trip_verified():
+    oci = _load(M1 / "oci_manifest.json")
+    assert oci["base_image_digest"].startswith("pytorch/pytorch@sha256:")
+    assert oci["image_id"].startswith("sha256:")
+    assert len(oci["archive"]["sha256"]) == 64
+    assert len(oci["compressed"]["sha256"]) == 64
+    assert oci["compressed"]["embedded_image_altered_by_compression"] is False
+    assert oci["round_trip_verification"]["byte_identical"] is True
+    assert (
+        oci["round_trip_verification"]["downloaded_sha256"]
+        == oci["compressed"]["sha256"]
+    )
+    assert oci["no_acr_was_created"] is True
+    assert oci["blob"]["sas_or_key_used"] is False
+    assert oci["is_the_image_used_for_every_executed_cell"] is True
+    assert oci["distinct_container_images_across_all_864_journalled_items"] == 1
+
+
+def test_the_oci_manifest_binds_the_same_image_as_the_seal():
+    oci = _load(M1 / "oci_manifest.json")
+    seal = _load(M1 / "execution_seal.json")
+    assert oci["image_id"] == seal["container"]["execution_image_id"]
+    assert oci["base_image_digest"] == seal["container"]["base_digest"]
+    assert oci["seal_sha256"] == seal["seal_sha256"]
+    for key, value in oci["pinned_versions"].items():
+        assert seal["container"][key] == value, key
+
+
+def test_every_checkpoint_byte_is_content_addressed_in_blob():
+    index = _load(M1 / "model_blob_index.json")
+    manifest = _load(M1 / "acquisition_manifest.json")
+    assert index["total_files"] == manifest["total_files"] == 34
+    assert index["total_bytes"] == manifest["total_bytes"] == 113881744368
+    for name, cp in index["checkpoints"].items():
+        assert cp["revision"] == manifest["checkpoints"][name]["revision"]
+        for entry in cp["files"]:
+            digest = entry["digest"]
+            assert len(digest) == 64, entry["path"]
+            # the blob name IS the proof of what the blob contains
+            assert entry["blob"] == f"models/sha256/{digest[:2]}/{digest}"
+
+
+def test_the_model_blob_index_covers_every_acquired_file():
+    index = _load(M1 / "model_blob_index.json")
+    manifest = _load(M1 / "acquisition_manifest.json")
+    for name, cp in manifest["checkpoints"].items():
+        indexed = {e["path"] for e in index["checkpoints"][name]["files"]}
+        acquired = {f["path"] for f in cp["files"]}
+        assert indexed == acquired, (name, acquired - indexed)
+
+
+def test_storage_makes_gpu_deallocation_non_destructive():
+    storage = _load(STATUS)["storage"]
+    assert storage["models_container_populated"] is True
+    assert storage["oci_container_populated"] is True
+    assert storage["content_address_round_trip_verified"] is True
+    assert storage["oci_archive_round_trip_verified"] is True
+    assert storage["deallocating_the_gpu_vm_no_longer_destroys_verified_bytes"] is True
+    assert storage["sas_tokens_issued"] == 0
+    assert storage["keys_committed"] is False
+
+
 def test_the_authority_exists_and_forbids_vm_creation():
     text = AUTHORITY.read_text(encoding="utf-8")
     assert "Do not create any virtual machine." in text

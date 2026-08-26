@@ -1,0 +1,59 @@
+{
+ "schema_version": "study4f-m1-oci-manifest-v1",
+ "study_id": "STUDY4F_M1",
+ "image_tag": "study4f-m1:shakedown",
+ "image_id": "sha256:b3635aecac546de0559ccc444048c0716aef1c98a63fb522761d543bd21dd8a5",
+ "base_image_digest": "pytorch/pytorch@sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
+ "base_image_is_the_one_registered_in_the_repository_dockerfile": true,
+ "platform": "linux/amd64",
+ "built_on": "the GPU execution host, chinaeast3",
+ "no_acr_was_created": true,
+ "archive": {
+  "name": "study4f-m1-execution.tar",
+  "sha256": "afd1987c889b6f0ea625486463b013c648abc2af17eba061a9d766c3c623f501",
+  "bytes": 3192503296,
+  "format": "docker save archive"
+ },
+ "compressed": {
+  "name": "study4f-m1-execution.tar.gz",
+  "sha256": "577f52f98861ea7a8d77c6face233cb7a7390d2d282f87ccd3357422d895ab6e",
+  "bytes": 3183943592,
+  "compression": "gzip -n -9",
+  "embedded_image_altered_by_compression": false,
+  "gzip_n_flag_rationale": "-n omits the filename and timestamp from the gzip header so the compression step is deterministic."
+ },
+ "blob": {
+  "container": "oci",
+  "path": "oci/study4f-m1-execution.tar.gz",
+  "upload_method": "staged block upload, 48 blocks of 64 MiB, then Put Block List",
+  "upload_auth": "system-assigned managed identity, audience https://storage.azure.com/",
+  "sas_or_key_used": false
+ },
+ "round_trip_verification": {
+  "performed": true,
+  "method": "The blob was downloaded back from Azure Blob and re-hashed on the execution host.",
+  "downloaded_sha256": "577f52f98861ea7a8d77c6face233cb7a7390d2d282f87ccd3357422d895ab6e",
+  "downloaded_bytes": 3183943592,
+  "byte_identical": true
+ },
+ "pinned_versions": {
+  "python": "3.11.9",
+  "torch": "2.4.1+cu121",
+  "cuda": "12.1",
+  "transformers": "4.44.2",
+  "tokenizers": "0.19.1",
+  "safetensors": "0.4.5",
+  "accelerate": "0.34.2"
+ },
+ "is_the_image_used_for_every_executed_cell": true,
+ "distinct_container_images_across_all_864_journalled_items": 1,
+ "seal_sha256": "5a59cc432ebb63dc23ea5ed07fe9ba207124b11f731a13d6422f203d4c3973c7",
+ "what_this_establishes": [
+  "The exact container that executed all ten cells is preserved as a frozen archive with a recorded SHA-256, independently of the ephemeral NVMe it was built on.",
+  "The archive survived a full round trip through Azure Blob byte-identically, so the storage transport boundary preserves bytes.",
+  "The base image is pinned by the same digest registered in the repository Dockerfile, so a registry mirror could not have substituted a different image."
+ ],
+ "what_this_does_not_establish": [
+  "Nothing scientific. A container archive is an engineering artifact and is not evidence about any checkpoint, about any interface or about J-space."
+ ]
+}
