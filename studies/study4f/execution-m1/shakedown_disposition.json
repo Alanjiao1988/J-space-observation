@@ -1,0 +1,121 @@
+{
+ "schema_version": "study4f-m1-shakedown-disposition-v1",
+ "study_id": "STUDY4F_M1",
+ "authority": "studies/study4f/prompts/study4f_m1_mooncake_four_a100_execution_authority.md",
+ "authority_commit": "1ca457e105b29b73027ad21c6adce9a9e8904682",
+ "observation_timestamp_utc": "2026-08-26T15:35:00Z",
+
+ "allowance": {
+  "inherited_from": "studies/study4f/prompts/study4f_e1_qualifying_accelerator_execution_authority.md section 7",
+  "attempts_permitted_before_this_invocation": 2,
+  "accelerator_hours_permitted": 6,
+  "complete_attempts_consumed_by_this_invocation": 1,
+  "attempts_remaining": 1,
+  "accelerator_hours_consumed": 0.0011,
+  "accelerator_hours_remaining": 5.9989,
+  "synthetic_non_study_fixtures_only": true,
+  "d2_or_d3_banks_realized_during_shakedown": false,
+  "study_task_outputs_inspected_during_shakedown": 0
+ },
+
+ "accelerator_accounting": {
+  "note": "The three quantities are reported separately and are never substituted for one another.",
+  "vm_wall_clock_hours": 7.4,
+  "allocated_gpu_hours": 29.6,
+  "actively_used_gpu_hours": 0.0011,
+  "actively_used_gpu_seconds": 4.0,
+  "allocated_gpu_hours_definition": "VM wall-clock hours multiplied by the four allocated A100 devices, whether or not a device was executing.",
+  "actively_used_definition": "Measured in-container time from checkpoint load to unload during the shakedown attempt plus the four canary runs."
+ },
+
+ "attempt": {
+  "attempt_index": 1,
+  "checkpoint_role": "RT",
+  "checkpoint_repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+  "immutable_revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+  "device": "one isolated A100 80GB PCIe, CUDA_VISIBLE_DEVICES=0",
+  "container_image_id": "sha256:b3635aecac546de0559ccc444048c0716aef1c98a63fb522761d543bd21dd8a5",
+  "container_base_digest": "pytorch/pytorch@sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
+  "result": "PASS",
+  "all_checks_passed": true,
+  "checks": {
+   "exactly_one_visible_device": {"pass": true, "detail": "device_count=1"},
+   "gpu_is_a100_80gb": {"pass": true, "detail": "NVIDIA A100 80GB PCIe"},
+   "free_memory_above_floor": {"pass": true, "detail": "free=84648263680 floor=69502926848"},
+   "bf16_supported": {"pass": true},
+   "deterministic_algorithms": {"pass": true},
+   "renderer_parser_io": {"pass": true},
+   "w1_surface_sha256_stable": {"pass": true, "detail": "9dab5a865967308bc43b219f5b44476cc610fb0b310dd6f528dd3fd0934a4c95"},
+   "seed_is_deterministic": {"pass": true},
+   "seed_varies_with_depth": {"pass": true},
+   "tokenizer_loads_without_trust_remote_code": {"pass": true, "detail": "vocab=151665"},
+   "weights_are_bfloat16": {"pass": true, "detail": "{'torch.bfloat16'}"},
+   "model_on_exactly_one_device": {"pass": true, "detail": "{'cuda:0'}"},
+   "unquantized_fit_without_offload": {"pass": true, "detail": "weights_resident_bytes~6158155776 load_s=3.3"},
+   "forward_pass_on_synthetic_fixture": {"pass": true, "detail": "generated_token_ids=[151649, 271]"},
+   "create_only_logging_and_retrieval": {"pass": true},
+   "unload_releases_memory": {"pass": true, "detail": "free_after_unload=84524531712"}
+  }
+ },
+
+ "w1_surface_provenance_check": {
+  "recomputed_on_the_execution_substrate": "9dab5a865967308bc43b219f5b44476cc610fb0b310dd6f528dd3fd0934a4c95",
+  "registered_in_the_protocol": "9dab5a865967308bc43b219f5b44476cc610fb0b310dd6f528dd3fd0934a4c95",
+  "match": true,
+  "note": "The frozen W1_RAW_DIRECT rendered surface hash registered in studies/study4f/protocol/study4f_protocol_v1.json reproduces byte-exactly on the Mooncake execution substrate."
+ },
+
+ "device_equivalence_canary": {
+  "is_scientific_evidence": false,
+  "purpose": "engineering_device_equivalence_qualification_only",
+  "enters_the_evidence_ledger": false,
+  "fixture": "synthetic non-study item, is_scientific_item=false",
+  "decoding": "frozen E0 contract, do_sample=false, max_new_tokens=2, num_beams=1",
+  "devices_tested": 4,
+  "generated_token_ids_per_device": {
+   "gpu0": [151649, 271],
+   "gpu1": [151649, 271],
+   "gpu2": [151649, 271],
+   "gpu3": [151649, 271]
+  },
+  "all_four_devices_byte_equal": true,
+  "deterministic_algorithms_enabled_on_every_device": true,
+  "cublas_workspace_config": ":4096:8",
+  "free_bytes_per_device_during_canary": 78799306752
+ },
+
+ "engineering_repairs_applied": [
+  {
+   "defect": "Two synthetic shakedown fixtures were authored with an option list whose registered label did not carry the derivable value, so the instrument correctly rejected them with Study4FItemIneligibleError.",
+   "whitelisted_category": "serialization / fixture authoring",
+   "scientific_bytes_changed": 0,
+   "checkpoint_revision_dtype_task_bank_prompt_parser_decoding_threshold_alpha_boundary_or_transition_changed": false,
+   "note": "The defect was in this invocation's own synthetic fixture, not in the instrument. The instrument's rejection was correct behaviour and is itself evidence that eligibility checking works."
+  },
+  {
+   "defect": "torch.use_deterministic_algorithms(True) emitted a CuBLAS warning showing determinism was not actually in force for matmul on CUDA >= 10.2.",
+   "whitelisted_category": "environment",
+   "repair": "CUBLAS_WORKSPACE_CONFIG=:4096:8 is now set in every worker container.",
+   "scientific_bytes_changed": 0,
+   "note": "This is an environment variable, not a decoding-contract change. It makes the already registered determinism requirement actually effective."
+  }
+ ],
+
+ "disposition": "STUDY4F_M1_SHAKEDOWN_PASSED",
+ "study_bank_execution_authorized_by_this_record": false,
+ "next_gate": "Realize the original D2 and D3 banks using the ORIGINAL Study 4F authority hash 7d5ff0837d77af9e6df9f49d580ec0e42bdc2729, verify every bank invariant and hash, then create and publish the execution seal. Developmental execution authorization remains false until that sealed commit is published.",
+
+ "what_this_establishes": [
+  "One complete shakedown attempt passed on one isolated A100 80GB with the registered unquantized BF16 contract, no offload and no device_map.",
+  "The frozen W1_RAW_DIRECT surface hash reproduces byte-exactly on this substrate.",
+  "Renderer, parser, scorer and seed derivation behave correctly on synthetic non-study fixtures, including that an unparseable response is classified UNPARSEABLE rather than dropped.",
+  "All four A100 devices produce byte-identical output under the frozen decoding contract, so worker placement is not a source of variation."
+ ],
+ "what_this_does_not_establish": [
+  "Nothing about whether any registered checkpoint has generated-CoT task headroom on D2 or D3, because no study-bank cell was executed.",
+  "Nothing about whether any registered checkpoint shows zero-generated-reasoning-token expressed competence, because no E0 study cell was executed.",
+  "Nothing about whether a natural positive-reference candidate exists, because the ladder was never run.",
+  "Nothing about whether J-space exists, is observable or is unobservable.",
+  "The device-equivalence canary is an engineering qualification and is not evidence about any checkpoint's behaviour."
+ ]
+}
