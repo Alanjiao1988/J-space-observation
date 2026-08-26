@@ -1,0 +1,2921 @@
+{
+ "authority_commit": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729",
+ "bank_id": "D3_DEVELOPMENT_BANK",
+ "items": [
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((5 * 7) + 8) * 8).\nA) 345\nB) 344\nC) 351\nD) 341",
+   "item_key": "8bf36e8a7f75c048761e307d48d0004422b66bfbc8c05f7e8cf9d1b34ab0da83",
+   "operands": [
+    5,
+    7,
+    8,
+    8
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    345,
+    344,
+    351,
+    341
+   ],
+   "stem": "Compute (((5 * 7) + 8) * 8).",
+   "value": 344
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((7 * 4) - 1) - 9).\nA) 18\nB) 23\nC) 21\nD) 25",
+   "item_key": "cd6e56c28bd6fb97e3f22d72be05e1d58ef439ee951cd2c7cddc506ca2f9d66e",
+   "operands": [
+    7,
+    4,
+    1,
+    9
+   ],
+   "operations": [
+    "MUL",
+    "SUB",
+    "SUB"
+   ],
+   "options": [
+    18,
+    23,
+    21,
+    25
+   ],
+   "stem": "Compute (((7 * 4) - 1) - 9).",
+   "value": 18
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((7 * 5) * 7) - 2).\nA) 239\nB) 243\nC) 249\nD) 235",
+   "item_key": "bda33a794f98cdacab917acced1a2899219fd2a829f75627a90b841581121cc8",
+   "operands": [
+    7,
+    5,
+    7,
+    2
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "SUB"
+   ],
+   "options": [
+    239,
+    243,
+    249,
+    235
+   ],
+   "stem": "Compute (((7 * 5) * 7) - 2).",
+   "value": 243
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((3 + 3) * 9) + 4).\nA) 65\nB) 55\nC) 58\nD) 64",
+   "item_key": "bdfd4286371018923112b0760b91a76e16309c910d6caaae3f9606dc0634bb2d",
+   "operands": [
+    3,
+    3,
+    9,
+    4
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    65,
+    55,
+    58,
+    64
+   ],
+   "stem": "Compute (((3 + 3) * 9) + 4).",
+   "value": 58
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((9 - 5) + 5) + 4).\nA) 6\nB) 17\nC) 13\nD) 18",
+   "item_key": "323d1a1e294595bdcb61d3ce6c3120117e920e361feaf8797e71e7c9474130fe",
+   "operands": [
+    9,
+    5,
+    5,
+    4
+   ],
+   "operations": [
+    "SUB",
+    "ADD",
+    "ADD"
+   ],
+   "options": [
+    6,
+    17,
+    13,
+    18
+   ],
+   "stem": "Compute (((9 - 5) + 5) + 4).",
+   "value": 13
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((5 + 3) * 8) - 5).\nA) 59\nB) 54\nC) 61\nD) 65",
+   "item_key": "72779a17cbc5668be5b807774f8a997371f2c66a8c8c5463ae37d95b64f41860",
+   "operands": [
+    5,
+    3,
+    8,
+    5
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "SUB"
+   ],
+   "options": [
+    59,
+    54,
+    61,
+    65
+   ],
+   "stem": "Compute (((5 + 3) * 8) - 5).",
+   "value": 59
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 * 3) * 6) + 0).\nA) 149\nB) 144\nC) 142\nD) 151",
+   "item_key": "f0d974cfe23bc3ae2f32ce3e24f2fc8ba89c34b9d5d05d9dd4a87b380d3cb31a",
+   "operands": [
+    8,
+    3,
+    6,
+    0
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    149,
+    144,
+    142,
+    151
+   ],
+   "stem": "Compute (((8 * 3) * 6) + 0).",
+   "value": 144
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 * 1) + 8) - 1).\nA) 17\nB) 16\nC) 11\nD) 19",
+   "item_key": "cf40a33acab09e0ae9b87ee414a81ee66a87cfcf0022ff2d68c73c617d261d03",
+   "operands": [
+    4,
+    1,
+    8,
+    1
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    17,
+    16,
+    11,
+    19
+   ],
+   "stem": "Compute (((4 * 1) + 8) - 1).",
+   "value": 11
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((5 + 9) - 3) * 4).\nA) 36\nB) 44\nC) 47\nD) 37",
+   "item_key": "0f82e0158f1feed5bede7637f7eeb07ff2bb5d89bd1f398dc7abd72b50b7b3d0",
+   "operands": [
+    5,
+    9,
+    3,
+    4
+   ],
+   "operations": [
+    "ADD",
+    "SUB",
+    "MUL"
+   ],
+   "options": [
+    36,
+    44,
+    47,
+    37
+   ],
+   "stem": "Compute (((5 + 9) - 3) * 4).",
+   "value": 44
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((3 + 3) + 0) - 5).\nA) 4\nB) 1\nC) 6\nD) 9",
+   "item_key": "ecb53172035d27361211bd68767b2812bd650f66b08e66ca80deff95730dcd15",
+   "operands": [
+    3,
+    3,
+    0,
+    5
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    4,
+    1,
+    6,
+    9
+   ],
+   "stem": "Compute (((3 + 3) + 0) - 5).",
+   "value": 1
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((7 * 4) - 9) - 4).\nA) 22\nB) 15\nC) 20\nD) 21",
+   "item_key": "39cca68405cd6f644963e47dec1c0de7e805e14be0afdcc21c01e0cfc5b257ca",
+   "operands": [
+    7,
+    4,
+    9,
+    4
+   ],
+   "operations": [
+    "MUL",
+    "SUB",
+    "SUB"
+   ],
+   "options": [
+    22,
+    15,
+    20,
+    21
+   ],
+   "stem": "Compute (((7 * 4) - 9) - 4).",
+   "value": 15
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 * 3) * 3) + 6).\nA) 79\nB) 74\nC) 88\nD) 78",
+   "item_key": "67a7d943c7f444bb1cbb512594a5d748dca6365dd0ebb1d534186d5bc1d42601",
+   "operands": [
+    8,
+    3,
+    3,
+    6
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    79,
+    74,
+    88,
+    78
+   ],
+   "stem": "Compute (((8 * 3) * 3) + 6).",
+   "value": 78
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 + 4) + 4) - 8).\nA) 15\nB) 13\nC) 6\nD) 9",
+   "item_key": "20eaae5a90ab0d5e29fbb9ebf6df8c6256532addfcc5a9420c52ee728a75be03",
+   "operands": [
+    6,
+    4,
+    4,
+    8
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    15,
+    13,
+    6,
+    9
+   ],
+   "stem": "Compute (((6 + 4) + 4) - 8).",
+   "value": 6
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((3 + 6) + 1) - 9).\nA) 1\nB) 9\nC) 11\nD) 5",
+   "item_key": "9c284ca5f3eb9dbcae6f9f8944c7b7b428e86b25498df90d6e2d9552825ea386",
+   "operands": [
+    3,
+    6,
+    1,
+    9
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    1,
+    9,
+    11,
+    5
+   ],
+   "stem": "Compute (((3 + 6) + 1) - 9).",
+   "value": 1
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 - 5) + 7) - 0).\nA) 10\nB) 8\nC) 12\nD) 1",
+   "item_key": "ccbb9e501ed375ab5548b85e0da8bb6226610746e7bc29a4a509fb4c1bb69297",
+   "operands": [
+    6,
+    5,
+    7,
+    0
+   ],
+   "operations": [
+    "SUB",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    10,
+    8,
+    12,
+    1
+   ],
+   "stem": "Compute (((6 - 5) + 7) - 0).",
+   "value": 8
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 * 2) - 4) + 3).\nA) 16\nB) 7\nC) 12\nD) 4",
+   "item_key": "65c2f0ca150a896a54210e189c063cf860d708bcd9db705c481350305747a8f7",
+   "operands": [
+    4,
+    2,
+    4,
+    3
+   ],
+   "operations": [
+    "MUL",
+    "SUB",
+    "ADD"
+   ],
+   "options": [
+    16,
+    7,
+    12,
+    4
+   ],
+   "stem": "Compute (((4 * 2) - 4) + 3).",
+   "value": 7
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 * 9) + 2) * 5).\nA) 290\nB) 288\nC) 280\nD) 273",
+   "item_key": "3919778dec85e8cd999d9e8db3b8a94bc9ff189c1c46f6d57e4924aafc716fde",
+   "operands": [
+    6,
+    9,
+    2,
+    5
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    290,
+    288,
+    280,
+    273
+   ],
+   "stem": "Compute (((6 * 9) + 2) * 5).",
+   "value": 280
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 * 1) - 4) + 2).\nA) 4\nB) 14\nC) 13\nD) 1",
+   "item_key": "c758fabeec97e055cf8e128d75b46a2ab42172d451e9d046ce877ced4a57930d",
+   "operands": [
+    6,
+    1,
+    4,
+    2
+   ],
+   "operations": [
+    "MUL",
+    "SUB",
+    "ADD"
+   ],
+   "options": [
+    4,
+    14,
+    13,
+    1
+   ],
+   "stem": "Compute (((6 * 1) - 4) + 2).",
+   "value": 4
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((7 + 4) + 9) + 4).\nA) 30\nB) 19\nC) 24\nD) 25",
+   "item_key": "b7c20df574b9b3b222e53953d62eb380d42c50aa5145e1238a7e17e6fa9ae74d",
+   "operands": [
+    7,
+    4,
+    9,
+    4
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "ADD"
+   ],
+   "options": [
+    30,
+    19,
+    24,
+    25
+   ],
+   "stem": "Compute (((7 + 4) + 9) + 4).",
+   "value": 24
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 + 1) * 4) * 0).\nA) 2\nB) 1\nC) 7\nD) 0",
+   "item_key": "e8d17ca622ca5727599dd6ffca5a899fabf69dd5152d16f50289b581d0882377",
+   "operands": [
+    4,
+    1,
+    4,
+    0
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    2,
+    1,
+    7,
+    0
+   ],
+   "stem": "Compute (((4 + 1) * 4) * 0).",
+   "value": 0
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 * 8) * 1) * 4).\nA) 191\nB) 199\nC) 184\nD) 192",
+   "item_key": "c02f6dd6c3b8e55f42b33221f9577096415390dcaaf0c560af93de78f92420f9",
+   "operands": [
+    6,
+    8,
+    1,
+    4
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    191,
+    199,
+    184,
+    192
+   ],
+   "stem": "Compute (((6 * 8) * 1) * 4).",
+   "value": 192
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 + 4) * 4) + 2).\nA) 42\nB) 36\nC) 44\nD) 32",
+   "item_key": "aa56b39a12bd9f39f98b8ed5b85bd3a146147c4121b13584583374870da1804a",
+   "operands": [
+    6,
+    4,
+    4,
+    2
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    42,
+    36,
+    44,
+    32
+   ],
+   "stem": "Compute (((6 + 4) * 4) + 2).",
+   "value": 42
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((1 * 8) + 7) * 7).\nA) 105\nB) 104\nC) 110\nD) 115",
+   "item_key": "b2b737ba93fe43afef8c38def0e68da10da487506977dec504922f462fb6603c",
+   "operands": [
+    1,
+    8,
+    7,
+    7
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    105,
+    104,
+    110,
+    115
+   ],
+   "stem": "Compute (((1 * 8) + 7) * 7).",
+   "value": 105
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((1 - 0) * 7) - 3).\nA) 14\nB) 8\nC) 10\nD) 4",
+   "item_key": "a9c40be60ad4a07044e87dfc004ec2c3fb428ed32bf8976733beca13877de9f6",
+   "operands": [
+    1,
+    0,
+    7,
+    3
+   ],
+   "operations": [
+    "SUB",
+    "MUL",
+    "SUB"
+   ],
+   "options": [
+    14,
+    8,
+    10,
+    4
+   ],
+   "stem": "Compute (((1 - 0) * 7) - 3).",
+   "value": 4
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((1 * 3) + 6) - 4).\nA) 10\nB) 5\nC) 1\nD) 2",
+   "item_key": "b14e2a49c0a14ddbc7663219195810e8bfd80bb44d6f61bfb636d67437497aa8",
+   "operands": [
+    1,
+    3,
+    6,
+    4
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    10,
+    5,
+    1,
+    2
+   ],
+   "stem": "Compute (((1 * 3) + 6) - 4).",
+   "value": 5
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 + 7) + 5) + 6).\nA) 13\nB) 12\nC) 29\nD) 22",
+   "item_key": "e82e03a533acea6bcabc8236b94801b045a509baa3074942f6ca2a8cb7053714",
+   "operands": [
+    4,
+    7,
+    5,
+    6
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "ADD"
+   ],
+   "options": [
+    13,
+    12,
+    29,
+    22
+   ],
+   "stem": "Compute (((4 + 7) + 5) + 6).",
+   "value": 22
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((0 + 7) * 1) + 2).\nA) 8\nB) 18\nC) 9\nD) 7",
+   "item_key": "1447e69cc5117dcedf331aaf6333a5a89063c95c9449b91ea1c03e55226b6079",
+   "operands": [
+    0,
+    7,
+    1,
+    2
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    8,
+    18,
+    9,
+    7
+   ],
+   "stem": "Compute (((0 + 7) * 1) + 2).",
+   "value": 9
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 - 2) - 0) + 0).\nA) 2\nB) 11\nC) 12\nD) 1",
+   "item_key": "7e108e8e74591cfff85800aafd180e8e87aeb07cb01041c3a45da76ba1874be1",
+   "operands": [
+    4,
+    2,
+    0,
+    0
+   ],
+   "operations": [
+    "SUB",
+    "SUB",
+    "ADD"
+   ],
+   "options": [
+    2,
+    11,
+    12,
+    1
+   ],
+   "stem": "Compute (((4 - 2) - 0) + 0).",
+   "value": 2
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 * 5) * 6) + 8).\nA) 188\nB) 182\nC) 185\nD) 178",
+   "item_key": "07d4d31d30debc351a9969728795d05380aec9d09d8ff5e3937f6a3a22d2cc32",
+   "operands": [
+    6,
+    5,
+    6,
+    8
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    188,
+    182,
+    185,
+    178
+   ],
+   "stem": "Compute (((6 * 5) * 6) + 8).",
+   "value": 188
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((5 + 4) + 6) * 6).\nA) 100\nB) 98\nC) 90\nD) 97",
+   "item_key": "69af0084e0ef67015120277114901f054e932e20e2deb864377238fb89617565",
+   "operands": [
+    5,
+    4,
+    6,
+    6
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    100,
+    98,
+    90,
+    97
+   ],
+   "stem": "Compute (((5 + 4) + 6) * 6).",
+   "value": 90
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((9 * 3) + 4) * 5).\nA) 145\nB) 157\nC) 160\nD) 155",
+   "item_key": "bbb71a86c847cd943c4a00f6a1d1cebfbaecbd715bba7a55712b58b64e43245a",
+   "operands": [
+    9,
+    3,
+    4,
+    5
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    145,
+    157,
+    160,
+    155
+   ],
+   "stem": "Compute (((9 * 3) + 4) * 5).",
+   "value": 155
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((2 + 8) + 8) - 4).\nA) 23\nB) 22\nC) 14\nD) 11",
+   "item_key": "b8b39b0f25a2f414ace2ebb665dfd29d60477e519473941bd11ffb78b4ade74e",
+   "operands": [
+    2,
+    8,
+    8,
+    4
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    23,
+    22,
+    14,
+    11
+   ],
+   "stem": "Compute (((2 + 8) + 8) - 4).",
+   "value": 14
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((2 + 1) - 3) * 9).\nA) 10\nB) 9\nC) 7\nD) 0",
+   "item_key": "540bcb92ed57dd5904240b4680bd5946b44da84f84a94701280d77fad268a08c",
+   "operands": [
+    2,
+    1,
+    3,
+    9
+   ],
+   "operations": [
+    "ADD",
+    "SUB",
+    "MUL"
+   ],
+   "options": [
+    10,
+    9,
+    7,
+    0
+   ],
+   "stem": "Compute (((2 + 1) - 3) * 9).",
+   "value": 0
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 - 0) * 3) * 1).\nA) 34\nB) 26\nC) 27\nD) 24",
+   "item_key": "38958ab280429066608095f59a39e6c6dcf037d58b72315cba8731cc70fcebc1",
+   "operands": [
+    8,
+    0,
+    3,
+    1
+   ],
+   "operations": [
+    "SUB",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    34,
+    26,
+    27,
+    24
+   ],
+   "stem": "Compute (((8 - 0) * 3) * 1).",
+   "value": 24
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((5 * 5) - 5) - 6).\nA) 17\nB) 22\nC) 20\nD) 14",
+   "item_key": "5a172693cf2f45127e2b9e064973655f15468b2f969d5aedf30bb80271df9af9",
+   "operands": [
+    5,
+    5,
+    5,
+    6
+   ],
+   "operations": [
+    "MUL",
+    "SUB",
+    "SUB"
+   ],
+   "options": [
+    17,
+    22,
+    20,
+    14
+   ],
+   "stem": "Compute (((5 * 5) - 5) - 6).",
+   "value": 14
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((9 + 3) - 4) + 7).\nA) 18\nB) 22\nC) 14\nD) 15",
+   "item_key": "fc75a46f7b50519cb820eeca4e2bf934bdd7e3924e4b3a3b701a9ba3a3c4d622",
+   "operands": [
+    9,
+    3,
+    4,
+    7
+   ],
+   "operations": [
+    "ADD",
+    "SUB",
+    "ADD"
+   ],
+   "options": [
+    18,
+    22,
+    14,
+    15
+   ],
+   "stem": "Compute (((9 + 3) - 4) + 7).",
+   "value": 15
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((0 + 7) - 3) * 0).\nA) 0\nB) 1\nC) 8\nD) 2",
+   "item_key": "d68c6fe65d540badf423df137143220dd429692aad307776d98c4efe80ce1439",
+   "operands": [
+    0,
+    7,
+    3,
+    0
+   ],
+   "operations": [
+    "ADD",
+    "SUB",
+    "MUL"
+   ],
+   "options": [
+    0,
+    1,
+    8,
+    2
+   ],
+   "stem": "Compute (((0 + 7) - 3) * 0).",
+   "value": 0
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((2 - 1) + 3) + 0).\nA) 11\nB) 4\nC) 13\nD) 9",
+   "item_key": "e2e5f083696b98394903cfa7614a926de5e7dfe218937853456f7b7f1414a199",
+   "operands": [
+    2,
+    1,
+    3,
+    0
+   ],
+   "operations": [
+    "SUB",
+    "ADD",
+    "ADD"
+   ],
+   "options": [
+    11,
+    4,
+    13,
+    9
+   ],
+   "stem": "Compute (((2 - 1) + 3) + 0).",
+   "value": 4
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 + 2) + 0) - 3).\nA) 1\nB) 4\nC) 7\nD) 11",
+   "item_key": "d662697955006c14d4d4e42871098e344609de66a83c6deb00a2fc669017801d",
+   "operands": [
+    8,
+    2,
+    0,
+    3
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    1,
+    4,
+    7,
+    11
+   ],
+   "stem": "Compute (((8 + 2) + 0) - 3).",
+   "value": 7
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((7 * 5) - 9) - 7).\nA) 19\nB) 23\nC) 16\nD) 28",
+   "item_key": "a429c6d3af31c714c57fb94c8b1387ca4fb89f1c68b1790eef60e7bbb8c62d20",
+   "operands": [
+    7,
+    5,
+    9,
+    7
+   ],
+   "operations": [
+    "MUL",
+    "SUB",
+    "SUB"
+   ],
+   "options": [
+    19,
+    23,
+    16,
+    28
+   ],
+   "stem": "Compute (((7 * 5) - 9) - 7).",
+   "value": 19
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((1 + 5) - 1) * 2).\nA) 10\nB) 0\nC) 13\nD) 16",
+   "item_key": "3a0734d0aab23faf759c8a788a47be972564ca5a944416313f0989885d676a36",
+   "operands": [
+    1,
+    5,
+    1,
+    2
+   ],
+   "operations": [
+    "ADD",
+    "SUB",
+    "MUL"
+   ],
+   "options": [
+    10,
+    0,
+    13,
+    16
+   ],
+   "stem": "Compute (((1 + 5) - 1) * 2).",
+   "value": 10
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((0 * 8) * 4) * 6).\nA) 6\nB) 5\nC) 8\nD) 0",
+   "item_key": "d9f26e9941981c88620b8a9bb5c7a044e35364b45a43fcee98e06db0743c7e6e",
+   "operands": [
+    0,
+    8,
+    4,
+    6
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    6,
+    5,
+    8,
+    0
+   ],
+   "stem": "Compute (((0 * 8) * 4) * 6).",
+   "value": 0
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 + 1) * 2) + 3).\nA) 31\nB) 22\nC) 14\nD) 21",
+   "item_key": "2647492cec2fd952947ba62e2b681840f4c8b76fb3f327e701f0580036ce3934",
+   "operands": [
+    8,
+    1,
+    2,
+    3
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    31,
+    22,
+    14,
+    21
+   ],
+   "stem": "Compute (((8 + 1) * 2) + 3).",
+   "value": 21
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((3 * 3) + 4) * 6).\nA) 71\nB) 81\nC) 78\nD) 79",
+   "item_key": "5b6787c89b3815786d7c3aab131496ede578a903d43ec7ead264372d50ba9094",
+   "operands": [
+    3,
+    3,
+    4,
+    6
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    71,
+    81,
+    78,
+    79
+   ],
+   "stem": "Compute (((3 * 3) + 4) * 6).",
+   "value": 78
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 + 1) + 8) - 7).\nA) 7\nB) 6\nC) 11\nD) 13",
+   "item_key": "1ae84593d402c3f367382ae6c63f30d49760670652dfd394ccb211b1d80d985b",
+   "operands": [
+    4,
+    1,
+    8,
+    7
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    7,
+    6,
+    11,
+    13
+   ],
+   "stem": "Compute (((4 + 1) + 8) - 7).",
+   "value": 6
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 * 4) * 0) + 0).\nA) 0\nB) 4\nC) 3\nD) 8",
+   "item_key": "2e5644d3ffd9f9bf1e3d1465f5ab86bd504ee12d6ee62b63e90c47800e0d2172",
+   "operands": [
+    6,
+    4,
+    0,
+    0
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    0,
+    4,
+    3,
+    8
+   ],
+   "stem": "Compute (((6 * 4) * 0) + 0).",
+   "value": 0
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((1 + 6) * 2) - 3).\nA) 11\nB) 1\nC) 17\nD) 19",
+   "item_key": "063e7a7eba9be1db1ce26a399299ad9fdeb07a6d64d39f9f717eee4427c69f6c",
+   "operands": [
+    1,
+    6,
+    2,
+    3
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "SUB"
+   ],
+   "options": [
+    11,
+    1,
+    17,
+    19
+   ],
+   "stem": "Compute (((1 + 6) * 2) - 3).",
+   "value": 11
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((9 + 7) - 7) + 4).\nA) 14\nB) 13\nC) 18\nD) 7",
+   "item_key": "c8fa5a929642e7a78e619c04bc83a1f5b948e550abccb7c4e2af74a76b721889",
+   "operands": [
+    9,
+    7,
+    7,
+    4
+   ],
+   "operations": [
+    "ADD",
+    "SUB",
+    "ADD"
+   ],
+   "options": [
+    14,
+    13,
+    18,
+    7
+   ],
+   "stem": "Compute (((9 + 7) - 7) + 4).",
+   "value": 13
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 * 1) * 6) * 0).\nA) 1\nB) 10\nC) 0\nD) 6",
+   "item_key": "717e15b6f0f1604f1126b658f5be77a3b0fb0a93645ae724eefe318cf2e12191",
+   "operands": [
+    4,
+    1,
+    6,
+    0
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    1,
+    10,
+    0,
+    6
+   ],
+   "stem": "Compute (((4 * 1) * 6) * 0).",
+   "value": 0
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 * 4) + 8) * 3).\nA) 67\nB) 72\nC) 62\nD) 70",
+   "item_key": "ed1d9d54155ae82f322807337bc8394174f97791bd8ad8ffdc9bffdbdb810309",
+   "operands": [
+    4,
+    4,
+    8,
+    3
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    67,
+    72,
+    62,
+    70
+   ],
+   "stem": "Compute (((4 * 4) + 8) * 3).",
+   "value": 72
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((1 + 6) + 1) + 8).\nA) 20\nB) 23\nC) 10\nD) 16",
+   "item_key": "b983bbd2f46af377660836c546ccd849901077ccf75da3d10d1fa00126759186",
+   "operands": [
+    1,
+    6,
+    1,
+    8
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "ADD"
+   ],
+   "options": [
+    20,
+    23,
+    10,
+    16
+   ],
+   "stem": "Compute (((1 + 6) + 1) + 8).",
+   "value": 16
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 * 6) * 2) + 7).\nA) 88\nB) 79\nC) 71\nD) 82",
+   "item_key": "8768dc0f08b94649d88a34529a1e4d0bbd748fb0c62918a11b454560bd5b90b6",
+   "operands": [
+    6,
+    6,
+    2,
+    7
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    88,
+    79,
+    71,
+    82
+   ],
+   "stem": "Compute (((6 * 6) * 2) + 7).",
+   "value": 79
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 * 4) * 5) - 3).\nA) 69\nB) 77\nC) 70\nD) 78",
+   "item_key": "dd1f42dd072bbd57204a2dc915a97c9a72d05606f9921e0f24b67f0c0a48d4a0",
+   "operands": [
+    4,
+    4,
+    5,
+    3
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "SUB"
+   ],
+   "options": [
+    69,
+    77,
+    70,
+    78
+   ],
+   "stem": "Compute (((4 * 4) * 5) - 3).",
+   "value": 77
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((5 + 3) * 6) + 1).\nA) 52\nB) 53\nC) 57\nD) 49",
+   "item_key": "51b987b1ca6b1a270961ad80c5251f93138dd6c2745e5d532ab0d827d18d1dbb",
+   "operands": [
+    5,
+    3,
+    6,
+    1
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    52,
+    53,
+    57,
+    49
+   ],
+   "stem": "Compute (((5 + 3) * 6) + 1).",
+   "value": 49
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 + 6) * 1) - 5).\nA) 7\nB) 4\nC) 3\nD) 6",
+   "item_key": "86d1abcaa3f89c93849cc656d2e66d217cea02df3cb7227de0f5adeb42b05aec",
+   "operands": [
+    6,
+    6,
+    1,
+    5
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "SUB"
+   ],
+   "options": [
+    7,
+    4,
+    3,
+    6
+   ],
+   "stem": "Compute (((6 + 6) * 1) - 5).",
+   "value": 7
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((1 + 2) + 1) + 0).\nA) 4\nB) 11\nC) 5\nD) 12",
+   "item_key": "b603d4a6758bc075c4b80df52d5e087f487719e3c27a2e5782f5d1e7f5cd0b3f",
+   "operands": [
+    1,
+    2,
+    1,
+    0
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "ADD"
+   ],
+   "options": [
+    4,
+    11,
+    5,
+    12
+   ],
+   "stem": "Compute (((1 + 2) + 1) + 0).",
+   "value": 4
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((7 * 3) * 8) + 2).\nA) 165\nB) 171\nC) 170\nD) 176",
+   "item_key": "37058b550a02a07eca8cc3373e9324e8d141c74b380231fcd0e4320fc5170c51",
+   "operands": [
+    7,
+    3,
+    8,
+    2
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    165,
+    171,
+    170,
+    176
+   ],
+   "stem": "Compute (((7 * 3) * 8) + 2).",
+   "value": 170
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((9 + 2) + 7) + 6).\nA) 31\nB) 26\nC) 24\nD) 16",
+   "item_key": "7280d4377a4bf079ae7df5dae2b87702dcc7e964e57d1b756c53d7b97c4e886a",
+   "operands": [
+    9,
+    2,
+    7,
+    6
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "ADD"
+   ],
+   "options": [
+    31,
+    26,
+    24,
+    16
+   ],
+   "stem": "Compute (((9 + 2) + 7) + 6).",
+   "value": 24
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((7 + 8) + 0) - 7).\nA) 2\nB) 0\nC) 9\nD) 8",
+   "item_key": "0f4a28539c58266d113ef4fd5539ca3e89d1922ef3027c1c7a986078669744f1",
+   "operands": [
+    7,
+    8,
+    0,
+    7
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    2,
+    0,
+    9,
+    8
+   ],
+   "stem": "Compute (((7 + 8) + 0) - 7).",
+   "value": 8
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 * 9) + 7) - 5).\nA) 46\nB) 41\nC) 38\nD) 44",
+   "item_key": "a9153908d00c66bc11274d33a5dceb62a51069f3793668f300b65fca091b5b2d",
+   "operands": [
+    4,
+    9,
+    7,
+    5
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    46,
+    41,
+    38,
+    44
+   ],
+   "stem": "Compute (((4 * 9) + 7) - 5).",
+   "value": 38
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((3 + 0) * 9) * 4).\nA) 110\nB) 108\nC) 101\nD) 109",
+   "item_key": "ce09ed886f949c159f6c5af75be1ab219c966aa6ea2a8766e6350861c8c4054e",
+   "operands": [
+    3,
+    0,
+    9,
+    4
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    110,
+    108,
+    101,
+    109
+   ],
+   "stem": "Compute (((3 + 0) * 9) * 4).",
+   "value": 108
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 * 3) + 8) - 1).\nA) 15\nB) 32\nC) 31\nD) 25",
+   "item_key": "c7657fdf0d5cb49bb53f234d54b8019b352a116a94fa0ddf3ae592b92f4957fe",
+   "operands": [
+    6,
+    3,
+    8,
+    1
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    15,
+    32,
+    31,
+    25
+   ],
+   "stem": "Compute (((6 * 3) + 8) - 1).",
+   "value": 25
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((9 * 5) + 0) - 1).\nA) 44\nB) 51\nC) 43\nD) 42",
+   "item_key": "c3c6e8fb2b524540c47a1c69a5d9df4549089f2f4c50cdaa6507e18e9a8a43b2",
+   "operands": [
+    9,
+    5,
+    0,
+    1
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    44,
+    51,
+    43,
+    42
+   ],
+   "stem": "Compute (((9 * 5) + 0) - 1).",
+   "value": 44
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 * 3) * 3) + 1).\nA) 65\nB) 79\nC) 73\nD) 82",
+   "item_key": "6bcab82848515baf8ebcc523b73a4e40c96bb353450b7397a80b3ab3418f613f",
+   "operands": [
+    8,
+    3,
+    3,
+    1
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    65,
+    79,
+    73,
+    82
+   ],
+   "stem": "Compute (((8 * 3) * 3) + 1).",
+   "value": 73
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((7 * 6) * 6) - 9).\nA) 249\nB) 240\nC) 239\nD) 243",
+   "item_key": "5a28f2564c080a758c2dc3826f1a26732102023cfe2759cbc0db078be3cb3427",
+   "operands": [
+    7,
+    6,
+    6,
+    9
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "SUB"
+   ],
+   "options": [
+    249,
+    240,
+    239,
+    243
+   ],
+   "stem": "Compute (((7 * 6) * 6) - 9).",
+   "value": 243
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((7 * 1) - 3) * 8).\nA) 22\nB) 25\nC) 28\nD) 32",
+   "item_key": "da543c47b21d2f824ec9d54b09278ac0549e781f4f875121c15d407b360adee8",
+   "operands": [
+    7,
+    1,
+    3,
+    8
+   ],
+   "operations": [
+    "MUL",
+    "SUB",
+    "MUL"
+   ],
+   "options": [
+    22,
+    25,
+    28,
+    32
+   ],
+   "stem": "Compute (((7 * 1) - 3) * 8).",
+   "value": 32
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((9 + 2) + 8) - 6).\nA) 13\nB) 23\nC) 19\nD) 4",
+   "item_key": "7f3c86f3601310903434015fa09ff4774e8fa0f85391ba277078e204923600ca",
+   "operands": [
+    9,
+    2,
+    8,
+    6
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    13,
+    23,
+    19,
+    4
+   ],
+   "stem": "Compute (((9 + 2) + 8) - 6).",
+   "value": 13
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 * 1) + 5) * 7).\nA) 63\nB) 60\nC) 55\nD) 56",
+   "item_key": "520358a10a5357d72130fc7d93295d2ce3149b67e31ad2dff021f9d380c20d04",
+   "operands": [
+    4,
+    1,
+    5,
+    7
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    63,
+    60,
+    55,
+    56
+   ],
+   "stem": "Compute (((4 * 1) + 5) * 7).",
+   "value": 63
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((5 - 0) * 9) + 0).\nA) 45\nB) 50\nC) 47\nD) 54",
+   "item_key": "30f9031d1569c90c0b71312a782d15295b1e2680e5e76fbb785cb2cbbb58f2a0",
+   "operands": [
+    5,
+    0,
+    9,
+    0
+   ],
+   "operations": [
+    "SUB",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    45,
+    50,
+    47,
+    54
+   ],
+   "stem": "Compute (((5 - 0) * 9) + 0).",
+   "value": 45
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((7 - 5) - 0) * 5).\nA) 3\nB) 12\nC) 9\nD) 10",
+   "item_key": "e386b9d5d2d55f6681be9b6d4c2cf931b3deca2fb0d6d3b75114732231cbccee",
+   "operands": [
+    7,
+    5,
+    0,
+    5
+   ],
+   "operations": [
+    "SUB",
+    "SUB",
+    "MUL"
+   ],
+   "options": [
+    3,
+    12,
+    9,
+    10
+   ],
+   "stem": "Compute (((7 - 5) - 0) * 5).",
+   "value": 10
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 - 0) * 7) * 0).\nA) 9\nB) 1\nC) 7\nD) 0",
+   "item_key": "d4f3fbd8d9732b6f3c3f74d13711b8baff563f861ed68e425b3a545a8e9b20fb",
+   "operands": [
+    8,
+    0,
+    7,
+    0
+   ],
+   "operations": [
+    "SUB",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    9,
+    1,
+    7,
+    0
+   ],
+   "stem": "Compute (((8 - 0) * 7) * 0).",
+   "value": 0
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 + 6) + 9) * 8).\nA) 155\nB) 146\nC) 152\nD) 156",
+   "item_key": "0dfea980fa47e6795713ea724cd07d72165023e32f3a59f2bd80011f89a5136b",
+   "operands": [
+    4,
+    6,
+    9,
+    8
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    155,
+    146,
+    152,
+    156
+   ],
+   "stem": "Compute (((4 + 6) + 9) * 8).",
+   "value": 152
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 - 3) * 7) * 7).\nA) 150\nB) 147\nC) 157\nD) 153",
+   "item_key": "e895c02482e2f6ff118c4543ddee730aacf852dba55dc5e4c30fd30503cb37b3",
+   "operands": [
+    6,
+    3,
+    7,
+    7
+   ],
+   "operations": [
+    "SUB",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    150,
+    147,
+    157,
+    153
+   ],
+   "stem": "Compute (((6 - 3) * 7) * 7).",
+   "value": 147
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((3 - 3) + 5) * 4).\nA) 26\nB) 12\nC) 20\nD) 24",
+   "item_key": "fc4ffc2def95342bd8480d02500afa986c658e56caff0a21151c73c25d65198f",
+   "operands": [
+    3,
+    3,
+    5,
+    4
+   ],
+   "operations": [
+    "SUB",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    26,
+    12,
+    20,
+    24
+   ],
+   "stem": "Compute (((3 - 3) + 5) * 4).",
+   "value": 20
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((5 * 1) * 0) + 0).\nA) 5\nB) 8\nC) 0\nD) 3",
+   "item_key": "58219c7dd7eb67e9ea24e3ade646293279920406812ef21a737ece2937cbeab7",
+   "operands": [
+    5,
+    1,
+    0,
+    0
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    5,
+    8,
+    0,
+    3
+   ],
+   "stem": "Compute (((5 * 1) * 0) + 0).",
+   "value": 0
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((2 + 9) - 3) + 6).\nA) 6\nB) 14\nC) 24\nD) 20",
+   "item_key": "13b72fb2429f9a68821766c860518bedacd5a2caeaa57dc8da6cc0c5b5c403f7",
+   "operands": [
+    2,
+    9,
+    3,
+    6
+   ],
+   "operations": [
+    "ADD",
+    "SUB",
+    "ADD"
+   ],
+   "options": [
+    6,
+    14,
+    24,
+    20
+   ],
+   "stem": "Compute (((2 + 9) - 3) + 6).",
+   "value": 14
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 + 9) * 2) + 0).\nA) 41\nB) 30\nC) 34\nD) 42",
+   "item_key": "2d4267b560586a7c50d53c2ee6f719d9948ac5688730540a5000347c1b7fb328",
+   "operands": [
+    8,
+    9,
+    2,
+    0
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    41,
+    30,
+    34,
+    42
+   ],
+   "stem": "Compute (((8 + 9) * 2) + 0).",
+   "value": 34
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((0 + 2) * 9) - 0).\nA) 14\nB) 15\nC) 18\nD) 20",
+   "item_key": "1f1f97c386fd4831e0318baaf3424043bc5f2f63b582478de99cbe31d1db32c3",
+   "operands": [
+    0,
+    2,
+    9,
+    0
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "SUB"
+   ],
+   "options": [
+    14,
+    15,
+    18,
+    20
+   ],
+   "stem": "Compute (((0 + 2) * 9) - 0).",
+   "value": 18
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((3 * 6) + 4) * 8).\nA) 169\nB) 176\nC) 170\nD) 168",
+   "item_key": "46d1e2ed7e9cb5bbd057b5ffaddbc3565baefa83b5ec954f75e5fa4469fb3830",
+   "operands": [
+    3,
+    6,
+    4,
+    8
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    169,
+    176,
+    170,
+    168
+   ],
+   "stem": "Compute (((3 * 6) + 4) * 8).",
+   "value": 176
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((0 + 4) + 2) - 4).\nA) 11\nB) 3\nC) 2\nD) 5",
+   "item_key": "3db0d8d830110a6707f00d9388e3526502fc1850df1a111b59d9ac543955d54a",
+   "operands": [
+    0,
+    4,
+    2,
+    4
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    11,
+    3,
+    2,
+    5
+   ],
+   "stem": "Compute (((0 + 4) + 2) - 4).",
+   "value": 2
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 - 2) + 0) * 6).\nA) 15\nB) 29\nC) 14\nD) 24",
+   "item_key": "7943e34682f81aaeb5f6e789948b3df1a2be9d92aee1c8b8ef1b461b5938a2f6",
+   "operands": [
+    6,
+    2,
+    0,
+    6
+   ],
+   "operations": [
+    "SUB",
+    "ADD",
+    "MUL"
+   ],
+   "options": [
+    15,
+    29,
+    14,
+    24
+   ],
+   "stem": "Compute (((6 - 2) + 0) * 6).",
+   "value": 24
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((5 * 5) + 2) - 9).\nA) 13\nB) 18\nC) 9\nD) 14",
+   "item_key": "cf83efe479bca7b0574fe9f885253082556c31af6b38c233ea1108de4436a035",
+   "operands": [
+    5,
+    5,
+    2,
+    9
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    13,
+    18,
+    9,
+    14
+   ],
+   "stem": "Compute (((5 * 5) + 2) - 9).",
+   "value": 18
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((9 + 4) * 4) * 1).\nA) 58\nB) 47\nC) 52\nD) 49",
+   "item_key": "73c019aad49f8c2ee6b3955580d294e6cac69ef07f9f3277d4c9fd1c948f7c7e",
+   "operands": [
+    9,
+    4,
+    4,
+    1
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    58,
+    47,
+    52,
+    49
+   ],
+   "stem": "Compute (((9 + 4) * 4) * 1).",
+   "value": 52
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 * 2) * 2) * 5).\nA) 150\nB) 160\nC) 156\nD) 168",
+   "item_key": "925b629233464953a24de1af7356ac6fd5087f13403e0fa75b10d270bf2bc4eb",
+   "operands": [
+    8,
+    2,
+    2,
+    5
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    150,
+    160,
+    156,
+    168
+   ],
+   "stem": "Compute (((8 * 2) * 2) * 5).",
+   "value": 160
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 - 3) * 7) * 8).\nA) 280\nB) 272\nC) 285\nD) 276",
+   "item_key": "cd786321bfe6dc6a47ed962cd8dd92bd4e60bebdd345a50fba561fb2ecb34a07",
+   "operands": [
+    8,
+    3,
+    7,
+    8
+   ],
+   "operations": [
+    "SUB",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    280,
+    272,
+    285,
+    276
+   ],
+   "stem": "Compute (((8 - 3) * 7) * 8).",
+   "value": 280
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((5 * 7) + 3) + 1).\nA) 45\nB) 47\nC) 39\nD) 42",
+   "item_key": "23c9f3740b9e66456d27e21fddd3ef10af3d5933794e904f71e4bacb0bdcaf6b",
+   "operands": [
+    5,
+    7,
+    3,
+    1
+   ],
+   "operations": [
+    "MUL",
+    "ADD",
+    "ADD"
+   ],
+   "options": [
+    45,
+    47,
+    39,
+    42
+   ],
+   "stem": "Compute (((5 * 7) + 3) + 1).",
+   "value": 39
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 * 0) * 0) * 7).\nA) 1\nB) 7\nC) 0\nD) 9",
+   "item_key": "a651f53703342f9cfd3b40b7d61fb0305efe6717c695ad726e5d1b7f82105c67",
+   "operands": [
+    8,
+    0,
+    0,
+    7
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    1,
+    7,
+    0,
+    9
+   ],
+   "stem": "Compute (((8 * 0) * 0) * 7).",
+   "value": 0
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 - 2) * 5) * 7).\nA) 142\nB) 136\nC) 139\nD) 140",
+   "item_key": "5d77c9058203621fb7b383a8cc34215ceb57da06de005d2308b38a051220c575",
+   "operands": [
+    6,
+    2,
+    5,
+    7
+   ],
+   "operations": [
+    "SUB",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    142,
+    136,
+    139,
+    140
+   ],
+   "stem": "Compute (((6 - 2) * 5) * 7).",
+   "value": 140
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((7 - 3) * 0) + 1).\nA) 6\nB) 1\nC) 9\nD) 0",
+   "item_key": "67c711a7f57f841d6e02bf6b27d88007f7b60cb01b83ae8deebacb1797b6128c",
+   "operands": [
+    7,
+    3,
+    0,
+    1
+   ],
+   "operations": [
+    "SUB",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    6,
+    1,
+    9,
+    0
+   ],
+   "stem": "Compute (((7 - 3) * 0) + 1).",
+   "value": 1
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 - 0) + 2) + 8).\nA) 19\nB) 18\nC) 15\nD) 12",
+   "item_key": "cb24719df327576e513ef957e6ac1543a27c0c0341ae685d938e5d75904482ae",
+   "operands": [
+    8,
+    0,
+    2,
+    8
+   ],
+   "operations": [
+    "SUB",
+    "ADD",
+    "ADD"
+   ],
+   "options": [
+    19,
+    18,
+    15,
+    12
+   ],
+   "stem": "Compute (((8 - 0) + 2) + 8).",
+   "value": 18
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((0 + 9) * 5) - 5).\nA) 40\nB) 50\nC) 43\nD) 39",
+   "item_key": "0524c8678e54ce808264527ef90d0e7a7ebe2bcd32b1884f55349bb3e0c3f15e",
+   "operands": [
+    0,
+    9,
+    5,
+    5
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "SUB"
+   ],
+   "options": [
+    40,
+    50,
+    43,
+    39
+   ],
+   "stem": "Compute (((0 + 9) * 5) - 5).",
+   "value": 40
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 - 4) - 0) + 4).\nA) 4\nB) 9\nC) 0\nD) 10",
+   "item_key": "39c488c3863df0906b04bc80bd6fab628d3ed08716ef4961e5dca1b0ea06e535",
+   "operands": [
+    4,
+    4,
+    0,
+    4
+   ],
+   "operations": [
+    "SUB",
+    "SUB",
+    "ADD"
+   ],
+   "options": [
+    4,
+    9,
+    0,
+    10
+   ],
+   "stem": "Compute (((4 - 4) - 0) + 4).",
+   "value": 4
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((3 * 5) - 1) - 3).\nA) 7\nB) 11\nC) 14\nD) 6",
+   "item_key": "ba3f6fb4283bdc0b41e37fe3e8336322b876fd189bac3f5cc26aff0b70c9145a",
+   "operands": [
+    3,
+    5,
+    1,
+    3
+   ],
+   "operations": [
+    "MUL",
+    "SUB",
+    "SUB"
+   ],
+   "options": [
+    7,
+    11,
+    14,
+    6
+   ],
+   "stem": "Compute (((3 * 5) - 1) - 3).",
+   "value": 11
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 * 8) - 3) * 5).\nA) 155\nB) 145\nC) 142\nD) 136",
+   "item_key": "f1aa1e69b93b6fa45c7fb8565e28785054adb87050e62b3c4688223e4a6212aa",
+   "operands": [
+    4,
+    8,
+    3,
+    5
+   ],
+   "operations": [
+    "MUL",
+    "SUB",
+    "MUL"
+   ],
+   "options": [
+    155,
+    145,
+    142,
+    136
+   ],
+   "stem": "Compute (((4 * 8) - 3) * 5).",
+   "value": 145
+  },
+  {
+   "correct_index": 1,
+   "correct_label": "B",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((6 - 5) + 2) - 2).\nA) 11\nB) 1\nC) 6\nD) 2",
+   "item_key": "e68943b77bca6a4c3e6ad7fb5cdb690cf5ec1ab66e00029ad9acc9cf64c6a00e",
+   "operands": [
+    6,
+    5,
+    2,
+    2
+   ],
+   "operations": [
+    "SUB",
+    "ADD",
+    "SUB"
+   ],
+   "options": [
+    11,
+    1,
+    6,
+    2
+   ],
+   "stem": "Compute (((6 - 5) + 2) - 2).",
+   "value": 1
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((0 + 8) - 0) + 6).\nA) 13\nB) 18\nC) 8\nD) 14",
+   "item_key": "c72532983cfd391d2791baaf62fb51aff80b3adcfae3f6c936083389f3f3337d",
+   "operands": [
+    0,
+    8,
+    0,
+    6
+   ],
+   "operations": [
+    "ADD",
+    "SUB",
+    "ADD"
+   ],
+   "options": [
+    13,
+    18,
+    8,
+    14
+   ],
+   "stem": "Compute (((0 + 8) - 0) + 6).",
+   "value": 14
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((3 * 0) * 9) + 7).\nA) 10\nB) 2\nC) 5\nD) 7",
+   "item_key": "10662017d05246300922c07e7c927e68a6e9dc629019a5354e1aa16a4f86c751",
+   "operands": [
+    3,
+    0,
+    9,
+    7
+   ],
+   "operations": [
+    "MUL",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    10,
+    2,
+    5,
+    7
+   ],
+   "stem": "Compute (((3 * 0) * 9) + 7).",
+   "value": 7
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((9 + 4) * 0) * 2).\nA) 6\nB) 3\nC) 2\nD) 0",
+   "item_key": "d43a04b7807f178f0b38ccac3c42f2914f3f414b0ae3f2fec379d31d04026169",
+   "operands": [
+    9,
+    4,
+    0,
+    2
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    6,
+    3,
+    2,
+    0
+   ],
+   "stem": "Compute (((9 + 4) * 0) * 2).",
+   "value": 0
+  },
+  {
+   "correct_index": 2,
+   "correct_label": "C",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((4 + 2) - 0) * 7).\nA) 32\nB) 34\nC) 42\nD) 47",
+   "item_key": "87f094827180bc7f720808d82599b28f42c76056434bfef85df6ff42be9137e2",
+   "operands": [
+    4,
+    2,
+    0,
+    7
+   ],
+   "operations": [
+    "ADD",
+    "SUB",
+    "MUL"
+   ],
+   "options": [
+    32,
+    34,
+    42,
+    47
+   ],
+   "stem": "Compute (((4 + 2) - 0) * 7).",
+   "value": 42
+  },
+  {
+   "correct_index": 3,
+   "correct_label": "D",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((1 + 0) * 9) - 2).\nA) 13\nB) 10\nC) 14\nD) 7",
+   "item_key": "375b0c1ea87af1d4a7e6f67088981b7c6dd3eea40372f6e8047e7b9cde618e98",
+   "operands": [
+    1,
+    0,
+    9,
+    2
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "SUB"
+   ],
+   "options": [
+    13,
+    10,
+    14,
+    7
+   ],
+   "stem": "Compute (((1 + 0) * 9) - 2).",
+   "value": 7
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((5 + 3) * 9) - 1).\nA) 71\nB) 68\nC) 67\nD) 78",
+   "item_key": "cf529a63dfb394e94bff627ec80d01151522b3cd96d83af4bbe473c50003c4d7",
+   "operands": [
+    5,
+    3,
+    9,
+    1
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "SUB"
+   ],
+   "options": [
+    71,
+    68,
+    67,
+    78
+   ],
+   "stem": "Compute (((5 + 3) * 9) - 1).",
+   "value": 71
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 + 1) + 4) + 0).\nA) 13\nB) 8\nC) 7\nD) 10",
+   "item_key": "392ca329d06bf3c7249734120dd89ef24d9756bd1dc81c773bd941a637b1116a",
+   "operands": [
+    8,
+    1,
+    4,
+    0
+   ],
+   "operations": [
+    "ADD",
+    "ADD",
+    "ADD"
+   ],
+   "options": [
+    13,
+    8,
+    7,
+    10
+   ],
+   "stem": "Compute (((8 + 1) + 4) + 0).",
+   "value": 13
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((8 + 2) * 1) + 3).\nA) 13\nB) 9\nC) 16\nD) 5",
+   "item_key": "29cb88c125c3f742903d040e0d6f8a63e238af886d5f45d3601e841ffa79a605",
+   "operands": [
+    8,
+    2,
+    1,
+    3
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "ADD"
+   ],
+   "options": [
+    13,
+    9,
+    16,
+    5
+   ],
+   "stem": "Compute (((8 + 2) * 1) + 3).",
+   "value": 13
+  },
+  {
+   "correct_index": 0,
+   "correct_label": "A",
+   "depth": 3,
+   "family": "D3",
+   "is_scientific_item": true,
+   "item_body": "You are answering a multiple-choice item.\nReply with exactly one option label and nothing else.\n\nItem: Compute (((2 + 0) * 7) * 9).\nA) 126\nB) 117\nC) 128\nD) 118",
+   "item_key": "884fde94ed40c223efbc0cbc5400c1cb6e5d9965b016fc4c207347690b73b616",
+   "operands": [
+    2,
+    0,
+    7,
+    9
+   ],
+   "operations": [
+    "ADD",
+    "MUL",
+    "MUL"
+   ],
+   "options": [
+    126,
+    117,
+    128,
+    118
+   ],
+   "stem": "Compute (((2 + 0) * 7) * 9).",
+   "value": 126
+  }
+ ],
+ "seed": "81904481161676450335208903385081575713502954794112522021809108716402237340962",
+ "seed_material": "STUDY4F|7d5ff0837d77af9e6df9f49d580ec0e42bdc2729|D3_DEVELOPMENT_BANK",
+ "size": 104
+}

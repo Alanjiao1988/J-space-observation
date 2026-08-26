@@ -1,0 +1,68 @@
+{
+ "all_invariants_pass": true,
+ "authority_commit_used_for_seeds": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729",
+ "banks": {
+  "D2_DEVELOPMENT_BANK": {
+   "bank_id": "D2_DEVELOPMENT_BANK",
+   "content_hash_rollup_sha256": "a870482f61b9041de1331e367d5c7358995e278c252a9e34b63e77785922bc9b",
+   "depth": "D2",
+   "deterministic_prefix": 60,
+   "every_item_has_four_options": true,
+   "every_item_has_the_right_depth": true,
+   "every_item_is_scientific": true,
+   "internal_content_hashes_unique": true,
+   "label_balance_is_26_each": true,
+   "label_counts": {
+    "A": 26,
+    "B": 26,
+    "C": 26,
+    "D": 26
+   },
+   "prefix_balance_is_15_each": true,
+   "prefix_label_counts": {
+    "A": 15,
+    "B": 15,
+    "C": 15,
+    "D": 15
+   },
+   "realization_is_deterministic": true,
+   "seed": 76125096867979937787033004768582911334099303146078734851273128706593234029894,
+   "seed_material": "STUDY4F|7d5ff0837d77af9e6df9f49d580ec0e42bdc2729|D2_DEVELOPMENT_BANK",
+   "size": 104,
+   "size_is_registered_104": true
+  },
+  "D3_DEVELOPMENT_BANK": {
+   "bank_id": "D3_DEVELOPMENT_BANK",
+   "content_hash_rollup_sha256": "eae3e02d18c1fe61297225cc2dcc9a9dcd3daf15d0ffdd76e315c945b88ff38e",
+   "depth": "D3",
+   "deterministic_prefix": 60,
+   "every_item_has_four_options": true,
+   "every_item_has_the_right_depth": true,
+   "every_item_is_scientific": true,
+   "internal_content_hashes_unique": true,
+   "label_balance_is_26_each": true,
+   "label_counts": {
+    "A": 26,
+    "B": 26,
+    "C": 26,
+    "D": 26
+   },
+   "prefix_balance_is_15_each": true,
+   "prefix_label_counts": {
+    "A": 15,
+    "B": 15,
+    "C": 15,
+    "D": 15
+   },
+   "realization_is_deterministic": true,
+   "seed": 81904481161676450335208903385081575713502954794112522021809108716402237340962,
+   "seed_material": "STUDY4F|7d5ff0837d77af9e6df9f49d580ec0e42bdc2729|D3_DEVELOPMENT_BANK",
+   "size": 104,
+   "size_is_registered_104": true
+  }
+ },
+ "confirmation_bank_realized": false,
+ "cross_bank_disjoint": true,
+ "cross_bank_overlap": 0,
+ "mixed_family_banks_permitted": false
+}

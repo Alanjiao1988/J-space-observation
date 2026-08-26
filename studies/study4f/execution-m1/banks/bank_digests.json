@@ -1,0 +1,12 @@
+{
+ "D2_DEVELOPMENT_BANK": {
+  "path": "studies/study4f/execution-m1/banks/d2_development_bank.json",
+  "bytes": 59334,
+  "sha256": "ea552537c023c4bf9a03b4fec6b8657717ba5259a5c83435af5a2352047a547e"
+ },
+ "D3_DEVELOPMENT_BANK": {
+  "path": "studies/study4f/execution-m1/banks/d3_development_bank.json",
+  "bytes": 63147,
+  "sha256": "b54f687bd17d34e702c058f10eb4457b81e9e1322a4155bc269e3948e43c0f16"
+ }
+}
