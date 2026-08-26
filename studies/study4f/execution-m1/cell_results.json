@@ -1,0 +1,148 @@
+{
+ "schema_version": "study4f-m1-cell-results-v1",
+ "study_id": "STUDY4F_M1",
+ "seal_sha256": "5a59cc432ebb63dc23ea5ed07fe9ba207124b11f731a13d6422f203d4c3973c7",
+ "seal_commit": "126563842974097e93c202ef0cfc088dc2fde208",
+ "observation_timestamp_utc": "2026-08-26T17:35:00Z",
+ "is_a_final_scientific_result": false,
+ "note": "These are per-cell tallies produced by the sealed instrument. The terminal study state is decided only by the published state machine after the ladder resolves, and is recorded separately.",
+
+ "execution_contract_in_force": {
+  "one_isolated_gpu_per_worker": true,
+  "cuda_device_order": "PCI_BUS_ID",
+  "cublas_workspace_config": ":4096:8",
+  "tensor_parallel": false,
+  "pipeline_parallel": false,
+  "mig": false,
+  "multi_node": false,
+  "batch_size": 1,
+  "torch_dtype": "bfloat16",
+  "quantization": null,
+  "cpu_offload": false,
+  "disk_offload": false,
+  "device_map_auto": false,
+  "trust_remote_code": false,
+  "statistical_unit": "item",
+  "unparseable_counted_as": "incorrect",
+  "cells_repeated_because_a_result_was_unfavorable": 0,
+  "engineering_fixes_after_the_first_study_bank_call": 0,
+  "hardware_switches_after_the_first_study_bank_call": 0,
+  "reseals": 0
+ },
+
+ "cells": [
+  {
+   "cell_id": "RP_B1|D2|COT",
+   "checkpoint_role": "RP_B1",
+   "checkpoint_repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+   "immutable_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+   "depth": "D2",
+   "route": "C1_LONG_GENERATED_COT_HEADROOM",
+   "bank": "D2_DEVELOPMENT_BANK",
+   "n": 104,
+   "correct": 97,
+   "incorrect_wrong_label": 0,
+   "unparseable": 7,
+   "null_floor": "3/4",
+   "pass_boundary": 90,
+   "passes": true,
+   "gpu": "GPU0",
+   "gpu_seconds": 2593.1
+  },
+  {
+   "cell_id": "RP_B1|D3|COT",
+   "checkpoint_role": "RP_B1",
+   "checkpoint_repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+   "immutable_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+   "depth": "D3",
+   "route": "C1_LONG_GENERATED_COT_HEADROOM",
+   "bank": "D3_DEVELOPMENT_BANK",
+   "n": 104,
+   "correct": 97,
+   "incorrect_wrong_label": 0,
+   "unparseable": 7,
+   "null_floor": "3/4",
+   "pass_boundary": 90,
+   "passes": true,
+   "gpu": "GPU1",
+   "gpu_seconds": 2175.0
+  },
+  {
+   "cell_id": "RP_B1|D2|E0",
+   "checkpoint_role": "RP_B1",
+   "checkpoint_repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+   "immutable_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+   "depth": "D2",
+   "route": "W1_RAW_DIRECT",
+   "bank": "D2_DEVELOPMENT_BANK deterministic prefix",
+   "n": 60,
+   "correct": 0,
+   "unparseable": 60,
+   "null_floor": "1/2",
+   "pass_boundary": 41,
+   "passes": false,
+   "gpu": "GPU0",
+   "gpu_seconds": 6.2
+  },
+  {
+   "cell_id": "RP_B1|D3|E0",
+   "checkpoint_role": "RP_B1",
+   "checkpoint_repository": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+   "immutable_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+   "depth": "D3",
+   "route": "W1_RAW_DIRECT",
+   "bank": "D3_DEVELOPMENT_BANK deterministic prefix",
+   "n": 60,
+   "correct": 0,
+   "unparseable": 60,
+   "null_floor": "1/2",
+   "pass_boundary": 41,
+   "passes": false,
+   "gpu": "GPU1",
+   "gpu_seconds": 6.1
+  }
+ ],
+
+ "e0_unparseable_forensics": {
+  "claim": "The E0 zero-correct outcome is a real measured behaviour of the checkpoint under the frozen raw-direct contract, not a parser or tokenizer defect.",
+  "evidence": [
+   "The registered answer tokens resolve to single ids on this tokenizer: A=32, B=33, C=34, D=35, all distinct.",
+   "The EOS id is 151643 and does not collide with any registered answer token, so parse_e0 did not raise.",
+   "Every one of the 120 E0 continuations began with token 151649, which decodes to '</think>'. That is not a registered answer surface.",
+   "The frozen contract requires exactly [registered answer token, registered EOS]. A continuation starting with '</think>' is UNPARSEABLE by the published rule, and the protocol counts unparseable as incorrect rather than dropping it.",
+   "The same checkpoint scored 97/104 on both CoT cells, so the model is not broken; it simply does not emit a bare answer token under the raw-direct envelope."
+  ],
+  "parser_was_modified": false,
+  "answer_surface_was_added": false,
+  "prefix_matching_enabled": false,
+  "whitespace_normalization_enabled": false,
+  "textual_reparsing_enabled": false,
+  "post_hoc_surface_addition": false,
+  "cell_rerun_after_seeing_the_result": false
+ },
+
+ "candidate_disposition": {
+  "RP_B1": {
+   "cot_d2_passed": true,
+   "cot_d3_passed": true,
+   "both_cot_passed": true,
+   "e0_unlocked_because_both_cot_passed": true,
+   "e0_d2_passed": false,
+   "e0_d3_passed": false,
+   "qualified": false,
+   "ladder_advances_to": "RP_B2"
+  }
+ },
+
+ "what_this_establishes": [
+  "Under the registered C1 long-generated-CoT route, the 7B checkpoint reaches 97/104 correct at both D2 and D3, above the registered pass boundary of 90.",
+  "Under the registered W1 raw-direct route, the same checkpoint produced zero parseable answer surfaces in 120 items, so its E0 cells do not pass."
+ ],
+ "what_this_does_not_establish": [
+  "Nothing about RP_B2, RP_B3 or RT, whose cells were not complete when this record was written.",
+  "Nothing about whether a natural positive-reference candidate exists, because the ladder has not resolved.",
+  "Nothing about whether the raw-direct interface is valid or invalid. A checkpoint failing to emit a bare answer token is a measurement of that checkpoint under that envelope, not a verdict on the interface.",
+  "Nothing about whether J-space exists, is observable or is unobservable. No cell in this study could test that.",
+  "Nothing confirmatory. Only development banks were used and confirmation remains unauthorized."
+ ]
+}
