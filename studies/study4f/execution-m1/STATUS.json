@@ -340,7 +340,8 @@
   "scheduler": "studies/study4f/execution-m1/analysis/study4f_m1_scheduler.py",
   "tests": "studies/study4f/execution-m1/tests/test_study4f_m1_mooncake_execution.py",
   "banks": "studies/study4f/execution-m1/banks/",
-  "cell_results": "studies/study4f/execution-m1/cell_results.json"
+  "cell_results": "studies/study4f/execution-m1/cell_results.json",
+  "final_disclosure": "studies/study4f/execution-m1/M1_FINAL_DISCLOSURE.md"
  },
  "shakedown": {
   "attempts_consumed_by_this_invocation": 1,
