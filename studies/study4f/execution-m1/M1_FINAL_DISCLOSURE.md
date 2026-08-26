@@ -147,7 +147,28 @@ The data-plane path was verified end to end. The first token request used
 audience `https://storage.chinacloudapi.cn/` and Mooncake rejected it with
 `InvalidAuthenticationInfo — Audience validation failed`. The correct audience is
 `https://storage.azure.com/`, after which PUT and GET both returned success.
-19 blobs totalling 611,828 bytes were written using the managed identity alone.
+
+Final contents, all written with the managed identity alone, no SAS and no key:
+
+| Container | Blobs | Bytes | Contents |
+| --- | --- | --- | --- |
+| `models` | 25 | 113,860,639,632 | all 34 checkpoint files, content-addressed |
+| `oci` | 2 | 3,183,944,622 | frozen execution image archive + manifest |
+| `runs` | 11 | 581,732 | 10 per-cell item journals + logs archive |
+| `logs` | 6 | 3,249 | shakedown report + four device canaries |
+| `seals` | 3 | 32,027 | acquisition manifest, report, blob index |
+| `handoff` | 0 | 0 | — |
+| **total** | **47** | **117,045,201,262** | **109.00 GiB** |
+
+Checkpoint bytes use content-addressed paths `models/sha256/<aa>/<full sha256>`,
+so the blob name *is* the proof of what the blob contains. Content addressing
+deduplicated the tokenizer and generation-config files that are byte-identical
+across checkpoints, which is why 34 files occupy 25 blobs. Two round-trip spot
+checks — a 679-byte `config.json` and an 8.79 GB weight shard — were downloaded
+back and re-hashed to exactly their blob names.
+
+The OCI archive was likewise downloaded back out of Blob and re-hashed
+byte-identically, so the storage transport boundary is proven in both directions.
 
 ## 8. NVMe: proof of ephemerality before formatting
 
@@ -375,7 +396,7 @@ Price resolution followed the required order and is reported honestly.
 | `cpuserver_OsDisk` | operator | Premium P4, 30 GiB | managed disk | ¥42.04/mo | ¥0.58 | ¥42.04/mo |
 | `a100-vmPublicIP` | session | Standard static | public IPv4 | ¥0.026/h | ¥0.28 | ¥19.34/mo |
 | `cpuserver-ip` | operator | Standard static | public IPv4 | ¥0.026/h | ¥0.26 | ¥19.34/mo |
-| `s4fm11ca457e105b29b7` | session | StorageV2 Hot LRS | blob capacity | `CONTRACT_UNIT_PRICE_UNAVAILABLE` | ~¥0 (0.0006 GB) | negligible |
+| `s4fm11ca457e105b29b7` | session | StorageV2 Hot LRS | blob capacity | `CONTRACT_UNIT_PRICE_UNAVAILABLE` | UNRESOLVED (109.00 GiB) | UNRESOLVED/mo |
 | VNets / NSGs / NICs | mixed | — | none | ¥0 | ¥0 | ¥0 |
 | Local NVMe 3.5 TB | included in SKU | — | none | ¥0 | ¥0 | ¥0 |
 
@@ -396,7 +417,7 @@ written same-region.
 | Item | Value |
 | --- | --- |
 | Resolved invocation cost | **¥70.87 – ¥74.90** |
-| Unresolved | `a100-vm` compute for 10.75 h — the dominant charge |
+| Unresolved | `a100-vm` compute — the dominant charge; blob capacity for 109.00 GiB |
 | Total invocation cost | `UNRESOLVED_BECAUSE_THE_DOMINANT_METER_HAS_NO_RESOLVABLE_PRICE` |
 | Continuing, resolved portion | ¥7.05/hour, ¥169.16/day |
 
@@ -416,8 +437,11 @@ Actions that would stop each continuing charge without deleting anything —
 | public IPs | only dissociation + deletion | — | — |
 | storage | delete blobs | capacity charge | — |
 
-Deallocating `a100-vm` destroys the `/scratch` RAID0 and all 113.9 GB of
-verified checkpoint bytes on it, which would have to be re-acquired.
+**Deallocating `a100-vm` is now safe.** It still destroys the `/scratch` RAID0,
+but every one of the 113.9 GB of verified checkpoint bytes and the exact
+execution container archive now live in Blob, so nothing unrecoverable is lost
+and the work does not have to be re-acquired. Before the `models/` and `oci/`
+uploads this was not true, and this disclosure previously said so.
 
 ## 15. Resource preservation
 
@@ -446,8 +470,10 @@ Study 4F-M1 is terminal. The result is **developmental and non-confirmatory**.
 
 The next legal action is an **operator decision**, not an automatic step:
 
-1. decide whether to deallocate `a100-vm` to stop the dominant charge, accepting
-   that `/scratch` and its 113.9 GB of verified bytes are destroyed;
+1. decide whether to deallocate `a100-vm` to stop the dominant charge. This is
+   now **safe**: `/scratch` is destroyed but every verified checkpoint byte and
+   the exact execution container survive in Blob, so nothing must be
+   re-acquired;
 2. if confirmation of any finding is wanted, publish a **separate** authority
    with its own confirmation bank — which does not exist today — and its own
    registered transition.
