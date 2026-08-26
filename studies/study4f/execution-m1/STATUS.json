@@ -1,0 +1,326 @@
+{
+  "schema_version": "study4f-m1-status-v1",
+  "study_id": "STUDY4F_M1",
+  "namespace": "studies/study4f/execution-m1/",
+  "is_authoritative_lifecycle_router": true,
+  "routes_only_this_execution_successor": true,
+  "lifecycle_state": "STUDY4F_M1_RESOURCE_ROUTE_QUALIFIED_ACQUISITION_IN_PROGRESS",
+  "terminal": false,
+  "resumable": true,
+  "study_kind": "mooncake_parallel_execution_substrate_for_a_published_instrument",
+  "authority": {
+    "path": "studies/study4f/prompts/study4f_m1_mooncake_four_a100_execution_authority.md",
+    "bytes": 13056,
+    "sha256": "8d07bee782c7c8f47adeba89f38d0a6b5093b2c895dd3bbd2df089485e5f0f46",
+    "git_blob": "9e990aadda5bea2e0301d48b9fb249f539f873f4",
+    "commit": "1ca457e105b29b73027ad21c6adce9a9e8904682",
+    "tree": "55d59d8246966675421b00205d873586221bf335",
+    "parent_commit": "ddf592010cd8788b637a90a998724f7ccdce4383",
+    "parent_tree": "a96b6696a20d9169a397b427595a28225b52b53e",
+    "published_alone_as_the_sole_path_in_its_commit": true
+  },
+  "predecessor": {
+    "study4f_commit": "5fd9602df207e95789263d0f8d52428540f48fb8",
+    "original_study4f_authority_commit": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729",
+    "study4f_e1_lifecycle_state": "STUDY4F_E1_AWAITING_AZURE_GPU_QUOTA_APPROVAL",
+    "study4f_e1_q1_lifecycle_state": "STUDY4F_E1_Q1_AWAITING_AZURE_SUPPORT_DECISION",
+    "m1_amends_or_reinterprets_the_global_azure_route": false,
+    "m1_closes_the_global_azure_route": false,
+    "q1_or_q1r_ticket_queried": false,
+    "q1_or_q1r_ticket_modified": false,
+    "q1_or_q1r_quota_request_queried": false,
+    "q1_or_q1r_quota_request_modified": false,
+    "study4f_instrument_modified": false,
+    "study3r_bytes_modified": false,
+    "evidence_ledger_modified": false
+  },
+  "azure": {
+    "cloud": "AzureChinaCloud",
+    "subscription_salted_sha256": "942506e424308d326ff8c8e7cd3417f33b35c76a543dcf5e125a486dd84c6b31",
+    "subscription_last_four": "8845",
+    "subscription_id_committed": false,
+    "tenant_salted_sha256": "e0bbcf27e7a04070ff44cf33b12da5468aefd4954a764f576b7aa43c26c3f343",
+    "tenant_id_committed": false,
+    "resource_group_salted_sha256": "a6e043d19f979b3fa3287c69892154f7a926d53666815b0bb8c4a487604203c4",
+    "resource_group_safe_name": "J-space",
+    "full_resource_ids_committed": false,
+    "credentials_committed": false,
+    "vms_created_by_this_invocation": 0,
+    "vms_resized": 0,
+    "vms_deleted": 0,
+    "resources_deleted": 0,
+    "storage_accounts_created": 1,
+    "cpu_and_gpu_vm_in_different_regions": true,
+    "different_region_warning_is_a_blocker": false,
+    "gpu_vm": {
+      "safe_name": "a100-vm",
+      "sku": "Standard_NC96ads_A100_v4",
+      "region": "chinaeast3",
+      "os": "Ubuntu 22.04 LTS gen2",
+      "image": "Canonical:0001-com-ubuntu-server-jammy:22_04-lts-gen2:22.04.202608060",
+      "vcpu_count": 96,
+      "cpu_model": "AMD EPYC 7V13",
+      "sockets": 2,
+      "threads_per_core": 1,
+      "visible_ram_gib": 866,
+      "os_disk_gib": 256,
+      "os_disk_sku": "Premium_LRS",
+      "local_nvme_devices": 4,
+      "local_nvme_size_gib_each": 894.3,
+      "resource_disk_gib": 256,
+      "power_state": "running",
+      "operator_created": false,
+      "session_created": true
+    },
+    "cpu_vm": {
+      "safe_name": "cpuserver",
+      "sku": "Standard_D16ds_v5",
+      "region": "chinanorth3",
+      "os": "Ubuntu 24.04.4 LTS",
+      "vcpu_count": 16,
+      "visible_ram_gib": 62,
+      "os_disk_gib": 30,
+      "os_disk_sku": "Premium_LRS",
+      "resource_disk_gib": 600,
+      "resource_disk_mount": "/mnt",
+      "power_state": "running",
+      "operator_created": true,
+      "session_created": false
+    }
+  },
+  "gpu": {
+    "live_verified_not_inferred_from_sku": true,
+    "driver_version": "580.173.02",
+    "cuda_version": "13.0",
+    "devices_visible": 4,
+    "model": "NVIDIA A100 80GB PCIe",
+    "compute_capability": "8.0",
+    "mig_mode": [
+      "Disabled",
+      "Disabled",
+      "Disabled",
+      "Disabled"
+    ],
+    "memory_total_bytes_per_device": 85093777408,
+    "memory_free_bytes_per_device_at_check": {
+      "nvidia_smi": 85094039552,
+      "torch_inside_container": 84648263680
+    },
+    "registered_floor_bytes": 69502926848,
+    "floor_pass": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "margin_bytes": 15145336832,
+    "margin_source": "torch_inside_container",
+    "processes_occupying_gpu_memory": 0,
+    "topology": {
+      "gpu0_to_gpu1": "NV12",
+      "gpu2_to_gpu3": "NV12",
+      "cross_pair": "SYS",
+      "links_per_device_on_gpu0_gpu1_gpu2": 12,
+      "gb_per_second_per_link": 25
+    },
+    "nvlink_is_pairwise_not_full_mesh": true,
+    "pairwise_nvlink_not_full_mesh_is_a_blocker": false,
+    "pairwise_nvlink_rationale": "Primary execution uses isolated single-GPU workers.",
+    "gpu_uuids_committed_in_full": false,
+    "gpu_uuid_last_twelve": [
+      "e85524f36fdf",
+      "b29579ca41a6",
+      "0ec45dca0dfc",
+      "5767cc3ad060"
+    ]
+  },
+  "runtime": {
+    "docker_version": "29.1.3",
+    "nvidia_container_toolkit_version": "1.20.0",
+    "container_base_image": "pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime",
+    "container_base_image_digest": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126",
+    "torch_version": "2.4.1+cu121",
+    "cuda_version_inside_container": "12.1",
+    "cuda_device_order": "PCI_BUS_ID",
+    "single_device_cuda_visible_devices_verified": true,
+    "torch_cuda_device_count_per_worker": 1,
+    "workers_verified": 4,
+    "bf16_supported": true,
+    "deterministic_algorithms_enabled": true,
+    "sdpa_available": true
+  },
+  "storage": {
+    "storage_accounts_created": 1,
+    "safe_name": "s4fm11ca457e105b29b7",
+    "region": "chinaeast3",
+    "kind": "StorageV2",
+    "sku": "Standard_LRS",
+    "access_tier": "Hot",
+    "https_only": true,
+    "min_tls_version": "TLS1_2",
+    "allow_blob_public_access": false,
+    "containers": [
+      {
+        "name": "models",
+        "public_access": "private"
+      },
+      {
+        "name": "oci",
+        "public_access": "private"
+      },
+      {
+        "name": "runs",
+        "public_access": "private"
+      },
+      {
+        "name": "logs",
+        "public_access": "private"
+      },
+      {
+        "name": "seals",
+        "public_access": "private"
+      },
+      {
+        "name": "handoff",
+        "public_access": "private"
+      }
+    ],
+    "auth": {
+      "method": "system-assigned managed identity",
+      "enabled_on_gpu_vm": true,
+      "enabled_on_cpu_vm": true,
+      "role": "Storage Blob Data Contributor",
+      "scope": "storage account only",
+      "sas_issued": false,
+      "storage_keys_committed": false
+    }
+  },
+  "nvme": {
+    "devices": 4,
+    "device_model": "Microsoft NVMe Direct Disk",
+    "proven_ephemeral_before_format": true,
+    "pre_format_partition_table_present": false,
+    "pre_format_filesystem_present": false,
+    "pre_format_mounted": false,
+    "absent_from_dev_disk_azure_scsi1": true,
+    "managed_disks": false,
+    "raid": "RAID0",
+    "raid_device": "md0",
+    "filesystem": "XFS",
+    "mounted_at": "/scratch",
+    "mounted_size_tb": 3.5,
+    "os_disk_sda_touched": false,
+    "resource_disk_sdb_touched": false
+  },
+  "acquisition": {
+    "acquisition_complete": false,
+    "in_progress": true,
+    "byte_equality_proven_per_file": true,
+    "weight_file_authority": "HuggingFace LFS object id at the pinned revision",
+    "small_file_authority": "studies/study3r/acquisition/study3r_checkpoint_acquisition_v1.json",
+    "huggingface_origin_unreachable_from_mooncake": true,
+    "byte_verified_mirror_used": true,
+    "checkpoint_revisions": {
+      "RT": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+      "RP_B1": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "RP_B2": "1df8507178afcc1bef68cd8c393f61a886323761",
+      "RP_B3": "711ad2ea6aa40cfca18895e8aca02ab92df1a746"
+    }
+  },
+  "authorization_flags": {
+    "provisioning_authorized": false,
+    "developmental_execution_authorized": false,
+    "model_execution_authorized": false,
+    "quantization_authorized": false,
+    "sharding_authorized": false,
+    "offload_authorized": false,
+    "device_map_auto_authorized": false,
+    "unregistered_model_authorized": false,
+    "d0_authorized": false,
+    "activation_capture_or_patching_authorized": false,
+    "study3m_authorized": false,
+    "confirmation_authorized": false,
+    "evidence_ledger_row_authorized": false,
+    "github_actions_run_authorized": false,
+    "threshold_or_estimand_change_authorized": false,
+    "reinterpretation_authorized": false
+  },
+  "claim_boundary": {
+    "rp_b_developmental_candidate_identified": false,
+    "rp_b_confirmed": false,
+    "claims_j_space_exists": false,
+    "claims_j_space_does_not_exist": false,
+    "claims_j_space_is_observable": false,
+    "claims_j_space_is_unobservable": false,
+    "claims_the_model_cannot_reason_internally": false,
+    "claims_single_forward_reasoning_was_demonstrated": false,
+    "claims_the_interface_is_valid": false,
+    "claims_the_interface_is_invalid": false,
+    "claims_any_result_generalizes": false,
+    "is_a_scientific_result": false,
+    "is_a_negative_result_about_any_checkpoint": false,
+    "is_a_negative_result_about_azure_capacity": false
+  },
+  "evidence_ledger": {
+    "path": "paper/evidence_ledger.csv",
+    "last_row": "EV-0016",
+    "rows_added_by_study4f_m1": 0,
+    "sha256": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1"
+  },
+  "shakedown_allowance_carried_forward": {
+    "attempts_remaining": 2,
+    "accelerator_hours_remaining": 6,
+    "consumed_by_this_invocation": 0
+  },
+  "zero_operation_counters": {
+    "checkpoint_downloads": "in_progress",
+    "model_constructions": 0,
+    "forward_passes": 0,
+    "prefill_operations": 0,
+    "generations": 0,
+    "generated_tokens": 0,
+    "logit_reads": 0,
+    "activation_collections": 0,
+    "activation_patches": 0,
+    "d0_runs": 0,
+    "execution_seeds_drawn": 0,
+    "study_banks_realized": 0,
+    "rp_b_selections": 0,
+    "gpu_seconds": 0,
+    "accelerator_hours": 0,
+    "evidence_ledger_rows_written": 0,
+    "github_actions_runs": 0,
+    "cells_executed": 0,
+    "vms_created": 0,
+    "vms_resized": 0,
+    "resources_deleted": 0
+  },
+  "what_this_state_establishes": {
+    "establishes": [
+      "The Mooncake resource route is qualified: four live NVIDIA A100 80GB PCIe devices were observed above the registered free-memory floor, MIG was disabled on all four, and no foreign process occupied GPU memory.",
+      "Byte-exact acquisition is provable on this substrate: weight files are checked against authoritative HuggingFace LFS object ids at pinned revisions, and small files are checked against the committed Study 3R acquisition hashes.",
+      "Exactly one Storage Account was created, and no VM was created, resized or deleted by this invocation."
+    ],
+    "does_not_establish": [
+      "Nothing about any checkpoint's generated-CoT headroom or E0 competence, because no cell was executed.",
+      "Nothing about whether a natural positive reference exists, because the registered ladder was not run.",
+      "Nothing about whether J-space exists, is observable or is unobservable.",
+      "Nothing about any model output, because no model construction, forward pass, generation, logit read, activation collection or activation patch occurred.",
+      "Nothing that authorizes confirmation, D0, activation capture, patching, Study 3M or any evidence-ledger row."
+    ]
+  },
+  "next_action_rule": {
+    "statement": "The next legal action is to complete byte-verified acquisition, then run the registered shakedown within the inherited allowance, then realize the original banks using the ORIGINAL Study 4F authority hash 7d5ff0837d77af9e6df9f49d580ec0e42bdc2729, then create and publish the execution seal BEFORE the first study-bank model call.",
+    "complete_byte_verified_acquisition_first": true,
+    "run_registered_shakedown_before_bank_execution": true,
+    "use_original_study4f_authority_hash_for_banks": true,
+    "execution_seal_must_be_published_before_first_study_bank_model_call": true,
+    "quantization_or_sharding_is_a_permitted_workaround": false,
+    "device_map_auto_is_a_permitted_workaround": false
+  },
+  "artifacts": {
+    "status": "studies/study4f/execution-m1/STATUS.json",
+    "status_schema": "studies/study4f/execution-m1/STATUS.schema.json",
+    "invocation_record": "studies/study4f/execution-m1/M1_INVOCATION_RECORD.md"
+  }
+}
