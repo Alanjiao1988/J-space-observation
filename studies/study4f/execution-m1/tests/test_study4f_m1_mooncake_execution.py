@@ -281,10 +281,53 @@ def test_operator_created_resources_are_included_not_just_session_created():
 # --------------------------------------------------------------------------
 
 
-def test_every_authorization_flag_is_false():
+def test_only_developmental_execution_is_authorized_by_the_seal():
+    """The seal unlocks developmental execution and nothing else.
+
+    Before the seal every flag is false. Publishing the seal flips exactly two
+    flags -- developmental and model execution -- and every other flag, above
+    all confirmation, D0, activation capture, patching and Study 3M, must stay
+    false forever.
+    """
     flags = _load(STATUS)["authorization_flags"]
     assert flags, "authorization_flags must not be empty"
-    assert all(value is False for value in flags.values()), flags
+    unlocked_by_the_seal = {
+        "developmental_execution_authorized",
+        "model_execution_authorized",
+    }
+    seal_published = _load(STATUS).get("seal", {}).get("created") is True
+    for name, value in flags.items():
+        if name in unlocked_by_the_seal:
+            assert value is seal_published, name
+        else:
+            assert value is False, name
+
+
+def test_the_seal_was_published_before_the_first_study_bank_model_call():
+    seal = _load(STATUS)["seal"]
+    assert seal["created"] is True
+    assert seal["published_before_the_first_study_bank_model_call"] is True
+    assert len(seal["seal_sha256"]) == 64
+
+
+def test_confirmation_d0_activation_and_patching_stay_unauthorized():
+    flags = _load(STATUS)["authorization_flags"]
+    for name in (
+        "confirmation_authorized",
+        "d0_authorized",
+        "activation_capture_or_patching_authorized",
+        "study3m_authorized",
+        "quantization_authorized",
+        "sharding_authorized",
+        "offload_authorized",
+        "device_map_auto_authorized",
+        "unregistered_model_authorized",
+        "threshold_or_estimand_change_authorized",
+        "reinterpretation_authorized",
+        "evidence_ledger_row_authorized",
+        "github_actions_run_authorized",
+    ):
+        assert flags[name] is False, name
 
 
 def test_every_claim_boundary_is_false():
@@ -294,21 +337,33 @@ def test_every_claim_boundary_is_false():
 
 
 def test_no_d0_activation_or_patching_operation_was_run():
+    """Bank realization and checkpoint acquisition are authorized after the
+    seal; D0, activation capture, patching and ledger writes never are."""
     counters = _load(STATUS)["zero_operation_counters"]
     for key in (
         "d0_runs",
         "activation_collections",
         "activation_patches",
-        "forward_passes",
-        "generations",
         "logit_reads",
-        "model_constructions",
-        "cells_executed",
-        "study_banks_realized",
+        "rp_b_selections",
         "evidence_ledger_rows_written",
         "github_actions_runs",
     ):
         assert counters[key] == 0, key
+
+
+def test_exactly_the_two_registered_development_banks_were_realized():
+    counters = _load(STATUS)["zero_operation_counters"]
+    assert counters["study_banks_realized"] == 2
+    banks = _load(STATUS)["banks"]
+    assert banks["confirmation_bank_realized"] is False
+    assert banks["cross_bank_disjoint"] is True
+    assert banks["all_invariants_pass"] is True
+    assert (
+        banks["authority_commit_used_for_seeds"]
+        == ORIGINAL_STUDY4F_AUTHORITY_COMMIT
+    )
+    assert banks["uses_the_m1_authority_hash_for_seeds"] is False
 
 
 def test_the_status_validates_against_its_own_schema():

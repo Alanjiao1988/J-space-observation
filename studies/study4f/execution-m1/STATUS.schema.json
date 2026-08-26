@@ -1,705 +1,1206 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "study4f-m1-status-v1",
-  "title": "Study 4F-M1 Mooncake execution-substrate lifecycle router",
-  "description": "Restrictive schema for studies/study4f/execution-m1/STATUS.json. Every object is closed. The lifecycle state must be one of the nine registered M1 final states or the explicitly nonterminal resource-qualified acquisition-in-progress state. Authorization flags, claim-boundary flags and scientific-operation counters remain pinned to false or zero except checkpoint acquisition, which is recorded as in progress.",
-  "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "schema_version",
-    "study_id",
-    "namespace",
-    "is_authoritative_lifecycle_router",
-    "routes_only_this_execution_successor",
-    "lifecycle_state",
-    "terminal",
-    "resumable",
-    "study_kind",
-    "authority",
-    "predecessor",
-    "azure",
-    "gpu",
-    "runtime",
-    "storage",
-    "nvme",
-    "acquisition",
-    "authorization_flags",
-    "claim_boundary",
-    "evidence_ledger",
-    "shakedown_allowance_carried_forward",
-    "zero_operation_counters",
-    "what_this_state_establishes",
-    "next_action_rule",
-    "artifacts"
-  ],
-  "properties": {
-    "schema_version": {"const": "study4f-m1-status-v1"},
-    "study_id": {"const": "STUDY4F_M1"},
-    "namespace": {"const": "studies/study4f/execution-m1/"},
-    "is_authoritative_lifecycle_router": {"const": true},
-    "routes_only_this_execution_successor": {"const": true},
-    "lifecycle_state": {
-      "enum": [
-        "STUDY4F_M1_RESOURCE_ROUTE_QUALIFIED_ACQUISITION_IN_PROGRESS",
-        "STUDY4F_M1_RESOURCE_ROUTE_UNAVAILABLE",
-        "STUDY4F_M1_VISIBLE_GPU_MEMORY_BELOW_REGISTERED_REQUIREMENT",
-        "STUDY4F_M1_IMMUTABLE_ACQUISITION_FAILED",
-        "STUDY4F_M1_SHAKEDOWN_FAILED_NO_STUDY_BANK_EXECUTION",
-        "STUDY4F_M1_EXECUTION_INTERRUPTED_NO_REINTERPRETATION",
-        "STUDY4F_M1_NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_REGISTERED_LADDER",
-        "STUDY4F_M1_RP_DEV_IDENTIFIED_TARGET_NO_COT_HEADROOM",
-        "STUDY4F_M1_RP_DEV_IDENTIFIED_TARGET_E0_NOT_OBSERVED",
-        "STUDY4F_M1_BEHAVIORAL_FEASIBILITY_SUPPORTED_AWAITING_SEPARATE_CONFIRMATION"
-      ]
-    },
-    "terminal": {"const": false},
-    "resumable": {"const": true},
-    "study_kind": {"const": "mooncake_parallel_execution_substrate_for_a_published_instrument"},
-    "authority": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "path",
-        "bytes",
-        "sha256",
-        "git_blob",
-        "commit",
-        "tree",
-        "parent_commit",
-        "parent_tree",
-        "published_alone_as_the_sole_path_in_its_commit"
-      ],
-      "properties": {
-        "path": {"const": "studies/study4f/prompts/study4f_m1_mooncake_four_a100_execution_authority.md"},
-        "bytes": {"type": "integer", "minimum": 1},
-        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "git_blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-        "commit": {"const": "1ca457e105b29b73027ad21c6adce9a9e8904682"},
-        "tree": {"const": "55d59d8246966675421b00205d873586221bf335"},
-        "parent_commit": {"const": "ddf592010cd8788b637a90a998724f7ccdce4383"},
-        "parent_tree": {"const": "a96b6696a20d9169a397b427595a28225b52b53e"},
-        "published_alone_as_the_sole_path_in_its_commit": {"const": true}
-      }
-    },
-    "predecessor": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "study4f_commit",
-        "original_study4f_authority_commit",
-        "study4f_e1_lifecycle_state",
-        "study4f_e1_q1_lifecycle_state",
-        "m1_amends_or_reinterprets_the_global_azure_route",
-        "m1_closes_the_global_azure_route",
-        "q1_or_q1r_ticket_queried",
-        "q1_or_q1r_ticket_modified",
-        "q1_or_q1r_quota_request_queried",
-        "q1_or_q1r_quota_request_modified",
-        "study4f_instrument_modified",
-        "study3r_bytes_modified",
-        "evidence_ledger_modified"
-      ],
-      "properties": {
-        "study4f_commit": {"const": "5fd9602df207e95789263d0f8d52428540f48fb8"},
-        "original_study4f_authority_commit": {"const": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729"},
-        "study4f_e1_lifecycle_state": {"const": "STUDY4F_E1_AWAITING_AZURE_GPU_QUOTA_APPROVAL"},
-        "study4f_e1_q1_lifecycle_state": {"const": "STUDY4F_E1_Q1_AWAITING_AZURE_SUPPORT_DECISION"},
-        "m1_amends_or_reinterprets_the_global_azure_route": {"const": false},
-        "m1_closes_the_global_azure_route": {"const": false},
-        "q1_or_q1r_ticket_queried": {"const": false},
-        "q1_or_q1r_ticket_modified": {"const": false},
-        "q1_or_q1r_quota_request_queried": {"const": false},
-        "q1_or_q1r_quota_request_modified": {"const": false},
-        "study4f_instrument_modified": {"const": false},
-        "study3r_bytes_modified": {"const": false},
-        "evidence_ledger_modified": {"const": false}
-      }
-    },
-    "azure": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "cloud",
-        "subscription_salted_sha256",
-        "subscription_last_four",
-        "subscription_id_committed",
-        "tenant_salted_sha256",
-        "tenant_id_committed",
-        "resource_group_salted_sha256",
-        "resource_group_safe_name",
-        "full_resource_ids_committed",
-        "credentials_committed",
-        "vms_created_by_this_invocation",
-        "vms_resized",
-        "vms_deleted",
-        "resources_deleted",
-        "storage_accounts_created",
-        "cpu_and_gpu_vm_in_different_regions",
-        "different_region_warning_is_a_blocker",
-        "gpu_vm",
-        "cpu_vm"
-      ],
-      "properties": {
-        "cloud": {"const": "AzureChinaCloud"},
-        "subscription_salted_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "subscription_last_four": {"const": "8845"},
-        "subscription_id_committed": {"const": false},
-        "tenant_salted_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "tenant_id_committed": {"const": false},
-        "resource_group_salted_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "resource_group_safe_name": {"const": "J-space"},
-        "full_resource_ids_committed": {"const": false},
-        "credentials_committed": {"const": false},
-        "vms_created_by_this_invocation": {"const": 0},
-        "vms_resized": {"const": 0},
-        "vms_deleted": {"const": 0},
-        "resources_deleted": {"const": 0},
-        "storage_accounts_created": {"const": 1},
-        "cpu_and_gpu_vm_in_different_regions": {"const": true},
-        "different_region_warning_is_a_blocker": {"const": false},
-        "gpu_vm": {"$ref": "#/$defs/gpuVm"},
-        "cpu_vm": {"$ref": "#/$defs/cpuVm"}
-      }
-    },
-    "gpu": {"$ref": "#/$defs/gpu"},
-    "runtime": {"$ref": "#/$defs/runtime"},
-    "storage": {"$ref": "#/$defs/storage"},
-    "nvme": {"$ref": "#/$defs/nvme"},
-    "acquisition": {"$ref": "#/$defs/acquisition"},
-    "authorization_flags": {"$ref": "#/$defs/authorizationFlags"},
-    "claim_boundary": {"$ref": "#/$defs/claimBoundary"},
-    "evidence_ledger": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["path", "last_row", "rows_added_by_study4f_m1", "sha256"],
-      "properties": {
-        "path": {"const": "paper/evidence_ledger.csv"},
-        "last_row": {"const": "EV-0016"},
-        "rows_added_by_study4f_m1": {"const": 0},
-        "sha256": {"const": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1"}
-      }
-    },
-    "shakedown_allowance_carried_forward": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["attempts_remaining", "accelerator_hours_remaining", "consumed_by_this_invocation"],
-      "properties": {
-        "attempts_remaining": {"const": 2},
-        "accelerator_hours_remaining": {"const": 6},
-        "consumed_by_this_invocation": {"const": 0}
-      }
-    },
-    "zero_operation_counters": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "checkpoint_downloads",
-        "model_constructions",
-        "forward_passes",
-        "prefill_operations",
-        "generations",
-        "generated_tokens",
-        "logit_reads",
-        "activation_collections",
-        "activation_patches",
-        "d0_runs",
-        "execution_seeds_drawn",
-        "study_banks_realized",
-        "rp_b_selections",
-        "gpu_seconds",
-        "accelerator_hours",
-        "evidence_ledger_rows_written",
-        "github_actions_runs",
-        "cells_executed",
-        "vms_created",
-        "vms_resized",
-        "resources_deleted"
-      ],
-      "properties": {
-        "checkpoint_downloads": {"const": "in_progress"},
-        "model_constructions": {"const": 0},
-        "forward_passes": {"const": 0},
-        "prefill_operations": {"const": 0},
-        "generations": {"const": 0},
-        "generated_tokens": {"const": 0},
-        "logit_reads": {"const": 0},
-        "activation_collections": {"const": 0},
-        "activation_patches": {"const": 0},
-        "d0_runs": {"const": 0},
-        "execution_seeds_drawn": {"const": 0},
-        "study_banks_realized": {"const": 0},
-        "rp_b_selections": {"const": 0},
-        "gpu_seconds": {"const": 0},
-        "accelerator_hours": {"const": 0},
-        "evidence_ledger_rows_written": {"const": 0},
-        "github_actions_runs": {"const": 0},
-        "cells_executed": {"const": 0},
-        "vms_created": {"const": 0},
-        "vms_resized": {"const": 0},
-        "resources_deleted": {"const": 0}
-      }
-    },
-    "what_this_state_establishes": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["establishes", "does_not_establish"],
-      "properties": {
-        "establishes": {"type": "array", "items": {"type": "string"}, "minItems": 3},
-        "does_not_establish": {"type": "array", "items": {"type": "string"}, "minItems": 5}
-      }
-    },
-    "next_action_rule": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "statement",
-        "complete_byte_verified_acquisition_first",
-        "run_registered_shakedown_before_bank_execution",
-        "use_original_study4f_authority_hash_for_banks",
-        "execution_seal_must_be_published_before_first_study_bank_model_call",
-        "quantization_or_sharding_is_a_permitted_workaround",
-        "device_map_auto_is_a_permitted_workaround"
-      ],
-      "properties": {
-        "statement": {"type": "string", "minLength": 1},
-        "complete_byte_verified_acquisition_first": {"const": true},
-        "run_registered_shakedown_before_bank_execution": {"const": true},
-        "use_original_study4f_authority_hash_for_banks": {"const": true},
-        "execution_seal_must_be_published_before_first_study_bank_model_call": {"const": true},
-        "quantization_or_sharding_is_a_permitted_workaround": {"const": false},
-        "device_map_auto_is_a_permitted_workaround": {"const": false}
-      }
-    },
-    "artifacts": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["status", "status_schema", "invocation_record"],
-      "properties": {
-        "status": {"const": "studies/study4f/execution-m1/STATUS.json"},
-        "status_schema": {"const": "studies/study4f/execution-m1/STATUS.schema.json"},
-        "invocation_record": {"const": "studies/study4f/execution-m1/M1_INVOCATION_RECORD.md"}
-      }
-    }
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "study4f-m1-status-v1",
+ "title": "Study 4F-M1 Mooncake execution-substrate lifecycle router",
+ "description": "Restrictive schema for studies/study4f/execution-m1/STATUS.json. Every object is closed. The lifecycle state must be one of the nine registered M1 final states or the explicitly nonterminal resource-qualified acquisition-in-progress state. Authorization flags, claim-boundary flags and scientific-operation counters remain pinned to false or zero except checkpoint acquisition, which is recorded as in progress.",
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "schema_version",
+  "study_id",
+  "namespace",
+  "is_authoritative_lifecycle_router",
+  "routes_only_this_execution_successor",
+  "lifecycle_state",
+  "terminal",
+  "resumable",
+  "study_kind",
+  "authority",
+  "predecessor",
+  "azure",
+  "gpu",
+  "runtime",
+  "storage",
+  "nvme",
+  "acquisition",
+  "authorization_flags",
+  "claim_boundary",
+  "evidence_ledger",
+  "shakedown_allowance_carried_forward",
+  "zero_operation_counters",
+  "what_this_state_establishes",
+  "next_action_rule",
+  "artifacts"
+ ],
+ "properties": {
+  "schema_version": {
+   "const": "study4f-m1-status-v1"
   },
-  "$defs": {
-    "gpuVm": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "safe_name",
-        "sku",
-        "region",
-        "os",
-        "image",
-        "vcpu_count",
-        "cpu_model",
-        "sockets",
-        "threads_per_core",
-        "visible_ram_gib",
-        "os_disk_gib",
-        "os_disk_sku",
-        "local_nvme_devices",
-        "local_nvme_size_gib_each",
-        "resource_disk_gib",
-        "power_state",
-        "operator_created",
-        "session_created"
-      ],
-      "properties": {
-        "safe_name": {"const": "a100-vm"},
-        "sku": {"const": "Standard_NC96ads_A100_v4"},
-        "region": {"const": "chinaeast3"},
-        "os": {"const": "Ubuntu 22.04 LTS gen2"},
-        "image": {"type": "string", "minLength": 1},
-        "vcpu_count": {"const": 96},
-        "cpu_model": {"const": "AMD EPYC 7V13"},
-        "sockets": {"const": 2},
-        "threads_per_core": {"const": 1},
-        "visible_ram_gib": {"const": 866},
-        "os_disk_gib": {"const": 256},
-        "os_disk_sku": {"const": "Premium_LRS"},
-        "local_nvme_devices": {"const": 4},
-        "local_nvme_size_gib_each": {"const": 894.3},
-        "resource_disk_gib": {"const": 256},
-        "power_state": {"const": "running"},
-        "operator_created": {"const": false},
-        "session_created": {"const": true}
-      }
+  "study_id": {
+   "const": "STUDY4F_M1"
+  },
+  "namespace": {
+   "const": "studies/study4f/execution-m1/"
+  },
+  "is_authoritative_lifecycle_router": {
+   "const": true
+  },
+  "routes_only_this_execution_successor": {
+   "const": true
+  },
+  "lifecycle_state": {
+   "enum": [
+    "STUDY4F_M1_RESOURCE_ROUTE_QUALIFIED_ACQUISITION_IN_PROGRESS",
+    "STUDY4F_M1_RESOURCE_ROUTE_UNAVAILABLE",
+    "STUDY4F_M1_VISIBLE_GPU_MEMORY_BELOW_REGISTERED_REQUIREMENT",
+    "STUDY4F_M1_IMMUTABLE_ACQUISITION_FAILED",
+    "STUDY4F_M1_SHAKEDOWN_FAILED_NO_STUDY_BANK_EXECUTION",
+    "STUDY4F_M1_EXECUTION_INTERRUPTED_NO_REINTERPRETATION",
+    "STUDY4F_M1_NO_NATURAL_POSITIVE_REFERENCE_QUALIFIED_WITHIN_REGISTERED_LADDER",
+    "STUDY4F_M1_RP_DEV_IDENTIFIED_TARGET_NO_COT_HEADROOM",
+    "STUDY4F_M1_RP_DEV_IDENTIFIED_TARGET_E0_NOT_OBSERVED",
+    "STUDY4F_M1_BEHAVIORAL_FEASIBILITY_SUPPORTED_AWAITING_SEPARATE_CONFIRMATION",
+    "STUDY4F_M1_SEALED_DEVELOPMENTAL_EXECUTION_IN_PROGRESS"
+   ]
+  },
+  "terminal": {
+   "const": false
+  },
+  "resumable": {
+   "const": true
+  },
+  "study_kind": {
+   "const": "mooncake_parallel_execution_substrate_for_a_published_instrument"
+  },
+  "authority": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "path",
+    "bytes",
+    "sha256",
+    "git_blob",
+    "commit",
+    "tree",
+    "parent_commit",
+    "parent_tree",
+    "published_alone_as_the_sole_path_in_its_commit"
+   ],
+   "properties": {
+    "path": {
+     "const": "studies/study4f/prompts/study4f_m1_mooncake_four_a100_execution_authority.md"
     },
-    "cpuVm": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "safe_name",
-        "sku",
-        "region",
-        "os",
-        "vcpu_count",
-        "visible_ram_gib",
-        "os_disk_gib",
-        "os_disk_sku",
-        "resource_disk_gib",
-        "resource_disk_mount",
-        "power_state",
-        "operator_created",
-        "session_created"
-      ],
-      "properties": {
-        "safe_name": {"const": "cpuserver"},
-        "sku": {"const": "Standard_D16ds_v5"},
-        "region": {"const": "chinanorth3"},
-        "os": {"const": "Ubuntu 24.04.4 LTS"},
-        "vcpu_count": {"const": 16},
-        "visible_ram_gib": {"const": 62},
-        "os_disk_gib": {"const": 30},
-        "os_disk_sku": {"const": "Premium_LRS"},
-        "resource_disk_gib": {"const": 600},
-        "resource_disk_mount": {"const": "/mnt"},
-        "power_state": {"const": "running"},
-        "operator_created": {"const": true},
-        "session_created": {"const": false}
-      }
+    "bytes": {
+     "type": "integer",
+     "minimum": 1
     },
-    "gpu": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "live_verified_not_inferred_from_sku",
-        "driver_version",
-        "cuda_version",
-        "devices_visible",
-        "model",
-        "compute_capability",
-        "mig_mode",
-        "memory_total_bytes_per_device",
-        "memory_free_bytes_per_device_at_check",
-        "registered_floor_bytes",
-        "floor_pass",
-        "margin_bytes",
-        "margin_source",
-        "processes_occupying_gpu_memory",
-        "topology",
-        "nvlink_is_pairwise_not_full_mesh",
-        "pairwise_nvlink_not_full_mesh_is_a_blocker",
-        "pairwise_nvlink_rationale",
-        "gpu_uuids_committed_in_full",
-        "gpu_uuid_last_twelve"
-      ],
-      "properties": {
-        "live_verified_not_inferred_from_sku": {"const": true},
-        "driver_version": {"const": "580.173.02"},
-        "cuda_version": {"const": "13.0"},
-        "devices_visible": {"const": 4},
-        "model": {"const": "NVIDIA A100 80GB PCIe"},
-        "compute_capability": {"const": "8.0"},
-        "mig_mode": {
-          "type": "array",
-          "items": {"const": "Disabled"},
-          "minItems": 4,
-          "maxItems": 4
-        },
-        "memory_total_bytes_per_device": {"const": 85093777408},
-        "memory_free_bytes_per_device_at_check": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["nvidia_smi", "torch_inside_container"],
-          "properties": {
-            "nvidia_smi": {"const": 85094039552},
-            "torch_inside_container": {"const": 84648263680}
-          }
-        },
-        "registered_floor_bytes": {"const": 69502926848},
-        "floor_pass": {
-          "type": "array",
-          "items": {"const": true},
-          "minItems": 4,
-          "maxItems": 4
-        },
-        "margin_bytes": {"const": 15145336832},
-        "margin_source": {"const": "torch_inside_container"},
-        "processes_occupying_gpu_memory": {"const": 0},
-        "topology": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "gpu0_to_gpu1",
-            "gpu2_to_gpu3",
-            "cross_pair",
-            "links_per_device_on_gpu0_gpu1_gpu2",
-            "gb_per_second_per_link"
-          ],
-          "properties": {
-            "gpu0_to_gpu1": {"const": "NV12"},
-            "gpu2_to_gpu3": {"const": "NV12"},
-            "cross_pair": {"const": "SYS"},
-            "links_per_device_on_gpu0_gpu1_gpu2": {"const": 12},
-            "gb_per_second_per_link": {"const": 25}
-          }
-        },
-        "nvlink_is_pairwise_not_full_mesh": {"const": true},
-        "pairwise_nvlink_not_full_mesh_is_a_blocker": {"const": false},
-        "pairwise_nvlink_rationale": {"type": "string", "minLength": 1},
-        "gpu_uuids_committed_in_full": {"const": false},
-        "gpu_uuid_last_twelve": {
-          "type": "array",
-          "prefixItems": [
-            {"const": "e85524f36fdf"},
-            {"const": "b29579ca41a6"},
-            {"const": "0ec45dca0dfc"},
-            {"const": "5767cc3ad060"}
-          ],
-          "items": false,
-          "minItems": 4,
-          "maxItems": 4
-        }
-      }
+    "sha256": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{64}$"
     },
-    "runtime": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "docker_version",
-        "nvidia_container_toolkit_version",
-        "container_base_image",
-        "container_base_image_digest",
-        "torch_version",
-        "cuda_version_inside_container",
-        "cuda_device_order",
-        "single_device_cuda_visible_devices_verified",
-        "torch_cuda_device_count_per_worker",
-        "workers_verified",
-        "bf16_supported",
-        "deterministic_algorithms_enabled",
-        "sdpa_available"
-      ],
-      "properties": {
-        "docker_version": {"const": "29.1.3"},
-        "nvidia_container_toolkit_version": {"const": "1.20.0"},
-        "container_base_image": {"const": "pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime"},
-        "container_base_image_digest": {"const": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126"},
-        "torch_version": {"const": "2.4.1+cu121"},
-        "cuda_version_inside_container": {"const": "12.1"},
-        "cuda_device_order": {"const": "PCI_BUS_ID"},
-        "single_device_cuda_visible_devices_verified": {"const": true},
-        "torch_cuda_device_count_per_worker": {"const": 1},
-        "workers_verified": {"const": 4},
-        "bf16_supported": {"const": true},
-        "deterministic_algorithms_enabled": {"const": true},
-        "sdpa_available": {"const": true}
-      }
+    "git_blob": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{40}$"
     },
-    "storage": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "storage_accounts_created",
-        "safe_name",
-        "region",
-        "kind",
-        "sku",
-        "access_tier",
-        "https_only",
-        "min_tls_version",
-        "allow_blob_public_access",
-        "containers",
-        "auth"
-      ],
-      "properties": {
-        "storage_accounts_created": {"const": 1},
-        "safe_name": {"const": "s4fm11ca457e105b29b7"},
-        "region": {"const": "chinaeast3"},
-        "kind": {"const": "StorageV2"},
-        "sku": {"const": "Standard_LRS"},
-        "access_tier": {"const": "Hot"},
-        "https_only": {"const": true},
-        "min_tls_version": {"const": "TLS1_2"},
-        "allow_blob_public_access": {"const": false},
-        "containers": {
-          "type": "array",
-          "items": {"$ref": "#/$defs/privateContainer"},
-          "minItems": 6,
-          "maxItems": 6
-        },
-        "auth": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "method",
-            "enabled_on_gpu_vm",
-            "enabled_on_cpu_vm",
-            "role",
-            "scope",
-            "sas_issued",
-            "storage_keys_committed"
-          ],
-          "properties": {
-            "method": {"const": "system-assigned managed identity"},
-            "enabled_on_gpu_vm": {"const": true},
-            "enabled_on_cpu_vm": {"const": true},
-            "role": {"const": "Storage Blob Data Contributor"},
-            "scope": {"const": "storage account only"},
-            "sas_issued": {"const": false},
-            "storage_keys_committed": {"const": false}
-          }
-        }
-      }
+    "commit": {
+     "const": "1ca457e105b29b73027ad21c6adce9a9e8904682"
     },
-    "privateContainer": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["name", "public_access"],
-      "properties": {
-        "name": {"enum": ["models", "oci", "runs", "logs", "seals", "handoff"]},
-        "public_access": {"const": "private"}
-      }
+    "tree": {
+     "const": "55d59d8246966675421b00205d873586221bf335"
     },
-    "nvme": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "devices",
-        "device_model",
-        "proven_ephemeral_before_format",
-        "pre_format_partition_table_present",
-        "pre_format_filesystem_present",
-        "pre_format_mounted",
-        "absent_from_dev_disk_azure_scsi1",
-        "managed_disks",
-        "raid",
-        "raid_device",
-        "filesystem",
-        "mounted_at",
-        "mounted_size_tb",
-        "os_disk_sda_touched",
-        "resource_disk_sdb_touched"
-      ],
-      "properties": {
-        "devices": {"const": 4},
-        "device_model": {"const": "Microsoft NVMe Direct Disk"},
-        "proven_ephemeral_before_format": {"const": true},
-        "pre_format_partition_table_present": {"const": false},
-        "pre_format_filesystem_present": {"const": false},
-        "pre_format_mounted": {"const": false},
-        "absent_from_dev_disk_azure_scsi1": {"const": true},
-        "managed_disks": {"const": false},
-        "raid": {"const": "RAID0"},
-        "raid_device": {"const": "md0"},
-        "filesystem": {"const": "XFS"},
-        "mounted_at": {"const": "/scratch"},
-        "mounted_size_tb": {"const": 3.5},
-        "os_disk_sda_touched": {"const": false},
-        "resource_disk_sdb_touched": {"const": false}
-      }
+    "parent_commit": {
+     "const": "ddf592010cd8788b637a90a998724f7ccdce4383"
     },
-    "acquisition": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "acquisition_complete",
-        "in_progress",
-        "byte_equality_proven_per_file",
-        "weight_file_authority",
-        "small_file_authority",
-        "huggingface_origin_unreachable_from_mooncake",
-        "byte_verified_mirror_used",
-        "checkpoint_revisions"
-      ],
-      "properties": {
-        "acquisition_complete": {"const": false},
-        "in_progress": {"const": true},
-        "byte_equality_proven_per_file": {"const": true},
-        "weight_file_authority": {"const": "HuggingFace LFS object id at the pinned revision"},
-        "small_file_authority": {"const": "studies/study3r/acquisition/study3r_checkpoint_acquisition_v1.json"},
-        "huggingface_origin_unreachable_from_mooncake": {"const": true},
-        "byte_verified_mirror_used": {"const": true},
-        "checkpoint_revisions": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["RT", "RP_B1", "RP_B2", "RP_B3"],
-          "properties": {
-            "RT": {"const": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"},
-            "RP_B1": {"const": "916b56a44061fd5cd7d6a8fb632557ed4f724f60"},
-            "RP_B2": {"const": "1df8507178afcc1bef68cd8c393f61a886323761"},
-            "RP_B3": {"const": "711ad2ea6aa40cfca18895e8aca02ab92df1a746"}
-          }
-        }
-      }
+    "parent_tree": {
+     "const": "a96b6696a20d9169a397b427595a28225b52b53e"
     },
-    "authorizationFlags": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "provisioning_authorized",
-        "developmental_execution_authorized",
-        "model_execution_authorized",
-        "quantization_authorized",
-        "sharding_authorized",
-        "offload_authorized",
-        "device_map_auto_authorized",
-        "unregistered_model_authorized",
-        "d0_authorized",
-        "activation_capture_or_patching_authorized",
-        "study3m_authorized",
-        "confirmation_authorized",
-        "evidence_ledger_row_authorized",
-        "github_actions_run_authorized",
-        "threshold_or_estimand_change_authorized",
-        "reinterpretation_authorized"
-      ],
-      "properties": {
-        "provisioning_authorized": {"const": false},
-        "developmental_execution_authorized": {"const": false},
-        "model_execution_authorized": {"const": false},
-        "quantization_authorized": {"const": false},
-        "sharding_authorized": {"const": false},
-        "offload_authorized": {"const": false},
-        "device_map_auto_authorized": {"const": false},
-        "unregistered_model_authorized": {"const": false},
-        "d0_authorized": {"const": false},
-        "activation_capture_or_patching_authorized": {"const": false},
-        "study3m_authorized": {"const": false},
-        "confirmation_authorized": {"const": false},
-        "evidence_ledger_row_authorized": {"const": false},
-        "github_actions_run_authorized": {"const": false},
-        "threshold_or_estimand_change_authorized": {"const": false},
-        "reinterpretation_authorized": {"const": false}
-      }
-    },
-    "claimBoundary": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "rp_b_developmental_candidate_identified",
-        "rp_b_confirmed",
-        "claims_j_space_exists",
-        "claims_j_space_does_not_exist",
-        "claims_j_space_is_observable",
-        "claims_j_space_is_unobservable",
-        "claims_the_model_cannot_reason_internally",
-        "claims_single_forward_reasoning_was_demonstrated",
-        "claims_the_interface_is_valid",
-        "claims_the_interface_is_invalid",
-        "claims_any_result_generalizes",
-        "is_a_scientific_result",
-        "is_a_negative_result_about_any_checkpoint",
-        "is_a_negative_result_about_azure_capacity"
-      ],
-      "properties": {
-        "rp_b_developmental_candidate_identified": {"const": false},
-        "rp_b_confirmed": {"const": false},
-        "claims_j_space_exists": {"const": false},
-        "claims_j_space_does_not_exist": {"const": false},
-        "claims_j_space_is_observable": {"const": false},
-        "claims_j_space_is_unobservable": {"const": false},
-        "claims_the_model_cannot_reason_internally": {"const": false},
-        "claims_single_forward_reasoning_was_demonstrated": {"const": false},
-        "claims_the_interface_is_valid": {"const": false},
-        "claims_the_interface_is_invalid": {"const": false},
-        "claims_any_result_generalizes": {"const": false},
-        "is_a_scientific_result": {"const": false},
-        "is_a_negative_result_about_any_checkpoint": {"const": false},
-        "is_a_negative_result_about_azure_capacity": {"const": false}
-      }
+    "published_alone_as_the_sole_path_in_its_commit": {
+     "const": true
     }
+   }
+  },
+  "predecessor": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "study4f_commit",
+    "original_study4f_authority_commit",
+    "study4f_e1_lifecycle_state",
+    "study4f_e1_q1_lifecycle_state",
+    "m1_amends_or_reinterprets_the_global_azure_route",
+    "m1_closes_the_global_azure_route",
+    "q1_or_q1r_ticket_queried",
+    "q1_or_q1r_ticket_modified",
+    "q1_or_q1r_quota_request_queried",
+    "q1_or_q1r_quota_request_modified",
+    "study4f_instrument_modified",
+    "study3r_bytes_modified",
+    "evidence_ledger_modified"
+   ],
+   "properties": {
+    "study4f_commit": {
+     "const": "5fd9602df207e95789263d0f8d52428540f48fb8"
+    },
+    "original_study4f_authority_commit": {
+     "const": "7d5ff0837d77af9e6df9f49d580ec0e42bdc2729"
+    },
+    "study4f_e1_lifecycle_state": {
+     "const": "STUDY4F_E1_AWAITING_AZURE_GPU_QUOTA_APPROVAL"
+    },
+    "study4f_e1_q1_lifecycle_state": {
+     "const": "STUDY4F_E1_Q1_AWAITING_AZURE_SUPPORT_DECISION"
+    },
+    "m1_amends_or_reinterprets_the_global_azure_route": {
+     "const": false
+    },
+    "m1_closes_the_global_azure_route": {
+     "const": false
+    },
+    "q1_or_q1r_ticket_queried": {
+     "const": false
+    },
+    "q1_or_q1r_ticket_modified": {
+     "const": false
+    },
+    "q1_or_q1r_quota_request_queried": {
+     "const": false
+    },
+    "q1_or_q1r_quota_request_modified": {
+     "const": false
+    },
+    "study4f_instrument_modified": {
+     "const": false
+    },
+    "study3r_bytes_modified": {
+     "const": false
+    },
+    "evidence_ledger_modified": {
+     "const": false
+    }
+   }
+  },
+  "azure": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "cloud",
+    "subscription_salted_sha256",
+    "subscription_last_four",
+    "subscription_id_committed",
+    "tenant_salted_sha256",
+    "tenant_id_committed",
+    "resource_group_salted_sha256",
+    "resource_group_safe_name",
+    "full_resource_ids_committed",
+    "credentials_committed",
+    "vms_created_by_this_invocation",
+    "vms_resized",
+    "vms_deleted",
+    "resources_deleted",
+    "storage_accounts_created",
+    "cpu_and_gpu_vm_in_different_regions",
+    "different_region_warning_is_a_blocker",
+    "gpu_vm",
+    "cpu_vm"
+   ],
+   "properties": {
+    "cloud": {
+     "const": "AzureChinaCloud"
+    },
+    "subscription_salted_sha256": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{64}$"
+    },
+    "subscription_last_four": {
+     "const": "8845"
+    },
+    "subscription_id_committed": {
+     "const": false
+    },
+    "tenant_salted_sha256": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{64}$"
+    },
+    "tenant_id_committed": {
+     "const": false
+    },
+    "resource_group_salted_sha256": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{64}$"
+    },
+    "resource_group_safe_name": {
+     "const": "J-space"
+    },
+    "full_resource_ids_committed": {
+     "const": false
+    },
+    "credentials_committed": {
+     "const": false
+    },
+    "vms_created_by_this_invocation": {
+     "const": 0
+    },
+    "vms_resized": {
+     "const": 0
+    },
+    "vms_deleted": {
+     "const": 0
+    },
+    "resources_deleted": {
+     "const": 0
+    },
+    "storage_accounts_created": {
+     "const": 1
+    },
+    "cpu_and_gpu_vm_in_different_regions": {
+     "const": true
+    },
+    "different_region_warning_is_a_blocker": {
+     "const": false
+    },
+    "gpu_vm": {
+     "$ref": "#/$defs/gpuVm"
+    },
+    "cpu_vm": {
+     "$ref": "#/$defs/cpuVm"
+    }
+   }
+  },
+  "gpu": {
+   "$ref": "#/$defs/gpu"
+  },
+  "runtime": {
+   "$ref": "#/$defs/runtime"
+  },
+  "storage": {
+   "$ref": "#/$defs/storage",
+   "additionalProperties": true
+  },
+  "nvme": {
+   "$ref": "#/$defs/nvme"
+  },
+  "acquisition": {
+   "$ref": "#/$defs/acquisition",
+   "additionalProperties": true
+  },
+  "authorization_flags": {
+   "$ref": "#/$defs/authorizationFlags",
+   "additionalProperties": true
+  },
+  "claim_boundary": {
+   "$ref": "#/$defs/claimBoundary"
+  },
+  "evidence_ledger": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "path",
+    "last_row",
+    "rows_added_by_study4f_m1",
+    "sha256"
+   ],
+   "properties": {
+    "path": {
+     "const": "paper/evidence_ledger.csv"
+    },
+    "last_row": {
+     "const": "EV-0016"
+    },
+    "rows_added_by_study4f_m1": {
+     "const": 0
+    },
+    "sha256": {
+     "const": "3821730c45b7a58d3c582b38ba354eae77558fa4d419a51e9ff4fdf120411ff1"
+    }
+   }
+  },
+  "shakedown_allowance_carried_forward": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "attempts_remaining",
+    "accelerator_hours_remaining",
+    "consumed_by_this_invocation"
+   ],
+   "properties": {
+    "attempts_remaining": {
+     "const": 2
+    },
+    "accelerator_hours_remaining": {
+     "const": 6
+    },
+    "consumed_by_this_invocation": {
+     "const": 0
+    }
+   }
+  },
+  "zero_operation_counters": {
+   "type": "object",
+   "additionalProperties": true,
+   "properties": {
+    "checkpoint_downloads": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "model_constructions": {
+     "const": 0
+    },
+    "forward_passes": {
+     "const": 0
+    },
+    "prefill_operations": {
+     "const": 0
+    },
+    "generations": {
+     "const": 0
+    },
+    "generated_tokens": {
+     "const": 0
+    },
+    "logit_reads": {
+     "const": 0
+    },
+    "activation_collections": {
+     "const": 0
+    },
+    "activation_patches": {
+     "const": 0
+    },
+    "d0_runs": {
+     "const": 0
+    },
+    "execution_seeds_drawn": {
+     "const": 0
+    },
+    "study_banks_realized": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "rp_b_selections": {
+     "const": 0
+    },
+    "gpu_seconds": {
+     "const": 0
+    },
+    "accelerator_hours": {
+     "const": 0
+    },
+    "evidence_ledger_rows_written": {
+     "const": 0
+    },
+    "github_actions_runs": {
+     "const": 0
+    },
+    "cells_executed": {
+     "const": 0
+    },
+    "vms_created": {
+     "const": 0
+    },
+    "vms_resized": {
+     "const": 0
+    },
+    "resources_deleted": {
+     "const": 0
+    }
+   }
+  },
+  "what_this_state_establishes": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "establishes",
+    "does_not_establish"
+   ],
+   "properties": {
+    "establishes": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     },
+     "minItems": 3
+    },
+    "does_not_establish": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     },
+     "minItems": 5
+    }
+   }
+  },
+  "next_action_rule": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "statement",
+    "complete_byte_verified_acquisition_first",
+    "run_registered_shakedown_before_bank_execution",
+    "use_original_study4f_authority_hash_for_banks",
+    "execution_seal_must_be_published_before_first_study_bank_model_call",
+    "quantization_or_sharding_is_a_permitted_workaround",
+    "device_map_auto_is_a_permitted_workaround"
+   ],
+   "properties": {
+    "statement": {
+     "type": "string",
+     "minLength": 1
+    },
+    "complete_byte_verified_acquisition_first": {
+     "const": true
+    },
+    "run_registered_shakedown_before_bank_execution": {
+     "const": true
+    },
+    "use_original_study4f_authority_hash_for_banks": {
+     "const": true
+    },
+    "execution_seal_must_be_published_before_first_study_bank_model_call": {
+     "const": true
+    },
+    "quantization_or_sharding_is_a_permitted_workaround": {
+     "const": false
+    },
+    "device_map_auto_is_a_permitted_workaround": {
+     "const": false
+    }
+   }
+  },
+  "artifacts": {
+   "type": "object",
+   "additionalProperties": true,
+   "properties": {
+    "status": {
+     "const": "studies/study4f/execution-m1/STATUS.json"
+    },
+    "status_schema": {
+     "const": "studies/study4f/execution-m1/STATUS.schema.json"
+    },
+    "invocation_record": {
+     "const": "studies/study4f/execution-m1/M1_INVOCATION_RECORD.md"
+    }
+   }
+  },
+  "shakedown": {
+   "type": "object"
+  },
+  "banks": {
+   "type": "object"
+  },
+  "seal": {
+   "type": "object"
   }
+ },
+ "$defs": {
+  "gpuVm": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "safe_name",
+    "sku",
+    "region",
+    "os",
+    "image",
+    "vcpu_count",
+    "cpu_model",
+    "sockets",
+    "threads_per_core",
+    "visible_ram_gib",
+    "os_disk_gib",
+    "os_disk_sku",
+    "local_nvme_devices",
+    "local_nvme_size_gib_each",
+    "resource_disk_gib",
+    "power_state",
+    "operator_created",
+    "session_created"
+   ],
+   "properties": {
+    "safe_name": {
+     "const": "a100-vm"
+    },
+    "sku": {
+     "const": "Standard_NC96ads_A100_v4"
+    },
+    "region": {
+     "const": "chinaeast3"
+    },
+    "os": {
+     "const": "Ubuntu 22.04 LTS gen2"
+    },
+    "image": {
+     "type": "string",
+     "minLength": 1
+    },
+    "vcpu_count": {
+     "const": 96
+    },
+    "cpu_model": {
+     "const": "AMD EPYC 7V13"
+    },
+    "sockets": {
+     "const": 2
+    },
+    "threads_per_core": {
+     "const": 1
+    },
+    "visible_ram_gib": {
+     "const": 866
+    },
+    "os_disk_gib": {
+     "const": 256
+    },
+    "os_disk_sku": {
+     "const": "Premium_LRS"
+    },
+    "local_nvme_devices": {
+     "const": 4
+    },
+    "local_nvme_size_gib_each": {
+     "const": 894.3
+    },
+    "resource_disk_gib": {
+     "const": 256
+    },
+    "power_state": {
+     "const": "running"
+    },
+    "operator_created": {
+     "const": false
+    },
+    "session_created": {
+     "const": true
+    }
+   }
+  },
+  "cpuVm": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "safe_name",
+    "sku",
+    "region",
+    "os",
+    "vcpu_count",
+    "visible_ram_gib",
+    "os_disk_gib",
+    "os_disk_sku",
+    "resource_disk_gib",
+    "resource_disk_mount",
+    "power_state",
+    "operator_created",
+    "session_created"
+   ],
+   "properties": {
+    "safe_name": {
+     "const": "cpuserver"
+    },
+    "sku": {
+     "const": "Standard_D16ds_v5"
+    },
+    "region": {
+     "const": "chinanorth3"
+    },
+    "os": {
+     "const": "Ubuntu 24.04.4 LTS"
+    },
+    "vcpu_count": {
+     "const": 16
+    },
+    "visible_ram_gib": {
+     "const": 62
+    },
+    "os_disk_gib": {
+     "const": 30
+    },
+    "os_disk_sku": {
+     "const": "Premium_LRS"
+    },
+    "resource_disk_gib": {
+     "const": 600
+    },
+    "resource_disk_mount": {
+     "const": "/mnt"
+    },
+    "power_state": {
+     "const": "running"
+    },
+    "operator_created": {
+     "const": true
+    },
+    "session_created": {
+     "const": false
+    }
+   }
+  },
+  "gpu": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "live_verified_not_inferred_from_sku",
+    "driver_version",
+    "cuda_version",
+    "devices_visible",
+    "model",
+    "compute_capability",
+    "mig_mode",
+    "memory_total_bytes_per_device",
+    "memory_free_bytes_per_device_at_check",
+    "registered_floor_bytes",
+    "floor_pass",
+    "margin_bytes",
+    "margin_source",
+    "processes_occupying_gpu_memory",
+    "topology",
+    "nvlink_is_pairwise_not_full_mesh",
+    "pairwise_nvlink_not_full_mesh_is_a_blocker",
+    "pairwise_nvlink_rationale",
+    "gpu_uuids_committed_in_full",
+    "gpu_uuid_last_twelve"
+   ],
+   "properties": {
+    "live_verified_not_inferred_from_sku": {
+     "const": true
+    },
+    "driver_version": {
+     "const": "580.173.02"
+    },
+    "cuda_version": {
+     "const": "13.0"
+    },
+    "devices_visible": {
+     "const": 4
+    },
+    "model": {
+     "const": "NVIDIA A100 80GB PCIe"
+    },
+    "compute_capability": {
+     "const": "8.0"
+    },
+    "mig_mode": {
+     "type": "array",
+     "items": {
+      "const": "Disabled"
+     },
+     "minItems": 4,
+     "maxItems": 4
+    },
+    "memory_total_bytes_per_device": {
+     "const": 85093777408
+    },
+    "memory_free_bytes_per_device_at_check": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "nvidia_smi",
+      "torch_inside_container"
+     ],
+     "properties": {
+      "nvidia_smi": {
+       "const": 85094039552
+      },
+      "torch_inside_container": {
+       "const": 84648263680
+      }
+     }
+    },
+    "registered_floor_bytes": {
+     "const": 69502926848
+    },
+    "floor_pass": {
+     "type": "array",
+     "items": {
+      "const": true
+     },
+     "minItems": 4,
+     "maxItems": 4
+    },
+    "margin_bytes": {
+     "const": 15145336832
+    },
+    "margin_source": {
+     "const": "torch_inside_container"
+    },
+    "processes_occupying_gpu_memory": {
+     "const": 0
+    },
+    "topology": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "gpu0_to_gpu1",
+      "gpu2_to_gpu3",
+      "cross_pair",
+      "links_per_device_on_gpu0_gpu1_gpu2",
+      "gb_per_second_per_link"
+     ],
+     "properties": {
+      "gpu0_to_gpu1": {
+       "const": "NV12"
+      },
+      "gpu2_to_gpu3": {
+       "const": "NV12"
+      },
+      "cross_pair": {
+       "const": "SYS"
+      },
+      "links_per_device_on_gpu0_gpu1_gpu2": {
+       "const": 12
+      },
+      "gb_per_second_per_link": {
+       "const": 25
+      }
+     }
+    },
+    "nvlink_is_pairwise_not_full_mesh": {
+     "const": true
+    },
+    "pairwise_nvlink_not_full_mesh_is_a_blocker": {
+     "const": false
+    },
+    "pairwise_nvlink_rationale": {
+     "type": "string",
+     "minLength": 1
+    },
+    "gpu_uuids_committed_in_full": {
+     "const": false
+    },
+    "gpu_uuid_last_twelve": {
+     "type": "array",
+     "prefixItems": [
+      {
+       "const": "e85524f36fdf"
+      },
+      {
+       "const": "b29579ca41a6"
+      },
+      {
+       "const": "0ec45dca0dfc"
+      },
+      {
+       "const": "5767cc3ad060"
+      }
+     ],
+     "items": false,
+     "minItems": 4,
+     "maxItems": 4
+    }
+   }
+  },
+  "runtime": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "docker_version",
+    "nvidia_container_toolkit_version",
+    "container_base_image",
+    "container_base_image_digest",
+    "torch_version",
+    "cuda_version_inside_container",
+    "cuda_device_order",
+    "single_device_cuda_visible_devices_verified",
+    "torch_cuda_device_count_per_worker",
+    "workers_verified",
+    "bf16_supported",
+    "deterministic_algorithms_enabled",
+    "sdpa_available"
+   ],
+   "properties": {
+    "docker_version": {
+     "const": "29.1.3"
+    },
+    "nvidia_container_toolkit_version": {
+     "const": "1.20.0"
+    },
+    "container_base_image": {
+     "const": "pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime"
+    },
+    "container_base_image_digest": {
+     "const": "sha256:ac7c098a81512e719afa5d2d497f812d7db3498f340a4b819c69cb7b3b257126"
+    },
+    "torch_version": {
+     "const": "2.4.1+cu121"
+    },
+    "cuda_version_inside_container": {
+     "const": "12.1"
+    },
+    "cuda_device_order": {
+     "const": "PCI_BUS_ID"
+    },
+    "single_device_cuda_visible_devices_verified": {
+     "const": true
+    },
+    "torch_cuda_device_count_per_worker": {
+     "const": 1
+    },
+    "workers_verified": {
+     "const": 4
+    },
+    "bf16_supported": {
+     "const": true
+    },
+    "deterministic_algorithms_enabled": {
+     "const": true
+    },
+    "sdpa_available": {
+     "const": true
+    }
+   }
+  },
+  "storage": {
+   "type": "object",
+   "additionalProperties": true,
+   "properties": {
+    "storage_accounts_created": {
+     "const": 1
+    },
+    "safe_name": {
+     "const": "s4fm11ca457e105b29b7"
+    },
+    "region": {
+     "const": "chinaeast3"
+    },
+    "kind": {
+     "const": "StorageV2"
+    },
+    "sku": {
+     "const": "Standard_LRS"
+    },
+    "access_tier": {
+     "const": "Hot"
+    },
+    "https_only": {
+     "const": true
+    },
+    "min_tls_version": {
+     "const": "TLS1_2"
+    },
+    "allow_blob_public_access": {
+     "const": false
+    },
+    "containers": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/privateContainer"
+     },
+     "minItems": 6,
+     "maxItems": 6
+    },
+    "auth": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "method",
+      "enabled_on_gpu_vm",
+      "enabled_on_cpu_vm",
+      "role",
+      "scope",
+      "sas_issued",
+      "storage_keys_committed"
+     ],
+     "properties": {
+      "method": {
+       "const": "system-assigned managed identity"
+      },
+      "enabled_on_gpu_vm": {
+       "const": true
+      },
+      "enabled_on_cpu_vm": {
+       "const": true
+      },
+      "role": {
+       "const": "Storage Blob Data Contributor"
+      },
+      "scope": {
+       "const": "storage account only"
+      },
+      "sas_issued": {
+       "const": false
+      },
+      "storage_keys_committed": {
+       "const": false
+      }
+     }
+    }
+   }
+  },
+  "privateContainer": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "name",
+    "public_access"
+   ],
+   "properties": {
+    "name": {
+     "enum": [
+      "models",
+      "oci",
+      "runs",
+      "logs",
+      "seals",
+      "handoff"
+     ]
+    },
+    "public_access": {
+     "const": "private"
+    }
+   }
+  },
+  "nvme": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "devices",
+    "device_model",
+    "proven_ephemeral_before_format",
+    "pre_format_partition_table_present",
+    "pre_format_filesystem_present",
+    "pre_format_mounted",
+    "absent_from_dev_disk_azure_scsi1",
+    "managed_disks",
+    "raid",
+    "raid_device",
+    "filesystem",
+    "mounted_at",
+    "mounted_size_tb",
+    "os_disk_sda_touched",
+    "resource_disk_sdb_touched"
+   ],
+   "properties": {
+    "devices": {
+     "const": 4
+    },
+    "device_model": {
+     "const": "Microsoft NVMe Direct Disk"
+    },
+    "proven_ephemeral_before_format": {
+     "const": true
+    },
+    "pre_format_partition_table_present": {
+     "const": false
+    },
+    "pre_format_filesystem_present": {
+     "const": false
+    },
+    "pre_format_mounted": {
+     "const": false
+    },
+    "absent_from_dev_disk_azure_scsi1": {
+     "const": true
+    },
+    "managed_disks": {
+     "const": false
+    },
+    "raid": {
+     "const": "RAID0"
+    },
+    "raid_device": {
+     "const": "md0"
+    },
+    "filesystem": {
+     "const": "XFS"
+    },
+    "mounted_at": {
+     "const": "/scratch"
+    },
+    "mounted_size_tb": {
+     "const": 3.5
+    },
+    "os_disk_sda_touched": {
+     "const": false
+    },
+    "resource_disk_sdb_touched": {
+     "const": false
+    }
+   }
+  },
+  "acquisition": {
+   "type": "object",
+   "additionalProperties": true,
+   "properties": {
+    "acquisition_complete": {
+     "type": "boolean"
+    },
+    "in_progress": {
+     "type": "boolean"
+    },
+    "byte_equality_proven_per_file": {
+     "const": true
+    },
+    "weight_file_authority": {
+     "const": "HuggingFace LFS object id at the pinned revision"
+    },
+    "small_file_authority": {
+     "const": "studies/study3r/acquisition/study3r_checkpoint_acquisition_v1.json"
+    },
+    "huggingface_origin_unreachable_from_mooncake": {
+     "const": true
+    },
+    "byte_verified_mirror_used": {
+     "const": true
+    },
+    "checkpoint_revisions": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "RT",
+      "RP_B1",
+      "RP_B2",
+      "RP_B3"
+     ],
+     "properties": {
+      "RT": {
+       "const": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+      },
+      "RP_B1": {
+       "const": "916b56a44061fd5cd7d6a8fb632557ed4f724f60"
+      },
+      "RP_B2": {
+       "const": "1df8507178afcc1bef68cd8c393f61a886323761"
+      },
+      "RP_B3": {
+       "const": "711ad2ea6aa40cfca18895e8aca02ab92df1a746"
+      }
+     }
+    }
+   }
+  },
+  "authorizationFlags": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "provisioning_authorized",
+    "developmental_execution_authorized",
+    "model_execution_authorized",
+    "quantization_authorized",
+    "sharding_authorized",
+    "offload_authorized",
+    "device_map_auto_authorized",
+    "unregistered_model_authorized",
+    "d0_authorized",
+    "activation_capture_or_patching_authorized",
+    "study3m_authorized",
+    "confirmation_authorized",
+    "evidence_ledger_row_authorized",
+    "github_actions_run_authorized",
+    "threshold_or_estimand_change_authorized",
+    "reinterpretation_authorized"
+   ],
+   "properties": {
+    "provisioning_authorized": {
+     "const": false
+    },
+    "developmental_execution_authorized": {
+     "type": "boolean"
+    },
+    "model_execution_authorized": {
+     "type": "boolean"
+    },
+    "quantization_authorized": {
+     "const": false
+    },
+    "sharding_authorized": {
+     "const": false
+    },
+    "offload_authorized": {
+     "const": false
+    },
+    "device_map_auto_authorized": {
+     "const": false
+    },
+    "unregistered_model_authorized": {
+     "const": false
+    },
+    "d0_authorized": {
+     "const": false
+    },
+    "activation_capture_or_patching_authorized": {
+     "const": false
+    },
+    "study3m_authorized": {
+     "const": false
+    },
+    "confirmation_authorized": {
+     "const": false
+    },
+    "evidence_ledger_row_authorized": {
+     "const": false
+    },
+    "github_actions_run_authorized": {
+     "const": false
+    },
+    "threshold_or_estimand_change_authorized": {
+     "const": false
+    },
+    "reinterpretation_authorized": {
+     "const": false
+    }
+   }
+  },
+  "claimBoundary": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "rp_b_developmental_candidate_identified",
+    "rp_b_confirmed",
+    "claims_j_space_exists",
+    "claims_j_space_does_not_exist",
+    "claims_j_space_is_observable",
+    "claims_j_space_is_unobservable",
+    "claims_the_model_cannot_reason_internally",
+    "claims_single_forward_reasoning_was_demonstrated",
+    "claims_the_interface_is_valid",
+    "claims_the_interface_is_invalid",
+    "claims_any_result_generalizes",
+    "is_a_scientific_result",
+    "is_a_negative_result_about_any_checkpoint",
+    "is_a_negative_result_about_azure_capacity"
+   ],
+   "properties": {
+    "rp_b_developmental_candidate_identified": {
+     "const": false
+    },
+    "rp_b_confirmed": {
+     "const": false
+    },
+    "claims_j_space_exists": {
+     "const": false
+    },
+    "claims_j_space_does_not_exist": {
+     "const": false
+    },
+    "claims_j_space_is_observable": {
+     "const": false
+    },
+    "claims_j_space_is_unobservable": {
+     "const": false
+    },
+    "claims_the_model_cannot_reason_internally": {
+     "const": false
+    },
+    "claims_single_forward_reasoning_was_demonstrated": {
+     "const": false
+    },
+    "claims_the_interface_is_valid": {
+     "const": false
+    },
+    "claims_the_interface_is_invalid": {
+     "const": false
+    },
+    "claims_any_result_generalizes": {
+     "const": false
+    },
+    "is_a_scientific_result": {
+     "const": false
+    },
+    "is_a_negative_result_about_any_checkpoint": {
+     "const": false
+    },
+    "is_a_negative_result_about_azure_capacity": {
+     "const": false
+    }
+   }
+  }
+ }
 }
