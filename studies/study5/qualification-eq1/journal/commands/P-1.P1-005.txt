@@ -1,0 +1,7 @@
+# P-1/P1-005 - register OD-004, OD-005, OD-006; run the OD-004 paired analysis
+# All three registered before the work they govern.
+python tools/analyse_l0_paired.py \
+    --primary p1/l0_primary.json --other p1/l0_sparsity.json \
+    --out p1/l0_paired_analysis.json --figure p1/l0_per_layer_curve.svg
+# Journal gains gpu_index_in_container and gpu_uuid_last_twelve per OD-006.
+python -m pytest studies/study5/qualification-eq1/tests -q

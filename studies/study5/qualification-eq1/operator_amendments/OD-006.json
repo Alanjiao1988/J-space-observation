@@ -1,0 +1,52 @@
+{
+ "schema_version": "study5-eq1-operator-definition-v1",
+ "definition_id": "OD-006",
+ "recorded_at_utc": "2026-08-27T13:07:00Z",
+ "phase": "P-1",
+ "approved_by": "operator, in session, 2026-08-27",
+ "kind": "standing journalling rule",
+ "applies_from": "P-1 onward, for the remainder of this invocation",
+
+ "problem": {
+  "observed_at": "P-1/P1-004",
+  "statement": "docker --gpus device=N remaps the selected physical card to index 0 inside the container. Every worker therefore reports itself as GPU 0 from inside.",
+  "consequence_if_unaddressed": "with four workers all recording gpu_index = 0, the journal's gpu_index field carries no information. Resource accounting cannot attribute GPU-seconds to a device, and a per-device anomaly - a card running hot, throttling, or producing different numerics - becomes invisible and unattributable after the fact.",
+  "this_is_a_provenance_defect_not_a_cosmetic_one": true
+ },
+
+ "rule": {
+  "every_journal_record_carries_both": [
+   "gpu_index_in_container, the container's view, which is 0 for every single-device worker",
+   "gpu_uuid_last_twelve, the physical identity"
+  ],
+  "authoritative_field": "gpu_uuid_last_twelve",
+  "why": "the physical UUID is stable across container boundaries, host restarts and scheduling, and is the only field that identifies which piece of hardware produced a number"
+ },
+
+ "registered_physical_devices": {
+  "source": "recorded by the predecessor study, Study 4F-M1",
+  "uuid_last_twelve": [
+   "e85524f36fdf",
+   "b29579ca41a6",
+   "0ec45dca0dfc",
+   "5767cc3ad060"
+  ],
+  "full_uuids_committed": false,
+  "why_only_the_last_twelve": "it is sufficient to distinguish four devices and to match the predecessor record, without committing a full hardware identifier"
+ },
+
+ "assertions": {
+  "each_worker_resolves_exactly_one_physical_uuid": true,
+  "resolved_uuids_are_pairwise_distinct_across_concurrent_workers": true,
+  "every_resolved_uuid_is_one_of_the_four_registered": true,
+  "a_uuid_outside_the_registered_four_is_a_stop": "it would mean the hardware is not the hardware the predecessor recorded, which is a resource-inventory question and not something to work around"
+ },
+
+ "interaction_with_the_isolation_contract": {
+  "the_contract_still_requires_exactly_one_visible_device_per_worker": true,
+  "how_it_is_verified": "the worker asserts torch.cuda.device_count() == 1 rather than trusting CUDA_VISIBLE_DEVICES, because the remapping described above means the environment variable does not say what it appears to say",
+  "this_assertion_already_caught_one_real_error": "at P-1/P1-004 a worker was launched with CUDA_VISIBLE_DEVICES=1 against --gpus device=1; inside the container that addressed nothing, and the device_count assertion is what surfaced it rather than a silently wrong measurement"
+ },
+
+ "claim_ceiling": "This is a record-keeping rule. It licenses no claim of any kind."
+}

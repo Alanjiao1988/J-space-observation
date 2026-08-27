@@ -40,6 +40,8 @@ RECORD_FIELDS = (
     "step_id",
     "host",
     "gpu_index",
+    "gpu_index_in_container",
+    "gpu_uuid_last_twelve",
     "gpu_seconds",
     "command_sha256",
     "inputs_sha256",
@@ -48,6 +50,12 @@ RECORD_FIELDS = (
     "blocker_id",
     "note",
 )
+
+# OD-006: the physical devices recorded by the predecessor study. A worker that
+# resolves a UUID outside this set is not running on the hardware the record
+# describes, which is a resource-inventory question rather than something to
+# work around.
+REGISTERED_GPU_UUIDS = ("e85524f36fdf", "b29579ca41a6", "0ec45dca0dfc", "5767cc3ad060")
 
 
 class DuplicateJournalKey(RuntimeError):
@@ -97,6 +105,8 @@ class JournalRecord:
     command_sha256: str
     duration_s: float | None = None
     gpu_index: int | None = None
+    gpu_index_in_container: int | None = None
+    gpu_uuid_last_twelve: str | None = None
     gpu_seconds: float = 0.0
     inputs_sha256: list[str] = field(default_factory=list)
     outputs_sha256: list[str] = field(default_factory=list)
@@ -117,6 +127,8 @@ class JournalRecord:
             "step_id": self.step_id,
             "host": self.host,
             "gpu_index": self.gpu_index,
+            "gpu_index_in_container": self.gpu_index_in_container,
+            "gpu_uuid_last_twelve": self.gpu_uuid_last_twelve,
             "gpu_seconds": round(float(self.gpu_seconds), 3),
             "command_sha256": self.command_sha256,
             "inputs_sha256": list(self.inputs_sha256),
@@ -233,6 +245,8 @@ def _cmd_append(args: argparse.Namespace) -> int:
         exit_status=args.exit_status,
         command_sha256=args.command_sha256,
         gpu_index=args.gpu_index,
+        gpu_index_in_container=args.gpu_index_in_container,
+        gpu_uuid_last_twelve=args.gpu_uuid_last_twelve,
         gpu_seconds=args.gpu_seconds,
         inputs_sha256=args.input or [],
         outputs_sha256=args.output or [],
@@ -275,6 +289,8 @@ def build_parser() -> argparse.ArgumentParser:
     append.add_argument("--ts-end-utc")
     append.add_argument("--host")
     append.add_argument("--gpu-index", type=int)
+    append.add_argument("--gpu-index-in-container", type=int)
+    append.add_argument("--gpu-uuid-last-twelve")
     append.add_argument("--gpu-seconds", type=float, default=0.0)
     append.add_argument("--command-sha256", required=True)
     append.add_argument("--input", action="append")

@@ -1,0 +1,71 @@
+{
+ "schema_version": "study5-eq1-operator-definition-v1",
+ "definition_id": "OD-004",
+ "recorded_at_utc": "2026-08-27T13:05:00Z",
+ "phase": "P-1",
+ "approved_by": "operator, in session, 2026-08-27",
+ "kind": "primary-statistic registration for an instrument property",
+ "subject": "the direction of l1_weight -> L0 in the transcoder-adapters family",
+
+ "not_a_hypothesis_test": {
+  "statement": "This is descriptive statistics of an instrument property. It is NOT a research hypothesis test and it does NOT consume any part of the multiple-testing budget.",
+  "why": "the quantity described is a property of the measuring apparatus, decided before and independently of any accuracy measurement; it enters no estimand and licenses no scientific claim",
+  "counted_against_alpha": false
+ },
+
+ "why_the_layers_are_a_paired_unit": {
+  "statement": "The two checkpoints share an architecture and a layer indexing, so layer l of one corresponds to layer l of the other. The 28 layers are therefore a paired unit.",
+  "same_principle_as_the_study": "this is the same principle the study already applies to items: compare within the pair, then aggregate, rather than aggregating each arm separately and differencing the summaries",
+  "why_mean_and_median_over_layers_are_wrong_here": "both are UNPAIRED summaries. They discard the layer correspondence and are dominated by the order-of-magnitude tail at layers 26 and 27, where layer 27 alone differs by roughly 19 features per token - enough to flip the sign of the unpaired mean by itself."
+ },
+
+ "registered_primary_statistic": {
+  "statistic": "the per-layer paired difference L0_c(l) - L0_primary(l), across l = 0..27",
+  "tests": ["exact two-sided sign test", "Wilcoxon signed-rank"],
+  "effect_size": "median_l [ L0_{l1w0.003}(l) / L0_{l1w0.001}(l) ]",
+  "primary_object_for_reporting": "the per-layer L0 curve, both checkpoints on one figure"
+ },
+
+ "demoted_to_descriptive": {
+  "statistics": ["mean over layers", "median over layers"],
+  "must_be_labelled": "dominated by the layer 26 and 27 tail",
+  "may_not_be_used_to_decide_the_direction": true
+ },
+
+ "measured_result": {
+  "layers": 28,
+  "layers_supporting_prose_direction": 21,
+  "layers_supporting_table_direction": 7,
+  "ties": 0,
+  "sign_test_two_sided_p": 0.012541,
+  "sign_test_supports": "prose",
+  "wilcoxon_signed_rank_W": 136.0,
+  "wilcoxon_z": -1.5257,
+  "wilcoxon_two_sided_p": 0.127088,
+  "wilcoxon_supports_at_alpha_0.05": false,
+  "median_paired_ratio": 0.6685,
+  "median_paired_ratio_supports": "prose, since the ratio is below 1",
+  "paired_ratio_range": [0.4225, 3.5032],
+  "layers_with_paired_ratio_below_one": 21,
+  "unpaired_mean_ratio_for_contrast": 1.1154,
+  "unpaired_median_ratio_for_contrast": 1.0724
+ },
+
+ "the_two_registered_tests_disagree": {
+  "disclosed": true,
+  "finding": "The sign test reaches p = 0.0125 and supports the prose direction. The Wilcoxon signed-rank does NOT reach significance at alpha = 0.05, returning p = 0.127. Both were registered, so both are reported; reporting only the significant one would be selective reporting.",
+  "why_they_disagree": "The sign test counts direction only and is magnitude-free. Wilcoxon weights each layer by the rank of its absolute difference, so it is magnitude-sensitive. Layers 26 and 27 differ enormously in the TABLE direction - layer 27 alone by about 19 features per token - so those two layers receive the top ranks and pull the signed-rank statistic back toward the null.",
+  "consequence_for_the_conclusion": "The Wilcoxon remains partially vulnerable to exactly the tail that motivated this registration, whereas the sign test does not. That is a reason to prefer the sign test HERE, but it is a reason stated before the conclusion is drawn rather than after, and it does not make the Wilcoxon result disappear.",
+  "honest_strength_of_evidence": "The direction claim rests on the sign test and on the median paired ratio of 0.6685, which agree. It is NOT corroborated by the magnitude-weighted test. The evidence for the direction is therefore real but not overwhelming, and the conclusion is registered at that strength and no higher."
+ },
+
+ "registered_conclusion": {
+  "conclusion": "The README prose is right and the README table is wrong: higher l1_weight produces LOWER L0, meaning a sparser adapter.",
+  "supported_by": ["the sign test, p = 0.0125", "the median paired ratio, 0.6685", "21 of 28 layers"],
+  "not_supported_by": ["the Wilcoxon signed-rank, p = 0.127"],
+  "prose_direction_is_also_the_physically_conventional_one": "a larger L1 penalty should sparsify, which is what the prose says and the table denies",
+  "the_readme_table_may_no_longer_be_used": "OD-005 forbids using the table's nominal values in place of measurement when selecting the sensitivity arm"
+ },
+
+ "claim_ceiling": "This describes the behaviour of an instrument on a data slice. It is not evidence about J-space, about distillation, or about reasoning, and it is not a scientific result."
+}

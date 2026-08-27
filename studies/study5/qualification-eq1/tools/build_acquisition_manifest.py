@@ -74,6 +74,37 @@ RECORDED_NOT_ACQUIRED = {
     "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.0001-l0-0.1": "5846092d62317129ec24af0c5b276c2e5f7dbf0e",
 }
 
+# OD-005 authorises acquiring the three remaining published checkpoints. The
+# registered sensitivity arm turned out to separate from the primary by only
+# about 1.1x in measured L0, and OD-004 falsified the README table, so the arm
+# must be selected on measured L0 rather than on published nominal values.
+# Every revision below is exactly the one authority section 4.1 records.
+OD005_TARGETS: tuple[dict[str, str], ...] = (
+    {
+        "role": "sparsity_candidate_l1w0.01",
+        "repo": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.01-l0-10.3",
+        "revision": "0f628036f9522bc8687c7fd09fc5af2cf6c51336",
+        "licence": "none",
+        "redistributable": "no",
+    },
+    {
+        "role": "sparsity_candidate_l1w0.0003",
+        "repo": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.0003-l0-0.4",
+        "revision": "893466285964c27b7b9ecb42d8036fd67686afaa",
+        "licence": "none",
+        "redistributable": "no",
+    },
+    {
+        "role": "sparsity_candidate_l1w0.0001",
+        "repo": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.0001-l0-0.1",
+        "revision": "5846092d62317129ec24af0c5b276c2e5f7dbf0e",
+        "licence": "none",
+        "redistributable": "no",
+    },
+)
+
+TARGET_SETS = {"p0": REGISTERED, "od005": OD005_TARGETS}
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -138,10 +169,11 @@ def manifest_for(entry: dict[str, str]) -> dict[str, Any]:
     }
 
 
-def build() -> dict[str, Any]:
-    entries = [manifest_for(e) for e in REGISTERED]
+def build(target_set: str = "p0") -> dict[str, Any]:
+    entries = [manifest_for(e) for e in TARGET_SETS[target_set]]
     return {
         "schema_version": "study5-eq1-acquisition-manifest-v2",
+        "target_set": target_set,
         "authority_section": "4.1",
         "built_at_utc": utc_now(),
         "built_from": "HuggingFace API metadata only",
@@ -179,9 +211,10 @@ def build() -> dict[str, Any]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", required=True)
+    parser.add_argument("--targets", choices=sorted(TARGET_SETS), default="p0")
     args = parser.parse_args(argv)
 
-    payload = build()
+    payload = build(args.targets)
     path = Path(args.out)
     path.parent.mkdir(parents=True, exist_ok=True)
     text = json.dumps(payload, ensure_ascii=False, indent=1) + "\n"

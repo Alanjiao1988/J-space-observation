@@ -1,0 +1,69 @@
+{
+ "schema_version": "study5-eq1-operator-definition-v1",
+ "definition_id": "OD-005",
+ "recorded_at_utc": "2026-08-27T13:06:00Z",
+ "phase": "P-1",
+ "approved_by": "operator, in session, 2026-08-27",
+ "kind": "selection rule for the sparsity sensitivity arm",
+ "frozen_before_its_inputs_exist": true,
+ "inputs_that_do_not_yet_exist_at_registration_time": [
+  "L0 of l1w0.01",
+  "L0 of l1w0.0003",
+  "L0 of l1w0.0001"
+ ],
+
+ "problem_being_solved": {
+  "measured": "the registered sensitivity checkpoint separates from the primary by about 1.12x on the unpaired mean and 1.07x on the unpaired median, against the 3.07x the README table implies",
+  "why_this_matters_beyond_wasted_compute": "At that separation the arm contrasts two nearly equally sparse models, so it would almost certainly agree with the primary. A sensitivity analysis that is bound to agree READS as robustness evidence while establishing nothing. That is an inferential harm, not merely a compute cost.",
+  "the_readme_cannot_be_used_instead": "OD-004 falsified the README table's direction, so its nominal L0 values may not stand in for measurement when choosing an arm"
+ },
+
+ "step_1_acquisition": {
+  "candidates": [
+   {"repo": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.01-l0-10.3", "revision": "0f628036f9522bc8687c7fd09fc5af2cf6c51336"},
+   {"repo": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.0003-l0-0.4", "revision": "893466285964c27b7b9ecb42d8036fd67686afaa"},
+   {"repo": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.0001-l0-0.1", "revision": "5846092d62317129ec24af0c5b276c2e5f7dbf0e"}
+  ],
+  "revisions_are_exactly_those_in_authority_4_1": true,
+  "path": "the identical byte-verification and content-addressing route used at P-0: fetched by the cloud VM, checked against the origin-published authority, content-addressed into models/sha256/<aa>/<full>, create-only under If-None-Match",
+  "a_candidate_that_cannot_be_byte_verified_is_dropped": true,
+  "dropping_a_candidate_does_not_stop_the_main_track": true
+ },
+
+ "step_2_measurement": {
+  "protocol": "identical to the primary and sensitivity measurements already performed",
+  "identical_in": [
+   "the OpenThoughts3 val split, never train",
+   "the same slice size of 200 rows taken as a deterministic prefix",
+   "the same max_seq_len of 1024",
+   "the same code, the same masking, batch_size 1, bf16"
+  ],
+  "why_identical_matters": "the selection compares candidates against the primary, so any protocol difference would be confounded with the quantity being selected on"
+ },
+
+ "step_3_selection_rule": {
+  "separation_statistic": "sep(c) = median_l [ L0_c(l) / L0_primary(l) ]",
+  "why_a_paired_median_ratio": "it is the OD-004 primary statistic applied to selection: paired by layer, and a median rather than a mean so the layer 26 and 27 tail cannot dominate the choice",
+  "qualifying_condition": "sep(c) >= 2.0 OR sep(c) <= 0.5",
+  "why_two_sided": "separation in either direction gives the arm leverage; a candidate that is much sparser is as informative as one that is much denser",
+  "chosen": "among qualifying candidates, the one with the greatest separation from 1.0",
+  "thresholds_frozen_before_any_candidate_L0_exists": true
+ },
+
+ "step_4_if_none_qualify": {
+  "action": "DELETE the sparsity sensitivity arm entirely",
+  "reported_as": "a conclusive limitation, namely that the published checkpoint family does not, on measurement, provide effective sparsity leverage",
+  "is_this_a_failure_of_the_study": false,
+  "why_not": "it is a measured property of the released artifacts; reporting it is more informative than running an arm that cannot discriminate"
+ },
+
+ "why_this_is_not_outcome_dependent_selection": {
+  "statement": "The selection criterion is L0, an instrument property measured before any accuracy measurement exists and entirely unrelated to the estimand.",
+  "no_accuracy_figure_is_consulted": true,
+  "no_recovery_figure_is_consulted": true,
+  "the_rule_and_its_thresholds_are_frozen_before_the_candidate_measurements_exist": true,
+  "consequence": "the arm cannot be chosen for producing a preferred result, because at selection time no result of any kind has been observed"
+ },
+
+ "claim_ceiling": "Selecting or dropping this arm is an instrument decision. It is not evidence about J-space, about distillation, or about reasoning."
+}
