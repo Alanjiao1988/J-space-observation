@@ -1,0 +1,71 @@
+{
+ "schema_version": "study5-eq1-contamination-report-v1",
+ "authority_section": "4.3",
+ "checked_at_utc": "2026-08-27T04:50:52Z",
+ "phase": "P-0",
+ "run_before_any_model_call": true,
+ "method": "dual channel: exact 13-gram overlap and hashed character 5-gram cosine",
+ "channels_are_lexical_not_neural": true,
+ "hash_is_stable_across_processes": true,
+ "why_lexical": "the check must run before any model call, and a neural embedding would make contamination depend on the artefact under study",
+ "thresholds_fixed_before_measurement": true,
+ "ngram_n": 13,
+ "ngram_flag_threshold": 1,
+ "cosine_char_ngram": 5,
+ "cosine_flag_threshold": 0.8,
+ "flag_rule": "either channel exceeding its threshold flags the item",
+ "benchmark_split_artifact": "/scratch/study5/reports/benchmark_split.json",
+ "benchmark_split_sha256": "c62dbd0ddf720cc972d17d10338b81968c4ce5b77c9e9cea5f4e8bdb49faf322",
+ "development_items_checked": 200,
+ "confirmation_items_checked": 0,
+ "confirmation_items_loaded": 0,
+ "confirmation_isolation_held": true,
+ "reference_files": [
+  "/scratch/study5/contamination/val.jsonl",
+  "/scratch/study5/contamination/train.jsonl"
+ ],
+ "reference_rows_scanned": 54948,
+ "flagged_item_count": 5,
+ "overlap_rate": 0.025,
+ "flagged_items": [
+  {
+   "item_id": "test/prealgebra/1646.json",
+   "shared_ngrams": 5,
+   "max_cosine": 0.4815,
+   "flagged_by_ngram": true,
+   "flagged_by_cosine": false
+  },
+  {
+   "item_id": "test/prealgebra/1003.json",
+   "shared_ngrams": 1,
+   "max_cosine": 0.2535,
+   "flagged_by_ngram": true,
+   "flagged_by_cosine": false
+  },
+  {
+   "item_id": "test/precalculus/541.json",
+   "shared_ngrams": 2,
+   "max_cosine": 0.31,
+   "flagged_by_ngram": true,
+   "flagged_by_cosine": false
+  },
+  {
+   "item_id": "test/geometry/1108.json",
+   "shared_ngrams": 1,
+   "max_cosine": 0.2712,
+   "flagged_by_ngram": true,
+   "flagged_by_cosine": false
+  },
+  {
+   "item_id": "test/precalculus/1281.json",
+   "shared_ngrams": 3,
+   "max_cosine": 0.4501,
+   "flagged_by_ngram": true,
+   "flagged_by_cosine": false
+  }
+ ],
+ "max_cosine_observed": 0.4815,
+ "max_shared_ngrams_observed": 5,
+ "interpretation_ceiling": "This measures overlap between the adapter's training sample and the development items. It is reported alongside any accuracy figure. It is not evidence about J-space, about distillation, or about reasoning.",
+ "unused_confirmation_pool_size": 300
+}

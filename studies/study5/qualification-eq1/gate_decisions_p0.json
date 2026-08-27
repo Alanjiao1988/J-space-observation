@@ -1,0 +1,132 @@
+{
+ "schema_version": "study5-eq1-gate-decision-v1",
+ "phase": "P-0",
+ "decided_at_utc": "2026-08-27T04:55:00Z",
+ "decided_before_any_model_call": true,
+ "gates_decided": [
+  "Q-1",
+  "Q-2"
+ ],
+ "criteria_were_written_before_the_measurement": true,
+ "Q-1": {
+  "name": "Availability and legality",
+  "criterion": "all section 4 bytes obtainable; section 3.7 licence position recorded",
+  "verdict": "PASS",
+  "bytes_obtainable": {
+   "base_mlp_donor": {
+    "repo": "Qwen/Qwen2.5-Math-7B",
+    "revision": "b101308fe89651ea5ce025f25317fea6fc07e96e",
+    "files": 14,
+    "obtained": true
+   },
+   "adapter_primary": {
+    "repo": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.001-l0-1.4",
+    "revision": "9033fcd16d2fcb8fbe18efa2e6ed6503b0a784dc",
+    "files": 69,
+    "obtained": true,
+    "includes_classifications": true
+   },
+   "adapter_sparsity_sensitivity": {
+    "repo": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.003-l0-4.3",
+    "revision": "89ead0db81b65fa1ed6d433324d100c74bf77edd",
+    "files": 12,
+    "obtained": true
+   },
+   "target_T": {
+    "repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+    "revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+    "obtained": true,
+    "note": "byte-verified into the models container by the predecessor study; not re-acquired"
+   },
+   "jlens_code": {
+    "repo": "anthropics/jacobian-lens",
+    "commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+    "obtained": true,
+    "note": "installed into the frozen image from the pinned commit"
+   },
+   "primary_benchmark": {
+    "repo": "HuggingFaceH4/MATH-500",
+    "revision": "6e4ed1a2a79af7d8630a6b768ec859cb5af4d3be",
+    "obtained": true
+   },
+   "secondary_benchmark": {
+    "registered": "Idavidrein/gpqa diamond",
+    "obtained": false,
+    "reason": "gated auto; the deciding data file returns HTTP 401 unauthenticated and no token exists on the execution host",
+    "registered_fallback_used": "TIGER-Lab/MMLU-Pro STEM at b189ec765aa7ed75c8acfea42df31fdae71f97be",
+    "fallback_obtainable": true,
+    "resolved_at": "P-0, before any model call, before any outcome was observed",
+    "counts_as_a_Q1_failure": false,
+    "why_not_a_failure": "section 4.3 registers the fallback in advance precisely for this case; taking a pre-registered fallback at the pre-registered time is the criterion being satisfied, not evaded"
+   },
+   "contamination_reference": {
+    "repo": "nathu0/transcoder-adapters-openthoughts3-stratified-55k",
+    "revision": "b6d6ca48ac7e12517bd16411687a28e404cc2692",
+    "obtained": true
+   }
+  },
+  "licence_position_recorded": {
+   "recorded_in": [
+    "studies/study5/qualification-eq1/STATUS.json",
+    "studies/study5/prompts/study5_eq1_qualification_authority.md section 3.7"
+   ],
+   "nathanhu0_transcoder_adapters": "no licence",
+   "all_five_hf_adapter_checkpoints": "no licence",
+   "position": "research use; no adapter weight byte and no repository source file redistributed, not into Git, not to any public location, not into the handoff container",
+   "missing_licence_recorded_verbatim_as_an_open_legal_question": true,
+   "adapter_weight_bytes_committed_to_git": 0,
+   "adapter_source_files_committed_to_git": 0,
+   "adapter_bytes_written_to_handoff_container": 0,
+   "authors_contacted": 0,
+   "seeking_a_grant_is_an_operator_decision_not_taken_here": true,
+   "unencumbered": {
+    "Qwen/Qwen2.5-Math-7B": "apache-2.0",
+    "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B": "MIT",
+    "anthropics/jacobian-lens": "apache-2.0"
+   }
+  }
+ },
+ "Q-2": {
+  "name": "Immutable hashes",
+  "criterion": "every acquired file hashed on the execution host and matching its authoritative value before use; content-addressed into models/sha256/<aa>/<full>; round-trip re-hash after upload",
+  "verdict": "PASS",
+  "hashed_on_the_execution_host": true,
+  "operator_workstation_in_the_data_path": false,
+  "files_processed": 95,
+  "files_failed": 0,
+  "hash_mismatches": 0,
+  "all_hashes_match_authority": true,
+  "authority_kinds_used": {
+   "lfs_sha256": "the origin's LFS object id, which is the content sha256, compared directly",
+   "git_blob_sha1": "for non-LFS files the origin publishes only a git blob id, a sha1 over b'blob <len>\\0'+content; the host recomputes that same construction"
+  },
+  "why_two_kinds": "a git blob id is not a content sha256; treating one as the other is the silent mismatch this gate exists to catch, so they are stored in separate fields and verified by separate code paths",
+  "content_addressed": true,
+  "path_scheme": "models/sha256/<aa>/<full sha256>",
+  "round_trip_reverified_after_upload": true,
+  "all_round_trips_verified": true,
+  "files_uploaded": 82,
+  "files_already_present_and_verified_by_full_reread": 13,
+  "bytes_written": 53330976198,
+  "existing_blobs_overwritten": 0,
+  "containers_created": 0,
+  "sas_tokens_issued": 0,
+  "storage_keys_used": 0,
+  "role_assignments_changed": 0,
+  "create_only_precondition_used": "If-None-Match: *",
+  "precondition_failures": 0,
+  "deduplication_note": "13 files were already present at their content-addressed path, which is expected because the two adapter repositories share byte-identical tokenizer and template files. A pre-existing blob is verified by HEAD plus a full round-trip re-hash rather than by issuing a PUT, so benign deduplication does not trip hard blocker 12.6 and nothing is overwritten.",
+  "mirror_route_disclosure": "the GPU host cannot reach the HuggingFace origin, so bytes were fetched through a mirror; the mirror is never trusted, because every file is checked against an authority obtained from the origin and a failing file is deleted rather than uploaded"
+ },
+ "artifacts": {
+  "acquisition_manifest": "studies/study5/qualification-eq1/acquisition_manifest.json",
+  "acquisition_manifest_sha256": "1af300aea39be38d47669e3eb4964d56fde388624a038a3ab7c024811af4de39",
+  "acquisition_report": "studies/study5/qualification-eq1/acquisition_report.json",
+  "acquisition_report_sha256": "d10f8cfc07c5d3b1e1f88d7d9ffd0aa00870ad82d1f008c20a121c626cd8d206",
+  "gpqa_gate_resolution": "studies/study5/qualification-eq1/gpqa_gate_resolution.json",
+  "benchmark_split": "studies/study5/qualification-eq1/benchmark_split.json",
+  "contamination_report": "studies/study5/qualification-eq1/contamination_report.json",
+  "container_image_provenance": "studies/study5/qualification-eq1/container_image.json"
+ },
+ "claim_ceiling": "Q-1 and Q-2 are engineering gates. Passing them establishes that the registered bytes exist, were obtained byte-exactly and are addressable. It establishes nothing about J-space, about distillation, or about reasoning, and it is not a scientific result."
+}

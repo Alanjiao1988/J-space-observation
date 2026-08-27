@@ -182,7 +182,7 @@
   }
  ],
  "amended": true,
- "amended_at_utc": "2026-08-27T02:19:11Z",
+ "amended_at_utc": "2026-08-27T04:56:52Z",
  "amendment_reason": "The opening snapshot predates the inclusion of network security groups in the snapshot field table. The NSG subtree here is reconstructed, not captured: it is the post-change listing with the rules registered in expected_deltas.json removed, checked against the rule listing independently recorded at P-0/P0-005 immediately before the change was applied.",
  "nsg_subtree_is_reconstructed_not_captured": true,
  "reconstruction_verified_against_pre_change_listing": true,
@@ -190,5 +190,5 @@
  "original_opening_snapshot_sha256": "23503ddaf3c9f7dfeec7f69c0341b36cf8434d74167352cfb80f3f180d3f5cfa",
  "original_opening_snapshot_unmodified": true,
  "expected_deltas_artifact": "studies/study5/qualification-eq1/inventory/expected_deltas.json",
- "expected_deltas_sha256": "c7d9ab00096d62d58c49b109c887be97f847343d9159c6319f6ebad13a94cf93"
+ "expected_deltas_sha256": "952e7854c5f95e40d55ed97e66ac7ded0d93644383fce0c70b2fd4f97d65d760"
 }

@@ -1,8 +1,8 @@
 {
  "schema_version": "study5-eq1-resource-accounting-v1",
  "authority_section": "9.3",
- "updated_at_utc": "2026-08-27T02:25:00Z",
- "phase": "P-0",
+ "updated_at_utc": "2026-08-27T04:55:00Z",
+ "phase": "P-0 complete",
  "invocation_complete": false,
  "budget_measurement_definition": {
   "definition_id": "OD-001",
@@ -64,12 +64,13 @@
   "units": "actively used GPU-hours"
  },
  "bytes_written": {
-  "blob_bytes_written_this_invocation": "IN_PROGRESS",
+  "blob_bytes_written_this_invocation": 53330976198,
+  "blobs_written": 82,
   "container": "models",
   "path_scheme": "models/sha256/<aa>/<full sha256>",
   "existing_blobs_overwritten": 0,
   "containers_created": 0,
-  "note": "content-addressed create-only writes; a pre-existing blob at the same path is verified by round-trip re-hash rather than rewritten"
+  "note": "content-addressed create-only writes; 13 files already present at their content-addressed path were verified by full round-trip re-hash rather than rewritten"
  },
  "paid_resources": {
   "a100_vm": {
@@ -109,5 +110,16 @@
  "cost_reduction_actions_proposed": 0,
  "cost_reduction_actions_performed": 0,
  "vms_stopped_or_deallocated": 0,
- "spend_interrupted_by_this_invocation": false
+ "spend_interrupted_by_this_invocation": false,
+ "network_transfer": {
+  "model_and_adapter_bytes_fetched_by_the_vm": 53344133827,
+  "contamination_corpus_bytes_fetched_by_the_vm": 1502173552,
+  "benchmark_bytes_fetched_by_the_vm": 446564,
+  "file_bytes_fetched_by_the_operator_workstation": 0,
+  "operator_constraint_satisfied": true,
+  "egress_meter_triggered": false,
+  "egress_note": "uploads are same-region from the GPU host to the storage account; the inbound fetch from the public mirror is ingress, which is not metered",
+  "consumed_accelerator_hours": 0.0,
+  "why_zero": "acquisition is network-bound and uses no GPU; under OD-001 the 240-hour ceiling counts actively used GPU-hours only"
+ }
 }

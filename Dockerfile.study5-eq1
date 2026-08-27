@@ -44,6 +44,21 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1
 
+# The package index is pinned rather than left to the default. From this
+# network pypi.org resolves only intermittently -- one build of this image
+# succeeded against it and the next failed with "no matching distribution" for
+# a package that plainly exists. A build that depends on which way that
+# intermittency falls is not reproducible, so the mirror that answers reliably
+# is named explicitly. It is a mirror of the same index; every version here is
+# still pinned by requirements-jlens.txt and the resolved set is frozen into the
+# image, so this changes where bytes come from and not which bytes they are.
+ARG PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+ARG PIP_RETRIES=5
+ARG PIP_TIMEOUT=120
+ENV PIP_INDEX_URL=${PIP_INDEX_URL} \
+    PIP_RETRIES=${PIP_RETRIES} \
+    PIP_TIMEOUT=${PIP_TIMEOUT}
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates git tini \
     && groupadd --system --gid 10001 jspace \
@@ -73,27 +88,13 @@ RUN python -m pip install --no-cache-dir scipy \
 
 # Fail the build rather than the study: every capability the phase plan depends
 # on is exercised now, while a failure is still cheap to diagnose.
-RUN python - <<'PY'
-import importlib.metadata as m
-import jlens, sympy, scipy, torch, transformers, numpy
-
-for name in ("fit", "apply", "merge"):
-    assert hasattr(jlens, name), f"jlens.{name} is missing"
-
-from scipy.optimize import linear_sum_assignment  # authority 6.3 matching
-from transformers import AutoConfig               # authority 3.6 scoring
-
-# The registered symbolic checker must actually decide equivalence.
-from sympy.parsing.latex import parse_latex  # noqa: F401
-assert sympy.simplify(sympy.sympify("2*(x+1)") - sympy.sympify("2*x+2")) == 0
-
-print("jlens", m.version("jlens"))
-print("torch", torch.__version__)
-print("transformers", transformers.__version__)
-print("numpy", numpy.__version__)
-print("scipy", scipy.__version__)
-print("sympy", sympy.__version__)
-PY
+#
+# This is a COPY-ed file and not an inline heredoc. The first version used
+# `RUN python - <<'PY'`, which the classic Docker builder does not support: the
+# heredoc body was never delivered, `python -` read empty stdin, exited 0, and
+# the build passed without running a single assertion.
+COPY studies/study5/qualification-eq1/tools/verify_runtime.py /workspace/
+RUN python /workspace/verify_runtime.py
 
 RUN install -d -o jspace -g jspace -m 0700 \
         /workspace/runtime/home \
@@ -105,10 +106,12 @@ RUN install -d -o jspace -g jspace -m 0700 \
     && chown -R 0:0 \
         /workspace/requirements-jlens.txt \
         /workspace/requirements.study5-eq1.lock.txt \
+        /workspace/verify_runtime.py \
         /workspace/Dockerfile.study5-eq1 \
     && chmod -R a-w \
         /workspace/requirements-jlens.txt \
         /workspace/requirements.study5-eq1.lock.txt \
+        /workspace/verify_runtime.py \
         /workspace/Dockerfile.study5-eq1
 
 ENV HOME=/workspace/runtime/home \

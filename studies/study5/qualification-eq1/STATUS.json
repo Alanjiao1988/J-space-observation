@@ -3,14 +3,14 @@
  "study_id": "STUDY5_EQ1",
  "namespace": "studies/study5/qualification-eq1/",
  "kind": "engineering qualification for a causal decomposition study",
- "lifecycle_state": "STUDY5_EQ1_P0_IN_PROGRESS",
+ "lifecycle_state": "STUDY5_EQ1_P0_COMPLETE_AWAITING_P1",
  "lifecycle_state_is_registered_terminal": false,
  "terminal": false,
  "resumable": true,
  "is_a_scientific_result": false,
  "confirmation_authorized": false,
- "current_phase": "P-0",
- "next_phase": "P-0 remainder: GPQA access, byte acquisition, container digest, split freeze, contamination check",
+ "current_phase": "P-0 complete",
+ "next_phase": "P-1 (not started; requires operator release)",
  "authority": {
   "path": "studies/study5/prompts/study5_eq1_qualification_authority.md",
   "bytes": 29485,
@@ -70,16 +70,16 @@
   "journal_tests_passed": 10,
   "journal_tests_failed": 0,
   "create_only_journaling_demonstrated": true,
-  "records": 14,
-  "unique_keys": 14,
+  "records": 18,
+  "unique_keys": 18,
   "duplicate_keys": 0,
-  "journal_key_rollup_sha256": "cf80c413d79834468b20e83ee44f6ce73994a48ca8dd4513691d4d4b4aef077b",
+  "journal_key_rollup_sha256": "2b8ad4cc12ff9bbf4ea0d05ce3f39f8d63ce5ee510fb2ab73e63bfeb230ce552",
   "timeline": "studies/study5/qualification-eq1/TIMELINE.md",
   "resource_accounting": "studies/study5/qualification-eq1/resource_accounting.json",
   "resource_accounting_written": true,
   "azure_inventory_tests": "studies/study5/qualification-eq1/tests/test_study5_eq1_azure_inventory.py",
   "azure_inventory_tests_sha256": "76032f751829e316e05128ab07aa7a37d50dcda6990d2d6d29a1792327d26d8f",
-  "study5_tests_passed": 69,
+  "study5_tests_passed": 83,
   "study5_tests_failed": 0,
   "blocker_ids": [
    "HB-001"
@@ -126,9 +126,24 @@
    "escalated_to_hard_blocker": false,
    "run_is_resumable": true,
    "disposition": "disclosed engineering warning under authority 12",
-   "throughput_curve_artifact": "recorded on the GPU host at reports/throughput_curve.jsonl, sampled every 30 minutes",
+   "throughput_curve_artifact": "studies/study5/qualification-eq1/throughput_curve.jsonl",
    "consumes_accelerator_hours": 0.0,
-   "erodes_the_240h_ceiling": false
+   "erodes_the_240h_ceiling": false,
+   "resolved": true,
+   "resolution": "the throttle was a rolling-window quota, not a permanent per-IP limit; the first curve sample recorded 5.84 MB/s against the 0.66 MB/s low point and acquisition completed in about two hours",
+   "throughput_curve_sha256": "0629af710af382e99791a80cfb2d57d5b3e2abdecafae039d2298ac605d1c216"
+  },
+  {
+   "id": "DC-003",
+   "step": "P-0/P0-011",
+   "condition": "the execution host NAT egress moved outside the registered prefix mid-invocation and SSH stopped connecting",
+   "action": "the existing OA-001 rule was widened in place to the narrowest prefix covering every observed address",
+   "second_rule_added": false,
+   "expected_delta_count_unchanged": true,
+   "pre_existing_rule_touched": false,
+   "vms_touched": 0,
+   "register_updated_to_match": true,
+   "escalated_to_hard_blocker": false
   }
  ],
  "azure": {
@@ -195,7 +210,7 @@
   "gpu_host_ssh_verified_at_utc": "2026-08-27T01:05:00Z",
   "nsg_rules_in_snapshot_field_table": true,
   "reference_snapshot_after_oa001": "studies/study5/qualification-eq1/inventory/post_oa001_snapshot.json",
-  "reference_snapshot_after_oa001_sha256": "14117bd4a0212726d736eb5a495a14a1c3d1784dbca99d942d9585df81f6422f"
+  "reference_snapshot_after_oa001_sha256": "a0b8d0a4b58ba2380d0d51d8df1a48cfae717be7d8f706288282dbe3f99ea39b"
  },
  "budget": {
   "registered_accelerator_hour_ceiling": 240,
@@ -207,8 +222,8 @@
   "allocated_gpu_hours_bound_by_ceiling": false
  },
  "gates": {
-  "Q-1": "in_progress",
-  "Q-2": "not_started",
+  "Q-1": "PASS",
+  "Q-2": "PASS",
   "Q-3": "not_started",
   "Q-4a": "not_started",
   "Q-4b": "not_started",
@@ -218,7 +233,7 @@
  },
  "phases": {
   "P-BOOT": "complete",
-  "P-0": "in_progress",
+  "P-0": "complete",
   "P-1": "not_started",
   "P-2": "not_started",
   "P-3": "not_started",
@@ -239,7 +254,9 @@
   "adapter_weight_bytes_redistributed": 0,
   "unlicensed_source_files_committed": 0,
   "authors_contacted": 0,
-  "gpu_seconds": 0
+  "gpu_seconds": 0,
+  "blobs_written": 82,
+  "bytes_written": 53330976198
  },
  "authorization_flags": {
   "qualification_authorized": true,
@@ -337,14 +354,15 @@
   {
    "amendment_id": "OA-001",
    "artifact": "studies/study5/qualification-eq1/operator_amendments/OA-001.json",
-   "artifact_sha256": "a7ba1960c0363f675d32f08f3ca55c576e978988756a1f0b60c069cd46539af8",
+   "artifact_sha256": "b49e09f959cf67dae068c69c85385698320a2bf5066f34bcf3ff867cd24b73e9",
    "committed_before_the_change_was_applied": true,
    "supersedes": [
     "2.3 for NSG only",
     "2.5 for an NSG rule only"
    ],
    "does_not_supersede_vm_freeze": true,
-   "spend_reducing_actions": 0
+   "spend_reducing_actions": 0,
+   "source_prefix_widened": true
   }
  ],
  "gpu_host": {
@@ -372,26 +390,27 @@
  "acquisition": {
   "manifest": "studies/study5/qualification-eq1/acquisition_manifest.json",
   "manifest_sha256": "1af300aea39be38d47669e3eb4964d56fde388624a038a3ab7c024811af4de39",
+  "report": "studies/study5/qualification-eq1/acquisition_report.json",
+  "report_sha256": "d10f8cfc07c5d3b1e1f88d7d9ffd0aa00870ad82d1f008c20a121c626cd8d206",
   "performed_by": "a100-vm",
   "operator_workstation_in_data_path": false,
   "route": "mirror -> a100-vm /scratch -> blob",
   "auth": "system-assigned managed identity bearer token",
-  "sas_tokens_issued": 0,
-  "storage_keys_read": 0,
-  "uploads_are_create_only": true,
-  "existing_blobs_overwritten": 0,
-  "containers_created": 0,
+  "complete": true,
   "total_files": 95,
-  "total_bytes": 53344133827,
-  "files_verified": 75,
+  "files_processed": 95,
+  "files_uploaded": 82,
+  "files_already_present_verified": 13,
   "files_failed": 0,
   "hash_mismatches": 0,
-  "base_mlp_donor_complete": true,
-  "adapter_primary_files_done": 61,
-  "adapter_primary_files_total": 69,
-  "adapter_sparsity_files_done": 0,
-  "adapter_sparsity_files_total": 12,
-  "in_progress": true
+  "all_hashes_match_authority": true,
+  "all_round_trips_verified": true,
+  "bytes_written": 53330976198,
+  "existing_blobs_overwritten": 0,
+  "containers_created": 0,
+  "sas_tokens_issued": 0,
+  "storage_keys_read": 0,
+  "precondition_failures": 0
  },
  "benchmark_split": {
   "artifact": "studies/study5/qualification-eq1/benchmark_split.json",
@@ -428,16 +447,62 @@
   "nsg_rules_in_snapshot_field_table": true,
   "nsg_diffed_structurally_by_rule_identity": true,
   "expected_deltas_artifact": "studies/study5/qualification-eq1/inventory/expected_deltas.json",
-  "expected_deltas_sha256": "c7d9ab00096d62d58c49b109c887be97f847343d9159c6319f6ebad13a94cf93",
+  "expected_deltas_sha256": "952e7854c5f95e40d55ed97e66ac7ded0d93644383fce0c70b2fd4f97d65d760",
   "expected_delta_count": 1,
   "registered_delta": "nsg_rule_added / a100-nsg / allow-ssh-study5-eq1",
   "authorizing_commit": "859ff77e597017f711e499b8e61f55ed9586b8b5",
   "baseline_artifact": "studies/study5/qualification-eq1/inventory/opening_snapshot_amended.json",
-  "baseline_sha256": "703eee8622b7cdcbac3977079308c92a8f1d761e53dec10350caaa3239a6aed7",
+  "baseline_sha256": "cf873897bfbf13ed39be8b64cf18e4380ac34a0395325eae7b4fad62fb184d1d",
   "baseline_nsg_subtree_is_reconstructed_not_captured": true,
   "baseline_reconstruction_verified_against_pre_change_listing": true,
   "original_opening_snapshot_unmodified": true,
   "verified_passes_with_register": true,
-  "verified_fails_without_register": true
+  "verified_fails_without_register": true,
+  "nsg_rule_widened_in_place": true,
+  "reverified_after_widening": true
+ },
+ "gate_decisions": {
+  "artifact": "studies/study5/qualification-eq1/gate_decisions_p0.json",
+  "artifact_sha256": "a17630ede21932819899a3fcc71c1f9e046548d14deab3d769856bc3909c29e3",
+  "Q-1": "PASS",
+  "Q-2": "PASS",
+  "decided_before_any_model_call": true,
+  "criteria_written_before_the_measurement": true,
+  "is_a_scientific_result": false
+ },
+ "container_image": {
+  "artifact": "studies/study5/qualification-eq1/container_image.json",
+  "artifact_sha256": "50639ebbd38da738b39ed74d61cd2c8e469ac04d6ae90eaf4875628e2d46b146",
+  "tag": "study5-eq1:qualification",
+  "image_id": "sha256:0eba5740ebb0c2d68db89f63d5f95b074f4a52f63d4d79c1ed4af87ca119b100",
+  "base_image_digest": "sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d",
+  "dockerfile_sha256": "fdc1215326c4bd8646690b356d81709f2b4c04b1effd01b26cfe0cdab2f2a8dc",
+  "resolved_lock_sha256": "1bc6cf38f23d1a9eb967c034b229d127da63d3a7c15e4162dc32143a6089da25",
+  "digest_frozen": true,
+  "runtime_verification_ran": true,
+  "runtime_verification_verdict": "PASSED",
+  "gpu_smoke_test_devices": 4,
+  "bf16_supported": true,
+  "model_or_adapter_weights_included": false,
+  "acr_created": false
+ },
+ "contamination_check": {
+  "artifact": "studies/study5/qualification-eq1/contamination_report.json",
+  "artifact_sha256": "2b5a53b5f9d7b46e2b926e03b3831ec78b0bcfedf68e26e4df620008b1bd9157",
+  "reference_repo": "nathu0/transcoder-adapters-openthoughts3-stratified-55k",
+  "reference_revision": "b6d6ca48ac7e12517bd16411687a28e404cc2692",
+  "reference_verified_against_origin_lfs_sha256": true,
+  "reference_rows_scanned": 54948,
+  "development_items_checked": 200,
+  "confirmation_items_checked": 0,
+  "flagged_item_count": 5,
+  "overlap_rate": 0.025,
+  "flagged_by_ngram": 5,
+  "flagged_by_cosine": 0,
+  "max_cosine_observed": 0.4815,
+  "cosine_threshold": 0.8,
+  "max_shared_ngrams_observed": 5,
+  "thresholds_fixed_before_measurement": true,
+  "is_evidence_about_j_space": false
  }
 }

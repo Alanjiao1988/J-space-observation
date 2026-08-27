@@ -1,0 +1,5 @@
+# P-0/P0-013 - container image build and digest freeze
+scp Dockerfile.study5-eq1 tools/verify_runtime.py <gpu-host>:/scratch/study5/build/...
+ssh <gpu-host> "sudo docker build --network=host -f Dockerfile.study5-eq1 -t study5-eq1:qualification ."
+ssh <gpu-host> "sudo docker inspect study5-eq1:qualification --format '{{.Id}}'"
+ssh <gpu-host> "sudo docker run --rm --gpus all study5-eq1:qualification python -c '<smoke test>'"

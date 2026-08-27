@@ -1,0 +1,8 @@
+# P-0/P0-014 - OpenThoughts3 contamination check, on the VM
+ssh <gpu-host> "/scratch/study5/tools/fetch_contamination.sh"      # 1.5 GB, VM-side only
+ssh <gpu-host> "sha256sum train.jsonl val.jsonl"                   # vs origin LFS oids
+ssh <gpu-host> "python3 tools/contamination_check.py \
+    --split reports/benchmark_split.json \
+    --benchmark contamination/math500_test.jsonl \
+    --reference contamination/val.jsonl contamination/train.jsonl \
+    --out reports/contamination_report.json"

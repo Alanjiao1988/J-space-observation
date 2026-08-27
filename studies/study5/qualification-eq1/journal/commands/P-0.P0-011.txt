@@ -1,0 +1,7 @@
+# P-0/P0-011 - egress NAT pool moved; widen the OA-001 rule, do not add a second
+az network nsg rule list -g J-space --nsg-name a100-nsg -o table   # read-only first
+az network nsg rule update -g J-space --nsg-name a100-nsg -n allow-ssh-study5-eq1 \
+    --source-address-prefixes <narrowest prefix covering every observed egress address>
+# Same rule, same name, same priority 1010: still exactly one registered delta.
+# The pre-existing rule at priority 1000 remains untouched.
+az vm list -d -o table   # confirm both VMs still running

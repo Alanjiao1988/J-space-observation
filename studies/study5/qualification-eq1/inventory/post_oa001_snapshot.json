@@ -1,6 +1,6 @@
 {
  "schema_version": "study5-eq1-azure-inventory-v1",
- "captured_at_utc": "2026-08-27T02:17:27Z",
+ "captured_at_utc": "2026-08-27T04:56:51Z",
  "read_only": true,
  "control_plane_writes": 0,
  "data_plane_writes": 0,
@@ -162,7 +162,7 @@
      "direction": "Inbound",
      "access": "Allow",
      "protocol": "Tcp",
-     "source_prefix_salted": "salted:e5af1d24f4713893571a92eeaa3136f5c2aeece723d2cc86a65afceff302cc03",
+     "source_prefix_salted": "salted:9e12d031c34857fbffc3ab9b65c749de3b88fd533ce58108a40ab78b85377a50",
      "destination_port": "22"
     }
    ]

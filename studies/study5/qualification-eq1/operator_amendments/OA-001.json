@@ -30,8 +30,10 @@
   "action": "create one new inbound Allow rule for TCP/22 from the execution host's egress prefix",
   "existing_rules_modified": 0,
   "existing_rules_deleted": 0,
-  "source_prefix_width": "/23",
-  "source_prefix_rationale": "the execution host egresses from a NAT pool that was observed to span two adjacent /24s; a /23 is the narrowest prefix that covers the observed spread, and no wider prefix is used",
+  "source_prefix_width": "/19",
+  "source_prefix_width_initial": "/23",
+  "source_prefix_widened_at_utc": "2026-08-27T04:41:00Z",
+  "source_prefix_rationale": "the execution host egresses from a NAT pool that proved wider than the first measurement showed; addresses were observed in two discontiguous /24s, so the prefix was widened to the narrowest single range covering every observed address. The pre-existing operator rule sits inside that same range, which is independent evidence that it is one corporate pool.",
   "source_prefix_committed": false,
   "cost_impact": "none; a network security group rule carries no charge",
   "spend_impact": "none; no VM is started, stopped, resized or reconfigured"

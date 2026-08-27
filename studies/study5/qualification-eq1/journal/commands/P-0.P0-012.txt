@@ -1,0 +1,4 @@
+# P-0/P0-012 - acquisition complete, Q-2 evidence
+ssh <gpu-host> "python3 -c \"import json;d=json.load(open('reports/acquisition_report.json'));print(d)\""
+# 95/95 files, 0 failures, all_hashes_match_authority=True, all_round_trips_verified=True,
+# existing_blobs_overwritten=0, sas_tokens_issued=0, storage_keys_used=0, containers_created=0

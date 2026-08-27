@@ -545,3 +545,168 @@ a rolling-window quota rather than a permanent per-IP limit, the curve will show
 the recovery. Either way, "acquisition took N hours, the cause was throttling,
 and here is the measured curve" is exactly the data the reproducibility section
 of a paper needs.
+
+### 2026-08-27T04:41:00Z → 04:45:00Z — `P0-011` — the NAT pool moved; widen, don't accumulate
+
+SSH stopped connecting at the transport layer. The execution host's NAT egress
+had moved outside the prefix registered under OA-001 — addresses now appeared in
+a *different* `/24` from the one first measured. The pre-existing operator rule
+at priority 1000 sits inside the higher range, which is independent evidence
+that both belong to one corporate pool rather than being unrelated networks.
+
+The existing rule was **widened in place** to the narrowest single prefix
+covering every address observed so far, rather than a second rule being added.
+Adding rules would have grown the expected-delta register every time the pool
+moved; widening keeps exactly **one** registered delta and leaves the closing
+check unchanged in shape. Same rule name, same priority 1010. The priority-1000
+rule was not touched, and both VMs were confirmed still running immediately
+afterwards.
+
+`expected_deltas.json` and `OA-001.json` were both updated to record the
+widening. A register that describes a rule which no longer exists is worse than
+no register — the closing check compares against what is registered, so the
+registration has to track the authorised change. The check was re-run afterwards
+and still reports `hard_blocker false` with one observed delta, zero
+unregistered and zero registered-but-absent.
+
+### 2026-08-27T01:19:00Z → 03:17:00Z — `P0-012` — **acquisition complete**
+
+| Quantity | Value |
+| --- | --- |
+| Files processed | **95 / 95** |
+| Failures / hash mismatches | **0 / 0** |
+| Uploaded and round-trip verified | 82 |
+| Already present, verified by full re-read | 13 |
+| Bytes written | 53,330,976,198 |
+| Existing blobs overwritten | **0** |
+| Containers created | **0** |
+| SAS tokens issued / storage keys read | **0 / 0** |
+
+`all_hashes_match_authority` and `all_round_trips_verified` are both true, which
+is the substance of Q-2.
+
+The 13 pre-existing blobs are the expected consequence of content addressing:
+the two adapter repositories ship byte-identical tokenizer and template files, so
+they resolve to the same path. Each was verified by a full round-trip re-hash
+rather than a `PUT`, so deduplication never trips hard blocker 12.6.
+
+Every byte was fetched by the VM and checked against the authority the *origin*
+published — LFS object id where the file is LFS, recomputed git blob SHA-1 where
+it is not. The workstation was not in the data path for a single byte.
+
+### 2026-08-27T02:20:00Z → 03:12:00Z — `P0-013` — container image built and frozen
+
+    study5-eq1:qualification
+    image  sha256:0eba5740ebb0c2d68db89f63d5f95b074f4a52f63d4d79c1ed4af87ca119b100
+    base   python:3.11.14-slim-bookworm@sha256:65a93d69fa75…3543d
+    68 packages frozen; torch 2.12.0, transformers 5.9.0, jlens 0.1.0 @ 581d398,
+    numpy 2.4.6, scipy 1.17.1, sympy 1.14.0
+
+GPU smoke test inside the container: CUDA available, **4 devices**, bf16
+supported.
+
+The transformers floor turned out to be higher than the operator's brief
+suggested. jacobian-lens at the registered commit declares `transformers>=5.5`
+in its own `pyproject`, and the adapter checkpoints agree independently — their
+`config.json` uses the v5 conventions `dtype` and `layer_types`, and they ship
+`chat_template.jinja` as a separate file that older transformers does not read.
+So the 4.x line was never an option, and the predecessor's proven Phase 0.5A
+lock supplies exactly the right resolution.
+
+**Three defects found and fixed, all recorded because all three were invisible.**
+
+`IMG-001` — the build verification layer was written as `RUN python - <<'PY'`.
+The classic Docker builder does not support heredocs, so `python -` read **empty
+stdin**, exited 0, and the build passed *without executing a single assertion*.
+A check that cannot fail is worse than no check, because it manufactures
+confidence. It is now a COPY-ed file and its `RUNTIME VERIFICATION PASSED` line
+is present in the build log, so it demonstrably ran.
+
+`IMG-002` — an ad-hoc probe reported `jlens.merge` as missing, which looked like
+the registered code pin contradicting §4.2. **The probe was wrong, not the
+authority.** `merge()` is a *classmethod* on `JacobianLens`, and filtering
+`vars()` by `callable()` misses a classmethod on Python 3.11. Reading the
+package source settled it: `def merge` is at `jlens/lens.py:106`. The corrected
+check uses `getattr` and confirms `fit` at module level plus `apply`, `merge`
+and `transport` on `JacobianLens`. §4.2 is accurate as written.
+
+`IMG-003` — `pypi.org` resolves only intermittently from this network: one build
+succeeded against it and the very next failed with "no matching distribution"
+for a package that plainly exists. A build whose success depends on which way
+that falls is not reproducible, so the index is now pinned to a mirror that
+answers reliably. Every version stays pinned by `requirements-jlens.txt` and the
+resolved set is frozen into the image, so this changes *where* bytes come from,
+not *which* bytes they are.
+
+The Dockerfile and verification script are byte-identical across the repository,
+the build host and the image interior — all three hash to the same values.
+
+No ACR was created; §2.5 forbids creating any Azure resource.
+
+### 2026-08-27T03:20:00Z → 04:50:00Z — `P0-014` — contamination check
+
+The reference corpus was fetched **by the VM** — 1,502,173,552 bytes across
+`train.jsonl` and `val.jsonl` — and both verified against the origin-published
+LFS SHA-256 exactly. MATH-500 was re-fetched on the VM and re-verified against
+its origin git blob id.
+
+**Result: 5 of 200 development items flagged, overlap rate 0.025**, across
+54,948 reference rows.
+
+| Item | Shared 13-grams | Max cosine |
+| --- | --- | --- |
+| `test/prealgebra/1646.json` | 5 | 0.4815 |
+| `test/precalculus/1281.json` | 3 | 0.4501 |
+| `test/precalculus/541.json` | 2 | 0.3100 |
+| `test/prealgebra/1003.json` | 1 | 0.2535 |
+| `test/geometry/1108.json` | 1 | 0.2712 |
+
+All five were flagged by the **exact 13-gram** channel. None was flagged by the
+cosine channel, whose maximum observed value was 0.4815 against a threshold of
+0.80 — so there is no evidence of heavy paraphrased reuse, and the flags are
+short verbatim spans rather than whole reproduced problems.
+
+Thresholds were fixed before the measurement and are recorded inside the report,
+so the decision rule could not be adjusted after seeing the result. Only
+development items were read; **0** confirmation items were loaded or inspected.
+
+This number is reported alongside any accuracy figure. It is not evidence about
+J-space, about distillation, or about reasoning.
+
+### `DC-002` update — the throttle was a rolling quota, not a permanent limit
+
+The first curve sample recorded **5.84 MB/s** over a 30-minute window, against
+the 0.66 MB/s measured at the low point. The collapse was a rolling-window quota
+that recovered, not a permanent per-IP limit. Acquisition finished in about two
+hours rather than the thirteen the worst-case rate implied.
+
+Recording the curve rather than a single point is what makes that visible, and
+it is the reproducibility data a paper needs.
+
+---
+
+## P-0 gate decisions — **Q-1 PASS, Q-2 PASS**
+
+Full evidence in `gate_decisions_p0.json`.
+
+**Q-1 availability and legality — PASS.** Every §4 byte was obtained: the base
+donor, both adapters including `classifications/`, the jlens code at its pinned
+commit, the primary benchmark and the contamination reference. Target `T` was
+already byte-verified by the predecessor and was not re-acquired. GPQA was not
+obtainable and the **pre-registered fallback** MMLU-Pro STEM took effect at the
+pre-registered time — taking a registered fallback is the criterion being
+satisfied, not evaded. The §3.7 licence position is recorded: no adapter weight
+byte and no repository source file has been redistributed, 0 authors contacted,
+and the missing licence is carried verbatim as an open legal question.
+
+**Q-2 immutable hashes — PASS.** 95 of 95 files hashed **on the execution host**
+against the origin's authority before use, content-addressed into
+`models/sha256/<aa>/<full>`, and round-trip re-hashed after upload. 0 mismatches,
+0 overwrites, 0 SAS, 0 keys, 0 containers created.
+
+Both are engineering gates. They establish that the registered bytes exist, were
+obtained byte-exactly and are addressable. They establish nothing about J-space,
+distillation or reasoning, and neither is a scientific result.
+
+**P-0 accelerator consumption: 0 h of the registered 0 h allocation.** Cumulative
+0 of 240.

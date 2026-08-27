@@ -1,0 +1,89 @@
+{
+ "schema_version": "study5-eq1-container-image-v1",
+ "built_at_utc": "2026-08-27T03:11:44Z",
+ "built_on": "a100-vm",
+ "phase": "P-0",
+ "image_tag": "study5-eq1:qualification",
+ "image_id": "sha256:0eba5740ebb0c2d68db89f63d5f95b074f4a52f63d4d79c1ed4af87ca119b100",
+ "image_size_bytes": 2993017596,
+ "base_image": "python:3.11.14-slim-bookworm",
+ "base_image_digest": "sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d",
+ "base_image_digest_is_the_predecessor_pin": true,
+ "dockerfile": "Dockerfile.study5-eq1",
+ "dockerfile_sha256": "fdc1215326c4bd8646690b356d81709f2b4c04b1effd01b26cfe0cdab2f2a8dc",
+ "verification_script_sha256": "e6e2b23fb3eb520feb6b3b5da51311df9429d60b7593cb58e4c60c43a50881cb",
+ "verification_script": "studies/study5/qualification-eq1/tools/verify_runtime.py",
+ "resolved_lock": "studies/study5/qualification-eq1/requirements.study5-eq1.lock.txt",
+ "resolved_lock_sha256": "1bc6cf38f23d1a9eb967c034b229d127da63d3a7c15e4162dc32143a6089da25",
+ "resolved_package_count": 68,
+ "registered_pins": {
+  "jlens": "0.1.0",
+  "jlens_commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+  "torch": "2.12.0",
+  "transformers": "5.9.0",
+  "numpy": "2.4.6",
+  "scipy": "1.17.1",
+  "sympy": "1.14.0",
+  "safetensors": "0.7.0",
+  "tokenizers": "0.22.2"
+ },
+ "why_transformers_5x": "authority 4.2 registers jacobian-lens at 581d398, whose own pyproject declares transformers>=5.5, so the 4.x line is not an option. The adapter checkpoints agree independently: their config.json uses the v5 conventions dtype and layer_types, and they ship chat_template.jinja as a separate file that older transformers does not read.",
+ "dependency_provenance": "inherited from the predecessor's Phase 0.5A lock, requirements-jlens.txt, which is an exact resolution already built and executed on this hardware; scipy is the only addition, needed for the one-to-one optimal assignment in authority 6.3",
+ "runtime_verification": {
+  "ran": true,
+  "verdict": "RUNTIME VERIFICATION PASSED",
+  "present_in_build_log": true,
+  "checks": [
+   "every registered package version matches exactly",
+   "jlens.fit is callable at module level",
+   "JacobianLens.apply, .merge and .transport are callable",
+   "scipy.optimize.linear_sum_assignment imports (authority 6.3 matching)",
+   "sympy decides a trivial algebraic equivalence (authority 3.6 scoring)",
+   "torch exposes bfloat16 (authority 8 forbids quantisation)",
+   "the target architecture is supported natively (authority 8 sets trust_remote_code=false)"
+  ]
+ },
+ "gpu_smoke_test": {
+  "cuda_available": true,
+  "devices_visible": 4,
+  "bf16_supported": true,
+  "cuda_device_order": "PCI_BUS_ID"
+ },
+ "defects_found_and_fixed": [
+  {
+   "id": "IMG-001",
+   "defect": "the build verification layer was written as `RUN python - <<'PY'`, and the classic Docker builder does not support heredocs",
+   "effect": "python read empty stdin, exited 0, and the build passed without executing a single assertion",
+   "why_it_matters": "a check that cannot fail is worse than no check, because it manufactures confidence",
+   "fix": "the verification is now a COPY-ed file, and its PASS line is present in the build log, so it demonstrably ran",
+   "detected_before_the_image_was_used": true
+  },
+  {
+   "id": "IMG-002",
+   "defect": "an ad-hoc probe reported jlens.merge as missing, appearing to contradict authority 4.2",
+   "effect": "would have suggested the registered code pin was wrong",
+   "actual_cause": "the probe was wrong, not the authority: merge() is a classmethod on JacobianLens, and filtering vars() by callable() misses a classmethod on Python 3.11",
+   "fix": "membership is tested with getattr; fit is confirmed at module level and apply, merge and transport on JacobianLens",
+   "authority_4_2_is_correct": true
+  },
+  {
+   "id": "IMG-003",
+   "defect": "pypi.org resolves only intermittently from this network: one build succeeded against it and the next failed with 'no matching distribution' for a package that plainly exists",
+   "effect": "the build was not reproducible; success depended on which way the intermittency fell",
+   "fix": "the package index is pinned to a mirror that answers reliably",
+   "does_this_change_which_bytes": false,
+   "why_not": "every version remains pinned by requirements-jlens.txt and the fully resolved set is frozen into the image, so this changes where bytes come from and not which bytes they are"
+  }
+ ],
+ "contents_boundary": {
+  "model_weights_included": false,
+  "adapter_weights_included": false,
+  "benchmark_bytes_included": false,
+  "why": "the image is a runtime only, so it can be rebuilt and published without touching the licence position in authority 3.7"
+ },
+ "azure": {
+  "acr_created": false,
+  "registry_pushed_to": null,
+  "note": "built locally on the GPU host; authority 2.5 forbids creating any Azure resource, including an ACR"
+ }
+}
