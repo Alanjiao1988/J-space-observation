@@ -1,0 +1,10 @@
+# P-0/P0-007 - acquisition executed ON THE GPU HOST (Q-2)
+scp tools/acquire_and_upload.py acquisition_manifest.json <gpu-host>:/scratch/study5/tools/
+ssh <gpu-host> "sha256sum /scratch/study5/tools/*"   # confirm byte-identical transfer
+ssh <gpu-host> "nohup python3 tools/acquire_and_upload.py \
+    --manifest tools/acquisition_manifest.json \
+    --staging /scratch/study5/staging \
+    --account <storage account safe name> \
+    --report /scratch/study5/reports/acquisition_report.json &"
+# Bytes flow mirror -> GPU host /scratch -> blob. The operator workstation is not
+# in the data path. Auth is the VM system-assigned managed identity; no SAS, no key.

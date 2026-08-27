@@ -325,3 +325,64 @@ study.
 accounts and containers, so this authorized NSG rule will not surface as drift.
 It is recorded here and in `OA-001` explicitly, because the run record should be
 complete rather than merely passing its own check.
+
+### 2026-08-27T01:06:00Z → 01:18:00Z — `P0-006` — authoritative acquisition manifest, and an operator correction
+
+Gate Q-2 requires every acquired file to be hashed on the execution host and
+matched against *its authoritative value* before use. The GPU host cannot reach
+the HuggingFace origin, so bytes must come through a mirror — and mirrored bytes
+are only trustworthy if checked against an authority obtained from the origin.
+That is what this manifest is for.
+
+**Correction, recorded rather than quietly applied.** The first version of this
+tool downloaded the ~30 MB of non-LFS files onto the operator's workstation in
+order to compute their SHA-256. The operator then required that *all*
+downloading be done by the cloud VM and not by their PC. The tool was rewritten
+to read HuggingFace API metadata only, and now reports
+`file_bytes_downloaded_by_this_tool: 0`.
+
+The rewrite is not merely compliant, it is better provenance. Every file is now
+anchored to an id **the origin itself published**, rather than to a digest this
+invocation computed:
+
+| Kind | Files | Authority | Verified on the host by |
+| --- | --- | --- | --- |
+| LFS | 63 | LFS object id — *is* the content SHA-256 | direct SHA-256 comparison |
+| non-LFS | 32 | git blob id — SHA-1 over `b"blob <len>\0"` + content | recomputing the same construction |
+
+The two are kept in **separate fields**. A git blob id is not a content
+SHA-256, and quietly treating one as the other is exactly the silent mismatch
+Q-2 exists to catch.
+
+Manifest: 3 registered §4.1 targets, 95 files, 53,344,133,827 bytes, all
+resolved. Target `T` is not re-acquired; it was byte-verified into the `models`
+container by the predecessor study.
+
+### 2026-08-27T01:11:00Z → in progress — `P0-007` — acquisition on the GPU host
+
+Running **on `a100-vm`**, per the operator constraint. The data path is
+mirror → `/scratch` → blob; the workstation is not in it. Tool and manifest were
+transferred by `scp` and confirmed byte-identical on the host with `sha256sum`
+before use.
+
+Three properties of the uploader are worth stating, because each is somewhere a
+careless implementation would breach §2:
+
+* **The mirror is never trusted.** A file that fails its origin authority is
+  deleted and never uploaded, and the failure stops that file.
+* **A pre-existing content-addressed blob is not a precondition failure.** The
+  blob name *is* its SHA-256, so an existing blob at that path already holds the
+  same content. The tool issues a `HEAD` first and, if present, verifies by full
+  round-trip re-hash rather than issuing a `PUT` at all. That honours §2.7
+  without inventing an overwrite and without tripping hard blocker 12.6 over
+  benign deduplication. Six blobs from the superseded first run were confirmed
+  this way.
+* **No SAS, no storage key.** Every data-plane call carries a bearer token from
+  the VM's system-assigned managed identity, per §2.8 and §2.9.
+
+Uploads are create-only under `If-None-Match: *`, staged as 64 MiB blocks above
+200 MiB, and round-trip re-hashed after commit. Measured mirror throughput
+37 MB/s.
+
+The superseded first run was stopped and its `.part` files deleted; its six
+completed uploads are content-addressed, so the new run simply re-verified them.

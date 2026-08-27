@@ -1,0 +1,8 @@
+# P-0/P0-006 - authoritative acquisition manifest, metadata only (no PC byte transfer)
+# Operator constraint: all downloading is done by the cloud VM, not the operator's PC.
+python studies/study5/qualification-eq1/tools/build_acquisition_manifest.py \
+       --out studies/study5/qualification-eq1/acquisition_manifest.json
+# Reads the HuggingFace tree API at each pinned revision and records, per file,
+# either the LFS object id (a content sha256) or the git blob id (a sha1 over
+# b"blob <len>\0" + content). The two are kept in separate fields on purpose.
+# file bytes downloaded by this tool: 0

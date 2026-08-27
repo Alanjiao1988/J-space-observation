@@ -1,0 +1,930 @@
+{
+ "schema_version": "study5-eq1-acquisition-manifest-v2",
+ "authority_section": "4.1",
+ "built_at_utc": "2026-08-27T01:15:55Z",
+ "built_from": "HuggingFace API metadata only",
+ "file_bytes_downloaded_by_this_tool": 0,
+ "operator_constraint": "All byte transfer is performed by the cloud VM. The operator's workstation downloads no file bytes, so this tool reads metadata only and derives every authority from published integrity ids.",
+ "why_this_manifest_exists": "The Mooncake GPU host cannot reach the HuggingFace origin, so bytes are fetched there through a mirror. Mirrored bytes are only trustworthy when checked against an authority obtained from the origin, which is what this manifest supplies.",
+ "authority_kinds": {
+  "lfs_sha256": "content SHA-256, compared directly against the host-computed digest",
+  "git_blob_sha1": "SHA-1 over b'blob <len>\\0' + content, recomputed on the host"
+ },
+ "targets": [
+  {
+   "role": "base_mlp_donor",
+   "repo": "Qwen/Qwen2.5-Math-7B",
+   "revision": "b101308fe89651ea5ce025f25317fea6fc07e96e",
+   "licence": "apache-2.0",
+   "redistributable": "yes",
+   "file_count": 14,
+   "total_bytes": 15242804374,
+   "lfs_file_count": 4,
+   "non_lfs_file_count": 10,
+   "files": [
+    {
+     "path": ".gitattributes",
+     "size_bytes": 1519,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "LICENSE",
+     "size_bytes": 11343,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "6634c8cc3133b3848ec74b9f275acaaa1ea618ab",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "README.md",
+     "size_bytes": 3421,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "20bd726d16504db7e074229e741f012dee4c67ef",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "config.json",
+     "size_bytes": 678,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "25567e9563b3f0a79c046f5d624cc740c4407380",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "generation_config.json",
+     "size_bytes": 138,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "cbbb3133034e192527e5321b4c679154e4819ab8",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "merges.txt",
+     "size_bytes": 1671839,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "20024bfe7c83998e9aeaf98a0cd6a2ce6306c2f0",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "model-00001-of-00004.safetensors",
+     "size_bytes": 3945441440,
+     "is_lfs": true,
+     "authoritative_sha256": "568edbe0da275cc5d49d676d87363edc0148217b94b89cf4c49697b4355f44a3",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model-00002-of-00004.safetensors",
+     "size_bytes": 3864726352,
+     "is_lfs": true,
+     "authoritative_sha256": "0372acd5aae4090c693bfdeaa6858c09231c96d2e51614a9da73d90e0c153bf2",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model-00003-of-00004.safetensors",
+     "size_bytes": 3864726424,
+     "is_lfs": true,
+     "authoritative_sha256": "38e7eafd2d123e03b9797d42ebbacb8e4981eb6a410e2ce0d6c508130f78af90",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model-00004-of-00004.safetensors",
+     "size_bytes": 3556377672,
+     "is_lfs": true,
+     "authoritative_sha256": "3aa0cc3aab8aeb338e238e3569f5f7228f16afca3dd8609be6c859d953ac4f88",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model.safetensors.index.json",
+     "size_bytes": 27752,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "14d037fdda5a1311dcc0275003a7a370d84114e6",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "tokenizer.json",
+     "size_bytes": 7031645,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "443909a61d429dff23010e5bddd28ff530edda00",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "tokenizer_config.json",
+     "size_bytes": 7318,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "0a23f6ce98e3d5c04af5c736666f2a1df0797940",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "vocab.json",
+     "size_bytes": 2776833,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "4783fe10ac3adce15ac8f358ef5462739852c569",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    }
+   ],
+   "files_without_authority": [],
+   "fully_resolved": true
+  },
+  {
+   "role": "adapter_primary",
+   "repo": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.001-l0-1.4",
+   "revision": "9033fcd16d2fcb8fbe18efa2e6ed6503b0a784dc",
+   "licence": "none",
+   "redistributable": "no",
+   "file_count": 69,
+   "total_bytes": 19569580520,
+   "lfs_file_count": 54,
+   "non_lfs_file_count": 15,
+   "files": [
+    {
+     "path": ".gitattributes",
+     "size_bytes": 3426,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "5f51ae0e3fefce04e701b0867d66a674cf39ac69",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "chat_template.jinja",
+     "size_bytes": 2246,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "c2066bd7391c270626e39c9d7124f00360126412",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer0.json",
+     "size_bytes": 13651595,
+     "is_lfs": true,
+     "authoritative_sha256": "110525bd7fe849270c3be2214f7980ea7862e8514e846be94a5ab863c35a9647",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer1.json",
+     "size_bytes": 2657211,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "5a67d496407325f7124eb695974b21778934ae6e",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer10.json",
+     "size_bytes": 12286830,
+     "is_lfs": true,
+     "authoritative_sha256": "4f253814fc59d4de16a4ac3d1816a51284348d1bc6adbf509474b4f06d79d7cb",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer11.json",
+     "size_bytes": 13091540,
+     "is_lfs": true,
+     "authoritative_sha256": "6c06300cf520b29371e7d56f73da409d89809a6ccd5d0fa04b3755bb6812c0b8",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer12.json",
+     "size_bytes": 13448842,
+     "is_lfs": true,
+     "authoritative_sha256": "6c18ae0f364fedfc6b5758b403f14b5152b5631d79cda8a067987563a47fcbee",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer13.json",
+     "size_bytes": 13668615,
+     "is_lfs": true,
+     "authoritative_sha256": "b1e63358d96b5c37bdd11bb2da06535dd82d9ea771e2613c1824571b7d63ce3c",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer14.json",
+     "size_bytes": 13992763,
+     "is_lfs": true,
+     "authoritative_sha256": "c4bfc2223ea776e458c1b76b386fa05284f78f85f08b174df10c02b61db78e2a",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer15.json",
+     "size_bytes": 14544927,
+     "is_lfs": true,
+     "authoritative_sha256": "40271cbaf58c5de9f807ca9dbbeba39cbb2dd7aee677d1eb7b02101db27abce8",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer16.json",
+     "size_bytes": 14770735,
+     "is_lfs": true,
+     "authoritative_sha256": "33554debcea85d4e113dd6372cbd43edcd223547f4a190bc8fe1db736839b8f8",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer17.json",
+     "size_bytes": 14747786,
+     "is_lfs": true,
+     "authoritative_sha256": "12f8fab91b2d5e3928e9372fedd28b4ee56f10bd435e13f853609e30661ff87e",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer18.json",
+     "size_bytes": 14770124,
+     "is_lfs": true,
+     "authoritative_sha256": "e0c6ac4c8b6c3a64978d7228cb45bbd4e3831b5be96e41326eb7f12461b2e3fd",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer19.json",
+     "size_bytes": 13825445,
+     "is_lfs": true,
+     "authoritative_sha256": "cad5b4416019379f1ead2c13275a52a9582aee882322565fdb071a34119ac8d3",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer2.json",
+     "size_bytes": 2955951,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "4fb93ff826be3538b63d35dc4c21c7c02d82ca4a",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer20.json",
+     "size_bytes": 13264541,
+     "is_lfs": true,
+     "authoritative_sha256": "c930eade1a441fff096b26629975b3985c5922bd01d6889e7b4519bd72eb049b",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer21.json",
+     "size_bytes": 12650912,
+     "is_lfs": true,
+     "authoritative_sha256": "a877dd130aa686a46bdfd6aed9f0eb40d22868365877e24812599eb31e818498",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer22.json",
+     "size_bytes": 12575991,
+     "is_lfs": true,
+     "authoritative_sha256": "0f38350d818a90b234229a6bd2db646fb88010aa6ad3ea706c22b86e489bfc75",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer23.json",
+     "size_bytes": 11995765,
+     "is_lfs": true,
+     "authoritative_sha256": "5f6091af58e2e73c6328b21578e1bf8765dd0221e5043240f21dd1c4671cef4c",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer24.json",
+     "size_bytes": 11629987,
+     "is_lfs": true,
+     "authoritative_sha256": "80b101dfd1b5290bd75c74a4f876d3316d57b06ff8c552805b12b84796585c1c",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer25.json",
+     "size_bytes": 11589743,
+     "is_lfs": true,
+     "authoritative_sha256": "0693dd099fb277305a2806cfb87ce6df10f5e0d9a650e262f561ea4ffc823bf0",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer26.json",
+     "size_bytes": 9835088,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "68da02fc90faab865dc1bb89e0795fd8c2aea69f",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer27.json",
+     "size_bytes": 9914791,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "06b23b34bd3548538322e4ea854a6e60810a6b61",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer3.json",
+     "size_bytes": 3780869,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "639a87e4b58e3649643f999273b50a6ce54e11c9",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer4.json",
+     "size_bytes": 4347067,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "dcf77241a1091bf6d9b2c051feca4cc109ea191d",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer5.json",
+     "size_bytes": 4214191,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "c7ab4037cb596a3bafff37d659959faa1cdd50bb",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer6.json",
+     "size_bytes": 10712970,
+     "is_lfs": true,
+     "authoritative_sha256": "2d93aa107fbc862ac5781625b9ed4d96475f9baba4264c56488eacce1db9107d",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer7.json",
+     "size_bytes": 12016600,
+     "is_lfs": true,
+     "authoritative_sha256": "6ae451c777995e08fccc3e3a3d9b3d9d7dadaf34aa35aa0187d90976698d072f",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer8.json",
+     "size_bytes": 13100574,
+     "is_lfs": true,
+     "authoritative_sha256": "2a8543b86aec2435cfc26cf6b6147b459de59f53dc621ca78889395fd08a2115",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "classifications/feature_classifications_all_layer9.json",
+     "size_bytes": 9873422,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "c7a7fe3fd0d50714a9d5958443ec4fd9e1c37d9e",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "config.json",
+     "size_bytes": 1415,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "223b520a2c3222a6a9ebba4f94e9a369d5939310",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "features/index.json.gz",
+     "size_bytes": 772609,
+     "is_lfs": true,
+     "authoritative_sha256": "5f002c99b92c76a02e44041b8d53e466bbd628ee6cd4865bd9c0f4b92f5d5293",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_0.bin",
+     "size_bytes": 35283438,
+     "is_lfs": true,
+     "authoritative_sha256": "cd29ac8ecf48b92020ae18fff9c05c085bf4cd7f7e683ca6fa8d01c1880e517f",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_1.bin",
+     "size_bytes": 6070465,
+     "is_lfs": true,
+     "authoritative_sha256": "ab36fb794cc6fdebdcd84987e73234a4a620c99e22119c19d3b13a003beb7bd9",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_10.bin",
+     "size_bytes": 27806041,
+     "is_lfs": true,
+     "authoritative_sha256": "c334986f30417a5ea1eea1ebff9e9cab4d2405831689781b341cfc5893b2dfd0",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_11.bin",
+     "size_bytes": 30624492,
+     "is_lfs": true,
+     "authoritative_sha256": "f69ed670f9d8b51316b3347cb799f4b1bffc75dff292b833f4f9df978bb79091",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_12.bin",
+     "size_bytes": 32096037,
+     "is_lfs": true,
+     "authoritative_sha256": "193c8262b20e0703145057c70aff9e0f5a442b5f71c62252848e351eb1d24a96",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_13.bin",
+     "size_bytes": 33800174,
+     "is_lfs": true,
+     "authoritative_sha256": "549af0f8ac3dfdf313d1def587e49b84d7502145dfeb25b831e3f7e7148fce5e",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_14.bin",
+     "size_bytes": 33306963,
+     "is_lfs": true,
+     "authoritative_sha256": "d214464279ecae111b82827bda668bd8be93ff972bf29560550550d2572d093b",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_15.bin",
+     "size_bytes": 35096617,
+     "is_lfs": true,
+     "authoritative_sha256": "3492ef9fe16b7340fce7f3116c7c3ca80cb6f1fe3ea00bae95a9dbf3e980b2ae",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_16.bin",
+     "size_bytes": 35888383,
+     "is_lfs": true,
+     "authoritative_sha256": "fce72109c6405c856e4a2c5d896c3ecd9d64c002a71ab151c1378d73db75d191",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_17.bin",
+     "size_bytes": 36193723,
+     "is_lfs": true,
+     "authoritative_sha256": "8fe1bbef18b35a0d03e4f9c51732078702afc52641c62a4c070578a9784f6065",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_18.bin",
+     "size_bytes": 34920434,
+     "is_lfs": true,
+     "authoritative_sha256": "83d8ad35039246ec3a66e196bcd00d527243877e006b1bc1a176e86bf11863ed",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_19.bin",
+     "size_bytes": 33718427,
+     "is_lfs": true,
+     "authoritative_sha256": "e82850fe13088aa0a40277d0f3940006413840f25a27f14f1a2a6a147f121d9f",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_2.bin",
+     "size_bytes": 6533936,
+     "is_lfs": true,
+     "authoritative_sha256": "8dd328b33425fb8e580e1ef7d06690dc53c9d54ca8c265a6531018e3c7a81104",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_20.bin",
+     "size_bytes": 30938854,
+     "is_lfs": true,
+     "authoritative_sha256": "ea9348ec2266b10aff3797d922d99fb66125d386c5fb4177476d8ddf787726e8",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_21.bin",
+     "size_bytes": 27997989,
+     "is_lfs": true,
+     "authoritative_sha256": "91fcb502412f8d5b92927f9214655c4feec13cd6b050b5c6c5f7d45c580b0d27",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_22.bin",
+     "size_bytes": 29356331,
+     "is_lfs": true,
+     "authoritative_sha256": "64d175821bf65318ea7ef5ef3122f719210dc3a3fd82d96a67b5859624c81f60",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_23.bin",
+     "size_bytes": 27888359,
+     "is_lfs": true,
+     "authoritative_sha256": "fd6c14c46b563e4ec796aa602fb9a67915e60ac728118d2c0fd8a331d1e32353",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_24.bin",
+     "size_bytes": 25373586,
+     "is_lfs": true,
+     "authoritative_sha256": "ddfa56eec5c3f1da5e7f514c3dd46c41b184dba38b385e5eeb2ddc0983276e5d",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_25.bin",
+     "size_bytes": 25399780,
+     "is_lfs": true,
+     "authoritative_sha256": "c18756462934cb2843abf8c9d976f79fdd46e1941140d0f3ce562bad99d9024e",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_26.bin",
+     "size_bytes": 22935082,
+     "is_lfs": true,
+     "authoritative_sha256": "1e4320dae7482799204d8f48db44e086ec7c6045030d805a3a6e83f20849be99",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_27.bin",
+     "size_bytes": 25805082,
+     "is_lfs": true,
+     "authoritative_sha256": "3ee20f1b90ab01b849ca2a3f989ba66c1385f53b9054d90683e15965f6e9e238",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_3.bin",
+     "size_bytes": 8102978,
+     "is_lfs": true,
+     "authoritative_sha256": "fd7190b5f6df722ed07975785b1f855f759f97789cad662f2401fd9d141097df",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_4.bin",
+     "size_bytes": 8583837,
+     "is_lfs": true,
+     "authoritative_sha256": "e66dc4a3657dca9fce9a294c0af7e222b7cbe02420394e0eed70807a7e92a206",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_5.bin",
+     "size_bytes": 9064473,
+     "is_lfs": true,
+     "authoritative_sha256": "d577b34069077387317e553c26f680450a8e855f6155833772eddc1eef1df4ee",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_6.bin",
+     "size_bytes": 23972031,
+     "is_lfs": true,
+     "authoritative_sha256": "1a4c1912c9c6ae47d6a24ba7ca205eb2fb6d91ecedcfe99877fb76ca8b4c48fd",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_7.bin",
+     "size_bytes": 28105679,
+     "is_lfs": true,
+     "authoritative_sha256": "6546e7e776820b45e15ca12269aa68a307f72713647b9c221fb744e107c2ee4c",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_8.bin",
+     "size_bytes": 30801038,
+     "is_lfs": true,
+     "authoritative_sha256": "956f9233f463768db2d99609fbbf34334deffc1ec46c50ae1997829e7206a85a",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "features/layer_9.bin",
+     "size_bytes": 21478018,
+     "is_lfs": true,
+     "authoritative_sha256": "97924898b6f59ac7834266e6e7b5bbfd020556b60e409f5b2a578adebe661fe7",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "generation_config.json",
+     "size_bytes": 121,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "6d4c4eea279578016480d51057592007fa20bb22",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "model-00001-of-00004.safetensors",
+     "size_bytes": 4921795440,
+     "is_lfs": true,
+     "authoritative_sha256": "3c44cbf1b952583c13865083c4072446a2f9ee523851cb2bbf2239fe6f25f6d0",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model-00002-of-00004.safetensors",
+     "size_bytes": 4980651952,
+     "is_lfs": true,
+     "authoritative_sha256": "a4eba26c884406d96ee2bf8c22f8f1525f9f75bcdd6f58ec7279daf66bb8667a",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model-00003-of-00004.safetensors",
+     "size_bytes": 4940233360,
+     "is_lfs": true,
+     "authoritative_sha256": "f6a410a102b7907d82fb8becce31f7220ab6b27a05ef6c337098341fa380f66f",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model-00004-of-00004.safetensors",
+     "size_bytes": 3677597920,
+     "is_lfs": true,
+     "authoritative_sha256": "48ee61ad8ba83aac1005baee47b9dd021120a6c6ec6c20d2608b9e1d238a8732",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model.safetensors.index.json",
+     "size_bytes": 37156,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "bf1a7c53cf5a02f2b6da97256aac75c1261a4ac4",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "special_tokens_map.json",
+     "size_bytes": 485,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "1d385d62cf08bca35254547902b792c243656ec1",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "tokenizer.json",
+     "size_bytes": 11422778,
+     "is_lfs": true,
+     "authoritative_sha256": "e20ddafc659ba90242154b55275402edeca0715e5dbb30f56815a4ce081f4893",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "tokenizer_config.json",
+     "size_bytes": 4490,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "d252dd4e5764106823080946500c02a8ed8c90c9",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    }
+   ],
+   "files_without_authority": [],
+   "fully_resolved": true
+  },
+  {
+   "role": "adapter_sparsity_sensitivity",
+   "repo": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.003-l0-4.3",
+   "revision": "89ead0db81b65fa1ed6d433324d100c74bf77edd",
+   "licence": "none",
+   "redistributable": "no",
+   "file_count": 12,
+   "total_bytes": 18531748933,
+   "lfs_file_count": 5,
+   "non_lfs_file_count": 7,
+   "files": [
+    {
+     "path": ".gitattributes",
+     "size_bytes": 1570,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "52373fe24473b1aa44333d318f578ae6bf04b49b",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "chat_template.jinja",
+     "size_bytes": 2246,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "c2066bd7391c270626e39c9d7124f00360126412",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "config.json",
+     "size_bytes": 1415,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "223b520a2c3222a6a9ebba4f94e9a369d5939310",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "generation_config.json",
+     "size_bytes": 121,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "6d4c4eea279578016480d51057592007fa20bb22",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "model-00001-of-00004.safetensors",
+     "size_bytes": 4921795440,
+     "is_lfs": true,
+     "authoritative_sha256": "cbbe09bb472ce6cd7edb0ff7b2d175994f17ec8e334679ebb6f5019f06cab397",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model-00002-of-00004.safetensors",
+     "size_bytes": 4980651952,
+     "is_lfs": true,
+     "authoritative_sha256": "48b64858209cdce946286ee611c57f2ebe471e0bd5346479d3f747dc4826abc6",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model-00003-of-00004.safetensors",
+     "size_bytes": 4940233360,
+     "is_lfs": true,
+     "authoritative_sha256": "b17b1034f5672bcc97db47b3f2752d2485568f8633071677ca4c6459ce305d30",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model-00004-of-00004.safetensors",
+     "size_bytes": 3677597920,
+     "is_lfs": true,
+     "authoritative_sha256": "3b17dab928712333967d872adb5eb58f59642db40a9af0a8b44c149f189f408f",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "model.safetensors.index.json",
+     "size_bytes": 37156,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "bf1a7c53cf5a02f2b6da97256aac75c1261a4ac4",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "special_tokens_map.json",
+     "size_bytes": 485,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "1d385d62cf08bca35254547902b792c243656ec1",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    },
+    {
+     "path": "tokenizer.json",
+     "size_bytes": 11422778,
+     "is_lfs": true,
+     "authoritative_sha256": "e20ddafc659ba90242154b55275402edeca0715e5dbb30f56815a4ce081f4893",
+     "authoritative_git_blob_sha1": null,
+     "authority_kind": "lfs_sha256",
+     "authority_source": "HuggingFace LFS object id at the pinned revision; this is the content SHA-256"
+    },
+    {
+     "path": "tokenizer_config.json",
+     "size_bytes": 4490,
+     "is_lfs": false,
+     "authoritative_sha256": null,
+     "authoritative_git_blob_sha1": "d252dd4e5764106823080946500c02a8ed8c90c9",
+     "authority_kind": "git_blob_sha1",
+     "authority_source": "HuggingFace git blob id at the pinned revision; a SHA-1 over b'blob <len>\\0' + content, NOT a content SHA-256; the execution host verifies it by recomputing the same construction"
+    }
+   ],
+   "files_without_authority": [],
+   "fully_resolved": true
+  }
+ ],
+ "target_count": 3,
+ "total_bytes": 53344133827,
+ "total_files": 95,
+ "all_targets_fully_resolved": true,
+ "recorded_but_not_acquired": {
+  "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.01-l0-10.3": "0f628036f9522bc8687c7fd09fc5af2cf6c51336",
+  "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.0003-l0-0.4": "893466285964c27b7b9ecb42d8036fd67686afaa",
+  "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.0001-l0-0.1": "5846092d62317129ec24af0c5b276c2e5f7dbf0e"
+ },
+ "already_verified_by_predecessor": {
+  "role": "target_T",
+  "repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+  "revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+  "note": "byte-verified into the models container by Study 4F-M1; not re-acquired"
+ }
+}
