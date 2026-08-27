@@ -1,0 +1,11 @@
+# P-0/P0-002 - pre-commit identity leak scan and correction
+# Scan every Study 5 file for committed identities before staging anything.
+Get-ChildItem -Recurse -File studies/study5 | ForEach-Object {
+  match against: <real subscription id prefix>, <tenant default domain>,
+                 'AccountKey=', 'SharedAccessSignature', '/subscriptions/'
+}
+# The scan flagged tests/test_study5_eq1_azure_inventory.py: the leak test had
+# embedded the real subscription id in order to assert its absence. Rewritten so
+# no test holds a secret - synthetic GUID for salting, structural GUID-shape
+# assertion for the snapshot.
+python -m pytest studies/study5/qualification-eq1/tests -q

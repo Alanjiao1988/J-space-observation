@@ -152,11 +152,78 @@ call. 0 GPU seconds. 0 of 240 accelerator hours consumed.
 
 ---
 
-## P-0 — pending
+## P-0 — acquisition and freeze (in progress)
 
-Not started. Requires: read-only opening Azure inventory snapshot, GPQA access
-resolution before any model call, acquisition and byte-verification of
-`Qwen2.5-Math-7B` and both adapters into content-addressed paths, container
-image build with a frozen digest, frozen benchmark development/confirmation
-split, and the contamination check against OpenThoughts3-55k. Gates Q-1 and Q-2.
-Accelerator budget 0 h.
+Gates Q-1 and Q-2. Registered accelerator budget 0 h.
+
+### 2026-08-27T00:31:00Z → 00:40:00Z — `P0-001` — opening read-only Azure inventory
+
+Authority §2 requires a read-only inventory before the first write. It is
+captured by `tools/azure_inventory.py`, which is built so the freeze is enforced
+by the tool rather than by intent:
+
+* every Azure invocation passes through a whitelist and any mutating verb —
+  `start`, `stop`, `deallocate`, `resize`, `delete`, `create`, `update`,
+  `role assignment create`, `keys list`, `generate-sas`, or a non-GET
+  `az rest` — raises **before** the subprocess is spawned;
+* containers are listed through the **management-plane** read, not a data-plane
+  call, so no storage key and no SAS is ever needed (§2.8) and no role
+  assignment is consulted, let alone changed (§2.9);
+* only salted hashes and the §14 published safe names are written. The salt is
+  32 fresh random bytes generated outside the repository and is never committed.
+
+**Result — hard blocker 1 does not fire.** Both registered roles resolve
+uniquely and both are running, as §2.2 requires:
+
+| Role | Name | Size | Region | Power |
+| --- | --- | --- | --- | --- |
+| GPU host | `a100-vm` | `Standard_NC96ads_A100_v4` | chinaeast3 | VM running |
+| CPU host | `cpuserver` | `Standard_D16ds_v5` | chinanorth3 | VM running |
+
+Cloud `AzureChinaCloud`, subscription ending `8845`, resource group `J-space` —
+all matching §14. Exactly one storage account, `s4fm11ca457e105b29b7`, carrying
+exactly the six registered containers `models`, `oci`, `runs`, `logs`, `seals`,
+`handoff`, every one of them private, with no immutability policy and no legal
+hold.
+
+Four unowned `Standard_NC24s_v3` VMs exist in a separate resource group. They
+are **not** ours and are not touched. They are recorded as salted hashes rather
+than omitted, because a snapshot that ignored them could not detect drift in
+them at close, and rather than by name, because they are not published safe
+names.
+
+Counters for this step: 0 control-plane writes, 0 data-plane writes, 0 blobs,
+0 SAS tokens, 0 storage keys read, 0 role assignments changed, 0 GPU seconds.
+
+One correction, recorded rather than quietly amended: the first capture salted
+the resource group of both in-scope VMs, because `az group list` reports
+`J-space` while `az vm list` reports `J-SPACE`, and the exact-match redaction
+treated the two spellings as different names. Matching is now case-insensitive
+and returns the canonical published spelling. The snapshot was re-captured
+before being committed, so no superseded snapshot was ever published. The
+regression is pinned by a test. Had this survived to the closing snapshot it
+would have looked like drift in a resource that had not moved.
+
+The inventory tool carries 47 tests. They assert the two load-bearing
+properties directly: that all 24 sampled mutating commands are refused, and
+that no raw subscription id, unowned VM name, SAS or account key can reach the
+committed snapshot. The §2 drift rule is tested in both directions — a changed
+power state, a changed VM size, a new container and a disappeared VM each raise
+a hard blocker, while blob count and byte totals are the only tolerated
+differences.
+
+**A second correction, and a near-miss worth recording.** The first version of
+the leak test asserted that the *real* subscription id was absent from the
+snapshot — by embedding the real subscription id in the test file. A test
+fixture is a committed artifact like any other, so that would itself have
+violated §2.8, which forbids committing a subscription id. A pre-commit scan
+across every Study 5 file caught it before anything was staged.
+
+Both tests were rewritten so that neither needs a secret: the salting test uses
+a synthetic GUID, and the leak test is now structural, asserting that the
+snapshot contains **no GUID-shaped string at all** plus none of the usual
+credential markers. That is a stronger check than the original — it would also
+catch a tenant id or a resource GUID, which the original would have missed —
+and it holds no secret of its own. Recorded rather than silently fixed, because
+"the check that enforces the rule broke the rule" is exactly the kind of thing
+§9.2 exists to surface.

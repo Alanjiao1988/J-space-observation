@@ -1,0 +1,9 @@
+# P-0/P0-001 - opening read-only Azure inventory snapshot (authority 2)
+# Fresh 32-byte salt generated outside the repository; never committed (authority 14).
+$env:STUDY5_EQ1_INVENTORY_SALT = <fresh per-invocation salt, not committed>
+python studies/study5/qualification-eq1/tools/azure_inventory.py \
+       --out studies/study5/qualification-eq1/inventory/opening_snapshot.json
+python -m pytest studies/study5/qualification-eq1/tests -q
+# Every Azure call is routed through a whitelist that refuses any mutating verb
+# before the subprocess is spawned. Container listing uses the management-plane
+# read, so no storage key and no SAS is required and no role assignment is read.
