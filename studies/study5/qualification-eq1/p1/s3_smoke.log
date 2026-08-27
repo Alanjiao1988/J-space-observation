@@ -1,0 +1,12 @@
+[2026-08-27T13:08:14Z] physical GPU e85524f36fdf, container index 0
+[2026-08-27T13:08:14Z] development primary set: 195 items after 5 exclusions
+[2026-08-27T13:08:14Z] this worker: 10 items (shard 0/1)
+[2026-08-27T13:08:14Z] 0 records already present; they will be skipped, not repeated
+[2026-08-27T13:08:15Z] loading T
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights: 100%|██████████| 339/339 [00:00<00:00, 3971.61it/s]
+[2026-08-27T13:08:18Z] loading the adapter, which supplies both H and F
+Loading weights:   0%|          | 0/451 [00:00<?, ?it/s]Loading weights:  86%|████████▌ | 388/451 [00:00<00:00, 3869.62it/s]Loading weights: 100%|██████████| 451/451 [00:00<00:00, 3910.74it/s]
+[2026-08-27T13:23:13Z]   5/10 items, 15 records, 0.2479 GPU-hours
+[2026-08-27T13:32:47Z]   10/10 items, 30 records, 0.4074 GPU-hours
+[2026-08-27T13:32:47Z] done: 30 records, 1466.5 GPU-seconds
+P1-CHECK-S3.SMOKE PASSED

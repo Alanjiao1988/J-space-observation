@@ -1,0 +1,11 @@
+{
+ "step": "P-1 steps 3, 4 and the OD-005 side track",
+ "rule": "OD-003",
+ "enumerated_in_advance": true,
+ "expected_checks": [
+  "S3.SMOKE",
+  "S3.FULL-shard0", "S3.FULL-shard1", "S3.FULL-shard2", "S3.FULL-shard3",
+  "S4.Q3",
+  "S5.L1W001", "S5.L1W0003", "S5.L1W0001"
+ ]
+}

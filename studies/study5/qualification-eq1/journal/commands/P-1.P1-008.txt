@@ -1,0 +1,4 @@
+# P-1/P1-008 - Q-3 decision, run inside the frozen image
+sudo docker run --rm study5-eq1:qualification python tools/decide_q3.py \
+    --results <smoke + 4 shards> --rule tools/q3_decision_rule.json --out p1/q3_decision.json
+# plus the ceiling sensitivity bound and the OA-002 reverse-solve

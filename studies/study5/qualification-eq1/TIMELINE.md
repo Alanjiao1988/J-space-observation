@@ -1005,3 +1005,107 @@ smoke output so those 30 records are continued rather than redone.
 Four *distinct* physical devices, every one of them in the registered set — and
 every one reporting container index **0**. Without the UUID field, all four
 workers would have been indistinguishable in the record.
+
+### 2026-08-27T13:44:41Z → 17:40:01Z — `P1-007` — full run complete
+
+**585 records = 195 items × 3 arms, every item complete, none missing.** Four
+shards, one physical GPU each, 14.17 accelerator-hours.
+
+OD-006 paid for itself: GPU-seconds are attributable per device —
+`e85524f36fdf` 3.830 h, `b29579ca41a6` 3.008 h, `0ec45dca0dfc` 3.920 h,
+`5767cc3ad060` 3.818 h. Without the UUID field all four workers would have been
+"GPU 0" and this table could not exist.
+
+### 2026-08-27T17:42:00Z → 17:55:00Z — `P1-008` — **Q-3: PASS**
+
+| Arm | acc | no-boxed | ceiling | degen | p50 tok |
+| --- | --- | --- | --- | --- | --- |
+| `T` | **0.8821** | 0.0205 | 0.0205 | 0.0000 | 2441 |
+| `H` | **0.5846** | 0.1641 | 0.0769 | 0.0769 | 710 |
+| `F` | **0.7744** | 0.0821 | 0.0769 | 0.0564 | 2365 |
+
+    recovery = (0.7744 − 0.5846) / (0.8821 − 0.5846) = 0.6379
+    bootstrap 95% CI [0.4714, 0.7857], resampled over items
+
+**0.6379 ≥ 0.50 → Q-3 PASS.** The escalation band is not entered, so the
+pre-registered `k`→2 escalation is *not* triggered.
+
+Length condition **passes**: median completed length of `F` over `T` is 0.8572
+against the frozen 0.70 tolerance. Parser false-negative rate is **0.0** — all
+195 known answers were recovered by the frozen pipeline, confirming the parser
+is not manufacturing failures. No Study 4F E0 artifact was used, imported or
+referenced. `H` at 0.5846 is degraded but not catastrophic, so that stop
+condition does not fire.
+
+#### The ceiling question, settled by measurement rather than by argument
+
+The residual ceiling-hit rate is 2.05% for `T` and 7.69% for `H`/`F`. Whether
+that counts as "significant" is a question about a word; whether the **verdict
+depends on it** is a question that can be measured:
+
+| Treatment of ceiling-truncated responses | recovery | verdict |
+| --- | --- | --- |
+| As measured (counted incorrect) | 0.6379 | PASS |
+| Upper bound: **all** counted correct | 0.7660 | PASS |
+| Paired deletion of every affected item (n=162) | 0.7000 | PASS |
+
+**The verdict is invariant.** Stop condition 4 does not fire.
+
+The residual hits are also not the artefact OA-002 feared. That concern was that
+truncation penalises the arm reasoning *longer* — but `T` has the **longest**
+median response and the **lowest** ceiling rate. `P(degenerate | ceiling)` is
+0.467 for `H` and 0.667 for `F`, and **32 of 34** ceiling-hitting responses
+produced no `\boxed{}` at all. Raising the ceiling again cannot recover a
+non-terminating loop, which is exactly why the registered stop condition says to
+re-judge rather than raise it twice. Honestly qualified: `T`'s 4 ceiling hits
+show zero degeneration, so for `T` the ceiling does bind on genuinely long
+generations — a real if small effect, not explained away.
+
+**OA-002 reverse-solve**, on the p99 of *completed* responses (14,936) so that
+truncated ones cannot inflate it: `max_new_tokens_confirmatory = 16384`.
+
+### 2026-08-27T13:00:46Z → 17:45:05Z — `P1-009` — **OD-005: the arm is saved, not deleted**
+
+All five published checkpoints are now measured — far stronger evidence than the
+two-checkpoint comparison OD-004 rested on.
+
+| checkpoint | `l1_weight` | README | measured mean | `sep(c)` | qualifies |
+| --- | --- | --- | --- | --- | --- |
+| `l1w0.01` | 0.01 | 10.3 | 3.578 | 0.570 | no |
+| `l1w0.003` | 0.003 | 4.3 | 3.759 | 0.669 | no |
+| `l1w0.001` | 0.001 | 1.4 | 3.370 | — | reference |
+| `l1w0.0003` | 0.0003 | 0.4 | 5.059 | 2.341 | **yes** |
+| `l1w0.0001` | 0.0001 | 0.1 | **11.602** | **5.323** | **yes** |
+
+**The published ordering is inverted.** The README claims `L0` *falls* from 10.3
+to 0.1 as `l1_weight` falls; measurement shows it *rises* from 3.58 to 11.60.
+Spearman ρ between `l1_weight` and measured mean `L0` is **−0.700** where the
+table implies **+1.000**.
+
+Per-layer paired sign tests against the primary confirm the prose direction for
+**every** candidate: `l1w0.01` 22/28 (p=0.0037), `l1w0.003` 21/28 (p=0.0125),
+`l1w0.0003` 26/28 higher (p=3e-6), `l1w0.0001` 27/28 higher (p<1e-6).
+
+**This resolves the OD-004 ambiguity.** That conclusion rested on a sign test its
+companion Wilcoxon did not corroborate, and I flagged it as evidence that was
+real but not overwhelming. The full family removes the doubt. It also explains
+*why* the original pair looked flat: `l1w0.01`, `0.003` and `0.001` all measure
+between 3.37 and 3.76, so the registered arm was two points inside a flat region.
+
+**Selected: `l1w0.0001-l0-0.1`** at revision `5846092d…`, separation **5.32×**,
+up from the original arm's 1.07×. No accuracy or recovery figure was consulted.
+
+One transient fault, disclosed: a **short read** on `l1w0.01` (3,995,552,455 of
+4,921,795,440 bytes). The tool detected it, discarded the partial and refused to
+upload. That is a *transport* fault, not evidence about the checkpoint, so
+retrying rather than dropping the candidate was correct — and retrying cannot
+shop for an outcome, because the content is fixed by its origin hash. Retry: 0
+failures.
+
+---
+
+## P-1 complete — **Q-3 PASS**
+
+OD-003 proof verification: **9 of 9** checks, all present, all unique.
+Accelerator budget: **14.611 of 24** actively used GPU-hours; cumulative
+**14.611 of 240**. Both VMs ran throughout with 0 configuration changes.

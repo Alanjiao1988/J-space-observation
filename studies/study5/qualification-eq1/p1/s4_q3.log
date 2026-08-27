@@ -1,0 +1,11 @@
+/scratch/study5/reports/p1/q3_decision.json  sha256 6bb25e6b2e7c75c8d6fe93576960476c2bbf49cf8a1b8f3ebcef2dba496b6601
+items complete 195/195
+  T  acc=0.8821 boxed_miss=0.0205 ceil=0.0205 degen=0.0000 p50=2441 p99=16384
+  H  acc=0.5846 boxed_miss=0.1641 ceil=0.0769 degen=0.0769 p50=710 p99=16384
+  F  acc=0.7744 boxed_miss=0.0821 ceil=0.0769 degen=0.0564 p50=2365 p99=16384
+recovery = 0.637931  CI [0.471408, 0.785714]
+length ratio F/T = 0.857203 (tolerance 0.7)
+parser FN rate = 0.0
+VERDICT: PASS  (recovery >= 0.50)
+confirmatory max_new_tokens = 16384 from p99 14936
+P1-CHECK-S4.Q3 PASSED

@@ -1,0 +1,4 @@
+# P-1/P1-009 - OD-005 side track: acquire 3 checkpoints, measure L0, select the arm
+python3 tools/acquire_and_upload.py --manifest tools/acquisition_manifest_od005.json ...
+#   one transient short read; retried; 0 byte-verification failures
+tools/run_l0.sh   # 3 checkpoints, one physical GPU each

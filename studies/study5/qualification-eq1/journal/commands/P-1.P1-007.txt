@@ -1,0 +1,3 @@
+# P-1/P1-007 - full 195-item three-arm run, four shards, one physical GPU each
+ssh <gpu-host> tools/run_full.sh   # shards 0-3, each --results its OWN file
+#   --resume-from arm_results.jsonl so the 30 smoke records are kept and continued

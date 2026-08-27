@@ -1,8 +1,8 @@
 {
  "schema_version": "study5-eq1-resource-accounting-v1",
  "authority_section": "9.3",
- "updated_at_utc": "2026-08-27T12:40:00Z",
- "phase": "P-1 in progress",
+ "updated_at_utc": "2026-08-27T18:00:00Z",
+ "phase": "P-1 complete",
  "invocation_complete": false,
  "budget_measurement_definition": {
   "definition_id": "OD-001",
@@ -36,16 +36,16 @@
    "definition": "GPU-seconds actually consumed by work this invocation performed, summed from the per-step gpu_seconds field of the journal, divided by 3600",
    "bound_by_the_240h_ceiling": true,
    "is_the_registered_budget_quantity": true,
-   "value_this_invocation": 0.014228,
+   "value_this_invocation": 14.611366,
    "ceiling": 240,
-   "remaining": 239.985772,
+   "remaining": 225.388634,
    "source": "studies/study5/qualification-eq1/journal/*.jsonl, field gpu_seconds"
   }
  },
  "per_phase_actively_used_gpu_hours": {
   "P-BOOT": 0.0,
   "P-0": 0.0,
-  "P-1": 0.014228,
+  "P-1": 14.611366,
   "P-2": null,
   "P-3": null,
   "P-4": null,
@@ -125,13 +125,21 @@
  "p1_budget": {
   "ceiling": 24,
   "units": "actively used GPU-hours",
-  "consumed": 0.014228,
-  "remaining": 23.985772,
+  "consumed": 14.611366,
+  "remaining": 9.388634,
   "breakdown": {
-   "step1_construction_verification": 0.0,
-   "step2_l0_measurement": 0.014228,
-   "step3_three_arm_measurement": "not yet run"
+   "step1_construction_cpu_only": 0.0,
+   "step2_l0_primary_pair": 0.014228,
+   "step3_smoke": 0.4074,
+   "step3_full_run": 14.1682,
+   "od005_l0_three_checkpoints": 0.021528
   },
-  "note": "step 1 ran entirely on CPU, so the phase's first two steps together cost under one minute of GPU time"
+  "per_physical_gpu_hours": {
+   "e85524f36fdf": 3.8297,
+   "b29579ca41a6": 3.008,
+   "0ec45dca0dfc": 3.9202,
+   "5767cc3ad060": 3.8178
+  },
+  "attribution_possible_because_of": "OD-006; without the physical UUID all four workers report container index 0 and GPU-seconds could not be attributed"
  }
 }

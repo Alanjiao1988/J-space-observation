@@ -1,0 +1,12 @@
+[2026-08-27T13:44:41Z] physical GPU e85524f36fdf, container index 0
+[2026-08-27T17:10:09Z] done: 138 records, 12320.3 GPU-seconds
+P1-CHECK-S3.FULL-shard0 PASSED
+[2026-08-27T13:44:41Z] physical GPU b29579ca41a6, container index 0
+[2026-08-27T16:45:17Z] done: 138 records, 10828.8 GPU-seconds
+P1-CHECK-S3.FULL-shard1 PASSED
+[2026-08-27T13:44:41Z] physical GPU 0ec45dca0dfc, container index 0
+[2026-08-27T17:40:01Z] done: 141 records, 14112.6 GPU-seconds
+P1-CHECK-S3.FULL-shard2 PASSED
+[2026-08-27T13:44:41Z] physical GPU 5767cc3ad060, container index 0
+[2026-08-27T17:33:53Z] done: 138 records, 13744.1 GPU-seconds
+P1-CHECK-S3.FULL-shard3 PASSED

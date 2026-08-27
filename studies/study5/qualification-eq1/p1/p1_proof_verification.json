@@ -1,0 +1,63 @@
+{
+ "schema_version": "study5-eq1-proof-verification-v1",
+ "rule": "OD-003",
+ "verified_at_utc": "2026-08-27T17:58:22Z",
+ "expected_check_count": 9,
+ "expected_checks_enumerated_in_advance": true,
+ "checks": [
+  {
+   "check_id": "S3.SMOKE",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "S3.FULL-shard0",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "S3.FULL-shard1",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "S3.FULL-shard2",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "S3.FULL-shard3",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "S4.Q3",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "S5.L1W001",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "S5.L1W0003",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "S5.L1W0001",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  }
+ ],
+ "missing_proof_strings": [],
+ "duplicated_proof_strings": [],
+ "explicit_failures": [],
+ "unexpected_proof_strings": [],
+ "exit_code_used_as_evidence_of_execution": false,
+ "all_checks_passed": true,
+ "verdict": "PASS",
+ "log": "studies/study5/qualification-eq1/p1/p1_all_proofs.log",
+ "log_sha256": "048af80f18c61d15b9e50f8809495d85215cbc5144cdf750fc6556b099d3aa5a"
+}

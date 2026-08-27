@@ -3,14 +3,14 @@
  "study_id": "STUDY5_EQ1",
  "namespace": "studies/study5/qualification-eq1/",
  "kind": "engineering qualification for a causal decomposition study",
- "lifecycle_state": "STUDY5_EQ1_P1_IN_PROGRESS",
+ "lifecycle_state": "STUDY5_EQ1_P1_COMPLETE_AWAITING_P2",
  "lifecycle_state_is_registered_terminal": false,
  "terminal": false,
  "resumable": true,
  "is_a_scientific_result": false,
  "confirmation_authorized": false,
- "current_phase": "P-1",
- "next_phase": "P-1 steps 3 and 4: T/H/F on the 195-item dev main set, then the Q-3 decision",
+ "current_phase": "P-1 complete",
+ "next_phase": "P-2 (not started; requires operator release)",
  "authority": {
   "path": "studies/study5/prompts/study5_eq1_qualification_authority.md",
   "bytes": 29485,
@@ -70,10 +70,10 @@
   "journal_tests_passed": 10,
   "journal_tests_failed": 0,
   "create_only_journaling_demonstrated": true,
-  "records": 22,
-  "unique_keys": 22,
+  "records": 27,
+  "unique_keys": 27,
   "duplicate_keys": 0,
-  "journal_key_rollup_sha256": "2b8ad4cc12ff9bbf4ea0d05ce3f39f8d63ce5ee510fb2ab73e63bfeb230ce552",
+  "journal_key_rollup_sha256": "c857d3adf80117da933628a2c619154268ffb3838e511793b903da12bc73e6b1",
   "timeline": "studies/study5/qualification-eq1/TIMELINE.md",
   "resource_accounting": "studies/study5/qualification-eq1/resource_accounting.json",
   "resource_accounting_written": true,
@@ -215,28 +215,28 @@
  "budget": {
   "registered_accelerator_hour_ceiling": 240,
   "ceiling_quantity": "actively used GPU-hours",
-  "accelerator_hours_consumed": 0.014228,
-  "accelerator_hours_remaining": 239.985772,
+  "accelerator_hours_consumed": 14.611366,
+  "accelerator_hours_remaining": 225.388634,
   "ceiling_reached": false,
   "vm_wall_clock_hours_bound_by_ceiling": false,
   "allocated_gpu_hours_bound_by_ceiling": false,
   "p1_ceiling": 24,
-  "p1_consumed": 0.014228
+  "p1_consumed": 14.611366
  },
  "gates": {
   "Q-1": "PASS",
   "Q-2": "PASS",
-  "Q-3": "in_progress",
+  "Q-3": "PASS",
   "Q-4a": "not_started",
   "Q-4b": "not_started",
   "Q-5": "not_started",
-  "Q-6": "not_started",
+  "Q-6": "parser false-negative rate measured at 0.0; formally decided at P-5",
   "Q-7": "in_progress"
  },
  "phases": {
   "P-BOOT": "complete",
   "P-0": "complete",
-  "P-1": "in_progress",
+  "P-1": "complete",
   "P-2": "not_started",
   "P-3": "not_started",
   "P-4": "not_started",
@@ -539,6 +539,21 @@
   "Q3_rule": {
    "frozen_before_measurement": true,
    "sha256": "1c92d67bd8fdc87ae485f041c23d446c8947e8c7094fefb100b8371c2b6b4e9e"
+  },
+  "OD-004": {
+   "primary_statistic": "per-layer paired difference",
+   "conclusion": "README prose right, table wrong",
+   "tests_disagreed_and_both_reported": true,
+   "sha256": "e4473dc349cfa6b90c35872c32b254d7ea0e1c32d0ba9eab2fb372170ab91214"
+  },
+  "OD-005": {
+   "rule": "sep(c)=median paired ratio; qualify >=2.0 or <=0.5",
+   "frozen_before_inputs_existed": true,
+   "sha256": "932ba1363eec260dcf968d3922d5f653a08ad936a84cf6816577d1f6675f834e"
+  },
+  "OD-006": {
+   "rule": "physical GPU UUID in every journal record",
+   "sha256": "cfe64885c42fdeeba9e58344417e7546e492036e91f6f966b128558404a0f8a9"
   }
  },
  "p1_step1_construction": {
@@ -579,5 +594,81 @@
   "why_not": "no L0 threshold is registered anywhere; inventing one after seeing the measurement is what pre-registration forbids",
   "od003_proof_verification": "PASS",
   "gpu_seconds": 51.219
+ },
+ "p1_step3_arms": {
+  "artifact": "studies/study5/qualification-eq1/p1/q3_decision.json",
+  "items": 195,
+  "arms": 3,
+  "k": 1,
+  "records": 585,
+  "items_missing": 0,
+  "accuracy": {
+   "T": 0.8821,
+   "H": 0.5846,
+   "F": 0.7744
+  },
+  "no_boxed_rate": {
+   "T": 0.0205,
+   "H": 0.1641,
+   "F": 0.0821
+  },
+  "ceiling_hit_rate": {
+   "T": 0.0205,
+   "H": 0.0769,
+   "F": 0.0769
+  },
+  "degeneration_rate": {
+   "T": 0.0,
+   "H": 0.0769,
+   "F": 0.0564
+  },
+  "length_p50": {
+   "T": 2441,
+   "H": 710,
+   "F": 2365
+  },
+  "length_p99_completed": 14936,
+  "parser_false_negative_rate": 0.0,
+  "study4f_e0_artifacts_used": false
+ },
+ "p1_step4_q3": {
+  "verdict": "PASS",
+  "recovery": 0.637931,
+  "bootstrap_ci_95": [
+   0.471408,
+   0.785714
+  ],
+  "resampling_unit": "item",
+  "escalation_triggered": false,
+  "length_condition_ratio": 0.857203,
+  "length_tolerance": 0.7,
+  "length_condition_passed": true,
+  "catastrophic_H": false,
+  "ceiling_sensitivity_artifact": "studies/study5/qualification-eq1/p1/ceiling_sensitivity.json",
+  "recovery_under_all_ceiling_treatments": [
+   0.6379,
+   0.766,
+   0.7
+  ],
+  "verdict_invariant_to_ceiling_treatment": true,
+  "stop_condition_4_fired": false,
+  "max_new_tokens_confirmatory": 16384
+ },
+ "p1_sensitivity_arm": {
+  "artifact": "studies/study5/qualification-eq1/p1/sensitivity_arm_selection.json",
+  "arm_deleted": false,
+  "selected": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.0001-l0-0.1",
+  "selected_revision": "5846092d62317129ec24af0c5b276c2e5f7dbf0e",
+  "separation": 5.3232,
+  "previous_arm_separation": 1.07,
+  "readme_ordering_is_inverted": true,
+  "spearman_l1weight_vs_measured_L0": -0.7,
+  "readme_implied_spearman": 1.0,
+  "all_five_checkpoints_measured": true
+ },
+ "od003_proof_verification": {
+  "expected_checks": 9,
+  "all_passed": true,
+  "artifact": "studies/study5/qualification-eq1/p1/p1_proof_verification.json"
  }
 }

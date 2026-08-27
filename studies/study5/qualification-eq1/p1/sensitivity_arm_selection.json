@@ -1,0 +1,78 @@
+{
+ "schema_version": "study5-eq1-sensitivity-arm-selection-v1",
+ "rule": "OD-005",
+ "decided_at_utc": "2026-08-27T17:50:00Z",
+ "phase": "P-1",
+ "rule_frozen_before_these_measurements_existed": true,
+ "no_accuracy_or_recovery_figure_consulted_in_this_selection": true,
+
+ "acquisition": {
+  "candidates_registered": 3,
+  "revisions_exactly_as_authority_4_1": true,
+  "files_processed": 36,
+  "byte_verification_failures": 0,
+  "existing_blobs_overwritten": 0,
+  "sas_tokens_issued": 0,
+  "containers_created": 0,
+  "transient_failure_and_its_disposition": {
+   "what_happened": "one file, model-00001-of-00004.safetensors of l1w0.01, ended a short read at 3,995,552,455 bytes against a manifest size of 4,921,795,440",
+   "was_it_a_byte_verification_failure": false,
+   "what_it_actually_was": "a truncated transfer; the tool detected the short read, discarded the partial bytes and refused to upload them",
+   "why_the_candidate_was_not_dropped": "stop condition 9 drops a checkpoint that cannot be BYTE-VERIFIED. A transient truncation is a transport fault, not evidence about the checkpoint's integrity, and dropping a candidate for it would have silently narrowed the OD-005 candidate set for a reason unrelated to the artifact.",
+   "why_retrying_is_not_result_shopping": "the content is fixed by its origin-published hash, so a retry either produces the authoritative bytes or fails again; there is no outcome to shop for",
+   "retry_outcome": "processed 12, uploaded 1, failed 0; the 11 already-verified files were skipped rather than re-fetched"
+  }
+ },
+
+ "measurement": {
+  "protocol_identical_to_the_primary": true,
+  "identical_in": ["val split", "200-row deterministic prefix", "max_seq_len 1024", "code", "masking", "batch_size 1", "bf16"],
+  "gpu_seconds": 77.5
+ },
+
+ "full_family_result": {
+  "note": "all five published checkpoints are now measured, which is far stronger evidence than the two-checkpoint comparison OD-004 was decided on",
+  "table": [
+   {"checkpoint": "l1w0.01", "l1_weight": 0.01, "readme_nominal_L0": 10.3, "measured_mean_L0": 3.5777, "measured_median_L0": 1.6681, "sep_vs_primary": 0.5697, "qualifies": false},
+   {"checkpoint": "l1w0.003", "l1_weight": 0.003, "readme_nominal_L0": 4.3, "measured_mean_L0": 3.7588, "measured_median_L0": 1.8528, "sep_vs_primary": 0.6685, "qualifies": false},
+   {"checkpoint": "l1w0.001", "l1_weight": 0.001, "readme_nominal_L0": 1.4, "measured_mean_L0": 3.3699, "measured_median_L0": 1.7277, "sep_vs_primary": 1.0, "qualifies": "reference"},
+   {"checkpoint": "l1w0.0003", "l1_weight": 0.0003, "readme_nominal_L0": 0.4, "measured_mean_L0": 5.0592, "measured_median_L0": 3.8993, "sep_vs_primary": 2.3407, "qualifies": true},
+   {"checkpoint": "l1w0.0001", "l1_weight": 0.0001, "readme_nominal_L0": 0.1, "measured_mean_L0": 11.6021, "measured_median_L0": 9.7072, "sep_vs_primary": 5.3232, "qualifies": true}
+  ],
+  "the_published_ordering_is_inverted": {
+   "readme_claims": "L0 falls from 10.3 to 0.1 as l1_weight falls from 0.01 to 0.0001",
+   "measured": "L0 RISES from 3.58 to 11.60 as l1_weight falls over the same range",
+   "spearman_rho_l1weight_vs_measured_mean_L0": -0.700,
+   "spearman_rho_implied_by_the_readme_table": 1.0
+  },
+  "per_layer_paired_sign_tests_against_the_primary": [
+   {"checkpoint": "l1w0.01", "layers_with_lower_L0": 22, "of": 28, "sign_p": 0.003719, "direction": "higher l1_weight gives lower L0 = prose"},
+   {"checkpoint": "l1w0.003", "layers_with_lower_L0": 21, "of": 28, "sign_p": 0.012541, "direction": "higher l1_weight gives lower L0 = prose"},
+   {"checkpoint": "l1w0.0003", "layers_with_lower_L0": 2, "of": 28, "sign_p": 0.000003, "direction": "lower l1_weight gives higher L0 = prose"},
+   {"checkpoint": "l1w0.0001", "layers_with_lower_L0": 1, "of": 28, "sign_p": 0.000000, "direction": "lower l1_weight gives higher L0 = prose"}
+  ],
+  "every_candidate_confirms_the_prose_direction": true,
+  "this_resolves_the_od004_ambiguity": "OD-004's conclusion rested on a sign test that its companion Wilcoxon did not corroborate. The full family removes that ambiguity: all four candidates differ from the primary in the prose direction, two of them at p < 1e-5, and the family-level rank correlation is negative where the README implies +1.",
+  "why_the_original_pair_looked_flat": "l1w0.01, l1w0.003 and l1w0.001 all measure between 3.37 and 3.76 mean L0, so they sit in a flat region. The registered sensitivity pair happened to be two points inside it, which is exactly why that arm had almost no leverage."
+ },
+
+ "selection": {
+  "qualifying_condition": "sep(c) >= 2.0 or sep(c) <= 0.5",
+  "qualifying_candidates": ["l1w0.0003 at 2.3407", "l1w0.0001 at 5.3232"],
+  "non_qualifying": ["l1w0.01 at 0.5697", "l1w0.003 at 0.6685"],
+  "selected": "nathu0/transcoder-adapters-R1-Distill-Qwen-7B-l1w0.0001-l0-0.1",
+  "selected_revision": "5846092d62317129ec24af0c5b276c2e5f7dbf0e",
+  "selected_separation": 5.3232,
+  "selection_basis": "greatest separation from 1.0 among qualifying candidates",
+  "arm_deleted": false,
+  "improvement_over_the_originally_registered_arm": "separation rises from 1.07x to 5.32x, so the arm can now actually discriminate"
+ },
+
+ "what_this_does_not_establish": [
+  "nothing about J-space",
+  "nothing about distillation",
+  "nothing about reasoning",
+  "no accuracy or recovery claim of any kind; no such figure was consulted in this selection"
+ ],
+ "claim_ceiling": "This is an instrument selection made on an instrument property. It is not a scientific result."
+}

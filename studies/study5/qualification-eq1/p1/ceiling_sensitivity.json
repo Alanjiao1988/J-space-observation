@@ -1,0 +1,65 @@
+{
+ "schema_version": "study5-eq1-ceiling-sensitivity-v1",
+ "phase": "P-1",
+ "analysed_at_utc": "2026-08-27T17:52:00Z",
+ "question": "Does the residual ceiling-hit rate at max_new_tokens = 16384 trigger stop condition 4, and does it threaten the Q-3 verdict?",
+
+ "why_this_analysis_exists": {
+  "stop_condition_4": "the invocation stops if the ceiling-hit rate is still significant at 16384",
+  "the_problem_with_deciding_it_by_argument": "whether 2.05 percent or 7.69 percent counts as 'significant' is a question about a word. The decision-relevant question is whether the verdict depends on those responses, and that can be measured instead of argued.",
+  "approach": "bound the verdict across the entire plausible range of how ceiling-truncated responses could be scored"
+ },
+
+ "observed_ceiling_rates": {
+  "T": 0.020513,
+  "H": 0.076923,
+  "F": 0.076923,
+  "differential_across_arms": true,
+  "is_this_the_pattern_oa002_feared": {
+   "oa002_concern": "a ceiling binds differentially and penalises the arm that reasons LONGER",
+   "observed_direction": "the opposite. T has the LONGEST median completed response at 2441 tokens and the LOWEST ceiling rate at 2.05 percent. H has the SHORTEST median at 710 tokens and the HIGHEST ceiling rate at 7.69 percent.",
+   "conclusion": "the residual ceiling-hitting is not driven by legitimate long reasoning being cut off"
+  }
+ },
+
+ "what_the_ceiling_hits_actually_are": {
+  "P_degenerate_given_ceiling": {"T": 0.0, "H": 0.467, "F": 0.667},
+  "ceiling_hits_producing_a_boxed_answer": {"T": "0 of 4", "H": "1 of 15", "F": "1 of 15"},
+  "ceiling_hits_scored_correct": {"T": "0 of 4", "H": "0 of 15", "F": "1 of 15"},
+  "interpretation": "32 of 34 ceiling-hitting responses produced no boxed answer at all. Roughly half to two thirds of them in H and F are outright repetition degeneration, which is the failure mode DeepSeek explicitly warns about for R1-Distill models. A degenerate loop does not terminate, so raising the ceiling further would not recover those responses.",
+  "honest_qualification": "T's 4 ceiling hits show zero degeneration, so for T the ceiling is binding on genuinely long generations rather than on loops. That is a real if small effect and it is not explained away."
+ },
+
+ "verdict_sensitivity": {
+  "method": "recompute recovery under every plausible treatment of ceiling-truncated responses",
+  "treatments": [
+   {"treatment": "as measured, ceiling counted incorrect", "acc_T": 0.8821, "acc_H": 0.5846, "acc_F": 0.7744, "recovery": 0.6379, "verdict": "PASS"},
+   {"treatment": "upper bound, ALL ceiling hits counted correct", "acc_T": 0.9026, "acc_H": 0.6615, "acc_F": 0.8462, "recovery": 0.7660, "verdict": "PASS"},
+   {"treatment": "paired deletion of every item where ANY arm hit the ceiling, n = 162 of 195", "acc_T": 0.9136, "acc_H": 0.6667, "acc_F": 0.8395, "recovery": 0.7000, "verdict": "PASS"}
+  ],
+  "range_of_recovery": [0.6379, 0.7660],
+  "every_treatment_clears_the_registered_floor": true,
+  "verdict_is_invariant_to_ceiling_treatment": true
+ },
+
+ "stop_condition_4_disposition": {
+  "fires": false,
+  "reasoning": [
+   "the residual ceiling-hitting is dominated by repetition degeneration, a model pathology, rather than by truncated legitimate reasoning, so it is not the instrument artefact OA-002 was written to remove",
+   "raising the ceiling a second time would not recover a non-terminating loop, which is precisely why the registered stop condition says to re-judge rather than raise it again",
+   "the Q-3 verdict is invariant across the full range of ways these responses could be scored, so no decision in this phase depends on them"
+  ],
+  "recorded_as": "a disclosed degraded condition rather than a stop",
+  "carried_forward_to_the_confirmatory_stage": "the degeneration rate and the ceiling rate are both reported per arm, and the confirmatory ceiling is reverse-solved from the p99 of COMPLETED responses so that truncated responses do not inflate it"
+ },
+
+ "confirmatory_reverse_solve": {
+  "formula": "min(32768, 2^ceil(log2(p99_completed_length_on_dev)))",
+  "p99_of_completed_responses": 14936,
+  "result": 16384,
+  "note": "the p99 is computed on responses that reached EOS, so ceiling-truncated responses cannot inflate the input to the formula",
+  "formula_was_frozen_before_its_input_existed": true
+ },
+
+ "claim_ceiling": "This is an instrument diagnostic. It is not evidence about J-space, about distillation, or about reasoning."
+}
