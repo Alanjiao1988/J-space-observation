@@ -1109,3 +1109,28 @@ failures.
 OD-003 proof verification: **9 of 9** checks, all present, all unique.
 Accelerator budget: **14.611 of 24** actively used GPU-hours; cumulative
 **14.611 of 240**. Both VMs ran throughout with 0 configuration changes.
+
+### 2026-08-27T18:45:00Z → 18:52:00Z — `P1-010` — ruling out a read race
+
+A delayed waiter log surfaced *after* P-1 was reported, showing the shard record
+count at **554 at 17:38:29** and **555 at 17:53:29** — a window that brackets
+the time the Q-3 decision was computed.
+
+The `decide_q3` tool asserts item completeness and had reported 195/195 with its
+proof string, so a short read would have failed loudly rather than silently. But
+"the tool would have caught it" is an *argument*, and the question is cheaply
+answerable by *measurement*.
+
+Re-ran the identical decision against the now definitively final files and
+diffed the two reports field by field, ignoring only `decided_at_utc`:
+
+    82 fields compared, 0 substantive differences
+
+Identical verdict **PASS**, identical recovery **0.637931**, identical CI
+**[0.471408, 0.785714]**, identical 195/195 complete items, identical
+accuracies, length ratio, parser false-negative rate and confirmatory ceiling.
+
+**There was no race; the committed result stands unchanged.** 0 GPU seconds, no
+registered decision altered. Recorded because a result whose timing could be
+questioned should have that question answered in the record rather than left to
+the reader to worry about.

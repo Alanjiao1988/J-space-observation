@@ -1,0 +1,106 @@
+{
+ "schema_version": "study5-eq1-q3-decision-v1",
+ "phase": "P-1",
+ "step": "S4",
+ "decided_at_utc": "2026-08-27T18:40:42Z",
+ "rule_artifact": "/scratch/study5/tools/q3_decision_rule.json",
+ "rule_frozen_before_measurement": true,
+ "expected_items": 195,
+ "complete_items": 195,
+ "missing_items": [],
+ "missing_item_count": 0,
+ "analysis_is_complete": true,
+ "records_total": 585,
+ "k_samples_per_item": 1,
+ "statistical_unit": "item",
+ "aggregated_to_per_item_before_analysis": true,
+ "arms": {
+  "T": {
+   "responses": 195,
+   "accuracy": 0.882051,
+   "no_boxed_rate": 0.020513,
+   "ceiling_hit_rate": 0.020513,
+   "degeneration_rate": 0.0,
+   "length_p50": 2441.0,
+   "length_p90": 7001.199999999999,
+   "length_p99": 16384.0,
+   "length_mean": 3443.43,
+   "length_max": 16384,
+   "completed_only_median_length": 2395.0,
+   "completed_responses": 191
+  },
+  "H": {
+   "responses": 195,
+   "accuracy": 0.584615,
+   "no_boxed_rate": 0.164103,
+   "ceiling_hit_rate": 0.076923,
+   "degeneration_rate": 0.076923,
+   "length_p50": 710.0,
+   "length_p90": 10982.4,
+   "length_p99": 16384.0,
+   "length_mean": 2651.35,
+   "length_max": 16384,
+   "completed_only_median_length": 655.0,
+   "completed_responses": 180
+  },
+  "F": {
+   "responses": 195,
+   "accuracy": 0.774359,
+   "no_boxed_rate": 0.082051,
+   "ceiling_hit_rate": 0.076923,
+   "degeneration_rate": 0.05641,
+   "length_p50": 2365.0,
+   "length_p90": 14523.399999999996,
+   "length_p99": 16384.0,
+   "length_mean": 4312.83,
+   "length_max": 16384,
+   "completed_only_median_length": 2053.0,
+   "completed_responses": 180
+  }
+ },
+ "accuracy": {
+  "T": 0.882051,
+  "H": 0.584615,
+  "F": 0.774359
+ },
+ "parser_false_negative_rate": 0.0,
+ "parser_false_negative_count": 0,
+ "parser_false_negative_examples": [],
+ "parser_fn_method": "each item's known answer is presented in the canonical answer surface and the frozen pipeline is asked to recover it; this isolates parser and checker failure from model failure",
+ "study4f_e0_artifacts_used": false,
+ "recovery": {
+  "formula": "(acc_F - acc_H) / (acc_T - acc_H)",
+  "point_estimate": 0.637931,
+  "denominator": 0.297436,
+  "bootstrap_ci_95": [
+   0.471408,
+   0.785714
+  ],
+  "bootstrap_resamples": 10000,
+  "resampling_unit": "item",
+  "verdict_decided_by": "point estimate, because the band table was frozen against it"
+ },
+ "length_condition": {
+  "tolerance": 0.7,
+  "statistic": "median completed length of F / median completed length of T",
+  "completed_only": true,
+  "value": 0.857203,
+  "passed": true,
+  "one_sided": true
+ },
+ "catastrophic_H": {
+  "triggered": false,
+  "H_accuracy": 0.584615,
+  "H_degeneration_rate": 0.076923
+ },
+ "verdict": "PASS",
+ "band": "recovery >= 0.50",
+ "terminal_state_if_fail": "STUDY5_EQ1_ADAPTER_FIDELITY_BELOW_REGISTERED_FLOOR",
+ "oa002_confirmatory_reverse_solve": {
+  "formula": "min(32768, 2^ceil(log2(p99_completed_length_on_dev)))",
+  "p99_completed_length_on_dev": 14935.5,
+  "max_new_tokens_confirmatory": 16384,
+  "formula_frozen_before_its_input_existed": true
+ },
+ "claim_ceiling": "Q-3 is an engineering gate. It establishes that the adapter recovers a pre-registered share of a behavioural gap under a registered decoding law. It establishes nothing about J-space, about distillation, or about reasoning, and it is not a scientific result."
+}

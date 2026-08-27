@@ -1,0 +1,8 @@
+# P-1/P1-010 - rule out a read race between the last shard write and the Q-3 read
+# A delayed waiter log showed 554 records at 17:38 and 555 at 17:53, which brackets
+# the time the Q-3 decision was computed. The decide_q3 tool asserts completeness
+# and had reported 195/195 with its proof string, but "the tool would have caught
+# it" is an argument, and re-running is a measurement.
+sudo docker run --rm study5-eq1:qualification python tools/decide_q3.py \
+    --results <smoke + 4 shards> --out p1/q3_decision_recheck.json
+# field-by-field diff of the two reports, ignoring only decided_at_utc
