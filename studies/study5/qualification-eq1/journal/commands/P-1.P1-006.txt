@@ -1,0 +1,9 @@
+# P-1/P1-006 - step 3 smoke run, 10 items x 3 arms, output KEPT
+ssh <gpu-host> "sudo docker run --rm --gpus device=0 -v /scratch:/scratch \
+    -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e CUDA_VISIBLE_DEVICES=0 \
+    -e PYTHONPATH=<adapter repo> study5-eq1:qualification \
+    python tools/measure_arms.py --target <T> --adapter <primary> \
+      --benchmark contamination/math500_test.jsonl \
+      --split reports/benchmark_split.json \
+      --contamination reports/p1/contamination_development.json \
+      --results reports/p1/arm_results.jsonl --limit 10 --check-id S3.SMOKE"

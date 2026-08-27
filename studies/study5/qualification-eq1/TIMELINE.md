@@ -911,3 +911,97 @@ The script asserting `device_count() == 1` rather than trusting the flag is what
 caught it.
 
 OD-003 proof verification: **PASS** for both checkpoints.
+
+### 2026-08-27T13:00:00Z → 13:20:00Z — `P1-005` — OD-004, OD-005, OD-006 registered
+
+**OD-004** makes the **per-layer paired difference** the primary `L0` statistic.
+The two checkpoints share an architecture and a layer indexing, so layer ℓ
+corresponds to layer ℓ and the 28 layers are a paired unit — the same principle
+the study already applies to items. Mean and median over layers are *unpaired*
+summaries, dominated by the order-of-magnitude tail at layers 26–27, and are
+demoted to descriptive.
+
+**The two registered tests disagree, and both are reported.**
+
+| Test | Result | Supports |
+| --- | --- | --- |
+| Exact two-sided sign test | **p = 0.012541**, 21/28 layers | **prose** |
+| Median paired ratio | **0.6685** | **prose** |
+| Wilcoxon signed-rank | W = 136, z = −1.5257, **p = 0.127088** | not significant |
+
+The explanation is mechanical: the sign test is magnitude-free, Wilcoxon weights
+by the rank of absolute difference — so layers 26–27 take the top ranks and pull
+the statistic back toward the null. **Wilcoxon remains partially vulnerable to
+exactly the tail this registration exists to neutralise.** That is a reason to
+prefer the sign test here, stated as part of the registration rather than
+produced afterwards to explain away an inconvenient number.
+
+So the conclusion — *prose right, table wrong* — rests on the sign test and the
+median paired ratio, is **not** corroborated by the magnitude-weighted test, and
+is registered at that strength and no higher. Reporting only the significant
+test would have been selective reporting, which is precisely why both were
+registered in advance.
+
+**OD-005** freezes the sensitivity-arm selection rule *before its inputs exist*:
+`sep(c) = median_ℓ[L0_c(ℓ)/L0_primary(ℓ)]`, qualifying at ≥ 2.0 or ≤ 0.5,
+greatest separation wins; if nothing qualifies the arm is **deleted** and the
+published family's lack of measured leverage is reported as a conclusive
+limitation. The criterion is `L0` — an instrument property measured before any
+accuracy figure exists — so the arm cannot be chosen for producing a preferred
+result.
+
+**OD-006** requires both `gpu_index_in_container` and `gpu_uuid_last_twelve` in
+every record, the physical UUID authoritative.
+
+The per-layer curve is emitted as hand-written SVG, so the figure adds no
+plotting library to the frozen image and its digest stays valid.
+
+### 2026-08-27T13:08:14Z → 13:32:47Z — `P1-006` — **Step 3 smoke: PASS**
+
+10 items × 3 arms = 30 records, **0.4074 accelerator-hours**. Output is **kept**
+and counts toward the final result: seed and model are fixed, so a rerun would
+produce the same bytes and there is no run-twice-keep-one hazard.
+
+| Arm | acc | boxed | ceiling | degen | p50 tok | p99 tok |
+| --- | --- | --- | --- | --- | --- | --- |
+| `T` | 1.000 | 1.000 | 0.000 | 0.000 | 1914 | 3069 |
+| `H` | 0.700 | 0.800 | 0.000 | 0.200 | 630 | 11020 |
+| `F` | 1.000 | 1.000 | 0.000 | 0.000 | 1762 | 3386 |
+
+Every criterion verified: all three arms parseable; ceiling-hit rate measurable
+and **0 of 30** — the first evidence that OA-002's raise to 16384 removed the
+truncation confound rather than merely moving it; every record carries a
+physical GPU UUID from the registered four; no NaN/inf, evidenced by the
+`P1-CHECK-S3.SMOKE` proof string rather than by an exit code.
+
+`H` is **degraded but not catastrophic** — 0.700 accuracy — so the
+catastrophic-`H` stop condition does not fire and the `H → T` gap stays a
+meaningful denominator. `H`'s p99 of 11020 against a p50 of 630 is the heavy
+tail the registered degeneration detector exists to catch.
+
+These are 10-item figures, reported as smoke evidence and **not** as a result.
+
+**A note on how `H` is constructed.** `H` is the adapter with the transcoder
+disabled, not a separately built hybrid. That is not a shortcut — it follows
+from step 1: S1.A proved the 339 non-transcoder tensors byte-identical, and
+S1.C proved transcoder-off logits identical to **exactly 0.0**. Sharing one load
+therefore *guarantees* `H` and `F` differ in the transcoder and nothing else, a
+guarantee two separate checkpoint loads could not give, since any divergence in
+loading would silently become part of the contrast.
+
+### 2026-08-27T13:44:41Z → in progress — `P1-007` — full run, 4 shards
+
+Four workers, one physical GPU each, each writing its **own** results file so
+concurrent workers never append to a shared one, and each resuming from the
+smoke output so those 30 records are continued rather than redone.
+
+**OD-006 justified itself immediately.** All four shards report:
+
+    physical GPU e85524f36fdf, container index 0
+    physical GPU b29579ca41a6, container index 0
+    physical GPU 0ec45dca0dfc, container index 0
+    physical GPU 5767cc3ad060, container index 0
+
+Four *distinct* physical devices, every one of them in the registered set — and
+every one reporting container index **0**. Without the UUID field, all four
+workers would have been indistinguishable in the record.
