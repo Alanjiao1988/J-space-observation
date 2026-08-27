@@ -1,0 +1,51 @@
+{
+ "schema_version": "study5-eq1-disclosed-correction-v1",
+ "correction_id": "DC-003",
+ "phase": "P-2",
+ "step": "P2-001",
+ "recorded_at_utc": "2026-08-27T22:40:00Z",
+ "severity": "would have silently corrupted every downstream measurement",
+ "caught_before_it_propagated": true,
+ "self_caught": true,
+
+ "what_happened": {
+  "summary": "The first retokenisation run produced sequences with NO beginning-of-sentence token, even though OD-008 requires force_bos to be carried forward from the corpus manifest.",
+  "my_error": "I assumed add_special_tokens=True would prepend BOS because tokenizer_config.json contains add_bos_token: true. Under transformers 5.9.0 the loaded Qwen2Tokenizer defaults add_bos_token to False regardless of that config value.",
+  "how_the_corpus_actually_did_it": "jlens_s2_corpus_acquisition.py lines 294-304 set tokenizer.add_bos_token = True on the loaded object. That is the mechanism the manifest's force_bos: true records, and I had not read it before writing the tool.",
+  "how_it_surfaced": "The tool reported that 0 of 1402 rows kept a byte-identical 128-token prefix, and that BOS was not first on all 1402 rows. Both numbers were implausible for two closely related tokenizers, so the run was investigated instead of accepted."
+ },
+
+ "why_it_would_have_been_damaging": {
+  "shift": "Without BOS every sequence shifts by one position, so no prefix matches and the token window covers different text.",
+  "false_discards": "token_count_untruncated in the frozen corpus counts BOS; my counts did not. Rows sitting exactly at the 128-token boundary therefore fell to 127 and were discarded. The first run discarded 4 rows - 3 from A, 1 from B - and every one of those discards was an artifact of my bug, not a property of the tokenizer.",
+  "worst_part": "The run exited 0 and printed its OD-003 proof string. Every assertion in it passed. The corrupted output looked exactly like a clean success, and the discard list would have been committed as a genuine finding about the 7B tokenizer.",
+  "downstream": "Both lenses would have been fitted on off-by-one windows, and the resulting kurtosis curves would have been numerically fine and scientifically meaningless."
+ },
+
+ "the_underlying_class_of_fault": {
+  "observation": "The corpus builder confirmed force_bos by reading the attribute back: applied = bool(tokenizer.add_bos_token) immediately after assigning it True. That check cannot fail, because assigning a Python attribute always succeeds whether or not the tokenizer honours it.",
+  "relation_to_IMG_001": "This is the same class as IMG-001, where a verification step silently did not run. A check that cannot fail is indistinguishable from no check at all.",
+  "what_this_tool_does_instead": "It tokenises a fixed probe string and asserts BOS actually appears in the output, then asserts BOS is the first token on every one of the 1402 rows, raising rather than recording."
+ },
+
+ "correction": {
+  "action": "Set tokenizer.add_bos_token = True after loading, verify empirically with a probe, and assert BOS-first per row.",
+  "first_run_discarded": true,
+  "first_run_artifacts_not_committed": true,
+  "no_frozen_rule_was_changed": "OD-008 was executed as written, both before and after. The bug was in the tool, not in the rule, and the rule was not touched.",
+  "rerun_result": "All 1402 rows survive; A=600, B=600, heldout=200, smoke=2; 0 discarded."
+ },
+
+ "verification_that_the_corrected_run_is_right": {
+  "check": "Because the 7B and 1.5B tokenizer files are byte-identical, a correct retokenisation must reproduce the frozen token-id hash of every row exactly.",
+  "result": "1402 of 1402 token_ids_sha256 values reproduced",
+  "why_this_is_a_strong_check": "It is an exact byte-level agreement against a value frozen before this phase existed, so it cannot be satisfied by a tool that is merely self-consistent."
+ },
+
+ "not_repaired_elsewhere": {
+  "statement": "The weak readback check in jlens_s2_corpus_acquisition.py is inherited code from an earlier phase and is NOT modified here. Authority section 13 forbids weakening or rewriting historical tests, and the corpus it produced is verified correct by the exact hash reproduction above.",
+  "recorded_for_the_record_only": true
+ },
+
+ "claim_ceiling": "This is a disclosure of an execution fault and its correction. It licenses no claim of any kind."
+}

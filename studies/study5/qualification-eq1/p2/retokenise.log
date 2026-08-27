@@ -1,0 +1,29 @@
+{
+ "original_role_counts": {
+  "A": 600,
+  "B": 600,
+  "heldout": 200,
+  "smoke": 2
+ },
+ "surviving_role_counts": {
+  "A": 600,
+  "B": 600,
+  "heldout": 200,
+  "smoke": 2
+ },
+ "discarded_role_counts": {
+  "A": 0,
+  "B": 0,
+  "heldout": 0,
+  "smoke": 0
+ },
+ "total_surviving": 1402,
+ "total_discarded": 0,
+ "rows_whose_128_token_prefix_is_byte_identical_to_the_1_5b_prefix": 1402,
+ "rows_whose_token_ids_sha256_reproduces_the_frozen_value": 1402,
+ "rows_whose_untruncated_token_count_is_unchanged": 1402,
+ "duplicate_7b_prefixes": [],
+ "duplicate_7b_prefix_count": 0
+}
+surviving rows sha256 09fff55bd6291bb678b90f40103a5a4d04b8453592ee8c89c2aae2157eda827e
+P2-CHECK-OD008-RETOKENISE PASSED
