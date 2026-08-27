@@ -227,3 +227,101 @@ catch a tenant id or a resource GUID, which the original would have missed —
 and it holds no secret of its own. Recorded rather than silently fixed, because
 "the check that enforces the rule broke the rule" is exactly the kind of thing
 §9.2 exists to surface.
+
+### 2026-08-27T00:44:00Z → 00:50:00Z — `P0-003` — the §4.3 secondary benchmark gate, resolved before any model call
+
+§4.3 registers GPQA diamond as the secondary benchmark, marks it `gated: auto`,
+and registers MMLU-Pro STEM as the fallback if access is not obtained — with the
+decision made at P-0, before any model call, before any outcome is observed, and
+never revisited.
+
+The gate is decided on readability of the **deciding data file at the pinned
+revision**, not on repository metadata, because a gated dataset still serves
+public metadata and would otherwise look available.
+
+| Registered source | Revision | Deciding file | Result |
+| --- | --- | --- | --- |
+| `HuggingFaceH4/MATH-500` primary | `6e4ed1a2` | `test.jsonl` | HTTP 206, readable |
+| `Idavidrein/gpqa` secondary | `633f5ee8` | `gpqa_diamond.csv` | **HTTP 401, not readable** |
+| `TIGER-Lab/MMLU-Pro` fallback | `b189ec76` | `data/test-00000-of-00001.parquet` | HTTP 206, readable |
+| OpenThoughts3-55k contamination ref | `b6d6ca48` | `data/train.jsonl` | HTTP 206, readable |
+
+GPQA's revision resolves and the diamond file is listed, so the pin is correct;
+it is the *content* that is withheld, and no HuggingFace token exists on this
+execution host. **Access was not obtained.** The registered fallback therefore
+takes effect: the secondary benchmark is `TIGER-Lab/MMLU-Pro` STEM at
+`b189ec765aa7ed75c8acfea42df31fdae71f97be`. Frozen; not revisitable.
+
+Recorded in `gpqa_gate_resolution.json` with the full probe evidence, so the
+decision can be audited rather than taken on trust.
+
+### 2026-08-27T00:50:00Z → 00:56:00Z — `P0-004` — hard blocker `HB-001`, raised and **not** repaired
+
+The registered GPU host was unreachable from this execution host. The VM itself
+was fine — running, correctly configured, nothing wrong with it. The NSG
+attached to it admitted inbound TCP/22 from exactly one `/32`, and this host
+egresses from a varying NAT pool that is not that prefix. The probe timed out at
+the transport layer, which is consistent with the rule rather than with an
+authentication failure.
+
+Every remaining route required something §2 prohibits:
+
+| Route | Prohibited by |
+| --- | --- |
+| Add this host's prefix to the NSG | §2.3 — no NSG modification |
+| `az vm run-command invoke` | §11 control-plane write, §2.3 VM extension |
+| Create an Azure Bastion | §2.5 — names Bastion explicitly |
+| Inject a key via the VMAccess extension | §11 and §2.3 |
+| Jump through the CPU host | reachable, but no valid credential; provisioning one is a control-plane write |
+| Restart the VM or its guest agent | §2.2 — both VMs must stay running |
+
+So the invocation **stopped and reported instead of repairing**, exactly as §12
+and §8 of the execution prompt require. No terminal state was declared: §2 binds
+this invocation, not the operator, and the obstruction was a single rule the
+operator could lawfully lift, so declaring `..._CONTAINER_OR_RUNTIME_UNAVAILABLE`
+would have foreclosed the study over an access question. Recorded in
+`blockers/HB-001.json`, including the routes considered and why each was
+refused. Zero Azure writes at this step.
+
+### 2026-08-27T00:56:00Z → 01:05:00Z — `P0-005` — operator amendment `OA-001`, and `HB-001` lifted
+
+The operator amended the boundary: the freeze exists to protect **spend**. A
+pre-computed quantity of money must actually be consumed, the two VMs are the
+spend-bearing resources and must therefore stay running and unmodified, and
+resources that do not bear that spend may be changed.
+
+That distinction resolves `HB-001` cleanly. A network security group carries no
+charge, so amending it neither reduces spend nor endangers a recorded byte.
+`OA-001` was written and **committed before the change was applied**, keeping
+the repository's authority-before-action discipline.
+
+The change was deliberately additive and minimal: one **new** inbound rule at
+priority 1010 for the execution host's egress `/23` — the narrowest prefix
+covering the observed NAT spread. The pre-existing rule at priority 1000 was not
+edited, moved or deleted, so the originally registered rule stays independently
+auditable.
+
+Verified immediately afterwards:
+
+| Check | Result |
+| --- | --- |
+| Both VMs still running | yes — `a100-vm` and `cpuserver` both `VM running` |
+| VM configuration / SKU changes | 0 / 0 |
+| Pre-existing NSG rules modified | 0 (1 added) |
+| GPUs visible | 4 × NVIDIA A100 80GB PCIe |
+| Free GPU memory per device | 85,097,644,032 B vs registered floor 69,502,926,848 B — **hard blocker 4 does not fire** |
+| `/scratch` | mounted, 3.4 T free |
+| Driver / Docker | 580.173.02 / 29.1.3, registered base image present |
+| Managed-identity storage token | acquired; 0 SAS, 0 storage keys |
+
+Two environment facts carried forward: HuggingFace is **unreachable** from the
+GPU host, confirming the inherited Study 4F-M1 finding, while `hf-mirror.com`
+answers 200 — so acquisition must go through the byte-verified mirror route and
+every byte must still be checked against its authoritative SHA-256. The
+registered target `T` is already present on `/scratch` from the predecessor
+study.
+
+**Note on the closing snapshot.** The inventory comparison covers VMs, storage
+accounts and containers, so this authorized NSG rule will not surface as drift.
+It is recorded here and in `OA-001` explicitly, because the run record should be
+complete rather than merely passing its own check.

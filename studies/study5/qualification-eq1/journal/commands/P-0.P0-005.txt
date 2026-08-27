@@ -1,0 +1,11 @@
+# P-0/P0-005 - apply operator amendment OA-001 and confirm the blocker is lifted
+# OA-001 was written and committed BEFORE the change was applied.
+az network nsg rule create -g J-space --nsg-name a100-nsg \
+   --name allow-ssh-study5-eq1 --priority 1010 \
+   --direction Inbound --access Allow --protocol Tcp \
+   --source-address-prefixes <execution host egress /23> \
+   --destination-port-ranges 22
+# The pre-existing rule at priority 1000 was not edited, moved or deleted.
+az vm list -d -o table          # confirm both VMs still 'VM running'
+ssh -i <key> azureuser@<gpu-host> "nvidia-smi; df -h /scratch; docker --version"
+curl -H Metadata:true "<IMDS>/metadata/identity/oauth2/token?resource=storage.azure.com"

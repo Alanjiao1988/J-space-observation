@@ -1,0 +1,7 @@
+# P-0/P0-004 - GPU host reachability probe; hard blocker raised, NOT repaired
+az vm list-ip-addresses -g J-space -o table                 # read-only
+az network nsg rule list -g J-space --nsg-name a100-nsg     # read-only
+ssh -i <key> azureuser@<gpu-host>   # -> connection timed out at the transport layer
+ssh <cpu-host>                      # -> reachable, but no valid credential
+# Every remaining route required a section 2 prohibited action. Stopped and
+# recorded blockers/HB-001.json. No repair attempted.

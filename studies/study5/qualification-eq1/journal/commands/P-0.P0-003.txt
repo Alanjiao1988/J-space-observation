@@ -1,0 +1,6 @@
+# P-0/P0-003 - resolve the section 4.3 secondary benchmark gate, before any model call
+python studies/study5/qualification-eq1/tools/resolve_secondary_benchmark.py \
+       --out studies/study5/qualification-eq1/gpqa_gate_resolution.json
+# The gate is decided on readability of the deciding DATA FILE at the registered
+# revision, not on repository metadata, because a gated dataset still serves
+# public metadata and would otherwise look available.

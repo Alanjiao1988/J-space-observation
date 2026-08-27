@@ -1,0 +1,113 @@
+{
+ "schema_version": "study5-eq1-blocker-v1",
+ "blocker_id": "HB-001",
+ "authority_trigger": "12.3",
+ "authority_trigger_text": "a required step would need a reboot, a driver change, a resize or any section 2 prohibited action",
+ "raised_at_utc": "2026-08-27T00:52:00Z",
+ "phase": "P-0",
+ "step_id": "P0-004",
+ "severity": "hard_blocker",
+ "repaired": false,
+ "repair_attempted": false,
+ "summary": "The registered GPU execution host is unreachable from this execution host, and every route to it that exists would require an action authority section 2 prohibits.",
+ "detail": {
+  "registered_gpu_host_safe_name": "a100-vm",
+  "gpu_host_power_state": "VM running",
+  "gpu_host_is_healthy": true,
+  "problem_is_not_the_vm": "The VM is running and its configuration is exactly as registered. Nothing is wrong with it. The obstruction is purely network reachability from this particular execution host.",
+  "network_finding": "The network security group attached to the GPU host permits inbound TCP/22 from exactly one /32 source prefix. This execution host's public egress address is not that prefix, and its egress is drawn from a varying NAT pool, so it is not stably any single prefix. The SSH probe times out at the transport layer, which is consistent with the rule rather than with an authentication failure.",
+  "cpu_host_finding": "The CPU host permits inbound TCP/22 from any source and is reachable at the transport layer, but its registered admin account rejects every key available on this execution host. It therefore cannot be used as a jump host without provisioning a credential, which is not an action this invocation may take.",
+  "ip_addresses_committed": false,
+  "ip_addresses_redacted_reason": "the structural fact is what matters for governance; publishing infrastructure addresses adds nothing and is avoided by the same conservatism as authority 2.8"
+ },
+ "routes_considered_and_rejected": [
+  {
+   "route": "add this host's egress prefix to the GPU host network security group",
+   "rejected_because": "authority 2.3 forbids modifying any NSG",
+   "prohibited_by": "2.3"
+  },
+  {
+   "route": "use az vm run-command invoke to execute on the GPU host",
+   "rejected_because": "it is an Azure control-plane write and it operates through the RunCommand VM extension, which authority 2.3 forbids modifying",
+   "prohibited_by": "11 and 2.3"
+  },
+  {
+   "route": "create an Azure Bastion host",
+   "rejected_because": "authority 2.5 forbids creating any Azure resource, and names Bastion explicitly",
+   "prohibited_by": "2.5"
+  },
+  {
+   "route": "reset the admin credential or add an SSH key via the VMAccess extension",
+   "rejected_because": "authority 2.3 forbids modifying any VM extension, and it is a control-plane write",
+   "prohibited_by": "11 and 2.3"
+  },
+  {
+   "route": "reach the GPU host through the CPU host as a jump host",
+   "rejected_because": "no working credential for the CPU host exists on this execution host, and provisioning one is a control-plane write",
+   "prohibited_by": "11 and 2.3"
+  },
+  {
+   "route": "restart the VM or its guest agent to clear the condition",
+   "rejected_because": "authority 2.2 forbids restarting any VM, and both VMs must stay running",
+   "prohibited_by": "2.2"
+  }
+ ],
+ "blocked_work": [
+  "P-0 acquisition and byte-verification of Qwen2.5-Math-7B and both transcoder adapters into content-addressed models/sha256/<aa>/<full> paths",
+  "P-0 container image build and digest freeze",
+  "gate Q-2, which requires each acquired file to be hashed on the execution host and round-trip re-hashed after upload",
+  "every later phase, all of which require the GPU host"
+ ],
+ "not_blocked_work": [
+  "the opening read-only Azure inventory, which completed",
+  "the section 4.3 secondary benchmark gate, which was resolved at P-0 before any model call"
+ ],
+ "gates_affected": {
+  "Q-1": "partially satisfied: the licence position is recorded and every registered byte source was proven reachable and revision-pinned from this host, but the bytes cannot be landed on the registered execution host",
+  "Q-2": "cannot be evaluated: hashing on the execution host and round-trip verification after upload both require the GPU host"
+ },
+ "candidate_terminal_state": "STUDY5_EQ1_CONTAINER_OR_RUNTIME_UNAVAILABLE",
+ "terminal_state_declared": false,
+ "terminal_state_not_declared_because": "Authority section 2 binds this invocation, not the operator. The obstruction is a single network rule that the operator may lawfully change, or may sidestep by running the invocation from the permitted source prefix. Declaring a terminal state now would foreclose the study over an operator-resolvable access question, so the blocker is reported for an operator decision instead, exactly as section 8 of the execution prompt requires.",
+ "operator_decision_required": true,
+ "operator_options": [
+  "run the invocation from the source prefix the GPU host already permits, which changes no Azure configuration at all and is the only option requiring no operator write",
+  "authorise a narrowly scoped NSG amendment, which is an operator resource decision and would supersede section 2.3 for that one rule",
+  "accept the terminal state STUDY5_EQ1_CONTAINER_OR_RUNTIME_UNAVAILABLE and close the invocation"
+ ],
+ "invocation_took_no_repair_action": true,
+ "azure_writes_performed": 0,
+ "nsg_rules_modified": 0,
+ "vm_power_state_changes": 0,
+ "extensions_modified": 0,
+ "role_assignments_modified": 0,
+ "resolution": {
+  "status": "resolved",
+  "resolved_at_utc": "2026-08-27T01:05:00Z",
+  "resolved_by": "operator amendment OA-001",
+  "resolved_how": "The operator clarified that the freeze exists to protect the spend, that the two VMs are the spend-bearing resources and must stay running and unmodified, and that resources which do not bear that spend may be changed. A network security group carries no charge, so one additive inbound rule was created for the execution host's egress prefix. The pre-existing rule at priority 1000 was not edited, moved or deleted.",
+  "self_repair": false,
+  "self_repair_note": "The blocker was reported and left unrepaired until the operator amended the boundary. No route was taken before that amendment existed, and the amendment was committed to the repository before the change was applied.",
+  "verified_after": {
+   "both_vms_still_running": true,
+   "gpu_host_power_state": "VM running",
+   "cpu_host_power_state": "VM running",
+   "vm_configuration_changes": 0,
+   "vm_sku_changes": 0,
+   "pre_existing_nsg_rules_modified": 0,
+   "nsg_rules_added": 1,
+   "ssh_reachable": true,
+   "gpus_visible": 4,
+   "gpu_model": "NVIDIA A100 80GB PCIe",
+   "gpu_free_bytes_per_device": 85097644032,
+   "registered_free_memory_floor_bytes": 69502926848,
+   "memory_floor_pass": true,
+   "hard_blocker_4_fired": false,
+   "scratch_mounted": true,
+   "scratch_available": "3.4T",
+   "managed_identity_storage_token_acquired": true,
+   "sas_tokens_issued": 0,
+   "storage_keys_read": false
+  }
+ }
+}

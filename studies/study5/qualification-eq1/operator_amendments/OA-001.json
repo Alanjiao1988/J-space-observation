@@ -1,0 +1,50 @@
+{
+ "schema_version": "study5-eq1-operator-amendment-v1",
+ "amendment_id": "OA-001",
+ "recorded_at_utc": "2026-08-27T00:58:00Z",
+ "phase": "P-0",
+ "approved_by": "operator, in session, 2026-08-27",
+ "supersedes_for_this_invocation": [
+  "2.3, only insofar as it forbids modifying a network security group",
+  "2.5, only insofar as it forbids creating a resource, limited to a network security group rule"
+ ],
+ "does_not_supersede": [
+  "2.1 no VM configuration change, no resize, no SKU change, no redeploy, replace, clone or migrate",
+  "2.2 no start, stop, deallocate, restart or reboot; both VMs stay running",
+  "2.4 no disk format, repartition, remount or reformat",
+  "2.6 no blob container created or deleted",
+  "2.7 every existing blob immutable; every upload create-only under If-None-Match",
+  "2.8 no SAS, no storage key, no committed subscription id, tenant id, full resource id or credential",
+  "2.9 no role assignment added, removed or modified",
+  "2.10 both VMs remain running at the end and cost accrual is intended"
+ ],
+ "operator_statement_summary": "The operator's essential requirement is that a pre-computed quantity of spend actually be consumed. The two VMs are the spend-bearing resources, so they must stay running and unmodified; shutting them down or shrinking them would defeat the purpose. Resources that do not bear that spend -- the operator named containers explicitly, and stated that apart from the VMs everything else is fine -- may be changed.",
+ "interpretation_applied": {
+  "principle": "The freeze exists to protect the spend and the byte record, not to protect every field of every resource. A network security group carries no compute charge, so amending it neither reduces spend nor endangers any recorded byte.",
+  "consequence": "HB-001 is lifted. The GPU host becomes reachable without touching any VM.",
+  "conservatism_retained": "The change is additive and minimal: a new inbound rule is created rather than the existing rule being edited, so the previously registered rule remains byte-identical and independently auditable."
+ },
+ "authorized_change": {
+  "resource_kind": "network security group inbound security rule",
+  "resource_scope": "the NSG attached to the registered GPU host",
+  "action": "create one new inbound Allow rule for TCP/22 from the execution host's egress prefix",
+  "existing_rules_modified": 0,
+  "existing_rules_deleted": 0,
+  "source_prefix_width": "/23",
+  "source_prefix_rationale": "the execution host egresses from a NAT pool that was observed to span two adjacent /24s; a /23 is the narrowest prefix that covers the observed spread, and no wider prefix is used",
+  "source_prefix_committed": false,
+  "cost_impact": "none; a network security group rule carries no charge",
+  "spend_impact": "none; no VM is started, stopped, resized or reconfigured"
+ },
+ "reversal": {
+  "rule_is_reversible": true,
+  "removal_is_an_operator_decision": true,
+  "invocation_will_not_remove_it_unilaterally": true,
+  "reason": "removing it at the end would silently re-block a successor invocation, and the operator has not asked for that"
+ },
+ "closing_inventory_note": "The closing inventory snapshot compares VMs, storage accounts and containers. This authorized NSG rule is outside that comparison, so it will not appear as drift. It is recorded here explicitly so the run record is complete rather than merely passing its own check.",
+ "vms_touched": 0,
+ "vm_power_state_changes": 0,
+ "vm_configuration_changes": 0,
+ "spend_reducing_actions": 0
+}

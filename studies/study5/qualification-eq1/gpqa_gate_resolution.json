@@ -1,0 +1,130 @@
+{
+ "schema_version": "study5-eq1-secondary-benchmark-gate-v1",
+ "authority_section": "4.3",
+ "resolved_at_utc": "2026-08-27T00:53:48Z",
+ "resolved_at_phase": "P-0",
+ "resolved_before_any_model_call": true,
+ "resolved_before_any_outcome_observed": true,
+ "may_be_revisited_afterwards": false,
+ "huggingface_token_available_on_execution_host": false,
+ "gpqa_access_obtained": false,
+ "selected_secondary_repo": "TIGER-Lab/MMLU-Pro",
+ "selected_secondary_revision": "b189ec765aa7ed75c8acfea42df31fdae71f97be",
+ "selected_secondary_is_the_registered_fallback": true,
+ "selected_secondary_slice": "STEM",
+ "primary_benchmark": {
+  "repo": "HuggingFaceH4/MATH-500",
+  "registered_revision": "6e4ed1a2a79af7d8630a6b768ec859cb5af4d3be",
+  "probed_at_utc": "2026-08-27T00:53:36Z",
+  "authenticated": false,
+  "token_used": false,
+  "metadata_http_status": 200,
+  "gated": false,
+  "private": false,
+  "revision_resolves": true,
+  "file_count": 4,
+  "files": [
+   ".gitattributes",
+   "README.md",
+   "eval.yaml",
+   "test.jsonl"
+  ],
+  "deciding_file": "test.jsonl",
+  "file_probe": {
+   "http_status": 206,
+   "readable": true,
+   "bytes_read": 1024,
+   "content_length_header": "bytes 0-1023/446564",
+   "error": null
+  },
+  "accessible": true
+ },
+ "registered_secondary": {
+  "repo": "Idavidrein/gpqa",
+  "registered_revision": "633f5ee89ab8ad4522a9f850766b73f62147ffdd",
+  "probed_at_utc": "2026-08-27T00:53:39Z",
+  "authenticated": false,
+  "token_used": false,
+  "metadata_http_status": 200,
+  "gated": "auto",
+  "private": false,
+  "revision_resolves": true,
+  "file_count": 8,
+  "files": [
+   ".gitattributes",
+   "README.md",
+   "eval.yaml",
+   "gpqa_diamond.csv",
+   "gpqa_experts.csv",
+   "gpqa_extended.csv",
+   "gpqa_main.csv",
+   "license.txt"
+  ],
+  "deciding_file": "gpqa_diamond.csv",
+  "file_probe": {
+   "http_status": 401,
+   "readable": false,
+   "bytes_read": 0,
+   "content_length_header": null,
+   "error": "Unauthorized"
+  },
+  "accessible": false
+ },
+ "registered_fallback": {
+  "repo": "TIGER-Lab/MMLU-Pro",
+  "registered_revision": "b189ec765aa7ed75c8acfea42df31fdae71f97be",
+  "probed_at_utc": "2026-08-27T00:53:40Z",
+  "authenticated": false,
+  "token_used": false,
+  "metadata_http_status": 200,
+  "gated": false,
+  "private": false,
+  "revision_resolves": true,
+  "file_count": 7,
+  "files": [
+   ".gitattributes",
+   "README.md",
+   "data/test-00000-of-00001.parquet",
+   "data/validation-00000-of-00001.parquet",
+   "eval.yaml",
+   "run_claude3.py",
+   "run_gpt4o.py"
+  ],
+  "deciding_file": "data/test-00000-of-00001.parquet",
+  "file_probe": {
+   "http_status": 206,
+   "readable": true,
+   "bytes_read": 1024,
+   "content_length_header": "bytes 0-1023/4144185",
+   "error": null
+  },
+  "accessible": true
+ },
+ "contamination_reference": {
+  "repo": "nathu0/transcoder-adapters-openthoughts3-stratified-55k",
+  "registered_revision": "b6d6ca48ac7e12517bd16411687a28e404cc2692",
+  "probed_at_utc": "2026-08-27T00:53:44Z",
+  "authenticated": false,
+  "token_used": false,
+  "metadata_http_status": 200,
+  "gated": false,
+  "private": false,
+  "revision_resolves": true,
+  "file_count": 3,
+  "files": [
+   ".gitattributes",
+   "data/train.jsonl",
+   "data/val.jsonl"
+  ],
+  "deciding_file": "data/train.jsonl",
+  "file_probe": {
+   "http_status": 206,
+   "readable": true,
+   "bytes_read": 1024,
+   "content_length_header": "bytes 0-1023/1365958895",
+   "error": null
+  },
+  "accessible": true
+ },
+ "note": "The gate is decided on readability of the deciding data file at the registered revision, not on repository metadata, because a gated dataset still serves public metadata and would otherwise appear available."
+}
