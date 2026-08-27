@@ -710,3 +710,84 @@ distillation or reasoning, and neither is a scientific result.
 
 **P-0 accelerator consumption: 0 h of the registered 0 h allocation.** Cumulative
 0 of 240.
+
+---
+
+## P-1 — build `H`, measure `T`/`H`/`F`, decide Q-3
+
+Registered accelerator budget ≤ 24 **actively used** GPU-hours (OD-001).
+
+### 2026-08-27T05:32:00Z → 05:45:00Z — `P1-001` — five registrations, before any model call
+
+`OA-002` raises `max_new_tokens` 4096 → 16384. The rationale is recorded
+verbatim and matters: a truncation ceiling binds **differentially across arms**
+and systematically penalises whichever arm reasons longer — and "J features
+affect accuracy, style features affect length" is exactly the primary estimand.
+That makes it a confound on the estimand, not an efficiency question. The
+confirmatory reverse-solve `min(32768, 2^ceil(log2(p99)))` is frozen now, before
+its input exists.
+
+`OD-002` scopes §10.2: "inspected" means model exposure and outcome-correlated
+inspection, so a pure-text, zero-model-call item-property screen is in scope
+**now** rather than only after unblinding. All 300 confirmation items are
+screened with the P-0 thresholds unchanged; matched 13-grams are recorded
+verbatim so a reader can judge boilerplate for themselves. The limitation must
+be worded as a **ceiling risk that compresses paired differences**, never as a
+threat to validity.
+
+`OD-003` promotes the IMG-001 fix to a standing rule: every gate assertion emits
+a unique `P1-CHECK-<id> PASSED` string, a missing string is a **FAIL**, and exit
+code 0 is not evidence of execution. IMG-001 is the whole argument — that step
+exited 0 *precisely because* nothing ran.
+
+`SC-001` registers the decoding law and the per-item seed. The seed deliberately
+does **not** depend on condition: common random numbers share sampling noise
+across `T`/`H`/`F` so it differences out of the paired contrast. Seeding per
+condition would inflate the variance of exactly the quantity being estimated.
+Not greedy, because DeepSeek warns greedy induces repetition degeneration in
+R1-Distill — it would manufacture a failure mode in the arm most at risk.
+
+The Q-3 length tolerance is frozen **before** the measurement it judges: median
+completed length of `F` ≥ 0.70 × that of `T`, one-sided, computed on responses
+that reached EOS rather than the ceiling.
+
+93 tests pass, including that an empty log fails every check.
+
+### 2026-08-27T05:42:00Z → 11:55:00Z — `P1-002` — **Step 1: all four assertions PASS**
+
+Zero GPU seconds. This is the most important output of the phase: it confirms
+the premise everything else rests on.
+
+| Check | Result |
+| --- | --- |
+| **S1.A** H ≡ adapter non-transcoder weights | **339 / 339 tensors byte-equal**, 0 mismatched, 0 unmatched |
+| **S1.B** load completeness + geometry | `missing_keys` **[]**, `unexpected_keys` **[]**, transcoder params **1,644,496,896** = expected exactly |
+| **S1.C** transcoder-off ≡ H | max abs logit difference **exactly 0.0** |
+| **S1.D** transcoder-on ≠ off | max **28.5625**, mean **2.767** |
+
+S1.A settles the construction question empirically: the adapter checkpoint *is*
+target attention/embed/norm + base MLP + transcoder, so `F` and `H` differ in
+exactly the transcoder and nothing else. Rollup
+`47db2d30cc35fefcadc0035121356628e3d0fc641725d3532e7697a0b88c944a`.
+
+S1.B's arithmetic closes to the parameter: 28 × 2 × 3584 × 8192 matrix params
+plus 28 × (8192 + 3584) bias params equals the observed count exactly, and the
+total feature count is **229,376 = 28 × 8192**, matching authority §4.1.
+
+S1.C returning **exactly 0.0** rather than merely a small number is stronger
+than the check required — the two load paths produce bit-identical logits.
+
+S1.D is the one that protects Q-3 from a false negative. Had the transcoder
+weights been silently dropped on load, `F` would equal `H`, and Q-3 would have
+failed for a reason having nothing to do with adapter fidelity while looking
+exactly like a genuine fidelity result. A difference of 28.56 rules that out.
+
+OD-003 proof verification: **PASS**, all four unique proof strings present.
+
+**Two `transformers` 5.x deviations, recorded rather than absorbed.** `device_map`
+now requires `accelerate`, so it was removed entirely — CPU is the default
+placement and §8 forbids `device_map auto` in any case, so removing it moves
+*toward* the registered contract. And the adapter class is imported in place
+rather than through `trust_remote_code`, because the checkpoint declares no
+`auto_map`; there is no remote code in it to trust. The adapter source sits on
+`/scratch` only and is never committed, per §3.7 — only its SHA-256 is recorded.

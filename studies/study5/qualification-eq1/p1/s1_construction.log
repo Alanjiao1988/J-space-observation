@@ -1,0 +1,14 @@
+[2026-08-27T12:03:29Z] loading target for H: /scratch/models/DeepSeek-R1-Distill-Qwen-7B
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights: 100%|██████████| 339/339 [00:00<00:00, 4147.46it/s]
+[2026-08-27T12:03:30Z] loading base MLP donor: /scratch/study5/staging/Qwen__Qwen2.5-Math-7B
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights: 100%|██████████| 339/339 [00:00<00:00, 3710.02it/s]
+[2026-08-27T12:03:32Z] swapped 84 projections, 5,703,204,864 parameters
+[2026-08-27T12:03:32Z] S1.A byte-comparing H against the adapter non-transcoder weights
+P1-CHECK-S1.A PASSED
+[2026-08-27T12:04:14Z] S1.B loading the adapter and checking load completeness
+Loading weights:   0%|          | 0/451 [00:00<?, ?it/s]Loading weights:  89%|████████▉ | 401/451 [00:00<00:00, 4006.13it/s]Loading weights: 100%|██████████| 451/451 [00:00<00:00, 4017.09it/s]
+P1-CHECK-S1.B PASSED
+[2026-08-27T12:04:14Z] S1.C / S1.D probe-batch logits with the transcoder off and on
+P1-CHECK-S1.C PASSED
+P1-CHECK-S1.D PASSED
+[2026-08-27T12:04:27Z] report written to /scratch/study5/reports/p1/construction_verification.json

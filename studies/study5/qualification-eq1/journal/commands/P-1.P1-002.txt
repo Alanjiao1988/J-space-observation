@@ -1,0 +1,13 @@
+# P-1/P1-002 - step 1 construction verification, zero GPU
+# The adapter class is fetched onto /scratch at the registered commit and used in
+# place. It is never committed to Git (authority 3.7). Only its sha256 is recorded.
+ssh <gpu-host> "curl -sfL .../transcoder-adapters/<commit>/models/qwen2_transcoder.py"
+ssh <gpu-host> "sudo docker run --rm -v /scratch:/scratch \
+    -e PYTHONPATH=/scratch/study5/third_party/transcoder-adapters \
+    study5-eq1:qualification \
+    python tools/verify_construction.py \
+      --base <Qwen2.5-Math-7B> --target <DeepSeek-R1-Distill-Qwen-7B> \
+      --adapter <l1w0.001-l0-1.4> --adapter-repo <repo> \
+      --out reports/p1/construction_verification.json"
+python tools/verify_proof_strings.py --log p1/s1_construction.log \
+    --expect p1/s1_expected_checks.json --out p1/s1_proof_verification.json

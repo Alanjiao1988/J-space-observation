@@ -1,0 +1,78 @@
+{
+ "schema_version": "study5-eq1-construction-verification-v1",
+ "phase": "P-1",
+ "step": "S1",
+ "started_at_utc": "2026-08-27T12:03:29Z",
+ "device": "cpu",
+ "gpu_seconds": 0,
+ "checks_expected": [
+  "S1.A",
+  "S1.B",
+  "S1.C",
+  "S1.D"
+ ],
+ "hybrid_built_by": "this script, not misc_scripts/make_hybrid_model.py",
+ "hybrid_construction_deviation": "identical swap of gate_proj, up_proj and down_proj, but with trust_remote_code disabled as authority section 8 requires for the target and the base model",
+ "adapter_class_source": "imported in place from the registered repository at the registered commit; the checkpoint declares no auto_map, so there is no remote code in it to trust. Never redistributed, per section 3.7.",
+ "checks": {
+  "S1.A": {
+   "name": "independently built H is byte-exactly equal to the adapter non-transcoder weights",
+   "adapter_transcoder_tensor_count": 112,
+   "adapter_non_transcoder_tensor_count": 339,
+   "tensors_compared": 339,
+   "tensors_byte_equal": 339,
+   "mismatch_count": 0,
+   "mismatches": [],
+   "unmatched_tensor_names": [],
+   "non_transcoder_rollup_sha256": "47db2d30cc35fefcadc0035121356628e3d0fc641725d3532e7697a0b88c944a",
+   "passed": true
+  },
+  "S1.B": {
+   "name": "load completeness and transcoder parameter geometry",
+   "config_hidden_size": 3584,
+   "config_num_hidden_layers": 28,
+   "config_transcoder_n_features": 8192,
+   "config_transcoder_dec_bias": true,
+   "expected_matrix_params": 1644167168,
+   "expected_matrix_params_formula": "num_hidden_layers * 2 * hidden_size * transcoder_n_features",
+   "expected_bias_params": 329728,
+   "expected_bias_params_formula": "num_hidden_layers * (transcoder_n_features + hidden_size if dec_bias)",
+   "expected_total_transcoder_params": 1644496896,
+   "observed_transcoder_params": 1644496896,
+   "total_feature_count": 229376,
+   "missing_keys": [],
+   "unexpected_keys": [],
+   "missing_keys_count": 0,
+   "unexpected_keys_count": 0,
+   "keys_committed_in_full_even_when_empty": true,
+   "passed": true
+  },
+  "S1.C": {
+   "name": "transcoder-off logits match the independently built H",
+   "layers_toggled": 28,
+   "layers_expected": 28,
+   "max_abs_logit_difference": 0.0,
+   "tolerance": 0.01,
+   "tolerance_rationale": "bf16 accumulation order can differ between the two load paths; the tolerance admits that without admitting a real weight difference",
+   "probe_prompts": 4,
+   "passed": true
+  },
+  "S1.D": {
+   "name": "transcoder-on logits differ materially from transcoder-off",
+   "layers_toggled": 28,
+   "layers_expected": 28,
+   "max_abs_logit_difference": 28.5625,
+   "mean_abs_logit_difference": 2.766986608505249,
+   "threshold": 0.01,
+   "why_this_check_exists": "if transcoder weights were silently dropped on load then F would equal H, and Q-3 would fail for a spurious reason while resembling a genuine fidelity result",
+   "passed": true
+  }
+ },
+ "hybrid_geometry": {
+  "layers": 28,
+  "mlp_params_swapped": 5703204864
+ },
+ "finished_at_utc": "2026-08-27T12:04:27Z",
+ "all_checks_passed": true,
+ "transformers_major_version_jump_guarded": true
+}

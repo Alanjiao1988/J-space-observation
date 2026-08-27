@@ -1,0 +1,6 @@
+{
+ "step": "P-1 step 1, construction verification",
+ "rule": "OD-003",
+ "enumerated_in_advance": true,
+ "expected_checks": ["S1.A", "S1.B", "S1.C", "S1.D"]
+}
