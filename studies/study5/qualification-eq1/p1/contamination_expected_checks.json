@@ -1,0 +1,6 @@
+{
+ "step": "P-1 OD-002 contamination screening, both splits",
+ "rule": "OD-003",
+ "enumerated_in_advance": true,
+ "expected_checks": ["S0.CONTAM-development", "S0.CONTAM-confirmation"]
+}

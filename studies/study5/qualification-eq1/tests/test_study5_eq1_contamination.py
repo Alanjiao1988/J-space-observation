@@ -180,10 +180,10 @@ def test_only_development_items_are_checked(tmp_path: Path) -> None:
     """Authority 10.2: no confirmation item is loaded or inspected."""
 
     report = _run(tmp_path, contaminated=True)
-    assert report["development_items_checked"] == 2
-    assert report["confirmation_items_checked"] == 0
-    assert report["confirmation_items_loaded"] == 0
-    assert report["confirmation_isolation_held"] is True
+    assert report["items_checked"] == 2
+    assert report["other_split_items_checked"] == 0
+    assert report["other_split_items_loaded"] == 0
+    assert report["screened_split"] == "development"
     assert all(f["item_id"] != "i2" for f in report["flagged_items"])
 
 
@@ -231,3 +231,65 @@ def test_the_result_is_reproducible(tmp_path: Path) -> None:
     second = _run(tmp_path / "b", contaminated=True)
     assert first["flagged_items"] == second["flagged_items"]
     assert first["max_cosine_observed"] == second["max_cosine_observed"]
+
+
+def test_matched_ngrams_are_recorded_verbatim(tmp_path: Path) -> None:
+    """OD-002: a reader must be able to judge boilerplate for themselves."""
+
+    report = _run(tmp_path, contaminated=True)
+    flagged = report["flagged_items"][0]
+    assert flagged["matched_ngram_count"] >= 1
+    assert flagged["matched_ngrams_verbatim"]
+    assert all(isinstance(g, str) and g for g in flagged["matched_ngrams_verbatim"])
+
+
+def test_the_confirmation_split_can_be_screened(tmp_path: Path) -> None:
+    """OD-002 authorises screening confirmation items, and only that."""
+
+    split, benchmark, reference = _fixture(tmp_path, contaminated=False)
+    out = tmp_path / "conf.json"
+    assert (
+        contamination.main(
+            [
+                "--split", str(split),
+                "--benchmark", str(benchmark),
+                "--reference", str(reference),
+                "--screen", "confirmation",
+                "--out", str(out),
+            ]
+        )
+        == 0
+    )
+    report = json.loads(out.read_text(encoding="utf-8"))
+    assert report["screened_split"] == "confirmation"
+    assert report["items_checked"] == 1
+    assert report["other_split_items_loaded"] == 0
+    assert report["model_calls"] == 0
+    assert report["items_tokenized"] == 0
+    assert report["items_generated_from"] == 0
+    assert report["items_scored"] == 0
+
+
+def test_screening_defaults_to_development(tmp_path: Path) -> None:
+    assert _run(tmp_path, contaminated=False)["screened_split"] == "development"
+
+
+def test_the_primary_analysis_set_excludes_flagged_items(tmp_path: Path) -> None:
+    report = _run(tmp_path, contaminated=True)
+    assert report["primary_analysis_set_size"] == (
+        report["items_checked"] - report["flagged_item_count"]
+    )
+    assert report["excluded_items_retained_as_registered_sensitivity_set"] is True
+
+
+def test_the_limitation_is_worded_as_a_ceiling_risk(tmp_path: Path) -> None:
+    """OD-002 forbids calling this a threat to validity."""
+
+    wording = _run(tmp_path, contaminated=False)["limitation_wording"].lower()
+    assert "ceiling" in wording
+    assert "compresses the difference" in wording
+    assert "threatens validity" not in wording
+
+
+def test_thresholds_are_recorded_as_unchanged_from_p0(tmp_path: Path) -> None:
+    assert _run(tmp_path, contaminated=False)["thresholds_unchanged_from_p0"] is True

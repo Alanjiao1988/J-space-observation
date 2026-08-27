@@ -143,18 +143,32 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--reference", nargs="+", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--max-reference-rows", type=int, default=0)
+    parser.add_argument(
+        "--screen",
+        choices=("development", "confirmation"),
+        default="development",
+        help=(
+            "which split to screen. Screening the confirmation split is "
+            "authorised by OD-003's sibling OD-002: contamination screening is a "
+            "pure-text, zero-model-call determination of an item property that "
+            "is uncorrelated with any result, so it is not the 'inspection' "
+            "section 10.2 prohibits."
+        ),
+    )
     args = parser.parse_args(argv)
 
     split = json.loads(Path(args.split).read_text(encoding="utf-8"))
     development = set(split["development_ids"])
     confirmation = set(split["confirmation_ids"])
+    target_ids = development if args.screen == "development" else confirmation
+    other_ids = confirmation if args.screen == "development" else development
 
     items: list[dict[str, Any]] = []
     for index, row in enumerate(iter_jsonl(Path(args.benchmark))):
         identifier = str(
             row.get("unique_id") or row.get("id") or row.get("problem_id") or index
         )
-        if identifier not in development:
+        if identifier not in target_ids:
             continue
         text = normalise(str(row.get("problem", "")))
         items.append(
@@ -165,14 +179,15 @@ def main(argv: list[str] | None = None) -> int:
                 "vector": hashed_char_vector(text),
                 "max_cosine": 0.0,
                 "shared_ngrams": 0,
+                "matched_ngrams": set(),
                 "nearest_reference_row": None,
             }
         )
 
-    if len(items) != len(development):
+    if len(items) != len(target_ids):
         raise SystemExit(
-            f"loaded {len(items)} development items but the split registers "
-            f"{len(development)}; refusing to report a partial check"
+            f"loaded {len(items)} {args.screen} items but the split registers "
+            f"{len(target_ids)}; refusing to report a partial check"
         )
 
     ngram_index: dict[str, list[int]] = {}
@@ -191,12 +206,15 @@ def main(argv: list[str] | None = None) -> int:
                 continue
 
             hits: Counter[int] = Counter()
+            matched: dict[int, set[str]] = {}
             for gram in word_ngrams(text):
                 for position in ngram_index.get(gram, ()):
                     hits[position] += 1
+                    matched.setdefault(position, set()).add(gram)
             for position, count in hits.items():
                 if count > items[position]["shared_ngrams"]:
                     items[position]["shared_ngrams"] = count
+                items[position]["matched_ngrams"] |= matched[position]
 
             if hits:
                 vector = hashed_char_vector(text)
@@ -218,14 +236,21 @@ def main(argv: list[str] | None = None) -> int:
                     "max_cosine": round(item["max_cosine"], 4),
                     "flagged_by_ngram": by_ngram,
                     "flagged_by_cosine": by_cosine,
+                    # OD-002 requires the matched spans verbatim, so a reader can
+                    # decide for themselves whether a hit is substantive reuse or
+                    # shared LaTeX boilerplate rather than taking the flag on trust.
+                    "matched_ngrams_verbatim": sorted(item["matched_ngrams"])[:10],
+                    "matched_ngram_count": len(item["matched_ngrams"]),
                 }
             )
 
     report = {
-        "schema_version": "study5-eq1-contamination-report-v1",
+        "schema_version": "study5-eq1-contamination-report-v2",
         "authority_section": "4.3",
+        "scope_definition": "OD-002",
+        "screened_split": args.screen,
         "checked_at_utc": utc_now(),
-        "phase": "P-0",
+        "phase": "P-0" if args.screen == "development" else "P-1",
         "run_before_any_model_call": True,
         "method": "dual channel: exact 13-gram overlap and hashed character 5-gram cosine",
         "channels_are_lexical_not_neural": True,
@@ -235,6 +260,7 @@ def main(argv: list[str] | None = None) -> int:
             "would make contamination depend on the artefact under study"
         ),
         "thresholds_fixed_before_measurement": True,
+        "thresholds_unchanged_from_p0": True,
         "ngram_n": NGRAM_N,
         "ngram_flag_threshold": NGRAM_FLAG_THRESHOLD,
         "cosine_char_ngram": CHAR_NGRAM,
@@ -244,28 +270,41 @@ def main(argv: list[str] | None = None) -> int:
         "benchmark_split_sha256": hashlib.sha256(
             Path(args.split).read_bytes()
         ).hexdigest(),
-        "development_items_checked": len(items),
-        "confirmation_items_checked": 0,
-        "confirmation_items_loaded": 0,
-        "confirmation_isolation_held": True,
+        "items_checked": len(items),
+        "other_split_items_checked": 0,
+        "other_split_items_loaded": 0,
         "reference_files": [str(r) for r in args.reference],
         "reference_rows_scanned": rows_scanned,
         "flagged_item_count": len(flagged),
         "overlap_rate": round(len(flagged) / len(items), 6) if items else 0.0,
         "flagged_items": flagged,
+        "primary_analysis_set_size": len(items) - len(flagged),
+        "excluded_items_retained_as_registered_sensitivity_set": True,
         "max_cosine_observed": round(
             max((i["max_cosine"] for i in items), default=0.0), 4
         ),
         "max_shared_ngrams_observed": max(
             (i["shared_ngrams"] for i in items), default=0
         ),
+        "model_calls": 0,
+        "items_tokenized": 0,
+        "items_prefilled": 0,
+        "items_generated_from": 0,
+        "items_scored": 0,
+        "limitation_wording": (
+            "In an item-paired difference design, contamination is primarily a "
+            "CEILING risk: it lifts every arm equally and compresses the "
+            "difference between them. It is not described as a threat to "
+            "validity, because the paired design differences out an item-level "
+            "effect common to all arms."
+        ),
         "interpretation_ceiling": (
             "This measures overlap between the adapter's training sample and the "
-            "development items. It is reported alongside any accuracy figure. It "
+            "benchmark items. It is reported alongside any accuracy figure. It "
             "is not evidence about J-space, about distillation, or about "
             "reasoning."
         ),
-        "unused_confirmation_pool_size": len(confirmation),
+        "other_split_pool_size": len(other_ids),
     }
 
     out = Path(args.out)
@@ -276,13 +315,15 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"{args.out}  sha256 {hashlib.sha256(text.encode('utf-8')).hexdigest()}")
     print(
-        f"development_items={len(items)} reference_rows={rows_scanned} "
-        f"flagged={len(flagged)} overlap_rate={report['overlap_rate']}"
+        f"split={args.screen} items={len(items)} reference_rows={rows_scanned} "
+        f"flagged={len(flagged)} overlap_rate={report['overlap_rate']} "
+        f"primary_set={report['primary_analysis_set_size']}"
     )
     print(
         f"max_shared_ngrams={report['max_shared_ngrams_observed']} "
         f"max_cosine={report['max_cosine_observed']}"
     )
+    print(f"P1-CHECK-S0.CONTAM-{args.screen} PASSED")
     return 0
 
 

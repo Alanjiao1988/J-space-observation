@@ -1,0 +1,12 @@
+# P-1/P1-003 - OD-002 contamination screening of BOTH splits, zero model calls
+ssh <gpu-host> "for S in development confirmation; do
+    python3 tools/contamination_check.py \
+      --split reports/benchmark_split.json \
+      --benchmark contamination/math500_test.jsonl \
+      --reference contamination/val.jsonl contamination/train.jsonl \
+      --screen \$S --out reports/p1/contamination_\${S}.json
+  done"
+python tools/verify_proof_strings.py --log p1/contamination_both.log \
+    --expect p1/contamination_expected_checks.json \
+    --out p1/contamination_proof_verification.json
+# Thresholds unchanged from P-0. Matched 13-grams recorded verbatim per OD-002.

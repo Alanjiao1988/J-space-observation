@@ -791,3 +791,48 @@ placement and §8 forbids `device_map auto` in any case, so removing it moves
 rather than through `trust_remote_code`, because the checkpoint declares no
 `auto_map`; there is no remote code in it to trust. The adapter source sits on
 `/scratch` only and is never committed, per §3.7 — only its SHA-256 is recorded.
+
+### 2026-08-27T11:58:00Z → 12:10:00Z — `P1-003` — OD-002 screening of **both** splits
+
+Zero model calls, zero GPU seconds, thresholds unchanged from P-0.
+
+| Split | Items | Flagged | Rate | Primary set | Max n-grams | Max cosine |
+| --- | --- | --- | --- | --- | --- | --- |
+| development | 200 | 5 | 0.0250 | **195** | 5 | 0.4815 |
+| confirmation | 300 | 1 | 0.0033 | **299** | 3 | 0.2792 |
+
+The development figures reproduce P-0 exactly — same count, same maxima — which
+is an independent confirmation that the screen is deterministic.
+
+All six flags across both splits came from the exact 13-gram channel. The cosine
+channel flagged nothing at all; its maximum was 0.4815 against a 0.80 threshold.
+
+**The substantive finding, and precisely why OD-002 required verbatim spans:
+every matched n-gram is boilerplate, not problem reuse.**
+
+    "a a sw label b b nw label c c ne label d"          <- Asymptote diagram markup
+    "label a a n label b b sw label c c se label"       <- Asymptote diagram markup
+    "express your answer as a common fraction asy for int i 0 i"
+    "the equation of the line can be expressed in the form y mx b"
+    "write your answer in the form x y where x and y are"
+    "is m n where m and n are relatively prime positive integers find"
+
+Three are Asymptote `label(...)` calls — the markup MATH uses to draw diagrams.
+The rest are standard competition-mathematics instruction phrasing. **None of
+them indicates that problem content was in the adapter's training sample.** A
+reader can verify that judgement directly from the spans above rather than
+taking the flag on trust, which is the whole reason OD-002 demanded them.
+
+**The frozen exclusion rule is applied unchanged anyway.** Un-flagging items
+after inspecting their content would be changing the rule after seeing the data,
+which is exactly what pre-registration forbids. The consequence is worth stating
+plainly: the exclusion is **conservative** — most likely over-inclusive rather
+than under-inclusive — and the six excluded items are retained as the registered
+sensitivity set for the confirmatory with-and-without comparison.
+
+Limitation wording per OD-002: in an item-paired difference design contamination
+is primarily a **ceiling risk** that lifts every arm and compresses the
+difference between them. It is not a threat to validity.
+
+OD-003 proof verification: **PASS** for both splits. 0 confirmation items were
+tokenized, prefilled, generated from or scored.

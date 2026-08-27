@@ -1,0 +1,109 @@
+{
+ "schema_version": "study5-eq1-contamination-report-v2",
+ "authority_section": "4.3",
+ "scope_definition": "OD-002",
+ "screened_split": "development",
+ "checked_at_utc": "2026-08-27T12:15:19Z",
+ "phase": "P-0",
+ "run_before_any_model_call": true,
+ "method": "dual channel: exact 13-gram overlap and hashed character 5-gram cosine",
+ "channels_are_lexical_not_neural": true,
+ "hash_is_stable_across_processes": true,
+ "why_lexical": "the check must run before any model call, and a neural embedding would make contamination depend on the artefact under study",
+ "thresholds_fixed_before_measurement": true,
+ "thresholds_unchanged_from_p0": true,
+ "ngram_n": 13,
+ "ngram_flag_threshold": 1,
+ "cosine_char_ngram": 5,
+ "cosine_flag_threshold": 0.8,
+ "flag_rule": "either channel exceeding its threshold flags the item",
+ "benchmark_split_artifact": "/scratch/study5/reports/benchmark_split.json",
+ "benchmark_split_sha256": "c62dbd0ddf720cc972d17d10338b81968c4ce5b77c9e9cea5f4e8bdb49faf322",
+ "items_checked": 200,
+ "other_split_items_checked": 0,
+ "other_split_items_loaded": 0,
+ "reference_files": [
+  "/scratch/study5/contamination/val.jsonl",
+  "/scratch/study5/contamination/train.jsonl"
+ ],
+ "reference_rows_scanned": 54948,
+ "flagged_item_count": 5,
+ "overlap_rate": 0.025,
+ "flagged_items": [
+  {
+   "item_id": "test/prealgebra/1646.json",
+   "shared_ngrams": 5,
+   "max_cosine": 0.4815,
+   "flagged_by_ngram": true,
+   "flagged_by_cosine": false,
+   "matched_ngrams_verbatim": [
+    "a a sw label b b nw label c c ne label d",
+    "a sw label b b nw label c c ne label d d",
+    "cycle label a a sw label b b nw label c c ne",
+    "label a a sw label b b nw label c c ne label",
+    "label b b nw label c c ne label d d se pair",
+    "sw label b b nw label c c ne label d d se"
+   ],
+   "matched_ngram_count": 6
+  },
+  {
+   "item_id": "test/prealgebra/1003.json",
+   "shared_ngrams": 1,
+   "max_cosine": 0.2535,
+   "flagged_by_ngram": true,
+   "flagged_by_cosine": false,
+   "matched_ngrams_verbatim": [
+    "express your answer as a common fraction asy for int i 0 i"
+   ],
+   "matched_ngram_count": 1
+  },
+  {
+   "item_id": "test/precalculus/541.json",
+   "shared_ngrams": 2,
+   "max_cosine": 0.31,
+   "flagged_by_ngram": true,
+   "flagged_by_cosine": false,
+   "matched_ngrams_verbatim": [
+    "equation of the line can be expressed in the form y mx b",
+    "the equation of the line can be expressed in the form y mx"
+   ],
+   "matched_ngram_count": 2
+  },
+  {
+   "item_id": "test/geometry/1108.json",
+   "shared_ngrams": 1,
+   "max_cosine": 0.2712,
+   "flagged_by_ngram": true,
+   "flagged_by_cosine": false,
+   "matched_ngrams_verbatim": [
+    "write your answer in the form x y where x and y are"
+   ],
+   "matched_ngram_count": 1
+  },
+  {
+   "item_id": "test/precalculus/1281.json",
+   "shared_ngrams": 3,
+   "max_cosine": 0.4501,
+   "flagged_by_ngram": true,
+   "flagged_by_cosine": false,
+   "matched_ngrams_verbatim": [
+    "a a n label b b sw label c c se label d",
+    "a n label b b sw label c c se label d d",
+    "label a a n label b b sw label c c se label"
+   ],
+   "matched_ngram_count": 3
+  }
+ ],
+ "primary_analysis_set_size": 195,
+ "excluded_items_retained_as_registered_sensitivity_set": true,
+ "max_cosine_observed": 0.4815,
+ "max_shared_ngrams_observed": 5,
+ "model_calls": 0,
+ "items_tokenized": 0,
+ "items_prefilled": 0,
+ "items_generated_from": 0,
+ "items_scored": 0,
+ "limitation_wording": "In an item-paired difference design, contamination is primarily a CEILING risk: it lifts every arm equally and compresses the difference between them. It is not described as a threat to validity, because the paired design differences out an item-level effect common to all arms.",
+ "interpretation_ceiling": "This measures overlap between the adapter's training sample and the benchmark items. It is reported alongside any accuracy figure. It is not evidence about J-space, about distillation, or about reasoning.",
+ "other_split_pool_size": 300
+}

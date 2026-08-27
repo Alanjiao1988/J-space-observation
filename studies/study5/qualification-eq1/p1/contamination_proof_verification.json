@@ -1,0 +1,28 @@
+{
+ "schema_version": "study5-eq1-proof-verification-v1",
+ "rule": "OD-003",
+ "verified_at_utc": "2026-08-27T12:16:31Z",
+ "expected_check_count": 2,
+ "expected_checks_enumerated_in_advance": true,
+ "checks": [
+  {
+   "check_id": "S0.CONTAM-development",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "S0.CONTAM-confirmation",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  }
+ ],
+ "missing_proof_strings": [],
+ "duplicated_proof_strings": [],
+ "explicit_failures": [],
+ "unexpected_proof_strings": [],
+ "exit_code_used_as_evidence_of_execution": false,
+ "all_checks_passed": true,
+ "verdict": "PASS",
+ "log": "studies/study5/qualification-eq1/p1/contamination_both.log",
+ "log_sha256": "383e0fe1d8fc877766e690f5a21e238aab35945105bca4dc91dc45b25e80f827"
+}

@@ -1,0 +1,8 @@
+/scratch/study5/reports/p1/contamination_development.json  sha256 ec826387eecd7bd7347a47a6518c970d9a8cedd684da0a62b87128be9fef178a
+split=development items=200 reference_rows=54948 flagged=5 overlap_rate=0.025 primary_set=195
+max_shared_ngrams=5 max_cosine=0.4815
+P1-CHECK-S0.CONTAM-development PASSED
+/scratch/study5/reports/p1/contamination_confirmation.json  sha256 8025d40bccea04aa9241d9e54b152f8aaee1c294e67ae042e154f28be272af01
+split=confirmation items=300 reference_rows=54948 flagged=1 overlap_rate=0.003333 primary_set=299
+max_shared_ngrams=3 max_cosine=0.2792
+P1-CHECK-S0.CONTAM-confirmation PASSED
