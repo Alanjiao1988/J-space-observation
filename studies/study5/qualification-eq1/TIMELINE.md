@@ -386,3 +386,40 @@ Uploads are create-only under `If-None-Match: *`, staged as 64 MiB blocks above
 
 The superseded first run was stopped and its `.part` files deleted; its six
 completed uploads are content-addressed, so the new run simply re-verified them.
+
+### 2026-08-27T01:24:00Z → 01:28:00Z — `P0-008` — development / confirmation split frozen
+
+§10.1 requires a deterministic hash split, frozen and committed at P-0 before
+any model call. Run **on the cloud VM**; the workstation downloaded nothing.
+
+MATH-500 `test.jsonl` was fetched through the mirror and checked against the
+origin-published **git blob id** `2376b9a1…` — the correct authority, because
+the file is not LFS and the origin therefore publishes no content SHA-256 for
+it. A mismatch would have rejected the bytes outright.
+
+The rule is fixed before any measurement and depends only on registered
+identities, so it is reproducible and cannot be nudged by an outcome that does
+not yet exist:
+
+```
+rank by sha256("STUDY5_EQ1|{repo}|{revision}|{item_id}") ascending
+first 200 -> development, remainder -> confirmation
+```
+
+| Quantity | Value |
+| --- | --- |
+| Total items | 500 |
+| Development | 200 |
+| Confirmation | 300 |
+| Disjoint / covering | yes / yes |
+| Development rollup | `cba4648dce8b383584769bb9bc80aa3ff5e9fd14a30a494698fc1b77bc323b99` |
+| Confirmation rollup | `a566e21a6fc58e4b28b382ff9887f9c264be5d9a4dbd8443ef61393b4fbf73cd` |
+
+Confirmation **ids** are committed on purpose: §10.5 requires a check that
+recomputes the split and proves no confirmation id appears in any journal
+record, which is impossible without them. That is not a §10.2 breach — no
+confirmation item has been tokenized, prefilled, generated from, scored or
+inspected, and the count of confirmation items touched is 0.
+
+The artifact retrieved from the VM re-hashed identically on the workstation, so
+the transfer is byte-exact.

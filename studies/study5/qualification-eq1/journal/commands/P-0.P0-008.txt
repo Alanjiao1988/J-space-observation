@@ -1,0 +1,10 @@
+# P-0/P0-008 - freeze the development/confirmation split (authority 10.1), ON THE VM
+ssh <gpu-host> "python3 tools/freeze_benchmark_split.py \
+    --out /scratch/study5/reports/benchmark_split.json \
+    --development-n 200 \
+    --expected-git-blob-sha1 2376b9a194b46c0790e197c91b7249e5f88ac09b \
+    --expected-bytes 446564"
+scp <gpu-host>:/scratch/study5/reports/benchmark_split.json .
+# MATH-500 test.jsonl is non-LFS, so the origin publishes a git blob id and not a
+# content sha256; the VM recomputes that construction and rejects the mirrored
+# bytes on mismatch. The origin authority was read from API metadata only.
