@@ -1,0 +1,127 @@
+# Study 5-EQ1 engineering qualification runtime.
+#
+# The dependency set is inherited from the predecessor's proven Phase 0.5A lock
+# rather than invented here. That matters for two reasons:
+#
+#   * authority 4.2 registers `anthropics/jacobian-lens` at 581d398, and that
+#     commit's own pyproject requires `transformers>=5.5` -- so the floor is
+#     transformers 5.x, not the 4.x line. The adapter checkpoints agree: their
+#     config.json uses the v5 conventions `dtype` and `layer_types`, and they
+#     ship `chat_template.jinja` as a separate file, which older transformers
+#     does not read;
+#   * the predecessor lock is an exact resolution that has already been built
+#     and executed on this hardware, so reusing it inherits its provenance
+#     instead of starting a fresh resolution whose failure modes are unknown.
+#
+# One addition on top of that lock: scipy, needed for the one-to-one optimal
+# assignment in authority 6.3. It is installed in a separate layer so the
+# inherited lock is applied first and unmodified, and the fully resolved set is
+# frozen into the image at /workspace/requirements.study5-eq1.lock.txt.
+#
+# The symbolic equivalence checker required by authority 3.6 is built on sympy,
+# which the inherited lock already pins at 1.14.0.
+#
+# No model weight, adapter weight or benchmark byte is baked into this image.
+# It is a runtime only, so it can be published and rebuilt without touching the
+# licence position in authority 3.7.
+
+FROM python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d
+
+ARG JLENS_REPOSITORY=https://github.com/anthropics/jacobian-lens
+ARG JLENS_COMMIT=581d398613e5602a5af361e1c34d3a92ea82ba8e
+ARG STUDY5_AUTHORITY_SHA256=5c45d31a2aab23ffe93bbf5f4a220fb1835c1b98e960a2588fa587efcb9b1a35
+
+LABEL org.opencontainers.image.title="J-space Study 5-EQ1 qualification runtime"
+LABEL org.opencontainers.image.source="${JLENS_REPOSITORY}"
+LABEL org.opencontainers.image.revision="${JLENS_COMMIT}"
+LABEL io.jspace.study5.authority-sha256="${STUDY5_AUTHORITY_SHA256}"
+LABEL io.jspace.study5.jlens-source-pin="https://github.com/anthropics/jacobian-lens@581d398613e5602a5af361e1c34d3a92ea82ba8e"
+LABEL io.jspace.study5.model-weights-included="0"
+LABEL io.jspace.study5.adapter-weights-included="0"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates git tini \
+    && groupadd --system --gid 10001 jspace \
+    && useradd --system --uid 10001 --gid jspace --create-home \
+        --home-dir /workspace/runtime/home --shell /usr/sbin/nologin jspace \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+COPY requirements-jlens.txt Dockerfile.study5-eq1 /workspace/
+
+# The registered jlens pin is asserted here, not assumed: if the requirements
+# file ever stopped naming 581d398 the build fails rather than silently
+# producing an image that violates authority 4.2.
+RUN test "${JLENS_REPOSITORY}" = "https://github.com/anthropics/jacobian-lens" \
+    && test "${JLENS_COMMIT}" = "581d398613e5602a5af361e1c34d3a92ea82ba8e" \
+    && grep -Fq \
+        "git+https://github.com/anthropics/jacobian-lens.git@${JLENS_COMMIT}" \
+        /workspace/requirements-jlens.txt \
+    && python -m pip install --no-cache-dir \
+        pip==26.1.2 setuptools==81.0.0 wheel==0.47.0 \
+    && python -m pip install --no-cache-dir --no-build-isolation \
+        -r /workspace/requirements-jlens.txt \
+    && python -c "import importlib.metadata as m; assert m.version('jlens') == '0.1.0'; assert m.version('torch') == '2.12.0'; assert m.version('transformers') == '5.9.0'"
+
+RUN python -m pip install --no-cache-dir scipy \
+    && python -m pip freeze > /workspace/requirements.study5-eq1.lock.txt
+
+# Fail the build rather than the study: every capability the phase plan depends
+# on is exercised now, while a failure is still cheap to diagnose.
+RUN python - <<'PY'
+import importlib.metadata as m
+import jlens, sympy, scipy, torch, transformers, numpy
+
+for name in ("fit", "apply", "merge"):
+    assert hasattr(jlens, name), f"jlens.{name} is missing"
+
+from scipy.optimize import linear_sum_assignment  # authority 6.3 matching
+from transformers import AutoConfig               # authority 3.6 scoring
+
+# The registered symbolic checker must actually decide equivalence.
+from sympy.parsing.latex import parse_latex  # noqa: F401
+assert sympy.simplify(sympy.sympify("2*(x+1)") - sympy.sympify("2*x+2")) == 0
+
+print("jlens", m.version("jlens"))
+print("torch", torch.__version__)
+print("transformers", transformers.__version__)
+print("numpy", numpy.__version__)
+print("scipy", scipy.__version__)
+print("sympy", sympy.__version__)
+PY
+
+RUN install -d -o jspace -g jspace -m 0700 \
+        /workspace/runtime/home \
+        /workspace/runtime/hf-cache \
+        /workspace/runtime/results \
+        /workspace/runtime/cache \
+        /workspace/runtime/cache/tmp \
+        /workspace/runtime/pycache \
+    && chown -R 0:0 \
+        /workspace/requirements-jlens.txt \
+        /workspace/requirements.study5-eq1.lock.txt \
+        /workspace/Dockerfile.study5-eq1 \
+    && chmod -R a-w \
+        /workspace/requirements-jlens.txt \
+        /workspace/requirements.study5-eq1.lock.txt \
+        /workspace/Dockerfile.study5-eq1
+
+ENV HOME=/workspace/runtime/home \
+    HF_HOME=/workspace/runtime/hf-cache \
+    HUGGINGFACE_HUB_CACHE=/workspace/runtime/hf-cache/hub \
+    XDG_CACHE_HOME=/workspace/runtime/cache \
+    TMPDIR=/workspace/runtime/cache/tmp \
+    PYTHONPYCACHEPREFIX=/workspace/runtime/pycache \
+    RESULTS_DIR=/workspace/runtime/results \
+    CUDA_DEVICE_ORDER=PCI_BUS_ID \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1
+
+USER 10001:10001
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["python", "-c", "import jlens, torch; print('study5-eq1 runtime', torch.__version__)"]
