@@ -14,6 +14,7 @@ on and stopping at ``STUDY5_EQ1_RESOURCE_INVENTORY_DRIFT_DETECTED``.
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 import re
@@ -216,6 +217,158 @@ def test_the_capture_timestamp_alone_is_not_drift() -> None:
     closing = copy.deepcopy(opening)
     closing["captured_at_utc"] = "2027-01-01T00:00:00Z"
     assert inventory.compare(opening, closing)["differences"] == []
+
+
+# --------------------------------------------------------------------------
+# OA-001 expected-delta register (authority 2 verification requirement)
+# --------------------------------------------------------------------------
+
+_INVENTORY = Path(__file__).resolve().parent.parent / "inventory"
+
+
+def _amended_opening() -> dict:
+    return json.loads(
+        (_INVENTORY / "opening_snapshot_amended.json").read_text(encoding="utf-8")
+    )
+
+
+def _post_change() -> dict:
+    return json.loads(
+        (_INVENTORY / "post_oa001_snapshot.json").read_text(encoding="utf-8")
+    )
+
+
+def _register() -> dict:
+    return json.loads((_INVENTORY / "expected_deltas.json").read_text(encoding="utf-8"))
+
+
+def test_nsg_rules_are_part_of_the_snapshot_field_table() -> None:
+    """A change that appears in neither snapshot is a hole in the record."""
+
+    snap = _post_change()
+    names = {n["name"] for n in snap["network_security_groups"]}
+    assert "a100-nsg" in names
+    rules = {
+        r["name"]
+        for n in snap["network_security_groups"]
+        if n["name"] == "a100-nsg"
+        for r in n["rules"]
+    }
+    assert rules == {"allow-ssh", "allow-ssh-study5-eq1"}
+
+
+def test_the_authorized_change_passes_with_the_register() -> None:
+    result = inventory.compare(_amended_opening(), _post_change(), _register())
+    assert result["hard_blocker"] is False
+    assert result["blocking_differences"] == 0
+    assert result["closing_equals_opening_plus_registered_deltas"] is True
+
+
+def test_the_same_change_is_drift_without_the_register() -> None:
+    """The register must not make the check blind, only precise."""
+
+    result = inventory.compare(_amended_opening(), _post_change(), None)
+    assert result["hard_blocker"] is True
+    assert [
+        (d["kind"], d["nsg"], d["rule"])
+        for d in result["structural_deltas_unregistered"]
+    ] == [("nsg_rule_added", "a100-nsg", "allow-ssh-study5-eq1")]
+
+
+def test_exactly_one_delta_is_observed_and_it_is_the_registered_one() -> None:
+    result = inventory.compare(_amended_opening(), _post_change(), _register())
+    assert len(result["structural_deltas_observed"]) == 1
+    assert result["structural_deltas_unregistered"] == []
+    assert result["structural_deltas_registered_but_absent"] == []
+
+
+def test_one_extra_rule_beyond_the_register_is_drift() -> None:
+    closing = _post_change()
+    for nsg in closing["network_security_groups"]:
+        if nsg["name"] == "a100-nsg":
+            nsg["rules"].append({**nsg["rules"][0], "name": "sneaky", "priority": 4000})
+            nsg["rule_count"] += 1
+    result = inventory.compare(_amended_opening(), closing, _register())
+    assert result["hard_blocker"] is True
+    assert any(
+        d["rule"] == "sneaky" for d in result["structural_deltas_unregistered"]
+    )
+
+
+def test_a_registered_delta_that_is_absent_is_also_drift() -> None:
+    """One fewer must fail too, or the register could describe fiction."""
+
+    unchanged = _amended_opening()
+    result = inventory.compare(unchanged, copy.deepcopy(unchanged), _register())
+    assert result["hard_blocker"] is True
+    assert [
+        d["delta_id"] for d in result["structural_deltas_registered_but_absent"]
+    ] == ["OA-001-nsg-rule"]
+
+
+def test_removing_the_pre_existing_rule_is_drift() -> None:
+    closing = _post_change()
+    for nsg in closing["network_security_groups"]:
+        if nsg["name"] == "a100-nsg":
+            nsg["rules"] = [r for r in nsg["rules"] if r["name"] != "allow-ssh"]
+            nsg["rule_count"] = len(nsg["rules"])
+    result = inventory.compare(_amended_opening(), closing, _register())
+    assert result["hard_blocker"] is True
+    assert any(
+        d["kind"] == "nsg_rule_removed" and d["rule"] == "allow-ssh"
+        for d in result["structural_deltas_unregistered"]
+    )
+
+
+def test_modifying_the_pre_existing_rule_is_drift() -> None:
+    closing = _post_change()
+    for nsg in closing["network_security_groups"]:
+        if nsg["name"] == "a100-nsg":
+            for rule in nsg["rules"]:
+                if rule["name"] == "allow-ssh":
+                    rule["access"] = "Deny"
+    result = inventory.compare(_amended_opening(), closing, _register())
+    assert result["hard_blocker"] is True
+    assert any(
+        d["kind"] == "nsg_rule_modified" for d in result["structural_deltas_unregistered"]
+    )
+
+
+def test_the_register_binds_the_delta_to_its_authorizing_commit() -> None:
+    register = _register()
+    assert register["expected_delta_count"] == 1
+    delta = register["expected_deltas"][0]
+    assert delta["authorized_by"] == "OA-001"
+    assert len(delta["authorizing_commit"]) == 40
+    assert delta["rule_source_prefix_committed"] is False
+    result = inventory.compare(_amended_opening(), _post_change(), register)
+    assert result["authorizing_commits"] == [delta["authorizing_commit"]]
+
+
+def test_the_reconstructed_opening_is_labelled_as_reconstructed() -> None:
+    amended = _amended_opening()
+    assert amended["nsg_subtree_is_reconstructed_not_captured"] is True
+    assert amended["reconstruction_verified_against_pre_change_listing"] is True
+    assert amended["original_opening_snapshot_unmodified"] is True
+
+
+def test_the_original_opening_snapshot_is_untouched_by_the_amendment() -> None:
+    original = (_INVENTORY / "opening_snapshot.json").read_text(encoding="utf-8")
+    assert "network_security_groups" not in original
+    assert (
+        _amended_opening()["original_opening_snapshot_sha256"]
+        == hashlib.sha256(original.encode("utf-8")).hexdigest()
+    )
+
+
+def test_vm_drift_is_still_caught_when_a_register_is_supplied() -> None:
+    """The register covers NSG rules only; it must not excuse a VM change."""
+
+    closing = _post_change()
+    closing["vms"][0]["power_state"] = "VM deallocated"
+    result = inventory.compare(_amended_opening(), closing, _register())
+    assert result["hard_blocker"] is True
+    assert result["blocking_differences"] >= 1
 
 
 def test_the_committed_opening_snapshot_matches_the_registered_identities() -> None:

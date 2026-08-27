@@ -458,3 +458,90 @@ is the point of keeping them up.
 
 This is an engineering warning under §12, not a hard blocker: nothing about it
 requires a prohibited action, and nothing about it forces a reinterpretation.
+
+### 2026-08-27T02:10:00Z → 02:25:00Z — `P0-010` — budget measurement definition `OD-001`, and the OA-001 snapshot register
+
+Two operator-directed items, both of which had to land **before** the closing
+snapshot.
+
+#### `OD-001` — what the 240-hour ceiling actually measures
+
+A definition clarification, not an amendment: made before any measurement, before
+any model call, and with no observed outcome in play.
+
+> The §8 ceiling of 240 accelerator-hours, and every per-phase sub-quota, are
+> measured in **actively used GPU-hours** as defined in §9.3. VM wall-clock
+> hours and allocated GPU-hours are still reported separately under §9.3, but
+> are **not** bound by that ceiling.
+
+The reason it cannot be otherwise: §2.10 requires both VMs to stay running and
+forbids any cost-reduction action. Binding §8 to allocated GPU-hours or to VM
+wall-clock would put §8 in direct conflict with §2.10 — the ceiling would be
+consumed by a state the authority independently requires be maintained, and
+would eventually force a fail-closed stop for a reason unrelated to any
+computation performed.
+
+This corrects a claim in the previous report. Acquisition is network-bound and
+touches no GPU, so however long the mirror throttle makes it, it consumes
+**0 accelerator-hours**. The earlier phrasing that the slow download would
+"consume budget" was wrong, and P-0's 0 h allocation is intact.
+
+`resource_accounting.json` now reports all three quantities separately, with the
+rule that none may substitute for another written into the artifact itself.
+
+#### The OA-001 closing-snapshot trap, closed
+
+OA-001 authorised one additive NSG rule. That left two bad outcomes available,
+and both were real:
+
+* if the snapshot field table omitted NSG rules, the closing check would pass
+  while a genuine configuration change never appeared in either snapshot — a
+  hole in the paper record;
+* if it included them, the closing check would necessarily report drift and
+  manufacture a **false** `STUDY5_EQ1_RESOURCE_INVENTORY_DRIFT_DETECTED` at the
+  final step of P-0.
+
+Resolution, in three parts:
+
+1. **NSG rules are now part of the snapshot field table.** Source prefixes are
+   salted; rule names, priorities, direction, access, protocol and ports are in
+   the clear, so the change is auditable in substance without committing an
+   infrastructure address.
+2. **`inventory/expected_deltas.json`** registers exactly one delta —
+   `nsg_rule_added / a100-nsg / allow-ssh-study5-eq1` — bound to OA-001's
+   artifact SHA-256, blob id and authorising commit `859ff77e…`.
+3. **The closing check is now** `closing == opening + exactly the registered
+   deltas`. An unregistered delta is drift; a registered delta that is *absent*
+   is also drift, so the register cannot come to describe fiction.
+
+NSG rules are diffed **structurally**, by `(nsg, rule)` identity rather than
+through the generic flattener, so one rule change reads as one delta instead of
+a dozen unrelated-looking key differences — and a re-prioritised rule reads as
+*modified* rather than as a removal plus an unrelated addition.
+
+**One honest wrinkle.** The opening snapshot predates the NSG field, so there is
+no captured NSG baseline to compare against, and it cannot be re-captured
+because the authorised rule now exists. Rather than back-date the committed
+opening snapshot, `opening_snapshot_amended.json` is a **new** artifact whose
+NSG subtree is explicitly flagged as *reconstructed, not captured*. The
+reconstruction is the post-change listing minus the registered additions, and
+the tool refuses to write anything unless the result matches the rule listing
+independently recorded at `P0-005` immediately **before** the change was
+applied. The original opening snapshot stays byte-identical and its SHA-256 is
+carried inside the amended file.
+
+Twelve new tests pin the behaviour, including the cases that matter most: the
+same change is still drift *without* the register, one extra rule is drift, a
+registered-but-absent delta is drift, removing or modifying the pre-existing
+priority-1000 rule is drift, and a VM power-state change is still caught even
+when a register is supplied. 69 tests pass.
+
+#### `DC-002` throughput curve
+
+A probe now appends a measured sample to `reports/throughput_curve.jsonl` every
+30 minutes: window length, delta bytes, bytes/s, staged total, files verified,
+and whether acquisition is still running. If the 37 MB/s → 0.66 MB/s collapse is
+a rolling-window quota rather than a permanent per-IP limit, the curve will show
+the recovery. Either way, "acquisition took N hours, the cause was throttling,
+and here is the measured curve" is exactly the data the reproducibility section
+of a paper needs.

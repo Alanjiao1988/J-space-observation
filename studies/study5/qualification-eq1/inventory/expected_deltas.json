@@ -1,0 +1,52 @@
+{
+ "schema_version": "study5-eq1-expected-deltas-v1",
+ "artifact": "studies/study5/qualification-eq1/inventory/expected_deltas.json",
+ "registered_at_utc": "2026-08-27T02:15:00Z",
+ "registered_at_phase": "P-0",
+ "registered_before_the_closing_snapshot": true,
+ "authority_sections": [
+  "2 verification requirement",
+  "15 STUDY5_EQ1_RESOURCE_INVENTORY_DRIFT_DETECTED"
+ ],
+ "rule": "closing snapshot == opening snapshot + exactly the deltas registered here. An observed delta that is not registered is drift. A registered delta that is not observed is also drift. One more or one fewer either way fails.",
+ "why_this_register_exists": {
+  "problem": "OA-001 authorised one additive NSG rule. That left two bad outcomes available. If the snapshot field table omitted NSG rules, the closing check would pass while a real configuration change went unrecorded, which is a hole in the paper record. If the field table included them, the closing check would necessarily report drift and manufacture a false hard blocker at the last step of P-0.",
+  "resolution": "NSG rules were added to the snapshot field table, and the single authorised change is registered here and bound to the commit that authorised it. The change is therefore both visible and expected, and any other change remains drift."
+ },
+ "expected_deltas": [
+  {
+   "delta_id": "OA-001-nsg-rule",
+   "kind": "nsg_rule_added",
+   "nsg": "a100-nsg",
+   "rule": "allow-ssh-study5-eq1",
+   "rule_priority": 1010,
+   "rule_direction": "Inbound",
+   "rule_access": "Allow",
+   "rule_protocol": "Tcp",
+   "rule_destination_port": "22",
+   "rule_source_prefix_committed": false,
+   "authorized_by": "OA-001",
+   "authorizing_artifact": "studies/study5/qualification-eq1/operator_amendments/OA-001.json",
+   "authorizing_artifact_sha256": "a7ba1960c0363f675d32f08f3ca55c576e978988756a1f0b60c069cd46539af8",
+   "authorizing_commit": "859ff77e597017f711e499b8e61f55ed9586b8b5",
+   "authorizing_blob": "4f2c7913a0d0a0023b0feb9513c2bb8dcb824ffa",
+   "applied_at_utc": "2026-08-27T01:00:00Z",
+   "spend_impact": "none; a network security group rule carries no charge",
+   "vm_impact": "none; no VM was started, stopped, resized or reconfigured"
+  }
+ ],
+ "expected_delta_count": 1,
+ "not_registered_and_therefore_drift_if_observed": [
+  "any VM power state change",
+  "any VM size or configuration change",
+  "any modification or removal of the pre-existing NSG rule at priority 1000",
+  "any change to the cpuserver NSG",
+  "any storage account or container creation, deletion or property change",
+  "any role assignment change",
+  "any second NSG rule beyond the one registered above"
+ ],
+ "tolerated_without_registration": [
+  "blob_count",
+  "blob_bytes"
+ ]
+}

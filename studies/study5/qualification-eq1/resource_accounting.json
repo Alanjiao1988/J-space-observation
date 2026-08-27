@@ -1,0 +1,113 @@
+{
+ "schema_version": "study5-eq1-resource-accounting-v1",
+ "authority_section": "9.3",
+ "updated_at_utc": "2026-08-27T02:25:00Z",
+ "phase": "P-0",
+ "invocation_complete": false,
+ "budget_measurement_definition": {
+  "definition_id": "OD-001",
+  "recorded_at_utc": "2026-08-27T02:25:00Z",
+  "recorded_by": "operator, in session, 2026-08-27",
+  "kind": "definition clarification, not an amendment",
+  "made_before_any_measurement": true,
+  "made_before_any_model_call": true,
+  "involves_any_observed_outcome": false,
+  "statement": "The section 8 ceiling of 240 accelerator-hours, and every per-phase sub-quota, are measured in actively used GPU-hours as defined in section 9.3. VM wall-clock hours and allocated GPU-hours continue to be reported separately under 9.3 but are not bound by that ceiling.",
+  "rationale": "Both VMs run continuously by operator decision under section 2.10, which requires them to stay running and forbids any cost-reduction action. Binding the section 8 ceiling to allocated GPU-hours or to VM wall-clock would therefore put section 8 in direct conflict with section 2.10: the ceiling would be consumed by a state the authority independently requires to be maintained, and would eventually force a fail-closed stop for a reason unrelated to any computation performed.",
+  "consequence_for_this_phase": "Acquisition is network-bound and uses no GPU. Its wall-clock duration, however long the mirror throttle makes it, consumes 0 accelerator-hours and does not erode the P-0 budget of 0 h.",
+  "three_quantities_remain_separately_reported": true,
+  "no_quantity_may_substitute_for_another": true
+ },
+ "quantities": {
+  "vm_wall_clock_hours": {
+   "definition": "elapsed hours during which each VM was in the running power state",
+   "bound_by_the_240h_ceiling": false,
+   "note": "accrues by operator decision under section 2.10; measured and reported, never used to argue for stopping anything",
+   "a100_vm_hours_this_invocation": "UNRESOLVED_UNTIL_CLOSE",
+   "cpuserver_hours_this_invocation": "UNRESOLVED_UNTIL_CLOSE"
+  },
+  "allocated_gpu_hours": {
+   "definition": "visible GPU count multiplied by the hours the GPU host was running",
+   "bound_by_the_240h_ceiling": false,
+   "gpu_count": 4,
+   "value_this_invocation": "UNRESOLVED_UNTIL_CLOSE"
+  },
+  "actively_used_gpu_hours": {
+   "definition": "GPU-seconds actually consumed by work this invocation performed, summed from the per-step gpu_seconds field of the journal, divided by 3600",
+   "bound_by_the_240h_ceiling": true,
+   "is_the_registered_budget_quantity": true,
+   "value_this_invocation": 0.0,
+   "ceiling": 240,
+   "remaining": 240.0,
+   "source": "studies/study5/qualification-eq1/journal/*.jsonl, field gpu_seconds"
+  }
+ },
+ "per_phase_actively_used_gpu_hours": {
+  "P-BOOT": 0.0,
+  "P-0": 0.0,
+  "P-1": null,
+  "P-2": null,
+  "P-3": null,
+  "P-4": null,
+  "P-5": null,
+  "P-6": null
+ },
+ "per_phase_registered_ceilings": {
+  "P-0": 0,
+  "P-1": 24,
+  "P-2": 48,
+  "P-3": 24,
+  "P-4": 72,
+  "P-5": 60,
+  "P-6": 0,
+  "total": 240,
+  "units": "actively used GPU-hours"
+ },
+ "bytes_written": {
+  "blob_bytes_written_this_invocation": "IN_PROGRESS",
+  "container": "models",
+  "path_scheme": "models/sha256/<aa>/<full sha256>",
+  "existing_blobs_overwritten": 0,
+  "containers_created": 0,
+  "note": "content-addressed create-only writes; a pre-existing blob at the same path is verified by round-trip re-hash rather than rewritten"
+ },
+ "paid_resources": {
+  "a100_vm": {
+   "safe_name": "a100-vm",
+   "sku": "Standard_NC96ads_A100_v4",
+   "region": "chinaeast3",
+   "unit_price": "CONTRACT_UNIT_PRICE_UNAVAILABLE",
+   "unit_price_note": "inherited from Study 4F-M1: the subscription exposes no price sheet for this SKU, the consumption meter returns HTTP 500 on every supported api-version, the SKU appears nowhere on the official azure.cn pricing page, and the Azure China retail API returns Count=0 for it. No number is invented and no Global Azure price is used as a Mooncake price.",
+   "continuing_cost_rate": "CONTRACT_UNIT_PRICE_UNAVAILABLE",
+   "power_state": "running",
+   "stopped_by_this_invocation": false
+  },
+  "cpuserver": {
+   "safe_name": "cpuserver",
+   "sku": "Standard_D16ds_v5",
+   "region": "chinanorth3",
+   "unit_price": "RESOLVED_IN_PREDECESSOR_RECORD",
+   "power_state": "running",
+   "stopped_by_this_invocation": false
+  },
+  "blob_storage": {
+   "account_safe_name": "s4fm11ca457e105b29b7",
+   "sku": "Standard_LRS",
+   "access_tier": "Hot",
+   "unit_price": "CONTRACT_UNIT_PRICE_UNAVAILABLE",
+   "note": "capacity price remains unresolved; the byte total is reported instead of an invented cost"
+  },
+  "egress": {
+   "meter_triggered": false,
+   "note": "uploads are same-region from the GPU host to the storage account"
+  },
+  "network_security_group_rule": {
+   "cost": "none",
+   "note": "OA-001 added one inbound rule; NSG rules carry no charge"
+  }
+ },
+ "cost_reduction_actions_proposed": 0,
+ "cost_reduction_actions_performed": 0,
+ "vms_stopped_or_deallocated": 0,
+ "spend_interrupted_by_this_invocation": false
+}

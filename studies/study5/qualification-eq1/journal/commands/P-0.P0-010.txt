@@ -1,0 +1,19 @@
+# P-0/P0-010 - budget definition OD-001, and close the OA-001 closing-snapshot trap
+# 1. resource_accounting.json: 240h ceiling is measured in ACTIVELY USED GPU-hours
+#    (authority 9.3). VM wall-clock and allocated GPU-hours reported separately,
+#    not bound by the ceiling, because binding them would conflict with 2.10.
+# 2. Add NSG rules to the snapshot field table (source prefixes salted).
+python tools/azure_inventory.py --out inventory/post_oa001_snapshot.json
+# 3. Register the single authorised delta, bound to the OA-001 commit.
+#    inventory/expected_deltas.json
+# 4. Reconstruct the opening NSG baseline; refuse to write unless it matches the
+#    listing independently recorded at P0-005 BEFORE the change was applied.
+python tools/amend_opening_snapshot.py --opening inventory/opening_snapshot.json \
+    --nsg-from inventory/post_oa001_snapshot.json \
+    --expected-deltas inventory/expected_deltas.json \
+    --out inventory/opening_snapshot_amended.json
+# 5. Prove the check both ways.
+python tools/azure_inventory.py --compare <amended> <post> --expected-deltas <register>  # PASS
+python tools/azure_inventory.py --compare <amended> <post>                                # FAIL
+python -m pytest studies/study5/qualification-eq1/tests -q
+# 6. Start the DC-002 throughput curve probe on the GPU host, 30 minute samples.

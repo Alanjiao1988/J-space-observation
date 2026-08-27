@@ -70,20 +70,21 @@
   "journal_tests_passed": 10,
   "journal_tests_failed": 0,
   "create_only_journaling_demonstrated": true,
-  "records": 13,
-  "unique_keys": 13,
+  "records": 14,
+  "unique_keys": 14,
   "duplicate_keys": 0,
-  "journal_key_rollup_sha256": "34a45452375f7c010511293dff0a1b93c1a87d969d4b91bfba7fbbad1132e955",
+  "journal_key_rollup_sha256": "cf80c413d79834468b20e83ee44f6ce73994a48ca8dd4513691d4d4b4aef077b",
   "timeline": "studies/study5/qualification-eq1/TIMELINE.md",
   "resource_accounting": "studies/study5/qualification-eq1/resource_accounting.json",
-  "resource_accounting_written": false,
+  "resource_accounting_written": true,
   "azure_inventory_tests": "studies/study5/qualification-eq1/tests/test_study5_eq1_azure_inventory.py",
   "azure_inventory_tests_sha256": "76032f751829e316e05128ab07aa7a37d50dcda6990d2d6d29a1792327d26d8f",
-  "study5_tests_passed": 57,
+  "study5_tests_passed": 69,
   "study5_tests_failed": 0,
   "blocker_ids": [
    "HB-001"
-  ]
+  ],
+  "resource_accounting_sha256": "6a6e4e81d3f771feff3dfee35db951c1e43502a7368af7524cebd1e9cf5718c1"
  },
  "inherited_tests": {
   "run": [
@@ -124,7 +125,10 @@
    "reason_no_workaround": "switching mirrors mid-run would change the byte source after acquisition began, and the adapters exist only on the HuggingFace origin, which this host cannot reach",
    "escalated_to_hard_blocker": false,
    "run_is_resumable": true,
-   "disposition": "disclosed engineering warning under authority 12"
+   "disposition": "disclosed engineering warning under authority 12",
+   "throughput_curve_artifact": "recorded on the GPU host at reports/throughput_curve.jsonl, sampled every 30 minutes",
+   "consumes_accelerator_hours": 0.0,
+   "erodes_the_240h_ceiling": false
   }
  ],
  "azure": {
@@ -188,13 +192,19 @@
   "pre_existing_nsg_rules_modified": 0,
   "vm_configuration_changes": 0,
   "gpu_host_reachable": true,
-  "gpu_host_ssh_verified_at_utc": "2026-08-27T01:05:00Z"
+  "gpu_host_ssh_verified_at_utc": "2026-08-27T01:05:00Z",
+  "nsg_rules_in_snapshot_field_table": true,
+  "reference_snapshot_after_oa001": "studies/study5/qualification-eq1/inventory/post_oa001_snapshot.json",
+  "reference_snapshot_after_oa001_sha256": "14117bd4a0212726d736eb5a495a14a1c3d1784dbca99d942d9585df81f6422f"
  },
  "budget": {
   "registered_accelerator_hour_ceiling": 240,
+  "ceiling_quantity": "actively used GPU-hours",
   "accelerator_hours_consumed": 0.0,
   "accelerator_hours_remaining": 240.0,
-  "ceiling_reached": false
+  "ceiling_reached": false,
+  "vm_wall_clock_hours_bound_by_ceiling": false,
+  "allocated_gpu_hours_bound_by_ceiling": false
  },
  "gates": {
   "Q-1": "in_progress",
@@ -395,5 +405,39 @@
   "development_rollup_sha256": "cba4648dce8b383584769bb9bc80aa3ff5e9fd14a30a494698fc1b77bc323b99",
   "confirmation_rollup_sha256": "a566e21a6fc58e4b28b382ff9887f9c264be5d9a4dbd8443ef61393b4fbf73cd",
   "confirmation_items_touched": 0
+ },
+ "budget_measurement_definition": {
+  "definition_id": "OD-001",
+  "kind": "definition clarification, not an amendment",
+  "recorded_by": "operator, in session, 2026-08-27",
+  "made_before_any_measurement": true,
+  "made_before_any_model_call": true,
+  "involves_any_observed_outcome": false,
+  "ceiling_is_measured_in": "actively used GPU-hours (authority 9.3)",
+  "vm_wall_clock_bound_by_ceiling": false,
+  "allocated_gpu_hours_bound_by_ceiling": false,
+  "rationale": "binding the ceiling to allocated GPU-hours or VM wall-clock would conflict directly with 2.10, which requires both VMs to keep running and forbids any cost-reduction action",
+  "consequence": "network-bound acquisition consumes 0 accelerator-hours however long the mirror throttle makes it; the P-0 allocation of 0 h is intact",
+  "corrects_a_previous_report_claim": true,
+  "artifact": "studies/study5/qualification-eq1/resource_accounting.json"
+ },
+ "closing_snapshot_check": {
+  "rule": "closing == opening + exactly the registered expected deltas",
+  "unregistered_delta_is_drift": true,
+  "registered_but_absent_delta_is_drift": true,
+  "nsg_rules_in_snapshot_field_table": true,
+  "nsg_diffed_structurally_by_rule_identity": true,
+  "expected_deltas_artifact": "studies/study5/qualification-eq1/inventory/expected_deltas.json",
+  "expected_deltas_sha256": "c7d9ab00096d62d58c49b109c887be97f847343d9159c6319f6ebad13a94cf93",
+  "expected_delta_count": 1,
+  "registered_delta": "nsg_rule_added / a100-nsg / allow-ssh-study5-eq1",
+  "authorizing_commit": "859ff77e597017f711e499b8e61f55ed9586b8b5",
+  "baseline_artifact": "studies/study5/qualification-eq1/inventory/opening_snapshot_amended.json",
+  "baseline_sha256": "703eee8622b7cdcbac3977079308c92a8f1d761e53dec10350caaa3239a6aed7",
+  "baseline_nsg_subtree_is_reconstructed_not_captured": true,
+  "baseline_reconstruction_verified_against_pre_change_listing": true,
+  "original_opening_snapshot_unmodified": true,
+  "verified_passes_with_register": true,
+  "verified_fails_without_register": true
  }
 }
