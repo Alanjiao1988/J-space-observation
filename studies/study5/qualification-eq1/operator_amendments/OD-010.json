@@ -1,0 +1,43 @@
+{
+ "schema_version": "study5-eq1-operator-definition-v1",
+ "definition_id": "OD-010",
+ "recorded_at_utc": "2026-08-27T22:13:00Z",
+ "phase": "P-2",
+ "approved_by": "operator, in session, 2026-08-27",
+ "kind": "explicit prohibition",
+ "subject": "the scope of jlens.JacobianLens.merge()",
+
+ "what_merge_is_for": {
+  "source": "jlens/lens.py line 106 at the registered commit 581d398613e5602a5af361e1c34d3a92ea82ba8e",
+  "docstring": "Combine lenses fitted on disjoint prompt subsets into one (n_prompts-weighted mean of the inputs).",
+  "implementation": "merged[layer] = sum(lens.jacobians[layer] * lens.n_prompts) / sum(n_prompts)",
+  "legitimate_use": "recombining shards of a SINGLE fit that were computed on different GPUs for speed"
+ },
+
+ "prohibition": {
+  "permitted": [
+   "shards of half A -> merge() -> lens_A",
+   "shards of half B -> merge() -> lens_B"
+  ],
+  "forbidden": [
+   "merge(lens_A, lens_B)",
+   "any operation equivalent to it, including averaging their Jacobians by hand or fitting a single lens over A and B together and calling the result either name"
+  ],
+  "applies_for_the_remainder_of_this_invocation": true
+ },
+
+ "why_this_is_written_as_an_explicit_ban": {
+  "the_danger": "merge() would accept lens_A and lens_B without complaint. They agree on source_layers and d_model, so the ValueError guards do not fire. The call would succeed and return a perfectly well-formed lens.",
+  "the_consequence": "every cross-fit stability criterion would then be comparing a lens against itself. C4 would pass trivially, and the P-4 feature screen that requires a feature to clear the band under BOTH lenses would lose its entire meaning.",
+  "why_that_is_worse_than_a_crash": "the failure is silent. Nothing raises, no test fails, and the resulting numbers look normal - they simply no longer measure what they claim to measure.",
+  "hence": "the ban is registered explicitly rather than left to be inferred from the docstring"
+ },
+
+ "what_the_independence_is_for": [
+  "C4, the cross-fit agreement criterion of OD-009",
+  "the P-4 requirement that a feature clear the band under both the A and the B lens",
+  "the P-4 rank-correlation floor on JA across the two lenses"
+ ],
+
+ "claim_ceiling": "This is a procedural prohibition. It licenses no claim of any kind."
+}

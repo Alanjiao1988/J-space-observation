@@ -1,0 +1,50 @@
+{
+ "schema_version": "study5-eq1-operator-definition-v1",
+ "definition_id": "OD-008",
+ "recorded_at_utc": "2026-08-27T22:11:00Z",
+ "phase": "P-2",
+ "approved_by": "operator, in session, 2026-08-27",
+ "kind": "retokenisation rule",
+ "frozen_before_any_retokenisation": true,
+
+ "situation": {
+  "corpus": "data/jlens_s2_wikitext/corpus_rows.jsonl",
+  "corpus_rows_sha256": "63ed70ef0a7457f47a77a0d96855a2aeb605026c99a6708b6cf8d2f630b1445d",
+  "original_tokenizer": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B at ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+  "original_eligibility_rule": "at least 128 untruncated tokens under the 1.5B tokenizer",
+  "frozen_role_assignment": {"A": 600, "B": 600, "heldout": 200, "smoke": 2},
+  "role_key_rule": "SHA-256(UTF8(seed) || NUL || UTF8(row_id) || NUL || ASCII(raw_text_sha256) || NUL || ASCII(token_ids_sha256))",
+  "vocab_size_1_5B": 151936,
+  "vocab_size_7B": 152064,
+  "why_retokenisation_is_needed": "authority 4.3 reuses this corpus for its raw text rows and its frozen role assignment, but the token ids were produced by a different tokenizer than the model P-2 fits on"
+ },
+
+ "rule": {
+  "1_retokenise": "every row is retokenised with the 7B target tokenizer at revision 916b56a44061fd5cd7d6a8fb632557ed4f724f60, carrying forward force_bos = True exactly as the corpus manifest records it",
+  "2_assert": "each row must still yield at least 128 untruncated tokens",
+  "3_discard": "a row that fails is discarded, and recorded individually with row_id, its 1.5B token count and its 7B token count",
+  "4_never_backfill": "no new row may be drawn from the candidate pool to replace a discarded one",
+  "5_roles_preserved": "surviving rows keep their frozen role assignment exactly; no row is reassigned",
+  "6_hashes": "both token-id hashes are committed, the original 1.5B and the newly computed 7B, together with surviving counts per role"
+ },
+
+ "why_backfilling_is_forbidden": {
+  "statement": "Drawing a replacement row from the candidate pool would let the 7B tokenizer participate in a selection that was frozen before it was involved.",
+  "consequence_if_allowed": "the surviving corpus would no longer be a subset of the pre-registered corpus; it would be a new corpus selected partly by a property of the model under study",
+  "cost_of_the_rule": "the effective sample size can only shrink, never be topped back up. That cost is accepted deliberately, because a smaller pre-registered sample is worth more than a full sample with a contaminated selection rule."
+ },
+
+ "stop_condition": {
+  "rule": "if surviving rows in role A or role B fall below 400, stop and report",
+  "threshold": 400,
+  "basis": "roughly four times the published saturation point of about 100 sequences, so it retains a substantial margin",
+  "do_not_lower_the_standard_to_proceed": true
+ },
+
+ "expected_direction": {
+  "prediction_recorded_before_measuring": "most rows should survive, because the two tokenizers are close relatives with nearly identical vocabulary sizes, 151936 against 152064, and a row at the 128-token margin under one is likely near it under the other",
+  "why_record_a_prediction": "so that a large unexpected loss is visibly surprising rather than quietly accepted"
+ },
+
+ "claim_ceiling": "This is a data-preparation rule. It licenses no claim of any kind."
+}

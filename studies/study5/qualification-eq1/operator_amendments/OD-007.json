@@ -1,0 +1,41 @@
+{
+ "schema_version": "study5-eq1-operator-definition-v1",
+ "definition_id": "OD-007",
+ "recorded_at_utc": "2026-08-27T22:10:00Z",
+ "phase": "P-2",
+ "approved_by": "operator, in session, 2026-08-27",
+ "kind": "budget accounting rule",
+ "subject": "how unspent per-phase accelerator-hours are treated",
+
+ "arithmetic_that_motivates_it": {
+  "per_phase_ceilings": {"P-0": 0, "P-1": 24, "P-2": 48, "P-3": 24, "P-4": 72, "P-5": 60, "P-6": 0},
+  "sum_of_per_phase_ceilings": 228,
+  "global_ceiling": 240,
+  "unallocated_from_the_start": 12,
+  "p1_ceiling": 24,
+  "p1_actually_used": 14.611366,
+  "p1_unspent": 9.388634
+ },
+
+ "rule": {
+  "statement": "A per-phase ceiling constrains spending WITHIN that phase. Unspent balance returns to a shared reserve. The 240 actively used GPU-hour global ceiling is the only hard stop.",
+  "quantity": "actively used GPU-hours, per OD-001",
+  "drawing_on_the_reserve_requires": "an explicit journal record naming the source phase and the amount",
+  "the_global_ceiling_is_never_relaxed": true
+ },
+
+ "rationale": {
+  "why_not_forfeit_unspent_hours": "Forfeiting would artificially starve P-4, whose 72-hour allocation is the largest and whose work - JA for every candidate feature, three-layer motor exclusion, matched control construction - is the most expensive in the plan. Starving it for bookkeeping reasons would degrade the study for no governance benefit.",
+  "why_240_is_the_right_binding_number": "240 is the quantity the operator actually approved. The per-phase figures are a plan for spending it, not seven separate approvals.",
+  "what_this_does_not_do": "It does not raise any ceiling, does not create hours that were never approved, and does not weaken the fail-closed stop at 240."
+ },
+
+ "reserve_at_registration": {
+  "unallocated_at_plan_time": 12.0,
+  "returned_from_P-1": 9.388634,
+  "total_available_reserve": 21.388634,
+  "consumed_from_reserve_so_far": 0.0
+ },
+
+ "claim_ceiling": "This is an accounting rule. It licenses no claim of any kind."
+}

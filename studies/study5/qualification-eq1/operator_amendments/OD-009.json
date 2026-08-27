@@ -1,0 +1,86 @@
+{
+ "schema_version": "study5-eq1-operator-definition-v1",
+ "definition_id": "OD-009",
+ "recorded_at_utc": "2026-08-27T22:12:00Z",
+ "phase": "P-2",
+ "approved_by": "operator, in session, 2026-08-27",
+ "kind": "falsifiable criterion for gate Q-4a",
+ "frozen_before_any_kurtosis_measurement": true,
+
+ "problem_being_solved": {
+  "authority_text": "Q-4a: a discernible mid-depth kurtosis band exists on the 7B target",
+  "why_that_is_not_yet_a_criterion": "'discernible' is unquantified, so applied after the fact it degrades into a judgement call about a curve one has already seen. Any noisy curve has a maximum somewhere.",
+  "resolution": "quantify it now, before the curve exists, and make it falsifiable"
+ },
+
+ "quantity": {
+  "statistic": "per-layer excess kurtosis of the readout logit distribution, kappa(l) for l = 0..27",
+  "computed_for": ["lens_A", "lens_B", "matched-norm random-J null", "logit lens (descriptive only)"],
+  "activations_from": "heldout rows only; the A and B rows are reserved for fitting and may not be reused"
+ },
+
+ "criteria": {
+  "all_five_must_hold": true,
+  "C1": {
+   "name": "interior maximum",
+   "requirement": "argmax_l kappa(l) lies strictly inside (0, 27)",
+   "why": "a maximum at the first or last layer is what a monotone trend looks like, not what a band looks like"
+  },
+  "C2": {
+   "name": "contiguity",
+   "requirement": "with tau = kappa_min + 0.5 * (kappa_max - kappa_min), the candidate band is the LONGEST CONTIGUOUS run of layers with kappa(l) >= tau",
+   "why_a_relative_threshold": "an absolute kurtosis threshold would have to be invented, and no such value is registered anywhere",
+   "why_longest_contiguous_run": "a band is a connected region; scattered layers above a threshold are not a band"
+  },
+  "C3": {
+   "name": "coverage",
+   "requirement": "the candidate band spans at least 7 layers, which is at least 25 percent of depth",
+   "why": "a two- or three-layer bump is a spike, not a workspace band"
+  },
+  "C4": {
+   "name": "cross-fit agreement",
+   "requirement": "Jaccard(band_A, band_B) >= 0.70 AND |argmax_A - argmax_B| <= 3 layers",
+   "why": "A and B are independent fits on disjoint halves; a band that does not reproduce across them is a property of one sample, not of the model"
+  },
+  "C5": {
+   "name": "exceeds the null",
+   "requirement": "kappa(l) inside the candidate band exceeds the matched-norm random-J null curve at every layer in the band, and the within-band mean difference is at least the pre-registered margin",
+   "margin": 1.0,
+   "margin_units": "excess kurtosis",
+   "margin_frozen_before_measurement": true,
+   "null_construction": "replace each J_l with a random matrix of the SAME Frobenius norm, leave the rest of the readout path identical, and use the same heldout activations",
+   "why_matched_norm": "an unmatched random matrix would differ from J in scale as well as in structure, so exceeding it would demonstrate nothing about structure",
+   "why_this_criterion_is_the_load_bearing_one": "without a null, 'a band exists' is unfalsifiable: any noisy curve has a maximum, a half-height threshold and a contiguous run above it. C1 to C4 describe a shape; only C5 asks whether the shape carries information."
+  }
+ },
+
+ "the_published_prior_is_excluded_from_the_derivation": {
+  "prior": "the workspace paper's depth-reindexed band of approximately [38, 92], which on 28 layers corresponds to roughly layers 11 to 26",
+  "may_be_used_for": "an after-the-fact comparison in the report only",
+  "may_not_be_used_for": [
+   "defining tau",
+   "selecting or trimming the band",
+   "any of C1 through C5"
+  ],
+  "why": "whether the derived band agrees with the prior is a RESULT. Letting the prior shape the derivation would convert it into an input and the agreement would then be circular."
+ },
+
+ "descriptive_companion_not_part_of_any_criterion": {
+  "curve": "logit-lens kappa(l) computed through the identical readout path with use_jacobian = False",
+  "purpose": "the published claim is that the J-lens stays interpretable at early layers where the logit lens is noise; this curve tests that claim directly rather than repeating it",
+  "counts_toward_Q4a": false
+ },
+
+ "outcomes": {
+  "pass": "all five hold; record band_A, band_B and the registered band as their intersection, and report the comparison with the prior",
+  "fail": {
+   "terminal_state": "STUDY5_EQ1_WORKSPACE_BAND_NOT_ESTABLISHED_AT_THIS_SCALE",
+   "what_it_means": "the construct was not established on this model, and therefore NOTHING WAS MEASURED",
+   "what_it_does_not_mean": "it is NOT evidence that J-space is absent at 7B",
+   "may_not_be_written_up_as": "a negative finding about J-space, or cited by any later text as negative evidence",
+   "this_wording_must_appear_verbatim_in_the_artifact": true
+  }
+ },
+
+ "claim_ceiling": "A kurtosis curve is not evidence of J-space. It is a gate that decides whether later measurement is qualified to proceed. Nothing here is a scientific result."
+}

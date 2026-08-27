@@ -1,0 +1,64 @@
+{
+ "schema_version": "study5-eq1-readout-convention-v1",
+ "phase": "P-2",
+ "recorded_at_utc": "2026-08-27T22:15:00Z",
+ "purpose": "Fix the readout convention from the jlens SOURCE rather than from the paper's prose, so the kurtosis curves measure what the official implementation actually computes.",
+ "why_source_and_not_prose": "The paper describes a method; the registered artifact is a specific implementation of it. Where the two could differ, the implementation is what authority 4.2 pins.",
+
+ "package": {
+  "repo": "anthropics/jacobian-lens",
+  "commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+  "installed_version": "0.1.0",
+  "installed_in": "the frozen image study5-eq1:qualification"
+ },
+
+ "readout_path": {
+  "entry_point": "jlens.JacobianLens.apply",
+  "source_file": "jlens/lens.py",
+  "apply_defined_at_line": 146,
+  "steps_in_source_order": [
+   {"line": 199, "code": "input_ids = model.encode(prompt, max_length=max_seq_len)", "note": "tokenisation, truncated to max_seq_len"},
+   {"line": 200, "code": "with ActivationRecorder(model.layers, at=record_at)", "note": "residuals captured by forward hook"},
+   {"line": 203, "code": "def select(layer): full = activations[layer][0]; return (full if positions is None else full[list(positions)]).float()", "note": "residual at the requested positions, cast to float32"},
+   {"line": 211, "code": "residual = self.transport(residual, layer)", "note": "applied only when use_jacobian is True"},
+   {"line": 213, "code": "lens_logits[layer] = model.unembed(residual).float().cpu()", "note": "THE READOUT"}
+  ],
+  "transport_defined_at_line": 135,
+  "transport_body": "J_bar = self.jacobians[layer].to(residual.device); return residual @ J_bar.T"
+ },
+
+ "settled_questions": {
+  "is_a_softmax_applied": {
+   "answer": "NO",
+   "evidence": "line 213 calls model.unembed(residual) and casts to float; there is no softmax anywhere in apply() or transport(), and the returned object is named lens_logits",
+   "consequence": "excess kurtosis is computed on RAW LOGITS, not on a probability distribution"
+  },
+  "is_the_residual_normalised_before_transport": {
+   "answer": "NO explicit normalisation in the lens code",
+   "evidence": "transport() at line 135 is exactly residual @ J_bar.T with no scaling; select() at line 203 only casts dtype",
+   "caveat_recorded_honestly": "whatever normalisation the model applies inside unembed() is the model's own, and it is applied identically to the lens path and to the logit-lens baseline, so it cannot differentiate the two curves"
+  },
+  "how_the_logit_lens_baseline_is_obtained": {
+   "answer": "the same function with use_jacobian=False",
+   "evidence": "line 211 is guarded by `if use_jacobian:`, so with it False the residual reaches unembed untransported",
+   "why_this_matters": "the descriptive logit-lens curve travels the IDENTICAL path, differing only in whether J_l is applied; nothing else varies between the two curves"
+  },
+  "what_merge_does": {
+   "answer": "an n_prompts-weighted mean of the per-layer Jacobians",
+   "defined_at_line": 106,
+   "see": "OD-010, which forbids using it across the A and B halves"
+  }
+ },
+
+ "aggregation_rule_frozen_before_computation": {
+  "per_layer_statistic": "excess kurtosis of the readout logit distribution over the vocabulary axis, computed per (row, position, layer)",
+  "excess_kurtosis_definition": "E[(x - mu)^4] / sigma^4 - 3, so a Gaussian scores 0",
+  "aggregation_across_positions_and_rows": "arithmetic mean over all (row, position) pairs, giving one kappa per layer",
+  "why_mean_of_per_position_kurtosis_rather_than_kurtosis_of_pooled_logits": "pooling logits across positions and rows would mix distributions with different scales and locations, so the resulting kurtosis would be dominated by that between-position spread rather than by the peakedness of any individual readout",
+  "positions_used": "all positions except the first, since position 0 carries only the BOS token and its readout is degenerate",
+  "sequence_length": 128,
+  "frozen_before_any_curve_was_computed": true
+ },
+
+ "claim_ceiling": "This records how a measurement is taken. It licenses no claim of any kind."
+}
