@@ -1,8 +1,8 @@
 {
  "schema_version": "study5-eq1-resource-accounting-v1",
  "authority_section": "9.3",
- "updated_at_utc": "2026-08-27T04:55:00Z",
- "phase": "P-0 complete",
+ "updated_at_utc": "2026-08-27T12:40:00Z",
+ "phase": "P-1 in progress",
  "invocation_complete": false,
  "budget_measurement_definition": {
   "definition_id": "OD-001",
@@ -36,16 +36,16 @@
    "definition": "GPU-seconds actually consumed by work this invocation performed, summed from the per-step gpu_seconds field of the journal, divided by 3600",
    "bound_by_the_240h_ceiling": true,
    "is_the_registered_budget_quantity": true,
-   "value_this_invocation": 0.0,
+   "value_this_invocation": 0.014228,
    "ceiling": 240,
-   "remaining": 240.0,
+   "remaining": 239.985772,
    "source": "studies/study5/qualification-eq1/journal/*.jsonl, field gpu_seconds"
   }
  },
  "per_phase_actively_used_gpu_hours": {
   "P-BOOT": 0.0,
   "P-0": 0.0,
-  "P-1": null,
+  "P-1": 0.014228,
   "P-2": null,
   "P-3": null,
   "P-4": null,
@@ -121,5 +121,17 @@
   "egress_note": "uploads are same-region from the GPU host to the storage account; the inbound fetch from the public mirror is ingress, which is not metered",
   "consumed_accelerator_hours": 0.0,
   "why_zero": "acquisition is network-bound and uses no GPU; under OD-001 the 240-hour ceiling counts actively used GPU-hours only"
+ },
+ "p1_budget": {
+  "ceiling": 24,
+  "units": "actively used GPU-hours",
+  "consumed": 0.014228,
+  "remaining": 23.985772,
+  "breakdown": {
+   "step1_construction_verification": 0.0,
+   "step2_l0_measurement": 0.014228,
+   "step3_three_arm_measurement": "not yet run"
+  },
+  "note": "step 1 ran entirely on CPU, so the phase's first two steps together cost under one minute of GPU time"
  }
 }

@@ -3,14 +3,14 @@
  "study_id": "STUDY5_EQ1",
  "namespace": "studies/study5/qualification-eq1/",
  "kind": "engineering qualification for a causal decomposition study",
- "lifecycle_state": "STUDY5_EQ1_P0_COMPLETE_AWAITING_P1",
+ "lifecycle_state": "STUDY5_EQ1_P1_IN_PROGRESS",
  "lifecycle_state_is_registered_terminal": false,
  "terminal": false,
  "resumable": true,
  "is_a_scientific_result": false,
  "confirmation_authorized": false,
- "current_phase": "P-0 complete",
- "next_phase": "P-1 (not started; requires operator release)",
+ "current_phase": "P-1",
+ "next_phase": "P-1 steps 3 and 4: T/H/F on the 195-item dev main set, then the Q-3 decision",
  "authority": {
   "path": "studies/study5/prompts/study5_eq1_qualification_authority.md",
   "bytes": 29485,
@@ -70,8 +70,8 @@
   "journal_tests_passed": 10,
   "journal_tests_failed": 0,
   "create_only_journaling_demonstrated": true,
-  "records": 18,
-  "unique_keys": 18,
+  "records": 22,
+  "unique_keys": 22,
   "duplicate_keys": 0,
   "journal_key_rollup_sha256": "2b8ad4cc12ff9bbf4ea0d05ce3f39f8d63ce5ee510fb2ab73e63bfeb230ce552",
   "timeline": "studies/study5/qualification-eq1/TIMELINE.md",
@@ -79,7 +79,7 @@
   "resource_accounting_written": true,
   "azure_inventory_tests": "studies/study5/qualification-eq1/tests/test_study5_eq1_azure_inventory.py",
   "azure_inventory_tests_sha256": "76032f751829e316e05128ab07aa7a37d50dcda6990d2d6d29a1792327d26d8f",
-  "study5_tests_passed": 83,
+  "study5_tests_passed": 99,
   "study5_tests_failed": 0,
   "blocker_ids": [
    "HB-001"
@@ -215,16 +215,18 @@
  "budget": {
   "registered_accelerator_hour_ceiling": 240,
   "ceiling_quantity": "actively used GPU-hours",
-  "accelerator_hours_consumed": 0.0,
-  "accelerator_hours_remaining": 240.0,
+  "accelerator_hours_consumed": 0.014228,
+  "accelerator_hours_remaining": 239.985772,
   "ceiling_reached": false,
   "vm_wall_clock_hours_bound_by_ceiling": false,
-  "allocated_gpu_hours_bound_by_ceiling": false
+  "allocated_gpu_hours_bound_by_ceiling": false,
+  "p1_ceiling": 24,
+  "p1_consumed": 0.014228
  },
  "gates": {
   "Q-1": "PASS",
   "Q-2": "PASS",
-  "Q-3": "not_started",
+  "Q-3": "in_progress",
   "Q-4a": "not_started",
   "Q-4b": "not_started",
   "Q-5": "not_started",
@@ -234,7 +236,7 @@
  "phases": {
   "P-BOOT": "complete",
   "P-0": "complete",
-  "P-1": "not_started",
+  "P-1": "in_progress",
   "P-2": "not_started",
   "P-3": "not_started",
   "P-4": "not_started",
@@ -503,6 +505,79 @@
   "cosine_threshold": 0.8,
   "max_shared_ngrams_observed": 5,
   "thresholds_fixed_before_measurement": true,
-  "is_evidence_about_j_space": false
+  "is_evidence_about_j_space": false,
+  "confirmation_screened_under_OD_002": true,
+  "confirmation_items_screened": 300,
+  "confirmation_flagged": 1,
+  "confirmation_overlap_rate": 0.003333,
+  "confirmation_primary_set": 299,
+  "development_primary_set": 195,
+  "all_matched_ngrams_are_boilerplate": true,
+  "boilerplate_finding": "every matched span is Asymptote diagram markup or standard MATH instruction phrasing; none indicates problem content was in the training sample",
+  "frozen_exclusion_rule_applied_unchanged_despite_that": true,
+  "exclusion_is_conservative": true
+ },
+ "p1_registrations": {
+  "OA-002": {
+   "change": "max_new_tokens 4096 -> 16384",
+   "sha256": "bde251d06565e87c60b76770780a8e90cbceabcb48abb9ec56eecb614581742c",
+   "before_any_model_call": true
+  },
+  "OD-002": {
+   "scope": "contamination screening of confirmation items is not section 10.2 'inspection'",
+   "sha256": "f4a097654d6ef6a84522b7e48b9bfbf3ad2aefd796b8d951515d6613d405881e"
+  },
+  "OD-003": {
+   "rule": "execution proof strings mandatory; missing proof == FAIL; exit code 0 is not evidence",
+   "sha256": "db54920e2dde363f43a2316f66dcf8bf3ed24d9404c66219722c6f8d6eee0c64"
+  },
+  "SC-001": {
+   "sampling_contract": true,
+   "seed_is_condition_independent": true,
+   "sha256": "dd358debbdd3ab1122536aa3ccedc3cbeb0fc1191aff2867c14b44c8148fd724"
+  },
+  "Q3_rule": {
+   "frozen_before_measurement": true,
+   "sha256": "1c92d67bd8fdc87ae485f041c23d446c8947e8c7094fefb100b8371c2b6b4e9e"
+  }
+ },
+ "p1_step1_construction": {
+  "artifact": "studies/study5/qualification-eq1/p1/construction_verification.json",
+  "all_four_assertions_passed": true,
+  "S1_A_tensors_compared": 339,
+  "S1_A_tensors_byte_equal": 339,
+  "S1_A_mismatches": 0,
+  "S1_B_missing_keys": 0,
+  "S1_B_unexpected_keys": 0,
+  "S1_B_transcoder_params_observed": 1644496896,
+  "S1_B_transcoder_params_expected": 1644496896,
+  "S1_B_total_features": 229376,
+  "S1_C_max_abs_logit_difference": 0.0,
+  "S1_D_max_abs_logit_difference": 28.5625,
+  "od003_proof_verification": "PASS",
+  "gpu_seconds": 0
+ },
+ "p1_step2_l0": {
+  "artifact": "studies/study5/qualification-eq1/p1/l0_comparison.json",
+  "measured_on": "OpenThoughts3 val split, never train",
+  "l1w0.001_readme_claims": 1.4,
+  "l1w0.001_measured_mean": 3.3699,
+  "l1w0.001_measured_median": 1.7277,
+  "l1w0.003_readme_claims": 4.3,
+  "l1w0.003_measured_mean": 3.7588,
+  "l1w0.003_measured_median": 1.8528,
+  "readme_table_vs_prose": "SPLIT; not forced to a single answer",
+  "per_layer_majority_supports": "prose (21 of 28 layers)",
+  "whole_model_mean_supports": "table",
+  "mean_excluding_layers_26_27_supports": "prose",
+  "why_statistics_disagree": "layers 26 and 27 carry L0 an order of magnitude above every other layer; layer 27 alone flips the sign of the mean",
+  "published_separation_ratio": 3.07,
+  "measured_separation_ratio_mean": 1.12,
+  "measured_separation_ratio_median": 1.07,
+  "consequence": "the sparsity-sensitivity arm may have materially less leverage than its registered purpose assumes",
+  "is_a_q3_failure": false,
+  "why_not": "no L0 threshold is registered anywhere; inventing one after seeing the measurement is what pre-registration forbids",
+  "od003_proof_verification": "PASS",
+  "gpu_seconds": 51.219
  }
 }
