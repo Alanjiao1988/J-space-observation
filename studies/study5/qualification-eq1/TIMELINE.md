@@ -423,3 +423,38 @@ inspected, and the count of confirmation items touched is 0.
 
 The artifact retrieved from the VM re-hashed identically on the workstation, so
 the transfer is byte-exact.
+
+### 2026-08-27T01:31:30Z → ongoing — `P0-009` — mirror throughput collapse, `DC-002`
+
+Measured, disclosed, **not** repaired.
+
+Mirror throughput fell from **37 MB/s** at the start of the run to **0.66 MB/s**
+after roughly 22 GB had been fetched. Three concurrent range requests each
+returned about **1.4 kB/s regardless of stream count**, so the throttle is
+**per-IP, not per-connection**, and parallelism cannot help. That was measured
+rather than assumed, because assuming it would have meant adding concurrency
+that could not have worked.
+
+No workaround was applied, for two reasons worth stating. Switching mirrors
+mid-run would change the byte source *after* acquisition had begun, which is
+precisely the kind of quiet substitution the byte-verification discipline exists
+to prevent. And the adapters are published only on the HuggingFace origin, which
+this host cannot reach at all — so there is no second source for the bytes that
+actually remain.
+
+Progress when this was recorded:
+
+| Target | Files | Status |
+| --- | --- | --- |
+| `base_mlp_donor` — `Qwen2.5-Math-7B` | 14 / 14 | **complete** |
+| `adapter_primary` | 61 / 69 | in progress |
+| `adapter_sparsity_sensitivity` | 0 / 12 | queued |
+| **Overall** | **75 / 95** | 0 failures, 0 hash mismatches, 0 blobs overwritten |
+
+The run is idempotent and resumable — a file already verified is never
+re-downloaded — and it is still making forward progress, just slowly. Both VMs
+remain running, so the operator's spend continues to accrue as intended, which
+is the point of keeping them up.
+
+This is an engineering warning under §12, not a hard blocker: nothing about it
+requires a prohibited action, and nothing about it forces a reinterpretation.

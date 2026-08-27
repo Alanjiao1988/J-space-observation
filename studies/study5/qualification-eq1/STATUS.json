@@ -70,10 +70,10 @@
   "journal_tests_passed": 10,
   "journal_tests_failed": 0,
   "create_only_journaling_demonstrated": true,
-  "records": 9,
-  "unique_keys": 9,
+  "records": 13,
+  "unique_keys": 13,
   "duplicate_keys": 0,
-  "journal_key_rollup_sha256": "3eccbadd1f587ec1f53577ca33cfd4836b8a2c6cb33f45c755b6b353bdb83483",
+  "journal_key_rollup_sha256": "34a45452375f7c010511293dff0a1b93c1a87d969d4b91bfba7fbbad1132e955",
   "timeline": "studies/study5/qualification-eq1/TIMELINE.md",
   "resource_accounting": "studies/study5/qualification-eq1/resource_accounting.json",
   "resource_accounting_written": false,
@@ -113,6 +113,18 @@
    "reason_not_repaired": "authority 13 forbids weakening a historical test and 11 forbids modifying Phase 1.0D bytes",
    "escalated_to_hard_blocker": false,
    "disposition": "disclosed degraded condition under authority 12"
+  },
+  {
+   "id": "DC-002",
+   "step": "P-0/P0-009",
+   "condition": "mirror throughput collapsed from 37 MB/s to 0.66 MB/s after ~22 GB",
+   "throttle_scope": "per-IP, measured: 3 concurrent streams each returned ~1.4 kB/s",
+   "parallelism_would_help": false,
+   "workaround_applied": false,
+   "reason_no_workaround": "switching mirrors mid-run would change the byte source after acquisition began, and the adapters exist only on the HuggingFace origin, which this host cannot reach",
+   "escalated_to_hard_blocker": false,
+   "run_is_resumable": true,
+   "disposition": "disclosed engineering warning under authority 12"
   }
  ],
  "azure": {
@@ -346,5 +358,42 @@
   "huggingface_reachable_from_host": false,
   "hf_mirror_reachable_from_host": true,
   "target_T_already_on_scratch": true
+ },
+ "acquisition": {
+  "manifest": "studies/study5/qualification-eq1/acquisition_manifest.json",
+  "manifest_sha256": "1af300aea39be38d47669e3eb4964d56fde388624a038a3ab7c024811af4de39",
+  "performed_by": "a100-vm",
+  "operator_workstation_in_data_path": false,
+  "route": "mirror -> a100-vm /scratch -> blob",
+  "auth": "system-assigned managed identity bearer token",
+  "sas_tokens_issued": 0,
+  "storage_keys_read": 0,
+  "uploads_are_create_only": true,
+  "existing_blobs_overwritten": 0,
+  "containers_created": 0,
+  "total_files": 95,
+  "total_bytes": 53344133827,
+  "files_verified": 75,
+  "files_failed": 0,
+  "hash_mismatches": 0,
+  "base_mlp_donor_complete": true,
+  "adapter_primary_files_done": 61,
+  "adapter_primary_files_total": 69,
+  "adapter_sparsity_files_done": 0,
+  "adapter_sparsity_files_total": 12,
+  "in_progress": true
+ },
+ "benchmark_split": {
+  "artifact": "studies/study5/qualification-eq1/benchmark_split.json",
+  "artifact_sha256": "c62dbd0ddf720cc972d17d10338b81968c4ce5b77c9e9cea5f4e8bdb49faf322",
+  "frozen_at_phase": "P-0",
+  "frozen_before_any_model_call": true,
+  "total_items": 500,
+  "development_n": 200,
+  "confirmation_n": 300,
+  "disjoint": true,
+  "development_rollup_sha256": "cba4648dce8b383584769bb9bc80aa3ff5e9fd14a30a494698fc1b77bc323b99",
+  "confirmation_rollup_sha256": "a566e21a6fc58e4b28b382ff9887f9c264be5d9a4dbd8443ef61393b4fbf73cd",
+  "confirmation_items_touched": 0
  }
 }

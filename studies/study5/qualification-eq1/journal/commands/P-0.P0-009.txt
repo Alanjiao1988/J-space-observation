@@ -1,0 +1,7 @@
+# P-0/P0-009 - mirror throughput collapse, measured and disclosed (not repaired)
+ssh <gpu-host> 'a=$(du -sb staging|cut -f1); sleep 60; b=$(du -sb staging|cut -f1); echo $(( (b-a)/60 ))'
+# -> 0.66 MB/s, down from 37 MB/s measured at the start of the run.
+# Test whether the throttle is per-connection or per-IP:
+ssh <gpu-host> 'for i in 0 1 2; do curl -s -m 30 -r <range> -o /dev/null -w "%{speed_download}\n" <url> & done; wait'
+# -> ~1.4 kB/s per stream regardless of stream count, so the limit is per-IP and
+#    parallelism cannot help. No workaround applied; the run continues as-is.
