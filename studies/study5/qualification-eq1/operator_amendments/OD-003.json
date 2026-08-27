@@ -1,0 +1,25 @@
+{
+ "schema_version": "study5-eq1-operator-definition-v1",
+ "definition_id": "OD-003",
+ "recorded_at_utc": "2026-08-27T05:37:00Z",
+ "phase": "P-1",
+ "approved_by": "operator, in session, 2026-08-27",
+ "kind": "standing execution rule",
+ "applies_from": "P-1 onward, for the remainder of this invocation",
+ "statement": "Every gate assertion and every verification script must emit a unique affirmative execution proof string at the end of its success path, of the form 'P1-CHECK-<id> PASSED', into a committed log. A judging tool reading that log treats a MISSING proof string as a FAIL for that check, identically to an assertion failure. Exit code 0 is not accepted as evidence that a check executed.",
+ "rationale": "IMG-001 demonstrated that 'the verification step silently did not run at all' is a real failure mode, and it is far more dangerous than an assertion failure. A failed assertion is loud and stops the build. A verification layer that never executed is silent, exits 0, and manufactures confidence in an artifact nobody checked.",
+ "why_exit_code_is_insufficient": "In IMG-001 the build step exited 0 precisely because nothing ran: the heredoc body was never delivered, python read empty stdin and terminated successfully. A success exit code was returned by a process that performed no verification, so exit status cannot distinguish 'passed' from 'never happened'.",
+ "requirements": {
+  "proof_string_is_unique_per_check": true,
+  "proof_string_emitted_only_on_the_success_path": true,
+  "proof_string_written_to_a_committed_log": true,
+  "missing_proof_string_equals_fail": true,
+  "exit_code_zero_is_not_evidence_of_execution": true,
+  "the_judging_tool_enumerates_expected_checks_in_advance": "so that a check which is silently removed is detected as missing rather than simply not looked for"
+ },
+ "supersedes_nothing": true,
+ "strengthens": [
+  "gate Q-7 logging and isolation",
+  "authority 9.4 traceability: a number whose verification cannot be shown to have run has no committed provenance"
+ ]
+}

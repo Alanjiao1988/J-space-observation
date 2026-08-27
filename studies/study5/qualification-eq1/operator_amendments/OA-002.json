@@ -1,0 +1,32 @@
+{
+ "schema_version": "study5-eq1-operator-amendment-v1",
+ "amendment_id": "OA-002",
+ "recorded_at_utc": "2026-08-27T05:35:00Z",
+ "phase": "P-1",
+ "approved_by": "operator, in session, 2026-08-27",
+ "recorded_before_any_model_call": true,
+ "recorded_before_any_measurement": true,
+ "involves_any_observed_outcome": false,
+ "amends": "authority section 3.6",
+ "change": {
+  "field": "max_new_tokens",
+  "from": 4096,
+  "to": 16384
+ },
+ "rationale_verbatim": "4096 继承自 Study 4F 的 C1 契约，其题库远比 MATH-500 简单。R1-Distill 在 MATH-500 上的 CoT 长度尾部超过 4096。截断上限会跨臂差异化地生效，系统性惩罚推理更长的那条臂——而『J features 影响 accuracy、style features 影响长度』正是本研究的主估计量。因此这是一个直接作用在主估计量上的混淆，不是效率问题。抬高上限对提前遇到 EOS 的 item 零成本。",
+ "rationale_english": "4096 is inherited from the Study 4F C1 contract, whose item bank is far simpler than MATH-500. R1-Distill's chain-of-thought length distribution on MATH-500 has a tail beyond 4096. A truncation ceiling therefore binds differentially across arms and systematically penalises the arm that reasons for longer -- and 'J features affect accuracy, style features affect length' is precisely the primary estimand of this study. This is a confound acting directly on the primary estimand, not an efficiency question. Raising the ceiling costs nothing on items that reach EOS earlier.",
+ "why_this_is_an_instrument_property_not_an_outcome_choice": "The ceiling is a property of the measuring instrument and is being corrected before any measurement exists. No accuracy, length or recovery figure has been observed at the time this is recorded, so the change cannot be an adjustment made to obtain a preferred result.",
+ "confirmatory_ceiling_reverse_solve_rule": {
+  "frozen_here_before_any_measurement": true,
+  "formula": "max_new_tokens_confirmatory = min( 32768, 2^ceil(log2(p99_completed_length_on_dev)) )",
+  "only_input_comes_from_data": "p99_completed_length_on_dev",
+  "formula_may_not_be_changed_after_seeing_its_input": true
+ },
+ "verification_requirement": "The ceiling-hit rate is measured and reported per arm. If it remains materially non-zero at 16384, that is stop condition 4: the amendment did not resolve the confound, and the correct response is to re-judge rather than to raise the ceiling a second time.",
+ "does_not_change": [
+  "the answer surface: native chat template, full chain of thought, last \\boxed{...}, frozen symbolic checker",
+  "the statistical unit, which remains the item",
+  "the benchmark, the split, any threshold, the estimands or the scoring rule"
+ ],
+ "retired_gate_not_reintroduced": "zero-generated-reasoning-token expressed competence remains retired; raising a generation ceiling is the opposite of narrowing the answer surface"
+}

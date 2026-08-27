@@ -1,0 +1,83 @@
+{
+ "schema_version": "study5-eq1-gate-rule-v1",
+ "gate": "Q-3",
+ "name": "Adapter fidelity",
+ "recorded_at_utc": "2026-08-27T05:39:00Z",
+ "phase": "P-1",
+ "frozen_before_any_model_call": true,
+ "frozen_before_any_measurement": true,
+ "involves_any_observed_outcome": false,
+
+ "authority_criterion": "F recovers >= 50% of the H -> T accuracy gap on the development slice, and does not shorten responses relative to T beyond the pre-registered tolerance; and the true L0 of each acquired checkpoint is measured empirically.",
+
+ "estimator": {
+  "formula": "recovery = (acc_F - acc_H) / (acc_T - acc_H)",
+  "analysis_set": "the 195-item development primary set (200 minus the 5 items excluded by OD-002)",
+  "statistical_unit": "item",
+  "k_samples_per_item": 1,
+  "arms_are_item_paired": true,
+  "common_random_numbers": "the same seed is used for an item across T, H and F; see SC-001"
+ },
+
+ "two_stage_decision_rule": {
+  "frozen_now_not_chosen_afterwards": true,
+  "bands": [
+   {
+    "condition": "recovery point estimate >= 0.50",
+    "verdict": "Q-3 PASS",
+    "action": "proceed"
+   },
+   {
+    "condition": "0.40 <= recovery point estimate < 0.50",
+    "verdict": "ESCALATE",
+    "action": "draw sample_index = 1 for ALL 195 items, giving k = 2, aggregate to a per-item mean, and re-judge once against this same table",
+    "is_a_free_rerun": false,
+    "why_not_a_free_rerun": "the escalation band, the item set, the additional sample count and the re-judging table are all fixed here before any measurement; nothing about the second stage is selected after seeing the first result",
+    "re_judgement_is_final": true
+   },
+   {
+    "condition": "recovery point estimate < 0.40",
+    "verdict": "Q-3 FAIL",
+    "terminal_state": "STUDY5_EQ1_ADAPTER_FIDELITY_BELOW_REGISTERED_FLOOR",
+    "action": "stop fail-closed, commit everything, report; this is an engineering blocker and may NOT be rewritten as a scientific finding"
+   }
+  ],
+  "aggregation_under_escalation": "responses are aggregated to a per-item score BEFORE any analysis, so the statistical unit remains the item and repeated responses are never treated as independent samples"
+ },
+
+ "uncertainty": {
+  "method": "nonparametric bootstrap",
+  "resampling_unit": "item",
+  "why_item": "features, tokens, layers, GPU workers and repeated responses are never independent samples; resampling anything else would understate the interval",
+  "resamples": 10000,
+  "interval": "percentile, two sided, 95%",
+  "reported_alongside_the_point_estimate": true,
+  "the_verdict_is_decided_by_the_point_estimate": true,
+  "why_the_point_estimate_decides": "the band table above was frozen against the point estimate; switching to an interval-based rule after seeing the interval would be choosing the decision procedure after the fact"
+ },
+
+ "length_condition": {
+  "source": "SC-001 length_tolerance_for_Q3, frozen before measurement",
+  "criterion": "median completed length of F >= 0.70 x median completed length of T",
+  "one_sided": true,
+  "failing_this_condition_fails_Q3": true
+ },
+
+ "l0_condition": {
+  "requirement": "the true L0 of each acquired checkpoint is measured empirically on the OpenThoughts3 val split",
+  "readme_is_not_trusted": true,
+  "why": "the published README's table and its prose disagree about the direction of l1_weight -> sparsity, so at most one of them is right and neither can be relied on",
+  "reporting_requirement": "state explicitly whether the measurement supports the table or the prose",
+  "l0_value_itself_is_not_a_pass_fail_threshold": true,
+  "why_not": "no L0 threshold is registered anywhere in the authority, and introducing one now would be inventing a criterion after the fact"
+ },
+
+ "catastrophic_H_stop_condition": {
+  "rule": "if H collapses catastrophically, meaning near-zero accuracy together with a high degeneration rate, the H -> T gap is no longer a meaningful denominator",
+  "action": "do not compute or report a recovery ratio; stop and report",
+  "why": "a denominator formed from a broken baseline makes the ratio arbitrarily large or small for reasons unrelated to adapter fidelity",
+  "H_being_merely_much_worse_than_T_is_expected": "H is the designed degraded baseline of the adapter paper; a large T minus H gap is the intended condition, not a fault"
+ },
+
+ "claim_ceiling": "Q-3 is an engineering gate. Passing it establishes that the adapter recovers a pre-registered share of a behavioural gap under a registered decoding law. It establishes nothing about J-space, about distillation, or about reasoning, and it is not a scientific result. A failure is an engineering or construct blocker and may not be registered as a scientific finding."
+}

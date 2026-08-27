@@ -1,0 +1,94 @@
+{
+ "schema_version": "study5-eq1-sampling-contract-v1",
+ "contract_id": "SC-001",
+ "recorded_at_utc": "2026-08-27T05:38:00Z",
+ "phase": "P-1",
+ "registered_here_and_carried_into_the_confirmatory_stage": true,
+ "recorded_before_any_model_call": true,
+ "involves_any_observed_outcome": false,
+
+ "decoding": {
+  "do_sample": true,
+  "temperature": 0.6,
+  "top_p": 0.95,
+  "top_k": 0,
+  "num_beams": 1,
+  "repetition_penalty": 1.0,
+  "batch_size": 1,
+  "max_new_tokens": 16384,
+  "max_new_tokens_authority": "OA-002",
+  "k_samples_per_item": 1,
+  "two_stage_escalation": "see Q-3 rule; k may become 2 only under the pre-registered escalation band"
+ },
+ "why_not_greedy": "DeepSeek explicitly warns that greedy decoding induces repetition degeneration in R1-Distill models. Greedy would therefore manufacture a failure mode in the arm most susceptible to it, which is exactly the arm this phase is measuring.",
+
+ "seed_rule": {
+  "formula": "seed(item_id, sample_index) = int.from_bytes(sha256(f\"STUDY5_EQ1|{authority_sha256}|{item_id}|{sample_index}\").digest()[:8], \"big\")",
+  "authority_sha256": "5c45d31a2aab23ffe93bbf5f4a220fb1835c1b98e960a2588fa587efcb9b1a35",
+  "depends_on_condition": false,
+  "why_the_seed_does_not_depend_on_condition": "This is common random numbers, and it is deliberate rather than an oversight. The same item draws the same seed under T, H and F, so the sampling noise is shared across arms and differences out of the item-paired contrast. Seeding per condition would inject independent noise into every arm and inflate the variance of exactly the paired difference this phase exists to estimate.",
+  "deterministic_across_hosts_and_processes": true,
+  "recorded_per_item_in_the_results_artifact": true
+ },
+
+ "isolation_contract": {
+  "cuda_device_order": "PCI_BUS_ID",
+  "one_worker_per_visible_gpu": true,
+  "single_device_cuda_visible_devices_per_worker": true,
+  "dtype": "bfloat16",
+  "quantization": false,
+  "tensor_parallelism": false,
+  "pipeline_parallelism": false,
+  "mig": false,
+  "device_map_auto": false,
+  "offload": false,
+  "trust_remote_code": {
+   "target_T": false,
+   "base_model": false,
+   "hybrid_H": false,
+   "adapter_F": true,
+   "adapter_exception_basis": "authority 4.2 records that the adapter requires its own Qwen2ForCausalLMWithTranscoder class; this is the single registered exception and it applies to no other model"
+  },
+  "four_gpus_may_only_reduce_wall_time": true,
+  "may_not_change": [
+   "item count",
+   "condition count",
+   "sample count",
+   "retry count",
+   "the statistical unit"
+  ],
+  "statistical_unit": "item"
+ },
+
+ "scoring": {
+  "chat_template": "the model's own native template",
+  "chain_of_thought": "full",
+  "answer_extraction": "the LAST \\boxed{...} occurrence",
+  "equivalence": "frozen symbolic checker, version pinned in the container image",
+  "study4f_e0_artifacts_used": false,
+  "study4f_parse_e0_contract_used": false,
+  "study4f_e0_artifacts_imported_or_referenced": false
+ },
+
+ "length_tolerance_for_Q3": {
+  "frozen_before_any_measurement": true,
+  "criterion": "median completed length of F must be at least 0.70 x the median completed length of T",
+  "threshold": 0.70,
+  "applies_to": "completed responses only, meaning responses that reached EOS rather than the generation ceiling",
+  "why_median_not_mean": "completion length is heavy tailed, so a mean is dominated by a handful of long responses and would not describe the typical response",
+  "why_completed_only": "including ceiling-truncated responses would censor the very quantity being compared and would make the statistic depend on the ceiling rather than on the model",
+  "rationale": "Authority Q-3 requires that F not shorten responses relative to T beyond a pre-registered tolerance. A materially shorter F would indicate the adapter has damaged the reasoning process rather than recovered it, and an accuracy figure obtained from truncated reasoning would not mean what it appears to mean.",
+  "direction": "one sided; F being LONGER than T is not a Q-3 failure",
+  "why_one_sided": "the registered concern is damage that shortens reasoning; a longer response is not evidence of that damage and is reported descriptively"
+ },
+
+ "recorded_per_arm_alongside_accuracy": [
+  "completion length distribution including p50 and p99",
+  "ceiling-hit rate against max_new_tokens",
+  "no-\\boxed{} rate",
+  "repetition degeneration rate",
+  "parser false-negative rate on development items with known answers"
+ ],
+
+ "claim_ceiling": "This contract fixes how measurements are taken. Nothing in it, and no number produced under it, is evidence about J-space, about distillation, or about reasoning."
+}

@@ -1,0 +1,10 @@
+# P-1/P1-001 - register OA-002, OD-002, OD-003, SC-001 and the Q-3 rule
+# All five are committed BEFORE any model call and before any measurement.
+# Each is an instrument property or a decision procedure, never an outcome choice.
+#   OA-002  max_new_tokens 4096 -> 16384, plus the frozen confirmatory reverse-solve
+#   OD-002  contamination screening scope; screen all 300 confirmation items now
+#   OD-003  execution proof strings become mandatory; missing proof == FAIL
+#   SC-001  sampling contract, per-item common-random-number seed, length tolerance
+#   Q-3     two-stage decision table, bootstrap CI, catastrophic-H stop condition
+python -m pytest studies/study5/qualification-eq1/tests -q
+git add studies/study5/qualification-eq1 && git commit
