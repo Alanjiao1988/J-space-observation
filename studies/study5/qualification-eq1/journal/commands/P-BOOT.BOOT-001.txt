@@ -1,0 +1,15 @@
+# P-BOOT/BOOT-001 - establish the branch and publish the authority alone
+git fetch --all --prune
+git rev-parse origin/alanjiao1988-azure-mooncake-a100-vm   # expect dac07a695e9cf820fcf3546ccff24826d3e47a30
+git rev-parse origin/main                                  # expect ddf592010cd8788b637a90a998724f7ccdce4383
+git reset --hard dac07a695e9cf820fcf3546ccff24826d3e47a30
+# transcribe the authority mechanically, never by retyping: lines 114..712 of the
+# operator-approved text, joined with LF, UTF-8 without BOM, one trailing newline
+python - <<'PY'
+lines = open(SOURCE, encoding='utf-8').read().split('\n')
+open(DEST, 'w', encoding='utf-8', newline='\n').write('\n'.join(lines[113:712]) + '\n')
+PY
+# verify line-for-line against the source slice: 599 lines, 0 mismatches
+git add -- studies/study5/prompts/study5_eq1_qualification_authority.md
+git diff --cached --name-only   # must print exactly one path
+git commit -F <message>

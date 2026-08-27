@@ -1,0 +1,5 @@
+# P-BOOT/BOOT-003 - build and demonstrate the run-record instrument (authority 9.1, gate Q-7)
+# create studies/study5/qualification-eq1/tools/journal.py
+# create studies/study5/qualification-eq1/tests/test_study5_eq1_journal.py
+python -m pytest studies/study5/qualification-eq1/tests/test_study5_eq1_journal.py -q
+python studies/study5/qualification-eq1/tools/journal.py verify

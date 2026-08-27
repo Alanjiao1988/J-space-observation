@@ -1,0 +1,6 @@
+# P-BOOT/BOOT-002 - publish, then re-verify that nothing advanced underneath it
+git fetch origin --prune
+git rev-parse origin/alanjiao1988-azure-mooncake-a100-vm   # expect dac07a695e9cf820fcf3546ccff24826d3e47a30
+git rev-parse origin/main                                  # expect ddf592010cd8788b637a90a998724f7ccdce4383
+git push --set-upstream origin alanjiao1988-study5-eq1-qualification
+git ls-remote --heads origin alanjiao1988-study5-eq1-qualification

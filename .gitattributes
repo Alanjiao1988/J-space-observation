@@ -261,3 +261,14 @@ studies/study3r/analysis/*.py text eol=lf
 studies/study3r/analysis/*.json text eol=lf
 studies/study3r/tasks/*.py text eol=lf
 tests/test_study3r_protocol_v1.py text eol=lf
+# Study 5-EQ1 engineering qualification. Registered for the same reason as the
+# Stage T and P0-R1 blocks above: the run record, the authority and the journal
+# are hashed artifacts, and a CRLF checkout would change their bytes and break
+# the provenance chain that authority section 9.4 requires.
+studies/study5/prompts/*.md text eol=lf
+studies/study5/qualification-eq1/*.md text eol=lf
+studies/study5/qualification-eq1/*.json text eol=lf
+studies/study5/qualification-eq1/journal/** text eol=lf
+studies/study5/qualification-eq1/inventory/** text eol=lf
+studies/study5/qualification-eq1/tools/*.py text eol=lf
+studies/study5/qualification-eq1/tests/*.py text eol=lf

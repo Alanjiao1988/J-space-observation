@@ -1,0 +1,10 @@
+# P-BOOT/BOOT-004 - run inherited governance tests alongside the new journal tests
+python -m pytest tests/test_paper_registries.py tests/test_phase1_0d_protected_bytes.py \
+                 tests/test_phase1_0d_rv2_protected_bytes.py \
+                 studies/study5/qualification-eq1/tests -q
+# one failure observed; prove it is pre-existing rather than caused here, on a
+# clean detached checkout of the predecessor commit with no Study 5 byte present
+git worktree add --detach <tmp> dac07a695e9cf820fcf3546ccff24826d3e47a30
+( cd <tmp> && python -m pytest tests/test_phase1_0d_protected_bytes.py -q )
+git worktree remove --force <tmp>
+git worktree prune
