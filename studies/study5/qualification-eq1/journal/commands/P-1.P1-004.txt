@@ -1,0 +1,9 @@
+# P-1/P1-004 - step 2, true L0 measured empirically on the OpenThoughts3 VAL split
+ssh <gpu-host> "sudo docker run --rm --gpus device=0 -v /scratch:/scratch \
+    -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e CUDA_VISIBLE_DEVICES=0 \
+    -e PYTHONPATH=<adapter repo> study5-eq1:qualification \
+    python tools/measure_l0.py --adapter <l1w0.001> --val contamination/val.jsonl \
+      --rows 200 --check-id S2.PRIMARY --out reports/p1/l0_primary.json"
+# and the same on device=1 for <l1w0.003>, --check-id S2.SPARSITY
+python tools/verify_proof_strings.py --log p1/s2_l0_combined.log \
+    --expect p1/s2_expected_checks.json --out p1/s2_proof_verification.json

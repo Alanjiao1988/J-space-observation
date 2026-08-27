@@ -1,0 +1,16 @@
+[2026-08-27T12:24:01Z] loading adapter: /scratch/study5/staging/nathu0__transcoder-adapters-R1-Distill-Qwen-7B-l1w0.001-l0-1.4
+Loading weights:   0%|          | 0/451 [00:00<?, ?it/s]Loading weights:  90%|████████▉ | 405/451 [00:00<00:00, 4047.41it/s]Loading weights: 100%|██████████| 451/451 [00:00<00:00, 4107.92it/s]
+[2026-08-27T12:24:02Z] materialised 28 dead-feature counters left on the meta device
+[2026-08-27T12:24:03Z] loaded 200 rows from the val split
+[2026-08-27T12:24:06Z]   25/200 rows
+[2026-08-27T12:24:10Z]   50/200 rows
+[2026-08-27T12:24:13Z]   75/200 rows
+[2026-08-27T12:24:16Z]   100/200 rows
+[2026-08-27T12:24:19Z]   125/200 rows
+[2026-08-27T12:24:22Z]   150/200 rows
+[2026-08-27T12:24:25Z]   175/200 rows
+[2026-08-27T12:24:28Z]   200/200 rows
+[2026-08-27T12:24:28Z] primary l1w0.001 README-claims-L0-1.4: whole-model mean L0 = 3.369928327287947
+[2026-08-27T12:24:28Z]   per-layer range 0.1076513671875 .. 23.3293994140625
+[2026-08-27T12:24:28Z]   gpu_seconds 25.669
+P1-CHECK-S2.PRIMARY PASSED

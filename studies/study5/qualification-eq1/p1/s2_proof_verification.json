@@ -1,0 +1,28 @@
+{
+ "schema_version": "study5-eq1-proof-verification-v1",
+ "rule": "OD-003",
+ "verified_at_utc": "2026-08-27T12:31:13Z",
+ "expected_check_count": 2,
+ "expected_checks_enumerated_in_advance": true,
+ "checks": [
+  {
+   "check_id": "S2.PRIMARY",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "S2.SPARSITY",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  }
+ ],
+ "missing_proof_strings": [],
+ "duplicated_proof_strings": [],
+ "explicit_failures": [],
+ "unexpected_proof_strings": [],
+ "exit_code_used_as_evidence_of_execution": false,
+ "all_checks_passed": true,
+ "verdict": "PASS",
+ "log": "studies/study5/qualification-eq1/p1/s2_l0_combined.log",
+ "log_sha256": "a54c4f41547254360715e9b1c674de3988a241ae933a6d9723e9711929255eb5"
+}

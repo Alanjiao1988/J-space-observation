@@ -1,0 +1,6 @@
+{
+ "step": "P-1 step 2, true L0 measurement, both checkpoints",
+ "rule": "OD-003",
+ "enumerated_in_advance": true,
+ "expected_checks": ["S2.PRIMARY", "S2.SPARSITY"]
+}

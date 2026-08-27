@@ -1,0 +1,70 @@
+{
+ "schema_version": "study5-eq1-l0-comparison-v1",
+ "phase": "P-1",
+ "step": "S2",
+ "analysed_at_utc": "2026-08-27T12:35:00Z",
+ "authority_basis": "Q-3 requires the true L0 of each acquired checkpoint to be measured empirically, because the published README's table and prose disagree about the direction of l1_weight -> sparsity and neither is trusted",
+
+ "the_disagreement_being_adjudicated": {
+  "readme_table": {
+   "location": "transcoder-adapters README lines 11-17, at the registered commit",
+   "claim": "l1_weight 0.01 -> L0 10.3, 0.003 -> 4.3, 0.001 -> 1.4, 0.0003 -> 0.4, 0.0001 -> 0.1",
+   "implied_direction": "higher l1_weight -> HIGHER L0, meaning LESS sparse"
+  },
+  "readme_prose": {
+   "location": "transcoder-adapters README line 48, at the registered commit",
+   "claim": "transcoder.l1_weight: L1 sparsity penalty - higher values produce sparser adapters with fewer active features per token",
+   "implied_direction": "higher l1_weight -> LOWER L0, meaning MORE sparse"
+  },
+  "they_are_mutually_exclusive": true,
+  "note": "the table's direction is also the counterintuitive one: a larger L1 penalty would normally produce a sparser representation, which is what the prose says"
+ },
+
+ "measurement": {
+  "checkpoints": {
+   "l1w0.001": {"readme_table_claims": 1.4, "measured_mean": 3.3699, "measured_median": 1.7277},
+   "l1w0.003": {"readme_table_claims": 4.3, "measured_mean": 3.7588, "measured_median": 1.8528}
+  },
+  "identical_conditions_for_both": "same 200 val rows, same max_seq_len 1024, same code, same masking, batch_size 1, bf16",
+  "gpu_seconds_total": 51.2
+ },
+
+ "verdict": {
+  "summary": "NEITHER the table's values nor its claimed separation is reproduced, and the DIRECTION question is genuinely split by which summary statistic is used. This is reported as a split result rather than resolved in favour of whichever statistic tells a cleaner story.",
+
+  "on_values": {
+   "finding": "neither checkpoint reproduces its published L0",
+   "l1w0.001": "published 1.4, measured mean 3.37",
+   "l1w0.003": "published 4.3, measured mean 3.76",
+   "separation_published_ratio": 3.07,
+   "separation_measured_mean_ratio": 1.12,
+   "separation_measured_median_ratio": 1.07,
+   "conclusion": "the two checkpoints are far closer together in measured sparsity than the table implies, under every statistic computed"
+  },
+
+  "on_direction": {
+   "per_layer_majority": "21 of 28 layers show the PROSE direction: the higher l1_weight checkpoint has the LOWER L0",
+   "whole_model_mean": "supports the TABLE direction, 3.3699 -> 3.7588",
+   "whole_model_median": "supports the TABLE direction, but marginally, 1.7277 -> 1.8528",
+   "mean_excluding_layers_26_and_27": "supports the PROSE direction, 2.0242 -> 1.6770",
+   "why_the_statistics_disagree": "layers 26 and 27 carry L0 values an order of magnitude above every other layer (23.33/24.39 and 18.40/37.25). Layer 27 alone differs by roughly 19 features per token between the checkpoints, which is enough to reverse the sign of the whole-model mean on its own.",
+   "conclusion": "the aggregate mean is dominated by two anomalous final layers; excluding them reverses the direction. A single-number answer to 'table or prose' cannot be given honestly from this measurement."
+  }
+ },
+
+ "substantive_consequence_for_the_study": {
+  "finding": "the sparsity-sensitivity arm may have materially less leverage than its registered purpose assumes",
+  "reasoning": "the sparsity sensitivity checkpoint is registered in authority 4.1 precisely to vary sparsity. If the two checkpoints differ by a factor of about 1.1 in measured L0 rather than the roughly 3.07 the table implies, then a sensitivity analysis contrasting them is contrasting two nearly equally sparse models on this data.",
+  "is_this_a_Q3_failure": false,
+  "why_not": "no L0 threshold is registered anywhere in the authority. Introducing one now, in either direction, would be inventing a criterion after seeing the measurement.",
+  "action_taken": "recorded and reported to the operator; no threshold invented, no arm dropped, no registered decision altered"
+ },
+
+ "measurement_scope_caveat": {
+  "statement": "the absolute values here need not match the authors' published 'Val L0' figures, because the evaluation slice is almost certainly different: this measurement uses the first 200 usable rows of the registered OpenThoughts3-55k val split, truncated at 1024 tokens, taking problem and human-turn text only.",
+  "what_this_caveat_does_not_undermine": "the comparison BETWEEN the two checkpoints, which is apples to apples - identical rows, identical truncation, identical code, identical masking. The values are slice-dependent; the direction and the ratio are not.",
+  "recorded_rather_than_used_to_dismiss_the_mismatch": true
+ },
+
+ "claim_ceiling": "This is an instrument measurement. It establishes what these two checkpoints do on this data slice. It is not evidence about J-space, about distillation, or about reasoning, and it is not a scientific result."
+}

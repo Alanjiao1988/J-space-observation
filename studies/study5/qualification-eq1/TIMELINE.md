@@ -836,3 +836,78 @@ difference between them. It is not a threat to validity.
 
 OD-003 proof verification: **PASS** for both splits. 0 confirmation items were
 tokenized, prefilled, generated from or scored.
+
+### 2026-08-27T12:20:00Z → 12:35:00Z — `P1-004` — **Step 2: true `L0` measured**
+
+51.2 GPU-seconds total = **0.0142 accelerator-hours**. Measured on the
+OpenThoughts3 **val** split, never `train` — measuring sparsity on data the
+adapter was fit to would report memorisation, not representational sparsity.
+`L0` is the adapter class's own `cached_l0`, so it is the same quantity the
+training objective shaped, with padding masked out.
+
+| Checkpoint | README table claims | measured mean | measured median |
+| --- | --- | --- | --- |
+| `l1w0.001` | 1.4 | **3.3699** | 1.7277 |
+| `l1w0.003` | 4.3 | **3.7588** | 1.8528 |
+
+#### Table versus prose — reported as split, not forced
+
+The README at the registered commit contradicts itself, exactly as the authority
+anticipated. Its **table** (lines 11–17) implies higher `l1_weight` → *higher*
+`L0`. Its **prose** (line 48) says "higher values produce sparser adapters with
+fewer active features per token" → *lower* `L0`. The prose is also the
+physically conventional direction: a larger L1 penalty should sparsify.
+
+The measurement does **not** resolve this cleanly, and saying otherwise would
+mean choosing whichever statistic told a tidier story:
+
+| Statistic | Direction it supports |
+| --- | --- |
+| Per-layer majority, **21 of 28 layers** | **prose** |
+| Whole-model mean (3.3699 → 3.7588) | table |
+| Whole-model median (1.7277 → 1.8528) | table, but marginally |
+| Mean excluding layers 26–27 (2.0242 → 1.6770) | **prose** |
+
+The statistics disagree because layers 26 and 27 carry `L0` an order of
+magnitude above every other layer — 23.33/24.39 and 18.40/37.25. Layer 27 alone
+differs by ~19 features per token between checkpoints, which is enough to flip
+the sign of the whole-model mean by itself.
+
+**On values, neither checkpoint reproduces its published figure**, and the more
+consequential number is the *separation*: measured ratio ≈ **1.12** by mean and
+**1.07** by median, against the **3.07** the table implies.
+
+#### The consequence worth flagging
+
+The sparsity-sensitivity checkpoint is registered in §4.1 precisely to *vary*
+sparsity. If the two checkpoints differ by ~1.1× rather than ~3.1×, that arm has
+materially less leverage than its registered purpose assumes — it would be
+contrasting two nearly equally sparse models on this data.
+
+**This is not a Q-3 failure.** No `L0` threshold is registered anywhere in the
+authority, and inventing one now — in either direction — would be precisely the
+move pre-registration exists to prevent. Recorded and reported; no threshold
+invented, no arm dropped, no registered decision altered.
+
+**Scope caveat.** Absolute values are slice-dependent and need not match the
+authors' published "Val L0", since the evaluation slice is almost certainly
+different. That caveat does **not** touch the between-checkpoint comparison,
+which is apples-to-apples: identical rows, truncation, code and masking. The
+values are slice-dependent; the direction and the ratio are not.
+
+#### Two defects, fixed in our own code
+
+`transformers` 5.x initialises on the meta device, and `_dead_feature_counters`
+is a plain attribute rather than a registered buffer, so it is never
+materialised and the class's own forward raises *"Cannot copy out of meta
+tensor"*. It is restored to the zeros `__init__` intended — no weight altered,
+and the `L0` figure is computed earlier in the same block. Editing the
+third-party source instead would have meant measuring a model that differs from
+the registered commit.
+
+And a GPU addressing error: `docker --gpus device=N` remaps the physical card to
+index **0** inside the container, so `CUDA_VISIBLE_DEVICES=1` addressed nothing.
+The script asserting `device_count() == 1` rather than trusting the flag is what
+caught it.
+
+OD-003 proof verification: **PASS** for both checkpoints.
