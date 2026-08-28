@@ -1,0 +1,97 @@
+{
+ "schema_version": "study5-eq2-hard-blocker-v1",
+ "blocker_id": "HB-003",
+ "phase": "R-1b",
+ "step": "C",
+ "recorded_at_utc": "2026-08-28T15:25:00Z",
+ "action_taken": "STOPPED. Committed. Reported. NOT repaired. No criterion revised.",
+ "self_repair_attempted": false,
+ "criterion_revised": false,
+ "proceeded_to_target": false,
+
+ "headline": "OA-005 condition (ii) removes almost the entire band. The late band was largely the PLAIN LOGIT LENS's own readability, not information contributed by the Jacobian.",
+
+ "the_numbers": {
+  "positive_control": {
+   "model": "Qwen2.5-7B-Instruct",
+   "condition_i_band": [21, 22, 23, 24, 25, 26],
+   "j_lens_peak_readrate": 0.084615,
+   "plain_logit_lens_peak_readrate": 0.076923,
+   "peak_ratio": 1.100,
+   "layers_passing_condition_ii": [21],
+   "layers_failing_condition_ii": [22, 23, 24, 25, 26],
+   "final_band": [21],
+   "final_band_length": 1
+  },
+  "depth_test": {
+   "model": "Qwen3-1.7B",
+   "condition_i_band": [20, 21, 22, 23, 24, 25, 26],
+   "j_lens_peak_readrate": 0.075824,
+   "plain_logit_lens_peak_readrate": 0.076923,
+   "peak_ratio": 0.986,
+   "observation": "the PLAIN LOGIT LENS is very slightly BETTER than the J-lens at peak",
+   "layers_passing_condition_ii": [],
+   "final_band": [],
+   "band_destroyed_entirely": true
+  },
+  "negative_control": {
+   "model": "gpt2",
+   "condition_i_band": [],
+   "note": "no band from condition (i), so (ii) was not reached"
+  }
+ },
+
+ "what_condition_ii_actually_revealed": {
+  "statement": "At layers 22 to 26 on the positive control, the plain logit lens reads the labelled intermediates almost as well as the J-lens: 0.0637 against 0.0791 at layer 23, 0.0769 against 0.0835 at layer 24, 0.0703 against 0.0846 at layer 25. The Wilson intervals overlap at every one of those layers.",
+  "interpretation_of_the_measurement": "the late region's readability is a property of the residual stream at those depths, which the unembedding alone already exposes. It is not information the Jacobian transport contributes.",
+  "this_is_exactly_the_confounder_OA_005_was_written_to_catch": true,
+  "the_operator_diagnosis_was_correct": "a late band's real risk is that what is read is the answer about to be emitted rather than a workspace intermediate; the random-lens null could not test this, and the logit-lens control could"
+ },
+
+ "the_one_genuinely_positive_finding_stated_precisely": {
+  "observation": "There is a real region where the J-lens adds information the plain logit lens does not have. At layers 13 to 21 of the positive control the plain logit lens reads NOTHING at rank 1, readrate exactly 0.0000, while the J-lens reads 0.0011 to 0.0132.",
+  "layer_21": {
+   "j_lens_readrate": 0.0132,
+   "plain_logit_lens_readrate": 0.0000,
+   "j_lower_bound": 0.00756,
+   "null_ceiling": 0.004204,
+   "logit_lens_upper_bound": 0.00420,
+   "passes_all_three_conditions": true
+  },
+  "but_the_honest_qualification": "layers 13 to 20 have J-lens readrates at or below the random-lens null ceiling of 0.004204, so they are NOT significant against the null. Exactly ONE layer, 21, clears both the null and the plain logit lens.",
+  "so_the_surviving_structure_is_a_single_layer": true
+ },
+
+ "why_i_am_stopping_rather_than_calling_this_a_pass": {
+  "the_literal_reading": "under OA-005 as written, the positive control's band [21] satisfies (i), (ii) and (iii): the run is contiguous, its readrate clears the null, it exceeds the plain logit lens, and its argmax at layer 21 is interior. Literally, band_valid = true.",
+  "why_that_reading_should_not_be_acted_on": [
+   "a one-layer band is degenerate. OD-015 registered the object as 'the contiguous mid-network layer RANGE'; a single layer is a point, not a range.",
+   "the R-0 adjudication ladder, committed at bd8be7e0 before any measurement, sets the R-2 coverage threshold to 'the positive control's own band length minus 2, floored at 3'. With a band length of 1 that floor is 3, and the positive control itself would fail the threshold derived from it. The calibration is self-contradictory at this band length.",
+   "the depth test lost its band ENTIRELY, so the method does not reproduce across the two models that were supposed to corroborate each other."
+  ],
+  "so_the_substance_of_stop_condition_2_is_met_even_though_its_literal_text_is_arguable": true,
+  "what_i_did_not_do": "I did not revise the criterion to resolve the ambiguity in either direction. The operator's instruction is explicit that criterion revision stops here and the next revision requires approval.",
+  "who_decides": "the operator"
+ },
+
+ "what_this_does_and_does_not_mean": {
+  "permitted_reading": "On these open models at this scale, the Jacobian lens adds little readability over a plain logit lens in the late layers, and the late band found under condition (i) is largely attributable to the plain unembedding rather than to the Jacobian.",
+  "forbidden_readings": [
+   "it is NOT evidence that J-space exists or does not exist",
+   "it is NOT evidence about the target, which has not been touched",
+   "it is NOT a claim that the published method is wrong; it is a measurement of how that method behaves on these particular open checkpoints at this scale",
+   "it does NOT reproduce the published mid-depth band, and no text may say it does"
+  ],
+  "the_measurement_is_of_the_instrument_not_of_any_model": true
+ },
+
+ "state_at_the_stop": {
+  "lens_A_and_lens_B_read": false,
+  "od012_guard": "PASS, 0 lens-reading records",
+  "target_touched": false,
+  "eq1_artifacts_modified": false,
+  "criterion_revisions_made_this_step": 0
+ },
+
+ "claim_ceiling": "An instrument finding and a governance stop. It licenses no claim about any model, and nothing here is evidence about J-space."
+}

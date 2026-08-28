@@ -346,3 +346,103 @@ guard now reports **PASS** with **0 lens-reading records** — `lens_A` and
 and untouched.
 
 New entries: **DC-005**. HB-002 lifted. 53 tests passing.
+
+---
+
+## R-1b — OA-005 tightens the criterion, and the band does not survive
+
+### Rulings recorded
+
+**The directionality criterion**, fixed as precedent in `OD-017`: *changing the
+implementation to match the registered text is a bug fix; changing the registered
+text to match the data is p-hacking.* The distinguishing feature is **direction**,
+not outcome. DC-005 was a bug fix by that test, and the supporting check — the
+negative control was clean under both readings — made it verifiable rather than
+merely assertable.
+
+Two limitations recorded verbatim. **gpt2's non-significance is
+power-dependent**: `0.003781` against a ceiling of `0.004260` is a ~12% miss,
+about 7 hits in 910, and with more items it would quite possibly cross. It must
+not be read as "gpt2 has no readout". **The band's upper edge is right-censored
+by the end of the network**, not determined by the phenomenon — only the lower
+edge and the argmax carry information.
+
+**EQ1 boundary**: its record stands, and restarting any part of EQ1 on the
+grounds that convention D might PASS is forbidden. EQ1's FAIL is an accomplished
+fact about that execution.
+
+### Step A — OD-017 conformance audit: **19 entries, 0 divergences**
+
+The audit imports the modules and compares **live values**, not comments — a
+hand-written table asserting agreement would be precisely the check that cannot
+fail. One honest flag: for multihop / multilingual / order-ops, "token before
+target" and "final prompt token" resolve to the same index because these prompts
+stop immediately before the answer. That is a property of the data, not a
+harmonisation of the rules.
+
+### Step B — output-adjacency is **not** the explanation
+
+| | fraction |
+|---|---|
+| intermediate == the item's own `target` | 0.0032 |
+| intermediate == the **model's own top-1** at the readout position | **0.0053** (5/937) |
+
+Worst set is order-ops at 1.82%. The late band is **not** simply the lens reading
+the answer. Reported only; no criterion adjusted.
+
+### Step C — **condition (ii) removes almost the entire band**
+
+| | J-lens peak | plain logit lens peak | ratio |
+|---|---|---|---|
+| positive (7B-It) | 0.084615 | 0.076923 | **1.100** |
+| depth (1.7B) | 0.075824 | 0.076923 | **0.986** |
+| negative (gpt2) | 0.007795 | 0.004454 | 1.750 |
+
+Positive control, layer by layer inside the condition-(i) band:
+
+| layer | J-lens | logit lens | (ii) passes |
+|---|---|---|---|
+| 21 | 0.0132 | **0.0000** | **yes** |
+| 22 | 0.0319 | 0.0132 | no |
+| 23 | 0.0791 | 0.0637 | no |
+| 24 | 0.0835 | 0.0769 | no |
+| 25 | 0.0846 | 0.0703 | no |
+| 26 | 0.0319 | 0.0253 | no |
+
+**The band collapses from six layers to one.** On the depth test **no layer
+passes at all** — and the plain logit lens is very slightly *better* than the
+J-lens at peak.
+
+**What this means as a measurement:** the late region's readability is a property
+of the residual stream at those depths that the unembedding alone already
+exposes. It is not information the Jacobian transport contributes. That is
+exactly the confounder OA-005 was written to catch, and the diagnosis behind it
+was right.
+
+**The one genuine positive, stated precisely:** at layers 13–21 the plain logit
+lens reads *exactly* 0.0000 while the J-lens reads 0.0011–0.0132 — there is a
+real region where the Jacobian adds what the unembedding alone cannot. But layers
+13–20 sit at or below the null ceiling of 0.004204, so **exactly one layer, 21,
+clears both the null and the logit lens**.
+
+### HB-003 — stopped, nothing repaired, no criterion revised
+
+Under the literal text of OA-005 the positive band `[21]` satisfies (i), (ii) and
+(iii). I am **not** acting on that reading, for three stated reasons: a one-layer
+"band" is a point, not the "layer range" OD-015 registered; the R-0 ladder
+(committed at `bd8be7e0`, before any measurement) sets the R-2 coverage floor to
+*the positive control's own band length minus 2, floored at 3* — which the
+positive control itself would then fail, so the calibration is self-contradictory
+at this length; and the depth test lost its band entirely, so the two models that
+were meant to corroborate each other do not.
+
+The substance of stop condition 2 is met even though its literal text is
+arguable. **I did not revise the criterion in either direction** — the
+instruction is explicit that revision stops here pending approval.
+
+`lens_A` / `lens_B` still **never read** (guard PASS, 0 records); target untouched.
+
+### R-1b resources
+
+R-1 + R-1b: **7.483 of 10**; EQ2 **7.483 of 24**; cumulative **39.066 of 240**.
+New entries: **HB-003**, **OD-017**, **OA-005**. No DC, no IMG.

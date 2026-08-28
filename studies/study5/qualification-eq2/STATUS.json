@@ -3,14 +3,14 @@
  "study_id": "STUDY5_EQ2",
  "namespace": "studies/study5/qualification-eq2/",
  "kind": "construct adjudication",
- "lifecycle_state": "STUDY5_EQ2_R1_COMPLETE_CONVENTION_D_COMMITTED_AWAITING_R2",
+ "lifecycle_state": "STUDY5_EQ2_R1B_STOPPED_LOGIT_LENS_CONTROL_REMOVES_BAND",
  "lifecycle_state_is_registered_terminal": false,
  "terminal": false,
  "resumable": true,
  "is_a_scientific_result": false,
  "confirmation_authorized": false,
- "current_phase": "R-1 complete",
- "next_phase": "R-2, apply convention D to EQ1 sealed lenses (requires operator release)",
+ "current_phase": "R-1b stopped at step C",
+ "next_phase": "none without an operator decision on HB-003",
  "authority": {
   "path": "studies/study5/prompts/study5_eq2_construct_adjudication_authority.md",
   "sha256": "63e4751573586d5ed7c8242d7fcaf1b1d6cb3f3232eb60ec46b0bcde795df894",
@@ -68,7 +68,7 @@
  },
  "budget": {
   "ceiling_actively_used_gpu_hours": 24,
-  "consumed": 6.0,
+  "consumed": 7.483333,
   "phase_ceilings": {
    "R-0": 0,
    "R-1": 10,
@@ -88,7 +88,8 @@
  },
  "claim_ceiling": "EQ2 is construct adjudication. No state it can reach is a scientific result.",
  "hard_blockers": [
-  "HB-002 (lifted by OA-004)"
+  "HB-002 (lifted by OA-004)",
+  "HB-003 (open)"
  ],
  "r1_progress": {
   "external_identity_distance_distribution": "done, n=37, median 0.578094",
@@ -132,5 +133,27 @@
   "DC-003",
   "DC-004",
   "DC-005"
- ]
+ ],
+ "r1b_progress": {
+  "od017_conformance_audit": "PASS, 19 entries, 0 divergences",
+  "item_construction_intermediate_equals_model_top1": 0.0053,
+  "logit_lens_controls": [
+   "positive",
+   "depth",
+   "negative"
+  ],
+  "oa005_condition_ii_positive_passing_layers": [
+   21
+  ],
+  "oa005_condition_ii_depth_passing_layers": [],
+  "positive_final_band": [
+   21
+  ],
+  "depth_final_band": [],
+  "j_vs_logit_peak_ratio_positive": 1.1,
+  "j_vs_logit_peak_ratio_depth": 0.986,
+  "sealed_lenses_read": false,
+  "target_touched": false,
+  "criterion_revisions_made": 0
+ }
 }

@@ -1,0 +1,10 @@
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights: 100%|██████████| 339/339 [00:00<00:00, 4004.89it/s]
+  association    scored=99    pass@1=0.0000
+  multihop       scored=94    pass@1=0.1809
+  multilingual   scored=414   pass@1=0.1836
+  order-ops      scored=109   pass@1=0.0642
+  poetry         scored=98    pass@1=0.0102
+  typo           scored=96    pass@1=0.0938
+
+plain logit lens peak pass@1: 0.076923
+EQ2-CHECK-LOGIT-LENS-positive PASSED
