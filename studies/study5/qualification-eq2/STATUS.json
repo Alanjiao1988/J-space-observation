@@ -3,7 +3,7 @@
  "study_id": "STUDY5_EQ2",
  "namespace": "studies/study5/qualification-eq2/",
  "kind": "construct adjudication",
- "lifecycle_state": "STUDY5_EQ2_R0_IN_PROGRESS",
+ "lifecycle_state": "STUDY5_EQ2_R0_COMPLETE_AWAITING_R1",
  "lifecycle_state_is_registered_terminal": false,
  "terminal": false,
  "resumable": true,
@@ -52,9 +52,14 @@
   "external_method_recovered_from_primary_sources": true,
   "adjudication_ladder_committed": true,
   "adjudication_ladder_sha256": "bd8be7e02af1b0cb1b64b0ddecef0742d05003017d12326d05bdd79481bc002b",
-  "control_weights_acquired": "IN PROGRESS",
-  "sealed_lenses_read": false,
-  "lens_reading_records_in_journal": 0
+ "control_weights_acquired": true,
+ "control_weight_files": 27,
+ "control_weight_bytes": 19873171263,
+ "acquisition_failures": 0,
+ "bytes_fetched_by_operator_workstation": 0,
+ "r0_complete": true,
+ "sealed_lenses_read": false,
+ "lens_reading_records_in_journal": 0
  },
 
  "gates": {

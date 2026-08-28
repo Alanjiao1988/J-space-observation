@@ -148,3 +148,20 @@ violation.
 **0 actively used GPU-hours**, as the phase plan requires. Both VMs and the four
 `TRAINING`-group V100 machines remain running, idle and untouched; **0** NSG
 rules added, **0** containers created, **0** SAS tokens, **0** storage keys.
+
+### Control weights acquired
+
+27 files, **19,873,171,263 bytes**, **0 failures**, all byte-verified against
+origin-published anchors: 8 by LFS SHA-256, 19 by git blob SHA-1.
+`Qwen2.5-7B-Instruct` @ `a09a3545` (positive control), `Qwen3-1.7B` @ `70d244cc`
+(depth test), `gpt2` @ `607a30d7` (negative control), `trust_remote_code=false`.
+Again **0 bytes** fetched by the operator's workstation.
+
+**R-0 is complete at 0 actively used GPU-hours**, as its phase plan requires.
+
+### New DC / IMG / HB entries in R-0
+
+**None.** No disclosed correction, no image defect, no hard blocker. The one
+thing worth flagging is not a defect but a design choice recorded above: the
+OD-012 guard's first version treated a prose mention as a read, and the checker
+was corrected rather than the evidence reworded.
