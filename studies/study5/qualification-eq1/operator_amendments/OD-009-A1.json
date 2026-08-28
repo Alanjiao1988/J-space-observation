@@ -1,0 +1,28 @@
+{
+ "schema_version": "study5-eq1-operator-definition-v1",
+ "definition_id": "OD-009-A1",
+ "kind": "clarification of OD-009, made before any curve was computed",
+ "recorded_at_utc": "2026-08-27T22:55:00Z",
+ "phase": "P-2",
+ "amends": "OD-009",
+ "changes_any_threshold": false,
+
+ "the_discrepancy": {
+  "od_009_says": "compute kappa(l) for l = 0..27, and C1 requires argmax strictly inside (0, 27)",
+  "what_the_lens_actually_produces": "the Jacobian lens is defined only for source layers STRICTLY BELOW the target layer - jlens/fitting.py:93-96 raises if any source layer is >= target_layer",
+  "registered_layer_convention": "source_layers = 0..26, target_layer = 27, inherited unchanged from jlens_s2_protocol.py where the 1.5B precedent used exactly these values; the 7B has the same 28-layer depth",
+  "consequence": "the curve has 27 points, indices 0 through 26, not 28. There is no J_27, because layer 27 is the frame the lens transports INTO; transporting it into itself is the identity and carries no information."
+ },
+
+ "clarification": {
+  "C1_is_applied_to_the_endpoints_of_the_actual_curve": "argmax must not fall on the first or the last point of the measured curve, i.e. argmax must lie in 1..25 inclusive",
+  "why_this_is_the_faithful_reading": "C1 exists to reject a maximum that sits at an end of the curve, because that is what a monotone trend looks like rather than a band. The endpoints of the curve are 0 and 26, so those are the values C1 must exclude.",
+  "note_that_this_is_stricter_not_looser": "a literal reading of 'strictly inside (0, 27)' would ACCEPT argmax = 26, which is the last measured point and exactly the case C1 was written to reject. This clarification therefore tightens the criterion rather than relaxing it.",
+  "C3_unchanged": "the required band length stays 7 layers; 7 of 27 points is 25.9 percent, which still satisfies the 'at least 25 percent of depth' rationale stated in OD-009",
+  "C2_C4_C5_unchanged": true
+ },
+
+ "why_this_is_registered_rather_than_decided_later": "The mismatch between the stated index range and the range the instrument can produce was found while reading the fitting code, before any lens was fitted and before any curve existed. Resolving it now means the resolution cannot have been influenced by a curve. Had it been left, it would have become a judgement call made with the answer already visible.",
+
+ "claim_ceiling": "This is a criterion clarification. It licenses no claim of any kind."
+}
