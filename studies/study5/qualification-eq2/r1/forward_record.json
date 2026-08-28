@@ -1,0 +1,47 @@
+{
+ "schema_version": "study5-eq2-forward-record-v1",
+ "recorded_at_utc": "2026-08-28T07:55:00Z",
+ "phase": "R-1",
+ "purpose": "Record two consequences NOW, while they are cheap to act on, rather than discovering them at P-4 or at write-up.",
+ "status": "forward-looking record; neither item is a result",
+
+ "item_1_the_observed_band_is_later_and_narrower_than_the_prior": {
+  "measured_on": "the positive control, Qwen2.5-7B-Instruct, by the official rank method with no kurtosis involved",
+  "profile_landmarks": {
+   "readrate_exactly_zero_through_layers": "0 to 12",
+   "first_non_zero_layer": 13,
+   "steep_rise_begins": 20,
+   "peak": {"layer": 25, "readrate": 0.0846},
+   "final_layer_falls_to": {"layer": 26, "readrate": 0.0319}
+  },
+  "all_three_published_landmarks_present": "near-zero early region, a rise, and a fall in the last layers",
+  "the_discrepancy": "the rise begins at roughly three quarters of depth (layer 20 of 27), not at about one third as the published description says",
+  "band_under_the_superseded_rule": [23, 24, 25],
+  "the_prior_in_our_own_method_memo": {
+   "prior_band": "layer 11 to 26, 16 layers",
+   "source": "the depth-reindexed [38, 92] prior recorded in EQ1's OD-009",
+   "verdict": "NOT consistent with what was measured on the positive control"
+  },
+  "why_this_is_recorded_now": {
+   "consequence_if_the_shape_transfers_to_the_target": "the P-4 candidate feature pool would shrink from roughly 130,000 to roughly 25,000",
+   "arithmetic": "a 16-layer band versus a 3-layer band is a factor of about 5.3; the pool scales with the number of band layers",
+   "the_point": "this is cheap to know now and expensive to discover at P-4",
+   "caveat": "it is measured on the positive control, not on the target; whether the shape transfers is unknown and is not assumed here"
+  }
+ },
+
+ "item_2_absolute_readability_is_low": {
+  "measurement": "peak pooled pass@1 on the positive control is 0.0846",
+  "meaning": "at its best layer, the lens puts the labelled intermediate at rank 1 for about 8.5 percent of scored intermediates",
+  "comparison": "this is substantially weaker than the published report on a much larger frontier model",
+  "how_it_must_be_reported": "as a scale limitation, carried into the final limitations section",
+  "what_it_is_not": [
+   "it is not evidence that the method is wrong",
+   "it is not evidence about J-space",
+   "it is not a statement about the target, which has not been measured"
+  ],
+  "an_honest_caveat_on_the_comparison": "our figure and the published figure are not measured on the same items or the same models, so the comparison is indicative rather than a controlled contrast, and must be described that way"
+ },
+
+ "claim_ceiling": "A forward-looking record. Neither item is a scientific finding, and neither licenses any claim about J-space."
+}

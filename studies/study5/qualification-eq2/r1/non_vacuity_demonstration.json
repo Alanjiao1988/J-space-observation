@@ -1,0 +1,32 @@
+{
+ "rule": "OA-004 revision 3",
+ "trials": 900,
+ "seed": 20260828,
+ "null_replicates": 5,
+ "cases": {
+  "random_lens_own_profile": {
+   "band_exists": false,
+   "band": [],
+   "n_significant_layers": 0,
+   "must_be": "no band",
+   "passed": true
+  },
+  "pure_noise_profile": {
+   "band_exists": false,
+   "band": [],
+   "n_significant_layers": 0,
+   "must_be": "no band",
+   "passed": true
+  },
+  "all_zero_profile": {
+   "band_exists": false,
+   "band": [],
+   "n_significant_layers": 0,
+   "must_be": "no band",
+   "passed": true
+  }
+ },
+ "all_passed": true,
+ "meaning": "the criterion is not vacuous: it does not manufacture a band from a random lens, from noise, or from an empty profile",
+ "proven_before_any_real_profile_was_judged": true
+}

@@ -151,6 +151,157 @@ def readout_position(slug: str, token_strings: list[str]) -> int:
     raise RankProfileError(f"unknown readout rule {rule}")
 
 
+def score_with_lens(
+    lens_model,
+    tokenizer,
+    lens,
+    eval_dir: str,
+    max_seq_len: int,
+    limit: int = 0,
+) -> dict:
+    """Score every evaluation set with one lens and return the profile report.
+
+    Factored out so the real measurement and the matched-norm null measurement
+    run through LITERALLY the same code. If the null had its own copy of this
+    loop, the two could drift apart and the comparison would quietly stop being
+    like-for-like.
+    """
+    import torch
+
+    layers = list(lens.source_layers)
+    per_set: dict[str, dict] = {}
+    pooled_hits = {k: {layer: 0 for layer in layers} for k in (1, 5, 10)}
+    pooled_total = 0
+    unrankable: list[dict] = []
+
+    for slug in sorted(READOUT_RULE):
+        path = Path(eval_dir) / f"lens-eval-{slug}.json"
+        items = json.loads(path.read_text(encoding="utf-8"))["items"]
+        if limit:
+            items = items[:limit]
+
+        hits = {k: {layer: 0 for layer in layers} for k in (1, 5, 10)}
+        min_rank_over_layers: list[int] = []
+        scored = 0
+
+        for item in items:
+            prompt = item["prompt"]
+            ids = lens_model.encode(prompt, max_length=max_seq_len)
+            n_tokens = int(ids.shape[1])
+            if n_tokens >= max_seq_len:
+                raise RankProfileError(
+                    f"{slug}/{item['name']}: prompt hit the truncation limit, "
+                    "which would move the readout position"
+                )
+            token_strings = [
+                tokenizer.decode([int(t)], clean_up_tokenization_spaces=False)
+                for t in ids[0]
+            ]
+            position = readout_position(slug, token_strings)
+
+            lens_logits, _model_logits, _ = lens.apply(
+                lens_model,
+                prompt,
+                layers=layers,
+                positions=[position],
+                max_seq_len=max_seq_len,
+                use_jacobian=True,
+            )
+
+            for intermediate in item["intermediates"]:
+                token_ids = single_token_ids(
+                    tokenizer, synonym_forms(slug, intermediate)
+                )
+                if not token_ids:
+                    unrankable.append(
+                        {
+                            "set": slug,
+                            "item": item["name"],
+                            "intermediate": intermediate,
+                            "reason": "no single-token surface form",
+                        }
+                    )
+                    continue
+
+                scored += 1
+                pooled_total += 1
+                best_rank_any_layer = None
+                for layer in layers:
+                    row = lens_logits[layer][0]
+                    targets = torch.tensor(token_ids, dtype=torch.long)
+                    target_logits = row[targets]
+                    rank_here = int(
+                        (row.unsqueeze(0) > target_logits.unsqueeze(1))
+                        .sum(dim=1)
+                        .min()
+                        .item()
+                    )
+                    for k in (1, 5, 10):
+                        if rank_here < k:
+                            hits[k][layer] += 1
+                            pooled_hits[k][layer] += 1
+                    if best_rank_any_layer is None or rank_here < best_rank_any_layer:
+                        best_rank_any_layer = rank_here
+                min_rank_over_layers.append(int(best_rank_any_layer))
+
+            del lens_logits
+
+        per_set[slug] = {
+            "readout_rule": READOUT_RULE[slug],
+            "items": len(items),
+            "scored_intermediates": scored,
+            "profile": {
+                str(k): [
+                    {
+                        "layer": layer,
+                        "readrate": (hits[k][layer] / scored) if scored else 0.0,
+                        "hits": hits[k][layer],
+                    }
+                    for layer in layers
+                ]
+                for k in (1, 5, 10)
+            },
+            "pass_at_k": {
+                str(k): (
+                    sum(1 for r in min_rank_over_layers if r < k)
+                    / len(min_rank_over_layers)
+                    if min_rank_over_layers
+                    else 0.0
+                )
+                for k in (1, 5, 10)
+            },
+        }
+        print(
+            f"  {slug:14} scored={scored:<5} "
+            f"pass@1={per_set[slug]['pass_at_k']['1']:.4f}",
+            flush=True,
+        )
+
+    pooled = {
+        str(k): [
+            {
+                "layer": layer,
+                "readrate": (pooled_hits[k][layer] / pooled_total)
+                if pooled_total
+                else 0.0,
+                "hits": pooled_hits[k][layer],
+            }
+            for layer in layers
+        ]
+        for k in (1, 5, 10)
+    }
+
+    return {
+        "layers": layers,
+        "per_set": per_set,
+        "pooled_profile": pooled,
+        "pooled_scored_intermediates": pooled_total,
+        "unrankable": unrankable,
+        "unrankable_count": len(unrankable),
+        "lens_n_prompts": lens.n_prompts,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-dir", required=True)
@@ -189,126 +340,12 @@ def main() -> int:
     lens_model = jlens.from_hf(model, tokenizer, force_bos=True)
     lens = JacobianLens.load(args.lens)
 
-    layers = list(lens.source_layers)
-    per_set: dict[str, dict] = {}
-    pooled_hits = {k: {layer: 0 for layer in layers} for k in (1, 5, 10)}
-    pooled_total = 0
-    unrankable: list[dict] = []
-
-    for slug in sorted(READOUT_RULE):
-        path = Path(args.eval_dir) / f"lens-eval-{slug}.json"
-        items = json.loads(path.read_text(encoding="utf-8"))["items"]
-        if args.limit:
-            items = items[: args.limit]
-
-        hits = {k: {layer: 0 for layer in layers} for k in (1, 5, 10)}
-        min_rank_over_layers: list[int] = []
-        scored = 0
-
-        for item in items:
-            prompt = item["prompt"]
-            ids = lens_model.encode(prompt, max_length=args.max_seq_len)
-            n_tokens = int(ids.shape[1])
-            if n_tokens >= args.max_seq_len:
-                raise RankProfileError(
-                    f"{slug}/{item['name']}: prompt hit the truncation limit, "
-                    "which would move the readout position"
-                )
-            token_strings = [
-                tokenizer.decode([int(t)], clean_up_tokenization_spaces=False)
-                for t in ids[0]
-            ]
-            position = readout_position(slug, token_strings)
-
-            lens_logits, _model_logits, _ = lens.apply(
-                lens_model,
-                prompt,
-                layers=layers,
-                positions=[position],
-                max_seq_len=args.max_seq_len,
-                use_jacobian=True,
-            )
-
-            for intermediate in item["intermediates"]:
-                token_ids = single_token_ids(
-                    tokenizer, synonym_forms(slug, intermediate)
-                )
-                if not token_ids:
-                    unrankable.append(
-                        {
-                            "set": slug,
-                            "item": item["name"],
-                            "intermediate": intermediate,
-                            "reason": "no single-token surface form",
-                        }
-                    )
-                    continue
-
-                scored += 1
-                pooled_total += 1
-                best_rank_any_layer = None
-                for layer in layers:
-                    row = lens_logits[layer][0]
-                    targets = torch.tensor(token_ids, dtype=torch.long)
-                    target_logits = row[targets]
-                    # rank 0 = top; rank of the best synonym at this layer
-                    rank = int(
-                        (row.unsqueeze(0) > target_logits.unsqueeze(1))
-                        .sum(dim=1)
-                        .min()
-                        .item()
-                    )
-                    for k in (1, 5, 10):
-                        if rank < k:
-                            hits[k][layer] += 1
-                            pooled_hits[k][layer] += 1
-                    if best_rank_any_layer is None or rank < best_rank_any_layer:
-                        best_rank_any_layer = rank
-                min_rank_over_layers.append(int(best_rank_any_layer))
-
-            del lens_logits
-
-        per_set[slug] = {
-            "readout_rule": READOUT_RULE[slug],
-            "items": len(items),
-            "scored_intermediates": scored,
-            "profile": {
-                str(k): [
-                    {
-                        "layer": layer,
-                        "readrate": (hits[k][layer] / scored) if scored else 0.0,
-                        "hits": hits[k][layer],
-                    }
-                    for layer in layers
-                ]
-                for k in (1, 5, 10)
-            },
-            "pass_at_k": {
-                str(k): (
-                    sum(1 for r in min_rank_over_layers if r < k)
-                    / len(min_rank_over_layers)
-                    if min_rank_over_layers
-                    else 0.0
-                )
-                for k in (1, 5, 10)
-            },
-        }
-        p1 = per_set[slug]["pass_at_k"]["1"]
-        print(f"  {slug:14} scored={scored:<5} pass@1={p1:.4f}", flush=True)
-
-    pooled = {
-        str(k): [
-            {
-                "layer": layer,
-                "readrate": (pooled_hits[k][layer] / pooled_total)
-                if pooled_total
-                else 0.0,
-                "hits": pooled_hits[k][layer],
-            }
-            for layer in layers
-        ]
-        for k in (1, 5, 10)
-    }
+    scored_report = score_with_lens(
+        lens_model, tokenizer, lens, args.eval_dir, args.max_seq_len, args.limit
+    )
+    layers = scored_report["layers"]
+    pooled = scored_report["pooled_profile"]
+    pooled_total = scored_report["pooled_scored_intermediates"]
 
     report = {
         "schema_version": "study5-eq2-rank-profile-v1",
@@ -317,8 +354,6 @@ def main() -> int:
         "model_dir": args.model_dir,
         "lens": args.lens,
         "lens_sha256": sha256_file(Path(args.lens)),
-        "lens_n_prompts": lens.n_prompts,
-        "layers": layers,
         "method": {
             "source": "anthropics/jacobian-lens data/evaluations/README.md at 581d398",
             "hit_definition": "target token at lens rank 1",
@@ -331,16 +366,16 @@ def main() -> int:
                 "and is a reconstruction of that stated rule"
             ),
             "single_token_synonyms_only": True,
+            "scoring_shared_with_the_null": (
+                "the null profiles run through this same score_with_lens "
+                "function, so the two measurements cannot drift apart"
+            ),
         },
-        "per_set": per_set,
-        "pooled_profile": pooled,
-        "pooled_scored_intermediates": pooled_total,
-        "unrankable": unrankable,
-        "unrankable_count": len(unrankable),
         "gpu_index_in_container": 0,
         "gpu_uuid_last_twelve": gpu_uuid,
         "claim_ceiling": "A rank profile. It licenses no claim of any kind.",
     }
+    report.update(scored_report)
     Path(args.out_report).write_bytes(canonical_json_bytes(report))
 
     print(f"\npooled scored intermediates: {pooled_total}")

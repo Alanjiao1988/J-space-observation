@@ -1,0 +1,37 @@
+{
+ "schema_version": "study5-eq2-supersession-notice-v1",
+ "supersedes": "OD-015",
+ "superseded_by": "OA-004",
+ "recorded_at_utc": "2026-08-28T07:52:00Z",
+ "phase": "R-1",
+
+ "the_original_is_retained_not_deleted": {
+  "path": "studies/study5/qualification-eq2/r1/OD-015.json",
+  "sha256": "6440e22160198a795810d25531b5e6e139c6ae9ed20845adbeb110182a147d86",
+  "why_retained": "the rule was frozen before any profile existed and was applied honestly; the record of what it said, and of how it failed, is part of the evidence and is not edited away"
+ },
+
+ "what_specifically_is_superseded": {
+  "the_failed_element": "band = longest contiguous run at or above HALF OF THE PROFILE'S OWN MAXIMUM readrate",
+  "why_it_failed": "normalising by the profile's own maximum makes the rule scale-free, which was deliberate, but also makes it produce a band on ANY profile with an interior peak, including one that is nothing but a small signal or noise",
+  "evidence_of_failure": {
+   "artifact": "studies/study5/qualification-eq2/r1/HB-002.json",
+   "negative_control_band_under_od_015": [9],
+   "negative_control_peak_readrate": 0.0078
+  }
+ },
+
+ "what_is_carried_forward_unchanged_from_od_015": [
+  "k = 1 as the primary readrate threshold, taken verbatim from the official Hit definition",
+  "the per-set readout positions, executed verbatim and never harmonised",
+  "the order-ops min-over-single-token-synonyms rule",
+  "the pooled profile as the band source, with per-set profiles still reported",
+  "the mid-depth and contiguity shape requirements",
+  "the Jaccard agreement measure for the V versus D adjudication",
+  "the rule that if neither convention agrees, the invocation records that and continues"
+ ],
+
+ "what_replaces_the_failed_element": "significance against a matched-norm random-lens null upper confidence bound, per OA-004 revision 2",
+
+ "claim_ceiling": "A record-keeping notice. It licenses no claim of any kind."
+}

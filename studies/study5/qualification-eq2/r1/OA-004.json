@@ -1,0 +1,73 @@
+{
+ "schema_version": "study5-eq2-operator-amendment-v1",
+ "amendment_id": "OA-004",
+ "recorded_at_utc": "2026-08-28T07:50:00Z",
+ "phase": "R-1",
+ "approved_by": "operator, in session, 2026-08-28",
+ "amends": "OD-015, the band decision rule",
+ "lifts": "HB-002",
+ "supersedes": "OD-015",
+
+ "diagnosis_verbatim": {
+  "statement": "gpt2 is not a model without a workspace; it is a model that is weak at everything. Its readrate of 0.0078 at layer 9 is about 390 times the chance rate of roughly 1/50257 = 2e-5. It really is reading content out, just weakly. Using a weak model as the null gives not a null hypothesis but a small signal, and any rule defined RELATIVE TO A PROFILE'S OWN MAXIMUM will produce a band on a small signal. OD-015's failure is structural; changing the threshold cannot close it.",
+  "chance_rate_gpt2": 1.9897726038164935e-05,
+  "observed_negative_peak": 0.0078,
+  "ratio_over_chance": 392.0,
+  "directional_fact": {
+   "gpt2_vocab": 50257,
+   "qwen_vocab": 152064,
+   "statement": "rank-1 is about 3 times easier for gpt2 by vocabulary size alone, so the 10.85x separation already observed is CONSERVATIVE",
+   "ratio": 3.0257675741240424
+  }
+ },
+
+ "revision_1_negative_control_becomes_a_matched_norm_random_lens": {
+  "construction": "per layer, replace J_l with a random matrix of the SAME Frobenius norm, leaving the entire rest of the readout path unchanged",
+  "provenance": "this is the construction EQ1 already registered and used for kappa_null; it is transplanted to the rank pipeline rather than invented here",
+  "properties": "same model, same items, same positions, same vocabulary; the only difference is that the lens carries no Jacobian information",
+  "one_per_evaluated_model": "including the target when it is eventually evaluated",
+  "gpt2_status": "demoted to a DESCRIPTIVE control; still reported, no longer a gate"
+ },
+
+ "revision_2_band_criterion": {
+  "definition": "band = the longest contiguous mid-depth run of layers whose readrate significantly exceeds the random-lens null upper confidence bound",
+  "null_replicates": 5,
+  "null_replicates_rule": "at least 5 independent random lenses",
+  "null_ceiling": "the MAXIMUM of the per-replicate upper confidence bounds, which is the conservative direction",
+  "confidence_level": 0.95,
+  "confidence_level_justification": "a statistical convention, not a value selected to fit the data",
+  "significance_test": "binomial confidence interval over item x intermediate trials",
+  "retained_from_od_015": ["the mid-depth requirement", "the contiguity requirement"],
+  "removed_from_od_015": "the scale-free 'at least half of the profile's own maximum' rule, which is the element that failed"
+ },
+
+ "revision_3_non_vacuity_must_be_demonstrated_first": {
+  "requirement": "before this criterion touches any real profile, three negative cases must be demonstrated",
+  "cases": [
+   "feed the random lens's OWN profile to the band extractor -> must yield NO band",
+   "feed a pure noise profile -> must yield NO band",
+   "feed an all-zero profile -> must yield NO band"
+  ],
+  "gate": "the criterion may not be applied to any real data until all three pass",
+  "why_this_is_the_dividing_line": "this is what separates the amendment from 'look at the answer, then pick a ratio that passes'. The non-vacuity of this criterion can be proven independently, BEFORE touching any real profile."
+ },
+
+ "honest_labelling_verbatim": "This amendment was made, in time, after the positive, depth and negative control numbers had been seen, and is labelled post-hoc accordingly. Its validity does not depend on those numbers: non-vacuity is proven independently by the three negative cases above, and the confidence level is a statistical convention rather than a fitted value. The amendment was carried out entirely against non-target models; the target was not touched when it was made, lens_A and lens_B were not read, and the OD-012 guard records zero lens reads.",
+
+ "status_changes": {
+  "HB-002": "retained as a recorded blocker, LIFTED by OA-004, following the HB-001 / OA-001 pattern",
+  "OD-015": "marked SUPERSEDED BY OA-004; its original text and the evidence of its failure are retained, not deleted",
+  "eq1_q4a_fail": "not retracted, thresholds not relaxed",
+  "r1_sub_ceiling": {"hours": 10, "used_at_amendment_time": 1.0}
+ },
+
+ "what_this_amendment_does_not_do": [
+  "it does not retract HB-002 or pretend the stop did not happen",
+  "it does not delete OD-015 or the evidence that it failed",
+  "it does not relax any EQ1 threshold",
+  "it does not permit reading the sealed lenses any earlier",
+  "it does not change the rule that if neither kurtosis convention matches, the invocation continues rather than stopping"
+ ],
+
+ "claim_ceiling": "A criterion amendment. It licenses no claim of any kind."
+}
