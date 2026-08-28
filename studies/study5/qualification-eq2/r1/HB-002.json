@@ -1,0 +1,74 @@
+{
+ "schema_version": "study5-eq2-hard-blocker-v1",
+ "blocker_id": "HB-002",
+ "phase": "R-1",
+ "step": "R1-005",
+ "recorded_at_utc": "2026-08-28T07:30:00Z",
+ "stop_condition_fired": 1,
+ "stop_condition_text": "the negative control gpt2 shows a band",
+ "action_taken": "STOPPED. Committed. Reported. NOT repaired.",
+ "self_repair_attempted": false,
+ "proceeded_to_target": false,
+
+ "what_happened": {
+  "summary": "Under the band rule frozen in OD-015, the negative control gpt2-small yields band_exists = true. Registered stop condition 1 therefore fired.",
+  "negative_control_band": [9],
+  "negative_control_band_length": 1,
+  "negative_control_peak_readrate": 0.0078,
+  "negative_control_peak_in_items": "7 of 898 scored intermediates",
+  "negative_control_argmax_layer": 9,
+  "argmax_is_interior": "yes, gpt2 has source layers 0..10, so layer 9 is interior and the interior-argmax requirement did not reject it"
+ },
+
+ "the_defect_is_in_my_registered_rule_not_necessarily_in_the_method": {
+  "statement": "OD-015 defines the band as the longest contiguous run at or above HALF OF THE MAXIMUM readrate. That rule is scale-free by construction, which was deliberate - it avoids an absolute threshold we would have had to invent. The negative control has now shown the cost of that choice: because the rule normalises by the profile's own maximum, ANY profile with an interior peak yields a band, including a profile that is pure noise.",
+  "the_gap": "OD-015 has no absolute floor on the peak readrate and no minimum band length for the control comparison. A single layer at 0.78 percent therefore satisfies it.",
+  "this_is_exactly_what_a_negative_control_is_for": "it was included to detect a non-discriminative method, and it detected one - the non-discriminative element being my band rule rather than the underlying rank measurement."
+ },
+
+ "the_quantitative_picture_which_does_NOT_rescue_the_verdict": {
+  "positive_control_peak": 0.0846,
+  "depth_test_peak": 0.0758,
+  "negative_control_peak": 0.0078,
+  "positive_over_negative": 10.85,
+  "depth_over_negative": 9.73,
+  "pass_at_10_peaks": {"positive": 0.1901, "depth": 0.1923, "negative": 0.0323},
+  "observation": "the underlying rank measurement discriminates strongly: the two Qwen models read labelled content about ten times more often than gpt2 does",
+  "why_this_may_not_be_used_to_declare_the_negative_control_held": {
+   "statement": "Declaring the negative control clean would require an absolute floor on the peak readrate, or a minimum band length. Neither was registered. Choosing either NOW would be choosing a threshold with the answer already visible, which is precisely the failure mode OD-012 and the whole EQ1/EQ2 governance exist to prevent.",
+   "therefore": "the 10.85x ratio is reported as an observation and explicitly does NOT change the verdict",
+   "who_decides": "the operator, not this invocation"
+  }
+ },
+
+ "what_was_still_established_and_stands_on_its_own": {
+  "positive_control_reproduces_the_published_qualitative_signature": {
+   "profile": "readrate is exactly 0.0000 for layers 0-12, first non-zero at layer 13, rises steeply from layer 20 (0.0044) through 21 (0.0132), 22 (0.0319), 23 (0.0791), 24 (0.0835) to a peak at 25 (0.0846), then FALLS at the last layer 26 to 0.0319",
+   "published_signature": "near zero through the first third of the layers, increases beginning around a third of the way through the depth, and falls in the last few layers",
+   "assessment": "the near-zero early region, the rise, and the fall at the end are all reproduced. The rise begins later than 'a third of the way through' - around layer 20 of 27, roughly three quarters - so the agreement is qualitative and partial, and is reported as such rather than as a match.",
+   "this_was_measured_with_no_kurtosis_involved": true
+  },
+  "depth_question_is_answered": {
+   "question": "is 28 layers too shallow",
+   "answer": "externally refuted",
+   "evidence": "Qwen3-1.7B, a 1.7B model, shows peak readrate 0.0758 against the 7B's 0.0846, and a LONGER band, layers 21-25 versus 23-25. Its pass@10 peak, 0.1923, slightly exceeds the 7B's 0.1901.",
+   "caveat": "this says nothing about whether the target has a band, and must not be read as supporting the shallowness explanation either"
+  },
+  "these_findings_do_not_depend_on_the_defective_band_rule": "the profiles and peaks are direct measurements; only the band EXTRACTION rule is at fault"
+ },
+
+ "what_was_not_done_because_of_the_stop": [
+  "step 4, the V versus D kurtosis adjudication on the positive control, was not run",
+  "no convention was selected or committed",
+  "lens_A and lens_B were NOT read, and the OD-012 boundary record was never written",
+  "the target was not touched in any way"
+ ],
+
+ "options_for_the_operator_stated_without_recommending_one_over_the_registered_stop": [
+  "register an absolute floor on peak readrate, or a minimum band length, as an amendment - noting explicitly that it would be registered AFTER these numbers were seen, and recording that fact in the amendment",
+  "accept the stop and record terminal state STUDY5_EQ2_NEGATIVE_CONTROL_CONTAMINATED",
+  "re-scope the negative-control criterion to a relative one, for instance requiring the positive peak to exceed the negative peak by a registered factor, again registered as a post-hoc amendment with that status stated"
+ ],
+
+ "claim_ceiling": "This is an instrument finding and a governance stop. It licenses no claim about any model, and nothing here is evidence about J-space."
+}

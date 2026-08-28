@@ -3,15 +3,14 @@
  "study_id": "STUDY5_EQ2",
  "namespace": "studies/study5/qualification-eq2/",
  "kind": "construct adjudication",
- "lifecycle_state": "STUDY5_EQ2_R0_COMPLETE_AWAITING_R1",
+ "lifecycle_state": "STUDY5_EQ2_R1_STOPPED_NEGATIVE_CONTROL_BAND_UNDER_REGISTERED_RULE",
  "lifecycle_state_is_registered_terminal": false,
  "terminal": false,
  "resumable": true,
  "is_a_scientific_result": false,
  "confirmation_authorized": false,
- "current_phase": "R-0",
- "next_phase": "R-1, adjudicate the convention on external controls",
-
+ "current_phase": "R-1 stopped at step 3",
+ "next_phase": "none without an operator decision on HB-002",
  "authority": {
   "path": "studies/study5/prompts/study5_eq2_construct_adjudication_authority.md",
   "sha256": "63e4751573586d5ed7c8242d7fcaf1b1d6cb3f3232eb60ec46b0bcde795df894",
@@ -24,7 +23,6 @@
   "extracted_mechanically_not_retyped": true,
   "line_for_line_mismatches_against_source": 0
  },
-
  "predecessor": {
   "study_id": "STUDY5_EQ1",
   "terminal_state": "STUDY5_EQ1_WORKSPACE_BAND_NOT_ESTABLISHED_AT_THIS_SCALE",
@@ -35,14 +33,17 @@
   "every_eq1_artifact_byte_identical": true,
   "eq1_p3_is_not_reachable_from_here": true
  },
-
  "standing_rules_registered_this_invocation": {
   "OD-011": "a check must carry a demonstrated failing case, or it counts as not implemented",
   "OD-012": "commit before compute, enforced structurally; the sealed lenses may not be read until the convention is committed",
   "OD-013": "one variable at a time; EQ2 tests the readout convention only"
  },
- "inherited_rules_still_in_force": ["OD-001", "OD-003", "OD-006", "OD-007"],
-
+ "inherited_rules_still_in_force": [
+  "OD-001",
+  "OD-003",
+  "OD-006",
+  "OD-007"
+ ],
  "r0_progress": {
   "official_readout_answered": true,
   "official_kurtosis_path": "NOT PROVIDED",
@@ -52,28 +53,30 @@
   "external_method_recovered_from_primary_sources": true,
   "adjudication_ladder_committed": true,
   "adjudication_ladder_sha256": "bd8be7e02af1b0cb1b64b0ddecef0742d05003017d12326d05bdd79481bc002b",
- "control_weights_acquired": true,
- "control_weight_files": 27,
- "control_weight_bytes": 19873171263,
- "acquisition_failures": 0,
- "bytes_fetched_by_operator_workstation": 0,
- "r0_complete": true,
- "sealed_lenses_read": false,
- "lens_reading_records_in_journal": 0
+  "control_weights_acquired": true,
+  "control_weight_files": 27,
+  "control_weight_bytes": 19873171263,
+  "acquisition_failures": 0,
+  "bytes_fetched_by_operator_workstation": 0,
+  "r0_complete": true,
+  "sealed_lenses_read": false,
+  "lens_reading_records_in_journal": 0
  },
-
  "gates": {
   "convention_adjudicated": "NOT YET",
   "band_on_target": "NOT YET EVALUATED"
  },
-
  "budget": {
-  "ceiling_actively_used_gpu_hours": 12,
-  "consumed": 0.0,
-  "phase_ceilings": {"R-0": 0, "R-1": 6, "R-2": 4, "R-3": 0},
+  "ceiling_actively_used_gpu_hours": 24,
+  "consumed": 1.0,
+  "phase_ceilings": {
+   "R-0": 0,
+   "R-1": 10,
+   "R-2": 8,
+   "R-3": 0
+  },
   "denominated_per": "OD-001"
  },
-
  "azure": {
   "vms_reconfigured": 0,
   "vms_stopped_or_started": 0,
@@ -83,6 +86,23 @@
   "training_group_v100_machines_touched": 0,
   "nsg_rules_added_this_invocation": 0
  },
-
- "claim_ceiling": "EQ2 is construct adjudication. No state it can reach is a scientific result."
+ "claim_ceiling": "EQ2 is construct adjudication. No state it can reach is a scientific result.",
+ "hard_blockers": [
+  "HB-002"
+ ],
+ "r1_progress": {
+  "external_identity_distance_distribution": "done, n=37",
+  "tolerance_registered": "OD-016",
+  "rank_profiles_computed": [
+   "positive",
+   "negative",
+   "depth"
+  ],
+  "band_derivation": "done",
+  "stop_condition_1_fired": true,
+  "kurtosis_adjudication_step4": "NOT RUN due to the stop",
+  "convention_selected": false,
+  "sealed_lenses_read": false,
+  "target_touched": false
+ }
 }

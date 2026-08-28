@@ -165,3 +165,91 @@ Again **0 bytes** fetched by the operator's workstation.
 thing worth flagging is not a defect but a design choice recorded above: the
 OD-012 guard's first version treated a prose mention as a read, and the checker
 was corrected rather than the evidence reworded.
+
+---
+
+## R-1 — stopped at step 3, stop condition 1 fired
+
+### Step 1 — external identity-distance distribution (0 GPU)
+
+**37** published convergence traces, not 39. The prompt said 39; the pinned
+revision publishes 37, and 37 is what was used. Recorded rather than rounded.
+
+| n | min | Q1 | median | Q3 | max | IQR |
+|---|---|---|---|---|---|---|
+| 37 | 0.130071 | 0.441750 | **0.578094** | 0.843554 | 3.649054 | 0.401804 |
+
+The positive control's `final_identity_distance` is **exactly the median**. That
+was observed, not arranged.
+
+`OD-016` registers the tolerance *from* this data: Tukey inner fence
+`[Q1−1.5·IQR, Q3+1.5·IQR]` = `[−0.160956, 1.446260]`, clamped at 0.
+
+Stated rather than papered over: the raw lower fence is negative, so the primary
+rule is **non-binding below**. It can only catch a Jacobian unusually *far* from
+identity — not one unusually *close*, which would mean the lens had collapsed
+into an ordinary logit lens. A secondary lower gate is therefore registered at
+the observed external minimum `0.130071`, kept as a separate item so its weaker
+basis (one observed minimum, not a quantile fence) stays visible.
+
+### Steps 2–3 — rank profiles on the three controls
+
+Pooled pass@1 readrate, ~900 scored intermediates per model:
+
+| | positive (Qwen2.5-7B-It) | depth (Qwen3-1.7B) | negative (gpt2) |
+|---|---|---|---|
+| peak | **0.0846** @ L25 | **0.0758** @ L24 | **0.0078** @ L9 |
+| band | [23, 24, 25] | [21…25] | **[9]** |
+| pass@10 peak | 0.1901 | 0.1923 | 0.0323 |
+
+**The positive control partially reproduces the published signature**, measured
+with no kurtosis anywhere: readrate is *exactly* 0.0000 through layers 0–12,
+first non-zero at 13, rises steeply from 20 → 21 → 22 → 23 → 24 → 25, then
+**falls at the last layer** to 0.0319. The near-zero early region, the rise and
+the terminal fall are all present. The rise begins *later* than "a third of the
+way through" — about layer 20 of 27 — so this is reported as **partial**
+qualitative agreement, not a match.
+
+**The depth question is answered: "28 layers is too shallow" is externally
+refuted.** Qwen3-1.7B reaches peak 0.0758 against the 7B's 0.0846, with a
+**longer** band (21–25 vs 23–25) and a slightly higher pass@10 peak. This says
+nothing about whether the target has a band, and does not support the shallowness
+explanation either.
+
+### HB-002 — stop condition 1 fired, not repaired
+
+Under the frozen `OD-015` rule the **negative control yields a band**, `[9]`,
+length 1, peak `0.0078` — **7 of 898** intermediates. Registered stop condition 1
+fired, so this invocation stopped, committed and reported.
+
+**The defect is in my own registered rule, not necessarily in the method.**
+`OD-015` defines the band as the longest run at or above *half of the maximum*.
+That is scale-free by construction — deliberately, to avoid inventing an absolute
+threshold. The negative control has now shown the cost: because the rule
+normalises by the profile's own maximum, **any** profile with an interior peak
+yields a band, including pure noise. There is no absolute floor on peak readrate
+and no minimum band length. This is precisely what a negative control is for, and
+it worked.
+
+The underlying rank measurement *does* discriminate: **10.85×** between the
+positive and negative peaks, 9.73× for the depth test. **That observation does
+not rescue the verdict.** Declaring the negative control clean would require an
+absolute floor or a minimum band length, neither of which was registered, and
+choosing one now would be choosing a threshold with the answer already visible —
+the exact failure mode this governance exists to prevent. The operator decides,
+not this invocation.
+
+### What was deliberately not done
+
+Step 4 (V vs D kurtosis adjudication) **was not run**. No convention was
+selected. `lens_A` and `lens_B` were **not read** — the OD-012 guard reports
+**0 lens-reading records** and the boundary record was never written. The target
+was not touched.
+
+### R-1 resources
+
+**1.0 actively used GPU-hours** of the R-1 ceiling of 10 (OA-003); cumulative
+**32.583 of 240**. Both VMs and the four `TRAINING`-group V100 machines remain
+running, idle and untouched; 0 NSG rules, 0 containers, 0 SAS, 0 storage keys.
+
+New entries: **HB-002**. No DC, no IMG.

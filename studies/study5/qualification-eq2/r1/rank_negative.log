@@ -1,0 +1,22 @@
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|██████████| 148/148 [00:00<00:00, 1821.09it/s]
+  association    scored=93    pass@1=0.0000
+  multihop       scored=103   pass@1=0.0097
+  multilingual   scored=398   pass@1=0.0151
+  order-ops      scored=110   pass@1=0.0000
+  poetry         scored=98    pass@1=0.0000
+  typo           scored=96    pass@1=0.0208
+
+pooled scored intermediates: 898
+layer  pass@1 readrate
+    0  0.0000
+    1  0.0000
+    2  0.0000
+    3  0.0000
+    4  0.0000
+    5  0.0000
+    6  0.0000
+    7  0.0011
+    8  0.0011
+    9  0.0078
+   10  0.0022
+EQ2-CHECK-RANK-PROFILE-negative PASSED
