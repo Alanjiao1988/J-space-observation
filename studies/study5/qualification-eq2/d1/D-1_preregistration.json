@@ -1,0 +1,72 @@
+{
+ "schema_version": "study5-eq2-registration-v1",
+ "registration_id": "D-1",
+ "recorded_at_utc": "2026-08-28T15:50:00Z",
+ "phase": "post-terminal diagnostic",
+ "kind": "instrument validity check, registered BEFORE it is run",
+ "approved_by": "operator, in session, 2026-08-28",
+
+ "the_question": {
+  "statement": "There are two kinds of negative, and they require completely different text in the record.",
+  "negative_A_about_the_models": {
+   "condition": "J departs substantially from the identity, yet the J-lens readout is still approximately equal to the logit lens readout",
+   "meaning": "the Jacobian genuinely carries no readable information beyond the unembedding in these models",
+   "status": "a substantive finding about the models"
+  },
+  "negative_B_about_us": {
+   "condition": "J is approximately the identity, so the J-lens degenerates into a plain logit lens by construction",
+   "meaning": "our J construction is degenerate, this negative does not adjudicate the construct, and EQ2 amounts to having FAILED TO ADJUDICATE",
+   "status": "a finding about our implementation, not about the models"
+  },
+  "why_it_must_be_settled": "the depth model's ratio of 0.986 - the J-lens performing slightly WORSE than the plain logit lens - makes B a live possibility that must be excluded before A may be written"
+ },
+
+ "what_will_be_measured": {
+  "per_layer_degeneracy": "for square J_l, the relative Frobenius distance from the identity, ||J_l - I||_F / ||I||_F",
+  "spectrum": "singular value distribution of each J_l, plus eigenvalue statistics where meaningful",
+  "identity_attributable_share": "the proportion of the J-lens readout attributable to the identity component, obtained by decomposing J_l into a scaled-identity part and a residual and comparing their contributions",
+  "shape_contingency": "if J_l is not square, the deviation from the scaled-identity or projection component is reported instead"
+ },
+
+ "connection_to_OD_016": {
+  "od_016_registered": "a comparability tolerance whose Tukey lower fence came out NEGATIVE and therefore non-binding below",
+  "what_od_016_was_explicitly_written_to_catch": "a lens whose Jacobian has degenerated toward the identity, which is to say a J-lens that has collapsed into an ordinary logit lens",
+  "the_situation_now": "the present symptom is EXACTLY the failure mode OD-016 was supposed to catch, and OD-016's primary rule could not have caught it",
+  "d1_must_report": "whether OD-016 WOULD have fired on this data had its lower fence been effective"
+ },
+
+ "pre_registered_constraints_verbatim": [
+  "No result of D-1 may reopen R-2.",
+  "No result of D-1 may cause the target to be touched.",
+  "No result of D-1 may revise any criterion.",
+  "D-1 decides ONLY whether the record says negative-A or negative-B.",
+  "If the conclusion is negative-B, the correct successor is A NEW STUDY REQUIRING ITS OWN INDEPENDENT PRE-REGISTRATION, not a continuation of EQ2, and it is outside the present authorisation."
+ ],
+
+ "asymmetric_motivation_labelled_verbatim": "The motivation for proposing D-1 is asymmetric: had the J-lens readout been several times the logit lens readout, this diagnostic would not have been requested. It is therefore labelled an instrument-validity check triggered only under a negative result. Its legitimacy rests on the fact that OUTCOME AND STAY-OR-GO DECISION HAVE BEEN DECOUPLED IN ADVANCE: the terminal ruling was made before D-1 and cannot be overturned by it, so D-1 cannot be used to select a favourable stay-or-go conclusion and can only determine the CATEGORY of the negative.",
+
+ "what_d1_may_read": {
+  "permitted": [
+   "the external lenses already acquired and byte-verified in R-0, namely the positive control, depth test and negative control lenses from neuronpedia/jacobian-lens",
+   "the profiles already computed in R-1 and R-1b"
+  ],
+  "forbidden": ["lens_A", "lens_B", "anything belonging to the target"],
+  "note": "D-1 needs only the external lenses, so it can be completed without approaching the forbidden set at all"
+ },
+
+ "abort_rule": "if D-1 turns out to require reading lens_A or lens_B, or touching the target, D-1 is ABANDONED and the study closes as 'negative, category undetermined'",
+
+ "decision_rule_frozen_before_the_measurement": {
+  "note": "fixed now so the category is not chosen after seeing the numbers",
+  "negative_B_if": "the relative Frobenius distance ||J_l - I||_F / ||I||_F is small across most layers, indicating J is close to the identity",
+  "negative_A_if": "that distance is large across layers, so J is far from the identity and yet adds nothing readable",
+  "the_threshold": {
+   "value": 0.5,
+   "meaning": "a relative distance below 0.5 would mean J is closer to the identity than to a matrix unrelated to it",
+   "reference_point": "for a random matrix of matched norm the expected relative distance is approximately sqrt(2) = 1.414, since ||J - I||^2 = ||J||^2 + ||I||^2 for uncorrelated J and I of equal norm",
+   "rule": "median over layers below 0.5 supports negative-B; at or above 1.0 supports negative-A; between 0.5 and 1.0 is reported as INTERMEDIATE and the category is recorded as mixed rather than forced"
+  }
+ },
+
+ "claim_ceiling": "An instrument-validity diagnostic. It licenses no claim of any kind, and it cannot alter the terminal ruling."
+}

@@ -1,0 +1,43 @@
+{
+ "schema_version": "study5-eq2-terminal-ruling-v1",
+ "recorded_at_utc": "2026-08-28T15:45:00Z",
+ "phase": "R-1b close",
+ "ruled_by": "operator, in session, 2026-08-28",
+ "status": "TERMINAL",
+
+ "the_verdict": {
+  "eq2_determination": "NEGATIVE",
+  "statement": "The J-lens locator method did not yield a usable locating band under this implementation at this scale.",
+  "r2_authorised": false,
+  "lens_A_or_lens_B_to_be_read": false,
+  "target_to_be_touched": false
+ },
+
+ "how_the_literal_versus_substance_dispute_was_dissolved": {
+  "i_had_reported": "under OA-005's literal text the positive band [21] satisfies (i), (ii) and (iii), so it reads as valid, while its substance meets stop condition 2",
+  "the_ruling": "the dispute does not exist, and no criterion needs to move to settle it",
+  "the_argument_verbatim": "The R-0 ladder, committed BEFORE any measurement, defines the R-2 coverage threshold as 'the positive control's own band length minus 2, floored at 3'. At a band length of 1 the positive control cannot pass the threshold derived from itself. Therefore a 'valid band' means one that is USABLE FOR ITS REGISTERED DOWNSTREAM PURPOSE. A band that is unusable under the pre-registered downstream rule is not a valid band. This is not a new rule; all of it is already in bd8be7e0.",
+  "which_of_my_three_reasons_was_decisive": "reason 2, the self-contradictory calibration. Reasons 1 and 3 are corroborating.",
+  "stop_condition_2": "TRIGGERED"
+ },
+
+ "what_this_says_about_the_protocol": {
+  "statement_verbatim": "This is the answer EQ2 was designed to be able to give. EQ2's entire function was to adjudicate whether the construct holds before spending budget on the target; it adjudicated: it does not hold. The protocol worked.",
+  "budget_protected": "the R-2 allocation of 8 GPU-hours, and everything downstream of it, was not spent on an instrument that cannot measure"
+ },
+
+ "a_precedent_to_be_recorded_alongside_the_directionality_criterion": {
+  "statement_verbatim": "OA-005 was a post-hoc TIGHTENING, and it saved this study. Had the relaxed reading been accepted - that a late band satisfies 'mid-depth' - we would have entered R-2 with a method whose readout is INDISTINGUISHABLE FROM A PLAIN LOGIT LENS, and spent the target's budget on an instrument that measures nothing. A post-hoc tightening prevented a false positive.",
+  "the_general_lesson": "post-hoc is not automatically illegitimate; DIRECTION is what determines legitimacy. A post-hoc change that makes one's own conclusion easier to falsify is the opposite of p-hacking, and here it was the thing that caught the error.",
+  "recorded_with": "OD-017's directionality criterion, as a paired precedent"
+ },
+
+ "downstream_consequences_recorded_not_resolved_here": {
+  "p4": "P-4 was to use a J-lens-derived band to shrink the candidate feature pool. That path is UNAVAILABLE under this determination. P-4 needs another basis for localisation, or needs to be re-scoped.",
+  "the_prior_is_void": "the method memo's prior of 'layer 11-26, 16 layers' is refuted by external measurement and is withdrawn",
+  "study_5_cumulative_honest_picture": "EQ1 Q-4a FAIL, EQ2 NEGATIVE",
+  "publishability_verbatim": "This is a publishable negative methodological result, PROVIDED it is written exactly as it is. It must not be packaged."
+ },
+
+ "claim_ceiling": "A terminal adjudication of a construct. It licenses no claim about any model, and it is not a scientific finding."
+}
