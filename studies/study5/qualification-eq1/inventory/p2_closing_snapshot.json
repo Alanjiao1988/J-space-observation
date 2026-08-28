@@ -1,0 +1,193 @@
+{
+ "schema_version": "study5-eq1-azure-inventory-v1",
+ "captured_at_utc": "2026-08-28T04:09:15Z",
+ "read_only": true,
+ "control_plane_writes": 0,
+ "data_plane_writes": 0,
+ "sas_tokens_issued": 0,
+ "storage_keys_read": false,
+ "role_assignments_read_or_changed": 0,
+ "cloud": "AzureChinaCloud",
+ "subscription_last_four": "8845",
+ "subscription_salted_sha256": "salted:c5462da015ca01974a7d381390921860d7dc0606cb66fd7eba6ac304d3a79b04",
+ "tenant_salted_sha256": "salted:4b157c700e218e4c6f675f9271a71e4bd7aaef12c69612dfebfa2f10e88299a6",
+ "subscription_id_committed": false,
+ "tenant_id_committed": false,
+ "full_resource_ids_committed": false,
+ "resource_groups": [
+  {
+   "name": "J-space",
+   "location": "chinanorth3"
+  },
+  {
+   "name": "salted:2833d30829e580785bdf1b2a6aa5a439cac98bfea71e0c82061a9416a86f516c",
+   "location": "chinaeast3"
+  },
+  {
+   "name": "salted:f70ac4b60f4b897626580afe411f9599898dab3fb78b3db5cc2393926bb3c81c",
+   "location": "chinanorth3"
+  }
+ ],
+ "resource_group_count": 3,
+ "vm_count": 6,
+ "vms": [
+  {
+   "name": "a100-vm",
+   "resource_group": "J-space",
+   "size": "Standard_NC96ads_A100_v4",
+   "location": "chinaeast3",
+   "power_state": "VM running",
+   "in_registered_scope": true
+  },
+  {
+   "name": "cpuserver",
+   "resource_group": "J-space",
+   "size": "Standard_D16ds_v5",
+   "location": "chinanorth3",
+   "power_state": "VM running",
+   "in_registered_scope": true
+  },
+  {
+   "name": "salted:df1e99dc9946b1747f065f4c11deec43069c5289650259b83b7a8461a1a72374",
+   "resource_group": "salted:1b636c97ecda31e61bdf586b79259e2e4c579d429c5153560ef685fa9217502f",
+   "size": "Standard_NC24s_v3",
+   "location": "chinanorth3",
+   "power_state": "VM running",
+   "in_registered_scope": false
+  },
+  {
+   "name": "salted:0b7c9dc629ea526f1e6ef5db0c18eeb0b96e854817745144217700ec2df730f7",
+   "resource_group": "salted:1b636c97ecda31e61bdf586b79259e2e4c579d429c5153560ef685fa9217502f",
+   "size": "Standard_NC24s_v3",
+   "location": "chinanorth3",
+   "power_state": "VM running",
+   "in_registered_scope": false
+  },
+  {
+   "name": "salted:57dddda5f2e097dcab449af558b8dd5f8583c87f0603e6e3a528cb0e29334af0",
+   "resource_group": "salted:1b636c97ecda31e61bdf586b79259e2e4c579d429c5153560ef685fa9217502f",
+   "size": "Standard_NC24s_v3",
+   "location": "chinanorth3",
+   "power_state": "VM running",
+   "in_registered_scope": false
+  },
+  {
+   "name": "salted:d8141b31f468693d8e3d44b273b7ba6b71e5d20a8b7df548a9db81c985ea302e",
+   "resource_group": "salted:1b636c97ecda31e61bdf586b79259e2e4c579d429c5153560ef685fa9217502f",
+   "size": "Standard_NC24s_v3",
+   "location": "chinanorth3",
+   "power_state": "VM running",
+   "in_registered_scope": false
+  }
+ ],
+ "storage_account_count": 1,
+ "storage_accounts": [
+  {
+   "name": "s4fm11ca457e105b29b7",
+   "resource_group": "J-space",
+   "location": "chinaeast3",
+   "kind": "StorageV2",
+   "sku": "Standard_LRS",
+   "access_tier": "Hot",
+   "https_only": true,
+   "min_tls_version": "TLS1_2",
+   "allow_blob_public_access": false,
+   "status_of_primary": "available",
+   "container_count": 6,
+   "containers": [
+    {
+     "name": "handoff",
+     "public_access": "None",
+     "has_immutability_policy": false,
+     "has_legal_hold": false,
+     "deleted": false
+    },
+    {
+     "name": "logs",
+     "public_access": "None",
+     "has_immutability_policy": false,
+     "has_legal_hold": false,
+     "deleted": false
+    },
+    {
+     "name": "models",
+     "public_access": "None",
+     "has_immutability_policy": false,
+     "has_legal_hold": false,
+     "deleted": false
+    },
+    {
+     "name": "oci",
+     "public_access": "None",
+     "has_immutability_policy": false,
+     "has_legal_hold": false,
+     "deleted": false
+    },
+    {
+     "name": "runs",
+     "public_access": "None",
+     "has_immutability_policy": false,
+     "has_legal_hold": false,
+     "deleted": false
+    },
+    {
+     "name": "seals",
+     "public_access": "None",
+     "has_immutability_policy": false,
+     "has_legal_hold": false,
+     "deleted": false
+    }
+   ]
+  }
+ ],
+ "network_security_group_count": 3,
+ "network_security_groups": [
+  {
+   "name": "a100-nsg",
+   "location": "chinaeast3",
+   "rule_count": 2,
+   "rules": [
+    {
+     "name": "allow-ssh",
+     "priority": 1000,
+     "direction": "Inbound",
+     "access": "Allow",
+     "protocol": "Tcp",
+     "source_prefix_salted": "salted:97fc6fc447cd840ed178556e6aed859b6cfd79f878d6fddce7fec4bc8487f85f",
+     "destination_port": "22"
+    },
+    {
+     "name": "allow-ssh-study5-eq1",
+     "priority": 1010,
+     "direction": "Inbound",
+     "access": "Allow",
+     "protocol": "Tcp",
+     "source_prefix_salted": "salted:9e12d031c34857fbffc3ab9b65c749de3b88fd533ce58108a40ab78b85377a50",
+     "destination_port": "22"
+    }
+   ]
+  },
+  {
+   "name": "salted:a4a9d587b56762d7e6ebafd765e3e1b9f594455d2f482377bb0466502f03c1de",
+   "location": "chinanorth3",
+   "rule_count": 0,
+   "rules": []
+  },
+  {
+   "name": "cpuserver-nsg",
+   "location": "chinanorth3",
+   "rule_count": 1,
+   "rules": [
+    {
+     "name": "SSH",
+     "priority": 300,
+     "direction": "Inbound",
+     "access": "Allow",
+     "protocol": "TCP",
+     "source_prefix_salted": "salted:306ce0c8fab82a63b25a4ecc763211c3c80447dc77dde78bcc6432f609f959f8",
+     "destination_port": "22"
+    }
+   ]
+  }
+ ]
+}
