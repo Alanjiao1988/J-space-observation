@@ -7,6 +7,17 @@
  "verdict": "negative-A",
  "verdict_meaning_verbatim": "J departs substantially from the identity, and yet the J-lens readout is approximately equal to the plain logit lens readout. The Jacobian carries essentially no readable information beyond the unembedding in these models under this implementation. This is a finding about the models and the method as applied, not about our construction being degenerate.",
  "negative_B_is_excluded": true,
+ "SCOPE_CORRECTION_SEE_CLOSING_ADDENDA": {
+  "corrected_at_utc": "2026-08-28T23:00:00Z",
+  "source": "d1/closing_addenda.json, addenda 1 and 2",
+  "what_this_file_originally_overstated": "that EQ2 'DID adjudicate' and that the negative is therefore informative about the construct",
+  "the_two_corrections": [
+   "negative-A is a conclusion about the per-layer MEDIAN. Within the band itself the degenerate mechanism of B is genuinely operating: identity energy share reaches 0.749 at the last layer with alpha approximately 1.0, and the rank readout is invariant to scalar scaling, so J approximately alpha*I is equivalently degenerate there. The layers where condition (ii) failed are precisely the layers where J is closest to a scaled identity.",
+   "D-1 excluded identity-collapse. It did NOT exclude that our way of applying J diverges from the authors' intent, and NO PASSING POSITIVE CONTROL WAS EVER OBTAINED, so 'the method does not hold' and 'we did not drive it correctly' are indistinguishable within this study."
+  ],
+  "the_accurate_statement": "EQ2 adjudicated OUR EXECUTION of the construct. It did not adjudicate the construct itself.",
+  "the_terminal_determination_is_unchanged": "EQ2 NEGATIVE, D-1 category negative-A, R-2 not authorised"
+ },
 
  "the_numbers_that_exclude_negative_B": {
   "registered_thresholds": {
@@ -67,7 +78,8 @@
  "why_negative_B_would_have_been_the_alternative_and_is_not": {
   "negative_B_would_have_required": "J approximately the identity across layers, making the J-lens a plain logit lens by construction and rendering EQ2 unable to adjudicate",
   "what_was_found_instead": "J is far from the identity across most of the depth, particularly in the early and middle layers, and the effective rank is 19 to 24 percent of d_model rather than near-full or near-one",
-  "therefore": "EQ2 DID adjudicate. The negative is informative rather than vacuous."
+  "therefore": "the aggregate category is A rather than B",
+  "but_see_the_scope_correction_above": "this does NOT mean the construct itself was adjudicated; within the band the B mechanism is operating, and no passing positive control was obtained"
  },
 
  "od_016_retrospective": {

@@ -162,5 +162,17 @@
  "d1_meaning": "J departs substantially from the identity yet adds nothing readable over the unembedding; EQ2 DID adjudicate",
  "r2_authorised": false,
  "sealed_lenses_ever_read": false,
- "target_ever_touched": false
+ "target_ever_touched": false,
+ "sealed": true,
+ "sealed_at_utc": "2026-08-28T23:00:00Z",
+ "no_further_rounds": true,
+ "d1_scope_correction": "EQ2 adjudicated OUR EXECUTION of the construct, not the construct itself; no passing positive control was ever obtained",
+ "passing_positive_control_obtained": false,
+ "closing_addenda": "d1/closing_addenda.json",
+ "additional_prohibition": "must not claim the published lenses are defective",
+ "reserved_for_successors": [
+  "layer-21 residual",
+  "OD-016 lower fence",
+  "a passing positive control"
+ ]
 }

@@ -541,3 +541,97 @@ Budget: EQ2 **7.483 of 24**; cumulative **39.066 of 240**. **16.5 GPU-hours were
 not spent**, because the instrument was disqualified before the target run.
 
 New entries: **HB-003** (terminal), **OD-017**, **OA-005**, **D-1**. 65 tests.
+
+---
+
+# Closing addenda — recorded before sealing
+
+Documentation only. **No computation, no lens read, no GPU.** Every number below
+is read from artifacts already committed. The terminal determination is
+unchanged: **EQ2 NEGATIVE, D-1 negative-A, R-2 not authorised.**
+
+## 1. Negative-A is a conclusion about the **median**; inside the band, B is real
+
+The pre-registered rule decides on the median `‖J−I‖/‖I‖`, all three models are
+≥ 1.0, so **negative-A stands and the determination does not change**. But the
+depth profile must be printed beside it, or a reader will take "negative-A" to
+mean B was excluded *at every depth*, which is not what was measured.
+
+| layer | 0 | 18 | 21 | 23 | 26 |
+|---|---|---|---|---|---|
+| identity energy share | 0.004 | 0.169 | 0.469 | 0.640 | **0.749** |
+
+α ≈ **1.0** at layers 23–26 — and **the rank readout is invariant to scalar
+scaling**, so `J ≈ αI` and `J ≈ I` are equivalently degenerate here.
+
+> The determination is negative-A, on the basis of the per-layer median. But the
+> identity energy share climbs monotonically with depth, reaching 0.749 at the
+> final layer with α ≈ 1.0. **The layers at which condition (ii) failed are
+> precisely the layers at which `J` is closest to a scaled identity.** So this
+> negative is A in aggregate, while **within the band the degenerate mechanism of
+> B is genuinely operating**. The two do not conflict: the J-lens coincides with
+> the logit lens exactly where `J` approaches the identity, and differs from it
+> exactly where it does not. This is a description of the fitted Jacobians, not a
+> mechanistic explanation of the models.
+
+## 2. The third explanation D-1 did not — and could not — exclude
+
+D-1 excluded "`J ≈ I`, so it degenerates by construction". It did **not** exclude
+**that our way of applying `J` diverges from what the lens's authors intended.**
+
+The gap is narrow but real, because both ends of the pipeline are pinned:
+
+- it **can** read — the plain logit lens reached 0.0769, so the pipeline is not dead;
+- it **does not fabricate** — the matched-norm random-lens null is essentially zero;
+- **the unverified step is exactly the one under test** — how the Jacobian is applied.
+
+And the control that should have closed this **never passed**: the positive band
+was `[21]`, length 1, unusable against the R-0 ladder's floor of 3; the depth
+band was empty.
+
+> This study **never obtained a passing positive control**. Consequently "the
+> J-lens method does not hold" and "we did not drive the lens as its authors
+> intended" **are indistinguishable within this study**. The negative conclusion
+> is **strong about our execution and weak about the method itself.** Any
+> successor should first obtain a passing positive control before attempting to
+> adjudicate the method.
+
+**This corrects something I wrote.** I reported that "EQ2 *did* adjudicate; the
+negative is informative rather than vacuous." That overstated it: D-1 established
+only that the lenses are not identity-collapsed, not that our application of them
+was faithful. The accurate statement is **EQ2 adjudicated *our execution* of the
+construct, not the construct itself.**
+
+## 3. The gpt2 ratio of 1.750 is noise — sealed off now
+
+gpt2 has the **highest** identity energy share (27.8%) yet the **highest**
+J-over-logit ratio (1.750). Verified against the committed artifacts: that ratio
+is `0.007795` vs `0.004454` at n = **898**, i.e. **7 hits against 4**.
+(The note said n ≈ 910; 910 is the two Qwen models, gpt2's n is 898. The hit
+counts, 7 and 4, are exactly as stated.)
+
+> This must **not** be read as "the Jacobian contributes most strongly on gpt2",
+> nor as any pattern whatsoever. It is counting noise: seven hits against four.
+
+## Additional prohibition
+
+> It must not be claimed that the **published lenses are defective**. What was
+> measured is the result of **our use** of those external artifacts, and addendum
+> 2 explains that we cannot distinguish a problem with the artifacts from a
+> problem with our usage.
+
+## Reserved for successor studies — not in scope here
+
+1. **Layer-21 residual** — on the 7B, layers 13–21 have a plain logit lens
+   readrate of exactly 0.0000 while the J-lens is non-zero; only layer 21 clears
+   both the null and the logit lens, at ~12 hits. A candidate requiring
+   independent pre-registration; **not a finding of this study**.
+2. **OD-016's lower fence** — the retrospective confirmed its not firing was
+   *correct* here, since the lenses are not collapsed; but non-binding-below
+   remains a real weakness, and any study reusing that guard must fix it first.
+3. **A passing positive control** — see addendum 2; a precondition for any
+   adjudication of the method.
+
+---
+
+**EQ2 sealed. No further rounds.**

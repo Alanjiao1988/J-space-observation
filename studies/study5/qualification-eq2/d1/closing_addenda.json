@@ -1,0 +1,95 @@
+{
+ "schema_version": "study5-eq2-closing-addenda-v1",
+ "recorded_at_utc": "2026-08-28T23:00:00Z",
+ "phase": "EQ2 close, documentation only",
+ "recorded_by": "operator, in session, 2026-08-28",
+ "computation_performed": "none; every number below is read from artifacts already committed",
+ "lens_A_or_lens_B_read": false,
+ "target_touched": false,
+ "gpu_seconds": 0,
+ "may_be_used_to_reopen_any_round": false,
+
+ "terminal_state_unchanged": {
+  "eq2_determination": "NEGATIVE",
+  "d1_category": "negative-A",
+  "r2_authorised": false
+ },
+
+ "addendum_1_negative_A_is_a_conclusion_about_the_MEDIAN": {
+  "the_rule_was_correctly_applied": "the pre-registered rule decides on the median relative distance from the identity; all three models are at or above 1.0, so negative-A stands and the determination does not change",
+  "why_the_depth_profile_must_be_printed_beside_it": "without it a reader will take 'negative-A' to mean that B was excluded AT EVERY DEPTH, which is not what was measured",
+  "identity_energy_share_by_layer_positive_control": {
+   "0": 0.00407,
+   "18": 0.16892,
+   "21": 0.46876,
+   "23": 0.64010,
+   "26": 0.74868
+  },
+  "best_scaled_identity_alpha_layers_23_to_26": [1.0092, 1.0134, 1.0097, 0.9988],
+  "the_fact_that_makes_alpha_matter": "the rank readout is INVARIANT TO SCALAR SCALING, so under this measurement J approximately alpha*I and J approximately I are equivalently degenerate",
+  "verbatim": "The determination is negative-A, on the basis of the per-layer median. But the identity energy share climbs monotonically with depth, reaching 0.749 at the final layer with alpha approximately 1.0. THE LAYERS AT WHICH CONDITION (ii) FAILED ARE PRECISELY THE LAYERS AT WHICH J IS CLOSEST TO A SCALED IDENTITY. So this negative is A in aggregate, while WITHIN THE BAND the degenerate mechanism of B is genuinely operating. The two do not conflict: the J-lens coincides with the logit lens exactly where J approaches the identity, and differs from it exactly where it does not. This is a description of the fitted Jacobians, not a mechanistic explanation of the models."
+ },
+
+ "addendum_2_the_third_explanation_D1_did_not_and_cannot_exclude": {
+  "what_d1_did_exclude": "that J is approximately the identity and the lens therefore degenerates by construction",
+  "what_d1_did_not_exclude": "that OUR WAY OF APPLYING J does not match what the lens's authors intended",
+  "why_the_gap_is_narrow_but_real": {
+   "the_pipeline_can_read": "the plain logit lens reached a peak of 0.0769, so the pipeline is not dead",
+   "the_pipeline_does_not_fabricate": "the matched-norm random-lens null is essentially zero",
+   "the_unverified_step_is_the_one_under_test": "how the Jacobian is applied"
+  },
+  "the_control_that_should_have_closed_this_did_not_pass": {
+   "positive_control_final_band": [21],
+   "final_band_length": 1,
+   "usable_for_its_registered_downstream_purpose": false,
+   "downstream_floor_from_the_R0_ladder": 3,
+   "depth_test_final_band": [],
+   "so": "no passing positive control was ever obtained"
+  },
+  "verbatim_limitation": "This study NEVER OBTAINED A PASSING POSITIVE CONTROL. Consequently 'the J-lens method does not hold' and 'we did not drive the lens as its authors intended' ARE INDISTINGUISHABLE WITHIN THIS STUDY. The negative conclusion is strong about OUR EXECUTION and weak about THE METHOD ITSELF. Any successor study should first obtain a passing positive control before attempting to adjudicate the method.",
+  "this_corrects_something_i_wrote": {
+   "what_i_had_written": "'EQ2 DID adjudicate; the negative is informative rather than vacuous'",
+   "why_that_overstated_it": "D-1 established only that the lenses are not identity-collapsed. It did not establish that our application of them was faithful, and without a passing positive control that question is open.",
+   "the_accurate_statement": "EQ2 adjudicated OUR EXECUTION of the construct. It did not adjudicate the construct itself."
+  }
+ },
+
+ "addendum_3_the_gpt2_ratio_is_noise_and_is_sealed_off_now": {
+  "the_apparent_pattern": "gpt2 has the HIGHEST identity energy share of the three at 27.8 percent, yet gives the HIGHEST J-lens over logit-lens ratio at 1.750",
+  "why_it_is_noise": {
+   "j_lens_peak_readrate": 0.007795,
+   "logit_lens_peak_readrate": 0.004454,
+   "n": 898,
+   "j_lens_peak_hits": 7,
+   "logit_lens_peak_hits": 4,
+   "statement": "the ratio is 7 hits against 4 hits",
+   "note_on_n": "the operator's note said n is about 910; 910 is the count for the two Qwen models, and gpt2's is 898. The hit counts, 7 and 4, are exactly as stated."
+  },
+  "verbatim": "This must NOT be read as 'the Jacobian contributes most strongly on gpt2', nor as any pattern whatsoever. It is counting noise: seven hits against four."
+ },
+
+ "additional_prohibition": {
+  "added_to_the_existing_must_not_claim_list": true,
+  "verbatim": "It must not be claimed that the published lenses are defective. What was measured is the RESULT OF OUR USE of those external artifacts, and addendum 2 explains that we cannot distinguish a problem with the artifacts from a problem with our usage."
+ },
+
+ "reserved_for_successor_studies_not_in_scope_here": [
+  {
+   "id": "layer-21 residual",
+   "what": "on the 7B, layers 13 to 21 have a plain logit lens readrate of exactly 0.0000 while the J-lens is non-zero; only layer 21 clears both the null and the logit lens, at about 12 hits",
+   "status": "a candidate requiring independent pre-registration; it is NOT a finding of this study"
+  },
+  {
+   "id": "OD-016 lower fence",
+   "what": "the retrospective confirmed that its not firing was CORRECT here, because the lenses are not collapsed; but the fence being non-binding below remains a real weakness",
+   "status": "any study reusing that guard must fix it first"
+  },
+  {
+   "id": "a passing positive control",
+   "what": "see addendum 2",
+   "status": "a precondition for any adjudication of the method"
+  }
+ ],
+
+ "claim_ceiling": "Closing addenda to a construct adjudication. They license no claim of any kind, and nothing here is a scientific finding."
+}
