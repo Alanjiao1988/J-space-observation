@@ -1,0 +1,98 @@
+{
+ "schema_version": "study5-eq2-r0-official-readout-v1",
+ "phase": "R-0",
+ "step": "R0-001",
+ "question": "Does anthropics/jacobian-lens at the registered commit provide an official readout / kurtosis path? (adjudication ladder rung A-1)",
+ "package": {
+  "repo": "anthropics/jacobian-lens",
+  "commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+  "installed_version": "0.1.0",
+  "note": "the config.yaml published with the external lenses cites the repo as github.com/anthropics/jlens; that name returns 404 and the actual repository is anthropics/jacobian-lens, which is the one the authority pins"
+ },
+
+ "how_this_was_established": {
+  "1_installed_wheel": "every .py file in the installed package was searched for kurt, moment, excess, skew and scipy.stats",
+  "2_full_public_api": "jlens/__init__.py __all__ was enumerated in full",
+  "3_every_definition": "every def and class in every module was listed",
+  "4_repository_tree": "the repository tree at the registered commit was listed via the GitHub API, to catch anything present in the repo but absent from the wheel",
+  "5_documentation": "README.md, walkthrough.ipynb, data/experiments/README.md and data/evaluations/README.md were fetched at the registered commit and searched"
+ },
+
+ "answer": {
+  "official_kurtosis_path": "NOT PROVIDED",
+  "official_readout_path": "PROVIDED",
+  "therefore_A1_does_not_end_adjudication": true
+ },
+
+ "readout_path_that_is_provided": [
+  {
+   "function": "jlens.lens.JacobianLens.apply",
+   "file": "jlens/lens.py",
+   "defined_at_line": 146,
+   "readout_line": 213,
+   "readout_code": "lens_logits[layer] = model.unembed(residual).float().cpu()",
+   "returns": "raw logits, shape [n_positions, vocab_size]; no softmax anywhere in the call",
+   "logit_lens_baseline": "the same function with use_jacobian=False, guarded at line 211"
+  },
+  {
+   "function": "jlens.lens.JacobianLens.transport",
+   "file": "jlens/lens.py",
+   "defined_at_line": 135,
+   "code": "J_bar = self.jacobians[layer].to(residual.device); return residual @ J_bar.T"
+  },
+  {
+   "function": "jlens.vis.compute_slice, nested helper lens_logits",
+   "file": "jlens/vis.py",
+   "defined_at_line": 255,
+   "readout_lines": "255-260",
+   "code": "residual = activations[layer][0, start:].float(); if layer in lens.jacobians: residual = lens.transport(residual, layer); return model.unembed(residual).float().detach()",
+   "significance": "this is the library's own ANALYSIS readout, and it agrees exactly with apply(): raw logits, no softmax, no extra normalisation"
+  }
+ ],
+
+ "full_public_api_enumerated": [
+  "ActivationRecorder",
+  "HFLensModel",
+  "JacobianLens",
+  "Layout",
+  "LensModel",
+  "configure_logging",
+  "fit",
+  "from_hf",
+  "jacobian_for_prompt"
+ ],
+ "public_api_contains_no_statistical_function": true,
+
+ "search_result": {
+  "pattern": "kurt|moment|excess|skew|scipy.stats",
+  "matches_in_any_python_module": 0,
+  "matches_in_documentation": 0,
+  "the_only_readout_hits_were": [
+   "jlens/__init__.py line 3, a docstring",
+   "jlens/lens.py line 23, a docstring",
+   "jlens/data/slice_vis.html, a CSS class name for a UI element"
+  ]
+ },
+
+ "repository_versus_wheel": {
+  "checked": true,
+  "package_files_are_identical_in_size_to_the_installed_wheel": true,
+  "extra_paths_present_in_the_repo_but_not_the_wheel": [
+   "README.md",
+   "walkthrough.ipynb",
+   "tests/",
+   "data/evaluations/ (six labelled lens-quality sets)",
+   "data/experiments/ (eleven global-workspace prompt sets)",
+   "assets/"
+  ],
+  "none_of_them_implements_a_kurtosis_statistic": true
+ },
+
+ "what_this_means_for_the_ladder": {
+  "the_readout_is_not_in_dispute": "EQ1 already used apply() and the raw-logit readout, and the library's own analysis code confirms that path independently. Nothing about EQ1's readout path is contradicted here.",
+  "what_is_in_dispute_is_untouched_by_A1": "the AXIS along which excess kurtosis is taken. The library computes no moments at all, so adopting 'the official readout path' leaves the V-versus-D question exactly where it was.",
+  "conclusion": "A-1 is answered honestly as: readout PROVIDED, kurtosis NOT PROVIDED. Because A-1 can only end adjudication if it resolves the convention, and it does not, adjudication proceeds to A-2."
+ },
+
+ "claim_ceiling": "A source-code finding. It licenses no claim of any kind."
+}

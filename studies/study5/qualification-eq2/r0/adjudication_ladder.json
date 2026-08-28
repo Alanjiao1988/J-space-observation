@@ -1,0 +1,112 @@
+{
+ "schema_version": "study5-eq2-adjudication-ladder-v1",
+ "phase": "R-0",
+ "step": "R0-003",
+ "status": "COMMITTED BEFORE ANY CURVE IS COMPUTED",
+ "rule": "OD-012",
+ "frozen": true,
+ "may_not_be_changed_after_this_commit": true,
+
+ "why_this_is_committed_first": {
+  "statement": "Both lenses already exist and recomputation is cheap, so 'compute both conventions and keep the one with a band' is trivially available. OD-012 requires that to be blocked by construction rather than by intention.",
+  "structural_guarantees": [
+   "adjudication runs only on external control models",
+   "lens_A and lens_B are not read until the convention is committed and its hash recorded",
+   "a committed check will prove that every journal record referencing lens_A or lens_B carries a timestamp later than this commit"
+  ]
+ },
+
+ "rung_A1": {
+  "question": "does the official library provide a readout / kurtosis path?",
+  "answer": "readout PROVIDED, kurtosis NOT PROVIDED",
+  "evidence": "r0/official_readout_finding.json",
+  "does_it_end_adjudication": false,
+  "reasoning": "A-1 can only end adjudication if it resolves the convention. The library computes no moments anywhere, so adopting its readout path, which EQ1 already used and which the library's own analysis code confirms, leaves the vocabulary-versus-dataset axis question untouched.",
+  "outcome": "proceed to A-2"
+ },
+
+ "the_two_candidate_conventions": {
+  "V": {
+   "name": "vocabulary axis",
+   "definition": "for a fixed (position, layer), excess kurtosis over the vocabulary dimension of that readout",
+   "this_is_what_EQ1_computed": true
+  },
+  "D": {
+   "name": "dataset axis",
+   "definition": "for a fixed (position, layer), excess kurtosis of the readout logit collected across a large set of activations",
+   "implementation_frozen_here": "for a fixed (position, layer) and a fixed vocabulary entry v, collect the logit for v across N activations, take the excess kurtosis of that N-sample distribution, then average over vocabulary entries and positions. The distribution whose kurtosis is measured therefore runs along the DATASET axis, which is the reading the paper's phrase 'across a large data set of activations' admits and which V does not implement.",
+   "N": 200,
+   "N_source": "the same heldout row count EQ1 used, so the two conventions see identical activations"
+  },
+  "both_conventions_consume_the_identical_readout": "jlens apply() raw logits; the conventions differ only in which axis the moment is taken along"
+ },
+
+ "rung_A2": {
+  "rule": "adopt the convention that reproduces the externally published band on the positive control AND produces no band on the negative control",
+  "how_the_external_band_is_located": {
+   "source": "the official repository's own definitions, recovered in r0/external_method.json",
+   "procedure": [
+    "use the six official lens-eval sets, 551 labelled items, each carrying `intermediates` (ground-truth readable content) and a source-fixed readout position",
+    "for each layer, read out with the external lens through the official path and rank the vocabulary",
+    "score each item at each layer by the minimum rank over its intermediates, or over the registered synonym set for order-ops",
+    "readrate(layer) = fraction of items whose score is <= k"
+   ],
+   "k": 1,
+   "k_justification": "k = 1 is not chosen by us. It is the official Hit definition verbatim: 'a target token is a hit if it appears at lens rank 1'.",
+   "k_companion_reported_but_not_decisive": 10,
+   "external_band": "the longest contiguous run of layers whose readrate is at least half of the maximum readrate, computed on the positive control",
+   "why_half_of_maximum": "this is the same shape rule EQ1 used for C2. It is scale-free and contains no absolute threshold, so it cannot be tuned; the quantity it is applied to is externally defined and label-driven."
+  },
+  "decision_rule": {
+   "correct_convention": "the one whose kurtosis band on the positive control overlaps the rank-derived external band with the higher Jaccard index, provided it also produces no band on the negative control",
+   "discrimination_requirement": "the two conventions must give materially different answers; if both match equally, A-2 cannot discriminate and A-3 is used",
+   "if_neither_matches": "hard blocker 7. Return to R-0. Do NOT proceed to T."
+  }
+ },
+
+ "rung_A3": {
+  "used_only_if": "A-2 cannot discriminate",
+  "rule": "adopt the convention reproducing the paper's published qualitative signature",
+  "signature_verbatim": "near zero through the first third of the layers, increases beginning around a third of the way through the depth, and falls in the last few layers",
+  "operationalisation_frozen_now": {
+   "L1": "mean kurtosis over the first third of layers is the LOWEST of the three thirds",
+   "L2": "the maximum lies in the middle third",
+   "L3": "the mean over the final three layers is below the maximum",
+   "all_three_must_hold": true
+  },
+  "why_this_cannot_be_tuned_by_us": "the signature is a three-landmark description published externally and fixed before any of our numbers existed; the operationalisation above adds no threshold, only the ordering the sentence already states"
+ },
+
+ "thresholds_for_R2": {
+  "source_rule": "authority section 6: band criteria and thresholds for R-2 must come from the external method and be calibrated on the positive control, never on T",
+  "criteria_form": "EQ1's C1 to C5 unchanged in form: interior maximum, contiguity, coverage, cross-fit agreement, exceeds a matched-norm null",
+  "calibration_procedure_frozen_now": {
+   "C1": "unchanged: argmax must not sit on either endpoint of the measured curve",
+   "C2": "unchanged: half-height threshold, longest contiguous run",
+   "C3_coverage": "the required band length is set to the band length the POSITIVE CONTROL exhibits under the winning convention, minus a tolerance of 2 layers, floored at 3. It is NOT EQ1's 7.",
+   "C4": "unchanged: Jaccard >= 0.70 and argmax separation <= 3, applied across EQ1's two independent half-lenses",
+   "C5_margin": "the required margin over the matched-norm null is set to half of the margin the POSITIVE CONTROL exhibits under the winning convention. It is NOT EQ1's 1.0.",
+   "direction_of_these_changes_is_not_predictable_in_advance": "the calibration may make C3 and C5 stricter or looser than EQ1's values; both directions are accepted in advance, and the calibrated numbers are committed before T is touched"
+  },
+  "explicitly_not_permitted": [
+   "calibrating any threshold on T",
+   "adjusting a threshold after seeing T's curve",
+   "reusing EQ1's 7-layer and 1.0-margin values as if they had been externally derived"
+  ],
+  "eq1_thresholds_are_not_being_relaxed": "EQ1's Q-4a verdict stands under EQ1's own frozen numbers and is not recomputed. The calibrated numbers here govern a DIFFERENT question asked under a different, externally validated convention."
+ },
+
+ "negative_control_stop": {
+  "rule": "if gpt2-small shows a band under the selected convention, the convention is not discriminative",
+  "consequence": "adjudication fails, terminal state STUDY5_EQ2_NEGATIVE_CONTROL_CONTAMINATED, do not proceed to T",
+  "not_a_licence_to_switch": "failing here does NOT permit picking the other convention on the basis of T's result"
+ },
+
+ "what_would_falsify_the_whole_exercise": {
+  "statement": "If neither V nor D reproduces the external band on the positive control, then our readout path has a deeper defect and nothing about T may be inferred or measured.",
+  "this_is_registered_as_hard_blocker_7": true,
+  "the_positive_control_is_the_load_bearing_test": "it is the same architecture, same scale family, same corpus and same library as T, fitted by an independent party"
+ },
+
+ "claim_ceiling": "This is an adjudication rule. It licenses no claim of any kind, and no result it can produce is a scientific finding."
+}

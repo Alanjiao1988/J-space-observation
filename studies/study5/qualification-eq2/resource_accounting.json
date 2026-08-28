@@ -1,0 +1,102 @@
+{
+ "schema_version": "study5-eq2-resource-accounting-v1",
+ "authority_section": "7",
+ "updated_at_utc": "2026-08-28T06:00:00Z",
+ "phase": "R-0",
+ "invocation_complete": false,
+
+ "budget_measurement_definition": {
+  "definition_id": "OD-001",
+  "inherited_from": "STUDY5_EQ1",
+  "statement": "The registered ceiling is measured in actively used GPU-hours. VM wall-clock hours and allocated GPU-hours are reported separately and are not bound by that ceiling.",
+  "three_quantities_remain_separately_reported": true,
+  "no_quantity_may_substitute_for_another": true
+ },
+
+ "quantities": {
+  "vm_wall_clock_hours": {
+   "definition": "elapsed hours during which each VM was in the running power state",
+   "bound_by_the_ceiling": false,
+   "note": "accrues by operator decision; measured and reported, never used to argue for stopping anything",
+   "a100_vm_hours_this_invocation": "UNRESOLVED_UNTIL_CLOSE",
+   "cpuserver_hours_this_invocation": "UNRESOLVED_UNTIL_CLOSE",
+   "training_group_v100_hours_this_invocation": "UNRESOLVED_UNTIL_CLOSE"
+  },
+  "allocated_gpu_hours": {
+   "definition": "visible GPU count multiplied by the hours each GPU host was running",
+   "bound_by_the_ceiling": false,
+   "gpu_count_a100_vm": 4,
+   "gpu_count_training_group": 16,
+   "value_this_invocation": "UNRESOLVED_UNTIL_CLOSE"
+  },
+  "actively_used_gpu_hours": {
+   "definition": "GPU-seconds actually consumed by work this invocation performed, from the per-step gpu_seconds field of the journal, divided by 3600",
+   "bound_by_the_ceiling": true,
+   "is_the_registered_budget_quantity": true,
+   "value_this_invocation": 0.0,
+   "ceiling": 12,
+   "remaining": 12.0,
+   "source": "studies/study5/qualification-eq2/journal/*.jsonl, field gpu_seconds"
+  }
+ },
+
+ "per_phase_actively_used_gpu_hours": {
+  "R-0": 0.0,
+  "R-1": null,
+  "R-2": null,
+  "R-3": null
+ },
+ "per_phase_registered_ceilings": {
+  "R-0": 0,
+  "R-1": 6,
+  "R-2": 4,
+  "R-3": 0,
+  "total": 12,
+  "units": "actively used GPU-hours"
+ },
+
+ "r0_used_zero_accelerator_hours": {
+  "value": true,
+  "why": "R-0 is source reading, network acquisition and rule commitment; none of it touches a GPU"
+ },
+
+ "network_transfer": {
+  "external_lens_bytes_fetched_by_the_vm": 933184004,
+  "control_weight_bytes_fetched_by_the_vm": "IN PROGRESS",
+  "documentation_bytes_fetched_by_the_vm": 141301,
+  "file_bytes_fetched_by_the_operator_workstation": 0,
+  "operator_constraint_satisfied": true,
+  "operator_constraint": "all downloads are performed by the cloud VM, not by the operator's PC",
+  "consumed_accelerator_hours": 0.0,
+  "endpoint_note": "huggingface.co is unreachable from the GPU host and raw.githubusercontent.com times out; hf-mirror.com and api.github.com are used, and every file is verified against the digest the ORIGIN published at the pinned revision, so the transport cannot substitute bytes without detection"
+ },
+
+ "paid_resources": {
+  "a100_vm": {"safe_name": "a100-vm", "power_state": "running", "reconfigured": false, "stopped_by_this_invocation": false},
+  "cpuserver": {"safe_name": "cpuserver", "power_state": "running", "reconfigured": false, "stopped_by_this_invocation": false},
+  "training_group_v100": {
+   "count": 4,
+   "sku": "Standard_NC24s_v3",
+   "gpus_each": 4,
+   "power_state": "running",
+   "reconfigured": false,
+   "touched_by_this_invocation": false,
+   "nsg_rules_added_to_reach_them": 0,
+   "note": "authority section 3.6 requires these to remain running, remain idle and remain untouched; their correct role in this study is to stay unchanged"
+  }
+ },
+
+ "cost_reduction_actions_proposed": 0,
+ "cost_reduction_actions_performed": 0,
+ "vms_stopped_or_deallocated": 0,
+ "spend_interrupted_by_this_invocation": false,
+
+ "bytes_written": {
+  "blob_bytes_written_this_invocation": 0,
+  "blobs_written": 0,
+  "containers_created": 0,
+  "existing_blobs_overwritten": 0
+ },
+
+ "claim_ceiling": "A resource record. It licenses no claim of any kind."
+}

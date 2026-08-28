@@ -1,0 +1,97 @@
+{
+ "schema_version": "study5-eq2-r0-external-method-v1",
+ "phase": "R-0",
+ "step": "R0-002",
+ "purpose": "Recover, from PRIMARY sources only, the method the external work uses to identify the workspace band. No second-hand heuristic is used.",
+
+ "primary_sources": [
+  {
+   "source": "anthropics/jacobian-lens @ 581d398613e5602a5af361e1c34d3a92ea82ba8e",
+   "paths": ["data/evaluations/README.md", "data/experiments/README.md"],
+   "git_blob_sha1": {
+    "data/evaluations/README.md": "588217f8bd7a05110202a6af9bad02f1d0cda176",
+    "data/experiments/README.md": "7dc8656d24520944ec9f5ec2d3f4795dd583a4f8"
+   },
+   "why_primary": "this is the method's own repository at the commit the authority pins"
+  },
+  {
+   "source": "neuronpedia/jacobian-lens @ 0731326edff4ae730ffc5356fe1a4728c748b3a6",
+   "paths": ["*/jlens/Salesforce-wikitext/config.yaml", "*_convergence.csv"],
+   "why_primary": "the published configs and convergence traces of the very lenses used as controls"
+  }
+ ],
+
+ "verbatim_definitions_from_the_official_repository": {
+  "lens_readout": "at each (layer, token position) the Jacobian lens returns a ranked list of vocabulary tokens.",
+  "workspace_band": "the contiguous mid-network layer range where workspace content is read; experiments report over this band, not individual layers.",
+  "hit": "a target token is a hit if it appears at lens rank 1 at any (layer, position) in the band over the scored span.",
+  "lens_quality_metric": "pass@k = mean over items of the fraction of intermediates whose min-over-layers lens rank <= k."
+ },
+
+ "the_decisive_observation": {
+  "statement": "The external method does not identify the band with kurtosis at all. It identifies it by WHERE LABELLED CONTENT IS READ, using vocabulary RANKS.",
+  "consequence": "the band on the positive control can be located by a procedure that is entirely external, uses ground-truth labels published with the method, and contains no threshold chosen by us",
+  "why_this_is_stronger_than_matching_the_paper_prose": "A-3 would have had us match a three-landmark qualitative description by eye. The rank-based procedure yields a band with a numeric location, on the same checkpoint we hold, and can be computed rather than judged."
+ },
+
+ "labelled_evaluation_sets_acquired": {
+  "note": "each item carries `intermediates`, the ground-truth concept token(s) that should be readable, plus a readout position rule fixed by the source",
+  "sets": [
+   {"slug": "association", "items": 102, "git_blob_sha1": "03a712344700b1f2bba8960995e998f04ded21e3", "readout_position": "the final prompt token, the closing period"},
+   {"slug": "multihop", "items": 93, "git_blob_sha1": "2d2d6e7bdf6fb63597ce11895dc55f5391b5f86f", "readout_position": "the token immediately preceding `target`; `target` is not itself scored"},
+   {"slug": "multilingual", "items": 107, "git_blob_sha1": "4aec3f4d32e1b4d0ed959ffe6b1ae27fcfeae650", "readout_position": "the token immediately preceding `target`"},
+   {"slug": "order-ops", "items": 55, "git_blob_sha1": "977e8ceac8d8030a21d4fcb8af4914d943c90ca9", "readout_position": "the token immediately preceding `target`; rank is the min over single-token synonyms"},
+   {"slug": "poetry", "items": 98, "git_blob_sha1": "5e06287e7fa49325506180aa4d2bb2a26ba29eaf", "readout_position": "the last newline token, end of line 1 of the couplet"},
+   {"slug": "typo", "items": 96, "git_blob_sha1": "7354faf759764c5837285ae6d35ac854b89135e6", "readout_position": "the final prompt token, the last tokenizer fragment of the misspelling"}
+  ],
+  "total_items": 551
+ },
+
+ "external_fit_parameters_recovered_from_the_published_configs": {
+  "library": "anthropics/jacobian-lens via Neuronpedia run-all-fit-lens.py",
+  "corpus": "Salesforce/wikitext, wikitext-103-raw-v1, split train, text field text, max_chars 2000",
+  "max_seq_len": 128,
+  "dim_batch": 128,
+  "dtype": "bfloat16",
+  "target_layer": null,
+  "target_layer_meaning": "null means the library default, the final layer, which is what EQ1 also used",
+  "compile": true,
+  "trust_remote_code": false,
+  "stop_at_delta": 0.002,
+  "n_prompts_requested": 1000,
+  "per_model": {
+   "qwen2.5-7b-it": {"prompts_fitted": 485, "final_identity_distance": 0.578094, "final_mean_rel_change": 0.00181395, "n_valid_positions": 111},
+   "gpt2-small": {"prompts_fitted": 277, "final_identity_distance": 1.305569, "final_mean_rel_change": 0.00159806},
+   "qwen3-1.7b": {"prompts_fitted": 466, "final_identity_distance": 0.52469, "final_mean_rel_change": 0.00183261}
+  }
+ },
+
+ "comparability_with_eq1_own_fit": {
+  "same_library": true,
+  "same_library_commit": true,
+  "same_corpus_family": "Salesforce/wikitext wikitext-103-raw-v1 train, which is exactly the corpus EQ1 fixed",
+  "same_max_seq_len": 128,
+  "same_skip_first": "the external convergence.csv records n_valid_positions = 111 for seq_len 128, which is 128 - 16 - 1; that is the library default skip_first of 16 with the final position dropped, identical to EQ1",
+  "same_target_layer_rule": "library default final layer in both",
+  "differences_recorded_honestly": [
+   "external used dim_batch 128, EQ1 used 8; dim_batch changes only how many output dimensions share a backward pass, not the estimator",
+   "external used compile=true, EQ1 did not; this is a speed setting",
+   "external early-stopped at prompts_fitted 485 (positive control) under stop_at_delta 0.002; EQ1 fitted a fixed 600 rows per half with no early stop",
+   "external fitted ONE lens per model; EQ1 fitted two independent half-lenses in order to have a cross-fit stability check, which the external work does not have"
+  ],
+  "final_identity_distance_comparison": {
+   "external_positive_control": 0.578094,
+   "our_corresponding_value": "NOT COMPUTED YET",
+   "why_not": "computing it requires reading lens_A or lens_B. OD-012 forbids reading either until the convention is committed, and hard blocker 5 makes an early read a stop. It is therefore deferred to R-2, where it will be reported beside the external value.",
+   "this_deferral_is_deliberate": true
+  }
+ },
+
+ "what_this_licenses": {
+  "a_band_location_can_be_measured_on_the_positive_control": true,
+  "using_only_external_labels_and_an_external_rank_rule": true,
+  "no_threshold_of_ours_enters_that_measurement": true
+ },
+
+ "claim_ceiling": "A method recovery from primary sources. It licenses no claim of any kind."
+}
