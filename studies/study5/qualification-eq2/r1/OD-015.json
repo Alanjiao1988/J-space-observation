@@ -1,0 +1,83 @@
+{
+ "schema_version": "study5-eq2-registration-v1",
+ "registration_id": "OD-015",
+ "recorded_at_utc": "2026-08-28T06:30:00Z",
+ "phase": "R-1",
+ "kind": "band decision rule for the rank profile",
+ "status": "COMMITTED BEFORE ANY RANK PROFILE IS COMPUTED",
+ "required_by": "authority R-1 step 2, which says the decision rule is committed before the computation",
+
+ "the_profile": {
+  "quantity": "readrate(layer) = fraction of scored intermediates whose lens rank at that layer is <= k",
+  "k_primary": 1,
+  "k_primary_justification": "verbatim from the official Hit definition: 'a target token is a hit if it appears at lens rank 1'. It is not a value we chose.",
+  "k_companion": [5, 10],
+  "k_companion_role": "reported for completeness; not decisive",
+  "per_set_and_pooled": "one profile per evaluation set plus one pooled profile over all scored intermediates",
+  "pooled_profile_is_the_one_the_band_is_derived_from": true,
+  "why_pooled": "the six sets probe different content; pooling avoids letting a single set's idiosyncrasy define the band, and the per-set profiles are still reported so any such idiosyncrasy is visible"
+ },
+
+ "readout_positions_executed_verbatim_never_unified": {
+  "multihop": "the token immediately preceding `target`; `target` itself is not scored",
+  "multilingual": "the token immediately preceding `target`; `target` itself is not scored",
+  "order-ops": "the token immediately preceding `target`; `target` itself is not scored",
+  "poetry": "the last newline token, end of line 1 of the couplet",
+  "association": "the final prompt token, the closing period",
+  "typo": "the final prompt token, the last tokenizer fragment of the misspelling",
+  "order_ops_special_rule": "each intermediate is a key expanded to a synonym set (numbers to digit and word forms, operations to symbol and word forms); the rank at each layer is the MINIMUM over the single-token synonyms",
+  "these_are_not_simplified_or_harmonised": true
+ },
+
+ "band_rule": {
+  "definition": "the longest contiguous run of layers whose pass@1 readrate is at least half of the profile's maximum readrate",
+  "why_half_of_maximum": "scale-free, contains no absolute threshold, and is the same shape rule EQ1 used for C2. Applied here to an externally defined, label-driven quantity rather than to a statistic of our own construction.",
+  "interior_requirement": "the band's argmax must not sit on either endpoint of the layer range, since a maximum at an endpoint is what a monotone trend looks like, not a band",
+  "degenerate_case": "if the maximum readrate is 0, no content is readable at any layer and NO band exists; this is reported as such and is not rescued by lowering k"
+ },
+
+ "roles": {
+  "positive_control": {
+   "model": "Qwen/Qwen2.5-7B-Instruct @ a09a35458c702b33eeacc393d103063234e8bc28",
+   "lens": "neuronpedia qwen2.5-7b-it/jlens/Salesforce-wikitext lens, LFS sha256 3b3ab44cd67c2ad1f26e9f66eb269db31289b6328585b0459a47e6d3814cba29",
+   "role": "its derived band is the EXTERNAL REFERENCE BAND for this invocation"
+  },
+  "negative_control": {
+   "model": "openai-community/gpt2 @ 607a30d783dfa663caf39e06633721c8d4cfcd7e",
+   "lens": "neuronpedia gpt2-small lens, LFS sha256 d1800a1335ada089ef2e1ec0e4bd4d5bd61e6011eacc31f8618fdb3d10aae762",
+   "expectation_registered_now": "under a discriminative method it should NOT show a band",
+   "if_it_does": "the method is not discriminative; stop, do not proceed to the target; terminal state STUDY5_EQ2_NEGATIVE_CONTROL_CONTAMINATED"
+  },
+  "depth_test": {
+   "model": "Qwen/Qwen3-1.7B @ 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+   "lens": "neuronpedia qwen3-1.7b lens, LFS sha256 6fcc79011bd921ffd87612255e2e99950a124fa519470ee44ebaf161c39be9d6",
+   "question": "does a 1.7B model show a band",
+   "if_yes": "'28 layers is too shallow' is refuted by external data",
+   "if_no": "this says nothing about whether the target has a band, and must not be read as supporting the shallowness explanation either"
+  }
+ },
+
+ "kurtosis_adjudication": {
+  "computed_on": "the positive control only",
+  "conventions": ["V, vocabulary axis, as EQ1 computed", "D, dataset axis"],
+  "criterion": "whichever convention's band agrees better with the rank-derived reference band",
+  "agreement_measure": "Jaccard index of the two layer sets",
+  "if_neither_agrees": {
+   "action": "record that kurtosis is not a valid locator under this method",
+   "do_not_stop": true,
+   "rank_method_continues_as_primary": true
+  },
+  "kurtosis_never_overrides_rank": true
+ },
+
+ "what_is_frozen_by_this_commit": [
+  "k = 1 as the primary readrate threshold",
+  "the half-of-maximum contiguous-run band rule",
+  "the interior-argmax requirement",
+  "the per-set readout positions, executed verbatim",
+  "the pooled profile as the band source",
+  "the Jaccard agreement measure for V versus D"
+ ],
+
+ "claim_ceiling": "A decision rule. It licenses no claim of any kind."
+}

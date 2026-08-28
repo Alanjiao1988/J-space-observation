@@ -1,0 +1,58 @@
+{
+ "schema_version": "study5-eq2-registration-v1",
+ "registration_id": "OD-014",
+ "recorded_at_utc": "2026-08-28T06:25:00Z",
+ "phase": "R-1",
+ "kind": "behavioural qualification rule for the target",
+ "status": "COMMITTED IN R-1, EXECUTED IN R-2",
+ "committed_before_any_rank_measurement_on_the_target": true,
+
+ "the_confounder_being_closed": {
+  "statement": "The six official evaluation sets are general-knowledge and language tasks. The target is a mathematics-distilled reasoning model. If the target's rank profile is poor, there are two very different explanations and the rank profile alone cannot separate them.",
+  "explanation_1": "the target has no readable mid-depth band",
+  "explanation_2": "the target does not compute these particular intermediates at all, so there is nothing at any depth for the lens to read",
+  "why_this_must_be_settled_first": "explanation 2 is a statement about the INSTRUMENT'S APPLICABLE RANGE. Reporting a poor rank profile as though it bore on the band, without excluding it, would attribute an instrument limitation to the model."
+ },
+
+ "the_rule": {
+  "1_measure_behavioural_ability": "for each of the six evaluation sets, measure whether the target can perform the task at all, using the REGISTERED NORMAL REGIME: native chat template, full chain of thought, and the registered scorer",
+  "2_no_retired_gate": {
+   "prohibition": "the retired zero-CoT raw-byte gate must NOT be reused",
+   "specifically_barred_numbers": "EV-0016's 2/93, 2/55 and 5/90 measured on the 1.5B",
+   "why": "those numbers were produced under the retired gate. They are very likely artifacts OF THAT GATE rather than properties of the model, and they must not be carried into this invocation as a prior about the target.",
+   "consequence": "no expectation about the target's behavioural ability is imported from them, in either direction"
+  },
+  "3_rank_and_behaviour_are_different_measurements": {
+   "rank": "read out at the position the official README specifies, in a single forward pass; NO generation is required",
+   "behaviour": "requires generation under the normal regime",
+   "each_follows_its_own_rules": true,
+   "note": "a model can therefore have a readable intermediate at a position without producing a correct final answer, and the two measurements are kept separate rather than collapsed"
+  },
+  "4_floor": {
+   "registered_floor": 0.15,
+   "units": "fraction of items in a given evaluation set answered correctly under the normal regime",
+   "scope": "applied per evaluation set",
+   "if_below_the_floor": "the rank method has NO adjudicating power for the target on that set",
+   "what_that_is": "a finding about the applicable range of the instrument",
+   "what_that_is_not": [
+    "it is not evidence about the presence or absence of a band",
+    "it is not evidence about J-space",
+    "it may not be written up as either"
+   ]
+  }
+ },
+
+ "why_the_floor_is_0_15": {
+  "reasoning": "The floor has to be low enough that it only excludes sets the target genuinely cannot do, and high enough that a set passed purely by chance cannot clear it. These are open-vocabulary generation tasks over a 150k-token vocabulary, so the chance rate is effectively zero and any floor above zero is already far above chance. 0.15 was chosen as a value that admits a set the model performs poorly but non-trivially on, while excluding a set it essentially cannot do.",
+  "committed_before_any_measurement_on_the_target": true,
+  "not_derived_from_any_observed_target_number": true
+ },
+
+ "reporting_requirement": {
+  "sets_that_clear_the_floor": "rank results are reported and are adjudicative",
+  "sets_that_fall_below": "rank results are reported as descriptive only, explicitly labelled as outside the instrument's demonstrated applicable range for this model",
+  "both_are_reported": "a set is never silently dropped"
+ },
+
+ "claim_ceiling": "A qualification rule for an instrument. It licenses no claim of any kind, and no result it produces is a scientific finding."
+}

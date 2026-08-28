@@ -1,0 +1,67 @@
+{
+ "schema_version": "study5-eq2-operator-amendment-v1",
+ "amendment_id": "OA-003",
+ "recorded_at_utc": "2026-08-28T06:20:00Z",
+ "phase": "R-1",
+ "approved_by": "operator, in session, 2026-08-28",
+ "amends": "authority section 6, the adjudication ladder",
+ "made_before_any_curve_or_rank_profile_on_the_target_existed": true,
+ "made_before_any_lens_A_or_lens_B_read": true,
+
+ "what_prompted_it": {
+  "finding": "R-0 established from primary sources that the external method does NOT locate the workspace band with excess kurtosis. It locates it with lens RANK: the official repository defines a Hit as the target token appearing at lens rank 1, and defines lens quality as pass@k over the min-over-layers rank of labelled intermediates.",
+  "status_of_that_finding": "a methodological discovery about the instrument, not a result about any model",
+  "when": "before any curve or rank profile on the target existed, and before either sealed lens was read"
+ },
+
+ "the_revision": {
+  "a2_already_pointed_here": "A-2 said 'adopt the convention that reproduces the externally published band'. Since the externally published band is defined by the rank evaluation and not by kurtosis, A-2 already pointed at the rank method. This amendment makes the precedence explicit rather than redirecting A-2.",
+  "primary_band_locator": {
+   "method": "official rank profile",
+   "inputs": "the official evaluation sets and the official metric, pass@k over min-over-layers lens rank",
+   "applies_to": "the positive control, the negative control, the depth test, and the target"
+  },
+  "secondary_descriptive_statistic": {
+   "method": "excess kurtosis",
+   "role": "descriptive and corroborating only",
+   "the_V_versus_D_criterion_becomes": "which convention agrees with the rank-derived band on the positive control"
+  },
+  "verdict_on_the_target": {
+   "primary": "given by the rank method",
+   "kurtosis": "corroboration only, never the deciding quantity"
+  },
+  "rationale_verbatim": "The official method takes precedence over our reconstruction of the paper's footnote."
+ },
+
+ "budget_change": {
+  "eq2_ceiling_before": 12,
+  "eq2_ceiling_after": 24,
+  "units": "actively used GPU-hours",
+  "sub_ceilings": {"R-0": 0, "R-1": 10, "R-2": 8, "R-3": 0},
+  "accounting_basis_unchanged": "OD-001",
+  "cumulative_across_the_programme_at_this_point": "31.583 of 240",
+  "note": "the global 240 ceiling is untouched and remains the only hard stop"
+ },
+
+ "explicitly_unchanged": {
+  "eq1_q4a_fail": "not retracted, not re-judged; its frozen numbers are not relaxed",
+  "eq1_artifacts": "byte-identical",
+  "OD_012": "still in force. BOTH the rank method and the kurtosis convention must be committed with their hashes before lens_A or lens_B is read.",
+  "OD_013": "still in force. EQ2 still tests item 1 only, the readout convention and locator method. The corpus is not touched and no scale variable is manipulated.",
+  "OD_011": "still in force for every check added this round"
+ },
+
+ "what_this_amendment_does_not_do": [
+  "it does not relax any EQ1 threshold",
+  "it does not re-open EQ1's verdict",
+  "it does not authorise touching the corpus or any scale variable",
+  "it does not permit reading the sealed lenses any earlier"
+ ],
+
+ "a_consequence_worth_stating_plainly": {
+  "statement": "If neither kurtosis convention agrees with the rank-derived band, that does NOT stop the invocation. It records that kurtosis is not a valid locator under this method, and the rank method continues as the primary locator.",
+  "why_this_matters": "it removes the incentive to find agreement, because the exercise proceeds either way"
+ },
+
+ "claim_ceiling": "A method-precedence amendment. It licenses no claim of any kind."
+}
