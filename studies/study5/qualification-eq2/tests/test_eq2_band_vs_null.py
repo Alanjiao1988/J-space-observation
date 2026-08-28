@@ -104,21 +104,47 @@ def test_a_strong_mid_depth_band_is_detected() -> None:
     assert result["band"] == list(range(12, 20))
 
 
-def test_a_band_touching_the_last_layer_is_rejected_as_not_mid_depth() -> None:
+def test_a_band_touching_the_last_layer_is_still_a_band_if_its_peak_is_interior() -> None:
+    """The registered rule constrains the ARGMAX, not the extent (DC-005).
+
+    Here the significant run reaches the last layer but its peak sits inside, so
+    the registered criterion accepts it. The stricter extent reading is still
+    reported, and this test pins the difference so it cannot drift again.
+    """
+
     rates = [0.001] * N_LAYERS
     for layer in range(20, N_LAYERS):
         rates[layer] = 0.15
+    rates[24] = 0.30  # interior peak
+    rates[26] = 0.05  # falls at the end but stays above the null
     result = bvn.extract_band(profile(rates), flat_nulls(0.002), TRIALS)
-    assert result["raw_longest_significant_run"]
-    assert result["mid_depth"] is False
+    assert result["raw_longest_significant_run"][-1] == N_LAYERS - 1
+    assert result["argmax_interior"] is True
+    assert result["band_exists"] is True
+    assert result["extent_interior"] is False
+    assert result["band_exists_under_stricter_extent_reading"] is False
+
+
+def test_a_monotone_run_peaking_at_the_last_layer_is_rejected() -> None:
+    """What the registered rule is actually for: a peak at the endpoint is a
+    trend, not a band."""
+
+    rates = [0.001] * N_LAYERS
+    for layer in range(20, N_LAYERS):
+        rates[layer] = 0.05 + 0.01 * (layer - 20)
+    result = bvn.extract_band(profile(rates), flat_nulls(0.002), TRIALS)
+    assert result["band_peak_layer"] == N_LAYERS - 1
+    assert result["argmax_interior"] is False
     assert result["band_exists"] is False
 
 
-def test_a_band_touching_the_first_layer_is_rejected() -> None:
+def test_a_run_peaking_at_the_first_layer_is_rejected() -> None:
     rates = [0.001] * N_LAYERS
     for layer in range(0, 8):
-        rates[layer] = 0.15
+        rates[layer] = 0.05
+    rates[0] = 0.20
     result = bvn.extract_band(profile(rates), flat_nulls(0.002), TRIALS)
+    assert result["band_peak_layer"] == 0
     assert result["band_exists"] is False
 
 

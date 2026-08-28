@@ -1,0 +1,69 @@
+{
+ "schema_version": "study5-eq2-convention-commitment-v1",
+ "phase": "R-1",
+ "step": "R1-CONVENTION-COMMIT",
+ "recorded_at_utc": "2026-08-28T14:45:00Z",
+ "status": "THE OD-012 BOUNDARY RECORD",
+ "purpose": "Commit the single adjudicated readout convention. Only after this record may lens_A and lens_B be read.",
+
+ "selected_convention": "D",
+ "selected_convention_name": "dataset axis",
+ "definition": "for a fixed (position, layer) and a fixed vocabulary entry, collect that logit across many activations and take the excess kurtosis of that distribution, then average over vocabulary entries",
+
+ "rejected_convention": "V",
+ "rejected_convention_name": "vocabulary axis",
+ "rejected_convention_note": "this is the convention EQ1 computed",
+
+ "how_it_was_decided": {
+  "criterion": "registered in OD-015 and OA-004 before any curve existed: whichever convention's band agrees better with the rank-derived band on the positive control, by Jaccard index",
+  "rank_derived_band": [21, 22, 23, 24, 25, 26],
+  "rank_band_provenance": "derived by the official rank method against a matched-norm random-lens null, per OA-004",
+  "convention_V_band": [2, 3],
+  "convention_V_jaccard": 0.0,
+  "convention_D_band": [20, 21, 22, 23, 24, 25],
+  "convention_D_jaccard": 0.7142857142857143,
+  "margin": "0.714 against 0.000; the two conventions do not merely differ in degree, they point at opposite ends of the network",
+  "adjudicated_entirely_on_an_external_control": true,
+  "the_target_played_no_part_in_this_decision": true
+ },
+
+ "the_shape_that_decided_it": {
+  "convention_D_curve_landmarks": {
+   "near_zero_or_negative_region": "layers 8 to 17, ranging from 0.0057 down to -0.2606",
+   "rise_begins": 18,
+   "peak": {"layer": 25, "excess_kurtosis": 2.3820},
+   "sharp_fall_at_the_last_source_layer": {"layer": 26, "excess_kurtosis": 0.1289}
+  },
+  "convention_V_curve_landmarks": {
+   "maximum": {"layer": 0, "excess_kurtosis": 2.2324},
+   "shape": "highest at the very first layers, no interior structure aligned with readability"
+  },
+  "honest_note_on_the_published_signature": {
+   "published": "near zero through the first third of the layers, increases beginning around a third of the way through the depth, and falls in the last few layers",
+   "what_D_actually_shows": "the near-zero region sits in the MIDDLE, layers 8 to 17, not in the first third; layers 0 to 7 are around 0.5 to 1.6. The rise and the terminal fall are reproduced; the position of the flat region is not.",
+   "assessment": "partial agreement, reported as partial rather than as a match"
+  }
+ },
+
+ "what_this_means_for_EQ1": {
+  "permitted_reading_per_authority_section_8": "EQ1 reconstructed the paper's footnote incorrectly. EQ1's Q-4a FAIL is attributed to an IMPLEMENTATION DEFECT, not to the model.",
+  "forbidden_reading_per_authority_section_8": "this is NOT a retraction of EQ1's FAIL; EQ1's record stands unchanged",
+  "eq1_artifacts_remain_byte_identical": true,
+  "eq1_thresholds_are_not_relaxed": true
+ },
+
+ "od_012_effect": {
+  "before_this_record": "lens_A and lens_B may not be read",
+  "after_this_record": "R-2 may read them",
+  "guard_state_at_the_time_of_this_record": "0 lens-reading records in the journal",
+  "the_guard_will_be_re_run_at_close": "to prove every lens-reading record is later than this one"
+ },
+
+ "what_is_still_NOT_authorised_by_this_record": [
+  "reading lens_A or lens_B before R-2 begins",
+  "any measurement on the target",
+  "any claim about J-space"
+ ],
+
+ "claim_ceiling": "A convention commitment. It licenses no claim of any kind, and it is not a scientific result."
+}

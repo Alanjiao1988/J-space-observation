@@ -253,3 +253,96 @@ was not touched.
 running, idle and untouched; 0 NSG rules, 0 containers, 0 SAS, 0 storage keys.
 
 New entries: **HB-002**. No DC, no IMG.
+
+---
+
+## R-1 續 — OA-004 lifts HB-002, convention **D** committed
+
+### Step A — non-vacuity, proven before any real profile was judged
+
+All three OA-004 revision-3 cases pass: a random lens's own profile, pure noise,
+and an all-zero profile each yield **no band**. The gate runs on every invocation
+of the tool, not only when asked for.
+
+### Step B — the matched-norm null changes everything
+
+The five random-lens replicates per model read **essentially nothing**: peak
+pass@1 of `0.000000` on every positive and negative replicate, and `0.001099`
+(one hit in 910) on two of five depth replicates. That is a far cleaner null than
+gpt2, exactly as the diagnosis predicted.
+
+| | positive (7B-It) | depth (1.7B) | negative (gpt2) |
+|---|---|---|---|
+| significant layers | 21–26 | 20–26 | **none** |
+| band (registered rule) | **[21…26]** | **[20…26]** | **[]** |
+| peak | 0.0846 @ L25 | 0.0758 @ L24 | 0.0078 @ L9 |
+| null ceiling | 0.004204 | 0.006198 | 0.004260 |
+
+**The negative control now holds.** gpt2's best lower bound is `0.003781` against
+a null ceiling of `0.004260` — it does **not** clear the null at any layer. HB-002
+is lifted on the merits, not by moving a threshold.
+
+### DC-005 — I had silently substituted a stricter rule of my own
+
+All three models first returned "no band", which was inconsistent enough to look
+at the code rather than the data. OD-015 registered that **the band's argmax**
+must not sit on an endpoint. My implementation required **the band's entire
+extent** not to touch an endpoint — strictly stronger, and never registered.
+
+Under my unregistered rule the positive control gets no band, which fires
+registered stop condition 2 and would have **terminated the invocation for a
+reason I invented**.
+
+Corrected to the registered rule, with the stricter reading kept as a labelled
+secondary diagnostic. This is not cherry-picking, for a checkable reason: **the
+negative control is clean under both readings** — zero significant layers either
+way — so the correction does not rescue it. It only restores the committed
+criterion for the positive and depth models.
+
+**A concern the correction does not resolve, stated plainly:** the positive
+band is layers 21–26 of source layers 0–26 — the **last quarter** of the network.
+It is a *late* band, not a mid-depth one. With a near-zero null, anything above
+≈0.4% readrate is significant, so the run extends to wherever readability has not
+yet collapsed. Readrate does fall sharply at L26 (0.0846 → 0.0319) but still
+clears 0.0042. The published description says the rise begins "about a third of
+the way through"; observed onset is ≈¾ of depth. Whether a late band satisfies
+the intent of "mid-depth" is the operator's call, not mine.
+
+### Step C — **convention D wins decisively**
+
+| convention | band | Jaccard vs rank band [21–26] |
+|---|---|---|
+| **V** — vocabulary axis, *EQ1's* | [2, 3] | **0.0000** |
+| **D** — dataset axis | [20…25] | **0.7143** |
+
+The two conventions do not merely differ in degree — they point at **opposite
+ends of the network**. Convention D's curve is near zero or negative through
+layers 8–17, rises from 18, peaks at **2.3820 @ L25**, and falls sharply to
+**0.1289 @ L26**.
+
+Honest note: D's flat region sits in the **middle** (layers 8–17), not in the
+first third as the published text describes; layers 0–7 run 0.5–1.6. The rise
+and the terminal fall are reproduced, the position of the flat region is not.
+Reported as **partial** agreement.
+
+Adjudicated **entirely on the external positive control**. The target played no
+part.
+
+**What this means for EQ1**, in the authority's own words: EQ1 reconstructed the
+paper's footnote incorrectly, and its `Q-4a FAIL` is attributable to an
+**implementation defect rather than to the model**. It is **not** a retraction —
+EQ1's record stands unchanged and its artifacts stay byte-identical.
+
+### OD-012 boundary
+
+`convention_commitment.json`, sha256 `a58be822…`, is the boundary record. The
+guard now reports **PASS** with **0 lens-reading records** — `lens_A` and
+`lens_B` have still never been read, and the target has not been touched.
+
+### R-1 resources
+
+**6.0** actively used GPU-hours of the R-1 ceiling of 10; cumulative **37.583 of
+240**. Both VMs and the four `TRAINING`-group V100 machines remain running, idle
+and untouched.
+
+New entries: **DC-005**. HB-002 lifted. 53 tests passing.

@@ -3,14 +3,14 @@
  "study_id": "STUDY5_EQ2",
  "namespace": "studies/study5/qualification-eq2/",
  "kind": "construct adjudication",
- "lifecycle_state": "STUDY5_EQ2_R1_STOPPED_NEGATIVE_CONTROL_BAND_UNDER_REGISTERED_RULE",
+ "lifecycle_state": "STUDY5_EQ2_R1_COMPLETE_CONVENTION_D_COMMITTED_AWAITING_R2",
  "lifecycle_state_is_registered_terminal": false,
  "terminal": false,
  "resumable": true,
  "is_a_scientific_result": false,
  "confirmation_authorized": false,
- "current_phase": "R-1 stopped at step 3",
- "next_phase": "none without an operator decision on HB-002",
+ "current_phase": "R-1 complete",
+ "next_phase": "R-2, apply convention D to EQ1 sealed lenses (requires operator release)",
  "authority": {
   "path": "studies/study5/prompts/study5_eq2_construct_adjudication_authority.md",
   "sha256": "63e4751573586d5ed7c8242d7fcaf1b1d6cb3f3232eb60ec46b0bcde795df894",
@@ -68,7 +68,7 @@
  },
  "budget": {
   "ceiling_actively_used_gpu_hours": 24,
-  "consumed": 1.0,
+  "consumed": 6.0,
   "phase_ceilings": {
    "R-0": 0,
    "R-1": 10,
@@ -88,21 +88,49 @@
  },
  "claim_ceiling": "EQ2 is construct adjudication. No state it can reach is a scientific result.",
  "hard_blockers": [
-  "HB-002"
+  "HB-002 (lifted by OA-004)"
  ],
  "r1_progress": {
-  "external_identity_distance_distribution": "done, n=37",
+  "external_identity_distance_distribution": "done, n=37, median 0.578094",
   "tolerance_registered": "OD-016",
   "rank_profiles_computed": [
    "positive",
    "negative",
    "depth"
   ],
-  "band_derivation": "done",
-  "stop_condition_1_fired": true,
-  "kurtosis_adjudication_step4": "NOT RUN due to the stop",
-  "convention_selected": false,
+  "oa004_non_vacuity_gate": "PASSED all three cases",
+  "null_replicates_per_model": 5,
+  "band_positive": [
+   21,
+   22,
+   23,
+   24,
+   25,
+   26
+  ],
+  "band_depth": [
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26
+  ],
+  "band_negative": [],
+  "negative_control_significant_layers": 0,
+  "negative_control_holds": true,
+  "convention_selected": "D",
+  "convention_commitment_sha256": "a58be822094226232a757bc52799cafa53105e4e4c1e86b5d82638750566e71d",
+  "convention_V_jaccard": 0.0,
+  "convention_D_jaccard": 0.7142857142857143,
   "sealed_lenses_read": false,
+  "od012_guard": "PASS, 0 lens-reading records",
   "target_touched": false
- }
+ },
+ "disclosed_corrections": [
+  "DC-003",
+  "DC-004",
+  "DC-005"
+ ]
 }

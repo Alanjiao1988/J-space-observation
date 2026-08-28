@@ -1,0 +1,37 @@
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights: 100%|██████████| 339/339 [00:00<00:00, 4552.30it/s]
+  association    scored=99    pass@1=0.0000
+  multihop       scored=94    pass@1=0.0000
+  multilingual   scored=414   pass@1=0.0000
+  order-ops      scored=109   pass@1=0.0000
+  poetry         scored=98    pass@1=0.0000
+  typo           scored=96    pass@1=0.0000
+  replicate 0: peak@1=0.000000  scored=910
+  association    scored=99    pass@1=0.0000
+  multihop       scored=94    pass@1=0.0000
+  multilingual   scored=414   pass@1=0.0000
+  order-ops      scored=109   pass@1=0.0000
+  poetry         scored=98    pass@1=0.0000
+  typo           scored=96    pass@1=0.0000
+  replicate 1: peak@1=0.000000  scored=910
+  association    scored=99    pass@1=0.0000
+  multihop       scored=94    pass@1=0.0000
+  multilingual   scored=414   pass@1=0.0000
+  order-ops      scored=109   pass@1=0.0000
+  poetry         scored=98    pass@1=0.0000
+  typo           scored=96    pass@1=0.0000
+  replicate 2: peak@1=0.000000  scored=910
+  association    scored=99    pass@1=0.0000
+  multihop       scored=94    pass@1=0.0000
+  multilingual   scored=414   pass@1=0.0000
+  order-ops      scored=109   pass@1=0.0000
+  poetry         scored=98    pass@1=0.0000
+  typo           scored=96    pass@1=0.0000
+  replicate 3: peak@1=0.000000  scored=910
+  association    scored=99    pass@1=0.0000
+  multihop       scored=94    pass@1=0.0000
+  multilingual   scored=414   pass@1=0.0000
+  order-ops      scored=109   pass@1=0.0000
+  poetry         scored=98    pass@1=0.0000
+  typo           scored=96    pass@1=0.0000
+  replicate 4: peak@1=0.000000  scored=910
+EQ2-CHECK-NULL-PROFILES-positive PASSED

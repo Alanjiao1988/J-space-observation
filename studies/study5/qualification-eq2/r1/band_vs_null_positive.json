@@ -1,0 +1,294 @@
+{
+ "band": [
+  21,
+  22,
+  23,
+  24,
+  25,
+  26
+ ],
+ "raw_longest_significant_run": [
+  21,
+  22,
+  23,
+  24,
+  25,
+  26
+ ],
+ "band_length": 6,
+ "band_peak_layer": 25,
+ "argmax_interior": true,
+ "argmax_interior_is_the_registered_criterion": true,
+ "extent_interior": false,
+ "extent_interior_is_a_secondary_diagnostic_only": true,
+ "extent_interior_note": "reported per DC-005; an earlier implementation used this stricter reading as the criterion, which was never registered",
+ "band_exists": true,
+ "band_exists_under_stricter_extent_reading": false,
+ "significant_layers": [
+  21,
+  22,
+  23,
+  24,
+  25,
+  26
+ ],
+ "n_significant_layers": 6,
+ "trials": 910,
+ "confidence": 0.95,
+ "null_replicates": 5,
+ "per_layer": [
+  {
+   "layer": 0,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 1,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 2,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 3,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 4,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 5,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 6,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 7,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 8,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 9,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 10,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 11,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 12,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 13,
+   "readrate": 0.001098901098901099,
+   "hits": 1,
+   "real_lower_bound": 0.0001940093723268553,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 14,
+   "readrate": 0.002197802197802198,
+   "hits": 2,
+   "real_lower_bound": 0.0006029236888231712,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 15,
+   "readrate": 0.002197802197802198,
+   "hits": 2,
+   "real_lower_bound": 0.0006029236888231712,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 16,
+   "readrate": 0.001098901098901099,
+   "hits": 1,
+   "real_lower_bound": 0.0001940093723268553,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 17,
+   "readrate": 0.0,
+   "hits": 0,
+   "real_lower_bound": 0.0,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 18,
+   "readrate": 0.001098901098901099,
+   "hits": 1,
+   "real_lower_bound": 0.0001940093723268553,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 19,
+   "readrate": 0.002197802197802198,
+   "hits": 2,
+   "real_lower_bound": 0.0006029236888231712,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 20,
+   "readrate": 0.004395604395604396,
+   "hits": 4,
+   "real_lower_bound": 0.001710652491838013,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": false
+  },
+  {
+   "layer": 21,
+   "readrate": 0.013186813186813187,
+   "hits": 12,
+   "real_lower_bound": 0.007559262648656275,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": true
+  },
+  {
+   "layer": 22,
+   "readrate": 0.031868131868131866,
+   "hits": 29,
+   "real_lower_bound": 0.022278937567263797,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": true
+  },
+  {
+   "layer": 23,
+   "readrate": 0.07912087912087912,
+   "hits": 72,
+   "real_lower_bound": 0.06330003596640367,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": true
+  },
+  {
+   "layer": 24,
+   "readrate": 0.08351648351648351,
+   "hits": 76,
+   "real_lower_bound": 0.0672445271894977,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": true
+  },
+  {
+   "layer": 25,
+   "readrate": 0.08461538461538462,
+   "hits": 77,
+   "real_lower_bound": 0.06823296018933932,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": true
+  },
+  {
+   "layer": 26,
+   "readrate": 0.031868131868131866,
+   "hits": 29,
+   "real_lower_bound": 0.022278937567263797,
+   "null_ceiling": 0.0042036381514704985,
+   "significant": true
+  }
+ ],
+ "reason": "a contiguous run significantly exceeds the matched-norm random-lens null, and its peak is interior",
+ "role": "positive",
+ "rule": "OA-004",
+ "supersedes": "OD-015",
+ "non_vacuity": {
+  "rule": "OA-004 revision 3",
+  "trials": 900,
+  "seed": 20260828,
+  "null_replicates": 5,
+  "cases": {
+   "random_lens_own_profile": {
+    "band_exists": false,
+    "band": [],
+    "n_significant_layers": 0,
+    "must_be": "no band",
+    "passed": true
+   },
+   "pure_noise_profile": {
+    "band_exists": false,
+    "band": [],
+    "n_significant_layers": 0,
+    "must_be": "no band",
+    "passed": true
+   },
+   "all_zero_profile": {
+    "band_exists": false,
+    "band": [],
+    "n_significant_layers": 0,
+    "must_be": "no band",
+    "passed": true
+   }
+  },
+  "all_passed": true,
+  "meaning": "the criterion is not vacuous: it does not manufacture a band from a random lens, from noise, or from an empty profile",
+  "proven_before_any_real_profile_was_judged": true
+ },
+ "claim_ceiling": "A band extraction. It licenses no claim of any kind."
+}

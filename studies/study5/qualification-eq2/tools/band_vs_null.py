@@ -32,10 +32,23 @@ CONFIDENCE = 0.95
 Z = 1.959963984540054  # two-sided 95%
 MIN_NULL_REPLICATES = 5
 
-#: Mid-depth requirement: the band must not begin at the very first layer nor
-#: end at the very last, since a run touching an endpoint is what a monotone
-#: trend looks like rather than a band.
-def is_mid_depth(band: list[int], layers: list[int]) -> bool:
+#: The REGISTERED interiority requirement, from OD-015 and retained by OA-004:
+#: "the band's argmax must not sit on either endpoint of the layer range".
+#: It constrains the ARGMAX, not the band's whole extent. See DC-005: an earlier
+#: version of this file constrained the extent instead, which is strictly
+#: stronger and was never registered.
+def argmax_is_interior(band: list[int], readrates: dict[int, float], layers: list[int]) -> bool:
+    if not band:
+        return False
+    peak_layer = max(band, key=lambda l: readrates[l])
+    return layers[0] < peak_layer < layers[-1]
+
+
+def extent_is_interior(band: list[int], layers: list[int]) -> bool:
+    """Secondary diagnostic only, NOT the registered criterion.
+
+    Reported so the stricter reading stays visible, per DC-005.
+    """
     if not band:
         return False
     return band[0] > layers[0] and band[-1] < layers[-1]
@@ -126,14 +139,26 @@ def extract_band(
         )
 
     band = longest_contiguous_run(flags, layers)
-    mid_depth = is_mid_depth(band, layers)
+    readrates = {int(p["layer"]): float(p["readrate"]) for p in real_profile}
+    argmax_interior = argmax_is_interior(band, readrates, layers)
+    extent_interior = extent_is_interior(band, layers)
+    peak_layer = max(band, key=lambda l: readrates[l]) if band else None
 
     return {
-        "band": band if mid_depth else [],
+        "band": band if argmax_interior else [],
         "raw_longest_significant_run": band,
-        "band_length": len(band) if mid_depth else 0,
-        "mid_depth": mid_depth,
-        "band_exists": bool(band) and mid_depth,
+        "band_length": len(band) if argmax_interior else 0,
+        "band_peak_layer": peak_layer,
+        "argmax_interior": argmax_interior,
+        "argmax_interior_is_the_registered_criterion": True,
+        "extent_interior": extent_interior,
+        "extent_interior_is_a_secondary_diagnostic_only": True,
+        "extent_interior_note": (
+            "reported per DC-005; an earlier implementation used this stricter "
+            "reading as the criterion, which was never registered"
+        ),
+        "band_exists": bool(band) and argmax_interior,
+        "band_exists_under_stricter_extent_reading": bool(band) and extent_interior,
         "significant_layers": [p["layer"] for p in per_layer if p["significant"]],
         "n_significant_layers": sum(flags),
         "trials": trials,
@@ -141,9 +166,10 @@ def extract_band(
         "null_replicates": len(null_profiles),
         "per_layer": per_layer,
         "reason": (
-            "band significantly exceeds the matched-norm random-lens null"
-            if (band and mid_depth)
-            else "no contiguous mid-depth run clears the null ceiling"
+            "a contiguous run significantly exceeds the matched-norm random-lens "
+            "null, and its peak is interior"
+            if (band and argmax_interior)
+            else "no contiguous run with an interior peak clears the null ceiling"
         ),
     }
 

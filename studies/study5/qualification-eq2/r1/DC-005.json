@@ -1,0 +1,59 @@
+{
+ "schema_version": "study5-eq2-disclosed-correction-v1",
+ "correction_id": "DC-005",
+ "phase": "R-1",
+ "step": "R1-008",
+ "recorded_at_utc": "2026-08-28T14:30:00Z",
+ "severity": "an unregistered rule change that would have fired a stop condition",
+ "self_caught": true,
+ "caught_before_it_was_reported_as_a_result": true,
+
+ "what_happened": {
+  "registered_requirement_verbatim": "the band's argmax must not sit on either endpoint of the layer range, since a maximum at an endpoint is what a monotone trend looks like, not a band",
+  "registered_in": "OD-015, and carried forward unchanged by OA-004 which says the mid-depth and contiguity shape requirements are retained",
+  "what_i_actually_implemented": "def is_mid_depth(band, layers): return band[0] > layers[0] and band[-1] < layers[-1]",
+  "the_difference": "the registered rule constrains the ARGMAX. My implementation constrains the BAND'S ENTIRE EXTENT. The second is strictly stronger: a band whose peak is comfortably interior is still rejected if the significant run happens to reach an endpoint.",
+  "how_it_surfaced": "all three models returned band_exists = false while all three had large contiguous significant runs, which was inconsistent enough to look at the code rather than the data"
+ },
+
+ "why_it_matters_here_specifically": {
+  "consequence": "under my unregistered rule the positive control gets NO band, which fires registered stop condition 2 - 'the positive control does not yield a mid-depth contiguous band, the method does not hold, do not proceed to the target'",
+  "so_the_deviation_would_have_terminated_the_invocation": true,
+  "and_it_would_have_done_so_for_a_reason_i_invented": true
+ },
+
+ "the_two_readings_side_by_side": {
+  "registered_rule_argmax_interior": {
+   "positive": {"argmax": 25, "interior": true, "band": [21, 22, 23, 24, 25, 26], "band_exists": true},
+   "depth": {"argmax": 24, "interior": true, "band": [20, 21, 22, 23, 24, 25, 26], "band_exists": true},
+   "negative": {"significant_layers": [], "band_exists": false}
+  },
+  "my_unregistered_stricter_rule_extent_interior": {
+   "positive": {"band_exists": false, "reason": "the significant run reaches layer 26, the last source layer"},
+   "depth": {"band_exists": false, "reason": "same"},
+   "negative": {"band_exists": false, "reason": "no significant layers at all"}
+  }
+ },
+
+ "the_correction": {
+  "action": "apply the REGISTERED rule, and additionally report extent-interiority as a labelled secondary diagnostic so the stricter reading stays visible",
+  "why_this_is_not_cherry_picking": {
+   "point_1": "the registered rule is what was registered. Applying an unregistered stricter rule that I introduced by accident is not conservatism, it is substituting my own criterion for the committed one.",
+   "point_2": "the decisive property - that the NEGATIVE CONTROL IS CLEAN - is identical under both readings. gpt2 has ZERO significant layers, so it has no band under either rule. The correction therefore does not rescue the negative control; that was already fixed by OA-004's matched-norm null.",
+   "point_3": "the correction only affects whether the positive and depth models get a band, and it does so by restoring the committed criterion rather than by relaxing it after seeing an unwelcome answer.",
+   "point_4": "both readings are reported, so a reader can apply either."
+  }
+ },
+
+ "a_substantive_concern_that_the_correction_does_not_resolve": {
+  "statement": "Under the registered rule the positive control's band is layers 21 to 26 out of source layers 0 to 26. That is the last quarter of the network. It is a LATE band, not a mid-depth band in any natural sense of the word.",
+  "why_this_happens": "the matched-norm random-lens null is very close to zero, so its 95 percent upper bound is only about 0.0042. Any layer whose readrate exceeds roughly 0.4 percent is therefore significant, and the significant run extends to wherever readability has not yet fallen below that. At layer 26 the readrate has fallen sharply, from 0.0846 at layer 25 to 0.0319, but 0.0319 still clears 0.0042.",
+  "the_published_signature_says": "increases beginning around a third of the way through the depth",
+  "observed_onset": "layer 21 of 0 to 26, which is about three quarters of depth",
+  "our_own_prior_said": "layer 11 to 26",
+  "assessment": "the observed region is significantly later than both the published description and our own prior. This is recorded in r1/forward_record.json and is reported as a finding about the measurement, not resolved by this correction.",
+  "who_decides_whether_a_late_band_satisfies_the_intent_of_mid_depth": "the operator; this invocation reports the numbers under both readings and does not settle it"
+ },
+
+ "claim_ceiling": "A disclosure of an implementation deviation. It licenses no claim of any kind."
+}
