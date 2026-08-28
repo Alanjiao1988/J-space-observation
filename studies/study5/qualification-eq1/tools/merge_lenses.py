@@ -71,17 +71,41 @@ def merge_one_half(shard_paths: list[Path], role: str, out_dir: Path) -> dict:
 
     merged = JacobianLens.merge(shards)
 
-    # Independent recomputation of the same weighted mean, so the merge is not
-    # verified by the function that produced it.
+    # Two separate checks, because they answer different questions.
+    #
+    # 1. Bookkeeping: replicate merge()'s arithmetic exactly - same float32
+    #    precision, same accumulation order - written independently here. This
+    #    must be EXACTLY 0. It catches a wrong shard set, wrong n_prompts
+    #    weighting or a wrong total, which are the errors that would silently
+    #    corrupt the lens.
+    # 2. Numerical accuracy: a float64 reference. This is NOT expected to be 0,
+    #    because merge() accumulates in float32; it bounds the rounding error
+    #    rather than asserting its absence. Reporting it as though it should be
+    #    zero would be reporting a float32 sum as if it were exact.
     n_total = sum(s.n_prompts for s in shards)
-    recompute_max_abs = 0.0
+    bookkeeping_max_abs = 0.0
+    float64_reference_max_abs = 0.0
     for layer in merged.source_layers:
+        replicated = sum(s.jacobians[layer] * s.n_prompts for s in shards) / n_total
+        bookkeeping_max_abs = max(
+            bookkeeping_max_abs,
+            (replicated - merged.jacobians[layer]).abs().max().item(),
+        )
+
         acc = torch.zeros_like(merged.jacobians[layer], dtype=torch.float64)
         for s in shards:
             acc += s.jacobians[layer].double() * s.n_prompts
         acc /= n_total
-        diff = (acc - merged.jacobians[layer].double()).abs().max().item()
-        recompute_max_abs = max(recompute_max_abs, diff)
+        float64_reference_max_abs = max(
+            float64_reference_max_abs,
+            (acc - merged.jacobians[layer].double()).abs().max().item(),
+        )
+
+    if bookkeeping_max_abs != 0.0:
+        raise RuntimeError(
+            f"half {role}: independent recomputation of the merge differs by "
+            f"{bookkeeping_max_abs}; expected exactly 0"
+        )
 
     lens_path = out_dir / f"lens_{role}.pt"
     # float32, not the fp16 default, so the round trip is exact and the saved
@@ -107,7 +131,16 @@ def merge_one_half(shard_paths: list[Path], role: str, out_dir: Path) -> dict:
         "lens_sha256": sha256_file(lens_path),
         "lens_bytes": lens_path.stat().st_size,
         "save_load_roundtrip_max_abs_diff": roundtrip_max_abs,
-        "shard_merge_vs_independent_recompute_max_abs_diff": recompute_max_abs,
+        "shard_merge_vs_independent_recompute_max_abs_diff": bookkeeping_max_abs,
+        "shard_merge_vs_independent_recompute_note": (
+            "float32, replicating merge()'s precision and accumulation order; "
+            "asserted to be exactly 0"
+        ),
+        "shard_merge_vs_float64_reference_max_abs_diff": float64_reference_max_abs,
+        "shard_merge_vs_float64_reference_note": (
+            "NOT expected to be 0: merge() accumulates in float32, so this "
+            "bounds the rounding error rather than asserting its absence"
+        ),
         "lens": merged,
     }
 
@@ -185,7 +218,8 @@ def main() -> int:
         print(
             f"half {role}: n={h['n_prompts_total']} "
             f"roundtrip={h['save_load_roundtrip_max_abs_diff']} "
-            f"merge_vs_recompute={h['shard_merge_vs_independent_recompute_max_abs_diff']}"
+            f"bookkeeping={h['shard_merge_vs_independent_recompute_max_abs_diff']} "
+            f"float64_ref={h['shard_merge_vs_float64_reference_max_abs_diff']:.3e}"
         )
     print("P2-CHECK-MERGE-STABILITY PASSED")
     return 0
