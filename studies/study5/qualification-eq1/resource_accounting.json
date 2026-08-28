@@ -1,8 +1,8 @@
 {
  "schema_version": "study5-eq1-resource-accounting-v1",
  "authority_section": "9.3",
- "updated_at_utc": "2026-08-27T18:00:00Z",
- "phase": "P-1 complete",
+ "updated_at_utc": "2026-08-28T04:30:00Z",
+ "phase": "P-2 complete",
  "invocation_complete": false,
  "budget_measurement_definition": {
   "definition_id": "OD-001",
@@ -36,9 +36,9 @@
    "definition": "GPU-seconds actually consumed by work this invocation performed, summed from the per-step gpu_seconds field of the journal, divided by 3600",
    "bound_by_the_240h_ceiling": true,
    "is_the_registered_budget_quantity": true,
-   "value_this_invocation": 14.611366,
+   "value_this_invocation": 31.582505,
    "ceiling": 240,
-   "remaining": 225.388634,
+   "remaining": 208.417495,
    "source": "studies/study5/qualification-eq1/journal/*.jsonl, field gpu_seconds"
   }
  },
@@ -46,7 +46,7 @@
   "P-BOOT": 0.0,
   "P-0": 0.0,
   "P-1": 14.611366,
-  "P-2": null,
+  "P-2": 16.971139,
   "P-3": null,
   "P-4": null,
   "P-5": null,
@@ -64,13 +64,22 @@
   "units": "actively used GPU-hours"
  },
  "bytes_written": {
-  "blob_bytes_written_this_invocation": 53330976198,
-  "blobs_written": 82,
+  "blob_bytes_written_this_invocation": 56105521192,
+  "blobs_written": 84,
   "container": "models",
   "path_scheme": "models/sha256/<aa>/<full sha256>",
   "existing_blobs_overwritten": 0,
   "containers_created": 0,
-  "note": "content-addressed create-only writes; 13 files already present at their content-addressed path were verified by full round-trip re-hash rather than rewritten"
+  "note": "content-addressed create-only writes; 13 files already present at their content-addressed path were verified by full round-trip re-hash rather than rewritten",
+  "p2_lens_blobs": {
+   "count": 2,
+   "bytes": 2774544994,
+   "prefix": "runs/study5-eq1/p2/lenses/sha256/",
+   "create_only": true,
+   "round_trip_rehashed": true,
+   "overwrites": 0,
+   "containers_created": 0
+  }
  },
  "paid_resources": {
   "a100_vm": {
@@ -141,5 +150,31 @@
    "5767cc3ad060": 3.8178
   },
   "attribution_possible_because_of": "OD-006; without the physical UUID all four workers report container index 0 and GPU-seconds could not be attributed"
+ },
+ "p2_budget": {
+  "ceiling": 48,
+  "units": "actively used GPU-hours",
+  "consumed": 16.971139,
+  "remaining": 31.028861,
+  "reserve_drawn_on": 0.0,
+  "reserve_rule": "OD-007",
+  "breakdown": {
+   "step1_retokenisation_cpu_only": 0.0,
+   "step2_lens_fitting_four_shards": 15.937806,
+   "step3_kurtosis_four_curves": 1.033333,
+   "control_diagnostic_and_reruns": "included in the figures above",
+   "step4_decision_cpu_only": 0.0,
+   "upload_cpu_only": 0.0
+  },
+  "note": "Within the phase ceiling; the OD-007 shared reserve was not drawn on."
+ },
+ "od_007_reserve": {
+  "rule": "OD-007",
+  "unallocated_at_plan_time": 12.0,
+  "returned_from_P-1": 9.388634,
+  "returned_from_P-2": 31.028861,
+  "total_available_reserve": 52.417495,
+  "consumed_from_reserve_so_far": 0.0,
+  "global_ceiling_is_the_only_hard_stop": 240
  }
 }

@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="520" viewBox="0 0 980 520" font-family="Helvetica,Arial,sans-serif">
+<rect width="980" height="520" fill="#ffffff"/>
+<text x="490.0" y="24" text-anchor="middle" font-size="16">Study 5-EQ1 P-2: excess kurtosis versus depth, 7B target</text>
+<text x="490.0" y="42" text-anchor="middle" font-size="11" fill="#555555">readout: jlens apply() at lens.py:213, raw logits, no softmax; mean over (row, position), position 0 excluded</text>
+<rect x="78.0" y="54" width="106.5" height="404" fill="#ffd27f" fill-opacity="0.32"/>
+<text x="131.2" y="68" text-anchor="middle" font-size="10" fill="#8a6d1f">derived band 0-4</text>
+<line x1="78" y1="355.8" x2="770" y2="355.8" stroke="#e6e6e6" stroke-width="1"/>
+<text x="70" y="359.8" text-anchor="end" font-size="11">0.6</text>
+<line x1="78" y1="229.3" x2="770" y2="229.3" stroke="#e6e6e6" stroke-width="1"/>
+<text x="70" y="233.3" text-anchor="end" font-size="11">0.8</text>
+<line x1="78" y1="102.7" x2="770" y2="102.7" stroke="#e6e6e6" stroke-width="1"/>
+<text x="70" y="106.7" text-anchor="end" font-size="11">1</text>
+<text x="78.0" y="476" text-anchor="middle" font-size="10">0</text>
+<text x="131.2" y="476" text-anchor="middle" font-size="10">2</text>
+<text x="184.5" y="476" text-anchor="middle" font-size="10">4</text>
+<text x="237.7" y="476" text-anchor="middle" font-size="10">6</text>
+<text x="290.9" y="476" text-anchor="middle" font-size="10">8</text>
+<text x="344.2" y="476" text-anchor="middle" font-size="10">10</text>
+<text x="397.4" y="476" text-anchor="middle" font-size="10">12</text>
+<text x="450.6" y="476" text-anchor="middle" font-size="10">14</text>
+<text x="503.8" y="476" text-anchor="middle" font-size="10">16</text>
+<text x="557.1" y="476" text-anchor="middle" font-size="10">18</text>
+<text x="610.3" y="476" text-anchor="middle" font-size="10">20</text>
+<text x="663.5" y="476" text-anchor="middle" font-size="10">22</text>
+<text x="716.8" y="476" text-anchor="middle" font-size="10">24</text>
+<text x="770.0" y="476" text-anchor="middle" font-size="10">26</text>
+<text x="424.0" y="504" text-anchor="middle" font-size="12">source layer index</text>
+<text x="20" y="256.0" text-anchor="middle" font-size="12" transform="rotate(-90 20 256.0)">excess kurtosis</text>
+<path d="M78.0,75.6 L104.6,110.5 L131.2,118.7 L157.8,129.1 L184.5,138.9 L211.1,188.8 L237.7,172.9 L264.3,196.8 L290.9,212.2 L317.5,194.1 L344.2,185.5 L370.8,218.5 L397.4,242.0 L424.0,242.1 L450.6,244.8 L477.2,259.4 L503.8,249.5 L530.5,228.2 L557.1,221.4 L583.7,239.3 L610.3,236.5 L636.9,224.2 L663.5,184.0 L690.2,128.2 L716.8,101.5 L743.4,86.5 L770.0,109.0" fill="none" stroke="#1f77b4" stroke-width="2"/>
+<circle cx="78.0" cy="75.6" r="2.2" fill="#1f77b4"/>
+<circle cx="104.6" cy="110.5" r="2.2" fill="#1f77b4"/>
+<circle cx="131.2" cy="118.7" r="2.2" fill="#1f77b4"/>
+<circle cx="157.8" cy="129.1" r="2.2" fill="#1f77b4"/>
+<circle cx="184.5" cy="138.9" r="2.2" fill="#1f77b4"/>
+<circle cx="211.1" cy="188.8" r="2.2" fill="#1f77b4"/>
+<circle cx="237.7" cy="172.9" r="2.2" fill="#1f77b4"/>
+<circle cx="264.3" cy="196.8" r="2.2" fill="#1f77b4"/>
+<circle cx="290.9" cy="212.2" r="2.2" fill="#1f77b4"/>
+<circle cx="317.5" cy="194.1" r="2.2" fill="#1f77b4"/>
+<circle cx="344.2" cy="185.5" r="2.2" fill="#1f77b4"/>
+<circle cx="370.8" cy="218.5" r="2.2" fill="#1f77b4"/>
+<circle cx="397.4" cy="242.0" r="2.2" fill="#1f77b4"/>
+<circle cx="424.0" cy="242.1" r="2.2" fill="#1f77b4"/>
+<circle cx="450.6" cy="244.8" r="2.2" fill="#1f77b4"/>
+<circle cx="477.2" cy="259.4" r="2.2" fill="#1f77b4"/>
+<circle cx="503.8" cy="249.5" r="2.2" fill="#1f77b4"/>
+<circle cx="530.5" cy="228.2" r="2.2" fill="#1f77b4"/>
+<circle cx="557.1" cy="221.4" r="2.2" fill="#1f77b4"/>
+<circle cx="583.7" cy="239.3" r="2.2" fill="#1f77b4"/>
+<circle cx="610.3" cy="236.5" r="2.2" fill="#1f77b4"/>
+<circle cx="636.9" cy="224.2" r="2.2" fill="#1f77b4"/>
+<circle cx="663.5" cy="184.0" r="2.2" fill="#1f77b4"/>
+<circle cx="690.2" cy="128.2" r="2.2" fill="#1f77b4"/>
+<circle cx="716.8" cy="101.5" r="2.2" fill="#1f77b4"/>
+<circle cx="743.4" cy="86.5" r="2.2" fill="#1f77b4"/>
+<circle cx="770.0" cy="109.0" r="2.2" fill="#1f77b4"/>
+<line x1="786" y1="60" x2="810" y2="60" stroke="#1f77b4" stroke-width="2"/>
+<text x="816" y="64" font-size="11">J-lens A</text>
+<path d="M78.0,84.3 L104.6,127.7 L131.2,138.0 L157.8,142.7 L184.5,155.6 L211.1,201.2 L237.7,183.2 L264.3,203.2 L290.9,218.2 L317.5,196.5 L344.2,188.5 L370.8,220.6 L397.4,242.9 L424.0,241.3 L450.6,244.0 L477.2,256.4 L503.8,246.4 L530.5,224.4 L557.1,217.6 L583.7,236.1 L610.3,232.3 L636.9,220.7 L663.5,181.1 L690.2,125.7 L716.8,98.6 L743.4,82.7 L770.0,105.6" fill="none" stroke="#2ca02c" stroke-width="2"/>
+<circle cx="78.0" cy="84.3" r="2.2" fill="#2ca02c"/>
+<circle cx="104.6" cy="127.7" r="2.2" fill="#2ca02c"/>
+<circle cx="131.2" cy="138.0" r="2.2" fill="#2ca02c"/>
+<circle cx="157.8" cy="142.7" r="2.2" fill="#2ca02c"/>
+<circle cx="184.5" cy="155.6" r="2.2" fill="#2ca02c"/>
+<circle cx="211.1" cy="201.2" r="2.2" fill="#2ca02c"/>
+<circle cx="237.7" cy="183.2" r="2.2" fill="#2ca02c"/>
+<circle cx="264.3" cy="203.2" r="2.2" fill="#2ca02c"/>
+<circle cx="290.9" cy="218.2" r="2.2" fill="#2ca02c"/>
+<circle cx="317.5" cy="196.5" r="2.2" fill="#2ca02c"/>
+<circle cx="344.2" cy="188.5" r="2.2" fill="#2ca02c"/>
+<circle cx="370.8" cy="220.6" r="2.2" fill="#2ca02c"/>
+<circle cx="397.4" cy="242.9" r="2.2" fill="#2ca02c"/>
+<circle cx="424.0" cy="241.3" r="2.2" fill="#2ca02c"/>
+<circle cx="450.6" cy="244.0" r="2.2" fill="#2ca02c"/>
+<circle cx="477.2" cy="256.4" r="2.2" fill="#2ca02c"/>
+<circle cx="503.8" cy="246.4" r="2.2" fill="#2ca02c"/>
+<circle cx="530.5" cy="224.4" r="2.2" fill="#2ca02c"/>
+<circle cx="557.1" cy="217.6" r="2.2" fill="#2ca02c"/>
+<circle cx="583.7" cy="236.1" r="2.2" fill="#2ca02c"/>
+<circle cx="610.3" cy="232.3" r="2.2" fill="#2ca02c"/>
+<circle cx="636.9" cy="220.7" r="2.2" fill="#2ca02c"/>
+<circle cx="663.5" cy="181.1" r="2.2" fill="#2ca02c"/>
+<circle cx="690.2" cy="125.7" r="2.2" fill="#2ca02c"/>
+<circle cx="716.8" cy="98.6" r="2.2" fill="#2ca02c"/>
+<circle cx="743.4" cy="82.7" r="2.2" fill="#2ca02c"/>
+<circle cx="770.0" cy="105.6" r="2.2" fill="#2ca02c"/>
+<line x1="786" y1="80" x2="810" y2="80" stroke="#2ca02c" stroke-width="2"/>
+<text x="816" y="84" font-size="11">J-lens B</text>
+<path d="M78.0,429.9 L104.6,428.5 L131.2,424.1 L157.8,422.4 L184.5,418.5 L211.1,424.6 L237.7,421.6 L264.3,427.8 L290.9,411.4 L317.5,430.0 L344.2,424.4 L370.8,432.1 L397.4,431.3 L424.0,425.7 L450.6,432.6 L477.2,422.7 L503.8,423.9 L530.5,428.0 L557.1,417.1 L583.7,425.9 L610.3,436.4 L636.9,424.1 L663.5,414.7 L690.2,434.3 L716.8,426.5 L743.4,425.8 L770.0,419.6" fill="none" stroke="#7f7f7f" stroke-width="2" stroke-dasharray="6,4"/>
+<circle cx="78.0" cy="429.9" r="2.2" fill="#7f7f7f"/>
+<circle cx="104.6" cy="428.5" r="2.2" fill="#7f7f7f"/>
+<circle cx="131.2" cy="424.1" r="2.2" fill="#7f7f7f"/>
+<circle cx="157.8" cy="422.4" r="2.2" fill="#7f7f7f"/>
+<circle cx="184.5" cy="418.5" r="2.2" fill="#7f7f7f"/>
+<circle cx="211.1" cy="424.6" r="2.2" fill="#7f7f7f"/>
+<circle cx="237.7" cy="421.6" r="2.2" fill="#7f7f7f"/>
+<circle cx="264.3" cy="427.8" r="2.2" fill="#7f7f7f"/>
+<circle cx="290.9" cy="411.4" r="2.2" fill="#7f7f7f"/>
+<circle cx="317.5" cy="430.0" r="2.2" fill="#7f7f7f"/>
+<circle cx="344.2" cy="424.4" r="2.2" fill="#7f7f7f"/>
+<circle cx="370.8" cy="432.1" r="2.2" fill="#7f7f7f"/>
+<circle cx="397.4" cy="431.3" r="2.2" fill="#7f7f7f"/>
+<circle cx="424.0" cy="425.7" r="2.2" fill="#7f7f7f"/>
+<circle cx="450.6" cy="432.6" r="2.2" fill="#7f7f7f"/>
+<circle cx="477.2" cy="422.7" r="2.2" fill="#7f7f7f"/>
+<circle cx="503.8" cy="423.9" r="2.2" fill="#7f7f7f"/>
+<circle cx="530.5" cy="428.0" r="2.2" fill="#7f7f7f"/>
+<circle cx="557.1" cy="417.1" r="2.2" fill="#7f7f7f"/>
+<circle cx="583.7" cy="425.9" r="2.2" fill="#7f7f7f"/>
+<circle cx="610.3" cy="436.4" r="2.2" fill="#7f7f7f"/>
+<circle cx="636.9" cy="424.1" r="2.2" fill="#7f7f7f"/>
+<circle cx="663.5" cy="414.7" r="2.2" fill="#7f7f7f"/>
+<circle cx="690.2" cy="434.3" r="2.2" fill="#7f7f7f"/>
+<circle cx="716.8" cy="426.5" r="2.2" fill="#7f7f7f"/>
+<circle cx="743.4" cy="425.8" r="2.2" fill="#7f7f7f"/>
+<circle cx="770.0" cy="419.6" r="2.2" fill="#7f7f7f"/>
+<line x1="786" y1="100" x2="810" y2="100" stroke="#7f7f7f" stroke-width="2" stroke-dasharray="6,4"/>
+<text x="816" y="104" font-size="11">matched-norm random J (null)</text>
+<path d="M78.0,332.7 L104.6,326.5 L131.2,349.6 L157.8,357.2 L184.5,357.7 L211.1,361.3 L237.7,363.6 L264.3,359.5 L290.9,360.4 L317.5,354.7 L344.2,350.9 L370.8,354.9 L397.4,357.5 L424.0,358.8 L450.6,352.8 L477.2,353.6 L503.8,357.4 L530.5,355.8 L557.1,355.3 L583.7,356.3 L610.3,365.9 L636.9,361.4 L663.5,378.5 L690.2,384.4 L716.8,396.8 L743.4,370.8 L770.0,351.2" fill="none" stroke="#d62728" stroke-width="2"/>
+<circle cx="78.0" cy="332.7" r="2.2" fill="#d62728"/>
+<circle cx="104.6" cy="326.5" r="2.2" fill="#d62728"/>
+<circle cx="131.2" cy="349.6" r="2.2" fill="#d62728"/>
+<circle cx="157.8" cy="357.2" r="2.2" fill="#d62728"/>
+<circle cx="184.5" cy="357.7" r="2.2" fill="#d62728"/>
+<circle cx="211.1" cy="361.3" r="2.2" fill="#d62728"/>
+<circle cx="237.7" cy="363.6" r="2.2" fill="#d62728"/>
+<circle cx="264.3" cy="359.5" r="2.2" fill="#d62728"/>
+<circle cx="290.9" cy="360.4" r="2.2" fill="#d62728"/>
+<circle cx="317.5" cy="354.7" r="2.2" fill="#d62728"/>
+<circle cx="344.2" cy="350.9" r="2.2" fill="#d62728"/>
+<circle cx="370.8" cy="354.9" r="2.2" fill="#d62728"/>
+<circle cx="397.4" cy="357.5" r="2.2" fill="#d62728"/>
+<circle cx="424.0" cy="358.8" r="2.2" fill="#d62728"/>
+<circle cx="450.6" cy="352.8" r="2.2" fill="#d62728"/>
+<circle cx="477.2" cy="353.6" r="2.2" fill="#d62728"/>
+<circle cx="503.8" cy="357.4" r="2.2" fill="#d62728"/>
+<circle cx="530.5" cy="355.8" r="2.2" fill="#d62728"/>
+<circle cx="557.1" cy="355.3" r="2.2" fill="#d62728"/>
+<circle cx="583.7" cy="356.3" r="2.2" fill="#d62728"/>
+<circle cx="610.3" cy="365.9" r="2.2" fill="#d62728"/>
+<circle cx="636.9" cy="361.4" r="2.2" fill="#d62728"/>
+<circle cx="663.5" cy="378.5" r="2.2" fill="#d62728"/>
+<circle cx="690.2" cy="384.4" r="2.2" fill="#d62728"/>
+<circle cx="716.8" cy="396.8" r="2.2" fill="#d62728"/>
+<circle cx="743.4" cy="370.8" r="2.2" fill="#d62728"/>
+<circle cx="770.0" cy="351.2" r="2.2" fill="#d62728"/>
+<line x1="786" y1="120" x2="810" y2="120" stroke="#d62728" stroke-width="2"/>
+<text x="816" y="124" font-size="11">logit lens (descriptive)</text>
+</svg>

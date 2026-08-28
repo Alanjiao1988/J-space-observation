@@ -1,0 +1,69 @@
+{
+ "schema_version": "study5-eq1-disclosed-correction-v1",
+ "correction_id": "DC-004",
+ "phase": "P-2",
+ "step": "P2-003",
+ "recorded_at_utc": "2026-08-28T04:05:00Z",
+ "severity": "a wrong prior of mine, which if applied literally would have voided a sound measurement",
+ "self_caught": true,
+ "changes_any_registered_criterion": false,
+
+ "what_happened": {
+  "observation": "The four Q-4a kurtosis curves came out between 0.47 and 1.05. For a 152064-dimensional logit distribution that is close to Gaussian, which I did not expect.",
+  "my_response": "Before recording any verdict I wrote a control measurement, kurtosis_control.py, to test whether the statistic itself was broken. I fixed its interpretation rule in the artifact BEFORE reading the result.",
+  "the_rule_I_fixed": {
+   "if_model_own_logits_are_large": "tens or hundreds - the statistic works and the curves stand",
+   "if_model_own_logits_are_also_near_one": "the fault is in the measurement and NO Q-4a verdict may be drawn"
+  },
+  "the_result": {
+   "model_own_final_logits_mean_excess_kurtosis": 1.5334214247986537,
+   "model_own_final_logits_p50": 1.4914738538675714,
+   "model_own_final_logits_range": [-0.13718901073976042, 4.07348585761226]
+  },
+  "the_problem": "1.53 is the same order of magnitude as the lens readouts. Read literally, my own rule said the measurement was broken and the phase could produce no verdict."
+ },
+
+ "why_the_rule_was_wrong": {
+  "my_prior": "that a language model's logits are extremely heavy-tailed, so excess kurtosis would run into the tens or hundreds",
+  "why_that_prior_is_false": "Excess kurtosis over a 152064-token vocabulary is dominated by the BULK of the distribution, not by the few tokens the model favours. Ten tokens sitting five standard deviations out contribute about 10 * 5^4 / 152064, which is roughly 0.04 - negligible. The heavy-tail intuition applies to probabilities after softmax, or to activations, not to raw logits averaged over a vocabulary this large.",
+  "this_is_demonstrated_not_asserted": "tests/test_study5_eq1_kurtosis_statistic.py includes a test that adds ten five-sigma outliers to a 152064-sample Gaussian and shows the excess kurtosis moves by less than 0.1"
+ },
+
+ "how_it_was_settled": {
+  "principle": "A wrong prior is not a reason to discard data, and it is also not something to quietly re-read after the fact. The question 'is the statistic correct?' has a definite answer that does not depend on anyone's expectation, so it was settled against ground truth instead of by judgement.",
+  "method": "The excess-kurtosis implementation was validated against distributions with analytically known excess kurtosis.",
+  "results": {
+   "gaussian": "recovers 0",
+   "uniform": "recovers -1.2",
+   "laplace": "recovers 3",
+   "student_t_df5": "recovers 6",
+   "bernoulli_p_0.2": "recovers its closed form (1 - 6p(1-p))/(p(1-p))",
+   "scale_and_shift_invariance": "unchanged under x -> 137x, x + 42, -3x, to 1e-6",
+   "agreement_with_a_naive_direct_formula": "within 1e-9",
+   "float32_promotion": "float32 input agrees with float64 input within 1e-3 on logits of magnitude 1000"
+  },
+  "the_specific_failure_mode_is_excluded": "a statistic stuck near 1 regardless of input would make the curves meaningless; the validated implementation spans -1.2 to above 6, and the observed J-lens readings themselves span 0.26 to 35.45 within a single layer",
+  "conclusion": "The statistic is correct. The near-Gaussian readings are a real property of the logits, not an artifact. The Q-4a curves stand."
+ },
+
+ "the_ordering_that_resulted": {
+  "matched_norm_random_J_null": 0.49,
+  "logit_lens": 0.60,
+  "j_lens": "0.75 to 1.05",
+  "model_own_final_logits": 1.53,
+  "note": "This ordering is reported as a description of the measurement. It is NOT offered as evidence for or against any claim about J-space, and no criterion depends on it."
+ },
+
+ "what_was_not_done": {
+  "the_rule_was_not_quietly_reinterpreted_to_fit_the_data": true,
+  "no_registered_Q4a_criterion_was_touched": true,
+  "no_threshold_was_moved": true,
+  "the_wrong_prior_is_recorded_rather_than_deleted": true
+ },
+
+ "caveat_recorded_honestly": {
+  "bf16": "the model runs in bfloat16 and jlens unembed casts the residual to the lm_head dtype, so the logits are bf16-quantised before the statistic is applied. The quantisation step is small relative to the logit spread, and it applies identically to all four curves including the null, so it cannot differentiate them. It is recorded because it is a real property of the measurement."
+ },
+
+ "claim_ceiling": "This is a disclosure about a measurement instrument. It licenses no claim of any kind."
+}

@@ -33,31 +33,52 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-PROOF_RE = re.compile(r"^P1-CHECK-([A-Za-z0-9_.\-]+)\s+PASSED\s*$")
-FAIL_RE = re.compile(r"^P1-CHECK-([A-Za-z0-9_.\-]+)\s+FAILED\b")
+DEFAULT_PREFIX = "P1-CHECK"
+
+
+def _compile(prefix: str) -> tuple[re.Pattern[str], re.Pattern[str]]:
+    """Build the proof/failure patterns for one phase tag.
+
+    The tag varies by phase (P1-CHECK, P2-CHECK, ...) but the RULE does not:
+    a check that cannot be shown to have executed did not pass. Only the
+    phase tag is parameterised here; nothing about the judgement changes.
+    """
+    escaped = re.escape(prefix)
+    return (
+        re.compile(rf"^{escaped}-([A-Za-z0-9_.\-]+)\s+PASSED\s*$"),
+        re.compile(rf"^{escaped}-([A-Za-z0-9_.\-]+)\s+FAILED\b"),
+    )
+
+
+PROOF_RE, FAIL_RE = _compile(DEFAULT_PREFIX)
 
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def scan(log_text: str) -> tuple[dict[str, int], dict[str, int]]:
+def scan(
+    log_text: str, prefix: str = DEFAULT_PREFIX
+) -> tuple[dict[str, int], dict[str, int]]:
+    proof_re, fail_re = _compile(prefix)
     passed: dict[str, int] = {}
     failed: dict[str, int] = {}
     for line in log_text.splitlines():
         line = line.strip()
-        match = PROOF_RE.match(line)
+        match = proof_re.match(line)
         if match:
             passed[match.group(1)] = passed.get(match.group(1), 0) + 1
             continue
-        match = FAIL_RE.match(line)
+        match = fail_re.match(line)
         if match:
             failed[match.group(1)] = failed.get(match.group(1), 0) + 1
     return passed, failed
 
 
-def judge(log_text: str, expected: list[str]) -> dict[str, Any]:
-    passed, failed = scan(log_text)
+def judge(
+    log_text: str, expected: list[str], prefix: str = DEFAULT_PREFIX
+) -> dict[str, Any]:
+    passed, failed = scan(log_text, prefix)
 
     missing = [c for c in expected if c not in passed]
     duplicated = sorted(c for c, n in passed.items() if n > 1)
@@ -91,6 +112,7 @@ def judge(log_text: str, expected: list[str]) -> dict[str, Any]:
     return {
         "schema_version": "study5-eq1-proof-verification-v1",
         "rule": "OD-003",
+        "proof_string_prefix": prefix,
         "verified_at_utc": utc_now(),
         "expected_check_count": len(expected),
         "expected_checks_enumerated_in_advance": True,
@@ -114,6 +136,14 @@ def main(argv: list[str] | None = None) -> int:
         help="JSON file listing the expected check ids, enumerated in advance",
     )
     parser.add_argument("--out", required=True)
+    parser.add_argument(
+        "--prefix",
+        default=DEFAULT_PREFIX,
+        help=(
+            "phase tag of the proof strings, e.g. P1-CHECK or P2-CHECK. Only "
+            "the tag varies; the OD-003 rule is identical for every phase."
+        ),
+    )
     args = parser.parse_args(argv)
 
     log_path = Path(args.log)
@@ -122,7 +152,7 @@ def main(argv: list[str] | None = None) -> int:
     if isinstance(expected, dict):
         expected = expected["expected_checks"]
 
-    report = judge(log_text, list(expected))
+    report = judge(log_text, list(expected), args.prefix)
     report["log"] = str(args.log)
     report["log_sha256"] = hashlib.sha256(log_path.read_bytes()).hexdigest()
 

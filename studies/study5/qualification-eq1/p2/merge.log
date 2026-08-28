@@ -1,0 +1,113 @@
+{
+ "schema_version": "study5-eq1-p2-lens-merge-v1",
+ "phase": "P-2",
+ "step": "P2-002",
+ "od_010": {
+  "merged_within_each_half_only": true,
+  "cross_half_merge_performed": false,
+  "structural_guarantee": "this tool merges one role at a time and has no code path that combines the A and B halves"
+ },
+ "cross_fit_stability": {
+  "definition": "relative Frobenius difference = ||J_A(l) - J_B(l)||_F divided by the mean of ||J_A(l)||_F and ||J_B(l)||_F",
+  "per_layer": [
+   {
+    "layer": 0,
+    "relative_frobenius_difference": 0.10981500139065545
+   },
+   {
+    "layer": 1,
+    "relative_frobenius_difference": 0.1002989436421461
+   },
+   {
+    "layer": 2,
+    "relative_frobenius_difference": 0.09062419309860215
+   },
+   {
+    "layer": 3,
+    "relative_frobenius_difference": 0.09726558507522666
+   },
+   {
+    "layer": 4,
+    "relative_frobenius_difference": 0.09245323650909537
+   },
+   {
+    "layer": 5,
+    "relative_frobenius_difference": 0.0900081656397536
+   },
+   {
+    "layer": 6,
+    "relative_frobenius_difference": 0.08362595446459721
+   },
+   {
+    "layer": 7,
+    "relative_frobenius_difference": 0.0794878107623862
+   },
+   {
+    "layer": 8,
+    "relative_frobenius_difference": 0.07316504188435012
+   },
+   {
+    "layer": 9,
+    "relative_frobenius_difference": 0.06827137016071885
+   },
+   {
+    "layer": 10,
+    "relative_frobenius_difference": 0.06514589673006993
+   },
+   {
+    "layer": 11,
+    "relative_frobenius_difference": 0.06053067603879085
+   },
+   {
+    "layer": 12,
+    "relative_frobenius_difference": 0.05467700233475004
+   },
+   {
+    "layer": 13,
+    "relative_frobenius_difference": 0.05048768155718592
+   },
+   {
+    "layer": 14,
+    "relative_frobenius_difference": 0.04695466979124262
+   },
+   {
+    "layer": 15,
+    "relative_frobenius_difference": 0.04484567287584945
+   },
+   {
+    "layer": 16,
+    "relative_frobenius_difference": 0.042182526723646634
+   },
+   {
+    "layer": 17,
+    "relative_frobenius_difference": 0.039095829634848006
+   },
+   {
+    "layer": 18,
+    "relative_frobenius_difference": 0.03476359323428408
+   },
+   {
+    "layer": 19,
+    "relative_frobenius_difference": 0.031781763881870095
+   },
+   {
+    "layer": 20,
+    "relative_frobenius_difference": 0.028663508777055854
+   },
+   {
+    "layer": 21,
+    "relative_frobenius_difference": 0.0255668332985066
+   },
+   {
+    "layer": 22,
+    "relative_frobenius_difference": 0.021897766207782846
+   },
+   {
+    "layer": 23,
+    "relative_frobenius_difference": 0.019036468906822077
+   
+max relative Frobenius A vs B (7B): 0.109815
+EV-0015 (1.5B) for comparison:      0.073860
+half A: n=600 roundtrip=0.0 bookkeeping=0.0 float64_ref=4.768e-07
+half B: n=600 roundtrip=0.0 bookkeeping=0.0 float64_ref=4.768e-07
+P2-CHECK-MERGE-STABILITY PASSED

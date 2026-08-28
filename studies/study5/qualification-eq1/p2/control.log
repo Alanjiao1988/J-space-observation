@@ -1,0 +1,42 @@
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights: 100%|██████████| 339/339 [00:00<00:00, 4062.48it/s]
+{
+ "schema_version": "study5-eq1-p2-kurtosis-control-v1",
+ "phase": "P-2",
+ "purpose": "control for the near-Gaussian kurtosis seen in the Q-4a curves; diagnostic only, no criterion depends on it",
+ "rows_used": 25,
+ "statistic": "excess kurtosis over the vocabulary axis, float64",
+ "model_own_final_logits": {
+  "n": 3175,
+  "mean": 1.5334214247986537,
+  "min": -0.13718901073976042,
+  "p50": 1.4914738538675714,
+  "max": 4.07348585761226
+ },
+ "jlens_readout_layer_0": {
+  "n": 3175,
+  "mean": 1.044508990980564,
+  "min": 0.2617472285196447,
+  "p50": 0.8988552605764624,
+  "max": 35.448900929238114
+ },
+ "logit_lens_readout_layer_0": {
+  "n": 3175,
+  "mean": 0.6375697836727016,
+  "min": 0.13770444102836388,
+  "p50": 0.6220190753872368,
+  "max": 1.1884058080749895
+ },
+ "model_top1_minus_top2_logit_gap": {
+  "n": 3175,
+  "mean": 1.8186614173228346,
+  "min": 0.0,
+  "p50": 1.125,
+  "max": 13.375
+ },
+ "interpretation_rule_fixed_before_reading": {
+  "if_model_own_logits_are_large": "the statistic works and the near-Gaussian lens readout is a real property of the lens readout, so the Q-4a curves stand",
+  "if_model_own_logits_are_also_near_one": "the fault is in the measurement and NO Q-4a verdict may be drawn from the curves"
+ },
+ "claim_ceiling": "A diagnostic. It licenses no claim of any kind."
+}
+P2-CHECK-KURTOSIS-CONTROL PASSED

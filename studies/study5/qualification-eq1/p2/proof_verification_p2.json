@@ -1,0 +1,99 @@
+{
+ "schema_version": "study5-eq1-proof-verification-v1",
+ "rule": "OD-003",
+ "proof_string_prefix": "P2-CHECK",
+ "verified_at_utc": "2026-08-28T03:58:17Z",
+ "expected_check_count": 16,
+ "expected_checks_enumerated_in_advance": true,
+ "checks": [
+  {
+   "check_id": "OD008-RETOKENISE",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "FIT-A_shard0of2",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "FIT-A_shard1of2",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "FIT-B_shard0of2",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "FIT-B_shard1of2",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "MERGE-STABILITY",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "KURTOSIS-CURVES",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "KURTOSIS-CONTROL",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "Q4A-C1",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "Q4A-C2",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "Q4A-C3",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "Q4A-C4",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "Q4A-C5",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "Q4A-DECISION",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "POSITION-SENSITIVITY",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  },
+  {
+   "check_id": "KURTOSIS-FIGURE",
+   "verdict": "PASS",
+   "reason": "unique execution proof string present"
+  }
+ ],
+ "missing_proof_strings": [],
+ "duplicated_proof_strings": [],
+ "explicit_failures": [],
+ "unexpected_proof_strings": [],
+ "exit_code_used_as_evidence_of_execution": false,
+ "all_checks_passed": true,
+ "verdict": "PASS",
+ "log": "p2/proof_log.txt",
+ "log_sha256": "c53fdc4759fded4c3f5d336096e0c3ff1fccf1909070d0c05ab27c0d7eeefacf"
+}

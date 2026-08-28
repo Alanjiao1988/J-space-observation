@@ -1264,3 +1264,135 @@ asserts BOS-first on every one of the 1402 rows, raising rather than recording.
 The inherited weak check is **not** modified — section 13 forbids rewriting
 historical code, and the corpus it produced is proven correct by the exact hash
 reproduction above.
+
+## Step 2 — fitting `lens_A` and `lens_B`
+
+1200 of 1200 prompts fitted with the official `jlens.fitting.fit` at the
+registered commit — the estimator was not reimplemented. Sources 0–26, target
+27, `dim_batch` 8, sequence 128, `skip_first` 16, inherited unchanged from the
+1.5B precedent. Four shards, one physical GPU each; all four registered UUIDs
+distinct and present. 47.6–48.2 s/prompt, **15.938 GPU-hours**.
+
+OD-010 respected: shards merged **within their own half only**. A n=600, B n=600.
+
+| stability quantity | result |
+|---|---|
+| save/load round trip | **exactly 0**, both halves |
+| independent float32 recomputation of the merge | **exactly 0**, both halves |
+| float64 reference bound | 4.768e-07, both halves |
+| A vs B relative Frobenius, max over layers (7B) | **0.109815** at layer 0 |
+| the same quantity on the 1.5B (`EV-0015`) | 0.073860 |
+
+The A/B difference falls monotonically with depth, from 0.1098 at layer 0 to
+0.0084 at layer 26. Reported as description; the 7B figure is a new measurement
+with no pass threshold, not something the model passes or fails.
+
+A re-run of the merge produced **byte-identical** lens files, so the merge is
+deterministic.
+
+## Step 3 — the four κ curves
+
+Computed on the 200 heldout rows through the identical official readout path,
+differing only in whether `J_l` is applied.
+
+The measured shape is **U-shaped, not a mid-depth band**: κ is highest at both
+ends and lowest in the middle.
+
+| | layer 0 | layer 15 (min) | layer 25 |
+|---|---|---|---|
+| κ_A | 1.0428 | 0.7524 | 1.0257 |
+| κ_B | 1.0291 | 0.7571 | 1.0317 |
+
+κ_null is flat at ≈ 0.49 and κ_logitlens is flat at ≈ 0.60. The two fits agree
+closely: **max |κ_A − κ_B| over all 27 layers is 0.0305.**
+
+### DC-004 — my prior was wrong, and that is recorded rather than re-read
+
+Readings near 1.0 for a 152064-dimensional logit distribution are close to
+Gaussian, which I had not expected. Before recording any verdict I wrote a
+control and **fixed its interpretation rule before reading the result**: if the
+model's own final-layer logits scored in the tens or hundreds the statistic was
+working; if they also scored near one, the measurement was broken and no verdict
+could be drawn.
+
+The model's own final logits scored **1.533**. Read literally, my own rule said
+the measurement was broken.
+
+The rule was wrong, not the data. Excess kurtosis over a 152064-token vocabulary
+is dominated by the **bulk** of the distribution, not by the few tokens the model
+favours: ten tokens sitting five standard deviations out contribute about
+`10 × 5⁴ / 152064 ≈ 0.04`. The heavy-tail intuition applies to probabilities
+after softmax, not to raw logits averaged over a vocabulary this large.
+
+Rather than quietly re-read the rule to suit the data, the underlying question —
+*is the statistic correct?* — was settled against ground truth. The
+implementation recovers Gaussian **0**, uniform **−1.2**, Laplace **3**,
+Student-t(5) **6**, and Bernoulli's closed form; it is invariant under
+`x → 137x`, `x + 42` and `−3x` to 1e-6; and it agrees with a naive direct
+formula to 1e-9. The failure mode the control existed to catch — a statistic
+stuck near 1 regardless of input — is excluded.
+
+The resulting ordering is coherent:
+`null 0.49 < logit lens 0.60 < J-lens 0.75–1.05 < model's own logits 1.53`.
+It is reported as description only.
+
+Recorded honestly: the model runs in bf16 and `unembed` casts to the `lm_head`
+dtype, so the logits are bf16-quantised before the statistic is applied. That
+applies identically to all four curves including the null, so it cannot
+differentiate them.
+
+## Step 4 — **Q-4a FAIL**
+
+| criterion | value | verdict |
+|---|---|---|
+| C1 interior maximum | argmax_A = **0** (curve endpoint), argmax_B = 25 | **FAIL** |
+| C2 contiguity | band `[0,1,2,3,4]` for both fits | PASS |
+| C3 coverage | length **5** < 7 | **FAIL** |
+| C4 cross-fit agreement | Jaccard **1.000**, argmax separation **25** > 3 | **FAIL** |
+| C5 exceeds the null | exceeds at every band layer, mean margin **0.490 / 0.466** < 1.0 | **FAIL** |
+
+Terminal state: **`STUDY5_EQ1_WORKSPACE_BAND_NOT_ESTABLISHED_AT_THIS_SCALE`**.
+
+**What this means, verbatim as registered:** the J-space construct was not
+established on this model, and therefore **nothing was measured**. It is **not**
+evidence that J-space is absent at 7B, it must not be written up as a negative
+finding, and no later text may cite it as negative evidence.
+
+Two mechanisms are worth stating so the numbers are not misread — neither
+changes the verdict:
+
+- **C4 is not a cross-fit disagreement.** The two bands are *identical*
+  (Jaccard 1.000) and the curves differ by at most 0.0305 anywhere. The argmax
+  separation of 25 arises because the curve is **bimodal with nearly-tied
+  peaks**: for A, layer 0 exceeds layer 25 by 0.017; for B, layer 25 exceeds
+  layer 0 by 0.0025. argmax is an unstable statistic on that shape.
+- **C3 and C5 are the robust failures.** The derived band is 5 layers where 7
+  were required, and the J-lens exceeds the matched-norm null by ≈ 0.49 where a
+  margin of 1.0 was pre-registered.
+
+### The verdict does not depend on the position convention
+
+The frozen aggregation averages over positions 1.. ; the fit's own convention
+skips the first 16. Re-running the **unchanged** criteria on the secondary
+aggregation, as a sensitivity artifact and not a second decision:
+
+- **verdict FAIL under both** — invariant;
+- **C3 and C5 fail under both**;
+- C1 and C4 flip, precisely because argmax moves from layer 0 to layer 25 under
+  the alternative convention — confirming the tied-peaks reading above.
+
+## P-2 close
+
+OD-003 proof verification: **16 of 16** checks, all present, all unique.
+Accelerator budget: **16.971 of 48** actively used GPU-hours; cumulative
+**31.583 of 240**. The OD-007 shared reserve was **not** drawn on. Both VMs ran
+throughout with **0** configuration changes, 0 containers created, 0 SAS, 0
+account keys, 0 overwrites.
+
+Both lens blobs were uploaded create-only under
+`runs/study5-eq1/p2/lenses/sha256/` and round-trip re-hashed. Lens bytes are not
+in Git; only digests, byte counts and paths.
+
+Carried forward from P-1 as requested: `p99_completed_length` = **14936**, and
+the confirmatory `max_new_tokens` back-solved by the frozen OA-002 formula =
+**16384**.
