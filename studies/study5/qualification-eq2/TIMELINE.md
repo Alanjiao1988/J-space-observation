@@ -446,3 +446,98 @@ instruction is explicit that revision stops here pending approval.
 
 R-1 + R-1b: **7.483 of 10**; EQ2 **7.483 of 24**; cumulative **39.066 of 240**.
 New entries: **HB-003**, **OD-017**, **OA-005**. No DC, no IMG.
+
+---
+
+# EQ2 terminal — **NEGATIVE**, and D-1 says it is negative-**A**
+
+## The ruling that closed it
+
+I had reported a split between OA-005's literal text and its substance. **The
+split does not exist**, and settling it needs no criterion to move: the R-0
+ladder — committed at `bd8be7e0` *before any measurement* — sets the R-2 coverage
+threshold to *the positive control's own band length minus 2, floored at 3*. At
+band length 1 the positive control **cannot pass the threshold derived from
+itself**. A "valid band" therefore means one **usable for its registered
+downstream purpose**, and all of that was already in `bd8be7e0`. Stop condition 2
+is triggered. My reason ② was the decisive one.
+
+```
+EQ2 determination: NEGATIVE
+The J-lens locator method did not yield a usable locating band
+under this implementation at this scale.
+R-2 not authorised.  lens_A / lens_B not read.  T not touched.
+```
+
+**This is the answer EQ2 was built to be able to give.** Its whole function was
+to adjudicate the construct *before* spending budget on the target. It
+adjudicated: the construct does not hold. The protocol worked.
+
+### A precedent, recorded beside OD-017's directionality criterion
+
+**OA-005 was a post-hoc *tightening*, and it saved the study.** Had the relaxed
+reading been accepted — that a late band satisfies "mid-depth" — we would have
+entered R-2 with a method whose readout is **indistinguishable from a plain logit
+lens**, and spent the target's budget on an instrument that measures nothing.
+A post-hoc tightening prevented a false positive. Post-hoc is not automatically
+illegitimate; **direction** decides.
+
+## D-1 — negative-**A**: EQ2 *did* adjudicate
+
+Registered, with its decision rule and asymmetric-motivation labelling committed,
+**before** it was run.
+
+| | median ‖J−I‖/‖I‖ | identity energy share | effective rank |
+|---|---|---|---|
+| positive (7B-It) | **1.2765** | 4.9% | 689 / 3584 |
+| depth (1.7B) | **3.2050** | 9.8% | 486 / 2048 |
+| negative (gpt2) | **1.1800** | 27.8% | 389 / 768 |
+
+Registered thresholds: below **0.5** → negative-B, at/above **1.0** → negative-A
+(uncorrelated matched-norm reference ≈ 1.414). **All three sit at or above 1.0.**
+
+**`J` is nowhere near the identity**, so the J-lens is *not* a plain logit lens by
+construction. **Negative-B is excluded, and EQ2 genuinely adjudicated** — the
+negative is informative, not vacuous.
+
+### The depth-dependence that makes both findings cohere
+
+The identity share is not constant — it climbs monotonically:
+
+| layer | 0 | 9 | 18 | 21 | 23 | 25 | 26 |
+|---|---|---|---|---|---|---|---|
+| identity share | 0.004 | 0.021 | 0.169 | 0.469 | 0.640 | 0.729 | **0.749** |
+
+with the best scaled-identity α ≈ **1.0** at layers 23–26. So **in the late
+layers, where condition (ii) failed, `J` really has approached the identity**;
+in the early and middle layers, where the plain logit lens read *exactly* 0.0000,
+`J` is far from it (<5% identity energy at layers 0–12). The J-lens matches the
+logit lens precisely where `J` has become the identity, and differs precisely
+where it has not. Internally consistent — and a **description of the fitted
+Jacobians**, not a mechanistic account. These are the **external** lenses, fitted
+by an independent party; we did not fit them.
+
+### OD-016 retrospective — the answer is **no**
+
+Even with an effective lower gate, OD-016 would **not** have fired: all three
+published `final_identity_distance` values (0.578094 / 0.524690 / 1.305569) sit
+comfortably inside the registered `[0.130071, 1.446260]`. **That is the correct
+outcome**, since D-1 has just shown these lenses are not collapsed. OD-016's
+non-binding lower fence remains a real weakness worth fixing in any successor —
+it simply was not what mattered here.
+
+## Close
+
+`lens_A` / `lens_B` **never read** across the entire invocation (guard PASS,
+**0** lens-reading records). Target never touched. EQ1 artifacts byte-identical.
+**0** criterion revisions in the closing steps.
+
+Closing inventory: **closing == opening + registered deltas**, no drift, no hard
+blocker. All six VMs still `VM running`, including the four `TRAINING` V100
+machines — **0** control-plane writes, **0** data-plane writes, **0** SAS, **0**
+storage keys.
+
+Budget: EQ2 **7.483 of 24**; cumulative **39.066 of 240**. **16.5 GPU-hours were
+not spent**, because the instrument was disqualified before the target run.
+
+New entries: **HB-003** (terminal), **OD-017**, **OA-005**, **D-1**. 65 tests.

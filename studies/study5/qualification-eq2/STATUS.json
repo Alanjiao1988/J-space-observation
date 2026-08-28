@@ -3,14 +3,14 @@
  "study_id": "STUDY5_EQ2",
  "namespace": "studies/study5/qualification-eq2/",
  "kind": "construct adjudication",
- "lifecycle_state": "STUDY5_EQ2_R1B_STOPPED_LOGIT_LENS_CONTROL_REMOVES_BAND",
- "lifecycle_state_is_registered_terminal": false,
- "terminal": false,
- "resumable": true,
+ "lifecycle_state": "STUDY5_EQ2_TERMINAL_NEGATIVE_CONSTRUCT_NOT_USABLE_AT_THIS_SCALE",
+ "lifecycle_state_is_registered_terminal": true,
+ "terminal": true,
+ "resumable": false,
  "is_a_scientific_result": false,
  "confirmation_authorized": false,
- "current_phase": "R-1b stopped at step C",
- "next_phase": "none without an operator decision on HB-003",
+ "current_phase": "closed",
+ "next_phase": "none; P-4 needs another basis for localisation, or re-scoping",
  "authority": {
   "path": "studies/study5/prompts/study5_eq2_construct_adjudication_authority.md",
   "sha256": "63e4751573586d5ed7c8242d7fcaf1b1d6cb3f3232eb60ec46b0bcde795df894",
@@ -75,7 +75,8 @@
    "R-2": 8,
    "R-3": 0
   },
-  "denominated_per": "OD-001"
+  "denominated_per": "OD-001",
+  "unused": 16.516667
  },
  "azure": {
   "vms_reconfigured": 0,
@@ -89,7 +90,7 @@
  "claim_ceiling": "EQ2 is construct adjudication. No state it can reach is a scientific result.",
  "hard_blockers": [
   "HB-002 (lifted by OA-004)",
-  "HB-003 (open)"
+  "HB-003 (terminal)"
  ],
  "r1_progress": {
   "external_identity_distance_distribution": "done, n=37, median 0.578094",
@@ -155,5 +156,11 @@
   "sealed_lenses_read": false,
   "target_touched": false,
   "criterion_revisions_made": 0
- }
+ },
+ "eq2_determination": "NEGATIVE",
+ "d1_category": "negative-A",
+ "d1_meaning": "J departs substantially from the identity yet adds nothing readable over the unembedding; EQ2 DID adjudicate",
+ "r2_authorised": false,
+ "sealed_lenses_ever_read": false,
+ "target_ever_touched": false
 }

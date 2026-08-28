@@ -1,0 +1,103 @@
+{
+ "schema_version": "study5-eq2-d1-conclusion-v1",
+ "recorded_at_utc": "2026-08-28T16:10:00Z",
+ "registration": "d1/D-1_preregistration.json",
+ "decision_rule_was_frozen_before_the_measurement": true,
+
+ "verdict": "negative-A",
+ "verdict_meaning_verbatim": "J departs substantially from the identity, and yet the J-lens readout is approximately equal to the plain logit lens readout. The Jacobian carries essentially no readable information beyond the unembedding in these models under this implementation. This is a finding about the models and the method as applied, not about our construction being degenerate.",
+ "negative_B_is_excluded": true,
+
+ "the_numbers_that_exclude_negative_B": {
+  "registered_thresholds": {
+   "negative_B_if_median_below": 0.5,
+   "negative_A_if_median_at_or_above": 1.0,
+   "uncorrelated_matched_norm_reference": 1.4142135623730951
+  },
+  "positive_control_qwen2_5_7b_it": {
+   "median_relative_distance_from_identity": 1.2765,
+   "min": 0.5787,
+   "max": 1.5494,
+   "median_identity_attributable_energy_share": 0.048519,
+   "median_effective_rank": 688.8,
+   "d_model": 3584
+  },
+  "depth_test_qwen3_1_7b": {
+   "median_relative_distance_from_identity": 3.2050,
+   "min": 0.4593,
+   "max": 8.7514,
+   "median_identity_attributable_energy_share": 0.097779,
+   "median_effective_rank": 485.9,
+   "d_model": 2048
+  },
+  "negative_control_gpt2": {
+   "median_relative_distance_from_identity": 1.1800,
+   "median_identity_attributable_energy_share": 0.278232,
+   "median_effective_rank": 388.7,
+   "d_model": 768
+  },
+  "reading": "J is nowhere near the identity. On the positive control the identity accounts for under 5 percent of J's energy at the median layer, and the depth model's J sits at 3.2 times the identity's norm away from it, well beyond even the uncorrelated reference of 1.41."
+ },
+
+ "the_depth_dependence_that_makes_the_result_coherent": {
+  "observation": "the identity share is not constant with depth; it rises monotonically and dramatically",
+  "positive_control_identity_share_by_layer": {
+   "layer_0": 0.00407,
+   "layer_9": 0.02051,
+   "layer_18": 0.16892,
+   "layer_21": 0.46876,
+   "layer_23": 0.64010,
+   "layer_25": 0.72908,
+   "layer_26": 0.74868
+  },
+  "best_scaled_identity_alpha_at_the_last_layers": {
+   "layer_23": 1.0092,
+   "layer_24": 1.0134,
+   "layer_25": 1.0097,
+   "layer_26": 0.9988
+  },
+  "what_this_explains": {
+   "statement": "In the LATE layers, where condition (ii) failed, J really is approaching the identity: alpha is essentially 1.0 and the identity accounts for 64 to 75 percent of J's energy at layers 23 to 26. In the EARLY and MIDDLE layers, where the plain logit lens read exactly 0.0000, J is far from the identity - under 5 percent identity energy at layers 0 to 12.",
+   "so_the_two_findings_fit_together": "the J-lens matches the plain logit lens exactly where J has become approximately the identity, and differs from it exactly where J has not. That is internally consistent and is what one would expect if the Jacobian's only readable contribution at late depth is the identity component the unembedding already applies.",
+   "this_is_a_property_of_the_fitted_J_not_of_our_code": "these are the EXTERNAL lenses, fitted by an independent party with the official library; we did not fit them"
+  },
+  "the_honest_qualification": "this depth-dependence is a description of the fitted Jacobians. It is NOT a mechanistic account, and no causal or architectural claim follows from it."
+ },
+
+ "why_negative_B_would_have_been_the_alternative_and_is_not": {
+  "negative_B_would_have_required": "J approximately the identity across layers, making the J-lens a plain logit lens by construction and rendering EQ2 unable to adjudicate",
+  "what_was_found_instead": "J is far from the identity across most of the depth, particularly in the early and middle layers, and the effective rank is 19 to 24 percent of d_model rather than near-full or near-one",
+  "therefore": "EQ2 DID adjudicate. The negative is informative rather than vacuous."
+ },
+
+ "od_016_retrospective": {
+  "what_od016_was_written_to_catch": "a lens whose Jacobian has degenerated toward the identity, i.e. a J-lens collapsed into an ordinary logit lens",
+  "od016_primary_rule": "Tukey inner fence, whose lower bound came out negative and was therefore non-binding below - a gap disclosed when OD-016 was registered",
+  "od016_registered_interval": [0.130071, 1.446260],
+  "external_published_final_identity_distance": {
+   "positive_control": 0.578094,
+   "depth_test": 0.524690,
+   "negative_control": 1.305569
+  },
+  "would_od016_have_fired": {
+   "positive_control": false,
+   "depth_test": false,
+   "negative_control": false
+  },
+  "the_answer_to_the_question_asked": "No. Even with an effective lower gate, OD-016 would NOT have fired on any of these lenses: all three published final_identity_distance values sit comfortably inside the registered interval [0.130071, 1.446260].",
+  "and_that_is_the_correct_outcome_here": "OD-016 exists to catch a lens collapsed toward the identity, and D-1 has just established that these lenses are NOT collapsed. OD-016 not firing is consistent with the finding rather than a further gap in it.",
+  "the_gap_that_remains_real": "OD-016's lower fence being non-binding is still a genuine weakness in that registration, and it is still worth fixing in any successor. It simply was not the thing that mattered here.",
+  "our_own_value_was_never_computed": "it requires lens_A, which remains unread"
+ },
+
+ "constraints_observed": {
+  "sealed_lenses_read": false,
+  "target_touched": false,
+  "criteria_revised": 0,
+  "r2_reopened": false,
+  "terminal_ruling_unchanged": true,
+  "the_tool_refuses_the_sealed_digests_by_construction": true
+ },
+
+ "claim_ceiling": "An instrument-validity diagnostic. It licenses no claim of any kind, it is not a scientific finding, and it does not alter the terminal ruling."
+}
