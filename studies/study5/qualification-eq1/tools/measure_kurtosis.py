@@ -25,6 +25,7 @@ import sys
 from pathlib import Path
 
 MAX_SEQ_LEN = 128
+SKIP_FIRST = 16
 AUTHORITY_SHA256 = (
     "5c45d31a2aab23ffe93bbf5f4a220fb1835c1b98e960a2588fa587efcb9b1a35"
 )
@@ -115,11 +116,26 @@ def build_null_lens(reference, seed: int):
 
 
 def curve_for(lens, lens_model, prompts, *, use_jacobian: bool, label: str):
-    """Mean excess kurtosis per layer, accumulated over (row, position)."""
+    """Mean excess kurtosis per layer, accumulated over (row, position).
+
+    Two aggregations are accumulated from the SAME per-position values:
+
+      primary   - positions 1.. , the rule frozen in readout_convention.json
+      secondary - positions SKIP_FIRST.. , matching the position convention the
+                  fit itself uses (jlens.fitting.valid_position_mask skips the
+                  first 16 as attention sinks)
+
+    The primary is the frozen rule and is the only one Q-4a is decided on. The
+    secondary costs nothing extra, because the per-position kurtosis is computed
+    either way, and it makes the sensitivity to the position convention visible
+    instead of leaving it as an unexamined assumption.
+    """
     import torch
 
     sums: dict[int, float] = {l: 0.0 for l in lens.source_layers}
     counts: dict[int, int] = {l: 0 for l in lens.source_layers}
+    alt_sums: dict[int, float] = {l: 0.0 for l in lens.source_layers}
+    alt_counts: dict[int, int] = {l: 0 for l in lens.source_layers}
 
     for index, prompt in enumerate(prompts):
         lens_logits, _model_logits, _ids = lens.apply(
@@ -131,15 +147,18 @@ def curve_for(lens, lens_model, prompts, *, use_jacobian: bool, label: str):
             use_jacobian=use_jacobian,
         )
         for layer, logits in lens_logits.items():
-            # Position 0 is BOS only; excluded by the frozen aggregation rule.
-            values = excess_kurtosis_rowwise(logits[1:, :])
-            finite = [v for v in values if v == v and abs(v) != float("inf")]
-            if len(finite) != len(values):
+            per_position = excess_kurtosis_rowwise(logits)
+            if any(v != v or abs(v) == float("inf") for v in per_position):
                 raise RuntimeError(
                     f"{label}: non-finite kurtosis at layer {layer}, row {index}"
                 )
-            sums[layer] += sum(finite)
-            counts[layer] += len(finite)
+            # Position 0 is BOS only; excluded by the frozen aggregation rule.
+            primary = per_position[1:]
+            secondary = per_position[SKIP_FIRST:]
+            sums[layer] += sum(primary)
+            counts[layer] += len(primary)
+            alt_sums[layer] += sum(secondary)
+            alt_counts[layer] += len(secondary)
         del lens_logits
         if (index + 1) % 20 == 0:
             print(f"  {label}: {index + 1}/{len(prompts)} rows", flush=True)
@@ -149,6 +168,8 @@ def curve_for(lens, lens_model, prompts, *, use_jacobian: bool, label: str):
             "layer": layer,
             "excess_kurtosis": sums[layer] / counts[layer],
             "n_position_samples": counts[layer],
+            "excess_kurtosis_skip_first_16": alt_sums[layer] / alt_counts[layer],
+            "n_position_samples_skip_first_16": alt_counts[layer],
         }
         for layer in lens.source_layers
     ]
@@ -272,6 +293,18 @@ def main() -> int:
             "aggregation": "arithmetic mean over all (row, position) pairs",
             "position_0_excluded": True,
             "frozen_before_computation": True,
+            "secondary_aggregation": {
+                "field": "excess_kurtosis_skip_first_16",
+                "rule": f"same values aggregated over positions {SKIP_FIRST}..",
+                "why_reported": (
+                    "the fit itself skips the first 16 positions as attention "
+                    "sinks (jlens.fitting.valid_position_mask); reporting the "
+                    "readout under that convention as well makes the sensitivity "
+                    "to the position rule visible rather than assumed"
+                ),
+                "used_for_the_q4a_decision": False,
+                "the_frozen_primary_rule_was_not_changed": True,
+            },
         },
         "activations": {
             "role": "heldout",
