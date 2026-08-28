@@ -1134,3 +1134,133 @@ accuracies, length ratio, parser false-negative rate and confirmatory ceiling.
 registered decision altered. Recorded because a result whose timing could be
 questioned should have that question answered in the record rather than left to
 the reader to worry about.
+
+---
+
+# P-2 — J-lens fitting, kurtosis band, gate Q-4a
+
+Released by the operator after P-1. Budget for this phase: **≤ 48 actively used
+GPU-hours**, with 14.611 of 240 already spent.
+
+## Registrations, all made before any P-2 data was touched
+
+**OD-007 — budget carry-forward.** The per-phase ceilings sum to 228 against a
+global 240, so 12 hours were never allocated; P-1 then returned another 9.389.
+Registered: a per-phase cap binds spending *within* that phase, unused balance
+returns to a shared reserve, and **240 actively used GPU-hours is the only hard
+stop**. Drawing on the reserve requires an explicit journal record naming the
+source phase and the amount. Without this, P-4 — the largest and most expensive
+phase — would be starved for bookkeeping reasons, while 240 is the number the
+operator actually approved.
+
+**OD-008 — retokenisation rule.** Retokenise every corpus row with the 7B target
+tokenizer, assert ≥128 untruncated tokens, discard failures with a per-row
+record, **never backfill**, preserve the frozen role assignment, commit both
+token-id hashes. Stop if role A or B survives below 400.
+
+Backfilling is banned because drawing a replacement row from the candidate pool
+would let the 7B tokenizer participate in a selection that was frozen before it
+was involved. The cost is that the sample can only shrink, never be topped back
+up. That cost is accepted deliberately: a smaller pre-registered sample is worth
+more than a full sample with a contaminated selection rule.
+
+**OD-009 — a falsifiable criterion for Q-4a.** The authority says "a discernible
+mid-depth kurtosis band exists", which applied after the fact degrades into a
+judgement call about a curve one has already seen. Quantified now, before the
+curve existed, as five criteria that must *all* hold: C1 interior maximum, C2
+contiguity at a half-height threshold, C3 band length ≥ 7 layers, C4 cross-fit
+agreement (Jaccard ≥ 0.70, argmax within 3), C5 exceeding a matched-norm
+random-`J` null at every band layer and by a mean margin of 1.0.
+
+**C5 is the criterion that does the work.** Without a null, "a band exists" is
+unfalsifiable — any noisy curve has a maximum, a half-height threshold and a
+contiguous run above it. C1–C4 describe a *shape*; only C5 asks whether the
+shape carries information. The margin was frozen before measurement.
+
+The published depth-reindexed band (≈ layer 11–26 on 28 layers) is **excluded
+from the derivation entirely** and admitted only as an after-the-fact
+comparison. Whether the derived band agrees with it is a result, not an input.
+
+**OD-010 — A and B are never merged.** `merge()` would accept `lens_A` and
+`lens_B` without complaint: they agree on `source_layers` and `d_model`, so no
+guard fires. Every cross-fit stability criterion would then be comparing a lens
+against itself, and the numbers would look perfectly normal. The failure is
+silent, which is why the ban is explicit rather than left to be inferred from a
+docstring.
+
+**OD-009-A1 — curve range, clarified before any curve existed.** The lens is
+defined only for source layers strictly below the target, so with the registered
+convention (sources 0–26, target 27, inherited from the 1.5B precedent) the
+curve has **27 points, not 28**. There is no `J_27`: layer 27 is the frame the
+lens transports *into*. C1 is therefore applied to the endpoints of the actual
+curve, so argmax must lie in 1–25.
+
+Note this **tightens** the criterion rather than relaxing it: a literal reading
+of "strictly inside (0, 27)" would accept argmax = 26, the last measured point,
+which is exactly the monotone-trend case C1 exists to reject.
+
+## Readout convention taken from the source, not the prose
+
+The paper describes a method; the registered artifact is one implementation of
+it. Where they could differ, the implementation is what the published anchors
+were produced by. Read from `jlens/lens.py` at the registered commit:
+
+- `apply()` at line 146; the readout at line 213 is `model.unembed(residual)` —
+  **raw logits, no softmax**, the returned object is literally `lens_logits`;
+- `transport()` at line 135 is `residual @ J_bar.T`, no normalisation;
+- `use_jacobian=False` at line 211 yields the **logit-lens baseline through the
+  identical path**, so the descriptive comparison curve needs no reimplementation.
+
+Aggregation was frozen in the same artifact, before any curve was computed:
+excess kurtosis over the vocabulary axis per (row, position, layer), then the
+arithmetic mean over (row, position), with position 0 excluded as BOS-only.
+
+## Step 1 — OD-008 retokenisation (zero GPU)
+
+**All 1402 rows survive.** A = 600, B = 600, heldout = 200, smoke = 2, with 0
+discarded and 0 backfilled. The stop condition never came close to firing.
+
+The reason is worth stating plainly: **the 7B and 1.5B tokenizer files are
+byte-identical.** `tokenizer.json` (git blob `a34650995d…`) and
+`tokenizer_config.json` (`9967ff32d9…`) are published under *both* revisions,
+each independently verified in P-0 against the origin-published ids. The
+151936-versus-152064 difference is in the **model** config — the number of
+embedding rows — not in the tokenizer.
+
+So OD-008 is a provable no-op. It was still executed in full rather than argued
+away, and the proof is that **1402 of 1402 frozen `token_ids_sha256` values were
+reproduced exactly** — byte-level agreement with values frozen before this phase
+existed, which a merely self-consistent tool could not achieve.
+
+### DC-003 — the first retokenisation run was wrong and was discarded
+
+I assumed `add_special_tokens=True` would prepend BOS, because
+`tokenizer_config.json` says `add_bos_token: true`. Under transformers 5.9.0 the
+loaded `Qwen2Tokenizer` defaults it to **False** regardless of that config. The
+corpus builder had applied `force_bos` by setting the attribute on the loaded
+object (`jlens_s2_corpus_acquisition.py:294-304`); I had not read that before
+writing the tool.
+
+Had it stood: every sequence shifts by one position; `token_count_untruncated`
+counts BOS in the frozen corpus but not in my run, so rows sitting exactly at the
+128-token boundary fell to 127 and were discarded. The first run dropped 4 rows —
+3 from A, 1 from B — and **every one of those discards was an artifact of my bug,
+not a property of the tokenizer**. Both lenses would then have been fitted on
+off-by-one windows and produced perfectly reasonable-looking, meaningless curves.
+
+The dangerous part: **the bad run exited 0 and printed its OD-003 proof string.**
+Every assertion in it passed.
+
+The underlying fault class is worth naming. The corpus builder confirmed
+`force_bos` with `applied = bool(tokenizer.add_bos_token)` immediately after
+assigning `True` — **a check that cannot fail**, because assigning a Python
+attribute always succeeds whether or not the tokenizer honours it. This is the
+same class as IMG-001: a check that cannot fail is indistinguishable from no
+check at all. `jlens`'s own `from_hf` docstring even warns that the attribute
+"may have no effect for some fast-tokenizer configurations".
+
+The corrected tool probes with a fixed string, asserts BOS actually appears, then
+asserts BOS-first on every one of the 1402 rows, raising rather than recording.
+The inherited weak check is **not** modified — section 13 forbids rewriting
+historical code, and the corpus it produced is proven correct by the exact hash
+reproduction above.
