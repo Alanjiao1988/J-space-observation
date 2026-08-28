@@ -1,0 +1,40 @@
+{
+ "schema_version": "study5-eq2-registration-v1",
+ "registration_id": "OD-017",
+ "recorded_at_utc": "2026-08-28T15:00:00Z",
+ "phase": "R-1b",
+ "kind": "standing rule: registered text versus implementation conformance",
+ "approved_by": "operator, in session, 2026-08-28",
+
+ "why_it_exists": {
+  "statement": "DC-005 was found ONLY because it produced an anomalous result. Had that unregistered stricter rule happened to produce a plausible-looking result, it would never have been found.",
+  "assessment_verbatim": "This is a heavier problem than DC-005 itself.",
+  "the_general_fault": "a divergence between what a criterion says and what the code does is invisible whenever the divergence happens to be flattering, or merely unremarkable"
+ },
+
+ "the_rule": {
+  "statement": "Before any pre-registered criterion is applied to data, a line-by-line conformance table of REGISTERED TEXT against IMPLEMENTED BEHAVIOUR must be produced and committed.",
+  "enforcement": "if the conformance table is not committed, or does not pass, the criterion may not run",
+  "scope": "every registered criterion, not only new ones",
+  "retroactive_requirement": "a conformance pass over all existing OD entries is the first step of R-1b"
+ },
+
+ "the_directionality_criterion": {
+  "recorded_verbatim_because_it_is_the_precedent_for_future_disputes": true,
+  "rule": "Changing the IMPLEMENTATION to match the REGISTERED TEXT is a bug fix. Changing the REGISTERED TEXT to match the DATA is p-hacking.",
+  "how_it_resolved_DC_005": "the correction moved the implementation back toward the registered text, so it was a bug fix rather than a choice of the more convenient reading",
+  "the_supporting_check_that_made_it_verifiable": "the negative control was clean under BOTH readings, so the correction could not have been rescuing it",
+  "this_is_the_adjudication_basis_for_future_disputes_of_the_same_kind": true
+ },
+
+ "what_a_conformance_entry_must_contain": [
+  "the registered identifier",
+  "the registered text, quoted",
+  "the implementing function and file",
+  "a plain statement of what the code actually does",
+  "a verdict: CONFORMS, or DIVERGES with the divergence described",
+  "for numeric constants, the registered value and the value in code, compared"
+ ],
+
+ "claim_ceiling": "A governance rule. It licenses no claim of any kind."
+}

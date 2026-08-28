@@ -1,0 +1,56 @@
+{
+ "schema_version": "study5-eq2-operator-amendment-v1",
+ "amendment_id": "OA-005",
+ "recorded_at_utc": "2026-08-28T15:05:00Z",
+ "phase": "R-1b",
+ "approved_by": "operator, in session, 2026-08-28",
+ "amends": "the band criterion, replacing the mid-depth requirement with a stricter test",
+ "direction": "TIGHTENING, not relaxing",
+
+ "the_problem": {
+  "observed": "the positive band is [21..26] and the depth band [20..26]; both sit in the LAST QUARTER of the network",
+  "assessment": "these are LATE bands, not mid-depth bands. Under the literal reading of 'mid-depth' neither qualifies.",
+  "the_upper_edge_carries_no_information": {
+   "recorded_verbatim": "Because the null is near zero, any readrate above about 0.42 percent is significant, so the contiguous run extends all the way to the final layer. The band's upper edge is RIGHT-CENSORED BY THE END OF THE NETWORK, not determined by the phenomenon. Only the lower edge (21 / 20) and the argmax (L25 / L24) carry information.",
+   "consequence": "no interpretation may rest on where the band ends"
+  }
+ },
+
+ "what_mid_depth_was_actually_standing_in_for": {
+  "statement": "The mid-depth requirement was a proxy for NON-TRIVIALITY: an intermediate should be readable in the middle of the network, not at the input end where it has not been computed yet, nor at the output end where it is merely the answer itself.",
+  "the_real_risk_of_a_late_band": "what is being read may not be an intermediate held in a workspace, but the answer about to be emitted",
+  "why_the_random_lens_null_cannot_catch_this": "the random lens destroys the signal entirely, so it can only test whether the pipeline manufactures signal from nothing. It cannot test whether J is merely reading output-adjacency that is already present in the residual stream.",
+  "therefore": "a SECOND control is required"
+ },
+
+ "the_revised_criterion": {
+  "band_is_valid_iff_all_three_hold": {
+   "i": "the longest contiguous run whose readrate significantly exceeds the matched-norm random-lens null upper confidence bound",
+   "ii": "within that run, J-lens readrate significantly exceeds PLAIN LOGIT LENS readrate",
+   "iii": "the run's argmax is not at an endpoint (OD-015's registered text, unchanged)"
+  },
+  "condition_ii_is_new": true,
+  "plain_logit_lens_definition": "the same residual stream, the same (layernorm +) unembed, carrying NO Jacobian at all",
+  "implementation_note": "obtained through the official path with use_jacobian=False, so it differs from the J-lens readout in exactly one respect"
+ },
+
+ "why_this_is_not_post_hoc_relaxation": {
+  "the_test": "this amendment makes the criterion HARDER to pass and may kill the current result",
+  "reasoning_recorded_verbatim": "A post-hoc change that makes its own conclusion easier to falsify runs in the opposite direction from p-hacking.",
+  "consistency": "this is the same adjudication logic applied to OA-004",
+  "non_vacuity_provable_a_priori": {
+   "argument": "if J is approximately the identity, then the J-lens is identical to the plain logit lens and condition (ii) fails BY CONSTRUCTION",
+   "why_that_matters": "that is exactly the failure mode OD-016 already registered - a lens collapsed toward the identity - so the two registrations meet here",
+   "so_condition_ii_can_fail": "demonstrably, and for a reason known before any measurement"
+  }
+ },
+
+ "honest_labelling_verbatim": "OA-005 was made, in time, after the R-1 band positions had been seen, and is labelled post-hoc. Its direction is TIGHTENING rather than relaxing: the new condition (ii) makes the criterion harder to pass, and the current positive result may be invalidated by it. Non-vacuity is proven a priori by the J approximately I case, which meets OD-016.",
+
+ "how_a_late_band_must_be_reported_if_condition_ii_passes": {
+  "forbidden": "claiming that the paper's mid-depth band was reproduced",
+  "required_wording": "On open models of 27 to 28 layers, the band appears at roughly 74 to 78 percent of depth, in the last quarter of the network, rather than at the one-third point of the published prior. Two models of different scale give a consistent late position. The published mid-depth prior does NOT transfer to shallow models, and this is recorded as a scale limitation."
+ },
+
+ "claim_ceiling": "A criterion amendment. It licenses no claim of any kind."
+}

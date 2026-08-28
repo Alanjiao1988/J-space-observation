@@ -1,0 +1,43 @@
+{
+ "schema_version": "study5-eq2-ruling-record-v1",
+ "recorded_at_utc": "2026-08-28T15:10:00Z",
+ "phase": "R-1b",
+ "purpose": "Record two operator rulings verbatim, because both constrain how later text may be written.",
+
+ "ruling_1_the_negative_control_is_clean_only_conditionally": {
+  "the_numbers": {
+   "gpt2_best_lower_bound": 0.003781,
+   "null_ceiling": 0.004260,
+   "gap": "about 12 percent",
+   "assessment": "a narrow miss, NOT a clean separation",
+   "gpt2_peak_readrate": 0.0078,
+   "n": 910,
+   "approximate_hits_at_peak": 7,
+   "consequence": "with a larger item count gpt2 would quite possibly cross the ceiling"
+  },
+  "limitation_text_recorded_verbatim": "The non-significance of the negative control gpt2 is POWER-DEPENDENT and must not be read as 'gpt2 has no readout'. The OA-004 diagnosis already established that gpt2 reads at about 390 times the chance rate. Its role in this study is as a descriptive control, and its non-significance does not constitute evidence of 'no workspace'. The real null is carried by the random-lens null, whose readout is essentially zero and which is clean.",
+  "must_appear_in_the_limitations_section": true
+ },
+
+ "ruling_2_the_eq1_boundary": {
+  "eq1_record_stands_unchanged": true,
+  "q4a_fail": {
+   "retracted": false,
+   "re_run": false,
+   "thresholds_relaxed": false,
+   "artifacts_modified": false
+  },
+  "the_only_permitted_consequence_of_the_convention_adjudication": "an INTERPRETIVE FOOTNOTE: the convention V that EQ1 used has no overlap with the rank-derived band, so EQ1's FAIL is attributable to EQ1's implementation choice rather than to a property of the model.",
+  "explicitly_forbidden_verbatim": "It is forbidden to restart any part of EQ1 on the grounds that re-running it under convention D might PASS. EQ1's FAIL is an accomplished fact about that execution of ours.",
+  "why_this_prohibition_matters": "re-running a failed measurement under a convention chosen after the failure would convert a recorded result into a search for a passing configuration, which is precisely what the whole registration discipline exists to prevent"
+ },
+
+ "ruling_3_dc_005_accepted_with_its_reasoning_fixed_as_precedent": {
+  "verdict": "the correction is accepted",
+  "the_adjudication_basis_verbatim": "Changing the implementation to match the registered text is a bug fix. Changing the registered text to match the data is p-hacking. The distinguishing feature is the DIRECTION.",
+  "the_supporting_check_accepted": "the negative control was clean under both readings, so the correction could not have been rescuing it",
+  "registered_as_standing_rule": "OD-017"
+ },
+
+ "claim_ceiling": "A record of rulings. It licenses no claim of any kind."
+}
