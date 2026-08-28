@@ -1,0 +1,72 @@
+{
+ "schema_version": "study5-eq2-registration-v1",
+ "registration_id": "OD-016",
+ "recorded_at_utc": "2026-08-28T06:50:00Z",
+ "phase": "R-1",
+ "kind": "comparability tolerance for our own lens's final_identity_distance",
+ "status": "COMMITTED IN R-1, APPLIED AS A GATE IN R-2",
+ "derived_from_external_data_not_chosen_by_us": true,
+ "committed_before_our_own_value_was_computed": true,
+
+ "external_distribution": {
+  "source": "neuronpedia/jacobian-lens @ 0731326edff4ae730ffc5356fe1a4728c748b3a6, every published *_convergence.csv",
+  "models_with_a_published_convergence_trace": 37,
+  "note_on_the_count": "the operator's prompt referred to 39 models; the pinned revision publishes 37 convergence traces, and 37 is what was actually used. The discrepancy is recorded rather than rounded to the expected number.",
+  "extraction": "the identity_distance column of the final data row, located by column NAME rather than by index so an upstream column reordering cannot silently yield the wrong quantity",
+  "every_csv_verified_against_its_origin_published_git_blob_sha1": true,
+  "n": 37,
+  "min": 0.130071,
+  "q1": 0.441750,
+  "median": 0.578094,
+  "q3": 0.843554,
+  "max": 3.649054,
+  "iqr": 0.401804,
+  "mean": 0.8161715405405405,
+  "span_of_the_sweep": "roughly 70M to 70B parameters across gemma, qwen, llama, olmo, pythia, gpt-oss and gpt2 families"
+ },
+
+ "a_fact_worth_recording": {
+  "statement": "The positive control's final_identity_distance, 0.578094, is EXACTLY the median of the external distribution.",
+  "why_it_matters": "the reference model against which our lens is compared sits at the centre of the external experience rather than at an extreme, which is the most favourable possible position for a reference",
+  "this_was_observed_not_arranged": true
+ },
+
+ "the_tolerance": {
+  "primary_rule": "Tukey inner fence on the external distribution",
+  "formula": "[Q1 - 1.5 * IQR, Q3 + 1.5 * IQR]",
+  "computed": {
+   "raw_lower": -0.160956,
+   "raw_upper": 1.446260
+  },
+  "identity_distance_is_non_negative_so_the_lower_fence_is_clamped": 0.0,
+  "effective_primary_interval": [0.0, 1.446260],
+  "honest_statement_about_its_power": {
+   "observation": "because the raw lower fence is negative, the primary rule is NON-BINDING BELOW. As a one-sided test it can only catch a lens whose Jacobian is unusually FAR from the identity; it cannot catch one that is unusually CLOSE to it.",
+   "why_that_gap_matters": "an identity distance near zero would mean J has degenerated towards the identity, which is to say the Jacobian lens has collapsed into an ordinary logit lens. That is a real failure mode and the primary rule would not detect it.",
+   "not_papered_over": true
+  },
+  "secondary_lower_gate": {
+   "value": 0.130071,
+   "source": "the minimum observed anywhere in the external sweep of 37 models",
+   "rule": "a value below this is outside the range any real fitted lens in the external sweep attained, and is treated as outside the external distribution",
+   "registered_separately_so_its_weaker_basis_is_visible": "a single observed minimum is a less robust bound than a quantile fence, and it is labelled as such rather than presented as equivalent"
+  },
+  "combined_acceptance_interval": [0.130071, 1.446260]
+ },
+
+ "how_it_is_applied": {
+  "when": "R-2, as its first action",
+  "it_is_a_gate": true,
+  "on_failure": "stop and report; do not proceed to interpret any band",
+  "why_it_gates": "if our lens is not comparable to the external ones, then agreement or disagreement of any band derived from it carries no weight, and reading the band first would be interpreting a number whose basis had not been established",
+  "our_value_is_not_yet_known": "computing it requires reading lens_A, which OD-012 forbids until the convention is committed"
+ },
+
+ "what_this_tolerance_is_not": [
+  "it is not a quality threshold for the lens",
+  "it is not evidence about any band",
+  "passing it does not make our lens correct, only comparable"
+ ],
+
+ "claim_ceiling": "A comparability tolerance. It licenses no claim of any kind."
+}
