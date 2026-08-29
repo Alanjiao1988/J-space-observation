@@ -1,0 +1,110 @@
+{
+ "schema_version": "study5-p0prime-blocker-v1",
+ "blocker_id": "HB-005",
+ "phase": "P-0'",
+ "recorded_at_utc": "2026-08-29T01:35:00Z",
+ "status": "TERMINAL FOR THIS INVOCATION, AWAITING OPERATOR",
+ "kind": "registered stop condition reached before any measurement",
+
+ "which_stop_conditions": {
+  "from": "the P-0' directive, section 8",
+  "clause_1_triggered": "any of the four synthetic cases fails; case 2 failed",
+  "clause_5_triggered": "a situation arises in which continuing would require a SECOND revision of the estimand",
+  "reached_before_any_gpu_work": true,
+  "gpu_seconds_spent_reaching_it": 0
+ },
+
+ "finding_1_the_prescribed_replacement_is_the_same_estimand": {
+  "statement": "the estimand prescribed as the replacement is algebraically identical to the estimand P-0 already used; it is not a replacement",
+  "prescribed": "effect = (L_patch - L_clean) / (L_full - L_clean), with L_x = logit_x(a_D) - logit_x(a_R)",
+  "what_P0_implemented": "restoration = (gap - ld_recipient) / (ld_donor - ld_recipient)",
+  "symbol_correspondence": {
+   "L_clean": "ld_recipient = logit_difference(recipient clean run)",
+   "L_patch": "gap = logit_difference(patched recipient run)",
+   "L_full": "ld_donor = logit_difference(donor clean run)",
+   "L_full_minus_L_clean": "denominator"
+  },
+  "numerical_check": {
+   "method": "200000 independent random draws of the six underlying logits, both formulas evaluated",
+   "worst_absolute_difference": 0.0,
+   "identical": true
+  },
+  "the_only_differences_are_not_in_the_formula": [
+   "P-0 takes a max over single-token surface forms where the directive writes a single token id; a refinement, not a change of kind",
+   "the denominator floor is new",
+   "the correct-only inclusion rule is new"
+  ],
+  "consequence": "adopting the prescribed replacement would re-run the identical estimand and reproduce the identical defect, while the record would say an estimand had been replaced. That is a silent failure of exactly the shape OD-017 exists to prevent"
+ },
+
+ "finding_2_the_premise_behind_the_replacement_is_false": {
+  "the_premise_as_written": "pure disruption depresses a_D and a_R by roughly equal amounts, the difference does not move, so effect is approximately 0",
+  "why_it_fails": "in its own clean run the recipient PREFERS its own answer, so logit(a_R) starts high and logit(a_D) starts low. A patch that destroys the state moves the output toward something uninformative about which token is which, which drags the high one down far more than the low one. The logit DIFFERENCE therefore rises rather than staying put",
+  "closed_form": "substituting the expected gap of a destroyed state, L_patch = 0, gives effect = -L_clean / (L_full - L_clean), which is strictly positive whenever the recipient prefers its own answer and the donor prefers its own",
+  "sweep": {
+   "method": "20000 draws with L_clean in [-15, -1] and L_full in [1, 15]; no P-0 artifact used",
+   "min": 0.06353,
+   "mean": 0.49971,
+   "max": 0.93521,
+   "fraction_at_or_below_zero": 0.0
+  },
+  "corroboration_from_the_measurement_already_in_hand": {
+   "note": "reported only, and consistent rather than load-bearing",
+   "observed_random_donor_null_at_BRIDGE": 0.4139,
+   "analytic_expectation": "approximately 0.5",
+   "reading": "the measured value sits where the closed form says it should, which is why the defect is constructional rather than a matter of precision"
+  }
+ },
+
+ "the_four_synthetic_cases_as_run": {
+  "estimand_under_test": "the prescribed one",
+  "run_before_any_real_profile_was_touched": true,
+  "any_threshold_taken_from_P0_data": false,
+  "case_1_no_op": {"must_be": "EXACTLY_ZERO", "worst_abs_mean": 0.0, "passed": true},
+  "case_2_random_vector": {
+   "must_be": "APPROXIMATELY_ZERO",
+   "worst_abs_mean": 0.515487,
+   "every_layer_interval_contains_zero": false,
+   "passed": false,
+   "significance": "this is the case the replacement existed to fix, and it is the case that fails"
+  },
+  "case_3_full_donor": {"must_be": "ONE", "worst_abs_deviation_from_one": 0.0, "passed": true},
+  "case_4_carries_the_intermediate": {
+   "must_be": "SIGNIFICANTLY_POSITIVE",
+   "smallest_lower_bound": 0.6,
+   "passed": true
+  },
+  "how_approximately_zero_was_formalised": "the 95 percent cluster-bootstrap interval must contain zero at every layer; no numeric tolerance was invented, because a tolerance chosen after the failure it is meant to judge would not be evidence"
+ },
+
+ "why_the_agent_does_not_choose_a_different_estimand": {
+  "the_directive_permits_one_replacement_only": "the estimand may be replaced this once",
+  "the_prescribed_replacement_does_not_work": "shown above, before any measurement",
+  "therefore": "making it work requires a SECOND choice of estimand, which section 8 clause 5 registers as a stop",
+  "and_separately": "an estimand chosen by the agent after seeing which one failed would be the agent selecting the instrument that decides the question, which is the substance of what the directionality precedent forbids",
+  "estimands_proposed_by_the_agent_in_this_invocation": 0
+ },
+
+ "what_this_does_not_mean": [
+  "it does not mean no valid estimand exists; it means the agent may not be the one to choose it",
+  "it does not resurrect P-0's withheld verdict, which remains withheld and uninterpretable",
+  "it says nothing about J-space, the J-lens, the published lenses, the paper, or T",
+  "it does not modify EQ1 or EQ2 in any respect"
+ ],
+
+ "what_was_completed_despite_the_stop": [
+  "P-0 closed UNINTERPRETABLE with the withheld direction recorded verbatim",
+  "OD-011 formally revised so a must-return-positive case is permanently required",
+  "the batch-baseline bug fix, which section 2 authorises independently of the estimand question",
+  "the correct-both pair count, which is estimand-independent and was computed only after its inclusion rule was pushed",
+  "the EQ2 item-accuracy addendum, written as a new file with EQ2 left byte-identical"
+ ],
+
+ "decisions_reserved_for_the_operator": [
+  "which estimand, given that a logit-difference recovery ratio is what P-0 already used",
+  "whether an estimand must be required to be invariant to a norm-matched destructive patch by construction, rather than checked for it afterwards",
+  "whether to proceed instead to P-0c, where the intermediate is defined by construction and this whole class of question does not arise"
+ ],
+
+ "claim_ceiling": "A blocker record. It licenses no claim of any kind, and it is not a finding."
+}

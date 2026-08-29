@@ -1,0 +1,49 @@
+{
+ "schema_version": "study5-od011-revision-v1",
+ "registration_id": "OD-011",
+ "revision": 2,
+ "status": "IN FORCE",
+ "recorded_at_utc": "2026-08-29T01:45:00Z",
+ "recorded_by": "operator ruling, in session, 2026-08-29",
+ "supersedes": "OD-011 revision 1, registered in STUDY5_EQ2",
+
+ "original_text_preserved": {
+  "from": "studies/study5/qualification-eq2/STATUS.json, standing_rules_registered_this_invocation",
+  "verbatim": "a check must carry a demonstrated failing case, or it counts as not implemented",
+  "still_in_force": true,
+  "not_weakened_by_this_revision": true
+ },
+
+ "the_revision": {
+  "statement": "A non-vacuity demonstration must from now on ALSO include a case that MUST RETURN POSITIVE. Cases that must return negative establish only that the rule cannot manufacture a positive; they cannot distinguish a working rule from one that always returns the negative.",
+  "both_directions_are_now_required": true,
+  "minimum_demonstration": [
+   "at least one case that must return the negative verdict",
+   "at least one case that must return the positive verdict"
+  ]
+ },
+
+ "why_the_revision_exists": {
+  "how_the_hole_was_found": "the agent added a fourth case of its own accord during P-0, on the reasoning that three must-return-negative cases would be passed by a rule that always returns the negative, which would be as uninformative as one that always returns the positive",
+  "found_by_reasoning_not_by_data": true,
+  "the_same_shape_as_OD_017": "OD-017 exists because DC-005 was found only by producing an anomalous result, and a flattering divergence would never have surfaced. The hole here is the mirror image: a rule that can only fail in one direction cannot be shown to work by tests that only probe that direction",
+  "operator_assessment": "recorded as an effective mechanism and added to the standing list"
+ },
+
+ "what_it_would_have_changed_had_it_been_in_force_earlier": {
+  "in_EQ2": "the band rule's non-vacuity demonstration covered the random lens, pure noise and an empty profile, all must-return-no-band. It did not demonstrate that the rule could return a band on a construction that should have one",
+  "stated_carefully": "this is an observation about the demonstration's coverage, NOT a claim that EQ2's determination was wrong. EQ2's NEGATIVE stands, is not reopened, and no EQ2 artifact is modified",
+  "reopens_EQ2": false,
+  "reopens_EQ1": false
+ },
+
+ "first_application": {
+  "phase": "P-0'",
+  "tool": "studies/study5/validation-p0-prime/tools/non_vacuity_p0prime.py",
+  "cases": 4,
+  "must_return_positive_cases": 2,
+  "outcome": "case 2, a must-return-approximately-zero case, FAILED for the prescribed estimand, which halted the phase before any GPU work"
+ },
+
+ "claim_ceiling": "A governance rule. It licenses no claim of any kind."
+}

@@ -1,0 +1,191 @@
+{
+ "schema_version": "study5-p0prime-preregistration-v1",
+ "registration_id": "P0PRIME-PREREG",
+ "phase": "P-0'",
+ "study_id": "STUDY5_P0_PRIME",
+ "namespace": "studies/study5/validation-p0-prime/",
+ "recorded_at_utc": "2026-08-29T01:40:00Z",
+ "recorded_by": "operator directive of 2026-08-29, executed in session",
+ "relationship_to_P0": "a new independent pre-registration, not a continuation and not an amendment; P-0 is closed UNINTERPRETABLE and may not be reopened by it",
+ "precedent": "D-1, which registered a new question separately rather than reopening a closed one",
+
+ "status": "PARTIAL. Everything estimand-independent is registered and pushed before any measurement. THE ESTIMAND ITSELF IS HELD under HB-005 and no measurement governed by it may run.",
+
+ "0_why_this_registration_is_partial": {
+  "what_was_ordered": "replace the estimand with a logit-difference recovery ratio, effect = (L_patch - L_clean) / (L_full - L_clean)",
+  "what_was_found_before_any_measurement": "that formula is algebraically identical to the one P-0 already used; 200000 random draws give a worst absolute difference of 0.0",
+  "and": "run against the four required synthetic cases, it FAILS case 2, the random-vector case, at 0.5155 with no layer's interval containing zero",
+  "therefore": "registering it as operative would register a known-failing criterion, and repairing it would be a second estimand revision, which section 8 clause 5 registers as a stop",
+  "what_is_registered_anyway_and_why": "every rule that does not depend on which estimand is chosen is fixed and pushed HERE, before any successor sees any data. That preserves the ordering discipline for whichever estimand the operator settles on, and it means the successor inherits a frame it could not have tuned",
+  "blocker": "blockers/HB-005.json"
+ },
+
+ "1_the_estimand_HELD": {
+  "state": "HELD, not registered, not operative",
+  "prescribed_form": "effect = (L_patch - L_clean) / (L_full - L_clean), with L_x = logit_x(a_D) - logit_x(a_R)",
+  "why_held": "it does not pass its own registered gate; see HB-005",
+  "estimands_proposed_by_the_agent": 0,
+  "the_agent_may_not_choose_one_because": "an estimand chosen after seeing which one failed would be the agent selecting the instrument that decides the question",
+  "replacement_budget_consumed": 0,
+  "note": "the directive permits ONE replacement. None has been spent, because the prescribed replacement turned out not to be one."
+ },
+
+ "2_registered_and_operative_regardless_of_the_estimand": {
+
+  "inclusion_correct_only": {
+   "rule": "a unit is admissible only if, in the CLEAN runs, the model's top-1 continuation at the readout position equals the item's own target for BOTH the donor and the recipient",
+   "why": "when the recipient is already wrong, 'moved toward the donor's answer' has no well-defined reference, and the denominator of any recovery ratio is unstable",
+   "measured_on": "clean runs only, so the criterion is independent of every patching result",
+   "fixed_before_the_count_was_known": true,
+   "may_be_applied_after_the_fact": false
+  },
+
+  "n_floor": {
+   "rule": "if fewer than 30 correct-both units are admissible, do not run; report and move to P-0c",
+   "value": 30,
+   "set_by": "the operator, in the directive",
+   "disclosure_required_by_the_directive": {
+    "question": "was the pair count already known when the floor was set?",
+    "answer": "no",
+    "detail": "when this clause was read, the P-0 report contained donor accuracy 0.3261 and recipient accuracy 0.3261 as SEPARATE marginals. The joint count of units correct on both sides had never been computed. It was deliberately not computed until this registration was pushed, so that the floor could not have been informed by it",
+    "the_count_is_reported_below_only_after_this_file_was_committed": true
+   }
+  },
+
+  "denominator_floor": {
+   "rule": "a unit is admissible only if L_full - L_clean is at least the registered floor",
+   "value": 1.0,
+   "units": "logits",
+   "why_a_floor_at_all": "a recovery ratio divided by a near-zero denominator is unbounded and uninterpretable",
+   "why_this_value": "one logit is the smallest difference that is not plausibly numerical noise in bfloat16 at this scale; it is a round number chosen for being unremarkable, not fitted",
+   "determined_from": "clean runs only, before any patched result exists",
+   "sensitivity_to_be_reported": [1.0, 2.0]
+  },
+
+  "null_procedure": {
+   "construction": "unrelated-donor: a third item C admissible against BOTH the donor and the recipient, patched at the same positions and scored on the same donor-versus-recipient contrast",
+   "replicates": 5,
+   "replicate_independence": "five independent draws of C per unit from the sorted admissible pool, seeded per unit id",
+   "ceiling": "the maximum, over every replicate and every layer, of the upper bound",
+   "confidence_level": 0.95,
+   "confidence_level_provenance": "statistical convention, two-sided; not fitted",
+   "uncertainty": "nonparametric cluster bootstrap resampling unordered pairs, 10000 resamples, seed 20260829",
+   "carried_over_unchanged_from_P0": true,
+   "one_change_from_P0": "the ceiling is taken WITHIN the decisive site rather than maximised across sites; P-0's global maximum imported the READOUT scale into a BRIDGE test. This is registered here, before any P-0' measurement exists, rather than chosen after seeing a curve"
+  },
+
+  "decisive_site": {
+   "site": "BRIDGE",
+   "unchanged_from_P0": true,
+   "why": "its input tokens are identical in donor and recipient, so a patch there can move nothing except state the model computed from the cue and carried forward",
+   "sites_reported_but_unable_to_decide": ["PREFIX", "CUE", "READOUT"]
+  },
+
+  "structural_gates": {
+   "prefix_integrity": "the PREFIX no-op must be within 1e-4 of zero",
+   "harness_positive_control": "CUE at the embedding output must have a lower bound of at least 0.90",
+   "unchanged_from_P0": true
+  },
+
+  "frame": {
+   "source": "studies/study5/qualification-eq2/r0/evaluations/lens-eval-multihop.json",
+   "no_new_items_authored": true,
+   "admissibility": "P-0's ten rules, unchanged, plus correct-only and the denominator floor",
+   "seed": 20260829
+  }
+ },
+
+ "3_conclusion_wordings_fixed_before_any_measurement": {
+  "these_are_verbatim_and_were_written_before_any_P0_prime_measurement_existed": true,
+  "they_are_registered_now_even_though_the_estimand_is_held": "so that whichever estimand is settled on inherits wordings it could not have shaped",
+
+  "NOT_CAUSALLY_USED": {
+   "recorded_as": "P-0' determination: the multihop items do not force a causally-used intermediate at non-cue positions in Qwen2.5-7B-Instruct.",
+   "verbatim": "Patching the donor's residual state into the recipient's run at BRIDGE - positions whose input tokens are IDENTICAL in the two prompts - produced no layer at which the effect cleared the unrelated-donor ceiling, on units the model answers correctly on both sides. Because those positions carry no lexical difference, the only thing a patch there can transfer is state the model computed from the cue and carried forward. Finding none means the items, as written and as read out, do not oblige this model to compute and carry an intermediate that anything could read. THIS IS THE GOOD OUTCOME: EQ2's negative is then explained without reference to the J-lens at all, there was nothing at those positions to read, and an item defect is repairable in a way that an instrument defect at this budget was not.",
+   "what_it_means_for_EQ2": "the EQ2 negative would not be evidence about the J-lens method, and the conclusions preceding it would need rewriting to say so",
+   "what_it_does_NOT_mean": [
+    "it does not mean the model performs no internal computation",
+    "it does not mean multi-hop items in general fail to induce intermediates",
+    "it does not mean the J-lens works, or does not work",
+    "it does not exclude an intermediate held only at the cue tokens or only at the readout position",
+    "it is not a failure of this study and must not be written up as one"
+   ],
+   "required_next_action": "stop and report; do not repair the items, do not author replacements, do not propose a third estimand"
+  },
+
+  "CAUSALLY_USED": {
+   "recorded_as": "P-0' determination: the multihop items do force a causally-used intermediate, localised to the reported layers.",
+   "verbatim": "Patching at BRIDGE cleared the unrelated-donor ceiling at the reported layers, on units the model answers correctly on both sides. Those positions are lexically identical between the two prompts, so the transferred quantity was computed by the model rather than read off the input. This is an item-validity result and an instrument-independent localisation, established by a method that uses no part of the lens under test. IT IS NOT A FINDING ABOUT J-SPACE, ABOUT THE PAPER, ABOUT T, OR ABOUT ANY MECHANISM, AND THE GATES PASSING CERTIFIES THE INSTRUMENT ONLY, NOT CAUSALITY IN ANY BROADER SENSE.",
+   "what_it_licenses": "entry to P-0b, and only that",
+   "what_it_does_NOT_mean": [
+    "it does not identify WHICH quantity is carried, only that a cue-dependent quantity is carried and used",
+    "it does not mean the labelled intermediate is that quantity",
+    "it does not mean the J-lens can read it",
+    "it says nothing about T, which is never touched"
+   ],
+   "required_next_action": "proceed to P-0b on exactly the reported layers, with a separate pre-registration"
+  }
+ },
+
+ "4_honest_labelling_recorded_verbatim": {
+  "required_by": "the directive, section 3",
+  "verbatim": "This estimand was selected in time AFTER it was observed that the random-donor null (0.4139) exceeded the real BRIDGE effect (0.2380), and is labelled post-hoc on that basis. Its discriminating property is established independently by four synthetic cases and does not rest on those two numbers.\n\nIT MUST ALSO BE RECORDED THAT THE DIRECTION OF THIS REPLACEMENT PUSHES A RESULT THAT THE REGISTERED RULE JUDGED NOT_CAUSALLY_USED - and which was then voided by a gate failure - TOWARD THE POSSIBLY-POSITIVE SIDE. THAT IS THE DIRECTION OF P-HACKING. The grounds for accepting it are that the discriminating property can be proven in advance and that the old estimand's failure is constructional; not that the new result looks better. To offset that direction, both conclusion wordings are fixed verbatim before any measurement runs, and the estimand may not be revised again.",
+  "how_this_invocation_stands_against_that_labelling": {
+   "the_replacement_was_not_adopted": true,
+   "why": "it failed case 2 in advance, which is the gate the labelling was written to be checked by",
+   "consequence": "the p-hacking direction was flagged, tested, and did not have to be relied on, because the check fired before any measurement"
+  }
+ },
+
+ "5_OD_011_as_revised": {
+  "revision_recorded_separately_in": "registrations/OD-011-REVISION.json",
+  "summary": "a non-vacuity demonstration must from now on include a case that MUST RETURN POSITIVE, not only cases that must return negative",
+  "in_force": true
+ },
+
+ "6_permitted_but_limited_recomputation_of_the_old_data": {
+  "permission": "after this registration is pushed, P-0's saved values may be used to recompute a candidate estimand, as a REPORTED-ONLY diagnostic",
+  "may_set_a_threshold": false,
+  "may_select_a_parameter": false,
+  "what_is_actually_available": "P-0 saved ld_donor, ld_recipient and denominator per unit, and the restoration curves; it did NOT save raw per-token logits",
+  "consequence": "because the prescribed estimand is algebraically identical to P-0's, the recomputation is the identity map and reproduces P-0's numbers exactly. It is reported for completeness and carries no information beyond what P-0 already published",
+  "no_rerun_was_performed_to_obtain_logits": true
+ },
+
+ "7_stop_conditions": [
+  "any of the four synthetic cases fails",
+  "the no-op cases still exceed 1e-4 after the batch-baseline repair",
+  "fewer than 30 correct-both units",
+  "lens_A or lens_B is read, or T is touched",
+  "a situation arises requiring a SECOND revision of the estimand",
+  "a situation arises requiring any change to an EQ1 or EQ2 criterion, threshold, split or reading",
+  "a reboot, resize, configuration change or NSG rule would be needed",
+  "a create-only upload hits an If-None-Match precondition failure"
+ ],
+
+ "8_boundaries": {
+  "azure": "resources are used and never reconfigured; a100-vm, cpuserver and the four TRAINING Standard_NC24s_v3 machines stay running, the V100 machines stay idle and untouched, no NSG rule, nothing resized, rebooted, created or deleted",
+  "cost": "no cost-reduction action proposed, performed or discussed",
+  "budget": "no GPU-hour ceiling applies to this phase; consumption is accounted honestly and reported, and no design compromise or gate reduction may be made to save time or hours",
+  "blobs": "existing blobs immutable; uploads create-only with If-None-Match: *",
+  "T": "not touched, not read, not loaded",
+  "lens_A_and_lens_B": "not read; the guard must show zero reading records",
+  "EQ1_and_EQ2": "byte-identical; no criterion, threshold, split or reading modified"
+ },
+
+ "9_claims_this_phase_may_not_support": [
+  "that J-space exists or does not exist",
+  "that the paper is wrong; it measured Sonnet 4.5",
+  "that the published lenses are defective",
+  "anything about how T would behave, T having never been measured",
+  "the existence of internal causal reasoning machinery",
+  "any training-causal effect of distillation",
+  "that attention, embeddings, normalisation or whole-model differences have been explained",
+  "anything about consciousness",
+  "that the paper's mid-depth band has been reproduced",
+  "P-0's withheld verdict, which may not be cited as a published conclusion",
+  "that gates passing establishes causality; gates passing certifies the instrument only"
+ ],
+
+ "claim_ceiling": "P-0' is item-validity verification. No outcome it can reach is a scientific finding."
+}
