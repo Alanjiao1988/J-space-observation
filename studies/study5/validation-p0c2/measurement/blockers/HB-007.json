@@ -1,0 +1,123 @@
+{
+ "schema_version": "study5-p0c2-blocker-v1",
+ "blocker_id": "HB-007",
+ "phase": "P-0c-2 measurement",
+ "recorded_at_utc": "2026-08-29T04:20:00Z",
+ "status": "TERMINAL FOR THE ESTIMAND ROUTE, AWAITING OPERATOR",
+ "kind": "registered stop condition reached before any null-only or real measurement",
+
+ "which_stop_condition": {
+  "from": "MEASUREMENT_PREREGISTRATION.json section 8, clause 1",
+  "clause": "any C1 OD-011 rev-2 case fails, including the flatten-only pipeline case",
+  "cases_failed": 4,
+  "cases_passed": 1,
+  "consequence_registered_in_advance": "C1 is out, the surviving candidate count falls to zero, and the phase stops and reports; C1 is not repaired and no candidate is added",
+  "reached_before_the_null_only_run": true,
+  "reached_before_any_real_patch": true,
+  "MDE_was_never_computed": "correctly so; the power of an eliminated estimand is not a meaningful quantity"
+ },
+
+ "the_result": {
+  "no_op": {
+   "must_be": "EXACTLY_ZERO",
+   "observed_worst_abs_mean": 0.506888,
+   "observed_per_layer": "approximately -0.50 at EVERY layer, tightly and consistently",
+   "passed": false
+  },
+  "random_vector": {
+   "must_be": "APPROXIMATELY_ZERO",
+   "observed_worst_abs_mean": 0.032604,
+   "interval_contains_zero_at_every_layer": false,
+   "passed": false
+  },
+  "flatten_only": {
+   "must_be": "APPROXIMATELY_ZERO",
+   "observed_worst_abs_mean": 0.144698,
+   "interval_contains_zero_at_every_layer": false,
+   "passed": false,
+   "note": "this is the cell the OD-022 sweep structurally could not see"
+  },
+  "full_donor": {
+   "must_be": "CAUSALLY_USED",
+   "observed_max_mean": 0.038606,
+   "passed": true
+  },
+  "attenuated_transfer": {
+   "must_be": "POSITIVE_AND_BELOW_FULL",
+   "observed_max_mean": 0.043370,
+   "full_donor_max_mean": 0.038606,
+   "strictly_below_full": false,
+   "passed": false,
+   "note": "a 50 percent transfer scored HIGHER than a 100 percent transfer, which is incoherent for an estimator that should be monotone in the amount transferred"
+  }
+ },
+
+ "the_diagnosis_and_why_it_is_not_a_bug": {
+  "statement": "C1's registered form is effect = raw(patched) minus the mean over replicates of raw(destructive patch). It therefore subtracts a destruction term from EVERY patch, including patches that were never destroyed.",
+  "the_no_op_case_in_arithmetic": "for a no-op, raw(patched) equals the baseline, so the effect reduces to baseline minus the null mean, which is neither zero nor close to it",
+  "is_this_an_implementation_defect": false,
+  "why_not": "the implementation computes exactly the registered expression; the shortlist defined C1 as a subtraction of a measured destruction term, and that is what it does. Changing it so a no-op returns zero would be REPAIRING THE CANDIDATE, which the pre-registration forbids",
+  "the_magnitude_that_settles_it": {
+   "no_op_bias": -0.506888,
+   "largest_real_signal_full_donor": 0.038606,
+   "ratio": 13.1,
+   "reading": "the estimator's own subtraction term is more than THIRTEEN TIMES the largest genuine effect it would have to detect; it is dominated by the quantity it subtracts"
+  }
+ },
+
+ "why_the_OD_022_sweep_did_not_catch_this": {
+  "the_honesty_note_that_predicted_it": "C1's flatten column in the sweep was exactly 0.000000 because the minuend and the subtrahend were the same deterministic function, so the cancellation was BY IDENTITY. That was recorded as a limitation of the sweep, not a strength of C1, before this demonstration was written",
+  "the_deeper_gap_now_visible": "the sweep evaluates candidates ONLY ON DESTRUCTIVE PATCHES. It never evaluates a no-op, because a no-op is not a destruction construction. C1's worst failure is therefore in a cell the sweep could not reach even in principle",
+  "the_governance_observation": {
+   "statement": "OD-022 and OD-011 revision 2 are COMPLEMENTARY and neither is sufficient alone",
+   "OD-022_tests": "behaviour under destruction",
+   "OD-011_rev_2_tests": "behaviour under NON-destruction, including the no-op and a genuine transfer",
+   "evidence": "C1 passed OD-022 and failed OD-011 rev 2 in four cases out of five",
+   "recorded_as": "an observation about the two gates; it proposes no new rule, because proposing one now would be acting on an unfavourable result"
+  }
+ },
+
+ "what_was_not_done": {
+  "C1_repaired": false,
+  "candidate_added": false,
+  "eliminated_candidate_revisited": false,
+  "selection_rule_revised": false,
+  "MDE_pass_line_adjusted": false,
+  "null_only_run_performed": false,
+  "real_patch_performed": false,
+  "any_threshold_moved": false
+ },
+
+ "what_this_does_and_does_not_mean": {
+  "it_does_mean": "the closed four-candidate shortlist is exhausted: three eliminated by the OD-022 sweep and the fourth by the OD-011 rev-2 pipeline demonstration. No estimand registered in this study can currently measure the constructed object",
+  "it_does_not_mean": [
+   "it does not mean no valid estimand exists; it means none of the four declared ones works and the executing party may not choose a fifth",
+   "it does not weaken the object, which established on its own registered criteria and remains established",
+   "it says nothing about real items, about J-space, about the J-lens, about the paper or about T",
+   "it is NOT an UNDERPOWERED determination; power was never computed, because an eliminated estimand's power is not a meaningful quantity"
+  ]
+ },
+
+ "what_survives_intact": {
+  "the_constructed_object": {
+   "determination": "OBJECT_ESTABLISHED",
+   "accuracy": 0.840625,
+   "ablated_accuracy": 0.10625,
+   "drop": 0.734375,
+   "correct_both_units": 112,
+   "unaffected_by_this_blocker": true,
+   "still_a_selection_set_and_not_a_conclusion": true
+  },
+  "the_harness": "bit-exact no-ops re-proven in both precisions on this object",
+  "the_measurement_pre_registration": "its MDE pass-line, its three outcome wordings and its decision rule stand unused and unmodified, available to any successor"
+ },
+
+ "decisions_reserved_for_the_operator": [
+  "whether a fifth candidate estimand may be declared, which the executing party may not do",
+  "whether requiring a no-op to return exactly zero is the right requirement for a null-SUBTRACTING estimand at all, since subtraction-based estimands are structurally incapable of satisfying it",
+  "whether the correct response is a different CLASS of estimand, one that does not subtract",
+  "whether to stop the J-lens route here"
+ ],
+
+ "claim_ceiling": "A blocker record. It licenses no claim of any kind, and it is not a finding."
+}

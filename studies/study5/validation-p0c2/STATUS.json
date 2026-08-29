@@ -3,7 +3,7 @@
  "study_id": "STUDY5_P0C2",
  "namespace": "studies/study5/validation-p0c2/",
  "kind": "constructed-object rebuild, instrument validation",
- "lifecycle_state": "STUDY5_P0C2_OBJECT_ESTABLISHED_ONE_CANDIDATE_SURVIVES",
+ "lifecycle_state": "STUDY5_P0C2_MEASUREMENT_HALTED_SHORTLIST_EXHAUSTED",
  "terminal": false,
  "resumable": true,
  "is_a_scientific_result": false,
@@ -162,7 +162,7 @@
   "OD-017_extended_by_OD-021": "PASS, 23 entries, 0 divergences",
   "OD-021": "IN FORCE",
   "OD-022": "IN FORCE and exercised: 4 candidates swept, 3 eliminated",
-  "OD-011_rev_2": "IN FORCE; owed by the surviving candidate before it may be applied",
+  "OD-011_rev_2": "IN FORCE and exercised: C1 failed 4 of 5 pipeline cases",
   "sealed_asset_guard": "PASS"
  },
  "writing_limitations_carried": {
@@ -182,9 +182,9 @@
  },
  "budget": {
   "ceiling_applies": false,
-  "consumed_this_phase": 0.318611,
+  "consumed_this_phase": 0.501944,
   "cumulative_before_this_phase": 39.642729,
-  "cumulative_after_this_phase": 39.96134,
+  "cumulative_after_this_phase": 40.144673,
   "denominated_per": "OD-001",
   "gates_reduced_to_save_time_or_hours": 0
  },
@@ -196,5 +196,24 @@
   "blobs_written": 0,
   "cost_reduction_actions_proposed": 0
  },
- "claim_ceiling": "P-0c-2 builds and validates an instrument. No state it can reach is a scientific result, and OBJECT_ESTABLISHED is a property of a constructed object and nothing else."
+ "claim_ceiling": "P-0c-2 builds and validates an instrument. No state it can reach is a scientific result, and OBJECT_ESTABLISHED is a property of a constructed object and nothing else.",
+ "halted_under": "HB-007",
+ "measurement_phase": {
+  "preregistration_sha256": "31070c208518067945169a30366f1f76d9ccd0d51a8215a404735488e4bcb296",
+  "pushed_before_any_null_or_real_patch": true,
+  "mde_pass_line": 0.15,
+  "mde_computed": false,
+  "why_not": "the phase stopped before the null-only run; the power of an eliminated estimand is not a meaningful quantity",
+  "null_only_run_performed": false,
+  "real_patch_performed": false,
+  "c1_od011_rev2": {
+   "cases_passed": 1,
+   "cases_failed": 4,
+   "verdict": "FAIL"
+  },
+  "c1_status": "ELIMINATED, not repaired",
+  "surviving_candidates": 0,
+  "candidates_added": 0,
+  "determination_is_UNDERPOWERED": false
+ }
 }
