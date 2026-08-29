@@ -1,0 +1,84 @@
+{
+ "schema_version": "study5-p0c-closure-v1",
+ "study_id": "STUDY5_P0C",
+ "namespace": "studies/study5/validation-p0c/",
+ "recorded_at_utc": "2026-08-29T02:40:00Z",
+ "recorded_by": "adjudicator ruling, in session, 2026-08-29",
+ "computation_performed": "none; every number below is read from artifacts already committed",
+
+ "determination": "OBJECT_NOT_ESTABLISHED",
+ "status": {
+  "withdrawn": false,
+  "rewritten": false,
+  "reinterpreted": false,
+  "cited_by_the_successor": true,
+  "artifacts_byte_identical": true
+ },
+
+ "what_failed": {
+  "requirement_4_accuracy": {"observed": 0.75625, "floor": 0.8, "margin": -0.04375},
+  "stop_condition": "section 7 clause 1 of the P-0c pre-registration"
+ },
+ "what_passed": {
+  "requirement_3_anti_retrieval": {
+   "ablated_accuracy": 0.115625,
+   "chance": 0.1111111111111111,
+   "ceiling": 0.1611111111111111,
+   "drop": 0.640625,
+   "verdict": "PASS, and not narrowly"
+  },
+  "requirement_2_behavioural": {"top1_is_the_intermediate_letter": 0, "of": 320}
+ },
+
+ "the_threshold_was_not_moved": {
+  "gap": 0.04375,
+  "why_that_matters": "0.7562 against 0.80 is precisely the position in which moving a threshold is most tempting and least defensible",
+  "floor_lowered": false,
+  "object_rebuilt_within_P0c": false
+ },
+
+ "a_registration_design_flaw_recorded_honestly": {
+  "the_flaw": "the stated rationale for the accuracy floor was to avoid repeating the 32.61 percent of P-0; that rationale is weak, because the units floor of 60 already measures directly how many units carry known ground truth. The two gates are partly redundant, and a proxy was able to veto a direct metric",
+  "is_this_grounds_to_relax_anything": false,
+  "why_not": "recording a defect in one's own registration is not a licence to act on it after seeing the result the registration produced"
+ },
+
+ "the_stronger_reason_the_data_supplied_recorded_verbatim": {
+  "note": "this reason was NOT in the registration; it is the one this round's data revealed, and it is stronger than the one that was written",
+  "verbatim": "The real work the 0.80 floor does is to bound the selection bias that correct-both filtering introduces. Accuracy at registration-line position 0 is 1.000 and at position 3 is 0.565; once correct-both filtering is applied, the surviving subset is systematically biased toward earlier positions, and SOURCE-LINE POSITION IS THE ONLY FREE CONFOUND IN THIS DESIGN THAT THE BRIDGE EQUAL-LENGTH IDENTITY DOES NOT ELIMINATE. An accuracy of 0.7562 means roughly 43 percent of pairs would be filtered out, and filtered out very unevenly. The gate did the job it should do, and did it more strongly than the registration's own stated intent.",
+  "consequence_for_the_successor": "the floor stays at 0.80 and per-position accuracy becomes a mandatory report item, before and after correct-both filtering"
+ },
+
+ "direction_disclosure_recorded_verbatim": {
+  "verbatim": "Arguing that the 0.80 floor is redundant would push the conclusion toward 'we may continue'. THAT IS THE DIRECTION OF P-HACKING. This ruling does not take that path, and the threshold is held at 0.80 in the successor as well."
+ },
+
+ "hop_2_never_fails_recorded_not_adjudicated": {
+  "observation": "all 78 errors were of one kind: the second-hop rule applied correctly to the wrong key",
+  "what_it_bears_on": "the original question of the P-0 series, whether the items oblige the model to carry something",
+  "how_it_must_be_written": "at the strength of behavioural evidence and no higher",
+  "verbatim_limitation": "A BEHAVIOURALLY CORRECT COMPOSITION IS NOT AN INTERNAL INTERMEDIATE REPRESENTATION. It must not be written as 'the intermediate is computed', nor as 'the intermediate is used', nor as anything else implying an internal representation. It is recorded, it is not adjudicated, and it enters no gate.",
+  "enters_any_gate": false
+ },
+
+ "hop_1_retrieval_is_not_made_a_new_study": {
+  "the_observation": "100 percent of the shortfall is in-context retrieval of the right registration line, and it tracks that line's position",
+  "why_it_is_not_taken_up": [
+   "it is an attention and retrieval phenomenon, and claiming to have explained attention is already on the prohibited list",
+   "taking it up would mean a different study, a different estimand, and the remaining time spent while Study 5's original question stands untouched",
+   "it is a failure mode that deserves a name: AFTER CONSECUTIVE NEGATIVES, TURNING TOWARD THE ONE OBJECT THAT PRODUCED A CLEAN SIGNAL. The signal is clean and attractive, and that is exactly what makes it dangerous, because it would yield a publishable-looking result answering a question this project never asked"
+  ],
+  "correct_use": "control it in the design of the successor object, and carry it as a limitation",
+  "may_be_written_as_a_finding_of_this_project": false
+ },
+
+ "successor": {
+  "id": "STUDY5_P0C2",
+  "relationship": "a new independent pre-registration; P-0c is not reopened by it and its determination is cited rather than revised",
+  "rebuilds_permitted": 1,
+  "rebuilds_used_after_the_successor": 1,
+  "if_the_successor_also_misses_0_80": "stop and report; there is no third object"
+ },
+
+ "claim_ceiling": "A closure record. It licenses no claim of any kind, and OBJECT_NOT_ESTABLISHED is a statement about a constructed object and nothing else."
+}
