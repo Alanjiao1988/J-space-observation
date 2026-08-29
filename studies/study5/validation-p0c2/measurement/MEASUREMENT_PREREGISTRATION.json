@@ -1,0 +1,172 @@
+{
+ "schema_version": "study5-p0c2-measurement-preregistration-v1",
+ "registration_id": "P0C2-MEAS-PREREG",
+ "phase": "P-0c-2 measurement",
+ "study_id": "STUDY5_P0C2",
+ "namespace": "studies/study5/validation-p0c2/measurement/",
+ "recorded_at_utc": "2026-08-29T04:10:00Z",
+ "recorded_by": "adjudicator directive of 2026-08-29, executed in session",
+ "pushed_before_any_null_or_real_patch_was_run": true,
+
+ "0_the_ordering_that_may_not_be_inverted": {
+  "rule": "the MDE pass-line is registered and PUSHED before the MDE is computed, and the MDE is computed from null-only data before any real patch exists",
+  "sequence": [
+   "1. push this file, containing the pass-line and its basis",
+   "2. run the OD-011 rev-2 demonstration of the full C1 pipeline",
+   "3. re-verify bit-exact no-ops",
+   "4. run NULL-ONLY, which contains no real patch and leaks no answer",
+   "5. compute the MDE from null replicate variance and the full-donor reference",
+   "6. compare the computed MDE against the pass-line pushed in step 1",
+   "7. only then, the real measurement"
+  ],
+  "why_verbatim": "EQ2's 'too weak to adjudicate' was painful because, after the fact, NO EFFECT and NO POWER could not be told apart. Registering the MDE in advance closes that ambiguity.",
+  "who_set_the_pass_line": "the executing party. The adjudicator explicitly did not issue the number, because OD-021 exists precisely because an intuition-issued value was the previous failure"
+ },
+
+ "1_the_MDE_pass_line": {
+  "value": 0.15,
+  "units": "normalised restoration, the scale on which a full donor transplant is 1.0",
+  "power": 0.80,
+  "alpha": 0.05,
+  "sidedness": "two-sided",
+  "statement": "the design passes the power gate if the minimum detectable effect at the decisive site, at 80 percent power and two-sided alpha 0.05, is at most 0.15",
+  "basis": {
+   "what_the_scale_means": "1.0 is the effect of transplanting the donor's entire state; an effect of x is x of the way from the recipient's clean answer to the donor's",
+   "why_0_15": "an effect below roughly this size at BRIDGE would be difficult to distinguish from residue in any case, so a design that cannot detect 0.15 cannot answer the question it was built for. The value is a round number chosen for being unremarkable",
+   "what_it_is_NOT_derived_from": [
+    "no null variance, which has not been computed",
+    "no real patch, of which none exists",
+    "no measured effect on this object or any other",
+    "no value from P-0, P-0' or P-0c"
+   ],
+   "the_risk_accepted_in_setting_it_now": "the null variance is unknown at the time of writing, so this pass-line may well fail. That is the point of setting it first"
+  }
+ },
+
+ "2_the_three_outcomes_fixed_verbatim_before_any_measurement": {
+  "CAUSALLY_USED": {
+   "condition": "the effect at the decisive site clears the registered decision rule",
+   "verbatim": "Patching the donor's residual state into the recipient's run at BRIDGE - positions whose input tokens are IDENTICAL in the two prompts - produced a null-subtracted effect significantly above zero at the reported layers. On this CONSTRUCTED object the intermediate is known by build and is required by the task, so what the patch transferred is a quantity the model derived from the cue and carried forward. THIS IS A RESULT ABOUT A CONSTRUCTED SELECTION SET AND NOTHING ELSE. It is not a result about real items, it is not a claim about J-space, the J-lens, the paper or T, and it does not establish that any internal representation exists. It establishes that an estimand and a harness, validated in advance, can detect a carried quantity on an object where one is known to be required.",
+   "what_it_licenses": "applying the selected estimand to the real item set, and nothing else"
+  },
+  "NOT_CAUSALLY_USED": {
+   "condition": "the effect does not clear the decision rule AND the computed MDE is at or below the registered pass-line",
+   "verbatim": "The null-subtracted effect at BRIDGE did not clear the decision rule at any layer, and the design was powered to detect an effect of 0.15 or larger. AN EFFECT OF INTERPRETABLE SIZE WOULD THEREFORE HAVE BEEN DETECTED, AND NONE WAS. On this constructed object, where the intermediate is known by build and the task provably requires it, patching at positions carrying identical tokens does not move the answer. THIS IS THE GOOD OUTCOME AND IT IS NOT A FAILURE. It is an informative negative made possible by pre-registering the power, which is exactly what EQ2 could not do; there, 'no effect' and 'no power' were indistinguishable after the fact. It says nothing about real items, about J-space, about the J-lens, about the paper or about T.",
+   "what_it_licenses": "reporting an informative negative for this object; it does not license any statement about real items"
+  },
+  "UNDERPOWERED": {
+   "condition": "the effect does not clear the decision rule AND the computed MDE exceeds the registered pass-line",
+   "verbatim": "The null-subtracted effect did not clear the decision rule, but the design could not detect an effect of 0.15, so no effect and no power cannot be told apart. THIS IS A FAILURE OF THIS DESIGN. It must not be written as 'the question remains open', which would present a defect of the instrument as a property of the world. Every cheap variance reduction registered in advance - common random numbers, twenty null replicates, cluster-level inference - had already been applied, so this outcome would mean the design is underpowered even after they are exhausted.",
+   "is_terminal_for_this_route": true,
+   "triggers_no_rebuild": "the one permitted rebuild was spent on P-0c-2",
+   "triggers_no_new_object": true,
+   "triggers_no_new_candidate": true,
+   "triggers_no_second_revision_of_the_selection_rule": true,
+   "must_not_be_written_as": "the question remains open"
+  }
+ },
+
+ "3_the_decision_rule_one_only": {
+  "the_choice": "C1 significantly greater than zero",
+  "the_rejected_alternative": "C1 greater than a null ceiling",
+  "why_only_one_may_be_used": "C1 ALREADY SUBTRACTS THE NULL. Comparing the null-subtracted quantity against a null ceiling as well would deduct the null twice, which would make the criterion conservative for a reason that has nothing to do with the evidence",
+  "the_rule_in_full": "at each layer of the decisive site, the null-subtracted effect is averaged over units and a cluster bootstrap gives a two-sided 95 percent interval; a layer clears the rule if its lower bound is strictly above zero. The determination is CAUSALLY_USED if at least one layer clears it",
+  "decisive_site": "BRIDGE",
+  "sites_reported_but_unable_to_decide": ["PREFIX", "CUE", "READOUT"],
+  "audited_as_an_OD_017_entry": true
+ },
+
+ "4_variance_reduction_registered_in_advance": {
+  "why_it_must_come_first": "UNDERPOWERED may not be claimed until the cheap power gains are exhausted, so all three are applied before the MDE is computed",
+  "common_random_numbers": {
+   "what": "the null and the real construction use the SAME recipient items and the SAME random sequence, so the two share their nuisance variation",
+   "why_it_is_the_largest_gain": "C1 is itself a difference, and the variance of a difference of positively correlated quantities is far below the sum of their variances",
+   "implementation": "a per-unit seed derived from the unit id, reused across constructions"
+  },
+  "null_replicates": {
+   "was": 5,
+   "now": 20,
+   "expected_gain": "the variance of the null mean falls by about a factor of four",
+   "why_it_is_affordable": "no GPU ceiling applies, and this phase explicitly favours spending GPU to reduce variance"
+  },
+  "cluster_level_inference": {
+   "rule": "the resampling unit is the cluster, not the unit",
+   "effect_on_MDE": "it can only increase the MDE, and that increase is the correct one",
+   "an_honest_note_recorded_in_advance": "on THIS object each pair contributes exactly one ordered unit, so there are 112 clusters for 112 units and cluster-level inference coincides with unit-level inference. The conservative step is therefore a no-op here. It is applied and stated anyway, because a step that happens not to bite must not be presented as a tightening that did"
+  }
+ },
+
+ "5_the_n_expansion_decision_made_now": {
+  "why_it_is_decided_now": "expanding n after seeing a real result would be inadmissible; deciding the trigger before any null or real data exists makes it legitimate",
+  "the_permitted_expansion": "generate additional pairs from the BYTE-IDENTICAL construction; the construction is not modified, the seven requirements are re-measured on the new pairs, and every threshold is unchanged",
+  "it_is_not_a_rebuild": "the construction is unchanged; only the number of draws from it changes",
+  "the_trigger": "the computed MDE exceeds the pass-line of 0.15",
+  "the_trigger_is_a_null_only_quantity": "the MDE is computed from null replicate variance and the full-donor reference; no real patch enters it",
+  "may_a_real_result_trigger_it": false,
+  "the_cap": {"N_PAIRS_now": 160, "N_PAIRS_if_triggered": 480, "expansions_permitted": 1},
+  "if_the_MDE_still_fails_after_the_expansion": "the determination is UNDERPOWERED and it is terminal"
+ },
+
+ "6_carried_over_and_not_reopened": {
+  "candidate_shortlist": "closed at four; C1 is the sole survivor; no candidate may be added and no eliminated candidate may be repaired",
+  "OD-011_rev_2": "IN FORCE; C1 owes a demonstration of the FULL PIPELINE, including a flatten-only case",
+  "OD-017": "IN FORCE",
+  "OD-021": "IN FORCE",
+  "OD-022": "IN FORCE and already exercised",
+  "the_three_part_batch_repair": "re-verified bit-exact on this object in both precisions; it is verified AGAIN before the real measurement rather than assumed to hold across phases",
+  "the_bfloat16_limitation": "a batch-width-dependent offset of 0.110937 logits in bf16 against 0.000008 in fp32, roughly 14000 times; any bf16 patching result at this effect scale that has not demonstrated bit-exact no-ops is uninterpretable",
+  "failed_repairs_are_committed_not_discarded": true
+ },
+
+ "7_the_C1_demonstration_owed": {
+  "why_the_sweep_is_not_enough": "C1's flatten column in the OD-022 sweep was exactly 0.000000 because in that construction the minuend and the subtrahend are the same deterministic function, so the cancellation was BY IDENTITY. The sweep therefore carries no information about C1's flatten robustness",
+  "what_the_demonstration_must_add": "a flatten-only case run through the REAL pipeline, where the true patch and the null flatten by different amounts and no identity cancellation is available. That is precisely the cell the sweep cannot see",
+  "what_is_being_validated": "the DECISION RULE, not the functional form",
+  "required_cases": {
+   "no_op": "exactly 0",
+   "random_vector_through_the_pipeline": "approximately 0",
+   "flatten_only_through_the_pipeline": "approximately 0",
+   "full_donor_transplant": "CAUSALLY_USED",
+   "attenuated_transfer": "significantly positive and strictly below the full-donor value"
+  },
+  "on_any_failure": "C1 is out, the surviving candidate count falls to zero, and the phase stops and reports. No candidate is added and C1 is not repaired"
+ },
+
+ "8_stop_conditions": [
+  "any C1 OD-011 rev-2 case fails, including the flatten-only pipeline case",
+  "any no-op family is not exactly 0.000e+00, at either precision",
+  "continuing would require adding a candidate, repairing an eliminated candidate, or revising the selection rule a second time",
+  "continuing would require expanding n after a real result was seen, or a third object",
+  "lens_A or lens_B is read, or T is touched",
+  "continuing would require changing an EQ1, EQ2, P-0, P-0', P-0c or P-0c-2 criterion, threshold, split or reading",
+  "a reboot, resize, configuration change or NSG rule would be needed",
+  "a create-only upload hits an If-None-Match precondition failure"
+ ],
+
+ "9_boundaries": {
+  "azure": "resources are used and never reconfigured; a100-vm, cpuserver and the four TRAINING Standard_NC24s_v3 machines stay running, the V100 machines stay idle and untouched, no NSG rule, nothing resized, rebooted, created or deleted",
+  "cost": "no cost-reduction action proposed, performed or discussed",
+  "budget": "no GPU-hour ceiling; this phase explicitly favours spending GPU to reduce variance, and NO GATE may be reduced to save time or hours",
+  "T": "not touched, not read, not loaded",
+  "lens_A_and_lens_B": "not read",
+  "predecessors": "EQ1, EQ2, P-0, P-0', P-0c and P-0c-2 artifacts are byte-identical"
+ },
+
+ "10_claims_this_phase_may_not_support": [
+  "that J-space exists or does not exist",
+  "that the paper is wrong; it measured Sonnet 4.5",
+  "that the published lenses are defective",
+  "anything about how T would behave, T having never been measured",
+  "the existence of internal causal reasoning machinery",
+  "any training-causal effect of distillation",
+  "that attention, embeddings, normalisation or whole-model differences have been explained",
+  "anything about consciousness",
+  "that the paper's mid-depth band has been reproduced",
+  "that a result on the constructed object is a result on real items; it is a SELECTION SET",
+  "that UNDERPOWERED means the question remains open; it is a failure of this design",
+  "that hop 2 never failing is an internal intermediate representation",
+  "P-0's withheld verdict, which may not be cited as a published conclusion"
+ ],
+
+ "claim_ceiling": "A measurement pre-registration for a constructed object. No outcome it can reach is a scientific finding."
+}
