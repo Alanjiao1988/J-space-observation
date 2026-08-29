@@ -9,15 +9,26 @@
  "is_a_scientific_result": false,
  "current_phase": "P-0c-2",
  "next_phase": "estimand selection on the established object, then application to the real item set",
-
  "determination": "OBJECT_ESTABLISHED",
  "determination_produced_by": "the registered criterion, applied unmodified, reading its thresholds from the pushed registration",
-
  "predecessors": {
-  "STUDY5_EQ1": {"q4a_fail_stands": true, "artifacts_modified": 0},
-  "STUDY5_EQ2": {"determination": "NEGATIVE", "stands": true, "artifacts_modified": 0},
-  "STUDY5_P0": {"determination": "UNINTERPRETABLE", "artifacts_modified": 0},
-  "STUDY5_P0_PRIME": {"halted_under": "HB-005", "artifacts_modified": 0},
+  "STUDY5_EQ1": {
+   "q4a_fail_stands": true,
+   "artifacts_modified": 0
+  },
+  "STUDY5_EQ2": {
+   "determination": "NEGATIVE",
+   "stands": true,
+   "artifacts_modified": 0
+  },
+  "STUDY5_P0": {
+   "determination": "UNINTERPRETABLE",
+   "artifacts_modified": 0
+  },
+  "STUDY5_P0_PRIME": {
+   "halted_under": "HB-005",
+   "artifacts_modified": 0
+  },
   "STUDY5_P0C": {
    "determination": "OBJECT_NOT_ESTABLISHED",
    "withdrawn": false,
@@ -28,15 +39,35 @@
    "closure_sha256": "e98fb675c74d60325316a0b7e507eabd22e8625fca9d02b7b78236ddf90f68d8"
   }
  },
-
  "the_thresholds": {
-  "accuracy_floor": {"was": 0.8, "now": 0.8, "direction": "unchanged", "observed": 0.840625, "verdict": "PASS"},
-  "ablation_ceiling": {"was": 0.1611111111111111, "now": 0.1611111111111111, "direction": "unchanged", "observed": 0.10625, "verdict": "PASS"},
-  "drop_floor": {"was": "> 0.50", "now": ">= 0.640625", "direction": "TIGHTENED", "observed": 0.734375, "verdict": "PASS"},
-  "correct_both_floor": {"value": 60, "observed": 112, "verdict": "PASS"},
+  "accuracy_floor": {
+   "was": 0.8,
+   "now": 0.8,
+   "direction": "unchanged",
+   "observed": 0.840625,
+   "verdict": "PASS"
+  },
+  "ablation_ceiling": {
+   "was": 0.1611111111111111,
+   "now": 0.1611111111111111,
+   "direction": "unchanged",
+   "observed": 0.10625,
+   "verdict": "PASS"
+  },
+  "drop_floor": {
+   "was": "> 0.50",
+   "now": ">= 0.640625",
+   "direction": "TIGHTENED",
+   "observed": 0.734375,
+   "verdict": "PASS"
+  },
+  "correct_both_floor": {
+   "value": 60,
+   "observed": 112,
+   "verdict": "PASS"
+  },
   "no_threshold_moved_in_the_relaxing_direction": true
  },
-
  "the_object_as_rebuilt": {
   "the_one_substantive_change": "registration lines 6 -> 4, tuned toward CLEAN ACCURACY which is causally upstream of everything patched",
   "the_control_added": "positions balanced by cycling the ordered position pairs",
@@ -46,33 +77,59 @@
   "items": 320,
   "requirement_2_vocabularies_disjoint": true,
   "requirement_7_violations": 0,
-  "sites": {"PREFIX": 63.19, "CUE": 2.0, "BRIDGE": 52.0, "READOUT": 1},
+  "sites": {
+   "PREFIX": 63.19,
+   "CUE": 2.0,
+   "BRIDGE": 52.0,
+   "READOUT": 1
+  },
   "top1_is_the_intermediate_letter": 0,
   "build_seed_unchanged_from_P0c": true,
   "all_seven_requirements_re_proven_by_measurement": true
  },
-
  "mandatory_per_position_report": {
-  "accuracy_by_position_all_items": {"0": 0.9878, "1": 0.775, "2": 0.7342, "3": 0.8608},
-  "position_share_before_filtering": {"0": 0.2562, "1": 0.25, "2": 0.2469, "3": 0.2469},
-  "position_share_after_filtering": {"0": 0.25, "1": 0.2411, "2": 0.2366, "3": 0.2723},
+  "accuracy_by_position_all_items": {
+   "0": 0.9878,
+   "1": 0.775,
+   "2": 0.7342,
+   "3": 0.8608
+  },
+  "position_share_before_filtering": {
+   "0": 0.2562,
+   "1": 0.25,
+   "2": 0.2469,
+   "3": 0.2469
+  },
+  "position_share_after_filtering": {
+   "0": 0.25,
+   "1": 0.2411,
+   "2": 0.2366,
+   "3": 0.2723
+  },
   "worst_absolute_share_shift": 0.0254,
-  "predecessor_spread_for_contrast": {"0": 1.0, "3": 0.5645},
+  "predecessor_spread_for_contrast": {
+   "0": 1.0,
+   "3": 0.5645
+  },
   "reading": "the position control worked; correct-both filtering moves no position's share by more than 2.5 percentage points, where the predecessor had positions drawn freely and a 1.000 to 0.565 spread"
  },
-
  "od022_sweep": {
   "shortlist_closed": true,
   "candidates_evaluated": 4,
   "candidates_added": 0,
   "candidates_repaired": 0,
-  "survivors": ["C1_null_subtracted"],
+  "survivors": [
+   "C1_null_subtracted"
+  ],
   "n_survivors": 1,
-  "eliminated": ["C2_matched_control_contrast", "C3_rank", "C4_two_sided_margin"],
+  "eliminated": [
+   "C2_matched_control_contrast",
+   "C3_rank",
+   "C4_two_sided_margin"
+  ],
   "all_numbers_reported_including_eliminated": true,
   "honesty_note": "C1's flatten column is exactly zero because in that construction the minuend and the subtrahend are the same deterministic function, so the subtraction cancels by identity. That is a limitation of the sweep, not a strength of C1; its resample column is the informative one, mean -0.002085 with a wide interval, which is the high-variance risk the shortlist recorded for it in advance"
  },
-
  "numerical_precision_re_proven_not_assumed": {
   "bfloat16": {
    "units": 160,
@@ -83,11 +140,24 @@
    "verdict": "PASS, bit-exact",
    "baseline_shift_vs_batch_of_one_logits": 0.110937
   },
-  "float32": "IN PROGRESS at the time of this record",
+  "float32": {
+   "units": 60,
+   "EMBED_NOOP": 0.0,
+   "PREFIX_DONOR": 0.0,
+   "SELF_PATCH": 0.0,
+   "worst_single_unit": 0.0,
+   "verdict": "PASS, bit-exact",
+   "baseline_shift_vs_batch_of_one_logits": 8.058547973632812e-06
+  },
   "the_three_part_repair_inherited": true,
-  "assumed_to_carry_over": false
+  "assumed_to_carry_over": false,
+  "the_hazard_is_bfloat16_specific": {
+   "bfloat16_baseline_shift_logits": 0.110937,
+   "float32_baseline_shift_logits": 8.058547973632812e-06,
+   "ratio": 13766,
+   "reading": "the batch-width-dependent offset is a bfloat16 reduction-order effect and essentially vanishes in float32, which is the same conclusion P-0 prime reached on a different object"
+  }
  },
-
  "gates": {
   "OD-017_extended_by_OD-021": "PASS, 23 entries, 0 divergences",
   "OD-021": "IN FORCE",
@@ -95,14 +165,12 @@
   "OD-011_rev_2": "IN FORCE; owed by the surviving candidate before it may be applied",
   "sealed_asset_guard": "PASS"
  },
-
  "writing_limitations_carried": {
   "hop_2_never_fails": "a behaviourally correct composition is NOT an internal intermediate representation; recorded, not adjudicated, entering no gate",
   "hop_1_retrieval": "not a finding of this project and not taken up as a study",
   "the_constructed_object": "a SELECTION SET; success on it is not success on real items",
   "bfloat16": "a batch-width-dependent offset of the same order as the effects being measured makes any bf16 patching result uninterpretable unless bit-exact no-ops are demonstrated"
  },
-
  "protected_objects": {
   "target_ever_touched": false,
   "sealed_lenses_ever_read": false,
@@ -112,7 +180,6 @@
   "p0prime_artifacts_modified": 0,
   "p0c_artifacts_modified": 0
  },
-
  "budget": {
   "ceiling_applies": false,
   "consumed_this_phase": 0.318611,
@@ -121,7 +188,6 @@
   "denominated_per": "OD-001",
   "gates_reduced_to_save_time_or_hours": 0
  },
-
  "azure": {
   "vms_reconfigured": 0,
   "vms_stopped_or_started": 0,
@@ -130,6 +196,5 @@
   "blobs_written": 0,
   "cost_reduction_actions_proposed": 0
  },
-
  "claim_ceiling": "P-0c-2 builds and validates an instrument. No state it can reach is a scientific result, and OBJECT_ESTABLISHED is a property of a constructed object and nothing else."
 }
