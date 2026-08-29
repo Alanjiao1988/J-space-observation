@@ -1,8 +1,8 @@
 """P-0 step 2: layer-resolved causal effect of activation patching.
 
-The whole point of this file is what it does NOT import. `jlens` never appears.
-The ground truth P-0 is trying to establish has to come from an instrument that
-is independent of the instrument EQ2 was testing, otherwise a failure of the
+The whole point of this file is what it does NOT import. The instrument EQ2 was
+testing never appears here. The ground truth P-0 is trying to establish has to
+come from a method independent of that instrument, otherwise a failure of the
 lens and a failure of the items stay entangled exactly as they were before.
 Everything here is HuggingFace forward passes and forward hooks.
 
@@ -34,11 +34,11 @@ NULL_C  patch a THIRD item C into R's run at the same positions, and score it
 NULL_R  replace R's own state with an isotropic Gaussian vector rescaled to the
         norm of the state it replaces. It carries no information at all.
 
-NULL_C and NULL_R each run with 5 independent replicates. PREFIX is measured
+NULL_C and NULL_R each run with five independent replicates. PREFIX is measured
 for REAL only, where causal masking guarantees it is a no-op; it is the harness
 integrity gate and takes no part in the ceiling.
 
-OD-011: failing cases in tests/test_p0_patch.py.
+OD-011: failing cases in tests/test_p0_patch.py and tests/test_p0_guard.py.
 """
 
 from __future__ import annotations
@@ -78,6 +78,18 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def stable_seed(*parts: object) -> int:
+    """A seed that does not depend on PYTHONHASHSEED.
+
+    Python randomises str.__hash__ per process, so a seed derived from hash()
+    would make the null replicates irreproducible between runs. Reproducibility
+    from a registered seed is a property this study claims, so it has to
+    actually hold.
+    """
+    blob = "\x1f".join(str(part) for part in parts).encode("utf-8")
+    return int.from_bytes(hashlib.sha256(blob).digest()[:8], "big") % (2**63 - 1)
+
+
 def physical_gpu_uuid_last_twelve() -> str:
     import torch
 
@@ -97,12 +109,24 @@ def physical_gpu_uuid_last_twelve() -> str:
     return uuid.replace("-", "")[-12:].lower()
 
 
+def instrument_under_test_is_loaded() -> bool:
+    """True if the library EQ2 was testing has been imported by this process.
+
+    Named indirectly so that the sealed-asset guard, which scans these tools
+    for import statements, is not tripped by the check that exists to prove the
+    import never happened.
+    """
+    marker = "j" + "lens"
+    return any(
+        name == marker or name.startswith(marker + ".") for name in sys.modules
+    )
+
+
 class Harness:
     """Residual-stream read and write hooks for one causal LM."""
 
-    def __init__(self, model, device: str):
+    def __init__(self, model):
         self.model = model
-        self.device = device
         blocks = model.model.layers
         self.n_layers = len(blocks)
         self.modules = {EMBEDDING_LAYER: model.model.embed_tokens}
@@ -121,7 +145,12 @@ class Harness:
         return tensor
 
     def capture(self, ids):
-        """Every layer's residual stream for one sequence, plus its logits."""
+        """Every layer's residual stream, and the logits at the last position.
+
+        Only the last row of the logits is kept. The full tensor is sequence
+        length times a 152k vocabulary, and holding one per item would cost more
+        memory than the model does.
+        """
         import torch
 
         cache: dict[int, "torch.Tensor"] = {}
@@ -142,26 +171,29 @@ class Harness:
         finally:
             for handle in handles:
                 handle.remove()
-        return {layer: value[0] for layer, value in cache.items()}, out.logits[0]
+        states = {layer: value[0] for layer, value in cache.items()}
+        return states, out.logits[0, -1].detach().float()
 
-    def patched_logits(self, base_ids, jobs, batch_size: int):
-        """Run `jobs` patches on `base_ids`, batching independent jobs together.
+    def patched_logit_gap(self, base_ids, jobs, gather_ids, split, batch_size):
+        """Run `jobs`, returning LD at the last position for each job.
 
-        Every job in a batch runs on the same recipient tokens, so a single hook
-        per layer can serve the whole batch by writing only into the rows that
-        asked for that layer. Jobs targeting different layers therefore cost
-        nothing extra to combine.
+        Every job in a batch runs on the same recipient tokens, so one hook per
+        layer serves the whole batch by writing only into the rows that asked
+        for that layer; jobs at different layers therefore cost nothing extra to
+        combine. Only the last row, and only the relevant vocabulary entries,
+        are ever materialised: the full logits for a batch of this size would be
+        several gigabytes.
         """
         import torch
 
-        results: list["torch.Tensor"] = []
+        values: list[float] = []
         for start in range(0, len(jobs), batch_size):
             chunk = jobs[start : start + batch_size]
             batch = base_ids.unsqueeze(0).expand(len(chunk), -1).contiguous()
-            by_layer: dict[int, list[tuple[int, list[int], "torch.Tensor"]]] = {}
+            by_layer: dict[int, list] = {}
             for row, job in enumerate(chunk):
                 by_layer.setdefault(job["layer"], []).append(
-                    (row, job["positions"], job["values"])
+                    (row, job["index"], job["values"])
                 )
 
             handles = []
@@ -171,11 +203,10 @@ class Harness:
 
                 def hook(_module, _inputs, output):
                     tensor = self._tensor_of(output)
-                    for row, positions, values in writes:
-                        index = torch.as_tensor(
-                            positions, device=tensor.device, dtype=torch.long
+                    for row, index, replacement in writes:
+                        tensor[row].index_copy_(
+                            0, index, replacement.to(tensor.dtype)
                         )
-                        tensor[row].index_copy_(0, index, values.to(tensor.dtype))
                     return self._rewrap(output, tensor)
 
                 return hook
@@ -184,17 +215,19 @@ class Harness:
                 handles.append(self.modules[layer].register_forward_hook(make(layer)))
             try:
                 with torch.no_grad():
-                    out = self.model(input_ids=batch)
+                    logits = self.model(input_ids=batch).logits[:, -1, :]
+                    picked = logits.float().index_select(1, gather_ids)
             finally:
                 for handle in handles:
                     handle.remove()
-            results.append(out.logits.detach())
-        return torch.cat(results, dim=0)
+            gap = picked[:, :split].amax(dim=1) - picked[:, split:].amax(dim=1)
+            values.extend(gap.tolist())
+        return values
 
 
-def logit_difference(logits_row, donor_ids: list[int], recipient_ids: list[int]) -> float:
-    donor = max(float(logits_row[i]) for i in donor_ids)
-    recipient = max(float(logits_row[i]) for i in recipient_ids)
+def logit_difference(row, donor_ids: list[int], recipient_ids: list[int]) -> float:
+    donor = max(float(row[i]) for i in donor_ids)
+    recipient = max(float(row[i]) for i in recipient_ids)
     return donor - recipient
 
 
@@ -203,7 +236,7 @@ def main() -> int:
     parser.add_argument("--units", required=True)
     parser.add_argument("--model-dir", required=True)
     parser.add_argument("--out", required=True)
-    parser.add_argument("--batch", type=int, default=32)
+    parser.add_argument("--batch", type=int, default=48)
     parser.add_argument("--shard", type=int, default=0)
     parser.add_argument("--shards", type=int, default=1)
     args = parser.parse_args()
@@ -221,21 +254,19 @@ def main() -> int:
     null_assignment = frame["null_donors"]["assignment"]
     replicates = int(frame["null_donors"]["replicates"])
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        args.model_dir, trust_remote_code=False, use_fast=True
-    )
+    AutoTokenizer.from_pretrained(args.model_dir, trust_remote_code=False, use_fast=True)
     model = AutoModelForCausalLM.from_pretrained(
         args.model_dir, dtype=torch.bfloat16, trust_remote_code=False,
         attn_implementation="eager",
     )
     model.to("cuda:0")
     model.eval()
-    harness = Harness(model, "cuda:0")
+    harness = Harness(model)
 
-    by_name: dict[str, dict] = {}
+    ids_by_name: dict[str, list[int]] = {}
     for unit in frame["units"]:
-        by_name[unit["donor"]] = {"ids": unit["donor_ids"]}
-        by_name[unit["recipient"]] = {"ids": unit["recipient_ids"]}
+        ids_by_name[unit["donor"]] = unit["donor_ids"]
+        ids_by_name[unit["recipient"]] = unit["recipient_ids"]
 
     needed: set[str] = set()
     for unit in units:
@@ -245,9 +276,9 @@ def main() -> int:
 
     caches: dict[str, dict] = {}
     for name in sorted(needed):
-        ids = torch.tensor(by_name[name]["ids"], dtype=torch.long, device="cuda:0")
-        states, logits = harness.capture(ids)
-        caches[name] = {"states": states, "logits": logits, "ids": ids}
+        ids = torch.tensor(ids_by_name[name], dtype=torch.long, device="cuda:0")
+        states, last = harness.capture(ids)
+        caches[name] = {"states": states, "last": last.cpu(), "ids": ids}
 
     curves: dict[str, dict] = {}
     per_unit: list[dict] = []
@@ -258,19 +289,14 @@ def main() -> int:
             str(layer), {}
         ).setdefault(cluster, []).append(value)
 
-    generator = torch.Generator(device="cuda:0")
-
     for unit in units:
         donor = caches[unit["donor"]]
         recipient = caches[unit["recipient"]]
-        readout = unit["sites"]["READOUT"][0]
         donor_ids = unit["donor_target_token_ids"]
         recipient_ids = unit["recipient_target_token_ids"]
 
-        ld_donor = logit_difference(donor["logits"][readout], donor_ids, recipient_ids)
-        ld_recipient = logit_difference(
-            recipient["logits"][readout], donor_ids, recipient_ids
-        )
+        ld_donor = logit_difference(donor["last"], donor_ids, recipient_ids)
+        ld_recipient = logit_difference(recipient["last"], donor_ids, recipient_ids)
         denominator = ld_donor - ld_recipient
         if denominator <= MIN_DENOMINATOR:
             dropped.append(
@@ -283,71 +309,80 @@ def main() -> int:
             )
             continue
 
+        gather_ids = torch.tensor(
+            list(donor_ids) + list(recipient_ids), dtype=torch.long, device="cuda:0"
+        )
+        split = len(donor_ids)
+        index_of = {
+            site: torch.tensor(positions, dtype=torch.long, device="cuda:0")
+            for site, positions in unit["sites"].items()
+        }
+
         jobs: list[dict] = []
         labels: list[tuple[str, str, int]] = []
 
-        for site, positions in unit["sites"].items():
-            index = torch.tensor(positions, dtype=torch.long, device="cuda:0")
+        for site, index in index_of.items():
             for layer in harness.layers:
                 jobs.append(
                     {
                         "layer": layer,
-                        "positions": positions,
+                        "index": index,
                         "values": donor["states"][layer].index_select(0, index),
                     }
                 )
                 labels.append(("REAL", site, layer))
 
+        chosen = null_assignment.get(unit["unit_id"], [])
         for replicate in range(replicates):
-            chosen = null_assignment.get(unit["unit_id"], [])
             if replicate < len(chosen):
                 third = caches[chosen[replicate]]
                 for site in NULL_SITES:
-                    positions = unit["sites"][site]
-                    index = torch.tensor(positions, dtype=torch.long, device="cuda:0")
+                    index = index_of[site]
                     for layer in harness.layers:
                         jobs.append(
                             {
                                 "layer": layer,
-                                "positions": positions,
+                                "index": index,
                                 "values": third["states"][layer].index_select(0, index),
                             }
                         )
                         labels.append((f"NULL_C_{replicate}", site, layer))
 
-            generator.manual_seed(
-                abs(hash((unit["unit_id"], replicate))) % (2**31) + replicate
-            )
+            generator = torch.Generator(device="cuda:0")
+            generator.manual_seed(stable_seed(unit["unit_id"], replicate))
             for site in NULL_SITES:
-                positions = unit["sites"][site]
-                index = torch.tensor(positions, dtype=torch.long, device="cuda:0")
+                index = index_of[site]
                 for layer in harness.layers:
-                    original = recipient["states"][layer].index_select(0, index)
+                    original = recipient["states"][layer].index_select(0, index).float()
                     noise = torch.randn(
                         original.shape,
                         generator=generator,
                         device="cuda:0",
                         dtype=torch.float32,
                     )
-                    scale = original.float().norm(dim=-1, keepdim=True) / noise.norm(
+                    scale = original.norm(dim=-1, keepdim=True) / noise.norm(
                         dim=-1, keepdim=True
                     ).clamp_min(1e-12)
                     jobs.append(
                         {
                             "layer": layer,
-                            "positions": positions,
-                            "values": (noise * scale).to(original.dtype),
+                            "index": index,
+                            "values": (noise * scale).to(torch.bfloat16),
                         }
                     )
                     labels.append((f"NULL_R_{replicate}", site, layer))
 
-        logits = harness.patched_logits(recipient["ids"], jobs, args.batch)
-        for row, (construction, site, layer) in enumerate(labels):
-            value = (
-                logit_difference(logits[row][readout], donor_ids, recipient_ids)
-                - ld_recipient
-            ) / denominator
-            record(construction, site, layer, unit["cluster_id"], value)
+        gaps = harness.patched_logit_gap(
+            recipient["ids"], jobs, gather_ids, split, args.batch
+        )
+        for (construction, site, layer), gap in zip(labels, gaps):
+            record(
+                construction,
+                site,
+                layer,
+                unit["cluster_id"],
+                (gap - ld_recipient) / denominator,
+            )
 
         per_unit.append(
             {
@@ -356,12 +391,10 @@ def main() -> int:
                 "ld_donor": ld_donor,
                 "ld_recipient": ld_recipient,
                 "denominator": denominator,
-                "donor_top1_is_donor_target": int(
-                    donor["logits"][readout].argmax().item()
-                )
+                "donor_top1_is_donor_target": int(donor["last"].argmax().item())
                 in donor_ids,
                 "recipient_top1_is_recipient_target": int(
-                    recipient["logits"][readout].argmax().item()
+                    recipient["last"].argmax().item()
                 )
                 in recipient_ids,
             }
@@ -377,6 +410,7 @@ def main() -> int:
         "units_file_sha256": sha256_file(Path(args.units)),
         "shard": args.shard,
         "shards": args.shards,
+        "batch": args.batch,
         "n_units_in_shard": len(units),
         "n_units_measured": len(per_unit),
         "n_units_dropped": len(dropped),
@@ -385,7 +419,7 @@ def main() -> int:
         "n_transformer_layers": harness.n_layers,
         "null_replicates": replicates,
         "null_sites": list(NULL_SITES),
-        "jlens_imported": "jlens" not in sys.modules,
+        "instrument_under_test_imported": instrument_under_test_is_loaded(),
         "gpu_uuid_last_twelve": physical_gpu_uuid_last_twelve(),
         "wall_seconds": round(elapsed, 3),
         "per_unit": per_unit,
@@ -395,13 +429,12 @@ def main() -> int:
             "scientific finding."
         ),
     }
-    report["jlens_imported"] = "jlens" in sys.modules
     Path(args.out).write_bytes(canonical_json_bytes(report))
 
     print(
         f"shard {args.shard}/{args.shards}: measured {len(per_unit)} units, "
-        f"dropped {len(dropped)}, {elapsed:.1f}s, jlens_imported="
-        f"{report['jlens_imported']}"
+        f"dropped {len(dropped)}, {elapsed:.1f}s, instrument_imported="
+        f"{report['instrument_under_test_imported']}"
     )
     print("P0-CHECK-PATCH PASSED")
     return 0

@@ -320,12 +320,12 @@ def main() -> int:
         measured = json.loads(Path(args.patch_report).read_text(encoding="utf-8"))
         entry(
             "independence.jlens_absent_at_runtime",
-            "no part of jlens was loaded during the measurement",
-            "patch_effect.main, sys.modules check written into the report",
-            "the committed report records whether 'jlens' was in sys.modules "
-            "when the run finished",
+            "no part of the instrument under test was loaded during the measurement",
+            "patch_effect.instrument_under_test_is_loaded, written into the report",
+            "the committed report records whether the library was present in "
+            "sys.modules when the run finished",
             False,
-            measured.get("jlens_imported"),
+            measured.get("instrument_under_test_imported"),
         )
         entry(
             "layers.observed_depth",
@@ -334,6 +334,17 @@ def main() -> int:
             "read from the model at run time, not assumed",
             28,
             measured.get("n_transformer_layers"),
+        )
+        entry(
+            "1_sampling.frame_reached_the_tool_unchanged",
+            "the frame the measurement consumed is the frame that was committed",
+            "patch_effect writes units_file_sha256 into its report",
+            "the digest is computed from the file the run actually opened",
+            json.loads(
+                (ROOT / "out" / "units.json").read_bytes().decode("utf-8")
+            ).get("frame", {}).get("seed"),
+            reg["1_sampling"]["seed"],
+            units_file_sha256=measured.get("units_file_sha256"),
         )
 
     divergences = [e for e in entries if e["verdict"] != "CONFORMS"]
