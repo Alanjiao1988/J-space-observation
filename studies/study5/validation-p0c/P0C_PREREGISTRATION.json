@@ -1,0 +1,197 @@
+{
+ "schema_version": "study5-p0c-preregistration-v1",
+ "registration_id": "P0C-PREREG",
+ "phase": "P-0c",
+ "study_id": "STUDY5_P0C",
+ "namespace": "studies/study5/validation-p0c/",
+ "recorded_at_utc": "2026-08-29T02:50:00Z",
+ "recorded_by": "operator directive of 2026-08-29, executed in session",
+
+ "ordering_discipline": {
+  "rule": "object first, prove the object, only then the estimand",
+  "why_it_cannot_be_inverted": "Study 5 has never held a PHENOMENON-level positive control, only an instrument-level one (P-0's CUE at the embedding output, 0.9862). Without an object whose intermediate is known to be computed, an estimand can only ever be checked against synthetic cases; with one, choosing an estimand becomes model selection WITH ground truth, which is legitimate",
+  "what_is_registered_in_this_file": "the object, its validity proofs, the floors, and both conclusion wordings",
+  "what_is_NOT_registered_in_this_file": "the estimand, which remains HELD and is settled only after the object is proven",
+  "pushed_before_any_accuracy_or_patching_measurement": true
+ },
+
+ "1_the_object": {
+  "status": "BUILT, not yet proven",
+  "artifact": "out/object.json",
+  "task": "NAME -> letter -> digit. The prompt registers names under letters and gives a letter-to-digit table; the question asks for the value registered to one name. The ANSWER is the digit; the INTERMEDIATE is the letter.",
+  "built_by": "tools/build_object.py",
+  "build_seed": 20260829,
+  "no_item_borrowed": true,
+  "no_model_output_consulted_during_construction": true,
+
+  "counts_as_built": {
+   "pairs_attempted": 160,
+   "pairs_built": 160,
+   "items": 320,
+   "rejected": 0,
+   "name_pool": 72,
+   "chance_rate": 0.1111111111111111
+  },
+
+  "the_seven_requirements": {
+   "1_intermediate_known": {
+    "how": "the letter IS the build parameter",
+    "verified": true,
+    "depends_on_annotation_or_model_output": false
+   },
+   "2_intermediate_never_the_emitted_token": {
+    "how": "intermediates are LETTERS and answers are DIGITS; the token-id sets are checked disjoint at build time over every single-token surface form either vocabulary can produce",
+    "observed_overlap": [],
+    "verified": true,
+    "why_it_is_a_vocabulary_property_and_not_a_wording_property": "so that no individual item can violate it"
+   },
+   "3_both_hops_real": {
+    "how": "the letter-to-digit table is randomised per pair, so the second hop cannot be known in advance; the first hop's input is removed by the ablation probe",
+    "verified_by": "the anti-retrieval proof below",
+    "status": "NOT YET VERIFIED"
+   },
+   "4_model_accuracy": {
+    "status": "NOT YET VERIFIED",
+    "floor": 0.80,
+    "floor_provenance": "the adjudicator suggested at least 0.80 and left the value to the executing party; 0.80 is adopted unchanged as a round number well above the 0.1111 chance rate, and is not fitted to anything",
+    "measured_on": "clean runs of the constructed items, top-1 continuation equals the built answer digit"
+   },
+   "5_enough_correct_both_units": {
+    "status": "NOT YET COUNTED",
+    "floor": 60,
+    "floor_units": "units correct on BOTH sides in the clean runs",
+    "floor_provenance": "set by the executing party as the directive requires. 60 clusters gives a cluster bootstrap enough resampling units for a percentile interval to be meaningful, and it is well above P-0''s 30, which had been set for a frame with far fewer usable pairs. It is a round number chosen for being unremarkable",
+    "disclosure": {
+     "was_the_correct_both_count_known_when_this_floor_was_set": "no",
+     "what_was_known": "that 160 pairs were built and that P-0 measured 32.61 percent accuracy on a DIFFERENT, borrowed item set",
+     "the_count_is_deliberately_not_computed_until_this_file_is_pushed": true
+    }
+   },
+   "6_equal_token_length": {
+    "how": "the two members of a pair differ only in the queried name, and the pair is admitted only if the two names tokenise to the same length IN THE QUESTION LINE",
+    "why_in_context": "a name that is one token bare can be two tokens after a space; filtering on the bare form admits misaligned pairs",
+    "verified": true,
+    "misaligned_pairs": 0
+   },
+   "7_bridge_tokens_identical": {
+    "how": "everything after the queried name is fixed template text",
+    "verified_position_by_position": true,
+    "positions_where_the_members_differ": 0,
+    "sites": {
+     "PREFIX": "min 76, max 82, mean 79.17",
+     "CUE": "min 1, max 3, mean 1.58",
+     "BRIDGE": "min 52, max 52, mean 52.00",
+     "READOUT": "exactly 1"
+    }
+   }
+  }
+ },
+
+ "2_the_anti_retrieval_proof": {
+  "probe": "the same prompt with the queried name's own registration line removed",
+  "why_it_is_the_right_probe": "it removes the FIRST hop's input while leaving the second hop's clue, the rules table, entirely intact. A model that could answer anyway would be retrieving rather than composing",
+  "why_the_answer_is_not_recoverable": "the letter-to-digit table is randomised per pair and the name-to-letter assignment appears nowhere else in the prompt",
+  "registered_criterion": "ablated accuracy must be at or below chance plus a tolerance",
+  "chance_rate": 0.1111111111111111,
+  "tolerance": 0.05,
+  "tolerance_provenance": "a round allowance for finite-sample fluctuation and for any residual surface bias in digit priors; not fitted",
+  "ceiling": 0.1611111111111111,
+  "must_also_hold": "full accuracy minus ablated accuracy must exceed 0.50, so the drop is unambiguous rather than marginal",
+  "if_it_fails": "the object is not established; stop and report, and do not patch"
+ },
+
+ "3_conclusion_wordings_fixed_before_any_measurement": {
+  "these_are_verbatim_and_were_written_before_any_accuracy_or_patching_measurement": true,
+  "why_they_are_registered_now": "so that whichever estimand is later settled on inherits wordings it could not have shaped",
+
+  "OBJECT_NOT_ESTABLISHED": {
+   "recorded_as": "P-0c determination: the constructed object is not established, and no patching was performed on it.",
+   "verbatim": "The constructed two-hop object failed one of its registered validity requirements: either the model does not answer it above the registered accuracy floor, or the ablation probe did not collapse to chance, which would mean the second hop can be answered without the first. In either case the object does not carry a known-computed intermediate, and patching it would produce numbers about an object that does not have the property the numbers would be interpreted as measuring. NOTHING IS CONCLUDED ABOUT REAL ITEMS, ABOUT THE J-LENS, OR ABOUT ANY MODEL. This is a failure to build an instrument, not a finding about anything.",
+   "required_next_action": "stop and report; do not weaken a requirement, do not adjust the object to pass, do not proceed to any estimand work"
+  },
+
+  "OBJECT_ESTABLISHED": {
+   "recorded_as": "P-0c determination: the constructed object is established as a known-positive selection set.",
+   "verbatim": "The model answers the constructed two-hop items above the registered accuracy floor, and removing the first hop's input collapses accuracy to chance. The intermediate is therefore known BY CONSTRUCTION and is required BY THE TASK, and the object may serve as the selection set on which candidate estimands are compared. THIS IS A PROPERTY OF A CONSTRUCTED OBJECT AND NOTHING ELSE. It is not a result about real items, it is not a phenomenon-level positive control for the multihop set, and it licenses no claim about J-space, the J-lens, the paper, or T. A constructed object is a selection set, and success on a selection set is not success on an application set.",
+   "what_it_licenses": "proceeding to the candidate-estimand shortlist and the clean-run destruction sweep, and nothing else"
+  },
+
+  "NO_CANDIDATE_SURVIVES": {
+   "recorded_as": "P-0c determination: no candidate estimand survived the clean-run destruction sweep.",
+   "verbatim": "Every candidate on the pre-declared shortlist returned a materially non-zero value under a purely destructive patch, computed from clean runs alone. Two natural families had already died this way before the shortlist was written. The measurement is therefore not attempted, because an estimand that moves under pure destruction cannot attribute the movement it reports. NO NEW CANDIDATE IS ADDED: the shortlist was fixed before it was tested, and extending it after seeing which members failed would be selecting the instrument that decides the question.",
+   "required_next_action": "stop and report; do not add candidates and do not revise the selection rule"
+  }
+ },
+
+ "4_the_estimand_remains_HELD": {
+  "state": "HELD",
+  "why": "two natural forms are already proven dead under OD-022, and no functional form may be assumed safe before it passes that sweep",
+  "family_1_dead": "difference ratios of the form (L_patch - L_clean)/(L_full - L_clean); closed form under pure destruction is -L_clean/(L_full - L_clean), swept mean 0.4997, fraction at or below zero 0.0000",
+  "family_2_dead": "the rise in the donor answer's own log-probability; a_D is a low-probability token in the recipient's clean run and destruction flattens the distribution, which necessarily lifts low-probability tokens",
+  "when_it_is_settled": "after the object is established, by the selection rule below, and only once",
+  "candidates_proposed_so_far": 0
+ },
+
+ "5_the_selection_rule": {
+  "shortlist": "declared in a separate file before any candidate is evaluated; once declared, no member may be added or removed",
+  "maximum_candidates": 4,
+  "step_1": "every candidate must independently pass the OD-022 clean-run destruction sweep; a failure is elimination, not a repair target",
+  "step_2": "survivors are evaluated on the CONSTRUCTED object, where the intermediate is known",
+  "step_3": "the selected candidate is the one with the largest margin over its own unrelated-donor null ceiling, with at least 5 independent replicates and the ceiling taken as the maximum upper 95 percent bound",
+  "step_4": "ALL candidates' numbers are reported, not only the winner's",
+  "step_5": "the selected estimand is applied ONLY to the real item set; the selection set and the application set do not overlap and no conclusion is drawn on the selection set",
+  "step_6": "one selection only; if zero candidates survive, stop and report and do not add candidates"
+ },
+
+ "6_numerical_precision_inherited_and_to_be_reproven": {
+  "the_finding_being_inherited": "bfloat16 carries a batch-width-dependent offset of about 0.476 logits, which is the same order as the effects being measured, roughly 0.2 to 0.5",
+  "the_consequence_registered_as_a_limitation": "any bfloat16 patching result at this effect scale that has not demonstrated bit-exact no-ops is UNINTERPRETABLE, and this applies to work outside this study as much as inside it",
+  "the_three_part_repair_inherited_from_P0_prime": [
+   "the baseline is an in-batch self-patch job",
+   "the cache is captured at the consuming run's batch width",
+   "every chunk is padded to full width"
+  ],
+  "must_be_reproven_on_the_new_object_not_assumed": true,
+  "required": "EMBED_NOOP, PREFIX_DONOR and SELF_PATCH all exactly 0.000e+00 over every unit, with the worst single-unit value reported, in bfloat16 AND float32",
+  "units_discipline": "the tolerance is on the NORMALISED scale; a raw-logit comparison against it is a units error, and one was caught in P-0' before any verdict was recorded",
+  "failed_repairs_are_committed_not_discarded": true
+ },
+
+ "7_stop_conditions": [
+  "the object is not established: the ablation probe does not collapse to chance, or accuracy is below the registered floor",
+  "any no-op family is not exactly 0.000e+00, at either precision",
+  "zero candidate estimands survive the destruction sweep",
+  "correct-both units are below the registered floor of 60",
+  "continuing would require adding a candidate, or revising the selection rule a second time",
+  "lens_A or lens_B is read, or T is touched",
+  "continuing would require changing an EQ1, EQ2, P-0 or P-0' criterion, threshold, split or reading",
+  "a reboot, resize, configuration change or NSG rule would be needed",
+  "a create-only upload hits an If-None-Match precondition failure"
+ ],
+
+ "8_boundaries": {
+  "azure": "resources are used and never reconfigured; a100-vm, cpuserver and the four TRAINING Standard_NC24s_v3 machines stay running, the V100 machines stay idle and untouched, no NSG rule, nothing resized, rebooted, created or deleted",
+  "cost": "no cost-reduction action proposed, performed or discussed",
+  "budget": "no GPU-hour ceiling applies; consumption is accounted honestly and NO GATE may be reduced to save time or hours",
+  "blobs": "existing blobs immutable; uploads create-only with If-None-Match: *",
+  "T": "not touched, not read, not loaded",
+  "lens_A_and_lens_B": "not read",
+  "predecessors": "EQ1, EQ2, P-0 and P-0' artifacts are byte-identical"
+ },
+
+ "9_claims_this_phase_may_not_support": [
+  "that J-space exists or does not exist",
+  "that the paper is wrong; it measured Sonnet 4.5",
+  "that the published lenses are defective",
+  "anything about how T would behave, T having never been measured",
+  "the existence of internal causal reasoning machinery",
+  "any training-causal effect of distillation",
+  "that attention, embeddings, normalisation or whole-model differences have been explained",
+  "anything about consciousness",
+  "that the paper's mid-depth band has been reproduced",
+  "P-0's withheld verdict, which may not be cited as a published conclusion",
+  "THAT SUCCESS ON THE CONSTRUCTED OBJECT IS SUCCESS ON REAL ITEMS; the constructed object is a selection set and never a conclusion"
+ ],
+
+ "claim_ceiling": "P-0c builds and validates an instrument. No outcome it can reach is a scientific finding."
+}

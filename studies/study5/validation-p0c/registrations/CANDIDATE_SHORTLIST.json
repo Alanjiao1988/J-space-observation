@@ -1,0 +1,62 @@
+{
+ "schema_version": "study5-p0c-shortlist-v1",
+ "registration_id": "P0C-SHORTLIST",
+ "phase": "P-0c",
+ "recorded_at_utc": "2026-08-29T02:55:00Z",
+ "status": "DECLARED AND CLOSED. No member may be added or removed.",
+
+ "why_a_shortlist_and_not_a_prescription": {
+  "two_natural_forms_are_already_dead": true,
+  "family_1": "difference ratios; killed by OD-022 with a closed form and a 20000-draw sweep, mean 0.4997, fraction at or below zero 0.0000",
+  "family_2": "the rise in the donor answer's own log-probability; killed by the same mechanism mirrored, because destruction flattens the distribution and a_D is a low-probability token in the recipient's clean run",
+  "the_lesson": "intuition about which quantities are destruction-immune has now failed twice, so nothing is prescribed and everything is swept",
+  "the_directive_s_seeds_are_directions_not_prescriptions": true
+ },
+
+ "the_candidates": {
+  "C1_null_subtracted": {
+   "seed_direction": "null subtraction",
+   "idea": "do not seek a functional form that is immune to destruction; measure destruction explicitly and subtract it",
+   "form": "effect = raw(patched) - mean over replicates of raw(destructive patch at the same site and layer), where raw is any monotone response",
+   "why_it_might_survive": "the subtrahend is measured under the same conditions as the minuend, so a common destructive component cancels rather than having to be argued away",
+   "known_risk_stated_in_advance": "it is conservative in the direction that matters, but it inflates variance because the subtrahend is itself estimated"
+  },
+  "C2_matched_control_contrast": {
+   "seed_direction": "matched-controls",
+   "idea": "deduct the flattening term using control tokens matched on clean probability",
+   "form": "effect = (rise of a_D) - (mean rise of a set of control tokens whose clean probabilities match a_D's), at the readout position",
+   "why_it_might_survive": "flattening lifts all low-probability tokens roughly alike, so a probability-matched control set absorbs the lift while a genuine transfer of the donor's answer does not lift the controls",
+   "known_risk_stated_in_advance": "matching quality is finite, and a control set that is matched badly reintroduces the term it was meant to remove"
+  },
+  "C3_rank": {
+   "seed_direction": "rank / competition",
+   "idea": "flattening lifts low-probability tokens roughly equally, which moves probabilities far more than it moves ORDER",
+   "form": "effect = improvement in the rank of a_D in the full vocabulary, normalised so the donor's own clean run scores 1",
+   "why_it_might_survive": "a uniform lift of the tail leaves relative order largely intact, so the destructive component should be much smaller in rank space than in probability space",
+   "known_risk_stated_in_advance": "rank is invariant to scalar scaling, which is exactly the degeneracy EQ2 recorded for the J-lens readout; that is a reason to be careful in interpretation, not a reason to exclude it here"
+  },
+  "C4_two_sided_margin": {
+   "seed_direction": "competition, restricted to the two answers",
+   "idea": "compare the two answer tokens only, but as a share rather than a difference, so a common multiplicative depression cancels",
+   "form": "effect = p(a_D) / (p(a_D) + p(a_R)), rescaled so the recipient's clean run scores 0 and the donor's clean run scores 1",
+   "why_it_might_survive": "a destructive patch that depresses both answers by a common FACTOR leaves the share unchanged, whereas the difference of logits does not",
+   "known_risk_stated_in_advance": "destruction is not exactly multiplicative, so the cancellation is approximate and the sweep must decide"
+  }
+ },
+
+ "count": 4,
+ "maximum_permitted": 4,
+ "may_a_candidate_be_added_later": false,
+ "may_a_candidate_be_repaired_to_pass": false,
+ "if_zero_survive": "stop and report; adding a fifth after seeing which four failed would be selecting the instrument that decides the question",
+
+ "evaluation_order": [
+  "every candidate faces the OD-022 clean-run destruction sweep first, because a candidate it rejects never needs anything further",
+  "survivors are then evaluated on the constructed object, where the intermediate is known",
+  "the winner is the largest margin over its own unrelated-donor null ceiling",
+  "every candidate's numbers are reported, including the eliminated ones"
+ ],
+
+ "declared_before_any_candidate_was_evaluated": true,
+ "claim_ceiling": "A declared shortlist. It licenses no claim of any kind."
+}
