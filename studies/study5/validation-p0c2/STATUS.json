@@ -218,7 +218,7 @@
  },
  "lifecycle_state_is_registered_terminal": true,
  "closure": {
-  "closure_md_sha256": "c1c281fc220b4f32a7a2230f9f643117366da67babd577fa36bca2647f0a1954",
+  "closure_md_sha256": "6b4e26225ab39aeeea9771485cf08f2c9251949cbaefe1f4a9fced43ef652035",
   "closure_json_sha256": "b042f265986a66b6bc6b4d904f4c6d26bc89eede4e91a5a873ada3137ac78b82",
   "handoff_md_sha256": "db3abbcb0852e9b51aff442406f9de4db6145962fc044d09967b0462af362635",
   "handoff_json_sha256": "0a5baaeda8436d468a87b569301d62fccfc9b559acd8847aa7470783c5fd274a",
@@ -231,7 +231,10 @@
   "why_not_underpowered": "the MDE was never computed; the power of an eliminated estimand is not a meaningful quantity",
   "fifth_candidate_declared": false,
   "cumulative_gpu_hours": 40.144672,
-  "predecessor_namespaces_verified_byte_identical": 6,
-  "files_verified": 375
+  "predecessor_namespaces_verified_byte_identical": 7,
+  "files_verified": 402,
+  "closure_md_sha256_SUPERSEDED": "c1c281fc220b4f32a7a2230f9f643117366da67babd577fa36bca2647f0a1954",
+  "closure_md_supersession_reason": "case 2 remedy: the methodological output was present and complete but sat two sections after the failure map, so a reader met three accounts of failure first. It was moved to sit immediately after the failure map by a proven pure reorder; byte count unchanged at 8984, non-heading line multiset unchanged, only three section ordinals moved. No conclusion, criterion, threshold or verdict was altered",
+  "p0c2_sealed_at": "5aefdf4"
  }
 }

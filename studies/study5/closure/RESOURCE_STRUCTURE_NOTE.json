@@ -1,0 +1,59 @@
+{
+ "schema_version": "study5-resource-structure-note-v1",
+ "document_kind": "descriptive observation, added at closure",
+ "recorded_at_utc": "2026-08-29T06:30:00Z",
+ "recorded_by": "adjudicator ruling, in session, 2026-08-29",
+
+ "status": {
+  "is_a_scientific_finding_of_this_project": false,
+  "was_pre_registered": false,
+  "added_at_closure_as_a_descriptive_note": true,
+  "may_be_used_to_reinterpret_any_phase_verdict": false,
+  "may_be_generalised_beyond_this_project": false
+ },
+
+ "the_observation": {
+  "eq1_hours": 31.582505,
+  "cumulative_hours": 40.144672,
+  "eq1_share_of_cumulative": 0.7867,
+  "p0_through_closure_hours": 1.080834,
+  "p0_through_closure_share": 0.0269,
+  "what_the_1_08_hours_contained": [
+   "constructing a two-hop object and proving it established",
+   "a bit-exact patching harness, re-proven in two precisions on each new object",
+   "the full screening of four candidate estimands",
+   "the establishment and the exercise of every governance mechanism in the stack"
+  ]
+ },
+
+ "why_the_later_phases_were_cheap": {
+  "the_reason": "most of the gates are ZERO-GPU",
+  "examples_from_this_project_only": [
+   "OD-022's clean-run destruction sweep killed the entire difference-ratio family without any accelerator time, and predicted its failure value in advance",
+   "the OD-017 and OD-021 diffs caught a criterion issued by the adjudicator",
+   "a pre-registration consumes no compute at all"
+  ]
+ },
+
+ "writing_limitations_that_govern_this_note": {
+  "1_it_is_descriptive_only": "it states the COST STRUCTURE OF THIS PROJECT and nothing else",
+  "2_it_may_not_be_generalised": "it must NOT be written as 'pre-registration is generally almost free', nor as any general methodological claim",
+  "3_it_does_not_say_the_later_phases_were_better": "cheaper gates are NOT stronger gates; the later phases were cheaper, and that is a different statement from being more rigorous or better executed",
+  "4_it_reinterprets_no_verdict": "no phase determination is revisited, softened or strengthened by it",
+  "5_the_comparison_is_not_a_criticism_of_EQ1": "EQ1's hours went into fitting and measurement that no zero-GPU gate could have substituted for"
+ },
+
+ "per_phase_hours": {
+  "EQ1": 31.582505,
+  "EQ2": 7.483333,
+  "P-0": 0.106056,
+  "P-0prime": 0.341667,
+  "P-0c": 0.129167,
+  "P-0c-2": 0.501944,
+  "closure": 0.0,
+  "cumulative": 40.144672,
+  "original_registered_ceiling": 240
+ },
+
+ "claim_ceiling": "A descriptive observation about this project's cost structure. It licenses no claim of any kind, generalises to nothing, and is not a finding."
+}

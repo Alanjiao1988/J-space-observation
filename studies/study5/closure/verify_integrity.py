@@ -8,7 +8,13 @@ ROOT = pathlib.Path(
     r"\J-space-observation\alanjiao1988-upgraded-sniffle"
 )
 
-# Every predecessor namespace, and the commit at which each was sealed.
+# Every sealed namespace, and the commit at which each was sealed.
+#
+# p0c2 was absent from the first integrity table for a real reason: the closure
+# commits were written ON that branch, so at the moment the table was produced
+# the namespace was still being written and had no sealing commit to name. The
+# terminal state has since been declared, so it is sealed here at the commit
+# that declared it.
 SEALED = [
     ("studies/study5/qualification-eq1", "a28ae6a"),
     ("studies/study5/qualification-eq2", "a28ae6a"),
@@ -16,6 +22,7 @@ SEALED = [
     ("studies/study5/validation-p0", "9556c40"),
     ("studies/study5/validation-p0-prime", "e948134"),
     ("studies/study5/validation-p0c", "f88b2a6"),
+    ("studies/study5/validation-p0c2", "5aefdf4"),
 ]
 
 
@@ -69,7 +76,7 @@ for namespace, sealed_at in SEALED:
     )
 
 report = {
-    "schema_version": "study5-closure-integrity-v1",
+    "schema_version": "study5-closure-integrity-v2",
     "recorded_at_utc": "2026-08-29T05:55:00Z",
     "method": (
         "for each sealed namespace, a sha256 over every file's path and content "
@@ -78,6 +85,12 @@ report = {
         "summary alone would not guarantee"
     ),
     "namespaces": results,
+    "p0c2_note": (
+        "p0c2 was absent from version 1 of this table because the closure commits "
+        "were written on that branch, so it was still being written when the table "
+        "was produced and had no sealing commit to name. The terminal state has "
+        "since been declared, so it is sealed at the commit that declared it"
+    ),
     "all_byte_identical": all_ok,
     "claim_ceiling": "An integrity record. It licenses no claim of any kind.",
 }

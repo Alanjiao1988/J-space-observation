@@ -39,7 +39,35 @@ Six phases, six failures, **all of them in the apparatus**.
 
 ---
 
-## 3. Why no fifth candidate was declared
+## 3. Methodological output
+
+To be reported **alongside** the failures, not buried beneath them.
+
+- **The directionality rule** — moving the implementation toward the
+  registration is a bug fix; moving the registration toward the data is
+  p-hacking. *The boundary is the direction, not the outcome.*
+- **Post-hoc tightening vs loosening** — the distinction that made OA-005
+  legitimate and would have made its inverse illegitimate.
+- **Asymmetric-motivation disclosure** — if a check would only have occurred to
+  you on an unfavourable result, say so.
+- **OD-011 rev 2** — a non-vacuity demonstration must include a
+  *must-return-positive* case; three must-return-negative cases are passed by a
+  rule that always returns the negative.
+- **OD-017** — a diff of registered text against implementation, comparing
+  **live imported values**, never comments.
+- **OD-021** — a criterion issued by the *adjudicator* is not exempt from
+  verification.
+- **OD-022** — the clean-run destruction sweep: a zero-GPU precondition gate that
+  killed two estimand families before either cost a forward pass.
+- **Push the rule before computing the number** — applied to the n floor, the
+  correct-both count, and the MDE pass-line.
+- **Commit failed repairs; do not discard them.**
+- **The sweep and rev 2 are complementary at the two ends of the nuisance
+  parameter** — one tests at high destruction, the other at zero.
+
+---
+
+## 4. Why no fifth candidate was declared
 
 This is not an adjudicator's judgement. It is **registered arithmetic**:
 
@@ -65,7 +93,7 @@ Recorded verbatim:
 
 ---
 
-## 4. The no-op requirement is coherent; C1's failure is a real defect
+## 5. The no-op requirement is coherent; C1's failure is a real defect
 
 > C1 subtracts the same destruction term from every patch, including patches
 > where no destruction occurred. For a no-op it degenerates to
@@ -94,34 +122,6 @@ full-donor signal is itself only +0.038606 against a bias of 0.507; after
 re-centring, the signal-to-noise ratio still does not hold. And rev 2 requires
 monotonicity to be *established*, which it was not. **This is written down so a
 successor does not walk the same path.**
-
----
-
-## 5. Methodological output
-
-To be reported **alongside** the failures, not buried beneath them.
-
-- **The directionality rule** — moving the implementation toward the
-  registration is a bug fix; moving the registration toward the data is
-  p-hacking. *The boundary is the direction, not the outcome.*
-- **Post-hoc tightening vs loosening** — the distinction that made OA-005
-  legitimate and would have made its inverse illegitimate.
-- **Asymmetric-motivation disclosure** — if a check would only have occurred to
-  you on an unfavourable result, say so.
-- **OD-011 rev 2** — a non-vacuity demonstration must include a
-  *must-return-positive* case; three must-return-negative cases are passed by a
-  rule that always returns the negative.
-- **OD-017** — a diff of registered text against implementation, comparing
-  **live imported values**, never comments.
-- **OD-021** — a criterion issued by the *adjudicator* is not exempt from
-  verification.
-- **OD-022** — the clean-run destruction sweep: a zero-GPU precondition gate that
-  killed two estimand families before either cost a forward pass.
-- **Push the rule before computing the number** — applied to the n floor, the
-  correct-both count, and the MDE pass-line.
-- **Commit failed repairs; do not discard them.**
-- **The sweep and rev 2 are complementary at the two ends of the nuisance
-  parameter** — one tests at high destruction, the other at zero.
 
 ---
 
