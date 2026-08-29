@@ -1,0 +1,93 @@
+{
+ "schema_version": "study5-p0-closure-v1",
+ "study_id": "STUDY5_P0",
+ "namespace": "studies/study5/validation-p0/",
+ "recorded_at_utc": "2026-08-29T01:10:00Z",
+ "recorded_by": "operator ruling, in session, 2026-08-29",
+ "supersedes_nothing": true,
+ "computation_performed": "none; every number below is read from artifacts already committed",
+
+ "determination": "UNINTERPRETABLE",
+ "determination_is_not": [
+  "not a negative result",
+  "not a positive result",
+  "not a finding of any kind"
+ ],
+
+ "why_uninterpretable": {
+  "statement": "the pre-registration states that a verdict means nothing until the structural gates pass; the PREFIX integrity gate did not pass, so the phase yields no interpretable determination",
+  "who_voided_it": "the pre-registration voided it",
+  "who_did_not_void_it": "the agent did not overturn a negative result; there was never a published negative to overturn",
+  "verbatim": "This is not a case of overturning a negative result. The pre-registration voided it."
+ },
+
+ "the_withheld_direction_recorded_verbatim": {
+  "why_this_is_recorded_at_all": "so that any subsequent replacement of the estimand can be seen to move toward one side or the other",
+  "verbatim": "Had the gates passed, P-0's registered rule would have returned NOT_CAUSALLY_USED. That verdict was withheld because the PREFIX gate failed, and it was never published. THIS DIRECTION IS RECORDED SO THAT ANY LATER REPLACEMENT OF THE ESTIMAND CAN BE SEEN TO MOVE TOWARD ONE SIDE OR THE OTHER.",
+  "the_withheld_verdict": "NOT_CAUSALLY_USED",
+  "layers_above_ceiling_in_the_withheld_computation": [],
+  "ceiling_in_the_withheld_computation": 1.0029503,
+  "bridge_peak_mean_in_the_withheld_computation": 0.238015,
+  "bridge_peak_layer_in_the_withheld_computation": 22,
+  "may_be_cited_as_a_published_conclusion": false
+ },
+
+ "what_is_preserved_unchanged": {
+  "artifacts": "every P-0 artifact, byte-identical",
+  "code": "every P-0 tool, unchanged",
+  "the_withheld_decision_file": "out/decision.json, unchanged",
+  "nothing_deleted": true,
+  "nothing_rewritten": true,
+  "criterion_revisions_made_in_P0": 0,
+  "verdict_recomputations_under_any_alternative_rule_in_P0": 0
+ },
+
+ "proposed_rules_remain_proposed": {
+  "OD-018": "PROPOSED, not in force",
+  "OD-019": "PROPOSED, not in force",
+  "OD-020": "PROPOSED, not in force",
+  "file": "registrations/PROPOSED-OD-018-019-020.json"
+ },
+
+ "the_one_thing_P0_did_establish": {
+  "harness_positive_control": "PASS at 0.9862, lower bound 0.9523, against a required 0.90",
+  "significance": "the first passing positive control obtained anywhere in Study 5",
+  "what_it_certifies": "that the patching harness moves what it claims to move",
+  "what_it_does_not_certify": "nothing about whether the model computes an intermediate, nothing about J, nothing about the paper, nothing about T",
+  "survives_this_closure": true,
+  "why_it_survives": "it is a property of the instrument, established by a construction whose expected value is fixed by token identity rather than by the estimand; the integrity failure is an additive baseline offset of about 0.0138, which cannot account for a recovery of 0.9862"
+ },
+
+ "two_defects_carried_forward": {
+  "implementation": {
+   "what": "the clean baseline was measured in a batch-of-one forward while every patched value was measured in a batch-of-48 forward",
+   "consequence": "a constant additive offset of about 0.0138 in every restoration value",
+   "adjudicated": "bug fix; the repair moves the implementation back toward the registered text",
+   "repaired_in_P0": false,
+   "why_not": "P-0 is closed; the repair belongs to the successor"
+  },
+  "registration": {
+   "what": "the estimand's behaviour under a purely disruptive patch, and the single global ceiling maximised across sites",
+   "adjudicated": "requires a new independent pre-registration, not an amendment to P-0",
+   "repaired_in_P0": false,
+   "why_not": "changing a registered estimand after seeing the curve it produced would move the registered text toward the data, whatever the merits of the replacement"
+  }
+ },
+
+ "eq1_and_eq2": {
+  "modified_by_this_closure": false,
+  "eq1_q4a_fail_stands": true,
+  "eq2_negative_stands": true,
+  "byte_identical_against": "a28ae6a",
+  "neither_confirmed_nor_weakened_by_an_uninterpretable_phase": true
+ },
+
+ "successor": {
+  "id": "STUDY5_P0_PRIME",
+  "relationship": "a new independent pre-registration, not a continuation and not an amendment",
+  "precedent": "D-1, which registered a new question separately rather than reopening a closed one",
+  "P0_may_not_be_reopened_by_it": true
+ },
+
+ "claim_ceiling": "A closure record for an uninterpretable phase. It licenses no claim of any kind, and the withheld verdict is not a conclusion."
+}

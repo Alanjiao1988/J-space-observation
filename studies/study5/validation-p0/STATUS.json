@@ -3,15 +3,14 @@
  "study_id": "STUDY5_P0",
  "namespace": "studies/study5/validation-p0/",
  "kind": "item-validity verification",
- "lifecycle_state": "STUDY5_P0_HALTED_AT_A_REGISTERED_STOP_CONDITION_AWAITING_OPERATOR",
- "lifecycle_state_is_registered_terminal": false,
- "terminal": false,
- "resumable": true,
+ "lifecycle_state": "STUDY5_P0_CLOSED_UNINTERPRETABLE",
+ "lifecycle_state_is_registered_terminal": true,
+ "terminal": true,
+ "resumable": false,
  "is_a_scientific_result": false,
- "current_phase": "P-0, halted",
- "next_phase": "none without an operator decision; P-0b is NOT entered",
+ "current_phase": "closed",
+ "next_phase": "STUDY5_P0_PRIME, a new independent pre-registration",
  "halted_under": "HB-004",
-
  "authority": {
   "path": "studies/study5/prompts/study5_p0_item_validity_authority.md",
   "source": "operator session prompt, 2026-08-29",
@@ -19,7 +18,6 @@
   "transcribed_by_the_agent_in_session": true,
   "why_not_mechanical": "the source was a live prompt rather than a file, so the mechanical extraction EQ1 and EQ2 used was not available; the limitation is disclosed rather than papered over"
  },
-
  "predecessors": {
   "STUDY5_EQ1": {
    "terminal_state": "STUDY5_EQ1_WORKSPACE_BAND_NOT_ESTABLISHED_AT_THIS_SCALE",
@@ -38,7 +36,6 @@
    "eq2_mounted_read_only_during_the_measurement": true
   }
  },
-
  "gates": {
   "OD-011_non_vacuity": "PASS, 4 of 4, proven on synthetic curves before any measurement existed",
   "OD-017_conformance": "PASS, 23 entries, 0 divergences",
@@ -46,7 +43,6 @@
   "harness_positive_control": "PASS, 0.9862 with lcb 0.9523 against a required 0.90",
   "prefix_integrity": "FAIL, 0.025512 against a tolerance of 0.0001"
  },
-
  "measurement": {
   "model": "Qwen2.5-7B-Instruct, 28 transformer layers, the EQ2 positive control",
   "eval_set": "the pre-existing multihop set; no item was authored",
@@ -56,45 +52,58 @@
   "units_dropped_on_the_registered_denominator_guard": 6,
   "clusters": 92,
   "depth_grid": "embedding output plus 28 block outputs",
-  "sites": ["PREFIX", "CUE", "BRIDGE", "READOUT"],
-  "null_constructions": ["PREFIX no-op", "unrelated third donor", "norm-matched random"],
+  "sites": [
+   "PREFIX",
+   "CUE",
+   "BRIDGE",
+   "READOUT"
+  ],
+  "null_constructions": [
+   "PREFIX no-op",
+   "unrelated third donor",
+   "norm-matched random"
+  ],
   "replicates_per_null": 5,
   "instrument_under_test_imported": false
  },
-
  "outcome": {
   "the_registered_rule_ran_unmodified": true,
   "it_returned": "NOT_CAUSALLY_USED",
   "the_verdict_is_reportable": false,
   "why_not": "the registration states a verdict means nothing until the structural gates pass, and the PREFIX integrity gate did not pass",
   "ceiling": 1.0029503,
-  "ceiling_source": {"construction": "NULL_R_2", "site": "READOUT", "layer": 19},
+  "ceiling_source": {
+   "construction": "NULL_R_2",
+   "site": "READOUT",
+   "layer": 19
+  },
   "bridge_peak_mean": 0.238015,
   "bridge_peak_layer": 22,
   "criterion_revisions_made": 0,
-  "verdict_recomputations_under_any_alternative_rule": 0
+  "verdict_recomputations_under_any_alternative_rule": 0,
+  "withheld_direction_recorded_verbatim_in": "P0_CLOSURE.json"
  },
-
  "two_defects_found": {
   "implementation": "the clean baseline was measured in a batch-of-one forward and every patched value in a batch-of-48 forward, putting a constant offset of about 0.0138 into every restoration value. The PREFIX gate caught it, which is the part of the design that worked as intended",
   "registration": "the estimand cannot separate movement toward the donor's answer from generic disruption of the recipient's, and the single global ceiling imports the READOUT scale into a BRIDGE test. Both are mine",
   "neither_is_repaired_here": "repairing either after seeing the curve would move the registered text toward the data"
  },
-
  "reported_only": {
   "item_accuracy_donor": 0.3261,
   "item_accuracy_recipient": 0.3261,
   "note": "the model produces the labelled target as its top-1 for about a third of the admissible multihop items; EQ2 never established this number. No criterion was adjusted from it"
  },
-
  "standing_rules_inherited_and_in_force": [
   "OD-001 the ceiling is measured in actively used GPU-hours",
   "OD-011 a check must carry a demonstrated failing case, or it counts as not implemented",
   "OD-013 one variable at a time",
   "OD-017 registered text versus implementation conformance, compared on live values"
  ],
- "rules_proposed_but_not_in_force": ["OD-018", "OD-019", "OD-020"],
-
+ "rules_proposed_but_not_in_force": [
+  "OD-018",
+  "OD-019",
+  "OD-020"
+ ],
  "budget": {
   "registered_total_ceiling_gpu_hours": 240,
   "cumulative_before_this_phase": 39.065839,
@@ -107,7 +116,6 @@
   "hard_stop_reached": false,
   "denominated_per": "OD-001"
  },
-
  "azure": {
   "vms_reconfigured": 0,
   "vms_stopped_or_started": 0,
@@ -119,19 +127,19 @@
   "cost_reduction_actions_proposed": 0,
   "blobs_written": 0
  },
-
  "protected_objects": {
   "target_ever_touched": false,
   "sealed_lenses_ever_read": false,
   "eq1_artifacts_modified": 0,
   "eq2_artifacts_modified": 0
  },
-
  "what_this_phase_did_establish": {
   "one_thing_only": "that the patching harness moves what it claims to move, at 0.9862 with a lower bound of 0.9523",
   "why_it_is_worth_recording": "no passing positive control had been obtained anywhere in Study 5 before this. It certifies an INSTRUMENT and nothing else",
   "what_it_does_not_establish": "nothing about whether the model computes an intermediate, nothing about J, nothing about the paper, nothing about T"
  },
-
- "claim_ceiling": "P-0 is item-validity verification. No state it can reach is a scientific result, and this state is a halt rather than a determination."
+ "claim_ceiling": "P-0 is item-validity verification. No state it can reach is a scientific result, and this state is a halt rather than a determination.",
+ "determination": "UNINTERPRETABLE",
+ "closure_file": "P0_CLOSURE.json",
+ "closure_file_sha256": "60d8c257896408cc9d1879f336e4ef97eacab0f3540ec87f9d5c9befd932548b"
 }

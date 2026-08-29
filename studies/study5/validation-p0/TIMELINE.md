@@ -272,3 +272,33 @@ disruption.
 
 **P-0 is item-validity verification. No state it can reach is a scientific
 result, and this state is a halt rather than a determination.**
+
+---
+
+## Closure
+
+P-0 is closed **`UNINTERPRETABLE`** by operator ruling of 2026-08-29,
+recorded in `P0_CLOSURE.json`, sha256
+`60d8c257896408cc9d1879f336e4ef97eacab0f3540ec87f9d5c9befd932548b`.
+
+Not a negative and not a positive. The distinction that matters:
+
+> This is not a case of overturning a negative result. The pre-registration
+> voided it.
+
+The withheld direction is recorded verbatim in the closure file, for one
+specific reason — so that any later replacement of the estimand can be seen to
+move toward one side or the other:
+
+> Had the gates passed, P-0's registered rule would have returned
+> `NOT_CAUSALLY_USED`. That verdict was withheld because the PREFIX gate
+> failed, and it was never published. THIS DIRECTION IS RECORDED SO THAT ANY
+> LATER REPLACEMENT OF THE ESTIMAND CAN BE SEEN TO MOVE TOWARD ONE SIDE OR THE
+> OTHER.
+
+It may not be cited as a published conclusion.
+
+Every P-0 artifact, tool and decision file is preserved unchanged. `OD-018`,
+`OD-019` and `OD-020` remain `PROPOSED, not in force`. The successor is a
+new independent pre-registration, following the D-1 precedent that a new
+question gets its own registration rather than reopening a closed one.
