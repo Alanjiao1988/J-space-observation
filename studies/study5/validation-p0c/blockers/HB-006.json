@@ -1,0 +1,110 @@
+{
+ "schema_version": "study5-p0c-blocker-v1",
+ "blocker_id": "HB-006",
+ "phase": "P-0c",
+ "recorded_at_utc": "2026-08-29T02:15:00Z",
+ "status": "TERMINAL FOR THIS INVOCATION, AWAITING OPERATOR",
+ "kind": "registered stop condition reached before any patching",
+
+ "which_stop_condition": {
+  "from": "P0C_PREREGISTRATION.json section 7, clause 1",
+  "clause": "the object is not established: the ablation probe does not collapse to chance, OR accuracy is below the registered floor",
+  "which_half_fired": "the accuracy half only",
+  "reached_before_any_patching": true,
+  "reached_before_any_candidate_estimand_was_evaluated": true
+ },
+
+ "the_determination": {
+  "value": "OBJECT_NOT_ESTABLISHED",
+  "produced_by": "the registered criterion, applied unmodified, reading its thresholds from the pushed registration file",
+  "verbatim_from_the_pre_registered_wording": "The constructed two-hop object failed one of its registered validity requirements: either the model does not answer it above the registered accuracy floor, or the ablation probe did not collapse to chance, which would mean the second hop can be answered without the first. In either case the object does not carry a known-computed intermediate, and patching it would produce numbers about an object that does not have the property the numbers would be interpreted as measuring. NOTHING IS CONCLUDED ABOUT REAL ITEMS, ABOUT THE J-LENS, OR ABOUT ANY MODEL. This is a failure to build an instrument, not a finding about anything."
+ },
+
+ "requirement_4_accuracy_FAILED": {
+  "observed": 0.75625,
+  "floor": 0.8,
+  "margin": -0.04375,
+  "chance": 0.1111111111111111,
+  "n_items": 320,
+  "who_set_the_floor": "the executing party, adopting the adjudicator's suggestion of at least 0.80 unchanged",
+  "when": "before any accuracy measurement existed, and pushed in commit 5d157a2",
+  "why_it_is_not_lowered": "0.7562 is close to 0.80, which is exactly the circumstance in which moving a threshold is most tempting and least defensible. Lowering it now would be moving the registered text toward the data, which the directionality precedent calls p-hacking regardless of whether 0.75 would have been a defensible floor to register in the first place"
+ },
+
+ "requirement_3_anti_retrieval_PASSED_and_not_narrowly": {
+  "observed_ablated_accuracy": 0.115625,
+  "chance": 0.1111111111111111,
+  "ceiling": 0.1611111111111111,
+  "distance_above_chance": 0.0045138888888889,
+  "drop_from_full_accuracy": 0.640625,
+  "required_drop": 0.5,
+  "reading": "removing the FIRST hop's input, while leaving the second hop's clue entirely intact, drops the model to essentially exactly chance. The task cannot be answered by retrieval and genuinely requires composing two lookups",
+  "what_this_establishes": "the two-hop STRUCTURE of the constructed object",
+  "what_this_does_not_establish": "the object as a whole, which also requires an accuracy the model did not reach"
+ },
+
+ "requirement_2_holds_behaviourally_as_well_as_on_paper": {
+  "top1_is_the_intermediate_letter": 0,
+  "of_items": 320,
+  "why_it_was_checked": "requirement 2 is a statement about vocabularies; if the model had emitted letters, the requirement would have held on paper while the object behaved differently in practice"
+ },
+
+ "the_diagnostic_that_cannot_change_the_outcome": {
+  "file": "out/object_diagnostic.json",
+  "motivation_asymmetry_disclosed": "it would not have been written had the floor been met; it is admissible because it cannot change a determination that is already committed",
+  "every_error_is_a_hop_1_error": {
+   "hop1_error_digit_of_another_letter_in_this_table": 78,
+   "digit_not_in_this_table": 0,
+   "emitted_a_letter": 0,
+   "not_a_digit_at_all": 0,
+   "errors_total": 78,
+   "fraction_of_errors_that_are_hop_1": 1.0,
+   "reading": "the second lookup is performed correctly on the WRONG key in every single error. Hop 2 never fails. The whole of the shortfall is hop 1, retrieving the right registration line"
+  },
+  "accuracy_tracks_the_position_of_the_registration_line": {
+   "0": 1.0,
+   "1": 0.7917,
+   "2": 0.6552,
+   "3": 0.5645,
+   "4": 0.7209,
+   "5": 0.8125,
+   "reading": "the first registration line is answered perfectly and the middle ones worst, which is an in-context lookup difficulty rather than a reasoning failure"
+  },
+  "what_the_diagnostic_does_not_authorise": [
+   "lowering the accuracy floor",
+   "rebuilding the object with fewer or reordered registration lines to make it pass, which is the same move by another route",
+   "proceeding to any estimand work"
+  ]
+ },
+
+ "what_was_NOT_done": {
+  "accuracy_floor_lowered": false,
+  "object_rebuilt_to_pass": false,
+  "requirement_weakened": false,
+  "candidate_estimands_evaluated": 0,
+  "patching_performed": false,
+  "determination_recomputed_under_any_alternative_rule": 0
+ },
+
+ "what_this_phase_did_establish": {
+  "one_thing": "that a two-hop object of this shape can be constructed such that removing the first hop's input collapses accuracy to chance, with the intermediate known by build and disjoint in vocabulary from the answer",
+  "why_it_is_worth_recording": "it is the first object in this study whose intermediate is known by construction rather than assumed, and its anti-retrieval property is demonstrated rather than argued",
+  "what_it_does_not_establish": "that this model can do the object reliably enough to serve as a known-positive selection set, which is precisely what the accuracy floor was for"
+ },
+
+ "decisions_reserved_for_the_operator": [
+  "whether an accuracy floor of 0.80 is the right requirement, decided in the abstract rather than against this measurement",
+  "whether an object with fewer distractor registration lines is a legitimate NEW object with its own pre-registration, or an inadmissible retune of this one",
+  "whether hop-1 in-context lookup difficulty is itself the thing worth studying, since it is where 100 percent of the shortfall lies",
+  "whether to abandon the constructed-object route entirely"
+ ],
+
+ "boundaries_held": {
+  "target_touched": false,
+  "sealed_lenses_read": false,
+  "eq1_eq2_p0_p0prime_artifacts_modified": 0,
+  "azure_changes": 0
+ },
+
+ "claim_ceiling": "A blocker record for a halted phase. It licenses no claim of any kind, and it is not a finding."
+}

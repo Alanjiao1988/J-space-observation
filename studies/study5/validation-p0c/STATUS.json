@@ -1,0 +1,124 @@
+{
+ "schema_version": "study5-p0c-status-v1",
+ "study_id": "STUDY5_P0C",
+ "namespace": "studies/study5/validation-p0c/",
+ "kind": "constructed-object instrument build and validation",
+ "lifecycle_state": "STUDY5_P0C_HALTED_OBJECT_NOT_ESTABLISHED",
+ "terminal": false,
+ "resumable": true,
+ "is_a_scientific_result": false,
+ "current_phase": "P-0c, halted before any patching",
+ "next_phase": "none without an operator decision",
+ "halted_under": "HB-006",
+
+ "determination": "OBJECT_NOT_ESTABLISHED",
+ "determination_produced_by": "the registered criterion, applied unmodified, reading its thresholds from the pushed registration",
+
+ "predecessors": {
+  "STUDY5_EQ1": {"q4a_fail_stands": true, "artifacts_modified": 0},
+  "STUDY5_EQ2": {"determination": "NEGATIVE", "stands": true, "artifacts_modified": 0},
+  "STUDY5_P0": {"determination": "UNINTERPRETABLE", "artifacts_modified": 0},
+  "STUDY5_P0_PRIME": {"halted_under": "HB-005", "artifacts_modified": 0}
+ },
+
+ "the_two_requirements_settled_here": {
+  "requirement_3_anti_retrieval": {
+   "verdict": "PASS, and not narrowly",
+   "ablated_accuracy": 0.115625,
+   "chance": 0.1111111111111111,
+   "ceiling": 0.1611111111111111,
+   "drop_from_full": 0.640625,
+   "required_drop": 0.5,
+   "what_it_establishes": "the two-hop STRUCTURE: removing the first hop's input while leaving the second hop's clue intact drops the model to essentially exactly chance, so the task cannot be answered by retrieval"
+  },
+  "requirement_4_accuracy": {
+   "verdict": "FAIL",
+   "observed": 0.75625,
+   "floor": 0.8,
+   "margin": -0.04375,
+   "n_items": 320,
+   "floor_set_before_measurement_and_pushed_in": "5d157a2",
+   "floor_lowered_after_seeing_the_result": false
+  }
+ },
+
+ "object_as_built": {
+  "pairs_attempted": 160,
+  "pairs_built": 160,
+  "rejected": 0,
+  "items": 320,
+  "requirement_2_vocabularies_disjoint": true,
+  "requirement_7_violations": 0,
+  "sites": {"PREFIX": 79.17, "CUE": 1.58, "BRIDGE": 52.0, "READOUT": 1},
+  "top1_is_the_intermediate_letter": 0,
+  "note": "requirement 2 holds behaviourally as well as on paper"
+ },
+
+ "diagnostic_reported_only": {
+  "every_error_is_a_hop_1_error": true,
+  "hop1_errors": 78,
+  "hop2_errors": 0,
+  "errors_total": 78,
+  "accuracy_by_registration_line_position": {
+   "0": 1.0, "1": 0.7917, "2": 0.6552, "3": 0.5645, "4": 0.7209, "5": 0.8125
+  },
+  "reading": "the second lookup never fails; the entire shortfall is in retrieving the right registration line, and it tracks that line's position in context",
+  "motivation_asymmetry_disclosed": true,
+  "can_change_the_determination": false
+ },
+
+ "gates": {
+  "OD-017_conformance": "PASS, 18 entries, 0 divergences, extended by OD-021 to audit handed-down values",
+  "OD-021": "IN FORCE, first applied here",
+  "OD-022": "IN FORCE; not yet exercised on a candidate, because the phase halted before any candidate was evaluated",
+  "OD-011_rev_2": "IN FORCE; not yet exercised here",
+  "sealed_asset_guard": "PASS"
+ },
+
+ "what_was_not_done": {
+  "accuracy_floor_lowered": false,
+  "object_rebuilt_to_pass": false,
+  "requirement_weakened": false,
+  "candidate_estimands_evaluated": 0,
+  "patching_performed": false,
+  "estimand_selected": false,
+  "correct_both_units_counted": false,
+  "why_the_count_was_not_taken": "counting it would have been the next step only if the object had established; taking it now would put a number on the record that no registered rule consumes"
+ },
+
+ "the_estimand": {
+  "state": "HELD",
+  "shortlist": "declared and CLOSED at 4, in registrations/CANDIDATE_SHORTLIST.json",
+  "candidates_evaluated": 0,
+  "candidates_added_after_declaration": 0
+ },
+
+ "protected_objects": {
+  "target_ever_touched": false,
+  "sealed_lenses_ever_read": false,
+  "eq1_artifacts_modified": 0,
+  "eq2_artifacts_modified": 0,
+  "p0_artifacts_modified": 0,
+  "p0prime_artifacts_modified": 0
+ },
+
+ "budget": {
+  "ceiling_applies": false,
+  "note": "no GPU ceiling; consumption is accounted honestly and no gate was reduced to save time or hours",
+  "consumed_this_phase": 0.129167,
+  "cumulative_before_this_phase": 39.513562,
+  "cumulative_after_this_phase": 39.642729,
+  "denominated_per": "OD-001"
+ },
+
+ "azure": {
+  "vms_reconfigured": 0,
+  "vms_stopped_or_started": 0,
+  "containers_created": 0,
+  "nsg_rules_added_this_invocation": 0,
+  "blobs_written": 0,
+  "cost_reduction_actions_proposed": 0
+ },
+
+ "claim_ceiling": "P-0c builds and validates an instrument. No state it can reach is a scientific result, and this state is a halt rather than a determination about anything outside the constructed object."
+}
