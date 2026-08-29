@@ -1,0 +1,61 @@
+{
+ "schema_version": "study5-governance-index-v1",
+ "recorded_at_utc": "2026-08-29T02:30:00Z",
+ "phase": "P-0c",
+ "purpose": "the standing rules in force as P-0c opens, and the ones that are not",
+
+ "in_force": {
+  "OD-001": {
+   "statement": "the registered ceiling is measured in actively used GPU-hours; VM wall-clock and allocated GPU-hours are reported separately and are not bound by it",
+   "origin": "STUDY5_EQ1",
+   "note": "no GPU ceiling applies to P-0c, but the three quantities are still reported separately and none substitutes for another"
+  },
+  "OD-011": {
+   "revision": 2,
+   "statement": "a check must carry a demonstrated failing case, or it counts as not implemented; AND the demonstration must include a case that must return POSITIVE",
+   "origin": "STUDY5_EQ2, revised in STUDY5_P0_PRIME",
+   "why_revised": "three must-return-negative cases are passed by a rule that always returns the negative"
+  },
+  "OD-013": {
+   "statement": "one variable at a time",
+   "origin": "STUDY5_EQ2"
+  },
+  "OD-017": {
+   "statement": "before any pre-registered criterion is applied to data, a line-by-line conformance table of registered text against implemented behaviour must be produced and committed, comparing LIVE values",
+   "origin": "STUDY5_EQ2"
+  },
+  "OD-021": {
+   "statement": "a criterion issued by the ADJUDICATOR must pass OD-017 conformance before entering a pre-registration; the adjudicator's instruction does not exempt it from verification",
+   "origin": "STUDY5_P0C",
+   "precipitated_by": "the P-0' prescribed estimand turning out to be the one already in use"
+  },
+  "OD-022": {
+   "statement": "a candidate estimand must be evaluated under a purely destructive patch from CLEAN RUNS ALONE, and reported, before it may be registered; not approximately zero means not registrable",
+   "origin": "STUDY5_P0C",
+   "precipitated_by": "the same event; the sweep killed the whole difference-ratio family with no GPU work and predicted the failure value in advance"
+  }
+ },
+
+ "proposed_not_in_force": {
+  "OD-018": "a null must be demonstrated quiet before it may set a ceiling",
+  "OD-019": "an estimand must be shown to separate the movement it names from movements it does not",
+  "OD-020": "a baseline must be measured under the same execution conditions as the quantity it is subtracted from",
+  "where": "studies/study5/validation-p0/registrations/PROPOSED-OD-018-019-020.json",
+  "note": "OD-022 substantially covers OD-019's concern for the specific case of destructive perturbation, and P-0''s bit-exact repair discharged OD-020's concern in practice; none of the three is thereby put in force, and the operator decides"
+ },
+
+ "the_directionality_precedent": {
+  "rule": "changing the IMPLEMENTATION to match the REGISTERED TEXT is a bug fix; changing the REGISTERED TEXT to match the DATA is p-hacking. The difference is the direction, not the outcome",
+  "origin": "STUDY5_EQ2, OD-017",
+  "still_governing": true
+ },
+
+ "the_disciplines_carried_forward_that_are_not_numbered_rules": [
+  "a failed repair is committed, not discarded; the first batch-baseline attempt at 0.5543 is in the record",
+  "motivation asymmetry is disclosed whenever a check would only have been thought of on an unfavourable result",
+  "a rule whose count could inform it is pushed before the count is computed",
+  "an artifact of record is rendered FROM the committed JSON rather than retyped, so the readable copy cannot drift"
+ ],
+
+ "claim_ceiling": "A governance index. It licenses no claim of any kind."
+}

@@ -1,0 +1,53 @@
+{
+ "schema_version": "study5-governance-v1",
+ "registration_id": "OD-022",
+ "status": "IN FORCE",
+ "recorded_at_utc": "2026-08-29T02:25:00Z",
+ "recorded_by": "adjudicator ruling, in session, 2026-08-29",
+ "phase_of_origin": "P-0c",
+ "short_name": "the clean-run destruction sweep",
+
+ "the_rule": {
+  "statement": "Before a candidate estimand may enter a pre-registration, its value under a PURELY DESTRUCTIVE patch must be computed from CLEAN RUNS ALONE, and its distribution and its fraction at or below zero must be reported. A candidate that is not approximately zero under pure destruction may not be registered.",
+  "when": "before any patched measurement exists",
+  "cost": "no GPU work and no patched data; clean forwards are sufficient",
+  "on_failure": "the candidate is out. It is not repaired to make it pass"
+ },
+
+ "how_the_substitution_is_made": {
+  "principle": "a state that has been destroyed carries no information about which answer token is which, so the model's output distribution at that position tends toward one that does not distinguish them",
+  "operationally": "substitute the destroyed run's statistics into the candidate's formula and evaluate it against the clean donor and clean recipient runs, sweeping over the observed range of clean-run values",
+  "what_makes_it_cheap": "both clean runs already exist for every unit; nothing has to be patched to learn what a destructive patch would do to the formula"
+ },
+
+ "why_it_exists": {
+  "it_killed_an_entire_family_before_any_measurement": {
+   "family": "difference-ratio estimands of the form (L_patch - L_clean) / (L_full - L_clean)",
+   "mechanism": "in its own clean run the recipient PREFERS its own answer, so logit(a_R) starts high and logit(a_D) starts low. Destruction drags the high one down far more than the low one, so the difference RISES",
+   "closed_form_under_pure_destruction": "effect = -L_clean / (L_full - L_clean)",
+   "sweep": "20000 clean-run pairs, using no measured data: mean 0.4997, fraction at or below zero 0.0000",
+   "it_predicted_the_failure_before_it_was_observed": "synthetic case 2 subsequently measured 0.515487, and P-0's random-donor null had measured 0.4139"
+  },
+  "it_also_kills_the_next_obvious_candidate": {
+   "candidate": "the rise in the donor answer's own log-probability",
+   "mechanism": "a_D is a LOW-probability token in the recipient's clean run, and destruction FLATTENS the distribution; flattening necessarily raises low-probability tokens, so the numerator is positive under pure destruction",
+   "relation_to_the_first": "the mirror image of the same mechanism, which is why two natural forms both died"
+  },
+  "the_general_lesson_recorded": "no functional form may be assumed safe before it passes this sweep; intuition about which quantities are 'obviously' destruction-immune has now failed twice"
+ },
+
+ "relation_to_OD_011": {
+  "OD-011_rev_2_remains_in_force": "a non-vacuity demonstration must include a must-return-negative case AND a must-return-positive case",
+  "how_they_differ": "OD-011 tests the DECISION RULE on synthetic curves; OD-022 tests the ESTIMAND itself against a specific adversary, using only clean runs",
+  "both_are_required": true,
+  "ordering": "OD-022 first, because a candidate it rejects never needs an OD-011 demonstration"
+ },
+
+ "what_it_does_not_do": [
+  "it does not certify that a surviving candidate is correct; it only removes candidates known to be broken",
+  "it does not replace a positive control on a known-positive object",
+  "it does not licence registering a candidate that survives it but fails OD-011"
+ ],
+
+ "claim_ceiling": "A governance rule. It licenses no claim of any kind."
+}

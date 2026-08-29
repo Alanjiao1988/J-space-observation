@@ -1,0 +1,41 @@
+{
+ "schema_version": "study5-governance-v1",
+ "registration_id": "OD-021",
+ "status": "IN FORCE",
+ "recorded_at_utc": "2026-08-29T02:20:00Z",
+ "recorded_by": "adjudicator ruling, in session, 2026-08-29",
+ "phase_of_origin": "P-0c",
+
+ "the_rule": {
+  "statement": "Any criterion, estimand, threshold or inclusion rule ISSUED BY THE ADJUDICATOR must pass an OD-017 implementation conformance check before it may enter a pre-registration. The adjudicator's instruction does not exempt it from verification.",
+  "enforcement": "a criterion that has not been compared against the relevant live implementation may not be registered, whatever its source",
+  "scope": "every registered criterion, including and especially those handed down rather than authored by the executing party"
+ },
+
+ "why_it_exists": {
+  "the_precipitating_event": "the P-0' directive prescribed replacing the estimand with a logit-difference recovery ratio; that formula is algebraically identical to the one P-0 was already using",
+  "how_it_was_caught": "OD-017 entry 0.estimand_is_a_replacement, which compared the PRESCRIBED formula against the implemented one rather than comparing each tool to its own registration",
+  "the_adjudicator_s_own_account": "the prescription was written from recollection of the literature and was not checked against the implementation",
+  "the_general_fault": "a conformance regime that audits only the executing party's code against the executing party's registration cannot detect a defect that entered through the instruction itself",
+  "what_would_have_happened_without_it": "the identical estimand would have been re-run under a new name, reproducing the identical defect, while the record stated that an estimand had been replaced"
+ },
+
+ "relation_to_OD_017": {
+  "OD-017_says": "before any pre-registered criterion is applied to data, a line-by-line conformance table of registered text against implemented behaviour must be produced and committed, comparing live values",
+  "OD-021_extends_it": "the comparison must also run in the direction of an incoming instruction, not only from a tool to its own registration",
+  "OD-017_is_not_weakened": true
+ },
+
+ "relation_to_the_directionality_precedent": {
+  "the_precedent": "changing the implementation to match the registered text is a bug fix; changing the registered text to match the data is p-hacking",
+  "how_OD_021_sits_beside_it": "the precedent governs what may be changed after a result is seen; OD-021 governs what must be checked before anything is registered at all. Neither substitutes for the other"
+ },
+
+ "first_application": {
+  "phase": "P-0c",
+  "what_it_governs_here": "every candidate estimand on the pre-declared shortlist, every inclusion rule, the accuracy floor and the unit floor",
+  "consequence_recorded_in_advance": "a candidate that fails its check is out; it is not repaired to make it pass"
+ },
+
+ "claim_ceiling": "A governance rule. It licenses no claim of any kind."
+}
