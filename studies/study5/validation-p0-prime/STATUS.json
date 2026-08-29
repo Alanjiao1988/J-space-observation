@@ -1,0 +1,119 @@
+{
+ "schema_version": "study5-p0prime-status-v1",
+ "study_id": "STUDY5_P0_PRIME",
+ "namespace": "studies/study5/validation-p0-prime/",
+ "kind": "item-validity verification, successor to P-0",
+ "lifecycle_state": "STUDY5_P0PRIME_HALTED_ESTIMAND_HELD_AND_N_FLOOR_NOT_MET",
+ "terminal": false,
+ "resumable": true,
+ "is_a_scientific_result": false,
+ "current_phase": "P-0', halted before any effect measurement",
+ "next_phase": "P-0c, by the directive's own pre-decision; entry does not require further consultation",
+ "halted_under": [
+  "HB-005"
+ ],
+ "predecessors": {
+  "STUDY5_P0": {
+   "determination": "UNINTERPRETABLE",
+   "closure_file": "studies/study5/validation-p0/P0_CLOSURE.json",
+   "closure_sha256": "60d8c257896408cc9d1879f336e4ef97eacab0f3540ec87f9d5c9befd932548b",
+   "reopened_by_this_phase": false,
+   "artifacts_modified": 0
+  },
+  "STUDY5_EQ1": {
+   "q4a_fail_stands": true,
+   "artifacts_modified": 0
+  },
+  "STUDY5_EQ2": {
+   "determination": "NEGATIVE",
+   "stands": true,
+   "artifacts_modified": 0,
+   "annotated_by_a_new_file_only": "eq2_addendum_item_accuracy.md"
+  }
+ },
+ "two_independent_halts": {
+  "halt_1_estimand": {
+   "stop_conditions": [
+    "clause 1, a synthetic case failed",
+    "clause 5, a second estimand revision would be required"
+   ],
+   "finding": "the prescribed replacement estimand is algebraically identical to the one P-0 already used; worst difference 0.0 over 200000 draws",
+   "synthetic_case_2": "FAILED at 0.515487; no layer's interval contains zero",
+   "estimands_proposed_by_the_agent": 0,
+   "replacement_budget_consumed": 0,
+   "blocker": "blockers/HB-005.json"
+  },
+  "halt_2_inclusion": {
+   "stop_condition": "clause 3, fewer than 30 correct-both units",
+   "correct_both_units": 18,
+   "correct_both_clusters": 9,
+   "registered_floor": 30,
+   "pre_decided_consequence": "report and move to P-0c; the directive states this does not require further consultation",
+   "the_count_was_computed_only_after_its_rule_was_pushed": true,
+   "independent_of_the_held_estimand": true,
+   "would_have_halted_the_phase_even_if_the_estimand_had_been_sound": true
+  }
+ },
+ "what_was_resolved_rather_than_halted": {
+  "batch_baseline_repair": {
+   "authorised_by": "the directive, section 2, independently of the estimand question",
+   "verdict": "PASS",
+   "no_op_families": [
+    "PREFIX_DONOR",
+    "SELF_PATCH",
+    "EMBED_NOOP"
+   ],
+   "worst_abs_mean_normalised": 0.0,
+   "worst_abs_single_unit_normalised": 0.0,
+   "tolerance": 0.0001,
+   "result_is_bit_exact_not_merely_within_tolerance": true,
+   "confirmed_in_both_dtypes": [
+    "bfloat16",
+    "float32"
+   ],
+   "the_repair_needed_three_parts_not_one": [
+    "the baseline is a self-patch job inside the same batch",
+    "the cache is captured at the same batch width as the run consuming it",
+    "every chunk is padded to full width"
+   ],
+   "the_first_attempt_failed_because": "it moved the baseline in-batch but still captured the cache at width 1, which is the same inconsistency one level down; that attempt returned 0.5543 and is recorded rather than discarded",
+   "root_cause_confirmed": {
+    "baseline_shift_vs_batch_of_one_bfloat16_logits": 0.62373,
+    "baseline_shift_vs_batch_of_one_float32_logits": 1.7e-05,
+    "reading": "the offset is bfloat16 batch-size-dependent reduction order, and it essentially vanishes in float32"
+   },
+   "stop_condition_2_triggered": false
+  }
+ },
+ "gates": {
+  "OD-011_non_vacuity": "RAN. 3 of 4 pass; case 2 FAILS for the prescribed estimand. This is the gate that halted the phase, working as designed and before any GPU work",
+  "OD-011_revision": "IN FORCE. A must-return-positive case is now permanently required",
+  "no_op_integrity": "PASS, bit-exact, after the completed three-part repair",
+  "OD-017_conformance": "RAN. 18 entries, 1 divergence, which is the EXPECTED one: the audit reporting that the prescribed replacement is P-0s own estimand",
+  "sealed_asset_guard": "PASS"
+ },
+ "protected_objects": {
+  "target_ever_touched": false,
+  "sealed_lenses_ever_read": false,
+  "eq1_artifacts_modified": 0,
+  "eq2_artifacts_modified": 0,
+  "p0_artifacts_modified": 0
+ },
+ "budget": {
+  "ceiling_applies": false,
+  "note": "the route ceiling was lifted by the directive; consumption is accounted honestly and no gate was reduced to save time or hours",
+  "cumulative_before_this_phase": 39.171895,
+  "denominated_per": "OD-001",
+  "consumed_this_phase": 0.341667,
+  "cumulative_after_this_phase": 39.513562
+ },
+ "azure": {
+  "vms_reconfigured": 0,
+  "vms_stopped_or_started": 0,
+  "containers_created": 0,
+  "nsg_rules_added_this_invocation": 0,
+  "blobs_written": 0,
+  "cost_reduction_actions_proposed": 0
+ },
+ "claim_ceiling": "P-0' is item-validity verification. No state it can reach is a scientific result, and this state is a halt rather than a determination."
+}
