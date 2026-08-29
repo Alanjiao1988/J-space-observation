@@ -1,0 +1,104 @@
+{
+ "schema_version": "study5-handoff-v1",
+ "document_kind": "handoff assets for any successor",
+ "study_id": "STUDY5",
+ "recorded_at_utc": "2026-08-29T05:45:00Z",
+ "companion_to": "closure/STUDY5_CLOSURE.md",
+ "computation_performed": "none",
+ "starts_nothing": true,
+
+ "asset_1_the_established_object": {
+  "what": "a constructed two-hop task, NAME -> letter -> digit, where the answer is the digit and the intermediate is the letter",
+  "where": "studies/study5/validation-p0c2/out/object.json",
+  "built_by": "studies/study5/validation-p0c2/tools/build_object.py",
+  "build_seed": 20260829,
+  "counts": {"pairs": 160, "items": 320, "rejected": 0},
+  "properties_measured_not_asserted": {
+   "intermediate_and_answer_vocabularies_disjoint": true,
+   "token_id_overlap": [],
+   "requirement_7_violations": 0,
+   "bridge_span_tokens": 52,
+   "bridge_tokens_identical_in_both_members": "verified position by position",
+   "accuracy": 0.840625,
+   "ablated_accuracy": 0.10625,
+   "chance_rate": 0.1111111111111111,
+   "drop": 0.734375,
+   "correct_both_units": 112,
+   "worst_position_share_shift_after_filtering": 0.0254,
+   "top1_is_the_intermediate_letter": 0
+  },
+  "why_it_outlives_this_termination": "its establishment depends on NO ESTIMAND. Accuracy and the ablation probe are clean-run properties, so nothing about the estimand search can invalidate them",
+  "the_limitation_that_travels_with_it": "it is a SELECTION SET; success on it is not success on real items"
+ },
+
+ "asset_2_the_bit_exact_patching_harness": {
+  "what": "a residual-stream patching harness carrying the three-part batch repair",
+  "the_three_parts": [
+   "the baseline is an in-batch self-patch job",
+   "the cache is captured at the consuming run's batch width",
+   "every chunk is padded to full width"
+  ],
+  "verified_on_the_established_object": {
+   "bfloat16": {"EMBED_NOOP": 0.0, "PREFIX_DONOR": 0.0, "SELF_PATCH": 0.0, "worst_single_unit": 0.0},
+   "float32": {"EMBED_NOOP": 0.0, "PREFIX_DONOR": 0.0, "SELF_PATCH": 0.0, "worst_single_unit": 0.0}
+  },
+  "the_hazard_it_neutralises": {
+   "bfloat16_baseline_shift_logits": 0.110937,
+   "float32_baseline_shift_logits": 0.000008,
+   "ratio": 14000,
+   "why_it_matters_beyond_this_study": "the offset is the same order as the effects being measured, so any bf16 patching result at this effect scale that has not demonstrated bit-exact no-ops is uninterpretable"
+  },
+  "must_be_re_proven_not_assumed": "it was re-proven on each new object rather than inherited, and a successor should do the same"
+ },
+
+ "asset_3_the_unused_measurement_preregistration": {
+  "where": "studies/study5/validation-p0c2/measurement/MEASUREMENT_PREREGISTRATION.json",
+  "sha256": "31070c208518067945169a30366f1f76d9ccd0d51a8215a404735488e4bcb296",
+  "state": "UNUSED and UNMODIFIED",
+  "why_that_matters": "it was pushed before any null or real patch existed and was never edited afterwards, so a successor inherits conclusion wordings and a power gate that no observed result could have shaped",
+  "contents": {
+   "mde_pass_line": 0.15,
+   "power": 0.8,
+   "alpha": 0.05,
+   "three_outcome_wordings_fixed_verbatim": ["CAUSALLY_USED", "NOT_CAUSALLY_USED", "UNDERPOWERED"],
+   "decision_rule": "C1 significantly greater than zero, NOT versus a null ceiling, because a null-subtracting estimand would otherwise deduct the null twice",
+   "variance_reductions_registered_in_advance": ["common random numbers", "k of 20", "cluster-level inference"]
+  }
+ },
+
+ "asset_4_the_governance_stack": {
+  "OD-011_rev_2": "a non-vacuity demonstration must include a must-return-positive case",
+  "OD-017": "a diff of registered text against implementation, comparing LIVE imported values",
+  "OD-021": "a criterion issued by the adjudicator is not exempt from verification",
+  "OD-022": "the clean-run destruction sweep, a zero-GPU precondition gate on any candidate estimand",
+  "unnumbered_disciplines": [
+   "the directionality rule: implementation toward registration is a bug fix, registration toward data is p-hacking",
+   "asymmetric-motivation disclosure",
+   "push the rule before computing the number",
+   "commit failed repairs rather than discarding them",
+   "render readable artifacts FROM the committed JSON so they cannot drift"
+  ],
+  "the_complementarity_learned_here": "OD-022 tests behaviour at HIGH nuisance parameter and OD-011 rev 2 tests it at ZERO; neither is sufficient alone, and C1 passed the first while failing the second"
+ },
+
+ "asset_5_the_post_hoc_diagnosis": {
+  "status": "POST-HOC, NOT ADOPTED, NOT WITHIN THIS AUTHORISATION, NOT A PROPOSAL",
+  "labelled_this_way_deliberately": true,
+  "verbatim": "The four candidates' failures share one structure: EACH TRIED TO BE IMMUNE TO DESTRUCTION THROUGH A FIXED FUNCTIONAL FORM, WHILE THE AMOUNT OF DESTRUCTION VARIES FROM PATCH TO PATCH. No fixed form can be invariant to a varying nuisance parameter.\n\nThis also explains precisely why OD-022 and OD-011 rev 2 are complementary, and it generalises: THE SWEEP TESTS ONLY AT HIGH NUISANCE PARAMETER, REV 2 TESTS AT ZERO, AND A FIXED-FORM CORRECTION CAN AT BEST MATCH ONE END. C1 passed the former and died at the latter.\n\nThe solution it points at is a PER-PATCH MATCHED CONTROL: same norm, same layer, same positions, contents shuffled, so the nuisance parameter is estimated at the SAME VALUE it takes under the real patch. The matched control of a no-op is itself a no-op, so it returns zero naturally.\n\nTHIS DIAGNOSIS IS POST-HOC, IS NOT ADOPTED, AND IS NOT A PROPOSAL. By the D-1 precedent it belongs to a new study requiring its own independent pre-registration, and that is outside this authorisation.",
+  "why_the_executing_session_did_not_volunteer_a_rule": "proposing a new rule immediately after an unfavourable result would be acting on that result; declining to do so was correct and the adjudicator preserved that handling",
+  "may_be_written_as_a_methodological_contribution_of_this_project": false,
+  "may_be_written_as_a_validated_solution": false
+ },
+
+ "what_a_successor_must_not_inherit_as_licence": [
+  "that J-space exists or does not exist; this project supplies no evidence either way",
+  "that a CLASS of estimand was refuted; what was exhausted is a CLOSED LIST of four",
+  "that 'the question remains open' is a conclusion of this project; the correct statement is that this project failed to test it",
+  "that any result on the constructed object transfers to real items",
+  "P-0's withheld verdict as a published conclusion",
+  "hop-1 retrieval decay as a finding",
+  "hop 2 never failing as evidence of an internal intermediate representation"
+ ],
+
+ "claim_ceiling": "A handoff note. It licenses no claim of any kind and starts nothing."
+}
