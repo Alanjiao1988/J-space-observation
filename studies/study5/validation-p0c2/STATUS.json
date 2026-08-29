@@ -235,6 +235,8 @@
   "files_verified": 402,
   "closure_md_sha256_SUPERSEDED": "c1c281fc220b4f32a7a2230f9f643117366da67babd577fa36bca2647f0a1954",
   "closure_md_supersession_reason": "case 2 remedy: the methodological output was present and complete but sat two sections after the failure map, so a reader met three accounts of failure first. It was moved to sit immediately after the failure map by a proven pure reorder; byte count unchanged at 8984, non-heading line multiset unchanged, only three section ordinals moved. No conclusion, criterion, threshold or verdict was altered",
-  "p0c2_sealed_at": "5aefdf4"
+  "p0c2_sealed_at": "e72e024",
+  "p0c2_seal_correction": "the first attempt pinned p0c2 at 5aefdf4, but the closing verification then wrote to the namespace own STATUS.json and journal, so the tree no longer matched and the check correctly reported CHANGED. The seal is taken at e72e024, where p0c2 actually stopped moving. The two files that moved were STATUS.json and journal/P-0c2.jsonl; no substantive artifact was touched",
+  "the_lesson_it_repeats": "a namespace cannot be sealed while the phase writing it is still running, which is the same reason p0c2 was absent from the original table"
  }
 }

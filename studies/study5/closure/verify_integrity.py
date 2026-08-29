@@ -12,9 +12,15 @@ ROOT = pathlib.Path(
 #
 # p0c2 was absent from the first integrity table for a real reason: the closure
 # commits were written ON that branch, so at the moment the table was produced
-# the namespace was still being written and had no sealing commit to name. The
-# terminal state has since been declared, so it is sealed here at the commit
-# that declared it.
+# the namespace was still being written and had no sealing commit to name.
+#
+# The first attempt to seal it here repeated that mistake in miniature. It was
+# pinned at 5aefdf4, the commit that declared the terminal state, but the closing
+# verification then wrote to the namespace's own STATUS.json and journal, so the
+# tree no longer matched and the check correctly reported CHANGED. The seal is
+# therefore taken at e72e024, the commit at which p0c2 actually stopped moving.
+# The lesson is the same one that produced the original omission: a namespace
+# cannot be sealed while the phase writing it is still running.
 SEALED = [
     ("studies/study5/qualification-eq1", "a28ae6a"),
     ("studies/study5/qualification-eq2", "a28ae6a"),
@@ -22,7 +28,7 @@ SEALED = [
     ("studies/study5/validation-p0", "9556c40"),
     ("studies/study5/validation-p0-prime", "e948134"),
     ("studies/study5/validation-p0c", "f88b2a6"),
-    ("studies/study5/validation-p0c2", "5aefdf4"),
+    ("studies/study5/validation-p0c2", "e72e024"),
 ]
 
 
