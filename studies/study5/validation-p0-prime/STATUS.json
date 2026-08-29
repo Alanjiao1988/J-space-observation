@@ -115,5 +115,22 @@
   "blobs_written": 0,
   "cost_reduction_actions_proposed": 0
  },
- "claim_ceiling": "P-0' is item-validity verification. No state it can reach is a scientific result, and this state is a halt rather than a determination."
+ "claim_ceiling": "P-0' is item-validity verification. No state it can reach is a scientific result, and this state is a halt rather than a determination.",
+ "reporting_artifacts": {
+  "timeline": "TIMELINE.md",
+  "gates_rendered_from_artifacts": "GATES.md",
+  "recomputation_diagnostic": "out/recomputation_diagnostic.json",
+  "p0c_handoff": "P0C_HANDOFF.json",
+  "eq2_addendum": "eq2_addendum_item_accuracy.md"
+ },
+ "permitted_recomputation": {
+  "status": "REPORTED ONLY, sets no threshold and selects no parameter",
+  "values_compared": 177944,
+  "worst_absolute_discrepancy": 0.0,
+  "conclusion": "the prescribed estimand is the identity map on P-0s own, confirmed on the committed data"
+ },
+ "p0c": {
+  "entered": false,
+  "why_not": "P-0c needs an estimand exactly as P-0 prime did, and the estimand is HELD under HB-005"
+ }
 }

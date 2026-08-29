@@ -1,0 +1,60 @@
+{
+ "schema_version": "study5-p0c-handoff-v1",
+ "document_kind": "handoff note, not a pre-registration and not an authority",
+ "recorded_at_utc": "2026-08-29T02:00:00Z",
+ "status": "NOT STARTED. P-0c is not entered by this invocation.",
+
+ "why_it_is_not_started_here": {
+  "the_directive_does_say_move_to_P0c": "yes, and it states that this does not require further consultation",
+  "but": "section 8 of the same directive says that when a stop condition fires the response is to stop, commit and report, without self-repair. Two fired",
+  "and_the_blocking_reason_is_concrete": "P-0c needs an estimand exactly as P-0' did. The estimand is HELD under HB-005, and the agent may not choose one. Starting P-0c would either inherit a criterion already shown to fail case 2, or require the agent to select a replacement, which is the thing reserved for the operator",
+  "so_this_file_records_what_P0c_inherits_rather_than_starting_it": true
+ },
+
+ "what_P0c_is": {
+  "from": "the P-0 authority, section 6",
+  "description": "train a small transformer on a two-step task with an intermediate defined by us, so ground truth is exact",
+  "status_in_that_authority": "a fallback, explicitly not the main line, because transfer is poor",
+  "hard_design_constraint_recorded_there": "the intermediate must NOT appear in any item's output tokens, or the logit lens reads it directly and J has no room to prove anything"
+ },
+
+ "why_n_equals_18_points_at_it": {
+  "observation": "only 18 of 184 admissible pairs have this model correct on both sides",
+  "consequence": "the multihop set does not supply enough units this model can actually do, and no repair of the instrument changes that",
+  "what_P0c_fixes": "it removes the dependence on a model happening to be able to do a set of items somebody else wrote",
+  "what_P0c_does_not_fix": "transfer; a result on a small trained transformer is a result about that transformer"
+ },
+
+ "what_is_already_fixed_and_should_be_inherited": {
+  "note": "these were registered and pushed before any measurement in P-0', so a successor inherits them rather than choosing them",
+  "inclusion_correct_only": "admissible only if the clean runs are correct on both sides; measured on clean runs, independent of every patching result",
+  "n_floor": 30,
+  "denominator_floor_logits": 1.0,
+  "null_procedure": "unrelated-donor, 5 independent replicates, ceiling as the maximum upper bound WITHIN the decisive site rather than across sites",
+  "confidence": 0.95,
+  "bootstrap": "cluster bootstrap over unordered pairs, 10000 resamples, seed 20260829",
+  "both_conclusion_wordings": "fixed verbatim in P0PRIME_PREREGISTRATION.json section 3",
+  "OD-011_as_revised": "a must-return-positive case is mandatory",
+  "the_repaired_harness": "the three-part batch fix, verified bit-exact over 190 units in both dtypes"
+ },
+
+ "what_P0c_must_settle_before_it_can_start": [
+  "an estimand that is invariant to a norm-matched destructive patch BY CONSTRUCTION rather than by after-the-fact check; the four synthetic cases exist and will test any candidate without modification",
+  "whether the intermediate's absence from every output token is enforced mechanically rather than by inspection, since that is the one constraint the P-0 authority singles out",
+  "a positive control for the PHENOMENON, which no phase of this study has ever had; P-0 obtained one for the instrument only"
+ ],
+
+ "the_four_synthetic_cases_are_reusable_as_is": {
+  "tool": "tools/non_vacuity_p0prime.py",
+  "how": "it takes the estimand as an argument rather than hard-coding one, so a candidate can be tested before it is adopted",
+  "why_that_matters": "an estimand whose discriminating property is only checked once real profiles exist cannot be distinguished from one chosen because those profiles came out well"
+ },
+
+ "what_must_not_be_carried_forward": [
+  "P-0's withheld verdict, which is uninterpretable and may not be cited as a conclusion",
+  "any claim about J-space, the J-lens, the published lenses, the paper, or T",
+  "any suggestion that EQ1's Q-4a FAIL or EQ2's NEGATIVE has been weakened; neither has been touched"
+ ],
+
+ "claim_ceiling": "A handoff note. It licenses no claim of any kind and starts nothing."
+}
