@@ -1,0 +1,251 @@
+{
+ "schema_version": "study5-p0-preregistration-v1",
+ "registration_id": "P0-PREREG",
+ "phase": "P-0",
+ "kind": "item-validity verification, pre-registered in full before any patching run",
+ "recorded_at_utc": "2026-08-29T00:20:00Z",
+ "recorded_by": "operator, in session, 2026-08-29",
+ "study_id": "STUDY5_P0",
+ "namespace": "studies/study5/validation-p0/",
+
+ "why_this_phase_exists": {
+  "eq2_left_four_explanations_open": [
+   "the phenomenon does not exist - not a claim this study has any standing to make",
+   "the phenomenon exists only above this scale",
+   "our instrument or our use of it is wrong",
+   "the items never forced the model to compute an intermediate at all"
+  ],
+  "the_fourth_was_never_checked": true,
+  "why_it_goes_first": "it is the cheapest of the four to check, it is the one most likely to be true, and it sits UNDER the other three: the old ordering assumed item validity, then assumed the model exhibits the phenomenon, then tested the instrument, so a failure at any level presented identically as instrument failure",
+  "what_it_would_explain": "if the intermediate is never computed there is nothing for any lens to read, and the EQ2 negative says nothing about the lens",
+  "eq1_and_eq2_are_untouched": "no EQ1 or EQ2 criterion, estimand, threshold, split or reading is modified, revisited or reopened by anything registered here"
+ },
+
+ "independence_from_the_instrument_under_test": {
+  "requirement": "ground truth must be established by a method that does not use J",
+  "how_it_is_enforced": [
+   "tools/patch_effect.py imports transformers and torch only; it never imports jlens",
+   "the readout-position rule is TRANSCRIBED as a constant rather than imported from EQ2's rank_profile, because importing that module would pull jlens into the ground-truth path; the OD-017 audit compares the transcribed constant against EQ2's live value",
+   "the measurement report records whether 'jlens' is present in sys.modules at the end of the run, and the value is committed"
+  ],
+  "why_it_matters": "EQ2 could not separate a failure of the method from a failure of our use of it because it had no independent handle on the object; using J to establish J's ground truth would reproduce exactly that"
+ },
+
+ "1_sampling": {
+  "source": "studies/study5/qualification-eq2/r0/evaluations/lens-eval-multihop.json",
+  "source_is_pre_existing": true,
+  "no_new_items_authored": true,
+  "why_pairs_and_not_items": "activation patching is a two-run operation by definition; the unit of analysis is an ORDERED PAIR (donor, recipient) drawn from items that already exist, and constructing a counterfactual by pairing existing prompts authors no text",
+  "unit": "an ordered pair of existing multihop items",
+  "cluster": "the unordered pair; both directions of one pair are kept and resampled together",
+  "admissibility_rules": [
+   "both members tokenise to the same length under the registered encoding",
+   "the token sequences differ in at least one position",
+   "targets differ after case and whitespace normalisation",
+   "the two targets share no single-token surface form",
+   "the intermediate sets are disjoint after normalisation",
+   "at least one single-token surface form exists for each target",
+   "at least one single-token surface form exists for each intermediate",
+   "the last differing position is strictly before the readout position",
+   "BRIDGE is non-empty",
+   "PREFIX is non-empty"
+  ],
+  "why_equal_length_is_required": "Qwen2.5 applies rotary position information inside attention rather than storing it in the residual stream, so transplanting a state from absolute position p to p' introduces a positional mismatch unrelated to the question; equal length removes the confound instead of arguing about its size",
+  "max_units": 200,
+  "seed": 20260829,
+  "seed_provenance": "the calendar date of this registration; not tuned to anything",
+  "selection_rule": "take every admissible unit up to max_units; if the cap binds, drop whole clusters in a seeded shuffle order. When the cap does not bind no randomness enters the frame at all and the frame is recoverable from the evaluation file alone",
+  "implementation": "tools/build_pairs.py",
+  "frame_size_was_enumerated_before_this_registration": {
+   "disclosed": true,
+   "what_was_run": "tools/build_pairs.py at an earlier revision, tokenizer only, zero GPU-seconds, zero forward passes",
+   "what_it_revealed": "how many admissible pairs the set contains, and nothing else",
+   "why_it_does_not_contaminate": "the cap is registered as min(200, available), so the count found could not and did not change the rule; no model was run and no effect was measured",
+   "motivation_asymmetry": "none - the enumeration was needed to know whether the design was executable at all, and would have been run whatever it returned"
+  }
+ },
+
+ "2_decision_rule": {
+  "model": "Qwen2.5-7B-Instruct, the EQ2 positive control; 28 transformer layers",
+  "why_this_model": "it is the model whose items and layers EQ2's residual concerned, and it is not T",
+  "target_is_not_touched": "T = deepseek-ai/DeepSeek-R1-Distill-Qwen-7B is not loaded, read or referenced by any P-0 tool",
+  "patch_object": "the residual stream",
+  "layers": "-1 (embedding output) and 0..27 (decoder block outputs), 29 sites in depth",
+  "sites": {
+   "PREFIX": "positions strictly before the first differing token; causal masking makes donor and recipient states identical here, so the patch is a guaranteed no-op",
+   "CUE": "positions where the two token sequences differ",
+   "BRIDGE": "positions strictly after the last CUE position and strictly before the readout position; the tokens here are IDENTICAL in donor and recipient",
+   "READOUT": "the final prompt token, which is what the registered EQ2 rule reads multihop out at"
+  },
+  "decisive_site": "BRIDGE",
+  "why_BRIDGE_and_only_BRIDGE": "its input tokens are identical in donor and recipient, so a patch there can move nothing except state the model COMPUTED from the cue and CARRIED forward. A model answering by direct retrieval at the readout position holds nothing there to move and the measurement returns zero. CUE and READOUT are measured and reported but cannot decide anything, because both are strongly positive whether or not an intermediate exists; a rule resting on them could not return the negative verdict, which is precisely the defect OD-011 exists to prevent",
+  "estimand": "at each (site, layer), the mean over units of normalised restoration",
+  "restoration": "(LD(patched recipient run) - LD(clean recipient run)) / (LD(clean donor run) - LD(clean recipient run)), evaluated at the readout position, where LD = max logit over the donor's target token ids minus max logit over the recipient's target token ids",
+  "unit_exclusion": "units whose denominator is not strictly positive are dropped and listed; the normalisation has no meaning when the donor run does not prefer the donor's own target, and flipping a sign to rescue them would be choosing a convenient reading",
+  "no_clipping": "restoration is not clipped or winsorised; the identical estimator is applied to the nulls, so heavy tails inflate the ceiling as much as the signal",
+  "uncertainty": "nonparametric cluster bootstrap, resampling unordered pairs with replacement, 10000 resamples, seed 20260829, percentile interval",
+  "confidence_level": 0.95,
+  "confidence_level_provenance": "statistical convention, two-sided; not fitted to any observed value",
+  "verdict_positive_condition": "there exists a layer of BRIDGE whose 2.5th bootstrap percentile is strictly greater than the ceiling",
+  "verdict_negative_condition": "no such layer exists",
+  "reported_layer_set": "exactly the BRIDGE layers whose 2.5th bootstrap percentile exceeds the ceiling",
+  "implementation": "tools/decide_p0.py"
+ },
+
+ "3_zero_intervention_null": {
+  "why_it_is_calibrated_and_not_chosen": "EQ2 recorded the failure mode directly: a null carrying a small real signal produced a band under a rule that assumed the null was empty. The threshold here is therefore measured from objects that by construction cannot carry the quantity being tested, not set by judgement",
+  "constructions": {
+   "PREFIX_no_op": {
+    "what": "patch the donor's own states into the recipient at positions strictly before the first differing token",
+    "why_it_is_zero_by_construction": "causal masking makes those states identical in the two runs, so the write is a no-op on equal values",
+    "role": "harness integrity gate, not a contributor to the ceiling",
+    "replicates": "deterministic; one run",
+    "tolerance_on_the_mean": 0.0001,
+    "excluded_from_the_ceiling_because": "a structurally zero, zero-variance construction inside a maximum can only lower the ceiling, never raise it, so excluding it is the conservative direction"
+   },
+   "NULL_C_unrelated_donor": {
+    "what": "patch a THIRD item C into the recipient at the same positions, and score it on the same donor-versus-recipient contrast",
+    "why_it_is_null": "C is admissible against BOTH the donor and the recipient, so its target and intermediates differ from both; it carries no information about the donor and has no route to a systematic effect on that contrast",
+    "why_it_is_the_primary_null": "it is fully in distribution and exercises byte-for-byte the same machinery as the real patch",
+    "replicates": 5,
+    "replicate_independence": "five independent draws of C per unit from the sorted admissible pool, seeded per unit id"
+   },
+   "NULL_R_norm_matched_random": {
+    "what": "replace the recipient's own state with an isotropic Gaussian vector rescaled to the norm of the state it replaces",
+    "why_it_is_null": "it carries no information at all, while perturbing the residual stream by a comparable magnitude",
+    "replicates": 5,
+    "replicate_independence": "five independent seeds per unit"
+   }
+  },
+  "replicates_per_construction": 5,
+  "ceiling": "the maximum, over every null construction, every replicate, every site other than PREFIX, and every layer, of the upper 95 percent cluster-bootstrap bound",
+  "ceiling_direction": "conservative; a single scalar maximum is harder to exceed than a per-layer ceiling would be",
+  "ceiling_is_not_calibrated_on_the_real_series": true
+ },
+
+ "4_harness_positive_control": {
+  "why_it_is_here": "EQ2's heaviest limitation is that it never obtained a passing positive control, so 'the method fails' and 'we drove it wrong' stayed indistinguishable. P-0 cannot obtain a positive control for the phenomenon - that is the very thing in question - but it can and must obtain one for the INSTRUMENT",
+  "the_control": "patching CUE at the embedding-output layer replaces the donor's embeddings at exactly the positions where the two prompts differ, which makes the recipient run token-identical to the donor run",
+  "required_value": "restoration = 1",
+  "gate": "the 2.5th bootstrap percentile of CUE at layer -1 must be at least 0.90",
+  "if_it_fails": "the instrument is not certified and no verdict is reportable; stop and report under section 9",
+  "what_it_does_not_establish": "nothing whatsoever about whether the model computes an intermediate; it certifies only that the patching harness moves what it claims to move"
+ },
+
+ "5_conclusion_wordings_fixed_before_any_data": {
+  "these_are_verbatim_and_were_written_before_the_first_forward_pass": true,
+  "NOT_CAUSALLY_USED": {
+   "recorded_as": "P-0 determination: the multihop items do not force a causally-used intermediate at non-cue positions in Qwen2.5-7B-Instruct.",
+   "verbatim": "Patching the donor's residual state into the recipient's run at BRIDGE - positions whose input tokens are IDENTICAL in the two prompts - produced no layer at which the effect cleared the zero-intervention ceiling. Because those positions carry no lexical difference, the only thing a patch there can transfer is state the model computed from the cue and carried forward. Finding none means the items, as written and as read out, do not oblige this model to compute and carry an intermediate that anything could read. EQ2's negative is therefore explained without reference to the J-lens at all: there was nothing at those positions to read, and a lens cannot be faulted for failing to read what was never there.",
+   "what_it_means_for_EQ2": "the EQ2 negative is not evidence about the J-lens method; the thirty-nine hours of conclusions preceding it must be rewritten to say so",
+   "why_this_is_the_good_outcome": "an item defect is repairable; an instrument defect at this budget was not",
+   "what_it_does_NOT_mean": [
+    "it does not mean the model performs no internal computation",
+    "it does not mean multi-hop items in general fail to induce intermediates",
+    "it does not mean the J-lens works, or does not work",
+    "it does not exclude an intermediate held only at the cue tokens themselves or only at the readout position; BRIDGE is silent about those and this limitation is registered here rather than discovered later"
+   ],
+   "required_next_action": "stop and report; do not repair the items, do not author replacements, do not proceed to P-0b"
+  },
+  "CAUSALLY_USED": {
+   "recorded_as": "P-0 determination: the multihop items do force a causally-used intermediate, localised to the reported layers.",
+   "verbatim": "Patching at BRIDGE cleared the zero-intervention ceiling at the reported layers. Those positions are lexically identical between the two prompts, so the transferred quantity was computed by the model rather than read off the input. For the first time in this study a piece of ground truth has been established by a method that does not use J: we now know, independently of the instrument under test, that something is computed and where it is carried. This is an item-validity result and an instrument-independent localisation. It is not a finding about J-space, about the paper, about T, or about any mechanism.",
+   "what_it_licenses": "entry to P-0b, and only that",
+   "what_it_does_NOT_mean": [
+    "it does not identify WHICH quantity is carried; it shows that a cue-dependent quantity is carried and used",
+    "it does not mean the labelled intermediate is that quantity",
+    "it does not mean the J-lens can read it",
+    "it says nothing about T, which is never touched"
+   ],
+   "required_next_action": "proceed to P-0b on exactly the reported layers, at BRIDGE positions and at the EQ2 readout position, with a separate pre-registration"
+  }
+ },
+
+ "6_reported_only_never_used_to_adjust_a_criterion": {
+  "item_accuracy": "whether the model's top-1 at the readout position is the item's own target, per item; EQ2 never checked this and it bears directly on item validity",
+  "cue_and_readout_curves": "the full layer-resolved effect at both non-decisive sites",
+  "secondary_restricted_analysis": "the same estimand restricted to units where the model's top-1 equals the target for BOTH members; registered now, computed always, and unable to change the verdict under any outcome",
+  "denominator_sensitivity": "the same estimand under denominator floors of 1.0 and 2.0 logits",
+  "binding_rule": "the verdict is read from the primary analysis alone. If a secondary analysis disagrees, both are reported verbatim and the primary still decides"
+ },
+
+ "7_gates_that_must_pass_before_the_criterion_touches_real_data": {
+  "OD-011": {
+   "rule": "a check must carry a demonstrated failing case, or it counts as not implemented",
+   "required_cases": {
+    "the_null_itself": "NOT_CAUSALLY_USED",
+    "pure_noise": "NOT_CAUSALLY_USED",
+    "all_zero": "NOT_CAUSALLY_USED",
+    "strong_localised_effect": "CAUSALLY_USED"
+   },
+   "why_the_fourth_case_is_included": "the three required cases prove the rule cannot manufacture a positive; without a case proving it can still return one, a rule that always says no would pass, and that is equally a check that cannot fail",
+   "ordering": "runs on synthetic curves with a registered seed, before any measurement exists; a confirmatory repeat using the measured null ensemble is registered and cannot change the rule",
+   "implementation": "tools/non_vacuity_p0.py"
+  },
+  "OD-017": {
+   "rule": "before any pre-registered criterion is applied to data, a line-by-line conformance table of registered text against implemented behaviour must be produced and committed",
+   "method": "the audit IMPORTS each module and compares LIVE values; a hand-written table asserting agreement is exactly the check that cannot fail, and is not acceptable",
+   "scope": "every constant and every rule registered in this file",
+   "implementation": "tools/od017_conformance_p0.py"
+  },
+  "sealed_asset_guard": {
+   "rule": "no P-0 artifact may reference lens_A or lens_B by name or by digest in any provenance field, no P-0 tool may reference T, and no P-0 tool may import jlens",
+   "self_reference_exclusion": {
+    "what": "guard_p0.py is excluded from the marker scan and is the only file so excluded; it is still scanned for an actual jlens import",
+    "why": "the guard cannot match on the markers without containing them, and a guard that fires on its own evidence gets silenced rather than fixed - the same reasoning EQ2 recorded when it ruled that prose naming a lens is not a read",
+    "how_the_jlens_check_avoids_the_same_trap": "it matches an import STATEMENT by regular expression rather than the bare word, so this guard and the OD-017 auditor, both of which necessarily name the library, are not reported",
+    "recorded_at_utc": "2026-08-29T00:45:00Z",
+    "recorded_before_any_forward_pass": true,
+    "direction": "this makes the registered text precise about a logical necessity discovered while implementing it; no data existed when it was written, so it cannot be a move of the text toward a result"
+   },
+   "implementation": "tools/guard_p0.py"
+  }
+ },
+
+ "8_budget": {
+  "cumulative_before_this_phase_gpu_hours": 39.065839,
+  "cumulative_source": "sum of gpu_seconds over studies/study5/qualification-eq*/journal/*.jsonl divided by 3600",
+  "registered_total_ceiling": 240,
+  "jlens_route_additional_ceiling": 15,
+  "hard_stop_at_cumulative": 54.065839,
+  "phase_allocation_gpu_hours": {"P-0": 6, "P-0b": 6, "P-0c": 3},
+  "denominated_per": "OD-001, actively used GPU-hours; VM wall-clock and allocated GPU-hours are reported separately and are not bound by the ceiling",
+  "if_the_ceiling_is_reached": "abandon the J-lens route; P-4 localises on another basis. This is already decided and is not reopened here"
+ },
+
+ "9_stop_conditions": [
+  "any OD-011 demonstration case fails",
+  "the OD-017 audit finds any divergence between registered text and implementation",
+  "continuing would require reading lens_A or lens_B, or touching T",
+  "continuing would require modifying an EQ1 criterion, estimand, threshold, split or reading",
+  "a create-only upload hits an If-None-Match precondition failure",
+  "continuing would require a reboot, resize, configuration change or NSG rule",
+  "cumulative actively-used GPU-hours reach 54.065839",
+  "any situation in which the operator wishes to revise a pre-registered criterion",
+  "the harness positive control does not pass"
+ ],
+
+ "10_hard_boundaries_acknowledged": {
+  "azure": "resources are used and never reconfigured; a100-vm, cpuserver and the four TRAINING Standard_NC24s_v3 machines stay running, the V100 machines stay idle and untouched, no NSG rule is added, nothing is resized, rebooted, created or deleted",
+  "cost": "no cost-reduction action is proposed, performed or discussed",
+  "blobs": "existing blobs are immutable; any upload is create-only with If-None-Match: *",
+  "T": "not touched, not read, not loaded",
+  "lens_A_and_lens_B": "not read; the guard must show zero reading records",
+  "EQ1": "not modified; its Q-4a FAIL is not withdrawn, not rerun and its thresholds are not relaxed",
+  "EQ1_rerun_under_convention_D": "explicitly forbidden and not attempted"
+ },
+
+ "11_claims_this_phase_may_not_support": [
+  "that J-space exists or does not exist",
+  "that the paper is wrong - it measured Sonnet 4.5 and this measures open models an order of magnitude smaller, with absolute readability already an order of magnitude apart",
+  "that the published lenses are defective - what is measured is the result of OUR USE of external artifacts",
+  "anything about how T would behave, T having never been measured",
+  "the existence of internal causal reasoning machinery",
+  "any training-causal effect of distillation",
+  "that attention, embeddings, normalisation or whole-model differences have been explained",
+  "anything about consciousness",
+  "that the gpt2 J-lens over logit-lens ratio of 1.750 is a pattern; it is seven hits against four and is counting noise"
+ ],
+
+ "claim_ceiling": "P-0 is item-validity verification. No outcome it can reach is a scientific finding."
+}

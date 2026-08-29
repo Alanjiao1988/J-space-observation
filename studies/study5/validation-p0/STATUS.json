@@ -1,0 +1,93 @@
+{
+ "schema_version": "study5-p0-status-v1",
+ "study_id": "STUDY5_P0",
+ "namespace": "studies/study5/validation-p0/",
+ "kind": "item-validity verification",
+ "lifecycle_state": "STUDY5_P0_PREREGISTERED_AWAITING_MEASUREMENT",
+ "lifecycle_state_is_registered_terminal": false,
+ "terminal": false,
+ "is_a_scientific_result": false,
+ "current_phase": "P-0",
+ "next_phase": "P-0 measurement, then P-0b only if the verdict is CAUSALLY_USED",
+
+ "authority": {
+  "path": "studies/study5/prompts/study5_p0_item_validity_authority.md",
+  "source": "operator session prompt, 2026-08-29",
+  "extracted_mechanically_not_retyped": false,
+  "transcribed_by_the_agent_in_session": true,
+  "why_not_mechanical": "the source was a live prompt rather than a file, so the mechanical extraction EQ1 and EQ2 used was not available; the limitation is disclosed rather than papered over"
+ },
+
+ "predecessors": {
+  "STUDY5_EQ1": {
+   "terminal_state": "STUDY5_EQ1_WORKSPACE_BAND_NOT_ESTABLISHED_AT_THIS_SCALE",
+   "q4a_verdict_stands": true,
+   "q4a_verdict_revisited": false,
+   "every_eq1_artifact_byte_identical": true,
+   "rerun_under_convention_D_attempted": false
+  },
+  "STUDY5_EQ2": {
+   "terminal_state": "STUDY5_EQ2_TERMINAL_NEGATIVE_CONSTRUCT_NOT_USABLE_AT_THIS_SCALE",
+   "determination": "NEGATIVE",
+   "d1_category": "negative-A",
+   "sealed": true,
+   "reopened_by_this_phase": false,
+   "the_limitation_this_phase_addresses": "EQ2 never obtained a passing positive control, so a failure of the method and a failure of our use of it stayed indistinguishable"
+  }
+ },
+
+ "what_this_phase_is_and_is_not": {
+  "is": "a test of whether the multihop items oblige Qwen2.5-7B-Instruct to compute and carry an intermediate at all",
+  "is_not": "a test of the J-lens, of J-space, of the paper, or of T",
+  "why_it_precedes_any_further_instrument_work": "the previous ordering stacked three assumptions - item validity, then the model exhibiting the phenomenon, then the instrument - so a collapse at any level presented identically as instrument failure"
+ },
+
+ "gates": {
+  "OD-011_non_vacuity": "PASS, 4 of 4 cases, proven on synthetic curves before any measurement existed",
+  "OD-017_conformance": "PASS, 20 entries, 0 divergences",
+  "sealed_asset_guard": "NOT YET RUN",
+  "harness_positive_control": "NOT YET EVALUATED",
+  "prefix_integrity": "NOT YET EVALUATED"
+ },
+
+ "standing_rules_inherited_and_in_force": [
+  "OD-001 the ceiling is measured in actively used GPU-hours",
+  "OD-011 a check must carry a demonstrated failing case, or it counts as not implemented",
+  "OD-013 one variable at a time",
+  "OD-017 registered text versus implementation conformance, compared on live values"
+ ],
+
+ "budget": {
+  "registered_total_ceiling_gpu_hours": 240,
+  "cumulative_before_this_phase": 39.065839,
+  "jlens_route_additional_ceiling": 15,
+  "hard_stop_at_cumulative": 54.065839,
+  "consumed_this_phase": 0.0,
+  "denominated_per": "OD-001"
+ },
+
+ "azure": {
+  "vms_reconfigured": 0,
+  "vms_stopped_or_started": 0,
+  "containers_created": 0,
+  "sas_tokens_used": 0,
+  "storage_keys_read": 0,
+  "training_group_v100_machines_touched": 0,
+  "nsg_rules_added_this_invocation": 0,
+  "cost_reduction_actions_proposed": 0
+ },
+
+ "protected_objects": {
+  "target_ever_touched": false,
+  "sealed_lenses_ever_read": false,
+  "eq1_artifacts_modified": 0,
+  "eq2_artifacts_modified": 0
+ },
+
+ "independence_from_the_instrument_under_test": {
+  "any_p0_tool_imports_jlens": false,
+  "how_verified": "guard_p0.imports_jlens matches an import statement across every file in tools/, and the measurement additionally records sys.modules membership at the end of each run"
+ },
+
+ "claim_ceiling": "P-0 is item-validity verification. No state it can reach is a scientific result."
+}
